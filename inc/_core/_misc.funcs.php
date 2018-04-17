@@ -4118,47 +4118,108 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 
 
 /**
+ * Sends an email to anonymous User
+ *
+ * @param integer Recipient ID.
+ * @param string Subject of the mail
+ * @param string Email template name
+ * @param array Email template params
+ * @param boolean Force to send this email even if the user is not activated. By default not activated user won't get emails.
+ *                Pasword reset, and account activation emails must be always forced.
+ * @param array Additional headers ( headername => value ). Take care of injection!
+ * @param string Use this param if you want use different email address instead of $User->email
+ * @return boolean True if mail could be sent (not necessarily delivered!), false if not - (return value of {@link mail()})
+ */
+function send_mail_to_anonymous_user( $user_email, $user_name, $subject, $template_name, $template_params = array(), $force_on_non_activated = false, $headers = array(), $force_email_address = '' )
+{
+	$template_params['boundary'] = 'b2evo-'.md5( rand() );
+	$headers['Content-Type'] = 'multipart/mixed; boundary="'.$template_params['boundary'].'"';
+
+	if( ! isset( $template_params['anonymous_recipient_name'] ) )
+	{	// Set recipient User, it should be defined for each template because of email footer:
+		$template_params['anonymous_recipient_name'] = $user_name;
+	}
+
+	// Get a message text from template file:
+	$message = mail_template( $template_name, 'auto', $template_params );
+
+	// Autoinsert user's data:
+	$subject = mail_autoinsert_user_data( $subject, NULL, 'text', $user_email, $user_name );
+
+	// Params for email log:
+	$email_campaign_ID = empty( $template_params['ecmp_ID'] ) ? NULL : $template_params['ecmp_ID'];
+	$automation_ID = empty( $template_params['autm_ID'] ) ? NULL : $template_params['autm_ID'];
+
+	if( send_mail( $user_email, $user_name, $subject, $message, NULL, NULL, $headers, NULL, $email_campaign_ID, $automation_ID ) )
+	{	// Email was sent:
+		return true;
+	}
+
+	// No user or email could not be sent:
+	return false;
+}
+
+
+/**
  * Autoinsert user's data into subject or message of the email
  *
  * @param string Text
  * @param object User
+ * @param string Format: 'html', 'text'
+ * @param string Email of anonymous user
+ * @param string Name of anonymous user
  * @return string Text
 */
-function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text' )
+function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user_email = NULL, $user_name = NULL )
 {
-	if( !$User )
-	{	// No user
+	if( ! $User && ! ( $user_email || $user_email ) )
+	{	// No user data:
 		return $text;
 	}
 
-	if( $format == 'html' )
-	{
-		$username = $User->get_colored_login( array(
-				'mask'      => '$avatar$ $login$',
-				'login_text'=> 'name',
-				'use_style' => true,
-				'protocol'  => 'http:',
-			) );
+	if( $User )
+	{	// Get data of registered User:
+		if( $format == 'html' )
+		{
+			$username = $User->get_colored_login( array(
+					'mask'      => '$avatar$ $login$',
+					'login_text'=> 'name',
+					'use_style' => true,
+					'protocol'  => 'http:',
+				) );
 
-		$user_login = $User->get_colored_login( array(
-				'mask'      => '$avatar$ $login$',
-				'use_style' => true,
-				'protocol'  => 'http:',
-			) );
+			$user_login = $User->get_colored_login( array(
+					'mask'      => '$avatar$ $login$',
+					'use_style' => true,
+					'protocol'  => 'http:',
+				) );
+		}
+		else
+		{
+			$username = $User->get_username();
+			$user_login = $User->login;
+		}
+
+		$firstname = $User->get( 'firstname' );
+		$lastname = $User->get( 'lastname' );
+		$firstname_and_login = empty( $firstname ) ? $user_login : $firstname.' ('.$user_login.')';
+		$firstname_or_login = empty( $firstname ) ? $user_login : $firstname;
+		$user_email = $User->email;
+		$user_ID = $User->ID;
+		$unsubscribe_key = '$secret_content_start$'.md5( $User->ID.$User->unsubscribe_key ).'$secret_content_end$';
 	}
 	else
-	{
-		$username = $User->get_username();
-		$user_login = $User->login;
+	{	// Get data of anonymous user:
+		$username = $user_name;
+		$user_login = $user_name;
+		$firstname = $user_name;
+		$lastname = $user_name;
+		$firstname_and_login = $user_name;
+		$firstname_or_login = $user_name;
+		$user_email = $user_email;
+		$user_ID = '';
+		$unsubscribe_key = '';
 	}
-
-	$firstname = $User->get( 'firstname' );
-	$lastname = $User->get( 'lastname' );
-	$firstname_and_login = empty( $firstname ) ? $user_login : $firstname.' ('.$user_login.')';
-	$firstname_or_login = empty( $firstname ) ? $user_login : $firstname;
-	$user_email = $User->email;
-	$user_ID = $User->ID;
-	$unsubscribe_key = '$secret_content_start$'.md5( $User->ID.$User->unsubscribe_key ).'$secret_content_end$';
 
 	$rpls_from = array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$', '$email$', '$user_ID$', '$unsubscribe_key$' );
 	$rpls_to = array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login, $user_email, $user_ID, $unsubscribe_key );
