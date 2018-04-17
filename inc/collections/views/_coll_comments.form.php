@@ -300,6 +300,13 @@ $Form->begin_fieldset( T_('Registration of commenters') . get_manual_link('comme
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset( T_('Comment recycle bin').get_manual_link('recycle-bin-settings') );
+
+	$Form->text_input( 'auto_empty_trash', $Settings->get('auto_empty_trash'), 5, T_('Prune recycled comments after'), T_('days').'. '.T_('Warning: This affects ALL collections on the system.') );
+
+$Form->end_fieldset();
+
+
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>
