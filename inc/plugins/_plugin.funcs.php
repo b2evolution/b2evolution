@@ -1370,7 +1370,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 	{ // the setting is disabled, but allow to update the value when it is forced by $set_value
 		return;
 	}
-	pre_dump($parname);
+
 	if( ! empty( $parmeta['inputs'] ) )
 	{
 		foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )
@@ -1430,6 +1430,8 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 	{ // Get the value from request:
 		$l_value = param( $Obj->get_param_prefix().$parname, $l_param_type, $l_param_default );
 	
+		//pre_dump();
+		
 		// Load [ radio | checklist | checkbox ] from support type of 'select_input'
 		if( isset($parmeta['type']) && $parmeta['type'] == 'select_input' )
 		{
@@ -1447,7 +1449,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
  		{
 			case 'select_input':
 				
-				if( ! empty( $parmeta['entries'] ) )
+				if( ! empty( $parmeta['entries'] ) && is_array( $l_value ) )
 				{
 					foreach( $l_value as $l_index => $l_index_values )
 					{	// If some entry([ radio | checklist | checkbox ] types) is missed:

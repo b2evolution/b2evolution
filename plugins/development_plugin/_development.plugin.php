@@ -186,7 +186,7 @@ class development_plugin extends Plugin
 		
 		return array(
 			
-			
+			/*
 								
 	'_vagtables' => array(
 										'label' 		=> T_('Vegtables'),
@@ -196,19 +196,19 @@ class development_plugin extends Plugin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => 'value1',
+																			'defaultvalue' => 'D value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => 'label1',
+																			'defaultvalue' => 'D label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 								)),
 			
-			
+			*/
 					'single' => array(
 					'label' 		=> T_('Single Input'),
 					'note' 			=> T_('Your note'), 
@@ -237,7 +237,7 @@ class development_plugin extends Plugin
 
 								)))),
 		
-			
+			/*
 			
 					'list' => array(
 					'label' 		=> T_('Single Input'),
@@ -421,8 +421,8 @@ class development_plugin extends Plugin
 			)),
 					
 			), 
-			
 			)
+			*/
 		);
 
 	}
