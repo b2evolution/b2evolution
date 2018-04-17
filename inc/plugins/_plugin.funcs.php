@@ -437,8 +437,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			
 				if( is_array( $set_value ) )
 				{
+					
+					
+					
 					foreach( $set_value as $sv => $sv_data )
-					{
+					{	
 						if( count( $sv_data ) > 1 )
 						{	// Grouped field:
 							if( ! isset( $multiple_par_entries ) )
@@ -486,6 +489,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								// Single field:
 								list( $set_value_entry_name ) = array_keys( $sv_data );
 								
+								list( $group ) = array_keys( $parmeta['entries'] ); 
+								
 								if( isset( $parmeta['entries'][ $set_value_entry_name ] ) )
 								{
 									
@@ -493,6 +498,20 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 														   $parmeta['entries'][ $set_value_entry_name ], 
 														   $Form, $set_type, $Obj, $set_target, $sv_data[ $set_value_entry_name ] );
 									$k_nb++;	
+								}
+								elseif( isset( $parmeta['entries'][$group]['inputs'] ) )
+								{
+									
+									$l_parmeta = array( 
+													'label' 		=> $parmeta['entries'][ $group ]['label'], 
+													'type' 			=> 'input_group', 
+													'inputs' 		=> $parmeta['entries'][ $group ]['inputs'] 
+												);
+									
+									autoform_display_field( $parname.'['.$sv.']['.$group.']', $l_parmeta, $Form, $set_type, $Obj, $set_target, NULL );
+									
+									$k_nb++;	
+									
 								}
 							}
 						}
@@ -530,7 +549,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			
 			if( count( $parmeta['entries'] ) == 1 )
 			{
-				$val = array_keys($parmeta['entries'])[0];
+				list( $val ) = array_keys($parmeta['entries']);
 				
 				$use_single_button = true;
 			}
