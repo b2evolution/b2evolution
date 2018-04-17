@@ -4378,12 +4378,20 @@ class User extends DataObject
 		$UserSettings->dbupdate();
 
 		if( $Settings->get( 'newusers_findcomments' ) )
-		{	// We have to assign the all old comments from current user by email
-			$DB->query( '
-				UPDATE T_comments
-				   SET comment_author_user_ID = "'.$this->ID.'"
+		{	// We have to assign the all old comments from current user by email:
+			$DB->query( 'UPDATE T_comments
+				   SET comment_author_user_ID = '.$DB->quote( $this->ID ).'
 				 WHERE comment_author_email = '.$DB->quote( $this->email ).'
-				   AND comment_author_user_ID IS NULL' );
+				   AND comment_author_user_ID IS NULL',
+				'Assign anonymous comments to register user after activation' );
+			// Subscribe user to posts where he selected "Notify me of replies" on creating those anonymous comments:
+			$SQL = new SQL();
+			$SQL->SELECT( 'DISTINCT comment_item_ID, comment_author_user_ID, 1' );
+			$SQL->FROM( 'T_comments' );
+			$SQL->WHERE( 'comment_author_user_ID = '.$DB->quote( $this->ID ) );
+			$SQL->WHERE_and( 'comment_anon_notify = 1' );
+			$DB->query( 'REPLACE INTO T_items__subscriptions ( isub_item_ID, isub_user_ID, isub_comments ) '.$SQL->get(),
+				'Subscribe user to posts where he selected "Notify me of replies" on creating those anonymous comments' );
 		}
 
 		// Create a welcome private message when user's status was changed to Active
