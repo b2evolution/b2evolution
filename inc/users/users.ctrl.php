@@ -444,7 +444,7 @@ if( !$Messages->has_errors() )
 
 			// Check permission:
 			$current_User->check_perm( 'users', 'edit', true );
-			
+
 			param( 'add_user_tags', 'string', '' );
 			param( 'remove_user_tags', 'string', '' );
 
@@ -503,16 +503,22 @@ else
 	// Load jQuery QueryBuilder plugin files for user list filters:
 	init_querybuilder_js( 'rsc_url' );
 
+	$entries = array(
+		'list' => array(
+			'text' => T_('List'),
+			'href' => '?ctrl=users' ),
+		'duplicates' => array(
+			'text' => T_('Find duplicates'),
+			'href' => '?ctrl=users&amp;tab3=duplicates' ) );
+	$AdminUI->add_menu_entries( array( 'users', 'users' ), $entries );
+
 	switch( $tab3 )
 	{
 		case 'duplicates':
-			//$AdminUI->set_path( 'users', 'duplicates' );
 			$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users&amp;tab3='.$tab3 );
 			break;
 
 		default:
-			//$AdminUI->set_path( 'users', 'list' );
-
 			// Initialize user tag input
 
 			$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users' );
