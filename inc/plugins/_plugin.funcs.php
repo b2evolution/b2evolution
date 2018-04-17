@@ -1028,20 +1028,6 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				{
 					$l_parmeta['group'] = $parname; // inject group	
 					
-					if( isset( $parmeta['group_type'] ) && $parmeta['group_type'] == 'select_input' )
-					{
-						$l_parmeta['group_type'] = $parmeta['group_type'];
-							
-						if( ( $p = strrpos( $parname, '[' ) ) !== false )
-						{
-							//$l_parmeta['group'] = str_replace(array('[',']'),'',substr( $parname, $p));
-						}
-					}
-					
-					/*
-					*	TODO: > Default values will NOT be loaded for dynamic types!
-					*/
-					
 					// RECURSE:
 					autoform_display_field( $l_parname, $l_parmeta, $Form, $set_type, $Obj, $set_target, $use_value );	
 					
@@ -1384,7 +1370,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 	{ // the setting is disabled, but allow to update the value when it is forced by $set_value
 		return;
 	}
-
+	pre_dump($parname);
 	if( ! empty( $parmeta['inputs'] ) )
 	{
 		foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )

@@ -186,6 +186,8 @@ class development_plugin extends Plugin
 		
 		return array(
 			
+			
+								
 	'_vagtables' => array(
 										'label' 		=> T_('Vegtables'),
 										'type' 			=> 'input_group',
@@ -206,20 +208,11 @@ class development_plugin extends Plugin
 																		),
 								)),
 			
-
-	'info_1' => array(
-						'label' => T_('Following'),
-						'info' => 'Type: \'select_input\'<br>\'max_number 	=> 4 \'<br>\'<font color=red><b>use_fieldset 	=> true</b></font> \'<br>\'fold 	=> true \'<br>\'entries 	=>  array("Vegtables", "Fruits") <br> This will display a <font color=red><b>list</b></font>\'',
-						'type' => 'info',
-					),
-
-					'input_item_1' => array(
-					'label' 		=> T_('Select Input'),
-					'note' 			=> T_('Your note'),
-					'multiple' 		=> true, 
-					'max_number' 	=> 4,
-					'use_fieldset' 	=> true, 
-					'fold' 			=> true, 
+			
+					'single' => array(
+					'label' 		=> T_('Single Input'),
+					'note' 			=> T_('Your note'), 
+					'max_number' 	=> 4, 
 					'type' 			=> 'select_input',
 					'entries' 		=> array(
 
@@ -231,58 +224,25 @@ class development_plugin extends Plugin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => 'value',
+																			'defaultvalue' => 'D single value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => 'label',
+																			'defaultvalue' => 'D single label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 
-								)),
-									'_fruits' => array(
-										'label' 		=> T_('Fruits'),
-										'type' 			=> 'input_group',
-										'inputs' 		=> array(
-
-
-														'_value' => array(
-																			'label' => T_('Value'),
-																			'defaultvalue' => 'value',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-														'_label' => array(
-																			'label' => T_('Label'),
-																			'defaultvalue' => 'label',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-
-								)),
-
-
-
-
-			)),
-
-
-	'info_2' => array(
-						'label' => T_('Following'),
-						'info' => 'Type: \'select_input\'<br>\'max_number 	=> 4 \'<br>\'<font color=red><b>use_fieldset 	=> false</b></font> \'<br>\'fold 	=> no affect \'<br>\'entries 	=>  array("Vegtables", "Fruits") <br> This will display a <font color=red><b>list</b></font>\'',
-						'type' => 'info',
-					),
-
-					'input_item_2' => array(
-					'label' 		=> T_('Select Input'),
-					'note' 			=> T_('Your note'),
-					'multiple' 		=> true, 
-					'max_number' 	=> 4,
-					'use_fieldset' 	=> false, 
-					'fold' 			=> true, 
+								)))),
+		
+			
+			
+					'list' => array(
+					'label' 		=> T_('Single Input'),
+					'note' 			=> T_('Your note'), 
+					'max_number' 	=> 4, 
 					'type' 			=> 'select_input',
 					'entries' 		=> array(
 
@@ -314,13 +274,13 @@ class development_plugin extends Plugin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => 'value',
+																			'defaultvalue' => 'D list value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => 'label',
+																			'defaultvalue' => 'D list label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
@@ -351,59 +311,7 @@ class development_plugin extends Plugin
 
 
 			)),
-
-
-	'info_3' => array(
-						'label' => T_('Following'),
-						'info' => 'Type: \'select_input\'<br>\'max_number 	=> 4 \'<br>\'use_fieldset 	=> false \'<br>\'fold 	=> no affect \'<br>\'entries 	=>  array("Vegtables") <br> This will display a  <font color=red><b>button</b></font>\'',
-						'type' => 'info',
-					),
-
-					'input_item_3' => array(
-					'label' 		=> T_('Select Input'),
-					'note' 			=> T_('Your note'),
-					'multiple' 		=> true, 
-					'max_number' 	=> 4,
-					'use_fieldset' 	=> false, 
-					'fold' 			=> true, 
-					'type' 			=> 'select_input',
-					'entries' 		=> array(
-
-									'_vagtables' => array(
-										'label' 		=> T_('Vegtables'),
-										'type' 			=> 'input_group',
-										'inputs' 		=> array(
-
-
-														'_value' => array(
-																			'label' => T_('Value'),
-																			'defaultvalue' => 'value',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-														'_label' => array(
-																			'label' => T_('Label'),
-																			'defaultvalue' => 'label',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-
-								)),
-
-
-
-
-
-			)),
-
-				'info_4' => array(
-						'label' => T_('Following'),
-						'info' => 'Type: \'array:array:string\'<br>\'<font color=red><b>max_number 	=> 3</b></font> \'<br>\'fold 	=> true \'',
-						'type' => 'info',
-					),
-
-
-							'plugin_sets'	=> array(
+		'plugin_sets'	=> array(
 												'label'			=> T_('Dynamic Fields'),
 												'note'			=> T_('Click to add another field item'),
 												// limited by array:array:string therefore html_textarea won't work
@@ -412,40 +320,37 @@ class development_plugin extends Plugin
 												'fold' => true,
 												'entries'		=> array(
 			
-						'plugin_sets'	=> array(
-												'label'			=> T_('Dynamic Fields'),
-												'note'			=> T_('Click to add another field item'),
-												// limited by array:array:string therefore html_textarea won't work
-												'type'			=> version_compare( $app_version, '6.6.5', '>' ) ? 'array:array:string' : 'array',
-												'max_number'		=> 3,
-												'fold' => true,
-												'entries'		=> array(
+								'single' => array(
+										'label' 		=> T_('Single Input'),
+										'note' 			=> T_('Your note'), 
+										'max_number' 	=> 4, 
+										'type' 			=> 'select_input',
+										'entries' 		=> array(
+
+														'_vagtables' => array(
+															'label' 		=> T_('Vegtables'),
+															'type' 			=> 'input_group',
+															'inputs' 		=> array(
 
 
+																			'_value' => array(
+																								'label' => T_('Value'),
+																								'defaultvalue' => 'DD single value',
+																								'type' => 'text',
+																								//'allow_empty' => false,
+																							),
+																			'_label' => array(
+																								'label' => T_('Label'),
+																								'defaultvalue' => 'DD single label',
+																								'type' => 'text',
+																								//'allow_empty' => false,
+																							),
 
-
-														'_value' => array(
-																			'label' => T_('Color'),
-																			'defaultvalue' => '#444444',
-																			'type' => 'color',
-																			//'allow_empty' => false,
-																		)
-	)),
-
-
-	'info_1' => array(
-						'label' => T_('Following'),
-						'info' => 'Type: \'select_input\'<br>\'max_number 	=> 4 \'<br>\'<font color=red><b>use_fieldset 	=> true</b></font> \'<br>\'fold 	=> true \'<br>\'entries 	=>  array("Vegtables", "Fruits") <br> This will display a <font color=red><b>list</b></font>\'',
-						'type' => 'info',
-					),
-
-					'input_item_1' => array(
-					'label' 		=> T_('Select Input'),
-					'note' 			=> T_('Your note'),
-					'multiple' 		=> true, 
-					'max_number' 	=> 4,
-					'use_fieldset' 	=> true, 
-					'fold' 			=> true, 
+								)))),
+			'list' => array(
+					'label' 		=> T_('Single Input'),
+					'note' 			=> T_('Your note'), 
+					'max_number' 	=> 4, 
 					'type' 			=> 'select_input',
 					'entries' 		=> array(
 
@@ -457,13 +362,13 @@ class development_plugin extends Plugin
 
 														'_value' => array(
 																			'label' => T_('Color'),
-																			'defaultvalue' => '#444444',
+																			'defaultvalue' => '#f8a5e3',
 																			'type' => 'color',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Color'),
-																			'defaultvalue' => '#444444',
+																			'defaultvalue' => '#f8a5e3',
 																			'type' => 'color',
 																			//'allow_empty' => false,
 																		),
@@ -477,13 +382,13 @@ class development_plugin extends Plugin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => 'value',
+																			'defaultvalue' => 'DD list value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => 'label',
+																			'defaultvalue' => 'DD list label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
@@ -497,13 +402,13 @@ class development_plugin extends Plugin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => 'value',
+																			'defaultvalue' => 'DD list value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => 'label',
+																			'defaultvalue' => 'DD list label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
@@ -514,48 +419,11 @@ class development_plugin extends Plugin
 
 
 			)),
-
-
-
-	'info_2' => array(
-						'label' => T_('Following'),
-						'info' => 'Type: \'select_input\'<br>\'max_number 	=> 4 \'<br>\'use_fieldset 	=> false \'<br>\'fold 	=> no affect \'<br>\'entries 	=>  array("Vegtables") <br> This will display a  <font color=red><b>button</b></font>\'',
-						'type' => 'info',
-					),
-
-					'input_item_3' => array(
-					'label' 		=> T_('Select Input'),
-					'note' 			=> T_('Your note'),
-					'multiple' 		=> true, 
-					'max_number' 	=> 4,
-					'use_fieldset' 	=> false, 
-					'fold' 			=> true, 
-					'type' 			=> 'select_input',
-					'entries' 		=> array(
-
-									'_vagtables' => array(
-										'label' 		=> T_('Vegtables'),
-										'type' 			=> 'input_group',
-										'inputs' 		=> array(
-
-
-														'_value' => array(
-																			'label' => T_('Value'),
-																			'defaultvalue' => 'value',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-														'_label' => array(
-																			'label' => T_('Label'),
-																			'defaultvalue' => 'label',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-								)),
-			)),
-	))
-
-				);
+					
+			), 
+			
+			)
+		);
 
 	}
 	

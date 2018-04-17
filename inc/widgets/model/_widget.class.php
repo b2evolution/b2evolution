@@ -416,21 +416,26 @@ class ComponentWidget extends DataObject
 	function get_param( $parname, $check_infinite_loop = false, $group = NULL )
 	{
 		$this->load_param_array();
-
+		
 		// Note we set 'infinite_loop' param to avoid calling the get_param() from the get_param_definitions() function recursively
 		$params = $this->get_param_definitions( $check_infinite_loop ? array( 'infinite_loop' => true ) : NULL );
 		
 		if( strpos( $parname, '[' ) !== false )
 		{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
+			
+			// strip out all the iterations
+			$parname = str_replace( ']', '', preg_replace('/\[\d\]/', '', $parname ) );
+			
 			$setting_names = explode( '[', $parname );
-
+			
 			/* 
 			* match $params level to $parname
 			*/ 
-			for( $i = 0; $i < count( $setting_names ) - 1; $i++ )
+			for( $i = 0; $i < count( $setting_names ); $i++ )
 			{
 				if( isset( $params[ $setting_names[$i] ] ) )
 				{
+					
 					if( isset( $params[ $setting_names[$i] ]['entries'] ) )
 					{
 
@@ -445,16 +450,6 @@ class ComponentWidget extends DataObject
 			{
 				$setting_value = $this->param_array[ $setting_names[0] ];
 				
-				if( isset( $params[ $setting_names[0] ] ) && isset( $setting_names[1] ) )
-				{
-
-					if( is_numeric(trim( $setting_names[1], ']' )) && isset( $params[ $setting_names[0] ]['entries'] ))
-					{
-
-						$params = $params[ $setting_names[0] ]['entries'];
-					}
-				}
-				
 				unset( $setting_names[0] );
 				foreach( $setting_names as $setting_name )
 				{
@@ -465,11 +460,7 @@ class ComponentWidget extends DataObject
 					}
 					else
 					{
-						
-						if( isset( $setting_names[2] ) )
-						{
-							$parname = substr( trim( $setting_names[2], ']' ), strlen( $group ) );
-						}
+						$parname = substr( end( $setting_names ), strlen( $group ) );
 						
 						if( isset( $params[ $group ]['type'] ) )
 						{
@@ -524,9 +515,9 @@ class ComponentWidget extends DataObject
 		}
 
 		// Try default values:
-
 		if( $group === NULL )
 		{	// Get param from simple field:
+			
 			if( isset( $params[$parname]['defaultvalue'] ) )
 			{	// We have a default value:
 				return $params[$parname]['defaultvalue'] ;
@@ -536,13 +527,7 @@ class ComponentWidget extends DataObject
 		{
 			$setting_names = explode( '[', $parname );
 			
-			if( isset( $setting_names[2] ) )
-			{
-				$parname = trim( $setting_names[2], ']' );
-			}
-			
-			$parname = substr( $parname, strlen( $group ) );
-			
+			$parname = substr( end($setting_names), strlen( $group ) );
 			// Get param from group field:
 			//$parname = substr( $parname, strlen( $group ) );
 			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
@@ -553,7 +538,6 @@ class ComponentWidget extends DataObject
 
 		return NULL;
 	}
-
 
 	/**
 	 * Set param value
