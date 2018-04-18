@@ -4200,8 +4200,21 @@ class Comment extends DataObject
 					}
 					else
 					{	// Subject for subscribed users:
-						/* TRANS: Subject of the mail to send on new comments to subscribed users. First %s is blog name, the second %s is the item's title. */
-						$subject = T_('[%s] New comment on "%s"');
+						switch( $this->get_author_type( $notify_User, $notify_email ) )
+						{	// Set email title depending on author type:
+							case 'parent':
+								/* TRANS: Subject of the mail to send on new comments to subscribed users. First %s is blog name, the second %s is the item's title. */
+								$subject = T_('[%s] Someone replied to your comment on "%s"');
+								break;
+							case 'normal':
+								/* TRANS: Subject of the mail to send on new comments to subscribed users. First %s is blog name, the second %s is the item's title. */
+								$subject = T_('[%s] Someone else commented after you on "%s"');
+								break;
+							case 'none':
+							default:
+								/* TRANS: Subject of the mail to send on new comments to subscribed users. First %s is blog name, the second %s is the item's title. */
+								$subject = T_('[%s] New comment on "%s"');
+						}
 					}
 					$subject = sprintf( $subject, $comment_item_Blog->get('shortname'), $comment_Item->get('title') );
 			}
@@ -4264,6 +4277,76 @@ class Comment extends DataObject
 		}
 
 		blocked_emails_display();
+	}
+
+
+	/**
+	 * Get author type depending on where he posted a comment in the same item as this comment
+	 *
+	 * @param object Author User (for registered User)
+	 * @param object Author email address (for anonymous user)
+	 * @return string 'parent' - user is owner of some comment's parent,
+	 *                'normal' - author posted at least one comment in the comment's item,
+	 *                'none' - author didn't post any comment in the comment's item.
+	 */
+	function get_author_type( $author_User, $author_email = NULL )
+	{
+		if( ! isset( $this->item_authors ) )
+		{	// Load it once and store into a cache array to don't load twice:
+			global $DB;
+
+			$comment_Item = & $this->get_Item();
+			$comment_item_Blog = & $comment_Item->get_Blog();
+
+			$this->item_authors = array();
+
+			if( $comment_item_Blog->get_setting( 'threaded_comments' ) )
+			{	// If the threaded comments are enabled for the collection:
+				$parent_comment_ID = $this->get( 'in_reply_to_cmt_ID' );
+				while( $parent_comment_ID !== NULL )
+				{	// Find all parents from this comment to root:
+					$SQL = new SQL( 'Get parent of comment #'.$this->ID.' to decide email notification title' );
+					$SQL->SELECT( 'comment_in_reply_to_cmt_ID as ID, IFNULL( comment_author_user_ID, comment_author_email ) AS author_ID_or_email' );
+					$SQL->FROM( 'T_comments' );
+					$SQL->WHERE( 'comment_ID = '.$DB->quote( $parent_comment_ID ) );
+					if( $parent_comment = $DB->get_row( $SQL ) )
+					{	// If parent comment is detected:
+						$parent_comment_ID = $parent_comment->ID;
+						// Mark such author as commenter of parent comment:
+						$this->item_authors[ $parent_comment->author_ID_or_email ] = 'parent';
+					}
+					else
+					{	// No parent comment:
+						$parent_comment_ID = NULL;
+					}
+				}
+			}
+
+			$SQL = new SQL( 'Get all comments authors from item of the comment #'.$this->ID );
+			$SQL->SELECT( 'DISTINCT IFNULL( comment_author_user_ID, comment_author_email ) AS author_ID_or_email' );
+			$SQL->FROM( 'T_comments' );
+			$SQL->WHERE( 'comment_item_ID = '.$DB->quote( $this->get( 'item_ID' ) ) );
+			$other_authors = $DB->get_col( $SQL );
+			foreach( $other_authors as $other_author_ID_or_email )
+			{
+				if( ! isset( $this->item_authors[ $other_author_ID_or_email ] ) )
+				{	// Mark such author as normal commenter:
+					$this->item_authors[ $other_author_ID_or_email ] = 'normal';
+				}
+			}
+		}
+
+		if( $author_User && isset( $this->item_authors[ $author_User->ID ] ) )
+		{	// If a registered user posted at least one comment in the same item where this comment is posted:
+			return $this->item_authors[ $author_User->ID ];
+		}
+		elseif( $author_email && isset( $this->item_authors[ $author_email ] ) )
+		{	// If anonymous user posted at least one comment in the same item where this comment is posted:
+			return $this->item_authors[ $author_email ];
+		}
+
+		// User is not posted a comment in the same item where this comment is posted yet:
+		return 'none';
 	}
 
 
