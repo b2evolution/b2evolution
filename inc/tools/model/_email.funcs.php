@@ -815,7 +815,12 @@ function test_smtp_transport( & $Swift_SmtpTransport )
  */
 function & get_Swift_SmtpTransport()
 {
-	global $Settings;
+	global $Settings, $Swift_SmtpTransport;
+
+	if( isset( $Swift_SmtpTransport ) )
+	{	// Get SMTP Swift Transport from cached global variable:
+		return $Swift_SmtpTransport;
+	}
 
 	// Load Swift Mailer functions:
 	load_funcs( '_ext/swift/swift_required.php' );
@@ -858,6 +863,13 @@ function & get_Swift_SmtpTransport()
  */
 function & get_Swift_Mailer()
 {
+	global $Swift_Mailer;
+
+	if( isset( $Swift_Mailer ) )
+	{	// Get SMTP Swift Mailer from cached global variable:
+		return $Swift_Mailer;
+	}
+
 	// Create Transport
 	$Swift_SmtpTransport = & get_Swift_SmtpTransport();
 
