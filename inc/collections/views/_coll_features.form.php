@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $edited_Blog, $AdminUI, $Settings;
+global $edited_Blog, $AdminUI, $Settings, $admin_url;
 $notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 $Form = new Form( NULL, 'coll_features_checkchanges' );
@@ -311,6 +311,18 @@ $Form->begin_fieldset( T_('Workflow').get_manual_link( 'coll-workflow-settings' 
 $Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+
+
+echo '<div class="well">';
+echo '<p>'.sprintf( T_('You can find more settings in the <a %s>Post Types</a>, including:'), 'href="'.$admin_url.'?blog='.$edited_Blog->ID.'&amp;ctrl=itemtypes&amp;ityp_ID='.$edited_Blog->get_setting( 'default_post_type' ).'&amp;action=edit"' ).'</p>';
+echo '<ul>';
+echo '<li>'.T_('Display instructions').'</li>';
+echo '<li>'.T_('Use title').', '.T_('Use text').', '.T_('Allow HTML').'...</li>';
+echo '<li>'.T_('Use of Advanced Properties').' ('.T_('Tags').', '.T_('Excerpt').'...)</li>';
+echo '<li>'.T_('Use of Location').'</li>';
+echo '<li>'.T_('Use of Custom Fields').'</li>';
+echo '</ul>';
+echo '</div>';
 
 ?>
 <script type="text/javascript">
