@@ -134,7 +134,7 @@ if( $item_id > 0 && ! $is_meta_comments_list && $comments_number > 0 )
 	echo_comment_status_buttons( $Form, NULL, $item_status, 'set_visibility' );
 	echo_status_dropdown_button_js( 'comment' );
 
-	if( $current_User->check_perm( 'blog_post_statuses', 'edit', true, $blog ) )
+	if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $blog ) )
 	{	// Display a button to create a post from selected comments:
 		echo ' '.T_('or').' ';
 		$Form->button( array( 'submit', 'actionArray[create_comments_post]', T_('Create new Post'), 'btn-warning' ) );
