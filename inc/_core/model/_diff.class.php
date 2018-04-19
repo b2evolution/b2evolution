@@ -332,8 +332,7 @@ class _DiffEngine {
 					continue;
 				}
 				$matches = $ymatches[$line];
-				reset( $matches );
-				//while ( list( , $y ) = each( $matches ) ) {
+
 				foreach( $matches as $key => $y ) {
 					if ( empty( $this->in_seq[$y] ) ) {
 						$k = $this->_lcs_pos( $y );
@@ -342,7 +341,6 @@ class _DiffEngine {
 						break;
 					}
 				}
-				//while ( list ( , $y ) = each( $matches ) ) {
 				foreach( $matches as $key => $y ) {
 					if ( $y > $this->seq[$k -1] ) {
 						assert( $y < $this->seq[$k] );
