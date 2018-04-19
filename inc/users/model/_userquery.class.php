@@ -157,7 +157,7 @@ class UserQuery extends FilterSQL
 	/**
 	 * Restrict by user IDs
 	 *
-	 * @param array User IDs
+	 * @param array User IDs array, if first item is "-1" then exclude the users
 	 */
 	function where_user_IDs( $user_IDs )
 	{
@@ -168,7 +168,19 @@ class UserQuery extends FilterSQL
 			return;
 		}
 
-		$this->WHERE_and( 'user_ID IN ( '.$DB->quote( $user_IDs ).' ) ');
+		if( $user_IDs[0] == '-1' )
+		{	// Exclude users if first char is "-":
+			$sql_operator = 'NOT IN';
+			// Remove the first char "-":
+			unset( $user_IDs[0] );
+		}
+		else
+		{	// Include users with requested IDs:
+			$sql_operator = 'IN';
+		}
+
+
+		$this->WHERE_and( 'user_ID '.$sql_operator.' ( '.$DB->quote( $user_IDs ).' ) ');
 	}
 
 

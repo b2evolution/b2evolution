@@ -5353,6 +5353,112 @@ function user_reports_results_block( $params = array() )
 
 
 /**
+ * Merge two users with displaying a log on the screen
+ *
+ * @param integer ID of user who is merged
+ * @param integer ID of remaining user
+ */
+function merge_users( $merging_user_ID, $remaining_user_ID )
+{
+	global $admin_url, $DB;
+
+	$UserCache = & get_UserCache();
+	$merging_User = & $UserCache->get_by_ID( $merging_user_ID );
+	$remaining_User = & $UserCache->get_by_ID( $remaining_user_ID );
+
+	$merging_user_login =  get_user_identity_link( '', $merging_user_ID );
+	$remaining_user_login =  get_user_identity_link( '', $remaining_user_ID );
+
+	// Start panel of the merging log:
+	echo '<div class="panel panel-warning">';
+		echo '<div class="panel-heading"><h3 class="panel-title">'.sprintf( T_('Merging user %s:'), $merging_user_login ).'</h3></div>';
+		echo '<div class="panel-body">';
+			echo '<h3 class="evo_confirm_delete__title">'.T_('A merging of this user are doing the following actions:').'</h3>';
+
+	// Config what should be merged:
+	$merge_config = array(
+		// 0 - log message, 1 - db table name, 2 - db column name which should be merged:
+		array( T_('Moving user settings from %s to %s'),              'T_users__usersettings', 'uset_user_ID' ),
+		array( T_('Moving user fields from %s to %s'),                'T_users__fields', 'uf_user_ID' ),
+		array( T_('Moving user own organizations from %s to %s'),     'T_users__organization', 'org_owner_user_ID' ),
+		array( T_('Moving membership in organization from %s to %s'), 'T_users__user_org', 'uorg_user_ID' ),
+		array( T_('Moving user reports from %s to %s'),               'T_users__reports', 'urep_reporter_ID' ),
+		array( T_('Moving user secondary groups from %s to %s'),      'T_users__secondary_user_groups', 'sug_user_ID' ),
+		array( T_('Moving user tags from %s to %s'),                  'T_users__usertag', 'uutg_user_ID' ),
+		array( T_('Moving user visits from %s to %s'),                'T_users__profile_visits', 'upv_visitor_user_ID' ),
+		array( T_('Moving plugin settings from %s to %s'),            'T_pluginusersettings', 'puset_user_ID' ),
+		array( T_('Moving Collections from %s to %s'),                'T_blogs', 'blog_owner_user_ID' ),
+		array( T_('Moving collection permissions from %s to %s'),     'T_coll_user_perms', 'bloguser_user_ID' ),
+		array( T_('Moving collection subscriptions %s to %s'),        'T_subscriptions', 'sub_user_ID' ),
+		array( T_('Moving favorite collections from %s to %s'),       'T_coll_user_favs', 'cufv_user_ID' ),
+		array( T_('Moving own Posts from %s to %s'),                  'T_items__item', 'post_creator_user_ID' ),
+		array( T_('Moving edited Posts from %s to %s'),               'T_items__item', 'post_lastedit_user_ID' ),
+		array( T_('Moving assigned Posts from %s to %s'),             'T_items__item', 'post_assigned_user_ID' ),
+		array( T_('Moving post subscriptions from %s to %s'),         'T_items__subscriptions', 'isub_user_ID' ),
+		array( T_('Moving post read data from %s to %s'),             'T_items__user_data', 'itud_user_ID' ),
+		array( T_('Moving post edit histories from %s to %s'),        'T_items__version', 'iver_edit_user_ID' ),
+		array( T_('Moving post votes from %s to %s'),                 'T_items__votes', 'itvt_user_ID' ),
+		array( T_('Moving Comments from %s to %s'),                   'T_comments', 'comment_author_user_ID' ),
+		array( T_('Moving comment votes from %s to %s'),              'T_comments__votes', 'cmvt_user_ID' ),
+		array( T_('Moving private messages from %s to %s'),           'T_messaging__message', 'msg_author_user_ID' ),
+		array( T_('Moving thread read status from %s to %s'),         'T_messaging__threadstatus', 'tsta_user_ID' ),
+		array( T_('Moving contacts from %s to %s'),                   'T_messaging__contact', 'mct_from_user_ID' ),
+		array( T_('Moving to contact lists from %s to %s'),           'T_messaging__contact', 'mct_to_user_ID' ),
+		array( T_('Moving own contact groups from %s to %s'),         'T_messaging__contact_groups', 'cgr_user_ID' ),
+		array( T_('Moving to contact groups from %s to %s'),          'T_messaging__contact_groupusers', 'cgu_user_ID' ),
+		array( T_('Moving own Automations from %s to %s'),            'T_automation__automation', 'autm_owner_user_ID' ),
+		array( T_('Moving automation step states from %s to %s'),     'T_automation__user_state', 'aust_user_ID' ),
+		array( T_('Moving campaign send statuses from %s to %s'),     'T_email__campaign_send', 'csnd_user_ID' ),
+		array( T_('Moving email logs from %s to %s'),                 'T_email__log', 'emlog_user_ID' ),
+		array( T_('Moving newsletter subscriptions %s to %s'),        'T_email__newsletter_subscription', 'enls_user_ID' ),
+		array( T_('Moving own files %s to %s'),                       'T_files', 'file_creator_user_ID' ),
+		array( T_('Moving own file Links %s to %s'),                  'T_links', 'link_creator_user_ID' ),
+		array( T_('Moving edited file Links %s to %s'),               'T_links', 'link_lastedit_user_ID' ),
+		array( T_('Moving user file Links %s to %s'),                 'T_links', 'link_usr_ID' ),
+		array( T_('Moving file link votes %s to %s'),                 'T_links__vote', 'lvot_user_ID' ),
+		array( T_('Moving own Polls %s to %s'),                       'T_polls__question', 'pqst_owner_user_ID' ),
+		array( T_('Moving poll answers %s to %s'),                    'T_polls__answer', 'pans_user_ID' ),
+		array( T_('Moving sessions %s to %s'),                        'T_sessions', 'sess_user_ID' ),
+		array( T_('Moving system logs %s to %s'),                     'T_syslog', 'slg_user_ID' ),
+	);
+
+	// Display the merging actions:
+	echo '<ul>';
+	foreach( $merge_config as $mc )
+	{	// Print out a merging log of each db column separately:
+		echo '<li>'.sprintf( $mc[0], $merging_user_login, $remaining_user_login ).'...';
+		evo_flush();
+
+		// Execute a merging query:
+		// NOTE: We use here the IGNORE modifier in order to avoid error of duplicate entries:
+		$affected_rows = $DB->query( 'UPDATE IGNORE '.$mc[1].'
+			  SET '.$mc[2].' = '.$remaining_User->ID.'
+			WHERE '.$mc[2].' = '.$merging_User->ID );
+
+		if( $mc[1] == 'T_links' && $mc[2] == 'link_usr_ID' )
+		{	// Also move the files from merging user folder to remaining user folder:
+			$FileRootCache = & get_FileRootCache();
+			move_files_r( $FileRootCache->get_root_dir( 'user', $merging_User->ID ), $FileRootCache->get_root_dir( 'user', $remaining_User->ID ) );
+		}
+
+		// Display how much records have been merged:
+		echo sprintf( T_('%d records'), intval( $affected_rows ) ).'.';
+
+		echo '</li>';
+	}
+	echo '</ul>';
+
+	// Button to merge and delete the user:
+	echo '<a href="'.$admin_url.'?ctrl=user&amp;user_tab=activity&amp;action=delete_all_userdata&amp;user_ID='.$merging_user_ID.'&amp;'.url_crumb( 'user' ).'" class="btn btn-danger">'.sprintf( T_('Delete User %s'), $merging_User->get( 'login' ) ).'</a>';
+	// Button to cancel the merging:
+	echo ' <a href="'.$admin_url.'?ctrl=users&amp;tab3=duplicates" class="btn btn-default">'.T_('Close').'</a>';
+
+		echo '</div>'; // END OF panel-body
+	echo '</div>'; // END OF panel
+}
+
+
+/**
  * Initialize Results object for threads list
  *
  * @param object Results
@@ -5420,6 +5526,7 @@ function users_results_block( $params = array() )
 			'viewed_user'          => NULL,
 			'reg_ip_min'           => NULL,
 			'reg_ip_max'           => NULL,
+			'exclude_users'        => NULL, // Exclude users by ID (string is separated by comma)
 			'filterset_name'       => 'admin',
 			'results_param_prefix' => 'users_',
 			'results_title'        => T_('Users').get_manual_link('users_and_groups'),
@@ -5439,6 +5546,8 @@ function users_results_block( $params = array() )
 			'display_btn_adduser'  => true,
 			'display_btn_addgroup' => true,
 			'display_btn_adduserorg' => false,
+			'display_btn_merge'    => false,
+			'display_selector'     => false,
 			'display_ID'           => true,
 			'display_avatar'       => true,
 			'display_login'        => true,
@@ -5484,6 +5593,7 @@ function users_results_block( $params = array() )
 			'display_enls_send_count'      => false,
 			'display_actions'      => true,
 			'display_org_actions'  => false,
+			'display_dupl_actions' => false,
 			'display_newsletter'   => true,
 			'display_automation'   => false,
 			'display_btn_tags'     => false,
@@ -5558,7 +5668,10 @@ function users_results_block( $params = array() )
 		$UserList->set_order( 'user_created_datetime' );
 	}
 
-	// Execute query
+	// Exclude users by ID:
+	$UserList->exclude_users = $params['exclude_users'];
+
+	// Execute query:
 	$UserList->query();
 
 	// Display number of rows in the title
@@ -5635,6 +5748,17 @@ function users_results_block( $params = array() )
 		$UserList->display( $params['display_params'] );
 	}
 
+	if( $params['display_btn_merge'] )
+	{	// Display a button to merge users:
+		echo '<p>';
+		echo get_icon( 'multi_action', 'imgtag', array( 'style' => 'margin:0 5px 0 14px' ) );
+		echo '<a href="'.$admin_url.'?ctrl=users&amp;tab3=duplicates&amp;action=merge&amp;merging_user_ID='.get_param( 'merging_user_ID' ).'&amp;'.url_crumb( 'user' ).'"'
+			.' class="btn btn-warning" onclick="return merge_duplicated_users( this )">'
+				.T_('Merge')
+			.'</a>';
+		echo '</p>';
+	}
+
 	$user_list_buttons = array();
 
 	if( $params['display_btn_tags'] && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
@@ -5699,6 +5823,7 @@ function users_results( & $UserList, $params = array() )
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
 			'display_orgstatus'  => false,
+			'display_selector'   => false,
 			'display_ID'         => true,
 			'display_avatar'     => true,
 			'display_login'      => true,
@@ -5746,9 +5871,10 @@ function users_results( & $UserList, $params = array() )
 			'display_enls_last_open'       => false,
 			'display_enls_last_click'      => false,
 			'display_enls_send_count'      => false,
-			'display_actions'    => true,
-			'display_campaign_actions' => false,
-			'display_org_actions'=> false,
+			'display_actions'              => true,
+			'display_campaign_actions'     => false,
+			'display_org_actions'          => false,
+			'display_dupl_actions'         => false,
 			'th_class_avatar'    => 'shrinkwrap small',
 			'td_class_avatar'    => 'shrinkwrap center small',
 			'avatar_size'        => 'crop-top-48x48',
@@ -5802,6 +5928,15 @@ function users_results( & $UserList, $params = array() )
 			);
 	}
 
+	if( $params['display_selector'] )
+	{ // Display ID
+		$UserList->cols[] = array(
+				'th' => '',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'td' => '%user_td_selector( #user_ID# )%',
+			);
+	}
 
 	if( $params['display_ID'] )
 	{ // Display ID
@@ -6382,7 +6517,7 @@ function users_results( & $UserList, $params = array() )
 		}
 
 		if( $params['display_org_actions'] )
-		{
+		{	// Display actions for organization's users:
 			$UserList->cols[] = array(
 					'th' => T_('Actions'),
 					'th_class' => 'small',
@@ -6392,12 +6527,22 @@ function users_results( & $UserList, $params = array() )
 		}
 
 		if( $params['display_campaign_actions'] )
-		{
+		{	// Display actions for email campaign's users:
 			$UserList->cols[] = array(
 					'th' => T_('Actions'),
 					'th_class' => 'small',
 					'td_class' => 'shrinkwrap small',
 					'td' => '%user_td_campaign_actions( '.intval( $params['ecmp_ID'] ).', #user_ID#, #csnd_status# )%'
+				);
+		}
+
+		if( $params['display_dupl_actions'] )
+		{	// Display action for duplicated users:
+			$UserList->cols[] = array(
+					'th' => T_('Actions'),
+					'th_class' => 'small',
+					'td_class' => 'shrinkwrap small',
+					'td' => '%user_td_dupl_actions( #user_ID# )%'
 				);
 		}
 
@@ -6423,6 +6568,27 @@ function get_report_status_text( $status )
 {
 	$statuses = get_report_statuses();
 	return isset( $statuses[ $status ] ) ? $statuses[ $status ] : '';
+}
+
+
+/**
+ * Helper function to display user radio selector
+ *
+ * @param integer User_ID
+ * @return string
+ */
+function user_td_selector( $user_ID )
+{
+	global $current_User;
+
+	$r = '';
+	if( $current_User->can_moderate_user( $user_ID ) )
+	{	// Allow to select users for actions only if current user can moderate this user:
+		$r .= '<input type="radio" name="selected_user_ID" value="'.$user_ID.'"'.
+			( param( 'selected_user_ID', 'integer' ) == $user_ID ? ' checked="checked"' : '' ).' />';
+	}
+
+	return $r;
 }
 
 
@@ -6798,10 +6964,9 @@ function user_td_soclinks( $User )
 
 
 /**
- * Get user level as link to edit ot as simple text to view
+ * Get user actions
  *
  * @param integer User_ID
- * @param integer User Level
  * @return string
  */
 function user_td_actions( $user_ID )
@@ -6833,11 +6998,12 @@ function user_td_actions( $user_ID )
 	return $r;
 }
 
+
 /**
- * Get user level as link to edit ot as simple text to view
+ * Get user actions to work with organization
  *
- * @param integer User_ID
- * @param integer User Level
+ * @param integer Organization ID
+ * @param integer User ID
  * @return string
  */
 function user_td_org_actions( $org_ID, $user_ID )
@@ -6861,6 +7027,25 @@ function user_td_org_actions( $org_ID, $user_ID )
 		$r .= get_icon( 'edit', 'noimg' );
 	}
 
+	return $r;
+}
+
+
+/**
+ * Get user level as link to edit ot as simple text to view
+ *
+ * @param integer User_ID
+ * @return string
+ */
+function user_td_dupl_actions( $user_ID )
+{
+	global $current_User;
+
+	$r = '';
+	if( $user_ID != 1 &&  $current_User->can_moderate_user( $user_ID ) )
+	{	// Allow to merge users if current user can moderate this user:
+		$r .= '<a href="'.regenerate_url( 'action', 'action=merge&merging_user_ID='.$user_ID ).'" class="btn btn-default btn-xs">'.T_('Merge').'</a>';
+	}
 
 	return $r;
 }

@@ -7466,6 +7466,8 @@ jQuery( document ).ready( function()
 <?php
 	}
 ?>
+if( jQuery( '<?php echo $params['column_selector']; ?>' ).length > 0 )
+{	// Initialize only when the requested element exists on the current page:
 	jQuery( '<?php echo $params['column_selector']; ?>' ).editable( '<?php echo $params['ajax_url']; ?>',
 	{
 		data: function( value, settings )
@@ -7547,6 +7549,7 @@ jQuery( document ).ready( function()
 			}
 		}
 	} );
+}
 <?php
 	if( $params['print_init_tags'] )
 	{
