@@ -261,28 +261,24 @@ function focus_on_first_input()
  * @param string value selected
  * @param string class name for the input text
  */
-function check_combo( el_ID, value, class_name )
+function check_combo( a, b )
 {
-	if( value == 'new' )
+	var s = $(a), v = s.val(), t = s.next();
+
+	if( v.toLowerCase() === b.toLowerCase() )
 	{	// Display the input text and focus on
-
-		// Get the combo the input text
-		input_text = document.getElementById(el_ID+'_combo' );
-
+		
 		// Display the input text
-		input_text.style.display = "inline";
-
+		t.css('display', 'inline-block');
  		// Focus on the new input text
-		input_text.focus();
+		t.focus();
 	}
 	else
 	{ // Hide the input text
 
 		// Get the combo the input text
-		input_text = document.getElementById(el_ID+'_combo' );
-
 		// Hide the input text
-		input_text.style.display = "none";
+		t.css('display', 'none');
 	}
 }
 

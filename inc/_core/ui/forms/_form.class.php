@@ -2886,6 +2886,36 @@ class Form extends Widget
 	function combo_box( $field_name, $field_value, $field_options, $field_label, $field_params = array() )
 	{
 		$input_class = 'form-control input-sm';
+		
+		// Set class if defined:
+		if( isset( $field_params['input_class'] ) )
+		{
+			$input_class = $input_class.' '.$field_params['input_class'];
+		}
+		unset( $field_params['input_class'] );
+		
+		// Allow text input label to be changed:
+		if( isset( $field_params['new_option_label'] ) )
+		{
+			$new_option_label = $field_params['new_option_label'];
+		}
+		else
+		{
+			$new_option_label = T_('New');
+		}
+		unset( $field_params['new_option_label'] );
+		
+		// Support input placeholder:
+		if( isset( $field_params['placeholder'] ) )
+		{
+			$placeholder = ' placeholder="'.$field_params['placeholder'].'" ';
+		}
+		else
+		{
+			$placeholder = '';
+		}
+		unset( $field_params['placeholder'] );
+		
 		if( param_has_error( $field_name) )
 		{ // There is an error on the combo, so we need to set the combo input text class to 'field_error'
 			$input_class .= ' field_error';
@@ -2906,16 +2936,24 @@ class Form extends Widget
 			$new_field_size = 30;
 		}
 		unset( $field_params['new_field_size'] );
-
-		// Set onchange event on the select, when the select changes, we check the value to display or hide an input text after it
-		$field_params['onchange']= 'check_combo( this.id, this.options[this.selectedIndex].value, "'.$input_class.'")';
+		
+		// Add onchange param to current if defined:
+		if( isset( $field_params['onchange'] ) )
+		{
+			$field_params['onchange'] = ( ! empty($field_params['onchange'] ) ? "check_combo( this, '$new_option_label'); {$field_params['onchange']}":"check_combo( this, '$new_option_label')");
+		}
+		else
+		{
+			// Set onchange event on the select, when the select changes, we check the value to display or hide an input text after it
+			$field_params['onchange'] = "check_combo( this, '$new_option_label')";
+		}
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
 		$r = $this->begin_field();
 
 		// Select option to add after the select list a combo input text:
-		$option_new  = '<option value="new">'.T_('New').': </option>'."\n";
+		$option_new  = '<option value="'.$new_option_label.'">'.$new_option_label.': </option>'."\n"; //make the value lowercase for JavaScript 
 
 		// Add the new option to the select list:
 		$field_options = $option_new . $field_options;
@@ -2936,13 +2974,13 @@ class Form extends Widget
 			$visible = 'none' ;
 		}
 
-		$r .= '<input type="text" id="'.$field_name.'_combo" name="'.$field_name.'_combo" size="'.$new_field_size.'" class="'.$input_class.'" style="display:'.$visible.'" value="'.$field_value.'" />';
+		$r .= '<input type="text" id="'.$field_name.'_combo" name="'.$field_name.'_combo" size="'.$new_field_size.'" class="'.$input_class.'" style="display:'.$visible.'" value="'.$field_value.'"'.$placeholder.' />';
 
 		if( $visible == 'none' )
 		{ // The input text is hidden, so if no javascript activated, we always display input text:
 			$r .= '<script type="text/javascript"></script>'; // We need <script> tag here to use a <noscript> tag when javascript is deactivated:
 			$r .= '<noscript>
-							<input type="text" id="'.$field_name.'_combo" name="'.$field_name.'_combo" size="30" class="'.$input_class.'">
+							<input type="text" id="'.$field_name.'_combo" name="'.$field_name.'_combo" size="30" class="'.$input_class.'" value="'.$field_value.'"'.$placeholder.'>
 						</noscript>';
 		}
 
