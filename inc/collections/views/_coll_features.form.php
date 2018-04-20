@@ -294,7 +294,15 @@ if( $notifications_mode != 'off' )
 				array( 'allow_subscriptions', 1, T_('Allow users to subscribe and receive email notifications for each new post.'), $edited_Blog->get_setting( 'allow_subscriptions' ) ),
 				array( 'allow_item_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ), $edited_Blog->get_setting( 'allow_item_subscriptions' ) ),
 				array( 'allow_item_mod_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications when post is modified and user has a permissions to moderate it.' ), $edited_Blog->get_setting( 'allow_item_mod_subscriptions' ) ),
-			), 'allow_coll_subscriptions', T_('Email subscriptions') );
+			), 'allow_coll_subscriptions', T_('Registered users') );
+		$Form->checklist( array(
+				array( 'allow_anon_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for replies to their comments.' ), $edited_Blog->get_setting( 'allow_anon_subscriptions' ) ),
+			), 'allow_anon_subscriptions', T_('Anonymous users') );
+		$Form->radio( 'default_anon_comment_notify', $edited_Blog->get_setting( 'default_anon_comment_notify' ), array(
+				array( 1, T_('Checked') ),
+				array( 0, T_('Unchecked') ),
+			), T_('Default option') );
+		$Form->text( 'anon_notification_email_limit', $edited_Blog->get_setting( 'anon_notification_email_limit' ), 4, T_('Limit'),  T_('Max # of emails an anonymous user may receive per day.'), 4 );
 	$Form->end_fieldset();
 }
 

@@ -9542,6 +9542,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12830, 'Upgrading comments table...' ) )
+	{	// part of 6.10.1-stable
+		db_add_col( 'T_comments', 'comment_anon_notify_last', 'VARCHAR(16) COLLATE ascii_general_ci NULL default NULL AFTER comment_anon_notify' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

@@ -136,6 +136,11 @@ class Comment extends DataObject
 	 * @var boolean
 	 */
 	var $anon_notify;
+	/**
+	 * Last time and count of email notifications per day for anonymous author
+	 * @var string
+	 */
+	var $anon_notify_last;
 
 	var $nofollow;
 	/**
@@ -255,6 +260,7 @@ class Comment extends DataObject
 			$this->spam_karma = $db_row->comment_spam_karma;
 			$this->allow_msgform = $db_row->comment_allow_msgform;
 			$this->anon_notify = $db_row->comment_anon_notify;
+			$this->anon_notify_last = $db_row->comment_anon_notify_last;
 			$this->secret = $db_row->comment_secret;
 			$this->notif_status = $db_row->comment_notif_status;
 			$this->notif_ctsk_ID = $db_row->comment_notif_ctsk_ID;
@@ -3867,21 +3873,23 @@ class Comment extends DataObject
 
 				// Find anonymous users which are subscribed on the comment's post:
 				$SQL = new SQL( 'Get list of anonymous users who want to be notified about comments of the the post #'.$comment_Item->ID );
-				$SQL->SELECT( 'DISTINCT comment_author_email, comment_author, post_locale' );
+				$SQL->SELECT( 'comment_author_email, comment_ID' );
 				$SQL->FROM( 'T_comments' );
 				$SQL->FROM_add( 'INNER JOIN T_items__item ON comment_item_ID = post_ID' );
 				$SQL->WHERE( 'comment_item_ID = '.$comment_Item->ID );
 				$SQL->WHERE_and( 'comment_author_user_ID IS NULL' );
 				$SQL->WHERE_and( 'comment_anon_notify = 1' );
+				$SQL->ORDER_BY( 'comment_anon_notify_last DESC' );
+				$SQL->GROUP_BY( 'comment_author_email' );
 
-				$notify_list = $DB->get_results( $SQL );
+				$notify_list = $DB->get_assoc( $SQL );
 
 				// Preprocess list:
-				foreach( $notify_list as $notification )
+				foreach( $notify_list as $anon_email => $anon_comment_ID )
 				{
-					if( ! isset( $notify_anon_users[ $notification->comment_author_email ] ) )
+					if( ! isset( $notify_anon_users[ 'cmnt_'.$anon_comment_ID ] ) )
 					{	// Don't rewrite a notify type if user already is notified by other type before:
-						$notify_anon_users[ $notification->comment_author_email ] = array( 'item_subscription', $notification->comment_author, $notification->post_locale );
+						$notify_anon_users[ 'cmnt_'.$anon_comment_ID ] = 'anon_subscription';
 					}
 				}
 			}
@@ -4083,11 +4091,12 @@ class Comment extends DataObject
 	/**
 	 * Send email notifications to users
 	 *
-	 * @param array Array of users which should be notified, where key is User ID or Email of anonymous user and value is a notify type:
+	 * @param array Array of users which should be notified, where key is User ID or Comment ID with prefix 'cmnt_' of anonymous user and value is a notify type:
 	 *              - 'moderator'
 	 *              - 'creator'
 	 *              - 'blog_subscription'
 	 *              - 'item_subscription'
+	 *              - 'anon_subscription'
 	 *              - 'meta_comment'
 	 * @param boolean TRUE if it is notification about new comment, FALSE - for edited comment
 	 */
@@ -4150,13 +4159,16 @@ class Comment extends DataObject
 		// Send emails:
 		foreach( $notify_users as $notify_user_ID => $notify_type )
 		{
-			if( is_array( $notify_type ) )
+			if( $notify_type == 'anon_subscription' )
 			{	// Get data of anonymous user:
+				$notify_comment_ID = intval( substr( $notify_user_ID, 5 ) );
+				$CommentCache = & get_CommentCache();
+				$anon_Comment = & $CommentCache->get_by_ID( $notify_comment_ID );
+				$anon_comment_Item = $anon_Comment->get_Item();
 				$notify_User = NULL;
-				$notify_email = $notify_user_ID;
-				$notify_user_name = $notify_type[1];
-				$notify_locale = isset( $notify_type[1] ) ? $notify_type[1] : $default_locale;
-				$notify_type = $notify_type[0];
+				$notify_email = $anon_Comment->get( 'author_email' );
+				$notify_user_name = $anon_Comment->get( 'author' );
+				$notify_locale = $anon_comment_Item->get( 'locale' );
 				$notify_full = false;
 			}
 			else
@@ -4227,7 +4239,8 @@ class Comment extends DataObject
 					break;
 
 				case 'blog_subscription': // blog subscription
-				case 'item_subscription': // item subscription
+				case 'item_subscription': // item subscription for registered user
+				case 'anon_subscription': // item subscription for anonymous user
 				case 'meta_comment': // meta comment notification
 					$user_reply_to = NULL;
 					break;
@@ -4268,6 +4281,8 @@ class Comment extends DataObject
 			}
 			else
 			{	// Send the email to anonymous user:
+				$email_template_params['comment_ID'] = $anon_Comment->ID;
+				$email_template_params['anonymous_unsubscribe_key'] = md5( $anon_Comment->ID.$anon_Comment->get( 'secret' ) );
 				send_mail_to_anonymous_user( $notify_email, $notify_user_name, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
 			}
 

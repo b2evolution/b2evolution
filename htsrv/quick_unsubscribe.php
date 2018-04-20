@@ -13,22 +13,38 @@ if( empty( $params ) )
 global $UserSettings, $Settings;
 
 param( 'type', 'string', true );
-param( 'user_ID', 'integer', true );
+param( 'comment_ID', 'integer', NULL );
+param( 'user_ID', 'integer', ( $comment_ID === NULL ) );
 param( 'key', 'string', true );
 param( 'coll_ID', 'integer', 0 );
 param( 'post_ID', 'integer', 0 );
 param( 'confirmed', 'integer', 0 );
 param( 'action', 'string', NULL );
 
-$UserCache = & get_UserCache();
-$edited_User = $UserCache->get_by_ID( $user_ID, false, false );
+$unsub_Comment = false;
+if( $comment_ID !== NULL )
+{	// This is a case to unsubscribe anonymous user from comment:
+	$CommentCache = & get_CommentCache();
+	$unsub_Comment = & $CommentCache->get_by_ID( $comment_ID, false, false );
+	if( $unsub_Comment->get( 'author_email' ) == '' || $unsub_Comment->get( 'author_user_ID' ) !== NULL )
+	{	// Don't allow to do unsubcription action if the requested comment is not from anonymous user:
+		$unsub_Comment = false;
+	}
+}
 
-if( empty( $edited_User ) )
-{	// User not found:
+if( ! $unsub_Comment )
+{	// This is a case to unsubscribe a registered user:
+	$UserCache = & get_UserCache();
+	$edited_User = $UserCache->get_by_ID( $user_ID, false, false );
+}
+
+if( empty( $edited_User ) && empty( $unsub_Comment ) )
+{	// Registered or anonymous user is not found:
 	$error_msg = T_( 'The user you are trying to unsubscribe does not seem to exist. You may already have deleted your account.' );
 }
-elseif( $key != md5( $user_ID.$edited_User->get( 'unsubscribe_key' ) ) ) 	// Security check
-{
+elseif( ( ! $unsub_Comment && $key != md5( $user_ID.$edited_User->get( 'unsubscribe_key' ) ) ) || // Registered user
+        ( $unsub_Comment && $key != md5( $comment_ID.$unsub_Comment->get( 'secret' ) ) ) ) // Anonymous user
+{	// Security check is failed:
 	$error_msg = T_('Invalid unsubscribe link!');
 }
 elseif( $confirmed )
@@ -100,31 +116,42 @@ elseif( $confirmed )
 					break;
 
 				case 'post':
-					// unsubscribe from a specific post
+					// unsubscribe from a specific post:
 					if( $post_ID == 0 )
 					{
 						$error_msg = T_('Invalid unsubscribe link!');
 					}
 					else
 					{
-						$ItemCache = & get_ItemCache();
-						$BlogCache = & get_BlogCache();
-						$Item = $ItemCache->get_by_ID( $post_ID );
-						$blog_ID = $Item->get_blog_ID();
-						$Blog = $BlogCache->get_by_ID( $blog_ID );
-
-						if( $Blog->get( 'advanced_perms' )
-								&& $Blog->get_setting( 'allow_item_subscriptions' )
-								&& $Blog->get_setting( 'opt_out_item_subscription' )
-								&& $edited_User->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
-						{
-							$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
-									VALUES ( '.$post_ID.', '.$user_ID.', 0 )' );
+						if( $unsub_Comment )
+						{	// Anonymous user form Comment:
+							$DB->query( 'UPDATE T_comments
+								  SET comment_anon_notify = 0
+								WHERE comment_item_ID = '.$unsub_Comment->get( 'item_ID' ).'
+								  AND comment_author_user_ID IS NULL
+								  AND comment_author_email = '.$DB->quote( $unsub_Comment->get( 'author_email' ) ) );
 						}
 						else
-						{
-							$DB->query( 'DELETE FROM T_items__subscriptions
-									WHERE isub_user_ID = '.$user_ID.' AND isub_item_ID = '.$post_ID );
+						{	// Registered User:
+							$ItemCache = & get_ItemCache();
+							$BlogCache = & get_BlogCache();
+							$Item = $ItemCache->get_by_ID( $post_ID );
+							$blog_ID = $Item->get_blog_ID();
+							$Blog = $BlogCache->get_by_ID( $blog_ID );
+
+							if( $Blog->get( 'advanced_perms' )
+									&& $Blog->get_setting( 'allow_item_subscriptions' )
+									&& $Blog->get_setting( 'opt_out_item_subscription' )
+									&& $edited_User->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
+							{
+								$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
+										VALUES ( '.$post_ID.', '.$user_ID.', 0 )' );
+							}
+							else
+							{
+								$DB->query( 'DELETE FROM T_items__subscriptions
+										WHERE isub_user_ID = '.$user_ID.' AND isub_item_ID = '.$post_ID );
+							}
 						}
 					}
 					break;
@@ -374,31 +401,42 @@ elseif( $confirmed )
 					break;
 
 				case 'post':
-					// resubscribe from a specific post
+					// resubscribe from a specific post:
 					if( $post_ID == 0 )
 					{
 						$error_msg = T_('Invalid resubscribe link!');
 					}
 					else
 					{
-						$ItemCache = & get_ItemCache();
-						$BlogCache = & get_BlogCache();
-						$Item = $ItemCache->get_by_ID( $post_ID );
-						$blog_ID = $Item->get_blog_ID();
-						$Blog = $BlogCache->get_by_ID( $blog_ID );
-
-						if( $Blog->get( 'advanced_perms' )
-								&& $Blog->get_setting( 'allow_item_subscriptions' )
-								&& $Blog->get_setting( 'opt_out_item_subscription' )
-								&& $edited_User->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
-						{
-							$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
-									VALUES ( '.$post_ID.', '.$user_ID.', 1 )' );
+						if( $unsub_Comment )
+						{	// Anonymous user form Comment:
+							$DB->query( 'UPDATE T_comments
+								  SET comment_anon_notify = 1
+								WHERE comment_item_ID = '.$unsub_Comment->get( 'item_ID' ).'
+								  AND comment_author_user_ID IS NULL
+								  AND comment_author_email = '.$DB->quote( $unsub_Comment->get( 'author_email' ) ) );
 						}
 						else
-						{
-							$DB->query( 'INSERT INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
-									VALUES ( '.$post_ID.', '.$user_ID.', 1 )' );
+						{	// Registered User:
+							$ItemCache = & get_ItemCache();
+							$BlogCache = & get_BlogCache();
+							$Item = $ItemCache->get_by_ID( $post_ID );
+							$blog_ID = $Item->get_blog_ID();
+							$Blog = $BlogCache->get_by_ID( $blog_ID );
+
+							if( $Blog->get( 'advanced_perms' )
+									&& $Blog->get_setting( 'allow_item_subscriptions' )
+									&& $Blog->get_setting( 'opt_out_item_subscription' )
+									&& $edited_User->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
+							{
+								$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
+										VALUES ( '.$post_ID.', '.$user_ID.', 1 )' );
+							}
+							else
+							{
+								$DB->query( 'INSERT INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
+										VALUES ( '.$post_ID.', '.$user_ID.', 1 )' );
+							}
 						}
 					}
 					break;
@@ -849,7 +887,14 @@ if( isset( $error_msg ) )
 else
 {
 	$Form->hidden( 'type', $type );
-	$Form->hidden( 'user_ID', $user_ID );
+	if( $unsub_Comment )
+	{	// Anonymous user from comment:
+		$Form->hidden( 'comment_ID', $unsub_Comment->ID );
+	}
+	else
+	{	// Registered user:
+		$Form->hidden( 'user_ID', $user_ID );
+	}
 	$Form->hidden( 'key', $key );
 	$Form->hidden( 'coll_ID', $coll_ID );
 	$Form->hidden( 'post_ID', $post_ID );
@@ -874,8 +919,15 @@ else
 		echo '</p>';
 	}
 
-	$avatar_tag = $edited_User->get_avatar_imgtag( 'crop-top-64x64', 'img-circle', '', true );
-	echo '<h2 class="user_title text-center">'.$avatar_tag.' '.$edited_User->get_colored_login( array( 'login_text' => 'name' ) ).'</h2>';
+	if( $unsub_Comment )
+	{	// Anonymous user from comment:
+		echo '<h2 class="user_title text-center">'.$unsub_Comment->get( 'author_email' ).'</h2>';
+	}
+	else
+	{	// Registered user:
+		$avatar_tag = $edited_User->get_avatar_imgtag( 'crop-top-64x64', 'img-circle', '', true );
+		echo '<h2 class="user_title text-center">'.$avatar_tag.' '.$edited_User->get_colored_login( array( 'login_text' => 'name' ) ).'</h2>';
+	}
 
 	if( isset( $unsubscribed ) )
 	{

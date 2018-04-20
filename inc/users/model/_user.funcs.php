@@ -328,11 +328,25 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
  *
  * @param string delimiter to use for more url params
  * @param integer|NULL User ID, NULL - use current user
+ * @param integer|NULL Comment ID for anonymous user
  * @return string URL
  */
-function get_notifications_url( $glue = '&amp;', $user_ID = NULL )
+function get_notifications_url( $glue = '&amp;', $user_ID = NULL, $comment_ID = NULL )
 {
 	global $blog, $Collection, $Blog, $admin_url;
+
+	if( $comment_ID !== NULL )
+	{	// Get notifications url for anonymous user:
+		$CommentCache = & get_CommentCache();
+		$Comment = & $CommentCache->get_by_ID( $comment_ID );
+		$comment_Item = & $Comment->get_Item();
+		$comment_item_Blog = & $comment_Item->geT_Blog();
+		// Display a register page in order to suggest to register anonymous user:
+		return $comment_item_Blog->get( 'registerurl', array(
+				'url_suffix' => 'comment_ID='.$Comment->ID,
+				'glue'       => $glue,
+			) );
+	}
 
 	if( ! empty( $blog ) && empty( $Blog ) )
 	{ // Try to initialize global $Collection, $Blog object
@@ -2772,6 +2786,7 @@ function add_user_profile_visit( $user_ID, $visitor_user_ID )
 			VALUES ( '.$user_ID.', '.$visitor_user_ID.', "'.$timestamp.'" )' );
 }
 
+
 /**
  * Check if user can receive new email today with the given email type or the limit was already exceeded
  *
@@ -2841,6 +2856,86 @@ function update_user_email_counter( $limit_setting, $last_email_setting, $user_I
 	$last_email = $servertimenow.'_'.$email_count;
 	$UserSettings->set( $last_email_setting, $last_email, $user_ID );
 	return $UserSettings->dbupdate();
+}
+
+
+/**
+ * Check if anonymous user can receive new email today with the given email type or the limit was already exceeded
+ *
+ * @param integer ID of Comment where anonymous user data are stored
+ * @return integer/boolean Number of next email counter if new email is allowed, false otherwise
+ */
+function check_allow_new_anon_email( $comment_ID )
+{
+	global $servertimenow;
+
+	$CommentCache = & get_CommentCache();
+	if( ( $Comment = & $CommentCache->get_by_ID( $comment_ID, false, false ) ) === false )
+	{	// Wrong request:
+		return false;
+	}
+
+	$comment_Item = & $Comment->get_Item();
+	$comment_item_Blog = & $comment_Item->get_Blog();
+
+	$limit = $comment_item_Blog->get_setting( 'anon_notification_email_limit' );
+	if( $limit == 0 )
+	{	// Email notifications are not allowed for anonymous users at all:
+		return false;
+	}
+
+	$email_count = 0;
+	$last_email = $Comment->get( 'anon_notify_last' );
+	if( ! empty( $last_email ) )
+	{	// at least one email was sent:
+		$current_date = date( 'Y-m-d', $servertimenow );
+		list( $last_email_ts, $last_email_count ) = explode( '_', $last_email );
+		$last_date = date( 'Y-m-d', $last_email_ts );
+		if( $last_date == $current_date )
+		{ // last email was sent today
+			if( $last_email_count >= $limit )
+			{ // the limit was already reached
+				return false;
+			}
+			$email_count = $last_email_count;
+		}
+	}
+
+	$email_count++;
+
+	return $email_count;
+}
+
+
+/**
+ * Update the counter of email sending of anonymous user
+ *
+ * @param integer ID of Comment where anonymous user data are stored
+ * @return boolean true if email counter is updated, false otherwise
+ */
+function update_anon_user_email_counter( $comment_ID )
+{
+	global $servertimenow, $DB;
+
+	$CommentCache = & get_CommentCache();
+	if( ( $Comment = & $CommentCache->get_by_ID( $comment_ID, false, false ) ) === false )
+	{	// Wrong request:
+		return false;
+	}
+
+	$email_count = check_allow_new_anon_email( $comment_ID );
+	if( empty( $email_count ) )
+	{
+		return false;
+	}
+
+	// new email is allowed, set new email setting value, right now:
+	// Update all anonymous comments from same comment's Item with same email author address:
+	return $DB->query( 'UPDATE T_comments
+		  SET comment_anon_notify_last = '.$DB->quote( $servertimenow.'_'.$email_count ).'
+		WHERE comment_author_user_ID IS NULL
+		  AND comment_item_ID = '.$Comment->get( 'item_ID' ).'
+		  AND comment_author_email = '.$DB->quote( $Comment->get( 'author_email' ) ) );
 }
 
 

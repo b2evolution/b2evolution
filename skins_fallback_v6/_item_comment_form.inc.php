@@ -463,9 +463,9 @@ function validateCommentForm(form)
 		$comment_options[] = array( 'comment_cookies', 1, T_('Remember me'), $comment_cookies, false, '('.T_('Set cookies so I don\'t need to fill out my details next time').')' );
 		// TODO: If we have an email in a cookie, Add links called "Add a contact icon to all my previous comments" and "Remove contact icon from all my previous comments".
 		$comment_options[] = array( 'comment_allow_msgform', 1, T_('Allow message form'), $comment_allow_msgform, false, '('.T_('Allow users to contact me through a message form -- Your email will <strong>not</strong> be revealed!').')', ( $email_is_detected ? 'comment_recommended_option' : '' ) );
-		if( $Blog->get_setting( 'allow_item_subscriptions' ) )
-		{	// If item subscriptions are allowed for current collection:
-			$comment_options[] = array( 'comment_anon_notify', 1, T_('Notify me of replies'), $comment_anon_notify );
+		if( $Blog->get_setting( 'allow_anon_subscriptions' ) )
+		{	// If item anonymous subscriptions are allowed for current collection:
+			$comment_options[] = array( 'comment_anon_notify', 1, T_('Notify me of replies'), isset( $comment_anon_notify ) ? $comment_anon_notify : $Blog->get_setting( 'default_anon_comment_notify' ) );
 		}
 	}
 	elseif( $params['comment_type'] != 'meta' && $Blog->get_setting( 'allow_item_subscriptions' ) )
