@@ -19,7 +19,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_ItemStatus;
 
-global $action;
+global $action, $admin_url;
+
+$ityp_usage = param( 'ityp_usage', 'string' );
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
@@ -37,6 +39,24 @@ $Form->begin_fieldset( T_('General') );
 	$Form->text_input( 'pst_name', $edited_ItemStatus->get( 'name' ), 30, T_('Name'), '', array( 'required' => true ) );
 $Form->end_fieldset();
 
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_itemtypes_results_block( & $Form )
+{
+	$Form->switch_layout( 'blockspan' );
+	echo '<div class="form-inline">';
+	$ItemTypeCache = & get_ItemTypeCache();
+	$item_usage_options = array(
+			'' => T_('All'),
+		) + $ItemTypeCache->get_usage_option_array();
+	$Form->select_input_array( 'ityp_usage', get_param( 'ityp_usage' ), $item_usage_options, T_('Post types') );
+	echo '</div>';
+	$Form->switch_layout( NULL );
+}
+
 $SQL = new SQL();
 if( $edited_ItemStatus->ID )
 {
@@ -51,9 +71,21 @@ else
 	$SQL->SELECT( 'ityp_ID, ityp_name, NULL AS its_pst_ID' );
 	$SQL->FROM( 'T_items__type' );
 }
+if( ! empty( $ityp_usage ) )
+{
+	$SQL->WHERE_and( 'ityp_usage = '.$DB->quote( $ityp_usage ) );
+}
 
 $Results = new Results( $SQL->get(), 'ityp_' );
 $Results->title = T_('Item Types allowed for this Item Status').get_manual_link( 'item-statuses-allowed-per-item-type' );
+$Results->Form = $Form;
+
+$Results->filter_area = array(
+	'callback' => 'filter_itemtypes_results_block',
+	'onclick' => format_to_js( 'return filterItemTypes();' ),
+);
+
+
 $Results->cols[] = array(
 		'th' => T_('ID'),
 		'th_class' => 'shrinkwrap',
@@ -105,8 +137,16 @@ $Results->cols[] = array(
 		'td' => '%get_name_for_itemtype( #ityp_ID#, #ityp_name# )%'
 	);
 
+$Results->display_init();
+$checkbox_buttons = '<div class="panel-footer">'.
+		'<input type="button" class="btn btn-default btn-xs" value="'.T_('Check all').'" onclick="checkAll();" /> '.
+		'<input type="button" class="btn btn-default btn-xs" value="'.T_('Uncheck all').'" onclick="uncheckAll();" /> '.
+		'<input type="button" class="btn btn-default btn-xs" value="'.T_('Reverse').'" onclick="reverseSelection();"  />'.
+		'</div>';
+
 $display_params = array(
-		'page_url' => 'admin.php?ctrl=itemstatuses&pst_ID='.$edited_ItemStatus->ID.'&action=edit'
+		'page_url' => 'admin.php?ctrl=itemstatuses&pst_ID='.$edited_ItemStatus->ID.'&action=edit',
+		'list_end' => $Results->params['list_end'].$checkbox_buttons,
 	);
 
 $Results->display( $display_params );
@@ -130,3 +170,39 @@ else
 	$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
 }
 ?>
+<script type="text/javascript">
+var checkboxes = jQuery( 'input[name^=type_]:checkbox' );
+
+function checkAll()
+{
+	checkboxes.prop( 'checked', true );
+}
+
+function uncheckAll()
+{
+	checkboxes.prop( 'checked', false );
+}
+
+function reverseSelection()
+{
+	checkboxes.each( function() {
+		this.checked = !this.checked;
+	} );
+}
+
+function filterItemTypes()
+{
+	var form = jQuery( '#itemstatus_checkchanges' );
+	var postUsageFilter = jQuery( '#ityp_usage' );
+
+	var params = { 'ctrl': 'itemstatuses', 'pst_ID':<?php echo $edited_ItemStatus->ID;?>, 'action': 'edit' };
+
+	if( postUsageFilter.val() != '' )
+	{
+		params.ityp_usage = postUsageFilter.val();
+	}
+
+	window.location.replace( '<?php echo $admin_url;?>?' + jQuery.param( params ) );
+	return false;
+}
+</script>
