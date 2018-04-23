@@ -319,8 +319,35 @@ if( $notifications_mode != 'off' )
 			{
 				$Form->begin_line( T_('Also available') );
 			}
-
-				$Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent', 'loop_object_method' => 'get_shortname' ) );
+				if( is_admin_page() )
+				{	// Group collections by sites on back-office:
+					$SQL = new SQL( 'Get sections and sites to group collections in subscription selector' );
+					$SQL->SELECT( 'sec_ID, site_name' );
+					$SQL->FROM( 'T_section' );
+					$SQL->FROM_add( 'INNER JOIN T_site ON sec_site_ID = site_ID' );
+					$SQL->ORDER_BY( 'site_order, sec_order' );
+					$sections = $DB->get_assoc( $SQL );
+					$subs_colls_options = array();
+					foreach( $sections as $sec_ID => $site_name )
+					{
+						foreach( $BlogCache->cache as $subs_Blog )
+						{
+							if( $subs_Blog->get( 'sec_ID' ) == $sec_ID )
+							{
+								if( ! isset( $subs_colls_options[ $site_name ] ) )
+								{
+									$subs_colls_options[ $site_name ] = array();
+								}
+								$subs_colls_options[ $site_name ][ $subs_Blog->ID ] = $subs_Blog->get( 'shortname' );
+							}
+						}
+					}
+					$Form->select_input_array( 'subscribe_blog', $subscribe_blog_ID, $subs_colls_options, '', '', array( 'force_keys_as_values' => true ) );
+				}
+				else
+				{	// Don't group collections by sites on front-office because we display collections only from current site:
+					$Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent', 'loop_object_method' => 'get_shortname' ) );
+				}
 				$Form->button( array(
 					'name'  => 'actionArray[subscribe]',
 					'value' => T_('Subscribe to this collection'),
