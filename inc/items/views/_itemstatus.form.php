@@ -46,13 +46,32 @@ $Form->end_fieldset();
  */
 function filter_itemtypes_results_block( & $Form )
 {
+	$ityp_usage = param( 'ityp_usage', 'string' );
+
 	$Form->switch_layout( 'blockspan' );
 	echo '<div class="form-inline">';
+
 	$ItemTypeCache = & get_ItemTypeCache();
 	$item_usage_options = array(
-			'' => T_('All'),
+			T_('All') => '',
 		) + $ItemTypeCache->get_usage_option_array();
-	$Form->select_input_array( 'ityp_usage', get_param( 'ityp_usage' ), $item_usage_options, T_('Post types') );
+
+	$options_str = '';
+	foreach( $item_usage_options as $usage_group => $rows )
+	{
+		$group_key = str_replace( ' ', '_', strtolower( $usage_group ) );
+		$options_str .= '<option style="font-weight: bold; font-style: italic;" value="'.$group_key.'"'.
+				( $ityp_usage == $group_key ? ' selected="selected"': '' ).'>'.$usage_group.'</option>';
+		if( ! empty( $rows ) )
+		{
+			foreach( $rows as $key => $value )
+			{
+				$options_str .= '<option value="'.$key.'"'.( $ityp_usage == $key ? ' selected="selected"': '' ).'>&nbsp;&nbsp;&nbsp;&nbsp;'.$value.'</option>';
+			}
+		}
+	}
+
+	$Form->select_input_options( 'ityp_usage', $options_str, T_('Usage') );
 	echo '</div>';
 	$Form->switch_layout( NULL );
 }
@@ -73,7 +92,45 @@ else
 }
 if( ! empty( $ityp_usage ) )
 {
-	$SQL->WHERE_and( 'ityp_usage = '.$DB->quote( $ityp_usage ) );
+	$ItemTypeCache = & get_ItemTypeCache();
+	$item_usage_options = array(
+			T_('All') => '',
+		) + $ItemTypeCache->get_usage_option_array();
+
+	$options = array();
+	foreach( $item_usage_options as $usage_group => $rows )
+	{
+		$group_key = str_replace( ' ', '_', strtolower( $usage_group ) );
+		$options[$group_key] = array();
+		if( ! empty( $rows ) )
+		{
+			foreach( $rows as $key => $value )
+			{
+				$options[$group_key][] = $key;
+			}
+		}
+	}
+
+	if( array_key_exists( $ityp_usage, $options ) )
+	{
+		$usage = $options[$ityp_usage];
+	}
+	else
+	{
+		$usage = $ityp_usage;
+	}
+
+	if( ! empty( $usage ) )
+	{
+		if( is_array( $usage ) )
+		{
+			$SQL->WHERE_and( 'ityp_usage IN ('.$DB->quote( $usage ).')' );
+		}
+		else
+		{
+			$SQL->WHERE_and( 'ityp_usage = '.$DB->quote( $usage ) );
+		}
+	}
 }
 
 $Results = new Results( $SQL->get(), 'ityp_' );
@@ -81,8 +138,7 @@ $Results->title = T_('Item Types allowed for this Item Status').get_manual_link(
 $Results->Form = $Form;
 
 $Results->filter_area = array(
-	'callback' => 'filter_itemtypes_results_block',
-	'onclick' => format_to_js( 'return filterItemTypes();' ),
+	'callback' => 'filter_itemtypes_results_block'
 );
 
 
@@ -157,6 +213,7 @@ foreach( $Results->rows as $row )
 {
 	$item_type_IDs[] = $row->ityp_ID;
 }
+$Form->hidden( 'action', 'edit' ); // This parameter will be overriden by actionArray parameter below
 $Form->hidden( 'item_type_IDs', implode( ',', $item_type_IDs ) );
 
 if( $creating )
@@ -188,21 +245,5 @@ function reverseSelection()
 	checkboxes.each( function() {
 		this.checked = !this.checked;
 	} );
-}
-
-function filterItemTypes()
-{
-	var form = jQuery( '#itemstatus_checkchanges' );
-	var postUsageFilter = jQuery( '#ityp_usage' );
-
-	var params = { 'ctrl': 'itemstatuses', 'pst_ID':<?php echo $edited_ItemStatus->ID;?>, 'action': 'edit' };
-
-	if( postUsageFilter.val() != '' )
-	{
-		params.ityp_usage = postUsageFilter.val();
-	}
-
-	window.location.replace( '<?php echo $admin_url;?>?' + jQuery.param( params ) );
-	return false;
 }
 </script>

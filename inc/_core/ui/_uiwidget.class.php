@@ -532,17 +532,13 @@ class Table extends Widget
 			{ // Display a filter button only when it is not hidden by param:
 				echo $this->params['filter_button_before'];
 				$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
-				$filter_button_params = array(
+				$this->Form->button_input( array(
 							'tag'   => 'button',
 							'name'  => $submit_name,
 							'value' => get_icon( 'filter' ).' '.$submit_title,
 							'class' => $this->params['filter_button_class']
-					);
-				if( !empty( $this->{$area_name}['onclick'] ) )
-				{
-					$filter_button_params['onclick'] = $this->{$area_name}['onclick'];
-				}
-				$this->Form->button_input( $filter_button_params );
+					) );
+
 				echo $this->params['filter_button_after'];
 			}
 
