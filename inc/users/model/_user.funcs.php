@@ -3733,7 +3733,7 @@ function load_cities( country_ID, region_ID, subregion_ID )
 <?php
 	}
 
-	if( $current_User->check_perm( 'users', 'moderate' ) )
+	if( is_logged_in() && $current_User->check_perm( 'users', 'moderate' ) )
 	{	// If current user can moderate other users:
 
 		// User last seen:
