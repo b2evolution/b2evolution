@@ -1110,7 +1110,7 @@ class collections_Module extends Module
 			case 'subs_update':
 				// Subscribe/Unsubscribe user on the selected collection
 
-				if( $demo_mode && ( $current_User->ID <= 3 ) )
+				if( $demo_mode && ( $current_User->ID <= 7 ) )
 				{ // don't allow default users profile change on demo mode
 					bad_request_die( 'Demo mode: you can\'t edit the admin and demo users profile!<br />[<a href="javascript:history.go(-1)">'
 								. T_('Back to profile') . '</a>]' );
@@ -1168,7 +1168,7 @@ class collections_Module extends Module
 			case 'isubs_update':
 				// Subscribe/Unsubscribe user on the selected item
 
-				if( $demo_mode && ( $current_User->ID <= 3 ) )
+				if( $demo_mode && ( $current_User->ID <= 7 ) )
 				{ // don't allow default users profile change on demo mode
 					bad_request_die( 'Demo mode: you can\'t edit the admin and demo users profile!<br />[<a href="javascript:history.go(-1)">'
 								. T_('Back to profile') . '</a>]' );

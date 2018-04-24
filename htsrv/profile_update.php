@@ -41,7 +41,7 @@ if( ! is_logged_in() )
 	bad_request_die( T_( 'You are not logged in.' ) );
 }
 
-if( $demo_mode && ( $current_User->ID <= 3 ) )
+if( $demo_mode && ( $current_User->ID <= 7 ) )
 {
 	bad_request_die( 'Demo mode: you can\'t edit the admin and demo users profile!<br />[<a href="javascript:history.go(-1)">'
 		. T_('Back to profile') . '</a>]' );

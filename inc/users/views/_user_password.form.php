@@ -114,16 +114,13 @@ $Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_te
 
 	/***************  Password  **************/
 
-if( $action != 'view' )
-{ // We can edit the values:
-
 	$Form->begin_fieldset( $is_admin ? T_('Password').get_manual_link( 'user-password-tab' ) : '', array( 'class'=>'fieldset clear' ) );
 
 		// current password is not required:
 		//   - password change requested by email
 		//   - password has not been set yet(email capture/quick registration)
 		if( ( empty( $reqID ) || $reqID != $Session->get( 'core.changepwd.request_id' ) ) &&
-		    ( $edited_User->get( 'pass_driver' ) != 'nopass' ) )
+				( $edited_User->get( 'pass_driver' ) != 'nopass' ) )
 		{
 			if( ! $has_full_access || $edited_User->ID == $current_User->ID )
 			{ // Current user has no full access or editing his own pasword
@@ -138,7 +135,6 @@ if( $action != 'view' )
 		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off', 'note' => '<span id="pass2_status" class="field_error"></span>' ) );
 
 	$Form->end_fieldset();
-}
 
 	/***************  Buttons  **************/
 
@@ -148,8 +144,8 @@ if( $action != 'view' )
 }
 
 if( $params['display_abandon_link'] )
-{ // Display a link to go away from this form
-	$Form->info( '', '<div><a href="'.regenerate_url( 'disp', 'disp=profile' ).'">'.T_( 'Abandon password change' ).'</a></div>' );
+{	// Display a link to go away from this form:
+	$Form->info( '', '<div><a href="'.get_user_settings_url( 'profile', $edited_User->ID ).'">'.T_( 'Abandon password change' ).'</a></div>' );
 }
 
 

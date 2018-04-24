@@ -476,7 +476,26 @@ else
 
 	if( $Settings->get('allow_avatars') )
 	{
-		$Form->info( T_('Profile picture'), $edited_User->get_avatar_imgtag( 'crop-top-64x64', 'avatar', '', true ) );
+		// Main profile picture:
+		$user_pictures = '<div class="avatartag main image_rounded">'
+				.$edited_User->get_avatar_imgtag( 'crop-top-320x320', 'avatar', 'top', true, '', 'user', '160x160' )
+			.'<div class="clear"></div></div>';
+		// Append the other pictures to main avatar:
+		$user_avatars = $edited_User->get_avatar_Links();
+		foreach( $user_avatars as $user_Link )
+		{
+			$user_pictures .= $user_Link->get_tag( array(
+					'before_image'        => '<div class="avatartag image_rounded">',
+					'before_image_legend' => '',
+					'after_image_legend'  => '',
+					'after_image'         => '</div>',
+					'image_size'          => 'crop-top-160x160',
+					'image_link_title'    => $edited_User->login,
+					'image_link_rel'      => 'lightbox[user]',
+					'tag_size'            => '80x80'
+				) );
+		}
+		$Form->info( T_('Profile picture'), $user_pictures );
 	}
 
 	$Form->info( /* TRANS: noun */ T_('Login'), $edited_User->get('login') );
@@ -515,11 +534,16 @@ else
 		$Form->info( T_( 'City' ), $edited_User->get_city_name() );
 	}
 
-	//$Form->info( T_('My ZIP/Postcode'), $edited_User->get('postcode') );
-	$Form->info( T_('My age group'), $edited_User->get('age_min') );
-	$Form->info( T_('to'), $edited_User->get('age_max') );
+	$Form->info( T_('My age group'), ( $edited_User->get( 'age_min' ) > 0 || $edited_User->get( 'age_max' ) > 0 ? $edited_User->get( 'age_min' ).' '.T_('to').' '.$edited_User->get( 'age_max' ) : '' ) );
 
-	$Form->info( T_('URL'), $edited_User->get('url'), $url_fieldnote );
+	// Organizations:
+	$user_organizations = $edited_User->get_organizations();
+	$org_names = array();
+	foreach( $user_organizations as $org )
+	{
+		$org_names[] = empty( $org->url ) ? $org->name : '<a href="'.$org->url.'" rel="nofollow" target="_blank">'.$org->name.'</a>';
+	}
+	$Form->info( T_('Organizations'), implode( ' &middot; ', $org_names ) );
 }
 
 $Form->end_fieldset();
