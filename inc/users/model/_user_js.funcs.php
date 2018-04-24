@@ -69,4 +69,19 @@ jQuery(document).ready( function()
 ?>
 });
 <?php } ?>
+
+/**
+ * Merge two users from duplicated users list
+ */
+function merge_duplicated_users( link_obj )
+{
+	var selected_user_ID = jQuery( '[name=selected_user_ID]:checked' );
+	if( selected_user_ID.length == 0 )
+	{
+		alert( '<?php echo TS_('Please select a remaining account!'); ?>' );
+		return false;
+	}
+	location.href = jQuery( link_obj ).attr( 'href' ) + '&selected_user_ID=' + selected_user_ID.val();
+	return false;
+}
 </script>

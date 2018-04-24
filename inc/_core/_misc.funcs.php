@@ -4132,6 +4132,25 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
  */
 function send_mail_to_anonymous_user( $user_email, $user_name, $subject, $template_name, $template_params = array(), $force_on_non_activated = false, $headers = array(), $force_email_address = '' )
 {
+	/**
+	 * @var string|NULL This global var stores ID of the last mail log message
+	 */
+	global $mail_log_message;
+	$mail_log_message = NULL;
+
+	// Check if a new email to anonymous user with the corrensponding email type is allowed:
+	switch( $template_name )
+	{
+		case 'comment_new':
+			// Notify anonymous user of replies:
+			if( isset( $template_params['comment_ID'] ) && ! check_allow_new_anon_email( $template_params['comment_ID'] ) )
+			{	// more notification email is not allowed today:
+				$mail_log_message = 'Sending mail to anonymous user #'.$user_email.'('.$user_name.') is FAILED, because user is already limited to receive more notifications for TODAY.';
+				return false;
+			}
+			break;
+	}
+
 	$template_params['boundary'] = 'b2evo-'.md5( rand() );
 	$headers['Content-Type'] = 'multipart/mixed; boundary="'.$template_params['boundary'].'"';
 
@@ -4152,6 +4171,10 @@ function send_mail_to_anonymous_user( $user_email, $user_name, $subject, $templa
 
 	if( send_mail( $user_email, $user_name, $subject, $message, NULL, NULL, $headers, NULL, $email_campaign_ID, $automation_ID ) )
 	{	// Email was sent:
+		if( isset( $template_params['comment_ID'] ) )
+		{	// Anonymous user settings(email counters) need to be updated:
+			update_anon_user_email_counter( $template_params['comment_ID'] );
+		}
 		return true;
 	}
 
@@ -4320,8 +4343,12 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 			$formated_message = mail_autoinsert_user_data( $formated_message, $User, $format );
 		}
 		elseif( ! empty( $params['anonymous_recipient_name'] ) )
-		{
+		{	// Replace anonymous name:
 			$formated_message = str_replace( '$name$', $params['anonymous_recipient_name'], $formated_message );
+			if( ! empty( $params['anonymous_unsubscribe_key'] ) )
+			{	// Replace anonymous unsubscribe key:
+				$formated_message = str_replace( '$unsubscribe_key$', $params['anonymous_unsubscribe_key'], $formated_message );
+			}
 		}
 
 		if( $params['add_email_tracking'] )
@@ -7466,6 +7493,8 @@ jQuery( document ).ready( function()
 <?php
 	}
 ?>
+if( jQuery( '<?php echo $params['column_selector']; ?>' ).length > 0 )
+{	// Initialize only when the requested element exists on the current page:
 	jQuery( '<?php echo $params['column_selector']; ?>' ).editable( '<?php echo $params['ajax_url']; ?>',
 	{
 		data: function( value, settings )
@@ -7547,6 +7576,7 @@ jQuery( document ).ready( function()
 			}
 		}
 	} );
+}
 <?php
 	if( $params['print_init_tags'] )
 	{

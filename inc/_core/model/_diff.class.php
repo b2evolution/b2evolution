@@ -333,15 +333,19 @@ class _DiffEngine {
 				}
 				$matches = $ymatches[$line];
 
-				foreach( $matches as $key => $y ) {
+				reset( $matches );
+				$y = current( $matches );
+				while( $y !== false ) {
 					if ( empty( $this->in_seq[$y] ) ) {
 						$k = $this->_lcs_pos( $y );
 						assert( $k > 0 );
 						$ymids[$k] = $ymids[$k -1];
+						$y = next( $matches );
 						break;
 					}
+					$y = next( $matches );
 				}
-				foreach( $matches as $key => $y ) {
+				while( $y !== false ) {
 					if ( $y > $this->seq[$k -1] ) {
 						assert( $y < $this->seq[$k] );
 						// Optimization: this is a common case:
@@ -354,6 +358,7 @@ class _DiffEngine {
 						assert( $k > 0 );
 						$ymids[$k] = $ymids[$k -1];
 					}
+					$y = next( $matches );
 				}
 			}
 		}

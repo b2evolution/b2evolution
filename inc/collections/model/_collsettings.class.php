@@ -166,6 +166,9 @@ class CollectionSettings extends AbstractSettings
 			'allow_subscriptions' => 1,         // Allow email subscriptions for new post by default
 			'allow_comment_subscriptions' => 1, // Allow email subscriptions for new comment by default
 			'allow_item_subscriptions' => 1,    // Allow email subscriptions for a specific post by default
+			'allow_anon_subscriptions' => 1,    // Allow email subscriptions for replies to anonymous users comments
+			'default_anon_comment_notify' => 0, // Default option to subscribe anonymous users for replies notification
+			'anon_notification_email_limit' => 3, // Max # of email notifications an anonymous user may receive per day
 			'use_workflow' => 0,						// Don't use workflow by default
 			'use_deadline' => 1,						// Use deadline for workflow by default
 			'aggregate_coll_IDs' => '',

@@ -3163,7 +3163,7 @@ function display_password_indicator( $params = array() )
 		if( ( pass1Field.val().length && ( pass1Field.val().match( regex ) == null ) ) ||
 				( pass2Field.val().length && ( pass2Field.val().match( regex ) == null ) ) )
 		{
-			errorMsg = '".sprintf( TS_('Password cannot contain the following characters: %s'), '< > &' )."';
+			errorMsg = '".sprintf( TS_('Password cannot contain the following characters: %s'), '<code><</code> <code>></code> <code>&</code>' )."';
 			pass1Field[0].setCustomValidity( pass1Field.val().match( regex ) ? '' : errorMsg );
 			pass2Field[0].setCustomValidity( pass2Field.val().match( regex ) ? '' : errorMsg );
 			passStatus.html( '".get_icon( 'xross' )." ' + errorMsg );
@@ -3353,21 +3353,21 @@ function display_login_validator( $params = array() )
 					result = ajax_debug_clear( result );
 					if( result == "exists" )
 					{	// Login already exists
-						jQuery( "#login_status" ).html( login_icon_exists );
-						note_Obj.html( login_text_exists ).attr( "class", "red" );
+						jQuery( "#login_status" ).html( "" );
+						note_Obj.html( login_icon_exists + " " + login_text_exists ).attr( "class", "red" );
 						login_field[0].setCustomValidity( login_text_exists );
 					}
 					else if( result == "available" )
 					{	// Login is available
-						jQuery( "#login_status" ).html( login_icon_available );
-						//note_Obj.html( login_text_available ).attr( "class", "green" );
+						jQuery( "#login_status" ).html( "" );
+						//note_Obj.html( login_icon_available + " " + login_text_available ).attr( "class", "green" );
 						note_Obj.html( "" );
 						login_field[0].setCustomValidity( "" );
 					}
 					else
 					{	// Errors
-						jQuery( "#login_status" ).html( login_icon_error.replace( "$error_msg$", result.replace( /(<([^>]+)>)/ig, "" ) ) );
-						note_Obj.html( result ).attr( "class", "red" );
+						jQuery( "#login_status" ).html( "" );
+						note_Obj.html( login_icon_error.replace( "$error_msg$", result.replace( /(<([^>]+)>)/ig, "" ) ) + " " + result ).attr( "class", "red" );
 						login_field[0].setCustomValidity( result.replace( /(<([^>]+)>)/ig, "" ) );
 					}
 				}
