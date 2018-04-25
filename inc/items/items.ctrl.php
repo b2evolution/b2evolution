@@ -75,6 +75,7 @@ if( $action == 'group_action' )
 switch( $action )
 {
 	case 'edit':
+	case 'propose':
 	case 'history':
 	case 'history_details':
 	case 'history_compare':
@@ -119,6 +120,7 @@ switch( $action )
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
 	case 'edit_type': // this gets set as action by JS, when we switch tabs
 	case 'extract_tags':
+	case 'save_propose':
 		if( $action != 'edit_switchtab' && $action != 'edit_type' )
 		{ // Stop a request from the blocked IP addresses or Domains
 			antispam_block_request();
@@ -638,10 +640,12 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
-		// get revision param, but it is possible that it is not a number because current version sign is 'C'
-		param( 'r', 'integer', 0, false, false, true, false );
+		$Revision = $edited_Item->get_revision( param( 'r', 'string' ) );
 
-		$Revision = $edited_Item->get_revision( $r );
+		if( ! $Revision )
+		{	// Exit on wrong requested revision:
+			debug_die( 'The requested revision is not found in DB!' );
+		}
 		break;
 
 	case 'history_compare':
@@ -652,11 +656,13 @@ switch( $action )
 			header_redirect( $admin_url );
 		}
 
-		param( 'r1', 'integer', 0 );
-		$r2 = (int)param( 'r2', 'string', 0 );
+		$Revision_1 = $edited_Item->get_revision( param( 'r1', 'string' ) );
+		$Revision_2 = $edited_Item->get_revision( param( 'r2', 'string' ) );
 
-		$Revision_1 = $edited_Item->get_revision( $r1 );
-		$Revision_2 = $edited_Item->get_revision( $r2 );
+		if( ! $Revision_1 || ! $Revision_2 )
+		{	// Exit on wrong requested revision:
+			debug_die( 'The requested revision is not found in DB!' );
+		}
 
 		load_class( '_core/model/_diff.class.php', 'Diff' );
 
@@ -719,6 +725,14 @@ switch( $action )
 
 		// Params we need for tab switching:
 		$tab_switch_params = 'p='.$edited_Item->ID;
+		break;
+
+	case 'propose':
+		// Check permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		$AdminUI->breadcrumbpath_add( sprintf( /* TRANS: noun */ T_('Post').' #%s', $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
+		$AdminUI->breadcrumbpath_add( T_('Propose change'), '?ctrl=items&amp;action=propose&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 		break;
 
 
@@ -1567,6 +1581,27 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=items&blog='.$blog.'&p='.$dest_Item->ID );
 		break;
 
+	case 'save_propose':
+		// Save new proposed change:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		// Check edit permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		if( $edited_Item->create_proposed_change() )
+		{	// If new proposed changes has been inserted in DB successfully:
+			$Messages->add( T_('New proposed change has been added.'), 'success' );
+			// Redirect to item history page with new poroposed change:
+			header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
+		}
+
+		// If some errors on creating new proposed change,
+		// Display the same submitted form of new proposed change:
+		$action = 'propose';
+		break;
+
 	default:
 		debug_die( 'unhandled action 2: '.htmlspecialchars($action) );
 }
@@ -1736,6 +1771,7 @@ switch( $action )
 	case 'edit':
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
 	case 'edit_type': // this gets set as action by JS, when we switch tabs
+	case 'propose':
 	case 'update_edit':
 	case 'update': // on error
 	case 'update_publish': // on error
@@ -1816,9 +1852,9 @@ switch( $action )
 				{ // Move the history icon in front
 					array_unshift( $AdminUI->global_icons, $history_icon );
 				}
-			};
+			}
 
-			if( $Blog->get_setting( 'in_skin_editing' ) && ( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )
+			if( $action != 'propose' && $Blog->get_setting( 'in_skin_editing' ) && ( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )
 			{ // Show 'In skin' link if Blog setting 'In-skin editing' is ON and User has a permission to publish item in this blog
 				$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;'.$tab_switch_params );
 				$mode_inskin_action = get_htsrv_url().'item_edit.php';
@@ -2035,6 +2071,7 @@ switch( $action )
 	case 'create':
 	case 'create_publish':
 	case 'edit':
+	case 'propose':
 	case 'update_edit':
 	case 'update':	// on error
 	case 'update_publish':	// on error
@@ -2059,13 +2096,22 @@ switch( $action )
 		$Plugins_admin->unfilter_contents( $item_title /* by ref */, $item_content /* by ref */, $edited_Item->get_renderers_validated(), $params );
 
 		// Display VIEW:
-		if( in_array( $action, array( 'new_type', 'edit_type' ) ) )
-		{ // Form to change post type
-			$AdminUI->disp_view( 'items/views/_item_edit_type.form.php' );
-		}
-		else
-		{ // Form to edit item
-			$AdminUI->disp_view( 'items/views/_item_expert.form.php' );
+		switch( $action )
+		{
+			case 'new_type':
+			case 'edit_type':
+				// Form to change post type:
+				$AdminUI->disp_view( 'items/views/_item_edit_type.form.php' );
+				break;
+
+			case 'propose':
+				// Form to change post type:
+				$AdminUI->disp_view( 'items/views/_item_propose.form.php' );
+				break;
+
+			default:
+				// Form to edit item
+				$AdminUI->disp_view( 'items/views/_item_expert.form.php' );
 		}
 
 		// End payload block:

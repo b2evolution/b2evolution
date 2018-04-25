@@ -4589,6 +4589,49 @@ function get_item_numviews( $Item )
 
 
 /**
+ * Get title for item revision
+ *
+ * @param object Revision/Version
+ */
+function get_item_version_title( $Version )
+{
+	global $admin_url;
+
+	$iver_date = mysql2localedatetime( $Version->iver_edit_last_touched_ts, 'Y-m-d', 'H:i:s' );
+
+	$iver_editor_user_link = get_user_identity_link( NULL, $Version->iver_edit_user_ID );
+	$iver_editor_user_link = ( empty( $iver_editor_user_link ) ? T_( 'Deleted user' ) : $iver_editor_user_link );
+
+	switch( $Version->iver_type )
+	{
+		case 'proposed':
+			// Title for proposed change:
+			$r = sprintf( T_('Proposed change #%s as of %s by %s'), $Version->iver_ID, $iver_date, $iver_editor_user_link );
+			break;
+
+		case 'archived':
+			// Title for archived version:
+			$r = sprintf( T_('Archived version #%s as of %s by %s'), $Version->iver_ID, $iver_date, $iver_editor_user_link );
+			break;
+
+		default:
+		case 'current':
+			// Title for current version:
+			$r = sprintf( T_('Current version as of %s by %s'), $iver_date, $iver_editor_user_link );
+			break;
+	}
+
+	// A link to view the revision details:
+	$r .= ' (<a href="'.$admin_url.'?ctrl=items&amp;action=history_details&amp;p='.$Version->iver_itm_ID.'&amp;r='.$Version->iver_ID.'"'
+		.' title="'.format_to_output( T_('View this revision'), 'htmlattr' ).'">'
+			.T_('View')
+		.'</a>)';
+
+	return $r;
+}
+
+
+/**
  * Initialize Results object for items list
  *
  * @param object Results

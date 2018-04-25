@@ -34,72 +34,83 @@ else
 	$lastedit_user_login = T_('(deleted user)');
 }
 
-$sql_current_version = 'SELECT "'.T_('Current').'" AS iver_ID,
+// SQL to get the proposed changes:
+$proposed_changes_SQL = new SQL();
+$proposed_changes_SQL->SELECT( 'iver_ID, CONCAT( "p", iver_ID ) AS param_ID, iver_edit_last_touched_ts, iver_edit_user_ID, iver_type, iver_status, iver_title, user_login, iver_ID AS version_order' );
+$proposed_changes_SQL->FROM( 'T_items__version' );
+// LEFT JOIN users to display proposed changes by already deleted users
+$proposed_changes_SQL->FROM_add( 'LEFT JOIN T_users ON iver_edit_user_ID = user_ID' );
+$proposed_changes_SQL->WHERE( 'iver_itm_ID = '.$edited_Item->ID );
+$proposed_changes_SQL->WHERE_and( 'iver_type = "proposed"' );
+
+// SQL to get current version:
+$current_sql = 'SELECT "current" AS iver_ID, "c" AS param_ID,
 		"'.$edited_Item->last_touched_ts.'" AS iver_edit_last_touched_ts,
 		"'.$edited_Item->lastedit_user_ID.'" AS iver_edit_user_ID,
-		"'.T_('Current version').'" AS action,
+		"current" AS iver_type,
 		"'.$edited_Item->status.'" AS iver_status,
 		"'.$edited_Item->title.'" AS iver_title,
-		"'.str_replace( '"', '\"', $lastedit_user_login ).'" AS user_login';
-$SQL = new SQL();
-$SQL->SELECT( 'iver_ID, iver_edit_last_touched_ts, iver_edit_user_ID, "'.T_('Archived version').'" AS action, iver_status, iver_title, user_login' );
-$SQL->FROM( 'T_items__version' );
-// LEFT JOIN users to display versions edited by already deleted users
-$SQL->FROM_add( 'LEFT JOIN T_users ON iver_edit_user_ID = user_ID' );
-$SQL->WHERE( 'iver_itm_ID = ' . $edited_Item->ID );
-// fp> not actually necessary:
-// UNION
-// SELECT "'.$edited_Item->datecreated.'" AS iver_edit_last_touched_ts, "'.$edited_Item->creator_user_ID.'" AS user_login, "First version" AS action';
+		"'.str_replace( '"', '\"', $lastedit_user_login ).'" AS user_login,
+		0 AS version_order';
 
+// SQL to get old versions:
+$old_versions_SQL = new SQL();
+$old_versions_SQL->SELECT( 'iver_ID, CONCAT( "a", iver_ID ) as param_ID, iver_edit_last_touched_ts, iver_edit_user_ID, iver_type, iver_status, iver_title, user_login, CONCAT( "-", iver_ID ) AS version_order' );
+$old_versions_SQL->FROM( 'T_items__version' );
+// LEFT JOIN users to display versions edited by already deleted users
+$old_versions_SQL->FROM_add( 'LEFT JOIN T_users ON iver_edit_user_ID = user_ID' );
+$old_versions_SQL->WHERE( 'iver_itm_ID = '.$edited_Item->ID );
+$old_versions_SQL->WHERE_and( 'iver_type = "archived"' );
+
+// Get a count of ALL revisions:
 $count_SQL = new SQL();
 $count_SQL->SELECT( 'COUNT(*)+1' );
 $count_SQL->FROM( 'T_items__version' );
-$count_SQL->WHERE( $SQL->get_where( '' ) );
-
-$revisions_count = $DB->get_var( $count_SQL->get() );
+$count_SQL->WHERE( 'iver_itm_ID = '.$edited_Item->ID );
+$revisions_count = intval( $DB->get_var( $count_SQL->get() ) );
 
 $default_order = $revisions_count > 1 ? '---D' : '-D';
 
 // Create result set:
-$Results = new Results( $sql_current_version . ' UNION ' . $SQL->get(), 'iver_', $default_order, NULL, $count_SQL->get() );
+$history_sql = $proposed_changes_SQL->get()
+	.' UNION '.$current_sql
+	.' UNION '.$old_versions_SQL->get()
+	.' ORDER BY version_order DESC';
+$Results = new Results( $history_sql, 'iver_', $default_order, NULL, $revisions_count );
 
 $Results->title = T_('Item history for:').' '.$edited_Item->get_title();
 
 /**
  * Get radio input to select a revision to compare
  *
- * @param integer Revision ID
+ * @param integer ID for version param
  * @param string Input name
- * @param integer Number of selected revision
- * @param string Direction (up | down)
  */
-function iver_compare_selector( $revision_ID, $input_name, $selected, $direction = 'up' )
+function iver_compare_selector( $param_ID, $input_name )
 {
-	global $iver_compare_selector;
-	if( !isset( $iver_compare_selector ) )
-	{
-		$iver_compare_selector = array();
-	}
-	if( !isset( $iver_compare_selector[ $input_name ] ) )
-	{
-		$iver_compare_selector[ $input_name ] = 0;
-	}
-	$iver_compare_selector[ $input_name ]++;
+	global $iver_compare_selector_current, $iver_compare_selector_previous;
 
 	$style = '';
-	if( ( $iver_compare_selector[ $input_name ] < $selected && $direction == 'up' ) ||
-	    ( $iver_compare_selector[ $input_name ] > $selected && $direction == 'down' ) )
-	{	// Hide inputs
+	if( ( empty( $iver_compare_selector_current ) && $input_name == 'r1' ) ||
+	    ( ! empty( $iver_compare_selector_current ) && $input_name == 'r2' ) )
+	{	// Hide inputs:
 		$style = ' style="display:none"';
 	}
 
 	$checked = '';
-	if( $iver_compare_selector[ $input_name ] == $selected )
-	{	// Select this input
+	if( $param_ID == 'c' && $input_name == 'r2' )
+	{	// This is a current version:
+		$iver_compare_selector_current = true;
+		$checked = ' checked="checked"';
+	}
+	elseif( $iver_compare_selector_previous == 'c' && $input_name == 'r1' )
+	{	// The previous was a current vesion:
 		$checked = ' checked="checked"';
 	}
 
-	return '<input type="radio" name="'.$input_name.'" value="'.$revision_ID.'"'.$style.$checked.' />';
+	$iver_compare_selector_previous = $param_ID;
+
+	return '<input type="radio" name="'.$input_name.'" value="'.$param_ID.'"'.$style.$checked.' />';
 }
 
 if( $revisions_count > 1 )
@@ -108,14 +119,14 @@ if( $revisions_count > 1 )
 							'th' => '',
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
-							'td' => '%iver_compare_selector( #iver_ID#, "r1", 2 )%',
+							'td' => '%iver_compare_selector( #param_ID#, "r1" )%',
 						);
 
 	$Results->cols[] = array(
 							'th' => '',
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
-							'td' => '%iver_compare_selector( #iver_ID#, "r2", 1, "down" )%',
+							'td' => '%iver_compare_selector( #param_ID#, "r2" )%',
 						);
 }
 
@@ -124,7 +135,7 @@ $Results->cols[] = array(
 						'order' => 'iver_ID',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
-						'td' => '$iver_ID$',
+						'td' => '~conditional( #iver_type# == "proposed", "+".#iver_ID#, #iver_ID# )~',
 					);
 
 $Results->cols[] = array(
@@ -185,10 +196,35 @@ $Results->cols[] = array(
 						'td_class' => 'shrinkwrap',
 					);
 
+/**
+ * Helper function to display a note column for post versions table
+ *
+ * @param string ID of version param
+ * @param string Version type
+ * @return string
+ */
+function iver_td_note( $param_ID, $iver_type )
+{
+	global $admin_url, $edited_Item;
+
+	switch( $iver_type )
+	{
+		case 'proposed':
+			$iver_type_title = T_('Proposed change');
+			break;
+		case 'current':
+			$iver_type_title = T_('Current version');
+			break;
+		case 'archived':
+			$iver_type_title = T_('Archived version');
+			break;
+	}
+
+	return '<a href="'.$admin_url.'?ctrl=items&amp;action=history_details&amp;p='.$edited_Item->ID.'&amp;r='.$param_ID.'">'.$iver_type_title.'</a>';
+}
 $Results->cols[] = array(
 						'th' => T_('Note'),
-						'order' => 'action',
-						'td' => '<a href="'.url_add_param( $admin_url, 'ctrl=items&amp;action=history_details&amp;p='.$edited_Item->ID.'&amp;r=' ).'$iver_ID$">$action$</a>',
+						'td' => '%iver_td_note( #param_ID#, #iver_type# )%</a>',
 					);
 
 $Results->cols[] = array(
@@ -197,29 +233,43 @@ $Results->cols[] = array(
 						'td' => '$iver_title$',
 					);
 
-function history_td_actions( $iver_ID )
+/**
+ * Helper function to display actions column for post versions table
+ *
+ * @param string Version ID
+ * @param string Version type
+ * @return string
+ */
+function iver_td_actions( $iver_ID, $iver_type )
 {
 	global $edited_Item, $current_User;
 	$r = '';
 
-	$permanent_url = $edited_Item->get_permanent_url();
-	if( ( int ) $iver_ID !== 0 )
-	{
-		$permanent_url = url_add_param( $permanent_url, array( 'revision' => $iver_ID ) );
+	if( $iver_type == 'proposed' )
+	{	// Button to accept or reject the proposed versions:
+		$r .= '<a href="'.regenerate_url( 'action', 'action=history_accept&amp;r='.$iver_ID.'&amp;'.url_crumb( 'item' ) ).'" class="action_icon btn btn-success btn-xs">'.T_('Accept').'</a>';
+		$r .= '<a href="'.regenerate_url( 'action', 'action=history_reject&amp;r='.$iver_ID.'&amp;'.url_crumb( 'item' ) ).'" class="action_icon btn btn-danger btn-xs">'.T_('Reject').'</a>';
 	}
-	$r .= '<a href="'.$permanent_url.'" class="action_icon btn btn-info btn-xs">'.T_('View').'</a>';
-	if( ( int ) $iver_ID !== 0 )
-	{
+
+	if( $iver_type == 'archived' || $iver_type == 'current' )
+	{	// Button to view the version:
+		$permanent_url = $edited_Item->get_permanent_url();
+		if( $iver_type == 'archived' )
+		{
+			$permanent_url = url_add_param( $permanent_url, array( 'revision' => $iver_ID ) );
+		}
+		$r .= '<a href="'.$permanent_url.'" class="action_icon btn btn-info btn-xs">'.T_('View').'</a>';
+	}
+	if( $iver_type == 'archived' )
+	{	// Button to restore the version:
 		$r .= '<a href="'.regenerate_url( 'action', 'action=history_restore&amp;r='.$iver_ID.'&amp;'.url_crumb( 'item' ) ).'" class="action_icon btn btn-primary btn-xs">'.T_('Restore').'</a>';
 	}
 
-
 	return $r;
 }
-
 $Results->cols[] = array(
 						'th' => T_('Actions'),
-						'td' => '%history_td_actions( #iver_ID# )%',
+						'td' => '%iver_td_actions( #iver_ID#, #iver_type# )%',
 						'td_class' => 'shrinkwrap left',
 					);
 
@@ -240,6 +290,7 @@ $buttons = array();
 if( $revisions_count > 1 )
 {	// Button to compare the revisions
 	$buttons = array( array( 'submit', '', T_('Compare selected revisions'), 'SaveButton' ) );
+	echo get_icon( 'multi_action', 'imgtag', array( 'style' => 'margin:0 5px 0 14px') );
 }
 $Form->end_form( $buttons );
 
@@ -247,13 +298,6 @@ if( $revisions_count > 2 )
 {	// Print JS code for selectors to compare the revisions
 ?>
 <script type="text/javascript">
-jQuery( document ).ready( function()
-{
-	jQuery( 'input[name=r1]:eq(1)' ).attr( 'checked', 'checked' );
-	jQuery( 'input[name=r2]:eq(0)' ).attr( 'checked', 'checked' );
-	<?php /*jQuery( 'input[name=r1]:lt(1)' ).hide();
-	jQuery( 'input[name=r2]:gt(0)' ).hide();*/ ?>
-} );
 jQuery( 'input[name=r1]' ).click( function()
 {
 	var index = jQuery( 'input[name=r1]' ).index( jQuery( this ) );

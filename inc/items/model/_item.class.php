@@ -4890,6 +4890,119 @@ class Item extends ItemLight
 
 
 	/**
+	 * Provide link to propose change a post if user has edit rights
+	 *
+	 * @param array Params:
+	 *  - 'before': to display before link
+	 *  - 'after':    to display after link
+	 *  - 'text': link text
+	 *  - 'title': link title
+	 *  - 'class': CSS class name
+	 *  - 'save_context': redirect to current URL?
+	 */
+	function get_propose_change_link( $params = array() )
+	{
+		$actionurl = $this->get_propose_change_url( $params );
+		if( ! $actionurl )
+		{	// Don't display the propose change button if current user has no rights:
+			return false;
+		}
+
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'       => ' ',
+				'after'        => ' ',
+				'text'         => '#',
+				'title'        => '#',
+				'class'        => '',
+				'save_context' => true,
+			), $params );
+
+
+		if( $params['text'] == '#' )
+		{	// Default text:
+			$params['text'] = get_icon( 'edit_button' ).' '.T_('Propose change');
+		}
+		elseif( $params['text'] == '#icon#' )
+		{	// Default text as single icon:
+			$params['text'] = get_icon( 'edit_button' );
+		}
+		if( $params['title'] == '#' )
+		{	// Default title:
+			$params['title'] = T_('Propose change');
+		}
+
+		return $params['before'].
+			'<a href="'.$actionurl.'"'.
+					' title="'.format_to_output( $params['title'], 'htmlattr' ).'"'.
+					( empty( $params['class'] ) ? '' : ' class="'.format_to_output( $params['class'], 'htmlattr' ).'"' ).'>'.
+				$params['text'].
+			'</a>';
+			$params['after'];
+	}
+
+
+	/**
+	 * Get URL to propose a change for a post if user has edit rights.
+	 *
+	 * @param array Params:
+	 *  - 'save_context': redirect to current URL?
+	 */
+	function get_propose_change_url( $params = array() )
+	{
+		global $admin_url, $current_User;
+
+		if( ! is_logged_in( false ) )
+		{	// User must be logged in and activated for this action:
+			return false;
+		}
+
+		if( ! $this->ID )
+		{	// Don't display this button in preview mode:
+			return false;
+		}
+
+		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		{	// User has no right to edit this post:
+			return false;
+		}
+
+		// default params:
+		$params += array( 'save_context' => true );
+
+		$this->load_Blog();
+		$url = false;
+		if( ! is_admin_page() && $this->Blog->get_setting( 'in_skin_editing' ) )
+		{	// We have a mode 'In-skin editing' for the current Blog
+			if( check_item_perm_edit( $this->ID, false ) )
+			{	// Current user can edit this post:
+				$url = url_add_param( $this->Blog->get( 'url' ), 'disp=propose&p='.$this->ID );
+			}
+		}
+		else if( $current_User->check_perm( 'admin', 'restricted' ) )
+		{	// Edit a post from Back-office:
+			$url = $admin_url.'?ctrl=items&amp;action=propose&amp;p='.$this->ID.'&amp;blog='.$this->Blog->ID;
+			if( $params['save_context'] )
+			{
+				$url .= '&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ).'#'.$this->get_anchor_id() );
+			}
+		}
+
+		return $url;
+	}
+
+
+	/**
+	 * Template tag
+	 * @see Item::get_edit_link()
+	 */
+	function propose_change_link( $params = array() )
+	{
+		echo $this->get_propose_change_link( $params );
+	}
+
+
+	/**
 	 * Provide link to merge a post if user has edit rights
 	 *
 	 * @param array Params:
@@ -8404,15 +8517,15 @@ class Item extends ItemLight
 	/**
 	 * Get item revision
 	 *
-	 * @param integer Revision ID
+	 * @param string Revision ID with prefix as first char: 'a' - archived version, 'c' - current version, 'p' - proposed change
 	 * @return object Revision
 	 */
-	function get_revision( $iver_ID = 0 )
+	function get_revision( $iver_ID )
 	{
-		if( $iver_ID == 'max' )
-		{
-			global $DB;
+		global $DB;
 
+		if( $iver_ID == 'max' )
+		{	// Get last revision:
 			$revision_SQL = new SQL();
 			$revision_SQL->SELECT( 'a.*' );
 			$revision_SQL->FROM( 'T_items__version a' );
@@ -8420,29 +8533,56 @@ class Item extends ItemLight
 			$revision_SQL->WHERE( 'b.iver_itm_ID IS NULL' );
 			$revision_SQL->WHERE_and( 'a.iver_itm_ID = '.$DB->quote( $this->ID ) );
 			$Revision = $DB->get_row( $revision_SQL->get() );
-		}
-		elseif( $iver_ID > 0 )
-		{	// Get revision from archive
-			global $DB;
 
-			$revision_SQL = new SQL();
-			$revision_SQL->SELECT( '*' );
-			$revision_SQL->FROM( 'T_items__version' );
-			$revision_SQL->WHERE( 'iver_ID = '.$DB->quote( $iver_ID ) );
-			$revision_SQL->WHERE_and( 'iver_itm_ID = '.$DB->quote( $this->ID ) );
-			$Revision = $DB->get_row( $revision_SQL->get() );
+			return $Revision;
+		}
+
+		// Get version type from first char:
+		$iver_ID_len = strlen( $iver_ID );
+		$iver_type = $iver_ID_len > 0 ? substr( $iver_ID, 0, 1 ) : 'c';
+
+		if( intval( $iver_type ) == 0 )
+		{	// Extract version ID:
+			$iver_ID = intval( substr( $iver_ID, 1 ) );
 		}
 		else
-		{	// Get current version
-			$Revision = (object) array(
-				'iver_ID'            => 0,
-				'iver_itm_id'        => $this->ID,
-				'iver_edit_last_touched_ts' => $this->contents_last_updated_ts,
-				'iver_edit_user_ID'  => $this->lastedit_user_ID,
-				'iver_status'        => $this->status,
-				'iver_title'         => $this->title,
-				'iver_content'       => $this->content
-			);
+		{	// Use the provided integer ID and decide this as archived version:
+			$iver_type = 'a';
+		}
+		$iver_ID = intval( $iver_ID );
+		if( $iver_ID == 0 )
+		{	// Force to get current version for request without ID:
+			$iver_type = 'c';
+		}
+
+		switch( $iver_type )
+		{
+			case 'a':
+			case 'p':
+				// Archived version or Proposed change:
+				$revision_SQL = new SQL();
+				$revision_SQL->SELECT( '*' );
+				$revision_SQL->FROM( 'T_items__version' );
+				$revision_SQL->WHERE( 'iver_ID = '.$DB->quote( $iver_ID ) );
+				$revision_SQL->WHERE_and( 'iver_itm_ID = '.$DB->quote( $this->ID ) );
+				$revision_SQL->WHERE_and( 'iver_type = "'.( $iver_type == 'a' ? 'archived' : 'proposed' ).'"' );
+				$Revision = $DB->get_row( $revision_SQL->get() );
+				break;
+
+			case 'c':
+			default:
+				// Current version:
+				$Revision = (object) array(
+					'iver_ID'            => 0,
+					'iver_type'          => 'current',
+					'iver_itm_ID'        => $this->ID,
+					'iver_edit_last_touched_ts' => $this->contents_last_updated_ts,
+					'iver_edit_user_ID'  => $this->lastedit_user_ID,
+					'iver_status'        => $this->status,
+					'iver_title'         => $this->title,
+					'iver_content'       => $this->content
+				);
+				break;
 		}
 
 		return $Revision;
@@ -9905,6 +10045,27 @@ class Item extends ItemLight
 
 
 	/**
+	 * Get ID of next version
+	 *
+	 * @param string Version type: 'archived', 'proposed'
+	 * @param integer
+	 */
+	function get_next_version_ID( $type = 'archived' )
+	{
+		global $DB;
+
+		// Get next version ID:
+		$iver_SQL = new SQL();
+		$iver_SQL->SELECT( 'MAX( iver_ID )' );
+		$iver_SQL->FROM( 'T_items__version' );
+		$iver_SQL->WHERE( 'iver_itm_ID = '.$this->ID );
+		$iver_SQL->WHERE_and( 'iver_type = '.$DB->quote( $type ) );
+
+		return intval( $DB->get_var( $iver_SQL->get() ) ) + 1;
+	}
+
+
+	/**
 	 * Create a new item revision
 	 *
 	 * @return integer/boolean ID of created item revision if successful, otherwise False
@@ -9913,12 +10074,8 @@ class Item extends ItemLight
 	{
 		global $DB;
 
-		// Get next version ID
-		$iver_SQL = new SQL();
-		$iver_SQL->SELECT( 'MAX( iver_ID )' );
-		$iver_SQL->FROM( 'T_items__version' );
-		$iver_SQL->WHERE( 'iver_itm_ID = '.$this->ID );
-		$iver_ID = ( int ) $DB->get_var( $iver_SQL->get() ) + 1;
+		// Get next version ID:
+		$iver_ID = $this->get_next_version_ID( 'archived' );
 
 		$sql = 'INSERT INTO T_items__version( iver_ID, iver_itm_ID, iver_edit_user_ID, iver_edit_last_touched_ts, iver_status, iver_title, iver_content )
 			SELECT "'.$iver_ID.'" AS iver_ID, post_ID, post_lastedit_user_ID, post_last_touched_ts, post_status, post_title, post_content
@@ -9975,6 +10132,99 @@ class Item extends ItemLight
 		}
 
 		return false;
+	}
+
+
+	/**
+	 * Create a new proposed change
+	 *
+	 * @return integer/boolean ID of created item revision if successful, otherwise False
+	 */
+	function create_proposed_change()
+	{
+		global $DB, $current_User, $Plugins_admin;
+
+		if( empty( $this->ID ) || ! is_logged_in() )
+		{	// Item must be created and current user must be logged in:
+			return false;
+		}
+
+		// Get next version ID:
+		$iver_ID = $this->get_next_version_ID( 'proposed' );
+
+		// START of loading Item data from request:
+		if( $this->get_type_setting( 'allow_html' ) )
+		{	// HTML is allowed for this post, we'll accept HTML tags:
+			$text_format = 'html';
+		}
+		else
+		{	// HTML is disallowed for this post, we'll encode all special chars:
+			$text_format = 'htmlspecialchars';
+		}
+
+		// Never allow html content on post titles:  (fp> probably so as to not mess up backoffice and all sorts of tools)
+		param( 'post_title', 'htmlspecialchars', NULL );
+
+		param( 'content', $text_format, NULL );
+
+		// Do some optional filtering on the content
+		// Typically stuff that will help the content to validate
+		// Useful for code display.
+		// Will probably be used for validation also.
+		$Plugins_admin = & get_Plugins_admin();
+		$params = array(
+				'object_type' => 'Item',
+				'object'      => & $this,
+				'object_Blog' => & $this->Blog
+			);
+		$Plugins_admin->filter_contents( $GLOBALS['post_title'] /* by ref */, $GLOBALS['content'] /* by ref */, $this->get_renderers(), $params /* by ref */ );
+
+		// Title checking:
+		if( $this->get_type_setting( 'use_title' ) == 'required' )
+		{
+			param_check_not_empty( 'post_title', T_('Please provide a title.'), '' );
+		}
+
+		// Format raw HTML input to cleaned up and validated HTML:
+		param_check_html( 'content', T_('Invalid content.') );
+		$this->set( 'content', prepare_item_content( get_param( 'content' ) ) );
+
+		$this->set( 'title', get_param( 'post_title' ) );
+
+		if( empty( $iver_content ) && $this->get_type_setting( 'use_text' ) == 'required' )
+		{	// Content must be entered:
+			param_check_not_empty( 'content', T_('Please enter some text.'), '' );
+		}
+
+		if( param_errors_detected() )
+		{	// Exit here if some errors on the submitted form:
+			return false;
+		}
+		// END of loading Item data from request.
+
+		$DB->begin();
+	
+		$result = $DB->query( 'INSERT INTO T_items__version( iver_ID, iver_type, iver_itm_ID, iver_edit_user_ID, iver_edit_last_touched_ts, iver_status, iver_title, iver_content )
+			VALUES ( '.$iver_ID.', '
+				.'"proposed", '
+				.$this->ID.', '
+				.$current_User->ID.', '
+				.$DB->quote( $this->get( 'last_touched_ts' ) ).','
+				.$DB->quote( $this->get( 'status' ) ).','
+				.$DB->quote( $this->get( 'title' ) ).','
+				.$DB->quote( $this->get( 'content' ) ).' )
+			', 'Save a proposed change of the Item #'.$this->ID );
+
+		if( $result )
+		{
+			$DB->commit();
+		}
+		else
+		{
+			$DB->rollback();
+		}
+
+		return $result;
 	}
 }
 ?>

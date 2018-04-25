@@ -328,6 +328,13 @@ while( $Item = & $ItemList->get_item() )
 					'text'   => get_icon( 'edit_button' ).' '.T_('Edit')
 				) );
 
+			// Display propose change button if current user has the rights:
+			$Item->propose_change_link( array(
+					'before' => '',
+					'after'  => '',
+					'class'  => button_class( 'text' ),
+				) );
+
 			// Display copy button if current user has the rights:
 			$Item->copy_link( array( // Link to backoffice for coping
 					'before' => '',
