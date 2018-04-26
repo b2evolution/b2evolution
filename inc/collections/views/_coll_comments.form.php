@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  *
@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $edited_Blog, $AdminUI, $Settings;
+global $edited_Blog, $AdminUI, $Settings, $admin_url;
 $notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 ?>
@@ -285,8 +285,10 @@ $Form->end_fieldset();
 if( $notifications_mode != 'off' )
 {
 	$Form->begin_fieldset( T_('Subscriptions') . get_manual_link('comment-subscriptions') );
-		$Form->checkbox( 'allow_comment_subscriptions', $edited_Blog->get_setting( 'allow_comment_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new comment.') );
-		$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
+		$Form->checklist( array(
+					array( 'allow_comment_subscriptions', 1, T_('Allow users to subscribe and receive email notifications for each new comment.'), $edited_Blog->get_setting( 'allow_comment_subscriptions' ) ),
+					array( 'allow_item_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ), $edited_Blog->get_setting( 'allow_item_subscriptions' ) ),
+				), 'allow_coll_subscriptions', T_('Email subscriptions') );
 	$Form->end_fieldset();
 }
 
@@ -298,7 +300,24 @@ $Form->begin_fieldset( T_('Registration of commenters') . get_manual_link('comme
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset( T_('Comment recycle bin').get_manual_link('recycle-bin-settings') );
+
+	$Form->text_input( 'auto_empty_trash', $Settings->get('auto_empty_trash'), 5, T_('Prune recycled comments after'), T_('days').'. '.T_('Warning: This affects ALL collections on the system.') );
+
+$Form->end_fieldset();
+
+
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+
+echo '<div class="well">';
+echo '<p>'.sprintf( T_('You can find more settings in the <a %s>Post Types</a>, including:'), 'href="'.$admin_url.'?blog='.$edited_Blog->ID.'&amp;ctrl=itemtypes&amp;ityp_ID='.$edited_Blog->get_setting( 'default_post_type' ).'&amp;action=edit"' ).'</p>';
+echo '<ul>';
+echo '<li>'.T_('Message before comment form').'</li>';
+echo '<li>'.T_('Allow closing comments').'</li>';
+echo '<li>'.T_('Allow disabling comments').'</li>';
+echo '<li>'.T_('Use comment expiration').'</li>';
+echo '</ul>';
+echo '</div>';
 
 ?>
 <script type="text/javascript">

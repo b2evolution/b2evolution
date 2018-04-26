@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -124,11 +124,24 @@ class AdminUI_general extends Menu
 
 
 	/**
+	 * Page bread crumb path
+	 */
+	var $display_breadcrumbpath = array();
+
+
+	/**
 	 * Titles of bread crumb paths
 	 *
 	 * Used to build a html <title> tag
 	 */
 	var $breadcrumb_titles = array();
+
+	/**
+	 * Titles of bread crumb paths
+	 *
+	 * Used to build a html <title> tag
+	 */
+	var $display_breadcrumb_titles = array();
 
 	/**
 	 * Manual link for entire pages, used to get a big scope describing functionalities.
@@ -213,6 +226,11 @@ class AdminUI_general extends Menu
 		$this->page_manual_link = get_manual_link( '', NULL, T_('View manual'), 5 );
 	}
 
+	function display_breadcrumbpath_init()
+	{
+		$this->display_breadcrumbpath = array();
+	}
+
 	/**
 	* Note: These are not real breadcrumbs. It's just "so to speak" for a hierarchical path.
 	*
@@ -241,6 +259,43 @@ class AdminUI_general extends Menu
 
 		$this->breadcrumbpath[] = $html;
 		$this->breadcrumb_titles[] = strip_tags( $text );
+	}
+
+	/**
+	* Note: These are not real breadcrumbs. It's just "so to speak" for a hierarchical path.
+	*
+	* @param string Text
+	* @param string Url
+	* @param string Title for help
+	* @param string Additional attributes for link tag
+	*/
+	function display_breadcrumbpath_add( $text, $url = NULL, $help = NULL, $attrs = '' )
+	{
+		global $Collection, $Blog, $current_User;
+
+		$blog_ID = isset($Blog) ? $Blog->ID : 0;
+		if( ! empty( $url ) )
+		{
+			$url = str_replace( '$blog$', $blog_ID, $url );
+
+			$html = $text;
+			if( $current_User->check_perm( 'admin', 'normal' ) )
+			{
+				$html = '<a href="'.$url.'"'.( !empty( $attrs ) ? ' '.$attrs : '' ).'>'.$text.'</a>';
+			}
+		}
+		else
+		{
+			$html = $text;
+		}
+
+		if( ! empty( $help ) )
+		{
+			$html .= ' <abbr title="'.$help.'">?</abbr>';
+		}
+
+		$this->display_breadcrumbpath[] = $html;
+		$this->display_breadcrumb_titles[] = strip_tags( $text );
 	}
 
 	/**
@@ -287,6 +342,47 @@ class AdminUI_general extends Menu
 			}
 
 			$r .= $params['beforeSel'].$this->breadcrumbpath[$i].$params['afterSel'];
+
+			$r .= $params['after'];
+		}
+
+		return $r;
+	}
+
+	/**
+	 * Get breadcrumb path in html format
+	 *
+	 * @param array Params
+	 * @return string Breadcrumb path links
+	 */
+	function display_breadcrumbpath_get_html( $params = array() )
+	{
+		$params = array_merge( array(
+				'before'     => '<div class="col-md-12"><nav aria-label="breadcrumb"><ol class="breadcrumb" style="margin-left: 0">',
+				'after'      => '</ol></nav></div>',
+				'beforeText' => '',
+				'beforeEach' => '<li class="breadcrumb-item">',
+				'afterEach'  => '</li>',
+				'beforeSel'  => '<li class="breadcrumb-item active">',
+				'afterSel'   => '</li>',
+				'separator'  => '',
+			), $params );
+
+		$r = '';
+
+		if( $count = count( $this->display_breadcrumbpath ) )
+		{
+			$r = $params['before'].$params['beforeText'];
+
+			for( $i=0; $i<$count-1; $i++ )
+			{
+				$r .= $params['beforeEach']
+						.$this->display_breadcrumbpath[$i]
+						.$params['separator']
+					.$params['afterEach'];
+			}
+
+			$r .= $params['beforeSel'].$this->display_breadcrumbpath[$i].$params['afterSel'];
 
 			$r .= $params['after'];
 		}
@@ -623,6 +719,7 @@ class AdminUI_general extends Menu
 		$params = array_merge( array(
 				'display_menu2' => true,
 				'display_menu3' => true,
+				'display_breadcrumb' => true
 			), $params );
 
 		global $Plugins;
@@ -639,6 +736,12 @@ class AdminUI_general extends Menu
 
 			echo $this->replace_vars( $r );
 			//echo ' disp_submenu-END ';
+
+			// Show breadcrumbs
+			if( $params['display_breadcrumb'] )
+			{
+				echo $this->display_breadcrumbpath_get_html();
+			}
 
 			// Show 3rd level menu for settings tab
 			$path1 = $this->get_path(1);
@@ -759,7 +862,7 @@ class AdminUI_general extends Menu
 		foreach( $this->coll_list_url_params as $name => $value )
 		{
 			$url_params .= $name.'='.$value.'&amp;';
-			$form_params .= '<input type="hidden" name="'.$name.'" value="'.$value.'" />';
+			$form_params .= '<input type="hidden" name="'.format_to_output( $name, 'htmlattr' ).'" value="'.format_to_output( $value, 'formvalue' ).'" />';
 		}
 
 		$template = $this->get_template( 'CollectionList' );
@@ -781,7 +884,7 @@ class AdminUI_general extends Menu
 			{ // If blog is favorute OR current blog, Add blog as a button:
 				$buttons .= $template[ $l_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
 
-				$buttons .= '<a href="'.$url_params.'blog='.$l_blog_ID
+				$buttons .= '<a href="'.format_to_output( $url_params.'blog='.$l_blog_ID, 'htmlattr' )
 							.'" class="'.( $l_blog_ID == $blog ? 'CurrentBlog' : 'OtherBlog' ).'"';
 
 				if( !is_null($this->coll_list_onclick) )
@@ -809,7 +912,7 @@ class AdminUI_general extends Menu
 				{
 					$select_options .= ' selected="selected"';
 				}
-				$select_options .= '>'.$l_Blog->dget( 'shortname', 'formvalue' ).'</option>';
+				$select_options .= '>'.$l_Blog->dget( 'shortname', 'htmlbody' ).'</option>';
 			}
 		}
 
@@ -820,9 +923,9 @@ class AdminUI_general extends Menu
 		if( !empty( $this->coll_list_all_title ) )
 		{ // We want to add an "all" button
 			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
-			$r .= '<a href="'.$this->coll_list_all_url
+			$r .= '<a href="'.format_to_output( $this->coll_list_all_url, 'htmlattr' )
 						.'" class="'.( $blog == 0 ? 'CurrentBlog' : 'OtherBlog' ).'">'
-						.$this->coll_list_all_title.'</a> ';
+						.format_to_output( $this->coll_list_all_title, 'htmlbody' ).'</a> ';
 			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
 		}
 
@@ -1145,6 +1248,7 @@ class AdminUI_general extends Menu
 					'customstart' => '',
 					'customend' => "\n",
 					'note_format' => ' <span class="notes">%s</span>',
+					'bottom_note_format' => ' <div><span class="notes">%s</span></div>',
 					'formend' => '',
 				);
 
@@ -1175,6 +1279,7 @@ class AdminUI_general extends Menu
 					'customstart' => '<div class="custom_content">',
 					'customend' => "</div>\n",
 					'note_format' => ' <span class="notes">%s</span>',
+					'bottom_note_format' => ' <div><span class="notes">%s</span></div>',
 					'formend' => '',
 				);
 

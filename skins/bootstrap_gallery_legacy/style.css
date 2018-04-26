@@ -10,75 +10,6 @@
 .nav.nav-tabs {
   margin-top: 0;
 }
-.nav.nav-tabs ul {
-  margin: 0;
-}
-.nav.nav-tabs ul li {
-  float: left;
-  list-style: none;
-  margin-bottom: -1px;
-}
-.nav.nav-tabs ul li a {
-  border: 1px solid transparent;
-  border-radius: 4px 4px 0 0;
-  display: block;
-  line-height: 1.42857143;
-  margin-right: 2px;
-  padding: 10px 15px;
-  position: relative;
-}
-.nav.nav-tabs ul li a:hover {
-  border-bottom: 1px solid #ddd;
-  border-color: #eee #eee #ddd;
-}
-.nav.nav-tabs ul li a:focus,
-.nav.nav-tabs ul li a:hover {
-  text-decoration: none;
-  background-color: #eee;
-}
-.nav.nav-tabs ul li a.default:hover {
-  background-color: #eee;
-  border-top-color: #eee;
-  border-left-color: #eee;
-  border-right-color: #eee;
-}
-.widget_core_user_login #login_form .form-group {
-  margin: 0;
-}
-.widget_core_user_login #login_form label {
-  text-align: left;
-  width: 160px;
-  padding-left: 0;
-}
-.widget_core_user_login #login_form .controls {
-  padding: 0;
-  width: 100%;
-  text-align: left;
-}
-.widget_core_user_login #login_form .form_text_input.form-control {
-  width: 100%;
-}
-.widget_core_user_login .submit {
-  font-size: 12px;
-}
-.widget_core_user_login .field_login_btn .panel {
-  margin: 0;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-}
-.widget_core_user_login .field_login_btn .panel .panel-body {
-  padding-left: 0;
-  padding-right: 0;
-  padding-bottom: 0;
-}
-.widget_core_user_login .field_login_btn .panel .panel-body #submit_login_form {
-  margin-right: 10px;
-}
-.widget_core_user_login .register_link {
-  display: block;
-  padding-top: 10px;
-}
 .widget_core_user_register #register_form .form-group {
   margin: 0;
 }
@@ -107,9 +38,6 @@
   padding-left: 0;
   padding-right: 0;
   padding-bottom: 0;
-}
-.widget_core_user_register .field_register_btn .panel .panel-body #submit_login_form {
-  margin-right: 10px;
 }
 ul.profile_tabs {
   margin: 0 2ex 2ex;
@@ -823,4 +751,14 @@ div.evo_image_index div:hover {
   .hidden-xl {
     display: none !important;
   }
+}
+.evo_post_content .evo_comment .evo_comment_footer .action_btn_group {
+  float: right;
+}
+.evo_post_content .evo_comment .comment_edit_btn {
+  margin-right: 5px;
+}
+.evo_post_content .evo_comment .btn-group > .btn.first-child {
+  border-top-left-radius: 3px !important;
+  border-bottom-left-radius: 3px !important;
 }

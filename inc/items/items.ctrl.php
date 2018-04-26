@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @todo dh> AFAICS there are three params used for "item ID": "p", "post_ID"
  *       and "item_ID". This should get cleaned up.
@@ -435,6 +435,273 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=items&action='.$prev_action.( $item_ID > 0 ? '&p='.$item_ID : '' ).'&blog='.$blog );
 		break;
 
+	case 'create_comments_post':
+		// Create new post from selected comments:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comments' );
+
+		$item_ID = param( 'p', 'integer', 0 );
+		$selected_comments = param( 'selected_comments', 'array:integer' );
+
+		if( empty( $selected_comments ) )
+		{	// If no comments selected:
+			$Messages->add( T_('Please select at least one comment.'), 'error' );
+			// REDIRECT / EXIT:
+			header_redirect( $admin_url.'?ctrl=items&blog='.$blog.'&p='.$item_ID.'&comment_type=feedback#comments' );
+		}
+
+		// Check perm:
+		$current_User->check_perm( 'blog_post_statuses', 'edit', true, $blog );
+
+		$new_post_creation_result = false;
+		$CommentCache = & get_CommentCache();
+		$moved_comments_IDs = array();
+		$reattached_comments_IDs = array();
+		foreach( $selected_comments as $s => $selected_comment_ID )
+		{
+			$selected_Comment = & $CommentCache->get_by_ID( $selected_comment_ID, false, false );
+			if( ! $selected_Comment || $selected_Comment->item_ID != $item_ID )
+			{	// Skip wrong comment:
+				continue;
+			}
+
+			$moved_comments_IDs[] = $selected_Comment->ID;
+
+			if( $s == 0 )
+			{	// Create post from first comment:
+				if( empty( $selected_Comment->author_user_ID ) )
+				{	// Don't create a post from comment with anonymous user:
+					$Messages->add( T_('Could not create new post from comment without author.'), 'error' );
+					break;
+				}
+
+				$comment_Item = & $selected_Comment->get_Item();
+
+				// Use same chapters of the parent Item:
+				$comment_item_chapters = $comment_Item->get_Chapters();
+				$comment_item_chapters_IDs = array();
+				foreach( $comment_item_chapters as $comment_item_Chapter )
+				{
+					$comment_item_chapters_IDs[] = $comment_item_Chapter->ID;
+				}
+
+				$new_Item = new Item();
+				$new_Item->set( $new_Item->creator_field, $selected_Comment->author_user_ID );
+				$new_Item->set( 'status', $comment_Item->status );
+				$new_Item->set( 'main_cat_ID', $comment_Item->main_cat_ID );
+				$new_Item->set( 'extra_cat_IDs', $comment_item_chapters_IDs );
+				$new_Item->set( 'title', substr( sprintf( T_('Branched from: %s'), $comment_Item->title ), 0, 255 ) );
+				$new_Item->set( 'content', $selected_Comment->content );
+				$new_Item->set( 'ityp_ID', $comment_Item->ityp_ID );
+				$new_Item->set( 'renderers', $selected_Comment->get_renderers() );
+				if( $new_Item->dbinsert() )
+				{	// New post creation is success:
+					$Messages->add( sprintf( T_('New post has been created from comment #%d'), $selected_Comment->ID ), 'success' );
+					$new_post_creation_result = true;
+					// Move all links/attachments from old comment to new created post:
+					$DB->query( 'UPDATE T_links
+						  SET link_itm_ID = '.$new_Item->ID.', link_cmt_ID = NULL
+						WHERE link_cmt_ID = '.$selected_Comment->ID );
+					// Delete source comment after creating of new post:
+					$selected_Comment->dbdelete( true );
+				}
+				else
+				{	// New post creation is failed:
+					$Messages->add( sprintf( T_('Could not create new post from comment #%d'), $selected_Comment->ID ), 'error' );
+					break;
+				}
+			}
+			else
+			{	// Append all next comments for new created post which has been created from first comment:
+				$selected_Comment->set( 'item_ID', $new_Item->ID );
+				// Set proper parent Comment if comment has been not moved to new Item:
+				$selected_Comment->set_correct_parent_comment();
+				// Update comment with new data:
+				if( $selected_Comment->dbupdate() )
+				{
+					$reattached_comments_IDs[] = $selected_Comment->ID;
+				}
+			}
+		}
+
+		// Set proper parent Comment for all child comments if the parent comment has been moved to other new Item:
+		foreach( $moved_comments_IDs as $moved_comments_ID )
+		{
+			$moved_Comment = & $CommentCache->get_by_ID( $moved_comments_ID );
+			$child_comment_IDs = $moved_Comment->get_child_comment_IDs();
+			foreach( $child_comment_IDs as $child_comment_ID )
+			{
+				$child_Comment = & $CommentCache->get_by_ID( $child_comment_ID );
+				$old_in_reply_to_cmt_ID = $child_Comment->get( 'in_reply_to_cmt_ID' );
+				$child_Comment->set_correct_parent_comment();
+				if( $old_in_reply_to_cmt_ID != $child_Comment->get( 'in_reply_to_cmt_ID' ) )
+				{	// Update only if parent comment has been really corrected:
+					if( $child_Comment->dbupdate() )
+					{
+						$reattached_comments_IDs[] = $child_Comment->ID;
+					}
+				}
+			}
+		}
+
+		if( count( $reattached_comments_IDs ) )
+		{	// Display a message about the reattached comments:
+			$Messages->add( sprintf( T_('Comments #%s have been attached to new post.'), implode( ',', $reattached_comments_IDs ) ), 'success' );
+		}
+
+		// REDIRECT / EXIT
+		header_redirect( $admin_url.'?ctrl=items&blog='.$blog.'&p='.( $new_post_creation_result ? $new_Item->ID : $item_ID.'&comment_type=feedback#comments' ) );
+		break;
+
+	case 'set_visibility':
+		// Set visibility of selected comments:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comments' );
+
+		$item_ID = param( 'p', 'integer', 0 );
+		$selected_comments = param( 'selected_comments', 'array:integer' );
+
+		if( $item_ID > 0 )
+		{	// Set an URL to redirect to item view details page after this action:
+			$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.'&p='.$item_ID.'&comment_type=feedback#comments';
+		}
+		else
+		{	// Set an URL to redirect to comments list after this action:
+			$redirect_to = $admin_url.'?ctrl=comments&blog='.$blog;
+		}
+
+		if( empty( $selected_comments ) )
+		{	// If no comments selected:
+			$Messages->add( T_('Please select at least one comment.'), 'error' );
+			// REDIRECT / EXIT:
+			header_redirect( $redirect_to );
+		}
+
+		$comment_status = param( 'comment_status', 'string' );
+		$status_options = get_visibility_statuses();
+		$comment_status_title = isset( $status_options[ $comment_status ] ) ? $status_options[ $comment_status ] : $comment_status;
+
+		$CommentCache = & get_CommentCache();
+		$comments_success = 0;
+		$comments_failed = 0;
+		foreach( $selected_comments as $selected_comment_ID )
+		{
+			if( ( $selected_Comment = & $CommentCache->get_by_ID( $selected_comment_ID, false, false ) ) &&
+			    $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $selected_Comment ) &&
+			    $current_User->check_perm( 'comment!'.$comment_status, 'moderate', false, $selected_Comment ) )
+			{	// If current User has a permission to edit the selected Comment:
+				$selected_Comment->set( 'status', $comment_status );
+				if( $selected_Comment->dbupdate() )
+				{
+					$comments_success++;
+					continue;
+				}
+			}
+			// Wrong comment or current User has no perm to edit the selected comment:
+			$comments_failed++;
+		}
+
+		if( $comments_success )
+		{	// Inform about success updates:
+			$Messages->add( sprintf( T_('Visibility of %d comments have been updated to %s.'), $comments_success, $comment_status_title ), 'success' );
+		}
+		if( $comments_failed )
+		{	// Inform about failed updates:
+			$Messages->add( sprintf( T_('Visibility of %d comments could not be updated to %s.'), $comments_failed, $comment_status_title ), 'error' );
+		}
+
+		// REDIRECT / EXIT:
+		header_redirect( $redirect_to );
+		break;
+
+	case 'recycle_comments':
+	case 'delete_comments':
+		// Recycle/Delete the selected comments:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'comments' );
+
+		$item_ID = param( 'p', 'integer', 0 );
+		$selected_comments = param( 'selected_comments', 'array:integer' );
+
+		if( $item_ID > 0 )
+		{	// Set an URL to redirect to item view details page after this action:
+			$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.'&p='.$item_ID.'&comment_type=feedback#comments';
+		}
+		else
+		{	// Set an URL to redirect to comments list after this action:
+			$redirect_to = $admin_url.'?ctrl=comments&blog='.$blog;
+		}
+
+		if( empty( $selected_comments ) )
+		{	// If no comments selected:
+			$Messages->add( T_('Please select at least one comment.'), 'error' );
+			// REDIRECT / EXIT:
+			header_redirect( $redirect_to );
+		}
+
+		// Force a permanent deletion for given action even if comments were not recycled:
+		$force_permanent_delete = ( $action == 'delete_comments' );
+
+		$CommentCache = & get_CommentCache();
+		$comments_success_recycled = 0;
+		$comments_success_deleted = 0;
+		$comments_failed_recycled = 0;
+		$comments_failed_deleted = 0;
+		foreach( $selected_comments as $selected_comment_ID )
+		{
+			$comment_status = false;
+			if( ( $selected_Comment = & $CommentCache->get_by_ID( $selected_comment_ID, false, false ) ) &&
+			    $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $selected_Comment ) )
+			{	// If current User has a permission to recycle/delete the selected Comment:
+				$comment_status = $selected_Comment->get( 'status' );
+				if( $selected_Comment->dbdelete( $force_permanent_delete ) )
+				{
+					if( $force_permanent_delete || $comment_status == 'trash' )
+					{	// If a selected comment has been deleted completely:
+						$comments_success_deleted++;
+					}
+					else
+					{	// If a selected comment has been moved to recycle bin:
+						$comments_success_recycled++;
+					}
+					continue;
+				}
+			}
+			// Wrong comment or current User has no perm to delete the selected comment:
+			if( $force_permanent_delete || $comment_status == 'trash' )
+			{	// If a selected comment has NOT been deleted completely:
+				$comments_failed_deleted++;
+			}
+			else
+			{	// If a selected comment has NOT been moved to recycle bin:
+				$comments_failed_recycled++;
+			}
+		}
+
+		if( $comments_success_recycled )
+		{	// Inform about success recycling:
+			$Messages->add( sprintf( T_('%d comments have been recycled.'), $comments_success_recycled ), 'success' );
+		}
+		if( $comments_success_deleted )
+		{	// Inform about success deleted:
+			$Messages->add( sprintf( T_('%d comments have been deleted.'), $comments_success_deleted ), 'success' );
+		}
+		if( $comments_failed_recycled )
+		{	// Inform about failed deletions:
+			$Messages->add( sprintf( T_('%d comments could not be recycled.'), $comments_failed_recycled ), 'error' );
+		}
+		if( $comments_failed_deleted )
+		{	// Inform about failed deletions:
+			$Messages->add( sprintf( T_('%d comments could not be deleted.'), $comments_failed_deleted ), 'error' );
+		}
+
+		// REDIRECT / EXIT:
+		header_redirect( $redirect_to );
+		break;
+
 	default:
 		debug_die( 'unhandled action 1:'.htmlspecialchars($action) );
 }
@@ -486,6 +753,9 @@ switch( $action )
 		if( empty( $edited_Item ) )
 		{ // Create new Item object
 			$edited_Item = new Item();
+			// Prefill data from url:
+			$edited_Item->set( 'title', param( 'post_title', 'string' ) );
+			$edited_Item->set( 'urltitle', param( 'post_urltitle', 'string' ) );
 		}
 
 		$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
@@ -501,10 +771,10 @@ switch( $action )
 		$edited_Item->set_creator_location( 'subregion' );
 		$edited_Item->set_creator_location( 'city' );
 
-		$edited_Item->status = param( 'post_status', 'string', NULL );		// 'published' or 'draft' or ...
+		$edited_Item->status = param( 'post_status', 'string', $Blog->get_setting( 'default_post_status' ) );		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
 		// but we need to make sure the requested/default one is ok:
-		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );
+		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status, $edited_Item );
 
 		// Check if new category was started to create. If yes then set up parameters for next page:
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item, ( $action == 'new_switchtab' ? 'frontoffice' : 'backoffice' ) );
@@ -609,7 +879,7 @@ switch( $action )
 		$edited_Item->status = param( 'post_status', 'string', NULL );		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
 		// but we need to make sure the requested/default one is ok:
-		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );
+		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status, $edited_Item );
 
 		// We use the request variables to fill the edit form, because we need to be able to pass those values
 		// from tab to tab via javascript when the editor wants to switch views...
@@ -1511,7 +1781,7 @@ switch( $action )
 		$ItemCache = & get_ItemCache();
 		if( ! ( $dest_Item = & $ItemCache->get_by_ID( $dest_post_ID, false, false ) ) )
 		{	// If Item doesn't exist in DB:
-			$Messages->add( T_('Wrong selected item for merging, please try again.'), 'error' );
+			$Messages->add( 'Item to merge does not exist any more.', 'error' );
 			// REDIRECT / EXIT
 			header_redirect();
 		}
@@ -1522,7 +1792,7 @@ switch( $action )
 			$SQL->SELECT( 'MAX( comment_date )' );
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_item_ID = '.$dest_Item->ID );
-			$latest_comment_time = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
+			$latest_comment_time = $DB->get_var( $SQL );
 			if( $latest_comment_time !== NULL )
 			{	// If target Item has at lest one comment use new date/time for new appended comments:
 				$append_comment_timestamp = strtotime( $latest_comment_time ) + 60;
@@ -1566,7 +1836,7 @@ switch( $action )
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_item_ID = '.$edited_Item->ID );
 			$SQL->ORDER_BY( 'comment_date' );
-			$source_comment_IDs = $DB->get_col( $SQL->get(), 0, $SQL->title );
+			$source_comment_IDs = $DB->get_col( $SQL );
 			foreach( $source_comment_IDs as $source_comment_ID )
 			{
 				$DB->query( 'UPDATE T_comments
@@ -1921,7 +2191,7 @@ switch( $action )
 				$AdminUI->global_icon( T_('In-skin editing'), 'edit', $mode_inskin_url,
 						' '.T_('In-skin editing'), 4, 3, array(
 						'style' => 'margin-right: 3ex',
-						'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$mode_inskin_action.'\' );'
+						'onclick' => 'return b2edit_reload( \'#item_checkchanges\', \''.$mode_inskin_action.'\' );'
 				) );
 			}
 

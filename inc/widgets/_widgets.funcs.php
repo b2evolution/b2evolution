@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -226,6 +226,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 			}
 			// User login widget
 			add_basic_widget( $blog_id, 'Sidebar', 'user_login', 'core', 10 );
+			add_basic_widget( $blog_id, 'Sidebar', 'user_greetings', 'core', 15 );
 		}
 		if( ( !$initial_install || $blog_id != $blog_forums_ID ) && $kind != 'forum' )
 		{ // Don't install these Sidebar widgets for blog 'Forums'
@@ -274,7 +275,12 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		}
 		if( $kind == 'forum' )
 		{
-			add_basic_widget( $blog_id, 'Sidebar', 'user_avatars', 'core', 90, 'a:13:{s:5:"title";s:17:"Most Active Users";s:10:"thumb_size";s:14:"crop-top-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"6";s:9:"bubbletip";i:1;s:8:"order_by";s:8:"numposts";s:5:"style";s:6:"simple";s:6:"gender";s:3:"any";s:8:"location";s:3:"any";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' );
+			add_basic_widget( $blog_id, 'Sidebar', 'user_avatars', 'core', 90, array(
+					'title'           => 'Most Active Users',
+					'limit'           => 6,
+					'order_by'        => 'numposts',
+					'rwd_block_class' => 'col-lg-3 col-md-3 col-sm-4 col-xs-6'
+				) );
 		}
 		add_basic_widget( $blog_id, 'Sidebar', 'coll_xml_feeds', 'core', 100 );
 		add_basic_widget( $blog_id, 'Sidebar', 'mobile_skin_switcher', 'core', 110 );
@@ -374,6 +380,19 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, '404 Page', 'page_404_not_found', 'core', 10 );
 	add_basic_widget( $blog_id, '404 Page', 'coll_search_form', 'core', 20 );
 	add_basic_widget( $blog_id, '404 Page', 'coll_tag_cloud', 'core', 30 );
+
+
+	/* Login Required */
+	add_basic_widget( $blog_id, 'Login Required', 'content_block', 'core', 10, array( 'item_slug' => 'login-required-'.$blog_id ) );
+	add_basic_widget( $blog_id, 'Login Required', 'user_login', 'core', 20, array(
+			'title'               => T_( 'Log in to your account' ),
+			'login_button_class'  => 'btn btn-success btn-lg',
+			'register_link_class' => 'btn btn-primary btn-lg pull-right',
+		) );
+
+
+	/* Access Denied */
+	add_basic_widget( $blog_id, 'Access Denied', 'content_block', 'core', 10, array( 'item_slug' => 'access-denied-'.$blog_id ) );
 
 
 	/* Mobile Footer */

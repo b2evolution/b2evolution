@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin-skin
@@ -165,13 +165,13 @@ class AdminUI extends AdminUI_general
 	 *
 	 * @param boolean Whether or not to display messages.
 	 */
-	function disp_body_top( $display_messages = true )
+	function disp_body_top( $display_messages = true, $params = array() )
 	{
 		global $Messages;
 
 		parent::disp_body_top( $display_messages );
 
-		parent::disp_payload_begin();
+		parent::disp_payload_begin( $params );
 
 		if( $display_messages )
 		{ // Display info & error messages:
@@ -456,6 +456,7 @@ class AdminUI extends AdminUI_general
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="help-inline">%s</span>',
+					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
 					'fieldstart_checkbox'    => '<div class="form-group form-group-sm checkbox" $ID$>'."\n",
@@ -505,6 +506,7 @@ class AdminUI extends AdminUI_general
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="help-inline">%s</span>',
+					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
 					'inputclass_checkbox'    => '',
@@ -552,6 +554,7 @@ class AdminUI extends AdminUI_general
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="help-inline">%s</span>',
+					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
 					'inputclass_checkbox'    => '',
@@ -589,7 +592,7 @@ class AdminUI extends AdminUI_general
 									 '</div>' // End of <div class="panel-body...>
 								.'</div>' // End of <div id="$group_item_id$...>
 							.'</div>'."\n", // End of <div class="panel panel-default...>
-					
+
 					) );
 
 			case 'linespan_form':
@@ -619,6 +622,7 @@ class AdminUI extends AdminUI_general
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="help-inline">%s</span>',
+					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
 					'inputclass_checkbox'    => '',
@@ -813,7 +817,7 @@ class AdminUI extends AdminUI_general
 			{ // If blog is favorute OR current blog, Add blog as a button:
 				$buttons .= $template[ $l_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
 
-				$buttons .= '<a href="'.$url_params.'blog='.$l_blog_ID
+				$buttons .= '<a href="'.format_to_output( $url_params.'blog='.$l_blog_ID, 'htmlattr' )
 							.'" class="btn btn-default'.( $l_blog_ID == $blog ? ' active' : '' ).'"';
 
 				if( !is_null($this->coll_list_onclick) )
@@ -841,8 +845,8 @@ class AdminUI extends AdminUI_general
 				{
 					//$select_options .= ' selected="selected"';
 				}
-				$select_options .= '<a href="'.$url_params.'blog='.$l_blog_ID.'">'
-					.$l_Blog->dget( 'shortname', 'formvalue' ).'</a></li>';
+				$select_options .= '<a href="'.format_to_output( $url_params.'blog='.$l_blog_ID, 'htmlattr' ).'">'
+					.$l_Blog->dget( 'shortname', 'htmlbody' ).'</a></li>';
 			}
 		}
 
@@ -853,9 +857,9 @@ class AdminUI extends AdminUI_general
 		if( !empty( $this->coll_list_all_title ) )
 		{ // We want to add an "all" button
 			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
-			$r .= '<a href="'.$this->coll_list_all_url
+			$r .= '<a href="'.format_to_output( $this->coll_list_all_url, 'htmlattr' )
 						.'" class="btn btn-default'.( $blog == 0 ? ' active' : '' ).'">'
-						.$this->coll_list_all_title.'</a> ';
+						.format_to_output( $this->coll_list_all_title, 'htmlbody' ).'</a> ';
 			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
 		}
 

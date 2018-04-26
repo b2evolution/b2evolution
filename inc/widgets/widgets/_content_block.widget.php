@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class content_block_Widget extends ComponentWidget
 {
+	var $icon = 'file-text-o';
+
 	/**
 	 * Constructor
 	 */
@@ -120,6 +122,26 @@ class content_block_Widget extends ComponentWidget
 
 
 	/**
+	 * Prepare display params
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function init_display( $params )
+	{
+		global $Collection, $Blog;
+
+		parent::init_display( $params );
+
+		$widget_Item = & $this->get_widget_Item();
+
+		if( $widget_Item && ! in_array( $widget_Item->get( 'status' ), get_inskin_statuses( $Blog->ID, 'post' ) ) )
+		{	// Disable block caching for this widget because target Item is not public for current collection:
+			$this->disp_params['allow_blockcache'] = 0;
+		}
+	}
+
+
+	/**
 	 * Display the widget!
 	 *
 	 * @param array MUST contain at least the basic display params
@@ -151,8 +173,17 @@ class content_block_Widget extends ComponentWidget
 			}
 			echo '<p class="red">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>';
 		}
-		else
-		{	// Display a content block item:
+		elseif( ! $widget_Item->can_be_displayed() )
+		{	// Current user has no permission to view item with such status:
+			echo '<p class="red">'.sprintf( T_('Content block "%s" cannot be included because you have no permission.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ).'</p>';
+		}
+		elseif( ( $widget_Blog = & $this->get_Blog() ) && (
+		          ( $widget_Item->get_blog_ID() == $widget_Blog->ID ) ||
+		          ( $widget_Item->get( 'creator_user_ID' ) == $widget_Blog->get( 'owner_user_ID' ) )
+		      ) )
+		{	// Display a content block item ONLY if at least one condition:
+			//  - Content block Item is in same collection as this widget,
+			//  - Content block Item has same owner as owner of this widget's collection:
 			global $Item;
 
 			// Save current dispalying Item in temp var:
@@ -170,6 +201,10 @@ class content_block_Widget extends ComponentWidget
 			// Restore current dispalying Item:
 			$Item = $orig_current_Item;
 		}
+		else
+		{	// Display error if the requested content block item cannot be used in this place:
+			echo '<p class="red">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or have the same owner.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ).'</p>';
+		}
 
 		echo $this->disp_params['block_body_end'];
 
@@ -186,11 +221,14 @@ class content_block_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
+		global $Collection, $Blog;
+
 		$widget_Item = & $this->get_widget_Item();
 
 		return array(
 				'wi_ID'        => $this->ID, // Cache each widget separately + Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				'cont_coll_ID' => $widget_Item ? $widget_Item->get_blog_ID() : 0, // Has the content of the displayed blog changed ?
 				'item_ID'      => $widget_Item ? $widget_Item->ID : 0, // Cache each item separately + Has the Item changed?
 			);
 	}

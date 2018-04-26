@@ -13,37 +13,6 @@
 }
 .nav.nav-tabs {
 	margin-top: 0;
-	ul {
-		margin: 0;
-		li {
-			float: left;
-			list-style: none;
-			margin-bottom: -1px;
-			a {
-				border: 1px solid transparent;
-				border-radius: 4px 4px 0 0;
-				display: block;
-				line-height: 1.42857143;
-				margin-right: 2px;
-				padding: 10px 15px;
-				position: relative;
-				&:hover {
-					border-bottom: 1px solid #ddd;
-					border-color: #eee #eee #ddd;
-				}
-				&:focus, &:hover {
-					text-decoration: none;
-					background-color: #eee;
-				}
-				&.default:hover {
-					background-color: #eee;
-					border-top-color: #eee;
-					border-left-color: #eee;
-					border-right-color: #eee;
-				}
-			}
-		}
-	}
 }
 
 // -------------------------- Footer --------------------------
@@ -213,6 +182,7 @@ div.bSideItem {
 }
 .evo_panel__login {
 	max-width: 400px;
+	min-width: auto;
 }
 .evo_panel__lostpass {
 	max-width: 480px;
@@ -367,5 +337,24 @@ ol.breadcrumb {
 		.btn {
 			float: none;
 		}
+	}
+}
+
+// Comment footer
+.evo_content_block .evo_comment {
+	.evo_comment_footer {
+		.action_btn_group {
+			float: right;
+		}
+	}
+
+	.comment_edit_btn {
+		margin-right: 5px;
+	}
+
+	// Fix buttons for comment actions
+	.btn-group>.btn.first-child {
+		border-top-left-radius: 3px !important;
+		border-bottom-left-radius: 3px !important;
 	}
 }

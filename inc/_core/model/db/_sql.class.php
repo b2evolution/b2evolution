@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -366,6 +366,16 @@ class SQL
 		}
 	}
 
+
+	/**
+	 * Callback for array_filter in WHERE_kw_search()
+	 */
+	private static function _WHERE_kw_search_callback( $val )
+	{
+		return !empty( $val );
+	}
+
+
 	/**
 	 * Create the filter whith the search field array
 	 *
@@ -392,7 +402,7 @@ class SQL
 			case 'OR':
 				// Create array of key words of the search string
 				$keyword_array = explode( ' ', $search );
-				$keyword_array = array_filter( $keyword_array, create_function( '$val', 'return !empty($val);' ) );
+				$keyword_array = array_filter( $keyword_array, array( 'SQL', '_WHERE_kw_search_callback' ) );
 
 				$twhere = array();
 				// Loop on all keywords

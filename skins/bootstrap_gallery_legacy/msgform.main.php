@@ -10,7 +10,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_gallery_legacy
@@ -47,7 +47,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <header class="row">
 
-	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
+	<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8">
 		<?php
 		if( $Skin->show_container_when_access_denied( 'page_top' ) )
 		{ // Display 'Page Top' widget container
@@ -72,7 +72,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		<?php } ?>
 	</div><!-- .col -->
 
-	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
+	<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 		<?php
 		if( $Skin->show_container_when_access_denied( 'header' ) )
 		{ // Display 'Header' widget container

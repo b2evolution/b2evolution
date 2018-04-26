@@ -7,13 +7,14 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Check minimum permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'view', true );
 
 load_funcs('locales/model/_translation.funcs.php');
@@ -70,22 +71,22 @@ switch( $action )
 	case 'new':
 		param( 'iost_ID', 'integer', 0, true );
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get original string' );
 		$SQL->SELECT( '*, "'.$edit_locale.'" AS itst_locale, "" AS itst_standard' );
 		$SQL->FROM( 'T_i18n_original_string' );
 		$SQL->WHERE( 'iost_ID = '.$DB->quote( $iost_ID ) );
-		$edited_String = $DB->get_row( $SQL->get() );
+		$edited_String = $DB->get_row( $SQL );
 		break;
 
 	case 'edit':
 		param( 'itst_ID', 'integer', 0, true );
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get translated string' );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_i18n_translated_string' );
 		$SQL->FROM_add( 'LEFT JOIN T_i18n_original_string ON iost_ID = itst_iost_ID' );
 		$SQL->WHERE( 'itst_ID = '.$DB->quote( $itst_ID ) );
-		$edited_String = $DB->get_row( $SQL->get() );
+		$edited_String = $DB->get_row( $SQL );
 		break;
 
 	case 'update':

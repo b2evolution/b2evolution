@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -276,6 +276,14 @@ class Plugin
 	 */
 	var $plugin_actions = array();
 
+	/**
+	 * Widget icon name.
+	 * Use icon name from http://fontawesome.io/icons/
+	 *
+	 * @var string
+	 */
+	var $widget_icon = 'puzzle-piece';
+
 	/**#@-*/
 
 
@@ -514,7 +522,7 @@ class Plugin
 	 *        'min_count': minimum count of sets (optional, default is no restriction)
 	 *	   'fileselect': opens a modal window to select file. The following can be set for this type:
 	 *        'root': default root
-	 *		  'path': default path
+	 *        'path': default path
 	 *        'thumbnail_size': thumbnail size
 	 *        'max_file_num': maximum number of files
 	 *        'initialize_with': initial value
@@ -522,6 +530,7 @@ class Plugin
 	 *        'inputs': an array of setting parameters
 	 *     'info': a form info field with label and info text see {@link Form::info()}; you must set 'info' for text.
 	 *     'color': a form color picker field, use 'defaultvalue' in format '#FFFFFF'
+	 *     'usertag': an input field to enter user tags
 	 * 'note' (gets displayed as a note to the param field),
 	 * 'info': Text for param with type 'info'
 	 * 'size': Size of the HTML input field (applies to types 'text', 'password' and 'integer'; defaults to 15)
@@ -3931,7 +3940,29 @@ class Plugin
 			// Name of the setting in the blog settings:
 			$blog_setting_name = 'plugin'.$this->ID.'_'.$parname;
 
-			$value = $Blog->get_setting( $blog_setting_name );
+			if( strpos( $blog_setting_name, '[' ) !== false )
+			{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
+				$setting_names = explode( '[', $blog_setting_name );
+				$value = $Blog->get_setting( $setting_names[0] );
+				unset( $setting_names[0] );
+				foreach( $setting_names as $setting_name )
+				{
+					$setting_name = trim( $setting_name, ']' );
+					if( isset( $value[ $setting_name ] ) )
+					{
+						$value = $value[ $setting_name ];
+					}
+					else
+					{
+						$value = NULL;
+						break;
+					}
+				}
+			}
+			else
+			{	// Get normal(not array) setting value:
+				$value = $Blog->get_setting( $blog_setting_name );
+			}
 
 			if( ! is_null( $value ) )
 			{ // We have a value for this param:
@@ -3947,20 +3978,19 @@ class Plugin
 
 
 	/**
-	 * Get a coll default param value of this Plugin
+	 * Get default value of plugin setting
 	 *
 	 * @param string Setting name
-	 * @param string Blog type
+	 * @param array Config array of plugin settings
 	 * @param string Input group name
-	 * @return string Setting value
+	 * @return mixed Default value
 	 */
-	function get_coll_default_setting( $parname, $blog_type = 'std', $group = NULL )
+	function get_default_setting( $parname, $params, $group = NULL )
 	{
-		$tmp_params = array( 'for_editing' => true, 'blog_type' => $blog_type );
-		$params = $this->get_coll_setting_definitions( $tmp_params );
 		if( $group === NULL )
 		{	// Get default value from sinple field:
-			if( isset( $params[$parname]['type'] ) && $params[$parname]['type'] == 'checklist' )
+			if( isset( $params[$parname]['type'] ) && $params[$parname]['type'] == 'checklist' &&
+			    ! empty( $params[$parname]['options'] ) && is_array( $params[$parname]['options'] ) )
 			{	// Get default values for checklist:
 				$param_defaults = array();
 				foreach( $params[$parname]['options'] as $param_option )
@@ -3971,7 +4001,7 @@ class Plugin
 			}
 			elseif( isset( $params[$parname]['defaultvalue'] ) )
 			{	// We have a default value:
-				return $params[$parname]['defaultvalue'] ;
+				return $params[$parname]['defaultvalue'];
 			}
 		}
 		else
@@ -3984,6 +4014,23 @@ class Plugin
 		}
 
 		return NULL;
+	}
+
+
+	/**
+	 * Get a coll default param value of this Plugin
+	 *
+	 * @param string Setting name
+	 * @param string Blog type
+	 * @param string Input group name
+	 * @return string Setting value
+	 */
+	function get_coll_default_setting( $parname, $blog_type = 'std', $group = NULL )
+	{
+		$tmp_params = array( 'for_editing' => true, 'blog_type' => $blog_type );
+		$params = $this->get_coll_setting_definitions( $tmp_params );
+
+		return $this->get_default_setting( $parname, $params, $group );
 	}
 
 
@@ -4068,23 +4115,8 @@ class Plugin
 		// Try default values:
 		$tmp_params = array( 'for_editing' => true );
 		$params = $this->get_msg_setting_definitions( $tmp_params );
-		if( $group === NULL )
-		{	// Get default value from sinple field:
-			if( isset( $params[$parname]['defaultvalue'] ) )
-			{	// We have a default value:
-				return $params[$parname]['defaultvalue'] ;
-			}
-		}
-		else
-		{	// Get default value from input group field:
-			$parname = substr( $parname, strlen( $group ) );
-			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
-			{	// We have a default value:
-				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
-			}
-		}
 
-		return NULL;
+		return $this->get_default_setting( $parname, $params, $group );
 	}
 
 	/**
@@ -4113,23 +4145,8 @@ class Plugin
 		// Try default values:
 		$tmp_params = array( 'for_editing' => true );
 		$params = $this->get_email_setting_definitions( $tmp_params );
-		if( $group === NULL )
-		{	// Get default value from sinple field:
-			if( isset( $params[$parname]['defaultvalue'] ) )
-			{	// We have a default value:
-				return $params[$parname]['defaultvalue'] ;
-			}
-		}
-		else
-		{	// Get default value from input group field:
-			$parname = substr( $parname, strlen( $group ) );
-			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
-			{	// We have a default value:
-				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
-			}
-		}
 
-		return NULL;
+		return $this->get_default_setting( $parname, $params, $group );
 	}
 
 

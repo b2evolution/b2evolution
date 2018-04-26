@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -34,7 +34,7 @@ class google_maps_plugin extends Plugin
 	var $name = 'Google Maps';
 	var $code = 'evo_Gmaps';
 	var $priority = 50;
-	var $version = '6.9.4';
+	var $version = '6.10.1';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -44,6 +44,7 @@ class google_maps_plugin extends Plugin
 	var $number_of_installs = 1;
 	var $group = 'widget';
 	var $subgroup = 'infoitem';
+	var $widget_icon = 'map-marker';
 	var $number_of_widgets ;
 
 
@@ -242,10 +243,8 @@ class google_maps_plugin extends Plugin
 		}
 
 		if( empty( $api_key ) )
-		{
-			$url = $admin_url.'?ctrl=coll_settings&tab=plugins&blog='.$Blog->ID.'&plugin_group=widget';
-
-			echo sprintf( T_('You must specify a valid Google Maps API key in the Plugins settings <a %s>Collection Settings</a> tab to use the plugin.'), 'href="'.$url.'"' );
+		{	// Display message if google API key is not defined:
+			echo sprintf( T_('You must specify a valid Google Maps API key in the Plugins settings <a %s>Collection Settings</a> tab to use the plugin.'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=plugins&amp;blog='.$Blog->ID.'&amp;plugin_group=widget"' );
 			$params['Form']->end_fieldset();
 			return;
 		}
@@ -358,7 +357,7 @@ class google_maps_plugin extends Plugin
 
 	?>
 	<div id="map_canvas" style="width:100%; <?php echo $height; ?>; margin: 5px 0px;"></div>
-	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=<?php echo $api_key;?>"></script>
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=<?php echo $api_key;?>"></script>
 	<script type="text/javascript">
 	var post_position = 0;
 	<?php
@@ -919,13 +918,32 @@ function locate()
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
+		global $Collection, $Blog;
+
 		require_js( '#jquery#', 'blog' );
+
+		$api_key = $this->get_coll_setting( 'api_key', $Blog );
+		if( empty( $api_key ) )
+		{	// Load css to display map image with message to set google API key:
+			$this->require_css( 'css/style.css' );
+		}
 	}
 
 
 	function SkinTag( & $params )
 	{
-		global $Collection, $Blog, $Item;
+		global $Collection, $Blog, $Item, $admin_url;
+
+		$api_key = $this->get_coll_setting( 'api_key', $Blog );
+
+		if( empty( $api_key ) )
+		{	// Display message if google API key is not defined:
+			echo '<div class="evo_plugin__google_maps_no_key">'
+					.'<img src="'.$this->get_plugin_url().'/img/google_maps.jpg" />'
+					.'<div><div>'.T_('Please configure an API key to see a live map.').'</div></div>'
+				.'</div>';
+			return;
+		}
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
@@ -955,7 +973,7 @@ function locate()
 		?>
 		<div class="map_title"><?php echo $this->get_widget_setting('map_title_coll'.$Blog->ID, $params); ?></div>
 		<div class="map_canvas" id="map_canvas<?php echo $this->number_of_widgets; ?>" style="<?php echo $width; ?>; <?php echo $height; ?>; margin: 5px 5px 5px 5px;"></div>
-		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=<?php echo $api_key;?>"></script>
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=<?php echo $api_key;?>"></script>
 		<script type="text/javascript">
 		<?php
 		$map_type = (string)$this->get_widget_setting('map_type', $params);

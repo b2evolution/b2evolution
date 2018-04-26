@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -117,12 +117,18 @@ class Item extends ItemLight
 	var $assigned_User;
 
 	/**
-	 * ID of the user that created the item
+	 * ID of the User assigned to the item
 	 * Can be NULL
 	 *
 	 * @var integer
 	 */
 	var $assigned_user_ID;
+	/**
+	 * Flag to know if item is assigned to a new user
+	 * Used to determine if assignment notification should be sent
+	 * @var boolean
+	 */
+	var $assigned_to_new_user;
 
 	/**
 	 * The visibility status of the item.
@@ -754,7 +760,8 @@ class Item extends ItemLight
 
 		// ISSUE DATE / TIMESTAMP:
 		$this->load_Blog();
-		if( $current_User->check_perm( 'admin', 'restricted' ) &&
+		if( is_logged_in() &&
+		    $current_User->check_perm( 'admin', 'restricted' ) &&
 		    $current_User->check_perm( 'blog_edit_ts', 'edit', false, $this->Blog->ID ) )
 		{ // Allow to update timestamp fields only if user has a permission to edit such fields
 		  //    and also if user has an access to back-office
@@ -824,7 +831,7 @@ class Item extends ItemLight
 		}
 
 		// TAGS:
-		if( $current_User->check_perm( 'admin', 'restricted' ) )
+		if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) )
 		{ // User should has an access to back-office to edit tags
 			$item_tags = param( 'item_tags', 'string', NULL );
 			if( $item_tags !== NULL )
@@ -842,40 +849,7 @@ class Item extends ItemLight
 		}
 
 		// WORKFLOW stuff:
-		$item_Blog = $this->get_Blog();
-		if( $is_not_content_block && $item_Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) )
-		{	// Update workflow properties only when it is enabled by collection setting and allowed for current user:
-			$ItemTypeCache = & get_ItemTypeCache();
-			$current_ItemType = $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ) );
-			$item_status = param( 'item_st_ID', 'integer', NULL );
-
-			if( in_array( $item_status, $current_ItemType->get_applicable_post_status() ) || $item_status == NULL )
-			{
-				$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
-			}
-			else
-			{
-				param_error( 'item_st_ID', sprintf( T_('Invalid task status for post type %s'), $current_ItemType->get_name() ) );
-			}
-
-			$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
-			$item_assigned_user_login = param( 'item_assigned_user_login', 'string', NULL );
-			$this->assign_to( $item_assigned_user_ID, $item_assigned_user_login );
-
-			$item_priority = param( 'item_priority', 'integer', NULL );
-			if( $item_priority !== NULL )
-			{ // Set task priority only if it is gone from form
-				$this->set_from_Request( 'priority', 'item_priority', true );
-			}
-
-			// DEADLINE:
-			if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL )
-			{
-				param_time( 'item_deadline_time', '', false, false, true, true );
-				$item_deadline_time = get_param( 'item_deadline' ) != '' ? substr( get_param( 'item_deadline_time' ), 0, 5 ) : '';
-				$this->set( 'datedeadline', trim( form_date( get_param( 'item_deadline' ), $item_deadline_time ) ), true );
-			}
-		}
+		$this->load_workflow_from_Request();
 
 		// FEATURED checkbox:
 		$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
@@ -899,11 +873,45 @@ class Item extends ItemLight
 
 		// OWNER:
 		$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
-		if( $current_User->check_perm( 'users', 'edit' ) && param( 'item_owner_login_displayed', 'string', NULL ) !== NULL )
+		if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && param( 'item_owner_login_displayed', 'string', NULL ) !== NULL )
 		{	// only admins can change the owner..
-			if( param_check_not_empty( 'item_owner_login', T_('Please enter valid owner login.') ) && param_check_login( 'item_owner_login', true ) )
-			{
-				$this->set_creator_by_login( $this->creator_user_login );
+			if( param_check_not_empty( 'item_owner_login', T_('Please enter valid owner login.') ) )
+			{	// If valid user login is entered:
+				if( param( 'item_create_user', 'integer', 0 ) )
+				{	// Try to create new user if it is checked on the edit item form:
+					$UserCache = & get_UserCache();
+
+					// Convert new entered login to proper login format:
+					$this->creator_user_login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $this->creator_user_login );
+					$this->creator_user_login = str_replace( ' ', '_', $this->creator_user_login );
+					$this->creator_user_login = utf8_substr( $this->creator_user_login, 0, 20 );
+					set_param( 'item_owner_login', $this->creator_user_login );
+
+					if( ( $creator_User = & $UserCache->get_by_login( $this->creator_user_login ) ) !== false )
+					{	// Display error if user already exists:
+						param_error( 'item_owner_login', sprintf( T_('User "%s" already exists.'), $this->creator_user_login ) );
+					}
+					else
+					{	// Create new user:
+						$item_new_User = new User();
+						$item_new_User->set( 'login', $this->creator_user_login );
+						$item_new_User->set( 'email', $this->creator_user_login.'@dummy.null' );
+						$item_new_User->set( 'source', 'created alongside post' );
+						$item_new_User->set( 'pass', '' );
+						$item_new_User->set( 'salt', '' );
+						$item_new_User->set( 'pass_driver', 'nopass' );
+						$item_new_User->dbinsert();
+						// Update user login cache with new created User:
+						$UserCache->cache_login[ $this->creator_user_login ] = $item_new_User;
+						// Uncheck the checkbox to don't suggest create new user on next form updating because the user already has been created with requested login:
+						set_param( 'item_create_user', 0 );
+					}
+				}
+
+				if( param_check_login( 'item_owner_login', true ) )
+				{	// Update item's owner if the user is detected in DB by the entered login:
+					$this->set_creator_by_login( $this->creator_user_login );
+				}
 			}
 		}
 
@@ -1013,6 +1021,7 @@ class Item extends ItemLight
 		modules_call_method( 'update_item_settings', array( 'edited_Item' => $this ) );
 
 		// RENDERERS:
+		$item_Blog = & $this->get_Blog();
 		if( is_admin_page() || $item_Blog->get_setting( 'in_skin_editing_renderers' ) )
 		{	// If text renderers are allowed to update from front-office:
 			if( param( 'renderers_displayed', 'integer', 0 ) )
@@ -1146,6 +1155,72 @@ class Item extends ItemLight
 		}
 
 		return ! param_errors_detected();
+	}
+
+	/**
+	 * Load workflow properties from Request form fields.
+	 *
+	 * @return boolean TRUE if loaded data seems valid, FALSE if some errors or workflow is not allowed or no any property has been changed
+	 */
+	function load_workflow_from_Request()
+	{
+		global $current_User;
+
+		// Get Item's Collection for settings and permissions validation:
+		$item_Blog = & $this->get_Blog();
+
+		if( ( $this->get_type_setting( 'usage' ) != 'content-block' ) && // Item types "Content Block" cannot have the workflow properties
+		    $item_Blog->get_setting( 'use_workflow' ) && // Collection must has the workflow properties enabled
+		    is_logged_in() && // Current User must be logged in
+		    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) && // Current User must has a permission to edit this Item
+		    $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) && // Current User must be assignee for items of the collection
+		    param( 'item_priority', 'integer', NULL ) !== NULL ) // At least Task Priority must be submitted to be sure the form really sends all other workflow properties
+		{	// Update workflow properties only when all conditions above is true:
+			// Assigned to:
+			$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
+			$item_assigned_user_login = param( 'item_assigned_user_login', 'string', NULL );
+			$this->assign_to( $item_assigned_user_ID, $item_assigned_user_login );
+
+			// Priority:
+			$this->set_from_Request( 'priority', 'item_priority', true );
+
+			// Task status:
+			$ItemTypeCache = & get_ItemTypeCache();
+			$current_ItemType = $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ) );
+			$item_status = param( 'item_st_ID', 'integer', NULL );
+			if( in_array( $item_status, $current_ItemType->get_applicable_post_status() ) || $item_status === NULL )
+			{	// Save only task status which is allowed for item's type:
+				$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
+			}
+			else
+			{	// If the submitted task status is not allowed for item's type:
+				param_error( 'item_st_ID', sprintf( T_('Invalid task status for post type %s'), $current_ItemType->get_name() ) );
+			}
+
+			// Deadline:
+			if( $item_Blog->get_setting( 'use_deadline' ) &&
+			    param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL )
+			{	// Update deadline only when it is enabled for item's collection:
+				param_time( 'item_deadline_time', '', false, false, true, true );
+				$item_deadline_time = get_param( 'item_deadline' ) != '' ? substr( get_param( 'item_deadline_time' ), 0, 5 ) : '';
+				$item_deadline_datetime = trim( form_date( get_param( 'item_deadline' ), $item_deadline_time ) );
+				if( ! empty( $item_deadline_datetime ) )
+				{	// Append seconds because they are not entered on the form but they are stored in the DB field "post_datedeadline" as date format "YYYY-mm-dd HH:ii:ss":
+					$item_deadline_datetime .= ':00';
+				}
+				$this->set( 'datedeadline', $item_deadline_datetime, true );
+			}
+
+			// Return TRUE when no errors and ata least one workflow property has been changed:
+			return ! param_errors_detected() && (
+				isset( $this->dbchanges['post_assigned_user_ID'] ) ||
+				isset( $this->dbchanges['post_priority'] ) ||
+				isset( $this->dbchanges['post_pst_ID'] ) ||
+				isset( $this->dbchanges['post_datedeadline'] ) );
+		}
+
+		// If workflow properties are not allowed to be stored for this Item by current User:
+		return false;
 	}
 
 
@@ -1666,12 +1741,12 @@ class Item extends ItemLight
 		if( $this->ID > 0 )
 		{ // The post is saved, so it can actually have attachments:
 			global $DB;
-			$links_SQL = new SQL();
+			$links_SQL = new SQL( 'Get item links IDs of the inline images' );
 			$links_SQL->SELECT( 'link_ID' );
 			$links_SQL->FROM( 'T_links' );
 			$links_SQL->WHERE( 'link_itm_ID = '.$DB->quote( $this->ID ) );
 			$links_SQL->WHERE_and( 'link_position = "inline"' );
-			$inline_links_IDs = $DB->get_col( $links_SQL->get(), 0, 'Get item links IDs of the inline images' );
+			$inline_links_IDs = $DB->get_col( $links_SQL );
 
 			$unused_inline_images = array();
 			foreach( $inline_images[2] as $i => $inline_link_ID )
@@ -1727,13 +1802,13 @@ class Item extends ItemLight
 		}
 
 		// Get a number of attachments from DB
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get a number of attachments for user #'.$User->ID.' and post #'.$this->ID );
 		$SQL->SELECT( 'COUNT( link_ID )' );
 		$SQL->FROM( 'T_links' );
 		$SQL->FROM_add( 'INNER JOIN T_comments ON comment_ID = link_cmt_ID' );
 		$SQL->WHERE( 'link_creator_user_ID = '.$DB->quote( $User->ID ) );
 		$SQL->WHERE_and( 'comment_item_ID = '.$DB->quote( $this->ID ) );
-		$cache_item_attachments_number[$User->ID] = (int)$DB->get_var( $SQL->get() );
+		$cache_item_attachments_number[$User->ID] = (int)$DB->get_var( $SQL );
 
 		return $cache_item_attachments_number[$User->ID];
 	}
@@ -2183,9 +2258,6 @@ class Item extends ItemLight
 		// Render all inline tags to HTML code:
 		$output = $this->render_inline_tags( $output, $params );
 
-		// Render Content block tags like [include:123], [include:item-slug] into item/post content:
-		$output = $this->render_content_blocks( $output, $params );
-
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
 				'Item' => $this,
@@ -2309,9 +2381,6 @@ class Item extends ItemLight
 
 		// Render all inline tags to HTML code:
 		$output = $this->render_inline_tags( $output, $params );
-
-		// Render Content block tags like [include:123], [include:item-slug] into item/post content:
-		$output = $this->render_content_blocks( $output, $params );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -2548,12 +2617,14 @@ class Item extends ItemLight
 	function render_inline_tags( $content, $params = array() )
 	{
 		$params = array_merge( array(
-				'check_code_block'     => true, // TRUE to find inline tags only outside of codeblocks
-				'render_inline_files'  => true,
-				'render_links'         => true,
-				'render_custom_fields' => true,
-				'render_parent'        => true,
-				'render_collection'    => true,
+				'check_code_block'      => true, // TRUE to find inline tags only outside of codeblocks
+				'render_inline_files'   => true,
+				'render_links'          => true,
+				'render_custom_fields'  => true,
+				'render_parent'         => true,
+				'render_collection'     => true,
+				'render_content_blocks' => true,
+				'render_inline_widgets' => true,
 			), $params );
 
 		if( $params['render_inline_files'] )
@@ -2579,6 +2650,202 @@ class Item extends ItemLight
 		if( $params['render_collection'] )
 		{	// Render Collection Data [coll:name], [coll:shortname]:
 			$content = $this->render_collection_data( $content, $params );
+		}
+
+		if( $params['render_content_blocks'] )
+		{	// Render Content block tags like [include:123], [include:item-slug]:
+			$content = $this->render_content_blocks( $content, $params );
+		}
+
+		if( $params['render_inline_widgets'] )
+		{ // Render subscription related tags
+			$content = $this->render_inline_widgets( $content, $params );
+		}
+
+		return $content;
+	}
+
+
+	/**
+	 * Convert inline widget tags like [subscribe] and [emailcapture] into HTML tags
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_inline_widgets( $content, $params )
+	{
+		global $Settings;
+
+		load_funcs( 'skins/_skin.funcs.php' );
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->render_collection_data() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_inline_widgets' ), array( $params ) );
+			return $content;
+		}
+
+		// Find all matches with tags of widgets:
+		preg_match_all( '/\[(subscribe|emailcapture):([^\]]*)\]/i', $content, $tags );
+
+		if( count( $tags[0] ) > 0 )
+		{	// If at least one widget tag is found in content:
+			foreach( $tags[0] as $t => $source_tag )
+			{	// Render URL custom field as html:
+				$field_Item = $this;
+				$widget_html = $source_tag;
+
+				$widget_params = explode( ':', $tags[2][$t] );
+				switch( $tags[1][$t] )
+				{
+					case 'subscribe':
+						$button_notsubscribed = '';
+						$button_subscribed = '';
+						$button_notloggedin = '';
+
+						preg_match( '/(\d+)(?:\/(.*))?/', $widget_params[0], $newsletter_ID_tags );
+						$newsletter_ID = intval( $newsletter_ID_tags[1] );
+						if( isset( $newsletter_ID_tags[2] ) )
+						{
+							$user_tags = $newsletter_ID_tags[2];
+						}
+
+						if( isset( $widget_params[1] ) )
+						{
+							$button_notsubscribed = $widget_params[1];
+						}
+
+						if( isset( $widget_params[2] ) )
+						{
+							$button_subscribed = $widget_params[2];
+						}
+
+						if( isset( $widget_params[3] ) )
+						{
+							$button_notloggedin = $widget_params[3];
+						}
+
+						$params = array(
+							'widget' => 'newsletter_subscription',
+							'title' => '',
+							'intro' => '',
+							'bottom' => '',
+							'title_subscribed' => '',
+							'intro_subscribed' => '',
+							'bottom_subscribed' => '',
+							'enlt_ID' => $newsletter_ID,
+							'button_notsubscribed_class' => 'btn-danger',
+							'button_subscribed_class' => 'btn-success',
+							'inline' => 1
+						);
+						if( ! empty( $button_notsubscribed ) )
+						{
+							$params['button_notsubscribed'] = $button_notsubscribed;
+						}
+						if( ! empty( $button_subscribed ) )
+						{
+							$params['button_subscribed'] = $button_subscribed;
+						}
+						if( ! empty( $user_tags ) )
+						{
+							$params['usertags'] = $user_tags;
+							$params['unsubscribed_if_not_tagged'] = true;
+						}
+
+						if( ! empty( $button_notloggedin ) && ! is_logged_in() )
+						{ // Email capture widget does not display if user is not logged in
+							$redirect_to = regenerate_url( '', '', '', '&' );
+							$widget_html = '<div class="center">';
+							$widget_html .= '<a href="'.get_login_url( 'inline subscribe', $redirect_to ).'" class="btn btn-primary">'.$button_notloggedin.'</a>';
+							$widget_html .= '</div>';
+						}
+						else
+						{
+							ob_start();
+							skin_widget( $params );
+							$widget_html = ob_get_contents();
+							ob_end_clean();
+						}
+
+						break;
+
+					case 'emailcapture':
+						$fields_to_display = array();
+						$button_text = '';
+
+						preg_match( '/(\d+)?(?:\/(.*))?/', $widget_params[0], $newsletter_ID_tags );
+						if( isset( $newsletter_ID_tags[1] ) )
+						{
+							$newsletter_ID = intval( $newsletter_ID_tags[1] );
+						}
+						if( isset( $newsletter_ID_tags[2] ) )
+						{
+							$user_tags = $newsletter_ID_tags[2];
+						}
+						if( isset( $widget_params[1] ) )
+						{
+							$fields_to_display = explode( '+', $widget_params[1] );
+						}
+						if( isset( $widget_params[2] ) )
+						{
+							$button_text = $widget_params[2];
+						}
+
+						$params = array(
+							'widget' => 'user_register',
+							'title' => '',
+							'intro' => '',
+							'ask_firstname' => in_array( 'firstname', $fields_to_display ) ? 'required' : 'no',
+							'ask_lastname' => in_array( 'lastname', $fields_to_display ) ? 'required' : 'no',
+							'source' => 'Page: '.$this->get( 'urltitle' ),
+							'usertags' => isset( $user_tags ) ? $user_tags : NULL,
+							'subscribe_post' => 0,
+							'subscribe_comment' => 0,
+							'subscribe_post_mod' => 0,
+							'button_class' => 'btn-primary',
+							'inline' => 1
+						);
+
+						$NewsletterCache = & get_NewsletterCache();
+						$load_where = 'enlt_active = 1';
+						$NewsletterCache->load_where( $load_where );
+						// Initialize checkbox options for param "Newsletter":
+						$newsletters_options = array();
+						$def_newsletters = explode( ',', $Settings->get( 'def_newsletters' ) );
+						foreach( $NewsletterCache->cache as $Newsletter )
+						{
+							$newsletters_options[] = array(
+								$Newsletter->ID,
+								$Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ),
+								$Newsletter->ID == $newsletter_ID ? 1 : 0, // checked if specified newsletter ID
+							);
+						}
+						$newsletters_options[] = array(
+							'default',
+							T_('Also subscribe user to all default newsletters for new users.'),
+							empty( $newsletter_ID ) ? 1 : 0, // checked if no specific newsletter ID specified
+						);
+						$params['newsletters'] = $newsletters_options;
+
+						if( ! empty ( $button_text ) )
+						{
+							$params['button'] = $button_text;
+						}
+
+						ob_start();
+						skin_widget( $params );
+						$widget_html = ob_get_contents();
+						ob_end_clean();
+						break;
+
+					default:
+						$widget_html = 'xxx';
+				}
+
+				$content = substr_replace( $content, $widget_html, strpos( $content, $source_tag ), strlen( $source_tag ) );
+			}
 		}
 
 		return $content;
@@ -2860,6 +3127,8 @@ class Item extends ItemLight
 
 		$ItemCache = & get_ItemCache();
 
+		$item_Blog = & $this->get_Blog();
+
 		foreach( $tags[0] as $t => $source_tag )
 		{
 			$item_ID_slug = trim( $tags[1][ $t ] );
@@ -2881,6 +3150,22 @@ class Item extends ItemLight
 				}
 				// Replace inline content block tag with error message about wrong referenced item:
 				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>', $content );
+				continue;
+			}
+			elseif( get_status_permvalue( $this->get( 'status' ) ) > get_status_permvalue( $content_Item->get( 'status' ) ) )
+			{	// Deny to display content block Item with lower status than parent Item:
+				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The visibility level of the content block "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				continue;
+			}
+			elseif( $content_Item->get( 'creator_user_ID' ) != $this->get( 'creator_user_ID' ) &&
+			        ( ! $item_Blog || $content_Item->get( 'creator_user_ID' ) != $item_Blog->get( 'owner_user_ID' ) ) &&
+			        ( ! $item_Blog || $content_Item->get_blog_ID() != $item_Blog->ID )
+			      )
+			{	// We can display a content block item with at least one condition:
+				//  - Content block Item has same owner as owner of parent Item,
+				//  - Content block Item has same owner as owner of parent Item's collection,
+				//  - Content block Item is in same collection as parent Item:
+				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
 				continue;
 			}
 
@@ -5202,7 +5487,7 @@ class Item extends ItemLight
 
 		$curr_status_permvalue = get_status_permvalue( $this->status );
 		// get the current User highest publish status for this item Blog
-		list( $highest_status, $publish_text ) = get_highest_publish_status( 'post', $this->get_blog_ID() );
+		list( $highest_status, $publish_text ) = get_highest_publish_status( 'post', $this->get_blog_ID(), true, '', $this );
 		// Get binary value of the highest available status
 		$highest_status_permvalue = get_status_permvalue( $highest_status );
 		if( $curr_status_permvalue >= $highest_status_permvalue || ( $highest_status_permvalue <= get_status_permvalue( 'private' ) ) )
@@ -6131,14 +6416,14 @@ class Item extends ItemLight
 		$post_url = '',
 		$post_comment_status = 'open',
 		$post_renderers = array('default'),
-		$item_type_name = '#', // Use 'Page', 'Post' and etc. OR '#' to use default post type
+		$item_type_name_or_ID = '#', // Use 'Page', 'Post' and etc. OR '#' to use default post type OR integer to use post type by ID
 		$item_st_ID = NULL,
 		$post_order = NULL )
 	{
 		global $DB, $query, $UserCache;
 		global $default_locale;
 
-		if( $item_type_name == '#' )
+		if( $item_type_name_or_ID == '#' )
 		{	// Try to set default post type ID from blog setting:
 			$ChapterCache = & get_ChapterCache();
 			if( $Chapter = & $ChapterCache->get_by_ID( $main_cat_ID, false, false ) &&
@@ -6150,7 +6435,11 @@ class Item extends ItemLight
 		else
 		{	// Try to get item type by requested name:
 			$ItemTypeCache = & get_ItemTypeCache();
-			if( $ItemType = & $ItemTypeCache->get_by_name( $item_type_name, false, false ) )
+			if( is_int( $item_type_name_or_ID ) && $ItemType = & $ItemTypeCache->get_by_ID( $item_type_name_or_ID, false, false ) )
+			{	// Item type exists in DB by requested ID, Use it:
+				$item_typ_ID = $ItemType->ID;
+			}
+			elseif( $ItemType = & $ItemTypeCache->get_by_name( $item_type_name_or_ID, false, false ) )
 			{	// Item type exists in DB by requested name, Use it:
 				$item_typ_ID = $ItemType->ID;
 			}
@@ -6190,7 +6479,8 @@ class Item extends ItemLight
 		$this->set( 'title', $post_title );
 		$this->set( 'urltitle', $post_urltitle );
 		$this->set( 'content', $post_content );
-		$this->set( 'datestart', $post_timestamp );
+		//$this->set( 'datestart', $post_timestamp );
+		$this->set( 'datestart', date( 'Y-m-d H:i:s' ) ); // Use current time temporarily, we'll update this later
 
 		$this->set( 'main_cat_ID', $main_cat_ID );
 		$this->set( 'extra_cat_IDs', $extra_cat_IDs );
@@ -6205,6 +6495,9 @@ class Item extends ItemLight
 
 		// INSERT INTO DB:
 		$this->dbinsert();
+
+		// Update post_datestart using FROM_UNIXTIME to prevent invalid datetime values during DST spring forward - fall back
+		$DB->query( 'UPDATE T_items__item SET post_datestart = FROM_UNIXTIME('.strtotime( $post_timestamp ).') WHERE post_ID = '.$DB->quote( $this->ID ) );
 
 		return $this->ID;
 	}
@@ -6245,7 +6538,7 @@ class Item extends ItemLight
 			$urltitles[ $u ] = utf8_trim( $urltitle_value );
 		}
 		$orig_urltitle = implode( ',', array_unique( $urltitles ) );
-		$this->set( 'urltitle', urltitle_validate( $urltitles[0], $this->title, $this->ID, false, 'slug_title', 'slug_itm_ID', 'T_slug', $this->locale ) );
+		$this->set( 'urltitle', urltitle_validate( $urltitles[0], $this->title, $this->ID, false, 'slug_title', 'slug_itm_ID', 'T_slug', $this->locale, 'T_items__item' ) );
 
 		$this->update_renderers_from_Plugins();
 
@@ -6269,6 +6562,12 @@ class Item extends ItemLight
 		    $this->get( 'locale' ) != $item_Blog->get( 'locale' ) )
 		{	// Force to use collection locale because it is restricted by collection setting:
 			$this->set( 'locale', $item_Blog->get( 'locale' ) );
+		}
+
+		// Check if item is assigned to a user
+		if( isset( $this->dbchanges['post_assigned_user_ID'] ) )
+		{
+			$this->assigned_to_new_user = true;
 		}
 
 		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
@@ -6458,6 +6757,12 @@ class Item extends ItemLight
 			$this->set( 'dateset', 1 );
 		}
 
+		// Check if item is assigned to a user
+		if( isset( $this->dbchanges['post_assigned_user_ID'] ) )
+		{
+			$this->assigned_to_new_user = true;
+		}
+
 		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
 
 		// Check whether any db change has been executed
@@ -6597,7 +6902,12 @@ class Item extends ItemLight
 
 			$DB->commit();
 
-			$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
+			if( empty( $this->AfterItemUpdate_is_executed ) )
+			{	// Execute this event once per request:
+				$Plugins->trigger_event( 'AfterItemUpdate', $params = array( 'Item' => & $this, 'dbchanges' => $dbchanges ) );
+				// Set flag to know we have already executed this plugin event:
+				$this->AfterItemUpdate_is_executed = true;
+			}
 		}
 
 		if( $db_changed )
@@ -7027,7 +7337,14 @@ class Item extends ItemLight
 		// Send email notifications to users who can moderate this item:
 		$already_notified_user_IDs = $this->send_moderation_emails( $executed_by_userid, $is_new_item );
 
-		// SECOND: Subscribers may be notified asynchornously... and that is a even a requirement if the post has an issue_date in the future.
+		// SECOND: Send email notification to assigned user
+		$Blog = & $this->get_Blog();
+		if( $Blog->get_setting( 'use_workflow' ) && $this->assigned_to_new_user && ! empty( $this->assigned_user_ID ) )
+		{
+			$already_notified_user_IDs = array_merge( $already_notified_user_IDs, $this->send_assignment_notification( $executed_by_userid, $is_new_item ) );
+		}
+
+		// THIRD: Subscribers may be notified asynchornously... and that is a even a requirement if the post has an issue_date in the future.
 
 		$notified_flags = array();
 		if( $force_members == 'mark' )
@@ -7168,6 +7485,10 @@ class Item extends ItemLight
 		{
 			$notify_condition = '( uset_value IS NULL OR ( '.$notify_condition.' ) )';
 		}
+		if( ! $is_new_item && $this->Blog->get_setting( 'allow_item_mod_subscriptions' ) )
+		{	// Notify moderators which selected to be notified per collection (if it is enabled by collection setting):
+			$notify_condition = '( sub_items_mod = 1 OR ( '.$notify_condition.' ) )';
+		}
 
 		// Select user_ids with the corresponding item edit permission on this item's blog
 		$SQL = new SQL();
@@ -7178,8 +7499,9 @@ class Item extends ItemLight
 		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0 AND user_grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$this->blog_ID.' )' );
 		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "'.$notify_moderation_setting_name.'"' );
 		$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
+		$SQL->FROM_add( 'LEFT JOIN T_subscriptions ON sub_coll_ID = blog_ID AND sub_user_ID = user_ID' );
 		$SQL->WHERE( $notify_condition );
-		$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
+		$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 		$SQL->WHERE_and( '( bloguser_perm_edit IS NOT NULL AND bloguser_perm_edit <> "no" AND bloguser_perm_edit <> "own" )
 				OR ( bloggroup_perm_edit IS NOT NULL AND bloggroup_perm_edit <> "no" AND bloggroup_perm_edit <> "own" )
 				OR ( grp_perm_blogs = "editall" ) OR ( user_ID = blog_owner_user_ID )' );
@@ -7263,6 +7585,73 @@ class Item extends ItemLight
 		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), count( $notified_user_IDs ) ), 'note', T_('Sending notifications:')  );
 
 		return $notified_user_IDs;
+	}
+
+
+	/**
+	 * Send "post assignment" notifications for user who have been assigned to this post and would like to receive these notifications.
+	 *
+	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
+	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
+	 * @return array the notified user ids
+	 */
+	function send_assignment_notification( $executed_by_userid = NULL, $is_new_item = false )
+	{
+		global $current_User, $Messages, $UserSettings;
+
+		if( $executed_by_userid === NULL && is_logged_in() )
+		{	// Use current user by default:
+			global $current_User;
+			$executed_by_userid = $current_User->ID;
+		}
+
+		if( $this->assigned_user_ID && $executed_by_userid != $this->assigned_user_ID )
+		{ // Item has assigned user and the assigned user is not the one who created/updated this post:
+			$UserCache = & get_UserCache();
+			$principal_User = $UserCache->get_by_ID( $executed_by_userid, false, false );
+			$assigned_User = $this->get_assigned_User();
+
+			if( $assigned_User &&
+					$UserSettings->get( 'notify_post_assignment', $assigned_User->ID ) &&
+					$assigned_User->check_perm( 'blog_ismember', 'view', false, $this->get_blog_ID() ) )
+			{ // Assigned user wants to receive post assignment notifications and is a member of at least one collection:
+				$user_Group = $assigned_User->get_Group();
+				$notify_full = $user_Group->check_perm( 'post_assignment_notif', 'full' );
+
+				$email_template_params = array(
+					'locale'         => $assigned_User->locale,
+					'notify_full'    => $notify_full,
+					'Item'           => $this,
+					'principal_User' => $principal_User,
+					'recipient_User' => $assigned_User,
+				);
+
+				locale_temp_switch( $assigned_User->locale );
+
+				/* TRANS: Subject of the mail to send on assignment of posts to a user. First %s is blog name, the second %s is the item's title. */
+				$subject = T_('[%s] Post assignment: "%s"');
+				$subject = sprintf( $subject, $this->Blog->get('shortname'), $this->get('title') );
+
+				// Send the email:
+				$notified_user_IDs = array();
+
+				if( send_mail_to_User( $assigned_User->ID, $subject, 'post_assignment', $email_template_params, false, array( 'Reply-To' => $principal_User->email ) ) )
+				{	// A send notification email request to the assigned user was processed:
+					$notified_user_IDs[] = $assigned_User->ID;
+					$Messages->add_to_group( T_('Sending email notification to assigned user.'), 'note', T_('Sending notifications:')  );
+				}
+
+				locale_restore_previous();
+
+				return $notified_user_IDs;
+			}
+			else
+			{ // No valid assigned user or the user does not want to receive post assignment notifications
+				return NULL;
+			}
+		}
+
+		return NULL;
 	}
 
 
@@ -7411,7 +7800,7 @@ class Item extends ItemLight
 					INNER JOIN T_users ON user_ID = sub_user_ID
 					WHERE sub_coll_ID = '.$this->get_blog_ID().'
 					AND sub_items <> 0
-					AND user_status IN ( "activated", "autoactivated" )
+					AND user_status IN ( "activated", "autoactivated", "manualactivated" )
 
 					UNION
 
@@ -7427,7 +7816,7 @@ class Item extends ItemLight
 						AND opt.cset_value = 1
 						AND NOT user_ID IS NULL
 						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
-						AND user_status IN ( "activated", "autoactivated" )
+						AND user_status IN ( "activated", "autoactivated", "manualactivated" )
 
 					UNION
 
@@ -7444,7 +7833,7 @@ class Item extends ItemLight
 						AND opt.cset_value = 1
 						AND NOT sug_user_ID IS NULL
 						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
-						AND user_status IN ( "activated", "autoactivated" )
+						AND user_status IN ( "activated", "autoactivated", "manualactivated" )
 
 					UNION
 
@@ -7460,7 +7849,7 @@ class Item extends ItemLight
 						AND opt.cset_value = 1
 						AND NOT bloguser_user_ID IS NULL
 						AND ( ( sub_items IS NULL OR sub_items = 1 ) )
-						AND user_status IN ( "activated", "autoactivated" )
+						AND user_status IN ( "activated", "autoactivated", "manualactivated" )
 				) AS users
 				WHERE NOT user_ID IS NULL';
 
@@ -7696,7 +8085,9 @@ class Item extends ItemLight
 				if( $Plugin )
 				{
 					$ping_messages = array();
-					$ping_messages[] = sprintf( T_('Pinging %s...'), $Plugin->ping_service_name );
+					$ping_messages[] = array(
+						'message' => sprintf( T_('Pinging %s...'), $Plugin->ping_service_name ),
+						'type' => 'note' );
 					$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
 
 					$r = $Plugin->ItemSendPing( $params ) && $r;
@@ -7708,8 +8099,14 @@ class Item extends ItemLight
 							// dh> TODO: let xmlrpc_displayresult() handle $Messages (e.g. "error", but should be connected/after the "Pinging %s..." from above)
 							ob_start();
 							xmlrpc_displayresult( $params['xmlrpcresp'], true );
-							$ping_messages[] = ob_get_contents();
+							$ping_messages[] = array(
+								'message' => ob_get_contents(),
+								'type' => 'note' );
 							ob_end_clean();
+						}
+						elseif( is_array( $params['xmlrpcresp'] ) )
+						{
+							$ping_messages = array_merge( $ping_messages, $params['xmlrpcresp'] );
 						}
 						else
 						{
@@ -7717,7 +8114,52 @@ class Item extends ItemLight
 						}
 					}
 
-					$Messages->add_to_group( implode( '<br />', $ping_messages ), 'note', T_('Sending notifications:') );
+					$current_type = NULL;
+					$current_title = NULL;
+					$current_message = NULL;
+
+					foreach( $ping_messages as $message )
+					{
+						if( is_array( $message ) )
+						{
+							$loop_type = empty( $message['type'] ) ? 'note' : $message['type'];
+							$loop_title = empty( $message['title'] ) ? T_('Sending notifications:') : $message['title'];
+							$loop_message = $message['message'];
+						}
+						else
+						{
+							$loop_type = 'note';
+							$loop_title = T_('Sending notifications:');
+							$loop_message = $message;
+						}
+
+						if( empty( $current_type ) ) $current_type = $loop_type;
+						if( empty( $current_title ) ) $current_title = $loop_title;
+
+						if( $loop_type == $current_type && $loop_title == $current_title )
+						{
+							if( empty( $current_message ) )
+							{
+								$current_message = $loop_message;
+							}
+							else
+							{
+								$current_message .= '<br>'.$loop_message;
+							}
+						}
+						else
+						{
+							$Messages->add_to_group( $current_message, $current_type, $current_title );
+							$current_message = $loop_message;
+							$current_type = $loop_type;
+							$current_title = $loop_title;
+						}
+					}
+
+					if( !empty( $current_message ) )
+					{ // Display last message
+						$Messages->add_to_group( $current_message, $current_type, $current_title );
+					}
 				}
 			}
 		}
@@ -8020,7 +8462,7 @@ class Item extends ItemLight
 			$SQL->WHERE_and( 'slug_ID != '.$DB->quote( $this->tiny_slug_ID ) );
 		}
 		$SQL->ORDER_BY( 'slug_order_num' );
-		$slugs = $DB->get_col( $SQL->get() );
+		$slugs = $DB->get_col( $SQL );
 
 		return implode( $separator, $slugs );
 	}
@@ -8189,7 +8631,7 @@ class Item extends ItemLight
 			$SQL->ORDER_BY( 'comment_date DESC' );
 			$SQL->LIMIT( '1' );
 
-			if( $comment_ID = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) )
+			if( $comment_ID = $DB->get_var( $SQL ) )
 			{	// Load the latest Comment in cache:
 				$CommentCache = & get_CommentCache();
 				// WARNING: Do NOT get this object by reference because it may rewrites current updating Comment:
@@ -8226,7 +8668,7 @@ class Item extends ItemLight
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $this->Blog->ID, 'comment' ), 'comment_', $this->Blog->ID, 'blog_comment!' ) );
 		$SQL->GROUP_BY( 'expiry_status, comment_rating' );
 		$SQL->ORDER_BY( 'comment_rating DESC' );
-		$results = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+		$results = $DB->get_results( $SQL );
 
 		// init rating arrays
 		$ratings = array();
@@ -8891,7 +9333,7 @@ class Item extends ItemLight
 			$SQL->FROM( 'T_items__user_data' );
 			$SQL->WHERE( 'itud_user_ID = '.$DB->quote( $current_User->ID ) );
 			$SQL->WHERE_and( 'itud_item_ID = '.$DB->quote( $this->ID ) );
-			$cache_items_user_data[ $this->ID ] = $DB->get_row( $SQL->get(), ARRAY_A, NULL, $SQL->title );
+			$cache_items_user_data[ $this->ID ] = $DB->get_row( $SQL, ARRAY_A );
 		}
 
 		if( isset( $cache_items_user_data[ $this->ID ] ) && is_array( $cache_items_user_data[ $this->ID ] ) &&  empty( $cache_items_user_data[ $this->ID ] ) )
@@ -9259,7 +9701,7 @@ class Item extends ItemLight
 		}
 
 		// Get all possible tags that are not related to this item:
-		$other_tags_SQL = new SQL();
+		$other_tags_SQL = new SQL( 'Get all possible tags that are not related to this item' );
 		$other_tags_SQL->SELECT( 'tag_name' );
 		$other_tags_SQL->FROM( 'T_items__tag' );
 		// Get all current tags to exclude from searching:
@@ -9268,7 +9710,7 @@ class Item extends ItemLight
 		{	// If this item has at least one tag, Exclude them:
 			$other_tags_SQL->WHERE( 'tag_name NOT IN ( '.$DB->quote( $item_tags ).' )' );
 		}
-		$other_tags = $DB->get_col( $other_tags_SQL->get(), 0, 'Get all possible tags that are not related to this item' );
+		$other_tags = $DB->get_col( $other_tags_SQL );
 
 		if( count( $other_tags ) == 0 )
 		{	// No tags for searching, Exit here:
@@ -9301,7 +9743,7 @@ class Item extends ItemLight
 		$current_status = $this->get( 'status' );
 
 		// Checks if the requested item status can be used by current user and if not, get max allowed item status of the collection
-		$restricted_status = $item_Blog->get_allowed_item_status( $current_status );
+		$restricted_status = $item_Blog->get_allowed_item_status( $current_status, $this );
 
 		if( $update_status )
 		{	// Update status to new restricted value:
@@ -9688,7 +10130,7 @@ class Item extends ItemLight
 		$SQL->FROM( 'T_items__votes' );
 		$SQL->WHERE( 'itvt_item_ID = '.$DB->quote( $this->ID ) );
 		$SQL->WHERE_and( 'itvt_user_ID = '.$DB->quote( $current_User->ID ) );
-		$existing_vote = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
+		$existing_vote = $DB->get_var( $SQL );
 
 		if( $existing_vote === NULL )
 		{	// Add a new vote for first time:
@@ -9722,7 +10164,7 @@ class Item extends ItemLight
 		$vote_SQL->FROM( 'T_items__votes' );
 		$vote_SQL->WHERE( 'itvt_item_ID = '.$DB->quote( $this->ID ) );
 		$vote_SQL->WHERE_and( 'itvt_updown IS NOT NULL' );
-		$vote = $DB->get_row( $vote_SQL->get(), OBJECT, NULL, $vote_SQL->title );
+		$vote = $DB->get_row( $vote_SQL );
 
 		// These values must be number and not NULL:
 		$vote->votes_sum = intval( $vote->votes_sum );
@@ -9773,7 +10215,7 @@ class Item extends ItemLight
 		$SQL->WHERE_and( 'itvt_user_ID = '.$DB->quote( $current_User->ID ) );
 		$SQL->WHERE_and( 'itvt_updown IS NOT NULL' );
 
-		if( $vote = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title ) )
+		if( $vote = $DB->get_row( $SQL ) )
 		{	// Get a vote for current user and this item:
 			$result['is_voted'] = true;
 			$class_disabled = 'disabled';

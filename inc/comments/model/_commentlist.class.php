@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -937,7 +937,7 @@ class CommentList2 extends DataObjectList2
 		$SQL->FROM( 'T_comments__votes' );
 		$SQL->WHERE( 'cmvt_cmt_ID IN ( '.$DB->quote( $not_cached_comment_ids ).' )' );
 		$SQL->WHERE_and( 'cmvt_user_ID = '.$DB->quote( $current_User->ID ) );
-		$comments_vote_statuses = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+		$comments_vote_statuses = $DB->get_results( $SQL, ARRAY_A );
 
 		// Load all existing votes into cache variable:
 		foreach( $comments_vote_statuses as $comments_vote_status )

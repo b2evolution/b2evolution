@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -103,7 +103,7 @@ if( !empty( $template_action ) )
 			// Prune old hits & sessions
 			load_class( 'sessions/model/_hitlist.class.php', 'Hitlist' );
 			$result = Hitlist::dbprune( false ); // will prune once per day, according to Settings
-			print_log( $result['message'], $result['result'] );
+			print_log( nl2br( $result['message'] ), $result['result'] );
 			break;
 
 		case 'recreate_itemslugs':

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  *
@@ -135,10 +135,6 @@ if( isset($GLOBALS['files_Module']) )
 	$Form->end_fieldset();
 }
 
-$Form->begin_fieldset( T_('Contact form').' (disp=msgform)'.get_manual_link( 'contact-form' ) );
-	$Form->text_input( 'msgform_title', $edited_Blog->get_setting( 'msgform_title' ), 80, T_('Page Title'), T_('Leave empty for default') );
-	$Form->checkbox( 'msgform_display_recipient', $edited_Blog->get_setting( 'msgform_display_recipient' ), T_('Display recipient'), T_('Check to show a "Message to:" line.') );
-$Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 

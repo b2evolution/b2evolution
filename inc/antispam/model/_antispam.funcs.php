@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
  * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as
@@ -213,9 +213,10 @@ function antispam_report_abuse( $abuse_string )
 /**
  * Request abuse list from central blacklist.
  *
+ * @param boolean Is cron job execution?
  * @return boolean true = success, false = error
  */
-function antispam_poll_abuse()
+function antispam_poll_abuse( $is_cron = false )
 {
 	global $Messages, $Settings, $baseurl, $debug, $antispamsrv_protocol, $antispamsrv_host, $antispamsrv_port, $antispamsrv_uri;
 	global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
@@ -235,7 +236,15 @@ function antispam_poll_abuse()
 	// Get datetime from last update, because we only want newer stuff...
 	$last_update = $Settings->get( 'antispam_last_update' );
 	// Encode it in the XML-RPC format
-	$Messages->add_to_group( T_('Latest update timestamp').': '.$last_update, 'note', T_('Updating antispam:') );
+	$log_message = T_('Latest update timestamp').': '.$last_update;
+	if( $is_cron )
+	{	// Cron mode:
+		cron_log_append( $log_message );
+	}
+	else
+	{	// Normal mode:
+		$Messages->add_to_group( $log_message, 'note', T_('Updating antispam:') );
+	}
 	$startat = mysql2date( 'Ymd\TH:i:s', $last_update );
 	//$startat = iso8601_encode( mktime(substr($m,11,2),substr($m,14,2),substr($m,17,2),substr($m,5,2),substr($m,8,2),substr($m,0,4)) );
 
@@ -251,7 +260,15 @@ function antispam_poll_abuse()
 								)
 							);
 
-	$Messages->add_to_group( sprintf( T_('Requesting abuse list from %s...'), $antispamsrv_host ), 'note', T_('Updating antispam:') );
+	$log_message = sprintf( T_('Requesting abuse list from %s...'), $antispamsrv_host );
+	if( $is_cron )
+	{	// Cron mode:
+		cron_log_append( $log_message );
+	}
+	else
+	{	// Normal mode:
+		$Messages->add_to_group( $log_message, 'note', T_('Updating antispam:') );
+	}
 
 	$result = $client->send( $message );
 
@@ -263,7 +280,15 @@ function antispam_poll_abuse()
 			$response = xmlrpc_decode_recurse( $response );
 			if( !isset( $response['strings'] ) || !isset( $response['lasttimestamp'] ) )
 			{
-				$Messages->add( T_('Incomplete response.'), 'error' );
+				$log_message = T_('Incomplete response.');
+				if( $is_cron )
+				{	// Cron mode:
+					cron_log_append( $log_message, 'error' );
+				}
+				else
+				{	// Normal mode:
+					$Messages->add_to_group( $log_message, 'error', T_('Updating antispam:') );
+				}
 				$ret = false;
 			}
 			else
@@ -271,7 +296,15 @@ function antispam_poll_abuse()
 				$value = $response['strings'];
 				if( count( $value ) == 0 )
 				{
-					$Messages->add_to_group( T_('No new blacklisted strings are available.'), 'note', T_('Updating antispam:') );
+					$log_message = T_('No new blacklisted strings are available.');
+					if( $is_cron )
+					{	// Cron mode:
+						cron_log_append( $log_message );
+					}
+					else
+					{	// Normal mode:
+						$Messages->add_to_group( $log_message, 'note', T_('Updating antispam:') );
+					}
 				}
 				else
 				{ // We got an array of strings:
@@ -279,29 +312,67 @@ function antispam_poll_abuse()
 					{
 						if( antispam_create( $banned_string, 'central' ) )
 						{ // Creation successed
-							$Messages->add_to_group( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
-								.T_('OK').'.', 'note', T_('Adding strings to local blacklist:') );
+							$log_message = T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '.T_('OK').'.';
+							if( $is_cron )
+							{	// Cron mode:
+								cron_log_action_end( $log_message, 'success' );
+							}
+							else
+							{	// Normal mode:
+								$Messages->add_to_group( $log_message, 'note', T_('Adding strings to local blacklist:') );
+							}
 						}
 						else
 						{ // Was already handled
-							$Messages->add_to_group( T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '
-								.T_('Not necessary! (Already handled)'), 'note', T_('Adding strings to local blacklist:') );
+							$log_message = T_('Adding:').' &laquo;'.$banned_string.'&raquo;: '.T_('Not necessary! (Already handled)');
+							if( $is_cron )
+							{	// Cron mode:
+								cron_log_action_end( $log_message, 'note' );
+							}
+							else
+							{	// Normal mode:
+								$Messages->add_to_group( $log_message, 'note', T_('Adding strings to local blacklist:') );
+							}
 							antispam_update_source( $banned_string, 'central' );
 						}
 					}
 					// Store latest timestamp:
 					$endedat = date('Y-m-d H:i:s', iso8601_decode( $response['lasttimestamp'] ) );
-					$Messages->add( T_('New latest update timestamp').': '.$endedat, 'note', T_('Adding strings to local blacklist:') );
+					$log_message = T_('New latest update timestamp').': '.$endedat;
+					if( $is_cron )
+					{	// Cron mode:
+						cron_log_append( $log_message );
+					}
+					else
+					{	// Normal mode:
+						$Messages->add_to_group( $log_message, 'note', T_('Adding strings to local blacklist:') );
+					}
 
 					$Settings->set( 'antispam_last_update', $endedat );
 					$Settings->dbupdate();
 				}
-				$Messages->add( T_('Done').'.', 'success' );
+				$log_message = T_('Done').'.';
+				if( $is_cron )
+				{	// Cron mode:
+					cron_log_append( $log_message );
+				}
+				else
+				{	// Normal mode:
+					$Messages->add( $log_message, 'success' );
+				}
 			}
 		}
 		else
 		{
-			$Messages->add( T_('Invalid response').'.', 'error' );
+			$log_message = T_('Invalid response').'.';
+			if( $is_cron )
+			{	// Cron mode:
+				cron_log_append( $log_message, 'error' );
+			}
+			else
+			{	// Normal mode:
+				$Messages->add( $log_message, 'error' );
+			}
 			$ret = false;
 		}
 	}
@@ -491,7 +562,7 @@ function get_ip_ranges( $ip_start, $ip_end, $aipr_ID = 0 )
 	}
 	$SQL->ORDER_BY( 'aipr_IPv4start' );
 
-	return $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+	return $DB->get_results( $SQL );
 }
 
 
@@ -540,13 +611,13 @@ function antispam_block_by_ip()
 	}
 	$condition = '( '.substr( $condition, 4 ).' )';
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get blocked IP ranges' );
 	$SQL->SELECT( 'aipr_ID' );
 	$SQL->FROM( 'T_antispam__iprange' );
 	$SQL->WHERE( $condition );
 	$SQL->WHERE_and( 'aipr_status = \'blocked\'' );
 	$SQL->LIMIT( 1 );
-	$ip_range_ID = $DB->get_var( $SQL->get() );
+	$ip_range_ID = $DB->get_var( $SQL );
 
 	if( !is_null( $ip_range_ID ) )
 	{ // The request from this IP address must be blocked
@@ -577,6 +648,11 @@ function antispam_block_by_domain()
 
 	foreach( $current_ip_addreses as $ip_address )
 	{
+		if( ! is_valid_ip_format( $ip_address ) )
+		{	// Skip not valid IP address:
+			continue;
+		}
+
 		// Get domain name by current IP adress:
 		$ip_domain = gethostbyaddr( $ip_address );
 
@@ -597,6 +673,11 @@ function antispam_block_by_domain()
 function antispam_block_by_initial_referer()
 {
 	global $Session;
+
+	if( ! isset( $Session ) )
+	{	// We cannot use this for request without initialized Session, e-g CLI mode:
+		return;
+	}
 
 	load_funcs( 'sessions/model/_hitlog.funcs.php' );
 
@@ -772,7 +853,7 @@ function antispam_suspect_user_by_IP( $IP_address = '', $user_ID = NULL, $check_
 	$SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $IP_address_int ) );
 	$SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $IP_address_int ) );
 	$SQL->WHERE_and( 'aipr_status = \'suspect\'' );
-	$ip_range_ID = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
+	$ip_range_ID = $DB->get_row( $SQL );
 
 	if( ! is_null( $ip_range_ID ) )
 	{	// Move the user to suspicious group because current IP address is suspected:
@@ -871,12 +952,12 @@ function antispam_suspect_user_by_country( $country_ID, $user_ID = NULL, $check_
 		$User = $UserCache->get_by_ID( $user_ID, false, false );
 	}
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Check suspected country with ID #'.$country_ID );
 	$SQL->SELECT( 'ctry_ID' );
 	$SQL->FROM( 'T_regional__country' );
 	$SQL->WHERE( 'ctry_ID = '.$DB->quote( $country_ID ) );
 	$SQL->WHERE_and( 'ctry_status = \'suspect\'' );
-	$country_ID = $DB->get_var( $SQL->get() );
+	$country_ID = $DB->get_var( $SQL );
 
 	if( !is_null( $country_ID ) )
 	{ // Move current user to suspicious group because country is suspected
@@ -1013,7 +1094,7 @@ function antispam_bankruptcy_blogs( $comment_status = NULL )
 	$SQL->GROUP_BY( 'blog_ID' );
 	$SQL->ORDER_BY( 'blog_'.$Settings->get('blogs_order_by').' '.$Settings->get('blogs_order_dir') );
 
-	return $DB->get_results( $SQL->get() );
+	return $DB->get_results( $SQL );
 }
 
 
@@ -1043,7 +1124,7 @@ function antispam_bankruptcy_delete( $blog_IDs = array(), $comment_status = NULL
 	$items_IDs_SQL->FROM( 'T_postcats' );
 	$items_IDs_SQL->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
 	$items_IDs_SQL->WHERE( 'cat_blog_ID IN ( '.$DB->quote( $blog_IDs ).' )' );
-	$items_IDs = $DB->get_col( $items_IDs_SQL->get() );
+	$items_IDs = $DB->get_col( $items_IDs_SQL );
 
 	$comments_IDs_SQL = new SQL( 'Get all comments IDs of selected blogs' );
 	$comments_IDs_SQL->SELECT( 'comment_ID' );
@@ -1177,5 +1258,158 @@ function antispam_increase_counter( $counter_name )
 			}
 		}
 	}
+}
+
+
+/**
+ * Get WHOIS information
+ *
+ * @param string Domain or IP address to query for WHOIS
+ * @param integer Window height to limit the result display
+ * @return string WHOIS query result
+ */
+function antispam_get_whois( $query = NULL, $window_height = NULL )
+{
+	global $current_User, $admin_url;
+
+	load_class('_ext/phpwhois/whois.main.php', 'whois' );
+
+	$whois = new Whois();
+
+	// Set to true if you want to allow proxy requests
+	$allowproxy = false;
+
+	// get faster but less acurate results
+	$whois->deep_whois = empty( $_GET['fast'] );
+
+	// To use special whois servers (see README)
+	//$whois->UseServer( 'uk', 'whois.nic.uk:1043?{hname} {ip} {query}' );
+	//$whois->UseServer( 'au', 'whois-check.ausregistry.net.au' );
+
+	// Comment the following line to disable support for non ICANN tld's
+	$whois->non_icann = true;
+
+	$result = $whois->Lookup( $query );
+
+	if( empty( $window_height ) )
+	{
+		$winfo = '<pre>';
+	}
+	else
+	{
+		$winfo = '<pre style="height: '.( $window_height - 200 ).'px; overflow: auto;">';
+	}
+
+	if( ! empty( $result['rawdata'] ) )
+	{
+		for( $i = 0; $i < count( $result['rawdata'] ); $i++ )
+		{
+			// Highlight lines starting with orgname: or org-name: (case insensitive)
+			if( preg_match( '/^(orgname:|org-name:|descr:)/i', $result['rawdata'][$i] ) )
+			{
+				$result['rawdata'][$i] = '<span style="font-weight: bold; background-color: yellow;">'.$result['rawdata'][$i].'</span>';
+			}
+
+			// Make URLs and emails clickable
+			if( preg_match_all( '#[-a-zA-Z0-9@:%_\+.~\#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~\#?&//=;]*)?#si', $result['rawdata'][$i], $matches ) )
+			{
+				foreach( $matches as $match )
+				{
+					if( filter_var( $match[0], FILTER_VALIDATE_EMAIL ) )
+					{ // check if valid email
+						$href_string = 'mailto:'.$match[0];
+						$result['rawdata'][$i] = str_replace( $match[0], '<a href="'.$href_string.'">'.$match[0].'</a>', $result['rawdata'][$i] );
+					}
+					else
+					{ // check if valid URL
+						$href_string = ( ! preg_match( '#^(ht|f)tps?://#', $match[0] ) ) // check if protocol not present
+								? 'http://' . $match[0] // temporarily add one
+								: $match[0]; // use current
+						if( filter_var( $href_string, FILTER_VALIDATE_URL ) )
+						{
+							$result['rawdata'][$i] = str_replace( $match[0], '<a href="'.$href_string.'" target="_blank">'.$match[0].'</a>', $result['rawdata'][$i] );
+						}
+					}
+				}
+			}
+
+			// Make IP ranges clickable
+			if( $current_User->check_perm( 'spamblacklist', 'view' ) &&
+					preg_match_all( '#(?<=\:)(\s*)(\b(?:(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\.){3}(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\s?-\s?(?:(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\.){3}(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\b)#', $result['rawdata'][$i], $matches ) )
+			{
+				$aipr_status_titles = aipr_status_titles();
+				// Try to get IP range from DB:
+				$IPRangeCache = & get_IPRangeCache();
+				if( $IPRange = & $IPRangeCache->get_by_ip( $query ) )
+				{	// Get status of IP range if it exists in DB:
+					$iprange_status = $IPRange->get( 'status' );
+				}
+				else
+				{	// Use "Unknown" status for new IP range:
+					$iprange_status = '';
+				}
+
+				$ip_range_text = $matches[2][0];
+				$whois_IPs = explode( '-', $ip_range_text );
+				$whois_IP_start = isset( $whois_IPs[0] ) ? trim( $whois_IPs[0] ) : '';
+				$whois_IP_end = isset( $whois_IPs[1] ) ? trim( $whois_IPs[1] ) : '';
+				if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+				{	// If current user has a permission to edit IP ranges:
+					if( $IPRange )
+					{	// If IP range is found in DB:
+						$db_IP_start = int2ip( $IPRange->get( 'IPv4start' ) );
+						$db_IP_end = int2ip( $IPRange->get( 'IPv4end' ) );
+						// Display IP range with status from DB to edit it:
+						$ip_range_text = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;'
+							.'action=iprange_edit&amp;iprange_ID='.$IPRange->ID.'">'
+								.$db_IP_start.' - '.$db_IP_end
+							.'</a>';
+						if( $db_IP_start != $whois_IP_start || $db_IP_end != $whois_IP_end )
+						{	// If IP range of "whois" tool is NOT same as IP range from DB,
+							// Display a link to create new IP range from suggested IPs by "whois" tool:
+							$whois_ip_range_create_link = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;'
+								.'action=iprange_new&amp;ip_start='.$whois_IP_start.'&amp;ip_end='.$whois_IP_end.'">'
+									.$whois_IP_start.' - '.$whois_IP_end
+								.'</a>';
+							if( $IPRange->get( 'IPv4start' ) <= ip2int( $whois_IP_start ) && $IPRange->get( 'IPv4end' ) >= ip2int( $whois_IP_end ) )
+							{	// If IP range of "whois" tool is PART of IP range from DB then
+								// Display "whois" IP range link with "Unknown" status BEFORE DB IP range:
+								$ip_range_text = $whois_ip_range_create_link
+									.' <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( '' ).'</div>'.$aipr_status_titles['']
+									.' included in '.$ip_range_text;
+							}
+							else
+							{	// If IP range of "whois" tool is INERTSECTING with IP range from DB then
+								// Display ONLY "whois" IP range link with "Unknown" status,
+								// (don't display DB IP range because it will be suggested to edit on creating new intersecting IP range):
+								$ip_range_text = $whois_ip_range_create_link;
+								$iprange_status = '';
+							}
+						}
+					}
+					else
+					{	// Display a link to create new IP range if it doesn't exist in DB yet:
+						$ip_range_text = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;'
+							.'action=iprange_new&amp;ip_start='.$whois_IP_start.'&amp;ip_end='.$whois_IP_end.'">'
+								.$ip_range_text
+							.'</a>';
+					}
+				}
+				// Display status of IP range:
+				$ip_range_text .= ' <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>'.$aipr_status_titles[ $iprange_status ];
+
+				// Replace static IP range of "whois" tool with links and ip range status to view/edit/create IP range in back-office:
+				$result['rawdata'][$i] = str_replace( $matches[2][0], $ip_range_text, $result['rawdata'][$i] );
+			}
+		}
+		$winfo .= format_to_output( implode( $result['rawdata'], "\n" ) );
+	}
+	else
+	{
+		$winfo = format_to_output( implode( $whois->Query['errstr'], "\n" ) )."<br></br>";
+	}
+	$winfo .= '</pre>';
+
+	return $winfo;
 }
 ?>

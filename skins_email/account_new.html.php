@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url;
+global $admin_url, $UserSettings;
 
 // Default params:
 $params = array_merge( array(
@@ -54,7 +54,14 @@ if( $params['reg_country'] > 0 )
 
 if( ! empty( $params['reg_domain'] ) )
 {	// Domain field is entered:
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Domain').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['reg_domain'].'</td></tr>'."\n";
+	if( ! empty( $params['new_user_ID'] ) )
+	{
+		$user_ip_address = int2ip( $UserSettings->get( 'created_fromIPv4', $params['new_user_ID'] ) );
+	}
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Domain').':</th>'.
+			'<td'.emailskin_style( 'table.email_table td' ).'>'.$params['reg_domain'].
+			( ! empty( $user_ip_address ) ? ' '.get_link_tag( $admin_url.'?ctrl=antispam&action=whois&query='.$user_ip_address, 'WHOIS', 'div.buttons a+a.button_gray' ) : '' ).
+			'</td></tr>'."\n";
 }
 
 if( $params['country'] > 0 )

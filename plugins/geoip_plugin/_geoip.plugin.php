@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -34,7 +34,7 @@ class geoip_plugin extends Plugin
 	var $name = 'GeoIP';
 	var $code = 'evo_GeoIP';
 	var $priority = 45;
-	var $version = '6.9.4';
+	var $version = '6.10.1';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 	var $plugin_actions = array( 'geoip_download', 'geoip_find_country', 'geoip_fix_country' );
@@ -264,11 +264,11 @@ class geoip_plugin extends Plugin
 		global $DB;
 
 		// Get country ID by code
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get country ID by code '.$country_code );
 		$SQL->SELECT( 'ctry_ID' );
 		$SQL->FROM( 'T_regional__country' );
 		$SQL->WHERE( 'ctry_code = '.$DB->quote( strtolower( $country_code ) ) );
-		$country_ID = $DB->get_var( $SQL->get() );
+		$country_ID = $DB->get_var( $SQL );
 
 		if( !$country_ID )
 		{ // No found country in the b2evo DB
@@ -937,7 +937,7 @@ jQuery( document ).ready( function()
 				ON user_ID = uset_user_ID
 			AND uset_name = "created_fromIPv4"' );
 		$SQL->WHERE( 'user_reg_ctry_ID IS NULL' );
-		$users = $DB->get_assoc( $SQL->get(), $SQL->title );
+		$users = $DB->get_assoc( $SQL );
 
 		$total_users = count( $users );
 		if( $total_users == 0 )
@@ -1008,7 +1008,7 @@ jQuery( document ).ready( function()
 		$SQL->WHERE( 'user_ctry_ID IS NULL' );
 		$SQL->ORDER_BY( 'sess_ID DESC' );
 		$SQL->GROUP_BY( 'user_ID' );
-		$users = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+		$users = $DB->get_results( $SQL );
 
 		$total_users = count( $users );
 		if( $total_users == 0 )

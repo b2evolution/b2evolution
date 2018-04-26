@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -1113,6 +1113,52 @@ function copy_r( $source, $dest, $new_folder_name = NULL, $exclude_dirs = array(
 
 
 /**
+ * Move files from one folder to another recursively
+ *
+ * @param string Source folder path
+ * @param string Destination folder path
+ * @return boolean TRUE on success, FALSE when no permission
+ */
+function move_files_r( $source_dir_path, $dest_dir_path )
+{
+	$result = false;
+
+	if( ! ( $dir_handle = @opendir( $source_dir_path ) ) )
+	{	// Unable to open dir:
+		return $result;
+	}
+
+	$source_dir_path = rtrim( $source_dir_path, '/' );
+	$dest_dir_path = rtrim( $dest_dir_path, '/' );
+
+	while( $file = readdir( $dir_handle ) )
+	{
+		if( $file == '.' || $file == '..' )
+		{	// Skip reserved folders:
+			continue;
+		}
+		if( is_dir( $source_dir_path.'/'.$file ) )
+		{	// Copy a folder recursively:
+			$result = copy_r( $source_dir_path.'/'.$file, $dest_dir_path ) && $result;
+			// Remove a folder recursively:
+			$result = rmdir_r( $source_dir_path.'/'.$file ) && $result;
+		}
+		else
+		{	// Copy a file:
+			$result = @copy( $source_dir_path.'/'.$file, $dest_dir_path.'/'.$file ) && $result;
+			// Remove a file:
+			$result = @unlink( $source_dir_path.'/'.$file ) && $result;
+		}
+	}
+
+	// Close the folder handler:
+	$result = closedir( $dir_handle ) && $result;
+
+	return $result;
+}
+
+
+/**
  * Is the given path absolute (non-relative)?
  *
  * @return boolean
@@ -1133,29 +1179,6 @@ function is_absolute_pathname($path)
 	{ // unix
 		return ( $path[0] == '/' );
 	}
-}
-
-
-/**
- * Define sys_get_temp_dir, if not available (PHP 5 >= 5.2.1)
- * @link http://us2.php.net/manual/en/function.sys-get-temp-dir.php#93390
- * @return string NULL on failure
- */
-if ( !function_exists('sys_get_temp_dir'))
-{
-  function sys_get_temp_dir()
-	{
-    if (!empty($_ENV['TMP'])) { return realpath($_ENV['TMP']); }
-    if (!empty($_ENV['TMPDIR'])) { return realpath( $_ENV['TMPDIR']); }
-    if (!empty($_ENV['TEMP'])) { return realpath( $_ENV['TEMP']); }
-    $tempfile=tempnam(__FILE__,'');
-    if (file_exists($tempfile))
-		{
-      unlink($tempfile);
-      return realpath(dirname($tempfile));
-    }
-    return null;
-  }
 }
 
 
@@ -1736,6 +1759,25 @@ function report_user_upload( $File )
 
 
 /**
+ * Handles warnings and errors when attempting to read EXIF data
+ */
+function exif_read_data_error_handler( $errno, $errstr )
+{
+	global $Messages;
+
+	switch( $errno )
+	{
+		case E_WARNING:
+			$Messages->add( T_('Unable to read EXIF data'), 'warning' );
+			break;
+
+		default:
+			$Messages->add( T_('Unknown error').': <code>'.$errstr.'</code>', 'error' );
+	}
+}
+
+
+/**
  * Rotate the JPEG image if EXIF Orientation tag is defined
  *
  * @param string File name (with full path)
@@ -1763,10 +1805,12 @@ function exif_orientation( $file_name, & $imh/* = null*/, $save_image = false )
 		return;
 	}
 
+	set_error_handler( 'exif_read_data_error_handler' );
 	if( ( $exif_data = exif_read_data( $file_name ) ) === false )
 	{ // Could not read Exif data
 		return;
 	}
+	restore_error_handler();
 
 	if( !( isset( $exif_data['Orientation'] ) && in_array( $exif_data['Orientation'], array( 3, 6, 8 ) ) ) )
 	{ // Exif Orientation tag is not defined OR we don't interested in current value
@@ -2472,7 +2516,9 @@ function display_dragdrop_upload_button( $params = array() )
 						var progressbar = jQuery( 'tr[qq-file-id=' + id + '] .progress-bar' );
 						var percentCompleted = Math.round( uploadedBytes / totalBytes * 100 ) + '%';
 
-						progressbar.css( 'width', percentCompleted );
+						//progressbar.style.width = percentCompleted;
+						progressbar.get(0).style.width = percentCompleted; // This should fix jQuery's .css() issue with some browsers
+
 						progressbar.text( percentCompleted );
 						<?php
 						if( $params['resize_frame'] )
@@ -2825,7 +2871,7 @@ function replace_old_file_with_new( $root_type, $root_in_type_ID, $path, $new_na
 	{
 		$error_message = T_( 'The new file name is empty!' );
 	}
-	elseif( empty( $new_name ) )
+	elseif( empty( $old_name ) )
 	{
 		$error_message = T_( 'The old file name is empty!' );
 	}
@@ -3060,7 +3106,7 @@ function get_root_path_by_abspath( $abspath, $is_cache_path = false )
 
 	load_class( 'files/model/_fileroot.class.php', 'FileRoot' );
 
-	$abspath = explode( DIRECTORY_SEPARATOR, $abspath );
+	$abspath = preg_split( '#[/\\\\]#', $abspath );
 
 	switch( $abspath[0] )
 	{
@@ -3222,24 +3268,97 @@ function get_social_tag_image_file( $disp )
 			}
 			break;
 
+		case 'posts':
+			$intro_Item = & get_featured_Item( $disp, NULL, true );
+			if( $intro_Item )
+			{
+				if( $intro_Item->is_intro() )
+				{
+					$LinkOwner = new LinkItem( $intro_Item );
+					if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink,inline', 'image', array(
+							'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+							'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
+					{ // Item has linked files
+						while( $Link = & $LinkList->get_next() )
+						{
+							if( ! ( $File = & $Link->get_File() ) )
+							{ // No File object
+								global $Debuglog;
+								$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
+								continue;
+							}
+
+							if( ! $File->exists() )
+							{ // File doesn't exist
+								global $Debuglog;
+								$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+								continue;
+							}
+
+							if( $File->is_image() )
+							{ // Use only image files for og:image tag
+								$social_tag_image_File = $File;
+								break;
+							}
+						}
+					}
+				}
+			}
+
+			if( empty( $social_tag_image_File ) )
+			{
+				global $Blog, $disp_detail;
+				$FileCache = & get_FileCache();
+
+				if( $disp_detail == 'posts-topcat' || $disp_detail == 'posts-subcat' )
+				{
+					$ChapterCache = & get_ChapterCache();
+					$default_cat_ID = $Blog->get_default_cat_ID();
+					if( $default_cat_ID && $default_Chapter = & $ChapterCache->get_by_ID( $default_cat_ID ) )
+					{ // Try social media boilerplate image
+						$social_media_image_file_ID = $default_Chapter->get( 'social_media_image_file_ID', false );
+						if( $social_media_image_file_ID > 0 && $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) && $File->is_image() )
+						{
+							$social_tag_image_File = $File;
+						}
+						else
+						{ // Try category image
+							$cat_image_file_ID = $default_Chapter->get( 'image_file_ID', false );
+							if( $cat_image_file_ID > 0 && $File = & $FileCache->get_by_ID( $cat_image_file_ID ) && $File->is_image() )
+							{
+								$social_tag_image_File = $File;
+							}
+						}
+					}
+				}
+			}
+			break;
+
 		default:
 			// Other disps
 	}
 
-	/*
 	if( empty( $social_tag_image_File ) )
-	{ // Use site logo if available
+	{ // Use social media boilerplate logo if configured
 		$FileCache = & get_FileCache();
-		$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
-		if( $notification_logo_file_ID > 0 &&
-    		( $FileCache = & get_FileCache() ) &&
-    		( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) ) &&
-    		$File->is_image() )
+		$social_media_image_file_ID = intval( $Settings->get( 'social_media_image_file_ID' ) );
+		if( $social_media_image_file_ID > 0
+				&& ( $File = $FileCache->get_by_ID( $social_media_image_file_ID, false ) )
+				&& $File->is_image() )
 		{
 			$social_tag_image_File = $File;
 		}
+		else
+		{ // Use site logo as fallback if configured
+			$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
+			if( $notification_logo_file_ID > 0
+					&& ( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) )
+					&& $File->is_image() )
+			{
+				$social_tag_image_File = $File;
+			}
+		}
 	}
-	*/
 
 	return $social_tag_image_File;
 }

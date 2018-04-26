@@ -3,7 +3,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -87,11 +87,11 @@ div.avatartag.main .avatar_actions {
   margin-right: 25px;
 }
 .avatar_main_frame > a:first-child {
-  margin-right: 25px;
+  margin-right: 0;
 }
 .avatar_main_frame .avatar_actions {
   text-align: center;
-  padding: 0 25px 0 0;
+  padding: 0 25px;
   float: none;
   display: table-cell;
   vertical-align: middle;
@@ -616,6 +616,14 @@ fieldset ul {
   color: #000;
   font-weight: normal;
 }
+.user_admin_tags {
+  width: 500px;
+  max-width: 100%;
+}
+.user_admin_tags ul.token-input-list-facebook {
+  width: 100%;
+  max-width: 100%;
+}
 #item_locations label {
   width: auto;
   float: right;
@@ -955,6 +963,15 @@ h2.user_title::first-line {
 #itemform_edit_workflow .form-group .controls {
   display: inline-block;
 }
+#itemform_extra #ffield_item_owner_login .help-inline {
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: 10px;
+}
+#itemform_extra label.ffield_item_create_user {
+  padding: 0;
+  font-weight: normal;
+}
 span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
   background-image: url("../../../../rsc/img/ajax-loader/fff.gif");
@@ -1027,7 +1044,6 @@ ul.widget_container li:hover {
 }
 ul.widget_container li > span,
 ul.widget_container li > a {
-  display: inline-block;
   padding: 3px 10px;
   margin: 0;
   border-color: #ddd;

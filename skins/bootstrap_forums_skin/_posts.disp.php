@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
@@ -142,8 +142,8 @@ if( count( $chapters ) > 0 )
 				</div>
 			</div>
 			<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s topics'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_postcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
-			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s replies'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_postcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
-			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( locale_extdatefmt().' '.locale_shorttimefmt() ); ?></div>
+			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s replies'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_commentcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
+			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( locale_extdatefmt().'<\b\r>'.locale_shorttimefmt() ); ?></div>
 			<!-- Apply this on XS size -->
 			<div class="ft_date_shrinked col-xs-2"><?php echo $Chapter->get_last_touched_date( locale_datefmt() ); ?></div>
 		</article>
@@ -164,8 +164,12 @@ if( count( $chapters ) > 0 )
 }
 
 // ---------------------------------- START OF POSTS ------------------------------------
-if( isset( $MainList ) && ( empty( $single_cat_ID ) || ! empty( $multi_cat_IDs ) ||
-   ( isset( $current_Chapter ) && ! $current_Chapter->meta ) /* Note: the meta categories cannot contain the posts */ ) )
+if( isset( $MainList ) &&
+    ( ! isset( $current_Chapter ) || ! $current_Chapter->meta ) && // Note: the meta categories cannot contain the posts
+    ( empty( $single_cat_ID ) || // disp=posts List all posts
+      ! empty( $multi_cat_IDs ) || // Filter for several categories
+      isset( $current_Chapter ) ) // Posts of the current viewed category ($disp_detail = posts-cat)
+  )
 {
 	echo !empty( $chapters ) ? '<br />' : '';
 ?>
@@ -193,9 +197,9 @@ if( isset( $MainList ) && ( empty( $single_cat_ID ) || ! empty( $multi_cat_IDs )
 <?php
 
 if( $single_cat_ID )
-{ // Go to grab the featured posts only on pages with defined category:
-	while( $Item = & get_featured_Item() )
-	{ // We have a intro post to display:
+{	// Go to grab the intro/featured posts only on pages with defined category:
+	while( $Item = & get_featured_Item( 'posts', NULL, false, true ) )
+	{	// We have the intro or featured posts to display:
 		// ---------------------- ITEM LIST INCLUDED HERE ------------------------
 		skin_include( '_item_list.inc.php', array(
 				'Item' => $Item
@@ -228,23 +232,12 @@ elseif( isset( $current_Chapter ) )
 ?>
 	</section>
 
-	<div class="panel-body comments_link__pagination">
+	<div class="panel-body">
 	<?php
-		// Buttons to post/reply
-		$Skin->display_post_button( $single_cat_ID );
-		if( check_user_status( 'can_be_validated' ) )
-		{	// Display a warning if current user cannot post a topic because he must activate account:
-			global $Messages;
-			$Messages->clear();
-			$Messages->add( T_( 'You must activate your account before you can post a new topic.' )
-				.' <a href="'.get_activate_info_url( NULL, '&amp;' ).'">'.T_( 'More info &raquo;' ).'</a>', 'warning' );
-			$Messages->display();
-		}
-
 		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 		mainlist_page_links( array(
-				'block_start'           => '<ul class="pagination">',
-				'block_end'             => '</ul>',
+				'block_start'           => '<div class="comments_link__pagination"><ul class="pagination">',
+				'block_end'             => '</ul></div>',
 				'page_current_template' => '<span>$page_num$</span>',
 				'page_item_before'      => '<li>',
 				'page_item_after'       => '</li>',
@@ -254,6 +247,31 @@ elseif( isset( $current_Chapter ) )
 				'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 			) );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+
+		if( ! is_logged_in() && ! $Blog->get_setting( 'post_anonymous' ) )
+		{	// Display a warning to log in or register before new post creating:
+			$register_link = '';
+			$login_link = '<a class="btn btn-primary btn-sm" href="'.get_login_url( 'cannot post' ).'">'.T_( 'Log in now!' ).'</a>';
+			if( ( $Settings->get( 'newusers_canregister' ) == 'yes' ) && ( $Settings->get( 'registration_is_public' ) ) )
+			{
+				$register_link = '<a class="btn btn-primary btn-sm" href="'.get_user_register_url( NULL, 'reg to post' ).'">'.T_( 'Register now!' ).'</a>';
+			}
+			echo '<p class="alert alert-warning alert-item-new">';
+			echo T_( 'In order to start a new topic' ).' '.$login_link.( ! empty( $register_link ) ? ' '.T_('or').' '.$register_link : '' );
+			echo '</p>';
+		}
+
+		// Buttons to post/reply
+		$Skin->display_post_button( $single_cat_ID );
+
+		if( check_user_status( 'can_be_validated' ) )
+		{	// Display a warning if current user cannot post a topic because he must activate account:
+			global $Messages;
+			$Messages->clear();
+			$Messages->add( T_( 'You must activate your account before you can post a new topic.' )
+				.' <a href="'.get_activate_info_url( NULL, '&amp;' ).'">'.T_( 'More info &raquo;' ).'</a>', 'warning' );
+			$Messages->display();
+		}
 	?>
 	</div>
 </div>

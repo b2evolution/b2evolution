@@ -9,82 +9,7 @@
 	}
 }
 .nav.nav-tabs {
-    margin-top: 0;
-	ul {
-		margin: 0;
-		li {
-			float: left;
-			list-style: none;
-			margin-bottom: -1px;
-			a {
-				border: 1px solid transparent;
-				border-radius: 4px 4px 0 0;
-				display: block;
-				line-height: 1.42857143;
-				margin-right: 2px;
-				padding: 10px 15px;
-				position: relative;
-				&:hover {
-					border-bottom: 1px solid #ddd;
-					border-color: #eee #eee #ddd;
-				}
-				&:focus, &:hover {
-					text-decoration: none;
-					background-color: #eee;
-				}
-				&.default:hover {
-					background-color: #eee;
-					border-top-color: #eee;
-					border-left-color: #eee;
-					border-right-color: #eee;
-				}
-			}
-		}
-	}
-}
-
-// Login widget form
-.widget_core_user_login {
-	#login_form {
-		.form-group {
-			margin: 0;
-		}
-		label {
-			text-align: left;
-			width: 160px;
-			padding-left: 0;
-		}
-		.controls {
-			padding: 0;
-			width: 100%;
-		}
-		.form_text_input.form-control {
-			width: 100%;
-		}
-	}
-	.submit {
-		font-size: 12px;
-	}
-	.field_login_btn {
-		.panel {
-			margin: 0;
-			border: none;
-			border-radius: 0;
-			box-shadow: none;
-			.panel-body {
-				padding-left: 0;
-				padding-right: 0;
-				padding-bottom: 0;
-				#submit_login_form {
-					margin-right: 10px;
-				}
-			}
-		}
-	}
-	.register_link {
-		display: block;
-		padding-top: 10px;
-	}
+	margin-top: 0;
 }
 
 // Register widget form
@@ -104,11 +29,16 @@
 		}
 		.form_text_input.form-control {
 			width: 100%;
+			.inline_widget {
+				width: 250px;
+			}
+		}
+		.form_text_input.form-control.inline_widget {
+			width: 100%;
+			max-width: 250px;
 		}
 	}
-	.submit {
-		font-size: 12px;
-	}
+
 	.field_register_btn {
 		.panel {
 			margin: 0;
@@ -119,9 +49,6 @@
 				padding-left: 0;
 				padding-right: 0;
 				padding-bottom: 0;
-				#submit_login_form {
-					margin-right: 10px;
-				}
 			}
 		}
 	}
@@ -268,6 +195,7 @@ div.bSideItem {
 }
 .evo_panel__login {
 	max-width: 400px;
+	min-width: auto;
 }
 .evo_panel__lostpass {
 	max-width: 480px;
@@ -367,4 +295,23 @@ footer.row {
 // Overrule predefined background-color style
 .avatar_main_frame {
 	background-color: transparent;
+}
+
+// Comment footer
+.evo_content_block .evo_comment {
+	.evo_comment_footer {
+		.action_btn_group {
+			float: right;
+		}
+	}
+
+	.comment_edit_btn {
+		margin-right: 5px;
+	}
+
+	// Fix buttons for comment actions
+	.btn-group>.btn.first-child {
+		border-top-left-radius: 3px !important;
+		border-bottom-left-radius: 3px !important;
+	}
 }

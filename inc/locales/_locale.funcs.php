@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -1522,10 +1522,10 @@ function locale_insert_default()
 
 	if( ! empty( $activate_locales ) )
 	{ // Insert locales into DB
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get locales' );
 		$SQL->SELECT( 'loc_locale' );
 		$SQL->FROM( 'T_locales' );
-		$existing_locales = $DB->get_col( $SQL->get() );
+		$existing_locales = $DB->get_col( $SQL );
 
 		$insert_data = array();
 		foreach( $activate_locales as $a_locale )
@@ -1645,11 +1645,11 @@ function locale_check_default()
 	}
 
 	// Get a row of current default locale in order to check if it is enabled:
-	$SQL = new SQL();
+	$SQL = new SQL( 'Check if current default locale is enabled' );
 	$SQL->SELECT( 'loc_enabled' );
 	$SQL->FROM( 'T_locales' );
 	$SQL->WHERE( 'loc_locale = '.$DB->quote( $current_default_locale ) );
-	$current_default_locale_enabled = $DB->get_var( $SQL->get() );
+	$current_default_locale_enabled = $DB->get_var( $SQL );
 
 	if( $current_default_locale_enabled !== NULL )
 	{	// Current default locale exists in DB
@@ -1913,4 +1913,49 @@ if( ! function_exists( 'normalizer_normalize' ) )
 	}
 }
 
+
+/**
+ * Get currency data from locale
+ *
+ * @param string Locale code, '#' - to use current currency
+ * @param string What return: 'code', 'symbol', 'ID'
+ * @return string|boolean Currency data depending on param $return OR FALSE on failed
+ */
+function locale_currency( $locale = '#', $return = 'code' )
+{
+	global $current_locale;
+
+	if( $locale == '#' )
+	{	// Use current locale:
+		$locale = $current_locale;
+	}
+
+	// Extract country code from locale code:
+	$country_code = strtolower( substr( $locale, 3, 2 ) );
+
+	$CountryCache = & get_CountryCache();
+	if( ! ( $locale_Country = & $CountryCache->get_by_name( $country_code, false, false ) ) )
+	{	// Couldn't detect country by code:
+		return false;
+	}
+
+	if( ! ( $country_Currency = & $locale_Country->get_Currency() ) )
+	{	// Couldn't detect currency for the locale country:
+		return false;
+	}
+
+	// Return currency code depending on param $return:
+	switch( $return )
+	{
+		case 'symbol':
+			return $country_Currency->get( 'shortcut' );
+
+		case 'ID':
+			return $country_Currency->ID;
+
+		case 'code':
+		default:
+			return $country_Currency->get( 'code' );
+	}
+}
 ?>

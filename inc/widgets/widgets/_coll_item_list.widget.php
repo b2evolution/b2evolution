@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_item_list_Widget extends ComponentWidget
 {
+	var $icon = 'list';
+
 	/**
 	 * Constructor
 	 */
@@ -358,11 +360,25 @@ class coll_item_list_Widget extends ComponentWidget
 			return;
 		}
 
+		// @var $placeholder_dimension is empty by default
+		$placeholder_dimension = '';
+		if( $this->disp_params['attached_pics'] != 'none' && // If "Display first image"
+		    $this->disp_params['disp_first_image'] == 'special' && // If "Special image placement"
+		    $this->disp_params['layout'] == 'list' ) // If "List layout"
+		{	// Create placeholder dimension from selected thumb_size param
+			global $thumbnail_sizes;
+			if( isset( $thumbnail_sizes[ $this->disp_params['thumb_size'] ] ) )
+			{	// Get thumbnail width & height from config:
+				$thumb_size = $thumbnail_sizes[ $this->disp_params['thumb_size'] ];
+				$placeholder_dimension = ' style="width:'.$thumb_size[1].'px;height:'.$thumb_size[2].'px"';
+			}
+		}
+
 		// Define default template params that can be rewritten by skin
 		$this->disp_params = array_merge( array(
 				'item_first_image_before'      => '<div class="item_first_image">',
 				'item_first_image_after'       => '</div>',
-				'item_first_image_placeholder' => '<div class="item_first_image_placeholder"><a href="$item_permaurl$"></a></div>',
+				'item_first_image_placeholder' => '<div class="item_first_image_placeholder"'.$placeholder_dimension.'><a href="$item_permaurl$"></a></div>',
 				'item_categories_before'       => '<div class="item_categories">',
 				'item_categories_after'        => '</div>',
 				'item_categories_separator'    => ', ',

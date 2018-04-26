@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -61,7 +61,7 @@ switch( $skin_type )
 }
 
 // Get what is the current skin ID from this kind of skin type
-$current_skin_ID = $edited_Blog->get_setting( $skin_type.'_skin_ID', true );
+$current_skin_ID = $edited_Blog->get( $skin_type.'_skin_ID', array( 'real_value' => true ) );
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:

@@ -19,6 +19,10 @@ require_once dirname(__FILE__).'/../conf/_config.php';
  */
 require_once $inc_path .'_main.inc.php';
 
+// Start timer for cron job:
+// (time is printed out after each action, @see cron_log_action_end())
+$Timer->start( 'cron_exec' );
+
 if( $Settings->get( 'system_lock' ) )
 { // System is locked down for maintenance, Stop cron execution
 	echo 'The site is locked for maintenance. All scheduled jobs are postponed. No job was executed.';
@@ -29,6 +33,11 @@ if( $Settings->get( 'system_lock' ) )
  * Cron support functions
  */
 load_funcs( 'cron/_cron.funcs.php' );
+
+// Register shutdown function to catch fatal errors:
+register_shutdown_function( 'cron_job_shutdown' );
+// Mark this script as cron job executing in order to catch function debug_die() here and store error log in cron log:
+$is_cron_job_executing = true;
 
 /**
  * @global integer Quietness.
@@ -101,7 +110,7 @@ if( $is_cli )
 	// Init charset handling - this will also set the encoding for MySQL connection
 	init_charsets( $current_charset );
 }
-else
+elseif( ! is_admin_page() )
 { // This is a web request: (for testing purposes only. Not designed for production)
 
 	// Make sure the response is never cached:
@@ -151,6 +160,9 @@ else
 {
 	$ctsk_ID = $task->ctsk_ID;
 	$ctsk_name = cron_job_name( $task->ctsk_key, $task->ctsk_name, $task->ctsk_params );
+
+	// Initialize a var to count a number of cron job actions:
+	$cron_log_actions_num = NULL;
 
 	cron_log( 'Requesting lock on task #'.$ctsk_ID.' ['.$ctsk_name.']', 0 );
 
@@ -207,8 +219,28 @@ else
 		// The job may need to know its ID and name (to set logical locks for example):
 		$cron_params['ctsk_ID'] = $ctsk_ID;
 
-		// EXECUTE
-		$error_message = call_job( $task->ctsk_key, $cron_params );
+		// Set max execution time for each cron job separately:
+		set_max_execution_time( $Settings->get( 'cjob_timeout_'.$task->ctsk_key ) );
+
+		// Try to execute cron job:
+		set_error_handler( 'cron_job_error_handler' );
+		try
+		{	// EXECUTE CRON JOB:
+			$error_message = call_job( $task->ctsk_key, $cron_params );
+		}
+		catch( Exception $ex )
+		{	// Unexpected error:
+			$result_status = 'error';
+			$error_message = "\n".'b2evolution caught an UNEXPECTED ERROR: '
+				.'<b>File:</b> '.$ex->getFile().', '
+				.'<b>Line:</b> '.$ex->getLine().', '
+				.'<b>Message:</b> '.$ex->getMessage();
+			$result_message .= $error_message;
+			echo nl2br( $result_message );
+			// We must rollback any started transaction in order to proper update cron job log below:
+			$DB->rollback();
+		}
+		restore_error_handler();
 
 		if( !empty( $error_message ) )
 		{
@@ -238,10 +270,14 @@ else
 		$sql = ' UPDATE T_cron__log
 								SET clog_status = '.$DB->quote( $result_status ).',
 										clog_realstop_datetime = '.$DB->quote( date2mysql( $timestop ) ).',
-										clog_messages = '.$DB->quote( $result_message ) /* May be NULL */.'
+										clog_messages = '.$DB->quote( $result_message ) /* May be NULL */.',
+										clog_actions_num = '.$DB->quote( $cron_log_actions_num ).'
 							WHERE clog_ctsk_ID = '.$ctsk_ID;
 		$DB->query( $sql, 'Record task as finished.' );
 	}
+
+	// Unset ID of the executed cron job to 
+	unset( $ctsk_ID );
 }
 
 
@@ -251,7 +287,7 @@ detect_timeout_cron_jobs( $error_task );
 
 
 
-if( ! $is_cli )
+if( ! $is_cli && ! is_admin_page() )
 { // This is a web request:
 	echo '<p><a href="cron_exec.php">Refresh Now!</a></p>';
 	echo '<p>This page should refresh automatically in 15 seconds...</p>';
@@ -263,4 +299,6 @@ if( ! $is_cli )
 	<?php
 }
 
+// Stop timer of cron job:
+$Timer->stop( 'cron_exec' );
 ?>

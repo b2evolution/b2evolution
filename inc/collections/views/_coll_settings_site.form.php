@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -57,8 +57,10 @@ $Form->begin_fieldset( T_('Global Site Settings').get_manual_link('global-site-s
 	$Form->color_input( 'site_color', $Settings->get( 'site_color' ), T_('Site color'), T_('E-g: #ff0000 for red') );
 	$Form->text_input( 'notification_short_name', $Settings->get( 'notification_short_name' ), 50, T_( 'Short site name' ), T_('Shared with email settings'), array( 'maxlength' => 127, 'required' => true ) );
 	$Form->text_input( 'notification_long_name', $Settings->get( 'notification_long_name' ), 50, T_( 'Long site name' ), T_('Shared with email settings'), array( 'maxlength' => 255 ) );
-	$fileselect_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select site logo'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
-	$Form->fileselect( 'notification_logo_file_ID', $Settings->get( 'notification_logo_file_ID' ), T_('Site logo'), NULL, $fileselect_params );
+	$site_logo_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select site logo'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
+	$Form->fileselect( 'notification_logo_file_ID', $Settings->get( 'notification_logo_file_ID' ), T_('Site logo'), NULL, $site_logo_params );
+	$social_media_boilerplate_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select logo for social media boilerplate'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
+	$Form->fileselect( 'social_media_image_file_ID', $Settings->get( 'social_media_image_file_ID' ), T_('Social media boilerplate'), NULL, $social_media_boilerplate_params );
 	$Form->text_input( 'site_footer_text', $Settings->get( 'site_footer_text' ), 50, T_('Site footer text'), '', array( 'maxlength' => 5000 ) );
 	$Form->checkbox_input( 'site_skins_enabled', $Settings->get( 'site_skins_enabled' ), T_('Enable site skins'), array( 'note' => T_('Enables a sitewide header and footer') ) );
 	$Form->begin_line( T_('Terms & Conditions'), 'site_terms_enabled' );

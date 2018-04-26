@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -96,6 +96,7 @@ $core_componentwidget_defs = array(
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
 			'content_block',          // Content Block
+			'display_item',           // Display Item
 		),
 	'infoitem' => array(
 			'item_info_line',
@@ -123,7 +124,9 @@ $core_componentwidget_defs = array(
 			'user_avatars',
 			'org_members',
 			'user_login',
+			'user_greetings',
 			'user_register',
+			'newsletter_subscription',
 			'user_tools',
 			'online_users',
 		),
@@ -161,7 +164,7 @@ foreach( $widget_groups as $widget_group_code => $widget_group_title )
 
 			echo '<li>';
 			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
-			echo get_icon( 'new' ).' <strong>'.$ComponentWidget->get_name().'</strong>';
+			echo '<span class="fa fa-'.$ComponentWidget->icon.'"></span> <strong>'.$ComponentWidget->get_name().'</strong>';
 			echo '</a> <span class="notes">'.$ComponentWidget->get_desc().'</span> '.$ComponentWidget->get_help_link( 'manual', false );
 			echo '</li>';
 		}
@@ -174,7 +177,7 @@ foreach( $widget_groups as $widget_group_code => $widget_group_title )
 		{
 			echo '<li>';
 			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
-			echo get_icon( 'puzzle' ).' <strong>'.$Plugin->name.'</strong>';
+			echo '<span class="fa fa-'.$Plugin->widget_icon.'"></span> <strong>'.$Plugin->name.'</strong>';
 			echo '</a> <span class="notes">'.$Plugin->short_desc.'</span> '.$Plugin->get_help_link( '$widget_url', 'manual', false );
 			echo '</li>';
 		}

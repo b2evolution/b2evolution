@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
@@ -60,11 +60,11 @@ if( $disp != 'front' && $disp != 'single' && isset( $MainList ) && $MainList->re
 	{	// If tracking of unread content is enabled:
 		$legends[] = array(
 				'topic_new' => array(
-					'system_icon' => 'bullet_orange',
+					'icon'        => 'icon_new fa-comments new',
 					'title'       => T_('New topic'),
 				),
 				'topic_updated' => array(
-					'system_icon' => 'bullet_brown',
+					'icon'        => 'fa-comments updated',
 					'title'       => T_('Updated topic'),
 				),
 			);

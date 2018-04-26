@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -363,7 +363,7 @@ function phpbb_rank_info( $rank_ID, $get_only_count = false )
 		$r = sprintf( '%s users', $users_count );
 
 		// Get the first 10 users of each rank
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get the first 10 users of each rank' );
 		$SQL->SELECT( 'username' );
 		$SQL->FROM( 'BB_users' );
 		$SQL->FROM_add( 'INNER JOIN BB_posts ON poster_id = user_id' ); // Get users which have at least one post
@@ -371,7 +371,7 @@ function phpbb_rank_info( $rank_ID, $get_only_count = false )
 		$SQL->ORDER_BY( 'user_id' );
 		$SQL->GROUP_BY( 'user_id' );
 		$SQL->LIMIT( '10' );
-		$users = $phpbb_DB->get_col( $SQL->get() );
+		$users = $phpbb_DB->get_col( $SQL );
 
 		foreach( $users as $u => $username )
 		{
@@ -567,7 +567,7 @@ function phpbb_import_users()
 			}
 			else
 			{	// Replace unauthorized chars from username
-				$user_login = preg_replace( '/([^a-z0-9_]+)/i', '_', $phpbb_user->username );
+				$user_login = preg_replace( '/([^a-z0-9_\-\.]+)/i', '_', $phpbb_user->username );
 				$user_login = utf8_substr( utf8_strtolower( $user_login ), 0, 20 );
 				if( $user_login == '_' )
 				{	// If all username chars are unauthorized
@@ -603,11 +603,11 @@ function phpbb_import_users()
 			}
 
 			// Check if this user already exists with same email address in b2evo DB
-			$SQL = new SQL();
+			$SQL = new SQL( 'phpBB: Check if this user already exists with same email address in b2evo DB' );
 			$SQL->SELECT( 'user_ID, user_login' );
 			$SQL->FROM( 'T_users' );
 			$SQL->WHERE( 'user_email = '.$DB->quote( utf8_strtolower( $phpbb_user->user_email ) ) );
-			$b2evo_user = $DB->get_row( $SQL->get() );
+			$b2evo_user = $DB->get_row( $SQL );
 			if( !empty( $b2evo_user ) )
 			{	// User already exists in DB of b2evo
 				// Don't insert this user
@@ -629,11 +629,11 @@ function phpbb_import_users()
 			$user_login_mask = preg_replace( '#\d+$#', '', $user_login );
 			do
 			{
-				$SQL = new SQL();
+				$SQL = new SQL( 'phpBB: Check if this user already exists with same login in b2evo DB' );
 				$SQL->SELECT( 'user_ID' );
 				$SQL->FROM( 'T_users' );
 				$SQL->WHERE( 'user_login = '.$DB->quote( $next_login ) );
-				if( $b2evo_user_ID = $DB->get_var( $SQL->get() ) )
+				if( $b2evo_user_ID = $DB->get_var( $SQL ) )
 				{	// Duplicated user login, Change to next login by increasing the number at the end
 					$next_login = $user_login_mask.( ++$user_login_number );
 				}
@@ -931,11 +931,11 @@ function phpbb_import_invalid_user( $phpbb_user_ID, & $users_IDs, $phpbb_usernam
 		}
 
 		// Check if this user already exists in b2evo DB
-		$SQL = new SQL();
+		$SQL = new SQL( 'phpBB: Check if this user already exists with same login in b2evo DB' );
 		$SQL->SELECT( 'user_ID' );
 		$SQL->FROM( 'T_users' );
 		$SQL->WHERE( 'user_login = '.$DB->quote( $user_login ) );
-		$b2evo_user_ID = $DB->get_var( $SQL->get() );
+		$b2evo_user_ID = $DB->get_var( $SQL );
 		if( empty( $b2evo_user_ID ) )
 		{	// User doesn't exist in DB of b2evo yet, Insert new user
 			$user_data = array(
@@ -1150,11 +1150,11 @@ function phpbb_unique_urlname( $source, $table, $field )
 	$url_name_correct = $url_name;
 	do
 	{	// Check for unique url name in DB
-		$SQL = new SQL();
+		$SQL = new SQL( 'phpBB: Get the unique url name' );
 		$SQL->SELECT( $field );
 		$SQL->FROM( $table );
 		$SQL->WHERE( $field.' = '.$DB->quote( $url_name_correct ) );
-		$row = $DB->get_var( $SQL->get() );
+		$row = $DB->get_var( $SQL );
 		if( $row )
 		{	// Row already exists with such field; Make it unique:
 			$url_name_correct = $url_name.'-'.$url_number;
@@ -2238,7 +2238,7 @@ function phpbb_get_config( $name )
 		$SQL->SELECT( 'config_value' );
 		$SQL->FROM( 'BB_config' );
 		$SQL->WHERE( 'config_name = '.$phpbb_DB->quote( $name ) );
-		$phpbb_config[ $name ] = $phpbb_DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
+		$phpbb_config[ $name ] = $phpbb_DB->get_var( $SQL );
 	}
 
 	return $phpbb_config[ $name ];
@@ -2752,7 +2752,7 @@ function phpbb_get_last_inserted_IDs( $table_name, $ID_field_name, $limit )
 	$SQL->FROM( $table_name );
 	$SQL->ORDER_BY( $ID_field_name.' DESC' );
 	$SQL->LIMIT( $limit );
-	$last_inserted_IDs = $DB->get_col( $SQL->get(), 0, $SQL->title );
+	$last_inserted_IDs = $DB->get_col( $SQL );
 
 	return array_reverse( $last_inserted_IDs );
 }

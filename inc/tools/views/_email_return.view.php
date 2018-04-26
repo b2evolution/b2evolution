@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -81,7 +81,7 @@ function filter_email_return( & $Form )
 
 	$Form->date_input( 'datestartinput', $datestart, T_('From date') );
 	$Form->date_input( 'datestopinput', $datestop, T_('To date') );
-	$Form->text_input( 'email', $email, 40, T_('Email') );
+	$Form->email_input( 'email', $email, 40, T_('Email') );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_email_return',

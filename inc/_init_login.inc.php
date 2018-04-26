@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -511,15 +511,15 @@ if( ! empty( $login_error ) || ( $login_required && ! is_logged_in() ) )
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
 			$skin = $Skin->folder;
-			$disp = 'login';
+			$disp = param( 'disp', 'string', 'login' );
 			// fp> We ABSOLUTELY want to recover the previous redirect_to so that after a new login attempt that may be successful,
 			// we will finally reach our intended destination. This is paramount with emails telling people to come back to the site
 			// to read a message or sth like that. They must log in first and they may enter the wrong password multiple times.
 			param( 'redirect_to', 'url', $Blog->gen_blogurl() );
 			$ads_current_skin_path = $skins_path.$skin.'/';
-			if( file_exists( $ads_current_skin_path.'login.main.php' ) )
+			if( file_exists( $ads_current_skin_path.$disp.'.main.php' ) )
 			{	// Call custom file for login disp if it exists:
-				require $ads_current_skin_path.'login.main.php';
+				require $ads_current_skin_path.$disp.'.main.php';
 			}
 			else
 			{	// Call index main skin file to display a login disp:

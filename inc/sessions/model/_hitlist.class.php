@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -61,6 +61,33 @@ class Hitlist
 
 
 	/**
+	 * Log a message of the hits pruning process
+	 *
+	 * @param string Message
+	 * @param boolean|string 'cron_job' - to log messages for cron job
+	 * @param boolean TRUE is end of cron action
+	 * @return string
+	 */
+	static function log_pruning( $message, $output_message = false, $is_end_action = false )
+	{
+		if( $output_message === 'cron_job' )
+		{	// Log a message for cron job:
+			if( $is_end_action )
+			{
+				cron_log_action_end( $message );
+			}
+			else
+			{
+				cron_log_append( $message );
+			}
+		}
+
+		return $message."\n";
+	}
+
+
+
+	/**
 	 * Auto pruning of old stats.
 	 *
 	 * It uses a general setting to store the day of the last prune, avoiding multiple prunes per day.
@@ -70,6 +97,7 @@ class Hitlist
 	 *
 	 * NOTE: do not call this directly, but only in conjuction with auto_prune_stats_mode.
 	 *
+	 * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
 	 * @return array array(
 	 *   'result'  => 'error' | 'ok'
 	 *   'message' => Message of the error or result data
@@ -80,7 +108,7 @@ class Hitlist
 		/**
 		 * @var DB
 		 */
-		global $DB;
+		global $DB, $tableprefix;
 		global $Debuglog, $Settings, $localtimenow;
 		global $Plugins, $Messages;
 
@@ -99,16 +127,14 @@ class Hitlist
 				);
 		}
 
-		// Get tables info
-		global $db_config;
-		$tables = array();
+		// DO NOT TRANSLATE! (This is sysadmin level info -- we assume they can read English)
+		$return_message = Hitlist::log_pruning( 'STATUS:', $output_message );
+
+		// Get tables info:
 		$tables_info = $DB->get_results( 'SHOW TABLE STATUS WHERE Name IN ( '.$DB->quote( array( 'T_hitlog', 'T_sessions', 'T_basedomains' ) ).' )' );
 		foreach( $tables_info as $table_info )
 		{
-			$tables[ $table_info->Name ] = array(
-					'type' => $table_info->Engine,
-					'rows' => $table_info->Rows
-				);
+			$return_message .= Hitlist::log_pruning( preg_replace( '/^'.preg_quote( $tableprefix ).'/', 'T_', $table_info->Name ).': '.$table_info->Engine.' - '.$table_info->Rows.' rows', $output_message, true );
 		}
 
 		// Init Timer for hitlist
@@ -118,23 +144,30 @@ class Hitlist
 
 		$time_prune_before = ( $localtimenow - ( $Settings->get( 'auto_prune_stats' ) * 86400 ) ); // 1 day = 86400 seconds
 
+		$return_message .= Hitlist::log_pruning( "\n".'AGGREGATING:', $output_message );
+
 		// Aggregate the hits before they will be deleted below:
 		$hitlist_Timer->start( 'aggregate' );
 		Hitlist::aggregate_hits();
 		$hitlist_Timer->stop( 'aggregate' );
+		$return_message .= Hitlist::log_pruning( sprintf( 'Aggregate the rows from T_hitlog to T_hits__aggregate, Execution time: %s seconds', $hitlist_Timer->get_duration( 'aggregate' ) ), $output_message, true );
 
 		// Aggregate the counts of unique sessions:
 		$hitlist_Timer->start( 'aggregate_sessions' );
 		Hitlist::aggregate_sessions();
 		$hitlist_Timer->stop( 'aggregate_sessions' );
+		$return_message .= Hitlist::log_pruning( sprintf( 'Aggregate the rows from T_hitlog to T_hits__aggregate_sessions, Execution time: %s seconds', $hitlist_Timer->get_duration( 'aggregate_sessions' ) ), $output_message, true );
 
 		// PRUNE HITLOG:
+		$return_message .= Hitlist::log_pruning( "\n".'PRUNING:', $output_message );
+
 		$hitlist_Timer->start( 'hitlog' );
 		$hitlog_rows_affected = $DB->query( '
 			DELETE FROM T_hitlog
 			WHERE hit_datetime < "'.date( 'Y-m-d', $time_prune_before ).'"', 'Autopruning hit log' );
 		$hitlist_Timer->stop( 'hitlog' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$hitlog_rows_affected.' rows from T_hitlog.', 'request' );
+		$return_message .= Hitlist::log_pruning( sprintf( '%s rows from T_hitlog, Execution time: %s seconds', $hitlog_rows_affected, $hitlist_Timer->get_duration( 'hitlog' ) ), $output_message, true );
 
 
 		// PREPARE PRUNING SESSIONS:
@@ -152,6 +185,7 @@ class Hitlist
 		$sessions_rows_affected = $DB->query( 'DELETE FROM T_sessions WHERE sess_lastseen_ts < '.$DB->quote( date( 'Y-m-d H:i:s', $smaller_time ) ), 'Autoprune sessions' );
 		$hitlist_Timer->stop( 'sessions' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$sessions_rows_affected.' rows from T_sessions.', 'request' );
+		$return_message .= Hitlist::log_pruning( sprintf( '%s rows from T_sessions, Execution time: %s seconds', $sessions_rows_affected, $hitlist_Timer->get_duration( 'sessions' ) ), $output_message, true );
 
 
 		// PRUNE BASEDOMAINS:
@@ -167,24 +201,32 @@ class Hitlist
 			 AND dom_status = "unknown"' );
 		$hitlist_Timer->stop( 'basedomains' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$basedomains_rows_affected.' rows from T_basedomains.', 'request' );
+		$return_message .= Hitlist::log_pruning( sprintf( '%s rows from T_basedomains, Execution time: %s seconds', $basedomains_rows_affected, $hitlist_Timer->get_duration( 'basedomains' ) ), $output_message, true );
 
 
 		// OPTIMIZE TABLES:
+		$return_message .= Hitlist::log_pruning( "\n".'OPTIMIZING:', $output_message );
+
 		$hitlist_Timer->start( 'optimize_hitlog' );
 		$DB->query( 'OPTIMIZE TABLE T_hitlog' );
 		$hitlist_Timer->stop( 'optimize_hitlog' );
+		$return_message .= Hitlist::log_pruning( sprintf( 'T_hitlog: %s seconds', $hitlist_Timer->get_duration( 'optimize_hitlog' ) ), $output_message, true );
 
 		$hitlist_Timer->start( 'optimize_sessions' );
 		$DB->query( 'OPTIMIZE TABLE T_sessions' );
 		$hitlist_Timer->stop( 'optimize_sessions' );
+		$return_message .= Hitlist::log_pruning( sprintf( 'T_sessions: %s seconds', $hitlist_Timer->get_duration( 'optimize_sessions' ) ), $output_message, true );
 
 		$hitlist_Timer->start( 'optimize_basedomains' );
 		$DB->query( 'OPTIMIZE TABLE T_basedomains' );
 		$hitlist_Timer->stop( 'optimize_basedomains' );
+		$return_message .= Hitlist::log_pruning( sprintf( 'T_basedomains: %s seconds', $hitlist_Timer->get_duration( 'optimize_basedomains' ) ), $output_message, true );
 
 
 		// Stop total hitlist timer
 		$hitlist_Timer->stop( 'prune_hits' );
+
+		$return_message .= Hitlist::log_pruning( "\n".sprintf( 'Total execution time: %s seconds', $hitlist_Timer->get_duration( 'prune_hits' ) ), $output_message );
 
 		$Settings->set( 'auto_prune_stats_done', date( 'Y-m-d H:i:s', $localtimenow ) ); // save exact datetime
 		$Settings->dbupdate();
@@ -196,33 +238,7 @@ class Hitlist
 		return array(
 				'result'  => 'ok',
 				// DO NOT TRANSLATE! (This is sysadmin level info -- we assume they can read English)
-				'message' =>
-					'STATUS:'."\n"
-					.sprintf( 'T_hitlog: %s - %s rows',
-						$tables[ $db_config['aliases']['T_hitlog'] ]['type'],
-						$tables[ $db_config['aliases']['T_hitlog'] ]['rows'] )."\n"
-					.sprintf( 'T_sessions: %s - %s rows',
-						$tables[ $db_config['aliases']['T_sessions'] ]['type'],
-						$tables[ $db_config['aliases']['T_sessions'] ]['rows'] )."\n"
-					.sprintf( 'T_basedomains: %s - %s rows',
-						$tables[ $db_config['aliases']['T_basedomains'] ]['type'],
-						$tables[ $db_config['aliases']['T_basedomains'] ]['rows'] )."\n"
-					."\n"
-					.'AGGREGATING:'."\n"
-					.sprintf( 'Aggregate the rows from T_hitlog to T_hits__aggregate, Execution time: %s seconds', $hitlist_Timer->get_duration( 'aggregate' ) )."\n"
-					.sprintf( 'Aggregate the rows from T_hitlog to T_hits__aggregate_sessions, Execution time: %s seconds', $hitlist_Timer->get_duration( 'aggregate_sessions' ) )."\n"
-					."\n"
-					.'PRUNING:'."\n"
-					.sprintf( '%s rows from T_hitlog, Execution time: %s seconds', $hitlog_rows_affected, $hitlist_Timer->get_duration( 'hitlog' ) )."\n"
-					.sprintf( '%s rows from T_sessions, Execution time: %s seconds', $sessions_rows_affected, $hitlist_Timer->get_duration( 'sessions' ) )."\n"
-					.sprintf( '%s rows from T_basedomains, Execution time: %s seconds', $basedomains_rows_affected, $hitlist_Timer->get_duration( 'basedomains' ) )."\n"
-					."\n"
-					.'OPTIMIZING:'."\n"
-					.sprintf( 'T_hitlog: %s seconds', $hitlist_Timer->get_duration( 'optimize_hitlog' ) )."\n"
-					.sprintf( 'T_sessions: %s seconds', $hitlist_Timer->get_duration( 'optimize_sessions' ) )."\n"
-					.sprintf( 'T_basedomains: %s seconds', $hitlist_Timer->get_duration( 'optimize_basedomains' ) )."\n"
-					."\n"
-					.sprintf( 'Total execution time: %s seconds', $hitlist_Timer->get_duration( 'prune_hits' ) )
+				'message' => $return_message
 			);
 	}
 

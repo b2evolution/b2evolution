@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -114,14 +114,17 @@ $Form->begin_fieldset( T_('Default skins').get_manual_link('collections-default-
 	{
 		switch( $iterator_Skin->get( 'type' ) )
 		{
+			case 'rwd':
 			case 'normal':
 				$normal_skins[ $iterator_Skin->ID ] = $iterator_Skin->get( 'name' );
 				break;
 
+			case 'rwd':
 			case 'mobile':
 				$mobile_skins[ $iterator_Skin->ID ] = $iterator_Skin->get( 'name' );
 				break;
 
+			case 'rwd':
 			case 'tablet':
 				$tablet_skins[ $iterator_Skin->ID ] = $iterator_Skin->get( 'name' );
 				break;
@@ -133,14 +136,6 @@ $Form->begin_fieldset( T_('Default skins').get_manual_link('collections-default-
 	$Form->select_input_array( 'def_normal_skin_ID', $Settings->get( 'def_normal_skin_ID' ), $normal_skins, T_('Default normal skin'), NULL, $field_params );
 	$Form->select_input_array( 'def_mobile_skin_ID', $Settings->get( 'def_mobile_skin_ID' ), $mobile_skins, T_('Default mobile phone skin'), NULL, $field_params );
 	$Form->select_input_array( 'def_tablet_skin_ID', $Settings->get( 'def_tablet_skin_ID' ), $tablet_skins, T_('Default tablet skin'), NULL, $field_params );
-$Form->end_fieldset();
-
-// --------------------------------------------
-
-$Form->begin_fieldset( T_('Comment recycle bin').get_manual_link('recycle-bin-settings') );
-
-	$Form->text_input( 'auto_empty_trash', $Settings->get('auto_empty_trash'), 5, T_('Prune recycled comments after'), T_('days').'.' );
-
 $Form->end_fieldset();
 
 // --------------------------------------------

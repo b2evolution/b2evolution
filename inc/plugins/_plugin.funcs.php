@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -63,7 +63,16 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	if( isset( $parmeta['group'] ) )
 	{
 		$group = $parmeta['group'];
-		$parname = $group.$parname;
+		if( substr( $group, -1 ) === ']' )
+		{	// If group name is in array format like "edit_plugin_1_set_sample_sets[0][group_name]",
+			// then param name must be like "edit_plugin_1_set_sample_sets[0][group_name_param_name]":
+			$parname = substr( $group, 0, strlen( $group ) - 1 ).$parname.']';
+		}
+		else
+		{	// If group name is simple like "group_name",
+			// then param name must be like "group_name_param_name"
+			$parname = $group.$parname;
+		}
 	}
 	else
 	{
@@ -73,7 +82,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	// Passthrough some attributes to elements:
 	foreach( $parmeta as $k => $v )
 	{
-		if( in_array( $k, array( 'id', 'class', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols', 'rows', 'maxlength' ) ) )
+		if( in_array( $k, array( 'id', 'class', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols', 'rows', 'maxlength', 'placeholder' ) ) )
 		{
 			$params[$k] = $v;
 		}
@@ -134,7 +143,18 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		{
 			case 'begin_fieldset':
 				$fieldset_title = $set_label;
-				$Form->begin_fieldset( $fieldset_title.$help_icon );
+				$fieldset_params = array();
+				if( isset( $parmeta['fold'] ) && $parmeta['fold'] === true )
+				{	// Enable folding for the fieldset:
+					$fieldset_params['fold'] = $parmeta['fold'];
+					if( isset( $parmeta['deny_fold'] ) )
+					{	// TRUE to don't allow fold the block and keep it opened always on page loading:
+						$fieldset_params['deny_fold'] = $parmeta['deny_fold'];
+					}
+					// Unique ID of fieldset to store in user  settings or in user per collection settings:
+					$fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $parname;
+				}
+				$Form->begin_fieldset( $fieldset_title.$help_icon, $fieldset_params );
 				break;
 
 			case 'end_fieldset':
@@ -361,6 +381,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		case 'array:array:string':
 		case 'array:regexp':
 			$has_array_type = true;
+			$has_color_field = false;
 
 			// Always use 'fieldset' layout to display it the same way from normal and ajax calls
 			$Form->switch_layout( 'fieldset' );
@@ -380,7 +401,18 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				{
 					$fieldset_title .= ' [debug: '.$parname.']';
 				}
-				$Form->begin_fieldset( $fieldset_title );
+				$fieldset_params = array();
+				if( isset( $parmeta['fold'] ) && $parmeta['fold'] === true )
+				{	// Enable folding for the fieldset:
+					$fieldset_params['fold'] = $parmeta['fold'];
+					if( isset( $parmeta['deny_fold'] ) )
+					{	// TRUE to don't allow fold the block and keep it opened always on page loading:
+						$fieldset_params['deny_fold'] = $parmeta['deny_fold'];
+					}
+					// Unique ID of fieldset to store in user  settings or in user per collection settings:
+					$fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $parname;
+				}
+				$Form->begin_fieldset( $fieldset_title, $fieldset_params );
 
 				if( ! empty($params['note']) )
 				{
@@ -389,12 +421,26 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$k_nb = 0;
 			}
 
+			// check if a color field is among the entries
+			foreach( $parmeta['entries'] as $entry )
+			{
+				if( isset( $entry['type'] ) && $entry['type'] == 'color' )
+				{
+					$has_color_field = true;
+					break;
+				}
+			}
 
 			$user_ID = $set_type == 'UserSettings' ? $set_target->ID : '';
 			if( is_array( $set_value ) && ! empty($set_value) )
 			{ // Display value of the setting. It may be empty, if there's no set yet.
 				foreach( $disp_arrays as $k => $v )
 				{
+					$fieldset_params = array(
+							'class' => 'bordered',
+							// Unique ID of fieldset(Also used to store a folding state in user settings or in user per collection settings):
+							'id'    => isset( $parmeta['id'] ) ? $parmeta['id'] : $parname.'_'.$k_nb,
+						);
 					$remove_action = '';
 					if( ! isset($parmeta['min_count']) || count($set_value) > $parmeta['min_count'] )
 					{ // provide icon to remove this set
@@ -407,12 +453,22 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								// attach onclick event to remove the whole fieldset:
 								array(
 									'onclick' => "
-										jQuery('#".$parname.'_'.$k_nb."').remove();
+										jQuery('#".$fieldset_params['id']."').remove();
 										return false;",
 									)
 								).'</span>';
 					}
-					$Form->begin_fieldset( '#'.$k_nb.$remove_action, array( 'class' => 'bordered', 'id' => $parname.'_'.$k_nb ) );
+					if( isset( $parmeta['fold'] ) && $parmeta['fold'] === true )
+					{	// Enable folding for the fieldset:
+						$fieldset_params['fold'] = $parmeta['fold'];
+						if( isset( $parmeta['deny_fold'] ) )
+						{	// TRUE to don't allow fold the block and keep it opened always on page loading:
+							$fieldset_params['deny_fold'] = $parmeta['deny_fold'];
+						}
+
+						$fieldset_params['id'] = $parname;
+					}
+					$Form->begin_fieldset( '#'.$k_nb.$remove_action, $fieldset_params );
 
 					if( isset($parmeta['key']) )
 					{ // KEY FOR THIS ENTRY:
@@ -472,6 +528,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 							},
 							function(r, status) {
 								jQuery('#".$parname."_add_new').replaceWith(r);
+								".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
 							}
 						);
 						return false;")
@@ -516,7 +573,35 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$params['hide_label'] = $parmeta['hide_label'];
 			}
 
+			if( $parmeta['type'] == 'integer' )
+			{	// Set special type 'number' for integer param to initialize control arrows to allow increase/decrease a value:
+				$params['type'] = 'number';
+				if( isset( $parmeta['valid_range']['min'] ) )
+				{	// Restrict with min value:
+					$params['min'] = $parmeta['valid_range']['min'];
+				}
+				if( isset( $parmeta['valid_range']['max'] ) )
+				{	// Restrict with max value:
+					$params['max'] = $parmeta['valid_range']['max'];
+				}
+				// Input number element doesn't support attribute "size", so we have only one way to set width with style:
+				$params['style'] = 'width:'.( 40 + $size * 8 ).'px';
+			}
+
 			$Form->text_input( $input_name, $set_value, $size, $set_label, '', $params ); // TEMP: Note already in params
+			break;
+
+		case 'usertag':
+			if( isset( $parmeta['size'] ) )
+			{
+				$size = (int) $parmeta['size'];
+			}
+			else
+			{
+				$size = 30;
+			}
+
+			$Form->usertag_input( $input_name, $set_value, $size, $set_label, '', $params );
 			break;
 
 		case 'info':
@@ -950,18 +1035,23 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 		$l_value = $set_value;
 	}
 
-	if( isset($parmeta['type']) && strpos( $parmeta['type'], 'array' ) === 0 )
-	{ // make keys (__key__) in arrays unique and remove them
-		handle_array_keys_in_plugin_settings($l_value);
-	}
-
-	if( isset( $parmeta['type'] ) && $parmeta['type'] == 'integer' )
-	{	// Convert to correct integer value:
-		$l_value = intval( $l_value );
-		if( $l_value == 0 && ! empty( $parmeta['allow_empty'] ) &&
-				isset( $parmeta['valid_range'], $parmeta['valid_range']['min'] ) && $parmeta['valid_range']['min'] > 0 )
-		{	// Convert 0 to empty value for integer field if it allows empty values:
-			$l_value = NULL;
+	if( isset( $parmeta['type'] ) )
+	{	// Prepare values before store them in DB:
+		if( strpos( $parmeta['type'], 'array' ) === 0 )
+		{	// Make keys (__key__) in arrays unique and remove them
+			handle_array_keys_in_plugin_settings( $l_value );
+		}
+		elseif( $parmeta['type'] == 'integer' )
+		{	// Convert to correct integer value:
+			if( $l_value !== '' )
+			{	// Don't convert empty string '' to integer 0:
+				$l_value = intval( $l_value );
+			}
+			if( empty( $l_value ) && ! empty( $parmeta['allow_empty'] ) &&
+					isset( $parmeta['valid_range'], $parmeta['valid_range']['min'] ) && $parmeta['valid_range']['min'] > 0 )
+			{	// Convert 0 to empty value for integer field if it allows empty values:
+				$l_value = NULL;
+			}
 		}
 	}
 
@@ -1111,11 +1201,19 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 		{
 			foreach( $value as $vk => $vv )
 			{
-				if( ! isset( $vv[$mk] ) )
-					continue;
-
-				if( ! autoform_validate_param_value( $param_name.'['.$vk.']['.$mk.']', $vv[$mk], $mv ) )
-				{
+				if( isset( $mv['type'] ) && $mv['type'] == 'input_group' &&
+				    ! empty( $mv['inputs'] ) && is_array( $mv['inputs'] ) )
+				{	// Validate each input field of the setting with type "input_group":
+					foreach( $mv['inputs'] as $k => $v )
+					{
+						if( isset( $vv[ $mk.$k ] ) && ! autoform_validate_param_value( $param_name.'['.$vk.']['.$mk.$k.']', $vv[ $mk.$k ], $v ) )
+						{	// If at least one setting of the grouped inputs has an error:
+							$r = false;
+						}
+					}
+				}
+				elseif( isset( $vv[ $mk ] ) && ! autoform_validate_param_value( $param_name.'['.$vk.']['.$mk.']', $vv[ $mk ], $mv ) )
+				{	// If single setting has an error:
 					$r = false;
 				}
 			}
@@ -1133,6 +1231,14 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 
 		switch( $meta['type'] )
 		{
+			case 'text':
+				if( isset( $meta['allow_empty'] ) && ! $meta['allow_empty'] && $value === '' )
+				{	// Display error if the text field is required to be not empty:
+					param_error( $param_name, sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), $meta['label'] ), T_('This field cannot be empty.') );
+					return false;
+				}
+				break;
+
 			case 'integer':
 				if( ! preg_match( '~^[-+]?\d+$~', $value ) )
 				{

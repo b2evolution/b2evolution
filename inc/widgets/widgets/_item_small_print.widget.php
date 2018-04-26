@@ -36,6 +36,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_small_print_Widget extends ComponentWidget
 {
+	var $icon = 'info-circle';
+
 	/**
 	 * Constructor
 	 * @param object $db_row

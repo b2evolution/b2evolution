@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -237,6 +237,8 @@ class Link extends DataObject
 				'image_desc'          => '#',
 				'image_size_x'        => 1, // Use '2' to build 2x sized thumbnail that can be used for Retina display
 				'tag_size'            => NULL,
+				'image_style'         => '',
+				'add_loadimg'         => true,
 			), $params );
 
 		return $File->get_tag( $params['before_image'],
@@ -253,7 +255,9 @@ class Link extends DataObject
 				$params['image_desc'],
 				'link_'.$this->ID,
 				$params['image_size_x'],
-				$params['tag_size'] );
+				$params['tag_size'],
+				$params['image_style'],
+				$params['add_loadimg'] );
 	}
 
 
@@ -355,13 +359,13 @@ class Link extends DataObject
 		}
 
 		// Try to find at least one another link by same file ID:
-		$SQL = new SQL();
+		$SQL = new SQL( 'Try to find at least one another link by same file ID #'.$File->ID );
 		$SQL->SELECT( 'link_ID' );
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_file_ID = '.$DB->quote( $File->ID ) );
 		$SQL->WHERE_and( 'link_ID != '.$DB->quote( $this->ID ) );
 		$SQL->LIMIT( '1' );
-		if( $DB->get_var( $SQL->get() ) )
+		if( $DB->get_var( $SQL ) )
 		{	// We cannot delete the file of this link because it is also linked to another object
 			return false;
 		}

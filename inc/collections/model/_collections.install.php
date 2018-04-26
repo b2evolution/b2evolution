@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -27,11 +27,13 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating table for installed skins',
 		"CREATE TABLE T_skins__skin (
 				skin_ID      int(10) unsigned NOT NULL auto_increment,
+				skin_class   varchar(32) NOT NULL,
 				skin_name    varchar(32) NOT NULL,
 				skin_type    enum('normal','feed','sitemap','mobile','tablet','rwd') COLLATE ascii_general_ci NOT NULL default 'normal',
 				skin_folder  varchar(32) NOT NULL,
 				PRIMARY KEY skin_ID (skin_ID),
 				UNIQUE skin_folder( skin_folder ),
+				UNIQUE skin_class( skin_class ),
 				KEY skin_name( skin_name )
 			) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -72,6 +74,9 @@ $schema_queries = array_merge( $schema_queries, array(
 			blog_media_url       VARCHAR( 255 ) NULL,
 			blog_type            VARCHAR( 16 ) COLLATE ascii_general_ci DEFAULT 'std' NOT NULL,
 			blog_order           int(11) NULL DEFAULT NULL,
+			blog_normal_skin_ID  int(10) unsigned NULL,
+			blog_mobile_skin_ID  int(10) unsigned NULL,
+			blog_tablet_skin_ID  int(10) unsigned NULL,
 			PRIMARY KEY blog_ID (blog_ID),
 			UNIQUE KEY blog_urlname (blog_urlname)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -109,6 +114,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			cat_urlname         varchar(255) COLLATE ascii_general_ci NOT NULL,
 			cat_blog_ID         int(10) unsigned NOT NULL default 2,
 			cat_image_file_ID   int(10) unsigned NULL,
+			cat_social_media_image_file_ID int(10) unsigned NULL,
 			cat_description     varchar(255) NULL DEFAULT NULL,
 			cat_order           int(11) NULL DEFAULT NULL,
 			cat_subcat_ordering enum('parent', 'alpha', 'manual') COLLATE ascii_general_ci NULL DEFAULT NULL,
@@ -216,6 +222,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_karma              INT(11) NOT NULL DEFAULT 0,
 			comment_spam_karma         TINYINT NULL,
 			comment_allow_msgform      TINYINT NOT NULL DEFAULT 0,
+			comment_anon_notify        TINYINT(1) NOT NULL DEFAULT 0,
+			comment_anon_notify_last   VARCHAR(16) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			comment_secret             CHAR(32) COLLATE ascii_general_ci NULL default NULL,
 			comment_notif_status       ENUM('noreq','todo','started','finished') COLLATE ascii_general_ci NOT NULL DEFAULT 'noreq' COMMENT 'Have notifications been sent for this comment? How far are we in the process?',
 			comment_notif_ctsk_ID      INT(10) unsigned NULL DEFAULT NULL COMMENT 'When notifications for this comment are sent through a scheduled job, what is the job ID?',
@@ -272,7 +280,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			iver_status        ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NULL,
 			iver_title         VARCHAR(255) NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			iver_content       MEDIUMTEXT NULL,
-			PRIMARY KEY        ( iver_ID , iver_type, iver_itm_ID )
+			PRIMARY KEY        ( iver_ID , iver_type, iver_itm_ID ),
+			INDEX iver_edit_user_ID ( iver_edit_user_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__version_custom_field' => array(
@@ -445,6 +454,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			sub_coll_ID     int(11) unsigned    not null,
 			sub_user_ID     int(11) unsigned    not null,
 			sub_items       tinyint(1)          not null,
+			sub_items_mod   TINYINT(1)          NOT NULL,
 			sub_comments    tinyint(1)          not null,
 			primary key (sub_coll_ID, sub_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

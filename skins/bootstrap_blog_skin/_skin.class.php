@@ -21,7 +21,7 @@ class bootstrap_blog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.4';
+	var $version = '6.10.1';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -533,7 +533,7 @@ class bootstrap_blog_Skin extends Skin
 		}
 
 		// Font family customization
-		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family', NULL, 'font_weight' );
+		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family', NULL, 'font_weight', 'font' );
 
 		if( ! empty( $custom_css ) )
 		{	// Function for custom_css:
