@@ -1853,8 +1853,9 @@ function load_publish_status( $creating = false )
  * @param object edited Item
  * @param boolean Is in-skin editing
  * @param boolean TRUE to display a preview button
+ * @param string Action
  */
-function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, $display_preview = false )
+function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, $display_preview = false, $action = NULL )
 {
 	global $Collection, $Blog, $current_User, $UserSettings;
 	global $next_action, $highest_publish_status; // needs to be passed out for echo_publishnowbutton_js( $action )
@@ -1866,7 +1867,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	}
 
 	// ---------- PREVIEW ----------
-	if( ! $inskin || $display_preview )
+	if( ( ! $inskin || $display_preview ) && $action != 'propose' )
 	{
 		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
 		$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
@@ -1880,17 +1881,17 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		echo '<span class="edit_actions_text">'.T_('Visibility').get_manual_link( 'visibility-status' ).': </span>';
 
 		// Get those statuses which are not allowed for the current User to create posts in this blog
-		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status ), array( 'trash' ) );
+		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->get( 'status' ) ), array( 'trash' ) );
 		// Get allowed visibility statuses
 		$status_options = get_visibility_statuses( '', $exclude_statuses );
 
 		if( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
 		{ // Use dropdown for bootstrap skin
 			$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
-			$Form->hidden( 'post_status', $edited_Item->status );
-			echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
-			echo '<button type="button" class="btn btn-status-'.$edited_Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
-							.'<span>'.$status_options[ $edited_Item->status ].'</span>'
+			$Form->hidden( 'post_status', $edited_Item->get( 'status' ) );
+			echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Item->get( 'status' ) ).'">';
+			echo '<button type="button" class="btn btn-status-'.$edited_Item->get( 'status' ).' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
+							.'<span>'.$status_options[ $edited_Item->get( 'status' ) ].'</span>'
 						.' <span class="caret"></span></button>';
 			echo '<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
 			foreach( $status_options as $status_key => $status_title )
@@ -1906,7 +1907,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 			foreach( $status_options as $status_key => $status_title )
 			{
 				echo '<option value="'.$status_key.'"'
-							.( $edited_Item->status == $status_key ? ' selected="selected"' : '' )
+							.( $edited_Item->get( 'status' ) == $status_key ? ' selected="selected"' : '' )
 							.' class="btn-status-'.$status_key.'">'
 						.$status_title
 					.'</option>';
@@ -1915,43 +1916,51 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		}
 	}
 
-	echo '<span class="btn-group">';
+	if( $action != 'propose' )
+	{	// Don't display the following buttons on propose change action:
+		echo '<span class="btn-group">';
 
-	// ---------- SAVE ----------
-	$next_action = ($creating ? 'create' : 'update');
-	if( ! $inskin && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
-	{ // Show Save & Edit only on admin mode
-		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-status-'.$edited_Item->status ) );
+		// ---------- SAVE ----------
+		$next_action = ($creating ? 'create' : 'update');
+		if( ! $inskin && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+		{ // Show Save & Edit only on admin mode
+			$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-status-'.$edited_Item->get( 'status' ) ) );
+		}
+
+		if( $inskin )
+		{ // Front-office: display a save button with title depending on post status
+			$button_titles = get_visibility_statuses( 'button-titles' );
+			$button_title = isset( $button_titles[ $edited_Item->get( 'status' ) ] ) ? T_( $button_titles[ $edited_Item->get( 'status' ) ] ) : T_('Save Changes!');
+		}
+		else
+		{ // Use static button title on back-office
+			$button_title = T_('Save');
+		}
+		$Form->submit( array( 'actionArray['.$next_action.']', $button_title, 'SaveButton btn-status-'.$edited_Item->get( 'status' ) ) );
+
+		echo '</span>';
+
+		$Form->hidden( 'publish_status', $highest_publish_status );
+
+		if( $highest_publish_status == 'published' && $UserSettings->get_collection_setting( 'show_quick_publish', $Blog->ID ) )
+		{ // Display this button to make a post published
+
+			// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
+			$publish_style = ( $edited_Item->get( 'status' ) == $highest_publish_status ) ? 'display: none' : 'display: inline';
+
+			$Form->submit( array(
+				'actionArray['.$next_action.'_publish]',
+				/* TRANS: This is the value of an input submit button */ T_('Publish').'!',
+				'SaveButton btn-status-published quick-publish',
+				'',
+				$publish_style
+			) );
+		}
 	}
 
-	if( $inskin )
-	{ // Front-office: display a save button with title depending on post status
-		$button_titles = get_visibility_statuses( 'button-titles' );
-		$button_title = isset( $button_titles[ $edited_Item->status ] ) ? T_( $button_titles[ $edited_Item->status ] ) : T_('Save Changes!');
-	}
-	else
-	{ // Use static button title on back-office
-		$button_title = T_('Save');
-	}
-	$Form->submit( array( 'actionArray['.$next_action.']', $button_title, 'SaveButton btn-status-'.$edited_Item->status ) );
-
-	echo '</span>';
-
-	$Form->hidden( 'publish_status', $highest_publish_status );
-
-	if( $highest_publish_status == 'published' && $UserSettings->get_collection_setting( 'show_quick_publish', $Blog->ID ) )
-	{ // Display this button to make a post published
-
-		// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
-		$publish_style = ( $edited_Item->status == $highest_publish_status ) ? 'display: none' : 'display: inline';
-
-		$Form->submit( array(
-			'actionArray['.$next_action.'_publish]',
-			/* TRANS: This is the value of an input submit button */ T_('Publish').'!',
-			'SaveButton btn-status-published quick-publish',
-			'',
-			$publish_style
-		) );
+	if( $action == 'propose' )
+	{	// Display a button to propose change:
+		$Form->submit( array( 'actionArray[save_propose]', T_('Propose change'), 'btn-primary evo_propose_change_btn' ) );
 	}
 }
 

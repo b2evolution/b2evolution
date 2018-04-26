@@ -182,6 +182,12 @@ class LinkItem extends LinkOwner
 	{
 		global $DB, $localtimenow;
 
+		if( ! $this->Item->check_before_update() )
+		{	// If the Link's Item cannot be updated:
+			// (e-g it can be restricted if this item has at least one proposed change)
+			return false;
+		}
+
 		if( is_null( $position ) )
 		{ // Use default link position
 			$position = $this->get_default_position( $file_ID );
@@ -238,9 +244,15 @@ class LinkItem extends LinkOwner
 	{
 		global $DB, $localtimenow;
 
+		if( ! $this->Item->check_before_update() )
+		{	// If the Link's Item cannot be updated:
+			// (e-g it can be restricted if this item has at least one proposed change)
+			return false;
+		}
+
 		$this->load_Links();
 
-		$previous_Revision = $this->Item->get_revision( 'max' );
+		$previous_Revision = $this->Item->get_revision( 'last_archived' );
 
 		if( ! empty( $previous_Revision ) &&  ( $localtimenow - strtotime( $this->Item->last_touched_ts ) ) < 90 )
 		{ // Check if we can remove the link from the previous revision

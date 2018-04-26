@@ -310,6 +310,13 @@ class Item extends ItemLight
 	var $revision;
 
 	/**
+	 * Cached revisions in order to don't load them twice
+	 *
+	 * @var array
+	 */
+	var $revisions;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object table Database row
@@ -670,6 +677,10 @@ class Item extends ItemLight
 	{
 		global $default_locale, $current_User, $localtimenow;
 		global $item_typ_ID;
+
+		// Check if this Item can be updated:
+		// (e-g it can be restricted if this item has at least one proposed change)
+		$this->check_before_update();
 
 		// LOCALE:
 		if( param( 'post_locale', 'string', NULL ) !== NULL )
@@ -1803,7 +1814,7 @@ class Item extends ItemLight
 		$cache_key = $format.'/'.implode('.', $post_renderers); // logic gets used below, for setting cache, too.
 
 		$use_cache = $this->ID && in_array( $format, array('htmlbody', 'entityencoded', 'xml', 'text') )
-				&& ! ( isset( $this->revision ) && $this->revision > 0 ); // do not use cache when viewing historical revision
+				&& empty( $this->revision ); // do not use cache when viewing historical revision
 
 		// $use_cache = false;
 
@@ -5560,9 +5571,9 @@ class Item extends ItemLight
 				'format'   => 'htmlbody', // Output format, see {@link format_to_output()}
 			), $params );
 
-		$r = str_replace( '$status$', $this->status, $params['template'] );
+		$r = str_replace( '$status$', $this->get( 'status' ), $params['template'] );
 		$r = str_replace( '$status_title$', $this->get('t_status'), $r );
-		$r = str_replace( '$tooltip_title$', get_status_tooltip_title( $this->status ), $r );
+		$r = str_replace( '$tooltip_title$', get_status_tooltip_title( $this->get( 'status' ) ), $r );
 
 		return format_to_output( $r, $params['format'] );
 	}
@@ -6033,9 +6044,6 @@ class Item extends ItemLight
 				// Save previous status as a reminder (it can be useful to compare later. The Comment class uses this).
 				$this->previous_status = $this->get( 'status' );
 				return parent::set( 'status', $parvalue, $make_null );
-
-			case 'revision':
-				return $this->set_param( $parname, 'integer', $parvalue, true );
 
 			default:
 				return parent::set( $parname, $parvalue, $make_null );
@@ -7776,15 +7784,7 @@ class Item extends ItemLight
 			case 't_status':
 				// Text status:
 				$post_statuses = get_visibility_statuses();
-				$t_status = $this->status;
-				if( isset( $this->revision ) && $this->revision > 0 )
-				{
-					if( $Revision = $this->get_revision( $this->revision ) )
-					{
-						$t_status = $Revision->iver_status;
-					}
-				}
-				return $post_statuses[$t_status];
+				return $post_statuses[ $this->get_from_revision( 'status' ) ];
 
 			case 't_extra_status':
 				$ItemStatusCache = & get_ItemStatusCache();
@@ -7820,36 +7820,31 @@ class Item extends ItemLight
 				return empty( $this->notifications_flags ) ? array() : explode( ',', $this->notifications_flags );
 
 			case 'title':
-				if( isset( $this->revision ) && $this->revision > 0 )
-				{
-					if( $Revision = $this->get_revision( $this->revision ) )
-					{
-						return $Revision->iver_title;
-					}
-				}
-				break;
-
 			case 'content':
-				if( isset( $this->revision ) && $this->revision > 0 )
-				{
-					if( $Revision = $this->get_revision( $this->revision ) )
-					{
-						return $Revision->iver_content;
-					}
-				}
-				break;
-
 			case 'status':
-				if( isset( $this->revision ) && $this->revision > 0 )
-				{
-					if( $Revision = $this->get_revision( $this->revision ) )
-					{
-						return $Revision->iver_status;
-					}
-				}
-				break;
+				return $this->get_from_revision( $parname );
 		}
 
+		return parent::get( $parname );
+	}
+
+
+	/**
+	 * Get param value from current revision
+	 *
+	 * @param mixed Name of parameter
+	 * @return mixed Value of parameter
+	 */
+	function get_from_revision( $parname )
+	{
+		if( ! empty( $this->revision ) && // If revision is active currently for this Item
+		    ( $Revision = $this->get_revision( $this->revision ) ) && // If current revision is detected for this Item
+				isset( $Revision->{'iver_'.$parname} ) ) // If revision really has the resuested field
+		{	// Get value from current revision of this Item:
+			return $Revision->{'iver_'.$parname};
+		}
+
+		// Get value from this Item:
 		return parent::get( $parname );
 	}
 
@@ -8524,17 +8519,32 @@ class Item extends ItemLight
 	{
 		global $DB;
 
-		if( $iver_ID == 'max' )
+		if( empty( $this->ID ) )
+		{	// Item must be stored in DB to get revisions:
+			return false;
+		}
+
+		if( isset( $this->revisions[ $iver_ID ] ) )
+		{	// Get revision data from cached array:
+			return $this->revisions[ $iver_ID ];
+		}
+
+		// Save original ID to use this for storing in cache:
+		$orig_iver_ID = $iver_ID;
+
+		if( $iver_ID == 'last_archived' || $iver_ID == 'last_proposed' )
 		{	// Get last revision:
+			list( , $iver_type ) = explode( '_', $iver_ID );
 			$revision_SQL = new SQL();
 			$revision_SQL->SELECT( 'a.*' );
 			$revision_SQL->FROM( 'T_items__version a' );
-			$revision_SQL->FROM_add( 'LEFT OUTER JOIN T_items__version b ON a.iver_itm_ID = b.iver_itm_ID AND a.iver_ID < b.iver_ID' );
+			$revision_SQL->FROM_add( 'LEFT OUTER JOIN T_items__version b ON a.iver_itm_ID = b.iver_itm_ID AND a.iver_ID < b.iver_ID AND b.iver_type = '.$DB->quote( $iver_type ) );
 			$revision_SQL->WHERE( 'b.iver_itm_ID IS NULL' );
 			$revision_SQL->WHERE_and( 'a.iver_itm_ID = '.$DB->quote( $this->ID ) );
-			$Revision = $DB->get_row( $revision_SQL->get() );
+			$revision_SQL->WHERE_and( 'a.iver_type = '.$DB->quote( $iver_type ) );
+			$this->revisions[ $orig_iver_ID ] = $DB->get_row( $revision_SQL->get(), OBJECT, NULL, $revision_SQL->title );
 
-			return $Revision;
+			return $this->revisions[ $orig_iver_ID ];
 		}
 
 		// Get version type from first char:
@@ -8560,19 +8570,19 @@ class Item extends ItemLight
 			case 'a':
 			case 'p':
 				// Archived version or Proposed change:
-				$revision_SQL = new SQL();
+				$revision_SQL = new SQL( 'Get '.( $iver_type == 'a' ? 'an archived version' : 'a proposed change' ).' #'.$this->ID.' for Item #'.$this->ID );
 				$revision_SQL->SELECT( '*' );
 				$revision_SQL->FROM( 'T_items__version' );
 				$revision_SQL->WHERE( 'iver_ID = '.$DB->quote( $iver_ID ) );
 				$revision_SQL->WHERE_and( 'iver_itm_ID = '.$DB->quote( $this->ID ) );
 				$revision_SQL->WHERE_and( 'iver_type = "'.( $iver_type == 'a' ? 'archived' : 'proposed' ).'"' );
-				$Revision = $DB->get_row( $revision_SQL->get() );
+				$this->revisions[ $orig_iver_ID ] = $DB->get_row( $revision_SQL->get(), OBJECT, NULL, $revision_SQL->title );
 				break;
 
 			case 'c':
 			default:
 				// Current version:
-				$Revision = (object) array(
+				$this->revisions[ $orig_iver_ID ] = (object) array(
 					'iver_ID'            => 0,
 					'iver_type'          => 'current',
 					'iver_itm_ID'        => $this->ID,
@@ -8585,7 +8595,7 @@ class Item extends ItemLight
 				break;
 		}
 
-		return $Revision;
+		return $this->revisions[ $orig_iver_ID ];
 	}
 
 
@@ -10136,23 +10146,51 @@ class Item extends ItemLight
 
 
 	/**
+	 * Check if this Item has at least one proposed change
+	 *
+	 * @param boolean
+	 */
+	function has_proposed_change()
+	{
+		if( ! isset( $this->has_proposed_change ) )
+		{	// Check if this Item has a proposed change and save the result in cache var:
+			if( empty( $this->ID ) )
+			{	// Item must be created to have the proposed changes:
+				return false;
+			}
+
+			global $DB;
+
+			$SQL = new SQL( 'Check if Item #'.$this->ID.' has at least one proposed change' );
+			$SQL->SELECT( 'iver_ID' );
+			$SQL->FROM( 'T_items__version' );
+			$SQL->WHERE( 'iver_itm_ID = '.$this->ID );
+			$SQL->WHERE_and( 'iver_type = "proposed"' );
+
+			$this->has_proposed_change = (boolean) $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
+		}
+
+		return $this->has_proposed_change;
+	}
+
+
+	/**
 	 * Create a new proposed change
 	 *
 	 * @return integer/boolean ID of created item revision if successful, otherwise False
 	 */
 	function create_proposed_change()
 	{
-		global $DB, $current_User, $Plugins_admin;
+		global $DB, $current_User, $Plugins_admin, $localtimenow;
 
 		if( empty( $this->ID ) || ! is_logged_in() )
 		{	// Item must be created and current user must be logged in:
 			return false;
 		}
 
-		// Get next version ID:
-		$iver_ID = $this->get_next_version_ID( 'proposed' );
+		// START of loading the proposed change this this Item from request:
+		$this->set( 'status', param( 'post_status', 'string', 'published' ) );
 
-		// START of loading Item data from request:
 		if( $this->get_type_setting( 'allow_html' ) )
 		{	// HTML is allowed for this post, we'll accept HTML tags:
 			$text_format = 'html';
@@ -10200,16 +10238,25 @@ class Item extends ItemLight
 		{	// Exit here if some errors on the submitted form:
 			return false;
 		}
-		// END of loading Item data from request.
+		// END of loading the proposed change this this Item from request.
 
-		$DB->begin();
+		$DB->begin( 'SERIALIZABLE' );
+
+		if( isset( $this->previous_status ) )
+		{	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
+			// (ONLY if current request is updating item status)
+			$this->restrict_status( true );
+		}
+
+		// Get next version ID:
+		$iver_ID = $this->get_next_version_ID( 'proposed' );
 	
-		$result = $DB->query( 'INSERT INTO T_items__version( iver_ID, iver_type, iver_itm_ID, iver_edit_user_ID, iver_edit_last_touched_ts, iver_status, iver_title, iver_content )
+		$result = $DB->query( 'INSERT INTO T_items__version ( iver_ID, iver_type, iver_itm_ID, iver_edit_user_ID, iver_edit_last_touched_ts, iver_status, iver_title, iver_content )
 			VALUES ( '.$iver_ID.', '
 				.'"proposed", '
 				.$this->ID.', '
 				.$current_User->ID.', '
-				.$DB->quote( $this->get( 'last_touched_ts' ) ).','
+				.$DB->quote( date2mysql( $localtimenow ) ).','
 				.$DB->quote( $this->get( 'status' ) ).','
 				.$DB->quote( $this->get( 'title' ) ).','
 				.$DB->quote( $this->get( 'content' ) ).' )
@@ -10225,6 +10272,40 @@ class Item extends ItemLight
 		}
 
 		return $result;
+	}
+
+
+	/**
+	 * Check if this item can be updated depending on proposed changes
+	 *
+	 * @param boolean TRUE to display messages
+	 * @return boolean
+	 */
+	function check_before_update( $display_messages = true )
+	{
+		if( ! isset( $this->check_before_update ) )
+		{	// Check and save result in cache var:
+			if( empty( $this->ID ) )
+			{	// Item is not created yet, so it cannot be updated:
+				$this->check_before_update = false;
+			}
+			elseif( $this->has_proposed_change() )
+			{	// Don't allow to edit this Item if it has at least one proposed change:
+				if( $display_messages )
+				{	// Display a message to inform user about this restriction:
+					global $Messages, $admin_url;
+					$Messages->add( sprintf( T_('You must accept or reject the <a %s>proposed changes</a> in order to continue edit this Item.'),
+						'href="'.$admin_url.'?ctrl=items&amp;action=history&amp;p='.$this->ID.'"' ), 'error' );
+				}
+				$this->check_before_update = false;
+			}
+			else
+			{	// Item can be updated:
+				$this->check_before_update = true;
+			}
+		}
+
+		return $this->check_before_update;
 	}
 }
 ?>

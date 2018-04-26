@@ -153,7 +153,8 @@ h2 .glyphicon {
 .edit_actions .pull-left {
   margin-right: 10px;
 }
-.edit_actions .quick-publish {
+.edit_actions .quick-publish,
+.edit_actions .evo_propose_change_btn {
   margin-left: 5px;
 }
 .edit_actions .html_status {

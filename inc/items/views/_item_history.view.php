@@ -247,8 +247,17 @@ function iver_td_actions( $iver_ID, $iver_type )
 
 	if( $iver_type == 'proposed' )
 	{	// Button to accept or reject the proposed versions:
-		$r .= '<a href="'.regenerate_url( 'action', 'action=history_accept&amp;r='.$iver_ID.'&amp;'.url_crumb( 'item' ) ).'" class="action_icon btn btn-success btn-xs">'.T_('Accept').'</a>';
-		$r .= '<a href="'.regenerate_url( 'action', 'action=history_reject&amp;r='.$iver_ID.'&amp;'.url_crumb( 'item' ) ).'" class="action_icon btn btn-danger btn-xs">'.T_('Reject').'</a>';
+		global $admin_url;
+		$r .= '<a href="'.$admin_url.'?ctrl=items&amp;action=accept_propose&amp;post_ID='.$edited_Item->ID.'&amp;r=p'.$iver_ID.'&amp;'.url_crumb( 'item' ).'"'
+			.' class="action_icon btn btn-success btn-xs"'
+			.' onclick="return confirm( \''.sprintf( TS_('You are about to accept the proposed change #%s.\nPlease note all previous proposed changes will be also accepted.\nAre you sure?'), $iver_ID ).'\')">'
+				.T_('Accept')
+			.'</a>';
+		$r .= '<a href="'.$admin_url.'?ctrl=items&amp;action=reject_propose&amp;post_ID='.$edited_Item->ID.'&amp;r=p'.$iver_ID.'&amp;'.url_crumb( 'item' ).'"'
+			.' class="action_icon btn btn-danger btn-xs"'
+			.' onclick="return confirm( \''.sprintf( TS_('You are about to reject the proposed change #%s.\nPlease note all newer proposed changes will be also rejected.\nAre you sure?'), $iver_ID ).'\')">'
+				.T_('Reject')
+			.'</a>';
 	}
 
 	if( $iver_type == 'archived' || $iver_type == 'current' )

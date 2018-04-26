@@ -113,16 +113,18 @@ switch( $action )
 
 		// Unlink File from Item/Comment:
 		$deleted_link_ID = $edited_Link->ID;
-		$LinkOwner->remove_link( $edited_Link );
-		unset( $edited_Link );
+		if( $LinkOwner->remove_link( $edited_Link ) )
+		{	// If Link has been removed successfully:
+			unset( $edited_Link );
 
-		$LinkOwner->after_unlink_action( $deleted_link_ID );
+			$LinkOwner->after_unlink_action( $deleted_link_ID );
 
-		$Messages->add( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'success' );
+			$Messages->add( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'success' );
 
-		if( $action == 'delete' && ! empty( $linked_File ) )
-		{	// Delete a linked file from disk and DB completely:
-			$linked_File->unlink();
+			if( $action == 'delete' && ! empty( $linked_File ) )
+			{	// Delete a linked file from disk and DB completely:
+				$linked_File->unlink();
+			}
 		}
 
 		header_redirect( $redirect_to );

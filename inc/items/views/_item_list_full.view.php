@@ -294,7 +294,7 @@ while( $Item = & $ItemList->get_item() )
 			}
 
 			echo $Item->get_history_link( array(
-					'class'     => button_class( 'text' ),
+					'class'     => button_class( 'text' ).( $Item->has_proposed_change() ? ' btn-warning' : '' ),
 					'link_text' => '$icon$ '.T_('History'),
 				) );
 

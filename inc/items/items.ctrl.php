@@ -94,12 +94,24 @@ switch( $action )
 			$edited_Item = & $ItemCache->get_by_ID( $p );
 		}
 
+		if( $action == 'propose' &&
+		    ( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) ) )
+		{	// Suggest item fields values from last proposed change when user creates new propose change:
+			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
+		}
+
 		// Load the blog we're in:
 		$Collection = $Blog = & $edited_Item->get_Blog();
 		set_working_blog( $Blog->ID );
 
 		// Where are we going to redirect to?
 		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' ) );
+
+		if( $action == 'edit' )
+		{	// Check if this Item can be updated:
+			// (e-g it can be restricted if this item has at least one proposed change)
+			$edited_Item->check_before_update();
+		}
 		break;
 
 	case 'mass_edit':
@@ -121,6 +133,8 @@ switch( $action )
 	case 'edit_type': // this gets set as action by JS, when we switch tabs
 	case 'extract_tags':
 	case 'save_propose':
+	case 'accept_propose':
+	case 'reject_propose':
 		if( $action != 'edit_switchtab' && $action != 'edit_type' )
 		{ // Stop a request from the blocked IP addresses or Domains
 			antispam_block_request();
@@ -1602,6 +1616,52 @@ switch( $action )
 		$action = 'propose';
 		break;
 
+	case 'accept_propose':
+	case 'reject_propose':
+		// Accept/Reject the proposed change:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		// Check edit permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		// Try to get a proposed change by requested ID:
+		$Revision = $edited_Item->get_revision( param( 'r', 'string' ) );
+
+		if( ! $Revision || $Revision->iver_type != 'proposed' )
+		{	// Stop on wrong requested proposed change:
+			debug_die( 'The proposed change #'.$r.' could not be found for Item #'.$edited_Item->ID.' in DB!' );
+		}
+
+		if( $action == 'accept_propose' )
+		{	// Accept the proposed change:
+			// Update current Item with values from the requested proposed change:
+			$edited_Item->set( 'status', $Revision->iver_status );
+			$edited_Item->set( 'title', $Revision->iver_title );
+			$edited_Item->set( 'content', $Revision->iver_content );
+			$edited_Item->dbupdate();
+			// Delete also all previous proposed changes:
+			$DB->query( 'DELETE FROM T_items__version
+				WHERE iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
+					AND iver_type = "proposed"
+					AND iver_ID <= '.$Revision->iver_ID );
+			$Messages->add( sprintf( T_('The proposed change #%d has been accepted.'), $Revision->iver_ID ), 'success' );
+		}
+		else
+		{	// Reject the proposed change:
+			// Delete also all newer proposed changes:
+			$DB->query( 'DELETE FROM T_items__version
+				WHERE iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
+					AND iver_type = "proposed"
+					AND iver_ID >= '.$Revision->iver_ID );
+			$Messages->add( sprintf( T_('The proposed change #%d has been rejected.'), $Revision->iver_ID ), 'success' );
+		}
+
+		// Redirect to item history page with new poroposed change:
+		header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
+		break;
+
 	default:
 		debug_die( 'unhandled action 2: '.htmlspecialchars($action) );
 }
@@ -2080,9 +2140,9 @@ switch( $action )
 		$AdminUI->disp_payload_begin();
 
 		// We never allow HTML in titles, so we always encode and decode special chars.
-		$item_title = htmlspecialchars_decode( $edited_Item->title );
+		$item_title = htmlspecialchars_decode( $edited_Item->get( 'title' ) );
 
-		$item_content = prepare_item_content( $edited_Item->content );
+		$item_content = prepare_item_content( $edited_Item->get( 'content' ) );
 
 		if( ! $edited_Item->get_type_setting( 'allow_html' ) )
 		{ // HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:

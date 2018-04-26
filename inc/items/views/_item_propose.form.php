@@ -154,7 +154,7 @@ $Form->begin_form( '', '', $params );
 	echo '</div>';
 
 	echo '<div class="pull-right">';
-	$Form->submit( array( 'actionArray[save_propose]', T_('Propose change'), 'btn-primary' ) );
+	echo_publish_buttons( $Form, false, $edited_Item, false, false, $action );
 	echo '</div>';
 
 	echo '<div class="clearfix"></div>';
@@ -172,6 +172,8 @@ $Form->begin_form( '', '', $params );
 // ================================== END OF PROPOSE CHANGE FORM ==================================
 $Form->end_form();
 
+// JS code for status dropdown select button
+echo_status_dropdown_button_js( 'post' );
 // Save and restore item content field height and scroll position:
 echo_item_content_position_js( get_param( 'content_height' ), get_param( 'content_scroll' ) );
 ?>
