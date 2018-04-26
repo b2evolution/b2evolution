@@ -39,6 +39,21 @@ $Form->hidden( 'tab', get_param( 'tab' ) );
 $Form->hidden( 'tab3', get_param( 'tab3' ) );
 $Form->hidden( 'action', 'settings' );
 
+// --------------------------------------------
+
+$Form->begin_fieldset( T_('After each new post or comment...').get_manual_link('after_each_post_settings') );
+	$Form->radio_input( 'outbound_notifications_mode', $Settings->get('outbound_notifications_mode'),
+		array(
+			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('No notification about your new content will be sent out.') ),
+			array( 'value'=>'immediate', 'label'=>T_('Immediate'), 'note'=>T_('This is guaranteed to work but may create an annoying delay after each post or comment publication.') ),
+			array( 'value'=>'cron', 'label'=>T_('Asynchronous'), 'note'=>T_('Recommended if you have your scheduled jobs properly set up.') )
+		),
+		T_('Outbound pings & email notifications'),
+		array( 'lines' => true ) );
+$Form->end_fieldset();
+
+// --------------------------------------------
+
 $Form->begin_fieldset( T_('Email campaign throttling').get_manual_link( 'email-other-settings' ) );
 
 	$Form->radio_input( 'email_campaign_send_mode', $Settings->get( 'email_campaign_send_mode' ),
@@ -52,6 +67,8 @@ $Form->begin_fieldset( T_('Email campaign throttling').get_manual_link( 'email-o
 	$Form->text_input( 'email_campaign_chunk_size', $Settings->get( 'email_campaign_chunk_size' ), 5, T_('Chunk Size'), T_('emails at a time'), array( 'maxlength' => 10 ) );
 
 $Form->end_fieldset();
+
+// --------------------------------------------
 
 if( $current_User->check_perm( 'emails', 'edit' ) )
 {

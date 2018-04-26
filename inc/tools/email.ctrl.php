@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var User
  */
-global $current_User;
+global $current_User, $Settings;
 
 global $DB;
 
@@ -245,6 +245,10 @@ switch( $action )
 
 				// Chunk Size:
 				$Settings->set( 'email_campaign_chunk_size', param( 'email_campaign_chunk_size', 'integer', 0 ) );
+
+				// Outbound pinging:
+				param( 'outbound_notifications_mode', 'string', true );
+				$Settings->set( 'outbound_notifications_mode',  get_param('outbound_notifications_mode') );
 				break;
 
 			default:
