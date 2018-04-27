@@ -3765,9 +3765,10 @@ function user_get_notification_sender( $user_ID, $setting )
  * @param integer User ID
  * @param integer Email Campaign ID
  * @param integer Automation ID
+ * @param mixed # if mail is to be queued, Email log ID to send queued email, and NULL if mail is to be sent immediately
  * @return boolean True if mail could be sent (not necessarily delivered!), false if not - (return value of {@link mail()})
  */
-function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name = NULL, $headers = array(), $user_ID = NULL, $email_campaign_ID = NULL, $automation_ID = NULL )
+function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name = NULL, $headers = array(), $user_ID = NULL, $email_campaign_ID = NULL, $automation_ID = NULL, $mail_log_ID = NULL )
 {
 	global $servertimenow, $email_send_simulate_only;
 
@@ -3792,10 +3793,13 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		$message_data = array( 'full' => $message );
 	}
 
-	// Replace secret content in the mail logs message body
-	$message = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $message );
-	// Remove secret content marks from the message
-	$message_data = str_replace( array( '$secret_content_start$', '$secret_content_end$' ), '', $message_data );
+	if( is_null( $mail_log_ID ) || $mail_log_ID != '#' )
+	{	// Replace secret content in the mail logs message body
+		$message = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $message );
+
+		// Remove secret content marks from the message
+		$message_data = str_replace( array( '$secret_content_start$', '$secret_content_end$' ), '', $message_data );
+	}
 
 	// Memorize email address
 	$to_email_address = $to;
@@ -3877,13 +3881,25 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	// COMPACT HEADERS:
 	$headerstring = get_mail_headers( $headers, $NL );
 
-	// Create initial email log with empty message
-	$email_key = generate_random_key();
-	mail_log( $user_ID, $to_email_address, $clear_subject, NULL, $headerstring, 'ready_to_send', $email_key, $email_campaign_ID, $automation_ID );
+	if( is_null( $mail_log_ID ) || $mail_log_ID == '#' )
+	{
+		// Create initial email log, serialize original $message_data array if mail is queued.
+		$email_key = generate_random_key();
+		mail_log( $user_ID, $to_email_address, $clear_subject, NULL, $headerstring, 'ready_to_send', $email_key, $email_campaign_ID, $automation_ID );
 
-	// Replace tracking code placeholders
-	$message = str_replace( array( '$email_key$', '$mail_log_ID$' ), array( $email_key, $mail_log_insert_ID ), $message );
-	$message_data = str_replace( array( '$email_key$', '$mail_log_ID$' ), array( $email_key, $mail_log_insert_ID ), $message_data );
+		// Replace mail log data placeholders
+		$message = str_replace( array( '$email_key$', '$mail_log_ID$' ), array( $email_key, $mail_log_insert_ID ), $message );
+		$message_data = str_replace( array( '$email_key$', '$mail_log_ID$' ), array( $email_key, $mail_log_insert_ID ), $message_data );
+
+		if( $mail_log_ID == '#' )
+		{
+			update_mail_log( $mail_log_insert_ID, 'ready_to_send', serialize( $message_data ) );
+		}
+	}
+	else
+	{ // From queued mail
+		$mail_log_insert_ID = $mail_log_ID;
+	}
 
 	// Set an additional parameter for the return path:
 	switch( $Settings->get( 'sendmail_params' ) )
@@ -3910,8 +3926,10 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		$additional_parameters = '';
 	}
 
-	// Remove email key markers from message that will be sent to actual email
-	$message_data = str_replace( array( '$email_key_start$', '$email_key_end$' ), '', $message_data );
+	if( is_null( $mail_log_ID ) || $mail_log_ID == '#' )
+	{	// Remove email key markers from message that will be sent to actual email
+		$message_data = str_replace( array( '$email_key_start$', '$email_key_end$' ), '', $message_data );
+	}
 
 	if( mail_is_blocked( $to_email_address ) )
 	{ // Check if the email address is blocked
@@ -3923,7 +3941,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		return false;
 	}
 
-	if( $email_send_simulate_only )
+	if( $email_send_simulate_only || $mail_log_ID == '#' )
 	{	// The email sending is turned on simulation mode, Don't send a real message:
 		$send_mail_result = true;
 	}
@@ -3947,10 +3965,18 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		}
 	}
 
-	$mail_log_message = 'Sent mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'".';
-	$Debuglog->add( htmlspecialchars( $mail_log_message ) );
+	if( $mail_log_ID == '#' )
+	{
+		$mail_log_message = 'Queued mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'".';
+		$Debuglog->add( htmlspecialchars( $mail_log_message ) );
+	}
+	else
+	{
+		$mail_log_message = 'Sent mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'".';
+		$Debuglog->add( htmlspecialchars( $mail_log_message ) );
 
-	update_mail_log( $mail_log_insert_ID, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $message );
+		update_mail_log( $mail_log_insert_ID, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $message );
+	}
 
 	return true;
 }
@@ -4065,6 +4091,30 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 				break;
 		}
 
+		$queue = NULL;
+		switch( $template_name )
+		{
+			case 'account_activate':
+			case 'private_message_new':
+			case 'comment_spam':
+			case 'post_assignment':
+			case 'account_activate':
+			case 'account_new':
+			case 'account_activated':
+			case 'account_closed':
+			case 'account_reported':
+			case 'account_changed':
+			case 'scheduled_task_error_report':
+			case 'automation_owner_notification':
+			case 'newsletter_test':
+				$notifications_mode = $Settings->get( $template_name.'_notifications_mode' );
+				if( $notifications_mode == 'cron' )
+				{
+					$queue = '#';
+				}
+				break;
+		}
+
 		// Update notification sender's info from General settings
 		$User->update_sender();
 
@@ -4102,7 +4152,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 		$email_campaign_ID = empty( $template_params['ecmp_ID'] ) ? NULL : $template_params['ecmp_ID'];
 		$automation_ID = empty( $template_params['autm_ID'] ) ? NULL : $template_params['autm_ID'];
 
-		if( send_mail( $to_email, NULL, $subject, $message, NULL, NULL, $headers, $user_ID, $email_campaign_ID, $automation_ID ) )
+		if( send_mail( $to_email, NULL, $subject, $message, NULL, NULL, $headers, $user_ID, $email_campaign_ID, $automation_ID, $queue ) )
 		{ // email was sent, update last email settings;
 			if( isset( $email_limit_setting, $email_counter_setting ) )
 			{ // User Settings(email counters) need to be updated

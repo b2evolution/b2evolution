@@ -86,6 +86,23 @@ class GeneralSettings extends AbstractSettings
 		'email_campaign_cron_repeat' => 300, // 5 minutes: Delay between chunks on scheduled campaign job runs
 		'email_campaign_cron_limited' => 21600, // 6 hours: Delay between chunks on scheduled campaign job runs in case all remaining recipients have reached max # of emails for the current day
 
+		'account_new_notifications_mode' => 'immediate',
+		'account_activate_notifications_mode' => 'immediate',
+		'account_activated_notifications_mode' => 'immediate',
+		'account_password_reset_notifications_mode' => 'immediate',
+		'account_changed_notifications_mode' => 'immediate',
+		'account_reported_notifications_mode' => 'immediate',
+		'account_closed_notifications_mode' => 'immediate',
+		'private_message_new_notifications_mode' => 'immediate',
+		'contact_message_new_notifications_mode' => 'immediate',
+		'post_assignment_notifications_mode' => 'immediate',
+		//'post_by_email_report_notifications_mode' => 'immediate',
+		'comment_spam_notifications_mode' => 'immediate',
+		'scheduled_task_error_report_notifications_mode' => 'immediate',
+		'automation_owner_notification_notifications_mode' => 'immediate',
+		'newsletter_test_notifications_mode' => 'immediate',
+		'email_notifications_chunk_size' => 50,
+
 		'fm_enable_create_dir' => '1',
 		'fm_enable_create_file' => '1',
 		'fm_enable_roots_blog' => '1',

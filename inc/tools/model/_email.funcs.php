@@ -637,7 +637,7 @@ function blocked_emails_display()
  * @param string Message
  * @return array|boolean Mail data or FALSE when message has only Plain Text content
  */
-function mail_log_parse_message( $headers, $message )
+function mail_log_parse_message( $headers, $message, $message_serialized = false )
 {
 	preg_match( '/Content-Type: ([^;]+);/i', $headers, $header_matches );
 
@@ -647,6 +647,15 @@ function mail_log_parse_message( $headers, $message )
 	}
 
 	$data = array();
+
+	if( $message_serialized )
+	{
+		$r = unserialize( $message );
+		if( $r !== false )
+		{
+			$message = $r['full'];
+		}
+	}
 
 	if( $header_matches[1] == 'text/html' )
 	{ // Message has one content in HTML format
@@ -1118,6 +1127,23 @@ function get_mail_headers( $headers, $nl = "\r\n" )
 	}
 
 	return $headers_string;
+}
+
+
+/**
+ * Parse header string into array
+ *
+ * @param string Headers string
+ * @param string Line carriage
+ * @return array Headers array
+ */
+function parse_mail_headers( $headers_string, $nl = "\r\n" )
+{
+	$headers = array();
+	preg_match_all( "/([^:]+):\s([^".$nl."]+)/x", $headers_string, $m );
+	$headers = array_combine( $m[1], $m[2] );
+
+	return $headers;
 }
 
 

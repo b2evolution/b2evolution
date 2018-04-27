@@ -248,7 +248,34 @@ switch( $action )
 
 				// Outbound pinging:
 				param( 'outbound_notifications_mode', 'string', true );
-				$Settings->set( 'outbound_notifications_mode',  get_param('outbound_notifications_mode') );
+				$Settings->set( 'outbound_notifications_mode',  get_param( 'outbound_notifications_mode' ) );
+
+				/* Email notification throttling */
+				$template_names = array(
+					'account_new',
+					'account_activate',
+					'account_activated',
+					'account_password_reset',
+					'account_changed',
+					'account_reported',
+					'account_closed',
+					'private_message_new',
+					'contact_message_new',
+					'post_assignment',
+					//'post_by_email_report',
+					'comment_spam',
+					'scheduled_task_error_report',
+					'automation_owner_notification',
+					'newsletter_test',
+				);
+
+				foreach( $template_names as $template )
+				{
+					$Settings->set( $template.'_notifications_mode', param( $template.'_notifications_mode', 'string', 'immediate' ) );
+				}
+
+				// Chunk Size:
+				$Settings->set( 'email_notifications_chunk_size', param( 'email_notifications_chunk_size', 'integer', 0 ) );
 				break;
 
 			default:

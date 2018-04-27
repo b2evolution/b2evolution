@@ -2310,6 +2310,12 @@ class _core_Module extends Module
 				'ctrl'   => 'cron/jobs/_execute_automations.job.php',
 				'params' => NULL,
 			),
+			'send-queued-email-notifications' => array(
+				'name'   => T_('Send queued email notifications'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_send_queued_notifications.job.php',
+				'params' => NULL,
+			),
 		);
 	}
 }

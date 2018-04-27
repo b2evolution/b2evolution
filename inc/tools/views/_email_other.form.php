@@ -70,6 +70,42 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
+$Form->begin_fieldset( T_('Email notification throttling').get_manual_link( 'email-other-settings' ) );
+
+	$template_names = array(
+			'account_new' => T_('New account'),
+			'account_activate' => T_('Activate account'),
+			'account_activated' => T_('Account activated'),
+			'account_password_reset' => T_('Password reset'),
+			'account_changed' => T_('Account change'),
+			'account_reported' => T_('Reported account'),
+			'account_closed' => T_('Account closed'),
+			'private_message_new' => T_('New private message'),
+			'contact_message_new' => T_('New contact message'),
+			'post_assignment' => T_('Post assignment'),
+			//'post_by_email_report',
+			'comment_spam' => T_('Comment spam'),
+			'scheduled_task_error_report' => T_('Scheduled task error'),
+			'automation_owner_notification' => T_('Automation notification'),
+			'newsletter_test' => T_('Email campaign test'),
+		);
+
+	foreach( $template_names as $template => $label )
+	{
+		$Form->radio_input( $template.'_notifications_mode', $Settings->get( $template.'_notifications_mode' ),
+			array(
+				array( 'value' => 'immediate', 'label' => T_('Immediate'), 'note' => T_('Press "Next" after each chunk') ),
+				array( 'value' => 'cron', 'label' => T_('Asynchronous'), 'note' => T_('A scheduled job will send chunks') )
+			),
+			$label,
+			array( 'lines' => true ) );
+	}
+
+	$Form->text_input( 'email_notifications_chunk_size', $Settings->get( 'email_notifications_chunk_size' ), 5, T_('Chunk Size'), T_('emails at a time'), array( 'maxlength' => 10 ) );
+
+$Form->end_fieldset();
+
+
 if( $current_User->check_perm( 'emails', 'edit' ) )
 {
 	$Form->end_form( array( array( 'submit', '', T_('Save Changes!'), 'SaveButton' ) ) );

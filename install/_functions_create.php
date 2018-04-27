@@ -1220,6 +1220,7 @@ function create_default_jobs( $is_upgrade = false )
 	$post_reminder_key        = 'send-unmoderated-posts-reminders';
 	$alert_old_contents_key   = 'monthly-alert-old-contents';
 	$execute_automations_key  = 'execute-automations';
+	$queued_notifications_key = 'send-queued-email-notifications';
 
 	// init insert values
 	$insert_values = array(
@@ -1239,6 +1240,7 @@ function create_default_jobs( $is_upgrade = false )
 			$post_reminder_key        => "( ".$DB->quote( form_date( $tomorrow, '07:00:00' ) ).", 86400, ".$DB->quote( $post_reminder_key ).", ".$ctsk_params." )",
 			$alert_old_contents_key   => "( ".$DB->quote( form_date( $next_sunday, '07:30:00' ) ).", 604800, ".$DB->quote( $alert_old_contents_key ).", ".$ctsk_params." )",
 			$execute_automations_key  => "( ".$DB->quote( form_date( $today, '00:00:00' ) ).", 300, ".$DB->quote( $execute_automations_key ).", ".$ctsk_params." )",
+			$queued_notifications_key => "( ".$DB->quote( form_date( $today, '00:03:00' ) ).", 300, ".$DB->quote( $queued_notifications_key ).", ".$ctsk_params." )",
 		);
 	if( $is_upgrade )
 	{ // Check if these jobs already exist, and don't create another

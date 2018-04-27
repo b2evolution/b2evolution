@@ -45,7 +45,7 @@ $Form->info( T_('Subject'), '<pre class="email_log"><span>'.htmlspecialchars($Ma
 
 $Form->info( T_('Headers'), '<pre class="email_log"><span>'.htmlspecialchars($MailLog->emlog_headers).'</span></pre>' );
 
-$mail_contents = mail_log_parse_message( $MailLog->emlog_headers, $MailLog->emlog_message );
+$mail_contents = mail_log_parse_message( $MailLog->emlog_headers, $MailLog->emlog_message, $MailLog->emlog_result == 'ready_to_send' );
 
 if( !empty( $mail_contents ) )
 {
@@ -74,7 +74,16 @@ if( !empty( $mail_contents ) )
 				.'<div class="email_log_html'.$div_html_class.'"'.$div_html_style.'>'.$html_content.'</div>' );
 	}
 }
-$emlog_message = preg_replace( '~\$secret_content_start\$.*?\$secret_content_end\$~', '***secret-content-removed***', $MailLog->emlog_message );
+$emlog_message = $MailLog->emlog_message;
+if( $MailLog->emlog_result == 'ready_to_send' )
+{
+	$r = unserialize( $emlog_message );
+	if( $r !== false )
+	{
+		$emlog_message = $r['full'];
+	}
+}
+$emlog_message = preg_replace( '~\$secret_content_start\$.*?\$secret_content_end\$~', '***secret-content-removed***', $emlog_message );
 $emlog_message = preg_replace( '~\$email_key_start\$(.*?)\$email_key_end\$~', '***prevent-tracking-through-log***$1', $emlog_message );
 $Form->info( T_('Raw email source'), '<pre class="email_log_scroll"><span>'.htmlspecialchars( $emlog_message ).'</span></pre>' );
 
