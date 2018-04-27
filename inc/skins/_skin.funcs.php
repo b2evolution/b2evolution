@@ -1234,6 +1234,14 @@ function skin_init( $disp )
 
 			// Display messages depending on user email status
 			display_user_email_status_message();
+
+			global $current_User, $demo_mode;
+			if( $demo_mode && ( $current_User->ID <= 7 ) )
+			{	// Demo mode restrictions: users created by install process cannot be edited:
+				$Messages->add( T_('You cannot edit the admin and demo users profile in demo mode!'), 'error' );
+				// Set action to 'view' in order to switch all form input elements to read mode:
+				set_param( 'action', 'view' );
+			}
 			break;
 
 		case 'users':
