@@ -80,53 +80,20 @@ $Results = new Results( $history_sql, 'iver_', $default_order, NULL, $revisions_
 
 $Results->title = T_('Item history for:').' '.$edited_Item->get_title();
 
-/**
- * Get radio input to select a revision to compare
- *
- * @param integer ID for version param
- * @param string Input name
- */
-function iver_compare_selector( $param_ID, $input_name )
-{
-	global $iver_compare_selector_current, $iver_compare_selector_previous;
-
-	$style = '';
-	if( ( empty( $iver_compare_selector_current ) && $input_name == 'r1' ) ||
-	    ( ! empty( $iver_compare_selector_current ) && $input_name == 'r2' ) )
-	{	// Hide inputs:
-		$style = ' style="display:none"';
-	}
-
-	$checked = '';
-	if( $param_ID == 'c' && $input_name == 'r2' )
-	{	// This is a current version:
-		$iver_compare_selector_current = true;
-		$checked = ' checked="checked"';
-	}
-	elseif( $iver_compare_selector_previous == 'c' && $input_name == 'r1' )
-	{	// The previous was a current vesion:
-		$checked = ' checked="checked"';
-	}
-
-	$iver_compare_selector_previous = $param_ID;
-
-	return '<input type="radio" name="'.$input_name.'" value="'.$param_ID.'"'.$style.$checked.' />';
-}
-
 if( $revisions_count > 1 )
 {	// Dispay the selectors to compare the revisions
 	$Results->cols[] = array(
 							'th' => '',
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
-							'td' => '%iver_compare_selector( #param_ID#, "r1" )%',
+							'td' => '<input type="radio" name="r1" value="$param_ID$" />',
 						);
 
 	$Results->cols[] = array(
 							'th' => '',
 							'th_class' => 'shrinkwrap',
 							'td_class' => 'shrinkwrap',
-							'td' => '%iver_compare_selector( #param_ID#, "r2" )%',
+							'td' => '<input type="radio" name="r2" value="$param_ID$" />',
 						);
 }
 
@@ -303,10 +270,26 @@ if( $revisions_count > 1 )
 }
 $Form->end_form( $buttons );
 
-if( $revisions_count > 2 )
+if( $revisions_count > 1 )
 {	// Print JS code for selectors to compare the revisions
 ?>
 <script type="text/javascript">
+jQuery( document ).ready( function()
+{	// Set default selected revisions on page loading:
+	var rows_num = jQuery( 'input[name=r1]' ).length,
+	current_index = jQuery( 'input[name=r1]' ).index( jQuery( 'input[name=r1][value=c]' ) );
+	if( current_index == rows_num - 1 )
+	{	// Suggest to compare curent version with first proposed change if post has only the proposed changes without archived versions:
+		jQuery( 'input[name=r1][value=c]' ).click();
+		jQuery( 'input[name=r2]:eq( ' + ( current_index - 1 ) + ' )' ).click();
+	}
+	else
+	{	// Suggest to compare curent version with last archived version if post has at least one archived version:
+		jQuery( 'input[name=r1]:eq( ' + ( current_index + 1 ) + ' )' ).click();
+		jQuery( 'input[name=r2][value=c]' ).click();
+	}
+} );
+
 jQuery( 'input[name=r1]' ).click( function()
 {
 	var index = jQuery( 'input[name=r1]' ).index( jQuery( this ) );
@@ -321,14 +304,6 @@ jQuery( 'input[name=r2]' ).click( function()
 	jQuery( 'input[name=r1]:lt(' + ( index + 1 ) + ')' ).hide();
 } );
 </script>
-<noscript><?php /* Display all selectors for browsers withOUT JavaScript */ ?>
-<style>
-div.results td.shrinkwrap input {
-	display: block !important;
-}
-</style>
-</noscript>
 <?php
 }
-
 ?>

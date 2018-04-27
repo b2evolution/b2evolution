@@ -1371,6 +1371,10 @@ class _core_Module extends Module
 								'text' => T_('Edit in Back-Office').'&hellip;',
 								'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
 							);
+						$entries['post']['entries']['propose'] = array(
+								'text' => T_('Propose change').'&hellip;',
+								'href' => $admin_url.'?ctrl=items&amp;action=propose&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
+							);
 						$entries['post']['entries']['view_back'] = array(
 								'text' => T_('View in Back-Office').'&hellip;',
 								'href' => $admin_url.'?ctrl=items&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
