@@ -66,7 +66,7 @@ switch( $type )
 							case 2: // Update clicked_unsubscribe
 								$result = $DB->query( 'UPDATE T_email__campaign_send
 										SET csnd_clicked_unsubscribe = 1
-										WHERE csnd_camp_ID = '.$DB->quote( $ecmp_ID ).' AND csnd_user_ID = '.$DB->quote( $email_User->ID ).' AND csnd_clicked_unsubscribe IS NULL' );
+										WHERE csnd_camp_ID = '.$DB->quote( $ecmp_ID ).' AND csnd_user_ID = '.$DB->quote( $email_User->ID ) );
 
 								if( $result )
 								{

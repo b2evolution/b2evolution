@@ -1220,9 +1220,10 @@ function get_user_identity_url( $user_ID, $user_tab = 'profile', $blog_ID = NULL
  * @param string user tab
  * @param integer user ID for the requested user. If isn't set then return $current_User settings url.
  * @param integer blog ID for the requested blog. NULL for current $Blog
+ * @param string delimiter to use for more params
  * @return string URL
  */
-function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
+function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL, $glue = '&amp;' )
 {
 	global $current_User, $is_admin_page, $admin_url, $ReqURI;
 
@@ -1300,11 +1301,11 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 				}
 				if( in_array( $user_tab, array( 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish' ) ) )
 				{
-					return $current_Blog->get( $user_tab.'url' );
+					return $current_Blog->get( $user_tab.'url', array( 'glue' => $glue ) );
 				}
 				else
 				{
-					return url_add_param( $blog_url, 'disp='.$user_tab );
+					return url_add_param( $blog_url, 'disp='.$user_tab, $glue );
 				}
 			}
 			else
@@ -1316,16 +1317,16 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL )
 		{ // Only users of the first group can use the admin tab
 			$user_tab = 'profile';
 		}
-		return $admin_url.'?ctrl=user&amp;user_tab='.$user_tab.'&amp;user_ID='.$user_ID;
+		return $admin_url.'?ctrl=user'.$glue.'user_tab='.$user_tab.$glue.'user_ID='.$user_ID;
 	}
 
 	if( ! empty( $current_Blog ) && in_array( $user_tab, array( 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish' ) ) )
 	{
-		return $current_Blog->get( $user_tab.'url' );
+		return $current_Blog->get( $user_tab.'url', array( 'glue' => $glue ) );
 	}
 	else
 	{
-		return url_add_param( $blog_url, 'disp='.$user_tab );
+		return url_add_param( $blog_url, 'disp='.$user_tab, $glue );
 	}
 }
 
@@ -2467,7 +2468,7 @@ function echo_user_actions( $Widget, $edited_User, $action )
 	if( $edited_User->ID != 0 )
 	{ // show these actions only if user already exists
 
-		if( $current_User->ID != $edited_User->ID && $current_User->check_status( 'can_report_user', $edited_User->ID ) )
+		if( $action != 'view' && $current_User->ID != $edited_User->ID && $current_User->check_status( 'can_report_user', $edited_User->ID ) )
 		{
 			global $user_tab;
 			// get current User report from edited User
@@ -2484,8 +2485,10 @@ function echo_user_actions( $Widget, $edited_User, $action )
 			$report_user_link_attribs = array_merge( $link_attribs, array( 'onclick' => 'return user_report( '.$edited_User->ID.', \''.( empty( $user_tab ) ? 'profile' : $user_tab ).'\')' ) );
 			$Widget->global_icon( $report_text_title, 'warning_yellow', $admin_url.'?ctrl=user&amp;user_tab=report&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.$report_text, 3, 4, $report_user_link_attribs );
 		}
-		if( ( $current_User->check_perm( 'users', 'edit', false ) ) && ( $current_User->ID != $edited_User->ID )
-			&& ( $edited_User->ID != 1 ) )
+		if( $action != 'view' &&
+		   $current_User->check_perm( 'users', 'edit', false ) &&
+		   ( $current_User->ID != $edited_User->ID ) &&
+		   ( $edited_User->ID != 1 ) )
 		{
 			$Widget->global_icon( T_('Delete this user!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete'), 3, 4, $link_attribs  );
 			$Widget->global_icon( T_('Delete this user as spammer!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete spammer'), 3, 4, $link_attribs );
@@ -3733,7 +3736,7 @@ function load_cities( country_ID, region_ID, subregion_ID )
 <?php
 	}
 
-	if( $current_User->check_perm( 'users', 'moderate' ) )
+	if( is_logged_in() && $current_User->check_perm( 'users', 'moderate' ) )
 	{	// If current user can moderate other users:
 
 		// User last seen:

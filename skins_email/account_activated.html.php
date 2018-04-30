@@ -58,6 +58,7 @@ if( $activated_User->reg_ctry_ID > 0 )
 $user_domain = $UserSettings->get( 'user_registered_from_domain', $activated_User->ID );
 if( ! empty( $user_domain ) )
 {	// Get user domain status if domain field is defined:
+	$user_ip_address = int2ip( $UserSettings->get( 'created_fromIPv4', $activated_User->ID ) );
 	load_funcs( 'sessions/model/_hitlog.funcs.php' );
 	$DomainCache = & get_DomainCache();
 	$Domain = & get_Domain_by_subdomain( $user_domain );
@@ -65,7 +66,7 @@ if( ! empty( $user_domain ) )
 	$dom_status = $dom_status_titles[ $Domain ? $Domain->get( 'status' ) : 'unknown' ];
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Domain').': </th>'.
 			'<td'.emailskin_style( 'table.email_table td' ).'>'.$user_domain.' ('.$dom_status.')'.
-			( ! empty( $user_domain ) ? ' '.get_link_tag( $admin_url.'?ctrl=antispam&action=whois&query='.$user_domain, 'WHOIS', 'div.buttons a+a.button_gray' ) : '' ).
+			( ! empty( $user_ip_address ) ? ' '.get_link_tag( $admin_url.'?ctrl=antispam&action=whois&query='.$user_ip_address, 'WHOIS', 'div.buttons a+a.button_gray' ) : '' ).
 			'</td></tr>'."\n";
 }
 

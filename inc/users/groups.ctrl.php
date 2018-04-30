@@ -85,7 +85,7 @@ if( $grp_ID !== NULL )
 			$Messages->add( T_('You have no permission to edit groups!'), 'error' );
 			$action = 'view';
 		}
-		elseif( $demo_mode && ( $edited_Group->ID <= 4 ) && ( $edited_Group->ID > 0 ) )
+		elseif( $demo_mode && ( $edited_Group->ID <= 7 ) )
 		{ // Demo mode restrictions: groups created by install process cannot be edited
 			$Messages->add( T_('You cannot edit the default groups in demo mode!'), 'error' );
 			$action = 'view';

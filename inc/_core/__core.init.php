@@ -1172,19 +1172,16 @@ class _core_Module extends Module
 									'href' => $admin_url.'?ctrl=campaigns' ),
 								)
 						);
-				}
 
-				if( $perm_options )
-				{	// If current user has a permissions to view options:
-					$entries['site']['entries']['email']['entries'] += array(
-							'automations' => array(
-								'text' => T_('Automations').'&hellip;',
-								'href' => $admin_url.'?ctrl=automations',
-						) );
-				}
+					if( $perm_options )
+					{	// If current user has a permissions to view options:
+						$entries['site']['entries']['email']['entries'] += array(
+								'automations' => array(
+									'text' => T_('Automations').'&hellip;',
+									'href' => $admin_url.'?ctrl=automations',
+							) );
+					}
 
-				if( $perm_emails )
-				{
 					$entries['site']['entries']['email']['entries'] += array(
 								'settings' => array(
 									'text' => T_('Settings').'&hellip;',
