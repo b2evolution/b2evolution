@@ -209,8 +209,8 @@ class development_plugin extends Plugin
 								)),
 			
 			*/
-					'single' => array(
-					'label' 		=> T_('Single Input'),
+				'single' => array(
+					'label' 		=> T_('Normal Static Input'),
 					'note' 			=> T_('Your note'), 
 					'max_number' 	=> 4, 
 					'type' 			=> 'select_input',
@@ -235,7 +235,30 @@ class development_plugin extends Plugin
 																			//'allow_empty' => false,
 																		),
 
-								)))),
+								)),
+			
+											'_color' => array(
+																'label' => T_('Single Item Color'),
+																'defaultvalue' => '#fed136',
+																'type' => 'color',
+															),
+			
+											'_integer' => array(
+																'label' => T_('Single Item Integer'),
+																'note' => '1-9',
+																'valid_range' => array( 'min'=>1, 'max'=>9 ),
+																'type' => 'integer',
+																'defaultvalue' => 1,
+															),
+			
+											'_text' => array(
+																'label' => T_('Single Item Text'),
+																'defaultvalue' => 'blank text',
+																'type' => 'text',
+																'allow_empty' => false,
+															),
+		
+		)),
 		
 			/*
 			
