@@ -709,7 +709,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			global $Blog;
 
 			$button_add_field .= action_icon( T_('Add'), 'add',
-				regenerate_url( 'action', array( 'action=add_settings_set1', 'set_path='.$set_path.( $set_type == 'UserSettings' ? '&amp;user_ID='.get_param( 'user_ID' ) : '' ), 'plugin_ID='.$Obj->ID ) ),
+				regenerate_url( 'action', array( 'action=add_settings_set', 'set_path='.$set_path.( $set_type == 'UserSettings' ? '&amp;user_ID='.get_param( 'user_ID' ) : '' ), 'plugin_ID='.$Obj->ID ) ),
 				T_('Add'), 5, 3,
 				// Replace the 'add new' action icon div with a new set of setting and a new 'add new' action icon div
 				array( 
