@@ -479,6 +479,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 												);
 								
 								autoform_display_field( $parname.'['.$sv.']['.$current_multiple_par_entry_name.']', $l_parmeta, $Form, $set_type, $Obj, $set_target, NULL );
+								
+								$k_nb++;
 							}
 							
 						}
