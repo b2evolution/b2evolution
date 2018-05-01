@@ -30,10 +30,10 @@ if( ! empty( $params['recipient_User'] ) )
 }
 echo "\n\n";
 
-if( ! empty( $params['recipient_User'] ) )
-{	// Display info to unsubscribe only for registered User:
+if( ! empty( $params['recipient_User'] ) || ! empty( $params['comment_ID'] ) )
+{	// Display info to unsubscribe registered or anonymous user:
 	echo T_( 'Too many emails?' )."\n";
-	echo sprintf( T_('To edit your email notification preferences, click here: %s'), get_notifications_url( '&', $recipient_user_ID ) );
+	echo sprintf( T_('To edit your email notification preferences, click here: %s'), get_notifications_url( '&', $recipient_user_ID, ( empty( $params['comment_ID'] ) ? NULL : $params['comment_ID'] ) ) );
 	if( !empty( $params['unsubscribe_text'] ) )
 	{ // Display the unsubscribe message with link
 		echo "\n".$params['unsubscribe_text'];

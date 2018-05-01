@@ -53,8 +53,11 @@ if( isset($filter['off']) )
 }
 
 // Check permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'spamblacklist', 'view', true );
+if( ! ( $current_User->check_perm( 'admin', 'normal' ) && $current_User->check_perm( 'spamblacklist', 'view' ) ) &&
+		! ( $current_User->check_perm( 'users', 'moderate' ) && ( ( $tab3 == 'tools' && $tool == 'whois' && empty( $action ) ) || $action == 'whois' ) ) )
+{
+	debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name ) );
+}
 
 
 if( param( 'iprange_ID', 'integer', '', true) )
@@ -616,7 +619,10 @@ switch( $tab3 )
 
 	case 'tools':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		if( $tool != 'whois' )
+		{
+			$current_User->check_perm( 'options', 'edit', true );
+		}
 
 		switch( $tool )
 		{

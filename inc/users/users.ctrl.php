@@ -82,9 +82,9 @@ if( ! is_null($user_ID) )
 		    && $edited_User->ID != $current_User->ID )
 		{ // user is only allowed to _view_ other user's profiles
 			$Messages->add( T_('You have no permission to edit other users!'), 'error' );
-			header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&amp;action=view&amp;user_ID='.$user_ID ) );
+			header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&action=view&user_ID='.$user_ID, '', '&' ) );
 		}
-		elseif( $demo_mode && $edited_User->ID <= 3 )
+		elseif( $demo_mode && ( $edited_User->ID <= 7 ) )
 		{ // Demo mode restrictions: users created by install process cannot be edited
 			$Messages->add( T_('You cannot edit the admin and demo users profile in demo mode!'), 'error' );
 
@@ -94,7 +94,7 @@ if( ! is_null($user_ID) )
 			}
 			else
 			{
-				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&amp;action=view&amp;user_ID='.$user_ID ) );
+				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&action=view&user_ID='.$user_ID, '', '&' ) );
 			}
 		}
 	}
@@ -470,6 +470,32 @@ if( !$Messages->has_errors() )
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=users', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
+			break;
+
+		case 'merge':
+			// Select user for merging and Merge:
+			$merging_user_ID = param( 'merging_user_ID', 'integer', true, true );
+			$selected_user_ID = param( 'selected_user_ID', 'integer' );
+
+			if( $merging_user_ID == 1 )
+			{	// User #1 cannot be deleted so we should not allow to merge it as well:
+				// Don't translate because this must not occurs:
+				debug_die( 'You can\'t merge User #1!' );
+			}
+
+			// Check edit permissions:
+			$current_User->can_moderate_user( $merging_user_ID, true );
+
+			if( empty( $selected_user_ID ) )
+			{	// Inform to select a remaining account if it is not selected yet:
+				$Messages->add( sprintf( T_('Please select a remaining account to merge with %s:'), get_user_identity_link( '', $merging_user_ID ) ), 'warning' );
+			}
+			else
+			{	// Check edit permissions for remaining user as well:
+				$current_User->can_moderate_user( $selected_user_ID, true );
+			}
+
+			// The merging process is executed in the template below by function display_users_merging_process().
 			break;
 	}
 }

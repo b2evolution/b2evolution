@@ -993,7 +993,7 @@ function param_check_valid_login( $var )
 		}
 		elseif( ! isset( $Settings ) || $Settings->get('strict_logins') )
 		{
-			$msg = sprintf( T_('Logins can only contain letters, digits and the following characters: %s'), '<code>_</code> <code>.</code> <code>-</code>' );
+			$msg = /* TRANS: %s gets replaced with list of valid characters */ sprintf( T_('Logins can only contain letters, digits and %s'), '<code>-</code> <code>.</code> <code>_</code>' );
 		}
 		else
 		{
@@ -2978,7 +2978,7 @@ function param_condition( $var, $default = '', $memorize = false )
  *
  * @param object|string JSON object of condition param
  * @param string Format action: 'db' - to database format, 'js' - from database to JavaScript format
- * @return object 
+ * @return object
  */
 function param_format_condition( $condition, $action )
 {

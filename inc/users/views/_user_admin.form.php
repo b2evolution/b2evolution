@@ -21,7 +21,7 @@ global $edited_User, $UserSettings, $Settings, $Plugins;
 
 global $current_User;
 
-global $servertimenow, $admin_url, $user_tags;
+global $servertimenow, $admin_url, $action;
 
 if( !$current_User->can_moderate_user( $edited_User->ID ) )
 { // Check permission:
@@ -43,7 +43,7 @@ $Form = new Form( NULL, 'user_checkchanges' );
 
 $Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
 
-echo_user_actions( $Form, $edited_User, 'edit' );
+echo_user_actions( $Form, $edited_User, $action );
 
 $form_text_title = T_( 'User admin settings' ); // used for js confirmation message on leave the changed form
 $form_title = get_usertab_header( $edited_User, 'admin', '<span class="nowrap">'.T_( 'User admin settings' ).'</span>'.get_manual_link( 'user-admin-tab' ) );
@@ -274,8 +274,11 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 		if( $posts_created > 0 )
 		{
 			$posts_created .= ' - <a href="'.$activity_tab_url.'#created_posts_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
-			$posts_created .= ' - '.action_icon( T_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.T_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
-			$posts_created .= get_manual_link( 'delete-user-data' );
+			if( $action != 'view' )
+			{	// If current user can edit this user:
+				$posts_created .= ' - '.action_icon( T_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.T_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
+				$posts_created .= get_manual_link( 'delete-user-data' );
+			}
 		}
 		$Form->info_field( '', $posts_created );
 		if( $posts_edited > 0 )
@@ -293,8 +296,11 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 	if( $comments_created > 0 )
 	{
 		$comments_created .= ' - <a href="'.$activity_tab_url.'#comments_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
-		$comments_created .= ' - '.action_icon( T_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.T_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
-		$comments_created .= get_manual_link( 'delete-user-data' );
+		if( $action != 'view' )
+		{	// If current user can edit this user:
+			$comments_created .= ' - '.action_icon( T_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.T_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
+			$comments_created .= get_manual_link( 'delete-user-data' );
+		}
 	}
 	$Form->info_field( T_('Comments'), $comments_created, array( 'class' => $comments_created_num > 0 ? 'info_full_height' : '' ) );
 
@@ -313,8 +319,11 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 			{
 				$messages_sent .= ' - <a href="'.$admin_url.'?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'">'.T_('Go to abuse management').' &raquo;</a>';
 			}
-			$messages_sent .= ' - '.action_icon( T_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.T_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
-			$messages_sent .= get_manual_link( 'delete-user-data' );
+			if( $action != 'view' )
+			{	// If current user can edit this user:
+				$messages_sent .= ' - '.action_icon( T_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.T_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
+				$messages_sent .= get_manual_link( 'delete-user-data' );
+			}
 		}
 		$Form->info_field( '', $messages_sent );
 		if( $messages_received > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
@@ -490,9 +499,10 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 
 $Form->end_fieldset(); // Registration info
 
-$action_buttons = array( array( '', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) );
-
-$Form->buttons( $action_buttons );
+if( $action != 'view' )
+{	// If current user can edit this user:
+	$Form->buttons( array( array( '', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
+}
 
 $Form->end_form();
 

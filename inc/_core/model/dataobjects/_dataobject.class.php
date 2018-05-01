@@ -820,6 +820,7 @@ class DataObject
 
 		$restriction_Messages = $this->check_relations( 'delete_cascades' );
 
+		$restriction_Messages->params['class_warning'] .= ' text-danger';
 		$restriction_Messages->params['class_note'] .= ' text-warning';
 
 		if( !empty( $additional_messages ) )

@@ -671,11 +671,11 @@ class UserQuery extends FilterSQL
 				break;
 
 			case 'disliked':
-				$this->WHERE_and( 'csnd_cta1 = -1' );
+				$this->WHERE_and( 'csnd_like = -1' );
 				break;
 
-			case 'clicked_unsubsubcribe':
-				$this->WHERE_and( 'clicked_unsubscribe = 1' );
+			case 'clicked_unsubscribe':
+				$this->WHERE_and( 'csnd_clicked_unsubscribe = 1' );
 				break;
 		}
 	}
