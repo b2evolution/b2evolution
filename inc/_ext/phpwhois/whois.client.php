@@ -526,9 +526,6 @@ class WhoisClient {
 
 	function merge_results($a1, $a2) {
 
-		reset($a2);
-
-		//while (list($key, $val) = each($a2))
 		foreach( $a2 as $key => $val )
 			{
 			if (isset($a1[$key]))

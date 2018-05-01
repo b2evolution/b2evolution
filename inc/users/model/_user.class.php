@@ -64,6 +64,11 @@ class User extends DataObject
 	 * @var string
 	 */
 	var $status;
+	/**
+	 * User previous status. It will be set only if the user status was changed.
+	 * @var string
+	 */
+	var $previous_status;
 
 	/**
 	 * Number of posts by this user. Use get_num_posts() to access this (lazy filled).
@@ -2705,6 +2710,13 @@ class User extends DataObject
 				// Limit source with 30 char because of this DB field max length:
 				return $this->set_param( $parname, 'string', utf8_substr( $parvalue, 0, 30 ), $make_null );
 
+			case 'status':
+				// We need to set a reminder here to later check if the new status is allowed at dbinsert or dbupdate time ( $this->restrict_status( true ) )
+				// We cannot check immediately because we may be setting the status before having set a main cat_ID -> a collection ID to check the status possibilities
+				// Save previous status as a reminder (it can be useful to compare later. The Comment class uses this).
+				$this->previous_status = $this->get( 'status' );
+				return parent::set( 'status', $parvalue, $make_null );
+
 			case 'ctry_ID':
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
@@ -4103,6 +4115,13 @@ class User extends DataObject
 		// Example: An authentication plugin could synchronize/update the password of the user.
 		$Plugins->trigger_event( 'AfterUserUpdate', $params = array( 'User' => & $this ) );
 
+		if( isset( $this->previous_status ) &&
+		    ! in_array( $this->previous_status, array( 'activated', 'manualactivated', 'autoactivated' ) ) &&
+		    in_array( $this->get( 'status' ), array( 'activated', 'manualactivated', 'autoactivated' ) ) )
+		{	// Complete activation if user has been activated:
+			$this->complete_activation();
+		}
+
 		$DB->commit();
 
 		// BLOCK CACHE INVALIDATION:
@@ -4364,13 +4383,26 @@ class User extends DataObject
 	 */
 	function activate_from_Request()
 	{
-		global $DB, $Settings, $UserSettings;
-
 		// Activate current user account:
 		$this->set( 'status', 'activated' );
 		$this->dbupdate();
+	}
 
-		// clear last reminder key and last activation email date because the user was activated
+
+	/**
+	 * Do actions to complete activation for this user account
+	 */
+	function complete_activation()
+	{
+		global $DB, $Settings, $UserSettings, $current_User;
+
+		if( empty( $UserSettings ) )
+		{	// initialize UserSettings:
+			load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+			$UserSettings = new UserSettings();
+		}
+
+		// Clear last reminder key and last activation email date because the user was activated:
 		$UserSettings->delete( 'last_activation_reminder_key', $this->ID );
 		$UserSettings->delete( 'last_activation_email', $this->ID );
 		$UserSettings->delete( 'activation_reminder_count', $this->ID );
@@ -4378,23 +4410,32 @@ class User extends DataObject
 		$UserSettings->dbupdate();
 
 		if( $Settings->get( 'newusers_findcomments' ) )
-		{	// We have to assign the all old comments from current user by email
-			$DB->query( '
-				UPDATE T_comments
-				   SET comment_author_user_ID = "'.$this->ID.'"
+		{	// We have to assign the all old comments from current user by email:
+			$DB->query( 'UPDATE T_comments
+				   SET comment_author_user_ID = '.$DB->quote( $this->ID ).'
 				 WHERE comment_author_email = '.$DB->quote( $this->email ).'
-				   AND comment_author_user_ID IS NULL' );
+				   AND comment_author_user_ID IS NULL',
+				'Assign anonymous comments to register user after activation' );
+			// Subscribe user to posts where he selected "Notify me of replies" on creating those anonymous comments:
+			$SQL = new SQL();
+			$SQL->SELECT( 'DISTINCT comment_item_ID, comment_author_user_ID, 1' );
+			$SQL->FROM( 'T_comments' );
+			$SQL->WHERE( 'comment_author_user_ID = '.$DB->quote( $this->ID ) );
+			$SQL->WHERE_and( 'comment_anon_notify = 1' );
+			$DB->query( 'REPLACE INTO T_items__subscriptions ( isub_item_ID, isub_user_ID, isub_comments ) '.$SQL->get(),
+				'Subscribe user to posts where he selected "Notify me of replies" on creating those anonymous comments' );
 		}
 
-		// Create a welcome private message when user's status was changed to Active
+		// Create a welcome private message when user's status was changed to Active:
 		$this->send_welcome_message();
 
-		// Send notification email about activated account to users with edit users permission
-		$email_template_params = array(
-			'User' => $this,
-			'login' => $this->login, // this is required in the send_admin_notification
-		);
-		send_admin_notification( NT_('New user account activated'), 'account_activated', $email_template_params );
+		// Send notification email about activated account to users with edit users permission:
+		send_admin_notification( NT_('New user account activated'), 'account_activated', array(
+				'User' => $this,
+				'login' => $this->login, // this is required in the send_admin_notification
+				// If admin activated some other user account:
+				'activated_by_admin' => ( is_logged_in() && $current_User->ID != $this->ID ? $current_User->get_username() : '' ),
+			) );
 	}
 
 
@@ -5533,19 +5574,6 @@ class User extends DataObject
 			}
 			else
 			{
-				$new_status_is_active = ( $new_status == 'activated' || $new_status == 'autoactivated' || $new_status == 'manualactivated' );
-				$old_status_is_not_active = false;
-				if( $this->check_status( 'can_be_validated' ) && $new_status_is_active )
-				{ // User was activated
-					$old_status_is_not_active = true;
-					// clear activation specific settings
-					$UserSettings->delete( 'last_activation_reminder_key', $this->ID );
-					$UserSettings->delete( 'last_activation_email', $this->ID );
-					$UserSettings->delete( 'activation_reminder_count', $this->ID );
-					$UserSettings->delete( 'send_activation_reminder', $this->ID );
-				}
-				$old_status_is_not_active = ( $old_status_is_not_active || $this->check_status( 'is_closed' ) );
-
 				// set status
 				$this->set( 'status', $new_status );
 				$UserSettings->set( 'account_close_reason', $account_close_reason, $this->ID );
@@ -5553,21 +5581,6 @@ class User extends DataObject
 				{ // db update
 					$UserSettings->dbupdate();
 					$DB->commit();
-					if( $old_status_is_not_active && $new_status_is_active )
-					{ // User was activated, create a welcome private message
-						$this->send_welcome_message();
-
-						if( $current_User->ID != $this->ID )
-						{	// If admin activated some user account
-							// Send notification email about activated account to users with edit users permission
-							$email_template_params = array(
-								'User' => $this,
-								'login' => $this->login, // this is required in the send_admin_notification
-								'activated_by_admin' => $current_User->get_username(),
-							);
-							send_admin_notification( NT_('New user account activated'), 'account_activated', $email_template_params );
-						}
-					}
 					return true;
 				}
 			}

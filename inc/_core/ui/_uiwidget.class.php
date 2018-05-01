@@ -533,11 +533,12 @@ class Table extends Widget
 				echo $this->params['filter_button_before'];
 				$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
 				$this->Form->button_input( array(
-						'tag'   => 'button',
-						'name'  => $submit_name,
-						'value' => get_icon( 'filter' ).' '.$submit_title,
-						'class' => $this->params['filter_button_class']
+							'tag'   => 'button',
+							'name'  => $submit_name,
+							'value' => get_icon( 'filter' ).' '.$submit_title,
+							'class' => $this->params['filter_button_class']
 					) );
+
 				echo $this->params['filter_button_after'];
 			}
 

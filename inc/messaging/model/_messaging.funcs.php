@@ -1944,6 +1944,7 @@ function threads_results_block( $params = array() )
 			'results_param_prefix' => 'actv_thrd_',
 			'results_title'        => T_('Threads with private messages sent by the user'),
 			'results_no_text'      => T_('User has not sent any private messages'),
+			'action'               => '',
 		), $params );
 
 	if( !is_logged_in() )
@@ -1996,7 +1997,7 @@ function threads_results_block( $params = array() )
 		$threads_Results->title = $params['results_title'];
 		$threads_Results->no_results_text = $params['results_no_text'];
 
-		if( $threads_Results->get_total_rows() > 0 )
+		if( $params['action'] != 'view' && $threads_Results->get_total_rows() > 0 )
 		{	// Display action icon to delete all records if at least one record exists
 			$threads_Results->global_icon( sprintf( T_('Delete all private messages sent by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_messages&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
 		}

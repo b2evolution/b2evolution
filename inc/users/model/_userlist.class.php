@@ -45,6 +45,12 @@ class UserList extends DataObjectList2
 	var $query_params = array();
 
 	/**
+	 * Exclude users by ID after the list was already filtered, @see run_query()
+	 * @var string separated by comma
+	 */
+	var $exclude_users = NULL;
+
+	/**
 	 * Constructor
 	 *
 	 * @param integer|NULL Limit
@@ -753,6 +759,18 @@ class UserList extends DataObjectList2
 			$this->save_filterset();
 
 			$Timer->stop( 'Users_IDs' );
+		}
+
+		if( ! empty( $this->exclude_users ) )
+		{	// Exclude users from filtered list:
+			$exclude_users = explode( ',', $this->exclude_users );
+			foreach( $exclude_users as $exclude_user_ID )
+			{
+				if( ( $exclude_user_ID_index = array_search( $exclude_user_ID, $user_IDs ) ) !== false )
+				{	// This user should be excluded from filtered list:
+					unset( $user_IDs[ $exclude_user_ID_index ] );
+				}
+			}
 		}
 
 		// GET TOTAL ROW COUNT:

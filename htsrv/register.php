@@ -119,11 +119,6 @@ switch( $action )
 			param( 'widget', 'integer', 0 );
 		}
 
-		if( $Messages->has_errors() )
-		{	// Stop registration if the errors exist:
-			break;
-		}
-
 		// Stop a request from the blocked email address or its domain:
 		antispam_block_by_email( $email );
 
@@ -224,11 +219,6 @@ switch( $action )
 					'pass1'     => & $pass1,
 					'pass2'     => & $pass2,
 				) );
-		}
-
-		if( $Messages->has_errors() )
-		{ // a Plugin has added an error
-			break;
 		}
 
 		// Set params:

@@ -404,18 +404,22 @@ function update_mail_log_time( $type, $emlog_ID, $emlog_key )
 {
 	global $DB, $localtimenow;
 
+	load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
 	switch( $type )
 	{
 		case 'open':
 			$log_time_field = 'emlog_last_open_ts';
 			$campaign_time_field = 'csnd_last_open_ts';
 			$newsletter_time_field = 'enls_last_open_ts';
+			$campaign_count_field = 'ecmp_img_loads';
 			break;
 
 		case 'click':
 			$log_time_field = 'emlog_last_click_ts';
 			$campaign_time_field = 'csnd_last_click_ts';
 			$newsletter_time_field = 'enls_last_click_ts';
+			$campaign_count_field = 'ecmp_link_clicks';
 			break;
 
 		default:
@@ -430,6 +434,16 @@ function update_mail_log_time( $type, $emlog_ID, $emlog_key )
 
 	if( $r )
 	{	// Update last time for email campaign per user:
+
+		// Check if mail is not yet opened
+		$unopened_mail = is_unopened_campaign_mail( $emlog_ID, $send_data );
+		if( empty( $send_data[$campaign_time_field] ) && ! empty( $send_data['csnd_camp_ID'] ) )
+		{ // First image load/click, update appropriate campaign counters
+			$DB->query( 'UPDATE T_email__campaign SET '.$campaign_count_field.' = '.$campaign_count_field.' + 1'.
+					( $unopened_mail ? ', ecmp_open_count = ecmp_open_count + 1' : '' ). // unopened mail, increment open count
+					' WHERE ecmp_ID = '.$DB->quote( $send_data['csnd_camp_ID'] ) );
+		}
+
 		$DB->query( 'UPDATE T_email__campaign_send
 			  SET '.$campaign_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
 			WHERE csnd_emlog_ID = '.$DB->quote( $emlog_ID ) );
@@ -801,7 +815,12 @@ function test_smtp_transport( & $Swift_SmtpTransport )
  */
 function & get_Swift_SmtpTransport()
 {
-	global $Settings;
+	global $Settings, $Swift_SmtpTransport;
+
+	if( isset( $Swift_SmtpTransport ) )
+	{	// Get SMTP Swift Transport from cached global variable:
+		return $Swift_SmtpTransport;
+	}
 
 	// Load Swift Mailer functions:
 	load_funcs( '_ext/swift/swift_required.php' );
@@ -844,6 +863,13 @@ function & get_Swift_SmtpTransport()
  */
 function & get_Swift_Mailer()
 {
+	global $Swift_Mailer;
+
+	if( isset( $Swift_Mailer ) )
+	{	// Get SMTP Swift Mailer from cached global variable:
+		return $Swift_Mailer;
+	}
+
 	// Create Transport
 	$Swift_SmtpTransport = & get_Swift_SmtpTransport();
 

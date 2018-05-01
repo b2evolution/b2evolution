@@ -125,26 +125,38 @@ $Form->begin_fieldset( T_('Receiving emails').( is_admin_page() ? get_manual_lin
 
 	if( $action != 'view' )
 	{ // We can edit the values:
-		$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email address'), $email_fieldnote, array( 'maxlength' => 255, 'required' => true ) );
-		$disabled = false;
+		$Form->email_input( 'edited_user_email', $edited_User->email, 30, T_('Email address'), array( 'maxlength' => 255, 'required' => true, 'note' => $email_fieldnote ) );
+		$Form->radio_input( 'edited_user_email_format', $UserSettings->get( 'email_format',  $edited_User->ID ), array(
+					array(
+						'value'   => 'auto',
+						'label'   => T_('Automatic (HTML + Plain text)') ),
+					array(
+						'value'   => 'html',
+						'label'   => T_('HTML') ),
+					array(
+						'value'   => 'text',
+						'label'   => T_('Plain text') ),
+				), T_('Email format'), array( 'lines' => true ) );
 	}
 	else
 	{ // display only
-		$Form->info( T_('Email'), $edited_User->get('email'), $email_fieldnote );
-		$disabled = true;
+		$Form->info_field( T_('Email'), $edited_User->get('email'), array( 'note' => $email_fieldnote, 'class' => 'info_full_height' ) );
+		switch( $UserSettings->get( 'email_format',  $edited_User->ID ) )
+		{
+			case 'auto':
+				$email_format_value_title = T_('Automatic (HTML + Plain text)');
+				break;
+			case 'html':
+				$email_format_value_title = T_('HTML');
+				break;
+			case 'text':
+				$email_format_value_title = T_('Plain text');
+				break;
+			default:
+				$email_format_value_title = $UserSettings->get( 'email_format',  $edited_User->ID );
+		}
+		$Form->info_field( T_('Email format'), $email_format_value_title );
 	}
-
-	$Form->radio_input( 'edited_user_email_format', $UserSettings->get( 'email_format',  $edited_User->ID ), array(
-				array(
-					'value'   => 'auto',
-					'label'   => T_('Automatic (HTML + Plain text)') ),
-				array(
-					'value'   => 'html',
-					'label'   => T_('HTML') ),
-				array(
-					'value'   => 'text',
-					'label'   => T_('Plain text') ),
-			), T_('Email format'), array( 'lines' => true ) );
 
 $Form->end_fieldset();
 
@@ -174,7 +186,7 @@ $Form->begin_fieldset( T_('Receiving private messages').( is_admin_page() ? get_
 	}
 	elseif( ( $emails_msgform == 'adminset' ) )
 	{ // only administrator users can set and current User is in 'Administrators' group
-		$is_disabled_email_method = ( ! $current_User->check_perm( 'users', 'edit' ) );
+		$is_disabled_email_method = ( $disabled || ! $current_User->check_perm( 'users', 'edit' ) );
 		$messaging_options[] = array( 'enable_email', 1, T_( 'emails through a message form that will NOT reveal my email address.' ).get_admin_badge( 'user' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $is_disabled_email_method, $email_messaging_note );
 	}
 	elseif( ! empty( $email_messaging_note ) )
@@ -197,7 +209,7 @@ $Form->begin_fieldset( T_('List subscriptions').( is_admin_page() ? get_manual_l
 		$newsletter_options = array();
 		foreach( $NewsletterCache->cache as $Newsletter )
 		{
-			$newsletter_options[] = array( 'edited_user_newsletters[]', $Newsletter->ID, $Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ), in_array( $Newsletter->ID, $user_newsletter_subscriptions ) );
+			$newsletter_options[] = array( 'edited_user_newsletters[]', $Newsletter->ID, $Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ), in_array( $Newsletter->ID, $user_newsletter_subscriptions ), $disabled );
 		}
 		$Form->checklist( $newsletter_options, 'edited_user_newsletter', T_( 'Lists' ), false, false, $checklist_params );
 	}
@@ -269,15 +281,15 @@ if( $notifications_mode != 'off' )
 				$subscriptions = array();
 				if( $sub_Blog->get_setting( 'allow_subscriptions' ) )
 				{	// If subscription is allowed for new posts:
-					$subscriptions[] = array( 'sub_items_'.$sub_Blog->ID, '1', T_('Notify me of any new post in this collection'), $blog_sub->sub_items );
+					$subscriptions[] = array( 'sub_items_'.$sub_Blog->ID, '1', T_('Notify me of any new post in this collection'), $blog_sub->sub_items, $disabled );
 				}
 				if( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) )
 				{	// If subscription is allowed for new comments:
-					$subscriptions[] = array( 'sub_comments_'.$sub_Blog->ID, '1', T_('Notify me of any new comment in this collection'), $blog_sub->sub_comments );
+					$subscriptions[] = array( 'sub_comments_'.$sub_Blog->ID, '1', T_('Notify me of any new comment in this collection'), $blog_sub->sub_comments, $disabled );
 				}
 				if( $sub_Blog->get_setting( 'allow_item_mod_subscriptions' ) )
 				{	// If subscription is allowed for modified posts:
-					$subscriptions[] = array( 'sub_items_mod_'.$sub_Blog->ID, '1', T_('Notify me when:').' '.T_('a post is modified and I have permissions to moderate it.'), $blog_sub->sub_items_mod );
+					$subscriptions[] = array( 'sub_items_mod_'.$sub_Blog->ID, '1', T_('Notify me when:').' '.T_('a post is modified and I have permissions to moderate it.'), $blog_sub->sub_items_mod, $disabled );
 				}
 				$Form->checklist( $subscriptions, 'subscriptions', $sub_Blog->dget( 'shortname', 'htmlbody' ) );
 			}
@@ -305,22 +317,25 @@ if( $notifications_mode != 'off' )
 		else
 		{ // Display a form to subscribe on new blog
 			$subscribe_blog_ID = param( 'subscribe_blog' , '', isset( $Blog ) ? $Blog->ID : 0 );
-			if( empty( $blog_subs ) )
-			{
-				$Form->begin_line( T_('Subscribe to') );
-			}
-			else
-			{
-				$Form->begin_line( T_('Also available') );
-			}
+			if( $action != 'view' )
+			{	// If current user can edit this user:
+				if( empty( $blog_subs ) )
+				{
+					$Form->begin_line( T_('Subscribe to') );
+				}
+				else
+				{
+					$Form->begin_line( T_('Also available') );
+				}
 
-				$Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent', 'loop_object_method' => 'get_shortname' ) );
-				$Form->button( array(
-					'name'  => 'actionArray[subscribe]',
-					'value' => T_('Subscribe to this collection'),
-					'style' => 'margin-left:10px;'
-				) );
-			$Form->end_line();
+					$Form->select_input_object( 'subscribe_blog', $subscribe_blog_ID, $BlogCache, '', array( 'object_callback' => 'get_option_list_parent', 'loop_object_method' => 'get_shortname' ) );
+					$Form->button( array(
+						'name'  => 'actionArray[subscribe]',
+						'value' => T_('Subscribe to this collection'),
+						'style' => 'margin-left:10px;'
+					) );
+				$Form->end_line();
+			}
 
 			// Get collection to set proper active checkboxes on page loading:
 			if( isset( $BlogCache->cache[ $subscribe_blog_ID ] ) )
@@ -392,7 +407,7 @@ if( $notifications_mode != 'off' )
 				{ // Link title to front-office
 					$item_title = $Item->get_permanent_link( '#title#' );
 				}
-				$post_subs[] = array( 'item_sub_'.$row->post_ID, 1, $item_title, 1 );
+				$post_subs[] = array( 'item_sub_'.$row->post_ID, 1, $item_title, 1, $disabled );
 			}
 			// display individual post subscriptions from the last Blog
 			$Form->checklist( $post_subs, 'item_subscriptions', $blog_name );
@@ -445,7 +460,7 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 	}
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{ // current User is an administrator
-		$notify_options[ T_('My account') ][] = array( 'edited_user_send_activation_reminder', 1, sprintf( T_('my account was deactivated or is not activated for more than %s.').get_admin_badge( 'user' ), seconds_to_period( $Settings->get( 'activate_account_reminder_threshold' ) ) ), $UserSettings->get( 'send_activation_reminder', $edited_User->ID ) );
+		$notify_options[ T_('My account') ][] = array( 'edited_user_send_activation_reminder', 1, sprintf( T_('my account was deactivated or is not activated for more than %s.').get_admin_badge( 'user' ), seconds_to_period( $Settings->get( 'activate_account_reminder_threshold' ) ) ), $UserSettings->get( 'send_activation_reminder', $edited_User->ID ), $disabled );
 	}
 	if( $edited_User->check_perm( 'users', 'edit' ) )
 	{ // edited user has permission to edit all users, save notification preferences

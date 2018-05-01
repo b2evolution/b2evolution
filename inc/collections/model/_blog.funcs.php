@@ -1709,6 +1709,7 @@ function blogs_user_results_block( $params = array() )
 			'results_param_prefix' => 'actv_blog_',
 			'results_title'        => T_('Blogs owned by the user'),
 			'results_no_text'      => T_('User does not own any blogs'),
+			'action'               => '',
 		), $params );
 
 	if( !is_logged_in() )
@@ -1755,7 +1756,7 @@ function blogs_user_results_block( $params = array() )
 
 	// Get a count of the blogs which current user can delete
 	$deleted_blogs_count = count( $edited_User->get_deleted_blogs() );
-	if( $blogs_Results->get_total_rows() > 0 && $deleted_blogs_count > 0 )
+	if( $params['action'] != 'view' && $blogs_Results->get_total_rows() > 0 && $deleted_blogs_count > 0 )
 	{	// Display action icon to delete all records if at least one record exists & user can delete at least one blog
 		$blogs_Results->global_icon( sprintf( T_('Delete all blogs owned by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_blogs&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
 	}

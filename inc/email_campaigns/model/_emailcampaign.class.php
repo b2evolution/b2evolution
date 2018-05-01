@@ -41,6 +41,8 @@ class EmailCampaign extends DataObject
 
 	var $email_plaintext;
 
+	var $sync_plaintext;
+
 	var $sent_ts;
 
 	var $auto_sent_ts;
@@ -61,11 +63,31 @@ class EmailCampaign extends DataObject
 
 	var $user_tag_dislike;
 
+	var $send_count;
+
+	var $open_count;
+
+	var $img_loads;
+
+	var $link_clicks;
+
+	var $cta1_clicks;
+
+	var $cta2_clicks;
+
+	var $cta3_clicks;
+
+	var $like_count;
+
+	var $dislike_count;
+
+	var $unsub_clicks;
+
 	var $use_wysiwyg = 0;
 
 	var $send_ctsk_ID;
 
-	var $welcone = 0;
+	var $welcome = 0;
 
 	var $sequence;
 
@@ -110,6 +132,7 @@ class EmailCampaign extends DataObject
 			$this->email_html = $db_row->ecmp_email_html;
 			$this->email_text = $db_row->ecmp_email_text;
 			$this->email_plaintext = $db_row->ecmp_email_plaintext;
+			$this->sync_plaintext = $db_row->ecmp_sync_plaintext;
 			$this->sent_ts = $db_row->ecmp_sent_ts;
 			$this->auto_sent_ts = $db_row->ecmp_auto_sent_ts;
 			$this->renderers = $db_row->ecmp_renderers;
@@ -124,6 +147,16 @@ class EmailCampaign extends DataObject
 			$this->user_tag_cta3 = $db_row->ecmp_user_tag_cta3;
 			$this->user_tag_like = $db_row->ecmp_user_tag_like;
 			$this->user_tag_dislike = $db_row->ecmp_user_tag_dislike;
+			$this->send_count = $db_row->ecmp_send_count;
+			$this->open_count = $db_row->ecmp_open_count;
+			$this->img_loads = $db_row->ecmp_img_loads;
+			$this->link_clicks = $db_row->ecmp_link_clicks;
+			$this->cta1_clicks = $db_row->ecmp_cta1_clicks;
+			$this->cta2_clicks = $db_row->ecmp_cta2_clicks;
+			$this->cta3_clicks = $db_row->ecmp_cta3_clicks;
+			$this->like_count = $db_row->ecmp_like_count;
+			$this->dislike_count = $db_row->ecmp_dislike_count;
+			$this->unsub_clicks = $db_row->ecmp_unsub_clicks;
 		}
 	}
 
@@ -246,6 +279,13 @@ class EmailCampaign extends DataObject
 	{
 		switch( $parname )
 		{
+			case 'plaintext_template_preview':
+				global $current_User;
+				$text_mail_template = mail_template( 'newsletter', 'text', array( 'message_text' => $this->get( 'email_plaintext' ), 'include_greeting' => false, 'add_email_tracking' => false ), $current_User );
+				$text_mail_template = str_replace( array( '$email_key$', '$mail_log_ID$', '$email_key_start$', '$email_key_end$' ), array( '***email-key***', '', '', '' ), $text_mail_template );
+				$text_mail_template = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $text_mail_template );
+				return nl2br( $text_mail_template );
+
 			default:
 				return parent::get( $parname );
 		}
@@ -559,15 +599,29 @@ class EmailCampaign extends DataObject
 			) );
 		$this->set( 'email_html', format_to_output( $email_text ) );
 
-		// Save plain-text message:
-		$email_plaintext = preg_replace( '#<a[^>]+href="([^"]+)"[^>]*>[^<]*</a>#i', ' [ $1 ] ', $this->get( 'email_html' ) );
-		$email_plaintext = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', ' [ $1 ] ', $email_plaintext );
-		$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
-		$email_plaintext = preg_replace( '#<(p|/h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
-		$email_plaintext = preg_replace( '#<(br|h[1-6]|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
-		$email_plaintext = preg_replace( '#<li[^>]*>#i', "- ", $email_plaintext );
-		$email_plaintext = preg_replace( '#<hr ?/?>#i', "\n\n----------------\n\n", $email_plaintext );
-		$this->set( 'email_plaintext', strip_tags( $email_plaintext ) );
+		// Update plain-text message:
+		$this->update_plaintext();
+	}
+
+
+	/**
+	 * Update the plain-text message field from HTML message
+	 *
+	 * @param boolean Force to update even when plain-text is NOT synced with HTML message
+	 */
+	function update_plaintext( $force_update = false )
+	{
+		if( $force_update || $this->get( 'sync_plaintext' ) )
+		{	// Update plain-text message only when it is enabled for this email campaign:
+			$email_plaintext = preg_replace( '#<a[^>]+href="([^"]+)"[^>]*>[^<]*</a>#i', ' [ $1 ] ', $this->get( 'email_html' ) );
+			$email_plaintext = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', ' [ $1 ] ', $email_plaintext );
+			$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
+			$email_plaintext = preg_replace( '#<(p|/h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
+			$email_plaintext = preg_replace( '#<(br|h[1-6]|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
+			$email_plaintext = preg_replace( '#<li[^>]*>#i', "- ", $email_plaintext );
+			$email_plaintext = preg_replace( '#<hr ?/?>#i', "\n\n----------------\n\n", $email_plaintext );
+			$this->set( 'email_plaintext', strip_tags( $email_plaintext ) );
+		}
 	}
 
 
@@ -664,6 +718,17 @@ class EmailCampaign extends DataObject
 		if( param( 'ecmp_email_text', 'html', NULL ) !== NULL )
 		{	// Save original message:
 			$this->set_from_Request( 'email_text' );
+		}
+
+		if( param( 'ecmp_sync_plaintext', 'integer', NULL ) !== NULL )
+		{	// Keep in sync with HTML / Edit separately:
+			$this->set_from_Request( 'sync_plaintext' );
+		}
+
+		if( ! $this->get( 'sync_plaintext' ) &&
+		    param( 'ecmp_email_plaintext', 'text', NULL ) !== NULL )
+		{	// Save plain-text message only when it is allowed for this email campaign:
+			$this->set_from_Request( 'email_plaintext' );
 		}
 
 		if( param( 'ecmp_user_tag_sendskip', 'string', NULL ) !== NULL )
@@ -1068,15 +1133,25 @@ class EmailCampaign extends DataObject
 		// Get all send statuses per users of this email campaign from cache or DB table T_email__campaign_send once:
 		$all_user_IDs = $this->get_recipients( 'full_all' );
 
+		$update_send_count = false;
 		if( in_array( $user_ID, $all_user_IDs ) )
 		{	// Update user send status for this email campaign:
+			if( $status == 'sent' )
+			{
+				list( $previous_status, $last_sent_ts ) = $DB->get_row( 'SELECT csnd_status, csnd_last_sent_ts FROM T_email__campaign_send WHERE csnd_camp_ID = '.$this->ID.' AND csnd_user_ID = '.$DB->quote( $user_ID ), ARRAY_N );
+				if( empty( $last_sent_ts ) && $previous_status != 'sent' )
+				{ // First time to send the email to this user
+					$update_send_count = true;
+				}
+			}
+
 			$last_sent_ts_field_value = ( $mail_log_ID === NULL ? '' : ', csnd_last_sent_ts = '.$DB->quote( date2mysql( $servertimenow ) ) );
 			$r = $DB->query( 'UPDATE T_email__campaign_send
 				SET csnd_status = '.$DB->quote( $status ).',
 				    csnd_emlog_ID = '.$DB->quote( $mail_log_ID ).'
 				    '.$last_sent_ts_field_value.'
 				WHERE csnd_camp_ID = '.$DB->quote( $this->ID ).'
-				  AND csnd_user_ID = '.$DB->quote( $user_ID ) );
+					AND csnd_user_ID = '.$DB->quote( $user_ID ) );
 		}
 		else
 		{	// Insert new record for user send status:
@@ -1084,10 +1159,22 @@ class EmailCampaign extends DataObject
 			$last_sent_ts_value = ( $mail_log_ID === NULL ? '' : ', '.$DB->quote( date2mysql( $servertimenow ) ) );
 			$r = $DB->query( 'INSERT INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status, csnd_emlog_ID'.$last_sent_ts_field.' )
 				VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $status ).', '.$DB->quote( $mail_log_ID ).$last_sent_ts_value.' )' );
+
+			if( $status == 'sent' )
+			{
+				$update_send_count = true;
+			}
 		}
 
 		if( $r )
 		{	// Update the CACHE array where we store email sending status for users:
+
+			if( $update_send_count )
+			{
+				$this->set( 'send_count', $this->get( 'send_count' ) + 1 );
+				$this->dbupdate();
+			}
+
 			$statuses_keys = array(
 					'ready_to_send'   => 'wait',
 					'ready_to_resend' => 'wait',

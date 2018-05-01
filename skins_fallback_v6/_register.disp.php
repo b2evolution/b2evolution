@@ -146,7 +146,7 @@ $Form->text_input( $dummy_fields['login'], $login, 22, /* TRANS: noun */ T_('Log
 			'maxlength'    => 20,
 			'class'        => 'input_text',
 			'required'     => true,
-			'input_suffix' => ' <span id="login_status"></span>',
+			'input_suffix' => ' <span id="login_status"></span><span class="help-inline"><div id="login_status_msg" class="red"></div></span>',
 			'style'        => 'width:'.( $params['register_field_width'] - 2 ).'px',
 		)
 	);
@@ -176,9 +176,10 @@ $Form->password_input( $dummy_fields[ 'pass2' ], '', 18, '',
 	);
 
 // Email
-$Form->text_input( $dummy_fields['email'], $email, 50, T_('Email'), '<br />'.T_('We respect your privacy. Your email will remain strictly confidential.'),
+$Form->email_input( $dummy_fields['email'], $email, 50, T_('Email'),
 	array(
 			'placeholder' => $params['register_use_placeholders'] ? T_('Email address') : '',
+			'bottom_note' => T_('We respect your privacy. Your email will remain strictly confidential.'),
 			'maxlength'   => 255,
 			'class'       => 'input_text wide_input',
 			'required'    => true,

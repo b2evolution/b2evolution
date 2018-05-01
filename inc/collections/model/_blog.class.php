@@ -943,6 +943,9 @@ class Blog extends DataObject
 				$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_mod_subscriptions', param( 'allow_item_mod_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_anon_subscriptions', param( 'allow_anon_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'default_anon_comment_notify', param( 'default_anon_comment_notify', 'integer', 0 ) );
+				$this->set_setting( 'anon_notification_email_limit', param( 'anon_notification_email_limit', 'integer', 0 ) );
 			}
 
 			// Voting options:
@@ -2768,12 +2771,17 @@ class Blog extends DataObject
 				$url_disp = str_replace( 'url', '', $parname );
 				if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $this ) )
 				{ // Use special blog for login/register actions if it is defined in general settings
-					return url_add_param( $login_Blog->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
+					$url = url_add_param( $login_Blog->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
 				}
 				else
 				{ // Use login/register urls of this blog
-					return url_add_param( $this->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
+					$url = url_add_param( $this->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
 				}
+				if( ! empty( $params['url_suffix'] ) )
+				{ // Append url suffix
+					$url = url_add_param( $url, $params['url_suffix'], $params['glue'] );
+				}
+				return $url;
 
 			case 'threadsurl':
 				$disp_param = 'threads';

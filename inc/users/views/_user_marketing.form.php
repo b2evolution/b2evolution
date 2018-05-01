@@ -21,7 +21,7 @@ global $edited_User, $UserSettings, $Settings, $Plugins;
 
 global $current_User;
 
-global $servertimenow, $admin_url, $user_tags;
+global $servertimenow, $admin_url, $user_tags, $action;
 
 if( ! $current_User->can_moderate_user( $edited_User->ID ) )
 { // Check permission:
@@ -43,7 +43,7 @@ $Form = new Form( NULL, 'user_checkchanges' );
 
 $Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
 
-echo_user_actions( $Form, $edited_User, 'edit' );
+echo_user_actions( $Form, $edited_User, $action );
 
 $form_text_title = T_( 'User marketing settings' ); // used for js confirmation message on leave the changed form
 $form_title = get_usertab_header( $edited_User, 'marketing', '<span class="nowrap">'.T_( 'User marketing settings' ).'</span>'.get_manual_link( 'user-marketing-tab' ) );
@@ -59,16 +59,24 @@ $Form->hidden( 'edited_user_login', $edited_User->login );
 
 $Form->begin_fieldset( T_('Tags').get_manual_link('user-marketing-tags') );
 
-	$Form->usertag_input( 'edited_user_tags', param( 'edited_user_tags', 'string', $user_tags ), 40, T_('Tags'), '', array(
-		'maxlength' => 255,
-		'style'     => 'width: 100%;',
-	) );
+	if( $action != 'view' )
+	{	// If current user can edit this user:
+		$Form->usertag_input( 'edited_user_tags', param( 'edited_user_tags', 'string', $user_tags ), 40, T_('Tags'), '', array(
+				'maxlength' => 255,
+				'style'     => 'width: 100%;',
+			) );
+	}
+	else
+	{	// If current user cannot edit this user:
+		$Form->info( T_('Tags'), $user_tags );
+	}
 
 $Form->end_fieldset(); // user tags
 
-$action_buttons = array( array( '', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) );
-
-$Form->buttons( $action_buttons );
+if( $action != 'view' )
+{	// If current user can edit this user:
+	$Form->buttons( array( array( '', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
+}
 
 $Form->end_form();
 
@@ -82,10 +90,13 @@ $SQL->WHERE( 'aust_user_ID = '.$edited_User->ID );
 
 $Results = new Results( $SQL->get(), 'ustep_', '--A' );
 
-$Results->global_icon( T_('Add user to an automation...'), 'new', regenerate_url( 'action,user_tab', 'action=new_automation&amp;user_tab=automation' ), T_('Add user to an automation...'), 3, 4, array(
-		'class' => 'action_icon btn-primary',
-		'onclick' => 'return add_user_automation( '.$edited_User->ID.' )'
-	) );
+if( $action != 'view' )
+{	// If current user can edit this user:
+	$Results->global_icon( T_('Add user to an automation...'), 'new', regenerate_url( 'action,user_tab', 'action=new_automation&amp;user_tab=automation' ), T_('Add user to an automation...'), 3, 4, array(
+			'class' => 'action_icon btn-primary',
+			'onclick' => 'return add_user_automation( '.$edited_User->ID.' )'
+		) );
+}
 
 $Results->title = T_('Automations').get_manual_link( 'user-automations' );
 
@@ -221,13 +232,15 @@ $campaign_Results->cols[] = array(
 	'order' => 'csnd_like',
 	'td' => '%user_td_liked_email( #csnd_like# )%'
 );
-
-$campaign_Results->cols[] = array(
-	'th' => T_('Actions'),
-	'th_class' => 'small',
-	'td_class' => 'shrinkwrap small',
-	'td' => '%user_td_campaign_actions( #ecmp_ID#, '.$edited_User->ID.', #csnd_status# )%'
-);
+if( $action != 'view' )
+{	// If current user can edit this user:
+	$campaign_Results->cols[] = array(
+		'th' => T_('Actions'),
+		'th_class' => 'small',
+		'td_class' => 'shrinkwrap small',
+		'td' => '%user_td_campaign_actions( #ecmp_ID#, '.$edited_User->ID.', #csnd_status# )%'
+	);
+}
 
 $campaign_Results->display();
 

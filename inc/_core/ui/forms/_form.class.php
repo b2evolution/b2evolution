@@ -312,7 +312,7 @@ class Form extends Widget
 					$this->customstart    = $template['customstart'];
 					$this->customend      = $template['customend'];
 					$this->note_format    = $template['note_format'];
-					$this->bottom_note_format = $template['bottom_note_format'];
+					$this->bottom_note_format = isset( $template['bottom_note_format'] ) ? $template['bottom_note_format'] : '<br />'.$template['note_format'];
 					$this->formend        = $template['formend'];
 					// Additional params depending on field type:
 					$template = array_merge( array(
@@ -1200,6 +1200,26 @@ class Form extends Widget
 	function password_input( $field_name, $field_value, $field_size, $field_label, $field_params = array() )
 	{
 		$field_params['type'] = 'password';
+
+		return $this->text_input( $field_name, $field_value, $field_size, $field_label, '', $field_params );	// TEMP: Note already in params
+	}
+
+
+	/**
+	 * Builds an email input field.
+	 *
+	 * Calls the text_input() method with type == 'email'.
+	 *
+	 * @param string The name of the input field. This gets used for id also, if no id given in $field_params.
+	 * @param string Initial value
+	 * @param integer Size of the input field
+	 * @param string Label displayed in front of the field
+	 * @param string Extended attributes, see {@link text_input()}.
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function email_input( $field_name, $field_value, $field_size, $field_label, $field_params = array() )
+	{
+		$field_params['type'] = 'email';
 
 		return $this->text_input( $field_name, $field_value, $field_size, $field_label, '', $field_params );	// TEMP: Note already in params
 	}
@@ -2865,65 +2885,95 @@ class Form extends Widget
 	 */
 	function combo_box( $field_name, $field_value, $field_options, $field_label, $field_params = array() )
 	{
-		$input_class = 'form-control input-sm';
-		if( param_has_error( $field_name) )
-		{ // There is an error on the combo, so we need to set the combo input text class to 'field_error'
-			$input_class .= ' field_error';
-		}
-		elseif( isset( $field_params['required'] ) && $field_params['required'] )
-		{ // The field is required, so update its class:
-			$input_class .= ' field_required';
-		}
-		unset( $field_params['required'] ); // already handled above, do not pass to handle_common_params()
+		// Default params:
+		$field_params = array_merge( array(
+				// Params for <select>(main element):
+				'class'                    => 'form-control input-sm', // Style class
+				'onchange'                 => '', // Append JavaScript code to event "onchange" with default value "check_combo(this);"
+				'new_option_value'         => 'new', // Value of new option
+				'new_option_label'         => T_('New').': ', // Label/title of new option
+				// Params for <input>(additional element to enter new value/option):
+				'new_field_params'         => array(), // Additional attributes except of the defined below (Array: key - attr name, value - attr value)
+				'new_field_type'           => 'text', // Field type
+				'new_field_id'             => $field_name.'_combo', // Attribute "id"
+				'new_field_name'           => $field_name.'_combo', // Attribute "name"
+				'new_field_class'          => 'form-control input-sm', // Normal style class
+				'new_field_class_error'    => 'field_error', // Style class for error
+				'new_field_class_required' => 'field_required', // Style class for required
+				'new_field_size'           => 30, // Attribute "size"
+				'required'                 => false, // TRUE for required new value
+				'placeholder'              => NULL, // Placeholder
+			), $field_params );
 
-		// Set size param for input with new value
-		if( isset( $field_params['new_field_size'] ) )
-		{
-			$new_field_size = $field_params['new_field_size'];
+		// Set params for <input>(additional element):
+		$input_params = array_merge( $field_params['new_field_params'], array(
+				'type'  => $field_params['new_field_type'],
+				'id'    => $field_params['new_field_id'],
+				'name'  => $field_params['new_field_name'],
+				'class' => $field_params['new_field_class'],
+				'size'  => $field_params['new_field_size'],
+				'value' => $field_value,
+			) );
+
+		if( $field_params['placeholder'] !== NULL )
+		{	// Use placeholder only when it is defined:
+			$input_params['placeholder'] = $field_params['placeholder'];
 		}
-		else
-		{
-			$new_field_size = 30;
+
+		if( param_has_error( $field_name ) )
+		{	// There is an error on the combo, so we need to add error style class to the combo input:
+			$input_params['class'] .= ' '.$field_params['new_field_class_error'];
 		}
+		elseif( $field_params['required'] )
+		{	// The field is required, so update its class:
+			$input_params['class'] .= ' '.$field_params['new_field_class_required'];
+			// Add HTML5 attribute:
+			$input_params['required'] = '';
+		}
+
+		// Hide additional element to enter new value when there is a selected predefined option:
+		$is_input_hidden = ( strpos( $field_options, 'selected="selected"' ) !== false );
+		if( $is_input_hidden )
+		{	// Add style to hide the input on page loading:
+			$input_params['style'] = 'display:none';
+		}
+
+		// Select option to add after the select list a combo input text:
+		$new_field_option  = '<option value="'.format_to_output( $field_params['new_option_value'], 'formvalue' ).'">'.format_to_output( $field_params['new_option_label'], 'htmlattr' ).'</option>'."\n";
+
+		// Do not pass these params to handle_common_params() of <select>:
+		unset( $field_params['new_field_params'] );
+		unset( $field_params['new_field_type'] );
+		unset( $field_params['new_field_id'] );
+		unset( $field_params['new_field_name'] );
+		unset( $field_params['new_field_class'] );
+		unset( $field_params['new_field_class_error'] );
+		unset( $field_params['new_field_class_required'] );
 		unset( $field_params['new_field_size'] );
+		unset( $field_params['required'] );
+		unset( $field_params['placeholder'] );
+		unset( $field_params['new_option_value'] );
+		unset( $field_params['new_option_label'] );
 
-		// Set onchange event on the select, when the select changes, we check the value to display or hide an input text after it
-		$field_params['onchange']= 'check_combo( this.id, this.options[this.selectedIndex].value, "'.$input_class.'")';
+		// Append custom JS code to default onchange event, when the select changes, we check the value to display or hide an input text after it:
+		$field_params['onchange'] = 'check_combo(this);'.$field_params['onchange'];
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
 		$r = $this->begin_field();
 
-		// Select option to add after the select list a combo input text:
-		$option_new  = '<option value="new">'.T_('New').': </option>'."\n";
-
-		// Add the new option to the select list:
-		$field_options = $option_new . $field_options;
-
-		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form-control input-sm';
-
-		// Select list
-		$r .="\n<select".get_field_attribs_as_string($field_params).'>'
-			 .$field_options
+		// Main element:
+		$r .="\n<select".get_field_attribs_as_string( $field_params ).'>'
+			 .$new_field_option.$field_options
 			 ."</select>\n";
 
-		if( $field_options == $option_new  || strpos( $input_class, 'field_error' ) !== false || $field_value != '' )
-		{	// The list is empty or there is an error on the combo or no field value, so we have to display the input text:
-			$visible = 'inline';
-		}
-		else
-		{ // Hide the input text:
-			$visible = 'none' ;
-		}
+		// Additional element to enter new value/option:
+		$r .= '<input'.get_field_attribs_as_string( $input_params ).'/>';
 
-		$r .= '<input type="text" id="'.$field_name.'_combo" name="'.$field_name.'_combo" size="'.$new_field_size.'" class="'.$input_class.'" style="display:'.$visible.'" value="'.$field_value.'" />';
-
-		if( $visible == 'none' )
-		{ // The input text is hidden, so if no javascript activated, we always display input text:
-			$r .= '<script type="text/javascript"></script>'; // We need <script> tag here to use a <noscript> tag when javascript is deactivated:
-			$r .= '<noscript>
-							<input type="text" id="'.$field_name.'_combo" name="'.$field_name.'_combo" size="30" class="'.$input_class.'">
-						</noscript>';
+		if( $is_input_hidden )
+		{	// The input text is hidden, so if no javascript activated, we must always display the input text to enter new option:
+			unset( $input_params['style'] );
+			$r .= '<noscript><input'.get_field_attribs_as_string( $input_params ).'/></noscript>';
 		}
 
 		$r .= $this->end_field();
@@ -4611,6 +4661,8 @@ class Form extends Widget
 			{
 				$field_params['class'] = isset( $field_params['class'] ) ? $field_params['class'].' field_required' : 'field_required';
 			}
+			// add "required" attribute
+			$field_params['required'] = '';
 		}
 
 		// Error handling:

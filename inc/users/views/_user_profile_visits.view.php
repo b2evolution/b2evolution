@@ -23,7 +23,7 @@ global $Collection, $Blog, $Skin, $Settings, $current_User, $is_admin_page;
  */
 global $user_profile_only;
 
-global $user_tab, $user_ID;
+global $user_tab, $user_ID, $action;
 
 global $UserSettings;
 
@@ -55,7 +55,7 @@ if( $is_admin_page )
 if( ! $user_profile_only )
 { // echo user edit action icons
 	$Widget = new Widget();
-	echo_user_actions( $Widget, $viewed_User, 'edit' );
+	echo_user_actions( $Widget, $viewed_User, $action );
 	echo '<span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">'.$Widget->gen_global_icons().'</span>';
 }
 
