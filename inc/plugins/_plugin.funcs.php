@@ -407,9 +407,8 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				}
 				$fieldset_params = array();
 				
-					// Unique ID of fieldset to store in user  settings or in user per collection settings:
+				// Unique ID of fieldset to store in user settings or in user per collection settings:
 				$fieldset_id = $fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $id.'_fieldset';
-				//$fieldset_params['style'] = ( $k_nb > 0 ) ? 'display: block;' : 'display: none;';
 				
 				if( isset( $parmeta['fold'] ) && $parmeta['fold'] === true )
 				{	// Enable folding for the fieldset:
@@ -437,9 +436,6 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			
 				if( is_array( $set_value ) )
 				{
-					
-					
-					
 					foreach( $set_value as $sv => $sv_data )
 					{	
 						if( count( $sv_data ) > 1 )
@@ -495,7 +491,6 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								
 								if( isset( $parmeta['entries'][ $set_value_entry_name ] ) )
 								{
-									
 									autoform_display_field( $parname.'['.$sv.']['.$set_value_entry_name.']', 
 														   $parmeta['entries'][ $set_value_entry_name ], 
 														   $Form, $set_type, $Obj, $set_target, $sv_data[ $set_value_entry_name ] );
@@ -503,7 +498,6 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								}
 								elseif( isset( $parmeta['entries'][$group]['inputs'] ) )
 								{
-									
 									$l_parmeta = array( 
 													'label' 		=> $parmeta['entries'][ $group ]['label'], 
 													'type' 			=> 'input_group', 
@@ -513,7 +507,6 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 									autoform_display_field( $parname.'['.$sv.']['.$group.']', $l_parmeta, $Form, $set_type, $Obj, $set_target, NULL );
 									
 									$k_nb++;	
-									
 								}
 							}
 						}
@@ -721,13 +714,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					'class'=> "btn btn-default",
 				) );
 		
-
 			$field_params = array(
 					'field_suffix' => $button_add_field.'<span id="'.$id.'_max_items"  class="btn btn-default" style="'.(($disable_add)?'':'display:none').'">'.T_('Maximum items added').'</span>'.( empty( $params['note'] ) ? '' : '<br /><span class="notes">'.$params['note'].'</span>' ),
 					'id'           => $id,
 					'style' => ($disable_add)?'display:none':'' 
 				);
-			
 			
 			if( $use_single_button )
 			{
@@ -740,11 +731,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			
 			if( isset( $parmeta['use_fieldset'] ) && $parmeta['use_fieldset'] == true )
 			{
-
 				$Form->end_fieldset();
 				
-				$Form->switch_layout( NULL );
-				
+				$Form->switch_layout( NULL );	
 			}
 			break;
 
