@@ -75,7 +75,7 @@ $Form->end_form( $buttons );
 
 // ---- Poll Answers - START ---- //
 if( $edited_Poll->ID > 0 )
-{	// Display the answers table only when poll question is already exist in DB:
+{	// Display the answers table only when poll question already exists in the DB:
 
 	// Get numbers of votes and voters for the edited poll:
 	$poll_vote_nums = $edited_Poll->get_vote_nums();
@@ -146,7 +146,7 @@ if( $edited_Poll->ID > 0 )
 	function poll_option_td_answers( $option_ID, $answers_count )
 	{
 		global $edited_Poll, $admin_url;
-		return '<a href="'.$admin_url.'?ctrl=users&amp;poll='.$edited_Poll->ID.'&amp;poll_option='.$option_ID.'&amp;filter=new">'.$answers_count.'</a>';
+		return '<a href="'.$admin_url.'?ctrl=polls&amp;pqst_ID='.$edited_Poll->ID.'&amp;action=edit&amp;popt_ID='.$option_ID.'">'.$answers_count.'</a>';
 	}
 
 	$Results->cols[] = array(
@@ -202,4 +202,108 @@ if( $edited_Poll->ID > 0 )
 	$Results->display();
 }
 // ---- Poll Answers - END ---- //
+
+// ---- Detailed Poll Answers - START ---- //
+if( $edited_Poll->ID > 0 )
+{	// Display the detailed answers table only when poll question already exists in the DB:
+
+	// Get all options of the edited poll:
+	$option_IDs = $Results->Cache->get_ID_array();
+
+	$popt_ID = param( 'popt_ID', 'integer', NULL );
+
+	$r = array();
+	$options = array();
+
+	foreach( $option_IDs as $key => $option_ID )
+	{
+		$option = $Results->Cache->get_by_ID( $option_ID );
+		$r[] = 'SUM( IF( pans_popt_ID = '.$option_ID.', 1, 0 ) ) AS opt'.$key;
+		$options[] = $option;
+	}
+	$r = implode( ', ', $r );
+
+	$answer_SQL = new SQL();
+	$answer_SQL->SELECT( 'pans_user_ID, user_login,'.$r );
+	$answer_SQL->FROM( 'T_polls__answer' );
+	$answer_SQL->FROM_add( 'LEFT JOIN T_users ON user_ID = pans_user_ID' );
+	$answer_SQL->WHERE( 'pans_pqst_ID = '.$edited_Poll->ID );
+	$answer_SQL->GROUP_BY( 'pans_user_ID, user_login' );
+
+	$answer_count_SQL = new SQL();
+	$answer_count_SQL->SELECT( 'COUNT( DISTINCT pans_user_ID )' );
+	$answer_count_SQL->FROM( 'T_polls__answer' );
+	$answer_count_SQL->WHERE( 'pans_pqst_ID = '.$edited_Poll->ID );
+	if( $popt_ID )
+	{
+		$option = $Results->Cache->get_by_ID( $popt_ID );
+		$answer_SQL->WHERE( 'pans_popt_ID = '.$DB->quote( $popt_ID ) );
+		$answer_count_SQL->WHERE( 'pans_popt_ID = '.$DB->quote( $popt_ID ) );
+		$option_text = $option->get( 'option_text' );
+	}
+
+	// Create result set:
+	$answer_Results = new Results( $answer_SQL->get(), 'dpans_', '-A', NULL, $answer_count_SQL->get() );
+	$answer_Results->title = T_('Detailed answers').( empty( $option_text ) ? '' : ' - '.$option_text );
+
+	$answer_Results->cols[] = array(
+		'th'       => T_('Picture'),
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap',
+		'order'    => 'pans_user_ID',
+		'td'       => '%user_td_avatar( #pans_user_ID# )%',
+	);
+
+	$answer_Results->cols[] = array(
+		'td_class' => 'nowrap',
+		'th'    => T_('Login'),
+		'order' => 'user_login',
+		'td' => '%get_user_identity_link( #user_login#, #pans_user_ID#, "profile", "login" )%',
+	);
+
+	/**
+	 * Get the Poll answer as checkmark
+	 *
+	 * @param boolean Poll answer
+	 * @return string
+	 */
+	function poll_answer_td_option( $answer )
+	{
+		if( $answer )
+		{
+			return get_icon( 'allowback' );
+		}
+
+		return NULL;
+	}
+
+
+	/**
+	 * Sort poll options based on order
+	 */
+	function sort_poll_options( $a, $b )
+	{
+		if( $a->get( 'order' ) == $b->get( 'order' ) )
+		{
+			return $a->ID < $b->ID ? -1 : 1;
+		}
+
+		return ( $a->get('order') < $b->get('order') ? -1 : 1 );
+	}
+
+	uasort( $options, 'sort_poll_options' ); // This ensures that the column order follows the order of the previous result
+	foreach( $options as $key => $option )
+	{
+		$answer_Results->cols[] = array(
+			'th'       => '<span title="'.$option->get( 'option_text' ).'">'.$option->get( 'order' ).'</span>',
+			'th_class' => '',
+			'td_class' => 'center',
+			'order'    => 'opt'.$key,
+			'td'       => '%poll_answer_td_option( #opt'.$key.'# )%',
+		);
+	}
+
+	$answer_Results->display();
+}
+// ---- Detailed Poll Answers - END ---- //
 ?>
