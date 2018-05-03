@@ -73,32 +73,31 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Email notification throttling').get_manual_link( 'email-other-settings' ) );
 
 	$template_names = array(
-			'account_new' => T_('New account'),
-			'account_activate' => T_('Activate account'),
-			'account_activated' => T_('Account activated'),
-			'account_password_reset' => T_('Password reset'),
-			'account_changed' => T_('Account change'),
-			'account_reported' => T_('Reported account'),
-			'account_closed' => T_('Account closed'),
-			'private_message_new' => T_('New private message'),
-			'contact_message_new' => T_('New contact message'),
-			'post_assignment' => T_('Post assignment'),
-			//'post_by_email_report',
-			'comment_spam' => T_('Comment spam'),
-			'scheduled_task_error_report' => T_('Scheduled task error'),
-			'automation_owner_notification' => T_('Automation notification'),
-			'newsletter_test' => T_('Email campaign test'),
+			'private_message_new' => T_('I receive a private message.'),
+			'comment_spam' => T_('a comment is reported as spam and I have permissions to moderate it.'),
+			'post_assignment' => T_('a post was assigned to me.'),
+			'account_new' => T_( 'a new user has registered.' ),
+			'account_activated' => T_( 'an account was activated.' ),
+			'account_closed' => T_( 'an account was closed.' ),
+			'account_reported' => T_( 'an account was reported.' ),
+			'account_changed' => T_( 'an account was changed.' ),
+			'scheduled_task_error_report' => T_( 'a scheduled task ends with an error or timeout.' ),
+			'automation_owner_notification' => T_('one of my automations wants to notify me.'),
+
+			'account_activate' => T_('an account needs to be activated'),
+			'account_password_reset' => T_('a password reset was requested'),
+			'contact_message_new' => T_('I receive a message through the contact form'),
+			'newsletter_test' => T_('an email campaign test was made'),
 		);
 
 	foreach( $template_names as $template => $label )
 	{
 		$Form->radio_input( $template.'_notifications_mode', $Settings->get( $template.'_notifications_mode' ),
 			array(
-				array( 'value' => 'immediate', 'label' => T_('Immediate'), 'note' => T_('Press "Next" after each chunk') ),
-				array( 'value' => 'cron', 'label' => T_('Asynchronous'), 'note' => T_('A scheduled job will send chunks') )
+				array( 'value' => 'immediate', 'label' => T_('Immediate') ),
+				array( 'value' => 'cron', 'label' => T_('Asynchronous') )
 			),
-			$label,
-			array( 'lines' => true ) );
+			$label );
 	}
 
 	$Form->text_input( 'email_notifications_chunk_size', $Settings->get( 'email_notifications_chunk_size' ), 5, T_('Chunk Size'), T_('emails at a time'), array( 'maxlength' => 10 ) );

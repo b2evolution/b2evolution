@@ -16,7 +16,7 @@ $SQL->LIMIT( $Settings->get( 'email_notifications_chunk_size' ) );
 
 $email_notifications = $DB->get_results( $SQL, ARRAY_A, 'Get deferred email notifications' );
 
-cron_log_append( sprintf( 'Sending %d email notifications...', count( $email_notifications ) ) );
+cron_log_append( sprintf( 'Sending %d email notifications...', count( $email_notifications ) )."\n" );
 foreach( $email_notifications as $notification )
 {
 	$message_data = unserialize( $notification['emlog_message'] );
@@ -42,7 +42,7 @@ foreach( $email_notifications as $notification )
 		$result = 'failed';
 	}
 
-	cron_log_append( sprintf( 'Sending mail #%d: %s', $mail_log_ID, $result ) );
+	cron_log_append( sprintf( 'Sending email #%d: %s', $mail_log_ID, $result ) );
 
 	// Store messages of the post sending email notifications:
 	cron_log_action_end( $Messages->get_string( '', '', "\n", '' ) );
