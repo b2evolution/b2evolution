@@ -41,7 +41,7 @@ $newsletters = $edited_Automation->get_newsletters();
 foreach( $newsletters as $n => $newsletter )
 {
 	$Form->begin_line( T_('Tied to List').' <span class="evo_tied_list_number">'.( $n + 1 ).'</span>', '', '', array( 'required' => true ) );
-		$Form->select_input_object( 'aunl_enlt_ID[]', $newsletter['ID'], $NewsletterCache, '', array( 'allow_none' => true ) );
+		$Form->select_input_object( 'aunl_enlt_ID[]', $newsletter['ID'], $NewsletterCache, '', array( 'allow_none' => true, 'required' => true ) );
 		$Form->checkbox_input( 'aunl_autostart', $newsletter['autostart'], '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.T_('auto start on list subscribe').'</label> &nbsp; ' ) );
 		$Form->checkbox_input( 'aunl_autoexit', $newsletter['autoexit'], '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.T_('auto exit on list unsubscribe').'</label>'
 			.' &nbsp; <a href="#" class="evo_remove_tied_list">'.get_icon( 'minus' ).'</a>' ) );
@@ -50,7 +50,7 @@ foreach( $newsletters as $n => $newsletter )
 // Initialize a template to add more newsletter fields by JS code below:
 $Form->output = false;
 $newsletter_fields = $Form->begin_line( T_('Tied to List').' <span class="evo_tied_list_number"></span>', '', '', array( 'required' => true ) )
-		.$Form->select_input_object( 'aunl_enlt_ID[]', '', $NewsletterCache, '', array( 'allow_none' => true ) )
+		.$Form->select_input_object( 'aunl_enlt_ID[]', '', $NewsletterCache, '', array( 'allow_none' => true, 'required' => true ) )
 		.$Form->checkbox_input( 'aunl_autostart', 1, '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.T_('auto start on list subscribe').'</label> &nbsp; ' ) )
 		.$Form->checkbox_input( 'aunl_autoexit', 1, '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.T_('auto exit on list unsubscribe').'</label>'
 			.' &nbsp; <a href="#" class="evo_remove_tied_list">'.get_icon( 'minus' ).'</a>' ) )
