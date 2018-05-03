@@ -1056,6 +1056,7 @@ class Form extends Widget
 	 *                 - 'class': the CSS class to use for the <input> element
 	 *                 - 'type': 'text', 'password' (defaults to 'text')
 	 *                 - 'force_to': 'UpperCase' (JS onchange handler)
+	 *                 - 'required': set to 'true' if both backend and frontend validation is required (use 'backend_only' for backend validation only)
 	 *                 - NOTE: any other attributes will be used as is (onchange, onkeyup, id, ..).
 	 * @return true|string true (if output) or the generated HTML if not outputting
 	 */
@@ -4661,8 +4662,11 @@ class Form extends Widget
 			{
 				$field_params['class'] = isset( $field_params['class'] ) ? $field_params['class'].' field_required' : 'field_required';
 			}
-			// add "required" attribute
-			$field_params['required'] = '';
+			// only add HTML5 "required" attribute if the parameter value is "true"
+			if( $this->_common_params['required'] === true )
+			{
+				$field_params['required'] = 'required';
+			}
 		}
 
 		// Error handling:
