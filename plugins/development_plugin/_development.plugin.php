@@ -186,266 +186,137 @@ class development_plugin extends Plugin
 		
 		return array(
 			
-			/*
-								
-	'_vagtables' => array(
-										'label' 		=> T_('Vegtables'),
-										'type' 			=> 'input_group',
-										'inputs' 		=> array(
-
-
-														'_value' => array(
-																			'label' => T_('Value'),
-																			'defaultvalue' => 'D value',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-														'_label' => array(
-																			'label' => T_('Label'),
-																			'defaultvalue' => 'D label',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-								)),
 			
-			*/
-				'single' => array(
-					'label' 		=> T_('Normal Static Input'),
-					'note' 			=> T_('Your note'), 
-					'max_number' 	=> 4, 
-					'type' 			=> 'select_input',
-					'entries' 		=> array(
+			'select_input' => array(
+				'label' 		=> T_('Select Input Sample 1'),
+				'note' 			=> T_('This set has param \'use_fieldset = false\' and will display a list'),
+				'defaultvalue' 	=> '',
+				'max_number' 	=> 4,
+				'use_fieldset' 	=> true,
+				'type' 			=> 'select_input',
+				'entries' 		=> array(
 
-									'_vagtables' => array(
-										'label' 		=> T_('Vegtables'),
-										'type' 			=> 'input_group',
-										'inputs' 		=> array(
+						'_html_textarea' 			=> array(
+								'label' 			=> T_('HTML textarea'),
+								'type' 				=> 'html_textarea',
+								'rows' 				=> 15,
+								'note' 				=> '',
+								'max_number' 		=> 2,
+								'defaultvalue' 		=> '<span>sample html input</span>',
+							),
 
+						'_html_input' 				=> array(
+								'label' 			=> T_('HTML input'),
+								'type' 				=> 'html_input',
+								'rows' 				=> 15,
+								'note' 				=> '',
+								'max_number' 		=> 2,
+								'defaultvalue' 		=> '<span>sample html input</span>',
+							),
 
-														'_value' => array(
-																			'label' => T_('Value'),
-																			'defaultvalue' => 'D single value',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-														'_label' => array(
-																			'label' => T_('Label'),
-																			'defaultvalue' => 'D single label',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
+						'_checkbox' 				=> array(
+								'label' 			=> T_('Checkbox'),
+								'type' 				=> 'checkbox',
+								'defaultvalue' 		=> 1,
+								'max_number' 		=> 2,
+								'note' 				=> '',
+						),
 
-								)),
+						'_checklist' => array(
+								'label' 			=> T_('Check List'),
+								'note' 				=> '',
+								'type' 				=> 'checklist',
+								'max_number' 		=> 2,
+								'options' 			=> array(
+										array( 'one', 	T_('First'), 0 ),
+										array( 'two',	T_('Second'), 0 ),
+										array( 'three', T_('Third'), 0 ),
+									),
+								),
+
+							'_radio' => array(
+								'label' 			=> T_('Radio buttons'),
+								'note' 				=> '',
+								'type' 				=> 'radio',
+								'inline' 			=> false,
+								'max_number' 		=> 2,
+								'options' 			=> array(
+										array( 'one', T_('First') ),
+										array( 'two', T_('Second') ),
+										array( 'three', T_('Third') )
+									),
+								),
+
+							'_fileselect' 			=> array(
+								'label' 			=> T_('File Select'),
+								'note' 				=> '',
+								'defaultvalue' 		=> '',
+								'type' 				=> 'fileselect',
+								'thumbnail_size' 	=> 'fit-320x320',
+								'max_number' => 2,
+							),
+
+							'_password' 			=> array(
+								'label' 			=> T_('Password Item Text'),
+								'defaultvalue' 		=> 'blank text',
+								'type' 				=> 'password',
+								'allow_empty' 		=> false,
+								'max_number' 		=> 2,
+											),
 			
-											'_color' => array(
-																'label' => T_('Single Item Color'),
-																'defaultvalue' => '#fed136',
-																'type' => 'color',
-															),
+							'_color' => array(
+								'label' 			=> T_('Single Item Color'),
+								'defaultvalue' 		=> '#fed136',
+								'type' 				=> 'color',
+								'max_number' 		=> 2,
+											),
+
+							'_integer' 				=> array(
+								'label' 			=> T_('Single Item Integer'),
+								'note' 				=> '1-9',
+								'valid_range' 		=> array( 'min'=>1, 'max'=>9 ),
+								'type' 				=> 'integer',
+								'defaultvalue' 		=> 1,
+								'max_number' 		=> 2,
+											),
+
+							'_text' => array(
+								'label' 			=> T_('Single Item Text'),
+								'defaultvalue' 		=> 'blank text',
+								'type' 				=> 'text',
+								'max_number' 		=> 2,
+											),
+
+							'_input_group' => array(
+								'label' 			=> T_('Group [color, integer, text]'),
+								'type' 				=> 'input_group',
+								'inputs' 			=> array(
 			
-											'_integer' => array(
-																'label' => T_('Single Item Integer'),
-																'note' => '1-9',
-																'valid_range' => array( 'min'=>1, 'max'=>9 ),
-																'type' => 'integer',
-																'defaultvalue' => 1,
-															),
-			
-											'_text' => array(
-																'label' => T_('Single Item Text'),
-																'defaultvalue' => 'blank text',
-																'type' => 'text',
-																'allow_empty' => false,
-															),
+												'_color' 	=> array(
+																	'label' 		=> T_('Group Item Color'),
+																	'defaultvalue' 	=> '#fed136',
+																	'type' 			=> 'color',
+																),
+
+												'_integer' 	=> array(
+																	'label' 		=> T_('Group Item Integer'),
+																	'note' 			=> '1-9',
+																	'valid_range' 	=> array( 'min'=>1, 'max'=>9 ),
+																	'type' 			=> 'integer',
+																	'defaultvalue' 	=> 1,
+																),
+
+												'_text' 	=> array(
+																	'label' 		=> T_('Group Item Text'),
+																	'defaultvalue' 	=> 'blank text',
+																	'type' 			=> 'text',
+																),
+									),
+
+						),
 		
 		)),
-		
-			/*
 			
-					'list' => array(
-					'label' 		=> T_('Single Input'),
-					'note' 			=> T_('Your note'), 
-					'max_number' 	=> 4, 
-					'type' 			=> 'select_input',
-					'entries' 		=> array(
-
-									'_color' => array(
-										'label' 		=> T_('Color'),
-										'type' 			=> 'input_group',
-										'inputs' 		=> array(
-
-
-														'_value' => array(
-																			'label' => T_('Color'),
-																			'defaultvalue' => '#444444',
-																			'type' => 'color',
-																			//'allow_empty' => false,
-																		),
-														'_label' => array(
-																			'label' => T_('Color'),
-																			'defaultvalue' => '#444444',
-																			'type' => 'color',
-																			//'allow_empty' => false,
-																		),
-
-								)),
-									'_vagtables' => array(
-										'label' 		=> T_('Vegtables'),
-										'type' 			=> 'input_group',
-										'inputs' 		=> array(
-
-
-														'_value' => array(
-																			'label' => T_('Value'),
-																			'defaultvalue' => 'D list value',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-														'_label' => array(
-																			'label' => T_('Label'),
-																			'defaultvalue' => 'D list label',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-
-								)),
-									'_fruits' => array(
-										'label' 		=> T_('Fruits'),
-										'type' 			=> 'input_group',
-										'inputs' 		=> array(
-
-
-														'_value' => array(
-																			'label' => T_('Value'),
-																			'defaultvalue' => 'value',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-														'_label' => array(
-																			'label' => T_('Label'),
-																			'defaultvalue' => 'label',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-
-								)),
-
-
-
-
-			)),
-		'plugin_sets'	=> array(
-												'label'			=> T_('Dynamic Fields'),
-												'note'			=> T_('Click to add another field item'),
-												// limited by array:array:string therefore html_textarea won't work
-												'type'			=> version_compare( $app_version, '6.6.5', '>' ) ? 'array:array:string' : 'array',
-												'max_number'		=> 3,
-												'fold' => true,
-												'entries'		=> array(
-			
-								'single' => array(
-										'label' 		=> T_('Single Input'),
-										'note' 			=> T_('Your note'), 
-										'max_number' 	=> 4, 
-										'type' 			=> 'select_input',
-										'entries' 		=> array(
-
-														'_vagtables' => array(
-															'label' 		=> T_('Vegtables'),
-															'type' 			=> 'input_group',
-															'inputs' 		=> array(
-
-
-																			'_value' => array(
-																								'label' => T_('Value'),
-																								'defaultvalue' => 'DD single value',
-																								'type' => 'text',
-																								//'allow_empty' => false,
-																							),
-																			'_label' => array(
-																								'label' => T_('Label'),
-																								'defaultvalue' => 'DD single label',
-																								'type' => 'text',
-																								//'allow_empty' => false,
-																							),
-
-								)))),
-			'list' => array(
-					'label' 		=> T_('Single Input'),
-					'note' 			=> T_('Your note'), 
-					'max_number' 	=> 4, 
-					'type' 			=> 'select_input',
-					'entries' 		=> array(
-
-									'_color' => array(
-										'label' 		=> T_('Color'),
-										'type' 			=> 'input_group',
-										'inputs' 		=> array(
-
-
-														'_value' => array(
-																			'label' => T_('Color'),
-																			'defaultvalue' => '#f8a5e3',
-																			'type' => 'color',
-																			//'allow_empty' => false,
-																		),
-														'_label' => array(
-																			'label' => T_('Color'),
-																			'defaultvalue' => '#f8a5e3',
-																			'type' => 'color',
-																			//'allow_empty' => false,
-																		),
-
-								)),
-									'_vagtables' => array(
-										'label' 		=> T_('Vegtables'),
-										'type' 			=> 'input_group',
-										'inputs' 		=> array(
-
-
-														'_value' => array(
-																			'label' => T_('Value'),
-																			'defaultvalue' => 'DD list value',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-														'_label' => array(
-																			'label' => T_('Label'),
-																			'defaultvalue' => 'DD list label',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-
-								)),
-									'_fruits' => array(
-										'label' 		=> T_('Fruits'),
-										'type' 			=> 'input_group',
-										'inputs' 		=> array(
-
-
-														'_value' => array(
-																			'label' => T_('Value'),
-																			'defaultvalue' => 'DD list value',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-														'_label' => array(
-																			'label' => T_('Label'),
-																			'defaultvalue' => 'DD list label',
-																			'type' => 'text',
-																			//'allow_empty' => false,
-																		),
-
-								)),
-
-
-
-
-			)),
-					
-			), 
-			)
-			*/
 		);
 
 	}

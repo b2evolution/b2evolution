@@ -218,35 +218,24 @@ $.extend(SelectInput.prototype, {
 								}
 							});	
 						}
-						/*	
-						Array.prototype.occurrence  = function () { 
-							var occurrence = {}; 
-							this.map( function (a){ 
-								if (!(a in this)) 
-								{ this[a] = 1; } 
-								else 
-								{ this[a] += 1; } 
-								return a; 
-							}, occurrence );  
-							return occurrence; 
-						};	
-						*/
 
 						// Build new array with type occurrence {input_name:occurrences}:
 						disp_entries = disp_entries.occurrence();
-
-						if( this.entry_max > 0 )
+							
+						if( entry_max > 0 || this.entry_max > 0 )
 						{	// Did the user reach maximum amount of entries allowed?
-							if( disp_entries[entry_name] >= this.entry_max )
+							if( disp_entries[entry_name] >= entry_max )
 							{	// Send a messsage to the user, else it might seem like there is no response on the click action? 
-								action_msg_container.html( '<div class="action_messages container-fluid"><ul><li><div class="alert alert-dismissible alert-danger fade in">' + this.max_msg +  '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div></li></ul></div>' );
+								action_msg_container.html( '<div id="max_items_msg_' + entry_name + this.id + '" class="action_messages container-fluid"><ul><li><div class="alert alert-dismissible alert-danger fade in">' + this.max_msg +  '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div></li></ul></div>' );
 
+								$("#max_items_msg_" + entry_name + this.id).fadeTo(4000, 500).slideUp(500, function(){
+    							$("#max_items_msg_" + entry_name + this.id).slideUp(500).remove();});
 								//Already added the maximum number of items for this type!
 								return false;
 							}
 							//Sure, let\'s add this type!
 						}
-
+							
 						if( entry_type === '' && this.use_single_button !== true )
 						{	// Mark select element of field types as error
 							
