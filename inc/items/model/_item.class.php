@@ -2428,8 +2428,15 @@ class Item extends ItemLight
 		}
 
 		if( empty( $this->custom_fields[$field_index]['value'] ) )
-		{ // get custom item field value from the item setting
-			$this->custom_fields[$field_index]['value'] = $this->get_setting( 'custom_'.$this->custom_fields[$field_index]['type'].'_'.$this->custom_fields[$field_index]['ID'] );
+		{	// Get custom item field value:
+			if( ! empty( $this->revision ) )
+			{	// from current revision if it is active for this Item:
+				$this->custom_fields[$field_index]['value'] = $this->get_revision_custom_field_value( $field_index );
+			}
+			else
+			{	// from the item setting:
+				$this->custom_fields[$field_index]['value'] = $this->get_setting( 'custom_'.$this->custom_fields[$field_index]['type'].'_'.$this->custom_fields[$field_index]['ID'] );
+			}
 		}
 		return true;
 	}
@@ -2580,14 +2587,10 @@ class Item extends ItemLight
 			}
 
 			$field = $this->custom_fields[ $field_name ];
-			$custom_field_value = utf8_trim( $this->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] ) );
+			$custom_field_value = $this->get_custom_field_value( $field_name );
 			if( ! empty( $custom_field_value ) ||
 			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )
 			{	// Display only the filled field AND also numeric field with '0' value:
-				if( $field['type'] == 'text' )
-				{	// Escape html tags and convert new lines to html <br> for text fields:
-					$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
-				}
 				$values = array( $field['label'], $custom_field_value );
 				$html .= str_replace( $mask, $values, $params['field_format'] );
 				$fields_exist = true;
@@ -8281,7 +8284,7 @@ class Item extends ItemLight
 	{
 		if( ! empty( $this->revision ) && // If revision is active currently for this Item
 		    ( $Revision = $this->get_revision( $this->revision ) ) && // If current revision is detected for this Item
-				isset( $Revision->{'iver_'.$parname} ) ) // If revision really has the resuested field
+				isset( $Revision->{'iver_'.$parname} ) ) // If revision really has the requested field
 		{	// Get value from current revision of this Item:
 			return $Revision->{'iver_'.$parname};
 		}
@@ -8957,13 +8960,14 @@ class Item extends ItemLight
 	 * @param string Revision ID with prefix as first char: 'a' - archived version, 'c' - current version, 'p' - proposed change
 	 * @return object Revision
 	 */
-	function get_revision( $iver_ID )
+	function & get_revision( $iver_ID )
 	{
 		global $DB;
 
 		if( empty( $this->ID ) )
 		{	// Item must be stored in DB to get revisions:
-			return false;
+			$r = false;
+			return $r;
 		}
 
 		if( isset( $this->revisions[ $iver_ID ] ) )
@@ -9038,6 +9042,49 @@ class Item extends ItemLight
 		}
 
 		return $this->revisions[ $orig_iver_ID ];
+	}
+
+
+	/**
+	 * Get item custom field value by index from current revision
+	 *
+	 * @param string Field index which by default is the field name, see {@link load_custom_field_value()}
+	 * @return mixed false if the field doesn't exist Double/String otherwise depending from the custom field type
+	 */
+	function get_revision_custom_field_value( $field_index )
+	{
+		if( empty( $this->revision ) )
+		{	// Revision is not active:
+			return NULL;
+		}
+
+		if( ! ( $Revision = & $this->get_revision( $this->revision ) ) )
+		{	// Revision cannot be detected:
+			return NULL;
+		}
+
+		if( ! isset( $Revision->custom_fields ) )
+		{	// Load custom fields from DB and store in cache:
+			global $DB;
+			$SQL = new SQL( 'Get custom fields values of Item #'.$this->ID.' for revision #'.$Revision->iver_ID.'('.$Revision->iver_type.')' );
+			$SQL->SELECT( 'itcf_name, ivcf_value' );
+			$SQL->FROM( 'T_items__version_custom_field' );
+			$SQL->FROM_add( 'INNER JOIN T_items__type_custom_field ON ivcf_itcf_ID = itcf_ID' );
+			$SQL->WHERE( 'itcf_ityp_ID = '.$DB->quote( $this->get( 'ityp_ID' ) ) );
+			$SQL->WHERE_and( 'ivcf_iver_ID = '.$DB->quote( $Revision->iver_ID ) );
+			$SQL->WHERE_and( 'ivcf_iver_type = '.$DB->quote( $Revision->iver_type ) );
+			$SQL->WHERE_and( 'ivcf_iver_itm_ID = '.$DB->quote( $Revision->iver_itm_ID ) );
+			$Revision->custom_fields = $DB->get_assoc( $SQL );
+		}
+
+		if( isset( $Revision->custom_fields[ $field_index ] ) )
+		{	// If the revision has a requested custom field:
+			return $Revision->custom_fields[ $field_index ];
+		}
+		else
+		{	// If the revision has no requested custom field:
+			return NULL;
+		}
 	}
 
 
