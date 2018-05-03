@@ -113,6 +113,12 @@ class bootstrap_blog_Skin extends Skin
 		$r = array_merge( array(
 			
 			
+			'test_begin' => array(
+				'label' => $this->T_('Normal Input Group'),
+				'layout' => 'begin_fieldset'
+			),
+			
+			
 	'_vagtables' => array(
 										'label' 		=> T_('Vegtables'),
 										'type' 			=> 'input_group',
@@ -132,6 +138,11 @@ class bootstrap_blog_Skin extends Skin
 																			//'allow_empty' => false,
 																		),
 								)),
+			
+			
+			'test_end' => array(
+				'layout' => 'end_fieldset'
+			),
 
 
 					'input_item_1' => array(
@@ -143,6 +154,15 @@ class bootstrap_blog_Skin extends Skin
 					'fold' 			=> true, 
 					'type' 			=> 'select_input',
 					'entries' 		=> array(
+			
+			
+									'color' => array(
+														'label' => T_('Color'),
+														'defaultvalue' => '#444444',
+														'type' => 'color',
+														//'allow_empty' => false,
+													),
+			
 
 									'_vagtables' => array(
 										'label' 		=> T_('Vegtables'),
@@ -160,6 +180,13 @@ class bootstrap_blog_Skin extends Skin
 																			'label' => T_('Label'),
 																			'defaultvalue' => 'label',
 																			'type' => 'text',
+																			//'allow_empty' => false,
+																		),
+			
+														'_value' => array(
+																			'label' => T_('Color'),
+																			'defaultvalue' => '#444444',
+																			'type' => 'color',
 																			//'allow_empty' => false,
 																		),
 
