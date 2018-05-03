@@ -162,6 +162,53 @@ $Form->begin_form( '', '', $params );
 	echo '</div>';
 
 	$Form->end_fieldset();
+
+	// ############################ CUSTOM FIELDS #############################
+
+	if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
+	{	// All CUSTOM FIELDS are hidden by post type:
+		display_hidden_custom_fields( $Form, $edited_Item );
+	}
+	else
+	{	// CUSTOM FIELDS:
+		$custom_fields = $edited_Item->get_type_custom_fields();
+
+		if( count( $custom_fields ) )
+		{	// Display fieldset with custom fields only if at least one exists:
+			$Form->begin_fieldset( T_('Custom fields').get_manual_link( 'post-custom-fields-panel' ), array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
+
+			echo '<table cellspacing="0" class="compose_layout">';
+
+			foreach( $custom_fields as $custom_field )
+			{	// Loop through custom fields:
+				echo '<tr><td class="label"><label for="item_'.$custom_field['type'].'_'.$custom_field['ID'].'"><strong>'.$custom_field['label'].':</strong></label></td>';
+				echo '<td class="input" width="97%">';
+				switch( $custom_field['type'] )
+				{
+					case 'double':
+						$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_custom_field_value( $custom_field['name'], false, false ), 10, '', $custom_field['note'].' <code>'.$custom_field['name'].'</code>' );
+						break;
+					case 'varchar':
+						$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_custom_field_value( $custom_field['name'], false, false ), 20, '', '<br />'.$custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+						break;
+					case 'text':
+						$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_custom_field_value( $custom_field['name'], false, false ), 5, '', array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
+						break;
+					case 'html':
+						$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_custom_field_value( $custom_field['name'], false, false ), 5, '', array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
+						break;
+					case 'url':
+						$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_custom_field_value( $custom_field['name'], false, false ), 20, '', '<br />'.$custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+						break;
+				}
+				echo '</td></tr>';
+			}
+
+			echo '</table>';
+
+			$Form->end_fieldset();
+		}
+	}
 	?>
 
 </div>
@@ -176,4 +223,6 @@ $Form->end_form();
 echo_status_dropdown_button_js( 'post' );
 // Save and restore item content field height and scroll position:
 echo_item_content_position_js( get_param( 'content_height' ), get_param( 'content_scroll' ) );
+// Fieldset folding
+echo_fieldset_folding_js();
 ?>

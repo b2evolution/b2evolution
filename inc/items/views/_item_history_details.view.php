@@ -55,6 +55,13 @@ $Form->info( T_('Title'), $Revision->iver_title );
 
 $Form->info( T_('Content'), $Revision->iver_content );
 
+$edited_Item->set( 'revision', $Revision->param_ID );
+$Form->info( T_('Custom fields'), $edited_Item->get_custom_fields( array(
+		'before'       => '<div class="evo_content_block"><table class="item_custom_fields" style="margin:0">',
+		'field_format' => '<tr><th valign="top">$title$:</th><td>$value$</td></tr>',
+		'after'        => '</table></div>',
+	) ) );
+
 $Form->end_form();
 
 ?>

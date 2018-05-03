@@ -950,15 +950,46 @@ switch( $action )
 
 		load_class( '_core/model/_diff.class.php', 'Diff' );
 
-		// Compare the titles of two revisions
+		// Compare the titles of two revisions:
 		$revisions_difference_title = new Diff( explode( "\n", $Revision_1->iver_title ), explode( "\n", $Revision_2->iver_title ) );
-		$format = new TitleDiffFormatter();
-		$revisions_difference_title = $format->format( $revisions_difference_title );
+		$TitleDiffFormatter = new TitleDiffFormatter();
+		$revisions_difference_title = $TitleDiffFormatter->format( $revisions_difference_title );
 
-		// Compare the contents of two revisions
+		// Compare the contents of two revisions:
 		$revisions_difference_content = new Diff( explode( "\n", $Revision_1->iver_content ), explode( "\n", $Revision_2->iver_content ) );
-		$format = new TableDiffFormatter();
-		$revisions_difference_content = $format->format( $revisions_difference_content );
+		$TableDiffFormatter = new TableDiffFormatter();
+		$revisions_difference_content = $TableDiffFormatter->format( $revisions_difference_content );
+
+		// Compare the custom fields of two revisions:
+		$oneline_TableDiffFormatter = new TableDiffFormatter();
+		$oneline_TableDiffFormatter->block_header = '';
+		$revisions_difference_custom_fields = array();
+		$custom_fields = $edited_Item->get_type_custom_fields();
+		$edited_Item->set( 'revision', get_param( 'r1' ) );
+		unset( $edited_Item->custom_fields );
+		$r1_custom_fields = array();
+		foreach( $custom_fields as $custom_field )
+		{
+			$r1_custom_fields[ $custom_field['name'] ] = $edited_Item->get_custom_field_value( $custom_field['name'], false, false );
+		}
+		$edited_Item->set( 'revision', get_param( 'r2' ) );
+		unset( $edited_Item->custom_fields );
+		foreach( $custom_fields as $custom_field )
+		{
+			$revisions_difference_custom_field = new Diff( explode( "\n", $r1_custom_fields[ $custom_field['name'] ] ), explode( "\n", $edited_Item->get_custom_field_value( $custom_field['name'], false, false ) ) );
+			if( $custom_field['type'] == 'html' || $custom_field['type'] == 'text' )
+			{	// Display a line number for custom fields with multiple lines:
+				$revisions_difference_custom_field = $TableDiffFormatter->format( $revisions_difference_custom_field );
+			}
+			else
+			{	// Don't display a line number for custom fields with single line:
+				$revisions_difference_custom_field = $oneline_TableDiffFormatter->format( $revisions_difference_custom_field );
+			}
+			if( ! empty( $revisions_difference_custom_field ) )
+			{	// Display custom fields only with differences:
+				$revisions_difference_custom_fields[ $custom_field['label'] ] = $revisions_difference_custom_field;
+			}
+		}
 
 		break;
 

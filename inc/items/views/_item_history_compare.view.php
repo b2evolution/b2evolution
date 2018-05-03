@@ -17,7 +17,7 @@ global $admin_url;
 
 global $edited_Item, $Revision_1, $Revision_2;
 
-global $revisions_difference_title, $revisions_difference_content;
+global $revisions_difference_title, $revisions_difference_content, $revisions_difference_custom_fields;
 
 $post_statuses = get_visibility_statuses();
 
@@ -74,6 +74,19 @@ else
 	echo '<tr><td colspan="4" class="center red"><b>';
 	echo T_('No difference between contents of the selected revisions');
 	echo '</b></td></tr>';
+}
+
+// Dispay custom fields difference:
+?>
+	<tr><td colspan="4">&nbsp;</td></tr>
+	<tr>
+		<td colspan="4" class="diff-title-addedline"><b><?php echo T_('Custom fields').':'; ?></b></td>
+	</tr>
+<?php
+foreach( $revisions_difference_custom_fields as $custom_field_label => $revisions_difference_custom_field )
+{
+	echo '<tr><td colspan="2"><b>'.$custom_field_label.':</b></td><td colspan="2"><b>'.$custom_field_label.':</b></td></tr>';
+	echo $revisions_difference_custom_field;
 }
 ?>
 </table>

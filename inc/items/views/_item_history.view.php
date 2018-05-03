@@ -212,6 +212,19 @@ function iver_td_actions( $iver_ID, $iver_type )
 	global $edited_Item, $current_User;
 	$r = '';
 
+	// Button to view the version:
+	$permanent_url = $edited_Item->get_permanent_url();
+	if( $iver_type != 'current' )
+	{
+		$permanent_url = url_add_param( $permanent_url, array( 'revision' => ( $iver_type == 'proposed' ? 'p' : '' ).$iver_ID ) );
+	}
+	$r .= '<a href="'.$permanent_url.'" class="action_icon btn btn-info btn-xs">'.T_('View').'</a>';
+
+	if( $iver_type == 'archived' )
+	{	// Button to restore the version:
+		$r .= '<a href="'.regenerate_url( 'action', 'action=history_restore&amp;r='.$iver_ID.'&amp;'.url_crumb( 'item' ) ).'" class="action_icon btn btn-primary btn-xs">'.T_('Restore').'</a>';
+	}
+
 	if( $iver_type == 'proposed' )
 	{	// Button to accept or reject the proposed versions:
 		global $admin_url;
@@ -225,20 +238,6 @@ function iver_td_actions( $iver_ID, $iver_type )
 			.' onclick="return confirm( \''.sprintf( TS_('You are about to reject the proposed change #%s.\nPlease note all newer proposed changes will be also rejected.\nAre you sure?'), $iver_ID ).'\')">'
 				.T_('Reject')
 			.'</a>';
-	}
-
-	if( $iver_type == 'archived' || $iver_type == 'current' )
-	{	// Button to view the version:
-		$permanent_url = $edited_Item->get_permanent_url();
-		if( $iver_type == 'archived' )
-		{
-			$permanent_url = url_add_param( $permanent_url, array( 'revision' => $iver_ID ) );
-		}
-		$r .= '<a href="'.$permanent_url.'" class="action_icon btn btn-info btn-xs">'.T_('View').'</a>';
-	}
-	if( $iver_type == 'archived' )
-	{	// Button to restore the version:
-		$r .= '<a href="'.regenerate_url( 'action', 'action=history_restore&amp;r='.$iver_ID.'&amp;'.url_crumb( 'item' ) ).'" class="action_icon btn btn-primary btn-xs">'.T_('Restore').'</a>';
 	}
 
 	return $r;

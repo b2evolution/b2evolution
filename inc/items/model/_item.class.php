@@ -934,59 +934,7 @@ class Item extends ItemLight
 		}
 
 		// CUSTOM FIELDS:
-		$custom_fields = $this->get_type_custom_fields();
-		$this->dbchanges_custom_fields = array();
-		foreach( $custom_fields as $custom_field )
-		{ // update each custom field
-			$param_name = 'item_'.$custom_field['type'].'_'.$custom_field['ID'];
-			$param_error = false;
-			if( isset_param( $param_name ) )
-			{ // param is set
-				switch( $custom_field['type'] )
-				{
-					case 'double':
-						$param_type = 'double';
-						$field_value = param( $param_name, 'string', NULL );
-						if( ! empty( $field_value ) && ! preg_match( '/^(\+|-)?[0-9]+(\.[0-9]+)?$/', $field_value ) ) // we could have used is_numeric here but this is how "double" type is checked in the param.funcs.php
-						{
-							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
-							$param_error = true;
-						}
-						break;
-					case 'html':
-					case 'text': // Keep html tags for text fields, they will be escaped at display
-						$param_type = 'html';
-						break;
-					case 'url':
-						$param_type = 'url';
-						$field_value = param( $param_name, 'string', NULL );
-						$url_error = validate_url( $field_value, 'http-https' );
-						if( $url_error !== false )
-						{
-							param_error( $param_name, $url_error );
-							$param_error = true;
-						}
-						break;
-					case 'varchar':
-					default:
-						$param_type = 'string';
-						break;
-				}
-				if( ! $param_error )
-				{
-					param( $param_name, $param_type, NULL ); // get par value
-				}
-				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
-
-				$custom_field_value = $this->get_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'] );
-				if( $custom_field_value != get_param( $param_name ) )
-				{
-					$this->dbchanges_custom_fields[$custom_field['ID']] = $custom_field_value;
-					$this->dbchanges_flags['custom_fields'] = true;
-				}
-				$this->set_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'], get_param( $param_name ), $custom_field_make_null );
-			}
-		}
+		$this->load_custom_fields_from_Request();
 
 		// COMMENTS:
 		if( $this->allow_comment_statuses() )
@@ -1221,6 +1169,66 @@ class Item extends ItemLight
 
 		// If workflow properties are not allowed to be stored for this Item by current User:
 		return false;
+	}
+
+	/**
+	 * Load custom fields values from Request form fields
+	 */
+	function load_custom_fields_from_Request()
+	{
+		$custom_fields = $this->get_type_custom_fields();
+		$this->dbchanges_custom_fields = array();
+		foreach( $custom_fields as $custom_field )
+		{ // update each custom field
+			$param_name = 'item_'.$custom_field['type'].'_'.$custom_field['ID'];
+			$param_error = false;
+			if( isset_param( $param_name ) )
+			{ // param is set
+				switch( $custom_field['type'] )
+				{
+					case 'double':
+						$param_type = 'double';
+						$field_value = param( $param_name, 'string', NULL );
+						if( ! empty( $field_value ) && ! preg_match( '/^(\+|-)?[0-9]+(\.[0-9]+)?$/', $field_value ) ) // we could have used is_numeric here but this is how "double" type is checked in the param.funcs.php
+						{
+							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
+							$param_error = true;
+						}
+						break;
+					case 'html':
+					case 'text': // Keep html tags for text fields, they will be escaped at display
+						$param_type = 'html';
+						break;
+					case 'url':
+						$param_type = 'url';
+						$field_value = param( $param_name, 'string', NULL );
+						$url_error = validate_url( $field_value, 'http-https' );
+						if( $url_error !== false )
+						{
+							param_error( $param_name, $url_error );
+							$param_error = true;
+						}
+						break;
+					case 'varchar':
+					default:
+						$param_type = 'string';
+						break;
+				}
+				if( ! $param_error )
+				{
+					param( $param_name, $param_type, NULL ); // get par value
+				}
+				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
+
+				$custom_field_value = $this->get_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'] );
+				if( $custom_field_value != get_param( $param_name ) )
+				{
+					$this->dbchanges_custom_fields[$custom_field['ID']] = $custom_field_value;
+					$this->dbchanges_flags['custom_fields'] = true;
+				}
+				$this->set_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'], get_param( $param_name ), $custom_field_make_null );
+			}
+		}
 	}
 
 
@@ -2447,9 +2455,10 @@ class Item extends ItemLight
 	 *
 	 * @param string Field index which by default is the field name, see {@link load_custom_field_value()}
 	 * @param string Restring field by type, FALSE - to don't restrict
+	 * @param boolean TRUE to prepare value to display depending on field type
 	 * @return mixed false if the field doesn't exist Double/String otherwise depending from the custom field type
 	 */
-	function get_custom_field_value( $field_index, $restrict_type = false )
+	function get_custom_field_value( $field_index, $restrict_type = false, $prepare_value = true )
 	{
 		if( $this->load_custom_field_value( $field_index ) )
 		{
@@ -2458,10 +2467,14 @@ class Item extends ItemLight
 				return false;
 			}
 
-			$custom_field_value = utf8_trim( $this->custom_fields[ $field_index ]['value'] );
-			if( $this->custom_fields[ $field_index ]['type'] == 'text' )
-			{	// Escape html tags and convert new lines to html <br> for text fields:
-				$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
+			$custom_field_value = $this->custom_fields[ $field_index ]['value'];
+			if( $prepare_value )
+			{	// Prepare value:
+				$custom_field_value = utf8_trim( $custom_field_value );
+				if( $this->custom_fields[ $field_index ]['type'] == 'text' )
+				{	// Escape html tags and convert new lines to html <br> for text fields:
+					$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
+				}
 			}
 			return $custom_field_value;
 		}
@@ -6333,6 +6346,16 @@ class Item extends ItemLight
 				$this->previous_status = $this->get( 'status' );
 				return parent::set( 'status', $parvalue, $make_null );
 
+			case 'revision':
+				if( $parvalue == 'c' )
+				{	// Don't set revision if required to current version:
+					if( isset( $this->revision ) )
+					{	// Unset previous active revision:
+						unset( $this->revision );
+					}
+					return false;
+				}
+
 			default:
 				return parent::set( $parname, $parvalue, $make_null );
 		}
@@ -8982,7 +9005,7 @@ class Item extends ItemLight
 		{	// Get last revision:
 			list( , $iver_type ) = explode( '_', $iver_ID );
 			$revision_SQL = new SQL();
-			$revision_SQL->SELECT( 'a.*' );
+			$revision_SQL->SELECT( 'a.*, CONCAT( "'.$iver_type.'", a.iver_ID ) AS param_ID' );
 			$revision_SQL->FROM( 'T_items__version a' );
 			$revision_SQL->FROM_add( 'LEFT OUTER JOIN T_items__version b ON a.iver_itm_ID = b.iver_itm_ID AND a.iver_ID < b.iver_ID AND b.iver_type = '.$DB->quote( $iver_type ) );
 			$revision_SQL->WHERE( 'b.iver_itm_ID IS NULL' );
@@ -9017,7 +9040,7 @@ class Item extends ItemLight
 			case 'p':
 				// Archived version or Proposed change:
 				$revision_SQL = new SQL( 'Get '.( $iver_type == 'a' ? 'an archived version' : 'a proposed change' ).' #'.$this->ID.' for Item #'.$this->ID );
-				$revision_SQL->SELECT( '*' );
+				$revision_SQL->SELECT( '*, CONCAT( "'.$iver_type.'", iver_ID ) AS param_ID' );
 				$revision_SQL->FROM( 'T_items__version' );
 				$revision_SQL->WHERE( 'iver_ID = '.$DB->quote( $iver_ID ) );
 				$revision_SQL->WHERE_and( 'iver_itm_ID = '.$DB->quote( $this->ID ) );
@@ -9029,6 +9052,7 @@ class Item extends ItemLight
 			default:
 				// Current version:
 				$this->revisions[ $orig_iver_ID ] = (object) array(
+					'param_ID'           => 'c',
 					'iver_ID'            => 0,
 					'iver_type'          => 'current',
 					'iver_itm_ID'        => $this->ID,
@@ -10723,6 +10747,9 @@ class Item extends ItemLight
 			param_check_not_empty( 'content', T_('Please enter some text.'), '' );
 		}
 
+		// Load values of custom fields:
+		$this->load_custom_fields_from_Request();
+
 		if( param_errors_detected() )
 		{	// Exit here if some errors on the submitted form:
 			return false;
@@ -10748,8 +10775,24 @@ class Item extends ItemLight
 				.$DB->quote( date2mysql( $localtimenow ) ).','
 				.$DB->quote( $this->get( 'status' ) ).','
 				.$DB->quote( $this->get( 'title' ) ).','
-				.$DB->quote( $this->get( 'content' ) ).' )
-			', 'Save a proposed change of the Item #'.$this->ID );
+				.$DB->quote( $this->get( 'content' ) ).' )',
+			'Save a proposed change of the Item #'.$this->ID );
+
+		if( $result && ( $custom_fields = $this->get_type_custom_fields() ) )
+		{	// Save custom fields of the proposition:
+			$custom_fields_insert_sql = array();
+			foreach( $custom_fields as $custom_field )
+			{
+				$custom_fields_insert_sql[] = '( '.$iver_ID.', '
+					.'"proposed", '
+					.$this->ID.', '
+					.$DB->quote( $custom_field['ID'] ).','
+					.$DB->quote( $this->get_custom_field_value( $custom_field['name'], false, false ) ).' )';
+			}
+			$result = $DB->query( 'INSERT INTO T_items__version_custom_field ( ivcf_iver_ID, ivcf_iver_type, ivcf_iver_itm_ID, ivcf_itcf_ID, ivcf_value )
+				VALUES '.implode( ', ', $custom_fields_insert_sql ),
+				'Save custom fields for a proposed change of the Item #'.$this->ID );
+		}
 
 		if( $result )
 		{
