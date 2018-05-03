@@ -837,14 +837,40 @@ class Skin extends DataObject
 	 * @return string|array|NULL
 	 */
 	function get_setting_default_value( $parname, $group = NULL )
-	{
-		if( ! empty ( $group ) )
-		{
-			$parname = substr( $parname, strlen( $group ) );
-		}
-		
+	{		
 		// Try default values:
 		$params = $this->get_param_definitions( NULL );
+
+		if( strpos( $parname, '[' ) !== false )
+		{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
+			
+			// strip out all the iterations for default values
+			$parsetting_names = explode( '[', str_replace( ']', '', preg_replace('/\[\d\]/', '', $parname ) ) );
+			
+			$setting_names = explode( '[', str_replace( ']', '', $parname ) );
+			
+			$parname = substr( end( $parsetting_names ), strlen( $group ) );
+			/* 
+			* match $params level to $parname
+			*/ 
+			for( $i = 0; $i < count( $parsetting_names ); $i++ )
+			{
+				if( isset( $params[ $parsetting_names[$i] ] ) )
+				{
+					if( isset( $params[ $parsetting_names[$i] ]['entries'] ) )
+					{
+						$params = $params[ $parsetting_names[$i] ]['entries'];
+					}
+				}
+			}
+		}
+		else
+		{
+			if( ! empty ( $group ) )
+			{
+				$parname = substr( $parname, strlen( $group ) );
+			}
+		}
 		
 		if( isset( $params[ $parname ]['defaultvalue'] ) )
 		{ // We have a default value:

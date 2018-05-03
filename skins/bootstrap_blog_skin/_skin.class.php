@@ -119,21 +119,21 @@ class bootstrap_blog_Skin extends Skin
 			),
 			
 			
-	'_vagtables' => array(
-										'label' 		=> T_('Vegtables'),
+	'items' => array(
+										'label' 		=> T_('Items'),
 										'type' 			=> 'input_group',
 										'inputs' 		=> array(
 
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => 'value',
+																			'defaultvalue' => 'items value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => 'label',
+																			'defaultvalue' => 'items label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
@@ -172,13 +172,13 @@ class bootstrap_blog_Skin extends Skin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => 'value',
+																			'defaultvalue' => '_vagtables value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => 'label',
+																			'defaultvalue' => '_vagtables label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
@@ -199,13 +199,13 @@ class bootstrap_blog_Skin extends Skin
 
 														'_value' => array(
 																			'label' => T_('Value'),
-																			'defaultvalue' => 'value',
+																			'defaultvalue' => 'fruits value',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
 														'_label' => array(
 																			'label' => T_('Label'),
-																			'defaultvalue' => 'label',
+																			'defaultvalue' => 'fruits label',
 																			'type' => 'text',
 																			//'allow_empty' => false,
 																		),
