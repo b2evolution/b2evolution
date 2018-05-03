@@ -785,7 +785,6 @@ class Skin extends DataObject
 	function get_setting( $parname, $group = NULL )
 	{
 		
-		
 		/**
 		 * @var Blog
 		 */
@@ -793,7 +792,7 @@ class Skin extends DataObject
 
 		// Name of the setting in the blog settings:
 		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
-
+		
 		if( strpos( $blog_setting_name, '[' ) !== false )
 		{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
 			$setting_names = explode( '[', $blog_setting_name );
@@ -818,8 +817,19 @@ class Skin extends DataObject
 		{	// Get normal(not array) setting value:
 			$value = $Blog->get_setting( $blog_setting_name );
 		}
-
 		
+		/* 
+		*	array:array:string will have serialized data
+		*/
+		
+		// Check if value has serialized data
+		$params = @unserialize( $value );
+		
+		if ( $params !== false ) 
+		{
+			$value = $params;
+		} 
+
 		if( ! is_null( $value ) )
 		{	// We have a value for this param:
 			return $value;
@@ -840,7 +850,9 @@ class Skin extends DataObject
 	{		
 		// Try default values:
 		$params = $this->get_param_definitions( NULL );
-
+		
+		
+		
 		if( strpos( $parname, '[' ) !== false )
 		{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
 			
@@ -869,6 +881,14 @@ class Skin extends DataObject
 			if( ! empty ( $group ) )
 			{
 				$parname = substr( $parname, strlen( $group ) );
+			}
+		}
+		
+		if( isset( $params[ $parname ] ) )
+		{
+			if( isset( $params[ $parname ]['entries'] ) )
+			{
+				$params = $params[ $parname ]['entries'];
 			}
 		}
 		
