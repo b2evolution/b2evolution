@@ -261,7 +261,7 @@ class development_plugin extends Plugin
 								'defaultvalue' 		=> 'blank text',
 								'type' 				=> 'password',
 								'allow_empty' 		=> false,
-								'max_number' 		=> 2,
+								'max_number' 		=> 3,
 											),
 			
 							'_color' => array(

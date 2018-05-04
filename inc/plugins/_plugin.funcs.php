@@ -547,6 +547,13 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				list( $val ) = array_keys($parmeta['entries']);
 				
 				$use_single_button = true;
+				
+				$l_max_number = ( isset( $parmeta['entries'][$val]['max_number'] ) ) ? $parmeta['entries'][$val]['max_number'] : 0;
+				
+				if( $l_max_number > 0 && $l_max_number <= ($k_nb) )
+				{
+					$disable_add = true;
+				}
 			}
 			
 			$blog_id = ( isset( $Blog ) ) ? $Blog->ID : '';

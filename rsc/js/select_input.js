@@ -101,7 +101,8 @@ $.extend(SelectInput.prototype, {
 							
 							if( typeof e.id === 'undefined' ){return;}
 
-							var max_items_container = $('#'+e.id+'_max_items'), 
+							var max_items_container = $('#'+e.id+'_max_items'),
+								entries = ( typeof e.entries === 'string' ) ? JSON.parse(e.entries) : e.entries,
 								select_input_add = $('#'+e.id+'_add_new'), 
 								select_input = $('#'+e.id), 
 								select_input_empty = $('#'+e.id+'_empty'),
@@ -117,27 +118,68 @@ $.extend(SelectInput.prototype, {
 							}
 							
 							if( typeof e.max_number === 'undefined' ){return;}
-
-							if( k_nb < e.max_number )
-							{
-								max_items_container.css({'display':'none'});
-								select_input_add.css({'display':''});
-								select_input.css({'display':''});
-							} 
-							else 
-							{
-								
-								var action_msg_container = jQuery( '#' + e.id + '_action_messages' );
-								
-								action_msg_container.html('<div class="alert alert-info" id="max_items_msg_' + e.id + '"><button type="button" class="close" data-dismiss="alert">x</button>' + e.max_msg + '</div>').disableSelection();
-								
-								$("#max_items_msg_" + e.id).fadeTo(4000, 500).slideUp(500, function(){
-    							$("#max_items_msg_" + e.id).slideUp(500).remove();});
-								
-								max_items_container.css({'display':''});
-								select_input_add.css({'display':'none'});
-								select_input.css({'display':'none'});
+							
+							function hasOwnProp(a, b) {
+								return Object.prototype.hasOwnProperty.call(a, b);
 							}
+							
+							var keys;
+							
+							if (Object.keys) {
+								keys = Object.keys;
+							} else {
+								keys = function (obj) {
+									var i, res = [];
+									for (i in obj) {
+										if (hasOwnProp(obj, i)) {
+											res.push(i);
+										}
+									}
+									return res;
+								};
+							}
+							
+							var single = ( keys(entries).length === 1 ) ? true : false;
+
+							function send_notice(m)
+							{
+								if( k_nb < m )
+								{
+									max_items_container.css({'display':'none'});
+									select_input_add.css({'display':''});
+									select_input.css({'display':''});
+								} 
+								else 
+								{
+
+									var action_msg_container = jQuery( '#' + e.id + '_action_messages' );
+
+									action_msg_container.html('<div class="alert alert-info" id="max_items_msg_' + e.id + '"><button type="button" class="close" data-dismiss="alert">x</button>' + e.max_msg + '</div>').disableSelection();
+
+									$("#max_items_msg_" + e.id).fadeTo(4000, 500).slideUp(500, function(){
+									$("#max_items_msg_" + e.id).slideUp(500).remove();});
+
+									max_items_container.css({'display':''});
+									select_input_add.css({'display':'none'});
+									select_input.css({'display':'none'});
+								}
+							}
+							
+							if( single )
+							{ 
+								//var m = entries[keys(entries)[0]].max_number;
+								var m = entries[e.val].max_number;
+								
+								if( typeof m !== 'undefined' )
+								{
+									send_notice(m);
+								}
+							}
+							else
+							{
+								send_notice(e.max_number);
+							}
+							
 						},
       input_select_add: function() 
 						{
