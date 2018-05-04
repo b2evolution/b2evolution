@@ -964,19 +964,29 @@ switch( $action )
 		$oneline_TableDiffFormatter = new TableDiffFormatter();
 		$oneline_TableDiffFormatter->block_header = '';
 		$revisions_difference_custom_fields = array();
-		$custom_fields = $edited_Item->get_type_custom_fields();
 		$edited_Item->set( 'revision', get_param( 'r1' ) );
-		unset( $edited_Item->custom_fields );
+		$custom_fields = $edited_Item->get_type_custom_fields();
 		$r1_custom_fields = array();
 		foreach( $custom_fields as $custom_field )
 		{
 			$r1_custom_fields[ $custom_field['name'] ] = $edited_Item->get_custom_field_value( $custom_field['name'], false, false );
 		}
 		$edited_Item->set( 'revision', get_param( 'r2' ) );
-		unset( $edited_Item->custom_fields );
+		$r2_custom_fields = $edited_Item->get_type_custom_fields();
+		foreach( $r2_custom_fields as $r2_custom_field )
+		{
+			if( ! isset( $custom_fields[ $r2_custom_field['name'] ] ) )
+			{	// Append custom fields which don't exist in 1st revision but exist in 2nd revision:
+				$custom_fields[ $r2_custom_field['name'] ] = $r2_custom_field;
+			}
+		}
 		foreach( $custom_fields as $custom_field )
 		{
-			$revisions_difference_custom_field = new Diff( explode( "\n", $r1_custom_fields[ $custom_field['name'] ] ), explode( "\n", $edited_Item->get_custom_field_value( $custom_field['name'], false, false ) ) );
+			// Compare custom field values of 1st and 2nd revisions:
+			$revisions_difference_custom_field = new Diff(
+					explode( "\n", isset( $r1_custom_fields[ $custom_field['name'] ] ) ? $r1_custom_fields[ $custom_field['name'] ] : '' ),
+					explode( "\n", $edited_Item->get_custom_field_value( $custom_field['name'], false, false ) )
+				);
 			if( $custom_field['type'] == 'html' || $custom_field['type'] == 'text' )
 			{	// Display a line number for custom fields with multiple lines:
 				$revisions_difference_custom_field = $TableDiffFormatter->format( $revisions_difference_custom_field );
@@ -987,6 +997,10 @@ switch( $action )
 			}
 			if( ! empty( $revisions_difference_custom_field ) )
 			{	// Display custom fields only with differences:
+				if( $custom_field['label'] === NULL && strpos( $custom_field['name'], '!deleted_' ) === 0 )
+				{	// Use this label when nonexistent custom field is loaded from revision:
+					$custom_field['label'] = '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), '#'.$custom_field['ID'] ).'</span>';
+				}
 				$revisions_difference_custom_fields[ $custom_field['label'] ] = $revisions_difference_custom_field;
 			}
 		}

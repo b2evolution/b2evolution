@@ -1897,7 +1897,7 @@ class Item extends ItemLight
 		$cache_key = $format.'/'.implode('.', $post_renderers); // logic gets used below, for setting cache, too.
 
 		$use_cache = $this->ID && in_array( $format, array('htmlbody', 'entityencoded', 'xml', 'text') )
-				&& empty( $this->revision ); // do not use cache when viewing historical revision
+				&& ! $this->is_revision(); // do not use cache when viewing historical revision
 
 		// $use_cache = false;
 
@@ -2437,7 +2437,7 @@ class Item extends ItemLight
 
 		if( empty( $this->custom_fields[$field_index]['value'] ) )
 		{	// Get custom item field value:
-			if( ! empty( $this->revision ) )
+			if( $this->is_revision() )
 			{	// from current revision if it is active for this Item:
 				$this->custom_fields[$field_index]['value'] = $this->get_revision_custom_field_value( $field_index );
 			}
@@ -2604,6 +2604,10 @@ class Item extends ItemLight
 			if( ! empty( $custom_field_value ) ||
 			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )
 			{	// Display only the filled field AND also numeric field with '0' value:
+				if( $field['label'] === NULL && strpos( $field['name'], '!deleted_' ) === 0 )
+				{	// Use this label when nonexistent custom field is loaded from revision:
+					$field['label'] = '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), '#'.$field['ID'] ).'</span>';
+				}
 				$values = array( $field['label'], $custom_field_value );
 				$html .= str_replace( $mask, $values, $params['field_format'] );
 				$fields_exist = true;
@@ -6347,9 +6351,13 @@ class Item extends ItemLight
 				return parent::set( 'status', $parvalue, $make_null );
 
 			case 'revision':
+				if( isset( $this->custom_fields ) && ( ! isset( $this->revision ) || $this->revision != $parvalue ) )
+				{	// Reset custom fields when revision is changed:
+					unset( $this->custom_fields );
+				}
 				if( $parvalue == 'c' )
 				{	// Don't set revision if required to current version:
-					if( isset( $this->revision ) )
+					if( $this->is_revision() )
 					{	// Unset previous active revision:
 						unset( $this->revision );
 					}
@@ -8305,8 +8313,8 @@ class Item extends ItemLight
 	 */
 	function get_from_revision( $parname )
 	{
-		if( ! empty( $this->revision ) && // If revision is active currently for this Item
-		    ( $Revision = $this->get_revision( $this->revision ) ) && // If current revision is detected for this Item
+		if( $this->is_revision() && // If revision is active currently for this Item
+		    ( $Revision = $this->get_revision() ) && // If current revision is detected for this Item
 				isset( $Revision->{'iver_'.$parname} ) ) // If revision really has the requested field
 		{	// Get value from current revision of this Item:
 			return $Revision->{'iver_'.$parname};
@@ -8978,17 +8986,33 @@ class Item extends ItemLight
 
 
 	/**
+	 * Check if currently this Item is viewed as revision(archived version or proposed change)
+	 *
+	 * @return boolean
+	 */
+	function is_revision()
+	{
+		return ! empty( $this->revision );
+	}
+
+
+	/**
 	 * Get item revision
 	 *
-	 * @param string Revision ID with prefix as first char: 'a' - archived version, 'c' - current version, 'p' - proposed change
+	 * @param string Revision ID with prefix as first char: 'a'(or digit) - archived version, 'c' - current version, 'p' - proposed change, NULL - to use current revision
 	 * @return object Revision
 	 */
-	function & get_revision( $iver_ID )
+	function & get_revision( $iver_ID = NULL )
 	{
 		global $DB;
 
-		if( empty( $this->ID ) )
-		{	// Item must be stored in DB to get revisions:
+		if( $iver_ID === NULL && $this->is_revision() )
+		{	// Use current revision
+			$iver_ID = $this->revision;
+		}
+
+		if( empty( $this->ID ) || empty( $iver_ID ) )
+		{	// Item must be stored in DB to get revisions and Revision ID must be defined:
 			$r = false;
 			return $r;
 		}
@@ -9077,12 +9101,12 @@ class Item extends ItemLight
 	 */
 	function get_revision_custom_field_value( $field_index )
 	{
-		if( empty( $this->revision ) )
+		if( ! $this->is_revision() )
 		{	// Revision is not active:
 			return NULL;
 		}
 
-		if( ! ( $Revision = & $this->get_revision( $this->revision ) ) )
+		if( ! ( $Revision = & $this->get_revision() ) )
 		{	// Revision cannot be detected:
 			return NULL;
 		}
@@ -9091,10 +9115,9 @@ class Item extends ItemLight
 		{	// Load custom fields from DB and store in cache:
 			global $DB;
 			$SQL = new SQL( 'Get custom fields values of Item #'.$this->ID.' for revision #'.$Revision->iver_ID.'('.$Revision->iver_type.')' );
-			$SQL->SELECT( 'itcf_name, ivcf_value' );
+			$SQL->SELECT( 'IFNULL( itcf_name, CONCAT( "!deleted_", ivcf_itcf_ID ) ), ivcf_value' );
 			$SQL->FROM( 'T_items__version_custom_field' );
-			$SQL->FROM_add( 'INNER JOIN T_items__type_custom_field ON ivcf_itcf_ID = itcf_ID' );
-			$SQL->WHERE( 'itcf_ityp_ID = '.$DB->quote( $this->get( 'ityp_ID' ) ) );
+			$SQL->FROM_add( 'LEFT JOIN T_items__type_custom_field ON ivcf_itcf_ID = itcf_ID' );
 			$SQL->WHERE_and( 'ivcf_iver_ID = '.$DB->quote( $Revision->iver_ID ) );
 			$SQL->WHERE_and( 'ivcf_iver_type = '.$DB->quote( $Revision->iver_type ) );
 			$SQL->WHERE_and( 'ivcf_iver_itm_ID = '.$DB->quote( $Revision->iver_itm_ID ) );
@@ -9605,16 +9628,47 @@ class Item extends ItemLight
 	 * Get custom fields of post type
 	 *
 	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url'. Use comma separator to get several types
+	 * @param boolean TRUE to force use custom fields of 
 	 * @return array
 	 */
-	function get_type_custom_fields( $type = 'all' )
+	function get_type_custom_fields( $type = 'all', $force_current_fields = false )
 	{
-		if( ! $this->get_ItemType() )
-		{ // Unknown post type
-			return array();
-		}
+		if( ! $force_current_fields && $this->is_revision() )
+		{	// Get custom fields of current active revision:
+			if( ! isset( $this->custom_fields ) )
+			{	// Initialize an array only first time:
+				$this->custom_fields = array();
+				if( ! empty( $this->ID ) &&
+				    ( $Revision = & $this->get_revision() ) )
+				{	// Get the custom fields from DB:
+					global $DB;
+					$SQL = new SQL( 'Get custom fields of revision #'.$Revision->iver_ID.'('.$Revision->iver_type.') for Item #'.$this->ID );
+					$SQL->SELECT( 'ivcf_itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, IFNULL( itcf_name, CONCAT( "!deleted_", ivcf_itcf_ID ) ) AS name, itcf_type AS type, IFNULL( itcf_order, 999999999 ) AS `order`, itcf_note AS note' );
+					$SQL->FROM( 'T_items__version_custom_field' );
+					$SQL->FROM_add( 'LEFT JOIN T_items__type_custom_field ON ivcf_itcf_ID = itcf_ID' );
+					$SQL->WHERE_and( 'ivcf_iver_ID = '.$DB->quote( $Revision->iver_ID ) );
+					$SQL->WHERE_and( 'ivcf_iver_type = '.$DB->quote( $Revision->iver_type ) );
+					$SQL->WHERE_and( 'ivcf_iver_itm_ID = '.$DB->quote( $Revision->iver_itm_ID ) );
+					$SQL->ORDER_BY( '`order`, ivcf_itcf_ID' );
+					$custom_fields = $DB->get_results( $SQL, ARRAY_A );
+					foreach( $custom_fields as $custom_field )
+					{
+						$this->custom_fields[ $custom_field['name'] ] = $custom_field;
+					}
+				}
+			}
 
-		return $this->ItemType->get_custom_fields( $type );
+			return $this->custom_fields;
+		}
+		else
+		{	// Get custom fields of current item type:
+			if( ! $this->get_ItemType() )
+			{ // Unknown post type
+				return array();
+			}
+
+			return $this->ItemType->get_custom_fields( $type );
+		}
 	}
 
 

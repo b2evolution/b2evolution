@@ -171,7 +171,7 @@ $Form->begin_form( '', '', $params );
 	}
 	else
 	{	// CUSTOM FIELDS:
-		$custom_fields = $edited_Item->get_type_custom_fields();
+		$custom_fields = $edited_Item->get_type_custom_fields( 'all', true );
 
 		if( count( $custom_fields ) )
 		{	// Display fieldset with custom fields only if at least one exists:

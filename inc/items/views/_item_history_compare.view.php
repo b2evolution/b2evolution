@@ -76,17 +76,19 @@ else
 	echo '</b></td></tr>';
 }
 
-// Dispay custom fields difference:
+if( ! empty( $revisions_difference_custom_fields ) )
+{	// Dispay custom fields difference:
 ?>
-	<tr><td colspan="4">&nbsp;</td></tr>
-	<tr>
-		<td colspan="4" class="diff-title-addedline"><b><?php echo T_('Custom fields').':'; ?></b></td>
-	</tr>
-<?php
-foreach( $revisions_difference_custom_fields as $custom_field_label => $revisions_difference_custom_field )
-{
-	echo '<tr><td colspan="2"><b>'.$custom_field_label.':</b></td><td colspan="2"><b>'.$custom_field_label.':</b></td></tr>';
-	echo $revisions_difference_custom_field;
+		<tr><td colspan="4">&nbsp;</td></tr>
+		<tr>
+			<td colspan="4" class="diff-title-addedline"><b><?php echo T_('Custom fields').':'; ?></b></td>
+		</tr>
+	<?php
+	foreach( $revisions_difference_custom_fields as $custom_field_label => $revisions_difference_custom_field )
+	{
+		echo '<tr><td colspan="2"><b>'.$custom_field_label.':</b></td><td colspan="2"><b>'.$custom_field_label.':</b></td></tr>';
+		echo $revisions_difference_custom_field;
+	}
 }
 ?>
 </table>
