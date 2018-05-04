@@ -1112,16 +1112,15 @@ class collections_Module extends Module
 			case 'subs_update':
 				// Subscribe/Unsubscribe user on the selected collection
 
-				if( $demo_mode && ( $current_User->ID <= 7 ) )
-				{ // don't allow default users profile change on demo mode
-					bad_request_die( 'Demo mode: you can\'t edit the admin and demo users profile!<br />[<a href="javascript:history.go(-1)">'
-								. T_('Back to profile') . '</a>]' );
-				}
-
 				// Get params
 				$blog = param( 'subscribe_blog', 'integer', true );
 				$notify_items = param( 'sub_items', 'integer', NULL );
 				$notify_comments = param( 'sub_comments', 'integer', NULL );
+
+				if( $demo_mode && ( $current_User->ID <= 7 ) )
+				{	// Don't allow default users profile change on demo mode:
+					header_redirect( get_user_settings_url( 'subs', NULL, $blog, '&' ) );
+				}
 
 				if( ( $notify_items < 0 ) || ( $notify_items > 1 ) || ( $notify_comments < 0 ) || ( $notify_comments > 1 ) )
 				{ // Invalid notify param. It should be 0 for unsubscribe and 1 for subscribe.
@@ -1170,15 +1169,16 @@ class collections_Module extends Module
 			case 'isubs_update':
 				// Subscribe/Unsubscribe user on the selected item
 
-				if( $demo_mode && ( $current_User->ID <= 7 ) )
-				{ // don't allow default users profile change on demo mode
-					bad_request_die( 'Demo mode: you can\'t edit the admin and demo users profile!<br />[<a href="javascript:history.go(-1)">'
-								. T_('Back to profile') . '</a>]' );
-				}
-
 				// Get params
 				$item_ID = param( 'p', 'integer', true );
 				$notify = param( 'notify', 'integer', 0 );
+
+				if( $demo_mode && ( $current_User->ID <= 7 ) )
+				{	// Don't allow default users profile change on demo mode:
+					$ItemCache = & get_ItemCache();
+					$Item = & $ItemCache->get_by_ID( $item_ID );
+					header_redirect( get_user_settings_url( 'subs', NULL, $Item->get_blog_ID(), '&' ) );
+				}
 
 				if( ( $notify < 0 ) || ( $notify > 1 ) )
 				{ // Invalid notify param. It should be 0 for unsubscribe and 1 for subscribe.

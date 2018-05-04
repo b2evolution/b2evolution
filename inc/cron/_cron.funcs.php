@@ -157,10 +157,10 @@ function get_cron_log_time( $action_num = NULL )
 {
 	global $Timer;
 
-	return '<p class="note">'
+	return '<div class="note">'
 			.( $action_num === NULL ? '' : 'Action #'.$action_num.' Finished. ' )
 			.'Elapsed time since beginning of task: '.$Timer->get_duration( 'cron_exec' ).' seconds'
-		.'</p>';
+		.'</div>';
 }
 
 

@@ -42,9 +42,8 @@ if( ! is_logged_in() )
 }
 
 if( $demo_mode && ( $current_User->ID <= 7 ) )
-{
-	bad_request_die( 'Demo mode: you can\'t edit the admin and demo users profile!<br />[<a href="javascript:history.go(-1)">'
-		. T_('Back to profile') . '</a>]' );
+{	// Demo mode restrictions: users created by install process cannot be edited:
+	header_redirect( get_user_settings_url( $disp, NULL, $blog, '&' ) );
 }
 
 // Check that this action request is not a CSRF hacked request:
