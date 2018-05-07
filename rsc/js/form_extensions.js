@@ -262,15 +262,20 @@ function focus_on_first_input()
 function check_combo( selector )
 {
 	var select_obj = jQuery( selector ),
-	    input_obj = select_obj.next();
+	input_obj = select_obj.next();
 
 	if( select_obj.find( 'option:first' ).is( ':selected' ) )
 	{	// Display the input text and focus on:
 		input_obj.show().focus();
+		if( input_obj.data( 'required' ) == 'required' )
+		{ // Combo box is required, restore the appropriate attribute
+			input_obj.attr( 'required', 'required' );
+		}
 	}
 	else
 	{	// Hide the input text:
 		input_obj.hide();
+		input_obj.removeAttr( 'required' );
 	}
 }
 
