@@ -84,10 +84,27 @@ if( ! empty( $revisions_difference_custom_fields ) )
 			<td colspan="4" class="diff-title-addedline"><b><?php echo T_('Custom fields').':'; ?></b></td>
 		</tr>
 	<?php
-	foreach( $revisions_difference_custom_fields as $custom_field_label => $revisions_difference_custom_field )
+	foreach( $revisions_difference_custom_fields as $custom_field_label => $revisions_diff_data )
 	{
-		echo '<tr><td colspan="2"><b>'.$custom_field_label.':</b></td><td colspan="2"><b>'.$custom_field_label.':</b></td></tr>';
-		echo $revisions_difference_custom_field;
+		echo '<tr>';
+		for( $f = 1; $f <= 2; $f++ )
+		{
+			echo '<td colspan="2"><b>';
+			if( ! $revisions_diff_data['r'.$f.'_has_field'] )
+			{	// Field label when the custom field is not used by this revision:
+				echo '<span class="text-danger">'.sprintf( T_('The field "%s" is not used in this revision'), $custom_field_label ).'</span>';
+			}
+			elseif( $revisions_diff_data['deleted'] )
+			{	// Field label when nonexistent custom field is loaded from revision:
+				echo '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $custom_field_label ).'</span>';
+			}
+			else
+			{	// Normal field label when it is used by revision and exists in DB:
+				echo $custom_field_label;
+			}
+			echo ':</b></td>';
+		}
+		echo $revisions_diff_data['difference'];
 	}
 }
 ?>

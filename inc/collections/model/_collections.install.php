@@ -291,6 +291,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ivcf_iver_type   ENUM('archived','proposed') COLLATE ascii_general_ci NOT NULL DEFAULT 'archived',
 			ivcf_iver_itm_ID INT UNSIGNED NOT NULL,
 			ivcf_itcf_ID     INT UNSIGNED NULL,
+			ivcf_itcf_label  VARCHAR(255) NOT NULL,
 			ivcf_value       VARCHAR( 10000 ) NULL,
 			PRIMARY KEY      ( ivcf_iver_ID, ivcf_iver_type, ivcf_iver_itm_ID, ivcf_itcf_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

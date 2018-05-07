@@ -9591,6 +9591,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12860, 'Upgrading item version custom fields tables...' ) )
+	{	// part of 6.10.1-stable
+		db_add_col( 'T_items__version_custom_field', 'ivcf_itcf_label', 'VARCHAR(255) NOT NULL AFTER ivcf_itcf_ID' );
+		$DB->query( 'UPDATE T_items__version_custom_field
+			LEFT JOIN T_items__type_custom_field ON ivcf_itcf_ID = itcf_ID
+			SET ivcf_itcf_label = itcf_label' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

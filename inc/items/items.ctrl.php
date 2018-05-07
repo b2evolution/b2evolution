@@ -983,9 +983,11 @@ switch( $action )
 		foreach( $custom_fields as $custom_field )
 		{
 			// Compare custom field values of 1st and 2nd revisions:
+			$r1_custom_field_value = ( isset( $r1_custom_fields[ $custom_field['name'] ] ) && $r1_custom_fields[ $custom_field['name'] ] !== false ) ? $r1_custom_fields[ $custom_field['name'] ] : false;
+			$r2_custom_field_value = $edited_Item->get_custom_field_value( $custom_field['name'], false, false );
 			$revisions_difference_custom_field = new Diff(
-					explode( "\n", isset( $r1_custom_fields[ $custom_field['name'] ] ) ? $r1_custom_fields[ $custom_field['name'] ] : '' ),
-					explode( "\n", $edited_Item->get_custom_field_value( $custom_field['name'], false, false ) )
+					explode( "\n", $r1_custom_field_value ),
+					explode( "\n", $r2_custom_field_value )
 				);
 			if( $custom_field['type'] == 'html' || $custom_field['type'] == 'text' )
 			{	// Display a line number for custom fields with multiple lines:
@@ -997,11 +999,12 @@ switch( $action )
 			}
 			if( ! empty( $revisions_difference_custom_field ) )
 			{	// Display custom fields only with differences:
-				if( $custom_field['label'] === NULL && strpos( $custom_field['name'], '!deleted_' ) === 0 )
-				{	// Use this label when nonexistent custom field is loaded from revision:
-					$custom_field['label'] = '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), '#'.$custom_field['ID'] ).'</span>';
-				}
-				$revisions_difference_custom_fields[ $custom_field['label'] ] = $revisions_difference_custom_field;
+				$revisions_difference_custom_fields[ ( empty( $custom_field['label'] ) ? '#'.$custom_field['ID'] : $custom_field['label'] ) ] = array(
+						'difference'   => $revisions_difference_custom_field,
+						'deleted'      => ( strpos( $custom_field['name'], '!deleted_' ) === 0 ),
+						'r1_has_field' => ( $r1_custom_field_value !== false ),
+						'r2_has_field' => ( $r2_custom_field_value !== false ),
+					);
 			}
 		}
 
@@ -1956,22 +1959,25 @@ switch( $action )
 			$edited_Item->set( 'title', $Revision->iver_title );
 			$edited_Item->set( 'content', $Revision->iver_content );
 			$edited_Item->dbupdate();
-			// Delete also all previous proposed changes:
-			$DB->query( 'DELETE FROM T_items__version
-				WHERE iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
-					AND iver_type = "proposed"
-					AND iver_ID <= '.$Revision->iver_ID );
 			$Messages->add( sprintf( T_('The proposed change #%d has been accepted.'), $Revision->iver_ID ), 'success' );
 		}
 		else
 		{	// Reject the proposed change:
-			// Delete also all newer proposed changes:
-			$DB->query( 'DELETE FROM T_items__version
-				WHERE iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
-					AND iver_type = "proposed"
-					AND iver_ID >= '.$Revision->iver_ID );
 			$Messages->add( sprintf( T_('The proposed change #%d has been rejected.'), $Revision->iver_ID ), 'success' );
 		}
+		// Delete also the proposed changes with custom fields and links to complete accept/reject action:
+		$DB->query( 'DELETE FROM T_items__version
+			WHERE iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
+				AND iver_type = "proposed"
+				AND iver_ID >= '.$Revision->iver_ID );
+		$DB->query( 'DELETE FROM T_items__version_custom_field
+			WHERE ivcf_iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
+				AND ivcf_iver_type = "proposed"
+				AND ivcf_iver_ID >= '.$Revision->iver_ID );
+		$DB->query( 'DELETE FROM T_items__version_link
+			WHERE ivl_iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
+				AND ivl_iver_type = "proposed"
+				AND ivl_iver_ID >= '.$Revision->iver_ID );
 
 		// Redirect to item history page with new poroposed change:
 		header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );

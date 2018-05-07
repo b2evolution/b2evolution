@@ -9643,7 +9643,7 @@ class Item extends ItemLight
 				{	// Get the custom fields from DB:
 					global $DB;
 					$SQL = new SQL( 'Get custom fields of revision #'.$Revision->iver_ID.'('.$Revision->iver_type.') for Item #'.$this->ID );
-					$SQL->SELECT( 'ivcf_itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, IFNULL( itcf_name, CONCAT( "!deleted_", ivcf_itcf_ID ) ) AS name, itcf_type AS type, IFNULL( itcf_order, 999999999 ) AS `order`, itcf_note AS note' );
+					$SQL->SELECT( 'ivcf_itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, ivcf_itcf_label AS label, IFNULL( itcf_name, CONCAT( "!deleted_", ivcf_itcf_ID ) ) AS name, itcf_type AS type, IFNULL( itcf_order, 999999999 ) AS `order`, itcf_note AS note' );
 					$SQL->FROM( 'T_items__version_custom_field' );
 					$SQL->FROM_add( 'LEFT JOIN T_items__type_custom_field ON ivcf_itcf_ID = itcf_ID' );
 					$SQL->WHERE_and( 'ivcf_iver_ID = '.$DB->quote( $Revision->iver_ID ) );
@@ -10669,7 +10669,7 @@ class Item extends ItemLight
 				foreach( $custom_fields as $custom_field )
 				{
 					$value = $this->get_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'] );
-					$custom_field_values[$custom_field['ID']] = '('.$iver_ID.','.$DB->quote( $this->ID ).','.$custom_field['ID'].','.$DB->quote( $value ).')';
+					$custom_field_values[$custom_field['ID']] = '('.$iver_ID.','.$DB->quote( $this->ID ).','.$custom_field['ID'].','.$DB->quote( $custom_field['label'] ).','.$DB->quote( $value ).')';
 				}
 			}
 
@@ -10677,13 +10677,13 @@ class Item extends ItemLight
 			{ // Set previous custom field values if they changed
 				foreach( $this->dbchanges_custom_fields as $custom_field_ID => $value )
 				{
-					$custom_field_values[$custom_field_ID] = '('.$iver_ID.','.$this->ID.','.$custom_field_ID.','.$DB->quote( $value ).')';
+					$custom_field_values[$custom_field_ID] = '('.$iver_ID.','.$this->ID.','.$custom_field_ID.','.$DB->quote( $custom_field['label'] ).','.$DB->quote( $value ).')';
 				}
 			}
 
 			if( ! empty( $custom_field_values ) )
 			{
-				$sql = 'INSERT INTO T_items__version_custom_field( ivcf_iver_ID, ivcf_iver_itm_ID, ivcf_itcf_ID, ivcf_value ) VALUES '.implode( ',', array_values( $custom_field_values ) );
+				$sql = 'INSERT INTO T_items__version_custom_field( ivcf_iver_ID, ivcf_iver_itm_ID, ivcf_itcf_ID, ivcf_itcf_label, ivcf_value ) VALUES '.implode( ',', array_values( $custom_field_values ) );
 				$result = $DB->query( $sql, 'Save a version of the custom fields' ) !== false;
 			}
 
@@ -10841,9 +10841,10 @@ class Item extends ItemLight
 					.'"proposed", '
 					.$this->ID.', '
 					.$DB->quote( $custom_field['ID'] ).','
+					.$DB->quote( $custom_field['label'] ).','
 					.$DB->quote( $this->get_custom_field_value( $custom_field['name'], false, false ) ).' )';
 			}
-			$result = $DB->query( 'INSERT INTO T_items__version_custom_field ( ivcf_iver_ID, ivcf_iver_type, ivcf_iver_itm_ID, ivcf_itcf_ID, ivcf_value )
+			$result = $DB->query( 'INSERT INTO T_items__version_custom_field ( ivcf_iver_ID, ivcf_iver_type, ivcf_iver_itm_ID, ivcf_itcf_ID, ivcf_itcf_label, ivcf_value )
 				VALUES '.implode( ', ', $custom_fields_insert_sql ),
 				'Save custom fields for a proposed change of the Item #'.$this->ID );
 		}
