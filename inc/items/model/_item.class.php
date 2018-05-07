@@ -3862,14 +3862,24 @@ class Item extends ItemLight
 			if( ! ( $File = & $Link->get_File() ) )
 			{ // No File object
 				global $Debuglog;
-				$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+				$log_message = sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID );
+				if( $this->is_revision() )
+				{	// Display the log message only for revision preview mode:
+					$r .= '<div class="red">'.$log_message.'</div>';
+				}
+				$Debuglog->add( $log_message, array( 'error', 'files' ) );
 				continue;
 			}
 
 			if( ! $File->exists() )
 			{ // File doesn't exist
 				global $Debuglog;
-				$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+				$log_message = sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() );
+				if( $this->is_revision() )
+				{	// Display the log message only for revision preview mode:
+					$r .= '<div class="red">'.$log_message.'</div>';
+				}
+				$Debuglog->add( $log_message, array( 'error', 'files' ) );
 				continue;
 			}
 
@@ -4090,17 +4100,32 @@ class Item extends ItemLight
 		$File = NULL;
 		while( ( $Link = & $LinkList->get_next() ) && $params['limit_attach'] > $i )
 		{
+			if( $Link->get( 'position' ) != 'attachment' )
+			{	// Skip not "attachment" links:
+				continue;
+			}
+
 			if( ! ( $File = & $Link->get_File() ) )
 			{ // No File object
 				global $Debuglog;
-				$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+				$log_message = sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID );
+				if( $this->is_revision() )
+				{	// Display the log message only for revision preview mode:
+					$r_file[$i] = $params['before_attach'].'<div class="red">'.$log_message.'</div>'.$params['after_attach'];
+				}
+				$Debuglog->add( $log_message, array( 'error', 'files' ) );
 				continue;
 			}
 
 			if( ! $File->exists() )
 			{ // File doesn't exist
 				global $Debuglog;
-				$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+				$log_message = sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() );
+				if( $this->is_revision() )
+				{	// Display the log message only for revision preview mode:
+					$r_file[$i] = $params['before_attach'].'<div class="red">'.$log_message.'</div>'.$params['after_attach'];
+				}
+				$Debuglog->add( $log_message, array( 'error', 'files' ) );
 				continue;
 			}
 
@@ -4114,11 +4139,6 @@ class Item extends ItemLight
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
 
-			if( $Link->get( 'position' ) != 'attachment' )
-			{	// Skip not "attachment" links:
-				continue;
-			}
-
 			// Prepare params before rendering item attachment:
 			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderItemAttachment', $params );
 
@@ -4127,7 +4147,7 @@ class Item extends ItemLight
 				continue;
 			}
 
-			if( $File->is_image() && $Link->get( 'position' ) != 'attachment' )
+			if( $File->is_image() )
 			{ // Skip images (except those in the attachment position) because these are displayed inline already
 				// fp> TODO: have a setting for each linked file to decide whether it should be displayed inline or as an attachment
 				continue;
