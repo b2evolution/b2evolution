@@ -6383,6 +6383,9 @@ class Item extends ItemLight
 					}
 					return false;
 				}
+				// Don't use parent::set() because post has no column "revision" in DB:
+				$this->revision = $parvalue;
+				return true;
 
 			default:
 				return parent::set( $parname, $parvalue, $make_null );
@@ -9156,6 +9159,43 @@ class Item extends ItemLight
 
 
 	/**
+	 * Update this item from revision
+	 *
+	 * @param string Revision ID with prefix as first char: 'a'(or digit) - archived version, 'c' - current version, 'p' - proposed change, NULL - to use current revision
+	 * @return boolean TRUE on success, FALSE on failed
+	 */
+	function update_from_revision( $iver_ID = NULL )
+	{
+		if( ! ( $Revision = & $this->get_revision( $iver_ID ) ) )
+		{	// If revision is not found:
+			return false;
+		}
+
+		// Update main fields:
+		$this->set( 'status', $Revision->iver_status );
+		$this->set( 'title', $Revision->iver_title );
+		$this->set( 'content', $Revision->iver_content );
+
+		if( $this->get_type_setting( 'use_custom_fields' ) )
+		{	// Update custom fields if item type allows them:
+			$custom_fields = $this->get_type_custom_fields();
+			// Switch to the requested revision:
+			$this->set( 'revision', $Revision->param_ID );
+			foreach( $custom_fields as $custom_field )
+			{
+				$this->set_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'], $this->get_custom_field_value( $custom_field['name'] ) );
+			}
+		}
+
+		$r = $this->dbupdate();
+
+		// TODO: Update attachments
+
+		return $r;
+	}
+
+
+	/**
 	 * Check if item is locked
 	 *
 	 * @return boolean TRUE - if item is locked
@@ -9648,7 +9688,7 @@ class Item extends ItemLight
 	 * Get custom fields of post type
 	 *
 	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url'. Use comma separator to get several types
-	 * @param boolean TRUE to force use custom fields of 
+	 * @param boolean TRUE to force use custom fields of current version instead of revision
 	 * @return array
 	 */
 	function get_type_custom_fields( $type = 'all', $force_current_fields = false )

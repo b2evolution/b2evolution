@@ -1019,18 +1019,9 @@ switch( $action )
 
 		param( 'r', 'integer', 0 );
 
-		if( $r > 0 )
-		{	// Update item only from revisions ($r == 0 for current version)
-			$Revision = $edited_Item->get_revision( $r );
-
-			$edited_Item->set( 'status', $Revision->iver_status );
-			$edited_Item->set( 'title', $Revision->iver_title );
-			$edited_Item->set( 'content', $Revision->iver_content );
-
-			if( $edited_Item->dbupdate() )
-			{	// Item updated
-				$Messages->add( sprintf( T_('Item has been restored from revision #%s'), $r ), 'success' );
-			}
+		if( $r > 0 && $edited_Item->update_from_revision( $r ) )
+		{	// Update item only from revisions ($r == 0 for current version):
+			$Messages->add( sprintf( T_('Item has been restored from revision #%s'), $r ), 'success' );
 		}
 
 		header_redirect( regenerate_url( 'action', 'action=history', '', '&' ) );
@@ -1955,10 +1946,7 @@ switch( $action )
 		if( $action == 'accept_propose' )
 		{	// Accept the proposed change:
 			// Update current Item with values from the requested proposed change:
-			$edited_Item->set( 'status', $Revision->iver_status );
-			$edited_Item->set( 'title', $Revision->iver_title );
-			$edited_Item->set( 'content', $Revision->iver_content );
-			$edited_Item->dbupdate();
+			$edited_Item->update_from_revision( get_param( 'r' ) );
 			$Messages->add( sprintf( T_('The proposed change #%d has been accepted.'), $Revision->iver_ID ), 'success' );
 		}
 		else
