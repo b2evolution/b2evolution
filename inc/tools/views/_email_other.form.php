@@ -73,23 +73,24 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Email notification throttling').get_manual_link( 'email-other-settings' ) );
 
 	$template_names = array(
-			'private_message_new' => T_('I receive a private message.'),
-			'comment_spam' => T_('a comment is reported as spam and I have permissions to moderate it.'),
-			'post_assignment' => T_('a post was assigned to me.'),
-			'account_new' => T_( 'a new user has registered.' ),
-			'account_activated' => T_( 'an account was activated.' ),
-			'account_closed' => T_( 'an account was closed.' ),
-			'account_reported' => T_( 'an account was reported.' ),
-			'account_changed' => T_( 'an account was changed.' ),
-			'scheduled_task_error_report' => T_( 'a scheduled task ends with an error or timeout.' ),
-			'automation_owner_notification' => T_('one of my automations wants to notify me.'),
+			'private_message_new' => '&hellip;'.T_('I receive a private message.'),
+			'comment_spam' => '&hellip;'.T_('a comment is reported as spam and I have permissions to moderate it.'),
+			'post_assignment' => '&hellip;'.T_('a post was assigned to me.'),
+			'account_new' => '&hellip;'.T_( 'a new user has registered.' ),
+			'account_activated' => '&hellip;'.T_( 'an account was activated.' ),
+			'account_closed' => '&hellip;'.T_( 'an account was closed.' ),
+			'account_reported' => '&hellip;'.T_( 'an account was reported.' ),
+			'account_changed' => '&hellip;'.T_( 'an account was changed.' ),
+			'scheduled_task_error_report' => '&hellip;'.T_( 'a scheduled task ends with an error or timeout.' ),
+			'automation_owner_notification' => '&hellip;'.T_('one of my automations wants to notify me.'),
 
-			'account_activate' => T_('an account needs to be activated'),
-			'account_password_reset' => T_('a password reset was requested'),
-			'contact_message_new' => T_('I receive a message through the contact form'),
-			'newsletter_test' => T_('an email campaign test was made'),
+			'account_activate' => '&hellip;'.T_('an account needs to be activated'),
+			'account_password_reset' => '&hellip;'.T_('a password reset was requested'),
+			'contact_message_new' => '&hellip;'.T_('I receive a message through the contact form'),
+			'newsletter_test' => '&hellip;'.T_('an email campaign test was made'),
 		);
 
+	$Form->checklist( array(), 'edited_user_notification', T_('Notification when').'&hellip;', false, false );
 	foreach( $template_names as $template => $label )
 	{
 		$Form->radio_input( $template.'_notifications_mode', $Settings->get( $template.'_notifications_mode' ),

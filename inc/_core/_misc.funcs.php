@@ -4107,6 +4107,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'scheduled_task_error_report':
 			case 'automation_owner_notification':
 			case 'newsletter_test':
+			case 'contact_message_new':
 				$notifications_mode = $Settings->get( $template_name.'_notifications_mode' );
 				if( $notifications_mode == 'cron' )
 				{
