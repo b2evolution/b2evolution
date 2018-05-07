@@ -267,8 +267,8 @@ function check_combo( selector )
 	if( select_obj.find( 'option:first' ).is( ':selected' ) )
 	{	// Display the input text and focus on:
 		input_obj.show().focus();
-		if( input_obj.data( 'required' ) == 'required' )
-		{ // Combo box is required, restore the appropriate attribute
+		if( select_obj.attr( 'required' ) == 'required' )
+		{	// Combo box is required, restore the appropriate attribute for input:
 			input_obj.attr( 'required', 'required' );
 		}
 	}

@@ -2956,7 +2956,7 @@ class Form extends Widget
 			$input_params['class'] .= ' '.$field_params['new_field_class_required'];
 			if( $field_params['required'] === true )
 			{
-				$input_params['data-required'] = 'required';
+				$input_params['required'] = 'required';
 			}
 		}
 
@@ -2979,7 +2979,6 @@ class Form extends Widget
 		unset( $field_params['new_field_class_error'] );
 		unset( $field_params['new_field_class_required'] );
 		unset( $field_params['new_field_size'] );
-		//unset( $field_params['required'] );
 		unset( $field_params['placeholder'] );
 		unset( $field_params['new_option_value'] );
 		unset( $field_params['new_option_label'] );
