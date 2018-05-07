@@ -36,7 +36,7 @@ $Form->begin_form( 'fform',  T_('Create sample email campaigns') );
 	{
 		$list_options[] = array( 'campaign_lists[]', $Newsletter->ID, $Newsletter->name, is_null( $campaign_lists ) || in_array( $Newsletter->ID, $campaign_lists ), 0 );
 	}
-	$Form->checklist( $list_options, 'campaign_lists', T_('Create new email campaigns in'), true, false,
+	$Form->checklist( $list_options, 'campaign_lists', T_('Create new email campaigns in'), 'mark_only', false,
 		array( 'note' => T_('Note: For each campaign it creates, the tool will randomly select between the allowed (checked) options above') ) );
 
 	$Form->checkbox( 'send_campaign_emails', is_null( $send_campaign_emails ) ? false : $send_campaign_emails, T_('Send test email') );

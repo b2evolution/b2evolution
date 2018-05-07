@@ -2562,7 +2562,7 @@ function display_login_form( $params )
 	else
 	{
 		$Form->login_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, '', '',
-					array( 'maxlength' => 255, 'input_required' => 'required', 'placeholder' => T_('Username (or email address)') ) );
+					array( 'maxlength' => 255, 'required' => true, 'placeholder' => T_('Username (or email address)') ) );
 	}
 
 	if( $params['display_lostpass_link'] )
