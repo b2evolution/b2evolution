@@ -55,7 +55,7 @@ $current_sql = 'SELECT "current" AS iver_ID, "c" AS param_ID,
 
 // SQL to get old versions:
 $old_versions_SQL = new SQL();
-$old_versions_SQL->SELECT( 'iver_ID, CONCAT( "a", iver_ID ) as param_ID, iver_edit_last_touched_ts, iver_edit_user_ID, iver_type, iver_status, iver_title, user_login, CONCAT( "-", iver_ID ) AS version_order' );
+$old_versions_SQL->SELECT( 'iver_ID, CONCAT( "a", iver_ID ) as param_ID, iver_edit_last_touched_ts, iver_edit_user_ID, iver_type, iver_status, iver_title, user_login, -iver_ID AS version_order' );
 $old_versions_SQL->FROM( 'T_items__version' );
 // LEFT JOIN users to display versions edited by already deleted users
 $old_versions_SQL->FROM_add( 'LEFT JOIN T_users ON iver_edit_user_ID = user_ID' );
@@ -72,9 +72,9 @@ $revisions_count = intval( $DB->get_var( $count_SQL->get() ) );
 $default_order = $revisions_count > 1 ? '---D' : '-D';
 
 // Create result set:
-$history_sql = $proposed_changes_SQL->get()
+$history_sql = $old_versions_SQL->get()
 	.' UNION '.$current_sql
-	.' UNION '.$old_versions_SQL->get()
+	.' UNION '.$proposed_changes_SQL->get()
 	.' ORDER BY version_order DESC';
 $Results = new Results( $history_sql, 'iver_', $default_order, NULL, $revisions_count );
 

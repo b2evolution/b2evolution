@@ -9171,6 +9171,10 @@ class Item extends ItemLight
 			return false;
 		}
 
+		global $DB;
+
+		$DB->begin( 'SERIALIZABLE' );
+
 		// Update main fields:
 		$this->set( 'status', $Revision->iver_status );
 		$this->set( 'title', $Revision->iver_title );
@@ -9189,7 +9193,108 @@ class Item extends ItemLight
 
 		$r = $this->dbupdate();
 
-		// TODO: Update attachments
+		// Update attachments:
+		$current_links_SQL = new SQL( 'Get current links of Item #'.$this->ID.' before updating from revision' );
+		$current_links_SQL->SELECT( '*' );
+		$current_links_SQL->FROM( 'T_links' );
+		$current_links_SQL->WHERE( 'link_itm_ID = '.$this->ID );
+		$current_links = $DB->get_results( $current_links_SQL, OBJECT, '', 'link_ID' );
+
+		$revision_links_SQL = new SQL( 'Get attachments of Item #'.$this->ID.' for revision #'.$Revision->iver_ID.'('.$Revision->iver_type.') before updating from revision' );
+		$revision_links_SQL->SELECT( 'T_items__version_link.*' );
+		$revision_links_SQL->FROM( 'T_items__version_link' );
+		$revision_links_SQL->FROM_add( 'INNER JOIN T_files ON ivl_file_ID = file_ID' );
+		$revision_links_SQL->WHERE( 'ivl_iver_ID = '.$Revision->iver_ID );
+		$revision_links_SQL->WHERE_and( 'ivl_iver_itm_ID = '.$this->ID );
+		$revision_links_SQL->WHERE_and( 'ivl_iver_type = '.$DB->quote( $Revision->iver_type ) );
+		$revision_links = $DB->get_results( $revision_links_SQL, OBJECT, '', 'ivl_link_ID' );
+
+		// Use this array to check for uniqueness links by order:
+		$link_orders = array();
+
+		$LinkOwner = new LinkItem( $this );
+		$LinkCache = & get_LinkCache();
+		foreach( $current_links as $current_link_ID => $current_link )
+		{
+			if( ! isset( $revision_links[ $current_link_ID ] ) )
+			{	// This link doesn't exist in revision, Delete it:
+				if( $deleted_Link = & $LinkCache->get_by_ID( $current_link_ID, false, false ) &&
+				    $LinkOwner->remove_link( $deleted_Link, true ) )
+				{
+					$LinkOwner->after_unlink_action( $current_link_ID );
+				}
+			}
+			else
+			{	// This link exists in revision, we should keep it:
+				// Also store an order in the array to check for uniqueness them by order:
+				$link_orders[ $current_link_ID ] = $current_link->link_order;
+			}
+		}
+
+		if( count( $revision_links ) )
+		{	// It revision has at least one link/attachment:
+			$updated_links = array();
+			$delete_updated_links = array();
+			foreach( $revision_links as $revision_link_ID => $revision_link )
+			{	// Add links of revision to array to check for uniqueness them by order:
+				$link_orders[ $revision_link_ID ] = $revision_link->ivl_order;
+				if( isset( $current_links[ $revision_link_ID ] ) )
+				{	// Store here what links of current version must be updated from revision:
+					$updated_links[ $revision_link_ID ] = $current_links[ $revision_link_ID ];
+					$delete_updated_links[] = $revision_link_ID;
+				}
+			}
+
+			if( count( $delete_updated_links ) )
+			{	// Delete the links(which must be updated) rows temporary from DB in order insert them later with new data to avoid duplicate entry error:
+				$DB->query( 'DELETE FROM T_links
+					WHERE link_ID IN ( '.$DB->quote( $delete_updated_links ).' )
+						AND link_itm_ID = '.$DB->quote( $this->ID ),
+					'Temporary deleting of links rows which must be updated from revision' );
+			}
+
+			// Sort links by order and check for duplicate orders:
+			asort( $link_orders );
+			$prev_order = -1;
+			foreach( $link_orders as $link_ID => $link_order )
+			{
+				if( $prev_order >= $link_order )
+				{	// If previous link has same order then increase it to avoid a duplicate error on insert links in DB:
+					$link_orders[ $link_ID ]++;
+				}
+				$prev_order = $link_order;
+			}
+
+			$insert_links_sql = array();
+			foreach( $revision_links as $revision_link_ID => $revision_link )
+			{
+				if( isset( $updated_links[ $revision_link_ID ] ) )
+				{	// This link exists in current version, Update it:
+					$updated_link = $updated_links[ $revision_link_ID ];
+				}
+				{	// This link doesn't exist in current version, Insert it:
+					$updated_link = false;
+				}
+				$insert_links_sql[] = '( '.$DB->quote( array(
+						$revision_link_ID,
+						$updated_link ? $updated_link->link_datecreated      : $Revision->iver_edit_last_touched_ts,
+						$updated_link ? $updated_link->link_datemodified     : $Revision->iver_edit_last_touched_ts,
+						$updated_link ? $updated_link->link_creator_user_ID  : $Revision->iver_edit_user_ID,
+						$updated_link ? $updated_link->link_lastedit_user_ID : $Revision->iver_edit_user_ID,
+						$this->ID,
+						$revision_link->ivl_file_ID,
+						$revision_link->ivl_position,
+						$link_orders[ $revision_link_ID ]
+					) ).' )';
+			}
+
+			// Insert/Update links with data from revision:
+			$DB->query( 'INSERT INTO T_links ( link_ID, link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_itm_ID, link_file_ID, link_position, link_order )
+				VALUES '.implode( ', ', $insert_links_sql ),
+				'Insert/Update item links with data from revision #'.$Revision->iver_ID.'('.$Revision->iver_type.')' );
+		}
+
+		$DB->commit();
 
 		return $r;
 	}

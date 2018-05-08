@@ -1017,11 +1017,14 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
-		param( 'r', 'integer', 0 );
+		if( $edited_Item->check_before_update() )
+		{	// Allow to restore an archived version only when it is not restricted currently for the edited Item:
+			param( 'r', 'integer', 0 );
 
-		if( $r > 0 && $edited_Item->update_from_revision( $r ) )
-		{	// Update item only from revisions ($r == 0 for current version):
-			$Messages->add( sprintf( T_('Item has been restored from revision #%s'), $r ), 'success' );
+			if( $r > 0 && $edited_Item->update_from_revision( $r ) )
+			{	// Update item only from revisions ($r == 0 for current version):
+				$Messages->add( sprintf( T_('Item has been restored from revision #%s'), $r ), 'success' );
+			}
 		}
 
 		header_redirect( regenerate_url( 'action', 'action=history', '', '&' ) );
@@ -1946,26 +1949,31 @@ switch( $action )
 		if( $action == 'accept_propose' )
 		{	// Accept the proposed change:
 			// Update current Item with values from the requested proposed change:
-			$edited_Item->update_from_revision( get_param( 'r' ) );
-			$Messages->add( sprintf( T_('The proposed change #%d has been accepted.'), $Revision->iver_ID ), 'success' );
+			$result = $edited_Item->update_from_revision( get_param( 'r' ) );
+			$success_message = sprintf( T_('The proposed change #%d has been accepted.'), $Revision->iver_ID );
 		}
 		else
 		{	// Reject the proposed change:
-			$Messages->add( sprintf( T_('The proposed change #%d has been rejected.'), $Revision->iver_ID ), 'success' );
+			$result = true;
+			$success_message = sprintf( T_('The proposed change #%d has been rejected.'), $Revision->iver_ID );
 		}
-		// Delete also the proposed changes with custom fields and links to complete accept/reject action:
-		$DB->query( 'DELETE FROM T_items__version
-			WHERE iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
-				AND iver_type = "proposed"
-				AND iver_ID >= '.$Revision->iver_ID );
-		$DB->query( 'DELETE FROM T_items__version_custom_field
-			WHERE ivcf_iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
-				AND ivcf_iver_type = "proposed"
-				AND ivcf_iver_ID >= '.$Revision->iver_ID );
-		$DB->query( 'DELETE FROM T_items__version_link
-			WHERE ivl_iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
-				AND ivl_iver_type = "proposed"
-				AND ivl_iver_ID >= '.$Revision->iver_ID );
+		if( $result )
+		{	// Delete also the proposed changes with custom fields and links to complete accept/reject action:
+			$DB->query( 'DELETE FROM T_items__version
+				WHERE iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
+				  AND iver_type = "proposed"
+				  AND iver_ID >= '.$Revision->iver_ID );
+			$DB->query( 'DELETE FROM T_items__version_custom_field
+				WHERE ivcf_iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
+				  AND ivcf_iver_type = "proposed"
+				  AND ivcf_iver_ID >= '.$Revision->iver_ID );
+			$DB->query( 'DELETE FROM T_items__version_link
+				WHERE ivl_iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
+				  AND ivl_iver_type = "proposed"
+				  AND ivl_iver_ID >= '.$Revision->iver_ID );
+			// Display success message:
+			$Messages->add( $success_message, 'success' );
+		}
 
 		// Redirect to item history page with new poroposed change:
 		header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );

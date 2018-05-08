@@ -238,13 +238,14 @@ class LinkItem extends LinkOwner
 	 * Remove link from the owner
 	 *
 	 * @param object Link
+	 * @param boolean TRUE to force a removing
 	 * @return boolean true on success
 	 */
-	function remove_link( & $Link )
+	function remove_link( & $Link, $force = false )
 	{
 		global $DB, $localtimenow;
 
-		if( ! $this->Item->check_before_update() )
+		if( ! $force && ! $this->Item->check_before_update() )
 		{	// If the Link's Item cannot be updated:
 			// (e-g it can be restricted if this item has at least one proposed change)
 			return false;
