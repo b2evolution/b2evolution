@@ -16,37 +16,44 @@ $SQL->LIMIT( $Settings->get( 'email_notifications_chunk_size' ) );
 
 $email_notifications = $DB->get_results( $SQL, ARRAY_A, 'Get deferred email notifications' );
 
-cron_log_append( sprintf( 'Sending %d email notifications...', count( $email_notifications ) )."\n" );
-foreach( $email_notifications as $notification )
+if( count( $email_notifications ) > 0 )
 {
-	$message_data = unserialize( $notification['emlog_message'] );
-
-	$to                = $notification['emlog_to'];
-	$to_name           = $message_data === false ? $message_data['to_name'] : NULL;
-	$subject           = $notification['emlog_subject'];
-	$message           = $message_data === false ? $notification['emlog_message'] : $message_data;
-	$from              = $message_data === false ? $message_data['from_email'] : NULL;
-	$from_name         = $message_data === false ? $message_data['from_name'] : NULL;
-	$headers           = parse_mail_headers( $notification['emlog_headers'] );
-	$user_ID           = $notification['emlog_user_ID'];
-	$email_campaign_ID = $notification['emlog_camp_ID'];
-	$automation_ID     = $notification['emlog_autm_ID'];
-	$mail_log_ID       = $notification['emlog_ID'];
-
-	if( send_mail( $to, $to_name, $subject, $message, $from, $from_name, $headers, $user_ID, $email_campaign_ID, $automation_ID, $mail_log_ID ) )
+	cron_log_append( sprintf( 'Sending %d email notifications...', count( $email_notifications ) )."\n" );
+	foreach( $email_notifications as $notification )
 	{
-		$result = 'success';
-	}
-	else
-	{
-		$result = 'failed';
-	}
+		$message_data = unserialize( $notification['emlog_message'] );
 
-	cron_log_append( sprintf( 'Sending email #%d: %s', $mail_log_ID, $result ) );
+		$to                = $notification['emlog_to'];
+		$to_name           = $message_data === false ? $message_data['to_name'] : NULL;
+		$subject           = $notification['emlog_subject'];
+		$message           = $message_data === false ? $notification['emlog_message'] : $message_data;
+		$from              = $message_data === false ? $message_data['from_email'] : NULL;
+		$from_name         = $message_data === false ? $message_data['from_name'] : NULL;
+		$headers           = parse_mail_headers( $notification['emlog_headers'] );
+		$user_ID           = $notification['emlog_user_ID'];
+		$email_campaign_ID = $notification['emlog_camp_ID'];
+		$automation_ID     = $notification['emlog_autm_ID'];
+		$mail_log_ID       = $notification['emlog_ID'];
 
-	// Store messages of the post sending email notifications:
-	cron_log_action_end( $Messages->get_string( '', '', "\n", '' ) );
-	$Messages->clear();
+		if( send_mail( $to, $to_name, $subject, $message, $from, $from_name, $headers, $user_ID, $email_campaign_ID, $automation_ID, $mail_log_ID ) )
+		{
+			$result = 'success';
+		}
+		else
+		{
+			$result = 'failed';
+		}
+
+		cron_log_append( sprintf( 'Sending email #%d: %s', $mail_log_ID, $result ) );
+
+		// Store messages of the post sending email notifications:
+		cron_log_action_end( $Messages->get_string( '', '', "\n", '' ) );
+		$Messages->clear();
+	}
+}
+else
+{
+	cron_log_append( "No queued email notifications to send.\n" );
 }
 
 if( empty( $result_message ) )

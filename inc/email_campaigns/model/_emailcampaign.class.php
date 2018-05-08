@@ -835,7 +835,7 @@ class EmailCampaign extends DataObject
 	 */
 	function send_email( $user_ID, $email_address = '', $mode = '', $update_sent_ts = false, $newsletter_ID = NULL, $automation_ID = NULL )
 	{
-		global $localtimenow;
+		global $Settings, $localtimenow;
 
 		$newsletter_params = array(
 				'include_greeting' => false,
@@ -863,7 +863,8 @@ class EmailCampaign extends DataObject
 			if( $test_User = & $UserCache->get_by_ID( $user_ID, false, false ) )
 			{ // Send a test email only when test user exists
 				$message = mail_template( 'newsletter', 'auto', $newsletter_params, $test_User );
-				$result = send_mail( $email_address, NULL, $this->get( 'email_title' ), $message, NULL, NULL, $headers );
+				$result = send_mail( $email_address, NULL, $this->get( 'email_title' ), $message, NULL, NULL, $headers,
+						NULL, NULL, NULL, $Settings->get( 'newsletter_test_notifications_mode' ) == 'cron' ? '#' : NULL );
 			}
 			else
 			{ // No test user found
