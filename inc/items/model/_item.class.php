@@ -11038,8 +11038,8 @@ class Item extends ItemLight
 		if( ! isset( $this->check_before_update ) )
 		{	// Check and save result in cache var:
 			if( empty( $this->ID ) )
-			{	// Item is not created yet, so it cannot be updated:
-				$this->check_before_update = false;
+			{	// Item is not created yet, so it can be updated, i.e. insert new record without restriction:
+				$this->check_before_update = true;
 			}
 			elseif( $this->has_proposed_change() )
 			{	// Don't allow to edit this Item if it has at least one proposed change:

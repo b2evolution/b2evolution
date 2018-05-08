@@ -1352,8 +1352,10 @@ function skin_init( $disp )
 			// Check if this Item can be updated:
 			// (e-g it can be restricted if this item has at least one proposed change)
 			$ItemCache = & get_ItemCache ();
-			$edited_Item = & $ItemCache->get_by_ID ( $post_ID );
-			$edited_Item->check_before_update();
+			if( $edited_Item = & $ItemCache->get_by_ID ( $post_ID, false, false ) )
+			{
+				$edited_Item->check_before_update();
+			}
 
 			// Prepare the 'In-skin editing':
 			init_inskin_editing();
