@@ -6371,9 +6371,15 @@ class Item extends ItemLight
 				return parent::set( 'status', $parvalue, $make_null );
 
 			case 'revision':
-				if( isset( $this->custom_fields ) && ( ! isset( $this->revision ) || $this->revision != $parvalue ) )
-				{	// Reset custom fields when revision is changed:
-					unset( $this->custom_fields );
+				if( ! isset( $this->revision ) || $this->revision != $parvalue )
+				{	// When revision is changed:
+					if( isset( $this->custom_fields ) )
+					{	// Reset custom fields:
+						unset( $this->custom_fields );
+					}
+					// Clear Links/Attachments to load them with data from other revision:
+					$LinkCache = & get_LinkCache();
+					$LinkCache->clear();
 				}
 				if( $parvalue == 'c' )
 				{	// Don't set revision if required to current version:
@@ -10819,6 +10825,8 @@ class Item extends ItemLight
 		// Get next version ID:
 		$iver_ID = $this->get_next_version_ID( 'archived' );
 
+		$DB->begin( 'SERIALIZABLE' );
+
 		$result = $DB->query( 'INSERT INTO T_items__version
 				( iver_ID, iver_itm_ID, iver_edit_user_ID, iver_edit_last_touched_ts, iver_status, iver_title, iver_content )
 				SELECT '.$iver_ID.' AS iver_ID, post_ID, post_lastedit_user_ID, post_last_touched_ts, post_status, post_title, post_content
@@ -10828,39 +10836,53 @@ class Item extends ItemLight
 
 		if( $result )
 		{	// Create a revision for custom fields:
-			if( count( $this->dbchanges_custom_fields ) )
+			$custom_fields = $this->get_type_custom_fields();
+			if( count( $custom_fields ) )
 			{	// If at least one custom field has been updated:
-				$custom_fields = $this->get_type_custom_fields();
 				$custom_field_values = array();
-				foreach( $this->dbchanges_custom_fields as $custom_field_name => $custom_field_value )
+				foreach( $custom_fields as $custom_field_name => $custom_field )
 				{
-					$custom_field = $custom_fields[ $custom_field_name ];
-					$custom_field_values[] = '('.$iver_ID.','.$DB->quote( $this->ID ).','.$custom_field['ID'].','.$DB->quote( $custom_field['label'] ).','.$DB->quote( $custom_field_value ).')';
-				}
-				$result = $DB->query( 'INSERT INTO T_items__version_custom_field
-						( ivcf_iver_ID, ivcf_iver_itm_ID, ivcf_itcf_ID, ivcf_itcf_label, ivcf_value )
-						VALUES '.implode( ',', $custom_field_values ),
-					'Save a version of the custom fields' ) !== false;
-			}
-
-			if( $result )
-			{	// Create a revision for links/attachments:
-				$LinkOwner = new LinkItem( $this );
-				$existing_Links = & $LinkOwner->get_Links();
-
-				if( ! empty( $existing_Links ) )
-				{
-					$link_values = array();
-					foreach( $existing_Links as $loop_Link )
+					if( isset( $this->dbchanges_custom_fields[ $custom_field_name ] ) )
 					{
-						$link_values[] = '('.$iver_ID.','.$this->ID.','.$loop_Link->ID.','.$loop_Link->file_ID.','.$DB->quote( $loop_Link->position ).','.$loop_Link->order.')';
+						$custom_field_values[] = '('.$iver_ID.','.$DB->quote( $this->ID ).','.$custom_field['ID'].','.$DB->quote( $custom_field['label'] ).','.$DB->quote( $this->dbchanges_custom_fields[ $custom_field_name ] ).')';
 					}
-					$result = $DB->query( 'INSERT INTO T_items__version_link
-							( ivl_iver_ID, ivl_iver_itm_ID, ivl_link_ID, ivl_file_ID, ivl_position, ivl_order )
-							VALUES '.implode( ',', $link_values ),
-						'Save a version of attachments' ) !== false;
+				}
+				if( count( $custom_field_values ) )
+				{
+					$result = $DB->query( 'INSERT INTO T_items__version_custom_field
+							( ivcf_iver_ID, ivcf_iver_itm_ID, ivcf_itcf_ID, ivcf_itcf_label, ivcf_value )
+							VALUES '.implode( ',', $custom_field_values ),
+						'Save a version of the custom fields' ) !== false;
 				}
 			}
+		}
+
+		if( $result )
+		{	// Create a revision for links/attachments:
+			$LinkOwner = new LinkItem( $this );
+			$existing_Links = & $LinkOwner->get_Links();
+
+			if( ! empty( $existing_Links ) )
+			{
+				$link_values = array();
+				foreach( $existing_Links as $loop_Link )
+				{
+					$link_values[] = '('.$iver_ID.','.$this->ID.','.$loop_Link->ID.','.$loop_Link->file_ID.','.$DB->quote( $loop_Link->position ).','.$loop_Link->order.')';
+				}
+				$result = $DB->query( 'INSERT INTO T_items__version_link
+						( ivl_iver_ID, ivl_iver_itm_ID, ivl_link_ID, ivl_file_ID, ivl_position, ivl_order )
+						VALUES '.implode( ',', $link_values ),
+					'Save a version of attachments' ) !== false;
+			}
+		}
+
+		if( $result )
+		{
+			$DB->commit();
+		}
+		else
+		{
+			$DB->rollback();
 		}
 
 		return $result ? $iver_ID : false;
@@ -10985,7 +11007,7 @@ class Item extends ItemLight
 				.$DB->quote( $this->get( 'status' ) ).','
 				.$DB->quote( $this->get( 'title' ) ).','
 				.$DB->quote( $this->get( 'content' ) ).' )',
-			'Save a proposed change of the Item #'.$this->ID );
+			'Save a proposed change of the Item #'.$this->ID ) !== false;
 
 		if( $result && ( $custom_fields = $this->get_type_custom_fields() ) )
 		{	// Save custom fields of the proposition:
@@ -11001,7 +11023,18 @@ class Item extends ItemLight
 			}
 			$result = $DB->query( 'INSERT INTO T_items__version_custom_field ( ivcf_iver_ID, ivcf_iver_type, ivcf_iver_itm_ID, ivcf_itcf_ID, ivcf_itcf_label, ivcf_value )
 				VALUES '.implode( ', ', $custom_fields_insert_sql ),
-				'Save custom fields for a proposed change of the Item #'.$this->ID );
+				'Save custom fields for a proposed change of the Item #'.$this->ID ) !== false;
+		}
+
+		if( $result )
+		{	// Save links/attachments of current version to new created proposed change:
+			// TODO: This is a temporary solution. We must allow to edit links/attachements for a proposed change and store them here!
+			$result = $DB->query( 'INSERT INTO T_items__version_link
+					( ivl_iver_ID, ivl_iver_type, ivl_iver_itm_ID, ivl_link_ID, ivl_file_ID, ivl_position, ivl_order )
+					SELECT '.$iver_ID.', "proposed", link_itm_ID, link_ID, link_file_ID, link_position, link_order
+					  FROM T_links
+					 WHERE link_itm_ID = '.$this->ID,
+				'Save custom fields for a proposed change of the Item #'.$this->ID ) !== false;
 		}
 
 		if( $result )

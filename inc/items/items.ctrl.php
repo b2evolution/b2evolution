@@ -964,6 +964,7 @@ switch( $action )
 		$oneline_TableDiffFormatter = new TableDiffFormatter();
 		$oneline_TableDiffFormatter->block_header = '';
 		$revisions_difference_custom_fields = array();
+		// Switch to 1st revision:
 		$edited_Item->set( 'revision', get_param( 'r1' ) );
 		$custom_fields = $edited_Item->get_type_custom_fields();
 		$r1_custom_fields = array();
@@ -971,6 +972,7 @@ switch( $action )
 		{
 			$r1_custom_fields[ $custom_field['name'] ] = $edited_Item->get_custom_field_value( $custom_field['name'], false, false );
 		}
+		// Switch to 2nd revision:
 		$edited_Item->set( 'revision', get_param( 'r2' ) );
 		$r2_custom_fields = $edited_Item->get_type_custom_fields();
 		foreach( $r2_custom_fields as $r2_custom_field )
@@ -1024,6 +1026,48 @@ switch( $action )
 						'deleted'      => ( strpos( $custom_field['name'], '!deleted_' ) === 0 ),
 						'difference'   => $revisions_difference_custom_field,
 					);
+			}
+		}
+
+		// Compare the links of two revisions:
+		$LinkOwner = new LinkItem( $edited_Item );
+		// Switch to 1st revision:
+		$edited_Item->set( 'revision', get_param( 'r1' ) );
+		$revisions_difference_links = array();
+		if( $r1_LinkList = $LinkOwner->get_attachment_LinkList() )
+		{
+			while( $r1_Link = & $r1_LinkList->get_next() )
+			{
+				$revisions_difference_links[ $r1_Link->ID ]['r1'] = array(
+						'icon'     => $r1_Link->get_preview_thumb(),
+						'path'     => ( $r1_link_File = & $r1_Link->get_File() ? $r1_link_File->get_view_link() : false ),
+						'order'    => $r1_Link->get( 'order' ),
+						'position' => $r1_Link->get( 'position' ),
+						'file_ID'  => $r1_Link->get( 'file_ID' ),
+					);
+			}
+		}
+		// Switch to 2nd revision:
+		$edited_Item->set( 'revision', get_param( 'r2' ) );
+		if( $r2_LinkList = $LinkOwner->get_attachment_LinkList() )
+		{
+			while( $r2_Link = & $r2_LinkList->get_next() )
+			{
+				$r_link_data = array(
+						'icon'     => $r2_Link->get_preview_thumb(),
+						'path'     => ( $r2_link_File = & $r2_Link->get_File() ? $r2_link_File->get_view_link() : false ),
+						'order'    => $r2_Link->get( 'order' ),
+						'position' => $r2_Link->get( 'position' ),
+						'file_ID'  => $r2_Link->get( 'file_ID' ),
+					);
+				if( isset( $revisions_difference_links[ $r2_Link->ID ]['r1'] ) && $revisions_difference_links[ $r2_Link->ID ]['r1'] == $r_link_data )
+				{	// The links/attachments of both revisions are equal:
+					unset( $revisions_difference_links[ $r2_Link->ID ] );
+				}
+				else
+				{	// The links/attachments of both revisions have at least one difference:
+					$revisions_difference_links[ $r2_Link->ID ]['r2'] = $r_link_data;
+				}
 			}
 		}
 
@@ -2371,7 +2415,7 @@ if( !empty( $Blog ) )
 }
 */
 
-if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action, 'new' ) !== false )
+if( $action == 'view' || $action == 'history_compare' || strpos( $action, 'edit' ) !== false || strpos( $action, 'new' ) !== false )
 {	// Initialize js to autocomplete usernames in post/comment form
 	init_autocomplete_usernames_js();
 	// Require colorbox js:

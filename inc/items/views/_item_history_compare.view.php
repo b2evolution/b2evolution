@@ -17,7 +17,7 @@ global $admin_url;
 
 global $edited_Item, $Revision_1, $Revision_2;
 
-global $revisions_difference_title, $revisions_difference_content, $revisions_difference_custom_fields;
+global $revisions_difference_title, $revisions_difference_content, $revisions_difference_custom_fields, $revisions_difference_links;
 
 $post_statuses = get_visibility_statuses();
 
@@ -77,7 +77,7 @@ else
 }
 
 if( ! empty( $revisions_difference_custom_fields ) )
-{	// Dispay custom fields difference:
+{	// Display custom fields difference:
 ?>
 		<tr><td colspan="4">&nbsp;</td></tr>
 		<tr>
@@ -107,6 +107,87 @@ if( ! empty( $revisions_difference_custom_fields ) )
 		}
 		echo $revisions_diff_data['difference'];
 	}
+}
+
+if( ! empty( $revisions_difference_links ) )
+{	// Display links/attachments difference:
+?>
+		<tr><td colspan="4">&nbsp;</td></tr>
+		<tr>
+			<td colspan="4" class="diff-title-addedline"><b><?php echo T_('Images &amp; Attachments').':'; ?></b></td>
+		</tr>
+		<tr>
+			<td colspan="4">
+				<table class="table table-striped table-bordered table-condensed">
+					<thead>
+						<tr>
+						<?php
+						for( $r = 1; $r <= 2; $r++ )
+						{	// Print out table headers for two revisions:
+							echo '<th class="nowrap">'.T_('Icon/Type').'</th>';
+							echo '<th class="nowrap" width="50%">'.T_('Destination').'</th>';
+							echo '<th class="nowrap">'.T_('Order').'</th>';
+							echo '<th class="nowrap">'.T_('Position').'</th>';
+							if( $r == 1 )
+							{	// Use ID column as separator between the compared revisions:
+								echo '<th class="nowrap">'.T_('Link ID').'</th>';
+							}
+						}
+						?>
+						</tr>
+					</thead>
+					<tbody>
+					<?php
+					foreach( $revisions_difference_links as $link_ID => $links_data )
+					{
+						echo '<tr>';
+						for( $r = 1; $r <= 2; $r++ )
+						{	// Print out differences of the compared revisions:
+							if( isset( $links_data['r'.$r] ) )
+							{	// If the revision has the Link/Attachment:
+								$link = $links_data['r'.$r];
+								foreach( $links_data['r'.$r] as $link_key => $link_value )
+								{	// Print out each link propoerty:
+									if( $link_key == 'file_ID' )
+									{	// Skip column with file ID:
+										continue;
+									}
+									$r2 = $r == 1 ? 2 : 1;
+									$class = '';
+									if( isset( $links_data['r'.$r2][ $link_key ] ) && $link_value != $links_data['r'.$r2][ $link_key ] )
+									{	// Mark the different property with red background color:
+										$class .= 'bg-danger';
+									}
+									if( $link_key == 'order' )
+									{	// Order value must be aligned to the right:
+										$class .= ' text-right';
+									}
+									elseif( $link_key == 'path' && $link_value === false )
+									{	// If file was deleted:
+										$link_value = '<b class="red">'.sprintf( T_('The file "%s" was deleted'), '#'.$links_data['r'.$r]['file_ID'] ).'</b>';
+										$class .= ' bg-danger';
+									}
+									$class = trim( $class );
+									echo '<td'.( empty( $class ) ? '' : ' class="'.$class.'"' ).'>'.$link_value.'</td>';
+								}
+							}
+							else
+							{	// If the revision has no the Link/Attachment:
+								echo '<td colspan="4"><b class="violet">'.sprintf( T_('The attachment "%s" is not used in this revision'), '#'.$link_ID ).'</b></td>';
+							}
+							if( $r == 1 )
+							{	// Use ID column as separator between the compared revisions:
+								echo '<td class="bg-info text-right"><b>'.$link_ID.'</b></td>';
+							}
+						}
+						echo '</tr>';
+					}
+					?>
+					</tbody>
+				</table>
+			</td>
+		</tr>
+<?php
 }
 ?>
 </table>
