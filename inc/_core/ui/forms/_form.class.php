@@ -61,7 +61,7 @@ class Form extends Widget
 	 * - 'note_format': The format of the note. %s gets replaced by the note.
 	 * - 'bottom_note_format': The format of the note. %s gets replaced by the note.
 	 * - 'label': The label for the field.
-	 * - 'required': is the element required to be filled/checked? This will add a visual hint (boolean; default: false)
+	 * - 'required': set to 'true' if field should be marked as required and frontend validated (use 'mark_only' to skip frontend validation)
 	 *
 	 * @see handle_common_params()
 	 * @var array
@@ -1056,7 +1056,7 @@ class Form extends Widget
 	 *                 - 'class': the CSS class to use for the <input> element
 	 *                 - 'type': 'text', 'password' (defaults to 'text')
 	 *                 - 'force_to': 'UpperCase' (JS onchange handler)
-	 *                 - 'required': set to 'true' if both backend and frontend validation is required (use 'backend_only' for backend validation only)
+	 *                 - 'required': set to 'true' if field should be marked as required and frontend validated (use 'mark_only' to skip frontend validation)
 	 *                 - NOTE: any other attributes will be used as is (onchange, onkeyup, id, ..).
 	 * @return true|string true (if output) or the generated HTML if not outputting
 	 */
@@ -1151,6 +1151,7 @@ class Form extends Widget
 	 *                 - 'type': 'text', 'password' (defaults to 'text')
 	 *                 - 'force_to': 'UpperCase' (JS onchange handler)
 	 *                 - NOTE: any other attributes will be used as is (onchange, onkeyup, id, ..).
+	 *                 - 'required': set to 'true' if field should be marked as required and frontend validated (use 'mark_only' to skip frontend validation)
 	 * @return true|string true (if output) or the generated HTML if not outputting
 	 */
 	function color_input( $field_name, $field_value, $field_label, $field_note = '', $field_params = array() )
@@ -1374,7 +1375,18 @@ class Form extends Widget
 				'status' => 'all', // Restrict users by status, 'all' - get users with all statuses, '' - activated, autoactivated and manually activated, or custom statuses separated by comma like 'new,activated,manualactivated,autoactivated,closed,deactivated,emailchanged,failedactivation'
 			), $field_params );
 
+		// The value of field param 'required' will be replaced by the next call to handle_common_params(), let's store the original value...
+		if( isset( $field_params['required'] ) )
+		{
+			$required_param = $field_params['required'];
+		}
+
 		$this->handle_common_params( $field_params, $field_name, $field_label );
+
+		if( isset( $required_param ) )
+		{ // restore original value of field param 'required'
+			$field_params['required'] = $required_param;
+		}
 
 		$r = $this->begin_field();
 
@@ -1860,7 +1872,9 @@ class Form extends Widget
 		$field_class = ' class="'.$field_class.'"';
 
 		// Display <select> with periods values
-		$r .= "\n".'<select name="'.$field_prefix.'_value" id="'.Form::get_valid_id( $field_prefix ).'_value"'.$field_class.'>';
+
+		$r .= "\n".'<select name="'.$field_prefix.'_value" id="'.Form::get_valid_id( $field_prefix ).'_value"'.$field_class
+				.( isset( $field_params['required'] ) && $field_params['required'] == 'required' ? ' required="required"' : '' ).'>';
 		if( $field_params['allow_none_value'] )
 		{	// Allow null value:
 			$r .= '<option value="0"'.( 0 == $current_value ? ' selected="selected"' : '' ).'>'.$field_params['none_value_label'].'</option>'."\n";
@@ -1872,7 +1886,8 @@ class Form extends Widget
 		$r .= '</select>'."\n";
 
 		// Display <select> with periods titles
-		$r .= "\n".'<select name="'.$field_prefix.'_name" id="'.Form::get_valid_id( $field_prefix ).'_name"'.$field_class.'>';
+		$r .= "\n".'<select name="'.$field_prefix.'_name" id="'.Form::get_valid_id( $field_prefix ).'_name"'.$field_class
+				.( isset( $field_params['required'] ) && $field_params['required'] == 'required' ? ' required="required"' : '' ).'>';
 		if( $field_params['allow_none_title'] )
 		{	// Allow none period name:
 			$r .= '<option value="0"'.( '' == $current_period ? ' selected="selected"' : '' ).'>'.$field_params['none_title_label'].'</option>'."\n";
@@ -2357,6 +2372,11 @@ class Form extends Widget
 				'input_suffix' => '',
 			), $field_params );
 
+		if( $required )
+		{
+			$field_params['required'] = $required;
+		}
+
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
 		$r = $this->begin_field( $field_name, $field_label );
@@ -2421,6 +2441,12 @@ class Form extends Widget
 			{ // the checkbox has to be disabled
 				$r .= ' disabled="disabled" ';
 			}
+
+			if( $required === true || ( isset( $field_params['required'] ) && $field_params['required'] === true ) )
+			{
+				$r .= ' required="required" ';
+			}
+
 			$r .= ' class="'.$this->inputclass_checkbox.'" />';
 
 			$r .= $after_field;
@@ -2902,7 +2928,7 @@ class Form extends Widget
 				'new_field_class_error'    => 'field_error', // Style class for error
 				'new_field_class_required' => 'field_required', // Style class for required
 				'new_field_size'           => 30, // Attribute "size"
-				'required'                 => false, // TRUE for required new value
+				'required'                 => false, // set to 'true' if field should be marked as required and frontend validated (use 'mark_only' to skip frontend validation)
 				'placeholder'              => NULL, // Placeholder
 			), $field_params );
 
@@ -2928,8 +2954,10 @@ class Form extends Widget
 		elseif( $field_params['required'] )
 		{	// The field is required, so update its class:
 			$input_params['class'] .= ' '.$field_params['new_field_class_required'];
-			// Add HTML5 attribute:
-			$input_params['required'] = '';
+			if( $field_params['required'] === true )
+			{
+				$input_params['required'] = 'required';
+			}
 		}
 
 		// Hide additional element to enter new value when there is a selected predefined option:
@@ -2951,7 +2979,6 @@ class Form extends Widget
 		unset( $field_params['new_field_class_error'] );
 		unset( $field_params['new_field_class_required'] );
 		unset( $field_params['new_field_size'] );
-		unset( $field_params['required'] );
 		unset( $field_params['placeholder'] );
 		unset( $field_params['new_option_value'] );
 		unset( $field_params['new_option_label'] );
@@ -3066,7 +3093,7 @@ class Form extends Widget
 	 * @param string
 	 * @param integer
 	 * @param string
-	 * @param boolean
+	 * @param mixed set to 'true' if field should be marked as required and frontend validated (use 'mark_only' to skip frontend validation)
 	 * @param string Placeholder text
 	 */
 	function textarea( $field_name, $field_value, $field_rows, $field_label, $field_note = '', $field_cols = 50 , $field_class = '', $required = false, $placeholder = '' )
@@ -3639,8 +3666,14 @@ class Form extends Widget
 		{
 			$field_params['note_format'] = '<div>'.$field_params['note_format'].'</div>';
 		}
+
 		// Why is this set to false for this type? This is needed for js hooks else remove button won't work in type select_input:
 		#$field_params['id'] = false; // No ID attribute for the label
+		if( isset( $field_params['required'] ) )
+		{
+			$field_required = $field_params['required'];
+		}
+
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 		unset($field_params['id']);  // unset, so it gets handled correctly as default below
 
@@ -3680,6 +3713,11 @@ class Form extends Widget
 			elseif( $field_value == $loop_radio['value'] )
 			{ // Current selection:
 				$loop_radio['checked'] = 'checked';
+			}
+
+			if( isset( $field_required ) && $field_required === true )
+			{
+				$loop_radio['required'] = 'required';
 			}
 
 			// Unset non-HTML attribs:
@@ -3730,7 +3768,7 @@ class Form extends Widget
 	 * @param string label
 	 * @param boolean options on seperate lines (DIVs)
 	 * @param string notes
-	 * @param boolean required
+	 * @param mixed required set to 'true' if field should be marked as required and frontend validated (use 'mark_only' to skip frontend validation)
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
 	function radio( $field_name, $field_value, $field_options, $field_label, $field_lines = false, $field_note = '', $field_required = false )
@@ -3764,10 +3802,9 @@ class Form extends Widget
 		}
 
 		$field_params = array( 'lines' => $field_lines, 'note' => $field_note );
-		if( $field_required )
-		{	// Field is required
-			$field_params['required'] = true;
-		}
+
+		// Field is required
+		$field_params['required'] = $field_required;
 
 		return $this->radio_input( $field_name, $field_value, $new_field_options, $field_label, $field_params );
 	}
@@ -3909,7 +3946,7 @@ class Form extends Widget
 	 * @param string Initial value
 	 * @param string Label displayed with the field
 	 * @param string "help" note
-	 * @param array Extended attributes/params
+	 * @param array Extended attributes/params, "required" will only mark the field as required and no front-end validation is possible at the moment
 	 * @return true|string true (if output) or the generated HTML if not outputting
 	 */
 	function fileselect( $field_name, $field_value, $field_label, $field_note = '', $field_params = array() )
@@ -4191,6 +4228,15 @@ class Form extends Widget
 
 	/**
 	 * Generate a tag text input
+	 *
+	 * @param string The name of the input field. This gets used for id also, if no id given in $field_params.
+	 * @param string Initial value
+	 * @param integer Size of the input field
+	 * @param string Label displayed with the field
+	 * @param string "help" note (Should provide something useful, otherwise leave it empty)
+	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
+	 *              - 'class': CSS class for select
+	 *              - 'required': will only mark field as required, no front-end validation implemented
 	 */
 	function usertag_input( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_params = array() )
 	{
@@ -4200,6 +4246,11 @@ class Form extends Widget
 			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 100%">',
 			'input_suffix' => '</div>',
 		), $field_params );
+
+		if( isset( $field_params['required'] ) && $field_params['required'] === true )
+		{ // We can only mark this field as required, the actual input is hidden and cannot be focused on when validation fails.
+			$field_params['required'] = 'mark_only';
+		}
 
 		$save_output = $this->output;
 		$this->output = false;
@@ -4651,7 +4702,7 @@ class Form extends Widget
 		}
 
 		// Mark required fields:
-		if( isset($this->_common_params['required']) && $this->_common_params['required'] )
+		if( isset( $this->_common_params['required'] ) && $this->_common_params['required'] )
 		{ // add "field_required" class:
 			if( isset($field_params['type']) && $field_params['type'] == 'checkbox' )
 			{ // checkboxes need a span
@@ -4662,7 +4713,7 @@ class Form extends Widget
 			{
 				$field_params['class'] = isset( $field_params['class'] ) ? $field_params['class'].' field_required' : 'field_required';
 			}
-			// only add HTML5 "required" attribute if the parameter value is "true"
+			// only add HTML5 "required" attribute if the parameter value is "true" or "required", the latter value can result from nested calls to this function
 			if( $this->_common_params['required'] === true )
 			{
 				$field_params['required'] = 'required';
