@@ -174,6 +174,10 @@ $.extend(SelectInput.prototype, {
 								{
 									send_notice(m);
 								}
+								else
+								{
+									send_notice(e.max_number);
+								}
 							}
 							else
 							{
