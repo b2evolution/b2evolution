@@ -1221,9 +1221,9 @@ class Item extends ItemLight
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
 
 				$custom_field_value = $this->get_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'] );
-				if( $custom_field_value != get_param( $param_name ) )
+				if( $custom_field_value != false )
 				{
-					$this->dbchanges_custom_fields[$custom_field['ID']] = $custom_field_value;
+					$this->dbchanges_custom_fields[ $custom_field['name'] ] = $custom_field_value;
 					$this->dbchanges_flags['custom_fields'] = true;
 				}
 				$this->set_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'], get_param( $param_name ), $custom_field_make_null );
@@ -10819,41 +10819,32 @@ class Item extends ItemLight
 		// Get next version ID:
 		$iver_ID = $this->get_next_version_ID( 'archived' );
 
-		$sql = 'INSERT INTO T_items__version( iver_ID, iver_itm_ID, iver_edit_user_ID, iver_edit_last_touched_ts, iver_status, iver_title, iver_content )
-			SELECT "'.$iver_ID.'" AS iver_ID, post_ID, post_lastedit_user_ID, post_last_touched_ts, post_status, post_title, post_content
-				FROM T_items__item
-				WHERE post_ID = '.$this->ID;
-		$result = $DB->query( $sql, 'Save a version of the Item' ) !== false;
+		$result = $DB->query( 'INSERT INTO T_items__version
+				( iver_ID, iver_itm_ID, iver_edit_user_ID, iver_edit_last_touched_ts, iver_status, iver_title, iver_content )
+				SELECT '.$iver_ID.' AS iver_ID, post_ID, post_lastedit_user_ID, post_last_touched_ts, post_status, post_title, post_content
+				  FROM T_items__item
+				  WHERE post_ID = '.$this->ID,
+			'Save a version of the Item' ) !== false;
 
 		if( $result )
-		{ // Create custom field revisions
-			$custom_field_values = array();
-			$custom_fields = $this->get_type_custom_fields();
-			if( count( $custom_fields ) )
-			{	// Get current version of custom fields
-				foreach( $custom_fields as $custom_field )
+		{	// Create a revision for custom fields:
+			if( count( $this->dbchanges_custom_fields ) )
+			{	// If at least one custom field has been updated:
+				$custom_fields = $this->get_type_custom_fields();
+				$custom_field_values = array();
+				foreach( $this->dbchanges_custom_fields as $custom_field_name => $custom_field_value )
 				{
-					$value = $this->get_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'] );
-					$custom_field_values[$custom_field['ID']] = '('.$iver_ID.','.$DB->quote( $this->ID ).','.$custom_field['ID'].','.$DB->quote( $custom_field['label'] ).','.$DB->quote( $value ).')';
+					$custom_field = $custom_fields[ $custom_field_name ];
+					$custom_field_values[] = '('.$iver_ID.','.$DB->quote( $this->ID ).','.$custom_field['ID'].','.$DB->quote( $custom_field['label'] ).','.$DB->quote( $custom_field_value ).')';
 				}
-			}
-
-			if( ! empty( $this->dbchanges_custom_fields ) )
-			{ // Set previous custom field values if they changed
-				foreach( $this->dbchanges_custom_fields as $custom_field_ID => $value )
-				{
-					$custom_field_values[$custom_field_ID] = '('.$iver_ID.','.$this->ID.','.$custom_field_ID.','.$DB->quote( $custom_field['label'] ).','.$DB->quote( $value ).')';
-				}
-			}
-
-			if( ! empty( $custom_field_values ) )
-			{
-				$sql = 'INSERT INTO T_items__version_custom_field( ivcf_iver_ID, ivcf_iver_itm_ID, ivcf_itcf_ID, ivcf_itcf_label, ivcf_value ) VALUES '.implode( ',', array_values( $custom_field_values ) );
-				$result = $DB->query( $sql, 'Save a version of the custom fields' ) !== false;
+				$result = $DB->query( 'INSERT INTO T_items__version_custom_field
+						( ivcf_iver_ID, ivcf_iver_itm_ID, ivcf_itcf_ID, ivcf_itcf_label, ivcf_value )
+						VALUES '.implode( ',', $custom_field_values ),
+					'Save a version of the custom fields' ) !== false;
 			}
 
 			if( $result )
-			{ // Create link revisions
+			{	// Create a revision for links/attachments:
 				$LinkOwner = new LinkItem( $this );
 				$existing_Links = & $LinkOwner->get_Links();
 
@@ -10862,18 +10853,17 @@ class Item extends ItemLight
 					$link_values = array();
 					foreach( $existing_Links as $loop_Link )
 					{
-						$link_values[] = '('.$iver_ID.','.$this->ID.','.$loop_Link->ID.','.$loop_Link->file_ID.','
-								.$DB->quote( $loop_Link->position ).','.$loop_Link->order.')';
+						$link_values[] = '('.$iver_ID.','.$this->ID.','.$loop_Link->ID.','.$loop_Link->file_ID.','.$DB->quote( $loop_Link->position ).','.$loop_Link->order.')';
 					}
-					$sql = 'INSERT INTO T_items__version_link( ivl_iver_ID, ivl_iver_itm_ID, ivl_link_ID, ivl_file_ID, ivl_position, ivl_order ) VALUES '.implode( ',', $link_values );
-					$result = $DB->query( $sql, 'Save a version of attachments' ) !== false;
+					$result = $DB->query( 'INSERT INTO T_items__version_link
+							( ivl_iver_ID, ivl_iver_itm_ID, ivl_link_ID, ivl_file_ID, ivl_position, ivl_order )
+							VALUES '.implode( ',', $link_values ),
+						'Save a version of attachments' ) !== false;
 				}
-
-				return $iver_ID;
 			}
 		}
 
-		return false;
+		return $result ? $iver_ID : false;
 	}
 
 

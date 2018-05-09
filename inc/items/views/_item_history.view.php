@@ -36,7 +36,7 @@ else
 
 // SQL to get the proposed changes:
 $proposed_changes_SQL = new SQL();
-$proposed_changes_SQL->SELECT( 'iver_ID, CONCAT( "p", iver_ID ) AS param_ID, iver_edit_last_touched_ts, iver_edit_user_ID, iver_type, iver_status, iver_title, user_login, iver_ID AS version_order' );
+$proposed_changes_SQL->SELECT( 'iver_ID, CONCAT( "p", iver_ID ) AS param_ID, iver_edit_last_touched_ts, iver_edit_user_ID, iver_type, iver_status, iver_title, user_login, -iver_ID AS version_order' );
 $proposed_changes_SQL->FROM( 'T_items__version' );
 // LEFT JOIN users to display proposed changes by already deleted users
 $proposed_changes_SQL->FROM_add( 'LEFT JOIN T_users ON iver_edit_user_ID = user_ID' );
@@ -72,10 +72,10 @@ $revisions_count = intval( $DB->get_var( $count_SQL->get() ) );
 $default_order = $revisions_count > 1 ? '---D' : '-D';
 
 // Create result set:
-$history_sql = $old_versions_SQL->get()
+$history_sql = $proposed_changes_SQL->get()
 	.' UNION '.$current_sql
-	.' UNION '.$proposed_changes_SQL->get()
-	.' ORDER BY version_order DESC';
+	.' UNION '.$old_versions_SQL->get()
+	.' ORDER BY iver_type DESC, version_order ASC';
 $Results = new Results( $history_sql, 'iver_', $default_order, NULL, $revisions_count );
 
 $Results->title = T_('Item history for:').' '.$edited_Item->get_title();
@@ -99,7 +99,6 @@ if( $revisions_count > 1 )
 
 $Results->cols[] = array(
 						'th' => T_('Revision'),
-						'order' => 'iver_ID',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
 						'td' => '~conditional( #iver_type# == "proposed", "+".#iver_ID#, #iver_ID# )~',
@@ -107,7 +106,6 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 						'th' => T_('Date'),
-						'order' => 'iver_edit_last_touched_ts',
 						'default_dir' => 'D',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
@@ -131,7 +129,6 @@ function iver_editor_login( $user_ID )
 }
 $Results->cols[] = array(
 						'th' => T_('User'),
-						'order' => 'user_login',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
 						'td' => '%iver_editor_login( #iver_edit_user_ID# )%',
@@ -157,7 +154,6 @@ function iver_status_label( $iver_status )
 }
 $Results->cols[] = array(
 						'th' => T_('Status'),
-						'order' => 'iver_status',
 						'td' => '%iver_status_label( #iver_status# )%',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap',
@@ -196,7 +192,6 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 						'th' => T_('Title'),
-						'order' => 'title',
 						'td' => '$iver_title$',
 					);
 

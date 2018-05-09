@@ -982,28 +982,47 @@ switch( $action )
 		}
 		foreach( $custom_fields as $custom_field )
 		{
-			// Compare custom field values of 1st and 2nd revisions:
-			$r1_custom_field_value = ( isset( $r1_custom_fields[ $custom_field['name'] ] ) && $r1_custom_fields[ $custom_field['name'] ] !== false ) ? $r1_custom_fields[ $custom_field['name'] ] : false;
+			// Get custom field values of both revisions:
+			$r1_custom_field_value = isset( $r1_custom_fields[ $custom_field['name'] ] ) ? $r1_custom_fields[ $custom_field['name'] ] : false;
 			$r2_custom_field_value = $edited_Item->get_custom_field_value( $custom_field['name'], false, false );
-			$revisions_difference_custom_field = new Diff(
-					explode( "\n", $r1_custom_field_value ),
-					explode( "\n", $r2_custom_field_value )
-				);
-			if( $custom_field['type'] == 'html' || $custom_field['type'] == 'text' )
-			{	// Display a line number for custom fields with multiple lines:
-				$revisions_difference_custom_field = $TableDiffFormatter->format( $revisions_difference_custom_field );
+			$r1_has_field = ( $r1_custom_field_value !== false );
+			$r2_has_field = ( $r2_custom_field_value !== false );
+			if( $r1_has_field && $r2_has_field )
+			{	// Compare custom field values of 1st and 2nd revisions if they are used for both revisions:
+				$revisions_difference_custom_field = new Diff(
+						explode( "\n", $r1_custom_field_value ),
+						explode( "\n", $r2_custom_field_value )
+					);
+				if( $custom_field['type'] == 'html' || $custom_field['type'] == 'text' )
+				{	// Display a line number for custom fields with multiple lines:
+					$revisions_difference_custom_field = $TableDiffFormatter->format( $revisions_difference_custom_field );
+				}
+				else
+				{	// Don't display a line number for custom fields with single line:
+					$revisions_difference_custom_field = $oneline_TableDiffFormatter->format( $revisions_difference_custom_field );
+				}
+			}
+			elseif( $r1_has_field || $r2_has_field )
+			{	// Don't compare custom field values if at least one is not used in revision but however they are different:
+				$revisions_difference_custom_field = '<tr>'
+						.'<td></td><td class="diff-context">'.nl2br( htmlspecialchars( $r1_custom_field_value ) ).'</td>'
+						.'<td></td><td class="diff-context">'.nl2br( htmlspecialchars( $r2_custom_field_value ) ).'</td>'
+					.'</tr>';
 			}
 			else
-			{	// Don't display a line number for custom fields with single line:
-				$revisions_difference_custom_field = $oneline_TableDiffFormatter->format( $revisions_difference_custom_field );
+			{	// Skip if both revisions have no the custom field:
+				continue;
 			}
+
 			if( ! empty( $revisions_difference_custom_field ) )
 			{	// Display custom fields only with differences:
-				$revisions_difference_custom_fields[ ( empty( $custom_field['label'] ) ? '#'.$custom_field['ID'] : $custom_field['label'] ) ] = array(
-						'difference'   => $revisions_difference_custom_field,
+				$revisions_difference_custom_fields[ $custom_field['ID'] ] = array(
+						'r1_label'     => $custom_field['label'],
+						'r2_label'     => isset( $r2_custom_fields[ $custom_field['name'] ] ) ? $r2_custom_fields[ $custom_field['name'] ]['label'] : $custom_field['label'],
+						'r1_has_field' => $r1_has_field,
+						'r2_has_field' => $r2_has_field,
 						'deleted'      => ( strpos( $custom_field['name'], '!deleted_' ) === 0 ),
-						'r1_has_field' => ( $r1_custom_field_value !== false ),
-						'r2_has_field' => ( $r2_custom_field_value !== false ),
+						'difference'   => $revisions_difference_custom_field,
 					);
 			}
 		}
