@@ -60,6 +60,21 @@ class bootstrap_blog_Skin extends Skin
 		return 6;
 	}
 
+	
+	function SkinBeforeSettingsUpdateAction()
+	{
+		global $Messages; 
+		
+		$Messages->add( T_('Skin settings before updating'), 'success' );
+	}
+	
+	
+	function SkinAfterSettingsUpdateAction()
+	{
+		global $Messages; 
+		
+		$Messages->add( T_('Skin settings after updating'), 'success' );
+	}
 
 	/**
 	 * Get supported collection kinds.

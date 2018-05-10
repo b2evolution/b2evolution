@@ -2100,6 +2100,57 @@ var downloadInterval = setInterval( function()
 
 		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
+	/**
+	 * Call a method on a Skin.
+	 *
+	 * This makes sure that the Timer for the Skin gets resumed.
+	 *
+	 * @param integer Skin ID
+	 * @param string Method name.
+	 * @param array Params (by reference).
+	 * @return NULL|mixed Return value of the plugin's method call or NULL if no such method.
+	 */
+	function call_method( $skin_ID, $method, & $params )
+	{
+		global $Timer, $debug, $Debuglog;
+
+		$SkinCache = & get_SkinCache();
+		$Skin = & $SkinCache->get_by_ID( $skin_ID );
+		
+		if( ! method_exists( $Skin, $method ) )
+		{
+			return NULL;
+		}
+
+		if( $debug )
+		{
+			$Debuglog->add( 'Calling '.$Skin->name.'(#'.$Skin->ID.')->'.$method.'( )', 'skins' );
+		}
+
+		$Timer->resume( $Skin->name.'_(#'.$Skin->ID.')' );
+		$r = $Skin->$method( $params );
+		$Timer->pause( $Skin->name.'_(#'.$Skin->ID.')' );
+
+		return $r;
+	}
+	
+	/**
+	 * Event handler: Called as action just before updating the {@link Skin::$Settings skin's settings}.
+	 *
+	 * @return if param errors are detected it will prevent the settings from being updated to DB.
+	 */
+	function SkinBeforeSettingsUpdateAction()
+	{
+	}
+	/**
+	 * Event handler: Called as action just after updating the {@link Skin::$Settings skin's settings}.
+	 *
+	 * @return NULL
+	 */
+	function SkinAfterSettingsUpdateAction()
+	{
+	}
+	
 }
 
 ?>

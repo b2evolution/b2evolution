@@ -212,10 +212,14 @@ switch( $action )
 
 					// Load skin params from request:
 					$edited_Skin->load_params_from_Request();
-
+					
+					$tmp_params = array();
+					$edited_Skin->call_method( $edited_Skin->ID, 'SkinBeforeSettingsUpdateAction', $tmp_params );
+					
 					if(	! param_errors_detected() )
 					{	// Update settings:
 						$edited_Skin->dbupdate_settings();
+						$edited_Skin->call_method( $edited_Skin->ID, 'SkinAfterSettingsUpdateAction', $tmp_params );
 						$Messages->add( T_('Skin settings have been updated'), 'success' );
 						// Redirect so that a reload doesn't write to the DB twice:
 						header_redirect( $update_redirect_url.'&skin_type='.$skin_type, 303 ); // Will EXIT
