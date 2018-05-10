@@ -3922,10 +3922,7 @@ class Item extends ItemLight
 			}
 
 			if( ! $File->is_image() )
-			{ // Skip anything that is not an image
-				// fp> TODO: maybe this property should be stored in link_ltype_ID
-
-				//$r .= $this->attachment_files($params);
+			{	// Skip anything that is not an image:
 				continue;
 			}
 

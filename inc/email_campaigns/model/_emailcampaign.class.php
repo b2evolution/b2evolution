@@ -1424,10 +1424,10 @@ class EmailCampaign extends DataObject
 		$DB->query( 'INSERT INTO T_links
 				( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID,
 				link_itm_ID, link_cmt_ID, link_usr_ID, link_ecmp_ID, link_msg_ID, link_tmp_ID, link_file_ID,
-				link_ltype_ID, link_position, link_order )
+				link_position, link_order )
 			SELECT link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID,
 				link_itm_ID, link_cmt_ID, link_usr_ID, '.$DB->quote( $this->ID ).' AS link_ecmp_ID, link_msg_ID, link_tmp_ID, link_file_ID,
-				link_ltype_ID, link_position, link_order
+				link_position, link_order
 			FROM T_links
 			WHERE link_ecmp_ID = '.$DB->quote( $duplicated_campaign_ID ),
 			'Duplicate linked files from email campaign #'.$duplicated_campaign_ID.' to #'.$this->ID );

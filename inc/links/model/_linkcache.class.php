@@ -464,7 +464,7 @@ class LinkCache extends DataObjectCache
 			$SQL->SELECT( '*' );
 			$SQL->FROM( 'T_links' );
 			$SQL->WHERE( 'link_itm_ID  = '.$DB->quote( $item_ID ) );
-			$SQL->ORDER_BY( 'link_ltype_ID, link_file_ID' );
+			$SQL->ORDER_BY( 'link_file_ID' );
 			$SQL->append( 'FOR UPDATE' ); // fp: we specify FOR UPDATE because we need to lock all changes to the link_order column. 
 			// fp: Note: FOR UPDATE won't do anything if we're not in a transaction (which is good)
 
