@@ -1438,6 +1438,11 @@ table.diff td.diff-title-addedline {
   font-size: 120%;
   font-weight: bold;
 }
+table.diff tr.diff-custom-field td.diff-title-deletedline,
+table.diff tr.diff-custom-field td.diff-title-addedline {
+  text-align: left;
+  font-size: 100%;
+}
 .radio input[type="radio"][name^="timestamp_"][value="duration"] {
   position: relative;
   margin-right: 4px;

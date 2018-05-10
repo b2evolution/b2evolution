@@ -84,28 +84,45 @@ if( ! empty( $revisions_difference_custom_fields ) )
 			<td colspan="4" class="diff-title-addedline"><b><?php echo T_('Custom fields').':'; ?></b></td>
 		</tr>
 	<?php
-	foreach( $revisions_difference_custom_fields as $custom_field_label => $revisions_diff_data )
+	foreach( $revisions_difference_custom_fields as $revisions_diff_data )
 	{
-		echo '<tr>';
-		for( $r = 1; $r <= 2; $r++ )
-		{
-			$custom_field_label = $revisions_diff_data['r'.$r.'_label'];
-			echo '<td colspan="2"><b>';
-			if( ! $revisions_diff_data['r'.$r.'_has_field'] )
-			{	// Field label when the custom field is not used by this revision:
-				echo '<span class="violet" title="'.format_to_output( sprintf( T_('The field "%s" is not used in this revision'), $custom_field_label ), 'htmlattr' ).'">'.$custom_field_label.'</span>';
-			}
-			elseif( $revisions_diff_data['deleted'] )
-			{	// Field label when nonexistent custom field is loaded from revision:
-				echo '<span class="red" title="'.format_to_output( sprintf( T_('The field "%s" does not exist'), $custom_field_label ), 'htmlattr' ).'">'.$custom_field_label.'</span>';
-			}
-			else
-			{	// Normal field label when it is used by revision and exists in DB:
-				echo $custom_field_label;
-			}
-			echo ':</b></td>';
+		if( isset( $revisions_diff_data['diff_label'] ) )
+		{	// Display a difference between two field labels:
+			echo $revisions_diff_data['diff_label'];
 		}
-		echo $revisions_diff_data['difference'];
+		else
+		{	// No difference between two field labels:
+			echo '<tr>'
+					.'<td colspan="2"><b>'.$revisions_diff_data['r1_label'].':</b></td>'
+					.'<td colspan="2"><b>'.$revisions_diff_data['r2_label'].':</b></td>'
+				.'</tr>';
+		}
+
+		if( isset( $revisions_diff_data['diff_value'] ) )
+		{	// Display a difference between two field values:
+			echo $revisions_diff_data['diff_value'];
+		}
+		else
+		{	// No difference because one revision has no the custom field:
+			echo '<tr>';
+			for( $r = 1; $r <= 2; $r++ )
+			{
+				echo '<td></td>';
+				if( isset( $revisions_diff_data['r'.$r.'_value'] ) )
+				{	// Display a field value if the revision has it:
+					echo '<td class="diff-context">'.nl2br( htmlspecialchars( $revisions_diff_data['r'.$r.'_value'] ) ).'</td>';
+				}
+				elseif( $r == 1 )
+				{	// If field exists only in new revision:
+					echo '<td class="red"><b>'.sprintf( T_('The field "%s" does not exist'), $revisions_diff_data['r'.$r.'_label'] ).'</b></td>';
+				}
+				else
+				{	// If field exists only in old revision:
+					echo '<td class="violet"><b>'.sprintf( T_('The field "%s" has been removed'), $revisions_diff_data['r'.$r.'_label'] ).'</b></td>';
+				}
+			}
+			echo '</tr>';
+		}
 	}
 }
 
