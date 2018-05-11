@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $edited_Blog, $AdminUI, $Settings;
+global $edited_Blog, $AdminUI, $Settings, $admin_url;
 $notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 $Form = new Form( NULL, 'coll_features_checkchanges' );
@@ -294,7 +294,15 @@ if( $notifications_mode != 'off' )
 				array( 'allow_subscriptions', 1, T_('Allow users to subscribe and receive email notifications for each new post.'), $edited_Blog->get_setting( 'allow_subscriptions' ) ),
 				array( 'allow_item_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ), $edited_Blog->get_setting( 'allow_item_subscriptions' ) ),
 				array( 'allow_item_mod_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications when post is modified and user has a permissions to moderate it.' ), $edited_Blog->get_setting( 'allow_item_mod_subscriptions' ) ),
-			), 'allow_coll_subscriptions', T_('Email subscriptions') );
+			), 'allow_coll_subscriptions', T_('Registered users') );
+		$Form->checklist( array(
+				array( 'allow_anon_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for replies to their comments.' ), $edited_Blog->get_setting( 'allow_anon_subscriptions' ) ),
+			), 'allow_anon_subscriptions', T_('Anonymous users') );
+		$Form->radio( 'default_anon_comment_notify', $edited_Blog->get_setting( 'default_anon_comment_notify' ), array(
+				array( 1, T_('Checked') ),
+				array( 0, T_('Unchecked') ),
+			), T_('Default option') );
+		$Form->text( 'anon_notification_email_limit', $edited_Blog->get_setting( 'anon_notification_email_limit' ), 4, T_('Limit'),  T_('Max # of emails an anonymous user may receive per day.'), 4 );
 	$Form->end_fieldset();
 }
 
@@ -311,6 +319,18 @@ $Form->begin_fieldset( T_('Workflow').get_manual_link( 'coll-workflow-settings' 
 $Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+
+
+echo '<div class="well">';
+echo '<p>'.sprintf( T_('You can find more settings in the <a %s>Post Types</a>, including:'), 'href="'.$admin_url.'?blog='.$edited_Blog->ID.'&amp;ctrl=itemtypes&amp;ityp_ID='.$edited_Blog->get_setting( 'default_post_type' ).'&amp;action=edit"' ).'</p>';
+echo '<ul>';
+echo '<li>'.T_('Display instructions').'</li>';
+echo '<li>'.T_('Use title').', '.T_('Use text').', '.T_('Allow HTML').'...</li>';
+echo '<li>'.T_('Use of Advanced Properties').' ('.T_('Tags').', '.T_('Excerpt').'...)</li>';
+echo '<li>'.T_('Use of Location').'</li>';
+echo '<li>'.T_('Use of Custom Fields').'</li>';
+echo '</ul>';
+echo '</div>';
 
 ?>
 <script type="text/javascript">

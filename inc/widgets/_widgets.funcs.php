@@ -1104,13 +1104,13 @@ function display_widgets_action_buttons( & $Form )
 {
 	echo '<span class="btn-group">';
 	$Form->button( array(
-			'value' => get_icon( 'check_all' ).' '.T_('Check All'),
+			'value' => get_icon( 'check_all' ).' '.T_('Check all'),
 			'id'    => 'widget_button_check_all',
 			'tag'   => 'button',
 			'type'  => 'button'
 		) );
 	$Form->button( array(
-			'value' => get_icon( 'uncheck_all' ).' '.T_('Uncheck All'),
+			'value' => get_icon( 'uncheck_all' ).' '.T_('Uncheck all'),
 			'id'    => 'widget_button_uncheck_all',
 			'tag'   => 'button',
 			'type'  => 'button'

@@ -111,33 +111,46 @@ $Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_te
 
 $Form->begin_fieldset( $is_admin ? T_('Other preferences').get_manual_link('user_preferences') : '', array( 'class'=>'fieldset clear' ) );
 
+// Enable/disable multiple sessions for the current user
+$multiple_sessions = $Settings->get( 'multiple_sessions' );
+switch( $multiple_sessions )
+{
+	case 'never':
+	case 'always':
+		$multiple_sessions_field_hidden = true;
+		$multiple_sessions_field_disabled = true;
+		break;
+	default:
+		$multiple_sessions_field_hidden = false;
+		if( ( $multiple_sessions == 'adminset_default_no' || $multiple_sessions == 'adminset_default_yes' ) && !$current_User->check_perm( 'users', 'edit' ) )
+		{
+			$multiple_sessions_field_disabled = true;
+		}
+		else
+		{
+			$multiple_sessions_field_disabled = false;
+		}
+}
+$multiple_sessions_value = $UserSettings->get( 'login_multiple_sessions', $edited_User->ID );
+
+// Session time out for the current user
+$timeout_sessions = $UserSettings->get( 'timeout_sessions', $edited_User->ID );
+$def_timeout_session = $Settings->get( 'timeout_sessions' );
+
+if( empty( $timeout_sessions ) )
+{
+	$timeout_sessions_selected = 'default';
+	$timeout_sessions = $def_timeout_session;
+}
+else
+{
+	$timeout_sessions_selected = 'custom';
+}
+
 if( $action != 'view' )
 { // We can edit the values:
 
 	$Form->select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options_return', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
-
-	// Enable/disable multiple sessions for the current user
-	$multiple_sessions = $Settings->get( 'multiple_sessions' );
-	switch( $multiple_sessions )
-	{
-		case 'never':
-		case 'always':
-			$multiple_sessions_field_hidden = true;
-			$multiple_sessions_field_disabled = true;
-			break;
-		default:
-			$multiple_sessions_field_hidden = false;
-			if( ( $multiple_sessions == 'adminset_default_no' || $multiple_sessions == 'adminset_default_yes' ) && !$current_User->check_perm( 'users', 'edit' ) )
-			{
-				$multiple_sessions_field_disabled = true;
-			}
-			else
-			{
-				$multiple_sessions_field_disabled = false;
-			}
-	}
-
-	$multiple_sessions_value = $UserSettings->get( 'login_multiple_sessions', $edited_User->ID );
 
 	if( $multiple_sessions_field_hidden )
 	{
@@ -148,20 +161,6 @@ if( $action != 'view' )
 		$Form->checkbox( 'edited_user_set_login_multiple_sessions', $multiple_sessions_value, T_('Multiple sessions'),
 				T_('Check this if you want to be able to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will automatically disconnect you on the previous one.'),
 				'', 1, $multiple_sessions_field_disabled );
-	}
-
-	// Session time out for the current user
-	$timeout_sessions = $UserSettings->get( 'timeout_sessions', $edited_User->ID );
-	$def_timeout_session = $Settings->get( 'timeout_sessions' );
-
-	if( empty( $timeout_sessions ) )
-	{
-		$timeout_sessions_selected = 'default';
-		$timeout_sessions = $def_timeout_session;
-	}
-	else
-	{
-		$timeout_sessions_selected = 'custom';
 	}
 
 	if( ( $current_User->ID == $edited_User->ID ) || ( $current_User->check_perm( 'users', 'edit' ) ) )
@@ -207,7 +206,18 @@ if( $action != 'view' )
 else
 { // display only
 	$Form->info( T_('Preferred locale'), $edited_User->get('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
-	$Form->info( T_('Show online'), ( $UserSettings->get( 'show_online', $edited_User->ID ) ) ? T_('yes') : T_('no') );
+	$Form->info( T_('Multiple sessions'), ( $multiple_sessions_value ? T_('yes') : T_('no') ), T_('Check this if you want to be able to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will automatically disconnect you on the previous one.') );
+	if( $timeout_sessions_selected == 'default' )
+	{
+		$Form->info( T_('Session timeout'), T_('Use default duration.'), duration_format( $def_timeout_session ) );
+	}
+	else
+	{
+		$Form->info( T_('Session timeout'), T_('Use custom duration...') );
+		$Form->info( T_('Custom duration'), duration_format( $timeout_sessions ) );
+	}
+	
+	$Form->info( T_('Show online'), ( $UserSettings->get( 'show_online', $edited_User->ID ) ? T_('yes') : T_('no') ), T_('Check this to be displayed as online when visiting the site.') );
 }
 
 $Form->end_fieldset();

@@ -109,6 +109,7 @@ switch( $action )
 		{
 			case 'general':
 			case 'urls':
+			case 'comments':
 				if( $edited_Blog->load_from_Request( array() ) )
 				{ // Commit update to the DB:
 					global $Settings;
@@ -129,6 +130,12 @@ switch( $action )
 					{
 						$Settings->set( 'msg_blog_ID', $edited_Blog->ID );
 					}
+					if( $tab == 'comments' )
+					{
+						// Comment recycle bin
+						param( 'auto_empty_trash', 'integer', $Settings->get_default('auto_empty_trash'), false, false, true, false );
+						$Settings->set( 'auto_empty_trash', get_param('auto_empty_trash') );
+					}
 					$Settings->dbupdate();
 
 					$edited_Blog->dbupdate();
@@ -140,7 +147,6 @@ switch( $action )
 
 			case 'home':
 			case 'features':
-			case 'comments':
 			case 'contact':
 			case 'userdir':
 			case 'other':

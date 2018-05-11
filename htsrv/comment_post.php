@@ -105,6 +105,7 @@ if( is_logged_in( false ) )
 	$url = null;
 	$comment_cookies = null;
 	$comment_allow_msgform = null;
+	param( 'comment_user_notify', 'integer', 0 );
 }
 else
 {	// User is not logged in (registered users), we need some id info from him:
@@ -120,6 +121,7 @@ else
 	}
 	param( 'comment_cookies', 'integer', 0 );
 	param( 'comment_allow_msgform', 'integer', 0 ); // checkbox
+	param( 'comment_anon_notify', 'integer', 0 );
 }
 
 param( 'comment_rating', 'integer', NULL );
@@ -151,6 +153,7 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 		'rating' => & $comment_rating,
 		'anon_allow_msgform' => & $comment_allow_msgform,
 		'anon_cookies' => & $comment_cookies,
+		'anon_notify' => & $comment_anon_notify,
 		'User' => & $User,
 		'redirect_to' => & $redirect_to,
 		'crumb_comment' => & $crumb_comment,
@@ -266,6 +269,7 @@ $Comment->set_Item( $commented_Item );
 if( $User )
 { // User is logged in, we'll use his ID
 	$Comment->set_author_User( $User );
+	$Comment->user_notify = $comment_user_notify;
 }
 else
 {	// User is not logged in:
@@ -273,6 +277,7 @@ else
 	$Comment->set( 'author_email', $email );
 	$Comment->set( 'author_url', $url );
 	$Comment->set( 'allow_msgform', $comment_allow_msgform );
+	$Comment->set( 'anon_notify', $comment_anon_notify );
 }
 
 if( ! $Comment->is_meta() && $commented_Item->can_rate() )
@@ -574,6 +579,9 @@ if( !is_logged_in() )
 		}
 	}
 }
+
+// Send the predefined cookies:
+evo_sendcookies();
 
 // Note: we don't give any clue that we have automatically deleted a comment. It would only give spammers the perfect tool to find out how to pass the filter.
 

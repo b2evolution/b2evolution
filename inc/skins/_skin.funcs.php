@@ -1125,6 +1125,25 @@ function skin_init( $disp )
 			$seo_page_type = 'Register form';
 			$robots_index = false;
 
+			$comment_ID = param( 'comment_ID', 'integer', 0 );
+			if( $comment_ID > 0 )
+			{	// Suggestion to register for anonymous user:
+				$CommentCache = & get_CommentCache();
+				$Comment = & $CommentCache->get_by_ID( $comment_ID, false, false );
+				if( $Comment && $Comment->get( 'author_email' ) !== '' )
+				{	// If comment is really from anonymous user:
+					// Display info message:
+					$Messages->add( T_('In order to manage all the comments you posted, please create a user account with the same email address.'), 'note' );
+					// Prefill the registration form with data from anonymous comment:
+					global $dummy_fields;
+					set_param( $dummy_fields['email'], $Comment->get( 'author_email' ) );
+					set_param( $dummy_fields['login'], $Comment->get( 'author' ) );
+					set_param( 'firstname', $Comment->get( 'author' ) );
+					$comment_Item = & $Comment->get_Item();
+					set_param( 'locale', $comment_Item->get( 'locale' ) );
+				}
+			}
+
 			// Check invitation code if it exists and registration is enabled
 			global $display_invitation;
 			$display_invitation = check_invitation_code();
@@ -1218,6 +1237,14 @@ function skin_init( $disp )
 
 			// Display messages depending on user email status
 			display_user_email_status_message();
+
+			global $current_User, $demo_mode;
+			if( $demo_mode && ( $current_User->ID <= 7 ) )
+			{	// Demo mode restrictions: users created by install process cannot be edited:
+				$Messages->add( T_('You cannot edit the admin and demo users profile in demo mode!'), 'error' );
+				// Set action to 'view' in order to switch all form input elements to read mode:
+				set_param( 'action', 'view' );
+			}
 			break;
 
 		case 'users':

@@ -2006,6 +2006,9 @@ a.selected {
   border-radius: 2px 2px 0 0;
   margin-bottom: 2px;
 }
+.avatar_rounded.no_avatar_actions img {
+  margin-bottom: 0;
+}
 .avatar_actions {
   float: left;
   line-height: 26px;

@@ -120,7 +120,7 @@ $Form->password_input( 'edited_user_pass2', '', 18, '',
 	);
 
 // Email
-$Form->email_input( 'edited_user_email', $edited_User->email, 50, T_('Email'), '<br />'.T_('We respect your privacy. Your email will remain strictly confidential.'),
+$Form->email_input( 'edited_user_email', $edited_User->email, 50, T_('Email'), array( 'note' => '<br />'.T_('We respect your privacy. Your email will remain strictly confidential.') ),
 	array(
 			'placeholder' => T_('Email address'),
 			'maxlength'   => 255,

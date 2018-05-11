@@ -171,10 +171,18 @@ switch( $params['notify_type'] )
 		break;
 
 	case 'item_subscription':
-		// item subscription
+		// item subscription for registered user:
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on this post.' ).'<br />'
 			.T_( 'If you don\'t want to receive any more notifications on this post, click here' ).': '
 			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+		// subscribers are not allowed to see comment author email
+		break;
+
+	case 'anon_subscription':
+		// item subscription for anonymous user:
+		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on this post.' ).'<br />'
+			.T_( 'If you don\'t want to receive any more notifications on this post, click here' ).': '
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&comment_ID='.$params['comment_ID'].'&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		// subscribers are not allowed to see comment author email
 		break;
 

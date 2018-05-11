@@ -174,14 +174,6 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Comment recycle bin').get_manual_link('recycle-bin-settings') );
-
-	$Form->text_input( 'auto_empty_trash', $Settings->get('auto_empty_trash'), 5, T_('Prune recycled comments after'), T_('days').'.' );
-
-$Form->end_fieldset();
-
-// --------------------------------------------
-
 if( $current_User->check_perm( 'options', 'edit' ) )
 {
 	$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );

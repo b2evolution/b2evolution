@@ -74,13 +74,13 @@ if( ! is_null( $user_ID ) )
 			$Messages->add( T_('You have no permission to edit other users!'), 'error' );
 			$action = 'view';
 		}
-		elseif( $demo_mode && ( $edited_User->ID <= 3 ) && ( $edited_User->ID > 0 ) )
+		elseif( $demo_mode && ( $edited_User->ID <= 7 ) )
 		{ // Demo mode restrictions: users created by install process cannot be edited
 			$Messages->add( T_('You cannot edit the admin and demo users profile in demo mode!'), 'error' );
 
 			if( strpos( $action, 'delete_' ) === 0 || $action == 'promote' )
 			{   // Fallback to list/view action
-				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=users&amp;action=list' ) );
+				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=users&action=list', '', '&' ) );
 			}
 			else
 			{
@@ -431,7 +431,7 @@ if( !$Messages->has_errors() )
 				$UserList->refresh_query = true;
 				$UserList->query();
 
-				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=users&amp;action=list', '', '&' ), 303 );
+				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=users&action=list', '', '&' ), 303 );
 			}
 			else
 			{ // The user is updated
@@ -676,11 +676,11 @@ if( !$Messages->has_errors() )
 			{	// confirmed
 				$user_login = $edited_User->dget( 'login' );
 
-				if( $edited_User->delete_messages() &&
-				    $edited_User->delete_comments() &&
-				    $edited_User->delete_posts( 'created|edited' ) &&
-				    $edited_User->delete_blogs() &&
-				    $edited_User->dbdelete( $Messages ) )
+				$edited_User->delete_messages();
+				$edited_User->delete_comments();
+				$edited_User->delete_posts( 'created|edited' );
+				$edited_User->delete_blogs();
+				if( $edited_User->dbdelete( $Messages ) )
 				{	// User and all his contributions were deleted successfully
 					$Messages->add( sprintf( T_('The user &laquo;%s&raquo; and all his contributions were deleted.'), $user_login ), 'success' );
 
@@ -944,6 +944,8 @@ if( $display_mode != 'js')
 		case 'visits':
 			// Initialize user tag input
 			init_tokeninput_js();
+			// Load jQuery QueryBuilder plugin files for user list filters:
+			init_querybuilder_js( 'rsc_url' );
 			$AdminUI->breadcrumbpath_add( T_('Visits'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 
 			// Set an url for manual page:
@@ -1141,8 +1143,40 @@ switch( $action )
 
 						case 'delete_all_userdata':
 							if(  $current_User->ID != $edited_User->ID && $edited_User->ID != 1 )
-							{	// User can NOT delete admin and own account
-								$confirm_message = T_('Delete user and all his contributions?');
+							{	// User can NOT delete admin and own account:
+								$confirm_messages = array();
+								$deleted_blogs_count = count( $edited_User->get_deleted_blogs() );
+								if( $deleted_blogs_count > 0 )
+								{	// Display a confirm message if curent user can delete at least one blog of the edited user:
+									$confirm_messages[] = array( sprintf( T_('%d collections of the user'), $deleted_blogs_count ), 'warning' );
+								}
+								$deleted_posts_created_count = count( $edited_User->get_deleted_posts( 'created' ) );
+								if( $deleted_posts_created_count > 0 )
+								{	// Display a confirm message if curent user can delete at least one post created by the edited user:
+									$confirm_messages[] = array( sprintf( T_('%d posts created by the user'), $deleted_posts_created_count ), 'warning' );
+								}
+								$deleted_posts_edited_count = count( $edited_User->get_deleted_posts( 'edited' ) );
+								if( $deleted_posts_edited_count > 0 )
+								{	// Display a confirm message if curent user can delete at least one post created by the edited user:
+									$confirm_messages[] = array( sprintf( T_('%d posts edited by the user'), $deleted_posts_edited_count ), 'warning' );
+								}
+								if( $edited_User->has_comment_to_delete() )
+								{	// Display a confirm message if curent user can delete at least one comment posted by the edited user:
+									$confirm_messages[] = array( sprintf( T_('%s comments posted by the user'), $edited_User->get_num_comments( '', true ) ), 'warning' );
+								}
+								$messages_count = $edited_User->get_num_messages();
+								if( $messages_count > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+								{	// Display a confirm message if curent user can delete the messages sent by the edited user
+									$confirm_messages[] = array( sprintf( T_('%d private messages sent by the user'), $messages_count ), 'warning' );
+								}
+								// Find other users with the same email address
+								$message_same_email_users = find_users_with_same_email( $edited_User->ID, $edited_User->get( 'email' ), T_('Note: this user has the same email address (%s) as: %s') );
+								if( $message_same_email_users !== false )
+								{
+									$confirm_messages[] = array( $message_same_email_users, 'note' );
+								}
+								// Displays a form to confirm the deletion of all user contributions:
+								$edited_User->confirm_delete( T_('Delete user and all his contributions?'), 'user', $action, get_memorized( 'action' ), $confirm_messages );
 							}
 							break;
 					}

@@ -9514,6 +9514,69 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12810, 'Upgrading comments table...' ) )
+	{	// part of 6.10.1-stable
+		db_add_col( 'T_comments', 'comment_anon_notify', 'TINYINT(1) NOT NULL DEFAULT 0 AFTER comment_allow_msgform' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12820, 'Upgrading email campaign table...' ) )
+	{ // part of 6.10.1-stable
+		db_upgrade_cols( 'T_email__campaign', array(
+			'ADD' => array(
+				'ecmp_send_count'    => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_user_tag_dislike',
+				'ecmp_open_count'    => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_send_count',
+				'ecmp_img_loads'     => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_open_count',
+				'ecmp_link_clicks'   => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_img_loads',
+				'ecmp_cta1_clicks'   => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_link_clicks',
+				'ecmp_cta2_clicks'   => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_cta1_clicks',
+				'ecmp_cta3_clicks'   => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_cta2_clicks',
+				'ecmp_like_count'    => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_cta3_clicks',
+				'ecmp_dislike_count' => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_like_count',
+				'ecmp_unsub_clicks'  => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_dislike_count',
+			),
+		) );
+
+		// Populate the new columns
+		$DB->query( 'UPDATE T_email__campaign
+				LEFT JOIN (
+					SELECT
+						csnd_camp_ID,
+						SUM( IF( csnd_last_sent_ts IS NULL, 0, 1 ) ) AS send_count,
+						SUM( IF( csnd_cta1 = 1, 1, 0 ) ) AS cta1_clicks,
+						SUM( IF( csnd_cta2 = 1, 1, 0 ) ) AS cta2_clicks,
+						SUM( IF( csnd_cta3 = 1, 1, 0 ) ) AS cta3_clicks,
+						SUM( IF( csnd_like = 1, 1, 0 ) ) AS like_count,
+						SUM( IF( csnd_like = -1, 1, 0 ) ) AS dislike_count,
+						SUM( COALESCE( csnd_clicked_unsubscribe, 0 ) ) AS unsub_clicks,
+						SUM( IF( csnd_last_open_ts IS NULL, 0, 1 ) ) AS img_loads,
+						SUM( IF( csnd_last_click_ts IS NULL, 0, 1 ) ) AS link_clicks,
+						SUM( IF( csnd_last_open_ts IS NOT NULL OR csnd_last_click_ts IS NOT NULL OR
+							csnd_like IS NOT NULL OR csnd_cta1 IS NOT NULL OR csnd_cta2 IS NOT NULL OR csnd_cta3 IS NOT NULL, 1, 0 ) ) AS open_count
+					FROM T_email__campaign_send
+					WHERE csnd_emlog_ID IS NOT NULL
+					GROUP BY csnd_camp_ID
+				) AS a ON a.csnd_camp_ID = ecmp_ID
+				SET
+					ecmp_send_count = COALESCE( a.send_count, 0 ),
+					ecmp_open_count = COALESCE( a.open_count, 0 ),
+					ecmp_img_loads = COALESCE( a.img_loads, 0 ),
+					ecmp_link_clicks = COALESCE( a.link_clicks, 0 ),
+					ecmp_cta1_clicks = COALESCE( a.cta1_clicks, 0 ),
+					ecmp_cta2_clicks = COALESCE( a.cta2_clicks, 0 ),
+					ecmp_cta3_clicks = COALESCE( a.cta3_clicks, 0 ),
+					ecmp_like_count = COALESCE( a.like_count, 0 ),
+					ecmp_dislike_count = COALESCE( a.dislike_count, 0 ),
+					ecmp_unsub_clicks = COALESCE( a.unsub_clicks, 0 )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12830, 'Upgrading comments table...' ) )
+	{	// part of 6.10.1-stable
+		db_add_col( 'T_comments', 'comment_anon_notify_last', 'VARCHAR(16) COLLATE ascii_general_ci NULL default NULL AFTER comment_anon_notify' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '
