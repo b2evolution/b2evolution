@@ -114,7 +114,7 @@ if( ! empty( $revisions_difference_custom_fields ) )
 				}
 				elseif( $r == 1 )
 				{	// If field exists only in new revision:
-					echo '<td class="red"><b>'.sprintf( T_('The field "%s" does not exist'), $revisions_diff_data['r'.$r.'_label'] ).'</b></td>';
+					echo '<td class="red"><b>'.sprintf( T_('The field "%s" did not exist'), $revisions_diff_data['r'.$r.'_label'] ).'</b></td>';
 				}
 				else
 				{	// If field exists only in old revision:
