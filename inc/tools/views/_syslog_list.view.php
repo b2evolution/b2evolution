@@ -117,7 +117,7 @@ $Results->cols[] = array(
 		'default_dir' => 'D',
 		'td' => '%mysql2localedatetime_spans( #slg_timestamp# )%',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap timestamp'
+		'td_class' => 'timestamp'
 	);
 
 $Results->cols[] = array(

@@ -171,9 +171,9 @@ if( ! $creating )
 	$Results->cols[] = array(
 			'th'       => T_('Next execution time'),
 			'order'    => 'aust_next_exec_ts',
-			'td'       => '%mysql2localedatetime( #aust_next_exec_ts# )%',
+			'td'       => '%mysql2localedatetime_spans( #aust_next_exec_ts# )%',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'nowrap',
+			'td_class' => 'timestamp',
 		);
 
 	$Results->cols[] = array(

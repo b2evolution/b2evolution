@@ -5570,9 +5570,9 @@ function user_reports_results( & $reports_Results, $params = array() )
 		'th' => T_('Date and time'),
 		'order' => 'urep_datetime',
 		'default_dir' => 'D',
-		'th_class' => 'nowrap',
-		'td_class' => 'shrinkwrap',
-		'td' => '<span class="date">%mysql2localedatetime( #urep_datetime# )%</span>',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'timestamp',
+		'td' => '%mysql2localedatetime_spans( #urep_datetime# )%',
 	);
 
 	$reports_Results->cols[] = array(
@@ -6409,7 +6409,7 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Send date'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'timestamp compact_data',
+				'td_class' => 'timestamp',
 				'order' => 'csnd_last_sent_ts',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #csnd_last_sent_ts# )%',
@@ -6421,7 +6421,7 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Last opened'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'timestamp compact_data',
+				'td_class' => 'timestamp',
 				'order' => 'csnd_last_open_ts',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #csnd_last_open_ts# )%',
@@ -6430,7 +6430,7 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Last clicked'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'timestamp compact_data',
+				'td_class' => 'timestamp',
 				'order' => 'csnd_last_click_ts',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #csnd_last_click_ts# )%',
@@ -6486,10 +6486,10 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Subscribed'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'center nowrap',
+				'td_class' => 'timestamp',
 				'order' => 'enls_subscribed_ts',
 				'default_dir' => 'D',
-				'td' => '%mysql2localedatetime( #enls_subscribed_ts# )%',
+				'td' => '%mysql2localedatetime_spans( #enls_subscribed_ts# )%',
 			);
 	}
 
@@ -6498,10 +6498,10 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Unsubscribed'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'center nowrap',
+				'td_class' => 'timestamp',
 				'order' => 'enls_unsubscribed_ts',
 				'default_dir' => 'D',
-				'td' => '%mysql2localedatetime( #enls_unsubscribed_ts# )%',
+				'td' => '%mysql2localedatetime_spans( #enls_unsubscribed_ts# )%',
 			);
 	}
 
@@ -6510,10 +6510,10 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Last sent'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'center nowrap',
+				'td_class' => 'timestamp',
 				'order' => 'enls_last_sent_manual_ts',
 				'default_dir' => 'D',
-				'td' => '%mysql2localedatetime( #enls_last_sent_manual_ts# )%',
+				'td' => '%mysql2localedatetime_spans( #enls_last_sent_manual_ts# )%',
 			);
 	}
 
@@ -6522,7 +6522,7 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Last opened'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'timestamp compact_data',
+				'td_class' => 'timestamp',
 				'order' => 'enls_last_open_ts',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #enls_last_open_ts# )%',
@@ -6534,7 +6534,7 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Last clicked'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'timestamp compact_data',
+				'td_class' => 'timestamp',
 				'order' => 'enls_last_click_ts',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #enls_last_click_ts# )%',
