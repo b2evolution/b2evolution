@@ -244,7 +244,7 @@ if( $edited_Poll->ID > 0 )
 
 	// Create result set:
 	$answer_Results = new Results( $answer_SQL->get(), 'dpans_', '-A', NULL, $answer_count_SQL->get() );
-	$answer_Results->title = T_('Detailed answers').( empty( $option_text ) ? '' : ' - '.$option_text );
+	$answer_Results->title = T_('Detailed answers').( empty( $option_text ) ? '' : ' - '.$option_text ).get_manual_link( 'poll-detailed-answers' );
 
 	$answer_Results->cols[] = array(
 		'th'       => T_('Picture'),
