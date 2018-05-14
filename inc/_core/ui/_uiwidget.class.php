@@ -698,7 +698,8 @@ jQuery( document ).ready( function()
 			error: 'fa fa-warning',
 		},
 		operators: [
-			{ type: 'blank', optgroup: 'custom', nb_inputs: 1, multiple: false, apply_to: ['string'] }
+			'equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between', 'contains', 'not_contains',
+			{ type: 'blank', nb_inputs: 1, multiple: false, apply_to: ['string'] }
 		],
 		lang: {
 			operators: {
