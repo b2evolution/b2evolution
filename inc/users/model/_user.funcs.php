@@ -5877,7 +5877,7 @@ function users_results_block( $params = array() )
 		echo_userlist_automation_js();
 	}
 
-	if( $params['display_newsletter'] && is_logged_in() && $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 && ! empty( $UserList->filters['newsletter'] ) )
+	if( $params['display_newsletter'] && is_logged_in() && $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Button to change users of email campaign OR Create new email campaign for current selection:
 		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 		if( $edited_EmailCampaign = & get_session_EmailCampaign() )
@@ -5895,7 +5895,10 @@ function users_results_block( $params = array() )
 			$campaign_ID_param = '';
 		}
 
-		$user_list_buttons[] = '<a href="'.$admin_url.'?ctrl=campaigns&amp;action='.$campaign_action.$campaign_ID_param.'&amp;newsletter='.$UserList->filters['newsletter'].'&amp;'.url_crumb( 'campaign' ).'"'
+		$user_list_buttons[] = '<a '
+			.( empty( $UserList->filters['newsletter'] )
+				? 'onclick="alert( \''.TS_('Please select a subsription list first!').'\');return false"'
+				: 'href="'.$admin_url.'?ctrl=campaigns&amp;action='.$campaign_action.$campaign_ID_param.'&amp;newsletter='.$UserList->filters['newsletter'].'&amp;'.url_crumb( 'campaign' ).'"' )
 			.' class="btn '.$campaign_button_class.'">'
 				.format_to_output( $campaign_button_text )
 			.'</a>';
