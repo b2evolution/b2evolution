@@ -3463,10 +3463,6 @@ function callback_filter_userlist( & $Form )
 
 	$Form->text( 'keywords', get_param('keywords'), 20, T_('Name'), '', 50 );
 
-	$Form->checkbox( 'gender_men', get_param('gender_men'), T_('Men') );
-	$Form->checkbox( 'gender_women', get_param('gender_women'), T_('Women') );
-	$Form->checkbox( 'gender_other', get_param('gender_other'), T_('Other') );
-
 	if( is_admin_page() )
 	{ // show this filters only on admin interface
 		if( $current_User->check_perm( 'users', 'edit' ) )
@@ -3554,21 +3550,6 @@ function callback_filter_userlist( & $Form )
 		$Form->text( 'age_max', get_param('age_max'), 3, T_('to') );
 	$Form->end_line();
 
-	$Form->begin_line( T_('Level'), 'level_min' );
-		$Form->text( 'level_min', get_param('level_min'), 3, '' );
-		$Form->text( 'level_max', get_param('level_max'), 3, T_('to') );
-	$Form->end_line();
-
-	if( empty( $edited_Organization ) )
-	{ // Show organization filter only when organization form is not selected
-		$OrganizationCache = & get_OrganizationCache( T_('All') );
-		$OrganizationCache->load_all();
-		if( count( $OrganizationCache->cache ) > 0 )
-		{
-			$Form->select_input_object( 'org', get_param('org'), $OrganizationCache, T_('Organization'), array( 'allow_none' => true ) );
-		}
-	}
-
 	if( is_admin_page() && empty( $edited_Newsletter ) && empty( $edited_EmailCampaign ) )
 	{	// Filter by newsletter only on back-office and don't display on newsletter and email campaign edit forms:
 		$NewsletterCache = & get_NewsletterCache( T_('All') );
@@ -3596,15 +3577,6 @@ function callback_filter_userlist( & $Form )
 		$Form->end_line();
 	}
 
-	if( is_admin_page() )
-	{
-		if( $current_User->check_perm( 'users', 'edit' ) )
-		{
-			$Form->checkbox( 'custom_sender_email', get_param('custom_sender_email'), T_('Users with custom sender address') );
-			$Form->checkbox( 'custom_sender_name', get_param('custom_sender_name'), T_('Users with custom sender name') );
-		}
-	}
-
 	if( is_admin_page() && $edited_EmailCampaign )
 	{
 		$campaign_send_status = array(
@@ -3617,6 +3589,63 @@ function callback_filter_userlist( & $Form )
 		$Form->select_input_array( 'recipient_type', get_param( 'recipient_type' ), $campaign_send_status, '<span class="text-info">'.T_('Campaign Status').'</span>', '', array( 'allow_none' => true ) );
 	}
 	echo '<br />';
+
+	// Gender:
+	$filters['gender'] = array(
+			'label'  => T_('Gender'),
+			'input'  => 'select',
+			'values' => array(
+					'M' => T_('Men'),
+					'F' => T_('Women'),
+					'O' => T_('Other'),
+				),
+		);
+
+	// Level:
+	$filters['level'] = array(
+			'label'     => T_('User level'),
+			'operators' => '=,!=,<,<=,>,>=,between,not_between',
+			'input'     => 'select',
+			'type'      => 'integer',
+			'values'    => array( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ),
+		);
+
+	// Organization:
+	if( empty( $edited_Organization ) )
+	{	// Show organization filter only when organization form is not selected:
+		$OrganizationCache = & get_OrganizationCache( T_('All') );
+		$OrganizationCache->load_all();
+		$filters['org'] = array(
+				'label'  => T_('Organization'),
+				'input'  => 'select',
+				'values' => $OrganizationCache->get_option_array(),
+			);
+	}
+
+	if( is_admin_page() && $current_User->check_perm( 'users', 'edit' ) )
+	{
+		// Uses custom sender address:
+		$filters['custom_sender_email'] = array(
+				'label'     => T_('Uses custom sender address'),
+				'operators' => 'blank',
+				'input'     => 'radio',
+				'values'    => array(
+						'yes' => T_('yes'),
+						'no'  => T_('no')
+					),
+			);
+
+		// Uses custom sender name:
+		$filters['custom_sender_name'] = array(
+				'label'     => T_('Uses custom sender name'),
+				'operators' => 'blank',
+				'input'     => 'radio',
+				'values'    => array(
+						'yes' => T_('yes'),
+						'no'  => T_('no')
+					),
+			);
+	}
 
 	// Specific criteria:
 	$Form->output = false;

@@ -603,7 +603,7 @@ class Table extends Widget
 
 			if( ! isset( $params['operators'] ) )
 			{	// Use default operator if it is not defined:
-				$params['operators'] = '=';
+				$params['operators'] = '=,!=';
 			}
 
 			foreach( $params as $param_name => $param_value )
