@@ -20,5 +20,6 @@ if( $edited_Newsletter->ID > 0 )
 {	// Display campaigns attached to this Newsletter:
 	campaign_results_block( array(
 			'enlt_ID'               => $edited_Newsletter->ID,
+			'results_title'         => T_('Email campaigns').get_manual_link( 'campaigns-for-a-list' )
 		) );
 }
