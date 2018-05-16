@@ -1831,16 +1831,12 @@ function create_default_email_campaigns()
 
 	task_begin( 'Creating default email campaigns... ' );
 
-	load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
-	load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
-
 	if( $create_sample_contents )
 	{
-		$EmailCampaign = new EmailCampaign();
-		$EmailCampaign->set( 'enlt_ID', 1 );
-		$EmailCampaign->set( 'name', T_('Markdown Example') );
-		$EmailCampaign->set( 'email_defaultdest', $baseurl );
-		$EmailCampaign->set( 'email_text', T_('Heading
+		load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
+		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+		$email_campaign_text = T_('Heading
 =======
 
 Sub-heading
@@ -1881,15 +1877,110 @@ Button examples:
 [button]This is a button[/button]
 [like]I like this[/like] [dislike]I don\'t like this[/dislike]
 [cta:1:info]Call to action 1 info button[/cta] [cta:2:warning]Call to action 2 warning button[/cta] [cta:3:default]Call to action 3 default button[/cta]
-[cta:1:link]Call to action 1 link only[/cta]') );
+[cta:1:link]Call to action 1 link only[/cta]');
 
-		if( $EmailCampaign->dbinsert() )
-		{	// Add recipients after successfull email campaign creating:
-			$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
-			if( ! empty( $user_IDs ) )
-			{	// Only if we have found the users in DB
+		$email_campaigns = array(
+			array(
+				'name' => T_('Markdown Example'),
+				'text' => $email_campaign_text,
+			),
+			array(
+				'name' => T_('Another example'),
+				'text' => T_('Hi')."\n\n".$email_campaign_text."\n\n".T_('This is another example email campaign.'),
+			),
+		);
+
+		$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
+		foreach( $email_campaigns as $email_campaign )
+		{
+			$EmailCampaign = new EmailCampaign();
+			$EmailCampaign->set( 'enlt_ID', 1 );
+			$EmailCampaign->set( 'name', $email_campaign['name'] );
+			$EmailCampaign->set( 'email_defaultdest', $baseurl );
+			$EmailCampaign->set( 'email_text', $email_campaign['text'] );
+
+			if( $EmailCampaign->dbinsert() && ! empty( $user_IDs ) )
+			{	// Add recipients after successfull email campaign creating,
+				// only if we have found the users in DB:
 				$EmailCampaign->add_recipients( $user_IDs );
 			}
+		}
+	}
+
+	task_end();
+}
+
+
+/**
+ * Create default automations
+ */
+function create_default_automations()
+{
+	global $DB, $create_sample_contents, $baseurl;
+
+	task_begin( 'Creating default automations... ' );
+
+	if( $create_sample_contents )
+	{
+		//load_funcs( 'automations/model/_automation.funcs.php' );
+		load_class( 'automations/model/_automation.class.php', 'Automation' );
+		load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
+
+		$Automation = new Automation();
+		$Automation->set( 'name', T_('Sample Automation') );
+		$Automation->set( 'owner_user_ID', 1 );
+		$Automation->update_newsletters = true;
+		$Automation->newsletters = array( array(
+				'ID'        => 1,
+				'autostart' => 1,
+				'autoexit'  => 1,
+			) );
+
+		if( $Automation->dbinsert() )
+		{	// Add steps after successfull creating of the automation:
+			$AutomationStep = new AutomationStep();
+			$AutomationStep->set( 'autm_ID', $Automation->ID );
+			$AutomationStep->set( 'order', 1 );
+			$AutomationStep->set( 'label', 'admin' );
+			$AutomationStep->set( 'type', 'notify_owner' );
+			$AutomationStep->set( 'info', 'The User $login$ has reached step $step_number$ (ID: $step_ID$) in automation $automation_name$ (ID: $automation_ID$)' );
+			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'yes_next_step_delay', 86400 ); // 1 day
+			$AutomationStep->set( 'error_next_step_ID', 1 ); // Loop
+			$AutomationStep->set( 'error_next_step_delay', 14400 ); // 4 hours
+			$AutomationStep->dbinsert();
+
+			$AutomationStep = new AutomationStep();
+			$AutomationStep->set( 'autm_ID', $Automation->ID );
+			$AutomationStep->set( 'order', 2 );
+			$AutomationStep->set( 'label', 'Markdown Example' );
+			$AutomationStep->set( 'type', 'send_campaign' );
+			$AutomationStep->set( 'info', '1' ); // Email Campaign ID
+			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'yes_next_step_delay', 259200 ); // 3 days
+			$AutomationStep->set( 'no_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
+			$AutomationStep->set( 'error_next_step_ID', 2 ); // Loop
+			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
+			$AutomationStep->dbinsert();
+
+			$AutomationStep = new AutomationStep();
+			$AutomationStep->set( 'autm_ID', $Automation->ID );
+			$AutomationStep->set( 'order', 3 );
+			$AutomationStep->set( 'label', 'Another example' );
+			$AutomationStep->set( 'type', 'send_campaign' );
+			$AutomationStep->set( 'info', '2' ); // Email Campaign ID
+			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'yes_next_step_delay', 259200 ); // 3 days
+			$AutomationStep->set( 'no_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
+			$AutomationStep->set( 'error_next_step_ID', 2 ); // Loop
+			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
+			$AutomationStep->dbinsert();
+
+			// Add users to this automation:
+			$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
+			$Automation->add_users( $user_IDs );
 		}
 	}
 
