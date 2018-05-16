@@ -46,7 +46,7 @@ class polls_plugin extends Plugin
 	function get_coll_setting_definitions( & $params )
 	{
 		$default_params = array_merge( $params, array(
-				'default_comment_rendering' => 'opt-in',
+				'default_comment_rendering' => 'never',
 				'default_post_rendering' => 'opt-out'
 			) );
 
@@ -218,7 +218,6 @@ class polls_plugin extends Plugin
 	 */
 	function DisplayCommentToolbar( & $params )
 	{
-/*
 		if( ! empty( $params['Comment'] ) )
 		{	// Comment is set, get Blog from comment:
 			$Comment = & $params['Comment'];
@@ -243,7 +242,7 @@ class polls_plugin extends Plugin
 		{	// Plugin is not enabled for current case, so don't display a toolbar:
 			return false;
 		}
-*/
+
 		// Print toolbar on screen
 		return $this->DisplayCodeToolbar( $params );
 	}
