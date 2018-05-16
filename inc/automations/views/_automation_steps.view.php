@@ -42,8 +42,10 @@ $count_SQL = new SQL( 'Get number of steps of automation #'.$edited_Automation->
 $count_SQL->SELECT( 'COUNT( step_ID )' );
 $count_SQL->FROM( 'T_automation__step' );
 $count_SQL->WHERE( 'step_autm_ID = '.$edited_Automation->ID );
+// Use additional row to display a total row even when automation has no steps:
+$steps_count = $DB->get_var( $count_SQL ) + 1;
 
-$Results = new Results( $SQL->get(), 'step_', 'A', NULL, $count_SQL->get() );
+$Results = new Results( $SQL->get(), 'step_', 'A', NULL, $steps_count );
 
 if( $edited_Automation->get( 'status' ) == 'active' )
 {	// Set status text and button of the Automation for title:
