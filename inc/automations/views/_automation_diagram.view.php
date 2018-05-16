@@ -42,7 +42,7 @@ else
 if( count( $steps ) > 0 )
 {	// Display a button to reset a diagram layout to default positions:
 	echo '<a href="'.$admin_url.'?ctrl=automations&amp;action=reset_diagram&amp;autm_ID='.$edited_Automation->ID.'&amp;'.url_crumb( 'automationstep' ).'"'
-				.' class="btn btn-danger pull-right" onclick="return confirm( \''.TS_('Are you sure want to reset steps to default positions?').'\' )">'
+				.' class="btn btn-danger pull-right" onclick="return confirm( \''.TS_('Are you sure you want to reset step positions to the default layout?').'\' )">'
 			.T_('Reset layout')
 		.'</a>';
 }

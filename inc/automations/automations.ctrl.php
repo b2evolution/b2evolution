@@ -547,7 +547,7 @@ switch( $action )
 			  SET step_diagram = NULL
 			WHERE step_autm_ID = '.$DB->quote( $edited_Automation->ID ) );
 
-		$Messages->add( T_('Diagram layout has been reseted.'), 'success' );
+		$Messages->add( T_('Diagram layout has been reset.'), 'success' );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=diagram&autm_ID='.$edited_Automation->ID, 303 ); // Will EXIT
