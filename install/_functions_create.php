@@ -1974,7 +1974,7 @@ function create_default_automations()
 			$AutomationStep->set( 'yes_next_step_delay', 259200 ); // 3 days
 			$AutomationStep->set( 'no_next_step_ID', 0 ); // Continue
 			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
-			$AutomationStep->set( 'error_next_step_ID', 2 ); // Loop
+			$AutomationStep->set( 'error_next_step_ID', 3 ); // Loop
 			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
 			$AutomationStep->dbinsert();
 
