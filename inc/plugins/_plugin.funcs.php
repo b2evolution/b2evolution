@@ -591,6 +591,19 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			$Form->text_input( $input_name, $set_value, $size, $set_label, '', $params ); // TEMP: Note already in params
 			break;
 
+		case 'usertag':
+			if( isset( $parmeta['size'] ) )
+			{
+				$size = (int) $parmeta['size'];
+			}
+			else
+			{
+				$size = 30;
+			}
+
+			$Form->usertag_input( $input_name, $set_value, $size, $set_label, '', $params );
+			break;
+
 		case 'info':
 			$Form->info( $parmeta['label'], $parmeta['info'] );
 			break;
@@ -1022,21 +1035,23 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 		$l_value = $set_value;
 	}
 
-	if( isset($parmeta['type']) && strpos( $parmeta['type'], 'array' ) === 0 )
-	{ // make keys (__key__) in arrays unique and remove them
-		handle_array_keys_in_plugin_settings($l_value);
-	}
-
-	if( isset( $parmeta['type'] ) && $parmeta['type'] == 'integer' )
-	{	// Convert to correct integer value:
-		if( $l_value !== '' )
-		{	// Don't convert empty string '' to integer 0:
-			$l_value = intval( $l_value );
+	if( isset( $parmeta['type'] ) )
+	{	// Prepare values before store them in DB:
+		if( strpos( $parmeta['type'], 'array' ) === 0 )
+		{	// Make keys (__key__) in arrays unique and remove them
+			handle_array_keys_in_plugin_settings( $l_value );
 		}
-		if( empty( $l_value ) && ! empty( $parmeta['allow_empty'] ) &&
-				isset( $parmeta['valid_range'], $parmeta['valid_range']['min'] ) && $parmeta['valid_range']['min'] > 0 )
-		{	// Convert 0 to empty value for integer field if it allows empty values:
-			$l_value = NULL;
+		elseif( $parmeta['type'] == 'integer' )
+		{	// Convert to correct integer value:
+			if( $l_value !== '' )
+			{	// Don't convert empty string '' to integer 0:
+				$l_value = intval( $l_value );
+			}
+			if( empty( $l_value ) && ! empty( $parmeta['allow_empty'] ) &&
+					isset( $parmeta['valid_range'], $parmeta['valid_range']['min'] ) && $parmeta['valid_range']['min'] > 0 )
+			{	// Convert 0 to empty value for integer field if it allows empty values:
+				$l_value = NULL;
+			}
 		}
 	}
 
@@ -1186,11 +1201,19 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 		{
 			foreach( $value as $vk => $vv )
 			{
-				if( ! isset( $vv[$mk] ) )
-					continue;
-
-				if( ! autoform_validate_param_value( $param_name.'['.$vk.']['.$mk.']', $vv[$mk], $mv ) )
-				{
+				if( isset( $mv['type'] ) && $mv['type'] == 'input_group' &&
+				    ! empty( $mv['inputs'] ) && is_array( $mv['inputs'] ) )
+				{	// Validate each input field of the setting with type "input_group":
+					foreach( $mv['inputs'] as $k => $v )
+					{
+						if( isset( $vv[ $mk.$k ] ) && ! autoform_validate_param_value( $param_name.'['.$vk.']['.$mk.$k.']', $vv[ $mk.$k ], $v ) )
+						{	// If at least one setting of the grouped inputs has an error:
+							$r = false;
+						}
+					}
+				}
+				elseif( isset( $vv[ $mk ] ) && ! autoform_validate_param_value( $param_name.'['.$vk.']['.$mk.']', $vv[ $mk ], $mv ) )
+				{	// If single setting has an error:
 					$r = false;
 				}
 			}

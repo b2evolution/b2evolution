@@ -6,10 +6,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $DB, $UserSettings, $Settings;
 
-global $servertimenow, $unread_message_reminder_delay, $unread_messsage_reminder_threshold;
+global $servertimenow;
+
+// Get array of the unread private messages reminder delay settings:
+$unread_message_reminder_delay = $Settings->get( 'unread_message_reminder_delay' );
 
 // New unread messages reminder may be sent to a user if it has at least one unread message which is older then the given threshold date
-$threshold_date = date2mysql( $servertimenow - $unread_messsage_reminder_threshold );
+$threshold_date = date2mysql( $servertimenow - $Settings->get( 'unread_message_reminder_threshold' ) );
 // New unread messages reminder should be sent to a user if the last one was sent at least x days ago, where x depends from the configuration
 // Get the minimum delay value from the configuration array
 $minimum_delay = array_values( $unread_message_reminder_delay );
@@ -48,7 +51,7 @@ $query = 'SELECT DISTINCT user_ID, last_sent.uset_value
 		WHERE ( msg_datetime < '.$DB->quote( $threshold_date ).' )
 			AND ( last_sent.uset_value IS NULL OR last_sent.uset_value < '.$DB->quote( $reminder_threshold ).' )
 			AND ( '.$notify_condition.' )
-			AND ( user_status IN ( "activated", "autoactivated" ) )
+			AND ( user_status IN ( "activated", "autoactivated", "manualactivated" ) )
 			AND ( LENGTH(TRIM(user_email)) > 0 )
 			AND ( user_email NOT IN ( SELECT emadr_address FROM T_email__address WHERE '.get_mail_blocked_condition().' ) )';
 $users_to_remind = $DB->get_assoc( $query, 0, 'Find users who need to be reminded' );
@@ -113,6 +116,7 @@ $unread_threads = get_users_unread_threads( $users_to_remind_ids, NULL, 'array',
 list( $threads_link ) = get_messages_link_to();
 
 $reminder_sent = 0;
+$reminder_failed = 0;
 foreach( $users_to_remind_ids as $user_ID )
 {
 	// send reminder email
@@ -128,11 +132,19 @@ foreach( $users_to_remind_ids as $user_ID )
 		$UserSettings->set( 'last_unread_messages_reminder', date2mysql( $servertimenow ), $user_ID );
 		// save UserSettings after each email, because the cron task mail fail and users won't be updated!
 		$UserSettings->dbupdate();
+		cron_log_action_end( 'User '.$notify_User->get_identity_link().' has been notified' );
 		$reminder_sent++;
+	}
+	else
+	{	// Log failed mail sending:
+		global $mail_log_message;
+		cron_log_action_end( 'User '.$notify_User->get_identity_link().' could not be notified because of error: '
+			.'"'.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'"', 'warning' );
+		$reminder_failed++;
 	}
 	locale_restore_previous();
 }
 
-cron_log_append( sprintf( T_('%d reminder emails were sent!'), $reminder_sent ) );
+cron_log_append( ( ( $reminder_sent + $reminder_failed ) ? "\n" : '' ).sprintf( T_('%d reminder emails were sent!'), $reminder_sent ) );
 return 1; /* ok */
 ?>

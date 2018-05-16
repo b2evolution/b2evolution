@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url;
+global $admin_url, $UserSettings;
 
 // Default params:
 $params = array_merge( array(
@@ -54,7 +54,12 @@ if( $params['reg_country'] > 0 )
 
 if( ! empty( $params['reg_domain'] ) )
 {	// Domain field is entered:
-	echo T_('Registration Domain').": ".$params['reg_domain']."\n";
+	if( ! empty( $params['new_user_ID'] ) )
+	{
+		$user_ip_address = int2ip( $UserSettings->get( 'created_fromIPv4', $params['new_user_ID'] ) );
+	}
+	echo T_('Registration Domain').": ".$params['reg_domain'].
+			( ! empty( $user_ip_address ) ? ' '.$admin_url.'?ctrl=antispam&action=whois&query='.$user_ip_address : '' )."\n";
 }
 
 if( $params['country'] > 0 )

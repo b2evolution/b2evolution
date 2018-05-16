@@ -439,18 +439,13 @@ class Automation extends DataObject
 			$first_step_SQL->WHERE( 'step_autm_ID = '.$this->ID );
 			$first_step_SQL->ORDER_BY( 'step_order ASC' );
 			$first_step_SQL->LIMIT( 1 );
-			$first_step_ID = intval( $DB->get_var( $first_step_SQL ) );
-		}
-
-		if( empty( $first_step_ID ) )
-		{	// No detected first step or no users to add or requeue:
-			return $added_users_num;
+			$first_step_ID = $DB->get_var( $first_step_SQL );
 		}
 
 		if( $params['users_automated'] == 'requeue' && count( $automated_user_IDs ) )
 		{	// Requeue already automated users to first Step:
 			$added_users_num += $DB->query( 'UPDATE T_automation__user_state 
-				  SET aust_next_step_ID = '.$DB->quote( $first_step_ID ).',
+				  SET aust_next_step_ID = '.$DB->quote( intval( $first_step_ID ) ).',
 				      aust_next_exec_ts = '.$DB->quote( date2mysql( $servertimenow ) ).'
 				WHERE aust_autm_ID = '.$DB->quote( $this->ID ).'
 				  AND aust_user_ID IN ( '.$DB->quote( $automated_user_IDs ).' )',

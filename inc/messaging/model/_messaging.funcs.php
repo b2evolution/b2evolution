@@ -1624,7 +1624,7 @@ function get_first_unread_message_date( $user_ID )
  */
 function get_next_reminder_info( $user_ID )
 {
-	global $UserSettings, $DB, $servertimenow, $unread_message_reminder_delay, $unread_messsage_reminder_threshold;
+	global $Settings, $UserSettings, $DB, $servertimenow;
 
 	if( ! $UserSettings->get( 'notify_unread_messages', $user_ID ) )
 	{ // The user doesn't want to recive unread messages reminders
@@ -1636,6 +1636,9 @@ function get_next_reminder_info( $user_ID )
 	{ // The user doesn't have unread messages
 		return T_('This user doesn\'t have unread messages.');
 	}
+
+	// Get array of the unread private messages reminder delay settings:
+	$unread_message_reminder_delay = $Settings->get( 'unread_message_reminder_delay' );
 
 	// We assume that reminder is not delayed because of the user was not logged in since too many days
 	$reminder_is_delayed = false;
@@ -1690,7 +1693,7 @@ function get_next_reminder_info( $user_ID )
 	}
 	elseif( empty( $last_unread_messages_reminder ) )
 	{ // The user didn't get unread messages reminder emails before
-		$note = sprintf( T_('The user has never received a notification yet, so the first notification is sent with %s delay'), seconds_to_period( $unread_messsage_reminder_threshold ) );
+		$note = sprintf( T_('The user has never received a notification yet, so the first notification is sent with %s delay'), seconds_to_period( $Settings->get( 'unread_message_reminder_threshold' ) ) );
 	}
 	else
 	{ // Reminder is not delayed
@@ -1941,6 +1944,7 @@ function threads_results_block( $params = array() )
 			'results_param_prefix' => 'actv_thrd_',
 			'results_title'        => T_('Threads with private messages sent by the user'),
 			'results_no_text'      => T_('User has not sent any private messages'),
+			'action'               => '',
 		), $params );
 
 	if( !is_logged_in() )
@@ -1993,7 +1997,7 @@ function threads_results_block( $params = array() )
 		$threads_Results->title = $params['results_title'];
 		$threads_Results->no_results_text = $params['results_no_text'];
 
-		if( $threads_Results->get_total_rows() > 0 )
+		if( $params['action'] != 'view' && $threads_Results->get_total_rows() > 0 )
 		{	// Display action icon to delete all records if at least one record exists
 			$threads_Results->global_icon( sprintf( T_('Delete all private messages sent by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_messages&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
 		}

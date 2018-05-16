@@ -602,6 +602,9 @@ class RestApi
 		// Get param to limit number posts per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
 
+		// Get param to know what post fields should be sent in response:
+		$api_details = param( 'details', 'string', NULL );
+
 		// Try to get a post ID for request "<baseurl>/api/v1/collections/<collname>/items/<id>":
 		$post_ID = empty( $this->args[3] ) ? 0 : $this->args[3];
 
@@ -637,57 +640,105 @@ class RestApi
 			$this->add_response( 'pages_total', $ItemList2->total_pages, 'integer' );
 		}
 
+		if( $api_details == '*' || ( $post_ID && empty( $api_details ) ) )
+		{	// Use all possible fields for single post request or if it is defined to current request:
+			$api_details = array(
+					'id',
+					'datestart',
+					'urltitle',
+					'type',
+					'title',
+					'content',
+					'excerpt',
+					'teaser',
+					'URL',
+					'attachments',
+				);
+		}
+		elseif( empty( $api_details ) )
+		{	// For posts list get only ID and title by default:
+			$api_details = array( 'id', 'title' );
+		}
+		else
+		{	// Use custom fields from request:
+			$api_details = explode( ',', $api_details );
+		}
+
 		// Add each post row in the response array:
 		while( $Item = & $ItemList2->get_next() )
 		{
-			// Get all(1000) item attachemnts:
-			$attachments = array();
-			$LinkOwner = new LinkItem( $Item );
-			if( $LinkList = $LinkOwner->get_attachment_LinkList( 1000 ) )
+			// Initialize data for each item:
+			$item_data = array();
+			foreach( $api_details as $api_details_field )
 			{
-				while( $Link = & $LinkList->get_next() )
+				switch( $api_details_field )
 				{
-					if( ! ( $File = & $Link->get_File() ) )
-					{	// No File object
-						global $Debuglog;
-						$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
-						continue;
-					}
+					case 'id':
+						$item_data['id'] = intval( $Item->ID );
+						break;
+					case 'datestart':
+						$item_data['datestart'] = $Item->get( 'datestart' );
+						break;
+					case 'urltitle':
+						$item_data['urltitle'] = $Item->get( 'urltitle' );
+						break;
+					case 'type':
+						$item_data['type'] = $Item->get_type_setting( 'name' );
+						break;
+					case 'title':
+						$item_data['title'] = $Item->get( 'title' );
+						break;
+					case 'content':
+						$item_data['content'] = $Item->get_prerendered_content( 'htmlbody' );
+						break;
+					case 'excerpt':
+						$item_data['excerpt'] = $Item->get( 'excerpt' );
+						break;
+					case 'teaser':
+						$item_data['teaser'] = $Item->get_content_teaser();
+						break;
+					case 'URL':
+						$item_data['URL'] = $Item->get_permanent_url( '', '', '&' );
+						break;
+					case 'attachments':
+						// Get all(1000) item attachemnts:
+						$attachments = array();
+						$LinkOwner = new LinkItem( $Item );
+						if( $LinkList = $LinkOwner->get_attachment_LinkList( 1000 ) )
+						{
+							while( $Link = & $LinkList->get_next() )
+							{
+								if( ! ( $File = & $Link->get_File() ) )
+								{	// No File object
+									global $Debuglog;
+									$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
+									continue;
+								}
 
-					if( ! $File->exists() )
-					{	// File doesn't exist
-						global $Debuglog;
-						$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
-						continue;
-					}
+								if( ! $File->exists() )
+								{	// File doesn't exist
+									global $Debuglog;
+									$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+									continue;
+								}
 
-					$attachments[] = array(
-							'link_ID'  => intval( $Link->ID ),
-							'file_ID'  => intval( $File->ID ),
-							'type'     => strval( $File->is_dir() ? 'dir' : $File->type ),
-							'position' => $Link->get( 'position' ),
-							'name'     => $File->get_name(),
-							'url'      => $File->get_url(),
-							'title'    => strval( $File->get( 'title' ) ),
-							'alt'      => strval( $File->get( 'alt' ) ),
-							'desc'     => strval( $File->get( 'desc' ) ),
-						);
+								$attachments[] = array(
+										'link_ID'  => intval( $Link->ID ),
+										'file_ID'  => intval( $File->ID ),
+										'type'     => strval( $File->is_dir() ? 'dir' : $File->type ),
+										'position' => $Link->get( 'position' ),
+										'name'     => $File->get_name(),
+										'url'      => $File->get_url(),
+										'title'    => strval( $File->get( 'title' ) ),
+										'alt'      => strval( $File->get( 'alt' ) ),
+										'desc'     => strval( $File->get( 'desc' ) ),
+									);
+							}
+						}
+						$item_data['attachments'] = $attachments;
+						break;
 				}
 			}
-
-			// Initialize data for each item:
-			$item_data = array(
-					'id'          => intval( $Item->ID ),
-					'datestart'   => $Item->get( 'datestart' ),
-					'urltitle'    => $Item->get( 'urltitle' ),
-					'type'        => $Item->get_type_setting( 'name' ),
-					'title'       => $Item->get( 'title' ),
-					'content'     => $Item->get_prerendered_content( 'htmlbody' ),
-					'excerpt'     => $Item->get( 'excerpt' ),
-					'teaser'      => $Item->get_content_teaser(),
-					'URL'         => $Item->get_permanent_url( '', '', '&' ),
-					'attachments' => $attachments,
-				);
 
 			if( $post_ID )
 			{	// If only one post is requested then response should as one level array with post fields:
@@ -1671,7 +1722,7 @@ class RestApi
 		$user_logins = array();
 		foreach( $users as $User )
 		{
-			if( $can_view_all_users || in_array( $User->get( 'status' ), array( 'activated', 'autoactivated' ) ) )
+			if( $can_view_all_users || in_array( $User->get( 'status' ), array( 'activated', 'autoactivated', 'manualactivated' ) ) )
 			{	// Allow to see this user only if current User has a permission to see users with current status:
 				$user_logins[] = $User->get( 'login' );
 			}
@@ -1693,7 +1744,7 @@ class RestApi
 		global $DB;
 
 		$params = array_merge( array(
-				'sql_where' => 'user_status IN ( "activated", "autoactivated" )',
+				'sql_where' => 'user_status IN ( "activated", "autoactivated", "manualactivated" )',
 				'sql_mask'  => '$login$%',
 				'sql_limit' => 0,
 			), $params );

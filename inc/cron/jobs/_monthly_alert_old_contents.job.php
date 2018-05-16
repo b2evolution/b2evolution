@@ -148,7 +148,7 @@ $SQL->SELECT( '*' );
 $SQL->FROM( 'T_users' );
 $SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "send_pst_stale_alert"' );
 $SQL->WHERE( 'user_ID IN ('.implode( ',', $all_required_user_IDs ).')' );
-$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
+$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 $SQL->WHERE_and( 'LENGTH( TRIM( user_email ) ) > 0' );
 // Set notify moderation condition:
 if( $UserSettings->get( 'send_pst_stale_alert' ) )
@@ -176,6 +176,7 @@ if( empty( $UserCache->cache ) )
 }
 
 $mail_moderator_sent = array();
+$mail_moderator_num = 0;
 $mail_coll_sent = 0;
 foreach( $BlogCache->cache as $alert_Blog )
 {
@@ -256,12 +257,21 @@ foreach( $BlogCache->cache as $alert_Blog )
 
 		// Send one email message for each moderator per collection:
 		if( send_mail_to_User( $alert_User->ID, sprintf( T_('Stale contents found in %s'), $alert_Blog->get( 'shortname' ) ), 'posts_stale_alert', $email_params, false ) )
-		{
+		{	// Log success mail sending:
+			cron_log_action_end( 'User '.$alert_User->get_identity_link().' has been alerted' );
 			$mail_moderator_sent[ $alert_User->ID ] = 0;
+		}
+		else
+		{	// Log failed mail sending:
+			global $mail_log_message;
+			cron_log_action_end( 'User '.$alert_User->get_identity_link().' could not be alerted because of error: '
+				.'"'.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'"', 'warning' );
 		}
 
 		// Restore locale:
 		locale_restore_previous();
+
+		$mail_moderator_num++;
 	}
 
 	$mail_coll_sent++;
@@ -269,11 +279,11 @@ foreach( $BlogCache->cache as $alert_Blog )
 
 if( count( $mail_moderator_sent ) )
 {
-	cron_log_append( sprintf( '%s moderators have been alerted on old contents of %s collections!', count( $mail_moderator_sent ), $mail_coll_sent ) );
+	cron_log_append( ( $mail_moderator_num ? "\n" : '' ).sprintf( '%s moderators have been alerted on old contents of %s collections!', count( $mail_moderator_sent ), $mail_coll_sent ) );
 }
 else
 {
-	cron_log_append( 'No moderators have been alerted on old contents!' );
+	cron_log_append( ( $mail_moderator_num ? "\n" : '' ).'No moderators have been alerted on old contents!' );
 }
 
 return 1; /*OK*/

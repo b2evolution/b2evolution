@@ -1163,6 +1163,7 @@ function comments_results_block( $params = array() )
 			'results_param_prefix' => 'actv_comment_',
 			'results_title'        => T_('Comments posted by the user'),
 			'results_no_text'      => T_('User has not posted any comment yet'),
+			'action'               => '',
 		), $params );
 
 	if( !is_logged_in() )
@@ -1208,7 +1209,7 @@ function comments_results_block( $params = array() )
 	$comments_Results->title = $params['results_title'];
 	$comments_Results->no_results_text = $params['results_no_text'];
 
-	if( $comments_Results->get_total_rows() > 0 && $edited_User->has_comment_to_delete() )
+	if( $params['action'] != 'view' && $comments_Results->get_total_rows() > 0 && $edited_User->has_comment_to_delete() )
 	{	// Display action icon to delete all records if at least one record exists & current user can delete at least one comment posted by user
 		$comments_Results->global_icon( sprintf( T_('Delete all comments posted by %s'), $edited_User->login ), 'recycle', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_comments&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
 	}

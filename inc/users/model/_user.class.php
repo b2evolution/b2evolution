@@ -59,11 +59,16 @@ class User extends DataObject
 	/**
 	 * User account status
 	 *
-	 * 'new', 'activated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
+	 * 'new', 'activated', 'manualactivated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
 	 *
 	 * @var string
 	 */
 	var $status;
+	/**
+	 * User previous status. It will be set only if the user status was changed.
+	 * @var string
+	 */
+	var $previous_status;
 
 	/**
 	 * Number of posts by this user. Use get_num_posts() to access this (lazy filled).
@@ -1467,6 +1472,7 @@ class User extends DataObject
 					$subscribe_blog_ID = param( 'subscribe_blog', 'integer', 0 );
 
 					$sub_items    = 1;
+					$sub_items_mod = 1;
 					$sub_comments = 0; // We normally subscribe to new posts only
 
 					// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
@@ -1484,8 +1490,8 @@ class User extends DataObject
 								$sub_comments = 1;
 							}
 
-							$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
-								VALUES ( '.$DB->quote( $subscribe_blog_ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $sub_items ).', '.$DB->quote( $sub_comments ).' )' );
+							$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
+								VALUES ( '.$DB->quote( $subscribe_blog_ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $sub_items ).', '.$DB->quote( $sub_items_mod ).', '.$DB->quote( $sub_comments ).' )' );
 
 							$Messages->add( T_('Subscriptions have been changed.'), 'success' );
 						}
@@ -1560,6 +1566,10 @@ class User extends DataObject
 					$UserSettings->set( 'send_pst_moderation_reminder', param( 'edited_user_send_pst_moderation_reminder', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'send_pst_stale_alert', param( 'edited_user_send_pst_stale_alert', 'integer', 0 ), $this->ID );
 				}
+				if( $this->check_role( 'member' ) )
+				{
+					$UserSettings->set( 'notify_post_assignment', param( 'edited_user_notify_post_assignment', 'integer', 0 ), $this->ID );
+				}
 				if( $current_User->check_perm( 'users', 'edit' ) )
 				{
 					$UserSettings->set( 'send_activation_reminder', param( 'edited_user_send_activation_reminder', 'integer', 0 ), $this->ID );
@@ -1621,10 +1631,11 @@ class User extends DataObject
 							// Get checkbox values:
 							$sub_items    = param( 'sub_items_'.$loop_blog_ID,    'integer', 0 );
 							$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
+							$sub_items_mod = param( 'sub_items_mod_'.$loop_blog_ID, 'integer', 0 );
 
 							if( $sub_items || $sub_comments )
 							{	// We have a subscription for this blog
-								$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
+								$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_items_mod, $sub_comments )";
 							}
 							else
 							{	// No subscription here:
@@ -1633,12 +1644,15 @@ class User extends DataObject
 								$Blog = & $BlogCache->get_by_ID( $loop_blog_ID );
 
 								if( $Blog->get( 'advanced_perms' )
-										&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) || ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) )
+										&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) ||
+										     ( $Blog->get_setting( 'allow_item_mod_subscriptions' ) && $Blog->get_setting( 'opt_out_item_mod_subscription' ) ) ||
+										     ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) )
 										&& $this->check_perm( 'blog_ismember', 'view', true, $loop_blog_ID ) )
 								{
 									$opt_item = $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ? $sub_items : 0;
+									$opt_item_mod = $Blog->get_setting( 'allow_item_mod_subscriptions' ) && $Blog->get_setting( 'opt_out_item_mod_subscription' ) ? $sub_items : 0;
 									$opt_comment = $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ? $sub_comments : 0;
-									$opt_out_values[] = "( $loop_blog_ID, $this->ID, $opt_item, $opt_comment )";
+									$opt_out_values[] = "( $loop_blog_ID, $this->ID, $opt_item, $opt_item_mod, $opt_comment )";
 								}
 								else
 								{
@@ -1651,13 +1665,13 @@ class User extends DataObject
 					// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
 					if( count( $subscription_values ) )
 					{	// We need to record values:
-						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
 													VALUES '.implode( ', ', $subscription_values ) );
 					}
 
 					if( count( $opt_out_values ) )
 					{
-						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
 													VALUES '.implode( ', ', $opt_out_values ) );
 					}
 
@@ -2696,6 +2710,13 @@ class User extends DataObject
 				// Limit source with 30 char because of this DB field max length:
 				return $this->set_param( $parname, 'string', utf8_substr( $parvalue, 0, 30 ), $make_null );
 
+			case 'status':
+				// We need to set a reminder here to later check if the new status is allowed at dbinsert or dbupdate time ( $this->restrict_status( true ) )
+				// We cannot check immediately because we may be setting the status before having set a main cat_ID -> a collection ID to check the status possibilities
+				// Save previous status as a reminder (it can be useful to compare later. The Comment class uses this).
+				$this->previous_status = $this->get( 'status' );
+				return parent::set( 'status', $parvalue, $make_null );
+
 			case 'ctry_ID':
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
@@ -3636,13 +3657,13 @@ class User extends DataObject
 				{ // even anonymous users can see users profile, or user wants to check his own profile
 					return true;
 				}
-				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) );
+				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) || ( $this->status == 'manualactivated' ) );
 			case 'can_view_users':
 				if( $Settings->get( 'allow_anonymous_user_list' ) )
 				{ // even anonymous users can see users list
 					return true;
 				}
-				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) );
+				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) || ( $this->status == 'manualactivated' ) );
 			case 'can_view_comments':
 			case 'can_view_contacts':
 			case 'can_view_messages':
@@ -3652,13 +3673,13 @@ class User extends DataObject
 			case 'can_edit_post':
 			case 'can_edit_comment':
 			case 'can_edit_contacts':
-				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) );
+				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) || ( $this->status == 'manualactivated' ) );
 			case 'can_report_user':
 				if( ! empty( $target ) )
 				{
 					$UserCache = & get_UserCache();
 					$target_User = & $UserCache->get_by_ID( $target );
-					return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) )
+					return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) || ( $this->status == 'manualactivated' ) )
 							&& ( ! empty( $target_User ) && ( $target_User->get( 'level' ) <= $this->get( 'level' ) ) );
 				}
 				return false;
@@ -4094,6 +4115,13 @@ class User extends DataObject
 		// Example: An authentication plugin could synchronize/update the password of the user.
 		$Plugins->trigger_event( 'AfterUserUpdate', $params = array( 'User' => & $this ) );
 
+		if( isset( $this->previous_status ) &&
+		    ! in_array( $this->previous_status, array( 'activated', 'manualactivated', 'autoactivated' ) ) &&
+		    in_array( $this->get( 'status' ), array( 'activated', 'manualactivated', 'autoactivated' ) ) )
+		{	// Complete activation if user has been activated:
+			$this->complete_activation();
+		}
+
 		$DB->commit();
 
 		// BLOCK CACHE INVALIDATION:
@@ -4355,13 +4383,26 @@ class User extends DataObject
 	 */
 	function activate_from_Request()
 	{
-		global $DB, $Settings, $UserSettings;
-
 		// Activate current user account:
 		$this->set( 'status', 'activated' );
 		$this->dbupdate();
+	}
 
-		// clear last reminder key and last activation email date because the user was activated
+
+	/**
+	 * Do actions to complete activation for this user account
+	 */
+	function complete_activation()
+	{
+		global $DB, $Settings, $UserSettings, $current_User;
+
+		if( empty( $UserSettings ) )
+		{	// initialize UserSettings:
+			load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+			$UserSettings = new UserSettings();
+		}
+
+		// Clear last reminder key and last activation email date because the user was activated:
 		$UserSettings->delete( 'last_activation_reminder_key', $this->ID );
 		$UserSettings->delete( 'last_activation_email', $this->ID );
 		$UserSettings->delete( 'activation_reminder_count', $this->ID );
@@ -4369,23 +4410,32 @@ class User extends DataObject
 		$UserSettings->dbupdate();
 
 		if( $Settings->get( 'newusers_findcomments' ) )
-		{	// We have to assign the all old comments from current user by email
-			$DB->query( '
-				UPDATE T_comments
-				   SET comment_author_user_ID = "'.$this->ID.'"
+		{	// We have to assign the all old comments from current user by email:
+			$DB->query( 'UPDATE T_comments
+				   SET comment_author_user_ID = '.$DB->quote( $this->ID ).'
 				 WHERE comment_author_email = '.$DB->quote( $this->email ).'
-				   AND comment_author_user_ID IS NULL' );
+				   AND comment_author_user_ID IS NULL',
+				'Assign anonymous comments to register user after activation' );
+			// Subscribe user to posts where he selected "Notify me of replies" on creating those anonymous comments:
+			$SQL = new SQL();
+			$SQL->SELECT( 'DISTINCT comment_item_ID, comment_author_user_ID, 1' );
+			$SQL->FROM( 'T_comments' );
+			$SQL->WHERE( 'comment_author_user_ID = '.$DB->quote( $this->ID ) );
+			$SQL->WHERE_and( 'comment_anon_notify = 1' );
+			$DB->query( 'REPLACE INTO T_items__subscriptions ( isub_item_ID, isub_user_ID, isub_comments ) '.$SQL->get(),
+				'Subscribe user to posts where he selected "Notify me of replies" on creating those anonymous comments' );
 		}
 
-		// Create a welcome private message when user's status was changed to Active
+		// Create a welcome private message when user's status was changed to Active:
 		$this->send_welcome_message();
 
-		// Send notification email about activated account to users with edit users permission
-		$email_template_params = array(
-			'User' => $this,
-			'login' => $this->login, // this is required in the send_admin_notification
-		);
-		send_admin_notification( NT_('New user account activated'), 'account_activated', $email_template_params );
+		// Send notification email about activated account to users with edit users permission:
+		send_admin_notification( NT_('New user account activated'), 'account_activated', array(
+				'User' => $this,
+				'login' => $this->login, // this is required in the send_admin_notification
+				// If admin activated some other user account:
+				'activated_by_admin' => ( is_logged_in() && $current_User->ID != $this->ID ? $current_User->get_username() : '' ),
+			) );
 	}
 
 
@@ -5312,6 +5362,22 @@ class User extends DataObject
 			$update_success = true;
 			if( $is_new_user )
 			{
+				// Find and inform administrator about other users with same email address on creating new user from back-office:
+				$SQL = new SQL( 'Find other users with same email as new created user' );
+				$SQL->SELECT( 'user_login' );
+				$SQL->FROM( 'T_users' );
+				$SQL->WHERE( 'user_email = '.$DB->quote( $this->get( 'email' ) ) );
+				$SQL->WHERE_and( 'user_ID != '.$DB->quote( $this->ID ) );
+				$same_email_logins = $DB->get_col( $SQL );
+				if( ! empty( $same_email_logins ) )
+				{	// If at least one user exists with same email address:
+					foreach( $same_email_logins as $l => $same_email_login )
+					{	// Display a login as link to account profile page:
+						$same_email_logins[ $l ] = get_user_identity_link( $same_email_login );
+					}
+					$Messages->add( sprintf( T_('WARNING: the user was created but it shares the same email address as: %s.'), implode( ', ', $same_email_logins ) ), 'warning' );
+				}
+
 				$Messages->add( T_('New user has been created.'), 'success' );
 				report_user_create( $this );
 			}
@@ -5508,19 +5574,6 @@ class User extends DataObject
 			}
 			else
 			{
-				$new_status_is_active = ( $new_status == 'activated' || $new_status == 'autoactivated' );
-				$old_status_is_not_active = false;
-				if( $this->check_status( 'can_be_validated' ) && $new_status_is_active )
-				{ // User was activated
-					$old_status_is_not_active = true;
-					// clear activation specific settings
-					$UserSettings->delete( 'last_activation_reminder_key', $this->ID );
-					$UserSettings->delete( 'last_activation_email', $this->ID );
-					$UserSettings->delete( 'activation_reminder_count', $this->ID );
-					$UserSettings->delete( 'send_activation_reminder', $this->ID );
-				}
-				$old_status_is_not_active = ( $old_status_is_not_active || $this->check_status( 'is_closed' ) );
-
 				// set status
 				$this->set( 'status', $new_status );
 				$UserSettings->set( 'account_close_reason', $account_close_reason, $this->ID );
@@ -5528,21 +5581,6 @@ class User extends DataObject
 				{ // db update
 					$UserSettings->dbupdate();
 					$DB->commit();
-					if( $old_status_is_not_active && $new_status_is_active )
-					{ // User was activated, create a welcome private message
-						$this->send_welcome_message();
-
-						if( $current_User->ID != $this->ID )
-						{	// If admin activated some user account
-							// Send notification email about activated account to users with edit users permission
-							$email_template_params = array(
-								'User' => $this,
-								'login' => $this->login, // this is required in the send_admin_notification
-								'activated_by_admin' => $current_User->get_username(),
-							);
-							send_admin_notification( NT_('New user account activated'), 'account_activated', $email_template_params );
-						}
-					}
 					return true;
 				}
 			}
@@ -7756,14 +7794,9 @@ class User extends DataObject
 
 		if( count( $new_subscriptions ) )
 		{	// User is really subscribing to new newsletters:
-			$SQL = new SQL( 'Get email campaigns(of lists #'.implode( ',', $new_subscriptions ).') which must be sent at subscription' );
-			$SQL->SELECT( '*' );
-			$SQL->FROM( 'T_email__campaign' );
-			$SQL->WHERE( 'ecmp_enlt_ID IN ( '.$DB->quote( $new_subscriptions ).' )' );
-			$SQL->WHERE_and( 'ecmp_auto_send = "subscription"' );
 			$EmailCampaignCache = & get_EmailCampaignCache();
 			$EmailCampaignCache->clear();
-			$EmailCampaignCache->load_by_sql( $SQL );
+			$EmailCampaignCache->load_where( 'ecmp_enlt_ID IN ( '.$DB->quote( $new_subscriptions ).' ) AND ecmp_welcome = 1' );
 
 			foreach( $EmailCampaignCache->cache as $EmailCampaign )
 			{	// Send an email of the campaign at subscription:

@@ -21,6 +21,7 @@ global $current_User;
 global $DB;
 
 // Check permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'emails', 'view', true );
 
 load_class( 'tools/model/_emailaddress.class.php', 'EmailAddress' );
@@ -244,12 +245,6 @@ switch( $action )
 
 				// Chunk Size:
 				$Settings->set( 'email_campaign_chunk_size', param( 'email_campaign_chunk_size', 'integer', 0 ) );
-
-				// Delay between chunks:
-				$Settings->set( 'email_campaign_cron_repeat', param_duration( 'email_campaign_cron_repeat' ) );
-
-				// Delay between chunks in case all remaining recipients have reached max # of emails for the current day:
-				$Settings->set( 'email_campaign_cron_limited', param_duration( 'email_campaign_cron_limited' ) );
 				break;
 
 			default:

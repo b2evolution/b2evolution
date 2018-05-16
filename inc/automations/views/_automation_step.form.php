@@ -171,9 +171,9 @@ if( ! $creating )
 	$Results->cols[] = array(
 			'th'       => T_('Next execution time'),
 			'order'    => 'aust_next_exec_ts',
-			'td'       => '%mysql2localedatetime( #aust_next_exec_ts# )%',
+			'td'       => '%mysql2localedatetime_spans( #aust_next_exec_ts# )%',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'nowrap',
+			'td_class' => 'timestamp',
 		);
 
 	$Results->cols[] = array(
@@ -210,6 +210,7 @@ jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID, #step_error_next_step_ID
 function step_type_update_info( step_type )
 {
 	jQuery( '#ffield_step_email_campaign, .ffield_step_if_condition, #ffield_step_notification_message, #ffield_step_usertag, #ffield_step_newsletter, #ffield_step_automation' ).hide();
+	jQuery( '#step_email_campaign, #step_newsletter, #step_automation' ).removeAttr( 'required' );
 	jQuery( '#ffield_step_no_next' ).show();
 	jQuery( '#ffield_step_error_next' ).show();
 
@@ -217,6 +218,7 @@ function step_type_update_info( step_type )
 	{
 		case 'send_campaign':
 			jQuery( '#ffield_step_email_campaign' ).show();
+			jQuery( '#step_email_campaign' ).attr( 'required', 'required' );
 			jQuery( '#step_result_label_yes' ).html( '<?php echo TS_( step_get_result_label( 'send_campaign', 'YES' ) ); ?>' );
 			jQuery( '#step_result_label_no' ).html( '<?php echo TS_( step_get_result_label( 'send_campaign', 'NO' ) ); ?>' );
 			jQuery( '#step_result_label_error' ).html( '<?php echo TS_( step_get_result_label( 'send_campaign', 'ERROR' ) ); ?>' );
@@ -266,6 +268,7 @@ function step_type_update_info( step_type )
 		case 'subscribe':
 		case 'unsubscribe':
 			jQuery( '#ffield_step_newsletter' ).show();
+			jQuery( '#step_newsletter' ).attr( 'required', 'required' );
 			jQuery( '#step_result_label_yes' ).html( step_type == 'subscribe' ? '<?php echo TS_( step_get_result_label( 'subscribe', 'YES' ) ); ?>' : '<?php echo TS_( step_get_result_label( 'unsubscribe', 'YES' ) ); ?>' );
 			jQuery( '#step_result_label_no' ).html( step_type == 'subscribe' ? '<?php echo TS_( step_get_result_label( 'subscribe', 'NO' ) ); ?>' : '<?php echo TS_( step_get_result_label( 'unsubscribe', 'NO' ) ); ?>' );
 			jQuery( '#step_result_label_error' ).html( step_type == 'subscribe' ? '<?php echo TS_( step_get_result_label( 'subscribe', 'ERROR' ) ); ?>' : '<?php echo TS_( step_get_result_label( 'unsubscribe', 'ERROR' ) ); ?>' );
@@ -282,6 +285,7 @@ function step_type_update_info( step_type )
 
 		case 'start_automation':
 			jQuery( '#ffield_step_automation' ).show();
+			jQuery( '#step_automation' ).attr( 'required', 'required' );
 			jQuery( '#step_result_label_yes' ).html( '<?php echo TS_( step_get_result_label( 'start_automation', 'YES' ) ); ?>' );
 			jQuery( '#step_result_label_no' ).html( '<?php echo TS_( step_get_result_label( 'start_automation', 'NO' ) ); ?>' );
 			jQuery( '#step_result_label_error' ).html( '<?php echo TS_( step_get_result_label( 'start_automation', 'ERROR' ) ); ?>' );

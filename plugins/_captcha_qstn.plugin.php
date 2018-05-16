@@ -36,7 +36,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class captcha_qstn_plugin extends Plugin
 {
-	var $version = '6.10.0';
+	var $version = '6.10.1';
 	var $group = 'antispam';
 	var $code = 'captcha_qstn';
 
@@ -458,6 +458,7 @@ class captcha_qstn_plugin extends Plugin
 				10, $this->T_('Captcha answer'), ( empty( $params['use_placeholders'] ) ? $this->T_('Please answer the question above').'.' : '' ),
 				array(
 						'placeholder' => empty( $params['use_placeholders'] ) ? '' : T_('Please answer the question above'),
+						'required'    => true,
 					)
 			);
 

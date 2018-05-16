@@ -51,6 +51,7 @@ $registration_ask_locale = $Settings->get('registration_ask_locale');
 // Check what subscriptions should be activated (It can be used for quick registration by widget)
 $auto_subscribe_posts = false;
 $auto_subscribe_comments = false;
+$auto_subscribe_posts_mod = false;
 
 $login = param( $dummy_fields[ 'login' ], 'string', '' );
 $email = utf8_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
@@ -110,20 +111,12 @@ switch( $action )
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
 
-		// Make sure email is valid first and that it only contains ASCII characters
-		if( ! is_email( $email )  )
-		{
-			param_error( $dummy_fields['email'], T_('The email address is invalid.') );
-		}
+		// Check email:
+		param_check_new_user_email( $dummy_fields['email'], $email );
 
 		if( $is_quick || $is_inline )
 		{	// We will need the following parameter for the session data that will be set later:
 			param( 'widget', 'integer', 0 );
-		}
-
-		if( $Messages->has_errors() )
-		{	// Stop registration if the errors exist:
-			break;
 		}
 
 		// Stop a request from the blocked email address or its domain:
@@ -154,6 +147,7 @@ switch( $action )
 				$user_tags = param( 'usertags', 'string', NULL );
 				$subscribe_posts = param( 'subscribe_post', 'integer', true );
 				$subscribe_comments = param( 'subscribe_comment', 'integer', true );
+				$subscribe_posts_mod = param( 'subscribe_post_mod', 'integer', true );
 				$newsletters = param( 'newsletters', 'string', true );
 				$newsletters = explode( ',', $newsletters );
 				$widget_newsletters = array();
@@ -184,17 +178,10 @@ switch( $action )
 				$ask_lastname = $user_register_Widget->disp_params['ask_lastname'];
 				$subscribe_posts = $user_register_Widget->disp_params['subscribe_post'];
 				$subscribe_comments = $user_register_Widget->disp_params['subscribe_comment'];
+				$subscribe_posts_mod = $user_register_Widget->disp_params['subscribe_post_mod'];
 				$widget_newsletters = $user_register_Widget->disp_params['newsletters'];
 				$user_tags = $user_register_Widget->disp_params['usertags'];
 				$widget_redirect_to = trim( $user_register_Widget->disp_params['redirect_to'] );
-			}
-
-			if( $DB->get_var( 'SELECT user_ID FROM T_users WHERE user_email = '.$DB->quote( utf8_strtolower( $email ) ) ) )
-			{ // Don't allow the duplicate emails
-				$Messages->add( sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know or have forgotten it, you can <a %s>set your password here</a>.'),
-					'href="'.$Blog->get( 'loginurl' ).'"',
-					'href="'.$Blog->get( 'lostpasswordurl' ).'"' ), 'warning' );
-				break;
 			}
 
 			// Check what fields should be required by current widget
@@ -204,8 +191,9 @@ switch( $action )
 			$registration_require_lastname = ( $ask_lastname == 'required' );
 
 			// Check what subscriptions should be activated by current widget
-			$auto_subscribe_posts = ! empty( $subscribe_posts  );
+			$auto_subscribe_posts = ! empty( $subscribe_posts );
 			$auto_subscribe_comments = ! empty( $subscribe_comments );
+			$auto_subscribe_posts_mod = ! empty( $subscribe_posts_mod );
 		}
 
 		if( ! $is_quick )
@@ -231,11 +219,6 @@ switch( $action )
 					'pass1'     => & $pass1,
 					'pass2'     => & $pass2,
 				) );
-		}
-
-		if( $Messages->has_errors() )
-		{ // a Plugin has added an error
-			break;
 		}
 
 		// Set params:
@@ -463,10 +446,10 @@ switch( $action )
 		$UserSettings->dbupdate();
 
 		// Auto subscribe new user to current collection posts/comments:
-		if( $auto_subscribe_posts || $auto_subscribe_comments )
+		if( $auto_subscribe_posts || $auto_subscribe_comments || $auto_subscribe_posts_mod )
 		{ // If at least one option is enabled
-			$DB->query( 'REPLACE INTO T_subscriptions ( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
-					VALUES ( '.$DB->quote( $Blog->ID ).', '.$DB->quote( $new_User->ID ).', '.$DB->quote( intval( $auto_subscribe_posts ) ).', '.$DB->quote( intval( $auto_subscribe_comments ) ).' )' );
+			$DB->query( 'REPLACE INTO T_subscriptions ( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
+					VALUES ( '.$DB->quote( $Blog->ID ).', '.$DB->quote( $new_User->ID ).', '.$DB->quote( intval( $auto_subscribe_posts ) ).', '.$DB->quote( intval( $auto_subscribe_posts_mod ) ).', '.$DB->quote( intval( $auto_subscribe_comments ) ).' )' );
 		}
 
 		// Get user domain status:
@@ -481,6 +464,7 @@ switch( $action )
 				'country'     => $new_User->get( 'ctry_ID' ),
 				'reg_country' => $new_User->get( 'reg_ctry_ID' ),
 				'reg_domain'  => $user_domain.' ('.$dom_status.')',
+				'user_domain' => $user_domain,
 				'firstname'   => $firstname,
 				'lastname'    => $lastname,
 				'fullname'    => $new_User->get( 'fullname' ),

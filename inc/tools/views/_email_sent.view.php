@@ -41,7 +41,7 @@ param( 'email', 'string', '', true );
 // Create result set:
 
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE emlog_ID, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_last_open_ts, emlog_last_click_ts, emlog_camp_ID, ecmp_email_title' );
+$SQL->SELECT( 'SQL_NO_CACHE emlog_ID, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_last_open_ts, emlog_last_click_ts, emlog_camp_ID, ecmp_name' );
 $SQL->FROM( 'T_email__log' );
 $SQL->FROM_add( 'LEFT JOIN T_email__campaign ON ecmp_ID = emlog_camp_ID' );
 
@@ -82,7 +82,7 @@ function filter_email_sent( & $Form )
 
 	$Form->date_input( 'datestartinput', $datestart, T_('From date') );
 	$Form->date_input( 'datestopinput', $datestop, T_('To date') );
-	$Form->text_input( 'email', $email, 40, T_('Email') );
+	$Form->email_input( 'email', $email, 40, T_('Email') );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_email_sent',
@@ -104,7 +104,7 @@ $Results->cols[] = array(
 		'order' => 'emlog_timestamp',
 		'default_dir' => 'D',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'timestamp compact_data',
+		'td_class' => 'timestamp',
 		'td' => '%mysql2localedatetime_spans( #emlog_timestamp# )%',
 	);
 
@@ -154,8 +154,8 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => T_('Email campaign'),
-		'order' => 'ecmp_email_title',
-		'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$emlog_camp_ID$">$ecmp_email_title$</a>',
+		'order' => 'ecmp_name',
+		'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$emlog_camp_ID$">$ecmp_name$</a>',
 	);
 
 $Results->cols[] = array(
@@ -164,7 +164,7 @@ $Results->cols[] = array(
 		'th' => T_('Last opened'),
 		'th_class' => 'shrinkwrap',
 		'td' => '%mysql2localedatetime_spans( #emlog_last_open_ts# )%',
-		'td_class' => 'timestamp compact_data'
+		'td_class' => 'timestamp'
 	);
 
 $Results->cols[] = array(
@@ -173,7 +173,7 @@ $Results->cols[] = array(
 		'th' => T_('Last clicked'),
 		'th_class' => 'shrinkwrap',
 		'td' => '%mysql2localedatetime_spans( #emlog_last_click_ts# )%',
-		'td_class' => 'timestamp compact_data'
+		'td_class' => 'timestamp'
 	);
 
 

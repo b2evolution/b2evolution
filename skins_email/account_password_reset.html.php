@@ -17,7 +17,7 @@ emailskin_include( '_email_header.inc.html.php', $params );
 /**
  * @var Session
  */
-global $Session;
+global $Session, $admin_url;
 
 global $dummy_fields;
 
@@ -73,6 +73,11 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 	{ // Several accounts with the given email address, display last used date for each
 		$message_content .= '</div>';
 	}
+
+	if( empty( $stats_perm ) && ! empty( $iterator_User ) && $iterator_User->check_perm( 'stats', 'view' ) )
+	{
+		$stats_perm = true;
+	}
 }
 
 if( $params['user_count'] > 1 )
@@ -93,6 +98,16 @@ echo $message_content;
 echo '<p'.emailskin_style( '.p+.note' ).'>'.T_('Please note:').' '.$message_note."</p>\n";
 
 echo '<p'.emailskin_style( '.p' ).'><i'.emailskin_style( '.note' ).'>'.T_('If you did not request this password reset, simply ignore this email.').'</i></p>';
+
+if( isset( $stats_perm ) && $stats_perm )
+{
+	$session_ID = '<a href="'.$admin_url.'?ctrl=stats&amp;tab=hits&amp;blog=0&amp;sess_ID='.$Session->ID.'">'.$Session->ID.'</a>';
+}
+else
+{
+	$session_ID = $Session->ID;
+}
+echo '<p'.emailskin_style( '.p+.note' ).'>'.sprintf( T_('Session ID').': %s', $session_ID ).'</p>';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.html.php', $params );

@@ -20,41 +20,17 @@ global $UserSettings, $edited_EmailCampaign;
 echo '<div class="well">';
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
-		ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send,
-		ecmp_user_tag, ecmp_user_tag_cta1, ecmp_user_tag_cta2, ecmp_user_tag_cta3, ecmp_user_tag_like, ecmp_user_tag_dislike,
-		enlt_ID, enlt_name,
-		SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS send_count,
-		SUM( IF( emlog_last_open_ts IS NOT NULL OR emlog_last_click_ts IS NOT NULL OR
-			csnd_like IS NOT NULL OR csnd_cta1 IS NOT NULL OR csnd_cta2 IS NOT NULL OR csnd_cta3 IS NOT NULL, 1, 0 ) ) /
-			SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS open_rate,
-		SUM( IF( emlog_last_open_ts IS NULL, 0, 1 ) ) AS open_count,
-		SUM( IF( emlog_last_click_ts IS NULL, 0, 1 ) ) AS click_count,
-		SUM( IF( csnd_cta1 = 1, 1, 0 ) ) AS cta1_count,
-		SUM( IF( csnd_cta2 = 1, 1, 0 ) ) AS cta2_count,
-		SUM( IF( csnd_cta3 = 1, 1, 0 ) ) AS cta3_count,
-		SUM( IF( csnd_like = 1, 1, 0 ) ) AS like_count,
-		SUM( IF( csnd_like = -1, 1, 0 ) ) AS dislike_count,
-		SUM( COALESCE( csnd_clicked_unsubscribe, 0 ) ) AS unsubscribe_click_count' );
+$SQL->SELECT( 'T_email__campaign.*, enlt_ID, enlt_name, IF( ecmp_send_count = 0, 0, ecmp_open_count / ecmp_send_count ) AS open_rate' );
 $SQL->FROM( 'T_email__campaign' );
 $SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
-$SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
-$SQL->FROM_add( 'LEFT JOIN T_email__log ON emlog_ID = csnd_emlog_ID' );
 $SQL->WHERE( 'ecmp_ID ='.$DB->quote( $edited_EmailCampaign->ID ) );
-$SQL->GROUP_BY( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
-		ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send, ecmp_user_tag, enlt_ID, enlt_name' );
-
-$count_SQL = new SQL();
-$count_SQL->SELECT( 'COUNT( ecmp_ID )' );
-$count_SQL->FROM( 'T_email__campaign' );
 
 if( isset( $params['enlt_ID'] ) )
 {
 	$SQL->WHERE_and( 'ecmp_enlt_ID = '.$DB->quote( $params['enlt_ID'] ) );
-	$count_SQL->WHERE_and( 'ecmp_enlt_ID = '.$DB->quote( $params['enlt_ID'] ) );
 }
 
-$Results = new Results( $SQL->get(), 'emcmp_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
+$Results = new Results( $SQL->get(), 'emcmp_', 'D', $UserSettings->get( 'results_per_page' ), 'SELECT 1' );
 $Results->Cache = & get_EmailCampaignCache();
 
 $Results->cols[] = array(
@@ -62,7 +38,7 @@ $Results->cols[] = array(
 	'order' => 'ecmp_sent_ts',
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
-	'td_class' => 'timestamp compact_data',
+	'td_class' => 'timestamp',
 	'td' => '%mysql2localedatetime_spans( #ecmp_sent_ts# )%',
 );
 
@@ -71,7 +47,7 @@ $Results->cols[] = array(
 	'order' => 'ecmp_auto_sent_ts',
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
-	'td_class' => 'timestamp compact_data',
+	'td_class' => 'timestamp',
 	'td' => '%mysql2localedatetime_spans( #ecmp_auto_sent_ts# )%',
 );
 
@@ -81,7 +57,7 @@ $Results->cols[] = array(
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
-	'td' =>'$send_count$'
+	'td' =>'$ecmp_send_count$'
 );
 
 $Results->cols[] = array(
@@ -90,7 +66,7 @@ $Results->cols[] = array(
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
-	'td' =>'%empty( #send_count# ) ? "" : number_format( #open_rate# * 100, 1 )%%'
+	'td' =>'%empty( #ecmp_send_count# ) ? "" : number_format( #open_rate# * 100, 1 )%%'
 );
 
 $Results->cols[] = array(

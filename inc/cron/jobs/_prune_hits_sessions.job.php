@@ -22,7 +22,7 @@ if( $Settings->get( 'auto_prune_stats_mode' ) != 'cron' )
 
 load_class( 'sessions/model/_hitlist.class.php', 'Hitlist' );
 
-$result = Hitlist::dbprune(); // will prune once per day, according to Settings
+$result = Hitlist::dbprune( 'cron_job' ); // will prune once per day, according to Settings
 
 // Restore DB error states
 $DB->restore_error_state();
@@ -48,7 +48,6 @@ if( empty( $result ) )
 }
 elseif( isset( $result['message'] ) )
 { // Get a message from result for report
-	cron_log_append( $result['message'] );
 	if( isset( $result['result'] ) && $result['result'] == 'ok' )
 	{
 		return 1; /* ok */

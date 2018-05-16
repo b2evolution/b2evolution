@@ -828,11 +828,6 @@ class Blog extends DataObject
 			$this->set_setting('ping_plugins', implode(',', $blog_ping_plugins));
 		}
 
-		if( in_array( 'authors', $groups ) )
-		{ // we want to load the workflow & permissions params
-			$this->set_setting( 'use_workflow',  param( 'blog_use_workflow', 'integer', 0 ) );
-		}
-
 		if( in_array( 'home', $groups ) )
 		{ // we want to load the front page params:
 			$front_disp = param( 'front_disp', 'string', '' );
@@ -848,6 +843,12 @@ class Blog extends DataObject
 
 		if( in_array( 'features', $groups ) )
 		{ // we want to load the posts related features:
+			$this->set_setting( 'use_workflow', param( 'blog_use_workflow', 'integer', 0 ) );
+			if( get_param( 'blog_use_workflow' ) )
+			{	// Update deadline setting only when workflow is enabled:
+				$this->set_setting( 'use_deadline', param( 'blog_use_deadline', 'integer', 0 ) );
+			}
+
 			$this->set_setting( 'enable_goto_blog', param( 'enable_goto_blog', 'string', NULL ) );
 
 			$this->set_setting( 'editing_goto_blog', param( 'editing_goto_blog', 'string', NULL ) );
@@ -941,6 +942,7 @@ class Blog extends DataObject
 				// Subscriptions:
 				$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_item_mod_subscriptions', param( 'allow_item_mod_subscriptions', 'integer', 0 ) );
 			}
 
 			// Voting options:
@@ -972,6 +974,9 @@ class Blog extends DataObject
 				// Subscriptions:
 				$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_anon_subscriptions', param( 'allow_anon_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'default_anon_comment_notify', param( 'default_anon_comment_notify', 'integer', 0 ) );
+				$this->set_setting( 'anon_notification_email_limit', param( 'anon_notification_email_limit', 'integer', 0 ) );
 			}
 
 			$this->set_setting( 'comments_detect_email', param( 'comments_detect_email', 'integer', 0 ) );
@@ -1065,6 +1070,8 @@ class Blog extends DataObject
 				$this->set_setting( 'opt_out_comment_subscription', param( 'opt_out_comment_subscription', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 				$this->set_setting( 'opt_out_item_subscription', param( 'opt_out_item_subscription', 'integer', 0 ) );
+				$this->set_setting( 'allow_item_mod_subscriptions', param( 'allow_item_mod_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'opt_out_item_mod_subscription', param( 'opt_out_item_mod_subscription', 'integer', 0 ) );
 			}
 
 			// Sitemaps:
@@ -2330,9 +2337,10 @@ class Blog extends DataObject
 	 * @todo make default a Blog param
 	 *
 	 * @param string status to start with. Empty to use default.
+	 * @param object Permission object: Item or Comment
 	 * @return string authorized status; NULL if none
 	 */
-	function get_allowed_item_status( $status = NULL )
+	function get_allowed_item_status( $status = NULL, $perm_target = NULL )
 	{
 		global $current_User;
 
@@ -2347,7 +2355,7 @@ class Blog extends DataObject
 		}
 
 		// Get max allowed visibility status:
-		$max_allowed_status = get_highest_publish_status( 'post', $this->ID, false );
+		$max_allowed_status = get_highest_publish_status( 'post', $this->ID, false, '', $perm_target );
 
 		$visibility_statuses = get_visibility_statuses();
 		$status_is_allowed = false;
@@ -2763,12 +2771,17 @@ class Blog extends DataObject
 				$url_disp = str_replace( 'url', '', $parname );
 				if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $this ) )
 				{ // Use special blog for login/register actions if it is defined in general settings
-					return url_add_param( $login_Blog->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
+					$url = url_add_param( $login_Blog->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
 				}
 				else
 				{ // Use login/register urls of this blog
-					return url_add_param( $this->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
+					$url = url_add_param( $this->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
 				}
+				if( ! empty( $params['url_suffix'] ) )
+				{ // Append url suffix
+					$url = url_add_param( $url, $params['url_suffix'], $params['glue'] );
+				}
+				return $url;
 
 			case 'threadsurl':
 				$disp_param = 'threads';
@@ -4386,11 +4399,11 @@ class Blog extends DataObject
 
 				if( !empty( $post_title ) )
 				{ // Append a post title
-					$url = url_add_param( $url, 'post_title='.$post_title );
+					$url = url_add_param( $url, 'post_title='.urlencode( $post_title ) );
 				}
 				if( !empty( $post_urltitle ) )
 				{ // Append a post urltitle
-					$url = url_add_param( $url, 'post_urltitle='.$post_urltitle );
+					$url = url_add_param( $url, 'post_urltitle='.urlencode( $post_urltitle ) );
 				}
 				if( ! empty( $post_type_usage ) )
 				{ // Append a post type ID
@@ -4895,7 +4908,7 @@ class Blog extends DataObject
 			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s3 ON s3.uset_user_ID = user_ID AND s3.uset_name = "notify_spam_cmt_moderation"' );
 			$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 			$SQL->WHERE( 'LENGTH( TRIM( user_email ) ) > 0' );
-			$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
+			$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 			$SQL->WHERE_and( '( grp_perm_blogs = "editall" )
 				OR ( user_ID IN ( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = '.$this->ID.' AND bloguser_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )
 				OR ( grp_ID IN ( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = '.$this->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )' );

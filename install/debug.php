@@ -252,6 +252,7 @@ $booststrap_install_form_params = array(
 		'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-4 col-sm-8">',
 		'buttonsend'     => "</div></div>\n\n",
 		'note_format'    => ' <span class="help-inline text-muted small">%s</span>',
+		'bottom_note_format' => ' <div><span class="help-inline text-muted small">%s</span></div>',
 	);
 
 header('Content-Type: text/html; charset='.$evo_charset);
@@ -334,7 +335,7 @@ switch( $action )
 		 * Form to change the debug config
 		 * -----------------------------------------------------------------------------------
 		 */
-		
+
 		block_open( T_('Debug config') );
 		$Form = new Form( $_SERVER['PHP_SELF'] );
 

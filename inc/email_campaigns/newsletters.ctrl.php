@@ -285,6 +285,8 @@ switch( $action )
 				init_datepicker_js();
 				// Initialize user tag input
 				init_tokeninput_js();
+				// Load jQuery QueryBuilder plugin files for user list filters:
+				init_querybuilder_js( 'rsc_url' );
 				$AdminUI->set_page_manual_link( 'email-list-subscribers' );
 				$AdminUI->set_path( 'email', 'newsletters', 'subscribers' );
 				break;
@@ -336,7 +338,7 @@ switch( $action )
 				// Display automations tied to this Newsletter:
 				automation_results_block( array(
 						'enlt_ID'               => $edited_Newsletter->ID,
-						'results_title'         => T_('Automations').get_manual_link( 'email-list-automations' ),
+						'results_title'         => T_('Automations').get_manual_link( 'automations-for-a-list' ),
 						'results_prefix'        => 'enltautm_',
 					) );
 				break;

@@ -533,11 +533,12 @@ class Table extends Widget
 				echo $this->params['filter_button_before'];
 				$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
 				$this->Form->button_input( array(
-						'tag'   => 'button',
-						'name'  => $submit_name,
-						'value' => get_icon( 'filter' ).' '.$submit_title,
-						'class' => $this->params['filter_button_class']
+							'tag'   => 'button',
+							'name'  => $submit_name,
+							'value' => get_icon( 'filter' ).' '.$submit_title,
+							'class' => $this->params['filter_button_class']
 					) );
+
 				echo $this->params['filter_button_after'];
 			}
 
@@ -547,7 +548,12 @@ class Table extends Widget
 			}
 
 			$func = $this->{$area_name}['callback'];
-			$func( $this->Form );
+			$filter_fields = $func( $this->Form );
+
+			if( is_admin_page() && ! empty( $filter_fields ) && is_array( $filter_fields ) )
+			{	// Display filters only in back-office because they require JavaScript plugin QueryBuilder:
+				$this->display_filter_fields( $this->Form, $filter_fields );
+			}
 
 			if( $create_new_form )
 			{ // We do not already have a form surrounding the whole result list:
@@ -559,6 +565,178 @@ class Table extends Widget
 		echo '</div>';
 
 		echo $this->params['filters_end'];
+	}
+
+
+	/**
+	 * Display filter fields
+	 *
+	 * @param array Filters
+	 */
+	function display_filter_fields( & $Form, $filter_fields )
+	{
+		echo '<div id="evo_results_filters"></div>';
+		$Form->hidden( 'filter_query', '' );
+
+		$js_filters = array();
+		foreach( $filter_fields as $field_ID => $params )
+		{
+			$js_filter = array( 'id:\''.$field_ID.'\'' );
+
+			if( isset( $params['type'] ) )
+			{	// Set default params depending on field type:
+				switch( $params['type'] )
+				{
+					case 'date':
+						$params['operators'] = '=,!=,>,>=,<,<=,between,not_between';
+						$params['plugin'] = 'datepicker';
+						$params['plugin_config'] = array(
+							'dateFormat'  => jquery_datepicker_datefmt(),
+							'monthNames'  => jquery_datepicker_month_names(),
+							'dayNamesMin' => jquery_datepicker_day_names(),
+							'firstDay'    => locale_startofweek(),
+						);
+						$params['validation'] = array( 'format' => strtoupper( jquery_datepicker_datefmt() ) );
+						break;
+				}
+			}
+
+			if( ! isset( $params['operators'] ) )
+			{	// Use default operator if it is not defined:
+				$params['operators'] = '=,!=';
+			}
+
+			foreach( $params as $param_name => $param_value )
+			{
+				switch( $param_name )
+				{
+					case 'operators':
+						// Convert operators to proper format:
+						if( ! empty( $param_value ) )
+						{
+							$operators = explode( ',', $param_value );
+							foreach( $operators as $o => $operator )
+							{	// Replace aliases with corrent name which is used in jQuery QueryBuilder plugin:
+								switch( $operator )
+								{
+									case '=':
+										$operators[ $o ] = 'equal';
+										break;
+									case '!=':
+									case '<>':
+										$operators[ $o ] = 'not_equal';
+										break;
+									case '<':
+										$operators[ $o ] = 'less';
+										break;
+									case '<=':
+										$operators[ $o ] = 'less_or_equal';
+										break;
+									case '>':
+										$operators[ $o ] = 'greater';
+										break;
+									case '>=':
+										$operators[ $o ] = 'greater_or_equal';
+										break;
+								}
+							}
+							$param_value = '[\''.implode( '\',\'', $operators ).'\']';
+						}
+						break;
+
+					case 'input':
+					case 'valueGetter':
+					case 'valueSetter':
+						if( strpos( $param_value, 'function' ) === 0 )
+						{	// Don't convert these param to string if it is a function:
+							break;
+						}
+
+					default:
+						if( is_array( $param_value ) )
+						{	// Array param:
+							$param_values = array();
+							foreach( $param_value as $sub_param_name => $sub_param_value )
+							{
+								if( $sub_param_value == 'true' || $sub_param_value == 'false' ||
+								    strpos( $sub_param_value, '[' ) === 0 )
+								{	// This is a not string value:
+									$sub_param_value = $sub_param_value;
+								}
+								else
+								{	// This is a string value:
+									$sub_param_value = '\''.format_to_js( $sub_param_value ).'\'';
+								}
+								$param_values[] = $sub_param_name.':'.$sub_param_value;
+							}
+							$param_value = '{'.implode( ',', $param_values ).'}';
+						}
+						else
+						{	// String param:
+							$param_value = '\''.format_to_js( $param_value ).'\'';
+						}
+				}
+
+				$js_filter[] = $param_name.':'.$param_value;
+			}
+			$js_filters[] = '{'.implode( ',', $js_filter ).'}';
+		}
+?>
+<script type="text/javascript">
+jQuery( document ).ready( function()
+{
+	jQuery( '#evo_results_filters' ).queryBuilder(
+	{
+		allow_empty: true,
+		display_empty_filter: true,
+		plugins: ['bt-tooltip-errors'],
+		icons: {
+			add_group: 'fa fa-plus-circle',
+			add_rule: 'fa fa-plus',
+			remove_group: 'fa fa-close',
+			remove_rule: 'fa fa-close',
+			error: 'fa fa-warning',
+		},
+		operators: [
+			'equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between', 'contains', 'not_contains',
+			{ type: 'blank', nb_inputs: 1, multiple: false, apply_to: ['string'] }
+		],
+		lang: {
+			operators: {
+				equal: '=',
+				not_equal: '&#8800;',
+				less: '<',
+				less_or_equal: '&#8804;',
+				greater: '>',
+				greater_or_equal: '&#8805;',
+				between: '<?php echo TS_('between'); ?>',
+				not_between: '<?php echo TS_('not between'); ?>',
+				contains: '<?php echo TS_('contains'); ?>',
+				not_contains: '<?php echo TS_('doesn\'t contain'); ?>',
+				blank: ' ',
+			}
+		},
+		filters: [<?php echo implode( ',', $js_filters ); ?>],
+		rules: <?php echo param_format_condition( param_condition( 'filter_query' ), 'js' ); ?>,
+	} );
+
+	// Prepare form before submitting:
+	jQuery( '#evo_results_filters' ).closest( 'form' ).on( 'submit', function()
+	{
+		// Convert filter fields to JSON format:
+		var result = jQuery( '#evo_results_filters' ).queryBuilder( 'getRules', { allow_invalid: true } );
+		if( result === null )
+		{	// Stop submitting on wrong SQL:
+			return false;
+		}
+		else
+		{	// Set query rules to hidden field before submitting:
+			jQuery( 'input[name=filter_query]' ).val( JSON.stringify( result ) );
+		}
+	} );
+} );
+</script>
+<?php
 	}
 
 

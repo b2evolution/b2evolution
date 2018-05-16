@@ -15,6 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // Check permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'emails', 'view', true );
 
 load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
@@ -22,6 +23,7 @@ load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 
 param_action();
 param( 'tab', 'string', 'info' );
+param( 'display_mode', 'string' );
 
 if( param( 'ecmp_ID', 'integer', '', true ) )
 {	// Load Email Campaign object:
@@ -33,6 +35,13 @@ if( param( 'ecmp_ID', 'integer', '', true ) )
 		$action = '';
 		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Email Campaign') ), 'error' );
 	}
+}
+
+if( $tab == 'plaintext' &&
+    isset( $edited_EmailCampaign ) &&
+    $edited_EmailCampaign->get( 'sync_plaintext' ) )
+{	// Don't allow plaintext tab if it is not enabled by email campaign setting:
+	$tab = 'compose';
 }
 
 switch( $action )
@@ -85,6 +94,7 @@ switch( $action )
 
 	case 'switchtab':
 	case 'save':
+	case 'save_sync_plaintext':
 		// Save Campaign:
 
 		// Check that this action request is not a CSRF hacked request:
@@ -115,9 +125,44 @@ switch( $action )
 			$tab = $current_tab;
 			$redirect_tab_type = 'next';
 		}
+		elseif( $action == 'save_sync_plaintext' )
+		{	// Save & redirect to edit plain-text manually:
+			$tab = 'plaintext';
+		}
+
+		if( $action == 'save_sync_plaintext' && $display_mode == 'js' )
+		{	// Exit here to don'r render a page when it is updated from AJAX request:
+			// Return new plain-text to update it on the form:
+			echo $edited_EmailCampaign->get( 'plaintext_template_preview' );
+			exit;
+		}
+		else
+		{	// Redirect after saving:
+			header_redirect( get_campaign_tab_url( $tab, $edited_EmailCampaign->ID, $redirect_tab_type ), 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		break;
+
+	case 'resync':
+		// Resync plain-text of Email Campaign:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'campaign' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		// Update the plain-text message field from HTML message:
+		$edited_EmailCampaign->update_plaintext( true );
+
+		// Save changes in DB:
+		if( $edited_EmailCampaign->dbupdate() === true )
+		{
+			$Messages->add( T_('The email campaign was updated.'), 'success' );
+		}
 
 		// Redirect after saving:
-		header_redirect( get_campaign_tab_url( $tab, $edited_EmailCampaign->ID, $redirect_tab_type ), 303 ); // Will EXIT
+		header_redirect( get_campaign_tab_url( 'plaintext', $edited_EmailCampaign->ID ), 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -188,7 +233,7 @@ switch( $action )
 		{	// Create new email campaign if admin want creates it from free users list:
 			$edited_EmailCampaign = new EmailCampaign();
 			$edited_EmailCampaign->set( 'enlt_ID', $Newsletter->ID );
-			$edited_EmailCampaign->set( 'email_title', $Newsletter->get( 'name' ) );
+			$edited_EmailCampaign->set( 'name', $Newsletter->get( 'name' ) );
 			$edited_EmailCampaign->dbinsert();
 			$Messages->add( T_('New email campaign has been created for the users selection.'), 'success' );
 		}
@@ -225,6 +270,60 @@ switch( $action )
 		// We have EXITed already at this point!!
 		break;
 
+	case 'duplicate':
+		// Duplicate email campaign
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'campaign' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		if( $edited_EmailCampaign && $edited_EmailCampaign->duplicate() )
+		{
+			$Messages->add( T_('The email campaign has been duplicated.'), 'success' );
+			header_redirect( $admin_url.'?ctrl=campaigns&action=edit&ecmp_ID='.$edited_EmailCampaign->ID ); // will save $Messages into Session
+		}
+		break;
+
+	case 'enable_welcome':
+	case 'disable_welcome':
+		// Set/Unset welcome email campaign:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'campaign' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		param( 'from', 'string', '' );
+
+		// Make sure we got an ecmp_ID:
+		param( 'ecmp_ID', 'integer', true );
+
+		$edited_EmailCampaign->set( 'welcome', ( $action == 'enable_welcome' ? 1 : 0 ) );
+		if( $edited_EmailCampaign->dbupdate() && $action == 'enable_welcome' )
+		{	// If email campaign has been set as "Welcome" we should other campaign of its list set to not "Welcome":
+			$DB->query( 'UPDATE T_email__campaign
+				  SET ecmp_welcome = 0
+				WHERE ecmp_enlt_ID = '.$DB->quote( $edited_EmailCampaign->get( 'enlt_ID' ) ).'
+				  AND ecmp_welcome = 1
+				  AND ecmp_ID != '.$DB->quote( $edited_EmailCampaign->ID ) );
+		}
+
+		$Messages->add( ( $action == 'enable_welcome' ?
+			T_('The email campaign has been set as "Welcome" to its list.') :
+			T_('The email campaign has been unset as "Welcome" from its list.') ), 'success' );
+
+		// We want to highlight the reduced Step on list display:
+		$Session->set( 'fadeout_array', array( 'ecmp_ID' => array( $ecmp_ID ) ) );
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $from == 'newsletters'
+			? $admin_url.'?ctrl=newsletters&action=edit&tab=campaigns&enlt_ID='.$edited_EmailCampaign->get( 'enlt_ID' )
+			: $admin_url.'?ctrl=campaigns', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
 	case 'delete':
 		// Delete Email Campaign...
 
@@ -239,7 +338,7 @@ switch( $action )
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{	// Delete from DB if confirmed:
-			$msg = sprintf( T_('The email campaign "%s" has been deleted.'), $edited_EmailCampaign->dget( 'email_title' ) );
+			$msg = sprintf( T_('The email campaign "%s" has been deleted.'), $edited_EmailCampaign->dget( 'name' ) );
 			$edited_EmailCampaign->dbdelete();
 			unset( $edited_EmailCampaign );
 			forget_param( 'ecmp_ID' );
@@ -250,7 +349,7 @@ switch( $action )
 		}
 		else
 		{	// Check for restrictions if not confirmed yet:
-			if( ! $edited_EmailCampaign->check_delete( sprintf( T_('Cannot delete email campaign "%s"'), $edited_EmailCampaign->dget( 'email_title' ) ) ) )
+			if( ! $edited_EmailCampaign->check_delete( sprintf( T_('Cannot delete email campaign "%s"'), $edited_EmailCampaign->dget( 'name' ) ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -375,23 +474,32 @@ switch( $action )
 		break;
 
 	case 'queue':
-		param( 'ecmp_ID', 'integer', NULL );
-		param( 'user_ID', 'integer', NULL );
-
-		queue_campaign_user( $ecmp_ID, $user_ID );
-
-		// Set this var to display again the same form where we can review and send campaign
-		$action = 'edit';
-		break;
-
 	case 'skip':
 		param( 'ecmp_ID', 'integer', NULL );
 		param( 'user_ID', 'integer', NULL );
+		param( 'redirect_to', 'url' );
+		$redirect_to = str_replace( '&amp;', '&', $redirect_to );
 
-		skip_campaign_user( $ecmp_ID, $user_ID );
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'campaign' );
+
+		if( $action == 'queue' )
+		{
+			queue_campaign_user( $ecmp_ID, $user_ID );
+		}
+		elseif( $action == 'skip' )
+		{
+			skip_campaign_user( $ecmp_ID, $user_ID );
+		}
+
+		if( ! empty( $redirect_to ) )
+		{
+			header_redirect( $redirect_to );
+		}
 
 		// Set this var to display again the same form where we can review and send campaign
 		$action = 'edit';
+		$tab = 'recipient';
 		break;
 }
 
@@ -401,6 +509,7 @@ switch( $action )
 {
 	case 'edit':
 	case 'edit_users':
+	case 'duplicate':
 		if( empty( $edited_EmailCampaign ) )
 		{	// If no edited email campaign - clear action and display list of campaigns:
 			$action = '';
@@ -424,6 +533,11 @@ switch( $action )
 		break;
 }
 
+if( $tab == 'recipient' )
+{	// Load jQuery QueryBuilder plugin files for user list filters:
+	init_querybuilder_js( 'rsc_url' );
+}
+
 
 $AdminUI->breadcrumbpath_init( false );
 $AdminUI->breadcrumbpath_add( T_('Emails'), $admin_url.'?ctrl=campaigns' );
@@ -436,9 +550,35 @@ switch( $action )
 {
 	case 'new':
 	case 'edit':
-		$AdminUI->set_page_manual_link( 'creating-an-email-campaign' );
+		switch( $tab )
+		{
+			case 'info':
+				$AdminUI->set_page_manual_link( ( ! isset( $edited_EmailCampaign ) || $edited_EmailCampaign->ID == 0 ) ? 'creating-an-email-campaign' : 'campaign-info-panel' );
+				break;
+			case 'compose':
+				$AdminUI->set_page_manual_link( 'campaign-compose-panel' );
+				break;
+			case 'plaintext':
+				$AdminUI->set_page_manual_link( 'campaign-plaintext-panel' );
+				break;
+			case 'send':
+				$AdminUI->set_page_manual_link( 'campaign-review-panel' );
+				break;
+			case 'recipient':
+				$AdminUI->set_page_manual_link( 'email-campaign-recipients' );
+				break;
+			default:
+				$AdminUI->set_page_manual_link( 'creating-an-email-campaign' );
+				break;
+		}
+		
 		$AdminUI->display_breadcrumbpath_add( T_('Campaigns'), $admin_url.'?ctrl=campaigns' );
-		$AdminUI->display_breadcrumbpath_add( isset( $edited_EmailCampaign ) ? $edited_EmailCampaign->get( 'email_title' ) : T_('New Campaign') );
+		$AdminUI->display_breadcrumbpath_add( isset( $edited_EmailCampaign ) ? $edited_EmailCampaign->get( 'name' ) : T_('New Campaign') );
+		break;
+	case 'copy':
+		$AdminUI->set_page_manual_link( 'duplicating-an-email-campaign' );
+		$AdminUI->display_breadcrumbpath_add( T_('Campaigns'), $admin_url.'?ctrl=campaigns' );
+		$AdminUI->display_breadcrumbpath_add( sprintf( T_('Duplicate [%s]'), $edited_EmailCampaign->get( 'name' ) ) );
 		break;
 	default:
 	$AdminUI->display_breadcrumbpath_add( T_('Campaigns') );
@@ -484,6 +624,10 @@ if( $action == 'edit' || $action == 'delete' )
 }
 else
 { // List of campaigns
+	if( $action == 'copy' )
+	{
+		init_tokeninput_js();
+	}
 	$AdminUI->set_path( 'email', 'campaigns' );
 }
 
@@ -501,6 +645,7 @@ evo_flush();
 switch( $action )
 {
 	case 'new':
+	case 'copy':
 		// Display a form of new email campaign:
 		$AdminUI->disp_view( 'email_campaigns/views/_campaigns_new.form.php' );
 		break;
@@ -508,7 +653,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_EmailCampaign->confirm_delete(
-				sprintf( T_('Delete email campaign "%s"?'), $edited_EmailCampaign->dget( 'email_title' ) ),
+				sprintf( T_('Delete email campaign "%s"?'), $edited_EmailCampaign->dget( 'name' ) ),
 				'campaign', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'edit':
@@ -525,6 +670,10 @@ switch( $action )
 					$edited_EmailCampaign->set( 'email_text', sprintf( T_('Hello %s!'), '$firstname_and_login$' )."\r\n\r\n".T_('Here are some news...') );
 				}
 				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_compose.form.php' );
+				break;
+
+			case 'plaintext':
+				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_plaintext.form.php' );
 				break;
 
 			case 'send':

@@ -275,6 +275,7 @@ switch( $action )
 			param( 'newcomment_author_email', 'string' );
 			param( 'newcomment_author_url', 'string' );
 			param( 'comment_allow_msgform', 'integer', 0 /* checkbox */ );
+			param( 'comment_anon_notify', 'integer', 0 );
 
 			param_check_not_empty( 'newcomment_author', T_('Please enter an author name.'), '' );
 			$edited_Comment->set( 'author', $newcomment_author );
@@ -283,6 +284,7 @@ switch( $action )
 			param_check_url( 'newcomment_author_url', 'posting', '' ); // Give posting permissions here
 			$edited_Comment->set( 'author_url', $newcomment_author_url );
 			$edited_Comment->set( 'allow_msgform', $comment_allow_msgform );
+			$edited_Comment->set( 'anon_notify', $comment_anon_notify );
 		}
 
 		// Move to different post

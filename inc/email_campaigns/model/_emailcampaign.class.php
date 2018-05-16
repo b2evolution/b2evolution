@@ -29,7 +29,11 @@ class EmailCampaign extends DataObject
 
 	var $enlt_ID;
 
+	var $name;
+
 	var $email_title;
+
+	var $email_defaultdest;
 
 	var $email_html;
 
@@ -37,9 +41,15 @@ class EmailCampaign extends DataObject
 
 	var $email_plaintext;
 
+	var $sync_plaintext;
+
 	var $sent_ts;
 
 	var $auto_sent_ts;
+
+	var $user_tag_sendskip;
+
+	var $user_tag_sendsuccess;
 
 	var $user_tag;
 
@@ -53,11 +63,31 @@ class EmailCampaign extends DataObject
 
 	var $user_tag_dislike;
 
+	var $send_count;
+
+	var $open_count;
+
+	var $img_loads;
+
+	var $link_clicks;
+
+	var $cta1_clicks;
+
+	var $cta2_clicks;
+
+	var $cta3_clicks;
+
+	var $like_count;
+
+	var $dislike_count;
+
+	var $unsub_clicks;
+
 	var $use_wysiwyg = 0;
 
 	var $send_ctsk_ID;
 
-	var $auto_send = 'no';
+	var $welcome = 0;
 
 	var $sequence;
 
@@ -96,22 +126,37 @@ class EmailCampaign extends DataObject
 			$this->ID = $db_row->ecmp_ID;
 			$this->date_ts = $db_row->ecmp_date_ts;
 			$this->enlt_ID = $db_row->ecmp_enlt_ID;
+			$this->name = $db_row->ecmp_name;
 			$this->email_title = $db_row->ecmp_email_title;
+			$this->email_defaultdest = $db_row->ecmp_email_defaultdest;
 			$this->email_html = $db_row->ecmp_email_html;
 			$this->email_text = $db_row->ecmp_email_text;
 			$this->email_plaintext = $db_row->ecmp_email_plaintext;
+			$this->sync_plaintext = $db_row->ecmp_sync_plaintext;
 			$this->sent_ts = $db_row->ecmp_sent_ts;
 			$this->auto_sent_ts = $db_row->ecmp_auto_sent_ts;
 			$this->renderers = $db_row->ecmp_renderers;
 			$this->use_wysiwyg = $db_row->ecmp_use_wysiwyg;
 			$this->send_ctsk_ID = $db_row->ecmp_send_ctsk_ID;
-			$this->auto_send = $db_row->ecmp_auto_send;
+			$this->welcome = $db_row->ecmp_welcome;
+			$this->user_tag_sendskip = $db_row->ecmp_user_tag_sendskip;
+			$this->user_tag_sendsuccess = $db_row->ecmp_user_tag_sendsuccess;
 			$this->user_tag = $db_row->ecmp_user_tag;
 			$this->user_tag_cta1 = $db_row->ecmp_user_tag_cta1;
 			$this->user_tag_cta2 = $db_row->ecmp_user_tag_cta2;
 			$this->user_tag_cta3 = $db_row->ecmp_user_tag_cta3;
 			$this->user_tag_like = $db_row->ecmp_user_tag_like;
 			$this->user_tag_dislike = $db_row->ecmp_user_tag_dislike;
+			$this->send_count = $db_row->ecmp_send_count;
+			$this->open_count = $db_row->ecmp_open_count;
+			$this->img_loads = $db_row->ecmp_img_loads;
+			$this->link_clicks = $db_row->ecmp_link_clicks;
+			$this->cta1_clicks = $db_row->ecmp_cta1_clicks;
+			$this->cta2_clicks = $db_row->ecmp_cta2_clicks;
+			$this->cta3_clicks = $db_row->ecmp_cta3_clicks;
+			$this->like_count = $db_row->ecmp_like_count;
+			$this->dislike_count = $db_row->ecmp_dislike_count;
+			$this->unsub_clicks = $db_row->ecmp_unsub_clicks;
 		}
 	}
 
@@ -151,7 +196,7 @@ class EmailCampaign extends DataObject
 	 */
 	function get_name()
 	{
-		return $this->get( 'email_title' );
+		return $this->get( 'name' );
 	}
 
 
@@ -178,7 +223,7 @@ class EmailCampaign extends DataObject
 			$new_users_SQL->FROM( 'T_users' );
 			$new_users_SQL->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_subscribed = 1' );
 			$new_users_SQL->WHERE( 'user_ID IN ( '.$DB->quote( $filtered_users_IDs ).' )' );
-			$new_users_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
+			$new_users_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 			$new_users_SQL->WHERE_and( 'enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
 			$new_users = $DB->get_col( $new_users_SQL->get(), 0, $new_users_SQL->title );
 
@@ -234,16 +279,12 @@ class EmailCampaign extends DataObject
 	{
 		switch( $parname )
 		{
-			case 'name':
-				if( $Newsletter = & $this->get_Newsletter() )
-				{	// Get name of newsletter:
-					return $Newsletter->get( 'name' );
-				}
-				else
-				{	// Get email title of this campaign:
-					return $this->get( 'email_title' );
-				}
-				break;
+			case 'plaintext_template_preview':
+				global $current_User;
+				$text_mail_template = mail_template( 'newsletter', 'text', array( 'message_text' => $this->get( 'email_plaintext' ), 'include_greeting' => false, 'add_email_tracking' => false ), $current_User );
+				$text_mail_template = str_replace( array( '$email_key$', '$mail_log_ID$', '$email_key_start$', '$email_key_end$' ), array( '***email-key***', '', '', '' ), $text_mail_template );
+				$text_mail_template = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $text_mail_template );
+				return nl2br( $text_mail_template );
 
 			default:
 				return parent::get( $parname );
@@ -272,11 +313,13 @@ class EmailCampaign extends DataObject
 	 * Get recipient user IDs of this campaign
 	 *
 	 * @param string Type of users:
-	 *   'all'     - All active users which accept newsletter of this campaign
-	 *   'filter'  - Filtered active users which accept newsletter of this campaign
-	 *   'receive' - Users which already received email newsletter
-	 *   'skipped' - Users which will not receive email newsletter
-	 *   'wait'    - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
+	 *   'all'         - All active users which accept newsletter of this campaign
+	 *   'filter'      - Filtered active users which accept newsletter of this campaign
+	 *   'receive'     - Users which already received email newsletter
+	 *   'skipped'     - Users which will not receive email newsletter
+	 *   'skipped_tag' - Users which will not receive email newsletter because of they are restricted by user tag
+	 *   'error'       - Users which got an error during receiving email newsletter
+	 *   'wait'        - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
 	 *   Use same keys with prefix 'unsub_' for users are NOT subscribed to Newsletter of this Email Campaign,
 	 *   Use same keys with prefix 'full_' for users which are linked with this Email Campaign somehow,
 	 * @return array user IDs
@@ -322,24 +365,26 @@ class EmailCampaign extends DataObject
 		$users_SQL->FROM( 'T_users' );
 		$users_SQL->FROM_add( 'INNER JOIN T_email__campaign_send ON ( csnd_camp_ID = '.$DB->quote( $this->ID ).' AND ( csnd_user_ID = user_ID OR csnd_user_ID IS NULL ) )' );
 		$users_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_subscribed = 1 AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
-		$users_SQL->WHERE( 'user_status IN ( "activated", "autoactivated" )' );
+		$users_SQL->WHERE( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 		$users = $DB->get_results( $users_SQL->get(), OBJECT, $users_SQL->title );
 
 		$this->users = array(
 				// Users are subscribed to Newsletter of this Email Campaign:
-				'all'           => array(),
-				'filter'        => array(),
-				'receive'       => array(),
-				'skipped'       => array(),
-				'error'         => array(),
-				'wait'          => array(),
+				'all'               => array(),
+				'filter'            => array(),
+				'receive'           => array(),
+				'skipped'           => array(),
+				'skipped_tag'       => array(),
+				'error'             => array(),
+				'wait'              => array(),
 				// Users are NOT subscribed to Newsletter of this Email Campaign:
-				'unsub_all'     => array(),
-				'unsub_filter'  => array(),
-				'unsub_receive' => array(),
-				'unsub_skipped' => array(),
-				'unsub_error'   => array(),
-				'unsub_wait'    => array(),
+				'unsub_all'         => array(),
+				'unsub_filter'      => array(),
+				'unsub_receive'     => array(),
+				'unsub_skipped'     => array(),
+				'unsub_skipped_tag' => array(),
+				'unsub_error'       => array(),
+				'unsub_wait'        => array(),
 				// All Users which are linked with this Email Campaign somehow:
 				// Use prefix 'full_' like 'full_all', 'full_filter' and etc.
 			);
@@ -378,6 +423,19 @@ class EmailCampaign extends DataObject
 				else
 				{	// This user is subscribed to newsletter of this email campaign:
 					$this->users['skipped'][] = $user_data->user_ID;
+					$this->users['filter'][] = $user_data->user_ID;
+				}
+			}
+			elseif( check_usertags( $user_data->user_ID, explode( ',', $this->get( 'user_tag_sendskip' ) ), 'has_any' ) )
+			{	// This user will be skipped from receiving newsletter email because of skip tags:
+				if( $user_data->enls_user_ID === NULL )
+				{	// This user is unsubscribed from newsletter of this email campaign:
+					$this->users['unsub_skipped_tag'][] = $user_data->user_ID;
+					$this->users['unsub_filter'][] = $user_data->user_ID;
+				}
+				else
+				{	// This user is subscribed to newsletter of this email campaign:
+					$this->users['skipped_tag'][] = $user_data->user_ID;
 					$this->users['filter'][] = $user_data->user_ID;
 				}
 			}
@@ -465,8 +523,22 @@ class EmailCampaign extends DataObject
 	 */
 	function dbinsert()
 	{
+		global $baseurl;
+
 		// Update the message fields:
 		$this->update_message_fields();
+
+		// Make sure email title is not empty
+		if( empty( $this->email_title ) && ! empty( $this->name ) )
+		{
+			$this->set( 'email_title', $this->name );
+		}
+
+		// Pre-fill email default destination
+		if( empty( $this->email_defaultdest ) )
+		{
+			$this->set( 'email_defaultdest', $baseurl );
+		}
 
 		$r = parent::dbinsert();
 
@@ -527,15 +599,29 @@ class EmailCampaign extends DataObject
 			) );
 		$this->set( 'email_html', format_to_output( $email_text ) );
 
-		// Save plain-text message:
-		$email_plaintext = preg_replace( '#<a[^>]+href="([^"]+)"[^>]*>[^<]*</a>#i', ' [ $1 ] ', $this->get( 'email_html' ) );
-		$email_plaintext = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', ' [ $1 ] ', $email_plaintext );
-		$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
-		$email_plaintext = preg_replace( '#<(p|/h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
-		$email_plaintext = preg_replace( '#<(br|h[1-6]|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
-		$email_plaintext = preg_replace( '#<li[^>]*>#i', "- ", $email_plaintext );
-		$email_plaintext = preg_replace( '#<hr ?/?>#i', "\n\n----------------\n\n", $email_plaintext );
-		$this->set( 'email_plaintext', strip_tags( $email_plaintext ) );
+		// Update plain-text message:
+		$this->update_plaintext();
+	}
+
+
+	/**
+	 * Update the plain-text message field from HTML message
+	 *
+	 * @param boolean Force to update even when plain-text is NOT synced with HTML message
+	 */
+	function update_plaintext( $force_update = false )
+	{
+		if( $force_update || $this->get( 'sync_plaintext' ) )
+		{	// Update plain-text message only when it is enabled for this email campaign:
+			$email_plaintext = preg_replace( '#<a[^>]+href="([^"]+)"[^>]*>[^<]*</a>#i', ' [ $1 ] ', $this->get( 'email_html' ) );
+			$email_plaintext = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', ' [ $1 ] ', $email_plaintext );
+			$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
+			$email_plaintext = preg_replace( '#<(p|/h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
+			$email_plaintext = preg_replace( '#<(br|h[1-6]|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
+			$email_plaintext = preg_replace( '#<li[^>]*>#i', "- ", $email_plaintext );
+			$email_plaintext = preg_replace( '#<hr ?/?>#i', "\n\n----------------\n\n", $email_plaintext );
+			$this->set( 'email_plaintext', strip_tags( $email_plaintext ) );
+		}
 	}
 
 
@@ -585,12 +671,35 @@ class EmailCampaign extends DataObject
 			param_string_not_empty( 'ecmp_enlt_ID', T_('Please select a list.') );
 			$this->newsletter_is_changed = ( get_param( 'ecmp_enlt_ID' ) != $this->get( 'enlt_ID' ) );
 			$this->set_from_Request( 'enlt_ID' );
+			if( $this->newsletter_is_changed )
+			{	// If the list/newsletter has been changed, the welcome flag must be automatically be lost:
+				$this->set( 'welcome', 0 );
+			}
+		}
+
+		if( param( 'ecmp_name', 'string', NULL ) !== NULL )
+		{ // Campaign name:
+			param_string_not_empty( 'ecmp_name', T_('Please enter a name.') );
+			$this->set_from_Request( 'name' );
 		}
 
 		if( param( 'ecmp_email_title', 'string', NULL ) !== NULL )
 		{	// Email title:
 			param_string_not_empty( 'ecmp_email_title', T_('Please enter an email title.') );
 			$this->set_from_Request( 'email_title' );
+		}
+
+		$email_defaultdest = param( 'ecmp_email_defaultdest', 'string', NULL );
+		if( $email_defaultdest !== NULL )
+		{	// Email default destination:
+			if( validate_url( $email_defaultdest ) )
+			{
+				param_error( 'ecmp_email_defaultdest', sprintf( T_('Supplied URL is invalid. (%s)'), htmlspecialchars( $email_defaultdest ) ) );
+			}
+			else
+			{
+				$this->set_from_Request( 'email_defaultdest' );
+			}
 		}
 
 		if( param( 'ecmp_email_html', 'html', NULL ) !== NULL )
@@ -611,9 +720,25 @@ class EmailCampaign extends DataObject
 			$this->set_from_Request( 'email_text' );
 		}
 
-		if( param( 'ecmp_auto_send', 'string', NULL ) !== NULL )
-		{	// Auto send:
-			$this->set_from_Request( 'auto_send' );
+		if( param( 'ecmp_sync_plaintext', 'integer', NULL ) !== NULL )
+		{	// Keep in sync with HTML / Edit separately:
+			$this->set_from_Request( 'sync_plaintext' );
+		}
+
+		if( ! $this->get( 'sync_plaintext' ) &&
+		    param( 'ecmp_email_plaintext', 'text', NULL ) !== NULL )
+		{	// Save plain-text message only when it is allowed for this email campaign:
+			$this->set_from_Request( 'email_plaintext' );
+		}
+
+		if( param( 'ecmp_user_tag_sendskip', 'string', NULL ) !== NULL )
+		{	// User tag:
+			$this->set_from_Request( 'user_tag_sendskip' );
+		}
+
+		if( param( 'ecmp_user_tag_sendsuccess', 'string', NULL ) !== NULL )
+		{	// User tag:
+			$this->set_from_Request( 'user_tag_sendsuccess' );
 		}
 
 		if( param( 'ecmp_user_tag', 'string', NULL ) !== NULL )
@@ -749,9 +874,20 @@ class EmailCampaign extends DataObject
 		{	// Send a newsletter to real user:
 			global $DB, $mail_log_insert_ID;
 
-			// Force email sending to not activated users if email campaign is configurated to auto sending (e-g to send email on auto subscription on registration):
-			$force_on_non_activated = ( $this->get( 'auto_send' ) == 'subscription' );
-			$result = send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, $force_on_non_activated, array(), $email_address );
+			if( in_array( $user_ID, $this->get_recipients( 'full_receive' ) ) ||
+			    in_array( $user_ID, $this->get_recipients( 'full_skipped' ) ) ||
+			    in_array( $user_ID, $this->get_recipients( 'full_skipped_tag' ) ) ||
+			    check_usertags( $user_ID, explode( ',', $this->get( 'user_tag_sendskip' ) ), 'has_any' ) ) // check this separately for new subscribed users which receive email at subscription
+			{	// Skip this user because it either already received this email or it is skipped manually or by user tag:
+				$result = false;
+			}
+			else
+			{	// Try to send email campaign to the user only if he is really waiting this:
+				// Force email sending to not activated users if email campaign is configurated to auto sending (e-g to send email on auto subscription on registration):
+				$force_on_non_activated = ( $this->get( 'welcome' ) == 1 );
+				$result = send_mail_to_User( $user_ID, $this->get( 'email_title' ), 'newsletter', $newsletter_params, $force_on_non_activated, array(), $email_address );
+			}
+
 			if( $result )
 			{	// Update last sending data for newsletter per user:
 				$DB->query( 'UPDATE T_email__newsletter_subscription
@@ -759,6 +895,16 @@ class EmailCampaign extends DataObject
 					    enls_send_count = enls_send_count + 1
 					WHERE enls_user_ID = '.$DB->quote( $user_ID ).'
 					  AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+				// Add tags to user after successful email sending:
+				$user_tag_sendsuccess = trim( $this->get( 'user_tag_sendsuccess' ) );
+				if( ! empty( $user_tag_sendsuccess ) )
+				{	// Only if at least one tag is defined:
+					if( $User = & $UserCache->get_by_ID( $user_ID, false, false ) )
+					{
+						$User->add_usertags( $user_tag_sendsuccess );
+						$User->dbupdate();
+					}
+				}
 			}
 
 			if( empty( $mail_log_insert_ID ) )
@@ -796,7 +942,7 @@ class EmailCampaign extends DataObject
 	/**
 	 * Send email newsletter for all users of this campaign
 	 *
-	 * @param boolean TRUE to print out messages
+	 * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
 	 * @param array Force users instead of users which are ready to receive this email campaign
 	 * @param string|boolean Update time of last sending: 'auto', 'manual', FALSE - to don't update
 	 */
@@ -809,9 +955,10 @@ class EmailCampaign extends DataObject
 			$user_IDs = $this->get_recipients( 'wait' );
 		}
 		else
-		{	// Exclude users which already received this email campaign to avoid double sending even with forcing user IDs:
-			$receive_user_IDs = $this->get_recipients( 'receive' );
-			$user_IDs = array_diff( $user_IDs, $receive_user_IDs );
+		{	// Exclude users(which already received this email campaign or skipped manually or skipped by user tag) to avoid double sending even with forcing user IDs:
+			$user_IDs = array_diff( $user_IDs, $this->get_recipients( 'full_receive' ) );
+			$user_IDs = array_diff( $user_IDs, $this->get_recipients( 'full_skipped' ) );
+			$user_IDs = array_diff( $user_IDs, $this->get_recipients( 'full_skipped_tag' ) );
 		}
 
 		if( empty( $user_IDs ) )
@@ -986,15 +1133,25 @@ class EmailCampaign extends DataObject
 		// Get all send statuses per users of this email campaign from cache or DB table T_email__campaign_send once:
 		$all_user_IDs = $this->get_recipients( 'full_all' );
 
+		$update_send_count = false;
 		if( in_array( $user_ID, $all_user_IDs ) )
 		{	// Update user send status for this email campaign:
+			if( $status == 'sent' )
+			{
+				list( $previous_status, $last_sent_ts ) = $DB->get_row( 'SELECT csnd_status, csnd_last_sent_ts FROM T_email__campaign_send WHERE csnd_camp_ID = '.$this->ID.' AND csnd_user_ID = '.$DB->quote( $user_ID ), ARRAY_N );
+				if( empty( $last_sent_ts ) && $previous_status != 'sent' )
+				{ // First time to send the email to this user
+					$update_send_count = true;
+				}
+			}
+
 			$last_sent_ts_field_value = ( $mail_log_ID === NULL ? '' : ', csnd_last_sent_ts = '.$DB->quote( date2mysql( $servertimenow ) ) );
 			$r = $DB->query( 'UPDATE T_email__campaign_send
 				SET csnd_status = '.$DB->quote( $status ).',
 				    csnd_emlog_ID = '.$DB->quote( $mail_log_ID ).'
 				    '.$last_sent_ts_field_value.'
 				WHERE csnd_camp_ID = '.$DB->quote( $this->ID ).'
-				  AND csnd_user_ID = '.$DB->quote( $user_ID ) );
+					AND csnd_user_ID = '.$DB->quote( $user_ID ) );
 		}
 		else
 		{	// Insert new record for user send status:
@@ -1002,10 +1159,22 @@ class EmailCampaign extends DataObject
 			$last_sent_ts_value = ( $mail_log_ID === NULL ? '' : ', '.$DB->quote( date2mysql( $servertimenow ) ) );
 			$r = $DB->query( 'INSERT INTO T_email__campaign_send ( csnd_camp_ID, csnd_user_ID, csnd_status, csnd_emlog_ID'.$last_sent_ts_field.' )
 				VALUES ( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', '.$DB->quote( $status ).', '.$DB->quote( $mail_log_ID ).$last_sent_ts_value.' )' );
+
+			if( $status == 'sent' )
+			{
+				$update_send_count = true;
+			}
 		}
 
 		if( $r )
 		{	// Update the CACHE array where we store email sending status for users:
+
+			if( $update_send_count )
+			{
+				$this->set( 'send_count', $this->get( 'send_count' ) + 1 );
+				$this->dbupdate();
+			}
+
 			$statuses_keys = array(
 					'ready_to_send'   => 'wait',
 					'ready_to_resend' => 'wait',
@@ -1013,16 +1182,23 @@ class EmailCampaign extends DataObject
 					'send_error'      => 'error',
 					'skipped'         => 'skipped',
 				);
-			$this->users['all'][] = $user_ID;
-			if( isset( $statuses_keys[ $status ] ) )
+			if( ! in_array( $user_ID, $this->users['all'] ) )
+			{
+				$this->users['all'][] = $user_ID;
+			}
+			if( isset( $statuses_keys[ $status ] ) && ! in_array( $user_ID, $this->users['filter'] ) )
 			{	// Add user ID to filtered array:
 				$this->users['filter'][] = $user_ID;
 			}
+
 			foreach( $statuses_keys as $email_status => $array_key )
 			{
 				if( $email_status == $status )
 				{	// Add user ID to proper cache array:
-					$this->users[ $array_key ][] = $user_ID;
+					if( ! in_array( $user_ID, $this->users[ $array_key ] ) )
+					{
+						$this->users[ $array_key ][] = $user_ID;
+					}
 				}
 				elseif( ( $unset_user_ID_key = array_search( $user_ID, $this->users[ $array_key ] ) ) !== false )
 				{	// Remove user ID from previous status cache array:
@@ -1185,24 +1361,91 @@ class EmailCampaign extends DataObject
 
 
 	/**
-	 * Get title of sending method
+	 * Duplicate email campaign
 	 *
-	 * @return string
+	 * @return boolean True if duplication was successfull, false otherwise
 	 */
-	function get_sending_title()
+	function duplicate()
 	{
-		$titles = array(
-				'no'           => T_('Manual'),
-				'subscription' => T_('At subscription'),
-			);
+		global $DB, $localtimenow;
 
-		if( isset( $titles[ $this->get( 'auto_send' ) ] ) )
+		$DB->begin();
+
+		$duplicated_campaign_ID = $this->ID;
+		$this->ID = 0;
+
+		// Get all fields of the duplicated email campaign:
+		$source_fields_SQL = new SQL( 'Get all fields of the duplicated email campaign #'.$duplicated_campaign_ID );
+		$source_fields_SQL->SELECT( '*' );
+		$source_fields_SQL->FROM( 'T_email__campaign' );
+		$source_fields_SQL->WHERE( 'ecmp_ID = '.$DB->quote( $duplicated_campaign_ID ) );
+		$source_fields = $DB->get_row( $source_fields_SQL, ARRAY_A );
+		// Use field values of duplicated collection by default:
+		foreach( $source_fields as $source_field_name => $source_field_value )
 		{
-			return $titles[ $this->get( 'auto_send' ) ];
+			// Cut prefix "ecmp_" of each field:
+			$source_field_name = substr( $source_field_name, 5 );
+			if( $source_field_name == 'ID' || $source_field_name == 'welcome' )
+			{	// Skip fields ID and "welcome":
+				continue;
+			}
+			if( isset( $this->$source_field_name ) )
+			{	// Unset current value in order to assing new below, especially to update this in array $this->dbchanges:
+				unset( $this->$source_field_name );
+			}
+			$this->set( $source_field_name, $source_field_value );
 		}
 
-		// Unknown sending method
-		return $this->get( 'auto_send' );
+		// Call this firstly to find all possible errors before inserting:
+		// Also to set new values from submitted form:
+		if( ! $this->load_from_Request() )
+		{	// Error on handle new values from form:
+			$this->ID = $duplicated_campaign_ID;
+			$DB->rollback();
+			return false;
+		}
+
+		// Set email campaign timestamp to current local time
+		$this->set( 'date_ts', $localtimenow );
+
+		// Reset sent dates
+		$this->set( 'sent_ts', NULL );
+		$this->set( 'auto_sent_ts', NULL );
+
+		// Try insert new collection in DB:
+		if( ! $this->dbinsert() )
+		{	// Error on insert collection in DB:
+			$this->ID = $duplicated_campaign_ID;
+			$DB->rollback();
+			return false;
+		}
+
+		// Copy all files linked to the campaign
+		$DB->query( 'INSERT INTO T_links
+				( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID,
+				link_itm_ID, link_cmt_ID, link_usr_ID, link_ecmp_ID, link_msg_ID, link_tmp_ID, link_file_ID,
+				link_ltype_ID, link_position, link_order )
+			SELECT link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID,
+				link_itm_ID, link_cmt_ID, link_usr_ID, '.$DB->quote( $this->ID ).' AS link_ecmp_ID, link_msg_ID, link_tmp_ID, link_file_ID,
+				link_ltype_ID, link_position, link_order
+			FROM T_links
+			WHERE link_ecmp_ID = '.$DB->quote( $duplicated_campaign_ID ),
+			'Duplicate linked files from email campaign #'.$duplicated_campaign_ID.' to #'.$this->ID );
+
+		// Add newsletter list subscribers as recipients
+		if( $Newsletter = & $this->get_Newsletter() )
+		{
+			$this->add_recipients( $Newsletter->get_user_IDs() );
+		}
+
+		// Duplication is successful, commit all above changes:
+		$DB->commit();
+
+		// Commit changes in cache:
+		$EmailCampaignCache = & get_EmailCampaignCache();
+		$EmailCampaignCache->add( $this );
+
+		return true;
 	}
 }
 

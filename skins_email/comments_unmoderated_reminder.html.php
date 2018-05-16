@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $baseurl, $comment_moderation_reminder_threshold;
+global $admin_url, $baseurl, $Settings;
 
 $BlogCache = & get_BlogCache();
 
@@ -24,7 +24,7 @@ $params = array_merge( array(
 		'comments' => array(),
 	), $params );
 
-echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('There have been comments awaiting moderation for more than %s in the following blogs:'), seconds_to_period( $comment_moderation_reminder_threshold ) ).'</p>';
+echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('There have been comments awaiting moderation for more than %s in the following blogs:'), seconds_to_period( $Settings->get( 'comment_moderation_reminder_threshold' ) ) ).'</p>';
 
 echo '<ul>';
 foreach( $params['blogs'] as $blog_ID )

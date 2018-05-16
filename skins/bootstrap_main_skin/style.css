@@ -133,42 +133,6 @@ body.pictured div#debug_info.debug {
     margin-bottom: 0;
   }
 }
-.widget_core_user_login #login_form .form-group {
-  margin: 0;
-}
-.widget_core_user_login #login_form label {
-  text-align: left;
-  width: 160px;
-  padding-left: 0;
-}
-.widget_core_user_login #login_form .controls {
-  padding: 0;
-  width: 100%;
-}
-.widget_core_user_login #login_form .form_text_input.form-control {
-  width: 100%;
-}
-.widget_core_user_login .submit {
-  font-size: 12px;
-}
-.widget_core_user_login .field_login_btn .panel {
-  margin: 0;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-}
-.widget_core_user_login .field_login_btn .panel .panel-body {
-  padding-left: 0;
-  padding-right: 0;
-  padding-bottom: 0;
-}
-.widget_core_user_login .field_login_btn .panel .panel-body #submit_login_form {
-  margin-right: 10px;
-}
-.widget_core_user_login .register_link {
-  display: block;
-  padding-top: 10px;
-}
 .widget_core_user_register #register_form .form-group {
   margin: 0;
 }
@@ -197,9 +161,6 @@ body.pictured div#debug_info.debug {
   padding-left: 0;
   padding-right: 0;
   padding-bottom: 0;
-}
-.widget_core_user_register .field_register_btn .panel .panel-body #submit_login_form {
-  margin-right: 10px;
 }
 ul.profile_tabs {
   margin: 0 2ex 2ex;
@@ -319,6 +280,7 @@ div.bSideItem h4 {
 }
 .evo_panel__login {
   max-width: 400px;
+  min-width: auto;
 }
 .evo_panel__lostpass {
   max-width: 480px;
@@ -459,8 +421,7 @@ body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
   color: #ffffff;
   text-align: center;
   opacity: 0.5;
-  -webkit-transition: 0.1s all;
-          transition: 0.1s all;
+  transition: 0.1s all;
   position: relative;
   left: -50%;
 }

@@ -1110,16 +1110,15 @@ class collections_Module extends Module
 			case 'subs_update':
 				// Subscribe/Unsubscribe user on the selected collection
 
-				if( $demo_mode && ( $current_User->ID <= 3 ) )
-				{ // don't allow default users profile change on demo mode
-					bad_request_die( 'Demo mode: you can\'t edit the admin and demo users profile!<br />[<a href="javascript:history.go(-1)">'
-								. T_('Back to profile') . '</a>]' );
-				}
-
 				// Get params
 				$blog = param( 'subscribe_blog', 'integer', true );
 				$notify_items = param( 'sub_items', 'integer', NULL );
 				$notify_comments = param( 'sub_comments', 'integer', NULL );
+
+				if( $demo_mode && ( $current_User->ID <= 7 ) )
+				{	// Don't allow default users profile change on demo mode:
+					header_redirect( get_user_settings_url( 'subs', NULL, $blog, '&' ) );
+				}
 
 				if( ( $notify_items < 0 ) || ( $notify_items > 1 ) || ( $notify_comments < 0 ) || ( $notify_comments > 1 ) )
 				{ // Invalid notify param. It should be 0 for unsubscribe and 1 for subscribe.
@@ -1168,15 +1167,16 @@ class collections_Module extends Module
 			case 'isubs_update':
 				// Subscribe/Unsubscribe user on the selected item
 
-				if( $demo_mode && ( $current_User->ID <= 3 ) )
-				{ // don't allow default users profile change on demo mode
-					bad_request_die( 'Demo mode: you can\'t edit the admin and demo users profile!<br />[<a href="javascript:history.go(-1)">'
-								. T_('Back to profile') . '</a>]' );
-				}
-
 				// Get params
 				$item_ID = param( 'p', 'integer', true );
 				$notify = param( 'notify', 'integer', 0 );
+
+				if( $demo_mode && ( $current_User->ID <= 7 ) )
+				{	// Don't allow default users profile change on demo mode:
+					$ItemCache = & get_ItemCache();
+					$Item = & $ItemCache->get_by_ID( $item_ID );
+					header_redirect( get_user_settings_url( 'subs', NULL, $Item->get_blog_ID(), '&' ) );
+				}
 
 				if( ( $notify < 0 ) || ( $notify > 1 ) )
 				{ // Invalid notify param. It should be 0 for unsubscribe and 1 for subscribe.
@@ -1297,7 +1297,6 @@ class collections_Module extends Module
 
 				// Email:
 				$user_email = param( $dummy_fields['email'], 'string' );
-				param_check_email( $dummy_fields['email'], true );
 
 				// Stop a request from the blocked IP addresses or Domains
 				antispam_block_request();
@@ -1316,15 +1315,15 @@ class collections_Module extends Module
 				// Set default status:
 				$new_Item->set( 'status', $item_Blog->get_setting( 'default_post_status_anon' ) );
 
-				if( $DB->get_var( 'SELECT user_ID FROM T_users WHERE user_email = '.$DB->quote( utf8_strtolower( $user_email ) ) ) )
-				{	// Don't allow the duplicate emails for users:
-					$Messages->add_to_group( sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know or have forgotten it, you can <a %s>set your password here</a>.'),
-						'href="'.$item_Blog->get( 'loginurl' ).'"',
-						'href="'.$item_Blog->get( 'lostpasswordurl' ).'"' ), 'error', T_('Validation errors:') );
-				}
+				// Check email:
+				param_check_new_user_email( $dummy_fields['email'], $user_email, $item_Blog );
 
 				// Set item properties from submitted form:
 				$new_Item->load_from_Request( false, true );
+
+				// Use default item/post type of the collection:
+				$default_item_type_ID = $item_Blog->get_setting( 'default_post_type' );
+				$new_Item->set( 'ityp_ID', ( empty( $default_item_type_ID ) ? 1 /* Post */ : $default_item_type_ID ) );
 
 				// Call plugin event for additional checking, e-g captcha:
 				$Plugins->trigger_event( 'AdminBeforeItemEditCreate', array( 'Item' => & $new_Item ) );

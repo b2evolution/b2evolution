@@ -19,6 +19,10 @@ require_once dirname(__FILE__).'/../conf/_config.php';
  */
 require_once $inc_path .'_main.inc.php';
 
+// Start timer for cron job:
+// (time is printed out after each action, @see cron_log_action_end())
+$Timer->start( 'cron_exec' );
+
 if( $Settings->get( 'system_lock' ) )
 { // System is locked down for maintenance, Stop cron execution
 	echo 'The site is locked for maintenance. All scheduled jobs are postponed. No job was executed.';
@@ -106,7 +110,7 @@ if( $is_cli )
 	// Init charset handling - this will also set the encoding for MySQL connection
 	init_charsets( $current_charset );
 }
-else
+elseif( ! is_admin_page() )
 { // This is a web request: (for testing purposes only. Not designed for production)
 
 	// Make sure the response is never cached:
@@ -215,6 +219,9 @@ else
 		// The job may need to know its ID and name (to set logical locks for example):
 		$cron_params['ctsk_ID'] = $ctsk_ID;
 
+		// Set max execution time for each cron job separately:
+		set_max_execution_time( $Settings->get( 'cjob_timeout_'.$task->ctsk_key ) );
+
 		// Try to execute cron job:
 		set_error_handler( 'cron_job_error_handler' );
 		try
@@ -250,11 +257,6 @@ else
 			$timestop = time() + $time_difference;
 		}
 
-		if( $result_status == 'finished' && $timestop - $cron_timestart > 60 )
-		{ // Record a finished task as warning if it has run for more than 60 seconds
-			$result_status = 'warning';
-		}
-
 		if( is_array( $result_message ) )
 		{	// If result is array we should store it as serialized data
 			$result_message = serialize( $result_message );
@@ -280,7 +282,7 @@ detect_timeout_cron_jobs( $error_task );
 
 
 
-if( ! $is_cli )
+if( ! $is_cli && ! is_admin_page() )
 { // This is a web request:
 	echo '<p><a href="cron_exec.php">Refresh Now!</a></p>';
 	echo '<p>This page should refresh automatically in 15 seconds...</p>';
@@ -292,4 +294,6 @@ if( ! $is_cli )
 	<?php
 }
 
+// Stop timer of cron job:
+$Timer->stop( 'cron_exec' );
 ?>

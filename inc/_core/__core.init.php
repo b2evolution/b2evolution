@@ -707,6 +707,7 @@ class _core_Module extends Module
 			'comment_moderation_notif' => $def_notification,
 			'post_subscription_notif' => $def_notification,
 			'post_moderation_notif' => $def_notification,
+			'post_assignment_notif' => $def_notification,
 			'cross_country_allow_profiles' => $cross_country_settings_default,
 			'cross_country_allow_contact' => $cross_country_settings_default,
 			'perm_orgs' => $permorgs,
@@ -851,6 +852,9 @@ class _core_Module extends Module
 				),
 			'post_moderation_notif' => array_merge(
 				array( 'label' => T_( 'Post moderation notifications' ) ), $notifications_array
+				),
+			'post_assignment_notif' => array_merge(
+				array( 'label' => T_( 'Post assignment notifications' ) ), $notifications_array
 				),
 			'cross_country_allow_profiles' => array(
 				'label' => T_('Users'),
@@ -1150,12 +1154,12 @@ class _core_Module extends Module
 			// PLACE HOLDER FOR FILES MODULE:
 			$entries['site']['entries']['files'] = NULL;
 
-			if( $perm_spam || $perm_options || $perm_maintenance || $perm_emails )
+			if( $perm_admin_normal && $perm_options )
 			{
 				$entries['site']['entries'][] = array( 'separator' => true );
 
 				if( $perm_emails )
-				{
+				{	// Emails:
 					$entries['site']['entries']['email'] = array(
 							'text' => T_('Emails'),
 							'href' => $admin_url.'?ctrl=newsletters',
@@ -1168,19 +1172,16 @@ class _core_Module extends Module
 									'href' => $admin_url.'?ctrl=campaigns' ),
 								)
 						);
-				}
 
-				if( $perm_options )
-				{	// If current user has a permissions to view options:
-					$entries['site']['entries']['email']['entries'] += array(
-							'automations' => array(
-								'text' => T_('Automations').'&hellip;',
-								'href' => $admin_url.'?ctrl=automations',
-						) );
-				}
+					if( $perm_options )
+					{	// If current user has a permissions to view options:
+						$entries['site']['entries']['email']['entries'] += array(
+								'automations' => array(
+									'text' => T_('Automations').'&hellip;',
+									'href' => $admin_url.'?ctrl=automations',
+							) );
+					}
 
-				if( $perm_emails )
-				{
 					$entries['site']['entries']['email']['entries'] += array(
 								'settings' => array(
 									'text' => T_('Settings').'&hellip;',
@@ -1197,22 +1198,21 @@ class _core_Module extends Module
 								);
 				}
 
+				// System:
 				$entries['site']['entries']['system'] = array(
 						'text' => T_('System'),
 						'href' => $admin_url.'?ctrl=system',
+						'entries' => array(
+							'status' => array(
+								'text' => T_('Status').'&hellip;',
+								'href' => $admin_url.'?ctrl=system',
+							),
+							'crontab' => array(
+								'text' => T_('Scheduler').'&hellip;',
+								'href' => $admin_url.'?ctrl=crontab',
+							),
+						)
 					);
-
-				if( $perm_options )
-				{
-					$entries['site']['entries']['system']['entries']['status'] = array(
-							'text' => T_('Status').'&hellip;',
-							'href' => $admin_url.'?ctrl=system',
-						);
-					$entries['site']['entries']['system']['entries']['crontab'] = array(
-							'text' => T_('Scheduler').'&hellip;',
-							'href' => $admin_url.'?ctrl=crontab',
-						);
-				}
 
 				if( $perm_spam )
 				{
@@ -1221,10 +1221,7 @@ class _core_Module extends Module
 							'href' => $admin_url.'?ctrl=antispam',
 						);
 				}
-			}
 
-			if( $perm_options )
-			{	// Global settings:
 				$entries['site']['entries']['system']['entries']['regional'] = array(
 						'text' => T_('Regional').'&hellip;',
 						'href' => $admin_url.'?ctrl=regional',
@@ -2003,16 +2000,7 @@ class _core_Module extends Module
 			$users_entries['entries'] = array(
 					'users' => array(
 						'text' => T_('Users'),
-						'href' => '?ctrl=users',
-						'entries' => array(
-							'list' => array(
-								'text' => T_('List'),
-								'href' => '?ctrl=users' ),
-							'duplicates' => array(
-								'text' => T_('Find duplicates'),
-								'href' => '?ctrl=users&amp;tab3=duplicates' ),
-							),
-						),
+						'href' => '?ctrl=users' ),
 					'groups' => array(
 						'text' => T_('Groups'),
 						'href' => '?ctrl=groups' ),
@@ -2162,10 +2150,26 @@ class _core_Module extends Module
 					$AdminUI->add_menu_entries( 'options', array(
 						'system' => array(
 							'text' => T_('Status'),
-							'href' => '?ctrl=system' ),
+							'href' => $admin_url.'?ctrl=system' ),
 						'cron' => array(
 							'text' => T_('Scheduler'),
-							'href' => '?ctrl=crontab' ) ) );
+							'href' => $admin_url.'?ctrl=crontab',
+							'entries' => array(
+								'list' => array(
+									'text' => T_('List'),
+									'href' => $admin_url.'?ctrl=crontab'
+								),
+								'settings' => array(
+									'text' => T_('Settings'),
+									'href' => $admin_url.'?ctrl=crontab&amp;tab=settings'
+								),
+								'test' => array(
+									'text' => T_('Test'),
+									'href' => $admin_url.'?ctrl=crontab&amp;tab=test'
+								),
+							)
+						)
+					) );
 				}
 				if( $perm_spam )
 				{ // Permission to view antispam:
