@@ -59,11 +59,47 @@ foreach( $steps as $step )
 	
 }
 echo '</div>';
+
+// Initialize JavaScript to build and open window:
+echo_modalwindow_js();
 ?>
 <script type="text/javascript">
 jQuery( document ).ready( function()
 {	// CSS fix to make diagram canvas full height:
-	jQuery( '#evo_automation__diagram_canvas' ).css( 'height', jQuery( window ).height() - 343	 );
+	jQuery( '#evo_automation__diagram_canvas' ).css( 'height', jQuery( window ).height() - 343 );
+
+	// Open modal window to edit the automation step:
+	jQuery( document ).on( 'click', '.evo_automation__diagram_step_box', function()
+	{
+		if( typeof( evo_automation__diagram_step_is_dragging ) != 'undefined' && evo_automation__diagram_step_is_dragging )
+		{	// Ignore event "mouseup" of the end of the dragging:
+			evo_automation__diagram_step_is_dragging = false;
+			return false;
+		}
+
+		openModalWindow( '<span class="loader_img loader_file_edit absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
+			'80%', '', true,
+			'<?php echo TS_('Step').get_manual_link( 'automation-step-form' ); ?>',
+			'<?php echo TS_('Save Changes!'); ?>', true, true );
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo $admin_url; ?>',
+			data:
+			{
+				'ctrl': 'automations',
+				'action': 'edit_step',
+				'step_ID': jQuery( this ).attr( 'id' ).replace( 'step_', '' ),
+				'display_mode': 'js',
+			},
+			success: function( result )
+			{
+				openModalWindow( result, '80%', '',true,
+					'<?php echo TS_('Step').get_manual_link( 'automation-step-form' ); ?>',
+					'<?php echo TS_('Save Changes!'); ?>', false, true );
+			}
+		} );
+	} );
 } );
 
 jsPlumb.ready( function ()
@@ -149,6 +185,10 @@ jsPlumb.ready( function ()
 		instance.draggable( jsPlumb.getSelector( '.evo_automation__diagram_step_box' ),
 		{
 			grid: [20, 20],
+			start: function( e )
+			{	// Set a flag to know we are dragging the automation step instead of a clicking:
+				evo_automation__diagram_step_is_dragging = true;
+			},
 			stop: function( e )
 			{	// Store the changed step box position in DB by AJAX:
 				jQuery.ajax(

@@ -15,7 +15,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $edited_AutomationStep, $action, $admin_url;
+global $edited_AutomationStep, $action, $admin_url, $display_mode;
 
 // Get Automation of the creating/editing Step:
 $step_Automation = & $edited_AutomationStep->get_Automation();
@@ -23,13 +23,16 @@ $step_Automation = & $edited_AutomationStep->get_Automation();
 // Determine if we are creating or updating:
 $creating = is_create_action( $action );
 
-$Form = new Form( NULL, 'automation_checkchanges', 'post', 'compact' );
+$Form = new Form( NULL, 'automation_checkchanges', 'post', $display_mode == 'js' ? NULL : 'compact' );
 
 $edit_automation_url = regenerate_url( 'action,step_ID', 'action=edit&amp;autm_ID='.$step_Automation->ID );
 
-$Form->global_icon( T_('Cancel editing').'!', 'close', $edit_automation_url );
+if( $display_mode != 'js' )
+{
+	$Form->global_icon( T_('Cancel editing').'!', 'close', $edit_automation_url );
+}
 
-$Form->begin_form( 'fform', sprintf( $creating ? ( $edited_AutomationStep->ID > 0 ? T_('Duplicate step') : T_('New step') ) : T_('Step') ).get_manual_link( 'automation-step-form' ) );
+$Form->begin_form( 'fform', $display_mode == 'js' ? '' : sprintf( $creating ? ( $edited_AutomationStep->ID > 0 ? T_('Duplicate step') : T_('New step') ) : T_('Step') ).get_manual_link( 'automation-step-form' ) );
 
 $Form->add_crumb( 'automationstep' );
 $Form->hidden( 'action', $creating ? ( $edited_AutomationStep->ID > 0 ? 'duplicate_step' : 'create_step' ) : 'update_step' );
@@ -145,7 +148,7 @@ $Form->end_form( array(
 		array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' )
 	) );
 
-if( ! $creating )
+if( ! $creating && $display_mode != 'js' )
 {	// Display numbers of users queued for the edited Automation Step:
 	$SQL = new SQL( 'Get all users queued for automation step #'.$edited_AutomationStep->ID );
 	$SQL->SELECT( 'aust_autm_ID, aust_user_ID, aust_next_exec_ts, user_login' );

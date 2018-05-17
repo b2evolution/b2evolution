@@ -458,11 +458,13 @@ switch( $action )
 			// Update automation step in DB:
 			$edited_AutomationStep->dbupdate();
 			$Messages->add( T_('Automation step has been updated.'), 'success' );
-			// We want to highlight the moved Step on next list display:
-			$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
+			if( $tab != 'diagram' )
+			{	// We want to highlight the moved Step on next list display:
+				$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
+			}
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab='.$tab.'&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'edit_step';
@@ -705,7 +707,7 @@ switch( $action )
 			if( empty( $edited_Automation ) )
 			{	// Get Automation of the edited Step:
 				$edited_Automation = & $edited_AutomationStep->get_Automation();
-				set_param( 'tab', 'steps' );
+				set_param( 'tab', $display_mode == 'js' ? 'diagram' : 'steps' );
 			}
 			$AdminUI->add_menu_entries( array( 'email', 'automations' ), array(
 					'settings' => array(
@@ -784,6 +786,10 @@ if( in_array( $action, array( 'new_step', 'edit_step', 'copy_step' ) ) )
 	{
 		$AdminUI->display_breadcrumbpath_add( T_('Step').' #'.$edited_AutomationStep->dget( 'order' ) );
 	}
+}
+if( $tab == 'diagram' )
+{	// Load jQuery QueryBuilder plugin files for edit step form in modal window:
+	init_querybuilder_js( 'rsc_url' );
 }
 
 if( $display_mode != 'js' )
