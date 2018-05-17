@@ -720,6 +720,27 @@ jQuery( document ).ready( function()
 		rules: <?php echo param_format_condition( param_condition( 'filter_query' ), 'js' ); ?>,
 	} );
 
+	// Fix space of blank hidden operator:
+	evo_fix_query_builder_blaml_operator();
+	jQuery( '#evo_results_filters' ).on( 'afterUpdateRuleFilter.queryBuilder.filter', function()
+	{
+		evo_fix_query_builder_blaml_operator();
+	} );
+	function evo_fix_query_builder_blaml_operator()
+	{
+		jQuery( '.rule-container .rule-operator-container' ).each( function()
+		{
+			if( jQuery( this ).find( 'option' ).length == jQuery( this ).find( 'option[value=blank]' ).length )
+			{	// Hide container if rule uses only single blank operator:
+				jQuery( this ).hide();
+			}
+			else
+			{	// Show container with other operators:
+				jQuery( this ).show();
+			}
+		} );
+	}
+
 	// Prepare form before submitting:
 	jQuery( '#evo_results_filters' ).closest( 'form' ).on( 'submit', function()
 	{
