@@ -48,7 +48,7 @@ if( count( $steps ) > 0 )
 }
 
 // Print out HTML boxes for steps and Initialise steps data to build connectors between steps by JS code below:
-echo '<div class="evo_automation__diagram_canvas jtk-surface jtk-surface-nopan clear" id="evo_automation__diagram_canvas">';
+echo '<div id="evo_automation__diagram_canvas" class="jtk-surface jtk-surface-nopan clear">';
 foreach( $steps as $step )
 {
 	// Print box of step with data:
@@ -66,7 +66,16 @@ echo_modalwindow_js();
 <script type="text/javascript">
 jQuery( document ).ready( function()
 {	// CSS fix to make diagram canvas full height:
-	jQuery( '#evo_automation__diagram_canvas' ).css( 'height', jQuery( window ).height() - 343 );
+	var min_step_bottom_position = 0;
+	jQuery( '.evo_automation__diagram_step_box' ).each( function()
+	{	// Find the most bottom step:
+		var step_bottom_position = jQuery( this ).position().top + jQuery( this ).height();
+		if( min_step_bottom_position < step_bottom_position )
+		{
+			min_step_bottom_position = step_bottom_position;
+		}
+	} );
+	jQuery( '#evo_automation__diagram_canvas' ).css( 'height', min_step_bottom_position + 100 );
 
 	// Open modal window to edit the automation step:
 	jQuery( document ).on( 'click', '.evo_automation__diagram_step_box', function()
