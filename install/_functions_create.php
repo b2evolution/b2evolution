@@ -1836,7 +1836,10 @@ function create_default_email_campaigns()
 		load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
 		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 
-		$email_campaign_text = T_('Heading
+		$email_campaigns = array(
+			array(
+				'name' => T_('Markdown Example'),
+				'text' => T_('Heading
 =======
 
 Sub-heading
@@ -1877,16 +1880,11 @@ Button examples:
 [button]This is a button[/button]
 [like]I like this[/like] [dislike]I don\'t like this[/dislike]
 [cta:1:info]Call to action 1 info button[/cta] [cta:2:warning]Call to action 2 warning button[/cta] [cta:3:default]Call to action 3 default button[/cta]
-[cta:1:link]Call to action 1 link only[/cta]');
-
-		$email_campaigns = array(
-			array(
-				'name' => T_('Markdown Example'),
-				'text' => $email_campaign_text,
+[cta:1:link]Call to action 1 link only[/cta]'),
 			),
 			array(
 				'name' => T_('Another example'),
-				'text' => T_('Hi')."\n\n".$email_campaign_text."\n\n".T_('This is another example email campaign.'),
+				'text' => sprintf( T_('Hello %s!'), '$firstname_and_login$' )."\r\n\r\n".T_('Here are some news...'),
 			),
 		);
 
