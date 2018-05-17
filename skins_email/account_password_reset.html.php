@@ -66,7 +66,7 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 
 	// Buttons:
 	$message_content .= '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
-	$message_content .= get_link_tag( $url_change_password, T_( 'Reset your password NOW' ), 'div.buttons a+a.button_yellow' )."\n";
+	$message_content .= get_link_tag( $url_change_password, T_( 'Reset your password NOW' ), 'div.buttons a+a.btn-primary' )."\n";
 	$message_content .= "</div>\n";
 
 	if( $params['user_count'] > 1 )

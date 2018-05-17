@@ -51,14 +51,14 @@ $emailskins_styles = array(
 'div.email_header' => '
 	margin: 0 2em 4px;
 	padding: 0;
-	text-align: right;
+	text-align: center;
 ',
 'div.email_payload' => '
 	background-color: #fff;
-	border: 1px solid #ddd;
-	margin: 8px 10px;
+	border-top: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+	margin: 8px 0px;
 	padding: 1px 1em;
-	border-radius: 5px;
 ',
 'div.email_ugc' => '
 	margin: 1em 1em;
@@ -120,14 +120,11 @@ $emailskins_styles = array(
 	margin: 1ex 0;
 ',
 'div.buttons a' => '
-	margin: 2px 14px 8px 0;
+	margin: 3px 0;
 	padding: 6px 14px;
 	border-radius: 4px;
-	font-size: 84%;
-	font-weight: bold;
 	text-decoration: none;
 	display: inline-block;
-	box-shadow: 1px 1px 4px #c4c4c4;
 ',
 'a.button_green' => '
 	color: #454;
