@@ -69,6 +69,7 @@ $db_config['aliases'] = array(
 		'T_users__user_org'        => $tableprefix.'users__user_org',
 		'T_users__secondary_user_groups' => $tableprefix.'users__secondary_user_groups',
 		'T_users__profile_visits'  => $tableprefix.'users__profile_visits',
+		'T_users__profile_visit_counters' => $tableprefix.'users__profile_visit_counters',
 		'T_users__tag'             => $tableprefix.'users__tag',
 		'T_users__usertag'         => $tableprefix.'users__usertag',
 		'T_slug'                   => $tableprefix.'slug',

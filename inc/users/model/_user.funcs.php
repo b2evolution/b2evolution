@@ -2779,14 +2779,67 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 	return '<div class="user_header">'.$result.'</div>'.'<div class="clear"></div>';
 }
 
+
+/**
+ * Insert or update user profile visit
+ *
+ * @param integer ID of user whose profile is viewed
+ * @param integer ID of user who is viewing the profile
+ * @return mixed # of rows affected or false if error
+ */
 function add_user_profile_visit( $user_ID, $visitor_user_ID )
 {
 	global $DB, $servertimenow;
 
 	$timestamp = date2mysql( $servertimenow );
 
+	$SQL = new SQL();
+	$SQL->SELECT( '*' );
+	$SQL->FROM( 'T_users__profile_visit_counters' );
+	$SQL->FROM_add( 'LEFT JOIN T_users__profile_visits ON upv_visited_user_ID = upvc_user_ID AND upv_visitor_user_ID = '.$DB->quote( $visitor_user_ID ) );
+	$SQL->WHERE( 'upvc_user_ID = '.$DB->quote( $user_ID ) );
+	$counter_row = $DB->get_row( $SQL->get(), ARRAY_A );
+
+	if( $counter_row )
+	{
+		if( empty( $counter_row['upv_last_visit_ts'] ) )
+		{ // Increment total new unique visitor
+			$DB->query( 'UPDATE T_users__profile_visit_counters
+					SET upvc_total_unique_visitors = upvc_total_unique_visitors + 1,
+							upvc_new_unique_visitors = upvc_new_unique_visitors + 1
+					WHERE upvc_user_ID = '.$DB->quote( $user_ID ) );
+		}
+		elseif( $counter_row['upv_last_visit_ts'] < $counter_row['upvc_last_view_ts'] )
+		{ // Increment new unique visitors only
+			$DB->query( 'UPDATE T_users__profile_visit_counters
+					SET upvc_new_unique_visitors = upvc_new_unique_visitors + 1
+					WHERE upvc_user_ID = '.$DB->quote( $user_ID ) );
+		}
+	}
+	else
+	{ // First profile visit
+		$DB->query( 'INSERT INTO T_users__profile_visit_counters( upvc_user_ID, upvc_total_unique_visitors, upvc_new_unique_visitors ) VALUES ( '.$DB->quote( $user_ID ).', 1, 1 )' );
+	}
+
 	return $DB->query( 'REPLACE INTO T_users__profile_visits( upv_visited_user_ID, upv_visitor_user_ID, upv_last_visit_ts )
 			VALUES ( '.$user_ID.', '.$visitor_user_ID.', "'.$timestamp.'" )' );
+}
+
+
+/**
+ * Reset new unique user profile view counter and timestamp
+ *
+ * @param integer User ID
+ * @return mixed # of rows affected or false if error
+ */
+function reset_user_profile_view_ts( $user_ID )
+{
+	global $DB, $servertimenow;
+
+	$timestamp = date2mysql( $servertimenow );
+
+	return $DB->query( 'UPDATE T_users__profile_visit_counters SET upvc_new_unique_visitors = 0, upvc_last_view_ts = "'.$timestamp.'"
+			WHERE upvc_user_ID = '.$DB->quote( $user_ID ) );
 }
 
 
