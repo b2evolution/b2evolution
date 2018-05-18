@@ -97,6 +97,11 @@ class AutomationStep extends DataObject
 	 */
 	function dbinsert()
 	{
+		if( ! $this->can_be_modified() )
+		{	// If this step cannnot be modified
+			return false;
+		}
+
 		if( $r = parent::dbinsert() )
 		{
 			// Update next steps with selected option "Loop" to ID of this new inserted Step:
@@ -116,6 +121,22 @@ class AutomationStep extends DataObject
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 *
+	 * @return boolean true on success, false on failure to update, NULL if no update necessary
+	 */
+	function dbupdate()
+	{
+		if( ! $this->can_be_modified() )
+		{	// If this step cannnot be modified
+			return false;
+		}
+
+		return parent::dbupdate();
 	}
 
 
@@ -151,6 +172,12 @@ class AutomationStep extends DataObject
 		{	// Set Automation only for new creating Step:
 			param( 'autm_ID', 'integer', true );
 			$this->set_from_Request( 'autm_ID', 'autm_ID' );
+		}
+
+		if( ! $this->can_be_modified() && ! param( 'confirm_pause', 'integer' ) )
+		{	// Don't allow to edit step of active automation without confirmation:
+			global $Messages;
+			$Messages->add( T_('You must pause the automation before modifying it.'), 'error' );
 		}
 
 		// Order:
@@ -1247,6 +1274,57 @@ class AutomationStep extends DataObject
 		}
 
 		$this->set( 'label', utf8_substr( utf8_trim( $label ), 0, 500 ) );
+	}
+
+
+	/**
+	 * Check if this automation step can be modified(added/edited/deleted) currently
+	 *
+	 * @param boolean
+	 */
+	function can_be_modified()
+	{
+		if( ( $step_Automation = & $this->get_Automation() ) &&
+		    $step_Automation->get( 'status' ) == 'paused' )
+		{	// Automation of this step must be paused in order to edit steps:
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Pause automation by confirmation from request
+	 *
+	 * @return boolean
+	 */
+	function pause_automation()
+	{
+		if( $this->can_be_modified() )
+		{	// If step automation is already paused
+			return true;
+		}
+
+		if( ! param( 'confirm_pause', 'integer' ) )
+		{	// If action is not confirmed
+			return false;
+		}
+
+		// Try to pause the step's automation:
+		$step_Automation = & $this->get_Automation();
+		$step_Automation->set( 'status', 'paused' );
+
+		if( $step_Automation->dbupdate() )
+		{	// Display a message if automation has been paused:
+			global $Messages;
+			$Messages->add( T_('Automation has been paused.'), 'success' );
+			return true;
+		}
+		else
+		{	// If automation could not paused
+			return false;
+		}
 	}
 }
 

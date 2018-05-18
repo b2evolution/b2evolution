@@ -73,6 +73,14 @@ switch( $action )
 		if( $action == 'copy_step' )
 		{	// Clear an order of the duplicating step in order to set this automatically right below current one:
 			$edited_AutomationStep->set( 'order', '' );
+			if( ! $edited_AutomationStep->can_be_modified() )
+			{	// If step cannot be modified currently
+				$Messages->add( T_('You must pause the automation before creating it.'), 'warning' );
+			}
+		}
+		elseif( $action == 'edit_step' && ! $edited_AutomationStep->can_be_modified() )
+		{	// If step cannot be modified currently
+			$Messages->add( T_('You must pause the automation before modifying it.'), 'warning' );
 		}
 		break;
 
@@ -85,6 +93,11 @@ switch( $action )
 		// Create object of new Automation:
 		$edited_AutomationStep = new AutomationStep();
 		$edited_AutomationStep->set( 'autm_ID', $autm_ID );
+
+		if( ! $edited_AutomationStep->can_be_modified() )
+		{	// If step cannot be modified currently
+			$Messages->add( T_('You must pause the automation before creating it.'), 'warning' );
+		}
 		break;
 
 	case 'create':
@@ -284,6 +297,15 @@ switch( $action )
 		// Check that current user has permission to create automation steps:
 		$current_User->check_perm( 'options', 'edit', true );
 
+		if( ! $edited_AutomationStep->can_be_modified() )
+		{	// If step cannot be modified currently
+			$Messages->add( T_('You must pause the automation before modifying it.'), 'error' );
+			$action = 'edit'; // To keep same opened page
+			// We want to highlight the Step:
+			$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
+			break;
+		}
+
 		// Make sure we got an step_ID:
 		param( 'step_ID', 'integer', true );
 
@@ -365,8 +387,9 @@ switch( $action )
 		$entered_step_order = param( 'step_order', 'integer', NULL );
 
 		// load data from request
-		if( $edited_AutomationStep->load_from_Request() )
-		{	// We could load data from form without errors:
+		if( $edited_AutomationStep->load_from_Request() &&
+		    $edited_AutomationStep->pause_automation() )
+		{	// We could load data from form without errors and automation can be paused:
 			// Insert in DB:
 			$edited_AutomationStep->dbinsert();
 			$Messages->add( T_('New automation step has been created.'), 'success' );
@@ -398,8 +421,9 @@ switch( $action )
 		$entered_step_order = param( 'step_order', 'integer', NULL );
 
 		// Load data from request:
-		if( $edited_AutomationStep->load_from_Request() )
-		{	// We could load data from form without errors:
+		if( $edited_AutomationStep->load_from_Request() &&
+		    $edited_AutomationStep->pause_automation() )
+		{	// We could load data from form without errors and automation can be paused:
 			// Insert in DB:
 			$edited_AutomationStep->dbinsert();
 
@@ -453,8 +477,9 @@ switch( $action )
 		param( 'step_ID', 'integer', true );
 
 		// load data from request:
-		if( $edited_AutomationStep->load_from_Request() )
-		{	// We could load data from form without errors:
+		if( $edited_AutomationStep->load_from_Request() &&
+		    $edited_AutomationStep->pause_automation() )
+		{	// We could load data from form without errors and automation can be paused:
 			// Update automation step in DB:
 			$edited_AutomationStep->dbupdate();
 			$Messages->add( T_('Automation step has been updated.'), 'success' );
@@ -568,7 +593,11 @@ switch( $action )
 		// Make sure we got an autm_ID:
 		param( 'autm_ID', 'integer', true );
 
-		if( $edited_AutomationStep->dbdelete() )
+		if( ! $edited_AutomationStep->can_be_modified() )
+		{	// If step cannot be modified currently
+			$Messages->add( T_('You must pause the automation before deleting it.'), 'error' );
+		}
+		elseif( $edited_AutomationStep->dbdelete() )
 		{
 			$Messages->add( T_('Automation step has been deleted.'), 'success' );
 
@@ -579,7 +608,7 @@ switch( $action )
 
 		// Display the same edit automation page with steps list because step cannot be deleted by some restriciton:
 		$action = 'edit';
-		// We want to highlight the Step which cannot de leted on next list display:
+		// We want to highlight the Step which cannot be deleted on next list display:
 		$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
 		break;
 
