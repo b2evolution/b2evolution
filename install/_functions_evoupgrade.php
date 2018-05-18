@@ -9548,6 +9548,36 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12840, 'Upgrading automation step table...' ) )
+	{	// part of 6.10.0-beta
+		db_add_col( 'T_automation__step', 'step_diagram', 'VARCHAR(64) NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12850, 'Creating user profile visit counter table...' ) )
+	{ // part of 6.10.1-stable
+		db_create_table( 'T_users__profile_visit_counters', '
+				upvc_user_ID  INT(11) UNSIGNED NOT NULL,
+				upvc_total_unique_visitors INT(10) UNSIGNED NOT NULL DEFAULT 0,
+				upvc_last_view_ts TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
+				upvc_new_unique_visitors INT(10) UNSIGNED NOT NULL DEFAULT 0,
+				PRIMARY KEY (upvc_user_ID)' );
+
+		// Populate profile visit counters table
+		$DB->query( 'INSERT INTO T_users__profile_visit_counters (upvc_user_ID, upvc_total_unique_visitors, upvc_new_unique_visitors)
+				SELECT user_ID, COALESCE( upv.total_unique, 0 ), COALESCE( upv.total_unique, 0 )
+				FROM T_users
+				LEFT JOIN
+				(
+					SELECT upv_visited_user_ID, COUNT(*) AS total_unique
+					FROM T_users__profile_visits
+					GROUP BY upv_visited_user_ID
+				) AS upv
+				ON upv.upv_visited_user_ID = user_ID' );
+
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

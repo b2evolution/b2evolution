@@ -194,17 +194,12 @@ $Results->cols[] = array(
 	);
 
 $Results->display_init();
-$checkbox_buttons = '<div class="panel-footer">'.
-		'<input type="button" class="btn btn-default btn-xs" value="'.T_('Check all').'" onclick="checkAll();" /> '.
-		'<input type="button" class="btn btn-default btn-xs" value="'.T_('Uncheck all').'" onclick="uncheckAll();" /> '.
-		'<input type="button" class="btn btn-default btn-xs" value="'.T_('Reverse').'" onclick="reverseSelection();"  />'.
-		'</div>';
 
 $display_params = array(
 		'page_url' => 'admin.php?ctrl=itemstatuses&pst_ID='.$edited_ItemStatus->ID.'&action=edit',
-		'list_end' => $Results->params['list_end'].$checkbox_buttons,
 	);
 
+$Results->checkbox_toggle_selectors = 'input[name^=type_]:checkbox';
 $Results->display( $display_params );
 
 
@@ -227,23 +222,3 @@ else
 	$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
 }
 ?>
-<script type="text/javascript">
-var checkboxes = jQuery( 'input[name^=type_]:checkbox' );
-
-function checkAll()
-{
-	checkboxes.prop( 'checked', true );
-}
-
-function uncheckAll()
-{
-	checkboxes.prop( 'checked', false );
-}
-
-function reverseSelection()
-{
-	checkboxes.each( function() {
-		this.checked = !this.checked;
-	} );
-}
-</script>

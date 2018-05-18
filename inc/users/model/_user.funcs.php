@@ -2779,14 +2779,67 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 	return '<div class="user_header">'.$result.'</div>'.'<div class="clear"></div>';
 }
 
+
+/**
+ * Insert or update user profile visit
+ *
+ * @param integer ID of user whose profile is viewed
+ * @param integer ID of user who is viewing the profile
+ * @return mixed # of rows affected or false if error
+ */
 function add_user_profile_visit( $user_ID, $visitor_user_ID )
 {
 	global $DB, $servertimenow;
 
 	$timestamp = date2mysql( $servertimenow );
 
+	$SQL = new SQL();
+	$SQL->SELECT( '*' );
+	$SQL->FROM( 'T_users__profile_visit_counters' );
+	$SQL->FROM_add( 'LEFT JOIN T_users__profile_visits ON upv_visited_user_ID = upvc_user_ID AND upv_visitor_user_ID = '.$DB->quote( $visitor_user_ID ) );
+	$SQL->WHERE( 'upvc_user_ID = '.$DB->quote( $user_ID ) );
+	$counter_row = $DB->get_row( $SQL->get(), ARRAY_A );
+
+	if( $counter_row )
+	{
+		if( empty( $counter_row['upv_last_visit_ts'] ) )
+		{ // Increment total new unique visitor
+			$DB->query( 'UPDATE T_users__profile_visit_counters
+					SET upvc_total_unique_visitors = upvc_total_unique_visitors + 1,
+							upvc_new_unique_visitors = upvc_new_unique_visitors + 1
+					WHERE upvc_user_ID = '.$DB->quote( $user_ID ) );
+		}
+		elseif( $counter_row['upv_last_visit_ts'] < $counter_row['upvc_last_view_ts'] )
+		{ // Increment new unique visitors only
+			$DB->query( 'UPDATE T_users__profile_visit_counters
+					SET upvc_new_unique_visitors = upvc_new_unique_visitors + 1
+					WHERE upvc_user_ID = '.$DB->quote( $user_ID ) );
+		}
+	}
+	else
+	{ // First profile visit
+		$DB->query( 'INSERT INTO T_users__profile_visit_counters( upvc_user_ID, upvc_total_unique_visitors, upvc_new_unique_visitors ) VALUES ( '.$DB->quote( $user_ID ).', 1, 1 )' );
+	}
+
 	return $DB->query( 'REPLACE INTO T_users__profile_visits( upv_visited_user_ID, upv_visitor_user_ID, upv_last_visit_ts )
 			VALUES ( '.$user_ID.', '.$visitor_user_ID.', "'.$timestamp.'" )' );
+}
+
+
+/**
+ * Reset new unique user profile view counter and timestamp
+ *
+ * @param integer User ID
+ * @return mixed # of rows affected or false if error
+ */
+function reset_user_profile_view_ts( $user_ID )
+{
+	global $DB, $servertimenow;
+
+	$timestamp = date2mysql( $servertimenow );
+
+	return $DB->query( 'UPDATE T_users__profile_visit_counters SET upvc_new_unique_visitors = 0, upvc_last_view_ts = "'.$timestamp.'"
+			WHERE upvc_user_ID = '.$DB->quote( $user_ID ) );
 }
 
 
@@ -3463,10 +3516,6 @@ function callback_filter_userlist( & $Form )
 
 	$Form->text( 'keywords', get_param('keywords'), 20, T_('Name'), '', 50 );
 
-	$Form->checkbox( 'gender_men', get_param('gender_men'), T_('Men') );
-	$Form->checkbox( 'gender_women', get_param('gender_women'), T_('Women') );
-	$Form->checkbox( 'gender_other', get_param('gender_other'), T_('Other') );
-
 	if( is_admin_page() )
 	{ // show this filters only on admin interface
 		if( $current_User->check_perm( 'users', 'edit' ) )
@@ -3554,21 +3603,6 @@ function callback_filter_userlist( & $Form )
 		$Form->text( 'age_max', get_param('age_max'), 3, T_('to') );
 	$Form->end_line();
 
-	$Form->begin_line( T_('Level'), 'level_min' );
-		$Form->text( 'level_min', get_param('level_min'), 3, '' );
-		$Form->text( 'level_max', get_param('level_max'), 3, T_('to') );
-	$Form->end_line();
-
-	if( empty( $edited_Organization ) )
-	{ // Show organization filter only when organization form is not selected
-		$OrganizationCache = & get_OrganizationCache( T_('All') );
-		$OrganizationCache->load_all();
-		if( count( $OrganizationCache->cache ) > 0 )
-		{
-			$Form->select_input_object( 'org', get_param('org'), $OrganizationCache, T_('Organization'), array( 'allow_none' => true ) );
-		}
-	}
-
 	if( is_admin_page() && empty( $edited_Newsletter ) && empty( $edited_EmailCampaign ) )
 	{	// Filter by newsletter only on back-office and don't display on newsletter and email campaign edit forms:
 		$NewsletterCache = & get_NewsletterCache( T_('All') );
@@ -3596,15 +3630,6 @@ function callback_filter_userlist( & $Form )
 		$Form->end_line();
 	}
 
-	if( is_admin_page() )
-	{
-		if( $current_User->check_perm( 'users', 'edit' ) )
-		{
-			$Form->checkbox( 'custom_sender_email', get_param('custom_sender_email'), T_('Users with custom sender address') );
-			$Form->checkbox( 'custom_sender_name', get_param('custom_sender_name'), T_('Users with custom sender name') );
-		}
-	}
-
 	if( is_admin_page() && $edited_EmailCampaign )
 	{
 		$campaign_send_status = array(
@@ -3617,6 +3642,63 @@ function callback_filter_userlist( & $Form )
 		$Form->select_input_array( 'recipient_type', get_param( 'recipient_type' ), $campaign_send_status, '<span class="text-info">'.T_('Campaign Status').'</span>', '', array( 'allow_none' => true ) );
 	}
 	echo '<br />';
+
+	// Gender:
+	$filters['gender'] = array(
+			'label'  => T_('Gender'),
+			'input'  => 'select',
+			'values' => array(
+					'M' => T_('Men'),
+					'F' => T_('Women'),
+					'O' => T_('Other'),
+				),
+		);
+
+	// Level:
+	$filters['level'] = array(
+			'label'     => T_('User level'),
+			'operators' => '=,!=,<,<=,>,>=,between,not_between',
+			'input'     => 'select',
+			'type'      => 'integer',
+			'values'    => array( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ),
+		);
+
+	// Organization:
+	if( empty( $edited_Organization ) )
+	{	// Show organization filter only when organization form is not selected:
+		$OrganizationCache = & get_OrganizationCache( T_('All') );
+		$OrganizationCache->load_all();
+		$filters['org'] = array(
+				'label'  => T_('Organization'),
+				'input'  => 'select',
+				'values' => $OrganizationCache->get_option_array(),
+			);
+	}
+
+	if( is_admin_page() && $current_User->check_perm( 'users', 'edit' ) )
+	{
+		// Uses custom sender address:
+		$filters['custom_sender_email'] = array(
+				'label'     => T_('Uses custom sender address'),
+				'operators' => 'blank',
+				'input'     => 'radio',
+				'values'    => array(
+						'yes' => T_('yes'),
+						'no'  => T_('no')
+					),
+			);
+
+		// Uses custom sender name:
+		$filters['custom_sender_name'] = array(
+				'label'     => T_('Uses custom sender name'),
+				'operators' => 'blank',
+				'input'     => 'radio',
+				'values'    => array(
+						'yes' => T_('yes'),
+						'no'  => T_('no')
+					),
+			);
+	}
 
 	// Specific criteria:
 	$Form->output = false;
@@ -5570,9 +5652,9 @@ function user_reports_results( & $reports_Results, $params = array() )
 		'th' => T_('Date and time'),
 		'order' => 'urep_datetime',
 		'default_dir' => 'D',
-		'th_class' => 'nowrap',
-		'td_class' => 'shrinkwrap',
-		'td' => '<span class="date">%mysql2localedatetime( #urep_datetime# )%</span>',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'timestamp',
+		'td' => '%mysql2localedatetime_spans( #urep_datetime# )%',
 	);
 
 	$reports_Results->cols[] = array(
@@ -5877,7 +5959,7 @@ function users_results_block( $params = array() )
 		echo_userlist_automation_js();
 	}
 
-	if( $params['display_newsletter'] && is_logged_in() && $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 && ! empty( $UserList->filters['newsletter'] ) )
+	if( $params['display_newsletter'] && is_logged_in() && $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Button to change users of email campaign OR Create new email campaign for current selection:
 		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 		if( $edited_EmailCampaign = & get_session_EmailCampaign() )
@@ -5895,7 +5977,10 @@ function users_results_block( $params = array() )
 			$campaign_ID_param = '';
 		}
 
-		$user_list_buttons[] = '<a href="'.$admin_url.'?ctrl=campaigns&amp;action='.$campaign_action.$campaign_ID_param.'&amp;newsletter='.$UserList->filters['newsletter'].'&amp;'.url_crumb( 'campaign' ).'"'
+		$user_list_buttons[] = '<a '
+			.( empty( $UserList->filters['newsletter'] )
+				? 'onclick="alert( \''.TS_('Please select a subsription list first!').'\');return false"'
+				: 'href="'.$admin_url.'?ctrl=campaigns&amp;action='.$campaign_action.$campaign_ID_param.'&amp;newsletter='.$UserList->filters['newsletter'].'&amp;'.url_crumb( 'campaign' ).'"' )
 			.' class="btn '.$campaign_button_class.'">'
 				.format_to_output( $campaign_button_text )
 			.'</a>';
@@ -6409,7 +6494,7 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Send date'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'timestamp compact_data',
+				'td_class' => 'timestamp',
 				'order' => 'csnd_last_sent_ts',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #csnd_last_sent_ts# )%',
@@ -6421,7 +6506,7 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Last opened'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'timestamp compact_data',
+				'td_class' => 'timestamp',
 				'order' => 'csnd_last_open_ts',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #csnd_last_open_ts# )%',
@@ -6430,7 +6515,7 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Last clicked'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'timestamp compact_data',
+				'td_class' => 'timestamp',
 				'order' => 'csnd_last_click_ts',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #csnd_last_click_ts# )%',
@@ -6486,10 +6571,10 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Subscribed'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'center nowrap',
+				'td_class' => 'timestamp',
 				'order' => 'enls_subscribed_ts',
 				'default_dir' => 'D',
-				'td' => '%mysql2localedatetime( #enls_subscribed_ts# )%',
+				'td' => '%mysql2localedatetime_spans( #enls_subscribed_ts# )%',
 			);
 	}
 
@@ -6498,10 +6583,10 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Unsubscribed'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'center nowrap',
+				'td_class' => 'timestamp',
 				'order' => 'enls_unsubscribed_ts',
 				'default_dir' => 'D',
-				'td' => '%mysql2localedatetime( #enls_unsubscribed_ts# )%',
+				'td' => '%mysql2localedatetime_spans( #enls_unsubscribed_ts# )%',
 			);
 	}
 
@@ -6510,10 +6595,10 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Last sent'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'center nowrap',
+				'td_class' => 'timestamp',
 				'order' => 'enls_last_sent_manual_ts',
 				'default_dir' => 'D',
-				'td' => '%mysql2localedatetime( #enls_last_sent_manual_ts# )%',
+				'td' => '%mysql2localedatetime_spans( #enls_last_sent_manual_ts# )%',
 			);
 	}
 
@@ -6522,7 +6607,7 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Last opened'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'timestamp compact_data',
+				'td_class' => 'timestamp',
 				'order' => 'enls_last_open_ts',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #enls_last_open_ts# )%',
@@ -6534,7 +6619,7 @@ function users_results( & $UserList, $params = array() )
 		$UserList->cols[] = array(
 				'th' => T_('Last clicked'),
 				'th_class' => 'shrinkwrap',
-				'td_class' => 'timestamp compact_data',
+				'td_class' => 'timestamp',
 				'order' => 'enls_last_click_ts',
 				'default_dir' => 'D',
 				'td' => '%user_td_emlog_date( #enls_last_click_ts# )%',

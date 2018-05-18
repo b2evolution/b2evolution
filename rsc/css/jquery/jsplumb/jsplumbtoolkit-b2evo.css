@@ -1,0 +1,78 @@
+.jtk-connector {
+	z-index: 4;
+}
+.jtk-endpoint {
+	z-index: 21;
+	cursor: pointer;
+}
+.jtk-drag {
+	outline: 2px solid pink !important;
+}
+/* Step box: */
+.evo_automation__diagram_step_box {
+	border: 1px solid #666;
+	box-shadow: 2px 2px 19px #aaa;
+	-o-box-shadow: 2px 2px 19px #aaa;
+	-webkit-box-shadow: 2px 2px 19px #aaa;
+	-moz-box-shadow: 2px 2px 19px #aaa;
+	-moz-border-radius: 0.5em;
+	border-radius: 0.5em;
+	opacity: 0.8;
+	width: 200px;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+	text-align: center;
+	z-index: 20;
+	position: absolute;
+	background-color: #eeeeef;
+	color: black;
+	font-family: helvetica, sans-serif;
+	padding: 0.5em;
+	font-size: 0.9em;
+	-webkit-transition: -webkit-box-shadow 0.15s ease-in;
+	-moz-transition: -moz-box-shadow 0.15s ease-in;
+	-o-transition: -o-box-shadow 0.15s ease-in;
+	transition: box-shadow 0.15s ease-in;
+}
+.evo_automation__diagram_step_box:hover {
+	box-shadow: 2px 2px 19px #444;
+	-o-box-shadow: 2px 2px 19px #444;
+	-webkit-box-shadow: 2px 2px 19px #444;
+	-moz-box-shadow: 2px 2px 19px #444;
+	opacity: 0.6;
+}
+/* Labels: */
+.jtk-label {
+	padding: 3px 3px 23px 3px;
+	font: 12px sans-serif;
+		font-weight: bold;
+	color: #333;
+	z-index: 21;
+	opacity: 0.8;
+	cursor: pointer;
+		color: #61bd4f;
+}
+.jtk-label.jtk-label-no {
+	padding-top: 23px;
+	padding-bottom: 3px;
+	color: #0079bf;
+}
+.jtk-label.jtk-label-error {
+	color: #eb5a46;
+}
+.jtk-label.jtk-hover {
+	background-color: #61bd4f;
+	color: white;
+	border: 1px solid white;
+	border-radius: 5px;
+	padding: 3px;
+}
+.jtk-label.jtk-hover.jtk-label-no {
+	background-color: #0079bf;
+	color: white;
+}
+.jtk-label.jtk-hover.jtk-label-error {
+	background-color: #eb5a46;
+	color: white;
+}

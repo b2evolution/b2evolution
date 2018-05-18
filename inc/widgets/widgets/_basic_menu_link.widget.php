@@ -445,6 +445,11 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 
 				$url = $current_User->get_visits_url();
 				$text = T_('My visits');
+				$visit_count = $current_User->get_profile_visitors_count();
+				if( $visit_count )
+				{
+					$text .= ' <span class="badge badge-info">'.$visit_count.'</span>';
+				}
 				$highlight_current = ( $highlight_current && $disp == 'visits' );
 				break;
 

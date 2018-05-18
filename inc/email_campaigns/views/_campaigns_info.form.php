@@ -36,7 +36,7 @@ $Form->begin_fieldset( T_('Campaign info').get_manual_link( 'campaign-info-panel
 	$Form->info( T_('Last sent automatically'), $edited_EmailCampaign->get( 'auto_sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'auto_sent_ts' ) ) : T_('Not sent yet') );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('List recipients') );
+$Form->begin_fieldset( T_('List recipients').get_manual_link( 'campaign-recipients-panel' ) );
 	$NewsletterCache = & get_NewsletterCache();
 	$NewsletterCache->load_where( 'enlt_active = 1 OR enlt_ID = '.intval( $edited_EmailCampaign->get( 'enlt_ID' ) ) );
 	$Form->select_input_object( 'ecmp_enlt_ID', $edited_EmailCampaign->get( 'enlt_ID' ), $NewsletterCache, T_('Send to subscribers of'), array(
@@ -69,7 +69,7 @@ $Form->begin_fieldset( T_('List recipients') );
 	) );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Click tracking') );
+$Form->begin_fieldset( T_('Click tagging').get_manual_link( 'campaign-tagging-panel' ) );
 	$Form->usertag_input( 'ecmp_user_tag', param( 'ecmp_user_tag', 'string', $edited_EmailCampaign->get( 'user_tag' ) ), 60, T_('Tag users who click on content links with'), '', array(
 		'maxlength' => 255,
 		'style'     => 'width: 100%;',

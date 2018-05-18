@@ -104,7 +104,7 @@ $Results->cols[] = array(
 		'order' => 'emlog_timestamp',
 		'default_dir' => 'D',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'timestamp compact_data',
+		'td_class' => 'timestamp',
 		'td' => '%mysql2localedatetime_spans( #emlog_timestamp# )%',
 	);
 
@@ -164,7 +164,7 @@ $Results->cols[] = array(
 		'th' => T_('Last opened'),
 		'th_class' => 'shrinkwrap',
 		'td' => '%mysql2localedatetime_spans( #emlog_last_open_ts# )%',
-		'td_class' => 'timestamp compact_data'
+		'td_class' => 'timestamp'
 	);
 
 $Results->cols[] = array(
@@ -173,7 +173,7 @@ $Results->cols[] = array(
 		'th' => T_('Last clicked'),
 		'th_class' => 'shrinkwrap',
 		'td' => '%mysql2localedatetime_spans( #emlog_last_click_ts# )%',
-		'td_class' => 'timestamp compact_data'
+		'td_class' => 'timestamp'
 	);
 
 

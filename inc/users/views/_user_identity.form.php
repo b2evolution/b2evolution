@@ -289,7 +289,7 @@ if( $action != 'view' )
 				$CountryCache,
 				T_('Country'),
 				array(	// field params
-						'required' => $Settings->get( 'location_country' ) == 'required', // true if Country is required
+						'required' => ( $Settings->get( 'location_country' ) == 'required' ? 'mark_only' : false ), // true if Country is required
 						'allow_none' => // Allow none value:
 						                $has_full_access || // Current user has permission to edit users
 						                empty( $edited_User->ctry_ID ) || // Country is not defined yet
@@ -306,7 +306,7 @@ if( $action != 'view' )
 				T_( 'Region' ),
 				sprintf( $button_refresh_regional, 'button_refresh_region' ), // Button to refresh regions list
 				array(	// field params
-						'required' => $Settings->get( 'location_region' ) == 'required' // true if Region is required
+						'required' => ( $Settings->get( 'location_region' ) == 'required' ? 'mark_only' : false ) // true if Region is required
 					)
 			);
 	}
@@ -319,7 +319,7 @@ if( $action != 'view' )
 				T_( 'Sub-region' ),
 				sprintf( $button_refresh_regional, 'button_refresh_subregion' ), // Button to refresh subregions list
 				array(	// field params
-						'required' => $Settings->get( 'location_subregion' ) == 'required' // true if Subregion is required
+						'required' => ( $Settings->get( 'location_subregion' ) == 'required' ? 'mark_only' : false ) // true if Subregion is required
 					)
 			);
 	}
@@ -332,7 +332,7 @@ if( $action != 'view' )
 				T_( 'City' ),
 				sprintf( $button_refresh_regional, 'button_refresh_city' ), // Button to refresh cities list
 				array(	// field params
-						'required' => $Settings->get( 'location_city' ) == 'required' // true if City is required
+						'required' => ( $Settings->get( 'location_city' ) == 'required' ? 'mark_only' : false ) // true if City is required
 					)
 			);
 	}

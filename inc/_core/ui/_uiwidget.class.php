@@ -603,7 +603,7 @@ class Table extends Widget
 
 			if( ! isset( $params['operators'] ) )
 			{	// Use default operator if it is not defined:
-				$params['operators'] = '=';
+				$params['operators'] = '=,!=';
 			}
 
 			foreach( $params as $param_name => $param_value )
@@ -698,7 +698,8 @@ jQuery( document ).ready( function()
 			error: 'fa fa-warning',
 		},
 		operators: [
-			{ type: 'blank', optgroup: 'custom', nb_inputs: 1, multiple: false, apply_to: ['string'] }
+			'equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between', 'contains', 'not_contains',
+			{ type: 'blank', nb_inputs: 1, multiple: false, apply_to: ['string'] }
 		],
 		lang: {
 			operators: {
@@ -733,6 +734,27 @@ jQuery( document ).ready( function()
 			jQuery( 'input[name=filter_query]' ).val( JSON.stringify( result ) );
 		}
 	} );
+
+	// Fix space of blank hidden operator:
+	evo_fix_query_builder_blank_operator();
+	jQuery( '#evo_results_filters' ).on( 'afterUpdateRuleFilter.queryBuilder.filter', function()
+	{
+		evo_fix_query_builder_blank_operator();
+	} );
+	function evo_fix_query_builder_blank_operator()
+	{
+		jQuery( '.rule-container .rule-operator-container' ).each( function()
+		{
+			if( jQuery( this ).find( 'option' ).length == jQuery( this ).find( 'option[value=blank]' ).length )
+			{	// Hide container if rule uses only single blank operator:
+				jQuery( this ).hide();
+			}
+			else
+			{	// Show container with other operators:
+				jQuery( this ).show();
+			}
+		} );
+	}
 } );
 </script>
 <?php

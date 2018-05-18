@@ -283,21 +283,21 @@ switch( $action )
 						{	// Store only a filled reminder:
 							if( empty( $reminder_delay_day ) )
 							{	// If one field is not filled:
-								param_error( 'unread_message_reminder_delay_day_'.$i, sprintf( T_('Please fill two fields of the unread private messages reminder #%d.'), $i ) );
+								param_error( 'unread_message_reminder_delay_day_'.$i, sprintf( T_('Please fill both fields of the unread private messages reminder #%d.'), $i ) );
 								$reminder_delay_day = 0;
 							}
 							elseif( $prev_reminder_delay_day >= $reminder_delay_day )
 							{	// If current value is less than previous:
-								param_error( 'unread_message_reminder_delay_day_'.$i, T_('The values of the unread private messages reminder must be ascendant.') );
+								param_error( 'unread_message_reminder_delay_day_'.$i, T_('The values of the unread private messages reminder must be ascending.') );
 							}
 							if( empty( $reminder_delay_spacing ) )
 							{	// If one field is not filled:
-								param_error( 'unread_message_reminder_delay_spacing_'.$i, sprintf( T_('Please fill two fields of the unread private messages reminder #%d.'), $i ) );
+								param_error( 'unread_message_reminder_delay_spacing_'.$i, sprintf( T_('Please fill both fields of the unread private messages reminder #%d.'), $i ) );
 								$reminder_delay_spacing = 0;
 							}
 							elseif( $prev_reminder_delay_spacing >= $reminder_delay_spacing )
 							{	// If current value is less than previous:
-								param_error( 'unread_message_reminder_delay_spacing_'.$i, T_('The values of the unread private messages reminder must be ascendant.') );
+								param_error( 'unread_message_reminder_delay_spacing_'.$i, T_('The values of the unread private messages reminder must be ascending.') );
 							}
 							$reminder_delay[] = $reminder_delay_day.':'.$reminder_delay_spacing;
 							$prev_reminder_delay_day = $reminder_delay_day;

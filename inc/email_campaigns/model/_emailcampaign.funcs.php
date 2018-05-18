@@ -396,7 +396,7 @@ function campaign_results_block( $params = array() )
 			'order' => 'ecmp_date_ts',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'timestamp compact_data',
+			'td_class' => 'timestamp',
 			'td' => '%mysql2localedatetime_spans( #ecmp_date_ts# )%',
 		);
 
@@ -433,7 +433,7 @@ function campaign_results_block( $params = array() )
 			'order' => 'ecmp_sent_ts',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'timestamp compact_data',
+			'td_class' => 'timestamp',
 			'td' => '%mysql2localedatetime_spans( #ecmp_sent_ts# )%',
 		);
 
@@ -442,7 +442,7 @@ function campaign_results_block( $params = array() )
 			'order' => 'ecmp_auto_sent_ts',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'timestamp compact_data',
+			'td_class' => 'timestamp',
 			'td' => '%mysql2localedatetime_spans( #ecmp_auto_sent_ts# )%',
 		);
 

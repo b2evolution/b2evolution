@@ -439,18 +439,13 @@ class Automation extends DataObject
 			$first_step_SQL->WHERE( 'step_autm_ID = '.$this->ID );
 			$first_step_SQL->ORDER_BY( 'step_order ASC' );
 			$first_step_SQL->LIMIT( 1 );
-			$first_step_ID = intval( $DB->get_var( $first_step_SQL ) );
-		}
-
-		if( empty( $first_step_ID ) )
-		{	// No detected first step or no users to add or requeue:
-			return $added_users_num;
+			$first_step_ID = $DB->get_var( $first_step_SQL );
 		}
 
 		if( $params['users_automated'] == 'requeue' && count( $automated_user_IDs ) )
 		{	// Requeue already automated users to first Step:
 			$added_users_num += $DB->query( 'UPDATE T_automation__user_state 
-				  SET aust_next_step_ID = '.$DB->quote( $first_step_ID ).',
+				  SET aust_next_step_ID = '.$DB->quote( intval( $first_step_ID ) ).',
 				      aust_next_exec_ts = '.$DB->quote( date2mysql( $servertimenow ) ).'
 				WHERE aust_autm_ID = '.$DB->quote( $this->ID ).'
 				  AND aust_user_ID IN ( '.$DB->quote( $automated_user_IDs ).' )',
@@ -504,6 +499,326 @@ class Automation extends DataObject
 
 		// User is not subscribed to any tied newsletter of this Automation:
 		return false;
+	}
+
+
+	/**
+	 * Get steps data for diagram view
+	 *
+	 * @return array Steps
+	 */
+	function get_diagram_steps_data()
+	{
+		$steps = array();
+
+		$AutomationStepCache = & get_AutomationStepCache();
+		$AutomationStepCache->load_where( 'step_autm_ID = '.$this->ID );
+
+		if( empty( $AutomationStepCache->cache ) )
+		{	// Automation has no steps yet:
+			return $steps;
+		}
+
+		$step_results = array( 'YES', 'NO', 'ERROR' );
+		$step_result_labels = step_get_result_labels();
+
+		foreach( $AutomationStepCache->cache as $AutomationStep )
+		{
+			$step = array(
+					'order'      => $AutomationStep->get( 'order' ),
+					'type'       => $AutomationStep->get( 'type' ),
+					'label'      => $AutomationStep->get( 'label' ),
+					'next_steps' => array(),
+				);
+			// Fill data of next steps to initialise connectors between step boxes by JS code below:
+			if( $yes_next_AutomationStep = & $AutomationStep->get_yes_next_AutomationStep() )
+			{	// Next YES step:
+				$step['next_steps']['yes'] = $yes_next_AutomationStep->ID;
+			}
+			if( $no_next_AutomationStep = & $AutomationStep->get_no_next_AutomationStep() )
+			{	// Next NO step:
+				$step['next_steps']['no'] = $no_next_AutomationStep->ID;
+			}
+			if( $error_next_AutomationStep = & $AutomationStep->get_error_next_AutomationStep() )
+			{	// Next ERROR step:
+				$step['next_steps']['error'] = $error_next_AutomationStep->ID;
+			}
+
+			$step['attrs'] = array(
+					'id'    => 'step_'.$AutomationStep->ID,
+					'class' => 'evo_automation__diagram_step_box',
+				);
+
+			$step_type_result_labels = $step_result_labels[ $AutomationStep->get( 'type' ) ];
+
+			foreach( $step_results as $step_result )
+			{	// Initialize step data for each result type(YES|NO|ERROR):
+				if( ! empty( $step_type_result_labels[ $step_result ] ) )
+				{
+					$step['attrs']['data-info-'.strtolower( $step_result ) ] = str_replace( 'Next step if ', '', $step_type_result_labels[ $step_result ] )
+						.' ('.seconds_to_period( $AutomationStep->get( strtolower( $step_result ).'_next_step_delay' ), true ).')';
+				}
+			}
+
+			// Get stored position from DB:
+			$position = $AutomationStep->get( 'diagram' );
+			if( $position !== NULL )
+			{
+				$position = explode( ':', $position );
+				if( count( $position ) == 2 )
+				{
+					$step['attrs']['style'] = 'left:'.$position[0].'px;top:'.$position[1].'px';
+				}
+			}
+
+			$steps[ $AutomationStep->ID ] = $step;
+		}
+
+		// Set default positions for step boxes when they are not stored in DB yet:
+		$this->set_diagram_default_steps_positions( $steps );
+
+		return $steps;
+	}
+
+
+	/**
+	 * Set default steps positions for diagram view
+	 *
+	 * @param array Steps data (by reference)
+	 */
+	function set_diagram_default_steps_positions( & $steps )
+	{
+		if( empty( $steps ) )
+		{	// No steps:
+			return $steps;
+		}
+
+		// Set temp array for diagram functions:
+		$this->diagram_steps = $steps;
+
+		foreach( $this->diagram_steps as $step_ID => $step )
+		{	// Start with first step:
+			$this->resolve_diagram_step_position_conflicts( $step_ID, 3, 1 );
+			// Call next steps recursively:
+			$this->set_diagram_default_step_position( $step_ID );
+			break;
+		}
+
+		// Find all steps which are not linked with other steps:
+		$unlinked_row = 1;
+		$unlinked_steps = array();
+		foreach( $this->diagram_steps as $step_ID => $step )
+		{
+			if( isset( $step['xy'] ) )
+			{	// Step is linked:
+				if( $unlinked_row < $step['xy'][1] )
+				{	// Define last row:
+					$unlinked_row = $step['xy'][1];
+				}
+			}
+			else
+			{	// Step is not linked:
+				$unlinked_steps[] = $step_ID;
+			}
+		}
+		// Set position for unlinked steps at the end of diagram:
+		$unlinked_col = 1;
+		$unlinked_row++;
+		foreach( $unlinked_steps as $unlinked_step_ID )
+		{
+			if( isset( $this->diagram_steps[ $unlinked_step_ID ]['xy'] ) )
+			{	// Skip step with already defined position:
+				continue;
+			}
+			$this->resolve_diagram_step_position_conflicts( $unlinked_step_ID, $unlinked_col, $unlinked_row );
+			// Call next steps recursively:
+			$this->set_diagram_default_step_position( $unlinked_step_ID );
+			// Set next column:
+			$unlinked_col++;
+			if( $unlinked_col > 5 )
+			{	// Switch to next row:
+				$unlinked_col = 1;
+				$unlinked_row++;
+			}
+		}
+
+		foreach( $this->diagram_steps as $step_ID => $step )
+		{	// Convert row and column to CSS coordinates:
+			if( ! isset( $step['attrs']['style'] ) )
+			{
+				$x = ( ( 19 * ( $step['xy'][0] - 1 ) ) + 4 ).'%';
+				$y = ( ( 250 * $step['xy'][1] ) - 150 ).'px';
+				$this->diagram_steps[ $step_ID ]['attrs']['style'] = 'left:'.$x.';top:'.$y;
+			}
+		}
+
+		// Update steps array with array with defined CSS coordinates:
+		$steps = $this->diagram_steps;
+
+		// Remove temp arrays:
+		unset( $this->diagram_steps );
+		if( isset( $this->diagram_cells ) )
+		{
+			unset( $this->diagram_cells );
+		}
+	}
+
+
+	/**
+	 * Set default step positions for diagram view recursively
+	 *
+	 * @param integer Parent step ID
+	 */
+	function set_diagram_default_step_position( $parent_step_ID )
+	{
+		if( empty( $this->diagram_steps[ $parent_step_ID ]['next_steps'] ) )
+		{	// No next steps, Finish branch:
+			return;
+		}
+
+		// Count how many next steps current step has without defined position:
+		$new_next_step_IDs = array();
+		foreach( $this->diagram_steps[ $parent_step_ID ]['next_steps'] as $next_result => $next_step_ID )
+		{
+			if( isset( $this->diagram_steps[ $next_step_ID ] ) &&
+			    ! isset( $this->diagram_steps[ $next_step_ID ]['xy'] ) &&
+			    $parent_step_ID != $next_step_ID &&
+			    ! in_array( $next_step_ID, $new_next_step_IDs ) )
+			{	// Exclude next steps with already defined position:
+				//unset( $next_step_IDs[ $next_result ] );
+				$new_next_step_IDs[ $next_result ] = $next_step_ID;
+			}
+		}
+		$new_next_steps_count = count( $new_next_step_IDs );
+
+		if( $new_next_steps_count == 0 )
+		{	// No next steps without defined position, Finish branch:
+			return;
+		}
+
+		// Get column and row of parent step:
+		list( $parent_col, $parent_row ) = $this->diagram_steps[ $parent_step_ID ]['xy'];
+
+		// Use next row after previous step box:
+		$current_row = $parent_row + 1;
+		// Set column for first next step:
+		if( $new_next_steps_count == 3 && $parent_col == 5 )
+		{	// If parent step is located in last column we should start first next step in shifted to 2 columns to the left:
+			$current_col = $parent_col - 2;
+		}
+		elseif( $new_next_steps_count == 1 )
+		{	// Use same column as previous step box for single new next step
+			$current_col = $parent_col;
+		}
+		else
+		{	// Shift to the left for 2 or 3 new next steps:
+			$current_col = $parent_col - 1;
+		}
+
+		foreach( $new_next_step_IDs as $next_result => $next_step_ID )
+		{
+			if( $current_col < 1 )
+			{	// Min column is 1:
+				$current_col = 1;
+			}
+			elseif( $current_col > 5 )
+			{	// Max column is 5:
+				$current_col = 5;
+			}
+
+			// Define row and column:
+			$this->resolve_diagram_step_position_conflicts( $next_step_ID, $current_col, $current_row );
+
+			if( $new_next_steps_count == 1 )
+			{	// Don't calculate column for next steps because of single next step:
+				break;
+			}
+
+			// Set column for next step:
+			$current_col += ( $new_next_steps_count == 3 || ( $new_next_steps_count == 2 && $parent_col == 1 ) ? 1 : 2 );
+		}
+
+		// Note: we should run recursive function only after defined position for all next steps of current parent step:
+		foreach( $new_next_step_IDs as $next_result => $next_step_ID )
+		{	// Set positions to next step recursively:
+			$this->set_diagram_default_step_position( $next_step_ID );
+		}
+	}
+
+
+	/**
+	 * Set position column and row and resolve a conflict if another step is using same position
+	 *
+	 * @param integer Step ID
+	 * @param integer Column (1,2,3,4,5)
+	 * @param integer Row from 1 to infinity
+	 */
+	function resolve_diagram_step_position_conflicts( $step_ID, $col, $row )
+	{
+		if( ! isset( $this->diagram_cells ) )
+		{	// Initialize array to store the filled cells on diagram:
+			$this->diagram_cells = array();
+		}
+
+		if( isset( $this->diagram_cells[ $col.':'.$row ] ) )
+		{	// If current cell is filled with another step box we should resolve this conflict:
+			$conflict_is_resolved = false;
+
+			while( ! $conflict_is_resolved )
+			{
+				// LEFT shifting:
+				if( $col > 1 )
+				{	// Find a free cell in the left columns of the same row:
+					for( $c = $col - 1; $c >= 1; $c-- )
+					{
+						if( ! isset( $this->diagram_cells[ $c.':'.$row ] ) )
+						{	// This is a free cell:
+							for( $c2 = $c; $c2 <= $col - 1; $c2++ )
+							{	// Move all step boxes before current to the left:
+								$shifted_step_ID = $this->diagram_cells[ ( $c2 + 1 ).':'.$row ];
+								$this->diagram_steps[ $shifted_step_ID ]['xy'] = array( $c2, $row );
+								$this->diagram_cells[ $c2.':'.$row ] = $shifted_step_ID;
+							}
+							// A free left cell is found, Stop to find others:
+							$conflict_is_resolved = true;
+							break;
+						}
+					}
+				}
+
+				// RIGHT shifting:
+				if( ! $conflict_is_resolved && $col < 5 )
+				{	// Find a free cell in the right columns of the same row:
+					for( $c = $col + 1; $c <= 5; $c++ )
+					{
+						if( ! isset( $this->diagram_cells[ $c.':'.$row ] ) )
+						{	// This is a free cell, Use it for current step:
+							$col = $c;
+							// A free left cell is found, Stop to find others:
+							$conflict_is_resolved = true;
+							break;
+						}
+					}
+				}
+
+				// DOWN shifting:
+				if( ! $conflict_is_resolved )
+				{	// Find a free cell in the down rows of the same column:
+					$row++;
+					if( ! isset( $this->diagram_cells[ $col.':'.$row ] ) )
+					{	// This is a free cell, Use it for current step:
+						// A free left cell is found, Stop to find others:
+						$conflict_is_resolved = true;
+					}
+				}
+			}
+		}
+
+		// Set the resolved column and for for current step:
+		$this->diagram_steps[ $step_ID ]['xy'] = array( $col, $row );
+
+		// Fill cells array to know current cell is busy with current step:
+		$this->diagram_cells[ $col.':'.$row ] = $step_ID;
 	}
 }
 

@@ -1460,9 +1460,6 @@ table.diff td.diff-title-addedline {
 .timestamp .time {
   font-size: 84%;
 }
-.compact_data {
-  white-space: nowrap;
-}
 #skin_wrapper .email_wrap .email_payload > p:first-child {
   margin-top: 10px;
 }
@@ -1653,4 +1650,8 @@ table.diff td.diff-title-addedline {
 .jeditable_cell select,
 .jeditable_cell input {
   max-width: 100%;
+}
+div.query-builder .rule-container .rule-value-container {
+  border: none;
+  padding-left: 0;
 }
