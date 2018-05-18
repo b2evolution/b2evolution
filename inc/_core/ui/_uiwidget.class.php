@@ -581,6 +581,11 @@ class Table extends Widget
 		$js_filters = array();
 		foreach( $filter_fields as $field_ID => $params )
 		{
+			if( $field_ID == '#default' )
+			{	// Skip a reserved field for default filters:
+				continue;
+			}
+
 			$js_filter = array( 'id:\''.$field_ID.'\'' );
 
 			if( isset( $params['type'] ) )
@@ -596,7 +601,11 @@ class Table extends Widget
 							'dayNamesMin' => jquery_datepicker_day_names(),
 							'firstDay'    => locale_startofweek(),
 						);
-						$params['validation'] = array( 'format' => strtoupper( jquery_datepicker_datefmt() ) );
+						if( ! isset( $params['validation'] ) )
+						{
+							$params['validation'] = array();
+						}
+						$params['validation']['format'] = strtoupper( jquery_datepicker_datefmt() );
 						break;
 				}
 			}
@@ -658,6 +667,10 @@ class Table extends Widget
 							$param_values = array();
 							foreach( $param_value as $sub_param_name => $sub_param_value )
 							{
+								if( $param_name == 'values' )
+								{	// All value indexes must be strings:
+									$sub_param_name = '\''.format_to_js( $sub_param_name ).'\'';
+								}
 								if( $sub_param_value == 'true' || $sub_param_value == 'false' ||
 								    strpos( $sub_param_value, '[' ) === 0 )
 								{	// This is a not string value:
@@ -681,6 +694,27 @@ class Table extends Widget
 			}
 			$js_filters[] = '{'.implode( ',', $js_filter ).'}';
 		}
+
+		// Get filter values from request:
+		$filter_query = param_condition( 'filter_query' );
+		if( empty( $filter_query ) )
+		{	// Set filter values if no request yet:
+			$filter_query = array(
+				'rules'     => array(),
+				'valid'     => true,
+			);
+			if( isset( $filter_fields['#default'] ) )
+			{	// Set filters from default config:
+				foreach( $filter_fields['#default'] as $def_filter_id => $def_filter_value )
+				{
+					$filter_query['rules'][] = array(
+						'id'    => $def_filter_id,
+						'value' => $def_filter_value,
+					);
+				}
+			}
+			$filter_query = json_encode( $filter_query );
+		}
 ?>
 <script type="text/javascript">
 jQuery( document ).ready( function()
@@ -702,6 +736,7 @@ jQuery( document ).ready( function()
 			{ type: 'blank', nb_inputs: 1, multiple: false, apply_to: ['string'] }
 		],
 		lang: {
+			add_rule: '<?php echo TS_('Add filter'); ?>',
 			operators: {
 				equal: '=',
 				not_equal: '&#8800;',
@@ -717,14 +752,14 @@ jQuery( document ).ready( function()
 			}
 		},
 		filters: [<?php echo implode( ',', $js_filters ); ?>],
-		rules: <?php echo param_format_condition( param_condition( 'filter_query' ), 'js' ); ?>,
+		rules: <?php echo param_format_condition( $filter_query, 'js' ); ?>,
 	} );
 
 	// Prepare form before submitting:
 	jQuery( '#evo_results_filters' ).closest( 'form' ).on( 'submit', function()
 	{
 		// Convert filter fields to JSON format:
-		var result = jQuery( '#evo_results_filters' ).queryBuilder( 'getRules', { allow_invalid: true } );
+		var result = jQuery( '#evo_results_filters' ).queryBuilder( 'getRules' );
 		if( result === null )
 		{	// Stop submitting on wrong SQL:
 			return false;

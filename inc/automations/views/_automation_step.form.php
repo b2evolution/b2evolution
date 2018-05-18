@@ -345,6 +345,7 @@ jQuery( document ).ready( function()
 			error: 'fa fa-warning',
 		},
 		lang: {
+			add_rule: '<?php echo TS_('Add condition'); ?>',
 			operators: {
 				equal: '=',
 				not_equal: '&#8800;',

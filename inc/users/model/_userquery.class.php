@@ -773,7 +773,10 @@ class UserQuery extends FilterSQL
 	 */
 	function filter_field_gender( $value, $operator )
 	{
-		return $this->get_where_condition( 'user_gender', $value, $operator );
+		if( in_array( $value, array( 'M', 'F', 'O' ) ) )
+		{
+			return $this->get_where_condition( 'user_gender', $value, $operator );
+		}
 	}
 
 
@@ -928,7 +931,10 @@ class UserQuery extends FilterSQL
 	 */
 	function filter_field_lastseen( $value, $operator )
 	{
-		return $this->get_where_condition( 'DATE( user_lastseen_ts )', $value, $operator );
+		if( ! empty( $value ) )
+		{
+			return $this->get_where_condition( 'DATE( user_lastseen_ts )', $value, $operator );
+		}
 	}
 
 

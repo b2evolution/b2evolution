@@ -2991,7 +2991,8 @@ function param_format_condition_rule( $rule_value, $rule_type, $action )
 
 				case 'js':
 					// To JavaScript format:
-					return mysql2date( locale_input_datefmt(), $rule_value );
+					$formatted_date = mysql2date( locale_input_datefmt(), $rule_value );
+					return $formatted_date ? $formatted_date : $rule_value;
 			}
 			break;
 	}

@@ -3505,7 +3505,14 @@ function callback_filter_userlist( & $Form )
 	global $Settings, $current_User, $Collection, $Blog, $edited_Organization, $edited_Newsletter, $edited_EmailCampaign;
 	global $registered_min, $registered_max;
 
-	$filters = array();
+	$filters = array(
+		// Set default filters which are displayed on not filtered list:
+		'#default' => array(
+			'gender'   => '',
+			'criteria' => '0:contains:',
+			'lastseen' => '',
+		)
+	);
 
 	$Form->hidden( 'filter', 'new' );
 
@@ -3648,10 +3655,12 @@ function callback_filter_userlist( & $Form )
 			'label'  => T_('Gender'),
 			'input'  => 'select',
 			'values' => array(
+					''  => T_('Any'),
 					'M' => T_('Men'),
 					'F' => T_('Women'),
 					'O' => T_('Other'),
 				),
+			'validation' => array( 'allow_empty_value' => 'true' ),
 		);
 
 	// Level:
@@ -3823,14 +3832,15 @@ function load_cities( country_ID, region_ID, subregion_ID )
 
 		// User last seen:
 		$filters['lastseen'] = array(
-				'label' => T_('User last seen'),
-				'type'  => 'date',
+				'label'      => T_('User last seen'),
+				'type'       => 'date',
+				'validation' => array( 'allow_empty_value' => 'true' ),
 			);
 
 		// Registration source:
 		$filters['source'] = array(
-				'label' => T_('Registration source'),
-				'operators' => 'contains,not_contains',
+				'label'      => T_('Registration source'),
+				'operators'  => 'contains,not_contains',
 			);
 	}
 
