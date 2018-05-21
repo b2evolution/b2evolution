@@ -88,6 +88,10 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 				$Form->hidden( 'activate_account_reminder_config_num', $config_count );
 				break;
 
+			case 'send-inactive-account-reminders':
+				$Form->duration_input( 'inactive_account_reminder_threshold', $Settings->get( 'inactive_account_reminder_threshold' ), T_('Trigger after'), 'days', 'minutes', array( 'note' => T_('An inactive account is an account that had been activated but the user hasn\'t connected for an extended period.') ) );
+				break;
+
 			case 'send-unmoderated-comments-reminders':
 				// Send reminders about comments awaiting moderation:
 				$Form->duration_input( 'comment_moderation_reminder_threshold', $Settings->get( 'comment_moderation_reminder_threshold' ), T_('Trigger after'), 'days', 'minutes', array( 'note' => T_('A moderator will receive Comment moderation reminders if there are comments awaiting moderation at least as old as the selected period.') ) );

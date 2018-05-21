@@ -1575,6 +1575,7 @@ class User extends DataObject
 				{
 					$UserSettings->set( 'send_activation_reminder', param( 'edited_user_send_activation_reminder', 'integer', 0 ), $this->ID );
 				}
+				$UserSettings->set( 'send_inactive_reminder', param( 'edited_user_send_inactive_reminder', 'integer', 0 ), $this->ID );
 
 				if( $this->check_perm( 'users', 'edit' ) )
 				{ // edited user has permission to edit all users, save notification preferences

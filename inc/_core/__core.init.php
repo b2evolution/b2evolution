@@ -2305,6 +2305,12 @@ class _core_Module extends Module
 				'ctrl'   => 'cron/jobs/_activate_account_reminder.job.php',
 				'params' => NULL,
 			),
+			'send-inactive-account-reminders' => array(
+				'name'   => T_('Send reminders about inactive accounts'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_inactive_account_reminder.job.php',
+				'params' => NULL,
+			),
 			'execute-automations' => array(
 				'name'   => T_('Execute automations'),
 				'help'   => '#',

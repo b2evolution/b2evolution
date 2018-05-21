@@ -257,6 +257,11 @@ switch( $action )
 					$Settings->set( 'activate_account_reminder_config', implode( ',', $reminder_config ) );
 					break;
 
+				case 'send-inactive-account-reminders':
+					// Send reminders about inactivate accounts:
+					$Settings->set( 'inactive_account_reminder_threshold', param_duration( 'inactive_account_reminder_threshold' ) );
+					break;
+
 				case 'send-unmoderated-comments-reminders':
 					// Send reminders about comments awaiting moderation:
 					$Settings->set( 'comment_moderation_reminder_threshold', param_duration( 'comment_moderation_reminder_threshold' ) );
