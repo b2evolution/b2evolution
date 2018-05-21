@@ -224,18 +224,31 @@ $Plugins->trigger_event( 'DisplayRegisterFormFieldset', array(
 		'use_placeholders' => $params['register_use_placeholders']
 	) );
 
-// Submit button:
-$submit_button = array( array( 'name' => 'register', 'value' => T_('Register my account now!'), 'class' => 'search btn-primary btn-lg' ) );
-
-$Form->buttons_input( $submit_button );
+// Buttons:
+$Form->buttons_input( array(
+	array( 'name' => 'register', 'value' => T_('Register my account now!'), 'class' => 'search btn-primary btn-lg', 'input_suffix' => '<br>' ),
+	array( 'tag' => 'link', 'value' => T_('Already have an account... ?'), 'href' => get_login_url( $source, $redirect_to ), 'class' => 'btn-default btn-lg' ),
+) );
 
 $Form->end_form();
 
 echo $params['skin_form_after'];
 
-echo '<div class="evo_form__login_links"'.$params['register_links_attrs'].'>';
-echo '<a href="'.get_login_url( $source, $redirect_to ).'">&laquo; '.T_('Already have an account... ?').'</a>';
-echo '</div>';
+// ------------------ "Register" CONTAINER EMBEDDED HERE -------------------
+// Display container and contents:
+skin_container( NT_('Register'), array(
+		// The following (optional) params will be used as defaults for widgets included in this container:
+		// This will enclose each widget in a block:
+		'block_start'       => '<br><div class="panel panel-default evo_widget $wi_class$">',
+		'block_end'         => '</div>',
+		// This will enclose the title of each widget:
+		'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
+		'block_title_end'   => '</h4></div>',
+		// This will enclose the body of each widget:
+		'block_body_start'  => '<div class="panel-body">',
+		'block_body_end'    => '</div>',
+	) );
+// --------------------- END OF "Register" CONTAINER -----------------------
 
 if( $params['register_form_footer'] )
 { // Display register form footer
@@ -251,5 +264,4 @@ display_password_indicator( array( 'field-width' => $params['register_field_widt
 
 // Display javascript login validator
 display_login_validator();
-
 ?>

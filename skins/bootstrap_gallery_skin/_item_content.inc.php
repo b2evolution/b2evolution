@@ -28,10 +28,10 @@ $params = array_merge( array(
 		// Wrap images and text:
 		'content_start_excerpt'    => '<section class="evo_post__excerpt">',		// In case of compact display
 		'content_end_excerpt'      => '</section>',
-		'content_start_full'       => $disp_detail == 'help' ? '' : '<section class="evo_post__full panel panel-default">',		// In case of full display
+		'content_start_full'       => in_array( $disp_detail, array( 'help', 'register' ) ) ? '' : '<section class="evo_post__full panel panel-default">',		// In case of full display
 		'content_title_start'      => '<div class="panel-heading gallery-single-content">',			// Wraps title and number of photos in the album
 		'content_title_end'        => '</div>',
-		'content_end_full'         => $disp_detail == 'help' ? '' : '</section>',
+		'content_end_full'         => in_array( $disp_detail, array( 'help', 'register' ) ) ? '' : '</section>',
 
 		// In case we display a compact version of the post:
 		'excerpt_before_text'      => '<div class="evo_post__excerpt_text">',
@@ -42,8 +42,8 @@ $params = array_merge( array(
 		'excerpt_more_text'        => T_('more').' &raquo;',
 
 		// In case we display a full version of the post:
-		'content_start_full_text'  => $disp_detail == 'help' ? '' : '<div class="evo_post__full_text panel-body">',
-		'content_end_full_text'    => $disp_detail == 'help' ? '' : '</div>',
+		'content_start_full_text'  => in_array( $disp_detail, array( 'help', 'register' ) ) ? '' : '<div class="evo_post__full_text panel-body">',
+		'content_end_full_text'    => in_array( $disp_detail, array( 'help', 'register' ) ) ? '' : '</div>',
 
 		'before_content_teaser'    => '',
 		'after_content_teaser'     => '',
@@ -216,25 +216,25 @@ switch( $content_mode )
 		// Normal dislpay:  (and Full display if force_more is true)
 		echo $params['content_start_full'];
 
-			if( $disp_detail != 'help' )
-			{	// Title and number of photos in album
-				echo $params['content_title_start'];
-					// Flag:
-					$Item->flag( array(
-							'before' => '<span class="pull-left">',
-							'after'  => '</span>',
-						) );
-					// Title:
-					$Item->title( array(
-							'link_type' => 'permalink',
-							'before'    => '<h4 class="panel-title">',
-							'after'     => '',
-						) );
-						// Writes the number of photos in the current gallery
-						printf( T_(' (%s photos)'), $Item->get_number_of_images() );
-					echo '</h4>';
-				echo $params['content_title_end'];
-			}
+		if( ! in_array( $disp_detail, array( 'help', 'register' ) ) )
+		{	// Title and number of photos in album
+			echo $params['content_title_start'];
+				// Flag:
+				$Item->flag( array(
+						'before' => '<span class="pull-left">',
+						'after'  => '</span>',
+					) );
+				// Title:
+				$Item->title( array(
+						'link_type' => 'permalink',
+						'before'    => '<h4 class="panel-title">',
+						'after'     => '',
+					) );
+					// Writes the number of photos in the current gallery
+					printf( T_(' (%s photos)'), $Item->get_number_of_images() );
+				echo '</h4>';
+			echo $params['content_title_end'];
+		}
 
 		if( ! empty($params['image_size']) )
 		{
