@@ -66,19 +66,6 @@ siteskin_include( '_site_body_header.inc.php' );
 		// --------------------------------- END OF MESSAGES ---------------------------------
 	?>
 
-	<?php
-		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
-		request_title( array(
-				'title_before'=> '<h2 class="evo_req_title">',
-				'title_after' => '</h2>',
-				'title_none'  => '',
-				'glue'        => ' - ',
-				'title_single_disp' => false,
-				'format'      => 'htmlbody',
-			) );
-		// ------------------------------ END OF REQUEST TITLE -----------------------------
-	?>
-
 	<!-- =================================== START OF MAIN AREA =================================== -->
 
 	<?php

@@ -149,17 +149,6 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 			// --------------------------------- END OF MESSAGES ---------------------------------
 		?>
 
-	<?php
-			// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
-			request_title( array(
-					'title_before'      => '<h2 class="page_title">',
-					'title_after'       => '</h2>',
-					'title_none'        => '',
-					'glue'              => ' - ',
-				) );
-			// ----------------------------- END OF REQUEST TITLE ----------------------------
-		?>
-
 		<?php
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 			skin_include( '$disp$' );

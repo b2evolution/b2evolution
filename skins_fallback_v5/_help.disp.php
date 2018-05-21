@@ -20,6 +20,15 @@ global $Collection, $Blog;
 // TODO: add more help stuff here
 // TODO: maked editable through admin (special post type?) and use the contents below as default only
 
+// ------------------ "Help" CONTAINER EMBEDDED HERE -------------------
+// Display container and contents:
+skin_container( NT_('Help'), array(
+		// The following params will be used as defaults for widgets included in this container:
+		'block_start' => '<div class="evo_widget $wi_class$">',
+		'block_end'   => '</div>',
+	) );
+// --------------------- END OF "Help" CONTAINER -----------------------
+
 if( isset( $Blog ) && $Blog->get_setting( 'allow_access' ) != 'public' )
 { // Display the following only if collection is not public access:
 
@@ -30,7 +39,7 @@ if( isset( $Blog ) && $Blog->get_setting( 'allow_access' ) != 'public' )
 	echo '<p>'.sprintf( T_('If you need assistance, please <a %s>contact the owner of this website/section</a>.'), 'href="'.$Blog->get_contact_url().'"' ).'</p>';
 }
 
-echo '<h2>'.T_('Content issues').'</h2>';
+echo '<h2>'.T_('Resolving remaining issues').'</h2>';
 
 echo '<p>'.T_('This is an independent website published solely under the reponsibility of its owner.').'</p>';
 

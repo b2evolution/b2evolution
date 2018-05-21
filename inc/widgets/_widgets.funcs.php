@@ -395,6 +395,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, 'Access Denied', 'content_block', 'core', 10, array( 'item_slug' => 'access-denied-'.$blog_id ) );
 
 
+	/* Help */
+	add_basic_widget( $blog_id, 'Help', 'content_block', 'core', 10, array( 'item_slug' => 'help-content-'.$blog_id ) );
+
+
 	/* Mobile Footer */
 	add_basic_widget( $blog_id, 'Mobile: Footer', 'coll_longdesc', 'core', 10 );
 	add_basic_widget( $blog_id, 'Mobile: Footer', 'mobile_skin_switcher', 'core', 20 );
