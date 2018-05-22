@@ -396,11 +396,14 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Help */
-	add_basic_widget( $blog_id, 'Help', 'content_block', 'core', 10, array( 'item_slug' => 'help-content-'.$blog_id ) );
+	add_basic_widget( $blog_id, 'Help', 'content_block', 'core', 10, array(
+			'item_slug' => 'help-content',
+			'title'     => T_('Personal Data & Privacy'),
+		) );
 
 
 	/* Help */
-	add_basic_widget( $blog_id, 'Register', 'content_block', 'core', 10, array( 'item_slug' => 'register-content-'.$blog_id ) );
+	add_basic_widget( $blog_id, 'Register', 'content_block', 'core', 10, array( 'item_slug' => 'register-content' ) );
 
 
 	/* Mobile Footer */

@@ -3131,13 +3131,15 @@ class Item extends ItemLight
 			}
 			elseif( $content_Item->get( 'creator_user_ID' ) != $this->get( 'creator_user_ID' ) &&
 			        ( ! $item_Blog || $content_Item->get( 'creator_user_ID' ) != $item_Blog->get( 'owner_user_ID' ) ) &&
-			        ( ! $item_Blog || $content_Item->get_blog_ID() != $item_Blog->ID )
+			        ( ! $item_Blog || $content_Item->get_blog_ID() != $item_Blog->ID ) &&
+		          ( ! ( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) || $content_Item->get_blog_ID() != $info_Blog->ID )
 			      )
 			{	// We can display a content block item with at least one condition:
 				//  - Content block Item has same owner as owner of parent Item,
 				//  - Content block Item has same owner as owner of parent Item's collection,
-				//  - Content block Item is in same collection as parent Item:
-				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				//  - Content block Item is in same collection as parent Item,
+				//  - Content block Item from collection for info pages:
+				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or have the same owner or from collection for info pages.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
 				continue;
 			}
 

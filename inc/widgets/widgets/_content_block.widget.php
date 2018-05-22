@@ -197,11 +197,13 @@ class content_block_Widget extends ComponentWidget
 		}
 		elseif( ( $widget_Blog = & $this->get_Blog() ) && (
 		          ( $widget_Item->get_blog_ID() == $widget_Blog->ID ) ||
-		          ( $widget_Item->get( 'creator_user_ID' ) == $widget_Blog->get( 'owner_user_ID' ) )
+		          ( $widget_Item->get( 'creator_user_ID' ) == $widget_Blog->get( 'owner_user_ID' ) ||
+		          ( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) && $widget_Item->get_blog_ID() == $info_Blog->ID ) )
 		      ) )
 		{	// Display a content block item ONLY if at least one condition:
 			//  - Content block Item is in same collection as this widget,
-			//  - Content block Item has same owner as owner of this widget's collection:
+			//  - Content block Item has same owner as owner of this widget's collection,
+			//  - Content block Item from collection for info pages:
 			global $Item;
 
 			// Save current dispalying Item in temp var:
@@ -221,7 +223,7 @@ class content_block_Widget extends ComponentWidget
 		}
 		else
 		{	// Display error if the requested content block item cannot be used in this place:
-			echo '<p class="red">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or have the same owner.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ).'</p>';
+			echo '<p class="red">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or have the same owner or from collection for info pages.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ).'</p>';
 		}
 
 		echo $this->disp_params['block_body_end'];
