@@ -72,7 +72,7 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 				{
 					$reminder_config_label = sprintf( T_('Reminder #%d'), $c + 1 );
 					$reminder_config_params = array(
-							'note'             => T_('After subscription'),
+							'note'             => T_('After last notification'),
 							'none_title_label' => T_('Don\'t send'),
 						);
 					if( $c == $config_count - 1 )

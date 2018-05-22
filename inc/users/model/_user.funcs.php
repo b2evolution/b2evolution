@@ -3150,8 +3150,10 @@ function send_inactive_user_emails( $user_ids, $redirect_to_after = NULL, $log_m
 			locale_restore_previous();
 		}
 
+		$login_Blog = & get_setting_Blog( 'login_blog_ID' );
 		$email_template_params = array(
-				'User' => $User
+				'User' => $User,
+				'login_Blog' => $login_Blog
 			);
 
 		// Update notification sender's info from General settings

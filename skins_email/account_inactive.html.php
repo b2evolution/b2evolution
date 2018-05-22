@@ -27,10 +27,12 @@ global $baseurl, $admin_url, $dummy_fields, $Blog;
 
 // Default params:
 $params = array_merge( array(
-		'User'    => NULL,
+		'User'       => NULL,
+		'login_Blog' => NULL,
 	), $params );
 
 $inactive_User = $params['User'];
+$login_Blog = $params['login_Blog'];
 
 echo '<p'.emailskin_style( '.p' ).'>';
 echo sprintf( T_('We haven\'t seen you on <a %s>%s</a> for %s.'), 'href="'.$baseurl.'"'.emailskin_style( '.a' ), $Settings->get( 'notification_short_name' ), seconds_to_period( $Settings->get( 'inactive_account_reminder_threshold' ) ) );
@@ -39,13 +41,13 @@ echo '<p'.emailskin_style( '.p' ).'>';
 echo T_('Check out what\'s new by clicking below.');
 echo '</p>';
 
-if( use_in_skin_login() )
-{ // Use in-skin lostpassword form of the current blog or of the special blog for login/register actions
-	$login_url = $Blog->get( $blog_page, array( 'glue' => '&' ) );
-	$lostpassword_url = $Blog->get( 'lostpasswordurl', array( 'glue' => $glue ) );
+if( ! empty( $login_Blog ) )
+{ // Use special blog for login/lost password actions if it is defined
+	$login_url = $login_Blog->get( 'loginurl', array( 'glue' => '&' ) );
+	$lostpassword_url = $login_Blog->get( 'lostpasswordurl', array( 'glue' => '&' ) );
 }
 else
-{ // Use normal/standard lostpassword form (without blog skin)
+{ // Use standard login/lost password urls
 	$login_url = get_htsrv_url( true ).'login.php';
 	$lostpassword_url = get_htsrv_url( true ).'login.php?action=lostpassword';
 }
