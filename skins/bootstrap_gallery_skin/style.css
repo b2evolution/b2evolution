@@ -200,9 +200,6 @@ div.bSideItem h4 {
 .wrap-form-register .control-buttons {
   text-align: left;
 }
-.wrap-form-register.register-disabled {
-  width: 350px;
-}
 .wrap-form-register .form-control#country,
 .wrap-form-register .form-control#u {
   width: 100%;

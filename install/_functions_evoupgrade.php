@@ -9700,7 +9700,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 						'title'     => T_('Personal Data & Privacy'),
 					) );
 				/* Register */
-				add_basic_widget_12860( $coll_ID, 'Register', 'content_block', 'core', 10, array(
+				add_basic_widget_12860( $coll_ID, 'Register', 'user_normal_register', 'core', 10 );
+				add_basic_widget_12860( $coll_ID, 'Register', 'content_block', 'core', 20, array(
 						'item_slug' => ( isset( $register_Item ) ? $register_Item->get( 'urltitle' ) : 'register-content' )
 					) );
 				task_end();

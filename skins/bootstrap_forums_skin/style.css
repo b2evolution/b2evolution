@@ -489,9 +489,6 @@ ul.legend span.note {
 .evo_panel__register .control-buttons {
   text-align: left;
 }
-.evo_panel__register.register-disabled {
-  width: 350px;
-}
 .evo_panel__register .form-control#country,
 .evo_panel__register .form-control#u {
   width: 100%;

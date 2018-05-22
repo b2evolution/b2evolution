@@ -126,6 +126,7 @@ $core_componentwidget_defs = array(
 			'user_login',
 			'user_greetings',
 			'user_register',
+			'user_normal_register',
 			'newsletter_subscription',
 			'user_tools',
 			'online_users',
