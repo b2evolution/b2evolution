@@ -225,30 +225,36 @@ $Plugins->trigger_event( 'DisplayRegisterFormFieldset', array(
 	) );
 
 // Buttons:
-$Form->buttons_input( array(
-	array( 'name' => 'register', 'value' => T_('Register my account now!'), 'class' => 'search btn-primary btn-lg', 'input_suffix' => '<br>' ),
-	array( 'tag' => 'link', 'value' => T_('Already have an account... ?'), 'href' => get_login_url( $source, $redirect_to ), 'class' => 'btn-default btn-lg' ),
-) );
+$form_fieldstart = str_replace( array( '$id$', 'class="' ), array( '', 'class="center ' ), $Form->fieldstart );
+echo $form_fieldstart;
+$Form->button_input( array( 'name' => 'register', 'value' => T_('Register my account now!'), 'class' => 'search btn-primary btn-lg' ) );
+echo $Form->fieldend;
+echo $form_fieldstart;
+$Form->button_input( array( 'tag' => 'link', 'value' => T_('Already have an account... ?'), 'href' => get_login_url( $source, $redirect_to ), 'class' => 'btn-default btn-lg' ) );
+echo $Form->fieldend;
 
 $Form->end_form();
 
 echo $params['skin_form_after'];
 
-// ------------------ "Register" CONTAINER EMBEDDED HERE -------------------
-// Display container and contents:
-skin_container( NT_('Register'), array(
-		// The following (optional) params will be used as defaults for widgets included in this container:
-		// This will enclose each widget in a block:
-		'block_start'       => '<br><div class="panel panel-default evo_widget $wi_class$">',
-		'block_end'         => '</div>',
-		// This will enclose the title of each widget:
-		'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
-		'block_title_end'   => '</h4></div>',
-		// This will enclose the body of each widget:
-		'block_body_start'  => '<div class="panel-body">',
-		'block_body_end'    => '</div>',
-	) );
-// --------------------- END OF "Register" CONTAINER -----------------------
+if( isset( $Blog ) )
+{	// Only for front-office register page
+	// ------------------ "Register" CONTAINER EMBEDDED HERE -------------------
+	// Display container and contents:
+	skin_container( NT_('Register'), array(
+			// The following (optional) params will be used as defaults for widgets included in this container:
+			// This will enclose each widget in a block:
+			'block_start'       => '<br><div class="panel panel-default evo_widget $wi_class$">',
+			'block_end'         => '</div>',
+			// This will enclose the title of each widget:
+			'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
+			'block_title_end'   => '</h4></div>',
+			// This will enclose the body of each widget:
+			'block_body_start'  => '<div class="panel-body">',
+			'block_body_end'    => '</div>',
+		) );
+	// --------------------- END OF "Register" CONTAINER -----------------------
+}
 
 if( $params['register_form_footer'] )
 { // Display register form footer
