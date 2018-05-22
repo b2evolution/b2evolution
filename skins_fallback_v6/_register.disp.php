@@ -237,23 +237,34 @@ $Form->end_form();
 
 echo $params['skin_form_after'];
 
+$widget_params = array(
+		// The following (optional) params will be used as defaults for widgets included in this container:
+		// This will enclose each widget in a block:
+		'block_start'       => '<br><div class="panel panel-default evo_widget $wi_class$">',
+		'block_end'         => '</div>',
+		// This will enclose the title of each widget:
+		'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
+		'block_title_end'   => '</h4></div>',
+		// This will enclose the body of each widget:
+		'block_body_start'  => '<div class="panel-body">',
+		'block_body_end'    => '</div>',
+	);
+
 if( isset( $Blog ) )
-{	// Only for front-office register page
+{	// For in-skin registration form:
 	// ------------------ "Register" CONTAINER EMBEDDED HERE -------------------
 	// Display container and contents:
-	skin_container( NT_('Register'), array(
-			// The following (optional) params will be used as defaults for widgets included in this container:
-			// This will enclose each widget in a block:
-			'block_start'       => '<br><div class="panel panel-default evo_widget $wi_class$">',
-			'block_end'         => '</div>',
-			// This will enclose the title of each widget:
-			'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
-			'block_title_end'   => '</h4></div>',
-			// This will enclose the body of each widget:
-			'block_body_start'  => '<div class="panel-body">',
-			'block_body_end'    => '</div>',
-		) );
+	skin_container( NT_('Register'), $widget_params );
 	// --------------------- END OF "Register" CONTAINER -----------------------
+}
+else
+{	// For standard registration form:
+	skin_widget( array_merge( $widget_params, array(
+		// CODE for the widget:
+		'widget'    => 'content_block',
+		// Optional display params:
+		'item_slug' => 'register-content',
+	) ) );
 }
 
 if( $params['register_form_footer'] )

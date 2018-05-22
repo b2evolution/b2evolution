@@ -146,14 +146,12 @@ class content_block_Widget extends ComponentWidget
 	 */
 	function init_display( $params )
 	{
-		global $Collection, $Blog;
-
 		parent::init_display( $params );
 
 		$widget_Item = & $this->get_widget_Item();
 
-		if( $widget_Item && ! in_array( $widget_Item->get( 'status' ), get_inskin_statuses( $Blog->ID, 'post' ) ) )
-		{	// Disable block caching for this widget because target Item is not public for current collection:
+		if( $widget_Item && ! in_array( $widget_Item->get( 'status' ), get_inskin_statuses( $widget_Item->get_blog_ID(), 'post' ) ) )
+		{	// Disable block caching for this widget because target Item is not public for its collection:
 			$this->disp_params['allow_blockcache'] = 0;
 		}
 	}
@@ -195,11 +193,9 @@ class content_block_Widget extends ComponentWidget
 		{	// Current user has no permission to view item with such status:
 			echo '<p class="red">'.sprintf( T_('Content block "%s" cannot be included because you have no permission.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ).'</p>';
 		}
-		elseif( ( $widget_Blog = & $this->get_Blog() ) && (
-		          ( $widget_Item->get_blog_ID() == $widget_Blog->ID ) ||
-		          ( $widget_Item->get( 'creator_user_ID' ) == $widget_Blog->get( 'owner_user_ID' ) ||
-		          ( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) && $widget_Item->get_blog_ID() == $info_Blog->ID ) )
-		      ) )
+		elseif( ( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get_blog_ID() == $widget_Blog->ID ) ||
+		        ( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get( 'creator_user_ID' ) == $widget_Blog->get( 'owner_user_ID' ) ||
+		        ( ( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) && $widget_Item->get_blog_ID() == $info_Blog->ID ) ) )
 		{	// Display a content block item ONLY if at least one condition:
 			//  - Content block Item is in same collection as this widget,
 			//  - Content block Item has same owner as owner of this widget's collection,
