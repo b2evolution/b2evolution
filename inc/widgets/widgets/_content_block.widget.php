@@ -52,7 +52,7 @@ class content_block_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Content Block' );
+		return T_('Content Block');
 	}
 
 
@@ -74,6 +74,24 @@ class content_block_Widget extends ComponentWidget
 	function get_desc()
 	{
 		return T_('Display post of type "Content Block".');
+	}
+
+
+	/**
+	 * Get a clean description to display in the widget list.
+	 * @return string
+	 */
+	function get_desc_for_list()
+	{
+		$r = '<span class="fa fa-'.$this->icon.'"></span>'
+			.' <strong>'.$this->get_name().'</strong>';
+
+		if( $widget_Item = & $this->get_widget_Item() )
+		{	// Display a title of widget Item if it is defined:
+			$r .= ' ('.$widget_Item->get( 'title' ).')';
+		}
+
+		return $r;
 	}
 
 
