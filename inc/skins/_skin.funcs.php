@@ -1148,10 +1148,6 @@ function skin_init( $disp )
 					set_param( 'locale', $comment_Item->get( 'locale' ) );
 				}
 			}
-
-			// Check invitation code if it exists and registration is enabled
-			global $display_invitation;
-			$display_invitation = check_invitation_code();
 			break;
 
 		case 'lostpassword':

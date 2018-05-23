@@ -83,10 +83,10 @@ if( $inskin && !empty( $Blog ) )
 }
 
 // Check invitation code if it exists and registration is enabled
-$display_invitation = check_invitation_code();
+$invitation_code_status = check_invitation_code();
 
-if( $display_invitation == 'deny' )
-{ // Registration is disabled
+if( $invitation_code_status == 'deny' )
+{	// Registration is disabled or system is locked:
 	$action = 'disabled';
 }
 

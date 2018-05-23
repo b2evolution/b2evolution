@@ -307,6 +307,12 @@ div.bSideItem h4 {
 .evo_panel__register #fieldset_wrapper_captcha_qstn .panel div[id$=_answer] .control-label {
   padding-right: 14px;
 }
+.evo_panel__register .panel-body {
+  padding: 15px;
+}
+.evo_panel__register .panel-body p:last-child {
+  margin-bottom: 0;
+}
 @media (min-width: 768px) {
   #fieldset_wrapper_captcha_qstn .panel div[id$=_answer] {
     max-height: 34px;
@@ -314,7 +320,6 @@ div.bSideItem h4 {
 }
 .evo_register_buttons {
   text-align: center;
-  margin: 0 0 15px 0;
 }
 .evo_register_buttons input.btn {
   margin: 0 0 15px 0;

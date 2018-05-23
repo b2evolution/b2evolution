@@ -26,13 +26,19 @@ $params = array_merge( array(
 
 echo $params['register_page_before'];
 
+// Display the form messages:
+messages( array(
+		'block_start' => '<div class="action_messages">',
+		'block_end'   => '</div>',
+	) );
+
 // ------------------ "Register" CONTAINER EMBEDDED HERE -------------------
 // Display container and contents:
 skin_container( NT_('Register'), array_merge( $params, array(
 		// The following (optional) params will be used as defaults for widgets included in this container:
 		// This will enclose each widget in a block:
-		'block_start'       => '<br><div class="panel panel-default skin-form evo_widget $wi_class$">',
-		'block_end'         => '</div>',
+		'block_start'       => '<div class="panel panel-default skin-form evo_widget $wi_class$">',
+		'block_end'         => '</div><br>',
 		// This will enclose the title of each widget:
 		'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
 		'block_title_end'   => '</h4></div>',

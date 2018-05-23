@@ -48,7 +48,7 @@ skin_widget( array_merge( array(
 	'register_buttons_after'    => '</div>',
 	// The following (optional) params will be used as defaults for widget template:
 	// This will enclose each widget in a block:
-	'block_start'       => '<br><div class="panel panel-default skin-form evo_widget $wi_class$">',
+	'block_start'       => '<div class="panel panel-default skin-form evo_widget $wi_class$">',
 	'block_end'         => '</div>',
 	// This will enclose the title of each widget:
 	'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',

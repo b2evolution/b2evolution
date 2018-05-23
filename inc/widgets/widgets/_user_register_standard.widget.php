@@ -116,7 +116,7 @@ class user_register_standard_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Collection, $Blog, $Settings, $Session, $Plugins, $dummy_fields, $display_invitation;
+		global $Collection, $Blog, $Settings, $Session, $Plugins, $dummy_fields;
 
 		// Default params:
 		$params = array_merge( array(
@@ -125,12 +125,15 @@ class user_register_standard_Widget extends ComponentWidget
 				'register_field_width'      => 140,
 				'register_form_params'      => NULL,
 				'register_disp_home_button' => false, // Display button to go home when registration is disabled
-				'display_form_messages'     => false,
+				'register_disp_messages'    => false,
 				'register_buttons_before'   => '<p class="center">',
 				'register_buttons_after'    => '</p>',
 			), $params );
 
 		$this->init_display( $params );
+
+		// Check invitation code if it exists and registration is enabled
+		$invitation_code_status = check_invitation_code();
 
 		if( isset( $this->BlockCache ) )
 		{	// Do NOT cache some of these links are using a redirect_to param, which makes it page dependent.
@@ -142,7 +145,7 @@ class user_register_standard_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_start'];
 
-		$this->disp_title( ! is_logged_in() && $display_invitation == 'deny' ? $this->disp_params['title_disabled'] : NULL );
+		$this->disp_title( ! is_logged_in() && $invitation_code_status == 'deny' ? $this->disp_params['title_disabled'] : NULL );
 
 		echo $this->disp_params['block_body_start'];
 
@@ -150,21 +153,29 @@ class user_register_standard_Widget extends ComponentWidget
 		{	// Don't allow to register if a user is already logged in:
 			echo '<p>'.T_('You are already logged in').'</p>';
 		}
-		elseif( $display_invitation == 'deny' )
+		elseif( $invitation_code_status == 'deny' )
 		{	// If registration is disabled
-			global $baseurl;
-
-			echo '<p class="error red">'.T_('User registration is currently not allowed.').'</p>';
+			echo '<p class="error red">';
+			if( $Settings->get( 'newusers_canregister' ) == 'no' || ! $Settings->get( 'system_lock' ) )
+			{	// If registration is disabled:
+				echo T_('User registration is currently not allowed.');
+			}
+			else
+			{	// If system is locked:
+				echo T_('The site is currently locked for maintenance.');
+			}
+			echo '</p>';
 
 			if( $params['register_disp_home_button'] )
-			{
+			{	// Display button to go home:
+				global $baseurl;
 				echo '<p class="center"><a href="'.$baseurl.'" class="btn btn-default">'.T_('Home').'</a></p>';
 			}
 		}
 		else
 		{	// Display a registration form:
-			if( $params['display_form_messages'] )
-			{ // Display the form messages before form inside wrapper
+			if( $params['register_disp_messages'] )
+			{	// Display the form messages before form inside wrapper:
 				messages( array(
 						'block_start' => '<div class="action_messages">',
 						'block_end'   => '</div>',
@@ -218,7 +229,7 @@ class user_register_standard_Widget extends ComponentWidget
 			$Form->hidden( 'source', $source );
 			$Form->hidden( 'redirect_to', $redirect_to );
 
-			if( $display_invitation == 'input' )
+			if( $invitation_code_status == 'input' )
 			{ // Display an input field to enter invitation code manually or to change incorrect code
 				$invitation_field_params = array( 'maxlength' => 32, 'class' => 'input_text', 'style' => 'width:138px' );
 				if( $Settings->get( 'newusers_canregister' ) == 'invite' )
@@ -227,7 +238,7 @@ class user_register_standard_Widget extends ComponentWidget
 				}
 				$Form->text_input( 'invitation', get_param( 'invitation' ), 22, T_('Your invitation code'), '', $invitation_field_params );
 			}
-			elseif( $display_invitation == 'info' )
+			elseif( $invitation_code_status == 'info' )
 			{ // Display info field (when invitation code is correct)
 				$Form->info( T_('Your invitation code'), get_param( 'invitation' ) );
 				$Form->hidden( 'invitation', get_param( 'invitation' ) );

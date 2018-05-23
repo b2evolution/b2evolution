@@ -14,12 +14,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'regional/model/_country.class.php', 'Country' );
 
-global $Settings, $Plugins;
-
-global $Collection, $Blog, $rsc_path, $rsc_url, $dummy_fields;
-
-global $display_invitation;
-
 // Default params:
 $params = array_merge( array(
 		'register_page_before'      => '',
@@ -32,6 +26,12 @@ $params = array_merge( array(
 
 
 echo $params['register_page_before'];
+
+// Display the form messages:
+messages( array(
+		'block_start' => '<div class="action_messages">',
+		'block_end'   => '</div>',
+	) );
 
 // ------------------ "Register" CONTAINER EMBEDDED HERE -------------------
 // Display container and contents:
@@ -47,9 +47,9 @@ skin_container( NT_('Register'), array_merge( $params, array(
 // --------------------- END OF "Register" CONTAINER -----------------------
 
 if( $params['register_form_footer'] )
-{ // Display register form footer
-	echo '<div class="notes standard_login_link"><a href="'.get_htsrv_url( true ).'register.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'&amp;return_to='.rawurlencode( $return_to ).'">'.T_( 'Use basic registration form instead').' &raquo;</a></div>';
-
+{	// Display register form footer:
+	global $Hit;
+	echo '<div class="notes standard_login_link"><a href="'.get_htsrv_url( true ).'register.php?source='.rawurlencode( get_param( 'source' ) ).'&amp;redirect_to='.rawurlencode( get_param( 'redirect_to' ) ).'&amp;return_to='.rawurlencode( get_param( 'return_to' ) ).'">'.T_( 'Use basic registration form instead').' &raquo;</a></div>';
 	echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 }
 

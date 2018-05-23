@@ -5204,14 +5204,14 @@ function echo_user_remove_membership_js( $edited_Organization )
  *        ''      - Don't display a field of invitation code
  *        'info'  - Display an info field with invitation code
  *        'input' - Display an input field to change invitation code
- *        'deny'  - Don't display a registration form at all
+ *        'deny'  - Don't display a registration form at all because registration is disabled or system is locked
  */
 function check_invitation_code( $invitation_name = 'invitation' )
 {
 	global $Settings;
 
-	if( $Settings->get( 'newusers_canregister' ) == 'no' )
-	{ // Don't display a registration form when it is disabled for all
+	if( $Settings->get( 'system_lock' ) || $Settings->get( 'newusers_canregister' ) == 'no' )
+	{	// Don't display a registration form when it is disabled for all or sysytem is locked:
 		return 'deny';
 	}
 
