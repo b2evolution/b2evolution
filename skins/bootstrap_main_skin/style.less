@@ -169,7 +169,7 @@ body.pictured {
 }
 
 // Register widget form
-.widget_core_user_register {
+.widget_core_user_register_quick {
 	#register_form {
 		.form-group {
 			margin: 0;
@@ -353,13 +353,31 @@ div.bSideItem {
 }
 .evo_panel__register {
 	max-width: 580px;
-	.control-buttons{
-		text-align: left;
-	}
 	.form-control {
 		&#country, &#u {
 			width: 100%;
 		}
+	}
+	#fieldset_wrapper_captcha_qstn .panel {
+		margin: 0;
+		div[id$=_answer] .control-label {
+			padding-right: 14px;
+		}
+	}
+}
+@media (min-width: 768px) {
+	#fieldset_wrapper_captcha_qstn .panel div[id$=_answer] {
+		max-height: 34px;
+	}
+}
+.evo_register_buttons {
+	text-align: center;
+	margin: 0 0 15px 0;
+	input.btn {
+		margin: 0 0 15px 0;
+	}
+	a.btn {
+		margin: 0;
 	}
 }
 .evo_form__login_links {

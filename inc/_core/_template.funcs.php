@@ -2524,7 +2524,7 @@ function display_login_form( $params )
 		$separator = '<br />';
 	}
 	else
-	{ // standard login form
+	{ // basic login form
 
 		if( ! empty( $params['form_title'] ) )
 		{
@@ -2906,7 +2906,7 @@ function display_activateinfo( $params )
 			$Form->hidden( 'blog', $params[ 'blog' ] );
 		}
 		else
-		{ // Form title in standard form
+		{ // Form title in basic form
 			echo '<h4>'.$params['form_title'].'</h4>';
 		}
 		$Form->hidden( 'req_activate_email_submit', 1 ); // to know if the form has been submitted

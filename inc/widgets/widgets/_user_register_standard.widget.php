@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the user_normal_register_Widget class.
+ * This file implements the user_register_standard_Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -23,7 +23,7 @@ load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectLis
  *
  * @package evocore
  */
-class user_normal_register_Widget extends ComponentWidget
+class user_register_standard_Widget extends ComponentWidget
 {
 	var $icon = 'registered';
 
@@ -33,7 +33,7 @@ class user_normal_register_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'user_normal_register' );
+		parent::__construct( $db_row, 'core', 'user_register_standard' );
 	}
 
 
@@ -126,6 +126,8 @@ class user_normal_register_Widget extends ComponentWidget
 				'register_form_params'      => NULL,
 				'register_disp_home_button' => false, // Display button to go home when registration is disabled
 				'display_form_messages'     => false,
+				'register_buttons_before'   => '<p class="center">',
+				'register_buttons_after'    => '</p>',
 			), $params );
 
 		$this->init_display( $params );
@@ -313,15 +315,19 @@ class user_normal_register_Widget extends ComponentWidget
 				) );
 
 			// Buttons:
-			$form_fieldstart = str_replace( array( '$id$', 'class="' ), array( '', 'class="center ' ), $Form->fieldstart );
-			echo $form_fieldstart;
+			echo $params['register_buttons_before'];
 			$Form->button_input( array( 'name' => 'register', 'value' => T_('Register my account now!'), 'class' => 'search btn-primary btn-lg' ) );
-			echo $Form->fieldend;
-			echo $form_fieldstart;
-			$Form->button_input( array( 'tag' => 'link', 'value' => T_('Already have an account... ?'), 'href' => get_login_url( $source, $redirect_to ), 'class' => 'btn-default btn-lg' ) );
-			echo $Form->fieldend;
+			echo '<br>';
+			$Form->button_input( array( 'tag' => 'link', 'value' => T_('Already have an account... ?'), 'href' => get_login_url( $source, $redirect_to ), 'class' => 'btn-default' ) );
+			echo $params['register_buttons_after'];
 
 			$Form->end_form();
+
+			// Display javascript password strength indicator bar:
+			display_password_indicator( array( 'field-width' => $params['register_field_width'] ) );
+
+			// Display javascript login validator:
+			display_login_validator();
 		}
 
 		echo $this->disp_params['block_body_end'];

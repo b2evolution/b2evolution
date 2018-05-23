@@ -2766,7 +2766,7 @@ class Item extends ItemLight
 						}
 
 						$params = array(
-							'widget' => 'user_register',
+							'widget' => 'user_register_quick',
 							'title' => '',
 							'intro' => '',
 							'ask_firstname' => in_array( 'firstname', $fields_to_display ) ? 'required' : 'no',

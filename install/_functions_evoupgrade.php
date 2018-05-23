@@ -9719,9 +9719,20 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
 								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
 		}
-		/* ---- Install basic widgets for containers "Login Required" and "Access Denied": ---- END */
+		/* ---- Install basic widgets for containers "Help" and "Register": ---- END */
 
 		upg_task_end( false );
+	}
+
+	if( upg_task_start( 12870, 'Renaming registration widgets...' ) )
+	{	// part of 6.10.1-stable
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "user_register_quick"
+			WHERE wi_code = "user_register"' );
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "user_register_standard"
+			WHERE wi_code = "user_normal_register"' );
+		upg_task_end();
 	}
 
 	/*

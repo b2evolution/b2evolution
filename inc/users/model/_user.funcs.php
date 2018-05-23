@@ -230,7 +230,7 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 		$url = $Blog->get( $blog_page, array( 'glue' => '&' ) );
 	}
 	else
-	{ // Use normal/standard login form (without blog skin)
+	{ // Use normal/basic login form (without blog skin)
 		if( ! empty( $redirect_url ) )
 		{
 			$redirect_url = url_rel_to_same_host( $redirect_url, get_htsrv_url( true ) );

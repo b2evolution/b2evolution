@@ -403,7 +403,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Help */
-	add_basic_widget( $blog_id, 'Register', 'user_normal_register', 'core', 10 );
+	add_basic_widget( $blog_id, 'Register', 'user_register_standard', 'core', 10 );
 	add_basic_widget( $blog_id, 'Register', 'content_block', 'core', 20, array( 'item_slug' => 'register-content' ) );
 
 

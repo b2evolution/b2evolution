@@ -20,6 +20,8 @@ $params = array_merge( array(
 		'register_use_placeholders' => true, // Set TRUE to use placeholders instead of notes for input fields
 		'register_field_width'      => 252,
 		'register_form_footer'      => true,
+		'register_buttons_before'   => '<div class="evo_register_buttons">',
+		'register_buttons_after'    => '</div>',
 	), $params );
 
 echo $params['register_page_before'];
@@ -43,15 +45,9 @@ skin_container( NT_('Register'), array_merge( $params, array(
 if( $params['register_form_footer'] )
 {	// Display register form footer:
 	global $Hit;
-	echo '<div class="evo_login_dialog_standard_link"><a href="'.get_htsrv_url( true ).'register.php?source='.rawurlencode( get_param( 'source' ) ).'&amp;redirect_to='.rawurlencode( get_param( 'redirect_to' ) ).'&amp;return_to='.rawurlencode( get_param( 'return_to' ) ).'">'.T_( 'Use standard registration form instead').' &raquo;</a></div>';
+	echo '<div class="evo_login_dialog_standard_link"><a href="'.get_htsrv_url( true ).'register.php?source='.rawurlencode( get_param( 'source' ) ).'&amp;redirect_to='.rawurlencode( get_param( 'redirect_to' ) ).'&amp;return_to='.rawurlencode( get_param( 'return_to' ) ).'">'.T_( 'Use basic registration form instead').' &raquo;</a></div>';
 	echo '<div class="evo_login_dialog_footer text-muted">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 }
 
 echo $params['register_page_after'];
-
-// Display javascript password strength indicator bar
-display_password_indicator( array( 'field-width' => $params['register_field_width'] ) );
-
-// Display javascript login validator
-display_login_validator();
 ?>

@@ -48,17 +48,10 @@ skin_container( NT_('Register'), array_merge( $params, array(
 
 if( $params['register_form_footer'] )
 { // Display register form footer
-	echo '<div class="notes standard_login_link"><a href="'.get_htsrv_url( true ).'register.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'&amp;return_to='.rawurlencode( $return_to ).'">'.T_( 'Use standard registration form instead').' &raquo;</a></div>';
+	echo '<div class="notes standard_login_link"><a href="'.get_htsrv_url( true ).'register.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'&amp;return_to='.rawurlencode( $return_to ).'">'.T_( 'Use basic registration form instead').' &raquo;</a></div>';
 
 	echo '<div class="form_footer_notes">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 }
 
 echo $params['register_page_after'];
-
-// Display javascript password strength indicator bar
-display_password_indicator( array( 'field-width' => $params['register_field_width'] ) );
-
-// Display javascript login validator
-display_login_validator();
-
 ?>

@@ -160,28 +160,28 @@ switch( $action )
 			else
 			{	// Set params for a request from widget quick registration:
 				$WidgetCache = & get_WidgetCache();
-				$user_register_Widget = & $WidgetCache->get_by_ID( $widget, false, false );
-				if( ! $user_register_Widget ||
-						$user_register_Widget->code != 'user_register' ||
-						$user_register_Widget->get( 'coll_ID' ) != $Blog->ID )
+				$user_register_quick_Widget = & $WidgetCache->get_by_ID( $widget, false, false );
+				if( ! $user_register_quick_Widget ||
+						$user_register_quick_Widget->code != 'user_register_quick' ||
+						$user_register_quick_Widget->get( 'coll_ID' ) != $Blog->ID )
 				{ // Wrong or hacked request!
 					debug_die( 'Quick registration is currently disabled on this system.' );
 					break;
 				}
 
 				// Initialize the widget settings
-				$user_register_Widget->init_display( array() );
+				$user_register_quick_Widget->init_display( array() );
 
 				// Get a source from widget setting
-				$source = $user_register_Widget->disp_params['source'];
-				$ask_firstname = $user_register_Widget->disp_params['ask_firstname'];
-				$ask_lastname = $user_register_Widget->disp_params['ask_lastname'];
-				$subscribe_posts = $user_register_Widget->disp_params['subscribe_post'];
-				$subscribe_comments = $user_register_Widget->disp_params['subscribe_comment'];
-				$subscribe_posts_mod = $user_register_Widget->disp_params['subscribe_post_mod'];
-				$widget_newsletters = $user_register_Widget->disp_params['newsletters'];
-				$user_tags = $user_register_Widget->disp_params['usertags'];
-				$widget_redirect_to = trim( $user_register_Widget->disp_params['redirect_to'] );
+				$source = $user_register_quick_Widget->disp_params['source'];
+				$ask_firstname = $user_register_quick_Widget->disp_params['ask_firstname'];
+				$ask_lastname = $user_register_quick_Widget->disp_params['ask_lastname'];
+				$subscribe_posts = $user_register_quick_Widget->disp_params['subscribe_post'];
+				$subscribe_comments = $user_register_quick_Widget->disp_params['subscribe_comment'];
+				$subscribe_posts_mod = $user_register_quick_Widget->disp_params['subscribe_post_mod'];
+				$widget_newsletters = $user_register_quick_Widget->disp_params['newsletters'];
+				$user_tags = $user_register_quick_Widget->disp_params['usertags'];
+				$widget_redirect_to = trim( $user_register_quick_Widget->disp_params['redirect_to'] );
 			}
 
 			// Check what fields should be required by current widget
