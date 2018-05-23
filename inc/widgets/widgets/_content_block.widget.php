@@ -83,12 +83,18 @@ class content_block_Widget extends ComponentWidget
 	 */
 	function get_desc_for_list()
 	{
+		$short_desc = $this->get_short_desc();
+
 		$r = '<span class="fa fa-'.$this->icon.'"></span>'
-			.' <strong>'.$this->get_name().'</strong>';
+			.' <strong>'.( empty( $short_desc ) ? $this->get_name() : $short_desc ).'</strong>';
 
 		if( $widget_Item = & $this->get_widget_Item() )
 		{	// Display a title of widget Item if it is defined:
-			$r .= ' ('.$widget_Item->get( 'title' ).')';
+			$r .= ' ('.$widget_Item->dget( 'title' ).')';
+		}
+		elseif( ! empty( $short_desc ) )
+		{	// Display a widget name:
+			$r .= ' ('.$this->get_name().')';
 		}
 
 		return $r;
