@@ -474,6 +474,25 @@ function & get_EmailAddressCache()
 
 
 /**
+ * Get the EmailLogCache
+ *
+ * @return EmailLogCache
+ */
+function & get_EmailLogCache()
+{
+	global $EmailLogCache;
+
+	if( ! isset( $EmailLogCache ) )
+	{ // Cache doesn't exist yet:
+		load_class( 'tools/model/_emaillog.class.php', 'EmailLog' );
+		$EmailLogCache = new DataObjectCache( 'EmailLog', false, 'T_email__log', 'emlog_', 'emlog_ID' );
+	}
+
+	return $EmailLogCache;
+}
+
+
+/**
  * Get the NewsletterCache
  *
  * @param string The text that gets used for the "None" option in the objects options list (Default: T_('Unknown')).
