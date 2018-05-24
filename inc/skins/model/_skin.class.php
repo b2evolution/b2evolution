@@ -1746,6 +1746,21 @@ var downloadInterval = setInterval( function()
 							'radio_oneline_end'      => "</label>\n",
 						);
 
+					case 'fields_table_form':
+						return array_merge( $this->get_template( 'Form' ), array(
+								'fieldset_begin' => '<div class="evo_fields_table $class$" id="fieldset_wrapper_$id$" $fieldset_attribs$>'."\n",
+								'fieldset_end'   => '</div>'."\n",
+								'fieldstart'     => '<div class="evo_fields_table__field" $ID$>'."\n",
+								'fieldend'       => "</div>\n\n",
+								'labelclass'     => 'evo_fields_table__label',
+								'labelstart'     => '',
+								'labelend'       => "\n",
+								'labelempty'     => '',
+								'inputstart'     => '<div class="evo_fields_table__input">',
+								'inputend'       => "</div>\n",
+							) );
+						break;
+
 					case 'user_navigation':
 						// The Prev/Next links of users (Used on disp=user to navigate between users):
 						return array(

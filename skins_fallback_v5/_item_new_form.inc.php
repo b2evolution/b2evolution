@@ -41,12 +41,8 @@ $Form->hidden( 'mname', 'collections' );
 $Form->add_crumb( 'collections_create_post' );
 $Form->hidden( 'cat', get_param( 'cat' ) );
 
-$Form->switch_layout( 'none' );
-echo '<table width="100%" class="compose_layout">';
-$Form->labelstart = '<tr><th width="1%" class="label">';
-$Form->labelend = '</th>';
-$Form->inputstart = '<td>';
-$Form->inputend = '</td></tr>';
+$Form->switch_layout( 'fields_table' );
+$Form->begin_fieldset();
 
 $Form->text_input( $dummy_fields['name'], ( isset( $new_Item->temp_user_name ) ? $new_Item->temp_user_name : '' ), 40, T_('Name'), '', array( 'maxlength' => 100, 'required' => true, 'style' => 'width:auto' ) );
 
@@ -59,7 +55,7 @@ if( $use_title != 'never' )
 	$Form->text_input( 'post_title', $new_Item->get( 'title' ), 20, T_('Title'), '', array( 'maxlength' => 255, 'style' => 'width: 100%;', 'required' => ( $use_title == 'required' ) ) );
 }
 
-echo '</table>';
+$Form->end_fieldset();
 $Form->switch_layout( NULL );
 
 if( $new_Item->get_type_setting( 'use_text' ) != 'never' )

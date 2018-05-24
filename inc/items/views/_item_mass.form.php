@@ -134,7 +134,7 @@ $Form->begin_form( '', '', $params );
 	echo '<br />';
 
 	// ------------------------------- SETTINGS ---------------------------------
-	$Form->checkbox( 'paragraphs_linebreak', false, '', T_( 'Create paragraphs at each line break' ), 'compose_layout' );
+	$Form->checkbox( 'paragraphs_linebreak', false, '', T_( 'Create paragraphs at each line break' ) );
 
 	$Form->switch_layout( NULL );
 

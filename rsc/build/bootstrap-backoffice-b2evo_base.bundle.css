@@ -2255,23 +2255,6 @@ a.btn.action_icon.hoverlink {
   vertical-align: top;
   margin-left: 7px;
 }
-.form-horizontal .compose_layout td {
-  padding: 0 2px 15px 0;
-  vertical-align: middle;
-}
-.form-horizontal .compose_layout th.label,
-.form-horizontal .compose_layout td.label {
-  display: table-cell;
-  color: #333;
-  font-size: 100%;
-}
-.form-horizontal .compose_layout th.label label,
-.form-horizontal .compose_layout td.label label {
-  margin: 0;
-}
-.form-horizontal .compose_layout td.input div.tile label.control-label {
-  display: none;
-}
 .form-horizontal #itemform_custom_fields .panel-body .form-group:last-child {
   margin-bottom: 0;
 }
@@ -2341,6 +2324,61 @@ a.btn.action_icon.hoverlink {
 }
 .form-inline .form-group.large {
   width: 100%;
+}
+.evo_fields_table {
+  display: table;
+  width: 100%;
+}
+.evo_fields_table.evo_fields_table__single_row .evo_fields_table__field {
+  display: table-cell;
+}
+.evo_fields_table.evo_fields_table__single_row .evo_fields_table__field + .evo_fields_table__field .evo_fields_table__label {
+  padding-left: 10px;
+}
+.evo_fields_table__field {
+  display: table-row;
+  width: 100%;
+}
+.evo_fields_table__field .evo_fields_table__label {
+  display: table-cell;
+  color: #333;
+  font-weight: bold;
+  white-space: nowrap;
+  padding: 5px 10px 15px 0;
+  vertical-align: top;
+  text-align: right;
+}
+.evo_fields_table__field .evo_fields_table__input {
+  display: table-cell;
+  width: 100%;
+  padding-bottom: 15px;
+}
+.evo_fields_table__field .evo_fields_table__input .help-inline {
+  color: #999;
+  font-size: 84%;
+}
+.evo_fields_table__field .evo_fields_table__input input {
+  display: inline-block;
+}
+@media (max-width: 767px) {
+  .evo_fields_table.evo_fields_table__single_row .evo_fields_table__field {
+    display: table;
+  }
+  .evo_fields_table.evo_fields_table__single_row .evo_fields_table__field + .evo_fields_table__field .evo_fields_table__label {
+    padding-left: 0;
+  }
+}
+@media (max-width: 413px) {
+  .evo_fields_table__field .evo_fields_table__input {
+    display: block;
+  }
+  .evo_fields_table__field .evo_fields_table__label {
+    display: block;
+    padding: 0 0 5px 0;
+    margin: 0;
+    white-space: normal;
+    text-align: left;
+  }
 }
 .evo_msgform_recipient label.control-label,
 .evo_msgform_recipient div.controls {
