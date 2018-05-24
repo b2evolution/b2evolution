@@ -77,8 +77,9 @@ class Widget
 	 * @param integer 1-5: weight of the word. the word will be displayed only if its weight is >= than the user setting threshold
 	 * @param array Additional attributes to the A tag. See {@link action_icon()}.
 	 * @param string Group name is used to group several buttons in one as dropdown button for bootstrap skins
+	 * @param array Group options: 'parent', 'class', 'item_class', 'btn_class'
 	 */
-	function global_icon( $title, $icon, $url, $word = '', $icon_weight = 3, $word_weight = 2, $link_attribs = array(), $group = NULL )
+	function global_icon( $title, $icon, $url, $word = '', $icon_weight = 3, $word_weight = 2, $link_attribs = array(), $group = NULL, $group_options = NULL )
 	{
 		$link_attribs = array_merge( array(
 				'class'  => 'action_icon',
@@ -94,7 +95,8 @@ class Widget
 			'icon_weight'  => $icon_weight,
 			'word_weight'  => $word_weight,
 			'link_attribs' => $link_attribs,
-			'group'        => $group );
+			'group'        => $group,
+			'group_options'=> $group_options );
 	}
 
 
@@ -258,19 +260,26 @@ class Widget
 		}
 
 		$r = '';
-		foreach( $icons as $icon )
+		foreach( $icons as $group => $icon )
 		{
 			if( is_array( $icon ) && count( $icon ) )
 			{ // Grouped icons
 				$first_icon = $icon[0];
-				$r .= '<div class="btn-group dropdown">';
-				$r .= '<a href="'.$first_icon['url'].'" class="'.$first_icon['link_attribs']['class'].'" title="'.$first_icon['title'].'">'.get_icon( $first_icon['icon'] ).' '.$first_icon['word'].'</a>';
-				$r .= '<button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'
+				$r .= '<div class="btn-group dropdown'.( empty( $first_icon['group_options']['class'] ) ? '' : ' '.$first_icon['group_options']['class'] ).'">';
+				$r .= '<a href="'.$first_icon['url'].'" class="'.$first_icon['link_attribs']['class'].'" title="'.format_to_output( $first_icon['title'], 'htmlattr' ).'">'.get_icon( $first_icon['icon'] ).' '.$first_icon['word'].'</a>';
+				$r .= '<button type="button" class="btn btn-sm btn-default dropdown-toggle'.( empty( $first_icon['group_options']['btn_class'] ) ? '' : ' '.$first_icon['group_options']['btn_class'] ).'" data-toggle="dropdown" aria-expanded="false">'
 							.' <span class="caret"></span></button>';
 				$r .= '<ul class="dropdown-menu dropdown-menu-right" role="menu">';
 				foreach( $icon as $grouped_icon )
 				{
-					$r .= '<li role="presentation"><a href="'.$grouped_icon['url'].'" role="menuitem" tabindex="-1" title="'.$grouped_icon['title'].'">'.get_icon( $grouped_icon['icon'] ).' '.$grouped_icon['word'].'</a></li>';
+					$r .= '<li role="presentation"><a href="'.$grouped_icon['url'].'" role="menuitem" tabindex="-1" title="'.format_to_output( $grouped_icon['title'], 'htmlattr' ).'">'.get_icon( $grouped_icon['icon'] ).' '.$grouped_icon['word'].'</a></li>';
+				}
+				foreach( $this->global_icons as $icon_params )
+				{
+					if( isset( $icon_params['group_options']['parent'] ) && $icon_params['group_options']['parent'] == $group )
+					{	// Append also items from others buttons if they a linked with this button by group:
+						$r .= '<li role="presentation"'.( empty( $icon_params['group_options']['item_class'] ) ? '' : ' class="'.$icon_params['group_options']['item_class'].'"' ).'><a href="'.$icon_params['url'].'" role="menuitem" tabindex="-1" title="'.format_to_output( $icon_params['title'], 'htmlattr' ).'">'.get_icon( $icon_params['icon'] ).' '.$icon_params['word'].'</a></li>';
+					}
 				}
 				$r .= '</ul>';
 				$r .= '</div>';

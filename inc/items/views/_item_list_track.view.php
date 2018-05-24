@@ -125,14 +125,15 @@ $ItemList->cols[] = array(
 		'th' => /* TRANS: abbrev for info */ T_('i'),
 		'order' => 'datemodified',
 		'default_dir' => 'D',
-		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap',
+		'th_class' => 'shrinkwrap hidden-xs',
+		'td_class' => 'shrinkwrap hidden-xs',
 		'td' => '@history_info_icon()@',
 	);
 
 $ItemList->cols[] = array(
 		'th' => T_('Actions'),
-		'td_class' => 'shrinkwrap',
+		'th_class' => 'shrinkwrap hidden-xs',
+		'td_class' => 'shrinkwrap hidden-xs',
 		'td' => '%item_edit_actions( {Obj} )%',
 	);
 

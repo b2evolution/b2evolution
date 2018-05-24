@@ -3038,3 +3038,8 @@ div.message_toolbars {
   max-width: 400px;
   margin: 10px auto;
 }
+@media (min-width: 768px) {
+  .panel_heading_action_icons .btn-group.dropdown.single-group-xs a.btn.btn-sm {
+    border-radius: 3px;
+  }
+}
