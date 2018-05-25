@@ -779,6 +779,7 @@ switch( $action )
 				require_js( 'jquery/jsplumb/jsplumb.min.js', 'rsc_url' );
 				require_css( 'jquery/jsplumb/jsplumbtoolkit-defaults.css', 'rsc_url' );
 				require_css( 'jquery/jsplumb/jsplumbtoolkit-b2evo.css', 'rsc_url' );
+				require_js( 'jquery/jquery.panzoom.min.js', 'rsc_url' );
 				break;
 
 			default:

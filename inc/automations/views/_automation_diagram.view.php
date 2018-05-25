@@ -48,6 +48,13 @@ if( count( $steps ) > 0 )
 }
 
 // Print out HTML boxes for steps and Initialise steps data to build connectors between steps by JS code below:
+echo '<div>';
+echo '<div class="evo_panzoom__buttons">
+	<button class="btn btn-default btn-sm evo_panzoom_btn_in"><span class="fa fa-plus"></span></button><br>
+	<button class="btn btn-default btn-sm evo_panzoom_btn_out"><span class="fa fa-minus"></span></button><br>
+	<button class="btn btn-default btn-sm evo_panzoom_btn_reset"><span class="fa fa-repeat"></span></button>
+</div>';
+echo '<div id="evo_automation__diagram_panzoom">';
 echo '<div id="evo_automation__diagram_canvas" class="jtk-surface jtk-surface-nopan clear">';
 foreach( $steps as $step )
 {
@@ -58,6 +65,8 @@ foreach( $steps as $step )
 		.'</div>'."\n";
 	
 }
+echo '</div>';
+echo '</div>';
 echo '</div>';
 
 // Initialize JavaScript to build and open window:
@@ -297,5 +306,19 @@ jsPlumb.ready( function ()
 		}
 	}
 	?>
+
+	// Initialise pan & zoom for diagram:
+	$panzoom = jQuery( '#evo_automation__diagram_panzoom' ).panzoom(
+	{
+		$zoomIn:    jQuery( '.evo_panzoom_btn_in' ),
+		$zoomOut:   jQuery( '.evo_panzoom_btn_out' ),
+		$reset:     jQuery( '.evo_panzoom_btn_reset' ),
+		minScale:   0.1,
+		maxScale:   2,
+		increment:  0.1,
+		cursor:     '',
+		onStart:    function() { jQuery( '#evo_automation__diagram_canvas' ).css( 'cursor', 'move' ) },
+		onEnd:      function() { jQuery( '#evo_automation__diagram_canvas' ).css( 'cursor', '' ) },
+	} );
 } );
 </script>
