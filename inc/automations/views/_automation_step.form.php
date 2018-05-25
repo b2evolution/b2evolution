@@ -577,7 +577,7 @@ jQuery( document ).on( 'click', '#btn_abort_edit, #step_confirmation_modal .clos
 				<h4 class="modal-title"><?php echo T_('Confirmation'); ?></h4>
 			</div>
 			<div class="modal-body">
-				<p><?php echo T_('You must pause the automation before modifying it.'); ?></p>
+				<p><?php echo T_('You must pause the automation before creating it.'); ?></p>
 			</div>
 			<div class="modal-footer">
 				<button id="btn_pause_edit" type="button" class="btn btn-danger"><?php echo T_('Pause & edit'); ?></button>
