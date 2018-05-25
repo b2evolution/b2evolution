@@ -29,7 +29,7 @@ $SQL->WHERE( 'aust_autm_ID = '.$edited_Automation->ID );
 $count_SQL = new SQL( 'Get a count of users queued for automation #'.$edited_Automation->ID );
 $count_SQL->SELECT( 'COUNT( aust_user_ID )' );
 $count_SQL->FROM( 'T_automation__user_state' );
-$SQL->WHERE( 'aust_autm_ID = '.$edited_Automation->ID );
+$count_SQL->WHERE( 'aust_autm_ID = '.$edited_Automation->ID );
 
 // Filter by step:
 if( strtolower( $step ) === 'finished' )
@@ -50,6 +50,8 @@ elseif( $step !== '' )
 }
 
 $Results = new Results( $SQL->get(), 'aust_', '-A', NULL, $count_SQL->get() );
+
+$Results->global_icon( T_('Add users...'), 'new', $admin_url.'?ctrl=users', T_('Add users...'), 3, 4 );
 
 $Results->title = T_('Users queued').get_manual_link( 'automation-users-queued' );
 
@@ -87,9 +89,9 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th'       => T_('Next execution time'),
 		'order'    => 'aust_next_exec_ts',
-		'td'       => '%mysql2localedatetime( #aust_next_exec_ts# )%',
+		'td'       => '%mysql2localedatetime_spans( #aust_next_exec_ts# )%',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'nowrap',
+		'td_class' => 'timestamp',
 	);
 
 $Results->cols[] = array(

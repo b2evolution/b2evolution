@@ -506,6 +506,26 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	}
 
 
+	/* Help */
+	if( array_key_exists( 'help', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['help']['wico_ID'];
+		add_basic_widget( $wico_id, 'content_block', 'core', 10, array(
+				'item_slug' => 'help-content',
+				'title'     => T_('Personal Data & Privacy'),
+			) );
+	}
+
+
+	/* Register */
+	if( array_key_exists( 'register', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['register']['wico_ID'];
+		add_basic_widget( $wico_id, 'user_register_standard', 'core', 10 );
+		add_basic_widget( $wico_id, 'content_block', 'core', 20, array( 'item_slug' => 'register-content' ) );
+	}
+
+
 	/* Mobile Footer */
 	if( array_key_exists( 'mobile_footer', $blog_containers ) )
 	{

@@ -77,8 +77,9 @@ class Widget
 	 * @param integer 1-5: weight of the word. the word will be displayed only if its weight is >= than the user setting threshold
 	 * @param array Additional attributes to the A tag. See {@link action_icon()}.
 	 * @param string Group name is used to group several buttons in one as dropdown button for bootstrap skins
+	 * @param array Group options: 'parent', 'class', 'item_class', 'btn_class'
 	 */
-	function global_icon( $title, $icon, $url, $word = '', $icon_weight = 3, $word_weight = 2, $link_attribs = array(), $group = NULL )
+	function global_icon( $title, $icon, $url, $word = '', $icon_weight = 3, $word_weight = 2, $link_attribs = array(), $group = NULL, $group_options = NULL )
 	{
 		$link_attribs = array_merge( array(
 				'class'  => 'action_icon',
@@ -94,7 +95,8 @@ class Widget
 			'icon_weight'  => $icon_weight,
 			'word_weight'  => $word_weight,
 			'link_attribs' => $link_attribs,
-			'group'        => $group );
+			'group'        => $group,
+			'group_options'=> $group_options );
 	}
 
 
@@ -266,19 +268,26 @@ class Widget
 		}
 
 		$r = '';
-		foreach( $icons as $icon )
+		foreach( $icons as $group => $icon )
 		{
 			if( is_array( $icon ) && count( $icon ) )
 			{ // Grouped icons
 				$first_icon = $icon[0];
-				$r .= '<div class="btn-group dropdown">';
-				$r .= '<a href="'.$first_icon['url'].'" class="'.$first_icon['link_attribs']['class'].'" title="'.$first_icon['title'].'">'.get_icon( $first_icon['icon'] ).' '.$first_icon['word'].'</a>';
-				$r .= '<button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'
+				$r .= '<div class="btn-group dropdown'.( empty( $first_icon['group_options']['class'] ) ? '' : ' '.$first_icon['group_options']['class'] ).'">';
+				$r .= '<a href="'.$first_icon['url'].'" class="'.$first_icon['link_attribs']['class'].'" title="'.format_to_output( $first_icon['title'], 'htmlattr' ).'">'.get_icon( $first_icon['icon'] ).' '.$first_icon['word'].'</a>';
+				$r .= '<button type="button" class="btn btn-sm btn-default dropdown-toggle'.( empty( $first_icon['group_options']['btn_class'] ) ? '' : ' '.$first_icon['group_options']['btn_class'] ).'" data-toggle="dropdown" aria-expanded="false">'
 							.' <span class="caret"></span></button>';
 				$r .= '<ul class="dropdown-menu dropdown-menu-right" role="menu">';
 				foreach( $icon as $grouped_icon )
 				{
-					$r .= '<li role="presentation"><a href="'.$grouped_icon['url'].'" role="menuitem" tabindex="-1" title="'.$grouped_icon['title'].'">'.get_icon( $grouped_icon['icon'] ).' '.$grouped_icon['word'].'</a></li>';
+					$r .= '<li role="presentation"><a href="'.$grouped_icon['url'].'" role="menuitem" tabindex="-1" title="'.format_to_output( $grouped_icon['title'], 'htmlattr' ).'">'.get_icon( $grouped_icon['icon'] ).' '.$grouped_icon['word'].'</a></li>';
+				}
+				foreach( $this->global_icons as $icon_params )
+				{
+					if( isset( $icon_params['group_options']['parent'] ) && $icon_params['group_options']['parent'] == $group )
+					{	// Append also items from others buttons if they a linked with this button by group:
+						$r .= '<li role="presentation"'.( empty( $icon_params['group_options']['item_class'] ) ? '' : ' class="'.$icon_params['group_options']['item_class'].'"' ).'><a href="'.$icon_params['url'].'" role="menuitem" tabindex="-1" title="'.format_to_output( $icon_params['title'], 'htmlattr' ).'">'.get_icon( $icon_params['icon'] ).' '.$icon_params['word'].'</a></li>';
+					}
 				}
 				$r .= '</ul>';
 				$r .= '</div>';
@@ -589,6 +598,11 @@ class Table extends Widget
 		$js_filters = array();
 		foreach( $filter_fields as $field_ID => $params )
 		{
+			if( $field_ID == '#default' )
+			{	// Skip a reserved field for default filters:
+				continue;
+			}
+
 			$js_filter = array( 'id:\''.$field_ID.'\'' );
 
 			if( isset( $params['type'] ) )
@@ -604,14 +618,18 @@ class Table extends Widget
 							'dayNamesMin' => jquery_datepicker_day_names(),
 							'firstDay'    => locale_startofweek(),
 						);
-						$params['validation'] = array( 'format' => strtoupper( jquery_datepicker_datefmt() ) );
+						if( ! isset( $params['validation'] ) )
+						{
+							$params['validation'] = array();
+						}
+						$params['validation']['format'] = strtoupper( jquery_datepicker_datefmt() );
 						break;
 				}
 			}
 
 			if( ! isset( $params['operators'] ) )
 			{	// Use default operator if it is not defined:
-				$params['operators'] = '=';
+				$params['operators'] = '=,!=';
 			}
 
 			foreach( $params as $param_name => $param_value )
@@ -666,6 +684,10 @@ class Table extends Widget
 							$param_values = array();
 							foreach( $param_value as $sub_param_name => $sub_param_value )
 							{
+								if( $param_name == 'values' )
+								{	// All value indexes must be strings:
+									$sub_param_name = '\''.format_to_js( $sub_param_name ).'\'';
+								}
 								if( $sub_param_value == 'true' || $sub_param_value == 'false' ||
 								    strpos( $sub_param_value, '[' ) === 0 )
 								{	// This is a not string value:
@@ -689,6 +711,27 @@ class Table extends Widget
 			}
 			$js_filters[] = '{'.implode( ',', $js_filter ).'}';
 		}
+
+		// Get filter values from request:
+		$filter_query = param_condition( 'filter_query' );
+		if( empty( $filter_query ) )
+		{	// Set filter values if no request yet:
+			$filter_query = array(
+				'rules'     => array(),
+				'valid'     => true,
+			);
+			if( isset( $filter_fields['#default'] ) )
+			{	// Set filters from default config:
+				foreach( $filter_fields['#default'] as $def_filter_id => $def_filter_value )
+				{
+					$filter_query['rules'][] = array(
+						'id'    => $def_filter_id,
+						'value' => $def_filter_value,
+					);
+				}
+			}
+			$filter_query = json_encode( $filter_query );
+		}
 ?>
 <script type="text/javascript">
 jQuery( document ).ready( function()
@@ -706,9 +749,11 @@ jQuery( document ).ready( function()
 			error: 'fa fa-warning',
 		},
 		operators: [
-			{ type: 'blank', optgroup: 'custom', nb_inputs: 1, multiple: false, apply_to: ['string'] }
+			'equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between', 'contains', 'not_contains',
+			{ type: 'blank', nb_inputs: 1, multiple: false, apply_to: ['string'] }
 		],
 		lang: {
+			add_rule: '<?php echo TS_('Add filter'); ?>',
 			operators: {
 				equal: '=',
 				not_equal: '&#8800;',
@@ -724,14 +769,14 @@ jQuery( document ).ready( function()
 			}
 		},
 		filters: [<?php echo implode( ',', $js_filters ); ?>],
-		rules: <?php echo param_format_condition( param_condition( 'filter_query' ), 'js' ); ?>,
+		rules: <?php echo param_format_condition( $filter_query, 'js' ); ?>,
 	} );
 
 	// Prepare form before submitting:
 	jQuery( '#evo_results_filters' ).closest( 'form' ).on( 'submit', function()
 	{
 		// Convert filter fields to JSON format:
-		var result = jQuery( '#evo_results_filters' ).queryBuilder( 'getRules', { allow_invalid: true } );
+		var result = jQuery( '#evo_results_filters' ).queryBuilder( 'getRules' );
 		if( result === null )
 		{	// Stop submitting on wrong SQL:
 			return false;
@@ -741,6 +786,27 @@ jQuery( document ).ready( function()
 			jQuery( 'input[name=filter_query]' ).val( JSON.stringify( result ) );
 		}
 	} );
+
+	// Fix space of blank hidden operator:
+	evo_fix_query_builder_blank_operator();
+	jQuery( '#evo_results_filters' ).on( 'afterUpdateRuleFilter.queryBuilder.filter', function()
+	{
+		evo_fix_query_builder_blank_operator();
+	} );
+	function evo_fix_query_builder_blank_operator()
+	{
+		jQuery( '.rule-container .rule-operator-container' ).each( function()
+		{
+			if( jQuery( this ).find( 'option' ).length == jQuery( this ).find( 'option[value=blank]' ).length )
+			{	// Hide container if rule uses only single blank operator:
+				jQuery( this ).hide();
+			}
+			else
+			{	// Show container with other operators:
+				jQuery( this ).show();
+			}
+		} );
+	}
 } );
 </script>
 <?php

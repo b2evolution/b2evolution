@@ -218,14 +218,10 @@ $Form->begin_form( 'inskin', '', $form_params );
 	$use_title = $edited_Item->get_type_setting( 'use_title' );
 	if( $use_title != 'never' )
 	{
-		$Form->switch_layout( 'none' );
-		echo '<table width="100%" class="compose_layout"><tr>';
-		$Form->labelstart = '<th width="1%" class="label">';
-		$Form->labelend = '</th>';
-		$Form->inputstart = '<td>';
-		$Form->inputend = '</td>';
+		$Form->switch_layout( 'fields_table' );
+		$Form->begin_fieldset();
 		$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array( 'maxlength' => 255, 'style' => 'width: 100%;', 'required' => ( $use_title == 'required' ) ) );
-		echo '</tr></table>';
+		$Form->end_fieldset();
 		$Form->switch_layout( NULL );
 	}
 

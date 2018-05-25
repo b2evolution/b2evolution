@@ -934,6 +934,21 @@ switch( $action )
 
 		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
 
+	case 'get_automation_status':
+		// Get automation status:
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'view', true );
+
+		param( 'autm_ID', 'integer', true );
+
+		$AutomationCache = & get_AutomationCache();
+		$Automation = & $AutomationCache->get_by_ID( $autm_ID );
+
+		echo $Automation->get( 'status' );
+
+		exit(0); // Exit here in order to don't display the AJAX debug info.
+
 	default:
 		$incorrect_action = true;
 		break;

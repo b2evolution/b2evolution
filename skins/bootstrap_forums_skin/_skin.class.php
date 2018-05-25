@@ -131,6 +131,8 @@ class bootstrap_forums_Skin extends Skin
 				'404_page'                   => array( NT_('404 Page'), 130 ),
 				'login_required'             => array( NT_('Login Required'), 140 ),
 				'access_denied'              => array( NT_('Access Denied'), 150 ),
+				'help'                       => array( NT_('Help'), 160 ),
+				'register'                   => array( NT_('Register'), 170 ),
 			);
 	}
 

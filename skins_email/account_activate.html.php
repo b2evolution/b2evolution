@@ -71,7 +71,7 @@ if( $Settings->get( 'validation_process' ) == 'easy' )
 		.'&userID=$user_ID$'
 		.'&reminderKey='.$params['reminder_key'];
 
-	echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n".get_link_tag( $activation_url, $activation_text, 'div.buttons a+a.button_green' )."</div>\n";
+	echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n".get_link_tag( $activation_url, $activation_text, 'div.buttons a+a.btn-primary' )."</div>\n";
 
 	if( !empty( $params['already_received_messages'] ) )
 	{ // add already received message list to email body
@@ -86,7 +86,7 @@ else
 		.'&reqID='.$params['request_id']
 		.'&sessID='.$Session->ID; // used to detect cookie problems
 
-	echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n".get_link_tag( $activation_url, $activation_text, 'div.buttons a+a.button_green' )."\n</div>\n";
+	echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n".get_link_tag( $activation_url, $activation_text, 'div.buttons a+a.btn-primary' )."\n</div>\n";
 
 // TODO: check why this appears only in secure mode?
 	echo '<p'.emailskin_style( '.p' ).'>'.T_('If this does not work, please copy/paste that link into the address bar of your browser.')."</p>\n";

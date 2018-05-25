@@ -103,7 +103,7 @@ $Results->cols[] = array(
 		'order' => 'emret_timestamp',
 		'default_dir' => 'D',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'timestamp compact_data',
+		'td_class' => 'timestamp',
 		'td' => '%mysql2localedatetime_spans( #emret_timestamp# )%',
 	);
 

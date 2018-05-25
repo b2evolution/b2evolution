@@ -110,7 +110,7 @@ switch( $action )
 			case 'general':
 			case 'urls':
 			case 'comments':
-				if( $edited_Blog->load_from_Request( array() ) )
+				if( $edited_Blog->load_from_Request( array( $tab ) ) )
 				{ // Commit update to the DB:
 					global $Settings;
 

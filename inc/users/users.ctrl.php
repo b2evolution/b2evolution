@@ -432,7 +432,7 @@ if( !$Messages->has_errors() )
 			$Messages->add( sprintf( T_('%d users have been added or requeued for automation "%s"'), $added_users_num, $Automation->get( 'name' ) ), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=users', 303 ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=users&autm_ID='.$Automation->ID, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 			break;
 

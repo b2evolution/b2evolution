@@ -38,7 +38,7 @@ $Results->cols[] = array(
 	'order' => 'ecmp_sent_ts',
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
-	'td_class' => 'timestamp compact_data',
+	'td_class' => 'timestamp',
 	'td' => '%mysql2localedatetime_spans( #ecmp_sent_ts# )%',
 );
 
@@ -47,7 +47,7 @@ $Results->cols[] = array(
 	'order' => 'ecmp_auto_sent_ts',
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
-	'td_class' => 'timestamp compact_data',
+	'td_class' => 'timestamp',
 	'td' => '%mysql2localedatetime_spans( #ecmp_auto_sent_ts# )%',
 );
 

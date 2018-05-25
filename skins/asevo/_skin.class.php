@@ -91,6 +91,8 @@ class asevo_Skin extends Skin
 				'sidebar'                => array( NT_('Sidebar'), 80 ),
 				'login_required'         => array( NT_('Login Required'), 90 ),
 				'access_denied'          => array( NT_('Access Denied'), 100 ),
+				'help'                   => array( NT_('Help'), 110 ),
+				'register'               => array( NT_('Register'), 120 ),
 			);
 	}
 

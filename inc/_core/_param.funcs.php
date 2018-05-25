@@ -2918,10 +2918,19 @@ function param_format_condition( $condition, $action )
 		{	// Wrong condition object:
 			return $action == 'db' ? '' : 'null';
 		}
+
+		if( ! isset( $condition->condition ) )
+		{	// Set default condition:
+			$condition->condition = 'AND';
+		}
 	}
 
 	if( empty( $condition->rules ) )
 	{	// No rules, Skip it:
+		if( $is_encoded )
+		{	// If the source param has been passed here as encoded we should return it in the same format:
+			$condition = json_encode( $condition );
+		}
 		return $condition;
 	}
 
@@ -2933,6 +2942,10 @@ function param_format_condition( $condition, $action )
 		}
 		else
 		{	// This is a single field, Format condition only for this field:
+			if( ! isset( $rule->type ) )
+			{	// Set default type:
+				$rule->type = 'string';
+			}
 			if( is_array( $rule->value ) )
 			{	// Field with multiple values like 'between'(field BETWEEN value_1 AND value_2):
 				foreach( $rule->value as $v => $rule_value )
@@ -2978,7 +2991,8 @@ function param_format_condition_rule( $rule_value, $rule_type, $action )
 
 				case 'js':
 					// To JavaScript format:
-					return mysql2date( locale_input_datefmt(), $rule_value );
+					$formatted_date = mysql2date( locale_input_datefmt(), $rule_value );
+					return $formatted_date ? $formatted_date : $rule_value;
 			}
 			break;
 	}

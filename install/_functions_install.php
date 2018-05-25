@@ -277,6 +277,9 @@ function install_newdb()
 	evo_flush();
 	create_default_email_campaigns();
 
+	evo_flush();
+	create_default_automations();
+
 	// Update the progress bar status
 	update_install_progress_bar();
 

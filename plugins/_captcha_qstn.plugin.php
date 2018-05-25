@@ -449,7 +449,7 @@ class captcha_qstn_plugin extends Plugin
 			$Form = & $params['Form'];
 			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
 			{
-				$Form->begin_fieldset();
+				$Form->begin_fieldset( '', array( 'id' => $this->code ) );
 			}
 		}
 

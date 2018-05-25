@@ -98,7 +98,7 @@ if( $User = & $UserCache->get_by_ID( $params['user_ID'], false, false ) )
 
 // Buttons:
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
-echo get_link_tag( $admin_url.'?ctrl=user&user_tab=profile&user_ID='.$params['user_ID'], T_('Edit User'), 'div.buttons a+a.button_yellow' )."\n";
+echo get_link_tag( $admin_url.'?ctrl=user&user_tab=profile&user_ID='.$params['user_ID'], T_('Edit User'), 'div.buttons a+a.btn-primary' )."\n";
 echo "</div>\n";
 
 // Footer vars:

@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the user_register_Widget class.
+ * This file implements the user_register_quick_Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -23,7 +23,7 @@ load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectLis
  *
  * @package evocore
  */
-class user_register_Widget extends ComponentWidget
+class user_register_quick_Widget extends ComponentWidget
 {
 	var $icon = 'registered';
 
@@ -33,7 +33,7 @@ class user_register_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'user_register' );
+		parent::__construct( $db_row, 'core', 'user_register_quick' );
 	}
 
 

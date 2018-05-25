@@ -68,14 +68,14 @@ function hits_results( & $Results, $params = array() )
 	$Results->cols[] = array(
 			'th' => T_('Session'),
 			'order' => 'hit_sess_ID',
-			'td_class' => 'right compact_data',
+			'td_class' => 'right nowrap',
 			'td' => $session_link,
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('User'),
 			'order' => 'user_login',
-			'td_class' => 'shrinkwrap compact_data',
+			'td_class' => 'shrinkwrap',
 			'td' => '%stat_session_login( #user_login# )%',
 		);
 
@@ -83,14 +83,14 @@ function hits_results( & $Results, $params = array() )
 			'th' => T_('Date Time'),
 			'order' => 'hit_ID',
 			'default_dir' => 'D',
-			'td_class' => 'timestamp compact_data',
+			'td_class' => 'timestamp',
 			'td' => '%mysql2localedatetime_spans( #hit_datetime# )%',
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Agent'),
 			'order' => 'hit_agent_type',
-			'td_class' => 'shrinkwrap compact_data',
+			'td_class' => 'shrinkwrap',
 			'td' => '$hit_agent_type$',
 			'extra' => array ( 'style' => 'background-color: %hit_agent_type_color( "#hit_agent_type#" )%;',
 			'format_to_output'	=> false)
@@ -99,7 +99,7 @@ function hits_results( & $Results, $params = array() )
 	$Results->cols[] = array(
 			'th' => T_('Device'),
 			'order' => 'sess_device',
-			'td_class' => 'shrinkwrap compact_data',
+			'td_class' => 'shrinkwrap',
 			'td' => '$sess_device$',
 			'extra' => array ( 'style' => 'background-color: %hit_device_color( "#sess_device#" )%;', 'format_to_output' => false )
 		);
@@ -110,7 +110,7 @@ function hits_results( & $Results, $params = array() )
 				'th_group' => T_('Referer'),
 				'th' => T_('Type'),
 				'order' => 'hit_referer_type',
-				'td_class' => 'shrinkwrap compact_data',
+				'td_class' => 'shrinkwrap',
 				'td' => '$hit_referer_type$',
 				'extra' => array ( 'style' => 'background-color: %hit_referer_type_color( "#hit_referer_type#" )%;',
 					'format_to_output' => false )
@@ -120,7 +120,7 @@ function hits_results( & $Results, $params = array() )
 				'th_group' => T_('Referer'),
 				'th' => T_('Domain'),
 				'order' => 'dom_name',
-				'td_class' => 'nowrap compact_data',
+				'td_class' => 'nowrap',
 				'td' => '<a href="$hit_referer$">$dom_name$</a>',
 			);
 	}
@@ -130,7 +130,7 @@ function hits_results( & $Results, $params = array() )
 			'th' => T_('Search keywords'),
 			'order' => 'hit_keyphrase',
 			'td' => '%stats_search_keywords( #hit_keyphrase#, 45 )%',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 
 	// Serp Rank:
@@ -138,7 +138,7 @@ function hits_results( & $Results, $params = array() )
 			'th' => T_('SR'),
 			'th_title' => T_('Serp rank'),
 			'order' => 'hit_serprank',
-			'td_class' => 'center compact_data',
+			'td_class' => 'center nowrap',
 			'td' => '$hit_serprank$',
 		);
 
@@ -147,19 +147,19 @@ function hits_results( & $Results, $params = array() )
 			'order' => 'goal_name',
 			'default_dir' => 'D',
 			'td' => '$goal_name$',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Collection'),
 			'order' => 'hit_coll_ID',
 			'td' => '$blog_shortname$',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 	$Results->cols[] = array(
 			'th' => T_('Hit type'),
 			'order' => 'hit_type',
-			'td_class' => 'shrinkwrap compact_data',
+			'td_class' => 'shrinkwrap',
 			'td' => '$hit_type$',
 			'extra' => array (	'style'				=> 'background-color: %hit_type_color( "#hit_type#" )%',
 								'format_to_output'	=> false)
@@ -169,19 +169,19 @@ function hits_results( & $Results, $params = array() )
 			'th' => T_('Requested URI'),
 			'order' => 'hit_uri',
 			'td' => '%stats_format_req_URI( #hit_coll_ID#, #hit_uri#, 40, #hit_disp#, #hit_ctrl#, #hit_action# )%',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 	$Results->cols[] = array(
 			'th' => T_('HTTP resp'),
 			'order' => 'hit_response_code',
 			'td' => '$hit_response_code$',
-			'td_class' => '%hit_response_code_class( #hit_response_code# )% shrinkwrap compact_data'
+			'td_class' => '%hit_response_code_class( #hit_response_code# )% shrinkwrap'
 		);
 	$Results->cols[] = array(
 			'th' => T_('HTTP meth'),
 			'order' => 'hit_method',
 			'td' => '$hit_method$',
-			'td_class' => 'shrinkwrap compact_data',
+			'td_class' => 'shrinkwrap',
 			'extra' => array(
 					'style' => '%hit_method_style( "#hit_method#" )%',
 					'format_to_output'=> false
@@ -192,14 +192,14 @@ function hits_results( & $Results, $params = array() )
 			'th' => T_('Remote IP'),
 			'order' => 'hit_remote_addr',
 			'td' => '%disp_clickable_log_IP( #hit_remote_addr# )%',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Agent Name'),
 			'order' => 'hit_agent_ID',
 			'td' => '%get_hit_agent_name_by_ID( #hit_agent_ID# )%',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 }
 
@@ -277,14 +277,13 @@ function filter_hits( & $Form )
  */
 function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp = NULL, $hit_ctrl = NULL, $hit_action = NULL)
 {
-	if( ! empty( $hit_coll_ID ) )
-	{
-		$BlogCache = & get_BlogCache();
-		$tmp_Blog = & $BlogCache->get_by_ID( $hit_coll_ID );
+	$BlogCache = & get_BlogCache();
+	if( $tmp_Blog = & $BlogCache->get_by_ID( $hit_coll_ID, false, false ) )
+	{	// Use root url of the requested collection if it still exists in DB:
 		$full_url = $tmp_Blog->get_baseurl_root().$hit_uri;
 	}
 	else
-	{
+	{	// Don't use root url if a request was without collection or it doesn't exist in DB anymore:
 		$full_url = $hit_uri;
 	}
 

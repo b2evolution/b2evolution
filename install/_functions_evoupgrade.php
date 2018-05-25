@@ -9577,6 +9577,193 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12840, 'Upgrading automation step table...' ) )
+	{	// part of 6.10.0-beta
+		db_add_col( 'T_automation__step', 'step_diagram', 'VARCHAR(64) NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12850, 'Creating user profile visit counter table...' ) )
+	{ // part of 6.10.1-stable
+		db_create_table( 'T_users__profile_visit_counters', '
+				upvc_user_ID  INT(11) UNSIGNED NOT NULL,
+				upvc_total_unique_visitors INT(10) UNSIGNED NOT NULL DEFAULT 0,
+				upvc_last_view_ts TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
+				upvc_new_unique_visitors INT(10) UNSIGNED NOT NULL DEFAULT 0,
+				PRIMARY KEY (upvc_user_ID)' );
+
+		// Populate profile visit counters table
+		$DB->query( 'INSERT INTO T_users__profile_visit_counters (upvc_user_ID, upvc_total_unique_visitors, upvc_new_unique_visitors)
+				SELECT user_ID, COALESCE( upv.total_unique, 0 ), COALESCE( upv.total_unique, 0 )
+				FROM T_users
+				LEFT JOIN
+				(
+					SELECT upv_visited_user_ID, COUNT(*) AS total_unique
+					FROM T_users__profile_visits
+					GROUP BY upv_visited_user_ID
+				) AS upv
+				ON upv.upv_visited_user_ID = user_ID' );
+
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12860 ) )
+	{	// part of 6.10.1-stable
+
+		/* ---- Install basic widgets for containers "Help" and "Register": ---- START */
+		global $basic_widgets_insert_sql_rows;
+		$basic_widgets_insert_sql_rows = array();
+
+		/**
+		 * Add a widget to global array in order to insert it in DB by single SQL query later
+		 *
+		 * @param integer Blog ID
+		 * @param string Container name
+		 * @param string Type
+		 * @param string Code
+		 * @param integer Order
+		 * @param array|string|NULL Widget params
+		 * @param integer 1 - enabled, 0 - disabled
+		 */
+		function add_basic_widget_12860( $blog_ID, $container_name, $code, $type, $order, $params = NULL, $enabled = 1 )
+		{
+			global $basic_widgets_insert_sql_rows, $DB;
+
+			if( is_null( $params ) )
+			{ // NULL
+				$params = 'NULL';
+			}
+			elseif( is_array( $params ) )
+			{ // array
+				$params = $DB->quote( serialize( $params ) );
+			}
+			else
+			{ // string
+				$params = $DB->quote( $params );
+			}
+
+			$basic_widgets_insert_sql_rows[] = '( '
+				.$blog_ID.', '
+				.$DB->quote( $container_name ).', '
+				.$order.', '
+				.$enabled.', '
+				.$DB->quote( $type ).', '
+				.$DB->quote( $code ).', '
+				.$params.' )';
+		}
+
+		$SQL = new SQL();
+		$SQL->SELECT( 'blog_ID, cat_ID' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->FROM_add( 'LEFT JOIN T_categories ON cat_blog_ID = blog_ID AND cat_meta = 0' );
+		$SQL->WHERE( '( SELECT COUNT( wi_coll_ID ) FROM T_widget WHERE wi_coll_ID = blog_ID AND wi_sco_name IN ( "Help", "Register" ) AND wi_code = "content_block" ) = 0' );
+		$SQL->ORDER_BY( 'blog_ID, cat_ID DESC' );
+		$collections = $DB->get_assoc( $SQL );
+		if( count( $collections ) > 0 )
+		{	// If at least one collection exists:
+
+			$SQL = new SQL( 'Get first item type with usage "content-block"' );
+			$SQL->SELECT( 'ityp_ID' );
+			$SQL->FROM( 'T_items__type' );
+			$SQL->WHERE( 'ityp_usage = "content-block"' );
+			$SQL->ORDER_BY( 'ityp_ID' );
+			$SQL->LIMIT( 1 );
+			$content_block_ityp_ID = intval( $DB->get_var( $SQL ) );
+
+			// We're going to need some environment in order to init item type cache and create item:
+			load_class( 'items/model/_item.class.php', 'Item' );
+			$use_temp_settings_object = false;
+			if( ! is_object( $Settings ) )
+			{	// Create temporary Settings object WITHOUT version checking:
+				load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+				$Settings = new GeneralSettings( false );
+				$use_temp_settings_object = true;
+			}
+			if( ! is_object( $Plugins ) )
+			{	// Create Plugins object:
+				load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+				$Plugins = new Plugins();
+			}
+
+			// Get collection for info pages:
+			if( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) )
+			{	// Create a help content block item for info/shared collection:
+				$help_Item = new Item();
+				$help_Item->set_tags_from_string( 'demo' );
+				$help_Item->insert( 1, T_('Help content'), '### '.T_('Email preferences')
+					."\n\n"
+					.sprintf( T_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>'), 'href="'.$info_Blog->get( 'subsurl' ).'"' )
+					."\n\n"
+					.'### '.T_('Managing your personal information')
+					."\n\n"
+					.sprintf( T_('You can see and correct the personal details we know about you by clicking <a %s>here</a>'), 'href="'.$info_Blog->get( 'profileurl' ).'"' )
+					."\n\n"
+					.'### '.T_('Closing your account')
+					."\n\n"
+					.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>'), 'href="'.$info_Blog->get( 'closeaccounturl' ).'"' ),
+						date( 'Y-m-d H:i:s' ), $collections[ $info_Blog->ID ], array(), 'published', '#', 'help-content', '', 'open', array( 'default' ), $content_block_ityp_ID );
+				// Create a register content block item for info/shared collection:
+				$register_Item = new Item();
+				$register_Item->set_tags_from_string( 'demo' );
+				$register_Item->insert( 1, T_('Register content'), T_('The information you provide in this form will be recorded in your user account.')
+					."\n\n"
+					.T_('You will be able to modify it (or even close your account) at any time after logging in with your username and password.')
+					."\n\n"
+					.T_('Should you forget your password, you will be able to reset it by receiving a link on your email address.')
+					."\n\n"
+					.T_('All other info is used to personalize your experience with this website.')
+					."\n\n"
+					.T_('This site may allow conversation between users.')
+					.' '.T_('Your email address and password will not be shared with other users.')
+					.' '.T_('All other information may be shared with other users.')
+					.' '.T_('Do not provide information you are not willing to share.'),
+						date( 'Y-m-d H:i:s' ), $collections[ $info_Blog->ID ], array(), 'published', '#', 'register-content', '', 'open', array( 'default' ), $content_block_ityp_ID );
+			}
+
+			foreach( $collections as $coll_ID => $cat_ID )
+			{
+				task_begin( 'Installing default "Help" and "Register" widgets for collection #'.$coll_ID.'... ' );
+				/* Help */
+				add_basic_widget_12860( $coll_ID, 'Help', 'content_block', 'core', 10, array(
+						'item_slug' => ( isset( $help_Item ) ? $help_Item->get( 'urltitle' ) : 'help-content' ),
+						'title'     => T_('Personal Data & Privacy'),
+					) );
+				/* Register */
+				add_basic_widget_12860( $coll_ID, 'Register', 'user_normal_register', 'core', 10 );
+				add_basic_widget_12860( $coll_ID, 'Register', 'content_block', 'core', 20, array(
+						'item_slug' => ( isset( $register_Item ) ? $register_Item->get( 'urltitle' ) : 'register-content' )
+					) );
+				task_end();
+			}
+
+			if( $use_temp_settings_object )
+			{	// Reset the temporary Settings object because it is used WITHOUT version checking,
+				// Some code below may be required in normal Settings object WITH version checking:
+				$Settings = false;
+			}
+		}
+
+		if( ! empty( $basic_widgets_insert_sql_rows ) )
+		{	// Insert the widget records by single SQL query:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
+		}
+		/* ---- Install basic widgets for containers "Help" and "Register": ---- END */
+
+		upg_task_end( false );
+	}
+
+	if( upg_task_start( 12870, 'Renaming registration widgets...' ) )
+	{	// part of 6.10.1-stable
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "user_register_quick"
+			WHERE wi_code = "user_register"' );
+		$DB->query( 'UPDATE T_widget
+			  SET wi_code = "user_register_standard"
+			WHERE wi_code = "user_normal_register"' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '

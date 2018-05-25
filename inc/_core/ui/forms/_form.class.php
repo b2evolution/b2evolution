@@ -4454,18 +4454,26 @@ class Form extends Widget
 
 		$r = $input_prefix;
 
-		if( $field_params['tag'] == 'button' )
+		switch( $field_params['tag'] )
 		{
-			$value = $field_params['value'];
-			unset( $field_params['value'] );
-			unset( $field_params['tag'] );
+			case 'button':
+				$value = $field_params['value'];
+				unset( $field_params['value'] );
+				unset( $field_params['tag'] );
+				$r .= '<button'.get_field_attribs_as_string( $field_params, $format_to_output ).'>'.$value.'</button>';
+				break;
 
-			$r .= '<button'.get_field_attribs_as_string( $field_params, $format_to_output ).'>'.$value.'</button>';
-		}
-		else
-		{
-			unset( $field_params['tag'] );
-			$r .= '<input'.get_field_attribs_as_string( $field_params, $format_to_output ).' />';
+			case 'link':
+				$value = $field_params['value'];
+				unset( $field_params['value'] );
+				unset( $field_params['tag'] );
+				unset( $field_params['type'] );
+				$r .= '<a'.get_field_attribs_as_string( $field_params, $format_to_output ).'>'.$value.'</a>';
+				break;
+
+			default:
+				unset( $field_params['tag'] );
+				$r .= '<input'.get_field_attribs_as_string( $field_params, $format_to_output ).' />';
 		}
 
 		$r .= $input_suffix;

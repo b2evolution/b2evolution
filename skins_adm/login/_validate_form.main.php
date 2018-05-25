@@ -1,6 +1,6 @@
 <?php
 /**
- * This form allows the user to request a new activation email (in case of standard login forms, not in-skin login forms)
+ * This form allows the user to request a new activation email (in case of basic login forms, not in-skin login forms)
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.

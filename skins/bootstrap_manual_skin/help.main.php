@@ -147,31 +147,6 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 			}
 		?>
 
-		<?php
-			// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
-			request_title( array(
-					'title_before'      => '<h1 class="page_title">',
-					'title_after'       => '</h1>',
-					'title_single_disp' => false,
-					'title_page_disp'   => false,
-					'format'            => 'htmlbody',
-					'category_text'     => '',
-					'categories_text'   => '',
-					'catdir_text'       => '',
-					'front_text'        => '',
-					'posts_text'        => '',
-					'register_text'     => '',
-					'login_text'        => '',
-					'lostpassword_text' => '',
-					'account_activation' => '',
-					'msgform_text'      => '',
-					'user_text'         => '',
-					'users_text'        => '',
-					'display_edit_links'=> false,
-				) );
-			// ----------------------------- END OF REQUEST TITLE ----------------------------
-?>
-
 
 <?php
 // -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------

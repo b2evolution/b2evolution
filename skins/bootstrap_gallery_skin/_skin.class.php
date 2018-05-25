@@ -124,6 +124,8 @@ class bootstrap_gallery_Skin extends Skin
 				'404_page'                  => array( NT_('404 Page'), 130 ),
 				'login_required'            => array( NT_('Login Required'), 140 ),
 				'access_denied'             => array( NT_('Access Denied'), 150 ),
+				'help'                      => array( NT_('Help'), 160 ),
+				'register'                  => array( NT_('Register'), 170 ),
 			);
 	}
 
@@ -365,9 +367,9 @@ class bootstrap_gallery_Skin extends Skin
 // fp> TODO: the following code WORKS but produces UGLY CSS with tons of repetitions. It needs a full rewrite.
 
 		// ===== Custom page styles: =====
-		$custom_styles = array();
 
 		// Text size <=== THIS IS A WORK IN PROGRESS
+		$custom_styles = array();
 		if( $text_size = $this->get_setting( 'page_text_size' ) )
 		{
 			$custom_styles[] = 'font-size: '.$text_size;
@@ -389,19 +391,21 @@ class bootstrap_gallery_Skin extends Skin
 		}
 
 		// Link color
+		$custom_styles = array();
 		if( $text_color = $this->get_setting( 'page_link_color' ) )
 		{
 			$custom_styles[] = 'color: '.$text_color;
 		}
 		if( ! empty( $custom_styles ) )
 		{
-			$custom_css .= '	#skin_wrapper .container a { '.implode( ';', $custom_styles )." }\n";
-			$custom_css .= '	ul li a { '.implode( ';', $custom_styles )." }\n";
-			$custom_css .= "	ul li a {background-color: transparent;}\n";
-			$custom_css .= "	.ufld_icon_links a {color: #fff !important;}\n";
+			$custom_css .= '	#skin_wrapper .container a:not(.btn) { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= '	ul li a:not(.btn) { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= "	ul li a:not(.btn) {background-color: transparent;}\n";
+			$custom_css .= "	.ufld_icon_links a:not(.btn) {color: #fff !important;}\n";
 		}
 
 		// Current tab text color
+		$custom_styles = array();
 		if( $text_color = $this->get_setting( 'current_tab_text_color' ) )
 		{
 			$custom_styles[] = 'color: '.$text_color;
@@ -412,6 +416,7 @@ class bootstrap_gallery_Skin extends Skin
 		}
 
 		// Page background color
+		$custom_styles = array();
 		if( $bg_color = $this->get_setting( 'page_bg_color' ) )
 		{
 			$custom_styles[] = 'background-color: '.$bg_color;

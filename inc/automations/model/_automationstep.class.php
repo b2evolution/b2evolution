@@ -37,6 +37,7 @@ class AutomationStep extends DataObject
 	var $no_next_step_delay;
 	var $error_next_step_ID;
 	var $error_next_step_delay;
+	var $diagram;
 
 	var $Automation = NULL;
 
@@ -68,6 +69,7 @@ class AutomationStep extends DataObject
 			$this->no_next_step_delay = $db_row->step_no_next_step_delay;
 			$this->error_next_step_ID = $db_row->step_error_next_step_ID;
 			$this->error_next_step_delay = $db_row->step_error_next_step_delay;
+			$this->diagram = $db_row->step_diagram;
 		}
 	}
 
@@ -95,6 +97,11 @@ class AutomationStep extends DataObject
 	 */
 	function dbinsert()
 	{
+		if( ! $this->can_be_modified() )
+		{	// If this step cannnot be modified
+			return false;
+		}
+
 		if( $r = parent::dbinsert() )
 		{
 			// Update next steps with selected option "Loop" to ID of this new inserted Step:
@@ -114,6 +121,22 @@ class AutomationStep extends DataObject
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 *
+	 * @return boolean true on success, false on failure to update, NULL if no update necessary
+	 */
+	function dbupdate()
+	{
+		if( ! $this->can_be_modified() )
+		{	// If this step cannnot be modified
+			return false;
+		}
+
+		return parent::dbupdate();
 	}
 
 
@@ -149,6 +172,12 @@ class AutomationStep extends DataObject
 		{	// Set Automation only for new creating Step:
 			param( 'autm_ID', 'integer', true );
 			$this->set_from_Request( 'autm_ID', 'autm_ID' );
+		}
+
+		if( ! $this->can_be_modified() && ! param( 'confirm_pause', 'integer' ) )
+		{	// Don't allow to edit step of active automation without confirmation:
+			global $Messages;
+			$Messages->add( T_('You must pause the automation before creating it.'), 'error' );
 		}
 
 		// Order:
@@ -337,16 +366,7 @@ class AutomationStep extends DataObject
 		}
 		elseif( $next_step_ID == 0 || ! $next_AutomationStep )
 		{	// Get next ordered Step when option is selected to "Continue" OR Step cannot be found by ID in DB:
-			global $DB;
-			$next_ordered_step_SQL = new SQL( 'Get next ordered Step after current Step #'.$this->ID );
-			$next_ordered_step_SQL->SELECT( 'step_ID' );
-			$next_ordered_step_SQL->FROM( 'T_automation__step' );
-			$next_ordered_step_SQL->WHERE( 'step_autm_ID = '.$DB->quote( $this->get( 'autm_ID' ) ) );
-			$next_ordered_step_SQL->WHERE_and( 'step_order > '.$DB->quote( $this->get( 'order' ) ) );
-			$next_ordered_step_SQL->ORDER_BY( 'step_order ASC' );
-			$next_ordered_step_SQL->LIMIT( 1 );
-			$next_ordered_step_ID = $DB->get_var( $next_ordered_step_SQL );
-			$next_AutomationStep = & $AutomationStepCache->get_by_ID( $next_ordered_step_ID, false, false );
+			$next_AutomationStep = & $AutomationStepCache->get_by_ID( $this->get_next_ordered_step_ID(), false, false );
 			if( empty( $next_AutomationStep ) )
 			{	// If it is the latest Step of the Automation:
 				$next_AutomationStep = false;
@@ -354,6 +374,32 @@ class AutomationStep extends DataObject
 		}
 
 		return $next_AutomationStep;
+	}
+
+
+	/**
+	 * Get ID of the next ordered Step after this Step
+	 *
+	 * @return integer|NULL Step ID or NULL if this is the latest
+	 */
+	function get_next_ordered_step_ID()
+	{
+		if( empty( $this->ID ) )
+		{	// New creating step is the latest by default:
+			return NULL;
+		}
+
+		global $DB;
+
+		$next_ordered_step_SQL = new SQL( 'Get next ordered Step after current Step #'.$this->ID );
+		$next_ordered_step_SQL->SELECT( 'step_ID' );
+		$next_ordered_step_SQL->FROM( 'T_automation__step' );
+		$next_ordered_step_SQL->WHERE( 'step_autm_ID = '.$DB->quote( $this->get( 'autm_ID' ) ) );
+		$next_ordered_step_SQL->WHERE_and( 'step_order > '.$DB->quote( $this->get( 'order' ) ) );
+		$next_ordered_step_SQL->ORDER_BY( 'step_order ASC' );
+		$next_ordered_step_SQL->LIMIT( 1 );
+
+		return $DB->get_var( $next_ordered_step_SQL );
 	}
 
 
@@ -1228,6 +1274,57 @@ class AutomationStep extends DataObject
 		}
 
 		$this->set( 'label', utf8_substr( utf8_trim( $label ), 0, 500 ) );
+	}
+
+
+	/**
+	 * Check if this automation step can be modified(added/edited/deleted) currently
+	 *
+	 * @param boolean
+	 */
+	function can_be_modified()
+	{
+		if( ( $step_Automation = & $this->get_Automation() ) &&
+		    $step_Automation->get( 'status' ) == 'paused' )
+		{	// Automation of this step must be paused in order to edit steps:
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Pause automation by confirmation from request
+	 *
+	 * @return boolean
+	 */
+	function pause_automation()
+	{
+		if( $this->can_be_modified() )
+		{	// If step automation is already paused
+			return true;
+		}
+
+		if( ! param( 'confirm_pause', 'integer' ) )
+		{	// If action is not confirmed
+			return false;
+		}
+
+		// Try to pause the step's automation:
+		$step_Automation = & $this->get_Automation();
+		$step_Automation->set( 'status', 'paused' );
+
+		if( $step_Automation->dbupdate() )
+		{	// Display a message if automation has been paused:
+			global $Messages;
+			$Messages->add( T_('Automation has been paused.'), 'success' );
+			return true;
+		}
+		else
+		{	// If automation could not paused
+			return false;
+		}
 	}
 }
 

@@ -338,7 +338,7 @@ switch( $action )
 				// Display automations tied to this Newsletter:
 				automation_results_block( array(
 						'enlt_ID'               => $edited_Newsletter->ID,
-						'results_title'         => T_('Automations').get_manual_link( 'email-list-automations' ),
+						'results_title'         => T_('Automations').get_manual_link( 'automations-for-a-list' ),
 						'results_prefix'        => 'enltautm_',
 					) );
 				break;

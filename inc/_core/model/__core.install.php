@@ -215,6 +215,16 @@ $schema_queries = array(
 			PRIMARY KEY ( upv_visited_user_ID, upv_visitor_user_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	'T_users__profile_visit_counters' => array(
+		'Creating table for profile visit counters',
+		"CREATE TABLE T_users__profile_visit_counters (
+			upvc_user_ID  INT(11) UNSIGNED NOT NULL,
+			upvc_total_unique_visitors INT(10) UNSIGNED NOT NULL DEFAULT 0,
+			upvc_last_view_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			upvc_new_unique_visitors INT(10) UNSIGNED NOT NULL DEFAULT 0,
+			PRIMARY KEY (upvc_user_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
 	'T_users__tag' => array(
 		'Creating table for user tags',
 		"CREATE TABLE T_users__tag (
@@ -639,6 +649,7 @@ $schema_queries = array(
 			step_no_next_step_delay    INT UNSIGNED NULL,
 			step_error_next_step_ID    INT NULL,
 			step_error_next_step_delay INT UNSIGNED NULL,
+			step_diagram               VARCHAR(64) NULL,
 			PRIMARY KEY                (step_ID),
 			UNIQUE                     step_autm_ID_order (step_autm_ID, step_order)
 		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),

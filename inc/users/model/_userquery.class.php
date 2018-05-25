@@ -258,8 +258,6 @@ class UserQuery extends FilterSQL
 	 */
 	function where_gender( $gender )
 	{
-		global $DB;
-
 		if( empty( $gender ) )
 		{
 			return;
@@ -267,11 +265,17 @@ class UserQuery extends FilterSQL
 
 		switch( $gender )
 		{
-			case 'MF': $this->WHERE_and( 'user_gender IN ( "M", "F" )' ); break;
-			case 'MO': $this->WHERE_and( 'user_gender IN ( "M", "O" )' ); break;
-			case 'FO': $this->WHERE_and( 'user_gender IN ( "F", "O" )' ); break;
-			case 'MFO': $this->WHERE_and( 'user_gender IN ( "M", "F", "O" )' ); break;
-			default: $this->WHERE_and( 'user_gender = '.$DB->quote( $gender ) ); break;
+			case 'MF':
+			case 'MO':
+			case 'FO':
+			case 'MFO':
+				$this->add_filter_rule( 'gender', str_split( $gender ), NULL, 'OR' );
+				break;
+			case 'M':
+			case 'F':
+			case 'O':
+				$this->add_filter_rule( 'gender', $gender );
+				break;
 		}
 	}
 
@@ -365,15 +369,13 @@ class UserQuery extends FilterSQL
 		global $DB, $Settings;
 
 		if( $custom_sender_email )
-		{ // restrict to users with custom notification sender email address
-			$this->FROM_add( ' LEFT JOIN T_users__usersettings as custom_sender_email ON custom_sender_email.uset_user_ID = user_ID AND custom_sender_email.uset_name = "notification_sender_email"' );
-			$this->WHERE_and( 'custom_sender_email.uset_value IS NOT NULL AND custom_sender_email.uset_value <> '.$DB->quote( $Settings->get( 'notification_sender_email' ) ) );
+		{	// Restrict to users with custom notification sender email address:
+			$this->add_filter_rule( 'custom_sender_email', 'yes' );
 		}
 
 		if( $custom_sender_name )
-		{ // restrict to users with custom notification sender name
-			$this->FROM_add( ' LEFT JOIN T_users__usersettings as custom_sender_name ON custom_sender_name.uset_user_ID = user_ID AND custom_sender_name.uset_name = "notification_sender_name"' );
-			$this->WHERE_and( 'custom_sender_name.uset_value IS NOT NULL AND custom_sender_name.uset_value <> '.$DB->quote( $Settings->get( 'notification_sender_name' ) ) );
+		{	// Restrict to users with custom notification sender name:
+			$this->add_filter_rule( 'custom_sender_name', 'yes' );
 		}
 	}
 
@@ -547,9 +549,7 @@ class UserQuery extends FilterSQL
 			return;
 		}
 
-		// Join Organization table
-		$this->SELECT_add( ', uorg_org_ID, uorg_accepted, uorg_role, uorg_priority' );
-		$this->FROM_add( 'INNER JOIN T_users__user_org ON uorg_user_ID = user_ID AND uorg_org_ID = '.$DB->quote( $org_ID ) );
+		$this->add_filter_rule( 'org', $org_ID );
 	}
 
 
@@ -737,8 +737,6 @@ class UserQuery extends FilterSQL
 	 */
 	function where_level( $user_level_min, $user_level_max )
 	{
-		global $DB;
-
 		if( $user_level_min < 0 || is_null($user_level_min) )
 		{ // Min group level is 0
 			$user_level_min = 0;
@@ -749,8 +747,10 @@ class UserQuery extends FilterSQL
 			$user_level_max = 10;
 		}
 
-		$this->WHERE_and( 'user_level >= '.$DB->quote( $user_level_min ) );
-		$this->WHERE_and( 'user_level <= '.$DB->quote( $user_level_max ) );
+		if( $user_level_min > 0 || $user_level_max < 10 )
+		{	// Filter only with actual values:
+			$this->add_filter_rule( 'level', array( $user_level_min, $user_level_max ), 'between' );
+		}
 	}
 
 
@@ -762,6 +762,96 @@ class UserQuery extends FilterSQL
 		$this->SELECT_add( ', email_user_count' );
 		$this->FROM_add( 'LEFT JOIN ( SELECT user_email AS dup_email, COUNT(*) AS email_user_count FROM T_users GROUP BY user_email ) AS dup_emails ON dup_emails.dup_email = T_users.user_email' );
 		$this->WHERE_and( 'email_user_count > 1' );
+	}
+
+
+	/**
+	 * Restrict with user gender
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_gender( $value, $operator )
+	{
+		if( in_array( $value, array( 'M', 'F', 'O' ) ) )
+		{
+			return $this->get_where_condition( 'user_gender', $value, $operator );
+		}
+	}
+
+
+	/**
+	 * Restrict with user level
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_level( $value, $operator )
+	{
+		return $this->get_where_condition( 'user_level', $value, $operator );
+	}
+
+
+	/**
+	 * Restrict with user organization
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_org( $value, $operator )
+	{
+		if( $operator == 'equal' || $operator == 'not_equal' )
+		{	// If operator is allowed for this filter:
+			global $DB;
+			$this->SELECT_add( ', uorg_org_ID, uorg_accepted, uorg_role, uorg_priority' );
+			$this->FROM_add( 'LEFT JOIN T_users__user_org ON uorg_user_ID = user_ID' );
+			if( $operator == 'equal' )
+			{	// Select users which are in the requested organization:
+				$this->WHERE_and( 'uorg_org_ID = '.$DB->quote( $value ) );
+			}
+			else
+			{	// Select users which are NOT in the requested organization:
+				$this->WHERE_and( '( SELECT uorg_org_ID FROM T_users__user_org WHERE uorg_user_ID = user_ID AND uorg_org_ID = '.$DB->quote( $value ).' ) IS NULL' );
+			}
+		}
+	}
+
+
+	/**
+	 * Restrict if user uses custom sender email address
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_custom_sender_email( $value, $operator )
+	{
+		if( $value == 'yes' || $value == 'no' )
+		{	// If value is allowed for this filter:
+			global $Settings, $DB;
+			$this->FROM_add( 'LEFT JOIN T_users__usersettings as custom_sender_email ON custom_sender_email.uset_user_ID = user_ID AND custom_sender_email.uset_name = "notification_sender_email"' );
+			$operator1 = ( $value == 'yes' ? 'IS NOT NULL AND' : 'IS NULL OR' );
+			$operator2 = ( $value == 'yes' ? '<>' : '=' );
+			return 'custom_sender_email.uset_value '.$operator1.' custom_sender_email.uset_value '.$operator2.' '.$DB->quote( $Settings->get( 'notification_sender_email' ) );
+		}
+	}
+
+
+	/**
+	 * Restrict if user uses custom sender name
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_custom_sender_name( $value, $operator )
+	{
+		if( $value == 'yes' || $value == 'no' )
+		{	// If value is allowed for this filter:
+			global $Settings, $DB;
+			$this->FROM_add( 'LEFT JOIN T_users__usersettings as custom_sender_name ON custom_sender_name.uset_user_ID = user_ID AND custom_sender_name.uset_name = "notification_sender_name"' );
+			$operator1 = ( $value == 'yes' ? 'IS NOT NULL AND' : 'IS NULL OR' );
+			$operator2 = ( $value == 'yes' ? '<>' : '=' );
+			return 'custom_sender_name.uset_value '.$operator1.' custom_sender_name.uset_value '.$operator2.' '.$DB->quote( $Settings->get( 'notification_sender_name' ) );
+		}
 	}
 
 
@@ -841,7 +931,10 @@ class UserQuery extends FilterSQL
 	 */
 	function filter_field_lastseen( $value, $operator )
 	{
-		return $this->get_where_condition( 'DATE( user_lastseen_ts )', $value, $operator );
+		if( ! empty( $value ) )
+		{
+			return $this->get_where_condition( 'DATE( user_lastseen_ts )', $value, $operator );
+		}
 	}
 
 

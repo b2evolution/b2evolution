@@ -34,7 +34,7 @@ if( is_array( $params['tasks'] ) && count( $params['tasks'] ) )
 
 // Buttons:
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
-echo get_link_tag( $admin_url.'?ctrl=crontab&ctst_timeout=1&ctst_error=1', T_( 'Review tasks with errors' ), 'div.buttons a+a.button_yellow' )."\n";
+echo get_link_tag( $admin_url.'?ctrl=crontab&ctst_timeout=1&ctst_error=1', T_( 'Review tasks with errors' ), 'div.buttons a+a.btn-primary' )."\n";
 echo "</div>\n";
 
 
