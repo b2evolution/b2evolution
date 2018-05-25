@@ -167,13 +167,25 @@ siteskin_include( '_site_body_header.inc.php' );
 					'item_class'           => 'evo_post evo_content_block',
 					'item_type_class'      => 'evo_post__ptyp_',
 					'item_status_class'    => 'evo_post__',
+					// Form params for the forms below: login, register, lostpassword, activateinfo and msgform
+					'skin_form_before'      => '<div class="panel panel-default skin-form">'
+																				.'<div class="panel-heading">'
+																					.'<h3 class="panel-title">$form_title$</h3>'
+																				.'</div>'
+																				.'<div class="panel-body">',
+					'skin_form_after'       => '</div></div>',
 					// Login
-					'login_page_before'    => '<div class="login_block"><div class="evo_details">',
-					'login_page_after'     => '</div></div>',
-					// Register
-					'register_page_before' => '<div class="login_block"><div class="evo_details">',
-					'register_page_after'  => '</div></div>',
-					'display_abort_link'   => ( $Blog->get_setting( 'allow_access' ) == 'public' ), // Display link to abort login only when it is really possible
+					'display_form_messages' => true,
+					'form_title_login'      => T_('Log in to your account').'$form_links$',
+					'form_title_lostpass'   => get_request_title().'$form_links$',
+					'lostpass_page_class'   => 'evo_panel__lostpass',
+					'login_form_inskin'     => false,
+					'login_page_class'      => 'evo_panel__login',
+					'login_page_before'     => '<div class="$form_class$">',
+					'login_page_after'      => '</div>',
+					'display_reg_link'      => true,
+					'abort_link_position'   => 'form_title',
+					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
 				) );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.

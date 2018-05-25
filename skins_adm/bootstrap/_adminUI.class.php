@@ -645,6 +645,21 @@ class AdminUI extends AdminUI_general
 					'radio_oneline_end'      => "</label>\n",
 				);
 
+			case 'fields_table_form':
+				return array_merge( $this->get_template( 'Form' ), array(
+						'fieldset_begin' => '<div class="evo_fields_table $class$" id="fieldset_wrapper_$id$" $fieldset_attribs$>'."\n",
+						'fieldset_end'   => '</div>'."\n",
+						'fieldstart'     => '<div class="evo_fields_table__field" $ID$>'."\n",
+						'fieldend'       => "</div>\n\n",
+						'labelclass'     => 'evo_fields_table__label',
+						'labelstart'     => '',
+						'labelend'       => "\n",
+						'labelempty'     => '',
+						'inputstart'     => '<div class="evo_fields_table__input">',
+						'inputend'       => "</div>\n",
+					) );
+				break;
+
 			case 'file_browser':
 				return array(
 					'block_start' => '<div class="panel panel-default file_browser"><div class="panel-heading"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body">',

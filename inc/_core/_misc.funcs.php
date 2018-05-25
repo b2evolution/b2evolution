@@ -4032,6 +4032,8 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 				// 'send_pst_stale_alert' - "there are stale posts and I have permission to moderate them."
 			case 'account_activate':
 				// 'send_activation_reminder' - "my account was deactivated or is not activated for more than X seconds."(X - $Settings->get( 'activate_account_reminder_threshold' ))
+			case 'account_inactive':
+				// 'send_inactive_reminder' - "my account has been inactive for more than X months."(X - $Settings->get( 'inactive_account_reminder_threshold' ))
 			case 'account_new':
 				// 'notify_new_user_registration' - "a new user has registered."
 			case 'account_activated':

@@ -345,6 +345,7 @@ jQuery( document ).ready( function()
 			error: 'fa fa-warning',
 		},
 		lang: {
+			add_rule: '<?php echo TS_('Add condition'); ?>',
 			operators: {
 				equal: '=',
 				not_equal: '&#8800;',
@@ -508,7 +509,7 @@ function evo_query_builder_listsend_value_setter( rule, value )
 }
 
 // Prepare form before submitting:
-jQuery( 'form' ).on( 'submit', function()
+jQuery( 'form#automation_checkchanges' ).submit( function( e )
 {
 	if( jQuery( '#step_type' ).val() == 'if_condition' )
 	{	// Convert "IF Condition" field to JSON format:
@@ -522,5 +523,66 @@ jQuery( 'form' ).on( 'submit', function()
 			jQuery( 'input[name=step_if_condition]' ).val( JSON.stringify( result ) );
 		}
 	}
+
+	jQuery.ajax(
+	{	// Check if automation is paused before saving step:
+		url: '<?php echo get_htsrv_url(); ?>async.php',
+		data: {
+			'action': 'get_automation_status',
+			'autm_ID': <?php echo $step_Automation->ID; ?>
+		},
+		success: function( automation_status )
+		{
+			if( automation_status == 'paused' )
+			{	// Allow to submit if automation is paused:
+				default_submit_automation_step();
+			}
+			else
+			{	// Confirm to pause automation before modifying step:
+				jQuery( '#step_confirmation_modal' ).modal();
+			}
+		}
+	} );
+
+	return false;
+} );
+
+function default_submit_automation_step()
+{
+	// Unbind custom function in order to submit the form as default event without restrictions:
+	jQuery( 'form#automation_checkchanges' ).unbind( 'submit' );
+	// Note: We use the btn.click() here because the form.submit() does not work as expected by some unknown reason:
+	jQuery( 'form#automation_checkchanges [type=submit]' ).click();
+}
+
+// Actions for confirmation modal window:
+jQuery( document ).on( 'click', '#btn_pause_edit', function()
+{	// Submit a form to pause and save changes:
+	jQuery( 'form#automation_checkchanges' ).append( '<input type="hidden" name="confirm_pause" value="1">' );
+	default_submit_automation_step();
+} );
+jQuery( document ).on( 'click', '#btn_abort_edit, #step_confirmation_modal .close', function()
+{	// Abort:
+	jQuery( '#step_confirmation_modal' ).modal( 'hide' );
 } );
 </script>
+<?php
+// Modal window to confirm editing when automation is paused:
+?>
+<div id="step_confirmation_modal" class="modal modal2 fade in" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" aria-hidden="true">&times;</button>
+				<h4 class="modal-title"><?php echo T_('Confirmation'); ?></h4>
+			</div>
+			<div class="modal-body">
+				<p><?php echo T_('You must pause the automation before creating it.'); ?></p>
+			</div>
+			<div class="modal-footer">
+				<button id="btn_pause_edit" type="button" class="btn btn-danger"><?php echo T_('Pause & edit'); ?></button>
+				<button id="btn_abort_edit" type="button" class="btn btn-default"><?php echo T_('Abort edit'); ?></button>
+			</div>
+		</div>
+	</div>
+</div>

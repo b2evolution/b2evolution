@@ -240,7 +240,7 @@ if( $Settings->get( 'account_close_enabled' ) && isset( $Blog ) &&
     ( $current_User->ID == $edited_User->ID ) && ! $current_User->check_perm( 'users', 'edit', false ) )
 { // Display a linkt to close account
   // Admins cannot close own accounts from front office
-	$Form->info( '', '<a href="'.url_add_param( $Blog->gen_blogurl(), 'disp=closeaccount' ).'">'.T_( 'I want to close my account...' ).'</a>' );
+	$Form->info( '', '<a href="'.$Blog->get( 'closeaccounturl' ).'">'.T_( 'I want to close my account...' ).'</a>' );
 }
 
 $Form->end_form();

@@ -1207,6 +1207,7 @@ function create_default_jobs( $is_upgrade = false )
 	$next_sunday = date2mysql( strtotime( 'next Sunday',  $localtimenow + 86400 ) );
 
 	$cleanup_jobs_key         = 'cleanup-scheduled-jobs';
+	$cleanup_email_logs_key   = 'cleanup-email-logs';
 	$heavy_db_maintenance_key = 'heavy-db-maintenance';
 	$light_db_maintenance_key = 'light-db-maintenance';
 	$poll_antispam_key        = 'poll-antispam-blacklist';
@@ -1215,6 +1216,7 @@ function create_default_jobs( $is_upgrade = false )
 	$prune_sessions_key       = 'prune-old-hits-and-sessions';
 	$prune_comments_key       = 'prune-recycled-comments';
 	$activate_reminder_key    = 'send-non-activated-account-reminders';
+	$inactive_reminder_key    = 'send-inactive-account-reminders';
 	$comment_reminder_key     = 'send-unmoderated-comments-reminders';
 	$messages_reminder_key    = 'send-unread-messages-reminders';
 	$post_reminder_key        = 'send-unmoderated-posts-reminders';
@@ -1239,6 +1241,8 @@ function create_default_jobs( $is_upgrade = false )
 			$post_reminder_key        => "( ".$DB->quote( form_date( $tomorrow, '07:00:00' ) ).", 86400, ".$DB->quote( $post_reminder_key ).", ".$ctsk_params." )",
 			$alert_old_contents_key   => "( ".$DB->quote( form_date( $next_sunday, '07:30:00' ) ).", 604800, ".$DB->quote( $alert_old_contents_key ).", ".$ctsk_params." )",
 			$execute_automations_key  => "( ".$DB->quote( form_date( $today, '00:00:00' ) ).", 300, ".$DB->quote( $execute_automations_key ).", ".$ctsk_params." )",
+			$inactive_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '08:00:00' ) ).", 86400, ".$DB->quote( $inactive_reminder_key ).", ".$ctsk_params." )",
+			$cleanup_email_logs_key   => "( ".$DB->quote( form_date( $tomorrow, '08:30:00' ) ).", 86400, ".$DB->quote( $cleanup_email_logs_key ).", ".$ctsk_params." )",
 		);
 	if( $is_upgrade )
 	{ // Check if these jobs already exist, and don't create another

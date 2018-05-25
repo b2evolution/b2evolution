@@ -230,7 +230,7 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 		$url = $Blog->get( $blog_page, array( 'glue' => '&' ) );
 	}
 	else
-	{ // Use normal/standard login form (without blog skin)
+	{ // Use normal/basic login form (without blog skin)
 		if( ! empty( $redirect_url ) )
 		{
 			$redirect_url = url_rel_to_same_host( $redirect_url, get_htsrv_url( true ) );
@@ -3107,6 +3107,88 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 
 
 /**
+ * Send inactive account email notification
+ *
+ * @param array user ids to send email
+ * @param string URL, where to redirect the user after he clicked the validation link (gets saved in Session).
+ * @param boolean|string 'cron_job' - to log messages for cron job, FALSE - to don't log
+ * @return integer the number of successfully sent emails
+ */
+function send_inactive_user_emails( $user_ids, $redirect_to_after = NULL, $log_messages = false )
+{
+	global $UserSettings, $Session, $Settings, $servertimenow;
+
+	$UserCache = & get_UserCache();
+
+	$cache_by_locale = array();
+	$email_sent = 0;
+	foreach( $user_ids as $user_ID )
+	{ // Iterate through user ids and send account activation reminder to all user
+		$User = $UserCache->get_by_ID( $user_ID, false );
+		if( !$User )
+		{ // user not exists
+			continue;
+		}
+
+		if( !$UserSettings->get( 'send_inactive_reminder' ) )
+		{ // This is an activation reminder, but user wouldn't like to receive this kind of emails
+			continue;
+		}
+
+		if( mail_is_blocked( $User->get( 'email' ) ) )
+		{ // prevent trying to send an email to a blocked email address
+			continue;
+		}
+
+		$notify_locale = $User->get( 'locale' );
+		if( ! isset($cache_by_locale[$notify_locale]) )
+		{ // No subject for this locale generated yet:
+			locale_temp_switch( $notify_locale );
+
+			$cache_by_locale[$notify_locale]['subject'] = sprintf( T_('We haven\'t seen you on %s for %s.'), $Settings->get( 'notification_short_name' ), seconds_to_period( $Settings->get( 'inactive_account_reminder_threshold' ) ) );
+
+			locale_restore_previous();
+		}
+
+		$login_Blog = & get_setting_Blog( 'login_blog_ID' );
+		$email_template_params = array(
+				'User' => $User,
+				'login_Blog' => $login_Blog
+			);
+
+		// Update notification sender's info from General settings
+		$User->update_sender( true );
+
+		if( send_mail_to_User( $User->ID, $cache_by_locale[$notify_locale]['subject'], 'account_inactive', $email_template_params, true ) )
+		{ // save corresponding user settings right after the email was sent, to prevent not saving if an eroor occurs
+			$email_sent++;
+			// Set last remind activation email date and increase sent reminder emails number in UserSettings
+			$UserSettings->set( 'last_inactive_status_email', date2mysql( $servertimenow ), $User->ID );
+			$UserSettings->dbupdate();
+			if( $log_messages == 'cron_job' )
+			{	// Log success mail sending for cron job:
+				cron_log_action_end( 'User '.$User->get_identity_link().' has been notified' );
+			}
+		}
+		elseif( $log_messages == 'cron_job' )
+		{	// Log failed mail sending for cron job:
+			global $mail_log_message;
+			cron_log_action_end( 'User '.$User->get_identity_link().' could not be notified because of error: '
+				.'"'.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'"', 'warning' );
+		}
+	}
+
+	if( $email_sent && isset( $Session ) && $redirect_to_after !== NULL )
+	{	// Set a redirect_to session variable because this way after the account will be activated we will know where to redirect
+		$Session->set( 'core.activateacc.redirect_to', $redirect_to_after  );
+		$Session->dbsave(); // save immediately
+	}
+
+	return $email_sent;
+}
+
+
+/**
  * Check the specified tags against the user's existing tags
  *
  * @param integer User ID
@@ -3505,7 +3587,14 @@ function callback_filter_userlist( & $Form )
 	global $Settings, $current_User, $Collection, $Blog, $edited_Organization, $edited_Newsletter, $edited_EmailCampaign;
 	global $registered_min, $registered_max;
 
-	$filters = array();
+	$filters = array(
+		// Set default filters which are displayed on not filtered list:
+		'#default' => array(
+			'gender'   => '',
+			'criteria' => '0:contains:',
+			'lastseen' => '',
+		)
+	);
 
 	$Form->hidden( 'filter', 'new' );
 
@@ -3648,10 +3737,12 @@ function callback_filter_userlist( & $Form )
 			'label'  => T_('Gender'),
 			'input'  => 'select',
 			'values' => array(
+					''  => T_('Any'),
 					'M' => T_('Men'),
 					'F' => T_('Women'),
 					'O' => T_('Other'),
 				),
+			'validation' => array( 'allow_empty_value' => 'true' ),
 		);
 
 	// Level:
@@ -3823,14 +3914,15 @@ function load_cities( country_ID, region_ID, subregion_ID )
 
 		// User last seen:
 		$filters['lastseen'] = array(
-				'label' => T_('User last seen'),
-				'type'  => 'date',
+				'label'      => T_('User last seen'),
+				'type'       => 'date',
+				'validation' => array( 'allow_empty_value' => 'true' ),
 			);
 
 		// Registration source:
 		$filters['source'] = array(
-				'label' => T_('Registration source'),
-				'operators' => 'contains,not_contains',
+				'label'      => T_('Registration source'),
+				'operators'  => 'contains,not_contains',
 			);
 	}
 
@@ -5112,14 +5204,14 @@ function echo_user_remove_membership_js( $edited_Organization )
  *        ''      - Don't display a field of invitation code
  *        'info'  - Display an info field with invitation code
  *        'input' - Display an input field to change invitation code
- *        'deny'  - Don't display a registration form at all
+ *        'deny'  - Don't display a registration form at all because registration is disabled or system is locked
  */
 function check_invitation_code( $invitation_name = 'invitation' )
 {
 	global $Settings;
 
-	if( $Settings->get( 'newusers_canregister' ) == 'no' )
-	{ // Don't display a registration form when it is disabled for all
+	if( $Settings->get( 'system_lock' ) || $Settings->get( 'newusers_canregister' ) == 'no' )
+	{	// Don't display a registration form when it is disabled for all or sysytem is locked:
 		return 'deny';
 	}
 

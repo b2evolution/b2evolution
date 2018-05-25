@@ -474,6 +474,25 @@ function & get_EmailAddressCache()
 
 
 /**
+ * Get the EmailLogCache
+ *
+ * @return EmailLogCache
+ */
+function & get_EmailLogCache()
+{
+	global $EmailLogCache;
+
+	if( ! isset( $EmailLogCache ) )
+	{ // Cache doesn't exist yet:
+		load_class( 'tools/model/_emaillog.class.php', 'EmailLog' );
+		$EmailLogCache = new DataObjectCache( 'EmailLog', false, 'T_email__log', 'emlog_', 'emlog_ID' );
+	}
+
+	return $EmailLogCache;
+}
+
+
+/**
  * Get the NewsletterCache
  *
  * @param string The text that gets used for the "None" option in the objects options list (Default: T_('Unknown')).
@@ -2303,6 +2322,12 @@ class _core_Module extends Module
 				'name'   => T_('Send reminders about non-activated accounts'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_activate_account_reminder.job.php',
+				'params' => NULL,
+			),
+			'send-inactive-account-reminders' => array(
+				'name'   => T_('Send reminders about inactive accounts'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_inactive_account_reminder.job.php',
 				'params' => NULL,
 			),
 			'execute-automations' => array(

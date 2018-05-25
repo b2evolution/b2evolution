@@ -160,25 +160,6 @@ h2 .glyphicon {
   margin-top: 14px;
   display: inline-block;
 }
-.compose_layout {
-  margin-bottom: 15px;
-}
-.compose_layout td.label {
-  font-size: 100%;
-  padding-right: 10px;
-  color: #333;
-}
-.compose_layout #post_locale {
-  width: 180px !important;
-}
-.compose_layout td {
-  white-space: nowrap;
-  vertical-align: middle;
-}
-#itemform_custom_fields .compose_layout,
-#itemform_adv_props .compose_layout {
-  margin-bottom: 0;
-}
 div.log_container {
   margin: 0;
 }

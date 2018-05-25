@@ -1112,7 +1112,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 	{
 		// =======================================================================================================
 		case 'main':
-			$post_count = 15;
+			$post_count = 17;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -1282,6 +1282,43 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$edited_Item->set_tags_from_string( 'demo' );
 				$edited_Item->insert( $owner_ID, T_('Access Denied'), '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
 						$now, $cat_home_b2evo, array(), 'published', '#', 'access-denied-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
+
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->insert( $owner_ID, T_('Help content'), '### '.T_('Email preferences')
+					."\n\n"
+					.sprintf( T_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>'), 'href="'.$edited_Blog->get( 'subsurl' ).'"' )
+					."\n\n"
+					.'### '.T_('Managing your personal information')
+					."\n\n"
+					.sprintf( T_('You can see and correct the personal details we know about you by clicking <a %s>here</a>'), 'href="'.$edited_Blog->get( 'profileurl' ).'"' )
+					."\n\n"
+					.'### '.T_('Closing your account')
+					."\n\n"
+					.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>'), 'href="'.$edited_Blog->get( 'closeaccounturl' ).'"' ),
+						$now, $cat_home_b2evo, array(), 'published', '#', 'help-content', '', 'open', array( 'default' ), 'Content Block' );
+
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->insert( $owner_ID, T_('Register content'), T_('The information you provide in this form will be recorded in your user account.')
+					."\n\n"
+					.T_('You will be able to modify it (or even close your account) at any time after logging in with your username and password.')
+					."\n\n"
+					.T_('Should you forget your password, you will be able to reset it by receiving a link on your email address.')
+					."\n\n"
+					.T_('All other info is used to personalize your experience with this website.')
+					."\n\n"
+					.T_('This site may allow conversation between users.')
+					.' '.T_('Your email address and password will not be shared with other users.')
+					.' '.T_('All other information may be shared with other users.')
+					.' '.T_('Do not provide information you are not willing to share.'),
+						$now, $cat_home_b2evo, array(), 'published', '#', 'register-content', '', 'open', array( 'default' ), 'Content Block' );
 			}
 			break;
 

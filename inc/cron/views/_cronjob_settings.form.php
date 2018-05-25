@@ -62,6 +62,11 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 				$Form->text_input( 'cleanup_jobs_threshold', $Settings->get( 'cleanup_jobs_threshold' ), 5, T_('Trigger after'), T_('days').'. '.T_('The scheduled jobs older than the selected number of days will be removed.') );
 				break;
 
+			case 'cleanup-email-logs':
+				// Clean up email logs older than a threshold:
+				$Form->duration_input( 'cleanup_email_logs_threshold', $Settings->get( 'cleanup_email_logs_threshold' ), T_('Delete after'), 'days', 'minutes' );
+				break;
+
 			case 'send-non-activated-account-reminders':
 				// Send reminders about non-activated accounts:
 				$Form->duration_input( 'activate_account_reminder_threshold', $Settings->get( 'activate_account_reminder_threshold' ), T_('Trigger after'), 'days', 'minutes', array( 'note' => T_('A user will receive Account activation reminders if his account has remained non-activated for the selected period.') ) );
@@ -72,7 +77,7 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 				{
 					$reminder_config_label = sprintf( T_('Reminder #%d'), $c + 1 );
 					$reminder_config_params = array(
-							'note'             => T_('After subscription'),
+							'note'             => T_('After last notification'),
 							'none_title_label' => T_('Don\'t send'),
 						);
 					if( $c == $config_count - 1 )
@@ -86,6 +91,10 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 					}
 				}
 				$Form->hidden( 'activate_account_reminder_config_num', $config_count );
+				break;
+
+			case 'send-inactive-account-reminders':
+				$Form->duration_input( 'inactive_account_reminder_threshold', $Settings->get( 'inactive_account_reminder_threshold' ), T_('Trigger after'), 'days', 'minutes', array( 'note' => T_('An inactive account is an account that had been activated but the user hasn\'t connected for an extended period.') ) );
 				break;
 
 			case 'send-unmoderated-comments-reminders':

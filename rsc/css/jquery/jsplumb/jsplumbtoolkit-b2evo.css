@@ -8,6 +8,18 @@
 .jtk-drag {
 	outline: 2px solid pink !important;
 }
+.evo_panzoom__buttons {
+	position: absolute;
+	z-index: 100;
+	background: #FFF;
+	margin-top: 10px;
+	padding: 3px 5px 3px 0;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+#evo_automation__diagram_canvas {
+	overflow: visible !important;
+}
 /* Step box: */
 .evo_automation__diagram_step_box {
 	border: 1px solid #666;

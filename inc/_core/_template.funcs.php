@@ -474,6 +474,7 @@ function get_request_title( $params = array() )
 			'edit_links_template' => array(), // More params for the links to advanced editing on disp=edit|edit_comment
 			'tags_text'           => T_('Tags'),
 			'flagged_text'        => T_('Flagged posts'),
+			'help_text'           => T_('In case of issues with this site...'),
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -826,6 +827,10 @@ function get_request_title( $params = array() )
 		case 'flagged':
 			// We are requesting the flagged posts list:
 			$r[] = $params['flagged_text'];
+			break;
+
+		case 'help':
+			$r[] = $params['help_text'];
 			break;
 
 		case 'posts':
@@ -2519,7 +2524,7 @@ function display_login_form( $params )
 		$separator = '<br />';
 	}
 	else
-	{ // standard login form
+	{ // basic login form
 
 		if( ! empty( $params['form_title'] ) )
 		{
@@ -2901,7 +2906,7 @@ function display_activateinfo( $params )
 			$Form->hidden( 'blog', $params[ 'blog' ] );
 		}
 		else
-		{ // Form title in standard form
+		{ // Form title in basic form
 			echo '<h4>'.$params['form_title'].'</h4>';
 		}
 		$Form->hidden( 'req_activate_email_submit', 1 ); // to know if the form has been submitted

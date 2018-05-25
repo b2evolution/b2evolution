@@ -273,14 +273,13 @@ function filter_hits( & $Form )
  */
 function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp = NULL, $hit_ctrl = NULL, $hit_action = NULL)
 {
-	if( ! empty( $hit_coll_ID ) )
-	{
-		$BlogCache = & get_BlogCache();
-		$tmp_Blog = & $BlogCache->get_by_ID( $hit_coll_ID );
+	$BlogCache = & get_BlogCache();
+	if( $tmp_Blog = & $BlogCache->get_by_ID( $hit_coll_ID, false, false ) )
+	{	// Use root url of the requested collection if it still exists in DB:
 		$full_url = $tmp_Blog->get_baseurl_root().$hit_uri;
 	}
 	else
-	{
+	{	// Don't use root url if a request was without collection or it doesn't exist in DB anymore:
 		$full_url = $hit_uri;
 	}
 

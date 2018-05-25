@@ -176,6 +176,13 @@ $Results->cols[] = array(
 		'td_class' => 'timestamp'
 	);
 
+$Results->cols[] = array(
+		'th' => T_('Actions'),
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap',
+		'td' => ( $current_User->check_perm( 'emails', 'edit' ) ? action_icon( T_('Delete this record!'), 'delete', $admin_url.'?ctrl=email&amp;tab=sent&amp;action=delete&amp;emlog_ID=$emlog_ID$&amp;'.url_crumb( 'email' ) ) : '' )
+	);
+
 
 
 // Display results:
