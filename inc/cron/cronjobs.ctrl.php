@@ -232,6 +232,11 @@ switch( $action )
 					$Settings->set( 'cleanup_jobs_threshold', param( 'cleanup_jobs_threshold', 'integer', 0 ) );
 					break;
 
+				case 'cleanup-email-logs':
+					// Clean up email logs older than a threshold:
+					$Settings->set( 'cleanup_email_logs_threshold', param_duration( 'cleanup_email_logs_threshold', 'integer', 0 ) );
+					break;
+
 				case 'send-non-activated-account-reminders':
 					// Send reminders about non-activated accounts:
 					$Settings->set( 'activate_account_reminder_threshold', param_duration( 'activate_account_reminder_threshold' ) );

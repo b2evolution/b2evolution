@@ -52,6 +52,7 @@ class GeneralSettings extends AbstractSettings
 		'auto_empty_trash' => '15',         // days (How many days to keep recycled comments)
 
 		'cleanup_jobs_threshold' => 45, // days (Cleanup scheduled jobs threshold)
+		'cleanup_email_logs_threshold' => 59616000, // seconds (Cleanup email logs threshold)
 		'activate_account_reminder_threshold' => 86400, // seconds (Account activation reminder threshold)
 		'activate_account_reminder_config' => '86400'./* one day */',129600'./* 1.5 days */',345600'./* 4 days */',604800'/* 7 days */, // seconds (Account activation reminder settings)
 		'inactive_account_reminder_threshold' => 31104000, // seconds (Inactive account reminder threshold)

@@ -62,6 +62,11 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 				$Form->text_input( 'cleanup_jobs_threshold', $Settings->get( 'cleanup_jobs_threshold' ), 5, T_('Trigger after'), T_('days').'. '.T_('The scheduled jobs older than the selected number of days will be removed.') );
 				break;
 
+			case 'cleanup-email-logs':
+				// Clean up email logs older than a threshold:
+				$Form->duration_input( 'cleanup_email_logs_threshold', $Settings->get( 'cleanup_email_logs_threshold' ), T_('Delete after'), 'days', 'minutes' );
+				break;
+
 			case 'send-non-activated-account-reminders':
 				// Send reminders about non-activated accounts:
 				$Form->duration_input( 'activate_account_reminder_threshold', $Settings->get( 'activate_account_reminder_threshold' ), T_('Trigger after'), 'days', 'minutes', array( 'note' => T_('A user will receive Account activation reminders if his account has remained non-activated for the selected period.') ) );

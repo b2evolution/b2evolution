@@ -221,6 +221,12 @@ class maintenance_Module extends Module
 				'ctrl'   => 'cron/jobs/_cleanup_jobs.job.php',
 				'params' => NULL,
 			),
+			'cleanup-email-logs' => array(
+				'name'   => T_('Clean up email logs older than a threshold'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_cleanup_email_logs.job.php',
+				'params' => NULL,
+			),
 			'heavy-db-maintenance' => array(
 				'name'   => T_('Heavy DB maintenance (CHECK & OPTIMIZE)'),
 				'help'   => '#',

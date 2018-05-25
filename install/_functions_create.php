@@ -1207,6 +1207,7 @@ function create_default_jobs( $is_upgrade = false )
 	$next_sunday = date2mysql( strtotime( 'next Sunday',  $localtimenow + 86400 ) );
 
 	$cleanup_jobs_key         = 'cleanup-scheduled-jobs';
+	$cleanup_email_logs_key   = 'cleanup-email-logs';
 	$heavy_db_maintenance_key = 'heavy-db-maintenance';
 	$light_db_maintenance_key = 'light-db-maintenance';
 	$poll_antispam_key        = 'poll-antispam-blacklist';
@@ -1241,6 +1242,7 @@ function create_default_jobs( $is_upgrade = false )
 			$alert_old_contents_key   => "( ".$DB->quote( form_date( $next_sunday, '07:30:00' ) ).", 604800, ".$DB->quote( $alert_old_contents_key ).", ".$ctsk_params." )",
 			$execute_automations_key  => "( ".$DB->quote( form_date( $today, '00:00:00' ) ).", 300, ".$DB->quote( $execute_automations_key ).", ".$ctsk_params." )",
 			$inactive_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '08:00:00' ) ).", 86400, ".$DB->quote( $inactive_reminder_key ).", ".$ctsk_params." )",
+			$cleanup_email_logs_key   => "( ".$DB->quote( form_date( $tomorrow, '08:30:00' ) ).", 86400, ".$DB->quote( $cleanup_email_logs_key ).", ".$ctsk_params." )",
 		);
 	if( $is_upgrade )
 	{ // Check if these jobs already exist, and don't create another
