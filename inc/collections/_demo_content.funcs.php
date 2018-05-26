@@ -1754,7 +1754,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'demo' );
 				$edited_Item->insert( $owner_ID, T_('Login Required'), '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
-						$now, $cat_ann_b, array(), 'published', '#', 'login-required-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
+						$now, $cat_ann_b, array(), '!published', '#', 'login-required-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
 
 				// Insert a post:
 				$post_count--;
@@ -1762,7 +1762,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'demo' );
 				$edited_Item->insert( $owner_ID, T_('Access Denied'), '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
-						$now, $cat_ann_b, array(), 'published', '#', 'access-denied-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
+						$now, $cat_ann_b, array(), '!published', '#', 'access-denied-'.$blog_ID, '', 'open', array( 'default' ), 'Content Block' );
 			}
 			break;
 
