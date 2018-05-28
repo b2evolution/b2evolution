@@ -571,11 +571,11 @@ class Skin extends DataObject
 	 */
 	function db_save_containers()
 	{
-		global $DB;
-
+		global $DB, $Blog;
+		
 		// Get a list of all currently empty containers:
 		$sql = 'SELECT sco_name
-						  FROM T_skins__container LEFT JOIN T_widget ON ( sco_name = wi_sco_name )
+						  FROM T_skins__container LEFT JOIN T_widget ON ( sco_name = wi_sco_name AND wi_coll_ID = '.$Blog->ID.' )
 						 WHERE sco_skin_ID = '.$this->ID.'
 						 GROUP BY sco_name
 						HAVING COUNT(wi_ID) = 0';
@@ -608,6 +608,7 @@ class Skin extends DataObject
 										VALUES '.implode( ',', $values ), 'Insert containers' );
 		}
 	}
+
 
 
 	/**

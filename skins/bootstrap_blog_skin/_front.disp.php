@@ -31,19 +31,7 @@ $params = array_merge( array(
 ?>
 <div class="evo_container evo_container__front_page_primary">
 <?php
-skin_container( NT_('Front Page Main Area'), array(
-		// The following params will be used as defaults for widgets included in this container:
-		'author_link_text'        => $params['author_link_text'],
-		'featured_intro_before'   => $params['featured_intro_before'],
-		'featured_intro_after'    => $params['featured_intro_after'],
-		'block_start'             => $params['front_block_start'],
-		'block_end'               => $params['front_block_end'],
-		'block_first_title_start' => $params['front_block_first_title_start'],
-		'block_first_title_end'   => $params['front_block_first_title_end'],
-		'block_title_start'       => $params['front_block_title_start'],
-		'block_title_end'         => $params['front_block_title_end'],
-	) );
-// --------------------- END OF "Front Page Main Area" CONTAINER -----------------------
+
 ?>
 </div>
 <?php
@@ -53,16 +41,7 @@ skin_container( NT_('Front Page Main Area'), array(
 ?>
 <div class="evo_container evo_container__front_page_secondary">
 <?php
-skin_container( NT_('Front Page Secondary Area'), array(
-		// The following params will be used as defaults for widgets included in this container:
-		'block_start'             => $params['front_block_start'],
-		'block_end'               => $params['front_block_end'],
-		'block_first_title_start' => $params['front_block_first_title_start'],
-		'block_first_title_end'   => $params['front_block_first_title_end'],
-		'block_title_start'       => $params['front_block_title_start'],
-		'block_title_end'         => $params['front_block_title_end'],
-	) );
-// --------------------- END OF "Front Page Secondary Area" CONTAINER -----------------------
+
 ?>
 </div>
 
