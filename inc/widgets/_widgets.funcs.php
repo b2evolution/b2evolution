@@ -383,7 +383,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Login Required */
-	add_basic_widget( $blog_id, 'Login Required', 'content_block', 'core', 10, array( 'item_slug' => 'login-required-'.$blog_id ) );
+	add_basic_widget( $blog_id, 'Login Required', 'content_block', 'core', 10, array( 'item_slug' => 'login-required' ) );
 	add_basic_widget( $blog_id, 'Login Required', 'user_login', 'core', 20, array(
 			'title'               => T_( 'Log in to your account' ),
 			'login_button_class'  => 'btn btn-success btn-lg',
@@ -392,7 +392,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Access Denied */
-	add_basic_widget( $blog_id, 'Access Denied', 'content_block', 'core', 10, array( 'item_slug' => 'access-denied-'.$blog_id ) );
+	add_basic_widget( $blog_id, 'Access Denied', 'content_block', 'core', 10, array( 'item_slug' => 'access-denied' ) );
 
 
 	/* Help */
