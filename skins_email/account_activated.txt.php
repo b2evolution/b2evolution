@@ -70,9 +70,13 @@ if( $activated_User->ctry_ID > 0 )
 	echo T_('Profile Country').": ".$activated_User->get_country_name()."\n";
 }
 
-if( !empty( $activated_User->source ) )
-{	// Source is defined
-	echo T_('Registration Source').": ".$activated_User->source."\n";
+echo "\n";
+
+$initial_blog_ID = $UserSettings->get( 'initial_blog_ID', $activated_User->ID );
+if( !empty( $initial_blog_ID ) )
+{	// Hit info
+	echo T_('Initial referer').": ".$UserSettings->get( 'initial_referer', $activated_User->ID )."\n";
+	echo T_('Initial page').": ".T_('Blog')." ".$UserSettings->get( 'initial_blog_ID', $activated_User->ID )." - ".$UserSettings->get( 'initial_URI', $activated_User->ID )."\n";
 }
 
 if( $activated_User->gender == 'M' )
@@ -96,11 +100,9 @@ if( !empty( $registration_trigger_url ) )
 	echo T_('Registration Trigger Page').": ".$registration_trigger_url."\n";
 }
 
-$initial_blog_ID = $UserSettings->get( 'initial_blog_ID', $activated_User->ID );
-if( !empty( $initial_blog_ID ) )
-{	// Hit info
-	echo T_('Initial page').": ".T_('Blog')." ".$UserSettings->get( 'initial_blog_ID', $activated_User->ID )." - ".$UserSettings->get( 'initial_URI', $activated_User->ID )."\n";
-	echo T_('Initial referer').": ".$UserSettings->get( 'initial_referer', $activated_User->ID )."\n";
+if( !empty( $activated_User->source ) )
+{	// Source is defined
+	echo T_('Registration Source').": ".$activated_User->source."\n";
 }
 
 echo "\n";

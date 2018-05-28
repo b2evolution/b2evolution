@@ -66,7 +66,7 @@ if( ! empty( $user_domain ) )
 	$dom_status = $dom_status_titles[ $Domain ? $Domain->get( 'status' ) : 'unknown' ];
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Domain').': </th>'.
 			'<td'.emailskin_style( 'table.email_table td' ).'>'.$user_domain.' ('.$dom_status.')'.
-			( ! empty( $user_ip_address ) ? ' '.get_link_tag( $admin_url.'?ctrl=antispam&action=whois&query='.$user_ip_address, 'WHOIS', 'div.buttons a+a.btn-default' ) : '' ).
+			( ! empty( $user_ip_address ) ? ' '.get_link_tag( $admin_url.'?ctrl=antispam&action=whois&query='.$user_ip_address, 'WHOIS', 'div.buttons a+a.btn-default+a.btn-sm' ) : '' ).
 			'</td></tr>'."\n";
 }
 
@@ -76,9 +76,13 @@ if( $activated_User->ctry_ID > 0 )
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Profile Country').': </th><td'.emailskin_style( 'table.email_table td' ).'>'.$activated_User->get_country_name().'</td></tr>'."\n";
 }
 
-if( !empty( $activated_User->source ) )
-{ // Source is defined
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Source').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$activated_User->source.'</td></tr>'."\n";
+echo '<tr><td'.emailskin_style( 'table.email_table td' ).' colspan=2>&nbsp;</td></tr>'."\n";
+
+$initial_blog_ID = $UserSettings->get( 'initial_blog_ID', $activated_User->ID );
+if( !empty( $initial_blog_ID ) )
+{ // Hit info
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial referer').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $UserSettings->get( 'initial_referer', $activated_User->ID ), '', '.a' ).'</td></tr>'."\n";
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Collection')." ".$UserSettings->get( 'initial_blog_ID', $activated_User->ID )." - ".$UserSettings->get( 'initial_URI', $activated_User->ID ).'</td></tr>'."\n";
 }
 
 if( $activated_User->gender == 'M' )
@@ -102,11 +106,9 @@ if( !empty( $registration_trigger_url ) )
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Trigger Page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $registration_trigger_url, '', '.a' ).'</td></tr>'."\n";
 }
 
-$initial_blog_ID = $UserSettings->get( 'initial_blog_ID', $activated_User->ID );
-if( !empty( $initial_blog_ID ) )
-{ // Hit info
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Collection')." ".$UserSettings->get( 'initial_blog_ID', $activated_User->ID )." - ".$UserSettings->get( 'initial_URI', $activated_User->ID ).'</td></tr>'."\n";
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial referer').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $UserSettings->get( 'initial_referer', $activated_User->ID ), '', '.a' ).'</td></tr>'."\n";
+if( !empty( $activated_User->source ) )
+{ // Source is defined
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Source').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$activated_User->source.'</td></tr>'."\n";
 }
 
 echo '<tr><td'.emailskin_style( 'table.email_table td' ).' colspan=2>&nbsp;</td></tr>'."\n";
