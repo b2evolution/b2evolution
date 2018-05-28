@@ -573,9 +573,11 @@ class Skin extends DataObject
 	{
 		global $DB, $Blog;
 		
+		$sql = ( $Blog ) ? ' AND wi_coll_ID = '.$Blog->ID : '';
+		
 		// Get a list of all currently empty containers:
 		$sql = 'SELECT sco_name
-						  FROM T_skins__container LEFT JOIN T_widget ON ( sco_name = wi_sco_name AND wi_coll_ID = '.$Blog->ID.' )
+						  FROM T_skins__container LEFT JOIN T_widget ON ( sco_name = wi_sco_name'.$sql.'  )
 						 WHERE sco_skin_ID = '.$this->ID.'
 						 GROUP BY sco_name
 						HAVING COUNT(wi_ID) = 0';
