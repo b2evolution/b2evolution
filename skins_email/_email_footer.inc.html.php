@@ -20,10 +20,11 @@ $params = array_merge( array(
 
 $recipient_user_ID  = empty( $params['recipient_User'] ) ? NULL : $params['recipient_User']->ID;
 ?>
-
+</div>
 </div>
 
 <div class="email_footer"<?php echo emailskin_style( 'div.email_footer' ); ?>>
+<div style="max-width: 700px; margin: 1ex auto;">
 
 <?php
 echo '<p'.emailskin_style( '.p' ).'><b>'.T_( 'Please do not reply to this email!' ).'</b><br />'."\n";
@@ -51,7 +52,7 @@ if( ! empty( $params['recipient_User'] ) || ! empty( $params['comment_ID'] ) )
 
 echo '<p'.emailskin_style( '.p+p.center' ).'><img'.emailskin_style( '.img+img.b2evo' ).' src="'.$rsc_url.'img/powered-by-b2evolution-120t.gif" alt="Powered by b2evolution" /></p>';
 ?>
-
+</div>
 </div>
 
 </div><?php /* End of "div.email_wrap"*/?>

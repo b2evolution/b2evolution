@@ -9335,6 +9335,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$SQL->SELECT( 'blog_ID, cat_ID' );
 		$SQL->FROM( 'T_blogs' );
 		$SQL->FROM_add( 'LEFT JOIN T_categories ON cat_blog_ID = blog_ID AND cat_meta = 0' );
+		$SQL->WHERE( '( SELECT COUNT( wi_coll_ID ) FROM T_widget WHERE wi_coll_ID = blog_ID AND wi_sco_name IN ( "Login Required", "Access Denied" ) AND wi_code = "content_block" ) = 0' );
 		$SQL->ORDER_BY( 'blog_ID, cat_ID DESC' );
 		$collections = $DB->get_assoc( $SQL );
 		if( count( $collections ) > 0 )
@@ -9362,20 +9363,46 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				$Plugins = new Plugins();
 			}
 
+			// Get collection for info pages in order to create a help and a register content block items below:
+			$info_Blog = & get_setting_Blog( 'info_blog_ID' );
+
 			foreach( $collections as $coll_ID => $cat_ID )
 			{
+				if( ! $info_Blog || ! isset( $login_required_Item ) || ! isset( $access_denied_Item ) )
+				{	// Create a help and a register content block items once for info/shared collection if it is defined
+					// otherwise create them for each current collection:
+					if( $info_Blog )
+					{	// Use info pages collection if it is defined:
+						$content_block_Blog = $info_Blog;
+					}
+					else
+					{	// Otherwise use current collection:
+						$BlogCache = & get_BlogCache();
+						$content_block_Blog = & $BlogCache->get_by_ID( $coll_ID, false, false );
+					}
+					if( $content_block_Blog )
+					{	// The collection must be always defined but we need this additional check to avoid unexpected die error during upgrade process:
+						task_begin( 'Creating default content blocks "Login Required" and "Access Denied" for'
+							.( $info_Blog && $info_Blog->ID == $content_block_Blog->ID ? ' info pages' : '' ).' collection #'.$content_block_Blog->ID.'... ' );
+						$login_required_Item = new Item();
+						$login_required_Item->set_tags_from_string( 'demo' );
+						$login_required_Item->insert( 1, T_('Login Required'), '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
+							date( 'Y-m-d H:i:s' ), $collections[ $content_block_Blog->ID ], array(), '!published', '#', 'login-required', '', 'open', array( 'default' ), $content_block_ityp_ID );
+						// Create a register content block item for info/shared collection:
+						$access_denied_Item = new Item();
+						$access_denied_Item->set_tags_from_string( 'demo' );
+						$access_denied_Item->insert( 1, T_('Access Denied'), '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
+							date( 'Y-m-d H:i:s' ), $collections[ $content_block_Blog->ID ], array(), '!published', '#', 'access-denied', '', 'open', array( 'default' ), $content_block_ityp_ID );
+						task_end();
+					}
+				}
+
 				task_begin( 'Installing default "Login Required" and "Access Denied" widgets for collection #'.$coll_ID.'... ' );
 				/* Login Required */
-				$widget_Item = new Item();
-				$widget_Item->insert( 1, T_('Login Required'), '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
-					date( 'Y-m-d H:i:s' ), $cat_ID, array(), 'published', '#', 'login-required-'.$coll_ID, '', 'open', array( 'default' ), $content_block_ityp_ID );
-				add_basic_widget_12740( $coll_ID, 'Login Required', 'content_block', 'core', 10, array( 'item_slug' => $widget_Item->get( 'urltitle' ) ) );
+				add_basic_widget_12740( $coll_ID, 'Login Required', 'content_block', 'core', 10, array( 'item_slug' => $login_required_Item->get( 'urltitle' ) ) );
 				add_basic_widget_12740( $coll_ID, 'Login Required', 'user_login', 'core', 20, array( 'title' => T_( 'Log in to your account' ) ) );
 				/* Access Denied */
-				$widget_Item = new Item();
-				$widget_Item->insert( 1, T_('Access Denied'), '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
-					date( 'Y-m-d H:i:s' ), $cat_ID, array(), 'published', '#', 'access-denied-'.$coll_ID, '', 'open', array( 'default' ), $content_block_ityp_ID );
-				add_basic_widget_12740( $coll_ID, 'Access Denied', 'content_block', 'core', 10, array( 'item_slug' => $widget_Item->get( 'urltitle' ) ) );
+				add_basic_widget_12740( $coll_ID, 'Access Denied', 'content_block', 'core', 10, array( 'item_slug' => $access_denied_Item->get( 'urltitle' ) ) );
 				task_end();
 			}
 
@@ -9656,43 +9683,61 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				$Plugins = new Plugins();
 			}
 
-			// Get collection for info pages:
-			if( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) )
-			{	// Create a help content block item for info/shared collection:
-				$help_Item = new Item();
-				$help_Item->set_tags_from_string( 'demo' );
-				$help_Item->insert( 1, T_('Help content'), '### '.T_('Email preferences')
-					."\n\n"
-					.sprintf( T_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>'), 'href="'.$info_Blog->get( 'subsurl' ).'"' )
-					."\n\n"
-					.'### '.T_('Managing your personal information')
-					."\n\n"
-					.sprintf( T_('You can see and correct the personal details we know about you by clicking <a %s>here</a>'), 'href="'.$info_Blog->get( 'profileurl' ).'"' )
-					."\n\n"
-					.'### '.T_('Closing your account')
-					."\n\n"
-					.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>'), 'href="'.$info_Blog->get( 'closeaccounturl' ).'"' ),
-						date( 'Y-m-d H:i:s' ), $collections[ $info_Blog->ID ], array(), 'published', '#', 'help-content', '', 'open', array( 'default' ), $content_block_ityp_ID );
-				// Create a register content block item for info/shared collection:
-				$register_Item = new Item();
-				$register_Item->set_tags_from_string( 'demo' );
-				$register_Item->insert( 1, T_('Register content'), T_('The information you provide in this form will be recorded in your user account.')
-					."\n\n"
-					.T_('You will be able to modify it (or even close your account) at any time after logging in with your username and password.')
-					."\n\n"
-					.T_('Should you forget your password, you will be able to reset it by receiving a link on your email address.')
-					."\n\n"
-					.T_('All other info is used to personalize your experience with this website.')
-					."\n\n"
-					.T_('This site may allow conversation between users.')
-					.' '.T_('Your email address and password will not be shared with other users.')
-					.' '.T_('All other information may be shared with other users.')
-					.' '.T_('Do not provide information you are not willing to share.'),
-						date( 'Y-m-d H:i:s' ), $collections[ $info_Blog->ID ], array(), 'published', '#', 'register-content', '', 'open', array( 'default' ), $content_block_ityp_ID );
-			}
+			// Get collection for info pages in order to create a help and a register content block items below:
+			$info_Blog = & get_setting_Blog( 'info_blog_ID' );
 
 			foreach( $collections as $coll_ID => $cat_ID )
 			{
+				if( ! $info_Blog || ! isset( $help_Item ) || ! isset( $register_Item ) )
+				{	// Create a help and a register content block items once for info/shared collection if it is defined
+					// otherwise create them for each current collection:
+					if( $info_Blog )
+					{	// Use info pages collection if it is defined:
+						$content_block_Blog = $info_Blog;
+					}
+					else
+					{	// Otherwise use current collection:
+						$BlogCache = & get_BlogCache();
+						$content_block_Blog = & $BlogCache->get_by_ID( $coll_ID, false, false );
+					}
+					if( $content_block_Blog )
+					{	// The collection must be always defined but we need this additional check to avoid unexpected die error during upgrade process:
+						task_begin( 'Creating default content blocks "Help content" and "Register content" for'
+							.( $info_Blog && $info_Blog->ID == $content_block_Blog->ID ? ' info pages' : '' ).' collection #'.$content_block_Blog->ID.'... ' );
+						$help_Item = new Item();
+						$help_Item->set_tags_from_string( 'demo' );
+						$help_Item->insert( 1, T_('Help content'), '### '.T_('Email preferences')
+							."\n\n"
+							.sprintf( T_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>'), 'href="'.$content_block_Blog->get( 'subsurl' ).'"' )
+							."\n\n"
+							.'### '.T_('Managing your personal information')
+							."\n\n"
+							.sprintf( T_('You can see and correct the personal details we know about you by clicking <a %s>here</a>'), 'href="'.$content_block_Blog->get( 'profileurl' ).'"' )
+							."\n\n"
+							.'### '.T_('Closing your account')
+							."\n\n"
+							.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>'), 'href="'.$content_block_Blog->get( 'closeaccounturl' ).'"' ),
+								date( 'Y-m-d H:i:s' ), $collections[ $content_block_Blog->ID ], array(), '!published', '#', 'help-content', '', 'open', array( 'default' ), $content_block_ityp_ID );
+						// Create a register content block item for info/shared collection:
+						$register_Item = new Item();
+						$register_Item->set_tags_from_string( 'demo' );
+						$register_Item->insert( 1, T_('Register content'), T_('The information you provide in this form will be recorded in your user account.')
+							."\n\n"
+							.T_('You will be able to modify it (or even close your account) at any time after logging in with your username and password.')
+							."\n\n"
+							.T_('Should you forget your password, you will be able to reset it by receiving a link on your email address.')
+							."\n\n"
+							.T_('All other info is used to personalize your experience with this website.')
+							."\n\n"
+							.T_('This site may allow conversation between users.')
+							.' '.T_('Your email address and password will not be shared with other users.')
+							.' '.T_('All other information may be shared with other users.')
+							.' '.T_('Do not provide information you are not willing to share.'),
+								date( 'Y-m-d H:i:s' ), $collections[ $content_block_Blog->ID ], array(), '!published', '#', 'register-content', '', 'open', array( 'default' ), $content_block_ityp_ID );
+						task_end();
+					}
+				}
+
 				task_begin( 'Installing default "Help" and "Register" widgets for collection #'.$coll_ID.'... ' );
 				/* Help */
 				add_basic_widget_12860( $coll_ID, 'Help', 'content_block', 'core', 10, array(
@@ -9732,6 +9777,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( 'UPDATE T_widget
 			  SET wi_code = "user_register_standard"
 			WHERE wi_code = "user_normal_register"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12880, 'Adding Send reminders about inactive accounts threshold setting...' ) )
+	{ // part of 6.10.1-stable
+		$DB->query( "REPLACE INTO T_settings( set_name, set_value ) VALUES ( 'inactive_account_reminder_threshold', 0 )" );
 		upg_task_end();
 	}
 

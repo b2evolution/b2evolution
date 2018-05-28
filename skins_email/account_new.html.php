@@ -60,7 +60,7 @@ if( ! empty( $params['reg_domain'] ) )
 	}
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Domain').':</th>'.
 			'<td'.emailskin_style( 'table.email_table td' ).'>'.$params['reg_domain'].
-			( ! empty( $user_ip_address ) ? ' '.get_link_tag( $admin_url.'?ctrl=antispam&action=whois&query='.$user_ip_address, 'WHOIS', 'div.buttons a+a.button_gray' ) : '' ).
+			( ! empty( $user_ip_address ) ? ' '.get_link_tag( $admin_url.'?ctrl=antispam&action=whois&query='.$user_ip_address, 'WHOIS', 'div.buttons a+a.btn-default+a.btn-sm' ) : '' ).
 			'</td></tr>'."\n";
 }
 
@@ -72,9 +72,13 @@ if( $params['country'] > 0 )
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Profile Country').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$user_Country->get_name().'</td></tr>'."\n";
 }
 
-if( !empty( $params['source'] ) )
-{ // Source is defined
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Source').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['source'].'</td></tr>'."\n";
+echo '<tr><td'.emailskin_style( 'table.email_table td' ).' colspan=2>&nbsp;</td></tr>'."\n";
+
+
+if( ! empty( $params['initial_hit'] ) )
+{ // Hit info
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial referer').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $params['initial_hit']->hit_referer, '', '.a' ).'</td></tr>'."\n";
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri.'</td></tr>'."\n";
 }
 
 if( $params['gender'] == 'M' )
@@ -97,10 +101,9 @@ if( !empty( $params['trigger_url'] ) )
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Trigger Page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $params['trigger_url'], '', '.a' ).'</td></tr>'."\n";
 }
 
-if( ! empty( $params['initial_hit'] ) )
-{ // Hit info
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri.'</td></tr>'."\n";
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial referer').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $params['initial_hit']->hit_referer, '', '.a' ).'</td></tr>'."\n";
+if( !empty( $params['source'] ) )
+{ // Source is defined
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Source').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['source'].'</td></tr>'."\n";
 }
 
 echo '<tr><td'.emailskin_style( 'table.email_table td' ).' colspan=2>&nbsp;</td></tr>'."\n";

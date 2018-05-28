@@ -42,7 +42,8 @@ else
 { // Normal comment
 	$info_text = T_( '%s posted a new comment on %s in %s.' );
 }
-$notify_message = sprintf( $info_text, $params['author_name'], '"'.$Item->get('title').'"', '"'.$Blog->get('shortname').'"' )."\n\n";
+$author_type = empty( $params['author_ID'] ) ? ' ['.T_('Visitor').']' : ' ['.T_('Member').']';
+$notify_message = sprintf( $info_text, $params['author_name'].$author_type, '"'.$Item->get('title').'"', '"'.$Blog->get('shortname').'"' )."\n\n";
 
 if( $params['notify_full'] )
 { // Long format notification:
