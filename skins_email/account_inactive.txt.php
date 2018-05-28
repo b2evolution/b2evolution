@@ -34,7 +34,7 @@ $params = array_merge( array(
 $inactive_User = $params['User'];
 $login_Blog = $params['login_Blog'];
 
-echo sprintf( T_('We haven\'t seen you on %s for %s.'), $Settings->get( 'notification_short_name' ), seconds_to_period( $Settings->get( 'inactive_account_reminder_threshold' ) ) );
+echo strip_tags( sprintf( T_('We haven\'t seen you on <a %s>%s</a> for %s.'), 'href="'.$baseurl.'"'.emailskin_style( '.a' ), $Settings->get( 'notification_short_name' ), seconds_to_period( $Settings->get( 'inactive_account_reminder_threshold' ) ) ) );
 echo "\n\n";
 echo T_('Check out what\'s new by clicking below.');
 echo "\n\n";
@@ -50,7 +50,7 @@ else
 	$lostpassword_url = get_htsrv_url( true ).'login.php?action=lostpassword';
 }
 
-echo T_('Log in now').': '.url_add_param( $login_url, $dummy_fields['login'].'='.format_to_output( $inactive_User->login, 'urlencoded' ) )."\n";
+echo T_('Log in now!').': '.url_add_param( $login_url, $dummy_fields['login'].'='.format_to_output( $inactive_User->login, 'urlencoded' ) )."\n";
 echo T_('Lost password?').': '.url_add_param( $lostpassword_url, $dummy_fields['login'].'='.format_to_output( $inactive_User->email, 'urlencoded' ) )."\n";
 
 // Footer vars:

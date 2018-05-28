@@ -9753,6 +9753,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12880, 'Adding Send reminders about inactive accounts threshold setting...' ) )
+	{ // part of 6.10.1-stable
+		$DB->query( "REPLACE INTO T_settings( set_name, set_value ) VALUES ( 'inactive_account_reminder_threshold', 0 )" );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

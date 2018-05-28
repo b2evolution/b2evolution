@@ -54,13 +54,14 @@ else
 
 // Buttons:
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
-echo get_link_tag( url_add_param( $login_url, $dummy_fields['login'].'='.format_to_output( $inactive_User->login, 'urlencoded' ) ), T_('Log in now'), 'div.buttons a+a.btn-primary' )."\n";
+echo get_link_tag( url_add_param( $login_url, $dummy_fields['login'].'='.format_to_output( $inactive_User->login, 'urlencoded' ) ), T_('Log in now!'), 'div.buttons a+a.btn-primary' )."\n";
 echo get_link_tag( url_add_param( $lostpassword_url, $dummy_fields['login'].'='.format_to_output( $inactive_User->email, 'urlencoded' ) ), T_('Lost password?'), 'div.buttons a+a.btn-primary' )."\n";
 echo "</div>\n";
 
 // Footer vars:
-$params['unsubscribe_text'] = T_( 'If you don\'t want to receive notifications when you have been inactive for an extended period of time, click here:' ).' '.
-		get_htsrv_url().'quick_unsubscribe.php?type=account_inactive&user_ID=$user_ID$&key=$unsubscribe_key$';
+$params['unsubscribe_text'] = T_( 'If you don\'t want to receive notifications when you have been inactive for an extended period of time, click here:' )
+		.' <a href="'.get_htsrv_url().'quick_unsubscribe.php?type=account_inactive&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
+		.T_('instant unsubscribe').'</a>.';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.html.php', $params );
