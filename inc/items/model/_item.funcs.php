@@ -3333,7 +3333,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 	$CommentList->display_if_empty( array(
 		'before'    => '<div class="evo_comment"><p>',
 		'after'     => '</p></div>',
-		'msg_empty' => T_('No feedback for this post yet...'),
+		'msg_empty' => ( $item_ID > 0 ? T_('No feedback for this post yet...') : T_('No comment yet...') ),
 	) );
 
 	// Display comments:

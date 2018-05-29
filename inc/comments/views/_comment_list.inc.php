@@ -23,7 +23,7 @@ global $Comment;
  */
 global $CommentList;
 
-global $AdminUI, $UserSettings;
+global $AdminUI, $UserSettings, $current_User;
 
 // If rediret_to was not set, create new redirect
 $redirect_to = param( 'redirect_to', 'url', regenerate_url( '', 'filter=restore', '', '&' ) );
@@ -43,7 +43,7 @@ $is_meta_comments_list = ( isset( $CommentList->filters['types'] ) && in_array( 
 
 if( ! $is_meta_comments_list && $CommentList->total_rows > 0 )
 {	// Allow to select ONLY normal comments(EXCLUDE meta comments) for action on item view page:
-	global $blog, $admin_url, $current_User;
+	global $blog, $admin_url;
 
 	$Form = new Form( $admin_url );
 
