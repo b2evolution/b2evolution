@@ -182,8 +182,12 @@ class Hitlist
 
 		// PRUNE SESSIONS:
 		$hitlist_Timer->start( 'sessions' );
-		$sessions_rows_affected = $DB->query( 'DELETE FROM T_sessions WHERE sess_user_ID IS NOT NULL AND sess_lastseen_ts < '.$DB->quote( date( 'Y-m-d H:i:s', $oldest_date ) ), 'Autoprune sessions of logged-in users' );
-		$sessions_rows_affected += $DB->query( 'DELETE FROM T_sessions WHERE sess_user_ID IS NULL AND sess_lastseen_ts < '.$DB->quote( date( 'Y-m-d H:i:s', $time_prune_before ) ), 'Autoprune sessions of anonymous users' );
+		$sessions_rows_affected = $DB->query( 'DELETE FROM T_sessions
+			WHERE
+				( sess_user_ID IS NOT NULL AND sess_lastseen_ts < '.$DB->quote( date( 'Y-m-d H:i:s', $oldest_date ) ).' )
+				OR
+				( sess_user_ID IS NULL AND sess_lastseen_ts < '.$DB->quote( date( 'Y-m-d H:i:s', $time_prune_before ) ).' )',
+			'Autoprune sessions' );
 		$hitlist_Timer->stop( 'sessions' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$sessions_rows_affected.' rows from T_sessions.', 'request' );
 		$return_message .= Hitlist::log_pruning( sprintf( '%s rows from T_sessions, Execution time: %s seconds', $sessions_rows_affected, $hitlist_Timer->get_duration( 'sessions' ) ), $output_message, true );
