@@ -5069,7 +5069,7 @@ class User extends DataObject
 	{
 		global $DB;
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get values of user fields by type "'.$field_type.'" for User #'.$this->ID );
 		$SQL->SELECT( 'uf_varchar, ufdf_ID, ufdf_icon_name, ufdf_code' );
 		$SQL->FROM( 'T_users__fields' );
 		$SQL->FROM_add( 'INNER JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID' );
@@ -5081,7 +5081,7 @@ class User extends DataObject
 		}
 		$SQL->ORDER_BY( 'ufdf_order' );
 
-		return $DB->get_results( $SQL->get() );
+		return $DB->get_results( $SQL );
 	}
 
 
@@ -5187,14 +5187,15 @@ class User extends DataObject
 
 		global $DB;
 
-		$userfields = $DB->get_results( '
-			SELECT uf_ID, ufdf_ID, uf_varchar, ufdf_duplicated, ufdf_type, ufdf_name, ufdf_icon_name, ufdf_code, ufgp_ID, ufgp_name
-				FROM T_users__fields
-					INNER JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
-					INNER JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID
-			WHERE uf_user_ID = '.$this->ID.'
-				AND ufdf_required != "hidden"
-			ORDER BY ufgp_order, ufdf_order, uf_ID' );
+		$SQL = new SQL( 'Load values of user fields for User #'.$this->ID );
+		$SQL->SELECT( 'uf_ID, ufdf_ID, uf_varchar, ufdf_duplicated, ufdf_type, ufdf_name, ufdf_icon_name, ufdf_code, ufgp_ID, ufgp_name' );
+		$SQL->FROM( 'T_users__fields' );
+		$SQL->FROM_add( 'INNER JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID' );
+		$SQL->FROM_add( 'INNER JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID' );
+		$SQL->WHERE( 'uf_user_ID = '.$this->ID );
+		$SQL->WHERE_and( 'ufdf_required != "hidden"' );
+		$SQL->ORDER_BY( 'ufgp_order, ufdf_order, uf_ID' );
+		$userfields = $DB->get_results( $SQL );
 
 		$userfield_lists = array();
 		foreach( $userfields as $userfield )
@@ -5249,9 +5250,10 @@ class User extends DataObject
 
 		if( !isset($this->userfield_defs) )
 		{
-			$userfield_defs = $DB->get_results( '
-				SELECT ufdf_ID, ufdf_type, ufdf_name, ufdf_required, ufdf_options, ufdf_duplicated
-					FROM T_users__fielddefs' );
+			$SQL = new SQL( 'Load user field definitions' );
+			$SQL->SELECT( 'ufdf_ID, ufdf_type, ufdf_name, ufdf_required, ufdf_options, ufdf_duplicated' );
+			$SQL->FROM( 'T_users__fielddefs' );
+			$userfield_defs = $DB->get_results( $SQL );
 
 			foreach( $userfield_defs as $userfield_def )
 			{

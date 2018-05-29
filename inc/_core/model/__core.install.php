@@ -145,6 +145,7 @@ $schema_queries = array(
 			uf_ufdf_ID int(10) unsigned NOT NULL,
 			uf_varchar varchar(10000) NOT NULL,
 			PRIMARY KEY (uf_ID),
+			INDEX uf_user_ID ( uf_user_ID ),
 			INDEX uf_ufdf_ID ( uf_ufdf_ID ),
 			INDEX uf_varchar ( uf_varchar (255) )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

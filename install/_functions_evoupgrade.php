@@ -9786,6 +9786,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12890, 'Upgrading user fields table...' ) )
+	{	// part of 6.10.1-stable
+		db_add_index( 'T_users__fields', 'uf_user_ID', 'uf_user_ID' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
