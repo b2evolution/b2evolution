@@ -175,14 +175,15 @@ class Hitlist
 		$sess_prune_before = ( $localtimenow - $Settings->get( 'timeout_sessions' ) );
 		// IMPORTANT: we cut off at the oldest date between session timeout and sessions pruning.
 		// So if session timeout is really long (2 years for example), the sessions table won't be pruned as small as expected from the pruning delay.
-		$smaller_time = min( $sess_prune_before, $time_prune_before );
+		$oldest_date = min( $sess_prune_before, $time_prune_before );
 
 		// allow plugins to prune session based data
-		$Plugins->trigger_event( 'BeforeSessionsDelete', $temp_array = array( 'cutoff_timestamp' => $smaller_time ) );
+		$Plugins->trigger_event( 'BeforeSessionsDelete', $temp_array = array( 'cutoff_timestamp' => $oldest_date ) );
 
 		// PRUNE SESSIONS:
 		$hitlist_Timer->start( 'sessions' );
-		$sessions_rows_affected = $DB->query( 'DELETE FROM T_sessions WHERE sess_lastseen_ts < '.$DB->quote( date( 'Y-m-d H:i:s', $smaller_time ) ), 'Autoprune sessions' );
+		$sessions_rows_affected = $DB->query( 'DELETE FROM T_sessions WHERE sess_user_ID IS NOT NULL AND sess_lastseen_ts < '.$DB->quote( date( 'Y-m-d H:i:s', $oldest_date ) ), 'Autoprune sessions of logged-in users' );
+		$sessions_rows_affected += $DB->query( 'DELETE FROM T_sessions WHERE sess_user_ID IS NULL AND sess_lastseen_ts < '.$DB->quote( date( 'Y-m-d H:i:s', $time_prune_before ) ), 'Autoprune sessions of anonymous users' );
 		$hitlist_Timer->stop( 'sessions' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$sessions_rows_affected.' rows from T_sessions.', 'request' );
 		$return_message .= Hitlist::log_pruning( sprintf( '%s rows from T_sessions, Execution time: %s seconds', $sessions_rows_affected, $hitlist_Timer->get_duration( 'sessions' ) ), $output_message, true );

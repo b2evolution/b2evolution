@@ -28,7 +28,7 @@ $Form->begin_fieldset( T_('Session Settings').get_manual_link('session-settings'
 	// fp>TODO: enhance UI with a general Form method for Days:Hours:Minutes:Seconds
 
 	$Form->duration_input( 'timeout_sessions', $Settings->get('timeout_sessions'), T_('Session timeout'), 'months', 'seconds',
-						array( 'minutes_step' => 1, 'required' => true, 'note' => T_( 'If the user stays inactive for this long, he will have to log in again.' ) ) );
+						array( 'minutes_step' => 1, 'required' => true, 'note' => T_('Logged-in users won\'t have to log in again for this long. Note: this sets the duration of the Session Cookie + the Session will stay in the DB for this long.') ) );
 	// $Form->text_input( 'timeout_sessions', $Settings->get('timeout_sessions'), 9, T_('Session timeout'), T_('seconds. How long can a user stay inactive before automatic logout?'), array( 'required'=>true) );
 
 	// fp>TODO: It may make sense to have a different (smaller) timeout for sessions with no logged user.
