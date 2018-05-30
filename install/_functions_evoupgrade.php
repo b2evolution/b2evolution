@@ -9382,17 +9382,29 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 					}
 					if( $content_block_Blog )
 					{	// The collection must be always defined but we need this additional check to avoid unexpected die error during upgrade process:
+						$cat_ID = $collections[ $content_block_Blog->ID ];
+						if( $cat_ID === NULL )
+						{	// Create new category if collection has no categories:
+							load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
+							$new_Chapter = new Chapter( NULL, $content_block_Blog->ID );
+							$new_Chapter->set( 'name', T_('Uncategorized') );
+							$new_Chapter->set( 'urlname', $content_block_Blog->get( 'urlname' ).'-main' );
+							$new_Chapter->dbinsert();
+							$cat_ID = $new_Chapter->ID;
+							$ChapterCache = & get_ChapterCache();
+							$ChapterCache->add( $new_Chapter );
+						}
 						task_begin( 'Creating default content blocks "Login Required" and "Access Denied" for'
 							.( $info_Blog && $info_Blog->ID == $content_block_Blog->ID ? ' info pages' : '' ).' collection #'.$content_block_Blog->ID.'... ' );
 						$login_required_Item = new Item();
 						$login_required_Item->set_tags_from_string( 'demo' );
 						$login_required_Item->insert( 1, T_('Login Required'), '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
-							date( 'Y-m-d H:i:s' ), $collections[ $content_block_Blog->ID ], array(), '!published', '#', 'login-required', '', 'open', array( 'default' ), $content_block_ityp_ID );
+							date( 'Y-m-d H:i:s' ), $cat_ID, array(), '!published', '#', 'login-required', '', 'open', array( 'default' ), $content_block_ityp_ID );
 						// Create a register content block item for info/shared collection:
 						$access_denied_Item = new Item();
 						$access_denied_Item->set_tags_from_string( 'demo' );
 						$access_denied_Item->insert( 1, T_('Access Denied'), '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
-							date( 'Y-m-d H:i:s' ), $collections[ $content_block_Blog->ID ], array(), '!published', '#', 'access-denied', '', 'open', array( 'default' ), $content_block_ityp_ID );
+							date( 'Y-m-d H:i:s' ), $cat_ID, array(), '!published', '#', 'access-denied', '', 'open', array( 'default' ), $content_block_ityp_ID );
 						task_end();
 					}
 				}
@@ -9702,6 +9714,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 					}
 					if( $content_block_Blog )
 					{	// The collection must be always defined but we need this additional check to avoid unexpected die error during upgrade process:
+						$cat_ID = $collections[ $content_block_Blog->ID ];
+						if( $cat_ID === NULL )
+						{	// Create new category if collection has no categories:
+							load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
+							$new_Chapter = new Chapter( NULL, $content_block_Blog->ID );
+							$new_Chapter->set( 'name', T_('Uncategorized') );
+							$new_Chapter->set( 'urlname', $content_block_Blog->get( 'urlname' ).'-main' );
+							$new_Chapter->dbinsert();
+							$cat_ID = $new_Chapter->ID;
+							$ChapterCache = & get_ChapterCache();
+							$ChapterCache->add( $new_Chapter );
+						}
 						task_begin( 'Creating default content blocks "Help content" and "Register content" for'
 							.( $info_Blog && $info_Blog->ID == $content_block_Blog->ID ? ' info pages' : '' ).' collection #'.$content_block_Blog->ID.'... ' );
 						$help_Item = new Item();
@@ -9717,7 +9741,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							.'### '.T_('Closing your account')
 							."\n\n"
 							.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>'), 'href="'.$content_block_Blog->get( 'closeaccounturl' ).'"' ),
-								date( 'Y-m-d H:i:s' ), $collections[ $content_block_Blog->ID ], array(), '!published', '#', 'help-content', '', 'open', array( 'default' ), $content_block_ityp_ID );
+								date( 'Y-m-d H:i:s' ), $cat_ID, array(), '!published', '#', 'help-content', '', 'open', array( 'default' ), $content_block_ityp_ID );
 						// Create a register content block item for info/shared collection:
 						$register_Item = new Item();
 						$register_Item->set_tags_from_string( 'demo' );
@@ -9733,7 +9757,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							.' '.T_('Your email address and password will not be shared with other users.')
 							.' '.T_('All other information may be shared with other users.')
 							.' '.T_('Do not provide information you are not willing to share.'),
-								date( 'Y-m-d H:i:s' ), $collections[ $content_block_Blog->ID ], array(), '!published', '#', 'register-content', '', 'open', array( 'default' ), $content_block_ityp_ID );
+								date( 'Y-m-d H:i:s' ), $cat_ID, array(), '!published', '#', 'register-content', '', 'open', array( 'default' ), $content_block_ityp_ID );
 						task_end();
 					}
 				}
