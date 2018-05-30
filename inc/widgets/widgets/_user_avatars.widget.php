@@ -102,10 +102,12 @@ class user_avatars_Widget extends ComponentWidget
 				'note' => T_('How to sort the users'),
 				'type' => 'select',
 				'options' => array(
-						'random'  => T_('Random users'),
-						'regdate' => T_('Most recent registrations'),
-						'moddate' => T_('Most recent profile updates'),
-						'numposts' => T_('Number of (Public+Community+Member) posts'),
+						'random'     => T_('Random users'),
+						'opt_random' => T_('Optimized Random'),
+						'php_random' => T_('PHP Random'),
+						'regdate'    => T_('Most recent registrations'),
+						'moddate'    => T_('Most recent profile updates'),
+						'numposts'   => T_('Number of (Public+Community+Member) posts'),
 					),
 				'defaultvalue' => 'random',
 			),
@@ -212,6 +214,10 @@ class user_avatars_Widget extends ComponentWidget
 				break;
 			case 'numposts':
 				$sql_order = 'user_numposts DESC';
+				break;
+			case 'opt_random':
+			case 'php_random':
+				$sql_order = 'user_ID';
 				break;
 			case 'random':
 			default:
@@ -322,12 +328,99 @@ class user_avatars_Widget extends ComponentWidget
 					break;
 			}
 		}
+
+		$users_limit = intval( $this->disp_params[ 'limit' ] );
 		$SQL->ORDER_BY( $sql_order );
-		$SQL->LIMIT( intval( $this->disp_params[ 'limit' ] ) );
+		$SQL->LIMIT( $users_limit );
+
+		switch( $this->disp_params['order_by'] )
+		{
+			case 'opt_random':
+				// Optimized Random:
+				$count_SQL = new SQL( 'Get user numbers for widget #'.$this->ID.' "'.$this->get_name().'"' );
+				$count_SQL->SELECT( 'MIN( user_ID ) AS min_user_ID, MAX( user_ID ) AS max_user_ID, COUNT( user_ID ) AS cnt' );
+				$count_SQL->FROM( 'T_users' );
+				$count_SQL->WHERE( $SQL->get_where( '' ) );
+				$user_nums = $DB->get_row( $count_SQL );
+				if( $user_nums->cnt == 0 )
+				{	// If no users for current filter:
+					$SQL->WHERE( 'FALSE' );
+				}
+				elseif( $user_nums->cnt <= $users_limit )
+				{	// If filtered users number is less or equal than the requested limit:
+					$user_IDs_SQL = $count_SQL;
+					$user_IDs_SQL->title = 'Get filtered user IDs for widget #'.$this->ID.' "'.$this->get_name().'"';
+					$user_IDs_SQL->SELECT( 'user_ID' );
+					$user_IDs = $DB->get_col( $user_IDs_SQL );
+					// Randomizes the order of the user IDs:
+					shuffle( $user_IDs );
+					$SQL->WHERE( 'user_ID IN ( '.implode( ', ', $user_IDs ).' )' );
+					$SQL->ORDER_BY( 'FIND_IN_SET( user_ID, "'.implode( ',', $user_IDs ).'" )' );
+				}
+				else
+				{	// If filtered users number is more than the requested limit:
+					$user_IDs = array();
+					while( count( $user_IDs ) < $users_limit )
+					{
+						$random_user_ID = rand( $user_nums->min_user_ID, $user_nums->max_user_ID );
+						if( ! in_array( $random_user_ID, $user_IDs ) )
+						{	// Use only new random user ID is not array yet:
+							$check_user_SQL = new SQL( 'Check random user ID for widget #'.$this->ID.' "'.$this->get_name().'"' );
+							$check_user_SQL->SELECT( 'user_ID' );
+							$check_user_SQL->FROM( 'T_users' );
+							$check_user_SQL->WHERE( 'user_ID = '.$random_user_ID );
+							$check_user_SQL->WHERE_and( $SQL->get_where( '' ) );
+							if( $DB->get_var( $check_user_SQL ) )
+							{	// Add to array only when user is realted to current filter:
+								$user_IDs[] = $random_user_ID;
+							}
+						}
+					}
+					$SQL->WHERE( 'user_ID IN ( '.implode( ', ', $user_IDs ).' )' );
+					$SQL->ORDER_BY( 'FIND_IN_SET( user_ID, "'.implode( ',', $user_IDs ).'" )' );
+				}
+				// Don't limit because the selection is already limited by fixed array of user IDs:
+				$SQL->LIMIT( '' );
+				break;
+
+			case 'php_random':
+				// PHP Random:
+				$filtered_user_IDs_SQL = new SQL( 'Get all filtered user IDs before PHP random for widget #'.$this->ID.' "'.$this->get_name().'"' );
+				$filtered_user_IDs_SQL->SELECT( 'user_ID' );
+				$filtered_user_IDs_SQL->FROM( 'T_users' );
+				$filtered_user_IDs_SQL->WHERE( $SQL->get_where( '' ) );
+				$filtered_user_IDs = $DB->get_col( $filtered_user_IDs_SQL );
+				$filtered_user_IDs_num = count( $filtered_user_IDs );
+				if( $filtered_user_IDs_num == 0 )
+				{	// If no users for current filter:
+					$SQL->WHERE( 'FALSE' );
+				}
+				else
+				{	// If at least one user is found by widget filter:
+					if( $users_limit > $filtered_user_IDs_num )
+					{	// If filtered users are less than max limit is required by widget setting:
+						$users_limit = $filtered_user_IDs_num;
+					}
+					$user_IDs = array();
+					while( count( $user_IDs ) < $users_limit )
+					{
+						$random_user_ID = $filtered_user_IDs[ rand( 0, $filtered_user_IDs_num - 1 ) ];
+						if( ! in_array( $random_user_ID, $user_IDs ) )
+						{	// Add only new random user ID is not array yet:
+							$user_IDs[] = $random_user_ID;
+						}
+					}
+					$SQL->WHERE( 'user_ID IN ( '.implode( ', ', $user_IDs ).' )' );
+					$SQL->ORDER_BY( 'FIND_IN_SET( user_ID, "'.implode( ',', $user_IDs ).'" )' );
+				}
+				// Don't limit because the selection is already limited by fixed array of user IDs:
+				$SQL->LIMIT( '' );
+				break;
+		}
 
 		$UserList->sql = $SQL->get();
 
-		$UserList->run_query( false, false, false, 'User avatars widget' );
+		$UserList->run_query( false, false, false, 'Get users by filter of widget #'.$this->ID.' "'.$this->get_name().'"' );
 
 		$avatar_link_attrs = '';
 		if( $this->disp_params[ 'style' ] == 'badges' )
