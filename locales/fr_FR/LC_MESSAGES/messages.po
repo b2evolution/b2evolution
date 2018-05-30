@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2018-05-29 22:52+0200\n"
+"POT-Creation-Date: 2018-05-30 15:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Erika, 2017\n"
 "Language-Team: French (France) (https://www.transifex.com/fplanque/teams/23/fr_FR/)\n"
@@ -187,7 +187,7 @@ msgstr "Info"
 #: ../../../skins_email/comment_spam.txt.php:66
 #: ../../../skins_fallback_v5/_contact_msg.form.php:120
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:58
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:309
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:310
 #: ../../../skins_fallback_v5/_item_new_form.inc.php:49
 #: ../../../skins_fallback_v6/_contact_msg.form.php:120
 #: ../../../skins_fallback_v6/_edit_comment.disp.php:80
@@ -204,7 +204,7 @@ msgstr "WWW"
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:305
 #: ../../../skins/touch/_item_comment_form.inc.php:254
 #: ../../../skins_email/comment_new.txt.php:71
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:317
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:318
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:335
 msgid "Website"
 msgstr "Site web"
@@ -248,7 +248,7 @@ msgstr "Contacts"
 #: ../../../skins/basic/_item_comment_form.inc.php:62
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:287
 #: ../../../skins/touch/_item_comment_form.inc.php:232
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:296
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:297
 msgid "User"
 msgstr "Utilisateur"
 
@@ -2215,7 +2215,7 @@ msgstr "Fichier introuvable! Impossible de l'effacer."
 #: ../../../inc/skins/model/_skin.class.php:746
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:414
 #: ../../../skins/touch/_item_comment_form.inc.php:367
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:421
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:422
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:496
 msgid "Preview"
 msgstr "Prévisualiser"
@@ -3805,7 +3805,7 @@ msgstr "Idx Blog"
 #: ../../../skins/basic/_item_comment_form.inc.php:74
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:298
 #: ../../../skins/touch/_item_comment_form.inc.php:244
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:307
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:308
 #: ../../../skins_fallback_v5/_item_new_form.inc.php:47
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:325
 msgid "Name"
@@ -4997,21 +4997,21 @@ msgstr "Ligne %s"
 msgid "Some restrictions prevent deletion:"
 msgstr "Certaines restrictions interdisent la suppression:"
 
-#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:787
+#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:799
 #: ../../../inc/xmlrpc/apis/_wordpress.api.php:828
 msgid "The following relations prevent deletion:"
 msgstr "Les relations suivantes empêchent la suppression:"
 
-#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:788
+#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:800
 #: ../../../inc/xmlrpc/apis/_wordpress.api.php:829
 msgid "Please delete related objects before you proceed."
 msgstr "Merci de supprimer les objets liés avant de continuer."
 
-#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:836
+#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:848
 msgid "WARNING: Deleting this object will also delete:"
 msgstr "ATTENTION: Supprimer cet objet supprimera également:"
 
-#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:841
+#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:853
 #: ../../../inc/_core/ui/results/_resultsel.class.php:522
 #: ../../../inc/collections/views/_coll_general.form.php:78
 #: ../../../inc/plugins/plugins.ctrl.php:984
@@ -5020,7 +5020,7 @@ msgstr "ATTENTION: Supprimer cet objet supprimera également:"
 msgid "THIS CANNOT BE UNDONE!"
 msgstr "CETTE OPERATION N'EST PAS REVERSIBLE!"
 
-#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:854
+#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:866
 #: ../../../inc/_core/ui/results/_resultsel.class.php:536
 #: ../../../inc/collections/_collections.init.php:1094
 #: ../../../inc/collections/views/_coll_general.form.php:86
@@ -5033,7 +5033,7 @@ msgstr "CETTE OPERATION N'EST PAS REVERSIBLE!"
 msgid "I am sure!"
 msgstr "Je suis sûr!"
 
-#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:864
+#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:876
 #: ../../../inc/_core/ui/results/_resultsel.class.php:544
 #: ../../../inc/collections/_collections.init.php:1095
 #: ../../../inc/collections/views/_coll_general.form.php:87
@@ -5041,44 +5041,44 @@ msgstr "Je suis sûr!"
 msgid "CANCEL"
 msgstr "ANNULER"
 
-#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1100
+#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1112
 msgid "Edit this object..."
 msgstr "Modifier cet objet..."
 
-#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1101
+#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1113
 msgid "Duplicate this object..."
 msgstr "Dupliquer cet objet..."
 
-#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1102
+#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1114
 msgid "Delete this object!"
 msgstr "Supprimer cet objet!"
 
-#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1156
+#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1168
 #, php-format
 msgid "Created on %s by %s"
 msgstr "Créé le %s par %s"
 
-#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1161
+#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1173
 #, php-format
 msgid "Created by %s"
 msgstr "Créé par %s"
 
-#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1166
+#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1178
 #, php-format
 msgid "Created on %s"
 msgstr "Créé le %s"
 
-#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1176
+#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1188
 #, php-format
 msgid "Last mod on %s by %s"
 msgstr "Dernière modification le %s par %s"
 
-#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1181
+#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1193
 #, php-format
 msgid "Last mod by %s"
 msgstr "Dernière modification le %s"
 
-#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1186
+#: ../../../inc/_core/model/dataobjects/_dataobject.class.php:1198
 #, php-format
 msgid "Last mod on %s"
 msgstr "Dernière modification le %s"
@@ -5303,7 +5303,7 @@ msgstr "Choisir une autre"
 #: ../../../inc/links/views/_link_list.inc.php:162
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:374
 #: ../../../skins/touch/_item_comment_form.inc.php:325
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:384
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:385
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:455
 msgid "Attach files"
 msgstr "Attacher des fichiers"
@@ -7917,7 +7917,7 @@ msgid "This element is locked and cannot be edited!"
 msgstr "Cet élément est verrouillé et ne peut pas être modifié!"
 
 #: ../../../inc/chapters/chapters.ctrl.php:203
-#: ../../../inc/chapters/model/_chaptercache.class.php:995
+#: ../../../inc/chapters/model/_chaptercache.class.php:998
 msgid "Root"
 msgstr "Racine"
 
@@ -8864,7 +8864,7 @@ msgid "This is a Content Block"
 msgstr "Ceci est un Bloc de Contenu"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1275
-#: ../../../install/_functions_evoupgrade.php:9389
+#: ../../../install/_functions_evoupgrade.php:9401
 #: ../../../skins_fallback_v5/_access_requires_login.disp.php:15
 msgid "Login Required"
 msgstr "Identification Requise"
@@ -8872,18 +8872,18 @@ msgstr "Identification Requise"
 #: ../../../inc/collections/_demo_content.funcs.php:1275
 #: ../../../inc/collections/model/_blog.class.php:4522
 #: ../../../inc/rest/_restapi.class.php:367
-#: ../../../install/_functions_evoupgrade.php:9389
+#: ../../../install/_functions_evoupgrade.php:9401
 msgid "You need to log in before you can access this section."
 msgstr "Vous devez vous connecter avant de pouvoir accéder à cette section."
 
 #: ../../../inc/collections/_demo_content.funcs.php:1283
-#: ../../../install/_functions_evoupgrade.php:9394
+#: ../../../install/_functions_evoupgrade.php:9406
 #: ../../../skins_fallback_v5/_access_denied.disp.php:15
 msgid "Access Denied"
 msgstr "Accès Refusé"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1283
-#: ../../../install/_functions_evoupgrade.php:9394
+#: ../../../install/_functions_evoupgrade.php:9406
 msgid ""
 "You are not a member of this collection, therefore you are not allowed to "
 "access it."
@@ -8892,17 +8892,17 @@ msgstr ""
 "accéder."
 
 #: ../../../inc/collections/_demo_content.funcs.php:1291
-#: ../../../install/_functions_evoupgrade.php:9709
+#: ../../../install/_functions_evoupgrade.php:9733
 msgid "Email preferences"
 msgstr "Préférences email"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1291
-#: ../../../install/_functions_evoupgrade.php:9709
+#: ../../../install/_functions_evoupgrade.php:9733
 msgid "Help content"
 msgstr "Contenu d'aide"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1293
-#: ../../../install/_functions_evoupgrade.php:9711
+#: ../../../install/_functions_evoupgrade.php:9735
 #, php-format
 msgid ""
 "You can see and change all your email subscriptions and notifications coming"
@@ -8912,12 +8912,12 @@ msgstr ""
 "provenant de ce site en cliquant <a %s>ici</a>"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1295
-#: ../../../install/_functions_evoupgrade.php:9713
+#: ../../../install/_functions_evoupgrade.php:9737
 msgid "Managing your personal information"
 msgstr ""
 
 #: ../../../inc/collections/_demo_content.funcs.php:1297
-#: ../../../install/_functions_evoupgrade.php:9715
+#: ../../../install/_functions_evoupgrade.php:9739
 #, php-format
 msgid ""
 "You can see and correct the personal details we know about you by clicking "
@@ -8927,23 +8927,23 @@ msgstr ""
 "connaissons sur vous en cliquant <a %s>ici</a>"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1299
-#: ../../../install/_functions_evoupgrade.php:9717
+#: ../../../install/_functions_evoupgrade.php:9741
 msgid "Closing your account"
 msgstr "Fermer votre compte"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1301
-#: ../../../install/_functions_evoupgrade.php:9719
+#: ../../../install/_functions_evoupgrade.php:9743
 #, php-format
 msgid "You can close your account yourself by clicking <a %s>here</a>"
 msgstr "Vous pouvez fermer votre compte vous-même en cliquant <a %s>ici</a>"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1309
-#: ../../../install/_functions_evoupgrade.php:9724
+#: ../../../install/_functions_evoupgrade.php:9748
 msgid "Register content"
 msgstr "Contenu d'enregistrement"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1309
-#: ../../../install/_functions_evoupgrade.php:9724
+#: ../../../install/_functions_evoupgrade.php:9748
 msgid ""
 "The information you provide in this form will be recorded in your user "
 "account."
@@ -8952,7 +8952,7 @@ msgstr ""
 "dans votre compte utilisateur."
 
 #: ../../../inc/collections/_demo_content.funcs.php:1311
-#: ../../../install/_functions_evoupgrade.php:9726
+#: ../../../install/_functions_evoupgrade.php:9750
 msgid ""
 "You will be able to modify it (or even close your account) at any time after"
 " logging in with your username and password."
@@ -8962,7 +8962,7 @@ msgstr ""
 "passe."
 
 #: ../../../inc/collections/_demo_content.funcs.php:1313
-#: ../../../install/_functions_evoupgrade.php:9728
+#: ../../../install/_functions_evoupgrade.php:9752
 msgid ""
 "Should you forget your password, you will be able to reset it by receiving a"
 " link on your email address."
@@ -8971,7 +8971,7 @@ msgstr ""
 "réinitialiser en recevant un email sur votre adresse email."
 
 #: ../../../inc/collections/_demo_content.funcs.php:1315
-#: ../../../install/_functions_evoupgrade.php:9730
+#: ../../../install/_functions_evoupgrade.php:9754
 msgid ""
 "All other info is used to personalize your experience with this website."
 msgstr ""
@@ -8979,26 +8979,26 @@ msgstr ""
 "experience sur ce site."
 
 #: ../../../inc/collections/_demo_content.funcs.php:1317
-#: ../../../install/_functions_evoupgrade.php:9732
+#: ../../../install/_functions_evoupgrade.php:9756
 msgid "This site may allow conversation between users."
 msgstr "Ce site peut autoriser les conversations entre les utilisateurs."
 
 #: ../../../inc/collections/_demo_content.funcs.php:1318
-#: ../../../install/_functions_evoupgrade.php:9733
+#: ../../../install/_functions_evoupgrade.php:9757
 msgid "Your email address and password will not be shared with other users."
 msgstr ""
 "Votre email et mot de passe ne seront pas partagés avec les autres "
 "utilisateurs."
 
 #: ../../../inc/collections/_demo_content.funcs.php:1319
-#: ../../../install/_functions_evoupgrade.php:9734
+#: ../../../install/_functions_evoupgrade.php:9758
 msgid "All other information may be shared with other users."
 msgstr ""
 "Toutes les autres informations peuvent être partagées avec les autres "
 "utilisateurs"
 
 #: ../../../inc/collections/_demo_content.funcs.php:1320
-#: ../../../install/_functions_evoupgrade.php:9735
+#: ../../../install/_functions_evoupgrade.php:9759
 msgid "Do not provide information you are not willing to share."
 msgstr "Ne fournissez pas d'informations que vous ne voulez pas partager."
 
@@ -10568,6 +10568,8 @@ msgstr ""
 
 #: ../../../inc/collections/model/_blog.class.php:3270
 #: ../../../inc/tools/model/_wp.funcs.php:574
+#: ../../../install/_functions_evoupgrade.php:9390
+#: ../../../install/_functions_evoupgrade.php:9722
 msgid "Uncategorized"
 msgstr "Non catégorisé"
 
@@ -12050,7 +12052,7 @@ msgstr "Limite"
 
 #: ../../../inc/collections/views/_coll_comments.form.php:299
 msgid "Max # of emails an anonymous user may receive per day."
-msgstr ""
+msgstr "Nombre max d'emails qu'un utilisateur anonyme peut recevoir par jour."
 
 #: ../../../inc/collections/views/_coll_comments.form.php:304
 msgid "Registration of commenters"
@@ -12085,7 +12087,7 @@ msgstr "Purger les commentaires recyclés après"
 
 #: ../../../inc/collections/views/_coll_comments.form.php:313
 msgid "Warning: This affects ALL collections on the system."
-msgstr ""
+msgstr "Attention: ceci affecte TOUTES les collections du système."
 
 #: ../../../inc/collections/views/_coll_comments.form.php:313
 #: ../../../inc/collections/views/_coll_features.form.php:66
@@ -12714,7 +12716,7 @@ msgstr "Utiliser le workflow"
 #: ../../../skins/basic/_item_comment_form.inc.php:110
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:404
 #: ../../../skins/touch/_item_comment_form.inc.php:347
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:406
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:407
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:477
 msgid "Options"
 msgstr "Options"
@@ -15632,7 +15634,7 @@ msgstr "ou"
 #: ../../../skins/basic/_item_comment_form.inc.php:54
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:273
 #: ../../../skins/touch/_item_comment_form.inc.php:218
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:282
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:283
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:305
 msgid "You are currently replying to a specific comment"
 msgstr "Vous répondez actuellement à un commentaire précis"
@@ -15776,8 +15778,8 @@ msgstr ""
 #: ../../../inc/comments/views/_comment.form.php:130
 #: ../../../skins/touch/_item_comment_form.inc.php:338
 #: ../../../skins/touch/_item_comment_form.inc.php:343
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:397
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:402
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:398
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:403
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:468
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:473
 msgid "Notify me of replies"
@@ -15835,7 +15837,7 @@ msgstr "Info sur les réactions"
 #: ../../../skins/touch/_item_comment_form.inc.php:355
 #: ../../../skins_fallback_v5/_edit.disp.php:303
 #: ../../../skins_fallback_v5/_edit_comment.disp.php:122
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:413
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:414
 #: ../../../skins_fallback_v5/_item_new_form.inc.php:108
 #: ../../../skins_fallback_v6/_edit.disp.php:310
 #: ../../../skins_fallback_v6/_edit_comment.disp.php:117
@@ -16855,8 +16857,9 @@ msgstr ""
 "les filtres."
 
 #: ../../../inc/email_campaigns/campaigns.ctrl.php:576
-msgid "New Campaign"
-msgstr ""
+#: ../../../inc/email_campaigns/views/_campaigns_new.form.php:38
+msgid "New campaign"
+msgstr "Nouvelle campagne"
 
 #: ../../../inc/email_campaigns/campaigns.ctrl.php:594
 msgid "Edit campaign"
@@ -17017,7 +17020,7 @@ msgstr "Liste des destinataires"
 
 #: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:320
 msgid "Username or email address"
-msgstr ""
+msgstr "Nom d'utilisateur ou adresse email"
 
 #: ../../../inc/email_campaigns/model/_emailcampaign.funcs.php:335
 #: ../../../inc/email_campaigns/views/_newsletters_campaign.view.php:23
@@ -17384,10 +17387,6 @@ msgstr "Enregistrer les informations"
 #: ../../../inc/email_campaigns/views/_campaigns_new.form.php:30
 msgid "Duplicate campaign"
 msgstr ""
-
-#: ../../../inc/email_campaigns/views/_campaigns_new.form.php:38
-msgid "New campaign"
-msgstr "Nouvelle campagne"
 
 #: ../../../inc/email_campaigns/views/_campaigns_new.form.php:63
 msgid "Create campaign"
@@ -20985,15 +20984,15 @@ msgstr "Retour"
 
 #: ../../../inc/items/model/_item.funcs.php:2631
 msgid "Move source post & comments"
-msgstr ""
+msgstr "Déplacer le post source & ses commentaires"
 
 #: ../../../inc/items/model/_item.funcs.php:2633
 msgid "by keeping original dates (merge)"
-msgstr ""
+msgstr "en conservant les dates d'origine (fusion)"
 
 #: ../../../inc/items/model/_item.funcs.php:2634
 msgid "by assigning new dates (append)"
-msgstr ""
+msgstr "en assignant de nouvelles dates (ajout)"
 
 #: ../../../inc/items/model/_item.funcs.php:2870
 msgid "You are not allowed to cross post to several collections."
@@ -22033,7 +22032,7 @@ msgstr ""
 #: ../../../inc/items/views/_item_list_full.view.php:623
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:311
 #: ../../../skins/touch/_item_comment_form.inc.php:260
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:326
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:327
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:344
 msgid "Your vote"
 msgstr "Votre vote"
@@ -22041,7 +22040,7 @@ msgstr "Votre vote"
 #: ../../../inc/items/views/_item_list_full.view.php:665
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:367
 #: ../../../skins/touch/_item_comment_form.inc.php:318
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:377
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:378
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:448
 msgid "Attached files"
 msgstr "Fichiers attachés"
@@ -22049,7 +22048,7 @@ msgstr "Fichiers attachés"
 #: ../../../inc/items/views/_item_list_full.view.php:692
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:414
 #: ../../../skins/touch/_item_comment_form.inc.php:367
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:421
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:422
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:496
 msgid "Preview/Add file"
 msgstr "Prévisualiser/Ajouter fichier"
@@ -24107,11 +24106,11 @@ msgstr "Aucun fichier trouvé"
 
 #: ../../../inc/maintenance/model/_maintenance.funcs.php:806
 msgid "Affected paths:"
-msgstr "Chemins affectés"
+msgstr "Chemins affectés:"
 
 #: ../../../inc/maintenance/model/_maintenance.funcs.php:842
 msgid "Affected tables:"
-msgstr "Tables affectées"
+msgstr "Tables affectées:"
 
 #: ../../../inc/maintenance/model/_maintenance.funcs.php:903
 msgid "Unzip"
@@ -25431,7 +25430,7 @@ msgid "The database has been updated."
 msgstr "La base données a été mise à jour."
 
 #: ../../../inc/plugins/_plugin.funcs.php:1544
-#: ../../../install/_functions_evoupgrade.php:9999
+#: ../../../install/_functions_evoupgrade.php:10023
 msgid "The DB schema has been changed since confirmation."
 msgstr "Le schéma de la base de données a changé depuis la confirmation."
 
@@ -25716,7 +25715,7 @@ msgid "The plugin needs the following database changes."
 msgstr "Le plugin requiert les modifications de base de donnée suivantes."
 
 #: ../../../inc/plugins/plugins.ctrl.php:924
-#: ../../../install/_functions_evoupgrade.php:10036
+#: ../../../install/_functions_evoupgrade.php:10060
 msgid ""
 "The following database changes will be carried out. If you are not sure what"
 " this means, it will probably be alright."
@@ -26130,7 +26129,7 @@ msgstr "Nouvelle option de sondage"
 
 #: ../../../inc/polls/views/_poll.form.php:247
 msgid "Detailed answers"
-msgstr ""
+msgstr "Détail des réponses"
 
 #: ../../../inc/polls/views/_poll_option.form.php:28
 #, php-format
@@ -28252,6 +28251,8 @@ msgid ""
 "In order to manage all the comments you posted, please create a user account"
 " with the same email address."
 msgstr ""
+"Afin de pouvoir contrôler tous les commentaires que vous avez posté, merci "
+"de créer un compte utilisateur avec la même adresse email."
 
 #: ../../../inc/skins/_skin.funcs.php:1172
 msgid "You must log in before you can activate your account."
@@ -28329,11 +28330,11 @@ msgstr "Cette fonction est désactivée."
 
 #: ../../../inc/skins/_skin.funcs.php:1513
 msgid "The account closing feature is disabled."
-msgstr ""
+msgstr "La fonction de fermeture de compte est désactivée."
 
 #: ../../../inc/skins/_skin.funcs.php:1518
 msgid "You must log in before you can close your account."
-msgstr ""
+msgstr "Vous devez vous connecter avant de pouvoir fermer votre compte."
 
 #: ../../../inc/skins/_skin.funcs.php:1523
 msgid ""
@@ -28341,6 +28342,10 @@ msgid ""
 "cannot close your own account. Please ask the admin (or another admin) to "
 "remove your user moderation privileges before closing your account."
 msgstr ""
+"Vous avez la permission de modérer les autres utilisateurs. Afin d'éviter "
+"des erreurs, vous ne pouvez pas fermer votre compte. Merci de demander à "
+"l'administrateur (ou un autre administrateur) de supprimer votre permission "
+"de modération avant de fermer votre compte."
 
 #: ../../../inc/skins/_skin.funcs.php:1578
 #: ../../../skins_adm/_adminUI_general.class.php:182
@@ -32873,7 +32878,7 @@ msgstr "Fermer le profil utilisateur!"
 #: ../../../inc/users/model/_user.funcs.php:2579
 #: ../inc/users/user.ctrl.php:907
 msgid "Marketing"
-msgstr ""
+msgstr "Marketing"
 
 #: ../../../inc/users/model/_user.funcs.php:2586
 #: ../inc/users/user.ctrl.php:920
@@ -33042,25 +33047,25 @@ msgstr "Abonné à"
 #. TRANS: Full sentence is "Subscribed to: <select> and not to: <select>"
 #: ../../../inc/users/model/_user.funcs.php:3703
 msgid "and not to"
-msgstr ""
+msgstr "et pas à"
 
 #: ../../../inc/users/model/_user.funcs.php:3710
 msgid "Has all these tags"
-msgstr ""
+msgstr "A tous ces tags"
 
 #: ../../../inc/users/model/_user.funcs.php:3715
 msgid "but not any of these tags"
-msgstr ""
+msgstr "mais aucun de ces tags"
 
 #: ../../../inc/users/model/_user.funcs.php:3728
 #: ../../../inc/users/model/_user.funcs.php:7409
 msgid "Send error"
-msgstr ""
+msgstr "Erreur d'envoi"
 
 #: ../../../inc/users/model/_user.funcs.php:3729
 #: ../../../inc/users/model/_user.funcs.php:7412
 msgid "Skipped"
-msgstr ""
+msgstr "Ignoré"
 
 #: ../../../inc/users/model/_user.funcs.php:3731
 #: ../../../inc/users/model/_user.funcs.php:6576
@@ -33873,7 +33878,7 @@ msgstr ""
 
 #: ../../../inc/users/model/_user.funcs.php:7347
 msgid "Skip"
-msgstr ""
+msgstr "Ignorer"
 
 #: ../../../inc/users/model/_user.funcs.php:7403
 msgid "Ready to resend"
@@ -36046,7 +36051,7 @@ msgstr ""
 #: ../../../inc/users/views/_user_list_automation.form.php:57
 #: ../../../inc/users/views/_user_list_automation.form.php:62
 msgid "Ignore"
-msgstr ""
+msgstr "Ignorer"
 
 #: ../../../inc/users/views/_user_list_automation.form.php:53
 msgid "Add anyway"
@@ -36422,6 +36427,8 @@ msgstr ""
 #, php-format
 msgid "Never send me more than %s list emails per day, all lists combined."
 msgstr ""
+"Ne m'envoyez jamais plis de %s emails de liste par jour, toutes listes "
+"combinées."
 
 #: ../../../inc/users/views/_user_subscriptions.form.php:234
 msgid "Collection subscriptions"
@@ -36429,7 +36436,7 @@ msgstr "Abonnements aux collections"
 
 #: ../../../inc/users/views/_user_subscriptions.form.php:292
 msgid "Notify me when:"
-msgstr ""
+msgstr "Notifiez moi quand:"
 
 #: ../../../inc/users/views/_user_subscriptions.form.php:301
 msgid ""
@@ -36493,12 +36500,12 @@ msgstr "Cette notification n'est renvoyée qu'une fois tous les %s jours."
 #: ../../../inc/users/views/_user_subscriptions.form.php:463
 #: ../../../inc/users/views/_user_subscriptions.form.php:465
 msgid "My account"
-msgstr ""
+msgstr "Mon compte"
 
 #: ../../../inc/users/views/_user_subscriptions.form.php:465
 #, php-format
 msgid "my account has been inactive for more than %s."
-msgstr ""
+msgstr "mon compte est resté inactif pendant plus de %s."
 
 #: ../../../inc/users/views/_user_subscriptions.form.php:468
 #: ../../../inc/users/views/_user_subscriptions.form.php:469
@@ -36667,7 +36674,7 @@ msgid "More Posts"
 msgstr "Plus de posts"
 
 #: ../../../inc/widgets/_widgets.funcs.php:388
-#: ../../../install/_functions_evoupgrade.php:9403
+#: ../../../install/_functions_evoupgrade.php:9415
 #: ../../../skins/bootstrap_blog_skin/index.main.php:234
 #: ../../../skins/bootstrap_forums_skin/index.main.php:254
 #: ../../../skins/bootstrap_gallery_legacy/index.main.php:179
@@ -36681,9 +36688,9 @@ msgid "Log in to your account"
 msgstr "Connectez-vous à votre compte"
 
 #: ../../../inc/widgets/_widgets.funcs.php:401
-#: ../../../install/_functions_evoupgrade.php:9745
+#: ../../../install/_functions_evoupgrade.php:9769
 msgid "Personal Data & Privacy"
-msgstr ""
+msgstr "Données personnelles & vie privée"
 
 #: ../../../inc/widgets/model/_widget.class.php:189
 #: ../../../inc/widgets/model/_widget.class.php:263
@@ -39940,15 +39947,15 @@ msgstr ""
 msgid "Linkblog"
 msgstr "Linkblog"
 
-#: ../../../install/_functions_evoupgrade.php:9984
+#: ../../../install/_functions_evoupgrade.php:10008
 msgid "The database schema is up to date."
 msgstr "Le schéma de base de données est à jour."
 
-#: ../../../install/_functions_evoupgrade.php:10025
+#: ../../../install/_functions_evoupgrade.php:10049
 msgid "Upgrade database"
 msgstr "Mise à jour de la base de données!"
 
-#: ../../../install/_functions_evoupgrade.php:10034
+#: ../../../install/_functions_evoupgrade.php:10058
 msgid ""
 "The version number is correct, but we have detected changes in the database "
 "schema. This can happen if you've been using development versions directly "
@@ -39958,7 +39965,7 @@ msgstr ""
 "dans le schéma de la base. Celà peut arriver si vous avez utilisé des "
 "versions de développement provenant de GitHub..."
 
-#: ../../../install/_functions_evoupgrade.php:10048
+#: ../../../install/_functions_evoupgrade.php:10072
 msgid "Try to Repair/Upgrade database now!"
 msgstr "Essayez de Réparer/Mettre à jour la base de données maintenant!"
 
@@ -44026,7 +44033,7 @@ msgstr "Site/Url"
 #: ../../../skins/basic/_item_comment_form.inc.php:93
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:305
 #: ../../../skins/touch/_item_comment_form.inc.php:254
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:317
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:318
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:335
 msgid "Your URL will be displayed."
 msgstr "Votre URL sera affichée."
@@ -44042,7 +44049,7 @@ msgstr "(Placer des cookies pour le nom, l'email & l'url)"
 #: ../../../skins/basic/_item_comment_form.inc.php:115
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:382
 #: ../../../skins/touch/_item_comment_form.inc.php:333
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:392
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:393
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:463
 msgid "Remember me"
 msgstr "Se rappeler de moi"
@@ -45489,7 +45496,7 @@ msgstr "Vous pensez que cette réponse est OK"
 
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:300
 #: ../../../skins/touch/_item_comment_form.inc.php:247
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:310
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:311
 #: ../../../skins_fallback_v5/_item_new_form.inc.php:49
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:328
 msgid "Your email address will <strong>not</strong> be revealed on this site."
@@ -45501,14 +45508,14 @@ msgstr "Pour mon prochain commentaire sur ce site"
 
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:396
 #: ../../../skins/touch/_item_comment_form.inc.php:335
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:394
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:395
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:465
 msgid "Allow message form"
 msgstr "Autoriser messages"
 
 #: ../../../skins/pureforums_skin/_item_comment_form.inc.php:397
 #: ../../../skins/touch/_item_comment_form.inc.php:335
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:394
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:395
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:465
 msgid ""
 "Allow users to contact me through a message form -- Your email will "
@@ -45651,7 +45658,7 @@ msgid "Mobile: Tools Menu"
 msgstr "Mobile: Menu Outils"
 
 #: ../../../skins/touch/_item_comment_form.inc.php:333
-#: ../../../skins_fallback_v5/_item_comment_form.inc.php:392
+#: ../../../skins_fallback_v5/_item_comment_form.inc.php:393
 #: ../../../skins_fallback_v6/_item_comment_form.inc.php:463
 msgid "Set cookies so I don't need to fill out my details next time"
 msgstr ""
@@ -46549,7 +46556,7 @@ msgstr ""
 #: ../../../skins_email/post_assignment.txt.php:79
 #, php-format
 msgid "%s assigned you to a post on %s with title %s."
-msgstr ""
+msgstr "%s vous as assigné un post sur %s ayant pour titre %s."
 
 #: ../../../skins_email/post_assignment.html.php:77
 #: ../../../skins_email/post_assignment.txt.php:87
@@ -46570,6 +46577,8 @@ msgid ""
 "If you don't want to receive any more notifications when posts are assigned "
 "to you, click here:"
 msgstr ""
+"Si vous ne souhaitez plus recevoir de notifications lorsqu'un post vous est "
+"assigné,  cliquez ici:"
 
 #: ../../../skins_email/post_assignment.txt.php:74
 #: ../../../skins_email/post_new.txt.php:77
@@ -46876,6 +46885,9 @@ msgid ""
 "You haven't flagged any post yet. You can click on the flag icon (%s) on any"
 " post in order to save it here for later review."
 msgstr ""
+"Vous n'avez marqué aucun post pour le moment. Vous pouvez cliquer sur "
+"l'icône drapeau (%s) sur n'importe quel post afin de le sauvegarder pour "
+"référence ultérieure."
 
 #: ../../../skins_fallback_v5/_help.disp.php:26
 msgid "This is a private website or section"
@@ -46933,12 +46945,12 @@ msgstr "Créer post"
 #: ../../../skins_fallback_v5/_login.disp.php:126
 #: ../../../skins_fallback_v6/_login.disp.php:127
 msgid "Use basic login form instead"
-msgstr ""
+msgstr "Utiliser le formulaire de connexion basique à la place"
 
 #: ../../../skins_fallback_v5/_lostpassword.disp.php:66
 #: ../../../skins_fallback_v6/_lostpassword.disp.php:66
 msgid "Use basic password recovery form instead"
-msgstr ""
+msgstr "Utiliser le formulaire de récupération de mot de passe basique"
 
 #: ../../../skins_fallback_v5/_messages.disp.php:88
 #: ../../../skins_fallback_v6/_messages.disp.php:88
@@ -46985,7 +46997,7 @@ msgstr "Mobile: Pied de page"
 #: ../../../skins_fallback_v5/_register.disp.php:52
 #: ../../../skins_fallback_v6/_register.disp.php:54
 msgid "Use basic registration form instead"
-msgstr ""
+msgstr "Utiliser le formulaire d'inscription basique à la place"
 
 #: ../../../skins_fallback_v5/_sitemap.disp.php:20
 #: ../../../skins_fallback_v6/_sitemap.disp.php:20
