@@ -334,7 +334,7 @@ class User extends DataObject
 				array( 'table'=>'T_comments__votes', 'fk'=>'cmvt_user_ID', 'msg'=>T_('%d user votes on comments') ),
 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_user_ID', 'msg'=>T_('%d blog subscriptions') ),
 				array( 'table'=>'T_items__item', 'fk'=>'post_creator_user_ID', 'msg'=>T_('%d posts created by this user'),
-						'class'=>'Item', 'class_path'=>'items/model/_item.class.php' ),
+						'class'=>'Item', 'class_path'=>'items/model/_item.class.php', 'style' => 'bold' ),
 				array( 'table'=>'T_items__subscriptions', 'fk'=>'isub_user_ID', 'msg'=>T_('%d post subscriptions') ),
 				array( 'table'=>'T_messaging__contact', 'fk'=>'mct_to_user_ID', 'msg'=>T_('%d contacts from other users contact list') ),
 				array( 'table'=>'T_messaging__contact', 'fk'=>'mct_from_user_ID', 'msg'=>T_('%d contacts from this user contact list') ),
@@ -345,7 +345,7 @@ class User extends DataObject
 				array( 'table'=>'T_items__user_data', 'fk'=>'itud_user_ID', 'msg'=>T_('%d recordings of user data for a specific post') ),
 				array( 'table'=>'T_links', 'fk'=>'link_usr_ID', 'msg'=>T_('%d links to this user'),
 						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
-				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "user"', 'msg'=>T_('%d files from this user file root') ),
+				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "user"', 'msg'=>T_('%d files from this user file root'), 'style' => 'bold' ),
 				array( 'table' => 'T_files', 'fk'=>'file_creator_user_ID', 'and_condition'=>'file_root_type != "user"', 'msg'=>T_('%d files will lose their creator ID.') ),
 				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_user_ID', 'msg'=>T_('%d list emails for this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_target_user_ID', 'msg'=>T_('%d reports about this user') ),
@@ -380,10 +380,10 @@ class User extends DataObject
 		if( $is_spammer )
 		{
 			$this->delete_cascades[] = array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('%d messages from this user'),
-					'class'=>'Message', 'class_path'=>'messaging/model/_message.class.php' );
+					'class'=>'Message', 'class_path'=>'messaging/model/_message.class.php', 'style' => 'bold' );
 			$this->delete_cascades[] = array( 'table'=>'T_messaging__threadstatus', 'fk'=>'tsta_user_ID', 'msg'=>T_('%d message read statuses from this user') );
 			$this->delete_cascades[] = array( 'table'=>'T_comments', 'fk'=>'comment_author_user_ID', 'msg'=>T_('%d comments by this user'),
-					'class'=>'Comment', 'class_path'=>'comments/model/_comment.class.php' );
+					'class'=>'Comment', 'class_path'=>'comments/model/_comment.class.php', 'style' => 'bold' );
 			$this->delete_cascades[] = array( 'table'=>'T_links', 'fk'=>'link_creator_user_ID', 'msg'=>T_('%d links created by this user'),
 					'class'=>'Link', 'class_path'=>'links/model/_link.class.php' );
 		}

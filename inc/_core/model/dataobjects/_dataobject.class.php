@@ -759,6 +759,18 @@ class DataObject
 				0, 0, 'restriction/cascade check' );
 				if( $count )
 				{
+					if( isset( $restriction['style'] ) )
+					{
+						switch( $restriction['style'] )
+						{
+							case 'bold':
+								$restriction['msg'] = '<b>'.$restriction['msg'].'</b>';
+								break;
+
+							case 'italic':
+								$restriction['msg'] = '<i>'.$restriction['msg'].'</i>';
+						}
+					}
 					$restriction_Messages->add( sprintf( $restriction['msg'], $count ), 'error' );
 				}
 			}
@@ -824,7 +836,7 @@ class DataObject
 		$restriction_Messages->params['class_note'] .= ' text-warning';
 
 		if( !empty( $additional_messages ) )
-		{ // Initialaize additional messages
+		{ // Initialize additional messages
 			foreach( $additional_messages as $additional_message )
 			{
 				$restriction_Messages->add( $additional_message[0], $additional_message[1] );
