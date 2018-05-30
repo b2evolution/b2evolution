@@ -19,12 +19,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for maintenance module to function properly
  */
-$required_php_version[ 'maintenance' ] = '5.2';
+$required_php_version[ 'maintenance' ] = '5.4';
 
 /**
  * Minimum MYSQL version required for maintenance module to function properly
  */
-$required_mysql_version[ 'maintenance' ] = '5.0.3';
+$required_mysql_version[ 'maintenance' ] = '5.1';
 
 $ctrl_mappings['backup'] = 'maintenance/backup.ctrl.php';
 $ctrl_mappings['upgrade'] = 'maintenance/upgrade.ctrl.php';
@@ -219,6 +219,12 @@ class maintenance_Module extends Module
 				'name'   => T_('Clean up scheduled jobs older than a threshold'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_cleanup_jobs.job.php',
+				'params' => NULL,
+			),
+			'cleanup-email-logs' => array(
+				'name'   => T_('Clean up email logs older than a threshold'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_cleanup_email_logs.job.php',
 				'params' => NULL,
 			),
 			'heavy-db-maintenance' => array(

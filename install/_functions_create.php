@@ -219,6 +219,7 @@ function create_default_data()
 			'group_ID'  => $admins_Group->ID,
 			'org_IDs'   => $user_org_IDs,
 			'org_roles' => array( 'King of Spades' ),
+			'org_priorities' => array( 0 ),
 			'fields'    => array(
 					'Micro bio'   => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
 					'Website'     => 'http://b2evolution.net/',
@@ -1200,11 +1201,13 @@ function create_default_jobs( $is_upgrade = false )
 	global $DB, $localtimenow;
 
 	// get tomorrow date
-	$date = date2mysql( $localtimenow + 86400 );
+	$today = date2mysql( $localtimenow );
+	$tomorrow = date2mysql( $localtimenow + 86400 );
 	$ctsk_params = $DB->quote( 'N;' );
 	$next_sunday = date2mysql( strtotime( 'next Sunday',  $localtimenow + 86400 ) );
 
 	$cleanup_jobs_key         = 'cleanup-scheduled-jobs';
+	$cleanup_email_logs_key   = 'cleanup-email-logs';
 	$heavy_db_maintenance_key = 'heavy-db-maintenance';
 	$light_db_maintenance_key = 'light-db-maintenance';
 	$poll_antispam_key        = 'poll-antispam-blacklist';
@@ -1213,28 +1216,33 @@ function create_default_jobs( $is_upgrade = false )
 	$prune_sessions_key       = 'prune-old-hits-and-sessions';
 	$prune_comments_key       = 'prune-recycled-comments';
 	$activate_reminder_key    = 'send-non-activated-account-reminders';
+	$inactive_reminder_key    = 'send-inactive-account-reminders';
 	$comment_reminder_key     = 'send-unmoderated-comments-reminders';
 	$messages_reminder_key    = 'send-unread-messages-reminders';
 	$post_reminder_key        = 'send-unmoderated-posts-reminders';
 	$alert_old_contents_key   = 'monthly-alert-old-contents';
+	$execute_automations_key  = 'execute-automations';
 
 	// init insert values
 	$insert_values = array(
 			// run unread messages reminder in every 29 minutes
-			$messages_reminder_key    => "( ".$DB->quote( form_date( $date, '01:00:00' ) ).", 1740,  ".$DB->quote( $messages_reminder_key ).", ".$ctsk_params." )",
+			$messages_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '01:00:00' ) ).", 1740,  ".$DB->quote( $messages_reminder_key ).", ".$ctsk_params." )",
 			// run activate account reminder in every 31 minutes
-			$activate_reminder_key    => "( ".$DB->quote( form_date( $date, '01:30:00' ) ).", 1860,  ".$DB->quote( $activate_reminder_key ).", ".$ctsk_params." )",
-			$prune_pagecache_key      => "( ".$DB->quote( form_date( $date, '02:00:00' ) ).", 86400, ".$DB->quote( $prune_pagecache_key ).", ".$ctsk_params." )",
-			$process_hitlog_key       => "( ".$DB->quote( form_date( $date, '02:30:00' ) ).", 86400, ".$DB->quote( $process_hitlog_key ).", ".$ctsk_params." )",
-			$prune_sessions_key       => "( ".$DB->quote( form_date( $date, '03:00:00' ) ).", 86400, ".$DB->quote( $prune_sessions_key ).", ".$ctsk_params." )",
-			$poll_antispam_key        => "( ".$DB->quote( form_date( $date, '04:00:00' ) ).", 86400, ".$DB->quote( $poll_antispam_key ).", ".$ctsk_params." )",
-			$comment_reminder_key     => "( ".$DB->quote( form_date( $date, '04:30:00' ) ).", 86400, ".$DB->quote( $comment_reminder_key ).", ".$ctsk_params." )",
-			$cleanup_jobs_key         => "( ".$DB->quote( form_date( $date, '05:00:00' ) ).", 86400, ".$DB->quote( $cleanup_jobs_key ).", ".$ctsk_params." )",
-			$prune_comments_key       => "( ".$DB->quote( form_date( $date, '05:30:00' ) ).", 86400, ".$DB->quote( $prune_comments_key ).", ".$ctsk_params." )",
-			$light_db_maintenance_key => "( ".$DB->quote( form_date( $date, '06:00:00' ) ).", 86400, ".$DB->quote( $light_db_maintenance_key ).", ".$ctsk_params." )",
+			$activate_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '01:30:00' ) ).", 1860,  ".$DB->quote( $activate_reminder_key ).", ".$ctsk_params." )",
+			$prune_pagecache_key      => "( ".$DB->quote( form_date( $tomorrow, '02:00:00' ) ).", 86400, ".$DB->quote( $prune_pagecache_key ).", ".$ctsk_params." )",
+			$process_hitlog_key       => "( ".$DB->quote( form_date( $tomorrow, '02:30:00' ) ).", 86400, ".$DB->quote( $process_hitlog_key ).", ".$ctsk_params." )",
+			$prune_sessions_key       => "( ".$DB->quote( form_date( $tomorrow, '03:00:00' ) ).", 86400, ".$DB->quote( $prune_sessions_key ).", ".$ctsk_params." )",
+			$poll_antispam_key        => "( ".$DB->quote( form_date( $tomorrow, '04:00:00' ) ).", 86400, ".$DB->quote( $poll_antispam_key ).", ".$ctsk_params." )",
+			$comment_reminder_key     => "( ".$DB->quote( form_date( $tomorrow, '04:30:00' ) ).", 86400, ".$DB->quote( $comment_reminder_key ).", ".$ctsk_params." )",
+			$cleanup_jobs_key         => "( ".$DB->quote( form_date( $tomorrow, '05:00:00' ) ).", 86400, ".$DB->quote( $cleanup_jobs_key ).", ".$ctsk_params." )",
+			$prune_comments_key       => "( ".$DB->quote( form_date( $tomorrow, '05:30:00' ) ).", 86400, ".$DB->quote( $prune_comments_key ).", ".$ctsk_params." )",
+			$light_db_maintenance_key => "( ".$DB->quote( form_date( $tomorrow, '06:00:00' ) ).", 86400, ".$DB->quote( $light_db_maintenance_key ).", ".$ctsk_params." )",
 			$heavy_db_maintenance_key => "( ".$DB->quote( form_date( $next_sunday, '06:30:00' ) ).", 604800, ".$DB->quote( $heavy_db_maintenance_key ).", ".$ctsk_params." )",
-			$post_reminder_key        => "( ".$DB->quote( form_date( $date, '07:00:00' ) ).", 86400, ".$DB->quote( $post_reminder_key ).", ".$ctsk_params." )",
+			$post_reminder_key        => "( ".$DB->quote( form_date( $tomorrow, '07:00:00' ) ).", 86400, ".$DB->quote( $post_reminder_key ).", ".$ctsk_params." )",
 			$alert_old_contents_key   => "( ".$DB->quote( form_date( $next_sunday, '07:30:00' ) ).", 604800, ".$DB->quote( $alert_old_contents_key ).", ".$ctsk_params." )",
+			$execute_automations_key  => "( ".$DB->quote( form_date( $today, '00:00:00' ) ).", 300, ".$DB->quote( $execute_automations_key ).", ".$ctsk_params." )",
+			$inactive_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '08:00:00' ) ).", 86400, ".$DB->quote( $inactive_reminder_key ).", ".$ctsk_params." )",
+			$cleanup_email_logs_key   => "( ".$DB->quote( form_date( $tomorrow, '08:30:00' ) ).", 86400, ".$DB->quote( $cleanup_email_logs_key ).", ".$ctsk_params." )",
 		);
 	if( $is_upgrade )
 	{ // Check if these jobs already exist, and don't create another
@@ -1275,7 +1283,7 @@ function create_sample_organization()
 	task_end();
 
 	task_begin( 'Adding admin user to sample organization...' );
-	$admin_user->update_organizations( $user_org_IDs, array( 'King of Spades' ), true );
+	$admin_user->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
 	task_end();
 }
 
@@ -1737,23 +1745,23 @@ function create_demo_contents()
 
 
 	task_begin( 'Creating default polls... ' );
-	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text )
-		VALUES ( 1, "What is your favorite b2evolution feature?" )' );
+	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text, pqst_max_answers )
+		VALUES ( 1, "What are your favorite b2evolution features?", 3 )' );
 	$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
 		VALUES ( 1, "Multiple blogs",          1 ),
 		       ( 1, "Photo Galleries",         2 ),
 		       ( 1, "Forums",                  3 ),
 		       ( 1, "Online Manuals",          4 ),
-		       ( 1, "Newsletters / E-mailing", 5 ),
+		       ( 1, "Lists / E-mailing", 5 ),
 		       ( 1, "Easy Maintenance",        6 )' );
 	$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
-		VALUES ( 1, 5, 1 ),
-		       ( 1, 6, 2 ),
-		       ( 1, 7, 2 ),
-		       ( 1, 2, 2 ),
-		       ( 1, 3, 3 ),
-		       ( 1, 4, 3 ),
-		       ( 1, 1, 6 )' );
+		VALUES ( 1, 5, 1 ), ( 1, 5, 5 ), ( 1, 5, 6 ),
+		       ( 1, 6, 2 ), ( 1, 6, 5 ), ( 1, 6, 1 ),
+		       ( 1, 7, 2 ), ( 1, 7, 5 ), ( 1, 6, 3 ),
+		       ( 1, 2, 2 ), ( 1, 2, 5 ), ( 1, 2, 4 ),
+		       ( 1, 3, 3 ), ( 1, 3, 5 ), ( 1, 3, 1 ),
+		       ( 1, 4, 3 ), ( 1, 4, 6 ), ( 1, 4, 2 ),
+		       ( 1, 1, 6 ), ( 1, 1, 5 ), ( 1, 1, 3 )' );
 	task_end();
 
 
@@ -1794,23 +1802,48 @@ function create_default_posts_location()
 
 
 /**
+ * Create default newsletters
+ */
+function create_default_newsletters()
+{
+	global $DB, $create_sample_contents;
+
+	task_begin( 'Creating default lists... ' );
+
+	if( $create_sample_contents )
+	{
+		// Insert default newsletters:
+		$DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label, enlt_order )
+			VALUES ( "News", "Send me news about this site.", 1 ),
+			       ( "Promotions", "I want to receive ADs that may be relevant to my interests.", 2 )' );
+
+		// Insert default subscriptions for each user on first newsletter:
+		$DB->query( 'REPLACE INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
+			SELECT user_ID, 1 FROM T_users' );
+	}
+
+	task_end();
+}
+
+
+/**
  * Create default email campaigns
  */
 function create_default_email_campaigns()
 {
-	global $DB, $create_sample_contents;
+	global $DB, $create_sample_contents, $baseurl;
 
 	task_begin( 'Creating default email campaigns... ' );
 
-	load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
-	load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
-
 	if( $create_sample_contents )
 	{
-		$EmailCampaign = new EmailCampaign();
-		$EmailCampaign->set( 'name', T_('Markdown Example') );
-		$EmailCampaign->set( 'email_title', T_('Markdown Example') );
-		$EmailCampaign->set( 'email_text', T_('Heading
+		load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
+		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+		$email_campaigns = array(
+			array(
+				'name' => T_('Markdown Example'),
+				'text' => T_('Heading
 =======
 
 Sub-heading
@@ -1845,15 +1878,111 @@ Shopping list:
 * oranges
 * pears
 
-The rain---not the reign---in Spain.') );
+The rain---not the reign---in Spain.
 
-		if( $EmailCampaign->dbinsert() )
-		{	// Add recipients after successfull email campaign creating:
-			$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
-			if( ! empty( $user_IDs ) )
-			{	// Only if we have found the users in DB
-				$EmailCampaign->add_users( $user_IDs );
+Button examples:
+[button]This is a button[/button]
+[like]I like this[/like] [dislike]I don\'t like this[/dislike]
+[cta:1:info]Call to action 1 info button[/cta] [cta:2:warning]Call to action 2 warning button[/cta] [cta:3:default]Call to action 3 default button[/cta]
+[cta:1:link]Call to action 1 link only[/cta]'),
+			),
+			array(
+				'name' => T_('Another example'),
+				'text' => sprintf( T_('Hello %s!'), '$firstname_and_login$' )."\r\n\r\n".T_('Here are some news...'),
+			),
+		);
+
+		$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
+		foreach( $email_campaigns as $email_campaign )
+		{
+			$EmailCampaign = new EmailCampaign();
+			$EmailCampaign->set( 'enlt_ID', 1 );
+			$EmailCampaign->set( 'name', $email_campaign['name'] );
+			$EmailCampaign->set( 'email_defaultdest', $baseurl );
+			$EmailCampaign->set( 'email_text', $email_campaign['text'] );
+
+			if( $EmailCampaign->dbinsert() && ! empty( $user_IDs ) )
+			{	// Add recipients after successfull email campaign creating,
+				// only if we have found the users in DB:
+				$EmailCampaign->add_recipients( $user_IDs );
 			}
+		}
+	}
+
+	task_end();
+}
+
+
+/**
+ * Create default automations
+ */
+function create_default_automations()
+{
+	global $DB, $create_sample_contents, $baseurl;
+
+	task_begin( 'Creating default automations... ' );
+
+	if( $create_sample_contents )
+	{
+		//load_funcs( 'automations/model/_automation.funcs.php' );
+		load_class( 'automations/model/_automation.class.php', 'Automation' );
+		load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
+
+		$Automation = new Automation();
+		$Automation->set( 'name', T_('Sample Automation') );
+		$Automation->set( 'owner_user_ID', 1 );
+		$Automation->update_newsletters = true;
+		$Automation->newsletters = array( array(
+				'ID'        => 1,
+				'autostart' => 1,
+				'autoexit'  => 1,
+			) );
+
+		if( $Automation->dbinsert() )
+		{	// Add steps after successfull creating of the automation:
+			$AutomationStep = new AutomationStep();
+			$AutomationStep->set( 'autm_ID', $Automation->ID );
+			$AutomationStep->set( 'order', 1 );
+			$AutomationStep->set( 'label', 'admin' );
+			$AutomationStep->set( 'type', 'notify_owner' );
+			$AutomationStep->set( 'info', 'The User $login$ has reached step $step_number$ (ID: $step_ID$) in automation $automation_name$ (ID: $automation_ID$)' );
+			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'yes_next_step_delay', 86400 ); // 1 day
+			$AutomationStep->set( 'error_next_step_ID', 1 ); // Loop
+			$AutomationStep->set( 'error_next_step_delay', 14400 ); // 4 hours
+			$AutomationStep->dbinsert();
+
+			$AutomationStep = new AutomationStep();
+			$AutomationStep->set( 'autm_ID', $Automation->ID );
+			$AutomationStep->set( 'order', 2 );
+			$AutomationStep->set( 'label', 'Markdown Example' );
+			$AutomationStep->set( 'type', 'send_campaign' );
+			$AutomationStep->set( 'info', '1' ); // Email Campaign ID
+			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'yes_next_step_delay', 259200 ); // 3 days
+			$AutomationStep->set( 'no_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
+			$AutomationStep->set( 'error_next_step_ID', 2 ); // Loop
+			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
+			$AutomationStep->dbinsert();
+
+			$AutomationStep = new AutomationStep();
+			$AutomationStep->set( 'autm_ID', $Automation->ID );
+			$AutomationStep->set( 'order', 3 );
+			$AutomationStep->set( 'label', 'Another example' );
+			$AutomationStep->set( 'type', 'send_campaign' );
+			$AutomationStep->set( 'info', '2' ); // Email Campaign ID
+			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'yes_next_step_delay', 259200 ); // 3 days
+			$AutomationStep->set( 'no_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
+			$AutomationStep->set( 'error_next_step_ID', 3 ); // Loop
+			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
+			$AutomationStep->dbinsert();
+
+			// Add users to this automation:
+			$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
+			$Automation->add_users( $user_IDs );
 		}
 	}
 

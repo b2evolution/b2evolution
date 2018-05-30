@@ -56,6 +56,8 @@ if( empty( $Blog ) )
 	// EXIT.
 }
 
+// Set a selected collection in user settings in order to use a correct last viewed collection URL in back-office:
+set_working_blog( $blog );
 
 if( $debug == 2 || is_logged_in() )
 {	// Allow debug info only for logged-in users OR when debug == 2:
@@ -495,7 +497,7 @@ param( 'm', 'string', NULL );
 if( empty( $Item ) &&
 		(
 			! is_null( $catsel ) || // Filter by many categories
-			( $disp != 'edit' && ! is_null( $cat ) ) || // Filter by one category
+			( $disp != 'edit' && $disp != 'anonpost' && ! is_null( $cat ) ) || // Filter by one category
 			! is_null( $tag ) || // Filter by tag
 			! empty( $m ) // Filter by date like '201410' (urls from ?disp=arcdir)
 	) )
@@ -629,6 +631,10 @@ param( 'user_ID', 'integer', NULL );
 if( ( $disp == 'user' ) && isset( $user_ID ) && isset( $current_User ) && ( $user_ID != $current_User->ID ) && ( $Settings->get( 'enable_visit_tracking') == 1 ) )
 { // add or increment to user profile visit
 	add_user_profile_visit( $user_ID, $current_User->ID );
+}
+elseif( ( $disp == 'visits' ) && isset( $user_ID ) && isset( $current_User ) && ( $user_ID == $current_User->ID ) && ( $Settings->get( 'enable_visit_tracking') == 1 ) )
+{
+	reset_user_profile_view_ts( $user_ID );
 }
 
 
@@ -826,6 +832,7 @@ if( !empty( $skin ) )
 					'access_denied'         => 'access_denied.main.php',
 					'access_requires_login' => 'access_requires_login.main.php',
 					'activateinfo'          => 'activateinfo.main.php',
+					'anonpost'              => 'anonpost.main.php',
 					'arcdir'                => 'arcdir.main.php',
 					'catdir'                => 'catdir.main.php',
 					'closeaccount'          => 'closeaccount.main.php',
@@ -854,6 +861,7 @@ if( !empty( $skin ) )
 					'subs'                  => 'subs.main.php',
 					'visits'                => 'visits.main.php',
 					'register'              => 'register.main.php',
+					'register_finish'       => 'register_finish.main.php',
 					'search'                => 'search.main.php',
 					'single'                => 'single.main.php',
 					'sitemap'               => 'sitemap.main.php',

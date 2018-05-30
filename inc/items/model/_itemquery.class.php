@@ -632,7 +632,8 @@ class ItemQuery extends SQL
 	 * Restrict to specific post types usage
 	 *
 	 * @param string List of types usage to restrict to (must have been previously validated):
-	 *               Allowed values: post, page, intro-front, intro-main, intro-cat, intro-tag, intro-sub, intro-all, special
+	 *               Allowed values: post, page, intro-front, intro-main, intro-cat, intro-tag, intro-sub, intro-all, special,
+	 *                               *featured* - to get also featured posts
 	 */
 	function where_itemtype_usage( $itemtype_usage )
 	{
@@ -645,22 +646,31 @@ class ItemQuery extends SQL
 			return;
 		}
 
+		$featured_sql_where = '';
+		$not_featured_sql_where = '';
+		if( strpos( $itemtype_usage, '*featured*' ) !== false )
+		{	// Get also featured posts:
+			$itemtype_usage = preg_replace( '#,?\*featured\*,?#', '', $itemtype_usage );
+			$featured_sql_where .= ' OR post_featured = 1';
+			$not_featured_sql_where .= ' AND post_featured != 1';
+		}
+
 		$this->FROM_add( 'LEFT JOIN T_items__type ON ityp_ID = '.$this->dbprefix.'ityp_ID' );
 
 		if( $itemtype_usage == '-' )
 		{	// List is ONLY a MINUS sign (we want only those not assigned)
-			$this->WHERE_and( $this->dbprefix.'ityp_ID IS NULL' );
+			$this->WHERE_and( $this->dbprefix.'ityp_ID IS NULL'.$not_featured_sql_where );
 		}
 		elseif( substr( $itemtype_usage, 0, 1 ) == '-' )
 		{	// List starts with MINUS sign:
 			$itemtype_usage = explode( ',', substr( $itemtype_usage, 1 ) );
 			$this->WHERE_and( '( '.$this->dbprefix.'ityp_ID IS NULL
-			                  OR ityp_usage NOT IN ( '.$DB->quote( $itemtype_usage ).' ) )' );
+			                  OR ( ityp_usage NOT IN ( '.$DB->quote( $itemtype_usage ).' )'.$not_featured_sql_where.' ) )' );
 		}
 		else
 		{
 			$itemtype_usage = explode( ',', $itemtype_usage );
-			$this->WHERE_and( 'ityp_usage IN ( '.$DB->quote( $itemtype_usage ).' )' );
+			$this->WHERE_and( '( ityp_usage IN ( '.$DB->quote( $itemtype_usage ).' )'.$featured_sql_where.' )' );
 		}
 	}
 
@@ -1098,6 +1108,11 @@ class ItemQuery extends SQL
 //			$additional_clause++;
 //		}
 //		$order_clause = implode( ',', $orderby_fields );
+
+		if( strpos( $this->itemtype_usage, '*featured*' ) !== false )
+		{	// If we get featured posts together with other post types(like intro) then we should order featured posts below not featured posts:
+			$order_clause = trim( 'post_featured, '.$order_clause, ', ' );
+		}
 
 		return $order_clause;
 	}

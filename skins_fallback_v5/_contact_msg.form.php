@@ -71,7 +71,7 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 	if( $Blog->get_setting( 'msgform_display_recipient' ) )
 	{	// Display recipient:
 		$recipient_label = utf8_trim( $Blog->get_setting( 'msgform_recipient_label' ) );
-		$Form->info( ( empty( $recipient_label ) ? T_('Message to') : $recipient_label ), $recipient_link );
+		$Form->info( ( empty( $recipient_label ) ? T_('Message to') : $recipient_label ), $Blog->get_msgform_recipient_link() );
 	}
 
 	if( is_logged_in() &&
@@ -117,8 +117,8 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 				'class'     => 'wide_input',
 				'required'  => $Blog->get_setting( 'msgform_require_name' ),
 			) );
-		$Form->text_input( $dummy_fields['email'], $email_author_address, 40, T_('Email'),
-			T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'), array(
+		$Form->email_input( $dummy_fields['email'], $email_author_address, 40, T_('Email'), array(
+				'note'      => T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'),
 				'maxlength' => 150,
 				'class'     => 'wide_input',
 				'required'  => true,

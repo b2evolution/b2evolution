@@ -105,6 +105,7 @@ if( is_logged_in( false ) )
 	$url = null;
 	$comment_cookies = null;
 	$comment_allow_msgform = null;
+	param( 'comment_user_notify', 'integer', 0 );
 }
 else
 {	// User is not logged in (registered users), we need some id info from him:
@@ -120,6 +121,7 @@ else
 	}
 	param( 'comment_cookies', 'integer', 0 );
 	param( 'comment_allow_msgform', 'integer', 0 ); // checkbox
+	param( 'comment_anon_notify', 'integer', 0 );
 }
 
 param( 'comment_rating', 'integer', NULL );
@@ -151,6 +153,7 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 		'rating' => & $comment_rating,
 		'anon_allow_msgform' => & $comment_allow_msgform,
 		'anon_cookies' => & $comment_cookies,
+		'anon_notify' => & $comment_anon_notify,
 		'User' => & $User,
 		'redirect_to' => & $redirect_to,
 		'crumb_comment' => & $crumb_comment,
@@ -159,6 +162,21 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'comment' );
+
+$workflow_is_updated = false;
+if( $action != 'preview' && $commented_Item->load_workflow_from_Request() )
+{	// Update workflow properties if they are loaded from request without errors and at least one of them has been changed:
+	if( $commented_Item->dbupdate() )
+	{	// Display a message on success result:
+		$Messages->add( T_('The workflow properties have been updated.'), 'success' );
+		$workflow_is_updated = true;
+
+		if( $commented_Item->assigned_to_new_user && ! empty( $commented_Item->assigned_user_ID ) )
+		{ // Send post assignment notification
+			$commented_Item->send_assignment_notification();
+		}
+	}
+}
 
 $comments_email_is_detected = false;
 
@@ -251,6 +269,7 @@ $Comment->set_Item( $commented_Item );
 if( $User )
 { // User is logged in, we'll use his ID
 	$Comment->set_author_User( $User );
+	$Comment->user_notify = $comment_user_notify;
 }
 else
 {	// User is not logged in:
@@ -258,6 +277,7 @@ else
 	$Comment->set( 'author_email', $email );
 	$Comment->set( 'author_url', $url );
 	$Comment->set( 'allow_msgform', $comment_allow_msgform );
+	$Comment->set( 'anon_notify', $comment_anon_notify );
 }
 
 if( ! $Comment->is_meta() && $commented_Item->can_rate() )
@@ -355,8 +375,10 @@ if( $commented_Item->can_attach() && !empty( $_FILES['uploadfile'] ) && !empty( 
 	}
 }
 
-if( empty( $comment ) && $checked_attachments_count == 0 )
-{ // comment should not be empty!
+$is_empty_comment = ( empty( $comment ) && $checked_attachments_count == 0 );
+if( $is_empty_comment && ! $workflow_is_updated )
+{	// Comment text should not be empty!
+	// (exception if at least one file has been attached or if at least one workflow properties has been updated)
 	$Messages->add_to_group( T_('Please do not send empty comments.'), 'error', T_('Validation errors:') );
 }
 
@@ -368,11 +390,11 @@ $Plugins->trigger_event('BeforeCommentFormInsert', array(
 	'is_preview' => ($action == 'preview'),
 	'action' => & $action ) );
 
-
-/*
- * Display error messages:
- */
-if( $Messages->has_errors() && $action != 'preview' )
+// Redirect and:
+// Display error messages for the comment form OR
+// Display success message when workflow has been updated but comment text has not been filled:
+if( ( $Messages->has_errors() && $action != 'preview' ) ||
+    ( $workflow_is_updated && $is_empty_comment ) )
 {
 	$Comment->set( 'preview_attachments', $preview_attachments );
 	$Comment->set( 'checked_attachments', $checked_attachments );
@@ -557,6 +579,9 @@ if( !is_logged_in() )
 		}
 	}
 }
+
+// Send the predefined cookies:
+evo_sendcookies();
 
 // Note: we don't give any clue that we have automatically deleted a comment. It would only give spammers the perfect tool to find out how to pass the filter.
 

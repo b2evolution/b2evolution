@@ -39,7 +39,7 @@ $Form->hidden( 'tab', get_param( 'tab' ) );
 $Form->hidden( 'tab3', get_param( 'tab3' ) );
 $Form->hidden( 'action', 'settings' );
 
-$Form->begin_fieldset( T_('Campaign/Newsletter throttling').get_manual_link( 'email-other-settings' ) );
+$Form->begin_fieldset( T_('Email campaign throttling').get_manual_link( 'email-other-settings' ) );
 
 	$Form->radio_input( 'email_campaign_send_mode', $Settings->get( 'email_campaign_send_mode' ),
 		array(
@@ -50,8 +50,6 @@ $Form->begin_fieldset( T_('Campaign/Newsletter throttling').get_manual_link( 'em
 		array( 'lines' => true ) );
 
 	$Form->text_input( 'email_campaign_chunk_size', $Settings->get( 'email_campaign_chunk_size' ), 5, T_('Chunk Size'), T_('emails at a time'), array( 'maxlength' => 10 ) );
-
-	$Form->duration_input( 'email_campaign_cron_repeat', $Settings->get( 'email_campaign_cron_repeat' ), T_('Delay between chunks'), 'days', 'minutes', array( 'note' => T_('timing between scheduled job runs') ) );
 
 $Form->end_fieldset();
 

@@ -90,11 +90,11 @@ else
 
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
 
-echo get_link_tag( $Item->get_permanent_url( '', '', '&' ), T_( 'View post' ), 'div.buttons a+a.button_green' )."\n";
+echo get_link_tag( $Item->get_permanent_url( '', '', '&' ), T_( 'View post' ), 'div.buttons a+a.btn-primary' )."\n";
 
 if( $recipient_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 { // User has permission to edit this post
-	echo get_link_tag( $admin_url.'?ctrl=items&blog='.$Item->get_blog_ID().'&p='.$Item->ID, T_('Edit post'), 'div.buttons a+a.button_yellow' )."\n";
+	echo get_link_tag( $admin_url.'?ctrl=items&blog='.$Item->get_blog_ID().'&p='.$Item->ID, T_('Edit post'), 'div.buttons a+a.btn-default' )."\n";
 }
 
 echo "</div>\n";
@@ -106,11 +106,13 @@ if( $params['notify_type'] == 'moderator' )
 	{	// about new item:
 		$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating new posts, click here' );
 		$unsubscribe_type = 'post_moderator';
+		$unsubscribe_params = '';
 	}
 	else
 	{	// about updated item:
 		$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating updated posts, click here' );
 		$unsubscribe_type = 'post_moderator_edit';
+		$unsubscribe_params = '&amp;coll_ID='.$Item->get_blog_ID();
 	}
 	$params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when a post may need moderation.' ).'<br />'
 			.$unsubscribe_text.': '

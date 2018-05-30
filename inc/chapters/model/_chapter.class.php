@@ -91,6 +91,11 @@ class Chapter extends DataObject
 	var $image_file_ID;
 
 	/**
+	 * Social media image
+	 */
+	var $social_media_image_file_ID;
+
+	/**
 	 * Constructor
 	 *
 	 * @param table Database row

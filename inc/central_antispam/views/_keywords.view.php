@@ -117,7 +117,7 @@ $Results->cols[] = array(
 		'th_class' => 'shrinkwrap',
 		'order' => 'cakw_statuschange_ts',
 		'default_dir' => 'D',
-		'td_class' => 'timestamp compact_data',
+		'td_class' => 'timestamp',
 		'td' => '%mysql2localedatetime_spans( #cakw_statuschange_ts# )%',
 	);
 
@@ -166,7 +166,7 @@ $Results->cols[] = array(
 		'th_class' => 'shrinkwrap',
 		'order' => 'cakw_lastreport_ts',
 		'default_dir' => 'D',
-		'td_class' => 'timestamp compact_data',
+		'td_class' => 'timestamp',
 		'td' => '%mysql2localedatetime_spans( #cakw_lastreport_ts# )%',
 	);
 

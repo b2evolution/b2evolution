@@ -81,7 +81,7 @@ function filter_email_return( & $Form )
 
 	$Form->date_input( 'datestartinput', $datestart, T_('From date') );
 	$Form->date_input( 'datestopinput', $datestop, T_('To date') );
-	$Form->text_input( 'email', $email, 40, T_('Email') );
+	$Form->email_input( 'email', $email, 40, T_('Email') );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_email_return',
@@ -103,7 +103,7 @@ $Results->cols[] = array(
 		'order' => 'emret_timestamp',
 		'default_dir' => 'D',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'timestamp compact_data',
+		'td_class' => 'timestamp',
 		'td' => '%mysql2localedatetime_spans( #emret_timestamp# )%',
 	);
 

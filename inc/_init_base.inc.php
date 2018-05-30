@@ -108,6 +108,12 @@ require_once $inc_path.'_core/_misc.funcs.php';
 
 
 /**
+ * Parameter handling functions
+ */
+load_funcs( '_core/_param.funcs.php' );
+
+
+/**
  * Debug message log for debugging only (initialized here).
  *
  * @global Log|Log_noop $Debuglog

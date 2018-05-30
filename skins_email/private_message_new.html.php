@@ -63,14 +63,14 @@ if( $recipient_User->check_perm( 'pm_notif', 'full' ) )
 
 	// Buttons:
 	echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
-	echo get_link_tag( $params['message_link'], T_( 'Read full conversation' ), 'div.buttons a+a.button_green' )."\n";
+	echo get_link_tag( $params['message_link'], T_( 'Read full conversation' ), 'div.buttons a+a.btn-primary' )."\n";
 	echo "</div>\n";
 }
 else
 {
 	// Buttons:
 	echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
-	echo get_link_tag( $params['message_link'], T_( 'Read full message' ), 'div.buttons a+a.button_green' )."\n";
+	echo get_link_tag( $params['message_link'], T_( 'Read full message' ), 'div.buttons a+a.btn-primary' )."\n";
 	echo "</div>\n";
 }
 

@@ -988,6 +988,9 @@ class ChapterCache extends DataObjectCache
 			$Cat_array = $this->root_cats;
 		}
 
+		// Sort categories alphabetically or manually depending on settings:
+		usort( $Cat_array, array( 'Chapter', 'compare_chapters' ) );
+
 		$r = '';
 
 		if( $include_root )

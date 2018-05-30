@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $Collection, $Blog;
+global $admin_url, $Collection, $Blog, $Session;
 
 // Default params:
 $params = array_merge( array(
@@ -36,6 +36,7 @@ $Item = $params['Item'];
 $recipient_User = & $params['recipient_User'];
 
 $author_name = empty( $params['author_ID'] ) ? $params['author_name'] : get_user_colored_login_link( $params['author_name'], array( 'use_style' => true, 'protocol' => 'http:', 'login_text' => 'name' ) );
+$author_type = empty( $params['author_ID'] ) ? ' <span class="bUser-anonymous-tag">['.T_('Visitor').']</span>' : ' <span class="bUser-member-tag">['.T_('Member').']</span>';
 if( $params['notify_type'] == 'meta_comment' )
 { // Meta comment
 	$info_text = T_( '%s posted a new meta comment on %s in %s.' );
@@ -44,27 +45,30 @@ else
 { // Normal comment
 	$info_text = T_( '%s posted a new comment on %s in %s.' );
 }
-$notify_message = '<p'.emailskin_style( '.p' ).'>'.sprintf( $info_text, '<b>'.$author_name.'</b>', '<b>'.get_link_tag( $Item->get_permanent_url( '', '', '&' ), $Item->get( 'title' ), '.a' ).'</b>', '<b>'.$Blog->get('shortname').'</b>' )."</p>\n";
+$notify_message = '<p'.emailskin_style( '.p' ).'>'.sprintf( $info_text, '<b>'.$author_name.'</b>'.$author_type, '<b>'.get_link_tag( $Item->get_permanent_url( '', '', '&' ), $Item->get( 'title' ), '.a' ).'</b>', '<b>'.$Blog->get('shortname').'</b>' )."</p>\n";
 
 if( $params['notify_full'] )
 { // Long format notification:
-	$ip_list = implode( ', ', get_linked_ip_list( array( $Comment->author_IP ), $recipient_User ) );
-	$user_domain = gethostbyaddr( $Comment->author_IP );
-	if( $user_domain != $Comment->author_IP )
-	{ // Add host name after author IP address
-		$ip_list .= ', '.$user_domain;
+	if( ! empty( $recipient_User ) && $recipient_User->check_perm( 'stats', 'view' ) )
+	{
+		$session_ID = '<a href="'.$admin_url.'?ctrl=stats&amp;tab=hits&amp;blog=0&amp;sess_ID='.$Session->ID.'">'.$Session->ID.'</a>';
 	}
+	else
+	{
+		$session_ID = $Session->ID;
+	}
+
 	switch( $Comment->type )
 	{
 		case 'trackback':
-			$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_('Trackback IP').': '.$ip_list."</p>\n";
+			$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_('Session ID').': '.$session_ID."</p>\n";
 			$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_('Url').': '.get_link_tag( $Comment->author_url, '', '.a' )."</p>\n";
 			break;
 
 		default:
 			if( ! $Comment->get_author_User() )
 			{ // Comment from visitor:
-				$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_('Commenter IP').': '.$ip_list."</p>\n";
+				$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_('Session ID').': '.$session_ID."</p>\n";
 				$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_('Email').': '.$Comment->author_email."</p>\n";
 				$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_('Url').': '.get_link_tag( $Comment->author_url, '', '.a' )."</p>\n";
 			}
@@ -124,15 +128,15 @@ echo $notify_message;
 
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
 
-echo get_link_tag( $Comment->get_permanent_url( '&', '#comments' ), T_( 'Read full comment' ), 'div.buttons a+a.button_green' )."\n";
+echo get_link_tag( $Comment->get_permanent_url( '&', '#comments' ), T_( 'Read full comment' ), 'div.buttons a+a.btn-default' )."\n";
 
 if( $params['notify_type'] == 'moderator' )
 { // moderation email
 	if( ( $Blog->get_setting( 'comment_quick_moderation' ) != 'never' ) && ( !empty( $Comment->secret ) ) )
 	{ // quick moderation is permitted, and comment secret was set
-		echo get_link_tag( '$secret_content_start$'.get_htsrv_url().'comment_review.php?cmt_ID='.$Comment->ID.'&secret='.$Comment->secret.'$secret_content_end$', T_('Quick moderation'), 'div.buttons a+a.button_yellow' )."\n";
+		echo get_link_tag( '$secret_content_start$'.get_htsrv_url().'comment_review.php?cmt_ID='.$Comment->ID.'&secret='.$Comment->secret.'$secret_content_end$', T_('Quick moderation'), 'div.buttons a+a.btn-primary' )."\n";
 	}
-	echo get_link_tag( $admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID, T_('Edit comment'), 'div.buttons a+a.button_gray' )."\n";
+	echo get_link_tag( $admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID, T_('Edit comment'), 'div.buttons a+a.btn-default' )."\n";
 }
 
 echo "</div>\n";
@@ -168,10 +172,18 @@ switch( $params['notify_type'] )
 		break;
 
 	case 'item_subscription':
-		// item subscription
+		// item subscription for registered user:
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on this post.' ).'<br />'
 			.T_( 'If you don\'t want to receive any more notifications on this post, click here' ).': '
 			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+		// subscribers are not allowed to see comment author email
+		break;
+
+	case 'anon_subscription':
+		// item subscription for anonymous user:
+		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on this post.' ).'<br />'
+			.T_( 'If you don\'t want to receive any more notifications on this post, click here' ).': '
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&comment_ID='.$params['comment_ID'].'&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		// subscribers are not allowed to see comment author email
 		break;
 

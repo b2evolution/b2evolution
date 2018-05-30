@@ -21,6 +21,7 @@ load_class( 'regional/model/_country.class.php', 'Country' );
 global $current_User;
 
 // Check minimum permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'view', true );
 
 // Memorize this as the last "tab" used in the Global Settings:

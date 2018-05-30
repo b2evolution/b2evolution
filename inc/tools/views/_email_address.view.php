@@ -65,7 +65,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
  */
 function filter_email_blocked( & $Form )
 {
-	$Form->text_input( 'email', get_param( 'email' ), 40, T_('Email') );
+	$Form->email_input( 'email', get_param( 'email' ), 40, T_('Email') );
 
 	$statuses = emadr_get_status_titles();
 	foreach( $statuses as $status_value => $status_title )

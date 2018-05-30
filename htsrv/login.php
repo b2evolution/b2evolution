@@ -650,7 +650,7 @@ if( $inskin && use_in_skin_login() )
 
 
 /**
- * Display one of the standard login management screens:
+ * Display one of the basic login management screens:
  */
 switch( $action )
 {

@@ -54,12 +54,14 @@ if( $activated_User->reg_ctry_ID > 0 )
 $user_domain = $UserSettings->get( 'user_registered_from_domain', $activated_User->ID );
 if( ! empty( $user_domain ) )
 {	// Get user domain status if domain field is defined:
+	$user_ip_address = int2ip( $UserSettings->get( 'created_fromIPv4', $activated_User->ID ) );
 	load_funcs( 'sessions/model/_hitlog.funcs.php' );
 	$DomainCache = & get_DomainCache();
 	$Domain = & get_Domain_by_subdomain( $user_domain );
 	$dom_status_titles = stats_dom_status_titles();
 	$dom_status = $dom_status_titles[ $Domain ? $Domain->get( 'status' ) : 'unknown' ];
-	echo T_('Registration Domain').": ".$user_domain.' ('.$dom_status.')'."\n";
+	echo T_('Registration Domain').": ".$user_domain.' ('.$dom_status.')'.
+			( ! empty( $user_ip_address ) ? ' '.$admin_url.'?ctrl=antispam&action=whois&query='.$user_ip_address : '' )."\n";
 }
 
 if( $activated_User->ctry_ID > 0 )
@@ -68,9 +70,13 @@ if( $activated_User->ctry_ID > 0 )
 	echo T_('Profile Country').": ".$activated_User->get_country_name()."\n";
 }
 
-if( !empty( $activated_User->source ) )
-{	// Source is defined
-	echo T_('Registration Source').": ".$activated_User->source."\n";
+echo "\n";
+
+$initial_blog_ID = $UserSettings->get( 'initial_blog_ID', $activated_User->ID );
+if( !empty( $initial_blog_ID ) )
+{	// Hit info
+	echo T_('Initial referer').": ".$UserSettings->get( 'initial_referer', $activated_User->ID )."\n";
+	echo T_('Initial page').": ".T_('Blog')." ".$UserSettings->get( 'initial_blog_ID', $activated_User->ID )." - ".$UserSettings->get( 'initial_URI', $activated_User->ID )."\n";
 }
 
 if( $activated_User->gender == 'M' )
@@ -94,11 +100,9 @@ if( !empty( $registration_trigger_url ) )
 	echo T_('Registration Trigger Page').": ".$registration_trigger_url."\n";
 }
 
-$initial_blog_ID = $UserSettings->get( 'initial_blog_ID', $activated_User->ID );
-if( !empty( $initial_blog_ID ) )
-{	// Hit info
-	echo T_('Initial page').": ".T_('Blog')." ".$UserSettings->get( 'initial_blog_ID', $activated_User->ID )." - ".$UserSettings->get( 'initial_URI', $activated_User->ID )."\n";
-	echo T_('Initial referer').": ".$UserSettings->get( 'initial_referer', $activated_User->ID )."\n";
+if( !empty( $activated_User->source ) )
+{	// Source is defined
+	echo T_('Registration Source').": ".$activated_User->source."\n";
 }
 
 echo "\n";

@@ -21,7 +21,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'settings/model/_abstractsettings.class.php', 'AbstractSettings' );
 
 /**
- * Class to handle the settings for users, and any user name-value pair which is not frequently used 
+ * Class to handle the settings for users, and any user name-value pair which is not frequently used
  *
  * @package evocore
  */
@@ -83,6 +83,7 @@ class UserSettings extends AbstractSettings
 		'last_activation_reminder_key' => NULL, // It will be set at the first time when activation reminder email will be sent
 		'activation_reminder_count' => 0, // How many activation reminder was sent since the user is not activated
 		'send_activation_reminder' => 1, // Send reminder to activate my account if it is not activated
+		'send_inactive_reminder' => 1, // Send reminder when my account has been inactive for an extended period of time
 		'welcome_message_sent' => 0, // Used to know if user already received a welcome message after email activation
 
 		// admin user notifications
@@ -95,6 +96,7 @@ class UserSettings extends AbstractSettings
 		'notify_reported_account' => 1, // Notify admin user when an account has been reported by another user
 		'notify_changed_account' => 1, // Notify admin user when an account has been changed
 		'notify_cronjob_error' => 1, // Notify admin user when a scheduled task ends with an error or timeout
+		'notify_automation_owner' => 1, // Notify automation owner user when step is executed
 
 		'account_close_ts' => NULL, // It will be the date when the account was closed. Until the account is not closed this will be NULL.
 		'account_close_reason' => NULL, // It will be the reason why the account was closed. Until the account is not closed this will be NULL.
@@ -134,16 +136,14 @@ class UserSettings extends AbstractSettings
 		'notify_spam_cmt_moderation' => 1, // Notify when comment is reported as spam and the user has right to moderate that comment
 		'notify_post_moderation' => 1, // Notify when a new post is awaiting moderation and the user has right to moderate that post
 		'notify_edit_pst_moderation' => 1, // Notify when a edited post is awaiting moderation and the user has right to moderate that post
+		'notify_post_assignment' => 1, // Notify user when a post is assigned to the user
 		'notify_meta_comments' => 1, // Notify user when a META comment is published in a post where user can sees meta comments
 
 		'enable_PM' => 1,
 		'enable_email' => 1,
 
-		'newsletter_news' => 1, // Send news
-		'newsletter_ads'  => 0, // Send ADs
-
 		'notification_email_limit' => 3, // How many notification email is allowed per day for this user
-		'newsletter_limit' => 1, // How many newsletter email is allowed per day for this user
+		'newsletter_limit' => 3, // How many newsletter email is allowed per day for this user
 	);
 
 
@@ -300,7 +300,7 @@ class UserSettings extends AbstractSettings
 
 	/**
 	 * Reset a user settings to the default values
-	 * 
+	 *
 	 * @param integer user ID
 	 * @param boolean set to true to save modifications
 	 */

@@ -77,8 +77,9 @@ class Widget
 	 * @param integer 1-5: weight of the word. the word will be displayed only if its weight is >= than the user setting threshold
 	 * @param array Additional attributes to the A tag. See {@link action_icon()}.
 	 * @param string Group name is used to group several buttons in one as dropdown button for bootstrap skins
+	 * @param array Group options: 'parent', 'class', 'item_class', 'btn_class'
 	 */
-	function global_icon( $title, $icon, $url, $word = '', $icon_weight = 3, $word_weight = 2, $link_attribs = array(), $group = NULL )
+	function global_icon( $title, $icon, $url, $word = '', $icon_weight = 3, $word_weight = 2, $link_attribs = array(), $group = NULL, $group_options = NULL )
 	{
 		$link_attribs = array_merge( array(
 				'class'  => 'action_icon',
@@ -94,7 +95,8 @@ class Widget
 			'icon_weight'  => $icon_weight,
 			'word_weight'  => $word_weight,
 			'link_attribs' => $link_attribs,
-			'group'        => $group );
+			'group'        => $group,
+			'group_options'=> $group_options );
 	}
 
 
@@ -258,19 +260,26 @@ class Widget
 		}
 
 		$r = '';
-		foreach( $icons as $icon )
+		foreach( $icons as $group => $icon )
 		{
 			if( is_array( $icon ) && count( $icon ) )
 			{ // Grouped icons
 				$first_icon = $icon[0];
-				$r .= '<div class="btn-group dropdown">';
-				$r .= '<a href="'.$first_icon['url'].'" class="'.$first_icon['link_attribs']['class'].'" title="'.$first_icon['title'].'">'.get_icon( $first_icon['icon'] ).' '.$first_icon['word'].'</a>';
-				$r .= '<button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'
+				$r .= '<div class="btn-group dropdown'.( empty( $first_icon['group_options']['class'] ) ? '' : ' '.$first_icon['group_options']['class'] ).'">';
+				$r .= '<a href="'.$first_icon['url'].'" class="'.$first_icon['link_attribs']['class'].'" title="'.format_to_output( $first_icon['title'], 'htmlattr' ).'">'.get_icon( $first_icon['icon'] ).' '.$first_icon['word'].'</a>';
+				$r .= '<button type="button" class="btn btn-sm btn-default dropdown-toggle'.( empty( $first_icon['group_options']['btn_class'] ) ? '' : ' '.$first_icon['group_options']['btn_class'] ).'" data-toggle="dropdown" aria-expanded="false">'
 							.' <span class="caret"></span></button>';
 				$r .= '<ul class="dropdown-menu dropdown-menu-right" role="menu">';
 				foreach( $icon as $grouped_icon )
 				{
-					$r .= '<li role="presentation"><a href="'.$grouped_icon['url'].'" role="menuitem" tabindex="-1" title="'.$grouped_icon['title'].'">'.get_icon( $grouped_icon['icon'] ).' '.$grouped_icon['word'].'</a></li>';
+					$r .= '<li role="presentation"><a href="'.$grouped_icon['url'].'" role="menuitem" tabindex="-1" title="'.format_to_output( $grouped_icon['title'], 'htmlattr' ).'">'.get_icon( $grouped_icon['icon'] ).' '.$grouped_icon['word'].'</a></li>';
+				}
+				foreach( $this->global_icons as $icon_params )
+				{
+					if( isset( $icon_params['group_options']['parent'] ) && $icon_params['group_options']['parent'] == $group )
+					{	// Append also items from others buttons if they a linked with this button by group:
+						$r .= '<li role="presentation"'.( empty( $icon_params['group_options']['item_class'] ) ? '' : ' class="'.$icon_params['group_options']['item_class'].'"' ).'><a href="'.$icon_params['url'].'" role="menuitem" tabindex="-1" title="'.format_to_output( $icon_params['title'], 'htmlattr' ).'">'.get_icon( $icon_params['icon'] ).' '.$icon_params['word'].'</a></li>';
+					}
 				}
 				$r .= '</ul>';
 				$r .= '</div>';
@@ -533,11 +542,12 @@ class Table extends Widget
 				echo $this->params['filter_button_before'];
 				$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
 				$this->Form->button_input( array(
-						'tag'   => 'button',
-						'name'  => $submit_name,
-						'value' => get_icon( 'filter' ).' '.$submit_title,
-						'class' => $this->params['filter_button_class']
+							'tag'   => 'button',
+							'name'  => $submit_name,
+							'value' => get_icon( 'filter' ).' '.$submit_title,
+							'class' => $this->params['filter_button_class']
 					) );
+
 				echo $this->params['filter_button_after'];
 			}
 
@@ -547,7 +557,12 @@ class Table extends Widget
 			}
 
 			$func = $this->{$area_name}['callback'];
-			$func( $this->Form );
+			$filter_fields = $func( $this->Form );
+
+			if( is_admin_page() && ! empty( $filter_fields ) && is_array( $filter_fields ) )
+			{	// Display filters only in back-office because they require JavaScript plugin QueryBuilder:
+				$this->display_filter_fields( $this->Form, $filter_fields );
+			}
 
 			if( $create_new_form )
 			{ // We do not already have a form surrounding the whole result list:
@@ -559,6 +574,234 @@ class Table extends Widget
 		echo '</div>';
 
 		echo $this->params['filters_end'];
+	}
+
+
+	/**
+	 * Display filter fields
+	 *
+	 * @param array Filters
+	 */
+	function display_filter_fields( & $Form, $filter_fields )
+	{
+		echo '<div id="evo_results_filters"></div>';
+		$Form->hidden( 'filter_query', '' );
+
+		$js_filters = array();
+		foreach( $filter_fields as $field_ID => $params )
+		{
+			if( $field_ID == '#default' )
+			{	// Skip a reserved field for default filters:
+				continue;
+			}
+
+			$js_filter = array( 'id:\''.$field_ID.'\'' );
+
+			if( isset( $params['type'] ) )
+			{	// Set default params depending on field type:
+				switch( $params['type'] )
+				{
+					case 'date':
+						$params['operators'] = '=,!=,>,>=,<,<=,between,not_between';
+						$params['plugin'] = 'datepicker';
+						$params['plugin_config'] = array(
+							'dateFormat'  => jquery_datepicker_datefmt(),
+							'monthNames'  => jquery_datepicker_month_names(),
+							'dayNamesMin' => jquery_datepicker_day_names(),
+							'firstDay'    => locale_startofweek(),
+						);
+						if( ! isset( $params['validation'] ) )
+						{
+							$params['validation'] = array();
+						}
+						$params['validation']['format'] = strtoupper( jquery_datepicker_datefmt() );
+						break;
+				}
+			}
+
+			if( ! isset( $params['operators'] ) )
+			{	// Use default operator if it is not defined:
+				$params['operators'] = '=,!=';
+			}
+
+			foreach( $params as $param_name => $param_value )
+			{
+				switch( $param_name )
+				{
+					case 'operators':
+						// Convert operators to proper format:
+						if( ! empty( $param_value ) )
+						{
+							$operators = explode( ',', $param_value );
+							foreach( $operators as $o => $operator )
+							{	// Replace aliases with corrent name which is used in jQuery QueryBuilder plugin:
+								switch( $operator )
+								{
+									case '=':
+										$operators[ $o ] = 'equal';
+										break;
+									case '!=':
+									case '<>':
+										$operators[ $o ] = 'not_equal';
+										break;
+									case '<':
+										$operators[ $o ] = 'less';
+										break;
+									case '<=':
+										$operators[ $o ] = 'less_or_equal';
+										break;
+									case '>':
+										$operators[ $o ] = 'greater';
+										break;
+									case '>=':
+										$operators[ $o ] = 'greater_or_equal';
+										break;
+								}
+							}
+							$param_value = '[\''.implode( '\',\'', $operators ).'\']';
+						}
+						break;
+
+					case 'input':
+					case 'valueGetter':
+					case 'valueSetter':
+						if( strpos( $param_value, 'function' ) === 0 )
+						{	// Don't convert these param to string if it is a function:
+							break;
+						}
+
+					default:
+						if( is_array( $param_value ) )
+						{	// Array param:
+							$param_values = array();
+							foreach( $param_value as $sub_param_name => $sub_param_value )
+							{
+								if( $param_name == 'values' )
+								{	// All value indexes must be strings:
+									$sub_param_name = '\''.format_to_js( $sub_param_name ).'\'';
+								}
+								if( $sub_param_value == 'true' || $sub_param_value == 'false' ||
+								    strpos( $sub_param_value, '[' ) === 0 )
+								{	// This is a not string value:
+									$sub_param_value = $sub_param_value;
+								}
+								else
+								{	// This is a string value:
+									$sub_param_value = '\''.format_to_js( $sub_param_value ).'\'';
+								}
+								$param_values[] = $sub_param_name.':'.$sub_param_value;
+							}
+							$param_value = '{'.implode( ',', $param_values ).'}';
+						}
+						else
+						{	// String param:
+							$param_value = '\''.format_to_js( $param_value ).'\'';
+						}
+				}
+
+				$js_filter[] = $param_name.':'.$param_value;
+			}
+			$js_filters[] = '{'.implode( ',', $js_filter ).'}';
+		}
+
+		// Get filter values from request:
+		$filter_query = param_condition( 'filter_query' );
+		if( empty( $filter_query ) )
+		{	// Set filter values if no request yet:
+			$filter_query = array(
+				'rules'     => array(),
+				'valid'     => true,
+			);
+			if( isset( $filter_fields['#default'] ) )
+			{	// Set filters from default config:
+				foreach( $filter_fields['#default'] as $def_filter_id => $def_filter_value )
+				{
+					$filter_query['rules'][] = array(
+						'id'    => $def_filter_id,
+						'value' => $def_filter_value,
+					);
+				}
+			}
+			$filter_query = json_encode( $filter_query );
+		}
+?>
+<script type="text/javascript">
+jQuery( document ).ready( function()
+{
+	jQuery( '#evo_results_filters' ).queryBuilder(
+	{
+		allow_empty: true,
+		display_empty_filter: true,
+		plugins: ['bt-tooltip-errors'],
+		icons: {
+			add_group: 'fa fa-plus-circle',
+			add_rule: 'fa fa-plus',
+			remove_group: 'fa fa-close',
+			remove_rule: 'fa fa-close',
+			error: 'fa fa-warning',
+		},
+		operators: [
+			'equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between', 'contains', 'not_contains',
+			{ type: 'blank', nb_inputs: 1, multiple: false, apply_to: ['string'] }
+		],
+		lang: {
+			add_rule: '<?php echo TS_('Add filter'); ?>',
+			operators: {
+				equal: '=',
+				not_equal: '&#8800;',
+				less: '<',
+				less_or_equal: '&#8804;',
+				greater: '>',
+				greater_or_equal: '&#8805;',
+				between: '<?php echo TS_('between'); ?>',
+				not_between: '<?php echo TS_('not between'); ?>',
+				contains: '<?php echo TS_('contains'); ?>',
+				not_contains: '<?php echo TS_('doesn\'t contain'); ?>',
+				blank: ' ',
+			}
+		},
+		filters: [<?php echo implode( ',', $js_filters ); ?>],
+		rules: <?php echo param_format_condition( $filter_query, 'js' ); ?>,
+	} );
+
+	// Prepare form before submitting:
+	jQuery( '#evo_results_filters' ).closest( 'form' ).on( 'submit', function()
+	{
+		// Convert filter fields to JSON format:
+		var result = jQuery( '#evo_results_filters' ).queryBuilder( 'getRules' );
+		if( result === null )
+		{	// Stop submitting on wrong SQL:
+			return false;
+		}
+		else
+		{	// Set query rules to hidden field before submitting:
+			jQuery( 'input[name=filter_query]' ).val( JSON.stringify( result ) );
+		}
+	} );
+
+	// Fix space of blank hidden operator:
+	evo_fix_query_builder_blank_operator();
+	jQuery( '#evo_results_filters' ).on( 'afterUpdateRuleFilter.queryBuilder.filter', function()
+	{
+		evo_fix_query_builder_blank_operator();
+	} );
+	function evo_fix_query_builder_blank_operator()
+	{
+		jQuery( '.rule-container .rule-operator-container' ).each( function()
+		{
+			if( jQuery( this ).find( 'option' ).length == jQuery( this ).find( 'option[value=blank]' ).length )
+			{	// Hide container if rule uses only single blank operator:
+				jQuery( this ).hide();
+			}
+			else
+			{	// Show container with other operators:
+				jQuery( this ).show();
+			}
+		} );
+	}
+} );
+</script>
+<?php
 	}
 
 

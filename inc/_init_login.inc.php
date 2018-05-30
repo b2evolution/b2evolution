@@ -301,8 +301,7 @@ if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) 
 
 			if( $Settings->get('system_lock') && $current_User->check_perm( 'users', 'edit' ) )
 			{ // System is locked for maintenance but current user has permission to log in, Display a message about this mode
-				$system_lock_url = ' href="'.$admin_url.'?ctrl=tools"';
-				$Messages->add( sprintf( T_('The site is currently locked for maintenance. Click <a %s>here</a> to access lock settings.'), $system_lock_url ), 'warning' );
+				$Messages->add( T_('The site is currently locked for maintenance.').' '.sprintf( T_('Click <a %s>here</a> to access lock settings.'), 'href="'.$admin_url.'?ctrl=tools"' ), 'warning' );
 			}
 		}
 
@@ -391,8 +390,7 @@ elseif( $Session->has_User() /* logged in */
 		{ // Current user is a "super admin"
 			if( ! $Messages->count() )
 			{ // If there are no other messages yet, display a warning about the system lock
-				$system_lock_url = ' href="'.$admin_url.'?ctrl=tools"';
-				$Messages->add( sprintf( T_('The site is currently locked for maintenance. Click <a %s>here</a> to access lock settings.'), $system_lock_url ), 'warning' );
+				$Messages->add( T_('The site is currently locked for maintenance.').' '.sprintf( T_('Click <a %s>here</a> to access lock settings.'), 'href="'.$admin_url.'?ctrl=tools"' ), 'warning' );
 			}
 		}
 		else
@@ -511,15 +509,15 @@ if( ! empty( $login_error ) || ( $login_required && ! is_logged_in() ) )
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
 			$skin = $Skin->folder;
-			$disp = 'login';
+			$disp = param( 'disp', 'string', 'login' );
 			// fp> We ABSOLUTELY want to recover the previous redirect_to so that after a new login attempt that may be successful,
 			// we will finally reach our intended destination. This is paramount with emails telling people to come back to the site
 			// to read a message or sth like that. They must log in first and they may enter the wrong password multiple times.
 			param( 'redirect_to', 'url', $Blog->gen_blogurl() );
 			$ads_current_skin_path = $skins_path.$skin.'/';
-			if( file_exists( $ads_current_skin_path.'login.main.php' ) )
+			if( file_exists( $ads_current_skin_path.$disp.'.main.php' ) )
 			{	// Call custom file for login disp if it exists:
-				require $ads_current_skin_path.'login.main.php';
+				require $ads_current_skin_path.$disp.'.main.php';
 			}
 			else
 			{	// Call index main skin file to display a login disp:

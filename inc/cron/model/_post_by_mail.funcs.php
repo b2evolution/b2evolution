@@ -21,18 +21,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function pbm_msg( $message, $cron = false )
 {
-	global $is_web, $result_message, $pbm_messages;
+	global $is_web, $pbm_messages;
 
 	// Log all messages to $pbm_messages no matter if we are in cron mode or not
 	// We may use this report later, display or send to the blog owner
 	$pbm_messages[] = $message;
 
 	if( $cron )
-	{	// We are in cron mode, log the message
-		if( $is_web )
-			$message .= '<br />';
-
-		$result_message .= $message."\n";
+	{	// Append a message to cron log if we are in cron mode:
+		cron_log_append( $message );
 	}
 }
 
@@ -128,8 +125,11 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 	global $Settings, $debug;
 	global $pbm_item_files, $pbm_messages, $pbm_items, $post_cntr, $del_cntr, $is_cron_mode;
 
-	// This may take a very long time if there are many messages; No execution time limit:
-	set_max_execution_time(0);
+	if( empty( $is_cron_mode ) )
+	{	// This may take a very long time if there are many messages; No execution time limit:
+		// (don't apply this for cron job because it uses a setting "Max execution time")
+		set_max_execution_time( 0 );
+	}
 
 	// Are we in test mode?
 	$test_mode_on = $Settings->get('eblog_test_mode');
