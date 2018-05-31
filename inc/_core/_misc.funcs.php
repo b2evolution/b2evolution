@@ -6835,8 +6835,8 @@ function get_samedomain_htsrv_url( $secure = false )
 		debug_die( 'Invalid hosts!' );
 	}
 
-	$req_domain = $req_url_parts['host'];
-	$htsrv_domain = $hsrv_url_parts['host'];
+	$req_domain = rtrim( $req_url_parts['host'].( isset( $req_url_parts['path'] ) ? $req_url_parts['path'] : '' ), '/' );
+	$htsrv_domain = rtrim( $hsrv_url_parts['host'].( isset( $hsrv_url_parts['path'] ) ? $hsrv_url_parts['path'] : '' ), '/' );
 
 	// Replace domain + path of htsrv URL with current request:
 	$samedomain_htsrv_url = substr_replace( $req_htsrv_url, $req_domain, strpos( $req_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
