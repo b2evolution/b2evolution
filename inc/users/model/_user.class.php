@@ -1575,7 +1575,10 @@ class User extends DataObject
 				{
 					$UserSettings->set( 'send_activation_reminder', param( 'edited_user_send_activation_reminder', 'integer', 0 ), $this->ID );
 				}
-				$UserSettings->set( 'send_inactive_reminder', param( 'edited_user_send_inactive_reminder', 'integer', 0 ), $this->ID );
+				if( $Settings->get( 'inactive_account_reminder_threshold' ) > 0 )
+				{	// If setting "Trigger after" of cron job "Send reminders about inactive accounts" is selected at least to 1 second:
+					$UserSettings->set( 'send_inactive_reminder', param( 'edited_user_send_inactive_reminder', 'integer', 0 ), $this->ID );
+				}
 
 				if( $this->check_perm( 'users', 'edit' ) )
 				{ // edited user has permission to edit all users, save notification preferences
@@ -1591,8 +1594,8 @@ class User extends DataObject
 					$UserSettings->set( 'notify_cronjob_error', param( 'edited_user_notify_cronjob_error', 'integer', 0 ), $this->ID );
 				}
 
-				if( $current_User->check_perm( 'users', 'edit' ) )
-				{
+				if( $current_User->check_perm( 'users', 'edit' ) && $this->check_perm( 'options', 'view' ) )
+				{	// current User is an administrator and the edited user has a permission to automations:
 					$UserSettings->set( 'notify_automation_owner', param( 'edited_user_notify_automation_owner', 'integer', 0 ), $this->ID );
 				}
 
