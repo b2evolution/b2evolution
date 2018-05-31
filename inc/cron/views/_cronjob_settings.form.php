@@ -14,7 +14,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Settings, $current_User;
+global $Settings, $current_User, $admin_url;
 
 $Form = new Form( NULL, 'cron_settings_checkchanges' );
 
@@ -49,7 +49,8 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 
 			case 'prune-old-hits-and-sessions':
 				// Prune old hits & sessions (includes OPTIMIZE):
-				$Form->text_input( 'auto_prune_stats', $Settings->get( 'auto_prune_stats' ), 5, T_('Keep detailed hitlog for'), T_('days. How many days of hits & sessions do you want to keep in the database for stats?') );
+				$oldest_session_period = max( $Settings->get( 'auto_prune_stats' ) * 86400, $Settings->get( 'timeout_sessions' ) );
+				$Form->text_input( 'auto_prune_stats', $Settings->get( 'auto_prune_stats' ), 5, T_('Keep detailed logs for'), T_('days').'. '.sprintf( T_('Note: <a %s>logged-in Sessions</a> will be kept for %s.'), 'href="'.$admin_url.'?ctrl=usersettings"', seconds_to_period( $oldest_session_period ) ) );
 				break;
 
 			case 'prune-recycled-comments':

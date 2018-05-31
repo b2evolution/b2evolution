@@ -306,6 +306,7 @@ function deleteComment( commentId, request_from, comment_type )
 			data:
 				{ 'action': 'get_opentrash_link',
 					'blog': '<?php echo $Blog->ID; ?>',
+					'request_from': request_from,
 					'crumb_comment': '<?php echo get_crumb('comment'); ?>',
 				},
 			success: function(result)
@@ -335,7 +336,7 @@ function deleteComment( commentId, request_from, comment_type )
 	success: function(result)
 		{
 			var target_selector = ( comment_type == 'meta' ? '#comments' : '#recycle_bin' );
-			jQuery( selector ).effect( 'transfer', { to: jQuery( target_selector ) }, 700, function() {
+			jQuery( selector ).transfer( { to: target_selector, duration: 700 }, function() {
 				delete modifieds[divid];
 				if( request_from == 'dashboard' || request_from == 'coll_settings' ) {
 					updateCommentsList( divid );

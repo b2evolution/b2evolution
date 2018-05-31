@@ -22,7 +22,7 @@ global $current_User;
  */
 global $Settings;
 
-global $dispatcher;
+global $admin_url;
 
 global $collections_Module;
 
@@ -66,7 +66,8 @@ $Form->begin_fieldset( T_('Hit & session logging').get_manual_link('hit_logging'
 		'lines' => true ) );
 
 	echo '<div id="auto_prune_stats_container">';
-	$Form->text_input( 'auto_prune_stats', $Settings->get('auto_prune_stats'), 5, T_('Keep detailed hitlog for'), T_('days. How many days of hits & sessions do you want to keep in the database for stats?') );
+	$oldest_session_period = max( $Settings->get( 'auto_prune_stats' ) * 86400, $Settings->get( 'timeout_sessions' ) );
+	$Form->text_input( 'auto_prune_stats', $Settings->get( 'auto_prune_stats' ), 5, T_('Keep detailed logs for'), T_('days').'. '.sprintf( T_('Note: <a %s>logged-in Sessions</a> will be kept for %s.'), 'href="'.$admin_url.'?ctrl=usersettings"', seconds_to_period( $oldest_session_period ) ) );
 	echo '</div>';
 
 	if( $Settings->get('auto_prune_stats_mode') == 'off' )

@@ -58,7 +58,7 @@ $emailskins_styles = array(
 	border-top: 1px solid #ddd;
 	border-bottom: 1px solid #ddd;
 	margin: 8px 0px;
-	padding: 1px 1em;
+	padding: 30px 1em;
 ',
 'div.email_ugc' => '
 	margin: 1em 1em;

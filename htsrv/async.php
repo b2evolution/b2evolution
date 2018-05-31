@@ -265,7 +265,7 @@ switch( $action )
 		echo get_opentrash_link( true, true, array(
 				'before' => ' <span id="recycle_bin">',
 				'after' => '</span>',
-				'class' => 'btn btn-default'
+				'class' => 'btn btn-default'.( param( 'request_from', 'string' ) == 'items' ? '' : ' btn-sm' ),
 			) );
 		break;
 
@@ -316,7 +316,7 @@ switch( $action )
 			// In case of comments_fullview we must set a filterset name to be abble to restore filterset.
 			// If $item_ID is not valid, then this requests came from the comments_fullview
 			// TODO: asimo> This should be handled with a better solution
-			$filterset_name = /*'';*/( $item_ID > 0 ) ? '' : 'fullview';
+			$filterset_name = /*'';*/( $item_ID > 0 ) ? '' : ( $comment_type == 'meta' ? 'meta' : 'fullview' );
 
 			echo_item_comments( $blog, $item_ID, $statuses, $currentpage, $limit, array(), $filterset_name, $expiry_status, $comment_type );
 		}
