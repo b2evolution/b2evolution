@@ -271,7 +271,7 @@ if( in_array( 'login', $show_columns ) )
 		{
 			if( $link )
 			{
-				$login_text = get_user_identity_link( $User->login, $User->ID, 'user', 'login' );
+				$login_text = get_user_identity_link( $User->login, $User->ID, 'profile', 'login' );
 				if( $User->check_status( 'is_closed' ) )
 				{ // add (closed account) note to corresponding contacts!
 					$login_text .= '<span class="note">('.T_( 'closed account' ).')</span>';
