@@ -82,11 +82,11 @@ else
 
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
 
-echo get_link_tag( $Item->get_permanent_url( '', '', '&' ), T_( 'View post' ), 'div.buttons a+a.button_green' )."\n";
+echo get_link_tag( $Item->get_permanent_url( '', '', '&' ), T_( 'View post' ), 'div.buttons a+a.btn-primary' )."\n";
 
 if( $assigned_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 { // User has permission to edit this post
-	echo get_link_tag( $admin_url.'?ctrl=items&blog='.$Item->get_blog_ID().'&p='.$Item->ID, T_('Edit post'), 'div.buttons a+a.button_yellow' )."\n";
+	echo get_link_tag( $admin_url.'?ctrl=items&blog='.$Item->get_blog_ID().'&p='.$Item->ID, T_('Edit post'), 'div.buttons a+a.btn-default' )."\n";
 }
 
 echo "</div>\n";
