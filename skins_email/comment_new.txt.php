@@ -123,7 +123,7 @@ else
 	{
 		$notify_message .= "\n"
 						.T_('Status').': '.$Comment->get( 't_status' )."\n"
-						.T_( 'This is a short form moderation message. To make these emails more useful for quick moderation, ask the administrator to send you long form moderation messages instead.' )
+						.T_( 'This is a short form notification. To make these emails more useful, ask the administrator to send you long form notifications instead.' )
 						."\n";
 	}
 }

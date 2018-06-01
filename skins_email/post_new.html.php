@@ -81,7 +81,7 @@ else
 		echo '<p'.emailskin_style( '.p' ).'>'.T_('Status').': '.$Item->get( 't_status' )."</p>\n";
 
 		echo '<div class="email_ugc"'.emailskin_style( 'div.email_ugc' ).'>'."\n";
-		echo '<p'.emailskin_style( '.p' ).'><i'.emailskin_style( '.note' ).'>'.T_( 'This is a short form moderation message. To make these emails more useful for quick moderation, ask the administrator to send you long form moderation messages instead.' ).'</i></p>';
+		echo '<p'.emailskin_style( '.p' ).'><i'.emailskin_style( '.note' ).'>'.T_( 'This is a short form notification. To make these emails more useful, ask the administrator to send you long form notifications instead.' ).'</i></p>';
 		echo "</div>\n";
 	}
 }

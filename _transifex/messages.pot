@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: b2evolution 6\n"
 "Report-Msgid-Bugs-To: http://fplanque.com/\n"
-"POT-Creation-Date: 2018-05-30 15:32+0200\n"
+"POT-Creation-Date: 2018-06-01 16:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2971,7 +2971,7 @@ msgstr ""
 #: ../../../inc/_core/__core.init.php:2044
 #: ../../../inc/collections/views/_coll_features.form.php:63
 #: ../../../inc/users/display.ctrl.php:104
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:113
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:115
 msgid "Display"
 msgstr ""
 
@@ -20308,8 +20308,8 @@ msgstr ""
 #: ../../../inc/items/views/_item_list_sidebar.view.php:189
 #: ../../../inc/items/views/_item_list_sidebar.view.php:253
 #: ../../../inc/users/model/_user.funcs.php:3740
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:128
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:139
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:130
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:141
 msgid "Any"
 msgstr ""
 
@@ -36016,70 +36016,78 @@ msgid "Random users"
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:106
-msgid "Most recent registrations"
+msgid "Optimized Random"
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:107
-msgid "Most recent profile updates"
+msgid "PHP Random"
 msgstr ""
 
 #: ../../../inc/widgets/widgets/_user_avatars.widget.php:108
+msgid "Most recent registrations"
+msgstr ""
+
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:109
+msgid "Most recent profile updates"
+msgstr ""
+
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:110
 msgid "Number of (Public+Community+Member) posts"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:117
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:119
 msgid "User Names"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:118
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:120
 msgid "Profile Badges"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:119
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:121
 msgid "Profile Pictures only"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:124
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:126
 msgid "Gender filtering"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:129
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:131
 msgid "Same gender as User"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:130
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:132
 msgid "Opposite gender as User"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:135
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:137
 msgid "Location filtering"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:140
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:142
 msgid "Same country as User"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:141
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:143
 msgid "Same region as User"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:142
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:144
 msgid "Same sub-region as User"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:143
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:145
 msgid "Same city as User"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:144
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:146
 msgid "Closest users"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:170
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:172
 msgid "User list"
 msgstr ""
 
-#: ../../../inc/widgets/widgets/_user_avatars.widget.php:188
+#: ../../../inc/widgets/widgets/_user_avatars.widget.php:190
 msgid "Index of users avatars; click goes to user page."
 msgstr ""
 
@@ -42151,9 +42159,11 @@ msgstr ""
 #: ../../../skins_email/comment_new.html.php:120
 #: ../../../skins_email/comment_new.txt.php:126
 #: ../../../skins_email/comment_spam.html.php:97
-#: ../../../skins_email/comment_spam.txt.php:105 ../skins_email/post_new.html.php:84
-#: ../../../skins_email/post_new.txt.php:92
-msgid "This is a short form moderation message. To make these emails more useful for quick moderation, ask the administrator to send you long form moderation messages instead."
+#: ../../../skins_email/comment_spam.txt.php:105
+#: ../../../skins_email/post_assignment.html.php:77
+#: ../../../skins_email/post_assignment.txt.php:87
+#: ../../../skins_email/post_new.html.php:84 ../skins_email/post_new.txt.php:92
+msgid "This is a short form notification. To make these emails more useful, ask the administrator to send you long form notifications instead."
 msgstr ""
 
 #: ../../../skins_email/comment_new.html.php:131
@@ -42341,24 +42351,19 @@ msgid ""
 msgstr ""
 
 #: ../../../skins_email/newsletter.html.php:26 ../skins_email/newsletter.txt.php:26
-msgid "If you don't want to receive this list anymore, click here:"
+msgid "If you don't want to receive emails from this list anymore, click here:"
 msgstr ""
 
 #: ../../../skins_email/post_assignment.html.php:34
 #: ../../../skins_email/post_assignment.txt.php:34
 #, php-format
-msgid "%s assigned you to the following post"
+msgid "%s assigned you the following post"
 msgstr ""
 
 #: ../../../skins_email/post_assignment.html.php:74
 #: ../../../skins_email/post_assignment.txt.php:79
 #, php-format
-msgid "%s assigned you to a post on %s with title %s."
-msgstr ""
-
-#: ../../../skins_email/post_assignment.html.php:77
-#: ../../../skins_email/post_assignment.txt.php:87
-msgid "This is a short form post assignment message. To make these emails more useful for quick review, ask the administrator to send you long form post assignment messages instead."
+msgid "%s assigned you a post on %s with title %s."
 msgstr ""
 
 #: ../../../skins_email/post_assignment.html.php:85
