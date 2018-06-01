@@ -20,8 +20,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * @param string Message text
  * @param boolean TRUE if it is called from cron
+ * @param string Message type: 'success', 'warning', 'error', 'note', NULL - to use default text without addition style color
  */
-function dre_msg( $message, $cron = false )
+function dre_msg( $message, $cron = false, $type = NULL )
 {
 	global $is_web, $dre_messages;
 
@@ -36,7 +37,12 @@ function dre_msg( $message, $cron = false )
 
 	if( $cron )
 	{	// Append a message to cron log if we are in cron mode:
-		cron_log_append( $message );
+		cron_log_append( $message, $type );
+	}
+
+	if( $type == 'error' )
+	{	// Store an error message in system log:
+		syslog_insert( 'Returned email: '.$message, 'error' );
 	}
 }
 
@@ -116,7 +122,7 @@ function dre_connect( $cron = false, $print_out_folders = false )
 			$error = implode( "<br />\n", $error );
 		}
 
-		dre_msg( sprintf( ('Connection failed: %s'), $error ), $cron );
+		dre_msg( sprintf( ('Connection failed: %s'), $error ), $cron, 'error' );
 		return false;
 	}
 	dre_msg( '<b class="green">'.('Successfully connected!').'</b>', $cron );
@@ -126,7 +132,7 @@ function dre_connect( $cron = false, $print_out_folders = false )
 	if( $print_out_folders )
 	{	// Print out all possible folders of host:
 		$server_folders = imap_list( $mbox, $mailserver, '*' );
-		dre_msg( '<b>'.T_('Mail server has the following folders:').'</b>', $cron );
+		dre_msg( '<b>'.('Mail server has the following folders:').'</b>', $cron );
 		$folders_html = '<ol>';
 		foreach( $server_folders as $server_folder )
 		{
@@ -221,7 +227,7 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		// STEP 1: Parse and decode message data and retrieve its structure:
 		if( !$mimeParser->Decode( $MIMEparameters, /* BY REF */ $decodedMIME ) )
 		{	// error:
-			dre_msg( sprintf( ('MIME message decoding error: %s at position %d.'), $mimeParser->error, $mimeParser->error_position ), $cron );
+			dre_msg( sprintf( ('MIME message decoding error: %s at position %d.'), $mimeParser->error, $mimeParser->error_position ), $cron, 'error' );
 			rmdir_r( $tmpDirMIME );
 			unlink( $tmpMIME );
 			continue;
@@ -233,7 +239,7 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 			// STEP 2: Analyze (the first) parsed message to describe its contents:
 			if( ! $mimeParser->Analyze( $decodedMIME[0], /* BY REF */ $parsedMIME ) )
 			{	// error:
-				dre_msg( sprintf( ('MIME message analyze error: %s'), $mimeParser->error ), $cron );
+				dre_msg( sprintf( ('MIME message analyze error: %s'), $mimeParser->error ), $cron, 'error' );
 				rmdir_r( $tmpDirMIME );
 				unlink( $tmpMIME );
 				continue;
@@ -349,7 +355,7 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		{
 			// Make it easier for user to find and correct the errors
 			dre_msg( "\n".sprintf( ('Processing message: %s'), $post_title ), $cron );
-			dre_msg( $Messages->get_string( ('Cannot post, please correct these errors:'), 'error' ), $cron );
+			dre_msg( $Messages->get_string( ('Cannot post, please correct these errors:'), 'error' ), $cron, 'error' );
 
 			$Messages->clear();
 			rmdir_r( $tmpDirMIME );
@@ -472,7 +478,7 @@ function dre_process_header( $header, & $subject, & $post_date, $cron = false )
 	$subject = $header['Subject'];
 	$ddate = $header['Date'];
 
-	dre_msg( T_('Subject').': '.$subject, $cron );
+	dre_msg( ('Subject').': '.$subject, $cron );
 
 	// Check subject to match in titles to identify return path emails
 	$subject_is_correct = false;
