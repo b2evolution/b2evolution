@@ -35,7 +35,7 @@ function pbm_msg( $message, $cron = false, $type = NULL )
 
 	if( $type == 'error' )
 	{	// Store an error message in system log:
-		syslog_insert( 'Post by Email: '.$message, 'error' );
+		syslog_insert( 'Get posts by email: '.$message, 'error' );
 	}
 }
 

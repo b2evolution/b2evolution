@@ -42,7 +42,7 @@ function dre_msg( $message, $cron = false, $type = NULL )
 
 	if( $type == 'error' )
 	{	// Store an error message in system log:
-		syslog_insert( 'Returned email: '.$message, 'error' );
+		syslog_insert( 'Get returned emails: '.$message, 'error' );
 	}
 }
 
