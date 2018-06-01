@@ -26,7 +26,7 @@ if( is_array( $params['tasks'] ) && count( $params['tasks'] ) )
 {
 	foreach( $params['tasks'] as $task_ID => $task )
 	{
-		echo '- '.$task['name'].' (#'.$task_ID.'): '.T_( $task['message'] )."\n";
+		echo '- '.$task['name'].' (#'.$task_ID.'):'."\n".T_( $task['message'] )."\n";
 	}
 }
 echo "\n";

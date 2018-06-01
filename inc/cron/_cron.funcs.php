@@ -237,7 +237,7 @@ function call_job( $job_key, $job_params = array() )
 	if( $error_code != 1 )
 	{	// We got an error
 		$result_status = 'error';
-		$result_message_text = '[Error code: '.$error_code.' ] '.$result_message_text;
+		$result_message_text = '[Error code: '.$error_code.']'."\n".$result_message_text;
 		if( is_array( $result_message ) )
 		{ // If result is array
 			$result_message['message'] = $result_message_text;
