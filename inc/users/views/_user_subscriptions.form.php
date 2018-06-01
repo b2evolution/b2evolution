@@ -462,7 +462,10 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 	{ // current User is an administrator
 		$notify_options[ T_('My account') ][] = array( 'edited_user_send_activation_reminder', 1, sprintf( T_('my account was deactivated or is not activated for more than %s.').get_admin_badge( 'user' ), seconds_to_period( $Settings->get( 'activate_account_reminder_threshold' ) ) ), $UserSettings->get( 'send_activation_reminder', $edited_User->ID ), $disabled );
 	}
-	$notify_options[ T_('My account') ][] = array( 'edited_user_send_inactive_reminder', 1, sprintf( T_('my account has been inactive for more than %s.'), seconds_to_period( $Settings->get( 'inactive_account_reminder_threshold' ) ) ), $UserSettings->get( 'send_inactive_reminder', $edited_User->ID ), $disabled );
+	if( $Settings->get( 'inactive_account_reminder_threshold' ) > 0 )
+	{	// If setting "Trigger after" of cron job "Send reminders about inactive accounts" is selected at least to 1 second:
+		$notify_options[ T_('My account') ][] = array( 'edited_user_send_inactive_reminder', 1, sprintf( T_('my account has been inactive for more than %s.'), seconds_to_period( $Settings->get( 'inactive_account_reminder_threshold' ) ) ), $UserSettings->get( 'send_inactive_reminder', $edited_User->ID ), $disabled );
+	}
 	if( $edited_User->check_perm( 'users', 'edit' ) )
 	{ // edited user has permission to edit all users, save notification preferences
 		$notify_options[ T_('System users') ][] = array( 'edited_user_notify_new_user_registration', 1, T_( 'a new user has registered.' ), $UserSettings->get( 'notify_new_user_registration', $edited_User->ID ), $disabled );
@@ -475,8 +478,8 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 	{ // edited user has permission to edit options, save notification preferences
 		$notify_options[ T_('System maintenance') ][] = array( 'edited_user_notify_cronjob_error', 1, T_( 'a scheduled task ends with an error or timeout.' ), $UserSettings->get( 'notify_cronjob_error',  $edited_User->ID ), $disabled );
 	}
-	if( $current_User->check_perm( 'users', 'edit' ) )
-	{	// current User is an administrator
+	if( $current_User->check_perm( 'users', 'edit' ) && $edited_User->check_perm( 'options', 'view' ) )
+	{	// current User is an administrator and the edited user has a permission to automations:
 		$notify_options[ T_('System maintenance') ][] = array( 'edited_user_notify_automation_owner', 1, T_('one of my automations wants to notify me.'), $UserSettings->get( 'notify_automation_owner', $edited_User->ID ), $disabled );
 	}
 	if( !empty( $notify_options ) )

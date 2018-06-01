@@ -431,6 +431,7 @@ switch( $action )
 		$initial_hit = $Session->get_first_hit_params();
 		if( ! empty ( $initial_hit ) )
 		{	// Save User Settings
+			$UserSettings->set( 'initial_sess_ID' , $initial_hit->hit_sess_ID, $new_User->ID );
 			$UserSettings->set( 'initial_blog_ID' , $initial_hit->hit_coll_ID, $new_User->ID );
 			$UserSettings->set( 'initial_URI' , $initial_hit->hit_uri, $new_User->ID );
 			$UserSettings->set( 'initial_referer' , $initial_hit->hit_referer , $new_User->ID );

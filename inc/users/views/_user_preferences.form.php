@@ -147,6 +147,14 @@ else
 	$timeout_sessions_selected = 'custom';
 }
 
+$oldest_session_period = seconds_to_period( max( $Settings->get( 'auto_prune_stats' ) * 86400, $def_timeout_session ) );
+$timeout_sessions_note = T_('Cannot exceed the default').' ('.$oldest_session_period.')';
+if( $timeout_sessions > $Settings->get( 'auto_prune_stats' ) * 86400 &&
+		$timeout_sessions > $def_timeout_session )
+{	// Display a warning if the user session can be deleted earlier:
+	$timeout_sessions_note .= '<br /><span class="red">'.sprintf( T_('WARNING: The session will actually die earlier because the sessions table is pruned after %s.'), $oldest_session_period ).'</span>';
+}
+
 if( $action != 'view' )
 { // We can edit the values:
 
@@ -169,7 +177,7 @@ if( $action != 'view' )
 					array(
 						'value'   => 'default',
 						'label'   => T_('Use default duration.'),
-						'note'    => duration_format( $def_timeout_session ),
+						'note'    => $oldest_session_period,
 						'onclick' => 'jQuery("[id$=timeout_sessions]").hide();' ),
 					array(
 						'value'   => 'custom',
@@ -184,16 +192,7 @@ if( $action != 'view' )
 		{ // Hide the field to customize a session duration when default duration is selected
 			$Form->fieldstart = str_replace( '>', ' style="display:none">', $Form->fieldstart );
 		}
-		if( $timeout_sessions > $Settings->get( 'auto_prune_stats' ) * 86400 &&
-		    $timeout_sessions > $def_timeout_session )
-		{ // Display a warning if the user session can be deleted earlier
-			$timeout_sessions_warning = '<br /><span class="red">'.sprintf( T_('WARNING: The session will actually die earlier because the sessions table is pruned after %d days.'), intval( $Settings->get( 'auto_prune_stats' ) ) ).'</span>';
-		}
-		else
-		{ // No warning, because the custom user session duration will be used
-			$timeout_sessions_warning = '';
-		}
-		$Form->duration_input( 'timeout_sessions', $timeout_sessions, T_('Custom duration'), 'months', 'seconds', array( 'minutes_step' => 1, 'note' => $timeout_sessions_warning ) );
+		$Form->duration_input( 'timeout_sessions', $timeout_sessions, T_('Custom duration'), 'months', 'seconds', array( 'minutes_step' => 1, 'note' => $timeout_sessions_note ) );
 		$Form->fieldstart = $fieldstart;
 	}
 	else
@@ -209,12 +208,12 @@ else
 	$Form->info( T_('Multiple sessions'), ( $multiple_sessions_value ? T_('yes') : T_('no') ), T_('Check this if you want to be able to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will automatically disconnect you on the previous one.') );
 	if( $timeout_sessions_selected == 'default' )
 	{
-		$Form->info( T_('Session timeout'), T_('Use default duration.'), duration_format( $def_timeout_session ) );
+		$Form->info( T_('Session timeout'), T_('Use default duration.'), $oldest_session_period );
 	}
 	else
 	{
 		$Form->info( T_('Session timeout'), T_('Use custom duration...') );
-		$Form->info( T_('Custom duration'), duration_format( $timeout_sessions ) );
+		$Form->info( T_('Custom duration'), seconds_to_period( $timeout_sessions ), $timeout_sessions_note );
 	}
 	
 	$Form->info( T_('Show online'), ( $UserSettings->get( 'show_online', $edited_User->ID ) ? T_('yes') : T_('no') ), T_('Check this to be displayed as online when visiting the site.') );

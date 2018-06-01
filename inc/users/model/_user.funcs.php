@@ -1990,42 +1990,13 @@ function get_default_avatar_url( $gender = '', $size = NULL )
 /**
  * Convert seconds to months, days, hours, minutes and seconds format
  *
+ * @deprecated since version 6.10.1-stable: Use seconds_to_period()
  * @param integer seconds
  * @return string
  */
 function duration_format( $duration, $show_seconds = true )
 {
-	$result = '';
-
-	$fields = get_duration_fields( $duration );
-	if( $fields[ 'months' ] > 0 )
-	{
-		$result .= sprintf( T_( '%d months' ), $fields[ 'months' ] ).' ';
-	}
-	if( $fields[ 'days' ] > 0 )
-	{
-		$result .= sprintf( T_( '%d days' ), $fields[ 'days' ] ).' ';
-	}
-	if( $fields[ 'hours' ] > 0 )
-	{
-		$result .= sprintf( T_( '%d hours' ), $fields[ 'hours' ] ).' ';
-	}
-	if( $fields[ 'minutes' ] > 0 )
-	{
-		$result .= sprintf( T_( '%d minutes' ), $fields[ 'minutes' ] ).' ';
-	}
-	if( $show_seconds && ( $fields[ 'seconds' ] > 0 ) )
-	{
-		$result .= sprintf( T_( '%d seconds' ),  $fields[ 'seconds' ] );
-	}
-
-	$result = trim( $result );
-	if( empty( $result ) )
-	{
-		$result = '0';
-	}
-
-	return $result;
+	return seconds_to_period( $duration );
 }
 
 

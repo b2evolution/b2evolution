@@ -102,7 +102,7 @@ if( !empty( $template_action ) )
 		case 'prune_hits_sessions':
 			// Prune old hits & sessions
 			load_class( 'sessions/model/_hitlist.class.php', 'Hitlist' );
-			$result = Hitlist::dbprune( false ); // will prune once per day, according to Settings
+			$result = Hitlist::dbprune( false, false ); // will prune once per day, according to Settings
 			print_log( nl2br( $result['message'] ), $result['result'] );
 			break;
 
