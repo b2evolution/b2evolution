@@ -9816,6 +9816,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12900, 'Upgrading system log table...' ) )
+	{	// part of 6.10.1-stable
+		db_modify_col( 'T_syslog', 'slg_object', 'ENUM("comment", "item", "user", "file", "email_log") COLLATE ascii_general_ci' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
