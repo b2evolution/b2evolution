@@ -31,7 +31,7 @@ if( is_array( $params['tasks'] ) && count( $params['tasks'] ) )
 }
 echo "\n";
 
-$tasks_url = $admin_url.'?ctrl=crontab&ctst_timeout=1&ctst_error=1';
+$tasks_url = $admin_url.'?ctrl=crontab&ctst_status[]=warning&ctst_status[]=timeout&ctst_status[]=error';
 echo sprintf( T_('To see more information about these tasks click here: %s'), $tasks_url );
 
 // Footer vars:
