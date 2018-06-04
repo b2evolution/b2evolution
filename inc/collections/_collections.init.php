@@ -1267,8 +1267,6 @@ class collections_Module extends Module
 				// Refresh last touched date of the Item:
 
 				$item_ID = param( 'item_ID', 'integer', true );
-				// What comment date use to refresh: 'touch'(Default) - 'comment_last_touched_ts', 'create' - 'comment_date'
-				$date_type = param( 'type', 'string' );
 
 				$ItemCache = & get_ItemCache();
 				$refreshed_Item = & $ItemCache->get_by_ID( $item_ID );
@@ -1280,8 +1278,13 @@ class collections_Module extends Module
 					// EXIT HERE.
 				}
 
+				// What post and comment date fields use to refresh:
+				// - 'touched' - 'post_datemodified', 'comment_last_touched_ts' (Default)
+				// - 'created' - 'post_datestart', 'comment_date'
+				$date_type = param( 'type', 'string', 'touched' );
+
 				// Run refreshing and display a message:
-				$refreshed_Item->refresh_contents_last_updated_ts( true, ( $date_type == 'create' ? 'date' : 'last_touched_ts' ) );
+				$refreshed_Item->refresh_contents_last_updated_ts( true, $date_type );
 
 				header_redirect();
 				break; // already exited here

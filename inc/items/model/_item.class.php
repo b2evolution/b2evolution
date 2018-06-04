@@ -10241,7 +10241,7 @@ class Item extends ItemLight
 
 		if( $params['title'] == '#' )
 		{	// Use default title
-			$params['title'] = T_('Refresh "contents last updated" timestamp!');
+			$params['title'] = T_('Reset the "contents last updated" date to the latest content change on this thread');
 		}
 
 		$params['text'] = utf8_trim( $params['text'] );
@@ -10268,9 +10268,12 @@ class Item extends ItemLight
 	 *
 	 * @param boolean TRUE to display messages
 	 * @param string Field name(without prefix "comment_") of the latest comment which should be used to refresh the post date column: 'date', 'last_touched_ts'
+	 * @param string What post and comment date fields use to refresh:
+	                   'touched' - 'post_datemodified', 'comment_last_touched_ts' (Default)
+	                   'created' - 'post_datestart', 'comment_date'
 	 * @return boolean TRUE of success
 	 */
-	function refresh_contents_last_updated_ts( $display_messages = false, $comment_date_field = 'last_touched_ts' )
+	function refresh_contents_last_updated_ts( $display_messages = false, $date_type = 'touched' )
 	{
 		if( ! $this->can_refresh_contents_last_updated() )
 		{	// If current User has no permission to refresh a contents last updated date of the requested Item:
@@ -10282,13 +10285,24 @@ class Item extends ItemLight
 		// Clear latest Comment from previous calling before Comment updating:
 		$this->latest_Comment = NULL;
 
+		if( $date_type == 'created' )
+		{	// Use dates for 'created' mode:
+			$post_date_field = 'datestart';
+			$comment_date_field = 'date';
+		}
+		else
+		{	// Use dates for 'touched' mode:
+			$post_date_field = 'datemodified';
+			$comment_date_field = 'last_touched_ts';
+		}
+
 		if( $latest_Comment = & $this->get_latest_Comment( get_inskin_statuses( $this->get_blog_ID(), 'comment' ), $comment_date_field ) )
 		{	// Use date from the latest public Comment:
 			$new_contents_last_updated_ts = $latest_Comment->get( $comment_date_field );
 			if( $display_messages )
-			{
+			{	// Display message:
 				$Messages->add( sprintf(
-						( $comment_date_field == 'date'
+						( $date_type == 'created'
 							? T_('"Contents last updated" timestamp has been refreshed using <a %s>most recently added comment</a> date = %s.')
 							: T_('"Contents last updated" timestamp has been refreshed using <a %s>most recently touched comment</a> date = %s.')
 						),
@@ -10299,10 +10313,14 @@ class Item extends ItemLight
 		}
 		else
 		{	// Use date from issue date of this Item when it has no comments yet:
-			$new_contents_last_updated_ts = $this->get( 'datestart' );
+			$new_contents_last_updated_ts = $this->get( $post_date_field );
 			if( $display_messages )
-			{	// Display message
-				$Messages->add( sprintf( T_('"Contents last updated" timestamp has been refreshed using post issue date = %s.'),
+			{	// Display message:
+				$Messages->add( sprintf(
+						( $date_type == 'created'
+							? T_('"Contents last updated" timestamp has been refreshed using post issue date = %s.')
+							: T_('"Contents last updated" timestamp has been refreshed using post modified date = %s.')
+						),
 						mysql2localedatetime( $new_contents_last_updated_ts )
 					), 'success' );
 			}
