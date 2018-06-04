@@ -6548,7 +6548,7 @@ function users_results( & $UserList, $params = array() )
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'center nowrap',
 				'order' => 'csnd_status',
-				'td' => '%user_td_campaign_status( #csnd_status# )%'
+				'td' => '%user_td_campaign_status( #csnd_status#, #csnd_emlog_ID# )%'
 			);
 	}
 
@@ -7363,8 +7363,10 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 /**
  * Get user campaign status
  */
-function user_td_campaign_status( $csnd_status )
+function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL )
 {
+	global $current_User, $admin_url;
+
 	switch( $csnd_status )
 	{
 		case 'ready_to_send':
@@ -7377,7 +7379,14 @@ function user_td_campaign_status( $csnd_status )
 			return T_('Sent');
 
 		case 'send_error':
-			return T_('Send error');
+			if( $current_User->check_perm( 'emails', 'view', true ) && ! empty( $csnd_emlog_ID ) )
+			{
+				return '<a href="'.get_dispctrl_url( 'email', 'tab=sent&amp;emlog_ID='.$csnd_emlog_ID ).'">'.T_('Send error').'</a>';
+			}
+			else
+			{
+				return T_('Send error');
+			}
 
 		case 'skipped':
 			return T_('Skipped');
