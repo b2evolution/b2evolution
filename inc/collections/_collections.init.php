@@ -1267,6 +1267,8 @@ class collections_Module extends Module
 				// Refresh last touched date of the Item:
 
 				$item_ID = param( 'item_ID', 'integer', true );
+				// What comment date use to refresh: 'touch'(Default) - 'comment_last_touched_ts', 'create' - 'comment_date'
+				$date_type = param( 'type', 'string' );
 
 				$ItemCache = & get_ItemCache();
 				$refreshed_Item = & $ItemCache->get_by_ID( $item_ID );
@@ -1279,8 +1281,7 @@ class collections_Module extends Module
 				}
 
 				// Run refreshing and display a message:
-				$refreshed_Item->refresh_contents_last_updated_ts();
-				$Messages->add( T_('"Contents last updated" timestamp has been refreshed.'), 'success' );
+				$refreshed_Item->refresh_contents_last_updated_ts( true, ( $date_type == 'create' ? 'date' : 'last_touched_ts' ) );
 
 				header_redirect();
 				break; // already exited here

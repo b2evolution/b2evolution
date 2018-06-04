@@ -171,6 +171,10 @@ while( $Item = & $ItemList->get_item() )
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 				echo ' ', T_('by'), ' ', $Item->creator_User->get_identity_link( array( 'link_text' => 'name' ) );
 
+				// Last modified date:
+				echo ' <span class="text-nowrap">&middot; '.T_('Last modified').': '
+					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'datemodified' ) ).'</span>';
+
 				// Last touched date:
 				echo ' <span class="text-nowrap">&middot; '.T_('Last touched').': '
 					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'last_touched_ts' ) ).'</span>';
@@ -178,7 +182,12 @@ while( $Item = & $ItemList->get_item() )
 				// Contents updated date:
 				echo ' <span class="text-nowrap">&middot; '.T_('Contents updated').': '
 					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'contents_last_updated_ts' ) )
-					.$Item->get_refresh_contents_last_updated_link().'</span>';
+					.$Item->get_refresh_contents_last_updated_link()
+					.$Item->get_refresh_contents_last_updated_link( array(
+							'title' => T_('Refresh "contents last updated" timestamp using only creation dates (ignoring subsequent modifications)'),
+							'type'  => 'create',
+						) )
+					.'</span>';
 
 				echo '<br />';
 				$Item->type( T_('Type').': <span class="bType">', '</span> &nbsp; ' );
