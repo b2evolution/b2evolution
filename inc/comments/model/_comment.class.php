@@ -1144,7 +1144,7 @@ class Comment extends DataObject
 
 		if( $this->get_author_User() )
 		{ // Author is a registered user:
-			if( $params['after_user'] == '#' ) $params['after_user'] = ' <span class="bUser-member-tag">['.T_('Member').']</span>';
+			if( $params['after_user'] == '#' ) $params['after_user'] = ' '.$this->get_author_label( $params );
 
 			$r = $this->author_User->get_identity_link( $params );
 
@@ -1152,7 +1152,7 @@ class Comment extends DataObject
 		}
 		else
 		{ // Not a registered user, display info recorded at edit time:
-			if( $params['after'] == '#' ) $params['after'] = ' <span class="bUser-anonymous-tag">['.T_('Visitor').']</span>';
+			if( $params['after'] == '#' ) $params['after'] = ' '.$this->get_author_label( $params );
 
 			if( utf8_strlen( $this->author_url ) <= 10 )
 			{ // URL is too short anyways...
@@ -1192,6 +1192,52 @@ class Comment extends DataObject
 		);
 
 		$Plugins->trigger_event( 'FilterCommentAuthor', $hook_params );
+
+		return $r;
+	}
+
+
+	/**
+	 * Get author label
+	 *
+	 * @param array Params
+	 */
+	function get_author_label( $params = array() )
+	{
+		global $Skin;
+
+		// Default params:
+		if( is_admin_page() || ( isset( $Skin ) && $Skin->get_api_version() >= 6 && strpos( $Skin->folder, 'bootstrap' ) !== FALSE ) )
+		{	// for v6 bootstrap skins:
+			$default_params = array(
+					'member_before'  => '<span class="label label-info">',
+					'member_after'   => '</span>',
+					'visitor_before' => '<span class="label label-warning">',
+					'visitor_after'  => '</span>',
+				);
+		}
+		else
+		{	// for v5 skins:
+			$default_params = array(
+					'member_before'  => '<span class="bUser-member-tag">[',
+					'member_after'   => ']</span>',
+					'visitor_before' => '<span class="bUser-anonymous-tag">[',
+					'visitor_after'  => ']</span>',
+				);
+		}
+		$params = array_merge( $default_params, $params );
+
+		$r = '';
+
+		// Type of author:
+		if( $this->get_author_User() )
+		{	// If author is a registered user:
+			$r .= $params['member_before'].T_('Member').$params['member_after'];
+		}
+		else
+		{	// If author is not a registered user:
+			$r .= $params['visitor_before'].T_('Visitor').$params['visitor_after'];
+		}
 
 		return $r;
 	}
