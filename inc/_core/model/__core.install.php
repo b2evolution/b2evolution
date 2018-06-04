@@ -546,6 +546,7 @@ $schema_queries = array(
 			PRIMARY KEY (enls_user_ID, enls_enlt_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
+	// When adding fields to this table do not forget to check EmailCampaign::duplicate() for fields that should not be duplicated!
 	'T_email__campaign' => array(
 		'Creating email campaigns table',
 		"CREATE TABLE T_email__campaign (
