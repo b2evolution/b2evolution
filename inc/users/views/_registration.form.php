@@ -86,6 +86,7 @@ $Form->begin_fieldset( T_('Default user settings').get_manual_link('default-user
 			array( 'notify_unread_messages', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'I have unread private messages for more than 24 hours.' ),  $Settings->get( 'def_notify_unread_messages' ), false, T_( 'This notification is sent only once every 3 days.' ) ),
 		), 'default_user_notification', T_('Messaging') );
 	$Form->checklist( array(
+			array( 'notify_when_mentioned', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'I have been mentioned on a comment.' ), $Settings->get( 'def_notify_when_mentioned' ) ),
 			array( 'notify_published_comments', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is published on one of <strong>my</strong> posts.' ), $Settings->get( 'def_notify_published_comments' ) ),
 			array( 'notify_comment_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is posted and I have permissions to moderate it.' ), $Settings->get( 'def_notify_comment_moderation' ) ),
 			array( 'notify_edit_cmt_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is modified and I have permissions to moderate it.' ), $Settings->get( 'def_notify_edit_cmt_moderation' ) ),

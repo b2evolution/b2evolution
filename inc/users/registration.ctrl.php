@@ -44,6 +44,7 @@ switch ( $action )
 		param( 'enable_email', 'integer', 0 );
 		param( 'notify_messages', 'integer', 0 );
 		param( 'notify_unread_messages', 'integer', 0 );
+		param( 'notify_when_mentioned', 'integer', 0 );
 		param( 'notify_published_comments', 'integer', 0 );
 		param( 'notify_comment_moderation', 'integer', 0 );
 		param( 'notify_edit_cmt_moderation', 'integer', 0 );
@@ -132,6 +133,7 @@ switch ( $action )
 					 array( 'def_enable_email', $enable_email ),
 					 array( 'def_notify_messages', $notify_messages ),
 					 array( 'def_notify_unread_messages', $notify_unread_messages ),
+					 array( 'def_notify_when_mentioned', $notify_when_mentioned ),
 					 array( 'def_notify_published_comments', $notify_published_comments ),
 					 array( 'def_notify_comment_moderation', $notify_comment_moderation ),
 					 array( 'def_notify_edit_cmt_moderation', $notify_edit_cmt_moderation ),

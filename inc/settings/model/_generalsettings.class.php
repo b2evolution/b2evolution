@@ -130,6 +130,7 @@ class GeneralSettings extends AbstractSettings
 		'def_enable_email' => '0',
 		'def_notify_messages' => '1',
 		'def_notify_unread_messages' => '1',
+		'def_notify_when_mentioned' => '1',
 		'def_notify_published_comments' => '1',
 		'def_notify_comment_moderation' => '1',
 		'def_notify_edit_cmt_moderation' => '1',

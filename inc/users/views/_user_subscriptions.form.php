@@ -428,6 +428,7 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 		$unread_message_reminder_delay = $Settings->get( 'unread_message_reminder_delay' );
 		$notify_options[ T_('Messaging') ][] = array( 'edited_user_notify_unread_messages', 1, sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $Settings->get( 'unread_message_reminder_threshold' ) ) ),  $UserSettings->get( 'notify_unread_messages', $edited_User->ID ), $disabled, sprintf( T_('This notification is sent only once every %s days.'), array_shift( $unread_message_reminder_delay ) ) );
 	}
+	$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_when_mentioned', 1, T_( 'I have been mentioned on a comment.' ), $UserSettings->get( 'notify_when_mentioned', $edited_User->ID ) );
 	if( $edited_User->check_role( 'post_owner' ) )
 	{ // user has at least one post or user has right to create new post
 		$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_publ_comments', 1, T_('a comment is published on one of <strong>my</strong> posts.'), $UserSettings->get( 'notify_published_comments', $edited_User->ID ), $disabled );

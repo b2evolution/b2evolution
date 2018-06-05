@@ -47,6 +47,11 @@ else
 }
 $notify_message = '<p'.emailskin_style( '.p' ).'>'.sprintf( $info_text, '<b>'.$author_name.'</b>'.$author_type, '<b>'.get_link_tag( $Item->get_permanent_url( '', '', '&' ), $Item->get( 'title' ), '.a' ).'</b>', '<b>'.$Blog->get('shortname').'</b>' )."</p>\n";
 
+if( $params['notify_type'] == 'user_mentioned' )
+{	// Add this info line if user was mentioned in the comment content:
+	$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_( 'You were mentioned in this comment.' )."</p>\n";
+}
+
 if( $params['notify_full'] )
 { // Long format notification:
 	if( ! empty( $recipient_User ) && $recipient_User->check_perm( 'stats', 'view' ) )
@@ -161,6 +166,13 @@ switch( $params['notify_type'] )
 		$params['unsubscribe_text'] = T_( 'You are a moderator of this blog and you are receiving notifications when a comment may need moderation.' ).'<br />'
 			.$unsubscribe_text.': '
 			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+		break;
+
+	case 'user_mentioned':
+		// user is mentioned in the comment
+		$params['unsubscribe_text'] = T_( 'You were mentioned in this comment, and you are receiving notifications when anyone mention your name in a comment.' ).'<br />'
+			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in a comment, click here' ).': '
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=user_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		break;
 
 	case 'blog_subscription':

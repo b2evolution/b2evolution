@@ -4013,6 +4013,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'private_messages_unread_reminder':
 				// 'notify_unread_messages' - "I have unread private messages for more than X seconds."(X = $Settings->get( 'unread_message_reminder_threshold' ))
 			case 'comment_new':
+				// 'notify_when_mentioned' - "I have been mentioned on a comment.",
 				// 'notify_published_comments' - "a comment is published on one of my posts.",
 				// 'notify_comment_moderation' - "a comment is posted and I have permissions to moderate it.",
 				// 'notify_edit_cmt_moderation' - "a comment is modified and I have permissions to moderate it.",

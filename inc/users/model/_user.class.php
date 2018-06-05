@@ -1541,6 +1541,7 @@ class User extends DataObject
 					$UserSettings->set( 'notify_messages', param( 'edited_user_notify_messages', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'notify_unread_messages', param( 'edited_user_notify_unread_messages', 'integer', 0 ), $this->ID );
 				}
+				$UserSettings->set( 'notify_when_mentioned', param( 'edited_user_notify_when_mentioned', 'integer', 0 ), $this->ID );
 				if( $this->check_role( 'post_owner' ) )
 				{ // update 'notify_published_comments' only if user has at least one post or user has right to create new post
 					$UserSettings->set( 'notify_published_comments', param( 'edited_user_notify_publ_comments', 'integer', 0 ), $this->ID );
