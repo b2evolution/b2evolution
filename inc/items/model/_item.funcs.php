@@ -5210,7 +5210,7 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 		$cat_icon = get_icon( 'filters_show' );
 		$open_url .= '&amp;cat_ID='.$Chapter->ID;
 	}
-	$r .= '<td class="firstcol">'
+	$r .= '<td class="firstcol nowrap">'
 					.'<strong style="padding-left: '.($level).'em;">'
 						.'<a href="'.$open_url.'">'.$cat_icon.' '.$Chapter->dget('name').'</a> ';
 	if( $perm_edit )
