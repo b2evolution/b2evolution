@@ -3858,9 +3858,9 @@ class Comment extends DataObject
 				$mentioned_SQL = new SQL( 'Get the notify users when they are mentioned in new comment' );
 				$mentioned_SQL->SELECT( 'user_ID' );
 				$mentioned_SQL->FROM( 'T_users' );
-				$mentioned_SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "notify_when_mentioned"' );
+				$mentioned_SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "notify_comment_mentioned"' );
 				// Also get users with default enabled setting:
-				$mentioned_sql_where = $Settings->get( 'def_notify_when_mentioned' ) ? ' OR uset_value IS NULL' : '';
+				$mentioned_sql_where = $Settings->get( 'def_notify_comment_mentioned' ) ? ' OR uset_value IS NULL' : '';
 				$mentioned_SQL->WHERE( '( uset_value = "1"'.$mentioned_sql_where.' )'.$except_condition );
 				$mentioned_SQL->WHERE_and( 'user_login IN ( '.$DB->quote( $mentioned_logins ).' )' );
 				$mentioned_users = $DB->get_col( $mentioned_SQL );
@@ -3868,7 +3868,7 @@ class Comment extends DataObject
 				{
 					if( ! empty( $mentioned_user_ID ) )
 					{	// The user is mentioned in the comment content
-						$notify_users[ $mentioned_user_ID ] = 'user_mentioned';
+						$notify_users[ $mentioned_user_ID ] = 'comment_mentioned';
 					}
 				}
 			}
@@ -4308,7 +4308,7 @@ class Comment extends DataObject
 					break;
 
 				case 'blog_subscription': // blog subscription
-				case 'user_mentioned': // user was mentioned in the comment content
+				case 'comment_mentioned': // user was mentioned in the comment content
 				case 'item_subscription': // item subscription for registered user
 				case 'anon_subscription': // item subscription for anonymous user
 				case 'meta_comment': // meta comment notification

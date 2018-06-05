@@ -45,7 +45,7 @@ else
 $author_type = empty( $params['author_ID'] ) ? ' ['.T_('Visitor').']' : ' ['.T_('Member').']';
 $notify_message = sprintf( $info_text, $params['author_name'].$author_type, '"'.$Item->get('title').'"', '"'.$Blog->get('shortname').'"' )."\n\n";
 
-if( $params['notify_type'] == 'user_mentioned' )
+if( $params['notify_type'] == 'comment_mentioned' )
 {	// Add this info line if user was mentioned in the comment content:
 	$notify_message .= T_( 'You were mentioned in this comment.' )."\n\n";
 }
@@ -167,11 +167,11 @@ switch( $params['notify_type'] )
 			.get_htsrv_url().'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$';
 		break;
 
-	case 'user_mentioned':
+	case 'comment_mentioned':
 		// user is mentioned in the comment
 		$params['unsubscribe_text'] = T_( 'You were mentioned in this comment, and you are receiving notifications when anyone mention your name in a comment.' )."\n"
 			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in a comment, click here' ).': '
-			.get_htsrv_url().'quick_unsubscribe.php?type=user_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$';
+			.get_htsrv_url().'quick_unsubscribe.php?type=comment_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$';
 		break;
 
 	case 'blog_subscription':

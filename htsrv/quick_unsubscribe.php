@@ -325,9 +325,9 @@ elseif( $confirmed )
 					$UserSettings->dbupdate();
 					break;
 
-				case 'user_mentioned':
+				case 'comment_mentioned':
 					// unsubscribe from new comment notifications when user is mentioned:
-					$UserSettings->set( 'notify_when_mentioned', '0', $edited_User->ID );
+					$UserSettings->set( 'notify_comment_mentioned', '0', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
@@ -612,9 +612,9 @@ elseif( $confirmed )
 					$UserSettings->dbupdate();
 					break;
 
-				case 'user_mentioned':
+				case 'comment_mentioned':
 					// resubscribe to new comment notifications when user is mentioned:
-					$UserSettings->set( 'notify_when_mentioned', '1', $edited_User->ID );
+					$UserSettings->set( 'notify_comment_mentioned', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
@@ -802,7 +802,7 @@ switch( $type )
 		$type_str = $notification_prefix.': '.T_('a meta comment is posted.');
 		break;
 
-	case 'user_mentioned':
+	case 'comment_mentioned':
 		// unsubscribe from new comment notifications when user is mentioned:
 		$type_str = $notification_prefix.': '.T_('I have been mentioned on a comment.');
 		break;
