@@ -528,8 +528,8 @@ class EmailCampaign extends DataObject
 		// Update the message fields:
 		$this->update_message_fields();
 
-		// Make sure email title is not empty
-		if( empty( $this->email_title ) && ! empty( $this->name ) )
+		// Make sure email title is not NULL
+		if( is_null( $this->email_title ) && ! empty( $this->name ) )
 		{
 			$this->set( 'email_title', $this->name );
 		}
@@ -558,6 +558,12 @@ class EmailCampaign extends DataObject
 	{
 		// Update the message fields:
 		$this->update_message_fields();
+
+		// Make sure email title is not NULL
+		if( is_null( $this->email_title ) && ! empty( $this->name ) )
+		{
+			$this->set( 'email_title', $this->name );
+		}
 
 		$r = parent::dbupdate();
 
@@ -1416,6 +1422,9 @@ class EmailCampaign extends DataObject
 		// Reset sent dates
 		$this->set( 'sent_ts', NULL );
 		$this->set( 'auto_sent_ts', NULL );
+
+		// Set email to NULL so that it will changed automatically to whatever the campaign name is when we insert the new record
+		$this->set( 'email_title', NULL );
 
 		// Try insert new collection in DB:
 		if( ! $this->dbinsert() )
