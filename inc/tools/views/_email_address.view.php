@@ -40,8 +40,8 @@ $count_SQL->FROM( 'T_email__address' );
 if( !empty( $email ) )
 {	// Filter by email
 	$email = utf8_strtolower( $email );
-	$SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( $email ) );
-	$count_SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( $email ) );
+	$SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( '%'.$email.'%' ) );
+	$count_SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( '%'.$email.'%' ) );
 }
 if( !empty( $statuses ) )
 {	// Filter by statuses
@@ -65,7 +65,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
  */
 function filter_email_blocked( & $Form )
 {
-	$Form->email_input( 'email', get_param( 'email' ), 40, T_('Email') );
+	$Form->text_input( 'email', get_param( 'email' ), 40, T_('Email') );
 
 	$statuses = emadr_get_status_titles();
 	foreach( $statuses as $status_value => $status_title )
