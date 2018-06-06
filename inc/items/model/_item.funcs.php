@@ -5044,10 +5044,11 @@ function item_row_status( $Item, $index )
 						.'<span>'.$status_options[ $Item->status ].'</span>'
 					.' <span class="caret"></span></button>'
 				.'<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
+		$tab_param = ( get_param( 'tab' ) == '' ? '' : '&amp;tab='.get_param( 'tab' ) );
 		foreach( $status_options as $status_key => $status_title )
 		{
 			$r .= '<li rel="'.$status_key.'" role="presentation"><a href="'
-					.$admin_url.'?ctrl=items&amp;blog='.$blog_ID.'&amp;action=update_status&amp;post_ID='.$Item->ID.'&amp;status='.$status_key.'&amp;'.url_crumb( 'item' )
+					.$admin_url.'?ctrl=items'.$tab_param.'&amp;blog='.$blog_ID.'&amp;action=update_status&amp;post_ID='.$Item->ID.'&amp;status='.$status_key.'&amp;'.url_crumb( 'item' )
 					.'" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
 		}
 		$r .= '</ul>'
@@ -5212,7 +5213,7 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 	}
 	$r .= '<td class="firstcol nowrap">'
 					.'<strong style="padding-left: '.($level).'em;">'
-						.'<a href="'.$open_url.'">'.$cat_icon.' '.$Chapter->dget('name').'</a> ';
+						.'<a href="'.$open_url.'">'.$cat_icon.'&nbsp;<span style="white-space:normal">'.$Chapter->dget('name').'</span></a>&nbsp;';
 	if( $perm_edit )
 	{ // Current user can edit the chapters of the blog
 		$edit_url = $admin_url.'?ctrl=chapters&amp;blog='.$Chapter->blog_ID.'&amp;cat_ID='.$Chapter->ID.'&amp;action=edit'.$redirect_page;
@@ -5444,7 +5445,7 @@ function item_td_task_class( $post_ID, $post_pst_ID, $editable_class )
 	$ItemCache = & get_ItemCache();
 	$Item = & $ItemCache->get_by_ID( $post_ID );
 
-	$class = 'center nowrap tskst_'.$post_pst_ID;
+	$class = 'shrinkwrap tskst_'.$post_pst_ID;
 	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{ // Current user can edit this item, Add a class to edit a priority by click from view list
 		$class .= ' '.$editable_class;
