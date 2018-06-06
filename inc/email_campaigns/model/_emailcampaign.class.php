@@ -528,12 +528,6 @@ class EmailCampaign extends DataObject
 		// Update the message fields:
 		$this->update_message_fields();
 
-		// Make sure email title is not NULL
-		if( is_null( $this->email_title ) && ! empty( $this->name ) )
-		{
-			$this->set( 'email_title', $this->name );
-		}
-
 		// Pre-fill email default destination
 		if( empty( $this->email_defaultdest ) )
 		{
@@ -559,8 +553,8 @@ class EmailCampaign extends DataObject
 		// Update the message fields:
 		$this->update_message_fields();
 
-		// Make sure email title is not NULL
-		if( is_null( $this->email_title ) && ! empty( $this->name ) )
+		// Update email title if it is NULL and the campaign name is modified
+		if( isset( $this->dbchanges['ecmp_name'] ) && is_null( $this->email_title ) && ! empty( $this->name ) )
 		{
 			$this->set( 'email_title', $this->name );
 		}
@@ -691,8 +685,10 @@ class EmailCampaign extends DataObject
 
 		if( param( 'ecmp_email_title', 'string', NULL ) !== NULL )
 		{	// Email title:
-			param_string_not_empty( 'ecmp_email_title', T_('Please enter an email title.') );
-			$this->set_from_Request( 'email_title' );
+			if( param_string_not_empty( 'ecmp_email_title', T_('Please enter an email title.') ) )
+			{
+				$this->set_from_Request( 'email_title' );
+			}
 		}
 
 		$email_defaultdest = param( 'ecmp_email_defaultdest', 'string', NULL );
@@ -1423,7 +1419,7 @@ class EmailCampaign extends DataObject
 		$this->set( 'sent_ts', NULL );
 		$this->set( 'auto_sent_ts', NULL );
 
-		// Set email to NULL so that it will changed automatically to whatever the campaign name is when we insert the new record
+		// Set email title to NULL so that it will changed automatically to whatever the campaign name is when we edit the campaign name
 		$this->set( 'email_title', NULL );
 
 		// Try insert new collection in DB:

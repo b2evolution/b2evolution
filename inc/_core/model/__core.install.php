@@ -554,7 +554,7 @@ $schema_queries = array(
 			ecmp_date_ts              TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			ecmp_enlt_ID              INT UNSIGNED NOT NULL,
 			ecmp_name                 VARCHAR(255) NOT NULL,
-			ecmp_email_title          VARCHAR(255) NOT NULL,
+			ecmp_email_title          VARCHAR(255) NULL,
 			ecmp_email_defaultdest    VARCHAR(255) NULL,
 			ecmp_email_html           TEXT NULL,
 			ecmp_email_text           TEXT NULL,

@@ -1485,8 +1485,10 @@ switch( $action )
 			$edited_Item->handle_notifications();
 
 			// Set redirect back to items list with new item type tab:
-			$tab = get_tab_by_item_type_usage( $edited_Item->get_type_setting( 'usage' ) );
-			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.( $tab ? $tab[0] : 'post' ).'&filter=restore';
+			$tab = param( 'tab', 'string', 'type' );
+			$tab_type = get_tab_by_item_type_usage( $edited_Item->get_type_setting( 'usage' ) );
+			$tab_type_param = ( $tab == 'type' ? '&tab_type='.( $tab_type ? $tab_type[0] : 'post' ) : '' );
+			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab='.$tab.$tab_type_param.'&filter=restore';
 
 			// Highlight the updated item in list
 			$Session->set( 'highlight_id', $edited_Item->ID );
