@@ -3851,26 +3851,10 @@ class Comment extends DataObject
 			}
 
 			// Get list of users who want to be notified when his login is mentioned in the comment content by @user's_login:
-			preg_match_all( '/@([A-Za-z0-9_\.]+)/', $this->content, $matches );
-			$mentioned_logins = $matches[1];
-			if( count( $mentioned_logins ) > 0 )
-			{	// At least one mentioned user login is found in content
-				$mentioned_SQL = new SQL( 'Get the notify users when they are mentioned in new comment' );
-				$mentioned_SQL->SELECT( 'user_ID' );
-				$mentioned_SQL->FROM( 'T_users' );
-				$mentioned_SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "notify_comment_mentioned"' );
-				// Also get users with default enabled setting:
-				$mentioned_sql_where = $Settings->get( 'def_notify_comment_mentioned' ) ? ' OR uset_value IS NULL' : '';
-				$mentioned_SQL->WHERE( '( uset_value = "1"'.$mentioned_sql_where.' )'.$except_condition );
-				$mentioned_SQL->WHERE_and( 'user_login IN ( '.$DB->quote( $mentioned_logins ).' )' );
-				$mentioned_users = $DB->get_col( $mentioned_SQL );
-				foreach( $mentioned_users as $mentioned_user_ID )
-				{
-					if( ! empty( $mentioned_user_ID ) )
-					{	// The user is mentioned in the comment content
-						$notify_users[ $mentioned_user_ID ] = 'comment_mentioned';
-					}
-				}
+			$mentioned_user_IDs = get_mentioned_user_IDs( 'comment', $this->get( 'content' ), $already_notified_user_IDs );
+			foreach( $mentioned_user_IDs as $mentioned_user_ID )
+			{
+				$notify_users[ $mentioned_user_ID ] = 'comment_mentioned';
 			}
 
 			// Get list of users who want to be notified about the this post comments:

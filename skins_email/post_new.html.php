@@ -30,8 +30,13 @@ $recipient_User = $params['recipient_User'];
 $Item = $params['Item'];
 $Collection = $Blog = & $Item->get_Blog();
 
+// Add this info line if user was mentioned in the post content:
+$mentioned_user_message = ( $params['notify_type'] == 'post_mentioned' ? '<p'.emailskin_style( '.p' ).'>'.T_('You were mentioned in this post.')."</p>\n" : '' );
+
 if( $params['notify_full'] )
 {	/* Full notification */
+	echo $mentioned_user_message;
+
 	echo '<p'.emailskin_style( '.p' ).'>'.T_('Collection').': '.get_link_tag( $Blog->gen_blogurl(), $Blog->get('shortname'), '.a' )."</p>\n";
 
 	echo '<p'.emailskin_style( '.p' ).'>'.T_('Author').': '.get_user_colored_login_link( $Item->creator_User->login, array( 'use_style' => true, 'protocol' => 'http:' ) ).' ('.$Item->creator_User->get('login').")</p>\n";
@@ -76,6 +81,8 @@ else
 { /* Short notification */
 	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( '%s created a new post on %s with title %s.' ), $Item->creator_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:', 'login_text' => 'name' ) ), '<b>'.$Blog->get('shortname').'</b>', '<b>'.$Item->get('title').'</b>' )."</p>\n";
 
+	echo $mentioned_user_message;
+
 	if( $params['notify_type'] == 'moderator' )
 	{
 		echo '<p'.emailskin_style( '.p' ).'>'.T_('Status').': '.$Item->get( 't_status' )."</p>\n";
@@ -100,30 +107,40 @@ if( $recipient_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 echo "</div>\n";
 
 // Footer vars:
-if( $params['notify_type'] == 'moderator' )
-{ // moderation email
-	if( $params['is_new_item'] )
-	{	// about new item:
-		$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating new posts, click here' );
-		$unsubscribe_type = 'post_moderator';
-		$unsubscribe_params = '';
-	}
-	else
-	{	// about updated item:
-		$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating updated posts, click here' );
-		$unsubscribe_type = 'post_moderator_edit';
-		$unsubscribe_params = '&amp;coll_ID='.$Item->get_blog_ID();
-	}
-	$params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when a post may need moderation.' ).'<br />'
+switch( $params['notify_type'] )
+{
+	case 'moderator':
+		// moderation email
+		if( $params['is_new_item'] )
+		{	// about new item:
+			$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating new posts, click here' );
+			$unsubscribe_type = 'post_moderator';
+			$unsubscribe_params = '';
+		}
+		else
+		{	// about updated item:
+			$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating updated posts, click here' );
+			$unsubscribe_type = 'post_moderator_edit';
+			$unsubscribe_params = '&amp;coll_ID='.$Item->get_blog_ID();
+		}
+		$params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when a post may need moderation.' ).'<br />'
 			.$unsubscribe_text.': '
-			.'<a href="'.get_htsrv_url().'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
-			.T_('instant unsubscribe').'</a>.';
-}
-else
-{ // subscription email
-	$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notifications about new posts on this blog, click here:' )
-			.' <a href="'.get_htsrv_url().'quick_unsubscribe.php?type=coll_post&user_ID=$user_ID$&coll_ID='.$Blog->ID.'&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
-			.T_('instant unsubscribe').'</a>.';
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' ).'.';
+		break;
+
+	case 'post_mentioned':
+		// user is mentioned in the post
+		$params['unsubscribe_text'] = T_( 'You were mentioned in this post, and you are receiving notifications when anyone mention your name in a post.' ).'<br />'
+			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in a post, click here' ).': '
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=post_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' ).'.';
+		break;
+
+	case 'subscription':
+	default:
+		// subscription email
+		$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notifications about new posts on this blog, click here:' )
+			.' '.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=coll_post&user_ID=$user_ID$&coll_ID='.$Blog->ID.'&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' ).'.';
+		break;
 }
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

@@ -4023,6 +4023,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'comments_unmoderated_reminder':
 				// 'send_cmt_moderation_reminder' - "comments are awaiting moderation for more than X seconds."(X = $Settings->get( 'comment_moderation_reminder_threshold' ))
 			case 'post_new':
+				// 'notify_post_mentioned' - "I have been mentioned on a post.",
 				// 'notify_post_moderation' - "a post is created and I have permissions to moderate it."
 				// 'notify_edit_pst_moderation' - "a post is modified and I have permissions to moderate it."
 			case 'post_assignment':

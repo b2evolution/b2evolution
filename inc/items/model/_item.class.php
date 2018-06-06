@@ -7662,6 +7662,15 @@ class Item extends ItemLight
 		$Debuglog->add( 'Ready to send notifications to members? : '.($notify_members ? 'Yes' : 'No' ), 'notifications' );
 		$Debuglog->add( 'Ready to send notifications to community? : '.($notify_community ? 'Yes' : 'No' ), 'notifications' );
 
+		$notify_users = array();
+
+		// Get list of users who want to be notified when his login is mentioned in the item content by @user's_login:
+		$mentioned_user_IDs = get_mentioned_user_IDs( 'item', $this->get( 'content' ), $already_notified_user_IDs );
+		foreach( $mentioned_user_IDs as $mentioned_user_ID )
+		{
+			$notify_users[ $mentioned_user_ID ] = 'post_mentioned';
+		}
+
 		// Get list of users who want to be notified:
 		// TODO: also use extra cats/blogs??
 		$sql = 'SELECT user_ID
@@ -7733,24 +7742,35 @@ class Item extends ItemLight
 			$sql .= ' AND user_ID != '.$DB->quote( $executed_by_userid );
 		}
 
-		$notify_users = $DB->get_col( $sql, 0, 'Get users to be notified', 0, 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
+		$notify_list = $DB->get_col( $sql, 0, 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
 
-		$Debuglog->add( 'Number of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID().' = '.count($notify_users), 'notifications' );
-		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice($notify_users, 0, 10) ), 'notifications' );
+		// Preprocess list:
+		foreach( $notify_list as $notify_user_ID )
+		{
+			if( ! isset( $notify_users[ $notify_user_ID ] ) )
+			{	// Don't rewrite a notify type if user already is notified by other type before:
+				$notify_users[ $notify_user_ID ] = 'subscription';
+			}
+		}
+
+		$notify_user_IDs = array_keys( $notify_users );
+
+		$Debuglog->add( 'Number of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID().' = '.count( $notify_users ), 'notifications' );
+		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice( $notify_user_IDs, 0, 10 ) ), 'notifications' );
 
 		// Load all users who will be notified:
 		$UserCache = & get_UserCache();
-		$UserCache->load_list( $notify_users );
+		$UserCache->load_list( $notify_user_IDs );
 
 		$members_count = 0;
 		$community_count = 0;
-		foreach( $notify_users as $u => $user_ID )
+		foreach( $notify_users as $user_ID => $notify_type )
 		{	// Check for each subscribed User, if we can send a notification to him depending on current request and Item settings:
 
 			if( ! ( $notify_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
 			{	// Invalid User, Skip it:
 				$Debuglog->add( 'User #'.$user_ID.' is invalid.', 'notifications'  );
-				unset( $notify_users[ $u ] );
+				unset( $notify_users[ $user_ID ] );
 				continue;
 			}
 
@@ -7777,7 +7797,7 @@ class Item extends ItemLight
 				else
 				{	// Skip not member:
 					$Debuglog->add( 'User #'.$user_ID.' is a not a member but at this time, we only want to notify members.', 'notifications'  );
-					unset( $notify_users[ $u ] );
+					unset( $notify_users[ $user_ID ] );
 				}
 			}
 			else
@@ -7789,13 +7809,13 @@ class Item extends ItemLight
 				else
 				{	// Skip member:
 					$Debuglog->add( 'User #'.$user_ID.' is a member but we at this time, we only want to notify community.', 'notifications'  );
-					unset( $notify_users[ $u ] );
+					unset( $notify_users[ $user_ID ] );
 				}
 			}
 		}
 
-		$Debuglog->add( 'Number of users who are allowed to be notified about new items on colection #'.$this->get_blog_ID().' = '.count($notify_users), 'notifications' );
-		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice($notify_users, 0, 10) ), 'notifications' );
+		$Debuglog->add( 'Number of users who are allowed to be notified about new items on colection #'.$this->get_blog_ID().' = '.count( $notify_users ), 'notifications' );
+		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice( $notify_user_IDs, 0, 10 ) ), 'notifications' );
 
 		if( $notify_members )
 		{	// Display a message to know how many members are notified:
@@ -7817,11 +7837,11 @@ class Item extends ItemLight
 		$this->get_creator_User();
 
 		// Load a list with the blocked emails in cache:
-		load_blocked_emails( $notify_users );
+		load_blocked_emails( $notify_user_IDs );
 
 		// Send emails:
 		$cache_by_locale = array();
-		foreach( $notify_users as $user_ID )
+		foreach( $notify_users as $user_ID => $notify_type )
 		{
 			$notify_User = & $UserCache->get_by_ID( $user_ID, false, false );
 			if( empty( $notify_User ) )
@@ -7853,7 +7873,7 @@ class Item extends ItemLight
 					'notify_full'    => $notify_full,
 					'Item'           => $this,
 					'recipient_User' => $notify_User,
-					'notify_type'    => 'subscription',
+					'notify_type'    => $notify_type,
 					'is_new_item'    => $is_new_item,
 				);
 

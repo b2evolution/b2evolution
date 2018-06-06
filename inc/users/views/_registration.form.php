@@ -94,6 +94,7 @@ $Form->begin_fieldset( T_('Default user settings').get_manual_link('default-user
 			array( 'notify_meta_comments', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a meta comment is posted and I have permission to view it.' ), $Settings->get( 'def_notify_meta_comments' ) ),
 		), 'default_user_notification', T_('Comments') );
 	$Form->checklist( array(
+			array( 'notify_post_mentioned', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'I have been mentioned on a post.' ), $Settings->get( 'def_notify_post_mentioned' ) ),
 			array( 'notify_post_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a post is created and I have permissions to moderate it.' ), $Settings->get( 'def_notify_post_moderation' ) ),
 			array( 'notify_edit_pst_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a post is modified and I have permissions to moderate it.' ), $Settings->get( 'def_notify_edit_pst_moderation' ) ),
 			array( 'notify_post_assignment', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a post was assigned to me.' ), $Settings->get( 'def_notify_post_assignment' ) ),

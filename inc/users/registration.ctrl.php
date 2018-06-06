@@ -50,6 +50,7 @@ switch ( $action )
 		param( 'notify_edit_cmt_moderation', 'integer', 0 );
 		param( 'notify_spam_cmt_moderation', 'integer', 0 );
 		param( 'notify_meta_comments', 'integer', 0 );
+		param( 'notify_post_mentioned', 'integer', 0 );
 		param( 'notify_post_moderation', 'integer', 0 );
 		param( 'notify_edit_pst_moderation', 'integer', 0 );
 		param( 'notify_post_assignment', 'integer', 0 );
@@ -139,6 +140,7 @@ switch ( $action )
 					 array( 'def_notify_edit_cmt_moderation', $notify_edit_cmt_moderation ),
 					 array( 'def_notify_spam_cmt_moderation', $notify_spam_cmt_moderation ),
 					 array( 'def_notify_meta_comments', $notify_meta_comments ),
+					 array( 'def_notify_post_mentioned', $notify_post_mentioned ),
 					 array( 'def_notify_post_moderation', $notify_post_moderation ),
 					 array( 'def_notify_edit_pst_moderation', $notify_edit_pst_moderation ),
 					 array( 'def_notify_post_assignment', $notify_post_assignment ),
