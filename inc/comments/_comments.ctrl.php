@@ -580,11 +580,11 @@ switch( $action )
 					INNER JOIN T_categories ON cat_ID = post_main_cat_ID
 					WHERE comment_status = "trash" AND cat_blog_ID = '.$DB->quote( $blog_ID );
 			$comment_ids = $DB->get_col( $query, 0, 'get trash comment ids' );
-			$result = Comment::db_delete_where( 'Comment', NULL, $comment_ids );
+			$result = Comment::db_delete_where( NULL, $comment_ids );
 		}
 		else
 		{ // delete by where clause
-			$result = Comment::db_delete_where( 'Comment', 'comment_status = "trash"' );
+			$result = Comment::db_delete_where( 'comment_status = "trash"' );
 		}
 
 		if( $result !== false )

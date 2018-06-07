@@ -1786,7 +1786,7 @@ function delete_orphan_threads( $user_ids = NULL )
 	{ // There are orphan threads ( or orphan thread targets )
 		load_class( 'messaging/model/_thread.class.php', 'Thread' );
 		// Delete all orphan threads with all cascade relations
-		if( Thread::db_delete_where( 'Thread', NULL, $orphan_thread_ids, array( 'use_transaction' => false ) ) === false )
+		if( Thread::db_delete_where( NULL, $orphan_thread_ids, array( 'use_transaction' => false ) ) === false )
 		{ // Deleting orphan threads failed
 			$DB->rollback();
 			return false;

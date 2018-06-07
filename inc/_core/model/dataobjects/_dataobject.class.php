@@ -178,16 +178,16 @@ class DataObject
 	 * Note: the delete cascade arrays are handled!
 	 * Delete cascades are handled recursively only if the cascade arrays from the reffering class contains the class and class_path params ( e.g. see User class )!
 	 *
-	 * @param string the name of the class which objects needs to be deleted;
-	 *   Note: This is required until min phpversion will be 5.3. Since PHP 5.3 we can use static::function_name to achieve late static bindings
 	 * @param string where condition
 	 * @param array object ids
 	 * @param array additional params if required
 	 * @return mixed # of rows affected or false if error
 	 */
-	static function db_delete_where( $class_name, $sql_where, $object_ids = NULL, $params = NULL )
+	static function db_delete_where( $sql_where, $object_ids = NULL, $params = NULL )
 	{
 		global $DB, $db_config;
+
+		$class_name = get_called_class();
 
 		// Init delete cascades
 		if( isset( $params['delete_cascades'] ) )
@@ -197,7 +197,7 @@ class DataObject
 		}
 		else
 		{ // Get delete cascades from the given class
-			$delete_cascades = call_user_func( array( $class_name, 'get_delete_cascades' ) );
+			$delete_cascades = $class_name::get_delete_cascades();
 		}
 
 		// Init dbconfig variables
@@ -208,12 +208,12 @@ class DataObject
 		}
 		else
 		{ // Get class dbconfig from the given class
-			$self_db_config = call_user_func( array( $class_name, 'get_class_db_config' ) );
+			$self_db_config = $class_name::get_class_db_config();
 		}
 
 		if( isset( $params['force_delete'] ) )
 		{ // In case of force deletion, also delete restrictions
-			$delete_restrictions = call_user_func( array( $class_name, 'get_delete_restrictions' ) );
+			$delete_restrictions = $class_name::get_delete_restrictions();
 			$delete_cascades = array_merge( $delete_cascades, $delete_restrictions );
 		}
 
@@ -288,7 +288,7 @@ class DataObject
 				load_class( $cascade['class_path'], $cascade['class'] );
 				// Delete the given class objects together with all of its delete cascades
 				$params['force_delete'] = true;
-				$result = call_user_func( array( $cascade['class'], 'db_delete_where' ), $cascade['class'], $cascade_condition, NULL, $params );
+				$result = $cascade['class']::db_delete_where( $cascade_condition, NULL, $params );
 				if( $result === false )
 				{ // Delete cascade operation failed in a cascade class
 					if( $use_transaction )
@@ -658,7 +658,7 @@ class DataObject
 		);
 
 		// Delete this object with all of its cascade and execute all required updates if there are any
-		$result = $this->db_delete_where( get_class($this), NULL, array( $this->ID ), $params );
+		$result = $this->db_delete_where( NULL, array( $this->ID ), $params );
 
 		$Plugins->trigger_event( 'AfterObjectDelete', $params = array( 'Object' => & $this, 'type' => get_class($this) ) );
 
