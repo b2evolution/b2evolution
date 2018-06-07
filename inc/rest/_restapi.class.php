@@ -1030,8 +1030,8 @@ class RestApi
 		 *
 		 * More info here: http://en.wikipedia.org/wiki/Percent-encoding#Non-standard_implementations
 		 */
-		if( preg_match( '~%u[0-9a-f]{3,4}~i', $api_q ) && version_compare(PHP_VERSION, '5', '>=') )
-		{	// Decode UTF-8 string (PHP 5 and up)
+		if( preg_match( '~%u[0-9a-f]{3,4}~i', $api_q ) )
+		{	// Decode UTF-8 string:
 			$api_q = preg_replace( '~%u([0-9a-f]{3,4})~i', '&#x\\1;', $api_q );
 			$api_q = html_entity_decode( $api_q, ENT_COMPAT, 'UTF-8' );
 		}
@@ -1690,8 +1690,8 @@ class RestApi
 		 *
 		 * More info here: http://en.wikipedia.org/wiki/Percent-encoding#Non-standard_implementations
 		 */
-		if( preg_match( '~%u[0-9a-f]{3,4}~i', $api_q ) && version_compare(PHP_VERSION, '5', '>=') )
-		{	// Decode UTF-8 string (PHP 5 and up)
+		if( preg_match( '~%u[0-9a-f]{3,4}~i', $api_q ) )
+		{	// Decode UTF-8 string:
 			$api_q = preg_replace( '~%u([0-9a-f]{3,4})~i', '&#x\\1;', $api_q );
 			$api_q = html_entity_decode( $api_q, ENT_COMPAT, 'UTF-8' );
 		}

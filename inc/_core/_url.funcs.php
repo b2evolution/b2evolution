@@ -850,16 +850,8 @@ function idna_encode( $url )
 
 	$url_utf8 = convert_charset( $url, 'utf-8', $evo_charset );
 
-	if( version_compare(PHP_VERSION, '5', '>=') )
-	{
-		load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
-		$IDNA = new idna_convert();
-	}
-	else
-	{
-		load_class('_ext/idna/_idna_convert.class.php4', 'Net_IDNA_php4' );
-		$IDNA = new Net_IDNA_php4();
-	}
+	load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
+	$IDNA = new idna_convert();
 
 	//echo '['.$url_utf8.'] ';
 	$url = $IDNA->encode( $url_utf8 );
@@ -881,16 +873,8 @@ function idna_encode( $url )
  */
 function idna_decode( $url )
 {
-	if( version_compare(PHP_VERSION, '5', '>=') )
-	{
-		load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
-		$IDNA = new idna_convert();
-	}
-	else
-	{
-		load_class('_ext/idna/_idna_convert.class.php4', 'Net_IDNA_php4' );
-		$IDNA = new Net_IDNA_php4();
-	}
+	load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
+	$IDNA = new idna_convert();
 	return $IDNA->decode($url);
 }
 

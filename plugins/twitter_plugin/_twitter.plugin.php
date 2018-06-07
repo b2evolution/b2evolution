@@ -64,13 +64,6 @@ class twitter_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		// Check php version
-		if( version_compare( phpversion(), '5.0.0', '<' ) )
-		{ // the plugin is not supported
-			$this->set_status( 'disabled' );
-			return false;
-		}
-
 		if( !extension_loaded( 'curl' ) )
 		{ // the plugin is not supported
 			$this->set_status( 'disabled' );
@@ -110,11 +103,6 @@ class twitter_plugin extends Plugin
 		if( empty($this->code) )
 		{
 			return T_('The twitter plugin needs a non-empty code.');
-		}
-
-		if( version_compare( phpversion(), '5.0.0', '<' ) )
-		{
-			return T_('The twitter plugin requires PHP 5.');
 		}
 
 		if( !extension_loaded( 'curl' ) )
