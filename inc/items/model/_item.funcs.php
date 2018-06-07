@@ -2675,9 +2675,15 @@ jQuery( document ).on( 'click', '#evo_merge_btn_back_to_list', function()
  * Output Javascript for tags autocompletion.
  * @todo dh> a more facebook like widget would be: http://plugins.jquery.com/project/facelist
  *           "ListBuilder" is being planned for jQuery UI: http://wiki.jqueryui.com/ListBuilder
+ *
+ * @param array Params
  */
-function echo_autocomplete_tags()
+function echo_autocomplete_tags( $params = array() )
 {
+	$params = array_merge( array(
+			'item_ID'        => NULL,
+			'update_by_ajax' => false,
+		), $params );
 ?>
 	<script type="text/javascript">
 	function init_autocomplete_tags( selector )
@@ -2705,12 +2711,35 @@ function echo_autocomplete_tags()
 			noResultsText: '<?php echo TS_('No results') ?>',
 			searchingText: '<?php echo TS_('Searching...') ?>',
 			jsonContainer: 'tags',
+			<?php if( $params['update_by_ajax'] ) { ?>
+			onAdd: function() { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector ) },
+			onDelete: function() { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector ) },
+			<?php } ?>
 		} );
 	}
 
+	<?php if( $params['update_by_ajax'] ) { ?>
+	function evo_update_item_tags_by_ajax( item_ID, tags_selector )
+	{
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url(); ?>action.php',
+			data:
+			{
+				'mname': 'collections',
+				'action': 'update_tags',
+				'item_ID': item_ID,
+				'item_tags': jQuery( tags_selector ).val(),
+				'crumb_collections_update_tags': '<?php echo get_crumb( 'collections_update_tags' ); ?>'
+			}
+		} );
+	}
+	<?php } ?>
+
 	jQuery( document ).ready( function()
 	{
-		if( jQuery( '#suggest_item_tags' ).is( ':checked' ) )
+		if( jQuery( '#suggest_item_tags' ).length == 0 || jQuery( '#suggest_item_tags' ).is( ':checked' ) )
 		{
 			init_autocomplete_tags( '#item_tags' );
 		}

@@ -1416,6 +1416,40 @@ class collections_Module extends Module
 
 				header_redirect( $redirect_to );
 				break;
+
+			case 'update_tags':
+				// Update item tags:
+				$item_ID = param( 'item_ID', 'integer', true );
+				$item_tags = param( 'item_tags', 'string', true );
+
+				$ItemCache = & get_ItemCache();
+				$edited_Item = & $ItemCache->get_by_ID( $item_ID );
+
+				// Check perms:
+				$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+				if( empty( $item_tags ) && $edited_Item->get_type_setting( 'use_tags' ) == 'required' )
+				{	// Tags must be entered:
+					param_check_not_empty( 'item_tags', T_('Please provide at least one tag.') );
+				}
+
+				if( ! param_errors_detected() )
+				{	// Update tags only when no errors:
+					$edited_Item->set_tags_from_string( $item_tags );
+					if( $edited_Item->dbupdate() )
+					{
+						$Messages->add( T_('Post has been updated.'), 'success' );
+					}
+				}
+
+				if( isset( $_POST['actionArray']['update_tags'] ) )
+				{	// Use a default redirect to referer page when it has been submitted as normal form:
+					break;
+				}
+				else
+				{	// Exit here when AJAX request, so we don't need a redirect after this function:
+					exit(0);
+				}
 		}
 	}
 }
