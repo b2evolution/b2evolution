@@ -528,12 +528,6 @@ class EmailCampaign extends DataObject
 		// Update the message fields:
 		$this->update_message_fields();
 
-		// Make sure email title is not empty
-		if( empty( $this->email_title ) && ! empty( $this->name ) )
-		{
-			$this->set( 'email_title', $this->name );
-		}
-
 		// Pre-fill email default destination
 		if( empty( $this->email_defaultdest ) )
 		{
@@ -558,6 +552,12 @@ class EmailCampaign extends DataObject
 	{
 		// Update the message fields:
 		$this->update_message_fields();
+
+		// Update email title if it is NULL and the campaign name is modified
+		if( isset( $this->dbchanges['ecmp_name'] ) && is_null( $this->email_title ) && ! empty( $this->name ) )
+		{
+			$this->set( 'email_title', $this->name );
+		}
 
 		$r = parent::dbupdate();
 
@@ -685,8 +685,10 @@ class EmailCampaign extends DataObject
 
 		if( param( 'ecmp_email_title', 'string', NULL ) !== NULL )
 		{	// Email title:
-			param_string_not_empty( 'ecmp_email_title', T_('Please enter an email title.') );
-			$this->set_from_Request( 'email_title' );
+			if( param_string_not_empty( 'ecmp_email_title', T_('Please enter an email title.') ) )
+			{
+				$this->set_from_Request( 'email_title' );
+			}
 		}
 
 		$email_defaultdest = param( 'ecmp_email_defaultdest', 'string', NULL );
@@ -1374,19 +1376,24 @@ class EmailCampaign extends DataObject
 		$duplicated_campaign_ID = $this->ID;
 		$this->ID = 0;
 
+		// Fields that should not be duplicated must be included in the array below:
+		$skipped_fields = array( 'ID', 'welcome', 'send_count', 'open_count', 'img_loads', 'link_clicks',
+				'cta1_clicks', 'cta2_clicks', 'cta3_clicks', 'like_count', 'dislike_count', 'unsub_clicks' );
+
 		// Get all fields of the duplicated email campaign:
 		$source_fields_SQL = new SQL( 'Get all fields of the duplicated email campaign #'.$duplicated_campaign_ID );
 		$source_fields_SQL->SELECT( '*' );
 		$source_fields_SQL->FROM( 'T_email__campaign' );
 		$source_fields_SQL->WHERE( 'ecmp_ID = '.$DB->quote( $duplicated_campaign_ID ) );
 		$source_fields = $DB->get_row( $source_fields_SQL, ARRAY_A );
+
 		// Use field values of duplicated collection by default:
 		foreach( $source_fields as $source_field_name => $source_field_value )
 		{
 			// Cut prefix "ecmp_" of each field:
 			$source_field_name = substr( $source_field_name, 5 );
-			if( $source_field_name == 'ID' || $source_field_name == 'welcome' )
-			{	// Skip fields ID and "welcome":
+			if( in_array( $source_field_name, $skipped_fields ) )
+			{ // Do not duplicate skipped fields
 				continue;
 			}
 			if( isset( $this->$source_field_name ) )
@@ -1411,6 +1418,9 @@ class EmailCampaign extends DataObject
 		// Reset sent dates
 		$this->set( 'sent_ts', NULL );
 		$this->set( 'auto_sent_ts', NULL );
+
+		// Set email title to NULL so that it will changed automatically to whatever the campaign name is when we edit the campaign name
+		$this->set( 'email_title', NULL );
 
 		// Try insert new collection in DB:
 		if( ! $this->dbinsert() )

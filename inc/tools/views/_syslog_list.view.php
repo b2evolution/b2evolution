@@ -256,6 +256,11 @@ function syslog_object_link( $object_type, $object_ID )
 				$link = 'No file';
 			}
 			break;
+
+		case 'email_log':
+			// Link to email log
+			$link = get_link_tag( $admin_url.'?ctrl=email&tab=sent&emlog_ID='.$object_ID, sprintf( T_('Mail log ID#%s'), $object_ID ) );
+			break;
 	}
 
 	return $link;

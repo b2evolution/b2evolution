@@ -4013,6 +4013,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'private_messages_unread_reminder':
 				// 'notify_unread_messages' - "I have unread private messages for more than X seconds."(X = $Settings->get( 'unread_message_reminder_threshold' ))
 			case 'comment_new':
+				// 'notify_comment_mentioned' - "I have been mentioned on a comment.",
 				// 'notify_published_comments' - "a comment is published on one of my posts.",
 				// 'notify_comment_moderation' - "a comment is posted and I have permissions to moderate it.",
 				// 'notify_edit_cmt_moderation' - "a comment is modified and I have permissions to moderate it.",
@@ -4022,6 +4023,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'comments_unmoderated_reminder':
 				// 'send_cmt_moderation_reminder' - "comments are awaiting moderation for more than X seconds."(X = $Settings->get( 'comment_moderation_reminder_threshold' ))
 			case 'post_new':
+				// 'notify_post_mentioned' - "I have been mentioned on a post.",
 				// 'notify_post_moderation' - "a post is created and I have permissions to moderate it."
 				// 'notify_edit_pst_moderation' - "a post is modified and I have permissions to moderate it."
 			case 'post_assignment':
@@ -6835,8 +6837,8 @@ function get_samedomain_htsrv_url( $secure = false )
 		debug_die( 'Invalid hosts!' );
 	}
 
-	$req_domain = $req_url_parts['host'];
-	$htsrv_domain = $hsrv_url_parts['host'];
+	$req_domain = rtrim( $req_url_parts['host'].( isset( $req_url_parts['path'] ) ? $req_url_parts['path'] : '' ), '/' );
+	$htsrv_domain = rtrim( $hsrv_url_parts['host'].( isset( $hsrv_url_parts['path'] ) ? $hsrv_url_parts['path'] : '' ), '/' );
 
 	// Replace domain + path of htsrv URL with current request:
 	$samedomain_htsrv_url = substr_replace( $req_htsrv_url, $req_domain, strpos( $req_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
@@ -7206,7 +7208,7 @@ function is_ajax_content( $template_name = '' )
  *
  * @param string Message text
  * @param string Log type: 'info', 'warning', 'error', 'critical_error'
- * @param string Object type: 'comment', 'item', 'user', 'file' or leave default NULL if none of them
+ * @param string Object type: 'comment', 'item', 'user', 'file', 'email_log' or leave default NULL if none of them
  * @param integer Object ID
  * @param string Origin type: 'core', 'plugin'
  * @param integer Origin ID

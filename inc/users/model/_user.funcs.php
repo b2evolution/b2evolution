@@ -1990,42 +1990,13 @@ function get_default_avatar_url( $gender = '', $size = NULL )
 /**
  * Convert seconds to months, days, hours, minutes and seconds format
  *
+ * @deprecated since version 6.10.1-stable: Use seconds_to_period()
  * @param integer seconds
  * @return string
  */
 function duration_format( $duration, $show_seconds = true )
 {
-	$result = '';
-
-	$fields = get_duration_fields( $duration );
-	if( $fields[ 'months' ] > 0 )
-	{
-		$result .= sprintf( T_( '%d months' ), $fields[ 'months' ] ).' ';
-	}
-	if( $fields[ 'days' ] > 0 )
-	{
-		$result .= sprintf( T_( '%d days' ), $fields[ 'days' ] ).' ';
-	}
-	if( $fields[ 'hours' ] > 0 )
-	{
-		$result .= sprintf( T_( '%d hours' ), $fields[ 'hours' ] ).' ';
-	}
-	if( $fields[ 'minutes' ] > 0 )
-	{
-		$result .= sprintf( T_( '%d minutes' ), $fields[ 'minutes' ] ).' ';
-	}
-	if( $show_seconds && ( $fields[ 'seconds' ] > 0 ) )
-	{
-		$result .= sprintf( T_( '%d seconds' ),  $fields[ 'seconds' ] );
-	}
-
-	$result = trim( $result );
-	if( empty( $result ) )
-	{
-		$result = '0';
-	}
-
-	return $result;
+	return seconds_to_period( $duration );
 }
 
 
@@ -6577,7 +6548,7 @@ function users_results( & $UserList, $params = array() )
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'center nowrap',
 				'order' => 'csnd_status',
-				'td' => '%user_td_campaign_status( #csnd_status# )%'
+				'td' => '%user_td_campaign_status( #csnd_status#, #csnd_emlog_ID# )%'
 			);
 	}
 
@@ -7392,8 +7363,10 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 /**
  * Get user campaign status
  */
-function user_td_campaign_status( $csnd_status )
+function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL )
 {
+	global $current_User, $admin_url;
+
 	switch( $csnd_status )
 	{
 		case 'ready_to_send':
@@ -7406,7 +7379,14 @@ function user_td_campaign_status( $csnd_status )
 			return T_('Sent');
 
 		case 'send_error':
-			return T_('Send error');
+			if( $current_User->check_perm( 'emails', 'view', true ) && ! empty( $csnd_emlog_ID ) )
+			{
+				return '<a href="'.get_dispctrl_url( 'email', 'tab=sent&amp;emlog_ID='.$csnd_emlog_ID ).'">'.T_('Send error').'</a>';
+			}
+			else
+			{
+				return T_('Send error');
+			}
 
 		case 'skipped':
 			return T_('Skipped');
@@ -7660,4 +7640,54 @@ function get_PasswordDriver( $driver_code = '' )
 	return $PasswordDriver;
 }
 
+
+/**
+ * Get IDs of users which are mentioned in the given content
+ *
+ * @param string Type of content: 'item', 'comment'
+ * @param string Content
+ * @param array Exclude users by ID
+ * @return array User IDs
+ */
+function get_mentioned_user_IDs( $type, $content, $exclude_user_IDs = NULL )
+{
+	switch( $type )
+	{
+		case 'item':
+			$setting_name = 'notify_post_mentioned';
+			$default_setting_name = 'def_notify_post_mentioned';
+			break;
+
+		case 'comment':
+			$setting_name = 'notify_comment_mentioned';
+			$default_setting_name = 'def_notify_comment_mentioned';
+			break;
+
+		default:
+			debug_die( 'Unknown type "'.$type.'" for function '.__FUNCTION__ );
+	}
+
+	if( preg_match_all( '/(^|[\s\t\n\r>,])@([A-Za-z0-9_\.]+)/', $content, $mentioned_logins ) )
+	{	// At least one mentioned user login is found in the given content:
+		global $Settings, $DB;
+
+		$mentioned_SQL = new SQL( 'Get the notify users when they are mentioned in new '.$type );
+		$mentioned_SQL->SELECT( 'user_ID' );
+		$mentioned_SQL->FROM( 'T_users' );
+		$mentioned_SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = '.$DB->quote( $setting_name ) );
+		// Also get users with default enabled setting:
+		$mentioned_sql_where = $Settings->get( $default_setting_name ) ? ' OR uset_value IS NULL' : '';
+		$mentioned_SQL->WHERE( '( uset_value = "1"'.$mentioned_sql_where.' )' );
+		$mentioned_SQL->WHERE_and( 'user_login IN ( '.$DB->quote( $mentioned_logins[2] ).' )' );
+		if( ! empty( $exclude_user_IDs ) )
+		{	// Set except moderators condition. Exclude moderators who already got a notification email:
+			$mentioned_SQL->WHERE_and( 'user_ID NOT IN ( '.$DB->quote( $exclude_user_IDs ).' )' );
+		}
+
+		return $DB->get_col( $mentioned_SQL );
+	}
+
+	// Return an empty array if no mentioned user is found in the given content:
+	return array();
+}
 ?>

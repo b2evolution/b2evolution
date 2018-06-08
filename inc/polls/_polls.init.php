@@ -262,19 +262,21 @@ class polls_Module extends Module
 	{
 		global $Session, $Messages;
 
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'polls' );
+		$action = param_action();
 
-		if( ! is_logged_in() )
-		{	// User must be logged in
-			debug_die( 'User must be logged in to vote!' );
+		if( $action != 'email_vote' )
+		{	// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'polls' );
+
+			if( ! is_logged_in() )
+			{	// User must be logged in
+				debug_die( 'User must be logged in to vote!' );
+			}
 		}
 
 		// Load classes:
 		load_class( 'polls/model/_poll.class.php', 'Poll' );
 		load_class( 'polls/model/_poll_option.class.php', 'PollOption' );
-
-		$action = param_action();
 
 		switch( $action )
 		{
@@ -325,6 +327,33 @@ class polls_Module extends Module
 					$PollOption->vote();
 				}
 				$Messages->add( T_('Your vote has been cast.'), 'success' );
+				break;
+
+			case 'email_vote':
+				$poll_ID = param( 'poll_ID', 'integer', true );
+				$user_ID = param( 'user_ID', 'integer', true );
+				$poll_answer = param( 'poll_answer', 'integer', true );
+				$redirect_to = param( 'redirect_to', 'url', '' );
+
+				$PollCache = & get_PollCache();
+				$PollOptionCache = & get_PollOptionCache();
+				$UserCache = & get_UserCache();
+
+				$Poll = & $PollCache->get_by_ID( $poll_ID );
+				$PollOption = & $PollOptionCache->get_by_ID( $poll_answer );
+				$User = & $UserCache->get_by_ID( $user_ID );
+
+				if( $Poll && $PollOption && $User )
+				{
+					$Poll->clear_user_votes( $User->ID );
+					$PollOption->vote( $User->ID );
+				}
+
+				if( ! empty( $redirect_to ) )
+				{ // header_redirect can prevent redirection depending on some advanced settings like $allow_redirects_to_different_domain!
+					header( 'Location: '.$redirect_to, true, 303 ); // explictly setting the status is required for (fast)cgi
+					exit( 0 );
+				}
 				break;
 		}
 	}

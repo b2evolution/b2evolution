@@ -7662,6 +7662,15 @@ class Item extends ItemLight
 		$Debuglog->add( 'Ready to send notifications to members? : '.($notify_members ? 'Yes' : 'No' ), 'notifications' );
 		$Debuglog->add( 'Ready to send notifications to community? : '.($notify_community ? 'Yes' : 'No' ), 'notifications' );
 
+		$notify_users = array();
+
+		// Get list of users who want to be notified when his login is mentioned in the item content by @user's_login:
+		$mentioned_user_IDs = get_mentioned_user_IDs( 'item', $this->get( 'content' ), $already_notified_user_IDs );
+		foreach( $mentioned_user_IDs as $mentioned_user_ID )
+		{
+			$notify_users[ $mentioned_user_ID ] = 'post_mentioned';
+		}
+
 		// Get list of users who want to be notified:
 		// TODO: also use extra cats/blogs??
 		$sql = 'SELECT user_ID
@@ -7733,24 +7742,35 @@ class Item extends ItemLight
 			$sql .= ' AND user_ID != '.$DB->quote( $executed_by_userid );
 		}
 
-		$notify_users = $DB->get_col( $sql, 0, 'Get users to be notified', 0, 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
+		$notify_list = $DB->get_col( $sql, 0, 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
 
-		$Debuglog->add( 'Number of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID().' = '.count($notify_users), 'notifications' );
-		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice($notify_users, 0, 10) ), 'notifications' );
+		// Preprocess list:
+		foreach( $notify_list as $notify_user_ID )
+		{
+			if( ! isset( $notify_users[ $notify_user_ID ] ) )
+			{	// Don't rewrite a notify type if user already is notified by other type before:
+				$notify_users[ $notify_user_ID ] = 'subscription';
+			}
+		}
+
+		$notify_user_IDs = array_keys( $notify_users );
+
+		$Debuglog->add( 'Number of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID().' = '.count( $notify_users ), 'notifications' );
+		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice( $notify_user_IDs, 0, 10 ) ), 'notifications' );
 
 		// Load all users who will be notified:
 		$UserCache = & get_UserCache();
-		$UserCache->load_list( $notify_users );
+		$UserCache->load_list( $notify_user_IDs );
 
 		$members_count = 0;
 		$community_count = 0;
-		foreach( $notify_users as $u => $user_ID )
+		foreach( $notify_users as $user_ID => $notify_type )
 		{	// Check for each subscribed User, if we can send a notification to him depending on current request and Item settings:
 
 			if( ! ( $notify_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
 			{	// Invalid User, Skip it:
 				$Debuglog->add( 'User #'.$user_ID.' is invalid.', 'notifications'  );
-				unset( $notify_users[ $u ] );
+				unset( $notify_users[ $user_ID ] );
 				continue;
 			}
 
@@ -7777,7 +7797,7 @@ class Item extends ItemLight
 				else
 				{	// Skip not member:
 					$Debuglog->add( 'User #'.$user_ID.' is a not a member but at this time, we only want to notify members.', 'notifications'  );
-					unset( $notify_users[ $u ] );
+					unset( $notify_users[ $user_ID ] );
 				}
 			}
 			else
@@ -7789,13 +7809,13 @@ class Item extends ItemLight
 				else
 				{	// Skip member:
 					$Debuglog->add( 'User #'.$user_ID.' is a member but we at this time, we only want to notify community.', 'notifications'  );
-					unset( $notify_users[ $u ] );
+					unset( $notify_users[ $user_ID ] );
 				}
 			}
 		}
 
-		$Debuglog->add( 'Number of users who are allowed to be notified about new items on colection #'.$this->get_blog_ID().' = '.count($notify_users), 'notifications' );
-		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice($notify_users, 0, 10) ), 'notifications' );
+		$Debuglog->add( 'Number of users who are allowed to be notified about new items on colection #'.$this->get_blog_ID().' = '.count( $notify_users ), 'notifications' );
+		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice( $notify_user_IDs, 0, 10 ) ), 'notifications' );
 
 		if( $notify_members )
 		{	// Display a message to know how many members are notified:
@@ -7817,11 +7837,11 @@ class Item extends ItemLight
 		$this->get_creator_User();
 
 		// Load a list with the blocked emails in cache:
-		load_blocked_emails( $notify_users );
+		load_blocked_emails( $notify_user_IDs );
 
 		// Send emails:
 		$cache_by_locale = array();
-		foreach( $notify_users as $user_ID )
+		foreach( $notify_users as $user_ID => $notify_type )
 		{
 			$notify_User = & $UserCache->get_by_ID( $user_ID, false, false );
 			if( empty( $notify_User ) )
@@ -7853,7 +7873,7 @@ class Item extends ItemLight
 					'notify_full'    => $notify_full,
 					'Item'           => $this,
 					'recipient_User' => $notify_User,
-					'notify_type'    => 'subscription',
+					'notify_type'    => $notify_type,
 					'is_new_item'    => $is_new_item,
 				);
 
@@ -8447,9 +8467,10 @@ class Item extends ItemLight
 	 * Get the latest Comment on this Item
 	 *
 	 * @param array|NULL Restrict comments selection with statuses, NULL - to select only allowed statuses for current User
+	 * @param string Type of the latest comment: NULL|'date' - latest added comment, 'last_touched_ts' - latest touched comment
 	 * @return Comment
 	 */
-	function & get_latest_Comment( $statuses = NULL )
+	function & get_latest_Comment( $statuses = NULL, $order_date_type = NULL )
 	{
 		global $DB;
 
@@ -8474,7 +8495,14 @@ class Item extends ItemLight
 			{	// Restrict with given comment statuses:
 				$SQL->WHERE_and( 'comment_status IN ( '.$DB->quote( $statuses ).' )' );
 			}
-			$SQL->ORDER_BY( 'comment_date DESC' );
+			if( $order_date_type == 'last_touched_ts' )
+			{	// Get the latest touched comment:
+				$SQL->ORDER_BY( 'comment_last_touched_ts DESC, comment_ID DESC' );
+			}
+			else
+			{	// Get the latest added comment:
+				$SQL->ORDER_BY( 'comment_date DESC, comment_ID DESC' );
+			}
 			$SQL->LIMIT( '1' );
 
 			if( $comment_ID = $DB->get_var( $SQL ) )
@@ -10195,12 +10223,14 @@ class Item extends ItemLight
 		}
 
 		$params = array_merge( array(
-				'glue' => '&amp;'
+				'glue' => '&amp;',
+				'type' => 'touch', // What comment date use to update: 'touch' - 'comment_last_touched_ts', 'create' - 'comment_date'
 			), $params );
 
 		$url = get_htsrv_url().'action.php?mname=collections'.$params['glue']
 			.'action=refresh_contents_last_updated'.$params['glue']
 			.'item_ID='.$this->ID.$params['glue']
+			.( $params['type'] != 'touch' ? 'type='.$params['type'].$params['glue'] : '' )
 			.url_crumb( 'collections_refresh_contents_last_updated' );
 
 		return $url;
@@ -10231,7 +10261,7 @@ class Item extends ItemLight
 
 		if( $params['title'] == '#' )
 		{	// Use default title
-			$params['title'] = T_('Refresh "contents last updated" timestamp!');
+			$params['title'] = T_('Reset the "contents last updated" date to the latest content change on this thread');
 		}
 
 		$params['text'] = utf8_trim( $params['text'] );
@@ -10256,28 +10286,65 @@ class Item extends ItemLight
 	/**
 	 * Refresh contents last updated ts with date of the latest Comment
 	 *
+	 * @param boolean TRUE to display messages
+	 * @param string Field name(without prefix "comment_") of the latest comment which should be used to refresh the post date column: 'date', 'last_touched_ts'
+	 * @param string What post and comment date fields use to refresh:
+	                   'touched' - 'post_datemodified', 'comment_last_touched_ts' (Default)
+	                   'created' - 'post_datestart', 'comment_date'
 	 * @return boolean TRUE of success
 	 */
-	function refresh_contents_last_updated_ts()
+	function refresh_contents_last_updated_ts( $display_messages = false, $date_type = 'touched' )
 	{
 		if( ! $this->can_refresh_contents_last_updated() )
 		{	// If current User has no permission to refresh a contents last updated date of the requested Item:
 			return false;
 		}
 
+		global $DB, $Messages;
+
 		// Clear latest Comment from previous calling before Comment updating:
 		$this->latest_Comment = NULL;
 
-		if( $latest_Comment = & $this->get_latest_Comment( get_inskin_statuses( $this->get_blog_ID(), 'comment' ) ) )
-		{	// Use date from the latest public Comment:
-			$new_contents_last_updated_ts = $latest_Comment->get( 'last_touched_ts' );
+		if( $date_type == 'created' )
+		{	// Use dates for 'created' mode:
+			$post_date_field = 'datestart';
+			$comment_date_field = 'date';
 		}
 		else
-		{	// Use date from issue date of this Item:
-			$new_contents_last_updated_ts = $this->get( 'datestart' );
+		{	// Use dates for 'touched' mode:
+			$post_date_field = 'datemodified';
+			$comment_date_field = 'last_touched_ts';
 		}
 
-		global $DB;
+		if( $latest_Comment = & $this->get_latest_Comment( get_inskin_statuses( $this->get_blog_ID(), 'comment' ), $comment_date_field ) )
+		{	// Use date from the latest public Comment:
+			$new_contents_last_updated_ts = $latest_Comment->get( $comment_date_field );
+			if( $display_messages )
+			{	// Display message:
+				$Messages->add( sprintf(
+						( $date_type == 'created'
+							? T_('"Contents last updated" timestamp has been refreshed using <a %s>most recently added comment</a> date = %s.')
+							: T_('"Contents last updated" timestamp has been refreshed using <a %s>most recently touched comment</a> date = %s.')
+						),
+						'href="'.$latest_Comment->get_permanent_url().'"',
+						mysql2localedatetime( $new_contents_last_updated_ts )
+					), 'success' );
+			}
+		}
+		else
+		{	// Use date from issue date of this Item when it has no comments yet:
+			$new_contents_last_updated_ts = $this->get( $post_date_field );
+			if( $display_messages )
+			{	// Display message:
+				$Messages->add( sprintf(
+						( $date_type == 'created'
+							? T_('"Contents last updated" timestamp has been refreshed using post issue date = %s.')
+							: T_('"Contents last updated" timestamp has been refreshed using post modified date = %s.')
+						),
+						mysql2localedatetime( $new_contents_last_updated_ts )
+					), 'success' );
+			}
+		}
 
 		$DB->query( 'UPDATE T_items__item
 					SET post_contents_last_updated_ts = '.$DB->quote( $new_contents_last_updated_ts ).'

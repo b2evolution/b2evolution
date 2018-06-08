@@ -26,12 +26,12 @@ if( is_array( $params['tasks'] ) && count( $params['tasks'] ) )
 {
 	foreach( $params['tasks'] as $task_ID => $task )
 	{
-		echo '- '.$task['name'].' (#'.$task_ID.'): '.T_( $task['message'] )."\n";
+		echo '- '.$task['name'].' (#'.$task_ID.'):'."\n".T_( $task['message'] )."\n";
 	}
 }
 echo "\n";
 
-$tasks_url = $admin_url.'?ctrl=crontab&ctst_timeout=1&ctst_error=1';
+$tasks_url = $admin_url.'?ctrl=crontab&ctst_status[]=warning&ctst_status[]=timeout&ctst_status[]=error';
 echo sprintf( T_('To see more information about these tasks click here: %s'), $tasks_url );
 
 // Footer vars:

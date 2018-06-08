@@ -325,6 +325,18 @@ elseif( $confirmed )
 					$UserSettings->dbupdate();
 					break;
 
+				case 'comment_mentioned':
+					// unsubscribe from new comment notifications when user is mentioned:
+					$UserSettings->set( 'notify_comment_mentioned', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'post_mentioned':
+					// unsubscribe from new post notifications when user is mentioned:
+					$UserSettings->set( 'notify_post_mentioned', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
 				default:
 					// DEFENSIVE programming:
 					$error_msg = 'Unhandled unsubscribe type.';
@@ -606,6 +618,18 @@ elseif( $confirmed )
 					$UserSettings->dbupdate();
 					break;
 
+				case 'comment_mentioned':
+					// resubscribe to new comment notifications when user is mentioned:
+					$UserSettings->set( 'notify_comment_mentioned', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'post_mentioned':
+					// resubscribe to new post notifications when user is mentioned:
+					$UserSettings->set( 'notify_post_mentioned', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
 				default:
 					// DEFENSIVE programming:
 					$error_msg = 'Unhandled resubscribe type.';
@@ -788,6 +812,16 @@ switch( $type )
 	case 'meta_comment':
 		// unsubscribe from meta comment notifications
 		$type_str = $notification_prefix.': '.T_('a meta comment is posted.');
+		break;
+
+	case 'comment_mentioned':
+		// unsubscribe from new comment notifications when user is mentioned:
+		$type_str = $notification_prefix.': '.T_('I have been mentioned on a comment.');
+		break;
+
+	case 'post_mentioned':
+		// unsubscribe from new comment notifications when user is mentioned:
+		$type_str = $notification_prefix.': '.T_('I have been mentioned on a post.');
 		break;
 
 	default:

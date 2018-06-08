@@ -17,9 +17,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Print out a debugging message with optional HTML color added
  *
  * @param string Message
- * @param string
+ * @param boolean TRUE if it is called from cron
+ * @param string Message type: 'success', 'warning', 'error', 'note', NULL - to use default text without addition style color
  */
-function pbm_msg( $message, $cron = false )
+function pbm_msg( $message, $cron = false, $type = NULL )
 {
 	global $is_web, $pbm_messages;
 
@@ -29,7 +30,12 @@ function pbm_msg( $message, $cron = false )
 
 	if( $cron )
 	{	// Append a message to cron log if we are in cron mode:
-		cron_log_append( $message );
+		cron_log_append( $message, $type );
+	}
+
+	if( $type == 'error' )
+	{	// Store an error message in system log:
+		syslog_insert( 'Get posts by email: '.$message, 'error' );
 	}
 }
 
@@ -101,7 +107,7 @@ function pbm_connect( $cron = false )
 			$error = implode( "<br />\n", $error );
 		}
 
-		pbm_msg( sprintf( ('Connection failed: %s'), $error ), $cron );
+		pbm_msg( sprintf( ('Connection failed: %s'), $error ), $cron, 'error' );
 		return false;
 	}
 	pbm_msg( '<b class="green">'.('Successfully connected!').'</b>', $cron );
@@ -182,7 +188,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		// STEP 1: Parse and decode message data and retrieve its structure:
 		if( !$mimeParser->Decode( $MIMEparameters, $decodedMIME ) )
 		{	// error:
-			pbm_msg( sprintf( ('MIME message decoding error: %s at position %d.'), $mimeParser->error, $mimeParser->error_position ), $cron );
+			pbm_msg( sprintf( ('MIME message decoding error: %s at position %d.'), $mimeParser->error, $mimeParser->error_position ), $cron, 'error' );
 			rmdir_r( $tmpDirMIME );
 			unlink( $tmpMIME );
 			continue;
@@ -194,7 +200,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 			// STEP 2: Analyze (the first) parsed message to describe its contents:
 			if( ! $mimeParser->Analyze( $decodedMIME[0], $parsedMIME ) )
 			{	// error:
-				pbm_msg( sprintf( ('MIME message analyze error: %s'), $mimeParser->error ), $cron );
+				pbm_msg( sprintf( ('MIME message analyze error: %s'), $mimeParser->error ), $cron, 'error' );
 				rmdir_r( $tmpDirMIME );
 				unlink( $tmpMIME );
 				continue;
@@ -337,7 +343,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		$pbmUser = & pbm_validate_user_password( $user_login, $user_pass );
 		if( ! $pbmUser )
 		{
-			pbm_msg( sprintf( ( 'Authentication failed for user &laquo;%s&raquo;' ), htmlspecialchars( $user_login ) ), $cron );
+			pbm_msg( sprintf( ( 'Authentication failed for user &laquo;%s&raquo;' ), htmlspecialchars( $user_login ) ), $cron, 'error' );
 			rmdir_r( $tmpDirMIME );
 			continue;
 		}
@@ -378,7 +384,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		}
 
 		$blog_ID = $pbmChapter->blog_ID;
-		pbm_msg( T_('Blog ID').': '.$blog_ID, $cron );
+		pbm_msg( ('Blog ID').': '.$blog_ID, $cron );
 
 		$BlogCache = & get_BlogCache();
 		$pbmBlog = & $BlogCache->get_by_ID( $blog_ID, false, false );
@@ -393,7 +399,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		pbm_msg( sprintf( ('Checking permissions for User &laquo;%s&raquo; to post to Collection #%d'), $user_login, $blog_ID ), $cron );
 		if( !$pbmUser->check_perm( 'blog_post!published', 'edit', false, $blog_ID ) )
 		{
-			pbm_msg( T_('Permission denied.'), $cron );
+			pbm_msg( ('Permission denied.'), $cron );
 			rmdir_r( $tmpDirMIME );
 			continue;
 		}
@@ -476,7 +482,7 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		{
 			// Make it easier for user to find and correct the errors
 			pbm_msg( "\n".sprintf( ('Processing message: %s'), $post_title ), $cron );
-			pbm_msg( $Messages->get_string( ('Cannot post, please correct these errors:'), 'error' ), $cron );
+			pbm_msg( $Messages->get_string( ('Cannot post, please correct these errors:'), 'error' ), $cron, 'error' );
 
 			$Messages->clear();
 			rmdir_r( $tmpDirMIME );
@@ -592,7 +598,7 @@ function pbm_process_header( $header, & $subject, & $post_date, $cron = false )
 	$ddate = $header['Date'];
 
 	$prefix = $Settings->get( 'eblog_subject_prefix' );
-	pbm_msg( T_('Subject').': '.$subject, $cron );
+	pbm_msg( ('Subject').': '.$subject, $cron );
 
 	if( utf8_substr($subject, 0, utf8_strlen($prefix)) !== $prefix )
 	{
@@ -689,7 +695,7 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 		// Check valid filename/extension: (includes check for locked filenames)
 		if( $error_filename = process_filename( $filename, true ) )
 		{
-			pbm_msg( ('Invalid filename').': '.$error_filename, $cron );
+			pbm_msg( ('Invalid filename').': '.$error_filename, $cron, 'error' );
 			syslog_insert( sprintf( 'The posted by mail file %s has an unrecognized extension', '[['.$filename.']]' ), 'warning', 'file' );
 			continue;
 		}
@@ -709,7 +715,7 @@ function pbm_process_attachments( & $content, $mailAttachments, $mediadir, $medi
 				$filename = fix_filename_length( $filename, strlen( $prename ) - 1 );
 				if( $error_in_filename = process_filename( $filename, true ) )
 				{ // The file name is not valid, this is an unexpected situation, because the file name was already validated before
-					pbm_msg( ('Invalid filename').': '.$error_filename, $cron );
+					pbm_msg( ('Invalid filename').': '.$error_filename, $cron, 'error' );
 					syslog_insert( sprintf( 'The posted by mail file %s has an unrecognized extension', '[['.$filename.']]' ), 'warning', 'file' );
 					break;
 				}

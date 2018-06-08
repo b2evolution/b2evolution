@@ -46,6 +46,7 @@ $params = array_merge( array(
 		'comment_image_size'         => 'fit-400x320',
 		'comment_attach_info'        => '<br />'.get_upload_restriction(),
 		'comment_mode'         => '', // Can be 'quote' from GET request
+		'comment_type'         => 'comment',
 	), $params );
 
 $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
@@ -304,7 +305,7 @@ function validateCommentForm(form)
 			$comment_author_email = $current_User->email;
 		}
 		// Note: we use funky field names to defeat the most basic guestbook spam bots
-		$Form->text( $dummy_fields[ 'name' ], $comment_author, 40, T_('Name'), '', 100, 'bComment' );
+		$Form->text( $dummy_fields[ 'name' ], $comment_author, 40, T_('Name'), '<br />'.sprintf( T_('<a %s>Click here to log in</a> if you already have an account on this site.'), 'href="'.get_login_url( 'comment form', $Item->get_permanent_url() ).'" style="font-weight:bold"' ), 100, 'bComment' );
 
 		$Form->email_input( $dummy_fields[ 'email' ], $comment_author_email, 40, T_('Email'), array(
 				'bottom_note' => T_('Your email address will <strong>not</strong> be revealed on this site.'),
