@@ -330,23 +330,33 @@ class polls_Module extends Module
 				break;
 
 			case 'email_vote':
+				global $DB, $Messages;
+
+				$email_ID = param( 'email_ID', 'integer', true );
+				$email_key = param( 'email_key', 'string', true );
 				$poll_ID = param( 'poll_ID', 'integer', true );
-				$user_ID = param( 'user_ID', 'integer', true );
 				$poll_answer = param( 'poll_answer', 'integer', true );
 				$redirect_to = param( 'redirect_to', 'url', '' );
 
-				$PollCache = & get_PollCache();
-				$PollOptionCache = & get_PollOptionCache();
-				$UserCache = & get_UserCache();
+				$email_log = $DB->get_row( 'SELECT * FROM T_email__log WHERE emlog_ID = '.$DB->quote( $email_ID ).' AND emlog_key = '.$DB->quote( $email_key ), ARRAY_A );
 
-				$Poll = & $PollCache->get_by_ID( $poll_ID );
-				$PollOption = & $PollOptionCache->get_by_ID( $poll_answer );
-				$User = & $UserCache->get_by_ID( $user_ID );
-
-				if( $Poll && $PollOption && $User )
+				if( $email_log )
 				{
-					$Poll->clear_user_votes( $User->ID );
-					$PollOption->vote( $User->ID );
+					$user_ID = $email_log['emlog_user_ID'];
+					$UserCache = & get_UserCache();
+					$User = & $UserCache->get_by_ID( $user_ID );
+					$PollCache = & get_PollCache();
+					$PollOptionCache = & get_PollOptionCache();
+					$Poll = & $PollCache->get_by_ID( $poll_ID );
+					$PollOption = & $PollOptionCache->get_by_ID( $poll_answer );
+
+					if( $Poll && $PollOption && $User )
+					{
+						$Poll->clear_user_votes( $User->ID );
+						$PollOption->vote( $User->ID );
+
+						$Messages->add( T_('Your vote has been cast.'), 'success' );
+					}
 				}
 
 				if( ! empty( $redirect_to ) )
