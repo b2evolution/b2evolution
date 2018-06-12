@@ -493,7 +493,7 @@ class polls_plugin extends Plugin
 			echo '<ul>'.$poll_question == '-' ? '' : '<b>'.$poll_question.'</b>';
 			foreach( $poll_options as $poll_option )
 			{
-				$vote_url = get_htsrv_url().'action.php?mname=polls&action=email_vote&poll_ID='.$params['poll_ID'].'&poll_answer='.$poll_option->ID.'&user_ID=$user_ID$';
+				$vote_url = get_htsrv_url().'action.php?mname=polls&action=email_vote&poll_ID='.$params['poll_ID'].'&poll_answer='.$poll_option->ID.'&email_ID=$mail_log_ID$&email_key=$email_key$';
 				if( ! empty( $params['redirect_to'] ) )
 				{
 					$vote_url = url_add_param( $vote_url, 'redirect_to='.rawurlencode( $params['redirect_to'] ) );
