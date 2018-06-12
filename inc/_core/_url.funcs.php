@@ -757,6 +757,7 @@ function url_absolute( $url, $base = NULL )
  */
 function make_rel_links_abs( $s, $host = NULL )
 {
+	load_class( '_core/model/_urlhelper.class.php', 'UrlHelper' );
 	$url_helper = new UrlHelper( $host );
 	$s = preg_replace_callback( '~(<[^>]+?)\b((?:src|href)\s*=\s*)(["\'])?([^\\3]+?)(\\3)~i', array( $url_helper, 'callback' ), $s );
 	return $s;
