@@ -344,6 +344,12 @@ ol.breadcrumb {
 .evo_comment_title a.permalink:hover {
   color: #23527c;
 }
+.evo_comment_title .label {
+  display: inline-block;
+  padding-top: .3em;
+  position: relative;
+  top: -1px;
+}
 .bCommentAvatar {
   border-radius: 50%;
   float: left;
