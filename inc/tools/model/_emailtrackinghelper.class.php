@@ -238,7 +238,7 @@ class EmailTrackingHelper
 					return $passthrough_url.$redirect_url;
 				}
 
-				$redirect_url - rawurlencode( $redirect_url );
+				$redirect_url = rawurlencode( $redirect_url );
 				// Restore $mail_log_ID$ and $email_key$ markers
 				$redirect_url = str_replace( array( '_____mail_log_ID_____', '_____email_key_____' ), array( '$mail_log_ID$', '$email_key$' ), $redirect_url );
 
