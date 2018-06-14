@@ -112,13 +112,14 @@ $is_admin_page = true;
 // Get all those user threads and their recipients where the corresponding users have unread messages:
 $unread_threads = get_users_unread_threads( $users_to_remind_ids, NULL, 'array', 'html', 'http:' );
 
-// Get unread thread urls
-list( $threads_link ) = get_messages_link_to();
-
 $reminder_sent = 0;
 $reminder_failed = 0;
 foreach( $users_to_remind_ids as $user_ID )
 {
+	// Get unread thread urls
+	$messages_urls = get_messages_link_to( NULL, $user_ID );
+	$threads_link = $messages_urls[0];
+
 	// send reminder email
 	$email_template_params = array(
 			'unread_threads' => $unread_threads[$user_ID],

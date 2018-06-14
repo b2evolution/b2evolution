@@ -488,7 +488,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'login_required', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['login_required']['wico_ID'];
-		add_basic_widget( $wico_id, 'content_block', 'core', 10, array( 'item_slug' => 'login-required-'.$blog_id ) );
+		add_basic_widget( $wico_id, 'content_block', 'core', 10, array( 'item_slug' => 'login-required' ) );
 		add_basic_widget( $wico_id, 'user_login', 'core', 20, array(
 				'title'               => T_( 'Log in to your account' ),
 				'login_button_class'  => 'btn btn-success btn-lg',
@@ -502,7 +502,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'access_denied', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['access_denied']['wico_ID'];
-		add_basic_widget( $wico_id, 'content_block', 'core', 10, array( 'item_slug' => 'access-denied-'.$blog_id ) );
+		add_basic_widget( $wico_id, 'content_block', 'core', 10, array( 'item_slug' => 'access-denied' ) );
 	}
 
 

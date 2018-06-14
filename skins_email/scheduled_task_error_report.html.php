@@ -27,14 +27,14 @@ if( is_array( $params['tasks'] ) && count( $params['tasks'] ) )
 	echo '<p'.emailskin_style( '.p' ).'><ul>';
 	foreach( $params['tasks'] as $task_ID => $task )
 	{
-		echo '<li>'.$task['name'].' (#'.$task_ID.'): '.T_( $task['message'] ).'</li>';
+		echo '<li>'.$task['name'].' (#'.$task_ID.'):<br>'.str_replace( "\n", '<br>', T_( $task['message'] ) ).'</li>';
 	}
 	echo "</ul></p>\n";
 }
 
 // Buttons:
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
-echo get_link_tag( $admin_url.'?ctrl=crontab&ctst_timeout=1&ctst_error=1', T_( 'Review tasks with errors' ), 'div.buttons a+a.btn-primary' )."\n";
+echo get_link_tag( $admin_url.'?ctrl=crontab&ctst_status[]=warning&ctst_status[]=timeout&ctst_status[]=error', T_( 'Review tasks with errors' ), 'div.buttons a+a.btn-primary' )."\n";
 echo "</div>\n";
 
 

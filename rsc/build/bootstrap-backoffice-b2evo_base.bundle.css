@@ -2718,6 +2718,22 @@ form ul.token-input-list-facebook li.token-input-input-token-facebook {
 body.modal-open div.token-input-dropdown-facebook {
   z-index: 10002;
 }
+.evo_widget.widget_core_item_tags form {
+  display: inline-block;
+  vertical-align: middle;
+}
+.evo_widget.widget_core_item_tags form ul.token-input-list-facebook {
+  width: 100%;
+  max-width: 100%;
+}
+.evo_widget.widget_core_item_tags form #item_tags {
+  display: inline-block;
+  width: auto;
+  vertical-align: middle;
+}
+.evo_widget.widget_core_item_tags form input[type=submit] {
+  margin: 0;
+}
 div.results {
   margin-top: 0;
 }

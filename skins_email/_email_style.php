@@ -49,7 +49,7 @@ $emailskins_styles = array(
 	padding: 2em 0 0 0;
 ',
 'div.email_header' => '
-	margin: 0 2em 4px;
+	margin: 0 2em 12px;
 	padding: 0;
 	text-align: center;
 ',
@@ -58,7 +58,7 @@ $emailskins_styles = array(
 	border-top: 1px solid #ddd;
 	border-bottom: 1px solid #ddd;
 	margin: 8px 0px;
-	padding: 1px 1em;
+	padding: 30px 1em;
 ',
 'div.email_ugc' => '
 	margin: 1em 1em;
@@ -251,5 +251,11 @@ $emailskins_styles = array(
 	border: 1px solid #46b8da;
 	border-radius: 4px;
 ',
+'a.btn-sm' => '
+	font-size: 0.85em;
+	padding: 5px 10px;
+	border-radius: 4px;
+	line-height: 1.5;
+'
 );
 ?>

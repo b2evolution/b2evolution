@@ -247,35 +247,9 @@ function utf8_chr( $code_point )
 		{
 		return mb_convert_encoding( "&#$i;", 'UTF-8', 'HTML-ENTITIES' );
 	}
-	else if( version_compare( phpversion(), '5.0.0' ) === 1 )
-	{
-		//html_entity_decode did not support Multi-Byte before PHP 5.0.0
-		return html_entity_decode( "&#{$i};", ENT_QUOTES, 'UTF-8' );
-	}
-
-	//Fallback
-
-	$bits = ( int ) ( log( $i, 2 ) + 1 );
-
-	if( $bits <= 7 ) //Single Byte
-	{
-		return chr( $i );
-	}
-	else if( $bits <= 11 ) //Two Bytes
-	{
-		return chr( ( ( $i >> 6 ) & 0x1F ) | 0xC0 ) . chr( ( $i & 0x3F ) | 0x80 );
-	}
-	else if( $bits <= 16 ) //Three Bytes
-	{
-		return chr( ( ( $i >> 12 ) & 0x0F ) | 0xE0 ) . chr( ( ( $i >> 6 ) & 0x3F ) | 0x80 ) . chr( ( $i & 0x3F ) | 0x80 );
-	}
-	else if( $bits <= 21 ) //Four Bytes
-	{
-		return chr( ( ( $i >> 18 ) & 0x07 ) | 0xF0 ) . chr( ( ( $i >> 12 ) & 0x3F ) | 0x80 ) . chr( ( ( $i >> 6 ) & 0x3F ) | 0x80 ) . chr( ( $i & 0x3F ) | 0x80 );
-	}
 	else
 	{
-		return ''; //Cannot be encoded as Valid UTF-8
+		return html_entity_decode( "&#{$i};", ENT_QUOTES, 'UTF-8' );
 	}
 }
 

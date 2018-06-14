@@ -70,9 +70,13 @@ if( $params['country'] > 0 )
 	echo T_('Profile Country').": ".$user_Country->get_name()."\n";
 }
 
-if( !empty( $params['source'] ) )
-{ // Source is defined
-	echo T_('Registration Source').": ".$params['source']."\n";
+echo "\n";
+
+if( !empty ( $params['initial_hit'] ) )
+{ // Hit info
+	echo T_('Session ID').': '.$params['initial_hit']->hit_sess_ID.' - '.$admin_url.'?ctrl=stats&tab=hits&blog=0&sess_ID='.$params['initial_hit']->hit_sess_ID."\n";
+	echo T_('Initial referer').": ".$params['initial_hit']->hit_referer."\n";
+	echo T_('Initial page').": ".T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri."\n";
 }
 
 if( $params['gender'] == 'M' )
@@ -95,10 +99,9 @@ if( !empty( $params['trigger_url'] ) )
 	echo T_('Registration Trigger Page').": ".$params['trigger_url']."\n";
 }
 
-if( !empty ( $params['initial_hit'] ) )
-{ // Hit info
-	echo T_('Initial page').": ".T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri."\n";
-	echo T_('Initial referer').": ".$params['initial_hit']->hit_referer."\n";
+if( !empty( $params['source'] ) )
+{ // Source is defined
+	echo T_('Registration Source').": ".$params['source']."\n";
 }
 
 echo "\n";

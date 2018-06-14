@@ -61,8 +61,8 @@ if( !empty( $datestop ) )
 if( !empty( $email ) )
 {	// Filter by email
 	$email = utf8_strtolower( $email );
-	$SQL->WHERE_and( 'emret_address LIKE '.$DB->quote( $email ) );
-	$count_SQL->WHERE_and( 'emret_address LIKE '.$DB->quote( $email ) );
+	$SQL->WHERE_and( 'emret_address LIKE '.$DB->quote( '%'.$email.'%' ) );
+	$count_SQL->WHERE_and( 'emret_address LIKE '.$DB->quote( '%'.$email.'%' ) );
 }
 
 
@@ -81,7 +81,7 @@ function filter_email_return( & $Form )
 
 	$Form->date_input( 'datestartinput', $datestart, T_('From date') );
 	$Form->date_input( 'datestopinput', $datestop, T_('To date') );
-	$Form->email_input( 'email', $email, 40, T_('Email') );
+	$Form->text_input( 'email', $email, 40, T_('Email') );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_email_return',

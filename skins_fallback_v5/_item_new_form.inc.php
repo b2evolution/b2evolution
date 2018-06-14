@@ -44,7 +44,7 @@ $Form->hidden( 'cat', get_param( 'cat' ) );
 $Form->switch_layout( 'fields_table' );
 $Form->begin_fieldset();
 
-$Form->text_input( $dummy_fields['name'], ( isset( $new_Item->temp_user_name ) ? $new_Item->temp_user_name : '' ), 40, T_('Name'), '', array( 'maxlength' => 100, 'required' => true, 'style' => 'width:auto' ) );
+$Form->text_input( $dummy_fields['name'], ( isset( $new_Item->temp_user_name ) ? $new_Item->temp_user_name : '' ), 40, T_('Name'), sprintf( T_('<a %s>Click here to log in</a> if you already have an account on this site.'), 'href="'.get_login_url( 'new item form', $Blog->get( 'url' ) ).'" style="font-weight:bold"' ), array( 'maxlength' => 100, 'required' => true, 'style' => 'width:auto' ) );
 
 $Form->email_input( $dummy_fields['email'], ( isset( $new_Item->temp_user_email ) ? $new_Item->temp_user_email : '' ), 40, T_('Email'), array( 'maxlength' => 255, 'required' => true, 'style' => 'width:auto', 'note' => T_('Your email address will <strong>not</strong> be revealed on this site.') ) );
 

@@ -573,7 +573,7 @@ switch( $action )
 		}
 		
 		$AdminUI->display_breadcrumbpath_add( T_('Campaigns'), $admin_url.'?ctrl=campaigns' );
-		$AdminUI->display_breadcrumbpath_add( isset( $edited_EmailCampaign ) ? $edited_EmailCampaign->get( 'name' ) : T_('New Campaign') );
+		$AdminUI->display_breadcrumbpath_add( isset( $edited_EmailCampaign ) ? $edited_EmailCampaign->get( 'name' ) : T_('New campaign') );
 		break;
 	case 'copy':
 		$AdminUI->set_page_manual_link( 'duplicating-an-email-campaign' );

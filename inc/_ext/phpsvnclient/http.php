@@ -590,7 +590,7 @@ class http_class {
 		    elseif (IsSet($arguments["SSLKeyFile"]))
 			$error = "establishing SSL connections using a private key is only supported when the cURL extension is enabled";
 		    else {
-			$version = explode(".", function_exists("phpversion") ? phpversion() : "3.0.7");
+			$version = explode( ".", phpversion() );
 			$php_version = intval($version[0]) * 1000000 + intval($version[1]) * 1000 + intval($version[2]);
 			if ($php_version < 4003000)
 			    $error = "establishing SSL connections requires at least PHP version 4.3.0 or having the cURL extension enabled";

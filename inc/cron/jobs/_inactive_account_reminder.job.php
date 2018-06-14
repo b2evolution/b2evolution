@@ -8,14 +8,14 @@ global $DB, $UserSettings, $Settings;
 
 global $servertimenow, $baseurl;
 
-if( empty( $UserSettings ) )
-{ // initialize UserSettings, because in CLI mode is not initialized yet
-	load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
-	$UserSettings = new UserSettings();
+$inactive_account_threshold = intval( $Settings->get( 'inactive_account_reminder_threshold' ) );
+if( $inactive_account_threshold === 0 )
+{
+	cron_log_append( 'Sending of inactive account reminders disabled.' );
+	return 1;
 }
 
-// Only users with "new", "emailchanged" OR "deactivated" statuses may receive activation reminders
-// This will be a precondition to get less users from db, but this will be checked again with check_status() in the send_easy_validate_emails() function
+// Only users with "activated", "manualactivated" OR "autoactivated" statuses may receive inactive account reminders
 $status_condition = '( user_status = "activated" OR user_status = "manualactivated" OR user_status = "autoactivated" )';
 
 $SQL = new SQL();
@@ -24,7 +24,7 @@ $SQL->FROM( 'T_users' );
 $SQL->FROM_add( 'LEFT JOIN T_users__usersettings last_sent ON last_sent.uset_user_ID = user_ID AND last_sent.uset_name = "last_inactive_status_email"' );
 $SQL->FROM_add( 'LEFT JOIN T_users__usersettings notif_setting ON notif_setting.uset_user_ID = user_ID AND notif_setting.uset_name = "send_inactive_reminder"' );
 
-// check that user status is 'new' or 'emailchanged' or 'deactivated', and send reminders only for these users.
+// check that user status is 'activated' or 'manualactivated' or 'autoactivated', and send reminders only for these users.
 $SQL->WHERE( $status_condition );
 // check if user has an email address
 $SQL->WHERE_and( 'LENGTH(TRIM(user_email)) > 0' );
@@ -35,7 +35,7 @@ $SQL->WHERE_and( 'last_sent.uset_value IS NULL' );
 // check if user wants to receive inactive reminder or not
 $SQL->WHERE_and( 'notif_setting.uset_value IS NULL OR notif_setting.uset_value <> '.$DB->quote( '0' ) );
 // check if user last seen timestamp exceeds threshold for inactive users
-$SQL->WHERE_and( 'TIMESTAMPDIFF( SECOND, IF( user_lastseen_ts IS NULL, user_created_datetime, user_lastseen_ts ), '.$DB->quote( date2mysql( $servertimenow ) ).' ) > '.$Settings->get( 'inactive_account_reminder_threshold' ) );
+$SQL->WHERE_and( 'TIMESTAMPDIFF( SECOND, IF( user_lastseen_ts IS NULL, user_created_datetime, user_lastseen_ts ), '.$DB->quote( date2mysql( $servertimenow ) ).' ) > '.$inactive_account_threshold );
 
 $UserCache = & get_UserCache();
 $UserCache->clear();

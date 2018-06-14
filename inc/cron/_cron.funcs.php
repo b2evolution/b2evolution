@@ -237,7 +237,7 @@ function call_job( $job_key, $job_params = array() )
 	if( $error_code != 1 )
 	{	// We got an error
 		$result_status = 'error';
-		$result_message_text = '[Error code: '.$error_code.' ] '.$result_message_text;
+		$result_message_text = '[Error code: '.$error_code.']'."\n".$result_message_text;
 		if( is_array( $result_message ) )
 		{ // If result is array
 			$result_message['message'] = $result_message_text;
@@ -666,7 +666,7 @@ function cron_job_error_handler()
  */
 function cron_job_shutdown()
 {
-	global $result_message, $ctsk_ID, $DB;
+	global $result_message, $ctsk_ID, $ctsk_name, $DB;
 
 	if( empty( $ctsk_ID ) )
 	{	// Run this function to detect only interrupted cron jobs:
@@ -682,5 +682,12 @@ function cron_job_shutdown()
 		      clog_messages = '.$DB->quote( $result_message ).'
 		WHERE clog_ctsk_ID = '.$ctsk_ID,
 		'Record task as finished with error by shutdown function.' );
+
+	// Detect timed out tasks and send notification about timed out and error tasks:
+	detect_timeout_cron_jobs( array(
+			'ID'      => $ctsk_ID,
+			'name'    => $ctsk_name,
+			'message' => $result_message,
+		) );
 }
 ?>

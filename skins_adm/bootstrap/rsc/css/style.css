@@ -1647,6 +1647,9 @@ div.query-builder .rule-container .rule-value-container {
   border: none;
   padding-left: 0;
 }
+.ui-effects-transfer {
+  border: 1px solid #F00;
+}
 #customizer_wrapper {
   padding-top: 140px;
 }
