@@ -128,7 +128,7 @@ echo '<div class="profile_column_left">';
 	}
 
 	// Login:
-	echo '<h2 class="text-muted">'.$User->get( 'login' ).'</h2>';
+	echo '<h2 class="'.$User->get_gender_class().'">'.$User->get( 'login' ).'</h2>';
 
 	echo '<hr class="profile_separator" />'."\n";
 

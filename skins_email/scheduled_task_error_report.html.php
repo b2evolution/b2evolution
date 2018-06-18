@@ -14,20 +14,30 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $baseurl;
+global $admin_url;
 
 // Default params:
 $params = array_merge( array(
-		'tasks' => array(),
+		'timeout_tasks' => array(),
+		'error_task'    => NULL,
 	), $params );
 
-echo '<p'.emailskin_style( '.p' ).'>'.T_('The following scheduled tasks have ended with error:')."</p>\n";
-if( is_array( $params['tasks'] ) && count( $params['tasks'] ) )
-{
+if( $params['error_task'] !== NULL )
+{	// Display an error task:
+	echo '<p'.emailskin_style( '.p' ).'>'.T_('The following scheduled task has ended with an error:')."</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'>';
+	echo '<b>'.$params['error_task']['name'].'</b> ('.get_link_tag( $admin_url.'?ctrl=crontab&action=view&cjob_ID='.$params['error_task']['ID'], '#'.$params['error_task']['ID'], '.a' ).'):<br>';
+	echo str_replace( "\n", '<br>', ltrim( $params['error_task']['message'], "\n" ) );
+	echo "</p>\n";
+}
+
+if( is_array( $params['timeout_tasks'] ) && count( $params['timeout_tasks'] ) )
+{	// Display timeout tasks:
+	echo '<p'.emailskin_style( '.p' ).'>'.T_('The following scheduled tasks have timed out:')."</p>\n";
 	echo '<p'.emailskin_style( '.p' ).'><ul>';
-	foreach( $params['tasks'] as $task_ID => $task )
+	foreach( $params['timeout_tasks'] as $task_ID => $task )
 	{
-		echo '<li>'.$task['name'].' (#'.$task_ID.'):<br>'.str_replace( "\n", '<br>', T_( $task['message'] ) ).'</li>';
+		echo '<li><b>'.$task['name'].'</b> ('.get_link_tag( $admin_url.'?ctrl=crontab&action=view&cjob_ID='.$task_ID, '#'.$task_ID, '.a' ).'):<br>'.str_replace( "\n", '<br>', T_( $task['message'] ) ).'</li>';
 	}
 	echo "</ul></p>\n";
 }
