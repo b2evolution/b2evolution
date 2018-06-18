@@ -600,7 +600,7 @@ switch( $action )
 
 			if( ! empty( $git_user ) )
 			{	// Replace user and password in Git URL from entered fields:
-				$git_url = preg_replace( '#://[^@]+@#', '://'.$git_user.( empty( $git_password ) ? '' : ':'.$git_password ).'@', $git_url );
+				$git_url = preg_replace( '#://([^@]+@)?#', '://'.$git_user.( empty( $git_password ) ? '' : ':'.$git_password ).'@', $git_url );
 			}
 
 			// Get latest commit has of the requested branch:
