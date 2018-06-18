@@ -187,9 +187,9 @@ class maintenance_Module extends Module
 									'href' => '?ctrl=upgrade' ),
 							) );
 			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
-									'upgradesvn' => array(
-									'text' => T_('Upgrade from SVN'),
-									'href' => '?ctrl=upgrade&amp;tab=svn' ),
+									'upgradegit' => array(
+									'text' => T_('Upgrade from Git'),
+									'href' => '?ctrl=upgrade&amp;tab=git' ),
 							) );
 		}
 	}

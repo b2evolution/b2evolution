@@ -47,12 +47,12 @@ check_upgrade_config( true );
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
 $AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
-if( $tab == 'svn' )
+if( $tab == 'git' )
 {
-	$AdminUI->breadcrumbpath_add( T_('Upgrade from SVN'), $admin_url.'?ctrl=upgrade&amp;tab='.$tab );
+	$AdminUI->breadcrumbpath_add( T_('Upgrade from Git'), $admin_url.'?ctrl=upgrade&amp;tab='.$tab );
 
 	// Set an url for manual page:
-	$AdminUI->set_page_manual_link( 'upgrade-from-svn' );
+	$AdminUI->set_page_manual_link( 'upgrade-from-git' );
 }
 else
 {
@@ -127,12 +127,12 @@ switch( $action )
 			$action = 'start';
 			$AdminUI->disp_view( 'maintenance/views/_upgrade.form.php' );
 		}
-		elseif( $tab == 'svn' )
+		elseif( $tab == 'git' )
 		{
-			svnupgrade_display_steps( 1 );
+			gitupgrade_display_steps( 1 );
 
 			$action = 'start';
-			$AdminUI->disp_view( 'maintenance/views/_upgrade_svn.form.php' );
+			$AdminUI->disp_view( 'maintenance/views/_upgrade_git.form.php' );
 		}
 		break;
 
@@ -326,15 +326,15 @@ switch( $action )
 
 	case 'ready':
 		// STEP 4: READY TO UPGRADE.
-	case 'ready_svn':
-		// SVN STEP 3: READY TO UPGRADE.
+	case 'ready_git':
+		// GIT STEP 3: READY TO UPGRADE.
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'upgrade_is_ready' );
 
-		if( $action == 'ready_svn' )
-		{ // SVN upgrade
-			svnupgrade_display_steps( 3 );
+		if( $action == 'ready_git' )
+		{ // Git upgrade
+			gitupgrade_display_steps( 3 );
 
 			$upgrade_name = param( 'upd_name', 'string', NULL, true );
 		}
@@ -356,7 +356,7 @@ switch( $action )
 		evo_flush();
 
 		$new_version_status = check_version( $upgrade_name );
-		$action_backup_value = ( $action == 'ready_svn' ) ? 'backup_and_overwrite_svn' : 'backup_and_overwrite';
+		$action_backup_value = ( $action == 'ready_git' ) ? 'backup_and_overwrite_git' : 'backup_and_overwrite';
 		if( empty( $new_version_status ) )
 		{ // New version
 			echo '<p><b>'.T_( 'The new files are ready to be installed.' ).'</b></p>';
@@ -385,8 +385,8 @@ switch( $action )
 
 	case 'backup_and_overwrite':
 		// STEP 5: BACKUP & UPGRADE.
-	case 'backup_and_overwrite_svn':
-		// SVN STEP 2: BACKUP AND OVERWRITE.
+	case 'backup_and_overwrite_git':
+		// GIT STEP 2: BACKUP AND OVERWRITE.
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'upgrade_is_launched' );
@@ -401,9 +401,9 @@ switch( $action )
 
 		if( !isset( $block_item_Widget ) )
 		{
-			if( $action == 'backup_and_overwrite_svn' )
-			{ // SVN upgrade
-				svnupgrade_display_steps( 4 );
+			if( $action == 'backup_and_overwrite_git' )
+			{ // Git upgrade
+				gitupgrade_display_steps( 4 );
 			}
 			else
 			{ // Auto upgrade
@@ -411,14 +411,14 @@ switch( $action )
 			}
 
 			$block_item_Widget = new Widget( 'block_item' );
-			$block_item_Widget->title = $action == 'backup_and_overwrite_svn'
-				? T_('Installing package from SVN...')
+			$block_item_Widget->title = $action == 'backup_and_overwrite_git'
+				? T_('Installing package from Git...')
 				: T_('Installing package...');
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
 			$upgrade_name = param( 'upd_name', 'string', NULL, true );
 			if( $upgrade_name === NULL )
-			{ // Get an upgrade name from url (Used for auto-upgrade, not svn)
+			{ // Get an upgrade name from url (Used for auto-upgrade, not git)
 				forget_param( 'upd_name' );
 				$download_url = param( 'upd_url', 'string', '', true );
 				$upgrade_name = pathinfo( $download_url );
@@ -508,7 +508,7 @@ switch( $action )
 			$Form->begin_form( 'fform' );
 			$Form->begin_fieldset( T_( 'Actions' ) );
 			echo '<p><b>'.T_('All new b2evolution files are in place. You will now be redirected to the installer to perform a DB upgrade.').'</b> '.T_('Note: the User Interface will look different.').'</p>';
-			$continue_onclick = 'location.href=\''.$baseurl.'install/index.php?action='.( ( $action == 'backup_and_overwrite_svn' ) ? 'svn_upgrade' : 'auto_upgrade' ).'&locale='.$current_locale.'\'';
+			$continue_onclick = 'location.href=\''.$baseurl.'install/index.php?action='.( ( $action == 'backup_and_overwrite_git' ) ? 'git_upgrade' : 'auto_upgrade' ).'&locale='.$current_locale.'\'';
 			$Form->end_form( array( array( 'button', 'continue', T_('Continue to installer'), 'SaveButton', $continue_onclick ) ) );
 			unset( $block_item_Widget );
 		}
@@ -529,10 +529,10 @@ switch( $action )
 		}
 		break;
 
-	/****** UPGRADE FROM SVN *****/
-	case 'export_svn':
-	case 'force_export_svn':
-		// SVN STEP 2: EXPORT.
+	/****** UPGRADE FROM GIT *****/
+	case 'export_git':
+	case 'force_export_git':
+		// GIT STEP 2: EXPORT.
 
 		$Session->assert_received_crumb( 'upgrade_export' );
 
@@ -544,28 +544,26 @@ switch( $action )
 			break;
 		}
 
-		svnupgrade_display_steps( 2 );
+		gitupgrade_display_steps( 2 );
 
 		$block_item_Widget = new Widget( 'block_item' );
-		$block_item_Widget->title = T_('Exporting package from SVN...');
+		$block_item_Widget->title = T_('Exporting package from Git...');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
-		$svn_url = param( 'svn_url', 'string', '', true );
-		$svn_folder = param( 'svn_folder', 'string', '/', true );
-		$svn_user = param( 'svn_user', 'string', false, true );
-		$svn_password = param( 'svn_password', 'string', false, true );
-		$svn_revision = param( 'svn_revision', 'integer', 0, true );
+		$git_url = param( 'git_url', 'string', '', true );
+		$git_branch = param( 'git_branch', 'string', '', true );
+		$git_user = param( 'git_user', 'string', false, true );
+		$git_password = param( 'git_password', 'string', false, true );
 
-		$UserSettings->set( 'svn_upgrade_url', $svn_url );
-		$UserSettings->set( 'svn_upgrade_folder', $svn_folder );
-		$UserSettings->set( 'svn_upgrade_user', $svn_user );
-		$UserSettings->set( 'svn_upgrade_revision', $svn_revision );
+		$UserSettings->set( 'git_upgrade_url', $git_url );
+		$UserSettings->set( 'git_upgrade_branch', $git_branch );
+		$UserSettings->set( 'git_upgrade_user', $git_user );
 		$UserSettings->dbupdate();
 
 		$Messages->clear(); // Clear the messages to avoid a double displaying here
 
-		$success = param_check_not_empty( 'svn_url', T_('Please enter the URL of repository') );
-		$success = $success && param_check_url( 'svn_url', 'download_src' );
+		$success = param_check_not_empty( 'git_url', T_('Please enter the URL of repository') );
+		$success = $success && param_check_url( 'git_url', 'download_src' );
 
 		// Display the errors and the download form again to fix data
 		$Messages->display();
@@ -573,7 +571,7 @@ switch( $action )
 		if( ! $success )
 		{
 			$action = 'start';
-			$AdminUI->disp_view( 'maintenance/views/_upgrade_svn.form.php' );
+			$AdminUI->disp_view( 'maintenance/views/_upgrade_git.form.php' );
 			break;
 		}
 
@@ -584,43 +582,44 @@ switch( $action )
 			// Set maximum execution time
 			set_max_execution_time( 2400 ); // 60 minutes
 
-			load_class('_ext/phpsvnclient/phpsvnclient.php', 'phpsvnclient' );
+			// Check Git tool:
+			$git_path = exec( 'which git' );
 
-			$phpsvnclient = new phpsvnclient( $svn_url, $svn_user, $svn_password );
-
-			// Get an error if it was during connecting to svn server
-			$svn_error = $phpsvnclient->getError();
-
-			if( ! empty( $svn_error ) || $phpsvnclient->getVersion() < 1 )
-			{ // Some errors or Incorrect version
-				echo '<p class="red">'.T_( 'Unable to get a repository version, probably URL of repository is incorrect.' ).'</p>';
+			if( empty( $git_path ) )
+			{	// If Git tool is not installed on the server:
+				echo '<p class="red">'.T_( 'Git tool is not installed on your server.' ).'</p>';
 				evo_flush();
 				$action = 'start';
-				break; // Stop an upgrade from SVN
+				break; // Stop an upgrade from Git
 			}
 
-			if( $svn_revision > 0 )
-			{ // Set revision from request
-				if( $phpsvnclient->getVersion() < $svn_revision )
-				{ // Incorrect revision number
-					echo '<p class="red">'.sprintf( T_( 'Please select a correct revision number. The latest revision is %s.' ), $phpsvnclient->getVersion() ).'</p>';
-					evo_flush();
-					$action = 'start';
-					break; // Stop an upgrade from SVN
-				}
-				else
-				{ // Use only correct revision
-					$phpsvnclient->setVersion( $svn_revision );
-				}
+			if( empty( $git_branch ) )
+			{	// Set default branch:
+				$git_branch = 'master';
 			}
 
-			$repository_version = $phpsvnclient->getVersion();
+			if( ! empty( $git_user ) )
+			{	// Replace user and password in Git URL from entered fields:
+				$git_url = preg_replace( '#://[^@]+@#', '://'.$git_user.( empty( $git_password ) ? '' : ':'.$git_password ).'@', $git_url );
+			}
 
-			$upgrade_name = 'export_svn_'.$repository_version;
+			// Get latest commit has of the requested branch:
+			$latest_commit_hash = explode( "\t", exec( 'git ls-remote '.$git_url.' -b '.$git_branch ) );
+			$latest_commit_hash = $latest_commit_hash[0];
+
+			if( empty( $latest_commit_hash ) )
+			{	// If no access:
+				echo '<p class="red">'.sprintf( T_( 'Unable to access to branch %s of Git repository %s.' ), '<code>'.$git_branch.'</code>', '<code>'.$git_url.'</code>' ).'</p>';
+				evo_flush();
+				$action = 'start';
+				break; // Stop an upgrade from Git
+			}
+
+			$upgrade_name = 'export_git_'.$git_branch.'_'.$latest_commit_hash;
 			memorize_param( 'upd_name', 'string', '', $upgrade_name );
 			$upgrade_folder = $upgrade_path.$upgrade_name;
 
-			if( $action == 'force_export_svn' && file_exists( $upgrade_folder ) )
+			if( $action == 'force_export_git' && file_exists( $upgrade_folder ) )
 			{ // The exported folder already exists
 				// Try to delete previous package
 				if( ! rmdir_r( $upgrade_folder ) )
@@ -632,22 +631,22 @@ switch( $action )
 
 			if( file_exists( $upgrade_folder ) )
 			{ // Current version already is downloaded
-				echo '<p class="green">'.sprintf( T_('Revision %s has already been downloaded. Using: %s'), $repository_version, $upgrade_folder );
-				$revision_is_exported = true;
+				echo '<p class="green">'.sprintf( T_('Commit %s has already been downloaded. Using: %s'), '<code>'.$latest_commit_hash.'</code>', '<code>'.$upgrade_folder.'</code>' );
+				$commit_is_exported = true;
 			}
 			else
 			{ // Download files
 				echo '<p>'.sprintf( T_( 'Downloading package to &laquo;<strong>%s</strong>&raquo;...' ), $upgrade_folder );
 				evo_flush();
 
-				// Export all files in temp folder for following coping
-				$svn_result = $phpsvnclient->checkOut( $svn_folder, $upgrade_folder, false, true );
+				// Export all files in temp folder for following coping:
+				$git_result = exec( 'git clone -b '.$git_branch.' --single-branch '.$git_url.' '.$upgrade_folder );
 
 				echo '</p>';
 
-				if( $svn_result === false )
+				if( ! empty( $git_result ) )
 				{ // Checkout is failed
-					echo '<p style="color:red">'.sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $svn_url ).'</p>';
+					echo '<p style="color:red">'.sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $git_url ).'</p>';
 					evo_flush();
 					$action = 'start';
 					break;
