@@ -698,7 +698,7 @@ while( $Item = & $ItemList->get_item() )
 					'setting_name' => 'coll_apply_comment_rendering'
 				) ) );
 
-			$preview_text = ( $Item->can_attach() ) ? T_('Preview/Add file') : T_('Preview');
+			$preview_text = ( $Item->can_attach() ) ? T_('Preview/Add file') : /* TRANS: Verb */ T_('Preview');
 			$Form->buttons_input( array(
 					array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview btn-info', 'value' => $preview_text ),
 					array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit SaveButton', 'value' => T_('Send comment') )

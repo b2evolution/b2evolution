@@ -446,7 +446,7 @@ if( $action == 'preview' )
 
 	// This message serves the purpose that the next page will not even try to retrieve preview from cache... (and won't collect data to be cached)
 	// This is session based, so it's not 100% safe to prevent caching. We are also using explicit caching prevention whenever personal data is displayed
-	$Messages->add_to_group( T_('This is a preview only! Do not forget to send your comment!'), 'error', T_('Preview').':' );
+	$Messages->add_to_group( T_('This is a preview only! Do not forget to send your comment!'), 'error', /* TRANS: Noun */ T_('Preview:') );
 
 	if( $comments_email_is_detected )
 	{ // Comment contains an email address, We should show an error about this
@@ -458,7 +458,7 @@ if( $action == 'preview' )
 			}
 			$link_log_in = 'href="'.get_login_url( 'blocked comment email', $commented_Item->get_url( 'public_view' ) ).'"';
 			$link_register = 'href="'.get_user_register_url( $commented_Item->get_url( 'public_view' ), 'blocked comment email' ).'"';
-			$Messages->add_to_group( sprintf( T_('Your comment contains an email address. Please <a %s>log in</a> or <a %s>create an account now</a> instead. This will allow people to send you private messages without revealing your email address to SPAM robots.'), $link_log_in, $link_register ), 'error', T_('Preview').':' );
+			$Messages->add_to_group( sprintf( T_('Your comment contains an email address. Please <a %s>log in</a> or <a %s>create an account now</a> instead. This will allow people to send you private messages without revealing your email address to SPAM robots.'), $link_log_in, $link_register ), 'error', /* TRANS: Noun */ T_('Preview:') );
 
 			// Save the user data if he will go to register form after this action
 			$register_user = array(
@@ -469,7 +469,7 @@ if( $action == 'preview' )
 		}
 		else
 		{	// No registration
-			$Messages->add_to_group( T_('Your comment contains an email address. We recommend you check the box "Allow message form." below instead. This will allow people to contact you without revealing your email address to SPAM robots.'), 'error', T_('Preview').':' );
+			$Messages->add_to_group( T_('Your comment contains an email address. We recommend you check the box "Allow message form." below instead. This will allow people to contact you without revealing your email address to SPAM robots.'), 'error', /* TRANS: Noun */ T_('Preview:') );
 		}
 	}
 

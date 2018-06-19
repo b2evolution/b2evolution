@@ -656,7 +656,7 @@ function get_request_title( $params = array() )
 			// We are displaying a single message:
 			if( $preview )
 			{	// We are requesting a post preview:
-				$r[] = T_('PREVIEW');
+				$r[] = /* TRANS: Noun */ T_('PREVIEW');
 			}
 			elseif( $params['title_'.$disp.'_disp'] && isset( $MainList ) )
 			{
