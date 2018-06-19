@@ -582,10 +582,11 @@ switch( $action )
 			// Set maximum execution time
 			set_max_execution_time( 2400 ); // 60 minutes
 
-			// Check Git tool:
-			$git_path = exec( 'which git' );
+			// Create object to work with Git repository:
+			load_class( '_ext/git/Git.php', 'GitRepo' );
+			$GitRepo = new GitRepo();
 
-			if( empty( $git_path ) )
+			if( ! $GitRepo->test_git() )
 			{	// If Git tool is not installed on the server:
 				echo '<p class="red">'.T_( 'Git tool is not installed on your server.' ).'</p>';
 				evo_flush();
@@ -598,18 +599,21 @@ switch( $action )
 				$git_branch = 'master';
 			}
 
+			$git_hidden_pass_url = $git_url;
 			if( ! empty( $git_user ) )
 			{	// Replace user and password in Git URL from entered fields:
-				$git_url = preg_replace( '#://([^@]+@)?#', '://'.$git_user.( empty( $git_password ) ? '' : ':'.$git_password ).'@', $git_url );
+				$git_url_regexp = '#://([^@]+@)?#';
+				$git_hidden_pass_url = preg_replace( $git_url_regexp, '://'.$git_user.( empty( $git_password ) ? '' : ':'.str_repeat( '*', strlen( $git_password ) ) ).'@', $git_url );
+				$git_url = preg_replace( $git_url_regexp, '://'.$git_user.( empty( $git_password ) ? '' : ':'.$git_password ).'@', $git_url );
 			}
 
 			// Get latest commit has of the requested branch:
-			$latest_commit_hash = explode( "\t", exec( 'git ls-remote '.$git_url.' -b '.$git_branch ) );
+			$latest_commit_hash = explode( "\t", $GitRepo->run( 'ls-remote '.$git_url.' -b '.$git_branch ) );
 			$latest_commit_hash = $latest_commit_hash[0];
 
 			if( empty( $latest_commit_hash ) )
 			{	// If no access:
-				echo '<p class="red">'.sprintf( T_( 'Unable to access to branch %s of Git repository %s.' ), '<code>'.$git_branch.'</code>', '<code>'.$git_url.'</code>' ).'</p>';
+				echo '<p class="red">'.sprintf( T_( 'Unable to access to branch %s of Git repository %s.' ), '<code>'.$git_branch.'</code>', '<code>'.$git_hidden_pass_url.'</code>' ).'</p>';
 				evo_flush();
 				$action = 'start';
 				break; // Stop an upgrade from Git
@@ -640,13 +644,16 @@ switch( $action )
 				evo_flush();
 
 				// Export all files in temp folder for following coping:
-				$git_result = exec( 'git clone -b '.$git_branch.' --single-branch '.$git_url.' '.$upgrade_folder );
+				$git_result = $GitRepo->run( 'clone -b '.$git_branch.' --single-branch '.$git_url.' '.$upgrade_folder );
+
+				// Remove .git folder:
+				rmdir_r( $upgrade_folder.'/.git' );
 
 				echo '</p>';
 
 				if( ! empty( $git_result ) )
 				{ // Checkout is failed
-					echo '<p style="color:red">'.sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $git_url ).'</p>';
+					echo '<p style="color:red">'.sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $git_hidden_pass_url ).'</p>';
 					evo_flush();
 					$action = 'start';
 					break;
