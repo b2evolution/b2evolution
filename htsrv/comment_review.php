@@ -204,18 +204,22 @@ if( empty( $params ) )
 // Default params:
 $params = array_merge( array(
 	'wrap_width'         => '580px',
-	'review_page_before' => '<div class="evo_panel__comment_review">',
+	'review_page_before' => '<div class="evo_panel__comment_review col-md-8 col-md-offset-2">',
 	'review_page_after'  => '</div>',
 	'review_form_title'  => T_('Comment review'),
+	'review_form_before' => '',
+	'review_form_after'  => '',
 	'form_class_review'  => 'evo_form__comment_review',
 ), $params );
 
 // Header
 $page_title = $params['review_form_title'];
-$wrap_width = $params['wrap_width'];
 
 require $adminskins_path.'/login/_html_header.inc.php';
 
+echo $params['review_page_before'];
+
+echo $params['review_form_before'];
 
 $Form = new Form( get_htsrv_url( true ).'comment_review.php', 'review', 'post' );
 
@@ -368,6 +372,10 @@ else
 }
 
 $Form->end_form();
+
+echo $params['review_form_after'];
+
+echo $params['review_page_after'];
 
 // Footer
 require $adminskins_path.'/login/_html_footer.inc.php';
