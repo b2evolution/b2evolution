@@ -1644,7 +1644,11 @@ class RestApi
 	 */
 	private function controller_user_autocomplete()
 	{
+		global $DB;
+
 		$api_q = param( 'q', 'string', '' );
+		$api_mentioned = param( 'mentioned', 'array:string' ); // User logins mentioned on the page
+		$api_blog = param( 'blog', 'integer' );
 
 		if( ! is_valid_login( $api_q ) )
 		{	// Restrict a wrong request:
@@ -1655,8 +1659,30 @@ class RestApi
 		// Add backslash for special char of sql operator LIKE:
 		$api_q = str_replace( '_', '\_', $api_q );
 
+		$search_params = array();
+		$order_priorities = array();
+
+		if( ! empty( $api_mentioned ) )
+		{	// Mentioned logins must be ordered on the top:
+			$order_priorities[] = 'WHEN user_login IN ( '.$DB->quote( $api_mentioned ).' ) THEN 1';
+		}
+
+		if( ! empty( $api_blog ) )
+		{	// Collection assignees and members must be ordered with priorities 2 and 3:
+			$search_params['sql_from_add'] = 'LEFT JOIN T_coll_user_perms ON bloguser_user_ID = user_ID AND bloguser_blog_ID = '.$DB->quote( $api_blog ).'
+				LEFT JOIN T_coll_group_perms ON bloggroup_group_ID = user_grp_ID AND bloggroup_blog_ID = '.$DB->quote( $api_blog );
+			$order_priorities[] = 'WHEN bloguser_can_be_assignee = 1 OR bloggroup_can_be_assignee = 1 THEN 2';
+			$order_priorities[] = 'WHEN bloguser_ismember = 1 OR bloggroup_ismember = 1  THEN 3';
+		}
+
+		if( ! empty( $order_priorities ) )
+		{	// Order users by custom priority:
+			$search_params['sql_select'] = '*, CASE '.implode( ' ', $order_priorities ).' ELSE 4 END AS user_order_priority';
+			$search_params['sql_order_by'] = 'user_order_priority, user_login';
+		}
+
 		// Search users:
-		$users = $this->func_user_search( $api_q );
+		$users = $this->func_user_search( $api_q, $search_params );
 
 		foreach( $users as $User )
 		{
@@ -1744,9 +1770,12 @@ class RestApi
 		global $DB;
 
 		$params = array_merge( array(
-				'sql_where' => 'user_status IN ( "activated", "autoactivated", "manualactivated" )',
-				'sql_mask'  => '$login$%',
-				'sql_limit' => 0,
+				'sql_select'   => '*',
+				'sql_from_add' => '',
+				'sql_where'    => 'user_status IN ( "activated", "autoactivated", "manualactivated" )',
+				'sql_mask'     => '$login$%',
+				'sql_limit'    => 0,
+				'sql_order_by' => 'user_login',
 			), $params );
 
 		// Get request params:
@@ -1755,8 +1784,12 @@ class RestApi
 
 		// Initialize SQL to get users:
 		$users_SQL = new SQL();
-		$users_SQL->SELECT( '*' );
+		$users_SQL->SELECT( $params['sql_select'] );
 		$users_SQL->FROM( 'T_users' );
+		if( ! empty( $params['sql_from_add'] ) )
+		{	// Additional tables:
+			$users_SQL->FROM_add( $params['sql_from_add'] );
+		}
 		if( ! empty( $search_string ) )
 		{	// Filter by login:
 			$users_SQL->WHERE( 'user_login LIKE '.$DB->quote( str_replace( '$login$', $search_string, $params['sql_mask'] ) ) );
@@ -1765,7 +1798,7 @@ class RestApi
 		{	// Additional restrict:
 			$users_SQL->WHERE_and( $params['sql_where'] );
 		}
-		$users_SQL->ORDER_BY( 'user_login' );
+		$users_SQL->ORDER_BY( $params['sql_order_by'] );
 
 		// Get a count of users:
 		$count_users = $DB->get_var( preg_replace( '/SELECT(.+)FROM/i', 'SELECT COUNT( user_ID ) FROM', $users_SQL->get() ) );
