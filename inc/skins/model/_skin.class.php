@@ -759,7 +759,7 @@ class Skin extends DataObject
 					if( ! empty( $disp_params['function_url'] ) )
 					{
 						echo '<a href="'.$disp_params['function_url'].'" target="_blank" title="'.T_('Preview blog with this skin in a new window').'">';
-						echo T_('Preview').'</a>';
+						echo /* TRANS: Verb */ T_('Preview').'</a>';
 					}
 					break;
 			}

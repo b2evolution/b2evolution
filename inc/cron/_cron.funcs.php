@@ -445,15 +445,11 @@ function detect_timeout_cron_jobs( $error_task = NULL )
 			WHERE clog_ctsk_ID IN ( '.$DB->quote( array_keys( $tasks ) ).' )', 'Mark timeouts in cron jobs.' );
 	}
 
-	if( !is_null( $error_task ) )
-	{ // Send notification with error task
-		$tasks[ $error_task['ID'] ] = $error_task;
-	}
-
-	if( count( $tasks ) > 0 )
-	{ // Send notification email about timed out and error cron jobs to users with edit options permission
+	if( count( $tasks ) > 0 || $error_task !== NULL )
+	{	// Send notification email about timed out and error cron jobs to users with edit options permission:
 		$email_template_params = array(
-				'tasks' => $tasks,
+				'timeout_tasks' => $tasks,
+				'error_task'    => $error_task,
 			);
 		send_admin_notification( NT_('Scheduled task error'), 'scheduled_task_error_report', $email_template_params );
 	}

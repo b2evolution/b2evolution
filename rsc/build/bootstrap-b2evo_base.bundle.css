@@ -980,6 +980,17 @@ div.filters .filter_item div {
   margin-top: 1px;
   margin-bottom: 2px;
 }
+.evo_form__comment_review .comment_avatar {
+  float: left;
+  margin: 0 10px 10px 0;
+}
+.evo_form__comment_review .comment_avatar img.user {
+  border-radius: 50%;
+}
+.evo_form__comment_review h3.comment_title {
+  font-size: 16px;
+  margin: 0;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.

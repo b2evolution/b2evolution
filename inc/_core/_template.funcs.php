@@ -656,7 +656,7 @@ function get_request_title( $params = array() )
 			// We are displaying a single message:
 			if( $preview )
 			{	// We are requesting a post preview:
-				$r[] = T_('PREVIEW');
+				$r[] = /* TRANS: Noun */ T_('PREVIEW');
 			}
 			elseif( $params['title_'.$disp.'_disp'] && isset( $MainList ) )
 			{
@@ -3563,9 +3563,10 @@ function init_field_editor_js( $params = array() )
  */
 function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 {
+	global $Collection, $Blog;
+
 	if( is_admin_page() )
 	{ // Check to enable it in back-office
-		global $Collection, $Blog;
 		if( empty( $Blog ) || ! $Blog->get_setting( 'autocomplete_usernames' ) )
 		{ // Blog setting doesn't allow to autocomplete usernames
 			return;
@@ -3585,6 +3586,10 @@ function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 	}
 
 	require_js( '#jquery#', $relative_to );
+	if( ! empty( $Blog ) )
+	{	// Set global blog ID for textcomplete(Used to sort users by collection members and assignees):
+		add_js_headline( 'var blog = '.$Blog->ID );
+	}
 	require_js( 'build/textcomplete.bmin.js', $relative_to );
 }
 

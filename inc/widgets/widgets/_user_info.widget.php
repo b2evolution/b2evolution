@@ -161,7 +161,7 @@ class user_info_Widget extends ComponentWidget
 
 			case 'login':
 				// Login:
-				$r = $target_User->get( 'login' );
+				$r = $target_User->get_colored_login();
 				break;
 
 			case 'gender_age':
