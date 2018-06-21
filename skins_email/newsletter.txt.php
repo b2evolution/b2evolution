@@ -23,7 +23,7 @@ $params = array_merge( array(
 echo $params['message_text'];
 
 // Footer vars:
-$params['unsubscribe_text'] = T_( 'If you don\'t want to receive this list anymore, click here:' ).' '.
+$params['unsubscribe_text'] = T_( 'If you don\'t want to receive emails from this list anymore, click here:' ).' '.
 		get_htsrv_url().'quick_unsubscribe.php?type=newsletter&newsletter='.$params['newsletter'].'&user_ID=$user_ID$&key=$unsubscribe_key$';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

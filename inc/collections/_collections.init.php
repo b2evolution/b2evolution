@@ -1278,9 +1278,13 @@ class collections_Module extends Module
 					// EXIT HERE.
 				}
 
+				// What post and comment date fields use to refresh:
+				// - 'touched' - 'post_datemodified', 'comment_last_touched_ts' (Default)
+				// - 'created' - 'post_datestart', 'comment_date'
+				$date_type = param( 'type', 'string', 'touched' );
+
 				// Run refreshing and display a message:
-				$refreshed_Item->refresh_contents_last_updated_ts();
-				$Messages->add( T_('"Contents last updated" timestamp has been refreshed.'), 'success' );
+				$refreshed_Item->refresh_contents_last_updated_ts( true, $date_type );
 
 				header_redirect();
 				break; // already exited here

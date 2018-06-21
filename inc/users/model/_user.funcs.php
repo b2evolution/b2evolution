@@ -1990,42 +1990,13 @@ function get_default_avatar_url( $gender = '', $size = NULL )
 /**
  * Convert seconds to months, days, hours, minutes and seconds format
  *
+ * @deprecated since version 6.10.1-stable: Use seconds_to_period()
  * @param integer seconds
  * @return string
  */
 function duration_format( $duration, $show_seconds = true )
 {
-	$result = '';
-
-	$fields = get_duration_fields( $duration );
-	if( $fields[ 'months' ] > 0 )
-	{
-		$result .= sprintf( T_( '%d months' ), $fields[ 'months' ] ).' ';
-	}
-	if( $fields[ 'days' ] > 0 )
-	{
-		$result .= sprintf( T_( '%d days' ), $fields[ 'days' ] ).' ';
-	}
-	if( $fields[ 'hours' ] > 0 )
-	{
-		$result .= sprintf( T_( '%d hours' ), $fields[ 'hours' ] ).' ';
-	}
-	if( $fields[ 'minutes' ] > 0 )
-	{
-		$result .= sprintf( T_( '%d minutes' ), $fields[ 'minutes' ] ).' ';
-	}
-	if( $show_seconds && ( $fields[ 'seconds' ] > 0 ) )
-	{
-		$result .= sprintf( T_( '%d seconds' ),  $fields[ 'seconds' ] );
-	}
-
-	$result = trim( $result );
-	if( empty( $result ) )
-	{
-		$result = '0';
-	}
-
-	return $result;
+	return seconds_to_period( $duration );
 }
 
 
@@ -6577,7 +6548,7 @@ function users_results( & $UserList, $params = array() )
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'center nowrap',
 				'order' => 'csnd_status',
-				'td' => '%user_td_campaign_status( #csnd_status# )%'
+				'td' => '%user_td_campaign_status( #csnd_status#, #csnd_emlog_ID# )%'
 			);
 	}
 
@@ -7392,8 +7363,10 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 /**
  * Get user campaign status
  */
-function user_td_campaign_status( $csnd_status )
+function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL )
 {
+	global $current_User, $admin_url;
+
 	switch( $csnd_status )
 	{
 		case 'ready_to_send':
@@ -7406,7 +7379,14 @@ function user_td_campaign_status( $csnd_status )
 			return T_('Sent');
 
 		case 'send_error':
-			return T_('Send error');
+			if( $current_User->check_perm( 'emails', 'view', true ) && ! empty( $csnd_emlog_ID ) )
+			{
+				return '<a href="'.get_dispctrl_url( 'email', 'tab=sent&amp;emlog_ID='.$csnd_emlog_ID ).'">'.T_('Send error').'</a>';
+			}
+			else
+			{
+				return T_('Send error');
+			}
 
 		case 'skipped':
 			return T_('Skipped');

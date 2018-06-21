@@ -618,7 +618,7 @@ class UserQuery extends FilterSQL
 			return;
 		}
 
-		$this->SELECT_add( ', csnd_status' );
+		$this->SELECT_add( ', csnd_status, csnd_emlog_ID' );
 		$this->FROM_add( 'INNER JOIN T_email__campaign_send ON csnd_user_ID = user_ID AND csnd_camp_ID = '.$DB->quote( $ecmp_ID ) );
 
 		// Get email log date and time:

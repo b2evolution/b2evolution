@@ -1487,7 +1487,7 @@ class Results extends Table
 			{
 				$r .= $this->params['footer_start'];
 				$r .= '<div class="form-inline">';
-				if( count( $this->checkbox_toggle_selectors ) > 1 )
+				if( is_array( $this->checkbox_toggle_selectors ) && count( $this->checkbox_toggle_selectors ) > 1 )
 				{
 					$r .= '<select class="form-control input-sm">';
 					foreach( $this->checkbox_toggle_selectors as $label => $selector )

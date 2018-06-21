@@ -72,6 +72,11 @@ if( $activated_User->ctry_ID > 0 )
 
 echo "\n";
 
+$initial_sess_ID = $UserSettings->get( 'initial_sess_ID', $activated_User->ID );
+if( ! empty( $initial_sess_ID ) )
+{	// Initial session ID:
+	echo T_('Session ID').': '.$initial_sess_ID.' - '.$admin_url.'?ctrl=stats&tab=hits&blog=0&sess_ID='.$initial_sess_ID."\n";
+}
 $initial_blog_ID = $UserSettings->get( 'initial_blog_ID', $activated_User->ID );
 if( !empty( $initial_blog_ID ) )
 {	// Hit info

@@ -546,6 +546,7 @@ $schema_queries = array(
 			PRIMARY KEY (enls_user_ID, enls_enlt_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
+	// When adding fields to this table do not forget to check EmailCampaign::duplicate() for fields that should not be duplicated!
 	'T_email__campaign' => array(
 		'Creating email campaigns table',
 		"CREATE TABLE T_email__campaign (
@@ -553,7 +554,7 @@ $schema_queries = array(
 			ecmp_date_ts              TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			ecmp_enlt_ID              INT UNSIGNED NOT NULL,
 			ecmp_name                 VARCHAR(255) NOT NULL,
-			ecmp_email_title          VARCHAR(255) NOT NULL,
+			ecmp_email_title          VARCHAR(255) NULL,
 			ecmp_email_defaultdest    VARCHAR(255) NULL,
 			ecmp_email_html           TEXT NULL,
 			ecmp_email_text           TEXT NULL,
@@ -664,7 +665,7 @@ $schema_queries = array(
 			slg_type      ENUM('info', 'warning', 'error', 'critical_error') COLLATE ascii_general_ci NOT NULL DEFAULT 'info',
 			slg_origin    ENUM('core', 'plugin') COLLATE ascii_general_ci,
 			slg_origin_ID INT UNSIGNED NULL,
-			slg_object    ENUM('comment', 'item', 'user', 'file') COLLATE ascii_general_ci,
+			slg_object    ENUM('comment', 'item', 'user', 'file', 'email_log') COLLATE ascii_general_ci,
 			slg_object_ID INT UNSIGNED NULL,
 			slg_message   VARCHAR(255) NOT NULL,
 			PRIMARY KEY   (slg_ID),

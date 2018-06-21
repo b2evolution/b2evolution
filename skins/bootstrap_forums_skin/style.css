@@ -344,6 +344,12 @@ ol.breadcrumb {
 .evo_comment_title a.permalink:hover {
   color: #23527c;
 }
+.evo_comment_title .label {
+  display: inline-block;
+  padding-top: .3em;
+  position: relative;
+  top: -1px;
+}
 .bCommentAvatar {
   border-radius: 50%;
   float: left;
@@ -1077,9 +1083,13 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
   float: none !important;
   display: inline;
 }
+.posts_panel_title_wrapper .cell2 .evo_status.badge {
+  top: 0;
+}
 .cell1,
 .cell2 {
   display: table-cell;
+  vertical-align: middle;
 }
 a.to_top {
   font-size: 14px !important;

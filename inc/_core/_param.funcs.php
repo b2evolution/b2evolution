@@ -2566,7 +2566,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		{
 			$errmsg = ($context == 'commenting')
 				? T_('Illegal content found (spam?)').'.'
-				: sprintf( T_('Illegal content found: blacklisted word &laquo;%s&raquo;.'), htmlspecialchars($block) );
+				: sprintf( T_('Illegal content found: blacklisted word "%s".'), htmlspecialchars($block) );
 		}
 
 		$Messages->add_to_group(	$errmsg, 'error', T_('Validation errors:') );

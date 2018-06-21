@@ -36,7 +36,7 @@ $Item = $params['Item'];
 $recipient_User = & $params['recipient_User'];
 
 $author_name = empty( $params['author_ID'] ) ? $params['author_name'] : get_user_colored_login_link( $params['author_name'], array( 'use_style' => true, 'protocol' => 'http:', 'login_text' => 'name' ) );
-$author_type = empty( $params['author_ID'] ) ? ' <span class="bUser-anonymous-tag">['.T_('Visitor').']</span>' : ' <span class="bUser-member-tag">['.T_('Member').']</span>';
+$author_type = empty( $params['author_ID'] ) ? ' <span class="label label-warning">'.T_('Visitor').'</span>' : ' <span class="label label-info">'.T_('Member').'</span>';
 if( $params['notify_type'] == 'meta_comment' )
 { // Meta comment
 	$info_text = T_( '%s posted a new meta comment on %s in %s.' );
@@ -117,7 +117,7 @@ else
 		$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_('Status').': <b>'.$Comment->get( 't_status' )."</b></p>\n";
 
 		$notify_message .= '<div class="email_ugc"'.emailskin_style( 'div.email_ugc' ).'>'."\n";
-		$notify_message .= '<p'.emailskin_style( '.p' ).'><i'.emailskin_style( '.note' ).'>'.T_( 'This is a short form moderation message. To make these emails more useful for quick moderation, ask the administrator to send you long form moderation messages instead.' ).'</i></p>';
+		$notify_message .= '<p'.emailskin_style( '.p' ).'><i'.emailskin_style( '.note' ).'>'.T_( 'This is a short form notification. To make these emails more useful, ask the administrator to send you long form notifications instead.' ).'</i></p>';
 		$notify_message .= "</div>\n";
 	}
 }
@@ -128,7 +128,7 @@ echo $notify_message;
 
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
 
-echo get_link_tag( $Comment->get_permanent_url( '&', '#comments' ), T_( 'Read full comment' ), 'div.buttons a+a.btn-default' )."\n";
+echo get_link_tag( $Comment->get_permanent_url( '&', '#comments' ), T_( 'Read full comment' ), 'div.buttons a+a.btn-primary' )."\n";
 
 if( $params['notify_type'] == 'moderator' )
 { // moderation email

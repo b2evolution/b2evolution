@@ -757,6 +757,7 @@ function url_absolute( $url, $base = NULL )
  */
 function make_rel_links_abs( $s, $host = NULL )
 {
+	load_class( '_core/model/_urlhelper.class.php', 'UrlHelper' );
 	$url_helper = new UrlHelper( $host );
 	$s = preg_replace_callback( '~(<[^>]+?)\b((?:src|href)\s*=\s*)(["\'])?([^\\3]+?)(\\3)~i', array( $url_helper, 'callback' ), $s );
 	return $s;
@@ -850,16 +851,8 @@ function idna_encode( $url )
 
 	$url_utf8 = convert_charset( $url, 'utf-8', $evo_charset );
 
-	if( version_compare(PHP_VERSION, '5', '>=') )
-	{
-		load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
-		$IDNA = new idna_convert();
-	}
-	else
-	{
-		load_class('_ext/idna/_idna_convert.class.php4', 'Net_IDNA_php4' );
-		$IDNA = new Net_IDNA_php4();
-	}
+	load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
+	$IDNA = new idna_convert();
 
 	//echo '['.$url_utf8.'] ';
 	$url = $IDNA->encode( $url_utf8 );
@@ -881,16 +874,8 @@ function idna_encode( $url )
  */
 function idna_decode( $url )
 {
-	if( version_compare(PHP_VERSION, '5', '>=') )
-	{
-		load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
-		$IDNA = new idna_convert();
-	}
-	else
-	{
-		load_class('_ext/idna/_idna_convert.class.php4', 'Net_IDNA_php4' );
-		$IDNA = new Net_IDNA_php4();
-	}
+	load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
+	$IDNA = new idna_convert();
 	return $IDNA->decode($url);
 }
 

@@ -671,7 +671,7 @@ function get_icon_info( $name )
 		case 'manual': return array(
 			'rollover' => true,
 			'alt'  => T_('Help'),
-			'legend' => T_('Online Manual'),
+			'legend' => T_('Online manual'),
 			'size' => array( 16, 15 ),
 			'xy' => array( 128, 96 ),
 			'glyph' => 'book',

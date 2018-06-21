@@ -28,7 +28,7 @@ function score_text( $text, $search_term, $words = array(), $quoted_terms = arra
 	$score = 0.0;
 	$scores_map = array();
 
-	if( !empty( $search_term ) && strpos( $text, $search_term ) !== false )
+	if( !empty( $search_term ) && utf8_stripos( $text, $search_term ) !== false )
 	{
 		// the max score what it may received in this methods
 		$score = ( ( count( $words ) * 4 ) + ( count( $quoted_terms ) * 6 ) ) * $score_weight;
@@ -324,7 +324,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
 		$scores_map['tags'] = score_tags( $row->tag_name, $search_term, /* multiplier: */ 4 );
 		$scores_map['excerpt'] = score_text( $row->post_excerpt, $search_term, $keywords, $quoted_parts );
 		$scores_map['titletag'] = score_text( $row->post_titletag, $search_term, $keywords, $quoted_parts, 4 );
-		if( !empty( $search_term ) && !empty( $row->creator_login ) && strpos( $row->creator_login, $search_term ) !== false )
+		if( !empty( $search_term ) && !empty( $row->creator_login ) && utf8_stripos( $row->creator_login, $search_term ) !== false )
 		{
 			$scores_map['creator_login'] = 5;
 		}
@@ -393,7 +393,7 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts )
 
 		$scores_map['item_title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts );
 		$scores_map['content'] = score_text( $row->comment_content, $search_term, $keywords, $quoted_parts );
-		if( !empty( $row->author ) && !empty( $search_term ) && strpos( $row->author, $search_term ) !== false )
+		if( !empty( $row->author ) && !empty( $search_term ) && utf8_stripos( $row->author, $search_term ) !== false )
 		{
 			$scores_map['author_name'] = 5;
 		}
@@ -908,6 +908,10 @@ function search_result_block( $params = array() )
 	// Memorize best scores:
 	$max_percentage = isset( $search_result[0]['max_percentage'] ) ? $search_result[0]['max_percentage'] : 100;
 	$max_score = isset( $search_result[0]['max_score'] ) ? $search_result[0]['max_score'] : $search_result[0]['score'];
+	if( $max_score == 0 )
+	{	// This must not happens, however use 1 to avoid error of division by zero:
+		$max_score = 1;
+	}
 
 	// Display results for current page:
 	for( $index = $from; $index < $to; $index++ )

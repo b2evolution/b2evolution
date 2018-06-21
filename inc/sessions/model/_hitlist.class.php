@@ -98,12 +98,13 @@ class Hitlist
 	 * NOTE: do not call this directly, but only in conjuction with auto_prune_stats_mode.
 	 *
 	 * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
+	 * @param boolean TRUE to limit a pruning by one execution per day
 	 * @return array array(
 	 *   'result'  => 'error' | 'ok'
 	 *   'message' => Message of the error or result data
 	 * )
 	 */
-	static function dbprune( $output_message = true )
+	static function dbprune( $output_message = true, $day_limit = true )
 	{
 		/**
 		 * @var DB
@@ -112,23 +113,32 @@ class Hitlist
 		global $Debuglog, $Settings, $localtimenow;
 		global $Plugins, $Messages;
 
+		$return_message = '';
+
 		// Prune when $localtime is a NEW day (which will be the 1st request after midnight):
 		$last_prune = $Settings->get( 'auto_prune_stats_done' );
 		if( $last_prune >= date( 'Y-m-d', $localtimenow ) && $last_prune <= date( 'Y-m-d', $localtimenow + 86400 ) )
 		{ // Already pruned today (and not more than one day in the future -- which typically never happens)
-			$message = T_('Pruning has already been done today');
+			$error_message = Hitlist::log_pruning( T_('Pruning has already been done today'), $output_message );
 			if( $output_message )
 			{
-				$Messages->add( $message, 'error' );
+				$Messages->add( $error_message, 'error' );
 			}
-			return array(
-					'result'  => 'error',
-					'message' => $message
-				);
+			if( $day_limit )
+			{	// Limit a pruning by one execution per day:
+				return array(
+						'result'  => 'error',
+						'message' => $error_message
+					);
+			}
+			else
+			{	// Don't limit by day but display a warning:
+				$return_message .= Hitlist::log_pruning( '<span class="text-danger">'.T_('WARNING').': '.$error_message.'</span>', $output_message );
+			}
 		}
 
 		// DO NOT TRANSLATE! (This is sysadmin level info -- we assume they can read English)
-		$return_message = Hitlist::log_pruning( 'STATUS:', $output_message );
+		$return_message .= Hitlist::log_pruning( 'STATUS:', $output_message );
 
 		// Get tables info:
 		$tables_info = $DB->get_results( 'SHOW TABLE STATUS WHERE Name IN ( '.$DB->quote( array( 'T_hitlog', 'T_sessions', 'T_basedomains' ) ).' )' );

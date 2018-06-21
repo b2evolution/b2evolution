@@ -330,14 +330,8 @@ function format_to_output( $content, $format = 'htmlbody' )
 		case 'htmlspecialchars':
 		case 'formvalue':
 			// Replace special chars to &amp;, &quot;, &#039;|&apos;, &lt; and &gt; :
-			if( version_compare( phpversion(), '5.4', '>=' ) )
-			{	// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
-				$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
-			}
-			else
-			{	// Handles & " ' < > to &amp; &quot; &#039; &lt; &gt;
-				$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );
-			}
+			// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
+			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
 			break;
 
 		case 'xml':
@@ -365,14 +359,8 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 		case 'syslog':
 			// Replace special chars to &amp;, &quot;, &#039;|&apos;, &lt; and &gt; :
-			if( version_compare( phpversion(), '5.4', '>=' ) )
-			{	// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
-				$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
-			}
-			else
-			{	// Handles & " ' < > to &amp; &quot; &#039; &lt; &gt;
-				$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );
-			}
+			// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
+			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
 			$content = preg_replace( "/\[\[(.+?)]]/is", "<code>$1</code>", $content ); // Replaces [[...]] into <code>...</code>
 			break;
 
@@ -6835,8 +6823,8 @@ function get_samedomain_htsrv_url( $secure = false )
 		debug_die( 'Invalid hosts!' );
 	}
 
-	$req_domain = $req_url_parts['host'];
-	$htsrv_domain = $hsrv_url_parts['host'];
+	$req_domain = rtrim( $req_url_parts['host'].( isset( $req_url_parts['path'] ) ? $req_url_parts['path'] : '' ), '/' );
+	$htsrv_domain = rtrim( $hsrv_url_parts['host'].( isset( $hsrv_url_parts['path'] ) ? $hsrv_url_parts['path'] : '' ), '/' );
 
 	// Replace domain + path of htsrv URL with current request:
 	$samedomain_htsrv_url = substr_replace( $req_htsrv_url, $req_domain, strpos( $req_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
@@ -7206,7 +7194,7 @@ function is_ajax_content( $template_name = '' )
  *
  * @param string Message text
  * @param string Log type: 'info', 'warning', 'error', 'critical_error'
- * @param string Object type: 'comment', 'item', 'user', 'file' or leave default NULL if none of them
+ * @param string Object type: 'comment', 'item', 'user', 'file', 'email_log' or leave default NULL if none of them
  * @param integer Object ID
  * @param string Origin type: 'core', 'plugin'
  * @param integer Origin ID

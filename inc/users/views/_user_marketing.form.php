@@ -133,7 +133,7 @@ $Results->display();
 
 // Display email campaigns
 $campaign_SQL = new SQL( 'Get email campaigns for the edited Uer #'.$edited_User->ID );
-$campaign_SQL->SELECT( 'ecmp_ID, ecmp_name, csnd_last_sent_ts, csnd_last_open_ts, csnd_last_click_ts, csnd_cta1, csnd_cta2, csnd_cta3, csnd_like, csnd_status, enls_subscribed' );
+$campaign_SQL->SELECT( 'ecmp_ID, ecmp_name, csnd_last_sent_ts, csnd_last_open_ts, csnd_last_click_ts, csnd_cta1, csnd_cta2, csnd_cta3, csnd_like, csnd_status, enls_subscribed, csnd_emlog_ID' );
 $campaign_SQL->FROM( 'T_email__campaign' );
 $campaign_SQL->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = '.$edited_User->ID.' AND enls_enlt_ID = ecmp_enlt_ID' );
 $campaign_SQL->FROM_add( 'INNER JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID' );
@@ -171,7 +171,7 @@ $campaign_Results->cols[] = array(
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center nowrap',
 		'order' => 'csnd_status',
-		'td' => '%user_td_campaign_status( #csnd_status# )%'
+		'td' => '%user_td_campaign_status( #csnd_status#, #csnd_emlog_ID# )%'
 	);
 
 $campaign_Results->cols[] = array(
