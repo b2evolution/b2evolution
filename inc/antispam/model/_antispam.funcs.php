@@ -528,7 +528,7 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 		echo '</td>';
 		echo '<td>'.excerpt( $Comment->get_content( 'raw_text' ), 71 ).'</td>';
 		// no permission check, because affected_comments contains current user editable comments
-		echo '<td class="shrinkwrap">'.action_icon( T_('Edit...'), 'edit', '?ctrl=comments&amp;action=edit&amp;comment_ID='.$Comment->ID ).'</td>';
+		echo '<td class="shrinkwrap">'.action_icon( /* TRANS: Verb */ T_('Edit...'), 'edit', '?ctrl=comments&amp;action=edit&amp;comment_ID='.$Comment->ID ).'</td>';
 		echo '</tr>';
 		$count++;
 	}
@@ -1258,5 +1258,158 @@ function antispam_increase_counter( $counter_name )
 			}
 		}
 	}
+}
+
+
+/**
+ * Get WHOIS information
+ *
+ * @param string Domain or IP address to query for WHOIS
+ * @param integer Window height to limit the result display
+ * @return string WHOIS query result
+ */
+function antispam_get_whois( $query = NULL, $window_height = NULL )
+{
+	global $current_User, $admin_url;
+
+	load_class('_ext/phpwhois/whois.main.php', 'whois' );
+
+	$whois = new Whois();
+
+	// Set to true if you want to allow proxy requests
+	$allowproxy = false;
+
+	// get faster but less acurate results
+	$whois->deep_whois = empty( $_GET['fast'] );
+
+	// To use special whois servers (see README)
+	//$whois->UseServer( 'uk', 'whois.nic.uk:1043?{hname} {ip} {query}' );
+	//$whois->UseServer( 'au', 'whois-check.ausregistry.net.au' );
+
+	// Comment the following line to disable support for non ICANN tld's
+	$whois->non_icann = true;
+
+	$result = $whois->Lookup( $query );
+
+	if( empty( $window_height ) )
+	{
+		$winfo = '<pre>';
+	}
+	else
+	{
+		$winfo = '<pre style="height: '.( $window_height - 200 ).'px; overflow: auto;">';
+	}
+
+	if( ! empty( $result['rawdata'] ) )
+	{
+		for( $i = 0; $i < count( $result['rawdata'] ); $i++ )
+		{
+			// Highlight lines starting with orgname: or org-name: (case insensitive)
+			if( preg_match( '/^(orgname:|org-name:|descr:)/i', $result['rawdata'][$i] ) )
+			{
+				$result['rawdata'][$i] = '<span style="font-weight: bold; background-color: yellow;">'.$result['rawdata'][$i].'</span>';
+			}
+
+			// Make URLs and emails clickable
+			if( preg_match_all( '#[-a-zA-Z0-9@:%_\+.~\#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~\#?&//=;]*)?#si', $result['rawdata'][$i], $matches ) )
+			{
+				foreach( $matches as $match )
+				{
+					if( filter_var( $match[0], FILTER_VALIDATE_EMAIL ) )
+					{ // check if valid email
+						$href_string = 'mailto:'.$match[0];
+						$result['rawdata'][$i] = str_replace( $match[0], '<a href="'.$href_string.'">'.$match[0].'</a>', $result['rawdata'][$i] );
+					}
+					else
+					{ // check if valid URL
+						$href_string = ( ! preg_match( '#^(ht|f)tps?://#', $match[0] ) ) // check if protocol not present
+								? 'http://' . $match[0] // temporarily add one
+								: $match[0]; // use current
+						if( filter_var( $href_string, FILTER_VALIDATE_URL ) )
+						{
+							$result['rawdata'][$i] = str_replace( $match[0], '<a href="'.$href_string.'" target="_blank">'.$match[0].'</a>', $result['rawdata'][$i] );
+						}
+					}
+				}
+			}
+
+			// Make IP ranges clickable
+			if( $current_User->check_perm( 'spamblacklist', 'view' ) &&
+					preg_match_all( '#(?<=\:)(\s*)(\b(?:(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\.){3}(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\s?-\s?(?:(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\.){3}(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\b)#', $result['rawdata'][$i], $matches ) )
+			{
+				$aipr_status_titles = aipr_status_titles();
+				// Try to get IP range from DB:
+				$IPRangeCache = & get_IPRangeCache();
+				if( $IPRange = & $IPRangeCache->get_by_ip( $query ) )
+				{	// Get status of IP range if it exists in DB:
+					$iprange_status = $IPRange->get( 'status' );
+				}
+				else
+				{	// Use "Unknown" status for new IP range:
+					$iprange_status = '';
+				}
+
+				$ip_range_text = $matches[2][0];
+				$whois_IPs = explode( '-', $ip_range_text );
+				$whois_IP_start = isset( $whois_IPs[0] ) ? trim( $whois_IPs[0] ) : '';
+				$whois_IP_end = isset( $whois_IPs[1] ) ? trim( $whois_IPs[1] ) : '';
+				if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+				{	// If current user has a permission to edit IP ranges:
+					if( $IPRange )
+					{	// If IP range is found in DB:
+						$db_IP_start = int2ip( $IPRange->get( 'IPv4start' ) );
+						$db_IP_end = int2ip( $IPRange->get( 'IPv4end' ) );
+						// Display IP range with status from DB to edit it:
+						$ip_range_text = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;'
+							.'action=iprange_edit&amp;iprange_ID='.$IPRange->ID.'">'
+								.$db_IP_start.' - '.$db_IP_end
+							.'</a>';
+						if( $db_IP_start != $whois_IP_start || $db_IP_end != $whois_IP_end )
+						{	// If IP range of "whois" tool is NOT same as IP range from DB,
+							// Display a link to create new IP range from suggested IPs by "whois" tool:
+							$whois_ip_range_create_link = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;'
+								.'action=iprange_new&amp;ip_start='.$whois_IP_start.'&amp;ip_end='.$whois_IP_end.'">'
+									.$whois_IP_start.' - '.$whois_IP_end
+								.'</a>';
+							if( $IPRange->get( 'IPv4start' ) <= ip2int( $whois_IP_start ) && $IPRange->get( 'IPv4end' ) >= ip2int( $whois_IP_end ) )
+							{	// If IP range of "whois" tool is PART of IP range from DB then
+								// Display "whois" IP range link with "Unknown" status BEFORE DB IP range:
+								$ip_range_text = $whois_ip_range_create_link
+									.' <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( '' ).'</div>'.$aipr_status_titles['']
+									.' included in '.$ip_range_text;
+							}
+							else
+							{	// If IP range of "whois" tool is INERTSECTING with IP range from DB then
+								// Display ONLY "whois" IP range link with "Unknown" status,
+								// (don't display DB IP range because it will be suggested to edit on creating new intersecting IP range):
+								$ip_range_text = $whois_ip_range_create_link;
+								$iprange_status = '';
+							}
+						}
+					}
+					else
+					{	// Display a link to create new IP range if it doesn't exist in DB yet:
+						$ip_range_text = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;'
+							.'action=iprange_new&amp;ip_start='.$whois_IP_start.'&amp;ip_end='.$whois_IP_end.'">'
+								.$ip_range_text
+							.'</a>';
+					}
+				}
+				// Display status of IP range:
+				$ip_range_text .= ' <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>'.$aipr_status_titles[ $iprange_status ];
+
+				// Replace static IP range of "whois" tool with links and ip range status to view/edit/create IP range in back-office:
+				$result['rawdata'][$i] = str_replace( $matches[2][0], $ip_range_text, $result['rawdata'][$i] );
+			}
+		}
+		$winfo .= format_to_output( implode( $result['rawdata'], "\n" ) );
+	}
+	else
+	{
+		$winfo = format_to_output( implode( $whois->Query['errstr'], "\n" ) )."<br></br>";
+	}
+	$winfo .= '</pre>';
+
+	return $winfo;
 }
 ?>

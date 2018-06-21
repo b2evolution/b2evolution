@@ -64,6 +64,8 @@ class touch_Skin extends Skin
 				'404_page'               => array( NT_('404 Page'), 140 ),
 				'login_required'         => array( NT_('Login Required'), 150 ),
 				'access_denied'          => array( NT_('Access Denied'), 160 ),
+				'help'                   => array( NT_('Help'), 170 ),
+				'register'               => array( NT_('Register'), 180 ),
 			);
 	}
 

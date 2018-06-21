@@ -23,7 +23,7 @@ global $Comment;
  */
 global $CommentList;
 
-global $AdminUI, $UserSettings;
+global $AdminUI, $UserSettings, $current_User;
 
 // If rediret_to was not set, create new redirect
 $redirect_to = param( 'redirect_to', 'url', regenerate_url( '', 'filter=restore', '', '&' ) );
@@ -41,9 +41,9 @@ $comments_number = param( 'comments_number', 'integer', 0 );
 // Check if current comments list displays meta comments:
 $is_meta_comments_list = ( isset( $CommentList->filters['types'] ) && in_array( 'meta', $CommentList->filters['types'] ) );
 
-if( $item_id > 0 && ! $is_meta_comments_list && $comments_number > 0 )
+if( ! $is_meta_comments_list && $CommentList->total_rows > 0 )
 {	// Allow to select ONLY normal comments(EXCLUDE meta comments) for action on item view page:
-	global $blog, $admin_url, $current_User;
+	global $blog, $admin_url;
 
 	$Form = new Form( $admin_url );
 
@@ -51,6 +51,7 @@ if( $item_id > 0 && ! $is_meta_comments_list && $comments_number > 0 )
 	$Form->hidden( 'ctrl', 'items' );
 	$Form->hidden( 'blog', $blog );
 	$Form->hidden( 'p', $item_id );
+	$Form->add_crumb( 'comments' );
 }
 
 if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
@@ -85,6 +86,10 @@ if( $threaded_comments_mode )
 	}
 }
 
+// Flag vars to know the comments list has at least one comment to recycle or delete in order to display multiple buttons:
+$comments_can_be_recycled = false;
+$comments_can_be_deleted = false;
+
 while( $Comment = & $CommentList->get_next() )
 { // Loop through comments:
 	if( ( $show_comments == 'draft' ) && ( $Comment->get( 'status' ) != 'draft' ) )
@@ -114,6 +119,15 @@ while( $Comment = & $CommentList->get_next() )
 				'display_meta_title' => $display_meta_title,
 			) );
 	}
+
+	if( ! $comments_can_be_recycled && $Comment->get( 'status' ) != 'trash' && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment ) )
+	{	// Set flag to know at least one comment from the current list can be recycled:
+		$comments_can_be_recycled = true;
+	}
+	if( ! $comments_can_be_deleted && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment ) )
+	{	// Set flag to know at least one comment from the current list can be deleted:
+		$comments_can_be_deleted = true;
+	}
 } //end of the loop, don't delete
 
 if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
@@ -122,7 +136,7 @@ if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
 	echo_comment_pages( $item_id, $currentpage, $comments_number, $comment_params );
 }
 
-if( $item_id > 0 && ! $is_meta_comments_list && $comments_number > 0 )
+if( ! $is_meta_comments_list && $CommentList->total_rows > 0 )
 {	// Allow to select ONLY normal comments(EXCLUDE meta comments) for action on item view page:
 	echo T_('With checked comments').': ';
 
@@ -134,10 +148,42 @@ if( $item_id > 0 && ! $is_meta_comments_list && $comments_number > 0 )
 	echo_comment_status_buttons( $Form, NULL, $item_status, 'set_visibility' );
 	echo_status_dropdown_button_js( 'comment' );
 
-	if( $current_User->check_perm( 'blog_post_statuses', 'edit', true, $blog ) )
+	if( $item_id > 0 && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $blog ) )
 	{	// Display a button to create a post from selected comments:
 		echo ' '.T_('or').' ';
 		$Form->button( array( 'submit', 'actionArray[create_comments_post]', T_('Create new Post'), 'btn-warning' ) );
+	}
+
+	if( $comments_can_be_recycled || $comments_can_be_deleted )
+	{	// Display buttons to recycle or delete the selected comments:
+		echo ' '.T_('or').' ';
+		if( $comments_can_be_recycled && $comments_can_be_deleted )
+		{	// Group recycle and delete buttons:
+			echo '<div class="btn-group">';
+		}
+		if( $comments_can_be_recycled )
+		{	// Button to recycle the comments:
+			$Form->button_input( array(
+					'tag'   => 'button',
+					'name'  => 'actionArray[recycle_comments]',
+					'value' => get_icon( 'recycle' ).' '.T_('Recycle').'!',
+					'class' => 'btn-danger'
+				) );
+		}
+		if( $comments_can_be_deleted )
+		{	// Button to delete the comments:
+			$Form->button_input( array(
+					'tag'     => 'button',
+					'name'    => 'actionArray[delete_comments]',
+					'value'   => get_icon( 'delete' ).' '.T_('Delete').'!',
+					'class'   => 'btn-danger',
+					'onclick' => 'return confirm( \''.TS_('You are about to delete the selected comments!\\nThis cannot be undone!').'\' )',
+				) );
+		}
+		if( $comments_can_be_recycled && $comments_can_be_deleted )
+		{	// End of group recycle and delete buttons:
+			echo '</div>';
+		}
 	}
 
 	$Form->end_form();

@@ -40,8 +40,8 @@ $count_SQL->FROM( 'T_email__address' );
 if( !empty( $email ) )
 {	// Filter by email
 	$email = utf8_strtolower( $email );
-	$SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( $email ) );
-	$count_SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( $email ) );
+	$SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( '%'.$email.'%' ) );
+	$count_SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( '%'.$email.'%' ) );
 }
 if( !empty( $statuses ) )
 {	// Filter by statuses

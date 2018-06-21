@@ -13,22 +13,38 @@ if( empty( $params ) )
 global $UserSettings, $Settings;
 
 param( 'type', 'string', true );
-param( 'user_ID', 'integer', true );
+param( 'comment_ID', 'integer', NULL );
+param( 'user_ID', 'integer', ( $comment_ID === NULL ) );
 param( 'key', 'string', true );
 param( 'coll_ID', 'integer', 0 );
 param( 'post_ID', 'integer', 0 );
 param( 'confirmed', 'integer', 0 );
 param( 'action', 'string', NULL );
 
-$UserCache = & get_UserCache();
-$edited_User = $UserCache->get_by_ID( $user_ID, false, false );
+$unsub_Comment = false;
+if( $comment_ID !== NULL )
+{	// This is a case to unsubscribe anonymous user from comment:
+	$CommentCache = & get_CommentCache();
+	$unsub_Comment = & $CommentCache->get_by_ID( $comment_ID, false, false );
+	if( $unsub_Comment->get( 'author_email' ) == '' || $unsub_Comment->get( 'author_user_ID' ) !== NULL )
+	{	// Don't allow to do unsubcription action if the requested comment is not from anonymous user:
+		$unsub_Comment = false;
+	}
+}
 
-if( empty( $edited_User ) )
-{	// User not found:
+if( ! $unsub_Comment )
+{	// This is a case to unsubscribe a registered user:
+	$UserCache = & get_UserCache();
+	$edited_User = $UserCache->get_by_ID( $user_ID, false, false );
+}
+
+if( empty( $edited_User ) && empty( $unsub_Comment ) )
+{	// Registered or anonymous user is not found:
 	$error_msg = T_( 'The user you are trying to unsubscribe does not seem to exist. You may already have deleted your account.' );
 }
-elseif( $key != md5( $user_ID.$edited_User->get( 'unsubscribe_key' ) ) ) 	// Security check
-{
+elseif( ( ! $unsub_Comment && $key != md5( $user_ID.$edited_User->get( 'unsubscribe_key' ) ) ) || // Registered user
+        ( $unsub_Comment && $key != md5( $comment_ID.$unsub_Comment->get( 'secret' ) ) ) ) // Anonymous user
+{	// Security check is failed:
 	$error_msg = T_('Invalid unsubscribe link!');
 }
 elseif( $confirmed )
@@ -100,31 +116,42 @@ elseif( $confirmed )
 					break;
 
 				case 'post':
-					// unsubscribe from a specific post
+					// unsubscribe from a specific post:
 					if( $post_ID == 0 )
 					{
 						$error_msg = T_('Invalid unsubscribe link!');
 					}
 					else
 					{
-						$ItemCache = & get_ItemCache();
-						$BlogCache = & get_BlogCache();
-						$Item = $ItemCache->get_by_ID( $post_ID );
-						$blog_ID = $Item->get_blog_ID();
-						$Blog = $BlogCache->get_by_ID( $blog_ID );
-
-						if( $Blog->get( 'advanced_perms' )
-								&& $Blog->get_setting( 'allow_item_subscriptions' )
-								&& $Blog->get_setting( 'opt_out_item_subscription' )
-								&& $edited_User->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
-						{
-							$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
-									VALUES ( '.$post_ID.', '.$user_ID.', 0 )' );
+						if( $unsub_Comment )
+						{	// Anonymous user form Comment:
+							$DB->query( 'UPDATE T_comments
+								  SET comment_anon_notify = 0
+								WHERE comment_item_ID = '.$unsub_Comment->get( 'item_ID' ).'
+								  AND comment_author_user_ID IS NULL
+								  AND comment_author_email = '.$DB->quote( $unsub_Comment->get( 'author_email' ) ) );
 						}
 						else
-						{
-							$DB->query( 'DELETE FROM T_items__subscriptions
-									WHERE isub_user_ID = '.$user_ID.' AND isub_item_ID = '.$post_ID );
+						{	// Registered User:
+							$ItemCache = & get_ItemCache();
+							$BlogCache = & get_BlogCache();
+							$Item = $ItemCache->get_by_ID( $post_ID );
+							$blog_ID = $Item->get_blog_ID();
+							$Blog = $BlogCache->get_by_ID( $blog_ID );
+
+							if( $Blog->get( 'advanced_perms' )
+									&& $Blog->get_setting( 'allow_item_subscriptions' )
+									&& $Blog->get_setting( 'opt_out_item_subscription' )
+									&& $edited_User->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
+							{
+								$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
+										VALUES ( '.$post_ID.', '.$user_ID.', 0 )' );
+							}
+							else
+							{
+								$DB->query( 'DELETE FROM T_items__subscriptions
+										WHERE isub_user_ID = '.$user_ID.' AND isub_item_ID = '.$post_ID );
+							}
 						}
 					}
 					break;
@@ -175,6 +202,12 @@ elseif( $confirmed )
 				case 'post_moderator':
 					// unsubscribe from new post moderation notifications:
 					$UserSettings->set( 'notify_post_moderation', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'post_assignment':
+					// unsubscribe from new post moderation notifications:
+					$UserSettings->set( 'notify_post_assignment', '0', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
@@ -292,6 +325,18 @@ elseif( $confirmed )
 					$UserSettings->dbupdate();
 					break;
 
+				case 'comment_mentioned':
+					// unsubscribe from new comment notifications when user is mentioned:
+					$UserSettings->set( 'notify_comment_mentioned', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'post_mentioned':
+					// unsubscribe from new post notifications when user is mentioned:
+					$UserSettings->set( 'notify_post_mentioned', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
 				default:
 					// DEFENSIVE programming:
 					$error_msg = 'Unhandled unsubscribe type.';
@@ -314,10 +359,10 @@ elseif( $confirmed )
 			{
 				case 'coll_comment':
 				case 'coll_post':
-					// unsubscribe from blog
+					// resubscribe from blog
 					if( $coll_ID == 0 )
 					{
-						$error_msg = T_('Invalid unsubscribe link!');
+						$error_msg = T_('Invalid resubscribe link!');
 					}
 					else
 					{
@@ -368,81 +413,98 @@ elseif( $confirmed )
 					break;
 
 				case 'post':
-					// unsubscribe from a specific post
+					// resubscribe from a specific post:
 					if( $post_ID == 0 )
 					{
-						$error_msg = T_('Invalid unsubscribe link!');
+						$error_msg = T_('Invalid resubscribe link!');
 					}
 					else
 					{
-						$ItemCache = & get_ItemCache();
-						$BlogCache = & get_BlogCache();
-						$Item = $ItemCache->get_by_ID( $post_ID );
-						$blog_ID = $Item->get_blog_ID();
-						$Blog = $BlogCache->get_by_ID( $blog_ID );
-
-						if( $Blog->get( 'advanced_perms' )
-								&& $Blog->get_setting( 'allow_item_subscriptions' )
-								&& $Blog->get_setting( 'opt_out_item_subscription' )
-								&& $edited_User->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
-						{
-							$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
-									VALUES ( '.$post_ID.', '.$user_ID.', 1 )' );
+						if( $unsub_Comment )
+						{	// Anonymous user form Comment:
+							$DB->query( 'UPDATE T_comments
+								  SET comment_anon_notify = 1
+								WHERE comment_item_ID = '.$unsub_Comment->get( 'item_ID' ).'
+								  AND comment_author_user_ID IS NULL
+								  AND comment_author_email = '.$DB->quote( $unsub_Comment->get( 'author_email' ) ) );
 						}
 						else
-						{
-							$DB->query( 'INSERT INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
-									VALUES ( '.$post_ID.', '.$user_ID.', 1 )' );
+						{	// Registered User:
+							$ItemCache = & get_ItemCache();
+							$BlogCache = & get_BlogCache();
+							$Item = $ItemCache->get_by_ID( $post_ID );
+							$blog_ID = $Item->get_blog_ID();
+							$Blog = $BlogCache->get_by_ID( $blog_ID );
+
+							if( $Blog->get( 'advanced_perms' )
+									&& $Blog->get_setting( 'allow_item_subscriptions' )
+									&& $Blog->get_setting( 'opt_out_item_subscription' )
+									&& $edited_User->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
+							{
+								$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
+										VALUES ( '.$post_ID.', '.$user_ID.', 1 )' );
+							}
+							else
+							{
+								$DB->query( 'INSERT INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
+										VALUES ( '.$post_ID.', '.$user_ID.', 1 )' );
+							}
 						}
 					}
 					break;
 
 				case 'creator':
-					// unsubscribe from the user own posts
+					// resubscribe from the user own posts
 					$UserSettings->set( 'notify_published_comments', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'cmt_moderation_reminder':
-					// unsubscribe from comment moderation reminder notifications
+					// resubscribe from comment moderation reminder notifications
 					$UserSettings->set( 'send_cmt_moderation_reminder', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'comment_moderator':
-				case 'moderator': // Note: This was not chaned to 'comment_moderator' to make sure old emails unsubscribe link are also work
-					// unsubscribe from new comment may need moderation notifications:
+				case 'moderator': // Note: This was not chaned to 'comment_moderator' to make sure old emails subscribe link are also work
+					// resubscribe from new comment may need moderation notifications:
 					$UserSettings->set( 'notify_comment_moderation', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'comment_moderator_edit':
-					// unsubscribe from updated comment may need moderation notifications:
+					// resubscribe from updated comment may need moderation notifications:
 					$UserSettings->set( 'notify_edit_cmt_moderation', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'comment_moderator_spam':
-					// unsubscribe from spam comment may need moderation notifications:
+					// resubscribe from spam comment may need moderation notifications:
 					$UserSettings->set( 'notify_spam_cmt_moderation', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'pst_moderation_reminder':
-					// unsubscribe from post moderation reminder notifications
+					// resubscribe from post moderation reminder notifications
 					$UserSettings->set( 'send_pst_moderation_reminder', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'pst_stale_alert':
-					// unsubscribe from stale posts alert notifications:
+					// resubscribe from stale posts alert notifications:
 					$UserSettings->set( 'send_pst_stale_alert', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'post_moderator':
-					// unsubscribe from new post moderation notifications:
+					// resubscribe from new post moderation notifications:
 					$UserSettings->set( 'notify_post_moderation', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'post_assignment':
+					// resubscribe from post assignment notifications:
+					$UserSettings->set( 'notify_post_assignment', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
@@ -472,25 +534,25 @@ elseif( $confirmed )
 					break;
 
 				case 'unread_msg':
-					// unsubscribe from unread messages reminder
+					// resubscribe from unread messages reminder
 					$UserSettings->set( 'notify_unread_messages', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'new_msg':
-					// unsubscribe from new messages notification
+					// resubscribe from new messages notification
 					$UserSettings->set( 'notify_messages', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'account_activation':
-					// unsubscribe from account activation reminder
+					// resubscribe from account activation reminder
 					$UserSettings->set( 'send_activation_reminder', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'newsletter':
-					// unsubscribe from newsletter
+					// resubscribe from newsletter
 
 					// Use first newsletter by default for old unsubscribe url when we had only one static newsletter,
 					//    which was upgraded to Newsletter with ID = 1
@@ -503,62 +565,74 @@ elseif( $confirmed )
 					break;
 
 				case 'user_registration':
-					// unsubscribe from new user registration notifications
+					// resubscribe from new user registration notifications
 					$UserSettings->set( 'notify_new_user_registration', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'account_activated':
-					// unsubscribe from account activated notifications
+					// resubscribe from account activated notifications
 					$UserSettings->set( 'notify_activated_account', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'account_closed':
-					// unsubscribe from account closed notifications
+					// resubscribe from account closed notifications
 					$UserSettings->set( 'notify_closed_account', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'account_reported':
-					// unsubscribe from account reported notifications
+					// resubscribe from account reported notifications
 					$UserSettings->set( 'notify_reported_account', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'account_changed':
-					// unsubscribe from account changed notifications
+					// resubscribe from account changed notifications
 					$UserSettings->set( 'notify_changed_account', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'msgform':
-					// turn off allow emails through b2evo message forms
+					// turn on allow emails through b2evo message forms
 					$UserSettings->set( 'enable_email', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'cronjob_error':
-					// unsubscribe from cron job error notifications
+					// resubscribe from cron job error notifications
 					$UserSettings->set( 'notify_cronjob_error', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'automation_owner_notification':
-					// unsubscribe from automation step owner notifications:
+					// resubscribe from automation step owner notifications:
 					$UserSettings->set( 'notify_automation_owner', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				case 'meta_comment':
-					// unsubscribe from meta comment notifications
+					// resubscribe from meta comment notifications
 					$UserSettings->set( 'notify_meta_comments', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'comment_mentioned':
+					// resubscribe to new comment notifications when user is mentioned:
+					$UserSettings->set( 'notify_comment_mentioned', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'post_mentioned':
+					// resubscribe to new post notifications when user is mentioned:
+					$UserSettings->set( 'notify_post_mentioned', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
 				default:
 					// DEFENSIVE programming:
-					$error_msg = 'Unhandled unsubscribe type.';
+					$error_msg = 'Unhandled resubscribe type.';
 			}
 
 			if( ! isset( $error_msg ) )
@@ -658,6 +732,11 @@ switch( $type )
 		$type_str = $notification_prefix.': '.T_('a post is created and I have permissions to moderate it.');
 		break;
 
+	case 'post_assignment':
+		// unsubscribe from post assignment notifications:
+		$type_str = $notification_prefix.': '.T_('a post was assigned to me.');
+		break;
+
 	case 'post_moderator_edit':
 		// unsubscribe from updated post moderation notifications:
 		$type_str = $notification_prefix.': '.T_('a post is modified and I have permissions to moderate it.');
@@ -735,6 +814,16 @@ switch( $type )
 		$type_str = $notification_prefix.': '.T_('a meta comment is posted.');
 		break;
 
+	case 'comment_mentioned':
+		// unsubscribe from new comment notifications when user is mentioned:
+		$type_str = $notification_prefix.': '.T_('I have been mentioned on a comment.');
+		break;
+
+	case 'post_mentioned':
+		// unsubscribe from new comment notifications when user is mentioned:
+		$type_str = $notification_prefix.': '.T_('I have been mentioned on a post.');
+		break;
+
 	default:
 		// DEFENSIVE programming:
 		$type_str = T_('Unhandled unsubscribe type');
@@ -770,6 +859,7 @@ $unsubscribe_form_params = array(
 	'customstart'    => '<div class="custom_content">',
 	'customend'      => "</div>\n",
 	'note_format'    => ' <span class="help-inline">%s</span>',
+	'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 	// Additional params depending on field type:
 	// - checkbox
 	'inputclass_checkbox'    => '',
@@ -831,7 +921,14 @@ if( isset( $error_msg ) )
 else
 {
 	$Form->hidden( 'type', $type );
-	$Form->hidden( 'user_ID', $user_ID );
+	if( $unsub_Comment )
+	{	// Anonymous user from comment:
+		$Form->hidden( 'comment_ID', $unsub_Comment->ID );
+	}
+	else
+	{	// Registered user:
+		$Form->hidden( 'user_ID', $user_ID );
+	}
 	$Form->hidden( 'key', $key );
 	$Form->hidden( 'coll_ID', $coll_ID );
 	$Form->hidden( 'post_ID', $post_ID );
@@ -856,8 +953,15 @@ else
 		echo '</p>';
 	}
 
-	$avatar_tag = $edited_User->get_avatar_imgtag( 'crop-top-64x64', 'img-circle', '', true );
-	echo '<h2 class="user_title text-center">'.$avatar_tag.' '.$edited_User->get_colored_login( array( 'login_text' => 'name' ) ).'</h2>';
+	if( $unsub_Comment )
+	{	// Anonymous user from comment:
+		echo '<h2 class="user_title text-center">'.$unsub_Comment->get( 'author_email' ).'</h2>';
+	}
+	else
+	{	// Registered user:
+		$avatar_tag = $edited_User->get_avatar_imgtag( 'crop-top-64x64', 'img-circle', '', true );
+		echo '<h2 class="user_title text-center">'.$avatar_tag.' '.$edited_User->get_colored_login( array( 'login_text' => 'name' ) ).'</h2>';
+	}
 
 	if( isset( $unsubscribed ) )
 	{

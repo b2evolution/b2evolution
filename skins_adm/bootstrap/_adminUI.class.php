@@ -456,6 +456,7 @@ class AdminUI extends AdminUI_general
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="help-inline">%s</span>',
+					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
 					'fieldstart_checkbox'    => '<div class="form-group form-group-sm checkbox" $ID$>'."\n",
@@ -505,6 +506,7 @@ class AdminUI extends AdminUI_general
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="help-inline">%s</span>',
+					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
 					'inputclass_checkbox'    => '',
@@ -553,6 +555,7 @@ class AdminUI extends AdminUI_general
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="help-inline">%s</span>',
+					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
 					'inputclass_checkbox'    => '',
@@ -624,6 +627,7 @@ class AdminUI extends AdminUI_general
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="help-inline">%s</span>',
+					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
 					'inputclass_checkbox'    => '',
@@ -645,6 +649,21 @@ class AdminUI extends AdminUI_general
 					'radio_oneline_start'    => '<label class="radio-inline $radio_option_class$">',
 					'radio_oneline_end'      => "</label>\n",
 				);
+
+			case 'fields_table_form':
+				return array_merge( $this->get_template( 'Form' ), array(
+						'fieldset_begin' => '<div class="evo_fields_table $class$" id="fieldset_wrapper_$id$" $fieldset_attribs$>'."\n",
+						'fieldset_end'   => '</div>'."\n",
+						'fieldstart'     => '<div class="evo_fields_table__field" $ID$>'."\n",
+						'fieldend'       => "</div>\n\n",
+						'labelclass'     => 'evo_fields_table__label',
+						'labelstart'     => '',
+						'labelend'       => "\n",
+						'labelempty'     => '',
+						'inputstart'     => '<div class="evo_fields_table__input">',
+						'inputend'       => "</div>\n",
+					) );
+				break;
 
 			case 'file_browser':
 				return array(

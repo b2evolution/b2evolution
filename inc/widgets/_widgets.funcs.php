@@ -286,6 +286,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 				}
 				// User login widget
 				add_basic_widget( $wico_id, 'user_login', 'core', 10 );
+				add_basic_widget( $wico_id, 'user_greetings', 'core', 15 );
 			}
 			if( ( ! $initial_install || $blog_id != $blog_forums_ID ) && $kind != 'forum' )
 			{ // Don't install these Sidebar widgets for blog 'Forums'
@@ -487,8 +488,13 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'login_required', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['login_required']['wico_ID'];
-		add_basic_widget( $wico_id, 'content_block', 'core', 10, array( 'item_slug' => 'login-required-'.$blog_id ) );
-		add_basic_widget( $wico_id, 'user_login', 'core', 20, array( 'title' => T_( 'Log in to your account' ) ) );
+		add_basic_widget( $wico_id, 'content_block', 'core', 10, array( 'item_slug' => 'login-required' ) );
+		add_basic_widget( $wico_id, 'user_login', 'core', 20, array(
+				'title'               => T_( 'Log in to your account' ),
+				'login_button_class'  => 'btn btn-success btn-lg',
+				'register_link_class' => 'btn btn-primary btn-lg pull-right',
+			) );
+		
 	}
 
 
@@ -496,7 +502,27 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'access_denied', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['access_denied']['wico_ID'];
-		add_basic_widget( $wico_id, 'content_block', 'core', 10, array( 'item_slug' => 'access-denied-'.$blog_id ) );
+		add_basic_widget( $wico_id, 'content_block', 'core', 10, array( 'item_slug' => 'access-denied' ) );
+	}
+
+
+	/* Help */
+	if( array_key_exists( 'help', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['help']['wico_ID'];
+		add_basic_widget( $wico_id, 'content_block', 'core', 10, array(
+				'item_slug' => 'help-content',
+				'title'     => T_('Personal Data & Privacy'),
+			) );
+	}
+
+
+	/* Register */
+	if( array_key_exists( 'register', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['register']['wico_ID'];
+		add_basic_widget( $wico_id, 'user_register_standard', 'core', 10 );
+		add_basic_widget( $wico_id, 'content_block', 'core', 20, array( 'item_slug' => 'register-content' ) );
 	}
 
 
@@ -1098,13 +1124,13 @@ function display_widgets_action_buttons( & $Form )
 {
 	echo '<span class="btn-group">';
 	$Form->button( array(
-			'value' => get_icon( 'check_all' ).' '.T_('Check All'),
+			'value' => get_icon( 'check_all' ).' '.T_('Check all'),
 			'id'    => 'widget_button_check_all',
 			'tag'   => 'button',
 			'type'  => 'button'
 		) );
 	$Form->button( array(
-			'value' => get_icon( 'uncheck_all' ).' '.T_('Uncheck All'),
+			'value' => get_icon( 'uncheck_all' ).' '.T_('Uncheck all'),
 			'id'    => 'widget_button_uncheck_all',
 			'tag'   => 'button',
 			'type'  => 'button'

@@ -170,9 +170,12 @@ else
 	$Form->info_field( T_('Admin skin'), $value_admin_skin, array( 'note' => T_('The skin defines how the backoffice appears to you.') ) );
 	 */
 
-	// fp> TODO: a lot of things will not be displayed in view only mode. Do we want that?
-
-	$Form->info_field( T_('Results per page'), $UserSettings->get( 'results_per_page', $edited_User->ID ), array( 'note' => T_('Number of rows displayed in results tables.') ) );
+	$Form->info( T_('Action icon display'), $UserSettings->get( 'action_icon_threshold', $edited_User->ID ), T_('1:more icons ... 5:less icons') );
+	$Form->info( T_('Action word display'), $UserSettings->get( 'action_word_threshold', $edited_User->ID ), T_('1:more action words ... 5:less action words') );
+	$Form->info( T_('Display icon legend'), ( $UserSettings->get( 'display_icon_legend', $edited_User->ID ) ? T_('yes') : T_('no') ), T_('Display a legend at the bottom of every page including all action icons used on that page.') );
+	$Form->info( T_('Control form closing'), ( $UserSettings->get( 'control_form_abortions', $edited_User->ID ) ? T_('yes') : T_('no') ), T_('This will alert you if you fill in data into a form and try to leave the form before submitting the data.') );
+	$Form->info( T_('Focus on first field'), ( $UserSettings->get( 'focus_on_first_input', $edited_User->ID ) ? T_('yes') : T_('no') ), T_('The focus will automatically go to the first input text field.') );
+	$Form->info( T_('Results per page'), $UserSettings->get( 'results_per_page', $edited_User->ID ), T_('Number of rows displayed in results tables.') );
 }
 
 $Form->end_fieldset();

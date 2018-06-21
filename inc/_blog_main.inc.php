@@ -629,6 +629,10 @@ if( ( $disp == 'user' ) && isset( $user_ID ) && isset( $current_User ) && ( $use
 { // add or increment to user profile visit
 	add_user_profile_visit( $user_ID, $current_User->ID );
 }
+elseif( ( $disp == 'visits' ) && isset( $user_ID ) && isset( $current_User ) && ( $user_ID == $current_User->ID ) && ( $Settings->get( 'enable_visit_tracking') == 1 ) )
+{
+	reset_user_profile_view_ts( $user_ID );
+}
 
 
 if( $disp == 'terms' )

@@ -341,43 +341,61 @@ class DB
 		}
 
 		// Optional parameters (Allow overriding through $params):
-		if( isset($params['name']) ) $this->dbname = $params['name'];
-		if( isset($params['host']) ) $this->dbhost = $params['host'];
-		if( isset($params['show_errors']) ) $this->show_errors = $params['show_errors'];
-		if( isset($params['halt_on_error']) ) $this->halt_on_error = $params['halt_on_error'];
-		if( isset($params['table_options']) ) $this->table_options = $params['table_options'];
-		if( isset($params['use_transactions']) ) $this->use_transactions = $params['use_transactions'];
-		if( isset($params['debug_dump_rows']) ) $this->debug_dump_rows = $params['debug_dump_rows']; // Nb of rows to dump
-		if( isset($params['debug_explain_joins']) ) $this->debug_explain_joins = $params['debug_explain_joins'];
-		if( isset($params['debug_profile_queries']) ) $this->debug_profile_queries = $params['debug_profile_queries'];
-		if( isset($params['debug_dump_function_trace_for_queries']) ) $this->debug_dump_function_trace_for_queries = $params['debug_dump_function_trace_for_queries'];
-		if( isset($params['log_queries']) )
+		if( isset( $params['name'] ) ) $this->dbname = $params['name'];
+		if( isset( $params['host'] ) ) $this->dbhost = $params['host'];
+		if( isset( $params['show_errors'] ) ) $this->show_errors = $params['show_errors'];
+		if( isset( $params['halt_on_error'] ) ) $this->halt_on_error = $params['halt_on_error'];
+		if( isset( $params['table_options'] ) ) $this->table_options = $params['table_options'];
+		if( isset( $params['use_transactions'] ) ) $this->use_transactions = $params['use_transactions'];
+		if( isset( $params['debug_dump_rows'] ) ) $this->debug_dump_rows = $params['debug_dump_rows']; // Nb of rows to dump
+		if( isset( $params['debug_explain_joins'] ) ) $this->debug_explain_joins = $params['debug_explain_joins'];
+		if( isset( $params['debug_profile_queries'] ) ) $this->debug_profile_queries = $params['debug_profile_queries'];
+		if( isset( $params['debug_dump_function_trace_for_queries'] ) ) $this->debug_dump_function_trace_for_queries = $params['debug_dump_function_trace_for_queries'];
+		if( isset( $params['log_queries'] ) )
 		{
 			$this->log_queries = $debug && $params['log_queries'];
 		}
-		elseif( isset($debug) && ! isset($this->log_queries) )
+		elseif( isset( $debug ) && ! isset( $this->log_queries ) )
 		{ // $log_queries follows $debug and respects subclasses, which may define it:
-			$this->log_queries = (bool)$debug;
+			$this->log_queries = ( bool ) $debug;
 		}
 
-		if( ! extension_loaded('mysqli') )
+		if( ! extension_loaded( 'mysqli' ) )
 		{ // The mysql extension is not loaded, try to dynamically load it:
-			if( function_exists('dl') )
+			if( function_exists( 'dl' ) )
 			{
 				$mysql_ext_file = is_windows() ? 'php_mysqli.dll' : 'mysqli.so';
-				$php_errormsg = null;
-				$old_track_errors = @ini_set('track_errors', 1);
-				$old_html_errors = @ini_set('html_errors', 0);
+				if( version_compare( PHP_VERSION, '7.2', '>=' ) )
+				{
+					error_clear_last();
+				}
+				else
+				{
+					$php_errormsg = null;
+					$old_track_errors = @ini_set( 'track_errors', 1 );
+				}
+				$old_html_errors = @ini_set( 'html_errors', 0 );
 				@dl( $mysql_ext_file );
-				$error_msg = $php_errormsg;
-				if( $old_track_errors !== false ) @ini_set('track_errors', $old_track_errors);
-				if( $old_html_errors !== false ) @ini_set('html_errors', $old_html_errors);
+				if( version_compare( PHP_VERSION, '7.2', '>=' ) )
+				{
+					$error_msg = error_get_last();
+					if( isset( $error_msg['message'] ) )
+					{
+						$error_msg = $error_msg['message'];
+					}
+				}
+				else
+				{
+					$error_msg = $php_errormsg;
+					if( $old_track_errors !== false ) @ini_set( 'track_errors', $old_track_errors );
+				}
+				if( $old_html_errors !== false ) @ini_set( 'html_errors', $old_html_errors );
 			}
 			else
 			{
 				$error_msg = 'The PHP mysqli extension is not installed and we cannot load it dynamically.';
 			}
-			if( ! extension_loaded('mysqli') )
+			if( ! extension_loaded( 'mysqli' ) )
 			{ // Still not loaded:
 				$this->print_error( 'The PHP MySQL Improved module could not be loaded.', '
 					<p><strong>Error:</strong> '.$error_msg.'</p>
@@ -387,27 +405,44 @@ class DB
 			}
 		}
 
-		$port = isset( $params['port'] ) ? $params['port'] : ini_get('mysqli.default_port');
-		$socket = isset( $params['socket'] ) ? $params['socket'] : ini_get('mysqli.default_socket');
+		$port = isset( $params['port'] ) ? $params['port'] : ini_get( 'mysqli.default_port' );
+		$socket = isset( $params['socket'] ) ? $params['socket'] : ini_get( 'mysqli.default_socket' );
 		$client_flags = isset( $params['client_flags'] ) ? $params['client_flags'] : 0;
 
-		/* Persistent connections are only available in PHP 5.3+ */
-		$this->use_persistent = isset($params['use_persistent']) ? $params['use_persistent'] : version_compare(PHP_VERSION, '5.3', '>=');
+		$this->use_persistent = isset( $params['use_persistent'] ) ? $params['use_persistent'] : true;
 
 		if( ! $this->dbhandle )
 		{ // Connect to the Database:
 			// echo "mysqli::real_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $this->dbname, port, $socket, $client_flags )";
 			// mysqli::$connect_error is tied to an established connection
 			// if the connection fails we need a different method to get the error message
-			$php_errormsg = null;
-			$old_track_errors = @ini_set('track_errors', 1);
-			$old_html_errors = @ini_set('html_errors', 0);
+			if( version_compare( PHP_VERSION, '7.2', '>=' ) )
+			{
+				error_clear_last();
+			}
+			else
+			{
+				$php_errormsg = null;
+				$old_track_errors = @ini_set( 'track_errors', 1 );
+			}
+			$old_html_errors = @ini_set( 'html_errors', 0 );
 			$this->dbhandle = new mysqli();
-			@$this->dbhandle->real_connect($this->use_persistent ? 'p:'.$this->dbhost : $this->dbhost,
+			@$this->dbhandle->real_connect( $this->use_persistent ? 'p:'.$this->dbhost : $this->dbhost,
 				$this->dbuser, $this->dbpassword, '', $port, $socket, $client_flags );
-			$mysql_error = $php_errormsg;
-			if( $old_track_errors !== false ) @ini_set('track_errors', $old_track_errors);
-			if( $old_html_errors !== false ) @ini_set('html_errors', $old_html_errors);
+			if( version_compare( PHP_VERSION, '7.2', '>=' ) )
+			{
+				$mysql_error = error_get_last();
+				if( isset( $mysql_error['message'] ) )
+				{
+					$mysql_error = $mysql_error['message'];
+				}
+			}
+			else
+			{
+				$mysql_error = $php_errormsg;
+				if( $old_track_errors !== false ) @ini_set( 'track_errors', $old_track_errors );
+			}
+			if( $old_html_errors !== false ) @ini_set( 'html_errors', $old_html_errors );
 		}
 
 		if( 0 != $this->dbhandle->connect_errno )
@@ -420,9 +455,9 @@ class DB
 					<li>Are you sure that the database server is running?</li>
 				</ol>', false );
 		}
-		elseif( isset($this->dbname) )
+		elseif( isset( $this->dbname ) )
 		{
-			$this->select($this->dbname);
+			$this->select( $this->dbname );
 		}
 
 		if( ! empty( $params['connection_charset'] ) )
@@ -443,7 +478,7 @@ class DB
 		*/
 
 
-		if( isset($params['aliases']) )
+		if( isset( $params['aliases'] ) )
 		{ // Prepare aliases for replacements:
 			foreach( $params['aliases'] as $dbalias => $dbreplace )
 			{

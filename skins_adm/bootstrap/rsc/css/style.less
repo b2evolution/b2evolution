@@ -125,11 +125,11 @@ div.avatartag {
 }
 .avatar_main_frame {
 	>a:first-child {
-		margin-right: 25px;
+		margin-right: 0;
 	}
 	.avatar_actions {
 		text-align: center;
-		padding: 0 25px 0 0;
+		padding: 0 25px;
 		float: none;
 		display: table-cell;
 		vertical-align: middle;
@@ -199,27 +199,6 @@ div.avatartag {
 	.html_status {
 		margin-top: 14px;
 		display: inline-block;
-	}
-}
-
-.compose_layout{
-	margin-bottom: 15px;
-	td.label {
-		font-size: 100%;
-		padding-right: 10px;
-		color: #333;
-	}
-	#post_locale {
-		width: 180px !important;
-	}
-	td {
-		white-space: nowrap;
-		vertical-align: middle;
-	}
-}
-#itemform_custom_fields, #itemform_adv_props {
-	.compose_layout {
-		margin-bottom: 0;
 	}
 }
 
@@ -1608,9 +1587,6 @@ table.diff {
 .timestamp .time {
 	font-size: 84%;
 }
-.compact_data {
-	white-space: nowrap;
-}
 
 // Style fixes for email preview from back-office:
 #skin_wrapper {
@@ -1706,6 +1682,17 @@ table.diff {
 	select, input {
 		max-width: 100%;
 	}
+}
+
+// Fix styles for jQuery plugin "QueryBuilder":
+div.query-builder .rule-container .rule-value-container {
+	border: none;
+	padding-left: 0;
+}
+
+// Style for a trasfering object, e-g when a comment is moving to a recycle bin:
+.ui-effects-transfer {
+	border: 1px solid #F00;
 }
 
 // Skin Customizer Mode:

@@ -74,18 +74,6 @@ siteskin_include( '_site_body_header.inc.php' );
 	?>
 
 	<?php
-		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
-		request_title( array(
-				'title_before'=> '<h2>',
-				'title_after' => '</h2>',
-				'title_none'  => '<h2>&nbsp;</h2>',
-				'glue'        => ' - ',
-				'format'      => 'htmlbody',
-			) );
-		// ------------------------------ END OF REQUEST TITLE -----------------------------
-	?>
-
-	<?php
 		// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 		skin_include( '$disp$' );
 		// Note: you can customize any of the sub templates included here by

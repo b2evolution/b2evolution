@@ -42,7 +42,13 @@ else
 { // Normal comment
 	$info_text = T_( '%s posted a new comment on %s in %s.' );
 }
-$notify_message = sprintf( $info_text, $params['author_name'], '"'.$Item->get('title').'"', '"'.$Blog->get('shortname').'"' )."\n\n";
+$author_type = empty( $params['author_ID'] ) ? ' ['.T_('Visitor').']' : ' ['.T_('Member').']';
+$notify_message = sprintf( $info_text, $params['author_name'].$author_type, '"'.$Item->get('title').'"', '"'.$Blog->get('shortname').'"' )."\n\n";
+
+if( $params['notify_type'] == 'comment_mentioned' )
+{	// Add this info line if user was mentioned in the comment content:
+	$notify_message .= T_( 'You were mentioned in this comment.' )."\n\n";
+}
 
 if( $params['notify_full'] )
 { // Long format notification:
@@ -122,7 +128,7 @@ else
 	{
 		$notify_message .= "\n"
 						.T_('Status').': '.$Comment->get( 't_status' )."\n"
-						.T_( 'This is a short form moderation message. To make these emails more useful for quick moderation, ask the administrator to send you long form moderation messages instead.' )
+						.T_( 'This is a short form notification. To make these emails more useful, ask the administrator to send you long form notifications instead.' )
 						."\n";
 	}
 }
@@ -161,6 +167,13 @@ switch( $params['notify_type'] )
 			.get_htsrv_url().'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$';
 		break;
 
+	case 'comment_mentioned':
+		// user is mentioned in the comment
+		$params['unsubscribe_text'] = T_( 'You were mentioned in this comment, and you are receiving notifications when anyone mention your name in a comment.' )."\n"
+			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in a comment, click here' ).': '
+			.get_htsrv_url().'quick_unsubscribe.php?type=comment_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$';
+		break;
+
 	case 'blog_subscription':
 		// blog subscription
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on any post.' )."\n"
@@ -170,10 +183,18 @@ switch( $params['notify_type'] )
 		break;
 
 	case 'item_subscription':
-		// item subscription
+		// item subscription for registered user:
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on this post.' )."\n"
 			.T_( 'If you don\'t want to receive any more notifications on this post, click here' ).': '
 			.get_htsrv_url().'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$';
+		// subscribers are not allowed to see comment author email
+		break;
+
+	case 'anon_subscription':
+		// item subscription for anonymous user:
+		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on this post.' )."\n"
+			.T_( 'If you don\'t want to receive any more notifications on this post, click here' ).': '
+			.get_htsrv_url().'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&comment_ID='.$params['comment_ID'].'&key=$unsubscribe_key$';
 		// subscribers are not allowed to see comment author email
 		break;
 

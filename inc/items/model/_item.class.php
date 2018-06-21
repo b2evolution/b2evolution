@@ -117,12 +117,18 @@ class Item extends ItemLight
 	var $assigned_User;
 
 	/**
-	 * ID of the user that created the item
+	 * ID of the User assigned to the item
 	 * Can be NULL
 	 *
 	 * @var integer
 	 */
 	var $assigned_user_ID;
+	/**
+	 * Flag to know if item is assigned to a new user
+	 * Used to determine if assignment notification should be sent
+	 * @var boolean
+	 */
+	var $assigned_to_new_user;
 
 	/**
 	 * The visibility status of the item.
@@ -824,40 +830,7 @@ class Item extends ItemLight
 		}
 
 		// WORKFLOW stuff:
-		$item_Blog = $this->get_Blog();
-		if( $is_not_content_block && $item_Blog->get_setting( 'use_workflow' ) && is_logged_in() && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) )
-		{	// Update workflow properties only when it is enabled by collection setting and allowed for current user:
-			$ItemTypeCache = & get_ItemTypeCache();
-			$current_ItemType = $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ) );
-			$item_status = param( 'item_st_ID', 'integer', NULL );
-
-			if( in_array( $item_status, $current_ItemType->get_applicable_post_status() ) || $item_status == NULL )
-			{
-				$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
-			}
-			else
-			{
-				param_error( 'item_st_ID', sprintf( T_('Invalid task status for post type %s'), $current_ItemType->get_name() ) );
-			}
-
-			$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
-			$item_assigned_user_login = param( 'item_assigned_user_login', 'string', NULL );
-			$this->assign_to( $item_assigned_user_ID, $item_assigned_user_login );
-
-			$item_priority = param( 'item_priority', 'integer', NULL );
-			if( $item_priority !== NULL )
-			{ // Set task priority only if it is gone from form
-				$this->set_from_Request( 'priority', 'item_priority', true );
-			}
-
-			// DEADLINE:
-			if( param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL )
-			{
-				param_time( 'item_deadline_time', '', false, false, true, true );
-				$item_deadline_time = get_param( 'item_deadline' ) != '' ? substr( get_param( 'item_deadline_time' ), 0, 5 ) : '';
-				$this->set( 'datedeadline', trim( form_date( get_param( 'item_deadline' ), $item_deadline_time ) ), true );
-			}
-		}
+		$this->load_workflow_from_Request();
 
 		// FEATURED checkbox:
 		$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
@@ -1021,6 +994,7 @@ class Item extends ItemLight
 		modules_call_method( 'update_item_settings', array( 'edited_Item' => $this ) );
 
 		// RENDERERS:
+		$item_Blog = & $this->get_Blog();
 		if( is_admin_page() || $item_Blog->get_setting( 'in_skin_editing_renderers' ) )
 		{	// If text renderers are allowed to update from front-office:
 			if( param( 'renderers_displayed', 'integer', 0 ) )
@@ -1154,6 +1128,72 @@ class Item extends ItemLight
 		}
 
 		return ! param_errors_detected();
+	}
+
+	/**
+	 * Load workflow properties from Request form fields.
+	 *
+	 * @return boolean TRUE if loaded data seems valid, FALSE if some errors or workflow is not allowed or no any property has been changed
+	 */
+	function load_workflow_from_Request()
+	{
+		global $current_User;
+
+		// Get Item's Collection for settings and permissions validation:
+		$item_Blog = & $this->get_Blog();
+
+		if( ( $this->get_type_setting( 'usage' ) != 'content-block' ) && // Item types "Content Block" cannot have the workflow properties
+		    $item_Blog->get_setting( 'use_workflow' ) && // Collection must has the workflow properties enabled
+		    is_logged_in() && // Current User must be logged in
+		    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) && // Current User must has a permission to edit this Item
+		    $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) && // Current User must be assignee for items of the collection
+		    param( 'item_priority', 'integer', NULL ) !== NULL ) // At least Task Priority must be submitted to be sure the form really sends all other workflow properties
+		{	// Update workflow properties only when all conditions above is true:
+			// Assigned to:
+			$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
+			$item_assigned_user_login = param( 'item_assigned_user_login', 'string', NULL );
+			$this->assign_to( $item_assigned_user_ID, $item_assigned_user_login );
+
+			// Priority:
+			$this->set_from_Request( 'priority', 'item_priority', true );
+
+			// Task status:
+			$ItemTypeCache = & get_ItemTypeCache();
+			$current_ItemType = $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ) );
+			$item_status = param( 'item_st_ID', 'integer', NULL );
+			if( in_array( $item_status, $current_ItemType->get_applicable_post_status() ) || $item_status === NULL )
+			{	// Save only task status which is allowed for item's type:
+				$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
+			}
+			else
+			{	// If the submitted task status is not allowed for item's type:
+				param_error( 'item_st_ID', sprintf( T_('Invalid task status for post type %s'), $current_ItemType->get_name() ) );
+			}
+
+			// Deadline:
+			if( $item_Blog->get_setting( 'use_deadline' ) &&
+			    param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL )
+			{	// Update deadline only when it is enabled for item's collection:
+				param_time( 'item_deadline_time', '', false, false, true, true );
+				$item_deadline_time = get_param( 'item_deadline' ) != '' ? substr( get_param( 'item_deadline_time' ), 0, 5 ) : '';
+				$item_deadline_datetime = trim( form_date( get_param( 'item_deadline' ), $item_deadline_time ) );
+				if( ! empty( $item_deadline_datetime ) )
+				{	// Append seconds because they are not entered on the form but they are stored in the DB field "post_datedeadline" as date format "YYYY-mm-dd HH:ii:ss":
+					$item_deadline_datetime .= ':00';
+				}
+				$this->set( 'datedeadline', $item_deadline_datetime, true );
+			}
+
+			// Return TRUE when no errors and ata least one workflow property has been changed:
+			return ! param_errors_detected() && (
+				isset( $this->dbchanges['post_assigned_user_ID'] ) ||
+				isset( $this->dbchanges['post_priority'] ) ||
+				isset( $this->dbchanges['post_pst_ID'] ) ||
+				isset( $this->dbchanges['post_datedeadline'] ) );
+		}
+
+		// If workflow properties are not allowed to be stored for this Item by current User:
+		return false;
 	}
 
 
@@ -2726,7 +2766,7 @@ class Item extends ItemLight
 						}
 
 						$params = array(
-							'widget' => 'user_register',
+							'widget' => 'user_register_quick',
 							'title' => '',
 							'intro' => '',
 							'ask_firstname' => in_array( 'firstname', $fields_to_display ) ? 'required' : 'no',
@@ -3091,13 +3131,15 @@ class Item extends ItemLight
 			}
 			elseif( $content_Item->get( 'creator_user_ID' ) != $this->get( 'creator_user_ID' ) &&
 			        ( ! $item_Blog || $content_Item->get( 'creator_user_ID' ) != $item_Blog->get( 'owner_user_ID' ) ) &&
-			        ( ! $item_Blog || $content_Item->get_blog_ID() != $item_Blog->ID )
+			        ( ! $item_Blog || $content_Item->get_blog_ID() != $item_Blog->ID ) &&
+		          ( ! ( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) || $content_Item->get_blog_ID() != $info_Blog->ID )
 			      )
 			{	// We can display a content block item with at least one condition:
 				//  - Content block Item has same owner as owner of parent Item,
 				//  - Content block Item has same owner as owner of parent Item's collection,
-				//  - Content block Item is in same collection as parent Item:
-				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				//  - Content block Item is in same collection as parent Item,
+				//  - Content block Item from collection for info pages:
+				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
 				continue;
 			}
 
@@ -6229,7 +6271,7 @@ class Item extends ItemLight
 		$post_timestamp,              // 'Y-m-d H:i:s'
 		$main_cat_ID = 1,             // Main cat ID
 		$extra_cat_IDs = array(),     // Table of extra cats
-		$post_status = 'published',
+		$post_status = 'published',   // Use first char '!' before status name to force this status without restriction by max allowed status of the collection
 		$post_locale = '#',
 		$post_urltitle = '',
 		$post_url = '',
@@ -6303,7 +6345,16 @@ class Item extends ItemLight
 
 		$this->set( 'main_cat_ID', $main_cat_ID );
 		$this->set( 'extra_cat_IDs', $extra_cat_IDs );
+		if( substr( $post_status, 0, 1 ) == '!' )
+		{	// Force the requested status to ignore restriction by collection settings:
+			$post_status = substr( $post_status, 1 );
+			$force_status = true;
+		}
 		$this->set( 'status', $post_status );
+		if( ! empty( $force_status ) )
+		{	// Unset flag to don't restrict the status:
+			unset( $this->previous_status );
+		}
 		$this->set( 'locale', $post_locale );
 		$this->set( 'url', $post_url );
 		$this->set( 'comment_status', $post_comment_status );
@@ -6381,6 +6432,12 @@ class Item extends ItemLight
 		    $this->get( 'locale' ) != $item_Blog->get( 'locale' ) )
 		{	// Force to use collection locale because it is restricted by collection setting:
 			$this->set( 'locale', $item_Blog->get( 'locale' ) );
+		}
+
+		// Check if item is assigned to a user
+		if( isset( $this->dbchanges['post_assigned_user_ID'] ) )
+		{
+			$this->assigned_to_new_user = true;
 		}
 
 		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
@@ -6568,6 +6625,12 @@ class Item extends ItemLight
 		if( $this->status != 'draft' )
 		{	// The post is getting published in some form, set the publish date so it doesn't get auto updated in the future:
 			$this->set( 'dateset', 1 );
+		}
+
+		// Check if item is assigned to a user
+		if( isset( $this->dbchanges['post_assigned_user_ID'] ) )
+		{
+			$this->assigned_to_new_user = true;
 		}
 
 		$dbchanges = $this->dbchanges; // we'll save this for passing it to the plugin hook
@@ -7145,7 +7208,14 @@ class Item extends ItemLight
 		// Send email notifications to users who can moderate this item:
 		$already_notified_user_IDs = $this->send_moderation_emails( $executed_by_userid, $is_new_item );
 
-		// SECOND: Subscribers may be notified asynchornously... and that is a even a requirement if the post has an issue_date in the future.
+		// SECOND: Send email notification to assigned user
+		$Blog = & $this->get_Blog();
+		if( $Blog->get_setting( 'use_workflow' ) && $this->assigned_to_new_user && ! empty( $this->assigned_user_ID ) )
+		{
+			$already_notified_user_IDs = array_merge( $already_notified_user_IDs, $this->send_assignment_notification( $executed_by_userid, $is_new_item ) );
+		}
+
+		// THIRD: Subscribers may be notified asynchornously... and that is a even a requirement if the post has an issue_date in the future.
 
 		$notified_flags = array();
 		if( $force_members == 'mark' )
@@ -7390,6 +7460,73 @@ class Item extends ItemLight
 
 
 	/**
+	 * Send "post assignment" notifications for user who have been assigned to this post and would like to receive these notifications.
+	 *
+	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
+	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
+	 * @return array the notified user ids
+	 */
+	function send_assignment_notification( $executed_by_userid = NULL, $is_new_item = false )
+	{
+		global $current_User, $Messages, $UserSettings;
+
+		if( $executed_by_userid === NULL && is_logged_in() )
+		{	// Use current user by default:
+			global $current_User;
+			$executed_by_userid = $current_User->ID;
+		}
+
+		if( $this->assigned_user_ID && $executed_by_userid != $this->assigned_user_ID )
+		{ // Item has assigned user and the assigned user is not the one who created/updated this post:
+			$UserCache = & get_UserCache();
+			$principal_User = $UserCache->get_by_ID( $executed_by_userid, false, false );
+			$assigned_User = $this->get_assigned_User();
+
+			if( $assigned_User &&
+					$UserSettings->get( 'notify_post_assignment', $assigned_User->ID ) &&
+					$assigned_User->check_perm( 'blog_ismember', 'view', false, $this->get_blog_ID() ) )
+			{ // Assigned user wants to receive post assignment notifications and is a member of at least one collection:
+				$user_Group = $assigned_User->get_Group();
+				$notify_full = $user_Group->check_perm( 'post_assignment_notif', 'full' );
+
+				$email_template_params = array(
+					'locale'         => $assigned_User->locale,
+					'notify_full'    => $notify_full,
+					'Item'           => $this,
+					'principal_User' => $principal_User,
+					'recipient_User' => $assigned_User,
+				);
+
+				locale_temp_switch( $assigned_User->locale );
+
+				/* TRANS: Subject of the mail to send on assignment of posts to a user. First %s is blog name, the second %s is the item's title. */
+				$subject = T_('[%s] Post assignment: "%s"');
+				$subject = sprintf( $subject, $this->Blog->get('shortname'), $this->get('title') );
+
+				// Send the email:
+				$notified_user_IDs = array();
+
+				if( send_mail_to_User( $assigned_User->ID, $subject, 'post_assignment', $email_template_params, false, array( 'Reply-To' => $principal_User->email ) ) )
+				{	// A send notification email request to the assigned user was processed:
+					$notified_user_IDs[] = $assigned_User->ID;
+					$Messages->add_to_group( T_('Sending email notification to assigned user.'), 'note', T_('Sending notifications:')  );
+				}
+
+				locale_restore_previous();
+
+				return $notified_user_IDs;
+			}
+			else
+			{ // No valid assigned user or the user does not want to receive post assignment notifications
+				return NULL;
+			}
+		}
+
+		return NULL;
+	}
+
+
+	/**
 	 * Send email notifications to subscribed users
 	 *
 	 * @todo fp>> shall we notify suscribers of blog were this is in extra-cat? blueyed>> IMHO yes.
@@ -7525,6 +7662,15 @@ class Item extends ItemLight
 		$Debuglog->add( 'Ready to send notifications to members? : '.($notify_members ? 'Yes' : 'No' ), 'notifications' );
 		$Debuglog->add( 'Ready to send notifications to community? : '.($notify_community ? 'Yes' : 'No' ), 'notifications' );
 
+		$notify_users = array();
+
+		// Get list of users who want to be notified when his login is mentioned in the item content by @user's_login:
+		$mentioned_user_IDs = get_mentioned_user_IDs( 'item', $this->get( 'content' ), $already_notified_user_IDs );
+		foreach( $mentioned_user_IDs as $mentioned_user_ID )
+		{
+			$notify_users[ $mentioned_user_ID ] = 'post_mentioned';
+		}
+
 		// Get list of users who want to be notified:
 		// TODO: also use extra cats/blogs??
 		$sql = 'SELECT user_ID
@@ -7596,24 +7742,35 @@ class Item extends ItemLight
 			$sql .= ' AND user_ID != '.$DB->quote( $executed_by_userid );
 		}
 
-		$notify_users = $DB->get_col( $sql, 0, 'Get users to be notified', 0, 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
+		$notify_list = $DB->get_col( $sql, 0, 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
 
-		$Debuglog->add( 'Number of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID().' = '.count($notify_users), 'notifications' );
-		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice($notify_users, 0, 10) ), 'notifications' );
+		// Preprocess list:
+		foreach( $notify_list as $notify_user_ID )
+		{
+			if( ! isset( $notify_users[ $notify_user_ID ] ) )
+			{	// Don't rewrite a notify type if user already is notified by other type before:
+				$notify_users[ $notify_user_ID ] = 'subscription';
+			}
+		}
+
+		$notify_user_IDs = array_keys( $notify_users );
+
+		$Debuglog->add( 'Number of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID().' = '.count( $notify_users ), 'notifications' );
+		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice( $notify_user_IDs, 0, 10 ) ), 'notifications' );
 
 		// Load all users who will be notified:
 		$UserCache = & get_UserCache();
-		$UserCache->load_list( $notify_users );
+		$UserCache->load_list( $notify_user_IDs );
 
 		$members_count = 0;
 		$community_count = 0;
-		foreach( $notify_users as $u => $user_ID )
+		foreach( $notify_users as $user_ID => $notify_type )
 		{	// Check for each subscribed User, if we can send a notification to him depending on current request and Item settings:
 
 			if( ! ( $notify_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
 			{	// Invalid User, Skip it:
 				$Debuglog->add( 'User #'.$user_ID.' is invalid.', 'notifications'  );
-				unset( $notify_users[ $u ] );
+				unset( $notify_users[ $user_ID ] );
 				continue;
 			}
 
@@ -7640,7 +7797,7 @@ class Item extends ItemLight
 				else
 				{	// Skip not member:
 					$Debuglog->add( 'User #'.$user_ID.' is a not a member but at this time, we only want to notify members.', 'notifications'  );
-					unset( $notify_users[ $u ] );
+					unset( $notify_users[ $user_ID ] );
 				}
 			}
 			else
@@ -7652,13 +7809,13 @@ class Item extends ItemLight
 				else
 				{	// Skip member:
 					$Debuglog->add( 'User #'.$user_ID.' is a member but we at this time, we only want to notify community.', 'notifications'  );
-					unset( $notify_users[ $u ] );
+					unset( $notify_users[ $user_ID ] );
 				}
 			}
 		}
 
-		$Debuglog->add( 'Number of users who are allowed to be notified about new items on colection #'.$this->get_blog_ID().' = '.count($notify_users), 'notifications' );
-		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice($notify_users, 0, 10) ), 'notifications' );
+		$Debuglog->add( 'Number of users who are allowed to be notified about new items on colection #'.$this->get_blog_ID().' = '.count( $notify_users ), 'notifications' );
+		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice( $notify_user_IDs, 0, 10 ) ), 'notifications' );
 
 		if( $notify_members )
 		{	// Display a message to know how many members are notified:
@@ -7680,11 +7837,11 @@ class Item extends ItemLight
 		$this->get_creator_User();
 
 		// Load a list with the blocked emails in cache:
-		load_blocked_emails( $notify_users );
+		load_blocked_emails( $notify_user_IDs );
 
 		// Send emails:
 		$cache_by_locale = array();
-		foreach( $notify_users as $user_ID )
+		foreach( $notify_users as $user_ID => $notify_type )
 		{
 			$notify_User = & $UserCache->get_by_ID( $user_ID, false, false );
 			if( empty( $notify_User ) )
@@ -7716,7 +7873,7 @@ class Item extends ItemLight
 					'notify_full'    => $notify_full,
 					'Item'           => $this,
 					'recipient_User' => $notify_User,
-					'notify_type'    => 'subscription',
+					'notify_type'    => $notify_type,
 					'is_new_item'    => $is_new_item,
 				);
 
@@ -8310,9 +8467,10 @@ class Item extends ItemLight
 	 * Get the latest Comment on this Item
 	 *
 	 * @param array|NULL Restrict comments selection with statuses, NULL - to select only allowed statuses for current User
+	 * @param string Type of the latest comment: NULL|'date' - latest added comment, 'last_touched_ts' - latest touched comment
 	 * @return Comment
 	 */
-	function & get_latest_Comment( $statuses = NULL )
+	function & get_latest_Comment( $statuses = NULL, $order_date_type = NULL )
 	{
 		global $DB;
 
@@ -8337,7 +8495,14 @@ class Item extends ItemLight
 			{	// Restrict with given comment statuses:
 				$SQL->WHERE_and( 'comment_status IN ( '.$DB->quote( $statuses ).' )' );
 			}
-			$SQL->ORDER_BY( 'comment_date DESC' );
+			if( $order_date_type == 'last_touched_ts' )
+			{	// Get the latest touched comment:
+				$SQL->ORDER_BY( 'comment_last_touched_ts DESC, comment_ID DESC' );
+			}
+			else
+			{	// Get the latest added comment:
+				$SQL->ORDER_BY( 'comment_date DESC, comment_ID DESC' );
+			}
 			$SQL->LIMIT( '1' );
 
 			if( $comment_ID = $DB->get_var( $SQL ) )
@@ -10058,12 +10223,14 @@ class Item extends ItemLight
 		}
 
 		$params = array_merge( array(
-				'glue' => '&amp;'
+				'glue' => '&amp;',
+				'type' => 'touch', // What comment date use to update: 'touch' - 'comment_last_touched_ts', 'create' - 'comment_date'
 			), $params );
 
 		$url = get_htsrv_url().'action.php?mname=collections'.$params['glue']
 			.'action=refresh_contents_last_updated'.$params['glue']
 			.'item_ID='.$this->ID.$params['glue']
+			.( $params['type'] != 'touch' ? 'type='.$params['type'].$params['glue'] : '' )
 			.url_crumb( 'collections_refresh_contents_last_updated' );
 
 		return $url;
@@ -10094,7 +10261,7 @@ class Item extends ItemLight
 
 		if( $params['title'] == '#' )
 		{	// Use default title
-			$params['title'] = T_('Refresh "contents last updated" timestamp!');
+			$params['title'] = T_('Reset the "contents last updated" date to the latest content change on this thread');
 		}
 
 		$params['text'] = utf8_trim( $params['text'] );
@@ -10119,28 +10286,65 @@ class Item extends ItemLight
 	/**
 	 * Refresh contents last updated ts with date of the latest Comment
 	 *
+	 * @param boolean TRUE to display messages
+	 * @param string Field name(without prefix "comment_") of the latest comment which should be used to refresh the post date column: 'date', 'last_touched_ts'
+	 * @param string What post and comment date fields use to refresh:
+	                   'touched' - 'post_datemodified', 'comment_last_touched_ts' (Default)
+	                   'created' - 'post_datestart', 'comment_date'
 	 * @return boolean TRUE of success
 	 */
-	function refresh_contents_last_updated_ts()
+	function refresh_contents_last_updated_ts( $display_messages = false, $date_type = 'touched' )
 	{
 		if( ! $this->can_refresh_contents_last_updated() )
 		{	// If current User has no permission to refresh a contents last updated date of the requested Item:
 			return false;
 		}
 
+		global $DB, $Messages;
+
 		// Clear latest Comment from previous calling before Comment updating:
 		$this->latest_Comment = NULL;
 
-		if( $latest_Comment = & $this->get_latest_Comment( get_inskin_statuses( $this->get_blog_ID(), 'comment' ) ) )
-		{	// Use date from the latest public Comment:
-			$new_contents_last_updated_ts = $latest_Comment->get( 'last_touched_ts' );
+		if( $date_type == 'created' )
+		{	// Use dates for 'created' mode:
+			$post_date_field = 'datestart';
+			$comment_date_field = 'date';
 		}
 		else
-		{	// Use date from issue date of this Item:
-			$new_contents_last_updated_ts = $this->get( 'datestart' );
+		{	// Use dates for 'touched' mode:
+			$post_date_field = 'datemodified';
+			$comment_date_field = 'last_touched_ts';
 		}
 
-		global $DB;
+		if( $latest_Comment = & $this->get_latest_Comment( get_inskin_statuses( $this->get_blog_ID(), 'comment' ), $comment_date_field ) )
+		{	// Use date from the latest public Comment:
+			$new_contents_last_updated_ts = $latest_Comment->get( $comment_date_field );
+			if( $display_messages )
+			{	// Display message:
+				$Messages->add( sprintf(
+						( $date_type == 'created'
+							? T_('"Contents last updated" timestamp has been refreshed using <a %s>most recently added comment</a> date = %s.')
+							: T_('"Contents last updated" timestamp has been refreshed using <a %s>most recently touched comment</a> date = %s.')
+						),
+						'href="'.$latest_Comment->get_permanent_url().'"',
+						mysql2localedatetime( $new_contents_last_updated_ts )
+					), 'success' );
+			}
+		}
+		else
+		{	// Use date from issue date of this Item when it has no comments yet:
+			$new_contents_last_updated_ts = $this->get( $post_date_field );
+			if( $display_messages )
+			{	// Display message:
+				$Messages->add( sprintf(
+						( $date_type == 'created'
+							? T_('"Contents last updated" timestamp has been refreshed using post issue date = %s.')
+							: T_('"Contents last updated" timestamp has been refreshed using post modified date = %s.')
+						),
+						mysql2localedatetime( $new_contents_last_updated_ts )
+					), 'success' );
+			}
+		}
 
 		$DB->query( 'UPDATE T_items__item
 					SET post_contents_last_updated_ts = '.$DB->quote( $new_contents_last_updated_ts ).'

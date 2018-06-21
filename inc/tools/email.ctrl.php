@@ -37,7 +37,7 @@ param( 'action', 'string' );
 
 if( $tab == 'addresses' )
 {	// Email addresses
-	if( param( 'emadr_ID', 'integer', '', true) )
+	if( param( 'emadr_ID', 'integer', '', true ) )
 	{	// Load Email Address object
 		$EmailAddressCache = & get_EmailAddressCache();
 		if( ( $edited_EmailAddress = & $EmailAddressCache->get_by_ID( $emadr_ID, false ) ) === false )
@@ -45,6 +45,19 @@ if( $tab == 'addresses' )
 			unset( $edited_EmailAddress );
 			forget_param( 'emadr_ID' );
 			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Email Address') ), 'error' );
+		}
+	}
+}
+elseif( $tab == 'sent' && empty( $tab3 ) )
+{ // Email log
+	if( param( 'emlog_ID', 'integer', 0, true ) )
+	{ // Load Email Log object
+		$EmailLogCache = & get_EmailLogCache();
+		if( ( $edited_EmailLog = & $EmailLogCache->get_by_ID( $emlog_ID, false ) ) === false )
+		{
+			unset( $edited_EmailLog );
+			forget_param( 'emlog_ID' );
+			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Email Log') ), 'error' );
 		}
 	}
 }
@@ -457,6 +470,44 @@ switch( $action )
 			// We have EXITed already at this point!!
 		}
 		break;
+
+	case 'delete':
+		// Delete email log:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'email' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		// Make sure we got an enlt_ID:
+		param( 'emlog_ID', 'integer', 0, true );
+
+		$EmailLogCache = & get_EmailLogCache();
+		$edited_EmailLog = & $EmailLogCache->get_by_ID( $emlog_ID, false );
+
+		if( param( 'confirm', 'integer', 0 ) )
+		{
+			if( $edited_EmailLog === false )
+			{ // We could not find the email log to delete:
+				unset( $edited_EmailLog );
+				forget_param( 'emlog_ID' );
+				$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Email Log') ), 'error' );
+			}
+			else
+			{
+				// Delete from DB:
+				if( $edited_EmailLog->dbdelete() )
+				{
+					$Messages->add( sprintf( T_('Email log #%d has been deleted.'), $emlog_ID ), 'success' );
+				}
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=email&tab=sent', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		break;
 }
 
 $AdminUI->breadcrumbpath_init( false );
@@ -482,7 +533,9 @@ switch( $tab )
 			default:
 				$tab3 = 'log';
 
-				$emlog_ID = param( 'emlog_ID', 'integer', 0 );
+				// Init JS to autcomplete the user logins
+				init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+
 				if( empty( $emlog_ID ) )
 				{ // Initialize date picker on list page
 					init_datepicker_js();
@@ -649,18 +702,20 @@ switch( $tab )
 				break;
 
 			default:
-				if( $emlog_ID > 0 )
-				{	// Display a details of selected email log
-					$MailLog = $DB->get_row( '
-						SELECT *
-							FROM T_email__log
-						WHERE emlog_ID = '.$DB->quote( $emlog_ID ) );
-					if( $MailLog )
-					{	// The mail log exists with selected ID
-						$AdminUI->disp_view( 'tools/views/_email_sent_details.view.php' );
-						break;
-					}
+				if( ! empty( $edited_EmailLog ) && ( $action != 'delete' ) )
+				{	// Display details of selected email log
+					$AdminUI->disp_view( 'tools/views/_email_sent_details.view.php' );
+					break;
 				}
+
+				// We need to ask for confirmation:
+				if( ! empty( $edited_EmailLog ) && $action == 'delete' )
+				{
+					$edited_EmailLog->confirm_delete(
+						sprintf( T_('Delete email log #%d?'), $edited_EmailLog->ID ),
+						'email', $action, get_memorized( 'action' ) );
+				}
+
 				// Display a list of email logs:
 				$AdminUI->disp_view( 'tools/views/_email_sent.view.php' );
 		}

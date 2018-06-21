@@ -915,10 +915,10 @@ function autoupgrade_display_steps( $current_step )
  *
  * @param integer Current step
  */
-function svnupgrade_display_steps( $current_step )
+function gitupgrade_display_steps( $current_step )
 {
 	$steps = array(
-			1 => T_('Connect to SVN'),
+			1 => T_('Connect to Git'),
 			2 => T_('Export'),
 			3 => T_('Ready to upgrade'),
 			4 => T_('Backup &amp; Upgrade'),

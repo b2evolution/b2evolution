@@ -109,7 +109,8 @@ switch( $action )
 		{
 			case 'general':
 			case 'urls':
-				if( $edited_Blog->load_from_Request( array() ) )
+			case 'comments':
+				if( $edited_Blog->load_from_Request( array( $tab ) ) )
 				{ // Commit update to the DB:
 					global $Settings;
 
@@ -129,6 +130,12 @@ switch( $action )
 					{
 						$Settings->set( 'msg_blog_ID', $edited_Blog->ID );
 					}
+					if( $tab == 'comments' )
+					{
+						// Comment recycle bin
+						param( 'auto_empty_trash', 'integer', $Settings->get_default('auto_empty_trash'), false, false, true, false );
+						$Settings->set( 'auto_empty_trash', get_param('auto_empty_trash') );
+					}
 					$Settings->dbupdate();
 
 					$edited_Blog->dbupdate();
@@ -140,7 +147,6 @@ switch( $action )
 
 			case 'home':
 			case 'features':
-			case 'comments':
 			case 'contact':
 			case 'userdir':
 			case 'other':
@@ -631,8 +637,8 @@ if( $action == 'dashboard' )
 				echo '<!-- Start of Comments Awaiting Moderation Block -->';
 				$opentrash_link = get_opentrash_link( true, false, array(
 						'class'  => 'btn btn-default btn-sm',
-						'before' => '',
-						'after'  => '',
+						'before' => '<span id="recycle_bin">',
+						'after'  => '</span> ',
 					) );
 				$refresh_link = action_icon( T_('Refresh comment list'), 'refresh', $admin_url.'?blog='.$blog, ' '.T_('Refresh'), 3, 4, array( 'onclick' => 'startRefreshComments( \'dashboard\' ); return false;', 'class' => 'btn btn-default btn-sm' ) );
 
@@ -731,12 +737,9 @@ if( $action == 'dashboard' )
 				$nb_blocks_displayed++;
 
 				echo '<!-- Start of Latest Meta Comments Block -->';
-				$opentrash_link = get_opentrash_link( true, false, array(
-						'class' => 'btn btn-default'
-					) );
 
 				$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $user_modeartion_statuses );
-				$block_item_Widget->title = $opentrash_link.T_('Latest Meta Comments').
+				$block_item_Widget->title = T_('Latest Meta Comments').
 					' <a href="'.$admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;tab3=meta" style="text-decoration:none">'.
 					'<span id="badge" class="badge badge-important">'.$CommentList->get_total_rows().'</span></a>';
 

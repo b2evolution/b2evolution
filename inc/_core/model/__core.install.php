@@ -145,6 +145,7 @@ $schema_queries = array(
 			uf_ufdf_ID int(10) unsigned NOT NULL,
 			uf_varchar varchar(10000) COLLATE utf8mb4_unicode_ci NOT NULL,
 			PRIMARY KEY (uf_ID),
+			INDEX uf_user_ID ( uf_user_ID ),
 			INDEX uf_ufdf_ID ( uf_ufdf_ID ),
 			INDEX uf_varchar ( uf_varchar (191) )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -213,6 +214,16 @@ $schema_queries = array(
 			upv_visitor_user_ID INT(11) UNSIGNED NOT NULL,
 			upv_last_visit_ts   TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY ( upv_visited_user_ID, upv_visitor_user_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_users__profile_visit_counters' => array(
+		'Creating table for profile visit counters',
+		"CREATE TABLE T_users__profile_visit_counters (
+			upvc_user_ID  INT(11) UNSIGNED NOT NULL,
+			upvc_total_unique_visitors INT(10) UNSIGNED NOT NULL DEFAULT 0,
+			upvc_last_view_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			upvc_new_unique_visitors INT(10) UNSIGNED NOT NULL DEFAULT 0,
+			PRIMARY KEY (upvc_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_users__tag' => array(
@@ -383,7 +394,7 @@ $schema_queries = array(
 			clog_realstart_datetime   TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			clog_realstop_datetime    TIMESTAMP NULL,
 			clog_status               enum('started','finished','error','timeout','warning') COLLATE ascii_general_ci not null default 'started',
-			clog_messages             text COLLATE utf8mb4_unicode_ci,
+			clog_messages             MEDIUMTEXT COLLATE utf8mb4_unicode_ci,
 			clog_actions_num          INT UNSIGNED NULL,
 			PRIMARY KEY (clog_ctsk_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -545,6 +556,7 @@ $schema_queries = array(
 			PRIMARY KEY (enls_user_ID, enls_enlt_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
+	// When adding fields to this table do not forget to check EmailCampaign::duplicate() for fields that should not be duplicated!
 	'T_email__campaign' => array(
 		'Creating email campaigns table',
 		"CREATE TABLE T_email__campaign (
@@ -552,11 +564,12 @@ $schema_queries = array(
 			ecmp_date_ts              TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			ecmp_enlt_ID              INT UNSIGNED NOT NULL,
 			ecmp_name                 VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-			ecmp_email_title          VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+			ecmp_email_title          VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
 			ecmp_email_defaultdest    VARCHAR(255) NULL,
 			ecmp_email_html           TEXT NULL COLLATE utf8mb4_unicode_ci,
 			ecmp_email_text           TEXT NULL COLLATE utf8mb4_unicode_ci,
 			ecmp_email_plaintext      TEXT NULL COLLATE utf8mb4_unicode_ci,
+			ecmp_sync_plaintext       TINYINT(1) NOT NULL DEFAULT 1,
 			ecmp_sent_ts              TIMESTAMP NULL,
 			ecmp_auto_sent_ts         TIMESTAMP NULL,
 			ecmp_renderers            VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
@@ -571,6 +584,16 @@ $schema_queries = array(
 			ecmp_user_tag_cta3        VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
 			ecmp_user_tag_like        VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
 			ecmp_user_tag_dislike     VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
+			ecmp_send_count           INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_open_count           INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_img_loads            INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_link_clicks          INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_cta1_clicks          INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_cta2_clicks          INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_cta3_clicks          INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_like_count           INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_dislike_count        INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_unsub_clicks         INT UNSIGNED NOT NULL DEFAULT 0,
 			PRIMARY KEY               (ecmp_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
@@ -628,6 +651,7 @@ $schema_queries = array(
 			step_no_next_step_delay    INT UNSIGNED NULL,
 			step_error_next_step_ID    INT NULL,
 			step_error_next_step_delay INT UNSIGNED NULL,
+			step_diagram               VARCHAR(64) NULL,
 			PRIMARY KEY                (step_ID),
 			UNIQUE                     step_autm_ID_order (step_autm_ID, step_order)
 		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
@@ -651,7 +675,7 @@ $schema_queries = array(
 			slg_type      ENUM('info', 'warning', 'error', 'critical_error') COLLATE ascii_general_ci NOT NULL DEFAULT 'info',
 			slg_origin    ENUM('core', 'plugin') COLLATE ascii_general_ci,
 			slg_origin_ID INT UNSIGNED NULL,
-			slg_object    ENUM('comment', 'item', 'user', 'file') COLLATE ascii_general_ci,
+			slg_object    ENUM('comment', 'item', 'user', 'file', 'email_log') COLLATE ascii_general_ci,
 			slg_object_ID INT UNSIGNED NULL,
 			slg_message   VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
 			PRIMARY KEY   (slg_ID),

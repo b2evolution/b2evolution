@@ -70,6 +70,7 @@ $db_config['aliases'] = array(
 		'T_users__user_org'        => $tableprefix.'users__user_org',
 		'T_users__secondary_user_groups' => $tableprefix.'users__secondary_user_groups',
 		'T_users__profile_visits'  => $tableprefix.'users__profile_visits',
+		'T_users__profile_visit_counters' => $tableprefix.'users__profile_visit_counters',
 		'T_users__tag'             => $tableprefix.'users__tag',
 		'T_users__usertag'         => $tableprefix.'users__usertag',
 		'T_slug'                   => $tableprefix.'slug',
@@ -475,6 +476,25 @@ function & get_EmailAddressCache()
 
 
 /**
+ * Get the EmailLogCache
+ *
+ * @return EmailLogCache
+ */
+function & get_EmailLogCache()
+{
+	global $EmailLogCache;
+
+	if( ! isset( $EmailLogCache ) )
+	{ // Cache doesn't exist yet:
+		load_class( 'tools/model/_emaillog.class.php', 'EmailLog' );
+		$EmailLogCache = new DataObjectCache( 'EmailLog', false, 'T_email__log', 'emlog_', 'emlog_ID' );
+	}
+
+	return $EmailLogCache;
+}
+
+
+/**
  * Get the NewsletterCache
  *
  * @param string The text that gets used for the "None" option in the objects options list (Default: T_('Unknown')).
@@ -709,6 +729,7 @@ class _core_Module extends Module
 			'comment_moderation_notif' => $def_notification,
 			'post_subscription_notif' => $def_notification,
 			'post_moderation_notif' => $def_notification,
+			'post_assignment_notif' => $def_notification,
 			'cross_country_allow_profiles' => $cross_country_settings_default,
 			'cross_country_allow_contact' => $cross_country_settings_default,
 			'perm_orgs' => $permorgs,
@@ -853,6 +874,9 @@ class _core_Module extends Module
 				),
 			'post_moderation_notif' => array_merge(
 				array( 'label' => T_( 'Post moderation notifications' ) ), $notifications_array
+				),
+			'post_assignment_notif' => array_merge(
+				array( 'label' => T_( 'Post assignment notifications' ) ), $notifications_array
 				),
 			'cross_country_allow_profiles' => array(
 				'label' => T_('Users'),
@@ -1186,19 +1210,16 @@ class _core_Module extends Module
 									'href' => $admin_url.'?ctrl=campaigns' ),
 								)
 						);
-				}
 
-				if( $perm_options )
-				{	// If current user has a permissions to view options:
-					$entries['site']['entries']['email']['entries'] += array(
-							'automations' => array(
-								'text' => T_('Automations').'&hellip;',
-								'href' => $admin_url.'?ctrl=automations',
-						) );
-				}
+					if( $perm_options )
+					{	// If current user has a permissions to view options:
+						$entries['site']['entries']['email']['entries'] += array(
+								'automations' => array(
+									'text' => T_('Automations').'&hellip;',
+									'href' => $admin_url.'?ctrl=automations',
+							) );
+					}
 
-				if( $perm_emails )
-				{
 					$entries['site']['entries']['email']['entries'] += array(
 								'settings' => array(
 									'text' => T_('Settings').'&hellip;',
@@ -2025,16 +2046,7 @@ class _core_Module extends Module
 			$users_entries['entries'] = array(
 					'users' => array(
 						'text' => T_('Users'),
-						'href' => '?ctrl=users',
-						'entries' => array(
-							'list' => array(
-								'text' => T_('List'),
-								'href' => '?ctrl=users' ),
-							'duplicates' => array(
-								'text' => T_('Find duplicates'),
-								'href' => '?ctrl=users&amp;tab3=duplicates' ),
-							),
-						),
+						'href' => '?ctrl=users' ),
 					'groups' => array(
 						'text' => T_('Groups'),
 						'href' => '?ctrl=groups' ),
@@ -2336,6 +2348,12 @@ class _core_Module extends Module
 				'name'   => T_('Send reminders about non-activated accounts'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_activate_account_reminder.job.php',
+				'params' => NULL,
+			),
+			'send-inactive-account-reminders' => array(
+				'name'   => T_('Send reminders about inactive accounts'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_inactive_account_reminder.job.php',
 				'params' => NULL,
 			),
 			'execute-automations' => array(

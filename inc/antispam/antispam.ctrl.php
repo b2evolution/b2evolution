@@ -53,8 +53,11 @@ if( isset($filter['off']) )
 }
 
 // Check permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'spamblacklist', 'view', true );
+if( ! ( $current_User->check_perm( 'admin', 'normal' ) && $current_User->check_perm( 'spamblacklist', 'view' ) ) &&
+		! ( $current_User->check_perm( 'users', 'moderate' ) && ( ( $tab3 == 'tools' && $tool == 'whois' && empty( $action ) ) || $action == 'whois' ) ) )
+{
+	debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name ) );
+}
 
 
 if( param( 'iprange_ID', 'integer', '', true) )
@@ -130,7 +133,7 @@ switch( $action )
 			$deleted_ids = implode( ',', $deleted_ids );
 
 			// Delete all comments data from DB
-			Comment::db_delete_where( 'Comment', $keyword_cond.$del_condition );
+			Comment::db_delete_where( $keyword_cond.$del_condition );
 
 			$Messages->add_to_group( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
 		}
@@ -459,6 +462,21 @@ switch( $action )
 			$delete_bankruptcy_blogs = true;
 		}
 		break;
+
+	case 'whois':
+		$tab = '';
+		$tab3 = 'tools';
+		$tool = 'whois';
+		$query = param( 'query', 'string', NULL );
+		if( empty( $query ) )
+		{
+			param_error( 'query', T_('You must specify an IP address or domain to query') );
+		}
+		else
+		{
+			$template_action = 'whois';
+		}
+		break;
 }
 
 if( $display_mode != 'js' )
@@ -581,6 +599,8 @@ if( $display_mode != 'js' )
 if( in_array( $action, array( 'iprange_edit' ) ) )
 { // Initialize date picker
 	init_datepicker_js();
+	// Load jQuery QueryBuilder plugin files for user list filters:
+	init_querybuilder_js( 'rsc_url' );
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -600,13 +620,20 @@ switch( $tab3 )
 
 	case 'tools':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		if( $tool != 'whois' )
+		{
+			$current_User->check_perm( 'options', 'edit', true );
+		}
 
 		switch( $tool )
 		{
 			case 'bankruptcy':
 				$comment_status = param( 'comment_status', 'string', 'draft' );
 				$AdminUI->disp_view( 'antispam/views/_antispam_tools_bankruptcy.view.php' );
+				break;
+
+			case 'whois';
+				$AdminUI->disp_view( 'antispam/views/_antispam_whois.view.php' );
 				break;
 
 			default:

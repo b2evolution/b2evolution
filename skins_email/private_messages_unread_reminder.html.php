@@ -35,7 +35,7 @@ if( count( $params['unread_threads'] ) > 0 )
 
 // Buttons:
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
-echo get_link_tag( $params['threads_link'], T_('Read your private messages'), 'div.buttons a+a.button_green' )."\n";
+echo get_link_tag( $params['threads_link'], T_('Read your private messages'), 'div.buttons a+a.btn-primary' )."\n";
 echo "</div>\n";
 
 // Footer vars:

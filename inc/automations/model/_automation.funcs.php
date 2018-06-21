@@ -245,7 +245,7 @@ function step_get_result_titles()
 		),
 		'send_campaign' => array(
 			'YES'   => 'Email SENT',
-			'NO'    => 'Email was ALREADY sent',
+			'NO'    => 'Skipped: %s',
 			'ERROR' => 'ERROR: Email cannot be sent: %s',
 		),
 		'notify_owner' => array(
@@ -585,8 +585,8 @@ function automation_results_block( $params = array() )
 		WHERE autm_ID = an.aunl_autm_ID ) AS newsletters' );
 	$SQL->FROM( 'T_automation__automation' );
 	$SQL->FROM_add( 'LEFT JOIN T_automation__user_state ON aust_autm_ID = autm_ID' );
-	$SQL->FROM_add( 'INNER JOIN T_automation__newsletter ON autm_ID = aunl_autm_ID' );
-	$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON enlt_ID = aunl_enlt_ID' );
+	$SQL->FROM_add( 'LEFT JOIN T_automation__newsletter ON autm_ID = aunl_autm_ID' );
+	$SQL->FROM_add( 'LEFT JOIN T_email__newsletter ON enlt_ID = aunl_enlt_ID' );
 	$SQL->GROUP_BY( 'autm_ID' );
 
 	$count_SQL = new SQL( 'Get a count of automations' );

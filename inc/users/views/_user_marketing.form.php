@@ -21,7 +21,7 @@ global $edited_User, $UserSettings, $Settings, $Plugins;
 
 global $current_User;
 
-global $servertimenow, $admin_url, $user_tags;
+global $servertimenow, $admin_url, $user_tags, $action;
 
 if( ! $current_User->can_moderate_user( $edited_User->ID ) )
 { // Check permission:
@@ -43,7 +43,7 @@ $Form = new Form( NULL, 'user_checkchanges' );
 
 $Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
 
-echo_user_actions( $Form, $edited_User, 'edit' );
+echo_user_actions( $Form, $edited_User, $action );
 
 $form_text_title = T_( 'User marketing settings' ); // used for js confirmation message on leave the changed form
 $form_title = get_usertab_header( $edited_User, 'marketing', '<span class="nowrap">'.T_( 'User marketing settings' ).'</span>'.get_manual_link( 'user-marketing-tab' ) );
@@ -59,20 +59,24 @@ $Form->hidden( 'edited_user_login', $edited_User->login );
 
 $Form->begin_fieldset( T_('Tags').get_manual_link('user-marketing-tags') );
 
-	$Form->text_input( 'edited_user_tags', param( 'edited_user_tags', 'string', $user_tags ), 40, T_('Tags'), '', array(
-		'maxlength' => 255,
-		'style'     => 'width: 100%;',
-		'input_prefix' => '<div class="input-group user_admin_tags" style="width: 100%">',
-		'input_suffix' => '</div>',
-	) );
-	// Initialize JS to auto complete user tags fields:
-	echo_user_autocomplete_tags_js( '#edited_user_tags' );
+	if( $action != 'view' )
+	{	// If current user can edit this user:
+		$Form->usertag_input( 'edited_user_tags', param( 'edited_user_tags', 'string', $user_tags ), 40, T_('Tags'), '', array(
+				'maxlength' => 255,
+				'style'     => 'width: 100%;',
+			) );
+	}
+	else
+	{	// If current user cannot edit this user:
+		$Form->info( T_('Tags'), $user_tags );
+	}
 
 $Form->end_fieldset(); // user tags
 
-$action_buttons = array( array( '', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) );
-
-$Form->buttons( $action_buttons );
+if( $action != 'view' )
+{	// If current user can edit this user:
+	$Form->buttons( array( array( '', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
+}
 
 $Form->end_form();
 
@@ -86,10 +90,13 @@ $SQL->WHERE( 'aust_user_ID = '.$edited_User->ID );
 
 $Results = new Results( $SQL->get(), 'ustep_', '--A' );
 
-$Results->global_icon( T_('Add user to an automation...'), 'new', regenerate_url( 'action,user_tab', 'action=new_automation&amp;user_tab=automation' ), T_('Add user to an automation...'), 3, 4, array(
-		'class' => 'action_icon btn-primary',
-		'onclick' => 'return add_user_automation( '.$edited_User->ID.' )'
-	) );
+if( $action != 'view' )
+{	// If current user can edit this user:
+	$Results->global_icon( T_('Add user to an automation...'), 'new', regenerate_url( 'action,user_tab', 'action=new_automation&amp;user_tab=automation' ), T_('Add user to an automation...'), 3, 4, array(
+			'class' => 'action_icon btn-primary',
+			'onclick' => 'return add_user_automation( '.$edited_User->ID.' )'
+		) );
+}
 
 $Results->title = T_('Automations').get_manual_link( 'user-automations' );
 
@@ -110,9 +117,9 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th'       => T_('Next execution time'),
 		'order'    => 'aust_next_exec_ts',
-		'td'       => '%mysql2localedatetime( #aust_next_exec_ts# )%',
+		'td'       => '%mysql2localedatetime_spans( #aust_next_exec_ts# )%',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'nowrap',
+		'td_class' => 'timestamp',
 	);
 
 $Results->cols[] = array(
@@ -123,6 +130,120 @@ $Results->cols[] = array(
 	);
 
 $Results->display();
+
+// Display email campaigns
+$campaign_SQL = new SQL( 'Get email campaigns for the edited Uer #'.$edited_User->ID );
+$campaign_SQL->SELECT( 'ecmp_ID, ecmp_name, csnd_last_sent_ts, csnd_last_open_ts, csnd_last_click_ts, csnd_cta1, csnd_cta2, csnd_cta3, csnd_like, csnd_status, enls_subscribed, csnd_emlog_ID' );
+$campaign_SQL->FROM( 'T_email__campaign' );
+$campaign_SQL->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = '.$edited_User->ID.' AND enls_enlt_ID = ecmp_enlt_ID' );
+$campaign_SQL->FROM_add( 'INNER JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID' );
+$campaign_SQL->WHERE( 'csnd_user_ID = '.$edited_User->ID );
+
+$campaign_Results = new Results( $campaign_SQL->get(), 'ucamp_', 'D' );
+$Results->Cache = & get_EmailCampaignCache();
+$campaign_Results->title = T_('Email campaigns').get_manual_link( 'email-campaign-recipients' );
+
+$campaign_Results->cols[] = array(
+	'th' => T_('ID'),
+	'order' => 'ecmp_ID',
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'right',
+	'td' => '$ecmp_ID$',
+);
+
+$campaign_Results->cols[] = array(
+	'th' => T_('Campaign name'),
+	'order' => 'ecmp_name',
+	'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$"><b>$ecmp_name$</b></a>',
+);
+
+
+$campaign_Results->cols[] = array(
+		'th' => T_('List Status'),
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'nowrap',
+		'order' => 'enls_user_ID',
+		'td' => '~conditional( #enls_subscribed# > 0, \''.format_to_output( T_('Still subscribed'), 'htmlattr' ).'\', \''.format_to_output( T_('Unsubscribed'), 'htmlattr' ).'\' )~',
+	);
+
+$campaign_Results->cols[] = array(
+		'th' => T_('Campaign Status'),
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'center nowrap',
+		'order' => 'csnd_status',
+		'td' => '%user_td_campaign_status( #csnd_status#, #csnd_emlog_ID# )%'
+	);
+
+$campaign_Results->cols[] = array(
+		'th' => T_('Send date'),
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'timestamp',
+		'order' => 'csnd_last_sent_ts',
+		'default_dir' => 'D',
+		'td' => '%user_td_emlog_date( #csnd_last_sent_ts# )%',
+	);
+
+$campaign_Results->cols[] = array(
+	'th' => T_('Last opened'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'timestamp',
+	'order' => 'csnd_last_open_ts',
+	'default_dir' => 'D',
+	'td' => '%user_td_emlog_date( #csnd_last_open_ts# )%',
+);
+
+$campaign_Results->cols[] = array(
+	'th' => T_('Last clicked'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'timestamp',
+	'order' => 'csnd_last_click_ts',
+	'default_dir' => 'D',
+	'td' => '%user_td_emlog_date( #csnd_last_click_ts# )%',
+);
+
+$campaign_Results->cols[] = array(
+	'th' => /* TRANS: Call To Action 1*/ T_('CTA1'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'center',
+	'order' => 'csnd_cta1',
+	'td' => '%user_td_cta( #csnd_cta1# )%'
+);
+
+$campaign_Results->cols[] = array(
+	'th' => /* TRANS: Call To Action 2*/ T_('CTA2'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'center',
+	'order' => 'csnd_cta2',
+	'td' => '%user_td_cta( #csnd_cta2# )%'
+);
+
+$campaign_Results->cols[] = array(
+	'th' => /* TRANS: Call To Action 3*/ T_('CTA3'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'center',
+	'order' => 'csnd_cta3',
+	'td' => '%user_td_cta( #csnd_cta3# )%'
+);
+
+$campaign_Results->cols[] = array(
+	'th' => T_('Liked'),
+	'th_class' => 'shrinkwrap',
+	'td_class' => 'center',
+	'order' => 'csnd_like',
+	'td' => '%user_td_liked_email( #csnd_like# )%'
+);
+if( $action != 'view' )
+{	// If current user can edit this user:
+	$campaign_Results->cols[] = array(
+		'th' => T_('Actions'),
+		'th_class' => 'small',
+		'td_class' => 'shrinkwrap small',
+		'td' => '%user_td_campaign_actions( #ecmp_ID#, '.$edited_User->ID.', #csnd_status# )%'
+	);
+}
+
+$campaign_Results->display();
+
 
 // End payload block:
 $this->disp_payload_end();

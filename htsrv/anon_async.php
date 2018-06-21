@@ -759,48 +759,6 @@ switch( $action )
 
 		break;
 
-	case 'get_userfields_criteria':
-		// Get fieldset for users filter by Specific criteria
-
-		// Use the glyph or font-awesome icons if requested by skin
-		param( 'b2evo_icons_type', 'string', '' );
-
-		if( param( 'is_backoffice', 'integer', 0 ) )
-		{
-			global $current_User, $UserSettings, $is_admin_page;
-			$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
-			$is_admin_page = true;
-			/**
-			 * Load the AdminUI class for the skin.
-			 */
-			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
-			$AdminUI = new AdminUI();
-		}
-		else
-		{
-			$BlogCache = &get_BlogCache();
-			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
-			$skin_ID = $Blog->get_skin_ID();
-			$SkinCache = & get_SkinCache();
-			$Skin = & $SkinCache->get_by_ID( $skin_ID );
-		}
-
-		$Form = new Form();
-		$Form->switch_layout( 'blockspan' );
-
-		echo '<br />';
-		$Form->output = false;
-		$criteria_input = $Form->text( 'criteria_value[]', '', 17, '', '', 50 );
-		$criteria_input .= get_icon( 'add', 'imgtag', array( 'rel' => 'add_criteria' ) );
-		$Form->output = true;
-
-		global $user_fields_empty_name;
-		$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
-
-		$Form->select( 'criteria_type[]', '', 'callback_options_user_new_fields', T_('Specific criteria'), $criteria_input );
-
-		break;
-
 	case 'get_regions_option_list':
 		// Get option list with regions by selected country
 		$country_ID = param( 'ctry_id', 'integer', 0 );

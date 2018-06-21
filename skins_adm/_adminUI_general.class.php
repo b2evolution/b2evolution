@@ -1268,6 +1268,7 @@ class AdminUI_general extends Menu
 					'customstart' => '',
 					'customend' => "\n",
 					'note_format' => ' <span class="notes">%s</span>',
+					'bottom_note_format' => ' <div><span class="notes">%s</span></div>',
 					'formend' => '',
 				);
 
@@ -1298,6 +1299,7 @@ class AdminUI_general extends Menu
 					'customstart' => '<div class="custom_content">',
 					'customend' => "</div>\n",
 					'note_format' => ' <span class="notes">%s</span>',
+					'bottom_note_format' => ' <div><span class="notes">%s</span></div>',
 					'formend' => '',
 				);
 

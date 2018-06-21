@@ -449,7 +449,7 @@ class captcha_qstn_plugin extends Plugin
 			$Form = & $params['Form'];
 			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
 			{
-				$Form->begin_fieldset();
+				$Form->begin_fieldset( '', array( 'id' => $this->code ) );
 			}
 		}
 
@@ -458,6 +458,7 @@ class captcha_qstn_plugin extends Plugin
 				10, $this->T_('Captcha answer'), ( empty( $params['use_placeholders'] ) ? $this->T_('Please answer the question above').'.' : '' ),
 				array(
 						'placeholder' => empty( $params['use_placeholders'] ) ? '' : T_('Please answer the question above'),
+						'required'    => true,
 					)
 			);
 

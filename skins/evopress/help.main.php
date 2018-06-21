@@ -54,19 +54,6 @@ skin_include( '_body_header.inc.php' );
 	?>
 
 	<?php
-		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
-		request_title( array(
-				'title_before'=> '<h2>',
-				'title_after' => '</h2>',
-				'title_none'  => '',
-				'glue'        => ' - ',
-				'title_single_disp' => true,
-				'format'      => 'htmlbody',
-			) );
-		// ------------------------------ END OF REQUEST TITLE -----------------------------
-	?>
-
-	<?php
 		// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 		skin_include( '$disp$' );
 		// Note: you can customize any of the sub templates included here by

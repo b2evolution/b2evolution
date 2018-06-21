@@ -15,7 +15,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $edited_AutomationStep, $action, $admin_url;
+global $edited_AutomationStep, $action, $admin_url, $display_mode;
 
 // Get Automation of the creating/editing Step:
 $step_Automation = & $edited_AutomationStep->get_Automation();
@@ -23,13 +23,16 @@ $step_Automation = & $edited_AutomationStep->get_Automation();
 // Determine if we are creating or updating:
 $creating = is_create_action( $action );
 
-$Form = new Form( NULL, 'automation_checkchanges', 'post', 'compact' );
+$Form = new Form( NULL, 'automation_checkchanges', 'post', $display_mode == 'js' ? NULL : 'compact' );
 
 $edit_automation_url = regenerate_url( 'action,step_ID', 'action=edit&amp;autm_ID='.$step_Automation->ID );
 
-$Form->global_icon( T_('Cancel editing').'!', 'close', $edit_automation_url );
+if( $display_mode != 'js' )
+{
+	$Form->global_icon( T_('Cancel editing').'!', 'close', $edit_automation_url );
+}
 
-$Form->begin_form( 'fform', sprintf( $creating ? ( $edited_AutomationStep->ID > 0 ? T_('Duplicate step') : T_('New step') ) : T_('Step') ).get_manual_link( 'automation-step-form' ) );
+$Form->begin_form( 'fform', $display_mode == 'js' ? '' : sprintf( $creating ? ( $edited_AutomationStep->ID > 0 ? T_('Duplicate step') : T_('New step') ) : T_('Step') ).get_manual_link( 'automation-step-form' ) );
 
 $Form->add_crumb( 'automationstep' );
 $Form->hidden( 'action', $creating ? ( $edited_AutomationStep->ID > 0 ? 'duplicate_step' : 'create_step' ) : 'update_step' );
@@ -145,7 +148,7 @@ $Form->end_form( array(
 		array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' )
 	) );
 
-if( ! $creating )
+if( ! $creating && $display_mode != 'js' )
 {	// Display numbers of users queued for the edited Automation Step:
 	$SQL = new SQL( 'Get all users queued for automation step #'.$edited_AutomationStep->ID );
 	$SQL->SELECT( 'aust_autm_ID, aust_user_ID, aust_next_exec_ts, user_login' );
@@ -171,9 +174,9 @@ if( ! $creating )
 	$Results->cols[] = array(
 			'th'       => T_('Next execution time'),
 			'order'    => 'aust_next_exec_ts',
-			'td'       => '%mysql2localedatetime( #aust_next_exec_ts# )%',
+			'td'       => '%mysql2localedatetime_spans( #aust_next_exec_ts# )%',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'nowrap',
+			'td_class' => 'timestamp',
 		);
 
 	$Results->cols[] = array(
@@ -210,6 +213,7 @@ jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID, #step_error_next_step_ID
 function step_type_update_info( step_type )
 {
 	jQuery( '#ffield_step_email_campaign, .ffield_step_if_condition, #ffield_step_notification_message, #ffield_step_usertag, #ffield_step_newsletter, #ffield_step_automation' ).hide();
+	jQuery( '#step_email_campaign, #step_newsletter, #step_automation' ).removeAttr( 'required' );
 	jQuery( '#ffield_step_no_next' ).show();
 	jQuery( '#ffield_step_error_next' ).show();
 
@@ -217,6 +221,7 @@ function step_type_update_info( step_type )
 	{
 		case 'send_campaign':
 			jQuery( '#ffield_step_email_campaign' ).show();
+			jQuery( '#step_email_campaign' ).attr( 'required', 'required' );
 			jQuery( '#step_result_label_yes' ).html( '<?php echo TS_( step_get_result_label( 'send_campaign', 'YES' ) ); ?>' );
 			jQuery( '#step_result_label_no' ).html( '<?php echo TS_( step_get_result_label( 'send_campaign', 'NO' ) ); ?>' );
 			jQuery( '#step_result_label_error' ).html( '<?php echo TS_( step_get_result_label( 'send_campaign', 'ERROR' ) ); ?>' );
@@ -266,6 +271,7 @@ function step_type_update_info( step_type )
 		case 'subscribe':
 		case 'unsubscribe':
 			jQuery( '#ffield_step_newsletter' ).show();
+			jQuery( '#step_newsletter' ).attr( 'required', 'required' );
 			jQuery( '#step_result_label_yes' ).html( step_type == 'subscribe' ? '<?php echo TS_( step_get_result_label( 'subscribe', 'YES' ) ); ?>' : '<?php echo TS_( step_get_result_label( 'unsubscribe', 'YES' ) ); ?>' );
 			jQuery( '#step_result_label_no' ).html( step_type == 'subscribe' ? '<?php echo TS_( step_get_result_label( 'subscribe', 'NO' ) ); ?>' : '<?php echo TS_( step_get_result_label( 'unsubscribe', 'NO' ) ); ?>' );
 			jQuery( '#step_result_label_error' ).html( step_type == 'subscribe' ? '<?php echo TS_( step_get_result_label( 'subscribe', 'ERROR' ) ); ?>' : '<?php echo TS_( step_get_result_label( 'unsubscribe', 'ERROR' ) ); ?>' );
@@ -282,6 +288,7 @@ function step_type_update_info( step_type )
 
 		case 'start_automation':
 			jQuery( '#ffield_step_automation' ).show();
+			jQuery( '#step_automation' ).attr( 'required', 'required' );
 			jQuery( '#step_result_label_yes' ).html( '<?php echo TS_( step_get_result_label( 'start_automation', 'YES' ) ); ?>' );
 			jQuery( '#step_result_label_no' ).html( '<?php echo TS_( step_get_result_label( 'start_automation', 'NO' ) ); ?>' );
 			jQuery( '#step_result_label_error' ).html( '<?php echo TS_( step_get_result_label( 'start_automation', 'ERROR' ) ); ?>' );
@@ -338,6 +345,7 @@ jQuery( document ).ready( function()
 			error: 'fa fa-warning',
 		},
 		lang: {
+			add_rule: '<?php echo TS_('Add condition'); ?>',
 			operators: {
 				equal: '=',
 				not_equal: '&#8800;',
@@ -501,7 +509,7 @@ function evo_query_builder_listsend_value_setter( rule, value )
 }
 
 // Prepare form before submitting:
-jQuery( 'form' ).on( 'submit', function()
+jQuery( 'form#automation_checkchanges' ).submit( function( e )
 {
 	if( jQuery( '#step_type' ).val() == 'if_condition' )
 	{	// Convert "IF Condition" field to JSON format:
@@ -515,5 +523,66 @@ jQuery( 'form' ).on( 'submit', function()
 			jQuery( 'input[name=step_if_condition]' ).val( JSON.stringify( result ) );
 		}
 	}
+
+	jQuery.ajax(
+	{	// Check if automation is paused before saving step:
+		url: '<?php echo get_htsrv_url(); ?>async.php',
+		data: {
+			'action': 'get_automation_status',
+			'autm_ID': <?php echo $step_Automation->ID; ?>
+		},
+		success: function( automation_status )
+		{
+			if( automation_status == 'paused' )
+			{	// Allow to submit if automation is paused:
+				default_submit_automation_step();
+			}
+			else
+			{	// Confirm to pause automation before modifying step:
+				jQuery( '#step_confirmation_modal' ).modal();
+			}
+		}
+	} );
+
+	return false;
+} );
+
+function default_submit_automation_step()
+{
+	// Unbind custom function in order to submit the form as default event without restrictions:
+	jQuery( 'form#automation_checkchanges' ).unbind( 'submit' );
+	// Note: We use the btn.click() here because the form.submit() does not work as expected by some unknown reason:
+	jQuery( 'form#automation_checkchanges [type=submit]' ).click();
+}
+
+// Actions for confirmation modal window:
+jQuery( document ).on( 'click', '#btn_pause_edit', function()
+{	// Submit a form to pause and save changes:
+	jQuery( 'form#automation_checkchanges' ).append( '<input type="hidden" name="confirm_pause" value="1">' );
+	default_submit_automation_step();
+} );
+jQuery( document ).on( 'click', '#btn_abort_edit, #step_confirmation_modal .close', function()
+{	// Abort:
+	jQuery( '#step_confirmation_modal' ).modal( 'hide' );
 } );
 </script>
+<?php
+// Modal window to confirm editing when automation is paused:
+?>
+<div id="step_confirmation_modal" class="modal modal2 fade in" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" aria-hidden="true">&times;</button>
+				<h4 class="modal-title"><?php echo T_('Confirmation'); ?></h4>
+			</div>
+			<div class="modal-body">
+				<p><?php echo T_('You must pause the automation before creating it.'); ?></p>
+			</div>
+			<div class="modal-footer">
+				<button id="btn_pause_edit" type="button" class="btn btn-danger"><?php echo T_('Pause & edit'); ?></button>
+				<button id="btn_abort_edit" type="button" class="btn btn-default"><?php echo T_('Abort edit'); ?></button>
+			</div>
+		</div>
+	</div>
+</div>

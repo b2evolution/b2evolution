@@ -64,6 +64,8 @@ class photoalbums_Skin extends Skin
 				'404_page'               => array( NT_('404 Page'), 110 ),
 				'login_required'         => array( NT_('Login Required'), 120 ),
 				'access_denied'          => array( NT_('Access Denied'), 130 ),
+				'help'                   => array( NT_('Help'), 140 ),
+				'register'               => array( NT_('Register'), 150 ),
 			);
 	}
 

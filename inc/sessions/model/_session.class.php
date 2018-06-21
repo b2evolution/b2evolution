@@ -280,9 +280,12 @@ class Session
 	/**
 	 * Delete sessions from database based on where condition or by object ids
 	 *
-	 * @return array
+	 * @param string where condition
+	 * @param array object ids
+	 * @param array additional params if required
+	 * @return mixed # of rows affected or false if error
 	 */
-	static function db_delete_where( $class_name, $sql_where, $object_ids = NULL, $params = NULL )
+	static function db_delete_where( $sql_where, $object_ids = NULL, $params = NULL )
 	{
 		global $DB;
 

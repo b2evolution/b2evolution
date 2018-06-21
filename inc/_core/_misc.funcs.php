@@ -330,14 +330,8 @@ function format_to_output( $content, $format = 'htmlbody' )
 		case 'htmlspecialchars':
 		case 'formvalue':
 			// Replace special chars to &amp;, &quot;, &#039;|&apos;, &lt; and &gt; :
-			if( version_compare( phpversion(), '5.4', '>=' ) )
-			{	// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
-				$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
-			}
-			else
-			{	// Handles & " ' < > to &amp; &quot; &#039; &lt; &gt;
-				$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );
-			}
+			// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
+			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
 			break;
 
 		case 'xml':
@@ -365,14 +359,8 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 		case 'syslog':
 			// Replace special chars to &amp;, &quot;, &#039;|&apos;, &lt; and &gt; :
-			if( version_compare( phpversion(), '5.4', '>=' ) )
-			{	// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
-				$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
-			}
-			else
-			{	// Handles & " ' < > to &amp; &quot; &#039; &lt; &gt;
-				$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );
-			}
+			// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
+			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
 			$content = preg_replace( "/\[\[(.+?)]]/is", "<code>$1</code>", $content ); // Replaces [[...]] into <code>...</code>
 			break;
 
@@ -1683,17 +1671,18 @@ function date_ago( $timestamp )
  * Convert seconds to readable period
  *
  * @param integer Seconds
+ * @param boolean TRUE to use short format(only first letter of period name)
  * @return string Readable time period
  */
-function seconds_to_period( $seconds )
+function seconds_to_period( $seconds, $short_format = false )
 {
 	$periods = array(
-		array( 31536000, T_('1 year'),   T_('%s years') ), // 365 days
-		array( 2592000,  T_('1 month'),  T_('%s months') ), // 30 days
-		array( 86400,    T_('1 day'),    T_('%s days') ),
-		array( 3600,     T_('1 hour'),   T_('%s hours') ),
-		array( 60,       T_('1 minute'), T_('%s minutes') ),
-		array( 1,        T_('1 second'), T_('%s seconds') ),
+		array( 31536000, T_('1 year'),   T_('%s years'),   /* TRANS: Short for "1year" */  T_('%sy') ), // 365 days
+		array( 2592000,  T_('1 month'),  T_('%s months'),  /* TRANS: Short for "1month" */ T_('%sm') ), // 30 days
+		array( 86400,    T_('1 day'),    T_('%s days'),    /* TRANS: Short for "1day" */   T_('%sd') ),
+		array( 3600,     T_('1 hour'),   T_('%s hours'),   /* TRANS: Short for "1hour" */  T_('%sh') ),
+		array( 60,       T_('1 minute'), T_('%s minutes'), /* TRANS: Short for "1minute" */T_('%smn') ),
+		array( 1,        T_('1 second'), T_('%s seconds'), /* TRANS: Short for "1second" */T_('%ss') ),
 	);
 
 	foreach( $periods as $p_info )
@@ -1701,7 +1690,11 @@ function seconds_to_period( $seconds )
 		$period_value = intval( $seconds / $p_info[0] * 10 ) /10;
 		if( $period_value >= 1 )
 		{ // Stop on this period
-			if( $period_value == 1 )
+			if( $short_format )
+			{	// Use short format:
+				$period_text = sprintf( $p_info[3], $period_value );
+			}
+			elseif( $period_value == 1 )
 			{ // One unit of period
 				$period_text = $p_info[1];
 			}
@@ -1715,7 +1708,7 @@ function seconds_to_period( $seconds )
 
 	if( !isset( $period_text ) )
 	{ // 0 seconds
-		$period_text = sprintf( T_('%s seconds'), 0 );
+		$period_text = $short_format ? sprintf( T_('%ss'), 0 ) : sprintf( T_('%s seconds'), 0 );
 	}
 
 	return $period_text;
@@ -4008,6 +4001,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'private_messages_unread_reminder':
 				// 'notify_unread_messages' - "I have unread private messages for more than X seconds."(X = $Settings->get( 'unread_message_reminder_threshold' ))
 			case 'comment_new':
+				// 'notify_comment_mentioned' - "I have been mentioned on a comment.",
 				// 'notify_published_comments' - "a comment is published on one of my posts.",
 				// 'notify_comment_moderation' - "a comment is posted and I have permissions to moderate it.",
 				// 'notify_edit_cmt_moderation' - "a comment is modified and I have permissions to moderate it.",
@@ -4017,14 +4011,19 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'comments_unmoderated_reminder':
 				// 'send_cmt_moderation_reminder' - "comments are awaiting moderation for more than X seconds."(X = $Settings->get( 'comment_moderation_reminder_threshold' ))
 			case 'post_new':
+				// 'notify_post_mentioned' - "I have been mentioned on a post.",
 				// 'notify_post_moderation' - "a post is created and I have permissions to moderate it."
 				// 'notify_edit_pst_moderation' - "a post is modified and I have permissions to moderate it."
+			case 'post_assignment':
+				// 'notify_post_assignment' - "a post was assigned to me."
 			case 'posts_unmoderated_reminder':
 				// 'send_pst_moderation_reminder' - "posts are awaiting moderation for more than X seconds."(X = $Settings->get( 'post_moderation_reminder_threshold' ))
 			case 'posts_stale_alert':
 				// 'send_pst_stale_alert' - "there are stale posts and I have permission to moderate them."
 			case 'account_activate':
 				// 'send_activation_reminder' - "my account was deactivated or is not activated for more than X seconds."(X - $Settings->get( 'activate_account_reminder_threshold' ))
+			case 'account_inactive':
+				// 'send_inactive_reminder' - "my account has been inactive for more than X months."(X - $Settings->get( 'inactive_account_reminder_threshold' ))
 			case 'account_new':
 				// 'notify_new_user_registration' - "a new user has registered."
 			case 'account_activated':
@@ -4116,47 +4115,131 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 
 
 /**
+ * Sends an email to anonymous User
+ *
+ * @param integer Recipient ID.
+ * @param string Subject of the mail
+ * @param string Email template name
+ * @param array Email template params
+ * @param boolean Force to send this email even if the user is not activated. By default not activated user won't get emails.
+ *                Pasword reset, and account activation emails must be always forced.
+ * @param array Additional headers ( headername => value ). Take care of injection!
+ * @param string Use this param if you want use different email address instead of $User->email
+ * @return boolean True if mail could be sent (not necessarily delivered!), false if not - (return value of {@link mail()})
+ */
+function send_mail_to_anonymous_user( $user_email, $user_name, $subject, $template_name, $template_params = array(), $force_on_non_activated = false, $headers = array(), $force_email_address = '' )
+{
+	/**
+	 * @var string|NULL This global var stores ID of the last mail log message
+	 */
+	global $mail_log_message;
+	$mail_log_message = NULL;
+
+	// Check if a new email to anonymous user with the corrensponding email type is allowed:
+	switch( $template_name )
+	{
+		case 'comment_new':
+			// Notify anonymous user of replies:
+			if( isset( $template_params['comment_ID'] ) && ! check_allow_new_anon_email( $template_params['comment_ID'] ) )
+			{	// more notification email is not allowed today:
+				$mail_log_message = 'Sending mail to anonymous user #'.$user_email.'('.$user_name.') is FAILED, because user is already limited to receive more notifications for TODAY.';
+				return false;
+			}
+			break;
+	}
+
+	$template_params['boundary'] = 'b2evo-'.md5( rand() );
+	$headers['Content-Type'] = 'multipart/mixed; boundary="'.$template_params['boundary'].'"';
+
+	if( ! isset( $template_params['anonymous_recipient_name'] ) )
+	{	// Set recipient User, it should be defined for each template because of email footer:
+		$template_params['anonymous_recipient_name'] = $user_name;
+	}
+
+	// Get a message text from template file:
+	$message = mail_template( $template_name, 'auto', $template_params );
+
+	// Autoinsert user's data:
+	$subject = mail_autoinsert_user_data( $subject, NULL, 'text', $user_email, $user_name );
+
+	// Params for email log:
+	$email_campaign_ID = empty( $template_params['ecmp_ID'] ) ? NULL : $template_params['ecmp_ID'];
+	$automation_ID = empty( $template_params['autm_ID'] ) ? NULL : $template_params['autm_ID'];
+
+	if( send_mail( $user_email, $user_name, $subject, $message, NULL, NULL, $headers, NULL, $email_campaign_ID, $automation_ID ) )
+	{	// Email was sent:
+		if( isset( $template_params['comment_ID'] ) )
+		{	// Anonymous user settings(email counters) need to be updated:
+			update_anon_user_email_counter( $template_params['comment_ID'] );
+		}
+		return true;
+	}
+
+	// No user or email could not be sent:
+	return false;
+}
+
+
+/**
  * Autoinsert user's data into subject or message of the email
  *
  * @param string Text
  * @param object User
+ * @param string Format: 'html', 'text'
+ * @param string Email of anonymous user
+ * @param string Name of anonymous user
  * @return string Text
 */
-function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text' )
+function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user_email = NULL, $user_name = NULL )
 {
-	if( !$User )
-	{	// No user
+	if( ! $User && ! ( $user_email || $user_email ) )
+	{	// No user data:
 		return $text;
 	}
 
-	if( $format == 'html' )
-	{
-		$username = $User->get_colored_login( array(
-				'mask'      => '$avatar$ $login$',
-				'login_text'=> 'name',
-				'use_style' => true,
-				'protocol'  => 'http:',
-			) );
+	if( $User )
+	{	// Get data of registered User:
+		if( $format == 'html' )
+		{
+			$username = $User->get_colored_login( array(
+					'mask'      => '$avatar$ $login$',
+					'login_text'=> 'name',
+					'use_style' => true,
+					'protocol'  => 'http:',
+				) );
 
-		$user_login = $User->get_colored_login( array(
-				'mask'      => '$avatar$ $login$',
-				'use_style' => true,
-				'protocol'  => 'http:',
-			) );
+			$user_login = $User->get_colored_login( array(
+					'mask'      => '$avatar$ $login$',
+					'use_style' => true,
+					'protocol'  => 'http:',
+				) );
+		}
+		else
+		{
+			$username = $User->get_username();
+			$user_login = $User->login;
+		}
+
+		$firstname = $User->get( 'firstname' );
+		$lastname = $User->get( 'lastname' );
+		$firstname_and_login = empty( $firstname ) ? $user_login : $firstname.' ('.$user_login.')';
+		$firstname_or_login = empty( $firstname ) ? $user_login : $firstname;
+		$user_email = $User->email;
+		$user_ID = $User->ID;
+		$unsubscribe_key = '$secret_content_start$'.md5( $User->ID.$User->unsubscribe_key ).'$secret_content_end$';
 	}
 	else
-	{
-		$username = $User->get_username();
-		$user_login = $User->login;
+	{	// Get data of anonymous user:
+		$username = $user_name;
+		$user_login = $user_name;
+		$firstname = $user_name;
+		$lastname = $user_name;
+		$firstname_and_login = $user_name;
+		$firstname_or_login = $user_name;
+		$user_email = $user_email;
+		$user_ID = '';
+		$unsubscribe_key = '';
 	}
-
-	$firstname = $User->get( 'firstname' );
-	$lastname = $User->get( 'lastname' );
-	$firstname_and_login = empty( $firstname ) ? $user_login : $firstname.' ('.$user_login.')';
-	$firstname_or_login = empty( $firstname ) ? $user_login : $firstname;
-	$user_email = $User->email;
-	$user_ID = $User->ID;
-	$unsubscribe_key = '$secret_content_start$'.md5( $User->ID.$User->unsubscribe_key ).'$secret_content_end$';
 
 	$rpls_from = array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$', '$email$', '$user_ID$', '$unsubscribe_key$' );
 	$rpls_to = array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login, $user_email, $user_ID, $unsubscribe_key );
@@ -4257,8 +4340,12 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 			$formated_message = mail_autoinsert_user_data( $formated_message, $User, $format );
 		}
 		elseif( ! empty( $params['anonymous_recipient_name'] ) )
-		{
+		{	// Replace anonymous name:
 			$formated_message = str_replace( '$name$', $params['anonymous_recipient_name'], $formated_message );
+			if( ! empty( $params['anonymous_unsubscribe_key'] ) )
+			{	// Replace anonymous unsubscribe key:
+				$formated_message = str_replace( '$unsubscribe_key$', $params['anonymous_unsubscribe_key'], $formated_message );
+			}
 		}
 
 		if( $params['add_email_tracking'] )
@@ -4606,6 +4693,11 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 		$link_attribs['class'] .= ' hoverlink';
 	}
 
+	// Format title attribute because it may contains the unexpected chars from translatable strings:
+	if( isset( $link_attribs['title'] ) )
+	{
+		$link_attribs['title'] = format_to_output( $link_attribs['title'], 'htmlattr' );
+	}
 
 	// NOTE: We do not use format_to_output with get_field_attribs_as_string() here, because it interferes with the Results class (eval() fails on entitied quotes..) (blueyed)
 	return '<a'.get_field_attribs_as_string( $link_attribs, false ).'>'.$a_body.'</a>';
@@ -4840,6 +4932,16 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 				}
 
+				// Format title and alt attributes because they may contain the unexpected chars from translatable strings:
+				if( isset( $params['title'] ) )
+				{
+					$params['title'] = format_to_output( $params['title'], 'htmlattr' );
+				}
+				if( isset( $params['alt'] ) )
+				{
+					$params['alt'] = format_to_output( $params['alt'], 'htmlattr' );
+				}
+
 				if( isset( $icon['size-'.$icon_param_name] ) )
 				{ // Set a size for icon only for current type
 					if( isset( $icon['size-'.$icon_param_name][0] ) )
@@ -4919,6 +5021,16 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 				}
 
+				// Format title and alt attributes because they may contain the unexpected chars from translatable strings:
+				if( isset( $params['title'] ) )
+				{
+					$params['title'] = format_to_output( $params['title'], 'htmlattr' );
+				}
+				if( isset( $params['alt'] ) )
+				{
+					$params['alt'] = format_to_output( $params['alt'], 'htmlattr' );
+				}
+
 				if( isset( $params['class'] ) )
 				{	// Get class from params
 					$params['class'] = 'icon '.$params['class'];
@@ -4972,6 +5084,12 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					{ // $iconKey as alt-tag
 						$params['alt'] = $iconKey;
 					}
+				}
+
+				// Format alt attribute because it may contains the unexpected chars from translatable strings:
+				if( isset( $params['alt'] ) )
+				{
+					$params['alt'] = format_to_output( $params['alt'], 'htmlattr' );
 				}
 
 				// Add all the attributes:
@@ -6712,8 +6830,8 @@ function get_samedomain_htsrv_url( $secure = false )
 		debug_die( 'Invalid hosts!' );
 	}
 
-	$req_domain = $req_url_parts['host'];
-	$htsrv_domain = $hsrv_url_parts['host'];
+	$req_domain = rtrim( $req_url_parts['host'].( isset( $req_url_parts['path'] ) ? $req_url_parts['path'] : '' ), '/' );
+	$htsrv_domain = rtrim( $hsrv_url_parts['host'].( isset( $hsrv_url_parts['path'] ) ? $hsrv_url_parts['path'] : '' ), '/' );
 
 	// Replace domain + path of htsrv URL with current request:
 	$samedomain_htsrv_url = substr_replace( $req_htsrv_url, $req_domain, strpos( $req_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
@@ -7083,7 +7201,7 @@ function is_ajax_content( $template_name = '' )
  *
  * @param string Message text
  * @param string Log type: 'info', 'warning', 'error', 'critical_error'
- * @param string Object type: 'comment', 'item', 'user', 'file' or leave default NULL if none of them
+ * @param string Object type: 'comment', 'item', 'user', 'file', 'email_log' or leave default NULL if none of them
  * @param integer Object ID
  * @param string Origin type: 'core', 'plugin'
  * @param integer Origin ID
@@ -7377,6 +7495,8 @@ jQuery( document ).ready( function()
 <?php
 	}
 ?>
+if( jQuery( '<?php echo $params['column_selector']; ?>' ).length > 0 )
+{	// Initialize only when the requested element exists on the current page:
 	jQuery( '<?php echo $params['column_selector']; ?>' ).editable( '<?php echo $params['ajax_url']; ?>',
 	{
 		data: function( value, settings )
@@ -7458,6 +7578,7 @@ jQuery( document ).ready( function()
 			}
 		}
 	} );
+}
 <?php
 	if( $params['print_init_tags'] )
 	{
@@ -7670,7 +7791,7 @@ function echo_fieldset_folding_js()
 
 ?>
 <script type="text/javascript">
-jQuery( 'span[id^=icon_folding_], span[id^=title_folding_]' ).click( function()
+jQuery( document ).on( 'click', 'span[id^=icon_folding_], span[id^=title_folding_]', function()
 {
 	var is_icon = jQuery( this ).attr( 'id' ).match( /^icon_folding_/ );
 	var wrapper_obj = jQuery( this ).closest( '.fieldset_wrapper' );

@@ -117,11 +117,12 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 				'class'     => 'wide_input',
 				'required'  => $Blog->get_setting( 'msgform_require_name' ),
 			) );
-		$Form->text_input( $dummy_fields['email'], $email_author_address, 40, T_('Email'),
-			T_('Your email address. (Will <strong>not</strong> be displayed on this site.)'), array(
-				'maxlength' => 150,
-				'class'     => 'wide_input',
-				'required'  => true,
+		$Form->email_input( $dummy_fields['email'], $email_author_address, 40, T_('Email'), array(
+				'maxlength'   => 150,
+				'class'       => 'wide_input',
+				'required'    => true,
+				'note'        => T_('Your email address' ),
+				'bottom_note' => T_('Your email address will <strong>not</strong> be displayed on this site BUT it will be sent to the person you are contacting, otherwise they would not be able to reply to you.')
 			) );
 	}
 

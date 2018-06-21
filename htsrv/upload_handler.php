@@ -85,8 +85,7 @@ class UploadHandler {
 
 		while( ! feof( $target ) )
 		{
-			$curr_mem_usage = memory_get_usage( true );
-			if( ( $memory_limit - $curr_mem_usage ) < 8192 )
+			if( $memory_limit != -1 && ( $memory_limit - memory_get_usage( true ) ) < 8192 )
 			{ // Don't try to load the next portion of image into the memory because it would cause 'Allowed memory size exhausted' error
 				fclose( $temp );
 				return array( 'error' => T_('Out of memory.') );
@@ -225,8 +224,7 @@ class UploadHandler {
 
 			while( ! feof( $temp ) )
 			{
-				$curr_mem_usage = memory_get_usage( true );
-				if( ( $memory_limit - $curr_mem_usage ) < 8192 )
+				if( $memory_limit != -1 && ( $memory_limit - memory_get_usage( true ) ) < 8192 )
 				{ // Don't try to load the next portion of image into the memory because it would cause 'Allowed memory size exhausted' error
 					fclose( $temp );
 					return array( 'error' => T_('Out of memory.') );

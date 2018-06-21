@@ -52,20 +52,22 @@ class GeneralSettings extends AbstractSettings
 		'auto_empty_trash' => '15',         // days (How many days to keep recycled comments)
 
 		'cleanup_jobs_threshold' => 45, // days (Cleanup scheduled jobs threshold)
+		'cleanup_email_logs_threshold' => 59616000, // seconds (Cleanup email logs threshold)
 		'activate_account_reminder_threshold' => 86400, // seconds (Account activation reminder threshold)
-		'activate_account_reminder_config' => '86400'./* one day */',129600'./* 1.5 days */',345600'./* 4 days */',604800'/* 7 days */, // seconds (Account activation reminder settings)
+		'activate_account_reminder_config' => '86400,129600,345600,604800', // seconds (Account activation reminder settings), Defaults: one day, 1.5 days, 4 days, 7 days
+		'inactive_account_reminder_threshold' => 31536000, // seconds (Inactive account reminder threshold)
 		'comment_moderation_reminder_threshold' => 86400, // seconds (Comment moderation reminder threshold)
 		'post_moderation_reminder_threshold' => 86400, // seconds (Post moderation reminder threshold)
 		'unread_message_reminder_threshold' => 86400, // seconds (Unread private messages reminder threshold)
-		'unread_message_reminder_delay' => // Unread message reminder is sent in every y days in case when a user last logged in date is below x days.
-			// The values below are in x:y format.
-			'10:3,'.   // less than 10 days -> 3 days spacing
-			'30:6,'.   //  10 to  30 days ->   6 days spacing
-			'90:15,'.  //  30 to  90 days ->  15 days spacing
-			'180:30,'. //  90 to 180 days ->  30 days spacing
-			'365:60,'. // 180 to 365 days ->  60 days spacing
-			'730:120', // 365 to 730 days -> 120 days spacing
-			// more => "The user has not logged in for x days, so we will not send him notifications any more".
+		'unread_message_reminder_delay' => '10:3,30:6,90:15,180:30,365:60,730:120',// Unread message reminder is sent in every y days in case when a user last logged in date is below x days.
+			/* The default values are in x:y format:
+				less than 10 days ->   3 days spacing
+				   10 to  30 days ->   6 days spacing
+				   30 to  90 days ->  15 days spacing
+				   90 to 180 days ->  30 days spacing
+				  180 to 365 days ->  60 days spacing
+				  365 to 730 days -> 120 days spacing
+				more => "The user has not logged in for x days, so we will not send him notifications any more"*/
 
 		'email_service' => 'mail', // Preferred email service: 'mail', 'smtp'
 		'force_email_sending' => '0', // Force email sending
@@ -128,13 +130,16 @@ class GeneralSettings extends AbstractSettings
 		'def_enable_email' => '0',
 		'def_notify_messages' => '1',
 		'def_notify_unread_messages' => '1',
+		'def_notify_comment_mentioned' => '1',
 		'def_notify_published_comments' => '1',
 		'def_notify_comment_moderation' => '1',
 		'def_notify_edit_cmt_moderation' => '1',
 		'def_notify_spam_cmt_moderation' => '1',
 		'def_notify_meta_comments' => '1',
+		'def_notify_post_mentioned' => '1',
 		'def_notify_post_moderation' => '1',
 		'def_notify_edit_pst_moderation' => '1',
+		'def_notify_post_assignment' => '1',
 		'def_newsletters' => '1',
 		'def_notification_email_limit' => '3',
 		'def_newsletter_limit' => '3',

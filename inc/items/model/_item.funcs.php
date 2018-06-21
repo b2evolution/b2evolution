@@ -184,7 +184,10 @@ function init_inskin_editing()
 		$def_status = get_highest_publish_status( 'post', $Blog->ID, false, '', $edited_Item );
 		$edited_Item->set( 'status', $def_status );
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
-		$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
+		$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
+		// Prefill data from url:
+		$edited_Item->set( 'title', param( 'post_title', 'string' ) );
+		$edited_Item->set( 'urltitle', param( 'post_urltitle', 'string' ) );
 
 		// Set default locations from current user
 		$edited_Item->set_creator_location( 'country' );
@@ -224,7 +227,7 @@ function init_inskin_editing()
 	// Get an url for a link 'Go to advanced edit screen'
 	$advanced_edit_link = array(
 			'href'    => $admin_url.'?ctrl=items&amp;action='.$action.'&amp;'.$tab_switch_params,
-			'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'\' );',
+			'onclick' => 'return b2edit_reload( \'#item_checkchanges\', \''.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'\' );',
 		);
 
 	$form_action = get_htsrv_url().'item_edit.php';
@@ -1908,7 +1911,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	if( ! $inskin || $display_preview )
 	{
 		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
-		$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
+		$Form->button( array( 'button', '', /* TRANS: Verb */ T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
 	}
 
 	// ---------- VISIBILITY ----------
@@ -2672,9 +2675,15 @@ jQuery( document ).on( 'click', '#evo_merge_btn_back_to_list', function()
  * Output Javascript for tags autocompletion.
  * @todo dh> a more facebook like widget would be: http://plugins.jquery.com/project/facelist
  *           "ListBuilder" is being planned for jQuery UI: http://wiki.jqueryui.com/ListBuilder
+ *
+ * @param array Params
  */
-function echo_autocomplete_tags()
+function echo_autocomplete_tags( $params = array() )
 {
+	$params = array_merge( array(
+			'item_ID'        => NULL,
+			'update_by_ajax' => false,
+		), $params );
 ?>
 	<script type="text/javascript">
 	function init_autocomplete_tags( selector )
@@ -2702,12 +2711,35 @@ function echo_autocomplete_tags()
 			noResultsText: '<?php echo TS_('No results') ?>',
 			searchingText: '<?php echo TS_('Searching...') ?>',
 			jsonContainer: 'tags',
+			<?php if( $params['update_by_ajax'] ) { ?>
+			onAdd: function() { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector ) },
+			onDelete: function() { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector ) },
+			<?php } ?>
 		} );
 	}
 
+	<?php if( $params['update_by_ajax'] ) { ?>
+	function evo_update_item_tags_by_ajax( item_ID, tags_selector )
+	{
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url(); ?>action.php',
+			data:
+			{
+				'mname': 'collections',
+				'action': 'update_tags',
+				'item_ID': item_ID,
+				'item_tags': jQuery( tags_selector ).val(),
+				'crumb_collections_update_tags': '<?php echo get_crumb( 'collections_update_tags' ); ?>'
+			}
+		} );
+	}
+	<?php } ?>
+
 	jQuery( document ).ready( function()
 	{
-		if( jQuery( '#suggest_item_tags' ).is( ':checked' ) )
+		if( jQuery( '#suggest_item_tags' ).length == 0 || jQuery( '#suggest_item_tags' ).is( ':checked' ) )
 		{
 			init_autocomplete_tags( '#item_tags' );
 		}
@@ -3330,7 +3362,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 	$CommentList->display_if_empty( array(
 		'before'    => '<div class="evo_comment"><p>',
 		'after'     => '</p></div>',
-		'msg_empty' => T_('No feedback for this post yet...'),
+		'msg_empty' => ( $item_ID > 0 ? T_('No feedback for this post yet...') : T_('No comment yet...') ),
 	) );
 
 	// Display comments:
@@ -3415,7 +3447,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 			echo '</div>';
 		}
 
-		if( ! empty( $item_id ) && $Comment->ID > 0 && ! $Comment->is_meta() )
+		if( $Comment->ID > 0 && ! $Comment->is_meta() )
 		{	// Display checkbox to select normal existing comments for action only on view item page:
 			echo '<input type="checkbox" name="selected_comments[]" value="'.$Comment->ID.'" /> ';
 		}
@@ -4015,6 +4047,9 @@ function get_session_Item( $item_ID = 0, $force_new = false )
 		load_class( 'items/model/_item.class.php', 'Item' );
 		$edited_Item = new Item();
 		$edited_Item->set( 'main_cat_ID', get_param( 'cat' ) );
+		// Prefill data from url:
+		$edited_Item->set( 'title', param( 'post_title', 'string' ) );
+		$edited_Item->set( 'urltitle', param( 'post_urltitle', 'string' ) );
 
 		return $edited_Item;
 	}
@@ -4326,6 +4361,7 @@ function items_created_results_block( $params = array() )
 			'results_param_prefix' => 'actv_postown_',
 			'results_title'        => T_('Posts created by the user'),
 			'results_no_text'      => T_('User has not created any posts'),
+			'action'               => '',
 		), $params );
 
 	if( !is_logged_in() )
@@ -4372,7 +4408,7 @@ function items_created_results_block( $params = array() )
 
 	// Get a count of the post which current user can delete
 	$deleted_posts_created_count = $edited_User->get_deleted_posts2( 'created', true );
-	if( ( $created_items_Results->get_total_rows() > 0 ) && ( $deleted_posts_created_count > 0 ) )
+	if( $params['action'] != 'view' && ( $created_items_Results->get_total_rows() > 0 ) && ( $deleted_posts_created_count > 0 ) )
 	{	// Display action icon to delete all records if at least one record exists & current user can delete at least one item created by user
 		$created_items_Results->global_icon( sprintf( T_('Delete all post created by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_posts_created&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
 	}
@@ -4716,8 +4752,8 @@ function items_results( & $items_Results, $params = array() )
 	{ // Display Author column:
 		$items_Results->cols[] = array(
 				'th' => T_('Author'),
-				'th_class' => 'nowrap',
-				'td_class' => 'nowrap',
+				'th_class' => 'nowrap hidden-xs',
+				'td_class' => 'nowrap hidden-xs',
 				'order' => $params['field_prefix'].'creator_user_ID',
 				'td' => '%get_user_identity_link( NULL, #post_creator_user_ID# )%',
 			);
@@ -4727,8 +4763,8 @@ function items_results( & $items_Results, $params = array() )
 	{ // Display Type column:
 		$items_Results->cols[] = array(
 				'th' => T_('Type'),
-				'th_class' => 'shrinkwrap',
-				'td_class' => 'shrinkwrap',
+				'th_class' => 'shrinkwrap hidden-xs',
+				'td_class' => 'shrinkwrap hidden-xs',
 				'order' => $params['field_prefix'].'ityp_ID',
 				'td' => '%item_row_type( {Obj} )%',
 			);
@@ -4760,9 +4796,9 @@ function items_results( & $items_Results, $params = array() )
 	{ // Display Ord column
 		$items_Results->cols[] = array(
 				'th' => T_('Ord'),
-				'th_class' => 'shrinkwrap',
+				'th_class' => 'shrinkwrap hidden-xs',
 				'order' => $params['field_prefix'].'order',
-				'td_class' => 'right jeditable_cell item_order_edit',
+				'td_class' => 'right jeditable_cell item_order_edit hidden-xs',
 				'td' => '%item_row_order( {Obj} )%',
 				'extra' => array( 'rel' => '#post_ID#' ),
 			);
@@ -4775,8 +4811,8 @@ function items_results( & $items_Results, $params = array() )
 				'th_title' => T_('Item history information'),
 				'order' => $params['field_prefix'].'datemodified',
 				'default_dir' => 'D',
-				'th_class' => 'shrinkwrap',
-				'td_class' => 'shrinkwrap',
+				'th_class' => 'shrinkwrap hidden-xs',
+				'td_class' => 'shrinkwrap hidden-xs',
 				'td' => '@get_history_link()@',
 			);
 	}
@@ -4785,7 +4821,8 @@ function items_results( & $items_Results, $params = array() )
 	{ // Display Actions column
 		$items_Results->cols[] = array(
 				'th' => T_('Actions'),
-				'td_class' => 'shrinkwrap',
+				'th_class' => 'shrinkwrap hidden-xs',
+				'td_class' => 'shrinkwrap hidden-xs',
 				'td' => '%item_edit_actions( {Obj} )%',
 			);
 	}
@@ -4818,25 +4855,54 @@ function item_type_global_icons( $object_Widget )
 		$count_item_types = count( $item_types );
 		if( $count_item_types > 0 )
 		{
+			// Group buttons of item types:
+			$icon_group_create_type = 'type_create';
 			if( $count_item_types > 1 )
-			{ // Group only if moer than one item type for selected back-office tab
-				$icon_group_create_type = 'type_create';
+			{	// Group only if moer than one item type for selected back-office tab:
 				$icon_group_create_mass = 'mass_create';
 			}
 			else
-			{ // No group
-				$icon_group_create_type = NULL;
+			{	// No group:
 				$icon_group_create_mass = NULL;
 			}
 
-			$object_Widget->global_icon( T_('Mass edit the current post list').'...', 'edit', $admin_url.'?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'action', '', '', '&' ) ), T_('Mass edit'), 3, 4 );
+			$object_Widget->global_icon( T_('Mass edit the current post list').'...', 'edit',
+				$admin_url.'?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'action', '', '', '&' ) ),
+				T_('Mass edit'), 3, 4,
+				array( 'class' => 'action_icon btn-default hidden-xs' ),
+				NULL,
+				array(
+					'parent'    => $icon_group_create_type,
+					'item_class' => 'visible-xs',
+				)
+			);
 
 			foreach( $item_types as $item_type )
 			{
 				if( $current_User->check_perm( 'blog_item_type_'.$item_type->perm_level, 'edit', false, $Blog->ID ) )
 				{ // We have the permission to create posts with this post type:
-					$object_Widget->global_icon( T_('Create multiple posts...'), 'new', $admin_url.'?ctrl=items&amp;action=new_mass&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_type->ID, ' '.sprintf( T_('Mass create "%s"'), $item_type->name ), 3, 4, array( 'class' => 'action_icon btn-default' ), $icon_group_create_mass );
-					$object_Widget->global_icon( T_('Write a new post...'), 'new', $admin_url.'?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_type->ID, ' '.$item_type->name, 3, 4, array( 'class' => 'action_icon btn-primary' ), $icon_group_create_type );
+					$object_Widget->global_icon( T_('Create multiple posts...'), 'new',
+						$admin_url.'?ctrl=items&amp;action=new_mass&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_type->ID,
+						' '.sprintf( T_('Mass create "%s"'), $item_type->name ), 3, 4,
+						array( 'class' => 'action_icon btn-default hidden-xs' ),
+						$icon_group_create_mass,
+						array(
+							'parent'     => $icon_group_create_type,
+							'class'      => 'hidden-xs',
+							'item_class' => 'visible-xs',
+						)
+					);
+					$object_Widget->global_icon( T_('Write a new post...'), 'new',
+						$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_type->ID,
+						' '.$item_type->name, 3, 4,
+						array( 'class' => 'action_icon btn-primary' ),
+						$icon_group_create_type,
+						( $count_item_types == 1 ? array(
+								'class'     => 'single-group-xs',
+								'btn_class' => 'visible-xs'
+							) : ''
+						)
+					);
 				}
 			}
 		}
@@ -5007,10 +5073,11 @@ function item_row_status( $Item, $index )
 						.'<span>'.$status_options[ $Item->status ].'</span>'
 					.' <span class="caret"></span></button>'
 				.'<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
+		$tab_param = ( get_param( 'tab' ) == '' ? '' : '&amp;tab='.get_param( 'tab' ) );
 		foreach( $status_options as $status_key => $status_title )
 		{
 			$r .= '<li rel="'.$status_key.'" role="presentation"><a href="'
-					.$admin_url.'?ctrl=items&amp;blog='.$blog_ID.'&amp;action=update_status&amp;post_ID='.$Item->ID.'&amp;status='.$status_key.'&amp;'.url_crumb( 'item' )
+					.$admin_url.'?ctrl=items'.$tab_param.'&amp;blog='.$blog_ID.'&amp;action=update_status&amp;post_ID='.$Item->ID.'&amp;status='.$status_key.'&amp;'.url_crumb( 'item' )
 					.'" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
 		}
 		$r .= '</ul>'
@@ -5173,9 +5240,9 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 		$cat_icon = get_icon( 'filters_show' );
 		$open_url .= '&amp;cat_ID='.$Chapter->ID;
 	}
-	$r .= '<td class="firstcol">'
+	$r .= '<td class="firstcol nowrap">'
 					.'<strong style="padding-left: '.($level).'em;">'
-						.'<a href="'.$open_url.'">'.$cat_icon.' '.$Chapter->dget('name').'</a> ';
+						.'<a href="'.$open_url.'">'.$cat_icon.'&nbsp;<span style="white-space:normal">'.$Chapter->dget('name').'</span></a>&nbsp;';
 	if( $perm_edit )
 	{ // Current user can edit the chapters of the blog
 		$edit_url = $admin_url.'?ctrl=chapters&amp;blog='.$Chapter->blog_ID.'&amp;cat_ID='.$Chapter->ID.'&amp;action=edit'.$redirect_page;
@@ -5407,7 +5474,7 @@ function item_td_task_class( $post_ID, $post_pst_ID, $editable_class )
 	$ItemCache = & get_ItemCache();
 	$Item = & $ItemCache->get_by_ID( $post_ID );
 
-	$class = 'center nowrap tskst_'.$post_pst_ID;
+	$class = 'shrinkwrap tskst_'.$post_pst_ID;
 	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{ // Current user can edit this item, Add a class to edit a priority by click from view list
 		$class .= ' '.$editable_class;

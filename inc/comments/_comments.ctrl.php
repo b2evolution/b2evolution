@@ -275,6 +275,7 @@ switch( $action )
 			param( 'newcomment_author_email', 'string' );
 			param( 'newcomment_author_url', 'string' );
 			param( 'comment_allow_msgform', 'integer', 0 /* checkbox */ );
+			param( 'comment_anon_notify', 'integer', 0 );
 
 			param_check_not_empty( 'newcomment_author', T_('Please enter an author name.'), '' );
 			$edited_Comment->set( 'author', $newcomment_author );
@@ -283,6 +284,7 @@ switch( $action )
 			param_check_url( 'newcomment_author_url', 'posting', '' ); // Give posting permissions here
 			$edited_Comment->set( 'author_url', $newcomment_author_url );
 			$edited_Comment->set( 'allow_msgform', $comment_allow_msgform );
+			$edited_Comment->set( 'anon_notify', $comment_anon_notify );
 		}
 
 		// Move to different post
@@ -578,11 +580,11 @@ switch( $action )
 					INNER JOIN T_categories ON cat_ID = post_main_cat_ID
 					WHERE comment_status = "trash" AND cat_blog_ID = '.$DB->quote( $blog_ID );
 			$comment_ids = $DB->get_col( $query, 0, 'get trash comment ids' );
-			$result = Comment::db_delete_where( 'Comment', NULL, $comment_ids );
+			$result = Comment::db_delete_where( NULL, $comment_ids );
 		}
 		else
 		{ // delete by where clause
-			$result = Comment::db_delete_where( 'Comment', 'comment_status = "trash"' );
+			$result = Comment::db_delete_where( 'comment_status = "trash"' );
 		}
 
 		if( $result !== false )

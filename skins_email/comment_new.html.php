@@ -36,6 +36,7 @@ $Item = $params['Item'];
 $recipient_User = & $params['recipient_User'];
 
 $author_name = empty( $params['author_ID'] ) ? $params['author_name'] : get_user_colored_login_link( $params['author_name'], array( 'use_style' => true, 'protocol' => 'http:', 'login_text' => 'name' ) );
+$author_type = empty( $params['author_ID'] ) ? ' <span class="label label-warning">'.T_('Visitor').'</span>' : ' <span class="label label-info">'.T_('Member').'</span>';
 if( $params['notify_type'] == 'meta_comment' )
 { // Meta comment
 	$info_text = T_( '%s posted a new meta comment on %s in %s.' );
@@ -44,7 +45,12 @@ else
 { // Normal comment
 	$info_text = T_( '%s posted a new comment on %s in %s.' );
 }
-$notify_message = '<p'.emailskin_style( '.p' ).'>'.sprintf( $info_text, '<b>'.$author_name.'</b>', '<b>'.get_link_tag( $Item->get_permanent_url( '', '', '&' ), $Item->get( 'title' ), '.a' ).'</b>', '<b>'.$Blog->get('shortname').'</b>' )."</p>\n";
+$notify_message = '<p'.emailskin_style( '.p' ).'>'.sprintf( $info_text, '<b>'.$author_name.'</b>'.$author_type, '<b>'.get_link_tag( $Item->get_permanent_url( '', '', '&' ), $Item->get( 'title' ), '.a' ).'</b>', '<b>'.$Blog->get('shortname').'</b>' )."</p>\n";
+
+if( $params['notify_type'] == 'comment_mentioned' )
+{	// Add this info line if user was mentioned in the comment content:
+	$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_( 'You were mentioned in this comment.' )."</p>\n";
+}
 
 if( $params['notify_full'] )
 { // Long format notification:
@@ -116,7 +122,7 @@ else
 		$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_('Status').': <b>'.$Comment->get( 't_status' )."</b></p>\n";
 
 		$notify_message .= '<div class="email_ugc"'.emailskin_style( 'div.email_ugc' ).'>'."\n";
-		$notify_message .= '<p'.emailskin_style( '.p' ).'><i'.emailskin_style( '.note' ).'>'.T_( 'This is a short form moderation message. To make these emails more useful for quick moderation, ask the administrator to send you long form moderation messages instead.' ).'</i></p>';
+		$notify_message .= '<p'.emailskin_style( '.p' ).'><i'.emailskin_style( '.note' ).'>'.T_( 'This is a short form notification. To make these emails more useful, ask the administrator to send you long form notifications instead.' ).'</i></p>';
 		$notify_message .= "</div>\n";
 	}
 }
@@ -127,15 +133,15 @@ echo $notify_message;
 
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
 
-echo get_link_tag( $Comment->get_permanent_url( '&', '#comments' ), T_( 'Read full comment' ), 'div.buttons a+a.button_green' )."\n";
+echo get_link_tag( $Comment->get_permanent_url( '&', '#comments' ), T_( 'Read full comment' ), 'div.buttons a+a.btn-primary' )."\n";
 
 if( $params['notify_type'] == 'moderator' )
 { // moderation email
 	if( ( $Blog->get_setting( 'comment_quick_moderation' ) != 'never' ) && ( !empty( $Comment->secret ) ) )
 	{ // quick moderation is permitted, and comment secret was set
-		echo get_link_tag( '$secret_content_start$'.get_htsrv_url().'comment_review.php?cmt_ID='.$Comment->ID.'&secret='.$Comment->secret.'$secret_content_end$', T_('Quick moderation'), 'div.buttons a+a.button_yellow' )."\n";
+		echo get_link_tag( '$secret_content_start$'.get_htsrv_url().'comment_review.php?cmt_ID='.$Comment->ID.'&secret='.$Comment->secret.'$secret_content_end$', T_('Quick moderation'), 'div.buttons a+a.btn-primary' )."\n";
 	}
-	echo get_link_tag( $admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID, T_('Edit comment'), 'div.buttons a+a.button_gray' )."\n";
+	echo get_link_tag( $admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID, T_('Edit comment'), 'div.buttons a+a.btn-default' )."\n";
 }
 
 echo "</div>\n";
@@ -162,6 +168,13 @@ switch( $params['notify_type'] )
 			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		break;
 
+	case 'comment_mentioned':
+		// user is mentioned in the comment
+		$params['unsubscribe_text'] = T_( 'You were mentioned in this comment, and you are receiving notifications when anyone mention your name in a comment.' ).'<br />'
+			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in a comment, click here' ).': '
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=comment_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+		break;
+
 	case 'blog_subscription':
 		// blog subscription
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on any post.' ).'<br />'
@@ -171,10 +184,18 @@ switch( $params['notify_type'] )
 		break;
 
 	case 'item_subscription':
-		// item subscription
+		// item subscription for registered user:
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on this post.' ).'<br />'
 			.T_( 'If you don\'t want to receive any more notifications on this post, click here' ).': '
 			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+		// subscribers are not allowed to see comment author email
+		break;
+
+	case 'anon_subscription':
+		// item subscription for anonymous user:
+		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on this post.' ).'<br />'
+			.T_( 'If you don\'t want to receive any more notifications on this post, click here' ).': '
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&comment_ID='.$params['comment_ID'].'&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		// subscribers are not allowed to see comment author email
 		break;
 

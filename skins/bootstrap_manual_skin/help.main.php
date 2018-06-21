@@ -53,7 +53,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			widget_container( 'page_top', array(
 					// The following params will be used as defaults for widgets included in this container:
 					'container_display_if_empty' => true, // Display container anyway even if no widget
-					'container_start'     => '<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8"><div class="evo_container $wico_class$">',
+					'container_start'     => '<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8"><div class="evo_container $wico_class$">',
 					'container_end'       => '</div></div>',
 					'block_start'         => '<div class="evo_widget $wi_class$">',
 					'block_end'           => '</div>',
@@ -74,7 +74,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			widget_container( 'header', array(
 					// The following params will be used as defaults for widgets included in this container:
 					'container_display_if_empty' => true, // Display container anyway even if no widget
-					'container_start'   => '<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4"><div class="evo_container $wico_class$">',
+					'container_start'   => '<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4"><div class="evo_container $wico_class$">',
 					'container_end'     => '</div></div>',
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
@@ -146,31 +146,6 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 					) );
 			}
 		?>
-
-		<?php
-			// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
-			request_title( array(
-					'title_before'      => '<h1 class="page_title">',
-					'title_after'       => '</h1>',
-					'title_single_disp' => false,
-					'title_page_disp'   => false,
-					'format'            => 'htmlbody',
-					'category_text'     => '',
-					'categories_text'   => '',
-					'catdir_text'       => '',
-					'front_text'        => '',
-					'posts_text'        => '',
-					'register_text'     => '',
-					'login_text'        => '',
-					'lostpassword_text' => '',
-					'account_activation' => '',
-					'msgform_text'      => '',
-					'user_text'         => '',
-					'users_text'        => '',
-					'display_edit_links'=> false,
-				) );
-			// ----------------------------- END OF REQUEST TITLE ----------------------------
-?>
 
 
 <?php

@@ -132,7 +132,7 @@ function cron_log_append( $message, $type = NULL, $nl = "\n" )
  */
 function cron_log_action_end( $message, $type = NULL, $nl = "\n" )
 {
-	global $cron_log_actions_num, $Timer;
+	global $cron_log_actions_num;
 
 	if( ! isset( $cron_log_actions_num ) )
 	{	// Initialize a var to count cron log actions:
@@ -142,11 +142,25 @@ function cron_log_action_end( $message, $type = NULL, $nl = "\n" )
 	// Mark this as separate action:
 	$cron_log_actions_num++;
 
-	// Log time:
-	$message .= '<p class="note">Action #'.$cron_log_actions_num.' Finished. Elapsed time since beginning of task: '.$Timer->get_duration( 'cron_exec' ).' seconds</p>';
-
 	// Append cron log:
-	cron_log_append( $message, $type, $nl );
+	cron_log_append( $message.get_cron_log_time( $cron_log_actions_num ), $type, $nl );
+}
+
+
+/**
+ * Get a time of cron log
+ *
+ * @param integer A number of cron log action
+ * @return string Cron log time
+ */
+function get_cron_log_time( $action_num = NULL )
+{
+	global $Timer;
+
+	return '<div class="note">'
+			.( $action_num === NULL ? '' : 'Action #'.$action_num.' Finished. ' )
+			.'Elapsed time since beginning of task: '.$Timer->get_duration( 'cron_exec' ).' seconds'
+		.'</div>';
 }
 
 
@@ -223,7 +237,7 @@ function call_job( $job_key, $job_params = array() )
 	if( $error_code != 1 )
 	{	// We got an error
 		$result_status = 'error';
-		$result_message_text = '[Error code: '.$error_code.' ] '.$result_message_text;
+		$result_message_text = '[Error code: '.$error_code.']'."\n".$result_message_text;
 		if( is_array( $result_message ) )
 		{ // If result is array
 			$result_message['message'] = $result_message_text;
@@ -431,15 +445,11 @@ function detect_timeout_cron_jobs( $error_task = NULL )
 			WHERE clog_ctsk_ID IN ( '.$DB->quote( array_keys( $tasks ) ).' )', 'Mark timeouts in cron jobs.' );
 	}
 
-	if( !is_null( $error_task ) )
-	{ // Send notification with error task
-		$tasks[ $error_task['ID'] ] = $error_task;
-	}
-
-	if( count( $tasks ) > 0 )
-	{ // Send notification email about timed out and error cron jobs to users with edit options permission
+	if( count( $tasks ) > 0 || $error_task !== NULL )
+	{	// Send notification email about timed out and error cron jobs to users with edit options permission:
 		$email_template_params = array(
-				'tasks' => $tasks,
+				'timeout_tasks' => $tasks,
+				'error_task'    => $error_task,
 			);
 		send_admin_notification( NT_('Scheduled task error'), 'scheduled_task_error_report', $email_template_params );
 	}
@@ -652,7 +662,7 @@ function cron_job_error_handler()
  */
 function cron_job_shutdown()
 {
-	global $result_message, $ctsk_ID, $DB;
+	global $result_message, $ctsk_ID, $ctsk_name, $DB;
 
 	if( empty( $ctsk_ID ) )
 	{	// Run this function to detect only interrupted cron jobs:
@@ -668,5 +678,12 @@ function cron_job_shutdown()
 		      clog_messages = '.$DB->quote( $result_message ).'
 		WHERE clog_ctsk_ID = '.$ctsk_ID,
 		'Record task as finished with error by shutdown function.' );
+
+	// Detect timed out tasks and send notification about timed out and error tasks:
+	detect_timeout_cron_jobs( array(
+			'ID'      => $ctsk_ID,
+			'name'    => $ctsk_name,
+			'message' => $result_message,
+		) );
 }
 ?>

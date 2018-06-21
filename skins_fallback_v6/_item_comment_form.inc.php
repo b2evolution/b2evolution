@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $cookie_name, $cookie_email, $cookie_url;
 global $comment_allowed_tags;
-global $comment_cookies, $comment_allow_msgform;
+global $comment_cookies, $comment_allow_msgform, $comment_anon_notify;
 global $checked_attachments; // Set this var as global to use it in the method $Item->can_attach()
 global $PageCache, $Session;
 global $Collection, $Blog, $dummy_fields;
@@ -58,6 +58,10 @@ $params = array_merge( array(
 			) ),
 		'comment_mode'         => '', // Can be 'quote' from GET request
 		'comment_type'         => 'comment',
+		'comment_rating_before' => '<div class="evo_comment_rating">',
+		'comment_rating_after'  => '</div>',
+		'comment_info_before'   => '<footer class="evo_comment_footer clear text-muted"><small>',
+		'comment_info_after'    => '</small></footer></div>',
 	), $params );
 
 $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
@@ -136,6 +140,9 @@ if( $params['disp_comment_form'] && ( $params['comment_type'] == 'meta' && $Item
 			$comment_author = $Comment->author;
 			$comment_author_email = $Comment->author_email;
 			$comment_author_url = $Comment->author_url;
+			$comment_allow_msgform = $Comment->allow_msgform;
+			$comment_anon_notify = $Comment->anon_notify;
+			$comment_user_notify = isset( $Comment->user_notify ) ? $Comment->user_notify : NULL;
 			// Get what renderer checkboxes were selected on form:
 			$comment_renderers = explode( '.', $Comment->get( 'renderers' ) );
 
@@ -177,6 +184,9 @@ if( $params['disp_comment_form'] && ( $params['comment_type'] == 'meta' && $Item
 			$comment_author = $Comment->author;
 			$comment_author_email = $Comment->author_email;
 			$comment_author_url = $Comment->author_url;
+			$comment_allow_msgform = $Comment->allow_msgform;
+			$comment_anon_notify = $Comment->anon_notify;
+			$comment_user_notify = isset( $Comment->user_notify ) ? $Comment->user_notify : NULL;
 			// comment_attachments contains all file IDs that have been attached
 			$comment_attachments = $Comment->preview_attachments;
 			// checked_attachments contains all attachment file IDs which checkbox was checked in
@@ -304,17 +314,20 @@ function validateCommentForm(form)
 			$params['form_comment_redirect_to']
 		);
 
-	if( ! check_user_status( 'is_validated' ) )
-	{ // User is not logged in or not activated:
+	if( ! is_logged_in( false ) )
+	{	// User is not logged in or not activated:
 		if( is_logged_in() && empty( $comment_author ) && empty( $comment_author_email ) )
 		{
 			$comment_author = $current_User->login;
 			$comment_author_email = $current_User->email;
 		}
 		// Note: we use funky field names to defeat the most basic guestbook spam bots
-		$Form->text( $dummy_fields[ 'name' ], $comment_author, 40, T_('Name'), '', 100, 'evo_comment_field' );
+		$Form->text( $dummy_fields[ 'name' ], $comment_author, 40, T_('Name'), '<br />'.sprintf( T_('<a %s>Click here to log in</a> if you already have an account on this site.'), 'href="'.get_login_url( 'comment form', $Item->get_permanent_url() ).'" style="font-weight:bold"' ), 100, 'evo_comment_field' );
 
-		$Form->text( $dummy_fields[ 'email' ], $comment_author_email, 40, T_('Email'), '<br />'.T_('Your email address will <strong>not</strong> be revealed on this site.'), 255, 'evo_comment_field' );
+		$Form->email_input( $dummy_fields[ 'email' ], $comment_author_email, 40, T_('Email'), array(
+			'bottom_note' => T_('Your email address will <strong>not</strong> be revealed on this site.'),
+			'maxlength'   => 255,
+			'class'       => 'evo_comment_field' ) );
 
 		$Item->load_Blog();
 		if( $Item->Blog->get_setting( 'allow_anon_url' ) )
@@ -334,6 +347,51 @@ function validateCommentForm(form)
 	if( !empty($params['policy_text']) )
 	{	// We have a policy text to display
 		$Form->info_field( '', $params['policy_text'] );
+	}
+
+	// Workflow properties:
+	if( $Comment->is_meta() &&
+			is_logged_in() &&
+			$Blog->get_setting( 'use_workflow' ) &&
+			$current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
+			$current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	{	// Display workflow properties if current user has a permission:
+		$Form->select_input_array( 'item_priority', $Item->priority, item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
+
+		// Load only first 21 users to know when we should display an input box instead of full users list:
+		$UserCache = & get_UserCache();
+		$UserCache->load_blogmembers( $Blog->ID, 21, false );
+		if( count( $UserCache->cache ) > 20 )
+		{	// Display a text input field with autocompletion if members more than 20:
+			$assigned_User = & $UserCache->get_by_ID( $Item->get( 'assigned_user_ID' ), false, false );
+			$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', array( 'size' => 10 ) );
+		}
+		else
+		{	// Display a select field if members less than 21:
+			$Form->select_object( 'item_assigned_user_ID', NULL, $Item, T_('Assigned to'), '', true, '', 'get_assigned_user_options' );
+		}
+
+		$ItemStatusCache = & get_ItemStatusCache();
+		$ItemStatusCache->load_all();
+		$ItemTypeCache = & get_ItemTypeCache();
+		$current_ItemType = & $Item->get_ItemType();
+		$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $Item->pst_ID, true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
+
+		if( $Blog->get_setting( 'use_deadline' ) )
+		{	// Display deadline fields only if it is enabled for collection:
+			$Form->begin_line( T_('Deadline'), 'item_deadline' );
+
+				$datedeadline = $Item->get( 'datedeadline' );
+				$Form->date( 'item_deadline', $datedeadline, '' );
+
+				$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
+				$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
+
+			$Form->end_line();
+		}
+
+		// Prepend info for the form submit button title to inform user about additional action when workflow properties are on the form:
+		$params['form_submit_text'] = T_('Update Status').' / '.$params['form_submit_text'];
 	}
 
 	// Set prefix for js code in plugins:
@@ -397,36 +455,26 @@ function validateCommentForm(form)
 		$Form->input_field( array( 'label' => T_('Attach files'), 'note' => $params['comment_attach_info'], 'name' => 'uploadfile[]', 'type' => 'file' ) );
 	}
 
+	// Additional options:
 	$comment_options = array();
-
 	if( ! is_logged_in( false ) )
-	{ // User is not logged in:
-		$comment_options[] = '<label><input type="checkbox" class="checkbox" name="comment_cookies" tabindex="7"'
-													.( $comment_cookies ? ' checked="checked"' : '' ).' value="1" /> '.T_('Remember me').'</label>'
-													.' <span class="note">('.T_('For my next comment on this site').')</span>';
+	{	// For anonymous or not activated user:
 		// TODO: If we got info from cookies, Add a link called "Forget me now!" (without posting a comment).
-
-		$msgform_class_start = '';
-		$msgform_class_end = '';
-		if( $email_is_detected )
-		{	// Set a class when comment contains a email
-			$msgform_class_start = '<div class="comment_recommended_option">';
-			$msgform_class_end = '</div>';
-		}
-
-		$comment_options[] = $msgform_class_start.
-													'<label><input type="checkbox" class="checkbox" name="comment_allow_msgform" tabindex="8"'
-													.( $comment_allow_msgform ? ' checked="checked"' : '' ).' value="1" /> '.T_('Allow message form').'</label>'
-													.' <span class="note">('.T_('Allow users to contact me through a message form -- Your email will <strong>not</strong> be revealed!').')</span>'.
-													$msgform_class_end;
+		$comment_options[] = array( 'comment_cookies', 1, T_('Remember me'), $comment_cookies, false, '('.T_('Set cookies so I don\'t need to fill out my details next time').')' );
 		// TODO: If we have an email in a cookie, Add links called "Add a contact icon to all my previous comments" and "Remove contact icon from all my previous comments".
+		$comment_options[] = array( 'comment_allow_msgform', 1, T_('Allow message form'), $comment_allow_msgform, false, '('.T_('Allow users to contact me through a message form -- Your email will <strong>not</strong> be revealed!').')', ( $email_is_detected ? 'comment_recommended_option' : '' ) );
+		if( $Blog->get_setting( 'allow_anon_subscriptions' ) )
+		{	// If item anonymous subscriptions are allowed for current collection:
+			$comment_options[] = array( 'comment_anon_notify', 1, T_('Notify me of replies'), isset( $comment_anon_notify ) ? $comment_anon_notify : $Blog->get_setting( 'default_anon_comment_notify' ) );
+		}
 	}
-
-	if( ! empty($comment_options) )
-	{
-		echo $Form->begin_field( NULL, T_('Options'), true );
-		echo implode( '<br />', $comment_options );
-		echo $Form->end_field();
+	elseif( $params['comment_type'] != 'meta' && $Blog->get_setting( 'allow_item_subscriptions' ) )
+	{	// For registered user and normal(not meta) comment and if item subscriptions are allowed for current collection:
+		$comment_options[] = array( 'comment_user_notify', 1, T_('Notify me of replies'), ( isset( $comment_user_notify ) ? $comment_user_notify : 1 ) );
+	}
+	if( count( $comment_options ) > 0 )
+	{	// Display additional options:
+		$Form->checklist( $comment_options, 'comment_options', T_('Options') );
 	}
 
 	// Display renderers

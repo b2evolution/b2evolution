@@ -131,6 +131,16 @@ class Comment extends DataObject
 	 * @var boolean
 	 */
 	var $allow_msgform;
+	/**
+	 * Does an anonymous commentator notify of replies?
+	 * @var boolean
+	 */
+	var $anon_notify;
+	/**
+	 * Last time and count of email notifications per day for anonymous author
+	 * @var string
+	 */
+	var $anon_notify_last;
 
 	var $nofollow;
 	/**
@@ -249,6 +259,8 @@ class Comment extends DataObject
 			$this->nofollow = $db_row->comment_nofollow;
 			$this->spam_karma = $db_row->comment_spam_karma;
 			$this->allow_msgform = $db_row->comment_allow_msgform;
+			$this->anon_notify = $db_row->comment_anon_notify;
+			$this->anon_notify_last = $db_row->comment_anon_notify_last;
 			$this->secret = $db_row->comment_secret;
 			$this->notif_status = $db_row->comment_notif_status;
 			$this->notif_ctsk_ID = $db_row->comment_notif_ctsk_ID;
@@ -306,13 +318,12 @@ class Comment extends DataObject
 	 * Delete those comments from the database which corresponds to the given condition or to the given ids array
 	 * Note: the delete cascade arrays are handled!
 	 *
-	 * @param string the name of this class
-	 *   Note: This is required until min phpversion will be 5.3. Since PHP 5.3 we can use static::function_name to achieve late static bindings
 	 * @param string where condition
 	 * @param array object ids
+	 * @param array additional params if required
 	 * @return mixed # of rows affected or false if error
 	 */
-	static function db_delete_where( $class_name, $sql_where, $object_ids = NULL, $params = NULL )
+	static function db_delete_where( $sql_where, $object_ids = NULL, $params = NULL )
 	{
 		global $DB;
 
@@ -341,7 +352,7 @@ class Comment extends DataObject
 			WHERE link_cmt_ID IN ( '.implode( ', ', $object_ids ).' )';
 		$attached_file_ids = $DB->get_col( $query_get_attached_file_ids );
 
-		$result = parent::db_delete_where( $class_name, $sql_where, $object_ids );
+		$result = parent::db_delete_where( $sql_where, $object_ids );
 
 		if( ( $result !== false ) && ( ! empty( $attached_file_ids ) ) )
 		{ // Delete orphan attachments and empty comment attachment folders
@@ -1132,7 +1143,7 @@ class Comment extends DataObject
 
 		if( $this->get_author_User() )
 		{ // Author is a registered user:
-			if( $params['after_user'] == '#' ) $params['after_user'] = ' <span class="bUser-member-tag">['.T_('Member').']</span>';
+			if( $params['after_user'] == '#' ) $params['after_user'] = ' '.$this->get_author_label( $params );
 
 			$r = $this->author_User->get_identity_link( $params );
 
@@ -1140,7 +1151,7 @@ class Comment extends DataObject
 		}
 		else
 		{ // Not a registered user, display info recorded at edit time:
-			if( $params['after'] == '#' ) $params['after'] = ' <span class="bUser-anonymous-tag">['.T_('Visitor').']</span>';
+			if( $params['after'] == '#' ) $params['after'] = ' '.$this->get_author_label( $params );
 
 			if( utf8_strlen( $this->author_url ) <= 10 )
 			{ // URL is too short anyways...
@@ -1180,6 +1191,52 @@ class Comment extends DataObject
 		);
 
 		$Plugins->trigger_event( 'FilterCommentAuthor', $hook_params );
+
+		return $r;
+	}
+
+
+	/**
+	 * Get author label
+	 *
+	 * @param array Params
+	 */
+	function get_author_label( $params = array() )
+	{
+		global $Skin;
+
+		// Default params:
+		if( is_admin_page() || ( isset( $Skin ) && $Skin->get_api_version() >= 6 && strpos( $Skin->folder, 'bootstrap' ) !== FALSE ) )
+		{	// for v6 bootstrap skins:
+			$default_params = array(
+					'member_before'  => '<span class="label label-info">',
+					'member_after'   => '</span>',
+					'visitor_before' => '<span class="label label-warning">',
+					'visitor_after'  => '</span>',
+				);
+		}
+		else
+		{	// for v5 skins:
+			$default_params = array(
+					'member_before'  => '<span class="bUser-member-tag">[',
+					'member_after'   => ']</span>',
+					'visitor_before' => '<span class="bUser-anonymous-tag">[',
+					'visitor_after'  => ']</span>',
+				);
+		}
+		$params = array_merge( $default_params, $params );
+
+		$r = '';
+
+		// Type of author:
+		if( $this->get_author_User() )
+		{	// If author is a registered user:
+			$r .= $params['member_before'].T_('Member').$params['member_after'];
+		}
+		else
+		{	// If author is not a registered user:
+			$r .= $params['visitor_before'].T_('Visitor').$params['visitor_after'];
+		}
 
 		return $r;
 	}
@@ -3770,6 +3827,7 @@ class Comment extends DataObject
 		}
 
 		$notify_users = array();
+		$notify_anon_users = array();
 
 		if( ! $this->is_meta() )
 		{	// Get the notify users for NORMAL comments:
@@ -3789,6 +3847,13 @@ class Comment extends DataObject
 				&& ( ! ( in_array( $creator_User->ID, $already_notified_user_IDs ) ) ) )
 			{	// Comment creator wants to be notified, and comment author is not a moderator:
 				$notify_users[$creator_User->ID] = 'creator';
+			}
+
+			// Get list of users who want to be notified when his login is mentioned in the comment content by @user's_login:
+			$mentioned_user_IDs = get_mentioned_user_IDs( 'comment', $this->get( 'content' ), $already_notified_user_IDs );
+			foreach( $mentioned_user_IDs as $mentioned_user_ID )
+			{
+				$notify_users[ $mentioned_user_ID ] = 'comment_mentioned';
 			}
 
 			// Get list of users who want to be notified about the this post comments:
@@ -3847,7 +3912,7 @@ class Comment extends DataObject
 						) AS users
 						WHERE user_ID IS NOT NULL'.$except_condition;
 
-				$notify_list = $DB->get_results( $sql, OBJECT, 'Get list of users who want to be notified about comments of the the post #'.$comment_Item->ID );
+				$notify_list = $DB->get_results( $sql, OBJECT, 'Get list of registered users who want to be notified about comments of the the post #'.$comment_Item->ID );
 
 				// Preprocess list:
 				foreach( $notify_list as $notification )
@@ -3855,6 +3920,28 @@ class Comment extends DataObject
 					if( ! isset( $notify_users[ $notification->user_ID ] ) )
 					{	// Don't rewrite a notify type if user already is notified by other type before:
 						$notify_users[ $notification->user_ID ] = 'item_subscription';
+					}
+				}
+
+				// Find anonymous users which are subscribed on the comment's post:
+				$SQL = new SQL( 'Get list of anonymous users who want to be notified about comments of the the post #'.$comment_Item->ID );
+				$SQL->SELECT( 'comment_author_email, comment_ID' );
+				$SQL->FROM( 'T_comments' );
+				$SQL->FROM_add( 'INNER JOIN T_items__item ON comment_item_ID = post_ID' );
+				$SQL->WHERE( 'comment_item_ID = '.$comment_Item->ID );
+				$SQL->WHERE_and( 'comment_author_user_ID IS NULL' );
+				$SQL->WHERE_and( 'comment_anon_notify = 1' );
+				$SQL->ORDER_BY( 'comment_anon_notify_last DESC' );
+				$SQL->GROUP_BY( 'comment_author_email' );
+
+				$notify_list = $DB->get_assoc( $SQL );
+
+				// Preprocess list:
+				foreach( $notify_list as $anon_email => $anon_comment_ID )
+				{
+					if( ! isset( $notify_anon_users[ 'cmnt_'.$anon_comment_ID ] ) )
+					{	// Don't rewrite a notify type if user already is notified by other type before:
+						$notify_anon_users[ 'cmnt_'.$anon_comment_ID ] = 'anon_subscription';
 					}
 				}
 			}
@@ -4042,12 +4129,12 @@ class Comment extends DataObject
 			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note', T_('Sending notifications:') );
 		}
 
-		if( empty( $notify_users ) )
+		if( empty( $notify_users ) && empty( $notify_anon_users ) )
 		{	// No-one to notify:
 			return $notified_flags;
 		}
 
-		$this->send_email_messages( $notify_users, $is_new_comment );
+		$this->send_email_messages( $notify_users + $notify_anon_users, $is_new_comment );
 
 		return $notified_flags;
 	}
@@ -4056,17 +4143,18 @@ class Comment extends DataObject
 	/**
 	 * Send email notifications to users
 	 *
-	 * @param array Array of users which should be notified, where key is User ID and value is a notify type:
+	 * @param array Array of users which should be notified, where key is User ID or Comment ID with prefix 'cmnt_' of anonymous user and value is a notify type:
 	 *              - 'moderator'
 	 *              - 'creator'
 	 *              - 'blog_subscription'
 	 *              - 'item_subscription'
+	 *              - 'anon_subscription'
 	 *              - 'meta_comment'
 	 * @param boolean TRUE if it is notification about new comment, FALSE - for edited comment
 	 */
 	function send_email_messages( $notify_users, $is_new_comment = false )
 	{
-		global $debug, $Debuglog;
+		global $debug, $Debuglog, $default_locale;
 
 		$UserCache = & get_UserCache();
 
@@ -4105,24 +4193,48 @@ class Comment extends DataObject
 			$author_user_ID = NULL;
 		}
 
-		// Load all users who will be notified, becasuse another way the send_mail_to_User funtion would load them one by one:
-		$UserCache->load_list( array_keys( $notify_users ) );
+		$load_users_IDs = array();
+		foreach( $notify_users as $notify_user_ID => $notify_type )
+		{
+			if( is_integer( $notify_user_ID ) )
+			{	// Get only ID of the registered Users and skip emails of anonymous users:
+				$load_users_IDs[] = $notify_user_ID;
+			}
+		}
 
-		// Load a list with the blocked emails  in cache
-		load_blocked_emails( array_keys( $notify_users ) );
+		// Load all users who will be notified, becasuse another way the send_mail_to_User funtion would load them one by one:
+		$UserCache->load_list( $load_users_IDs );
+
+		// Load a list with the blocked emails in cache
+		load_blocked_emails( $load_users_IDs );
 
 		// Send emails:
 		foreach( $notify_users as $notify_user_ID => $notify_type )
 		{
-			// get data content
-			$notify_User = $UserCache->get_by_ID( $notify_user_ID );
-			$notify_email = $notify_User->get( 'email' );
+			if( $notify_type == 'anon_subscription' )
+			{	// Get data of anonymous user:
+				$notify_comment_ID = intval( substr( $notify_user_ID, 5 ) );
+				$CommentCache = & get_CommentCache();
+				$anon_Comment = & $CommentCache->get_by_ID( $notify_comment_ID );
+				$anon_comment_Item = $anon_Comment->get_Item();
+				$notify_User = NULL;
+				$notify_email = $anon_Comment->get( 'author_email' );
+				$notify_user_name = $anon_Comment->get( 'author' );
+				$notify_locale = $anon_comment_Item->get( 'locale' );
+				$notify_full = false;
+			}
+			else
+			{	// Get data of registered user:
+				$notify_User = $UserCache->get_by_ID( $notify_user_ID );
+				$notify_email = $notify_User->get( 'email' );
+				$notify_user_Group = $notify_User->get_Group();
+				$notify_locale = $notify_User->get( 'locale' );
+				$notify_full = ( ( $notify_type == 'moderator' ) && ( $notify_user_Group->check_perm( 'comment_moderation_notif', 'full' ) )
+								|| ( $notify_user_Group->check_perm( 'comment_subscription_notif', 'full' ) ) );
+			}
 
 			// init notification setting
-			locale_temp_switch( $notify_User->get( 'locale' ) );
-			$notify_user_Group = $notify_User->get_Group();
-			$notify_full = ( ( $notify_type == 'moderator' ) && ( $notify_user_Group->check_perm( 'comment_moderation_notif', 'full' ) )
-							|| ( $notify_user_Group->check_perm( 'comment_subscription_notif', 'full' ) ) );
+			locale_temp_switch( $notify_locale );
 
 			switch( $this->type )
 			{
@@ -4152,8 +4264,21 @@ class Comment extends DataObject
 					}
 					else
 					{	// Subject for subscribed users:
-						/* TRANS: Subject of the mail to send on new comments to subscribed users. First %s is blog name, the second %s is the item's title. */
-						$subject = T_('[%s] New comment on "%s"');
+						switch( $this->get_author_type( $notify_User, $notify_email ) )
+						{	// Set email title depending on author type:
+							case 'parent':
+								/* TRANS: Subject of the mail to send on new comments to subscribed users. First %s is blog name, the second %s is the item's title. */
+								$subject = T_('[%s] Someone replied to your comment on "%s"');
+								break;
+							case 'normal':
+								/* TRANS: Subject of the mail to send on new comments to subscribed users. First %s is blog name, the second %s is the item's title. */
+								$subject = T_('[%s] Someone else commented after you on "%s"');
+								break;
+							case 'none':
+							default:
+								/* TRANS: Subject of the mail to send on new comments to subscribed users. First %s is blog name, the second %s is the item's title. */
+								$subject = T_('[%s] New comment on "%s"');
+						}
 					}
 					$subject = sprintf( $subject, $comment_item_Blog->get('shortname'), $comment_Item->get('title') );
 			}
@@ -4166,7 +4291,9 @@ class Comment extends DataObject
 					break;
 
 				case 'blog_subscription': // blog subscription
-				case 'item_subscription': // item subscription
+				case 'comment_mentioned': // user was mentioned in the comment content
+				case 'item_subscription': // item subscription for registered user
+				case 'anon_subscription': // item subscription for anonymous user
 				case 'meta_comment': // meta comment notification
 					$user_reply_to = NULL;
 					break;
@@ -4200,16 +4327,94 @@ class Comment extends DataObject
 				$Debuglog->add( $mail_dump, 'notification' );
 			}
 
-			// Send the email:
-			// Note: Note activated users won't get notification email
-			send_mail_to_User( $notify_user_ID, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+			if( $notify_User )
+			{	// Send the email to registered User:
+				// Note: Note activated users won't get notification email
+				send_mail_to_User( $notify_user_ID, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+			}
+			else
+			{	// Send the email to anonymous user:
+				$email_template_params['comment_ID'] = $anon_Comment->ID;
+				$email_template_params['anonymous_unsubscribe_key'] = md5( $anon_Comment->ID.$anon_Comment->get( 'secret' ) );
+				send_mail_to_anonymous_user( $notify_email, $notify_user_name, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+			}
 
-			blocked_emails_memorize( $notify_User->email );
+			blocked_emails_memorize( $notify_email );
 
 			locale_restore_previous();
 		}
 
 		blocked_emails_display();
+	}
+
+
+	/**
+	 * Get author type depending on where he posted a comment in the same item as this comment
+	 *
+	 * @param object Author User (for registered User)
+	 * @param object Author email address (for anonymous user)
+	 * @return string 'parent' - user is owner of some comment's parent,
+	 *                'normal' - author posted at least one comment in the comment's item,
+	 *                'none' - author didn't post any comment in the comment's item.
+	 */
+	function get_author_type( $author_User, $author_email = NULL )
+	{
+		if( ! isset( $this->item_authors ) )
+		{	// Load it once and store into a cache array to don't load twice:
+			global $DB;
+
+			$comment_Item = & $this->get_Item();
+			$comment_item_Blog = & $comment_Item->get_Blog();
+
+			$this->item_authors = array();
+
+			if( $comment_item_Blog->get_setting( 'threaded_comments' ) )
+			{	// If the threaded comments are enabled for the collection:
+				$parent_comment_ID = $this->get( 'in_reply_to_cmt_ID' );
+				while( $parent_comment_ID !== NULL )
+				{	// Find all parents from this comment to root:
+					$SQL = new SQL( 'Get parent of comment #'.$this->ID.' to decide email notification title' );
+					$SQL->SELECT( 'comment_in_reply_to_cmt_ID as ID, IFNULL( comment_author_user_ID, comment_author_email ) AS author_ID_or_email' );
+					$SQL->FROM( 'T_comments' );
+					$SQL->WHERE( 'comment_ID = '.$DB->quote( $parent_comment_ID ) );
+					if( $parent_comment = $DB->get_row( $SQL ) )
+					{	// If parent comment is detected:
+						$parent_comment_ID = $parent_comment->ID;
+						// Mark such author as commenter of parent comment:
+						$this->item_authors[ $parent_comment->author_ID_or_email ] = 'parent';
+					}
+					else
+					{	// No parent comment:
+						$parent_comment_ID = NULL;
+					}
+				}
+			}
+
+			$SQL = new SQL( 'Get all comments authors from item of the comment #'.$this->ID );
+			$SQL->SELECT( 'DISTINCT IFNULL( comment_author_user_ID, comment_author_email ) AS author_ID_or_email' );
+			$SQL->FROM( 'T_comments' );
+			$SQL->WHERE( 'comment_item_ID = '.$DB->quote( $this->get( 'item_ID' ) ) );
+			$other_authors = $DB->get_col( $SQL );
+			foreach( $other_authors as $other_author_ID_or_email )
+			{
+				if( ! isset( $this->item_authors[ $other_author_ID_or_email ] ) )
+				{	// Mark such author as normal commenter:
+					$this->item_authors[ $other_author_ID_or_email ] = 'normal';
+				}
+			}
+		}
+
+		if( $author_User && isset( $this->item_authors[ $author_User->ID ] ) )
+		{	// If a registered user posted at least one comment in the same item where this comment is posted:
+			return $this->item_authors[ $author_User->ID ];
+		}
+		elseif( $author_email && isset( $this->item_authors[ $author_email ] ) )
+		{	// If anonymous user posted at least one comment in the same item where this comment is posted:
+			return $this->item_authors[ $author_email ];
+		}
+
+		// User is not posted a comment in the same item where this comment is posted yet:
+		return 'none';
 	}
 
 
@@ -4492,6 +4697,12 @@ class Comment extends DataObject
 
 		if( $r = parent::dbinsert() )
 		{
+			if( isset( $this->user_notify ) && $this->user_notify && $this->author_user_ID > 0 )
+			{	// Subscribe user to the comment's post replies if such option has been selected on the comment submitted form:
+				global $DB;
+				$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
+					VALUES ( '.$DB->quote( $this->item_ID ).', '.$DB->quote( $this->author_user_ID ).', 1 )' );
+			}
 			// Update last touched date of item if comment is created with ANY status,
 			// But update contents last updated date of item if comment is created ONLY in published status(Public, Community or Members):
 			$this->update_last_touched_date( true, $this->may_be_seen_in_frontoffice() );

@@ -257,11 +257,6 @@ else
 			$timestop = time() + $time_difference;
 		}
 
-		if( $result_status == 'finished' && $timestop - $cron_timestart > 60 )
-		{ // Record a finished task as warning if it has run for more than 60 seconds
-			$result_status = 'warning';
-		}
-
 		if( is_array( $result_message ) )
 		{	// If result is array we should store it as serialized data
 			$result_message = serialize( $result_message );

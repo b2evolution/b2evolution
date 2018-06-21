@@ -15,13 +15,13 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( '_core/model/db/_sql.class.php', 'SQL' );
+load_class( '_core/model/db/_filtersql.class.php', 'FilterSQL' );
 
 /**
  * UserQuery: help constructing queries on Users
  * @package evocore
  */
-class UserQuery extends SQL
+class UserQuery extends FilterSQL
 {
 	/**
 	 * Fields of users table to search by keywords
@@ -258,8 +258,6 @@ class UserQuery extends SQL
 	 */
 	function where_gender( $gender )
 	{
-		global $DB;
-
 		if( empty( $gender ) )
 		{
 			return;
@@ -267,11 +265,17 @@ class UserQuery extends SQL
 
 		switch( $gender )
 		{
-			case 'MF': $this->WHERE_and( 'user_gender IN ( "M", "F" )' ); break;
-			case 'MO': $this->WHERE_and( 'user_gender IN ( "M", "O" )' ); break;
-			case 'FO': $this->WHERE_and( 'user_gender IN ( "F", "O" )' ); break;
-			case 'MFO': $this->WHERE_and( 'user_gender IN ( "M", "F", "O" )' ); break;
-			default: $this->WHERE_and( 'user_gender = '.$DB->quote( $gender ) ); break;
+			case 'MF':
+			case 'MO':
+			case 'FO':
+			case 'MFO':
+				$this->add_filter_rule( 'gender', str_split( $gender ), NULL, 'OR' );
+				break;
+			case 'M':
+			case 'F':
+			case 'O':
+				$this->add_filter_rule( 'gender', $gender );
+				break;
 		}
 	}
 
@@ -365,15 +369,13 @@ class UserQuery extends SQL
 		global $DB, $Settings;
 
 		if( $custom_sender_email )
-		{ // restrict to users with custom notification sender email address
-			$this->FROM_add( ' LEFT JOIN T_users__usersettings as custom_sender_email ON custom_sender_email.uset_user_ID = user_ID AND custom_sender_email.uset_name = "notification_sender_email"' );
-			$this->WHERE_and( 'custom_sender_email.uset_value IS NOT NULL AND custom_sender_email.uset_value <> '.$DB->quote( $Settings->get( 'notification_sender_email' ) ) );
+		{	// Restrict to users with custom notification sender email address:
+			$this->add_filter_rule( 'custom_sender_email', 'yes' );
 		}
 
 		if( $custom_sender_name )
-		{ // restrict to users with custom notification sender name
-			$this->FROM_add( ' LEFT JOIN T_users__usersettings as custom_sender_name ON custom_sender_name.uset_user_ID = user_ID AND custom_sender_name.uset_name = "notification_sender_name"' );
-			$this->WHERE_and( 'custom_sender_name.uset_value IS NOT NULL AND custom_sender_name.uset_value <> '.$DB->quote( $Settings->get( 'notification_sender_name' ) ) );
+		{	// Restrict to users with custom notification sender name:
+			$this->add_filter_rule( 'custom_sender_name', 'yes' );
 		}
 	}
 
@@ -507,46 +509,6 @@ class UserQuery extends SQL
 
 
 	/**
-	 * Restrict with user fields
-	 *
-	 * @param array User fields
-	 */
-	function where_userfields( $userfields )
-	{
-		global $DB;
-
-		if( empty( $userfields ) )
-		{
-			return;
-		}
-
-		$criteria_where_clauses = array();
-		foreach( $userfields as $field )
-		{
-			$type = (int)$field['type'];
-			$value = trim( strip_tags( $field['value'] ) );
-			if( $type > 0 && $value != '' )
-			{	// Filter by Specific criteria
-				$words = explode( ' ', $value );
-				if( count( $words ) > 0 )
-				{
-					foreach( $words as $word )
-					{
-						$criteria_where_clauses[] = 'uf_ufdf_ID = "'.$DB->escape($type).'" AND uf_varchar LIKE "%'.$DB->escape($word).'%"';
-					}
-				}
-			}
-		}
-
-		if( count( $criteria_where_clauses ) > 0 )
-		{	// Some creteria is defined
-			$this->FROM_add( ' LEFT JOIN T_users__fields ON uf_user_ID = user_ID' );
-			$this->WHERE_and( ' ( ( '.implode( ' ) OR ( ', $criteria_where_clauses ).' ) ) ' );
-		}
-	}
-
-
-	/**
 	 * Restrict with user group level
 	 *
 	 * @param integer Minimum group level
@@ -587,9 +549,7 @@ class UserQuery extends SQL
 			return;
 		}
 
-		// Join Organization table
-		$this->SELECT_add( ', uorg_org_ID, uorg_accepted, uorg_role, uorg_priority' );
-		$this->FROM_add( 'INNER JOIN T_users__user_org ON uorg_user_ID = user_ID AND uorg_org_ID = '.$DB->quote( $org_ID ) );
+		$this->add_filter_rule( 'org', $org_ID );
 	}
 
 
@@ -658,14 +618,14 @@ class UserQuery extends SQL
 			return;
 		}
 
-		$this->SELECT_add( ', csnd_status' );
+		$this->SELECT_add( ', csnd_status, csnd_emlog_ID' );
 		$this->FROM_add( 'INNER JOIN T_email__campaign_send ON csnd_user_ID = user_ID AND csnd_camp_ID = '.$DB->quote( $ecmp_ID ) );
 
 		// Get email log date and time:
 		$this->SELECT_add( ', csnd_last_sent_ts, enls_user_ID, csnd_last_open_ts, csnd_last_click_ts, csnd_like, csnd_cta1, csnd_cta2, csnd_cta3' );
 
 		// Get subscription status:
-		$this->SELECT_add( ', enls_user_ID' );
+		$this->SELECT_add( ', enls_subscribed' );
 		$this->FROM_add( 'LEFT JOIN T_email__campaign ON ecmp_ID = csnd_camp_ID' );
 		$this->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_enlt_ID = ecmp_enlt_ID AND enls_user_ID = user_ID AND enls_subscribed = 1' );
 
@@ -711,11 +671,11 @@ class UserQuery extends SQL
 				break;
 
 			case 'disliked':
-				$this->WHERE_and( 'csnd_cta1 = -1' );
+				$this->WHERE_and( 'csnd_like = -1' );
 				break;
 
-			case 'clicked_unsubsubcribe':
-				$this->WHERE_and( 'clicked_unsubscribe = 1' );
+			case 'clicked_unsubscribe':
+				$this->WHERE_and( 'csnd_clicked_unsubscribe = 1' );
 				break;
 		}
 	}
@@ -777,8 +737,6 @@ class UserQuery extends SQL
 	 */
 	function where_level( $user_level_min, $user_level_max )
 	{
-		global $DB;
-
 		if( $user_level_min < 0 || is_null($user_level_min) )
 		{ // Min group level is 0
 			$user_level_min = 0;
@@ -789,8 +747,10 @@ class UserQuery extends SQL
 			$user_level_max = 10;
 		}
 
-		$this->WHERE_and( 'user_level >= '.$DB->quote( $user_level_min ) );
-		$this->WHERE_and( 'user_level <= '.$DB->quote( $user_level_max ) );
+		if( $user_level_min > 0 || $user_level_max < 10 )
+		{	// Filter only with actual values:
+			$this->add_filter_rule( 'level', array( $user_level_min, $user_level_max ), 'between' );
+		}
 	}
 
 
@@ -806,38 +766,187 @@ class UserQuery extends SQL
 
 
 	/**
-	 * Restrict to users who voted for poll option
+	 * Restrict with user gender
 	 *
-	 * @param integer Poll option ID
+	 * @param string Value
+	 * @param string Operator
 	 */
-	function where_poll_answered( $poll_ID = NULL, $poll_option_ID = NULL )
+	function filter_field_gender( $value, $operator )
 	{
-		global $DB;
+		if( in_array( $value, array( 'M', 'F', 'O' ) ) )
+		{
+			return $this->get_where_condition( 'user_gender', $value, $operator );
+		}
+	}
 
-		if( empty( $poll_ID ) && empty( $poll_option_ID ) )
-		{ // No poll answered filter
+
+	/**
+	 * Restrict with user level
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_level( $value, $operator )
+	{
+		return $this->get_where_condition( 'user_level', $value, $operator );
+	}
+
+
+	/**
+	 * Restrict with user organization
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_org( $value, $operator )
+	{
+		if( $operator == 'equal' || $operator == 'not_equal' )
+		{	// If operator is allowed for this filter:
+			global $DB;
+			$this->SELECT_add( ', uorg_org_ID, uorg_accepted, uorg_role, uorg_priority' );
+			$this->FROM_add( 'LEFT JOIN T_users__user_org ON uorg_user_ID = user_ID' );
+			if( $operator == 'equal' )
+			{	// Select users which are in the requested organization:
+				$this->WHERE_and( 'uorg_org_ID = '.$DB->quote( $value ) );
+			}
+			else
+			{	// Select users which are NOT in the requested organization:
+				$this->WHERE_and( '( SELECT uorg_org_ID FROM T_users__user_org WHERE uorg_user_ID = user_ID AND uorg_org_ID = '.$DB->quote( $value ).' ) IS NULL' );
+			}
+		}
+	}
+
+
+	/**
+	 * Restrict if user uses custom sender email address
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_custom_sender_email( $value, $operator )
+	{
+		if( $value == 'yes' || $value == 'no' )
+		{	// If value is allowed for this filter:
+			global $Settings, $DB;
+			$this->FROM_add( 'LEFT JOIN T_users__usersettings as custom_sender_email ON custom_sender_email.uset_user_ID = user_ID AND custom_sender_email.uset_name = "notification_sender_email"' );
+			$operator1 = ( $value == 'yes' ? 'IS NOT NULL AND' : 'IS NULL OR' );
+			$operator2 = ( $value == 'yes' ? '<>' : '=' );
+			return 'custom_sender_email.uset_value '.$operator1.' custom_sender_email.uset_value '.$operator2.' '.$DB->quote( $Settings->get( 'notification_sender_email' ) );
+		}
+	}
+
+
+	/**
+	 * Restrict if user uses custom sender name
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_custom_sender_name( $value, $operator )
+	{
+		if( $value == 'yes' || $value == 'no' )
+		{	// If value is allowed for this filter:
+			global $Settings, $DB;
+			$this->FROM_add( 'LEFT JOIN T_users__usersettings as custom_sender_name ON custom_sender_name.uset_user_ID = user_ID AND custom_sender_name.uset_name = "notification_sender_name"' );
+			$operator1 = ( $value == 'yes' ? 'IS NOT NULL AND' : 'IS NULL OR' );
+			$operator2 = ( $value == 'yes' ? '<>' : '=' );
+			return 'custom_sender_name.uset_value '.$operator1.' custom_sender_name.uset_value '.$operator2.' '.$DB->quote( $Settings->get( 'notification_sender_name' ) );
+		}
+	}
+
+
+	/**
+	 * Restrict with user fields (Specific criteria)
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_criteria( $value, $operator )
+	{
+		if( ! preg_match( '#^(\d+):(contains|not_contains):(.+)$#', $value, $m ) )
+		{	// Skip wrong value:
 			return;
 		}
 
-		if( ! empty( $poll_option_ID ) )
-		{
-			$join_array = array( 'pans_user_ID = user_ID', 'pans_popt_ID = '.$DB->quote( $poll_option_ID ) );
+		$user_field_def_ID = intval( $m[1] );
+		$user_field_operator = trim( strip_tags( $m[2] ) );
+		$user_field_value = trim( strip_tags( $m[3] ) );
+		if( $user_field_def_ID <= 0 || $user_field_value == '' || $user_field_operator == '' )
+		{	// Skip wrong value:
+			return;
+		}
 
-			if( ! empty( $poll_ID ) )
-			{
-				array_unshift( $join_array, 'pans_pqst_ID = '.$DB->quote( $poll_ID ) );
-			}
-			$this->FROM_add( 'INNER JOIN T_polls__answer ON '.implode( ' AND ', $join_array ) );
+		global $DB;
+
+		switch( $user_field_operator )
+		{
+			case 'contains':
+				$word_operator = 'LIKE';
+				$field_condition_start = 'uf_ufdf_ID = '.$DB->quote( $user_field_def_ID );
+				$field_condition_end = '';
+				break;
+
+			case 'not_contains':
+				$word_operator = 'NOT LIKE';
+				$field_condition_start = '( uf_ufdf_ID = '.$DB->quote( $user_field_def_ID );
+				// This condition selects users which have no the requested field in DB, i.e. thier requested field has no the requested value:
+				$field_condition_end = ' ) OR ( SELECT COUNT( uf_ID ) FROM yb_users__fields WHERE uf_user_ID = user_ID AND uf_ufdf_ID = '.$DB->quote( $user_field_def_ID ).' ) = 0';
+				break;
+
+			default:
+				debug_die( 'Unknown operator "'.$user_field_operator.'" for user searching by specific criteria' );
+		}
+
+		$word_sql_conditions = array();
+		$words = explode( ' ', $user_field_value );
+		foreach( $words as $word )
+		{	// Find each word separately:
+			$word_sql_conditions[] = 'uf_varchar '.$word_operator.' '.$DB->quote( '%'.$word.'%' );
+		}
+
+		// Join table for columns uf_ufdf_ID and uf_varchar:
+		$this->FROM_add( 'LEFT JOIN T_users__fields ON uf_user_ID = user_ID' );
+
+		// Build SQL condition for specific criteria:
+		$criteria_sql_condition = '( '.$field_condition_start.' AND ';
+		if( count( $word_sql_conditions ) > 1 )
+		{
+			$criteria_sql_condition .= '( '.implode( ' OR ', $word_sql_conditions ).' )';
 		}
 		else
 		{
-			$this->FROM_add( 'INNER JOIN (
-					SELECT pans_user_ID
-					FROM T_polls__answer
-					WHERE pans_pqst_ID = '.$DB->quote( $poll_ID ).'
-					GROUP BY pans_user_ID
-				) AS poll_answers ON poll_answers.pans_user_ID = user_ID' );
+			$criteria_sql_condition .= $word_sql_conditions[0];
 		}
+		$criteria_sql_condition .= $field_condition_end.' )';
+
+		return $criteria_sql_condition;
+	}
+
+
+	/**
+	 * Restrict with user last seen date
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_lastseen( $value, $operator )
+	{
+		if( ! empty( $value ) )
+		{
+			return $this->get_where_condition( 'DATE( user_lastseen_ts )', $value, $operator );
+		}
+	}
+
+
+	/**
+	 * Restrict with user last seen date
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_source( $value, $operator )
+	{
+		return $this->get_where_condition( 'user_source', $value, $operator );
 	}
 }
 

@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url;
+global $admin_url, $UserSettings;
 
 // Default params:
 $params = array_merge( array(
@@ -54,7 +54,14 @@ if( $params['reg_country'] > 0 )
 
 if( ! empty( $params['reg_domain'] ) )
 {	// Domain field is entered:
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Domain').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['reg_domain'].'</td></tr>'."\n";
+	if( ! empty( $params['new_user_ID'] ) )
+	{
+		$user_ip_address = int2ip( $UserSettings->get( 'created_fromIPv4', $params['new_user_ID'] ) );
+	}
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Domain').':</th>'.
+			'<td'.emailskin_style( 'table.email_table td' ).'>'.$params['reg_domain'].
+			( ! empty( $user_ip_address ) ? ' '.get_link_tag( $admin_url.'?ctrl=antispam&action=whois&query='.$user_ip_address, 'WHOIS', 'div.buttons a+a.btn-default+a.btn-sm' ) : '' ).
+			'</td></tr>'."\n";
 }
 
 if( $params['country'] > 0 )
@@ -65,9 +72,14 @@ if( $params['country'] > 0 )
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Profile Country').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$user_Country->get_name().'</td></tr>'."\n";
 }
 
-if( !empty( $params['source'] ) )
-{ // Source is defined
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Source').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['source'].'</td></tr>'."\n";
+echo '<tr><td'.emailskin_style( 'table.email_table td' ).' colspan=2>&nbsp;</td></tr>'."\n";
+
+
+if( ! empty( $params['initial_hit'] ) )
+{ // Hit info
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Session ID').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $admin_url.'?ctrl=stats&tab=hits&blog=0&sess_ID='.$params['initial_hit']->hit_sess_ID, $params['initial_hit']->hit_sess_ID, '.a' ).'</td></tr>'."\n";
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial referer').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $params['initial_hit']->hit_referer, '', '.a' ).'</td></tr>'."\n";
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri.'</td></tr>'."\n";
 }
 
 if( $params['gender'] == 'M' )
@@ -90,10 +102,9 @@ if( !empty( $params['trigger_url'] ) )
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Trigger Page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $params['trigger_url'], '', '.a' ).'</td></tr>'."\n";
 }
 
-if( ! empty( $params['initial_hit'] ) )
-{ // Hit info
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri.'</td></tr>'."\n";
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial referer').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $params['initial_hit']->hit_referer, '', '.a' ).'</td></tr>'."\n";
+if( !empty( $params['source'] ) )
+{ // Source is defined
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Registration Source').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$params['source'].'</td></tr>'."\n";
 }
 
 echo '<tr><td'.emailskin_style( 'table.email_table td' ).' colspan=2>&nbsp;</td></tr>'."\n";
@@ -112,8 +123,8 @@ echo '</table>'."\n";
 
 // Buttons:
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
-echo get_link_tag( $admin_url.'?ctrl=user&user_tab=profile&user_ID='.$params['new_user_ID'], T_('Edit User'), 'div.buttons a+a.button_yellow' )."\n";
-echo get_link_tag( $admin_url.'?ctrl=users&action=show_recent', T_('View recent registrations'), 'div.buttons a+a.button_gray' )."\n";
+echo get_link_tag( $admin_url.'?ctrl=user&user_tab=profile&user_ID='.$params['new_user_ID'], T_('Edit User'), 'div.buttons a+a.btn-primary' )."\n";
+echo get_link_tag( $admin_url.'?ctrl=users&action=show_recent', T_('View recent registrations'), 'div.buttons a+a.btn-default' )."\n";
 echo "</div>\n";
 
 // Footer vars:

@@ -37,16 +37,12 @@ $close_icon = action_icon( T_('Close this window'), 'close', '', '', 0, 0, array
 
 $Form->begin_fieldset( T_('Add/Remove tags...').get_manual_link( 'add-remove-user-tags' ).$close_icon );
 
-	$Form->text_input( 'add_user_tags', '', 40, T_('Tags to add to each user'), '', array(
+	$Form->usertag_input( 'add_user_tags', '', 40, T_('Tags to add to each user'), '', array(
 		'style'        => 'width:100%',
-		'input_prefix' => '<div class="input-group user_admin_tags" style="width:100%">',
-		'input_suffix' => '</div>',
 	) );
 
-	$Form->text_input( 'remove_user_tags', '', 40, T_('Tags to remove from each user'), '', array(
+	$Form->usertag_input( 'remove_user_tags', '', 40, T_('Tags to remove from each user'), '', array(
 		'style'        => 'width:100%',
-		'input_prefix' => '<div class="input-group user_admin_tags" style="width:100%">',
-		'input_suffix' => '</div>',
 	) );
 
 $Form->end_fieldset();
@@ -54,7 +50,4 @@ $Form->end_fieldset();
 $Form->button( array( '', 'actionArray[update_tags]', T_('Make changes now!'), 'SaveButton' ) );
 
 $Form->end_form();
-
-// Initialize JS to auto complete user tags fields:
-echo_user_autocomplete_tags_js( '#add_user_tags, #remove_user_tags' );
 ?>

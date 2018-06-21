@@ -1113,6 +1113,52 @@ function copy_r( $source, $dest, $new_folder_name = NULL, $exclude_dirs = array(
 
 
 /**
+ * Move files from one folder to another recursively
+ *
+ * @param string Source folder path
+ * @param string Destination folder path
+ * @return boolean TRUE on success, FALSE when no permission
+ */
+function move_files_r( $source_dir_path, $dest_dir_path )
+{
+	$result = false;
+
+	if( ! ( $dir_handle = @opendir( $source_dir_path ) ) )
+	{	// Unable to open dir:
+		return $result;
+	}
+
+	$source_dir_path = rtrim( $source_dir_path, '/' );
+	$dest_dir_path = rtrim( $dest_dir_path, '/' );
+
+	while( $file = readdir( $dir_handle ) )
+	{
+		if( $file == '.' || $file == '..' )
+		{	// Skip reserved folders:
+			continue;
+		}
+		if( is_dir( $source_dir_path.'/'.$file ) )
+		{	// Copy a folder recursively:
+			$result = copy_r( $source_dir_path.'/'.$file, $dest_dir_path ) && $result;
+			// Remove a folder recursively:
+			$result = rmdir_r( $source_dir_path.'/'.$file ) && $result;
+		}
+		else
+		{	// Copy a file:
+			$result = @copy( $source_dir_path.'/'.$file, $dest_dir_path.'/'.$file ) && $result;
+			// Remove a file:
+			$result = @unlink( $source_dir_path.'/'.$file ) && $result;
+		}
+	}
+
+	// Close the folder handler:
+	$result = closedir( $dir_handle ) && $result;
+
+	return $result;
+}
+
+
+/**
  * Is the given path absolute (non-relative)?
  *
  * @return boolean
@@ -2825,7 +2871,7 @@ function replace_old_file_with_new( $root_type, $root_in_type_ID, $path, $new_na
 	{
 		$error_message = T_( 'The new file name is empty!' );
 	}
-	elseif( empty( $new_name ) )
+	elseif( empty( $old_name ) )
 	{
 		$error_message = T_( 'The old file name is empty!' );
 	}
