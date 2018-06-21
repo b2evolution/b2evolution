@@ -10968,6 +10968,376 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		) );
 		upg_task_end();
 	}
+
+	if( upg_task_start( 14450, 'Upgrading cron logs table...' ) )//copy of 12780
+	{	// part of 6.10.1-stable
+		db_modify_col( 'T_cron__log', 'clog_messages', 'MEDIUMTEXT' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14460, 'Upgrading for widgets "User log in"...' ) )//copy of 12790 + Modifications for widgets
+	{	// part of 6.10.1-stable
+		$SQL = new SQL( 'Get widgets "User log in" to upgrade' );
+		$SQL->SELECT( 'wi_ID, wico_ID, wico_code, wi_order, wi_params' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->FROM_add( 'INNER JOIN T_widget__container ON wi_wico_ID = wico_ID' );
+		$SQL->WHERE( 'wi_code = "user_login"' );
+		$login_widgets = $DB->get_results( $SQL );
+		foreach( $login_widgets as $login_widget )
+		{
+			$login_widget_params = @unserialize( $login_widget->wi_params );
+			if( ! $login_widget_params )
+			{
+				$login_widget_params = array();
+			}
+
+			if( $login_widget->wico_code == 'login_required' )
+			{	// Make form buttons larger only for login widgets of the container "Login Required":
+				$login_widget_params['login_button_class'] = 'btn btn-success btn-lg';
+				$login_widget_params['register_link_class'] = 'btn btn-primary btn-lg pull-right';
+				$DB->query( 'UPDATE T_widget__widget
+					  SET wi_params = '.$DB->quote( serialize( $login_widget_params ) ).'
+					WHERE wi_ID = '.$DB->quote( $login_widget->wi_ID ) );
+			}
+			else
+			{	// Add greetings widget after each login widget from any other container:
+				// Firstly we should increase an order of next widgets to avoid error of unique order column:
+				$DB->query( 'UPDATE T_widget__widget
+					  SET wi_order = wi_order + 1
+					WHERE wi_wico_ID = '.$DB->quote( $login_widget->wico_ID ).'
+					  AND wi_order > '.$DB->quote( $login_widget->wi_order ).'
+					ORDER BY wi_order DESC' );
+				// Insert the widget:
+				$login_widget_params['title'] = '';
+				$DB->query( 'INSERT INTO T_widget__widget ( wi_wico_ID, wi_order, wi_code, wi_params )
+					VALUES ( '.$DB->quote( $login_widget->wico_ID ).', '
+					.$DB->quote( $login_widget->wi_order + 1 ).', '
+					.'"user_greetings", '
+					.$DB->quote( serialize( $login_widget_params ) ).' )' );
+			}
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14470, 'Upgrading email campaigns table...' ) )//copy of 12800
+	{	// part of 6.10.1-stable
+		db_add_col( 'T_email__campaign', 'ecmp_sync_plaintext', 'TINYINT(1) NOT NULL DEFAULT 1 AFTER ecmp_email_plaintext' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14480, 'Upgrading comments table...' ) )//copy of 12810
+	{	// part of 6.10.1-stable
+		db_add_col( 'T_comments', 'comment_anon_notify', 'TINYINT(1) NOT NULL DEFAULT 0 AFTER comment_allow_msgform' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14490, 'Upgrading email campaign table...' ) )//copy of 12820
+	{ // part of 6.10.1-stable
+		db_upgrade_cols( 'T_email__campaign', array(
+			'ADD' => array(
+				'ecmp_send_count'    => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_user_tag_dislike',
+				'ecmp_open_count'    => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_send_count',
+				'ecmp_img_loads'     => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_open_count',
+				'ecmp_link_clicks'   => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_img_loads',
+				'ecmp_cta1_clicks'   => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_link_clicks',
+				'ecmp_cta2_clicks'   => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_cta1_clicks',
+				'ecmp_cta3_clicks'   => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_cta2_clicks',
+				'ecmp_like_count'    => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_cta3_clicks',
+				'ecmp_dislike_count' => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_like_count',
+				'ecmp_unsub_clicks'  => 'INT UNSIGNED NOT NULL DEFAULT 0 AFTER ecmp_dislike_count',
+			),
+		) );
+
+		// Populate the new columns
+		$DB->query( 'UPDATE T_email__campaign
+				LEFT JOIN (
+					SELECT
+						csnd_camp_ID,
+						SUM( IF( csnd_last_sent_ts IS NULL, 0, 1 ) ) AS send_count,
+						SUM( IF( csnd_cta1 = 1, 1, 0 ) ) AS cta1_clicks,
+						SUM( IF( csnd_cta2 = 1, 1, 0 ) ) AS cta2_clicks,
+						SUM( IF( csnd_cta3 = 1, 1, 0 ) ) AS cta3_clicks,
+						SUM( IF( csnd_like = 1, 1, 0 ) ) AS like_count,
+						SUM( IF( csnd_like = -1, 1, 0 ) ) AS dislike_count,
+						SUM( COALESCE( csnd_clicked_unsubscribe, 0 ) ) AS unsub_clicks,
+						SUM( IF( csnd_last_open_ts IS NULL, 0, 1 ) ) AS img_loads,
+						SUM( IF( csnd_last_click_ts IS NULL, 0, 1 ) ) AS link_clicks,
+						SUM( IF( csnd_last_open_ts IS NOT NULL OR csnd_last_click_ts IS NOT NULL OR
+							csnd_like IS NOT NULL OR csnd_cta1 IS NOT NULL OR csnd_cta2 IS NOT NULL OR csnd_cta3 IS NOT NULL, 1, 0 ) ) AS open_count
+					FROM T_email__campaign_send
+					WHERE csnd_emlog_ID IS NOT NULL
+					GROUP BY csnd_camp_ID
+				) AS a ON a.csnd_camp_ID = ecmp_ID
+				SET
+					ecmp_send_count = COALESCE( a.send_count, 0 ),
+					ecmp_open_count = COALESCE( a.open_count, 0 ),
+					ecmp_img_loads = COALESCE( a.img_loads, 0 ),
+					ecmp_link_clicks = COALESCE( a.link_clicks, 0 ),
+					ecmp_cta1_clicks = COALESCE( a.cta1_clicks, 0 ),
+					ecmp_cta2_clicks = COALESCE( a.cta2_clicks, 0 ),
+					ecmp_cta3_clicks = COALESCE( a.cta3_clicks, 0 ),
+					ecmp_like_count = COALESCE( a.like_count, 0 ),
+					ecmp_dislike_count = COALESCE( a.dislike_count, 0 ),
+					ecmp_unsub_clicks = COALESCE( a.unsub_clicks, 0 )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14500, 'Upgrading comments table...' ) )//copy of 12830
+	{	// part of 6.10.1-stable
+		db_add_col( 'T_comments', 'comment_anon_notify_last', 'VARCHAR(16) COLLATE ascii_general_ci NULL default NULL AFTER comment_anon_notify' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14510, 'Upgrading automation step table...' ) )//copy of 12840
+	{	// part of 6.10.0-beta
+		db_add_col( 'T_automation__step', 'step_diagram', 'VARCHAR(64) NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14520, 'Creating user profile visit counter table...' ) )//copy of 12850
+	{ // part of 6.10.1-stable
+		db_create_table( 'T_users__profile_visit_counters', '
+				upvc_user_ID  INT(11) UNSIGNED NOT NULL,
+				upvc_total_unique_visitors INT(10) UNSIGNED NOT NULL DEFAULT 0,
+				upvc_last_view_ts TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
+				upvc_new_unique_visitors INT(10) UNSIGNED NOT NULL DEFAULT 0,
+				PRIMARY KEY (upvc_user_ID)' );
+
+		// Populate profile visit counters table
+		$DB->query( 'INSERT INTO T_users__profile_visit_counters (upvc_user_ID, upvc_total_unique_visitors, upvc_new_unique_visitors)
+				SELECT user_ID, COALESCE( upv.total_unique, 0 ), COALESCE( upv.total_unique, 0 )
+				FROM T_users
+				LEFT JOIN
+				(
+					SELECT upv_visited_user_ID, COUNT(*) AS total_unique
+					FROM T_users__profile_visits
+					GROUP BY upv_visited_user_ID
+				) AS upv
+				ON upv.upv_visited_user_ID = user_ID' );
+
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14530 ) )//copy of 12860 + Modifications for widgets
+	{	// part of 6.10.1-stable
+
+		/* ---- Install basic widgets for containers "Help" and "Register": ---- START */
+		global $basic_widgets_insert_sql_rows;
+		$basic_widgets_insert_sql_rows = array();
+
+		/**
+		 * Add a widget to global array in order to insert it in DB by single SQL query later
+		 *
+		 * @param integer Container ID
+		 * @param string Type
+		 * @param string Code
+		 * @param integer Order
+		 * @param array|string|NULL Widget params
+		 * @param integer 1 - enabled, 0 - disabled
+		 */
+		function add_basic_widget_14530( $container_ID, $code, $type, $order, $params = NULL, $enabled = 1 )
+		{
+			global $basic_widgets_insert_sql_rows, $DB;
+
+			if( is_null( $params ) )
+			{ // NULL
+				$params = 'NULL';
+			}
+			elseif( is_array( $params ) )
+			{ // array
+				$params = $DB->quote( serialize( $params ) );
+			}
+			else
+			{ // string
+				$params = $DB->quote( $params );
+			}
+
+			$basic_widgets_insert_sql_rows[] = '( '
+				.$container_ID.', '
+				.$order.', '
+				.$enabled.', '
+				.$DB->quote( $type ).', '
+				.$DB->quote( $code ).', '
+				.$params.' )';
+		}
+
+		$SQL = new SQL();
+		$SQL->SELECT( 'blog_ID, cat_ID' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->FROM_add( 'LEFT JOIN T_categories ON cat_blog_ID = blog_ID AND cat_meta = 0' );
+		$SQL->WHERE( '( SELECT COUNT( wico_coll_ID ) FROM T_widget__widget INNER JOIN T_widget__container ON wi_wico_ID = wico_ID WHERE wico_coll_ID = blog_ID AND wico_code IN ( "help", "register" ) AND wi_code = "content_block" ) = 0' );
+		$SQL->ORDER_BY( 'blog_ID, cat_ID DESC' );
+		$collections = $DB->get_assoc( $SQL );
+		if( count( $collections ) > 0 )
+		{	// If at least one collection exists:
+
+			$SQL = new SQL( 'Get first item type with usage "content-block"' );
+			$SQL->SELECT( 'ityp_ID' );
+			$SQL->FROM( 'T_items__type' );
+			$SQL->WHERE( 'ityp_usage = "content-block"' );
+			$SQL->ORDER_BY( 'ityp_ID' );
+			$SQL->LIMIT( 1 );
+			$content_block_ityp_ID = intval( $DB->get_var( $SQL ) );
+
+			// We're going to need some environment in order to init item type cache and create item:
+			load_class( 'items/model/_item.class.php', 'Item' );
+			$use_temp_settings_object = false;
+			if( ! is_object( $Settings ) )
+			{	// Create temporary Settings object WITHOUT version checking:
+				load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+				$Settings = new GeneralSettings( false );
+				$use_temp_settings_object = true;
+			}
+			if( ! is_object( $Plugins ) )
+			{	// Create Plugins object:
+				load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+				$Plugins = new Plugins();
+			}
+
+			// Get collection for info pages in order to create a help and a register content block items below:
+			$info_Blog = & get_setting_Blog( 'info_blog_ID' );
+
+			foreach( $collections as $coll_ID => $cat_ID )
+			{
+				if( ! $info_Blog || ! isset( $help_Item ) || ! isset( $register_Item ) )
+				{	// Create a help and a register content block items once for info/shared collection if it is defined
+					// otherwise create them for each current collection:
+					if( $info_Blog )
+					{	// Use info pages collection if it is defined:
+						$content_block_Blog = $info_Blog;
+					}
+					else
+					{	// Otherwise use current collection:
+						$BlogCache = & get_BlogCache();
+						$content_block_Blog = & $BlogCache->get_by_ID( $coll_ID, false, false );
+					}
+					if( $content_block_Blog )
+					{	// The collection must be always defined but we need this additional check to avoid unexpected die error during upgrade process:
+						$cat_ID = $collections[ $content_block_Blog->ID ];
+						if( $cat_ID === NULL )
+						{	// Create new category if collection has no categories:
+							load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
+							$new_Chapter = new Chapter( NULL, $content_block_Blog->ID );
+							$new_Chapter->set( 'name', T_('Uncategorized') );
+							$new_Chapter->set( 'urlname', $content_block_Blog->get( 'urlname' ).'-main' );
+							$new_Chapter->dbinsert();
+							$cat_ID = $new_Chapter->ID;
+							$ChapterCache = & get_ChapterCache();
+							$ChapterCache->add( $new_Chapter );
+						}
+						task_begin( 'Creating default content blocks "Help content" and "Register content" for'
+							.( $info_Blog && $info_Blog->ID == $content_block_Blog->ID ? ' info pages' : '' ).' collection #'.$content_block_Blog->ID.'... ' );
+						$help_Item = new Item();
+						$help_Item->set_tags_from_string( 'demo' );
+						$help_Item->insert( 1, T_('Help content'), '### '.T_('Email preferences')
+							."\n\n"
+							.sprintf( T_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>'), 'href="'.$content_block_Blog->get( 'subsurl' ).'"' )
+							."\n\n"
+							.'### '.T_('Managing your personal information')
+							."\n\n"
+							.sprintf( T_('You can see and correct the personal details we know about you by clicking <a %s>here</a>'), 'href="'.$content_block_Blog->get( 'profileurl' ).'"' )
+							."\n\n"
+							.'### '.T_('Closing your account')
+							."\n\n"
+							.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>'), 'href="'.$content_block_Blog->get( 'closeaccounturl' ).'"' ),
+								date( 'Y-m-d H:i:s' ), $cat_ID, array(), '!published', '#', 'help-content', '', 'open', array( 'default' ), $content_block_ityp_ID );
+						// Create a register content block item for info/shared collection:
+						$register_Item = new Item();
+						$register_Item->set_tags_from_string( 'demo' );
+						$register_Item->insert( 1, T_('Register content'), T_('The information you provide in this form will be recorded in your user account.')
+							."\n\n"
+							.T_('You will be able to modify it (or even close your account) at any time after logging in with your username and password.')
+							."\n\n"
+							.T_('Should you forget your password, you will be able to reset it by receiving a link on your email address.')
+							."\n\n"
+							.T_('All other info is used to personalize your experience with this website.')
+							."\n\n"
+							.T_('This site may allow conversation between users.')
+							.' '.T_('Your email address and password will not be shared with other users.')
+							.' '.T_('All other information may be shared with other users.')
+							.' '.T_('Do not provide information you are not willing to share.'),
+								date( 'Y-m-d H:i:s' ), $cat_ID, array(), '!published', '#', 'register-content', '', 'open', array( 'default' ), $content_block_ityp_ID );
+						task_end();
+					}
+				}
+
+				$SQL = new SQL( 'Get widget containers "Help" and "Register" for collection #'.$coll_ID );
+				$SQL->SELECT( 'wico_code, wico_ID' );
+				$SQL->FROM( 'T_widget__container' );
+				$SQL->WHERE( 'wico_coll_ID = '.$coll_ID );
+				$widget_containers = $DB->get_assoc( $SQL );
+
+				task_begin( 'Installing default "Help" and "Register" widgets for collection #'.$coll_ID.'... ' );
+				/* Help */
+				if( isset( $widget_containers['help'] ) )
+				{
+					add_basic_widget_14530( $widget_containers['help'], 'content_block', 'core', 10, array(
+							'item_slug' => ( isset( $help_Item ) ? $help_Item->get( 'urltitle' ) : 'help-content' ),
+							'title'     => T_('Personal Data & Privacy'),
+						) );
+				}
+				/* Register */
+				if( isset( $widget_containers['register'] ) )
+				{
+					add_basic_widget_14530( $widget_containers['register'], 'user_normal_register', 'core', 10 );
+					add_basic_widget_14530( $widget_containers['register'], 'content_block', 'core', 20, array(
+							'item_slug' => ( isset( $register_Item ) ? $register_Item->get( 'urltitle' ) : 'register-content' )
+						) );
+				}
+				task_end();
+			}
+
+			if( $use_temp_settings_object )
+			{	// Reset the temporary Settings object because it is used WITHOUT version checking,
+				// Some code below may be required in normal Settings object WITH version checking:
+				$Settings = false;
+			}
+		}
+
+		if( ! empty( $basic_widgets_insert_sql_rows ) )
+		{	// Insert the widget records by single SQL query:
+			$DB->query( 'INSERT INTO T_widget__widget ( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
+		}
+		/* ---- Install basic widgets for containers "Help" and "Register": ---- END */
+
+		upg_task_end( false );
+	}
+
+	if( upg_task_start( 14540, 'Renaming registration widgets...' ) )//copy of 12870
+	{	// part of 6.10.1-stable
+		$DB->query( 'UPDATE T_widget__widget
+			  SET wi_code = "user_register_quick"
+			WHERE wi_code = "user_register"' );
+		$DB->query( 'UPDATE T_widget__widget
+			  SET wi_code = "user_register_standard"
+			WHERE wi_code = "user_normal_register"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14550, 'Adding Send reminders about inactive accounts threshold setting...' ) )//copy of 12880
+	{ // part of 6.10.1-stable
+		$DB->query( "REPLACE INTO T_settings( set_name, set_value ) VALUES ( 'inactive_account_reminder_threshold', 0 )" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14560, 'Upgrading user fields table...' ) )//copy of 12890
+	{	// part of 6.10.1-stable
+		db_add_index( 'T_users__fields', 'uf_user_ID', 'uf_user_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14570, 'Upgrading system log table...' ) )//copy of 12900
+	{	// part of 6.10.1-stable
+		db_modify_col( 'T_syslog', 'slg_object', 'ENUM("comment", "item", "user", "file", "email_log") COLLATE ascii_general_ci' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 14580, 'Upgrading email campaign table...' ) )//copy of 12910
+	{ // part of 6.10.2-stable
+		db_modify_col( 'T_email__campaign', 'ecmp_email_title', 'VARCHAR(255) NULL' );
+		upg_task_end();
+	}
 	/****************************************************************************
 	 * END OF THE COPIED BLOCKS
 	 ****************************************************************************/
