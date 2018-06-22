@@ -47,7 +47,7 @@ class twitter_plugin extends Plugin
 	 */
 	var $code = 'evo_twitter';
 	var $priority = 50;
-	var $version = '6.10.1';
+	var $version = '6.10.2';
 	var $author = 'b2evolution Group';
 
 	/*
@@ -64,13 +64,6 @@ class twitter_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		// Check php version
-		if( version_compare( phpversion(), '5.0.0', '<' ) )
-		{ // the plugin is not supported
-			$this->set_status( 'disabled' );
-			return false;
-		}
-
 		if( !extension_loaded( 'curl' ) )
 		{ // the plugin is not supported
 			$this->set_status( 'disabled' );
@@ -110,11 +103,6 @@ class twitter_plugin extends Plugin
 		if( empty($this->code) )
 		{
 			return T_('The twitter plugin needs a non-empty code.');
-		}
-
-		if( version_compare( phpversion(), '5.0.0', '<' ) )
-		{
-			return T_('The twitter plugin requires PHP 5.');
 		}
 
 		if( !extension_loaded( 'curl' ) )

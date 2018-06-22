@@ -528,7 +528,7 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 		echo '</td>';
 		echo '<td>'.excerpt( $Comment->get_content( 'raw_text' ), 71 ).'</td>';
 		// no permission check, because affected_comments contains current user editable comments
-		echo '<td class="shrinkwrap">'.action_icon( T_('Edit...'), 'edit', '?ctrl=comments&amp;action=edit&amp;comment_ID='.$Comment->ID ).'</td>';
+		echo '<td class="shrinkwrap">'.action_icon( /* TRANS: Verb */ T_('Edit...'), 'edit', '?ctrl=comments&amp;action=edit&amp;comment_ID='.$Comment->ID ).'</td>';
 		echo '</tr>';
 		$count++;
 	}

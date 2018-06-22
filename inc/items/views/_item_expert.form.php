@@ -154,15 +154,18 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'post_title', $item_title );
 	}
 
-	if( $Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' &&
-	    $edited_Item->get( 'locale' ) == $Blog->get( 'locale' ) &&
-	    isset( $locales[ $edited_Item->get( 'locale' ) ] ) )
-	{	// Force to use collection locale because it is restricted by collection setting and the edited item has the same locale as collection:
+	$locale_options = locale_options( $edited_Item->get( 'locale' ), false, true );
+	if( ( $Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' &&
+	      $edited_Item->get( 'locale' ) == $Blog->get( 'locale' ) &&
+	      isset( $locales[ $edited_Item->get( 'locale' ) ] )
+	    ) || is_array( $locale_options ) )
+	{	// Force to use collection locale because it is restricted by collection setting and the edited item has the same locale as collection
+		// OR only single locale is allowed to select:
 		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
 	}
 	else
 	{	// Allow to select a locale:
-		$Form->select_input_options( 'post_locale', locale_options( $edited_Item->get( 'locale' ), false, true ), T_('Language'), '', array( 'style' => 'width:180px' ) );
+		$Form->select_input_options( 'post_locale', $locale_options, T_('Language'), '', array( 'style' => 'width:180px' ) );
 	}
 	$Form->end_fieldset();
 	$Form->switch_layout( NULL );

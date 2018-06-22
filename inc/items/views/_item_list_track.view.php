@@ -77,8 +77,16 @@ $ItemList->cols[] = array(
 						'th' => T_('Item/Task'),
 						'order' => 'title',
 						'td_class' => 'tskst_$post_pst_ID$',
-						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, 1, 1 )%</strong>'.
+						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, 1 )%</strong>'.
 						        ( is_admin_page() ? ' @get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\' )@' : '' ),
+					);
+
+$ItemList->cols[] = array(
+						'th' => T_('Status'),
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap left',
+						'order' => 'status',
+						'td' => '%item_row_status( {Obj}, {CUR_IDX} )%',
 					);
 
 $ItemList->cols[] = array(
@@ -91,9 +99,8 @@ $ItemList->cols[] = array(
 					);
 
 $ItemList->cols[] = array(
-						'th' => T_('Status'),
+						'th' => T_('Workflow Status'),
 						'order' => 'pst_ID',
-						'th_class' => 'shrinkwrap',
 						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "jeditable_cell task_status_edit" )%',
 						'td' => '%item_td_task_cell( "status", {Obj} )%',
 						'extra' => array( 'rel' => '#post_ID#', 'data-post-type' => '#post_ityp_ID#', 'format_to_output' => false )

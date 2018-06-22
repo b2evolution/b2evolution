@@ -1898,6 +1898,7 @@ Button examples:
 			$EmailCampaign = new EmailCampaign();
 			$EmailCampaign->set( 'enlt_ID', 1 );
 			$EmailCampaign->set( 'name', $email_campaign['name'] );
+			$EmailCampaign->set( 'email_title', $email_campaign['name'] );
 			$EmailCampaign->set( 'email_defaultdest', $baseurl );
 			$EmailCampaign->set( 'email_text', $email_campaign['text'] );
 

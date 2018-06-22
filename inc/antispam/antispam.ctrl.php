@@ -133,7 +133,7 @@ switch( $action )
 			$deleted_ids = implode( ',', $deleted_ids );
 
 			// Delete all comments data from DB
-			Comment::db_delete_where( 'Comment', $keyword_cond.$del_condition );
+			Comment::db_delete_where( $keyword_cond.$del_condition );
 
 			$Messages->add_to_group( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
 		}

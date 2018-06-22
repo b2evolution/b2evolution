@@ -24,16 +24,5 @@ load_class( 'users/model/passwords/bcrypt.php', 'bcryptPasswordDriver' );
 class bcrypt2yPasswordDriver extends bcryptPasswordDriver
 {
 	protected $code = 'bb$2y';
-
-
-	/**
-	* Check if hash type is supported
-	*
-	* @return boolean TRUE if supported, FALSE if not
-	*/
-	public function is_supported()
-	{
-		return ( version_compare( PHP_VERSION, '5.3.7', '<' ) ) ? false : true;
-	}
 }
 ?>

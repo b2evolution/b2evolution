@@ -428,6 +428,7 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 		$unread_message_reminder_delay = $Settings->get( 'unread_message_reminder_delay' );
 		$notify_options[ T_('Messaging') ][] = array( 'edited_user_notify_unread_messages', 1, sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $Settings->get( 'unread_message_reminder_threshold' ) ) ),  $UserSettings->get( 'notify_unread_messages', $edited_User->ID ), $disabled, sprintf( T_('This notification is sent only once every %s days.'), array_shift( $unread_message_reminder_delay ) ) );
 	}
+	$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_comment_mentioned', 1, T_( 'I have been mentioned on a comment.' ), $UserSettings->get( 'notify_comment_mentioned', $edited_User->ID ) );
 	if( $edited_User->check_role( 'post_owner' ) )
 	{ // user has at least one post or user has right to create new post
 		$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_publ_comments', 1, T_('a comment is published on one of <strong>my</strong> posts.'), $UserSettings->get( 'notify_published_comments', $edited_User->ID ), $disabled );
@@ -447,6 +448,7 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 	{ // edited user has a permission to back-office
 		$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_meta_comments', 1, T_('a meta comment is posted.'), $UserSettings->get( 'notify_meta_comments', $edited_User->ID ), $disabled );
 	}
+	$notify_options[ T_('Posts') ][] = array( 'edited_user_notify_post_mentioned', 1, T_( 'I have been mentioned on a post.' ), $UserSettings->get( 'notify_post_mentioned', $edited_User->ID ) );
 	if( $edited_User->check_role( 'post_moderator' ) )
 	{ // edited user is post moderator at least in one blog
 		$notify_options[ T_('Posts') ][] = array( 'edited_user_notify_post_moderation', 1, T_('a post is created and I have permissions to moderate it.'), $UserSettings->get( 'notify_post_moderation', $edited_User->ID ), $disabled );
@@ -462,7 +464,10 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 	{ // current User is an administrator
 		$notify_options[ T_('My account') ][] = array( 'edited_user_send_activation_reminder', 1, sprintf( T_('my account was deactivated or is not activated for more than %s.').get_admin_badge( 'user' ), seconds_to_period( $Settings->get( 'activate_account_reminder_threshold' ) ) ), $UserSettings->get( 'send_activation_reminder', $edited_User->ID ), $disabled );
 	}
-	$notify_options[ T_('My account') ][] = array( 'edited_user_send_inactive_reminder', 1, sprintf( T_('my account has been inactive for more than %s.'), seconds_to_period( $Settings->get( 'inactive_account_reminder_threshold' ) ) ), $UserSettings->get( 'send_inactive_reminder', $edited_User->ID ), $disabled );
+	if( $Settings->get( 'inactive_account_reminder_threshold' ) > 0 )
+	{	// If setting "Trigger after" of cron job "Send reminders about inactive accounts" is selected at least to 1 second:
+		$notify_options[ T_('My account') ][] = array( 'edited_user_send_inactive_reminder', 1, sprintf( T_('my account has been inactive for more than %s.'), seconds_to_period( $Settings->get( 'inactive_account_reminder_threshold' ) ) ), $UserSettings->get( 'send_inactive_reminder', $edited_User->ID ), $disabled );
+	}
 	if( $edited_User->check_perm( 'users', 'edit' ) )
 	{ // edited user has permission to edit all users, save notification preferences
 		$notify_options[ T_('System users') ][] = array( 'edited_user_notify_new_user_registration', 1, T_( 'a new user has registered.' ), $UserSettings->get( 'notify_new_user_registration', $edited_User->ID ), $disabled );
@@ -475,8 +480,8 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 	{ // edited user has permission to edit options, save notification preferences
 		$notify_options[ T_('System maintenance') ][] = array( 'edited_user_notify_cronjob_error', 1, T_( 'a scheduled task ends with an error or timeout.' ), $UserSettings->get( 'notify_cronjob_error',  $edited_User->ID ), $disabled );
 	}
-	if( $current_User->check_perm( 'users', 'edit' ) )
-	{	// current User is an administrator
+	if( $current_User->check_perm( 'users', 'edit' ) && $edited_User->check_perm( 'options', 'view' ) )
+	{	// current User is an administrator and the edited user has a permission to automations:
 		$notify_options[ T_('System maintenance') ][] = array( 'edited_user_notify_automation_owner', 1, T_('one of my automations wants to notify me.'), $UserSettings->get( 'notify_automation_owner', $edited_User->ID ), $disabled );
 	}
 	if( !empty( $notify_options ) )

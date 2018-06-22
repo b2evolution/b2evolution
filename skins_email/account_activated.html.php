@@ -78,6 +78,11 @@ if( $activated_User->ctry_ID > 0 )
 
 echo '<tr><td'.emailskin_style( 'table.email_table td' ).' colspan=2>&nbsp;</td></tr>'."\n";
 
+$initial_sess_ID = $UserSettings->get( 'initial_sess_ID', $activated_User->ID );
+if( ! empty( $initial_sess_ID ) )
+{	// Initial session ID:
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Session ID').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $admin_url.'?ctrl=stats&tab=hits&blog=0&sess_ID='.$initial_sess_ID, $initial_sess_ID, '.a' ).'</td></tr>'."\n";
+}
 $initial_blog_ID = $UserSettings->get( 'initial_blog_ID', $activated_User->ID );
 if( !empty( $initial_blog_ID ) )
 { // Hit info

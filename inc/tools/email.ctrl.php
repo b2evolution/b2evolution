@@ -533,6 +533,9 @@ switch( $tab )
 			default:
 				$tab3 = 'log';
 
+				// Init JS to autcomplete the user logins
+				init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+
 				if( empty( $emlog_ID ) )
 				{ // Initialize date picker on list page
 					init_datepicker_js();

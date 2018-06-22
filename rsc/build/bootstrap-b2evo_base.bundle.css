@@ -982,6 +982,17 @@ div.filters .filter_item div {
   margin-top: 1px;
   margin-bottom: 2px;
 }
+.evo_form__comment_review .comment_avatar {
+  float: left;
+  margin: 0 10px 10px 0;
+}
+.evo_form__comment_review .comment_avatar img.user {
+  border-radius: 50%;
+}
+.evo_form__comment_review h3.comment_title {
+  font-size: 16px;
+  margin: 0;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.
@@ -4171,6 +4182,22 @@ form ul.token-input-list-facebook li.token-input-input-token-facebook {
 }
 body.modal-open div.token-input-dropdown-facebook {
   z-index: 10002;
+}
+.evo_widget.widget_core_item_tags form {
+  display: inline-block;
+  vertical-align: middle;
+}
+.evo_widget.widget_core_item_tags form ul.token-input-list-facebook {
+  width: 100%;
+  max-width: 100%;
+}
+.evo_widget.widget_core_item_tags form #item_tags {
+  display: inline-block;
+  width: auto;
+  vertical-align: middle;
+}
+.evo_widget.widget_core_item_tags form input[type=submit] {
+  margin: 0;
 }
 div.results {
   margin-top: 0;

@@ -31,7 +31,7 @@ $Collection = $Blog = & $Item->get_Blog();
 
 if( $params['notify_full'] )
 {	/* Full notification */
-	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( '%s assigned you to the following post' ).':', $principal_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:', 'login_text' => 'name' ) ) )."</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( '%s assigned you the following post' ).':', $principal_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:', 'login_text' => 'name' ) ) )."</p>\n";
 
 	echo '<p'.emailskin_style( '.p' ).'>'.T_('Collection').': '.get_link_tag( $Blog->gen_blogurl(), $Blog->get('shortname'), '.a' )."</p>\n";
 
@@ -71,10 +71,10 @@ if( $params['notify_full'] )
 }
 else
 { /* Short notification */
-	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( '%s assigned you to a post on %s with title %s.' ), $principal_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:', 'login_text' => 'name' ) ), '<b>'.$Blog->get('shortname').'</b>', '<b>'.$Item->get('title').'</b>' )."</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( '%s assigned you a post on %s with title %s.' ), $principal_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:', 'login_text' => 'name' ) ), '<b>'.$Blog->get('shortname').'</b>', '<b>'.$Item->get('title').'</b>' )."</p>\n";
 
 	echo '<div class="email_ugc"'.emailskin_style( 'div.email_ugc' ).'>'."\n";
-	echo '<p'.emailskin_style( '.p' ).'><i'.emailskin_style( '.note' ).'>'.T_( 'This is a short form post assignment message. To make these emails more useful for quick review, ask the administrator to send you long form post assignment messages instead.' ).'</i></p>';
+	echo '<p'.emailskin_style( '.p' ).'><i'.emailskin_style( '.note' ).'>'.T_( 'This is a short form notification. To make these emails more useful, ask the administrator to send you long form notifications instead.' ).'</i></p>';
 	echo "</div>\n";
 }
 
@@ -82,11 +82,11 @@ else
 
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
 
-echo get_link_tag( $Item->get_permanent_url( '', '', '&' ), T_( 'View post' ), 'div.buttons a+a.button_green' )."\n";
+echo get_link_tag( $Item->get_permanent_url( '', '', '&' ), T_( 'View post' ), 'div.buttons a+a.btn-primary' )."\n";
 
 if( $assigned_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 { // User has permission to edit this post
-	echo get_link_tag( $admin_url.'?ctrl=items&blog='.$Item->get_blog_ID().'&p='.$Item->ID, T_('Edit post'), 'div.buttons a+a.button_yellow' )."\n";
+	echo get_link_tag( $admin_url.'?ctrl=items&blog='.$Item->get_blog_ID().'&p='.$Item->ID, T_('Edit post'), 'div.buttons a+a.btn-default' )."\n";
 }
 
 echo "</div>\n";
