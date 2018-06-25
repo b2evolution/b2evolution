@@ -5609,74 +5609,78 @@ function merge_users( $merging_user_ID, $remaining_user_ID )
 	$merging_User = & $UserCache->get_by_ID( $merging_user_ID );
 	$remaining_User = & $UserCache->get_by_ID( $remaining_user_ID );
 
-	$merging_user_login =  get_user_identity_link( '', $merging_user_ID );
-	$remaining_user_login =  get_user_identity_link( '', $remaining_user_ID );
+	$merging_user_login = $merging_User->get_identity_link( array( 'thumb_class'  => 'avatar_before_login_middle') );
+	$remaining_user_login = $remaining_User->get_identity_link( array( 'thumb_class'  => 'avatar_before_login_middle') );
 
 	// Start panel of the merging log:
 	echo '<div class="panel panel-warning">';
 		echo '<div class="panel-heading"><h3 class="panel-title">'.sprintf( T_('Merging user %s:'), $merging_user_login ).'</h3></div>';
 		echo '<div class="panel-body">';
-			echo '<h3 class="evo_confirm_delete__title">'.T_('A merging of this user are doing the following actions:').'</h3>';
+			echo '<h3 class="evo_confirm_delete__title">'.sprintf( T_('Merging user data from %s to %s:'), $merging_user_login, $remaining_user_login ).'</h3>';
 
 	// Config what should be merged:
 	$merge_config = array(
-		// 0 - log message, 1 - db table name, 2 - db column name which should be merged:
-		array( T_('Moving user settings from %s to %s'),              'T_users__usersettings', 'uset_user_ID' ),
-		array( T_('Moving user fields from %s to %s'),                'T_users__fields', 'uf_user_ID' ),
-		array( T_('Moving user own organizations from %s to %s'),     'T_users__organization', 'org_owner_user_ID' ),
-		array( T_('Moving membership in organization from %s to %s'), 'T_users__user_org', 'uorg_user_ID' ),
-		array( T_('Moving user reports from %s to %s'),               'T_users__reports', 'urep_reporter_ID' ),
-		array( T_('Moving user secondary groups from %s to %s'),      'T_users__secondary_user_groups', 'sug_user_ID' ),
-		array( T_('Moving user tags from %s to %s'),                  'T_users__usertag', 'uutg_user_ID' ),
-		array( T_('Moving user visits from %s to %s'),                'T_users__profile_visits', 'upv_visitor_user_ID' ),
-		array( T_('Moving plugin settings from %s to %s'),            'T_pluginusersettings', 'puset_user_ID' ),
-		array( T_('Moving Collections from %s to %s'),                'T_blogs', 'blog_owner_user_ID' ),
-		array( T_('Moving collection permissions from %s to %s'),     'T_coll_user_perms', 'bloguser_user_ID' ),
-		array( T_('Moving collection subscriptions %s to %s'),        'T_subscriptions', 'sub_user_ID' ),
-		array( T_('Moving favorite collections from %s to %s'),       'T_coll_user_favs', 'cufv_user_ID' ),
-		array( T_('Moving own Posts from %s to %s'),                  'T_items__item', 'post_creator_user_ID' ),
-		array( T_('Moving edited Posts from %s to %s'),               'T_items__item', 'post_lastedit_user_ID' ),
-		array( T_('Moving assigned Posts from %s to %s'),             'T_items__item', 'post_assigned_user_ID' ),
-		array( T_('Moving post subscriptions from %s to %s'),         'T_items__subscriptions', 'isub_user_ID' ),
-		array( T_('Moving post read data from %s to %s'),             'T_items__user_data', 'itud_user_ID' ),
-		array( T_('Moving post edit histories from %s to %s'),        'T_items__version', 'iver_edit_user_ID' ),
-		array( T_('Moving post votes from %s to %s'),                 'T_items__votes', 'itvt_user_ID' ),
-		array( T_('Moving Comments from %s to %s'),                   'T_comments', 'comment_author_user_ID' ),
-		array( T_('Moving comment votes from %s to %s'),              'T_comments__votes', 'cmvt_user_ID' ),
-		array( T_('Moving private messages from %s to %s'),           'T_messaging__message', 'msg_author_user_ID' ),
-		array( T_('Moving thread read status from %s to %s'),         'T_messaging__threadstatus', 'tsta_user_ID' ),
-		array( T_('Moving contacts from %s to %s'),                   'T_messaging__contact', 'mct_from_user_ID' ),
-		array( T_('Moving to contact lists from %s to %s'),           'T_messaging__contact', 'mct_to_user_ID' ),
-		array( T_('Moving own contact groups from %s to %s'),         'T_messaging__contact_groups', 'cgr_user_ID' ),
-		array( T_('Moving to contact groups from %s to %s'),          'T_messaging__contact_groupusers', 'cgu_user_ID' ),
-		array( T_('Moving own Automations from %s to %s'),            'T_automation__automation', 'autm_owner_user_ID' ),
-		array( T_('Moving automation step states from %s to %s'),     'T_automation__user_state', 'aust_user_ID' ),
-		array( T_('Moving campaign send statuses from %s to %s'),     'T_email__campaign_send', 'csnd_user_ID' ),
-		array( T_('Moving email logs from %s to %s'),                 'T_email__log', 'emlog_user_ID' ),
-		array( T_('Moving newsletter subscriptions %s to %s'),        'T_email__newsletter_subscription', 'enls_user_ID' ),
-		array( T_('Moving own files %s to %s'),                       'T_files', 'file_creator_user_ID' ),
-		array( T_('Moving own file Links %s to %s'),                  'T_links', 'link_creator_user_ID' ),
-		array( T_('Moving edited file Links %s to %s'),               'T_links', 'link_lastedit_user_ID' ),
-		array( T_('Moving user file Links %s to %s'),                 'T_links', 'link_usr_ID' ),
-		array( T_('Moving file link votes %s to %s'),                 'T_links__vote', 'lvot_user_ID' ),
-		array( T_('Moving own Polls %s to %s'),                       'T_polls__question', 'pqst_owner_user_ID' ),
-		array( T_('Moving poll answers %s to %s'),                    'T_polls__answer', 'pans_user_ID' ),
-		array( T_('Moving sessions %s to %s'),                        'T_sessions', 'sess_user_ID' ),
-		array( T_('Moving system logs %s to %s'),                     'T_syslog', 'slg_user_ID' ),
+		// 0 - data title for log message, 1 - db table name, 2 - db column name which should be merged:
+		array( T_('User settings'),              'T_users__usersettings', 'uset_user_ID' ),
+		array( T_('User fields'),                'T_users__fields', 'uf_user_ID' ),
+		array( T_('User own organizations'),     'T_users__organization', 'org_owner_user_ID' ),
+		array( T_('Membership in organization'), 'T_users__user_org', 'uorg_user_ID' ),
+		array( T_('User reports'),               'T_users__reports', 'urep_reporter_ID' ),
+		array( T_('User secondary groups'),      'T_users__secondary_user_groups', 'sug_user_ID' ),
+		array( T_('User tags'),                  'T_users__usertag', 'uutg_user_ID' ),
+		array( T_('User visits'),                'T_users__profile_visits', 'upv_visitor_user_ID' ),
+		array( T_('Plugin settings'),            'T_pluginusersettings', 'puset_user_ID' ),
+		array( T_('Collections'),                'T_blogs', 'blog_owner_user_ID' ),
+		array( T_('Collection permissions'),     'T_coll_user_perms', 'bloguser_user_ID' ),
+		array( T_('Collection subscriptions'),   'T_subscriptions', 'sub_user_ID' ),
+		array( T_('Favorite collections'),       'T_coll_user_favs', 'cufv_user_ID' ),
+		array( T_('Own Posts'),                  'T_items__item', 'post_creator_user_ID' ),
+		array( T_('Edited Posts'),               'T_items__item', 'post_lastedit_user_ID' ),
+		array( T_('Assigned Posts'),             'T_items__item', 'post_assigned_user_ID' ),
+		array( T_('Post subscriptions'),         'T_items__subscriptions', 'isub_user_ID' ),
+		array( T_('Post read data'),             'T_items__user_data', 'itud_user_ID' ),
+		array( T_('Post edit histories'),        'T_items__version', 'iver_edit_user_ID' ),
+		array( T_('Post votes'),                 'T_items__votes', 'itvt_user_ID' ),
+		array( T_('Comments'),                   'T_comments', 'comment_author_user_ID' ),
+		array( T_('Comment votes'),              'T_comments__votes', 'cmvt_user_ID' ),
+		array( T_('Private messages'),           'T_messaging__message', 'msg_author_user_ID' ),
+		array( T_('Thread read status'),         'T_messaging__threadstatus', 'tsta_user_ID' ),
+		array( T_('Contacts'),                   'T_messaging__contact', 'mct_from_user_ID' ),
+		array( T_('Contact lists'),              'T_messaging__contact', 'mct_to_user_ID' ),
+		array( T_('Own contact groups'),         'T_messaging__contact_groups', 'cgr_user_ID' ),
+		array( T_('Contact Groups'),             'T_messaging__contact_groupusers', 'cgu_user_ID' ),
+		array( T_('Own Automations'),            'T_automation__automation', 'autm_owner_user_ID' ),
+		array( T_('Automation step states'),     'T_automation__user_state', 'aust_user_ID' ),
+		array( T_('Campaign send statuses'),     'T_email__campaign_send', 'csnd_user_ID' ),
+		array( T_('Email Log'),                  'T_email__log', 'emlog_user_ID' ),
+		array( T_('Newsletter subscriptions'),   'T_email__newsletter_subscription', 'enls_user_ID' ),
+		array( T_('Own files'),                  'T_files', 'file_creator_user_ID' ),
+		array( T_('User root files'),            'T_files', 'file_root_ID', 'file_root_type = "user"' ),
+		array( T_('Own file Links'),             'T_links', 'link_creator_user_ID' ),
+		array( T_('Edited file Links'),          'T_links', 'link_lastedit_user_ID' ),
+		array( T_('User file Links'),            'T_links', 'link_usr_ID' ),
+		array( T_('File link votes'),            'T_links__vote', 'lvot_user_ID' ),
+		array( T_('Own Polls'),                  'T_polls__question', 'pqst_owner_user_ID' ),
+		array( T_('Poll answers'),               'T_polls__answer', 'pans_user_ID' ),
+		array( T_('Sessions'),                   'T_sessions', 'sess_user_ID' ),
+		array( T_('System log'),                 'T_syslog', 'slg_user_ID' ),
 	);
 
 	// Display the merging actions:
 	echo '<ul>';
 	foreach( $merge_config as $mc )
 	{	// Print out a merging log of each db column separately:
-		echo '<li>'.sprintf( $mc[0], $merging_user_login, $remaining_user_login ).'...';
+		echo '<li>'.sprintf( T_('Moving "%s" data from %s to %s'), $mc[0], $merging_user_login, $remaining_user_login ).'...';
 		evo_flush();
 
 		// Execute a merging query:
 		// NOTE: We use here the IGNORE modifier in order to avoid error of duplicate entries:
 		$affected_rows = $DB->query( 'UPDATE IGNORE '.$mc[1].'
 			  SET '.$mc[2].' = '.$remaining_User->ID.'
-			WHERE '.$mc[2].' = '.$merging_User->ID );
+			WHERE '.$mc[2].' = '.$merging_User->ID.( isset( $mc[3] ) ? ' AND '.$mc[3] : '' ) );
+		// Also we should delete all data which cannot be merged above before of IGNORE option:
+		$DB->query( 'DELETE FROM '.$mc[1].'
+			WHERE '.$mc[2].' = '.$merging_User->ID.( isset( $mc[3] ) ? ' AND '.$mc[3] : '' ) );
 
 		if( $mc[1] == 'T_links' && $mc[2] == 'link_usr_ID' )
 		{	// Also move the files from merging user folder to remaining user folder:
@@ -5689,12 +5693,14 @@ function merge_users( $merging_user_ID, $remaining_user_ID )
 
 		echo '</li>';
 	}
-	echo '</ul>';
 
-	// Button to merge and delete the user:
-	echo '<a href="'.$admin_url.'?ctrl=user&amp;user_tab=activity&amp;action=delete_all_userdata&amp;user_ID='.$merging_user_ID.'&amp;'.url_crumb( 'user' ).'" class="btn btn-danger">'.sprintf( T_('Delete User %s'), $merging_User->get( 'login' ) ).'</a>';
-	// Button to cancel the merging:
-	echo ' <a href="'.$admin_url.'?ctrl=users&amp;tab3=duplicates" class="btn btn-default">'.T_('Close').'</a>';
+	// Delete the merging user from DB completely:
+	echo '<li>'.sprintf( T_('Deleting user %s'), $merging_user_login ).'...';
+	evo_flush();
+	echo $merging_User->dbdelete() ? T_('OK') : T_('Failed');
+	echo '.</li>';
+
+	echo '</ul>';
 
 		echo '</div>'; // END OF panel-body
 	echo '</div>'; // END OF panel
