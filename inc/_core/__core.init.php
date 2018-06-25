@@ -1369,33 +1369,29 @@ class _core_Module extends Module
 						);
 				}
 				if( ! is_admin_page() &&
-				  ( $disp == 'single' || $disp == 'page' ) &&
-				  ! empty( $Item ) &&
-				  $edit_item_url = $Item->get_edit_url() )
-				{	// If curent user has a permission to edit a current viewing post:
-					/*$entries['post'] = array(
-							'text'        => '<span class="fa fa-pencil-square"></span> '.( $perm_admin_restricted ? T_('Post') : T_('Edit') ),
-							'href'        => $edit_item_url,
-							'title'       => T_('Edit current post'),
-							'entry_class' => 'rwdhide',
-						);*/
-					if( $perm_admin_restricted )
-					{	// Menu entries to edit and view post in back-office:
-						//$entries['post']['entries'] = array();
-						if( $Blog->get_setting( 'in_skin_editing' ) )
-						{	// If collection allows to edit posts in front-office:
-							$entries['page']['entries']['edit_front'] = array(
-									'text' => sprintf( T_('Edit "%s" in Front-Office'), $Item->get_type_setting( 'name' ) ).'&hellip;',
-									'href' => $edit_item_url,
-								);
-						}
+				    in_array( $disp, array( 'single', 'page', 'edit' ) ) &&
+				    $perm_admin_restricted )
+				{	// If curent user has a permission to edit a current editing/viewing post:
+					if( $disp != 'edit' &&
+					    $Blog->get_setting( 'in_skin_editing' ) &&
+					    ! empty( $Item ) &&
+					    $edit_item_url = $Item->get_edit_url() )
+					{	// Display menu entry to edit the post in front-office:
+						$entries['page']['entries']['edit_front'] = array(
+								'text' => sprintf( T_('Edit "%s" in Front-Office'), $Item->get_type_setting( 'name' ) ).'&hellip;',
+								'href' => $edit_item_url,
+							);
+					}
+					if( ! empty( $Item ) || ( ! empty( $edited_Item ) && $edited_Item->ID > 0 ) )
+					{	// Display menu entries to edit and view the post in back-office:
+						$menu_Item = empty( $Item ) ? $edited_Item : $Item;
 						$entries['page']['entries']['edit_back'] = array(
-								'text' => sprintf( T_('Edit "%s" in Back-Office'), $Item->get_type_setting( 'name' ) ).'&hellip;',
-								'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
+								'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
+								'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
 							);
 						$entries['page']['entries']['view_back'] = array(
-								'text' => sprintf( T_('View "%s" in Back-Office'), $Item->get_type_setting( 'name' ) ).'&hellip;',
-								'href' => $admin_url.'?ctrl=items&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
+								'text' => sprintf( T_('View "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
+								'href' => $admin_url.'?ctrl=items&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
 							);
 					}
 				}
