@@ -488,7 +488,7 @@ if( !$Messages->has_errors() )
 
 			if( empty( $selected_user_ID ) )
 			{	// Inform to select a remaining account if it is not selected yet:
-				$Messages->add( sprintf( T_('Please select a remaining account to merge with %s:'), get_user_identity_link( '', $merging_user_ID ) ), 'warning' );
+				$Messages->add( sprintf( T_('User data from account %s will be merged to the account you select below. Check a radio button and click the orange button at the bottom.'), get_user_identity_link( '', $merging_user_ID ) ), 'warning' );
 			}
 			else
 			{	// Check edit permissions for remaining user as well:
