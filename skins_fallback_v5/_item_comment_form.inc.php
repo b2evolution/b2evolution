@@ -47,6 +47,15 @@ $params = array_merge( array(
 		'comment_attach_info'        => '<br />'.get_upload_restriction(),
 		'comment_mode'         => '', // Can be 'quote' from GET request
 		'comment_type'         => 'comment',
+		'comment_title_before'  => '<div class="bCommentTitle">',
+		'comment_title_after'   => '</div>',
+		'comment_rating_before' => '<div class="comment_rating">',
+		'comment_rating_after'  => '</div>',
+		'comment_text_before'   => '<div class="bCommentText">',
+		'comment_text_after'    => '</div>',
+		'comment_info_before'   => '<div class="bCommentSmallPrint">',
+		'comment_info_after'    => '</div>',
+		
 	), $params );
 
 $comment_reply_ID = param( 'reply_ID', 'integer', 0 );

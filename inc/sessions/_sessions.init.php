@@ -215,7 +215,9 @@ class sessions_Module extends Module
 			if( !is_admin_page() )
 			{	// Only for front-office:
 				$page_menus = array();
-				if( $topleft_Menu->get_node_by_path( array( 'page', 'edit' ) ) )
+				if( $topleft_Menu->get_node_by_path( array( 'page', 'edit_front' ) ) ||
+				    $topleft_Menu->get_node_by_path( array( 'page', 'edit_back' ) ) ||
+				    $topleft_Menu->get_node_by_path( array( 'page', 'view_back' ) ) )
 				{
 					$page_menus['stats_sep'] = array( 'separator' => true );
 				}

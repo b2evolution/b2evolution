@@ -1487,7 +1487,7 @@ class Blog extends DataObject
 				}
 			}
 
-			if( ! param_errors_detected() && ! empty( $old_media_dir ) )
+			if( $this->ID > 0 && ! param_errors_detected() && ! empty( $old_media_dir ) )
 			{ // No error were detected before and possibly the media directory path was updated, check if it can be managed
 				$this->check_media_dir_change( $old_media_dir, isset( $old_media_location ) ? $old_media_location : NULL );
 			}
