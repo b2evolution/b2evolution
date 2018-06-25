@@ -10088,6 +10088,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	/* DON'T EXECUTE THE FOLLOWING TASLS in 7.0upgrade branch because several tables and columns still don't exist at that moment,
+	 * new tables and columns from 12xxx tasks are added in duplicated tasks 14xxx before these 13xxx tasks.
+
 	if( upg_task_start( 13120, 'Converting columns to ASCII...' ) )
 	{	// part of 7.0.0-alpha
 		db_modify_col( 'T_automation__automation', 'autm_status', 'ENUM("paused", "active") COLLATE ascii_general_ci DEFAULT "paused"' );
@@ -10209,6 +10212,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		) );
 		upg_task_end();
 	}
+
+	**/
 
 	/****************************************************************************
 	 * These blocks are temporary copies of above blocks >12360 and <13000 and also >13110.
@@ -10829,15 +10834,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		/**
 		 * Add a widget to global array in order to insert it in DB by single SQL query later
 		 *
-		 * @param integer Blog ID
-		 * @param string Container name
+		 * @param integer Container ID
 		 * @param string Type
 		 * @param string Code
 		 * @param integer Order
 		 * @param array|string|NULL Widget params
 		 * @param integer 1 - enabled, 0 - disabled
 		 */
-		function add_basic_widget_12740( $blog_ID, $container_name, $code, $type, $order, $params = NULL, $enabled = 1 )
+		function add_basic_widget_14400( $container_ID, $code, $type, $order, $params = NULL, $enabled = 1 )
 		{
 			global $basic_widgets_insert_sql_rows, $DB;
 
@@ -10855,8 +10859,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			}
 
 			$basic_widgets_insert_sql_rows[] = '( '
-				.$blog_ID.', '
-				.$DB->quote( $container_name ).', '
+				.$container_ID.', '
 				.$order.', '
 				.$enabled.', '
 				.$DB->quote( $type ).', '
@@ -10897,18 +10900,46 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 			foreach( $collections as $coll_ID => $cat_ID )
 			{
+				$required_containers = array(
+						'login_required' => array( NT_('Login Required'), 200 ),
+						'access_denied'  => array( NT_('Access Denied'), 210 ),
+					);
+				$SQL = new SQL( 'Get widget containers "Login Required" and "Access Denied" for collection #'.$coll_ID );
+				$SQL->SELECT( 'wico_code, wico_ID' );
+				$SQL->FROM( 'T_widget__container' );
+				$SQL->WHERE( 'wico_coll_ID = '.$coll_ID );
+				$SQL->WHERE_and( 'wico_code IN ( '.$DB->quote( $required_containers ).' )' );
+				$widget_containers = $DB->get_assoc( $SQL );
+				foreach( $required_containers as $container_code => $container_data )
+				{
+					if( ! isset( $widget_containers[ $container_code ] ) )
+					{	// Create widget container if it doesn't still exist for the collection:
+						if( $DB->query( 'INSERT INTO T_widget__container ( wico_code, wico_name, wico_coll_ID, wico_order, wico_main )
+							VALUES ( '.$DB->quote( $container_code ).', '.$DB->quote( $container_data[0] ).', '.$DB->quote( $coll_ID ).', '.$DB->quote( $container_data[1] ).', 1 ) ' ) )
+						{
+							$widget_containers[ $container_code ] = $DB->insert_id;
+						}
+					}
+				}
+
 				task_begin( 'Installing default "Login Required" and "Access Denied" widgets for collection #'.$coll_ID.'... ' );
 				/* Login Required */
 				$widget_Item = new Item();
 				$widget_Item->insert( 1, T_('Login Required'), '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
 					date( 'Y-m-d H:i:s' ), $cat_ID, array(), 'published', '#', 'login-required-'.$coll_ID, '', 'open', array( 'default' ), $content_block_ityp_ID );
-				add_basic_widget_12740( $coll_ID, 'Login Required', 'content_block', 'core', 10, array( 'item_slug' => $widget_Item->get( 'urltitle' ) ) );
-				add_basic_widget_12740( $coll_ID, 'Login Required', 'user_login', 'core', 20, array( 'title' => T_( 'Log in to your account' ) ) );
+				if( isset( $widget_containers['login_required'] ) )
+				{
+					add_basic_widget_14400( $widget_containers['login_required'], 'content_block', 'core', 10, array( 'item_slug' => $widget_Item->get( 'urltitle' ) ) );
+					add_basic_widget_14400( $widget_containers['login_required'], 'user_login', 'core', 20, array( 'title' => T_( 'Log in to your account' ) ) );
+				}
 				/* Access Denied */
 				$widget_Item = new Item();
 				$widget_Item->insert( 1, T_('Access Denied'), '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
 					date( 'Y-m-d H:i:s' ), $cat_ID, array(), 'published', '#', 'access-denied-'.$coll_ID, '', 'open', array( 'default' ), $content_block_ityp_ID );
-				add_basic_widget_12740( $coll_ID, 'Access Denied', 'content_block', 'core', 10, array( 'item_slug' => $widget_Item->get( 'urltitle' ) ) );
+				if( isset( $widget_containers['access_denied'] ) )
+				{
+					add_basic_widget_14400( $widget_containers['access_denied'], 'content_block', 'core', 10, array( 'item_slug' => $widget_Item->get( 'urltitle' ) ) );
+				}
 				task_end();
 			}
 
@@ -10921,7 +10952,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		if( ! empty( $basic_widgets_insert_sql_rows ) )
 		{	// Insert the widget records by single SQL query:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+			$DB->query( 'INSERT INTO T_widget__widget ( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
 								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
 		}
 		/* ---- Install basic widgets for containers "Login Required" and "Access Denied": ---- END */
@@ -11261,11 +11292,27 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 					}
 				}
 
+				$required_containers = array(
+						'help'     => array( NT_('Help'), 220 ),
+						'register' => array( NT_('Register'), 230 ),
+					);
 				$SQL = new SQL( 'Get widget containers "Help" and "Register" for collection #'.$coll_ID );
 				$SQL->SELECT( 'wico_code, wico_ID' );
 				$SQL->FROM( 'T_widget__container' );
 				$SQL->WHERE( 'wico_coll_ID = '.$coll_ID );
+				$SQL->WHERE_and( 'wico_code IN ( "help", "register" )' );
 				$widget_containers = $DB->get_assoc( $SQL );
+				foreach( $required_containers as $container_code => $container_data )
+				{
+					if( ! isset( $widget_containers[ $container_code ] ) )
+					{	// Create widget container if it doesn't still exist for the collection:
+						if( $DB->query( 'INSERT INTO T_widget__container ( wico_code, wico_name, wico_coll_ID, wico_order, wico_main )
+							VALUES ( '.$DB->quote( $container_code ).', '.$DB->quote( $container_data[0] ).', '.$DB->quote( $coll_ID ).', '.$DB->quote( $container_data[1] ).', 1 ) ' ) )
+						{
+							$widget_containers[ $container_code ] = $DB->insert_id;
+						}
+					}
+				}
 
 				task_begin( 'Installing default "Help" and "Register" widgets for collection #'.$coll_ID.'... ' );
 				/* Help */
