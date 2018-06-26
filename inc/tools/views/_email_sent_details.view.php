@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $edited_EmailLog;
+global $edited_EmailLog, $admin_url;
 
 $Form = new Form( NULL, 'mail_log', 'post', 'compact' );
 
@@ -21,7 +21,13 @@ $Form->global_icon( T_('Cancel viewing!'), 'close', regenerate_url( 'blog' ) );
 
 $Form->begin_form( 'fform', sprintf( T_('Mail log ID#%s'), $edited_EmailLog->ID ) );
 
-$Form->info( T_('Result'), emlog_result_info( $edited_EmailLog->result, array(), $edited_EmailLog->last_open_ts, $edited_EmailLog->last_click_ts ) );
+$Form->begin_line( T_('Result'), NULL );
+$result = emlog_result_info( $edited_EmailLog->result, array(), $edited_EmailLog->last_open_ts, $edited_EmailLog->last_click_ts );
+$result .= ' <a href="'.url_add_param( $admin_url, array( 'ctrl' => 'email', 'tab' => 'return', 'email' => $edited_EmailLog->to ) ).'" class="'.button_class().' middle" title="'.format_to_output( T_('Go to return log'), 'htmlattr' ).'">'
+		.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to return log') ) ).' '.T_('Returns').'</a>';
+$Form->info_field( '', $result );
+$Form->end_line( NULL );
+
 
 $Form->info( T_('Date'), mysql2localedatetime_spans( $edited_EmailLog->timestamp ) );
 
@@ -39,7 +45,12 @@ if( $edited_EmailLog->user_ID > 0 )
 	}
 }
 
-$Form->info( T_('To'), '<pre class="email_log"><span>'.htmlspecialchars($edited_EmailLog->to).$deleted_user_note.'</span></pre>' );
+$Form->begin_line( T_('To'), NULL );
+$to_address = htmlspecialchars($edited_EmailLog->to).$deleted_user_note;
+$to_address .= ' <a href="'.url_add_param( $admin_url, array( 'ctrl' => 'email', 'tab' => 'sent', 'email' => $edited_EmailLog->to ) ).'" class="'.button_class().' middle" title="'.format_to_output( T_('Go to return log'), 'htmlattr' ).'">'
+		.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to send log') ) ).' '.T_('Send Log').'</a>';
+$Form->info_field( '', $to_address );
+$Form->end_line( NULL );
 
 $Form->info( T_('Subject'), '<pre class="email_log"><span>'.htmlspecialchars($edited_EmailLog->subject).'</span></pre>' );
 
