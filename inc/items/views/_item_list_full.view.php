@@ -184,7 +184,7 @@ while( $Item = & $ItemList->get_item() )
 					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'contents_last_updated_ts' ) )
 					.$Item->get_refresh_contents_last_updated_link()
 					.$Item->get_refresh_contents_last_updated_link( array(
-							'title' => T_('Reset the "contents last updated" date to the date of the lasted reply on this thread'),
+							'title' => T_('Reset the "contents last updated" date to the date of the latest reply on this thread'),
 							'type'  => 'created',
 						) )
 					.'</span>';
