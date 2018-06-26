@@ -256,6 +256,11 @@ $emailskins_styles = array(
 	padding: 5px 10px;
 	border-radius: 4px;
 	line-height: 1.5;
+',
+/* Polls */
+'li.evo_poll_option' => '
+	margin-top: 1ex;
+	margin-bottom: 1ex;
 '
 );
 ?>
