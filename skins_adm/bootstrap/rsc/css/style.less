@@ -1128,12 +1128,19 @@ div.available_widgets {
 		background: #FFF;
 		padding: 10px 15px;
 	}
-	.widget_list {
-		list-style: none;
-		margin: 0;
-	}
 	#available_widgets_inner {
 		top: 87px;
+	}
+}
+.widget_list {
+	list-style: none;
+	margin: 0;
+	li {
+		text-indent: -25px;
+		padding-left: 25px;
+		a {
+			text-indent: initial;
+		}
 	}
 }
 
@@ -1736,7 +1743,7 @@ div.query-builder .rule-container .rule-value-container {
 	}
 	.evo_customizer__available_widgets {
 		padding: 15px;
-		ul {
+		ul.widget_list {
 			list-style: none;
 			margin: 0 0 0 2px;
 		}

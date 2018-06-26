@@ -421,6 +421,21 @@ class ComponentWidget extends DataObject
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Advanced'),
 				);
+			$advanced_layout_is_started = true;
+		}
+
+		if( get_parent_class( $this ) == 'generic_menu_link_Widget' )
+		{	// Widget link/button CSS classes for menu link widgets:
+			$r['widget_link_class'] = array(
+					'label' => '<span class="dimmed">'.T_('Link/Button Class').'</span>',
+					'size' => 20,
+					'note' => T_('Replaces $link_class$ in class attribute of link/button.'),
+				);
+			$r['widget_active_link_class'] = array(
+					'label' => '<span class="dimmed">'.T_('Active Link/Button Class').'</span>',
+					'size' => 20,
+					'note' => T_('Replaces $link_class$ in class attribute of active link/button.'),
+				);
 		}
 
 		if( ! isset( $r['widget_css_class'] ) )
@@ -454,13 +469,12 @@ class ComponentWidget extends DataObject
 				);
 		}
 
-		if( ! isset( $r['widget_css_class'] ) ||
-		    ! isset( $r['widget_ID'] ) ||
-		    ! isset( $r['allow_blockcache'] ) )
+		if( ! empty( $advanced_layout_is_started ) )
 		{	// End fieldset of advanced settings:
 			$r['advanced_layout_end'] = array(
 					'layout' => 'end_fieldset',
 				);
+			$advanced_layout_is_started = false;
 		}
 
 		return $r;

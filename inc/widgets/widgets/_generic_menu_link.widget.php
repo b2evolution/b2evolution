@@ -64,12 +64,12 @@ class generic_menu_link_Widget extends ComponentWidget
 			if( $is_active_link )
 			{	// Use template and class to highlight current menu item:
 				$r .= $this->disp_params['item_selected_start'];
-				$link_class = $this->disp_params['link_selected_class'];
+				$link_class = empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['link_selected_class'] : $this->disp_params['widget_active_link_class'];
 			}
 			else
 			{	// Use normal template:
 				$r .= $this->disp_params['item_start'];
-				$link_class = $this->disp_params['link_default_class'];
+				$link_class = empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['link_default_class'] : $this->disp_params['widget_link_class'];
 			}
 
 			// Get a link from template:
@@ -94,11 +94,11 @@ class generic_menu_link_Widget extends ComponentWidget
 
 			if( $is_active_link )
 			{	// Use template and class to highlight current menu item:
-				$button_class = $this->disp_params['button_selected_class'];
+				$button_class = empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class'];
 			}
 			else
 			{	// Use normal template:
-				$button_class = $this->disp_params['button_default_class'];
+				$button_class = empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class'];
 			}
 
 			// Get a button from template:

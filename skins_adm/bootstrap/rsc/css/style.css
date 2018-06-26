@@ -1050,12 +1050,19 @@ div.available_widgets .available_widgets_toolbar {
   background: #FFF;
   padding: 10px 15px;
 }
-div.available_widgets .widget_list {
+div.available_widgets #available_widgets_inner {
+  top: 87px;
+}
+.widget_list {
   list-style: none;
   margin: 0;
 }
-div.available_widgets #available_widgets_inner {
-  top: 87px;
+.widget_list li {
+  text-indent: -25px;
+  padding-left: 25px;
+}
+.widget_list li a {
+  text-indent: initial;
 }
 .evo_widget_icon {
   display: inline-block;
@@ -1692,7 +1699,7 @@ div.query-builder .rule-container .rule-value-container {
 #customizer_wrapper .evo_customizer__available_widgets {
   padding: 15px;
 }
-#customizer_wrapper .evo_customizer__available_widgets ul {
+#customizer_wrapper .evo_customizer__available_widgets ul.widget_list {
   list-style: none;
   margin: 0 0 0 2px;
 }

@@ -66,8 +66,15 @@ $Plugins->trigger_event( 'WidgetBeginSettingsForm', array(
 
 // Display properties:
 $Form->begin_fieldset( T_('Widget info'), array( 'id' => 'widget_info' ) );
-	$Form->info( T_('Widget type'), $edited_ComponentWidget->get_icon().' '.$edited_ComponentWidget->get_name() );
-	$Form->info( T_('Description'), $edited_ComponentWidget->get_desc() );
+	if( $mode == 'customizer' )
+	{
+		$Form->info( '', $edited_ComponentWidget->get_icon().' '.$edited_ComponentWidget->get_name(), '<br>'.$edited_ComponentWidget->get_desc() );
+	}
+	else
+	{
+		$Form->info( T_('Widget type'), $edited_ComponentWidget->get_icon().' '.$edited_ComponentWidget->get_name() );
+		$Form->info( T_('Description'), $edited_ComponentWidget->get_desc() );
+	}
 $Form->end_fieldset();
 
 

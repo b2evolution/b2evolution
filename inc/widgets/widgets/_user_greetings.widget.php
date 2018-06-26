@@ -101,8 +101,11 @@ class user_greetings_Widget extends ComponentWidget
 					'defaultvalue' => 'crop-top-32x32',
 				),
 				// Group
+				'group_begin_line' => array(
+					'type' => 'begin_line',
+					'label' => T_('User group'),
+				),
 				'group_show' => array(
-					'label' => T_( 'User group'),
 					'note' => T_( 'Show user group' ),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
@@ -113,9 +116,15 @@ class user_greetings_Widget extends ComponentWidget
 					'type' => 'text',
 					'defaultvalue' => T_( 'Your group: $group$' ),
 				),
+				'group_end_line' => array(
+					'type' => 'end_line',
+				),
 				// Level
-				'level_show' => array(
+				'level_begin_line' => array(
+					'type' => 'begin_line',
 					'label' => T_( 'User level'),
+				),
+				'level_show' => array(
 					'note' => T_( 'Show user level' ),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
@@ -126,9 +135,15 @@ class user_greetings_Widget extends ComponentWidget
 					'type' => 'text',
 					'defaultvalue' => T_( 'Your level: $level$' ),
 				),
+				'level_end_line' => array(
+					'type' => 'end_line',
+				),
 				// Greeting
-				'greeting_show' => array(
+				'greeting_begin_line' => array(
+					'type' => 'begin_line',
 					'label' => T_( 'Greeting'),
+				),
+				'greeting_show' => array(
 					'note' => T_( 'Show greeting' ),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
@@ -138,6 +153,9 @@ class user_greetings_Widget extends ComponentWidget
 					'note' => T_( 'Greeting text to display' ),
 					'type' => 'text',
 					'defaultvalue' => sprintf( T_( 'Hello %s!' ), '$login$' ),
+				),
+				'greeting_end_line' => array(
+					'type' => 'end_line',
 				),
 			), parent::get_param_definitions( $params ) );
 

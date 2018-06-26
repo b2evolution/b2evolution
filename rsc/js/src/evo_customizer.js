@@ -79,6 +79,9 @@ jQuery( document ).on( 'ready', function()
 				button.after( '<div id="evo_customizer__form_loader"></div>' );
 			}
 		} );
+
+		// Open links from widget edit form on top window:
+		backoffice_content.find( 'form#widget_checkchanges a' ).attr( 'target', '_top' );
 	} );
 
 	jQuery( '#evo_customizer__updater' ).on( 'load', function()
