@@ -2459,6 +2459,10 @@ form ul.token-input-list-facebook {
   border-radius: 4px;
   padding: 4px 4px 0 4px;
 }
+form ul.token-input-list-facebook.token-input-list-process {
+  background: #fcf8e3;
+  border: 1px solid #f5e79e;
+}
 form ul.token-input-list-facebook.token-input-list-error {
   background: #fbf2ee;
   border: 1px solid #d99;
