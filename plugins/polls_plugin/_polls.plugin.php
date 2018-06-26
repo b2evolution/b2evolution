@@ -498,7 +498,7 @@ class polls_plugin extends Plugin
 				{
 					$vote_url = url_add_param( $vote_url, 'redirect_to='.rawurlencode( $params['redirect_to'] ) );
 				}
-				echo '<li><a href="'.$vote_url.'">'.$poll_option->option_text.'</a></li>';
+				echo '<li'.emailskin_style('li.evo_poll_option').'><a href="'.$vote_url.'">'.$poll_option->option_text.'</a></li>';
 			}
 			echo '</ul>';
 		}

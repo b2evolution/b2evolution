@@ -102,9 +102,9 @@ class user_avatars_Widget extends ComponentWidget
 				'note' => T_('How to sort the users'),
 				'type' => 'select',
 				'options' => array(
-						'random'     => T_('Random users'),
-						'opt_random' => T_('Optimized Random'),
-						'php_random' => T_('PHP Random'),
+						'random'     => T_('Random by MySQL (slow)'),
+						'opt_random' => T_('Random by alt algo (experimental)'),
+						'php_random' => T_('Random by PHP (recommended)'),
 						'regdate'    => T_('Most recent registrations'),
 						'moddate'    => T_('Most recent profile updates'),
 						'numposts'   => T_('Number of (Public+Community+Member) posts'),
@@ -198,6 +198,8 @@ class user_avatars_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
+		global $DB;
+
 		$this->init_display( $params );
 
 		$UserCache = & get_UserCache();
@@ -246,7 +248,7 @@ class user_avatars_Widget extends ComponentWidget
 		$SQL->WHERE_and( 'user_status <> "closed"' );
 		if( is_logged_in() )
 		{ // Add filters
-			global $current_User, $DB;
+			global $current_User;
 			switch( $this->disp_params[ 'gender' ] )
 			{ // Filter by gender
 				case 'same':
@@ -333,10 +335,12 @@ class user_avatars_Widget extends ComponentWidget
 		$SQL->ORDER_BY( $sql_order );
 		$SQL->LIMIT( $users_limit );
 
+		$search_users_by_sql = true;
+
 		switch( $this->disp_params['order_by'] )
 		{
 			case 'opt_random':
-				// Optimized Random:
+				// Random by alt algo (experimental):
 				$count_SQL = new SQL( 'Get user numbers for widget #'.$this->ID.' "'.$this->get_name().'"' );
 				$count_SQL->SELECT( 'MIN( user_ID ) AS min_user_ID, MAX( user_ID ) AS max_user_ID, COUNT( user_ID ) AS cnt' );
 				$count_SQL->FROM( 'T_users' );
@@ -344,7 +348,7 @@ class user_avatars_Widget extends ComponentWidget
 				$user_nums = $DB->get_row( $count_SQL );
 				if( $user_nums->cnt == 0 )
 				{	// If no users for current filter:
-					$SQL->WHERE( 'FALSE' );
+					$search_users_by_sql = false;
 				}
 				elseif( $user_nums->cnt <= $users_limit )
 				{	// If filtered users number is less or equal than the requested limit:
@@ -384,7 +388,7 @@ class user_avatars_Widget extends ComponentWidget
 				break;
 
 			case 'php_random':
-				// PHP Random:
+				// Random by PHP (recommended):
 				$filtered_user_IDs_SQL = new SQL( 'Get all filtered user IDs before PHP random for widget #'.$this->ID.' "'.$this->get_name().'"' );
 				$filtered_user_IDs_SQL->SELECT( 'user_ID' );
 				$filtered_user_IDs_SQL->FROM( 'T_users' );
@@ -393,7 +397,7 @@ class user_avatars_Widget extends ComponentWidget
 				$filtered_user_IDs_num = count( $filtered_user_IDs );
 				if( $filtered_user_IDs_num == 0 )
 				{	// If no users for current filter:
-					$SQL->WHERE( 'FALSE' );
+					$search_users_by_sql = false;
 				}
 				else
 				{	// If at least one user is found by widget filter:
@@ -418,67 +422,65 @@ class user_avatars_Widget extends ComponentWidget
 				break;
 		}
 
-		$UserList->sql = $SQL->get();
-
-		$UserList->run_query( false, false, false, 'Get users by filter of widget #'.$this->ID.' "'.$this->get_name().'"' );
-
-		$avatar_link_attrs = '';
-		if( $this->disp_params[ 'style' ] == 'badges' )
-		{ // Remove borders of <td> elements
-			$this->disp_params[ 'grid_cellstart' ] = str_replace( '>', ' style="border:none">', $this->disp_params[ 'grid_cellstart' ] );
-			$avatar_link_attrs = ' class="avatar_rounded"';
-		}
-
-		$layout = $this->disp_params[ 'thumb_layout' ];
-
 		$count = 0;
 		$r = '';
-		/**
-		 * @var User
-		 */
-		while( $User = & $UserList->get_next() )
-		{
-			$r .= $this->get_layout_item_start( $count );
 
-			$identity_url = get_user_identity_url( $User->ID );
-			$avatar_tag = $User->get_avatar_imgtag( $this->disp_params['thumb_size'] );
+		if( $search_users_by_sql )
+		{	// Search users by SQL query:
+			$UserList->sql = $SQL->get();
+			$UserList->run_query( false, false, false, 'Get users by filter of widget #'.$this->ID.' "'.$this->get_name().'"' );
 
-			if( $this->disp_params[ 'bubbletip' ] == '1' )
-			{	// Bubbletip is enabled
-				$bubbletip_param = ' rel="bubbletip_user_'.$User->ID.'"';
-				$avatar_tag = str_replace( '<img ', '<img '.$bubbletip_param.' ', $avatar_tag );
+			$avatar_link_attrs = '';
+			if( $this->disp_params[ 'style' ] == 'badges' )
+			{	// Remove borders of <td> elements:
+				$this->disp_params[ 'grid_cellstart' ] = str_replace( '>', ' style="border:none">', $this->disp_params[ 'grid_cellstart' ] );
+				$avatar_link_attrs = ' class="avatar_rounded"';
 			}
 
-			if( ! empty( $identity_url ) )
+			while( $User = & $UserList->get_next() )
 			{
-				$r .= '<a href="'.$identity_url.'"'.$avatar_link_attrs.'>';
-				if( $this->disp_params[ 'style' ] != 'username' )
-				{ // Display only username
+				$r .= $this->get_layout_item_start( $count );
+
+				$identity_url = get_user_identity_url( $User->ID );
+				$avatar_tag = $User->get_avatar_imgtag( $this->disp_params['thumb_size'] );
+
+				if( $this->disp_params[ 'bubbletip' ] == '1' )
+				{	// Bubbletip is enabled
+					$bubbletip_param = ' rel="bubbletip_user_'.$User->ID.'"';
+					$avatar_tag = str_replace( '<img ', '<img '.$bubbletip_param.' ', $avatar_tag );
+				}
+
+				if( ! empty( $identity_url ) )
+				{
+					$r .= '<a href="'.$identity_url.'"'.$avatar_link_attrs.'>';
+					if( $this->disp_params[ 'style' ] != 'username' )
+					{	// Display only username:
+						$r .= $avatar_tag;
+					}
+
+					if( $this->disp_params[ 'style' ] == 'badges' )
+					{	// Add user login after picture:
+						$r .= '<br >'.$User->get_colored_login( array( 'login_text' => 'name' ) );
+					}
+					elseif( $this->disp_params[ 'style' ] == 'username' )
+					{	// Display username without <br>:
+						$r .= $User->get_colored_login();
+					}
+					$r .= '</a>';
+				}
+				else
+				{
 					$r .= $avatar_tag;
 				}
 
-				if( $this->disp_params[ 'style' ] == 'badges' )
-				{ // Add user login after picture
-					$r .= '<br >'.$User->get_colored_login( array( 'login_text' => 'name' ) );
-				}
-				elseif( $this->disp_params[ 'style' ] == 'username' )
-				{ // username without <br>
-					$r .= $User->get_colored_login();
-				}
-				$r .= '</a>';
-			}
-			else
-			{
-				$r .= $avatar_tag;
-			}
+				++$count;
 
-			++$count;
-
-			$r .= $this->get_layout_item_end( $count );
+				$r .= $this->get_layout_item_end( $count );
+			}
 		}
 
-		if( empty( $r ) )
-		{	// Exit if no files found:
+		if( $count == 0 )
+		{	// Exit if no users found:
 			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there no users found with avatars.' );
 			return;
 		}

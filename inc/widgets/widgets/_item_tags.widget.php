@@ -108,9 +108,9 @@ class item_tags_Widget extends ComponentWidget
 					'defaultvalue' => T_('Tags').': '
 				),
 				'allow_edit' => array(
-					'label' => T_( 'Allow to edit' ),
+					'label' => T_( 'Allow editing' ),
 					'type' => 'checkbox',
-					'note' => T_( 'Check to allow editing item tags if current user has a permission' ),
+					'note' => T_( 'Check to enable AJAX editing of item tags if current user has permission.' ),
 					'defaultvalue' => 0,
 				),
 			), parent::get_param_definitions( $params ) );
