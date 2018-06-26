@@ -36,7 +36,14 @@ $Item = $params['Item'];
 $recipient_User = & $params['recipient_User'];
 
 $author_name = empty( $params['author_ID'] ) ? $params['author_name'] : get_user_colored_login_link( $params['author_name'], array( 'use_style' => true, 'protocol' => 'http:', 'login_text' => 'name' ) );
-$author_type = empty( $params['author_ID'] ) ? ' <span class="label label-warning">'.T_('Visitor').'</span>' : ' <span class="label label-info">'.T_('Member').'</span>';
+if( is_null( $Comment ) )
+{
+	$author_type = empty( $params['author_ID'] ) ? '<span'.emailskin_style( '.label+.label_warning').'>'.T_('Visitor').'</span>' : '<span'.emailskin_style( '.label+.label_info' ).'>'.T_('Member').'</span>';
+}
+else
+{
+	$author_type = $Comment->get_author_label( array( 'use_style' => true ) );
+}
 if( $params['notify_type'] == 'meta_comment' )
 { // Meta comment
 	$info_text = T_( '%s posted a new meta comment on %s in %s.' );
@@ -45,7 +52,7 @@ else
 { // Normal comment
 	$info_text = T_( '%s posted a new comment on %s in %s.' );
 }
-$notify_message = '<p'.emailskin_style( '.p' ).'>'.sprintf( $info_text, '<b>'.$author_name.'</b>'.$author_type, '<b>'.get_link_tag( $Item->get_permanent_url( '', '', '&' ), $Item->get( 'title' ), '.a' ).'</b>', '<b>'.$Blog->get('shortname').'</b>' )."</p>\n";
+$notify_message = '<p'.emailskin_style( '.p' ).'>'.sprintf( $info_text, '<b>'.$author_name.'</b> '.$author_type, '<b>'.get_link_tag( $Item->get_permanent_url( '', '', '&' ), $Item->get( 'title' ), '.a' ).'</b>', '<b>'.$Blog->get('shortname').'</b>' )."</p>\n";
 
 if( $params['notify_full'] )
 { // Long format notification:

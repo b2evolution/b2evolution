@@ -1206,7 +1206,16 @@ class Comment extends DataObject
 		global $Skin;
 
 		// Default params:
-		if( is_admin_page() || ( isset( $Skin ) && $Skin->get_api_version() >= 6 && strpos( $Skin->folder, 'bootstrap' ) !== FALSE ) )
+		if( isset( $params['use_style'] ) && $params['use_style'] )
+		{
+			$default_params = array(
+					'member_before'  => '<span'.emailskin_style( '.label+.label-info' ).'>',
+					'member_after'   => '</span>',
+					'visitor_before' => '<span'.emailskin_style( '.label+.label-warning' ).'>',
+					'visitor_after'  => '</span>',
+				);
+		}
+		elseif( is_admin_page() || ( isset( $Skin ) && $Skin->get_api_version() >= 6 && strpos( $Skin->folder, 'bootstrap' ) !== FALSE ) )
 		{	// for v6 bootstrap skins:
 			$default_params = array(
 					'member_before'  => '<span class="label label-info">',
