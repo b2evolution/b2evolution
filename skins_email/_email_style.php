@@ -288,5 +288,10 @@ $emailskins_styles = array(
 '.label-danger' => '
 	background-color: #d9534f;
 ',
+/* Polls */
+'li.evo_poll_option' => '
+	margin-top: 1ex;
+	margin-bottom: 1ex;
+'
 );
 ?>
