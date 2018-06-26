@@ -42,7 +42,12 @@ if( is_null( $Comment ) )
 }
 else
 {
-	$author_type = $Comment->get_author_label( array( 'use_style' => true ) );
+	$author_type = $Comment->get_author_label( array(
+			'member_before'  => '<span'.emailskin_style( '.label+.label-info' ).'>',
+			'member_after'   => '</span>',
+			'visitor_before' => '<span'.emailskin_style( '.label+.label-warning' ).'>',
+			'visitor_after'  => '</span>',
+		) );
 }
 if( $params['notify_type'] == 'meta_comment' )
 { // Meta comment
