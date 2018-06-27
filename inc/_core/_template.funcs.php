@@ -1643,6 +1643,60 @@ function init_results_js( $relative_to = 'rsc_url' )
 
 
 /**
+ * Registers headlines for initialization of functions to work with affixed Messages
+ */
+function init_affix_messages_js( $offset = 50 )
+{
+	add_js_headline( '
+	jQuery( document ).ready( function()
+	{
+		var msg_obj = jQuery( ".action_messages" );
+		var msg_offset = '.format_to_js( $offset == '' ? 50 : $offset ).';
+
+		if( msg_obj.length == 0 )
+		{ // No Messages, exit
+			return;
+		}
+
+		msg_obj.wrap( "<div class=\"msg_wrapper\"></div>" );
+		var wrapper = msg_obj.parent();
+
+		msg_obj.affix( {
+				offset: {
+					top: function() {
+						return wrapper.offset().top - msg_offset - parseInt( msg_obj.css( "margin-top" ) );
+					}
+				}
+			} );
+
+		msg_obj.on( "affix.bs.affix", function()
+			{
+				wrapper.css( { "min-height": msg_obj.outerHeight( true ) } );
+
+				msg_obj.css( { "width": msg_obj.outerWidth(), "top": msg_offset, "z-index": 99999 } );
+
+				jQuery( window ).on( "resize", function()
+					{ // This will resize the Messages based on the wrapper width
+						msg_obj.css( { "width": wrapper.css( "width" ) } );
+					});
+			} );
+
+		msg_obj.on( "affixed-top.bs.affix", function()
+			{
+				wrapper.css( { "min-height": "" } );
+				msg_obj.css( { "width": "", "top": "", "z-index": "" } );
+			} );
+
+		jQuery( "div.alert", msg_obj ).on( "closed.bs.alert", function()
+			{
+				wrapper.css({ "min-height": msg_obj.outerHeight( true ) });
+			} );
+	} );
+	' );
+}
+
+
+/**
  * Registers headlines for initialization of functions to work a voting panel for comments
  *
  * @param boolean|string Is the file's path relative to the base path/url?
