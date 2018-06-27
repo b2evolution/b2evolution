@@ -17,6 +17,19 @@ jQuery( document ).on( 'ready', function()
 		}
 	}
 
+	function evo_customizer_show_backoffice()
+	{	// Show back-office panel:
+		jQuery( '.evo_customizer__wrapper' ).removeClass( 'evo_customizer__collapsed' );
+		// Fix for Safari browser in order to make back-office panel scrollable again after collapse/expand action:
+		setTimeout( function() { jQuery( '#evo_customizer__backoffice' ).css( 'height', '100%' ); }, 1 );
+	}
+	function evo_customizer_hide_backoffice()
+	{	// Hide back-office panel:
+		jQuery( '.evo_customizer__wrapper' ).addClass( 'evo_customizer__collapsed' );
+		// Fix for Safari browser in order to make back-office panel scrollable again after collapse/expand action:
+		jQuery( '#evo_customizer__backoffice' ).css( 'height', '99.9%' );
+	}
+
 	jQuery( '#evo_customizer__backoffice' ).on( 'load', function()
 	{	// If iframe with settings has been loaded
 		var backoffice_content = jQuery( this ).contents();
@@ -62,7 +75,7 @@ jQuery( document ).on( 'ready', function()
 
 		backoffice_content.find( '#evo_customizer__collapser' ).click( function()
 		{	// Collapse customizer iframe:
-			jQuery( '.evo_customizer__wrapper' ).addClass( 'evo_customizer__collapsed' );
+			evo_customizer_hide_backoffice();
 		} );
 
 		backoffice_content.find( '#evo_customizer__closer' ).click( function()
@@ -160,7 +173,7 @@ jQuery( document ).on( 'ready', function()
 	{	// Expand customizer iframe if it is collapsed:
 		if( jQuery( '.evo_customizer__wrapper' ).hasClass( 'evo_customizer__collapsed' ) )
 		{
-			jQuery( '.evo_customizer__wrapper' ).removeClass( 'evo_customizer__collapsed' );
+			evo_customizer_show_backoffice();
 			// Prevent open link URL, because we need only to expand currently:
 			return false;
 		}
@@ -189,12 +202,12 @@ jQuery( document ).on( 'ready', function()
 			{	// Collapse left customizer panel if cursor is moved to the left:
 				if( ! is_collapsed )
 				{	// And if it is not collapsed yet:
-					jQuery( '.evo_customizer__wrapper' ).addClass( 'evo_customizer__collapsed' );
+					evo_customizer_hide_backoffice();
 				}
 			}
 			else if( is_collapsed )
 			{	// Expand left customizer panel if cursor is moved to the right and if it is really collapsed:
-				jQuery( '.evo_customizer__wrapper' ).removeClass( 'evo_customizer__collapsed' );
+				evo_customizer_show_backoffice();
 			}
 			if( e.pageX != jQuery( this ).data( 'startX' ) )
 			{	// Set flag if the resizing is detected for at least 1 pixel:
@@ -208,7 +221,14 @@ jQuery( document ).on( 'ready', function()
 	{
 		if( ! jQuery( this ).data( 'resized' ) )
 		{	// If it has not been resized then simulate "click" event to expand/collapse:
-			jQuery( '.evo_customizer__wrapper' ).toggleClass( 'evo_customizer__collapsed' );
+			if( jQuery( '.evo_customizer__wrapper' ).hasClass( 'evo_customizer__collapsed' ) )
+			{
+				evo_customizer_show_backoffice();
+			}
+			else
+			{
+				evo_customizer_hide_backoffice();
+			}
 		}
 		jQuery( this )
 			.removeClass( 'evo_customizer__vtoggler_resizing' ) // Remove class flag of resizing
