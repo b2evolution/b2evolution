@@ -94,7 +94,7 @@ class user_greetings_Widget extends ComponentWidget
 				),
 				// Picture
 				'profile_picture_size' => array(
-					'label' => T_( 'Profile picture'),
+					'label' => T_('Profile picture'),
 					'note' => '',
 					'type' => 'select',
 					'options' => get_available_thumb_sizes( T_('none') ),
@@ -106,13 +106,12 @@ class user_greetings_Widget extends ComponentWidget
 					'label' => T_('User group'),
 				),
 				'group_show' => array(
-					'note' => T_( 'Show user group' ),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
 				'group_text' => array(
-					'size' => 30,
-					'note' => T_( 'Group text to display' ),
+					'label' => T_('Show as:'),
+					'size' => 25,
 					'type' => 'text',
 					'defaultvalue' => T_( 'Your group: $group$' ),
 				),
@@ -122,16 +121,15 @@ class user_greetings_Widget extends ComponentWidget
 				// Level
 				'level_begin_line' => array(
 					'type' => 'begin_line',
-					'label' => T_( 'User level'),
+					'label' => T_('User level'),
 				),
 				'level_show' => array(
-					'note' => T_( 'Show user level' ),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
 				'level_text' => array(
-					'size' => 30,
-					'note' => T_( 'Level text to display' ),
+					'label' => T_('Show as:'),
+					'size' => 25,
 					'type' => 'text',
 					'defaultvalue' => T_( 'Your level: $level$' ),
 				),
@@ -141,16 +139,15 @@ class user_greetings_Widget extends ComponentWidget
 				// Greeting
 				'greeting_begin_line' => array(
 					'type' => 'begin_line',
-					'label' => T_( 'Greeting'),
+					'label' => T_('Greeting'),
 				),
 				'greeting_show' => array(
-					'note' => T_( 'Show greeting' ),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
 				'greeting_text' => array(
-					'size' => 30,
-					'note' => T_( 'Greeting text to display' ),
+					'label' => T_('Show as:'),
+					'size' => 25,
 					'type' => 'text',
 					'defaultvalue' => sprintf( T_( 'Hello %s!' ), '$login$' ),
 				),
