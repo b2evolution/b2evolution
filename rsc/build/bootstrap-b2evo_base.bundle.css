@@ -993,6 +993,9 @@ div.filters .filter_item div {
   font-size: 16px;
   margin: 0;
 }
+.msg_wrapper .affix div.alert {
+  box-shadow: 1px 10px 35px rgba(75, 75, 75, 0.75);
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.
