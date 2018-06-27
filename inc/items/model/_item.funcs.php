@@ -2721,6 +2721,9 @@ function echo_autocomplete_tags( $params = array() )
 	<?php if( $params['update_by_ajax'] ) { ?>
 	function evo_update_item_tags_by_ajax( item_ID, tags_selector )
 	{
+		// Mark input background with yellow color during AJAX updating:
+		var token_input = jQuery( '.token-input-' + tags_selector.substr( 1 ) );
+		token_input.removeClass( 'token-input-list-error' ).addClass( 'token-input-list-process' );
 		jQuery.ajax(
 		{
 			type: 'POST',
@@ -2732,6 +2735,14 @@ function echo_autocomplete_tags( $params = array() )
 				'item_ID': item_ID,
 				'item_tags': jQuery( tags_selector ).val(),
 				'crumb_collections_update_tags': '<?php echo get_crumb( 'collections_update_tags' ); ?>'
+			},
+			success: function()
+			{	// Remove yellow background from input after success AJAX updating:
+				token_input.removeClass( 'token-input-list-process' );
+			},
+			error: function()
+			{	// Mark input background with red color after fail AJAX updating:
+				token_input.removeClass( 'token-input-list-process' ).addClass( 'token-input-list-error' );
 			}
 		} );
 	}
