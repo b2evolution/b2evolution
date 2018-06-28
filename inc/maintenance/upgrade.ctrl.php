@@ -41,6 +41,66 @@ $AdminUI->set_path( 'options', 'misc', 'upgrade'.$tab );
 // Get action parameter from request:
 param_action();
 
+switch( $action )
+{
+	case 'delete':
+		// Delete already downloaded ZIP file or folder:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'upgrade_delete' );
+
+		$file = param( 'file', 'string' );
+
+		if( empty( $file ) )
+		{
+			debug_die( 'You don\'t select a file/folder for deleting!' );
+		}
+
+		// Decide file of folder depending on extension:
+		$is_dir = ! preg_match( '#\.zip$#i', $file );
+
+		$file_path = $upgrade_path.$file;
+
+		if( ! file_exists( $file_path ) )
+		{	// Display error when a requested file/folder doesn't exist:
+			// NOTE: Do NOT translate these messages because it must not occurs normally!
+			$Messages->add( sprintf( $is_dir
+				? 'The directory %s does not exist.'
+				: 'The file %s does not exist.', '<code>'.$file.'</code>' ), 'error' );
+			break;
+		}
+
+		// Check real type of the requested file or folder before deleting:
+		$is_dir = is_dir( $file_path );
+
+		if( $is_dir )
+		{	// Delete a folder:
+			$del_result = rmdir_r( $file_path );
+		}
+		else
+		{	// Delete a file:
+			$del_result = @unlink( $file_path );
+		}
+
+		if( $del_result )
+		{	// Successful deleting:
+			$Messages->add( sprintf( $is_dir
+				? T_('The directory &laquo;%s&raquo; has been deleted.')
+				: T_('The file &laquo;%s&raquo; has been deleted.'), $file ), 'success' );
+		}
+		else
+		{	// Failed deleting:
+			$Messages->add( sprintf( $is_dir
+				? T_('Cannot delete directory %s. Please check the permissions or delete it manually.')
+				: T_('File %s could not be deleted.'), '<code>'.$file.'</code>' ), 'error' );
+		}
+
+		// Redirect back to don't try delete the same file/folder twice:
+		header_redirect( $admin_url.'?ctrl=upgrade' );
+		// Exit here.
+		break;
+}
+
 // Display message if the upgrade config file doesn't exist
 check_upgrade_config( true );
 
@@ -160,7 +220,7 @@ switch( $action )
 		$block_item_Widget->title = T_('Downloading package...');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
-		$download_url = param( 'upd_url', 'string', '', true );
+		$download_url = param( 'upd_url', 'string' );
 		$Messages->clear(); // Clear the messages to avoid a double displaying here
 		param_check_not_empty( 'upd_url', T_('Please enter the URL to download ZIP archive') );
 		// Check the download url for correct http, https, ftp URI
@@ -183,8 +243,11 @@ switch( $action )
 		}
 
 		$upgrade_name = pathinfo( $download_url );
-		$upgrade_name = $upgrade_name['filename'];
-		$upgrade_file = $upgrade_path.$upgrade_name.'.zip';
+		$upgrade_name = $upgrade_name['filename'].'.zip';
+		$upgrade_file = $upgrade_path.$upgrade_name;
+
+		// Memorize ZIP file name for next step submitting:
+		memorize_param( 'upd_file', 'string', NULL, $upgrade_name );
 
 		if( file_exists( $upgrade_file ) )
 		{ // The downloading file already exists
@@ -199,7 +262,7 @@ switch( $action )
 			else
 			{
 				echo '<div class="action_messages"><div class="log_error" style="text-align:center;font-weight:bold">'
-					.sprintf( T_( 'The package %s is already downloaded.' ), $upgrade_name.'.zip' ).'</div></div>';
+					.sprintf( T_( 'The package %s is already downloaded.' ), $upgrade_name ).'</div></div>';
 				$action_success = false;
 			}
 			evo_flush();
@@ -271,12 +334,20 @@ switch( $action )
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 		evo_flush();
 
-		$download_url = param( 'upd_url', 'string', '', true );
+		$upd_file = param( 'upd_file', 'string', '', true );
 
-		$upgrade_name = pathinfo( $download_url );
-		$upgrade_name = $upgrade_name['filename'];
-		$upgrade_dir = $upgrade_path.$upgrade_name;
-		$upgrade_file = $upgrade_dir.'.zip';
+		if( ! preg_match( '#\.zip$#i', $upd_file ) )
+		{	// Check the provided file is a .zip or .ZIP:
+			debug_die( 'The file "'.$upd_file.'" must be a ZIP archive!' );
+		}
+
+		$upgrade_dir_name = substr( $upd_file, 0, -4 );
+
+		$upgrade_dir = $upgrade_path.$upgrade_dir_name;
+		$upgrade_file = $upgrade_path.$upd_file;
+
+		// Memorize folder name for next step submitting:
+		memorize_param( 'upd_dir', 'string', NULL, $upgrade_dir_name );
 
 		if( file_exists( $upgrade_dir ) )
 		{ // The downloading file already exists
@@ -291,7 +362,7 @@ switch( $action )
 			else
 			{
 				echo '<div class="action_messages"><div class="log_error" style="text-align:center;font-weight:bold">'
-					.sprintf( T_( 'The package %s is already unzipped.' ), $upgrade_name.'.zip' ).'</div></div>';
+					.sprintf( T_( 'The package %s is already unzipped.' ), $upd_file ).'</div></div>';
 				$action_success = false;
 			}
 			evo_flush();
@@ -342,12 +413,7 @@ switch( $action )
 		{ // Auto upgrade
 			autoupgrade_display_steps( 4 );
 
-			$download_url = param( 'upd_url', 'string', '', true );
-
-			$upgrade_name = pathinfo( $download_url );
-			$upgrade_name = $upgrade_name['filename'];
-			$upgrade_dir = $upgrade_path.$upgrade_name;
-			$upgrade_file = $upgrade_dir.'.zip';
+			$upgrade_name = param( 'upd_dir', 'string', '', true );
 		}
 
 		$block_item_Widget = new Widget( 'block_item' );
@@ -420,9 +486,7 @@ switch( $action )
 			if( $upgrade_name === NULL )
 			{ // Get an upgrade name from url (Used for auto-upgrade, not git)
 				forget_param( 'upd_name' );
-				$download_url = param( 'upd_url', 'string', '', true );
-				$upgrade_name = pathinfo( $download_url );
-				$upgrade_name = $upgrade_name['filename'];
+				$upgrade_name = param( 'upd_dir', 'string', '', true );
 			}
 
 			$success = true;
