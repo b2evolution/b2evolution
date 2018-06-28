@@ -662,6 +662,15 @@ class Table extends Widget
 						}
 						break;
 
+					case 'values':
+						$param_values = array();
+						foreach( $param_value as $sub_param_name => $sub_param_value )
+						{
+							$param_values[] = '{\''.format_to_js( $sub_param_name ).'\':\''.format_to_js( $sub_param_value ).'\'}';
+						}
+						$param_value = '['.implode( ',', $param_values ).']';
+						break;
+
 					case 'input':
 					case 'valueGetter':
 					case 'valueSetter':
@@ -676,10 +685,6 @@ class Table extends Widget
 							$param_values = array();
 							foreach( $param_value as $sub_param_name => $sub_param_value )
 							{
-								if( $param_name == 'values' )
-								{	// All value indexes must be strings:
-									$sub_param_name = '\''.format_to_js( $sub_param_name ).'\'';
-								}
 								if( $sub_param_value == 'true' || $sub_param_value == 'false' ||
 								    strpos( $sub_param_value, '[' ) === 0 )
 								{	// This is a not string value:
