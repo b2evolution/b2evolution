@@ -671,11 +671,14 @@ class Table extends Widget
 						$param_value = '['.implode( ',', $param_values ).']';
 						break;
 
-					case 'input':
 					case 'valueGetter':
 					case 'valueSetter':
+						// Don't convert these params to string because they are functions:
+						break;
+
+					case 'input':
 						if( strpos( $param_value, 'function' ) === 0 )
-						{	// Don't convert these param to string if it is a function:
+						{	// Don't convert this param to string if it is a function:
 							break;
 						}
 

@@ -3624,20 +3624,6 @@ function callback_filter_userlist( & $Form )
 		$Form->text( 'age_max', get_param('age_max'), 3, T_('to') );
 	$Form->end_line();
 
-	if( is_admin_page() && $current_User->check_perm( 'users', 'moderate' ) )
-	{	// Filter by user tags only on back-office and if current user can moderate other users:
-		$Form->begin_line( T_('Has all these tags'), 'user_tag' );
-			$Form->usertag_input( 'user_tag', get_param( 'user_tag' ), 20, '', '', array(
-				'maxlength' => 255,
-				'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
-				'input_suffix'=> '</div>' ) );
-			$Form->usertag_input( 'not_user_tag', get_param( 'not_user_tag' ), 20, T_('but not any of these tags'), '', array(
-				'maxlength' => 255,
-				'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
-				'input_suffix'=> '</div>' ) );
-		$Form->end_line();
-	}
-
 	if( is_admin_page() && $edited_EmailCampaign )
 	{
 		$campaign_send_status = array(
@@ -3916,6 +3902,66 @@ function load_cities( country_ID, region_ID, subregion_ID )
 						'values' => $NewsletterCache->get_option_array_worker(),
 					);
 			}
+		}
+
+		if( $current_User->check_perm( 'users', 'moderate' ) )
+		{	// Filter by user tags if current user can moderate other users:
+			$filters['tags'] = array(
+					'label'  => T_('User tags'),
+					'valueGetter' => 'evo_get_filter_user_tags',
+					'valueSetter' => 'evo_set_filter_user_tags'
+				);
+?>
+<script type="text/javascript">
+function evo_get_filter_user_tags( rule )
+{
+	var input_name = rule.$el.find( ".rule-value-container input" ).attr( "name" );
+	var selector = 'input[name=' + input_name + ']';
+	if( typeof( initialized_filter_user_tags ) == "undefined" )
+	{
+		initialized_filter_user_tags = new Array();
+	}
+
+	if( input_name == undefined || initialized_filter_user_tags.indexOf( input_name ) !== -1 )
+	{	// Don't initialize twice:
+		return jQuery( selector ).val();
+	}
+
+	jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'usertags'; ?>',
+	{
+		theme: 'facebook',
+		queryParam: 's',
+		propertyToSearch: 'name',
+		tokenValue: 'name',
+		preventDuplicates: true,
+		hintText: '<?php echo TS_('Type in a tag'); ?>',
+		noResultsText: '<?php echo TS_('No results'); ?>',
+		searchingText: '<?php echo TS_('Searching...'); ?>',
+		jsonContainer: 'tags',
+	} );
+
+	<?php echo get_prevent_key_enter_js( 'input[name=" + input_name + "]' ); ?>
+	
+	jQuery( selector ).prev().before( jQuery( selector ) );
+
+	initialized_filter_user_tags.push( input_name );
+
+	return jQuery( selector ).val();
+}
+
+function evo_set_filter_user_tags( rule, value )
+{
+	if( value != "" )
+	{
+		tags = value.split( "," );
+		for( var t in tags )
+		{
+			jQuery( "input[name=" + rule.$el.find( ".rule-value-container input" ).attr( "name" ) + "]" ).tokenInput( "add", { id: tags[t], name: tags[t] } );
+		}
+	}
+}
+</script>
+<?php
 		}
 	}
 
