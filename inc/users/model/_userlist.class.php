@@ -709,9 +709,9 @@ class UserList extends DataObjectList2
 			{	// Initialize count of collections (used on order by this field):
 				$step1_SQL->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
 			}
-			if( !empty( $this->filters['reported'] ) && $this->filters['reported'] )
-			{	// Filter is set to 'Reported users'
-				$step1_SQL->SELECT_add( ', COUNT( DISTINCT urep_reporter_ID ) AS user_rep' );
+			if( ! empty( $this->filters['reported'] ) && ( empty( $this->filters['filter_query'] ) || $this->check_filter_query( 'report_count', 0, '>' ) ) )
+			{	// Filter is selected to 'Report count'
+				$step1_SQL->SELECT_add( ', user_rep' );
 			}
 			if( ! empty( $this->query_params['join_sec_groups'] ) )
 			{	// Initialize count of secondary groups (used on order by this field):

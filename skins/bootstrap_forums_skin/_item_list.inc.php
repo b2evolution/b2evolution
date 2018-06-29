@@ -111,10 +111,10 @@ $display_workflow = ( $disp == 'posts' ) &&
 							switch( $Item->get_read_status() )
 							{
 								case 'new':
-									$legend_icons['topic_new'] = 1;
+									$legend_icons[ $Item->is_featured() || $Item->is_intro() ? 'topic_sticky_new' : 'topic_new' ] = 1;
 									break;
 								case 'updated':
-									$legend_icons['topic_updated'] = 1;
+									$legend_icons[ $Item->is_featured() || $Item->is_intro() ? 'topic_sticky_updated' : 'topic_updated' ] = 1;
 									break;
 							}
 						}

@@ -68,6 +68,16 @@ if( $disp != 'front' && $disp != 'single' && isset( $MainList ) && $MainList->re
 					'title'       => T_('Updated topic'),
 				),
 			);
+		$legends[] = array(
+				'topic_sticky_new' => array(
+					'icon'        => 'icon_new fa-bullhorn new',
+					'title'       => T_('New sticky topic / Announcement'),
+				),
+				'topic_sticky_updated' => array(
+					'icon'        => 'fa-bullhorn updated',
+					'title'       => T_('Updated sticky topic / Announcement'),
+				),
+			);
 	}
 }
 
