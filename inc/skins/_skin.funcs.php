@@ -1089,12 +1089,9 @@ function skin_init( $disp )
 
 				// User is already logged in, redirect to "redirect_to" page
 				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
-				$redirect_to = param( 'redirect_to', 'url', NULL );
-				if( empty( $redirect_to ) )
-				{ // If empty redirect to referer page
-					$redirect_to = '';
-				}
-				header_redirect( $redirect_to, 302 );
+				$redirect_to = param( 'redirect_to', 'url', '' );
+				$forward_to = param( 'forward_to', 'url', $redirect_to );
+				header_redirect( $forward_to, 302 );
 				// will have exited
 			}
 
@@ -1120,9 +1117,11 @@ function skin_init( $disp )
 
 		case 'register':
 			if( is_logged_in() )
-			{ // If user is logged in the register form should not be displayed. In this case redirect to the blog home page.
+			{	// If user is logged in the register form should not be displayed,
+				// Redirect to the collection home page or to a specified url:
 				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
-				header_redirect( $Blog->gen_blogurl(), false );
+				$forward_to = param( 'forward_to', 'url', $Blog->gen_blogurl() );
+				header_redirect( $forward_to );
 			}
 
 			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )

@@ -26,8 +26,9 @@ $login_required = false;
 global $baseurl;
 
 if( is_logged_in() )
-{ // if a user is already logged in don't allow to register
-	header_redirect( $baseurl );
+{	// If a user is already logged in don't allow to register:
+	param( 'forward_to', 'url', $baseurl );
+	header_redirect( $forward_to );
 }
 
 // Save trigger page

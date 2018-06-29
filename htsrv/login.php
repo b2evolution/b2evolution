@@ -38,6 +38,13 @@ if( $inskin )
 param( 'redirect_to', 'url', $ReqURI );
 // Used to ABORT login
 param( 'return_to', 'url', $ReqURI );
+// Used to redirect if user is already logged in:
+param( 'forward_to', 'url', NULL );
+
+if( $action == 'req_login' && is_logged_in() && $forward_to !== NULL )
+{	// Redirect to a requested URL if user is not logged-in:
+	header_redirect( $forward_to );
+}
 
 switch( $action )
 {
