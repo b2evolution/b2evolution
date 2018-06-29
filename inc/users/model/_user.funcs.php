@@ -3588,45 +3588,6 @@ function callback_filter_userlist( & $Form )
 
 	$Form->text( 'keywords', get_param('keywords'), 20, T_('Name'), '', 50 );
 
-	if( is_admin_page() )
-	{ // show this filters only on admin interface
-		if( $current_User->check_perm( 'users', 'edit' ) )
-		{ // Show "Reported users" filter only for users with edit user permission
-			$Form->checkbox( 'reported', get_param('reported'), T_('Reported users') );
-		}
-
-		// Primary group:
-		$GroupCache = new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name', 'grp_level DESC, grp_name ASC' );
-		$GroupCache->load_where( 'grp_usage = "primary"' );
-		$GroupCache->all_loaded = true;
-		$group_options_array = array(
-				'-1' => T_('All (Ungrouped)'),
-				'0'  => T_('All (Grouped)'),
-			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
-		$Form->select_input_array( 'group', get_param('group'), $group_options_array,
-			sprintf( T_('<span %s>Primary</span> Group'), 'class="label label-primary"' ),
-			'', array( 'force_keys_as_values' => true ) );
-
-		// Secondary group:
-		$GroupCache->clear();
-		$GroupCache->load_where( 'grp_usage = "secondary"' );
-		$GroupCache->all_loaded = true;
-		$group_options_array = array(
-				'0'  => T_('All'),
-			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
-		$Form->select_input_array( 'group2', get_param('group2'), $group_options_array,
-			sprintf( T_('<span %s>Secondary</span> Group'), 'class="label label-info"' ),
-			'', array( 'force_keys_as_values' => true ) );
-
-		$Form->select_input_array( 'account_status', get_param('account_status'), get_user_statuses( T_('All') ), T_('Account status') );
-
-		// Filter by registered date
-		$Form->begin_line( T_('Registered from'), 'registered_min' );
-		$Form->date_input( 'registered_min', $registered_min, '' );
-		$Form->date_input( 'registered_max', $registered_max, T_('to') );
-		$Form->end_line();
-	}
-
 	$location_filter_displayed = false;
 	if( user_country_visible() )
 	{ // Filter by country
@@ -3674,33 +3635,6 @@ function callback_filter_userlist( & $Form )
 		$Form->text( 'age_min', get_param('age_min'), 3, '' );
 		$Form->text( 'age_max', get_param('age_max'), 3, T_('to') );
 	$Form->end_line();
-
-	if( is_admin_page() && empty( $edited_Newsletter ) && empty( $edited_EmailCampaign ) )
-	{	// Filter by newsletter only on back-office and don't display on newsletter and email campaign edit forms:
-		$NewsletterCache = & get_NewsletterCache( T_('All') );
-		$NewsletterCache->load_all();
-		if( count( $NewsletterCache->cache ) > 0 )
-		{
-			$Form->begin_line( T_('Subscribed to') );
-				$Form->select_input_object( 'newsletter', get_param( 'newsletter' ), $NewsletterCache, '', array( 'allow_none' => true ) );
-				$Form->select_input_object( 'not_newsletter', get_param( 'not_newsletter' ), $NewsletterCache, '<label>'./* TRANS: Full sentence is "Subscribed to: <select> and not to: <select>"*/T_('and not to').':</label>', array( 'allow_none' => true ) );
-			$Form->end_line();
-		}
-	}
-
-	if( is_admin_page() && $current_User->check_perm( 'users', 'moderate' ) )
-	{	// Filter by user tags only on back-office and if current user can moderate other users:
-		$Form->begin_line( T_('Has all these tags'), 'user_tag' );
-			$Form->usertag_input( 'user_tag', get_param( 'user_tag' ), 20, '', '', array(
-				'maxlength' => 255,
-				'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
-				'input_suffix'=> '</div>' ) );
-			$Form->usertag_input( 'not_user_tag', get_param( 'not_user_tag' ), 20, T_('but not any of these tags'), '', array(
-				'maxlength' => 255,
-				'input_prefix' => '<div class="input-group user_admin_tags" style="width: 250px;">',
-				'input_suffix'=> '</div>' ) );
-		$Form->end_line();
-	}
 
 	if( is_admin_page() && $edited_EmailCampaign )
 	{
@@ -3907,6 +3841,140 @@ function load_cities( country_ID, region_ID, subregion_ID )
 				'label'      => T_('Registration source'),
 				'operators'  => 'contains,not_contains',
 			);
+	}
+
+	if( is_admin_page() )
+	{	// Filters only for back-office:
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{	// Allow "Report count" filter only for users with edit user permission:
+			$filters['report_count'] = array(
+					'label'         => T_('Report count'),
+					'type'          => 'integer',
+					'operators'     => 'greater_or_equal',
+					'default_value' => 1,
+				);
+		}
+
+		// Primary group:
+		$GroupCache = new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name', 'grp_level DESC, grp_name ASC' );
+		$GroupCache->load_where( 'grp_usage = "primary"' );
+		$GroupCache->all_loaded = true;
+		$group_options_array = array(
+				'-1' => T_('All (Ungrouped)'),
+				'0'  => T_('All (Grouped)'),
+			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
+		$OrganizationCache = & get_OrganizationCache( T_('All') );
+		$OrganizationCache->load_all();
+		$filters['group'] = array(
+				'label'  => T_('Primary Group'),
+				'type'   => 'integer',
+				'input'  => 'select',
+				'values' => $group_options_array,
+			);
+
+		// Secondary group:
+		$GroupCache->clear();
+		$GroupCache->load_where( 'grp_usage = "secondary"' );
+		$GroupCache->all_loaded = true;
+		$group_options_array = array(
+				'0'  => T_('All'),
+			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
+		$filters['group2'] = array(
+				'label'  => T_('Secondary Group'),
+				'type'   => 'integer',
+				'input'  => 'select',
+				'values' => $group_options_array,
+			);
+
+		// Account status:
+		$filters['status'] = array(
+				'label'  => T_('Account status'),
+				'input'  => 'select',
+				'values' => get_user_statuses(),
+			);
+
+		// Registered from:
+		$filters['regdate'] = array(
+				'label'      => T_('Registration date'),
+				'type'       => 'date',
+				'validation' => array( 'allow_empty_value' => 'true' ),
+			);
+
+		// Subscribed to:
+		if( empty( $edited_Newsletter ) && empty( $edited_EmailCampaign ) )
+		{	// Filter by newsletter(except of newsletter and email campaign edit forms):
+			$NewsletterCache = & get_NewsletterCache();
+			$NewsletterCache->load_all();
+			if( count( $NewsletterCache->cache ) > 0 )
+			{
+				$filters['newsletter'] = array(
+						'label'  => T_('Subscribed to'),
+						'type'   => 'integer',
+						'input'  => 'select',
+						'values' => $NewsletterCache->get_option_array_worker(),
+					);
+			}
+		}
+
+		if( $current_User->check_perm( 'users', 'moderate' ) )
+		{	// Filter by user tags if current user can moderate other users:
+			$filters['tags'] = array(
+					'label'  => T_('User tags'),
+					'valueGetter' => 'evo_get_filter_user_tags',
+					'valueSetter' => 'evo_set_filter_user_tags'
+				);
+?>
+<script type="text/javascript">
+function evo_get_filter_user_tags( rule )
+{
+	var input_name = rule.$el.find( ".rule-value-container input" ).attr( "name" );
+	var selector = 'input[name=' + input_name + ']';
+	if( typeof( initialized_filter_user_tags ) == "undefined" )
+	{
+		initialized_filter_user_tags = new Array();
+	}
+
+	if( input_name == undefined || initialized_filter_user_tags.indexOf( input_name ) !== -1 )
+	{	// Don't initialize twice:
+		return jQuery( selector ).val();
+	}
+
+	jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'usertags'; ?>',
+	{
+		theme: 'facebook',
+		queryParam: 's',
+		propertyToSearch: 'name',
+		tokenValue: 'name',
+		preventDuplicates: true,
+		hintText: '<?php echo TS_('Type in a tag'); ?>',
+		noResultsText: '<?php echo TS_('No results'); ?>',
+		searchingText: '<?php echo TS_('Searching...'); ?>',
+		jsonContainer: 'tags',
+	} );
+
+	<?php echo get_prevent_key_enter_js( 'input[name=" + input_name + "]' ); ?>
+	
+	jQuery( selector ).prev().before( jQuery( selector ) );
+
+	initialized_filter_user_tags.push( input_name );
+
+	return jQuery( selector ).val();
+}
+
+function evo_set_filter_user_tags( rule, value )
+{
+	if( value != "" )
+	{
+		tags = value.split( "," );
+		for( var t in tags )
+		{
+			jQuery( "input[name=" + rule.$el.find( ".rule-value-container input" ).attr( "name" ) + "]" ).tokenInput( "add", { id: tags[t], name: tags[t] } );
+		}
+	}
+}
+</script>
+<?php
+		}
 	}
 
 	return $filters;
@@ -6157,7 +6225,7 @@ function users_results( & $UserList, $params = array() )
 			'viewed_user'        => false,
 		), $params );
 
-	if( $UserList->filters['group'] != -1 )
+	if( $UserList->filters['group'] > -1 || $UserList->check_filter_query( 'group', -1, '>' ) )
 	{ // List is grouped
 
 		/*
@@ -6512,9 +6580,11 @@ function users_results( & $UserList, $params = array() )
 			);
 	}
 
-	$filter_reported = param( 'reported', 'integer' );
-	if( $params['display_reported'] && $filter_reported )
-	{ // Filter is set to 'Reported users'
+	if( $params['display_reported'] &&
+	    isset( $UserList->filters ) &&
+	    ( ! empty( $UserList->filters['reported'] ) && ( empty( $UserList->filters['filter_query'] ) || $UserList->check_filter_query( 'report_count', 0, '>' ) ) )
+	  )
+	{ // Filter is set to 'Reported users' or selected to "Report count"
 		$userlist_col_reputaion = array(
 				'th' => T_('Rep'),
 				'th_class' => 'shrinkwrap small',

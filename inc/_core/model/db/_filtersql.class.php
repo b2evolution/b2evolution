@@ -71,12 +71,15 @@ class FilterSQL extends SQL
 	 * @param string|array String for single value, Array for multiple values
 	 * @param string Operator
 	 * @param string Condition for grouped rules: 'AND', 'OR'
+	 * @param string Field type, 'string' by default, use 'date' for proper converting between mysql and locale date formats
 	 */
-	function add_filter_rule( $field, $values, $operator = NULL, $group_condition = NULL )
+	function add_filter_rule( $field, $values, $operator = NULL, $group_condition = NULL, $type = NULL )
 	{
 		if( ! isset( $this->preset_filter_query ) )
 		{	// Initialize query array:
 			$this->preset_filter_query = array(
+					// Use AND condition by default:
+					'condition' => 'AND',
 					// Decide this valid because it can be used only by developer:
 					'valid' => true
 				);
@@ -126,6 +129,10 @@ class FilterSQL extends SQL
 				{
 					$group_rule['operator'] = $operator;
 				}
+				if( $type !== NULL )
+				{
+					$group_rule['type'] = $type;
+				}
 				$rule['rules'][] = $group_rule;
 			}
 		}
@@ -138,6 +145,10 @@ class FilterSQL extends SQL
 			if( $operator !== NULL )
 			{
 				$rule['operator'] = $operator;
+			}
+			if( $type !== NULL )
+			{
+				$rule['type'] = $type;
 			}
 		}
 
@@ -154,7 +165,7 @@ class FilterSQL extends SQL
 	{
 		if( empty( $query ) && isset( $this->preset_filter_query ) )
 		{	// Use a preset filter query if the requested filters are empty:
-			$query = param_format_condition( json_encode( $this->preset_filter_query ), 'js' );
+			$query = json_encode( $this->preset_filter_query );
 			set_param( 'filter_query', $query );
 		}
 

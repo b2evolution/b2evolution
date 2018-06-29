@@ -289,8 +289,6 @@ class UserQuery extends FilterSQL
 	 */
 	function where_status( $status, $include = true, $exactly = false )
 	{
-		global $DB;
-
 		if( empty( $status ) )
 		{
 			return;
@@ -298,16 +296,13 @@ class UserQuery extends FilterSQL
 
 		if( $status == 'activated' && !$exactly )
 		{	// Activated, Manually activated, Autoactivated users:
-			$this->WHERE_and( 'user_status '.( $include ? 'IN' : 'NOT IN' ).' ( '.$DB->quote( array( 'activated', 'autoactivated', 'manualactivated' ) ).' )' );
+			$this->add_filter_rule( 'status', array( 'activated', 'autoactivated', 'manualactivated' ), '=', 'OR' );
 		}
 		else
 		{ // Other status check
 			// init compare, which depends if we want to include or exclude users with the given status
-			$compare = $include ? ' = ' : ' <> ';
-			$this->WHERE_and( 'user_status'.$compare.$DB->quote( $status ) );
+			$this->add_filter_rule( 'status', $status, $include ? '=' : '<>' );
 		}
-
-		return;
 	}
 
 
@@ -319,24 +314,18 @@ class UserQuery extends FilterSQL
 	 */
 	function where_registered_date( $min_date = NULL, $max_date = NULL )
 	{
-		global $DB;
-
-		if( empty( $min_date ) && empty( $max_date ) )
+		if( ! empty( $min_date ) && ! empty( $max_date ) )
 		{
-			return;
+			$this->add_filter_rule( 'regdate', array( $min_date, $max_date ), 'between', NULL, 'date' );
 		}
-
-		if( ! empty( $min_date ) )
+		elseif( ! empty( $min_date ) )
 		{
-			$this->WHERE_and( 'DATE(user_created_datetime) >= '.$DB->quote( $min_date ) );
+			$this->add_filter_rule( 'regdate', $min_date, '>=', NULL, 'date' );
 		}
-
-		if( ! empty( $max_date ) )
+		elseif( ! empty( $max_date ) )
 		{
-			$this->WHERE_and( 'DATE(user_created_datetime) <= '.$DB->quote( $max_date ) );
+			$this->add_filter_rule( 'regdate', $max_date, '<=', NULL, 'date' );
 		}
-
-		return;
 	}
 
 
@@ -347,14 +336,10 @@ class UserQuery extends FilterSQL
 	 */
 	function where_reported( $reported )
 	{
-		if( empty( $reported ) || !$reported )
+		if( ! empty( $reported ) )
 		{
-			return;
+			$this->add_filter_rule( 'report_count', 1, '>=' );
 		}
-
-		$this->SELECT_add( ', COUNT( DISTINCT urep_reporter_ID ) AS user_rep' );
-		$this->FROM_add( ' LEFT JOIN T_users__reports ON urep_target_user_ID = user_ID' );
-		$this->WHERE_and( 'urep_reporter_ID IS NOT NULL' );
 	}
 
 
@@ -388,34 +373,14 @@ class UserQuery extends FilterSQL
 	 */
 	function where_tag( $user_tag = NULL, $not_user_tag = NULL)
 	{
-		global $DB;
-
-		if( empty( $user_tag ) && empty( $not_user_tag ) )
+		if( trim( $user_tag ) !== '' )
 		{
-			return;
+			$this->add_filter_rule( 'tags', $user_tag, '=' );
 		}
-
-		$tags = array_unique( array_map( 'trim', explode( ',', $user_tag ) ) );
-		$not_tags = array_unique( array_map( 'trim', explode( ',', $not_user_tag ) ) );
-		$all_tags = array_merge( $tags, $not_tags );
-
-		$this->FROM_add( 'LEFT JOIN (
-					SELECT uutg_user_ID,
-						GROUP_CONCAT( DISTINCT IF( utag_name IN ('.$DB->quote( $tags ).'), utag_name, NULL ) ORDER BY utag_name ) AS tags,
-						GROUP_CONCAT( DISTINCT IF( utag_name IN ('.$DB->quote( $not_tags ).'), utag_name, NULL ) ) AS not_tags
-					FROM T_users__tag
-					LEFT JOIN T_users__usertag ON uutg_emtag_ID = utag_ID
-					WHERE utag_name IN ('.$DB->quote( $all_tags ).')
-					GROUP BY uutg_user_ID
-				) AS tags
-				ON tags.uutg_user_ID = user_ID' );
-
-		if( ! empty( $user_tag ) )
+		if( trim( $not_user_tag ) !== '' )
 		{
-			sort( $tags );
-			$this->WHERE_and( 'tags.tags = '.$DB->quote( implode( ',', array_unique( $tags ) ) ) );
+			$this->add_filter_rule( 'tags', $not_user_tag, '!=' );
 		}
-		$this->WHERE_and( 'tags.not_tags IS NULL' );
 	}
 
 
@@ -426,8 +391,6 @@ class UserQuery extends FilterSQL
 	 */
 	function where_group( $group_ID )
 	{
-		global $DB;
-
 		$group_ID = (int)$group_ID;
 
 		if( $group_ID < 1 )
@@ -435,7 +398,7 @@ class UserQuery extends FilterSQL
 			return;
 		}
 
-		$this->WHERE_and( 'user_grp_ID = '.$DB->quote( $group_ID ) );
+		$this->add_filter_rule( 'group', $group_ID );
 	}
 
 
@@ -446,8 +409,6 @@ class UserQuery extends FilterSQL
 	 */
 	function where_secondary_group( $secondary_group_ID )
 	{
-		global $DB;
-
 		$secondary_group_ID = intval( $secondary_group_ID );
 
 		if( $secondary_group_ID < 1 )
@@ -455,8 +416,7 @@ class UserQuery extends FilterSQL
 			return;
 		}
 
-		$this->FROM_add( 'INNER JOIN T_users__secondary_user_groups sug_filter ON sug_filter.sug_user_ID = user_ID' );
-		$this->WHERE_and( 'sug_filter.sug_grp_ID = '.$DB->quote( $secondary_group_ID ) );
+		$this->add_filter_rule( 'group2', $secondary_group_ID );
 	}
 
 
@@ -561,8 +521,6 @@ class UserQuery extends FilterSQL
 	 */
 	function where_newsletter( $newsletter_ID, $is_subscribed = true )
 	{
-		global $DB;
-
 		$newsletter_ID = intval( $newsletter_ID );
 
 		if( empty( $newsletter_ID ) )
@@ -570,14 +528,7 @@ class UserQuery extends FilterSQL
 			return;
 		}
 
-		$restrict_is_subscribed = '';
-		if( $is_subscribed !== NULL )
-		{	// Get only subscribed or unsubscribed users:
-			$restrict_is_subscribed = ' AND enls_subscribed = '.( $is_subscribed ? '1' : '0' );
-		}
-
-		$this->SELECT_add( ', enls_last_sent_manual_ts, enls_last_open_ts, enls_last_click_ts, enls_send_count, enls_subscribed, enls_subscribed_ts, enls_unsubscribed_ts, enls_enlt_ID' );
-		$this->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $newsletter_ID ).$restrict_is_subscribed );
+		$this->add_filter_rule( 'newsletter', array( $newsletter_ID, $is_subscribed ) );
 	}
 
 
@@ -588,8 +539,6 @@ class UserQuery extends FilterSQL
 	 */
 	function where_not_newsletter( $not_newsletter_ID )
 	{
-		global $DB;
-
 		$not_newsletter_ID = intval( $not_newsletter_ID );
 
 		if( empty( $not_newsletter_ID ) )
@@ -597,7 +546,7 @@ class UserQuery extends FilterSQL
 			return;
 		}
 
-		$this->WHERE( 'user_ID NOT IN ( SELECT noenls.enls_user_ID FROM T_email__newsletter_subscription AS noenls WHERE noenls.enls_enlt_ID = '.$DB->quote( $not_newsletter_ID ).' AND noenls.enls_subscribed = 1 )' );
+		$this->add_filter_rule( 'newsletter', $not_newsletter_ID, '!=' );
 	}
 
 
@@ -805,14 +754,7 @@ class UserQuery extends FilterSQL
 			global $DB;
 			$this->SELECT_add( ', uorg_org_ID, uorg_accepted, uorg_role, uorg_priority' );
 			$this->FROM_add( 'LEFT JOIN T_users__user_org ON uorg_user_ID = user_ID' );
-			if( $operator == 'equal' )
-			{	// Select users which are in the requested organization:
-				$this->WHERE_and( 'uorg_org_ID = '.$DB->quote( $value ) );
-			}
-			else
-			{	// Select users which are NOT in the requested organization:
-				$this->WHERE_and( '( SELECT uorg_org_ID FROM T_users__user_org WHERE uorg_user_ID = user_ID AND uorg_org_ID = '.$DB->quote( $value ).' ) IS NULL' );
-			}
+			return '( SELECT uorg_org_ID FROM T_users__user_org WHERE uorg_user_ID = user_ID AND uorg_org_ID = '.$DB->quote( $value ).' ) '.( $operator == 'equal' ? 'IS NOT NULL' : 'IS NULL' );
 		}
 	}
 
@@ -947,6 +889,156 @@ class UserQuery extends FilterSQL
 	function filter_field_source( $value, $operator )
 	{
 		return $this->get_where_condition( 'user_source', $value, $operator );
+	}
+
+
+	/**
+	 * Restrict with user report count
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_report_count( $value, $operator )
+	{
+		$value = intval( $value );
+
+		if( $value > 0 && $operator == 'greater_or_equal' )
+		{
+			$this->SELECT_add( ', user_rep' );
+			$this->FROM_add( 'LEFT JOIN ( SELECT urep_target_user_ID, COUNT( DISTINCT urep_reporter_ID ) AS user_rep FROM T_users__reports GROUP BY urep_target_user_ID ) AS urep ON urep.urep_target_user_ID = user_ID' );
+
+			return $this->get_where_condition( 'user_rep', $value, $operator );
+		}
+	}
+
+
+	/**
+	 * Restrict with user primary group
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_group( $value, $operator )
+	{
+		$value = intval( $value );
+
+		if( $value > 0 && ( $operator == 'equal' || $operator == 'not_equal' ) )
+		{
+			return $this->get_where_condition( 'user_grp_ID', $value, $operator );
+		}
+	}
+
+
+	/**
+	 * Restrict with user secondary group
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_group2( $value, $operator )
+	{
+		$value = intval( $value );
+
+		if( $value > 0 && ( $operator == 'equal' || $operator == 'not_equal' ) )
+		{	// If value and operator are allowed for this filter:
+			global $DB;
+			$this->FROM_add( 'LEFT JOIN T_users__secondary_user_groups AS sug_filter ON sug_filter.sug_user_ID = user_ID' );
+			return '( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = user_ID AND sug_grp_ID = '.$DB->quote( $value ).' ) '.( $operator == 'equal' ? 'IS NOT NULL' : 'IS NULL' );
+		}
+	}
+
+
+	/**
+	 * Restrict with user account status
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_status( $value, $operator )
+	{
+		return $this->get_where_condition( 'user_status', $value, $operator );
+	}
+
+
+	/**
+	 * Restrict with user registration date
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_regdate( $value, $operator )
+	{
+		if( ! empty( $value ) )
+		{
+			return $this->get_where_condition( 'DATE( user_created_datetime )', $value, $operator );
+		}
+	}
+
+
+	/**
+	 * Restrict with user newsletter
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_newsletter( $value, $operator )
+	{
+		if( is_array( $value ) && count( $value ) == 2 )
+		{	// Special case for additional param to also get user which will be unsubscribed:
+			$is_subscribed = $value[1];
+			$value = intval( $value[0] );
+		}
+		else
+		{	// Get only subscribed users:
+			$is_subscribed = 1;
+			$value = intval( $value );
+		}
+
+		if( $value > 0 && ( $operator == 'equal' || $operator == 'not_equal' ) )
+		{	// If value and operator are allowed for this filter:
+			$restrict_is_subscribed = '';
+			if( $is_subscribed !== NULL )
+			{	// Get only subscribed or unsubscribed users:
+				$restrict_is_subscribed = ' AND enls_subscribed = '.( $is_subscribed ? '1' : '0' );
+			}
+
+			global $DB;
+			$this->SELECT_add( ', enls_last_sent_manual_ts, enls_last_open_ts, enls_last_click_ts, enls_send_count, enls_subscribed, enls_subscribed_ts, enls_unsubscribed_ts, enls_enlt_ID' );
+			$this->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID'.( $is_subscribed === NULL ? ' AND enls_enlt_ID = '.$DB->quote( $value ) : '' ) );
+
+			return '( SELECT enls_enlt_ID FROM T_email__newsletter_subscription WHERE enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $value ).$restrict_is_subscribed.' ) '.( $operator == 'equal' ? 'IS NOT NULL' : 'IS NULL' );
+		}
+	}
+
+
+	/**
+	 * Restrict with user newsletter
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_tags( $value, $operator )
+	{
+		$tags = array_unique( array_map( 'trim', explode( ',', $value ) ) );
+
+		foreach( $tags as $t => $tag )
+		{
+			if( $tag === '' )
+			{	// Remove empty tags:
+				unset( $tags[ $t ] );
+			}
+		}
+
+		if( count( $tags ) > 0 && ( $operator == 'equal' || $operator == 'not_equal' ) )
+		{	// If value and operator are allowed for this filter:
+			global $DB;
+			return '( SELECT COUNT( uutg_emtag_ID )
+				 FROM T_users__tag
+				 INNER JOIN T_users__usertag ON uutg_emtag_ID = utag_ID
+				WHERE uutg_user_ID = user_ID
+				  AND utag_name IN ( '.$DB->quote( $tags ).' )
+				) '.( $operator == 'equal' ? '= '.count( $tags ) : '= 0' );
+		}
 	}
 }
 
