@@ -750,7 +750,9 @@ jQuery( document ).ready( function()
 		},
 		operators: [
 			'equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between', 'contains', 'not_contains',
-			{ type: 'blank', nb_inputs: 1, multiple: false, apply_to: ['string'] }
+			{ type: 'blank', nb_inputs: 1, multiple: false, apply_to: ['string'] },
+			{ type: 'user_tagged', nb_inputs: 1, multiple: false, apply_to: ['string'] },
+			{ type: 'user_not_tagged', nb_inputs: 1, multiple: false, apply_to: ['string'] }
 		],
 		lang: {
 			add_rule: '<?php echo TS_('Add filter'); ?>',
@@ -766,6 +768,8 @@ jQuery( document ).ready( function()
 				contains: '<?php echo TS_('contains'); ?>',
 				not_contains: '<?php echo TS_('doesn\'t contain'); ?>',
 				blank: ' ',
+				user_tagged: '<?php echo TS_('user is tagged with all of'); ?>',
+				user_not_tagged: '<?php echo TS_('user is not tagged with any of'); ?>',
 			}
 		},
 		filters: [<?php echo implode( ',', $js_filters ); ?>],

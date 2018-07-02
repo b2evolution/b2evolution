@@ -3909,7 +3909,8 @@ function load_cities( country_ID, region_ID, subregion_ID )
 			$filters['tags'] = array(
 					'label'  => T_('User tags'),
 					'valueGetter' => 'evo_get_filter_user_tags',
-					'valueSetter' => 'evo_set_filter_user_tags'
+					'valueSetter' => 'evo_set_filter_user_tags',
+					'operators'   => 'user_tagged,user_not_tagged',
 				);
 ?>
 <script type="text/javascript">
