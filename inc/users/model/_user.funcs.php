@@ -5916,6 +5916,8 @@ function users_results_block( $params = array() )
 			'display_btn_tags'     => false,
 			'force_check_user'     => false,
 			'where_duplicate_email' => false,
+			'display_btn_delspam'  => false,
+			'display_delspam_info' => false,
 		), $params );
 
 	global $current_User;
@@ -6121,6 +6123,35 @@ function users_results_block( $params = array() )
 			.' class="btn '.$campaign_button_class.'">'
 				.format_to_output( $campaign_button_text )
 			.'</a>';
+	}
+
+	if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
+	{	// Buttons and info to delete spammers:
+		if( $params['display_btn_delspam'] )
+		{	// Button to go to list with confirmation before spammers deleting:
+			$user_list_buttons[] = '<br><a href="'.$admin_url.'?ctrl=users&amp;action=spammers" class="btn btn-danger">'
+					.format_to_output( T_('Delete spammers...') )
+				.'</a>';
+		}
+		if( $params['display_delspam_info'] )
+		{	// Info and button to confirm to delete spammers:
+			$SQL = new SQL( 'Get a count of deleting spammers per each group' );
+			$SQL->SELECT( 'grp_name, COUNT( user_ID ) AS num_users' );
+			$SQL->FROM( 'T_users' );
+			$SQL->FROM_add( 'LEFT JOIN T_groups ON user_grp_ID = grp_ID' );
+			$SQL->WHERE( 'user_ID IN ( '.$DB->quote( $UserList->filters['users'] ).' )' );
+			$SQL->ORDER_BY( 'grp_ID' );
+			$SQL->GROUP_BY( 'user_grp_ID' );
+			$user_num_groups = $DB->get_results( $SQL );
+			echo '<ul>';
+			foreach( $user_num_groups as $user_num_group )
+			{
+				echo '<li>'.sprintf( T_('Delete %d users from group %s'), intval( $user_num_group->num_users ), $user_num_group->grp_name ).'</li>';
+			}
+			echo '</ul>';
+			// Display to delete the selected users as spammers completely:
+			echo '<a href="'.$admin_url.'?ctrl=users&amp;action=delete_spammers&amp;users='.rawurlencode( implode( ',', $UserList->filters['users'] ) ).'&amp;'.url_crumb( 'users' ).'" class="btn btn-danger">'.T_('Delete spammers NOW!').'</a>';
+		}
 	}
 
 	if( count( $user_list_buttons ) )

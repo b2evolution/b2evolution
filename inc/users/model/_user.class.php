@@ -4213,9 +4213,15 @@ class User extends DataObject
 	 */
 	function dbdelete( & $Log = array() )
 	{
-		global $DB, $Plugins;
+		global $DB, $Plugins, $current_User;
 
 		if( $this->ID == 0 ) debug_die( 'Non persistant object cannot be deleted!' );
+
+		if( $this->ID == 1 ||
+		    ( is_logged_in() && $this->ID == $current_User->ID ) )
+		{	// Don't allow to delete first admin user and current logged in user:
+			return false;
+		}
 
 		$deltype = param( 'deltype', 'string', '' ); // spammer
 
