@@ -81,14 +81,16 @@ class export_Module extends Module
 	 */
 	function build_menu_3()
 	{
-		global $AdminUI;
+		global $AdminUI, $current_User;
 
-		// Display tab in Tools menu
-		$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
-			'export' => array(
-				'text' => T_('Export'),
-				'href' => '?ctrl=exportxml' ),
-			) );
+		if( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
+		{	// Display tab for export in Tools menu if current user has a permission:
+			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
+				'export' => array(
+					'text' => T_('Export'),
+					'href' => '?ctrl=exportxml' ),
+				) );
+		}
 	}
 }
 
