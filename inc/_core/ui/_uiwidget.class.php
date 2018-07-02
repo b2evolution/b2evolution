@@ -559,8 +559,8 @@ class Table extends Widget
 			$func = $this->{$area_name}['callback'];
 			$filter_fields = $func( $this->Form );
 
-			if( is_admin_page() && ! empty( $filter_fields ) && is_array( $filter_fields ) )
-			{	// Display filters only in back-office because they require JavaScript plugin QueryBuilder:
+			if( ! empty( $filter_fields ) && is_array( $filter_fields ) )
+			{	// Display filters which use JavaScript plugin QueryBuilder:
 				$this->display_filter_fields( $this->Form, $filter_fields );
 			}
 
@@ -713,8 +713,8 @@ class Table extends Widget
 		}
 
 		// Get filter values from request:
-		$filter_query = param_condition( 'filter_query' );
-		if( empty( $filter_query ) )
+		$filter_query = param_condition( 'filter_query', '', false, array_keys( $filter_fields ) );
+		if( empty( $filter_query ) || $filter_query === 'null' )
 		{	// Set filter values if no request yet:
 			$filter_query = array(
 				'rules'     => array(),
@@ -773,7 +773,7 @@ jQuery( document ).ready( function()
 			}
 		},
 		filters: [<?php echo implode( ',', $js_filters ); ?>],
-		rules: <?php echo param_format_condition( $filter_query, 'js' ); ?>,
+		rules: <?php echo param_format_condition( $filter_query, 'js', array_keys( $filter_fields ) ); ?>,
 	} );
 
 	// Prepare form before submitting:

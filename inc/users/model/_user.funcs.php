@@ -3824,11 +3824,13 @@ function load_cities( country_ID, region_ID, subregion_ID )
 				'validation' => array( 'allow_empty_value' => 'true' ),
 			);
 
-		// Registration source:
-		$filters['source'] = array(
-				'label'      => T_('Registration source'),
-				'operators'  => 'contains,not_contains',
-			);
+		if( is_admin_page() )
+		{	// Registration source:
+			$filters['source'] = array(
+					'label'      => T_('Registration source'),
+					'operators'  => 'contains,not_contains',
+				);
+		}
 	}
 
 	if( is_admin_page() )
