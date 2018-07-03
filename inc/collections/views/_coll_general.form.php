@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @var Blog
  */
 global $edited_Blog;
-global $action, $next_action, $blogtemplate, $blog, $tab, $admin_url, $locales;
+global $action, $next_action, $blogtemplate, $blog, $tab, $admin_url, $locales, $duplicating_collection_name;
 global $Settings;
 
 $Form = new Form();
@@ -35,7 +35,7 @@ if( $edited_Blog->ID == 0 )
 }
 elseif( $action == 'copy' )
 {	// Copy collection form:
-	$form_title = sprintf( T_('Duplicate "%s" collection'), $edited_Blog->get( 'shortname' ) ).':';
+	$form_title = sprintf( T_('Duplicate "%s" collection'), $duplicating_collection_name ).':';
 
 	$Form->global_icon( T_('Abort duplicating collection'), 'close', $admin_url.'?ctrl=dashboard', ' '.T_('Abort duplicating collection'), 3, 3 );
 }
@@ -310,6 +310,12 @@ else
 	}
 }
 
+if( $action == 'copy' )
+{	// Additional options for collection duplicating:
+	$Form->begin_fieldset( T_('Options').get_manual_link( 'collection-options' ) );
+		$Form->checkbox( 'duplicate_contents', param( 'duplicate_contents', 'integer', 1 ), T_('Duplicate contents'), T_('Check to duplicate posts/items from source collection.') );
+	$Form->end_fieldset();
+}
 
 $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection-permission-settings' ) );
 
@@ -400,7 +406,7 @@ else
 }
 
 
-$Form->buttons( array( array( 'submit', 'submit', ( $action == 'copy' ? sprintf( T_('Save and duplicate all settings from %s'), $edited_Blog->get( 'shortname' ) ) : T_('Save Changes!') ), 'SaveButton' ) ) );
+$Form->buttons( array( array( 'submit', 'submit', ( $action == 'copy' ? T_('Duplicate NOW!') : T_('Save Changes!') ), 'SaveButton' ) ) );
 
 $Form->end_form();
 
