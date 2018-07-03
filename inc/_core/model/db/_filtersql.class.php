@@ -71,12 +71,15 @@ class FilterSQL extends SQL
 	 * @param string|array String for single value, Array for multiple values
 	 * @param string Operator
 	 * @param string Condition for grouped rules: 'AND', 'OR'
+	 * @param string Field type, 'string' by default, use 'date' for proper converting between mysql and locale date formats
 	 */
-	function add_filter_rule( $field, $values, $operator = NULL, $group_condition = NULL )
+	function add_filter_rule( $field, $values, $operator = NULL, $group_condition = NULL, $type = NULL )
 	{
 		if( ! isset( $this->preset_filter_query ) )
 		{	// Initialize query array:
 			$this->preset_filter_query = array(
+					// Use AND condition by default:
+					'condition' => 'AND',
 					// Decide this valid because it can be used only by developer:
 					'valid' => true
 				);
@@ -126,6 +129,10 @@ class FilterSQL extends SQL
 				{
 					$group_rule['operator'] = $operator;
 				}
+				if( $type !== NULL )
+				{
+					$group_rule['type'] = $type;
+				}
 				$rule['rules'][] = $group_rule;
 			}
 		}
@@ -138,6 +145,10 @@ class FilterSQL extends SQL
 			if( $operator !== NULL )
 			{
 				$rule['operator'] = $operator;
+			}
+			if( $type !== NULL )
+			{
+				$rule['type'] = $type;
 			}
 		}
 
@@ -152,9 +163,44 @@ class FilterSQL extends SQL
 	 */
 	function filter_query( $query )
 	{
-		if( empty( $query ) && isset( $this->preset_filter_query ) )
-		{	// Use a preset filter query if the requested filters are empty:
-			$query = param_format_condition( json_encode( $this->preset_filter_query ), 'js' );
+		if( isset( $this->preset_filter_query ) )
+		{	// Use a preset filter query:
+			if( empty( $query ) )
+			{	// Use preset filter query completely if the requested filters are empty:
+				$query = $this->preset_filter_query;
+			}
+			else
+			{	// Merge preset filter query which are not defined in current query:
+				$query = json_decode( $query );
+				$query_rules = array();
+				if( isset( $query->rules ) && is_array( $query->rules ) )
+				{
+					foreach( $query->rules as $query_rule )
+					{
+						if( isset( $query_rule->id ) )
+						{
+							$query_rules[] = $query_rule->id;
+						}
+					}
+				}
+				else
+				{
+					$query->rules = array();
+				}
+
+				if( isset( $this->preset_filter_query['rules'] ) && is_array( $this->preset_filter_query['rules'] ) )
+				{	// Find preset filters which are not in current query:
+					foreach( $this->preset_filter_query['rules'] as $preset_rule )
+					{
+						if( isset( $preset_rule['id'] ) && ! in_array( $preset_rule['id'], $query_rules ) )
+						{	// Add preset filter rule to the current query:
+							$query->rules[] = (object)$preset_rule;
+						}
+					}
+				}
+			}
+
+			$query = json_encode( $query );
 			set_param( 'filter_query', $query );
 		}
 

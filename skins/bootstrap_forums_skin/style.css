@@ -181,13 +181,13 @@ ol.breadcrumb {
 .forums_list .ft_status_topic .fa.fa-comments {
   color: #000000;
 }
-.forums_list .ft_status_topic .fa.fa-comments.updated {
+.forums_list .ft_status_topic .fa.updated {
   color: #990000;
 }
-.forums_list .ft_status_topic .fa.fa-comments.new {
+.forums_list .ft_status_topic .fa.new {
   color: #FF6600;
 }
-.forums_list .ft_status_topic .fa.fa-comments:hover {
+.forums_list .ft_status_topic .fa:hover {
   color: inherit;
 }
 .forums_list .ft_count {
@@ -414,10 +414,10 @@ ol.breadcrumb {
 .legend-item .fa.fa-comments {
   color: #000000;
 }
-.legend-item .fa.fa-comments.updated {
+.legend-item .fa.updated {
   color: #990000;
 }
-.legend-item .fa.fa-comments.new {
+.legend-item .fa.new {
   color: #FF6600;
 }
 ul.legend {

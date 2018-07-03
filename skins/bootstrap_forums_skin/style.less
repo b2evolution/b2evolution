@@ -187,19 +187,20 @@ ol.breadcrumb {
 	.ft_status_topic {
 		width: 30px;
 		padding: 0px;
-		//margin-top: 5px;
 		float: left;
-		.fa.fa-comments {
-			color: #000000;
+		.fa {
+			&.fa-comments {
+				color: #000000;
+			}
 			&.updated {
 				color: #990000;
 			}
 			&.new {
 				color: #FF6600;
 			}
-		}
-		.fa.fa-comments:hover {
-			color: inherit;
+			&:hover {
+				color: inherit;
+			}
 		}
 	}
 	.ft_count {
@@ -423,8 +424,10 @@ ol.breadcrumb {
 .legend-item {
 	margin: 0px 5px 12px 5px;
 	display: inline-block;
-	.fa.fa-comments {
-		color: #000000;
+	.fa {
+		&.fa-comments {
+			color: #000000;
+		}
 		&.updated {
 			color: #990000;
 		}

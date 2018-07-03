@@ -497,6 +497,56 @@ if( !$Messages->has_errors() )
 
 			// The merging process is executed in the template below by function display_users_merging_process().
 			break;
+
+		case 'delete_spammers':
+			// Delete selected users as spammers:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'users', 'edit', true );
+
+			$users = explode( ',', param( 'users', 'string' ) );
+
+			// Set this param in order to delete the users as spammer:
+			set_param( 'deltype', 'spammer' );
+
+			$deleted_spam_logins = array();
+			$not_deleted_spam_logins = array();
+			$UserCache = & get_UserCache();
+			$delspam_Messages = new Messages();
+			foreach( $users as $u => $user_ID )
+			{
+				if( ! ( $deleted_spam_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
+				{	// Skip if user is not found in DB by requested ID:
+					continue;
+				}
+				$deleted_spam_login = $deleted_spam_User->get( 'login' );
+				// Delete user as spammer:
+				if( $deleted_spam_User->dbdelete( $delspam_Messages ) )
+				{	// If user has been deleted:
+					$deleted_spam_logins[] = $deleted_spam_login;
+				}
+				else
+				{	// If user cannot be deleted by some reason:
+					$not_deleted_spam_logins[] = $deleted_spam_User->get_identity_link();
+				}
+			}
+
+			if( count( $deleted_spam_logins ) > 0 )
+			{	// Display a message if at least one spammer have been deleted:
+				$Messages->add( sprintf( T_('Spammers %s have been deleted.'), implode( ', ', $deleted_spam_logins ) ), 'success' );
+			}
+			if( count( $not_deleted_spam_logins ) > 0 )
+			{	// Display a message if at least one spammer have NOT been deleted:
+				$Messages->add( sprintf( T_('Spammers %s could not been deleted.'), implode( ', ', $not_deleted_spam_logins ) ), 'error' );
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=users'.( count( $not_deleted_spam_logins ) > 0 ? '&action=spammers' : '' ), 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
 	}
 }
 
@@ -668,6 +718,13 @@ switch( $action )
 
 		$AdminUI->disp_view( 'users/views/_user_list_tags.form.php' );
 
+		$AdminUI->disp_payload_end();
+		break;
+
+	case 'spammers':
+		memorize_param( 'action', 'string', '', $action );
+		$AdminUI->disp_payload_begin();
+		$AdminUI->disp_view( 'users/views/_user_list_spammers.view.php' );
 		$AdminUI->disp_payload_end();
 		break;
 
