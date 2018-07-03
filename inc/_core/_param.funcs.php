@@ -2883,13 +2883,14 @@ function is_safe_filepath( $filepath )
  * @param string Default value or TRUE if user input required
  * @param boolean Do we need to memorize this to regenerate the URL for this page?
  * @return string Validated and formatted value of condition param which is ready to be stored in DB
+ * @param string|array Allowed rules separated by comma, Use char "-" before each rule to deny it, NULL - to allow all rules
  */
-function param_condition( $var, $default = '', $memorize = false )
+function param_condition( $var, $default = '', $memorize = false, $rules = NULL )
 {
 	$condition = param( $var, 'string', $default, $memorize );
 
 	// Format condition to database format:
-	$condition = param_format_condition( $condition, 'db' );
+	$condition = param_format_condition( $condition, 'db', $rules );
 
 	// Update condition param with validated and formatted value:
 	set_param( $var, $condition );
@@ -2904,9 +2905,10 @@ function param_condition( $var, $default = '', $memorize = false )
  *
  * @param object|string JSON object of condition param
  * @param string Format action: 'db' - to database format, 'js' - from database to JavaScript format
+ * @param string|array Allowed rules separated by comma, Use char "-" before each rule to deny it, NULL - to allow all rules
  * @return object
  */
-function param_format_condition( $condition, $action )
+function param_format_condition( $condition, $action, $rules = NULL )
 {
 	$is_encoded = ! is_object( $condition );
 
@@ -2934,14 +2936,37 @@ function param_format_condition( $condition, $action )
 		return $condition;
 	}
 
+	if( $rules !== NULL )
+	{
+		if( is_string( $rules ) )
+		{	// Convert string to array:
+			$rules = array_map( 'trim', explode( ',', $rules ) );
+		}
+		$allowed_rules = array();
+		$denied_rules = array();
+		foreach( $rules as $r => $rule )
+		{
+			if( substr( $rule, 0, 1 ) == '-' )
+			{	// Deny this rule:
+				$denied_rules[] = substr( $rule, 1 );
+			}
+			else
+			{	// Allow this rule:
+				$allowed_rules[] = $rule;
+			}
+		}
+	}
+
+	$condition_rules = array();
 	foreach( $condition->rules as $r => $rule )
 	{
 		if( isset( $rule->rules ) && is_array( $rule->rules ) )
 		{	// This is a group of conditions, Run this function recursively:
-			$condition->rules[ $r ] = param_format_condition( $rule, $action );
+			$condition_rules[] = param_format_condition( $rule, $action, $rules );
 		}
-		else
-		{	// This is a single field, Format condition only for this field:
+		elseif( $rules === NULL || 
+		        ( $rules !== NULL && in_array( $rule->id, $allowed_rules ) && ! in_array( $rule->id, $denied_rules ) ) )
+		{	// This is a single allowed field, Format condition only for this field:
 			if( ! isset( $rule->type ) )
 			{	// Set default type:
 				$rule->type = 'string';
@@ -2957,8 +2982,15 @@ function param_format_condition( $condition, $action )
 			{	// Field with single value like 'equal'(field = value):
 				$rule->value = param_format_condition_rule( $rule->value, $rule->type, $action );
 			}
-			$condition->rules[ $r ] = $rule;
+			$condition_rules[] = $rule;
 		}
+	}
+
+	$condition->rules = $condition_rules;
+
+	if( empty( $condition->rules ) )
+	{	// Return empty string if condition has no allowed rules:
+		return $action == 'db' ? '' : 'null';
 	}
 
 	if( $is_encoded )

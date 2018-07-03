@@ -375,11 +375,11 @@ class UserQuery extends FilterSQL
 	{
 		if( trim( $user_tag ) !== '' )
 		{
-			$this->add_filter_rule( 'tags', $user_tag, '=' );
+			$this->add_filter_rule( 'tags', $user_tag, 'user_tagged' );
 		}
 		if( trim( $not_user_tag ) !== '' )
 		{
-			$this->add_filter_rule( 'tags', $not_user_tag, '!=' );
+			$this->add_filter_rule( 'tags', $not_user_tag, 'user_not_tagged' );
 		}
 	}
 
@@ -1029,7 +1029,7 @@ class UserQuery extends FilterSQL
 			}
 		}
 
-		if( count( $tags ) > 0 && ( $operator == 'equal' || $operator == 'not_equal' ) )
+		if( count( $tags ) > 0 && ( $operator == 'user_tagged' || $operator == 'user_not_tagged' ) )
 		{	// If value and operator are allowed for this filter:
 			global $DB;
 			return '( SELECT COUNT( uutg_emtag_ID )
@@ -1037,7 +1037,7 @@ class UserQuery extends FilterSQL
 				 INNER JOIN T_users__usertag ON uutg_emtag_ID = utag_ID
 				WHERE uutg_user_ID = user_ID
 				  AND utag_name IN ( '.$DB->quote( $tags ).' )
-				) '.( $operator == 'equal' ? '= '.count( $tags ) : '= 0' );
+				) '.( $operator == 'user_tagged' ? '= '.count( $tags ) : '= 0' );
 		}
 	}
 }

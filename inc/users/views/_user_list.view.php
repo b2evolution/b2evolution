@@ -28,6 +28,7 @@ users_results_block( array(
 		'display_email'      => true,
 		'display_automation' => true,
 		'display_btn_tags'   => true,
+		'display_btn_delspam'=> true,
 	) );
 
 if( is_admin_page() )
