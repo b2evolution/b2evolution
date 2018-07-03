@@ -2193,7 +2193,7 @@ if( !empty( $Blog ) )
 }
 */
 
-if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action, 'new' ) !== false )
+if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action, 'new' ) !== false || $action == 'copy' )
 {	// Initialize js to autocomplete usernames in post/comment form
 	init_autocomplete_usernames_js();
 	// Require colorbox js:
