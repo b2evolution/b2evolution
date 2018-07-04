@@ -313,7 +313,8 @@ else
 if( $action == 'copy' )
 {	// Additional options for collection duplicating:
 	$Form->begin_fieldset( T_('Options').get_manual_link( 'collection-options' ) );
-		$Form->checkbox( 'duplicate_contents', param( 'duplicate_contents', 'integer', 1 ), T_('Duplicate contents'), T_('Check to duplicate posts/items from source collection.') );
+		$Form->checkbox( 'duplicate_items', param( 'duplicate_items', 'integer', 1 ), T_('Duplicate contents'), T_('Check to duplicate posts/items from source collection.') );
+		$Form->checkbox( 'duplicate_comments', param( 'duplicate_comments', 'integer', 0 ), T_('Duplicate comments'), T_('Check to duplicate comments from source collection.'), '', 1, ! get_param( 'duplicate_items' ) );
 	$Form->end_fieldset();
 }
 
@@ -446,6 +447,11 @@ updateDemoContentInputs();
 jQuery( '#blog_name' ).keyup( function()
 {	// Count characters of collection title(each html entity is counted as single char):
 	jQuery( '#blog_name_chars_count' ).html( jQuery( this ).val().replace( /&[^;\s]+;/g, '&' ).length );
+} );
+
+jQuery( '#duplicate_items' ).click( function()
+{	// Disable option for comments duplicating when items duplicating is disabled:
+	jQuery( '#duplicate_comments' ).prop( 'disabled', ! jQuery( this ).is( ':checked' ) );
 } );
 
 </script>
