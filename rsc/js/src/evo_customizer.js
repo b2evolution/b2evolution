@@ -2,34 +2,35 @@
  * This file is used for customizer mode
  */
 
+function evo_customizer_reload_frontoffice( additional_url_params )
+{	// Reload iframe with front-office content:
+	jQuery( '#evo_customizer__frontoffice_loader' ).show();
+	if( typeof( additional_url_params ) == 'undefined' )
+	{	// Reload with current url:
+		jQuery( '#evo_customizer__frontoffice' ).get(0).contentDocument.location.reload();
+	}
+	else
+	{	// Reload with additional params:
+		jQuery( '#evo_customizer__frontoffice' ).get(0).contentDocument.location.href += additional_url_params;
+	}
+}
+
+function evo_customizer_show_backoffice()
+{	// Show back-office panel:
+	jQuery( '.evo_customizer__wrapper' ).removeClass( 'evo_customizer__collapsed' );
+	// Fix for Safari browser in order to make back-office panel scrollable again after collapse/expand action:
+	setTimeout( function() { jQuery( '#evo_customizer__backoffice' ).css( 'height', '100%' ); }, 1 );
+}
+
+function evo_customizer_hide_backoffice()
+{	// Hide back-office panel:
+	jQuery( '.evo_customizer__wrapper' ).addClass( 'evo_customizer__collapsed' );
+	// Fix for Safari browser in order to make back-office panel scrollable again after collapse/expand action:
+	jQuery( '#evo_customizer__backoffice' ).css( 'height', '99.9%' );
+}
+
 jQuery( document ).on( 'ready', function()
 {
-	function evo_customizer_reload_frontoffice( additional_url_params )
-	{	// Reload iframe with front-office content:
-		jQuery( '#evo_customizer__frontoffice_loader' ).show();
-		if( typeof( additional_url_params ) == 'undefined' )
-		{	// Reload with current url:
-			jQuery( '#evo_customizer__frontoffice' ).get(0).contentDocument.location.reload();
-		}
-		else
-		{	// Reload with additional params:
-			jQuery( '#evo_customizer__frontoffice' ).get(0).contentDocument.location.href += additional_url_params;
-		}
-	}
-
-	function evo_customizer_show_backoffice()
-	{	// Show back-office panel:
-		jQuery( '.evo_customizer__wrapper' ).removeClass( 'evo_customizer__collapsed' );
-		// Fix for Safari browser in order to make back-office panel scrollable again after collapse/expand action:
-		setTimeout( function() { jQuery( '#evo_customizer__backoffice' ).css( 'height', '100%' ); }, 1 );
-	}
-	function evo_customizer_hide_backoffice()
-	{	// Hide back-office panel:
-		jQuery( '.evo_customizer__wrapper' ).addClass( 'evo_customizer__collapsed' );
-		// Fix for Safari browser in order to make back-office panel scrollable again after collapse/expand action:
-		jQuery( '#evo_customizer__backoffice' ).css( 'height', '99.9%' );
-	}
-
 	jQuery( '#evo_customizer__backoffice' ).on( 'load', function()
 	{	// If iframe with settings has been loaded
 		var backoffice_content = jQuery( this ).contents();
