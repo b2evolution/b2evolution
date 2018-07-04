@@ -1835,7 +1835,9 @@ function blogs_all_results_block( $params = array() )
 			'results_title'        => $current_User->check_perm( 'blog_admin', 'view', false ) ? T_('List of Collections configured on this system').get_manual_link('site-collection-list') : T_('Your Collections'),
 			'results_no_text'      => T_('Create your first collection now').': '
 					.'<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-primary btn-sm" title="'.T_('New Collection').'..."><span class="fa fa-plus-square"></span> '.T_('New Collection').'...</a>',
-			'results_no_perm_text' => T_('Sorry, you have no permission to edit/view any blog\'s properties.'),
+			'results_no_perm_text' => ( $current_User->check_perm( 'blogs', 'create' )
+				? T_('Create your first collection now').': '.action_icon( T_('New Collection').'...', 'new', $admin_url.'?ctrl=collections&amp;action=new', T_('New Collection').'...', 3, 4, array( 'class' => 'action_icon btn btn-primary', 'style' => 'margin:-10px 0 -7px 0' ) )
+				: T_('Sorry, you have no permission to edit/view any collection\'s properties.') ),
 			'grouped'              => true,
 		), $params );
 
