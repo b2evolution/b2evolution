@@ -112,8 +112,10 @@ switch( $action )
 			header_redirect( $redirect_to );
 		}
 
-		// Get name of the duplicating collection to display on the form:
-		$duplicating_collection_name = $edited_Blog->get( 'shortname' );
+		if( $action == 'copy' )
+		{	// Get name of the duplicating collection to display on the form:
+			$duplicating_collection_name = $edited_Blog->get( 'shortname' );
+		}
 
 		$AdminUI->append_path_level( 'new', array( 'text' => T_('New') ) );
 		break;

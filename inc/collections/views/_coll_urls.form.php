@@ -153,7 +153,7 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 			),
 			array( 'relative', T_('Relative to baseurl').': ',
 										'',
-										'<span class="nobr"><code>'.$baseurl.'</code>'
+										'<span class="nobr help-inline"><code>'.$baseurl.'</code>'
 										.'<input type="text" id="blog_siteurl_relative" class="form_text_input form-control" name="blog_siteurl_relative" size="35" maxlength="120" value="'
 										.format_to_output( $blog_siteurl_relative, 'formvalue' )
 										.'" onkeyup="update_urlpreview( \''.$baseurl.'\', this.value );"
