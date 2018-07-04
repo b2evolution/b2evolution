@@ -3417,9 +3417,14 @@ class Blog extends DataObject
 	 * @param boolean TRUE to duplicate categories and posts/items from source collection
 	 * @return boolean Result
 	 */
-	function duplicate( $duplicate_contents = false )
+	function duplicate( $params = array() )
 	{
 		global $DB, $current_User;
+
+		$params = array_merge( array(
+				'duplicate_items'    => false,
+				'duplicate_comments' => false,
+			), $params );
 
 		$DB->begin();
 
@@ -3545,7 +3550,7 @@ class Blog extends DataObject
 			}
 		}
 
-		if( $duplicate_contents )
+		if( $params['duplicate_items'] )
 		{	// Duplicate categories and posts/items:
 			// Copy all categories from duplicated collection to new created:
 			$source_cats_SQL = new SQL( 'Get all categories of the duplicating collection #'.$duplicated_coll_ID );
@@ -3744,7 +3749,67 @@ class Blog extends DataObject
 						$DB->query( 'INSERT INTO T_links ( '.$old_links_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_links_values ),
 							'Duplicate links for posts of collection #'.$duplicated_coll_ID );
 					}
-					
+
+					if( $params['duplicate_comments'] )
+					{	// Duplicate comments:
+						$old_comments_SQL = new SQL( 'Get all comments of collection #'.$duplicated_coll_ID.' before duplicating' );
+						$old_comments_SQL->SELECT( '*' );
+						$old_comments_SQL->FROM( 'T_comments' );
+						$old_comments_SQL->WHERE( 'comment_item_ID IN ( '.$old_items_IDs.' )' );
+						$old_comments = $DB->get_results( $old_comments_SQL, ARRAY_A );
+						foreach( $old_comments as $old_comment )
+						{
+							if( isset( $new_items[ $old_comment['comment_item_ID'] ] ) )
+							{	// Insert only comments with correct item ID:
+								$old_comment_ID = $old_comment['comment_ID'];
+								unset( $old_comment['comment_ID'] );
+								$old_comment['comment_item_ID'] = $new_items[ $old_comment['comment_item_ID'] ];
+								$DB->query( 'INSERT INTO T_comments ( '.implode( ', ', array_keys( $old_comment ) ).' ) VALUES ( '.$DB->quote( $old_comment ).' )',
+									'Duplicate comment #'.$old_comment_ID.' of collection #'.$duplicated_coll_ID );
+								$new_comment_ID = $DB->insert_id;
+								$new_comments[ $old_comment_ID ] = $new_comment_ID;
+							}
+						}
+
+						// Update parent comment IDs with correct IDs of new inserted comments:
+						$update_parent_comments_sql = '';
+						foreach( $old_comments as $old_comment )
+						{
+							if( ! empty( $old_comment['comment_in_reply_to_cmt_ID'] ) && isset( $new_comments[ $old_comment['comment_in_reply_to_cmt_ID'] ] ) )
+							{
+								$update_parent_comments_sql .= ' WHEN comment_in_reply_to_cmt_ID = '.$old_comment['comment_in_reply_to_cmt_ID'].' THEN '.$new_comments[ $old_comment['comment_in_reply_to_cmt_ID'] ];
+							}
+						}
+						if( $update_parent_comments_sql != '' )
+						{
+							$DB->query( 'UPDATE T_comments
+									SET comment_in_reply_to_cmt_ID = CASE '.$update_parent_comments_sql.' ELSE comment_in_reply_to_cmt_ID END
+								WHERE comment_item_ID IN ( '.$DB->quote( $new_items ).' )' );
+						}
+
+						if( ! empty( $new_comments ) )
+						{	// Duplicate links/attachments of the comments:
+							$old_links_SQL = new SQL( 'Get all comments attachments of collection #'.$duplicated_coll_ID.' before duplicating' );
+							$old_links_SQL->SELECT( 'link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_cmt_ID, link_file_ID, link_position, link_order' );
+							$old_links_SQL->FROM( 'T_links' );
+							$old_links_SQL->WHERE( 'link_cmt_ID IN ( '.$old_items_IDs.' )' );
+							$old_links = $DB->get_results( $old_links_SQL, ARRAY_A );
+							$new_links_values = array();
+							foreach( $old_links as $old_link )
+							{
+								if( isset( $new_comments[ $old_link['link_cmt_ID'] ] ) )
+								{
+									$old_link['link_cmt_ID'] = $new_comments[ $old_link['link_cmt_ID'] ];
+									$new_links_values[] = '( '.$DB->quote( $old_link ).' )';
+								}
+							}
+							if( ! empty( $new_links_values ) )
+							{
+								$DB->query( 'INSERT INTO T_links ( '.$old_links_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_links_values ),
+									'Duplicate links for comments of collection #'.$duplicated_coll_ID );
+							}
+						}
+					}
 				}
 			}
 		}

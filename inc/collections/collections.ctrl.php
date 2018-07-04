@@ -276,9 +276,12 @@ switch( $action )
 		// Get name of the duplicating collection to display on the form:
 		$duplicating_collection_name = $edited_Blog->get( 'shortname' );
 
-		$duplicate_contents = param( 'duplicate_contents', 'integer', 0 );
+		$duplicate_params = array(
+				'duplicate_items'    => param( 'duplicate_items', 'integer', 0 ),
+				'duplicate_comments' => param( 'duplicate_comments', 'integer', 0 ),
+			);
 
-		if( $edited_Blog->duplicate( $duplicate_contents ) )
+		if( $edited_Blog->duplicate( $duplicate_params ) )
 		{	// The collection has been duplicated successfully:
 			$Messages->add( T_('The collection has been duplicated.'), 'success' );
 
