@@ -33,6 +33,14 @@ $Form->hidden( 'blog', $edited_Blog->ID );
 
 $Form->begin_fieldset( T_('User directory').get_manual_link( 'user-directory-other' ) );
 
+	$Form->checklist( array(
+			array( 'userdir_filter_gender', 1, T_('Gender'), $edited_Blog->get_setting( 'userdir_filter_gender' ) ),
+			array( 'userdir_filter_level', 1, T_('User level'), $edited_Blog->get_setting( 'userdir_filter_level' ) ),
+			array( 'userdir_filter_org', 1, T_('Organization'), $edited_Blog->get_setting( 'userdir_filter_org' ) ),
+			array( 'userdir_filter_criteria', 1, T_('Specific Criteria'), $edited_Blog->get_setting( 'userdir_filter_criteria' ) ),
+			array( 'userdir_filter_lastseen', 1, T_('User last seen'), $edited_Blog->get_setting( 'userdir_filter_lastseen' ) ),
+		), 'userdir_filters', T_('Filters') );
+
 if( isset( $GLOBALS['files_Module'] ) )
 {
 	load_funcs( 'files/model/_image.funcs.php' );

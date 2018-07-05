@@ -3650,30 +3650,37 @@ function callback_filter_userlist( & $Form )
 	echo '<br />';
 
 	// Gender:
-	$filters['gender'] = array(
-			'label'  => T_('Gender'),
-			'input'  => 'select',
-			'values' => array(
-					''  => T_('Any'),
-					'M' => T_('Men'),
-					'F' => T_('Women'),
-					'O' => T_('Other'),
-				),
-			'validation' => array( 'allow_empty_value' => 'true' ),
-		);
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_gender' ) ) )
+	{	// Show gender filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['gender'] = array(
+				'label'  => T_('Gender'),
+				'input'  => 'select',
+				'values' => array(
+						''  => T_('Any'),
+						'M' => T_('Men'),
+						'F' => T_('Women'),
+						'O' => T_('Other'),
+					),
+				'validation' => array( 'allow_empty_value' => 'true' ),
+			);
+	}
 
 	// Level:
-	$filters['level'] = array(
-			'label'     => T_('User level'),
-			'operators' => '=,!=,<,<=,>,>=,between,not_between',
-			'input'     => 'select',
-			'type'      => 'integer',
-			'values'    => array( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ),
-		);
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_level' ) ) )
+	{	// Show user level filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['level'] = array(
+				'label'     => T_('User level'),
+				'operators' => '=,!=,<,<=,>,>=,between,not_between',
+				'input'     => 'select',
+				'type'      => 'integer',
+				'values'    => array( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ),
+			);
+	}
 
 	// Organization:
-	if( empty( $edited_Organization ) )
-	{	// Show organization filter only when organization form is not selected:
+	if( ( is_admin_page() && empty( $edited_Organization ) ) ||
+	    ( ! is_admin_page() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_org' ) ) )
+	{	// Show organization filter only when organization form is not selected on back-office or if it is allowed by collection setting on front-office:
 		$OrganizationCache = & get_OrganizationCache( T_('All') );
 		$OrganizationCache->load_all();
 		$filters['org'] = array(
@@ -3709,34 +3716,37 @@ function callback_filter_userlist( & $Form )
 	}
 
 	// Specific criteria:
-	$Form->output = false;
-	$Form->switch_layout( 'none' );
-	global $user_fields_empty_name;
-	$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
-	$criteria_input = $Form->select_input_array( 'criteria_operator[]', '', array( 'contains' => T_('contains'), 'not_contains' => T_('doesn\'t contain') ), '' );
-	$criteria_input .= $Form->text( 'criteria_value[]', '', 17, '', '', 50 );
-	$criteria_input = $Form->select_input( 'criteria_type[]', '', 'callback_options_user_new_fields', '', array( 'field_suffix' => $criteria_input ) );
-	$Form->switch_layout( NULL );
-	$Form->output = true;
-	$filters['criteria'] = array(
-			'label' => T_('Specific criteria'),
-			'operators' => 'blank',
-			'input' => 'function( rule, input_name ) { return \''.format_to_js( $criteria_input ).'\'; }',
-			'validation' => array( 'allow_empty_value' => 'true' ),
-			'valueGetter' => 'function( rule )
-				{
-					return rule.$el.find(".rule-value-container [name^=criteria_type]").val()
-						+ ":" + rule.$el.find(".rule-value-container [name^=criteria_operator]").val()
-						+ ":" + rule.$el.find(".rule-value-container [name^=criteria_value]").val();
-				}',
-			'valueSetter' => 'function( rule, value )
-				{
-					var val = value.split( ":" );
-					rule.$el.find( ".rule-value-container [name^=criteria_type]" ).val( val[0] ).trigger( "change" );
-					rule.$el.find( ".rule-value-container [name^=criteria_operator]" ).val( val[1] ).trigger( "change" );
-					rule.$el.find( ".rule-value-container [name^=criteria_value]" ).val( val[2] ).trigger( "change" );
-				}'
-		);
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_criteria' ) ) )
+	{	// Show specific criteria filter only on back-office or if it is allowed by collection setting on front-office:
+		$Form->output = false;
+		$Form->switch_layout( 'none' );
+		global $user_fields_empty_name;
+		$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
+		$criteria_input = $Form->select_input_array( 'criteria_operator[]', '', array( 'contains' => T_('contains'), 'not_contains' => T_('doesn\'t contain') ), '' );
+		$criteria_input .= $Form->text( 'criteria_value[]', '', 17, '', '', 50 );
+		$criteria_input = $Form->select_input( 'criteria_type[]', '', 'callback_options_user_new_fields', '', array( 'field_suffix' => $criteria_input ) );
+		$Form->switch_layout( NULL );
+		$Form->output = true;
+		$filters['criteria'] = array(
+				'label' => T_('Specific criteria'),
+				'operators' => 'blank',
+				'input' => 'function( rule, input_name ) { return \''.format_to_js( $criteria_input ).'\'; }',
+				'validation' => array( 'allow_empty_value' => 'true' ),
+				'valueGetter' => 'function( rule )
+					{
+						return rule.$el.find(".rule-value-container [name^=criteria_type]").val()
+							+ ":" + rule.$el.find(".rule-value-container [name^=criteria_operator]").val()
+							+ ":" + rule.$el.find(".rule-value-container [name^=criteria_value]").val();
+					}',
+				'valueSetter' => 'function( rule, value )
+					{
+						var val = value.split( ":" );
+						rule.$el.find( ".rule-value-container [name^=criteria_type]" ).val( val[0] ).trigger( "change" );
+						rule.$el.find( ".rule-value-container [name^=criteria_operator]" ).val( val[1] ).trigger( "change" );
+						rule.$el.find( ".rule-value-container [name^=criteria_value]" ).val( val[2] ).trigger( "change" );
+					}'
+			);
+	}
 
 	if( user_region_visible() )
 	{	// JS functions for AJAX loading of regions, subregions & cities
@@ -3830,11 +3840,14 @@ function load_cities( country_ID, region_ID, subregion_ID )
 	{	// If current user can moderate other users:
 
 		// User last seen:
-		$filters['lastseen'] = array(
-				'label'      => T_('User last seen'),
-				'type'       => 'date',
-				'validation' => array( 'allow_empty_value' => 'true' ),
-			);
+		if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_lastseen' ) ) )
+		{	// Show user last seen filter only on back-office or if it is allowed by collection setting on front-office:
+			$filters['lastseen'] = array(
+					'label'      => T_('User last seen'),
+					'type'       => 'date',
+					'validation' => array( 'allow_empty_value' => 'true' ),
+				);
+		}
 
 		if( is_admin_page() )
 		{	// Registration source:
