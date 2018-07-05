@@ -684,8 +684,15 @@ switch( $action )
 
 		$edited_User->confirm_delete( $msg, 'user', $action, get_memorized( 'action' ), $confirm_messages, $delete_form_params );
 
-		// Display user identity form:
-		$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
+		if( $deltype == 'spammer' )
+		{	// Display user activity lists:
+			$user_tab = 'activity';
+			$AdminUI->disp_view( 'users/views/_user_activity.view.php' );
+		}
+		else
+		{	// Display user identity form:
+			$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
+		}
 		$AdminUI->disp_payload_end();
 
 		// Init JS for user reporting
