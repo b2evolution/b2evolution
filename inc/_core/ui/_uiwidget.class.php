@@ -442,10 +442,10 @@ class Table extends Widget
 	 * @param string area name ( colselect_area, filter_area )
 	 * @param string option title
 	 * @param string submit button title
-	 * @param string default folde state when is empty in the session
+	 * @param string default fold state when is empty in the session; possible values: 'collapsed', 'expanded'
 	 *
 	 */
-	function display_option_area( $option_name, $area_name, $option_title, $submit_title, $default_folde_state = 'expanded' )
+	function display_option_area( $option_name, $area_name, $option_title, $submit_title, $default_fold_state = 'expanded' )
 	{
 		global $debug, $Session;
 
@@ -458,7 +458,7 @@ class Table extends Widget
 
 		if( empty( $fold_state ) )
 		{
-			$fold_state = $default_folde_state;
+			$fold_state = $default_fold_state;
 		}
 
 		//__________________________________  Toogle link _______________________________________
@@ -873,6 +873,10 @@ jQuery( document ).ready( function()
 	{
 		if( $this->total_pages == 0 )
 		{ // There are no results! Nothing to display!
+			if( isset( $this->filter_area['is_filtered'] ) && ! $this->filter_area['is_filtered'] )
+			{	// If this table list is filtered and no results then we should collapse the filter area because nothing to filter:
+				echo '<script type="text/javascript">toggle_filter_area( "'.$this->param_prefix.'filters", "collapse" )</script>';
+			}
 			echo $this->replace_vars( $this->params['no_results_start'] );
 		}
 		else

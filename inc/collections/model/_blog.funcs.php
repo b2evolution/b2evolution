@@ -1883,6 +1883,14 @@ function blogs_all_results_block( $params = array() )
 		$collection_filters['type'] = $cf_type;
 	}
 
+	foreach( $collection_filters as $cf => $collection_filter )
+	{
+		if( empty( $collection_filter ) )
+		{	// Remove empty filter:
+			unset( $collection_filters[ $cf ] );
+		}
+	}
+
 	// Save new filters
 	$Session->set( 'collection_filters', $collection_filters );
 	$Session->dbsave();
@@ -2003,6 +2011,7 @@ function blogs_all_results_block( $params = array() )
 
 	$blogs_Results->filter_area = array(
 		'callback' => 'callback_filter_collectionlist',
+		'is_filtered' => ! empty( $collection_filters ),
 		'url_ignore' => 'results_blog_page',
 		'presets'  => array(
 			'all' => array( T_('All'), '?cf_type=&cf_name=&cf_owner=' )
