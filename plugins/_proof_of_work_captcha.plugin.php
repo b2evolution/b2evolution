@@ -168,23 +168,19 @@ class proof_of_work_captcha_plugin extends Plugin
 			return false;
 		}
 
-		$post_data = array(
-			'secret' => $this->Settings->get( 'api_secret_key' ),
-			'token'  => param( 'coinhive-captcha-token', 'string' ),
-			'hashes' => 1024
+		$post_params = array(
+			'method'       => 'POST',
+			'content_type' => 'application/x-www-form-urlencoded',
+			'fields'       => array(
+				'secret' => $this->Settings->get( 'api_secret_key' ),
+				'token'  => param( 'coinhive-captcha-token', 'string' ),
+				'hashes' => $this->get_hash_num(),
+			),
 		);
 
-		$post_context = stream_context_create( array(
-			'http' => array(
-				'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-				'method'  => 'POST',
-				'content' => http_build_query( $post_data )
-			)
-		) );
+		$response = json_decode( fetch_remote_page( 'https://api.coinhive.com/token/verify', $info, NULL, NULL, $post_params ) );
 
-		$response = json_decode( file_get_contents( 'https://api.coinhive.com/token/verify', false, $post_context ) );
-
-		if( $response && $response->success )
+		if( $response && isset( $response->success ) && $response->success )
 		{	// Successful verifying:
 			return true;
 		}
@@ -218,18 +214,6 @@ class proof_of_work_captcha_plugin extends Plugin
 			return;
 		}
 
-		$Plugins_admin = & get_Plugins_admin();
-		if( ( $geoip_Plugin = & $Plugins_admin->get_by_code( 'evo_GeoIP' ) ) &&
-		    ( $Country = $geoip_Plugin->get_country_by_IP( get_ip_list( true ) ) ) &&
-		    ( $Country->get( 'status' ) == 'suspect' ) )
-		{	// Use special setting when country can be detected by IP address and it is suspected:
-			$plugin_hash_num = $this->Settings->get( 'hash_num_suspect' );
-		}
-		else
-		{	// Use normal setting for number of hashes:
-			$plugin_hash_num = $this->Settings->get( 'hash_num' );
-		}
-
 		if( ! isset( $params['Form'] ) )
 		{	// there's no Form where we add to, but we create our own form:
 			$Form = new Form( regenerate_url() );
@@ -245,7 +229,7 @@ class proof_of_work_captcha_plugin extends Plugin
 		}
 
 		$Form->info( $this->T_('Antispam'), '<script src="https://authedmine.com/lib/captcha.min.js" async></script>
-			<div class="coinhive-captcha" data-hashes="'.format_to_output( $plugin_hash_num, 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="input[type=submit]:not([name$=\'[preview]\'])">
+			<div class="coinhive-captcha" data-hashes="'.format_to_output( $this->get_hash_num(), 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="input[type=submit]:not([name$=\'[preview]\'])">
 				<em>'.$this->T_('Loading Captcha...<br>If it doesn\'t load, please disable Adblock!').'</em>
 			</div>' );
 
@@ -399,6 +383,29 @@ class proof_of_work_captcha_plugin extends Plugin
 		}
 
 		return false;
+	}
+
+
+	/**
+	 * Get number of hashes
+	 *
+	 * @return integer
+	 */
+	function get_hash_num()
+	{
+		$Plugins_admin = & get_Plugins_admin();
+		if( ( $geoip_Plugin = & $Plugins_admin->get_by_code( 'evo_GeoIP' ) ) &&
+		    ( $Country = $geoip_Plugin->get_country_by_IP( get_ip_list( true ) ) ) &&
+		    ( $Country->get( 'status' ) == 'suspect' ) )
+		{	// Use special setting when country can be detected by IP address and it is suspected:
+			$plugin_hash_num = $this->Settings->get( 'hash_num_suspect' );
+		}
+		else
+		{	// Use normal setting for number of hashes:
+			$plugin_hash_num = $this->Settings->get( 'hash_num' );
+		}
+
+		return intval( $plugin_hash_num );
 	}
 }
 ?>

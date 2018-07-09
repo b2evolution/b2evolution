@@ -289,11 +289,18 @@ function _http_wrapper_last_status( & $headers )
  *                       is available)
  * @param integer Timeout (default: 15 seconds)
  * @param integer Maximum size in kB
+ * @param array Additional parameters
  * @return string|false The remote page as a string; false in case of error
  */
-function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL )
+function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL, $params = array() )
 {
 	global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
+
+	$params = array_merge( array(
+			'method'       => 'GET',
+			'content_type' => '',
+			'fields'       => '', // Array or string of POST/GET fields
+		), $params );
 
 	$info = array(
 		'error' => '',
@@ -314,6 +321,14 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, $timeout );
 		curl_setopt( $ch, CURLOPT_TIMEOUT, $timeout );
+		if( $params['method'] == 'POST' )
+		{	// Use POST method:
+			curl_setopt( $ch, CURLOPT_POST, true );
+		}
+		if( ! empty( $params['fields'] ) )
+		{	// Add fields for the request:
+			curl_setopt( $ch, CURLOPT_POSTFIELDS, $params['fields'] );
+		}
 
 		// Set proxy:
 		if( !empty($outgoing_proxy_hostname) )
@@ -350,23 +365,52 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 			return false;
 		}
 
+		if( isset( $url_parsed['scheme'] ) && $url_parsed['scheme'] == 'https' )
+		{	// Special params for https urls:
+			$host_prefix = 'ssl://';
+			$default_port = 443;
+		}
+		else
+		{	// Default params for normal urls:
+			$host_prefix = '';
+			$default_port = 80;
+		}
+
 		$host = $url_parsed['host'];
-		$port = empty( $url_parsed['port'] ) ? 80 : $url_parsed['port'];
+		$port = empty( $url_parsed['port'] ) ? $default_port : $url_parsed['port'];
 		$path = empty( $url_parsed['path'] ) ? '/' : $url_parsed['path'];
 		if( ! empty( $url_parsed['query'] ) )
 		{
 			$path .= '?'.$url_parsed['query'];
 		}
 
-		$out = 'GET '.$path.' HTTP/1.1'."\r\n";
+		if( ! empty( $params['fields'] ) )
+		{	// Convert fields array to string:
+			$url_fields_string = ( is_array( $params['fields'] ) ? http_build_query( $params['fields'] ) : $params['fields'] );
+		}
+
+		$out = $params['method'].' '.$path.' HTTP/1.1'."\r\n";
 		$out .= 'Host: '.$host;
 		if( ! empty( $url_parsed['port'] ) )
 		{	// we don't want to add :80 if not specified. remote end may not resolve it. (e-g b2evo multiblog does not)
 			$out .= ':'.$port;
 		}
-		$out .= "\r\n".'Connection: Close'."\r\n\r\n";
+		$out .= "\r\n";
+		if( ! empty( $params['content_type'] ) )
+		{
+			$out .= 'Content-type: '.$params['content_type']."\r\n";
+		}
+		if( ! empty( $url_fields_string ) )
+		{
+			$out .= 'Content-length: '.strlen( $url_fields_string )."\r\n";
+		}
+		$out .= 'Connection: close'."\r\n\r\n";
+		if( ! empty( $url_fields_string ) )
+		{	// Append fields to the request:
+			$out .= $url_fields_string;
+		}
 
-		$fp = @fsockopen( $host, $port, $errno, $errstr, $timeout );
+		$fp = @fsockopen( $host_prefix.$host, $port, $errno, $errstr, $timeout );
 		if( ! $fp )
 		{
 			$info['error'] = $errstr.' (#'.$errno.')';
@@ -424,7 +468,30 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 	{	// URL FOPEN:
 		$info['used_method'] = 'fopen';
 
-		$fp = @fopen( $url, 'r' );
+		$url_http_params = array();
+		if( ! empty( $params['content_type'] ) )
+		{	// Header of the request:
+			$url_http_params['header'] = 'Content-type: '.$params['content_type']."\r\n";
+		}
+		if( $params['method'] != 'GET' )
+		{	// Method of the request:
+			$url_http_params['method'] = $params['method'];
+		}
+		if( ! empty( $params['fields'] ) )
+		{	// Additional fields of the request:
+			$url_http_params['content'] = http_build_query( $params['fields'] );
+		}
+
+		if( empty( $url_http_params ) )
+		{	// Open simple URL:
+			$fp = @fopen( $url, 'r' );
+		}
+		else
+		{	// Open URL with additional params:
+			$url_context = stream_context_create( array( 'http' => $url_http_params ) );
+			$fp = @fopen( $url, 'r', false, $url_context );
+		}
+
 		if( ! $fp )
 		{
 			if( isset( $http_response_header )
@@ -478,6 +545,13 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 				$info['mimetype'] = trim(substr($header, 13));
 				break; // only looking for mimetype
 			}
+		}
+
+		if( $info['mimetype'] == 'application/json' &&
+		    strpos( $r, '{' ) !== false &&
+		    preg_match( '/^[^\{]*(\{.+\})[^\}]*$/', $r, $match ) )
+		{	// Fix response in JSON format, so it must be started with "{" and ended with "}":
+			$r = $match[1];
 		}
 
 		return $r;
