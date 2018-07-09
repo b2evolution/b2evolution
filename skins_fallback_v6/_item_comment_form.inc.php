@@ -401,6 +401,8 @@ function validateCommentForm(form)
 	// Set prefix for js code in plugins:
 	$plugin_js_prefix = ( $params['comment_type'] == 'meta' ? 'meta_' : '' );
 
+	$Plugins->trigger_event( 'DisplayCommentFormFieldsetAboveComment', array( 'Form' => & $Form, 'Item' => & $Item ) );
+
 	ob_start();
 	echo '<div class="comment_toolbars">';
 	// CALL PLUGINS NOW:

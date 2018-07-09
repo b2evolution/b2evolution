@@ -66,6 +66,12 @@ class proof_of_work_captcha_plugin extends Plugin
 		global $Settings;
 
 		return array(
+				'use_for_anonymous_item' => array(
+					'label' => $this->T_('Use for anonymous item forms'),
+					'defaultvalue' => 1,
+					'note' => $this->T_('Should this plugin be used for anonymous users on item forms?'),
+					'type' => 'checkbox',
+				),
 				'use_for_anonymous_comment' => array(
 					'label' => $this->T_('Use for anonymous comment forms'),
 					'defaultvalue' => 1,
@@ -101,7 +107,16 @@ class proof_of_work_captcha_plugin extends Plugin
 					'type'         => 'integer',
 					'defaultvalue' => 1024,
 					'valid_range'  => array(
-						'min' => 1,
+						'min' => 256,
+					),
+				),
+				'hash_num_suspect' => array(
+					'label'        => $this->T_('Number of hashes for suspected countries'),
+					'note'         => $this->T_('Plugin "GeoIP" must be enabled for using of this setting.'),
+					'type'         => 'integer',
+					'defaultvalue' => 10240,
+					'valid_range'  => array(
+						'min' => 256,
 					),
 				),
 			);
@@ -153,29 +168,25 @@ class proof_of_work_captcha_plugin extends Plugin
 			return false;
 		}
 
-		$post_data = array(
-			'secret' => $this->Settings->get( 'api_secret_key' ),
-			'token'  => param( 'coinhive-captcha-token', 'string' ),
-			'hashes' => 1024
+		$post_params = array(
+			'method'       => 'POST',
+			'content_type' => 'application/x-www-form-urlencoded',
+			'fields'       => array(
+				'secret' => $this->Settings->get( 'api_secret_key' ),
+				'token'  => param( 'coinhive-captcha-token', 'string' ),
+				'hashes' => $this->get_hash_num(),
+			),
 		);
 
-		$post_context = stream_context_create( array(
-			'http' => array(
-				'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-				'method'  => 'POST',
-				'content' => http_build_query( $post_data )
-			)
-		) );
+		$response = json_decode( fetch_remote_page( 'https://api.coinhive.com/token/verify', $info, NULL, NULL, $post_params ) );
 
-		$response = json_decode( file_get_contents( 'https://api.coinhive.com/token/verify', false, $post_context ) );
-
-		if( $response && $response->success )
+		if( $response && isset( $response->success ) && $response->success )
 		{	// Successful verifying:
 			return true;
 		}
 
 		// Display error message if captcha verifying has been failed:
-		$Messages->add( $this->T_('Captcha has not been verified successfully!'), 'error' );
+		$Messages->add_to_group( $this->T_('Antispam has not been verified successfully!'), 'error', T_('Validation errors:') );
 
 		return false;
 	}
@@ -218,7 +229,7 @@ class proof_of_work_captcha_plugin extends Plugin
 		}
 
 		$Form->info( $this->T_('Antispam'), '<script src="https://authedmine.com/lib/captcha.min.js" async></script>
-			<div class="coinhive-captcha" data-hashes="'.format_to_output( $this->Settings->get( 'hash_num' ), 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="input[type=submit]">
+			<div class="coinhive-captcha" data-hashes="'.format_to_output( $this->get_hash_num(), 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="input[type=submit]:not([name$=\'[preview]\'])">
 				<em>'.$this->T_('Loading Captcha...<br>If it doesn\'t load, please disable Adblock!').'</em>
 			</div>' );
 
@@ -239,9 +250,34 @@ class proof_of_work_captcha_plugin extends Plugin
 
 
 	/**
+	 * We display our captcha with item forms.
+	 */
+	function DisplayItemFormFieldset( & $params )
+	{
+		$params['form_type'] = 'comment';
+		$this->CaptchaPayload( $params );
+	}
+
+
+	/**
+	 * Validate the answer against our stored one.
+	 *
+	 * In case of error we add a message of category 'error' which prevents the item from
+	 * being posted.
+	 *
+	 * @param array Associative array of parameters.
+	 */
+	function AdminBeforeItemEditCreate( & $params )
+	{
+		$params['form_type'] = 'item';
+		$this->CaptchaValidated( $params );
+	}
+
+
+	/**
 	 * We display our captcha with comment forms.
 	 */
-	function DisplayCommentFormFieldset( & $params )
+	function DisplayCommentFormFieldsetAboveComment( & $params )
 	{
 		$params['form_type'] = 'comment';
 		$this->CaptchaPayload( $params );
@@ -289,7 +325,7 @@ class proof_of_work_captcha_plugin extends Plugin
 	/**
 	 * We display our captcha with the message form.
 	 */
-	function DisplayMessageFormFieldset( & $params )
+	function DisplayMessageFormFieldsetAboveMessage( & $params )
 	{
 		$params['form_type'] = 'message';
 		$this->CaptchaPayload( $params );
@@ -321,6 +357,13 @@ class proof_of_work_captcha_plugin extends Plugin
 	{
 		switch( $form_type )
 		{
+			case 'item':
+				if( !is_logged_in() )
+				{
+					return $this->Settings->get( 'use_for_anonymous_item' );
+				}
+				break;
+
 			case 'comment':
 				if( !is_logged_in() )
 				{
@@ -340,6 +383,29 @@ class proof_of_work_captcha_plugin extends Plugin
 		}
 
 		return false;
+	}
+
+
+	/**
+	 * Get number of hashes
+	 *
+	 * @return integer
+	 */
+	function get_hash_num()
+	{
+		$Plugins_admin = & get_Plugins_admin();
+		if( ( $geoip_Plugin = & $Plugins_admin->get_by_code( 'evo_GeoIP' ) ) &&
+		    ( $Country = $geoip_Plugin->get_country_by_IP( get_ip_list( true ) ) ) &&
+		    ( $Country->get( 'status' ) == 'suspect' ) )
+		{	// Use special setting when country can be detected by IP address and it is suspected:
+			$plugin_hash_num = $this->Settings->get( 'hash_num_suspect' );
+		}
+		else
+		{	// Use normal setting for number of hashes:
+			$plugin_hash_num = $this->Settings->get( 'hash_num' );
+		}
+
+		return intval( $plugin_hash_num );
 	}
 }
 ?>
