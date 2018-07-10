@@ -943,10 +943,17 @@ h2.user_title::first-line {
 #itemform_edit_workflow .form-group .controls {
   display: inline-block;
 }
+#itemform_extra td.flabel_item_owner_login {
+  vertical-align: top;
+  padding-top: 6px;
+}
 #itemform_extra #ffield_item_owner_login .help-inline {
   display: inline-block;
   vertical-align: middle;
   margin-top: 10px;
+}
+#itemform_extra #ffield_item_owner_login #item_owner_login {
+  vertical-align: middle !important;
 }
 #itemform_extra label.ffield_item_create_user {
   padding: 0;

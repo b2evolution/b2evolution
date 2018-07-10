@@ -139,8 +139,16 @@ $Form->begin_form( '', '', $params );
 			$form_title_item_ID = T_('New Item');
 		}
 	}
+	if( $current_User->check_perm( 'options', 'edit' ) )
+	{	// Add an icon to edit item type if current user has a permission:
+		$item_type_edit_link = ' '.action_icon( T_('Edit this Post Type...'), 'edit', $admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID='.$edited_Item->get( 'ityp_ID' ) );
+	}
+	else
+	{
+		$item_type_edit_link = '';
+	}
 	$Form->begin_fieldset( $form_title_item_ID.get_manual_link( 'post-contents-panel' )
-				.'<span class="pull-right">'.sprintf( T_('Type: %s'), $item_type_link ).'</span>',
+				.'<span class="pull-right">'.sprintf( T_('Type: %s'), $item_type_link ).$item_type_edit_link.'</span>',
 			array( 'id' => 'itemform_content' ) );
 
 	$Form->switch_layout( 'fields_table' );
@@ -452,7 +460,8 @@ $Form->begin_form( '', '', $params );
 			$parent_info = '';
 		}
 		$Form->text_input( 'post_parent_ID', $edited_Item->get( 'parent_ID' ), 11, T_('Parent ID'), $parent_info, array(
-				'required' => ( $edited_Item->get_type_setting( 'use_parent' ) == 'required' )
+				'required' => ( $edited_Item->get_type_setting( 'use_parent' ) == 'required' ),
+				'style'    => 'width:115px',
 			) );
 	}
 	else
@@ -684,7 +693,7 @@ $Form->begin_form( '', '', $params );
 
 	if( $is_not_content_block )
 	{	// Display "hide teaser" checkbox for item with type usage except of content block:
-		$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.T_('Hide teaser when displaying -- more --').'</strong>' );
+		$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.sprintf( T_('Hide teaser when displaying part after %s'), '<code>[teaserbreak]</code>' ).'</strong>' );
 	}
 
 	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
@@ -703,13 +712,11 @@ $Form->begin_form( '', '', $params );
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{	// If current User has full access to edit other users,
 		// Display item's owner:
-		echo '<tr><td><strong>'.T_('Owner').':</strong></td><td>';
+		echo '<tr><td class="flabel_item_owner_login"><strong>'.T_('Owner').':</strong></td><td>';
 		$Form->username( 'item_owner_login', $edited_Item->get_creator_User(), '', T_( 'login of this post\'s owner.') );
-		$Form->hidden( 'item_owner_login_displayed', 1 );
-		echo '</td></tr>';
 		// Display a checkbox to create new user:
-		echo '<tr><td></td><td>';
 		echo '<label class="ffield_item_create_user"><input type="checkbox" name="item_create_user" value="1"'.( get_param( 'item_create_user' ) ? ' checked="checked"' : '' ).' /> '.T_('Create new user').'</label>';
+		$Form->hidden( 'item_owner_login_displayed', 1 );
 		echo '</td></tr>';
 	}
 
