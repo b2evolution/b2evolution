@@ -6651,6 +6651,16 @@ class Item extends ItemLight
 		if( isset( $this->ItemSettings ) )
 		{
 			$db_changed = $this->ItemSettings->dbupdate() || $db_changed;
+
+			// Update custom fields of all child posts of this post:
+			$DB->query( 'UPDATE T_items__item_settings AS is1
+				INNER JOIN T_items__item ON post_ID = iset_item_ID
+				INNER JOIN T_items__item_settings AS is2 ON is1.iset_name = is2.iset_name
+				  SET is1.iset_value = is2.iset_value
+				WHERE post_parent_ID = '.$this->ID.'
+				  AND post_ityp_ID = '.$this->get( 'ityp_ID' ).'
+				  AND is2.iset_item_ID = '.$this->ID,
+				'Update custom fields of child posts on updating parent post #'.$this->ID );
 		}
 
 		// validate url title / slug
