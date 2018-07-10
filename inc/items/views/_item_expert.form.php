@@ -270,29 +270,58 @@ $Form->begin_form( '', '', $params );
 
 		if( count( $custom_fields ) )
 		{	// Display fieldset with custom fields only if at least one exists:
-			$Form->begin_fieldset( T_('Custom fields').get_manual_link( 'post-custom-fields-panel' ), array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
+			$custom_fields_title = T_('Custom fields').get_manual_link( 'post-custom-fields-panel' );
+			if( $current_User->check_perm( 'options', 'edit' ) )
+			{	// Display an icon to edit post type if current user has a permission:
+				$custom_fields_title .= '<span class="floatright panel_heading_action_icons">'
+						.action_icon( T_('Edit fields...'), 'edit',
+							$admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID='.$edited_Item->get( 'ityp_ID' ).'#fieldset_wrapper_custom_fields',
+							T_('Edit fields...'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm' ) )
+					.'</span>';
+			}
+
+			$Form->begin_fieldset( $custom_fields_title, array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
 
 			$Form->switch_layout( 'fields_table' );
 			$Form->begin_fieldset();
 
+			$parent_Item = & $edited_Item->get_parent_Item();
+
 			foreach( $custom_fields as $custom_field )
 			{	// Loop through custom fields:
+				$custom_field_note = '';
+				if( ! empty( $custom_field['note'] ) )
+				{	// Display a not of the custon field if it is filled:
+					$custom_field_note .= $custom_field['note'].' &middot; ';
+				}
+				// Display a field title and code:
+				$custom_field_note .= $custom_field['label'].': <code>'.$custom_field['name'].'</code>';
+				if( $parent_Item )
+				{	// Display a value of parent post custom field:
+					$parent_custom_field_value = $parent_Item->get_custom_field_value( $custom_field['name'], $custom_field['type'] );
+					if( $parent_custom_field_value !== false )
+					{	// If parent post realy has a custom field with same code and type
+						$custom_field_note .= ' &middot; '.T_('Parent Item Field value').': '
+							.$parent_Item->get_edit_link( array( 'text' => format_to_output( $parent_custom_field_value, 'htmlspecialchars' ) ) );
+					}
+				}
+
 				switch( $custom_field['type'] )
 				{
 					case 'double':
-						$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, $custom_field['label'], $custom_field['note'].' <code>'.$custom_field['name'].'</code>' );
+						$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, $custom_field['label'], $custom_field_note );
 						break;
 					case 'varchar':
-						$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, $custom_field['label'], $custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+						$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 						break;
 					case 'text':
-						$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
+						$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => $custom_field_note ) );
 						break;
 					case 'html':
-						$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
+						$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => $custom_field_note ) );
 						break;
 					case 'url':
-						$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_url_'.$custom_field['ID'] ), 20, $custom_field['label'], $custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+						$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_url_'.$custom_field['ID'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 						break;
 				}
 			}
