@@ -999,10 +999,19 @@ h2.user_title::first-line {
 }
 
 #itemform_extra {
-	#ffield_item_owner_login .help-inline {
-		display: inline-block;
-		vertical-align: middle;
-		margin-top: 10px;
+	td.flabel_item_owner_login {
+		vertical-align: top;
+		padding-top: 6px;
+	}
+	#ffield_item_owner_login {
+		.help-inline {
+			display: inline-block;
+			vertical-align: middle;
+			margin-top: 10px;
+		}
+		#item_owner_login {
+			vertical-align: middle !important;
+		}
 	}
 	label.ffield_item_create_user {
 		padding: 0;

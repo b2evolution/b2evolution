@@ -90,6 +90,16 @@ $Results->cols[] = array(
 		'td_class' => 'center %conditional( "'.$edited_Item->ityp_ID.'" == #ityp_ID#, " info", "" )%'
 	);
 
+if( $current_User->check_perm( 'options', 'edit' ) )
+{	// Add aactions if current user has a permission:
+	$Results->cols[] = array(
+			'th' => T_('Actions'),
+			'td' => action_icon( T_('Edit this Post Type...'), 'edit', $admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID=$ityp_ID$' ),
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'center',
+		);
+}
+
 // Display results:
 $Results->display();
 
