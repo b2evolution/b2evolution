@@ -3667,13 +3667,11 @@ class Form extends Widget
 			$field_params['note_format'] = '<div>'.$field_params['note_format'].'</div>';
 		}
 
-		// Why is this set to false for this type? This is needed for js hooks else remove button won't work in type select_input:
-		#$field_params['id'] = false; // No ID attribute for the label
+		$field_params['id'] = false; // No ID attribute for the label
 		if( isset( $field_params['required'] ) )
 		{
 			$field_required = $field_params['required'];
 		}
-
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 		unset($field_params['id']);  // unset, so it gets handled correctly as default below
 

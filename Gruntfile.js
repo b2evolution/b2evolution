@@ -265,7 +265,7 @@ module.exports = function(grunt) {
 			// JS files that are used on back-office standard skins:
 			evo_backoffice: {
 				options: {
-					banner: '/* This includes 15 files: functions.js, ajax.js, communication.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, dynamic_input.js, select_input.js, '+
+					banner: '/* This includes 15 files: functions.js, ajax.js, communication.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, '+
 						'src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, '+
 						'src/evo_user_org.js, src/evo_rest_api.js, src/evo_links.js */\n'
 				},
@@ -276,8 +276,6 @@ module.exports = function(grunt) {
 							'rsc/js/form_extensions.js',
 							'rsc/js/extracats.js',
 							'rsc/js/dynamic_select.js',
-							'rsc/js/dynamic_input.js',
-							'rsc/js/select_input.js',
 							'rsc/js/backoffice.js',
 							'rsc/js/blog_widgets.js',
 							'rsc/js/src/evo_modal_window.js',
@@ -295,7 +293,7 @@ module.exports = function(grunt) {
 			// JS files that are used on back-office bootstrap skins:
 			evo_backoffice_bootstrap: {
 				options: {
-					banner: '/* This includes 15 files: functions.js, ajax.js, communication.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, dynamic_input.js, select_input.js, '+
+					banner: '/* This includes 15 files: functions.js, ajax.js, communication.js, form_extensions.js, backoffice.js, extracats.js, dynamic_select.js, '+
 						'src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, '+
 						'src/evo_user_org.js, src/evo_rest_api.js, src/evo_links.js */\n'
 				},
@@ -306,8 +304,6 @@ module.exports = function(grunt) {
 							'rsc/js/form_extensions.js',
 							'rsc/js/extracats.js',
 							'rsc/js/dynamic_select.js',
-							'rsc/js/dynamic_input.js',
-							'rsc/js/select_input.js',
 							'rsc/js/backoffice.js',
 							'rsc/js/blog_widgets.js',
 							'rsc/js/src/bootstrap-evo_modal_window.js',

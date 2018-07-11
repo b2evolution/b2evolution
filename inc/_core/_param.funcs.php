@@ -337,7 +337,6 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 			case 'array:regexp':
 			case 'array:array:string':
 			case 'array:array:filepath':
-				
 				if( ! is_array( $GLOBALS[$var] ) )
 				{ // This param must be array
 					debug_die( 'param(-): <strong>'.$var.'</strong> is not array!' );
@@ -349,7 +348,6 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 				$one_dimensional = ( ( $type == 'array' ) || ( $type == 'array:integer' ) || ( $type == 'array:string' ) || ( $type == 'array:filepath' ) || ( $type == 'array:regexp' ) );
 				// Check if the given array type should contains string elements:
 				$contains_strings = ( ( $type == 'array:string' ) || ( $type == 'array:array:string' ) || ( $type == 'array:filepath' ) || ( $type == 'array:array:filepath' ) );
-				
 				if( $one_dimensional )
 				{ // Convert to a two dimensional array to handle one and two dimensional arrays the same way
 					$globals_var = array( $globals_var );
@@ -371,114 +369,42 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 
 					foreach( $var_array as $j => $var_value )
 					{
-						if( is_array( $var_value ) )
-						{ 							
-							$var_array = $var_value;
-							
-							$load_value = function ( array $array, $variables ) use ( & $load_value )
-							{
-								foreach ( $array as $j => $var_value ) 
-								{
-									if ( is_array( $var_value ) )
-									{
-										$load_value( $var_value, $variables );
-									}
-									else
-									{
-										
-										$type = $variables['type'];
-										$i = $variables['i'];
-										$contains_strings = $variables['contains_strings']; 
-									
-										if( ! is_scalar( $var_value ) )
-										{ // This happens if someone uses "foo[][]=x" where "foo[]" is expected as string
-											debug_die( 'param(-): element of array <strong>'.$var.'</strong> is not scalar!' );
-										}
-
-										if( $contains_strings )
-										{	// Prepare string elements of array:
-											if( $type == 'array:filepath' || $type == 'array:array:filepath' )
-											{	// Special verifying for file path params:
-												// Format param to valid file path value:
-												$globals_var[$i][$j] = param_format( $var_value, 'filepath' );
-												if( ! is_safe_filepath( $globals_var[$i][$j] ) )
-												{	// We cannot accept this unsecure file path:
-													bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
-												}
-											}
-											else
-											{	// Format param to valid string value:
-												$globals_var[$i][$j] = param_format( $var_value, 'string' );
-											}
-											continue;
-										}
-
-										if( isset( $elements_regexp ) )
-										{ // Array contains elements which must match to the given regular expression
-											if( ( $strict_typing == 'allow_empty' && empty( $var_value ) )
-												|| preg_match( $elements_regexp, $var_value ) )
-											{ // OK match, set the corresponding type
-												settype( $globals_var[$i][$j], $elements_type );
-											}
-											else
-											{ // No match, cannot accept this MISMATCH
-												// Note: In case of array:integer or array:regexp we always use strict typing for the array elements
-												bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
-											}
-										}
-									
-									}
-								}
-
-								return $var_value;
-								
-							};
-							
-							$load_value( $var_array, array( 'type' => $type, 'i' => $i, 'contains_strings' => $contains_strings ) );
-								
+						if( ! is_scalar( $var_value ) )
+						{ // This happens if someone uses "foo[][]=x" where "foo[]" is expected as string
+							debug_die( 'param(-): element of array <strong>'.$var.'</strong> is not scalar!' );
 						}
-						else
-						{
-						
-							if( ! is_scalar( $var_value ) )
-							{ // This happens if someone uses "foo[][]=x" where "foo[]" is expected as string
-								debug_die( 'param(-): element of array <strong>'.$var.'</strong> is not scalar!' );
-							}
 
-							if( $contains_strings )
-							{	// Prepare string elements of array:
-								if( $type == 'array:filepath' || $type == 'array:array:filepath' )
-								{	// Special verifying for file path params:
-									// Format param to valid file path value:
-									$globals_var[$i][$j] = param_format( $var_value, 'filepath' );
-									if( ! is_safe_filepath( $globals_var[$i][$j] ) )
-									{	// We cannot accept this unsecure file path:
-										bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
-									}
-								}
-								else
-								{	// Format param to valid string value:
-									$globals_var[$i][$j] = param_format( $var_value, 'string' );
-								}
-								continue;
-							}
-
-							if( isset( $elements_regexp ) )
-							{ // Array contains elements which must match to the given regular expression
-								if( ( $strict_typing == 'allow_empty' && empty( $var_value ) )
-									|| preg_match( $elements_regexp, $var_value ) )
-								{ // OK match, set the corresponding type
-									settype( $globals_var[$i][$j], $elements_type );
-								}
-								else
-								{ // No match, cannot accept this MISMATCH
-									// Note: In case of array:integer or array:regexp we always use strict typing for the array elements
+						if( $contains_strings )
+						{	// Prepare string elements of array:
+							if( $type == 'array:filepath' || $type == 'array:array:filepath' )
+							{	// Special verifying for file path params:
+								// Format param to valid file path value:
+								$globals_var[$i][$j] = param_format( $var_value, 'filepath' );
+								if( ! is_safe_filepath( $globals_var[$i][$j] ) )
+								{	// We cannot accept this unsecure file path:
 									bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
 								}
 							}
-						
+							else
+							{	// Format param to valid string value:
+								$globals_var[$i][$j] = param_format( $var_value, 'string' );
+							}
+							continue;
 						}
-						
+
+						if( isset( $elements_regexp ) )
+						{ // Array contains elements which must match to the given regular expression
+							if( ( $strict_typing == 'allow_empty' && empty( $var_value ) )
+							    || preg_match( $elements_regexp, $var_value ) )
+							{ // OK match, set the corresponding type
+								settype( $globals_var[$i][$j], $elements_type );
+							}
+							else
+							{ // No match, cannot accept this MISMATCH
+								// Note: In case of array:integer or array:regexp we always use strict typing for the array elements
+								bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
+							}
+						}
 					}
 				}
 
