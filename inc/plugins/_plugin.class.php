@@ -4022,6 +4022,7 @@ class Plugin
 	 */
 	function get_default_setting( $parname, $params, $group = NULL )
 	{
+		
 		if( $group === NULL )
 		{	// Get default value from sinple field:
 			if( isset( $params[$parname]['type'] ) && $params[$parname]['type'] == 'checklist' &&
@@ -4040,8 +4041,48 @@ class Plugin
 			}
 		}
 		else
-		{	// Get default value from input group field:
-			$parname = substr( $parname, strlen( $group ) );
+		{	
+			
+			if( strpos( $parname, '[' ) !== false )
+			{
+
+				// strip out all the iterations
+				$parname = str_replace( ']', '', preg_replace('/\[\d\]/', '', $parname ) );
+				
+				//create array
+				$setting_names = explode( '[', $parname );
+				
+				/* 
+				* match $params level to $parname
+				*/ 
+				for( $i = 0; $i < count( $setting_names ) - 1; $i++ )
+				{
+					if( isset( $params[ $setting_names[$i] ] ) )
+					{
+						if( isset( $params[ $setting_names[$i] ]['entries'] ) )
+						{
+							
+							$params = $params[ $setting_names[$i] ]['entries'];
+
+						}
+						
+					}
+				}
+
+				$pos_last_bracket = strrpos($parname, '[');
+				$parname = substr( str_replace( '[', '', substr($parname, $pos_last_bracket) ), strlen( $group ) );
+				
+				
+			}
+			else
+			{
+				
+				// Get default value from input group field:
+				$parname = substr( $parname, strlen( $group ) );
+			}
+			
+				
+			//pre_dump($parname, $params[$group]['inputs']);
 			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
 			{	// We have a default value:
 				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
@@ -4133,6 +4174,7 @@ class Plugin
 	 */
 	function get_msg_setting( $parname, $group = NULL )
 	{
+		
 		if( empty( $this->Settings ) )
 		{
 			global $Plugins;
@@ -4142,6 +4184,7 @@ class Plugin
 		// Use prefix 'msg_' for all message settings except of "msg_apply_rendering":
 		$value = $this->Settings->get( $parname == 'msg_apply_rendering' ? $parname : 'msg_'.$parname );
 
+		
 		if( ! is_null( $value ) )
 		{ // We have a value for this param:
 			return $value;
