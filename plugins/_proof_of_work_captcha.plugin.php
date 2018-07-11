@@ -63,61 +63,120 @@ class proof_of_work_captcha_plugin extends Plugin
 	 */
 	function GetDefaultSettings( & $params )
 	{
-		global $Settings;
+		global $DB;
+
+		$GroupCache = & get_GroupCache();
+		$GroupCache->load_all();
+		$groups = array();
+		foreach( $GroupCache->cache as $Group )
+		{
+			if( $Group->get( 'usage' ) == 'primary' )
+			{
+				$is_default = preg_match( '#(spammer|suspect)#i', $Group->get( 'name' ) );
+				$groups[] = array( $Group->ID, $Group->get( 'name' ), $is_default );
+			}
+		}
 
 		return array(
-				'use_for_anonymous_item' => array(
-					'label' => $this->T_('Use for anonymous item forms'),
-					'defaultvalue' => 1,
-					'note' => $this->T_('Should this plugin be used for anonymous users on item forms?'),
-					'type' => 'checkbox',
+				'apy_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('API settings')
 				),
-				'use_for_anonymous_comment' => array(
-					'label' => $this->T_('Use for anonymous comment forms'),
-					'defaultvalue' => 1,
-					'note' => $this->T_('Should this plugin be used for anonymous users on comment forms?'),
-					'type' => 'checkbox',
-				),
-				'use_for_registration' => array(
-					'label' => $this->T_('Use for new registration forms'),
-					'defaultvalue' => 1,
-					'note' => $this->T_('Should this plugin be used on registration forms?'),
-					'type' => 'checkbox',
-				),
-				'use_for_anonymous_message' => array(
-					'label' => $this->T_('Use for anonymous messaging forms'),
-					'defaultvalue' => 1,
-					'note' => $this->T_('Should this plugin be used for anonymous users on messaging forms?'),
-					'type' => 'checkbox',
-				),
-				'api_site_key' => array(
-					'label' => $this->T_('API site key'),
-					'note'  => sprintf( $this->T_('Use "%s" which is generated for your site on <a %s>%s</a>'), $this->T_('Site Key (public)'), 'href="https://coinhive.com/settings/sites" target="_blank"', 'coinhive.com' ),
-					'type'  => 'text',
-					'size'  => 40,
-				),
-				'api_secret_key' => array(
-					'label' => $this->T_('API secret key'),
-					'note'  => sprintf( $this->T_('Use "%s" which is generated for your site on <a %s>%s</a>'), $this->T_('Secret Key (private)'), 'href="https://coinhive.com/settings/sites" target="_blank"', 'coinhive.com' ),
-					'type'  => 'text',
-					'size'  => 40,
-				),
-				'hash_num' => array(
-					'label'        => $this->T_('Number of hashes'),
-					'type'         => 'integer',
-					'defaultvalue' => 1024,
-					'valid_range'  => array(
-						'min' => 256,
+					'api_site_key' => array(
+						'label' => $this->T_('Coinhive site key'),
+						'note'  => sprintf( $this->T_('Use "%s" which is generated for your site on <a %s>%s</a>'), $this->T_('Site Key (public)'), 'href="https://coinhive.com/settings/sites" target="_blank"', 'coinhive.com' ),
+						'type'  => 'text',
+						'size'  => 40,
 					),
-				),
-				'hash_num_suspect' => array(
-					'label'        => $this->T_('Number of hashes for suspected countries'),
-					'note'         => $this->T_('Plugin "GeoIP" must be enabled for using of this setting.'),
-					'type'         => 'integer',
-					'defaultvalue' => 10240,
-					'valid_range'  => array(
-						'min' => 256,
+					'api_secret_key' => array(
+						'label' => $this->T_('Coinhive secret key'),
+						'note'  => sprintf( $this->T_('Use "%s" which is generated for your site on <a %s>%s</a>'), $this->T_('Secret Key (private)'), 'href="https://coinhive.com/settings/sites" target="_blank"', 'coinhive.com' ),
+						'type'  => 'text',
+						'size'  => 40,
 					),
+				'api_layout_end' => array(
+					'layout' => 'end_fieldset',
+				),
+				'use_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Where to use')
+				),
+					'use_for_registration' => array(
+						'label' => $this->T_('Use in user registration forms'),
+						'defaultvalue' => 1,
+						'note' => $this->T_('Should this plugin be used on registration forms?'),
+						'type' => 'checkbox',
+					),
+					'use_for_anonymous_item' => array(
+						'label' => $this->T_('Use in anonymous item posting forms'),
+						'defaultvalue' => 1,
+						'note' => $this->T_('Should this plugin be used for anonymous users on item forms?'),
+						'type' => 'checkbox',
+					),
+					'use_for_anonymous_comment' => array(
+						'label' => $this->T_('Use in anonymous commenting forms'),
+						'defaultvalue' => 1,
+						'note' => $this->T_('Should this plugin be used for anonymous users on comment forms?'),
+						'type' => 'checkbox',
+					),
+					'use_for_anonymous_message' => array(
+						'label' => $this->T_('Use in anonymous messaging forms'),
+						'defaultvalue' => 1,
+						'note' => $this->T_('Should this plugin be used for anonymous users on messaging forms?'),
+						'type' => 'checkbox',
+					),
+					'use_for_suspect_users' => array(
+						'label' => $this->T_('Also use in the above forms for suspect users'),
+						'defaultvalue' => 1,
+						'note' => $this->T_('Should this plugin be used for suspect users in the above forms?'),
+						'type' => 'checkbox',
+					),
+				'use_layout_end' => array(
+					'layout' => 'end_fieldset',
+				),
+				'difficulty_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Difficulty settings')
+				),
+					'hash_num' => array(
+						'label'        => $this->T_('# of hashes by default'),
+						'type'         => 'integer',
+						'defaultvalue' => 1024,
+						'valid_range'  => array(
+							'min' => 256,
+						),
+					),
+					'hash_num_suspect' => array(
+						'label'        => $this->T_('# of hashes for anonymous users from suspect countries'),
+						'note'         => $this->T_('Plugin "GeoIP" must be enabled for using of this setting.'),
+						'type'         => 'integer',
+						'defaultvalue' => 10240,
+						'valid_range'  => array(
+							'min' => 256,
+						),
+					),
+					'hash_num_suspect_users' => array(
+						'label'        => $this->T_('# of hashes for suspect users'),
+						'type'         => 'integer',
+						'defaultvalue' => 10240,
+						'valid_range'  => array(
+							'min' => 256,
+						),
+					),
+				'difficulty_layout_end' => array(
+					'layout' => 'end_fieldset',
+				),
+				'suspect_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Suspect users')
+				),
+					'suspect_groups' => array(
+						'label' => T_('Suspect groups'),
+						'type' => 'checklist',
+						'options' => $groups,
+					),
+				'suspect_layout_end' => array(
+					'layout' => 'end_fieldset',
 				),
 			);
 	}
@@ -207,8 +266,6 @@ class proof_of_work_captcha_plugin extends Plugin
 	 */
 	function CaptchaPayload( & $params )
 	{
-		global $DB, $Session;
-
 		if( ! isset( $params['form_type'] ) || ! $this->does_apply( $params['form_type'] ) )
 		{	// We should not apply captcha to the requested form:
 			return;
@@ -229,9 +286,11 @@ class proof_of_work_captcha_plugin extends Plugin
 		}
 
 		$Form->info( $this->T_('Antispam'), '<script src="https://authedmine.com/lib/captcha.min.js" async></script>
-			<div class="coinhive-captcha" data-hashes="'.format_to_output( $this->get_hash_num(), 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="input[type=submit]:not([name$=\'[preview]\'])">
+			<div class="coinhive-captcha" data-hashes="'.format_to_output( $this->get_hash_num(), 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="form[data-coinhive-captcha] input[type=submit]:not([name$=\'[preview]\'])">
 				<em>'.$this->T_('Loading Captcha...<br>If it doesn\'t load, please disable Adblock!').'</em>
 			</div>' );
+		// Append a flag to the forms which contains the coinhive captcha in order to don't disable the submit buttons from other forms on the same page:
+		echo '<script type="text/javascript">jQuery( \'.coinhive-captcha[data-hashes]\' ).closest( \'form\' ).attr( \'data-coinhive-captcha\', 1 )</script>';
 
 		if( ! isset( $params['Form'] ) )
 		{	// there's no Form where we add to, but our own form:
@@ -254,7 +313,7 @@ class proof_of_work_captcha_plugin extends Plugin
 	 */
 	function DisplayItemFormFieldset( & $params )
 	{
-		$params['form_type'] = 'comment';
+		$params['form_type'] = 'item';
 		$this->CaptchaPayload( $params );
 	}
 
@@ -355,20 +414,26 @@ class proof_of_work_captcha_plugin extends Plugin
 	 */
 	function does_apply( $form_type )
 	{
+		$check_suspect_user = false;
+
 		switch( $form_type )
 		{
 			case 'item':
 				if( !is_logged_in() )
-				{
+				{	// Use setting for anonymous user:
 					return $this->Settings->get( 'use_for_anonymous_item' );
 				}
+				// Check if it should be applied also for suspected users:
+				$check_suspect_user = ( $this->Settings->get( 'use_for_suspect_users' ) && $this->Settings->get( 'use_for_anonymous_item' ) );
 				break;
 
 			case 'comment':
 				if( !is_logged_in() )
-				{
+				{	// Use setting for anonymous user:
 					return $this->Settings->get( 'use_for_anonymous_comment' );
 				}
+				// Check if it should be applied also for suspected users:
+				$check_suspect_user = ( $this->Settings->get( 'use_for_suspect_users' ) && $this->Settings->get( 'use_for_anonymous_comment' ) );
 				break;
 
 			case 'register':
@@ -376,10 +441,19 @@ class proof_of_work_captcha_plugin extends Plugin
 
 			case 'message':
 				if( !is_logged_in() )
-				{
+				{	// Use setting for anonymous user:
 					return $this->Settings->get( 'use_for_anonymous_message' );
 				}
+				// Check if it should be applied also for suspected users:
+				$check_suspect_user = ( $this->Settings->get( 'use_for_suspect_users' ) && $this->Settings->get( 'use_for_anonymous_message' ) );
 				break;
+		}
+
+		if( $check_suspect_user && is_logged_in() )
+		{	// Try to check if current logged in user is suspected by this plugin:
+			global $current_User;
+			$suspect_groups = $this->Settings->get( 'suspect_groups' );
+			return ( is_array( $suspect_groups ) && isset( $suspect_groups[ $current_User->get( 'grp_ID' ) ] ) );
 		}
 
 		return false;
