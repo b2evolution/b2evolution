@@ -1887,6 +1887,8 @@ function init_list_mode()
 
 	// Set different filterset name for each different tab and tab_type
 	$filterset_name = ( $tab == 'type' ) ? $tab.'_'.utf8_strtolower( $tab_type ) : $tab;
+	// Append collection ID to filterset in order to keep filters separately per collection:
+	$filterset_name .= $Blog->ID;
 
 	// Create empty List:
 	$ItemList = new ItemList2( $Blog, NULL, NULL, $UserSettings->get('results_per_page'), 'ItemCache', $items_list_param_prefix, $filterset_name /* filterset name */ ); // COPY (func)
