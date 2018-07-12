@@ -174,11 +174,7 @@ switch( $action )
 			{
 				$javascript_messages['refreshAfterBan'] = array( $deleted_ids );
 			}
-			$javascript_messages['updateModalAfterBan'] = array( array(
-					'title' => T_('Open Antispam Blacklist'),
-					'url'   => $admin_url.'?ctrl=antispam',
-					'class' => 'btn btn-info'
-				) );
+			$javascript_messages['closeModalAfterBan'] = array();
 		}
 
 		// We'll ask the user later what to do, if no "sub-action" given.
