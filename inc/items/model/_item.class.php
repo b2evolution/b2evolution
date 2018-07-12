@@ -2556,9 +2556,17 @@ class Item extends ItemLight
 			if( ! empty( $custom_field_value ) ||
 			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )
 			{	// Display only the filled field AND also numeric field with '0' value:
-				if( $field['type'] == 'text' )
-				{	// Escape html tags and convert new lines to html <br> for text fields:
-					$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
+				switch( $field['type'] )
+				{
+					case 'text':
+						// Escape html tags and convert new lines to html <br> for text fields:
+						$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
+						break;
+
+					case 'url':
+						// Display url fields as link:
+						$custom_field_value = get_link_tag( $custom_field_value );
+						break;
 				}
 				$values = array( $field['label'], $custom_field_value );
 				$html .= str_replace( $mask, $values, $params['field_format'] );
