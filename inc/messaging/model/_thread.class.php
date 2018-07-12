@@ -429,7 +429,10 @@ class Thread extends DataObject
 				list( $max_new_threads, $new_threads_count ) = get_todays_thread_settings();
 				if( ( !empty( $max_new_threads ) ) && ( ( $max_new_threads - $new_threads_count ) < $recipients_count ) )
 				{ // user has a create thread limit, and recipients number exceed that limit
-					$error_msg .= '<br />';
+					if ( ! empty( $error_msg ) )
+					{
+						$error_msg .= '<br />';
+					}
 					$error_msg .= sprintf( T_( 'You are unable to send %d individual messages, because it exceeds your remaining daily limit of %d.' ), $recipients_count, $max_new_threads - $new_threads_count );
 				}
 			}
