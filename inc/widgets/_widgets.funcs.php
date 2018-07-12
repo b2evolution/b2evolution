@@ -374,6 +374,9 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	{
 		add_basic_widget( $blog_id, 'Forum Front Secondary Area', 'coll_activity_stats', 'core', 10 );
 	}
+	
+	/* Compare Main Area */
+	add_basic_widget( $blog_id, 'Compare Main Area', 'item_fields_compare', 'core', 10 );
 
 
 	/* 404 Page */
