@@ -394,17 +394,12 @@ function refreshAfterBan( deleted_ids )
 	refresh_item_comments( item_id );
 }
 
-function updateModalAfterBan( button )
+function closeModalAfterBan()
 {
-	var modal_window = jQuery( '#modal_window' );
-
-	if( modal_window.length == 0 )
-	{	// Modal windown is not found on page:
-		return;
-	}
-
-	// Add button in modal bottom:
-	jQuery( '.modal-footer', modal_window ).prepend( '<button type="button" class="' + button.class + '" onclick="location.href=\'' + button.url + '\'">' + button.title + '</button>' );
+	// Copy messages from modal to the page:
+	jQuery( '#server_messages' ).html( '' ).append( jQuery( '#modal_window_frame_ban').contents().find( '.action_messages' ) );
+	// Close modal window:
+	closeModalWindow();
 }
 
 //Process result after publish/deprecate/delete action has been completed

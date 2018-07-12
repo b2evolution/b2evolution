@@ -1612,6 +1612,13 @@ function init_results_js( $relative_to = 'rsc_url' )
  */
 function init_affix_messages_js( $offset = 50 )
 {
+	global $display_mode;
+
+	if( isset( $display_mode ) && $display_mode == 'js' )
+	{	// Don't use affixed Messages in JS mode from modal windows:
+		return;
+	}
+
 	add_js_headline( '
 	jQuery( document ).ready( function()
 	{
