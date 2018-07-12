@@ -153,7 +153,7 @@ class CollectionSettings extends AbstractSettings
 			'enable_sitemaps' => 1,
 
 		// General settings:
-			'ajax_form_enabled' => 0,					// Comment and contacts forms will be fetched by javascript
+			'ajax_form_enabled' => 1,					// Comment and contacts forms will be fetched by javascript
 			'ajax_form_loggedin_enabled' => 0,			// Also use JS forms for logged in users
 			'cache_enabled' => 0,
 			'cache_enabled_widgets' => 0,
@@ -219,6 +219,11 @@ class CollectionSettings extends AbstractSettings
 			'msgform_require_message' => 1, // Require message
 
 		// User directory:
+			'userdir_filter_gender' => 1,
+			'userdir_filter_level' => 1,
+			'userdir_filter_org' => 1,
+			'userdir_filter_criteria' => 1,
+			'userdir_filter_lastseen' => 1,
 			'userdir_picture' => 1,
 			'image_size_user_list' => 'crop-top-48x48',
 			'userdir_login' => 1,

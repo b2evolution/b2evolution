@@ -1008,6 +1008,12 @@ class Blog extends DataObject
 
 		if( in_array( 'userdir', $groups ) )
 		{ // we want to load the user directory settings:
+			$this->set_setting( 'userdir_filter_gender', param( 'userdir_filter_gender', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_level', param( 'userdir_filter_level', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_org', param( 'userdir_filter_org', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_criteria', param( 'userdir_filter_criteria', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_lastseen', param( 'userdir_filter_lastseen', 'integer', 0 ) );
+
 			$this->set_setting( 'userdir_picture', param( 'userdir_picture', 'integer', 0 ) );
 			$this->set_setting( 'image_size_user_list', param( 'image_size_user_list', 'string' ) );
 
@@ -3320,11 +3326,17 @@ class Blog extends DataObject
 	/**
 	 * Duplicate collection to new one
 	 *
+	 * @param boolean TRUE to duplicate categories and posts/items from source collection
 	 * @return boolean Result
 	 */
-	function duplicate()
+	function duplicate( $params = array() )
 	{
 		global $DB, $current_User;
+
+		$params = array_merge( array(
+				'duplicate_items'    => false,
+				'duplicate_comments' => false,
+			), $params );
 
 		$DB->begin();
 
@@ -3432,48 +3444,280 @@ class Blog extends DataObject
 			 WHERE wi_coll_ID = '.$DB->quote( $duplicated_coll_ID ),
 			'Duplicate all widgets from collection #'.$duplicated_coll_ID.' to #'.$this->ID );
 
-		/*
-		// There is currently no use case to duplicate categories if category contents are not duplicated
-
-		// Copy all categories from duplicated collection to new created:
-		$source_cats_SQL = new SQL( 'Get all categories of the duplicating collection #'.$duplicated_coll_ID );
-		$source_cats_SQL->SELECT( '*' );
-		$source_cats_SQL->FROM( 'T_categories' );
-		$source_cats_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $duplicated_coll_ID ) );
-		$source_cats = $DB->get_results( $source_cats_SQL, ARRAY_A );
-		$new_cats = array(); // Store all new created categories with key as ID of copied category in order to correct assign parent IDs
-		$ChapterCache = & get_ChapterCache();
-		foreach( $source_cats as $source_cat_fields )
-		{	// Copy each category separately because of unique field "cat_urlname":
-			$new_Chapter = & $ChapterCache->new_obj( NULL, $this->ID );
-			foreach( $source_cat_fields as $source_cat_field_name => $source_cat_field_value )
-			{
-				// Cut prefix "cat_" of each field:
-				$source_cat_field_name = substr( $source_cat_field_name, 4 );
-				if( $source_cat_field_name == 'ID' || $source_cat_field_name == 'blog_ID' )
-				{	// Skip these fields, they must be new:
-					continue;
+		if( $params['duplicate_items'] )
+		{	// Duplicate categories and posts/items:
+			// Copy all categories from duplicated collection to new created:
+			$source_cats_SQL = new SQL( 'Get all categories of the duplicating collection #'.$duplicated_coll_ID );
+			$source_cats_SQL->SELECT( '*' );
+			$source_cats_SQL->FROM( 'T_categories' );
+			$source_cats_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $duplicated_coll_ID ) );
+			$source_cats = $DB->get_results( $source_cats_SQL, ARRAY_A );
+			$new_cats = array(); // Store all new created categories with key as ID of copied category in order to correct assign parent IDs
+			$ChapterCache = & get_ChapterCache();
+			foreach( $source_cats as $source_cat_fields )
+			{	// Copy each category separately because of unique field "cat_urlname":
+				$new_Chapter = & $ChapterCache->new_obj( NULL, $this->ID );
+				foreach( $source_cat_fields as $source_cat_field_name => $source_cat_field_value )
+				{
+					// Cut prefix "cat_" of each field:
+					$source_cat_field_name = substr( $source_cat_field_name, 4 );
+					if( $source_cat_field_name == 'ID' || $source_cat_field_name == 'blog_ID' )
+					{	// Skip these fields, they must be new:
+						continue;
+					}
+					$new_Chapter->set( $source_cat_field_name, $source_cat_field_value );
 				}
-				$new_Chapter->set( $source_cat_field_name, $source_cat_field_value );
+				// Insert the duplicated category:
+				if( $new_Chapter->dbinsert() )
+				{	// If category has been inserted successfully, then update IDs for correct parent hierarchy:
+					// Key - ID of copied category, Value - new created category:
+					$new_cats[ $source_cat_fields['cat_ID'] ] = $new_Chapter;
+				}
 			}
-			// Insert the duplicated category:
-			if( $new_Chapter->dbinsert() )
-			{	// If category has been inserted successfully, then update IDs for correct parent hierarchy:
-				// Key - ID of copied category, Value - new created category:
-				$new_cats[ $source_cat_fields['cat_ID'] ] = $new_Chapter;
+			foreach( $new_cats as $duplicated_cat_ID => $new_Chapter )
+			{	// Update wrong parent IDs to IDs of new created categories:
+				$old_cat_parent_ID = intval( $new_Chapter->get( 'parent_ID' ) );
+				if( $old_cat_parent_ID > 0 && isset( $new_cats[ $old_cat_parent_ID ] ) )
+				{
+					$new_parent_Chapter = $new_cats[ $old_cat_parent_ID ];
+					$new_Chapter->set( 'parent_ID', $new_parent_Chapter->ID );
+					$new_Chapter->dbupdate();
+				}
+				if( $this->get_setting( 'default_cat_ID' ) == $duplicated_cat_ID )
+				{	// Update wrong default category with correct ID of new duplicated category:
+					$this->set_setting( 'default_cat_ID', $new_Chapter->ID );
+					$this->dbupdate();
+				}
+			}
+
+			if( ! empty( $new_cats ) )
+			{	// Duplicate posts if collection has at least one category:
+				$old_items_SQL = new SQL( 'Get all posts of collection #'.$duplicated_coll_ID.' before duplicating them into collection #'.$this->ID );
+				$old_items_SQL->SELECT( 'T_items__item.*' );
+				$old_items_SQL->FROM( 'T_items__item' );
+				$old_items_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
+				$old_items_SQL->WHERE( 'cat_blog_ID = '.$duplicated_coll_ID );
+				$old_items_SQL->ORDER_BY( 'post_ID' );
+				$old_items = $DB->get_results( $old_items_SQL, ARRAY_A );
+				$new_items = array();
+				foreach( $old_items as $old_item )
+				{
+					$old_item_ID = $old_item['post_ID'];
+					unset( $old_item['post_ID'] );
+
+					if( isset( $new_cats[ $old_item['post_main_cat_ID'] ] ) )
+					{	// Use correct category ID:
+						$new_item_Chapter = $new_cats[ $old_item['post_main_cat_ID'] ];
+						$old_item['post_main_cat_ID'] = $new_item_Chapter->ID;
+					}
+
+					// Get new unique slug:
+					$old_item['post_urltitle'] = urltitle_validate( $old_item['post_urltitle'], $old_item['post_title'], 0, false, 'slug_title', 'slug_itm_ID', 'T_slug', $old_item['post_locale'], 'T_items__item' );
+
+					// Duplicate a post:
+					$DB->query( 'INSERT INTO T_items__item ( '.implode( ', ', array_keys( $old_item ) ).' ) VALUES ( '.$DB->quote( $old_item ).' )',
+						'Duplicate from post #'.$old_item_ID );
+					$new_item_ID = $DB->insert_id;
+
+					// Create canonical and tiny slugs:
+					load_funcs( 'slugs/model/_slug.funcs.php' );
+					$new_canonical_Slug = new Slug();
+					$new_canonical_Slug->set( 'title', $old_item['post_urltitle'] );
+					$new_canonical_Slug->set( 'type', 'item' );
+					$new_canonical_Slug->set( 'itm_ID', $new_item_ID );
+					$new_canonical_Slug->dbinsert();
+					$new_tiny_Slug = new Slug();
+					$new_tiny_Slug->set( 'title', getnext_tinyurl() );
+					$new_tiny_Slug->set( 'type', 'item' );
+					$new_tiny_Slug->set( 'itm_ID', $new_item_ID );
+					$new_tiny_Slug->dbinsert();
+
+					$DB->query( 'UPDATE T_items__item
+						  SET post_canonical_slug_ID = '.$new_canonical_Slug->ID.',
+						      post_tiny_slug_ID = '.$new_tiny_Slug->ID.'
+						WHERE post_ID = '.$new_item_ID );
+
+					$new_items[ $old_item_ID ] = $new_item_ID;
+				}
+
+				// Update parent post IDs with correct IDs of new inserted posts:
+				$update_parent_items_sql = '';
+				foreach( $old_items as $old_item )
+				{
+					if( ! empty( $old_item['post_parent_ID'] ) && isset( $new_items[ $old_item['post_parent_ID'] ] ) )
+					{
+						$update_parent_items_sql .= ' WHEN post_parent_ID = '.$old_item['post_parent_ID'].' THEN '.$new_items[ $old_item['post_parent_ID'] ];
+					}
+				}
+				if( $update_parent_items_sql != '' )
+				{
+					$DB->query( 'UPDATE T_items__item
+						INNER JOIN T_categories ON post_main_cat_ID = cat_ID
+						  SET post_parent_ID = CASE '.$update_parent_items_sql.' ELSE post_parent_ID END
+						WHERE cat_blog_ID = '.$this->ID );
+				}
+
+				if( ! empty( $new_items ) )
+				{
+					$old_items_IDs = $DB->quote( array_keys( $new_items ) );
+
+					// Duplicate extra categories:
+					$old_extra_cats_SQL = new SQL( 'Get all posts categories of collection #'.$duplicated_coll_ID.' before duplicating' );
+					$old_extra_cats_SQL->SELECT( 'postcat_post_ID, postcat_cat_ID' );
+					$old_extra_cats_SQL->FROM( 'T_postcats' );
+					$old_extra_cats_SQL->WHERE( 'postcat_post_ID IN ( '.$old_items_IDs.' )' );
+					$old_extra_cats = $DB->get_results( $old_extra_cats_SQL, ARRAY_A );
+					$new_extra_cats_values = array();
+					foreach( $old_extra_cats as $old_extra_cat )
+					{
+						if( isset( $new_items[ $old_extra_cat['postcat_post_ID'] ], $new_cats[ $old_extra_cat['postcat_cat_ID'] ] ) )
+						{
+							$new_extra_cats_values[] = '( '.$new_items[ $old_extra_cat['postcat_post_ID'] ].', '.$new_cats[ $old_extra_cat['postcat_cat_ID'] ]->ID.' )';
+						}
+					}
+					if( ! empty( $new_extra_cats_values ) )
+					{
+						$DB->query( 'INSERT INTO T_postcats ( '.$old_extra_cats_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_extra_cats_values ),
+							'Duplicate extra categories for posts of collection #'.$duplicated_coll_ID );
+					}
+
+					// Duplicate tags:
+					$old_tags_SQL = new SQL( 'Get all posts tags of collection #'.$duplicated_coll_ID.' before duplicating' );
+					$old_tags_SQL->SELECT( 'itag_itm_ID, itag_tag_ID' );
+					$old_tags_SQL->FROM( 'T_items__itemtag' );
+					$old_tags_SQL->WHERE( 'itag_itm_ID IN ( '.$old_items_IDs.' )' );
+					$old_tags = $DB->get_results( $old_tags_SQL, ARRAY_A );
+					$new_tags_values = array();
+					foreach( $old_tags as $old_tag )
+					{
+						if( isset( $new_items[ $old_tag['itag_itm_ID'] ] ) )
+						{
+							$old_tag['itag_itm_ID'] = $new_items[ $old_tag['itag_itm_ID'] ];
+							$new_tags_values[] = '( '.$DB->quote( $old_tag ).' )';
+						}
+					}
+					if( ! empty( $new_tags_values ) )
+					{
+						$DB->query( 'INSERT INTO T_items__itemtag ( '.$old_tags_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_tags_values ),
+							'Duplicate tags for posts of collection #'.$duplicated_coll_ID );
+					}
+
+					// Duplicate settings:
+					$old_settings_SQL = new SQL( 'Get all posts settings of collection #'.$duplicated_coll_ID.' before duplicating' );
+					$old_settings_SQL->SELECT( 'iset_item_ID, iset_name, iset_value' );
+					$old_settings_SQL->FROM( 'T_items__item_settings' );
+					$old_settings_SQL->WHERE( 'iset_item_ID IN ( '.$old_items_IDs.' )' );
+					$old_settings = $DB->get_results( $old_settings_SQL, ARRAY_A );
+					$new_settings_values = array();
+					foreach( $old_settings as $old_setting )
+					{
+						if( isset( $new_items[ $old_setting['iset_item_ID'] ] ) )
+						{
+							$old_setting['iset_item_ID'] = $new_items[ $old_setting['iset_item_ID'] ];
+							$new_settings_values[] = '( '.$DB->quote( $old_setting ).' )';
+						}
+					}
+					if( ! empty( $new_settings_values ) )
+					{
+						$DB->query( 'INSERT INTO T_items__item_settings ( '.$old_settings_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_settings_values ),
+							'Duplicate settings for posts of collection #'.$duplicated_coll_ID );
+					}
+
+					// Duplicate links/attachments:
+					$old_links_SQL = new SQL( 'Get all posts attachments of collection #'.$duplicated_coll_ID.' before duplicating' );
+					$old_links_SQL->SELECT( 'link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_itm_ID, link_file_ID, link_position, link_order' );
+					$old_links_SQL->FROM( 'T_links' );
+					$old_links_SQL->WHERE( 'link_itm_ID IN ( '.$old_items_IDs.' )' );
+					$old_links = $DB->get_results( $old_links_SQL, ARRAY_A );
+					$new_links_values = array();
+					foreach( $old_links as $old_link )
+					{
+						if( isset( $new_items[ $old_link['link_itm_ID'] ] ) )
+						{
+							$old_link['link_itm_ID'] = $new_items[ $old_link['link_itm_ID'] ];
+							$new_links_values[] = '( '.$DB->quote( $old_link ).' )';
+						}
+					}
+					if( ! empty( $new_links_values ) )
+					{
+						$DB->query( 'INSERT INTO T_links ( '.$old_links_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_links_values ),
+							'Duplicate links for posts of collection #'.$duplicated_coll_ID );
+					}
+
+					if( $params['duplicate_comments'] )
+					{	// Duplicate comments:
+						$old_comments_SQL = new SQL( 'Get all comments of collection #'.$duplicated_coll_ID.' before duplicating' );
+						$old_comments_SQL->SELECT( '*' );
+						$old_comments_SQL->FROM( 'T_comments' );
+						$old_comments_SQL->WHERE( 'comment_item_ID IN ( '.$old_items_IDs.' )' );
+						$old_comments = $DB->get_results( $old_comments_SQL, ARRAY_A );
+						foreach( $old_comments as $old_comment )
+						{
+							if( isset( $new_items[ $old_comment['comment_item_ID'] ] ) )
+							{	// Insert only comments with correct item ID:
+								$old_comment_ID = $old_comment['comment_ID'];
+								unset( $old_comment['comment_ID'] );
+								$old_comment['comment_item_ID'] = $new_items[ $old_comment['comment_item_ID'] ];
+								$DB->query( 'INSERT INTO T_comments ( '.implode( ', ', array_keys( $old_comment ) ).' ) VALUES ( '.$DB->quote( $old_comment ).' )',
+									'Duplicate comment #'.$old_comment_ID.' of collection #'.$duplicated_coll_ID );
+								$new_comment_ID = $DB->insert_id;
+								$new_comments[ $old_comment_ID ] = $new_comment_ID;
+							}
+						}
+
+						// Update parent comment IDs with correct IDs of new inserted comments:
+						$update_parent_comments_sql = '';
+						foreach( $old_comments as $old_comment )
+						{
+							if( ! empty( $old_comment['comment_in_reply_to_cmt_ID'] ) && isset( $new_comments[ $old_comment['comment_in_reply_to_cmt_ID'] ] ) )
+							{
+								$update_parent_comments_sql .= ' WHEN comment_in_reply_to_cmt_ID = '.$old_comment['comment_in_reply_to_cmt_ID'].' THEN '.$new_comments[ $old_comment['comment_in_reply_to_cmt_ID'] ];
+							}
+						}
+						if( $update_parent_comments_sql != '' )
+						{
+							$DB->query( 'UPDATE T_comments
+									SET comment_in_reply_to_cmt_ID = CASE '.$update_parent_comments_sql.' ELSE comment_in_reply_to_cmt_ID END
+								WHERE comment_item_ID IN ( '.$DB->quote( $new_items ).' )' );
+						}
+
+						if( ! empty( $new_comments ) )
+						{	// Duplicate links/attachments of the comments:
+							$old_links_SQL = new SQL( 'Get all comments attachments of collection #'.$duplicated_coll_ID.' before duplicating' );
+							$old_links_SQL->SELECT( 'link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_cmt_ID, link_file_ID, link_position, link_order' );
+							$old_links_SQL->FROM( 'T_links' );
+							$old_links_SQL->WHERE( 'link_cmt_ID IN ( '.$old_items_IDs.' )' );
+							$old_links = $DB->get_results( $old_links_SQL, ARRAY_A );
+							$new_links_values = array();
+							foreach( $old_links as $old_link )
+							{
+								if( isset( $new_comments[ $old_link['link_cmt_ID'] ] ) )
+								{
+									$old_link['link_cmt_ID'] = $new_comments[ $old_link['link_cmt_ID'] ];
+									$new_links_values[] = '( '.$DB->quote( $old_link ).' )';
+								}
+							}
+							if( ! empty( $new_links_values ) )
+							{
+								$DB->query( 'INSERT INTO T_links ( '.$old_links_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_links_values ),
+									'Duplicate links for comments of collection #'.$duplicated_coll_ID );
+							}
+						}
+					}
+				}
 			}
 		}
-		foreach( $new_cats as $duplicated_cat_ID => $new_Chapter )
-		{	// Update wrong parent IDs to IDs of new created categories:
-			$old_cat_parent_ID = intval( $new_Chapter->get( 'parent_ID' ) );
-			if( $old_cat_parent_ID > 0 && isset( $new_cats[ $old_cat_parent_ID ] ) )
-			{
-				$new_parent_Chapter = $new_cats[ $old_cat_parent_ID ];
-				$new_Chapter->set( 'parent_ID', $new_parent_Chapter->ID );
-				$new_Chapter->dbupdate();
-			}
+		else
+		{	// Create at least one default category:
+			load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
+			$new_Chapter = new Chapter( NULL, $this->ID );
+			$new_Chapter->set( 'name', T_('Uncategorized') );
+			$new_Chapter->set( 'urlname', $this->get( 'urlname' ).'-main' );
+			$new_Chapter->dbinsert();
+			// Use this single category as default:
+			$this->set_setting( 'default_cat_ID', $new_Chapter->ID );
+			$this->dbupdate();
 		}
-		*/
 
 		// The duplicating is successful, So commit all above changes:
 		$DB->commit();

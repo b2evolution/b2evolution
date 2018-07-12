@@ -139,8 +139,16 @@ $Form->begin_form( '', '', $params );
 			$form_title_item_ID = T_('New Item');
 		}
 	}
+	if( $current_User->check_perm( 'options', 'edit' ) )
+	{	// Add an icon to edit item type if current user has a permission:
+		$item_type_edit_link = ' '.action_icon( T_('Edit this Post Type...'), 'edit', $admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID='.$edited_Item->get( 'ityp_ID' ) );
+	}
+	else
+	{
+		$item_type_edit_link = '';
+	}
 	$Form->begin_fieldset( $form_title_item_ID.get_manual_link( 'post-contents-panel' )
-				.'<span class="pull-right">'.sprintf( T_('Type: %s'), $item_type_link ).'</span>',
+				.'<span class="pull-right">'.sprintf( T_('Type: %s'), $item_type_link ).$item_type_edit_link.'</span>',
 			array( 'id' => 'itemform_content' ) );
 
 	$Form->switch_layout( 'fields_table' );
@@ -270,29 +278,68 @@ $Form->begin_form( '', '', $params );
 
 		if( count( $custom_fields ) )
 		{	// Display fieldset with custom fields only if at least one exists:
-			$Form->begin_fieldset( T_('Custom fields').get_manual_link( 'post-custom-fields-panel' ), array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
+			$custom_fields_title = T_('Custom fields').get_manual_link( 'post-custom-fields-panel' );
+			if( $current_User->check_perm( 'options', 'edit' ) )
+			{	// Display an icon to edit post type if current user has a permission:
+				$custom_fields_title .= '<span class="floatright panel_heading_action_icons">'
+						.action_icon( T_('Edit fields...'), 'edit',
+							$admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID='.$edited_Item->get( 'ityp_ID' ).'#fieldset_wrapper_custom_fields',
+							T_('Edit fields...'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm' ) )
+					.'</span>';
+			}
+
+			$Form->begin_fieldset( $custom_fields_title, array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
 
 			$Form->switch_layout( 'fields_table' );
 			$Form->begin_fieldset();
 
+			$parent_Item = & $edited_Item->get_parent_Item();
+
 			foreach( $custom_fields as $custom_field )
 			{	// Loop through custom fields:
+				$custom_field_note = '';
+				if( ! empty( $custom_field['note'] ) )
+				{	// Display a not of the custon field if it is filled:
+					$custom_field_note .= $custom_field['note'].' &middot; ';
+				}
+				// Display a field title and code:
+				$custom_field_note .= T_('Field name').': <code>'.$custom_field['name'].'</code>';
+				if( $parent_Item )
+				{	// Display a value of parent post custom field:
+					$parent_custom_field_value = $parent_Item->get_custom_field_value( $custom_field['name'], $custom_field['type'] );
+					if( $parent_custom_field_value !== false )
+					{	// If parent post realy has a custom field with same code and type
+						$preview_parent_custom_field_value = $parent_custom_field_value;
+						if( $custom_field['type'] == 'html' || $custom_field['type'] == 'text' )
+						{	// Cut long values of multiline fields:
+							$preview_parent_custom_field_value = explode( "\n", $parent_custom_field_value );
+							$preview_parent_custom_field_value = strmaxlen( $preview_parent_custom_field_value[0], 23, '...' );
+						}
+						$custom_field_note .= ' &middot; '.T_('Parent Item Field value').': '
+							.$parent_Item->get_edit_link( array( 'text' => format_to_output( $preview_parent_custom_field_value, 'htmlspecialchars' ) ) )
+							.action_icon( '', 'refresh', '#', NULL, NULL, NULL, array(
+								'data-child-input-id' => 'item_'.$custom_field['type'].'_'.$custom_field['ID'],
+								'data-parent-value'   => $parent_custom_field_value,
+							) );
+					}
+				}
+
 				switch( $custom_field['type'] )
 				{
 					case 'double':
-						$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, $custom_field['label'], $custom_field['note'].' <code>'.$custom_field['name'].'</code>' );
+						$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, $custom_field['label'], $custom_field_note );
 						break;
 					case 'varchar':
-						$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, $custom_field['label'], $custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+						$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 						break;
 					case 'text':
-						$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
+						$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => $custom_field_note ) );
 						break;
 					case 'html':
-						$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
+						$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => $custom_field_note ) );
 						break;
 					case 'url':
-						$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_url_'.$custom_field['ID'] ), 20, $custom_field['label'], $custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+						$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_url_'.$custom_field['ID'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 						break;
 				}
 			}
@@ -419,7 +466,8 @@ $Form->begin_form( '', '', $params );
 			$parent_info = '';
 		}
 		$Form->text_input( 'post_parent_ID', $edited_Item->get( 'parent_ID' ), 11, T_('Parent ID'), $parent_info, array(
-				'required' => ( $edited_Item->get_type_setting( 'use_parent' ) == 'required' )
+				'required' => ( $edited_Item->get_type_setting( 'use_parent' ) == 'required' ),
+				'style'    => 'width:115px',
 			) );
 	}
 	else
@@ -651,7 +699,7 @@ $Form->begin_form( '', '', $params );
 
 	if( $is_not_content_block )
 	{	// Display "hide teaser" checkbox for item with type usage except of content block:
-		$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.T_('Hide teaser when displaying -- more --').'</strong>' );
+		$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.sprintf( T_('Hide teaser when displaying part after %s'), '<code>[teaserbreak]</code>' ).'</strong>' );
 	}
 
 	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
@@ -670,13 +718,11 @@ $Form->begin_form( '', '', $params );
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{	// If current User has full access to edit other users,
 		// Display item's owner:
-		echo '<tr><td><strong>'.T_('Owner').':</strong></td><td>';
+		echo '<tr><td class="flabel_item_owner_login"><strong>'.T_('Owner').':</strong></td><td>';
 		$Form->username( 'item_owner_login', $edited_Item->get_creator_User(), '', T_( 'login of this post\'s owner.') );
-		$Form->hidden( 'item_owner_login_displayed', 1 );
-		echo '</td></tr>';
 		// Display a checkbox to create new user:
-		echo '<tr><td></td><td>';
 		echo '<label class="ffield_item_create_user"><input type="checkbox" name="item_create_user" value="1"'.( get_param( 'item_create_user' ) ? ' checked="checked"' : '' ).' /> '.T_('Create new user').'</label>';
+		$Form->hidden( 'item_owner_login_displayed', 1 );
 		echo '</td></tr>';
 	}
 
@@ -951,13 +997,20 @@ echo_fieldset_folding_js();
 // Save and restore item content field height and scroll position:
 echo_item_content_position_js( get_param( 'content_height' ), get_param( 'content_scroll' ) );
 
-// JS to post excerpt mode switching:
+// JS to post excerpt mode switching
+// + to refresh custom field values from parent post custom fields:
 ?>
 <script type="text/javascript">
 jQuery( '#post_excerpt' ).on( 'keyup', function()
 {
 	// Disable excerpt auto-generation on any changing and enable if excerpt field is empty:
 	jQuery( 'input[name=post_excerpt_autogenerated]' ).prop( 'checked', ( jQuery( this ).val() == '' ) );
+} );
+
+jQuery( 'a[data-child-input-id]' ).click( function()
+{	// Update custom field value with value from parent post:
+	jQuery( '#' + jQuery( this ).data( 'child-input-id' ) ).val( jQuery( this ).data( 'parent-value' ) );
+	return false;
 } );
 </script>
 <?php

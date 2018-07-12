@@ -70,6 +70,10 @@ code {
       -ms-hyphens: none;
           hyphens: none;
 }
+code {
+  background-color: rgba(27, 31, 35, 0.05);
+  color: #24292e;
+}
 img {
   border: none;
   max-width: 100%;

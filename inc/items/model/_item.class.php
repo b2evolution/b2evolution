@@ -6612,7 +6612,7 @@ class Item extends ItemLight
 	 */
 	function dbupdate( $auto_track_modification = true, $update_slug = true, $dummy = true )
 	{
-		global $DB, $Plugins;
+		global $DB, $Plugins, $Messages;
 
 		$DB->begin( 'SERIALIZABLE' );
 
@@ -6651,6 +6651,45 @@ class Item extends ItemLight
 		if( isset( $this->ItemSettings ) )
 		{
 			$db_changed = $this->ItemSettings->dbupdate() || $db_changed;
+
+			// Update custom fields of all child posts of this post:
+			$custom_fields = $this->get_type_custom_fields();
+			if( ! empty( $custom_fields ) )
+			{	// If this post has at least one custom field
+				$ItemCache = & get_ItemCache();
+				$item_cache_SQL = $ItemCache->get_SQL_object();
+				$item_cache_SQL->FROM_add( 'INNER JOIN T_items__type ON ityp_ID = post_ityp_ID' );
+				$item_cache_SQL->WHERE_and( 'post_parent_ID = '.$this->ID );
+				$item_cache_SQL->WHERE_and( 'ityp_use_parent != "never"' );
+				$child_items = $ItemCache->load_by_sql( $item_cache_SQL );
+				foreach( $child_items as $child_Item )
+				{
+					$child_custom_fields = $child_Item->get_type_custom_fields();
+					if( ! empty( $child_custom_fields ) )
+					{	// If child post has at least one custom field:
+						$update_child_custom_field = false;
+						foreach( $custom_fields as $custom_field_code => $custom_field )
+						{
+							if( isset( $child_custom_fields[ $custom_field_code ] ) &&
+							    $child_custom_fields[ $custom_field_code ]['type'] == $custom_field['type'] )
+							{	// If child post has a custom field with same code and type:
+								$child_Item->set_setting( 'custom_'.$custom_field['type'].'_'.$child_custom_fields[ $custom_field_code ]['ID'], $this->get_custom_field_value( $custom_field_code, $custom_field['type'] ) );
+								// Mark to know custom fields of the child post must be updated from parent:
+								$update_child_custom_field = true;
+							}
+						}
+						if( $update_child_custom_field )
+						{	// Update child post custom fields if at least one field has been detected with same code and type as parent:
+							if( $child_Item->dbupdate() )
+							{	// Display a message to inform about updated child posts:
+								$child_item_Blog = $child_Item->get_Blog();
+								$Messages->add_to_group( $child_Item->get( 'title' ).' ('.$child_Item->ID.') '.T_('in').' '.$child_item_Blog->get( 'shortname' ),
+									'note', T_('Custom fields have been replicated to the following child posts').':' );
+							}
+						}
+					}
+				}
+			}
 		}
 
 		// validate url title / slug

@@ -174,11 +174,7 @@ switch( $action )
 			{
 				$javascript_messages['refreshAfterBan'] = array( $deleted_ids );
 			}
-			$javascript_messages['updateModalAfterBan'] = array( array(
-					'title' => T_('Open Antispam Blacklist'),
-					'url'   => $admin_url.'?ctrl=antispam',
-					'class' => 'btn btn-info'
-				) );
+			$javascript_messages['closeModalAfterBan'] = array();
 		}
 
 		// We'll ask the user later what to do, if no "sub-action" given.
@@ -409,7 +405,7 @@ switch( $action )
 			$Messages->add( T_('IP Range updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=antispam&tab='.$tab.'&tab3=ipranges', 303 ); // Will EXIT
+			header_redirect( '?ctrl=antispam&tab='.$tab.'&tab3=ipranges&iprange_ID='.$edited_IPRange->ID.'&action=iprange_edit', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'iprange_edit';

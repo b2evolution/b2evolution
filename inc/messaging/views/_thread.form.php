@@ -94,6 +94,11 @@ else
 	}
 }
 
+$Plugins->trigger_event( 'DisplayMessageFormFieldsetAboveMessage', array(
+		'Form'              => & $Form,
+		'form_use_fieldset' => false,
+	) );
+
 $Form->text_input( 'thrd_title', $edited_Thread->title, $params['cols'], T_('Subject'), '', array( 'maxlength'=> 255, 'required'=>true, 'class'=>'wide_input large' ) );
 
 
