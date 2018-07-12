@@ -467,16 +467,32 @@ class proof_of_work_captcha_plugin extends Plugin
 	 */
 	function get_hash_num()
 	{
-		$Plugins_admin = & get_Plugins_admin();
-		if( ( $geoip_Plugin = & $Plugins_admin->get_by_code( 'evo_GeoIP' ) ) &&
-		    ( $Country = $geoip_Plugin->get_country_by_IP( get_ip_list( true ) ) ) &&
-		    ( $Country->get( 'status' ) == 'suspect' ) )
-		{	// Use special setting when country can be detected by IP address and it is suspected:
-			$plugin_hash_num = $this->Settings->get( 'hash_num_suspect' );
+		if( is_logged_in() )
+		{	// Get hash number for logged in suspect user:
+			global $current_User;
+			$suspect_groups = $this->Settings->get( 'suspect_groups' );
+			if( ( is_array( $suspect_groups ) && isset( $suspect_groups[ $current_User->get( 'grp_ID' ) ] ) ) )
+			{	// Use special number of hashed for suspected logged in users:
+				$plugin_hash_num = $this->Settings->get( 'hash_num_suspect_users' );
+			}
+			else
+			{	// This should not occurs but set default number of hashes anyway to avoid errors:
+				$plugin_hash_num = $this->Settings->get( 'hash_num' );
+			}
 		}
 		else
-		{	// Use normal setting for number of hashes:
-			$plugin_hash_num = $this->Settings->get( 'hash_num' );
+		{	// Get hash number for anonymous user:
+			$Plugins_admin = & get_Plugins_admin();
+			if( ( $geoip_Plugin = & $Plugins_admin->get_by_code( 'evo_GeoIP' ) ) &&
+					( $Country = $geoip_Plugin->get_country_by_IP( get_ip_list( true ) ) ) &&
+					( $Country->get( 'status' ) == 'suspect' ) )
+			{	// Use special setting when country can be detected by IP address and it is suspected:
+				$plugin_hash_num = $this->Settings->get( 'hash_num_suspect' );
+			}
+			else
+			{	// Use normal setting for number of hashes:
+				$plugin_hash_num = $this->Settings->get( 'hash_num' );
+			}
 		}
 
 		return intval( $plugin_hash_num );
