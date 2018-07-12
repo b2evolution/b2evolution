@@ -2556,9 +2556,17 @@ class Item extends ItemLight
 			if( ! empty( $custom_field_value ) ||
 			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )
 			{	// Display only the filled field AND also numeric field with '0' value:
-				if( $field['type'] == 'text' )
-				{	// Escape html tags and convert new lines to html <br> for text fields:
-					$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
+				switch( $field['type'] )
+				{
+					case 'text':
+						// Escape html tags and convert new lines to html <br> for text fields:
+						$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
+						break;
+
+					case 'url':
+						// Display url fields as link:
+						$custom_field_value = get_link_tag( $custom_field_value );
+						break;
 				}
 				$values = array( $field['label'], $custom_field_value );
 				$html .= str_replace( $mask, $values, $params['field_format'] );
@@ -6656,11 +6664,19 @@ class Item extends ItemLight
 			$custom_fields = $this->get_type_custom_fields();
 			if( ! empty( $custom_fields ) )
 			{	// If this post has at least one custom field
+				if( ! isset( $this->updated_items ) )
+				{	// Store in this array all updated items in order to avoid inifitie loop updating:
+					$this->updated_items = array();
+				}
+				$this->updated_items[] = $this->ID;
+
 				$ItemCache = & get_ItemCache();
+				$ItemCache->clear();
 				$item_cache_SQL = $ItemCache->get_SQL_object();
 				$item_cache_SQL->FROM_add( 'INNER JOIN T_items__type ON ityp_ID = post_ityp_ID' );
 				$item_cache_SQL->WHERE_and( 'post_parent_ID = '.$this->ID );
 				$item_cache_SQL->WHERE_and( 'ityp_use_parent != "never"' );
+				$item_cache_SQL->WHERE_and( 'post_ID NOT IN ( '.$DB->quote( $this->updated_items ).' )' );
 				$child_items = $ItemCache->load_by_sql( $item_cache_SQL );
 				foreach( $child_items as $child_Item )
 				{
@@ -6680,10 +6696,20 @@ class Item extends ItemLight
 						}
 						if( $update_child_custom_field )
 						{	// Update child post custom fields if at least one field has been detected with same code and type as parent:
+							$child_Item->updated_items = $this->updated_items;
 							if( $child_Item->dbupdate() )
 							{	// Display a message to inform about updated child posts:
 								$child_item_Blog = $child_Item->get_Blog();
-								$Messages->add_to_group( $child_Item->get( 'title' ).' ('.$child_Item->ID.') '.T_('in').' '.$child_item_Blog->get( 'shortname' ),
+								$child_item_edit_link = $child_Item->get_edit_link( array(
+										'text'   => $child_Item->ID,
+										'before' => '',
+										'after'  => '',
+									) );
+								if( ! $child_item_edit_link )
+								{	// If current user has no permission to edit the child Item display the ID as text:
+									$child_item_edit_link = $child_Item->ID;
+								}
+								$Messages->add_to_group( $child_Item->get_title().' ('.$child_item_edit_link.') '.T_('in').' '.$child_item_Blog->get( 'shortname' ),
 									'note', T_('Custom fields have been replicated to the following child posts').':' );
 							}
 						}

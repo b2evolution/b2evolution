@@ -1325,7 +1325,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 		// =======================================================================================================
 		case 'std':
 		case 'blog_a':
-			$post_count = 11;
+			$post_count = 12;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -1464,10 +1464,41 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$edited_Item->set_setting( 'custom_varchar_3', 'abc' );
 				$edited_Item->set_setting( 'custom_varchar_4', 'Enter your own values' );
 				$edited_Item->set_setting( 'custom_text_5', 'This is a sample text field.
- It can have multiple lines.' );
+It can have multiple lines.' );
 				$edited_Item->set_setting( 'custom_html_6', 'This is an <b>HTML</b> <i>field</i>.' );
 				$edited_Item->set_setting( 'custom_url_7', 'http://b2evolution.net/' );
 				$post_custom_fields_ID = $edited_Item->insert( $owner_ID, T_('Custom Fields Example'),
+'<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>'.
+
+'<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>'.
+
+'<p>[fields]</p>'.
+
+'<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>'.
+
+'<p>[fields:first_numeric_field, first_string_field,second_numeric_field]</p>'.
+
+'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>'.
+
+'<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
+						$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->set_setting( 'custom_double_1', '123.45' );
+				$edited_Item->set_setting( 'custom_double_2', '456' );
+				$edited_Item->set_setting( 'custom_varchar_3', 'abcdef' );
+				$edited_Item->set_setting( 'custom_varchar_4', 'Enter your own values' );
+				$edited_Item->set_setting( 'custom_text_5', 'This is a sample text field.
+It can have multiple lines.
+This is an extra line.' );
+				$edited_Item->set_setting( 'custom_html_6', 'This is an <b>HTML</b> <i>field</i>.' );
+				$edited_Item->set_setting( 'custom_url_7', 'http://b2evolution.net/' );
+				$edited_Item->insert( $owner_ID, T_('Another Custom Fields Example'),
 '<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>'.
 
 '<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>'.
