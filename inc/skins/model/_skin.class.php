@@ -774,7 +774,6 @@ class Skin extends DataObject
 		return $r;
 	}
 
-
 	/**
 	 * Get a skin specific param value from current Blog
 	 *
@@ -784,27 +783,58 @@ class Skin extends DataObject
 	 */
 	function get_setting( $parname, $group = NULL )
 	{
+		
 		/**
 		 * @var Blog
 		 */
 		global $Collection, $Blog;
 
-		if( ! empty( $group ) )
-		{ // $parname is prefixed with $group, we'll remove the group prefix
-			$parname = substr( $parname, strlen( $group ) );
-		}
-
 		// Name of the setting in the blog settings:
-		$blog_setting_name = 'skin'.$this->ID.'_'.$group.$parname;
-
-		$value = $Blog->get_setting( $blog_setting_name );
+		$blog_setting_name = 'skin'.$this->ID.'_'.$parname;
+		
+		if( strpos( $blog_setting_name, '[' ) !== false )
+		{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
+			$setting_names = explode( '[', $blog_setting_name );
+			$value = $Blog->get_setting( $setting_names[0] );
+			
+			unset( $setting_names[0] );
+			foreach( $setting_names as $setting_name )
+			{
+				$setting_name = trim( $setting_name, ']' );
+				if( isset( $value[ $setting_name ] ) )
+				{
+					$value = $value[ $setting_name ];
+				}
+				else
+				{
+					$value = NULL;
+					break;
+				}
+			}
+		}
+		else
+		{	// Get normal(not array) setting value:
+			$value = $Blog->get_setting( $blog_setting_name );
+		}
+		
+		/* 
+		*	array:array:string will have serialized data
+		*/
+		
+		// Check if value has serialized data
+		$params = @unserialize( $value );
+		
+		if ( $params !== false ) 
+		{
+			$value = $params;
+		} 
 
 		if( ! is_null( $value ) )
 		{	// We have a value for this param:
 			return $value;
 		}
-
-		return $this->get_setting_default_value( $group.$parname, $group );
+		
+		return $this->get_setting_default_value( $parname, $group );
 	}
 
 
@@ -816,14 +846,48 @@ class Skin extends DataObject
 	 * @return string|array|NULL
 	 */
 	function get_setting_default_value( $parname, $group = NULL )
-	{
-		if( ! empty ( $group ) )
-		{
-			$parname = substr( $parname, strlen( $group ) );
-		}
-
+	{		
 		// Try default values:
 		$params = $this->get_param_definitions( NULL );
+		
+		if( strpos( $parname, '[' ) !== false )
+		{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
+			
+			// strip out all the iterations for default values
+			$parsetting_names = explode( '[', str_replace( ']', '', preg_replace('/\[\d\]/', '', $parname ) ) );
+			
+			$setting_names = explode( '[', str_replace( ']', '', $parname ) );
+			
+			$parname = substr( end( $parsetting_names ), strlen( $group ) );
+			/* 
+			* match $params level to $parname
+			*/ 
+			for( $i = 0; $i < count( $parsetting_names ); $i++ )
+			{
+				if( isset( $params[ $parsetting_names[$i] ] ) )
+				{
+					if( isset( $params[ $parsetting_names[$i] ]['entries'] ) )
+					{
+						$params = $params[ $parsetting_names[$i] ]['entries'];
+					}
+				}
+			}
+		}
+		else
+		{
+			if( ! empty ( $group ) )
+			{
+				$parname = substr( $parname, strlen( $group ) );
+			}
+		}
+		
+		if( isset( $params[ $parname ] ) )
+		{
+			if( isset( $params[ $parname ]['entries'] ) )
+			{
+				$params = $params[ $parname ]['entries'];
+			}
+		}
 		if( isset( $params[ $parname ]['defaultvalue'] ) )
 		{ // We have a default value:
 			return $params[ $parname ]['defaultvalue'] ;
@@ -857,7 +921,58 @@ class Skin extends DataObject
 		{
 			return $params[ $group ]['inputs'][ $parname ]['defaultvalue'];
 		}
+		elseif( isset( $params[ $group ]['type'] ) )
+		{
+			$type = $params[ $group ]['type'];
+			
+			if( strpos( $parname, '[' ) !== false )
+			{
+				$setting_names = explode( '[', $parname );
 
+				if( isset( $setting_names[2] ) )
+				{
+					$parname = substr( trim( $setting_names[2], ']' ), strlen( $group ) );
+
+				}
+			}
+
+			switch($type)
+			{
+				case 'input_group':
+
+					if( ! empty( $params[ $group ]['inputs'] ) &&
+					isset( $params[ $group ]['inputs'][ $parname ] ))
+					{
+						return $params[ $group ]['inputs'][ $parname ]['defaultvalue'];
+					}
+
+					break;
+				case 'fileselect':
+	
+					if([ $parname ]['type'] == 'fileselect' &&
+				! empty( $params[ $group ]['inputs'][ $parname ]['initialize_with'] ) &&
+				$default_File = & get_file_by_abspath( $params[ $group ]['inputs'][ $parname ]['initialize_with'], true ) )
+					{// Get default value for fileselect
+						return $default_File->ID;
+					}
+					break;
+				case 'checklist':
+						if(! empty( $params[ $group ]['inputs'][ $parname ]['options'] ) )
+						{ // Get default values for checkbox list:
+							$options = array();
+							foreach( $params[ $group ]['inputs'][ $parname ]['options'] as $option )
+							{
+								if( isset( $option[2] ) )
+								{ // Set default value only if it is defined by skin:
+									$options[ $option[0] ] = $option[2];
+								}
+							}
+							return $options;
+						}
+					break;	
+				}	
+		}
+		
 		return NULL;
 	}
 

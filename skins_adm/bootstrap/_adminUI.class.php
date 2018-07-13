@@ -77,7 +77,14 @@ class AdminUI extends AdminUI_general
 
 		// Load general JS file:
 		require_js( 'build/bootstrap-evo_backoffice.bmin.js', 'rsc_url' );
-
+		
+		/*
+		*
+		*	this should be moved and loaded via ctrl
+		*/
+		
+		require_js( 'dynamic_input.js', 'rsc_url' );
+		require_js( 'select_input.js', 'rsc_url' );
 		// Set bootstrap css classes for messages
 		$Messages->set_params( array(
 				'class_outerdiv' => 'action_messages container-fluid',

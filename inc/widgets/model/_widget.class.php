@@ -416,28 +416,105 @@ class ComponentWidget extends DataObject
 	function get_param( $parname, $check_infinite_loop = false, $group = NULL )
 	{
 		$this->load_param_array();
-
+		
+		// Note we set 'infinite_loop' param to avoid calling the get_param() from the get_param_definitions() function recursively
+		$params = $this->get_param_definitions( $check_infinite_loop ? array( 'infinite_loop' => true ) : NULL );
+		
 		if( strpos( $parname, '[' ) !== false )
 		{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
-			$setting_names = explode( '[', $parname );
+			
+			// strip out all the iterations for default values
+			$parsetting_names = explode( '[', str_replace( ']', '', preg_replace('/\[\d\]/', '', $parname ) ) );
+			
+			$setting_names = explode( '[', str_replace( ']', '', $parname ) );
+			
+			$parname = substr( end( $parsetting_names ), strlen( $group ) );
+			/* 
+			* match $params level to $parname
+			*/ 
+			for( $i = 0; $i < count( $parsetting_names ); $i++ )
+			{
+				if( isset( $params[ $parsetting_names[$i] ] ) )
+				{
+					if( isset( $params[ $parsetting_names[$i] ]['entries'] ) )
+					{
+						$params = $params[ $parsetting_names[$i] ]['entries'];
+					}
+				}
+			}
+			
+			$defaultvalue = function ( $params, $group, $parname )
+			{
+				if( isset( $params[ $group ]['type'] ) )
+				{
+					$type = $params[ $group ]['type'];
+
+					switch( $type )
+					{
+						case 'input_group':
+
+							if( ! empty( $params[ $group ]['inputs'] ) &&
+							isset( $params[ $group ]['inputs'][ $parname ] ))
+							{
+								return $params[ $group ]['inputs'][ $parname ]['defaultvalue'];
+							}
+
+							break;
+						case 'fileselect':
+							if([ $parname ]['type'] == 'fileselect' &&
+						! empty( $params[ $parname ]['initialize_with'] ) &&
+						$default_File = & get_file_by_abspath( $params[ $parname ]['initialize_with'], true ) )
+							{// Get default value for fileselect
+								return $default_File->ID;
+							}
+							break;
+						case 'checklist':
+								if(! empty( $params[ $parname ]['options'] ) )
+								{ // Get default values for checkbox list:
+									$options = array();
+									foreach( $params[ $parname ]['options'] as $option )
+									{
+										if( isset( $option[2] ) )
+										{ // Set default value only if it is defined by skin:
+											$options[ $option[0] ] = $option[2];
+										}
+									}
+									return $options;
+								}
+							break;	
+						default:
+							return NULL;
+							break;
+							
+						}	
+				}
+				
+				return NULL;
+			};
+			
 			if( isset( $this->param_array[ $setting_names[0] ] ) )
 			{
 				$setting_value = $this->param_array[ $setting_names[0] ];
+				
 				unset( $setting_names[0] );
 				foreach( $setting_names as $setting_name )
 				{
-					$setting_name = trim( $setting_name, ']' );
+					
 					if( isset( $setting_value[ $setting_name ] ) )
 					{
 						$setting_value = $setting_value[ $setting_name ];
 					}
 					else
 					{
-						$setting_value = NULL;
+						 $setting_value = $defaultvalue( $params, $group, $parname );
 						break;
 					}
 				}
 				return $setting_value;
+			}
+			else
+			{
+				return $defaultvalue( $params, $group, $parname );
 			}
 		}
 		elseif( isset( $this->param_array[ $parname ] ) )
@@ -446,19 +523,21 @@ class ComponentWidget extends DataObject
 		}
 
 		// Try default values:
-		// Note we set 'infinite_loop' param to avoid calling the get_param() from the get_param_definitions() function recursively
-		$params = $this->get_param_definitions( $check_infinite_loop ? array( 'infinite_loop' => true ) : NULL );
-
 		if( $group === NULL )
 		{	// Get param from simple field:
+			
 			if( isset( $params[$parname]['defaultvalue'] ) )
 			{	// We have a default value:
 				return $params[$parname]['defaultvalue'] ;
 			}
 		}
 		else
-		{	// Get param from group field:
-			$parname = substr( $parname, strlen( $group ) );
+		{
+			$setting_names = explode( '[', $parname );
+			
+			$parname = substr( end($setting_names), strlen( $group ) );
+			// Get param from group field:
+			//$parname = substr( $parname, strlen( $group ) );
 			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
 			{	// We have a default value:
 				return $params[$group]['inputs'][$parname]['defaultvalue'] ;

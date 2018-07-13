@@ -3667,7 +3667,8 @@ class Form extends Widget
 			$field_params['note_format'] = '<div>'.$field_params['note_format'].'</div>';
 		}
 
-		$field_params['id'] = false; // No ID attribute for the label
+		// Why is this set to false for this type? This is needed for js hooks else remove button won't work in type select_input:
+		#$field_params['id'] = false; // No ID attribute for the label
 		if( isset( $field_params['required'] ) )
 		{
 			$field_required = $field_params['required'];
