@@ -2541,15 +2541,6 @@ class Item extends ItemLight
 		// Get all custom fields by item ID:
 		$custom_fields = $this->get_custom_fields_defs();
 
-		// Get only public custom fields for displaying:
-		foreach( $custom_fields as $c => $custom_field )
-		{
-			if( ! $custom_field['public'] )
-			{	// Remove not public custom field from array:
-				unset( $custom_fields[ $c ] );
-			}
-		}
-
 		$fields_exist = false;
 
 		if( empty( $params['fields'] ) )
@@ -2582,6 +2573,18 @@ class Item extends ItemLight
 			}
 
 			$field = $custom_fields[ $field_name ];
+
+			if( ! $field['public'] )
+			{	// Not public field:
+				if( ! empty( $params['fields'] ) )
+				{	// Display an error message only when fields are called by names:
+					$values = array( $field['label'], '<span class="text-danger">'.sprintf( T_('The field "%s" is not public'), $field_name ).'</span>' );
+					$html .= str_replace( $mask, $values, $params['field_format'] );
+					$fields_exist = true;
+				}
+				continue;
+			}
+
 			$custom_field_value = $this->get_custom_field_value( $field_name );
 			if( ! empty( $custom_field_value ) ||
 			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )
@@ -2878,15 +2881,15 @@ class Item extends ItemLight
 				case 'fields':
 					// Render several fields as HTML table:
 					$custom_fields_params = array( 'fields' => trim( $tags[2][ $t ] ) );
-						$field_value = $this->get_custom_fields( $custom_fields_params );
-						if( empty( $field_value ) )
-						{	// Fields don't exist:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The Item has no custom fields').'</span>', $content );
-						}
-						else
-						{	// Display fields:
-							$content = str_replace( $source_tag, $field_value, $content );
-						}
+					$field_value = $this->get_custom_fields( $custom_fields_params );
+					if( empty( $field_value ) )
+					{	// Fields don't exist:
+						$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The Item has no custom fields').'</span>', $content );
+					}
+					else
+					{	// Display fields:
+						$content = str_replace( $source_tag, $field_value, $content );
+					}
 					break;
 
 				case 'field':
@@ -2899,7 +2902,15 @@ class Item extends ItemLight
 					}
 					else
 					{	// Display field value:
-						$content = str_replace( $source_tag, $field_value, $content );
+						$custom_fields = $this->get_custom_fields_defs();
+						if( $custom_fields[ $field_index ]['public'] )
+						{	// Display value only if custom field is public:
+							$content = str_replace( $source_tag, $field_value, $content );
+						}
+						else
+						{	// Display an error for not public custom field:
+							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public'), $field_index ).'</span>', $content );
+						}
 					}
 					break;
 			}
@@ -2987,7 +2998,15 @@ class Item extends ItemLight
 						}
 						else
 						{	// Display field value:
-							$content = str_replace( $source_tag, $field_value, $content );
+							$custom_fields = $other_Item->get_custom_fields_defs();
+							if( $custom_fields[ $field_index ]['public'] )
+							{	// Display value only if custom field is public:
+								$content = str_replace( $source_tag, $field_value, $content );
+							}
+							else
+							{	// Display an error for not public custom field:
+								$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public'), $field_index ).'</span>', $content );
+							}
 						}
 						break;
 
@@ -3115,10 +3134,15 @@ class Item extends ItemLight
 				// Get field code:
 				$url_field_code = trim( $link_data[0] );
 
+				$custom_fields = $other_Item->get_custom_fields_defs();
 				$field_value = $other_Item->get_custom_field_value( $url_field_code, 'url', false );
 				if( $field_value === false )
 				{	// Wrong field request, display error:
 					$link_html = '<span class="text-danger">'.sprintf( T_('The URL field "%s" does not exist'), $url_field_code ).'</span>';
+				}
+				elseif( ! $custom_fields[ $url_field_code ]['public'] )
+				{	// Display an error for not public custom field:
+					$link_html = '<span class="text-danger">'.sprintf( T_('The URL field "%s" is not public'), $url_field_code ).'</span>';
 				}
 				elseif( $field_value === '' )
 				{	// Empty field value, display error:
