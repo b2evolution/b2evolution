@@ -2532,11 +2532,22 @@ class Item extends ItemLight
 			$this->custom_fields = $this->get_type_custom_fields();
 		}
 
+		$custom_fields = $this->custom_fields;
+
+		// Get only public custom fields for displaying:
+		foreach( $custom_fields as $c => $custom_field )
+		{
+			if( ! $custom_field['public'] )
+			{	// Remove not public custom field from array:
+				unset( $custom_fields[ $c ] );
+			}
+		}
+
 		$fields_exist = false;
 
 		if( empty( $params['fields'] ) )
 		{	// Display all fields:
-			$display_fields = array_keys( $this->custom_fields );
+			$display_fields = array_keys( $custom_fields );
 		}
 		else
 		{	// Display only the requested fields:
@@ -2544,7 +2555,7 @@ class Item extends ItemLight
 			$fields_exist = true;
 		}
 
-		if( ! $fields_exist && count( $this->custom_fields ) == 0 )
+		if( ! $fields_exist && count( $custom_fields ) == 0 )
 		{	// No custom fields:
 			return '';
 		}
@@ -2555,7 +2566,7 @@ class Item extends ItemLight
 		foreach( $display_fields as $field_name )
 		{
 			$field_name = trim( $field_name );
-			if( ! isset( $this->custom_fields[ $field_name ] ) )
+			if( ! isset( $custom_fields[ $field_name ] ) )
 			{	// Wrong field:
 				$values = array( $field_name, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_name ).'</span>' );
 				$html .= str_replace( $mask, $values, $params['field_format'] );
@@ -2563,7 +2574,7 @@ class Item extends ItemLight
 				continue;
 			}
 
-			$field = $this->custom_fields[ $field_name ];
+			$field = $custom_fields[ $field_name ];
 			$custom_field_value = $this->get_custom_field_value( $field_name );
 			if( ! empty( $custom_field_value ) ||
 			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )

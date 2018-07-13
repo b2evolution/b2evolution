@@ -144,15 +144,21 @@ class item_fields_compare_Widget extends ComponentWidget
 			$item_custom_fields = $Item->get_type_custom_fields();
 			foreach( $item_custom_fields as $item_custom_field_key => $item_custom_field )
 			{
+				if( ! $item_custom_field['public'] )
+				{	// Skip not public custom field:
+					continue;
+				}
 				if( ! isset( $all_custom_fields[ $item_custom_field['ID'] ] ) )
-				{
+				{	// Initialize array to store values from all requested posts:
 					$all_custom_fields[ $item_custom_field['ID'] ] = $item_custom_field;
 					$all_custom_fields[ $item_custom_field['ID'] ]['values'] = array();
 				}
+				// Store custom field value of the post:
 				$all_custom_fields[ $item_custom_field['ID'] ]['values'][ $Item->ID ] = $Item->get_custom_field_value( $item_custom_field_key );
 			}
 		}
 
+		// Sort custom fields from all requested posts by custom field order:
 		usort( $all_custom_fields, array( $this, 'sort_custom_fields' ) );
 
 		if( empty( $all_custom_fields ) )
