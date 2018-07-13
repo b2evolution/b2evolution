@@ -89,6 +89,12 @@ class item_fields_compare_Widget extends ComponentWidget
 					'note' => T_('This is the title to display'),
 					'defaultvalue' => '',
 				),
+				'fields' => array(
+					'type' => 'textarea',
+					'label' => T_('Fields to compare'),
+					'note' => T_('Enter one field name per line.').' '.T_('Leave empty to compare all fields.'),
+					'rows' => 10,
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -133,6 +139,10 @@ class item_fields_compare_Widget extends ComponentWidget
 		$ItemCache = & get_ItemCache();
 		$ItemCache->load_list( $items );
 
+		// Check what fields should be displayed for this widget:
+		$widget_fields = trim( $this->get_param( 'fields' ) );
+		$widget_fields = empty( $widget_fields ) ? false : preg_split( '#[\s\n\r]+#', $widget_fields );
+
 		$all_custom_fields = array();
 		foreach( $items as $i => $item_ID )
 		{
@@ -141,25 +151,51 @@ class item_fields_compare_Widget extends ComponentWidget
 				unset( $items[ $i ] );
 				continue;
 			}
-			$item_custom_fields = $Item->get_type_custom_fields();
-			foreach( $item_custom_fields as $item_custom_field_key => $item_custom_field )
+
+			// Load all custom fields of the Item in cache:
+			$item_custom_fields = $Item->get_custom_fields_defs();
+			// Use either all custom fields of the Item or only specified fields in config of this Widget:
+			$search_custom_fields = $widget_fields ? $widget_fields : array_keys( $item_custom_fields );
+
+			foreach( $search_custom_fields as $search_custom_field_key )
 			{
+				if( ! isset( $all_custom_fields[ $search_custom_field_key ] ) )
+				{	// Initialize array to keep fields in the requested order:
+					$all_custom_fields[ $search_custom_field_key ] = array();
+				}
+				if( ! isset( $item_custom_fields[ $search_custom_field_key ] ) )
+				{	// Skip because the post has no this custom field:
+					continue;
+				}
+				$item_custom_field = $item_custom_fields[ $search_custom_field_key ];
 				if( ! $item_custom_field['public'] )
 				{	// Skip not public custom field:
 					continue;
 				}
-				if( ! isset( $all_custom_fields[ $item_custom_field['ID'] ] ) )
+				if( empty( $all_custom_fields[ $search_custom_field_key ] ) )
 				{	// Initialize array to store values from all requested posts:
-					$all_custom_fields[ $item_custom_field['ID'] ] = $item_custom_field;
-					$all_custom_fields[ $item_custom_field['ID'] ]['values'] = array();
+					$all_custom_fields[ $search_custom_field_key ] = $item_custom_field;
+					$all_custom_fields[ $search_custom_field_key ]['values'] = array();
 				}
 				// Store custom field value of the post:
-				$all_custom_fields[ $item_custom_field['ID'] ]['values'][ $Item->ID ] = $Item->get_custom_field_value( $item_custom_field_key );
+				$all_custom_fields[ $search_custom_field_key ]['values'][ $Item->ID ] = $Item->get_custom_field_value( $search_custom_field_key );
 			}
 		}
 
-		// Sort custom fields from all requested posts by custom field order:
-		usort( $all_custom_fields, array( $this, 'sort_custom_fields' ) );
+		// Clear array to remove fields which are not used by any post,
+		// for case when field doesn't exist or not public:
+		foreach( $all_custom_fields as $a => $all_custom_field )
+		{
+			if( empty( $all_custom_field ) )
+			{
+				unset( $all_custom_fields[ $a ] );
+			}
+		}
+
+		if( $widget_fields === false )
+		{	// Sort custom fields from all requested posts by custom field order:
+			usort( $all_custom_fields, array( $this, 'sort_custom_fields' ) );
+		}
 
 		if( empty( $all_custom_fields ) )
 		{	// Don't display widget if all selected items have no custom fields:

@@ -618,12 +618,12 @@ class ItemType extends DataObject
 			else
 			{ // Get the custom fields from DB
 				global $DB;
-				$SQL = new SQL();
+				$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->ID );
 				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, itcf_public AS public' );
 				$SQL->FROM( 'T_items__type_custom_field' );
 				$SQL->WHERE( 'itcf_ityp_ID = '.$DB->quote( $this->ID ) );
 				$SQL->ORDER_BY( 'itcf_order, itcf_ID' );
-				$this->custom_fields = $DB->get_results( $SQL->get(), ARRAY_A );
+				$this->custom_fields = $DB->get_results( $SQL, ARRAY_A );
 			}
 		}
 

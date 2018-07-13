@@ -988,6 +988,10 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 				$l_param_default = array();
 				break;
 
+			case 'textarea':
+				$l_param_type = 'text';
+				break;
+
 			case 'html_input':
 			case 'html_textarea':
 				$l_param_type = 'html';
