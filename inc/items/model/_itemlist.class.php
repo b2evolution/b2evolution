@@ -799,7 +799,7 @@ class ItemList2 extends ItemListLight
 						// asimo> If we would like to order the null values into the end of the result, then we must check the current direction
 						// asimo> In that case NULL values should be allowed only if the direction is 'NEXT' no matter what is the current $operator value
 
-						$custom_field_value = $current_Item->get_custom_field_value( $compare_field_name );
+						$custom_field_value = $current_Item->get_custom_field_value( $compare_field_name, false, false );
 						if( ( $custom_field_value === false ) || ( $custom_field_value === NULL ) )
 						{ // This custom field is not set for the current Item
 							$where_condition .= ( $operator == ' > ' ? $compare_field.' IS NOT NULL' : 'FALSE' );

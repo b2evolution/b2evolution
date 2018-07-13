@@ -2412,9 +2412,10 @@ class Item extends ItemLight
 	 *
 	 * @param string Field index which by default is the field name, see {@link load_custom_field_value()}
 	 * @param string Restring field by type, FALSE - to don't restrict
+	 * @param boolean Format value depending on field type
 	 * @return mixed false if the field doesn't exist Double/String otherwise depending from the custom field type
 	 */
-	function get_custom_field_value( $field_index, $restrict_type = false )
+	function get_custom_field_value( $field_index, $restrict_type = false, $format_value = true )
 	{
 		if( $this->load_custom_field_value( $field_index ) )
 		{
@@ -2423,10 +2424,21 @@ class Item extends ItemLight
 				return false;
 			}
 
-			$custom_field_value = utf8_trim( $this->custom_fields[ $field_index ]['value'] );
-			if( $this->custom_fields[ $field_index ]['type'] == 'text' )
-			{	// Escape html tags and convert new lines to html <br> for text fields:
-				$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
+			$custom_field_value = $this->custom_fields[ $field_index ]['value'];
+			if( $format_value )
+			{	// Format value:
+				switch( $this->custom_fields[ $field_index ]['type'] )
+				{
+					case 'text':
+						// Escape html tags and convert new lines to html <br> for text fields:
+						$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
+						break;
+
+					case 'url':
+						// Display url fields as link:
+						$custom_field_value = get_link_tag( $custom_field_value );
+						break;
+				}
 			}
 			return $custom_field_value;
 		}
@@ -2552,24 +2564,11 @@ class Item extends ItemLight
 			}
 
 			$field = $this->custom_fields[ $field_name ];
-			$custom_field_value = utf8_trim( $this->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] ) );
+			$custom_field_value = $this->get_custom_field_value( $field_name );
 			if( ! empty( $custom_field_value ) ||
 			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )
 			{	// Display only the filled field AND also numeric field with '0' value:
-				switch( $field['type'] )
-				{
-					case 'text':
-						// Escape html tags and convert new lines to html <br> for text fields:
-						$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
-						break;
-
-					case 'url':
-						// Display url fields as link:
-						$custom_field_value = get_link_tag( $custom_field_value );
-						break;
-				}
-				$values = array( $field['label'], $custom_field_value );
-				$html .= str_replace( $mask, $values, $params['field_format'] );
+				$html .= str_replace( $mask, array( $field['label'], $custom_field_value ), $params['field_format'] );
 				$fields_exist = true;
 			}
 		}
@@ -3063,7 +3062,7 @@ class Item extends ItemLight
 				// Get field code:
 				$url_field_code = trim( $link_data[0] );
 
-				$field_value = $field_Item->get_custom_field_value( $url_field_code, 'url' );
+				$field_value = $field_Item->get_custom_field_value( $url_field_code, 'url', false );
 				if( $field_value === false )
 				{	// Wrong field request, display error:
 					$link_html = '<span class="text-danger">'.sprintf( T_('The URL field "%s" does not exist'), $url_field_code ).'</span>';
@@ -6689,7 +6688,7 @@ class Item extends ItemLight
 							if( isset( $child_custom_fields[ $custom_field_code ] ) &&
 							    $child_custom_fields[ $custom_field_code ]['type'] == $custom_field['type'] )
 							{	// If child post has a custom field with same code and type:
-								$child_Item->set_setting( 'custom_'.$custom_field['type'].'_'.$child_custom_fields[ $custom_field_code ]['ID'], $this->get_custom_field_value( $custom_field_code, $custom_field['type'] ) );
+								$child_Item->set_setting( 'custom_'.$custom_field['type'].'_'.$child_custom_fields[ $custom_field_code ]['ID'], $this->get_custom_field_value( $custom_field_code, $custom_field['type'], false ) );
 								// Mark to know custom fields of the child post must be updated from parent:
 								$update_child_custom_field = true;
 							}
@@ -9573,7 +9572,7 @@ class Item extends ItemLight
 		$text_custom_fields = $this->get_type_custom_fields( 'varchar,text,html' );
 		foreach( $text_custom_fields as $field_index => $text_custom_field )
 		{
-			$search_string .= $this->get_custom_field_value( $field_index ).' ';
+			$search_string .= $this->get_custom_field_value( $field_index, false, false ).' ';
 		}
 
 		// Clear spaces:

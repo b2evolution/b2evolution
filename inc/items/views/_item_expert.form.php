@@ -306,7 +306,7 @@ $Form->begin_form( '', '', $params );
 				$custom_field_note .= T_('Field name').': <code>'.$custom_field['name'].'</code>';
 				if( $parent_Item )
 				{	// Display a value of parent post custom field:
-					$parent_custom_field_value = $parent_Item->get_custom_field_value( $custom_field['name'], $custom_field['type'] );
+					$parent_custom_field_value = $parent_Item->get_custom_field_value( $custom_field['name'], $custom_field['type'], false );
 					if( $parent_custom_field_value !== false )
 					{	// If parent post realy has a custom field with same code and type
 						$preview_parent_custom_field_value = $parent_custom_field_value;
