@@ -1461,6 +1461,8 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$edited_Item->set_tags_from_string( 'demo' );
 				$edited_Item->set_setting( 'custom:first_numeric_field', '123' );
 				$edited_Item->set_setting( 'custom:second_numeric_field', '456' );
+				$edited_Item->set_setting( 'custom:usd_price', '29.99' );
+				$edited_Item->set_setting( 'custom:eur_price', '24.79' );
 				$edited_Item->set_setting( 'custom:first_string_field', 'abc' );
 				$edited_Item->set_setting( 'custom:define_your_own_labels', 'Enter your own values' );
 				$edited_Item->set_setting( 'custom:multiline_plain_text_field', 'This is a sample text field.
@@ -1491,6 +1493,8 @@ It can have multiple lines.' );
 				$edited_Item->set_tags_from_string( 'demo' );
 				$edited_Item->set_setting( 'custom:first_numeric_field', '123.45' );
 				$edited_Item->set_setting( 'custom:second_numeric_field', '456' );
+				$edited_Item->set_setting( 'custom:usd_price', '17.50' );
+				$edited_Item->set_setting( 'custom:eur_price', '14.95' );
 				$edited_Item->set_setting( 'custom:first_string_field', 'abcdef' );
 				$edited_Item->set_setting( 'custom:define_your_own_labels', 'Enter your own values' );
 				$edited_Item->set_setting( 'custom:multiline_plain_text_field', 'This is a sample text field.

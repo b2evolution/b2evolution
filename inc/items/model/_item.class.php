@@ -2393,7 +2393,7 @@ class Item extends ItemLight
 			global $DB;
 
 			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
-			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, itcf_public AS public, iset_value AS value' );
+			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, itcf_public AS public, itcf_format AS format, iset_value AS value' );
 			$SQL->FROM( 'T_items__type_custom_field' );
 			$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON itcf_name = SUBSTRING( iset_name, 8 )' );
 			$SQL->WHERE( 'iset_item_ID = '.$this->ID );
@@ -2437,6 +2437,39 @@ class Item extends ItemLight
 			{	// Format value:
 				switch( $this->custom_fields[ $field_index ]['type'] )
 				{
+					case 'double':
+						$format = $this->custom_fields[ $field_index ]['format'];
+						if( ! empty( $format ) )
+						{	// If format is not empty:
+							$format = preg_split( '#(\d+)#', $format, -1, PREG_SPLIT_DELIM_CAPTURE );
+							$f_num = count( $format );
+							$format_decimals = 0;
+							$format_dec_point = '.';
+							$format_thousands_sep = '';
+							$format_prefix = isset( $format[0] ) ? $format[0] : '';
+							$format_suffix = $f_num > 1 ? $format[ $f_num - 1 ] : '';
+							if( $f_num > 2 )
+							{	// Extract data for number fomatting:
+								if( $f_num > 3 && preg_match( '#^\d+$#', $format[ $f_num - 2 ] ) )
+								{	// Get a number of digits after dot:
+									$format_decimals = strlen( $format[ $f_num - 2 ] );
+								}
+								if( $f_num > 4 && preg_match( '#^[^\d]+$#', $format[ $f_num - 3 ] ) )
+								{	// Get a decimal point:
+									$format_dec_point = $format[ $f_num - 3 ];
+								}
+								if( $f_num > 6 && preg_match( '#^[^\d]+$#', $format[ $f_num - 5 ] ) )
+								{	// Get a thousands separator:
+									$format_thousands_sep = $format[ $f_num - 5 ];
+								}
+								// Format number with extracted data:
+								$custom_field_value = number_format( $custom_field_value, $format_decimals, $format_dec_point, $format_thousands_sep );
+							}
+							// Add prefix and suffix:
+							$custom_field_value = $format_prefix.$custom_field_value.$format_suffix;
+						}
+						break;
+
 					case 'text':
 						// Escape html tags and convert new lines to html <br> for text fields:
 						$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
