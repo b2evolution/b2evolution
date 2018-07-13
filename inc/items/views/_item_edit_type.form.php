@@ -54,7 +54,7 @@ $Results->global_icon( T_('Do NOT change the type'), 'close', $close_url );
  */
 function get_name_for_itemtype( $ityp_ID, $name )
 {
-	global $admin_url, $edited_Item, $from_tab;
+	global $admin_url, $edited_Item, $from_tab, $blog;
 
 	$current = $edited_Item->ityp_ID == $ityp_ID ? ' '.T_('(current)') : '';
 
@@ -62,7 +62,7 @@ function get_name_for_itemtype( $ityp_ID, $name )
 
 	$duplicated_item_param = get_param( 'p' ) > 0 ? '&amp;p='.get_param( 'p' ) : '';
 
-	return '<strong><a href="'.$admin_url.'?ctrl=items&amp;action=update_type&amp;post_ID='.$edited_Item->ID.'&amp;ityp_ID='.$ityp_ID.$from_tab_param.$duplicated_item_param.'&amp;'.url_crumb( 'item' ).'">'
+	return '<strong><a href="'.$admin_url.'?ctrl=items&amp;action=update_type&amp;blog='.$blog.'&amp;post_ID='.$edited_Item->ID.'&amp;ityp_ID='.$ityp_ID.$from_tab_param.$duplicated_item_param.'&amp;'.url_crumb( 'item' ).'">'
 		.$name.'</a></strong>'
 		.$current;
 }
