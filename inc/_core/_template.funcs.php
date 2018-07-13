@@ -475,6 +475,7 @@ function get_request_title( $params = array() )
 			'tags_text'           => T_('Tags'),
 			'flagged_text'        => T_('Flagged posts'),
 			'help_text'           => T_('In case of issues with this site...'),
+			'compare_text'        => T_('Compare posts'),
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -831,6 +832,11 @@ function get_request_title( $params = array() )
 
 		case 'help':
 			$r[] = $params['help_text'];
+			break;
+
+		case 'compare':
+			// We are requesting the compare list:
+			$r[] = $params['compare_text'];
 			break;
 
 		case 'posts':
