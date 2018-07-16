@@ -475,7 +475,8 @@ function get_request_title( $params = array() )
 			'tags_text'           => T_('Tags'),
 			'flagged_text'        => T_('Flagged posts'),
 			'help_text'           => T_('In case of issues with this site...'),
-			'compare_text'        => T_('Compare posts'),
+			'compare_text'           => /* TRANS: title for disp=compare */ T_('%s compared'),
+			'compare_text_separator' => /* TRANS: title separator for disp=compare */ ' '.T_('vs').' ',
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -836,7 +837,28 @@ function get_request_title( $params = array() )
 
 		case 'compare':
 			// We are requesting the compare list:
-			$r[] = $params['compare_text'];
+			$items = trim( param( 'items', '/^[\d,]*$/' ), ',' );
+
+			if( ! empty( $items ) )
+			{	// It at least one item is selected to compare
+				$items = explode( ',', $items );
+
+				// Load all requested posts into the cache:
+				$ItemCache = & get_ItemCache();
+				$ItemCache->load_list( $items );
+
+				$compare_item_titles = array();
+				foreach( $items as $item_ID )
+				{
+					if( $Item = & $ItemCache->get_by_ID( $item_ID, false, false ) )
+					{	// Use only existing Item:
+						$compare_item_titles[] = $Item->get( 'title' );
+					}
+				}
+
+				$r[] = sprintf( $params['compare_text'], implode( $params['compare_text_separator'], $compare_item_titles ) );
+			}
+
 			break;
 
 		case 'posts':
