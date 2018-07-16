@@ -2492,7 +2492,7 @@ class Item extends ItemLight
 					case 'image':
 						// Display image fields as thumbnail:
 						$LinkCache = & get_LinkCache();
-						if( $Link = & $LinkCache->get_by_ID( $custom_field_value ) )
+						if( $Link = & $LinkCache->get_by_ID( $custom_field_value, false, false ) )
 						{
 							$custom_field_value = $Link->get_tag( array(
 								'image_size'     => $this->custom_fields[ $field_index ]['format'],

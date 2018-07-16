@@ -187,12 +187,12 @@ class item_fields_compare_Widget extends ComponentWidget
 					continue;
 				}
 				if( empty( $all_custom_fields[ $search_custom_field_key ] ) )
-				{	// Initialize array to store values from all requested posts:
+				{	// Initialize array to store items which really have this custom field:
 					$all_custom_fields[ $search_custom_field_key ] = $item_custom_field;
-					$all_custom_fields[ $search_custom_field_key ]['values'] = array();
+					$all_custom_fields[ $search_custom_field_key ]['items'] = array();
 				}
-				// Store custom field value of the post:
-				$all_custom_fields[ $search_custom_field_key ]['values'][ $Item->ID ] = $Item->get_custom_field_value( $search_custom_field_key );
+				// Store ID of the post which has this custom field:
+				$all_custom_fields[ $search_custom_field_key ]['items'][] = $item_ID;
 			}
 		}
 
@@ -221,19 +221,47 @@ class item_fields_compare_Widget extends ComponentWidget
 		foreach( $all_custom_fields as $c => $custom_field )
 		{
 			$all_custom_fields[ $c ]['is_different'] = false;
-			if( $items_count != count( $custom_field['values'] ) )
+			if( $items_count != count( $custom_field['items'] ) )
 			{	// If some post has no field then it is a different:
 				$all_custom_fields[ $c ]['is_different'] = true;
 			}
 			else
 			{	// Compare values:
 				$prev_custom_field_value = NULL;
-				foreach( $custom_field['values'] as $v => $custom_field_value )
+				foreach( $custom_field['items'] as $item_ID )
 				{
-					if( $prev_custom_field_value !== NULL && $custom_field_value != $prev_custom_field_value )
+					$Item = & $ItemCache->get_by_ID( $item_ID, false, false );
+					$custom_field_value = $Item->get_custom_field_value( $custom_field['name'], false, false );
+					if( $prev_custom_field_value !== NULL )
 					{
-						$all_custom_fields[ $c ]['is_different'] = true;
-						break;
+						switch( $custom_field['type'] )
+						{
+							case 'image':
+								// Special comparing for image fields:
+								$LinkCache = & get_LinkCache();
+								if( $prev_Link = & $LinkCache->get_by_ID( $prev_custom_field_value, false, false ) &&
+								    $prev_File = & $prev_Link->get_File() &&
+								    $cur_Link = & $LinkCache->get_by_ID( $custom_field_value, false, false ) &&
+								    $cur_File = & $cur_Link->get_File() )
+								{	// Compare hashes of the two files:
+									$is_different = $prev_File->get( 'hash' ) != $cur_File->get( 'hash' );
+								}
+								else
+								{	// If at least one field has a wrong link ID then compare IDs:
+									$is_different = $custom_field_value != $prev_custom_field_value;
+								}
+								break;
+
+							default:
+								$is_different = $custom_field_value != $prev_custom_field_value;
+								break;
+						}
+						if( $is_different )
+						{	// Mark this field is different:
+							$all_custom_fields[ $c ]['is_different'] = true;
+							// Don't compare next field values because two first differences is enough:
+							break;
+						}
 					}
 					$prev_custom_field_value = $custom_field_value;
 				}
@@ -265,7 +293,15 @@ class item_fields_compare_Widget extends ComponentWidget
 			foreach( $items as $item_ID )
 			{
 				// Custom field value per each post:
-				$custom_field_value = isset( $custom_field['values'][ $item_ID ] ) ? $custom_field['values'][ $item_ID ] : '';
+				if( in_array( $item_ID, $custom_field['items'] ) )
+				{	// Get a formatted value if post has this custom field:
+					$Item = & $ItemCache->get_by_ID( $item_ID, false, false );
+					$custom_field_value = $Item->get_custom_field_value( $custom_field['name'] );
+				}
+				else
+				{	// This post has no this custom field:
+					$custom_field_value = '';
+				}
 				echo str_replace( '$field_value$', $custom_field_value, $params['fields_compare_field_value'] );
 			}
 
