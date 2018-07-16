@@ -105,6 +105,7 @@ class photoblog_Skin extends Skin
 				'access_denied'          => array( NT_('Access Denied'), 130 ),
 				'help'                   => array( NT_('Help'), 140 ),
 				'register'               => array( NT_('Register'), 150 ),
+				'compare_main_area'      => array( NT_('Compare Main Area'), 160 ),
 			);
 	}
 

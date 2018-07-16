@@ -129,6 +129,7 @@ class bootstrap_photoblog_Skin extends Skin
 				'access_denied'             => array( NT_('Access Denied'), 150 ),
 				'help'                      => array( NT_('Help'), 160 ),
 				'register'                  => array( NT_('Register'), 170 ),
+				'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
 			);
 	}
 

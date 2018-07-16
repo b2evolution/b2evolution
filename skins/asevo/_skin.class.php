@@ -93,6 +93,7 @@ class asevo_Skin extends Skin
 				'access_denied'          => array( NT_('Access Denied'), 100 ),
 				'help'                   => array( NT_('Help'), 110 ),
 				'register'               => array( NT_('Register'), 120 ),
+				'compare_main_area'      => array( NT_('Compare Main Area'), 130 ),
 			);
 	}
 

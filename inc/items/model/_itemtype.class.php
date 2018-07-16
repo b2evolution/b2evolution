@@ -361,6 +361,8 @@ class ItemType extends DataObject
 				$custom_field_name = param( 'custom_'.$type.'_fname'.$i, '/^[a-z0-9\-_]+$/', NULL );
 				$custom_field_order = param( 'custom_'.$type.'_order'.$i, 'integer', NULL );
 				$custom_field_note = param( 'custom_'.$type.'_note'.$i, 'string', NULL );
+				$custom_field_public = param( 'custom_'.$type.'_public'.$i, 'integer', 0 );
+				$custom_field_format = param( 'custom_'.$type.'_format'.$i, 'string', NULL );
 				$custom_field_is_new = param( 'custom_'.$type.'_new'.$i, 'integer', 0 );
 
 				// Add each new/existing custom field in this array
@@ -374,6 +376,8 @@ class ItemType extends DataObject
 						'type'    => $type,
 						'order'   => $custom_field_order,
 						'note'    => $custom_field_note,
+						'public'  => $custom_field_public,
+						'format'  => $custom_field_format,
 					);
 
 				if( empty( $custom_field_label ) )
@@ -404,6 +408,8 @@ class ItemType extends DataObject
 						'label' => $custom_field_label,
 						'order' => $custom_field_order,
 						'note'  => $custom_field_note,
+						'public'=> $custom_field_public,
+						'format'=> $custom_field_format,
 					);
 				}
 				else
@@ -414,6 +420,8 @@ class ItemType extends DataObject
 						'label' => $custom_field_label,
 						'order' => $custom_field_order,
 						'note'  => $custom_field_note,
+						'public'=> $custom_field_public,
+						'format'=> $custom_field_format,
 					);
 				}
 			}
@@ -511,18 +519,22 @@ class ItemType extends DataObject
 			$sql_data = array();
 			foreach( $this->insert_custom_fields as $itcf_ID => $custom_field )
 			{
-				$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note )
+				$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format )
 					VALUES ( '.$DB->quote( $this->ID ).', '
 						.$DB->quote( $custom_field['label'] ).', '
 						.$DB->quote( $custom_field['name'] ).', '
 						.$DB->quote( $custom_field['type'] ).', '
 						.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).', '
-						.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).' )' );
+						.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).', '
+						.$DB->quote( $custom_field['public'] ).', '
+						.$DB->quote( $custom_field['format'] ).' )' );
 			}
 		}
 
 		if( ! empty( $this->update_custom_fields ) )
-		{ // Update custom fields
+		{	// Update custom fields:
+			unset( $this->custom_fields );
+			$old_custom_fields = $this->get_custom_fields( 'all', 'ID' );
 			foreach( $this->update_custom_fields as $itcf_ID => $custom_field )
 			{
 				$DB->query( 'UPDATE T_items__type_custom_field
@@ -530,10 +542,18 @@ class ItemType extends DataObject
 						itcf_label = '.$DB->quote( $custom_field['label'] ).',
 						itcf_name = '.$DB->quote( $custom_field['name'] ).',
 						itcf_order = '.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).',
-						itcf_note = '.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).'
+						itcf_note = '.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).',
+						itcf_public = '.$DB->quote( $custom_field['public'] ).',
+						itcf_format = '.$DB->quote( $custom_field['format'] ).'
 					WHERE itcf_ityp_ID = '.$DB->quote( $this->ID ).'
 						AND itcf_ID = '.$DB->quote( $itcf_ID ).'
 						AND itcf_type = '.$DB->quote( $custom_field['type'] ) );
+				if( isset( $old_custom_fields[ $itcf_ID ] ) )
+				{	// Update item setting names of custom field to use new field name:
+					$DB->query( 'UPDATE T_items__item_settings
+						  SET iset_name = '.$DB->quote( 'custom:'.$custom_field['name'] ).'
+						WHERE iset_name = '.$DB->quote( 'custom:'.$old_custom_fields[ $itcf_ID ]['name'] ) );
+				}
 			}
 		}
 
@@ -590,7 +610,7 @@ class ItemType extends DataObject
 	 * Get the custom feilds
 	 *
 	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url'. Use comma separator to get several types
-	 * @param string Field name that is used as key of array: 'ID', 'ityp_ID', 'label', 'name', 'type', 'order'
+	 * @param string Field name that is used as key of array: 'ID', 'ityp_ID', 'label', 'name', 'type', 'order', 'public'
 	 * @return array Custom fields
 	 */
 	function get_custom_fields( $type = 'all', $array_key = 'name' )
@@ -604,12 +624,12 @@ class ItemType extends DataObject
 			else
 			{ // Get the custom fields from DB
 				global $DB;
-				$SQL = new SQL();
-				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note' );
+				$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->ID );
+				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, itcf_public AS public, itcf_format AS format' );
 				$SQL->FROM( 'T_items__type_custom_field' );
 				$SQL->WHERE( 'itcf_ityp_ID = '.$DB->quote( $this->ID ) );
 				$SQL->ORDER_BY( 'itcf_order, itcf_ID' );
-				$this->custom_fields = $DB->get_results( $SQL->get(), ARRAY_A );
+				$this->custom_fields = $DB->get_results( $SQL, ARRAY_A );
 			}
 		}
 

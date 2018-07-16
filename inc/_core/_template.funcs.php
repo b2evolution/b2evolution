@@ -475,6 +475,8 @@ function get_request_title( $params = array() )
 			'tags_text'           => T_('Tags'),
 			'flagged_text'        => T_('Flagged posts'),
 			'help_text'           => T_('In case of issues with this site...'),
+			'compare_text'           => /* TRANS: title for disp=compare */ T_('%s compared'),
+			'compare_text_separator' => /* TRANS: title separator for disp=compare */ ' '.T_('vs').' ',
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -831,6 +833,32 @@ function get_request_title( $params = array() )
 
 		case 'help':
 			$r[] = $params['help_text'];
+			break;
+
+		case 'compare':
+			// We are requesting the compare list:
+			$items = trim( param( 'items', '/^[\d,]*$/' ), ',' );
+
+			if( ! empty( $items ) )
+			{	// It at least one item is selected to compare
+				$items = explode( ',', $items );
+
+				// Load all requested posts into the cache:
+				$ItemCache = & get_ItemCache();
+				$ItemCache->load_list( $items );
+
+				$compare_item_titles = array();
+				foreach( $items as $item_ID )
+				{
+					if( $Item = & $ItemCache->get_by_ID( $item_ID, false, false ) )
+					{	// Use only existing Item:
+						$compare_item_titles[] = $Item->get( 'title' );
+					}
+				}
+
+				$r[] = sprintf( $params['compare_text'], implode( $params['compare_text_separator'], $compare_item_titles ) );
+			}
+
 			break;
 
 		case 'posts':
@@ -1647,6 +1675,13 @@ function init_results_js( $relative_to = 'rsc_url' )
  */
 function init_affix_messages_js( $offset = 50 )
 {
+	global $display_mode;
+
+	if( isset( $display_mode ) && $display_mode == 'js' )
+	{	// Don't use affixed Messages in JS mode from modal windows:
+		return;
+	}
+
 	add_js_headline( '
 	jQuery( document ).ready( function()
 	{

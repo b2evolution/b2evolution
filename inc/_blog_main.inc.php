@@ -870,6 +870,7 @@ if( !empty( $skin ) )
 					'useritems'             => 'useritems.main.php',
 					'usercomments'          => 'usercomments.main.php',
 					'users'                 => 'users.main.php',
+					'compare'               => 'compare.main.php',
 					// All others will default to index.main.php
 				);
 

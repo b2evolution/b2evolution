@@ -474,6 +474,14 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	}
 
 
+	/* Compare Main Area */
+	if( array_key_exists( 'compare_main_area', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['compare_main_area']['wico_ID'];
+		add_basic_widget( $wico_id, 'item_fields_compare', 'core', 10 );
+	}
+
+
 	/* 404 Page */
 	if( array_key_exists( '404_page', $blog_containers ) )
 	{

@@ -66,6 +66,7 @@ class touch_Skin extends Skin
 				'access_denied'          => array( NT_('Access Denied'), 160 ),
 				'help'                   => array( NT_('Help'), 170 ),
 				'register'               => array( NT_('Register'), 180 ),
+				'compare_main_area'      => array( NT_('Compare Main Area'), 190 ),
 			);
 	}
 

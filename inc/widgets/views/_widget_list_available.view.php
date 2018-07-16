@@ -128,6 +128,7 @@ $core_componentwidget_defs = array(
 			'item_about_author',
 			'item_seen_by',
 			'item_vote',
+			'item_fields_compare',
 		),
 	'collection' => array(
 			'coll_logo',

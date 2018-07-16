@@ -9857,6 +9857,47 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12920, 'Upgrading post type custom fields table...' ) )
+	{	// part of 6.10.3-stable
+		db_upgrade_cols( 'T_items__type_custom_field', array(
+			'ADD' => array(
+				'itcf_public' => 'TINYINT DEFAULT 1',
+				'itcf_format' => 'VARCHAR(2000) NULL',
+			) ) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12930, 'Update setting names of item custom fields...' ) )
+	{	// part of 6.10.3-stable
+		$SQL = new SQL( 'Get all item custom field settings' );
+		$SQL->SELECT( 'iset_item_ID, iset_name' );
+		$SQL->FROM( 'T_items__item_settings' );
+		$SQL->WHERE( 'iset_name LIKE "custom\_%"' );
+		$custom_field_settings = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+
+		if( count( $custom_field_settings ) )
+		{	// If at least one item has a filled custom field:
+			$SQL = new SQL( 'Get all custom fields of all item types' );
+			$SQL->SELECT( 'itcf_ID, itcf_name' );
+			$SQL->FROM( 'T_items__type_custom_field' );
+			$custom_fields = $DB->get_assoc( $SQL->get(), $SQL->title );
+
+			foreach( $custom_field_settings as $custom_field_setting )
+			{	// Update each old custom field setting name like 'custom_double_1' to new 'custom:field_code'
+				$custom_field_ID = preg_replace( '#^custom_[a-z]+_(\d+)$#', '$1', $custom_field_setting->iset_name );
+				if( isset( $custom_fields[ $custom_field_ID ] ) )
+				{	// If custom field is detected
+					$DB->query( 'UPDATE T_items__item_settings
+						  SET iset_name = '.$DB->quote( 'custom:'.$custom_fields[ $custom_field_ID ] ).'
+						WHERE iset_item_ID = '.$custom_field_setting->iset_item_ID.'
+						  AND iset_name = '.$DB->quote( $custom_field_setting->iset_name ),
+						'Update setting name of item type custom field' );
+				}
+			}
+		}
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '
@@ -10206,6 +10247,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	{	// part of 7.0.0-alpha
 		db_convert_cols_to_utf8mb4( array(
 			'T_email__campaign' => array( 'ecmp_name', 'ecmp_user_tag_sendskip', 'ecmp_user_tag_sendsuccess' ),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13150, 'Converting columns to utf8mb4...' ) )
+	{	// part of 7.0.0-alpha
+		db_convert_cols_to_utf8mb4( array(
+			'T_items__type_custom_field' => array( 'itcf_format' ),
 		) );
 		upg_task_end();
 	}

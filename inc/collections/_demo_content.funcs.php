@@ -1343,7 +1343,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 		// =======================================================================================================
 		case 'std':
 		case 'blog_a':
-			$post_count = 11;
+			$post_count = 12;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -1477,15 +1477,48 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'demo' );
-				$edited_Item->set_setting( 'custom_double_1', '123' );
-				$edited_Item->set_setting( 'custom_double_2', '456' );
-				$edited_Item->set_setting( 'custom_varchar_3', 'abc' );
-				$edited_Item->set_setting( 'custom_varchar_4', 'Enter your own values' );
-				$edited_Item->set_setting( 'custom_text_5', 'This is a sample text field.
- It can have multiple lines.' );
-				$edited_Item->set_setting( 'custom_html_6', 'This is an <b>HTML</b> <i>field</i>.' );
-				$edited_Item->set_setting( 'custom_url_7', 'http://b2evolution.net/' );
+				$edited_Item->set_setting( 'custom:first_numeric_field', '123' );
+				$edited_Item->set_setting( 'custom:second_numeric_field', '456' );
+				$edited_Item->set_setting( 'custom:usd_price', '29.99' );
+				$edited_Item->set_setting( 'custom:eur_price', '24.79' );
+				$edited_Item->set_setting( 'custom:first_string_field', 'abc' );
+				$edited_Item->set_setting( 'custom:multiline_plain_text_field', 'This is a sample text field.
+It can have multiple lines.' );
+				$edited_Item->set_setting( 'custom:multiline_html_field', 'This is an <b>HTML</b> <i>field</i>.' );
+				$edited_Item->set_setting( 'custom:url_field', 'http://b2evolution.net/' );
 				$post_custom_fields_ID = $edited_Item->insert( $owner_ID, T_('Custom Fields Example'),
+'<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>'.
+
+'<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>'.
+
+'<p>[fields]</p>'.
+
+'<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>'.
+
+'<p>[fields:first_numeric_field, first_string_field,second_numeric_field]</p>'.
+
+'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>'.
+
+'<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
+						$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->set_setting( 'custom:first_numeric_field', '123.45' );
+				$edited_Item->set_setting( 'custom:second_numeric_field', '456' );
+				$edited_Item->set_setting( 'custom:usd_price', '17.50' );
+				$edited_Item->set_setting( 'custom:eur_price', '14.95' );
+				$edited_Item->set_setting( 'custom:first_string_field', 'abcdef' );
+				$edited_Item->set_setting( 'custom:multiline_plain_text_field', 'This is a sample text field.
+It can have multiple lines.
+This is an extra line.' );
+				$edited_Item->set_setting( 'custom:multiline_html_field', 'This is an <b>HTML</b> <i>field</i>.' );
+				$edited_Item->set_setting( 'custom:url_field', 'http://b2evolution.net/' );
+				$another_custom_fields_example_ID = $edited_Item->insert( $owner_ID, T_('Another Custom Fields Example'),
 '<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>'.
 
 '<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>'.
@@ -1509,6 +1542,8 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 					$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 					$edited_Item = new Item();
 					$edited_Item->set_tags_from_string( 'demo' );
+					$edited_Item->set_setting( 'custom:first_numeric_field', '123' );
+					$edited_Item->set_setting( 'custom:first_string_field', 'abc' );
 					$edited_Item->set( 'parent_ID', $post_custom_fields_ID ); // Set parent post ID
 					/*$edited_Item->insert( $owner_ID, T_('Child Post Example'), T_('<p>This post has a special post type called "Child Post".</p>'),*/
 					$edited_Item->insert( $owner_ID, T_('Child Post Example'),
@@ -1522,7 +1557,9 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 <p>[parent:fields:first_numeric_field, first_string_field,second_numeric_field]</p>
 
-<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this %s.'), '[parent:field: first_string_field]' ).'</p>
+<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[parent:field: first_string_field]' ).'</p>
+
+<p>'.sprintf( T_('We can also reference fields of any other post like this: %s or like this: %s.'), '[item:another-custom-fields-example:field:first_string_field]', '[item:'.$another_custom_fields_example_ID.':field:first_string_field]' ).'</p>
 
 <p>'.sprintf( T_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 							$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Child Post' );
