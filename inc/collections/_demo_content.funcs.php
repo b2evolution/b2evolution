@@ -1464,7 +1464,6 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$edited_Item->set_setting( 'custom:usd_price', '29.99' );
 				$edited_Item->set_setting( 'custom:eur_price', '24.79' );
 				$edited_Item->set_setting( 'custom:first_string_field', 'abc' );
-				$edited_Item->set_setting( 'custom:define_your_own_labels', 'Enter your own values' );
 				$edited_Item->set_setting( 'custom:multiline_plain_text_field', 'This is a sample text field.
 It can have multiple lines.' );
 				$edited_Item->set_setting( 'custom:multiline_html_field', 'This is an <b>HTML</b> <i>field</i>.' );
@@ -1496,7 +1495,6 @@ It can have multiple lines.' );
 				$edited_Item->set_setting( 'custom:usd_price', '17.50' );
 				$edited_Item->set_setting( 'custom:eur_price', '14.95' );
 				$edited_Item->set_setting( 'custom:first_string_field', 'abcdef' );
-				$edited_Item->set_setting( 'custom:define_your_own_labels', 'Enter your own values' );
 				$edited_Item->set_setting( 'custom:multiline_plain_text_field', 'This is a sample text field.
 It can have multiple lines.
 This is an extra line.' );
@@ -1526,6 +1524,8 @@ This is an extra line.' );
 					$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 					$edited_Item = new Item();
 					$edited_Item->set_tags_from_string( 'demo' );
+					$edited_Item->set_setting( 'custom:first_numeric_field', '123' );
+					$edited_Item->set_setting( 'custom:first_string_field', 'abc' );
 					$edited_Item->set( 'parent_ID', $post_custom_fields_ID ); // Set parent post ID
 					/*$edited_Item->insert( $owner_ID, T_('Child Post Example'), T_('<p>This post has a special post type called "Child Post".</p>'),*/
 					$edited_Item->insert( $owner_ID, T_('Child Post Example'),

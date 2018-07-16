@@ -2599,7 +2599,7 @@ class Item extends ItemLight
 			$field_name = trim( $field_name );
 			if( ! isset( $custom_fields[ $field_name ] ) )
 			{	// Wrong field:
-				$values = array( $field_name, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_name ).'</span>' );
+				$values = array( $field_name, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>' );
 				$html .= str_replace( $mask, $values, $params['field_format'] );
 				$fields_exist = true;
 				continue;
@@ -2611,7 +2611,7 @@ class Item extends ItemLight
 			{	// Not public field:
 				if( ! empty( $params['fields'] ) )
 				{	// Display an error message only when fields are called by names:
-					$values = array( $field['label'], '<span class="text-danger">'.sprintf( T_('The field "%s" is not public'), $field_name ).'</span>' );
+					$values = array( $field['label'], '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_name ).'</span>' );
 					$html .= str_replace( $mask, $values, $params['field_format'] );
 					$fields_exist = true;
 				}
@@ -2917,7 +2917,7 @@ class Item extends ItemLight
 					$field_value = $this->get_custom_fields( $custom_fields_params );
 					if( empty( $field_value ) )
 					{	// Fields don't exist:
-						$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The Item has no custom fields').'</span>', $content );
+						$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The Item has no custom fields.').'</span>', $content );
 					}
 					else
 					{	// Display fields:
@@ -2931,7 +2931,7 @@ class Item extends ItemLight
 					$field_value = $this->get_custom_field_value( $field_index );
 					if( $field_value === false )
 					{	// Wrong field request, display error:
-						$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_index ).'</span>', $content );
+						$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_index ).'</span>', $content );
 					}
 					else
 					{	// Display field value:
@@ -2942,7 +2942,7 @@ class Item extends ItemLight
 						}
 						else
 						{	// Display an error for not public custom field:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public'), $field_index ).'</span>', $content );
+							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_index ).'</span>', $content );
 						}
 					}
 					break;
@@ -3013,7 +3013,7 @@ class Item extends ItemLight
 							) );
 						if( empty( $field_value ) )
 						{	// Fields don't exist:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The parent Item has no custom fields').'</span>', $content );
+							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The parent Item has no custom fields.').'</span>', $content );
 						}
 						else
 						{	// Display fields:
@@ -3027,7 +3027,7 @@ class Item extends ItemLight
 						$field_value = $other_Item->get_custom_field_value( $field_index );
 						if( $field_value === false )
 						{	// Wrong field request, display error:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_index ).'</span>', $content );
+							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_index ).'</span>', $content );
 						}
 						else
 						{	// Display field value:
@@ -3038,7 +3038,7 @@ class Item extends ItemLight
 							}
 							else
 							{	// Display an error for not public custom field:
-								$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public'), $field_index ).'</span>', $content );
+								$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_index ).'</span>', $content );
 							}
 						}
 						break;
@@ -3171,11 +3171,11 @@ class Item extends ItemLight
 				$field_value = $other_Item->get_custom_field_value( $url_field_code, 'url', false );
 				if( $field_value === false )
 				{	// Wrong field request, display error:
-					$link_html = '<span class="text-danger">'.sprintf( T_('The URL field "%s" does not exist'), $url_field_code ).'</span>';
+					$link_html = '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $url_field_code ).'</span>';
 				}
 				elseif( ! $custom_fields[ $url_field_code ]['public'] )
 				{	// Display an error for not public custom field:
-					$link_html = '<span class="text-danger">'.sprintf( T_('The URL field "%s" is not public'), $url_field_code ).'</span>';
+					$link_html = '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $url_field_code ).'</span>';
 				}
 				elseif( $field_value === '' )
 				{	// Empty field value, display error:
