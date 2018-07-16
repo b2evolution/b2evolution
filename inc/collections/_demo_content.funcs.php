@@ -1483,6 +1483,11 @@ It can have multiple lines.' );
 
 '<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 						$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
+				$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$link_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'aftermore' );
+				$edited_Item->set_setting( 'custom:image_1', $link_ID );
+				$edited_Item->dbupdate();
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				// Insert a post:
@@ -1515,6 +1520,11 @@ This is an extra line.' );
 
 '<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 						$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
+				$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$link_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'aftermore' );
+				$edited_Item->set_setting( 'custom:image_1', $link_ID );
+				$edited_Item->dbupdate();
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				if( is_available_item_type( $blog_ID, 'Child Post' ) )
@@ -1545,6 +1555,11 @@ This is an extra line.' );
 
 <p>'.sprintf( T_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 							$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Child Post' );
+					$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
+					$LinkOwner = new LinkItem( $edited_Item );
+					$link_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'aftermore' );
+					$edited_Item->set_setting( 'custom:image_1', $link_ID );
+					$edited_Item->dbupdate();
 					$item_IDs[] = array( $edited_Item->ID, $now );
 				}
 			}

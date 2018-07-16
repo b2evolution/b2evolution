@@ -327,10 +327,10 @@ $Form->begin_form( '', '', $params );
 				switch( $custom_field['type'] )
 				{
 					case 'double':
-						$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 10, $custom_field['label'], $custom_field_note );
+						$Form->text_input( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) );
 						break;
 					case 'varchar':
-						$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+						$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000 ) );
 						break;
 					case 'text':
 						$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field['label'], array( 'note' => $custom_field_note ) );
@@ -339,7 +339,10 @@ $Form->begin_form( '', '', $params );
 						$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field['label'], array( 'note' => $custom_field_note ) );
 						break;
 					case 'url':
-						$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+						$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000 ) );
+						break;
+					case 'image':
+						$Form->text_input( 'item_image_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) );
 						break;
 				}
 			}

@@ -343,7 +343,7 @@ class ItemType extends DataObject
 		// Empty and Initialize the custom fields from POST data
 		$this->custom_fields = array();
 
-		$types = array( 'double', 'varchar', 'text', 'html', 'url' );
+		$types = array( 'double', 'varchar', 'text', 'html', 'url', 'image' );
 		foreach( $types as $type )
 		{
 			$empty_title_error = false; // use this to display empty title fields error message only ones
@@ -609,7 +609,7 @@ class ItemType extends DataObject
 	/**
 	 * Get the custom feilds
 	 *
-	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url'. Use comma separator to get several types
+	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url', 'image'. Use comma separator to get several types
 	 * @param string Field name that is used as key of array: 'ID', 'ityp_ID', 'label', 'name', 'type', 'order', 'public'
 	 * @return array Custom fields
 	 */

@@ -947,6 +947,15 @@ class Item extends ItemLight
 							$param_error = true;
 						}
 						break;
+					case 'image':
+						$param_type = 'integer';
+						$field_value = param( $param_name, 'string', NULL );
+						if( ! empty( $field_value ) && ! is_number( $field_value ) )
+						{
+							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
+							$param_error = true;
+						}
+						break;
 					case 'varchar':
 					default:
 						$param_type = 'string';
@@ -2479,6 +2488,18 @@ class Item extends ItemLight
 						// Display url fields as link:
 						$custom_field_value = get_link_tag( $custom_field_value );
 						break;
+
+					case 'image':
+						// Display image fields as thumbnail:
+						$LinkCache = & get_LinkCache();
+						if( $Link = & $LinkCache->get_by_ID( $custom_field_value ) )
+						{
+							$custom_field_value = $Link->get_tag( array(
+								'image_size'     => $this->custom_fields[ $field_index ]['format'],
+								'image_link_rel' => 'lightbox[p'.$this->ID.']'
+							) );
+						}
+						break;
 				}
 			}
 			return $custom_field_value;
@@ -2499,9 +2520,10 @@ class Item extends ItemLight
 				'before'        => ' ',
 				'after'         => ' ',
 				'format'        => 'htmlbody',
-				'decimals'      => 2,
-				'dec_point'     => '.',
-				'thousands_sep' => ',',
+				// The 3 params are deprecated, use new option "Format" of the item type custom field instead:
+				// 'decimals'      => 2,
+				// 'dec_point'     => '.',
+				// 'thousands_sep' => ',',
 			), $params );
 
 		if( empty( $params['field'] ) )
@@ -2531,14 +2553,7 @@ class Item extends ItemLight
 		elseif( !empty( $value ) )
 		{
 			echo $params['before'];
-			if( $type == 'double' )
-			{
-				echo number_format( $value, $params['decimals'], $params['dec_point'], $params['thousands_sep']  );
-			}
-			else
-			{
-				echo format_to_output( $value, $params['format'] );
-			}
+			echo $this->get_custom_field_value( $field_index );
 			echo $params['after'];
 		}
 	}
@@ -9530,7 +9545,7 @@ class Item extends ItemLight
 	/**
 	 * Get custom fields of post type
 	 *
-	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url'. Use comma separator to get several types
+	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url', 'image'. Use comma separator to get several types
 	 * @return array
 	 */
 	function get_type_custom_fields( $type = 'all' )
