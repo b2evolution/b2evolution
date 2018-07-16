@@ -95,6 +95,14 @@ class item_fields_compare_Widget extends ComponentWidget
 					'note' => T_('Enter one field name per line.').' '.T_('Leave empty to compare all fields.'),
 					'rows' => 10,
 				),
+				'items' => array(
+					'label' => T_('Items to compare'),
+					'note' => sprintf( T_('Separate Item IDs with %s.'), '<code>,</code>' ).' '.sprintf( T_('Leave empty to use URL parameter %s.'), '<code>items=</code>' ),
+					'valid_pattern' => array(
+						'pattern' => '/^(\d+(,\d+)*)?$/',
+						'error'   => T_('Invalid list of Item IDs.')
+					),
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -126,7 +134,13 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		$items = trim( param( 'items', '/^[\d,]*$/' ), ',' );
+		$items = $this->get_param( 'items' );
+		if( empty( $items ) )
+		{	// Use items from URL parameter if widget setting is empty:
+			$items = param( 'items', '/^[\d,]*$/' );
+		}
+
+		$items = trim( $items, ',' );
 
 		if( empty( $items ) )
 		{	// No items to compare:
