@@ -2716,7 +2716,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Convert inline widget tags like [subscribe] and [emailcapture] into HTML tags
+	 * Convert inline widget tags like [subscribe], [emailcapture], [compare] into HTML tags
 	 *
 	 * @param string Source content
 	 * @param array Params
@@ -2737,46 +2737,47 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of widgets:
-		preg_match_all( '/\[(subscribe|emailcapture):([^\]]*)\]/i', $content, $tags );
+		preg_match_all( '/\[(subscribe|emailcapture|compare):([^\]]*)\]/i', $content, $tags );
 
 		if( count( $tags[0] ) > 0 )
 		{	// If at least one widget tag is found in content:
 			foreach( $tags[0] as $t => $source_tag )
 			{	// Render URL custom field as html:
 				$field_Item = $this;
-				$widget_html = $source_tag;
-
-				$widget_params = explode( ':', $tags[2][$t] );
+				$widget_params = false;
+				$widget_html = false;
+				$tag_params = explode( ':', $tags[2][$t] );
 				switch( $tags[1][$t] )
 				{
 					case 'subscribe':
+						// Widget "Newsletter/Email list subscription":
 						$button_notsubscribed = '';
 						$button_subscribed = '';
 						$button_notloggedin = '';
 
-						preg_match( '/(\d+)(?:\/(.*))?/', $widget_params[0], $newsletter_ID_tags );
+						preg_match( '/(\d+)(?:\/(.*))?/', $tag_params[0], $newsletter_ID_tags );
 						$newsletter_ID = intval( $newsletter_ID_tags[1] );
 						if( isset( $newsletter_ID_tags[2] ) )
 						{
 							$user_tags = $newsletter_ID_tags[2];
 						}
 
-						if( isset( $widget_params[1] ) )
+						if( isset( $tag_params[1] ) )
 						{
-							$button_notsubscribed = $widget_params[1];
+							$button_notsubscribed = $tag_params[1];
 						}
 
-						if( isset( $widget_params[2] ) )
+						if( isset( $tag_params[2] ) )
 						{
-							$button_subscribed = $widget_params[2];
+							$button_subscribed = $tag_params[2];
 						}
 
-						if( isset( $widget_params[3] ) )
+						if( isset( $tag_params[3] ) )
 						{
-							$button_notloggedin = $widget_params[3];
+							$button_notloggedin = $tag_params[3];
 						}
 
-						$params = array(
+						$widget_params = array(
 							'widget' => 'newsletter_subscription',
 							'title' => '',
 							'intro' => '',
@@ -2791,16 +2792,16 @@ class Item extends ItemLight
 						);
 						if( ! empty( $button_notsubscribed ) )
 						{
-							$params['button_notsubscribed'] = $button_notsubscribed;
+							$widget_params['button_notsubscribed'] = $button_notsubscribed;
 						}
 						if( ! empty( $button_subscribed ) )
 						{
-							$params['button_subscribed'] = $button_subscribed;
+							$widget_params['button_subscribed'] = $button_subscribed;
 						}
 						if( ! empty( $user_tags ) )
 						{
-							$params['usertags'] = $user_tags;
-							$params['unsubscribed_if_not_tagged'] = true;
+							$widget_params['usertags'] = $user_tags;
+							$widget_params['unsubscribed_if_not_tagged'] = true;
 						}
 
 						if( ! empty( $button_notloggedin ) && ! is_logged_in() )
@@ -2810,21 +2811,14 @@ class Item extends ItemLight
 							$widget_html .= '<a href="'.get_login_url( 'inline subscribe', $redirect_to ).'" class="btn btn-primary">'.$button_notloggedin.'</a>';
 							$widget_html .= '</div>';
 						}
-						else
-						{
-							ob_start();
-							skin_widget( $params );
-							$widget_html = ob_get_contents();
-							ob_end_clean();
-						}
-
 						break;
 
 					case 'emailcapture':
+						// Widget "Email capture / Quick registration":
 						$fields_to_display = array();
 						$button_text = '';
 
-						preg_match( '/(\d+)?(?:\/(.*))?/', $widget_params[0], $newsletter_ID_tags );
+						preg_match( '/(\d+)?(?:\/(.*))?/', $tag_params[0], $newsletter_ID_tags );
 						if( isset( $newsletter_ID_tags[1] ) )
 						{
 							$newsletter_ID = intval( $newsletter_ID_tags[1] );
@@ -2833,16 +2827,16 @@ class Item extends ItemLight
 						{
 							$user_tags = $newsletter_ID_tags[2];
 						}
-						if( isset( $widget_params[1] ) )
+						if( isset( $tag_params[1] ) )
 						{
-							$fields_to_display = explode( '+', $widget_params[1] );
+							$fields_to_display = explode( '+', $tag_params[1] );
 						}
-						if( isset( $widget_params[2] ) )
+						if( isset( $tag_params[2] ) )
 						{
-							$button_text = $widget_params[2];
+							$button_text = $tag_params[2];
 						}
 
-						$params = array(
+						$widget_params = array(
 							'widget' => 'user_register_quick',
 							'title' => '',
 							'intro' => '',
@@ -2876,24 +2870,45 @@ class Item extends ItemLight
 							T_('Also subscribe user to all default newsletters for new users.'),
 							empty( $newsletter_ID ) ? 1 : 0, // checked if no specific newsletter ID specified
 						);
-						$params['newsletters'] = $newsletters_options;
+						$widget_params['newsletters'] = $newsletters_options;
 
 						if( ! empty ( $button_text ) )
 						{
-							$params['button'] = $button_text;
+							$widget_params['button'] = $button_text;
 						}
-
-						ob_start();
-						skin_widget( $params );
-						$widget_html = ob_get_contents();
-						ob_end_clean();
 						break;
 
-					default:
-						$widget_html = 'xxx';
+					case 'compare':
+						// Widget "Compare Item Fields":
+						// Set item IDs to compare:
+						$compare_items = isset( $tag_params[0] ) ? trim( $tag_params[0], ', ' ) : '';
+						if( empty( $compare_items ) )
+						{	// Skip a compare tag without item IDs:
+							break;
+						}
+						// Set fields to compare:
+						$compare_fields = isset( $tag_params[1] ) ? str_replace( ',', "\n", trim( $tag_params[1], ', ' ) ) : '';
+						// Set widget params to display:
+						$widget_params = array(
+							'widget' => 'item_fields_compare',
+							'items'  => $compare_items,
+							'fields' => $compare_fields,
+						);
+						break;
 				}
 
-				$content = substr_replace( $content, $widget_html, strpos( $content, $source_tag ), strlen( $source_tag ) );
+				if( $widget_params !== false )
+				{	// If widget display params are initialized for the inline tag:
+					if( $widget_html === false )
+					{	// Call widget with params only when content is not generated yet above:
+						ob_start();
+						skin_widget( $widget_params );
+						$widget_html = ob_get_contents();
+						ob_end_clean();
+					}
+					// Replace inline widget tag with content generated by requested widget:
+					$content = substr_replace( $content, $widget_html, strpos( $content, $source_tag ), strlen( $source_tag ) );
+				}
 			}
 		}
 

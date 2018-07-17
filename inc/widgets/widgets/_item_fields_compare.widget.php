@@ -91,11 +91,12 @@ class item_fields_compare_Widget extends ComponentWidget
 				),
 				'items' => array(
 					'label' => T_('Items to compare'),
-					'note' => sprintf( T_('Separate Item IDs with %s.'), '<code>,</code>' ).' '.sprintf( T_('Leave empty to use URL parameter %s.'), '<code>items=</code>' ),
+					'note' => sprintf( T_('Separate Item IDs or slugs or %s or %s with %s.'), '<code>$this$</code>', '<code>$parent$</code>', '<code>,</code>' ).' '.sprintf( T_('Leave empty to use URL parameter %s.'), '<code>items=</code>' ),
 					'valid_pattern' => array(
-						'pattern' => '/^(\d+(,\d+)*)?$/',
-						'error'   => T_('Invalid list of Item IDs.')
+						'pattern' => '/^(([\da-z\-_]+|\$this\$|\$parent\$)+(,([\da-z\-_]+|\$this\$|\$parent\$))*)?$/',
+						'error'   => sprintf( T_('Items to compare must be specified by ID, by slug or as %s or %s.'), '<code>$this$</code>', '<code>$parent$</code>' ),
 					),
+					'size' => 80,
 				),
 				'fields' => array(
 					'type' => 'textarea',
@@ -117,7 +118,7 @@ class item_fields_compare_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Plugins;
+		global $Plugins, $Item;
 
 		$params = array_merge( array(
 				'fields_compare_table_start'    => '<div class="evo_content_block"><table class="item_custom_fields">',
@@ -134,7 +135,7 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		$items = $this->get_param( 'items' );
+		$items = $this->disp_params['items'];
 		if( empty( $items ) )
 		{	// Use items from URL parameter if widget setting is empty:
 			$items = param( 'items', '/^[\d,]*$/' );
@@ -147,27 +148,71 @@ class item_fields_compare_Widget extends ComponentWidget
 			return;
 		}
 
+		$ItemCache = & get_ItemCache();
+
 		$items = explode( ',', $items );
 
+		// Check all item IDs:
+		foreach( $items as $i => $item_ID )
+		{
+			$item_ID = trim( $item_ID );
+			if( empty( $item_ID ) )
+			{	// Remove wrong item ID:
+				unset( $items[ $i ] );
+			}
+			if( $item_ID == '$this$' )
+			{	// Try to get a current post ID:
+				if( isset( $Item ) && $Item instanceof Item )
+				{	// Use ID of current post:
+					$items[ $i ] = $Item->ID;
+				}
+				else
+				{	// Remove it because no current post:
+					unset( $items[ $i ] );
+				}
+			}
+			elseif( $item_ID == '$parent$' )
+			{	// Try to get a parent post ID:
+				if( isset( $Item ) && $Item instanceof Item && $Item->get( 'parent_ID' ) > 0 )
+				{	// Use ID of parent post:
+					$items[ $i ] = $Item->get( 'parent_ID' );
+				}
+				else
+				{	// Remove it because no parent post:
+					unset( $items[ $i ] );
+				}
+			}
+			elseif( ! is_number( $item_ID ) )
+			{	// Try to get a post ID by slug:
+				if( $widget_Item = & $ItemCache->get_by_urltitle( $item_ID, false, false ) )
+				{	// Use ID of post detected by slug:
+					$items[ $i ] = $widget_Item->ID;
+				}
+				else
+				{	// Remove it because cannot find post by slug:
+					unset( $items[ $i ] );
+				}
+			}
+		}
+
 		// Load all requested posts into the cache:
-		$ItemCache = & get_ItemCache();
 		$ItemCache->load_list( $items );
 
 		// Check what fields should be displayed for this widget:
-		$widget_fields = trim( $this->get_param( 'fields' ) );
+		$widget_fields = trim( $this->disp_params['fields'] );
 		$widget_fields = empty( $widget_fields ) ? false : preg_split( '#[\s\n\r]+#', $widget_fields );
 
 		$all_custom_fields = array();
 		foreach( $items as $i => $item_ID )
 		{
-			if( ! $Item = & $ItemCache->get_by_ID( $item_ID, false, false ) )
+			if( ! $widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false ) )
 			{	// Skin wrong post:
 				unset( $items[ $i ] );
 				continue;
 			}
 
 			// Load all custom fields of the Item in cache:
-			$item_custom_fields = $Item->get_custom_fields_defs();
+			$item_custom_fields = $widget_Item->get_custom_fields_defs();
 			// Use either all custom fields of the Item or only specified fields in config of this Widget:
 			$search_custom_fields = $widget_fields ? $widget_fields : array_keys( $item_custom_fields );
 
@@ -230,8 +275,8 @@ class item_fields_compare_Widget extends ComponentWidget
 				$prev_custom_field_value = NULL;
 				foreach( $custom_field['items'] as $item_ID )
 				{
-					$Item = & $ItemCache->get_by_ID( $item_ID, false, false );
-					$custom_field_value = $Item->get_custom_field_value( $custom_field['name'], false, false );
+					$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
+					$custom_field_value = $widget_Item->get_custom_field_value( $custom_field['name'], false, false );
 					if( $prev_custom_field_value !== NULL )
 					{
 						switch( $custom_field['type'] )
@@ -279,9 +324,9 @@ class item_fields_compare_Widget extends ComponentWidget
 		echo $params['fields_compare_empty_cell'];
 		foreach( $items as $item_ID )
 		{
-			$Item = & $ItemCache->get_by_ID( $item_ID, false, false );
+			$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 			// Permanent post link:
-			echo str_replace( '$post_link$', $Item->get_title(), $params['fields_compare_post'] );
+			echo str_replace( '$post_link$', $widget_Item->get_title(), $params['fields_compare_post'] );
 		}
 		echo $params['fields_compare_row_end'];
 
@@ -295,8 +340,8 @@ class item_fields_compare_Widget extends ComponentWidget
 				// Custom field value per each post:
 				if( in_array( $item_ID, $custom_field['items'] ) )
 				{	// Get a formatted value if post has this custom field:
-					$Item = & $ItemCache->get_by_ID( $item_ID, false, false );
-					$custom_field_value = $Item->get_custom_field_value( $custom_field['name'] );
+					$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
+					$custom_field_value = $widget_Item->get_custom_field_value( $custom_field['name'] );
 				}
 				else
 				{	// This post has no this custom field:
