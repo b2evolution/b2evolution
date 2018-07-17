@@ -2472,7 +2472,7 @@ class Item extends ItemLight
 									$format_thousands_sep = $format[ $f_num - 5 ];
 								}
 								// Format number with extracted data:
-								$custom_field_value = number_format( $custom_field_value, $format_decimals, $format_dec_point, $format_thousands_sep );
+								$custom_field_value = number_format( floatval( $custom_field_value ), $format_decimals, $format_dec_point, $format_thousands_sep );
 							}
 							// Add prefix and suffix:
 							$custom_field_value = $format_prefix.$custom_field_value.$format_suffix;
@@ -6804,10 +6804,15 @@ class Item extends ItemLight
 				$item_cache_SQL->FROM_add( 'INNER JOIN T_items__type ON ityp_ID = post_ityp_ID' );
 				$item_cache_SQL->WHERE_and( 'post_parent_ID = '.$this->ID );
 				$item_cache_SQL->WHERE_and( 'ityp_use_parent != "never"' );
-				$item_cache_SQL->WHERE_and( 'post_ID NOT IN ( '.$DB->quote( $this->updated_items ).' )' );
 				$child_items = $ItemCache->load_by_sql( $item_cache_SQL );
 				foreach( $child_items as $child_Item )
 				{
+					if( in_array( $child_Item->ID, $this->updated_items ) )
+					{	// Display error to inform about infinite loop:
+						$Messages->add( sprintf( T_('Recursive update has stopped because of infinite loop. Item #%d has child #%d which was already updated.'), intval( $this->ID ), intval( $child_Item->ID ) ), 'error' );
+						// Stop here to avoid infinite loop:
+						continue;
+					}
 					$child_custom_fields = $child_Item->get_type_custom_fields();
 					if( ! empty( $child_custom_fields ) )
 					{	// If child post has at least one custom field:
