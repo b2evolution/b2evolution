@@ -290,6 +290,10 @@ function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp 
 		preg_match( '~[?&]s=([^&#]*)~', $int_search_uri, $res );
 		$hit_uri = sprintf( T_( 'Internal search: %s' ), $res[1] );
 	}
+	elseif( strpos( $hit_uri, 'email_passthrough.php' ) !== false )
+	{	// This is a click from email message:
+		return '['.get_link_tag( $full_url, 'email_passthrough' ).']';
+	}
 	elseif( utf8_strlen( $hit_uri ) > $max_len )
 	{
 		$hit_uri = '...'.utf8_substr( $hit_uri, -$max_len );
