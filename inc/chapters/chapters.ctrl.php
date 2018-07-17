@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -366,7 +366,12 @@ switch( $action )
 		break;
 
 	case 'make_default':
-		// Make category as default
+		// Make category as default:
+		if( $edited_Chapter->get( 'meta' ) )
+		{	// If category is meta:
+			$Messages->add( T_('Meta category cannot be used as default!'), 'error' );
+			break;
+		}
 
 		$edited_Blog->set_setting( 'default_cat_ID', $edited_Chapter->ID );
 		$edited_Blog->dbsave();
@@ -374,6 +379,13 @@ switch( $action )
 
 	case 'set_meta':
 		// Make category as meta category
+
+		if( $edited_Blog->get_default_cat_ID() == $edited_Chapter->ID )
+		{	// If category is default:
+			$Messages->add( T_('Meta category cannot be used as default!'), 'error' );
+			header_redirect( '?ctrl=chapters&blog='.$blog, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
 
 		// Start serializable transaction because a category can be meta only if it has no posts
 		$DB->begin( 'SERIALIZABLE' );

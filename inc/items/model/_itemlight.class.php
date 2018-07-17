@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -810,7 +810,7 @@ class ItemLight extends DataObject
 					$url_to_edit_post .= '&amp;blog='.$Blog->ID;
 					if( is_admin_page() )
 					{	// Try to set a main category
-						$default_cat_ID = $Blog->get_setting( 'default_cat_ID' );
+						$default_cat_ID = $Blog->get_default_cat_ID();
 						if( !empty( $default_cat_ID ) )
 						{	// If default category is set
 							$this->main_cat_ID = $default_cat_ID;
@@ -1284,7 +1284,8 @@ class ItemLight extends DataObject
 				'target_blog'     => '',
 				'nav_target'      => NULL,
 				'post_navigation' => $def_post_navigation,
-				'title_field'     => 'title',
+				'title_field'     => 'title', // '#' for custom title
+				'custom_title'    => $this->title,
 			), $params );
 
 		// Set post navigation target
@@ -1296,7 +1297,14 @@ class ItemLight extends DataObject
 			$blogurl = $Blog->gen_blogurl();
 		}
 
-		$title = format_to_output( $this->{$params['title_field']}, $params['format'] );
+		if( $params['title_field'] == '#' )
+		{
+			$title = format_to_output( $params['custom_title'], $params['format'] );
+		}
+		else
+		{
+			$title = format_to_output( $this->{$params['title_field']}, $params['format'] );
+		}
 
 		if( $params['max_length'] != '' )
 		{	// Crop long title

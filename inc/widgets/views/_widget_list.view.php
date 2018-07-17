@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -42,7 +42,7 @@ function display_container( $container, $legend_suffix = '' )
 
 	$Table = new Table();
 
-	$Table->title = '<span class="container_name">'.T_($container).'</span>'.$legend_suffix;
+	$Table->title = '<span class="container_name" data-container-name="'.format_to_output( $container, 'htmlattr' ).'">'.T_($container).'</span>'.$legend_suffix;
 
 	// Table ID - fp> needs to be handled cleanly by Table object
 	$table_id = str_replace( array( ' ', ':' ), array( '_', '-' ), $container ); // fp> Using the container name which has special chars is a bad idea. Counter would be better
@@ -122,6 +122,12 @@ function display_container( $container, $legend_suffix = '' )
 			$widget_count++;
 			$enabled = $ComponentWidget->get( 'enabled' );
 
+			$disabled_plugin = false;
+			if( $ComponentWidget->type == 'plugin' && $ComponentWidget->get_Plugin() == false )
+			{
+				$disabled_plugin = true;
+			}
+
 			$fadeout_id = $Session->get( 'fadeout_id' );
 			if( isset($fadeout_id) && $ComponentWidget->ID == $fadeout_id )
 			{
@@ -136,11 +142,17 @@ function display_container( $container, $legend_suffix = '' )
 			$Table->display_line_start( false, $fadeout );
 
 			$Table->display_col_start();
-			echo '<input type="checkbox" name="widgets[]" value="'.$ComponentWidget->ID.'" />';
+			echo '<input type="checkbox" name="widgets[]" value="'.$ComponentWidget->ID.'" '.( $disabled_plugin ? 'disabled="disabled" ' : '' ).'/>';
 			$Table->display_col_end();
 
 			$Table->display_col_start();
-			if ( $enabled )
+			if( $disabled_plugin )
+			{
+				echo '<span class="plugin_is_disabled">';
+				echo get_icon( 'warning', 'imgtag', array( 'title' => T_('Inactive / Uninstalled plugin') ) );
+				echo '</span>';
+			}
+			elseif( $enabled )
 			{
 				// Indicator for the JS UI:
 				echo '<span class="widget_is_enabled">';
@@ -211,7 +223,11 @@ function display_container( $container, $legend_suffix = '' )
 
 			// Actions
 			$Table->display_col_start();
-			if ( $enabled )
+			if( $disabled_plugin )
+			{
+				echo action_icon( T_( 'Disable this widget!' ), 'deactivate', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ), NULL, NULL, NULL, array( 'style' => 'visibility: hidden' ) );
+			}
+			elseif( $enabled )
 			{
 				echo action_icon( T_( 'Disable this widget!' ), 'deactivate', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
 			}
@@ -261,13 +277,13 @@ echo '</fieldset>'."\n";
 
 echo '<span class="btn-group">';
 $Form->button( array(
-		'value' => get_icon( 'check_all' ).' '.T_('Check All'),
+		'value' => get_icon( 'check_all' ).' '.T_('Check all'),
 		'id'    => 'widget_button_check_all',
 		'tag'   => 'button',
 		'type'  => 'button'
 	) );
 $Form->button( array(
-		'value' => get_icon( 'uncheck_all' ).' '.T_('Uncheck All'),
+		'value' => get_icon( 'uncheck_all' ).' '.T_('Uncheck all'),
 		'id'    => 'widget_button_uncheck_all',
 		'tag'   => 'button',
 		'type'  => 'button'

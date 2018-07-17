@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  *
@@ -129,6 +129,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 		</table>
 	<?php
 	}
+	evo_flush();
 
 	// Check for potentially affected comments:
 	$sql = 'SELECT *
@@ -169,10 +170,11 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 		foreach( $comments_by_status as $status => $comments )
 		{
 			echo_affected_comments( $comments, $status, $keyword, $no_perms_count[$status] );
+			evo_flush();
 		}
 	}
 
-	// Check for potentially affected comments:
+	// Check for potentially affected users:
 	$quoted_keyword = $DB->quote('%'.$keyword.'%');
 	$sql = 'SELECT DISTINCT T_users.*
 				FROM T_users
@@ -199,7 +201,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 		{ // matching found, and current user has permission to view -> display users table
 			?>
 			<p><label><strong><?php echo( T_('Affected users').':' )?></strong></label></p>
-			<table class="grouped" cellspacing="0">
+			<table class="grouped table table-striped table-bordered table-hover table-condensed" cellspacing="0">
 				<thead><tr>
 				<th class="firstcol"><?php printf( /* TRANS: noun */ T_('Login') )?></th>
 				<th><?php echo( T_('First name') )?></th>
@@ -245,6 +247,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 	{ // There is no affected users
 		printf( '<p>'.T_('No <strong>users</strong> match the keyword %s').'</p>', '<code>'.$keyword.'</code>' );
 	}
+	evo_flush();
 
 	// Check if the string is already in the blacklist:
 	if( antispam_check($keyword) )

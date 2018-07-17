@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package api
  */
@@ -602,6 +602,9 @@ class RestApi
 		// Get param to limit number posts per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
 
+		// Get param to know what post fields should be sent in response:
+		$api_details = param( 'details', 'string', NULL );
+
 		// Try to get a post ID for request "<baseurl>/api/v1/collections/<collname>/items/<id>":
 		$post_ID = empty( $this->args[3] ) ? 0 : $this->args[3];
 
@@ -637,57 +640,105 @@ class RestApi
 			$this->add_response( 'pages_total', $ItemList2->total_pages, 'integer' );
 		}
 
+		if( $api_details == '*' || ( $post_ID && empty( $api_details ) ) )
+		{	// Use all possible fields for single post request or if it is defined to current request:
+			$api_details = array(
+					'id',
+					'datestart',
+					'urltitle',
+					'type',
+					'title',
+					'content',
+					'excerpt',
+					'teaser',
+					'URL',
+					'attachments',
+				);
+		}
+		elseif( empty( $api_details ) )
+		{	// For posts list get only ID and title by default:
+			$api_details = array( 'id', 'title' );
+		}
+		else
+		{	// Use custom fields from request:
+			$api_details = explode( ',', $api_details );
+		}
+
 		// Add each post row in the response array:
 		while( $Item = & $ItemList2->get_next() )
 		{
-			// Get all(1000) item attachemnts:
-			$attachments = array();
-			$LinkOwner = new LinkItem( $Item );
-			if( $LinkList = $LinkOwner->get_attachment_LinkList( 1000 ) )
+			// Initialize data for each item:
+			$item_data = array();
+			foreach( $api_details as $api_details_field )
 			{
-				while( $Link = & $LinkList->get_next() )
+				switch( $api_details_field )
 				{
-					if( ! ( $File = & $Link->get_File() ) )
-					{	// No File object
-						global $Debuglog;
-						$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
-						continue;
-					}
+					case 'id':
+						$item_data['id'] = intval( $Item->ID );
+						break;
+					case 'datestart':
+						$item_data['datestart'] = $Item->get( 'datestart' );
+						break;
+					case 'urltitle':
+						$item_data['urltitle'] = $Item->get( 'urltitle' );
+						break;
+					case 'type':
+						$item_data['type'] = $Item->get_type_setting( 'name' );
+						break;
+					case 'title':
+						$item_data['title'] = $Item->get( 'title' );
+						break;
+					case 'content':
+						$item_data['content'] = $Item->get_prerendered_content( 'htmlbody' );
+						break;
+					case 'excerpt':
+						$item_data['excerpt'] = $Item->get( 'excerpt' );
+						break;
+					case 'teaser':
+						$item_data['teaser'] = $Item->get_content_teaser();
+						break;
+					case 'URL':
+						$item_data['URL'] = $Item->get_permanent_url( '', '', '&' );
+						break;
+					case 'attachments':
+						// Get all(1000) item attachemnts:
+						$attachments = array();
+						$LinkOwner = new LinkItem( $Item );
+						if( $LinkList = $LinkOwner->get_attachment_LinkList( 1000 ) )
+						{
+							while( $Link = & $LinkList->get_next() )
+							{
+								if( ! ( $File = & $Link->get_File() ) )
+								{	// No File object
+									global $Debuglog;
+									$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
+									continue;
+								}
 
-					if( ! $File->exists() )
-					{	// File doesn't exist
-						global $Debuglog;
-						$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
-						continue;
-					}
+								if( ! $File->exists() )
+								{	// File doesn't exist
+									global $Debuglog;
+									$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+									continue;
+								}
 
-					$attachments[] = array(
-							'link_ID'  => intval( $Link->ID ),
-							'file_ID'  => intval( $File->ID ),
-							'type'     => strval( $File->is_dir() ? 'dir' : $File->type ),
-							'position' => $Link->get( 'position' ),
-							'name'     => $File->get_name(),
-							'url'      => $File->get_url(),
-							'title'    => strval( $File->get( 'title' ) ),
-							'alt'      => strval( $File->get( 'alt' ) ),
-							'desc'     => strval( $File->get( 'desc' ) ),
-						);
+								$attachments[] = array(
+										'link_ID'  => intval( $Link->ID ),
+										'file_ID'  => intval( $File->ID ),
+										'type'     => strval( $File->is_dir() ? 'dir' : $File->type ),
+										'position' => $Link->get( 'position' ),
+										'name'     => $File->get_name(),
+										'url'      => $File->get_url(),
+										'title'    => strval( $File->get( 'title' ) ),
+										'alt'      => strval( $File->get( 'alt' ) ),
+										'desc'     => strval( $File->get( 'desc' ) ),
+									);
+							}
+						}
+						$item_data['attachments'] = $attachments;
+						break;
 				}
 			}
-
-			// Initialize data for each item:
-			$item_data = array(
-					'id'          => intval( $Item->ID ),
-					'datestart'   => $Item->get( 'datestart' ),
-					'urltitle'    => $Item->get( 'urltitle' ),
-					'type'        => $Item->get_type_setting( 'name' ),
-					'title'       => $Item->get( 'title' ),
-					'content'     => $Item->get_prerendered_content( 'htmlbody' ),
-					'excerpt'     => $Item->get( 'excerpt' ),
-					'teaser'      => $Item->get_content_teaser(),
-					'URL'         => $Item->get_permanent_url( '', '', '&' ),
-					'attachments' => $attachments,
-				);
 
 			if( $post_ID )
 			{	// If only one post is requested then response should as one level array with post fields:
@@ -979,8 +1030,8 @@ class RestApi
 		 *
 		 * More info here: http://en.wikipedia.org/wiki/Percent-encoding#Non-standard_implementations
 		 */
-		if( preg_match( '~%u[0-9a-f]{3,4}~i', $api_q ) && version_compare(PHP_VERSION, '5', '>=') )
-		{	// Decode UTF-8 string (PHP 5 and up)
+		if( preg_match( '~%u[0-9a-f]{3,4}~i', $api_q ) )
+		{	// Decode UTF-8 string:
 			$api_q = preg_replace( '~%u([0-9a-f]{3,4})~i', '&#x\\1;', $api_q );
 			$api_q = html_entity_decode( $api_q, ENT_COMPAT, 'UTF-8' );
 		}
@@ -1629,7 +1680,11 @@ class RestApi
 	 */
 	private function controller_user_autocomplete()
 	{
+		global $DB;
+
 		$api_q = param( 'q', 'string', '' );
+		$api_mentioned = param( 'mentioned', 'array:string' ); // User logins mentioned on the page
+		$api_blog = param( 'blog', 'integer' );
 
 		if( ! is_valid_login( $api_q ) )
 		{	// Restrict a wrong request:
@@ -1640,8 +1695,30 @@ class RestApi
 		// Add backslash for special char of sql operator LIKE:
 		$api_q = str_replace( '_', '\_', $api_q );
 
+		$search_params = array();
+		$order_priorities = array();
+
+		if( ! empty( $api_mentioned ) )
+		{	// Mentioned logins must be ordered on the top:
+			$order_priorities[] = 'WHEN user_login IN ( '.$DB->quote( $api_mentioned ).' ) THEN 1';
+		}
+
+		if( ! empty( $api_blog ) )
+		{	// Collection assignees and members must be ordered with priorities 2 and 3:
+			$search_params['sql_from_add'] = 'LEFT JOIN T_coll_user_perms ON bloguser_user_ID = user_ID AND bloguser_blog_ID = '.$DB->quote( $api_blog ).'
+				LEFT JOIN T_coll_group_perms ON bloggroup_group_ID = user_grp_ID AND bloggroup_blog_ID = '.$DB->quote( $api_blog );
+			$order_priorities[] = 'WHEN bloguser_can_be_assignee = 1 OR bloggroup_can_be_assignee = 1 THEN 2';
+			$order_priorities[] = 'WHEN bloguser_ismember = 1 OR bloggroup_ismember = 1  THEN 3';
+		}
+
+		if( ! empty( $order_priorities ) )
+		{	// Order users by custom priority:
+			$search_params['sql_select'] = '*, CASE '.implode( ' ', $order_priorities ).' ELSE 4 END AS user_order_priority';
+			$search_params['sql_order_by'] = 'user_order_priority, user_login';
+		}
+
 		// Search users:
-		$users = $this->func_user_search( $api_q );
+		$users = $this->func_user_search( $api_q, $search_params );
 
 		foreach( $users as $User )
 		{
@@ -1662,13 +1739,8 @@ class RestApi
 	{
 		global $current_User;
 
-		if( ! is_logged_in() || ! $current_User->check_perm( 'users', 'view' ) )
-		{	// Check permission: Current user must have at least view permission to see users login:
-			$this->halt( 'You are not allowed to view users.', 'no_access', 403 );
-			// Exit here.
-		}
-
 		$api_q = trim( urldecode( param( 'q', 'string', '' ) ) );
+		$api_status = param( 'status', 'string', '' );
 
 		/**
 		 * sam2kb> The code below decodes percent-encoded unicode string produced by Javascript "escape"
@@ -1680,8 +1752,8 @@ class RestApi
 		 *
 		 * More info here: http://en.wikipedia.org/wiki/Percent-encoding#Non-standard_implementations
 		 */
-		if( preg_match( '~%u[0-9a-f]{3,4}~i', $api_q ) && version_compare(PHP_VERSION, '5', '>=') )
-		{	// Decode UTF-8 string (PHP 5 and up)
+		if( preg_match( '~%u[0-9a-f]{3,4}~i', $api_q ) )
+		{	// Decode UTF-8 string:
 			$api_q = preg_replace( '~%u([0-9a-f]{3,4})~i', '&#x\\1;', $api_q );
 			$api_q = html_entity_decode( $api_q, ENT_COMPAT, 'UTF-8' );
 		}
@@ -1692,15 +1764,30 @@ class RestApi
 			// Exit here.
 		}
 
+		$func_user_search_params = array( 'sql_limit' => 10 );
+		if( $api_status == 'all' )
+		{	// Get users with all statuses:
+			$func_user_search_params['sql_where'] = '';
+		}
+		elseif( ! empty( $api_status ) )
+		{	// Restrict users with requested statuses:
+			global $DB;
+			$func_user_search_params['sql_where'] = 'user_status IN ( '.$DB->quote( explode( ',', $api_status ) ).' )';
+		}
+
 		// Search users:
-		$users = $this->func_user_search( $api_q, array(
-				'sql_limit' => 10,
-			) );
+		$users = $this->func_user_search( $api_q, $func_user_search_params );
+
+		// Check if current user can see other users with ALL statuses:
+		$can_view_all_users = ( is_logged_in() && $current_User->check_perm( 'users', 'view' ) );
 
 		$user_logins = array();
 		foreach( $users as $User )
 		{
-			$user_logins[] = $User->get( 'login' );
+			if( $can_view_all_users || in_array( $User->get( 'status' ), array( 'activated', 'autoactivated', 'manualactivated' ) ) )
+			{	// Allow to see this user only if current User has a permission to see users with current status:
+				$user_logins[] = $User->get( 'login' );
+			}
 		}
 
 		// Send users logins array as response:
@@ -1719,9 +1806,12 @@ class RestApi
 		global $DB;
 
 		$params = array_merge( array(
-				'sql_where' => '( user_status = "activated" OR user_status = "autoactivated" )',
-				'sql_mask'  => '$login$%',
-				'sql_limit' => 0,
+				'sql_select'   => '*',
+				'sql_from_add' => '',
+				'sql_where'    => 'user_status IN ( "activated", "autoactivated", "manualactivated" )',
+				'sql_mask'     => '$login$%',
+				'sql_limit'    => 0,
+				'sql_order_by' => 'user_login',
 			), $params );
 
 		// Get request params:
@@ -1730,8 +1820,12 @@ class RestApi
 
 		// Initialize SQL to get users:
 		$users_SQL = new SQL();
-		$users_SQL->SELECT( '*' );
+		$users_SQL->SELECT( $params['sql_select'] );
 		$users_SQL->FROM( 'T_users' );
+		if( ! empty( $params['sql_from_add'] ) )
+		{	// Additional tables:
+			$users_SQL->FROM_add( $params['sql_from_add'] );
+		}
 		if( ! empty( $search_string ) )
 		{	// Filter by login:
 			$users_SQL->WHERE( 'user_login LIKE '.$DB->quote( str_replace( '$login$', $search_string, $params['sql_mask'] ) ) );
@@ -1740,7 +1834,7 @@ class RestApi
 		{	// Additional restrict:
 			$users_SQL->WHERE_and( $params['sql_where'] );
 		}
-		$users_SQL->ORDER_BY( 'user_login' );
+		$users_SQL->ORDER_BY( $params['sql_order_by'] );
 
 		// Get a count of users:
 		$count_users = $DB->get_var( preg_replace( '/SELECT(.+)FROM/i', 'SELECT COUNT( user_ID ) FROM', $users_SQL->get() ) );
@@ -1841,6 +1935,65 @@ class RestApi
 
 
 	/**** MODULE TAGS ---- END ****/
+
+	/**** MODULE USER TAGS ---- START ****/
+
+
+	/**
+	 * Call module to prepare request for user tags
+	 */
+	private function module_usertags()
+	{
+		global $DB;
+
+		$term = param( 's', 'string' );
+
+		if( substr( $term, 0, 1 ) == '-' )
+		{	// Prevent chars '-' in first position:
+			$term = preg_replace( '/^-+/', '', $term );
+		}
+
+		// Deny to use a comma in tag names:
+		$term = str_replace( ',', ' ', $term );
+
+		$term_is_new_tag = true;
+
+		$tags = array();
+
+		$tags_SQL = new SQL();
+		$tags_SQL->SELECT( 'utag_name AS id, utag_name AS name' );
+		$tags_SQL->FROM( 'T_users__tag' );
+		/* Yura: Here I added "COLLATE utf8_general_ci" because:
+		 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
+		 * It also allows to find "ee" when we type in "éè" and otherwise.
+		 */
+		$tags_SQL->WHERE( 'utag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8_general_ci' );
+		$tags_SQL->ORDER_BY( 'utag_name' );
+		$tags = $DB->get_results( $tags_SQL->get(), ARRAY_A );
+
+		// Check if current term is not an existing tag:
+		foreach( $tags as $tag )
+		{
+			/* Yura: I have added "utf8_strtolower()" below in condition in order to:
+			 * When we enter new tag 'testA' and the tag 'testa' already exists
+			 * then we suggest only 'testa' instead of 'testA'.
+			 */
+			if( utf8_strtolower( $tag['name'] ) == utf8_strtolower( $term ) )
+			{ // Current term is an existing tag
+				$term_is_new_tag = false;
+			}
+		}
+
+		if( $term_is_new_tag && ! empty( $term ) )
+		{	// Add current term in the beginning of the tags list:
+			array_unshift( $tags, array( 'id' => $term, 'name' => $term ) );
+		}
+
+		$this->add_response( 'tags', $tags );
+	}
+
+
+	/**** MODULE USER TAGS ---- END ****/
 
 	/**** MODULE POLLS ---- START ****/
 

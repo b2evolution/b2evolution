@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -400,14 +400,11 @@ function echo_regional_js( $prefix, $region_visible )
 	}
 ?>
 <script type="text/javascript">
-<?php /*jQuery( document ).ready( function()
+jQuery( document ).ready( function()
 {
-	if( jQuery( '#<?php echo $prefix; ?>_ctry_ID' ).val() > 0 && jQuery( '#<?php echo $prefix; ?>_rgn_ID option' ).length == 1 )
-	{	// Preload a regions for case when country is selected as default but not saved in DB
-		load_regions( jQuery( '#<?php echo $prefix; ?>_ctry_ID' ).val(), jQuery( '#<?php echo $prefix; ?>_rgn_ID' ).val() );
-	}
+	check_regional_required_fields();
 } );
-*/ ?>
+
 jQuery( '#<?php echo $prefix; ?>_ctry_ID' ).change( function ()
 {	// Load option list with regions for seleted country
 	load_regions( jQuery( this ).val(), 0 );
@@ -442,6 +439,33 @@ jQuery( '#button_refresh_city' ).click( function ()
 	return false;
 } );
 
+/**
+ * Disable HTML attribute "required" if the regional selector has no locations for given parent location:
+ */
+function check_regional_required_fields()
+{
+	jQuery( '#<?php echo $prefix; ?>_rgn_ID, #<?php echo $prefix; ?>_subrg_ID, #<?php echo $prefix; ?>_city_ID' ).each( function()
+	{
+		if( typeof( jQuery( this ).attr( 'required' ) ) != 'undefined' ||
+				jQuery( this ).data( 'required' ) === true )
+		{	// If this regional field should be required:
+			if( jQuery( this ).find( 'option' ).length > 1 )
+			{	// Require if parent regional location has at least one child location:
+				jQuery( this ).attr( 'required', 'required' );
+			}
+			else
+			{	// Don't require if there are no child regional locations:
+				jQuery( this ).removeAttr( 'required' );
+			}
+			// Store original state of attribute "required":
+			jQuery( this ).data( 'required', true );
+		}
+		else
+		{	// Store original state of attribute "required":
+			jQuery( this ).data( 'required', false );
+		}
+	} );
+}
 
 function load_regions( country_ID, region_ID )
 {	// Load option list with regions for seleted country
@@ -460,6 +484,7 @@ function load_regions( country_ID, region_ID )
 			jQuery( '#<?php echo $prefix; ?>_rgn_ID' ).html( options[0] );
 			jQuery( '#<?php echo $prefix; ?>_subrg_ID' ).html( options[1] );
 			jQuery( '#<?php echo $prefix; ?>_city_ID' ).html( options[2] );
+			check_regional_required_fields();
 		}
 	} );
 }
@@ -480,6 +505,7 @@ function load_subregions( country_ID, region_ID )
 
 			jQuery( '#<?php echo $prefix; ?>_subrg_ID' ).html( options[0] );
 			jQuery( '#<?php echo $prefix; ?>_city_ID' ).html( options[1] );
+			check_regional_required_fields();
 		}
 	} );
 }
@@ -495,6 +521,7 @@ function load_cities( country_ID, region_ID, subregion_ID )
 		{
 			jQuery( '#<?php echo $prefix; ?>_city_ID' ).html( ajax_debug_clear( result ) );
 			jQuery( '#<?php echo $prefix; ?>_city_ID' ).next().find( 'button' ).show().next().hide();
+			check_regional_required_fields();
 		}
 	} );
 }

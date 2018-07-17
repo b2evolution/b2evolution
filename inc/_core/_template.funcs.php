@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -89,6 +89,42 @@ function headers_content_mightcache( $type = 'text/html', $max_age = '#', $chars
 
 
 /**
+ * Get URL to return
+ *
+ * @return string URL
+ */
+function get_returnto_url()
+{
+	global $Hit, $Blog, $baseurl, $ReqHost;
+
+	// See if there's a redirect_to request param given:
+	$redirect_to = param( 'redirect_to', 'url', '' );
+
+	if( empty( $redirect_to ) )
+	{	// If default redirect_to param is not defined:
+		if( ! empty( $Hit->referer ) )
+		{	// Use referer page:
+			$redirect_to = $Hit->referer;
+		}
+		elseif( isset( $Blog ) && is_object( $Blog ) )
+		{	// Use collection default page URL:
+			$redirect_to = $Blog->get( 'url' );
+		}
+		else
+		{	// Use base URL:
+			$redirect_to = $baseurl;
+		}
+	}
+	elseif( $redirect_to[0] == '/' )
+	{	// relative URL, prepend current host:
+		$redirect_to = $ReqHost.$redirect_to;
+	}
+
+	return $redirect_to;
+}
+
+
+/**
  * Sends HTTP header to redirect to the previous location (which can be given as function parameter, GET parameter (redirect_to),
  * is taken from {@link Hit::$referer} or {@link $baseurl}).
  *
@@ -114,32 +150,10 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	global $Session, $Debuglog, $Messages;
 	global $http_response_code, $allow_redirects_to_different_domain;
 
-	// TODO: fp> get this out to the caller, make a helper func like get_returnto_url()
-	if( empty($redirect_to) )
-	{ // see if there's a redirect_to request param given:
-		$redirect_to = param( 'redirect_to', 'url', '' );
-
-		if( empty($redirect_to) )
-		{
-			if( ! empty($Hit->referer) )
-			{
-				$redirect_to = $Hit->referer;
-			}
-			elseif( isset($Blog) && is_object($Blog) )
-			{
-				$redirect_to = $Blog->get('url');
-			}
-			else
-			{
-				$redirect_to = $baseurl;
-			}
-		}
-		elseif( $redirect_to[0] == '/' )
-		{ // relative URL, prepend current host:
-			$redirect_to = $ReqHost.$redirect_to;
-		}
+	if( empty( $redirect_to ) )
+	{	// Use automatic return URL if a redirect URL is not defined:
+		$redirect_to = get_returnto_url();
 	}
-	// <fp
 
 	$Debuglog->add('Preparing to redirect to: '.$redirect_to, 'request' );
 
@@ -421,6 +435,7 @@ function get_request_title( $params = array() )
 			'format'              => 'htmlbody',
 			// Title for each disp:
 			// fp> TODO: Make a global array of $disp => Clear text disp
+			'anonpost_text'       => '#',// # - 'New [Post]' ('Post' is item type name)
 			'arcdir_text'         => T_('Archive Directory'),
 			'catdir_text'         => T_('Category Directory'),
 			'mediaidx_text'       => T_('Photo Index'),
@@ -432,7 +447,8 @@ function get_request_title( $params = array() )
 			'contacts_text'       => T_('Contacts'),
 			'login_text'          => /* TRANS: trailing space = verb */ T_('Login '),
 			'register_text'       => T_('Register'),
-			'req_activate_email'    => T_('Account activation'),
+			'register_finish_text'=> T_('Finish Registration'),
+			'req_activate_email'  => T_('Account activation'),
 			'account_activation'  => T_('Account activation'),
 			'lostpassword_text'   => T_('Lost your password?'),
 			'profile_text'        => T_('User Profile'),
@@ -458,6 +474,7 @@ function get_request_title( $params = array() )
 			'edit_links_template' => array(), // More params for the links to advanced editing on disp=edit|edit_comment
 			'tags_text'           => T_('Tags'),
 			'flagged_text'        => T_('Flagged posts'),
+			'help_text'           => T_('In case of issues with this site...'),
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -554,6 +571,11 @@ function get_request_title( $params = array() )
 			$r[] = $params['subs_text'];
 			break;
 
+		case 'register_finish':
+			// We are requesting the register finish form:
+			$r[] = $params['register_finish_text'];
+			break;
+
 		case 'visits':
 			// We are requesting the profile visits screen:
 			$user_ID = param( 'user_ID', 'integer', 0 );
@@ -634,7 +656,7 @@ function get_request_title( $params = array() )
 			// We are displaying a single message:
 			if( $preview )
 			{	// We are requesting a post preview:
-				$r[] = T_('PREVIEW');
+				$r[] = /* TRANS: Noun */ T_('PREVIEW');
 			}
 			elseif( $params['title_'.$disp.'_disp'] && isset( $MainList ) )
 			{
@@ -682,6 +704,17 @@ function get_request_title( $params = array() )
 
 		case 'closeaccount':
 			$r[] = $params['closeaccount_text'];
+			break;
+
+		case 'anonpost':
+			if( $params['anonpost_text'] == '#' )
+			{	// Initialize default auto title:
+				$r[] = sprintf( T_('New [%s]'), $Blog->get_default_item_type_name() );
+			}
+			else
+			{	// Use custom title from param:
+				$r[] = $params['anonpost_text'];
+			}
 			break;
 
 		case 'edit':
@@ -794,6 +827,10 @@ function get_request_title( $params = array() )
 		case 'flagged':
 			// We are requesting the flagged posts list:
 			$r[] = $params['flagged_text'];
+			break;
+
+		case 'help':
+			$r[] = $params['help_text'];
 			break;
 
 		case 'posts':
@@ -1538,26 +1575,11 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
 	require_js( '#jqueryUI#', $relative_to );
 	require_css( '#jqueryUI_css#', $relative_to );
 
-	$datefmt = locale_input_datefmt();
-	//$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
-	$datefmt = php_to_jquery_date_format( $datefmt );
 	add_js_headline( 'jQuery(document).ready( function(){
-		var monthNames = ["'.T_('January').'","'.T_('February').'", "'.T_('March').'",
-						  "'.T_('April').'", "'.T_('May').'", "'.T_('June').'",
-						  "'.T_('July').'", "'.T_('August').'", "'.T_('September').'",
-						  "'.T_('October').'", "'.T_('November').'", "'.T_('December').'"];
-
-		var dayNamesMin = ["'.T_('Sun').'", "'.T_('Mon').'", "'.T_('Tue').'",
-						  "'.T_('Wed').'", "'.T_('Thu').'", "'.T_('Fri').'", "'.T_('Sat').'"];
-
-		var docHead = document.getElementsByTagName("head")[0];
-		for (i=0;i<dayNamesMin.length;i++)
-			dayNamesMin[i] = dayNamesMin[i].substr(0, 2)
-
 		jQuery(".form_date_input").datepicker({
-			dateFormat: "'.$datefmt.'",
-			monthNames: monthNames,
-			dayNamesMin: dayNamesMin,
+			dateFormat: "'.jquery_datepicker_datefmt().'",
+			monthNames: '.jquery_datepicker_month_names().',
+			dayNamesMin: '.jquery_datepicker_day_names().',
 			firstDay: '.locale_startofweek().'
 		})
 	})' );
@@ -1582,6 +1604,60 @@ function init_results_js( $relative_to = 'rsc_url' )
 {
 	require_js( '#jquery#', $relative_to ); // dependency
 	require_js( 'results.js', $relative_to );
+}
+
+
+/**
+ * Registers headlines for initialization of functions to work with affixed Messages
+ */
+function init_affix_messages_js( $offset = 50 )
+{
+	add_js_headline( '
+	jQuery( document ).ready( function()
+	{
+		var msg_obj = jQuery( ".action_messages" );
+		var msg_offset = '.format_to_js( $offset == '' ? 50 : $offset ).';
+
+		if( msg_obj.length == 0 )
+		{ // No Messages, exit
+			return;
+		}
+
+		msg_obj.wrap( "<div class=\"msg_wrapper\"></div>" );
+		var wrapper = msg_obj.parent();
+
+		msg_obj.affix( {
+				offset: {
+					top: function() {
+						return wrapper.offset().top - msg_offset - parseInt( msg_obj.css( "margin-top" ) );
+					}
+				}
+			} );
+
+		msg_obj.on( "affix.bs.affix", function()
+			{
+				wrapper.css( { "min-height": msg_obj.outerHeight( true ) } );
+
+				msg_obj.css( { "width": msg_obj.outerWidth(), "top": msg_offset, "z-index": 99999 } );
+
+				jQuery( window ).on( "resize", function()
+					{ // This will resize the Messages based on the wrapper width
+						msg_obj.css( { "width": wrapper.css( "width" ) } );
+					});
+			} );
+
+		msg_obj.on( "affixed-top.bs.affix", function()
+			{
+				wrapper.css( { "min-height": "" } );
+				msg_obj.css( { "width": "", "top": "", "z-index": "" } );
+			} );
+
+		jQuery( "div.alert", msg_obj ).on( "closed.bs.alert", function()
+			{
+				wrapper.css({ "min-height": msg_obj.outerHeight( true ) });
+			} );
+	} );
+	' );
 }
 
 
@@ -1707,6 +1783,10 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 						{
 							ajax_url = restapi_url + "users/logins";
 						}
+						if( jQuery( this ).data( "status" ) )
+						{
+							ajax_url += "&status=" + jQuery( this ).data( "status" );
+						}
 						jQuery( this ).typeahead( null,
 						{
 							displayKey: "login",
@@ -1761,6 +1841,10 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 				{
 					ajax_url = restapi_url + "users/logins";
 				}
+				if( jQuery( this ).data( "status" ) )
+				{
+					ajax_url += "&status=" + jQuery( this ).data( "status" );
+				}
 				jQuery( this ).hintbox(
 				{
 					url: ajax_url,
@@ -1796,6 +1880,35 @@ function init_jqplot_js( $relative_to = 'rsc_url' )
 	require_js( '#jqplot_donutRenderer#', $relative_to );
 	require_css( '#jqplot_css#', $relative_to );
 	require_css( 'jquery/jquery.jqplot.b2evo.css', $relative_to );
+}
+
+
+/**
+ * Initialize JavaScript variables for jQuery QueryBuilder plugin
+ */
+function init_querybuilder_js( $relative_to = 'rsc_url' )
+{
+	global $current_locale;
+
+	require_js( '#jquery#', $relative_to ); // dependency
+	require_css( '#jqueryUI_css#', $relative_to ); // dependency for date picker
+	require_js( 'jquery/query-builder/doT.min.js', $relative_to ); // dependency
+	require_js( 'jquery/query-builder/jquery.extendext.min.js', $relative_to ); // dependency
+	require_js( 'jquery/query-builder/moment.js', $relative_to ); // dependency
+
+	require_js( 'jquery/query-builder/query-builder.min.js', $relative_to );
+	require_css( 'jquery/jquery.query-builder.default.css', $relative_to );
+
+	// Load language file if such file exists:
+	$query_builder_langs = array( 'ar', 'az', 'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'fa-IR', 'fr', 'he', 'it', 'nl', 'no', 'pl', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sq', 'tr', 'ua', 'zh-CN' );
+	if( in_array( $current_locale, $query_builder_langs ) )
+	{	// Load lang by full locale name like "en-US":
+		require_js( 'jquery/query-builder/i18n/query-builder.'.$current_locale.'.js', $relative_to );
+	}
+	elseif( in_array( substr( $current_locale, 0, 2 ), $query_builder_langs ) )
+	{	// Load lang by locale code like "en":
+		require_js( 'jquery/query-builder/i18n/query-builder.'.substr( $current_locale, 0, 2 ).'.js', $relative_to );
+	}
 }
 
 
@@ -2240,7 +2353,7 @@ function is_recursive( /*array*/ & $array, /*array*/ & $alreadySeen = array() )
  */
 function display_ajax_form( $params )
 {
-	global $rsc_url, $ajax_form_number, $required_js;
+	global $rsc_url, $ajax_form_number, $required_js, $b2evo_icons_type;
 
 	if( is_recursive( $params ) )
 	{ // The params array contains recursion, don't try to encode, display error message instead
@@ -2253,6 +2366,11 @@ function display_ajax_form( $params )
 	{	// Send all loaded JS files to ajax request in order to don't load them twice:
 		// yura: It was done because JS of bootstrap modal doesn't work when jquery JS file is loaded twice.
 		$params['required_js'] = $required_js;
+	}
+
+	if( ! isset( $params['b2evo_icons_type'] ) && isset( $b2evo_icons_type ) )
+	{	// Send current icons type to display proper icons on the loaded AJAX form:
+		$params['b2evo_icons_type'] = $b2evo_icons_type;
 	}
 
 	if( empty( $ajax_form_number ) )
@@ -2367,10 +2485,18 @@ function display_login_form( $params )
 			'reqID' => '',
 			'sessID' => '',
 			'transmit_hashed_password' => false,
+			'get_widget_login_hidden_fields' => false,
 			'display_abort_link'  => true,
 			'abort_link_position' => 'above_form', // 'above_form', 'form_title'
 			'abort_link_text'     => T_('Abort login!'),
-			'display_reg_link'    => false, // Display registration link after login button
+			'login_button_text'     => T_('Log in!'),
+			'login_button_class'    => 'btn btn-success btn-lg',
+			'display_lostpass_link' => true,
+			'lostpass_link_text'    => T_('Lost your password?'),
+			'lostpass_link_class'   => '',
+			'display_reg_link'      => false, // Display registration link after login button
+			'reg_link_text'         => T_('Register').' &raquo;',
+			'reg_link_class'        => 'btn btn-primary btn-lg pull-right',
 		), $params );
 
 	$inskin = $params['inskin'];
@@ -2452,7 +2578,7 @@ function display_login_form( $params )
 		$separator = '<br />';
 	}
 	else
-	{ // standard login form
+	{ // basic login form
 
 		if( ! empty( $params['form_title'] ) )
 		{
@@ -2495,35 +2621,44 @@ function display_login_form( $params )
 	else
 	{
 		$Form->login_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, '', '',
-					array( 'maxlength' => 255, 'input_required' => 'required', 'placeholder' => T_('Username (or email address)') ) );
+					array( 'maxlength' => 255, 'required' => true, 'placeholder' => T_('Username (or email address)') ) );
 	}
 
-	$lost_password_url = get_lostpassword_url( $redirect_to, '&amp;', $return_to );
-	if( ! empty( $login ) )
-	{
-		$lost_password_url = url_add_param( $lost_password_url, $dummy_fields['login'].'='.rawurlencode( $login ) );
+	if( $params['display_lostpass_link'] )
+	{	// Display a lost password link:
+		$lost_password_url = get_lostpassword_url( $redirect_to, '&amp;', $return_to );
+		if( ! empty( $login ) )
+		{	// Append login to the lost password form url:
+			$lost_password_url = url_add_param( $lost_password_url, $dummy_fields['login'].'='.rawurlencode( $login ) );
+		}
+		$lost_password_link = '<a href="'.$lost_password_url.'"'
+			.( empty( $params['lostpass_link_text'] ) ? '' : ' class="'.format_to_output( $params['lostpass_link_class'], 'htmlattr' ).'"' ).'>'
+			.$params['lostpass_link_text'].'</a>';
 	}
-	$pwd_note = '<a href="'.$lost_password_url.'">'.T_('Lost your password?').'</a>';
+	else
+	{	// Don't display a lost password link:
+		$lost_password_link = '';
+	}
 
 	if( $inskin )
 	{
 		$Form->begin_field();
-		$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, T_('Password'), array( 'note' => $pwd_note, 'maxlength' => 70, 'class' => 'input_text', 'required' => true ) );
+		$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, T_('Password'), array( 'note' => $lost_password_link, 'maxlength' => 70, 'class' => 'input_text', 'required' => true ) );
 		$Form->end_field();
 	}
 	else
 	{
-		$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, '', array( 'placeholder' => T_('Password'), 'note' => $pwd_note, 'maxlength' => 70, 'class' => 'input_text', 'input_required' => 'required' ) );
+		$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, '', array( 'placeholder' => T_('Password'), 'note' => $lost_password_link, 'maxlength' => 70, 'class' => 'input_text', 'input_required' => 'required' ) );
 	}
 
 	// Allow a plugin to add fields/payload
 	$Plugins->trigger_event( 'DisplayLoginFormFieldset', array( 'Form' => & $Form ) );
 
 	// Display registration link after login button
-	$register_link = $params['display_reg_link'] ? get_user_register_link( '', '', T_('Register').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, $source, 'btn btn-primary btn-lg pull-right' ) : '';
+	$register_link = $params['display_reg_link'] ? get_user_register_link( '', '', $params['reg_link_text'], '#', true /*disp_when_logged_in*/, $redirect_to, $source, $params['reg_link_class'] ) : '';
 
 	// Submit button(s):
-	$submit_buttons = array( array( 'name' => 'login_action[login]', 'value' => T_('Log in!'), 'class' => 'btn-success btn-lg', 'input_suffix' => $register_link ) );
+	$submit_buttons = array( array( 'name' => 'login_action[login]', 'value' => $params['login_button_text'], 'class' => $params['login_button_class'], 'input_suffix' => $register_link ) );
 
 	$Form->buttons_input( $submit_buttons );
 
@@ -2825,7 +2960,7 @@ function display_activateinfo( $params )
 			$Form->hidden( 'blog', $params[ 'blog' ] );
 		}
 		else
-		{ // Form title in standard form
+		{ // Form title in basic form
 			echo '<h4>'.$params['form_title'].'</h4>';
 		}
 		$Form->hidden( 'req_activate_email_submit', 1 ); // to know if the form has been submitted
@@ -2839,7 +2974,7 @@ function display_activateinfo( $params )
 		// set email text input content only if this is not a forced request. This way the user may have bigger chance to write a correct email address.
 		$user_email = ( $force_request ? '' : $current_User->email );
 		// fp> note: 45 is the max length for evopress skin.
-		$Form->text_input( $dummy_fields[ 'email' ], $user_email, 42, T_('Your email'), '', array( 'maxlength' => 255, 'class' => 'input_text', 'required' => true, 'input_required' => 'required' ) );
+		$Form->email_input( $dummy_fields[ 'email' ], $user_email, 42, T_('Your email'), array( 'maxlength' => 255, 'class' => 'input_text', 'required' => true, 'input_required' => 'required' ) );
 		$Form->end_fieldset();
 
 		// Submit button:
@@ -2956,7 +3091,7 @@ function display_activateinfo( $params )
  */
 function display_password_indicator( $params = array() )
 {
-	global $Collection, $Blog, $rsc_url, $disp, $dummy_fields;
+	global $Settings, $Collection, $Blog, $rsc_url, $disp, $dummy_fields;
 
 	$params = array_merge( array(
 			'pass1-id'    => $dummy_fields[ 'pass1' ],
@@ -2995,7 +3130,7 @@ function display_password_indicator( $params = array() )
 			pass2input.css( 'width', '".($params['field-width'] - 2)."px' ); // Set fixed length
 		}
 
-		// Prepair password field
+		// Prepare password field
 		pass1input.css( 'width', '".($params['field-width'] - 2)."px' ); // Set fixed length
 		pass1input.attr( 'onkeyup', 'return passinfo(this);' ); // Add onkeyup attribute
 		pass1input.parent().append( \"<div id='p-container'><div id='p-result'></div><div id='p-status'></div><div id='p-time'></div></div>\" );
@@ -3077,16 +3212,159 @@ function display_password_indicator( $params = array() )
 
 	jQuery( 'input#".$params[ 'pass1-id' ].", input#".$params[ 'pass2-id' ]."' ).keyup( function()
 	{	// Validate passwords
-		if( jQuery( 'input#".$params[ 'pass2-id' ]."' ).val() != jQuery( 'input#".$params[ 'pass1-id' ]."' ).val() )
+		var minLength = ".format_to_js( $Settings->get( 'user_minpwdlen' ) ).";
+		var pass1Field = jQuery( 'input#".$params[ 'pass1-id' ]."' );
+		var pass2Field = jQuery( 'input#".$params[ 'pass2-id' ]."' );
+		var passStatus = jQuery( '#pass2_status' );
+		var errorMsg = '';
+		const regex = /^[^\<\&\>]+$/g; // Password cannot contain the following characters: < > &
+
+		if( ( pass1Field.val().length && ( pass1Field.val().match( regex ) == null ) ) ||
+				( pass2Field.val().length && ( pass2Field.val().match( regex ) == null ) ) )
+		{
+			errorMsg = '".sprintf( TS_('Password cannot contain the following characters: %s'), '<code><</code> <code>></code> <code>&</code>' )."';
+			pass1Field[0].setCustomValidity( pass1Field.val().match( regex ) ? '' : errorMsg );
+			pass2Field[0].setCustomValidity( pass2Field.val().match( regex ) ? '' : errorMsg );
+			passStatus.html( '".get_icon( 'xross' )." ' + errorMsg );
+		}
+		else if( ( pass1Field.val().length > 0 && pass1Field.val().length < minLength ) || ( pass2Field.val().length > 0 && pass2Field.val().length < minLength ) )
+		{ // Password does not meet minimum length
+			errorMsg = '".sprintf( TS_('The minimum password length is %d characters.'), $Settings->get( 'user_minpwdlen' ) )."';
+			pass1Field[0].setCustomValidity( pass1Field.val().length < minLength ? errorMsg : '' );
+			pass2Field[0].setCustomValidity( pass2Field.val().length < minLength ? errorMsg : '' );
+			passStatus.html( '".get_icon( 'xross' )." ' + errorMsg );
+		}
+		else if( pass2Field.val() != pass1Field.val() )
 		{	// Passwords are different
-			jQuery( '#pass2_status' ).html( '".get_icon( 'xross' )." ".TS_('The second password is different from the first.')."' );
+			errorMsg = '".TS_('The second password is different from the first.')."';
+			pass1Field[0].setCustomValidity( '' );
+			pass2Field[0].setCustomValidity( errorMsg );
+			passStatus.html( '".get_icon( 'xross' )." ' + errorMsg );
 		}
 		else
 		{
-			jQuery( '#pass2_status' ).html( '' );
+			pass1Field[0].setCustomValidity( errorMsg );
+			pass2Field[0].setCustomValidity( errorMsg );
+			passStatus.html( errorMsg );
 		}
 	} );
 </script>";
+}
+
+
+/*
+ * Display javascript code to edit password
+ *
+ * @param array Params
+ */
+function display_password_js_edit()
+{
+	global $Settings;
+
+	echo '<script type="text/javascript">
+jQuery( "#current_user_pass" ).keyup( function()
+{
+	var error_obj = jQuery( this ).parent().find( "span.field_error" );
+	if( error_obj.length )
+	{
+		if( jQuery( this ).val() == "" )
+		{
+			error_obj.show();
+		}
+		else
+		{
+			error_obj.hide();
+		}
+	}
+
+	user_pass_clear_style( "#current_user_pass" );
+} );
+
+jQuery( "#edited_user_pass1, #edited_user_pass2" ).keyup( function()
+{
+	var minpass_obj = jQuery( this ).parent().find( ".pass_check_min" );
+	if( minpass_obj.length )
+	{ // Hide/Show a message about min pass length
+		if( jQuery.trim( jQuery( this ).val() ).length >= '.intval( $Settings->get('user_minpwdlen') ).' )
+		{
+			minpass_obj.hide();
+		}
+		else
+		{
+			minpass_obj.show();
+		}
+	}
+
+	var diff_obj = jQuery( ".pass_check_diff" );
+	if( diff_obj.length && jQuery( "#edited_user_pass1" ).val() == jQuery( " #edited_user_pass2" ).val() )
+	{ // Hide message about different passwords
+		diff_obj.hide();
+	}
+
+	// Hide message about that new password must be entered
+	var new_obj = jQuery( this ).parent().find( ".pass_check_new" );
+	if( new_obj.length )
+	{
+		if( jQuery( this ).val() == "" )
+		{
+			new_obj.show();
+		}
+		else
+		{
+			new_obj.hide();
+		}
+	}
+
+	// Hide message about that new password must be entered twice
+	var twice_obj = jQuery( this ).parent().find( ".pass_check_twice" );
+	if( twice_obj.length )
+	{
+		if( jQuery( this ).val() == "" )
+		{
+			twice_obj.show();
+		}
+		else
+		{
+			twice_obj.hide();
+		}
+	}
+
+	var warning_obj = jQuery( this ).parent().find( ".pass_check_warning" );
+	if( jQuery.trim( jQuery( this ).val() ) != jQuery( this ).val() )
+	{ // Password contains the leading and trailing spaces
+		if( ! warning_obj.length )
+		{
+			jQuery( this ).parent().append( "<span class=\"pass_check_warning notes field_error\">.'.TS_('The leading and trailing spaces will be trimmed.').'</span>" );
+		}
+	}
+	else if( warning_obj.length )
+	{ // No spaces, Remove warning
+		warning_obj.remove();
+	}
+
+	user_pass_clear_style( "#edited_user_pass1, #edited_user_pass2" );
+} );
+
+/**
+ * Hide/Show error style of input depending on visibility of the error messages
+ *
+ * @param string jQuery selector
+ */
+function user_pass_clear_style( obj_selector )
+{
+	jQuery( obj_selector ).each( function()
+	{
+		if( jQuery( this ).parent().find( "span.field_error span:visible" ).length )
+		{
+			jQuery( this ).addClass( "field_error" );
+		}
+		else
+		{
+			jQuery( this ).removeClass( "field_error" );
+		}
+	} );
+}
+</script>';
 }
 
 
@@ -3107,14 +3385,16 @@ function display_login_validator( $params = array() )
 	var login_icon_load = \'<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.TS_('Loading...').'" title="'.TS_('Loading...').'" style="margin:2px 0 0 5px" align="top" />\';
 	var login_icon_available = \''.get_icon( 'allowback', 'imgtag', array( 'title' => TS_('This username is available.') ) ).'\';
 	var login_icon_exists = \''.get_icon( 'xross', 'imgtag', array( 'title' => TS_('This username is already in use. Please choose another one.') ) ).'\';
+	var login_icon_error = \''.get_icon( 'xross', 'imgtag', array( 'title' => '$error_msg$' ) ).'\';
 
-	var login_text_empty = \''.TS_('Choose an username').'.\';
+	var login_text_empty = \''.TS_('Choose a username').'.\';
 	var login_text_available = \''.TS_('This username is available.').'\';
 	var login_text_exists = \''.TS_('This username is already in use. Please choose another one.').'\';
 
-	jQuery( "#register_form input#'.$params[ 'login-id' ].'" ).change( function()
+	var login_field = jQuery( "#register_form input#'.$params[ 'login-id' ].'" );
+	login_field.change( function()
 	{	// Validate if username is available
-		var note_Obj = jQuery( this ).next().next();
+		var note_Obj = jQuery( "#login_status_msg" );
 		if( jQuery( this ).val() == "" )
 		{	// Login is empty
 			jQuery( "#login_status" ).html( "" );
@@ -3132,18 +3412,22 @@ function display_login_validator( $params = array() )
 					result = ajax_debug_clear( result );
 					if( result == "exists" )
 					{	// Login already exists
-						jQuery( "#login_status" ).html( login_icon_exists );
-						note_Obj.html( login_text_exists ).attr( "class", "notes red" );
+						jQuery( "#login_status" ).html( "" );
+						note_Obj.html( login_icon_exists + " " + login_text_exists ).attr( "class", "red" );
+						login_field[0].setCustomValidity( login_text_exists );
 					}
 					else if( result == "available" )
 					{	// Login is available
-						jQuery( "#login_status" ).html( login_icon_available );
-						note_Obj.html( login_text_available ).attr( "class", "notes green" );
+						jQuery( "#login_status" ).html( "" );
+						//note_Obj.html( login_icon_available + " " + login_text_available ).attr( "class", "green" );
+						note_Obj.html( "" );
+						login_field[0].setCustomValidity( "" );
 					}
 					else
 					{	// Errors
-						jQuery( "#login_status" ).html( login_icon_exists );
-						note_Obj.html( result ).attr( "class", "notes red" );
+						jQuery( "#login_status" ).html( "" );
+						note_Obj.html( login_icon_error.replace( "$error_msg$", result.replace( /(<([^>]+)>)/ig, "" ) ) + " " + result ).attr( "class", "red" );
+						login_field[0].setCustomValidity( result.replace( /(<([^>]+)>)/ig, "" ) );
 					}
 				}
 			} );
@@ -3279,9 +3563,10 @@ function init_field_editor_js( $params = array() )
  */
 function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 {
+	global $Collection, $Blog;
+
 	if( is_admin_page() )
 	{ // Check to enable it in back-office
-		global $Collection, $Blog;
 		if( empty( $Blog ) || ! $Blog->get_setting( 'autocomplete_usernames' ) )
 		{ // Blog setting doesn't allow to autocomplete usernames
 			return;
@@ -3301,6 +3586,10 @@ function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 	}
 
 	require_js( '#jquery#', $relative_to );
+	if( ! empty( $Blog ) )
+	{	// Set global blog ID for textcomplete(Used to sort users by collection members and assignees):
+		add_js_headline( 'var blog = '.$Blog->ID );
+	}
 	require_js( 'build/textcomplete.bmin.js', $relative_to );
 }
 

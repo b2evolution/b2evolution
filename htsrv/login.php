@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package htsrv
@@ -103,7 +103,7 @@ switch( $action )
 		}
 		else
 		{ // db update was unsuccessful
-			$Messages->add( T_( 'Unable to close your account. Please contact to system administrator.' ) );
+			$Messages->add_to_group( 'Unexpected error. Unable to close your account.', 'error', T_('Close account').':' );
 		}
 
 		header_redirect();
@@ -650,7 +650,7 @@ if( $inskin && use_in_skin_login() )
 
 
 /**
- * Display one of the standard login management screens:
+ * Display one of the basic login management screens:
  */
 switch( $action )
 {

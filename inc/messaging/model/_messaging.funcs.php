@@ -1624,7 +1624,7 @@ function get_first_unread_message_date( $user_ID )
  */
 function get_next_reminder_info( $user_ID )
 {
-	global $UserSettings, $DB, $servertimenow, $unread_message_reminder_delay, $unread_messsage_reminder_threshold;
+	global $Settings, $UserSettings, $DB, $servertimenow;
 
 	if( ! $UserSettings->get( 'notify_unread_messages', $user_ID ) )
 	{ // The user doesn't want to recive unread messages reminders
@@ -1636,6 +1636,9 @@ function get_next_reminder_info( $user_ID )
 	{ // The user doesn't have unread messages
 		return T_('This user doesn\'t have unread messages.');
 	}
+
+	// Get array of the unread private messages reminder delay settings:
+	$unread_message_reminder_delay = $Settings->get( 'unread_message_reminder_delay' );
 
 	// We assume that reminder is not delayed because of the user was not logged in since too many days
 	$reminder_is_delayed = false;
@@ -1690,7 +1693,7 @@ function get_next_reminder_info( $user_ID )
 	}
 	elseif( empty( $last_unread_messages_reminder ) )
 	{ // The user didn't get unread messages reminder emails before
-		$note = sprintf( T_('The user has never received a notification yet, so the first notification is sent with %s delay'), seconds_to_period( $unread_messsage_reminder_threshold ) );
+		$note = sprintf( T_('The user has never received a notification yet, so the first notification is sent with %s delay'), seconds_to_period( $Settings->get( 'unread_message_reminder_threshold' ) ) );
 	}
 	else
 	{ // Reminder is not delayed
@@ -1783,7 +1786,7 @@ function delete_orphan_threads( $user_ids = NULL )
 	{ // There are orphan threads ( or orphan thread targets )
 		load_class( 'messaging/model/_thread.class.php', 'Thread' );
 		// Delete all orphan threads with all cascade relations
-		if( Thread::db_delete_where( 'Thread', NULL, $orphan_thread_ids, array( 'use_transaction' => false ) ) === false )
+		if( Thread::db_delete_where( NULL, $orphan_thread_ids, array( 'use_transaction' => false ) ) === false )
 		{ // Deleting orphan threads failed
 			$DB->rollback();
 			return false;
@@ -1901,34 +1904,27 @@ function get_thread_prevnext_links( $current_thread_ID, $params = array() )
  */
 function get_msgform_contact_methods( $recipient_User = NULL )
 {
-	global $DB, $current_User;
+	global $Blog;
 
 	$contact_methods = array();
 
-	if( is_logged_in() && $recipient_User !== NULL &&
-	    $current_User->get_msgform_possibility( $recipient_User, 'PM' ) )
-	{	// Suggest PM method only if it is allowed between current and recipient users:
-		$contact_methods['pm'] = T_('Private Message on this Site');
+	if( $recipient_User !== NULL )
+	{	// Check what contact methods are allowed between recipient and current users:
+		if( $recipient_User->get_msgform_possibility( NULL, 'PM' ) == 'PM' )
+		{	// PM method is allowed:
+			$contact_methods['pm'] = T_('Private Message on this Site');
+		}
+		if( $recipient_User->get_msgform_possibility( NULL, 'email' ) == 'email' )
+		{	// Email method is allowed:
+			$contact_methods['email'] = T_('Email');
+		}
 	}
 
-	// Email method is allowed for all users:
-	$contact_methods['email'] = T_('Email');
-
-	if( is_logged_in() )
-	{	// Get additional user fields if they are filled for current user profile:
-		$SQL = new SQL( 'Get preferred contact methods for disp=msgform' );
-		$SQL->SELECT( 'ufdf_id, ufdf_name' );
-		$SQL->FROM( 'T_users__fielddefs' );
-		$SQL->FROM_add( 'INNER JOIN T_users__fields ON uf_ufdf_ID = ufdf_id' );
-		$SQL->FROM_add( 'LEFT JOIN T_users__fieldgroups ON ufgp_ID = ufdf_ufgp_ID' );
-		$SQL->WHERE( 'ufdf_type IN ( "phone", "email" )' );
-		$SQL->WHERE_and( 'uf_user_ID = '.$current_User->ID );
-		$SQL->ORDER_BY( 'ufdf_name' );
-		$user_fields = $DB->get_assoc( $SQL->get(), $SQL->title );
-		foreach( $user_fields as $user_field_ID => $user_field_name )
-		{
-			$contact_methods[ $user_field_ID ] = $user_field_name;
-		}
+	// Get additional user fields which are defined for current collection:
+	$msgform_additional_fields = $Blog->get_msgform_additional_fields();
+	foreach( $msgform_additional_fields as $additional_Userfield )
+	{
+		$contact_methods[ $additional_Userfield->ID ] = $additional_Userfield->get_name();
 	}
 
 	return $contact_methods;
@@ -1948,6 +1944,7 @@ function threads_results_block( $params = array() )
 			'results_param_prefix' => 'actv_thrd_',
 			'results_title'        => T_('Threads with private messages sent by the user'),
 			'results_no_text'      => T_('User has not sent any private messages'),
+			'action'               => '',
 		), $params );
 
 	if( !is_logged_in() )
@@ -2000,7 +1997,7 @@ function threads_results_block( $params = array() )
 		$threads_Results->title = $params['results_title'];
 		$threads_Results->no_results_text = $params['results_no_text'];
 
-		if( $threads_Results->get_total_rows() > 0 )
+		if( $params['action'] != 'view' && $threads_Results->get_total_rows() > 0 )
 		{	// Display action icon to delete all records if at least one record exists
 			$threads_Results->global_icon( sprintf( T_('Delete all private messages sent by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_messages&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
 		}

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author blueyed: Daniel HAHLER
@@ -13,6 +13,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $deferred_AdminToolActions;
 
+// Check permission:
+$current_User->check_perm( 'admin', 'normal', true );
+$current_User->check_perm( 'options', 'view', true );
 
 load_funcs( 'plugins/_plugin.funcs.php' );
 load_funcs( 'tools/model/_maintenance.funcs.php' );
@@ -32,6 +35,11 @@ if( $current_User->check_perm( 'options', 'edit' ) &&
 
 param( 'tab', 'string', '', true );
 param( 'tab3', 'string', 'tools', true );
+
+if( $tab3 == 'import' )
+{	// Check permission for import pages:
+	$current_User->check_perm( 'options', 'edit', true );
+}
 
 $tab_Plugin = NULL;
 $tab_plugin_ID = false;
@@ -288,13 +296,13 @@ if( empty( $tab ) )
 			$user_groups = param( 'user_groups', 'array:integer' );
 			if( empty( $user_groups ) )
 			{	// At least one option must be selected:
-				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Create new users in') ), 'error' );
+				$Messages->add( sprintf( T_('Please select at least one option of the setting "%s".'), T_('Create new users in') ), 'error' );
 			}
 
 			$advanced_user_perms = param( 'advanced_user_perms', 'array:string' );
 			if( empty( $advanced_user_perms ) )
 			{	// At least one option must be selected:
-				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Advanced user perms to grant on existing collections with advanced perms') ), 'error' );
+				$Messages->add( sprintf( T_('Please select at least one option of the setting "%s".'), T_('Advanced user perms to grant on existing collections with advanced perms') ), 'error' );
 			}
 
 			if( param_errors_detected() )
@@ -425,6 +433,28 @@ if( empty( $tab ) )
 
 			// Execute a creating of messages inside template in order to see a process
 			$template_action = 'create_sample_messages';
+			break;
+
+		case 'create_sample_campaigns':
+			$num_campaigns = param( 'num_campaigns', 'string', 0 );
+			param_check_number( 'num_campaigns', T_('"How many email campaigns" field must be a number'), true );
+
+			$campaign_lists = param( 'campaign_lists', 'array:integer' );
+			if( empty( $campaign_lists ) )
+			{	// At least one option must be selected:
+				$Messages->add_to_group( sprintf( T_('Please select at least one option of the setting "%s".'), T_('Create new email campaigns in') ), 'error', T_('Validation errors:') );
+			}
+
+			if( param_errors_detected() )
+			{	// If some param errors then stop a creating and display a form to correct:
+				$action = 'show_create_campaigns';
+				break;
+			}
+
+			$send_campaign_emails = param( 'send_campaign_emails', 'integer', 0 );
+
+			// Execute a creating of users inside template in order to see a process
+			$template_action = 'create_sample_campaigns';
 			break;
 
 		case 'test_flush':
@@ -564,6 +594,10 @@ if( empty( $tab ) )
 			$threads_count = $users_count * $users_count - $users_count + 1;
 
 			$AdminUI->disp_view( 'tools/views/_create_messages.form.php' );
+			break;
+
+		case 'show_create_campaigns':
+			$AdminUI->disp_view( 'tools/views/_create_campaigns.form.php' );
 			break;
 
 		case 'show_delete_item_versions':

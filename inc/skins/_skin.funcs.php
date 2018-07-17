@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -77,6 +77,14 @@ function skin_init( $disp )
 	}
 
 	$Debuglog->add('skin_init: $disp='.$disp, 'skins' );
+
+	if( in_array( $disp, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish', 'visits', 'closeaccount' ) ) &&
+	    $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) &&
+	    $Blog->ID != $msg_Blog->ID )
+	{	// Redirect to collection which should be used for profile/messaging pages:
+		header_redirect( $msg_Blog->get( $disp.'url', array( 'glue' => '&' ) ) );
+		// Exit here.
+	}
 
 	// This is the main template; it may be used to display very different things.
 	// Do inits depending on current $disp:
@@ -566,15 +574,12 @@ function skin_init( $disp )
 
 				if( $allow_msgform == 'login' )
 				{ // user must login first to be able to send a message to this User
-					$disp = 'login';
-					param( 'action', 'string', 'req_login' );
-					// override redirect to param
+					$Messages->add( sprintf( T_( 'You must log in before you can contact "%s".' ), $recipient_User->get( 'login' ) ) );
+					// Override redirect to param:
 					$redirect_to = param( 'redirect_to', 'url', regenerate_url(), true, true );
-					if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && $Blog->ID != $msg_Blog->ID )
-					{ // Redirect to special blog for messaging actions if it is defined in general settings
-						header_redirect( url_add_param( $msg_Blog->get( 'msgformurl', array( 'glue' => '&' ) ), 'redirect_to='.rawurlencode( $redirect_to ), '&' ) );
-					}
-					$Messages->add( T_( 'You must log in before you can contact this user' ) );
+					// Redirect to special blog for login actions:
+					header_redirect( url_add_param( $Blog->get( 'loginurl', array( 'glue' => '&' ) ), 'redirect_to='.rawurlencode( $redirect_to ), '&' ) );
+					// Exit here.
 				}
 				elseif( ( $allow_msgform == 'PM' ) && check_user_status( 'can_be_validated' ) )
 				{ // user is not activated
@@ -597,10 +602,6 @@ function skin_init( $disp )
 					if( ( !empty( $current_User ) ) && ( $recipient_id == $current_User->ID ) )
 					{
 						$Messages->add( T_( 'You cannot send a private message to yourself. However you can send yourself an email if you\'d like.' ), 'warning' );
-					}
-					else
-					{
-						$Messages->add( sprintf( T_( 'You cannot send a private message to %s. However you can send them an email if you\'d like.' ), $recipient_User->get( 'login' ) ), 'warning' );
 					}
 				}
 
@@ -1052,6 +1053,13 @@ function skin_init( $disp )
 		case 'access_requires_login':
 			global $login_mode;
 
+			if( is_logged_in() )
+			{	// Don't display this page for already logged in user:
+				global $Blog;
+				header_redirect( $Blog->get( 'url' ) );
+				// Exit here.
+			}
+
 			if( $Settings->get( 'http_auth_require' ) && ! isset( $_SERVER['PHP_AUTH_USER'] ) )
 			{	// Require HTTP authentication:
 				header( 'WWW-Authenticate: Basic realm="b2evolution"' );
@@ -1122,9 +1130,24 @@ function skin_init( $disp )
 			$seo_page_type = 'Register form';
 			$robots_index = false;
 
-			// Check invitation code if it exists and registration is enabled
-			global $display_invitation;
-			$display_invitation = check_invitation_code();
+			$comment_ID = param( 'comment_ID', 'integer', 0 );
+			if( $comment_ID > 0 )
+			{	// Suggestion to register for anonymous user:
+				$CommentCache = & get_CommentCache();
+				$Comment = & $CommentCache->get_by_ID( $comment_ID, false, false );
+				if( $Comment && $Comment->get( 'author_email' ) !== '' )
+				{	// If comment is really from anonymous user:
+					// Display info message:
+					$Messages->add( T_('In order to manage all the comments you posted, please create a user account with the same email address.'), 'note' );
+					// Prefill the registration form with data from anonymous comment:
+					global $dummy_fields;
+					set_param( $dummy_fields['email'], $Comment->get( 'author_email' ) );
+					set_param( $dummy_fields['login'], $Comment->get( 'author' ) );
+					set_param( 'firstname', $Comment->get( 'author' ) );
+					$comment_Item = & $Comment->get_Item();
+					set_param( 'locale', $comment_Item->get( 'locale' ) );
+				}
+			}
 			break;
 
 		case 'lostpassword':
@@ -1192,6 +1215,7 @@ function skin_init( $disp )
 			break;
 
 		case 'profile':
+		case 'register_finish':
 		case 'avatar':
 			$action = param_action();
 			if( $action == 'crop' && is_logged_in() )
@@ -1214,6 +1238,14 @@ function skin_init( $disp )
 
 			// Display messages depending on user email status
 			display_user_email_status_message();
+
+			global $current_User, $demo_mode;
+			if( $demo_mode && ( $current_User->ID <= 7 ) )
+			{	// Demo mode restrictions: users created by install process cannot be edited:
+				$Messages->add( T_('You cannot edit the admin and demo users profile in demo mode!'), 'error' );
+				// Set action to 'view' in order to switch all form input elements to read mode:
+				set_param( 'action', 'view' );
+			}
 			break;
 
 		case 'users':
@@ -1241,6 +1273,32 @@ function skin_init( $disp )
 			$UserList->load_from_Request();
 
 			$seo_page_type = 'User display';
+			break;
+
+		case 'anonpost':
+			// New item form for anonymous user:
+			if( is_logged_in() )
+			{	// The logged in user has another page to create a post:
+				header_redirect( url_add_param( $Blog->get( 'url', array( 'glue' => '&' ) ), 'disp=edit', '&' ), 302 );
+				// will have exited
+			}
+			elseif( ! $Blog->get_setting( 'post_anonymous' ) )
+			{	// Redirect to the login page if current collection doesn't allow to post by anonymous user:
+				$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit' );
+				$Messages->add( T_( 'You must log in to create & edit posts.' ) );
+				header_redirect( get_login_url( 'cannot create posts', $redirect_to ), 302 );
+				// will have exited
+			}
+
+			// Check if the requested category can be used for new post on the current collection:
+			$ChapterCache = & get_ChapterCache();
+			$Chapter = & $ChapterCache->get_by_ID( param( 'cat', 'integer' ), false, false );
+			if( ! $Chapter || // Not found
+			    $Chapter->get( 'blog_ID' ) != $Blog->ID || // Category from another collection
+			    $Chapter->get( 'meta' ) ) // Meta category cannot be used as post category
+			{	// Use default category instead of the wrong requested:
+				set_param( 'cat', $Blog->get_default_cat_ID() );
+			}
 			break;
 
 		case 'edit':
@@ -1448,15 +1506,21 @@ function skin_init( $disp )
 			break;
 
 		case 'closeaccount':
-			global $current_User;
-			if( ! $Settings->get( 'account_close_enabled' ) ||
-			    ( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) ) ||
-			    ( ! is_logged_in() && ! $Session->get( 'account_closing_success' ) ) )
-			{ // If an account closing page is disabled - Display 404 page with error message
-			  // Don't allow admins close own accounts from front office
-			  // Don't display this message for not logged in users, except of one case to display a bye message after account closing
-				global $disp;
-				$disp = '404';
+			global $current_User, $disp;
+			if( ! $Settings->get( 'account_close_enabled' ) )
+			{	// If an account closing page is disabled - Display 404 page with error message:
+				$disp = is_logged_in() ? 'profile' : 'login';
+				$Messages->add( T_('The account closing feature is disabled.'), 'error' );
+			}
+			elseif( ! is_logged_in() && ! $Session->get( 'account_closing_success' ) )
+			{	// Don't display this message for not logged in users, except of one case to display a bye message after account closing:
+				$disp = 'login';
+				$Messages->add( T_('You must log in before you can close your account.'), 'error' );
+			}
+			elseif( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
+			{	// Don't allow admins close own accounts from front office:
+				$disp = 'profile';
+				$Messages->add( T_('You have user moderation privileges. In order to prevent mistakes, you cannot close your own account. Please ask the admin (or another admin) to remove your user moderation privileges before closing your account.'), 'error' );
 			}
 			elseif( $Session->get( 'account_close_reason' ) )
 			{
@@ -1675,6 +1739,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_access_denied'         => '_access_denied.disp.php',
 				'disp_access_requires_login' => '_access_requires_login.disp.php',
 				'disp_activateinfo'          => '_activateinfo.disp.php',
+				'disp_anonpost'              => '_anonpost.disp.php',
 				'disp_arcdir'                => '_arcdir.disp.php',
 				'disp_catdir'                => '_catdir.disp.php',
 				'disp_closeaccount'          => '_closeaccount.disp.php',
@@ -1700,6 +1765,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_pwdchange'             => '_profile.disp.php',
 				'disp_userprefs'             => '_profile.disp.php',
 				'disp_subs'                  => '_profile.disp.php',
+				'disp_register_finish'       => '_profile.disp.php',
 				'disp_visits'                => '_visits.disp.php',
 				'disp_register'              => '_register.disp.php',
 				'disp_search'                => '_search.disp.php',

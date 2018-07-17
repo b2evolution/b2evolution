@@ -1,13 +1,13 @@
 <?php
 /**
- * This form allows the user to request a new activation email (in case of standard login forms, not in-skin login forms)
+ * This form allows the user to request a new activation email (in case of basic login forms, not in-skin login forms)
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package htsrv
  */

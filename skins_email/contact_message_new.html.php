@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $evo_charset;
+global $Session, $evo_charset, $admin_url;
 
 // Default params:
 $params = array_merge( array(
@@ -90,9 +90,15 @@ if( ! empty( $params['message'] ) )
 	echo "</div>\n";
 }
 
-// show sender IP address
-$ip_list = implode( ', ', get_linked_ip_list( NULL, $recipient_User ) );
-echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( 'This message was typed by a user connecting from this IP address: %s.' ), $ip_list ).'</p>';
+if( ! empty( $recipient_User ) && $recipient_User->check_perm( 'stats', 'view' ) )
+{
+	$session_ID = '<a href="'.$admin_url.'?ctrl=stats&amp;tab=hits&amp;blog=0&amp;sess_ID='.$Session->ID.'">'.$Session->ID.'</a>';
+}
+else
+{
+	$session_ID = $Session->ID;
+}
+echo sprintf( T_('Session ID').': %s', $session_ID );
 
 // show sender email address
 echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( 'By replying, your email will go directly to %s.' ), '<a href="mailto:'.$params['sender_address'].'"'.emailskin_style( '.a' ).'>'.$params['sender_address'].'</a>' ).'</p>';

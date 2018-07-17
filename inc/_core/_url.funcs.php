@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package evocore
@@ -615,7 +615,7 @@ function url_crumb( $crumb_name )
  * @param string crumb_name
  * @return string
  */
-function get_crumb($crumb_name)
+function get_crumb( $crumb_name )
 {
 	global $Session;
 	return isset( $Session ) ? $Session->create_crumb( $crumb_name ) : '';
@@ -757,8 +757,9 @@ function url_absolute( $url, $base = NULL )
  */
 function make_rel_links_abs( $s, $host = NULL )
 {
-	$s = preg_replace_callback( '~(<[^>]+?)\b((?:src|href)\s*=\s*)(["\'])?([^\\3]+?)(\\3)~i', create_function( '$m', '
-		return $m[1].$m[2].$m[3].url_absolute($m[4], "'.$host.'").$m[5];' ), $s );
+	load_class( '_core/model/_urlhelper.class.php', 'UrlHelper' );
+	$url_helper = new UrlHelper( $host );
+	$s = preg_replace_callback( '~(<[^>]+?)\b((?:src|href)\s*=\s*)(["\'])?([^\\3]+?)(\\3)~i', array( $url_helper, 'callback' ), $s );
 	return $s;
 }
 
@@ -814,8 +815,8 @@ function is_absolute_url( $url )
  */
 function is_same_url( $a, $b, $ignore_http_protocol = FALSE )
 {
-	$a = preg_replace_callback('~%[0-9A-F]{2}~', create_function('$m', 'return strtolower($m[0]);'), $a);
-	$b = preg_replace_callback('~%[0-9A-F]{2}~', create_function('$m', 'return strtolower($m[0]);'), $b);
+	$a = preg_replace_callback('~%[0-9A-F]{2}~', '_is_same_url_callback', $a);
+	$b = preg_replace_callback('~%[0-9A-F]{2}~', '_is_same_url_callback', $b);
 
 	if( $ignore_http_protocol )
 	{
@@ -831,6 +832,15 @@ function is_same_url( $a, $b, $ignore_http_protocol = FALSE )
 
 
 /**
+ * Callback for preg_replace_callback in is_same_url()
+ */
+function _is_same_url_callback( $matches )
+{
+	return strtolower( $matches[0] );
+}
+
+
+/**
  * IDNA-Encode URL to Punycode.
  * @param string URL
  * @return string Encoded URL (ASCII)
@@ -841,16 +851,8 @@ function idna_encode( $url )
 
 	$url_utf8 = convert_charset( $url, 'utf-8', $evo_charset );
 
-	if( version_compare(PHP_VERSION, '5', '>=') )
-	{
-		load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
-		$IDNA = new idna_convert();
-	}
-	else
-	{
-		load_class('_ext/idna/_idna_convert.class.php4', 'Net_IDNA_php4' );
-		$IDNA = new Net_IDNA_php4();
-	}
+	load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
+	$IDNA = new idna_convert();
 
 	//echo '['.$url_utf8.'] ';
 	$url = $IDNA->encode( $url_utf8 );
@@ -872,16 +874,8 @@ function idna_encode( $url )
  */
 function idna_decode( $url )
 {
-	if( version_compare(PHP_VERSION, '5', '>=') )
-	{
-		load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
-		$IDNA = new idna_convert();
-	}
-	else
-	{
-		load_class('_ext/idna/_idna_convert.class.php4', 'Net_IDNA_php4' );
-		$IDNA = new Net_IDNA_php4();
-	}
+	load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
+	$IDNA = new idna_convert();
 	return $IDNA->decode($url);
 }
 

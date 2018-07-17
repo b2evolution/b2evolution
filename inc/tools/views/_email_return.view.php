@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -61,8 +61,8 @@ if( !empty( $datestop ) )
 if( !empty( $email ) )
 {	// Filter by email
 	$email = utf8_strtolower( $email );
-	$SQL->WHERE_and( 'emret_address LIKE '.$DB->quote( $email ) );
-	$count_SQL->WHERE_and( 'emret_address LIKE '.$DB->quote( $email ) );
+	$SQL->WHERE_and( 'emret_address LIKE '.$DB->quote( '%'.$email.'%' ) );
+	$count_SQL->WHERE_and( 'emret_address LIKE '.$DB->quote( '%'.$email.'%' ) );
 }
 
 
@@ -103,7 +103,7 @@ $Results->cols[] = array(
 		'order' => 'emret_timestamp',
 		'default_dir' => 'D',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'timestamp compact_data',
+		'td_class' => 'timestamp',
 		'td' => '%mysql2localedatetime_spans( #emret_timestamp# )%',
 	);
 

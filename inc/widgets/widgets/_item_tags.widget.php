@@ -106,10 +106,30 @@ class item_tags_Widget extends ComponentWidget
 					'size' => 40,
 					'note' => T_( 'Label before the list of tags' ),
 					'defaultvalue' => T_('Tags').': '
-				)
+				),
+				'allow_edit' => array(
+					'label' => T_( 'Allow editing' ),
+					'type' => 'checkbox',
+					'note' => T_( 'Check to enable AJAX editing of item tags if current user has permission.' ),
+					'defaultvalue' => 0,
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
+	}
+
+
+	/**
+	 * Request all required css and js files for this widget
+	 */
+	function request_required_files()
+	{
+		global $Item, $current_User;
+
+		if( ! empty( $Item ) && $this->get_param( 'allow_edit' ) && is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+		{	// Load JS to edit tags if it is enabled by widget setting and current User has a permission to edit them:
+			init_tokeninput_js( 'blog' );
+		}
 	}
 
 
@@ -138,7 +158,7 @@ class item_tags_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item;
+		global $Item, $current_User;
 
 		if( empty( $Item ) )
 		{ // Don't display this widget when no Item object
@@ -163,12 +183,33 @@ class item_tags_Widget extends ComponentWidget
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
-		// List all tags attached to the Item:
-		$Item->tags( array(
-				'before'    => $this->disp_params['widget_item_tags_before'].( $this->disp_params['widget_item_tags_before_list'] ? $this->disp_params['widget_item_tags_before_list'].' ' : '' ),
-				'after'     => $this->disp_params['widget_item_tags_after'],
-				'separator' => $this->disp_params['widget_item_tags_separator'],
-			) );
+		if( $this->get_param( 'allow_edit' ) && is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+		{	// Allow to edit tags if it is enabled by widget setting and current User has a permission to edit them:
+			echo $this->disp_params['widget_item_tags_before'].( $this->disp_params['widget_item_tags_before_list'] ? $this->disp_params['widget_item_tags_before_list'].' ' : '' );
+			$Form = new Form( get_htsrv_url().'action.php?mname=collections&item_ID='.$Item->ID );
+			$Form->switch_layout( 'none' );
+			$Form->begin_form();
+			$Form->add_crumb( 'collections_update_tags' );
+			$Form->text_input( 'item_tags', implode( ', ', $Item->get_tags() ), 40, '' );
+			// Display the submit button only when JS is disabled, because with enabled JS we use AJAX to update tags:
+			echo '<noscript>';
+			$Form->button( array( 'submit', 'actionArray[update_tags]', T_('Save Changes!'), 'SaveButton' ) );
+			echo '</noscript>';
+			$Form->end_form();
+			echo_autocomplete_tags( array(
+					'item_ID'        => $Item->ID,
+					'update_by_ajax' => true,
+				) );
+			echo $this->disp_params['widget_item_tags_after'];
+		}
+		else
+		{	// Display a list of all tags attached to the Item:
+			$Item->tags( array(
+					'before'    => $this->disp_params['widget_item_tags_before'].( $this->disp_params['widget_item_tags_before_list'] ? $this->disp_params['widget_item_tags_before_list'].' ' : '' ),
+					'after'     => $this->disp_params['widget_item_tags_after'],
+					'separator' => $this->disp_params['widget_item_tags_separator'],
+				) );
+		}
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];

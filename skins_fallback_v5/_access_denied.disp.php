@@ -10,5 +10,12 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+// ------------------ "Access Denied" CONTAINER EMBEDDED HERE -------------------
+// Display container and contents:
+skin_container( NT_('Access Denied'), array(
+		// The following params will be used as defaults for widgets included in this container:
+		'block_start' => '<div class="evo_widget $wi_class$">',
+		'block_end'   => '</div>',
+	) );
+// --------------------- END OF "Access Denied" CONTAINER -----------------------
 ?>
-<p class="center"><?php echo T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ); ?></p>

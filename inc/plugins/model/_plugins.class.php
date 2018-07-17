@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -639,23 +639,14 @@ class Plugins
 	 */
 	function init_settings( & $Plugin )
 	{
-		if( version_compare( PHP_VERSION, '5.1', '>=' ) )
-		{ // we use overloading for PHP5, therefor the member has to be unset:
-			// Note: this is somehow buggy at least in PHP 5.0.5, therefor we use it from 5.1 on.
-			//       see http://forums.b2evolution.net/viewtopic.php?p=49031#49031
-			unset( $Plugin->Settings );
-			unset( $Plugin->UserSettings );
+		// we use overloading for PHP5, therefor the member has to be unset:
+		// Note: this is somehow buggy at least in PHP 5.0.5, therefor we use it from 5.1 on.
+		//       see http://forums.b2evolution.net/viewtopic.php?p=49031#49031
+		unset( $Plugin->Settings );
+		unset( $Plugin->UserSettings );
 
-			// Nothing to do here, will get called through Plugin::__get() when accessed
-			return;
-		}
-
-		// PHP < 5.1: instantiate now, but only for installed plugins (needs DB).
-		if( $Plugin->ID > 0 )
-		{
-			$this->instantiate_Settings( $Plugin, 'Settings' );
-			$this->instantiate_Settings( $Plugin, 'UserSettings' );
-		}
+		// Nothing to do here, will get called through Plugin::__get() when accessed
+		return;
 	}
 
 
@@ -2346,6 +2337,7 @@ class Plugins
 				global $current_User;
 				if( is_logged_in() && $current_User->check_perm( 'admin', 'normal' ) )
 				{
+					global $admin_url;
 					switch( $setting_name )
 					{
 						case 'msg_apply_rendering':

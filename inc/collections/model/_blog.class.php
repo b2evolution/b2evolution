@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005 by Jason Edgecombe.
  *
@@ -386,6 +386,7 @@ class Blog extends DataObject
 				$this->set_setting( 'track_unread_content', 1 );
 				$this->set_setting( 'allow_rating_comment_helpfulness', 1 );
 				$this->set_setting( 'category_ordering', 'manual' );
+				$this->set_setting( 'disp_featured_above_list', 1 );
 
 				// Try to find post type "Forum Topic" in DB
 				global $DB;
@@ -478,24 +479,15 @@ class Blog extends DataObject
 			// Language / locale:
 			if( param( 'blog_locale', 'string', NULL ) !== NULL )
 			{ // These settings can be hidden when only one locale is enabled in the system
-				if( $this->ID > 0 )
-				{
-					$this->set_from_Request( 'locale' );
-					$this->set_setting( 'locale_source', param( 'blog_locale_source', 'string', 'blog' ) );
-					$this->set_setting( 'post_locale_source', param( 'blog_post_locale_source', 'string', 'post' ) );
-					$this->set_setting( 'new_item_locale_source', param( 'blog_new_item_locale_source', 'string', 'select_coll' ) );
-				}
-				else
-				{ // default for new collections
-					$this->set_setting( 'locale_source', 'blog' );
-					$this->set_setting( 'post_locale_source', 'post' );
-					$this->set_setting( 'new_item_locale_source', 'select_coll' );
-				}
+				$this->set_from_Request( 'locale' );
+				$this->set_setting( 'locale_source', param( 'blog_locale_source', 'string', 'blog' ) );
+				$this->set_setting( 'post_locale_source', param( 'blog_post_locale_source', 'string', 'post' ) );
+				$this->set_setting( 'new_item_locale_source', param( 'blog_new_item_locale_source', 'string', 'select_coll' ) );
 			}
 
 			// Collection permissions:
 			$prev_advanced_perms = $this->get( 'advanced_perms' );
-			$new_advanced_perms = $this->ID > 0 ? param( 'advanced_perms', 'integer', 0 ) : 0;
+			$new_advanced_perms = param( 'advanced_perms', 'integer', 0 );
 			$prev_allow_access = $this->get_setting( 'allow_access' );
 			$new_allow_access = param( 'blog_allow_access', 'string', '' );
 
@@ -593,10 +585,10 @@ class Blog extends DataObject
 			}
 
 			// Lists of collections:
+			$this->set( 'order', param( 'blog_order', 'integer' ) );
 			if( $this->ID > 0 )
 			{
-				$this->set( 'order', param( 'blog_order', 'integer' ) );
-				$this->set( 'in_bloglist', param( 'blog_in_bloglist', 'string', 'public' ) );
+				$default_in_bloglist = 'public';
 			}
 			else
 			{
@@ -617,8 +609,8 @@ class Blog extends DataObject
 					default:
 						$default_in_bloglist = 'never';
 				}
-				$this->set( 'in_bloglist', $default_in_bloglist );
 			}
+			$this->set( 'in_bloglist', param( 'blog_in_bloglist' ), $default_in_bloglist );
 		}
 
 		if( param( 'archive_links', 'string', NULL ) !== NULL )
@@ -794,17 +786,14 @@ class Blog extends DataObject
 			$this->set_from_Request( 'keywords' );
 		}
 
-		if( $this->ID > 0 )
-		{
-			if( param( 'blog_tagline', 'string', NULL ) !== NULL )
-			{	// tagline:
-				$this->set( 'tagline', get_param( 'blog_tagline' ) );
-			}
-			if( param( 'blog_longdesc', 'html', NULL ) !== NULL )
-			{	// HTML long description:
-				param_check_html( 'blog_longdesc', T_('Invalid long description') );
-				$this->set( 'longdesc', get_param( 'blog_longdesc' ) );
-			}
+		if( param( 'blog_tagline', 'string', NULL ) !== NULL )
+		{	// tagline:
+			$this->set( 'tagline', get_param( 'blog_tagline' ) );
+		}
+		if( param( 'blog_longdesc', 'html', NULL ) !== NULL )
+		{	// HTML long description:
+			param_check_html( 'blog_longdesc', T_('Invalid long description') );
+			$this->set( 'longdesc', get_param( 'blog_longdesc' ) );
 		}
 
 		if( param( 'blog_footer_text', 'html', NULL ) !== NULL )
@@ -839,11 +828,6 @@ class Blog extends DataObject
 			$this->set_setting('ping_plugins', implode(',', $blog_ping_plugins));
 		}
 
-		if( in_array( 'authors', $groups ) )
-		{ // we want to load the workflow & permissions params
-			$this->set_setting( 'use_workflow',  param( 'blog_use_workflow', 'integer', 0 ) );
-		}
-
 		if( in_array( 'home', $groups ) )
 		{ // we want to load the front page params:
 			$front_disp = param( 'front_disp', 'string', '' );
@@ -859,11 +843,20 @@ class Blog extends DataObject
 
 		if( in_array( 'features', $groups ) )
 		{ // we want to load the posts related features:
+			$this->set_setting( 'use_workflow', param( 'blog_use_workflow', 'integer', 0 ) );
+			if( get_param( 'blog_use_workflow' ) )
+			{	// Update deadline setting only when workflow is enabled:
+				$this->set_setting( 'use_deadline', param( 'blog_use_deadline', 'integer', 0 ) );
+			}
+
 			$this->set_setting( 'enable_goto_blog', param( 'enable_goto_blog', 'string', NULL ) );
 
 			$this->set_setting( 'editing_goto_blog', param( 'editing_goto_blog', 'string', NULL ) );
 
+			$this->set_setting( 'post_anonymous', param( 'post_anonymous', 'integer', 0 ) );
+
 			$this->set_setting( 'default_post_status', param( 'default_post_status', 'string', NULL ) );
+			$this->set_setting( 'default_post_status_anon', param( 'default_post_status_anon', 'string', NULL ) );
 
 			param( 'old_content_alert', 'integer', NULL );
 			param_check_range( 'old_content_alert', 1, 12, T_('Stale content alert must be configured with a number of months.').'(1 - 12)', false );
@@ -949,6 +942,7 @@ class Blog extends DataObject
 				// Subscriptions:
 				$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_item_mod_subscriptions', param( 'allow_item_mod_subscriptions', 'integer', 0 ) );
 			}
 
 			// Voting options:
@@ -980,6 +974,9 @@ class Blog extends DataObject
 				// Subscriptions:
 				$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_anon_subscriptions', param( 'allow_anon_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'default_anon_comment_notify', param( 'default_anon_comment_notify', 'integer', 0 ) );
+				$this->set_setting( 'anon_notification_email_limit', param( 'anon_notification_email_limit', 'integer', 0 ) );
 			}
 
 			$this->set_setting( 'comments_detect_email', param( 'comments_detect_email', 'integer', 0 ) );
@@ -991,6 +988,8 @@ class Blog extends DataObject
 			$this->set_setting( 'msgform_title', param( 'msgform_title', 'string' ) );
 			$this->set_setting( 'msgform_display_recipient', param( 'msgform_display_recipient', 'integer', 0 ) );
 			$this->set_setting( 'msgform_recipient_label', param( 'msgform_recipient_label', 'string' ) );
+			$this->set_setting( 'msgform_display_avatar', param( 'msgform_display_avatar', 'integer', 0 ) );
+			$this->set_setting( 'msgform_avatar_size', param( 'msgform_avatar_size', 'string' ) );
 			$this->set_setting( 'msgform_user_name', param( 'msgform_user_name', 'string' ) );
 			$this->set_setting( 'msgform_require_name', param( 'msgform_require_name', 'integer', 0 ) );
 			$this->set_setting( 'msgform_subject_list', param( 'msgform_subject_list', 'text' ) );
@@ -1009,6 +1008,12 @@ class Blog extends DataObject
 
 		if( in_array( 'userdir', $groups ) )
 		{ // we want to load the user directory settings:
+			$this->set_setting( 'userdir_filter_gender', param( 'userdir_filter_gender', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_level', param( 'userdir_filter_level', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_org', param( 'userdir_filter_org', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_criteria', param( 'userdir_filter_criteria', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_lastseen', param( 'userdir_filter_lastseen', 'integer', 0 ) );
+
 			$this->set_setting( 'userdir_picture', param( 'userdir_picture', 'integer', 0 ) );
 			$this->set_setting( 'image_size_user_list', param( 'image_size_user_list', 'string' ) );
 
@@ -1072,6 +1077,8 @@ class Blog extends DataObject
 				$this->set_setting( 'opt_out_comment_subscription', param( 'opt_out_comment_subscription', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 				$this->set_setting( 'opt_out_item_subscription', param( 'opt_out_item_subscription', 'integer', 0 ) );
+				$this->set_setting( 'allow_item_mod_subscriptions', param( 'allow_item_mod_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'opt_out_item_mod_subscription', param( 'opt_out_item_mod_subscription', 'integer', 0 ) );
 			}
 
 			// Sitemaps:
@@ -1487,7 +1494,7 @@ class Blog extends DataObject
 				}
 			}
 
-			if( ! param_errors_detected() && ! empty( $old_media_dir ) )
+			if( $this->ID > 0 && ! param_errors_detected() && ! empty( $old_media_dir ) )
 			{ // No error were detected before and possibly the media directory path was updated, check if it can be managed
 				$this->check_media_dir_change( $old_media_dir, isset( $old_media_location ) ? $old_media_location : NULL );
 			}
@@ -2337,9 +2344,10 @@ class Blog extends DataObject
 	 * @todo make default a Blog param
 	 *
 	 * @param string status to start with. Empty to use default.
+	 * @param object Permission object: Item or Comment
 	 * @return string authorized status; NULL if none
 	 */
-	function get_allowed_item_status( $status = NULL )
+	function get_allowed_item_status( $status = NULL, $perm_target = NULL )
 	{
 		global $current_User;
 
@@ -2354,7 +2362,7 @@ class Blog extends DataObject
 		}
 
 		// Get max allowed visibility status:
-		$max_allowed_status = get_highest_publish_status( 'post', $this->ID, false );
+		$max_allowed_status = get_highest_publish_status( 'post', $this->ID, false, '', $perm_target );
 
 		$visibility_statuses = get_visibility_statuses();
 		$status_is_allowed = false;
@@ -2382,10 +2390,11 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get default category for current blog
+	 * Get default category ID of the current collection
 	 *
 	 * @todo fp> this is a super lame stub, but it's still better than nothing. Should be user configurable.
 	 *
+	 * @return integer Chapter ID
 	 */
 	function get_default_cat_ID()
 	{
@@ -2393,36 +2402,37 @@ class Blog extends DataObject
 
 		if( empty( $this->default_cat_ID ) )
 		{
-			if( $default_cat_ID = $this->get_setting('default_cat_ID') )
+			if( $default_cat_ID = $this->get_setting( 'default_cat_ID' ) )
 			{	// A specific cat has previosuly been configured as the default:
-				// Try to get it from the DB (to make sure it exists and is in teh right blog):
-				$sql = 'SELECT cat_ID
-				          FROM T_categories
-				         WHERE cat_blog_ID = '.$this->ID.'
-				         	 AND cat_ID = '.$default_cat_ID;
-				$this->default_cat_ID = $DB->get_var( $sql, 0, 0, 'Get default category' );
+				// Try to get it from the DB (to make sure it exists and is in the right collection and not meta):
+				$SQL = new SQL( 'Check default category ID of collection #'.$this->ID );
+				$SQL->SELECT( 'cat_ID' );
+				$SQL->FROM( 'T_categories' );
+				$SQL->WHERE( 'cat_ID = '.$DB->quote( $default_cat_ID ) );
+				$SQL->WHERE_and( 'cat_blog_ID = '.$this->ID );
+				$SQL->WHERE_and( 'cat_meta = 0' );
+				$this->default_cat_ID = $DB->get_var( $SQL );
 			}
 		}
 
 		if( empty( $this->default_cat_ID ) )
 		{	// If the previous query has returned NULL
+			$SQL = new SQL( 'Get auto default category ID of collection #'.$this->ID );
+			$SQL->SELECT( 'cat_ID' );
+			$SQL->FROM( 'T_categories' );
+			$SQL->WHERE( 'cat_blog_ID = '.$this->ID );
+			$SQL->WHERE_and( 'cat_meta = 0' );
+			$SQL->LIMIT( '1' );
 			if( $this->get_setting('category_ordering') == 'manual' )
 			{	// Manual order
-				$select_temp_order = ', IF( cat_order IS NULL, 999999999, cat_order ) AS temp_order';
-				$sql_order = ' ORDER BY cat_parent_ID, temp_order';
+				$SQL->SELECT_add( ', IF( cat_order IS NULL, 999999999, cat_order ) AS temp_order' );
+				$SQL->ORDER_BY( 'cat_parent_ID, temp_order' );
 			}
 			else
 			{	// Alphabetic order
-				$select_temp_order = '';
-				$sql_order = ' ORDER BY cat_parent_ID, cat_name';
+				$SQL->ORDER_BY( 'cat_parent_ID, cat_name' );
 			}
-			$sql = 'SELECT cat_ID'.$select_temp_order.'
-			          FROM T_categories
-			         WHERE cat_blog_ID = '.$this->ID.' AND cat_meta = 0'
-			         .$sql_order
-			         .' LIMIT 1';
-
-			$this->default_cat_ID = $DB->get_var( $sql, 0, 0, 'Get default category' );
+			$this->default_cat_ID = $DB->get_var( $SQL );
 		}
 
 		return $this->default_cat_ID;
@@ -2731,9 +2741,17 @@ class Blog extends DataObject
 				$disp_param = 'userprefs';
 				break;
 
+			case 'closeaccounturl':
+				$disp_param = 'closeaccount';
+				break;
+
 			case 'subsurl':
 				$disp_param = 'subs';
 				$params['url_suffix'] .= '#subs';
+				break;
+
+			case 'register_finishurl':
+				$disp_param = 'register_finish';
 				break;
 
 			case 'userurl':
@@ -2764,12 +2782,17 @@ class Blog extends DataObject
 				$url_disp = str_replace( 'url', '', $parname );
 				if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $this ) )
 				{ // Use special blog for login/register actions if it is defined in general settings
-					return url_add_param( $login_Blog->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
+					$url = url_add_param( $login_Blog->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
 				}
 				else
 				{ // Use login/register urls of this blog
-					return url_add_param( $this->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
+					$url = url_add_param( $this->gen_blogurl(), 'disp='.$url_disp, $params['glue'] );
 				}
+				if( ! empty( $params['url_suffix'] ) )
+				{ // Append url suffix
+					$url = url_add_param( $url, $params['url_suffix'], $params['glue'] );
+				}
+				return $url;
 
 			case 'threadsurl':
 				$disp_param = 'threads';
@@ -2877,8 +2900,8 @@ class Blog extends DataObject
 
 				if( $parname == 'mobile_skin_ID' || $parname == 'tablet_skin_ID' )
 				{
-					if( ( $result === NULL ) && ! ( isset( $params['real_value'] ) && $params['real_value'] ) )
-					{	// NULL value means that use the same as normal case:
+					if( empty( $result ) && ! ( isset( $params['real_value'] ) && $params['real_value'] ) )
+					{	// Empty values(NULL, 0, '0', '') means that use the same as normal case:
 						$result = $this->get( 'normal_skin_ID' );
 					}
 				}
@@ -2892,7 +2915,7 @@ class Blog extends DataObject
 		if( ! empty( $disp_param ) )
 		{ // Get url depending on value of param 'disp'
 			$this_Blog = & $this;
-			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'visits' ) ) )
+			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish', 'visits', 'closeaccount' ) ) )
 			{ // Check if we can use this blog for messaging actions or we should use spec blog
 				if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) )
 				{ // Use special blog for messaging actions if it is defined in general settings
@@ -3304,11 +3327,17 @@ class Blog extends DataObject
 	/**
 	 * Duplicate collection to new one
 	 *
+	 * @param boolean TRUE to duplicate categories and posts/items from source collection
 	 * @return boolean Result
 	 */
-	function duplicate()
+	function duplicate( $params = array() )
 	{
 		global $DB, $current_User;
+
+		$params = array_merge( array(
+				'duplicate_items'    => false,
+				'duplicate_comments' => false,
+			), $params );
 
 		$DB->begin();
 
@@ -3416,48 +3445,280 @@ class Blog extends DataObject
 			 WHERE wi_coll_ID = '.$DB->quote( $duplicated_coll_ID ),
 			'Duplicate all widgets from collection #'.$duplicated_coll_ID.' to #'.$this->ID );
 
-		/*
-		// There is currently no use case to duplicate categories if category contents are not duplicated
-
-		// Copy all categories from duplicated collection to new created:
-		$source_cats_SQL = new SQL( 'Get all categories of the duplicating collection #'.$duplicated_coll_ID );
-		$source_cats_SQL->SELECT( '*' );
-		$source_cats_SQL->FROM( 'T_categories' );
-		$source_cats_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $duplicated_coll_ID ) );
-		$source_cats = $DB->get_results( $source_cats_SQL, ARRAY_A );
-		$new_cats = array(); // Store all new created categories with key as ID of copied category in order to correct assign parent IDs
-		$ChapterCache = & get_ChapterCache();
-		foreach( $source_cats as $source_cat_fields )
-		{	// Copy each category separately because of unique field "cat_urlname":
-			$new_Chapter = & $ChapterCache->new_obj( NULL, $this->ID );
-			foreach( $source_cat_fields as $source_cat_field_name => $source_cat_field_value )
-			{
-				// Cut prefix "cat_" of each field:
-				$source_cat_field_name = substr( $source_cat_field_name, 4 );
-				if( $source_cat_field_name == 'ID' || $source_cat_field_name == 'blog_ID' )
-				{	// Skip these fields, they must be new:
-					continue;
+		if( $params['duplicate_items'] )
+		{	// Duplicate categories and posts/items:
+			// Copy all categories from duplicated collection to new created:
+			$source_cats_SQL = new SQL( 'Get all categories of the duplicating collection #'.$duplicated_coll_ID );
+			$source_cats_SQL->SELECT( '*' );
+			$source_cats_SQL->FROM( 'T_categories' );
+			$source_cats_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $duplicated_coll_ID ) );
+			$source_cats = $DB->get_results( $source_cats_SQL, ARRAY_A );
+			$new_cats = array(); // Store all new created categories with key as ID of copied category in order to correct assign parent IDs
+			$ChapterCache = & get_ChapterCache();
+			foreach( $source_cats as $source_cat_fields )
+			{	// Copy each category separately because of unique field "cat_urlname":
+				$new_Chapter = & $ChapterCache->new_obj( NULL, $this->ID );
+				foreach( $source_cat_fields as $source_cat_field_name => $source_cat_field_value )
+				{
+					// Cut prefix "cat_" of each field:
+					$source_cat_field_name = substr( $source_cat_field_name, 4 );
+					if( $source_cat_field_name == 'ID' || $source_cat_field_name == 'blog_ID' )
+					{	// Skip these fields, they must be new:
+						continue;
+					}
+					$new_Chapter->set( $source_cat_field_name, $source_cat_field_value );
 				}
-				$new_Chapter->set( $source_cat_field_name, $source_cat_field_value );
+				// Insert the duplicated category:
+				if( $new_Chapter->dbinsert() )
+				{	// If category has been inserted successfully, then update IDs for correct parent hierarchy:
+					// Key - ID of copied category, Value - new created category:
+					$new_cats[ $source_cat_fields['cat_ID'] ] = $new_Chapter;
+				}
 			}
-			// Insert the duplicated category:
-			if( $new_Chapter->dbinsert() )
-			{	// If category has been inserted successfully, then update IDs for correct parent hierarchy:
-				// Key - ID of copied category, Value - new created category:
-				$new_cats[ $source_cat_fields['cat_ID'] ] = $new_Chapter;
+			foreach( $new_cats as $duplicated_cat_ID => $new_Chapter )
+			{	// Update wrong parent IDs to IDs of new created categories:
+				$old_cat_parent_ID = intval( $new_Chapter->get( 'parent_ID' ) );
+				if( $old_cat_parent_ID > 0 && isset( $new_cats[ $old_cat_parent_ID ] ) )
+				{
+					$new_parent_Chapter = $new_cats[ $old_cat_parent_ID ];
+					$new_Chapter->set( 'parent_ID', $new_parent_Chapter->ID );
+					$new_Chapter->dbupdate();
+				}
+				if( $this->get_setting( 'default_cat_ID' ) == $duplicated_cat_ID )
+				{	// Update wrong default category with correct ID of new duplicated category:
+					$this->set_setting( 'default_cat_ID', $new_Chapter->ID );
+					$this->dbupdate();
+				}
+			}
+
+			if( ! empty( $new_cats ) )
+			{	// Duplicate posts if collection has at least one category:
+				$old_items_SQL = new SQL( 'Get all posts of collection #'.$duplicated_coll_ID.' before duplicating them into collection #'.$this->ID );
+				$old_items_SQL->SELECT( 'T_items__item.*' );
+				$old_items_SQL->FROM( 'T_items__item' );
+				$old_items_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
+				$old_items_SQL->WHERE( 'cat_blog_ID = '.$duplicated_coll_ID );
+				$old_items_SQL->ORDER_BY( 'post_ID' );
+				$old_items = $DB->get_results( $old_items_SQL, ARRAY_A );
+				$new_items = array();
+				foreach( $old_items as $old_item )
+				{
+					$old_item_ID = $old_item['post_ID'];
+					unset( $old_item['post_ID'] );
+
+					if( isset( $new_cats[ $old_item['post_main_cat_ID'] ] ) )
+					{	// Use correct category ID:
+						$new_item_Chapter = $new_cats[ $old_item['post_main_cat_ID'] ];
+						$old_item['post_main_cat_ID'] = $new_item_Chapter->ID;
+					}
+
+					// Get new unique slug:
+					$old_item['post_urltitle'] = urltitle_validate( $old_item['post_urltitle'], $old_item['post_title'], 0, false, 'slug_title', 'slug_itm_ID', 'T_slug', $old_item['post_locale'], 'T_items__item' );
+
+					// Duplicate a post:
+					$DB->query( 'INSERT INTO T_items__item ( '.implode( ', ', array_keys( $old_item ) ).' ) VALUES ( '.$DB->quote( $old_item ).' )',
+						'Duplicate from post #'.$old_item_ID );
+					$new_item_ID = $DB->insert_id;
+
+					// Create canonical and tiny slugs:
+					load_funcs( 'slugs/model/_slug.funcs.php' );
+					$new_canonical_Slug = new Slug();
+					$new_canonical_Slug->set( 'title', $old_item['post_urltitle'] );
+					$new_canonical_Slug->set( 'type', 'item' );
+					$new_canonical_Slug->set( 'itm_ID', $new_item_ID );
+					$new_canonical_Slug->dbinsert();
+					$new_tiny_Slug = new Slug();
+					$new_tiny_Slug->set( 'title', getnext_tinyurl() );
+					$new_tiny_Slug->set( 'type', 'item' );
+					$new_tiny_Slug->set( 'itm_ID', $new_item_ID );
+					$new_tiny_Slug->dbinsert();
+
+					$DB->query( 'UPDATE T_items__item
+						  SET post_canonical_slug_ID = '.$new_canonical_Slug->ID.',
+						      post_tiny_slug_ID = '.$new_tiny_Slug->ID.'
+						WHERE post_ID = '.$new_item_ID );
+
+					$new_items[ $old_item_ID ] = $new_item_ID;
+				}
+
+				// Update parent post IDs with correct IDs of new inserted posts:
+				$update_parent_items_sql = '';
+				foreach( $old_items as $old_item )
+				{
+					if( ! empty( $old_item['post_parent_ID'] ) && isset( $new_items[ $old_item['post_parent_ID'] ] ) )
+					{
+						$update_parent_items_sql .= ' WHEN post_parent_ID = '.$old_item['post_parent_ID'].' THEN '.$new_items[ $old_item['post_parent_ID'] ];
+					}
+				}
+				if( $update_parent_items_sql != '' )
+				{
+					$DB->query( 'UPDATE T_items__item
+						INNER JOIN T_categories ON post_main_cat_ID = cat_ID
+						  SET post_parent_ID = CASE '.$update_parent_items_sql.' ELSE post_parent_ID END
+						WHERE cat_blog_ID = '.$this->ID );
+				}
+
+				if( ! empty( $new_items ) )
+				{
+					$old_items_IDs = $DB->quote( array_keys( $new_items ) );
+
+					// Duplicate extra categories:
+					$old_extra_cats_SQL = new SQL( 'Get all posts categories of collection #'.$duplicated_coll_ID.' before duplicating' );
+					$old_extra_cats_SQL->SELECT( 'postcat_post_ID, postcat_cat_ID' );
+					$old_extra_cats_SQL->FROM( 'T_postcats' );
+					$old_extra_cats_SQL->WHERE( 'postcat_post_ID IN ( '.$old_items_IDs.' )' );
+					$old_extra_cats = $DB->get_results( $old_extra_cats_SQL, ARRAY_A );
+					$new_extra_cats_values = array();
+					foreach( $old_extra_cats as $old_extra_cat )
+					{
+						if( isset( $new_items[ $old_extra_cat['postcat_post_ID'] ], $new_cats[ $old_extra_cat['postcat_cat_ID'] ] ) )
+						{
+							$new_extra_cats_values[] = '( '.$new_items[ $old_extra_cat['postcat_post_ID'] ].', '.$new_cats[ $old_extra_cat['postcat_cat_ID'] ]->ID.' )';
+						}
+					}
+					if( ! empty( $new_extra_cats_values ) )
+					{
+						$DB->query( 'INSERT INTO T_postcats ( '.$old_extra_cats_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_extra_cats_values ),
+							'Duplicate extra categories for posts of collection #'.$duplicated_coll_ID );
+					}
+
+					// Duplicate tags:
+					$old_tags_SQL = new SQL( 'Get all posts tags of collection #'.$duplicated_coll_ID.' before duplicating' );
+					$old_tags_SQL->SELECT( 'itag_itm_ID, itag_tag_ID' );
+					$old_tags_SQL->FROM( 'T_items__itemtag' );
+					$old_tags_SQL->WHERE( 'itag_itm_ID IN ( '.$old_items_IDs.' )' );
+					$old_tags = $DB->get_results( $old_tags_SQL, ARRAY_A );
+					$new_tags_values = array();
+					foreach( $old_tags as $old_tag )
+					{
+						if( isset( $new_items[ $old_tag['itag_itm_ID'] ] ) )
+						{
+							$old_tag['itag_itm_ID'] = $new_items[ $old_tag['itag_itm_ID'] ];
+							$new_tags_values[] = '( '.$DB->quote( $old_tag ).' )';
+						}
+					}
+					if( ! empty( $new_tags_values ) )
+					{
+						$DB->query( 'INSERT INTO T_items__itemtag ( '.$old_tags_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_tags_values ),
+							'Duplicate tags for posts of collection #'.$duplicated_coll_ID );
+					}
+
+					// Duplicate settings:
+					$old_settings_SQL = new SQL( 'Get all posts settings of collection #'.$duplicated_coll_ID.' before duplicating' );
+					$old_settings_SQL->SELECT( 'iset_item_ID, iset_name, iset_value' );
+					$old_settings_SQL->FROM( 'T_items__item_settings' );
+					$old_settings_SQL->WHERE( 'iset_item_ID IN ( '.$old_items_IDs.' )' );
+					$old_settings = $DB->get_results( $old_settings_SQL, ARRAY_A );
+					$new_settings_values = array();
+					foreach( $old_settings as $old_setting )
+					{
+						if( isset( $new_items[ $old_setting['iset_item_ID'] ] ) )
+						{
+							$old_setting['iset_item_ID'] = $new_items[ $old_setting['iset_item_ID'] ];
+							$new_settings_values[] = '( '.$DB->quote( $old_setting ).' )';
+						}
+					}
+					if( ! empty( $new_settings_values ) )
+					{
+						$DB->query( 'INSERT INTO T_items__item_settings ( '.$old_settings_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_settings_values ),
+							'Duplicate settings for posts of collection #'.$duplicated_coll_ID );
+					}
+
+					// Duplicate links/attachments:
+					$old_links_SQL = new SQL( 'Get all posts attachments of collection #'.$duplicated_coll_ID.' before duplicating' );
+					$old_links_SQL->SELECT( 'link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_itm_ID, link_file_ID, link_position, link_order' );
+					$old_links_SQL->FROM( 'T_links' );
+					$old_links_SQL->WHERE( 'link_itm_ID IN ( '.$old_items_IDs.' )' );
+					$old_links = $DB->get_results( $old_links_SQL, ARRAY_A );
+					$new_links_values = array();
+					foreach( $old_links as $old_link )
+					{
+						if( isset( $new_items[ $old_link['link_itm_ID'] ] ) )
+						{
+							$old_link['link_itm_ID'] = $new_items[ $old_link['link_itm_ID'] ];
+							$new_links_values[] = '( '.$DB->quote( $old_link ).' )';
+						}
+					}
+					if( ! empty( $new_links_values ) )
+					{
+						$DB->query( 'INSERT INTO T_links ( '.$old_links_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_links_values ),
+							'Duplicate links for posts of collection #'.$duplicated_coll_ID );
+					}
+
+					if( $params['duplicate_comments'] )
+					{	// Duplicate comments:
+						$old_comments_SQL = new SQL( 'Get all comments of collection #'.$duplicated_coll_ID.' before duplicating' );
+						$old_comments_SQL->SELECT( '*' );
+						$old_comments_SQL->FROM( 'T_comments' );
+						$old_comments_SQL->WHERE( 'comment_item_ID IN ( '.$old_items_IDs.' )' );
+						$old_comments = $DB->get_results( $old_comments_SQL, ARRAY_A );
+						foreach( $old_comments as $old_comment )
+						{
+							if( isset( $new_items[ $old_comment['comment_item_ID'] ] ) )
+							{	// Insert only comments with correct item ID:
+								$old_comment_ID = $old_comment['comment_ID'];
+								unset( $old_comment['comment_ID'] );
+								$old_comment['comment_item_ID'] = $new_items[ $old_comment['comment_item_ID'] ];
+								$DB->query( 'INSERT INTO T_comments ( '.implode( ', ', array_keys( $old_comment ) ).' ) VALUES ( '.$DB->quote( $old_comment ).' )',
+									'Duplicate comment #'.$old_comment_ID.' of collection #'.$duplicated_coll_ID );
+								$new_comment_ID = $DB->insert_id;
+								$new_comments[ $old_comment_ID ] = $new_comment_ID;
+							}
+						}
+
+						// Update parent comment IDs with correct IDs of new inserted comments:
+						$update_parent_comments_sql = '';
+						foreach( $old_comments as $old_comment )
+						{
+							if( ! empty( $old_comment['comment_in_reply_to_cmt_ID'] ) && isset( $new_comments[ $old_comment['comment_in_reply_to_cmt_ID'] ] ) )
+							{
+								$update_parent_comments_sql .= ' WHEN comment_in_reply_to_cmt_ID = '.$old_comment['comment_in_reply_to_cmt_ID'].' THEN '.$new_comments[ $old_comment['comment_in_reply_to_cmt_ID'] ];
+							}
+						}
+						if( $update_parent_comments_sql != '' )
+						{
+							$DB->query( 'UPDATE T_comments
+									SET comment_in_reply_to_cmt_ID = CASE '.$update_parent_comments_sql.' ELSE comment_in_reply_to_cmt_ID END
+								WHERE comment_item_ID IN ( '.$DB->quote( $new_items ).' )' );
+						}
+
+						if( ! empty( $new_comments ) )
+						{	// Duplicate links/attachments of the comments:
+							$old_links_SQL = new SQL( 'Get all comments attachments of collection #'.$duplicated_coll_ID.' before duplicating' );
+							$old_links_SQL->SELECT( 'link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_cmt_ID, link_file_ID, link_position, link_order' );
+							$old_links_SQL->FROM( 'T_links' );
+							$old_links_SQL->WHERE( 'link_cmt_ID IN ( '.$old_items_IDs.' )' );
+							$old_links = $DB->get_results( $old_links_SQL, ARRAY_A );
+							$new_links_values = array();
+							foreach( $old_links as $old_link )
+							{
+								if( isset( $new_comments[ $old_link['link_cmt_ID'] ] ) )
+								{
+									$old_link['link_cmt_ID'] = $new_comments[ $old_link['link_cmt_ID'] ];
+									$new_links_values[] = '( '.$DB->quote( $old_link ).' )';
+								}
+							}
+							if( ! empty( $new_links_values ) )
+							{
+								$DB->query( 'INSERT INTO T_links ( '.$old_links_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_links_values ),
+									'Duplicate links for comments of collection #'.$duplicated_coll_ID );
+							}
+						}
+					}
+				}
 			}
 		}
-		foreach( $new_cats as $duplicated_cat_ID => $new_Chapter )
-		{	// Update wrong parent IDs to IDs of new created categories:
-			$old_cat_parent_ID = intval( $new_Chapter->get( 'parent_ID' ) );
-			if( $old_cat_parent_ID > 0 && isset( $new_cats[ $old_cat_parent_ID ] ) )
-			{
-				$new_parent_Chapter = $new_cats[ $old_cat_parent_ID ];
-				$new_Chapter->set( 'parent_ID', $new_parent_Chapter->ID );
-				$new_Chapter->dbupdate();
-			}
+		else
+		{	// Create at least one default category:
+			load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
+			$new_Chapter = new Chapter( NULL, $this->ID );
+			$new_Chapter->set( 'name', T_('Uncategorized') );
+			$new_Chapter->set( 'urlname', $this->get( 'urlname' ).'-main' );
+			$new_Chapter->dbinsert();
+			// Use this single category as default:
+			$this->set_setting( 'default_cat_ID', $new_Chapter->ID );
+			$this->dbupdate();
 		}
-		*/
 
 		// The duplicating is successful, So commit all above changes:
 		$DB->commit();
@@ -4347,8 +4608,10 @@ class Blog extends DataObject
 	{
 		$url = '';
 
-		if( is_logged_in( false ) )
-		{	// Only logged in and activated users can write a Post
+		if( is_logged_in( false ) ||
+		    ( ! is_logged_in() && $this->get_setting( 'post_anonymous' ) ) )
+		{	// Only logged in and activated users can write a Post,
+			// Or anonymous user can post if it is allowed with collection setting:
 			global $current_User;
 
 			$ChapterCache = & get_ChapterCache();
@@ -4357,7 +4620,7 @@ class Blog extends DataObject
 			{ // This category is locked, don't allow to create new post with this cat
 				return '';
 			}
-			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->ID ) )
+			if( ! is_logged_in() || $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->ID ) )
 			{	// We have permission to add a post with at least one status:
 				if( $this->get_setting( 'in_skin_editing' ) && ! is_admin_page() )
 				{	// We have a mode 'In-skin editing' for the current Blog
@@ -4367,9 +4630,9 @@ class Blog extends DataObject
 					{	// Link to create a Item with predefined category
 						$cat_url_param = '&amp;cat='.$cat_ID;
 					}
-					$url = url_add_param( $this->get( 'url' ), 'disp=edit'.$cat_url_param );
+					$url = url_add_param( $this->get( 'url' ), ( is_logged_in() ? 'disp=edit' : 'disp=anonpost' ).$cat_url_param );
 				}
-				elseif( $current_User->check_perm( 'admin', 'restricted' ) )
+				elseif( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) )
 				{	// Edit a post from Back-office
 					global $admin_url;
 					$url = $admin_url.'?ctrl=items&amp;action=new&amp;blog='.$this->ID;
@@ -4385,11 +4648,11 @@ class Blog extends DataObject
 
 				if( !empty( $post_title ) )
 				{ // Append a post title
-					$url = url_add_param( $url, 'post_title='.$post_title );
+					$url = url_add_param( $url, 'post_title='.urlencode( $post_title ) );
 				}
 				if( !empty( $post_urltitle ) )
 				{ // Append a post urltitle
-					$url = url_add_param( $url, 'post_urltitle='.$post_urltitle );
+					$url = url_add_param( $url, 'post_urltitle='.urlencode( $post_urltitle ) );
 				}
 				if( ! empty( $post_type_usage ) )
 				{ // Append a post type ID
@@ -4894,7 +5157,7 @@ class Blog extends DataObject
 			$SQL->FROM_add( 'LEFT JOIN T_users__usersettings AS s3 ON s3.uset_user_ID = user_ID AND s3.uset_name = "notify_spam_cmt_moderation"' );
 			$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 			$SQL->WHERE( 'LENGTH( TRIM( user_email ) ) > 0' );
-			$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
+			$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 			$SQL->WHERE_and( '( grp_perm_blogs = "editall" )
 				OR ( user_ID IN ( SELECT bloguser_user_ID FROM T_coll_user_perms WHERE bloguser_blog_ID = '.$this->ID.' AND bloguser_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )
 				OR ( grp_ID IN ( SELECT bloggroup_group_ID FROM T_coll_group_perms WHERE bloggroup_blog_ID = '.$this->ID.' AND bloggroup_perm_edit_cmt IN ( "anon", "lt", "le", "all" ) ) )' );
@@ -5146,6 +5409,47 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get recipient link on disp=msgform
+	 *
+	 * @return string
+	 */
+	function get_msgform_recipient_link()
+	{
+		$recipient_link = '';
+
+		if( get_param( 'recipient_id' ) > 0 )
+		{	// Get recipient identity link for registered user:
+			$UserCache = & get_UserCache();
+			$recipient_User = & $UserCache->get_by_ID( get_param( 'recipient_id' ) );
+
+			if( $this->get_setting( 'msgform_display_avatar' ) )
+			{	// Display recipient name with avatar:
+				$recipient_link_params = array(
+						'link_text'   => 'avatar_name',
+						'thumb_size'  => $this->get_setting( 'msgform_avatar_size' ),
+						'thumb_class' => 'avatar_before_login_middle',
+					);
+			}
+			else
+			{	// Display only recipient name:
+				$recipient_link_params = array( 'link_text' => 'auto' );
+			}
+			$recipient_link = $recipient_User->get_identity_link( $recipient_link_params );
+		}
+		elseif( get_param( 'comment_id' ) > 0 )
+		{	// Get login name for anonymous user:
+			$CommentCache = & get_CommentCache();
+			$Comment = & $CommentCache->get_by_ID( get_param( 'comment_id' ) );
+			// Set a gender class for anonymous user if the setting is enabled:
+			$gender_class = check_setting( 'gender_colored' ) ? ' nogender' : '';
+			$recipient_link = '<span class="user anonymous'.$gender_class.'" rel="bubbletip_comment_'.$Comment->ID.'">'.$Comment->get_author_name().'</span>';
+		}
+
+		return $recipient_link;
+	}
+
+
+	/**
 	 * Get additional fields on disp=msgform
 	 *
 	 * @return array
@@ -5180,9 +5484,10 @@ class Blog extends DataObject
 	 * Display all selected additional fields on disp=msgform
 	 *
 	 * @param object Form
+	 * @param array Filled user fields from submitted form
 	 * @return array
 	 */
-	function display_msgform_additional_fields( $Form )
+	function display_msgform_additional_fields( $Form, $filled_user_fields = array() )
 	{
 		$msgform_additional_fields = $this->get_msgform_additional_fields();
 
@@ -5190,7 +5495,21 @@ class Blog extends DataObject
 		{
 			$field_value = '';
 			$field_value2 = '';
-			if( is_logged_in() )
+
+			if( ! empty( $filled_user_fields[ $UserField->ID ] ) )
+			{	// Get values from the submitted form:
+				if( is_array( $filled_user_fields[ $UserField->ID ] ) )
+				{	// Multiple field:
+					$field_value = isset( $filled_user_fields[ $UserField->ID ][0] ) ? trim( $filled_user_fields[ $UserField->ID ][0] ) : '';
+					$field_value2 = isset( $filled_user_fields[ $UserField->ID ][1] ) ? trim( $filled_user_fields[ $UserField->ID ][1] ) : '';
+				}
+				else
+				{	// Single field:
+					$field_value = $filled_user_fields[ $UserField->ID ];
+				}
+			}
+
+			if( is_logged_in() && empty( $field_value ) )
 			{	// Get saved field value from the current logged in User:
 				global $current_User;
 				$userfields = $current_User->userfields_by_ID( $UserField->ID );
@@ -5281,6 +5600,36 @@ class Blog extends DataObject
 				$field_params['style'] = 'max-width:90%';
 				$Form->text_input( $field_name, $field_value, ( $UserField->get( 'type' ) == 'url' ? 80 : 40 ), $userfield_icon.$UserField->get( 'name' ), '', $field_params );
 		}
+	}
+
+
+	/**
+	 * Get default item type object
+	 *
+	 * @return object ItemType
+	 */
+	function & get_default_ItemType()
+	{
+		if( ! isset( $this->default_ItemType ) )
+		{	// Initialize default item type object for this collection:
+			$ItemTypeCache = & get_ItemTypeCache();
+			$this->default_ItemType = & $ItemTypeCache->get_by_ID( $this->get_setting( 'default_post_type' ), false, false );
+		}
+
+		return $this->default_ItemType;
+	}
+
+
+	/**
+	 * Get name of default item type
+	 *
+	 * @return string Name of default ItemType object
+	 */
+	function get_default_item_type_name()
+	{
+		$default_ItemType = $this->get_default_ItemType();
+
+		return $default_ItemType ? $default_ItemType->get_name() : T_('Post');
 	}
 }
 

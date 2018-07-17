@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -222,6 +222,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_karma              INT(11) NOT NULL DEFAULT 0,
 			comment_spam_karma         TINYINT NULL,
 			comment_allow_msgform      TINYINT NOT NULL DEFAULT 0,
+			comment_anon_notify        TINYINT(1) NOT NULL DEFAULT 0,
+			comment_anon_notify_last   VARCHAR(16) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			comment_secret             CHAR(32) COLLATE ascii_general_ci NULL default NULL,
 			comment_notif_status       ENUM('noreq','todo','started','finished') COLLATE ascii_general_ci NOT NULL DEFAULT 'noreq' COMMENT 'Have notifications been sent for this comment? How far are we in the process?',
 			comment_notif_ctsk_ID      INT(10) unsigned NULL DEFAULT NULL COMMENT 'When notifications for this comment are sent through a scheduled job, what is the job ID?',
@@ -427,6 +429,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			sub_coll_ID     int(11) unsigned    not null,
 			sub_user_ID     int(11) unsigned    not null,
 			sub_items       tinyint(1)          not null,
+			sub_items_mod   TINYINT(1)          NOT NULL,
 			sub_comments    tinyint(1)          not null,
 			primary key (sub_coll_ID, sub_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

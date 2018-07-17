@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -30,7 +30,7 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New email address') : T_('Email a
 	$Form->hidden( 'action', 'blocked_save' );
 	$Form->hiddens_by_key( get_memorized( 'action' ) );
 
-	$Form->text_input( 'emadr_address', $edited_EmailAddress->get( 'address' ), 50, T_('Email address'), '', array( 'maxlength'=> 255, 'required'=>true ) );
+	$Form->email_input( 'emadr_address', $edited_EmailAddress->get( 'address' ), 50, T_('Email address'), array( 'maxlength'=> 255, 'required'=>true ) );
 
 	$email_status_icon = '<div id="email_status_icon" class="status_icon">'.emadr_get_status_icon( $edited_EmailAddress->get( 'status' ) ).'</div>';
 	$Form->select_input_array( 'emadr_status', $edited_EmailAddress->get( 'status' ), emadr_get_status_titles(), 'Status', '', array( 'force_keys_as_values' => true, 'background_color' => emadr_get_status_colors(), 'required' => true, 'input_prefix' => $email_status_icon ) );

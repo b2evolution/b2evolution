@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -330,14 +330,8 @@ function format_to_output( $content, $format = 'htmlbody' )
 		case 'htmlspecialchars':
 		case 'formvalue':
 			// Replace special chars to &amp;, &quot;, &#039;|&apos;, &lt; and &gt; :
-			if( version_compare( phpversion(), '5.4', '>=' ) )
-			{	// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
-				$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
-			}
-			else
-			{	// Handles & " ' < > to &amp; &quot; &#039; &lt; &gt;
-				$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );
-			}
+			// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
+			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
 			break;
 
 		case 'xml':
@@ -365,14 +359,8 @@ function format_to_output( $content, $format = 'htmlbody' )
 
 		case 'syslog':
 			// Replace special chars to &amp;, &quot;, &#039;|&apos;, &lt; and &gt; :
-			if( version_compare( phpversion(), '5.4', '>=' ) )
-			{	// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
-				$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
-			}
-			else
-			{	// Handles & " ' < > to &amp; &quot; &#039; &lt; &gt;
-				$content = htmlspecialchars( $content, ENT_QUOTES, $evo_charset );
-			}
+			// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
+			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
 			$content = preg_replace( "/\[\[(.+?)]]/is", "<code>$1</code>", $content ); // Replaces [[...]] into <code>...</code>
 			break;
 
@@ -733,7 +721,7 @@ function convert_chars( $content, $flag = 'html' )
 		// fp> why do we actually bother doing this:?
 		$content = preg_replace_callback(
 			'/[\x80-\xff]/',
-			create_function( '$j', 'return "&#".ord($j[0]).";";' ),
+			'_convert_chars_callback',
 			$content);
 	}
 
@@ -756,6 +744,15 @@ function convert_chars( $content, $flag = 'html' )
 	}
 
 	return( $content );
+}
+
+
+/**
+ * Callback for preg_replace_callback in convert_chars()
+ */
+function _convert_chars_callback( $matches )
+{
+	return "&#".ord( $matches[0] ).";";
 }
 
 
@@ -1674,17 +1671,18 @@ function date_ago( $timestamp )
  * Convert seconds to readable period
  *
  * @param integer Seconds
+ * @param boolean TRUE to use short format(only first letter of period name)
  * @return string Readable time period
  */
-function seconds_to_period( $seconds )
+function seconds_to_period( $seconds, $short_format = false )
 {
 	$periods = array(
-		array( 31536000, T_('1 year'),   T_('%s years') ), // 365 days
-		array( 2592000,  T_('1 month'),  T_('%s months') ), // 30 days
-		array( 86400,    T_('1 day'),    T_('%s days') ),
-		array( 3600,     T_('1 hour'),   T_('%s hours') ),
-		array( 60,       T_('1 minute'), T_('%s minutes') ),
-		array( 1,        T_('1 second'), T_('%s seconds') ),
+		array( 31536000, T_('1 year'),   T_('%s years'),   /* TRANS: Short for "1year" */  T_('%sy') ), // 365 days
+		array( 2592000,  T_('1 month'),  T_('%s months'),  /* TRANS: Short for "1month" */ T_('%sm') ), // 30 days
+		array( 86400,    T_('1 day'),    T_('%s days'),    /* TRANS: Short for "1day" */   T_('%sd') ),
+		array( 3600,     T_('1 hour'),   T_('%s hours'),   /* TRANS: Short for "1hour" */  T_('%sh') ),
+		array( 60,       T_('1 minute'), T_('%s minutes'), /* TRANS: Short for "1minute" */T_('%smn') ),
+		array( 1,        T_('1 second'), T_('%s seconds'), /* TRANS: Short for "1second" */T_('%ss') ),
 	);
 
 	foreach( $periods as $p_info )
@@ -1692,7 +1690,11 @@ function seconds_to_period( $seconds )
 		$period_value = intval( $seconds / $p_info[0] * 10 ) /10;
 		if( $period_value >= 1 )
 		{ // Stop on this period
-			if( $period_value == 1 )
+			if( $short_format )
+			{	// Use short format:
+				$period_text = sprintf( $p_info[3], $period_value );
+			}
+			elseif( $period_value == 1 )
 			{ // One unit of period
 				$period_text = $p_info[1];
 			}
@@ -1706,7 +1708,7 @@ function seconds_to_period( $seconds )
 
 	if( !isset( $period_text ) )
 	{ // 0 seconds
-		$period_text = sprintf( T_('%s seconds'), 0 );
+		$period_text = $short_format ? sprintf( T_('%ss'), 0 ) : sprintf( T_('%s seconds'), 0 );
 	}
 
 	return $period_text;
@@ -2162,7 +2164,7 @@ function is_valid_login( $login, $force_strict_logins = false )
 	}
 
 	// Step 2
-	if( ($strict_logins || $force_strict_logins) && ! preg_match( '~^[A-Za-z0-9_.]+$~', $login ) )
+	if( ($strict_logins || $force_strict_logins) && ! preg_match( '~^[A-Za-z0-9_.\-]+$~', $login ) )
 	{	// WARNING: allowing special chars like latin 1 accented chars ( \xDF-\xF6\xF8-\xFF ) will create issues with
 		// user media directory names (tested on Max OS X) -- Do no allow any of this until we have a clean & safe media dir name generator.
 
@@ -2820,7 +2822,7 @@ function debug_get_backtrace( $limit_to_last = NULL, $ignore_from = array( 'func
 function debug_die( $additional_info = '', $params = array() )
 {
 	global $debug, $baseurl;
-	global $log_app_errors, $app_name, $is_cli, $display_errors_on_production, $is_api_request;
+	global $log_app_errors, $app_name, $is_cli, $display_errors_on_production, $is_api_request, $is_cron_job_executing;
 
 	$params = array_merge( array(
 		'status'     => '500 Internal Server Error',
@@ -2848,6 +2850,15 @@ function debug_die( $additional_info = '', $params = array() )
 			) );
 
 		die(1); // Error code 1. Note: This will still call the shutdown function.
+	}
+	elseif( $is_cron_job_executing )
+	{	// If debug die has been called during cron job executing:
+		$cron_job_error = '<div style="background-color: #ddd; padding: 1ex; margin-bottom: 1ex;">'
+				.'<h3>Additional information about this error:</h3>'
+				.$additional_info
+			.'</div>'
+			.debug_get_backtrace();
+		throw new Exception( str_replace( "\n", '', $cron_job_error ) );
 	}
 	elseif( $is_cli )
 	{ // Command line interface, e.g. in cron_exec.php:
@@ -3376,7 +3387,7 @@ function debug_info( $force = false, $force_clean = false )
 
 		foreach( array( // note: 8MB is default for memory_limit and is reported as 8388608 bytes
 			'memory_get_usage' => array( 'display' => 'Memory usage', 'high' => 8000000 ),
-			'memory_get_peak_usage' /* PHP 5.2 */ => array( 'display' => 'Memory peak usage', 'high' => 8000000 ) ) as $l_func => $l_var )
+			'memory_get_peak_usage' => array( 'display' => 'Memory peak usage', 'high' => 8000000 ) ) as $l_func => $l_var )
 		{
 			if( function_exists( $l_func ) )
 			{
@@ -3706,7 +3717,7 @@ function user_get_notification_sender( $user_ID, $setting )
 	if( $User = & $UserCache->get_by_ID( $user_ID ) )
 	{
 		if( $User->check_status( 'is_validated' ) )
-		{	// User is Activated or Autoactivated
+		{	// User is Activated or Autoactivated or Manually activated
 			global $UserSettings;
 			if( $UserSettings->get( $setting_name, $user_ID ) == '' )
 			{	// The user's setting is not defined yet
@@ -3745,16 +3756,24 @@ function user_get_notification_sender( $user_ID, $setting )
  * @param string From name.
  * @param array Additional headers ( headername => value ). Take care of injection!
  * @param integer User ID
+ * @param integer Email Campaign ID
+ * @param integer Automation ID
  * @return boolean True if mail could be sent (not necessarily delivered!), false if not - (return value of {@link mail()})
  */
-function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name = NULL, $headers = array(), $user_ID = NULL )
+function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name = NULL, $headers = array(), $user_ID = NULL, $email_campaign_ID = NULL, $automation_ID = NULL )
 {
 	global $servertimenow, $email_send_simulate_only;
+
+	/**
+	 * @var string|NULL This global var stores ID of the last mail log message
+	 */
+	global $mail_log_message;
+	$mail_log_message = NULL;
 
 	// Stop a request from the blocked IP addresses or Domains
 	antispam_block_request();
 
-	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode;
+	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode, $mail_log_insert_ID;
 
 	$message_data = $message;
 	if( is_array( $message_data ) && isset( $message_data['full'] ) )
@@ -3832,12 +3851,6 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	$message = str_replace( array( "\r\n", "\r" ), $NL, $message );
 
-	// Convert encoding of message (from internal encoding to the one of the message):
-	// fp> why do we actually convert to $current_charset?
-	// dh> I do not remember. Appears to make sense sending it unconverted in $evo_charset.
-	// asimo> converting the message creates wrong output, no need for conversion, however this needs further investigation
-	// $message = convert_charset( $message, $current_charset, $evo_charset );
-
 	if( !isset( $headers['Content-Type'] ) )
 	{	// Specify charset and content-type of email
 		$headers['Content-Type'] = 'text/plain; charset='.$current_charset;
@@ -3856,6 +3869,14 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	// COMPACT HEADERS:
 	$headerstring = get_mail_headers( $headers, $NL );
+
+	// Create initial email log with empty message
+	$email_key = generate_random_key();
+	mail_log( $user_ID, $to_email_address, $clear_subject, NULL, $headerstring, 'ready_to_send', $email_key, $email_campaign_ID, $automation_ID );
+
+	// Replace tracking code placeholders
+	$message = str_replace( array( '$email_key$', '$mail_log_ID$' ), array( $email_key, $mail_log_insert_ID ), $message );
+	$message_data = str_replace( array( '$email_key$', '$mail_log_ID$' ), array( $email_key, $mail_log_insert_ID ), $message_data );
 
 	// Set an additional parameter for the return path:
 	switch( $Settings->get( 'sendmail_params' ) )
@@ -3882,11 +3903,15 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		$additional_parameters = '';
 	}
 
+	// Remove email key markers from message that will be sent to actual email
+	$message_data = str_replace( array( '$email_key_start$', '$email_key_end$' ), '', $message_data );
+
 	if( mail_is_blocked( $to_email_address ) )
 	{ // Check if the email address is blocked
-		$Debuglog->add( 'Sending mail to &laquo;'.htmlspecialchars( $to_email_address ).'&raquo; FAILED, because this email marked with spam or permanent errors.', 'error' );
+		$mail_log_message = 'Sending mail to "'.$to_email_address.'" FAILED, because this email is marked with spam or permanent errors.';
+		$Debuglog->add( htmlspecialchars( $mail_log_message ), 'error' );
 
-		mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'blocked' );
+		update_mail_log( $mail_log_insert_ID, 'blocked', $message );
 
 		return false;
 	}
@@ -3902,25 +3927,23 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	if( ! $send_mail_result )
 	{	// The message has not been sent successfully
+		$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED.';
+		update_mail_log( $mail_log_insert_ID, 'error', $message );
 		if( $debug > 1 )
 		{ // We agree to die for debugging...
-			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
-
-			debug_die( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.' );
+			debug_die( htmlspecialchars( $mail_log_message ) );
 		}
 		else
 		{ // Soft debugging only....
-			$Debuglog->add( 'Sending mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo; FAILED.', 'error' );
-
-			mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, 'error' );
-
+			$Debuglog->add( htmlspecialchars( $mail_log_message ), 'error' );
 			return false;
 		}
 	}
 
-	$Debuglog->add( 'Sent mail from &laquo;'.htmlspecialchars($from).'&raquo; to &laquo;'.htmlspecialchars($to).'&raquo;, Subject &laquo;'.htmlspecialchars($subject).'&raquo;.' );
+	$mail_log_message = 'Sent mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'".';
+	$Debuglog->add( htmlspecialchars( $mail_log_message ) );
 
-	mail_log( $user_ID, $to_email_address, $clear_subject, $message, $headerstring, ( $email_send_simulate_only ? 'simulated' : 'ok' ) );
+	update_mail_log( $mail_log_insert_ID, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $message );
 
 	return true;
 }
@@ -3943,16 +3966,24 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 {
 	global $UserSettings, $Settings, $current_charset;
 
+	/**
+	 * @var string|NULL This global var stores ID of the last mail log message
+	 */
+	global $mail_log_message;
+	$mail_log_message = NULL;
+
 	$UserCache = & get_UserCache();
 	if( $User = $UserCache->get_by_ID( $user_ID ) )
 	{
 		if( !$User->check_status( 'can_receive_any_message' ) )
 		{ // user status doesn't allow to receive nor emails nor private messages
+			$mail_log_message = 'Sending mail to User #'.$User->ID.'('.$User->get( 'login' ).') is FAILED, because user status "'.$User->get( 'status' ).'" doesn\'t allow to receive any message.';
 			return false;
 		}
 
 		if( !( $User->check_status( 'is_validated' ) || $force_on_non_activated ) )
 		{ // user is not activated and non activated users should not receive emails, unless force_on_non_activated is turned on
+			$mail_log_message = 'Sending mail to User #'.$User->ID.'('.$User->get( 'login' ).') is FAILED, because user is not validated with status "'.$User->get( 'status' ).'".';
 			return false;
 		}
 
@@ -3964,20 +3995,54 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 				{ // this is not a notification email
 					break;
 				}
+			// Check a day notification limit for user settings "Notify me by email whenever":
 			case 'private_message_new':
+				// 'notify_messages' - "I receive a private message."
 			case 'private_messages_unread_reminder':
-			case 'post_new':
+				// 'notify_unread_messages' - "I have unread private messages for more than X seconds."(X = $Settings->get( 'unread_message_reminder_threshold' ))
 			case 'comment_new':
+				// 'notify_comment_mentioned' - "I have been mentioned on a comment.",
+				// 'notify_published_comments' - "a comment is published on one of my posts.",
+				// 'notify_comment_moderation' - "a comment is posted and I have permissions to moderate it.",
+				// 'notify_edit_cmt_moderation' - "a comment is modified and I have permissions to moderate it.",
+				// 'notify_meta_comments' - "a meta comment is posted.".
 			case 'comment_spam':
+				// 'notify_spam_cmt_moderation' - "a comment is reported as spam and I have permissions to moderate it."
+			case 'comments_unmoderated_reminder':
+				// 'send_cmt_moderation_reminder' - "comments are awaiting moderation for more than X seconds."(X = $Settings->get( 'comment_moderation_reminder_threshold' ))
+			case 'post_new':
+				// 'notify_post_mentioned' - "I have been mentioned on a post.",
+				// 'notify_post_moderation' - "a post is created and I have permissions to moderate it."
+				// 'notify_edit_pst_moderation' - "a post is modified and I have permissions to moderate it."
+			case 'post_assignment':
+				// 'notify_post_assignment' - "a post was assigned to me."
+			case 'posts_unmoderated_reminder':
+				// 'send_pst_moderation_reminder' - "posts are awaiting moderation for more than X seconds."(X = $Settings->get( 'post_moderation_reminder_threshold' ))
+			case 'posts_stale_alert':
+				// 'send_pst_stale_alert' - "there are stale posts and I have permission to moderate them."
+			case 'account_activate':
+				// 'send_activation_reminder' - "my account was deactivated or is not activated for more than X seconds."(X - $Settings->get( 'activate_account_reminder_threshold' ))
+			case 'account_inactive':
+				// 'send_inactive_reminder' - "my account has been inactive for more than X months."(X - $Settings->get( 'inactive_account_reminder_threshold' ))
+			case 'account_new':
+				// 'notify_new_user_registration' - "a new user has registered."
 			case 'account_activated':
+				// 'notify_activated_account' - "an account was activated."
 			case 'account_closed':
+				// 'notify_closed_account' - "an account was closed."
 			case 'account_reported':
+				// 'notify_reported_account' - "an account was reported."
 			case 'account_changed':
-				// this is a notificaiton email
+				// 'notify_changed_account' - "an account was changed."
+			case 'scheduled_task_error_report':
+				// 'notify_cronjob_error' - "a scheduled task ends with an error or timeout."
+			case 'automation_owner_notification':
+				// 'notify_automation_owner' - "one of my automations wants to notify me."
 				$email_limit_setting = 'notification_email_limit';
 				$email_counter_setting = 'last_notification_email';
 				if( !check_allow_new_email( $email_limit_setting, $email_counter_setting, $User->ID ) )
 				{ // more notification email is not allowed today
+					$mail_log_message = 'Sending mail to User #'.$User->ID.'('.$User->get( 'login' ).') is FAILED, because user is already limited to receive more notifications for TODAY.';
 					return false;
 				}
 				break;
@@ -3987,6 +4052,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 				$email_counter_setting = 'last_newsletter';
 				if( !check_allow_new_email( $email_limit_setting, $email_counter_setting, $User->ID ) )
 				{ // more newsletter email is not allowed today
+					$mail_log_message = 'Sending mail to User #'.$User->ID.'('.$User->get( 'login' ).') is FAILED, because user is already limited to receive more newsletters for TODAY.';
 					return false;
 				}
 				break;
@@ -4023,11 +4089,17 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 
 		// Autoinsert user's data
 		$subject = mail_autoinsert_user_data( $subject, $User );
-		$message = mail_autoinsert_user_data( $message, $User );
+
+		// erhsatingin > moved to mail_template()
+		//$message = mail_autoinsert_user_data( $message, $User );
 
 		$to_email = !empty( $force_email_address ) ? $force_email_address : $User->email;
 
-		if( send_mail( $to_email, NULL, $subject, $message, NULL, NULL, $headers, $user_ID ) )
+		// Params for email log:
+		$email_campaign_ID = empty( $template_params['ecmp_ID'] ) ? NULL : $template_params['ecmp_ID'];
+		$automation_ID = empty( $template_params['autm_ID'] ) ? NULL : $template_params['autm_ID'];
+
+		if( send_mail( $to_email, NULL, $subject, $message, NULL, NULL, $headers, $user_ID, $email_campaign_ID, $automation_ID ) )
 		{ // email was sent, update last email settings;
 			if( isset( $email_limit_setting, $email_counter_setting ) )
 			{ // User Settings(email counters) need to be updated
@@ -4043,21 +4115,134 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 
 
 /**
+ * Sends an email to anonymous User
+ *
+ * @param integer Recipient ID.
+ * @param string Subject of the mail
+ * @param string Email template name
+ * @param array Email template params
+ * @param boolean Force to send this email even if the user is not activated. By default not activated user won't get emails.
+ *                Pasword reset, and account activation emails must be always forced.
+ * @param array Additional headers ( headername => value ). Take care of injection!
+ * @param string Use this param if you want use different email address instead of $User->email
+ * @return boolean True if mail could be sent (not necessarily delivered!), false if not - (return value of {@link mail()})
+ */
+function send_mail_to_anonymous_user( $user_email, $user_name, $subject, $template_name, $template_params = array(), $force_on_non_activated = false, $headers = array(), $force_email_address = '' )
+{
+	/**
+	 * @var string|NULL This global var stores ID of the last mail log message
+	 */
+	global $mail_log_message;
+	$mail_log_message = NULL;
+
+	// Check if a new email to anonymous user with the corrensponding email type is allowed:
+	switch( $template_name )
+	{
+		case 'comment_new':
+			// Notify anonymous user of replies:
+			if( isset( $template_params['comment_ID'] ) && ! check_allow_new_anon_email( $template_params['comment_ID'] ) )
+			{	// more notification email is not allowed today:
+				$mail_log_message = 'Sending mail to anonymous user #'.$user_email.'('.$user_name.') is FAILED, because user is already limited to receive more notifications for TODAY.';
+				return false;
+			}
+			break;
+	}
+
+	$template_params['boundary'] = 'b2evo-'.md5( rand() );
+	$headers['Content-Type'] = 'multipart/mixed; boundary="'.$template_params['boundary'].'"';
+
+	if( ! isset( $template_params['anonymous_recipient_name'] ) )
+	{	// Set recipient User, it should be defined for each template because of email footer:
+		$template_params['anonymous_recipient_name'] = $user_name;
+	}
+
+	// Get a message text from template file:
+	$message = mail_template( $template_name, 'auto', $template_params );
+
+	// Autoinsert user's data:
+	$subject = mail_autoinsert_user_data( $subject, NULL, 'text', $user_email, $user_name );
+
+	// Params for email log:
+	$email_campaign_ID = empty( $template_params['ecmp_ID'] ) ? NULL : $template_params['ecmp_ID'];
+	$automation_ID = empty( $template_params['autm_ID'] ) ? NULL : $template_params['autm_ID'];
+
+	if( send_mail( $user_email, $user_name, $subject, $message, NULL, NULL, $headers, NULL, $email_campaign_ID, $automation_ID ) )
+	{	// Email was sent:
+		if( isset( $template_params['comment_ID'] ) )
+		{	// Anonymous user settings(email counters) need to be updated:
+			update_anon_user_email_counter( $template_params['comment_ID'] );
+		}
+		return true;
+	}
+
+	// No user or email could not be sent:
+	return false;
+}
+
+
+/**
  * Autoinsert user's data into subject or message of the email
  *
  * @param string Text
  * @param object User
+ * @param string Format: 'html', 'text'
+ * @param string Email of anonymous user
+ * @param string Name of anonymous user
  * @return string Text
 */
-function mail_autoinsert_user_data( $text, $User = NULL )
+function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user_email = NULL, $user_name = NULL )
 {
-	if( !$User )
-	{	// No user
+	if( ! $User && ! ( $user_email || $user_email ) )
+	{	// No user data:
 		return $text;
 	}
 
-	$rpls_from = array( '$login$' , '$email$', '$user_ID$', '$unsubscribe_key$' );
-	$rpls_to = array( $User->login, $User->email, $User->ID, '$secret_content_start$'.md5( $User->ID.$User->unsubscribe_key ).'$secret_content_end$' );
+	if( $User )
+	{	// Get data of registered User:
+		if( $format == 'html' )
+		{
+			$username = $User->get_colored_login( array(
+					'mask'      => '$avatar$ $login$',
+					'login_text'=> 'name',
+					'use_style' => true,
+					'protocol'  => 'http:',
+				) );
+
+			$user_login = $User->get_colored_login( array(
+					'mask'      => '$avatar$ $login$',
+					'use_style' => true,
+					'protocol'  => 'http:',
+				) );
+		}
+		else
+		{
+			$username = $User->get_username();
+			$user_login = $User->login;
+		}
+
+		$firstname = $User->get( 'firstname' );
+		$lastname = $User->get( 'lastname' );
+		$firstname_and_login = empty( $firstname ) ? $user_login : $firstname.' ('.$user_login.')';
+		$firstname_or_login = empty( $firstname ) ? $user_login : $firstname;
+		$user_email = $User->email;
+		$user_ID = $User->ID;
+		$unsubscribe_key = '$secret_content_start$'.md5( $User->ID.$User->unsubscribe_key ).'$secret_content_end$';
+	}
+	else
+	{	// Get data of anonymous user:
+		$username = $user_name;
+		$user_login = $user_name;
+		$firstname = $user_name;
+		$lastname = $user_name;
+		$firstname_and_login = $user_name;
+		$firstname_or_login = $user_name;
+		$user_email = $user_email;
+		$user_ID = '';
+		$unsubscribe_key = '';
+	}
+
+	$rpls_from = array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$', '$email$', '$user_ID$', '$unsubscribe_key$' );
+	$rpls_to = array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login, $user_email, $user_ID, $unsubscribe_key );
 
 	return str_replace( $rpls_from, $rpls_to, $text );
 }
@@ -4075,6 +4260,16 @@ function mail_autoinsert_user_data( $text, $User = NULL )
 function mail_template( $template_name, $format = 'auto', $params = array(), $User = NULL )
 {
 	global $current_charset, $current_User;
+	global $track_email_image_load, $track_email_click_html, $track_email_click_plain_text;
+
+	$params = array_merge( array(
+			'add_email_tracking' => true,
+			'template_parts' => array(
+					'header' => NULL,
+					'footer' => NULL
+				),
+			'default_template_tag' => NULL
+		), $params );
 
 	if( !empty( $params['locale'] ) )
 	{ // Switch to locale for current email template
@@ -4141,32 +4336,41 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 		$formated_message .= ob_get_clean();
 
 		if( ! empty( $User ) )
-		{ // Replace $login$ with gender colored link + icon in HTML format,
-		  //   and with simple login text in PLAIN TEXT format
-			if( $format == 'html' )
-			{
-				$username = $User->get_colored_login( array(
-						'mask'      => '$avatar$ $login$',
-						'login_text'=> 'name',
-						'use_style' => true,
-						'protocol'  => 'http:',
-					) );
-
-				$user_login = $User->get_colored_login( array(
-						'mask'      => '$avatar$ $login$',
-						'use_style' => true,
-						'protocol'  => 'http:',
-					) );
+		{ // Replace $login$ with gender colored link + icon in HTML format, and with simple login text in PLAIN TEXT format
+			$formated_message = mail_autoinsert_user_data( $formated_message, $User, $format );
+		}
+		elseif( ! empty( $params['anonymous_recipient_name'] ) )
+		{	// Replace anonymous name:
+			$formated_message = str_replace( '$name$', $params['anonymous_recipient_name'], $formated_message );
+			if( ! empty( $params['anonymous_unsubscribe_key'] ) )
+			{	// Replace anonymous unsubscribe key:
+				$formated_message = str_replace( '$unsubscribe_key$', $params['anonymous_unsubscribe_key'], $formated_message );
 			}
-			else
-			{
-				$username = $User->get_username();
-				$user_login = $User->login;
-			}
-			$formated_message = str_replace( array( '$login$', '$username$' ), array( $user_login, $username ) , $formated_message );
 		}
 
+		if( $params['add_email_tracking'] )
+		{
+			$tracking_params = array(
+					'content_type' => $format,
+					'image_load' => isset( $$track_email_image_load ) ? $$track_email_image_load : true,
+					'link_click_html' => isset( $track_email_click_html ) ? $track_email_click_html : true ,
+					'link_click_text' => isset( $track_email_click_plain_text ) ? $track_email_click_plain_text : true,
+					'template_parts' => $params['template_parts'],
+					'default_template_tag' => $params['default_template_tag']
+				);
+			$formated_message = add_email_tracking( $formated_message, '$mail_log_ID$', '$email_key$', $tracking_params );
+		}
+
+		// Remove template parts markers
+		$template_part_markers = array();
+		foreach( $params['template_parts'] as $part => $row )
+		{
+			$template_part_markers[] = '$template-content-'.$part.'-start$';
+			$template_part_markers[] = '$template-content-'.$part.'-end$';
+		}
+		$formated_message = str_replace( $template_part_markers, '', $formated_message  );
 		$template_message .= $formated_message;
+
 		if( isset( $template_contents ) )
 		{ // Multipart content
 			$template_contents[ $format ] = $formated_message;
@@ -4202,7 +4406,7 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
  * @param string Template name
  * @param array Params
  */
-function emailskin_include( $template_name, $params = array() )
+function emailskin_include( $template_name, $params = array(), $template_part = NULL )
 {
 	global $emailskins_path, $rsc_url;
 
@@ -4222,7 +4426,15 @@ function emailskin_include( $template_name, $params = array() )
 	if( file_exists( $template_path ) )
 	{ // Include custom template file if it exists
 		$Debuglog->add( 'emailskin_include: '.rel_path_to_base( $template_path ), 'skins' );
+		if( ! empty( $template_part ) )
+		{
+			echo '$template-content-'.$template_part.'-start$';
+		}
 		require $template_path;
+		if( ! empty( $template_part ) )
+		{
+			echo '$template-content-'.$template_part.'-end$';
+		}
 		// This template is customized, Don't include standard template
 		$is_customized = true;
 	}
@@ -4233,7 +4445,15 @@ function emailskin_include( $template_name, $params = array() )
 		if( file_exists( $template_path ) )
 		{ // Include standard template file if it exists
 			$Debuglog->add( 'emailskin_include: '.rel_path_to_base( $template_path ), 'skins' );
+			if( ! empty( $template_part ) )
+			{
+				echo '$template-content-'.$template_part.'-start$';
+			}
 			require $template_path;
+			if( ! empty( $template_part ) )
+			{
+				echo '$template-content-'.$template_part.'-end$';
+			}
 		}
 	}
 
@@ -4473,6 +4693,11 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 		$link_attribs['class'] .= ' hoverlink';
 	}
 
+	// Format title attribute because it may contains the unexpected chars from translatable strings:
+	if( isset( $link_attribs['title'] ) )
+	{
+		$link_attribs['title'] = format_to_output( $link_attribs['title'], 'htmlattr' );
+	}
 
 	// NOTE: We do not use format_to_output with get_field_attribs_as_string() here, because it interferes with the Results class (eval() fails on entitied quotes..) (blueyed)
 	return '<a'.get_field_attribs_as_string( $link_attribs, false ).'>'.$a_body.'</a>';
@@ -4707,6 +4932,16 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 				}
 
+				// Format title and alt attributes because they may contain the unexpected chars from translatable strings:
+				if( isset( $params['title'] ) )
+				{
+					$params['title'] = format_to_output( $params['title'], 'htmlattr' );
+				}
+				if( isset( $params['alt'] ) )
+				{
+					$params['alt'] = format_to_output( $params['alt'], 'htmlattr' );
+				}
+
 				if( isset( $icon['size-'.$icon_param_name] ) )
 				{ // Set a size for icon only for current type
 					if( isset( $icon['size-'.$icon_param_name][0] ) )
@@ -4786,6 +5021,16 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 				}
 
+				// Format title and alt attributes because they may contain the unexpected chars from translatable strings:
+				if( isset( $params['title'] ) )
+				{
+					$params['title'] = format_to_output( $params['title'], 'htmlattr' );
+				}
+				if( isset( $params['alt'] ) )
+				{
+					$params['alt'] = format_to_output( $params['alt'], 'htmlattr' );
+				}
+
 				if( isset( $params['class'] ) )
 				{	// Get class from params
 					$params['class'] = 'icon '.$params['class'];
@@ -4839,6 +5084,12 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					{ // $iconKey as alt-tag
 						$params['alt'] = $iconKey;
 					}
+				}
+
+				// Format alt attribute because it may contains the unexpected chars from translatable strings:
+				if( isset( $params['alt'] ) )
+				{
+					$params['alt'] = format_to_output( $params['alt'], 'htmlattr' );
 				}
 
 				// Add all the attributes:
@@ -5121,6 +5372,66 @@ function get_base_domain( $url )
 	$domain = preg_replace( '~^www[0-9]*\.~i', '', $domain );
 
 	return $domain;
+}
+
+
+/**
+ * Generate login from string
+ *
+ * @param string string to generate login from
+ * @return string login
+ */
+function generate_login_from_string( $login )
+{
+	global $Settings;
+
+	// Normalize login
+	load_funcs('locales/_charset.funcs.php');
+	$login = replace_special_chars( $login, NULL, true );
+
+	if( $Settings->get( 'strict_logins' ) )
+	{ // We allow only the plain ACSII characters, digits, the chars _ and . and -
+		$login = preg_replace( '/[^A-Za-z0-9_.\-]/', '', $login );
+	}
+	else
+	{ // We allow any character that is not explicitly forbidden in Step 1
+		// Enforce additional limitations
+		$login = preg_replace( '|%([a-fA-F0-9][a-fA-F0-9])|', '', $login ); // Kill octets
+		$login = preg_replace( '/&.+?;/', '', $login ); // Kill entities
+	}
+
+	$login = preg_replace( '/^usr_/i', '', $login );
+
+	// Trim to allowed login length
+	$max_login_length = 20;
+	if( strlen( $login ) > $max_login_length )
+	{
+		$login = substr( $login, 0, $max_login_length );
+	}
+
+	if( ! empty( $login ) )
+	{
+		// Check and search free login name if current is already in use
+		$login_name = $login;
+		$login_number = 1;
+		$UserCache = & get_UserCache();
+		while( $UserCache->get_by_login( $login_name ) )
+		{
+			$num_suffix_length = strlen( $login_number );
+			if( strlen( $login_name ) + $num_suffix_length > $max_login_length )
+			{
+				$login_name = substr( $login, 0, $max_login_length - $num_suffix_length ).$login_number;
+			}
+			else
+			{
+				$login_name = $login.$login_number;
+			}
+			$login_number++;
+		}
+		$login = $login_name;
+	}
+
+	return $login;
 }
 
 
@@ -6431,7 +6742,12 @@ function get_ReqURI()
 		<?php
 	}
 
-	return array($ReqPath,$ReqURI);
+	$r = array( $ReqPath, $ReqURI );
+
+	// Format several danger chars to urlencoded format to avoid issues:
+	$r = str_replace( array( '"', '\'', '<', '>' ), array( '%22', '%27', '%3C', '%3E' ), $r );
+
+	return $r;
 }
 
 
@@ -6509,8 +6825,8 @@ function get_samedomain_htsrv_url( $secure = false )
 		debug_die( 'Invalid hosts!' );
 	}
 
-	$req_domain = $req_url_parts['host'];
-	$htsrv_domain = $hsrv_url_parts['host'];
+	$req_domain = rtrim( $req_url_parts['host'].( isset( $req_url_parts['path'] ) ? $req_url_parts['path'] : '' ), '/' );
+	$htsrv_domain = rtrim( $hsrv_url_parts['host'].( isset( $hsrv_url_parts['path'] ) ? $hsrv_url_parts['path'] : '' ), '/' );
 
 	// Replace domain + path of htsrv URL with current request:
 	$samedomain_htsrv_url = substr_replace( $req_htsrv_url, $req_domain, strpos( $req_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
@@ -6586,72 +6902,6 @@ function sanitize_id_list( $str, $return_array = false, $quote = false )
 		return $DB->quote($array);
 	}
 	return ( $return_array ? $array : implode(',', $array) );
-}
-
-
-/**
- * Create json_encode function if it does not exist ( PHP < 5.2.0 )
- *
- * @return string
- */
-if ( !function_exists( 'json_encode' ) )
-{
-	function json_encode( $a = false )
-	{
-		if( is_null( $a ) )
-		{
-			return 'null';
-		}
-		if( $a === false )
-		{
-			return 'false';
-		}
-		if( $a === true )
-		{
-			return 'true';
-		}
-		if( is_scalar( $a ) )
-		{
-			if( is_float( $a ) )
-			{ // Always use "." for floats.
-				return floatval( str_replace( ",", ".", strval( $a ) ) );
-			}
-
-			if( is_string( $a ) )
-			{
-				$jsonReplaces = array( array( "\\", "/", "\n", "\t", "\r", "\b", "\f", '"' ), array( '\\\\', '\\/', '\\n', '\\t', '\\r', '\\b', '\\f', '\"' ) );
-				return '"'.str_replace( $jsonReplaces[0], $jsonReplaces[1], $a ).'"';
-			}
-
-			return $a;
-		}
-		$isList = true;
-		for( $i = 0, reset($a); $i < count($a); $i++, next($a) )
-		{
-			if( key($a) !== $i )
-			{
-				$isList = false;
-				break;
-			}
-		}
-		$result = array();
-		if( $isList )
-		{
-			foreach( $a as $v )
-			{
-				$result[] = json_encode($v);
-			}
-			return '['.join( ',', $result ).']';
-		}
-		else
-		{
-			foreach( $a as $k => $v )
-			{
-				$result[] = json_encode($k).':'.json_encode($v);
-			}
-			return '{'.join( ',', $result ).'}';
-		}
-	}
 }
 
 
@@ -6798,83 +7048,6 @@ function no_trailing_slash( $path )
 
 
 /**
- * Provide sys_get_temp_dir for older versions of PHP (< 5.2.1)
- *
- * @return string path to system temporary directory
- */
-if( !function_exists( 'sys_get_temp_dir' ) )
-{
-	function sys_get_temp_dir()
-	{
-		// Try to get from environment variable
-		if( !empty($_ENV['TMP']) )
-		{
-			return realpath( $_ENV['TMP'] );
-		}
-		elseif( !empty($_ENV['TMPDIR']) )
-		{
-			return realpath( $_ENV['TMPDIR'] );
-		}
-		elseif( !empty($_ENV['TEMP']) )
-		{
-			return realpath( $_ENV['TEMP'] );
-		}
-		else
-		{	// Detect by creating a temporary file
-
-			// Try to use system's temporary directory as random name shouldn't exist
-			$temp_file = tempnam( sha1(uniqid(rand()), true), '' );
-			if( $temp_file )
-			{
-				$temp_dir = realpath( dirname($temp_file) );
-				unlink($temp_file);
-				return $temp_dir;
-			}
-			else
-			{
-				return false;
-			}
-		}
-	}
-}
-
-
-/**
- * Provide inet_pton for older versions of PHP (< 5.1.0 linux & < 5.3.0 windows)
- *
- * Converts a human readable IP address to its packed in_addr representation
- * @param string A human readable IPv4 or IPv6 address
- * @return string The in_addr representation of the given address, or FALSE if a syntactically invalid address is given (for example, an IPv4 address without dots or an IPv6 address without colons
- */
-if( !function_exists( 'inet_pton' ) )
-{
-	function inet_pton( $ip )
-	{
-		if( strpos( $ip, '.' ) !== FALSE )
-		{	// IPv4
-			$ip = pack( 'N', ip2long( $ip ) );
-		}
-		elseif( strpos( $ip, ':' ) !== FALSE )
-		{	// IPv6
-			$ip = explode( ':', $ip );
-			$res = str_pad( '', ( 4 * ( 8 - count( $ip ) ) ), '0000', STR_PAD_LEFT );
-			foreach( $ip as $seg )
-			{
-				$res .= str_pad( $seg, 4, '0', STR_PAD_LEFT );
-			}
-			$ip = pack( 'H'.strlen( $res ), $res );
-		}
-		else
-		{	// Invalid IP address
-			$ip = FALSE;
-		}
-
-		return $ip;
-	}
-}
-
-
-/**
  * Convert integer to IP address
  *
  * @param integer Number
@@ -6959,156 +7132,6 @@ function is_ip_url_domain( $url )
 
 
 /**
- * Provide array_combine for older versions of PHP (< 5.0.0)
- *
- * Creates an array by using one array for keys and another for its values
- * @param array Keys
- * @param array Values
- * @return array Combined array, FALSE if the number of elements for each array isn't equal.
- */
-if( !function_exists( 'array_combine' ) )
-{
-	function array_combine( $arr1, $arr2 )
-	{
-		if( count( $arr1 ) != count( $arr2 ) )
-		{
-			return false;
-		}
-
-		$out = array();
-		foreach( $arr1 as $key1 => $value1 )
-		{
-			$out[$value1] = $arr2[$key1];
-		}
-		return $out;
-	}
-}
-
-
-/**
- * Provide array_combine for older versions of PHP (< 5.0.0)
- *
- * List of already/potentially sent HTTP responsee headers(),
- * CANNOT be implemented
- */
-if( !function_exists( 'headers_list' ) )
-{
-	function headers_list()
-	{
-		return array();
-	}
-}
-
-
-/**
- * Provide array_fill_keys for older versions of PHP (< 5.2.0)
- *
- * Fills an array with the value of the value parameter, using the values of the keys array as keys.
- * @param array Keys
- * @param mixed Value
- * @return array Filled array
- */
-if( !function_exists( 'array_fill_keys' ) )
-{
-	function array_fill_keys( $array, $value )
-	{
-		$filled_array = array();
-		foreach( $array as $key )
-		{
-			$filled_array[$key] = $value;
-		}
-
-		return $filled_array;
-	}
-}
-
-
-/**
- * Provide htmlspecialchars_decode for older versions of PHP (< 5.1.0)
- *
- * Convert special HTML entities back to characters
- * @param string Text to decode
- * @return string The decoded text
- */
-if( !function_exists( 'htmlspecialchars_decode' ) )
-{
-	function htmlspecialchars_decode( $text )
-	{
-		return strtr( $text, array_flip( get_html_translation_table( HTML_SPECIALCHARS ) ) );
-	}
-}
-
-
-/**
- * Provide array_walk_recursive for older versions of PHP (< 5.1.0)
- *
- * Apply a user function recursively to every member of an array
- * @param array The input array
- * @param string Funcname
- * @param string If the optional userdata parameter is supplied, it will be passed as the third parameter to the callback funcname.
- * @return TRUE on success or FALSE on failure
- */
-if( !function_exists( 'array_walk_recursive' ) )
-{
-	function array_walk_recursive( &$input, $funcname, $userdata = '' )
-	{
-		if( !is_callable( $funcname ) )
-		{
-			return false;
-		}
-
-		if( !is_array( $input ) )
-		{
-			return false;
-		}
-
-		foreach( $input AS $key => $value )
-		{
-			if( is_array( $input[$key] ) )
-			{
-				array_walk_recursive( $input[$key], $funcname, $userdata );
-			}
-			else
-			{
-				$saved_value = $value;
-				if( !empty( $userdata ) )
-				{
-					$funcname( $value, $key, $userdata );
-				}
-				else
-				{
-					$funcname( $value, $key );
-				}
-
-				if( $value != $saved_value )
-				{
-					$input[$key] = $value;
-				}
-			}
-		}
-
-		return true;
-	}
-}
-
-
-/**
- * Provide hex2bin for older versions of PHP (< 5.4)
- *
- * Decodes a hexadecimally encoded binary string
- * @param string Hexadecimal representation of data
- * @return string The binary representation of the given data or FALSE on failure
- */
-if( !function_exists( 'hex2bin' ) )
-{
-	function hex2bin( $hex )
-	{
-		return pack( 'H*', $hex );
-	}
-}
-
-
-/**
  * Save text data to file, create target file if it doesn't exist
  *
  * @param string data to be written
@@ -7173,7 +7196,7 @@ function is_ajax_content( $template_name = '' )
  *
  * @param string Message text
  * @param string Log type: 'info', 'warning', 'error', 'critical_error'
- * @param string Object type: 'comment', 'item', 'user', 'file' or leave default NULL if none of them
+ * @param string Object type: 'comment', 'item', 'user', 'file', 'email_log' or leave default NULL if none of them
  * @param integer Object ID
  * @param string Origin type: 'core', 'plugin'
  * @param integer Origin ID
@@ -7369,7 +7392,7 @@ function get_cookie_path()
  * @param string DEPRECATED: The path on the server in which the cookie will be available on
  * @param string DEPRECATED: The domain that the cookie is available
  * @param boolean Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
- * @param boolean (Added in PHP 5.2.0) When TRUE the cookie will be made accessible only through the HTTP protocol
+ * @param boolean When TRUE the cookie will be made accessible only through the HTTP protocol
  */
 function evo_setcookie( $name, $value = '', $expire = 0, $dummy = '', $dummy2 = '', $secure = false, $httponly = false )
 {
@@ -7407,21 +7430,12 @@ function evo_sendcookies()
 		return;
 	}
 
-	$php_version_52 = version_compare( phpversion(), '5.2', '>=' );
-
 	$current_cookie_domain = get_cookie_domain();
 	$current_cookie_path = get_cookie_path();
 
 	foreach( $evo_cookies as $evo_cookie_name => $evo_cookie )
 	{
-		if( $php_version_52 )
-		{	// Use HTTP-only setting since PHP 5.2.0:
-			setcookie( $evo_cookie_name, $evo_cookie['value'], $evo_cookie['expire'], $current_cookie_path, $current_cookie_domain, $evo_cookie['secure'], $evo_cookie['httponly'] );
-		}
-		else
-		{	// PHP < 5.2 doesn't support HTTP-only:
-			setcookie( $evo_cookie_name, $evo_cookie['value'], $evo_cookie['expire'], $current_cookie_path, $current_cookie_domain, $evo_cookie['secure'] );
-		}
+		setcookie( $evo_cookie_name, $evo_cookie['value'], $evo_cookie['expire'], $current_cookie_path, $current_cookie_domain, $evo_cookie['secure'], $evo_cookie['httponly'] );
 
 		// Unset to don't send cookie twice:
 		unset( $evo_cookies[ $evo_cookie_name ] );
@@ -7476,6 +7490,8 @@ jQuery( document ).ready( function()
 <?php
 	}
 ?>
+if( jQuery( '<?php echo $params['column_selector']; ?>' ).length > 0 )
+{	// Initialize only when the requested element exists on the current page:
 	jQuery( '<?php echo $params['column_selector']; ?>' ).editable( '<?php echo $params['ajax_url']; ?>',
 	{
 		data: function( value, settings )
@@ -7557,6 +7573,7 @@ jQuery( document ).ready( function()
 			}
 		}
 	} );
+}
 <?php
 	if( $params['print_init_tags'] )
 	{
@@ -7720,8 +7737,8 @@ function get_fieldset_folding_icon( $id, $params = array() )
 	}
 	else
 	{ // Get the fold value from user settings
-		global $UserSettings, $Collection, $Blog;
-		if( empty( $Blog ) )
+		global $UserSettings, $Collection, $Blog, $ctrl;
+		if( empty( $Blog ) || ( isset( $ctrl ) && in_array( $ctrl, array( 'plugins', 'user' ) ) ) )
 		{ // Get user setting value
 			$value = intval( $UserSettings->get( 'fold_'.$id ) );
 		}
@@ -7769,7 +7786,7 @@ function echo_fieldset_folding_js()
 
 ?>
 <script type="text/javascript">
-jQuery( 'span[id^=icon_folding_], span[id^=title_folding_]' ).click( function()
+jQuery( document ).on( 'click', 'span[id^=icon_folding_], span[id^=title_folding_]', function()
 {
 	var is_icon = jQuery( this ).attr( 'id' ).match( /^icon_folding_/ );
 	var wrapper_obj = jQuery( this ).closest( '.fieldset_wrapper' );
@@ -8244,7 +8261,7 @@ function render_inline_files( $content, $Object, $params = array() )
 	$content = move_short_tags( $content );
 
 	// Find all matches with inline tags
-	preg_match_all( '/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
+	preg_match_all( '/\[(image|file|inline|video|audio|thumbnail|folder):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
 
 	if( !empty( $inlines[0] ) )
 	{	// There are inline tags in the content...
@@ -8264,7 +8281,7 @@ function render_inline_files( $content, $Object, $params = array() )
 
 
 /**
- * Convert inline tags like [image:|file:|inline:|video:|audio:|thumbnail:] into HTML tags
+ * Convert inline tags like [image:|file:|inline:|video:|audio:|thumbnail:|folder:] into HTML tags
  *
  * @param object Source object: Item, EmailCampaign
  * @param array Inline tags
@@ -8335,7 +8352,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 	foreach( $tags as $current_inline )
 	{
-		preg_match("/\[(image|file|inline|video|audio|thumbnail):(\d+)(:?)([^\]]*)\]/i", $current_inline, $inline);
+		preg_match("/\[(image|file|inline|video|audio|thumbnail|folder):(\d+)(:?)([^\]]*)\]/i", $current_inline, $inline);
 
 		if( empty( $inline ) )
 		{
@@ -8343,7 +8360,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 			continue;
 		}
 
-		$inline_type = $inline[1]; // image|file|inline|video|audio|thumbnail
+		$inline_type = $inline[1]; // image|file|inline|video|audio|thumbnail|folder
 		$current_link_ID = (int) $inline[2];
 
 		if( empty( $current_link_ID ) )
@@ -8460,7 +8477,9 @@ function render_inline_tags( $Object, $tags, $params = array() )
 							case 'EmailCampaign':
 								// Get the IMG tag without link for email content:
 								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
-										'image_link_to' => false
+										'image_link_to' => false,
+										'image_style' => 'border: none; max-width: 100%; height: auto;',
+										'add_loadimg' => false,
 									) ) );
 								break;
 
@@ -8472,8 +8491,18 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					}
 					elseif( $inline_type == 'inline' )
 					{	// Generate simple IMG tag with resized image size:
-						$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
-							( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', '', '' );
+						switch( $object_class )
+						{
+							case 'EmailCampaign':
+								$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
+										( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', '', '', '', 1, NULL,
+										'border: none; max-width: 100%; height: auto;', false );
+								break;
+
+							default:
+								$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
+										( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', '', '' );
+						}
 					}
 				}
 				else
@@ -8559,7 +8588,9 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						case 'EmailCampaign':
 							// Get the IMG tag without link for email content:
 							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
-									'image_link_to' => false
+									'image_link_to' => false,
+									'image_style' => 'border: none; max-width: 100%; height: auto;',
+									'add_loadimg' => false
 								) ) );
 							break;
 
@@ -8678,6 +8709,27 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				}
 				break;
 
+			case 'folder':
+				if( $File->is_dir() )
+				{
+					$current_folder_params = $params;
+
+					if( ! empty( $inline[3] ) ) // check if second colon is present
+					{
+						if( preg_match( '/^\d+$/', $inline[4] ) )
+						{ // limit number of images
+							$current_folder_params['gallery_image_limit'] = (int) $inline[4];
+						}
+					}
+
+					$inlines[$current_inline] = $File->get_gallery( $current_folder_params );
+				}
+				else
+				{
+					$inlines[$current_inline] = $current_inline;
+				}
+				break;
+
 			default:
 				$inlines[$current_inline] = $current_inline;
 		}
@@ -8686,6 +8738,13 @@ function render_inline_tags( $Object, $tags, $params = array() )
 	return $inlines;
 }
 
+
+/**
+ * Convert date format from locale for jQuery datepicker plugin
+ *
+ * @param string Date format of locale from DB; for example: Y-m-d
+ * @return string Date format for jQuery datepicker plugin; for example: yy-mm-dd
+ */
 function php_to_jquery_date_format( $php_format )
 {
 	$tokens = array(
@@ -8753,5 +8812,176 @@ function php_to_jquery_date_format( $php_format )
 	}
 
 	return $js_format;
+}
+
+
+/**
+ * Check if given string is HTML
+ *
+ * @param string String to check if HTML
+ * @return boolean True if string is HTML
+ */
+function is_html( $string )
+{
+	return $string != strip_tags( $string ) ? true : false;
+}
+
+
+/**
+ * Get date format from current locale for jQuery datepicker plugin
+ *
+ * @return string Date format; for example: yy-mm-dd
+ */
+function jquery_datepicker_datefmt()
+{
+	return php_to_jquery_date_format( locale_input_datefmt() );
+}
+
+
+/**
+ * Get month names as string of JavaScript array for jQuery datepicker plugin
+ *
+ * @return string
+ */
+function jquery_datepicker_month_names()
+{
+	$months = array(
+			TS_('January'),
+			TS_('February'),
+			TS_('March'),
+			TS_('April'),
+			TS_('May'),
+			TS_('June'),
+			TS_('July'),
+			TS_('August'),
+			TS_('September'),
+			TS_('October'),
+			TS_('November'),
+			TS_('December')
+		);
+
+	return '[\''.implode( '\', \'', $months ).'\']';
+}
+
+
+/**
+ * Get week day names as string of JavaScript array for jQuery datepicker plugin
+ *
+ * @return string
+ */
+function jquery_datepicker_day_names()
+{
+	$days = array(
+			TS_('Sun'),
+			TS_('Mon'),
+			TS_('Tue'),
+			TS_('Wed'),
+			TS_('Thu'),
+			TS_('Fri'),
+			TS_('Sat')
+		);
+
+	foreach( $days as $d => $day )
+	{
+		$days[ $d ] = utf8_substr( $day, 0, 2 );
+	}
+
+	return '[\''.implode( '\', \'', $days ).'\']';
+}
+
+
+/**
+ * Find the dates without data and fill them with 0 to display on graph and table
+ *
+ * @param array Source data
+ * @param array Default data, e.g. array( 'hits' => 0 )
+ * @param string Start date of log in format 'YYYY-mm-dd'
+ * @param string End date of log in format 'YYYY-mm-dd'
+ * @return array Fixed data
+ */
+function fill_empty_days( $data, $default_data, $start_date, $end_date )
+{
+	$fixed_data = array();
+	$start_date = date( 'Y-n-j', strtotime( $start_date) );
+	$end_date = date( 'Y-n-j', strtotime( $end_date) );
+
+	if( empty( $data ) )
+	{
+		return $fixed_data;
+	}
+
+	// Get additional fields which must be exist in each array item of new filled empty day below:
+	$additional_fields = array_diff_key( $data[0], array( 'year' => 0, 'month' => 0, 'day' => 0 ) );
+
+	// Check if data array contains start and end dates:
+	$start_date_is_contained = empty( $start_date );
+	$end_date_is_contained = empty( $end_date );
+
+	if( ! $start_date_is_contained || ! $end_date_is_contained )
+	{
+		foreach( $data as $row )
+		{
+			$this_date = $row['year'].'-'.$row['month'].'-'.$row['day'];
+			if( $this_date == $start_date )
+			{	// The start date is detected:
+				$start_date_is_contained = true;
+			}
+			if( $this_date == $end_date )
+			{	// The start date is detected:
+				$end_date_is_contained = true;
+			}
+			if( $start_date_is_contained && $end_date_is_contained )
+			{	// Stop array searching here because we have found the dates:
+				break;
+			}
+		}
+	}
+
+	if( ! $start_date_is_contained )
+	{	// Add item to array with 0 for start date if stats has no data for the date:
+		array_push( $data, array_merge( array(
+				'year'     => date( 'Y', strtotime( $start_date ) ),
+				'month'    => date( 'n', strtotime( $start_date ) ),
+				'day'      => date( 'j', strtotime( $start_date ) ),
+		), $default_data ) + $additional_fields );
+	}
+	if( ! $end_date_is_contained )
+	{	// Add item to array with 0 for end date if stats has no data for the date:
+		array_unshift( $data, array_merge( array(
+				'year'     => date( 'Y', strtotime( $end_date ) ),
+				'month'    => date( 'n', strtotime( $end_date ) ),
+				'day'      => date( 'j', strtotime( $end_date ) ),
+		), $default_data ) + $additional_fields );
+	}
+
+	foreach( $data as $row )
+	{
+		$this_date = $row['year'].'-'.$row['month'].'-'.$row['day'];
+
+		if( isset( $prev_date ) && $prev_date != $this_date )
+		{	// If data are from another day:
+			$prev_time = strtotime( $prev_date ) - 86400;
+			$this_time = strtotime( $this_date );
+
+			if( $prev_time != $this_time )
+			{	// If previous date is not previous day(it means some day has no data):
+				$empty_days = ( $prev_time - $this_time ) / 86400;
+				for( $d = 0; $d < $empty_days; $d++ )
+				{	// Add each empty day to array with default data:
+					$empty_day = $prev_time - $d * 86400;
+					$fixed_data[] = array_merge( array(
+							'year'     => date( 'Y', $empty_day ),
+							'month'    => date( 'n', $empty_day ),
+							'day'      => date( 'j', $empty_day ),
+					), $default_data ) + $additional_fields;
+				}
+			}
+		}
+
+		$prev_date = $row['year'].'-'.$row['month'].'-'.$row['day'];
+		$fixed_data[] = $row;
+	}
+
+	return $fixed_data;
 }
 ?>

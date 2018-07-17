@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -96,6 +96,7 @@ $core_componentwidget_defs = array(
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
 			'content_block',          // Content Block
+			'display_item',           // Display Item
 		),
 	'infoitem' => array(
 			'item_info_line',
@@ -123,7 +124,10 @@ $core_componentwidget_defs = array(
 			'user_avatars',
 			'org_members',
 			'user_login',
-			'user_register',
+			'user_greetings',
+			'user_register_quick',
+			'user_register_standard',
+			'newsletter_subscription',
 			'user_tools',
 			'online_users',
 		),

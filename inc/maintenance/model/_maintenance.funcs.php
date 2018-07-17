@@ -18,20 +18,34 @@ function get_upgrade_folder_path( $version_folder_name )
 		debug_die( 'Invalid name of upgrade folder' );
 	}
 
-	// Use a root path by default
+	// Use a root path by default:
 	$upgrade_folder_path = $upgrade_path.$version_folder_name;
 
-	if( file_exists( $upgrade_folder_path.'/b2evolution/blogs' ) )
-	{ // Use 'b2evolution/blogs' folder
-		$upgrade_folder_path .= '/b2evolution/blogs';
-	}
-	else if( file_exists( $upgrade_folder_path.'/b2evolution/site' ) )
-	{ // Use 'b2evolution/site' folder
-		$upgrade_folder_path .= '/b2evolution/site';
-	}
-	else if( file_exists( $upgrade_folder_path.'/b2evolution' ) )
-	{ // Use 'b2evolution' folder
-		$upgrade_folder_path .= '/b2evolution';
+	if( $dir_handle = @opendir( $upgrade_folder_path ) )
+	{
+		while( ( $dir_name = readdir( $dir_handle ) ) !== false )
+		{
+			$dir_path = $upgrade_folder_path.'/'.$dir_name;
+			if( is_dir( $dir_path ) && preg_match( '#^b2evolution#i', $dir_name ) )
+			{	// Use any folder which name is started with "b2evolution":
+				if( file_exists( $dir_path.'/blogs' ) )
+				{	// Use 'b2evolution*/blogs' folder:
+					$upgrade_folder_path = $dir_path.'/blogs';
+					break;
+				}
+				elseif( file_exists( $dir_path.'/site' ) )
+				{	// Use 'b2evolution*/site' folder:
+					$upgrade_folder_path = $dir_path.'/site';
+					break;
+				}
+				elseif( file_exists( $dir_path ) )
+				{	// Use 'b2evolution*' folder:
+					$upgrade_folder_path = $dir_path;
+					break;
+				}
+			}
+		}
+		closedir( $dir_handle );
 	}
 
 	return $upgrade_folder_path;
@@ -915,10 +929,10 @@ function autoupgrade_display_steps( $current_step )
  *
  * @param integer Current step
  */
-function svnupgrade_display_steps( $current_step )
+function gitupgrade_display_steps( $current_step )
 {
 	$steps = array(
-			1 => T_('Connect to SVN'),
+			1 => T_('Connect to Git'),
 			2 => T_('Export'),
 			3 => T_('Ready to upgrade'),
 			4 => T_('Backup &amp; Upgrade'),

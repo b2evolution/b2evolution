@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -39,8 +39,10 @@ if( ! empty( $poll_owner_login ) )
 
 
 $SQL = new SQL();
-$SQL->SELECT( 'pqst_ID, pqst_owner_user_ID, pqst_question_text' );
+$SQL->SELECT( 'pqst_ID, pqst_owner_user_ID, pqst_question_text, pqst_max_answers, COUNT( DISTINCT pans_user_ID ) AS answers_count' );
 $SQL->FROM( 'T_polls__question' );
+$SQL->FROM_add( 'LEFT JOIN T_polls__answer ON pans_pqst_ID = pqst_ID' );
+$SQL->GROUP_BY( 'pqst_ID, pqst_owner_user_ID, pqst_question_text, pqst_max_answers' );
 if( ! $perm_poll_view )
 {	// If current user has no permission to view all polls, Display only the owner's polls:
 	$SQL->WHERE( 'pqst_owner_user_ID = '.$DB->quote( $current_User->ID ) );
@@ -141,6 +143,24 @@ $Results->cols[] = array(
 		'order' => 'pqst_question_text',
 		'td'    => '%poll_td_question( {Obj} )%',
 	);
+
+/**
+ * Get the Poll answers as link
+ *
+ * @param object Poll
+ */
+function poll_td_answers( $Poll )
+{
+	global $admin_url;
+	return '<a href="'.$admin_url.'?ctrl=users&amp;poll='.$Poll->pqst_ID.'&amp;filter=new">'.$Poll->answers_count.'</a>';
+}
+$Results->cols[] = array(
+		'th'       => T_('Answers'),
+		'th_class' => 'shrinkwrap',
+		'order'    => 'users_count',
+		'td'       => '%poll_td_answers( {row} )%',
+		'td_class' => 'shrinkwrap'
+);
 
 /**
  * Get action icons to view/edit/delete the Poll

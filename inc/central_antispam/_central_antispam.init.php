@@ -2,19 +2,19 @@
 /**
  * This is the init file for the central antispam module
  *
- * @copyright (c)2003-2016 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2018 by Francois PLANQUE - {@link http://fplanque.net/}
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Minimum PHP version required for central antispam module to function properly
  */
-$required_php_version[ 'central_antispam' ] = '5.2';
+$required_php_version[ 'central_antispam' ] = '5.4';
 
 /**
  * Minimum MYSQL version required for central antispam module to function properly
  */
-$required_mysql_version[ 'central_antispam' ] = '5.0.3';
+$required_mysql_version[ 'central_antispam' ] = '5.1';
 
 /**
  * Aliases for table names:

@@ -284,9 +284,6 @@ div.compact_search_form input.SearchField
 .widget_core_coll_longdesc {
 	border-bottom: none;
 }
-.widget_core_user_login .field_login_btn {
-	width: 150px;
-}
 
 /* Calendar: */
 table.bCalendarTable caption {

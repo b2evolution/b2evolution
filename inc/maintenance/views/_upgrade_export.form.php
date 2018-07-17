@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $block_item_Widget, $revision_is_exported;
+global $block_item_Widget, $commit_is_exported;
 
 if( isset( $block_item_Widget ) )
 {
@@ -32,14 +32,14 @@ $Form->begin_form( 'fform' );
 $Form->begin_fieldset( T_( 'Actions' ) );
 
 $form_buttons = array();
-if( empty( $revision_is_exported ) )
-{ // Init the buttons to continue
-	$form_buttons[] = array( 'submit', 'actionArray[ready_svn]', T_( 'Continue' ), 'SaveButton' );
+if( empty( $commit_is_exported ) )
+{ // Init a button to continue:
+	$form_buttons[] = array( 'submit', 'actionArray[ready_git]', T_( 'Continue' ), 'SaveButton' );
 }
 else
-{ // Init the buttons to select next action
-	$form_buttons[] = array( 'submit', 'actionArray[ready_svn]', T_( 'Skip Export' ), 'SaveButton' );
-	$form_buttons[] = array( 'submit', 'actionArray[force_export_svn]', T_( 'Force New Export' ), 'SaveButton btn-warning' );
+{	// Init the buttons to select next action:
+	$form_buttons[] = array( 'submit', 'actionArray[ready_git]', T_( 'Skip Export' ), 'SaveButton' );
+	$form_buttons[] = array( 'submit', 'actionArray[force_export_git]', T_( 'Force New Export' ), 'SaveButton btn-warning' );
 }
 
 $Form->end_form( $form_buttons );

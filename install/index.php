@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -160,7 +160,8 @@ $current_charset = $evo_charset;
 init_charsets( $current_charset );
 
 // Check minimum memory limit for successful using:
-if( system_check_memory_limit() < get_php_bytes_size( '48M' ) )
+$memory_limit = system_check_memory_limit();
+if( $memory_limit != -1 && $memory_limit < get_php_bytes_size( '48M' ) )
 { // Deny to use on server with small memory limit size:
 	$install_memory_limit_allow = false;
 	if( $action != 'localeinfo' )
@@ -194,7 +195,7 @@ switch( $action )
 {
 	case 'evoupgrade':
 	case 'auto_upgrade':
-	case 'svn_upgrade':
+	case 'git_upgrade':
 	case 'newdb':
 	case 'cafelogupgrade':
 	case 'deletedb':
@@ -321,7 +322,7 @@ switch( $action )
 {
 	case 'evoupgrade':
 	case 'auto_upgrade':
-	case 'svn_upgrade':
+	case 'git_upgrade':
 		$title = T_('Upgrade from a previous version');
 		break;
 
@@ -372,6 +373,7 @@ $booststrap_install_form_params = array(
 		'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-4 col-sm-8">',
 		'buttonsend'     => "</div></div>\n\n",
 		'note_format'    => ' <span class="help-inline text-muted small">%s</span>',
+		'bottom_note_format' => ' <div><span class="help-inline text-muted small">%s</span></div>',
 		// - checkbox
 		'fieldstart_checkbox'    => '<div class="form-group" $ID$>'."\n",
 		'fieldend_checkbox'      => "</div>\n\n",
@@ -1084,7 +1086,7 @@ switch( $action )
 
 	case 'evoupgrade':
 	case 'auto_upgrade':
-	case 'svn_upgrade':
+	case 'git_upgrade':
 		/*
 		 * -----------------------------------------------------------------------------------
 		 * EVO UPGRADE: Upgrade data from existing b2evolution database
@@ -1098,6 +1100,12 @@ switch( $action )
 		start_install_progress_bar( T_('Upgrade in progress'), get_upgrade_steps_count() );
 
 		echo get_install_format_text( '<h2>'.T_('Upgrading b2evolution...').'</h2>', 'h2' );
+
+		display_install_messages( sprintf( '<p>%s<ol><li>%s</li><li>%s</li><li>%s</li></ol></p>',
+				T_('IMPORTANT: if this upgrade procedure fails, do this:'),
+				T_('Make a screenshot showing as much context as possible, and save it in case you need support.'),
+				T_('Reload the page. The upgrade script is designed to recover from unexpected stops and may be able to pick up where it left off.'),
+				sprintf( T_('If needed, see <a %s>this man page &raquo;</a>' ), 'href="http://b2evolution.net/man/auto-upgrade-procedure"' ) ), 'info' );
 
 		if( $htaccess != 'skip' )
 		{
@@ -1131,7 +1139,7 @@ switch( $action )
 		if( $is_automated_upgrade && $upgrade_result !== 'need-fix' )
 		{
 			if( $upgrade_result === true )
-			{	// After successful auto_upgrade or svn_upgrade we must remove files/folder based on the upgrade_policy.conf
+			{	// After successful auto_upgrade or git_upgrade we must remove files/folder based on the upgrade_policy.conf
 				remove_after_upgrade();
 			}
 			// Disable maintenance mode at the end of the upgrade script:

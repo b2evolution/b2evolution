@@ -21,7 +21,7 @@ class bootstrap_blog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.4';
+	var $version = '6.10.2';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -174,6 +174,14 @@ class bootstrap_blog_Skin extends Skin
 								'type' => 'select',
 							)
 						)
+					),
+
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
 					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
@@ -543,6 +551,7 @@ class bootstrap_blog_Skin extends Skin
 -->
 		</style>';
 			add_headline( $custom_css );
+			init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 		}
 	}
 

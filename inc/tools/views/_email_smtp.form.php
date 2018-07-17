@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -89,8 +89,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('SMTP Server connection settings').get_manual_link('smtp-gateway-settings') );
 
-	$Form->checkbox_input( 'smtp_enabled', $Settings->get('smtp_enabled'), T_('Enabled'),
-		array( 'note' => sprintf(T_('Note: This feature needs PHP version 5.2 or higher ( Currently installed: %s )' ), phpversion() ) ) );
+	$Form->checkbox_input( 'smtp_enabled', $Settings->get('smtp_enabled'), T_('Enabled') );
 
 	$Form->text_input( 'smtp_server_host', $Settings->get('smtp_server_host'), 25, T_('SMTP Server'), T_('Hostname or IP address of your SMTP server.'), array( 'maxlength' => 255 ) );
 

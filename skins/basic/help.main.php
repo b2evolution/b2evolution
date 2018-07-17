@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage basic
@@ -106,19 +106,6 @@ siteskin_include( '_site_body_header.inc.php' );
 			'block_end'   => '</div>',
 		) );
 	// --------------------------------- END OF MESSAGES ---------------------------------
-	?>
-
-	<?php
-		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
-		request_title( array(
-				'title_before'=> '<h2>',
-				'title_after' => '</h2>',
-				'title_none'  => '',
-				'glue'        => ' - ',
-				'title_single_disp' => true,
-				'format'      => 'htmlbody',
-			) );
-		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?>
 
 	<?php
