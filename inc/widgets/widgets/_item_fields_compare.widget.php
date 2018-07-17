@@ -52,7 +52,7 @@ class item_fields_compare_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Fields Compare');
+		return T_('Compare Item Fields');
 	}
 
 
@@ -89,12 +89,6 @@ class item_fields_compare_Widget extends ComponentWidget
 					'note' => T_('This is the title to display'),
 					'defaultvalue' => '',
 				),
-				'fields' => array(
-					'type' => 'textarea',
-					'label' => T_('Fields to compare'),
-					'note' => T_('Enter one field name per line.').' '.T_('Leave empty to compare all fields.'),
-					'rows' => 10,
-				),
 				'items' => array(
 					'label' => T_('Items to compare'),
 					'note' => sprintf( T_('Separate Item IDs with %s.'), '<code>,</code>' ).' '.sprintf( T_('Leave empty to use URL parameter %s.'), '<code>items=</code>' ),
@@ -102,6 +96,12 @@ class item_fields_compare_Widget extends ComponentWidget
 						'pattern' => '/^(\d+(,\d+)*)?$/',
 						'error'   => T_('Invalid list of Item IDs.')
 					),
+				),
+				'fields' => array(
+					'type' => 'textarea',
+					'label' => T_('Fields to compare'),
+					'note' => T_('Enter one field name per line.').' '.T_('Leave empty to compare all fields.'),
+					'rows' => 10,
 				),
 			), parent::get_param_definitions( $params ) );
 
