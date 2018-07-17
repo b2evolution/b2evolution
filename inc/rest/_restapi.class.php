@@ -1215,7 +1215,7 @@ class RestApi
 					$user_controller = '';
 				}
 
-				$valid_resources = array( '', 'view', 'recipients', 'autocomplete', 'logins', 'search' );
+				$valid_resources = array( '', 'view', 'recipients', 'authors', 'autocomplete', 'logins', 'search' );
 				if( isset( $user_ID ) )
 				{ // Set controller to view the requested user profile:
 					$default_controller = 'view';
@@ -1626,6 +1626,42 @@ class RestApi
 				continue;
 			}
 
+			$user_data = array(
+					'id'       => $User->ID,
+					'login'    => $User->get( 'login' ),
+					'fullname' => $User->get( 'fullname' ),
+					'avatar'   => $User->get_avatar_imgtag( 'crop-top-32x32' ),
+				);
+
+			// Add data of each user in separate array of response:
+			$this->add_response( 'users', $user_data, 'array' );
+		}
+	}
+
+
+	/**
+	 * Call user controller to search for authors
+	 */
+	private function controller_user_authors()
+	{
+		global $current_User, $DB;
+
+		$api_q = param( 'q', 'string', '' );
+
+		if( ! is_logged_in() )
+		{
+			$this->halt( 'You are not allowed to view users.', 'no_access', 403 );
+			// Exit here.
+		}
+
+		// Search users:
+		$users = $this->func_user_search( $api_q, array(
+				'sql_where' => 'user_ID != '.$DB->quote( $current_User->ID ),
+				'sql_mask'  => '%$login$%',
+			) );
+
+		foreach( $users as $User )
+		{
 			$user_data = array(
 					'id'       => $User->ID,
 					'login'    => $User->get( 'login' ),
