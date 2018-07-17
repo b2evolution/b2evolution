@@ -314,7 +314,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
 	}
 
 	$search_ItemList = new ItemList2( $Blog, $timestamp_min, $timestamp_max, '', 'ItemCache', 'search_item' );
-	$search_ItemList->set_filters( array(
+	$search_filters = array(
 			'keywords'      => $search_term,
 			'keyword_scope' => 'title,content,tags,excerpt,titletag', // TODO: add more fields
 			'phrase'        => 'OR',
@@ -323,14 +323,19 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
 			'order'         => 'DESC',
 			'posts'         => 1000,
 			'post_ID_list'  => $exclude_posts,
-			'authors'       => is_logged_in() ? $authors : NULL,
-		) );
+		);
+
+	if( ! empty( $authors ) && is_logged_in() )
+	{
+		$search_filters['authors'] = $authors;
+	}
+	$search_ItemList->set_filters( $search_filters );
 
 	// Generate query from filters above and count results:
 	$search_ItemList->query_init();
 
-	if( ! is_logged_in() && ! empty( $author ) )
-	{
+	if( ! is_logged_in() && ! empty( $authors ) )
+	{ // This is necessary because the 'authors_login' filter above will not work for non-existent logins and
 		$search_ItemList->ItemQuery->WHERE_and( 'user_login = '.$DB->quote( $authors ) );
 	}
 
