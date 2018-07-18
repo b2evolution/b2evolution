@@ -290,6 +290,10 @@ function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp 
 		preg_match( '~[?&]s=([^&#]*)~', $int_search_uri, $res );
 		$hit_uri = sprintf( T_( 'Internal search: %s' ), $res[1] );
 	}
+	elseif( $hit_disp == '-' )
+	{	// This is a redirect:
+		return '['.get_link_tag( $full_url, 'redirect' ).']';
+	}
 	elseif( strpos( $hit_uri, 'email_passthrough.php' ) !== false )
 	{	// This is a click from email message:
 		return '['.get_link_tag( $full_url, 'email_passthrough' ).']';
@@ -430,28 +434,24 @@ function disp_color_agent( $hit_agent_type )
  */
 function hit_response_code_class( $hit_response_code )
 {
-	$class = '';
-
-	if( $hit_response_code >= 200 && $hit_response_code < 300 )
+	if( $hit_response_code >= 500 )
 	{
-		$class =  "code_2xx";
+		return 'text-danger';
 	}
-	if( $hit_response_code >= 300 && $hit_response_code < 400 )
+	elseif( $hit_response_code >= 400 )
 	{
-		$class =  "code_3xx";
+		return 'text-warning';
 	}
-
-	if( $hit_response_code == 304 )
+	elseif( $hit_response_code >= 300 )
 	{
-		$class =  "code_304";
+		return 'text-info';
 	}
-
-	if( $hit_response_code >= 400 )
+	elseif( $hit_response_code >= 200 )
 	{
-		$class =  "code_4xx";
+		return 'text-success';
 	}
 
-	return $class;
+	return '';
 }
 
 
