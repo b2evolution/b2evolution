@@ -6807,11 +6807,12 @@ class Item extends ItemLight
 			$custom_fields = $this->get_type_custom_fields();
 			if( ! empty( $custom_fields ) )
 			{	// If this post has at least one custom field
-				if( ! isset( $this->updated_items ) )
+				if( ! isset( $this->recursive_updated_items ) )
 				{	// Store in this array all updated items in order to avoid inifitie loop updating:
-					$this->updated_items = array();
+					$this->recursive_updated_items = array();
+					$this->recursive_updated_messages = array();
 				}
-				$this->updated_items[] = $this->ID;
+				$this->recursive_updated_items[] = $this->ID;
 
 				$ItemCache = & get_ItemCache();
 				$ItemCache->clear();
@@ -6822,9 +6823,16 @@ class Item extends ItemLight
 				$child_items = $ItemCache->load_by_sql( $item_cache_SQL );
 				foreach( $child_items as $child_Item )
 				{
-					if( in_array( $child_Item->ID, $this->updated_items ) )
+					if( in_array( $child_Item->ID, $this->recursive_updated_items ) )
 					{	// Display error to inform about infinite loop:
-						$Messages->add( sprintf( T_('Recursive update has stopped because of infinite loop. Item #%d has child #%d which was already updated.'), intval( $this->ID ), intval( $child_Item->ID ) ), 'error' );
+						if( ! isset( $this->recursive_updated_messages['nogroup'] ) )
+						{
+							$this->recursive_updated_messages['nogroup'] = array();
+						}
+						$this->recursive_updated_messages['nogroup'][] = array(
+							'text' => sprintf( T_('Recursive update has stopped because of infinite loop. Item #%d has child #%d which was already updated.'), intval( $this->ID ), intval( $child_Item->ID ) ),
+							'type' => 'error',
+						);
 						// Stop here to avoid infinite loop:
 						continue;
 					}
@@ -6844,7 +6852,8 @@ class Item extends ItemLight
 						}
 						if( $update_child_custom_field )
 						{	// Update child post custom fields if at least one field has been detected with same code and type as parent:
-							$child_Item->updated_items = $this->updated_items;
+							$child_Item->recursive_updated_items = & $this->recursive_updated_items;
+							$child_Item->recursive_updated_messages = & $this->recursive_updated_messages;
 							if( $child_Item->dbupdate() )
 							{	// Display a message to inform about updated child posts:
 								$child_item_Blog = $child_Item->get_Blog();
@@ -6857,11 +6866,41 @@ class Item extends ItemLight
 								{	// If current user has no permission to edit the child Item display the ID as text:
 									$child_item_edit_link = $child_Item->ID;
 								}
-								$Messages->add_to_group( $child_Item->get_title().' ('.$child_item_edit_link.') '.T_('in').' '.$child_item_Blog->get( 'shortname' ),
-									'note', T_('Custom fields have been replicated to the following child posts').':' );
+								$msg_group = T_('Custom fields have been replicated to the following child posts').':';
+								if( ! isset( $this->recursive_updated_messages[ $msg_group ] ) )
+								{
+									$this->recursive_updated_messages[ $msg_group ] = array();
+								}
+								$this->recursive_updated_messages[ $msg_group ][] = array(
+									'text' => $child_Item->get_title().' ('.$child_item_edit_link.') '.T_('in').' '.$child_item_Blog->get( 'shortname' ),
+									'type' => 'note',
+								);
 							}
 						}
 					}
+				}
+
+				// Display messages from recursion:
+				if( $this->ID == $this->recursive_updated_items[0] &&
+				    ! empty( $this->recursive_updated_messages ) )
+				{	// If we have at least one message during recursive updating of the child posts and this is end of the recursion:
+					foreach( $this->recursive_updated_messages as $msg_group => $messages )
+					{	// Reverse message to display in proper way and not as it is returned by recursion:
+						$messages = array_reverse( $messages );
+						foreach( $messages as $message )
+						{
+							if( $msg_group == 'nogroup' )
+							{	// Single message:
+								$Messages->add( $message['text'], $message['type'] );
+							}
+							else
+							{	// Grouped message:
+								$Messages->add_to_group( $message['text'], $message['type'], $msg_group );
+							}
+						}
+					}
+					unset( $this->recursive_updated_items );
+					unset( $this->recursive_updated_messages );
 				}
 			}
 		}
