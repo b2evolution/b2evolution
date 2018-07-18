@@ -161,7 +161,7 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 		$msgform_contact_methods = get_msgform_contact_methods( isset( $recipient_User ) ? $recipient_User : NULL );
 		if( count( $msgform_contact_methods ) > 1 )
 		{	// Only when at least two methods are allowed:
-			$Form->select_input_array( 'contact_method', $contact_method, $msgform_contact_methods, T_('Preferred contact method'), '', array( 'force_keys_as_values' => true ) );
+			$Form->select_input_array( 'contact_method', $contact_method, $msgform_contact_methods, T_('Reply method'), T_('How would you prefer to receive a reply?'), array( 'force_keys_as_values' => true ) );
 		}
 	}
 
