@@ -477,7 +477,7 @@ if( $success_message )
 
 		if( ! empty( $send_contact_method ) )
 		{	// Append a preferred contact method to the message text:
-			$send_message[1] = T_('Preferred contact method').': '.$send_contact_method;
+			$send_message[1] = T_('Reply method').': '.$send_contact_method;
 		}
 
 		if( ! empty( $message ) )

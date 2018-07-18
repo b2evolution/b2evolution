@@ -47,7 +47,7 @@ if( ! empty( $params['additional_fields'] ) )
 
 if( ! empty( $params['contact_method'] ) )
 {	// Display a preferred contact method only if it has been selected:
-	echo "\n\n-- \n".T_('Preferred contact method').': '.$params['contact_method'];
+	echo "\n\n-- \n".T_('Reply method').': '.$params['contact_method'];
 }
 
 if( ! empty( $params['message'] ) )
