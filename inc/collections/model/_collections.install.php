@@ -355,7 +355,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			itcf_ityp_ID INT(11) UNSIGNED NOT NULL,
 			itcf_label   VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
 			itcf_name    VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
-			itcf_type    ENUM( 'double', 'varchar', 'text', 'html', 'url' ) COLLATE ascii_general_ci NOT NULL,
+			itcf_type    ENUM( 'double', 'varchar', 'text', 'html', 'url', 'image' ) COLLATE ascii_general_ci NOT NULL,
 			itcf_order   INT NULL,
 			itcf_note    VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			itcf_public  TINYINT DEFAULT 1,

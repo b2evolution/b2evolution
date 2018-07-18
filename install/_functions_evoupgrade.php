@@ -9863,7 +9863,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			'ADD' => array(
 				'itcf_public' => 'TINYINT DEFAULT 1',
 				'itcf_format' => 'VARCHAR(2000) NULL',
-			) ) );
+			),
+			'MODIFY' => array(
+				'itcf_type' => 'ENUM( "double", "varchar", "text", "html", "url", "image" ) COLLATE ascii_general_ci NOT NULL',
+			),
+		) );
 		upg_task_end();
 	}
 

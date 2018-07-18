@@ -294,6 +294,14 @@ function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp 
 		preg_match( '~[?&]s=([^&#]*)~', $int_search_uri, $res );
 		$hit_uri = sprintf( T_( 'Internal search: %s' ), $res[1] );
 	}
+	elseif( $hit_disp == '-' )
+	{	// This is a redirect:
+		return '['.get_link_tag( $full_url, 'redirect' ).']';
+	}
+	elseif( strpos( $hit_uri, 'email_passthrough.php' ) !== false )
+	{	// This is a click from email message:
+		return '['.get_link_tag( $full_url, 'email_passthrough' ).']';
+	}
 	elseif( utf8_strlen( $hit_uri ) > $max_len )
 	{
 		$hit_uri = '...'.utf8_substr( $hit_uri, -$max_len );
@@ -430,28 +438,28 @@ function disp_color_agent( $hit_agent_type )
  */
 function hit_response_code_class( $hit_response_code )
 {
-	$class = '';
-
-	if( $hit_response_code >= 200 && $hit_response_code < 300 )
-	{
-		$class =  "code_2xx";
+	if( $hit_response_code >= 500 )
+	{	// Server errors:
+		return 'text-danger';
 	}
-	if( $hit_response_code >= 300 && $hit_response_code < 400 )
-	{
-		$class =  "code_3xx";
+	elseif( $hit_response_code >= 400 )
+	{	// Code errors:
+		return 'text-warning';
+	}
+	elseif( $hit_response_code == 304 )
+	{	// 304 means "Not Modified"; Display this as success 2xx codes:
+		return 'text-success';
+	}
+	elseif( $hit_response_code >= 300 )
+	{	// Redirects:
+		return 'text-info';
+	}
+	elseif( $hit_response_code >= 200 )
+	{	// Success pages:
+		return 'text-success';
 	}
 
-	if( $hit_response_code == 304 )
-	{
-		$class =  "code_304";
-	}
-
-	if( $hit_response_code >= 400 )
-	{
-		$class =  "code_4xx";
-	}
-
-	return $class;
+	return '';
 }
 
 

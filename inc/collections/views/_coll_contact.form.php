@@ -67,7 +67,7 @@ $Form->begin_fieldset( T_('Contact form').' (disp=msgform)'.get_manual_link( 'co
 			'input_prefix' => $saved_additional_fields,
 			'field_suffix' => '<button type="button" id="button_add_field" class="btn btn-default">'.T_('Add').'</button>'
 		) );
-	$Form->checkbox( 'msgform_contact_method', $edited_Blog->get_setting( 'msgform_contact_method' ), T_('Preferred contact method'), T_('Check to let user specify a preferred contact method.') );
+	$Form->checkbox( 'msgform_contact_method', $edited_Blog->get_setting( 'msgform_contact_method' ), T_('Reply method'), T_('Check to let user specify a preferred contact method.') );
 	$Form->checkbox( 'msgform_display_message', $edited_Blog->get_setting( 'msgform_display_message' ), T_('Allow message field'), T_('Check to display textarea.') );
 	$Form->checkbox( 'msgform_require_message', $edited_Blog->get_setting( 'msgform_require_message' ), T_('Require message field'), T_('Check to require a custom message.'), '', 1, ! $edited_Blog->get_setting( 'msgform_display_message' ) );
 	$msgform_message_label_params = array();

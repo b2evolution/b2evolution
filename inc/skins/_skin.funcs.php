@@ -536,6 +536,7 @@ function skin_init( $disp )
 			$comment_id = param( 'comment_id', 'integer', 0, true );
 			$post_id = param( 'post_id', 'integer', 0, true );
 			$subject = param( 'subject', 'string', '' );
+			$redirect_to = param( 'redirect_to', 'url', regenerate_url(), true, true );
 
 			// try to init recipient_User
 			if( !empty( $recipient_id ) )
@@ -578,8 +579,6 @@ function skin_init( $disp )
 				if( $allow_msgform == 'login' )
 				{ // user must login first to be able to send a message to this User
 					$Messages->add( sprintf( T_( 'You must log in before you can contact "%s".' ), $recipient_User->get( 'login' ) ) );
-					// Override redirect to param:
-					$redirect_to = param( 'redirect_to', 'url', regenerate_url(), true, true );
 					// Redirect to special blog for login actions:
 					header_redirect( url_add_param( $Blog->get( 'loginurl', array( 'glue' => '&' ) ), 'redirect_to='.rawurlencode( $redirect_to ), '&' ) );
 					// Exit here.
@@ -625,9 +624,8 @@ function skin_init( $disp )
 					$Messages->add( T_( 'This commentator does not want to get contacted through the message form.' ), 'error' );
 				}
 
-				$blogurl = $Blog->gen_blogurl();
 				// If it was a front page request or the front page is set to 'msgform' then we must not redirect to the front page because it is forbidden for the current User
-				$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'msgform' ) ) ? url_add_param( $blogurl, 'disp=403', '&' ) : $blogurl;
+				$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'msgform' ) ) ? url_add_param( $Blog->gen_blogurl(), 'disp=403', '&' ) : $redirect_to;
 				header_redirect( $redirect_to, 302 );
 				// exited here
 			}
@@ -1548,6 +1546,21 @@ function skin_init( $disp )
 			if( $Blog->get_setting( $disp.'_noindex' ) )
 			{	// We prefer robots not to index these pages:
 				$robots_index = false;
+			}
+			break;
+
+		case 'compare':
+			$items = trim( param( 'items', '/^[\d,]*$/' ), ',' );
+			if( ! empty( $items ) )
+			{	// Check if at least one item exist in DB:
+				$ItemCache = & get_ItemCache();
+				$items = $ItemCache->load_list( explode( ',', $items ) );
+			}
+			if( empty( $items ) )
+			{	// Display 404 page when no items to compare:
+				global $disp;
+				$disp = '404';
+				$Messages->add( T_('The requested items don\'t exist.'), 'error' );
 			}
 			break;
 	}

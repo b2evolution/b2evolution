@@ -15,10 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'items/model/_itemtype.class.php', 'ItemType' );
 
-/**
- * @var Itemtype
- */
-global $edited_Itemtype;
+global $edited_Itemtype, $thumbnail_sizes;
 
 // Determine if we are creating or updating...
 global $action;
@@ -157,6 +154,13 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 					'size'      => 20,
 					'maxlength' => 60
 				),
+			'image' => array(
+					'label'     => T_('Image'),
+					'title'     => T_('Add new image custom field'),
+					'note'      => T_('Ex: Cover... &ndash; will be stored as an integer.'),
+					'size'      => 20,
+					'maxlength' => 60
+				),
 	);
 
 	$custom_fields_names = array();
@@ -211,9 +215,19 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 			$custom_field_name = ' '.T_('Name').' <input type="text" name="custom_'.$type.'_fname'.$i.'" value="'.$custom_field_name.'" class="form_text_input form-control custom_field_name '.$custom_field_name_class.'" maxlength="36" />';
 			$custom_field_name .= ' '.T_('Order').' <input type="text" name="custom_'.$type.'_order'.$i.'" value="'.$custom_field['order'].'" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />';
 			$custom_field_name .= ' '.T_('Note').' <input type="text" name="custom_'.$type.'_note'.$i.'" value="'.format_to_output( $custom_field['note'], 'htmlattr' ).'" class="form_text_input form-control custom_field_note" size="30" maxlength="255" />';
-			if( $type == 'double' )
-			{	// Only numeric can has a format:
-				$custom_field_name .= ' '.T_('Format').' <input type="text" name="custom_'.$type.'_format'.$i.'" value="'.format_to_output( $custom_field['format'], 'htmlattr' ).'" class="form_text_input form-control custom_field_format" size="20" maxlength="2000" />';
+			switch( $type )
+			{
+				case 'double':
+					$custom_field_name .= ' '.T_('Format').' <input type="text" name="custom_'.$type.'_format'.$i.'" value="'.format_to_output( $custom_field['format'], 'htmlattr' ).'" class="form_text_input form-control custom_field_format" size="20" maxlength="2000" />';
+					break;
+				case 'image':
+					$custom_field_name .= ' '.T_('Format').' <select type="text" name="custom_'.$type.'_format'.$i.'" class="form-control custom_field_format">';
+					foreach( $thumbnail_sizes as $thumbnail_size_key => $thumbnail_size_data )
+					{
+						$custom_field_name .= '<option value="'.format_to_output( $thumbnail_size_key, 'htmlattr' ).'"'.( $custom_field['format'] == $thumbnail_size_key ? ' selected="selected"' : '' ).'>'.format_to_output( $thumbnail_size_key ).'</option>';
+					}
+					$custom_field_name .= '</select>';
+					break;
 			}
 			$custom_field_name .= ' <label class="text-normal"><input type="checkbox" name="custom_'.$type.'_public'.$i.'" value="1" '.( $custom_field['public'] ? ' checked="checked"' : '' ).' /> '.T_('Public').'</label>';
 			$Form->text_input( $field_id_suffix, $custom_field_label, $data[ 'size' ], $data[ 'label' ], $action_delete, array(
@@ -349,7 +363,7 @@ function add_new_custom_field( type, title, title_size )
 	var count_custom = jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value' );
 	count_custom++;
 	var custom_ID = guidGenerator();
-	jQuery( '#custom_' + type + '_field_list' ).append( '<?php echo str_replace( array( '$ID$' ), array( 'ffield_custom_\' + type + \'_\' + count_custom + \'' ), format_to_js( $Form->fieldstart ) ); ?>' +
+	var custom_field_inputs = '<?php echo str_replace( array( '$ID$' ), array( 'ffield_custom_\' + type + \'_\' + count_custom + \'' ), format_to_js( $Form->fieldstart ) ); ?>' +
 			'<input type="hidden" name="custom_' + type + '_ID' + count_custom + '" value="' + custom_ID + '" />' +
 			'<input type="hidden" name="custom_' + type + '_new' + count_custom + '" value="1" />' +
 			'<?php echo format_to_js( $Form->labelstart ); ?><label for="custom_' + type + '_' + count_custom + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>>' + title + ':</label><?php echo format_to_js( $Form->labelend ); ?>' +
@@ -357,10 +371,25 @@ function add_new_custom_field( type, title, title_size )
 				'<?php echo TS_('Title'); ?> <input type="text" id="custom_' + type + '_' + count_custom + '" name="custom_' + type + '_' + count_custom + '" class="form_text_input form-control new_custom_field_title" maxlength="255" size="' + title_size + '" />' +
 				' <?php echo TS_('Name'); ?> <input type="text" name="custom_' + type + '_fname' + count_custom + '" value="" class="form_text_input form-control custom_field_name" maxlength="255" />' +
 				' <?php echo TS_('Order'); ?> <input type="text" name="custom_' + type + '_order' + count_custom + '" value="" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />' +
-				' <?php echo TS_('Note'); ?> <input type="text" name="custom_' + type + '_note' + count_custom + '" value="" class="form_text_input form-control custom_field_note" maxlength="255" size="30" />' +
-				( type == 'double' ? ' <?php echo TS_('Format'); ?> <input type="text" name="custom_' + type + '_format' + count_custom + '" value="" class="form_text_input form-control custom_field_format" maxlength="2000" size="20" />' : '' ) +
+				' <?php echo TS_('Note'); ?> <input type="text" name="custom_' + type + '_note' + count_custom + '" value="" class="form_text_input form-control custom_field_note" maxlength="255" size="30" />';
+	switch( type )
+	{
+		case 'double':
+			custom_field_inputs += ' <?php echo TS_('Format'); ?> <input type="text" name="custom_' + type + '_format' + count_custom + '" value="" class="form_text_input form-control custom_field_format" maxlength="2000" size="20" />';
+			break;
+		case 'image':
+			custom_field_inputs += ' <?php echo TS_('Format'); ?> <select type="text" name="custom_' + type + '_format' + count_custom + '" class="form-control custom_field_format"><?php
+			foreach( $thumbnail_sizes as $thumbnail_size_key => $thumbnail_size_data )
+			{
+				echo '<option value="'.format_to_output( $thumbnail_size_key, 'htmlattr' ).'">'.format_to_output( $thumbnail_size_key ).'</option>';
+			}
+			?></select>';
+			break;
+	}
+	custom_field_inputs += 
 				' <label class="text-normal"><input type="checkbox" name="custom_' + type + '_public' + count_custom + '" value="1" checked="checked" /> <?php echo TS_('Public'); ?></label>' +
-			'<?php echo format_to_js( $Form->inputend.$Form->fieldend ); ?>' );
+			'<?php echo format_to_js( $Form->inputend.$Form->fieldend ); ?>';
+	jQuery( '#custom_' + type + '_field_list' ).append( custom_field_inputs );
 	jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value', count_custom );
 }
 
@@ -387,6 +416,11 @@ jQuery( '#add_new_html_custom_field' ).click( function()
 jQuery( '#add_new_url_custom_field' ).click( function()
 {
 	add_new_custom_field( 'url', '<?php echo TS_('URL'); ?>', 20 );
+} );
+
+jQuery( '#add_new_image_custom_field' ).click( function()
+{
+	add_new_custom_field( 'image', '<?php echo TS_('Image'); ?>', 20 );
 } );
 
 jQuery( '[id^="delete_custom_"]' ).click( function()

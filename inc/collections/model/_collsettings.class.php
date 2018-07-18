@@ -248,6 +248,7 @@ class CollectionSettings extends AbstractSettings
 			'search_include_posts' => 1, // Include posts to results on disp=search
 			'search_include_cmnts' => 1, // Include comments to results on disp=search
 			'search_include_tags'  => 1, // Include tags to results on disp=search
+			'search_include_files' => 1, // Include files to results on disp=search
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
 
 		// Time frame settings:

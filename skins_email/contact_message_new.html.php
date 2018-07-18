@@ -78,7 +78,7 @@ if( ! empty( $params['additional_fields'] ) )
 if( ! empty( $params['contact_method'] ) )
 {	// Display a preferred contact method only if it has been selected:
 	echo '<p'.emailskin_style( '.p' ).'>'
-			.'<b>'.T_('Preferred contact method').':</b> '
+			.'<b>'.T_('Reply method').':</b> '
 			.$params['contact_method']
 		.'</p>';
 }
