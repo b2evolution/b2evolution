@@ -435,19 +435,23 @@ function disp_color_agent( $hit_agent_type )
 function hit_response_code_class( $hit_response_code )
 {
 	if( $hit_response_code >= 500 )
-	{
+	{	// Server errors:
 		return 'text-danger';
 	}
 	elseif( $hit_response_code >= 400 )
-	{
+	{	// Code errors:
 		return 'text-warning';
 	}
+	elseif( $hit_response_code == 304 )
+	{	// 304 means "Not Modified"; Display this as success 2xx codes:
+		return 'text-success';
+	}
 	elseif( $hit_response_code >= 300 )
-	{
+	{	// Redirects:
 		return 'text-info';
 	}
 	elseif( $hit_response_code >= 200 )
-	{
+	{	// Success pages:
 		return 'text-success';
 	}
 
