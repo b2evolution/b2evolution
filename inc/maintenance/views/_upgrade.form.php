@@ -66,10 +66,10 @@ if( $dir_handle = @opendir( $upgrade_path ) )
 {
 	while( ( $file = readdir( $dir_handle ) ) !== false )
 	{
-		$is_dir = is_dir( $upgrade_path.$file );
-		if( $file != '.' && $file != '..' && ( $is_dir || preg_match( '#\.zip$#i', $file ) ) )
+		if( $file != '.' && $file != '..' &&
+		    ( is_dir( $upgrade_path.$file ) || preg_match( '#\.zip$#i', $file ) ) )
 		{	// Only folder or ZIP file:
-			$downloaded_files[ $file ] = $is_dir ? 'dir' : 'zip';
+			$downloaded_files[] = $file;
 		}
 	}
 	closedir( $dir_handle );
@@ -105,7 +105,11 @@ else
 	// BODY START:
 	$Table->display_body_start();
 
-	foreach( $downloaded_files as $file => $type )
+	// Sort files:
+	natsort( $downloaded_files );
+	$downloaded_files = array_reverse( $downloaded_files );
+
+	foreach( $downloaded_files as $file )
 	{
 		$Table->display_line_start();
 
@@ -115,7 +119,7 @@ else
 		$Table->display_col_end();
 
 		$use_file_url = $admin_url.'?ctrl=upgrade&amp;action=';
-		if( $type == 'zip' )
+		if( ! is_dir( $upgrade_path.$file ) )
 		{
 			$use_file_url .= 'unzip&amp;upd_file='.urlencode( $file ).'&amp;'.url_crumb( 'upgrade_downloaded' );
 		}
