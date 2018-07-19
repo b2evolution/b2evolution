@@ -49,12 +49,7 @@ $Form->begin_fieldset( T_( 'Existing Backups' ).get_manual_link( 'existing-backu
 		{
 			if( $dir_name != '.' && $dir_name != '..' && is_dir( $backup_path.'/'.$dir_name ) )
 			{
-				$backup_folders[] = '<code>'.$dir_name.'</code> '
-					.'<a href="'.$admin_url.'?ctrl=backup&amp;action=delete&amp;folder='.rawurlencode( $dir_name ).'&amp;'.url_crumb( 'backup' ).'"'
-							.' class="btn btn-danger btn-xs"'
-							.' onclick="return confirm(\''.TS_('Are you sure want to delete this folder?').'\')">'
-						.T_('Delete')
-					.'</a>';
+				$backup_folders[] = $dir_name;
 			}
 		}
 		closedir( $dir_handle );
@@ -62,6 +57,20 @@ $Form->begin_fieldset( T_( 'Existing Backups' ).get_manual_link( 'existing-backu
 
 	if( count( $backup_folders ) )
 	{
+		// Sort files:
+		natsort( $backup_folders );
+		$backup_folders = array_reverse( $backup_folders );
+
+		// Display backup folders:
+		foreach( $backup_folders as $f => $dir_name )
+		{
+			$backup_folders[ $f ] = '<code>'.$dir_name.'</code> '
+				.'<a href="'.$admin_url.'?ctrl=backup&amp;action=delete&amp;folder='.rawurlencode( $dir_name ).'&amp;'.url_crumb( 'backup' ).'"'
+						.' class="btn btn-danger btn-xs"'
+						.' onclick="return confirm(\''.TS_('Are you sure want to delete this folder?').'\')">'
+					.T_('Delete')
+				.'</a>';
+		}
 		$Form->info( T_('Subfolders'), implode( '<br>', $backup_folders ) );
 	}
 

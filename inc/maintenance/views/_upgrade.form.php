@@ -122,17 +122,19 @@ else
 		if( ! is_dir( $upgrade_path.$file ) )
 		{
 			$use_file_url .= 'unzip&amp;upd_file='.urlencode( $file ).'&amp;'.url_crumb( 'upgrade_downloaded' );
+			$confirm_message = TS_('Are you sure want to delete this file?');
 		}
 		else
 		{
 			$use_file_url .= 'ready&amp;upd_dir='.urlencode( $file ).'&amp;'.url_crumb( 'upgrade_is_ready' );
+			$confirm_message = TS_('Are you sure want to delete this folder?');
 		}
 		$del_file_url = $admin_url.'?ctrl=upgrade&amp;action=delete&amp;file='.urlencode( $file ).'&amp;'.url_crumb( 'upgrade_delete' );
 
 		// File date
 		$Table->display_col_start();
 		echo '<a href="'.$use_file_url.'" class="btn btn-warning btn-xs">'.T_('Use this...').'</a> ';
-		echo '<a href="'.$del_file_url.'" class="btn btn-danger btn-xs" onclick="return confirm(\''.TS_('Are you sure want to delete this file?').'\')">'.T_('Delete').'</a> ';
+		echo '<a href="'.$del_file_url.'" class="btn btn-danger btn-xs" onclick="return confirm(\''.$confirm_message.'\')">'.T_('Delete').'</a> ';
 		$Table->display_col_end();
 
 		$Table->display_line_end();
