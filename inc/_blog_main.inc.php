@@ -377,7 +377,9 @@ if( !empty($p) || !empty($title) )
 		{ // We have found an Item object, but it doesn't belong to the current blog!
 			// Check if we want to redirect moved posts:
 			if( $Settings->get( 'redirect_moved_posts' ) )
-			{ // Redirect to the item current permanent url
+			{	// Set disp to 'redirect' in order to store this value in hitlog table:
+				$disp = 'redirect';
+				// Redirect to the item current permanent url:
 				header_redirect( $Item->get_permanent_url(), 301 );
 				// already exited
 			}
