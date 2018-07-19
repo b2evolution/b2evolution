@@ -290,7 +290,7 @@ function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp 
 		preg_match( '~[?&]s=([^&#]*)~', $int_search_uri, $res );
 		$hit_uri = sprintf( T_( 'Internal search: %s' ), $res[1] );
 	}
-	elseif( $hit_disp == '-' || $hit_disp == 'redirect' )
+	elseif( $hit_disp == 'redirect' )
 	{	// This is a redirect:
 		return '['.get_link_tag( $full_url, 'redirect' ).']';
 	}
