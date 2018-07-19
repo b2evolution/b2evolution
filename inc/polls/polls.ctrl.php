@@ -13,6 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_funcs( 'polls/model/_poll.funcs.php' );
 load_class( 'polls/model/_poll.class.php', 'Poll' );
 load_class( 'polls/model/_poll_option.class.php', 'PollOption' );
 

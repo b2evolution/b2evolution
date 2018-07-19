@@ -98,6 +98,19 @@ threads_results_block( array(
 	) );
 evo_flush();
 
+/**** Polls owned by the user ****/
+polls_results_block( array(
+		'edited_User'          => $edited_User,
+		'action'               => $action,
+		'results_title'        => T_('Polls owned by the user'),
+		'manual_link'          => '',
+		'display_filters'      => false,
+		'display_owner'        => false,
+		'display_btn_add'      => false,
+		'display_btn_user_del' => true,
+	) );
+evo_flush();
+
 
 if( $action != 'view' && $current_User->ID != $edited_User->ID && $edited_User->ID != 1 && $current_User->check_perm( 'users', 'edit' ) )
 { // User can NOT delete admin and own account
