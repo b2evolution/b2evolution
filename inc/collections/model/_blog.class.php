@@ -128,6 +128,17 @@ class Blog extends DataObject
 
 
 	/**
+	 * The URL aliases
+	 *
+	 * Lazy filled by get_url_aliases()
+	 *
+	 * @var array
+	 */
+	var $url_aliases;
+	var $update_url_aliases = false;
+
+
+	/**
 	 * The domain for cookie of that collection.
 	 *
 	 * Lazy filled by get_cookie_domain()
@@ -268,6 +279,7 @@ class Blog extends DataObject
 		return array(
 				array( 'table'=>'T_coll_user_favs', 'fk'=>'cufv_blog_ID', 'msg'=>T_('%d user favorites') ),
 				array( 'table'=>'T_coll_settings', 'fk'=>'cset_coll_ID', 'msg'=>T_('%d blog settings') ),
+				array( 'table'=>'T_coll_url_aliases', 'fk'=>'cua_coll_ID', 'msg'=>T_('%d URL aliases') ),
 				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user permission definitions') ),
 				array( 'table'=>'T_coll_group_perms', 'fk'=>'bloggroup_blog_ID', 'msg'=>T_('%d group permission definitions') ),
 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_coll_ID', 'msg'=>T_('%d subscriptions') ),
@@ -1362,6 +1374,104 @@ class Blog extends DataObject
 				$this->set( 'http_protocol', $http_protocol );
 			}
 
+			if( ( $url_aliases = param( 'blog_url_alias', 'array', NULL ) ) !== NULL )
+			{
+				$has_error = array();
+				foreach( $url_aliases as $key => $alias )
+				{
+					$alias = trim( $alias );
+					$url_aliases[$key] = $alias;
+					if( empty( $alias ) )
+					{
+						unset( $url_aliases[$key] );
+						continue;
+					}
+					if( ! preg_match( '#^https?://[^/]+/.*#', $alias, $matches ) )
+					{ // It is not valid absolute URL
+						$Messages->add( T_('Invalid URL format').': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $alias ).'&raquo;' )
+							.'. '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>) and it must contain at least one \'/\' sign after the domain name!'), 'error' );
+					}
+					$has_error = validate_url( $alias, 'http-https' );
+					if( $has_error )
+					{
+						param_error( 'blog_url_alias', T_('Invalid URL format.') );
+						break;
+					}
+
+					$alias_wo_protocol = preg_replace( '#^https?(?=://)#', '', $alias );
+
+					// Check existing URL aliases in request array
+					foreach( $url_aliases as $sec_key => $sec_alias )
+					{
+						if( $sec_key == $key )
+						{
+							continue;
+						}
+
+						$re = "/^https?(.*)/i";
+						$subst = "https?$1";
+						$sec_alias = trim( $sec_alias );
+						$r =  count( $alias ) - count( $sec_alias );
+						if( $r < 0 )
+						{
+							$alias = rtrim( $alias, "/\\" );
+							$str = preg_quote( $alias );
+							$subject = $sec_alias;
+						}
+						else
+						{
+							$sec_alias = rtrim( $sec_alias, "/\\" );
+							$str = preg_quote( $sec_alias );
+							$subject = $alias;
+						}
+
+						// Add trailing slash to subject
+						if( ! preg_match( '~(^|/|\.php.?)$~i', $subject ) )
+						{
+							$subject .= '/';
+						}
+
+						$url_regex = preg_replace( $re, $str, $subst );
+						// Remove trailing slash from url_regex
+						//die( var_dump( $url_regex ) );
+
+						if( preg_match( '#^'.$url_regex.'(?=/)#', $subject, $matches ) )
+						{
+							param_error( 'blog_url_alias', sprintf( T_('URL alias %s is already in use by another collection or contains an existing alias.'), '&laquo;'.$alias.'&raquo;' ) );
+							break;
+						}
+					}
+
+					$trailing_slash = '';
+					if( ! preg_match( '~(^|/|\.php.?)$~i', $alias_wo_protocol ) )
+					{
+						$trailing_slash = '/';
+					}
+
+					// Check existing URL aliases in other collections
+					$SQL = new SQL('Check existing URL aliases');
+					$SQL->SELECT( 'cua_url_alias' );
+					$SQL->FROM( 'T_coll_url_aliases' );
+					$SQL->WHERE( '( cua_coll_ID != '.$this->ID.' )' );
+					$SQL->WHERE_and( '( cua_url_alias IN ('.implode( ',', array( $DB->quote( 'http'.$alias_wo_protocol ), $DB->quote( 'https'.$alias_wo_protocol ) ) ).') )'
+							.'OR '.$DB->quote( 'http'.$alias_wo_protocol ).' LIKE CONCAT( cua_url_alias, IF(cua_url_alias REGEXP "(^|/|\.php)$", "", "/"), "%" )'
+							.'OR '. $DB->quote( 'https'.$alias_wo_protocol ).' LIKE CONCAT( cua_url_alias, IF(cua_url_alias REGEXP "(^|/|\.php)$", "", "/"), "%" )'
+							.'OR cua_url_alias LIKE '.$DB->quote( 'http'.$alias_wo_protocol.$trailing_slash.'%' )
+							.'OR cua_url_alias LIKE '.$DB->quote( 'https'.$alias_wo_protocol.$trailing_slash.'%' ) );
+
+					if( $DB->get_var( $SQL->get() ) )
+					{
+						param_error( 'blog_url_aliases', sprintf( T_('URL alias %s is already in use by another collection or contains an existing alias.'), '&laquo;'.$alias.'&raquo;' ) );
+						break;
+					}
+				}
+
+				if( ! param_has_error( 'blog_url_alias' ) )
+				{
+					$this->set( 'url_aliases', $url_aliases );
+				}
+			}
+
 			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
 			{	// Cookies:
 				$this->set_setting( 'cookie_domain_type', get_param( 'cookie_domain_type' ) );
@@ -1690,6 +1800,11 @@ class Blog extends DataObject
 			case 'ID':
 			case 'allowtrackbacks':
 				return $this->set_param( $parname, 'number', $parvalue, $make_null );
+				break;
+
+			case 'url_aliases':
+				$this->url_aliases = $parvalue;
+				$this->update_url_aliases = true;
 				break;
 
 			default:
@@ -4087,6 +4202,27 @@ class Blog extends DataObject
 			$this->favorite( $this->owner_user_ID, 1 );
 		}
 
+		// URL aliases
+		if( $this->update_url_aliases )
+		{
+			$insert_values = array();
+			foreach( $this->url_aliases as $alias )
+			{
+				if( ! empty( $alias ) )
+				{
+					$insert_values[] = '('.$DB->quote( $this->ID ).', '.$DB->quote( $alias ).')';
+				}
+			}
+
+			// Clear existing URL aliases first
+			$DB->query( 'DELETE FROM T_coll_url_aliases WHERE cua_coll_ID ='.$DB->quote( $this->ID ) );
+			if( ! empty( $insert_values ) )
+			{
+				$SQL = new SQL( 'Update URL aliases for collection #'.$this->ID );
+				$SQL = $DB->query( 'INSERT INTO T_coll_url_aliases ( cua_coll_ID, cua_url_alias ) VALUES '.implode( ', ', $insert_values ) );
+			}
+		}
+
 		parent::dbupdate();
 
 		// if this blog settings was modified we need to invalidate this blog's page caches
@@ -5450,6 +5586,28 @@ class Blog extends DataObject
 		}
 
 		return $this->comment_moderator_user_data;
+	}
+
+
+
+	/**
+	 * Get data of domain aliases for this collection
+	 *
+	 * @return array Array of domain aliases
+	 */
+	function get_url_aliases()
+	{
+		if( ! isset( $this->url_aliases ) )
+		{
+			global $DB;
+			$SQL = new SQL( 'Get list of URL aliases of collection #'.$this->ID );
+			$SQL->SELECT( 'cua_url_alias' );
+			$SQL->FROM( 'T_coll_url_aliases' );
+			$SQL->WHERE( 'cua_coll_ID = '.$DB->quote( $this->ID ) );
+			$this->url_aliases = $DB->get_col( $SQL->get() );
+		}
+
+		return $this->url_aliases;
 	}
 
 
