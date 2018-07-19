@@ -16,7 +16,7 @@ class TinyMCE_SpellChecker_Engine {
 	private static $engines = array();
 	private $config;
 
-	public function __construct($config) {
+	public function __constructor($config) {
 		$this->config = $config;
 	}
 

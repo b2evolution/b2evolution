@@ -675,7 +675,8 @@ class tinymce_plugin extends Plugin
 		global $UserSettings;
 		global $ReqHost;
 
-		$tmce_plugins_array = array( 'image', 'importcss', 'link', 'pagebreak', 'morebreak', 'textcolor', 'media', 'nonbreaking', 'charmap', 'fullscreen', 'table', 'searchreplace', 'autocomplete' );
+		$tmce_plugins_array = array( 'image', 'importcss', 'link', 'pagebreak', 'morebreak', 'textcolor', 'media',
+				'nonbreaking', 'charmap', 'fullscreen', 'table', 'searchreplace', 'autocomplete', 'lists', 'advlist' );
 
 		if( function_exists( 'enchant_broker_init' ) )
 		{ // Requires Enchant spelling library
@@ -905,6 +906,12 @@ class tinymce_plugin extends Plugin
 
 		// remove_linebreaks : false,
 		// not documented:	auto_cleanup_word : true,
+
+		// Enable advanced tab for images:
+		$init_options[] = 'image_advtab : true';
+
+		// Disable branding:
+		$init_options[] = 'branding : false';
 
 		$init = implode( ",\n", $init_options );
 
