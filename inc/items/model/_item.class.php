@@ -2499,6 +2499,10 @@ class Item extends ItemLight
 								'image_link_rel' => 'lightbox[p'.$this->ID.']'
 							) );
 						}
+						else
+						{	// Display an error if Link is not found in DB:
+							$custom_field_value = '<span class="text-danger">'.T_('Invalid link ID:').' '.$custom_field_value.'</span>';
+						}
 						break;
 				}
 			}
