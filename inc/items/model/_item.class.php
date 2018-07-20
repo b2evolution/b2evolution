@@ -2425,140 +2425,200 @@ class Item extends ItemLight
 	 * Get item custom field value by field index
 	 *
 	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
-	 * @param string Restring field by type(double, varchar, html, text, url), FALSE - to don't restrict
-	 * @param boolean Format value depending on field type
-	 * @return string|boolean FALSE if the field doesn't exist Double/String otherwise depending from the custom field type
+	 * @param string Restrict field by type(double, varchar, html, text, url, image), FALSE - to don't restrict
+	 * @param boolean ****DEPRECATED**** Format value depending on field type 
+	 * @return string|boolean FALSE if the field doesn't exist
 	 */
-	function get_custom_field_value( $field_index, $restrict_type = false, $format_value = true )
+	function get_custom_field_value( $field_index, $restrict_type = false, $format_value = false )
 	{
 		// Get all custom fields by item ID:
 		$custom_fields = $this->get_custom_fields_defs();
 
-		if( isset( $custom_fields[ $field_index ] ) )
-		{
-			if( $restrict_type !== false && $custom_fields[ $field_index ]['type'] != $restrict_type )
-			{	// The requested field is detected but it has another type:
-				return false;
-			}
+		if( ! isset( $custom_fields[ $field_index ] ) )
+		{	// The requested field is not detected:
+			return false;
+		}
 
-			$custom_field_value = $this->custom_fields[ $field_index ]['value'];
-			if( $format_value &&
-			    (
-			      ( $custom_field_value !== '' && $custom_field_value !== NULL ) || // don't format empty value
-			      $this->custom_fields[ $field_index ]['type'] == 'double' // double fields may have a special format for empty value
-			    )
-			  )
-			{	// Format value only when value is not empty:
-				switch( $this->custom_fields[ $field_index ]['type'] )
-				{
-					case 'double':
-						$format = $this->custom_fields[ $field_index ]['format'];
-						if( empty( $format ) )
-						{	// No format:
-							break;
-						}
+		if( $restrict_type !== false && $custom_fields[ $field_index ]['type'] != $restrict_type )
+		{	// The requested field is detected but it has another type:
+			return false;
+		}
 
-						$formats = explode( ';', $format );
-						if( $custom_field_value === '' || $custom_field_value === NULL )
-						{	// If value is empty string or NULL
-							if( empty( $formats[3] ) )
-							{	// Use default for empty values:
-								$custom_field_value = /* TRANS: "Not Available" */ T_('N/A');
-							}
-							else
-							{	// Use a special format for empty values:
-								$custom_field_value = $formats[3];
-							}
-							// Stop here to don't apply other format:
-							break;
-						}
+		$custom_field_value = $custom_fields[ $field_index ]['value'];
 
-						if( $custom_field_value == 0 && isset( $formats[2] ) )
-						{	// If value == 0
-							$custom_field_value = $formats[2];
-							// Stop here to don't apply other format:
-							break;
-						}
+		if( $format_value )
+		{	// Format value:
+			$custom_field_value = $this->get_custom_field_formatted( $field_index );
+		}
 
-						if( count( $formats ) > 4 )
-						{	// Check other formats:
-							for( $f = 4; $f < count( $formats ); $f++ )
-							{
-								$cur_format = explode( '=', $formats[ $f ], 2 );
-								if( $cur_format[0] == $custom_field_value )
-								{	// Use the searched format for given value:
-									$custom_field_value = isset( $cur_format[1] ) ? $cur_format[1] : $custom_field_value;
-									// Stop here to don't apply other format:
-									break 2;
-								}
-							}
-						}
+		return $custom_field_value;
+	}
 
-						// Format all other values which are not related to the formats above:
-						$format = $formats[0];
-						if( $custom_field_value < 0 && ! empty( $formats[1] ) )
-						{	// Use a format for negative values:
-							$custom_field_value = abs( $custom_field_value );
-							$format = $formats[1];
-						}
-						$format = preg_split( '#(\d+)#', $format, -1, PREG_SPLIT_DELIM_CAPTURE );
-						$f_num = count( $format );
-						$format_decimals = 0;
-						$format_dec_point = '.';
-						$format_thousands_sep = '';
-						$format_prefix = isset( $format[0] ) ? $format[0] : '';
-						$format_suffix = $f_num > 1 ? $format[ $f_num - 1 ] : '';
-						if( $f_num > 2 )
-						{	// Extract data for number fomatting:
-							if( $f_num > 3 && preg_match( '#^\d+$#', $format[ $f_num - 2 ] ) )
-							{	// Get a number of digits after dot:
-								$format_decimals = strlen( $format[ $f_num - 2 ] );
-							}
-							if( $f_num > 4 && preg_match( '#^[^\d]+$#', $format[ $f_num - 3 ] ) )
-							{	// Get a decimal point:
-								$format_dec_point = $format[ $f_num - 3 ];
-							}
-							if( $f_num > 6 && preg_match( '#^[^\d]+$#', $format[ $f_num - 5 ] ) )
-							{	// Get a thousands separator:
-								$format_thousands_sep = $format[ $f_num - 5 ];
-							}
-							// Format number with extracted data:
-							$custom_field_value = number_format( floatval( $custom_field_value ), $format_decimals, $format_dec_point, $format_thousands_sep );
-						}
-						// Add prefix and suffix:
-						$custom_field_value = $format_prefix.$custom_field_value.$format_suffix;
-						break;
 
-					case 'text':
-						// Escape html tags and convert new lines to html <br> for text fields:
-						$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
-						break;
+	/**
+	 * Get formatted item custom field value by field index
+	 *
+	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
+	 * @param array Params
+	 * @return string|boolean FALSE if the field doesn't exist
+	 */
+	function get_custom_field_formatted( $field_index, $params = array() )
+	{
+		$params = array_merge( array(
+				'field_value_yes'     => '<span class="fa fa-check green"></span>', // Used to replace a mask #yes# in values of all types
+				'field_value_no'      => '<span class="fa fa-times red"></span>', // Used to replace a mask #no# in values of all types
+				'field_value_format'  => '', // Format for custom field, Leave empty to use a format from DB
+				'field_restrict_type' => false, // Restrict field by type(double, varchar, html, text, url, image), FALSE - to don't restrict
+			), $params );
 
-					case 'url':
-						// Display url fields as link:
-						$custom_field_value = get_link_tag( $custom_field_value );
-						break;
+		// Try to get an original value of the requested custom field:
+		$custom_field_value = $this->get_custom_field_value( $field_index, $params['field_restrict_type'] );
 
-					case 'image':
-						// Display image fields as thumbnail:
-						$LinkCache = & get_LinkCache();
-						if( $Link = & $LinkCache->get_by_ID( $custom_field_value, false, false ) )
-						{
-							$custom_field_value = $Link->get_tag( array(
-								'image_size'     => $this->custom_fields[ $field_index ]['format'],
-								'image_link_rel' => 'lightbox[p'.$this->ID.']'
-							) );
-						}
-						else
-						{	// Display an error if Link is not found in DB:
-							$custom_field_value = '<span class="text-danger">'.T_('Invalid link ID:').' '.$custom_field_value.'</span>';
-						}
-						break;
-				}
-			}
+		if( $custom_field_value === false )
+		{	// The requested field is not found for the item type:
+			return false;
+		}
+
+		// Get custom field:
+		$custom_fields = $this->get_custom_fields_defs();
+		$custom_field = $custom_fields[ $field_index ];
+
+		if( ( $custom_field_value === '' || $custom_field_value === NULL ) && // don't format empty value
+		    $custom_field['type'] != 'double' ) // double fields may have a special format even for empty value
+		{	// Don't format value in such cases:
 			return $custom_field_value;
 		}
-		return false;
+
+		if( $params['field_value_format'] === '' )
+		{	// Use a format from DB:
+			$format = $custom_field['format'];
+		}
+		else
+		{	// Use a format from params:
+			$format = $params['field_value_format'];
+		}
+
+		switch( $custom_field['type'] )
+		{
+			case 'double':
+				if( empty( $format ) )
+				{	// No format:
+					break;
+				}
+
+				$formats = explode( ';', $format );
+
+				if( count( $formats ) > 4 )
+				{	// Check formats like 123=text:
+					for( $f = 4; $f < count( $formats ); $f++ )
+					{
+						if( strpos( $formats[ $f ], '=' ) !== false )
+						{	// If format contains the equal sign
+							$cur_format = explode( '=', $formats[ $f ], 2 );
+							if( $cur_format[0] == $custom_field_value )
+							{	// Use the searched format for given value:
+								$custom_field_value = isset( $cur_format[1] ) ? $cur_format[1] : $custom_field_value;
+								// Stop here to don't apply other format:
+								break 2;
+							}
+						}
+					}
+				}
+
+				if( $custom_field_value === '' || $custom_field_value === NULL )
+				{	// If value is empty string or NULL
+					if( empty( $formats[3] ) )
+					{	// Use default for empty values:
+						$custom_field_value = /* TRANS: "Not Available" */ T_('N/A');
+					}
+					else
+					{	// Use a special format for empty values:
+						$custom_field_value = $formats[3];
+					}
+					// Stop here to don't apply other format:
+					break;
+				}
+
+				if( $custom_field_value == 0 && isset( $formats[2] ) )
+				{	// If value == 0
+					$custom_field_value = $formats[2];
+					// Stop here to don't apply other format:
+					break;
+				}
+
+				// Format all other values which are not related to the formats above:
+				$format = $formats[0];
+				if( $custom_field_value < 0 && ! empty( $formats[1] ) )
+				{	// Use a format for negative values:
+					$custom_field_value = abs( $custom_field_value );
+					$format = $formats[1];
+				}
+
+				if( $format == '#yes#' || $format == '#no#' )
+				{	// Use special formats:
+					$custom_field_value = $format;
+					break;
+				}
+
+				$format = preg_split( '#(\d+)#', $format, -1, PREG_SPLIT_DELIM_CAPTURE );
+				$f_num = count( $format );
+				$format_decimals = 0;
+				$format_dec_point = '.';
+				$format_thousands_sep = '';
+				$format_prefix = isset( $format[0] ) ? $format[0] : '';
+				$format_suffix = $f_num > 1 ? $format[ $f_num - 1 ] : '';
+				if( $f_num > 2 )
+				{	// Extract data for number fomatting:
+					if( $f_num > 3 && preg_match( '#^\d+$#', $format[ $f_num - 2 ] ) )
+					{	// Get a number of digits after dot:
+						$format_decimals = strlen( $format[ $f_num - 2 ] );
+					}
+					if( $f_num > 4 && preg_match( '#^[^\d]+$#', $format[ $f_num - 3 ] ) )
+					{	// Get a decimal point:
+						$format_dec_point = $format[ $f_num - 3 ];
+					}
+					if( $f_num > 6 && preg_match( '#^[^\d]+$#', $format[ $f_num - 5 ] ) )
+					{	// Get a thousands separator:
+						$format_thousands_sep = $format[ $f_num - 5 ];
+					}
+					// Format number with extracted data:
+					$custom_field_value = number_format( floatval( $custom_field_value ), $format_decimals, $format_dec_point, $format_thousands_sep );
+				}
+				// Add prefix and suffix:
+				$custom_field_value = $format_prefix.$custom_field_value.$format_suffix;
+				break;
+
+			case 'text':
+				// Escape html tags and convert new lines to html <br> for text fields:
+				$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
+				break;
+
+			case 'url':
+				// Display url fields as link:
+				$custom_field_value = get_link_tag( $custom_field_value );
+				break;
+
+			case 'image':
+				// Display image fields as thumbnail:
+				$LinkCache = & get_LinkCache();
+				if( $Link = & $LinkCache->get_by_ID( $custom_field_value, false, false ) )
+				{
+					$custom_field_value = $Link->get_tag( array(
+						'image_size'     => $format,
+						'image_link_rel' => 'lightbox[p'.$this->ID.']'
+					) );
+				}
+				else
+				{	// Display an error if Link is not found in DB:
+					$custom_field_value = '<span class="text-danger">'.T_('Invalid link ID:').' '.$custom_field_value.'</span>';
+				}
+				break;
+		}
+
+		// Replace special masks in value with template:
+		$custom_field_value = str_replace( array( '#yes#', '#no#' ), array( $params['field_value_yes'], $params['field_value_no'] ), $custom_field_value );
+
+		return $custom_field_value;
 	}
 
 
@@ -2607,7 +2667,7 @@ class Item extends ItemLight
 		elseif( !empty( $value ) )
 		{
 			echo $params['before'];
-			echo $this->get_custom_field_value( $field_index );
+			echo $this->get_custom_field_formatted( $field_index, $params );
 			echo $params['after'];
 		}
 	}
@@ -2687,7 +2747,7 @@ class Item extends ItemLight
 				continue;
 			}
 
-			$custom_field_value = $this->get_custom_field_value( $field_name );
+			$custom_field_value = $this->get_custom_field_formatted( $field_name, $params );
 			if( ! empty( $custom_field_value ) ||
 			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )
 			{	// Display only the filled field AND also numeric field with '0' value:
@@ -2956,7 +3016,7 @@ class Item extends ItemLight
 					if( $widget_html === false )
 					{	// Call widget with params only when content is not generated yet above:
 						ob_start();
-						skin_widget( $widget_params );
+						skin_widget( array_merge( $params, $widget_params ) );
 						$widget_html = ob_get_contents();
 						ob_end_clean();
 					}
@@ -3012,7 +3072,7 @@ class Item extends ItemLight
 				case 'field':
 					// Render single field as text:
 					$field_index = trim( $tags[2][ $t ] );
-					$field_value = $this->get_custom_field_value( $field_index );
+					$field_value = $this->get_custom_field_formatted( $field_index, $params );
 					if( $field_value === false )
 					{	// Wrong field request, display error:
 						$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_index ).'</span>', $content );
@@ -3108,7 +3168,7 @@ class Item extends ItemLight
 					case 'field':
 						// Render single parent custom field as text:
 						$field_index = trim( $tags[3][ $t ] );
-						$field_value = $other_Item->get_custom_field_value( $field_index );
+						$field_value = $other_Item->get_custom_field_formatted( $field_index, $params );
 						if( $field_value === false )
 						{	// Wrong field request, display error:
 							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_index ).'</span>', $content );
@@ -3252,7 +3312,7 @@ class Item extends ItemLight
 				$url_field_code = trim( $link_data[0] );
 
 				$custom_fields = $other_Item->get_custom_fields_defs();
-				$field_value = $other_Item->get_custom_field_value( $url_field_code, 'url', false );
+				$field_value = $other_Item->get_custom_field_value( $url_field_code, 'url' );
 				if( $field_value === false )
 				{	// Wrong field request, display error:
 					$link_html = '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $url_field_code ).'</span>';
@@ -6899,7 +6959,7 @@ class Item extends ItemLight
 							if( isset( $child_custom_fields[ $custom_field_code ] ) &&
 							    $child_custom_fields[ $custom_field_code ]['type'] == $custom_field['type'] )
 							{	// If child post has a custom field with same code and type:
-								$child_Item->set_setting( 'custom:'.$custom_field['name'], $this->get_custom_field_value( $custom_field_code, $custom_field['type'], false ) );
+								$child_Item->set_setting( 'custom:'.$custom_field['name'], $this->get_custom_field_value( $custom_field_code, $custom_field['type'] ) );
 								// Mark to know custom fields of the child post must be updated from parent:
 								$update_child_custom_field = true;
 							}
@@ -9814,7 +9874,7 @@ class Item extends ItemLight
 		$text_custom_fields = $this->get_type_custom_fields( 'varchar,text,html' );
 		foreach( $text_custom_fields as $field_index => $text_custom_field )
 		{
-			$search_string .= $this->get_custom_field_value( $field_index, false, false ).' ';
+			$search_string .= $this->get_custom_field_value( $field_index ).' ';
 		}
 
 		// Clear spaces:

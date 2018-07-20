@@ -282,7 +282,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				foreach( $custom_field['items'] as $item_ID )
 				{
 					$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
-					$custom_field_value = $widget_Item->get_custom_field_value( $custom_field['name'], false, false );
+					$custom_field_value = $widget_Item->get_custom_field_value( $custom_field['name'] );
 					if( $prev_custom_field_value !== NULL )
 					{
 						switch( $custom_field['type'] )
@@ -347,7 +347,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				if( in_array( $item_ID, $custom_field['items'] ) )
 				{	// Get a formatted value if post has this custom field:
 					$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
-					$custom_field_value = $widget_Item->get_custom_field_value( $custom_field['name'] );
+					$custom_field_value = $widget_Item->get_custom_field_formatted( $custom_field['name'], $params );
 				}
 				else
 				{	// This post has no this custom field:

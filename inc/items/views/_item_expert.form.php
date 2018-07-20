@@ -306,20 +306,24 @@ $Form->begin_form( '', '', $params );
 				$custom_field_note .= T_('Field name').': <code>'.$custom_field['name'].'</code>';
 				if( $parent_Item )
 				{	// Display a value of parent post custom field:
-					$parent_custom_field_value = $parent_Item->get_custom_field_value( $custom_field['name'], $custom_field['type'], ( $custom_field['type'] == 'double' ) );
+					$parent_custom_field_value = $parent_Item->get_custom_field_value( $custom_field['name'], $custom_field['type'] );
 					if( $parent_custom_field_value !== false )
 					{	// If parent post realy has a custom field with same code and type
 						$preview_parent_custom_field_value = $parent_custom_field_value;
+						if( $custom_field['type'] == 'double' )
+						{	// Use a formatted value to preview a double custom field:
+							$preview_parent_custom_field_value = $parent_Item->get_custom_field_formatted( $custom_field['name'], array( 'restrict_type' => $custom_field['type'] ) );
+						}
 						if( $custom_field['type'] == 'html' || $custom_field['type'] == 'text' )
 						{	// Cut long values of multiline fields:
 							$preview_parent_custom_field_value = explode( "\n", $parent_custom_field_value );
 							$preview_parent_custom_field_value = strmaxlen( $preview_parent_custom_field_value[0], 23, '...' );
 						}
 						$custom_field_note .= ' &middot; '.T_('Parent Item Field value').': '
-							.$parent_Item->get_edit_link( array( 'text' => format_to_output( $preview_parent_custom_field_value, 'htmlspecialchars' ) ) )
+							.$parent_Item->get_edit_link( array( 'text' => format_to_output( $preview_parent_custom_field_value, ( $custom_field['type'] == 'double' ? 'raw' : 'htmlspecialchars' ) ) ) )
 							.action_icon( '', 'refresh', '#', NULL, NULL, NULL, array(
 								'data-child-input-id' => 'item_'.$custom_field['type'].'_'.$custom_field['ID'],
-								'data-parent-value'   => ( $custom_field['type'] == 'double' ? $parent_Item->get_custom_field_value( $custom_field['name'], $custom_field['type'], false ) : $parent_custom_field_value ),
+								'data-parent-value'   => $parent_custom_field_value,
 							) );
 					}
 				}
