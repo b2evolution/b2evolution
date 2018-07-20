@@ -106,8 +106,14 @@ class item_fields_compare_Widget extends ComponentWidget
 				),
 			), parent::get_param_definitions( $params ) );
 
-		return $r;
+		if( isset( $r['allow_blockcache'] ) )
+		{ // Disable "allow blockcache" because this widget uses the selected items from GET param "items":
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
+		}
 
+		return $r;
 	}
 
 
