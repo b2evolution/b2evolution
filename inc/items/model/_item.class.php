@@ -2442,41 +2442,91 @@ class Item extends ItemLight
 			}
 
 			$custom_field_value = $this->custom_fields[ $field_index ]['value'];
-			if( $format_value && $custom_field_value !== '' && $custom_field_value !== NULL )
+			if( $format_value &&
+			    (
+			      ( $custom_field_value !== '' && $custom_field_value !== NULL ) || // don't format empty value
+			      $this->custom_fields[ $field_index ]['type'] == 'double' // double fields may have a special format for empty value
+			    )
+			  )
 			{	// Format value only when value is not empty:
 				switch( $this->custom_fields[ $field_index ]['type'] )
 				{
 					case 'double':
 						$format = $this->custom_fields[ $field_index ]['format'];
-						if( ! empty( $format ) )
-						{	// If format is not empty:
-							$format = preg_split( '#(\d+)#', $format, -1, PREG_SPLIT_DELIM_CAPTURE );
-							$f_num = count( $format );
-							$format_decimals = 0;
-							$format_dec_point = '.';
-							$format_thousands_sep = '';
-							$format_prefix = isset( $format[0] ) ? $format[0] : '';
-							$format_suffix = $f_num > 1 ? $format[ $f_num - 1 ] : '';
-							if( $f_num > 2 )
-							{	// Extract data for number fomatting:
-								if( $f_num > 3 && preg_match( '#^\d+$#', $format[ $f_num - 2 ] ) )
-								{	// Get a number of digits after dot:
-									$format_decimals = strlen( $format[ $f_num - 2 ] );
-								}
-								if( $f_num > 4 && preg_match( '#^[^\d]+$#', $format[ $f_num - 3 ] ) )
-								{	// Get a decimal point:
-									$format_dec_point = $format[ $f_num - 3 ];
-								}
-								if( $f_num > 6 && preg_match( '#^[^\d]+$#', $format[ $f_num - 5 ] ) )
-								{	// Get a thousands separator:
-									$format_thousands_sep = $format[ $f_num - 5 ];
-								}
-								// Format number with extracted data:
-								$custom_field_value = number_format( floatval( $custom_field_value ), $format_decimals, $format_dec_point, $format_thousands_sep );
-							}
-							// Add prefix and suffix:
-							$custom_field_value = $format_prefix.$custom_field_value.$format_suffix;
+						if( empty( $format ) )
+						{	// No format:
+							break;
 						}
+
+						$formats = explode( ';', $format );
+						if( $custom_field_value === '' || $custom_field_value === NULL )
+						{	// If value is empty string or NULL
+							if( empty( $formats[3] ) )
+							{	// Use default for empty values:
+								$custom_field_value = /* TRANS: "Not Available" */ T_('N/A');
+							}
+							else
+							{	// Use a special format for empty values:
+								$custom_field_value = $formats[3];
+							}
+							// Stop here to don't apply other format:
+							break;
+						}
+
+						if( $custom_field_value == 0 && isset( $formats[2] ) )
+						{	// If value == 0
+							$custom_field_value = $formats[2];
+							// Stop here to don't apply other format:
+							break;
+						}
+
+						if( count( $formats ) > 4 )
+						{	// Check other formats:
+							for( $f = 4; $f < count( $formats ); $f++ )
+							{
+								$cur_format = explode( '=', $formats[ $f ], 2 );
+								if( $cur_format[0] == $custom_field_value )
+								{	// Use the searched format for given value:
+									$custom_field_value = isset( $cur_format[1] ) ? $cur_format[1] : $custom_field_value;
+									// Stop here to don't apply other format:
+									break 2;
+								}
+							}
+						}
+
+						// Format all other values which are not related to the formats above:
+						$format = $formats[0];
+						if( $custom_field_value < 0 && ! empty( $formats[1] ) )
+						{	// Use a format for negative values:
+							$custom_field_value = abs( $custom_field_value );
+							$format = $formats[1];
+						}
+						$format = preg_split( '#(\d+)#', $format, -1, PREG_SPLIT_DELIM_CAPTURE );
+						$f_num = count( $format );
+						$format_decimals = 0;
+						$format_dec_point = '.';
+						$format_thousands_sep = '';
+						$format_prefix = isset( $format[0] ) ? $format[0] : '';
+						$format_suffix = $f_num > 1 ? $format[ $f_num - 1 ] : '';
+						if( $f_num > 2 )
+						{	// Extract data for number fomatting:
+							if( $f_num > 3 && preg_match( '#^\d+$#', $format[ $f_num - 2 ] ) )
+							{	// Get a number of digits after dot:
+								$format_decimals = strlen( $format[ $f_num - 2 ] );
+							}
+							if( $f_num > 4 && preg_match( '#^[^\d]+$#', $format[ $f_num - 3 ] ) )
+							{	// Get a decimal point:
+								$format_dec_point = $format[ $f_num - 3 ];
+							}
+							if( $f_num > 6 && preg_match( '#^[^\d]+$#', $format[ $f_num - 5 ] ) )
+							{	// Get a thousands separator:
+								$format_thousands_sep = $format[ $f_num - 5 ];
+							}
+							// Format number with extracted data:
+							$custom_field_value = number_format( floatval( $custom_field_value ), $format_decimals, $format_dec_point, $format_thousands_sep );
+						}
+						// Add prefix and suffix:
+						$custom_field_value = $format_prefix.$custom_field_value.$format_suffix;
 						break;
 
 					case 'text':

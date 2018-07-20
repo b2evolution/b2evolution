@@ -484,7 +484,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 	}
 	else
 	{
-		$account_close_date = 'n/a';
+		$account_close_date = /* TRANS: "Not Available" */ T_('N/A');
 		//$days_on_site = ( round( ( $servertimenow - $registration_ts ) / 86400/* 60*60*24 */) );
 	}
 
