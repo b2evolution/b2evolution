@@ -2442,8 +2442,8 @@ class Item extends ItemLight
 			}
 
 			$custom_field_value = $this->custom_fields[ $field_index ]['value'];
-			if( $format_value )
-			{	// Format value:
+			if( $format_value && $custom_field_value !== '' && $custom_field_value !== NULL )
+			{	// Format value only when value is not empty:
 				switch( $this->custom_fields[ $field_index ]['type'] )
 				{
 					case 'double':

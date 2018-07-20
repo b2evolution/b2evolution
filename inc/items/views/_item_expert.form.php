@@ -306,7 +306,7 @@ $Form->begin_form( '', '', $params );
 				$custom_field_note .= T_('Field name').': <code>'.$custom_field['name'].'</code>';
 				if( $parent_Item )
 				{	// Display a value of parent post custom field:
-					$parent_custom_field_value = $parent_Item->get_custom_field_value( $custom_field['name'], $custom_field['type'], false );
+					$parent_custom_field_value = $parent_Item->get_custom_field_value( $custom_field['name'], $custom_field['type'], ( $custom_field['type'] == 'double' ) );
 					if( $parent_custom_field_value !== false )
 					{	// If parent post realy has a custom field with same code and type
 						$preview_parent_custom_field_value = $parent_custom_field_value;
@@ -319,7 +319,7 @@ $Form->begin_form( '', '', $params );
 							.$parent_Item->get_edit_link( array( 'text' => format_to_output( $preview_parent_custom_field_value, 'htmlspecialchars' ) ) )
 							.action_icon( '', 'refresh', '#', NULL, NULL, NULL, array(
 								'data-child-input-id' => 'item_'.$custom_field['type'].'_'.$custom_field['ID'],
-								'data-parent-value'   => $parent_custom_field_value,
+								'data-parent-value'   => ( $custom_field['type'] == 'double' ? $parent_Item->get_custom_field_value( $custom_field['name'], $custom_field['type'], false ) : $parent_custom_field_value ),
 							) );
 					}
 				}
