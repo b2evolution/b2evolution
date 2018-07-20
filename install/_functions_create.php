@@ -426,9 +426,11 @@ function create_default_data()
 						 ( 3, '.$DB->quote( T_('Multiline plain text field') ).', "multiline_plain_text_field", "text", 6, '.$DB->quote( T_('Enter multiple lines') ).', NULL ),
 						 ( 3, '.$DB->quote( T_('Multiline HTML field') ).', "multiline_html_field", "html", 5, '.$DB->quote( T_('Enter HTML code') ).', NULL ),
 						 ( 3, '.$DB->quote( T_('URL field') ).', "url_field", "url", 7, '.$DB->quote( T_('Enter an URL (absolute or relative)') ).', NULL ),
+						 ( 3, '.$DB->quote( T_('Checkmark field') ).', "checkmark_field", "double", 10, '.$DB->quote( T_('Enter a number') ).', "#yes#;;#no#;n/a" ),
 						 ( 4, '.$DB->quote( T_('Image 1') ).', "image_1", "image", 1, '.$DB->quote( T_('Enter a link ID') ).', "crop-128x128" ),
 						 ( 4, '.$DB->quote( T_('First numeric field') ).', "first_numeric_field", "double", 2, '.$DB->quote( T_('Enter a number') ).', NULL ),
-						 ( 4, '.$DB->quote( T_('First string field') ).', "first_string_field", "varchar", 3, '.$DB->quote( T_('Enter a string') ).', NULL )' );
+						 ( 4, '.$DB->quote( T_('First string field') ).', "first_string_field", "varchar", 3, '.$DB->quote( T_('Enter a string') ).', NULL ),
+						 ( 4, '.$DB->quote( T_('Checkmark field') ).', "checkmark_field", "double", 4, '.$DB->quote( T_('Enter a number') ).', "#yes#;;#no#;n/a" )' );
 	task_end();
 
 
