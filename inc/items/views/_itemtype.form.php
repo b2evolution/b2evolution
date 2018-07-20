@@ -381,7 +381,7 @@ function add_new_custom_field( type, title, title_size )
 			custom_field_inputs += ' <?php echo TS_('Format'); ?> <select type="text" name="custom_' + type + '_format' + count_custom + '" class="form-control custom_field_format"><?php
 			foreach( $thumbnail_sizes as $thumbnail_size_key => $thumbnail_size_data )
 			{
-				echo '<option value="'.format_to_output( $thumbnail_size_key, 'htmlattr' ).'">'.format_to_output( $thumbnail_size_key ).'</option>';
+				echo '<option value="'.format_to_output( $thumbnail_size_key, 'htmlattr' ).'"'.( $thumbnail_size_key == 'fit-192x192' ? ' selected="selected"' : '' ).'>'.format_to_output( $thumbnail_size_key ).'</option>';
 			}
 			?></select>';
 			break;

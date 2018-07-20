@@ -417,7 +417,7 @@ function create_default_data()
 	$DB->query( $post_types_sql );
 
 	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note, itcf_format )
-			VALUES ( 3, '.$DB->quote( T_('Image 1') ).', "image_1", "image", 1, '.$DB->quote( T_('Enter a link ID') ).', "crop-128x128" ),
+			VALUES ( 3, '.$DB->quote( T_('Image 1') ).', "image_1", "image", 1, '.$DB->quote( T_('Enter a link ID') ).', "fit-192x192" ),
 						 ( 3, '.$DB->quote( T_('First numeric field') ).', "first_numeric_field", "double", 2, '.$DB->quote( T_('Enter a number') ).', NULL ),
 						 ( 3, '.$DB->quote( T_('Second numeric field') ).', "second_numeric_field", "double", 4, '.$DB->quote( T_('Enter a number') ).', NULL ),
 						 ( 3, '.$DB->quote( T_('USD Price') ).', "usd_price", "double", 8, '.$DB->quote( T_('Enter a number') ).', "$ 0 0.00" ),
