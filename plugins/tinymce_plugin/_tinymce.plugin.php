@@ -671,7 +671,7 @@ class tinymce_plugin extends Plugin
 	{
 		global $Collection, $Blog;
 		global $Plugins;
-		global $localtimenow, $debug, $rsc_url, $rsc_path, $skins_url;
+		global $localtimenow, $debug, $rsc_url, $rsc_path, $skins_url, $app_version_long;
 		global $UserSettings;
 		global $ReqHost;
 
@@ -824,6 +824,7 @@ class tinymce_plugin extends Plugin
 
 		// Configuration: -- http://wiki.moxiecode.com/index.php/TinyMCE:Configuration
 		$init_options = array();
+		$init_options[] = 'cache_suffix: "?v='.$app_version_long.'"';
 		$init_options[] = 'selector: "textarea#'.$content_id.'"';
 		if( $this->Settings->get( 'use_gzip_compressor' ) )
 		{	// Load script to use gzip compressor:
