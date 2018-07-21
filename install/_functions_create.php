@@ -496,7 +496,7 @@ function create_default_data()
 			'name'            => 'checkmark_field',
 			'type'            => 'double',
 			'order'           => 10,
-			'note'            => T_('Enter a number'),
+			'note'            => T_('1 = Yes; 0 = No'),
 			'format'          => '#yes#;;#no#;n/a',
 		),
 		// for Item Type "Child Post":
@@ -533,7 +533,7 @@ function create_default_data()
 			'name'            => 'checkmark_field',
 			'type'            => 'double',
 			'order'           => 4,
-			'note'            => T_('Enter a number'),
+			'note'            => T_('1 = Yes; 0 = No'),
 			'format'          => '#yes#;;#no#;n/a',
 		),
 	);
