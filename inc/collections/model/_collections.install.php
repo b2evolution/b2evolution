@@ -344,6 +344,9 @@ $schema_queries = array_merge( $schema_queries, array(
 			itcf_note    VARCHAR(255) NULL DEFAULT NULL,
 			itcf_public  TINYINT DEFAULT 1,
 			itcf_format  VARCHAR(2000) NULL,
+			itcf_line_highlight  ENUM( 'never', 'differences' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'differences',
+			itcf_green_highlight ENUM( 'never', 'lowest', 'highest' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'never',
+			itcf_red_highlight   ENUM( 'never', 'lowest', 'highest' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'never',
 			PRIMARY KEY ( itcf_ID ),
 			UNIQUE itcf_ityp_ID_name( itcf_ityp_ID, itcf_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
