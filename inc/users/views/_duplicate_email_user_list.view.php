@@ -21,7 +21,7 @@ if( !isset( $display_params ) )
 $users_results_params = array(
 		'filterset_name'          => 'duplicate_email_users',
 		'results_param_prefix'    => 'duplicates_',
-		'results_title'           => T_('Find Duplicates'),
+		'results_title'           => T_('Find duplicates'),
 		'results_order'           => '/user_email/A',
 		'page_url'                => get_dispctrl_url( 'users', 'tab3=duplicates' ),
 		'display_user_count'      => true,
