@@ -333,6 +333,9 @@ $Form->begin_form( '', '', $params );
 					case 'double':
 						$Form->text_input( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) );
 						break;
+					case 'computed':
+						$Form->info( $custom_field['label'], $edited_Item->get_custom_field_formatted( $custom_field['name'] ), $custom_field_note );
+						break;
 					case 'varchar':
 						$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000 ) );
 						break;

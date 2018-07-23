@@ -2403,11 +2403,10 @@ class Item extends ItemLight
 
 			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
 			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, iset_value AS value, ' );
-			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, ' );
+			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, ' );
 			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight' );
 			$SQL->FROM( 'T_items__type_custom_field' );
-			$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON itcf_name = SUBSTRING( iset_name, 8 )' );
-			$SQL->WHERE( 'iset_item_ID = '.$this->ID );
+			$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON itcf_name = SUBSTRING( iset_name, 8 ) AND iset_item_ID = '.$this->ID );
 			$SQL->WHERE_and( 'itcf_ityp_ID = '.$DB->quote( $this->get( 'ityp_ID' ) ) );
 			$SQL->ORDER_BY( 'itcf_order, itcf_ID' );
 			$custom_fields = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
@@ -2427,7 +2426,7 @@ class Item extends ItemLight
 	 * Get item custom field value by field index
 	 *
 	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
-	 * @param string Restrict field by type(double, varchar, html, text, url, image), FALSE - to don't restrict
+	 * @param string Restrict field by type(double, varchar, html, text, url, image, computed), FALSE - to don't restrict
 	 * @param boolean ****DEPRECATED**** Format value depending on field type 
 	 * @return string|boolean FALSE if the field doesn't exist
 	 */
@@ -2446,11 +2445,78 @@ class Item extends ItemLight
 			return false;
 		}
 
-		$custom_field_value = $custom_fields[ $field_index ]['value'];
-
 		if( $format_value )
 		{	// Format value:
-			$custom_field_value = $this->get_custom_field_formatted( $field_index );
+			return $this->get_custom_field_formatted( $field_index );
+		}
+
+		switch( $custom_fields[ $field_index ]['type'] )
+		{
+			case 'computed':
+				// Compute value by formula:
+				$formula = $custom_fields[ $field_index ]['formula'];
+				if( empty( $formula ) )
+				{	// Use NULL value because formula is empty:
+					return NULL;
+				}
+
+				// Use NULL value for all cases below when formula is invalid or it cannot be computed by some unknown reason:
+				$custom_field_value = NULL;
+
+				if( ! isset( $this->cache_computed_custom_fields ) )
+				{	// Store in this array all computed fields to avoid recursion:
+					$this->cache_computed_custom_fields = array();
+				}
+				if( in_array( $field_index, $this->cache_computed_custom_fields ) )
+				{	// Stop here because of recursion:
+					return NULL;
+				}
+				$this->cache_computed_custom_fields[] = $field_index;
+
+				// Try to use a formula:
+				if( preg_match_all( '#\$([^$]+)\$#', $formula, $formula_match ) )
+				{
+					foreach( $formula_match[1] as $formula_field_index )
+					{
+						if( ! isset( $custom_fields[ $formula_field_index ] ) ||
+								! in_array( $custom_fields[ $formula_field_index ]['type'], array( 'double', 'computed' ) ) ||
+								( $formula_field_value = $this->get_custom_field_value( $formula_field_index ) ) === false ||
+								! is_numeric( $formula_field_value ) )
+						{	// Formula must use only custom fields with type "double" and value must be a numeric;
+							// Stop here to don't check other fields because formula is already invalid:
+							return NULL;
+						}
+					}
+				}
+
+				// Try to compute a value if formula is valid:
+				$formula = preg_replace( '#\$([^$]+)\$#', '$this->get_custom_field_value( \'$1\' )', $formula );
+				try
+				{	// Compute value:
+					ob_start();
+					$custom_field_value = eval( "return $formula;" );
+					$formula_code_output = ob_get_clean();
+					if( ( $formula_code_output !== '' && $formula_code_output !== false ) ||
+							! is_numeric( $custom_field_value ) )
+					{	// If output buffer contains some text it means there is some error;
+						// Don't allow to use not numeric value for the "computed" custom field:
+						return NULL;
+					}
+				}
+				catch( Error $e )
+				{	// Set NULL value for wrong formula:
+					return NULL;
+				}
+				catch( ParseError $e )
+				{	// Set NULL value for wrong formula:
+					return NULL;
+				}
+				unset( $this->cache_computed_custom_fields );
+				break;
+
+			default:
+				// Use a value from DB:
+				$custom_field_value = $custom_fields[ $field_index ]['value'];
 		}
 
 		return $custom_field_value;
@@ -2470,7 +2536,7 @@ class Item extends ItemLight
 				'field_value_yes'     => '<span class="fa fa-check green"></span>', // Used to replace a mask #yes# in values of all types
 				'field_value_no'      => '<span class="fa fa-times red"></span>', // Used to replace a mask #no# in values of all types
 				'field_value_format'  => '', // Format for custom field, Leave empty to use a format from DB
-				'field_restrict_type' => false, // Restrict field by type(double, varchar, html, text, url, image), FALSE - to don't restrict
+				'field_restrict_type' => false, // Restrict field by type(double, varchar, html, text, url, image, computed), FALSE - to don't restrict
 			), $params );
 
 		// Try to get an original value of the requested custom field:
@@ -2486,7 +2552,7 @@ class Item extends ItemLight
 		$custom_field = $custom_fields[ $field_index ];
 
 		if( ( $custom_field_value === '' || $custom_field_value === NULL ) && // don't format empty value
-		    $custom_field['type'] != 'double' ) // double fields may have a special format even for empty value
+		    ! in_array( $custom_field['type'], array( 'double', 'computed' ) ) ) // double and computed fields may have a special format even for empty value
 		{	// Don't format value in such cases:
 			return $custom_field_value;
 		}
@@ -2503,6 +2569,8 @@ class Item extends ItemLight
 		switch( $custom_field['type'] )
 		{
 			case 'double':
+			case 'computed':
+				// Format double/computed field value:
 				if( empty( $format ) )
 				{	// No format:
 					break;
@@ -9720,7 +9788,7 @@ class Item extends ItemLight
 	/**
 	 * Get custom fields of post type
 	 *
-	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url', 'image'. Use comma separator to get several types
+	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url', 'image', 'computed'. Use comma separator to get several types
 	 * @return array
 	 */
 	function get_type_custom_fields( $type = 'all' )

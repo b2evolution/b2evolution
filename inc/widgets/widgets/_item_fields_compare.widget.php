@@ -273,8 +273,11 @@ class item_fields_compare_Widget extends ComponentWidget
 		foreach( $all_custom_fields as $c => $custom_field )
 		{
 			$all_custom_fields[ $c ]['is_different'] = false;
-			$all_custom_fields[ $c ]['highest_value'] = NULL;
-			$all_custom_fields[ $c ]['lowest_value'] = NULL;
+			if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) )
+			{	// Compare only numeric fields:
+				$all_custom_fields[ $c ]['highest_value'] = NULL;
+				$all_custom_fields[ $c ]['lowest_value'] = NULL;
+			}
 			if( $items_count != count( $custom_field['items'] ) )
 			{	// If some post has no field then it is a different:
 				$all_custom_fields[ $c ]['is_different'] = true;
@@ -282,14 +285,14 @@ class item_fields_compare_Widget extends ComponentWidget
 
 			// Compare values:
 			$prev_custom_field_value = NULL;
+			$i = 0;
 			foreach( $custom_field['items'] as $item_ID )
 			{
 				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 				$custom_field_value = $widget_Item->get_custom_field_value( $custom_field['name'] );
 
 				// Check if the values are different from given line:
-				if( ! $all_custom_fields[ $c ]['is_different'] &&
-						$prev_custom_field_value !== NULL )
+				if( ! $all_custom_fields[ $c ]['is_different'] && $i > 0 )
 				{	// Don't search differences in all fields if at least two fields are different:
 					switch( $custom_field['type'] )
 					{
@@ -320,19 +323,24 @@ class item_fields_compare_Widget extends ComponentWidget
 				}
 				$prev_custom_field_value = $custom_field_value;
 
-				// Search the highest value:
-				if( $all_custom_fields[ $c ]['highest_value'] === NULL ||
-						$custom_field_value > $all_custom_fields[ $c ]['highest_value'] )
-				{
-					$all_custom_fields[ $c ]['highest_value'] = $custom_field_value;
-				}
+				if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) &&
+				    is_numeric( $custom_field_value ) )
+				{	// Compare only numeric values:
+					// Search the highest value:
+					if( $all_custom_fields[ $c ]['highest_value'] === NULL ||
+							$custom_field_value > $all_custom_fields[ $c ]['highest_value'] )
+					{
+						$all_custom_fields[ $c ]['highest_value'] = $custom_field_value;
+					}
 
-				// Search the lowest value:
-				if( $all_custom_fields[ $c ]['lowest_value'] === NULL ||
-						$custom_field_value < $all_custom_fields[ $c ]['lowest_value'] )
-				{
-					$all_custom_fields[ $c ]['lowest_value'] = $custom_field_value;
+					// Search the lowest value:
+					if( $all_custom_fields[ $c ]['lowest_value'] === NULL ||
+							$custom_field_value < $all_custom_fields[ $c ]['lowest_value'] )
+					{
+						$all_custom_fields[ $c ]['lowest_value'] = $custom_field_value;
+					}
 				}
+				$i++;
 			}
 		}
 
@@ -381,31 +389,33 @@ class item_fields_compare_Widget extends ComponentWidget
 					$field_value_template = $params['fields_compare_field_value_diff'];
 				}
 
-				if( $custom_field_orig_value !== false &&
-				    $custom_field_orig_value === $custom_field['highest_value'] &&
-				    $custom_field_orig_value !== $custom_field['lowest_value'] )
-				{	// Check if we should mark the highest field:
-					if( $custom_field['green_highlight'] == 'highest' )
-					{	// The highest value must be marked as green:
-						$field_value_template = $params['fields_compare_field_value_green'];
+				if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) &&
+				    is_numeric( $custom_field_orig_value ) )
+				{	// Compare only numeric values:
+					if( $custom_field_orig_value === $custom_field['highest_value'] &&
+							$custom_field_orig_value !== $custom_field['lowest_value'] )
+					{	// Check if we should mark the highest field:
+						if( $custom_field['green_highlight'] == 'highest' )
+						{	// The highest value must be marked as green:
+							$field_value_template = $params['fields_compare_field_value_green'];
+						}
+						elseif( $custom_field['red_highlight'] == 'highest' )
+						{	// The highest value must be marked as red:
+							$field_value_template = $params['fields_compare_field_value_red'];
+						}
 					}
-					elseif( $custom_field['red_highlight'] == 'highest' )
-					{	// The highest value must be marked as red:
-						$field_value_template = $params['fields_compare_field_value_red'];
-					}
-				}
 
-				if( $custom_field_orig_value !== false &&
-				    $custom_field_orig_value === $custom_field['lowest_value'] &&
-				    $custom_field_orig_value !== $custom_field['highest_value'] )
-				{	// Check if we should mark the lowest field:
-					if( $custom_field['green_highlight'] == 'lowest' )
-					{	// The lowest value must be marked as green:
-						$field_value_template = $params['fields_compare_field_value_green'];
-					}
-					elseif( $custom_field['red_highlight'] == 'lowest' )
-					{	// The lowest value must be marked as red:
-						$field_value_template = $params['fields_compare_field_value_red'];
+					if( $custom_field_orig_value === $custom_field['lowest_value'] &&
+							$custom_field_orig_value !== $custom_field['highest_value'] )
+					{	// Check if we should mark the lowest field:
+						if( $custom_field['green_highlight'] == 'lowest' )
+						{	// The lowest value must be marked as green:
+							$field_value_template = $params['fields_compare_field_value_green'];
+						}
+						elseif( $custom_field['red_highlight'] == 'lowest' )
+						{	// The lowest value must be marked as red:
+							$field_value_template = $params['fields_compare_field_value_red'];
+						}
 					}
 				}
 

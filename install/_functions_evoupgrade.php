@@ -9834,12 +9834,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			'ADD' => array(
 				'itcf_public'          => 'TINYINT DEFAULT 1',
 				'itcf_format'          => 'VARCHAR(2000) NULL',
+				'itcf_formula'         => 'VARCHAR(2000) COLLATE ascii_general_ci NULL',
 				'itcf_line_highlight'  => 'ENUM( "never", "differences" ) COLLATE ascii_general_ci NOT NULL DEFAULT "differences"',
 				'itcf_green_highlight' => 'ENUM( "never", "lowest", "highest" ) COLLATE ascii_general_ci NOT NULL DEFAULT "never"',
 				'itcf_red_highlight'   => 'ENUM( "never", "lowest", "highest" ) COLLATE ascii_general_ci NOT NULL DEFAULT "never"',
 			),
 			'MODIFY' => array(
-				'itcf_type' => 'ENUM( "double", "varchar", "text", "html", "url", "image" ) COLLATE ascii_general_ci NOT NULL',
+				'itcf_type' => 'ENUM( "double", "varchar", "text", "html", "url", "image", "computed" ) COLLATE ascii_general_ci NOT NULL',
 			),
 		) );
 		upg_task_end();

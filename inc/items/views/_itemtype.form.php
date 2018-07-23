@@ -126,6 +126,13 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 					'size'      => 20,
 					'maxlength' => 40
 				),
+			'computed' => array(
+					'label'     => T_('Computed'),
+					'title'     => T_('Add new computed custom field'),
+					'note'      => T_('Ex: Sum, Total... &ndash; will be computed by formula automatically.'),
+					'size'      => 20,
+					'maxlength' => 40
+				),
 			'varchar' => array(
 					'label'     => T_('String'),
 					'title'     => T_('Add new string custom field'),
@@ -228,7 +235,12 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 			switch( $type )
 			{
 				case 'double':
+				case 'computed':
 					$custom_field_name .= ' '.T_('Format').' <input type="text" name="custom_'.$type.'_format'.$i.'" value="'.format_to_output( $custom_field['format'], 'htmlattr' ).'" class="form_text_input form-control custom_field_format" size="20" maxlength="2000" />';
+					if( $type == 'computed' )
+					{
+						$custom_field_name .= ' '.T_('Formula').' <input type="text" name="custom_'.$type.'_formula'.$i.'" value="'.format_to_output( $custom_field['formula'], 'htmlattr' ).'" class="form_text_input form-control custom_field_formula" size="45" maxlength="2000" />';
+					}
 					break;
 				case 'image':
 					$custom_field_name .= ' '.T_('Format').' <select type="text" name="custom_'.$type.'_format'.$i.'" class="form-control custom_field_format">'
@@ -391,7 +403,12 @@ function add_new_custom_field( type, title, title_size )
 	switch( type )
 	{
 		case 'double':
+		case 'computed':
 			custom_field_inputs += ' <?php echo TS_('Format'); ?> <input type="text" name="custom_' + type + '_format' + count_custom + '" value="" class="form_text_input form-control custom_field_format" maxlength="2000" size="20" />';
+			if( type == 'computed' )
+			{
+				custom_field_inputs += ' <?php echo TS_('Formula'); ?> <input type="text" name="custom_' + type + '_formula' + count_custom + '" value="" class="form_text_input form-control custom_field_formula" maxlength="2000" size="45" />';
+			}
 			break;
 		case 'image':
 			custom_field_inputs += ' <?php echo TS_('Format'); ?> <select type="text" name="custom_' + type + '_format' + count_custom + '" class="form-control custom_field_format"><?php
@@ -420,6 +437,11 @@ function add_new_custom_field( type, title, title_size )
 jQuery( '#add_new_double_custom_field' ).click( function()
 {
 	add_new_custom_field( 'double', '<?php echo TS_('Numeric'); ?>', 20 );
+} );
+
+jQuery( '#add_new_computed_custom_field' ).click( function()
+{
+	add_new_custom_field( 'computed', '<?php echo TS_('Computed'); ?>', 20 );
 } );
 
 jQuery( '#add_new_varchar_custom_field' ).click( function()
