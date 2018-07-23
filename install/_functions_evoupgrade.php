@@ -9877,6 +9877,79 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12940 ) )
+	{	// part of 6.10.3-stable
+
+		/* ---- Install basic widgets for containers "Compare Main Area": ---- START */
+		global $basic_widgets_insert_sql_rows;
+		$basic_widgets_insert_sql_rows = array();
+
+		/**
+		 * Add a widget to global array in order to insert it in DB by single SQL query later
+		 *
+		 * @param integer Blog ID
+		 * @param string Container name
+		 * @param string Type
+		 * @param string Code
+		 * @param integer Order
+		 * @param array|string|NULL Widget params
+		 * @param integer 1 - enabled, 0 - disabled
+		 */
+		function add_basic_widget_12940( $blog_ID, $container_name, $code, $type, $order, $params = NULL, $enabled = 1 )
+		{
+			global $basic_widgets_insert_sql_rows, $DB;
+
+			if( is_null( $params ) )
+			{ // NULL
+				$params = 'NULL';
+			}
+			elseif( is_array( $params ) )
+			{ // array
+				$params = $DB->quote( serialize( $params ) );
+			}
+			else
+			{ // string
+				$params = $DB->quote( $params );
+			}
+
+			$basic_widgets_insert_sql_rows[] = '( '
+				.$blog_ID.', '
+				.$DB->quote( $container_name ).', '
+				.$order.', '
+				.$enabled.', '
+				.$DB->quote( $type ).', '
+				.$DB->quote( $code ).', '
+				.$params.' )';
+		}
+
+		$SQL = new SQL();
+		$SQL->SELECT( 'blog_ID, cat_ID' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->FROM_add( 'LEFT JOIN T_categories ON cat_blog_ID = blog_ID AND cat_meta = 0' );
+		$SQL->WHERE( '( SELECT COUNT( wi_coll_ID ) FROM T_widget WHERE wi_coll_ID = blog_ID AND wi_sco_name = "Compare Main Area" AND wi_code = "item_fields_compare" ) = 0' );
+		$SQL->ORDER_BY( 'blog_ID, cat_ID DESC' );
+		$collections = $DB->get_assoc( $SQL );
+		if( count( $collections ) > 0 )
+		{	// If at least one collection exists:
+			foreach( $collections as $coll_ID => $cat_ID )
+			{
+				task_begin( 'Installing default "Compare Main Area" widgets for collection #'.$coll_ID.'... ' );
+				/* Compare Main Area */
+				add_basic_widget_12940( $coll_ID, 'Compare Main Area', 'item_fields_compare', 'core', 10 );
+				task_end();
+			}
+		}
+
+		if( ! empty( $basic_widgets_insert_sql_rows ) )
+		{	// Insert the widget records by single SQL query:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
+		}
+		/* ---- Install basic widgets for containers "Help" and "Register": ---- END */
+
+		upg_task_end( false );
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
