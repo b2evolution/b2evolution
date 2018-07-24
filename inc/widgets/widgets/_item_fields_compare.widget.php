@@ -106,13 +106,6 @@ class item_fields_compare_Widget extends ComponentWidget
 				),
 			), parent::get_param_definitions( $params ) );
 
-		if( isset( $r['allow_blockcache'] ) )
-		{ // Disable "allow blockcache" because this widget uses the selected items from GET param "items":
-			$r['allow_blockcache']['defaultvalue'] = false;
-			$r['allow_blockcache']['disabled'] = 'disabled';
-			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
-		}
-
 		return $r;
 	}
 
@@ -447,6 +440,25 @@ class item_fields_compare_Widget extends ComponentWidget
 	function sort_custom_fields( $custom_field_a, $custom_field_b )
 	{
 		return $custom_field_a['order'] > $custom_field_b['order'];
+	}
+
+
+	/**
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @return array of keys this widget depends on
+	 */
+	function get_cache_keys()
+	{
+		global $Collection, $Blog, $Item;
+
+		return array(
+				'wi_ID'        => $this->ID, // Have the widget settings changed ?
+				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
+				'item_ID'      => isset( $Item ) ? $Item->ID : NULL, // Has the Item page changed? (because ID masks '$this$' and '$parent$' depend on current Item)
+				'items'        => empty( $this->disp_params['items'] ) ? get_param( 'items' ) : $this->disp_params['items'], // Have the compared items changed? (Check firstly widget setting and then param from request)
+			);
 	}
 }
 
