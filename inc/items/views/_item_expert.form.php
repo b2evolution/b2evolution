@@ -310,7 +310,7 @@ $Form->begin_form( '', '', $params );
 					if( $parent_custom_field_value !== false )
 					{	// If parent post realy has a custom field with same code and type
 						$preview_parent_custom_field_value = $parent_custom_field_value;
-						if( $custom_field['type'] == 'double' )
+						if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) )
 						{	// Use a formatted value to preview a double custom field:
 							$preview_parent_custom_field_value = $parent_Item->get_custom_field_formatted( $custom_field['name'], array( 'restrict_type' => $custom_field['type'] ) );
 						}
@@ -320,11 +320,14 @@ $Form->begin_form( '', '', $params );
 							$preview_parent_custom_field_value = strmaxlen( $preview_parent_custom_field_value[0], 23, '...' );
 						}
 						$custom_field_note .= ' &middot; '.T_('Parent Item Field value').': '
-							.$parent_Item->get_edit_link( array( 'text' => format_to_output( $preview_parent_custom_field_value, ( $custom_field['type'] == 'double' ? 'raw' : 'htmlspecialchars' ) ) ) )
-							.action_icon( '', 'refresh', '#', NULL, NULL, NULL, array(
+							.$parent_Item->get_edit_link( array( 'text' => format_to_output( $preview_parent_custom_field_value, ( $custom_field['type'] == 'double' ? 'raw' : 'htmlspecialchars' ) ) ) );
+						if( $custom_field['type'] != 'computed' )
+						{	// The computed fields cannot be updated from parent here because we update them by formula on updating automatically:
+							$custom_field_note .= action_icon( '', 'refresh', '#', NULL, NULL, NULL, array(
 								'data-child-input-id' => 'item_'.$custom_field['type'].'_'.$custom_field['ID'],
 								'data-parent-value'   => $parent_custom_field_value,
 							) );
+						}
 					}
 				}
 

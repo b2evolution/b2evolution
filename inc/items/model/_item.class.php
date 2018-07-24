@@ -969,6 +969,15 @@ class Item extends ItemLight
 				$this->set_setting( 'custom:'.$custom_field['name'], get_param( $param_name ), $custom_field_make_null );
 			}
 		}
+		foreach( $custom_fields as $custom_field )
+		{	// Update computed custom fields after when all fields we updated above:
+			if( $custom_field['type'] == 'computed' )
+			{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
+				$this->set_setting( 'custom:'.$custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ), true );
+			}
+		}
+		// Clear the cached values to use new after updating:
+		unset( $this->custom_fields );
 
 		// COMMENTS:
 		if( $this->allow_comment_statuses() )
@@ -2450,76 +2459,8 @@ class Item extends ItemLight
 			return $this->get_custom_field_formatted( $field_index );
 		}
 
-		switch( $custom_fields[ $field_index ]['type'] )
-		{
-			case 'computed':
-				// Compute value by formula:
-				$formula = $custom_fields[ $field_index ]['formula'];
-				if( empty( $formula ) )
-				{	// Use NULL value because formula is empty:
-					return NULL;
-				}
-
-				// Use NULL value for all cases below when formula is invalid or it cannot be computed by some unknown reason:
-				$custom_field_value = NULL;
-
-				if( ! isset( $this->cache_computed_custom_fields ) )
-				{	// Store in this array all computed fields to avoid recursion:
-					$this->cache_computed_custom_fields = array();
-				}
-				if( in_array( $field_index, $this->cache_computed_custom_fields ) )
-				{	// Stop here because of recursion:
-					return NULL;
-				}
-				$this->cache_computed_custom_fields[] = $field_index;
-
-				// Try to use a formula:
-				if( preg_match_all( '#\$([^$]+)\$#', $formula, $formula_match ) )
-				{
-					foreach( $formula_match[1] as $formula_field_index )
-					{
-						if( ! isset( $custom_fields[ $formula_field_index ] ) ||
-								! in_array( $custom_fields[ $formula_field_index ]['type'], array( 'double', 'computed' ) ) ||
-								( $formula_field_value = $this->get_custom_field_value( $formula_field_index ) ) === false ||
-								! is_numeric( $formula_field_value ) )
-						{	// Formula must use only custom fields with type "double" and value must be a numeric;
-							// Stop here to don't check other fields because formula is already invalid:
-							return NULL;
-						}
-					}
-				}
-
-				// Try to compute a value if formula is valid:
-				$formula = preg_replace( '#\$([^$]+)\$#', '$this->get_custom_field_value( \'$1\' )', $formula );
-				try
-				{	// Compute value:
-					ob_start();
-					$custom_field_value = eval( "return $formula;" );
-					$formula_code_output = ob_get_clean();
-					if( ( $formula_code_output !== '' && $formula_code_output !== false ) ||
-							! is_numeric( $custom_field_value ) )
-					{	// If output buffer contains some text it means there is some error;
-						// Don't allow to use not numeric value for the "computed" custom field:
-						return NULL;
-					}
-				}
-				catch( Error $e )
-				{	// Set NULL value for wrong formula:
-					return NULL;
-				}
-				catch( ParseError $e )
-				{	// Set NULL value for wrong formula:
-					return NULL;
-				}
-				unset( $this->cache_computed_custom_fields );
-				break;
-
-			default:
-				// Use a value from DB:
-				$custom_field_value = $custom_fields[ $field_index ]['value'];
-		}
-
-		return $custom_field_value;
+		// Use a value from DB:
+		return $custom_fields[ $field_index ]['value'];
 	}
 
 
@@ -2687,6 +2628,104 @@ class Item extends ItemLight
 
 		// Replace special masks in value with template:
 		$custom_field_value = str_replace( array( '#yes#', '#no#' ), array( $params['field_value_yes'], $params['field_value_no'] ), $custom_field_value );
+
+		return $custom_field_value;
+	}
+
+
+	/**
+	 * Get computed item custom field value by field index
+	 *
+	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
+	 * @return string|boolean|NULL FALSE if the field doesn't exist, NULL if formula is invalid
+	 */
+	function get_custom_field_computed( $field_index )
+	{
+		// Get all custom fields by item ID:
+		$custom_fields = $this->get_custom_fields_defs();
+
+		if( ! isset( $custom_fields[ $field_index ] ) )
+		{	// The requested field is not detected:
+			return false;
+		}
+
+		if( $custom_fields[ $field_index ]['type'] == 'double' )
+		{	// This case may be called by computing of the formula:
+			// NOTE: Get a value directly from setting and not from the cached array
+			//       in order to get new updated double value after edit form updating:
+			return $this->get_setting( 'custom:'.$field_index );
+		}
+
+		if( $custom_fields[ $field_index ]['type'] != 'computed' )
+		{	// The requested field is detected but it is not computed field:
+			return false;
+		}
+
+		// Compute value by formula:
+		$formula = $custom_fields[ $field_index ]['formula'];
+		if( empty( $formula ) )
+		{	// Use NULL value because formula is empty:
+			return NULL;
+		}
+
+		// Use NULL value for all cases below when formula is invalid or it cannot be computed by some unknown reason:
+		$custom_field_value = NULL;
+
+		if( ! isset( $this->cache_computed_custom_fields ) )
+		{	// Store in this array all computed fields to avoid recursion:
+			$this->cache_computed_custom_fields = array();
+		}
+		if( in_array( $field_index, $this->cache_computed_custom_fields ) )
+		{	// Stop here because of recursion:
+			return NULL;
+		}
+		$this->cache_computed_custom_fields[] = $field_index;
+
+		// Try to use a formula:
+		$formula_is_valid = true;
+		if( preg_match_all( '#\$([^$]+)\$#', $formula, $formula_match ) )
+		{
+			foreach( $formula_match[1] as $formula_field_index )
+			{
+				if( ! isset( $custom_fields[ $formula_field_index ] ) ||
+						! in_array( $custom_fields[ $formula_field_index ]['type'], array( 'double', 'computed' ) ) ||
+						( $formula_field_value = $this->get_custom_field_computed( $formula_field_index ) ) === false ||
+						! is_numeric( $formula_field_value ) )
+				{	// Formula must use only custom fields with type "double"/"computed" and value must be a numeric:
+					$formula_is_valid = false;
+					// Stop here to don't check other fields because formula is already invalid:
+					break;
+				}
+			}
+		}
+
+		if( $formula_is_valid )
+		{	// Try to compute a value if formula is valid:
+			$formula = preg_replace( '#\$([^$]+)\$#', '$this->get_custom_field_computed( \'$1\' )', $formula );
+			try
+			{	// Compute value:
+				ob_start();
+				$custom_field_value = eval( "return $formula;" );
+				$formula_code_output = ob_get_clean();
+				if( ( $formula_code_output !== '' && $formula_code_output !== false ) ||
+						! is_numeric( $custom_field_value ) )
+				{	// If output buffer contains some text it means there is some error;
+					// Don't allow to use not numeric value for the "computed" custom field:
+					$custom_field_value = NULL;
+				}
+			}
+			catch( Error $e )
+			{	// Set NULL value for wrong formula:
+				$custom_field_value = NULL;
+			}
+			catch( ParseError $e )
+			{	// Set NULL value for wrong formula:
+				$custom_field_value = NULL;
+			}
+		}
+
+		// Unset temp array at the end of recursion:
+		unset( $this->cache_computed_custom_fields );
 
 		return $custom_field_value;
 	}
