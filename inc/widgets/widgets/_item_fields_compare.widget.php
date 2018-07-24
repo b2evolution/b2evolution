@@ -452,13 +452,42 @@ class item_fields_compare_Widget extends ComponentWidget
 	{
 		global $Collection, $Blog, $Item;
 
-		return array(
+		// Get item IDs from GET param or widget setting:
+		$items = empty( $this->disp_params['items'] ) ? get_param( 'items' ) : $this->disp_params['items'];
+		$items = explode( ',', $items );
+		foreach( $items as $i => $item_ID )
+		{
+			$item_ID = trim( $item_ID );
+			if( empty( $item_ID ) )
+			{	// Remove empty item ID:
+				unset( $items[ $i ] );
+			}
+		}
+
+		$cache_keys = array(
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
-				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
-				'item_ID'      => isset( $Item ) ? $Item->ID : NULL, // Has the Item page changed? (because ID masks '$this$' and '$parent$' depend on current Item)
-				'items'        => empty( $this->disp_params['items'] ) ? get_param( 'items' ) : $this->disp_params['items'], // Have the compared items changed? (Check firstly widget setting and then param from request)
+				'item_ID'      => isset( $Item ) ? $Item->ID : NULL, // Has the Item page changed? (this is important for disp=single|page because $this$ and $parent$ resolve differently depending on item ID)
+				'items'        => implode( ',', $items ), // Have the compared items changed? (Check firstly widget setting and then param from request) (this is important in case the same items are compared in different order)
 			);
+
+		// Add 1 cache key for each item that is being compared, in order to detect changes on each one:
+		foreach( $items as $item_ID )
+		{
+			if( $item_ID == '$parent$' && isset( $Item ) && $Item->get( 'parent_ID' ) > 0 )
+			{	// Also add a cache key for the parent item ID, in order to detect when it is changed, in case it is being referenced by $parent$:
+				$item_ID = $Item->get( 'parent_ID' );
+			}
+			elseif( intval( $item_ID ) == 0 )
+			{	// Skip wrong item ID and also $this$ because it is already used by key 'item_ID' above:
+				continue;
+			}
+
+			// 1 is a dummy value, only the key name is really important
+			$cache_keys['item_'.$item_ID] = 1;
+		}
+
+		return $cache_keys;
 	}
 }
 
