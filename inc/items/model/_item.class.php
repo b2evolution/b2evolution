@@ -7075,11 +7075,13 @@ class Item extends ItemLight
 							}
 						}
 						// NOTE: we must recompute values of the "computed" fields because child custom field may has a different formula than parent!
-						foreach( $custom_fields as $custom_field )
+						foreach( $child_custom_fields as $child_custom_field )
 						{	// Update computed custom fields after when all fields we updated above:
-							if( $custom_field['type'] == 'computed' )
+							if( $child_custom_field['type'] == 'computed' )
 							{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
-								$child_Item->set_setting( 'custom:'.$custom_field['name'], $child_Item->get_custom_field_computed( $custom_field['name'] ), true );
+								$child_Item->set_setting( 'custom:'.$child_custom_field['name'], $child_Item->get_custom_field_computed( $child_custom_field['name'] ), true );
+								// Mark to know custom fields of the child post must be updated from parent:
+								$update_child_custom_field = true;
 							}
 						}
 						if( $update_child_custom_field )
