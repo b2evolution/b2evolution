@@ -3999,6 +3999,101 @@ function display_hidden_custom_fields( & $Form, & $edited_Item )
 
 
 /**
+ * Display custom field settings as editable input fields
+ *
+ * @param object Form
+ * @param object edited Item
+ */
+function display_editable_custom_fields( & $Form, & $edited_Item )
+{
+	$custom_fields = $edited_Item->get_type_custom_fields();
+
+	if( empty( $custom_fields ) )
+	{	// No custom fields
+		return;
+	}
+
+	$parent_Item = & $edited_Item->get_parent_Item();
+
+	foreach( $custom_fields as $custom_field )
+	{	// Loop through custom fields:
+		$custom_field_note = '';
+		if( ! empty( $custom_field['note'] ) )
+		{	// Display a not of the custon field if it is filled:
+			$custom_field_note .= $custom_field['note'].' &middot; ';
+		}
+		// Display a field title and code:
+		$custom_field_note .= T_('Field name').': <code>'.$custom_field['name'].'</code>';
+		if( $parent_Item )
+		{	// Display a value of parent post custom field:
+			$parent_custom_field_value = $parent_Item->get_custom_field_value( $custom_field['name'], $custom_field['type'] );
+			if( $parent_custom_field_value !== false )
+			{	// If parent post realy has a custom field with same code and type
+				$preview_parent_custom_field_value = $parent_custom_field_value;
+				if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) )
+				{	// Use a formatted value to preview a double custom field:
+					$preview_parent_custom_field_value = $parent_Item->get_custom_field_formatted( $custom_field['name'], array( 'restrict_type' => $custom_field['type'] ) );
+				}
+				if( $custom_field['type'] == 'html' || $custom_field['type'] == 'text' )
+				{	// Cut long values of multiline fields:
+					$preview_parent_custom_field_value = explode( "\n", $parent_custom_field_value );
+					$preview_parent_custom_field_value = strmaxlen( $preview_parent_custom_field_value[0], 23, '...' );
+				}
+				if( $custom_field['type'] != 'computed' )
+				{	// The computed fields cannot be updated from parent here because we update them by formula on updating automatically,
+					// Also parent field may has a different formula so we should not display a value of the parent field:
+					$custom_field_note .= ' &middot; '.T_('Parent Item Field value').': '
+						.$parent_Item->get_edit_link( array( 'text' => format_to_output( $preview_parent_custom_field_value, ( $custom_field['type'] == 'double' ? 'raw' : 'htmlspecialchars' ) ) ) )
+						.action_icon( '', 'refresh', '#', NULL, NULL, NULL, array(
+						'data-child-input-id' => 'item_'.$custom_field['type'].'_'.$custom_field['ID'],
+						'data-parent-value'   => $parent_custom_field_value,
+					) );
+				}
+			}
+		}
+
+		switch( $custom_field['type'] )
+		{
+			case 'double':
+				$Form->text_input( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) );
+				break;
+			case 'computed':
+				$Form->info( $custom_field['label'], $edited_Item->get_custom_field_formatted( $custom_field['name'] ), $custom_field_note );
+				break;
+			case 'varchar':
+				$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) );
+				break;
+			case 'text':
+				$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field['label'], array( 'note' => $custom_field_note ) );
+				break;
+			case 'html':
+				$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field['label'], array( 'note' => $custom_field_note ) );
+				break;
+			case 'url':
+				$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) );
+				break;
+			case 'image':
+				$Form->text_input( 'item_image_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) );
+				break;
+		}
+	}
+
+	if( $parent_Item )
+	{	// JS to refresh custom field values from parent post custom fields:
+?>
+<script type="text/javascript">
+jQuery( 'a[data-child-input-id]' ).click( function()
+{	// Update custom field value with value from parent post:
+	jQuery( '#' + jQuery( this ).data( 'child-input-id' ) ).val( jQuery( this ).data( 'parent-value' ) );
+	return false;
+} );
+</script>
+<?php
+	}
+}
+
+
+/**
  * Save object Item into Session
  *
  * @param object Item

@@ -7066,11 +7066,20 @@ class Item extends ItemLight
 						foreach( $custom_fields as $custom_field_code => $custom_field )
 						{
 							if( isset( $child_custom_fields[ $custom_field_code ] ) &&
-							    $child_custom_fields[ $custom_field_code ]['type'] == $custom_field['type'] )
+							    $child_custom_fields[ $custom_field_code ]['type'] == $custom_field['type'] &&
+							    $custom_field['type'] != 'computed' ) // NOTE: we must NOT copy the computed values from parent because child custom field may has a different formula!
 							{	// If child post has a custom field with same code and type:
 								$child_Item->set_setting( 'custom:'.$custom_field['name'], $this->get_custom_field_value( $custom_field_code, $custom_field['type'] ) );
 								// Mark to know custom fields of the child post must be updated from parent:
 								$update_child_custom_field = true;
+							}
+						}
+						// NOTE: we must recompute values of the "computed" fields because child custom field may has a different formula than parent!
+						foreach( $custom_fields as $custom_field )
+						{	// Update computed custom fields after when all fields we updated above:
+							if( $custom_field['type'] == 'computed' )
+							{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
+								$child_Item->set_setting( 'custom:'.$custom_field['name'], $child_Item->get_custom_field_computed( $custom_field['name'] ), true );
 							}
 						}
 						if( $update_child_custom_field )
