@@ -334,7 +334,9 @@ class ItemType extends DataObject
 			param( 'deleted_custom_varchar', 'string', '' ).','.
 			param( 'deleted_custom_text', 'string', '' ).','.
 			param( 'deleted_custom_html', 'string', '' ).','.
-			param( 'deleted_custom_url', 'string', '' ), ',' );
+			param( 'deleted_custom_url', 'string', '' ).','.
+			param( 'deleted_custom_image', 'string', '' ).','.
+			param( 'deleted_custom_computed', 'string', '' ), ',' );
 		$this->delete_custom_fields = empty( $this->delete_custom_fields ) ? array() : explode( ',', $this->delete_custom_fields );
 
 		// Field names array is used to check the diplicates
@@ -343,7 +345,7 @@ class ItemType extends DataObject
 		// Empty and Initialize the custom fields from POST data
 		$this->custom_fields = array();
 
-		$types = array( 'double', 'varchar', 'text', 'html', 'url', 'image' );
+		$types = array( 'double', 'varchar', 'text', 'html', 'url', 'image', 'computed' );
 		foreach( $types as $type )
 		{
 			$empty_title_error = false; // use this to display empty title fields error message only ones
@@ -363,21 +365,29 @@ class ItemType extends DataObject
 				$custom_field_note = param( 'custom_'.$type.'_note'.$i, 'string', NULL );
 				$custom_field_public = param( 'custom_'.$type.'_public'.$i, 'integer', 0 );
 				$custom_field_format = param( 'custom_'.$type.'_format'.$i, 'string', NULL );
+				$custom_field_formula = param( 'custom_'.$type.'_formula'.$i, 'string', NULL );
 				$custom_field_is_new = param( 'custom_'.$type.'_new'.$i, 'integer', 0 );
+				$custom_field_line_highlight = param( 'custom_'.$type.'_line_highlight'.$i, 'string' );
+				$custom_field_green_highlight = param( 'custom_'.$type.'_green_highlight'.$i, 'string' );
+				$custom_field_red_highlight = param( 'custom_'.$type.'_red_highlight'.$i, 'string' );
 
 				// Add each new/existing custom field in this array
 				// in order to see all them on the form when post type is not updated because some errors
 				$this->custom_fields[] = array(
-						'temp_i'  => $i, // Used only on submit form to know the number of the field on the form
-						'ID'      => $custom_field_ID,
-						'ityp_ID' => $this->ID,
-						'label'   => $custom_field_label,
-						'name'    => $custom_field_name,
-						'type'    => $type,
-						'order'   => $custom_field_order,
-						'note'    => $custom_field_note,
-						'public'  => $custom_field_public,
-						'format'  => $custom_field_format,
+						'temp_i'          => $i, // Used only on submit form to know the number of the field on the form
+						'ID'              => $custom_field_ID,
+						'ityp_ID'         => $this->ID,
+						'label'           => $custom_field_label,
+						'name'            => $custom_field_name,
+						'type'            => $type,
+						'order'           => $custom_field_order,
+						'note'            => $custom_field_note,
+						'public'          => $custom_field_public,
+						'format'          => $custom_field_format,
+						'formula'         => $custom_field_formula,
+						'line_highlight'  => $custom_field_line_highlight,
+						'green_highlight' => $custom_field_green_highlight,
+						'red_highlight'   => $custom_field_red_highlight,
 					);
 
 				if( empty( $custom_field_label ) )
@@ -400,29 +410,26 @@ class ItemType extends DataObject
 				{
 					$field_names[] = $custom_field_name;
 				}
+				$custom_field_data = array(
+					'type'            => $type,
+					'name'            => $custom_field_name,
+					'label'           => $custom_field_label,
+					'order'           => $custom_field_order,
+					'note'            => $custom_field_note,
+					'public'          => $custom_field_public,
+					'format'          => $custom_field_format,
+					'formula'         => $custom_field_formula,
+					'line_highlight'  => $custom_field_line_highlight,
+					'green_highlight' => $custom_field_green_highlight,
+					'red_highlight'   => $custom_field_red_highlight,
+				);
 				if( $custom_field_is_new )
 				{ // Insert custom field
-					$this->insert_custom_fields[ $custom_field_ID ] = array(
-						'type'  => $type,
-						'name'  => $custom_field_name,
-						'label' => $custom_field_label,
-						'order' => $custom_field_order,
-						'note'  => $custom_field_note,
-						'public'=> $custom_field_public,
-						'format'=> $custom_field_format,
-					);
+					$this->insert_custom_fields[ $custom_field_ID ] = $custom_field_data;
 				}
 				else
 				{ // Update custom field
-					$this->update_custom_fields[ $custom_field_ID ] = array(
-						'type'  => $type,
-						'name'  => $custom_field_name,
-						'label' => $custom_field_label,
-						'order' => $custom_field_order,
-						'note'  => $custom_field_note,
-						'public'=> $custom_field_public,
-						'format'=> $custom_field_format,
-					);
+					$this->update_custom_fields[ $custom_field_ID ] = $custom_field_data;
 				}
 			}
 		}
@@ -519,7 +526,7 @@ class ItemType extends DataObject
 			$sql_data = array();
 			foreach( $this->insert_custom_fields as $itcf_ID => $custom_field )
 			{
-				$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format )
+				$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format, itcf_formula, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight )
 					VALUES ( '.$DB->quote( $this->ID ).', '
 						.$DB->quote( $custom_field['label'] ).', '
 						.$DB->quote( $custom_field['name'] ).', '
@@ -527,7 +534,11 @@ class ItemType extends DataObject
 						.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).', '
 						.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).', '
 						.$DB->quote( $custom_field['public'] ).', '
-						.$DB->quote( $custom_field['format'] ).' )' );
+						.$DB->quote( $custom_field['format'] ).', '
+						.$DB->quote( $custom_field['formula'] ).', '
+						.$DB->quote( $custom_field['line_highlight'] ).', '
+						.$DB->quote( $custom_field['green_highlight'] ).', '
+						.$DB->quote( $custom_field['red_highlight'] ).' )' );
 			}
 		}
 
@@ -544,7 +555,11 @@ class ItemType extends DataObject
 						itcf_order = '.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).',
 						itcf_note = '.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).',
 						itcf_public = '.$DB->quote( $custom_field['public'] ).',
-						itcf_format = '.$DB->quote( $custom_field['format'] ).'
+						itcf_format = '.$DB->quote( $custom_field['format'] ).',
+						itcf_formula = '.$DB->quote( $custom_field['formula'] ).',
+						itcf_line_highlight = '.$DB->quote( $custom_field['line_highlight'] ).',
+						itcf_green_highlight = '.$DB->quote( $custom_field['green_highlight'] ).',
+						itcf_red_highlight = '.$DB->quote( $custom_field['red_highlight'] ).'
 					WHERE itcf_ityp_ID = '.$DB->quote( $this->ID ).'
 						AND itcf_ID = '.$DB->quote( $itcf_ID ).'
 						AND itcf_type = '.$DB->quote( $custom_field['type'] ) );
@@ -609,7 +624,7 @@ class ItemType extends DataObject
 	/**
 	 * Get the custom feilds
 	 *
-	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url', 'image'. Use comma separator to get several types
+	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url', 'image', 'computed'. Use comma separator to get several types
 	 * @param string Field name that is used as key of array: 'ID', 'ityp_ID', 'label', 'name', 'type', 'order', 'public'
 	 * @return array Custom fields
 	 */
@@ -625,7 +640,9 @@ class ItemType extends DataObject
 			{ // Get the custom fields from DB
 				global $DB;
 				$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->ID );
-				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, itcf_public AS public, itcf_format AS format' );
+				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
+				$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, ' );
+				$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight' );
 				$SQL->FROM( 'T_items__type_custom_field' );
 				$SQL->WHERE( 'itcf_ityp_ID = '.$DB->quote( $this->ID ) );
 				$SQL->ORDER_BY( 'itcf_order, itcf_ID' );

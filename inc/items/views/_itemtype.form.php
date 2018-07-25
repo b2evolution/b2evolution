@@ -126,6 +126,13 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 					'size'      => 20,
 					'maxlength' => 40
 				),
+			'computed' => array(
+					'label'     => T_('Computed'),
+					'title'     => T_('Add new computed custom field'),
+					'note'      => T_('Ex: Sum, Total... &ndash; will be computed by formula automatically.'),
+					'size'      => 20,
+					'maxlength' => 40
+				),
 			'varchar' => array(
 					'label'     => T_('String'),
 					'title'     => T_('Add new string custom field'),
@@ -161,6 +168,16 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 					'size'      => 20,
 					'maxlength' => 60
 				),
+	);
+
+	$line_highlight_options = array(
+		'never'       => T_('Never'),
+		'differences' => T_('If different')
+	);
+	$color_highlight_options = array(
+		'never'   => T_('Never'),
+		'lowest'  => T_('Lowest'),
+		'highest' => T_('Highest'),
 	);
 
 	$custom_fields_names = array();
@@ -218,17 +235,28 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 			switch( $type )
 			{
 				case 'double':
+				case 'computed':
 					$custom_field_name .= ' '.T_('Format').' <input type="text" name="custom_'.$type.'_format'.$i.'" value="'.format_to_output( $custom_field['format'], 'htmlattr' ).'" class="form_text_input form-control custom_field_format" size="20" maxlength="2000" />';
+					if( $type == 'computed' )
+					{
+						$custom_field_name .= ' '.T_('Formula').' <input type="text" name="custom_'.$type.'_formula'.$i.'" value="'.format_to_output( $custom_field['formula'], 'htmlattr' ).'" class="form_text_input form-control custom_field_formula" size="45" maxlength="2000" />';
+					}
 					break;
 				case 'image':
-					$custom_field_name .= ' '.T_('Format').' <select type="text" name="custom_'.$type.'_format'.$i.'" class="form-control custom_field_format">';
-					foreach( $thumbnail_sizes as $thumbnail_size_key => $thumbnail_size_data )
-					{
-						$custom_field_name .= '<option value="'.format_to_output( $thumbnail_size_key, 'htmlattr' ).'"'.( $custom_field['format'] == $thumbnail_size_key ? ' selected="selected"' : '' ).'>'.format_to_output( $thumbnail_size_key ).'</option>';
-					}
-					$custom_field_name .= '</select>';
+					$custom_field_name .= ' '.T_('Format').' <select type="text" name="custom_'.$type.'_format'.$i.'" class="form-control custom_field_format">'
+							.Form::get_select_options_string( array_keys( $thumbnail_sizes ), $custom_field['format'] )
+						.'</select>';
 					break;
 			}
+			$custom_field_name .= ' '.T_('Line highlight').' <select type="text" name="custom_'.$type.'_line_highlight'.$i.'" class="form-control custom_field_line_highlight">'
+					.Form::get_select_options_string( $line_highlight_options, $custom_field['line_highlight'], true )
+				.'</select>';
+			$custom_field_name .= ' '.T_('Green highlight').' <select type="text" name="custom_'.$type.'_green_highlight'.$i.'" class="form-control custom_field_green_highlight">'
+					.Form::get_select_options_string( $color_highlight_options, $custom_field['green_highlight'], true )
+				.'</select>';
+			$custom_field_name .= ' '.T_('Red highlight').' <select type="text" name="custom_'.$type.'_red_highlight'.$i.'" class="form-control custom_field_red_highlight">'
+					.Form::get_select_options_string( $color_highlight_options, $custom_field['red_highlight'], true )
+				.'</select>';
 			$custom_field_name .= ' <label class="text-normal"><input type="checkbox" name="custom_'.$type.'_public'.$i.'" value="1" '.( $custom_field['public'] ? ' checked="checked"' : '' ).' /> '.T_('Public').'</label>';
 			$Form->text_input( $field_id_suffix, $custom_field_label, $data[ 'size' ], $data[ 'label' ], $action_delete, array(
 					'maxlength'    => $data[ 'maxlength' ],
@@ -375,17 +403,30 @@ function add_new_custom_field( type, title, title_size )
 	switch( type )
 	{
 		case 'double':
+		case 'computed':
 			custom_field_inputs += ' <?php echo TS_('Format'); ?> <input type="text" name="custom_' + type + '_format' + count_custom + '" value="" class="form_text_input form-control custom_field_format" maxlength="2000" size="20" />';
+			if( type == 'computed' )
+			{
+				custom_field_inputs += ' <?php echo TS_('Formula'); ?> <input type="text" name="custom_' + type + '_formula' + count_custom + '" value="" class="form_text_input form-control custom_field_formula" maxlength="2000" size="45" />';
+			}
 			break;
 		case 'image':
 			custom_field_inputs += ' <?php echo TS_('Format'); ?> <select type="text" name="custom_' + type + '_format' + count_custom + '" class="form-control custom_field_format"><?php
-			foreach( $thumbnail_sizes as $thumbnail_size_key => $thumbnail_size_data )
-			{
-				echo '<option value="'.format_to_output( $thumbnail_size_key, 'htmlattr' ).'">'.format_to_output( $thumbnail_size_key ).'</option>';
-			}
+				echo Form::get_select_options_string( array_keys( $thumbnail_sizes ), 'fit-192x192' );
 			?></select>';
 			break;
 	}
+	custom_field_inputs += ' <?php echo TS_('Line highlight'); ?> <select type="text" name="custom_' + type + '_line_highlight' + count_custom + '" class="form-control custom_field_line_highlight">';
+	custom_field_inputs += type == 'image'
+		? '<?php echo Form::get_select_options_string( $line_highlight_options, 'never', true ); ?>'
+		: '<?php echo Form::get_select_options_string( $line_highlight_options, 'differences', true ); ?>';
+	custom_field_inputs += '</select>';
+	custom_field_inputs += ' <?php echo TS_('Green highlight'); ?> <select type="text" name="custom_' + type + '_green_highlight' + count_custom + '" class="form-control custom_field_green_highlight"><?php
+		echo Form::get_select_options_string( $color_highlight_options, 'never', true );
+	?></select>';
+	custom_field_inputs += ' <?php echo TS_('Red highlight'); ?> <select type="text" name="custom_' + type + '_red_highlight' + count_custom + '" class="form-control custom_field_red_highlight"><?php
+		echo Form::get_select_options_string( $color_highlight_options, 'never', true );
+	?></select>';
 	custom_field_inputs += 
 				' <label class="text-normal"><input type="checkbox" name="custom_' + type + '_public' + count_custom + '" value="1" checked="checked" /> <?php echo TS_('Public'); ?></label>' +
 			'<?php echo format_to_js( $Form->inputend.$Form->fieldend ); ?>';
@@ -396,6 +437,11 @@ function add_new_custom_field( type, title, title_size )
 jQuery( '#add_new_double_custom_field' ).click( function()
 {
 	add_new_custom_field( 'double', '<?php echo TS_('Numeric'); ?>', 20 );
+} );
+
+jQuery( '#add_new_computed_custom_field' ).click( function()
+{
+	add_new_custom_field( 'computed', '<?php echo TS_('Computed'); ?>', 20 );
 } );
 
 jQuery( '#add_new_varchar_custom_field' ).click( function()

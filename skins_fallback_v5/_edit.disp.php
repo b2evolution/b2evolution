@@ -339,30 +339,8 @@ else
 
 		echo $Form->formstart;
 
-		foreach( $custom_fields as $custom_field )
-		{	// Display each custom field:
-			switch( $custom_field['type'] )
-			{
-				case 'double':
-					$Form->text_input( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 10000 ) );
-					break;
-				case 'varchar':
-					$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], '<br />'.$custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 10000, 'style' => 'width:100%' ) );
-					break;
-				case 'text':
-					$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field['label'], array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
-					break;
-				case 'html':
-					$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field['label'], array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
-					break;
-				case 'url':
-					$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], '<br />'.$custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 10000, 'style' => 'width:100%' ) );
-					break;
-				case 'image':
-					$Form->text_input( 'item_image_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 10000 ) );
-					break;
-			}
-		}
+		// Display inputs to edit custom fields:
+		display_editable_custom_fields( $Form, $edited_Item );
 
 		echo $Form->formend;
 

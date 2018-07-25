@@ -66,10 +66,10 @@ if( $dir_handle = @opendir( $upgrade_path ) )
 {
 	while( ( $file = readdir( $dir_handle ) ) !== false )
 	{
-		$is_dir = is_dir( $upgrade_path.$file );
-		if( $file != '.' && $file != '..' && ( $is_dir || preg_match( '#\.zip$#i', $file ) ) )
+		if( $file != '.' && $file != '..' &&
+		    ( is_dir( $upgrade_path.$file ) || preg_match( '#\.zip$#i', $file ) ) )
 		{	// Only folder or ZIP file:
-			$downloaded_files[ $file ] = $is_dir ? 'dir' : 'zip';
+			$downloaded_files[] = $file;
 		}
 	}
 	closedir( $dir_handle );
@@ -105,7 +105,11 @@ else
 	// BODY START:
 	$Table->display_body_start();
 
-	foreach( $downloaded_files as $file => $type )
+	// Sort files:
+	natsort( $downloaded_files );
+	$downloaded_files = array_reverse( $downloaded_files );
+
+	foreach( $downloaded_files as $file )
 	{
 		$Table->display_line_start();
 
@@ -115,20 +119,22 @@ else
 		$Table->display_col_end();
 
 		$use_file_url = $admin_url.'?ctrl=upgrade&amp;action=';
-		if( $type == 'zip' )
+		if( ! is_dir( $upgrade_path.$file ) )
 		{
 			$use_file_url .= 'unzip&amp;upd_file='.urlencode( $file ).'&amp;'.url_crumb( 'upgrade_downloaded' );
+			$confirm_message = TS_('Are you sure want to delete this file?');
 		}
 		else
 		{
 			$use_file_url .= 'ready&amp;upd_dir='.urlencode( $file ).'&amp;'.url_crumb( 'upgrade_is_ready' );
+			$confirm_message = TS_('Are you sure want to delete this folder?');
 		}
 		$del_file_url = $admin_url.'?ctrl=upgrade&amp;action=delete&amp;file='.urlencode( $file ).'&amp;'.url_crumb( 'upgrade_delete' );
 
 		// File date
 		$Table->display_col_start();
 		echo '<a href="'.$use_file_url.'" class="btn btn-warning btn-xs">'.T_('Use this...').'</a> ';
-		echo '<a href="'.$del_file_url.'" class="btn btn-danger btn-xs" onclick="return confirm(\''.TS_('Are you sure want to delete this file?').'\')">'.T_('Delete').'</a> ';
+		echo '<a href="'.$del_file_url.'" class="btn btn-danger btn-xs" onclick="return confirm(\''.$confirm_message.'\')">'.T_('Delete').'</a> ';
 		$Table->display_col_end();
 
 		$Table->display_line_end();

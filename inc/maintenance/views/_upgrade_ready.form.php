@@ -33,9 +33,8 @@ require( '_backup_options.form.php' );
 // Display the form buttons
 $Form->begin_fieldset( T_( 'Actions' ) );
 
-$action_backup_value = ( $action == 'ready_git' ) ? 'backup_and_overwrite_git' : 'backup_and_overwrite';
 $action_backup_title = ( empty( $new_version_status ) ) ? T_( 'Backup & Upgrade' ) : T_( 'Force Backup & Upgrade' );
 
-$Form->end_form( array( array( 'submit', 'actionArray['.$action_backup_value.']', $action_backup_title, 'SaveButton'.( empty( $new_version_status ) ? '' : ' btn-warning' ) ) ) );
+$Form->end_form( array( array( 'submit', 'actionArray[backup_and_overwrite]', $action_backup_title, 'SaveButton'.( empty( $new_version_status ) ? '' : ' btn-warning' ) ) ) );
 
 ?>

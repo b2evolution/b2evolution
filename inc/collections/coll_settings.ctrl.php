@@ -878,7 +878,7 @@ if( $action == 'dashboard' )
 			$nb_blocks_displayed++;
 
 			$block_item_Widget = new Widget( 'block_item' );
-			$block_item_Widget->title = T_('Getting started');
+			$block_item_Widget->title = T_('Getting Started');
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
 			echo '<p><strong>'.T_('Welcome to your new collection\'s dashboard!').'</strong></p>';

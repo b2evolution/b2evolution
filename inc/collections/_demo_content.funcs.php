@@ -1486,6 +1486,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 It can have multiple lines.' );
 				$edited_Item->set_setting( 'custom:multiline_html_field', 'This is an <b>HTML</b> <i>field</i>.' );
 				$edited_Item->set_setting( 'custom:url_field', 'http://b2evolution.net/' );
+				$edited_Item->set_setting( 'custom:checkmark_field', '1' );
 				$post_custom_fields_ID = $edited_Item->insert( $owner_ID, T_('Custom Fields Example'),
 '<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>'.
 
@@ -1525,6 +1526,7 @@ It can have multiple lines.
 This is an extra line.' );
 				$edited_Item->set_setting( 'custom:multiline_html_field', 'This is an <b>HTML</b> <i>field</i>.' );
 				$edited_Item->set_setting( 'custom:url_field', 'http://b2evolution.net/' );
+				$edited_Item->set_setting( 'custom:checkmark_field', '0' );
 				$another_custom_fields_example_ID = $edited_Item->insert( $owner_ID, T_('Another Custom Fields Example'),
 '<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>'.
 
@@ -1559,6 +1561,7 @@ This is an extra line.' );
 					$edited_Item->set_setting( 'custom:first_numeric_field', '123' );
 					$edited_Item->set_setting( 'custom:first_string_field', 'abc' );
 					$edited_Item->set_setting( 'custom:image_1', $custom_item_link_ID );
+					$edited_Item->set_setting( 'custom:checkmark_field', '1' );
 					$edited_Item->set( 'parent_ID', $post_custom_fields_ID ); // Set parent post ID
 					/*$edited_Item->insert( $owner_ID, T_('Child Post Example'), T_('<p>This post has a special post type called "Child Post".</p>'),*/
 					$edited_Item->insert( $owner_ID, T_('Child Post Example'),

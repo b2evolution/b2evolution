@@ -310,7 +310,7 @@ class User extends DataObject
 				//array( 'table'=>'T_items__item', 'fk'=>'post_lastedit_user_ID', 'msg'=>T_('%d posts last edited by this user') ),
 				array( 'table'=>'T_items__item', 'fk'=>'post_assigned_user_ID', 'msg'=>T_('%d posts assigned to this user') ),
 				array( 'table'=>'T_users__organization', 'fk'=>'org_owner_user_ID', 'msg'=>T_('%d organizations') ),
-				array( 'table'=>'T_polls__question', 'fk'=>'pqst_owner_user_ID', 'msg'=>T_('%d poll questions') ),
+				array( 'table'=>'T_polls__question', 'fk'=>'pqst_owner_user_ID', 'msg'=>T_('%d polls owned by this user') ),
 				array( 'table'=>'T_automation__automation', 'fk'=>'autm_owner_user_ID', 'msg'=>T_('%d automations') ),
 				// Do not delete user private messages
 				//array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('The user has authored %d message(s)') ),
@@ -2439,13 +2439,35 @@ class User extends DataObject
 	function get_num_edited_posts()
 	{
 		global $DB;
-		global $collections_Module;
 
 		return $DB->get_var( 'SELECT COUNT( DISTINCT( post_ID ) )
 									FROM T_items__item
 									INNER JOIN T_items__version ON post_ID = iver_itm_ID
 									WHERE post_creator_user_ID <> '.$this->ID.' AND
 										( iver_edit_user_ID = '.$this->ID.' OR post_lastedit_user_ID = '.$this->ID.' )' );
+	}
+
+
+	/**
+	 * Get the number of polls owned by this user
+	 *
+	 * @return integer the number of owned polls
+	 */
+	function get_num_polls()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{
+			return 0;
+		}
+
+		$SQL = new SQL( 'Get polls owned by user #'.$this->ID );
+		$SQL->SELECT( 'COUNT( pqst_ID )' );
+		$SQL->FROM( 'T_polls__question' );
+		$SQL->WHERE( 'pqst_owner_user_ID = '.$this->ID );
+
+		return $DB->get_var( $SQL );
 	}
 
 
@@ -6635,6 +6657,52 @@ class User extends DataObject
 		$DB->commit();
 
 		return true;
+	}
+
+
+	/**
+	 * Delete polls of the user
+	 *
+	 * @return boolean True on success
+	 */
+	function delete_polls()
+	{
+		global $DB, $current_User;
+
+		// If current user can moderate this user then it is allowed to delete all user data even if it wouldn't be allowed otherwise.
+		$current_user_can_moderate = $current_User->can_moderate_user( $this->ID );
+
+		$DB->begin();
+
+		$PollCache = & get_PollCache();
+		$PollCache->clear();
+		$PollCache->load_where( 'pqst_owner_user_ID = '.$this->ID );
+
+		$result = false;
+		while( ( $iterator_Poll = & $PollCache->get_next() ) != NULL )
+		{	// Iterate through PollCache:
+			if( $current_user_can_moderate ||
+			    $current_User->check_perm( 'polls', 'edit', false, $iterator_Poll ) )
+			{ // Current user has a permission to delete this poll
+				// Delete the poll from DB:
+				$result = $iterator_Poll->dbdelete();
+				if( ! $result )
+				{
+					break;
+				}
+			}
+		}
+
+		if( $result )
+		{
+			$DB->commit();
+		}
+		else
+		{
+			$DB->rollback();
+		}
+
+		return $result;
 	}
 
 

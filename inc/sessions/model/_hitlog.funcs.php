@@ -269,7 +269,7 @@ function stats_search_keywords( $keyphrase, $length = 45 )
 
 	if( empty( $keyphrase ) )
 	{
-		return '<span class="note">['.T_('n.a.').']</span>';
+		return '<span class="note">['./* TRANS: "Not Available" */ T_('N/A').']</span>';
 	}
 
 	// Save original string

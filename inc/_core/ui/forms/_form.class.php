@@ -4261,7 +4261,7 @@ class Form extends Widget
 						{
 							var tags = jQuery( selector ).val();
 							var tags_json = new Array();
-							if( tags.length > 0 )
+							if( tags && tags.length > 0 )
 							{ // Get tags from <input>
 								tags = tags.split( \',\' );
 								for( var t in tags )

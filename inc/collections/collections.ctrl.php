@@ -396,7 +396,7 @@ switch( $action )
 		if( ! $Messages->has_errors() )
 		{
 			$Settings->dbupdate();
-			$Messages->add( T_('Blog settings updated.'), 'success' );
+			$Messages->add( T_('The blog settings have been updated'), 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=collections&tab=blog_settings', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
