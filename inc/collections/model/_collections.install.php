@@ -290,7 +290,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ivcf_iver_ID     INT UNSIGNED NOT NULL,
 			ivcf_iver_type   ENUM('archived','proposed') COLLATE ascii_general_ci NOT NULL DEFAULT 'archived',
 			ivcf_iver_itm_ID INT UNSIGNED NOT NULL,
-			ivcf_itcf_ID     INT UNSIGNED NULL,
+			ivcf_itcf_ID     INT UNSIGNED NOT NULL,
 			ivcf_itcf_label  VARCHAR(255) NOT NULL,
 			ivcf_value       VARCHAR( 10000 ) NULL,
 			PRIMARY KEY      ( ivcf_iver_ID, ivcf_iver_type, ivcf_iver_itm_ID, ivcf_itcf_ID )
@@ -302,7 +302,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ivl_iver_ID     INT UNSIGNED NOT NULL,
 			ivl_iver_type   ENUM('archived','proposed') COLLATE ascii_general_ci NOT NULL DEFAULT 'archived',
 			ivl_iver_itm_ID INT UNSIGNED NOT NULL,
-			ivl_link_ID     INT(11) UNSIGNED NULL,
+			ivl_link_ID     INT(11) UNSIGNED NOT NULL,
 			ivl_file_ID     INT(11) UNSIGNED NULL,
 			ivl_position    VARCHAR(10) COLLATE ascii_general_ci NOT NULL,
 			ivl_order       INT(11) UNSIGNED NOT NULL,
