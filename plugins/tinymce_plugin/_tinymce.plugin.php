@@ -824,7 +824,7 @@ class tinymce_plugin extends Plugin
 
 		// Configuration: -- http://wiki.moxiecode.com/index.php/TinyMCE:Configuration
 		$init_options = array();
-		$init_options[] = 'cache_suffix: "?v=4.8.0-2018-06-27"';
+		$init_options[] = 'cache_suffix: "?v='.$this->version.'"';
 		$init_options[] = 'selector: "textarea#'.$content_id.'"';
 		if( $this->Settings->get( 'use_gzip_compressor' ) )
 		{	// Load script to use gzip compressor:
