@@ -196,11 +196,9 @@ class Plugins_admin extends Plugins
 				'DisplayCommentToolbar' => 'Display a toolbar on the feedback/comment form',
 				'DisplayCommentFormButton' => 'Called in the submit button section of the frontend comment form.',
 				'DisplayCommentFormFieldset' => 'Called at the end of the frontend comment form.',
-				'DisplayCommentFormFieldsetAboveComment' => 'Called before comment textarea of the frontend comment form.',
 				'DisplayMessageToolbar' => 'Display a toolbar on the message form',
 				'DisplayMessageFormButton' => 'Called in the submit button section of the frontend message form.',
 				'DisplayMessageFormFieldset' => 'Called at the end of the frontend message form.',
-				'DisplayMessageFormFieldsetAboveMessage' => 'Called before message textarea of the frontend message form.',
 				'DisplayEmailToolbar' => 'Display a toolbar on the email form',
 				'DisplayLoginFormFieldset' => 'Called when displaying the "Login" form.',
 				'DisplayRegisterFormBefore' => 'Called when displaying the "Register" form.',
@@ -227,6 +225,7 @@ class Plugins_admin extends Plugins
 				'GetSpamKarmaForComment' => 'Asks plugin for the spam karma of a comment/trackback.',
 
 				// Other Plugins can use this:
+				'RequestCaptcha' => 'Return data to display captcha html code',
 				'CaptchaValidated' => 'Validate the test from CaptchaPayload to detect humans.',
 				'CaptchaValidatedCleanup' => 'Cleanup data used for CaptchaValidated.',
 				'CaptchaPayload' => 'Provide a turing test to detect humans.',
