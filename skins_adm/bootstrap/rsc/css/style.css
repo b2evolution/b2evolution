@@ -1445,6 +1445,9 @@ table.diff tr.diff-custom-field td.diff-title-addedline {
   text-align: left;
   font-size: 100%;
 }
+table.diff td.diff-section-title {
+  background: none repeat scroll 0 0 #F5F5F5;
+}
 .radio input[type="radio"][name^="timestamp_"][value="duration"] {
   position: relative;
   margin-right: 4px;
