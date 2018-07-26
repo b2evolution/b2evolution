@@ -125,14 +125,6 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 			) );
 	}
 
-	$Plugins->trigger_event( 'DisplayMessageFormFieldsetAboveMessage', array(
-			'Form'              => & $Form,
-			'recipient_ID'      => & $recipient_id,
-			'item_ID'           => $post_id,
-			'comment_ID'        => $comment_id,
-			'form_use_fieldset' => false,
-		) );
-
 	if( $Blog->get_setting( 'msgform_display_subject' ) )
 	{	// Display a field to enter or select a subject:
 		$subject_options = $Blog->get_setting( 'msgform_subject_options' );
@@ -165,6 +157,14 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 		}
 	}
 
+	// Display plugin captcha for message form before textarea:
+	$Plugins->display_captcha( array(
+			'Form'              => & $Form,
+			'form_type'         => 'message',
+			'form_position'     => 'before_textarea',
+			'form_use_fieldset' => false,
+		) );
+
 	if( $Blog->get_setting( 'msgform_display_message' ) )
 	{	// Display a field to enter a message:
 		$message_label = utf8_trim( $Blog->get_setting( 'msgform_message_label' ) );
@@ -178,6 +178,14 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 			'recipient_ID'      => & $recipient_id,
 			'item_ID'           => $post_id,
 			'comment_ID'        => $comment_id,
+			'form_use_fieldset' => false,
+		) );
+
+	// Display plugin captcha for message form before submit button:
+	$Plugins->display_captcha( array(
+			'Form'              => & $Form,
+			'form_type'         => 'message',
+			'form_position'     => 'before_submit_button',
 			'form_use_fieldset' => false,
 		) );
 

@@ -260,61 +260,99 @@ class proof_of_work_captcha_plugin extends Plugin
 	 * @param array Associative array of parameters
 	 *   - 'Form': the form where payload should get added (by reference, OPTIONALLY!)
 	 *   - 'form_use_fieldset':
-	 *   - 'key': A key that is associated to the caller of the event (string, OPTIONALLY!)
-	 *   - 'form_type': Form type ( comment|register|message )
-	 * @return boolean|NULL true, if displayed; false, if error; NULL if it does not apply
+	 *   - 'form_type': Form type: 'item', 'comment', 'register', 'message'
+	 * @return string Captcha html code
 	 */
 	function CaptchaPayload( & $params )
 	{
+		$r = '';
 		if( ! isset( $params['form_type'] ) || ! $this->does_apply( $params['form_type'] ) )
 		{	// We should not apply captcha to the requested form:
-			return;
+			return $r;
 		}
 
 		if( ! isset( $params['Form'] ) )
 		{	// there's no Form where we add to, but we create our own form:
 			$Form = new Form( regenerate_url() );
-			$Form->begin_form();
+			$orig_form_output = $Form->output;
+			$Form->output = false;
+			$r .= $Form->begin_form();
 		}
 		else
 		{
 			$Form = & $params['Form'];
+			$orig_form_output = $Form->output;
+			$Form->output = false;
 			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
 			{
-				$Form->begin_fieldset();
+				$r .= $Form->begin_fieldset();
 			}
 		}
 
-		$Form->info( $this->T_('Antispam'), '<script src="https://authedmine.com/lib/captcha.min.js" async></script>
-			<div class="coinhive-captcha" data-hashes="'.format_to_output( $this->get_hash_num(), 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="form[data-coinhive-captcha] input[type=submit]:not([name$=\'[preview]\'])">
+		$r .= $Form->info( $this->T_('Antispam'), '<script src="https://authedmine.com/lib/captcha.min.js" async></script>'.
+			'<span class="coinhive-captcha" data-hashes="'.format_to_output( $this->get_hash_num(), 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="form[data-coinhive-captcha] input[type=submit]:not([name$=\'[preview]\'])">
 				<em>'.$this->T_('Loading Captcha...<br>If it doesn\'t load, please disable Adblock!').'</em>
-			</div>' );
+			</span>',
+			'<br>'.$params['captcha_info'].( is_logged_in() ? '' : $params['captcha_info_anonymous'] ) );
 		// Append a flag to the forms which contains the coinhive captcha in order to don't disable the submit buttons from other forms on the same page:
 		echo '<script type="text/javascript">jQuery( \'.coinhive-captcha[data-hashes]\' ).closest( \'form\' ).attr( \'data-coinhive-captcha\', 1 )</script>';
 
 		if( ! isset( $params['Form'] ) )
 		{	// there's no Form where we add to, but our own form:
-			$Form->end_form( array( array( 'submit', 'submit', $this->T_('Validate me'), 'ActionButton' ) ) );
+			$r .= $Form->end_form( array( array( 'submit', 'submit', $this->T_('Validate me'), 'ActionButton' ) ) );
 		}
 		else
 		{
 			if( ! isset($params['form_use_fieldset']) || $params['form_use_fieldset'] )
 			{
-				$Form->end_fieldset();
+				$r .= $Form->end_fieldset();
 			}
 		}
 
-		return true;
+		// Revert output mode back:
+		$Form->output = $orig_form_output;
+
+		return $r;
 	}
 
 
 	/**
-	 * We display our captcha with item forms.
+	 * Event handler: Return data to display captcha html code
+	 *
+	 * @param array Associative array of parameters:
+	 *   - 'Form':          Form object
+	 *   - 'form_type':     Form type
+	 *   - 'form_position': Current form position where this event is called
+	 * @return array Associative array of parameters:
+	 *   - 'captcha_position': Captcha position where current plugin must be displayed for the requested form type
+	 *   - 'captcha_html':     Captcha html code
 	 */
-	function DisplayItemFormFieldset( & $params )
+	function RequestCaptcha( & $params )
 	{
-		$params['form_type'] = 'item';
-		$this->CaptchaPayload( $params );
+		if( ! isset( $params['form_type'] ) )
+		{	// Exit here if the form type is not defined:
+			return false;
+		}
+
+		switch( $params['form_type'] )
+		{	// Set a position where we should display the captcha depending on form type:
+			case 'register':
+				$captcha_position = 'before_submit_button';
+				break;
+			case 'item':
+			case 'comment':
+			case 'message':
+				$captcha_position = 'before_textarea';
+				break;
+			default:
+				// The requested form type is not supported by this plugin
+				return false;
+		}
+
+		return array(
+				'captcha_position' => $captcha_position,
+				'captcha_html'     => $this->CaptchaPayload( $params ),
+			);
 	}
 
 
@@ -334,16 +372,6 @@ class proof_of_work_captcha_plugin extends Plugin
 
 
 	/**
-	 * We display our captcha with comment forms.
-	 */
-	function DisplayCommentFormFieldsetAboveComment( & $params )
-	{
-		$params['form_type'] = 'comment';
-		$this->CaptchaPayload( $params );
-	}
-
-
-	/**
 	 * Validate the answer against our stored one.
 	 *
 	 * In case of error we add a message of category 'error' which prevents the comment from
@@ -359,16 +387,6 @@ class proof_of_work_captcha_plugin extends Plugin
 
 
 	/**
-	 * We display our captcha with the register form.
-	 */
-	function DisplayRegisterFormFieldset( & $params )
-	{
-		$params['form_type'] = 'register';
-		$this->CaptchaPayload( $params );
-	}
-
-
-	/**
 	 * Validate the given private key against our stored one.
 	 *
 	 * In case of error we add a message of category 'error' which prevents the
@@ -378,16 +396,6 @@ class proof_of_work_captcha_plugin extends Plugin
 	{
 		$params['form_type'] = 'register';
 		$this->CaptchaValidated( $params );
-	}
-
-
-	/**
-	 * We display our captcha with the message form.
-	 */
-	function DisplayMessageFormFieldsetAboveMessage( & $params )
-	{
-		$params['form_type'] = 'message';
-		$this->CaptchaPayload( $params );
 	}
 
 

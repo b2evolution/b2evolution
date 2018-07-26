@@ -94,13 +94,15 @@ else
 	}
 }
 
-$Plugins->trigger_event( 'DisplayMessageFormFieldsetAboveMessage', array(
-		'Form'              => & $Form,
-		'form_use_fieldset' => false,
-	) );
-
 $Form->text_input( 'thrd_title', $edited_Thread->title, $params['cols'], T_('Subject'), '', array( 'maxlength'=> 255, 'required'=>true, 'class'=>'wide_input large' ) );
 
+// Display plugin captcha for message form before textarea:
+$Plugins->display_captcha( array(
+		'Form'              => & $Form,
+		'form_type'         => 'message',
+		'form_position'     => 'before_textarea',
+		'form_use_fieldset' => false,
+	) );
 
 ob_start();
 echo '<div class="message_toolbars">';
@@ -150,6 +152,14 @@ if( !empty( $thrd_recipients_array ) )
 		);
 	}
 }
+
+// Display plugin captcha for message form before submit button:
+$Plugins->display_captcha( array(
+		'Form'              => & $Form,
+		'form_type'         => 'message',
+		'form_position'     => 'before_submit_button',
+		'form_use_fieldset' => false,
+	) );
 
 // display submit button, but only if enabled
 $Form->end_form( array(
