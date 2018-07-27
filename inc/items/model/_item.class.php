@@ -2580,17 +2580,26 @@ class Item extends ItemLight
 				$format_suffix = $f_num > 1 ? $format[ $f_num - 1 ] : '';
 				if( $f_num > 2 )
 				{	// Extract data for number fomatting:
-					if( $f_num > 3 && preg_match( '#^\d+$#', $format[ $f_num - 2 ] ) )
-					{	// Get a number of digits after dot:
-						$format_decimals = strlen( $format[ $f_num - 2 ] );
+					if( in_array( $format[ $f_num - 3 ], array( '.', ',' ) ) )
+					{	// Allow only chars '.' and ',' as decimal separator:
+						if( $f_num > 3 && preg_match( '#^\d+$#', $format[ $f_num - 2 ] ) )
+						{	// Get a number of digits after dot:
+							$format_decimals = strlen( $format[ $f_num - 2 ] );
+						}
+						if( $f_num > 4 && preg_match( '#^[^\d]+$#', $format[ $f_num - 3 ] ) )
+						{	// Get a decimal point:
+							$format_dec_point = $format[ $f_num - 3 ];
+						}
+						$thousands_sep_pos = 5;
 					}
-					if( $f_num > 4 && preg_match( '#^[^\d]+$#', $format[ $f_num - 3 ] ) )
-					{	// Get a decimal point:
-						$format_dec_point = $format[ $f_num - 3 ];
+					else
+					{	// If format has no decimal part:
+						$format_decimals = 0;
+						$thousands_sep_pos = 3;
 					}
-					if( $f_num > 6 && preg_match( '#^[^\d]+$#', $format[ $f_num - 5 ] ) )
+					if( $f_num > $thousands_sep_pos + 1 && preg_match( '#^[^\d]+$#', $format[ $f_num - $thousands_sep_pos ] ) )
 					{	// Get a thousands separator:
-						$format_thousands_sep = $format[ $f_num - 5 ];
+						$format_thousands_sep = $format[ $f_num - $thousands_sep_pos ];
 					}
 					// Format number with extracted data:
 					$custom_field_value = number_format( floatval( $custom_field_value ), $format_decimals, $format_dec_point, $format_thousands_sep );
