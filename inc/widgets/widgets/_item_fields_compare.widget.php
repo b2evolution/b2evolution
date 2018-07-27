@@ -483,6 +483,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'item_ID'      => isset( $Item ) ? $Item->ID : NULL, // Has the Item page changed? (this is important for disp=single|page because $this$ and $parent$ resolve differently depending on item ID)
 				'items'        => implode( ',', $items ), // Have the compared items changed? (Check firstly widget setting and then param from request) (this is important in case the same items are compared in different order)
+				'meta_settings'=> 1, // Have meta settings(any item type) changed?
 			);
 
 		// Add 1 cache key for each item that is being compared, in order to detect changes on each one:

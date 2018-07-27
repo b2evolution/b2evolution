@@ -492,6 +492,9 @@ class ItemType extends DataObject
 		$this->dbsave_custom_fields();
 
 		$DB->commit();
+
+		// BLOCK CACHE INVALIDATION:
+		BlockCache::invalidate_key( 'meta_settings', 1 ); // Meta settings(any item type) have changed
 	}
 
 
