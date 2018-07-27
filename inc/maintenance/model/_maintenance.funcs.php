@@ -908,35 +908,17 @@ function get_tool_steps( $steps, $current_step )
  * Display steps panel
  *
  * @param integer Current step
+ * @param string Type: 'auto', 'git'
  */
-function autoupgrade_display_steps( $current_step )
+function autoupgrade_display_steps( $current_step, $type = '' )
 {
 	$steps = array(
-			1 => T_('Check for updates'),
+			1 => $type == 'git' ? T_('Connect to Git') : T_('Check for updates'),
 			2 => T_('Download'),
 			3 => T_('Unzip'),
 			4 => T_('Ready to upgrade'),
 			5 => T_('Backup &amp; Upgrade'),
 			6 => T_('Installer script'),
-		);
-
-	echo get_tool_steps( $steps, $current_step );
-}
-
-
-/**
- * Display steps panel
- *
- * @param integer Current step
- */
-function gitupgrade_display_steps( $current_step )
-{
-	$steps = array(
-			1 => T_('Connect to Git'),
-			2 => T_('Export'),
-			3 => T_('Ready to upgrade'),
-			4 => T_('Backup &amp; Upgrade'),
-			5 => T_('Installer script'),
 		);
 
 	echo get_tool_steps( $steps, $current_step );

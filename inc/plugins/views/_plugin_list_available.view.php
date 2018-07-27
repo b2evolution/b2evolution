@@ -29,7 +29,7 @@ $Table = new Table();
 
 $Table->title = T_('Plugins available for installation').get_manual_link('plugins_available_for_installation');
 
-$Table->global_icon( T_('Cancel install!'), 'close', regenerate_url(), T_('Cancel'), 3, 4 );
+$Table->global_icon( T_('Cancel installation!'), 'close', regenerate_url(), T_('Cancel'), 3, 4 );
 
 $Table->cols = array(
 		array( 'th' => T_('Plugin') ),

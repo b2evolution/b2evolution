@@ -52,13 +52,17 @@ class CommentList2 extends DataObjectList2
 	 * @param string name of cache to be used
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 * @param string Name to be used when saving the filterset (leave empty to use default for collection)
+	 * @param integer Comments created before this timestamp are excluded
+	 * @param integer Comments created after this timestamp are excluded
 	 */
 	function __construct(
 		$Blog,
 		$limit = 1000,
 		$cache_name = 'CommentCache',	// name of cache to be used
 		$param_prefix = '',
-		$filterset_name = ''			// Name to be used when saving the filterset (leave empty to use default for collection)
+		$filterset_name = '',			// Name to be used when saving the filterset (leave empty to use default for collection)
+		$comment_ts_min = NULL, // do not show comments before this timestamp
+		$comment_ts_max = NULL // do not show comments after this timestamp
 		)
 	{
 		global $Settings;
@@ -121,6 +125,8 @@ class CommentList2 extends DataObjectList2
 				'timestamp_max' => NULL, // Do not show comments from posts after this timestamp
 				'threaded_comments' => false, // Mode to display the comment replies
 				'user_perm' => NULL,
+				'comment_ts_min' => $comment_ts_min,
+				'comment_ts_max' => $comment_ts_max,
 		) );
 	}
 
@@ -215,6 +221,12 @@ class CommentList2 extends DataObjectList2
 			 * Restrict to not active/expired comments:
 			 */
 			memorize_param( $this->param_prefix.'expiry_statuses', 'array', $this->default_filters['expiry_statuses'], $this->filters['expiry_statuses'] );  // List of expiry statuses to restrict to
+
+			/*
+			 * Restrict to comment date:
+			 */
+			memorize_param( $this->param_prefix.'comment_ts_min', 'integer', $this->default_filters['comment_ts_min'], $this->filters['comment_ts_min'] );
+			memorize_param( $this->param_prefix.'comment_ts_max', 'integer', $this->default_filters['comment_ts_max'], $this->filters['comment_ts_max'] );
 
 			/*
 			 * Restrict to selected comment type:
@@ -337,6 +349,12 @@ class CommentList2 extends DataObjectList2
 		$this->filters['rating_turn'] = param( $this->param_prefix.'rating_turn', 'string', $this->default_filters['rating_turn'], true );      // Rating to restrict to
 		$this->filters['rating_limit'] = param( $this->param_prefix.'rating_limit', 'integer', $this->default_filters['rating_limit'], true ); 	// Rating to restrict to
 
+		/*
+		 * Restrict to selected comment date:
+		 */
+		$this->filters['comment_ts_min'] = param( $this->param_prefix.'comment_ts_min', 'integer', $this->default_filters['comment_ts_min'], true );
+		$this->filters['comment_ts_max'] = param( $this->param_prefix.'comment_ts_max', 'integer', $this->default_filters['comment_ts_max'], true );
+
 		// 'limit'
 		$this->filters['comments'] = param( $this->param_prefix.'comments', 'integer', $this->default_filters['comments'], true ); 			// # of units to display on the page
 		$this->limit = $this->filters['comments']; // for compatibility with parent class
@@ -417,6 +435,7 @@ class CommentList2 extends DataObjectList2
 		$this->CommentQuery->where_statuses( $this->filters['statuses'] );
 		$this->CommentQuery->where_types( $this->filters['types'] );
 		$this->ItemQuery->where_datestart( '', '', '', '', $this->filters['timestamp_min'], $this->filters['timestamp_max'] );
+		$this->CommentQuery->where_comment_date( $this->filters['comment_ts_min'], $this->filters['comment_ts_max'] );
 
 		if( !is_null( $this->Blog ) && isset( $this->filters['user_perm'] ) )
 		{ // If Blog and required user permission is set, add the corresponding restriction
@@ -500,10 +519,10 @@ class CommentList2 extends DataObjectList2
 
 	/**
 	 * Run Query: GET DATA ROWS *** HEAVY ***
-	 * 
+	 *
 	 * We need this query() stub in order to call it from restart() and still
 	 * let derivative classes override it
-	 * 
+	 *
 	 * @deprecated Use new function run_query()
 	 */
 	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
@@ -876,7 +895,7 @@ class CommentList2 extends DataObjectList2
 			$LinkCache = & get_LinkCache();
 			$LinkCache->load_by_comment_list( $page_comment_ids );
 		}
-		
+
 
 		if( $params['load_items_data'] )
 		{	// Load items data:

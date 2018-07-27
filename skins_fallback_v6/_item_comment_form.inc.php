@@ -401,7 +401,12 @@ function validateCommentForm(form)
 	// Set prefix for js code in plugins:
 	$plugin_js_prefix = ( $params['comment_type'] == 'meta' ? 'meta_' : '' );
 
-	$Plugins->trigger_event( 'DisplayCommentFormFieldsetAboveComment', array( 'Form' => & $Form, 'Item' => & $Item ) );
+	// Display plugin captcha for comment form before textarea:
+	$Plugins->display_captcha( array(
+			'Form'          => & $Form,
+			'form_type'     => 'comment',
+			'form_position' => 'before_textarea',
+		) );
 
 	ob_start();
 	echo '<div class="comment_toolbars">';
@@ -495,6 +500,13 @@ function validateCommentForm(form)
 	}
 
 	$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
+
+	// Display plugin captcha for comment form before submit button:
+	$Plugins->display_captcha( array(
+			'Form'          => & $Form,
+			'form_type'     => 'comment',
+			'form_position' => 'before_submit_button',
+		) );
 
 	$Form->begin_fieldset();
 		echo $Form->buttonsstart;

@@ -464,7 +464,7 @@ else
 $memory_limit = system_check_memory_limit();
 if( empty($memory_limit) )
 {
-	init_system_check( 'PHP memory_limit', T_('n.a.') );
+	init_system_check( 'PHP memory_limit', /* TRANS: "Not Available" */ T_('N/A') );
 	disp_system_check( 'note' );
 }
 else

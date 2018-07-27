@@ -1468,7 +1468,7 @@ class Comment extends DataObject
 		{
 			if( ! isset($template_unknown) )
 			{
-				echo /* TRANS: "not available" */ T_('N/A');
+				echo /* TRANS: "Not Available" */ T_('N/A');
 			}
 			else
 			{

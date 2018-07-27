@@ -1916,23 +1916,6 @@ class Plugin
 
 
 	/**
-	 * Event handler: Called before comment textarea of the front-office comment form.
-	 *
-	 * You might want to use this to inject antispam payload to use in
-	 * in {@link GetSpamKarmaForComment()} or modify the Comment according
-	 * to it in {@link BeforeCommentFormInsert()}.
-	 *
-	 * @see Plugin::BeforeCommentFormInsert(), Plugin::AfterCommentFormInsert()
-	 * @param array Associative array of parameters
-	 *   - 'Form': the comment form generating object
-	 *   - 'Item': the Item for which the comment is meant
-	 */
-	function DisplayCommentFormFieldsetAboveComment( & $params )
-	{
-	}
-
-
-	/**
 	 * Event handler: Called in the submit button section of the
 	 * front-office comment form.
 	 *
@@ -2185,24 +2168,6 @@ class Plugin
 	 *   - 'comment_ID': ID of the comment where the user clicked the msgform icon (if any)
 	 */
 	function DisplayMessageFormFieldset( & $params )
-	{
-	}
-
-
-	/**
-	 * Event handler: Called before message textarea of the front-office comment form, which
-	 * allows to send an email to a user/commentator.
-	 *
-	 * You might want to use this to inject antispam payload to use in
-	 * in {@link MessageFormSent()}.
-	 *
-	 * @param array Associative array of parameters
-	 *   - 'Form': the comment form generating object
-	 *   - 'recipient_ID': ID of the user (if any)
-	 *   - 'item_ID': ID of the item where the user clicked the msgform icon (if any)
-	 *   - 'comment_ID': ID of the comment where the user clicked the msgform icon (if any)
-	 */
-	function DisplayMessageFormFieldsetAboveMessage( & $params )
 	{
 	}
 
@@ -3045,6 +3010,22 @@ class Plugin
 
 
 	// General events: {{{
+
+	/**
+	 * Event handler: Return data to display captcha html code
+	 *
+	 * @param array Associative array of parameters:
+	 *   - 'Form':          Form object
+	 *   - 'form_type':     Form type
+	 *   - 'form_position': Current form position where this event is called
+	 * @return array Associative array of parameters:
+	 *   - 'captcha_position': Captcha position where current plugin must be displayed for the requested form type
+	 *   - 'captcha_html':     Captcha html code
+	 */
+	function RequestCaptcha( & $params )
+	{
+	}
+
 
 	/**
 	 * Event handler: general event to inject payload for a captcha test.

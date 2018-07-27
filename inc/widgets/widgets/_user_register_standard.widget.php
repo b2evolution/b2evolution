@@ -325,6 +325,15 @@ class user_register_standard_Widget extends ComponentWidget
 					'use_placeholders' => $params['register_use_placeholders']
 				) );
 
+			// Display plugin captcha for register form before submit button:
+			$Plugins->display_captcha( array(
+					'Form'              => & $Form,
+					'form_type'         => 'register',
+					'form_position'     => 'before_submit_button',
+					'form_use_fieldset' => false,
+					'use_placeholders'  => $params['register_use_placeholders'],
+				) );
+
 			// Buttons:
 			echo $params['register_buttons_before'];
 			$Form->button_input( array( 'name' => 'register', 'value' => T_('Register my account now!'), 'class' => 'search btn-primary btn-lg' ) );

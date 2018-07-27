@@ -829,8 +829,8 @@ Sub-heading
 
 Paragraphs are separated by a blank line.
 
-		This is a preformatted
-		code block.
+    This is a preformatted
+    code block.
 
 Text attributes *Italic*, **bold**, `monospace`.
 
@@ -840,9 +840,9 @@ Shopping list:
 * oranges
 * pears
 
-The rain---not the reign---in Spain.
-
-Button examples:
+The rain---not the reign---in Spain.').
+"\n".
+T_('Button examples:
 [button]This is a button[/button]
 [like]I like this[/like] [dislike]I don\'t like this[/dislike]
 [cta:1:info]Call to action 1 info button[/cta] [cta:2:warning]Call to action 2 warning button[/cta] [cta:3:default]Call to action 3 default button[/cta]

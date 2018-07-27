@@ -1201,6 +1201,11 @@ class Skin extends DataObject
 					require_once $inc_path.'_filters.inc.php';
 					break;
 
+				case 'disp_search':
+					// Used to suggest usernames for the field "Recipients":
+					init_tokeninput_js( 'blog' );
+					break;
+
 				case 'disp_login':
 				case 'disp_access_requires_login':
 					// Specific features for disp=login and disp=access_requires_login:

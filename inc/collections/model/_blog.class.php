@@ -1047,6 +1047,7 @@ class Blog extends DataObject
 			$this->set_setting( 'search_include_posts', param( 'search_include_posts', 'integer', 0 ) );
 			$this->set_setting( 'search_include_cmnts', param( 'search_include_cmnts', 'integer', 0 ) );
 			$this->set_setting( 'search_include_tags', param( 'search_include_tags', 'integer', 0 ) );
+			$this->set_setting( 'search_include_files', param( 'search_include_files', 'integer', 0 ) );
 
 			// Latest comments :
 			param_integer_range( 'latest_comments_num', 1, 9999, T_('Number of shown comments must be between %d and %d.') );

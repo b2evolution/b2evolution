@@ -15,10 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'items/model/_itemtype.class.php', 'ItemType' );
 
-/**
- * @var Itemtype
- */
-global $edited_Itemtype;
+global $edited_Itemtype, $thumbnail_sizes;
 
 // Determine if we are creating or updating...
 global $action;
@@ -129,6 +126,13 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 					'size'      => 20,
 					'maxlength' => 40
 				),
+			'computed' => array(
+					'label'     => T_('Computed'),
+					'title'     => T_('Add new computed custom field'),
+					'note'      => T_('Ex: Sum, Total... &ndash; will be computed by formula automatically.'),
+					'size'      => 20,
+					'maxlength' => 40
+				),
 			'varchar' => array(
 					'label'     => T_('String'),
 					'title'     => T_('Add new string custom field'),
@@ -157,6 +161,23 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 					'size'      => 20,
 					'maxlength' => 60
 				),
+			'image' => array(
+					'label'     => T_('Image'),
+					'title'     => T_('Add new image custom field'),
+					'note'      => T_('Ex: Cover... &ndash; will be stored as an integer.'),
+					'size'      => 20,
+					'maxlength' => 60
+				),
+	);
+
+	$line_highlight_options = array(
+		'never'       => T_('Never'),
+		'differences' => T_('If different')
+	);
+	$color_highlight_options = array(
+		'never'   => T_('Never'),
+		'lowest'  => T_('Lowest'),
+		'highest' => T_('Highest'),
 	);
 
 	$custom_fields_names = array();
@@ -211,6 +232,32 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 			$custom_field_name = ' '.T_('Name').' <input type="text" name="custom_'.$type.'_fname'.$i.'" value="'.$custom_field_name.'" class="form_text_input form-control custom_field_name '.$custom_field_name_class.'" maxlength="36" />';
 			$custom_field_name .= ' '.T_('Order').' <input type="text" name="custom_'.$type.'_order'.$i.'" value="'.$custom_field['order'].'" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />';
 			$custom_field_name .= ' '.T_('Note').' <input type="text" name="custom_'.$type.'_note'.$i.'" value="'.format_to_output( $custom_field['note'], 'htmlattr' ).'" class="form_text_input form-control custom_field_note" size="30" maxlength="255" />';
+			switch( $type )
+			{
+				case 'double':
+				case 'computed':
+					$custom_field_name .= ' '.T_('Format').' <input type="text" name="custom_'.$type.'_format'.$i.'" value="'.format_to_output( $custom_field['format'], 'htmlattr' ).'" class="form_text_input form-control custom_field_format" size="20" maxlength="2000" />';
+					if( $type == 'computed' )
+					{
+						$custom_field_name .= ' '.T_('Formula').' <input type="text" name="custom_'.$type.'_formula'.$i.'" value="'.format_to_output( $custom_field['formula'], 'htmlattr' ).'" class="form_text_input form-control custom_field_formula" size="45" maxlength="2000" />';
+					}
+					break;
+				case 'image':
+					$custom_field_name .= ' '.T_('Format').' <select type="text" name="custom_'.$type.'_format'.$i.'" class="form-control custom_field_format">'
+							.Form::get_select_options_string( array_keys( $thumbnail_sizes ), $custom_field['format'] )
+						.'</select>';
+					break;
+			}
+			$custom_field_name .= ' '.T_('Line highlight').' <select type="text" name="custom_'.$type.'_line_highlight'.$i.'" class="form-control custom_field_line_highlight">'
+					.Form::get_select_options_string( $line_highlight_options, $custom_field['line_highlight'], true )
+				.'</select>';
+			$custom_field_name .= ' '.T_('Green highlight').' <select type="text" name="custom_'.$type.'_green_highlight'.$i.'" class="form-control custom_field_green_highlight">'
+					.Form::get_select_options_string( $color_highlight_options, $custom_field['green_highlight'], true )
+				.'</select>';
+			$custom_field_name .= ' '.T_('Red highlight').' <select type="text" name="custom_'.$type.'_red_highlight'.$i.'" class="form-control custom_field_red_highlight">'
+					.Form::get_select_options_string( $color_highlight_options, $custom_field['red_highlight'], true )
+				.'</select>';
+			$custom_field_name .= ' <label class="text-normal"><input type="checkbox" name="custom_'.$type.'_public'.$i.'" value="1" '.( $custom_field['public'] ? ' checked="checked"' : '' ).' /> '.T_('Public').'</label>';
 			$Form->text_input( $field_id_suffix, $custom_field_label, $data[ 'size' ], $data[ 'label' ], $action_delete, array(
 					'maxlength'    => $data[ 'maxlength' ],
 					'input_prefix' => T_('Title').' ',
@@ -344,7 +391,7 @@ function add_new_custom_field( type, title, title_size )
 	var count_custom = jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value' );
 	count_custom++;
 	var custom_ID = guidGenerator();
-	jQuery( '#custom_' + type + '_field_list' ).append( '<?php echo str_replace( array( '$ID$' ), array( 'ffield_custom_\' + type + \'_\' + count_custom + \'' ), format_to_js( $Form->fieldstart ) ); ?>' +
+	var custom_field_inputs = '<?php echo str_replace( array( '$ID$' ), array( 'ffield_custom_\' + type + \'_\' + count_custom + \'' ), format_to_js( $Form->fieldstart ) ); ?>' +
 			'<input type="hidden" name="custom_' + type + '_ID' + count_custom + '" value="' + custom_ID + '" />' +
 			'<input type="hidden" name="custom_' + type + '_new' + count_custom + '" value="1" />' +
 			'<?php echo format_to_js( $Form->labelstart ); ?><label for="custom_' + type + '_' + count_custom + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>>' + title + ':</label><?php echo format_to_js( $Form->labelend ); ?>' +
@@ -352,14 +399,49 @@ function add_new_custom_field( type, title, title_size )
 				'<?php echo TS_('Title'); ?> <input type="text" id="custom_' + type + '_' + count_custom + '" name="custom_' + type + '_' + count_custom + '" class="form_text_input form-control new_custom_field_title" maxlength="255" size="' + title_size + '" />' +
 				' <?php echo TS_('Name'); ?> <input type="text" name="custom_' + type + '_fname' + count_custom + '" value="" class="form_text_input form-control custom_field_name" maxlength="255" />' +
 				' <?php echo TS_('Order'); ?> <input type="text" name="custom_' + type + '_order' + count_custom + '" value="" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />' +
-				' <?php echo TS_('Note'); ?> <input type="text" name="custom_' + type + '_note' + count_custom + '" value="" class="form_text_input form-control custom_field_note" maxlength="255" size="30" />' +
-			'<?php echo format_to_js( $Form->inputend.$Form->fieldend ); ?>' );
+				' <?php echo TS_('Note'); ?> <input type="text" name="custom_' + type + '_note' + count_custom + '" value="" class="form_text_input form-control custom_field_note" maxlength="255" size="30" />';
+	switch( type )
+	{
+		case 'double':
+		case 'computed':
+			custom_field_inputs += ' <?php echo TS_('Format'); ?> <input type="text" name="custom_' + type + '_format' + count_custom + '" value="" class="form_text_input form-control custom_field_format" maxlength="2000" size="20" />';
+			if( type == 'computed' )
+			{
+				custom_field_inputs += ' <?php echo TS_('Formula'); ?> <input type="text" name="custom_' + type + '_formula' + count_custom + '" value="" class="form_text_input form-control custom_field_formula" maxlength="2000" size="45" />';
+			}
+			break;
+		case 'image':
+			custom_field_inputs += ' <?php echo TS_('Format'); ?> <select type="text" name="custom_' + type + '_format' + count_custom + '" class="form-control custom_field_format"><?php
+				echo Form::get_select_options_string( array_keys( $thumbnail_sizes ), 'fit-192x192' );
+			?></select>';
+			break;
+	}
+	custom_field_inputs += ' <?php echo TS_('Line highlight'); ?> <select type="text" name="custom_' + type + '_line_highlight' + count_custom + '" class="form-control custom_field_line_highlight">';
+	custom_field_inputs += type == 'image'
+		? '<?php echo Form::get_select_options_string( $line_highlight_options, 'never', true ); ?>'
+		: '<?php echo Form::get_select_options_string( $line_highlight_options, 'differences', true ); ?>';
+	custom_field_inputs += '</select>';
+	custom_field_inputs += ' <?php echo TS_('Green highlight'); ?> <select type="text" name="custom_' + type + '_green_highlight' + count_custom + '" class="form-control custom_field_green_highlight"><?php
+		echo Form::get_select_options_string( $color_highlight_options, 'never', true );
+	?></select>';
+	custom_field_inputs += ' <?php echo TS_('Red highlight'); ?> <select type="text" name="custom_' + type + '_red_highlight' + count_custom + '" class="form-control custom_field_red_highlight"><?php
+		echo Form::get_select_options_string( $color_highlight_options, 'never', true );
+	?></select>';
+	custom_field_inputs += 
+				' <label class="text-normal"><input type="checkbox" name="custom_' + type + '_public' + count_custom + '" value="1" checked="checked" /> <?php echo TS_('Public'); ?></label>' +
+			'<?php echo format_to_js( $Form->inputend.$Form->fieldend ); ?>';
+	jQuery( '#custom_' + type + '_field_list' ).append( custom_field_inputs );
 	jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value', count_custom );
 }
 
 jQuery( '#add_new_double_custom_field' ).click( function()
 {
 	add_new_custom_field( 'double', '<?php echo TS_('Numeric'); ?>', 20 );
+} );
+
+jQuery( '#add_new_computed_custom_field' ).click( function()
+{
+	add_new_custom_field( 'computed', '<?php echo TS_('Computed'); ?>', 20 );
 } );
 
 jQuery( '#add_new_varchar_custom_field' ).click( function()
@@ -380,6 +462,11 @@ jQuery( '#add_new_html_custom_field' ).click( function()
 jQuery( '#add_new_url_custom_field' ).click( function()
 {
 	add_new_custom_field( 'url', '<?php echo TS_('URL'); ?>', 20 );
+} );
+
+jQuery( '#add_new_image_custom_field' ).click( function()
+{
+	add_new_custom_field( 'image', '<?php echo TS_('Image'); ?>', 20 );
 } );
 
 jQuery( '[id^="delete_custom_"]' ).click( function()

@@ -137,7 +137,7 @@ switch( $action )
 					$Settings->dbupdate();
 
 					$edited_Blog->dbupdate();
-					$Messages->add( T_('The blog settings have been updated'), 'success' );
+					$Messages->add( T_('The collection settings have been updated.'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
 					header_redirect( $update_redirect_url, 303 ); // Will EXIT
 				}
@@ -152,7 +152,7 @@ switch( $action )
 				if( $edited_Blog->load_from_Request( array( $tab ) ) )
 				{ // Commit update to the DB:
 					$edited_Blog->dbupdate();
-					$Messages->add( T_('The blog settings have been updated'), 'success' );
+					$Messages->add( T_('The collection settings have been updated.'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
 					header_redirect( $update_redirect_url, 303 ); // Will EXIT
 				}
@@ -162,7 +162,7 @@ switch( $action )
 				if( $edited_Blog->load_from_Request( array( 'seo' ) ) )
 				{ // Commit update to the DB:
 					$edited_Blog->dbupdate();
-					$Messages->add( T_('The blog settings have been updated'), 'success' );
+					$Messages->add( T_('The collection settings have been updated.'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
 					header_redirect( $update_redirect_url, 303 ); // Will EXIT
 				}
@@ -287,7 +287,7 @@ switch( $action )
 					}
 
 					$edited_Blog->dbupdate();
-					$Messages->add( T_('The blog settings have been updated'), 'success' );
+					$Messages->add( T_('The collection settings have been updated.'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
 					header_redirect( $update_redirect_url, 303 ); // Will EXIT
 				}
@@ -295,12 +295,12 @@ switch( $action )
 
 			case 'perm':
 				blog_update_perms( $blog, 'user' );
-				$Messages->add( T_('The blog permissions have been updated'), 'success' );
+				$Messages->add( T_('The collection permissions have been updated.'), 'success' );
 				break;
 
 			case 'permgroup':
 				blog_update_perms( $blog, 'group' );
-				$Messages->add( T_('The blog permissions have been updated'), 'success' );
+				$Messages->add( T_('The collection permissions have been updated.'), 'success' );
 				break;
 
 			case 'chapters':
@@ -869,7 +869,7 @@ if( $action == 'dashboard' )
 			$nb_blocks_displayed++;
 
 			$block_item_Widget = new Widget( 'block_item' );
-			$block_item_Widget->title = T_('Getting started');
+			$block_item_Widget->title = T_('Getting Started');
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
 			echo '<p><strong>'.T_('Welcome to your new collection\'s dashboard!').'</strong></p>';
