@@ -366,6 +366,7 @@ class ItemType extends DataObject
 				$custom_field_public = param( 'custom_'.$type.'_public'.$i, 'integer', 0 );
 				$custom_field_format = param( 'custom_'.$type.'_format'.$i, 'string', NULL );
 				$custom_field_formula = param( 'custom_'.$type.'_formula'.$i, 'string', NULL );
+				$custom_field_link = param( 'custom_'.$type.'_link'.$i, 'string', 'nolink' );
 				$custom_field_is_new = param( 'custom_'.$type.'_new'.$i, 'integer', 0 );
 				$custom_field_line_highlight = param( 'custom_'.$type.'_line_highlight'.$i, 'string' );
 				$custom_field_green_highlight = param( 'custom_'.$type.'_green_highlight'.$i, 'string' );
@@ -385,6 +386,7 @@ class ItemType extends DataObject
 						'public'          => $custom_field_public,
 						'format'          => $custom_field_format,
 						'formula'         => $custom_field_formula,
+						'link'            => $custom_field_link,
 						'line_highlight'  => $custom_field_line_highlight,
 						'green_highlight' => $custom_field_green_highlight,
 						'red_highlight'   => $custom_field_red_highlight,
@@ -419,6 +421,7 @@ class ItemType extends DataObject
 					'public'          => $custom_field_public,
 					'format'          => $custom_field_format,
 					'formula'         => $custom_field_formula,
+					'link'            => $custom_field_link,
 					'line_highlight'  => $custom_field_line_highlight,
 					'green_highlight' => $custom_field_green_highlight,
 					'red_highlight'   => $custom_field_red_highlight,
@@ -526,7 +529,7 @@ class ItemType extends DataObject
 			$sql_data = array();
 			foreach( $this->insert_custom_fields as $itcf_ID => $custom_field )
 			{
-				$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format, itcf_formula, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight )
+				$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format, itcf_formula, itcf_link, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight )
 					VALUES ( '.$DB->quote( $this->ID ).', '
 						.$DB->quote( $custom_field['label'] ).', '
 						.$DB->quote( $custom_field['name'] ).', '
@@ -536,6 +539,7 @@ class ItemType extends DataObject
 						.$DB->quote( $custom_field['public'] ).', '
 						.$DB->quote( $custom_field['format'] ).', '
 						.$DB->quote( $custom_field['formula'] ).', '
+						.$DB->quote( $custom_field['link'] ).', '
 						.$DB->quote( $custom_field['line_highlight'] ).', '
 						.$DB->quote( $custom_field['green_highlight'] ).', '
 						.$DB->quote( $custom_field['red_highlight'] ).' )' );
@@ -557,6 +561,7 @@ class ItemType extends DataObject
 						itcf_public = '.$DB->quote( $custom_field['public'] ).',
 						itcf_format = '.$DB->quote( $custom_field['format'] ).',
 						itcf_formula = '.$DB->quote( $custom_field['formula'] ).',
+						itcf_link = '.$DB->quote( $custom_field['link'] ).',
 						itcf_line_highlight = '.$DB->quote( $custom_field['line_highlight'] ).',
 						itcf_green_highlight = '.$DB->quote( $custom_field['green_highlight'] ).',
 						itcf_red_highlight = '.$DB->quote( $custom_field['red_highlight'] ).'
@@ -641,7 +646,7 @@ class ItemType extends DataObject
 				global $DB;
 				$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->ID );
 				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
-				$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, ' );
+				$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_link AS link, ' );
 				$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight' );
 				$SQL->FROM( 'T_items__type_custom_field' );
 				$SQL->WHERE( 'itcf_ityp_ID = '.$DB->quote( $this->ID ) );

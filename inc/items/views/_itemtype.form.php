@@ -248,6 +248,12 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 						.'</select>';
 					break;
 			}
+			if( $type != 'text' && $type != 'html' )
+			{
+				$custom_field_name .= ' '.T_('Link to').' <select type="text" name="custom_'.$type.'_link'.$i.'" class="form-control custom_field_link">'
+						.Form::get_select_options_string( get_item_type_field_linkto_options( $type ), $custom_field['link'], true )
+					.'</select>';
+			}
 			$custom_field_name .= ' '.T_('Line highlight').' <select type="text" name="custom_'.$type.'_line_highlight'.$i.'" class="form-control custom_field_line_highlight">'
 					.Form::get_select_options_string( $line_highlight_options, $custom_field['line_highlight'], true )
 				.'</select>';
@@ -415,6 +421,25 @@ function add_new_custom_field( type, title, title_size )
 				echo Form::get_select_options_string( array_keys( $thumbnail_sizes ), 'fit-192x192' );
 			?></select>';
 			break;
+	}
+	var custom_field_input_link = '';
+	switch( type )
+	{
+		case 'image':
+			custom_field_input_link += '<?php echo Form::get_select_options_string( get_item_type_field_linkto_options( 'image' ), 'linkpermzoom', true ); ?>';
+			break;
+		case 'url':
+			custom_field_input_link += '<?php echo Form::get_select_options_string( get_item_type_field_linkto_options( 'url' ), 'fieldurl', true ); ?>';
+			break;
+		case 'double':
+		case 'varchar':
+		case 'computed':
+			custom_field_input_link += '<?php echo Form::get_select_options_string( get_item_type_field_linkto_options( 'double' ), 'nolink', true ); ?>';
+			break;
+	}
+	if( custom_field_input_link != '' )
+	{
+		custom_field_inputs += ' <?php echo TS_('Link to'); ?> <select type="text" name="custom_' + type + '_link' + count_custom + '" class="form-control custom_field_link">' + custom_field_input_link + '</select>';
 	}
 	custom_field_inputs += ' <?php echo TS_('Line highlight'); ?> <select type="text" name="custom_' + type + '_line_highlight' + count_custom + '" class="form-control custom_field_line_highlight">';
 	custom_field_inputs += type == 'image'
