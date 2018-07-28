@@ -1734,6 +1734,49 @@ function get_item_type_usage_by_tab( $tab_name )
 
 
 /**
+ * Get options for setting "Link to" of item type custom field
+ *
+ * @return array
+ */
+function get_item_type_field_linkto_options( $field_type )
+{
+	switch( $field_type )
+	{
+		case 'image':
+			$options = array(
+				'linkpermzoom' => T_('Link to / Permalink / Zoom'),
+				'permzoom'     => T_('Permalink / Zoom'),
+				'linkto'       => T_('Always "Link to"'),
+				'permalink'    => T_('Always Permalink'),
+				'zoom'         => T_('Always Zoom'),
+				'nolink'       => T_('No Link'),
+			);
+			break;
+		case 'url':
+			$options = array(
+				'fieldurl' => T_('This field URL'),
+				'nolink'   => T_('No Link'),
+			);
+			break;
+		case 'double':
+		case 'varchar':
+		case 'computed':
+			$options = array(
+				'linkperm'  => T_('Link to / Permalink'),
+				'linkto'    => T_('Always "Link to"'),
+				'permalink' => T_('Always Permalink'),
+				'nolink'    => T_('No Link'),
+			);
+			break;
+		default:
+			$options = array();
+	}
+
+	return $options;
+}
+
+
+/**
  * Allow to select status/visibility
  *
  * @param object Form

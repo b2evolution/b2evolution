@@ -200,7 +200,13 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 			{
 				continue;
 			}
-			$action_delete = get_icon( 'minus', 'imgtag', array( 'id' => 'delete_'.$field_id_suffix, 'style' => 'cursor:pointer', 'title' => T_('Remove custom field') ) );
+			$action_icons = get_icon( 'minus', 'imgtag', array( 'id' => 'delete_'.$field_id_suffix, 'style' => 'cursor:pointer', 'title' => T_('Remove custom field') ) );
+			$action_icons .= ' '.get_icon( 'add', 'imgtag', array(
+					'class'     => 'duplicate_custom_field',
+					'data-type' => $type,
+					'style'     => 'cursor:pointer',
+					'title'     => T_('Duplicate custom field')
+				) );
 			$custom_field_name = $custom_field['name'];
 			$custom_field_label = $custom_field['label'];
 			$custom_field_label_class = '';
@@ -248,6 +254,12 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 						.'</select>';
 					break;
 			}
+			if( $type != 'text' && $type != 'html' )
+			{
+				$custom_field_name .= ' '.T_('Link to').' <select type="text" name="custom_'.$type.'_link'.$i.'" class="form-control custom_field_link">'
+						.Form::get_select_options_string( get_item_type_field_linkto_options( $type ), $custom_field['link'], true )
+					.'</select>';
+			}
 			$custom_field_name .= ' '.T_('Line highlight').' <select type="text" name="custom_'.$type.'_line_highlight'.$i.'" class="form-control custom_field_line_highlight">'
 					.Form::get_select_options_string( $line_highlight_options, $custom_field['line_highlight'], true )
 				.'</select>';
@@ -258,7 +270,7 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 					.Form::get_select_options_string( $color_highlight_options, $custom_field['red_highlight'], true )
 				.'</select>';
 			$custom_field_name .= ' <label class="text-normal"><input type="checkbox" name="custom_'.$type.'_public'.$i.'" value="1" '.( $custom_field['public'] ? ' checked="checked"' : '' ).' /> '.T_('Public').'</label>';
-			$Form->text_input( $field_id_suffix, $custom_field_label, $data[ 'size' ], $data[ 'label' ], $action_delete, array(
+			$Form->text_input( $field_id_suffix, $custom_field_label, $data[ 'size' ], $data[ 'label' ], $action_icons, array(
 					'maxlength'    => $data[ 'maxlength' ],
 					'input_prefix' => T_('Title').' ',
 					'input_suffix' => $custom_field_name,
@@ -270,7 +282,7 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 		echo '<input type="hidden" name="count_custom_'.$type.'" value='.( $i - 1 ).' />';
 		echo '<input type="hidden" name="deleted_custom_'.$type.'" value="'.$deleted_custom_fields.'" />';
 		// display link to create new custom field
-		$Form->info( '', '<a onclick="return false;" href="#" id="add_new_'.$type.'_custom_field">'.get_icon( 'add' ).' '.$data[ 'title' ].'</a>', '( '.$data[ 'note' ].' )' );
+		$Form->info( '', '<a onclick="return false;" href="#" class="add_new_custom_field" data-type="'.$type.'">'.get_icon( 'add' ).' '.$data[ 'title' ].'</a>', '( '.$data[ 'note' ].' )' );
 	}
 $Form->end_fieldset();
 
@@ -386,28 +398,85 @@ function guidGenerator()
 	return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4());
 }
 
-function add_new_custom_field( type, title, title_size )
+function add_new_custom_field( type, duplicated_field_obj )
 {
+	switch( type )
+	{
+		case 'double':
+			title = '<?php echo TS_('Numeric'); ?>';
+			break;
+		case 'computed':
+			title = '<?php echo TS_('Computed'); ?>';
+			break;
+		case 'varchar':
+			title = '<?php echo TS_('String'); ?>';
+			break;
+		case 'text':
+			title = '<?php echo TS_('Text'); ?>';
+			break;
+		case 'html':
+			title = 'HTML';
+			break;
+		case 'url':
+			title = '<?php echo TS_('URL'); ?>';
+			break;
+		case 'image':
+			title = '<?php echo TS_('Image'); ?>';
+			break;
+	}
+
+	// Set values:
+	var field_value_title = '';
+	var field_value_name = '';
+	var field_value_order = '';
+	var field_value_note = '';
+	var field_value_format = '';
+	var field_value_formula = '';
+	var field_value_link = '';
+	var field_value_line_highlight = '';
+	var field_value_green_highlight = '';
+	var field_value_red_highlight = '';
+	var field_value_public = '';
+	if( typeof( duplicated_field_obj ) != 'undefined' && duplicated_field_obj.length > 0 )
+	{
+		if( typeof( duplicated_count_custom_field ) == 'undefined' )
+		{
+			duplicated_count_custom_field = 0;
+		}
+		duplicated_count_custom_field++;
+		field_value_title = duplicated_field_obj.find( '.controls input[name^="custom_' + type + '"]:first' ).val();
+		field_value_name = duplicated_field_obj.find( 'input[name^="custom_' + type + '_fname"]' ).val() + '_' + duplicated_count_custom_field;
+		field_value_order = duplicated_field_obj.find( 'input[name^="custom_' + type + '_order"]' ).val();
+		field_value_note = duplicated_field_obj.find( 'input[name^="custom_' + type + '_note"]' ).val();
+		field_value_format = duplicated_field_obj.find( '[name^="custom_' + type + '_format"]' ).val();
+		field_value_formula = duplicated_field_obj.find( 'input[name^="custom_' + type + '_formula"]' ).val();
+		field_value_link = duplicated_field_obj.find( 'select[name^="custom_' + type + '_link"]' ).val();
+		field_value_line_highlight = duplicated_field_obj.find( 'select[name^="custom_' + type + '_line_highlight"]' ).val();
+		field_value_green_highlight = duplicated_field_obj.find( 'select[name^="custom_' + type + '_green_highlight"]' ).val();
+		field_value_red_highlight = duplicated_field_obj.find( 'select[name^="custom_' + type + '_red_highlight"]' ).val();
+		field_value_public = duplicated_field_obj.find( 'input[name^="custom_' + type + '_public"]' ).is( ':checked' );
+	}
+
 	var count_custom = jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value' );
 	count_custom++;
 	var custom_ID = guidGenerator();
-	var custom_field_inputs = '<?php echo str_replace( array( '$ID$' ), array( 'ffield_custom_\' + type + \'_\' + count_custom + \'' ), format_to_js( $Form->fieldstart ) ); ?>' +
+	var custom_field_inputs = '<?php echo str_replace( array( '$ID$' ), array( 'id="ffield_custom_\' + type + \'_\' + count_custom + \'"' ), format_to_js( $Form->fieldstart ) ); ?>' +
 			'<input type="hidden" name="custom_' + type + '_ID' + count_custom + '" value="' + custom_ID + '" />' +
 			'<input type="hidden" name="custom_' + type + '_new' + count_custom + '" value="1" />' +
 			'<?php echo format_to_js( $Form->labelstart ); ?><label for="custom_' + type + '_' + count_custom + '"<?php echo empty( $Form->labelclass ) ? '' : ' class="'.$Form->labelclass.'"'; ?>>' + title + ':</label><?php echo format_to_js( $Form->labelend ); ?>' +
 			'<?php echo format_to_js( $Form->inputstart ); ?>' +
-				'<?php echo TS_('Title'); ?> <input type="text" id="custom_' + type + '_' + count_custom + '" name="custom_' + type + '_' + count_custom + '" class="form_text_input form-control new_custom_field_title" maxlength="255" size="' + title_size + '" />' +
-				' <?php echo TS_('Name'); ?> <input type="text" name="custom_' + type + '_fname' + count_custom + '" value="" class="form_text_input form-control custom_field_name" maxlength="255" />' +
-				' <?php echo TS_('Order'); ?> <input type="text" name="custom_' + type + '_order' + count_custom + '" value="" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />' +
-				' <?php echo TS_('Note'); ?> <input type="text" name="custom_' + type + '_note' + count_custom + '" value="" class="form_text_input form-control custom_field_note" maxlength="255" size="30" />';
+				'<?php echo TS_('Title'); ?> <input type="text" id="custom_' + type + '_' + count_custom + '" name="custom_' + type + '_' + count_custom + '" value="' + field_value_title + '" class="form_text_input form-control new_custom_field_title" maxlength="255" size="20" />' +
+				' <?php echo TS_('Name'); ?> <input type="text" name="custom_' + type + '_fname' + count_custom + '" value="' + field_value_name + '" class="form_text_input form-control custom_field_name" maxlength="255" />' +
+				' <?php echo TS_('Order'); ?> <input type="text" name="custom_' + type + '_order' + count_custom + '" value="' + field_value_order + '" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />' +
+				' <?php echo TS_('Note'); ?> <input type="text" name="custom_' + type + '_note' + count_custom + '" value="' + field_value_note + '" class="form_text_input form-control custom_field_note" maxlength="255" size="30" />';
 	switch( type )
 	{
 		case 'double':
 		case 'computed':
-			custom_field_inputs += ' <?php echo TS_('Format'); ?> <input type="text" name="custom_' + type + '_format' + count_custom + '" value="" class="form_text_input form-control custom_field_format" maxlength="2000" size="20" />';
+			custom_field_inputs += ' <?php echo TS_('Format'); ?> <input type="text" name="custom_' + type + '_format' + count_custom + '" value="' + field_value_format + '" class="form_text_input form-control custom_field_format" maxlength="2000" size="20" />';
 			if( type == 'computed' )
 			{
-				custom_field_inputs += ' <?php echo TS_('Formula'); ?> <input type="text" name="custom_' + type + '_formula' + count_custom + '" value="" class="form_text_input form-control custom_field_formula" maxlength="2000" size="45" />';
+				custom_field_inputs += ' <?php echo TS_('Formula'); ?> <input type="text" name="custom_' + type + '_formula' + count_custom + '" value="' + field_value_formula + '" class="form_text_input form-control custom_field_formula" maxlength="2000" size="45" />';
 			}
 			break;
 		case 'image':
@@ -415,6 +484,25 @@ function add_new_custom_field( type, title, title_size )
 				echo Form::get_select_options_string( array_keys( $thumbnail_sizes ), 'fit-192x192' );
 			?></select>';
 			break;
+	}
+	var custom_field_input_link = '';
+	switch( type )
+	{
+		case 'image':
+			custom_field_input_link += '<?php echo Form::get_select_options_string( get_item_type_field_linkto_options( 'image' ), 'linkpermzoom', true ); ?>';
+			break;
+		case 'url':
+			custom_field_input_link += '<?php echo Form::get_select_options_string( get_item_type_field_linkto_options( 'url' ), 'fieldurl', true ); ?>';
+			break;
+		case 'double':
+		case 'varchar':
+		case 'computed':
+			custom_field_input_link += '<?php echo Form::get_select_options_string( get_item_type_field_linkto_options( 'double' ), 'nolink', true ); ?>';
+			break;
+	}
+	if( custom_field_input_link != '' )
+	{
+		custom_field_inputs += ' <?php echo TS_('Link to'); ?> <select type="text" name="custom_' + type + '_link' + count_custom + '" class="form-control custom_field_link">' + custom_field_input_link + '</select>';
 	}
 	custom_field_inputs += ' <?php echo TS_('Line highlight'); ?> <select type="text" name="custom_' + type + '_line_highlight' + count_custom + '" class="form-control custom_field_line_highlight">';
 	custom_field_inputs += type == 'image'
@@ -427,46 +515,46 @@ function add_new_custom_field( type, title, title_size )
 	custom_field_inputs += ' <?php echo TS_('Red highlight'); ?> <select type="text" name="custom_' + type + '_red_highlight' + count_custom + '" class="form-control custom_field_red_highlight"><?php
 		echo Form::get_select_options_string( $color_highlight_options, 'never', true );
 	?></select>';
+	var action_icons = '<?php echo format_to_js( get_icon( 'add', 'imgtag', array(
+			'class'     => 'duplicate_custom_field',
+			'data-type' => '$field_type$',
+			'style'     => 'cursor:pointer',
+			'title'     => T_('Duplicate custom field')
+		) ) );
+	?>';
+	action_icons = action_icons.replace( '$field_type$', type );
+	action_icons = '<?php echo format_to_js( $Form->note_format ); ?>'.replace( '%s', action_icons );
 	custom_field_inputs += 
 				' <label class="text-normal"><input type="checkbox" name="custom_' + type + '_public' + count_custom + '" value="1" checked="checked" /> <?php echo TS_('Public'); ?></label>' +
+			action_icons +
 			'<?php echo format_to_js( $Form->inputend.$Form->fieldend ); ?>';
-	jQuery( '#custom_' + type + '_field_list' ).append( custom_field_inputs );
+	if( typeof( duplicated_field_obj ) == 'undefined' || duplicated_field_obj.length == 0 )
+	{	// Add new field:
+		jQuery( '#custom_' + type + '_field_list' ).append( custom_field_inputs );
+	}
+	else
+	{	// Duplicate an existing field:
+		duplicated_field_obj.after( custom_field_inputs );
+		var new_field_obj = duplicated_field_obj.next();
+		new_field_obj.find( 'select[name^="custom_' + type + '_format"]' ).val( field_value_format );
+		new_field_obj.find( 'select[name^="custom_' + type + '_link"]' ).val( field_value_link );
+		new_field_obj.find( 'select[name^="custom_' + type + '_line_highlight"]' ).val( field_value_line_highlight );
+		new_field_obj.find( 'select[name^="custom_' + type + '_green_highlight"]' ).val( field_value_green_highlight );
+		new_field_obj.find( 'select[name^="custom_' + type + '_red_highlight"]' ).val( field_value_red_highlight );
+		console.log( field_value_public );
+		new_field_obj.find( 'input[name^="custom_' + type + '_public"]' ).prop( 'checked', field_value_public );
+	}
 	jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value', count_custom );
 }
 
-jQuery( '#add_new_double_custom_field' ).click( function()
+jQuery( '.add_new_custom_field' ).click( function()
 {
-	add_new_custom_field( 'double', '<?php echo TS_('Numeric'); ?>', 20 );
+	add_new_custom_field( jQuery( this ).data( 'type' ) );
 } );
 
-jQuery( '#add_new_computed_custom_field' ).click( function()
+jQuery( document ).on( 'click', '.duplicate_custom_field', function()
 {
-	add_new_custom_field( 'computed', '<?php echo TS_('Computed'); ?>', 20 );
-} );
-
-jQuery( '#add_new_varchar_custom_field' ).click( function()
-{
-	add_new_custom_field( 'varchar', '<?php echo TS_('String'); ?>', 20 );
-} );
-
-jQuery( '#add_new_text_custom_field' ).click( function()
-{
-	add_new_custom_field( 'text', '<?php echo TS_('Text'); ?>', 20 );
-} );
-
-jQuery( '#add_new_html_custom_field' ).click( function()
-{
-	add_new_custom_field( 'html', 'HTML', 20 );
-} );
-
-jQuery( '#add_new_url_custom_field' ).click( function()
-{
-	add_new_custom_field( 'url', '<?php echo TS_('URL'); ?>', 20 );
-} );
-
-jQuery( '#add_new_image_custom_field' ).click( function()
-{
-	add_new_custom_field( 'image', '<?php echo TS_('Image'); ?>', 20 );
+	add_new_custom_field( jQuery( this ).data( 'type' ), jQuery( this ).closest( 'div[id*="custom_' + jQuery( this ).data( 'type' ) + '"]' ) );
 } );
 
 jQuery( '[id^="delete_custom_"]' ).click( function()

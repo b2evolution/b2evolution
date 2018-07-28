@@ -266,7 +266,8 @@ class item_fields_compare_Widget extends ComponentWidget
 		foreach( $all_custom_fields as $c => $custom_field )
 		{
 			$all_custom_fields[ $c ]['is_different'] = false;
-			if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) )
+			$is_numeric_type = in_array( $custom_field['type'], array( 'double', 'computed' ) );
+			if( $is_numeric_type )
 			{	// Compare only numeric fields:
 				$all_custom_fields[ $c ]['highest_value'] = NULL;
 				$all_custom_fields[ $c ]['lowest_value'] = NULL;
@@ -279,10 +280,19 @@ class item_fields_compare_Widget extends ComponentWidget
 			// Compare values:
 			$prev_custom_field_value = NULL;
 			$i = 0;
+			$all_string_values_are_empty = ! $widget_fields;
 			foreach( $custom_field['items'] as $item_ID )
 			{
 				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 				$custom_field_value = $widget_Item->get_custom_field_value( $custom_field['name'] );
+
+				if( $all_string_values_are_empty &&
+				    ( ( ! $is_numeric_type && ! empty( $custom_field_value ) ) ||
+				      ( $is_numeric_type && ( ! empty( $custom_field_value ) || ! empty( $custom_field['format'] ) ) )
+				    ) )
+				{	// At least one field is not empty:
+					$all_string_values_are_empty = false;
+				}
 
 				// Check if the values are different from given line:
 				if( ! $all_custom_fields[ $c ]['is_different'] && $i > 0 )
@@ -316,8 +326,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				}
 				$prev_custom_field_value = $custom_field_value;
 
-				if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) &&
-				    is_numeric( $custom_field_value ) )
+				if( $is_numeric_type && is_numeric( $custom_field_value ) )
 				{	// Compare only numeric values:
 					// Search the highest value:
 					if( $all_custom_fields[ $c ]['highest_value'] === NULL ||
@@ -334,6 +343,11 @@ class item_fields_compare_Widget extends ComponentWidget
 					}
 				}
 				$i++;
+			}
+
+			if( $all_string_values_are_empty )
+			{	// Don't display row of custom field if values from all compared items are empty:
+				unset( $all_custom_fields[ $c ] );
 			}
 		}
 
@@ -469,6 +483,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'item_ID'      => isset( $Item ) ? $Item->ID : NULL, // Has the Item page changed? (this is important for disp=single|page because $this$ and $parent$ resolve differently depending on item ID)
 				'items'        => implode( ',', $items ), // Have the compared items changed? (Check firstly widget setting and then param from request) (this is important in case the same items are compared in different order)
+				'meta_settings'=> 1, // Have meta settings(any item type) changed?
 			);
 
 		// Add 1 cache key for each item that is being compared, in order to detect changes on each one:
