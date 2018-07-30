@@ -351,7 +351,9 @@ class item_fields_compare_Widget extends ComponentWidget
 			}
 		}
 
-		$this->disp_title( $this->disp_params['title'] );
+		echo $this->disp_params['block_start'];
+
+		$this->disp_title();
 
 		echo $this->disp_params['block_body_start'];
 
@@ -433,8 +435,6 @@ class item_fields_compare_Widget extends ComponentWidget
 		}
 
 		echo $params['fields_compare_table_end'];
-
-		echo $this->disp_params['block_start'];
 
 		echo $this->disp_params['block_body_end'];
 
