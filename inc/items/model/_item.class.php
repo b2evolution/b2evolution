@@ -2877,6 +2877,9 @@ class Item extends ItemLight
 				'field_format' => '<tr><th>$title$:</th><td>$value$</td></tr>', // $title$ $value$
 				'after'        => '</table>',
 				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
+				// Separate template for numeric fields:
+				// (To use templates for other field types('varchar', 'html', 'text', 'url', 'image', 'computed') replace 'double' with required type name)
+				'field_double_format' => '<tr><th>$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
 			), $params );
 
 		// Get all custom fields by item ID:
@@ -2915,12 +2918,15 @@ class Item extends ItemLight
 
 			$field = $custom_fields[ $field_name ];
 
+			// Use field format depending on type:
+			$field_format = isset( $params['field_'.$field['type'].'_format'] ) ? $params['field_'.$field['type'].'_format'] : $params['field_format'];
+
 			if( ! $field['public'] )
 			{	// Not public field:
 				if( ! empty( $params['fields'] ) )
 				{	// Display an error message only when fields are called by names:
 					$values = array( $field['label'], '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_name ).'</span>' );
-					$html .= str_replace( $mask, $values, $params['field_format'] );
+					$html .= str_replace( $mask, $values, $field_format );
 					$fields_exist = true;
 				}
 				continue;
@@ -2930,7 +2936,7 @@ class Item extends ItemLight
 			if( ! empty( $custom_field_value ) ||
 			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )
 			{	// Display only the filled field AND also numeric field with '0' value:
-				$html .= str_replace( $mask, array( $field['label'], $custom_field_value ), $params['field_format'] );
+				$html .= str_replace( $mask, array( $field['label'], $custom_field_value ), $field_format );
 				$fields_exist = true;
 			}
 		}
