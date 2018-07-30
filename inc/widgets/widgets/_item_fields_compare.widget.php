@@ -286,10 +286,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 				$custom_field_value = $widget_Item->get_custom_field_value( $custom_field['name'] );
 
-				if( $all_string_values_are_empty &&
-				    ( ( ! $is_numeric_type && ! empty( $custom_field_value ) ) ||
-				      ( $is_numeric_type && ( ! empty( $custom_field_value ) || ! empty( $custom_field['format'] ) ) )
-				    ) )
+				if( $all_string_values_are_empty && ! empty( $custom_field_value ) )
 				{	// At least one field is not empty:
 					$all_string_values_are_empty = false;
 				}
