@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'items/model/_itemtype.class.php', 'ItemType' );
 
-global $edited_Itemtype, $thumbnail_sizes;
+global $edited_Itemtype, $thumbnail_sizes, $admin_url;
 
 // Determine if we are creating or updating...
 global $action;
@@ -284,6 +284,20 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 		// display link to create new custom field
 		$Form->info( '', '<a onclick="return false;" href="#" class="add_new_custom_field" data-type="'.$type.'">'.get_icon( 'add' ).' '.$data[ 'title' ].'</a>', '( '.$data[ 'note' ].' )' );
 	}
+
+	// Add fields from another item type:
+	$SQL = new SQL( 'Get Item Types with custom fields' );
+	$SQL->SELECT( 'ityp_ID, ityp_name' );
+	$SQL->FROM( 'T_items__type' );
+	$SQL->FROM_add( 'INNER JOIN T_items__type_custom_field ON itcf_ityp_ID = ityp_ID' );
+	$SQL->WHERE( 'ityp_ID != '.$DB->quote( $edited_Itemtype->ID ) );
+	$SQL->GROUP_BY( 'ityp_ID' );
+	$item_type_with_custom_fields = $DB->get_assoc( $SQL );
+	$Form->select_input_array( 'another_item_type', '', $item_type_with_custom_fields, T_('Add fields from another item type'), '', array(
+			'force_keys_as_values' => true,
+			'field_suffix'         => '<button id="select_other_fields" type="button" class="btn btn-default">'.T_('Select fields').'...</button>',
+		) );
+
 $Form->end_fieldset();
 
 $SQL = new SQL();
@@ -387,6 +401,8 @@ else
 load_funcs( 'regional/model/_regional.funcs.php' );
 echo_regional_required_js( 'ityp_use_' );
 
+// Initialize JavaScript to build and open window:
+echo_modalwindow_js();
 ?>
 <script type="text/javascript">
 function guidGenerator()
@@ -398,7 +414,7 @@ function guidGenerator()
 	return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4());
 }
 
-function add_new_custom_field( type, duplicated_field_obj )
+function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data )
 {
 	switch( type )
 	{
@@ -437,8 +453,8 @@ function add_new_custom_field( type, duplicated_field_obj )
 	var field_value_green_highlight = '';
 	var field_value_red_highlight = '';
 	var field_value_public = '';
-	if( typeof( duplicated_field_obj ) != 'undefined' && duplicated_field_obj.length > 0 )
-	{
+	if( typeof( duplicated_field_obj ) != 'undefined' && duplicated_field_obj !== false && duplicated_field_obj.length > 0 )
+	{	// Get data from duplicated field of the current editing Item Type:
 		if( typeof( duplicated_count_custom_field ) == 'undefined' )
 		{
 			duplicated_count_custom_field = 0;
@@ -455,6 +471,20 @@ function add_new_custom_field( type, duplicated_field_obj )
 		field_value_green_highlight = duplicated_field_obj.find( 'select[name^="custom_' + type + '_green_highlight"]' ).val();
 		field_value_red_highlight = duplicated_field_obj.find( 'select[name^="custom_' + type + '_red_highlight"]' ).val();
 		field_value_public = duplicated_field_obj.find( 'input[name^="custom_' + type + '_public"]' ).is( ':checked' );
+	}
+	else if( typeof( duplicated_field_data ) != 'undefined' && duplicated_field_data.length > 0 )
+	{	// Get data from duplicated field from another selected Item Type:
+		field_value_title = duplicated_field_data.data( 'label' );
+		field_value_name = duplicated_field_data.data( 'name' );
+		field_value_order = duplicated_field_data.data( 'order' );
+		field_value_note = duplicated_field_data.data( 'note' );
+		field_value_format = duplicated_field_data.data( 'format' );
+		field_value_formula = duplicated_field_data.data( 'formula' );
+		field_value_link = duplicated_field_data.data( 'link' );
+		field_value_line_highlight = duplicated_field_data.data( 'line_highlight' );
+		field_value_green_highlight = duplicated_field_data.data( 'green_highlight' );
+		field_value_red_highlight = duplicated_field_data.data( 'red_highlight' );
+		field_value_public = duplicated_field_data.data( 'public' );
 	}
 
 	var count_custom = jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value' );
@@ -528,7 +558,7 @@ function add_new_custom_field( type, duplicated_field_obj )
 				' <label class="text-normal"><input type="checkbox" name="custom_' + type + '_public' + count_custom + '" value="1" checked="checked" /> <?php echo TS_('Public'); ?></label>' +
 			action_icons +
 			'<?php echo format_to_js( $Form->inputend.$Form->fieldend ); ?>';
-	if( typeof( duplicated_field_obj ) == 'undefined' || duplicated_field_obj.length == 0 )
+	if( typeof( duplicated_field_obj ) == 'undefined' || duplicated_field_obj === false || duplicated_field_obj.length == 0 )
 	{	// Add new field:
 		jQuery( '#custom_' + type + '_field_list' ).append( custom_field_inputs );
 	}
@@ -541,7 +571,6 @@ function add_new_custom_field( type, duplicated_field_obj )
 		new_field_obj.find( 'select[name^="custom_' + type + '_line_highlight"]' ).val( field_value_line_highlight );
 		new_field_obj.find( 'select[name^="custom_' + type + '_green_highlight"]' ).val( field_value_green_highlight );
 		new_field_obj.find( 'select[name^="custom_' + type + '_red_highlight"]' ).val( field_value_red_highlight );
-		console.log( field_value_public );
 		new_field_obj.find( 'input[name^="custom_' + type + '_public"]' ).prop( 'checked', field_value_public );
 	}
 	jQuery( 'input[name=count_custom_' + type + ']' ).attr( 'value', count_custom );
@@ -591,4 +620,66 @@ function parse_custom_field_name( field_name )
 {
 	return field_name.substr( 0, 36 ).replace( /[^a-z0-9\-_]/ig, '_' ).toLowerCase();
 }
+
+// Add fields from another item type:
+jQuery( '#select_other_fields' ).click( function()
+{
+	var selected_item_type_obj = jQuery( this ).prev();
+	openModalWindow( '<span class="loader_img absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
+		'80%', '', true,
+		'<?php echo TS_('Add fields from another item type'); ?>: ' + selected_item_type_obj.find( ':selected' ).html(),
+		'<?php echo TS_('Add fields now!'); ?>', true, true );
+	jQuery.ajax(
+	{
+		type: 'GET',
+		url: '<?php echo $admin_url; ?>',
+		data:
+		{
+			'ctrl': 'itemtypes',
+			'action': 'select_custom_fields',
+			'ityp_ID': '<?php echo $edited_Itemtype->ID; ?>',
+			'source_ityp_ID': selected_item_type_obj.val(),
+			'display_mode': 'js',
+		},
+		success: function( result )
+		{
+			openModalWindow( result, '80%', '', true,
+				'<?php echo TS_('Add fields from another item type'); ?>: ' + selected_item_type_obj.find( ':selected' ).html(),
+				'<?php echo TS_('Add fields now!'); ?>', false, true );
+		}
+	} );
+} );
+jQuery( document ).on( 'submit', 'form#itemtype_select_fields', function()
+{
+	jQuery( 'input[type=checkbox]:checked', this ).each( function()
+	{
+		var field_data_obj = jQuery( 'input[name=custom_field_data][data-name=' + jQuery( this ).val() + ']' );
+		if( ! field_data_obj.length )
+		{
+			return;
+		}
+		var field_type = field_data_obj.data( 'type' );
+		var existing_field = jQuery( 'input.custom_field_name[name^="custom_' + field_type + '_fname"][value=' + field_data_obj.data( 'name' ) + ']' );
+		if( existing_field.length )
+		{	// If the selected custom field already exists then update it:
+			var field_row = existing_field.parent();
+			field_row.find( 'input[name^="custom_' + field_type + '"]:first' ).val( field_data_obj.data( 'label' ) );
+			field_row.find( 'input[name^="custom_' + field_type + '_order"]' ).val( field_data_obj.data( 'order' ) );
+			field_row.find( 'input[name^="custom_' + field_type + '_note"]' ).val( field_data_obj.data( 'note' ) );
+			field_row.find( '[name^="custom_' + field_type + '_format"]' ).val( field_data_obj.data( 'format' ) );
+			field_row.find( 'input[name^="custom_' + field_type + '_formula"]' ).val( field_data_obj.data( 'formula' ) );
+			field_row.find( 'select[name^="custom_' + field_type + '_link"]' ).val( field_data_obj.data( 'link' ) );
+			field_row.find( 'select[name^="custom_' + field_type + '_line_highlight"]' ).val( field_data_obj.data( 'line_highlight' ) );
+			field_row.find( 'select[name^="custom_' + field_type + '_green_highlight"]' ).val( field_data_obj.data( 'green_highlight' ) );
+			field_row.find( 'select[name^="custom_' + field_type + '_red_highlight"]' ).val( field_data_obj.data( 'red_highlight' ) );
+			field_row.find( 'input[name^="custom_' + field_type + '_public"]' ).prop( 'checked', field_data_obj.data( 'public' ) );
+		}
+		else
+		{	// If the selected custom field doens't exist then duplicate it to current editing Item Type:
+			add_new_custom_field( field_data_obj.data( 'type' ), false, field_data_obj );
+		}
+	} );
+	closeModalWindow();
+	return false;
+} );
 </script>
