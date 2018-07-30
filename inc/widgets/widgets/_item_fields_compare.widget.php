@@ -134,14 +134,11 @@ class item_fields_compare_Widget extends ComponentWidget
 				'fields_compare_row_end'           => '</tr>',
 				'fields_compare_table_end'         => '</table></div>',
 				// Separate template for numeric fields:
-				// (To use templates for other field types('varchar', 'html', 'text', 'url', 'image', 'computed') replace 'double' with required type name)
-				'fields_compare_double_row_start'         => '<tr>',
-				'fields_compare_double_field_title'       => '<th>$field_title$:</th>',
-				'fields_compare_double_field_value'       => '<td class="right">$field_value$</td>',
-				'fields_compare_double_field_value_diff'  => '<td class="right bg-warning">$field_value$</td>',
-				'fields_compare_double_field_value_green' => '<td class="right bg-success">$field_value$</td>',
-				'fields_compare_double_field_value_red'   => '<td class="right bg-danger">$field_value$</td>',
-				'fields_compare_double_row_end'           => '</tr>',
+				// (To use templates for other field types('string', 'html', 'text', 'url', 'image', 'computed') replace 'numeric' with required type name)
+				'fields_compare_numeric_field_value'       => '<td class="right">$field_value$</td>',
+				'fields_compare_numeric_field_value_diff'  => '<td class="right bg-warning">$field_value$</td>',
+				'fields_compare_numeric_field_value_green' => '<td class="right bg-success">$field_value$</td>',
+				'fields_compare_numeric_field_value_red'   => '<td class="right bg-danger">$field_value$</td>',
 			), $params );
 
 		$items = $this->disp_params['items'];
@@ -455,9 +452,13 @@ class item_fields_compare_Widget extends ComponentWidget
 	 *
 	 * @param string Template name
 	 * @param string Custom field type: 'double', 'varchar', 'html', 'text', 'url', 'image', 'computed'
+	 * @return string HTML template
 	 */
 	function get_field_template( $template_name, $field_type = '' )
 	{
+		// Convert field types to non-devs names:
+		$field_type = ( $field_type == 'double' ? 'numeric' : ( $field_type == 'varchar' ? 'string' : $field_type ) );
+
 		if( isset( $this->disp_params['fields_compare_'.$field_type.'_'.$template_name] ) )
 		{	// Use special template for current type if it is defined:
 			return $this->disp_params['fields_compare_'.$field_type.'_'.$template_name];

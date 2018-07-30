@@ -2878,8 +2878,8 @@ class Item extends ItemLight
 				'after'        => '</table>',
 				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
 				// Separate template for numeric fields:
-				// (To use templates for other field types('varchar', 'html', 'text', 'url', 'image', 'computed') replace 'double' with required type name)
-				'field_double_format' => '<tr><th>$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
+				// (To use templates for other field types('string', 'html', 'text', 'url', 'image', 'computed') replace 'numeric' with required type name)
+				'field_numeric_format' => '<tr><th>$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
 			), $params );
 
 		// Get all custom fields by item ID:
@@ -2919,7 +2919,8 @@ class Item extends ItemLight
 			$field = $custom_fields[ $field_name ];
 
 			// Use field format depending on type:
-			$field_format = isset( $params['field_'.$field['type'].'_format'] ) ? $params['field_'.$field['type'].'_format'] : $params['field_format'];
+			$field_type = ( $field['type'] == 'double' ? 'numeric' : ( $field['type'] == 'varchar' ? 'string' : $field['type'] ) );
+			$field_format = isset( $params['field_'.$field_type.'_format'] ) ? $params['field_'.$field_type.'_format'] : $params['field_format'];
 
 			if( ! $field['public'] )
 			{	// Not public field:
