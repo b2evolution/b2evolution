@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @todo dh> Lazily handle properties through getters (and do not detect/do much in the constructor)!
@@ -1398,7 +1398,7 @@ class Hit
 				$SQL->WHERE_and( 'hit_agent_type = '.$DB->quote( $this->get_agent_type() ) );
 			}
 
-			if( $DB->get_var( $SQL->get(), 0, 0, $SQL->title ) )
+			if( $DB->get_var( $SQL, 0, 0 ) )
 			{
 				$Debuglog->add( 'Hit: No new view!', 'request' );
 				$this->_is_new_view = false;  // We don't want to log this hit again

@@ -14,7 +14,7 @@ global $Messages;
 // Get the ID of the post we are supposed to post-process:
 if( empty( $job_params['item_ID'] ) )
 {
-	$result_message = 'No item_ID parameter received.'; // No trans.
+	cron_log_append( 'No item_ID parameter received.', 'error' ); // No trans.
 	return 3;
 }
 
@@ -30,7 +30,7 @@ $DB->query( 'UPDATE T_items__item
 							  AND post_notifications_ctsk_ID = '.$job_params['ctsk_ID'] );
 if( $DB->rows_affected != 1 )
 {	// We could not "lock" the requested post
-	$result_message = sprintf( T_('Could not lock post #%d. It is probably being processed or has already been processed by another scheduled task.'), $item_ID );
+	cron_log_append( sprintf( T_('Could not lock post #%d. It is probably being processed or has already been processed by another scheduled task.'), $item_ID ) );
 	return 4;
 }
 
@@ -75,12 +75,15 @@ while( $edited_Item->get( 'status' ) != $previous_item_visibility_status )
 	// Destroy current Item to get most recent item from DB:
 	unset( $ItemCache->cache[ $edited_Item->ID ] );
 	$edited_Item = & $ItemCache->get_by_ID( $item_ID );
+
+	// Store messages of the post sending email notifications:
+	cron_log_action_end( $Messages->get_string( '', '', "\n", '' ) );
+	$Messages->clear();
 }
 
-$result_message = $Messages->get_string( '', '', "\n" );
 if( empty( $result_message ) )
 {
-	$result_message = T_('Done').'.';
+	cron_log_append( T_('Done').'.' );
 }
 
 return 1; /* ok */

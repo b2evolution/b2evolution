@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -28,7 +28,7 @@ else
 	$Form->begin_form( 'inskin' );
 
 	$Form->add_crumb( 'closeaccountform' );
-	$Form->hidden( 'redirect_to', url_add_param( $Blog->gen_blogurl(), 'disp=closeaccount', '&' ) );
+	$Form->hidden( 'redirect_to', $Blog->get( 'closeaccounturl', array( 'glue' => '&' ) ) );
 	$Form->hidden( 'action', 'closeaccount' );
 
 	// Display intro message
@@ -72,7 +72,6 @@ else
 		<?php echo T_( '255 characters max' ); ?>
 	</noscript>
 <?php
-	echo '</div>';
 
 	$Form->buttons( array( array( 'submit', 'submit', T_('Close my account now'), 'SaveButton' ) ) );
 

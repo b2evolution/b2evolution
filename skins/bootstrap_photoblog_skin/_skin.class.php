@@ -21,7 +21,7 @@ class bootstrap_photoblog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.2';
+	var $version = '6.10.3';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -77,8 +77,8 @@ class bootstrap_photoblog_Skin extends Skin
 	{
 		$supported_kinds = array(
 				'main' => 'no',
-				'std' => 'no',		// Blog
-				'photo' => 'yes',
+				'std' => 'yes',		// Blog
+				'photo' => 'maybe',
 				'forum' => 'no',
 				'manual' => 'no',
 				'group' => 'no',  // Tracker
@@ -435,11 +435,16 @@ class bootstrap_photoblog_Skin extends Skin
 		}
 		// Page link color
 		if ( $page_link_color = $this->get_setting( 'page_link_color' ) ) {
-			$custom_css .= '#skin_wrapper a, .evo_comment_title a, .panel-title .evo_comment_type { color: '.$page_link_color."; }\n";
+			$custom_css .= 'a, .evo_comment_title a, .panel-title .evo_comment_type { color: '.$page_link_color."; }\n";
+			// Pagination links:
+			$custom_css .= '.pagination > li > a, .pagination > li > span { color: '.$page_link_color."; }\n";
+			$custom_css .= '.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus { background-color: '.$page_link_color.'; border-color: '.$page_link_color."; }\n";
 		}
 		// Page link hover color
 		if ( $page_link_h_color = $this->get_setting( 'page_link_h_color' ) ) {
-			$custom_css .= '#skin_wrapper a:hover, .panel-title .evo_comment_type:hover { color: '.$page_link_h_color."; }\n";
+			$custom_css .= 'a:hover, .panel-title .evo_comment_type:hover { color: '.$page_link_h_color."; }\n";
+			// Pagination links:
+			$custom_css .= '.pagination > li > a:hover, .pagination > li > span:hover, .pagination > li > a:focus, .pagination > li > span:focus { color: '.$page_link_h_color."; }\n";
 		}
 		// Posts background color
 		if ( $well_color = $this->get_setting( 'well_color' ) ) {
@@ -474,28 +479,6 @@ class bootstrap_photoblog_Skin extends Skin
 		</style>';
 		add_headline( $custom_css );
 		}
-	}
-
-
-	/**
-	 * Check if we can display a widget container when access is denied to collection by current user
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function show_container_when_access_denied( $container_key )
-	{
-		global $Collection, $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
 
 

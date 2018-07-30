@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package htsrv
@@ -58,7 +58,7 @@ switch( $action )
 		/* exited */
 		break;
 
-	case 'closeaccount': 
+	case 'closeaccount':
 		// Close current user account and log out:
 
 		global $Session, $Messages, $UserSettings;
@@ -103,14 +103,14 @@ switch( $action )
 		}
 		else
 		{ // db update was unsuccessful
-			$Messages->add( T_( 'Unable to close your account. Please contact to system administrator.' ) );
+			$Messages->add_to_group( 'Unexpected error. Unable to close your account.', 'error', T_('Close account').':' );
 		}
 
 		header_redirect();
 		/* exited */
 		break;
 
-	case 'resetpassword': 
+	case 'resetpassword':
 		// Send password reset request by email:
 
 		global $servertimenow;
@@ -256,7 +256,7 @@ switch( $action )
 		break;
 
 
-	case 'changepwd': 
+	case 'changepwd':
 		// User clicked "Reset password NOW" link from an password reset email:
 
 		param( 'reqID', 'string', '' );
@@ -354,9 +354,9 @@ switch( $action )
 		break;
 
 
-	case 'activateacc_ez': 
+	case 'activateacc_ez':
 		// User clicked 'Activate NOW' or 'Reactivate NOW' from an account activation email with EASY activation process (first email or reminder):
-	
+
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
 
@@ -407,11 +407,11 @@ switch( $action )
 		$User->activate_from_Request();
 		$Messages->add( T_('Your account is now activated.'), 'success' );
 
-		header_redirect( redirect_after_account_activation() );
+		header_redirect( htmlspecialchars_decode( redirect_after_account_activation() ) );
 		/* exited */
 		break;
 
-	case 'activateacc_sec': 
+	case 'activateacc_sec':
 		// User clicked 'Activate NOW' or 'Reactivate NOW' from an account activation email with SECURE activation process (first email or reminder):
 		// fp> NOTE: I am not sure secure process works allows reminders.
 
@@ -469,15 +469,8 @@ switch( $action )
 			$Messages->add( T_( 'Your account is now activated.' ), 'success' );
 		}
 
-		// init redirect_to
-		$redirect_to = redirect_after_account_activation();
-
-		// Cleanup:
-		$Session->delete('core.activateacc.request_ids');
-		$Session->delete('core.activateacc.redirect_to');
-
 		// redirect Will save $Messages into Session:
-		header_redirect( $redirect_to );
+		header_redirect( htmlspecialchars_decode( redirect_after_account_activation() ) );
 		/* exited */
 		break;
 
@@ -657,7 +650,7 @@ if( $inskin && use_in_skin_login() )
 
 
 /**
- * Display one of the standard login management screens:
+ * Display one of the basic login management screens:
  */
 switch( $action )
 {

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -406,7 +406,7 @@ class LinkCache extends DataObjectCache
 	{
 		global $DB;
 
-		$links = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+		$links = $DB->get_results( $SQL );
 
 		// Load linked files into the FileCache
 		$this->load_linked_files( $links );
@@ -741,7 +741,7 @@ class LinkCache extends DataObjectCache
 		$SQL->FROM( 'T_links' );
 		$SQL->WHERE( 'link_file_ID = '.$DB->quote( $file_ID ) );
 		$SQL->ORDER_BY( 'link_ID' );
-		$links = $DB->get_results( $SQL->get() );
+		$links = $DB->get_results( $SQL );
 		foreach( $links as $row )
 		{ // Cache each matching object:
 			$this->add( new Link( $row ), 'file' );

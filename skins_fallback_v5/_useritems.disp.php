@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -28,7 +28,6 @@ $user_ItemList->no_results_text = $params['user_itemlist_no_results'];
 // Initialize Results object
 items_results( $user_ItemList, array(
 		'field_prefix'       => $user_ItemList->param_prefix,
-		'display_permalink'  => false,
 		'display_title_flag' => false,
 		'display_ord'        => false,
 		'display_history'    => false,

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois PLANQUE - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois PLANQUE - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -182,13 +182,28 @@ function evo_link_change_order( event_object, link_ID, action )
 	{
 		// Change an order in the attachments table
 		var row = jQuery( event_object ).closest( 'tr' );
+		var currentEl = row.find( 'span[data-order]' );
 		if( action == 'move_up' )
 		{	// Move up:
+			var currentOrder = currentEl.attr( 'data-order' );
+			var previousRow = jQuery( row.prev() );
+			var previousEl = previousRow.find( 'span[data-order]' );
+			var previousOrder = previousEl.attr( 'data-order' );
+
 			row.prev().before( row );
+			currentEl.attr( 'data-order', previousOrder );
+			previousEl.attr( 'data-order', currentOrder );
 		}
 		else
 		{	// Move down:
+			var currentOrder = currentEl.attr( 'data-order' );
+			var nextRow = jQuery( row.next() );
+			var nextEl = nextRow.find( 'span[data-order]' );
+			var nextOrder = nextEl.attr( 'data-order' );
+
 			row.next().after( row );
+			currentEl.attr( 'data-order', nextOrder );
+			nextEl.attr( 'data-order', currentOrder );
 		}
 		evoFadeSuccess( row );
 	},
@@ -219,7 +234,7 @@ function evo_link_attach( type, object_ID, root, path )
 	},
 	function( data )
 	{
-		var table_obj = jQuery( '#attachments_fieldset_table table', window.parent.document );
+		var table_obj = jQuery( '#attachments_fieldset_table .results table', window.parent.document );
 		var table_parent = table_obj.parent;
 		var results_obj = jQuery( data.list_content );
 		table_obj.replaceWith( jQuery( 'table', results_obj ) ).promise().done( function( e ) {
@@ -295,4 +310,45 @@ function evo_link_refresh_list( type, object_ID, action )
 	}
 
 	return false;
+}
+
+/**
+ * Sort list of Item/Comment attachments based on link_order
+ */
+function evo_link_sort_list()
+{
+	var rows = jQuery( 'tr', 'tbody#filelist_tbody' );
+	rows.sort( function( a, b )	{
+		var A = parseInt( jQuery( 'span[data-order]', a ).attr( 'data-order' ) );
+		var B = parseInt( jQuery( 'span[data-order]', b ).attr( 'data-order' ) );
+
+		if( ! A ) A = rows.length;
+		if( ! B ) B = rows.length;
+
+		if( A < B )
+		{
+			return -1;
+		}
+
+		if( B < A )
+		{
+			return 1;
+		}
+
+		return 0;
+	} );
+
+	var previousRow;
+	$.each( rows, function( index, row ) {
+		if( index === 0 )
+		{
+			jQuery( row ).prependTo( 'tbody#filelist_tbody' );
+			previousRow = row;
+		}
+		else
+		{
+			jQuery( row ).insertAfter( previousRow );
+			previousRow = row;
+		}
+	} );
 }

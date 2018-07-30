@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -268,6 +268,22 @@ class Plugin
 	 */
 	var $template;
 
+	/**
+	 * Plugin actions
+	 * List of actions that the plugin supports
+	 *
+	 * @var array
+	 */
+	var $plugin_actions = array();
+
+	/**
+	 * Widget icon name.
+	 * Use icon name from http://fontawesome.io/icons/
+	 *
+	 * @var string
+	 */
+	var $widget_icon = 'puzzle-piece';
+
 	/**#@-*/
 
 
@@ -384,6 +400,16 @@ class Plugin
 		{ // Merge default params with current skin params
 			$this->template = array_merge( $params, $skin_template );
 		}
+
+		if( ! empty( $this->template['toolbar_title_after'] ) )
+		{ // Add toolbar info icon after the title
+			$toolbar_params = array(
+					'tooltip_field' => 'name',
+					'tooltip_placement' => 'top',
+					'info_suffix_text' => '',
+					'icon_color' => 'gray' );
+			$this->template['toolbar_title_after'] = $this->get_help_link( '', 'info', true, $toolbar_params ).$this->template['toolbar_title_after'];
+		}
 	}
 
 
@@ -496,7 +522,7 @@ class Plugin
 	 *        'min_count': minimum count of sets (optional, default is no restriction)
 	 *	   'fileselect': opens a modal window to select file. The following can be set for this type:
 	 *        'root': default root
-	 *		  'path': default path
+	 *        'path': default path
 	 *        'thumbnail_size': thumbnail size
 	 *        'max_file_num': maximum number of files
 	 *        'initialize_with': initial value
@@ -504,6 +530,7 @@ class Plugin
 	 *        'inputs': an array of setting parameters
 	 *     'info': a form info field with label and info text see {@link Form::info()}; you must set 'info' for text.
 	 *     'color': a form color picker field, use 'defaultvalue' in format '#FFFFFF'
+	 *     'usertag': an input field to enter user tags
 	 * 'note' (gets displayed as a note to the param field),
 	 * 'info': Text for param with type 'info'
 	 * 'size': Size of the HTML input field (applies to types 'text', 'password' and 'integer'; defaults to 15)
@@ -2967,10 +2994,38 @@ class Plugin
 	{
 	}
 
+
+	/**
+	 * Event handler: Called right after displaying the admin users list.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
+	 */
+	function AdminAfterUsersList( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
 	// }}}
 
 
 	// General events: {{{
+
+	/**
+	 * Event handler: Return data to display captcha html code
+	 *
+	 * @param array Associative array of parameters:
+	 *   - 'Form':          Form object
+	 *   - 'form_type':     Form type
+	 *   - 'form_position': Current form position where this event is called
+	 * @return array Associative array of parameters:
+	 *   - 'captcha_position': Captcha position where current plugin must be displayed for the requested form type
+	 *   - 'captcha_html':     Captcha html code
+	 */
+	function RequestCaptcha( & $params )
+	{
+	}
+
 
 	/**
 	 * Event handler: general event to inject payload for a captcha test.
@@ -3593,14 +3648,21 @@ class Plugin
 	 * @param boolean TRUE - to add info to display it in tooltip on mouseover
 	 * @return string The html A tag, linking to the help (or empty in case of $readme, if there is none).
 	 */
-	function get_help_link( $target = '', $icon = 'help', $use_tooltip = true )
+	function get_help_link( $target = '', $icon = 'help', $use_tooltip = true, $params = array() )
 	{
 		static $target_counter = 0;
 		$title = '';
 		$word = '';
 		$link_attribs = array( 'target' => '_blank', 'id' => 'anchor_help_plugin_'.$this->ID.'_'.$target_counter++ );
+		$params = array_merge( array(
+				'tooltip_field'    => 'long_desc',
+				'tooltip_placement'=> 'right',
+				'info_suffix_text' => '<p><strong>'
+						.sprintf( T_('Click %s to access full documentation for this plugin'), get_icon( 'help' ) )
+						.'</strong></p>',
+				'icon_color'       => NULL,
+			), $params );
 
-		$info_suffix_text = '';
 		if( empty( $target ) || in_array( $target, array( '$help_url', '$apply_rendering', '$widget_url' ) ) )
 		{
 			if( $target == '$apply_rendering' )
@@ -3615,13 +3677,20 @@ class Plugin
 			if( $use_tooltip )
 			{ // Add these data only for tooltip
 				$link_attribs['class'] = 'action_icon help_plugin_icon';
-				$link_attribs['rel'] = format_to_output( $this->long_desc, 'htmlspecialchars' );
+				$link_attribs['rel'] = format_to_output( isset( $this->{$params['tooltip_field']} ) ? $this->{$params['tooltip_field']} : $this->long_desc, 'htmlspecialchars' );
+				if( isset( $params['icon_color'] ) )
+				{
+					$link_attribs['style'] = 'color: '.$params['icon_color'].';';
+				}
+				if( ! empty( $params['info_suffix_text'] ) )
+				{
+					$link_attribs['data-info-suffix-text'] = format_to_output( $params['info_suffix_text'], 'htmlspecialchars' );
+				}
+				$link_attribs['data-tooltip-placement'] = $params['tooltip_placement'];
 			}
 
 			// Display additional info for help plugin icon only one time. It is used on plugins.js
-			$info_suffix_text = '<div id="help_plugin_info_suffix" style="display:none"><p><strong>'
-					.sprintf( T_('Click %s to access full documentation for this plugin'), get_icon( 'help' ) )
-				.'</strong></p></div>';
+			//$info_suffix_text = $params['info_suffix_text'];
 		}
 		elseif( $target == '$readme' )
 		{ // README
@@ -3641,7 +3710,7 @@ class Plugin
 			debug_die( 'Invalid get_help_link() target: '.$target );
 		}
 
-		return action_icon( $title, $icon, $url, $word, 4, 1, $link_attribs ).$info_suffix_text;
+		return action_icon( $title, $icon, $url, $word, 4, 1, $link_attribs );
 	}
 
 
@@ -3866,9 +3935,10 @@ class Plugin
 	 * @param string Setting name
 	 * @param object Blog collection
 	 * @param boolean TRUE - to allow empty Blog, it is used to get default value when Blog is not defined, e.g. in case with Messages
+	 * @param string Input group name
 	 * @return string Setting value
 	 */
-	function get_coll_setting( $parname, & $Blog, $allow_null_blog = false )
+	function get_coll_setting( $parname, & $Blog, $allow_null_blog = false, $group = NULL )
 	{
 		if( empty( $Blog ) )
 		{ // Blog is not defined
@@ -3886,7 +3956,29 @@ class Plugin
 			// Name of the setting in the blog settings:
 			$blog_setting_name = 'plugin'.$this->ID.'_'.$parname;
 
-			$value = $Blog->get_setting( $blog_setting_name );
+			if( strpos( $blog_setting_name, '[' ) !== false )
+			{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
+				$setting_names = explode( '[', $blog_setting_name );
+				$value = $Blog->get_setting( $setting_names[0] );
+				unset( $setting_names[0] );
+				foreach( $setting_names as $setting_name )
+				{
+					$setting_name = trim( $setting_name, ']' );
+					if( isset( $value[ $setting_name ] ) )
+					{
+						$value = $value[ $setting_name ];
+					}
+					else
+					{
+						$value = NULL;
+						break;
+					}
+				}
+			}
+			else
+			{	// Get normal(not array) setting value:
+				$value = $Blog->get_setting( $blog_setting_name );
+			}
 
 			if( ! is_null( $value ) )
 			{ // We have a value for this param:
@@ -3897,7 +3989,47 @@ class Plugin
 		}
 
 		// Try default values:
-		return $this->get_coll_default_setting( $parname, $blog_type );
+		return $this->get_coll_default_setting( $parname, $blog_type, $group );
+	}
+
+
+	/**
+	 * Get default value of plugin setting
+	 *
+	 * @param string Setting name
+	 * @param array Config array of plugin settings
+	 * @param string Input group name
+	 * @return mixed Default value
+	 */
+	function get_default_setting( $parname, $params, $group = NULL )
+	{
+		if( $group === NULL )
+		{	// Get default value from sinple field:
+			if( isset( $params[$parname]['type'] ) && $params[$parname]['type'] == 'checklist' &&
+			    ! empty( $params[$parname]['options'] ) && is_array( $params[$parname]['options'] ) )
+			{	// Get default values for checklist:
+				$param_defaults = array();
+				foreach( $params[$parname]['options'] as $param_option )
+				{
+					$param_defaults[ $param_option[0] ] = $param_option[2];
+				}
+				return $param_defaults;
+			}
+			elseif( isset( $params[$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$parname]['defaultvalue'];
+			}
+		}
+		else
+		{	// Get default value from input group field:
+			$parname = substr( $parname, strlen( $group ) );
+			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
+			}
+		}
+
+		return NULL;
 	}
 
 
@@ -3906,18 +4038,15 @@ class Plugin
 	 *
 	 * @param string Setting name
 	 * @param string Blog type
+	 * @param string Input group name
 	 * @return string Setting value
 	 */
-	function get_coll_default_setting( $parname, $blog_type = 'std' )
+	function get_coll_default_setting( $parname, $blog_type = 'std', $group = NULL )
 	{
 		$tmp_params = array( 'for_editing' => true, 'blog_type' => $blog_type );
 		$params = $this->get_coll_setting_definitions( $tmp_params );
-		if( isset( $params[$parname]['defaultvalue'] ) )
-		{ // We have a default value:
-			return $params[$parname]['defaultvalue'] ;
-		}
 
-		return NULL;
+		return $this->get_default_setting( $parname, $params, $group );
 	}
 
 
@@ -3980,9 +4109,10 @@ class Plugin
 	 * Get a message specific param value
 	 *
 	 * @param string Setting name
+	 * @param string Input group name
 	 * @return string Setting value
 	 */
-	function get_msg_setting( $parname )
+	function get_msg_setting( $parname, $group = NULL )
 	{
 		if( empty( $this->Settings ) )
 		{
@@ -4001,21 +4131,18 @@ class Plugin
 		// Try default values:
 		$tmp_params = array( 'for_editing' => true );
 		$params = $this->get_msg_setting_definitions( $tmp_params );
-		if( isset( $params[$parname]['defaultvalue'] ) )
-		{ // We have a default value:
-			return $params[$parname]['defaultvalue'] ;
-		}
 
-		return NULL;
+		return $this->get_default_setting( $parname, $params, $group );
 	}
 
 	/**
 	 * Get a email specific param value
 	 *
 	 * @param string Setting name
+	 * @param string Input group name
 	 * @return string Setting value
 	 */
-	function get_email_setting( $parname )
+	function get_email_setting( $parname, $group = NULL )
 	{
 		if( empty( $this->Settings ) )
 		{
@@ -4034,12 +4161,8 @@ class Plugin
 		// Try default values:
 		$tmp_params = array( 'for_editing' => true );
 		$params = $this->get_email_setting_definitions( $tmp_params );
-		if( isset( $params[$parname]['defaultvalue'] ) )
-		{ // We have a default value:
-			return $params[$parname]['defaultvalue'] ;
-		}
 
-		return NULL;
+		return $this->get_default_setting( $parname, $params, $group );
 	}
 
 
@@ -4073,6 +4196,18 @@ class Plugin
 				// Never enabled
 				return false;
 		}
+	}
+
+
+	/**
+	 * This method checks if the plugin can process the requested action
+	 *
+	 * @param string Action
+	 * @return boolean TRUE if the plugin can process the action, otherwise FALSE
+	 */
+	function is_plugin_action( $action )
+	{
+		return in_array( $action, $this->plugin_actions );
 	}
 
 

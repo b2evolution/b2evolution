@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,8 @@ load_class( 'widgets/widgets/_coll_item_list.widget.php', 'coll_item_list_Widget
  */
 class coll_flagged_list_Widget extends coll_item_list_Widget
 {
+	var $icon = 'flag-o';
+
 	/**
 	 * Constructor
 	 */

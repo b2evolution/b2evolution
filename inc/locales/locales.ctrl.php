@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -15,6 +15,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Check minimum permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'view', true );
 
 load_funcs('locales/model/_translation.funcs.php');
@@ -267,11 +268,11 @@ switch( $action )
 		unset( $locales );
 
 		// Get all enabled locales before restoring:
-		$locale_SQL = new SQL();
+		$locale_SQL = new SQL( 'Get all enabled locales before restoring' );
 		$locale_SQL->SELECT( 'loc_locale' );
 		$locale_SQL->FROM( 'T_locales' );
 		$locale_SQL->WHERE( 'loc_enabled = 1' );
-		$enabled_locales = $DB->get_col( $locale_SQL->get(), 0, 'Get all enabled locales before restoring' );
+		$enabled_locales = $DB->get_col( $locale_SQL );
 
 		// Delete locales that are not enabled and have no file currently:
 		$q = $DB->query( 'DELETE FROM T_locales

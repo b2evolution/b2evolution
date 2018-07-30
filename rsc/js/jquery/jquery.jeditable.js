@@ -108,7 +108,6 @@
                         
             /* Save this to self because this changes when scope changes. */
             var self = this;
-            var $self = $(self);
 
             /* Inlined block elements lose their width and height after first edit. */
             /* Save them for later use as workaround. */
@@ -121,78 +120,6 @@
             /* If element is empty add something clickable (if requested) */
             if (!$.trim($(this).html())) {
                 $(this).html(settings.placeholder);
-            }
-
-            if( settings.type == 'select' && settings.width == 'input' ) {
-                self.revert     = $(self).html();
-
-                /* Create the form object. */
-                var form = $('<form />');
-
-                /* Apply css or style or both. */
-                if (settings.cssclass) {
-                    if ('inherit' == settings.cssclass) {
-                        form.attr('class', $(self).attr('class'));
-                    } else {
-                        form.attr('class', settings.cssclass);
-                    }
-                }
-
-                if (settings.style) {
-                    if ('inherit' == settings.style) {
-                        form.attr('style', $(self).attr('style'));
-                        /* IE needs the second line or display wont be inherited. */
-                        form.css('display', $(self).css('display'));
-                    } else {
-                        form.attr('style', settings.style);
-                    }
-                }
-
-                /* Add main input element to form and store it in input. */
-                var input = element.apply(form, [settings, self]);
-
-                /* Set input content via POST, GET, given data or existing value. */
-                var input_content;
-
-                if (settings.loadurl) {
-                    var t = setTimeout(function() {
-                        input.disabled = true;
-                        content.apply(form, [settings.loadtext, settings, self]);
-                    }, 100);
-
-                    var loaddata = {};
-                    loaddata[settings.id] = self.id;
-                    if ($.isFunction(settings.loaddata)) {
-                        $.extend(loaddata, settings.loaddata.apply(self, [self.revert, settings]));
-                    } else {
-                        $.extend(loaddata, settings.loaddata);
-                    }
-                    $.ajax({
-                       type : settings.loadtype,
-                       url  : settings.loadurl,
-                       data : loaddata,
-                       async : false,
-                       success: function(result) {
-                          window.clearTimeout(t);
-                          input_content = result;
-                          input.disabled = false;
-                       }
-                    });
-                } else if (settings.data) {
-                    input_content = settings.data;
-                    if ($.isFunction(settings.data)) {
-                        input_content = settings.data.apply(self, [self.revert, settings]);
-                    }
-                } else {
-                    input_content = self.revert;
-                }
-                content.apply(form, [input_content, settings, self]);
-
-                $self.append(form);
-                var selectWidth = $self.outerWidth();
-                $(form).remove();
-
-                $self.css({ 'min-width': selectWidth+'px' });
             }
 
 

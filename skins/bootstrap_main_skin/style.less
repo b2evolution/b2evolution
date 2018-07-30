@@ -43,7 +43,7 @@
 	// Important for hiding "Slide down" arrow behind this div
 	position: relative;
 	z-index: 1;
-	
+
 	width: 100%;
 	p {
 		margin-top: 10px;
@@ -168,52 +168,8 @@ body.pictured {
 	}
 }
 
-// Login widget form
-.widget_core_user_login {
-	#login_form {
-		.form-group {
-			margin: 0;
-		}
-		label {
-			text-align: left;
-			width: 160px;
-			padding-left: 0;
-		}
-		.controls {
-			padding: 0;
-			width: 100%;
-		}
-		.form_text_input.form-control {
-			width: 100%;
-		}
-	}
-	.submit {
-		font-size: 12px;
-	}
-	.field_login_btn {
-		.panel {
-			margin: 0;
-			border: none;
-			border-radius: 0;
-			box-shadow: none;
-			.panel-body {
-				padding-left: 0;
-				padding-right: 0;
-				padding-bottom: 0;
-				#submit_login_form {
-					margin-right: 10px;
-				}
-			}
-		}
-	}
-	.register_link {
-		display: block;
-		padding-top: 10px;
-	}
-}
-
 // Register widget form
-.widget_core_user_register {
+.widget_core_user_register_quick {
 	#register_form {
 		.form-group {
 			margin: 0;
@@ -244,9 +200,6 @@ body.pictured {
 				padding-left: 0;
 				padding-right: 0;
 				padding-bottom: 0;
-				#submit_login_form {
-					margin-right: 10px;
-				}
 			}
 		}
 	}
@@ -384,6 +337,7 @@ div.bSideItem {
 }
 .evo_panel__login {
 	max-width: 400px;
+	min-width: auto;
 }
 .evo_panel__lostpass {
 	max-width: 480px;
@@ -399,16 +353,36 @@ div.bSideItem {
 }
 .evo_panel__register {
 	max-width: 580px;
-	.control-buttons{
-		text-align: left;
-	}
-	&.register-disabled {
-		width: 350px;
-	}
 	.form-control {
 		&#country, &#u {
 			width: 100%;
 		}
+	}
+	#fieldset_wrapper_captcha_qstn .panel {
+		margin: 0;
+		div[id$=_answer] .control-label {
+			padding-right: 14px;
+		}
+	}
+	.panel-body {
+		padding: 15px;
+		p:last-child {
+			margin-bottom: 0;
+		}
+	}
+}
+@media (min-width: 768px) {
+	#fieldset_wrapper_captcha_qstn .panel div[id$=_answer] {
+		max-height: 34px;
+	}
+}
+.evo_register_buttons {
+	text-align: center;
+	input.btn {
+		margin: 0 0 15px 0;
+	}
+	a.btn {
+		margin: 0;
 	}
 }
 .evo_form__login_links {
@@ -465,10 +439,13 @@ div.action_messages, div.log_container {
 // Positions on the action buttons near page titles
 .evo_post_title {
 	display: table;
+	h1 {
+		margin-bottom: 0;
+	}
 	h2 {
 		display: table-cell;
 		margin: 0;
-		padding: 20px 0 10px;
+		padding: 20px 0 0;
 	}
 	.btn-group {
 		display: table-cell;
@@ -541,11 +518,30 @@ body.pictured .secondary_area .widget_core_org_members {
 		text-align: center;
 		opacity: 0.5;
 		transition: 0.1s all;
-		position:relative; 
+		position:relative;
 		left:-50%;
 		&:hover {
 			cursor: pointer;
 			opacity: 0.9;
 		}
+	}
+}
+
+// Comment footer
+.evo_content_block .evo_comment {
+	.evo_comment_footer {
+		.action_btn_group {
+			float: right;
+		}
+	}
+
+	.comment_edit_btn {
+		margin-right: 5px;
+	}
+
+	// Fix buttons for comment actions
+	.btn-group>.btn.first-child {
+		border-top-left-radius: 3px !important;
+		border-bottom-left-radius: 3px !important;
 	}
 }

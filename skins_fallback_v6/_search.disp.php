@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -42,6 +42,7 @@ skin_widget( array(
 		'search_submit_before' => $params['search_submit_before'],
 		'search_submit_after'  => $params['search_submit_after'],
 		'use_search_disp'      => 1,
+		'show_advanced_options' => true
 	) );
 // ------------------------- END OF SEARCH FORM WIDGET -------------------------
 

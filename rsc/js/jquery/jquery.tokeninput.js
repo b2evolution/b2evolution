@@ -204,11 +204,11 @@ $.TokenList = function (input, url_or_data, settings) {
             hide_dropdown();
             if( $(this).val() != "" )
             {
-                $( ".token-input-list-facebook" ).addClass( "warning" );
+                $( "ul." + settings.idPrefix + input.id ).addClass( "warning" );
             }
             else
             {
-                $( ".token-input-list-facebook" ).removeClass( "warning" );
+                $( "ul." + settings.idPrefix + input.id ).removeClass( "warning" );
             }
             //$(this).val("");
         })
@@ -318,7 +318,7 @@ $.TokenList = function (input, url_or_data, settings) {
 
     // The list to store the token items in
     var token_list = $("<ul />")
-        .addClass(settings.classes.tokenList)
+        .addClass(settings.classes.tokenList + ' ' + settings.idPrefix + input.id)
         .click(function (event) {
             var li = $(event.target).closest("li");
             if(li && li.get(0) && $.data(li.get(0), "tokeninput")) {
@@ -530,7 +530,7 @@ $.TokenList = function (input, url_or_data, settings) {
 
         // Clear input box
         input_box.val("");
-        $(".token-input-list-facebook").removeClass("warning");
+        $("ul." + settings.idPrefix + input.id).removeClass("warning");
 
         // Don't show the help dropdown, they've got the idea
         hide_dropdown();

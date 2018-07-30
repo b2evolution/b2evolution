@@ -77,7 +77,7 @@ if( !empty( $g ) )
 	$count_SQL->WHERE_and( 'cgr_user_ID = '.$current_User->ID );
 
 	// Get info of filtered group
-	$group_filtered_SQL = new SQL();
+	$group_filtered_SQL = new SQL( 'Get info of filtered contact group #'.$g );
 	$group_filtered_SQL->SELECT( 'cgr_ID AS ID, cgr_name AS name, COUNT(cgu_user_ID) AS count_users' );
 	$group_filtered_SQL->FROM( 'T_messaging__contact_groups' );
 	$group_filtered_SQL->FROM_add( 'LEFT JOIN T_messaging__contact_groupusers ON cgu_cgr_ID = cgr_ID' );
@@ -85,7 +85,7 @@ if( !empty( $g ) )
 	$group_filtered_SQL->WHERE_and( 'cgr_user_ID = '.$current_User->ID );
 	$group_filtered_SQL->GROUP_BY( 'cgr_ID' );
 
-	$group_filtered = $DB->get_row( $group_filtered_SQL->get() );
+	$group_filtered = $DB->get_row( $group_filtered_SQL );
 }
 
 // Create result set:
@@ -271,7 +271,7 @@ if( in_array( 'login', $show_columns ) )
 		{
 			if( $link )
 			{
-				$login_text = get_user_identity_link( $User->login, $User->ID, 'user', 'login' );
+				$login_text = get_user_identity_link( $User->login, $User->ID, 'profile', 'login' );
 				if( $User->check_status( 'is_closed' ) )
 				{ // add (closed account) note to corresponding contacts!
 					$login_text .= '<span class="note">('.T_( 'closed account' ).')</span>';

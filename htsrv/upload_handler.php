@@ -85,11 +85,10 @@ class UploadHandler {
 
 		while( ! feof( $target ) )
 		{
-			$curr_mem_usage = memory_get_usage( true );
-			if( ( $memory_limit - $curr_mem_usage ) < 8192 )
+			if( $memory_limit != -1 && ( $memory_limit - memory_get_usage( true ) ) < 8192 )
 			{ // Don't try to load the next portion of image into the memory because it would cause 'Allowed memory size exhausted' error
 				fclose( $temp );
-				return array( 'error' => T_('') );
+				return array( 'error' => T_('Out of memory.') );
 			}
 			$contents .= fread( $target, 8192 );
 		}
@@ -132,7 +131,7 @@ class UploadHandler {
 		if( $this->toBytes( ini_get( 'post_max_size' ) ) < $this->sizeLimit || $this->toBytes( ini_get( 'upload_max_filesize') ) < $this->sizeLimit )
 		{
 			$neededRequestSize = max( 1, $this->sizeLimit / 1024 / 1024 ) . 'M';
-			return array( 'error' => sprintf( T_('Server error. Increase post_max_size and upload_max_filesize to %s'), $neededRequestSize ) );
+			return array( 'error' => sprintf( /* NO TRANS for sysadmins */ 'Server error. Increase post_max_size and upload_max_filesize to %s', $neededRequestSize ) );
 		}
 
 		$type = $_SERVER['CONTENT_TYPE'];
@@ -143,11 +142,11 @@ class UploadHandler {
 
 		if( !isset( $type ) )
 		{
-			return array( 'error' => T_('No files were uploaded.') );
+			return array( 'error' => T_('No file was uploaded.') );
 		}
 		elseif ( strpos( strtolower( $type ), 'multipart/' ) !== 0 )
 		{
-			return array( 'error' => T_('Server error. Not a multipart request. Please set forceMultipart to default value (true).') );
+			return array( 'error' => /* NO TRANS for sysadmins */ 'Server error. Not a multipart request. Please set forceMultipart to default value (true).' );
 		}
 
 		// Get size and name
@@ -202,7 +201,7 @@ class UploadHandler {
 			$partIndex = ( int ) $_REQUEST['qqpartindex'];
 			if( ! is_writable( $chunksFolder ) )
 			{
-				return array( 'error' => T_('Server error. Chunks directory isn\'t writable or executable.') );
+				return array( 'error' => /* NO TRANS for sysadmins */ 'Server error. Chunks directory isn\'t writable or executable.' );
 			}
 			$targetFolder = $this->chunksFolder.DIRECTORY_SEPARATOR.$uuid;
 			if( ! file_exists( $targetFolder ) )
@@ -225,11 +224,10 @@ class UploadHandler {
 
 			while( ! feof( $temp ) )
 			{
-				$curr_mem_usage = memory_get_usage( true );
-				if( ( $memory_limit - $curr_mem_usage ) < 8192 )
+				if( $memory_limit != -1 && ( $memory_limit - memory_get_usage( true ) ) < 8192 )
 				{ // Don't try to load the next portion of image into the memory because it would cause 'Allowed memory size exhausted' error
 					fclose( $temp );
-					return array( 'error' => T_('') );
+					return array( 'error' => T_('Out of memory.') );
 				}
 				$contents .= fread( $temp, 8192 );
 			}
@@ -250,7 +248,7 @@ class UploadHandler {
 	{
 		if( $this->isInaccessible( $uploadDirectory ) )
 		{
-			return array( 'error' => T_('Server error. Uploads directory isn\'t writable') . ( ( ! $this->isWindows() ) ? " or executable." : "." ) );
+			return array( 'error' => /* NO TRANS for sysadmins */ 'Server error. Uploads directory isn\'t writable'. ( ( ! $this->isWindows() ) ? ' or executable.' : '.' ) );
 		}
 		$targetFolder = $uploadDirectory;
 		$url = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
@@ -371,8 +369,10 @@ class UploadHandler {
 		* Converts a given size with units to bytes.
 		* @param string $str
 		*/
-	protected function toBytes( $str ){
-		$val = trim( $str );
+	protected function toBytes( $str )
+	{
+		$str = trim( $str );
+		$val = intval( $str );
 		$last = strtolower( $str[strlen( $str ) - 1] );
 		switch( $last )
 		{

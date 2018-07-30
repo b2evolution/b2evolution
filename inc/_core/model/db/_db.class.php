@@ -16,7 +16,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004 by Justin Vincent - {@link http://justinvincent.com}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link https://daniel.hahler.de}.
  *
@@ -341,43 +341,61 @@ class DB
 		}
 
 		// Optional parameters (Allow overriding through $params):
-		if( isset($params['name']) ) $this->dbname = $params['name'];
-		if( isset($params['host']) ) $this->dbhost = $params['host'];
-		if( isset($params['show_errors']) ) $this->show_errors = $params['show_errors'];
-		if( isset($params['halt_on_error']) ) $this->halt_on_error = $params['halt_on_error'];
-		if( isset($params['table_options']) ) $this->table_options = $params['table_options'];
-		if( isset($params['use_transactions']) ) $this->use_transactions = $params['use_transactions'];
-		if( isset($params['debug_dump_rows']) ) $this->debug_dump_rows = $params['debug_dump_rows']; // Nb of rows to dump
-		if( isset($params['debug_explain_joins']) ) $this->debug_explain_joins = $params['debug_explain_joins'];
-		if( isset($params['debug_profile_queries']) ) $this->debug_profile_queries = $params['debug_profile_queries'];
-		if( isset($params['debug_dump_function_trace_for_queries']) ) $this->debug_dump_function_trace_for_queries = $params['debug_dump_function_trace_for_queries'];
-		if( isset($params['log_queries']) )
+		if( isset( $params['name'] ) ) $this->dbname = $params['name'];
+		if( isset( $params['host'] ) ) $this->dbhost = $params['host'];
+		if( isset( $params['show_errors'] ) ) $this->show_errors = $params['show_errors'];
+		if( isset( $params['halt_on_error'] ) ) $this->halt_on_error = $params['halt_on_error'];
+		if( isset( $params['table_options'] ) ) $this->table_options = $params['table_options'];
+		if( isset( $params['use_transactions'] ) ) $this->use_transactions = $params['use_transactions'];
+		if( isset( $params['debug_dump_rows'] ) ) $this->debug_dump_rows = $params['debug_dump_rows']; // Nb of rows to dump
+		if( isset( $params['debug_explain_joins'] ) ) $this->debug_explain_joins = $params['debug_explain_joins'];
+		if( isset( $params['debug_profile_queries'] ) ) $this->debug_profile_queries = $params['debug_profile_queries'];
+		if( isset( $params['debug_dump_function_trace_for_queries'] ) ) $this->debug_dump_function_trace_for_queries = $params['debug_dump_function_trace_for_queries'];
+		if( isset( $params['log_queries'] ) )
 		{
 			$this->log_queries = $debug && $params['log_queries'];
 		}
-		elseif( isset($debug) && ! isset($this->log_queries) )
+		elseif( isset( $debug ) && ! isset( $this->log_queries ) )
 		{ // $log_queries follows $debug and respects subclasses, which may define it:
-			$this->log_queries = (bool)$debug;
+			$this->log_queries = ( bool ) $debug;
 		}
 
-		if( ! extension_loaded('mysqli') )
+		if( ! extension_loaded( 'mysqli' ) )
 		{ // The mysql extension is not loaded, try to dynamically load it:
-			if( function_exists('dl') )
+			if( function_exists( 'dl' ) )
 			{
 				$mysql_ext_file = is_windows() ? 'php_mysqli.dll' : 'mysqli.so';
-				$php_errormsg = null;
-				$old_track_errors = @ini_set('track_errors', 1);
-				$old_html_errors = @ini_set('html_errors', 0);
+				if( version_compare( PHP_VERSION, '7.2', '>=' ) )
+				{
+					error_clear_last();
+				}
+				else
+				{
+					$php_errormsg = null;
+					$old_track_errors = @ini_set( 'track_errors', 1 );
+				}
+				$old_html_errors = @ini_set( 'html_errors', 0 );
 				@dl( $mysql_ext_file );
-				$error_msg = $php_errormsg;
-				if( $old_track_errors !== false ) @ini_set('track_errors', $old_track_errors);
-				if( $old_html_errors !== false ) @ini_set('html_errors', $old_html_errors);
+				if( version_compare( PHP_VERSION, '7.2', '>=' ) )
+				{
+					$error_msg = error_get_last();
+					if( isset( $error_msg['message'] ) )
+					{
+						$error_msg = $error_msg['message'];
+					}
+				}
+				else
+				{
+					$error_msg = $php_errormsg;
+					if( $old_track_errors !== false ) @ini_set( 'track_errors', $old_track_errors );
+				}
+				if( $old_html_errors !== false ) @ini_set( 'html_errors', $old_html_errors );
 			}
 			else
 			{
 				$error_msg = 'The PHP mysqli extension is not installed and we cannot load it dynamically.';
 			}
-			if( ! extension_loaded('mysqli') )
+			if( ! extension_loaded( 'mysqli' ) )
 			{ // Still not loaded:
 				$this->print_error( 'The PHP MySQL Improved module could not be loaded.', '
 					<p><strong>Error:</strong> '.$error_msg.'</p>
@@ -387,27 +405,44 @@ class DB
 			}
 		}
 
-		$port = isset( $params['port'] ) ? $params['port'] : ini_get('mysqli.default_port');
-		$socket = isset( $params['socket'] ) ? $params['socket'] : ini_get('mysqli.default_socket');
+		$port = isset( $params['port'] ) ? $params['port'] : ini_get( 'mysqli.default_port' );
+		$socket = isset( $params['socket'] ) ? $params['socket'] : ini_get( 'mysqli.default_socket' );
 		$client_flags = isset( $params['client_flags'] ) ? $params['client_flags'] : 0;
 
-		/* Persistent connections are only available in PHP 5.3+ */
-		$this->use_persistent = isset($params['use_persistent']) ? $params['use_persistent'] : version_compare(PHP_VERSION, '5.3', '>=');
+		$this->use_persistent = isset( $params['use_persistent'] ) ? $params['use_persistent'] : true;
 
 		if( ! $this->dbhandle )
 		{ // Connect to the Database:
 			// echo "mysqli::real_connect( $this->dbhost, $this->dbuser, $this->dbpassword, $this->dbname, port, $socket, $client_flags )";
 			// mysqli::$connect_error is tied to an established connection
 			// if the connection fails we need a different method to get the error message
-			$php_errormsg = null;
-			$old_track_errors = @ini_set('track_errors', 1);
-			$old_html_errors = @ini_set('html_errors', 0);
+			if( version_compare( PHP_VERSION, '7.2', '>=' ) )
+			{
+				error_clear_last();
+			}
+			else
+			{
+				$php_errormsg = null;
+				$old_track_errors = @ini_set( 'track_errors', 1 );
+			}
+			$old_html_errors = @ini_set( 'html_errors', 0 );
 			$this->dbhandle = new mysqli();
-			@$this->dbhandle->real_connect($this->use_persistent ? 'p:'.$this->dbhost : $this->dbhost,
+			@$this->dbhandle->real_connect( $this->use_persistent ? 'p:'.$this->dbhost : $this->dbhost,
 				$this->dbuser, $this->dbpassword, '', $port, $socket, $client_flags );
-			$mysql_error = $php_errormsg;
-			if( $old_track_errors !== false ) @ini_set('track_errors', $old_track_errors);
-			if( $old_html_errors !== false ) @ini_set('html_errors', $old_html_errors);
+			if( version_compare( PHP_VERSION, '7.2', '>=' ) )
+			{
+				$mysql_error = error_get_last();
+				if( isset( $mysql_error['message'] ) )
+				{
+					$mysql_error = $mysql_error['message'];
+				}
+			}
+			else
+			{
+				$mysql_error = $php_errormsg;
+				if( $old_track_errors !== false ) @ini_set( 'track_errors', $old_track_errors );
+			}
+			if( $old_html_errors !== false ) @ini_set( 'html_errors', $old_html_errors );
 		}
 
 		if( 0 != $this->dbhandle->connect_errno )
@@ -420,9 +455,9 @@ class DB
 					<li>Are you sure that the database server is running?</li>
 				</ol>', false );
 		}
-		elseif( isset($this->dbname) )
+		elseif( isset( $this->dbname ) )
 		{
-			$this->select($this->dbname);
+			$this->select( $this->dbname );
 		}
 
 		if( ! empty( $params['connection_charset'] ) )
@@ -443,7 +478,7 @@ class DB
 		*/
 
 
-		if( isset($params['aliases']) )
+		if( isset( $params['aliases'] ) )
 		{ // Prepare aliases for replacements:
 			foreach( $params['aliases'] as $dbalias => $dbreplace )
 			{
@@ -810,13 +845,26 @@ class DB
 	/**
 	 * Basic Query
 	 *
-	 * @param string SQL query
-	 * @param string title for debugging
+	 * @param string|object SQL query string or SQL object
+	 * @param string Optional title of query for debugging(If empty then $query_SQL->title is used instead)
 	 * @return mixed # of rows affected or false if error
 	 */
-	function query( $query, $title = '' )
+	function query( $query_SQL, $title = '' )
 	{
 		global $Timer;
+
+		if( $query_SQL instanceof SQL )
+		{	// Get SQL query string from provided object:
+			$query = $query_SQL->get();
+			if( empty( $title ) && $query_SQL->title !== NULL )
+			{	// Use title from SQL object if given function param is not provided:
+				$title = $query_SQL->title;
+			}
+		}
+		else
+		{	// Use SQL query from given function param because it is already a string:
+			$query = $query_SQL;
+		}
 
 		// initialise return
 		$return_val = 0;
@@ -1016,18 +1064,18 @@ class DB
 	 * Note: To be sure that you received NULL from the DB and not "no rows" check
 	 *       for {@link $num_rows}.
 	 *
-	 * @param string Optional query to execute
+	 * @param string|object|NULL Optional SQL query string or SQL object to execute (or NULL for previous query)
 	 * @param integer Column number (starting at and defaulting to 0)
 	 * @param integer Row (defaults to NULL for "next"/"do not seek")
-	 * @param string Optional title of query
+	 * @param string Optional title of query for debugging(If empty then $query_SQL->title is used instead)
 	 * @return mixed NULL if not found, the value otherwise (which may also be NULL).
 	 */
-	function get_var( $query = NULL, $x = 0, $y = NULL, $title = '' )
+	function get_var( $query_SQL = NULL, $x = 0, $y = NULL, $title = '' )
 	{
 		// If there is a query then perform it if not then use cached results..
-		if( $query )
+		if( $query_SQL )
 		{
-			$this->query($query, $title);
+			$this->query( $query_SQL, $title );
 		}
 
 		if( $this->num_rows
@@ -1048,22 +1096,22 @@ class DB
 	/**
 	 * Get one row from the DB.
 	 *
-	 * @param string Query (or NULL for previous query)
-	 * @param string Output type ("OBJECT", "ARRAY_A", "ARRAY_N")
+	 * @param string|object|NULL Optional SQL query string or SQL object to execute (or NULL for previous query)
+	 * @param string Output type (OBJECT, ARRAY_A, ARRAY_N)
 	 * @param int Row to fetch (or NULL for next - useful with $query=NULL)
-	 * @param string Optional title for $query (if any)
+	 * @param string Optional title of query for debugging(If empty then $query_SQL->title is used instead)
 	 * @return mixed
 	 */
-	function get_row( $query = NULL, $output = OBJECT, $y = NULL, $title = '' )
+	function get_row( $query_SQL = NULL, $output = OBJECT, $y = NULL, $title = '' )
 	{
 		// If there is a query then perform it if not then use cached results..
-		if( $query )
+		if( $query_SQL )
 		{
-			$this->query($query, $title);
+			$this->query( $query_SQL, $title );
 		}
 
 		if( ! $this->num_rows
-			|| ( isset($y) && ! $this->result->data_seek( $y) ) )
+			|| ( isset( $y ) && ! $this->result->data_seek( $y ) ) )
 		{
 			if( $output == OBJECT )
 				return NULL;
@@ -1094,14 +1142,17 @@ class DB
 	 * Function to get 1 column from the cached result set based on X index
 	 * see docs for usage and info
 	 *
+	 * @param string|object|NULL Optional SQL query string or SQL object to execute (or NULL for previous query)
+	 * @param integer Column number
+	 * @param string Optional title of query for debugging(If empty then $query_SQL->title is used instead)
 	 * @return array
 	 */
-	function get_col( $query = NULL, $x = 0, $title = '' )
+	function get_col( $query_SQL = NULL, $x = 0, $title = '' )
 	{
 		// If there is a query then perform it if not then use cached results..
-		if( $query )
+		if( $query_SQL )
 		{
-			$this->query( $query, $title );
+			$this->query( $query_SQL, $title );
 		}
 
 		// Extract the column values
@@ -1118,14 +1169,16 @@ class DB
 	/**
 	 * Function to get the second column from the cached result indexed by the first column
 	 *
+	 * @param string|object|NULL Optional SQL query string or SQL object to execute (or NULL for previous query)
+	 * @param string Optional title of query for debugging(If empty then $query_SQL->title is used instead)
 	 * @return array [col_0] => col_1
 	 */
-	function get_assoc( $query = NULL, $title = '' )
+	function get_assoc( $query_SQL = NULL, $title = '' )
 	{
 		// If there is a query then perform it if not then use cached results..
-		if( $query )
+		if( $query_SQL )
 		{
-			$this->query( $query, $title );
+			$this->query( $query_SQL, $title );
 		}
 
 		// Extract the column values
@@ -1144,14 +1197,17 @@ class DB
 	/**
 	 * Return the the query as a result set - see docs for more details
 	 *
+	 * @param string|object|NULL Optional SQL query string or SQL object to execute (or NULL for previous query)
+	 * @param string Output type (OBJECT, ARRAY_A, ARRAY_N)
+	 * @param string Optional title of query for debugging(If empty then $query_SQL->title is used instead)
 	 * @return mixed
 	 */
-	function get_results( $query = NULL, $output = OBJECT, $title = '' )
+	function get_results( $query_SQL = NULL, $output = OBJECT, $title = '' )
 	{
 		// If there is a query then perform it if not then use cached results..
-		if( $query )
+		if( $query_SQL )
 		{
-			$this->query($query, $title);
+			$this->query( $query_SQL, $title );
 		}
 
 		$r = array();
@@ -1276,6 +1332,15 @@ class DB
 
 
 	/**
+	 * Callback for preg_replace_callback in format_query()
+	 */
+	private static function _format_query_callback( $matches )
+	{
+		return str_replace( " ", "&nbsp;", $matches[1] );
+	}
+
+
+	/**
 	 * Format a SQL query
 	 *
 	 * @param string SQL
@@ -1337,7 +1402,7 @@ class DB
 		if( $html )
 		{ // poor man's indent
 			$sql = htmlspecialchars( $sql );
-			$sql = preg_replace_callback("~^(\s+)~m", create_function('$m', 'return str_replace(" ", "&nbsp;", $m[1]);'), $sql);
+			$sql = preg_replace_callback("~^(\s+)~m", array( 'DB', '_format_query_callback' ), $sql);
 			$sql = nl2br($sql);
 		}
 		return $sql;
@@ -1389,17 +1454,11 @@ class DB
 		{
 			$count_queries++;
 
-			$get_md5_query = create_function( '', '
-				static $r; if( isset($r) ) return $r;
-				global $query;
-				$r = md5(serialize($query))."-".rand();
-				return $r;' );
-
 			if ( $html )
 			{
 				echo '<h4>Query #'.$count_queries.': '.$query['title']."</h4>\n";
 
-				$div_id = 'db_query_sql_'.$i.'_'.$get_md5_query();
+				$div_id = 'db_query_sql_'.$i.'_'.$this->_get_md5_query();
 				if( strlen($query['sql']) > 512 )
 				{
 					$sql_short = DB::format_query( $query['sql'], true, 512 );
@@ -1502,7 +1561,7 @@ class DB
 
 					if( $html )
 					{
-						$div_id = 'db_query_explain_'.$i.'_'.$get_md5_query();
+						$div_id = 'db_query_explain_'.$i.'_'.$this->_get_md5_query();
 						echo '<div id="'.$div_id.'">';
 						echo $this->debug_get_rows_table( 100, true );
 						echo '</div>';
@@ -1521,7 +1580,7 @@ class DB
 			{
 				if( $html )
 				{
-					$div_id = 'db_query_profile_'.$i.'_'.$get_md5_query();
+					$div_id = 'db_query_profile_'.$i.'_'.$this->_get_md5_query();
 					echo '<div id="'.$div_id.'">';
 					echo $query['profile'];
 					echo '</div>';
@@ -1538,7 +1597,7 @@ class DB
 			{
 				if( $html )
 				{
-					$div_id = 'db_query_results_'.$i.'_'.$get_md5_query();
+					$div_id = 'db_query_results_'.$i.'_'.$this->_get_md5_query();
 					echo '<div id="'.$div_id.'">';
 					echo $query['results'];
 					echo '</div>';
@@ -1555,7 +1614,7 @@ class DB
 			{
 				if( $html )
 				{
-					$div_id = 'db_query_backtrace_'.$i.'_'.$get_md5_query();
+					$div_id = 'db_query_backtrace_'.$i.'_'.$this->_get_md5_query();
 					echo '<div id="'.$div_id.'">';
 					echo $query['function_trace'];
 					echo '</div>';
@@ -1594,6 +1653,21 @@ class DB
 				echo "Time difference: {$time_diff_percentage}%\n";
 			}
 		}
+	}
+
+
+	/**
+	 * Generate MD5 of query
+	 */
+	private static function _get_md5_query()
+	{
+		static $r;
+
+		if( isset( $r ) ) return $r;
+
+		global $query;
+		$r = md5( serialize( $query ) )."-".rand();
+		return $r;
 	}
 
 

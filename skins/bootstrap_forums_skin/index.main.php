@@ -72,7 +72,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <header class="row">
 
-	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
+	<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8">
 		<div class="evo_container evo_container__page_top">
 		<?php
 			// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
@@ -92,7 +92,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		</div>
 	</div><!-- .col -->
 
-	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
+	<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 		<div class="evo_container evo_container__header">
 		<?php
 			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
@@ -261,15 +261,6 @@ siteskin_include( '_site_body_header.inc.php' );
 					'display_reg_link'      => true,
 					'abort_link_position'   => 'form_title',
 					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-					// Register
-					'register_page_before'      => '<div class="evo_panel__register">',
-					'register_page_after'       => '</div>',
-					'register_form_title'       => T_('Register'),
-					'register_links_attrs'      => '',
-					'register_use_placeholders' => true,
-					'register_field_width'      => 252,
-					'register_disabled_page_before' => '<div class="evo_panel__register register-disabled">',
-					'register_disabled_page_after'  => '</div>',
 					// Activate form
 					'activate_form_title'  => T_('Account activation'),
 					'activate_page_before' => '<div class="evo_panel__activation">',
@@ -379,8 +370,8 @@ siteskin_include( '_site_body_header.inc.php' );
 	</aside><!-- .col -->
 	<?php } ?>
 
-	<footer class="col-md-12">
-	<?php skin_include( '_legend.inc.php' ); ?>
+	<footer class="col-md-12 clear">
+		<?php skin_include( '_legend.inc.php' ); ?>
 	</footer>
 
 </div><!-- .row -->
@@ -411,11 +402,12 @@ if( $disp == 'front' )
 
 <footer class="row">
 
-	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 center">
+   <!-- =================================== START OF FOOTER =================================== -->
+    <div class="col-md-12">
 
-		<div class="evo_container evo_container__footer">
-		<?php
+		<?php // Note: clearfix is because of Bootstraps' .cols ?>
+		<div class="evo_container evo_container__footer clearfix">
+			<?php
 			// Display container and contents:
 			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
@@ -423,10 +415,10 @@ if( $disp == 'front' )
 					'block_end'         => '</div>',
 				) );
 			// Note: Double quotes have been used around "Footer" only for test purposes.
-		?>
-		</div>
+			?>
+		</div><!-- .evo_container__footer -->
 
-		<p>
+		<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -63,7 +63,16 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	if( isset( $parmeta['group'] ) )
 	{
 		$group = $parmeta['group'];
-		$parname = $group.$parname;
+		if( substr( $group, -1 ) === ']' )
+		{	// If group name is in array format like "edit_plugin_1_set_sample_sets[0][group_name]",
+			// then param name must be like "edit_plugin_1_set_sample_sets[0][group_name_param_name]":
+			$parname = substr( $group, 0, strlen( $group ) - 1 ).$parname.']';
+		}
+		else
+		{	// If group name is simple like "group_name",
+			// then param name must be like "group_name_param_name"
+			$parname = $group.$parname;
+		}
 	}
 	else
 	{
@@ -73,7 +82,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	// Passthrough some attributes to elements:
 	foreach( $parmeta as $k => $v )
 	{
-		if( in_array( $k, array( 'id', 'class', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols', 'rows', 'maxlength' ) ) )
+		if( in_array( $k, array( 'id', 'class', 'onchange', 'onclick', 'onfocus', 'onkeyup', 'onkeydown', 'onreset', 'onselect', 'cols', 'rows', 'maxlength', 'placeholder' ) ) )
 		{
 			$params[$k] = $v;
 		}
@@ -134,7 +143,18 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		{
 			case 'begin_fieldset':
 				$fieldset_title = $set_label;
-				$Form->begin_fieldset( $fieldset_title.$help_icon );
+				$fieldset_params = array();
+				if( isset( $parmeta['fold'] ) && $parmeta['fold'] === true )
+				{	// Enable folding for the fieldset:
+					$fieldset_params['fold'] = $parmeta['fold'];
+					if( isset( $parmeta['deny_fold'] ) )
+					{	// TRUE to don't allow fold the block and keep it opened always on page loading:
+						$fieldset_params['deny_fold'] = $parmeta['deny_fold'];
+					}
+					// Unique ID of fieldset to store in user  settings or in user per collection settings:
+					$fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $parname;
+				}
+				$Form->begin_fieldset( $fieldset_title.$help_icon, $fieldset_params );
 				break;
 
 			case 'end_fieldset':
@@ -178,17 +198,17 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		switch( $set_type )
 		{
 			case 'CollSettings':
-				$set_value = $Obj->get_coll_setting( $parname, $set_target );
+				$set_value = $Obj->get_coll_setting( $parname, $set_target, false, $group );
 				$error_value = NULL;
 				break;
 
 			case 'MsgSettings':
-				$set_value = $Obj->get_msg_setting( $parname );
+				$set_value = $Obj->get_msg_setting( $parname, $group );
 				$error_value = NULL;
 				break;
 
 			case 'EmailSettings':
-				$set_value = $Obj->get_email_setting( $parname );
+				$set_value = $Obj->get_email_setting( $parname, $group );
 				$error_value = NULL;
 				break;
 
@@ -198,7 +218,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				break;
 
 			case 'Widget':
-				$set_value = $Obj->get_param( $parname );
+				$set_value = $Obj->get_param( $parname, false, $group );
 				$error_value = NULL;
 				break;
 
@@ -361,6 +381,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		case 'array:array:string':
 		case 'array:regexp':
 			$has_array_type = true;
+			$has_color_field = false;
 
 			// Always use 'fieldset' layout to display it the same way from normal and ajax calls
 			$Form->switch_layout( 'fieldset' );
@@ -380,7 +401,18 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				{
 					$fieldset_title .= ' [debug: '.$parname.']';
 				}
-				$Form->begin_fieldset( $fieldset_title );
+				$fieldset_params = array();
+				if( isset( $parmeta['fold'] ) && $parmeta['fold'] === true )
+				{	// Enable folding for the fieldset:
+					$fieldset_params['fold'] = $parmeta['fold'];
+					if( isset( $parmeta['deny_fold'] ) )
+					{	// TRUE to don't allow fold the block and keep it opened always on page loading:
+						$fieldset_params['deny_fold'] = $parmeta['deny_fold'];
+					}
+					// Unique ID of fieldset to store in user  settings or in user per collection settings:
+					$fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $parname;
+				}
+				$Form->begin_fieldset( $fieldset_title, $fieldset_params );
 
 				if( ! empty($params['note']) )
 				{
@@ -389,12 +421,26 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$k_nb = 0;
 			}
 
+			// check if a color field is among the entries
+			foreach( $parmeta['entries'] as $entry )
+			{
+				if( isset( $entry['type'] ) && $entry['type'] == 'color' )
+				{
+					$has_color_field = true;
+					break;
+				}
+			}
 
 			$user_ID = $set_type == 'UserSettings' ? $set_target->ID : '';
 			if( is_array( $set_value ) && ! empty($set_value) )
 			{ // Display value of the setting. It may be empty, if there's no set yet.
 				foreach( $disp_arrays as $k => $v )
 				{
+					$fieldset_params = array(
+							'class' => 'bordered',
+							// Unique ID of fieldset(Also used to store a folding state in user settings or in user per collection settings):
+							'id'    => isset( $parmeta['id'] ) ? $parmeta['id'] : $parname.'_'.$k_nb,
+						);
 					$remove_action = '';
 					if( ! isset($parmeta['min_count']) || count($set_value) > $parmeta['min_count'] )
 					{ // provide icon to remove this set
@@ -407,12 +453,22 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								// attach onclick event to remove the whole fieldset:
 								array(
 									'onclick' => "
-										jQuery('#".$parname.'_'.$k_nb."').remove();
+										jQuery('#".$fieldset_params['id']."').remove();
 										return false;",
 									)
 								).'</span>';
 					}
-					$Form->begin_fieldset( '#'.$k_nb.$remove_action, array( 'class' => 'bordered', 'id' => $parname.'_'.$k_nb ) );
+					if( isset( $parmeta['fold'] ) && $parmeta['fold'] === true )
+					{	// Enable folding for the fieldset:
+						$fieldset_params['fold'] = $parmeta['fold'];
+						if( isset( $parmeta['deny_fold'] ) )
+						{	// TRUE to don't allow fold the block and keep it opened always on page loading:
+							$fieldset_params['deny_fold'] = $parmeta['deny_fold'];
+						}
+
+						$fieldset_params['id'] = $parname;
+					}
+					$Form->begin_fieldset( '#'.$k_nb.$remove_action, $fieldset_params );
 
 					if( isset($parmeta['key']) )
 					{ // KEY FOR THIS ENTRY:
@@ -430,7 +486,14 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 					foreach( $parmeta['entries'] as $l_set_name => $l_set_entry )
 					{
-						$l_value = isset($set_value[$k][$l_set_name]) ? $set_value[$k][$l_set_name] : NULL;
+						if( isset( $set_value[$k][$l_set_name] ) )
+						{	// Use a saved value:
+							$l_value = $set_value[$k][$l_set_name];
+						}
+						else
+						{	// Use default value if it is defined:
+							$l_value = isset( $l_set_entry['defaultvalue'] ) ? $l_set_entry['defaultvalue'] : NULL;
+						}
 						// RECURSE:
 						autoform_display_field( $parname.'['.$k_nb.']['.$l_set_name.']', $l_set_entry, $Form, $set_type, $Obj, $set_target, $l_value );
 					}
@@ -442,6 +505,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			// TODO: fix this for AJAX callbacks, when removing and re-adding items (dh):
 			if( ! isset( $parmeta['max_number'] ) || $parmeta['max_number'] > ($k_nb) )
 			{ // no max_number defined or not reached: display link to add a new set
+				global $Blog;
 				$set_path = $parname.'['.$k_nb.']';
 
 				echo '<div id="'.$parname.'_add_new">';
@@ -459,9 +523,12 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								plugin_ID: '{$Obj->ID}',
 								set_type: '$set_type',
 								set_path: '$set_path'
+								".( isset( $Blog ) ? ',blog: '.$Blog->ID : '' )."
+								".( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' )."
 							},
 							function(r, status) {
 								jQuery('#".$parname."_add_new').replaceWith(r);
+								".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
 							}
 						);
 						return false;")
@@ -506,7 +573,35 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$params['hide_label'] = $parmeta['hide_label'];
 			}
 
+			if( $parmeta['type'] == 'integer' )
+			{	// Set special type 'number' for integer param to initialize control arrows to allow increase/decrease a value:
+				$params['type'] = 'number';
+				if( isset( $parmeta['valid_range']['min'] ) )
+				{	// Restrict with min value:
+					$params['min'] = $parmeta['valid_range']['min'];
+				}
+				if( isset( $parmeta['valid_range']['max'] ) )
+				{	// Restrict with max value:
+					$params['max'] = $parmeta['valid_range']['max'];
+				}
+				// Input number element doesn't support attribute "size", so we have only one way to set width with style:
+				$params['style'] = 'width:'.( 40 + $size * 8 ).'px';
+			}
+
 			$Form->text_input( $input_name, $set_value, $size, $set_label, '', $params ); // TEMP: Note already in params
+			break;
+
+		case 'usertag':
+			if( isset( $parmeta['size'] ) )
+			{
+				$size = (int) $parmeta['size'];
+			}
+			else
+			{
+				$size = 30;
+			}
+
+			$Form->usertag_input( $input_name, $set_value, $size, $set_label, '', $params );
 			break;
 
 		case 'info':
@@ -565,7 +660,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
  *
  * Walks the given settings path and either inits the target entry or unsets it ($init_value=NULL).
  *
- * @param Plugin
+ * @param object Plugin or Skin
  * @param string Settings type ("Settings" or "UserSettings")
  * @param string The settings path, e.g. 'setting[0]foo[1]'. (Is used as array internally for recursion.)
  * @param mixed The initial value of the setting, typically array() - NULL to unset it (action "delete_settings_set" uses it)
@@ -628,8 +723,37 @@ function _set_setting_by_path( & $Plugin, $set_type, $path, $init_value = array(
 		}
 	}
 
-	// Set it into $Plugin->Settings or $Plugin->UserSettings:
-	$Plugin->$set_type->set( $set_name, $setting );
+	switch( $set_type )
+	{
+		case 'Settings':
+		case 'CollSettings':
+		case 'Widget':
+			$Plugin->Settings->set( $set_name, $setting );
+			break;
+
+		case 'UserSettings':
+			$Plugin->UserSettings->set( $set_name, $setting );
+			break;
+
+		case 'MsgSettings':
+			$set_name = ( $set_name == 'msg_apply_rendering' ? '' : 'msg_' ).$set_name;
+			$Plugin->Settings->set( $set_name, $setting );
+			break;
+
+		case 'EmailSettings':
+			$set_name = ( $set_name == 'email_apply_rendering' ? '' : 'email_' ).$set_name;
+			$Plugin->Settings->set( $set_name, $setting );
+			break;
+
+		case 'Skin':
+			$Skin = & $Plugin;
+			$Skin->set_setting( $set_name, $setting );
+			break;
+
+		default:
+			debug_die( 'Invalid plugin type param!' );
+	}
+
 
 	return $setting;
 }
@@ -638,7 +762,7 @@ function _set_setting_by_path( & $Plugin, $set_type, $path, $init_value = array(
 /**
  * Get a node from settings by path (e.g. "locales[0][questions]")
  *
- * @param Plugin
+ * @param object Plugin or Skin
  * @param string Settings type ("Settings" or "UserSettings")
  * @param string The settings path, e.g. 'setting[0]foo[1]' or even 'setting[]'. (Is used as array internally for recursion.)
  * @return array Array(
@@ -664,18 +788,60 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
 
 	$set_name = $path[0];
 
-	$setting = $Plugin->$set_type->get($set_name);  // $Plugin->Settings or $Plugin->UserSettings
-	if( ! is_array($setting) )
+	// meta info for this setting:
+	$tmp_params = array( 'for_editing' => true );
+
+	switch( $set_type )
+	{
+		case 'Settings':
+			$setting = $Plugin->Settings->get( $set_name );
+			$defaults = $Plugin->GetDefaultSettings( $tmp_params );
+			break;
+
+		case 'UserSettings':
+			$setting = $Plugin->UserSettings->get( $set_name );
+			$defaults = $Plugin->GetDefaultUserSettings( $tmp_params );
+			break;
+
+		case 'CollSettings':
+			$setting = $Plugin->Settings->get( $set_name );
+			$defaults = $Plugin->get_coll_setting_definitions( $tmp_params );
+			break;
+
+		case 'MsgSettings':
+			$param_name = ( $set_name == 'msg_apply_rendering' ? '' : 'msg_' ).$set_name;
+			$setting = $Plugin->Settings->get( $param_name );
+			$defaults = $Plugin->get_msg_setting_definitions( $tmp_params );
+			break;
+
+		case 'EmailSettings':
+			$param_name = ( $set_name == 'email_apply_rendering' ? '' : 'email_' ).$set_name;
+			$setting = $Plugin->Settings->get( $param_name );
+			$defaults = $Plugin->get_email_setting_definitions( $tmp_params );
+			break;
+
+		case 'Widget':
+			$setting = $Plugin->Settings->get( $set_name );
+			$defaults = $Plugin->get_widget_param_definitions( $tmp_params );
+			break;
+
+		case 'Skin':
+			$Skin = & $Plugin;
+			$setting = $Skin->get_setting( $set_name );
+			$defaults = $Skin->get_param_definitions( $tmp_params );
+			break;
+
+		default:
+			debug_die( 'Invalid plugin type param!' );
+	}
+
+	if( ! is_array( $setting ) )
 	{ // this may happen, if there was a non-array setting stored previously:
 		// discard those!
 		$setting = array();
 	}
 
-	// meta info for this setting:
-	$method = 'GetDefault'.$set_type; // GetDefaultSettings or GetDefaultUserSettings
-	$tmp_params = array( 'for_editing' => true );
-	$defaults = $Plugin->$method( $tmp_params );
-	if( ! isset($defaults[ $set_name ]) )
+	if( ! isset( $defaults[ $set_name ] ) )
 	{
 		//debug_die( 'Invalid setting ('.$set_name.') - no meta data!' );
 		return false;
@@ -776,6 +942,16 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 		return;
 	}
 
+	if( ! empty( $parmeta['inputs'] ) )
+	{
+		foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )
+		{
+			$l_parmeta['group'] = $parname; // inject group into meta
+			autoform_set_param_from_request( $l_parname, $l_parmeta, $Obj, $set_type, $set_target, $set_value );
+		}
+		return;
+	}
+
 	// set input group
 	if( isset( $parmeta['group'] ) )
 	{
@@ -812,6 +988,10 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 				$l_param_default = array();
 				break;
 
+			case 'textarea':
+				$l_param_type = 'text';
+				break;
+
 			case 'html_input':
 			case 'html_textarea':
 				$l_param_type = 'html';
@@ -824,15 +1004,59 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 	if( $set_value === NULL )
 	{ // Get the value from request:
 		$l_value = param( $Obj->get_param_prefix().$parname, $l_param_type, $l_param_default );
+		// Store values of unchecked checkboxes manually because their empty values are not passed to a submitted form:
+		switch( $l_param_type )
+		{
+			case 'array':
+			case 'array:integer':
+			case 'array:array:integer':
+			case 'array:string':
+			case 'array:array:string':
+			case 'array:regexp':
+				if( ! empty( $parmeta['entries'] ) )
+				{
+					foreach( $l_value as $l_index => $l_index_values )
+					{
+						if( count( $parmeta['entries'] ) != count( $l_index_values ) )
+						{	// If some entry(like checkbox) is missed:
+							foreach( $parmeta['entries'] as $parmeta_entry_key => $parmeta_entry_data )
+							{
+								if( isset( $parmeta_entry_data['type'] ) &&
+								    $parmeta_entry_data['type'] == 'checkbox' &&
+								    ! isset( $l_index_values[ $parmeta_entry_key ] ) )
+								{	// If field is checkbox but value is not passed to a submitted form becauase it was unchecked:
+									$l_value[ $l_index ][ $parmeta_entry_key ] = 0;
+								}
+							}
+						}
+					}
+				}
+				break;
+		}
 	}
 	else
 	{ // Force value
 		$l_value = $set_value;
 	}
 
-	if( isset($parmeta['type']) && strpos( $parmeta['type'], 'array' ) === 0 )
-	{ // make keys (__key__) in arrays unique and remove them
-		handle_array_keys_in_plugin_settings($l_value);
+	if( isset( $parmeta['type'] ) )
+	{	// Prepare values before store them in DB:
+		if( strpos( $parmeta['type'], 'array' ) === 0 )
+		{	// Make keys (__key__) in arrays unique and remove them
+			handle_array_keys_in_plugin_settings( $l_value );
+		}
+		elseif( $parmeta['type'] == 'integer' )
+		{	// Convert to correct integer value:
+			if( $l_value !== '' )
+			{	// Don't convert empty string '' to integer 0:
+				$l_value = intval( $l_value );
+			}
+			if( empty( $l_value ) && ! empty( $parmeta['allow_empty'] ) &&
+					isset( $parmeta['valid_range'], $parmeta['valid_range']['min'] ) && $parmeta['valid_range']['min'] > 0 )
+			{	// Convert 0 to empty value for integer field if it allows empty values:
+				$l_value = NULL;
+			}
+		}
 	}
 
 	if( ! autoform_validate_param_value( $Obj->get_param_prefix().$parname, $l_value, $parmeta ) )
@@ -866,7 +1090,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 					) );
 				$l_value = array_fill_keys( $l_value, 1 );
 			}
-			$Obj->set( $parname, $l_value );
+			$Obj->set( $parname, $l_value, false, ( isset( $parmeta['group'] ) ? $parmeta['group'] : NULL ) );
 			break;
 
 		case 'UserSettings':
@@ -981,11 +1205,19 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 		{
 			foreach( $value as $vk => $vv )
 			{
-				if( ! isset( $vv[$mk] ) )
-					continue;
-
-				if( ! autoform_validate_param_value( $param_name.'['.$vk.']['.$mk.']', $vv[$mk], $mv ) )
-				{
+				if( isset( $mv['type'] ) && $mv['type'] == 'input_group' &&
+				    ! empty( $mv['inputs'] ) && is_array( $mv['inputs'] ) )
+				{	// Validate each input field of the setting with type "input_group":
+					foreach( $mv['inputs'] as $k => $v )
+					{
+						if( isset( $vv[ $mk.$k ] ) && ! autoform_validate_param_value( $param_name.'['.$vk.']['.$mk.$k.']', $vv[ $mk.$k ], $v ) )
+						{	// If at least one setting of the grouped inputs has an error:
+							$r = false;
+						}
+					}
+				}
+				elseif( isset( $vv[ $mk ] ) && ! autoform_validate_param_value( $param_name.'['.$vk.']['.$mk.']', $vv[ $mk ], $mv ) )
+				{	// If single setting has an error:
 					$r = false;
 				}
 			}
@@ -1003,6 +1235,14 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 
 		switch( $meta['type'] )
 		{
+			case 'text':
+				if( isset( $meta['allow_empty'] ) && ! $meta['allow_empty'] && $value === '' )
+				{	// Display error if the text field is required to be not empty:
+					param_error( $param_name, sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), $meta['label'] ), T_('This field cannot be empty.') );
+					return false;
+				}
+				break;
+
 			case 'integer':
 				if( ! preg_match( '~^[-+]?\d+$~', $value ) )
 				{

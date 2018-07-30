@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -62,7 +62,7 @@ else
 }
 $SQL->GROUP_BY( 'year, month, day, hit_agent_type, hit_type' );
 $SQL->ORDER_BY( 'year DESC, month DESC, day DESC, hit_agent_type, hit_type' );
-$res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+$res_hits = $DB->get_results( $SQL, ARRAY_A );
 
 
 /*

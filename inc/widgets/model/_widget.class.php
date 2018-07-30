@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -76,6 +76,13 @@ class ComponentWidget extends DataObject
 	*/
 	var $Blog = NULL;
 
+	/**
+	 * Widget icon name.
+	 * Use icon name from http://fontawesome.io/icons/
+	 *
+	 * @var string
+	 */
+	var $icon = 'cube';
 
 	/**
 	 * Constructor
@@ -206,18 +213,36 @@ class ComponentWidget extends DataObject
 		$name = $this->get_name();
 
 		if( $this->type == 'plugin' )
-		{
-			return '<strong>'.$name.'</strong> ('.T_('Plugin').')';
+		{	// Plugin widget:
+			$widget_Plugin = & $this->get_Plugin();
+			if( $widget_Plugin )
+			{
+				$icon = '<span class="fa fa-'.$widget_Plugin->widget_icon.'"></span>';
+
+				if( isset( $this->disp_params['title'] ) && ! empty( $this->disp_params['title'] ) )
+				{
+					return $icon.' <strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
+				}
+			}
+			else
+			{
+				$icon = '<span class="fa fa-warning"></span>';
+				return $icon.' <strong>'.$name.'</strong> ('.T_('Plugin').')';
+			}
+
+			return $icon.' <strong>'.$name.'</strong> ('.T_('Plugin').')';
 		}
 
+		// Normal widget:
 		$short_desc = $this->get_short_desc();
+		$icon = '<span class="fa fa-'.$this->icon.'"></span>';
 
-		if( $name == $short_desc || empty($short_desc) )
+		if( $name == $short_desc || empty( $short_desc ) )
 		{
-			return '<strong>'.$name.'</strong>';
+			return $icon.' <strong>'.$name.'</strong>';
 		}
 
-		return '<strong>'.$short_desc.'</strong> ('.$name.')';
+		return $icon.' <strong>'.$short_desc.'</strong> ('.$name.')';
 	}
 
 
@@ -310,8 +335,18 @@ class ComponentWidget extends DataObject
 			}
 		}
 
+		if( ! isset( $r['widget_css_class'] ) ||
+		    ! isset( $r['widget_ID'] ) ||
+		    ! isset( $r['allow_blockcache'] ) )
+		{	// Start fieldset of advanced settings:
+			$r['advanced_layout_start'] = array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Advanced'),
+				);
+		}
+
 		if( ! isset( $r['widget_css_class'] ) )
-		{
+		{	// Widget CSS class:
 			$r['widget_css_class'] = array(
 					'label' => '<span class="dimmed">'.T_( 'CSS Class' ).'</span>',
 					'size' => 20,
@@ -320,7 +355,7 @@ class ComponentWidget extends DataObject
 		}
 
 		if( ! isset( $r['widget_ID'] ) )
-		{
+		{	// Widget ID:
 			$r['widget_ID'] = array(
 					'label' => '<span class="dimmed">'.T_( 'DOM ID' ).'</span>',
 					'size' => 20,
@@ -329,7 +364,7 @@ class ComponentWidget extends DataObject
 		}
 
 		if( ! isset( $r['allow_blockcache'] ) )
-		{
+		{	// Allow widget/block caching:
 			$widget_Blog = & $this->get_Blog();
 			$r['allow_blockcache'] = array(
 					'label' => T_( 'Allow caching' ),
@@ -338,6 +373,15 @@ class ComponentWidget extends DataObject
 							T_('Block caching is disabled for this collection.'),
 					'type' => 'checkbox',
 					'defaultvalue' => true,
+				);
+		}
+
+		if( ! isset( $r['widget_css_class'] ) ||
+		    ! isset( $r['widget_ID'] ) ||
+		    ! isset( $r['allow_blockcache'] ) )
+		{	// End fieldset of advanced settings:
+			$r['advanced_layout_end'] = array(
+					'layout' => 'end_fieldset',
 				);
 		}
 
@@ -369,20 +413,56 @@ class ComponentWidget extends DataObject
  	 * @param boolean default false, set to true only if it is called from a widget::get_param_definition() function to avoid infinite loop
  	 * @return mixed
 	 */
-	function get_param( $parname, $check_infinite_loop = false )
+	function get_param( $parname, $check_infinite_loop = false, $group = NULL )
 	{
 		$this->load_param_array();
-		if( isset( $this->param_array[$parname] ) )
-		{	// We have a value for this param:
-			return $this->param_array[$parname];
+
+		if( strpos( $parname, '[' ) !== false )
+		{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
+			$setting_names = explode( '[', $parname );
+			if( isset( $this->param_array[ $setting_names[0] ] ) )
+			{
+				$setting_value = $this->param_array[ $setting_names[0] ];
+				unset( $setting_names[0] );
+				foreach( $setting_names as $setting_name )
+				{
+					$setting_name = trim( $setting_name, ']' );
+					if( isset( $setting_value[ $setting_name ] ) )
+					{
+						$setting_value = $setting_value[ $setting_name ];
+					}
+					else
+					{
+						$setting_value = NULL;
+						break;
+					}
+				}
+				return $setting_value;
+			}
+		}
+		elseif( isset( $this->param_array[ $parname ] ) )
+		{	// Get normal(not array) setting value:
+			return $this->param_array[ $parname ];
 		}
 
 		// Try default values:
 		// Note we set 'infinite_loop' param to avoid calling the get_param() from the get_param_definitions() function recursively
 		$params = $this->get_param_definitions( $check_infinite_loop ? array( 'infinite_loop' => true ) : NULL );
-		if( isset( $params[$parname]['defaultvalue'] ) )
-		{	// We ahve a default value:
-			return $params[$parname]['defaultvalue'] ;
+
+		if( $group === NULL )
+		{	// Get param from simple field:
+			if( isset( $params[$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$parname]['defaultvalue'] ;
+			}
+		}
+		else
+		{	// Get param from group field:
+			$parname = substr( $parname, strlen( $group ) );
+			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
+			}
 		}
 
 		return NULL;
@@ -397,11 +477,12 @@ class ComponentWidget extends DataObject
 	 * @param boolean true to set to NULL if empty value
 	 * @return boolean true, if a value has been set; false if it has not changed
 	 */
-	function set( $parname, $parvalue, $make_null = false )
+	function set( $parname, $parvalue, $make_null = false, $group = NULL )
 	{
 		$params = $this->get_param_definitions( NULL );
 
-		if( isset( $params[$parname] ) )
+		if( isset( $params[$parname] ) ||
+		    ( $group !== NULL && isset( $params[ $group ]['inputs'][ substr( $parname, strlen( $group ) ) ] ) ) )
 		{ // This is a widget specific param:
 			// Make sure param_array is loaded before set the param value
 			$this->load_param_array();

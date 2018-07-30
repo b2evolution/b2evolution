@@ -21,7 +21,7 @@ class bootstrap_gallery_legacy_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.2';
+	var $version = '6.10.3';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -345,8 +345,8 @@ class bootstrap_gallery_legacy_Skin extends Skin
 			$custom_css .= '	#skin_wrapper { '.implode( ';', $custom_styles )." }\n";
 		}
 
-		$custom_styles = array();
 		// Text color
+		$custom_styles = array();
 		if( $text_color = $this->get_setting( 'page_text_color' ) )
 		{
 			$custom_styles[] = 'color: '.$text_color;
@@ -357,19 +357,21 @@ class bootstrap_gallery_legacy_Skin extends Skin
 		}
 
 		// Link color
+		$custom_styles = array();
 		if( $text_color = $this->get_setting( 'page_link_color' ) )
 		{
 			$custom_styles[] = 'color: '.$text_color;
 		}
 		if( ! empty( $custom_styles ) )
 		{
-			$custom_css .= '	#skin_wrapper .container a { '.implode( ';', $custom_styles )." }\n";
-			$custom_css .= '	ul li a { '.implode( ';', $custom_styles )." }\n";
-			$custom_css .= "	ul li a {background-color: transparent;}\n";
-			$custom_css .= "	.ufld_icon_links a {color: #fff !important;}\n";
+			$custom_css .= '	#skin_wrapper .container a:not(.btn) { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= '	ul li a:not(.btn) { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= "	ul li a:not(.btn) {background-color: transparent;}\n";
+			$custom_css .= "	.ufld_icon_links a:not(.btn) {color: #fff !important;}\n";
 		}
 
 		// Current tab text color
+		$custom_styles = array();
 		if( $text_color = $this->get_setting( 'current_tab_text_color' ) )
 		{
 			$custom_styles[] = 'color: '.$text_color;
@@ -380,6 +382,7 @@ class bootstrap_gallery_legacy_Skin extends Skin
 		}
 
 		// Page background color
+		$custom_styles = array();
 		if( $bg_color = $this->get_setting( 'page_bg_color' ) )
 		{
 			$custom_styles[] = 'background-color: '.$bg_color;
@@ -465,29 +468,5 @@ class bootstrap_gallery_legacy_Skin extends Skin
 				return parent::get_template( $name );
 		}
 	}
-
-
-	/**
-	 * Check if we can display a widget container when access is denied to collection by current user
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function show_container_when_access_denied( $container_key )
-	{
-		global $Collection, $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
-	}
-
 }
-
 ?>

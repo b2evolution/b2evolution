@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -182,17 +182,20 @@ function load_image( $path, $mimetype )
 		// fp> Note: sometimes this GD call will die and there is no real way to recover :/
 		load_funcs( 'tools/model/_system.funcs.php' );
 		$memory_limit = system_check_memory_limit();
-		$curr_mem_usage = memory_get_usage( true );
-		// Calculate the aproximative memory size which would be required to create the image resource
-		$tweakfactor = 1.8; // Or whatever works for you
-		$memory_needed = round( ( $image_info[0] * $image_info[1]
-				* ( isset( $image_info['bits'] ) ? $image_info['bits'] : 4 )
-				* ( isset( $image_info['channels'] ) ? $image_info['channels'] / 8 : 1 )
-				+ Pow( 2, 16 ) // number of bytes in 64K
-			) * $tweakfactor );
-		if( ( $memory_limit - $curr_mem_usage ) < $memory_needed )// ( 4 * $image_info[0] * $image_info[1] ) )
-		{ // Don't try to load the image into the memory because it would cause 'Allowed memory size exhausted' error
-			return array( "!Cannot resize too large image", false );
+		if( $memory_limit != -1 )
+		{	// If memory is limited:
+			$curr_mem_usage = memory_get_usage( true );
+			// Calculate the aproximative memory size which would be required to create the image resource
+			$tweakfactor = 1.8; // Or whatever works for you
+			$memory_needed = round( ( $image_info[0] * $image_info[1]
+					* ( isset( $image_info['bits'] ) ? $image_info['bits'] : 4 )
+					* ( isset( $image_info['channels'] ) ? $image_info['channels'] / 8 : 1 )
+					+ Pow( 2, 16 ) // number of bytes in 64K
+				) * $tweakfactor );
+			if( ( $memory_limit - $curr_mem_usage ) < $memory_needed )// ( 4 * $image_info[0] * $image_info[1] ) )
+			{ // Don't try to load the image into the memory because it would cause 'Allowed memory size exhausted' error
+				return array( "!Cannot resize too large image", false );
+			}
 		}
 		$imh = $function( $path );
 	}
@@ -739,8 +742,9 @@ if( !function_exists( 'imagerotate' ) )
  * @param integer constrained height
  * @param string mimetype of File
  * @param integer image quality
+ * @return boolean TRUE if the image was successfully resized, otherwise FALSE
  */
-function resize_image( $File, $new_width, $new_height, $mimetype = NULL, $image_quality = NULL)
+function resize_image( $File, $new_width, $new_height, $mimetype = NULL, $image_quality = NULL, $output_message = true )
 {
 	global $Settings, $Messages;
 
@@ -765,15 +769,21 @@ function resize_image( $File, $new_width, $new_height, $mimetype = NULL, $image_
 
 	if( empty( $err ) )
 	{ // Image was resized successfully
-		$Messages->add_to_group( sprintf( T_( '%s was resized to %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', imagesx( $resized_imh ), imagesy( $resized_imh ) ),
-				'success', T_('The following images were resized:') );
+		if( $output_message )
+		{
+			$Messages->add_to_group( sprintf( T_( '%s was resized to %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', imagesx( $resized_imh ), imagesy( $resized_imh ) ),
+					'success', T_('The following images were resized:') );
+		}
 	}
 	else
 	{ // Image was not resized
-		$Messages->add_to_group( sprintf( T_( '%s could not be resized to target resolution of %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', $new_width, $new_height ),
-				'error', T_('Unable to resize the following images:') );
+		if( $output_message )
+		{
+			$Messages->add_to_group( sprintf( T_( '%s could not be resized to target resolution of %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', $new_width, $new_height ),
+					'error', T_('Unable to resize the following images:') );
+		}
 		// Error exists, exit here
-		return;
+		return false;
 	}
 
 	if( $mimetype == 'image/jpeg' )
@@ -783,12 +793,17 @@ function resize_image( $File, $new_width, $new_height, $mimetype = NULL, $image_
 
 	if( !$resized_imh )
 	{	// Image resource is incorrect
-		return;
+		return false;
 	}
 
 	if( empty( $err ) )
 	{	// Save resized image ( and also rotated image if this operation was done )
 		save_image( $resized_imh, $File->get_full_path(), $mimetype, $image_quality );
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 

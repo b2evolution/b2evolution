@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package plugins
@@ -176,6 +176,7 @@ class Plugins_admin extends Plugins
 				'AfterUserDelete' => 'This gets called after an user has been deleted from the database.',
 				'AfterUserInsert' => 'This gets called after an user has been inserted into the database.',
 				'AfterUserUpdate' => 'This gets called after an user has been updated in the database.',
+				'AdminAfterUsersList' => 'This gets called right after displaying the admin users list.',
 
 				// fp> This is actually RENDERing, right?
 				// TODO: Rename to "DispRender"
@@ -224,6 +225,7 @@ class Plugins_admin extends Plugins
 				'GetSpamKarmaForComment' => 'Asks plugin for the spam karma of a comment/trackback.',
 
 				// Other Plugins can use this:
+				'RequestCaptcha' => 'Return data to display captcha html code',
 				'CaptchaValidated' => 'Validate the test from CaptchaPayload to detect humans.',
 				'CaptchaValidatedCleanup' => 'Cleanup data used for CaptchaValidated.',
 				'CaptchaPayload' => 'Provide a turing test to detect humans.',

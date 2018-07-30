@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -320,6 +320,8 @@ function file_select_item( $file_ID, $params = array() )
 	$params = array_merge( array(
 			'field_item_start' => '<div class="file_select_item" data-item-value="%value%">',
 			'field_item_end' => '</div>',
+			'item_before' => '<div>',
+			'item_after' => '</div>',
 			'size_name' => 'crop-64x64',
 			'class' => '',
 			'remove_file_text' => T_('Remove file'),
@@ -333,7 +335,9 @@ function file_select_item( $file_ID, $params = array() )
 	{
 		if( $File->exists() )
 		{
+			$r .= $params['item_before'];
 			$r .= $File->get_thumb_imgtag( $params['size_name'], $params['class'] );
+			$r .= $params['item_after'];
 		}
 		else
 		{

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -21,6 +21,7 @@ load_class( 'links/model/_linkuser.class.php', 'LinkUser' );
 load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
 load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
 load_class( 'links/model/_temporaryid.class.php', 'TemporaryID' );
+load_class( 'messaging/model/_message.class.php', 'Message' );
 
 /**
  * Get a link owner object from link_type and object ID
@@ -464,7 +465,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
  */
 function display_link_position( & $row )
 {
-	global $LinkOwner;
+	global $LinkOwner, $current_File;
 
 	$r = '';
 
@@ -522,6 +523,15 @@ function display_link_position( & $row )
 						'onclick' => 'evo_link_insert_inline( \''.$type.'\', '.$row->link_ID.', \'\' )',
 						'style'   => 'cursor:default;'
 					) );
+
+			if( $current_File->is_dir() )
+			{
+				$r .= ' '.get_icon( 'add__cyan', 'imgtag', array(
+							'title'   => sprintf( T_('Insert %s tag into the post'), '[folder:]' ),
+							'onclick' => 'evo_link_insert_inline( \'folder\', '.$row->link_ID.', \'\' )',
+							'style'   => 'cursor:default;'
+						) );
+			}
 		}
 	}
 
@@ -589,7 +599,7 @@ jQuery( document ).ready( function()
 			var link_IDs = '';
 			jQuery( '#attachments_fieldset_table table tr' ).each( function()
 			{
-				var link_ID_cell = jQuery( this ).find( '.link_id_cell' );
+				var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
 				if( link_ID_cell.length > 0 )
 				{
 					link_IDs += link_ID_cell.html() + ',';
@@ -607,8 +617,18 @@ jQuery( document ).ready( function()
 					'links': link_IDs,
 					'crumb_link': '<?php echo get_crumb( 'link' ); ?>',
 				},
-				success: function()
+				success: function( data )
 				{
+					link_data = JSON.parse( ajax_debug_clear( data ) );
+					// Update data-order attributes
+					jQuery( '#attachments_fieldset_table table tr' ).each( function()
+					{
+						var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
+						if( link_ID_cell.length > 0 )
+						{
+							link_ID_cell.attr( 'data-order', link_data[link_ID_cell.html()] );
+						}
+					} );
 					evoFadeSuccess( $item );
 				}
 			} );
@@ -827,7 +847,7 @@ function link_vote( $link_ID, $user_ID, $vote_action, $checked = 1 )
 	$SQL->FROM( 'T_links__vote' );
 	$SQL->WHERE( 'lvot_link_ID = '.$DB->quote( $link_ID ) );
 	$SQL->WHERE_and( 'lvot_user_ID = '.$DB->quote( $user_ID ) );
-	$existing_vote = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
+	$existing_vote = $DB->get_row( $SQL );
 
 	// Save a voting results in DB:
 	if( empty( $existing_vote ) )

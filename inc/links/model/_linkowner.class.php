@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -124,6 +124,35 @@ class LinkOwner
 					$tmp_link_Object->set( 'coll_ID', $blog );
 				}
 				$tmp_link_Object->dbinsert();
+			}
+
+			if( ! is_object( $this->link_Object ) || empty( $this->link_Object ) )
+			{	// Try to create object if it is empty by some unknown reason:
+				switch( $this->type )
+				{
+					case 'user':
+						load_class( 'users/model/_user.class.php', 'User' );
+						$this->link_Object = new User();
+						break;
+					case 'item':
+						load_class( 'items/model/_item.class.php', 'Item' );
+						$this->link_Object = new Item();
+						break;
+					case 'comment':
+						load_class( 'comments/model/_comment.class.php', 'Comment' );
+						$this->link_Object = new Comment();
+						break;
+					case 'message':
+						load_class( 'messaging/model/_message.class.php', 'Message' );
+						$this->link_Object = new Message();
+						break;
+					case 'emailcampaign':
+						load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
+						$this->link_Object = new EmailCampaign();
+						break;
+					default:
+						debug_die( 'Unknow LinkOwner type "'.$this->type.'"' );
+				}
 			}
 
 			// Mark this link owner is using a temporary object:
@@ -259,7 +288,7 @@ class LinkOwner
 		}
 
 		// Set links query. Note: Use inner join to make sure that result contains only existing files!
-		$SQL->SELECT( 'link_ID, link_ltype_ID, link_position, link_cmt_ID, link_itm_ID, file_ID, file_creator_user_ID, file_type, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
+		$SQL->SELECT( 'link_ID, link_ltype_ID, link_position, link_order, link_cmt_ID, link_itm_ID, file_ID, file_creator_user_ID, file_type, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
 		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( $this->get_where_condition() );
 		$SQL->ORDER_BY( $order_by );
@@ -523,9 +552,9 @@ class LinkOwner
 		$SQL = new SQL( 'Get last order number of the Link Owner ( '.$this->type.', #'.$this->get_ID().' )' );
 		$SQL->SELECT( 'MAX( link_order )' );
 		$SQL->FROM( 'T_links' );
-		$SQL->WHERE( 'link_'.$this->ID_field_name.' = '.$this->get_ID() );
+		$SQL->WHERE( 'link_'.$this->get_ID_field_name().' = '.$this->get_ID() );
 
-		return intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
+		return intval( $DB->get_var( $SQL ) );
 	}
 }
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -33,11 +33,6 @@ $Form->hidden_ctrl();
 $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'advanced' );
 $Form->hidden( 'blog', $edited_Blog->ID );
-
-
-$Form->begin_fieldset( T_('Workflow').get_manual_link('coll-workflow-settings') );
-	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
-$Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('After each new post...').get_manual_link('after_each_new_post') );
@@ -99,13 +94,13 @@ $Form->begin_fieldset( T_('External Feeds').get_manual_link('external_feeds') );
 
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Template').get_manual_link('collection_template') );
+	$Form->checkbox_input( 'blog_allow_duplicate', $edited_Blog->get_setting( 'allow_duplicate' ), T_('Allow duplication'), array( 'note' => T_('Check to allow anyone to duplicate this collection.') ) );
+$Form->end_fieldset();
+
 
 if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 {	// Permission to edit advanced admin settings
-
-	$Form->begin_fieldset( T_('Aggregation').get_admin_badge().get_manual_link('collection_aggregation_settings') );
-		$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Collections to aggregate'), T_('List collection IDs separated by \',\', \'*\' for all collections or leave empty for current collection.').'<br />'.T_('Note: Current collection is always part of the aggregation.'), 255 );
-	$Form->end_fieldset();
 
 	$Form->begin_fieldset( T_('Caching').get_admin_badge().get_manual_link('collection_cache_settings'), array( 'id' => 'caching' ) );
 		$ajax_enabled = $edited_Blog->get_setting( 'ajax_form_enabled' );

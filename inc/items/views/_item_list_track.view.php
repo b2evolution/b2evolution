@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -62,7 +62,7 @@ $ItemList->filter_area = array(
 */
 
 
-$ItemList->title = T_('Task list');
+$ItemList->title = T_('Task list').get_manual_link( 'task-list' );
 
 $ItemList->cols[] = array(
 						'th' => /* TRANS: abbrev for Priority */ T_('Priority'),
@@ -77,7 +77,16 @@ $ItemList->cols[] = array(
 						'th' => T_('Item/Task'),
 						'order' => 'title',
 						'td_class' => 'tskst_$post_pst_ID$',
-						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, 1, 1 )%</strong>',
+						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, 1 )%</strong>'.
+						        ( is_admin_page() ? ' @get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\' )@' : '' ),
+					);
+
+$ItemList->cols[] = array(
+						'th' => T_('Status'),
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap left',
+						'order' => 'status',
+						'td' => '%item_row_status( {Obj}, {CUR_IDX} )%',
 					);
 
 $ItemList->cols[] = array(
@@ -90,49 +99,48 @@ $ItemList->cols[] = array(
 					);
 
 $ItemList->cols[] = array(
-						'th' => T_('Status'),
+						'th' => T_('Workflow Status'),
 						'order' => 'pst_ID',
-						'th_class' => 'shrinkwrap',
 						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "jeditable_cell task_status_edit" )%',
 						'td' => '%item_td_task_cell( "status", {Obj} )%',
 						'extra' => array( 'rel' => '#post_ID#', 'data-post-type' => '#post_ityp_ID#', 'format_to_output' => false )
 					);
 
-
-/**
- * Deadline
- */
-function deadline( $date )
-{
-	$timestamp = mysql2timestamp( $date );
-
-	if( $timestamp <= 0 )
+if( $Blog->get_setting( 'use_deadline' ) )
+{	// Display deadline column only when it is enabled for collection:
+	function deadline( $date )
 	{
-		return '&nbsp;';	// IE needs that crap in order to display cell border :/
-	}
+		$timestamp = mysql2timestamp( $date );
 
-	return mysql2localedate( $date );
-}
-$ItemList->cols[] = array(
+		if( $timestamp <= 0 )
+		{
+			return '&nbsp;';	// IE needs that crap in order to display cell border :/
+		}
+
+		return mysql2localedate( $date );
+	}
+	$ItemList->cols[] = array(
 						'th' => T_('Deadline'),
 						'order' => 'post_datedeadline',
 						'td_class' => 'shrinkwrap tskst_$post_pst_ID$',
 						'td' => '%deadline( #post_datedeadline# )%',
 					);
+}
 
 
 $ItemList->cols[] = array(
 		'th' => /* TRANS: abbrev for info */ T_('i'),
 		'order' => 'datemodified',
 		'default_dir' => 'D',
-		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap',
+		'th_class' => 'shrinkwrap hidden-xs',
+		'td_class' => 'shrinkwrap hidden-xs',
 		'td' => '@history_info_icon()@',
 	);
 
 $ItemList->cols[] = array(
 		'th' => T_('Actions'),
-		'td_class' => 'shrinkwrap',
+		'th_class' => 'shrinkwrap hidden-xs',
+		'td_class' => 'shrinkwrap hidden-xs',
 		'td' => '%item_edit_actions( {Obj} )%',
 	);
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,8 @@ load_class( 'widgets/widgets/_generic_menu_link.widget.php', 'generic_menu_link_
  */
 class profile_menu_link_Widget extends generic_menu_link_Widget
 {
+	var $icon = 'user';
+
 	/**
 	 * Constructor
 	 */

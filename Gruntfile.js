@@ -53,13 +53,14 @@ module.exports = function(grunt) {
 						],
 
 					// Bootstrap skins
-					'skins/bootstrap_blog_skin/style.css':    'skins/bootstrap_blog_skin/style.less',
-					'skins/bootstrap_main_skin/style.css':    'skins/bootstrap_main_skin/style.less',
-					'skins/bootstrap_forums_skin/style.css':  'skins/bootstrap_forums_skin/style.less',
+					'skins/bootstrap_blog_skin/style.css':      'skins/bootstrap_blog_skin/style.less',
+					'skins/bootstrap_main_skin/style.css':      'skins/bootstrap_main_skin/style.less',
+					'skins/bootstrap_forums_skin/style.css':    'skins/bootstrap_forums_skin/style.less',
 					'skins/bootstrap_gallery_legacy/style.css': 'skins/bootstrap_gallery_legacy/style.less',
-					'skins/bootstrap_gallery_skin/style.css': 'skins/bootstrap_gallery_skin/style.less',
-					'skins/bootstrap_manual_skin/style.css':  'skins/bootstrap_manual_skin/style.less',
-					'skins_adm/bootstrap/rsc/css/style.css':  'skins_adm/bootstrap/rsc/css/style.less',
+					'skins/bootstrap_gallery_skin/style.css':   'skins/bootstrap_gallery_skin/style.less',
+					'skins/bootstrap_manual_skin/style.css':    'skins/bootstrap_manual_skin/style.less',
+					'skins/bootstrap_photoblog_skin/style.css': 'skins/bootstrap_photoblog_skin/style.less',
+					'skins_adm/bootstrap/rsc/css/style.css':    'skins_adm/bootstrap/rsc/css/style.less',
 
 					// Helper pages
 					'rsc/build/b2evo_helper_screens.css':    'rsc/less/b2evo_helper_screens.less',
@@ -151,13 +152,14 @@ module.exports = function(grunt) {
 			bootstrap_skins: {
 				files: {
 					// Bootstrap skins
-					'skins/bootstrap_blog_skin/style.min.css':    'skins/bootstrap_blog_skin/style.css',
-					'skins/bootstrap_main_skin/style.min.css':    'skins/bootstrap_main_skin/style.css',
-					'skins/bootstrap_forums_skin/style.min.css':  'skins/bootstrap_forums_skin/style.css',
+					'skins/bootstrap_blog_skin/style.min.css':      'skins/bootstrap_blog_skin/style.css',
+					'skins/bootstrap_main_skin/style.min.css':      'skins/bootstrap_main_skin/style.css',
+					'skins/bootstrap_forums_skin/style.min.css':    'skins/bootstrap_forums_skin/style.css',
 					'skins/bootstrap_gallery_legacy/style.min.css': 'skins/bootstrap_gallery_legacy/style.css',
-					'skins/bootstrap_gallery_skin/style.min.css': 'skins/bootstrap_gallery_skin/style.css',
-					'skins/bootstrap_manual_skin/style.min.css':  'skins/bootstrap_manual_skin/style.css',
-					'skins_adm/bootstrap/rsc/css/style.min.css':  'skins_adm/bootstrap/rsc/css/style.css',
+					'skins/bootstrap_gallery_skin/style.min.css':   'skins/bootstrap_gallery_skin/style.css',
+					'skins/bootstrap_manual_skin/style.min.css':    'skins/bootstrap_manual_skin/style.css',
+					'skins/bootstrap_photoblog_skin/style.min.css': 'skins/bootstrap_photoblog_skin/style.css',
+					'skins_adm/bootstrap/rsc/css/style.min.css':    'skins_adm/bootstrap/rsc/css/style.css',
 				}
 			},
 			skin_evopress: {
@@ -282,6 +284,8 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_report.js',
 							'rsc/js/src/evo_user_deldata.js',
 							'rsc/js/src/evo_user_org.js',
+							'rsc/js/src/evo_automation.js',
+							'rsc/js/src/evo_user_tags.js',
 							'rsc/js/src/evo_rest_api.js',
 							'rsc/js/src/evo_links.js'],
 				dest: 'rsc/js/build/evo_backoffice.bmin.js'
@@ -308,6 +312,8 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_report.js',
 							'rsc/js/src/evo_user_deldata.js',
 							'rsc/js/src/evo_user_org.js',
+							'rsc/js/src/evo_automation.js',
+							'rsc/js/src/evo_user_tags.js',
 							'rsc/js/src/evo_rest_api.js',
 							'rsc/js/src/evo_links.js'],
 				dest: 'rsc/js/build/bootstrap-evo_backoffice.bmin.js'

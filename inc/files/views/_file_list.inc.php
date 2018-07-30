@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -89,7 +89,7 @@ $Form->begin_form();
 		}
 		else
 		{
-			echo action_icon( T_('Go to parent folder'), 'folder_parent', regenerate_url( 'path', 'path='.rawurlencode( $fm_Filelist->_rds_list_path.'..' ) ) );
+			echo action_icon( T_('Go to parent folder'), 'folder_parent', regenerate_url( 'path', 'path='.rawurlencode( preg_replace( '#[^\/]+\/?$#', '', $fm_Filelist->_rds_list_path ) ) ) );
 		}
 		echo '</th>';
 
@@ -721,8 +721,12 @@ $Form->begin_form();
 				$field_options['move_copy'] = T_('Copy/Move to another directory...');
 			}
 
-			if( $mode == 'upload' && isset( $LinkOwner ) && $LinkOwner->type == 'item' )
-			{	// We are uploading in a popup opened by an edit screen
+			if( $mode == 'upload' &&
+			    isset( $LinkOwner ) &&
+			    ( $LinkOwner->type == 'item' ||
+			      ( $LinkOwner->is_temp() && $LinkOwner->link_Object->type == 'item' )
+			    ) )
+			{	// We are uploading in a popup opened by an edit/new item form:
 				$field_options['img_tag'] = T_('Insert IMG/link into post');
 			}
 

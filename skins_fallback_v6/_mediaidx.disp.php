@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -51,8 +51,8 @@ skin_widget( array(
 		'grid_colend' => '',
 		'grid_cellstart' => '<div><span'.$photocell_styles.'>',
 		'grid_cellend' => '</span></div>',
-		'order_by' => $Blog->get_setting('orderby'),
-		'order_dir' => $Blog->get_setting('orderdir'),
+		'order_by' => get_blog_order( $Blog, 'field' ),
+		'order_dir' => get_blog_order( $Blog, 'dir' ),
 		'limit' => 1000,
 	) );
 // ---------------------------------- END OF MEDIA INDEX ---------------------------------

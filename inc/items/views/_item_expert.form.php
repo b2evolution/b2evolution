@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -98,6 +98,9 @@ $Form->begin_form( '', '', $params );
 
 	// Post type
 	$Form->hidden( 'item_typ_ID', $edited_Item->ityp_ID );
+
+	// Check if current Item type usage is not content block in order to hide several fields below:
+	$is_not_content_block = ( $edited_Item->get_type_setting( 'usage' ) != 'content-block' );
 ?>
 <div class="row">
 
@@ -136,60 +139,43 @@ $Form->begin_form( '', '', $params );
 			$form_title_item_ID = T_('New Item');
 		}
 	}
-	$Form->begin_fieldset( $form_title_item_ID.get_manual_link( 'post-contents-panel' )
-				.'<span class="pull-right">'.sprintf( T_('Type: %s'), $item_type_link ).'</span>',
-			array( 'id' => 'itemform_content' ) );
-
-	$Form->switch_layout( 'none' );
-
-	echo '<table cellspacing="0" class="compose_layout" align="center"><tr>';
-	$display_title_field = $edited_Item->get_type_setting( 'use_title' ) != 'never';
-	if( $display_title_field )
-	{ // Display title
-		$field_required = ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ? $required_star : '';
-		echo '<td width="1%" class="label">'.$field_required.'<strong>'.T_('Title').':</strong></td>';
-		echo '<td width="97%" class="input">';
-		$Form->text_input( 'post_title', $item_title, 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
-		echo '</td>';
+	if( $current_User->check_perm( 'options', 'edit' ) )
+	{	// Add an icon to edit item type if current user has a permission:
+		$item_type_edit_link = ' '.action_icon( T_('Edit this Post Type...'), 'edit', $admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID='.$edited_Item->get( 'ityp_ID' ) );
 	}
 	else
-	{ // Hide title
+	{
+		$item_type_edit_link = '';
+	}
+	$Form->begin_fieldset( $form_title_item_ID.get_manual_link( 'post-contents-panel' )
+				.'<span class="pull-right">'.sprintf( T_('Type: %s'), $item_type_link ).$item_type_edit_link.'</span>',
+			array( 'id' => 'itemform_content' ) );
+
+	$Form->switch_layout( 'fields_table' );
+	$Form->begin_fieldset( '', array( 'class' => 'evo_fields_table__single_row' ) );
+	if( $edited_Item->get_type_setting( 'use_title' ) != 'never' )
+	{	// Display a post title field:
+		$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array( 'maxlength' => 255, 'required' => ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ) );
+	}
+	else
+	{	// Hide a post title field:
 		$Form->hidden( 'post_title', $item_title );
 	}
 
-	// -- Language chooser BEGIN --
-	if( $Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' &&
-	    $edited_Item->get( 'locale' ) == $Blog->get( 'locale' ) &&
-	    isset( $locales[ $edited_Item->get( 'locale' ) ] ) )
-	{	// Force to use  collection locale because it is restricted by collection setting and the edited item has the same locale as collection:
-		$locale_options = array( $edited_Item->get( 'locale' ), $locales[ $edited_Item->get( 'locale' ) ]['name'] );
+	$locale_options = locale_options( $edited_Item->get( 'locale' ), false, true );
+	if( ( $Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' &&
+	      $edited_Item->get( 'locale' ) == $Blog->get( 'locale' ) &&
+	      isset( $locales[ $edited_Item->get( 'locale' ) ] )
+	    ) || is_array( $locale_options ) )
+	{	// Force to use collection locale because it is restricted by collection setting and the edited item has the same locale as collection
+		// OR only single locale is allowed to select:
+		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
 	}
 	else
 	{	// Allow to select a locale:
-		$locale_options = locale_options( $edited_Item->get( 'locale' ), false, true );
+		$Form->select_input_options( 'post_locale', $locale_options, T_('Language'), '', array( 'style' => 'width:180px' ) );
 	}
-
-	if( is_array( $locale_options ) )
-	{ // We've only one enabled locale.
-		// Tblue> The locale name is not really needed here, but maybe we
-		//        want to display the name of the only locale?
-		$Form->hidden( 'post_locale', $locale_options[0] );
-	}
-	else
-	{ // More than one locale => select field.
-		echo '<td width="1%" class="label">';
-		if( $display_title_field )
-		{
-			echo '&nbsp;&nbsp;';
-		}
-		echo '<strong>'.T_('Language').':</strong></td>';
-		echo '<td width="1%" class="select">';
-		$Form->select_options( 'post_locale', $locale_options, '' );
-		echo '</td>';
-	}
-	// -- Language chooser END --
-	echo '</tr></table>';
-
+	$Form->end_fieldset();
 	$Form->switch_layout( NULL );
 
 	if( $edited_Item->get_type_setting( 'use_text' ) != 'never' )
@@ -292,36 +278,26 @@ $Form->begin_form( '', '', $params );
 
 		if( count( $custom_fields ) )
 		{	// Display fieldset with custom fields only if at least one exists:
-			$Form->begin_fieldset( T_('Custom fields').get_manual_link( 'post-custom-fields-panel' ), array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
-
-			echo '<table cellspacing="0" class="compose_layout">';
-
-			foreach( $custom_fields as $custom_field )
-			{	// Loop through custom fields:
-				echo '<tr><td class="label"><label for="item_'.$custom_field['type'].'_'.$custom_field['ID'].'"><strong>'.$custom_field['label'].':</strong></label></td>';
-				echo '<td class="input" width="97%">';
-				switch( $custom_field['type'] )
-				{
-					case 'double':
-						$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, '', $custom_field['note'].' <code>'.$custom_field['name'].'</code>' );
-						break;
-					case 'varchar':
-						$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, '', '<br />'.$custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
-						break;
-					case 'text':
-						$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, '', array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
-						break;
-					case 'html':
-						$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, '', array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
-						break;
-					case 'url':
-						$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_url_'.$custom_field['ID'] ), 20, '', '<br />'.$custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
-						break;
-				}
-				echo '</td></tr>';
+			$custom_fields_title = T_('Custom fields').get_manual_link( 'post-custom-fields-panel' );
+			if( $current_User->check_perm( 'options', 'edit' ) )
+			{	// Display an icon to edit post type if current user has a permission:
+				$custom_fields_title .= '<span class="floatright panel_heading_action_icons">'
+						.action_icon( T_('Edit fields...'), 'edit',
+							$admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID='.$edited_Item->get( 'ityp_ID' ).'#fieldset_wrapper_custom_fields',
+							T_('Edit fields...'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm' ) )
+					.'</span>';
 			}
 
-			echo '</table>';
+			$Form->begin_fieldset( $custom_fields_title, array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
+
+			$Form->switch_layout( 'fields_table' );
+			$Form->begin_fieldset();
+
+			// Display inputs to edit custom fields:
+			display_editable_custom_fields( $Form, $edited_Item );
+
+			$Form->end_fieldset();
+			$Form->switch_layout( NULL );
 
 			$Form->end_fieldset();
 		}
@@ -331,11 +307,12 @@ $Form->begin_form( '', '', $params );
 
 	$Form->begin_fieldset( T_('Advanced properties').get_manual_link( 'post-advanced-properties-panel' ), array( 'id' => 'itemform_adv_props', 'fold' => true ) );
 
-	echo '<table cellspacing="0" class="compose_layout">';
+	$Form->switch_layout( 'fields_table' );
+	$Form->begin_fieldset();
 
+	// URL slugs:
 	//add slug_changed field - needed for slug trim, if this field = 0 slug will trimmed
 	$Form->hidden( 'slug_changed', 0 );
-
 	$edit_slug_link = '';
 	if( $edited_Item->ID > 0 && $current_User->check_perm( 'slugs', 'view' ) )
 	{ // user has permission to view slugs:
@@ -355,18 +332,10 @@ $Form->begin_form( '', '', $params );
 				'after'  => ''
 			) );
 	}
-
-	echo '<tr><td class="label" valign="top"><label for="post_urltitle" title="'.T_('&quot;slug&quot; to be used in permalinks').'"><strong>'.T_('URL slugs').':</strong></label></td>';
-	echo '<td class="input" width="97%">';
-	$Form->text_input( 'post_urltitle', $edited_Item->get_slugs(), 40, '', '<br />'.$edit_slug_link.$tiny_slug_info, array( 'maxlength' => 210, 'style' => 'width: 100%;' ) );
-	echo '</td></tr>';
+	$Form->text_input( 'post_urltitle', $edited_Item->get_slugs(), 40, T_('URL slugs'), $edit_slug_link.$tiny_slug_info, array( 'maxlength' => 210 ) );
 
 	if( $edited_Item->get_type_setting( 'use_tags' ) != 'never' )
-	{ // Display tags
-		$field_required = ( $edited_Item->get_type_setting( 'use_tags' ) == 'required' ) ? $required_star : '';
-		echo '<tr><td class="label"><label for="item_tags">'.$field_required.'<strong>'.T_('Tags').':</strong></label></td>';
-		echo '<td class="input" width="97%">';
-
+	{	// Display tags:
 		$link_to_tags_manager = '';
 		if( $current_User->check_perm( 'options', 'view' ) )
 		{ // Display a link to manage tags only when current use has the rights
@@ -377,8 +346,9 @@ $Form->begin_form( '', '', $params );
 				.'<input id="suggest_item_tags" name="suggest_item_tags" value="1" type="checkbox"'.( $UserSettings->get( 'suggest_item_tags' ) ? ' checked="checked"' : '' ).' /> '
 				.T_('Auto-suggest tags as you type (based on existing tags)').$link_to_tags_manager
 			.'</label>';
-		$Form->text_input( 'item_tags', $item_tags, 40, '', $suggest_checkbox, array(
+		$Form->text_input( 'item_tags', $item_tags, 40, T_('Tags'), $suggest_checkbox, array(
 				'maxlength' => 255,
+				'required'  => ( $edited_Item->get_type_setting( 'use_tags' ) == 'required' ),
 				'style'     => 'width: 100%;',
 				'input_prefix' => '<div class="input-group">',
 				'input_suffix' => '<span class="input-group-btn">'
@@ -389,52 +359,47 @@ $Form->begin_form( '', '', $params );
 							.' value="'.format_to_output( T_('Extract'), 'htmlattr' ).'" />'
 					.'</span></div>',
 			) );
-		echo '</td></tr>';
 	}
 	else
-	{ // Hide tags
+	{	// Hide tags:
 		$Form->hidden( 'item_tags', $item_tags );
 	}
 
-	$edited_item_excerpt = $edited_Item->get( 'excerpt' );
-	if( $edited_Item->get_type_setting( 'use_excerpt' ) != 'never' )
-	{ // Display excerpt
-		$field_required = ( $edited_Item->get_type_setting( 'use_excerpt' ) == 'required' ) ? $required_star : '';
-		$field_class = param_has_error( 'post_excerpt' ) ? ' field_error' : '';
-		echo '<tr><td class="label"><label for="post_excerpt">'.$field_required.'<strong>'.T_('Excerpt').':</strong></label></td>';
-		echo '<td class="input" width="97%">';
-		$excerpt_checkbox = '<label>'
-				.'<input name="post_excerpt_autogenerated" value="1" type="checkbox"'.( $edited_Item->get( 'excerpt_autogenerated' ) ? ' checked="checked"' : '' ).' /> '
-				.T_('Auto-generate excerpt from content')
-			.'</label>';
-		$Form->textarea_input( 'post_excerpt', $edited_item_excerpt, 3, '', array(
-				'class'    => $field_class,
-				'required' => $field_required,
-				'style'    => 'width:100%',
-				'note'     => $excerpt_checkbox,
-			) );
-		echo '</td></tr>';
-	}
-	else
-	{ // Hide excerpt
-		$Form->hidden( 'post_excerpt', htmlspecialchars( $edited_item_excerpt ) );
+	if( $is_not_content_block )
+	{	// Display excerpt for item with type usage except of content block:
+		$edited_item_excerpt = $edited_Item->get( 'excerpt' );
+		if( $edited_Item->get_type_setting( 'use_excerpt' ) != 'never' )
+		{	// Display excerpt:
+			$excerpt_checkbox = '<label>'
+					.'<input name="post_excerpt_autogenerated" value="1" type="checkbox"'.( $edited_Item->get( 'excerpt_autogenerated' ) ? ' checked="checked"' : '' ).' /> '
+					.T_('Auto-generate excerpt from content')
+				.'</label>';
+			$Form->textarea_input( 'post_excerpt', $edited_item_excerpt, 3, T_('Excerpt'), array(
+					'required' => ( $edited_Item->get_type_setting( 'use_excerpt' ) == 'required' ),
+					'style'    => 'width:100%',
+					'note'     => $excerpt_checkbox,
+				) );
+		}
+		else
+		{	// Hide excerpt:
+			$Form->hidden( 'post_excerpt', htmlspecialchars( $edited_item_excerpt ) );
+		}
 	}
 
 	if( $edited_Item->get_type_setting( 'use_url' ) != 'never' )
-	{ // Display url
-		$field_required = ( $edited_Item->get_type_setting( 'use_url' ) == 'required' ) ? $required_star : '';
-		echo '<tr><td class="label"><label for="post_url">'.$field_required.'<strong>'.T_('Link to url').':</strong></label></td>';
-		echo '<td class="input" width="97%">';
-		$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, '', '', array( 'maxlength' => 255, 'style' => 'width:100%' ) );
-		echo '</td></tr>';
+	{	// Display url:
+		$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, T_('Link to url'), '', array(
+				'maxlength' => 255,
+				'required'  => ( $edited_Item->get_type_setting( 'use_url' ) == 'required' )
+			) );
 	}
 	else
-	{ // Hide url
+	{	// Hide url:
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
 	}
 
 	if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
-	{ // Display parent ID:
+	{	// Display parent ID:
 		if( $parent_Item = & $edited_Item->get_parent_Item() )
 		{	// Get parent item info if it is defined:
 			$parent_info = '';
@@ -452,57 +417,57 @@ $Form->begin_form( '', '', $params );
 		{	// No parent item defined
 			$parent_info = '';
 		}
-		$field_required = ( $edited_Item->get_type_setting( 'use_parent' ) == 'required' ) ? $required_star : '';
-		echo '<tr><td class="label"><label for="post_parent_ID">'.$field_required.'<strong>'.T_('Parent ID').':</strong></label></td>';
-		echo '<td class="input" width="97%">';
-		$Form->text_input( 'post_parent_ID', $edited_Item->get( 'parent_ID' ), 11, '', $parent_info );
-		echo '</td></tr>';
+		$Form->text_input( 'post_parent_ID', $edited_Item->get( 'parent_ID' ), 11, T_('Parent ID'), $parent_info, array(
+				'required' => ( $edited_Item->get_type_setting( 'use_parent' ) == 'required' ),
+				'style'    => 'width:115px',
+			) );
 	}
 	else
-	{ // Hide parent ID:
+	{	// Hide parent ID:
 		$Form->hidden( 'post_parent_ID', $edited_Item->get( 'parent_ID' ) );
 	}
 
-	if( $edited_Item->get_type_setting( 'use_title_tag' ) != 'never' )
-	{ // Display <title> tag
-		$field_required = ( $edited_Item->get_type_setting( 'use_title_tag' ) == 'required' ) ? $required_star : '';
-		echo '<tr><td class="label"><label for="titletag">'.$field_required.'<strong>'.T_('&lt;title&gt; tag').':</strong></label></td>';
-		echo '<td class="input" width="97%">';
-		$Form->text_input( 'titletag', $edited_Item->get('titletag'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-		echo '</td></tr>';
-	}
-	else
-	{ // Hide <title> tag
-		$Form->hidden( 'titletag', $edited_Item->get('titletag') );
+	if( $is_not_content_block )
+	{	// Display title tag, meta description and meta keywords for item with type usage except of content block:
+		if( $edited_Item->get_type_setting( 'use_title_tag' ) != 'never' )
+		{	// Display <title> tag:
+			$Form->text_input( 'titletag', $edited_Item->get( 'titletag' ), 40, T_('&lt;title&gt; tag'), '', array(
+					'maxlength' => 255,
+					'required'  => ( $edited_Item->get_type_setting( 'use_title_tag' ) == 'required' )
+				) );
+		}
+		else
+		{	// Hide <title> tag:
+			$Form->hidden( 'titletag', $edited_Item->get( 'titletag' ) );
+		}
+
+		if( $edited_Item->get_type_setting( 'use_meta_desc' ) != 'never' )
+		{	// Display <meta> description:
+			$Form->text_input( 'metadesc', $edited_Item->get_setting( 'metadesc' ), 40, T_('&lt;meta&gt; desc'), '', array(
+					'maxlength' => 255,
+					'required'  => ( $edited_Item->get_type_setting( 'use_meta_desc' ) == 'required' )
+				) );
+		}
+		else
+		{	// Hide <meta> description:
+			$Form->hidden( 'metadesc', $edited_Item->get_setting('metadesc') );
+		}
+
+		if( $edited_Item->get_type_setting( 'use_meta_keywds' ) != 'never' )
+		{	// Display <meta> keywords:
+			$Form->text_input( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ), 40, T_('&lt;meta&gt; keywds'), '', array(
+					'maxlength' => 255, 
+					'required'  => ( $edited_Item->get_type_setting( 'use_meta_keywds' ) == 'required' )
+				) );
+		}
+		else
+		{	// Hide <meta> keywords:
+			$Form->hidden( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ) );
+		}
 	}
 
-	if( $edited_Item->get_type_setting( 'use_meta_desc' ) != 'never' )
-	{ // Display <meta> description
-		$field_required = ( $edited_Item->get_type_setting( 'use_meta_desc' ) == 'required' ) ? $required_star : '';
-		echo '<tr><td class="label"><label for="metadesc" title="&lt;meta name=&quot;description&quot;&gt;">'.$field_required.'<strong>'.T_('&lt;meta&gt; desc').':</strong></label></td>';
-		echo '<td class="input" width="97%">';
-		$Form->text_input( 'metadesc', $edited_Item->get_setting('metadesc'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-		echo '</td></tr>';
-	}
-	else
-	{ // Hide <meta> description
-		$Form->hidden( 'metadesc', $edited_Item->get_setting('metadesc') );
-	}
-
-	if( $edited_Item->get_type_setting( 'use_meta_keywds' ) != 'never' )
-	{ // Display <meta> keywords
-		$field_required = ( $edited_Item->get_type_setting( 'use_meta_keywds' ) == 'required' ) ? $required_star : '';
-		echo '<tr><td class="label"><label for="metakeywords" title="&lt;meta name=&quot;keywords&quot;&gt;">'.$field_required.'<strong>'.T_('&lt;meta&gt; keywds').':</strong></label></td>';
-		echo '<td class="input" width="97%">';
-		$Form->text_input( 'metakeywords', $edited_Item->get_setting('metakeywords'), 40, '', '', array('maxlength'=>255, 'style'=>'width: 100%;') );
-		echo '</td></tr>';
-	}
-	else
-	{ // Hide <meta> keywords
-		$Form->hidden( 'metakeywords', $edited_Item->get_setting('metakeywords') );
-	}
-
-	echo '</table>';
+	$Form->end_fieldset();
+	$Form->switch_layout( NULL );
 
 	$Form->end_fieldset();
 
@@ -600,7 +565,7 @@ $Form->begin_form( '', '', $params );
 
 	// ############################ WORKFLOW #############################
 
-	if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+	if( $is_not_content_block && $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 	{	// We want to use workflow properties for this blog:
 		$Form->begin_fieldset( T_('Workflow properties').get_manual_link( 'post-edit-workflow-panel' ), array( 'id' => 'itemform_workflow_props', 'fold' => true ) );
 
@@ -631,31 +596,40 @@ $Form->begin_form( '', '', $params );
 
 			$ItemStatusCache = & get_ItemStatusCache();
 			$ItemStatusCache->load_all();
-
 			$ItemTypeCache = & get_ItemTypeCache();
-			$current_ItemType = $ItemTypeCache->get_by_ID( $edited_Item->ityp_ID );
+			$current_ItemType = & $edited_Item->get_ItemType();
 			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
 
 			echo ' '; // allow wrapping!
 
-			$Form->begin_line( T_('Deadline'), 'item_deadline' );
+			if( $Blog->get_setting( 'use_deadline' ) )
+			{	// Display deadline fields only if it is enabled for collection:
+				$Form->begin_line( T_('Deadline'), 'item_deadline' );
 
-				$datedeadline = $edited_Item->get( 'datedeadline' );
-				$Form->date( 'item_deadline', $datedeadline, '' );
+					$datedeadline = $edited_Item->get( 'datedeadline' );
+					$Form->date( 'item_deadline', $datedeadline, '' );
 
-				$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
-				$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
+					$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
+					$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
 
-			$Form->end_line();
+				$Form->end_line();
+			}
 
 			$Form->switch_layout( NULL );
 			echo '</div>';
 
 		$Form->end_fieldset();
 	}
-	// ################### CATEGORIES ###################
 
-	cat_select( $Form, true, true, array( 'fold' => true ) );
+	if( $is_not_content_block )
+	{	// Display category selector for item with type usage except of content block:
+		// ################### CATEGORIES ###################
+		cat_select( $Form, true, true, array( 'fold' => true ) );
+	}
+	else
+	{	// Use a hidden input feild for category in order to don't reset this to default on each updating:
+		$Form->hidden( 'post_category', $edited_Item->get( 'main_cat_ID' ) );
+	}
 
 	// ################### LOCATIONS ###################
 	echo_item_location_form( $Form, $edited_Item, array( 'fold' => true ) );
@@ -675,7 +649,10 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'item_featured', $edited_Item->featured );
 	}
 
-	$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.T_('Hide teaser when displaying -- more --').'</strong>' );
+	if( $is_not_content_block )
+	{	// Display "hide teaser" checkbox for item with type usage except of content block:
+		$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.sprintf( T_('Hide teaser when displaying part after %s'), '<code>[teaserbreak]</code>' ).'</strong>' );
+	}
 
 	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
@@ -691,15 +668,18 @@ $Form->begin_form( '', '', $params );
 	echo '</td></tr>';
 
 	if( $current_User->check_perm( 'users', 'edit' ) )
-	{
-		echo '<tr><td><strong>'.T_('Owner').':</strong></td><td>';
-		$Form->username( 'item_owner_login', $edited_Item->get_creator_User(), '', T_( 'login of this post\'s owner.').'<br/>' );
+	{	// If current User has full access to edit other users,
+		// Display item's owner:
+		echo '<tr><td class="flabel_item_owner_login"><strong>'.T_('Owner').':</strong></td><td>';
+		$Form->username( 'item_owner_login', $edited_Item->get_creator_User(), '', T_( 'login of this post\'s owner.') );
+		// Display a checkbox to create new user:
+		echo '<label class="ffield_item_create_user"><input type="checkbox" name="item_create_user" value="1"'.( get_param( 'item_create_user' ) ? ' checked="checked"' : '' ).' /> '.T_('Create new user').'</label>';
 		$Form->hidden( 'item_owner_login_displayed', 1 );
 		echo '</td></tr>';
 	}
 
 	if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
-	{ // Dispaly Latitude & Longitude settings
+	{	// Display Latitude & Longitude settings:
 		$field_required = ( $edited_Item->get_type_setting( 'use_coordinates' ) == 'required' ) ? $required_star : '';
 		echo '<tr><td>'.$field_required.'<strong>'.T_('Latitude').':</strong></td><td>';
 		$Form->text( 'item_latitude', $edited_Item->get_setting( 'latitude' ), 10, '' );
@@ -780,109 +760,112 @@ $Form->begin_form( '', '', $params );
 	}
 
 
-	// ################### GOAL TRACKING ###################
+	if( $is_not_content_block )
+	{	// Display goal tracking and notifications for item with type usage except of content block:
+		// ################### GOAL TRACKING ###################
 
-	$Form->begin_fieldset( T_('Goal tracking').get_manual_link( 'post-goal-tracking-panel' )
-					.action_icon( T_('Goals'), 'edit', $admin_url.'?ctrl=goals&amp;blog='.$Blog->ID, T_('Goals'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
-				array( 'id' => 'itemform_goals', 'fold' => true ) );
+		$Form->begin_fieldset( T_('Goal tracking').get_manual_link( 'post-goal-tracking-panel' )
+						.action_icon( T_('Goals'), 'edit', $admin_url.'?ctrl=goals&amp;blog='.$Blog->ID, T_('Goals'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
+					array( 'id' => 'itemform_goals', 'fold' => true ) );
 
-	$Form->switch_layout( 'table' );
-	$Form->formstart = '<table id="item_locations" cellspacing="0" class="fform">'."\n";
-	$Form->labelstart = '<td class="right"><strong>';
-	$Form->labelend = '</strong></td>';
+		$Form->switch_layout( 'table' );
+		$Form->formstart = '<table id="item_locations" cellspacing="0" class="fform">'."\n";
+		$Form->labelstart = '<td class="right"><strong>';
+		$Form->labelend = '</strong></td>';
 
-	echo '<p class="note">'.T_( 'You can track a hit on a goal every time this page is displayed to a user.' ).'</p>';
+		echo '<p class="note">'.T_( 'You can track a hit on a goal every time this page is displayed to a user.' ).'</p>';
 
-	echo $Form->formstart;
+		echo $Form->formstart;
 
-	$goal_ID = $edited_Item->get_setting( 'goal_ID' );
-	$item_goal_cat_ID = 0;
-	$GoalCache = & get_GoalCache();
-	if( ! empty( $goal_ID ) && $item_Goal = $GoalCache->get_by_ID( $goal_ID, false, false ) )
-	{ // Get category ID of goal
-		$item_goal_cat_ID = $item_Goal->gcat_ID;
-	}
-
-	$GoalCategoryCache = & get_GoalCategoryCache( NT_( 'No Category' ) );
-	$GoalCategoryCache->load_all();
-	$Form->select_input_object( 'goal_cat_ID', $item_goal_cat_ID, $GoalCategoryCache, T_('Category'), array( 'allow_none' => true ) );
-
-	// Get only the goals without a defined redirect url
-	$goals_where_sql = 'goal_redir_url IS NULL';
-	if( empty( $item_goal_cat_ID ) )
-	{ // Get the goals without category
-		$goals_where_sql .= ' AND goal_gcat_ID IS NULL';
-	}
-	else
-	{ // Get the goals by category ID
-		$goals_where_sql .= ' AND goal_gcat_ID = '.$DB->quote( $item_goal_cat_ID );
-	}
-	$GoalCache->load_where( $goals_where_sql );
-	$Form->select_input_object( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ), $GoalCache,
-		get_icon( 'multi_action', 'imgtag', array( 'style' => 'margin:0 5px 0 14px;position:relative;top:-1px;') ).T_('Goal'),
-		array(
-			'allow_none' => true,
-			'note' => '<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.T_('Loading...').'" title="'.T_('Loading...').'" style="display:none;margin-left:5px" align="top" />'
-		) );
-
-	echo $Form->formend;
-
-	$Form->switch_layout( NULL );
-
-	$Form->end_fieldset();
-
-
-	// ################### NOTIFICATIONS ###################
-
-	$Form->begin_fieldset( T_('Notifications').get_manual_link( 'post-notifications-panel' ), array( 'id' => 'itemform_notifications', 'fold' => true ) );
-
-		$Form->info( T_('Moderators'), $edited_Item->check_notifications_flags( 'moderators_notified' ) ? T_('Notified at least once') : T_('Not notified yet') );
-
-		$notify_types = array(
-				'members_notified'   => T_('Members'),
-				'community_notified' => T_('Community'),
-				'pings_sent'         => T_('Public pings'),
-		);
-
-		foreach( $notify_types as $notify_type => $notify_title )
-		{
-			if( ! $edited_Item->notifications_allowed() )
-			{	// Notifications are not allowed for the Item:
-				$Form->info( $notify_title, T_('Not Possible for this post type') );
-			}
-			else
-			{	// Notifications are allowed for the Item:
-				if( $edited_Item->check_notifications_flags( $notify_type ) )
-				{	// Nofications/Pings were sent:
-					$notify_status = ( $notify_type == 'pings_sent' ) ? T_('Sent') : T_('Notified');
-					$notify_select_options = array(
-							''      => T_('Done'),
-							'force' => ( $notify_type == 'pings_sent' ) ? T_('Send again') : T_('Notify again')
-						);
-				}
-				elseif( $edited_Item->get_type_setting( 'usage' ) != 'post' )
-				{	// Item type is not applicable and Nofications/Pings are not sent yet:
-					$notify_status = T_('Not Recommended');
-					$notify_select_options = array(
-							''      => T_('Do nothing'),
-							'force' => ( $notify_type == 'pings_sent' ) ? T_('Send anyways') : T_('Notify anyways'),
-							'mark'  => ( $notify_type == 'pings_sent' ) ? T_('Mark as Sent') : T_('Mark as Notified')
-						);
-				}
-				else
-				{	// Nofications/Pings are not sent yet:
-					$notify_status = ( $notify_type == 'pings_sent' ) ? T_('To be sent') : T_('To be notified');
-					$notify_select_options = array(
-							''     => ( $notify_type == 'pings_sent' ) ? T_('Send on next save') : T_('Notify on next save'),
-							'skip' => T_('Skip on next save'),
-							'mark' => ( $notify_type == 'pings_sent' ) ? T_('Mark as Sent') : T_('Mark as Notified')
-						);
-				}
-				$Form->select_input_array( 'item_'.$notify_type, get_param( 'item_'.$notify_type ), $notify_select_options, $notify_title, NULL, array( 'input_prefix' => $notify_status.' &nbsp; &nbsp; ' ) );
-			}
+		$goal_ID = $edited_Item->get_setting( 'goal_ID' );
+		$item_goal_cat_ID = 0;
+		$GoalCache = & get_GoalCache();
+		if( ! empty( $goal_ID ) && $item_Goal = $GoalCache->get_by_ID( $goal_ID, false, false ) )
+		{ // Get category ID of goal
+			$item_goal_cat_ID = $item_Goal->gcat_ID;
 		}
 
-	$Form->end_fieldset();
+		$GoalCategoryCache = & get_GoalCategoryCache( NT_( 'No Category' ) );
+		$GoalCategoryCache->load_all();
+		$Form->select_input_object( 'goal_cat_ID', $item_goal_cat_ID, $GoalCategoryCache, T_('Category'), array( 'allow_none' => true ) );
+
+		// Get only the goals without a defined redirect url
+		$goals_where_sql = 'goal_redir_url IS NULL';
+		if( empty( $item_goal_cat_ID ) )
+		{ // Get the goals without category
+			$goals_where_sql .= ' AND goal_gcat_ID IS NULL';
+		}
+		else
+		{ // Get the goals by category ID
+			$goals_where_sql .= ' AND goal_gcat_ID = '.$DB->quote( $item_goal_cat_ID );
+		}
+		$GoalCache->load_where( $goals_where_sql );
+		$Form->select_input_object( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ), $GoalCache,
+			get_icon( 'multi_action', 'imgtag', array( 'style' => 'margin:0 5px 0 14px;position:relative;top:-1px;') ).T_('Goal'),
+			array(
+				'allow_none' => true,
+				'note' => '<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.T_('Loading...').'" title="'.T_('Loading...').'" style="display:none;margin-left:5px" align="top" />'
+			) );
+
+		echo $Form->formend;
+
+		$Form->switch_layout( NULL );
+
+		$Form->end_fieldset();
+
+
+		// ################### NOTIFICATIONS ###################
+
+		$Form->begin_fieldset( T_('Notifications').get_manual_link( 'post-notifications-panel' ), array( 'id' => 'itemform_notifications', 'fold' => true ) );
+
+			$Form->info( T_('Moderators'), $edited_Item->check_notifications_flags( 'moderators_notified' ) ? T_('Notified at least once') : T_('Not notified yet') );
+
+			$notify_types = array(
+					'members_notified'   => T_('Members'),
+					'community_notified' => T_('Community'),
+					'pings_sent'         => T_('Public pings'),
+			);
+
+			foreach( $notify_types as $notify_type => $notify_title )
+			{
+				if( ! $edited_Item->notifications_allowed() )
+				{	// Notifications are not allowed for the Item:
+					$Form->info( $notify_title, T_('Not Possible for this post type') );
+				}
+				else
+				{	// Notifications are allowed for the Item:
+					if( $edited_Item->check_notifications_flags( $notify_type ) )
+					{	// Nofications/Pings were sent:
+						$notify_status = ( $notify_type == 'pings_sent' ) ? T_('Sent') : T_('Notified');
+						$notify_select_options = array(
+								''      => T_('Done'),
+								'force' => ( $notify_type == 'pings_sent' ) ? T_('Send again') : T_('Notify again')
+							);
+					}
+					elseif( $edited_Item->get_type_setting( 'usage' ) != 'post' )
+					{	// Item type is not applicable and Nofications/Pings are not sent yet:
+						$notify_status = T_('Not Recommended');
+						$notify_select_options = array(
+								''      => T_('Do nothing'),
+								'force' => ( $notify_type == 'pings_sent' ) ? T_('Send anyways') : T_('Notify anyways'),
+								'mark'  => ( $notify_type == 'pings_sent' ) ? T_('Mark as Sent') : T_('Mark as Notified')
+							);
+					}
+					else
+					{	// Nofications/Pings are not sent yet:
+						$notify_status = ( $notify_type == 'pings_sent' ) ? T_('To be sent') : T_('To be notified');
+						$notify_select_options = array(
+								''     => ( $notify_type == 'pings_sent' ) ? T_('Send on next save') : T_('Notify on next save'),
+								'skip' => T_('Skip on next save'),
+								'mark' => ( $notify_type == 'pings_sent' ) ? T_('Mark as Sent') : T_('Mark as Notified')
+							);
+					}
+					$Form->select_input_array( 'item_'.$notify_type, get_param( 'item_'.$notify_type ), $notify_select_options, $notify_title, NULL, array( 'input_prefix' => $notify_status.' &nbsp; &nbsp; ' ) );
+				}
+			}
+
+		$Form->end_fieldset();
+	}
 
 
 	// ################### QUICK SETTINGS ###################

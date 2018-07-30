@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -419,58 +419,20 @@ class ItemLight extends DataObject
 	 *
 	 * @todo archives modes in clean URL mode
 	 *
-	 * @param string single, archive, subchap
-	 * @param string base url to use
-	 * @param string glue between url params
+	 * @param string Permalink type for case when it cannot be automatically detected from item settings (single, archive, subchap)
+	 * @param string Base url to use
+	 * @param string Glue between url params
+	 * @param array What permanent types should be ignored to don't return a permanent URL
+	 * @return string|boolean Permalink URL | FALSE when some permanent type must be ignored
 	 */
-	function get_permanent_url( $permalink_type = '', $blogurl = '', $glue = '&amp;' )
+	function get_permanent_url( $permalink_type = '', $blogurl = '', $glue = '&amp;', $ignore_types = array() )
 	{
-		global $DB, $cacheweekly, $Settings;
+		// Get permalink type depending on this item settings:
+		$permalink_type = $this->get_permalink_type( $permalink_type );
 
-		if( $ItemType = & $this->get_ItemType() )
-		{	// Get type usage of this item:
-			$item_type_usage = $ItemType->get( 'usage' );
-		}
-		else
-		{	// Use default item type usage:
-			$item_type_usage = 'post';
-		}
-
-		$this->get_Blog();
-
-		// Special Items types/usages will have special permalink types
-		if( ( $this->Blog->get_setting( 'front_disp' ) == 'page' &&
-		      $this->Blog->get_setting( 'front_post_ID' ) == $this->ID ) ||
-		    ( $this->Blog->get_setting( 'front_disp' ) == 'single' &&
-		      ( $first_mainlist_Item = & $this->Blog->get_first_mainlist_Item() ) &&
-		      $first_mainlist_Item->ID == $this->ID ) )
-		{ // This item is used as front specific page or as first post on the blog's home
-			$permalink_type = 'front';
-		}
-		elseif( $item_type_usage != 'post' ) // page, intros, sidebar and other not "post"
-		{	// This is not an "in stream" post:
-			if( in_array( $item_type_usage, array( 'intro-front', 'intro-main' ) ) )
-			{	// This type of post is not allowed to have a permalink:
-				$permalink_type = 'front';
-			}
-			elseif( in_array( $item_type_usage, array( 'special', 'content-block' ) ) )
-			{	// This type of post is not allowed to have a permalink:
-				$permalink_type = 'none';
-			}
-			elseif( in_array( $item_type_usage, array( 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all' ) ) )
-			{	// This post has a permanent URL as url to main chapter:
-				$permalink_type = 'cat';
-			}
-			else
-			{ // allowed to have a permalink:
-				// force use of single url:
-				$permalink_type = 'single';
-			}
-		}
-		elseif( empty( $permalink_type ) )
-		{	// Normal "in stream" post:
-			// Use default from collection settings (may be an "in stream" URL):
-			$permalink_type = $this->Blog->get_setting( 'permalinks' );
+		if( ! empty( $ignore_types ) && in_array( $permalink_type, $ignore_types ) )
+		{	// This permanent type must be ignored:
+			return false;
 		}
 
 		switch( $permalink_type )
@@ -498,6 +460,67 @@ class ItemLight extends DataObject
 			default:
 				return $this->get_single_url( true, $blogurl, $glue );
 		}
+	}
+
+
+	/**
+	 * Get permalink type
+	 *
+	 * @return string Permalink type: front, none, cat, single, archive, subchap
+	 */
+	function get_permalink_type( $default_permalink_type = '' )
+	{
+		if( $ItemType = & $this->get_ItemType() )
+		{	// Get type usage of this item:
+			$item_type_usage = $ItemType->get( 'usage' );
+		}
+		else
+		{	// Use default item type usage:
+			$item_type_usage = 'post';
+		}
+
+		$this->load_Blog();
+
+		// Special Items types/usages will have special permalink types
+		if( ( $this->Blog->get_setting( 'front_disp' ) == 'page' &&
+		      $this->Blog->get_setting( 'front_post_ID' ) == $this->ID ) ||
+		    ( $this->Blog->get_setting( 'front_disp' ) == 'single' &&
+		      ( $first_mainlist_Item = & $this->Blog->get_first_mainlist_Item() ) &&
+		      $first_mainlist_Item->ID == $this->ID ) )
+		{ // This item is used as front specific page or as first post on the blog's home
+			$permalink_type = 'front';
+		}
+		elseif( $item_type_usage != 'post' ) // page, intros, sidebar and other not "post"
+		{	// This is not an "in stream" post:
+			if( in_array( $item_type_usage, array( 'intro-front', 'intro-main' ) ) )
+			{	// This type of post is not allowed to have a permalink:
+				$permalink_type = 'front';
+			}
+			elseif( in_array( $item_type_usage, array( 'special', 'content-block' ) ) )
+			{	// This type of post is not allowed to have a permalink:
+				$permalink_type = 'none';
+			}
+			elseif( in_array( $item_type_usage, array( 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all' ) ) )
+			{	// This post has a permanent URL as url to main chapter:
+				$permalink_type = 'cat';
+			}
+			else
+			{	// Allowed to have a permalink:
+				// force use of single url:
+				$permalink_type = 'single';
+			}
+		}
+		elseif( empty( $permalink_type ) )
+		{	// Normal "in stream" post:
+			// Use default from collection settings (may be an "in stream" URL):
+			$permalink_type = $this->Blog->get_setting( 'permalinks' );
+		}
+		else
+		{	// Use type from param if it is not defined in all other cases above:
+			$permalink_type = $default_permalink_type;
+		}
+
+		return $permalink_type;
 	}
 
 
@@ -787,7 +810,7 @@ class ItemLight extends DataObject
 					$url_to_edit_post .= '&amp;blog='.$Blog->ID;
 					if( is_admin_page() )
 					{	// Try to set a main category
-						$default_cat_ID = $Blog->get_setting( 'default_cat_ID' );
+						$default_cat_ID = $Blog->get_default_cat_ID();
 						if( !empty( $default_cat_ID ) )
 						{	// If default category is set
 							$this->main_cat_ID = $default_cat_ID;
@@ -1126,13 +1149,35 @@ class ItemLight extends DataObject
 	 *
 	 * Note: If you only want the permalink URL, use {@link Item::get_permanent_url()}
 	 *
-	 * @param string link text or special value: '#', '#icon#', '#text#', '#title#' '... $title$ ...'
-	 * @param string link title
-	 * @param string class name
+	 * @param string Link text or special value: '#', '#icon#', '#text#', '#title#' '... $title$ ...'
+	 * @param string Link title
+	 * @param string Class name
+	 * @param string Target collection
+	 * @param string Post navigation type: same_category, same_tag, same_author, same_blog
+	 * @param integer|NULL ID of post navigation target
+	 * @param array What permanent types should be ignored to don't return a permanent URL
 	 */
-	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '', $post_navigation = '', $nav_target = NULL )
+	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '', $post_navigation = '', $nav_target = NULL, $ignore_types = array() )
 	{
-		global $current_User, $Collection, $Blog;
+		global $Collection, $Blog;
+
+		$blogurl = '';
+		$permalink_type = '';
+		if( ! empty( $Blog ) && $this->check_cross_post_nav( $target_blog, $Blog->ID ) )
+		{	// Use settings of current opened collection and not of this item's collection:
+			$permalink_type = $Blog->get_setting( 'permalinks' );
+			$blogurl = $Blog->gen_blogurl();
+		}
+
+		// Get item permanent URL:
+		$url = $this->get_permanent_url( $permalink_type, $blogurl, '&amp;', $ignore_types );
+		if( $url === false )
+		{	// If URL is not detected, e-g when it is ignored for current permanent type:
+			return '';
+		}
+
+		// Add navigation param if necessary:
+		$url = $this->add_navigation_param( $url, $post_navigation, $nav_target );
 
 		switch( $text )
 		{
@@ -1153,24 +1198,18 @@ class ItemLight extends DataObject
 				break;
 		}
 
-		if( $title == '#' ) $title = T_('Permanent link to full entry');
-
-		$blogurl = '';
-		$permalink_type = '';
-		if( !empty($Blog) && $this->check_cross_post_nav( $target_blog, $Blog->ID ) )
-		{
-			$permalink_type = $Blog->get_setting( 'permalinks' );
-			$blogurl = $Blog->gen_blogurl();
+		if( $title == '#' )
+		{	// Use default title for link:
+			$title = T_('Permanent link to full entry');
 		}
 
-		$url = $this->get_permanent_url( $permalink_type, $blogurl );
-		// add navigation param if necessary
-		$url = $this->add_navigation_param( $url, $post_navigation, $nav_target );
-
-		// Display as link
-		$r = '<a href="'.$url.'" title="'.$title.'"';
-		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
-		$r .= '>'.str_replace( '$title$', format_to_output( $this->title ), $text ).'</a>';
+		// Build a permanent link to Item:
+		$r = '<a href="'.$url.'"'
+				.( empty( $title ) ? '' : ' title="'.format_to_output( $title, 'htmlattr' ).'"' )
+				.( empty( $class ) ? '' : ' class="'.format_to_output( $class, 'htmlattr' ).'"' )
+			.'>'
+				.str_replace( '$title$', format_to_output( $this->title ), $text )
+			.'</a>';
 
 		return $r;
 	}
@@ -1245,7 +1284,8 @@ class ItemLight extends DataObject
 				'target_blog'     => '',
 				'nav_target'      => NULL,
 				'post_navigation' => $def_post_navigation,
-				'title_field'     => 'title',
+				'title_field'     => 'title', // '#' for custom title
+				'custom_title'    => $this->title,
 			), $params );
 
 		// Set post navigation target
@@ -1257,7 +1297,14 @@ class ItemLight extends DataObject
 			$blogurl = $Blog->gen_blogurl();
 		}
 
-		$title = format_to_output( $this->{$params['title_field']}, $params['format'] );
+		if( $params['title_field'] == '#' )
+		{
+			$title = format_to_output( $params['custom_title'], $params['format'] );
+		}
+		else
+		{
+			$title = format_to_output( $this->{$params['title_field']}, $params['format'] );
+		}
 
 		if( $params['max_length'] != '' )
 		{	// Crop long title
@@ -1561,7 +1608,8 @@ class ItemLight extends DataObject
 		$params = array_merge( array(
 				'before'    => '',
 				'after'     => '',
-				'link_text' => '$icon$' // Use a mask $icon$ or some other text
+				'link_text' => '$icon$', // Use a mask $icon$ or some other text
+				'class'     => '',
 			), $params );
 
 		if( ( $history_url = $this->get_history_url() ) === false )
@@ -1573,7 +1621,7 @@ class ItemLight extends DataObject
 		$link_text = str_replace( '$icon$', $this->history_info_icon(), $params['link_text'] );
 
 		return $params['before']
-			.'<a href="'.$history_url.'">'.$link_text.'</a>'
+			.'<a href="'.$history_url.'"'.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' ).'>'.$link_text.'</a>'
 			.$params['after'];
 	}
 

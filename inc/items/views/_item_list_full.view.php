@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -129,14 +129,14 @@ while( $Item = & $ItemList->get_item() )
 		<div class="panel-heading small <?php
 		if( $Item->ID == $highlight )
 		{
-			echo 'fadeout-ffff00" id="fadeout-1';
+			echo ' evo_highlight';
 		}
 		?>">
 			<?php
-				echo '<div class="pull-right">';
+				echo '<div class="pull-right text-right">';
 				$Item->permanent_link( array(
 						'before' => '',
-						'text'   => '#text#'
+						'text'   => get_icon( 'permalink' ).' '.T_('Permalink'),
 					) );
 				// Item slug control:
 				$Item->tinyurl_link( array(
@@ -153,6 +153,22 @@ while( $Item = & $ItemList->get_item() )
 				{
 					echo T_('Order').': '.$Item->order;
 				}
+				echo '<br>';
+				echo T_('Item ID').': '.$Item->ID;
+				if( $parent_Item = $Item->get_parent_Item() )
+				{	// Display parent ID if the Item has it:
+					echo ' &middot; '.T_('Parent ID').': ';
+					if( $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $parent_Item ) )
+					{	// Display parent ID as link to view the parent post if current user has a permission:
+						echo '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$parent_Item->get_blog_ID().'&amp;p='.$parent_Item->ID.'" title="'.$parent_Item->dget( 'title', 'htmlattr' ).'">'.$parent_Item->ID.'</a>';
+					}
+					else
+					{	// Display parent ID as text if current user has a permission to view the parent post:
+						echo $parent_Item->ID;
+					}
+				}
+				echo '<br>';
+				echo $Item->get( 'locale' ).' ';
 				$Item->locale_flag( array(' class' => 'flagtop' ) );
 				echo '</div>';
 
@@ -171,7 +187,23 @@ while( $Item = & $ItemList->get_item() )
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 				echo ' ', T_('by'), ' ', $Item->creator_User->get_identity_link( array( 'link_text' => 'name' ) );
 
-				echo $Item->get_history_link( array( 'before' => ' ' ) );
+				// Last modified date:
+				echo ' <span class="text-nowrap">&middot; '.T_('Last modified').': '
+					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'datemodified' ) ).'</span>';
+
+				// Last touched date:
+				echo ' <span class="text-nowrap">&middot; '.T_('Last touched').': '
+					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'last_touched_ts' ) ).'</span>';
+
+				// Contents updated date:
+				echo ' <span class="text-nowrap">&middot; '.T_('Contents updated').': '
+					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'contents_last_updated_ts' ) )
+					.$Item->get_refresh_contents_last_updated_link()
+					.$Item->get_refresh_contents_last_updated_link( array(
+							'title' => T_('Reset the "contents last updated" date to the date of the latest reply on this thread'),
+							'type'  => 'created',
+						) )
+					.'</span>';
 
 				echo '<br />';
 				$Item->type( T_('Type').': <span class="bType">', '</span> &nbsp; ' );
@@ -181,7 +213,7 @@ while( $Item = & $ItemList->get_item() )
 					$Item->priority( T_('Priority').': <span class="bPriority">', '</span> &nbsp; ' );
 					$Item->assigned_to( T_('Assigned to').': <span class="bAssignee">', '</span> &nbsp; ' );
 					$Item->extra_status( T_('Task Status').': <span class="bExtStatus">', '</span> &nbsp; ' );
-					if( ! empty( $Item->datedeadline ) )
+					if( $Blog->get_setting( 'use_deadline' ) && ! empty( $Item->datedeadline ) )
 					{ // Display deadline date
 						echo T_('Deadline').': <span class="bDate">';
 						$Item->deadline_date();
@@ -251,6 +283,16 @@ while( $Item = & $ItemList->get_item() )
 							'after_image_legend'  => '</figcaption>',
 							'after_image'         => '</figure>',
 							'image_size'          => 'fit-320x320',
+							'before_gallery'      => '<div class="evo_post_gallery">',
+							'after_gallery'       => '</div>',
+							'gallery_table_start' => '',
+							'gallery_table_end'   => '',
+							'gallery_row_start'   => '',
+							'gallery_row_end'     => '',
+							'gallery_cell_start'  => '<div class="evo_post_gallery__image">',
+							'gallery_cell_end'    => '</div>',
+							'gallery_image_limit' => 1000,
+							'gallery_link_rel'    => 'lightbox[p'.$Item->ID.']',
 						) );
 					$Item->more_link();
 					$Item->content_extension( array(
@@ -283,15 +325,20 @@ while( $Item = & $ItemList->get_item() )
 			echo '<span class="'.button_class( 'group' ).'">';
 			if( $action != 'view' )
 			{
-				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="'.button_class( 'text' ).'">'.get_icon( 'magnifier' ).' '.T_('View').'</a>';
+				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="'.button_class( 'text' ).'">'.get_icon( 'magnifier' ).' '.T_('Details').'</a>';
 			}
+
+			echo $Item->get_history_link( array(
+					'class'     => button_class( 'text' ),
+					'link_text' => '$icon$ '.T_('History'),
+				) );
 
 			if( isset( $GLOBALS['files_Module'] )
 			    && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item )
 			    && $current_User->check_perm( 'files', 'view' ) )
 			{	// Display a button to view the files of the post only if current user has a permissions:
 				echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_object&amp;link_type=item&amp;link_object_ID='.$Item->ID )
-							.'" class="'.button_class( 'text' ).'">'.get_icon( 'folder' ).' '.T_('Files').'</a>';
+							.'" class="'.button_class( 'text' ).'">'.get_icon( 'folder' ).' '.T_('Attachments').'</a>';
 			}
 
 			if( $Blog->get_setting( 'allow_comments' ) != 'never' )
@@ -321,6 +368,13 @@ while( $Item = & $ItemList->get_item() )
 					'before' => '',
 					'after'  => '',
 					'text'   => '#icon#',
+					'class'  => button_class()
+				) );
+
+			// Display merge button if current user has the rights:
+			$Item->merge_link( array( // Link to backoffice for merging
+					'before' => '',
+					'after'  => '',
 					'class'  => button_class()
 				) );
 			echo '</span>';
@@ -586,8 +640,6 @@ while( $Item = & $ItemList->get_item() )
 			$Form->hidden( 'comment_type', $comment_type );
 			$Form->hidden( 'redirect_to', $admin_url.'?ctrl=items&blog='.$Item->Blog->ID.'&p='.$Item->ID.'&comment_type='.$comment_type );
 
-			$Form->info( T_('User'), $current_User->get_identity_link( array( 'link_text' => 'name' ) ).' '.get_user_profile_link( ' [', ']', T_('Edit profile') )  );
-
 			if( $comment_type != 'meta' && $Item->can_rate() )
 			{	// Comment rating:
 				ob_start();
@@ -662,7 +714,7 @@ while( $Item = & $ItemList->get_item() )
 					'setting_name' => 'coll_apply_comment_rendering'
 				) ) );
 
-			$preview_text = ( $Item->can_attach() ) ? T_('Preview/Add file') : T_('Preview');
+			$preview_text = ( $Item->can_attach() ) ? T_('Preview/Add file') : /* TRANS: Verb */ T_('Preview');
 			$Form->buttons_input( array(
 					array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview btn-info', 'value' => $preview_text ),
 					array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit SaveButton', 'value' => T_('Send comment') )
@@ -762,7 +814,18 @@ while( $Item = & $ItemList->get_item() )
 				$ItemStatusCache->load_all();
 				$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $Item->pst_ID, true ), T_('Task status') );
 
-				$Form->date( 'item_deadline', $Item->get('datedeadline'), T_('Deadline') );
+				if( $Blog->get_setting( 'use_deadline' ) )
+				{	// Display deadline fields only if it is enabled for collection:
+					$Form->begin_line( T_('Deadline'), 'item_deadline' );
+
+						$datedeadline = $Item->get( 'datedeadline' );
+						$Form->date( 'item_deadline', $datedeadline, '' );
+
+						$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
+						$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
+
+					$Form->end_line();
+				}
 
 				$Form->button( array( 'submit', 'actionArray[update_workflow]', T_('Update'), 'SaveButton' ) );
 

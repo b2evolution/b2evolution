@@ -167,15 +167,6 @@ if( ! empty( $bg_File ) && $bg_File->exists() )
 					'display_reg_link'      => true,
 					'abort_link_position'   => 'form_title',
 					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-					// Register
-					'register_page_before'      => '<div class="evo_panel__register">',
-					'register_page_after'       => '</div>',
-					'register_form_title'       => T_('Register'),
-					'register_links_attrs'      => '',
-					'register_use_placeholders' => true,
-					'register_field_width'      => 252,
-					'register_disabled_page_before' => '<div class="evo_panel__register register-disabled">',
-					'register_disabled_page_after'  => '</div>',
 					// Activate form
 					'activate_form_title'  => T_('Account activation'),
 					'activate_page_before' => '<div class="evo_panel__activation">',
@@ -240,9 +231,9 @@ if( ! empty( $bg_File ) && $bg_File->exists() )
 			</div>
 		</div><!-- .col -->
 
-		<footer class="col-md-12 center">
+		<footer class="col-md-12">
 
-			<div class="evo_container evo_container__footer">
+			<div class="evo_container evo_container__footer clearfix">
 			<?php
 				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
 				// Display container and contents:
@@ -253,7 +244,7 @@ if( ! empty( $bg_File ) && $bg_File->exists() )
 			?>
 			</div>
 
-			<p>
+			<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(

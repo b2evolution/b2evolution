@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -67,6 +67,11 @@ $Form->begin_form( 'fform', ( $creating ? T_('New organization') : T_('Organizat
 				array( 'owner', T_('can be edited by organization owner only') )
 			), T_('Role in organization'), true );
 
+	$Form->radio( 'org_perm_priority', $edited_Organization->get( 'perm_priority' ),
+			array(
+				array( 'owner and member', T_('can be edited by user and organization owner') ),
+				array( 'owner', T_('can be edited by organization owner only') )
+			), T_('Priority in organization'), true );
 
 $buttons = array();
 if( $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
@@ -95,6 +100,7 @@ if( $edited_Organization->ID > 0 )
 			'page_url'             => get_dispctrl_url( 'organizations', 'action=edit&amp;org_ID='.$edited_Organization->ID ),
 			'display_orgstatus'    => true,
 			'display_role'         => true,
+			'display_priority'     => true,
 			'display_ID'           => false,
 			'display_btn_adduser'  => false,
 			'display_btn_addgroup' => false,

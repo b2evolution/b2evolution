@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -59,6 +59,7 @@ switch( $type )
 				.' '.T_('For security reasons the link is only valid for your current session (by means of your session cookie).')
 				."\n\n"
 				.T_('If it was not you that requested this, simply ignore this email.');
+			$message = add_email_tracking( $message, '$mail_log_ID$', '$email_key$' );
 
 			if( send_mail( $anon_email, NULL, T_('Confirm opt-out for emails through message form'), $message ) )
 			{

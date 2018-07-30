@@ -226,7 +226,7 @@ a.comment_reply_current {
 	text-align: center;
 	font-weight: bold;
 	color: #FF0000;
-	margin-top: 10px;
+	margin: 10px 0;
 }
 a.comment_reply_current:hover {
 	color: #0066CC;
@@ -349,41 +349,27 @@ div.container_menu_top input.search_field {
 }
 
 // User login/register widget
-.widget_core_user_login #login_form,
-.widget_core_user_register #register_form {
+.widget_core_user_register_quick #register_form {
 	margin-top: 5px;
 }
-.widget_core_user_login fieldset,
-.widget_core_user_register fieldset {
+.widget_core_user_register_quick fieldset {
 	border: none;
 	padding: 0;
 	margin: 0;
 }
-.widget_core_user_login .field_login_btn,
-.widget_core_user_register .field_register_btn {
+.widget_core_user_register_quick .field_register_btn {
 	margin: 5px 0;
 }
-.widget_core_user_login #ffield_pwd{
-	margin-top: 5px;
-}
-.widget_core_user_login .input_text,
-.widget_core_user_register .input_text {
+.widget_core_user_register_quick .input_text {
 	width: 96%;
 }
-.widget_core_user_login .submit,
-.widget_core_user_register .submit {
-	font-size: 10px;
-}
-.widget_core_user_login .register_link {
-	font-weight: bold;
-}
-.widget_core_user_login .greeting,
-.widget_core_user_login .avatar {
-	vertical-align: middle;
-}
-.widget_core_user_login .user_group,
-.widget_core_user_login .user_level {
-	color: #999;
+.widget_core_user_greetings {
+	.greeting, .avatar {
+		vertical-align: middle;
+	}
+	.user_group, .user_level {
+		color: #999;
+	}
 }
 
 // Advertisement widget
@@ -967,12 +953,18 @@ input.btn-lg {
 }
 
 // Poll table:
+.evo_poll__question {
+	font-weight: bold;
+}
 .evo_poll__table {
 	margin-bottom: 14px;
 	width: 100%;
 	td {
 		padding: 2px 10px 2px 0;
 		vertical-align: top;
+	}
+	td.evo_poll__title label {
+		font-weight: normal;
 	}
 	tr td:last-child {
 		padding-right: 0;

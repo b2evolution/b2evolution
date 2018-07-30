@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -91,6 +91,11 @@ class Chapter extends DataObject
 	var $image_file_ID;
 
 	/**
+	 * Social media image
+	 */
+	var $social_media_image_file_ID;
+
+	/**
 	 * Constructor
 	 *
 	 * @param table Database row
@@ -112,6 +117,7 @@ class Chapter extends DataObject
 			$this->parent_ID = $db_row->cat_parent_ID;
 			$this->blog_ID = $db_row->cat_blog_ID;
 			$this->image_file_ID = $db_row->cat_image_file_ID;
+			$this->social_media_image_file_ID = $db_row->cat_social_media_image_file_ID;
 			$this->urlname = $db_row->cat_urlname;
 			$this->description = $db_row->cat_description;
 			$this->order = $db_row->cat_order;
@@ -307,6 +313,10 @@ class Chapter extends DataObject
 		// Check image file
 		param( 'cat_image_file_ID', 'integer' );
 		$this->set_from_Request( 'image_file_ID' );
+
+		// Check social media boilerplate image
+		param( 'cat_social_media_image_file_ID', 'integer' );
+		$this->set_from_Request( 'social_media_image_file_ID' );
 
 		// Check url name
 		param( 'cat_urlname', 'string' );
@@ -603,6 +613,11 @@ class Chapter extends DataObject
 
 		// The chapter was updated successful
 		$DB->commit();
+
+		// BLOCK CACHE INVALIDATION:
+		$chapter_Blog = $this->get_Blog();
+		BlockCache::invalidate_key( 'cont_coll_ID', $chapter_Blog->ID ); // Content has changed
+
 		return true;
 	}
 
@@ -653,11 +668,11 @@ class Chapter extends DataObject
 
 		if( !isset( $this->count_posts ) )
 		{
-			$SQL = new SQL();
+			$SQL = new SQL( 'Check if category has posts' );
 			$SQL->SELECT( 'COUNT( postcat_post_ID )' );
 			$SQL->FROM( 'T_postcats' );
 			$SQL->WHERE( 'postcat_cat_ID = '.$DB->quote( $this->ID ) );
-			$count_posts = $DB->get_var( $SQL->get() );
+			$count_posts = $DB->get_var( $SQL );
 			$this->count_posts = $count_posts;
 		}
 

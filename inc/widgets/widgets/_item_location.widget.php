@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -36,6 +36,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_location_Widget extends ComponentWidget
 {
+	var $icon = 'location-arrow';
+
 	/**
 	 * Constructor
 	 */
@@ -148,7 +150,6 @@ class item_location_Widget extends ComponentWidget
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
 				'item_ID'      => $Item->ID, // Cache each item separately + Has the Item changed?
-				'item_page'    => isset( $GLOBALS['page'] ) ? $GLOBALS['page'] : 1, // Cache each Item page separately
 			);
 	}
 }

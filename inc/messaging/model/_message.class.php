@@ -183,13 +183,13 @@ class Message extends DataObject
 				global $DB, $current_User;
 
 				// Get last message of current user in this thread
-				$SQL = new SQL();
+				$SQL = new SQL( 'Get last message of current user in thread #'.$this->Thread->ID );
 				$SQL->SELECT( 'msg_text' );
 				$SQL->FROM( 'T_messaging__message' );
 				$SQL->WHERE( 'msg_thread_ID = '.$this->Thread->ID );
 				$SQL->WHERE_and( 'msg_author_user_ID = '.$current_User->ID );
 				$SQL->ORDER_BY( 'msg_ID DESC' );
-				$last_message = $DB->get_var( $SQL->get() );
+				$last_message = $DB->get_var( $SQL );
 
 				if( $last_message == $msg_text )
 				{
@@ -668,13 +668,12 @@ class Message extends DataObject
 	 * Delete those messages from the database which corresponds to the given condition or to the given ids array
 	 * Note: the delete cascade arrays are handled!
 	 *
-	 * @param string the name of this class
-	 *   Note: This is required until min phpversion will be 5.3. Since PHP 5.3 we can use static::function_name to achieve late static bindings
 	 * @param string where condition
 	 * @param array object ids
+	 * @param array additional params if required
 	 * @return mixed # of rows affected or false if error
 	 */
-	static function db_delete_where( $class_name, $sql_where, $object_ids = NULL, $params = NULL )
+	static function db_delete_where( $sql_where, $object_ids = NULL, $params = NULL )
 	{
 		global $DB;
 
@@ -717,7 +716,7 @@ class Message extends DataObject
 
 		if( $result )
 		{ // Remove messages with all of its delete cascade relations
-			$result = parent::db_delete_where( $class_name, $sql_where, $object_ids );
+			$result = parent::db_delete_where( $sql_where, $object_ids );
 		}
 
 		if( $result !== false )
@@ -731,7 +730,7 @@ class Message extends DataObject
 				HAVING COUNT(msg_ID) = 0' );
 
 			// Delete orphan threads if there are any
-			if( ( ! empty( $orphan_thread_ids ) ) && ( Thread::db_delete_where( 'Thread', NULL, $orphan_thread_ids ) === false ) )
+			if( ( ! empty( $orphan_thread_ids ) ) && ( Thread::db_delete_where( NULL, $orphan_thread_ids ) === false ) )
 			{ // Deleting threads was unsuccessful
 				$result = false;
 			}

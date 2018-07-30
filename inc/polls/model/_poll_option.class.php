@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -48,7 +48,7 @@ class PollOption extends DataObject
 		}
 		else
 		{	// Set default poll option data for new poll:
-			
+
 		}
 	}
 
@@ -110,11 +110,11 @@ class PollOption extends DataObject
 		{	// If order has not been defined on form:
 
 			// Get max order of the poll options:
-			$order_SQL = new SQL();
+			$order_SQL = new SQL( 'Get max order of the poll options' );
 			$order_SQL->SELECT( 'MAX( popt_order )' );
 			$order_SQL->FROM( 'T_polls__option' );
 			$order_SQL->WHERE( 'popt_pqst_ID = '.$this->get( 'pqst_ID' ) );
-			$max_order = $DB->get_var( $order_SQL->get(), 0, NULL, 'Get max order of the poll options' );
+			$max_order = $DB->get_var( $order_SQL );
 
 			// Set default order as next after max:
 			$this->set( 'order', intval( $max_order ) + 1 );
@@ -144,22 +144,33 @@ class PollOption extends DataObject
 
 
 	/**
-	 * Vote on this poll option by current User
+	 * Vote on this poll option by user
 	 *
+	 * @param integer User ID of specific user
 	 * @return boolean TRUE on successful voting
 	 */
-	function vote()
+	function vote( $user_ID = NULL )
 	{
 		global $current_User, $DB;
 
-		if( !is_logged_in() )
-		{	// User must be logged in for voting:
+		if( ! empty( $user_ID ) )
+		{
+			$UserCache = & get_UserCache();
+			$user = & $UserCache->get_by_ID( $user_ID, false, false );
+		}
+		elseif( is_logged_in() )
+		{
+			$user = $current_User;
+		}
+
+		if( empty( $user ) )
+		{
 			return false;
 		}
 
 		// Set new vote or update the previous vote for current user:
 		$result = $DB->query( 'REPLACE INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
-				VALUES ( '.$DB->quote( $this->pqst_ID ).', '.$DB->quote( $current_User->ID ).', '.$DB->quote( $this->ID ).' )' );
+				VALUES ( '.$DB->quote( $this->pqst_ID ).', '.$DB->quote( $user->ID ).', '.$DB->quote( $this->ID ).' )' );
 
 		return $result ? true : false;
 	}

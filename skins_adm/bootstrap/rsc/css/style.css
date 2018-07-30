@@ -3,7 +3,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -87,11 +87,11 @@ div.avatartag.main .avatar_actions {
   margin-right: 25px;
 }
 .avatar_main_frame > a:first-child {
-  margin-right: 25px;
+  margin-right: 0;
 }
 .avatar_main_frame .avatar_actions {
   text-align: center;
-  padding: 0 25px 0 0;
+  padding: 0 25px;
   float: none;
   display: table-cell;
   vertical-align: middle;
@@ -159,25 +159,6 @@ h2 .glyphicon {
 .edit_actions .html_status {
   margin-top: 14px;
   display: inline-block;
-}
-.compose_layout {
-  margin-bottom: 15px;
-}
-.compose_layout td.label {
-  font-size: 100%;
-  padding-right: 10px;
-  color: #333;
-}
-.compose_layout #post_locale {
-  width: 180px !important;
-}
-.compose_layout td {
-  white-space: nowrap;
-  vertical-align: middle;
-}
-#itemform_custom_fields .compose_layout,
-#itemform_adv_props .compose_layout {
-  margin-bottom: 0;
 }
 div.log_container {
   margin: 0;
@@ -271,6 +252,9 @@ div.delete_messages ul li {
 .evo_post__comments .evo_form__comment.form-horizontal.evo_form__comment_meta {
   border: 2px solid #5bc0de;
   background-color: #d9edf7;
+}
+.evo_post__comments .evo_form__comment.form-horizontal.evo_form__comment_meta .btn-toolbar {
+  background-color: #afd9ee;
 }
 .evo_post__comments .evo_form__comment.form-horizontal .form_info {
   display: block;
@@ -612,6 +596,14 @@ fieldset ul {
   color: #000;
   font-weight: normal;
 }
+.user_admin_tags {
+  width: 500px;
+  max-width: 100%;
+}
+.user_admin_tags ul.token-input-list-facebook {
+  width: 100%;
+  max-width: 100%;
+}
 #item_locations label {
   width: auto;
   float: right;
@@ -884,7 +876,6 @@ h2.user_title::first-line {
   font-weight: normal;
   color: #999;
   margin: 40px 0 30px;
-  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;
@@ -951,6 +942,22 @@ h2.user_title::first-line {
 }
 #itemform_edit_workflow .form-group .controls {
   display: inline-block;
+}
+#itemform_extra td.flabel_item_owner_login {
+  vertical-align: top;
+  padding-top: 6px;
+}
+#itemform_extra #ffield_item_owner_login .help-inline {
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: 10px;
+}
+#itemform_extra #ffield_item_owner_login #item_owner_login {
+  vertical-align: middle !important;
+}
+#itemform_extra label.ffield_item_create_user {
+  padding: 0;
+  font-weight: normal;
 }
 span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
@@ -1024,7 +1031,6 @@ ul.widget_container li:hover {
 }
 ul.widget_container li > span,
 ul.widget_container li > a {
-  display: inline-block;
   padding: 3px 10px;
   margin: 0;
   border-color: #ddd;
@@ -1442,9 +1448,6 @@ table.diff td.diff-title-addedline {
 .timestamp .time {
   font-size: 84%;
 }
-.compact_data {
-  white-space: nowrap;
-}
 #skin_wrapper .email_wrap .email_payload > p:first-child {
   margin-top: 10px;
 }
@@ -1635,4 +1638,11 @@ table.diff td.diff-title-addedline {
 .jeditable_cell select,
 .jeditable_cell input {
   max-width: 100%;
+}
+div.query-builder .rule-container .rule-value-container {
+  border: none;
+  padding-left: 0;
+}
+.ui-effects-transfer {
+  border: 1px solid #F00;
 }

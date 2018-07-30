@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -241,6 +241,12 @@ class Group extends DataObject
 			}
 		}
 
+		if( $GroupSettings->get( 'perm_admin', $this->ID ) != 'normal' && 
+				$GroupSettings->get( 'perm_users', $this->ID ) != 'none' )
+		{	// Display warning when users permissions are not allowed because of not full access to back-office:
+			$Messages->add( T_('Permission to view other users will not work because users of this group have restricted back-office access.'), 'warning' );
+		}
+
 		return !param_errors_detected();
 	}
 
@@ -314,7 +320,7 @@ class Group extends DataObject
 			$permvalue = false; // This will result in $perm == false always. We go on for the $Debuglog..
 		}
 
-		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'skins_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs', 'centralantispam' );
+		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'skins_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs', 'centralantispam', 'maintenance' );
 		if( in_array( $permname, $pluggable_perms ) )
 		{
 			$permname = 'perm_'.$permname;
@@ -391,6 +397,14 @@ class Group extends DataObject
 				$perm = Module::check_perm( $permname, $permlevel, $perm_target, 'group_func', $this );
 				if( $perm === NULL )
 				{	// Even if group permisson check function doesn't exist we should return false value
+					$perm = false;
+				}
+
+				if( $perm && // Permission is allowed
+						in_array( $permname, array( 'perm_spamblacklist', 'perm_slugs', 'perm_emails', 'perm_maintenance' ) ) && // These permissions depend on permission "Settings"
+						! Module::check_perm( 'perm_options', 'view', $perm_target, 'group_func', $this ) ) // permission "Settings" == "No Access"
+				{	// Force permission to FALSE when group perm setting "Settings" == "No Access" for
+					// all depending permissions: "Antispam", "Slug manager", "Email management", "Maintenance"
 					$perm = false;
 				}
 

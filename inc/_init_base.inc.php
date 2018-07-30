@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -105,6 +105,12 @@ require_once $inc_path.'locales/_locale.funcs.php';
  * Miscellaneous functions
  */
 require_once $inc_path.'_core/_misc.funcs.php';
+
+
+/**
+ * Parameter handling functions
+ */
+load_funcs( '_core/_param.funcs.php' );
 
 
 /**

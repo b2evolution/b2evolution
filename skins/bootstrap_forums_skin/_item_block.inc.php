@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
@@ -115,10 +115,10 @@ skin_widget( array(
 			'author_link_text' => $params['author_link_text'],
 		) );
 		// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
-
-		}
-		?>
+	?>
 	</div>
+
+	<?php } ?>
 
 	<div class="row">
 		<div class="<?php echo $Skin->get_column_class( 'single' ); ?>">
@@ -265,8 +265,10 @@ skin_widget( array(
 		</div><!-- ../panel-body -->
 
 		<div class="panel-footer clearfix small">
+			<?php if( $disp != 'page' ) { ?>
 			<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
 			<?php
+			}
 				// Check if BBcode plugin is enabled for current blog
 				$bbcode_plugin_is_enabled = false;
 				if( class_exists( 'bbcode_plugin' ) )
@@ -283,8 +285,10 @@ skin_widget( array(
 					echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
 				}
 
-				// Display a panel with voting buttons for item:
-				$Skin->display_item_voting_panel( $Item );
+				if( $disp != 'page' )
+				{	// Display a panel with voting buttons for item:
+					$Skin->display_item_voting_panel( $Item );
+				}
 
 				echo '<span class="pull-left">';
 					$Item->edit_link( array(

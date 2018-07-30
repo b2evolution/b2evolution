@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -25,6 +25,8 @@ init_jqplot_js();
  */
 class coll_activity_stats_Widget extends ComponentWidget
 {
+	var $icon = 'bar-chart';
+
 	/**
 	 * Constructor
 	 */
@@ -166,7 +168,7 @@ class coll_activity_stats_Widget extends ComponentWidget
 		$SQL->FROM( 'T_users' );
 		$SQL->WHERE( 'user_created_datetime > '.$DB->quote( $start_date ) );
 		$SQL->GROUP_BY( 'DATE(user_created_datetime)' );
-		$users_registered = $DB->get_assoc( $SQL->get(), $SQL->title );
+		$users_registered = $DB->get_assoc( $SQL );
 
 		// Get posts created
 		$visibility_statuses = get_visibility_statuses( 'raw', array( 'deprecated', 'redirected', 'trash' ) );
@@ -188,7 +190,7 @@ class coll_activity_stats_Widget extends ComponentWidget
 		$SQL->WHERE_and( 'post_datestart <= '.$DB->quote( $end_date ) );
 		$SQL->WHERE_and( 'post_status IN ("'.implode( '","', $filter_inskin_statuses ).'")' );
 		$SQL->GROUP_BY( 'DATE(post_datestart)' );
-		$posts_created = $DB->get_assoc( $SQL->get(), $SQL->title );
+		$posts_created = $DB->get_assoc( $SQL );
 
 		// Get new comments
 		$SQL = new SQL( 'Get count of new comments created per day' );
@@ -201,7 +203,7 @@ class coll_activity_stats_Widget extends ComponentWidget
 		$SQL->WHERE_and( 'comment_date <= '.$DB->quote( $end_date ) );
 		$SQL->WHERE_and( 'comment_status IN ("'.implode( '","', $filter_inskin_statuses ).'")' );
 		$SQL->GROUP_BY( 'DATE(comment_date)' );
-		$comments = $DB->get_assoc( $SQL->get(), $SQL->title );
+		$comments = $DB->get_assoc( $SQL );
 
 
 		for( $i = 0; $i < $num_days; $i++ )
@@ -266,11 +268,81 @@ class coll_activity_stats_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		CanvasBarsChart( $chart );
+		CanvasBarsChart( $chart, 'resize_coll_activity_stat_widget' );
 
 		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
+
+		?>
+		<script type="text/javascript">
+		var plot, originalData = [], weekData = [], xLabels = [],
+				displayed = '<?php echo format_to_js( $this->disp_params['time_period'] );?>',
+				resizeTimer;
+
+		function resize_coll_activity_stat_widget()
+		{
+			if( plot == undefined )
+			{
+				plot = jQuery( '#canvasbarschart' ).data( 'plot' );
+				xLabels = plot.axes.xaxis.ticks.slice(0);
+				for( var i = 0; i < plot.series.length; i++ )
+				{
+					originalData.push( plot.series[i].data.slice(0) );
+				}
+
+				if( originalData[0].length == 7 )
+				{
+					weekData = originalData;
+				}
+				else
+				{
+					for( var i = 0; i < originalData.length; i++ )
+					{
+						var weekSeries = [];
+						for( var j = 7, k = 1; j > 0; j--, k++ )
+						{
+							weekSeries.unshift( [ j, originalData[i][originalData[i].length - k][1] ] );
+						}
+						weekData.push( weekSeries );
+					}
+				}
+			}
+
+			if( jQuery( '#canvasbarschart' ).width() < 650 )
+			{
+				if( displayed != 'last_week' )
+				{
+					for( var i = 0; i < plot.series.length; i++ )
+					{
+						plot.series[i].data = weekData[i];
+					}
+					plot.axes.xaxis.ticks = xLabels.slice( -7 );
+					displayed = 'last_week';
+				}
+			}
+			else
+			{
+				if( displayed != 'last_month' )
+				{
+					for( var i = 0; i < plot.series.length; i++ )
+					{
+						plot.series[i].data = originalData[i];
+					}
+					plot.axes.xaxis.ticks = xLabels;
+					displayed = 'last_month';
+				}
+			}
+			plot.replot( { resetAxes: true } );
+		}
+
+		jQuery( window ).resize( function()
+		{
+			clearTimeout( resizeTimer );
+			resizeTimer = setTimeout( resize_coll_activity_stat_widget, 100 );
+		} );
+		</script>
+		<?php
 
 		return true;
 	}
