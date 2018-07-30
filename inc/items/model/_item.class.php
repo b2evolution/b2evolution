@@ -2659,7 +2659,7 @@ class Item extends ItemLight
 							// Link to "URL":
 							if( $this->get( 'url' ) != '' )
 							{	// If this post has a specified setting "Link to url":
-								$custom_field_value = '<a href="'.$this->get( 'url' ).'">'.$custom_field_value.'</a>';
+								$custom_field_value = '<a href="'.$this->get( 'url' ).'" target="_blank">'.$custom_field_value.'</a>';
 								break 2;
 							}
 							// else fallback to other points:
