@@ -2569,7 +2569,7 @@ class Item extends ItemLight
 
 				if( $format == '#yes#' || $format == '#no#' )
 				{	// Use special formats:
-					$custom_field_value = $format;
+					$custom_field_value = str_replace( array( '#yes#', '#no#' ), array( $params['field_value_yes'], $params['field_value_no'] ), $format );
 					break;
 				}
 
@@ -2631,9 +2631,6 @@ class Item extends ItemLight
 				}
 				break;
 		}
-
-		// Replace special masks in value with template:
-		$custom_field_value = str_replace( array( '#yes#', '#no#' ), array( $params['field_value_yes'], $params['field_value_no'] ), $custom_field_value );
 
 		// Apply setting "Link to":
 		if( $custom_field['link'] != 'nolink' && ! empty( $custom_field_value ) )
