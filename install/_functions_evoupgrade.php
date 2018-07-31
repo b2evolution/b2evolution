@@ -10281,7 +10281,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			'T_email__returns'             => array( 'emret_errormsg', 'emret_headers', 'emret_message' ),
 			'T_files'                      => array( 'file_title', 'file_alt', 'file_desc' ),
 			'T_filetypes'                  => array( 'ftyp_name' ),
-			'T_groups'                     => array( 'grp_name' ), 
+			'T_groups'                     => array( 'grp_name' ),
 			'T_groups__groupsettings'      => array( 'gset_value' ),
 			'T_hitlog'                     => array( 'hit_keyphrase' ),
 			'T_i18n_original_string'       => array( 'iost_string' ),
@@ -10354,6 +10354,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			cua_url_alias VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
 			PRIMARY KEY   ( cua_url_alias ),
 			INDEX         cua_coll_ID ( cua_coll_ID )" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13170, 'Updating Antispam IP Ranges table... ' ) )
+	{ // part of 7.0.0-alpha
+		db_modify_col( 'T_antispam__iprange', 'aipr_status', 'enum( "trusted", "probably_ok", "suspect", "very_suspect", "blocked" ) COLLATE ascii_general_ci NULL DEFAULT NULL' );
 		upg_task_end();
 	}
 

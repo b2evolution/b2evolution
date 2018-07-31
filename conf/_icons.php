@@ -550,6 +550,13 @@ function get_icon_info( $name )
 			'fa' => 'circle',
 			'color' => '#5bc0de'
 		);
+		case 'bullet_cyan': return array(
+			'alt'  => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 32, 192 ),
+			'fa' => 'circle',
+			'color' => '#00FFFF'
+		);
 		case 'bullet_red': return array(
 			'alt'  => '&bull;',
 			'size' => array( 9, 9 ),
@@ -563,6 +570,13 @@ function get_icon_info( $name )
 			'xy' => array( 64, 192 ),
 			'fa' => 'circle',
 			'color' => '#F60'
+		);
+		case 'bullet_redorange': return array(
+			'alt'  => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 64, 192 ),
+			'fa' => 'circle',
+			'color' => '#FF8000'
 		);
 		case 'bullet_green': return array(
 			'alt'  => '&bull;',

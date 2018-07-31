@@ -305,7 +305,7 @@ $schema_queries = array(
 			aipr_IPv4end             int(10) unsigned NOT NULL,
 			aipr_user_count          int(10) unsigned DEFAULT 0,
 			aipr_contact_email_count int(10) unsigned DEFAULT 0,
-			aipr_status              enum( 'trusted', 'suspect', 'blocked' ) COLLATE ascii_general_ci NULL DEFAULT NULL,
+			aipr_status              enum( 'trusted', 'probably_ok', 'suspect', 'very_suspect', 'blocked' ) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			aipr_block_count         int(10) unsigned DEFAULT 0,
 			PRIMARY KEY aipr_ID (aipr_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
