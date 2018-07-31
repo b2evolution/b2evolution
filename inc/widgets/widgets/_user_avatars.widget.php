@@ -484,7 +484,7 @@ class user_avatars_Widget extends ComponentWidget
 			return;
 		}
 
-		echo $this->disp_params[ 'block_start'];
+		echo $this->disp_params['block_start'];
 
 		// Display title if requested
 		$this->disp_title();
@@ -499,7 +499,7 @@ class user_avatars_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_end'];
 
-		echo $this->disp_params[ 'block_end' ];
+		echo $this->disp_params['block_end'];
 
 		return true;
 	}

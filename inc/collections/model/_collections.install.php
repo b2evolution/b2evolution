@@ -345,6 +345,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			itcf_public  TINYINT DEFAULT 1,
 			itcf_format  VARCHAR(2000) NULL,
 			itcf_formula VARCHAR(2000) COLLATE ascii_general_ci NULL,
+			itcf_link    ENUM( 'nolink', 'linkto', 'permalink', 'zoom', 'linkpermzoom', 'permzoom', 'linkperm', 'fieldurl' ) COLLATE ascii_general_ci NOT NULL default 'nolink',
 			itcf_line_highlight  ENUM( 'never', 'differences' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'differences',
 			itcf_green_highlight ENUM( 'never', 'lowest', 'highest' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'never',
 			itcf_red_highlight   ENUM( 'never', 'lowest', 'highest' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'never',

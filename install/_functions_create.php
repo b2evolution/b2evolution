@@ -428,6 +428,7 @@ function create_default_data()
 			'order'           => 1,
 			'note'            => T_('Enter a link ID'),
 			'format'          => 'fit-192x192',
+			'link'            => 'linkpermzoom',
 			'line_highlight'  => 'never',
 			'green_highlight' => 'never',
 		),
@@ -490,6 +491,7 @@ function create_default_data()
 			'type'            => 'url',
 			'order'           => 7,
 			'note'            => T_('Enter an URL (absolute or relative)'),
+			'link'            => 'fieldurl',
 		),
 		array(
 			'label'           => T_('Checkmark field'),
@@ -508,6 +510,7 @@ function create_default_data()
 			'order'           => 1,
 			'note'            => T_('Enter a link ID'),
 			'format'          => 'fit-192x192',
+			'link'            => 'linkpermzoom',
 			'line_highlight'  => 'never',
 			'green_highlight' => 'never',
 		),
@@ -546,6 +549,7 @@ function create_default_data()
 			'order'           => '',
 			'note'            => NULL,
 			'format'          => NULL,
+			'link'            => 'nolink',
 			'line_highlight'  => 'differences',
 			'green_highlight' => 'never',
 		);

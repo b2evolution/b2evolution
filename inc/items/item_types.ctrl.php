@@ -34,6 +34,8 @@ $current_User->check_perm( 'options', 'view', true );
 // We should activate toolbar menu items for this controller
 $activate_collection_toolbar = true;
 
+$display_mode = param( 'display_mode', 'string', 'normal' );
+
 $tab = param( 'tab', 'string', 'settings', true );
 
 $tab3 = param( 'tab3', 'string', 'types', true );
@@ -305,14 +307,16 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'managing-item-types' );
 		break;
 }
+if( $display_mode != 'js' )
+{
+	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
 
-// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-$AdminUI->disp_html_head();
+	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+	$AdminUI->disp_body_top();
 
-// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-$AdminUI->disp_body_top();
-
-$AdminUI->disp_payload_begin();
+	$AdminUI->disp_payload_begin();
+}
 
 /**
  * Display payload:
@@ -339,6 +343,11 @@ switch( $action )
 		$AdminUI->disp_view( 'items/views/_itemtype.form.php' );
 		break;
 
+	case 'select_custom_fields':
+		$custom_fields = rtrim( param( 'custom_fields', 'string' ), ',' );
+		$custom_fields = empty( $custom_fields ) ? array() : explode( ',', $custom_fields );
+		$AdminUI->disp_view( 'items/views/_itemtype_fields.form.php' );
+		break;
 
 	default:
 		// No specific request, list all post types:
@@ -349,10 +358,11 @@ switch( $action )
 		break;
 
 }
+if( $display_mode != 'js' )
+{
+	$AdminUI->disp_payload_end();
 
-$AdminUI->disp_payload_end();
-
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
-
+	// Display body bottom, debug info and close </html>:
+	$AdminUI->disp_global_footer();
+}
 ?>

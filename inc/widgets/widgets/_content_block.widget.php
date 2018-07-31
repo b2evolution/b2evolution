@@ -178,7 +178,7 @@ class content_block_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_start'];
 
-		$this->disp_title( $this->disp_params['title'] );
+		$this->disp_title();
 
 		echo $this->disp_params['block_body_start'];
 

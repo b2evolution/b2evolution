@@ -119,21 +119,27 @@ class item_fields_compare_Widget extends ComponentWidget
 	{
 		global $Plugins, $Item;
 
-		$params = array_merge( array(
-				'fields_compare_table_start'    => '<div class="evo_content_block"><table class="item_custom_fields">',
-				'fields_compare_table_end'      => '</table></div>',
-				'fields_compare_row_start'      => '<tr>',
-				'fields_compare_row_end'        => '</tr>',
-				'fields_compare_empty_cell'     => '<td style="border:none"></td>',
-				'fields_compare_post'           => '<th>$post_link$</th>',
-				'fields_compare_field_title'    => '<th>$field_title$:</th>',
+		$this->init_display( $params );
+
+		$this->disp_params = array_merge( $this->disp_params, array(
+				'fields_compare_table_start'       => '<div class="evo_content_block"><table class="item_custom_fields">',
+				'fields_compare_row_start'         => '<tr>',
+				'fields_compare_empty_cell'        => '<td style="border:none"></td>',
+				'fields_compare_post'              => '<th>$post_link$</th>',
+				'fields_compare_field_title'       => '<th>$field_title$:</th>',
 				'fields_compare_field_value'       => '<td>$field_value$</td>',
 				'fields_compare_field_value_diff'  => '<td class="bg-warning">$field_value$</td>',
 				'fields_compare_field_value_green' => '<td class="bg-success">$field_value$</td>',
 				'fields_compare_field_value_red'   => '<td class="bg-danger">$field_value$</td>',
+				'fields_compare_row_end'           => '</tr>',
+				'fields_compare_table_end'         => '</table></div>',
+				// Separate template for numeric fields:
+				// (To use templates for other field types('string', 'html', 'text', 'url', 'image', 'computed') replace 'numeric' with required type name)
+				'fields_compare_numeric_field_value'       => '<td class="right">$field_value$</td>',
+				'fields_compare_numeric_field_value_diff'  => '<td class="right bg-warning">$field_value$</td>',
+				'fields_compare_numeric_field_value_green' => '<td class="right bg-success">$field_value$</td>',
+				'fields_compare_numeric_field_value_red'   => '<td class="right bg-danger">$field_value$</td>',
 			), $params );
-
-		$this->init_display( $params );
 
 		$items = $this->disp_params['items'];
 		if( empty( $items ) )
@@ -266,7 +272,8 @@ class item_fields_compare_Widget extends ComponentWidget
 		foreach( $all_custom_fields as $c => $custom_field )
 		{
 			$all_custom_fields[ $c ]['is_different'] = false;
-			if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) )
+			$is_numeric_type = in_array( $custom_field['type'], array( 'double', 'computed' ) );
+			if( $is_numeric_type )
 			{	// Compare only numeric fields:
 				$all_custom_fields[ $c ]['highest_value'] = NULL;
 				$all_custom_fields[ $c ]['lowest_value'] = NULL;
@@ -279,10 +286,16 @@ class item_fields_compare_Widget extends ComponentWidget
 			// Compare values:
 			$prev_custom_field_value = NULL;
 			$i = 0;
+			$all_string_values_are_empty = ! $widget_fields;
 			foreach( $custom_field['items'] as $item_ID )
 			{
 				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 				$custom_field_value = $widget_Item->get_custom_field_value( $custom_field['name'] );
+
+				if( $all_string_values_are_empty && ! empty( $custom_field_value ) )
+				{	// At least one field is not empty:
+					$all_string_values_are_empty = false;
+				}
 
 				// Check if the values are different from given line:
 				if( ! $all_custom_fields[ $c ]['is_different'] && $i > 0 )
@@ -316,8 +329,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				}
 				$prev_custom_field_value = $custom_field_value;
 
-				if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) &&
-				    is_numeric( $custom_field_value ) )
+				if( $is_numeric_type && is_numeric( $custom_field_value ) )
 				{	// Compare only numeric values:
 					// Search the highest value:
 					if( $all_custom_fields[ $c ]['highest_value'] === NULL ||
@@ -335,30 +347,37 @@ class item_fields_compare_Widget extends ComponentWidget
 				}
 				$i++;
 			}
+
+			if( $all_string_values_are_empty )
+			{	// Don't display row of custom field if values from all compared items are empty:
+				unset( $all_custom_fields[ $c ] );
+			}
 		}
 
-		$this->disp_title( $this->disp_params['title'] );
+		echo $this->disp_params['block_start'];
+
+		$this->disp_title();
 
 		echo $this->disp_params['block_body_start'];
 
 		// Start a table to display differences of all custom fields for selected posts:
-		echo $params['fields_compare_table_start'];
+		echo $this->get_field_template( 'table_start' );
 
-		echo $params['fields_compare_row_start'];
-		echo $params['fields_compare_empty_cell'];
+		echo $this->get_field_template( 'row_start' );
+		echo $this->get_field_template( 'empty_cell' );
 		foreach( $items as $item_ID )
 		{
 			$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 			// Permanent post link:
-			echo str_replace( '$post_link$', $widget_Item->get_title(), $params['fields_compare_post'] );
+			echo str_replace( '$post_link$', $widget_Item->get_title(), $this->get_field_template( 'post' ) );
 		}
-		echo $params['fields_compare_row_end'];
+		echo $this->get_field_template( 'row_end' );
 
 		foreach( $all_custom_fields as $custom_field )
 		{
-			echo $params['fields_compare_row_start'];
+			echo $this->get_field_template( 'row_start', $custom_field['type'] );
 			// Custom field title:
-			echo str_replace( '$field_title$', $custom_field['label'], $params['fields_compare_field_title'] );
+			echo str_replace( '$field_title$', $custom_field['label'], $this->get_field_template( 'field_title', $custom_field['type'] ) );
 			foreach( $items as $item_ID )
 			{
 				// Custom field value per each post:
@@ -375,11 +394,11 @@ class item_fields_compare_Widget extends ComponentWidget
 				}
 
 				// Default template for field value:
-				$field_value_template = $params['fields_compare_field_value'];
+				$field_value_template = $this->get_field_template( 'field_value', $custom_field['type'] );
 
 				if( $custom_field['is_different'] && $custom_field['line_highlight'] == 'differences' )
 				{	// Mark the field value as different only when it is defined in the settings of the custom field:
-					$field_value_template = $params['fields_compare_field_value_diff'];
+					$field_value_template = $this->get_field_template( 'field_value_diff', $custom_field['type'] );
 				}
 
 				if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) &&
@@ -390,11 +409,11 @@ class item_fields_compare_Widget extends ComponentWidget
 					{	// Check if we should mark the highest field:
 						if( $custom_field['green_highlight'] == 'highest' )
 						{	// The highest value must be marked as green:
-							$field_value_template = $params['fields_compare_field_value_green'];
+							$field_value_template = $this->get_field_template( 'field_value_green', $custom_field['type'] );
 						}
 						elseif( $custom_field['red_highlight'] == 'highest' )
 						{	// The highest value must be marked as red:
-							$field_value_template = $params['fields_compare_field_value_red'];
+							$field_value_template = $this->get_field_template( 'field_value_red', $custom_field['type'] );
 						}
 					}
 
@@ -403,11 +422,11 @@ class item_fields_compare_Widget extends ComponentWidget
 					{	// Check if we should mark the lowest field:
 						if( $custom_field['green_highlight'] == 'lowest' )
 						{	// The lowest value must be marked as green:
-							$field_value_template = $params['fields_compare_field_value_green'];
+							$field_value_template = $this->get_field_template( 'field_value_green', $custom_field['type'] );
 						}
 						elseif( $custom_field['red_highlight'] == 'lowest' )
 						{	// The lowest value must be marked as red:
-							$field_value_template = $params['fields_compare_field_value_red'];
+							$field_value_template = $this->get_field_template( 'field_value_red', $custom_field['type'] );
 						}
 					}
 				}
@@ -415,18 +434,42 @@ class item_fields_compare_Widget extends ComponentWidget
 				echo str_replace( '$field_value$', $custom_field_value, $field_value_template );
 			}
 
-			echo $params['fields_compare_row_end'];
+			echo $this->get_field_template( 'row_end', $custom_field['type'] );
 		}
 
-		echo $params['fields_compare_table_end'];
-
-		echo $this->disp_params['block_start'];
+		echo $this->get_field_template( 'table_end' );
 
 		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
 
 		return true;
+	}
+
+
+	/**
+	 * Get field template depending on type of the custom field
+	 *
+	 * @param string Template name
+	 * @param string Custom field type: 'double', 'varchar', 'html', 'text', 'url', 'image', 'computed'
+	 * @return string HTML template
+	 */
+	function get_field_template( $template_name, $field_type = '' )
+	{
+		// Convert field types to non-devs names:
+		$field_type = ( $field_type == 'double' ? 'numeric' : ( $field_type == 'varchar' ? 'string' : $field_type ) );
+
+		if( isset( $this->disp_params['fields_compare_'.$field_type.'_'.$template_name] ) )
+		{	// Use special template for current type if it is defined:
+			return $this->disp_params['fields_compare_'.$field_type.'_'.$template_name];
+		}
+		elseif( isset( $this->disp_params['fields_compare_'.$template_name] ) )
+		{	// Use generic template for all types:
+			return $this->disp_params['fields_compare_'.$template_name];
+		}
+
+		// Unknown template:
+		return '';
 	}
 
 
@@ -469,6 +512,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'item_ID'      => isset( $Item ) ? $Item->ID : NULL, // Has the Item page changed? (this is important for disp=single|page because $this$ and $parent$ resolve differently depending on item ID)
 				'items'        => implode( ',', $items ), // Have the compared items changed? (Check firstly widget setting and then param from request) (this is important in case the same items are compared in different order)
+				'meta_settings'=> 1, // Have meta settings(any item type) changed?
 			);
 
 		// Add 1 cache key for each item that is being compared, in order to detect changes on each one:
