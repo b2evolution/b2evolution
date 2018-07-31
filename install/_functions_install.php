@@ -1248,7 +1248,7 @@ function display_install_back_link()
  */
 function start_install_progress_bar( $title, $steps = NULL )
 {
-	global $install_progress_bar_counter, $install_progress_bar_total, $display;
+	global $install_progress_bar_counter, $install_progress_bar_total, $install_progress_bar_status, $display;
 
 	if( ! empty( $display ) && $display != 'normal' )
 	{ // Exit here, because we can use progress bar on normal mode (Hide on compact mode)
@@ -1259,6 +1259,7 @@ function start_install_progress_bar( $title, $steps = NULL )
 	{ // Progress bar with steps
 		$install_progress_bar_total = $steps;
 		$install_progress_bar_counter = 0;
+		$install_progress_bar_status = 'success';
 		$bar_width = '0%';
 	}
 	else
@@ -1289,7 +1290,7 @@ function start_install_progress_bar( $title, $steps = NULL )
  */
 function stop_install_progress_bar()
 {
-	global $display;
+	global $install_progress_bar_status, $display;
 
 	if( ! empty( $display ) && $display != 'normal' )
 	{ // Exit here, because we can use progress bar on normal mode (Hide on compact mode)
@@ -1298,7 +1299,7 @@ function stop_install_progress_bar()
 
 	echo '<script type="text/javascript">'
 		.'jQuery( ".progress-bar" ).css( "width", "100%" ).removeClass( "active progress-bar-striped" );'
-		.'setTimeout( function() { jQuery( ".progress-bar" ).addClass( "progress-bar-success" ); }, 600 );'
+		.'setTimeout( function() { jQuery( ".progress-bar" ).addClass( "progress-bar-'.$install_progress_bar_status.'" ); }, 600 );'
 	.'</script>';
 }
 

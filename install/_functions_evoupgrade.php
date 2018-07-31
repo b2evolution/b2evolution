@@ -10214,6 +10214,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				$Form->end_form();
 			}
 
+			global $install_progress_bar_status;
+			$install_progress_bar_status = 'warning';
+
 			return 'need-fix';
 		}
 
