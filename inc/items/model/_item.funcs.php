@@ -4059,15 +4059,19 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 
 	$parent_Item = & $edited_Item->get_parent_Item();
 
+	$c = 0;
 	foreach( $custom_fields as $custom_field )
 	{	// Loop through custom fields:
 		$custom_field_note = '';
 		if( ! empty( $custom_field['note'] ) )
 		{	// Display a not of the custon field if it is filled:
-			$custom_field_note .= $custom_field['note'].' &middot; ';
+			$custom_field_note .= $custom_field['note'];
 		}
-		// Display a field title and code:
-		$custom_field_note .= T_('Field name').': <code>'.$custom_field['name'].'</code>';
+		if( $custom_field['type'] != 'separator' )
+		{	// Display a field name/code:
+			$custom_field_note .= empty( $custom_field_note ) ? '' : ' &middot; ';
+			$custom_field_note .= T_('Field name').': <code>'.$custom_field['name'].'</code>';
+		}
 		if( $parent_Item )
 		{	// Display a value of parent post custom field:
 			$parent_custom_field_value = $parent_Item->get_custom_field_value( $custom_field['name'], $custom_field['type'] );
@@ -4120,9 +4124,23 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 				$Form->text_input( 'item_image_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) );
 				break;
 			case 'separator':
-				$Form->info( $custom_field['label'], T_('Separator'), $custom_field_note );
+				if( is_admin_page() && $c > 0 )
+				{	// This is a hack for back-office because there is a css table layout:
+					$Form->end_fieldset();
+				}
+				echo '<h3>'.$custom_field['label'].'</h3>';
+				if( ! empty( $custom_field_note ) )
+				{
+					echo '<p class="note">'.$custom_field_note.'</p>';
+				}
+				if( is_admin_page() && $c > 0 && $c < count( $custom_fields ) - 1 )
+				{	// This is a hack for back-office because there is a css table layout:
+					$Form->begin_fieldset();
+				}
 				break;
 		}
+
+		$c++;
 	}
 
 	if( $parent_Item )
