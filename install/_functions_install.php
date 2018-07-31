@@ -1259,13 +1259,14 @@ function start_install_progress_bar( $title, $steps = NULL )
 	{ // Progress bar with steps
 		$install_progress_bar_total = $steps;
 		$install_progress_bar_counter = 0;
-		$install_progress_bar_status = 'success';
 		$bar_width = '0%';
 	}
 	else
 	{ // Progress bar has no steps for update
 		$bar_width = '100%';
 	}
+
+	$install_progress_bar_status = 'success';
 
 	echo '<div class="progress">'
 			.'<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:'.$bar_width.'">'
