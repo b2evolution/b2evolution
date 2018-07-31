@@ -629,6 +629,11 @@ jQuery( '#select_other_fields' ).click( function()
 		'80%', '', true,
 		'<?php echo TS_('Add fields from another item type'); ?>: ' + selected_item_type_obj.find( ':selected' ).html(),
 		'<?php echo TS_('Add fields now!'); ?>', true, true );
+	var custom_fields = '';
+	jQuery( 'input.custom_field_name' ).each( function()
+	{	// Get all custom field names from current form in order to don't check them automatically, to avoid double adding:
+		custom_fields += jQuery( this ).val() + ',';
+	} );
 	jQuery.ajax(
 	{
 		type: 'GET',
@@ -637,8 +642,8 @@ jQuery( '#select_other_fields' ).click( function()
 		{
 			'ctrl': 'itemtypes',
 			'action': 'select_custom_fields',
-			'ityp_ID': '<?php echo $edited_Itemtype->ID; ?>',
-			'source_ityp_ID': selected_item_type_obj.val(),
+			'ityp_ID': selected_item_type_obj.val(),
+			'custom_fields': custom_fields,
 			'display_mode': 'js',
 		},
 		success: function( result )

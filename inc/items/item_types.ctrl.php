@@ -282,13 +282,6 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=itemtypes&blog='.$blog.'&tab='.$tab.'&tab3='.$tab3.'', 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
-
-	case 'select_custom_fields':
-		// Select custom fields to add them to another item type:
-		param( 'source_ityp_ID', 'integer', true );
-		$ItemtypeCache = & get_ItemTypeCache();
-		$source_Itemtype = & $ItemtypeCache->get_by_ID( $source_ityp_ID );
-		break;
 }
 
 // Generate available blogs list:
@@ -351,6 +344,8 @@ switch( $action )
 		break;
 
 	case 'select_custom_fields':
+		$custom_fields = rtrim( param( 'custom_fields', 'string' ), ',' );
+		$custom_fields = empty( $custom_fields ) ? array() : explode( ',', $custom_fields );
 		$AdminUI->disp_view( 'items/views/_itemtype_fields.form.php' );
 		break;
 

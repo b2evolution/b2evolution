@@ -15,14 +15,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'items/model/_itemtype.class.php', 'ItemType' );
 
-global $edited_Itemtype, $source_Itemtype;
+global $edited_Itemtype, $custom_fields;
 
 $Form = new Form( NULL, 'itemtype_select_fields' );
 
 $Form->begin_form( 'fform' );
 
-$target_custom_fields = $edited_Itemtype->get_custom_fields();
-$source_custom_fields = $source_Itemtype->get_custom_fields();
+$source_custom_fields = $edited_Itemtype->get_custom_fields();
 
 $custom_field_type_titles = array(
 		'double'   => T_('Numeric'),
@@ -42,7 +41,7 @@ foreach( $source_custom_fields as $source_custom_field )
 	{
 		if( ! in_array( $col_key, array( 'ID', 'ityp_ID' ) ) )
 		{
-			$source_custom_field_data['data-'.$col_key] = $col_value;
+			$source_custom_field_data['data-'.$col_key] = ( $col_value === NULL ? '' : $col_value );
 		}
 	}
 	$custom_field_options[] = array( 'custom_field', $source_custom_field['name'],
@@ -50,7 +49,7 @@ foreach( $source_custom_fields as $source_custom_field )
 		'<code>'.$source_custom_field['name'].'</code> '.
 		'('.$custom_field_type_titles[ $source_custom_field['type'] ].')'.
 		'<input type="hidden" name="custom_field_data"'.get_field_attribs_as_string( $source_custom_field_data ).' />',
-		! isset( $target_custom_fields[ $source_custom_field['name'] ] ),
+		! in_array( $source_custom_field['name'], $custom_fields ), // check automatically only fields which is not added on the requested form yet
 		false,
 		( $source_custom_field['public'] ? T_('Public') : T_('Private') ) );
 }
