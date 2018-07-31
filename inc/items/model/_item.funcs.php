@@ -1761,6 +1761,7 @@ function get_item_type_field_linkto_options( $field_type )
 		case 'double':
 		case 'varchar':
 		case 'computed':
+		case 'separator':
 			$options = array(
 				'linkperm'  => T_('Link to / Permalink'),
 				'linkto'    => T_('Always "Link to"'),
@@ -4117,6 +4118,9 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 				break;
 			case 'image':
 				$Form->text_input( 'item_image_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) );
+				break;
+			case 'separator':
+				$Form->info( $custom_field['label'], T_('Separator'), $custom_field_note );
 				break;
 		}
 	}

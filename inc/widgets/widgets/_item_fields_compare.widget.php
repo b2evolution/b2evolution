@@ -133,12 +133,17 @@ class item_fields_compare_Widget extends ComponentWidget
 				'fields_compare_field_value_red'   => '<td class="bg-danger">$field_value$</td>',
 				'fields_compare_row_end'           => '</tr>',
 				'fields_compare_table_end'         => '</table></div>',
-				// Separate template for numeric fields:
-				// (To use templates for other field types('string', 'html', 'text', 'url', 'image', 'computed') replace 'numeric' with required type name)
+				// Separate template for numeric and separator fields:
+				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
 				'fields_compare_numeric_field_value'       => '<td class="right">$field_value$</td>',
 				'fields_compare_numeric_field_value_diff'  => '<td class="right bg-warning">$field_value$</td>',
 				'fields_compare_numeric_field_value_green' => '<td class="right bg-success">$field_value$</td>',
 				'fields_compare_numeric_field_value_red'   => '<td class="right bg-danger">$field_value$</td>',
+				'fields_compare_separator_field_title'       => '<th colspan="$cols_count$">$field_title$</th>',
+				'fields_compare_separator_field_value'       => '',
+				'fields_compare_separator_field_value_diff'  => '',
+				'fields_compare_separator_field_value_green' => '',
+				'fields_compare_separator_field_value_red'   => '',
 			), $params );
 
 		$items = $this->disp_params['items'];
@@ -292,7 +297,8 @@ class item_fields_compare_Widget extends ComponentWidget
 				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 				$custom_field_value = $widget_Item->get_custom_field_value( $custom_field['name'] );
 
-				if( $all_string_values_are_empty && ! empty( $custom_field_value ) )
+				if( $all_string_values_are_empty &&
+				    ( ! empty( $custom_field_value ) || $custom_field['type'] == 'separator' ) )
 				{	// At least one field is not empty:
 					$all_string_values_are_empty = false;
 				}
@@ -377,7 +383,9 @@ class item_fields_compare_Widget extends ComponentWidget
 		{
 			echo $this->get_field_template( 'row_start', $custom_field['type'] );
 			// Custom field title:
-			echo str_replace( '$field_title$', $custom_field['label'], $this->get_field_template( 'field_title', $custom_field['type'] ) );
+			echo str_replace( array( '$field_title$', '$cols_count$' ),
+				array( $custom_field['label'], $items_count + 1 ),
+				$this->get_field_template( 'field_title', $custom_field['type'] ) );
 			foreach( $items as $item_ID )
 			{
 				// Custom field value per each post:
@@ -451,7 +459,7 @@ class item_fields_compare_Widget extends ComponentWidget
 	 * Get field template depending on type of the custom field
 	 *
 	 * @param string Template name
-	 * @param string Custom field type: 'double', 'varchar', 'html', 'text', 'url', 'image', 'computed'
+	 * @param string Custom field type: 'double', 'varchar', 'html', 'text', 'url', 'image', 'computed', 'separator'
 	 * @return string HTML template
 	 */
 	function get_field_template( $template_name, $field_type = '' )

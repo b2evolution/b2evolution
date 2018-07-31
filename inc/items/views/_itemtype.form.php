@@ -123,50 +123,41 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 					'label'     => T_('Numeric'),
 					'title'     => T_('Add new numeric custom field'),
 					'note'      => T_('Ex: Price, Weight, Length... &ndash; will be stored as a double floating point number.'),
-					'size'      => 20,
-					'maxlength' => 40
 				),
 			'computed' => array(
 					'label'     => T_('Computed'),
 					'title'     => T_('Add new computed custom field'),
 					'note'      => T_('Ex: Sum, Total... &ndash; will be computed by formula automatically.'),
-					'size'      => 20,
-					'maxlength' => 40
 				),
 			'varchar' => array(
 					'label'     => T_('String'),
 					'title'     => T_('Add new string custom field'),
 					'note'      => T_('Ex: Color, Fabric... &ndash; will be stored as a varchar(10000) field.'),
-					'size'      => 20,
-					'maxlength' => 60
 				),
 			'text' => array(
 					'label'     => T_('Text'),
 					'title'     => T_('Add new text custom field'),
 					'note'      => T_('Ex: Content, Description... &ndash; will be stored as a varchar(10000) field.'),
-					'size'      => 20,
-					'maxlength' => 60
 				),
 			'html' => array(
 					'label'     => 'HTML',
 					'title'     => T_('Add new HTML custom field'),
 					'note'      => T_('Ex: Content, Description... &ndash; will be stored as a varchar(10000) field.'),
-					'size'      => 20,
-					'maxlength' => 60
 				),
 			'url' => array(
 					'label'     => T_('URL'),
 					'title'     => T_('Add new URL custom field'),
 					'note'      => T_('Ex: Website, Twitter... &ndash; will be stored as a varchar(10000) field.'),
-					'size'      => 20,
-					'maxlength' => 60
 				),
 			'image' => array(
 					'label'     => T_('Image'),
 					'title'     => T_('Add new image custom field'),
 					'note'      => T_('Ex: Cover... &ndash; will be stored as an integer.'),
-					'size'      => 20,
-					'maxlength' => 60
+				),
+			'separator' => array(
+					'label'     => T_('Separator'),
+					'title'     => T_('Add new separator custom field'),
+					'note'      => T_('Ex: Dimensions, Pricing... &ndash; will be stored as a varchar(10000) field.'),
 				),
 	);
 
@@ -260,18 +251,21 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 						.Form::get_select_options_string( get_item_type_field_linkto_options( $type ), $custom_field['link'], true )
 					.'</select>';
 			}
-			$custom_field_name .= ' '.T_('Line highlight').' <select type="text" name="custom_'.$type.'_line_highlight'.$i.'" class="form-control custom_field_line_highlight">'
-					.Form::get_select_options_string( $line_highlight_options, $custom_field['line_highlight'], true )
-				.'</select>';
-			$custom_field_name .= ' '.T_('Green highlight').' <select type="text" name="custom_'.$type.'_green_highlight'.$i.'" class="form-control custom_field_green_highlight">'
-					.Form::get_select_options_string( $color_highlight_options, $custom_field['green_highlight'], true )
-				.'</select>';
-			$custom_field_name .= ' '.T_('Red highlight').' <select type="text" name="custom_'.$type.'_red_highlight'.$i.'" class="form-control custom_field_red_highlight">'
-					.Form::get_select_options_string( $color_highlight_options, $custom_field['red_highlight'], true )
-				.'</select>';
+			if( $type != 'separator' )
+			{
+				$custom_field_name .= ' '.T_('Line highlight').' <select type="text" name="custom_'.$type.'_line_highlight'.$i.'" class="form-control custom_field_line_highlight">'
+						.Form::get_select_options_string( $line_highlight_options, $custom_field['line_highlight'], true )
+					.'</select>';
+				$custom_field_name .= ' '.T_('Green highlight').' <select type="text" name="custom_'.$type.'_green_highlight'.$i.'" class="form-control custom_field_green_highlight">'
+						.Form::get_select_options_string( $color_highlight_options, $custom_field['green_highlight'], true )
+					.'</select>';
+				$custom_field_name .= ' '.T_('Red highlight').' <select type="text" name="custom_'.$type.'_red_highlight'.$i.'" class="form-control custom_field_red_highlight">'
+						.Form::get_select_options_string( $color_highlight_options, $custom_field['red_highlight'], true )
+					.'</select>';
+			}
 			$custom_field_name .= ' <label class="text-normal"><input type="checkbox" name="custom_'.$type.'_public'.$i.'" value="1" '.( $custom_field['public'] ? ' checked="checked"' : '' ).' /> '.T_('Public').'</label>';
-			$Form->text_input( $field_id_suffix, $custom_field_label, $data[ 'size' ], $data[ 'label' ], $action_icons, array(
-					'maxlength'    => $data[ 'maxlength' ],
+			$Form->text_input( $field_id_suffix, $custom_field_label, 20, $data[ 'label' ], $action_icons, array(
+					'maxlength'    => 255,
 					'input_prefix' => T_('Title').' ',
 					'input_suffix' => $custom_field_name,
 					'class'        => $custom_field_label_class,
@@ -439,6 +433,9 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		case 'image':
 			title = '<?php echo TS_('Image'); ?>';
 			break;
+		case 'separator':
+			title = '<?php echo TS_('Separator'); ?>';
+			break;
 	}
 
 	// Set values:
@@ -527,6 +524,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		case 'double':
 		case 'varchar':
 		case 'computed':
+		case 'separator':
 			custom_field_input_link += '<?php echo Form::get_select_options_string( get_item_type_field_linkto_options( 'double' ), 'nolink', true ); ?>';
 			break;
 	}
@@ -534,17 +532,20 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 	{
 		custom_field_inputs += ' <?php echo TS_('Link to'); ?> <select type="text" name="custom_' + type + '_link' + count_custom + '" class="form-control custom_field_link">' + custom_field_input_link + '</select>';
 	}
-	custom_field_inputs += ' <?php echo TS_('Line highlight'); ?> <select type="text" name="custom_' + type + '_line_highlight' + count_custom + '" class="form-control custom_field_line_highlight">';
-	custom_field_inputs += type == 'image'
-		? '<?php echo Form::get_select_options_string( $line_highlight_options, 'never', true ); ?>'
-		: '<?php echo Form::get_select_options_string( $line_highlight_options, 'differences', true ); ?>';
-	custom_field_inputs += '</select>';
-	custom_field_inputs += ' <?php echo TS_('Green highlight'); ?> <select type="text" name="custom_' + type + '_green_highlight' + count_custom + '" class="form-control custom_field_green_highlight"><?php
-		echo Form::get_select_options_string( $color_highlight_options, 'never', true );
-	?></select>';
-	custom_field_inputs += ' <?php echo TS_('Red highlight'); ?> <select type="text" name="custom_' + type + '_red_highlight' + count_custom + '" class="form-control custom_field_red_highlight"><?php
-		echo Form::get_select_options_string( $color_highlight_options, 'never', true );
-	?></select>';
+	if( type != 'separator' )
+	{
+		custom_field_inputs += ' <?php echo TS_('Line highlight'); ?> <select type="text" name="custom_' + type + '_line_highlight' + count_custom + '" class="form-control custom_field_line_highlight">';
+		custom_field_inputs += type == 'image'
+			? '<?php echo Form::get_select_options_string( $line_highlight_options, 'never', true ); ?>'
+			: '<?php echo Form::get_select_options_string( $line_highlight_options, 'differences', true ); ?>';
+		custom_field_inputs += '</select>';
+		custom_field_inputs += ' <?php echo TS_('Green highlight'); ?> <select type="text" name="custom_' + type + '_green_highlight' + count_custom + '" class="form-control custom_field_green_highlight"><?php
+			echo Form::get_select_options_string( $color_highlight_options, 'never', true );
+		?></select>';
+		custom_field_inputs += ' <?php echo TS_('Red highlight'); ?> <select type="text" name="custom_' + type + '_red_highlight' + count_custom + '" class="form-control custom_field_red_highlight"><?php
+			echo Form::get_select_options_string( $color_highlight_options, 'never', true );
+		?></select>';
+	}
 	var action_icons = '<?php echo format_to_js( get_icon( 'add', 'imgtag', array(
 			'class'     => 'duplicate_custom_field',
 			'data-type' => '$field_type$',
