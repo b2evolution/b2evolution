@@ -150,13 +150,7 @@ if( $resolve_extra_path )
 	$blog_baseuri = substr( $Blog->gen_baseurl(), strlen( $Blog->get_baseurl_root() ) );
 	$Debuglog->add( 'blog_baseuri: "'.$blog_baseuri.'"', 'params' );
 
-	// Remove trailer:
-	$blog_baseuri_regexp = preg_replace( '~(\.php[0-9]?)?/?$~', '', $blog_baseuri );
-	// Read possibilities in order to get a broad match:
-	$blog_baseuri_regexp = '~^'.preg_quote( $blog_baseuri_regexp, '~' ).'(\.php[0-9]?)?/(.+)$~';
-	// pre_dump( '', 'blog_baseuri_regexp: "', $blog_baseuri_regexp );
-
-	if( preg_match( $blog_baseuri_regexp, $ReqPath, $matches ) )
+	if( preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) )
 	{ // We have extra path info
 		$path_string = $matches[2];
 

@@ -126,7 +126,7 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 												: /* TRANS: current default blog */ T_('Current default :').' '.$defblog ).
 											')',
 										'',
-										'onclick="update_urlpreview( \''.$baseurl.'\', \'index.php\' );"'
+										'onclick="update_urlpreview( \''.$baseurl.'\', \'\' );"'
 			),
 			array( 'default', T_('Default collection in index.php'),
 											$baseurl.'index.php ('.( !isset($defblog)
@@ -240,7 +240,7 @@ jQuery( '[id$=_assets_absolute_url]' ).focus( function()
 
 	// URL Preview (always displayed)
 	$blogurl = $edited_Blog->gen_blogurl();
-	$Form->info( T_('URL preview'), '<span id="urlpreview">'.$blogurl.'</span>' );
+	$Form->info( T_('URL preview'), '<code id="urlpreview">'.$blogurl.'</code>' );
 
 	$http_protocol_options = array(
 		array( 'always_redirect', T_('Always redirect to URL above') ),
