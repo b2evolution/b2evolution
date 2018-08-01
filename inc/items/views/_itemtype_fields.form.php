@@ -31,6 +31,7 @@ $custom_field_type_titles = array(
 		'html'     => 'HTML',
 		'url'      => T_('URL'),
 		'image'    => T_('Image'),
+		'separator'=> T_('Separator'),
 	);
 
 $custom_field_options = array();

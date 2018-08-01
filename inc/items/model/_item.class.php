@@ -2435,7 +2435,7 @@ class Item extends ItemLight
 	 * Get item custom field value by field index
 	 *
 	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
-	 * @param string Restrict field by type(double, varchar, html, text, url, image, computed), FALSE - to don't restrict
+	 * @param string Restrict field by type(double, varchar, html, text, url, image, computed, separator), FALSE - to don't restrict
 	 * @param boolean ****DEPRECATED**** Format value depending on field type 
 	 * @return string|boolean FALSE if the field doesn't exist
 	 */
@@ -2477,7 +2477,7 @@ class Item extends ItemLight
 				'field_value_yes'     => '<span class="fa fa-check green"></span>', // Used to replace a mask #yes# in values of all types
 				'field_value_no'      => '<span class="fa fa-times red"></span>', // Used to replace a mask #no# in values of all types
 				'field_value_format'  => '', // Format for custom field, Leave empty to use a format from DB
-				'field_restrict_type' => false, // Restrict field by type(double, varchar, html, text, url, image, computed), FALSE - to don't restrict
+				'field_restrict_type' => false, // Restrict field by type(double, varchar, html, text, url, image, computed, separator), FALSE - to don't restrict
 			), $params );
 
 		// Try to get an original value of the requested custom field:
@@ -2877,9 +2877,11 @@ class Item extends ItemLight
 				'field_format' => '<tr><th>$title$:</th><td>$value$</td></tr>', // $title$ $value$
 				'after'        => '</table>',
 				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
-				// Separate template for numeric fields:
-				// (To use templates for other field types('string', 'html', 'text', 'url', 'image', 'computed') replace 'numeric' with required type name)
-				'field_numeric_format' => '<tr><th>$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
+				// Separate template for numeric and separator fields:
+				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
+				'field_numeric_format'   => '<tr><th>$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
+				'field_computed_format'  => '<tr><th>$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
+				'field_separator_format' => '<tr><th colspan="2">$title$</th></tr>', // $title$
 			), $params );
 
 		// Get all custom fields by item ID:
@@ -2935,7 +2937,8 @@ class Item extends ItemLight
 
 			$custom_field_value = $this->get_custom_field_formatted( $field_name, $params );
 			if( ! empty( $custom_field_value ) ||
-			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )
+			    $field['type'] == 'separator' ||
+			    ( ( $field['type'] == 'double' || $field['type'] == 'computed' ) && $custom_field_value == '0' ) )
 			{	// Display only the filled field AND also numeric field with '0' value:
 				$html .= str_replace( $mask, array( $field['label'], $custom_field_value ), $field_format );
 				$fields_exist = true;
@@ -10002,7 +10005,7 @@ class Item extends ItemLight
 	/**
 	 * Get custom fields of post type
 	 *
-	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url', 'image', 'computed'. Use comma separator to get several types
+	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url', 'image', 'computed', 'separator'. Use comma separator to get several types
 	 * @return array
 	 */
 	function get_type_custom_fields( $type = 'all' )
