@@ -332,7 +332,7 @@ $.extend(SelectInput.prototype, {
 							
 							if( ajax_running === true ){ return; }
 							
-							jQuery.get( e.htsrv_url + 'async.php',
+							jQuery.get( e.htsrv_url,
 							{
 								action: e.action,
 								plugin_ID: e.obj_id,

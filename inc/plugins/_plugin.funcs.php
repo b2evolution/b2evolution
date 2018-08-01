@@ -569,7 +569,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			$select_input_json = json_encode( array(
 				'blog_id'			=> $blog_id,
 				'user_id'			=> $user_id,
-				'htsrv_url'			=> get_htsrv_url(),
+				'htsrv_url'			=> get_htsrv_url() . 'async.php',
 				'action'			=> 'add_plugin_sett_selected',
 				'val'				=> $val,
 				'id' 				=> $id,
@@ -799,7 +799,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			
 			global $Blog;
 					
-			$get_htsrv_url = get_htsrv_url();
+			$get_htsrv_url = get_htsrv_url() . 'async.php';
 			$add_link = "<div id=\"{$parname}_add_new\">";
 			$add_link .= action_icon(
 						sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label),
@@ -927,7 +927,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$input_json = json_encode( array(
 				'blog_id'			=> $blog_id,
 				'user_id'			=> $user_id,
-				'htsrv_url'			=> get_htsrv_url(),
+				'htsrv_url'			=> get_htsrv_url() . 'async.php',
 				'action'			=> 'add_plugin_sett_set',
 				'id' 				=> $id,
 				'max_number' 		=> $max_number,
