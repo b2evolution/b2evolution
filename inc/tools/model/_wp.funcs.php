@@ -325,7 +325,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 	{
 		global $Settings, $UserSettings;
 
-		echo T_('Importing the users... ');
+		echo T_('Importing users... ');
 		evo_flush();
 
 		// Get existing users

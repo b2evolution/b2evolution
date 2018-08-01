@@ -331,7 +331,7 @@ else
 
 	if( count( $custom_fields ) > 0 )
 	{
-		$Form->begin_fieldset( T_('Properties') );
+		$Form->begin_fieldset( T_('Additional fields') );
 
 		$Form->switch_layout( 'table' );
 		$Form->labelstart = '<td class="right"><strong>';
@@ -339,20 +339,8 @@ else
 
 		echo $Form->formstart;
 
-		foreach( $custom_fields as $field )
-		{ // Display each custom field
-			if( $field['type'] == 'varchar' )
-			{
-				$field_note = '';
-				$field_params = array( 'maxlength' => 255, 'style' => 'width:100%' );
-			}
-			else
-			{	// type == double
-				$field_note = T_('can be decimal');
-				$field_params = array();
-			}
-			$Form->text_input( 'item_'.$field['type'].'_'.$field['ID'], $edited_Item->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] ), 10, $field['label'], $field_note, $field_params );
-		}
+		// Display inputs to edit custom fields:
+		display_editable_custom_fields( $Form, $edited_Item );
 
 		echo $Form->formend;
 

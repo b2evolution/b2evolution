@@ -42,6 +42,7 @@ skin_widget( array(
 		'search_submit_before' => $params['search_submit_before'],
 		'search_submit_after'  => $params['search_submit_after'],
 		'use_search_disp'      => 1,
+		'show_advanced_options' => true
 	) );
 // ------------------------- END OF SEARCH FORM WIDGET -------------------------
 

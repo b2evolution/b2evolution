@@ -143,10 +143,11 @@ switch( $action )
 	case 'start':
 	default:
 		// STEP 1: Check for updates.
+
+		autoupgrade_display_steps( 1, $tab );
+
 		if( $tab == '' )
 		{
-			autoupgrade_display_steps( 1 );
-
 			$block_item_Widget = new Widget( 'block_item' );
 			$block_item_Widget->title = T_('Updates from b2evolution.net').get_manual_link( 'auto-upgrade' );
 			$block_item_Widget->disp_template_replaced( 'block_start' );
@@ -189,12 +190,52 @@ switch( $action )
 		}
 		elseif( $tab == 'git' )
 		{
-			gitupgrade_display_steps( 1 );
-
 			$action = 'start';
 			$AdminUI->disp_view( 'maintenance/views/_upgrade_git.form.php' );
 		}
 		break;
+
+	case 'export_git':
+		// GIT STEP 2: DOWNLOAD.
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'upgrade_started' );
+
+		if( $demo_mode )
+		{
+			$Messages->clear();
+			$Messages->add( T_( 'This feature is disabled on the demo server.' ), 'error' );
+			$Messages->display();
+			break;
+		}
+
+		$git_url = param( 'git_url', 'string', '', true );
+		$git_branch = param( 'git_branch', 'string', '', true );
+
+		$UserSettings->set( 'git_upgrade_url', $git_url );
+		$UserSettings->set( 'git_upgrade_branch', $git_branch );
+		$UserSettings->dbupdate();
+
+		$Messages->clear(); // Clear the messages to avoid a double displaying here
+
+		if( param_check_not_empty( 'git_url', T_('Please enter the URL of repository') ) &&
+		    param_check_url( 'git_url', 'download_src' ) &&
+		    preg_match( '#([^/]+)/([^/]+)/?$#', $git_url, $git_data ) )
+		{	// Generate an URL to download GIT branch as ZIP archive:
+			$git_owner = $git_data[1];
+			$git_repo = preg_replace( '#\.git$#', '', $git_data[2] );
+			set_param( 'upd_url', 'https://github.com/'.$git_owner.'/'.$git_repo.'/archive/'.$git_branch.'.zip' );
+			memorize_param( 'upd_url', 'url', NULL, get_param( 'upd_url' ) );
+			// No break here in order to go to the "download" form below
+		}
+		else
+		{	// Display the errors and the config form again to fix data:
+			$Messages->display();
+			autoupgrade_display_steps( 2, $tab );
+			$action = 'start';
+			$AdminUI->disp_view( 'maintenance/views/_upgrade_git.form.php' );
+			break;
+		}
 
 	case 'download':
 	case 'force_download':
@@ -214,13 +255,13 @@ switch( $action )
 		$action_success = true;
 		$download_success = true;
 
-		autoupgrade_display_steps( 2 );
+		autoupgrade_display_steps( 2, $tab );
 
 		$block_item_Widget = new Widget( 'block_item' );
 		$block_item_Widget->title = T_('Downloading package...');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
-		$download_url = param( 'upd_url', 'string' );
+		$download_url = param( 'upd_url', 'string', '', true );
 		$Messages->clear(); // Clear the messages to avoid a double displaying here
 		param_check_not_empty( 'upd_url', T_('Please enter the URL to download ZIP archive') );
 		// Check the download url for correct http, https, ftp URI
@@ -327,7 +368,7 @@ switch( $action )
 		$action_success = true;
 		$unzip_success = true;
 
-		autoupgrade_display_steps( 3 );
+		autoupgrade_display_steps( 3, $tab );
 
 		$block_item_Widget = new Widget( 'block_item' );
 		$block_item_Widget->title = T_('Unzipping package...');
@@ -397,24 +438,13 @@ switch( $action )
 
 	case 'ready':
 		// STEP 4: READY TO UPGRADE.
-	case 'ready_git':
-		// GIT STEP 3: READY TO UPGRADE.
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'upgrade_is_ready' );
 
-		if( $action == 'ready_git' )
-		{ // Git upgrade
-			gitupgrade_display_steps( 3 );
+		autoupgrade_display_steps( 4, $tab );
 
-			$upgrade_name = param( 'upd_name', 'string', NULL, true );
-		}
-		else
-		{ // Auto upgrade
-			autoupgrade_display_steps( 4 );
-
-			$upgrade_name = param( 'upd_dir', 'string', '', true );
-		}
+		$upgrade_name = param( 'upd_dir', 'string', '', true );
 
 		$block_item_Widget = new Widget( 'block_item' );
 		$block_item_Widget->title = T_('Ready to upgrade').'...';
@@ -422,7 +452,6 @@ switch( $action )
 		evo_flush();
 
 		$new_version_status = check_version( $upgrade_name );
-		$action_backup_value = ( $action == 'ready_git' ) ? 'backup_and_overwrite_git' : 'backup_and_overwrite';
 		if( empty( $new_version_status ) )
 		{ // New version
 			echo '<p><b>'.T_( 'The new files are ready to be installed.' ).'</b></p>';
@@ -451,8 +480,6 @@ switch( $action )
 
 	case 'backup_and_overwrite':
 		// STEP 5: BACKUP & UPGRADE.
-	case 'backup_and_overwrite_git':
-		// GIT STEP 2: BACKUP AND OVERWRITE.
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'upgrade_is_launched' );
@@ -467,19 +494,10 @@ switch( $action )
 
 		if( !isset( $block_item_Widget ) )
 		{
-			if( $action == 'backup_and_overwrite_git' )
-			{ // Git upgrade
-				gitupgrade_display_steps( 4 );
-			}
-			else
-			{ // Auto upgrade
-				autoupgrade_display_steps( 5 );
-			}
+			autoupgrade_display_steps( 5, $tab );
 
 			$block_item_Widget = new Widget( 'block_item' );
-			$block_item_Widget->title = $action == 'backup_and_overwrite_git'
-				? T_('Installing package from Git...')
-				: T_('Installing package...');
+			$block_item_Widget->title = T_('Installing package...');
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
 			$upgrade_name = param( 'upd_name', 'string', NULL, true );
@@ -572,7 +590,7 @@ switch( $action )
 			$Form->begin_form( 'fform' );
 			$Form->begin_fieldset( T_( 'Actions' ) );
 			echo '<p><b>'.T_('All new b2evolution files are in place. You will now be redirected to the installer to perform a DB upgrade.').'</b> '.T_('Note: the User Interface will look different.').'</p>';
-			$continue_onclick = 'location.href=\''.$baseurl.'install/index.php?action='.( ( $action == 'backup_and_overwrite_git' ) ? 'git_upgrade' : 'auto_upgrade' ).'&locale='.$current_locale.'\'';
+			$continue_onclick = 'location.href=\''.$baseurl.'install/index.php?action=auto_upgrade&locale='.$current_locale.'\'';
 			$Form->end_form( array( array( 'button', 'continue', T_('Continue to installer'), 'SaveButton', $continue_onclick ) ) );
 			unset( $block_item_Widget );
 		}
@@ -589,145 +607,6 @@ switch( $action )
 			$Form->begin_form( 'fform' );
 			$Form->begin_fieldset( T_( 'Actions' ) );
 			$Form->end_form( array( array( 'submit', 'actionArray['.$action.']', T_('Retry'), 'SaveButton' ) ) );
-			unset( $block_item_Widget );
-		}
-		break;
-
-	/****** UPGRADE FROM GIT *****/
-	case 'export_git':
-	case 'force_export_git':
-		// GIT STEP 2: EXPORT.
-
-		$Session->assert_received_crumb( 'upgrade_export' );
-
-		if( $demo_mode )
-		{
-			$Messages->clear();
-			$Messages->add( T_( 'This feature is disabled on the demo server.' ), 'error' );
-			$Messages->display();
-			break;
-		}
-
-		gitupgrade_display_steps( 2 );
-
-		$block_item_Widget = new Widget( 'block_item' );
-		$block_item_Widget->title = T_('Exporting package from Git...');
-		$block_item_Widget->disp_template_replaced( 'block_start' );
-
-		$git_url = param( 'git_url', 'string', '', true );
-		$git_branch = param( 'git_branch', 'string', '', true );
-		$git_user = param( 'git_user', 'string', false, true );
-		$git_password = param( 'git_password', 'string', false, true );
-
-		$UserSettings->set( 'git_upgrade_url', $git_url );
-		$UserSettings->set( 'git_upgrade_branch', $git_branch );
-		$UserSettings->set( 'git_upgrade_user', $git_user );
-		$UserSettings->dbupdate();
-
-		$Messages->clear(); // Clear the messages to avoid a double displaying here
-
-		$success = param_check_not_empty( 'git_url', T_('Please enter the URL of repository') );
-		$success = $success && param_check_url( 'git_url', 'download_src' );
-
-		// Display the errors and the download form again to fix data
-		$Messages->display();
-
-		if( ! $success )
-		{
-			$action = 'start';
-			$AdminUI->disp_view( 'maintenance/views/_upgrade_git.form.php' );
-			break;
-		}
-
-		$success = prepare_maintenance_dir( $upgrade_path, true );
-
-		if( $success )
-		{
-			// Set maximum execution time
-			set_max_execution_time( 2400 ); // 60 minutes
-
-			// Create object to work with Git repository:
-			load_class( '_ext/git/Git.php', 'GitRepo' );
-			$GitRepo = new GitRepo();
-
-			if( ! $GitRepo->test_git() )
-			{	// If Git tool is not installed on the server:
-				echo '<p class="red">'.T_( 'Git tool is not installed on your server.' ).'</p>';
-				evo_flush();
-				$action = 'start';
-				break; // Stop an upgrade from Git
-			}
-
-			if( empty( $git_branch ) )
-			{	// Set default branch:
-				$git_branch = 'master';
-			}
-
-			$git_hidden_pass_url = $git_url;
-			if( ! empty( $git_user ) )
-			{	// Replace user and password in Git URL from entered fields:
-				$git_url_regexp = '#://([^@]+@)?#';
-				$git_hidden_pass_url = preg_replace( $git_url_regexp, '://'.$git_user.( empty( $git_password ) ? '' : ':'.str_repeat( '*', strlen( $git_password ) ) ).'@', $git_url );
-				$git_url = preg_replace( $git_url_regexp, '://'.$git_user.( empty( $git_password ) ? '' : ':'.$git_password ).'@', $git_url );
-			}
-
-			// Get latest commit has of the requested branch:
-			$latest_commit_hash = explode( "\t", $GitRepo->run( 'ls-remote '.$git_url.' -b '.$git_branch ) );
-			$latest_commit_hash = $latest_commit_hash[0];
-
-			if( empty( $latest_commit_hash ) )
-			{	// If no access:
-				echo '<p class="red">'.sprintf( T_( 'Unable to access to branch %s of Git repository %s.' ), '<code>'.$git_branch.'</code>', '<code>'.$git_hidden_pass_url.'</code>' ).'</p>';
-				evo_flush();
-				$action = 'start';
-				break; // Stop an upgrade from Git
-			}
-
-			$upgrade_name = 'export_git_'.$git_branch.'_'.$latest_commit_hash;
-			memorize_param( 'upd_name', 'string', '', $upgrade_name );
-			$upgrade_folder = $upgrade_path.$upgrade_name;
-
-			if( $action == 'force_export_git' && file_exists( $upgrade_folder ) )
-			{ // The exported folder already exists
-				// Try to delete previous package
-				if( ! rmdir_r( $upgrade_folder ) )
-				{
-					echo '<p class="red">'.sprintf( T_('Unable to delete previous exported package %s before forcing the export.'), '<b>'.$upgrade_folder.'</b>' ).'</p>';
-				}
-				evo_flush();
-			}
-
-			if( file_exists( $upgrade_folder ) )
-			{ // Current version already is downloaded
-				echo '<p class="green">'.sprintf( T_('Commit %s has already been downloaded. Using: %s'), '<code>'.$latest_commit_hash.'</code>', '<code>'.$upgrade_folder.'</code>' );
-				$commit_is_exported = true;
-			}
-			else
-			{ // Download files
-				echo '<p>'.sprintf( T_( 'Downloading package to &laquo;<strong>%s</strong>&raquo;...' ), $upgrade_folder );
-				evo_flush();
-
-				// Export all files in temp folder for following coping:
-				$git_result = $GitRepo->run( 'clone -b '.$git_branch.' --single-branch '.$git_url.' '.$upgrade_folder );
-
-				// Remove .git folder:
-				rmdir_r( $upgrade_folder.'/.git' );
-
-				echo '</p>';
-
-				if( ! empty( $git_result ) )
-				{ // Checkout is failed
-					echo '<p style="color:red">'.sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $git_hidden_pass_url ).'</p>';
-					evo_flush();
-					$action = 'start';
-					break;
-				}
-			}
-		}
-
-		if( $success )
-		{ // Pause a process before upgrading
-			$AdminUI->disp_view( 'maintenance/views/_upgrade_export.form.php' );
 			unset( $block_item_Widget );
 		}
 		break;

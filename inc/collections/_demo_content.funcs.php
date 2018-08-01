@@ -1459,14 +1459,16 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'demo' );
-				$edited_Item->set_setting( 'custom_double_1', '123' );
-				$edited_Item->set_setting( 'custom_double_2', '456' );
-				$edited_Item->set_setting( 'custom_varchar_3', 'abc' );
-				$edited_Item->set_setting( 'custom_varchar_4', 'Enter your own values' );
-				$edited_Item->set_setting( 'custom_text_5', 'This is a sample text field.
+				$edited_Item->set_setting( 'custom:first_numeric_field', '123' );
+				$edited_Item->set_setting( 'custom:second_numeric_field', '456' );
+				$edited_Item->set_setting( 'custom:usd_price', '29.99' );
+				$edited_Item->set_setting( 'custom:eur_price', '24.79' );
+				$edited_Item->set_setting( 'custom:first_string_field', 'abc' );
+				$edited_Item->set_setting( 'custom:multiline_plain_text_field', 'This is a sample text field.
 It can have multiple lines.' );
-				$edited_Item->set_setting( 'custom_html_6', 'This is an <b>HTML</b> <i>field</i>.' );
-				$edited_Item->set_setting( 'custom_url_7', 'http://b2evolution.net/' );
+				$edited_Item->set_setting( 'custom:multiline_html_field', 'This is an <b>HTML</b> <i>field</i>.' );
+				$edited_Item->set_setting( 'custom:url_field', 'http://b2evolution.net/' );
+				$edited_Item->set_setting( 'custom:checkmark_field', '1' );
 				$post_custom_fields_ID = $edited_Item->insert( $owner_ID, T_('Custom Fields Example'),
 '<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>'.
 
@@ -1474,6 +1476,8 @@ It can have multiple lines.' );
 
 '<p>[fields]</p>'.
 
+'[teaserbreak]'.
+
 '<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>'.
 
 '<p>[fields:first_numeric_field, first_string_field,second_numeric_field]</p>'.
@@ -1482,6 +1486,11 @@ It can have multiple lines.' );
 
 '<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 						$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
+				$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$custom_item_link_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'attachment' );
+				$edited_Item->set_setting( 'custom:image_1', $custom_item_link_ID );
+				$edited_Item->dbupdate();
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				// Insert a post:
@@ -1489,21 +1498,25 @@ It can have multiple lines.' );
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'demo' );
-				$edited_Item->set_setting( 'custom_double_1', '123.45' );
-				$edited_Item->set_setting( 'custom_double_2', '456' );
-				$edited_Item->set_setting( 'custom_varchar_3', 'abcdef' );
-				$edited_Item->set_setting( 'custom_varchar_4', 'Enter your own values' );
-				$edited_Item->set_setting( 'custom_text_5', 'This is a sample text field.
+				$edited_Item->set_setting( 'custom:first_numeric_field', '123.45' );
+				$edited_Item->set_setting( 'custom:second_numeric_field', '456' );
+				$edited_Item->set_setting( 'custom:usd_price', '17.50' );
+				$edited_Item->set_setting( 'custom:eur_price', '14.95' );
+				$edited_Item->set_setting( 'custom:first_string_field', 'abcdef' );
+				$edited_Item->set_setting( 'custom:multiline_plain_text_field', 'This is a sample text field.
 It can have multiple lines.
 This is an extra line.' );
-				$edited_Item->set_setting( 'custom_html_6', 'This is an <b>HTML</b> <i>field</i>.' );
-				$edited_Item->set_setting( 'custom_url_7', 'http://b2evolution.net/' );
-				$edited_Item->insert( $owner_ID, T_('Another Custom Fields Example'),
+				$edited_Item->set_setting( 'custom:multiline_html_field', 'This is an <b>HTML</b> <i>field</i>.' );
+				$edited_Item->set_setting( 'custom:url_field', 'http://b2evolution.net/' );
+				$edited_Item->set_setting( 'custom:checkmark_field', '0' );
+				$another_custom_fields_example_ID = $edited_Item->insert( $owner_ID, T_('Another Custom Fields Example'),
 '<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>'.
 
 '<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>'.
 
 '<p>[fields]</p>'.
+
+'[teaserbreak]'.
 
 '<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>'.
 
@@ -1513,6 +1526,11 @@ This is an extra line.' );
 
 '<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 						$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
+				$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley-road.jpg' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$another_item_link_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'attachment' );
+				$edited_Item->set_setting( 'custom:image_1', $another_item_link_ID );
+				$edited_Item->dbupdate();
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				if( is_available_item_type( $blog_ID, 'Child Post' ) )
@@ -1522,22 +1540,42 @@ This is an extra line.' );
 					$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 					$edited_Item = new Item();
 					$edited_Item->set_tags_from_string( 'demo' );
+					$edited_Item->set_setting( 'custom:first_numeric_field', '123' );
+					$edited_Item->set_setting( 'custom:first_string_field', 'abc' );
+					$edited_Item->set_setting( 'custom:image_1', $custom_item_link_ID );
+					$edited_Item->set_setting( 'custom:checkmark_field', '1' );
 					$edited_Item->set( 'parent_ID', $post_custom_fields_ID ); // Set parent post ID
 					/*$edited_Item->insert( $owner_ID, T_('Child Post Example'), T_('<p>This post has a special post type called "Child Post".</p>'),*/
 					$edited_Item->insert( $owner_ID, T_('Child Post Example'),
-'<p>'.sprintf( T_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' ).'</p>
+'<p>'.sprintf( T_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' ).'</p>'.
 
-<p>'.T_('This also allows us to access the custom fields of the parent post:').'</p>
+'<p>'.T_('This also allows us to access the custom fields of the parent post:').'</p>'.
 
-<p>[parent:fields]</p>
+'<p>[parent:fields]</p>'.
 
-<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
+'[teaserbreak]'.
 
-<p>[parent:fields:first_numeric_field, first_string_field,second_numeric_field]</p>
+'<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>'.
 
-<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this %s.'), '[parent:field: first_string_field]' ).'</p>
+'<p>[parent:fields:first_numeric_field, first_string_field,second_numeric_field]</p>'.
 
-<p>'.sprintf( T_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
+'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[parent:field: first_string_field]' ).'</p>'.
+
+'<p>'.sprintf( T_('We can also reference fields of any other post like this: %s or like this: %s.'), '[item:another-custom-fields-example:field:first_string_field]', '[item:'.$another_custom_fields_example_ID.':field:first_string_field]' ).'</p>'.
+
+'<p>'.sprintf( T_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' ).'</p>'.
+
+'<h3>'.T_('Replicated fields').'</h3>'.
+
+'<p>'.T_('By using the same field names, it is also possible to automatically replicate some fields from parent to child (recursively).').'</p>'.
+
+'<p>'.T_('This child post has the following fields which automatically replicate from its parent:').'</p>'.
+
+'<p>[fields]</p>'.
+
+'<p>'.sprintf( T_('Another way to show this, is to use b2evolution\'s %s short tag:'), '`[compare:...]`' ).'</p>'.
+
+'<p>[compare:$this$,$parent$]</p>',
 							$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Child Post' );
 					$item_IDs[] = array( $edited_Item->ID, $now );
 				}

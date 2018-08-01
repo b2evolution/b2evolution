@@ -39,7 +39,8 @@ $edited_user_perms = array( 'edited-user', 'edited-user-required' );
 
 // Default params:
 $default_params = array(
-		'skin_form_params' => array(),
+		'skin_form_params'     => array(),
+		'register_field_width' => 252,
 	);
 
 if( isset( $params ) )

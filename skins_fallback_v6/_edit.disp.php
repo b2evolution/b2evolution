@@ -351,24 +351,8 @@ else
 	{
 		$Form->begin_fieldset( T_('Additional fields'), array( 'id' => 'itemform_custom_fields' ) );
 
-		foreach( $custom_fields as $custom_field )
-		{	// Display each custom field:
-			switch( $custom_field['type'] )
-			{
-				case 'double':
-					$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, $custom_field['label'], $custom_field['note'].' <code>'.$custom_field['name'].'</code>' );
-					break;
-				case 'varchar':
-					$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, $custom_field['label'], '<br />'.$custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
-					break;
-				case 'text':
-					$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
-					break;
-				case 'html':
-					$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
-					break;
-			}
-		}
+		// Display inputs to edit custom fields:
+		display_editable_custom_fields( $Form, $edited_Item );
 
 		$Form->end_fieldset();
 	}
