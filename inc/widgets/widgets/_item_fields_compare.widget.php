@@ -135,11 +135,15 @@ class item_fields_compare_Widget extends ComponentWidget
 				'fields_compare_table_end'         => '</table></div>',
 				// Separate template for numeric and separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
-				'fields_compare_numeric_field_value'       => '<td class="right">$field_value$</td>',
-				'fields_compare_numeric_field_value_diff'  => '<td class="right bg-warning">$field_value$</td>',
-				'fields_compare_numeric_field_value_green' => '<td class="right bg-success">$field_value$</td>',
-				'fields_compare_numeric_field_value_red'   => '<td class="right bg-danger">$field_value$</td>',
-				'fields_compare_separator_field_title'     => '<th colspan="$cols_count$">$field_title$</th>',
+				'fields_compare_numeric_field_value'        => '<td class="right">$field_value$</td>',
+				'fields_compare_numeric_field_value_diff'   => '<td class="right bg-warning">$field_value$</td>',
+				'fields_compare_numeric_field_value_green'  => '<td class="right bg-success">$field_value$</td>',
+				'fields_compare_numeric_field_value_red'    => '<td class="right bg-danger">$field_value$</td>',
+				'fields_compare_computed_field_value'       => '<td class="right">$field_value$</td>',
+				'fields_compare_computed_field_value_diff'  => '<td class="right bg-warning">$field_value$</td>',
+				'fields_compare_computed_field_value_green' => '<td class="right bg-success">$field_value$</td>',
+				'fields_compare_computed_field_value_red'   => '<td class="right bg-danger">$field_value$</td>',
+				'fields_compare_separator_field_title'      => '<th colspan="$cols_count$">$field_title$</th>',
 			), $params );
 
 		$items = $this->disp_params['items'];

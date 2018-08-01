@@ -245,7 +245,7 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 						.'</select>';
 					break;
 			}
-			if( $type != 'text' && $type != 'html' )
+			if( ! in_array( $type, array( 'text', 'html', 'separator' ) ) )
 			{
 				$custom_field_name .= ' '.T_('Link to').' <select type="text" name="custom_'.$type.'_link'.$i.'" class="form-control custom_field_link">'
 						.Form::get_select_options_string( get_item_type_field_linkto_options( $type ), $custom_field['link'], true )
@@ -286,6 +286,7 @@ $Form->begin_fieldset( T_('Use of Custom Fields').get_manual_link( 'item-type-cu
 	$SQL->FROM_add( 'INNER JOIN T_items__type_custom_field ON itcf_ityp_ID = ityp_ID' );
 	$SQL->WHERE( 'ityp_ID != '.$DB->quote( $edited_Itemtype->ID ) );
 	$SQL->GROUP_BY( 'ityp_ID' );
+	$SQL->ORDER_BY( 'ityp_name' );
 	$item_type_with_custom_fields = $DB->get_assoc( $SQL );
 	$Form->select_input_array( 'another_item_type', '', $item_type_with_custom_fields, T_('Add fields from another item type'), '', array(
 			'force_keys_as_values' => true,
@@ -524,7 +525,6 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		case 'double':
 		case 'varchar':
 		case 'computed':
-		case 'separator':
 			custom_field_input_link += '<?php echo Form::get_select_options_string( get_item_type_field_linkto_options( 'double' ), 'nolink', true ); ?>';
 			break;
 	}

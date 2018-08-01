@@ -2569,7 +2569,7 @@ class Item extends ItemLight
 
 				if( $format == '#yes#' || $format == '#no#' )
 				{	// Use special formats:
-					$custom_field_value = str_replace( array( '#yes#', '#no#' ), array( $params['field_value_yes'], $params['field_value_no'] ), $format );
+					$custom_field_value = $format;
 					break;
 				}
 
@@ -2631,6 +2631,9 @@ class Item extends ItemLight
 				}
 				break;
 		}
+
+		// Replace special masks in value with template:
+		$custom_field_value = str_replace( array( '#yes#', '#no#' ), array( $params['field_value_yes'], $params['field_value_no'] ), $custom_field_value );
 
 		// Apply setting "Link to":
 		if( $custom_field['link'] != 'nolink' && ! empty( $custom_field_value ) )
@@ -2876,7 +2879,8 @@ class Item extends ItemLight
 				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
 				// Separate template for numeric and separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
-				'field_numeric_format' => '<tr><th>$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
+				'field_numeric_format'   => '<tr><th>$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
+				'field_computed_format'  => '<tr><th>$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
 				'field_separator_format' => '<tr><th colspan="2">$title$</th></tr>', // $title$
 			), $params );
 
