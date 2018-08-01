@@ -75,3 +75,22 @@ div.average_rating .star_rating{
 	float: left;
 	padding-right: 10px;
 }
+
+// Star rating for custom fields with format like #stars#:
+@evo_star_color_active: #F90;
+@evo_star_color_empty: #999;
+.evo_stars {
+	color: @evo_star_color_active;
+	.evo_star_empty, .evo_star_percent {
+		color: @evo_star_color_empty;
+	}
+	.evo_star_percent {
+		position: relative;
+		.fa {
+			position: absolute;
+			left: 0;
+			overflow: hidden;
+			color: @evo_star_color_active;
+		}
+	}
+}

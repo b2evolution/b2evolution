@@ -2567,12 +2567,16 @@ class Item extends ItemLight
 					$format = $formats[1];
 				}
 
-				if( $format == '#yes#' || $format == '#no#' )
+				if( $format == '#yes#' ||
+				    $format == '#no#' ||
+				    strpos( $format, '#stars' ) !== false ||
+				    ( $format !== '' && ! preg_match( '/\d/', $format ) ) )
 				{	// Use special formats:
 					$custom_field_value = $format;
 					break;
 				}
 
+				// Format number:
 				$format = preg_split( '#(\d+)#', $format, -1, PREG_SPLIT_DELIM_CAPTURE );
 				$f_num = count( $format );
 				$format_decimals = 0;
@@ -2634,6 +2638,15 @@ class Item extends ItemLight
 
 		// Replace special masks in value with template:
 		$custom_field_value = str_replace( array( '#yes#', '#no#' ), array( $params['field_value_yes'], $params['field_value_no'] ), $custom_field_value );
+
+		if( preg_match_all( '/(#stars(\/\d+)?)#/', $custom_field_value, $star_matches ) )
+		{	// Use stars template:
+			foreach( $star_matches[0] as $s => $star_match )
+			{
+				$stars_num = ( isset( $star_matches[2][ $s ] ) && $star_matches[2][ $s ] !== '' ) ? intval( trim( $star_matches[2][ $s ], '/' ) ) : 5;
+				$custom_field_value = str_replace( $star_match, get_stars_template( $orig_custom_field_value, $stars_num, $params ), $custom_field_value );
+			}
+		}
 
 		// Apply setting "Link to":
 		if( $custom_field['link'] != 'nolink' && ! empty( $custom_field_value ) )

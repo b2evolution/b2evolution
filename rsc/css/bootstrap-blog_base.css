@@ -689,6 +689,22 @@ div.average_rating .star_rating {
   float: left;
   padding-right: 10px;
 }
+.evo_stars {
+  color: #ff9900;
+}
+.evo_stars .evo_star_empty,
+.evo_stars .evo_star_percent {
+  color: #999999;
+}
+.evo_stars .evo_star_percent {
+  position: relative;
+}
+.evo_stars .evo_star_percent .fa {
+  position: absolute;
+  left: 0;
+  overflow: hidden;
+  color: #ff9900;
+}
 .evo_container__footer {
   margin-bottom: 10px;
 }
