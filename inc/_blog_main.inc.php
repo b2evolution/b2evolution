@@ -497,6 +497,7 @@ param( 'cat', 'string', NULL );
 param( 'tag', 'string', NULL );
 param( 'm', 'string', NULL );
 if( empty( $Item ) &&
+		$disp != 'compare' && // This disp uses a filter like cat=, tag=, orderby= etc. so we should not force it to disp=post
 		(
 			! is_null( $catsel ) || // Filter by many categories
 			( $disp != 'edit' && $disp != 'anonpost' && ! is_null( $cat ) ) || // Filter by one category

@@ -3243,6 +3243,7 @@ class Item extends ItemLight
 						// Set widget params to display:
 						$widget_params = array(
 							'widget' => 'item_fields_compare',
+							'items_source' => 'list',
 							'items'  => $compare_items,
 							'fields' => $compare_fields,
 						);
