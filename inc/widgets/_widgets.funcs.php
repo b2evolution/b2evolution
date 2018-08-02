@@ -376,7 +376,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	}
 	
 	/* Compare Main Area */
-	add_basic_widget( $blog_id, 'Compare Main Area', 'item_fields_compare', 'core', 10 );
+	add_basic_widget( $blog_id, 'Compare Main Area', 'item_fields_compare', 'core', 10, array( 'items_source' => 'all' ) );
 
 
 	/* 404 Page */
