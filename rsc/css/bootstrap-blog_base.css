@@ -691,6 +691,7 @@ div.average_rating .star_rating {
 }
 .evo_stars {
   color: #ff9900;
+  white-space: nowrap;
 }
 .evo_stars .evo_star_empty,
 .evo_stars .evo_star_percent {
