@@ -3734,4 +3734,54 @@ function init_fineuploader_js_lang_strings()
 		/* TRANS: Abbr. for Terabytes */.TS_('TB').'\'];' );
 }
 
+
+/**
+ * Get rating stars template
+ *
+ * @param float Rating value, e-g: 2 - display 2 active stars of default 5, 4.33 - display 4 active stars and 5 star is filled for 33%
+ * @param integer Total number of stars
+ * @param array Additional parameters
+ * @return string HTML of stars
+ */
+function get_stars_template( $value, $stars_num = 5, $params = array() )
+{
+	$params = array_merge( array(
+			'stars_before'       => '<span class="evo_stars">',
+			'stars_star_full'    => '<i class="fa fa-star"></i>',
+			'stars_star_percent' => '<i class="fa fa-star evo_star_percent"><i class="fa fa-star" style="width:$percent$"></i></i>', // $percent$ is replaced with values like 10%, 67%
+			'stars_star_empty'   => '<i class="fa fa-star evo_star_empty"></i>',
+			'stars_after'        => '</span>',
+		), $params );
+
+	$stars_num = intval( $stars_num );
+
+	if( $stars_num < 1 )
+	{	// Nothing to display:
+		return '';
+	}
+
+	$stars_template = $params['stars_before'];
+
+	$full_stars_max = floor( $value );
+	$percents = round( ( $value - $full_stars_max ) * 100 );
+	for( $s = 1; $s <= $stars_num; $s++ )
+	{
+		if( $s == $full_stars_max + 1 && $percents > 0 )
+		{	// Percent star:
+			$stars_template .= str_replace( '$percent$', $percents.'%', $params['stars_star_percent'] );
+		}
+		elseif( $s > $full_stars_max )
+		{	// Empty star:
+			$stars_template .= $params['stars_star_empty'];
+		}
+		else
+		{	// Full star:
+			$stars_template .= $params['stars_star_full'];
+		}
+	}
+
+	$stars_template .= $params['stars_after'];
+
+	return $stars_template;
+}
 ?>

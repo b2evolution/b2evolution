@@ -309,3 +309,41 @@ function b2edit_confirm( msg, newaction, submit_action )
 
 	return b2edit_reload( '#item_checkchanges', newaction, null, { action: submit_action }, false );
 }
+
+
+/**
+ * Request WHOIS information
+ *
+ * Opens a modal window displaying results of WHOIS query
+ */
+function get_whois_info( ip_address )
+{
+	var window_height = jQuery( window ).height();
+	var margin_size_height = 20;
+	var modal_height = window_height - ( margin_size_height * 2 );
+
+	openModalWindow(
+			'<span id="spinner" class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_whois_title + '"></span>',
+			'90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true, true );
+
+	jQuery.ajax(
+	{
+		type: 'GET',
+		url: htsrv_url + 'async.php',
+		data: {
+			action: 'get_whois_info',
+			query: ip_address,
+			window_height: modal_height
+		},
+		success: function( result )
+		{
+			if( ajax_response_is_correct( result ) )
+			{
+				result = ajax_debug_clear( result );
+				openModalWindow( result, '90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true );
+			}
+		}
+	} );
+
+	return false;
+}

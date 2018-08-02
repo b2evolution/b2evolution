@@ -1829,7 +1829,7 @@ class Blog extends DataObject
 
 	/**
 	 * Generate blog URL. That is the URL of the main page/home page of the blog.
-	 * This will nto necessarily be a folder. For example, it can end in index.php?blog=4
+	 * This will not necessarily be a folder. For example, it can end in index.php?blog=4
 	 *
 	 * @param string default|original
 	 */

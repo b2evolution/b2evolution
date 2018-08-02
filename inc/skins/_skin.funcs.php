@@ -1548,21 +1548,6 @@ function skin_init( $disp )
 				$robots_index = false;
 			}
 			break;
-
-		case 'compare':
-			$items = trim( param( 'items', '/^[\d,]*$/' ), ',' );
-			if( ! empty( $items ) )
-			{	// Check if at least one item exist in DB:
-				$ItemCache = & get_ItemCache();
-				$items = $ItemCache->load_list( explode( ',', $items ) );
-			}
-			if( empty( $items ) )
-			{	// Display 404 page when no items to compare:
-				global $disp;
-				$disp = '404';
-				$Messages->add( T_('The requested items don\'t exist.'), 'error' );
-			}
-			break;
 	}
 
 	$Debuglog->add('skin_init: $disp='.$disp. ' / $disp_detail='.$disp_detail.' / $seo_page_type='.$seo_page_type, 'skins' );

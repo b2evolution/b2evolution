@@ -342,7 +342,8 @@ class ItemType extends DataObject
 			param( 'deleted_custom_html', 'string', '' ).','.
 			param( 'deleted_custom_url', 'string', '' ).','.
 			param( 'deleted_custom_image', 'string', '' ).','.
-			param( 'deleted_custom_computed', 'string', '' ), ',' );
+			param( 'deleted_custom_computed', 'string', '' ).','.
+			param( 'deleted_custom_separator', 'string', '' ), ',' );
 		$this->delete_custom_fields = empty( $this->delete_custom_fields ) ? array() : explode( ',', $this->delete_custom_fields );
 
 		// Field names array is used to check the diplicates
@@ -351,7 +352,7 @@ class ItemType extends DataObject
 		// Empty and Initialize the custom fields from POST data
 		$this->custom_fields = array();
 
-		$types = array( 'double', 'varchar', 'text', 'html', 'url', 'image', 'computed' );
+		$types = array( 'double', 'varchar', 'text', 'html', 'url', 'image', 'computed', 'separator' );
 		foreach( $types as $type )
 		{
 			$empty_title_error = false; // use this to display empty title fields error message only ones
@@ -374,9 +375,9 @@ class ItemType extends DataObject
 				$custom_field_formula = param( 'custom_'.$type.'_formula'.$i, 'string', NULL );
 				$custom_field_link = param( 'custom_'.$type.'_link'.$i, 'string', 'nolink' );
 				$custom_field_is_new = param( 'custom_'.$type.'_new'.$i, 'integer', 0 );
-				$custom_field_line_highlight = param( 'custom_'.$type.'_line_highlight'.$i, 'string' );
-				$custom_field_green_highlight = param( 'custom_'.$type.'_green_highlight'.$i, 'string' );
-				$custom_field_red_highlight = param( 'custom_'.$type.'_red_highlight'.$i, 'string' );
+				$custom_field_line_highlight = param( 'custom_'.$type.'_line_highlight'.$i, 'string', NULL );
+				$custom_field_green_highlight = param( 'custom_'.$type.'_green_highlight'.$i, 'string', NULL );
+				$custom_field_red_highlight = param( 'custom_'.$type.'_red_highlight'.$i, 'string', NULL );
 
 				// Add each new/existing custom field in this array
 				// in order to see all them on the form when post type is not updated because some errors
@@ -638,7 +639,7 @@ class ItemType extends DataObject
 	/**
 	 * Get the custom feilds
 	 *
-	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url', 'image', 'computed'. Use comma separator to get several types
+	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url', 'image', 'computed', 'separator'. Use comma separator to get several types
 	 * @param string Field name that is used as key of array: 'ID', 'ityp_ID', 'label', 'name', 'type', 'order', 'public'
 	 * @return array Custom fields
 	 */

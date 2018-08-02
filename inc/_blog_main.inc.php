@@ -141,16 +141,16 @@ if( ! isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
 if( $resolve_extra_path )
 {
 	// Check and Remove blog base URI from ReqPath:
+
+	// BaseURI is the part after the domain name and it will always end with / :
 	$blog_baseuri = substr( $Blog->gen_baseurl(), strlen( $Blog->get_baseurl_root() ) );
 	$Debuglog->add( 'blog_baseuri: "'.$blog_baseuri.'"', 'params' );
 
-	// Remove trailer:
-	$blog_baseuri_regexp = preg_replace( '~(\.php[0-9]?)?/?$~', '', $blog_baseuri );
-	// Read possibilities in order to get a broad match:
-	$blog_baseuri_regexp = '~^'.preg_quote( $blog_baseuri_regexp, '~' ).'(\.php[0-9]?)?/(.+)$~';
-	// pre_dump( '', 'blog_baseuri_regexp: "', $blog_baseuri_regexp );
-
-	if( preg_match( $blog_baseuri_regexp, $ReqPath, $matches ) )
+	// Check if we have one of these:
+	// - Either the ReqPath starts with collection base URI (always including trailing slash)
+	// - Or the ReqPath contains a .php file (which will be the case when using any slug, including old slug aliases)
+	// ... followed by some extra path info.
+	if( preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) )
 	{ // We have extra path info
 		$path_string = $matches[2];
 
@@ -492,6 +492,7 @@ param( 'cat', 'string', NULL );
 param( 'tag', 'string', NULL );
 param( 'm', 'string', NULL );
 if( empty( $Item ) &&
+		$disp != 'compare' && // This disp uses a filter like cat=, tag=, orderby= etc. so we should not force it to disp=post
 		(
 			! is_null( $catsel ) || // Filter by many categories
 			( $disp != 'edit' && $disp != 'anonpost' && ! is_null( $cat ) ) || // Filter by one category

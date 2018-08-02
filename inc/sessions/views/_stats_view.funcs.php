@@ -373,7 +373,7 @@ function stat_session_hits( $sess_ID, $link_text )
  */
 function disp_clickable_log_IP( $hit_remote_addr )
 {
-	global $current_User, $blog;
+	global $current_User, $blog, $admin_url;
 	static $perm = NULL;
 
 	if( empty( $perm ) )
@@ -383,7 +383,9 @@ function disp_clickable_log_IP( $hit_remote_addr )
 
 	if( $perm == true )
 	{
-		return '<a href="?ctrl=stats&tab='.get_param( 'tab' ).'&colselect_submit=Filter+list&sess_ID=&remote_IP='.$hit_remote_addr.'&blog='.$blog.'">'.$hit_remote_addr.'</a>';
+		return '<a href="?ctrl=stats&tab='.get_param( 'tab' ).'&colselect_submit=Filter+list&sess_ID=&remote_IP='.$hit_remote_addr.'&blog='.$blog.'">'.$hit_remote_addr.'</a>'
+				.' <a href="'.$admin_url.'?ctrl=antispam&amp;action=whois&amp;query='.$hit_remote_addr.'" class="btn btn-sm btn-info" onclick="return get_whois_info(\''.$hit_remote_addr.'\');">'
+				.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Check domain registration (WHOIS)...') ) ).'</a>';
 	}
 	else
 	{

@@ -82,6 +82,11 @@ class item_fields_compare_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		$ItemTypeCache = & get_ItemTypeCache();
+		$item_type_options = array(
+				'default' => T_('Default types shown for this collection')
+			) + $ItemTypeCache->get_option_array();
+
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_( 'Title' ),
@@ -89,18 +94,50 @@ class item_fields_compare_Widget extends ComponentWidget
 					'note' => T_('This is the title to display'),
 					'defaultvalue' => '',
 				),
-				'items' => array(
+				'items_source' => array(
 					'label' => T_('Items to compare'),
-					'note' => sprintf( T_('Separate Item IDs or slugs or %s or %s with %s.'), '<code>$this$</code>', '<code>$parent$</code>', '<code>,</code>' ).' '.sprintf( T_('Leave empty to use URL parameter %s.'), '<code>items=</code>' ),
+					'type' => 'select',
+					'options' => array(
+						'all'   => T_('All from collection'),
+						'param' => sprintf( T_('As specified by "%s" URL param'), 'items=' ),
+						'list'  => T_('Specific IDs listed below'),
+					),
+					'defaultvalue' => 'param',
+				),
+				'items_type' => array(
+					'label' => T_('Restrict to Post Type'),
+					'type' => 'select',
+					'options' => $item_type_options,
+					'defaultvalue' => 'default',
+				),
+				'items' => array(
+					'label' => T_('Specific Item IDs'),
+					'note' => sprintf( T_('Separate Item IDs or slugs or %s or %s with %s.'), '<code>$this$</code>', '<code>$parent$</code>', '<code>,</code>' ),
 					'valid_pattern' => array(
 						'pattern' => '/^(([\da-z\-_]+|\$this\$|\$parent\$)+(,([\da-z\-_]+|\$this\$|\$parent\$))*)?$/',
 						'error'   => sprintf( T_('Items to compare must be specified by ID, by slug or as %s or %s.'), '<code>$this$</code>', '<code>$parent$</code>' ),
 					),
 					'size' => 80,
 				),
+				'items_limit' => array(
+					'label' => T_('Limit'),
+					'type' => 'integer',
+					'note' => T_('Max number of items that can be compared.'),
+					'defaultvalue' => 10,
+					'valid_range' => array(
+						'min' => 0,
+					),
+					'allow_empty' => true,
+				),
+				'allow_filter' => array(
+					'label' => T_('Allow filter params'),
+					'type' => 'checkbox',
+					'note' => sprintf( T_('Check to allow filtering/ordering with URL params such as %s etc.'), '<code>cat=</code>, <code>tag=</code>, <code>orderby=</code>' ),
+					'defaultvalue' => 0,
+				),
 				'fields' => array(
 					'type' => 'textarea',
-					'label' => T_('Fields to compare'),
+					'label' => T_('Specific fields to compare'),
 					'note' => T_('Enter one field name per line.').' '.T_('Leave empty to compare all fields.'),
 					'rows' => 10,
 				),
@@ -117,82 +154,150 @@ class item_fields_compare_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Plugins, $Item;
-
-		$params = array_merge( array(
-				'fields_compare_table_start'    => '<div class="evo_content_block"><table class="item_custom_fields">',
-				'fields_compare_table_end'      => '</table></div>',
-				'fields_compare_row_start'      => '<tr>',
-				'fields_compare_row_end'        => '</tr>',
-				'fields_compare_empty_cell'     => '<td style="border:none"></td>',
-				'fields_compare_post'           => '<th>$post_link$</th>',
-				'fields_compare_field_title'    => '<th>$field_title$:</th>',
-				'fields_compare_field_value'       => '<td>$field_value$</td>',
-				'fields_compare_field_value_diff'  => '<td class="bg-warning">$field_value$</td>',
-				'fields_compare_field_value_green' => '<td class="bg-success">$field_value$</td>',
-				'fields_compare_field_value_red'   => '<td class="bg-danger">$field_value$</td>',
-			), $params );
+		global $Plugins, $Item, $Blog;
 
 		$this->init_display( $params );
 
-		$items = $this->disp_params['items'];
-		if( empty( $items ) )
-		{	// Use items from URL parameter if widget setting is empty:
-			$items = param( 'items', '/^[\d,]*$/' );
+		$this->disp_params = array_merge( $this->disp_params, array(
+				'fields_compare_table_start'       => '<div class="evo_content_block"><table class="item_custom_fields">',
+				'fields_compare_row_start'         => '<tr>',
+				'fields_compare_empty_cell'        => '<td style="border:none"></td>',
+				'fields_compare_post'              => '<th class="center">$post_link$</th>',
+				'fields_compare_field_title'       => '<th class="right">$field_title$:</th>',
+				'fields_compare_field_value'       => '<td class="center">$field_value$</td>',
+				'fields_compare_field_value_diff'  => '<td class="center bg-warning">$field_value$</td>',
+				'fields_compare_field_value_green' => '<td class="center bg-success">$field_value$</td>',
+				'fields_compare_field_value_red'   => '<td class="center bg-danger">$field_value$</td>',
+				'fields_compare_row_end'           => '</tr>',
+				'fields_compare_table_end'         => '</table></div>',
+				// Separate template for numeric and separator fields:
+				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
+				'fields_compare_numeric_field_value'        => '<td class="right">$field_value$</td>',
+				'fields_compare_numeric_field_value_diff'   => '<td class="right bg-warning">$field_value$</td>',
+				'fields_compare_numeric_field_value_green'  => '<td class="right bg-success">$field_value$</td>',
+				'fields_compare_numeric_field_value_red'    => '<td class="right bg-danger">$field_value$</td>',
+				'fields_compare_computed_field_value'       => '<td class="right">$field_value$</td>',
+				'fields_compare_computed_field_value_diff'  => '<td class="right bg-warning">$field_value$</td>',
+				'fields_compare_computed_field_value_green' => '<td class="right bg-success">$field_value$</td>',
+				'fields_compare_computed_field_value_red'   => '<td class="right bg-danger">$field_value$</td>',
+				'fields_compare_separator_field_title'      => '<th class="center" colspan="$cols_count$">$field_title$</th>',
+			), $params );
+
+		switch( $this->disp_params['items_source'] )
+		{
+			case 'all':
+				// Use all items from current collection,
+				// They are loaded by ItemList below:
+				$items = 'all';
+				break;
+
+			case 'param':
+				// Use items from param:
+				$items = param( 'items', '/^[\d,]*$/' );
+				$items = trim( $items, ',' );
+				$items = empty( $items ) ? false : explode( ',', $items );
+				break;
+
+			case 'list':
+				// Use items from specific list:
+				$items = trim( $this->disp_params['items'], ',' );
+				$items = empty( $items ) ? false : explode( ',', $items );
+				break;
+
+			default:
+				// Stop here, because unknown items source.
+				return;
 		}
 
-		$items = trim( $items, ',' );
-
-		if( empty( $items ) )
+		if( empty( $items ) && $items != 'all' )
 		{	// No items to compare:
 			return;
 		}
 
 		$ItemCache = & get_ItemCache();
 
-		$items = explode( ',', $items );
+		$items_limit = intval( $this->disp_params['items_limit'] );
+		$items_limit = $items_limit > 0 ? $items_limit : NULL;
 
-		// Check all item IDs:
-		foreach( $items as $i => $item_ID )
-		{
-			$item_ID = trim( $item_ID );
-			if( empty( $item_ID ) )
-			{	// Remove wrong item ID:
-				unset( $items[ $i ] );
-			}
-			if( $item_ID == '$this$' )
-			{	// Try to get a current post ID:
-				if( isset( $Item ) && $Item instanceof Item )
-				{	// Use ID of current post:
-					$items[ $i ] = $Item->ID;
-				}
-				else
-				{	// Remove it because no current post:
+		if( is_array( $items ) )
+		{	// Check item IDs which are loaded from URL param 'items=' or from specific widget settings list:
+			foreach( $items as $i => $item_ID )
+			{
+				$item_ID = trim( $item_ID );
+				if( empty( $item_ID ) )
+				{	// Remove wrong item ID:
 					unset( $items[ $i ] );
 				}
+				if( $item_ID == '$this$' )
+				{	// Try to get a current post ID:
+					if( isset( $Item ) && $Item instanceof Item )
+					{	// Use ID of current post:
+						$items[ $i ] = $Item->ID;
+					}
+					else
+					{	// Remove it because no current post:
+						unset( $items[ $i ] );
+					}
+				}
+				elseif( $item_ID == '$parent$' )
+				{	// Try to get a parent post ID:
+					if( isset( $Item ) && $Item instanceof Item && $Item->get( 'parent_ID' ) > 0 )
+					{	// Use ID of parent post:
+						$items[ $i ] = $Item->get( 'parent_ID' );
+					}
+					else
+					{	// Remove it because no parent post:
+						unset( $items[ $i ] );
+					}
+				}
+				elseif( ! is_number( $item_ID ) )
+				{	// Try to get a post ID by slug:
+					if( $widget_Item = & $ItemCache->get_by_urltitle( $item_ID, false, false ) )
+					{	// Use ID of post detected by slug:
+						$items[ $i ] = $widget_Item->ID;
+					}
+					else
+					{	// Remove it because cannot find post by slug:
+						unset( $items[ $i ] );
+					}
+				}
 			}
-			elseif( $item_ID == '$parent$' )
-			{	// Try to get a parent post ID:
-				if( isset( $Item ) && $Item instanceof Item && $Item->get( 'parent_ID' ) > 0 )
-				{	// Use ID of parent post:
-					$items[ $i ] = $Item->get( 'parent_ID' );
-				}
-				else
-				{	// Remove it because no parent post:
-					unset( $items[ $i ] );
-				}
+
+			if( $items_limit > 0 )
+			{	// Limit items by widget setting:
+				$items = array_slice( $items, 0, $items_limit );
 			}
-			elseif( ! is_number( $item_ID ) )
-			{	// Try to get a post ID by slug:
-				if( $widget_Item = & $ItemCache->get_by_urltitle( $item_ID, false, false ) )
-				{	// Use ID of post detected by slug:
-					$items[ $i ] = $widget_Item->ID;
-				}
-				else
-				{	// Remove it because cannot find post by slug:
-					unset( $items[ $i ] );
-				}
+		}
+
+		if( $this->disp_params['allow_filter'] || $items == 'all' )
+		{	// Use ItemList when we need a filter or when all items are requested from collection:
+			$ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $items_limit );
+			// Set additional debug info prefix for SQL queries in order to know what code executes it:
+			$ItemList->query_title_prefix = 'item_fields_compare_Widget';
+
+			if( $this->disp_params['items_type'] == 'default' )
+			{	// Exclude items with types which are hidden by collection setting "Show post types":
+				$filter_item_type = $Blog->get_setting( 'show_post_types' ) != '' ? '-'.$Blog->get_setting( 'show_post_types' ) : NULL;
 			}
+			else
+			{	// Filter by selected Item Type:
+				$filter_item_type = intval( $this->disp_params['items_type'] );
+			}
+			$ItemList->set_default_filters( array(
+				'types'        => $filter_item_type,
+				'post_ID_list' => is_array( $items ) ? implode( ',', $items ) : NULL,
+			) );
+
+			if( $this->disp_params['allow_filter'] )
+			{	// Filter items from request:
+				$ItemList->load_from_Request( false );
+			}
+
+			// Run query:
+			$ItemList->query();
+
+			// Get IDs of items filtered by $ItemList:
+			$items = $ItemList->get_page_ID_array();
 		}
 
 		// Load all requested posts into the cache:
@@ -253,7 +358,7 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		if( $widget_fields === false )
 		{	// Sort custom fields from all requested posts by custom field order:
-			usort( $all_custom_fields, array( $this, 'sort_custom_fields' ) );
+			uasort( $all_custom_fields, array( $this, 'sort_custom_fields' ) );
 		}
 
 		if( empty( $all_custom_fields ) )
@@ -265,6 +370,11 @@ class item_fields_compare_Widget extends ComponentWidget
 		$items_count = count( $items );
 		foreach( $all_custom_fields as $c => $custom_field )
 		{
+			if( $custom_field['type'] == 'separator' )
+			{	// Separator fields have no values:
+				continue;
+			}
+
 			$all_custom_fields[ $c ]['is_different'] = false;
 			$is_numeric_type = in_array( $custom_field['type'], array( 'double', 'computed' ) );
 			if( $is_numeric_type )
@@ -287,9 +397,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				$custom_field_value = $widget_Item->get_custom_field_value( $custom_field['name'] );
 
 				if( $all_string_values_are_empty &&
-				    ( ( ! $is_numeric_type && ! empty( $custom_field_value ) ) ||
-				      ( $is_numeric_type && ( ! empty( $custom_field_value ) || ! empty( $custom_field['format'] ) ) )
-				    ) )
+				    ( ! empty( $custom_field_value ) || $custom_field['type'] == 'separator' ) )
 				{	// At least one field is not empty:
 					$all_string_values_are_empty = false;
 				}
@@ -351,28 +459,85 @@ class item_fields_compare_Widget extends ComponentWidget
 			}
 		}
 
-		$this->disp_title( $this->disp_params['title'] );
+		echo $this->disp_params['block_start'];
+
+		$this->disp_title();
 
 		echo $this->disp_params['block_body_start'];
 
 		// Start a table to display differences of all custom fields for selected posts:
-		echo $params['fields_compare_table_start'];
+		echo $this->get_field_template( 'table_start' );
 
-		echo $params['fields_compare_row_start'];
-		echo $params['fields_compare_empty_cell'];
+		echo $this->get_field_template( 'row_start' );
+		echo $this->get_field_template( 'empty_cell' );
 		foreach( $items as $item_ID )
 		{
 			$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 			// Permanent post link:
-			echo str_replace( '$post_link$', $widget_Item->get_title(), $params['fields_compare_post'] );
+			echo str_replace( '$post_link$', $widget_Item->get_title(), $this->get_field_template( 'post' ) );
 		}
-		echo $params['fields_compare_row_end'];
+		echo $this->get_field_template( 'row_end' );
 
 		foreach( $all_custom_fields as $custom_field )
 		{
-			echo $params['fields_compare_row_start'];
-			// Custom field title:
-			echo str_replace( '$field_title$', $custom_field['label'], $params['fields_compare_field_title'] );
+			// Display a row of one compared field between all selected items:
+			$this->display_field_row_template( $custom_field, $items, $params );
+
+			// Display the repeated fields after separator:
+			if( $custom_field['type'] == 'separator' &&
+			    ! empty( $custom_field['format'] ) &&
+			    ! $widget_fields )
+			{	// Repeat fields after separator in case of displaying of all fields:
+				$separator_format = explode( ':', $custom_field['format'] );
+				if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
+				{	// Skip wrong separator format:
+					continue;
+				}
+				$repeat_fields = explode( ',', $separator_format[1] );
+				foreach( $repeat_fields as $repeat_field_name )
+				{
+					$repeat_field_name = trim( $repeat_field_name );
+					if( ! isset( $all_custom_fields[ $repeat_field_name ] ) ||
+					    $all_custom_fields[ $repeat_field_name ]['type'] == 'separator' )
+					{	// Skip unknown field and a separator field to avoid recursion:
+						continue;
+					}
+
+					// Display a row of the repeated custom field between all selected items:
+					$this->display_field_row_template( $all_custom_fields[ $repeat_field_name ], $items, $params );
+				}
+			}
+		}
+
+		echo $this->get_field_template( 'table_end' );
+
+		echo $this->disp_params['block_body_end'];
+
+		echo $this->disp_params['block_end'];
+
+		return true;
+	}
+
+
+	/**
+	 * Display a row of one compared field between the requested items
+	 *
+	 * @param array Custom field data
+	 * @param array IDs of the compared items
+	 * @param array Additional parameters
+	 */
+	function display_field_row_template( $custom_field, $items, $params = array() )
+	{
+		$ItemCache = & get_ItemCache();
+
+		echo $this->get_field_template( 'row_start', $custom_field['type'] );
+		// Custom field title:
+		echo str_replace( array( '$field_title$', '$cols_count$' ),
+			array( $custom_field['label'], count( $items ) + 1 ),
+			$this->get_field_template( 'field_title', $custom_field['type'] ) );
+
+		if( $custom_field['type'] != 'separator' )
+		{	// Separator fields have no values:
 			foreach( $items as $item_ID )
 			{
 				// Custom field value per each post:
@@ -389,26 +554,26 @@ class item_fields_compare_Widget extends ComponentWidget
 				}
 
 				// Default template for field value:
-				$field_value_template = $params['fields_compare_field_value'];
+				$field_value_template = $this->get_field_template( 'field_value', $custom_field['type'] );
 
 				if( $custom_field['is_different'] && $custom_field['line_highlight'] == 'differences' )
 				{	// Mark the field value as different only when it is defined in the settings of the custom field:
-					$field_value_template = $params['fields_compare_field_value_diff'];
+					$field_value_template = $this->get_field_template( 'field_value_diff', $custom_field['type'] );
 				}
 
 				if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) &&
-				    is_numeric( $custom_field_orig_value ) )
+						is_numeric( $custom_field_orig_value ) )
 				{	// Compare only numeric values:
 					if( $custom_field_orig_value === $custom_field['highest_value'] &&
 							$custom_field_orig_value !== $custom_field['lowest_value'] )
 					{	// Check if we should mark the highest field:
 						if( $custom_field['green_highlight'] == 'highest' )
 						{	// The highest value must be marked as green:
-							$field_value_template = $params['fields_compare_field_value_green'];
+							$field_value_template = $this->get_field_template( 'field_value_green', $custom_field['type'] );
 						}
 						elseif( $custom_field['red_highlight'] == 'highest' )
 						{	// The highest value must be marked as red:
-							$field_value_template = $params['fields_compare_field_value_red'];
+							$field_value_template = $this->get_field_template( 'field_value_red', $custom_field['type'] );
 						}
 					}
 
@@ -417,30 +582,46 @@ class item_fields_compare_Widget extends ComponentWidget
 					{	// Check if we should mark the lowest field:
 						if( $custom_field['green_highlight'] == 'lowest' )
 						{	// The lowest value must be marked as green:
-							$field_value_template = $params['fields_compare_field_value_green'];
+							$field_value_template = $this->get_field_template( 'field_value_green', $custom_field['type'] );
 						}
 						elseif( $custom_field['red_highlight'] == 'lowest' )
 						{	// The lowest value must be marked as red:
-							$field_value_template = $params['fields_compare_field_value_red'];
+							$field_value_template = $this->get_field_template( 'field_value_red', $custom_field['type'] );
 						}
 					}
 				}
 
 				echo str_replace( '$field_value$', $custom_field_value, $field_value_template );
 			}
-
-			echo $params['fields_compare_row_end'];
 		}
 
-		echo $params['fields_compare_table_end'];
+		echo $this->get_field_template( 'row_end', $custom_field['type'] );
+	}
 
-		echo $this->disp_params['block_start'];
 
-		echo $this->disp_params['block_body_end'];
+	/**
+	 * Get field template depending on type of the custom field
+	 *
+	 * @param string Template name
+	 * @param string Custom field type: 'double', 'varchar', 'html', 'text', 'url', 'image', 'computed', 'separator'
+	 * @return string HTML template
+	 */
+	function get_field_template( $template_name, $field_type = '' )
+	{
+		// Convert field types to non-devs names:
+		$field_type = ( $field_type == 'double' ? 'numeric' : ( $field_type == 'varchar' ? 'string' : $field_type ) );
 
-		echo $this->disp_params['block_end'];
+		if( isset( $this->disp_params['fields_compare_'.$field_type.'_'.$template_name] ) )
+		{	// Use special template for current type if it is defined:
+			return $this->disp_params['fields_compare_'.$field_type.'_'.$template_name];
+		}
+		elseif( isset( $this->disp_params['fields_compare_'.$template_name] ) )
+		{	// Use generic template for all types:
+			return $this->disp_params['fields_compare_'.$template_name];
+		}
 
-		return true;
+		// Unknown template:
+		return '';
 	}
 
 

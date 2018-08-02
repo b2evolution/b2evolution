@@ -1379,18 +1379,6 @@ ul.jslog_error {
   background: #fbf2ee;
   color: #e00;
 }
-.item_custom_fields {
-  border: none;
-  margin-bottom: 10px;
-  border-collapse: collapse;
-}
-.item_custom_fields th,
-.item_custom_fields td {
-  padding: 0 10px 0 0;
-}
-.item_custom_fields th {
-  text-align: left;
-}
 .b2evo_alert {
   width: 270px;
   position: fixed;
@@ -2950,6 +2938,23 @@ div.average_rating .star_rating {
   float: left;
   padding-right: 10px;
 }
+.evo_stars {
+  color: #ff9900;
+  white-space: nowrap;
+}
+.evo_stars .evo_star_empty,
+.evo_stars .evo_star_percent {
+  color: #999999;
+}
+.evo_stars .evo_star_percent {
+  position: relative;
+}
+.evo_stars .evo_star_percent .fa {
+  position: absolute;
+  left: 0;
+  overflow: hidden;
+  color: #ff9900;
+}
 .evo_container__footer {
   margin-bottom: 10px;
 }
@@ -3757,18 +3762,12 @@ form#comment_edit {
   padding: 8px;
   vertical-align: top;
 }
-.evo_content_block table.evo_poll__table {
-  margin: 1em 0;
-}
-.evo_content_block table.evo_poll__table th {
-  border: 0;
-  padding: 2px 10px 2px 0;
-  background-color: #eee;
-}
 .evo_content_block table.evo_poll__table td {
   border: 0;
   padding: 2px 10px 2px 0;
-  vertical-align: top;
+}
+.evo_content_block table.item_custom_fields {
+  margin-bottom: 10px;
 }
 .evo_form__comment .panel {
   margin: 0;
