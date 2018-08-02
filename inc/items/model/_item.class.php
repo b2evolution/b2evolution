@@ -2887,14 +2887,14 @@ class Item extends ItemLight
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'before'       => '<table class="item_custom_fields">',
-				'field_format' => '<tr><th>$title$:</th><td>$value$</td></tr>', // $title$ $value$
+				'field_format' => '<tr><th class="right">$title$:</th><td class="center">$value$</td></tr>', // $title$ $value$
 				'after'        => '</table>',
 				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
 				// Separate template for numeric and separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
-				'field_numeric_format'   => '<tr><th>$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
-				'field_computed_format'  => '<tr><th>$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
-				'field_separator_format' => '<tr><th colspan="2">$title$</th></tr>', // $title$
+				'field_numeric_format'   => '<tr><th class="right">$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
+				'field_computed_format'  => '<tr><th class="right">$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
+				'field_separator_format' => '<tr><th colspan="2" class="center">$title$</th></tr>', // $title$
 			), $params );
 
 		// Get all custom fields by item ID:

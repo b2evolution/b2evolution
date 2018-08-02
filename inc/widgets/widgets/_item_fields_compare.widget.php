@@ -125,12 +125,12 @@ class item_fields_compare_Widget extends ComponentWidget
 				'fields_compare_table_start'       => '<div class="evo_content_block"><table class="item_custom_fields">',
 				'fields_compare_row_start'         => '<tr>',
 				'fields_compare_empty_cell'        => '<td style="border:none"></td>',
-				'fields_compare_post'              => '<th>$post_link$</th>',
-				'fields_compare_field_title'       => '<th>$field_title$:</th>',
-				'fields_compare_field_value'       => '<td>$field_value$</td>',
-				'fields_compare_field_value_diff'  => '<td class="bg-warning">$field_value$</td>',
-				'fields_compare_field_value_green' => '<td class="bg-success">$field_value$</td>',
-				'fields_compare_field_value_red'   => '<td class="bg-danger">$field_value$</td>',
+				'fields_compare_post'              => '<th class="center">$post_link$</th>',
+				'fields_compare_field_title'       => '<th class="right">$field_title$:</th>',
+				'fields_compare_field_value'       => '<td class="center">$field_value$</td>',
+				'fields_compare_field_value_diff'  => '<td class="center bg-warning">$field_value$</td>',
+				'fields_compare_field_value_green' => '<td class="center bg-success">$field_value$</td>',
+				'fields_compare_field_value_red'   => '<td class="center bg-danger">$field_value$</td>',
 				'fields_compare_row_end'           => '</tr>',
 				'fields_compare_table_end'         => '</table></div>',
 				// Separate template for numeric and separator fields:
@@ -143,7 +143,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				'fields_compare_computed_field_value_diff'  => '<td class="right bg-warning">$field_value$</td>',
 				'fields_compare_computed_field_value_green' => '<td class="right bg-success">$field_value$</td>',
 				'fields_compare_computed_field_value_red'   => '<td class="right bg-danger">$field_value$</td>',
-				'fields_compare_separator_field_title'      => '<th colspan="$cols_count$">$field_title$</th>',
+				'fields_compare_separator_field_title'      => '<th class="center" colspan="$cols_count$">$field_title$</th>',
 			), $params );
 
 		$items = $this->disp_params['items'];
