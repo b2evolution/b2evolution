@@ -172,7 +172,7 @@ class CollectionSettings extends AbstractSettings
 			'use_workflow' => 0,						// Don't use workflow by default
 			'use_deadline' => 1,						// Use deadline for workflow by default
 			'aggregate_coll_IDs' => '',
-			'blog_footer_text' => 'This collection &copy;$year$ by $owner$',
+			'blog_footer_text' => 'This collection &copy;$year$ by $publisher$',
 			'max_footer_credits' => 3,
 			'enable_goto_blog' => 'blog',  // 'no' - No redirect, 'blog' - Go to blog after publishing post, 'post' - Redirect to permanent post url
 			'editing_goto_blog' => 'post', // 'no' - No redirect, 'blog' - Go to blog after editing post, 'post' - Redirect to permanent post url

@@ -401,6 +401,12 @@ if( ! $is_creating )
 
 	$Form->begin_fieldset( T_('Description').get_manual_link( 'collection-description' ) );
 
+		$collection_logo_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select collection logo'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
+		$Form->fileselect( 'blog_logo_file_ID', $edited_Blog->get_setting( 'logo_file_ID' ), T_('Collection logo'), NULL, $collection_logo_params );
+
+		$social_media_boilerplate_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select logo for social media boilerplate'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
+		$Form->fileselect( 'blog_social_media_image_file_ID', $edited_Blog->get_setting( 'social_media_image_file_ID' ), T_('Social media boilerplate'), NULL, $social_media_boilerplate_params );
+
 		$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is typically displayed by a widget right under the collection name in the front-office.'), 250 );
 
 		$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This may be displayed in several places of the front-office. This may also be included in the XML feeds. You may use HTML markup here.'), 50 );

@@ -166,6 +166,9 @@ $Form->begin_fieldset( T_('Meta data').get_manual_link('blog_meta_data') );
 	$Form->text( 'blog_shortdesc', $edited_Blog->get( 'shortdesc' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!')
 		.' ('.sprintf( T_('%s characters'), '<span id="blog_shortdesc_chars_count">'.$shortdesc_chars_count.'</span>' ).')', 250, 'large' );
 	$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
+	$publisher_logo_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select publisher logo'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
+	$Form->fileselect( 'blog_publisher_logo_file_ID', $edited_Blog->get_setting( 'publisher_logo_file_ID' ), T_('Publisher logo'), NULL, $publisher_logo_params );
+	$Form->text( 'blog_publisher_name', $edited_Blog->get_setting( 'publisher_name' ), 60, T_('Publisher name'), '', 250, 'large' );
 	$Form->text( 'blog_footer_text', $edited_Blog->get_setting( 'blog_footer_text' ), 60, T_('Blog footer'), sprintf(
 		T_('Use &lt;br /&gt; to insert a line break. You might want to put your copyright or <a href="%s" target="_blank">creative commons</a> notice here.'),
 		'http://creativecommons.org/license/' ), 1000, 'large' );

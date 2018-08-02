@@ -663,6 +663,12 @@ class Blog extends DataObject
 				}
 			}
 			$this->set( 'in_bloglist', param( 'blog_in_bloglist' ), $default_in_bloglist );
+
+			// Collection logo
+			$this->set_setting( 'logo_file_ID', param( 'blog_logo_file_ID' ) );
+
+			// Collection social media boilderplate
+			$this->set_setting( 'social_media_image_file_ID', param( 'blog_social_media_image_file_ID' ) );
 		}
 
 		if( param( 'archive_links', 'string', NULL ) !== NULL )
@@ -704,6 +710,14 @@ class Blog extends DataObject
 		if( in_array( 'template', $groups ) )
 		{
 			$this->set_setting( 'allow_duplicate', param( 'blog_allow_duplicate', 'integer', 0 ) );
+		}
+
+		if( in_array( 'meta', $groups ) )
+		{ // Publisher logo:
+			$this->set_setting( 'publisher_logo_file_ID', param( 'blog_publisher_logo_file_ID' ) );
+
+			// Publisher name:
+			$this->set_setting( 'publisher_name', param( 'blog_publisher_name' ) );
 		}
 
 		if( param( 'image_size', 'string', NULL ) !== NULL )
@@ -2812,6 +2826,13 @@ class Blog extends DataObject
 				// for copyrigth year
 				return date( 'Y', $localtimenow );
 
+			case 'publisher':
+				$publisher_name = $this->get_setting( 'publisher_name' );
+				if( ! empty( $publisher_name) )
+				{
+					return $publisher_name;
+				}
+				// No break, use owner instead
 			case 'owner':
 				/**
 				 * @var User
@@ -3246,6 +3267,18 @@ class Blog extends DataObject
 						{	// Use only not empty line:
 							$result[ $subject_option ] = $subject_option;
 						}
+					}
+				}
+				break;
+
+			case 'social_media_image':
+				if( $result === NULL )
+				{
+					$FileCache = & get_FileCache();
+					$File = & $FileCache->get_by_ID( $this->get_setting( 'social_media_image_file_ID' ), false, false );
+					if( $File )
+					{
+						return $File;
 					}
 				}
 				break;
