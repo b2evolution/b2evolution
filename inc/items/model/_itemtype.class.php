@@ -27,6 +27,7 @@ class ItemType extends DataObject
 	var $description;
 	var $usage;
 	var $template_name;
+	var $schema = '';
 	var $front_instruction = 0;
 	var $back_instruction = 0;
 	var $instruction = '';
@@ -96,6 +97,7 @@ class ItemType extends DataObject
 			$this->description = $db_row->ityp_description;
 			$this->usage = $db_row->ityp_usage;
 			$this->template_name = $db_row->ityp_template_name;
+			$this->schema = $db_row->ityp_schema;
 			$this->front_instruction = $db_row->ityp_front_instruction;
 			$this->back_instruction = $db_row->ityp_back_instruction;
 			$this->instruction = $db_row->ityp_instruction;
@@ -186,6 +188,10 @@ class ItemType extends DataObject
 		// Template name
 		param( 'ityp_template_name', 'string' );
 		$this->set_from_Request( 'template_name', NULL, true );
+
+		// Schema
+		param( 'ityp_schema', 'string' );
+		$this->set_from_Request( 'schema', NULL, true );
 
 		// Show instruction in front-office
 		param( 'ityp_front_instruction', 'integer' );

@@ -248,6 +248,7 @@ function create_default_data()
 	$post_types = array();
 	$post_types[] = array(
 			'name'           => 'Post',
+			'schema'         => 'Article',
 		);
 	$post_types[] = array(
 			'name'           => 'Podcast Episode',
@@ -402,6 +403,7 @@ function create_default_data()
 			'allow_disabling_comments' => 0,
 			'use_comment_expiration'   => 'optional',
 			'use_custom_fields'        => 1,
+			'schema'                   => NULL,
 		);
 	$post_types_sql = 'INSERT INTO T_items__type ( ityp_'.implode( ', ityp_', array_keys( $post_type_default_settings ) ).' ) VALUES ';
 	foreach( $post_types as $p => $post_type )

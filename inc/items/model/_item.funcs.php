@@ -5087,6 +5087,44 @@ function callback_filter_item_list_table( & $Form )
 
 
 /**
+ * Get schema titles of item type
+ *
+ * @param boolean TRUE - to include false statuses, which don't exist in DB
+ * @return array Status titles
+ */
+function ityp_schema_titles( $include_false_schema = true )
+{
+	$schema_titles = array();
+	if( $include_false_schema )
+	{ // Include Unknown status
+		$schema_titles[''] = T_('None');
+	}
+	$schema_titles['Article'] = T_('Article');
+	$schema_titles['WebPage'] = T_('Web Page');
+	$schema_titles['BlogPosting'] = T_('Blog Posting');
+	$schema_titles['ImageGallery'] = T_('Image Gallery');
+	$schema_titles['DiscussionForumPosting'] = T_('Discussion Forum Posting');
+	$schema_titles['TechArticle'] = T_('Technical Article');
+
+	return $schema_titles;
+}
+
+
+/**
+ * Get schema title of item type by schema value
+ *
+ * @param string Status value
+ * @return string Status title
+ */
+function ityp_schema_title( $schema )
+{
+	$aipr_statuses = aipr_status_titles();
+
+	return isset( $aipr_statuses[ $status ] ) ? $aipr_statuses[ $status ] : $status;
+}
+
+
+/**
  * Helper functions to display Items results.
  * New ( not display helper ) functions must be created above item_results function
  */

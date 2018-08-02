@@ -56,6 +56,7 @@ $Form->begin_fieldset( T_('General').get_manual_link('item-type-general') );
 			array( 'admin',      T_('Admin') )
 		), T_('Permission level') );
 	$Form->text_input( 'ityp_template_name', $edited_Itemtype->template_name, 25, T_('Template name'), T_('b2evolution will automatically append .main.php or .disp.php'), array( 'maxlength' => 40 ) );
+	$Form->select_input_array( 'ityp_schema', $edited_Itemtype->get( 'schema' ), ityp_schema_titles(), T_('Schema'), '', array( 'force_keys_as_values' => true ) );
 
 $Form->end_fieldset();
 
@@ -524,7 +525,7 @@ function add_new_custom_field( type, duplicated_field_obj )
 	?>';
 	action_icons = action_icons.replace( '$field_type$', type );
 	action_icons = '<?php echo format_to_js( $Form->note_format ); ?>'.replace( '%s', action_icons );
-	custom_field_inputs += 
+	custom_field_inputs +=
 				' <label class="text-normal"><input type="checkbox" name="custom_' + type + '_public' + count_custom + '" value="1" checked="checked" /> <?php echo TS_('Public'); ?></label>' +
 			action_icons +
 			'<?php echo format_to_js( $Form->inputend.$Form->fieldend ); ?>';
