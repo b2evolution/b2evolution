@@ -1073,6 +1073,9 @@ switch( $action )
 				if( $display_mode != 'js' )
 				{ // Init JS for form to delete the posts, the comments and the messages of user
 					echo_user_deldata_js();
+
+					// Init JS for WHOIS query window
+					echo_whois_js_bootstrap();
 				}
 				break;
 			case 'sessions':

@@ -7688,6 +7688,18 @@ function echo_modalwindow_js_bootstrap()
 	</script>';
 }
 
+/**
+ * Initialize JavaScript to build and open WHOIS window
+ */
+function echo_whois_js_bootstrap()
+{
+	echo '<script type="text/javascript">
+		var evo_js_lang_close = \''.TS_('Close').'\';
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_whois_title = \''.TS_('Querying WHOIS server...').'\';
+	</script>';
+}
+
 
 /**
  * Handle fatal error in order to display info message when debug is OFF
