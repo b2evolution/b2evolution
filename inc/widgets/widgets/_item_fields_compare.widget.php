@@ -264,7 +264,7 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		if( $widget_fields === false )
 		{	// Sort custom fields from all requested posts by custom field order:
-			usort( $all_custom_fields, array( $this, 'sort_custom_fields' ) );
+			uasort( $all_custom_fields, array( $this, 'sort_custom_fields' ) );
 		}
 
 		if( empty( $all_custom_fields ) )
@@ -386,72 +386,33 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		foreach( $all_custom_fields as $custom_field )
 		{
-			echo $this->get_field_template( 'row_start', $custom_field['type'] );
-			// Custom field title:
-			echo str_replace( array( '$field_title$', '$cols_count$' ),
-				array( $custom_field['label'], $items_count + 1 ),
-				$this->get_field_template( 'field_title', $custom_field['type'] ) );
+			// Display a row of one compared field between all selected items:
+			$this->display_field_row_template( $custom_field, $items, $params );
 
-			if( $custom_field['type'] != 'separator' )
-			{	// Separator fields have no values:
-				foreach( $items as $item_ID )
+			// Display the repeated fields after separator:
+			if( $custom_field['type'] == 'separator' &&
+			    ! empty( $custom_field['format'] ) &&
+			    ! $widget_fields )
+			{	// Repeat fields after separator in case of displaying of all fields:
+				$separator_format = explode( ':', $custom_field['format'] );
+				if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
+				{	// Skip wrong separator format:
+					continue;
+				}
+				$repeat_fields = explode( ',', $separator_format[1] );
+				foreach( $repeat_fields as $repeat_field_name )
 				{
-					// Custom field value per each post:
-					if( in_array( $item_ID, $custom_field['items'] ) )
-					{	// Get a formatted value if post has this custom field:
-						$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
-						$custom_field_value = $widget_Item->get_custom_field_formatted( $custom_field['name'], $params );
-						$custom_field_orig_value = $widget_Item->get_custom_field_value( $custom_field['name'] );
-					}
-					else
-					{	// This post has no this custom field:
-						$custom_field_value = '';
-						$custom_field_orig_value = false;
+					$repeat_field_name = trim( $repeat_field_name );
+					if( ! isset( $all_custom_fields[ $repeat_field_name ] ) ||
+					    $all_custom_fields[ $repeat_field_name ]['type'] == 'separator' )
+					{	// Skip unknown field and a separator field to avoid recursion:
+						continue;
 					}
 
-					// Default template for field value:
-					$field_value_template = $this->get_field_template( 'field_value', $custom_field['type'] );
-
-					if( $custom_field['is_different'] && $custom_field['line_highlight'] == 'differences' )
-					{	// Mark the field value as different only when it is defined in the settings of the custom field:
-						$field_value_template = $this->get_field_template( 'field_value_diff', $custom_field['type'] );
-					}
-
-					if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) &&
-					    is_numeric( $custom_field_orig_value ) )
-					{	// Compare only numeric values:
-						if( $custom_field_orig_value === $custom_field['highest_value'] &&
-						    $custom_field_orig_value !== $custom_field['lowest_value'] )
-						{	// Check if we should mark the highest field:
-							if( $custom_field['green_highlight'] == 'highest' )
-							{	// The highest value must be marked as green:
-								$field_value_template = $this->get_field_template( 'field_value_green', $custom_field['type'] );
-							}
-							elseif( $custom_field['red_highlight'] == 'highest' )
-							{	// The highest value must be marked as red:
-								$field_value_template = $this->get_field_template( 'field_value_red', $custom_field['type'] );
-							}
-						}
-
-						if( $custom_field_orig_value === $custom_field['lowest_value'] &&
-						    $custom_field_orig_value !== $custom_field['highest_value'] )
-						{	// Check if we should mark the lowest field:
-							if( $custom_field['green_highlight'] == 'lowest' )
-							{	// The lowest value must be marked as green:
-								$field_value_template = $this->get_field_template( 'field_value_green', $custom_field['type'] );
-							}
-							elseif( $custom_field['red_highlight'] == 'lowest' )
-							{	// The lowest value must be marked as red:
-								$field_value_template = $this->get_field_template( 'field_value_red', $custom_field['type'] );
-							}
-						}
-					}
-
-					echo str_replace( '$field_value$', $custom_field_value, $field_value_template );
+					// Display a row of the repeated custom field between all selected items:
+					$this->display_field_row_template( $all_custom_fields[ $repeat_field_name ], $items, $params );
 				}
 			}
-
-			echo $this->get_field_template( 'row_end', $custom_field['type'] );
 		}
 
 		echo $this->get_field_template( 'table_end' );
@@ -461,6 +422,86 @@ class item_fields_compare_Widget extends ComponentWidget
 		echo $this->disp_params['block_end'];
 
 		return true;
+	}
+
+
+	/**
+	 * Display a row of one compared field between the requested items
+	 *
+	 * @param array Custom field data
+	 * @param array IDs of the compared items
+	 * @param array Additional parameters
+	 */
+	function display_field_row_template( $custom_field, $items, $params = array() )
+	{
+		$ItemCache = & get_ItemCache();
+
+		echo $this->get_field_template( 'row_start', $custom_field['type'] );
+		// Custom field title:
+		echo str_replace( array( '$field_title$', '$cols_count$' ),
+			array( $custom_field['label'], count( $items ) + 1 ),
+			$this->get_field_template( 'field_title', $custom_field['type'] ) );
+
+		if( $custom_field['type'] != 'separator' )
+		{	// Separator fields have no values:
+			foreach( $items as $item_ID )
+			{
+				// Custom field value per each post:
+				if( in_array( $item_ID, $custom_field['items'] ) )
+				{	// Get a formatted value if post has this custom field:
+					$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
+					$custom_field_value = $widget_Item->get_custom_field_formatted( $custom_field['name'], $params );
+					$custom_field_orig_value = $widget_Item->get_custom_field_value( $custom_field['name'] );
+				}
+				else
+				{	// This post has no this custom field:
+					$custom_field_value = '';
+					$custom_field_orig_value = false;
+				}
+
+				// Default template for field value:
+				$field_value_template = $this->get_field_template( 'field_value', $custom_field['type'] );
+
+				if( $custom_field['is_different'] && $custom_field['line_highlight'] == 'differences' )
+				{	// Mark the field value as different only when it is defined in the settings of the custom field:
+					$field_value_template = $this->get_field_template( 'field_value_diff', $custom_field['type'] );
+				}
+
+				if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) &&
+						is_numeric( $custom_field_orig_value ) )
+				{	// Compare only numeric values:
+					if( $custom_field_orig_value === $custom_field['highest_value'] &&
+							$custom_field_orig_value !== $custom_field['lowest_value'] )
+					{	// Check if we should mark the highest field:
+						if( $custom_field['green_highlight'] == 'highest' )
+						{	// The highest value must be marked as green:
+							$field_value_template = $this->get_field_template( 'field_value_green', $custom_field['type'] );
+						}
+						elseif( $custom_field['red_highlight'] == 'highest' )
+						{	// The highest value must be marked as red:
+							$field_value_template = $this->get_field_template( 'field_value_red', $custom_field['type'] );
+						}
+					}
+
+					if( $custom_field_orig_value === $custom_field['lowest_value'] &&
+							$custom_field_orig_value !== $custom_field['highest_value'] )
+					{	// Check if we should mark the lowest field:
+						if( $custom_field['green_highlight'] == 'lowest' )
+						{	// The lowest value must be marked as green:
+							$field_value_template = $this->get_field_template( 'field_value_green', $custom_field['type'] );
+						}
+						elseif( $custom_field['red_highlight'] == 'lowest' )
+						{	// The lowest value must be marked as red:
+							$field_value_template = $this->get_field_template( 'field_value_red', $custom_field['type'] );
+						}
+					}
+				}
+
+				echo str_replace( '$field_value$', $custom_field_value, $field_value_template );
+			}
+		}
+
+		echo $this->get_field_template( 'row_end', $custom_field['type'] );
 	}
 
 

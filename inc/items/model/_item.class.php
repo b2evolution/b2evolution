@@ -2900,8 +2900,6 @@ class Item extends ItemLight
 		// Get all custom fields by item ID:
 		$custom_fields = $this->get_custom_fields_defs();
 
-		$fields_exist = false;
-
 		if( empty( $params['fields'] ) )
 		{	// Display all fields:
 			$display_fields = array_keys( $custom_fields );
@@ -2909,15 +2907,14 @@ class Item extends ItemLight
 		else
 		{	// Display only the requested fields:
 			$display_fields = explode( ',', $params['fields'] );
-			$fields_exist = true;
 		}
 
-		if( ! $fields_exist && count( $custom_fields ) == 0 )
+		if( count( $display_fields ) == 0 )
 		{	// No custom fields:
 			return '';
 		}
 
-		$html = $params['before'];
+		$html = '';
 
 		$mask = array( '$title$', '$value$' );
 		foreach( $display_fields as $field_name )
@@ -2927,46 +2924,79 @@ class Item extends ItemLight
 			{	// Wrong field:
 				$values = array( $field_name, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>' );
 				$html .= str_replace( $mask, $values, $params['field_format'] );
-				$fields_exist = true;
 				continue;
 			}
 
 			$field = $custom_fields[ $field_name ];
 
-			// Use field format depending on type:
-			$field_type = ( $field['type'] == 'double' ? 'numeric' : ( $field['type'] == 'varchar' ? 'string' : $field['type'] ) );
-			$field_format = isset( $params['field_'.$field_type.'_format'] ) ? $params['field_'.$field_type.'_format'] : $params['field_format'];
+			// Get HTML code of the custom field:
+			$html .= $this->get_custom_field_template( $field, $params );
 
-			if( ! $field['public'] )
-			{	// Not public field:
-				if( ! empty( $params['fields'] ) )
-				{	// Display an error message only when fields are called by names:
-					$values = array( $field['label'], '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_name ).'</span>' );
-					$html .= str_replace( $mask, $values, $field_format );
-					$fields_exist = true;
+			if( $field['type'] == 'separator' &&
+					! empty( $field['format'] ) &&
+					empty( $params['fields'] ) )
+			{	// Repeat fields after separator in case of displaying of all fields:
+				$separator_format = explode( ':', $field['format'] );
+				if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
+				{	// Skip wrong separator format:
+					continue;
 				}
-				continue;
+				$repeat_fields = explode( ',', $separator_format[1] );
+				foreach( $repeat_fields as $repeat_field_name )
+				{
+					$repeat_field_name = trim( $repeat_field_name );
+					if( ! isset( $custom_fields[ $repeat_field_name ] ) ||
+						$custom_fields[ $repeat_field_name ]['type'] == 'separator' )
+					{	// Skip unknown field and a separator field to avoid recursion:
+						continue;
+					}
+					// Get HTML code of the repeated custom field:
+					$html .= $this->get_custom_field_template( $custom_fields[ $repeat_field_name ], $params );
+				}
 			}
+		}
 
-			$custom_field_value = $this->get_custom_field_formatted( $field_name, $params );
-			if( ! empty( $custom_field_value ) ||
-			    $field['type'] == 'separator' ||
-			    ( ( $field['type'] == 'double' || $field['type'] == 'computed' ) && $custom_field_value == '0' ) )
-			{	// Display only the filled field AND also numeric field with '0' value:
-				$html .= str_replace( $mask, array( $field['label'], $custom_field_value ), $field_format );
+		if( $html == '' )
+		{	// No fields to display:
+			return '';
+		}
+
+		// Print out if at least one field is filled for this item:
+		return $params['before'].$html.$params['after'];
+	}
+
+
+	/**
+	 * Get HTML code of the requested field
+	 *
+	 * @param array Custom field data
+	 * @param array Additional parameters
+	 */
+	function get_custom_field_template( $field, $params = array() )
+	{
+		// Use field format depending on type:
+		$field_type = ( $field['type'] == 'double' ? 'numeric' : ( $field['type'] == 'varchar' ? 'string' : $field['type'] ) );
+		$field_format = isset( $params['field_'.$field_type.'_format'] ) ? $params['field_'.$field_type.'_format'] : $params['field_format'];
+
+		$mask = array( '$title$', '$value$' );
+
+		if( ! $field['public'] )
+		{	// Not public field:
+			if( ! empty( $params['fields'] ) )
+			{	// Display an error message only when fields are called by names:
+				$values = array( $field['label'], '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field['name'] ).'</span>' );
+				return str_replace( $mask, $values, $field_format );
 				$fields_exist = true;
 			}
-		}
-
-		$html .= $params['after'];
-
-		if( $fields_exist )
-		{	// Print out if at least one field is filled for this item
-			return $html;
-		}
-		else
-		{
 			return '';
+		}
+
+		$custom_field_value = $this->get_custom_field_formatted( $field['name'], $params );
+		if( ! empty( $custom_field_value ) ||
+				$field['type'] == 'separator' ||
+				( ( $field['type'] == 'double' || $field['type'] == 'computed' ) && $custom_field_value == '0' ) )
+		{	// Display only the filled field AND also numeric field with '0' value:
+			return str_replace( $mask, array( $field['label'], $custom_field_value ), $field_format );
 		}
 	}
 
