@@ -919,7 +919,9 @@ class Skin extends DataObject
 						! empty( $params[ $group ]['inputs'] ) &&
 						isset( $params[ $group ]['inputs'][ $parname ] ) )
 		{
-			return $params[ $group ]['inputs'][ $parname ]['defaultvalue'];
+				if( isset($params[ $group ]['inputs'][ $parname ]['defaultvalue']) ) return $params[ $group ]['inputs'][ $parname ]['defaultvalue'];
+				if( isset($params[ $group ]['inputs'][ $parname ]['initialize_with']) ) return $params[ $group ]['inputs'][ $parname ]['initialize_with'];
+				return NULL;
 		}
 		elseif( isset( $params[ $group ]['type'] ) )
 		{
@@ -943,9 +945,10 @@ class Skin extends DataObject
 					if( ! empty( $params[ $group ]['inputs'] ) &&
 					isset( $params[ $group ]['inputs'][ $parname ] ))
 					{
-						return $params[ $group ]['inputs'][ $parname ]['defaultvalue'];
+						if( isset($params[ $group ]['inputs'][ $parname ]['defaultvalue']) ) return $params[ $group ]['inputs'][ $parname ]['defaultvalue'];
+						if( isset($params[ $group ]['inputs'][ $parname ]['initialize_with']) ) return $params[ $group ]['inputs'][ $parname ]['initialize_with'];
+						return NULL;
 					}
-
 					break;
 				case 'fileselect':
 	

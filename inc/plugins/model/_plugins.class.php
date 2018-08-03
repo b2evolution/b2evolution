@@ -760,6 +760,10 @@ class Plugins
 					{
 						$set_Obj->_defaults[ $l_name.$l_meta_input_key ] = $l_meta_input_data['defaultvalue'];
 					}
+					if( isset( $l_meta_input_data['initialize_with'] ) )
+					{
+						$set_Obj->_defaults[ $l_name.$l_meta_input_key ] = $l_meta_input_data['initialize_with'];
+					}
 				}
 			}
 			else
