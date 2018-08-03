@@ -390,6 +390,13 @@ $Plugins->trigger_event('BeforeCommentFormInsert', array(
 	'is_preview' => ($action == 'preview'),
 	'action' => & $action ) );
 
+// Validate first enabled captcha plugin:
+$Plugins->trigger_event_first_return( 'ValidateCaptcha', array(
+	'form_type'  => 'comment',
+	'Comment'    => & $Comment,
+	'is_preview' => ( $action == 'preview' ),
+) );
+
 // Redirect and:
 // Display error messages for the comment form OR
 // Display success message when workflow has been updated but comment text has not been filled:

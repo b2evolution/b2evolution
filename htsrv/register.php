@@ -219,6 +219,9 @@ switch( $action )
 					'pass1'     => & $pass1,
 					'pass2'     => & $pass2,
 				) );
+
+			// Validate first enabled captcha plugin:
+			$Plugins->trigger_event_first_return( 'ValidateCaptcha', array( 'form_type' => 'register' ) );
 		}
 
 		// Set params:

@@ -830,7 +830,7 @@ class Plugin
 	 *
 	 * Each <b>class</b> of dependency can have the following types:
 	 *  - 'events_by_one': A list of eventlists that have to be provided by a single plugin,
-	 *                     e.g., <code>array( array('CaptchaPayload', 'CaptchaValidated') )</code>
+	 *                     e.g., <code>array( array('RequestCaptcha', 'ValidateCaptcha') )</code>
 	 *                     to look for a plugin that provides both events.
 	 *  - 'plugins':
 	 *    A list of plugins, either just the plugin's classname or an array with
@@ -3018,9 +3018,13 @@ class Plugin
 	 *   - 'Form':          Form object
 	 *   - 'form_type':     Form type
 	 *   - 'form_position': Current form position where this event is called
+	 *   - 'captcha_info':  Default captcha info text(can be changed by this plugin)
+	 *   - 'captcha_template_question': Default HTML template for question text = '<span class="evo_captcha_question">$captcha_question$</span><br>'
+	 *   - 'captcha_template_answer':   Default HTML template for answer field = '<span class="evo_captcha_answer">$captcha_answer$</span><br>'
 	 * @return array Associative array of parameters:
 	 *   - 'captcha_position': Captcha position where current plugin must be displayed for the requested form type
 	 *   - 'captcha_html':     Captcha html code
+	 *   - 'captcha_info':     Captcha info text
 	 */
 	function RequestCaptcha( & $params )
 	{
@@ -3028,59 +3032,16 @@ class Plugin
 
 
 	/**
-	 * Event handler: general event to inject payload for a captcha test.
-	 *
-	 * This does not get called by b2evolution itself, but provides an interface
-	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
-	 * uses this event optionally to whitelist a user.
-	 *
-	 * @param array Associative array of parameters
-	 *   - 'Form': the {@link form} where payload should get added (by reference, OPTIONALLY!)
-	 *     If it's not given as param, you have to create an own form, if you need one.
-	 *   - 'form_use_fieldset': if a "Form" param is given and we use it, should we add
-	 *                          an own fieldset? (boolean, default "true", OPTIONALLY!)
-	 *   - 'key': A key that is associated to the caller of the event (string, OPTIONALLY!)
-	 * @return boolean True, if you have provided payload for a captcha test
-	 */
-	function CaptchaPayload( & $params )
-	{
-	}
-
-
-	/**
 	 * Event handler: general event to validate a captcha which payload was added
-	 * through {@link CaptchaPayload()}.
+	 * through {@link RequestCaptcha()}.
 	 *
-	 * This does not get called by b2evolution itself, but provides an interface
-	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
-	 * uses this event optionally to whitelist a user.
-	 *
-	 * NOTE: if the action is verified/completed in total, you HAVE to call
-	 *       {@link CaptchaValidatedCleanup()}, so that the plugin can cleanup its data
+	 * NOTE: if the action is verified/completed in total, you HAVE to cleanup its data
 	 *       and is not vulnerable against multiple usage of the same captcha!
 	 *
 	 * @param array Associative array of parameters
-	 *   - 'validate_error': you can optionally set this, if you want to give a reason
-	 *     of the failure. This is optionally and meant to be used by other plugins
-	 *     that trigger this event.
 	 * @return boolean true if the catcha could be validated
 	 */
-	function CaptchaValidated( & $params )
-	{
-	}
-
-
-	/**
-	 * Event handler: general event to be called after an action has been taken, which
-	 * involved {@link CaptchaPayload()} and {@link CaptchaValidated()}.
-	 *
-	 * This is meant to cleanup generated data for the Captcha test.
-	 *
-	 * This does not get called by b2evolution itself, but provides an interface
-	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
-	 * uses this event optionally to whitelist a user.
-	 */
-	function CaptchaValidatedCleanup( & $params )
+	function ValidateCaptcha( & $params )
 	{
 	}
 
@@ -3468,7 +3429,7 @@ class Plugin
 	 *
 	 * @param array|string A single event or a list thereof
 	 * @param boolean Make sure there's at least one plugin that provides them all?
-	 *                This is useful for event pairs like "CaptchaPayload" and "CaptchaValidated", which
+	 *                This is useful for event pairs like "RequestCaptcha" and "ValidateCaptcha", which
 	 *                should be served by the same plugin.
 	 * @return boolean
 	 */

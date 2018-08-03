@@ -404,6 +404,8 @@ $Plugins->trigger_event( 'MessageFormSent', array(
 	'sender_email' => & $sender_address,
 	) );
 
+// Validate first enabled captcha plugin:
+$Plugins->trigger_event_first_return( 'ValidateCaptcha', array( 'form_type' => 'message' ) );
 
 $success_message = ( !$Messages->has_errors() );
 if( $success_message )

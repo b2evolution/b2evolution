@@ -185,6 +185,9 @@ switch( $action )
 
 		$Plugins->trigger_event ( 'AdminBeforeItemEditCreate', array ('Item' => & $edited_Item ) );
 
+		// Validate first enabled captcha plugin:
+		$Plugins->trigger_event_first_return( 'ValidateCaptcha', array( 'form_type' => 'item' ) );
+
 		if( !empty( $mass_create ) )
 		{	// ------ MASS CREATE ------
 			$Items = & create_multiple_posts( $edited_Item, param( 'paragraphs_linebreak', 'boolean', 0 ) );

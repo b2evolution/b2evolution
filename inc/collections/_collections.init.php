@@ -1332,6 +1332,9 @@ class collections_Module extends Module
 				// Call plugin event for additional checking, e-g captcha:
 				$Plugins->trigger_event( 'AdminBeforeItemEditCreate', array( 'Item' => & $new_Item ) );
 
+				// Validate first enabled captcha plugin:
+				$Plugins->trigger_event_first_return( 'ValidateCaptcha', array( 'form_type' => 'item' ) );
+
 				if( param_errors_detected() )
 				{	// If at least one error has been detected:
 
