@@ -31,8 +31,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Proof of Work Captcha Plugin.
  *
- * It displays an captcha question through {@link CaptchaValidated()} and validates
- * it in {@link CaptchaValidated()}.
+ * It displays an captcha question through {@link ValidateCaptcha()} and validates
+ * it in {@link ValidateCaptcha()}.
  */
 class proof_of_work_captcha_plugin extends Plugin
 {
@@ -200,31 +200,22 @@ class proof_of_work_captcha_plugin extends Plugin
 
 
 	/**
-	 * Validate the given answer against our stored one.
+	 * Event handler: general event to validate a captcha which payload was added
+	 * through {@link RequestCaptcha()}.
 	 *
-	 * This event is provided for other plugins and gets used internally
-	 * for other events we're hooking into.
+	 * NOTE: if the action is verified/completed in total, you HAVE to cleanup its data
+	 *       and is not vulnerable against multiple usage of the same captcha!
 	 *
-	 * @param array Associative array of parameters.
-	 * @return boolean|NULL
+	 * @param array Associative array of parameters
+	 * @return boolean true if the catcha could be validated
 	 */
-	function CaptchaValidated( & $params )
+	function ValidateCaptcha( & $params )
 	{
 		global $Messages;
 
-		if( ! empty( $params['is_preview'] ) )
-		{	// Don't validate on preview action:
-			return false;
-		}
-
-		if( empty( $params['form_type'] ) )
-		{	// Form type must be defined:
-			return false;
-		}
-
-		if( ! $this->does_apply( $params['form_type'] ) )
+		if( ! empty( $params['is_preview'] ) || ! isset( $params['form_type'] ) || ! $this->does_apply( $params['form_type'] ) )
 		{	// We should not apply captcha to the requested form:
-			return false;
+			return true;
 		}
 
 		$post_params = array(
@@ -252,85 +243,24 @@ class proof_of_work_captcha_plugin extends Plugin
 
 
 	/**
-	 * When a comment form gets displayed, we inject our captcha and an input field to
-	 * enter the answer.
-	 *
-	 * The question ID is saved into the user's Session and in the DB table "ip_question".
-	 *
-	 * @param array Associative array of parameters
-	 *   - 'Form': the form where payload should get added (by reference, OPTIONALLY!)
-	 *   - 'form_use_fieldset':
-	 *   - 'form_type': Form type: 'item', 'comment', 'register', 'message'
-	 * @return string Captcha html code
-	 */
-	function CaptchaPayload( & $params )
-	{
-		$r = '';
-		if( ! isset( $params['form_type'] ) || ! $this->does_apply( $params['form_type'] ) )
-		{	// We should not apply captcha to the requested form:
-			return $r;
-		}
-
-		if( ! isset( $params['Form'] ) )
-		{	// there's no Form where we add to, but we create our own form:
-			$Form = new Form( regenerate_url() );
-			$orig_form_output = $Form->output;
-			$Form->output = false;
-			$r .= $Form->begin_form();
-		}
-		else
-		{
-			$Form = & $params['Form'];
-			$orig_form_output = $Form->output;
-			$Form->output = false;
-			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
-			{
-				$r .= $Form->begin_fieldset();
-			}
-		}
-
-		$r .= $Form->info( $this->T_('Antispam'), '<script src="https://authedmine.com/lib/captcha.min.js" async></script>'.
-			'<span class="coinhive-captcha" data-hashes="'.format_to_output( $this->get_hash_num(), 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="form[data-coinhive-captcha] input[type=submit]:not([name$=\'[preview]\'])">
-				<em>'.$this->T_('Loading Captcha...<br>If it doesn\'t load, please disable Adblock!').'</em>
-			</span>',
-			'<br>'.$params['captcha_info'].( is_logged_in() ? '' : $params['captcha_info_anonymous'] ) );
-		// Append a flag to the forms which contains the coinhive captcha in order to don't disable the submit buttons from other forms on the same page:
-		echo '<script type="text/javascript">jQuery( \'.coinhive-captcha[data-hashes]\' ).closest( \'form\' ).attr( \'data-coinhive-captcha\', 1 )</script>';
-
-		if( ! isset( $params['Form'] ) )
-		{	// there's no Form where we add to, but our own form:
-			$r .= $Form->end_form( array( array( 'submit', 'submit', $this->T_('Validate me'), 'ActionButton' ) ) );
-		}
-		else
-		{
-			if( ! isset($params['form_use_fieldset']) || $params['form_use_fieldset'] )
-			{
-				$r .= $Form->end_fieldset();
-			}
-		}
-
-		// Revert output mode back:
-		$Form->output = $orig_form_output;
-
-		return $r;
-	}
-
-
-	/**
 	 * Event handler: Return data to display captcha html code
 	 *
 	 * @param array Associative array of parameters:
 	 *   - 'Form':          Form object
 	 *   - 'form_type':     Form type
 	 *   - 'form_position': Current form position where this event is called
+	 *   - 'captcha_info':  Default captcha info text(can be changed by this plugin)
+	 *   - 'captcha_template_question': Default HTML template for question text = '<span class="evo_captcha_question">$captcha_question$</span><br>'
+	 *   - 'captcha_template_answer':   Default HTML template for answer field = '<span class="evo_captcha_answer">$captcha_answer$</span><br>'
 	 * @return array Associative array of parameters:
 	 *   - 'captcha_position': Captcha position where current plugin must be displayed for the requested form type
 	 *   - 'captcha_html':     Captcha html code
+	 *   - 'captcha_info':     Captcha info text
 	 */
 	function RequestCaptcha( & $params )
 	{
-		if( ! isset( $params['form_type'] ) )
-		{	// Exit here if the form type is not defined:
+		if( ! isset( $params['form_type'] ) || ! $this->does_apply( $params['form_type'] ) )
+		{	// Exit here if the form type is not defined or this captcha plugin should not be applied for the requested form:
 			return false;
 		}
 
@@ -349,66 +279,18 @@ class proof_of_work_captcha_plugin extends Plugin
 				return false;
 		}
 
+		$captcha_html = '<script src="https://authedmine.com/lib/captcha.min.js" async></script>'.
+			'<span class="coinhive-captcha" data-hashes="'.format_to_output( $this->get_hash_num(), 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="form[data-coinhive-captcha] input[type=submit]:not([name$=\'[preview]\'])">
+				<em>'.$this->T_('Loading Captcha...<br>If it doesn\'t load, please disable Adblock!').'</em>
+			</span>';
+		$captcha_html = str_replace( '$captcha_answer$', $captcha_html, $params['captcha_template_answer'] );
+		// Append a flag to the forms which contains the coinhive captcha in order to don't disable the submit buttons from other forms on the same page:
+		$captcha_html .= '<script type="text/javascript">jQuery( \'.coinhive-captcha[data-hashes]\' ).closest( \'form\' ).attr( \'data-coinhive-captcha\', 1 )</script>';
+
 		return array(
 				'captcha_position' => $captcha_position,
-				'captcha_html'     => $this->CaptchaPayload( $params ),
+				'captcha_html'     => $captcha_html,
 			);
-	}
-
-
-	/**
-	 * Validate the answer against our stored one.
-	 *
-	 * In case of error we add a message of category 'error' which prevents the item from
-	 * being posted.
-	 *
-	 * @param array Associative array of parameters.
-	 */
-	function AdminBeforeItemEditCreate( & $params )
-	{
-		$params['form_type'] = 'item';
-		$this->CaptchaValidated( $params );
-	}
-
-
-	/**
-	 * Validate the answer against our stored one.
-	 *
-	 * In case of error we add a message of category 'error' which prevents the comment from
-	 * being posted.
-	 *
-	 * @param array Associative array of parameters.
-	 */
-	function BeforeCommentFormInsert( & $params )
-	{
-		$params['form_type'] = 'comment';
-		$this->CaptchaValidated( $params );
-	}
-
-
-	/**
-	 * Validate the given private key against our stored one.
-	 *
-	 * In case of error we add a message of category 'error' which prevents the
-	 * user from being registered.
-	 */
-	function RegisterFormSent( & $params )
-	{
-		$params['form_type'] = 'register';
-		$this->CaptchaValidated( $params );
-	}
-
-
-	/**
-	 * Validate the given private key against our stored one.
-	 *
-	 * In case of error we add a message of category 'error' which prevents the
-	 * user from being registered.
-	 */
-	function MessageFormSent( & $params )
-	{
-		$params['form_type'] = 'message';
-		$this->CaptchaValidated( $params );
 	}
 
 

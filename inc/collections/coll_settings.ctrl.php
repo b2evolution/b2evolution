@@ -770,7 +770,7 @@ if( $action == 'dashboard' )
 		// Filter list:
 		$ItemList->set_filters( array(
 				'visibility_array' => get_visibility_statuses( 'keys', array('trash') ),
-				'orderby' => 'last_touched_ts',
+				'orderby' => 'datemodified',
 				'order' => 'DESC',
 				'posts' => 5,
 			) );

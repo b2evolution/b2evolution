@@ -226,10 +226,8 @@ class Plugins_admin extends Plugins
 				'GetSpamKarmaForComment' => 'Asks plugin for the spam karma of a comment/trackback.',
 
 				// Other Plugins can use this:
-				'RequestCaptcha' => 'Return data to display captcha html code',
-				'CaptchaValidated' => 'Validate the test from CaptchaPayload to detect humans.',
-				'CaptchaValidatedCleanup' => 'Cleanup data used for CaptchaValidated.',
-				'CaptchaPayload' => 'Provide a turing test to detect humans.',
+				'RequestCaptcha' => 'Return data to display captcha html code.',
+				'ValidateCaptcha' => 'Validate the test from RequestCaptcha to detect humans.',
 
 				'RegisterFormSent' => 'Called when the "Register" form has been submitted.',
 				'ValidateAccountFormSent' => 'Called when the "Validate account" form has been submitted.',

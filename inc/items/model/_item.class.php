@@ -7231,7 +7231,14 @@ class Item extends ItemLight
 		// save Item settings
 		if( isset( $this->ItemSettings ) )
 		{
-			$db_changed = $this->ItemSettings->dbupdate() || $db_changed;
+			$item_settings_changed = $this->ItemSettings->dbupdate();
+			$db_changed = $item_settings_changed || $db_changed;
+
+			if( $item_settings_changed )
+			{	// Update post modified date when at least one setting of this post updated, e.g. when custom field value has been updated:
+				global $localtimenow;
+				$this->set_param( $this->datemodified_field, 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
+			}
 
 			// Update custom fields of all child posts of this post:
 			$custom_fields = $this->get_type_custom_fields();
@@ -9626,8 +9633,9 @@ class Item extends ItemLight
 	 * @param boolean Use transaction
 	 * @param boolean Use TRUE to update item field last_touched_ts
 	 * @param boolean Use TRUE to update item field contents_last_updated_ts
+	 * @param boolean do we want to auto track the mod date?
 	 */
-	function update_last_touched_date( $use_transaction = true, $update_last_touched_ts = true, $update_contents_last_updated_ts = false )
+	function update_last_touched_date( $use_transaction = true, $update_last_touched_ts = true, $update_contents_last_updated_ts = false, $auto_track_modification = false )
 	{
 		if( $use_transaction )
 		{
@@ -9645,7 +9653,7 @@ class Item extends ItemLight
 			{	// Update field contents_last_updated_ts:
 				$this->set_contents_last_updated_ts();
 			}
-			$this->dbupdate( false, false, false );
+			$this->dbupdate( $auto_track_modification, false, false );
 		}
 
 		// Also update last touched date of all categories of this Item

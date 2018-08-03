@@ -31,8 +31,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * The Captcha Questions Plugin.
  *
- * It displays an captcha question through {@link CaptchaValidated()} and validates
- * it in {@link CaptchaValidated()}.
+ * It displays an captcha question through {@link ValidateCaptcha()} and validates
+ * it in {@link ValidateCaptcha()}.
  */
 class captcha_qstn_plugin extends Plugin
 {
@@ -239,21 +239,20 @@ class captcha_qstn_plugin extends Plugin
 
 
 	/**
-	 * Validate the given answer against our stored one.
+	 * Event handler: general event to validate a captcha which payload was added
+	 * through {@link RequestCaptcha()}.
 	 *
-	 * This event is provided for other plugins and gets used internally
-	 * for other events we're hooking into.
+	 * NOTE: if the action is verified/completed in total, you HAVE to cleanup its data
+	 *       and is not vulnerable against multiple usage of the same captcha!
 	 *
-	 * @param array Associative array of parameters.
-	 * @return boolean|NULL
+	 * @param array Associative array of parameters
+	 * @return boolean true if the catcha could be validated
 	 */
-	function CaptchaValidated( & $params )
+	function ValidateCaptcha( & $params )
 	{
-		global $DB, $localtimenow, $Session;
-
-		if( ! isset( $params['form_type'] ) || ! $this->does_apply( $params['form_type'] ) )
+		if( ! empty( $params['is_preview'] ) || ! isset( $params['form_type'] ) || ! $this->does_apply( $params['form_type'] ) )
 		{	// We should not apply captcha to the requested form:
-			return;
+			return true;
 		}
 
 		$posted_answer = utf8_strtolower( param( 'captcha_qstn_'.$this->ID.'_answer', 'string', '' ) );
@@ -261,7 +260,7 @@ class captcha_qstn_plugin extends Plugin
 		if( empty( $posted_answer ) )
 		{
 			$this->debug_log( 'captcha_qstn_'.$this->ID.'_answer' );
-			$params['validate_error'] = $this->T_('Please enter the captcha answer.');
+			param_error( 'captcha_qstn_'.$this->ID.'_answer', $this->T_('Please enter the captcha answer.') );
 			if( $params['form_type'] == 'comment' && ( $comment_Item = & $params['Comment']->get_Item() ) )
 			{
 				syslog_insert( 'Comment captcha answer is not entered', 'warning', 'item', $comment_Item->ID, 'plugin', $this->ID );
@@ -286,7 +285,7 @@ class captcha_qstn_plugin extends Plugin
 		if( !$posted_answer_is_correct )
 		{
 			$this->debug_log( 'Posted ('.$posted_answer.') and saved ('.$question->cptq_answers.') answer do not match!' );
-			$params['validate_error'] = $this->T_('The entered answer is incorrect.');
+			param_error( 'captcha_qstn_'.$this->ID.'_answer', $this->T_('The entered answer is incorrect.') );
 			if( $params['form_type'] == 'comment' && ( $comment_Item = & $params['Comment']->get_Item() ) )
 			{
 				syslog_insert( 'Comment captcha answer is incorrect', 'warning', 'item', $comment_Item->ID, 'plugin', $this->ID );
@@ -409,96 +408,24 @@ class captcha_qstn_plugin extends Plugin
 
 
 	/**
-	 * When a comment form gets displayed, we inject our captcha and an input field to
-	 * enter the answer.
-	 *
-	 * The question ID is saved into the user's Session and in the DB table "ip_question".
-	 *
-	 * @param array Associative array of parameters
-	 *   - 'Form': the form where payload should get added (by reference, OPTIONALLY!)
-	 *   - 'form_use_fieldset':
-	 *   - 'form_type': Form type: 'item', 'comment', 'register', 'message'
-	 * @return string Captcha html code
-	 */
-	function CaptchaPayload( & $params )
-	{
-		$r = '';
-		if( ! isset( $params['form_type'] ) || ! $this->does_apply( $params['form_type'] ) )
-		{	// We should not apply captcha to the requested form:
-			return $r;
-		}
-
-		$question = $this->CaptchaQuestion();
-
-		if( empty( $question ) )
-		{	// No the defined questions
-			return $r;
-		}
-
-		$this->debug_log( 'Question ID is: ('.$this->question_ID.')' );
-
-		if( ! isset( $params['Form'] ) )
-		{	// there's no Form where we add to, but we create our own form:
-			$Form = new Form( regenerate_url() );
-			$orig_form_output = $Form->output;
-			$Form->output = false;
-			 $r .= $Form->begin_form();
-		}
-		else
-		{
-			$Form = & $params['Form'];
-			$orig_form_output = $Form->output;
-			$Form->output = false;
-			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
-			{
-				$r .= $Form->begin_fieldset( '', array( 'id' => $this->code ) );
-			}
-		}
-
-		$r .= $Form->info( $this->T_('Captcha question'), $question->cptq_question );
-		$r .= $Form->text_input( 'captcha_qstn_'.$this->ID.'_answer', param( 'captcha_qstn_'.$this->ID.'_answer', 'string', '' ),
-				10, $this->T_('Captcha answer'), ( empty( $params['use_placeholders'] ) ? $this->T_('Please answer the question above').'.' : '' )
-					.'<br>'.$params['captcha_info'].( is_logged_in() ? '' : $params['captcha_info_anonymous'] ),
-				array(
-						'placeholder' => empty( $params['use_placeholders'] ) ? '' : T_('Please answer the question above'),
-						'required'    => true,
-					)
-			);
-
-		if( ! isset($params['Form']) )
-		{	// there's no Form where we add to, but our own form:
-			$r .= $Form->end_form( array( array( 'submit', 'submit', $this->T_('Validate me'), 'ActionButton' ) ) );
-		}
-		else
-		{
-			if( ! isset($params['form_use_fieldset']) || $params['form_use_fieldset'] )
-			{
-				$r .= $Form->end_fieldset();
-			}
-		}
-
-		// Revert output mode back:
-		$Form->output = $orig_form_output;
-
-		return $r;
-	}
-
-
-	/**
 	 * Event handler: Return data to display captcha html code
 	 *
 	 * @param array Associative array of parameters:
 	 *   - 'Form':          Form object
 	 *   - 'form_type':     Form type
 	 *   - 'form_position': Current form position where this event is called
+	 *   - 'captcha_info':  Default captcha info text(can be changed by this plugin)
+	 *   - 'captcha_template_question': Default HTML template for question text = '<span class="evo_captcha_question">$captcha_question$</span><br>'
+	 *   - 'captcha_template_answer':   Default HTML template for answer field = '<span class="evo_captcha_answer">$captcha_answer$</span><br>'
 	 * @return array Associative array of parameters:
 	 *   - 'captcha_position': Captcha position where current plugin must be displayed for the requested form type
 	 *   - 'captcha_html':     Captcha html code
+	 *   - 'captcha_info':     Captcha info text
 	 */
 	function RequestCaptcha( & $params )
 	{
-		if( ! isset( $params['form_type'] ) )
-		{	// Exit here if the form type is not defined:
+		if( ! isset( $params['form_type'] ) || ! $this->does_apply( $params['form_type'] ) )
+		{	// Exit here if the form type is not defined or this captcha plugin should not be applied for the requested form:
 			return false;
 		}
 
@@ -515,94 +442,38 @@ class captcha_qstn_plugin extends Plugin
 				return false;
 		}
 
+		$question = $this->CaptchaQuestion();
+
+		if( empty( $question ) )
+		{	// No the defined questions
+			return false;
+		}
+
+		$this->debug_log( 'Question ID is: ('.$this->question_ID.')' );
+
+		// Question text:
+		$captcha_html = str_replace( '$captcha_question$', $question->cptq_question, $params['captcha_template_question'] );
+		// Answer input field:
+		$captcha_field_params = array(
+				'type'     => 'text',
+				'name'     => 'captcha_qstn_'.$this->ID.'_answer',
+				'value'    => param( 'captcha_qstn_'.$this->ID.'_answer', 'string', '' ),
+				'size'     => 10,
+				'required' => true,
+				'class'    => 'form_text_input form-control',
+			);
+		if( ! empty( $params['use_placeholders'] ) )
+		{
+			$captcha_field_params['placeholder'] = T_('Please answer the question above');
+		}
+		$Form = & $params['Form'];
+		$captcha_html .= str_replace( '$captcha_answer$', $Form->get_input_element( $captcha_field_params ), $params['captcha_template_answer'] );
+
 		return array(
 				'captcha_position' => $captcha_position,
-				'captcha_html'     => $this->CaptchaPayload( $params ),
+				'captcha_html'     => $captcha_html,
+				'captcha_info'     => ( empty( $params['use_placeholders'] ) ? $this->T_('Please answer the question above').'.<br>' : '' ).$params['captcha_info'],
 			);
-	}
-
-
-	/**
-	 * Validate the answer against our stored one.
-	 *
-	 * In case of error we add a message of category 'error' which prevents the item from
-	 * being posted.
-	 *
-	 * @param array Associative array of parameters.
-	 */
-	function AdminBeforeItemEditCreate( & $params )
-	{
-		$params['form_type'] = 'item';
-		$this->validate_form_by_captcha( $params );
-	}
-
-
-	/**
-	 * Validate the answer against our stored one.
-	 *
-	 * In case of error we add a message of category 'error' which prevents the comment from
-	 * being posted.
-	 *
-	 * @param array Associative array of parameters.
-	 */
-	function BeforeCommentFormInsert( & $params )
-	{
-		$params['form_type'] = 'comment';
-		$this->validate_form_by_captcha( $params );
-	}
-
-
-	/**
-	 * Validate the answer against our stored one.
-	 *
-	 * In case of error we add a message of category 'error' which prevents the comment from
-	 * being posted.
-	 *
-	 * @param array Associative array of parameters.
-	 */
-	function validate_form_by_captcha( & $params )
-	{
-		if( ! empty( $params['is_preview'] ) )
-		{	// Don't validate on preview action:
-			return;
-		}
-
-		if( empty( $params['form_type'] ) )
-		{	// Form type must be defined:
-			return;
-		}
-
-		if( $this->CaptchaValidated( $params ) === false )
-		{	// Some error on captcha validation:
-			$validate_error = $params['validate_error'];
-			param_error( 'captcha_qstn_'.$this->ID.'_answer', $validate_error );
-		}
-	}
-
-
-	/**
-	 * Validate the given private key against our stored one.
-	 *
-	 * In case of error we add a message of category 'error' which prevents the
-	 * user from being registered.
-	 */
-	function RegisterFormSent( & $params )
-	{
-		$params['form_type'] = 'register';
-		$this->validate_form_by_captcha( $params );
-	}
-
-
-	/**
-	 * Validate the given private key against our stored one.
-	 *
-	 * In case of error we add a message of category 'error' which prevents the
-	 * user from being registered.
-	 */
-	function MessageFormSent( & $params )
-	{
-		$params['form_type'] = 'message';
-		$this->validate_form_by_captcha( $params );
 	}
 
 

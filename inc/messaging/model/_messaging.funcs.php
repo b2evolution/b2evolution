@@ -175,6 +175,12 @@ function create_new_thread()
 	// Trigger event: a Plugin could add a $category="error" message here..
 	$Plugins->trigger_event( 'MessageFormSent', array( 'is_preview' => ( $action == 'preview' ) ) );
 
+	// Validate first enabled captcha plugin:
+	$Plugins->trigger_event_first_return( 'ValidateCaptcha', array(
+		'form_type'  => 'message',
+		'is_preview' => ( $action == 'preview' ),
+	) );
+
 	// Load data from request
 	if( $edited_Message->load_from_Request() )
 	{ // We could load data from form without errors:
@@ -235,6 +241,12 @@ function create_new_message( $thrd_ID )
 
 	// Trigger event: a Plugin could add a $category="error" message here..
 	$Plugins->trigger_event( 'MessageFormSent', array( 'is_preview' => ( $action == 'preview' ) ) );
+
+	// Validate first enabled captcha plugin:
+	$Plugins->trigger_event_first_return( 'ValidateCaptcha', array(
+		'form_type'  => 'message',
+		'is_preview' => ( $action == 'preview' ),
+	) );
 
 	// Load data from request
 	if( $edited_Message->load_from_Request() )

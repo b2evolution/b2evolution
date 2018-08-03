@@ -1155,6 +1155,13 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 			'action' => & $action
 		) );
 
+	// Validate first enabled captcha plugin:
+	$Plugins->trigger_event_first_return( 'ValidateCaptcha', array(
+		'form_type'  => 'comment',
+		'Comment'    => & $Comment,
+		'is_preview' => ( $action == 'preview' ),
+	) );
+
 	if( $Messages->has_errors() )
 	{
 		return xmlrpcs_resperror( 5, $Messages->get_string( 'Cannot create comment, please correct these errors:'."\n", '', "  //  \n", 'xmlrpc' ) );

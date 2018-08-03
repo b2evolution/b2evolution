@@ -1854,7 +1854,7 @@ class Plugins
 	 *
 	 * @param array|string A single event or a list thereof
 	 * @param boolean Make sure there's at least one plugin that provides them all?
-	 *                This is useful for event pairs like "CaptchaPayload" and "CaptchaValidated", which
+	 *                This is useful for event pairs like "RequestCaptcha" and "ValidateCaptcha", which
 	 *                should be served by the same plugin.
 	 * @return boolean
 	 */
@@ -2410,15 +2410,20 @@ class Plugins
 	 */
 	function display_captcha( $params = array() )
 	{
-		if( ! isset( $params['form_type'] ) ||
+		if( ! isset( $params['Form'] ) ||
+		    ! isset( $params['form_type'] ) ||
 		    ! isset( $params['form_position'] ) )
-		{	// Exit here if these two mandatory params are not defined:
+		{	// Exit here if the mandatory params are not defined:
 			return;
 		}
 
 		$params = array_merge( array(
-				'captcha_info'           => T_('We ask for this in order to slow down spammers.').'<br>'.T_('Sorry for the inconvenience.'),
-				'captcha_info_anonymous' => '<br>'.T_('Please log in to avoid this antispam check.'),
+				'captcha_template_question' => '<span class="evo_captcha_question">$captcha_question$</span><br>',
+				'captcha_template_answer'   => '<span class="evo_captcha_answer">$captcha_answer$</span><br>',
+				// Default captcha info text(can be customized by plugin):
+				'captcha_info' => T_('We ask for this in order to slow down spammers.')
+													.'<br>'.T_('Sorry for the inconvenience.')
+													.( is_logged_in() ? '' : '<br>'.T_('Please log in to avoid this antispam check.') ),
 			), $params );
 
 		$form_type = $params['form_type'];
@@ -2434,10 +2439,26 @@ class Plugins
 			$this->captcha_data[ $form_type ] = isset( $plugin_data['plugin_return'] ) ? $plugin_data['plugin_return'] : false;
 		}
 
-		if( isset( $this->captcha_data[ $form_type ]['captcha_position'], $this->captcha_data[ $form_type ]['captcha_html'] ) &&
-		    $this->captcha_data[ $form_type ]['captcha_position'] == $params['form_position'] )
+		$captcha_data = $this->captcha_data[ $form_type ];
+
+		if( isset( $captcha_data['captcha_position'], $captcha_data['captcha_html'] ) &&
+		    $captcha_data['captcha_position'] == $params['form_position'] )
 		{	// Display captcha html code only for requested form type and position:
-			echo $this->captcha_data[ $form_type ]['captcha_html'];
+			$Form = & $params['Form'];
+			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
+			{	// Begin fieldset if it is required from skin file:
+				$Form->begin_fieldset();
+			}
+
+			$Form->info_field( T_('Antispam'), $captcha_data['captcha_html'], array(
+				'note'     => ( isset( $captcha_data['captcha_info'] ) ? $captcha_data['captcha_info'] : $params['captcha_info'] ),
+				'required' => true,
+			) );
+
+			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
+			{	// End fieldset if it is required from skin file:
+				$Form->end_fieldset();
+			}
 		}
 	}
 
