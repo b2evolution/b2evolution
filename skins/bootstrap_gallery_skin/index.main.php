@@ -183,13 +183,14 @@ siteskin_include( '_site_body_header.inc.php' );
 			// copying the matching php file into your skin directory.
 			// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
 		?>
-		
+
 		</div><!-- .col -->
-		
+
 	</div><!-- .row -->
 
 
 	<?php
+	/* To be removed. Replaced by Item List Pages widget:
 	if( $disp != 'catdir' )
 	{	// Don't display the pages on disp=catdir because we don't have a limit by page there
 		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
@@ -201,6 +202,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			) );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	}
+	*/
 	?>
 
 </main>
@@ -274,7 +276,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 		?>
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 
