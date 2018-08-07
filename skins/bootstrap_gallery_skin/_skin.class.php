@@ -114,6 +114,7 @@ class bootstrap_gallery_Skin extends Skin
 				'menu'                      => array( NT_('Menu'), 15 ),
 				'front_page_main_area'      => array( NT_('Front Page Main Area'), 40 ),
 				'front_page_secondary_area' => array( NT_('Front Page Secondary Area'), 45 ),
+				'item_list'                 => array( NT_('Item List'), 48 ),
 				'item_single_header'        => array( NT_('Item Single Header'), 50 ),
 				'item_single'               => array( NT_('Item Single'), 51 ),
 				'item_page'                 => array( NT_('Item Page'), 55 ),
@@ -399,7 +400,7 @@ class bootstrap_gallery_Skin extends Skin
 		}
 		if( ! empty( $custom_styles ) )
 		{
-			$custom_css .= '	#skin_wrapper .container a:not(.btn) { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= '	#skin_wrapper .container a:not(.btn .active) { '.implode( ';', $custom_styles )." }\n";
 			$custom_css .= '	ul li a:not(.btn) { '.implode( ';', $custom_styles )." }\n";
 			$custom_css .= "	ul li a:not(.btn) {background-color: transparent;}\n";
 			$custom_css .= "	.ufld_icon_links a:not(.btn) {color: #fff !important;}\n";

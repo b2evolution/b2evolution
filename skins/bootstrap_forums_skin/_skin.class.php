@@ -118,6 +118,7 @@ class bootstrap_forums_Skin extends Skin
 				'front_page_main_area'       => array( NT_('Front Page Main Area'), 40 ),
 				'front_page_secondary_area'  => array( NT_('Front Page Secondary Area'), 45 ),
 				'forum_front_secondary_area' => array( NT_('Forum Front Secondary Area'), 47 ),
+				'item_list'                  => array( NT_('Item List'), 48 ),
 				'item_single_header'         => array( NT_('Item Single Header'), 50 ),
 				'item_single'                => array( NT_('Item Single'), 51 ),
 				'item_page'                  => array( NT_('Item Page'), 55 ),

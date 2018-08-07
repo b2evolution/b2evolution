@@ -103,6 +103,7 @@ $core_componentwidget_defs = array(
 			'breadcrumb_path',
 			'coll_common_links',
 			'coll_current_filters',
+			'coll_item_list_pages',
 		),
 	'content' => array(
 			'coll_featured_posts',    // Simplified UIL: Featured Posts
@@ -118,6 +119,7 @@ $core_componentwidget_defs = array(
 			'display_item',           // Display Item
 		),
 	'infoitem' => array(
+			'item_title',
 			'item_info_line',
 			'item_content',
 			'item_attachments',
@@ -129,6 +131,7 @@ $core_componentwidget_defs = array(
 			'item_seen_by',
 			'item_vote',
 			'item_fields_compare',
+			'item_next_previous',
 		),
 	'collection' => array(
 			'coll_logo',

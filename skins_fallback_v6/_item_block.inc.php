@@ -49,56 +49,58 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	<?php
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 
-		// ------- Title -------
-		if( $params['disp_title'] )
+		if( $disp == 'page' )
 		{
-			echo $params['item_title_line_before'];
-
-			if( $disp == 'single' || $disp == 'page' )
+			// ------- Title -------
+			if( $params['disp_title'] )
 			{
-				$title_before = $params['item_title_single_before'];
-				$title_after = $params['item_title_single_after'];
-			}
-			else
-			{
-				$title_before = $params['item_title_before'];
-				$title_after = $params['item_title_after'];
-			}
+				echo $params['item_title_line_before'];
 
-			// POST TITLE:
-			$Item->title( array(
-					'before'    => $title_before,
-					'after'     => $title_after,
-					'link_type' => '#'
-				) );
+				if( $disp == 'single' || $disp == 'page' )
+				{
+					$title_before = $params['item_title_single_before'];
+					$title_after = $params['item_title_single_after'];
+				}
+				else
+				{
+					$title_before = $params['item_title_before'];
+					$title_after = $params['item_title_after'];
+				}
 
-			// EDIT LINK:
-			if( $Item->is_intro() )
-			{ // Display edit link only for intro posts, because for all other posts the link is displayed on the info line.
-				$Item->edit_link( array(
-							'before' => '<div class="'.button_class( 'group' ).'">',
-							'after'  => '</div>',
-							'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
-							'class'  => button_class( 'text' ),
-						) );
+				// POST TITLE:
+				$Item->title( array(
+						'before'    => $title_before,
+						'after'     => $title_after,
+						'link_type' => '#'
+					) );
+
+				// EDIT LINK:
+				if( $Item->is_intro() )
+				{ // Display edit link only for intro posts, because for all other posts the link is displayed on the info line.
+					$Item->edit_link( array(
+								'before' => '<div class="'.button_class( 'group' ).'">',
+								'after'  => '</div>',
+								'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
+								'class'  => button_class( 'text' ),
+							) );
+				}
+
+				echo $params['item_title_line_after'];
 			}
-
-			echo $params['item_title_line_after'];
 		}
 	?>
 
 	<?php
 	if( ! $Item->is_intro() )
 	{ // Don't display the following for intro posts
-	?>
-	<div class="small text-muted">
-	<?php
+		/* To be removed. Transferred to Item Info Line widget in Item Single Header container:
 		if( $Item->status != 'published' )
 		{
 			$Item->format_status( array(
 					'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 				) );
 		}
+		*/
 
 		if( $disp != 'page' )
 		{
@@ -116,11 +118,27 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'block_title_end' => '</h3>',
 
 				'author_link_text' => $params['author_link_text'],
+
+				// Controlling the title:
+				'widget_disp_title'                 => true,
+				'widget_item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
+					'widget_item_title_before'          => '<h2>',
+					'widget_item_title_after'           => '</h2>',
+					'widget_item_title_single_before'   => '<h1>',	// This replaces the above in case of disp=single or disp=page
+					'widget_item_title_single_after'    => '</h1>',
+				'widget_item_title_line_after'      => '</div>',
+				// Item Previous Next widget
+				'widget_item_next_previous_block_start' => '<nav><ul class="pager">',
+					'widget_item_next_previous_prev_start'  => '<li class="previous">',
+					'widget_item_next_previous_prev_end'    => '</li>',
+					'widget_item_next_previous_next_start'  => '<li class="next">',
+					'widget_item_next_previous_next_end'    => '</li>',
+				'widget_item_next_previous_block_end'   => '</ul></nav>',
 			) );
 			// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
 		}
 	?>
-	</div>
+	
 	<?php
 	}
 	?>
@@ -194,6 +212,14 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 					'before_attach_size' => ' <span class="evo_file_size">(',
 					'after_attach_size'  => ')</span>',
 				),
+			// Controlling the title:
+			'widget_disp_title'                 => true,
+			'widget_item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
+				'widget_item_title_before'          => '<h2>',
+				'widget_item_title_after'           => '</h2>',
+				'widget_item_title_single_before'   => '<h1>',	// This replaces the above in case of disp=single or disp=page
+				'widget_item_title_single_after'    => '</h1>',
+			'widget_item_title_line_after'      => '</div>',
 		) );
 		// ----------------------------- END OF "Item Page" CONTAINER -----------------------------
 	}

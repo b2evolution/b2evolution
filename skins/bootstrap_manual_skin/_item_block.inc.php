@@ -92,12 +92,42 @@ $params = array_merge( array(
 				'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 			) );
 	}
-	$Item->title( array(
-			'link_type'  => $params['item_link_type'],
-			'before'     => '<div class="evo_post_title"><h1>',
-			'after'      => '</h1>'.$action_links.'</div>',
-			'nav_target' => false,
+
+	if( $disp == 'single' || $disp == 'page' )
+	{ // ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
+		// Display container contents:
+		widget_container( 'item_single_header', array(
+			'widget_context' => in_array( $disp, array( 'single', 'page' ) ) ? 'item' : 'general',
+			// The following (optional) params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
+			// This will enclose each widget in a block:
+			'block_start' => '<div class="evo_widget $wi_class$">',
+			'block_end' => '</div>',
+			// This will enclose the title of each widget:
+			'block_title_start' => '<h3>',
+			'block_title_end' => '</h3>',
+			// Template params for "Item Title" widget:
+			'widget_disp_title'                 => true,
+			'widget_item_title_line_before'     => '',	// Note: we use an extra class because it facilitates styling
+				'widget_item_title_before'          => '<div class="evo_post_title"><h1>',
+				'widget_item_title_after'           => '</h1>'.$action_links.'</div>',
+				'widget_item_title_single_before'   => '<div class="evo_post_title"><h1>',
+				'widget_item_title_single_after'    => '</h1>'.$action_links.'</div>',
+				'widget_item_title_link_type'       => $params['item_link_type'],
+				'widget_item_title_show_edit_intro' => false,
+			'widget_item_title_line_after'      => '',
 		) );
+		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
+	}
+	else
+	{
+		$Item->title( array(
+				'link_type'  => $params['item_link_type'],
+				'before'     => '<div class="evo_post_title"><h1>',
+				'after'      => '</h1>'.$action_links.'</div>',
+				'nav_target' => false,
+			) );
+	}
 	?>
 
 	<?php

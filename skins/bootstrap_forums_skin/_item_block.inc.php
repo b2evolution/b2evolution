@@ -63,6 +63,7 @@ skin_widget( array(
 <a name="p<?php echo $Item->ID; ?>"></a>
 
 	<?php
+		/* To be removed. Replaced by Item Next Previous widget in Item Single Header container:
 		// Buttons to prev/next post on single disp
 		if( !$Item->is_featured() )
 		{
@@ -83,6 +84,7 @@ skin_widget( array(
 				) );
 			// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 		}
+		*/
 	?>
 
 <div class="forums_list single_topic evo_content_block">
@@ -93,28 +95,62 @@ skin_widget( array(
 
 	<div class="single_page_title">
 		<?php
+		/* To be removed. Replaced by Item Title widget in Item Single Header container:
 		// Page title
 		$Item->title( array(
 				'before'    => '<h2>',
 				'after'     => '</h2>',
 				'link_type' => 'permalink'
 			) );
+		*/
 
 		// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
-		widget_container( 'item_single_header', array(
-			'widget_context' => 'item',	// Signal that we are displaying within an Item
-			// The following (optional) params will be used as defaults for widgets included in this container:
-			'container_display_if_empty' => false, // If no widget, don't display container at all
-			// This will enclose each widget in a block:
-			'block_start' => '<div class="evo_widget $wi_class$">',
-			'block_end' => '</div>',
-			// This will enclose the title of each widget:
-			'block_title_start' => '<h3>',
-			'block_title_end' => '</h3>',
+		$widget_container_params = array(
+				'widget_context' => 'item',	// Signal that we are displaying within an Item
+				// The following (optional) params will be used as defaults for widgets included in this container:
+				'container_display_if_empty' => false, // If no widget, don't display container at all
+				// This will enclose each widget in a block:
+				'block_start' => '<div class="evo_widget $wi_class$">',
+				'block_end' => '</div>',
+				// This will enclose the title of each widget:
+				'block_title_start' => '<h3>',
+				'block_title_end' => '</h3>',
 
-			'author_link_text' => $params['author_link_text'],
-		) );
+				'author_link_text' => $params['author_link_text'],
+
+				// Controlling the title:
+				'widget_disp_title'                 => true,
+				'widget_item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
+					'widget_item_title_before'          => '<h2>',
+					'widget_item_title_after'           => '</h2>',
+					'widget_item_title_single_before'   => '<h2>',	// This replaces the above in case of disp=single or disp=page
+					'widget_item_title_single_after'    => '</h2>',
+					'widget_item_title_link_type'       => 'permalink',
+				'widget_item_title_line_after'      => '</div>',
+				// Item Next Previous widget
+				'widget_item_next_previous_block_start'     => '<ul class="pager col-lg-12 post_nav">',
+				'widget_item_next_previous_prev_start'      => '<li class="previous">',
+				'widget_item_next_previous_prev_text'       => '<span aria-hidden="true">&larr;</span> $title$',
+				'widget_item_next_previous_prev_end'        => '</li>',
+				'widget_item_next_previous_separator'       => ' ',
+				'widget_item_next_previous_next_start'      => '<li class="next">',
+				'widget_item_next_previous_next_text'       => '$title$ <span aria-hidden="true">&rarr;</span>',
+				'widget_item_next_previous_next_end'        => '</li>',
+				'widget_item_next_previous_block_end'       => '</ul>',
+				'widget_item_next_previous_target_blog'     => $Blog->ID,	// this forces to stay in the same blog, should the post be cross posted in multiple blogs
+				'widget_item_next_previous_post_navigation' => 'same_category', // force to stay in the same category in this skin
+				'widget_item_next_previous_featured'        => false, // don't include the featured posts into navigation list
+
+				'ignored_widgets'                           => array()
+				);
+
+		if( $Item->is_featured() )
+		{ // Do not show Item Next Previous widget if featured item
+			$widget_container_params['ignored_widgets'][] = 'item_next_previous';
+		}
+
+		widget_container( 'item_single_header', $widget_container_params );
 		// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
 
 	?>
