@@ -347,7 +347,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_use_sub_region    ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
 			ityp_use_city          ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
 			ityp_use_coordinates   ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
-			ityp_use_custom_fields TINYINT DEFAULT 1,
 			ityp_use_comments      TINYINT DEFAULT 1,
 			ityp_comment_form_msg         TEXT COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			ityp_allow_comment_form_msg   TINYINT DEFAULT 0,

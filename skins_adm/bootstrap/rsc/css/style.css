@@ -683,6 +683,19 @@ fieldset ul {
 #itemform_goals td {
   padding-bottom: 2px;
 }
+.custom_fields_edit_table .results {
+  overflow: initial;
+}
+.custom_fields_edit_table .table_scroll {
+  margin-bottom: 20px;
+}
+.custom_fields_edit_table .form-control {
+  width: auto;
+}
+.custom_fields_edit_table .form-control.custom_field_label {
+  width: 100%;
+  min-width: 200px;
+}
 #attachments_fieldset_wrapper {
   width: 100%;
   height: 160px;

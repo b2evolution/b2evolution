@@ -267,40 +267,31 @@ $Form->begin_form( '', '', $params );
 
 
 	// ############################ CUSTOM FIELDS #############################
-
-	if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
-	{	// All CUSTOM FIELDS are hidden by post type:
-		display_hidden_custom_fields( $Form, $edited_Item );
-	}
-	else
-	{	// CUSTOM FIELDS:
-		$custom_fields = $edited_Item->get_type_custom_fields();
-
-		if( count( $custom_fields ) )
-		{	// Display fieldset with custom fields only if at least one exists:
-			$custom_fields_title = T_('Custom fields').get_manual_link( 'post-custom-fields-panel' );
-			if( $current_User->check_perm( 'options', 'edit' ) )
-			{	// Display an icon to edit post type if current user has a permission:
-				$custom_fields_title .= '<span class="floatright panel_heading_action_icons">'
-						.action_icon( T_('Edit fields...'), 'edit',
-							$admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID='.$edited_Item->get( 'ityp_ID' ).'#fieldset_wrapper_custom_fields',
-							T_('Edit fields...'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm' ) )
-					.'</span>';
-			}
-
-			$Form->begin_fieldset( $custom_fields_title, array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
-
-			$Form->switch_layout( 'fields_table' );
-			$Form->begin_fieldset();
-
-			// Display inputs to edit custom fields:
-			display_editable_custom_fields( $Form, $edited_Item );
-
-			$Form->end_fieldset();
-			$Form->switch_layout( NULL );
-
-			$Form->end_fieldset();
+	$custom_fields = $edited_Item->get_type_custom_fields();
+	if( count( $custom_fields ) )
+	{	// Display fieldset with custom fields only if at least one exists:
+		$custom_fields_title = T_('Custom fields').get_manual_link( 'post-custom-fields-panel' );
+		if( $current_User->check_perm( 'options', 'edit' ) )
+		{	// Display an icon to edit post type if current user has a permission:
+			$custom_fields_title .= '<span class="floatright panel_heading_action_icons">'
+					.action_icon( T_('Edit fields...'), 'edit',
+						$admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID='.$edited_Item->get( 'ityp_ID' ).'#fieldset_wrapper_custom_fields',
+						T_('Edit fields...'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm' ) )
+				.'</span>';
 		}
+
+		$Form->begin_fieldset( $custom_fields_title, array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
+
+		$Form->switch_layout( 'fields_table' );
+		$Form->begin_fieldset();
+
+		// Display inputs to edit custom fields:
+		display_editable_custom_fields( $Form, $edited_Item );
+
+		$Form->end_fieldset();
+		$Form->switch_layout( NULL );
+
+		$Form->end_fieldset();
 	}
 
 	// ############################ ADVANCED PROPERTIES #############################
@@ -627,7 +618,7 @@ $Form->begin_form( '', '', $params );
 		cat_select( $Form, true, true, array( 'fold' => true ) );
 	}
 	else
-	{	// Use a hidden input feild for category in order to don't reset this to default on each updating:
+	{	// Use a hidden input field for category in order to don't reset this to default on each updating:
 		$Form->hidden( 'post_category', $edited_Item->get( 'main_cat_ID' ) );
 	}
 

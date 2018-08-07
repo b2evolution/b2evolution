@@ -415,7 +415,7 @@ class Item extends ItemLight
 			$this->comment_status = $db_row->post_comment_status;			// Comments status
 			$this->order = $db_row->post_order;
 			$this->featured = $db_row->post_featured;
-			$this->parent_ID = $db_row->post_parent_ID;
+			$this->parent_ID = $db_row->post_parent_ID === NULL ? NULL : intval( $db_row->post_parent_ID );
 
 			// echo 'renderers=', $db_row->post_renderers;
 			$this->renderers = $db_row->post_renderers;
