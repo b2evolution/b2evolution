@@ -80,22 +80,7 @@ class star_plugin extends Plugin
 	 *
 	 * @see Plugin::RenderItemAsHtml()
 	 */
-	function RenderItemAsHtml( & $params )
-	{
-		$params['data'] = $this->render_stars( $params['data'] );
-
-		return true;
-	}
-
-
-	/**
-	 * Perform rendering of Message content
-	 *
-	 * NOTE: Use default coll settings of comments as messages settings
-	 *
-	 * @see Plugin::RenderMessageAsHtml()
-	 */
-	function RenderMessageAsHtml( & $params )
+	function DisplayItemAsHtml( & $params )
 	{
 		$params['data'] = $this->render_stars( $params['data'] );
 
@@ -108,27 +93,21 @@ class star_plugin extends Plugin
 	 *
 	 * @see RenderItemAsHtml()
 	 */
-	function RenderItemAsXml( & $params )
+	function DisplayItemAsXml( & $params )
 	{
-		$this->RenderItemAsHtml( $params );
+		return $this->DisplayItemAsHtml( $params );
 	}
 
 
 	/**
+	 * Perform rendering of email
 	 *
-	 * Render comments if required
-	 *
-	 * @see Plugin::FilterCommentContent()
+	 * @see Plugin::RenderEmailAsHtml()
 	 */
-	function FilterCommentContent( & $params )
+	function RenderEmailAsHtml( & $params )
 	{
-		$Comment = & $params['Comment'];
-		$comment_Item = & $Comment->get_Item();
-		$item_Blog = & $comment_Item->get_Blog();
-		if( in_array( $this->code, $Comment->get_renderers_validated() ) )
-		{	// If apply_comment_rendering is set to render:
-			$params['data'] = $this->render_stars( $params['data'] );
-		}
+		$this->force_img_stars = true;
+		return $this->DisplayItemAsHtml( $params );
 	}
 
 
@@ -161,6 +140,8 @@ class star_plugin extends Plugin
 	 */
 	function get_stars_template( $matches )
 	{
+		global $b2evo_icons_type;
+
 		if( empty( $matches ) )
 		{ // No stars found
 			return;
@@ -177,6 +158,12 @@ class star_plugin extends Plugin
 			$number_stars = 5;
 		}
 
+		if( empty( $this->force_img_stars ) && isset( $b2evo_icons_type ) && strpos( $b2evo_icons_type, 'fontawesome' ) !== false )
+		{	// Use font-awesome stars if it is allowed for current skin:
+			return get_stars_template( $active_stars, $number_stars );
+		}
+
+		// Use image stars:
 		$active_stars_max = floor( $active_stars );
 		$percents = round( ( $active_stars - $active_stars_max ) * 100 );
 		$template = '<span class="star_plugin"'.( $number_stars != 5 ? ' style="width:'.( $number_stars * 16 ).'px"' : '' ).'>';
