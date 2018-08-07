@@ -49,7 +49,6 @@ class ItemType extends DataObject
 	var $use_sub_region = 'never';
 	var $use_city = 'never';
 	var $use_coordinates = 'never';
-	var $use_custom_fields = 1;
 	var $use_comments = 1;
 	var $comment_form_msg = '';
 	var $allow_comment_form_msg = 0;
@@ -118,7 +117,6 @@ class ItemType extends DataObject
 			$this->use_sub_region = $db_row->ityp_use_sub_region;
 			$this->use_city = $db_row->ityp_use_city;
 			$this->use_coordinates = $db_row->ityp_use_coordinates;
-			$this->use_custom_fields = $db_row->ityp_use_custom_fields;
 			$this->use_comments = $db_row->ityp_use_comments;
 			$this->comment_form_msg = $db_row->ityp_comment_form_msg;
 			$this->allow_comment_form_msg = $db_row->ityp_allow_comment_form_msg;
@@ -284,10 +282,6 @@ class ItemType extends DataObject
 		param( 'ityp_use_coordinates', 'string' );
 		$this->set_from_Request( 'use_coordinates' );
 
-		// Use custom fields
-		param( 'ityp_use_custom_fields', 'integer', 0 );
-		$this->set_from_Request( 'use_custom_fields' );
-
 		// Use comments
 		param( 'ityp_use_comments', 'integer', 0 );
 		$this->set_from_Request( 'use_comments' );
@@ -329,15 +323,7 @@ class ItemType extends DataObject
 		// Initialize the arrays
 		$this->update_custom_fields = array();
 		$this->insert_custom_fields = array();
-		$this->delete_custom_fields = trim(
-			param( 'deleted_custom_double', 'string', '' ).','.
-			param( 'deleted_custom_varchar', 'string', '' ).','.
-			param( 'deleted_custom_text', 'string', '' ).','.
-			param( 'deleted_custom_html', 'string', '' ).','.
-			param( 'deleted_custom_url', 'string', '' ).','.
-			param( 'deleted_custom_image', 'string', '' ).','.
-			param( 'deleted_custom_computed', 'string', '' ).','.
-			param( 'deleted_custom_separator', 'string', '' ), ',' );
+		$this->delete_custom_fields = trim( param( 'deleted_custom_fields', 'string', '' ), ', ' );
 		$this->delete_custom_fields = empty( $this->delete_custom_fields ) ? array() : explode( ',', $this->delete_custom_fields );
 
 		// Field names array is used to check the diplicates
@@ -346,77 +332,42 @@ class ItemType extends DataObject
 		// Empty and Initialize the custom fields from POST data
 		$this->custom_fields = array();
 
-		$types = array( 'double', 'varchar', 'text', 'html', 'url', 'image', 'computed', 'separator' );
-		foreach( $types as $type )
+		$empty_title_error = false; // use this to display empty title fields error message only ones
+		$custom_field_count = param( 'count_custom_fields', 'integer', 0 ); // all custom fields count ( contains even deleted fields )
+
+		for( $i = 1 ; $i <= $custom_field_count; $i++ )
 		{
-			$empty_title_error = false; // use this to display empty title fields error message only ones
-			$custom_field_count = param( 'count_custom_'.$type, 'integer', 0 ); // all custom fields count ( contains even deleted fields )
+			// Note: this param contains ID of existing custom field from DB
+			//       or random value like d63d5d53-df3d-5299-8c85-35f69b77 for new creating field:
+			$custom_field_ID = param( 'custom_field_ID'.$i, '/^[a-z0-9\-_]+$/', NULL );
+			if( empty( $custom_field_ID ) || in_array( $custom_field_ID, $this->delete_custom_fields ) )
+			{ // This field was deleted, don't neeed to update
+				continue;
+			}
 
-			for( $i = 1 ; $i <= $custom_field_count; $i++ )
-			{
-				$custom_field_ID = param( 'custom_'.$type.'_ID'.$i, '/^[a-z0-9\-_]+$/', NULL );
-				if( empty( $custom_field_ID ) || in_array( $custom_field_ID, $this->delete_custom_fields ) )
-				{ // This field was deleted, don't neeed to update
-					continue;
-				}
+			$custom_field_type = param( 'custom_field_type'.$i, 'string', NULL );
+			$custom_field_label = param( 'custom_field_label'.$i, 'string', NULL );
+			$custom_field_name = param( 'custom_field_name'.$i, '/^[a-z0-9\-_]+$/', NULL );
+			$custom_field_order = param( 'custom_field_order'.$i, 'integer', NULL );
+			$custom_field_note = param( 'custom_field_note'.$i, 'string', NULL );
+			$custom_field_public = param( 'custom_field_public'.$i, 'integer', 0 );
+			$custom_field_format = param( 'custom_field_format'.$i, 'string', NULL );
+			$custom_field_formula = param( 'custom_field_formula'.$i, 'string', NULL );
+			$custom_field_link = param( 'custom_field_link'.$i, 'string', 'nolink' );
+			$custom_field_is_new = param( 'custom_field_new'.$i, 'integer', 0 );
+			$custom_field_line_highlight = param( 'custom_field_line_highlight'.$i, 'string', NULL );
+			$custom_field_green_highlight = param( 'custom_field_green_highlight'.$i, 'string', NULL );
+			$custom_field_red_highlight = param( 'custom_field_red_highlight'.$i, 'string', NULL );
 
-				$custom_field_label = param( 'custom_'.$type.'_'.$i, 'string', NULL );
-				$custom_field_name = param( 'custom_'.$type.'_fname'.$i, '/^[a-z0-9\-_]+$/', NULL );
-				$custom_field_order = param( 'custom_'.$type.'_order'.$i, 'integer', NULL );
-				$custom_field_note = param( 'custom_'.$type.'_note'.$i, 'string', NULL );
-				$custom_field_public = param( 'custom_'.$type.'_public'.$i, 'integer', 0 );
-				$custom_field_format = param( 'custom_'.$type.'_format'.$i, 'string', NULL );
-				$custom_field_formula = param( 'custom_'.$type.'_formula'.$i, 'string', NULL );
-				$custom_field_link = param( 'custom_'.$type.'_link'.$i, 'string', 'nolink' );
-				$custom_field_is_new = param( 'custom_'.$type.'_new'.$i, 'integer', 0 );
-				$custom_field_line_highlight = param( 'custom_'.$type.'_line_highlight'.$i, 'string', NULL );
-				$custom_field_green_highlight = param( 'custom_'.$type.'_green_highlight'.$i, 'string', NULL );
-				$custom_field_red_highlight = param( 'custom_'.$type.'_red_highlight'.$i, 'string', NULL );
-
-				// Add each new/existing custom field in this array
-				// in order to see all them on the form when post type is not updated because some errors
-				$this->custom_fields[] = array(
-						'temp_i'          => $i, // Used only on submit form to know the number of the field on the form
-						'ID'              => $custom_field_ID,
-						'ityp_ID'         => $this->ID,
-						'label'           => $custom_field_label,
-						'name'            => $custom_field_name,
-						'type'            => $type,
-						'order'           => $custom_field_order,
-						'note'            => $custom_field_note,
-						'public'          => $custom_field_public,
-						'format'          => $custom_field_format,
-						'formula'         => $custom_field_formula,
-						'link'            => $custom_field_link,
-						'line_highlight'  => $custom_field_line_highlight,
-						'green_highlight' => $custom_field_green_highlight,
-						'red_highlight'   => $custom_field_red_highlight,
-					);
-
-				if( empty( $custom_field_label ) )
-				{ // Field title can't be emtpy
-					if( ! $empty_title_error )
-					{ // This message was not displayed yet
-						$Messages->add( T_('Custom field titles can\'t be empty!') );
-						$empty_title_error = true;
-					}
-				}
-				elseif( empty( $custom_field_name ) )
-				{ // Field identical name can't be emtpy
-					$Messages->add( sprintf( T_('Please enter name for custom field "%s"'), $custom_field_label ) );
-				}
-				elseif( in_array( $custom_field_name, $field_names ) )
-				{ // Field name must be identical
-					$Messages->add( sprintf( T_('The field name "%s" is not identical, please use another.'), $custom_field_name ) );
-				}
-				else
-				{
-					$field_names[] = $custom_field_name;
-				}
-				$custom_field_data = array(
-					'type'            => $type,
-					'name'            => $custom_field_name,
+			// Add each new/existing custom field in this array
+			// in order to see all them on the form when post type is not updated because some errors
+			$this->custom_fields[] = array(
+					'temp_i'          => $i, // Used only on submit form to know the number of the field on the form
+					'ID'              => $custom_field_ID,
+					'ityp_ID'         => $this->ID,
 					'label'           => $custom_field_label,
+					'name'            => $custom_field_name,
+					'type'            => $custom_field_type,
 					'order'           => $custom_field_order,
 					'note'            => $custom_field_note,
 					'public'          => $custom_field_public,
@@ -427,14 +378,48 @@ class ItemType extends DataObject
 					'green_highlight' => $custom_field_green_highlight,
 					'red_highlight'   => $custom_field_red_highlight,
 				);
-				if( $custom_field_is_new )
-				{ // Insert custom field
-					$this->insert_custom_fields[ $custom_field_ID ] = $custom_field_data;
+
+			if( empty( $custom_field_label ) )
+			{ // Field title can't be emtpy
+				if( ! $empty_title_error )
+				{ // This message was not displayed yet
+					$Messages->add( T_('Custom field titles can\'t be empty!') );
+					$empty_title_error = true;
 				}
-				else
-				{ // Update custom field
-					$this->update_custom_fields[ $custom_field_ID ] = $custom_field_data;
-				}
+			}
+			elseif( empty( $custom_field_name ) )
+			{ // Field identical name can't be emtpy
+				$Messages->add( sprintf( T_('Please enter name for custom field "%s"'), $custom_field_label ) );
+			}
+			elseif( in_array( $custom_field_name, $field_names ) )
+			{ // Field name must be identical
+				$Messages->add( sprintf( T_('The field name "%s" is not identical, please use another.'), $custom_field_name ) );
+			}
+			else
+			{
+				$field_names[] = $custom_field_name;
+			}
+			$custom_field_data = array(
+				'type'            => $custom_field_type,
+				'name'            => $custom_field_name,
+				'label'           => $custom_field_label,
+				'order'           => $custom_field_order,
+				'note'            => $custom_field_note,
+				'public'          => $custom_field_public,
+				'format'          => $custom_field_format,
+				'formula'         => $custom_field_formula,
+				'link'            => $custom_field_link,
+				'line_highlight'  => $custom_field_line_highlight,
+				'green_highlight' => $custom_field_green_highlight,
+				'red_highlight'   => $custom_field_red_highlight,
+			);
+			if( $custom_field_is_new )
+			{ // Insert custom field
+				$this->insert_custom_fields[ $custom_field_ID ] = $custom_field_data;
+			}
+			else
+			{ // Update custom field
+				$this->update_custom_fields[ $custom_field_ID ] = $custom_field_data;
 			}
 		}
 	}
@@ -631,7 +616,7 @@ class ItemType extends DataObject
 
 
 	/**
-	 * Get the custom feilds
+	 * Get the custom fields
 	 *
 	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url', 'image', 'computed', 'separator'. Use comma separator to get several types
 	 * @param string Field name that is used as key of array: 'ID', 'ityp_ID', 'label', 'name', 'type', 'order', 'public'

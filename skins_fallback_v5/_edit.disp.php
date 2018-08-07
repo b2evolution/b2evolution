@@ -320,34 +320,26 @@ if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
 	$Form->hidden( 'google_map_type', $edited_Item->get_setting( 'map_type' ) );
 }
 
-// ################### PROPERTIES ###################
-if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
-{ // Custom fields are hidden by otem type
-	display_hidden_custom_fields( $Form, $edited_Item );
-}
-else
-{ // Custom fields should be displayed
-	$custom_fields = $edited_Item->get_type_custom_fields();
+// ################### CUSTOM FIELDS ###################
+$custom_fields = $edited_Item->get_type_custom_fields();
+if( count( $custom_fields ) > 0 )
+{
+	$Form->begin_fieldset( T_('Additional fields') );
 
-	if( count( $custom_fields ) > 0 )
-	{
-		$Form->begin_fieldset( T_('Additional fields') );
+	$Form->switch_layout( 'table' );
+	$Form->labelstart = '<td class="right"><strong>';
+	$Form->labelend = '</strong></td>';
 
-		$Form->switch_layout( 'table' );
-		$Form->labelstart = '<td class="right"><strong>';
-		$Form->labelend = '</strong></td>';
+	echo $Form->formstart;
 
-		echo $Form->formstart;
+	// Display inputs to edit custom fields:
+	display_editable_custom_fields( $Form, $edited_Item );
 
-		// Display inputs to edit custom fields:
-		display_editable_custom_fields( $Form, $edited_Item );
+	echo $Form->formend;
 
-		echo $Form->formend;
+	$Form->switch_layout( NULL );
 
-		$Form->switch_layout( NULL );
-
-		$Form->end_fieldset();
-	}
+	$Form->end_fieldset();
 }
 
 if( $edited_Item->get_type_setting( 'allow_attachments' ) && $edited_Item->ID > 0 )

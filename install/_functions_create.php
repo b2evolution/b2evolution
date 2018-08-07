@@ -372,7 +372,6 @@ function create_default_data()
 			'use_comments'           => 0,
 			'allow_closing_comments' => 0,
 			'use_comment_expiration' => 'never',
-			'use_custom_fields'      => 0,
 		);
 	$post_types[] = array(
 			'name' => 'Bug Report',
@@ -401,7 +400,6 @@ function create_default_data()
 			'allow_closing_comments'   => 1,
 			'allow_disabling_comments' => 0,
 			'use_comment_expiration'   => 'optional',
-			'use_custom_fields'        => 1,
 		);
 	$post_types_sql = 'INSERT INTO T_items__type ( ityp_'.implode( ', ityp_', array_keys( $post_type_default_settings ) ).' ) VALUES ';
 	foreach( $post_types as $p => $post_type )

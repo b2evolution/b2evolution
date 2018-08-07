@@ -9853,6 +9853,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				WHEN itcf_type = "url"   THEN "fieldurl"
 				ELSE "nolink"
 			END' );
+		db_drop_col( 'T_items__type', 'ityp_use_custom_fields' );
 		upg_task_end();
 	}
 
