@@ -520,12 +520,11 @@ class ItemType extends DataObject
 		global $DB;
 
 		if( ! empty( $this->insert_custom_fields ) )
-		{ // Insert new custom fields
+		{	// Insert new custom fields:
 			$sql_data = array();
 			foreach( $this->insert_custom_fields as $itcf_ID => $custom_field )
 			{
-				$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format, itcf_formula, itcf_link, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight )
-					VALUES ( '.$DB->quote( $this->ID ).', '
+				$sql_data[] = '( '.$DB->quote( $this->ID ).', '
 						.$DB->quote( $custom_field['label'] ).', '
 						.$DB->quote( $custom_field['name'] ).', '
 						.$DB->quote( $custom_field['type'] ).', '
@@ -537,8 +536,10 @@ class ItemType extends DataObject
 						.$DB->quote( $custom_field['link'] ).', '
 						.$DB->quote( $custom_field['line_highlight'] ).', '
 						.$DB->quote( $custom_field['green_highlight'] ).', '
-						.$DB->quote( $custom_field['red_highlight'] ).' )' );
+						.$DB->quote( $custom_field['red_highlight'] ).' )';
 			}
+			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format, itcf_formula, itcf_link, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight )
+					VALUES '.implode( ', ', $sql_data ) );
 		}
 
 		if( ! empty( $this->update_custom_fields ) )

@@ -125,6 +125,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 
 		<?php
+			/* To be removed. Replaced by Item Next Previous widget in Item Single Header
 			// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
 			item_prevnext_links( array(
 					'block_start' => '<nav><ul class="pager">',
@@ -135,6 +136,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'block_end'   => '</ul></nav>',
 				) );
 			// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
+			*/
 		?>
 
 		<?php

@@ -106,6 +106,8 @@ class bootstrap_blog_Skin extends Skin
 				'menu'                      => array( NT_('Menu'), 15 ),
 				'front_page_main_area'      => array( NT_('Front Page Main Area'), 40 ),
 				'front_page_secondary_area' => array( NT_('Front Page Secondary Area'), 45 ),
+				'item_list'                 => array( NT_('Item List'), 48 ),
+				'item_in_list'              => array( NT_('Item in List'), 49 ),
 				'item_single_header'        => array( NT_('Item Single Header'), 50 ),
 				'item_single'               => array( NT_('Item Single'), 51 ),
 				'item_page'                 => array( NT_('Item Page'), 55 ),

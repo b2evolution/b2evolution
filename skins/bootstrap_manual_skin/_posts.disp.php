@@ -29,7 +29,8 @@ if( isset( $tag ) )
 	if( isset( $MainList ) && !empty( $MainList ) )
 	{
 		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-		mainlist_page_links( $params['pagination'] );
+		widget_container( 'item_list', $params['pagination'] );
+		//mainlist_page_links( $params['pagination'] );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 
 		// --------------------------------- START OF POSTS -------------------------------------
@@ -160,7 +161,8 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 else
 { // Display the latest posts:
 	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-	mainlist_page_links( $params['pagination'] );
+	widget_container( 'item_list', $params['pagination'] );
+	//mainlist_page_links( $params['pagination'] );
 	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 ?>
 <ul class="posts_list">

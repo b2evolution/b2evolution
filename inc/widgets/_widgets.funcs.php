@@ -188,18 +188,40 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		}
 	}
 
+	/* Item List */
+	if( array_key_exists( 'item_list', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['item_list']['wico_ID'];
+		add_basic_widget( $wico_id, 'coll_item_list_pages', 'core', 10 );
+	}
+
+	/* Item in List */
+	if( array_key_exists( 'item_in_list', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['item_in_list']['wico_ID'];
+		add_basic_widget( $wico_id, 'item_title', 'core', 10 );
+		add_basic_widget( $wico_id, 'item_visibility_badge', 'core', 20 );
+		add_basic_widget( $wico_id, 'item_info_line', 'core', 30 );
+	}
+
 	/* Item Single Header */
 	if( array_key_exists( 'item_single_header', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['item_single_header']['wico_ID'];
+		if( $kind != 'manual' )
+		{
+			add_basic_widget( $wico_id, 'item_next_previous', 'core', 4 );
+		}
+		add_basic_widget( $wico_id, 'item_title', 'core', 5 );
 		if( in_array( $kind, array( 'forum', 'group' ) ) )
 		{
 			add_basic_widget( $wico_id, 'item_info_line', 'core', 10, 'a:14:{s:5:"title";s:0:"";s:9:"flag_icon";i:1;s:14:"permalink_icon";i:0;s:13:"before_author";s:10:"started_by";s:11:"date_format";s:8:"extended";s:9:"post_time";i:1;s:12:"last_touched";i:1;s:8:"category";i:0;s:9:"edit_link";i:0;s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;s:11:"time_format";s:4:"none";s:12:"display_date";s:12:"date_created";}' );
 			add_basic_widget( $wico_id, 'item_tags', 'core', 20 );
 			add_basic_widget( $wico_id, 'item_seen_by', 'core', 30 );
 		}
-		else
+		elseif( $kind != 'manual' )
 		{
+			add_basic_widget( $wico_id, 'item_visibility_badge', 'core', 8 );
 			add_basic_widget( $wico_id, 'item_info_line', 'core', 10 );
 		}
 	}
@@ -208,6 +230,10 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'item_single', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['item_single']['wico_ID'];
+		if( $kind == 'manual' )
+		{
+			add_basic_widget( $wico_id, 'item_title', 'core', 5 );
+		}
 		add_basic_widget( $wico_id, 'item_content', 'core', 10 );
 		add_basic_widget( $wico_id, 'item_attachments', 'core', 15 );
 		add_basic_widget( $wico_id, 'item_link', 'core', 17 );
@@ -502,7 +528,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 				'login_button_class'  => 'btn btn-success btn-lg',
 				'register_link_class' => 'btn btn-primary btn-lg pull-right',
 			) );
-		
+
 	}
 
 

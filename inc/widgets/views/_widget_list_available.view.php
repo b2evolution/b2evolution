@@ -81,6 +81,8 @@ $core_componentwidget_defs = array(
 			'separator',
 			'image',
 			'social_links',
+			'content_block', // Content Block
+			'display_item',  // Display Item
 		),
 	'about_user' => array(
 			'user_profile_pics',		// Avatar of User
@@ -103,6 +105,7 @@ $core_componentwidget_defs = array(
 			'breadcrumb_path',
 			'coll_common_links',
 			'coll_current_filters',
+			'coll_item_list_pages',
 		),
 	'content' => array(
 			'coll_featured_posts',    // Simplified UIL: Featured Posts
@@ -111,14 +114,15 @@ $core_componentwidget_defs = array(
 			'coll_related_post_list', // Simple Related Posts list
 			'coll_flagged_list',      // Simplified UIL: Flagged Items
 			'coll_item_list',         // Universal Item list
+			'item_fields_compare',    // Compare Item Fields
 			'coll_featured_intro',    // Featured/Intro Post
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
-			'content_block',          // Content Block
-			'display_item',           // Display Item
 		),
 	'infoitem' => array(
+			'item_title',
 			'item_info_line',
+			'item_visibility_badge',
 			'item_content',
 			'item_attachments',
 			'item_link',
@@ -128,7 +132,7 @@ $core_componentwidget_defs = array(
 			'item_about_author',
 			'item_seen_by',
 			'item_vote',
-			'item_fields_compare',
+			'item_next_previous',
 		),
 	'collection' => array(
 			'coll_logo',

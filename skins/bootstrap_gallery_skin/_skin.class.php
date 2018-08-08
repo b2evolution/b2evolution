@@ -399,7 +399,7 @@ class bootstrap_gallery_Skin extends Skin
 		}
 		if( ! empty( $custom_styles ) )
 		{
-			$custom_css .= '	#skin_wrapper .container a:not(.btn) { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= '	#skin_wrapper .container a:not(.btn .active) { '.implode( ';', $custom_styles )." }\n";
 			$custom_css .= '	ul li a:not(.btn) { '.implode( ';', $custom_styles )." }\n";
 			$custom_css .= "	ul li a:not(.btn) {background-color: transparent;}\n";
 			$custom_css .= "	.ufld_icon_links a:not(.btn) {color: #fff !important;}\n";
