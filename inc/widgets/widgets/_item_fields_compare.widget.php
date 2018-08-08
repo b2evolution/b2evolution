@@ -154,8 +154,6 @@ class item_fields_compare_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Plugins, $Item, $Blog;
-
 		$this->init_display( $params );
 
 		$this->disp_params = array_merge( $this->disp_params, array(
@@ -183,122 +181,15 @@ class item_fields_compare_Widget extends ComponentWidget
 				'fields_compare_separator_field_title'      => '<th class="center" colspan="$cols_count$">$field_title$</th>',
 			), $params );
 
-		switch( $this->disp_params['items_source'] )
-		{
-			case 'all':
-				// Use all items from current collection,
-				// They are loaded by ItemList below:
-				$items = 'all';
-				break;
+		// Get IDs of items which should be compared:
+		$items = $this->get_items_IDs();
 
-			case 'param':
-				// Use items from param:
-				$items = param( 'items', '/^[\d,]*$/' );
-				$items = trim( $items, ',' );
-				$items = empty( $items ) ? false : explode( ',', $items );
-				break;
-
-			case 'list':
-				// Use items from specific list:
-				$items = trim( $this->disp_params['items'], ',' );
-				$items = empty( $items ) ? false : explode( ',', $items );
-				break;
-
-			default:
-				// Stop here, because unknown items source.
-				return;
-		}
-
-		if( empty( $items ) && $items != 'all' )
+		if( empty( $items ) )
 		{	// No items to compare:
 			return;
 		}
 
 		$ItemCache = & get_ItemCache();
-
-		$items_limit = intval( $this->disp_params['items_limit'] );
-		$items_limit = $items_limit > 0 ? $items_limit : NULL;
-
-		if( is_array( $items ) )
-		{	// Check item IDs which are loaded from URL param 'items=' or from specific widget settings list:
-			foreach( $items as $i => $item_ID )
-			{
-				$item_ID = trim( $item_ID );
-				if( empty( $item_ID ) )
-				{	// Remove wrong item ID:
-					unset( $items[ $i ] );
-				}
-				if( $item_ID == '$this$' )
-				{	// Try to get a current post ID:
-					if( isset( $Item ) && $Item instanceof Item )
-					{	// Use ID of current post:
-						$items[ $i ] = $Item->ID;
-					}
-					else
-					{	// Remove it because no current post:
-						unset( $items[ $i ] );
-					}
-				}
-				elseif( $item_ID == '$parent$' )
-				{	// Try to get a parent post ID:
-					if( isset( $Item ) && $Item instanceof Item && $Item->get( 'parent_ID' ) > 0 )
-					{	// Use ID of parent post:
-						$items[ $i ] = $Item->get( 'parent_ID' );
-					}
-					else
-					{	// Remove it because no parent post:
-						unset( $items[ $i ] );
-					}
-				}
-				elseif( ! is_number( $item_ID ) )
-				{	// Try to get a post ID by slug:
-					if( $widget_Item = & $ItemCache->get_by_urltitle( $item_ID, false, false ) )
-					{	// Use ID of post detected by slug:
-						$items[ $i ] = $widget_Item->ID;
-					}
-					else
-					{	// Remove it because cannot find post by slug:
-						unset( $items[ $i ] );
-					}
-				}
-			}
-
-			if( $items_limit > 0 )
-			{	// Limit items by widget setting:
-				$items = array_slice( $items, 0, $items_limit );
-			}
-		}
-
-		if( $this->disp_params['allow_filter'] || $items == 'all' )
-		{	// Use ItemList when we need a filter or when all items are requested from collection:
-			$ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $items_limit );
-			// Set additional debug info prefix for SQL queries in order to know what code executes it:
-			$ItemList->query_title_prefix = 'item_fields_compare_Widget';
-
-			if( $this->disp_params['items_type'] == 'default' )
-			{	// Exclude items with types which are hidden by collection setting "Show post types":
-				$filter_item_type = $Blog->get_setting( 'show_post_types' ) != '' ? '-'.$Blog->get_setting( 'show_post_types' ) : NULL;
-			}
-			else
-			{	// Filter by selected Item Type:
-				$filter_item_type = intval( $this->disp_params['items_type'] );
-			}
-			$ItemList->set_default_filters( array(
-				'types'        => $filter_item_type,
-				'post_ID_list' => is_array( $items ) ? implode( ',', $items ) : NULL,
-			) );
-
-			if( $this->disp_params['allow_filter'] )
-			{	// Filter items from request:
-				$ItemList->load_from_Request( false );
-			}
-
-			// Run query:
-			$ItemList->query();
-
-			// Get IDs of items filtered by $ItemList:
-			$items = $ItemList->get_page_ID_array();
-		}
 
 		// Load all requested posts into the cache:
 		$ItemCache->load_list( $items );
@@ -600,6 +491,136 @@ class item_fields_compare_Widget extends ComponentWidget
 
 
 	/**
+	 * Get IDs of items which are used by this widget depending on settings
+	 *
+	 * @return array
+	 */
+	function get_items_IDs()
+	{
+		global $Collection, $Blog, $Item;
+
+		switch( $this->disp_params['items_source'] )
+		{
+			case 'all':
+				// Use all items from current collection,
+				// They are loaded by ItemList below:
+				$items = 'all';
+				break;
+
+			case 'param':
+				// Use items from param:
+				$items = param( 'items', '/^[\d,]*$/' );
+				$items = trim( $items, ',' );
+				$items = empty( $items ) ? false : explode( ',', $items );
+				break;
+
+			case 'list':
+				// Use items from specific list:
+				$items = trim( $this->disp_params['items'], ',' );
+				$items = empty( $items ) ? false : explode( ',', $items );
+				break;
+
+			default:
+				// Stop here, because unknown items source.
+				return array();
+		}
+
+		if( empty( $items ) && $items != 'all' )
+		{	// No items to compare:
+			return array();
+		}
+
+		$ItemCache = & get_ItemCache();
+
+		$items_limit = intval( $this->disp_params['items_limit'] );
+		$items_limit = $items_limit > 0 ? $items_limit : NULL;
+
+		if( is_array( $items ) )
+		{	// Check item IDs which are loaded from URL param 'items=' or from specific widget settings list:
+			foreach( $items as $i => $item_ID )
+			{
+				$item_ID = trim( $item_ID );
+				if( empty( $item_ID ) )
+				{	// Remove wrong item ID:
+					unset( $items[ $i ] );
+				}
+				if( $item_ID == '$this$' )
+				{	// Try to get a current post ID:
+					if( isset( $Item ) && $Item instanceof Item )
+					{	// Use ID of current post:
+						$items[ $i ] = $Item->ID;
+					}
+					else
+					{	// Remove it because no current post:
+						unset( $items[ $i ] );
+					}
+				}
+				elseif( $item_ID == '$parent$' )
+				{	// Try to get a parent post ID:
+					if( isset( $Item ) && $Item instanceof Item && $Item->get( 'parent_ID' ) > 0 )
+					{	// Use ID of parent post:
+						$items[ $i ] = $Item->get( 'parent_ID' );
+					}
+					else
+					{	// Remove it because no parent post:
+						unset( $items[ $i ] );
+					}
+				}
+				elseif( ! is_number( $item_ID ) )
+				{	// Try to get a post ID by slug:
+					if( $widget_Item = & $ItemCache->get_by_urltitle( $item_ID, false, false ) )
+					{	// Use ID of post detected by slug:
+						$items[ $i ] = $widget_Item->ID;
+					}
+					else
+					{	// Remove it because cannot find post by slug:
+						unset( $items[ $i ] );
+					}
+				}
+			}
+
+			if( $items_limit > 0 )
+			{	// Limit items by widget setting:
+				$items = array_slice( $items, 0, $items_limit );
+			}
+		}
+
+		if( $this->disp_params['allow_filter'] || $items == 'all' )
+		{	// Use ItemList when we need a filter or when all items are requested from collection:
+			$ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $items_limit );
+			// Set additional debug info prefix for SQL queries in order to know what code executes it:
+			$ItemList->query_title_prefix = 'item_fields_compare_Widget';
+
+			if( $this->disp_params['items_type'] == 'default' )
+			{	// Exclude items with types which are hidden by collection setting "Show post types":
+				$filter_item_type = $Blog->get_setting( 'show_post_types' ) != '' ? '-'.$Blog->get_setting( 'show_post_types' ) : NULL;
+			}
+			else
+			{	// Filter by selected Item Type:
+				$filter_item_type = intval( $this->disp_params['items_type'] );
+			}
+			$ItemList->set_default_filters( array(
+				'types'        => $filter_item_type,
+				'post_ID_list' => is_array( $items ) ? implode( ',', $items ) : NULL,
+			) );
+
+			if( $this->disp_params['allow_filter'] )
+			{	// Filter items from request:
+				$ItemList->load_from_Request( false );
+			}
+
+			// Run query:
+			$ItemList->query();
+
+			// Get IDs of items filtered by $ItemList:
+			$items = $ItemList->get_page_ID_array();
+		}
+
+		return $items;
+	}
+
+
+	/**
 	 * Get field template depending on type of the custom field
 	 *
 	 * @param string Template name
@@ -647,17 +668,8 @@ class item_fields_compare_Widget extends ComponentWidget
 	{
 		global $Collection, $Blog, $Item;
 
-		// Get item IDs from GET param or widget setting:
-		$items = empty( $this->disp_params['items'] ) ? get_param( 'items' ) : $this->disp_params['items'];
-		$items = explode( ',', $items );
-		foreach( $items as $i => $item_ID )
-		{
-			$item_ID = trim( $item_ID );
-			if( empty( $item_ID ) )
-			{	// Remove empty item ID:
-				unset( $items[ $i ] );
-			}
-		}
+		// Get IDs of items which should be compared:
+		$items = $this->get_items_IDs();
 
 		$cache_keys = array(
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?
@@ -670,15 +682,6 @@ class item_fields_compare_Widget extends ComponentWidget
 		// Add 1 cache key for each item that is being compared, in order to detect changes on each one:
 		foreach( $items as $item_ID )
 		{
-			if( $item_ID == '$parent$' && isset( $Item ) && $Item->get( 'parent_ID' ) > 0 )
-			{	// Also add a cache key for the parent item ID, in order to detect when it is changed, in case it is being referenced by $parent$:
-				$item_ID = $Item->get( 'parent_ID' );
-			}
-			elseif( intval( $item_ID ) == 0 )
-			{	// Skip wrong item ID and also $this$ because it is already used by key 'item_ID' above:
-				continue;
-			}
-
 			// 1 is a dummy value, only the key name is really important
 			$cache_keys['item_'.$item_ID] = 1;
 		}

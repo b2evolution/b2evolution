@@ -325,7 +325,7 @@ $i = 1;
 // TITLE:
 $Table->display_head();
 
-$custom_fields = $edited_Itemtype->get_custom_fields();
+$custom_fields = $edited_Itemtype->get_custom_fields( 'all', 'ID' );
 
 // TABLE START:
 $Table->display_list_start();
