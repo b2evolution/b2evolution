@@ -393,7 +393,7 @@ class ItemType extends DataObject
 			}
 			elseif( in_array( $custom_field_name, $field_names ) )
 			{ // Field name must be identical
-				$Messages->add( sprintf( T_('The field name "%s" is not identical, please use another.'), $custom_field_name ) );
+				$Messages->add( sprintf( T_('The field name "%s" is used more than once. Each field name must be unique.'), $custom_field_name ) );
 			}
 			else
 			{
@@ -513,6 +513,17 @@ class ItemType extends DataObject
 	{
 		global $DB;
 
+		if( ! empty( $this->delete_custom_fields ) )
+		{	// Delete custom fields:
+			$sql_data = array();
+			foreach( $this->delete_custom_fields as $itcf_ID )
+			{
+				$sql_data[] = '( itcf_ityp_ID = '.$DB->quote( $this->ID ).' AND itcf_ID = '.$DB->quote( $itcf_ID ).' )';
+			}
+			$DB->query( 'DELETE FROM T_items__type_custom_field
+				WHERE '.implode( ' OR ', $sql_data ) );
+		}
+
 		if( ! empty( $this->insert_custom_fields ) )
 		{	// Insert new custom fields:
 			$sql_data = array();
@@ -565,17 +576,6 @@ class ItemType extends DataObject
 						WHERE iset_name = '.$DB->quote( 'custom:'.$old_custom_fields[ $itcf_ID ]['name'] ) );
 				}
 			}
-		}
-
-		if( ! empty( $this->delete_custom_fields ) )
-		{ // Delete custom fields
-			$sql_data = array();
-			foreach( $this->delete_custom_fields as $itcf_ID )
-			{
-				$sql_data[] = '( itcf_ityp_ID = '.$DB->quote( $this->ID ).' AND itcf_ID = '.$DB->quote( $itcf_ID ).' )';
-			}
-			$DB->query( 'DELETE FROM T_items__type_custom_field
-				WHERE '.implode( ' OR ', $sql_data ) );
 		}
 	}
 
