@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -22,7 +22,7 @@ class widescroll_plugin extends Plugin
 	var $code = 'evo_widescroll';
 	var $name = 'Wide scroll';
 	var $priority = 100;
-	var $version = '6.7.9';
+	var $version = '7.0.0';
 	var $group = 'rendering';
 	var $number_of_installs = 1;
 
@@ -106,15 +106,15 @@ class widescroll_plugin extends Plugin
 
 		function widescroll_toolbar( title, prefix )
 		{
-			var r = '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
-				+ '<?php echo $this->get_template( 'toolbar_group_before' ); ?>';
+			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
+				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>';
 			for( var i = 0; i < widescroll_buttons.length; i++ )
 			{
 				var button = widescroll_buttons[i];
 				r += '<input type="button" id="' + button.id + '" title="' + button.title + '"'
 					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="widescroll_insert_tag|' + prefix + 'b2evoCanvas|'+i+'" value="' + button.text + '" />';
 			}
-			r += '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
+			r += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
 
 			jQuery( '.' + prefix + '<?php echo $this->code ?>_toolbar' ).html( r );
 		}
@@ -133,7 +133,7 @@ class widescroll_plugin extends Plugin
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript">widescroll_toolbar( '<?php echo TS_('Wide scroll:'); ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
+		?><script type="text/javascript">widescroll_toolbar( '<?php echo TS_('Wide scroll').':'; ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
 
 		return true;
 	}

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -33,11 +33,6 @@ $Form->hidden_ctrl();
 $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'advanced' );
 $Form->hidden( 'blog', $edited_Blog->ID );
-
-
-$Form->begin_fieldset( T_('Workflow').get_manual_link('coll-workflow-settings') );
-	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
-$Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('After each new post...').get_manual_link('after_each_new_post') );
@@ -99,13 +94,13 @@ $Form->begin_fieldset( T_('External Feeds').get_manual_link('external_feeds') );
 
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Template').get_manual_link('collection_template') );
+	$Form->checkbox_input( 'blog_allow_duplicate', $edited_Blog->get_setting( 'allow_duplicate' ), T_('Allow duplication'), array( 'note' => T_('Check to allow anyone to duplicate this collection.') ) );
+$Form->end_fieldset();
+
 
 if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 {	// Permission to edit advanced admin settings
-
-	$Form->begin_fieldset( T_('Aggregation').get_admin_badge().get_manual_link('collection_aggregation_settings') );
-		$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Collections to aggregate'), T_('List collection IDs separated by \',\', \'*\' for all collections or leave empty for current collection.').'<br />'.T_('Note: Current collection is always part of the aggregation.'), 255 );
-	$Form->end_fieldset();
 
 	$Form->begin_fieldset( T_('Caching').get_admin_badge().get_manual_link('collection_cache_settings'), array( 'id' => 'caching' ) );
 		$ajax_enabled = $edited_Blog->get_setting( 'ajax_form_enabled' );
@@ -129,7 +124,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		{ // Allow to select in-skin login for this blog
 			$Form->checkbox_input( 'in_skin_login', $edited_Blog->get_setting( 'in_skin_login' ), T_( 'In-skin login' ), array( 'note' => T_( 'Use in-skin login form every time it\'s possible' ) ) );
 		}
-		$Form->checkbox_input( 'in_skin_editing', $edited_Blog->get_setting( 'in_skin_editing' ), T_( 'In-skin editing' ), array( 'note' => sprintf( T_('See more option in Features &gt; <a %s>Posts</a>'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$edited_Blog->ID.'#post_options"' ) ) );
+		$Form->checkbox_input( 'in_skin_editing', $edited_Blog->get_setting( 'in_skin_editing' ), T_( 'In-skin editing' ), array( 'note' => sprintf( T_('See more options in Features &gt; <a %s>Posts</a>'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$edited_Blog->ID.'#post_options"' ) ) );
 	$Form->end_fieldset();
 
 	$Form->begin_fieldset( T_('Media directory location').get_admin_badge().get_manual_link('media_directory_location'), array( 'id' => 'media_dir_location' ) );
@@ -171,6 +166,9 @@ $Form->begin_fieldset( T_('Meta data').get_manual_link('blog_meta_data') );
 	$Form->text( 'blog_shortdesc', $edited_Blog->get( 'shortdesc' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!')
 		.' ('.sprintf( T_('%s characters'), '<span id="blog_shortdesc_chars_count">'.$shortdesc_chars_count.'</span>' ).')', 250, 'large' );
 	$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
+	$publisher_logo_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select publisher logo'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
+	$Form->fileselect( 'blog_publisher_logo_file_ID', $edited_Blog->get_setting( 'publisher_logo_file_ID' ), T_('Publisher logo'), NULL, $publisher_logo_params );
+	$Form->text( 'blog_publisher_name', $edited_Blog->get_setting( 'publisher_name' ), 60, T_('Publisher name'), '', 250, 'large' );
 	$Form->text( 'blog_footer_text', $edited_Blog->get_setting( 'blog_footer_text' ), 60, T_('Blog footer'), sprintf(
 		T_('Use &lt;br /&gt; to insert a line break. You might want to put your copyright or <a href="%s" target="_blank">creative commons</a> notice here.'),
 		'http://creativecommons.org/license/' ), 1000, 'large' );
@@ -256,10 +254,10 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveBut
 		switch( jQuery( 'input[name=blog_media_location]:checked' ).val() )
 		{
 			case 'default':
-				url_preview = '<?php echo $edited_Blog->get_local_media_url().'blogs/'.$edited_Blog->urlname.'/'; ?>';
+				url_preview = '<?php echo format_to_js( $edited_Blog->get_local_media_url().'blogs/'.$edited_Blog->urlname.'/' ); ?>';
 				break;
 			case 'subdir':
-				url_preview = '<?php echo $edited_Blog->get_local_media_url(); ?>' + jQuery( 'input[name=blog_media_subdir]' ).val();
+				url_preview = '<?php echo format_to_js( $edited_Blog->get_local_media_url() ); ?>' + jQuery( 'input[name=blog_media_subdir]' ).val();
 				break;
 			case 'custom':
 				url_preview = jQuery( 'input[name=blog_media_url]' ).val();

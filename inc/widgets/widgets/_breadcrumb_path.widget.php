@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class breadcrumb_path_Widget extends ComponentWidget
 {
+	var $icon = 'angle-right';
+
 	/**
 	 * Constructor
 	 */
@@ -171,8 +173,9 @@ class breadcrumb_path_Widget extends ComponentWidget
 		}
 
 		if( empty( $breadcrumbs ) )
-		{ // Nothing to display
-			return;
+		{	// Nothing to display
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is nothing to display.' );
+			return false;
 		}
 
 		echo $this->disp_params['block_start'];
@@ -198,6 +201,22 @@ class breadcrumb_path_Widget extends ComponentWidget
 		echo $this->disp_params['block_end'];
 
 		return true;
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			echo $this->disp_params['block_start'];
+			echo $message;
+			echo $this->disp_params['block_end'];
+		}
 	}
 }
 

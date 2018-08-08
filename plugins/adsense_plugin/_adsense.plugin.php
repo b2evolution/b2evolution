@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -27,7 +27,7 @@ class adsense_plugin extends Plugin
 	var $help_url = 'http://b2evolution.net/blog-ads/adsense-plugin.php';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.7.9';
+	var $version = '7.0.0';
 	var $number_of_installs = 1;
 
 	/**
@@ -82,7 +82,7 @@ class adsense_plugin extends Plugin
 					'label' => 'Auto blocks',
 					'type' => 'checkbox',
 					'defaultvalue' => 0,
-					'note' => T_('Automatically add an ad block in the middle of any post that has no [adsense:] tag yet.'),
+					'note' => T_('Automatically add an ad block in the middle of any post that has no <code>[adsense:]</code> tag yet.'),
 				),
 			);
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -67,7 +67,7 @@ class IPRangeCache extends DataObjectCache
 			$SQL->FROM( 'T_antispam__iprange' );
 			$SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $IP ) );
 			$SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $IP ) );
-			$IPRange_ID = $DB->get_var( $SQL->get() );
+			$IPRange_ID = $DB->get_var( $SQL );
 
 			// Get object from IPRangeCache bi ID
 			$IPRange =  $this->get_by_ID( $IPRange_ID, $halt_on_error, $halt_on_empty );

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -67,7 +67,7 @@ if( $list_is_filtered )
  */
 function filter_tags( & $Form )
 {
-	$Form->text_input( 'tag_filter', get_param( 'tag_filter' ), 24, T_('Tag'), '', array( 'maxlength' => 50 ) );
+	$Form->text_input( 'tag_filter', get_param( 'tag_filter' ), 24, /* TRANS: noun */ T_('Tag'), '', array( 'maxlength' => 50 ) );
 
 	$item_ID_filter_note = '';
 	if( $filter_item_ID = get_param( 'tag_item_ID' ) )
@@ -101,7 +101,7 @@ function tag_td_name( $tag_ID, $tag_name )
 	return $tag_name;
 }
 $Results->cols[] = array(
-		'th'       => T_('Tag'),
+		'th'       => /* TRANS: noun */ T_('Tag'),
 		'order'    => 'tag_name COLLATE utf8_general_ci',
 		'td'       => '%tag_td_name( #tag_ID#, #tag_name# )%',
 	);

@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
@@ -36,9 +36,9 @@ skin_widget( array(
 // Display the search result
 search_result_block( array(
 		'title_prefix_post'     => T_('Topic: '),
-		'title_prefix_comment'  => T_('Reply: '),
-		'title_prefix_category' => T_('Forum: '),
-		'title_prefix_tag'      => T_('Tag: '),
+		'title_prefix_comment'  => /* TRANS: noun */ T_('Reply:'),
+		'title_prefix_category' => T_('Forum').': ',
+		'title_prefix_tag'      => /* TRANS: noun */ T_('Tag').': ',
 		'block_start' => '<div class="evo_search_list">',
 		'block_end'   => '</div>',
 		'row_start'   => '<div class="evo_search_list__row">',

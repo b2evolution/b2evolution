@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -97,12 +97,13 @@ class BlogCache extends DataObjectCache
 		$req_url_wo_proto = substr( $req_url, strpos( $req_url, '://' ) ); // req_url without protocol, so it matches http and https below
 
 		$sql = 'SELECT *
-			  FROM T_blogs
-			 WHERE ( blog_access_type = "absolute"
-			         AND ( '.$DB->quote( 'http'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" )
-		                 OR '.$DB->quote( 'https'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" ) ) )
-			    OR ( blog_access_type = "subdom"
-			         AND '.$DB->quote( $req_url_wo_proto ).' LIKE CONCAT( "://", blog_urlname, ".'.$basehost.$baseport.'/%" ) )';
+						FROM T_blogs
+						WHERE ( blog_access_type = "absolute"
+							AND ( '.$DB->quote( 'http'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" )
+								OR '.$DB->quote( 'https'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" ) ) )
+							OR ( blog_access_type = "subdom"
+								AND '.$DB->quote( $req_url_wo_proto ).' LIKE CONCAT( "://", blog_urlname, ".'.$basehost.$baseport.'/%" ) )
+						ORDER BY blog_ID ASC';
 
 		// Match stubs like "http://base/url/STUB?param=1" on $baseurl
 		/*
@@ -164,6 +165,54 @@ class BlogCache extends DataObjectCache
 
 		$Collection = $Blog = new Blog( $row );
 		$this->add( $Blog );
+
+		return $Blog;
+	}
+
+
+	/**
+	 * Get a blog by its URL alias.
+	 *
+	 * Load the object into cache, if necessary.
+	 *
+	 * @param string URL alias of object to load
+	 * @param string Matching alias (by reference)
+	 * @param boolean false if you want to return false on error
+	 * @return
+	 */
+	function & get_by_url_alias( $req_url, & $alias, $halt_on_error = true )
+	{
+		global $DB, $Debuglog;
+
+		// Load just the requested object:
+		$Debuglog->add( "Loading <strong>$this->objtype($req_url)</strong> into cache", 'dataobjects' );
+
+		$req_url_wo_proto = substr( $req_url, strpos( $req_url, '://' ) ); // req_url without protocol, so it matches http and https below
+
+		$sql = 'SELECT T_blogs.*,	cua_url_alias,
+							LENGTH( REPLACE( '.$DB->quote( $req_url_wo_proto ).', SUBSTRING( cua_url_alias, POSITION( "://" IN cua_url_alias ) ), "" ) ) AS unmatched_length
+						FROM T_blogs
+						LEFT JOIN T_coll_url_aliases
+							ON cua_coll_ID = blog_ID
+						WHERE (
+							'.$DB->quote( 'http'.$req_url_wo_proto ).' LIKE CONCAT( cua_url_alias, "%" )
+							OR '.$DB->quote( 'https'.$req_url_wo_proto ).' LIKE CONCAT( cua_url_alias, "%" ) )
+							AND NOT cua_url_alias IS NULL
+						ORDER BY unmatched_length ASC';
+
+		$row = $DB->get_row( $sql, OBJECT, 0, 'Blog::get_by_url_alias()' );
+		if( empty( $row ) )
+		{ // Requested object does not exist
+			if( $halt_on_error ) debug_die( "Requested $this->objtype does not exist!" );
+
+			$r = false;
+			return $r; // we return by reference!
+		}
+
+		$Collection = $Blog = new Blog( $row );
+		$this->add( $Blog );
+
+		$alias = $row->cua_url_alias;
 
 		return $Blog;
 	}
@@ -534,8 +583,8 @@ class BlogCache extends DataObjectCache
 
 		if( $Settings->get( 'subscribe_new_blogs' ) == 'public' )
 		{	// If a subscribing is available only for the public collections:
-			$blog_cache_SQL->WHERE_and( '( blog_ID NOT IN ( SELECT cset_coll_ID FROM evo_coll_settings WHERE cset_name = "allow_access" AND cset_value = "members" ) ) OR
-				( blog_ID IN ( SELECT cset_coll_ID FROM evo_coll_settings WHERE cset_name = "allow_access" AND cset_value = "members" ) AND (
+			$blog_cache_SQL->WHERE_and( '( blog_ID NOT IN ( SELECT cset_coll_ID FROM T_coll_settings WHERE cset_name = "allow_access" AND cset_value = "members" ) ) OR
+				( blog_ID IN ( SELECT cset_coll_ID FROM T_coll_settings WHERE cset_name = "allow_access" AND cset_value = "members" ) AND (
 					( SELECT bloguser_user_ID
 					    FROM T_coll_user_perms
 					   WHERE bloguser_blog_ID = blog_ID

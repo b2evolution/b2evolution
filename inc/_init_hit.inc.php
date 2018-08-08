@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -124,8 +124,6 @@ $Debuglog->add( 'Login: default_locale from DB: '.$default_locale, 'locale' );
 $default_locale = locale_from_httpaccept(); // set default locale by autodetect
 $Debuglog->add( 'Login: default_locale from HTTP_ACCEPT: '.$default_locale, 'locale' );
 
-load_funcs('_core/_param.funcs.php');
-
 // $locale_from_get: USE CASE: allow overriding the locale via GET param &locale=, e.g. for tests.
 if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
 {
@@ -161,7 +159,7 @@ if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )
 locale_activate( $default_locale );
 
 // Set encoding for MySQL connection:
-$DB->set_connection_charset( $current_charset );
+$DB->connection_charset = $current_charset;
 
 
 /**

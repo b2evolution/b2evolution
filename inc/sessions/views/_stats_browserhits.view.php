@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -108,8 +108,8 @@ $SQL->ORDER_BY( 'year DESC, month DESC, day DESC, referer_type, hit_type' );
 $sessions_SQL->GROUP_BY( 'hit_date' );
 $sessions_SQL->ORDER_BY( 'hit_date DESC' );
 
-$res_hits = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
-$sessions = $DB->get_assoc( $sessions_SQL->get(), $SQL->title );
+$res_hits = $DB->get_results( $SQL, ARRAY_A );
+$sessions = $DB->get_assoc( $sessions_SQL );
 
 /*
  * Chart
@@ -336,14 +336,14 @@ if( count( $res_hits ) )
 
 			// Increment hitcounter:
 
-			if ( $row_stats['hit_type'] == 'ajax' )
+			if( $row_stats['hit_type'] == 'ajax' )
 			{
 				$hits['ajax'] += $row_stats['hits'];
 				$hits_total['ajax'] += $row_stats['hits'];
 			}
 			else
 			{
-				if ( $row_stats['hit_type'] == 'admin' )
+				if( $row_stats['hit_type'] == 'admin' )
 				{
 					$hits['admin'] += $row_stats['hits'];
 					$hits_total['admin'] += $row_stats['hits'];

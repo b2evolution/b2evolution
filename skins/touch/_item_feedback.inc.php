@@ -14,7 +14,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage touch
@@ -168,6 +168,8 @@ if( $Item->can_see_comments( true ) )
 			$disp_title[] = T_('No feedback yet');
 		}
 
+		global $CommentList;
+
 		$comments_per_page = !$Blog->get_setting( 'threaded_comments' ) ? $Blog->get_setting( 'comments_per_page' ) : 1000;
 		$CommentList = new CommentList2( $Blog, $comments_per_page, 'CommentCache', 'c_' );
 
@@ -282,22 +284,27 @@ if( $Item->can_see_comments( true ) )
 }
 
 // ------------------ COMMENT FORM INCLUDED HERE ------------------
-if( $Blog->get_ajax_form_enabled() && ( $Blog->get_setting( 'allow_comments' ) != 'never' ) )
-{
-	$json_params = array(
-		'action' => 'get_comment_form',
-		'p' => $Item->ID,
-		'blog' => $Blog->ID,
-		'disp' => $disp,
-		'params' => $params );
-	display_ajax_form( $json_params );
+if( $Blog->get_setting( 'allow_comments' ) != 'never' && // if enabled by collection setting
+    $Item->get_type_setting( 'use_comments' ) ) // if enabled by item type setting
+{	// Display a comment form only if it is enabled:
+	if( $Blog->get_ajax_form_enabled() )
+	{
+		$json_params = array(
+			'action' => 'get_comment_form',
+			'p' => $Item->ID,
+			'blog' => $Blog->ID,
+			'reply_ID' => param( 'reply_ID', 'integer', 0 ),
+			'disp' => $disp,
+			'params' => $params );
+		display_ajax_form( $json_params );
+	}
+	else
+	{
+		skin_include( '_item_comment_form.inc.php', $params );
+	}
+	// Note: You can customize the default item comment form by copying the generic
+	// /skins/_item_comment_form.inc.php file into the current skin folder.
 }
-else
-{
-	skin_include( '_item_comment_form.inc.php', $params );
-}
-// Note: You can customize the default item comment form by copying the generic
-// /skins/_item_comment_form.inc.php file into the current skin folder.
 // ---------------------- END OF COMMENT FORM ---------------------
 
 // ----------- Register for item's comment notification -----------

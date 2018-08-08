@@ -117,7 +117,7 @@ $Results->cols[] = array(
 		'default_dir' => 'D',
 		'td' => '%mysql2localedatetime_spans( #slg_timestamp# )%',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap timestamp'
+		'td_class' => 'timestamp'
 	);
 
 $Results->cols[] = array(
@@ -255,6 +255,11 @@ function syslog_object_link( $object_type, $object_ID )
 			{ // User was deleted or ID is incorrect
 				$link = 'No file';
 			}
+			break;
+
+		case 'email_log':
+			// Link to email log
+			$link = get_link_tag( $admin_url.'?ctrl=email&tab=sent&emlog_ID='.$object_ID, sprintf( T_('Mail log ID#%s'), $object_ID ) );
 			break;
 	}
 

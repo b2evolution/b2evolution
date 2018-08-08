@@ -177,7 +177,7 @@ $Results->title = $params['messages_list_title'].( is_admin_page() ? get_manual_
 
 if( is_admin_page() )
 {
-	$Results->global_icon( T_('Cancel!'), 'close', '?ctrl=threads' );
+	$Results->global_icon( T_('Cancel').'!', 'close', '?ctrl=threads' );
 }
 
 /**
@@ -307,6 +307,14 @@ if( $is_recipient )
 				$Form->info_field( '', T_( 'The other users involved in this conversation have closed their account.' ) );
 			}
 
+			// Display plugin captcha for message form before textarea:
+			$Plugins->display_captcha( array(
+					'Form'              => & $Form,
+					'form_type'         => 'message',
+					'form_position'     => 'before_textarea',
+					'form_use_fieldset' => false,
+				) );
+
 			ob_start();
 			echo '<div class="message_toolbars">';
 			// CALL PLUGINS NOW:
@@ -344,8 +352,16 @@ if( $is_recipient )
 				display_attachments_fieldset( $Form, $LinkOwner );
 			}
 
+			// Display plugin captcha for message form before submit button:
+			$Plugins->display_captcha( array(
+					'Form'              => & $Form,
+					'form_type'         => 'message',
+					'form_position'     => 'before_submit_button',
+					'form_use_fieldset' => false,
+				) );
+
 		$Form->end_form( array(
-				array( 'submit', 'actionArray[preview]', T_('Preview'), 'SaveButton btn-info' ),
+				array( 'submit', 'actionArray[preview]', /* TRANS: Verb */ T_('Preview'), 'SaveButton btn-info' ),
 				array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' )
 			) );
 

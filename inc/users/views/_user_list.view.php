@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -20,9 +20,22 @@ if( !isset( $display_params ) )
 }
 
 users_results_block( array(
+		'results_title'      => T_('Users'),
+		'display_user_count' => true,
 		'display_sec_groups' => true,
 		'display_params'     => $display_params,
+		'display_contact'    => false,
+		'display_email'      => true,
+		'display_automation' => true,
+		'display_btn_tags'   => true,
+		'display_btn_delspam'=> true,
 	) );
+
+if( is_admin_page() )
+{	// Call plugins event:
+	global $Plugins;
+	$Plugins->trigger_event( 'AdminAfterUsersList' );
+}
 
 load_funcs( 'users/model/_user_js.funcs.php' );
 ?>

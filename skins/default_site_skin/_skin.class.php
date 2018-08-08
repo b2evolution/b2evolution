@@ -78,6 +78,37 @@ class default_site_Skin extends Skin
 
 
 	/**
+	 * Get definitions for editable params
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 * @return array
+	 */
+	function get_param_definitions( $params )
+	{
+		$r = array_merge( array(
+				'section_header_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Header')
+				),
+					'menu_bar_logo_padding' => array(
+						'label' => T_('Menu bar logo padding'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set the padding around the logo.'),
+						'defaultvalue' => '2',
+						'type' => 'integer',
+						'size' => 1,
+					),
+				'section_header_end' => array(
+					'layout' => 'end_fieldset',
+				),
+			), parent::get_param_definitions( $params ) );
+
+		return $r;
+	}
+
+
+	/**
 	 * Get ready for displaying the site skin.
 	 *
 	 * This may register some CSS or JS...
@@ -86,6 +117,15 @@ class default_site_Skin extends Skin
 	{
 		// Include the default skin style.css relative current SITE skin folder:
 		require_css( 'style.css', 'siteskin' );
+
+		// Add custom styles:
+		$menu_bar_logo_padding = $this->get_setting( 'menu_bar_logo_padding' );
+
+		add_css_headline( '
+.sitewide_header .swhead_sitename.swhead_logo img {
+	padding: '.$menu_bar_logo_padding.'px;
+}
+' );
 	}
 }
 

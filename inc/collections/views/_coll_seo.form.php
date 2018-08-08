@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  *
@@ -123,7 +123,7 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 			T_('Meta Keywords'), T_('When no meta keywords are provided for an item, use tags instead.') );
 
 	$Form->checkbox( 'tags_open_graph', $edited_Blog->get_setting( 'tags_open_graph' ),
-			T_('Open Graph'), T_('Open Graph tags (og:title, og:url, og:description, og:type and og:image)') );
+			T_('Open Graph'), T_('Open Graph tags').' (og:title, og:url, og:description, og:type and og:image)' );
 
 	$Form->checkbox( 'tags_twitter_card', $edited_Blog->get_setting( 'tags_twitter_card' ),
 			T_('Twitter Card'), T_('Include Twitter Summary card') );
@@ -315,9 +315,9 @@ $Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
 	$Form->radio( '404_response', $edited_Blog->get_setting('404_response'),
 		array(
 				array( '200', T_('200 "OK" response') ),
-				array( '301', T_('301 redirect to main page') ),
-				array( '302', T_('302 redirect to main page') ),
-				array( '303', T_('303 redirect to main page') ),
+				array( '301', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '301' ) ),
+				array( '302', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '302' ) ),
+				array( '303', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '303' ) ),
 				array( '404', T_('404 "Not found" response') ),
 				array( '410', T_('410 "Gone" response') ),
 			), T_('404 "Not Found" response'), true );

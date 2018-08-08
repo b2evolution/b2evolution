@@ -21,7 +21,7 @@ class photoalbums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.9';
+	var $version = '7.0.0';
 
 	/**
 	 * Get default name for the skin.
@@ -39,6 +39,35 @@ class photoalbums_Skin extends Skin
 	function get_default_type()
 	{
 		return 'normal';
+	}
+
+
+	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		// Note: second param below is the ORDER
+		return array(
+				'page_top'               => array( NT_('Page Top'), 2 ),
+				'menu'                   => array( NT_('Menu'), 15 ),
+				'front_page_main_area'   => array( NT_('Front Page Main Area'), 40 ),
+				'item_single'            => array( NT_('Item Single'), 50 ),
+				'item_page'              => array( NT_('Item Page'), 55 ),
+				'contact_page_main_area' => array( NT_('Contact Page Main Area'), 60 ),
+				'footer'                 => array( NT_('Footer'), 100 ),
+				'404_page'               => array( NT_('404 Page'), 110 ),
+				'login_required'         => array( NT_('Login Required'), 120 ),
+				'access_denied'          => array( NT_('Access Denied'), 130 ),
+				'help'                   => array( NT_('Help'), 140 ),
+				'register'               => array( NT_('Register'), 150 ),
+				'compare_main_area'      => array( NT_('Compare Main Area'), 160 ),
+			);
 	}
 
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2008 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package evocore
@@ -25,6 +25,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_category_list_Widget extends ComponentWidget
 {
+	var $icon = 'indent';
+
 	/**
 	 * Constructor
 	 */
@@ -548,11 +550,14 @@ class coll_category_list_Widget extends ComponentWidget
 			$r .= '</label>';
 		}
 
-		// End the line even if it has children, since this is the end of one single item
+		// End the line only if it has no children, since this is the end of one single item
 		// To close the whole group of categories with all of it's children see @cat_before_level and @cat_after_level
 		// Note: If this solution will not work, and we can't add the 'item_end' here, then create new after_line callback,
 		// which then must be called from a the ChapterCache recurse method
-		$r .= $end_tag;
+		if( empty( $Chapter->children ) )
+		{
+			$r .= $end_tag;
+		}
 
 		return $r;
 	}
@@ -634,12 +639,12 @@ class coll_category_list_Widget extends ComponentWidget
 		global $DB;
 
 		// Try to get all children of the given category
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get all children of category #'.$cat_ID );
 		$SQL->SELECT( 'cat_ID' );
 		$SQL->FROM( 'T_categories' );
 		$SQL->WHERE( 'cat_parent_ID = '.$DB->quote( $cat_ID ) );
 
-		$category_children = $DB->get_col( $SQL->get() );
+		$category_children = $DB->get_col( $SQL );
 
 		foreach( $category_children as $category_child_ID )
 		{

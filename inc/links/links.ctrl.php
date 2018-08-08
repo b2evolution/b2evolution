@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -281,9 +281,10 @@ switch( $action )
 
 // require colorbox js
 require_js_helper( 'colorbox' );
-// require File Uploader js and css
-require_js( 'multiupload/fileuploader.js' );
-require_css( 'fileuploader.css' );
+// require Fine Uploader js and css:
+init_fineuploader_js_lang_strings();
+require_js( 'multiupload/fine-uploader.js' );
+require_css( 'fine-uploader.css' );
 if( $action == 'edit_links' )
 { // Load JS files to make the links table sortable:
 	require_js( '#jquery#' );

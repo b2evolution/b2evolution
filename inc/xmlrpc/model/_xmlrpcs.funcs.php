@@ -364,7 +364,7 @@ function _wp_mw_get_item_struct( & $Item )
 	if( isset($Item->parent_ID) )
 	{
 		$ItemCache = & get_ItemCache();
-		if( $parent_Item = & $ItemCache->get_by_ID( $Item->parent_ID, false, false ) );
+		if( $parent_Item = & $ItemCache->get_by_ID( $Item->parent_ID, false, false ) )
 		{
 			$parent_title = $parent_Item->title;
 		}
@@ -1154,6 +1154,13 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 			'is_preview' => false,
 			'action' => & $action
 		) );
+
+	// Validate first enabled captcha plugin:
+	$Plugins->trigger_event_first_return( 'ValidateCaptcha', array(
+		'form_type'  => 'comment',
+		'Comment'    => & $Comment,
+		'is_preview' => ( $action == 'preview' ),
+	) );
 
 	if( $Messages->has_errors() )
 	{

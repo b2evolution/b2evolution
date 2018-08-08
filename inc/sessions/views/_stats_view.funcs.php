@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -68,14 +68,14 @@ function hits_results( & $Results, $params = array() )
 	$Results->cols[] = array(
 			'th' => T_('Session'),
 			'order' => 'hit_sess_ID',
-			'td_class' => 'right compact_data',
+			'td_class' => 'right nowrap',
 			'td' => $session_link,
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('User'),
 			'order' => 'user_login',
-			'td_class' => 'shrinkwrap compact_data',
+			'td_class' => 'shrinkwrap',
 			'td' => '%stat_session_login( #user_login# )%',
 		);
 
@@ -83,14 +83,14 @@ function hits_results( & $Results, $params = array() )
 			'th' => T_('Date Time'),
 			'order' => 'hit_ID',
 			'default_dir' => 'D',
-			'td_class' => 'timestamp compact_data',
+			'td_class' => 'timestamp',
 			'td' => '%mysql2localedatetime_spans( #hit_datetime# )%',
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Agent'),
 			'order' => 'hit_agent_type',
-			'td_class' => 'shrinkwrap compact_data',
+			'td_class' => 'shrinkwrap',
 			'td' => '$hit_agent_type$',
 			'extra' => array ( 'style' => 'background-color: %hit_agent_type_color( "#hit_agent_type#" )%;',
 			'format_to_output'	=> false)
@@ -99,7 +99,7 @@ function hits_results( & $Results, $params = array() )
 	$Results->cols[] = array(
 			'th' => T_('Device'),
 			'order' => 'sess_device',
-			'td_class' => 'shrinkwrap compact_data',
+			'td_class' => 'shrinkwrap',
 			'td' => '$sess_device$',
 			'extra' => array ( 'style' => 'background-color: %hit_device_color( "#sess_device#" )%;', 'format_to_output' => false )
 		);
@@ -110,7 +110,7 @@ function hits_results( & $Results, $params = array() )
 				'th_group' => T_('Referer'),
 				'th' => T_('Type'),
 				'order' => 'hit_referer_type',
-				'td_class' => 'shrinkwrap compact_data',
+				'td_class' => 'shrinkwrap',
 				'td' => '$hit_referer_type$',
 				'extra' => array ( 'style' => 'background-color: %hit_referer_type_color( "#hit_referer_type#" )%;',
 					'format_to_output' => false )
@@ -120,7 +120,7 @@ function hits_results( & $Results, $params = array() )
 				'th_group' => T_('Referer'),
 				'th' => T_('Domain'),
 				'order' => 'dom_name',
-				'td_class' => 'nowrap compact_data',
+				'td_class' => 'nowrap',
 				'td' => '<a href="$hit_referer$">$dom_name$</a>',
 			);
 	}
@@ -130,7 +130,7 @@ function hits_results( & $Results, $params = array() )
 			'th' => T_('Search keywords'),
 			'order' => 'hit_keyphrase',
 			'td' => '%stats_search_keywords( #hit_keyphrase#, 45 )%',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 
 	// Serp Rank:
@@ -138,7 +138,7 @@ function hits_results( & $Results, $params = array() )
 			'th' => T_('SR'),
 			'th_title' => T_('Serp rank'),
 			'order' => 'hit_serprank',
-			'td_class' => 'center compact_data',
+			'td_class' => 'center nowrap',
 			'td' => '$hit_serprank$',
 		);
 
@@ -147,19 +147,19 @@ function hits_results( & $Results, $params = array() )
 			'order' => 'goal_name',
 			'default_dir' => 'D',
 			'td' => '$goal_name$',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Collection'),
 			'order' => 'hit_coll_ID',
 			'td' => '$blog_shortname$',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 	$Results->cols[] = array(
 			'th' => T_('Hit type'),
 			'order' => 'hit_type',
-			'td_class' => 'shrinkwrap compact_data',
+			'td_class' => 'shrinkwrap',
 			'td' => '$hit_type$',
 			'extra' => array (	'style'				=> 'background-color: %hit_type_color( "#hit_type#" )%',
 								'format_to_output'	=> false)
@@ -169,19 +169,19 @@ function hits_results( & $Results, $params = array() )
 			'th' => T_('Requested URI'),
 			'order' => 'hit_uri',
 			'td' => '%stats_format_req_URI( #hit_coll_ID#, #hit_uri#, 40, #hit_disp#, #hit_ctrl#, #hit_action# )%',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 	$Results->cols[] = array(
 			'th' => T_('HTTP resp'),
 			'order' => 'hit_response_code',
 			'td' => '$hit_response_code$',
-			'td_class' => '%hit_response_code_class( #hit_response_code# )% shrinkwrap compact_data'
+			'td_class' => '%hit_response_code_class( #hit_response_code# )% shrinkwrap'
 		);
 	$Results->cols[] = array(
 			'th' => T_('HTTP meth'),
 			'order' => 'hit_method',
 			'td' => '$hit_method$',
-			'td_class' => 'shrinkwrap compact_data',
+			'td_class' => 'shrinkwrap',
 			'extra' => array(
 					'style' => '%hit_method_style( "#hit_method#" )%',
 					'format_to_output'=> false
@@ -192,14 +192,14 @@ function hits_results( & $Results, $params = array() )
 			'th' => T_('Remote IP'),
 			'order' => 'hit_remote_addr',
 			'td' => '%disp_clickable_log_IP( #hit_remote_addr# )%',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Agent Name'),
 			'order' => 'hit_agent_ID',
 			'td' => '%get_hit_agent_name_by_ID( #hit_agent_ID# )%',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 }
 
@@ -277,25 +277,32 @@ function filter_hits( & $Form )
  */
 function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp = NULL, $hit_ctrl = NULL, $hit_action = NULL)
 {
-	if( ! empty( $hit_coll_ID ) )
-	{
-		$BlogCache = & get_BlogCache();
-		$tmp_Blog = & $BlogCache->get_by_ID( $hit_coll_ID );
+	$BlogCache = & get_BlogCache();
+	if( $tmp_Blog = & $BlogCache->get_by_ID( $hit_coll_ID, false, false ) )
+	{	// Use root url of the requested collection if it still exists in DB:
 		$full_url = $tmp_Blog->get_baseurl_root().$hit_uri;
 	}
 	else
-	{
+	{	// Don't use root url if a request was without collection or it doesn't exist in DB anymore:
 		$full_url = $hit_uri;
 	}
 
-	$int_search_uri = urldecode($hit_uri);
+	$int_search_uri = urldecode( $hit_uri );
 	if( ( utf8_strpos( $int_search_uri , '?s=' ) !== false )
 	 || ( utf8_strpos( $int_search_uri , '&s=' ) !== false ) )
 	{ // This is an internal search:
 		preg_match( '~[?&]s=([^&#]*)~', $int_search_uri, $res );
 		$hit_uri = sprintf( T_( 'Internal search: %s' ), $res[1] );
 	}
-	elseif( utf8_strlen($hit_uri) > $max_len )
+	elseif( $hit_disp == 'redirect' )
+	{	// This is a redirect:
+		return '['.get_link_tag( $full_url, 'redirect' ).']';
+	}
+	elseif( strpos( $hit_uri, 'email_passthrough.php' ) !== false )
+	{	// This is a click from email message:
+		return '['.get_link_tag( $full_url, 'email_passthrough' ).']';
+	}
+	elseif( utf8_strlen( $hit_uri ) > $max_len )
 	{
 		$hit_uri = '...'.utf8_substr( $hit_uri, -$max_len );
 	}
@@ -330,7 +337,7 @@ function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp 
  */
 function stat_session_login( $login )
 {
-	if( empty($login) )
+	if( empty( $login ) )
 	{
 		return '<span class="note">'.T_('Anon.').'</span>';
 	}
@@ -366,7 +373,7 @@ function stat_session_hits( $sess_ID, $link_text )
  */
 function disp_clickable_log_IP( $hit_remote_addr )
 {
-	global $current_User, $blog;
+	global $current_User, $blog, $admin_url;
 	static $perm = NULL;
 
 	if( empty( $perm ) )
@@ -376,7 +383,9 @@ function disp_clickable_log_IP( $hit_remote_addr )
 
 	if( $perm == true )
 	{
-		return '<a href="?ctrl=stats&tab='.get_param( 'tab' ).'&colselect_submit=Filter+list&sess_ID=&remote_IP='.$hit_remote_addr.'&blog='.$blog.'">'.$hit_remote_addr.'</a>';
+		return '<a href="?ctrl=stats&tab='.get_param( 'tab' ).'&colselect_submit=Filter+list&sess_ID=&remote_IP='.$hit_remote_addr.'&blog='.$blog.'">'.$hit_remote_addr.'</a>'
+				.' <a href="'.$admin_url.'?ctrl=antispam&amp;action=whois&amp;query='.$hit_remote_addr.'" class="btn btn-sm btn-info" onclick="return get_whois_info(\''.$hit_remote_addr.'\');">'
+				.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Check domain registration (WHOIS)...') ) ).'</a>';
 	}
 	else
 	{
@@ -393,7 +402,7 @@ function disp_clickable_log_IP( $hit_remote_addr )
 function disp_color_referer( $hit_referer_type )
 {
 	global $referer_type_color;
-	if(!empty ($referer_type_color[$hit_referer_type]))
+	if( ! empty( $referer_type_color[$hit_referer_type] ) )
 	{
 		return '<span style="background-color: #'.$referer_type_color[$hit_referer_type].'">'.$hit_referer_type.'</span>';
 	}
@@ -403,6 +412,7 @@ function disp_color_referer( $hit_referer_type )
 	}
 }
 
+
 /**
  * Display color agent type
  *
@@ -411,7 +421,7 @@ function disp_color_referer( $hit_referer_type )
 function disp_color_agent( $hit_agent_type )
 {
 	global $agent_type_color;
-	if(!empty ($agent_type_color[$hit_agent_type]))
+	if( ! empty( $agent_type_color[$hit_agent_type] ) )
 	{
 		return '<span style="background-color: #'.$agent_type_color[$hit_agent_type].'">'.$hit_agent_type.'</span>';
 	}
@@ -421,39 +431,38 @@ function disp_color_agent( $hit_agent_type )
 	}
 }
 
+
 /**
  * Generate html response code class
  *
  * @param integer response code
  * @return string class
  */
-function hit_response_code_class($hit_response_code)
+function hit_response_code_class( $hit_response_code )
 {
-	$class = '';
-
-	if($hit_response_code >= 200 && $hit_response_code < 300)
-	{
-		$class =  "code_2xx";
+	if( $hit_response_code >= 500 )
+	{	// Server errors:
+		return 'text-danger';
 	}
-	if($hit_response_code >= 300 && $hit_response_code < 400)
-	{
-		$class =  "code_3xx";
+	elseif( $hit_response_code >= 400 )
+	{	// Code errors:
+		return 'text-warning';
+	}
+	elseif( $hit_response_code == 304 )
+	{	// 304 means "Not Modified"; Display this as success 2xx codes:
+		return 'text-success';
+	}
+	elseif( $hit_response_code >= 300 )
+	{	// Redirects:
+		return 'text-info';
+	}
+	elseif( $hit_response_code >= 200 )
+	{	// Success pages:
+		return 'text-success';
 	}
 
-	if($hit_response_code == 304)
-	{
-		$class =  "code_304";
-	}
-
-	if ($hit_response_code >= 400)
-	{
-		$class =  "code_4xx";
-	}
-
-
-	return $class;
+	return '';
 }
-
 
 
 /**
@@ -467,7 +476,7 @@ function hit_type_color( $hit_type )
 	global $hit_type_color;
 	$color = '#FFFFFF';
 
-	if( ! empty ( $hit_type_color[$hit_type] ) )
+	if( ! empty( $hit_type_color[$hit_type] ) )
 	{
 		$color ='#'.$hit_type_color[$hit_type];
 	}
@@ -487,7 +496,7 @@ function hit_agent_type_color( $hit_agent_type )
 	global $agent_type_color;
 	$color = '#FFFFFF';
 
-	if( ! empty ( $agent_type_color[$hit_agent_type] ) )
+	if( ! empty( $agent_type_color[$hit_agent_type] ) )
 	{
 		$color ='#'.$agent_type_color[$hit_agent_type];
 	}

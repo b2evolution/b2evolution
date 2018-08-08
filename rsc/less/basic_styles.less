@@ -339,6 +339,7 @@ span.roundbutton.rbtn_black:hover, .roundbutton_group span.roundbutton.rbtn_blac
 	border: 1px solid transparent;
 	border-radius: 4px;
 	box-sizing: border-box;
+	padding: 1px 7px 2px;
 	&:hover,
 	&:focus {
 		color: #333;
@@ -478,7 +479,9 @@ div.comment_toolbars div.edit_toolbar, div.message_toolbars div.edit_toolbar {
 // Meta categories that appears on categories widget:
 .widget_core_coll_category_list {
 	.evo_cat_meta {
-		font-weight: bold;
+		> label, > a {
+			font-weight: bold;
+		}
 		ul {
 			font-weight: normal;
 		}

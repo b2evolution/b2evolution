@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage basic
@@ -51,7 +51,7 @@ $Comment = & $params['Comment'];
 			<?php break;
 	}
 
-	$Comment->edit_link( ' &middot; ', ' ', '#', '#', '', '&amp;', true, rawurlencode( $Comment->get_permanent_url() ) ); // Link to backoffice for editing
+	$Comment->edit_link( ' &middot; ', ' ', '#', '#', '', '&amp;', true, $Comment->get_permanent_url() ); // Link to backoffice for editing
 
 	if( $Comment->status != 'published' )
 	{

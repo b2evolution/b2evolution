@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -51,7 +51,7 @@ $Form->begin_form( 'evo_comment' );
 	$Form->output = false;
 	$edit_links = $Form->begin_fieldset( get_request_title( array_merge( array(
 			'edit_links_template' => array(
-				'before'              => '<span class="pull-right">',
+				'before'              => '<span class="pull-right panel_heading_action_icons">',
 				'after'               => '</span>',
 				'advanced_link_class' => 'btn btn-info btn-sm',
 				'close_link_class'    => 'btn btn-default btn-sm',
@@ -77,7 +77,7 @@ $Form->begin_form( 'evo_comment' );
 	else
 	{
 		$Form->text_input( 'newcomment_author', $edited_Comment->author, 20, T_('Author'), '', array( 'maxlength' => 100, 'style' => 'width: 100%;' ) );
-		$Form->text_input( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+		$Form->email_input( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 		$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('Website URL'), '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 	}
 

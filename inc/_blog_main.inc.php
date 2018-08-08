@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package main
@@ -30,6 +30,16 @@ load_class( 'items/model/_itemlist.class.php', 'ItemList' );
 //$dummy = new Blog();
 $Timer->start( '_BLOG_MAIN.inc' );
 
+// Evo toolbar visibility:
+// true   - (Default) Visible if current user has a permission to view toolbar,
+// false  - Hidden and it is not printed at all,
+// 'hidden' - Toolbar is printed out but it is hidden with css property.
+//            (Used for customizer mode when we should grab toolbar from iframe to main window)
+param( 'show_toolbar', 'string', NULL );
+if( $show_toolbar !== NULL && $show_toolbar !== 'hidden' )
+{	// Convert all not string possible values to boolean type:
+	$show_toolbar = (boolean)$show_toolbar;
+}
 
 /*
  * blog ID. This is a little bit special.
@@ -58,29 +68,19 @@ if( empty( $Blog ) )
 	// EXIT.
 }
 
+// Set a selected collection in user settings in order to use a correct last viewed collection URL in back-office:
+set_working_blog( $blog );
 
-// Show/Hide the containers:
-$display_containers = param( 'display_containers', 'string' );
-if( $display_containers == 'show' )
-{
-	$Session->set( 'display_containers_'.$blog, 1 );
-}
-elseif( $display_containers == 'hide' )
-{
-	$Session->delete( 'display_containers_'.$blog );
-}
+// Do we allow redirection to canonical URL? (allows to force a 'single post' URL for commenting)
+param( 'redir', 'string', 'yes', false );
 
-// Show/Hide the includes:
-$display_includes = param( 'display_includes', 'string' );
-if( $display_includes == 'show' )
-{
-	$Session->set( 'display_includes_'.$blog, 1 );
-}
-elseif( $display_includes == 'hide' )
-{
-	$Session->delete( 'display_includes_'.$blog );
-}
+// Initialize modes to debug and customize collection settings:
+initialize_debug_modes();
 
+if( $Session->get( 'customizer_mode_'.$Blog->ID ) && $redir != 'no' )
+{	// Redirect to customize collection if such mode is enabled:
+	header_redirect( $Blog->get( 'customizer_url', array( 'glue' => '&' ) ) );
+}
 
 // Init $disp
 $default_disp = '-'; // '-' means we have no explicit disp request yet... this may change with extraptah info or by detecting front page later
@@ -141,16 +141,16 @@ if( ! isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
 if( $resolve_extra_path )
 {
 	// Check and Remove blog base URI from ReqPath:
+
+	// BaseURI is the part after the domain name and it will always end with / :
 	$blog_baseuri = substr( $Blog->gen_baseurl(), strlen( $Blog->get_baseurl_root() ) );
 	$Debuglog->add( 'blog_baseuri: "'.$blog_baseuri.'"', 'params' );
 
-	// Remove trailer:
-	$blog_baseuri_regexp = preg_replace( '~(\.php[0-9]?)?/?$~', '', $blog_baseuri );
-	// Read possibilities in order to get a broad match:
-	$blog_baseuri_regexp = '~^'.preg_quote( $blog_baseuri_regexp, '~' ).'(\.php[0-9]?)?/(.+)$~';
-	// pre_dump( '', 'blog_baseuri_regexp: "', $blog_baseuri_regexp );
-
-	if( preg_match( $blog_baseuri_regexp, $ReqPath, $matches ) )
+	// Check if we have one of these:
+	// - Either the ReqPath starts with collection base URI (always including trailing slash)
+	// - Or the ReqPath contains a .php file (which will be the case when using any slug, including old slug aliases)
+	// ... followed by some extra path info.
+	if( preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) )
 	{ // We have extra path info
 		$path_string = $matches[2];
 
@@ -339,7 +339,6 @@ if( $resolve_extra_path )
  */
 param( 'p', 'integer', '', true );              // Specific post number to display
 param( 'title', 'string', '', true );						// urtitle of post to display
-param( 'redir', 'string', 'yes', false );				// Do we allow redirection to canonical URL? (allows to force a 'single post' URL for commenting)
 param( 'preview', 'integer', 0, true );         // Is this preview ?
 param( 'stats', 'integer', 0 );									// Deprecated but might still be used by spambots
 
@@ -373,7 +372,9 @@ if( !empty($p) || !empty($title) )
 		{ // We have found an Item object, but it doesn't belong to the current blog!
 			// Check if we want to redirect moved posts:
 			if( $Settings->get( 'redirect_moved_posts' ) )
-			{ // Redirect to the item current permanent url
+			{	// Set disp to 'redirect' in order to store this value in hitlog table:
+				$disp = 'redirect';
+				// Redirect to the item current permanent url:
 				header_redirect( $Item->get_permanent_url(), 301 );
 				// already exited
 			}
@@ -491,9 +492,10 @@ param( 'cat', 'string', NULL );
 param( 'tag', 'string', NULL );
 param( 'm', 'string', NULL );
 if( empty( $Item ) &&
+		$disp != 'compare' && // This disp uses a filter like cat=, tag=, orderby= etc. so we should not force it to disp=post
 		(
 			! is_null( $catsel ) || // Filter by many categories
-			( $disp != 'edit' && ! is_null( $cat ) ) || // Filter by one category
+			( $disp != 'edit' && $disp != 'anonpost' && ! is_null( $cat ) ) || // Filter by one category
 			! is_null( $tag ) || // Filter by tag
 			! empty( $m ) // Filter by date like '201410' (urls from ?disp=arcdir)
 	) )
@@ -533,7 +535,11 @@ elseif( ( $disp == 'visits' ) && ( ( $Settings->get( 'enable_visit_tracking' ) !
 elseif( $disp == '-' && !empty($Item) )
 { // We have not requested a specific disp but we have identified a specific post to be displayed
 	// We are going to display a single post
-	if( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
+	if( in_array( $Item->get_type_setting( 'usage' ), array( 'special', 'content-block' ) ) )
+	{	// Display 404 page for all "Content Blocks" and "Special" items intead of normal single page:
+		$disp = '404';
+	}
+	elseif( preg_match( '|[&?](download=\d+)|', $ReqURI ) )
 	{
 		$disp = 'download';
 
@@ -625,6 +631,10 @@ param( 'user_ID', 'integer', NULL );
 if( ( $disp == 'user' ) && isset( $user_ID ) && isset( $current_User ) && ( $user_ID != $current_User->ID ) && ( $Settings->get( 'enable_visit_tracking') == 1 ) )
 { // add or increment to user profile visit
 	add_user_profile_visit( $user_ID, $current_User->ID );
+}
+elseif( ( $disp == 'visits' ) && isset( $user_ID ) && isset( $current_User ) && ( $user_ID == $current_User->ID ) && ( $Settings->get( 'enable_visit_tracking') == 1 ) )
+{
+	reset_user_profile_view_ts( $user_ID );
 }
 
 
@@ -817,38 +827,53 @@ if( !empty( $skin ) )
 			$ads_current_skin_path = $skins_path.$skin.'/';
 
 			$disp_handlers = array(
-					'404'            => '404_not_found.main.php',
-					'activateinfo'   => 'activateinfo.main.php',
-					'arcdir'         => 'arcdir.main.php',
-					'catdir'         => 'catdir.main.php',
-					'comments'       => 'comments.main.php',
-					'feedback-popup' => 'feedback_popup.main.php',
-					'login'          => 'login.main.php',
-					'mediaidx'       => 'mediaidx.main.php',
-					'msgform'        => 'msgform.main.php',
-					'page'           => 'page.main.php',
-					'postidx'        => 'postidx.main.php',
-					'posts'          => 'posts.main.php',
-					'profile'        => 'profile.main.php',
-					'search'         => 'search.main.php',
-					'single'         => 'single.main.php',
-					'sitemap'        => 'sitemap.main.php',
-					'subs'           => 'subs.main.php',
-					'threads'        => 'threads.main.php',
-					'messages'       => 'messages.main.php',
-					'contacts'       => 'contacts.main.php',
-					'user'           => 'user.main.php',
-					'users'          => 'users.main.php',
-					'edit'           => 'edit.main.php',
-					'edit_comment'   => 'edit_comment.main.php',
-					'front'          => 'front.main.php',
-					'useritems'      => 'useritems.main.php',
-					'usercomments'   => 'usercomments.main.php',
-					'download'       => 'download.main.php',
+					'403'                   => '403_forbidden.main.php',
+					'404'                   => '404_not_found.main.php',
+					'access_denied'         => 'access_denied.main.php',
 					'access_requires_login' => 'access_requires_login.main.php',
-					'tags'           => 'tags.main.php',
-					'terms'          => 'terms.main.php',
-					'help'           => 'help.main.php',
+					'activateinfo'          => 'activateinfo.main.php',
+					'anonpost'              => 'anonpost.main.php',
+					'arcdir'                => 'arcdir.main.php',
+					'catdir'                => 'catdir.main.php',
+					'closeaccount'          => 'closeaccount.main.php',
+					'comments'              => 'comments.main.php',
+					'contacts'              => 'contacts.main.php',
+					'download'              => 'download.main.php',
+					'edit'                  => 'edit.main.php',
+					'edit_comment'          => 'edit_comment.main.php',
+					'feedback-popup'        => 'feedback_popup.main.php',
+					'flagged'               => 'flagged.main.php',
+					'front'                 => 'front.main.php',
+					'help'                  => 'help.main.php',
+					'login'                 => 'login.main.php',
+					'lostpassword'          => 'lostpassword.main.php',
+					'mediaidx'              => 'mediaidx.main.php',
+					'messages'              => 'messages.main.php',
+					'module_form'           => 'module_form.main.php',
+					'msgform'               => 'msgform.main.php',
+					'page'                  => 'page.main.php',
+					'postidx'               => 'postidx.main.php',
+					'posts'                 => 'posts.main.php',
+					'profile'               => 'profile.main.php',
+					'avatar'                => 'avatar.main.php',
+					'pwdchange'             => 'pwdchange.main.php',
+					'userprefs'             => 'userprefs.main.php',
+					'subs'                  => 'subs.main.php',
+					'visits'                => 'visits.main.php',
+					'register'              => 'register.main.php',
+					'register_finish'       => 'register_finish.main.php',
+					'search'                => 'search.main.php',
+					'single'                => 'single.main.php',
+					'sitemap'               => 'sitemap.main.php',
+					'tags'                  => 'tags.main.php',
+					'terms'                 => 'terms.main.php',
+					'threads'               => 'threads.main.php',
+					'contacts'              => 'contacts.main.php',
+					'user'                  => 'user.main.php',
+					'useritems'             => 'useritems.main.php',
+					'usercomments'          => 'usercomments.main.php',
+					'users'                 => 'users.main.php',
+					'compare'               => 'compare.main.php',
 					// All others will default to index.main.php
 				);
 

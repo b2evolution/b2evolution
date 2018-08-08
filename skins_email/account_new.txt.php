@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url;
+global $admin_url, $UserSettings;
 
 // Default params:
 $params = array_merge( array(
@@ -36,7 +36,7 @@ $params = array_merge( array(
 echo T_('A new user has registered on the site').":";
 echo "\n\n";
 
-echo T_('Login').": ".$params['login']."\n";
+echo /* TRANS: noun */ T_('Login').": ".$params['login']."\n";
 echo T_('Email').": ".$params['email']."\n";
 
 if( $params['fullname'] != '' )
@@ -54,7 +54,12 @@ if( $params['reg_country'] > 0 )
 
 if( ! empty( $params['reg_domain'] ) )
 {	// Domain field is entered:
-	echo T_('Registration Domain').": ".$params['reg_domain']."\n";
+	if( ! empty( $params['new_user_ID'] ) )
+	{
+		$user_ip_address = int2ip( $UserSettings->get( 'created_fromIPv4', $params['new_user_ID'] ) );
+	}
+	echo T_('Registration Domain').": ".$params['reg_domain'].
+			( ! empty( $user_ip_address ) ? ' '.$admin_url.'?ctrl=antispam&action=whois&query='.$user_ip_address : '' )."\n";
 }
 
 if( $params['country'] > 0 )
@@ -65,9 +70,13 @@ if( $params['country'] > 0 )
 	echo T_('Profile Country').": ".$user_Country->get_name()."\n";
 }
 
-if( !empty( $params['source'] ) )
-{ // Source is defined
-	echo T_('Registration Source').": ".$params['source']."\n";
+echo "\n";
+
+if( !empty ( $params['initial_hit'] ) )
+{ // Hit info
+	echo T_('Session ID').': '.$params['initial_hit']->hit_sess_ID.' - '.$admin_url.'?ctrl=stats&tab=hits&blog=0&sess_ID='.$params['initial_hit']->hit_sess_ID."\n";
+	echo T_('Initial referer').": ".$params['initial_hit']->hit_referer."\n";
+	echo T_('Initial page').": ".T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri."\n";
 }
 
 if( $params['gender'] == 'M' )
@@ -90,10 +99,9 @@ if( !empty( $params['trigger_url'] ) )
 	echo T_('Registration Trigger Page').": ".$params['trigger_url']."\n";
 }
 
-if( !empty ( $params['initial_hit'] ) )
-{ // Hit info
-	echo T_('Initial page').": ".T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri."\n";
-	echo T_('Initial referer').": ".$params['initial_hit']->hit_referer."\n";
+if( !empty( $params['source'] ) )
+{ // Source is defined
+	echo T_('Registration Source').": ".$params['source']."\n";
 }
 
 echo "\n";

@@ -45,6 +45,13 @@ div.dev-blocks--container {
 		background-color: #fdd;
 	}	
 }
+div.dev-blocks--subcontainer {
+	border-color: #f0f;	
+	> .dev-blocks-name {
+		color: #f0f;
+		background-color: #fef;
+	}	
+}
 div.dev-blocks--widget {
 	border-color: #00f;	
 	> .dev-blocks-name {
@@ -69,4 +76,230 @@ div.dev-blocks--widget--notincache {
 
 div.dev-blocks--belowtoolbar {
 	margin: 27px 0 -27px 0;
+}
+
+// Widget Designer Mode:
+// Styles for container(.evo_designer__container) and widget(.evo_designer__widget) designer blocks:
+.evo_designer {
+	position: absolute;
+	border: 3px solid #666;
+	border-radius: 4px;
+	> div {
+		position: relative;
+	}
+	.evo_designer__title {
+		position: absolute;
+		top: -19px;
+		left: -30px;
+		padding: 2px 7px;
+		border-radius: 4px 4px 3px 0;
+		background: #666;
+		color: #FFF;
+		font-size: 11px;
+		line-height: 1.42857143;
+		text-align: left;
+		white-space: nowrap;
+	}
+	.evo_designer__actions {
+		width: 30px;
+		position: absolute;
+		top: -3px;
+		left: -30px;
+		background: #666;
+		border-radius: 0 0 4px 4px;
+		border-top-right-radius: 0;
+		text-align: center;
+		.evo_designer__action {
+			color: #FFF !important;
+			padding: 1px 5px;
+			cursor: pointer;
+			font-size: 18px;
+			line-height: 1.42857143;
+		}
+	}
+	&.evo_designer__widget.evo_widget__outside {
+		.evo_designer__title, .evo_designer__actions {
+			left: -3px;
+		}
+	}
+
+	// Small different styles for container designer block:
+	&.evo_designer__container, &.evo_designer__subcontainer_active, &.evo_designer__subcontainer_inactive {
+		border-color: #DDD;
+		> div {
+			height: 100%;
+		}
+		.evo_designer__title {
+			top: auto;
+			left: auto;
+			bottom: -19px;
+			right: -30px;
+			border-radius: 4px 0 4px 3px;
+			background: #DDD;
+			color: #333;
+			text-align: right;
+		}
+		.evo_designer__actions {
+			top: auto;
+			left: auto;
+			bottom: 0;
+			right: -30px;
+			background: #DDD;
+			border-radius: 4px 4px 0 0;
+			.evo_designer__action {
+				color: #333 !important;
+			}
+		}
+	}
+
+	// Style with blur border for sub-container designer block:
+	&.evo_designer__subcontainer_active, &.evo_designer__subcontainer_inactive {
+		border-color: #00F;
+		.evo_designer__title, .evo_designer__actions {
+			background: #00F;
+			color: #FFF;
+			.evo_designer__action {
+				color: #FFF !important;
+			}
+		}
+	}
+	&.evo_designer__subcontainer_inactive {
+		border-color: #99F;
+		.evo_designer__title, .evo_designer__actions {
+			background: #99F;
+		}
+	}
+
+	// Color designer block on AJAX processing:
+	&.evo_designer__status_process {
+		border-color: #F60;
+		.evo_designer__title,
+		.evo_designer__actions {
+			background: #F60;
+		}
+	}
+	&.evo_designer__status_success {
+		border-color: #3C993D;
+		.evo_designer__title,
+		.evo_designer__actions {
+			background: #3C993D;
+		}
+	}
+	&.evo_designer__status_failed {
+		border-color: #E00;
+		.evo_designer__title,
+		.evo_designer__actions {
+			background: #E00;
+		}
+	}
+}
+// Set min sizes in order to manage empty containers/widgets:
+.evo_container[data-code], .evo_widget[data-id] {
+	min-width: 5px;
+	min-height: 5px;
+}
+// Set z-index for designer mode elements for proper work:
+.evo_container[data-code] {
+	z-index: 10000;
+}
+.evo_designer__container {
+	z-index: 10001;
+}
+.evo_widget[data-id] {
+	z-index: 10002;
+	// Set position to relative, otherwise z-index doesn't work properly and impossible to select
+	// other widget when designer container block is visible even if it has "z-index:10001"
+	position: relative;
+}
+.evo_designer__widget {
+	z-index: 10003;
+}
+.evo_designer__modal_backdrop.modal-backdrop {
+	z-index: 10004;
+}
+.evo_designer__modal_window.modal {
+	z-index: 10005;
+}
+
+// Skin Customizer Mode:
+.evo_customizer__html, .evo_customizer__html body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+}
+.evo_customizer__wrapper {
+	height: 100%;
+	padding-top: 27px;
+	box-sizing: border-box;
+	iframe {
+		width: 100%;
+		height: 100%;
+		border: none;
+		display: block; // to remove unwanted 5px space at the bottom
+	}
+	&.evo_customizer__collapsed {
+		.evo_customizer__left {
+			display: none;
+		}
+		.evo_customizer__right {
+			margin-left: 6px;
+		}
+	}
+}
+.evo_customizer__left {
+	float: left;
+	width: 320px;
+	height: 100%;
+	border-right: 1px solid #DDD;
+	box-sizing: border-box;
+}
+.evo_customizer__right {
+	margin-left: 326px;
+	height: 100%;
+	position: relative;
+}
+#evo_customizer__frontoffice_loader {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba( 0, 0, 0, 0.3 ) url(../img/ajax-loader/999.gif) no-repeat center;
+}
+#evo_customizer__form_loader {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;
+	width: 32px;
+	height: 32px;
+	background: url(../img/ajax-loader/999.gif) no-repeat center;
+}
+.evo_customizer__vtoggler {
+	position: absolute;
+	top: 0;
+	left: 320px;
+	height: 100%;
+	width: 6px;
+	background-color: #666;
+	cursor: w-resize;
+	.evo_customizer__collapsed & {
+		cursor: e-resize;
+		left: 0;
+	}
+	&.evo_customizer__vtoggler_resizing {
+		// Take full window place by vertical toggler to make resizing event properly:
+		width: 100%;
+		left: 0 !important;
+		background-color: transparent;
+	}
+	#evo_customizer__vtoggler_helper& {
+		background-color: rgba( 0, 0, 0, 0.2 );
+	}
+	.evo_customizer__collapsed #evo_customizer__vtoggler_helper2& {
+		left: 0;
+	}
 }

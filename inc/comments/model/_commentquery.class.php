@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -70,7 +70,7 @@ class CommentQuery extends SQL
 
 		$this->c = $c;
 		if( empty( $this->author ) )
-		{ // Change $this->author only if it is empty, because possible that it was set previously 
+		{ // Change $this->author only if it is empty, because possible that it was set previously
 			$this->author = $author;
 		}
 
@@ -167,8 +167,33 @@ class CommentQuery extends SQL
 
 
 	/**
+	 * Restrict to a specific comment date
+	 */
+	function where_comment_date( $timestamp_min, $timestamp_max )
+	{
+		global $time_difference, $DB;
+
+		if( empty( $timestamp_min ) && empty ( $timestamp_max ) )
+		{	// Don't restrict
+			return;
+		}
+
+		if( $timestamp_min )
+		{
+			$date_min = date( 'Y-m-d H:i:s', $timestamp_min + $time_difference );
+			$this->WHERE_and( $this->dbprefix.'date >= '.$DB->quote( $date_min ) );
+		}
+		if( $timestamp_max )
+		{
+			$date_max = date( 'Y-m-d H:i:s', $timestamp_max + $time_difference );
+			$this->WHERE_and( $this->dbprefix.'date <= '.$DB->quote( $date_max ) );
+		}
+	}
+
+
+	/**
 	 * Restrict to a specific post comments by post_datestart
-	 * 
+	 *
 	 * @param timestamp min - Do not show comments from posts before this timestamp
 	 * @param timestamp max - Do not show comments from posts after this timestamp
 	 */
@@ -522,7 +547,7 @@ class CommentQuery extends SQL
 	/**
 	 * Restrict to show or hide active/expired comments ( ecpired comments are older then the post expiry delay value )
 	 * By default only active comments will be allowed
-	 * 
+	 *
 	 * @param array expiry statuses to show
 	 */
 	function expiry_restrict( $expiry_statuses )
@@ -547,7 +572,7 @@ class CommentQuery extends SQL
 
 	/**
 	 * Restrict to show only those comments where user has some specific permission
-	 * 
+	 *
 	 * @param string the required permission to check
 	 * @param integer the blog ID
 	 */
@@ -578,12 +603,12 @@ class CommentQuery extends SQL
 		}
 
 		if( ! $Blog->get( 'advanced_perms' ) )
-		{ // Blog advanced perm settings is not enabled, user has no permission to edit/moderate comments 
+		{ // Blog advanced perm settings is not enabled, user has no permission to edit/moderate comments
 			$this->WHERE_and( 'FALSE' );
 			return;
 		}
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get comment edit permissions for current User' );
 		$SQL->SELECT( 'IF( IFNULL( bloguser_perm_edit_cmt + 0, 0 ) > IFNULL( bloggroup_perm_edit_cmt + 0, 0 ), bloguser_perm_edit_cmt, bloggroup_perm_edit_cmt ) as perm_edit_cmt' );
 		$SQL->FROM( 'T_blogs' );
 		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON bloguser_blog_ID = blog_ID AND bloguser_user_ID = '.$current_User->ID );
@@ -592,7 +617,7 @@ class CommentQuery extends SQL
 			      OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) )' );
 		$SQL->WHERE( 'blog_ID = '.$blog_ID );
 
-		$perm_edit_cmt = $DB->get_var( $SQL->get() );
+		$perm_edit_cmt = $DB->get_var( $SQL );
 		$user_level = $current_User->level;
 		$condition = '';
 

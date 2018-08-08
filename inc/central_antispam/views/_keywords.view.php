@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -65,7 +65,8 @@ $Results = new Results( $SQL->get(), 'cakw_', '---D', $UserSettings->get( 'resul
 
 $Results->title = T_('Keywords');
 
-$Results->global_icon( T_('Import from local antispam list...'), 'new', regenerate_url( 'action', 'action=import' ), T_('Import from local antispam list...'), 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+$Results->global_icon( T_('Add keyword'), 'new', regenerate_url( 'action', 'action=keyword_new' ), T_('Add keyword'), 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+$Results->global_icon( T_('Import from local antispam list...'), 'new', regenerate_url( 'action', 'action=import' ), T_('Import from local antispam list...'), 3, 4, array( 'class' => 'action_icon btn-default' ) );
 
 
 /**
@@ -104,7 +105,7 @@ $Results->cols[] = array(
 		'th' => T_('Status'),
 		'order' => 'cakw_status',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'cakeyword_status_edit',
+		'td_class' => 'jeditable_cell cakeyword_status_edit',
 		'td' =>  /* Check permission: */$current_User->check_perm( 'centralantispam', 'edit' ) ?
 			/* Current user can edit keyword */'<a href="#" rel="$cakw_status$" style="color:#FFF">%ca_get_keyword_status_title( #cakw_status# )%</a>' :
 			/* No edit, only view the status */'%ca_get_keyword_status_title( #cakw_status# )%',
@@ -116,7 +117,7 @@ $Results->cols[] = array(
 		'th_class' => 'shrinkwrap',
 		'order' => 'cakw_statuschange_ts',
 		'default_dir' => 'D',
-		'td_class' => 'timestamp compact_data',
+		'td_class' => 'timestamp',
 		'td' => '%mysql2localedatetime_spans( #cakw_statuschange_ts# )%',
 	);
 
@@ -165,7 +166,7 @@ $Results->cols[] = array(
 		'th_class' => 'shrinkwrap',
 		'order' => 'cakw_lastreport_ts',
 		'default_dir' => 'D',
-		'td_class' => 'timestamp compact_data',
+		'td_class' => 'timestamp',
 		'td' => '%mysql2localedatetime_spans( #cakw_lastreport_ts# )%',
 	);
 

@@ -21,7 +21,7 @@ class bootstrap_manual_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.0';
+	var $version = '7.0.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -43,7 +43,7 @@ class bootstrap_manual_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -99,6 +99,42 @@ class bootstrap_manual_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		// Note: second param below is the ORDER
+		return array(
+				'page_top'                  => array( NT_('Page Top'), 2 ),
+				'header'                    => array( NT_('Header'), 10 ),
+				'menu'                      => array( NT_('Menu'), 15 ),
+				'front_page_main_area'      => array( NT_('Front Page Main Area'), 40 ),
+				'front_page_secondary_area' => array( NT_('Front Page Secondary Area'), 45 ),
+				'item_single_header'        => array( NT_('Item Single Header'), 50 ),
+				'item_single'               => array( NT_('Item Single'), 51 ),
+				'item_page'                 => array( NT_('Item Page'), 55 ),
+				'contact_page_main_area'    => array( NT_('Contact Page Main Area'), 60 ),
+				'sidebar'                   => array( NT_('Sidebar'), 80 ),
+				'sidebar_2'                 => array( NT_('Sidebar 2'), 90 ),
+				'footer'                    => array( NT_('Footer'), 100 ),
+				'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
+				'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
+				'404_page'                  => array( NT_('404 Page'), 130 ),
+				'login_required'            => array( NT_('Login Required'), 140 ),
+				'access_denied'             => array( NT_('Access Denied'), 150 ),
+				'help'                      => array( NT_('Help'), 160 ),
+				'register'                  => array( NT_('Register'), 170 ),
+				'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
+			);
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -113,7 +149,8 @@ class bootstrap_manual_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -348,15 +385,6 @@ class bootstrap_manual_Skin extends Skin
 					'display_reg_link'      => true,
 					'abort_link_position'   => 'form_title',
 					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-					// Register
-					'register_page_before'      => '<div class="evo_panel__register">',
-					'register_page_after'       => '</div>',
-					'register_form_title'       => T_('Register'),
-					'register_links_attrs'      => '',
-					'register_use_placeholders' => true,
-					'register_field_width'      => 252,
-					'register_disabled_page_before' => '<div class="evo_panel__register register-disabled">',
-					'register_disabled_page_after'  => '</div>',
 					// Activate form
 					'activate_form_title'  => T_('Account activation'),
 					'activate_page_before' => '<div class="evo_panel__activation">',
@@ -375,7 +403,7 @@ class bootstrap_manual_Skin extends Skin
 					'featured_intro_before' => '<div class="jumbotron">',
 					'featured_intro_after'  => '</div>',
 					// Form "Sending a message"
-					'msgform_form_title' => T_('Sending a message'),
+					'msgform_form_title' => T_('Contact'),
 				);
 
 			default:
@@ -396,34 +424,11 @@ class bootstrap_manual_Skin extends Skin
 
 		if( in_array( $disp, array( 'access_requires_login', 'access_denied' ) ) )
 		{ // Display left navigation column on this page when at least one sidebar container is visible:
-			return $this->is_visible_container( 'sidebar' ) || $this->is_visible_container( 'sidebar2' );
+			return $this->show_container_when_access_denied( 'sidebar' ) || $this->show_container_when_access_denied( 'sidebar2' );
 		}
 
 		// Display left navigation column only on these pages:
 		return in_array( $disp, array( 'front', 'posts', 'flagged', 'single', 'search', 'edit', 'edit_comment', 'catdir', 'search', '404' ) );
 	}
-
-
-	/**
-	 * Check if we can display a widget container
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function is_visible_container( $container_key )
-	{
-		global $Collection, $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
-	}
 }
-
 ?>

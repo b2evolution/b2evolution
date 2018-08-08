@@ -4,12 +4,17 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author fplanque: Francois PLANQUE.
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
+// Check permission:
+$current_User->check_perm( 'admin', 'normal', true );
+$current_User->check_perm( 'options', 'edit', true );
 
 load_funcs( 'tools/model/_phpbb.funcs.php' );
 
@@ -61,7 +66,7 @@ switch( $action )
 		param_check_not_empty( 'db_name', T_('Please enter a database name!') );
 		param_check_not_empty( 'db_user', T_('Please enter a username!') );
 		param_check_not_empty( 'db_pass', T_('Please enter a password!') );
-		param_check_not_empty( 'forum_blog_ID', T_('Please select a blog!') );
+		param_check_not_empty( 'forum_blog_ID', T_('Please select a collection!') );
 
 		if( param_errors_detected() )
 		{

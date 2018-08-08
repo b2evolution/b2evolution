@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -22,7 +22,7 @@ class quicktags_plugin extends Plugin
 	var $code = 'b2evQTag';
 	var $name = 'Quick Tags';
 	var $priority = 30;
-	var $version = '6.7.9';
+	var $version = '7.0.0';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -93,6 +93,11 @@ class quicktags_plugin extends Plugin
 			return false;
 		}
 
+		global $current_User;
+
+		// Allow html tags like <pre>, <img> and <a> only when current user has a permission for this:
+		$params['allow_restricted_html'] = ( is_logged_in() && $current_User->check_perm( 'blog_comments', 'edit', false, $item_Blog->ID ) );
+
 		return $this->DisplayCodeToolbar( $params );
 	}
 
@@ -114,6 +119,7 @@ class quicktags_plugin extends Plugin
 
 		$params = array_merge( array(
 				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+				'allow_restricted_html' => true, // Set false if html tags like <pre>, <img> and <a> must be hidden for current case
 			), $params );
 
 		$simple = ( isset( $params['edit_layout'] ) && $params['edit_layout'] == 'inskin' );
@@ -219,6 +225,10 @@ class quicktags_plugin extends Plugin
 				,'<?php echo TS_('BLOCKQUOTE [Alt-B]') ?>'
 			);
 
+		<?php
+		if( $params['allow_restricted_html'] )
+		{	// Allow <pre> html tag:
+		?>
 		<?php echo $params['js_prefix']; ?>b2evoButtons[<?php echo $params['js_prefix']; ?>b2evoButtons.length] = new <?php echo $params['js_prefix']; ?>b2evoButton(
 				'<?php echo $params['js_prefix']; ?>b2evo_pre'
 				,'pre', ''
@@ -226,6 +236,9 @@ class quicktags_plugin extends Plugin
 				,'r'
 				,'<?php echo TS_('PREformatted text [Alt-R]') ?>'
 			);
+		<?php
+		}
+		?>
 
 		<?php echo $params['js_prefix']; ?>b2evoButtons[<?php echo $params['js_prefix']; ?>b2evoButtons.length] = new <?php echo $params['js_prefix']; ?>b2evoButton(
 				'<?php echo $params['js_prefix']; ?>b2evo_ul'
@@ -253,8 +266,10 @@ class quicktags_plugin extends Plugin
 
 		<?php
 	}
-	?>
 
+	if( $params['allow_restricted_html'] )
+	{	// Allow <img> and <a> html tags:
+	?>
 		<?php echo $params['js_prefix']; ?>b2evoButtons[<?php echo $params['js_prefix']; ?>b2evoButtons.length] = new <?php echo $params['js_prefix']; ?>b2evoButton(
 				'<?php echo $params['js_prefix']; ?>b2evo_img'
 				,'<?php echo ($simple ? 'image' : 'img') ?>', ''
@@ -271,6 +286,9 @@ class quicktags_plugin extends Plugin
 				,'a'
 				,'<?php echo TS_('A href [Alt-A]') ?>'
 			); // special case
+	<?php
+	}
+	?>
 
 		function <?php echo $params['js_prefix']; ?>b2evoGetButton(button, i)
 		{
@@ -349,19 +367,19 @@ class quicktags_plugin extends Plugin
 
 		function <?php echo $params['js_prefix']; ?>b2evoToolbar( title )
 		{
-			var r = '<?php echo $this->get_template( 'toolbar_title_before' ); ?>' + title + '<?php echo $this->get_template( 'toolbar_title_after' ); ?>'
-				+ '<?php echo $this->get_template( 'toolbar_group_before' ); ?>';
+			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
+				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>';
 			for (var i = 0; i < <?php echo $params['js_prefix']; ?>b2evoButtons.length; i++)
 			{
 				r += <?php echo $params['js_prefix']; ?>b2evoGetButton( <?php echo $params['js_prefix']; ?>b2evoButtons[i], i );
 				if( <?php echo $params['js_prefix']; ?>b2evoButtons[i].grp_pos == 'last' && i > 0 && i < <?php echo $params['js_prefix']; ?>b2evoButtons.length - 1 )
 				{ // Separator between groups
-					r += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>';
+					r += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ) ); ?>';
 				}
 			}
-			r += '<?php echo $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ); ?>'
+			r += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ) ); ?>'
 				+ '<input type="button" id="b2evo_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $params['js_prefix']; ?>b2evoCloseAllTags" title="<?php echo format_to_output( T_('Close all tags'), 'htmlattr' ); ?>" value="<?php echo ($simple ? 'close all tags' : 'X') ?>" />'
-				+ '<?php echo $this->get_template( 'toolbar_group_after' ); ?>';
+				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
 
 			jQuery( '.<?php echo $params['js_prefix'].$this->code ?>_toolbar' ).html( r );
 		}
@@ -457,7 +475,7 @@ class quicktags_plugin extends Plugin
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript"><?php echo $params['js_prefix']; ?>b2evoToolbar( '<?php echo 'HTML: '; ?>' );</script><?php
+		?><script type="text/javascript"><?php echo $params['js_prefix']; ?>b2evoToolbar( 'HTML: ' );</script><?php
 
 		return true;
 	}

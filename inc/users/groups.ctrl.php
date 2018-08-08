@@ -85,7 +85,7 @@ if( $grp_ID !== NULL )
 			$Messages->add( T_('You have no permission to edit groups!'), 'error' );
 			$action = 'view';
 		}
-		elseif( $demo_mode && ( $edited_Group->ID <= 4 ) && ( $edited_Group->ID > 0 ) )
+		elseif( $demo_mode && ( $edited_Group->ID <= 7 ) )
 		{ // Demo mode restrictions: groups created by install process cannot be edited
 			$Messages->add( T_('You cannot edit the default groups in demo mode!'), 'error' );
 			$action = 'view';
@@ -158,9 +158,46 @@ switch ( $action )
 		// Commit changes in cache:
 		$GroupCache->add( $edited_Group );
 
-		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( '?ctrl=groups', 303 ); // Will EXIT
-		// We have EXITed already at this point!!
+		// Update plugin group settings:
+		load_funcs( 'plugins/_plugin.funcs.php' );
+
+		$any_plugin_settings_updated = false;
+		$Plugins->restart();
+		while( $loop_Plugin = & $Plugins->get_next() )
+		{
+			$tmp_params = array( 'for_editing' => true );
+			$plugin_group_settings = $loop_Plugin->GetDefaultGroupSettings( $tmp_params );
+			if( empty( $plugin_group_settings ) )
+			{	// Skip plugin without group settings:
+				continue;
+			}
+
+			// Loop through settings for this plugin:
+			foreach( $plugin_group_settings as $set_name => $set_meta )
+			{
+				autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'GroupSettings', $edited_Group );
+			}
+
+			if( $loop_Plugin->GroupSettings->dbupdate() )
+			{
+				$any_plugin_settings_updated = true;
+			}
+		}
+
+		if( $any_plugin_settings_updated )
+		{
+			$Messages->add( T_('Plugin group settings have been updated.'), 'success' );
+		}
+
+		if( param_errors_detected() )
+		{
+			$action = 'edit';
+		}
+		else
+		{	// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=groups', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
 		break;
 
 
@@ -179,7 +216,7 @@ switch ( $action )
 
 		// Update group permissions for each colleciton:
 		blog_update_perms( $edited_Group->ID, 'coll' );
-		$Messages->add( T_('The blog permissions have been updated'), 'success' );
+		$Messages->add( T_('The collection permissions have been updated.'), 'success' );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $admin_url.'?ctrl=groups&action=edit&tab=collection&grp_ID='.$edited_Group->ID, 303 ); // Will EXIT

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -25,6 +25,8 @@ load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectLis
  */
 class coll_media_index_Widget extends ComponentWidget
 {
+	var $icon = 'file-photo-o';
+
 	/**
 	 * Constructor
 	 */
@@ -224,8 +226,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 		$BlogCache = & get_BlogCache();
 		if( ! $BlogCache->get_by_ID( $blog_ID, false, false ) )
-		{ // No blog exists
-			return;
+		{	// No collection exists
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there are no filters.' );
+			return false;
 		}
 
 		// Display photos:
@@ -327,8 +330,11 @@ class coll_media_index_Widget extends ComponentWidget
 			$r .= $this->get_layout_item_end( $count );
 		}
 
-		// Exit if no files found
-		if( empty($r) ) return;
+		if( empty( $r ) )
+		{	// Exit if no files found:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no image matching the current filters.' );
+			return false;
+		}
 
 		echo $this->disp_params['block_start'];
 

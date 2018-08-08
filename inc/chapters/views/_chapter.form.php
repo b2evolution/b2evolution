@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -31,7 +31,7 @@ $creating = is_create_action( $action );
 $Form = new Form( NULL, 'form_checkchanges' );
 
 $close_url = get_chapter_redirect_url( get_param( 'redirect_page' ), $edited_Chapter->parent_ID, $edited_Chapter->ID );
-$Form->global_icon( T_('Cancel editing!'), 'close', $close_url );
+$Form->global_icon( T_('Cancel editing').'!', 'close', $close_url );
 
 $Form->begin_form( 'fform', $creating ?  T_('New category') : T_('Category') );
 
@@ -57,8 +57,11 @@ $Form->begin_fieldset( T_('Properties').get_manual_link( 'categories-tab' ) );
 
 	$Form->text_input( 'cat_urlname', $edited_Chapter->urlname, 40, T_('URL "slug"'), T_('Used for clean URLs. Must be unique.'), array( 'maxlength' => 255 ) );
 
-	$field_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select category image'), 'size_name' => 'fit-320x320' );
-	$Form->fileselect( 'cat_image_file_ID', $edited_Chapter->get( 'image_file_ID' ), T_('Category image'), NULL, $field_params );
+	$cat_image_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select category image'), 'size_name' => 'fit-320x320' );
+	$Form->fileselect( 'cat_image_file_ID', $edited_Chapter->get( 'image_file_ID' ), T_('Category image'), NULL, $cat_image_params );
+
+	$social_media_image_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select social media boilerplate image'), 'size_name' => 'fit-320x320' );
+	$Form->fileselect( 'cat_social_media_image_file_ID', $edited_Chapter->get( 'social_media_image_file_ID' ), T_('Social media boilerplate'), NULL, $social_media_image_params );
 
 	$Form->text_input( 'cat_description', $edited_Chapter->description, 40, T_('Description'), T_('May be used as a title tag and/or meta description.'), array( 'maxlength' => 255 ) );
 

@@ -229,12 +229,13 @@ switch( $action )
 
 		$accepted = param( 'accepted', 'string', '1' );
 		$role = param( 'role', 'string', '' );
+		$priority = param( 'priority', 'integer', NULL );
 		$edit_mode = param( 'edit_mode', 'boolean' );
 
 		if( ! param_errors_detected() )
 		{	// Link user only when request has no errors:
-			$result = $DB->query( 'REPLACE INTO T_users__user_org ( uorg_user_ID, uorg_org_ID, uorg_accepted, uorg_role )
-				VALUES ( '.$login_User->ID.', '.$edited_Organization->ID.', '.$accepted.', '.$DB->quote( $role ).' ) ' );
+			$result = $DB->query( 'REPLACE INTO T_users__user_org ( uorg_user_ID, uorg_org_ID, uorg_accepted, uorg_role, uorg_priority )
+				VALUES ( '.$login_User->ID.', '.$edited_Organization->ID.', '.$accepted.', '.$DB->quote( $role ).', '.$DB->quote( $priority ).' ) ' );
 			if( $result )
 			{	// Display a message after successful linking:
 				if( $edit_mode )
@@ -279,7 +280,7 @@ switch( $action )
 			$result = $DB->query( 'DELETE FROM T_users__user_org WHERE uorg_user_ID = '.$login_User->ID.' AND uorg_org_ID = '.$edited_Organization->ID );
 			if( $result )
 			{	// Display a message after successful linking:
-				$Messages->add( sprintf( T_('%s removed removed from the organization.'), $login_User->get( 'preferredname') ), 'success');
+				$Messages->add( sprintf( T_('%s has been removed from the organization.'), $login_User->get( 'preferredname') ), 'success');
 			}
 		}
 
@@ -296,16 +297,28 @@ if( $display_mode != 'js')
 	$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
 	$AdminUI->breadcrumbpath_add( T_('Organizations'), '?ctrl=organizations' );
 
+	if( $action == 'edit' )
+	{	// Load jQuery QueryBuilder plugin files for user list filters:
+		init_querybuilder_js( 'rsc_url' );
+	}
+
 	if( $action == 'new' || $action == 'edit' || $action == 'add_user' )
 	{
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'organization-form' );
 		// Init JS to autcomplete the user logins:
 		init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+		// Initialize user tag input
+		init_tokeninput_js();
 	}
 	else
 	{	// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'organizations' );
+	}
+
+	if( in_array( $action, array( 'edit' ) ) )
+	{ // Initialize date picker
+		init_datepicker_js();
 	}
 
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

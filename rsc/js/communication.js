@@ -77,7 +77,14 @@ function SendServerRequest( url )
 		type: 'POST',
 		url: url,
 		data: data,
-		dataType: 'script'
+		dataType: 'script',
+		success: function()
+		{
+			if( data.indexOf( 'ctrl=widgets' ) > -1 && typeof( window.top.evo_customizer_reload_frontoffice ) === 'function' )
+			{	// Reload iframe with front-office content if widget has been updated from customizer mode:
+				window.top.evo_customizer_reload_frontoffice();
+			}
+		}
 	} );
 }
 

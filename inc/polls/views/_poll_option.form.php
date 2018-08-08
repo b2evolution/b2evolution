@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -23,7 +23,7 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'poll_option_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', url_add_param( regenerate_url( 'action,popt_ID,blog' ), 'action=edit' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', url_add_param( regenerate_url( 'action,popt_ID,blog' ), 'action=edit' ) );
 
 $Form->begin_form( 'fform', sprintf( ( $creating ?  T_('New poll option for question "%s"') : T_('Poll option for question "%s"') ), $edited_Poll->get_name() )
 		.get_manual_link( 'poll-option-form' ) );

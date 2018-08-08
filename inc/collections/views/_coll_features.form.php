@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  *
@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $edited_Blog, $AdminUI, $Settings;
+global $edited_Blog, $AdminUI, $Settings, $admin_url;
 $notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 $Form = new Form( NULL, 'coll_features_checkchanges' );
@@ -31,11 +31,35 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'features' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
+
 $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
-	$Form->select_input_array( 'orderby', $edited_Blog->get_setting('orderby'), get_available_sort_options(), T_('Order by'), T_('Default ordering of posts.') );
-	$Form->select_input_array( 'orderdir', $edited_Blog->get_setting('orderdir'), array(
-												'ASC'  => T_('Ascending'),
-												'DESC' => T_('Descending'), ), T_('Direction') );
+
+	// Display the 3 orderby fields with order direction
+	for( $order_index = 0; $order_index <= 2 /* The number of orderby fields - 1 */; $order_index++ )
+	{ // The order fields:
+		$field_suffix = ( $order_index == 0 ? '' : '_'.$order_index );
+
+		// Direction
+		$Form->output = false;
+		$Form->switch_layout( 'none' );
+		$field_params = array();
+		if( ( $order_index == 2 ) && ! $edited_Blog->get_setting( 'orderdir_1' ) )
+		{ // The third orderby field should be disable if the second was not set yet
+			$field_params['disabled'] = 'disabled';
+		}
+		$orderdir_select = $Form->select_input_array( 'orderdir'.$field_suffix, $edited_Blog->get_setting( 'orderdir'.$field_suffix ), array(
+													'ASC' => T_('Ascending'),
+													'DESC' => T_('Descending'), ), '', '', $field_params );
+		$Form->switch_layout( NULL );
+		$Form->output = true;
+
+		// Set order direction as field suffix
+		$field_params['field_suffix'] = $orderdir_select;
+		// Get orderby options and create the select list
+		$orderby_options = get_post_orderby_options( $edited_Blog->ID, $edited_Blog->get_setting( 'orderby'.$field_suffix ), $order_index > 0 );
+		$Form->select_input_options( 'orderby'.$field_suffix, $orderby_options, ( $order_index == 0 ? T_('Order by') : '' ), '', $field_params );
+	}
+
 	$Form->begin_line( T_('Display') );
 		$Form->text( 'posts_per_page', $edited_Blog->get_setting('posts_per_page'), 4, '', '', 4 );
 		$Form->radio( 'what_to_show', $edited_Blog->get_setting('what_to_show'),
@@ -153,6 +177,8 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' ) );
 
+	$Form->checkbox( 'post_anonymous', $edited_Blog->get_setting( 'post_anonymous' ), T_('New posts by anonymous users'), T_('Check to allow anonymous users to create new posts (useful for Forums). NOTE: a user account will be automatically created when they post.') );
+
 	// Get max allowed visibility status:
 	$max_allowed_status = get_highest_publish_status( 'comment', $edited_Blog->ID, false );
 
@@ -172,13 +198,22 @@ $Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' 
 				'title_format'     => 'notes-string',
 				'exclude_statuses' => $exclude_statuses,
 			) );
-		$Form->info( T_('Default status'), $default_status_field, T_('Default status for new posts') );
+		$Form->info( T_('Default status for new posts in backoffice'), $default_status_field, T_('Typically Draft if you want to make sure you don\'t publish by mistake.') );
 		$Form->hidden( 'default_post_status', $edited_Blog->get_setting('default_post_status') );
+		$default_status_field_anon = get_status_dropdown_button( array(
+				'name'             => 'default_post_status_anon',
+				'value'            => $edited_Blog->get_setting( 'default_post_status_anon' ),
+				'title_format'     => 'notes-string',
+				'exclude_statuses' => $exclude_statuses,
+			) );
+		$Form->info( T_('Default status for new anonymous posts'), $default_status_field_anon, T_('Typically Review if you want to prevent Spam.') );
+		$Form->hidden( 'default_post_status_anon', $edited_Blog->get_setting( 'default_post_status_anon' ) );
 		echo_form_dropdown_js();
 	}
 	else
 	{	// Use standard select element for other skins:
-		$Form->select_input_array( 'default_post_status', $edited_Blog->get_setting('default_post_status'), get_visibility_statuses( 'notes-string', $exclude_statuses ), T_('Default status'), T_('Default status for new posts') );
+		$Form->select_input_array( 'default_post_status', $edited_Blog->get_setting( 'default_post_status' ), get_visibility_statuses( 'notes-string', $exclude_statuses ), T_('Default status for new posts in backoffice'), T_('Typically Draft if you want to make sure you don\'t publish by mistake.') );
+		$Form->select_input_array( 'default_post_status_anon', $edited_Blog->get_setting( 'default_post_status_anon' ), get_visibility_statuses( 'notes-string', $exclude_statuses ), T_('Default status for new anonymous posts'), T_('Typically Review if you want to prevent Spam.') );
 	}
 
 	// Moderation statuses setting:
@@ -218,7 +253,7 @@ $Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' 
 	}
 	$Form->checklist( $checklist_options, 'post_moderation_statuses', T_('"Require moderation" statuses'), false, false, array( 'note' => T_('Posts with the selected statuses will be considered to require moderation. They will trigger "moderation required" notifications and will appear as such on the collection dashboard.') ) );
 
-	$Form->text_input( 'old_content_alert', $edited_Blog->get_setting( 'old_content_alert' ), 2, T_('Old content alert'), T_('Posts that have not been updated within the set delay will be reported to content moderators. Leave empty if you don\'t want such alerts.'), array( 'input_suffix' => ' '.T_('months').'.' ) );
+	$Form->text_input( 'old_content_alert', $edited_Blog->get_setting( 'old_content_alert' ), 2, T_('Stale content alert'), T_('Posts that have not been updated within the set delay will be reported to content moderators. Leave empty if you don\'t want such alerts.'), array( 'input_suffix' => ' '.T_('months').'.' ) );
 
 $Form->end_fieldset();
 
@@ -255,12 +290,39 @@ $Form->end_fieldset();
 if( $notifications_mode != 'off' )
 {
 	$Form->begin_fieldset( T_('Subscriptions').get_manual_link( 'item-subscriptions' ) );
-		$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post.') );
-		$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
+		$Form->checklist( array(
+				array( 'allow_subscriptions', 1, T_('Allow users to subscribe and receive email notifications for each new post.'), $edited_Blog->get_setting( 'allow_subscriptions' ) ),
+				array( 'allow_item_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ), $edited_Blog->get_setting( 'allow_item_subscriptions' ) ),
+				array( 'allow_item_mod_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications when post is modified and user has a permissions to moderate it.' ), $edited_Blog->get_setting( 'allow_item_mod_subscriptions' ) ),
+			), 'allow_coll_subscriptions', T_('Email subscriptions') );
 	$Form->end_fieldset();
 }
 
+$Form->begin_fieldset( T_('Aggregation').get_admin_badge().get_manual_link('collection_aggregation_settings') );
+	$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Collections to aggregate'), T_('List collection IDs separated by \',\', \'*\' for all collections or leave empty for current collection.').'<br />'.T_('Note: Current collection is always part of the aggregation.'), 255 );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Workflow').get_manual_link( 'coll-workflow-settings' ) );
+
+	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
+
+	$Form->checkbox( 'blog_use_deadline', $edited_Blog->get_setting( 'use_deadline' ), T_('Options'), T_('Use deadline.'), '', 1, ! $edited_Blog->get_setting( 'use_workflow' ) );
+
+$Form->end_fieldset();
+
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+
+
+echo '<div class="well">';
+echo '<p>'.sprintf( T_('You can find more settings in the <a %s>Post Types</a>, including:'), 'href="'.$admin_url.'?blog='.$edited_Blog->ID.'&amp;ctrl=itemtypes&amp;ityp_ID='.$edited_Blog->get_setting( 'default_post_type' ).'&amp;action=edit"' ).'</p>';
+echo '<ul>';
+echo '<li>'.T_('Display instructions').'</li>';
+echo '<li>'.T_('Use title').', '.T_('Use text').', '.T_('Allow HTML').'...</li>';
+echo '<li>'.T_('Use of Advanced Properties').' ('.T_('Tags').', '.T_('Excerpt').'...)</li>';
+echo '<li>'.T_('Use of Location').'</li>';
+echo '<li>'.T_('Use of Custom Fields').'</li>';
+echo '</ul>';
+echo '</div>';
 
 ?>
 <script type="text/javascript">
@@ -288,5 +350,53 @@ jQuery( '#voting_positive' ).click( function()
 	{
 		jQuery( '#voting_neutral, #voting_negative' ).attr( 'disabled', 'disabled' ).removeAttr( 'checked' );
 	}
+} );
+
+// JS for order fields:
+jQuery( document ).ready( function()
+{
+	disable_selected_orderby_options();
+} );
+
+jQuery( 'select[id^=orderby]' ).change( function()
+{
+	if( jQuery( this ).attr( 'id' ) == 'orderby_1' )
+	{ // First additional order field was changed
+		if( jQuery( this ).val() == '' )
+		{ // If 'None' is selected - Disable second additional order field
+			jQuery( '#orderby_2, #orderdir_2' ).attr( 'disabled', 'disabled' ).val( '' );
+		}
+		else
+		{ // Enable second if first is selected
+			jQuery( '#orderby_2, #orderdir_2' ).removeAttr( 'disabled' );
+		}
+	}
+
+	// Redisable options after some order field was changed
+	jQuery( 'select[id^=orderby] option' ).removeAttr( 'disabled' );
+	disable_selected_orderby_options();
+} );
+
+/**
+ * Disable the selected option in two other 'orderby' <select>s
+ */
+function disable_selected_orderby_options()
+{
+	jQuery( 'select[id^=orderby]' ).each( function()
+	{
+		var selected = jQuery( this ).val();
+		if( selected != '' )
+		{
+			jQuery( 'select[id^=orderby][id!="' + jQuery( this ).attr( 'id' ) + '"]' ).each( function()
+			{
+				jQuery( this ).find( 'option[value="' + selected + '"]' ).attr( 'disabled', 'disabled' );
+			} );
+		}
+	} );
+}
+
+jQuery( 'input[name=blog_use_workflow]' ).click( function()
+{	// Disable setting "Use deadline" when setting "Use workflow" is unchecked:
+	jQuery( 'input[name=blog_use_deadline]' ).prop( 'disabled', ! jQuery( this ).is( ':checked' ) );
 } );
 </script>

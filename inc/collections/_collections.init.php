@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -20,12 +20,12 @@ $default_ctrl = 'dashboard';
 /**
  * Minimum PHP version required for collections module to function properly
  */
-$required_php_version[ 'collections' ] = '5.2';
+$required_php_version[ 'collections' ] = '5.4';
 
 /**
  * Minimum MYSQL version required for collections module to function properly
  */
-$required_mysql_version[ 'collections' ] = '5.0.3';
+$required_mysql_version[ 'collections' ] = '5.1';
 
 /**
  * Aliases for table names:
@@ -36,6 +36,7 @@ $required_mysql_version[ 'collections' ] = '5.0.3';
  */
 $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_blogs'                    => $tableprefix.'blogs',
+		'T_coll_url_aliases'         => $tableprefix.'coll_url_aliases',
 		'T_categories'               => $tableprefix.'categories',
 		'T_coll_group_perms'         => $tableprefix.'bloggroups',
 		'T_coll_user_perms'          => $tableprefix.'blogusers',
@@ -62,10 +63,10 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_links'                    => $tableprefix.'links',
 		'T_links__vote'              => $tableprefix.'links__vote',
 		'T_postcats'                 => $tableprefix.'postcats',
-		'T_skins__container'         => $tableprefix.'skins__container',
 		'T_skins__skin'              => $tableprefix.'skins__skin',
 		'T_subscriptions'            => $tableprefix.'subscriptions',
-		'T_widget'                   => $tableprefix.'widget',
+		'T_widget__container'        => $tableprefix.'widget__container',
+		'T_widget__widget'           => $tableprefix.'widget__widget',
 		'T_temporary_ID'             => $tableprefix.'temporary_ID',
 	) );
 
@@ -398,6 +399,26 @@ function & get_WidgetCache()
 	return $WidgetCache;
 }
 
+
+/**
+ * Get the WidgetContainerCache
+ *
+ * @return WidgetContainerCache
+ */
+function & get_WidgetContainerCache()
+{
+	global $WidgetContainerCache;
+
+	if( ! isset( $WidgetContainerCache ) )
+	{ // Cache doesn't exist yet:
+		load_class( 'widgets/model/_widgetcontainercache.class.php', 'WidgetContainerCache' );
+		$WidgetContainerCache = new WidgetContainerCache();
+	}
+
+	return $WidgetContainerCache;
+}
+
+
 /**
  * Get the EnabledWidgetCache
  *
@@ -462,7 +483,15 @@ class collections_Module extends Module
 	function get_default_group_permissions( $grp_ID )
 	{
 		$SectionCache = & get_SectionCache();
-		$SectionCache->load_all();
+		if( ( $default_Section = & $SectionCache->get_by_ID( 3, false, false ) ) ||
+		    ( $default_Section = & $SectionCache->get_by_name( 'Blogs', false, false ) ) )
+		{	// Use section with #3 or name "Blogs" by default for user groups if it exists in DB:
+			$default_section_ID = $default_Section->ID;
+		}
+		else
+		{	// Use first section by default because it always exists and cannot be deleted from DB:
+			$default_section_ID = 1;
+		}
 
 		switch( $grp_ID )
 		{
@@ -471,7 +500,6 @@ class collections_Module extends Module
 				$permcreateblog = 'allowed'; // Creating new blogs
 				$permgetblog = 'denied'; // Automatically add a new blog to the new users
 				$permmaxcreateblognum = '';
-				$permallowedsections = implode( ',', array_keys( $SectionCache->get_option_array() ) );
 				break;
 
 			case 2:		// Moderators (group ID 2) have permission by default:
@@ -479,7 +507,6 @@ class collections_Module extends Module
 				$permcreateblog = 'allowed';
 				$permgetblog = 'denied';
 				$permmaxcreateblognum = '';
-				$permallowedsections = implode( ',', array_keys( $SectionCache->get_option_array( array( 1 ) ) ) );
 				break;
 
 			case 3:		// Editors (group ID 3) have permission by default:
@@ -488,7 +515,6 @@ class collections_Module extends Module
 				$permcreateblog = 'denied';
 				$permgetblog = 'denied';
 				$permmaxcreateblognum = '';
-				$permallowedsections = implode( ',', array_keys( $SectionCache->get_option_array( array( 1 ) ) ) );
 				break;
 
 			default:
@@ -497,7 +523,6 @@ class collections_Module extends Module
 				$permcreateblog = 'denied';
 				$permgetblog = 'denied';
 				$permmaxcreateblognum = '';
-				$permallowedsections = implode( ',', array_keys( $SectionCache->get_option_array( array( 1 ) ) ) );
 				break;
 		}
 
@@ -507,13 +532,9 @@ class collections_Module extends Module
 				'perm_api' => $permapi,
 				'perm_createblog' => $permcreateblog,
 				'perm_getblog' => $permgetblog,
-				'perm_default_sec_ID' => 3,
+				'perm_default_sec_ID' => $default_section_ID,
+				'perm_allowed_sections' => $default_section_ID,
 				);
-
-		if( ! empty( $permallowedsections ) )
-		{	// Set this default setting only when at least one is detected, to avoid empty on install when groups are created before sections:
-			$permissions['perm_allowed_sections'] = $permallowedsections;
-		}
 
 		$permissions['perm_max_createblog_num'] = $permmaxcreateblognum;
 
@@ -565,7 +586,7 @@ class collections_Module extends Module
 				'note' => T_('New users automatically get a new collection (in the Section specified below)'),
 				),
 			'perm_default_sec_ID' => array(
-				'label' => T_('Default Kind for new Collections'),
+				'label' => T_('Default Section for new Collections'),
 				'user_func'  => 'check_default_sec_user_perm',
 				'group_func' => 'check_default_sec_group_perm',
 				'perm_block' => 'blogging',
@@ -574,7 +595,7 @@ class collections_Module extends Module
 				'note' => '',
 				),
 			'perm_allowed_sections' => array(
-				'label'      => T_('Allowed kind of collections'),
+				'label'      => T_('Allowed section for new collections'),
 				'user_func'  => 'check_allowed_sections_user_perm',
 				'group_func' => 'check_allowed_sections_group_perm',
 				'perm_block' => 'blogging',
@@ -656,58 +677,6 @@ class collections_Module extends Module
 
 
 	/**
-	 * Build teh evobar menu
-	 */
-	function build_evobar_menu()
-	{
-		/**
-		 * @var Menu
-		 */
-		global $topleft_Menu, $topright_Menu;
-		global $current_User;
-		global $home_url, $admin_url, $debug, $seo_page_type, $robots_index;
-		global $Collection, $Blog, $blog;
-
-		global $Settings;
-
-		if( ! $current_User->check_perm( 'admin', 'normal' ) )
-		{
-			return;
-		}
-
-		$entries = array();
-		$entries['b2evonet'] = array(
-								'text' => T_('Open b2evolution.net'),
-								'href' => 'http://b2evolution.net/',
-								'target' => '_blank',
-							);
-		$entries['forums'] = array(
-								'text' => T_('Open Support forums'),
-								'href' => 'http://forums.b2evolution.net/',
-								'target' => '_blank',
-							);
-		$entries['manual'] = array(
-								'text' => T_('Open Online manual'),
-								'href' => get_manual_url( NULL ),
-								'target' => '_blank',
-							);
-		$entries[] = array( 'separator' => true );
-		$entries['twitter'] = array(
-								'text' => T_('b2evolution on twitter'),
-								'href' => 'http://twitter.com/b2evolution',
-								'target' => '_blank',
-							);
-		$entries['facebook'] = array(
-								'text' => T_('b2evolution on facebook'),
-								'href' => 'http://www.facebook.com/b2evolution',
-								'target' => '_blank',
-							);
-
-		$topleft_Menu->add_menu_entries( 'b2evo', $entries );
-	}
-
-
-	/**
 	 * Builds the 1st half of the menu. This is the one with the most important features
 	 */
 	function build_menu_1()
@@ -754,9 +723,17 @@ class collections_Module extends Module
 						'text' => T_('Site skin'),
 						'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin',
 						'entries' => array(
-							'site_skin' => array(
-								'text' => T_('Skins for this site'),
+							'skin_normal' => array(
+								'text' => T_('Default'),
 								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin'
+							),
+							'skin_mobile' => array(
+								'text' => T_('Phone'),
+								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin&amp;skin_type=mobile'
+							),
+							'skin_tablet' => array(
+								'text' => T_('Tablet'),
+								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin&amp;skin_type=tablet'
 							),
 							'manage_skins' => array(
 								'text' => T_('Manage skins'),
@@ -783,6 +760,7 @@ class collections_Module extends Module
 		}
 
 		$working_blog = get_working_blog();
+		$new_actions = array( 'new', 'new-selskin', 'new-name' );
 		if( $working_blog )
 		{ // User is member of some blog or has at least view perms, so Dashboard and Collections menus should be visible
 			$AdminUI->add_menu_entries(
@@ -792,6 +770,18 @@ class collections_Module extends Module
 					'collections' => array(
 						'text' => T_('Collections'),
 						'href' => $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$working_blog
+					)
+				)
+			);
+		}
+		elseif( $perm_admin_normal && param( 'ctrl', 'string' ) == 'collections' && in_array( param( 'action', 'string' ), $new_actions ) )
+		{ // User is not member of any blogs, but has admin normal permission.
+			$AdminUI->add_menu_entries(
+				NULL, // root
+				array(
+					'site' => $site_menu,
+					'collections' => array(
+						'text' => T_('Collections')
 					)
 				)
 			);
@@ -895,6 +885,9 @@ class collections_Module extends Module
 							'comments' => array(
 								'text' => T_('Comments'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=comments&amp;blog='.$blog ),
+							'contact' => array(
+								'text' => T_('Contact form'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=contact&amp;blog='.$blog ),
 							'userdir' => array(
 								'text' => T_('User directory'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=userdir&amp;blog='.$blog ),
@@ -910,15 +903,37 @@ class collections_Module extends Module
 						'text' => T_('Skin'),
 						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
 						'entries' => array(
-							'coll_skin' => array(
-								'text' => T_('Skins for this blog'),
+							'skin_normal' => array(
+								'text' => T_('Default'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog
+							),
+							'skin_mobile' => array(
+								'text' => T_('Phone'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog.'&amp;skin_type=mobile'
+							),
+							'skin_tablet' => array(
+								'text' => T_('Tablet'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog.'&amp;skin_type=tablet'
 							)
 						),
 					),
 					'widgets' => array(
 						'text' => T_('Widgets'),
 						'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog,
+						'entries' => array(
+							'skin_normal' => array(
+								'text' => T_('Default'),
+								'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog
+							),
+							'skin_mobile' => array(
+								'text' => T_('Phone'),
+								'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog.'&amp;skin_type=mobile'
+							),
+							'skin_tablet' => array(
+								'text' => T_('Tablet'),
+								'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog.'&amp;skin_type=tablet'
+							)
+						),
 						'order' => 'group_last', ),
 					'settings' => array(
 						'text' => T_('Settings'),
@@ -1096,7 +1111,7 @@ class collections_Module extends Module
 				'params' => NULL,
 			),
 			'monthly-alert-old-contents' => array(
-				'name'   => T_('Monthly alert on old contents'),
+				'name'   => T_('Monthly alert on stale contents'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_monthly_alert_old_contents.job.php',
 				'params' => NULL,
@@ -1110,16 +1125,16 @@ class collections_Module extends Module
 	 */
 	function handle_htsrv_action()
 	{
-		global $demo_mode, $current_User, $DB, $Session, $Messages;
+		global $demo_mode, $current_User, $DB, $Session, $Messages, $localtimenow;
 		global $UserSettings;
-
-		if( !is_logged_in() )
-		{ // user must be logged in
-			bad_request_die( $this->T_( 'You are not logged in.' ) );
-		}
 
 		// Init the objects we want to work on.
 		$action = param_action( true );
+
+		if( !is_logged_in() && $action != 'create_post' )
+		{ // user must be logged in
+			bad_request_die( $this->T_( 'You are not logged in.' ) );
+		}
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'collections_'.$action );
@@ -1213,16 +1228,15 @@ class collections_Module extends Module
 			case 'subs_update':
 				// Subscribe/Unsubscribe user on the selected collection
 
-				if( $demo_mode && ( $current_User->ID <= 3 ) )
-				{ // don't allow default users profile change on demo mode
-					bad_request_die( 'Demo mode: you can\'t edit the admin and demo users profile!<br />[<a href="javascript:history.go(-1)">'
-								. T_('Back to profile') . '</a>]' );
-				}
-
 				// Get params
 				$blog = param( 'subscribe_blog', 'integer', true );
 				$notify_items = param( 'sub_items', 'integer', NULL );
 				$notify_comments = param( 'sub_comments', 'integer', NULL );
+
+				if( $demo_mode && ( $current_User->ID <= 7 ) )
+				{	// Don't allow default users profile change on demo mode:
+					header_redirect( get_user_settings_url( 'subs', NULL, $blog, '&' ) );
+				}
 
 				if( ( $notify_items < 0 ) || ( $notify_items > 1 ) || ( $notify_comments < 0 ) || ( $notify_comments > 1 ) )
 				{ // Invalid notify param. It should be 0 for unsubscribe and 1 for subscribe.
@@ -1271,15 +1285,16 @@ class collections_Module extends Module
 			case 'isubs_update':
 				// Subscribe/Unsubscribe user on the selected item
 
-				if( $demo_mode && ( $current_User->ID <= 3 ) )
-				{ // don't allow default users profile change on demo mode
-					bad_request_die( 'Demo mode: you can\'t edit the admin and demo users profile!<br />[<a href="javascript:history.go(-1)">'
-								. T_('Back to profile') . '</a>]' );
-				}
-
 				// Get params
 				$item_ID = param( 'p', 'integer', true );
 				$notify = param( 'notify', 'integer', 0 );
+
+				if( $demo_mode && ( $current_User->ID <= 7 ) )
+				{	// Don't allow default users profile change on demo mode:
+					$ItemCache = & get_ItemCache();
+					$Item = & $ItemCache->get_by_ID( $item_ID );
+					header_redirect( get_user_settings_url( 'subs', NULL, $Item->get_blog_ID(), '&' ) );
+				}
 
 				if( ( $notify < 0 ) || ( $notify > 1 ) )
 				{ // Invalid notify param. It should be 0 for unsubscribe and 1 for subscribe.
@@ -1315,6 +1330,247 @@ class collections_Module extends Module
 
 				header_redirect();
 				break; // already exited here
+
+			case 'newsletter_widget':
+				// Subscribe⁄Unsubscribe to/from newsletter from widget:
+				$widget_ID = param( 'widget', 'integer', true );
+				$WidgetCache = & get_WidgetCache();
+
+				if( $widget_ID )
+				{ // Request from widget
+					$Widget = & $WidgetCache->get_by_ID( $widget_ID );
+					$newsletter_ID = $Widget->get_param( 'enlt_ID' );
+					$insert_user_tags = $Widget->get_param( 'usertags' );
+				}
+				elseif( param( 'inline', 'integer', 0 ) == 1 )
+				{ // Request from subscribe shorttag
+					$newsletter_ID = param( 'newsletter', 'integer', 0 );
+					$insert_user_tags = param( 'usertags', 'string', NULL );
+				}
+
+				// Check newsletter of the requested widget:
+				$NewsletterCache = & get_NewsletterCache();
+				if( empty( $newsletter_ID ) ||
+						! ( $Newsletter = & $NewsletterCache->get_by_ID( $newsletter_ID, false, false ) ) ||
+						! $Newsletter->get( 'active' ) )
+				{	// Display an error when newsletter is not found or not active:
+					$Messages->add( T_('List subscription widget references an inactive list.'), 'error' );
+					header_redirect();
+				}
+
+				if( param( 'subscribe', 'string', NULL ) === NULL )
+				{	// Unsubscribe from newsletter:
+					if( $current_User->unsubscribe( $Newsletter->ID ) )
+					{
+						$Messages->add( sprintf( T_('You have unsubscribed and you will no longer receive emails from %s.'), '"'.$Newsletter->get( 'name' ).'"' ), 'success' );
+					}
+				}
+				else
+				{	// Subscribe to newsletter:
+					if( $current_User->is_subscribed( $Newsletter->ID ) || $current_User->subscribe( $Newsletter->ID ) )
+					{
+						if( ! empty( $insert_user_tags ) )
+						{
+							$current_User->add_usertags( $insert_user_tags );
+							$current_User->dbupdate();
+						}
+						$Messages->add( sprintf( T_('You have successfully subscribed to: %s.'), '"'.$Newsletter->get( 'name' ).'"' ), 'success' );
+					}
+				}
+
+				header_redirect();
+				break; // already exited here
+
+			case 'refresh_contents_last_updated':
+				// Refresh last touched date of the Item:
+
+				$item_ID = param( 'item_ID', 'integer', true );
+
+				$ItemCache = & get_ItemCache();
+				$refreshed_Item = & $ItemCache->get_by_ID( $item_ID );
+
+				if( ! $refreshed_Item->can_refresh_contents_last_updated() )
+				{	// If current User has no permission to refresh a last touched date of the requested Item:
+					$Messages->add( T_('You have no permission to refresh this item.'), 'error' );
+					header_redirect();
+					// EXIT HERE.
+				}
+
+				// What post and comment date fields use to refresh:
+				// - 'touched' - 'post_datemodified', 'comment_last_touched_ts' (Default)
+				// - 'created' - 'post_datestart', 'comment_date'
+				$date_type = param( 'type', 'string', 'touched' );
+
+				// Run refreshing and display a message:
+				$refreshed_Item->refresh_contents_last_updated_ts( true, $date_type );
+
+				header_redirect();
+				break; // already exited here
+
+			case 'create_post':
+				// Create new post from front-office by anonymous user:
+				global $dummy_fields, $Plugins;
+
+				load_class( 'items/model/_item.class.php', 'Item' );
+
+				// Name:
+				$user_name = param( $dummy_fields['name'], 'string' );
+				param_check_not_empty( $dummy_fields['name'], sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Name') ) );
+
+				// Email:
+				$user_email = param( $dummy_fields['email'], 'string' );
+
+				// Stop a request from the blocked IP addresses or Domains
+				antispam_block_request();
+
+				// Stop a request from the blocked email address or its domain:
+				antispam_block_by_email( $user_email );
+
+				// Initialize new Item object:
+				$new_Item = new Item();
+
+				// Set main category:
+				$new_Item->set( 'main_cat_ID', param( 'cat', 'integer', true ) );
+
+				$item_Blog = & $new_Item->get_Blog();
+
+				// Set default status:
+				$new_Item->set( 'status', $item_Blog->get_setting( 'default_post_status_anon' ) );
+
+				// Check email:
+				param_check_new_user_email( $dummy_fields['email'], $user_email, $item_Blog );
+
+				// Set item properties from submitted form:
+				$new_Item->load_from_Request( false, true );
+
+				// Use default item/post type of the collection:
+				$default_item_type_ID = $item_Blog->get_setting( 'default_post_type' );
+				$new_Item->set( 'ityp_ID', ( empty( $default_item_type_ID ) ? 1 /* Post */ : $default_item_type_ID ) );
+
+				// Call plugin event for additional checking, e-g captcha:
+				$Plugins->trigger_event( 'AdminBeforeItemEditCreate', array( 'Item' => & $new_Item ) );
+
+				// Validate first enabled captcha plugin:
+				$Plugins->trigger_event_first_return( 'ValidateCaptcha', array( 'form_type' => 'item' ) );
+
+				if( param_errors_detected() )
+				{	// If at least one error has been detected:
+
+					// Save temp params only into session Item object to redisplay them on the form after redirect:
+					$new_Item->temp_user_name = $user_name;
+					$new_Item->temp_user_email = $user_email;
+
+					// Save new Item with entered data in Session:
+					set_session_Item( $new_Item );
+
+					// Redirect back to the form:
+					header_redirect();
+				}
+
+				// START: Auto register new user:
+				// Set unique user login from entered user name:
+				$max_login_length = 20;
+				$login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $user_name );
+				if( trim( $login ) == '' )
+				{	// Get login from entered user email:
+					$login = preg_replace( '/^([^@]+)@.+$/i', '$1', $user_email );
+					$login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $login );
+				}
+				$login = str_replace( ' ', '_', $login );
+				$login = utf8_substr( $login, 0, $max_login_length );
+
+				$exist_user_SQL = new SQL( 'Check if user exists with name from new item form' );
+				$exist_user_SQL->SELECT( 'user_ID' );
+				$exist_user_SQL->FROM( 'T_users' );
+				$exist_user_SQL->WHERE( 'user_login = '.$DB->quote( $login ) );
+				$user_unique_num = '';
+				$unique_login = $login;
+				while( $DB->get_var( $exist_user_SQL ) )
+				{	// Check while we find unique user login:
+					$user_unique_num++;
+					$unique_login = $login.$user_unique_num;
+					if( strlen( $unique_login ) > $max_login_length )
+					{	// Restrict user login with max db column length:
+						$unique_login = utf8_substr( $login, 0, $max_login_length - strlen( $user_unique_num ) ).$user_unique_num;
+					}
+					$exist_user_SQL->WHERE( 'user_login = '.$DB->quote( $unique_login ) );
+				}
+
+				$new_User = new User();
+				$new_User->set( 'firstname', $user_name );
+				$new_User->set( 'login', $unique_login );
+				$new_User->set_email( $user_email );
+				$new_User->set( 'pass', '' );
+				$new_User->set( 'salt', '' );
+				$new_User->set( 'pass_driver', 'nopass' );
+				$new_User->set( 'source', 'auto reg on new post' );
+				$new_User->set_datecreated( $localtimenow );
+				if( $new_User->dbinsert() )
+				{	// Insert system log about user's registration
+					syslog_insert( 'User auto registration on new item', 'info', 'user', $new_User->ID );
+					report_user_create( $new_User );
+				}
+
+				// Autologin the user. This is more comfortable for the user and avoids
+				// extra confusion when account validation is required.
+				$Session->set_User( $new_User );
+
+				// END: Auto register new user:
+
+				// Set creator User for new creating Item:
+				$new_Item->set_creator_User( $new_User );
+
+				if( $new_Item->dbinsert() )
+				{	// Successful new item creating:
+					$Messages->add( T_('Post has been created.'), 'success' );
+					$Messages->add( T_('Please double check your email address and choose a password so that you can log in next time you visit us.'), 'warning' );
+					$redirect_to = $item_Blog->get( 'register_finishurl', array( 'glue' => '&' ) );
+				}
+				else
+				{	// Error on creating new Item:
+					$Messages->add( T_('Couldn\'t create the new post'), 'error' );
+					$redirect_to = NULL;
+				}
+
+				// Delete Item from Session:
+				delete_session_Item( 0 );
+
+				header_redirect( $redirect_to );
+				break;
+
+			case 'update_tags':
+				// Update item tags:
+				$item_ID = param( 'item_ID', 'integer', true );
+				$item_tags = param( 'item_tags', 'string', true );
+
+				$ItemCache = & get_ItemCache();
+				$edited_Item = & $ItemCache->get_by_ID( $item_ID );
+
+				// Check perms:
+				$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+				if( empty( $item_tags ) && $edited_Item->get_type_setting( 'use_tags' ) == 'required' )
+				{	// Tags must be entered:
+					param_check_not_empty( 'item_tags', T_('Please provide at least one tag.') );
+				}
+
+				if( ! param_errors_detected() )
+				{	// Update tags only when no errors:
+					$edited_Item->set_tags_from_string( $item_tags );
+					if( $edited_Item->dbupdate() )
+					{
+						$Messages->add( T_('Post has been updated.'), 'success' );
+					}
+				}
+
+				if( isset( $_POST['actionArray']['update_tags'] ) )
+				{	// Use a default redirect to referer page when it has been submitted as normal form:
+					break;
+				}
+				else
+				{	// Exit here when AJAX request, so we don't need a redirect after this function:
+					exit(0);
+				}
 		}
 	}
 }

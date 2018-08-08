@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
@@ -46,7 +46,7 @@ if( $Item->is_featured() || $Item->is_intro() )
 { // Special icon for featured & intro posts
 	$status_icon = 'fa-bullhorn';
 	$status_alt = T_('Sticky topic / Announcement');
-	$status_title = '<strong>'.T_('Sticky').':</strong> ';
+	$status_title = '<strong>'.( $Item->is_intro() ? T_('Intro') : T_('Sticky') ).':</strong> ';
 	$legend_icons['topic_sticky'] = 1;
 }
 elseif( $Item->comment_status == 'closed' || $Item->comment_status == 'disabled' || $Item->is_locked() )
@@ -78,7 +78,23 @@ $display_workflow = ( $disp == 'posts' ) &&
 		<!-- Thread icon -->
 		<div class="ft_status_topic">
 			<a href="<?php echo $Item->permanent_url(); ?>">
-				<i class="icon fa <?php echo $status_icon; ?>" title="<?php echo $status_alt; ?>"></i>
+				<?php
+				switch( $Item->get_read_status() )
+				{
+					case 'new':
+						echo '<i class="icon_new fa '.$status_icon.' new" title="'.$status_alt.'"></i>';
+						break;
+
+					case 'updated':
+						echo '<i class="icon fa '.$status_icon.' updated" title="'.$status_alt.'"></i>';
+						break;
+
+					case 'read':
+					default:
+						echo '<i class="icon fa '.$status_icon.'" title="'.$status_alt.'"></i>';
+						break;
+				}
+				?>
 			</a>
 		</div>
 
@@ -91,16 +107,14 @@ $display_workflow = ( $disp == 'posts' ) &&
 						echo $status_title;
 
 						if( $Item->Blog->get_setting( 'track_unread_content' ) )
-						{ // Display icon about unread status
-							$Item->display_unread_status();
-							// Update legend array to display the unread status icons in footer legend:
+						{ // Update legend array to display the unread status icons in footer legend:
 							switch( $Item->get_read_status() )
 							{
 								case 'new':
-									$legend_icons['topic_new'] = 1;
+									$legend_icons[ $Item->is_featured() || $Item->is_intro() ? 'topic_sticky_new' : 'topic_new' ] = 1;
 									break;
 								case 'updated':
-									$legend_icons['topic_updated'] = 1;
+									$legend_icons[ $Item->is_featured() || $Item->is_intro() ? 'topic_sticky_updated' : 'topic_updated' ] = 1;
 									break;
 							}
 						}
@@ -138,7 +152,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 
 		<!-- Chapter -->
 		<div class="ft_author_info ellipsis">
-			<?php echo sprintf( T_('In %s'), $Item->get_chapter_links() ); ?>
+			<?php echo sprintf( /* TRANS: %s gets replaced by chapter links */ T_('In %s'), $Item->get_chapter_links() ); ?>
 		</div>
 	</div>
 
@@ -149,7 +163,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 		echo '<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-5">';
 		if( $comments_number == 0 && $Item->comment_status == 'disabled' )
 		{ // The comments are disabled:
-			echo T_('n.a.');
+			echo /* TRANS: "Not Available" */ T_('N/A');
 		}
 		else if( $latest_Comment = & $Item->get_latest_Comment() )
 		{	// At least one reply exists:
@@ -256,7 +270,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 		echo '<div class="ft_date_header">';
 		if( $comments_number == 0 && $Item->comment_status == 'disabled' )
 		{ // The comments are disabled:
-			echo T_('n.a.');
+			echo /* TRANS: "Not Available" */ T_('N/A');
 		}
 		else if( $latest_Comment = & $Item->get_latest_Comment() )
 		{	// At least one reply exists:

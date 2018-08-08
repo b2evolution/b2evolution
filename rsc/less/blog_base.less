@@ -29,6 +29,8 @@
 // CSS overrides for "HTML 5 VideoJS Player" plugin:
 @import "inc/video-js-overrides.inc.less";
 
+// Styles for jQuery plugin "Autocomplete for Textarea":
+@import "inc/jquery.textcomplete.inc.less";
 
 // -----
 
@@ -224,7 +226,7 @@ a.comment_reply_current {
 	text-align: center;
 	font-weight: bold;
 	color: #FF0000;
-	margin-top: 10px;
+	margin: 10px 0;
 }
 a.comment_reply_current:hover {
 	color: #0066CC;
@@ -325,7 +327,7 @@ textarea.form_textarea_input {
 
 
 // Avatar widget
-div.widget_core_coll_avatar {
+div.widget_core_user_profile_pics {
 	margin-top: 1em;
 	margin-bottom: 1em;
 	text-align:center;
@@ -347,41 +349,33 @@ div.container_menu_top input.search_field {
 }
 
 // User login/register widget
-.widget_core_user_login #login_form,
-.widget_core_user_register #register_form {
+.widget_core_user_register_quick #register_form {
 	margin-top: 5px;
 }
-.widget_core_user_login fieldset,
-.widget_core_user_register fieldset {
+.widget_core_user_register_quick fieldset {
 	border: none;
 	padding: 0;
 	margin: 0;
 }
-.widget_core_user_login .field_login_btn,
-.widget_core_user_register .field_register_btn {
+.widget_core_user_register_quick .field_register_btn {
 	margin: 5px 0;
 }
-.widget_core_user_login #ffield_pwd{
-	margin-top: 5px;
-}
-.widget_core_user_login .input_text,
-.widget_core_user_register .input_text {
+.widget_core_user_register_quick .input_text {
 	width: 96%;
 }
-.widget_core_user_login .submit,
-.widget_core_user_register .submit {
-	font-size: 10px;
+.widget_core_user_greetings {
+	.greeting, .avatar {
+		vertical-align: middle;
+	}
+	.user_group, .user_level {
+		color: #999;
+	}
 }
-.widget_core_user_login .register_link {
-	font-weight: bold;
-}
-.widget_core_user_login .greeting,
-.widget_core_user_login .avatar {
-	vertical-align: middle;
-}
-.widget_core_user_login .user_group,
-.widget_core_user_login .user_level {
-	color: #999;
+
+// User Profile Picture widget
+.widget_core_user_profile_pics img {
+	max-width: 100%;
+	height: auto;
 }
 
 // Advertisement widget
@@ -883,7 +877,8 @@ input.btn-lg {
 .main_profile_picture {
 	.border-radius;
 }
-.other_profile_pictures {
+div.other_profile_pictures {
+	text-align: left;
 	margin-bottom: 10px;
 	img {
 		.border-radius;
@@ -928,33 +923,33 @@ input.btn-lg {
 }
 
 // Standard style for all tables of content:
-.evo_content_block table {
-	border-spacing: 0;
-	border-collapse: collapse;
-	margin: 1em 0;
-	th {
-		border: 1px solid #ddd;
-		padding: 8px;
-		background-color: #eee;
-	}
-	td {
-		border: 1px solid #ddd;
-		padding: 8px;
-		vertical-align: top;
-	}
-}
-
-.evo_content_block table.evo_poll__table {
-	border-spacing: 0;
-	border-collapse: collapse;
-	margin: 1em 0;
-	th {
-		padding: 2px 10px 2px 0;
-		background-color: #eee;
-	}
-	td {
-		padding: 2px 10px 2px 0;
-		vertical-align: top;
+.evo_content_block {
+	table {
+		border-spacing: 0;
+		border-collapse: collapse;
+		margin: 1em 0;
+		th {
+			border: 1px solid #ddd;
+			padding: 8px;
+			background-color: #eee;
+		}
+		td {
+			border: 1px solid #ddd;
+			padding: 8px;
+			vertical-align: top;
+		}
+		&.evo_poll__table {
+			td {
+				padding: 2px 10px 2px 0;
+			}
+		}
+		&.item_custom_fields {
+			border: none;
+			margin-bottom: 10px;
+			th, td {
+				padding: 0 10px 0 0;
+			}
+		}
 	}
 }
 
@@ -965,12 +960,18 @@ input.btn-lg {
 }
 
 // Poll table:
+.evo_poll__question {
+	font-weight: bold;
+}
 .evo_poll__table {
 	margin-bottom: 14px;
 	width: 100%;
 	td {
 		padding: 2px 10px 2px 0;
 		vertical-align: top;
+	}
+	td.evo_poll__title label {
+		font-weight: normal;
 	}
 	tr td:last-child {
 		padding-right: 0;

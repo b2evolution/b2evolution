@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2008 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package evocore
@@ -25,6 +25,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_current_filters_Widget extends ComponentWidget
 {
+	var $icon = 'filter';
+
 	/**
 	 * Constructor
 	 */
@@ -95,7 +97,7 @@ class coll_current_filters_Widget extends ComponentWidget
 						array( 'category', T_('Category'), 1 ),
 						array( 'archive', T_('Archive'), 1 ),
 						array( 'keyword', T_('Keyword'), 1 ),
-						array( 'tag', T_('Tag'), 1 ),
+						array( 'tag', /* TRANS: noun */ T_('Tag'), 1 ),
 						array( 'author', T_('Author'), 1 ),
 						array( 'assignee', T_('Assignee'), 1 ),
 						array( 'locale', T_('Locale'), 1 ),
@@ -128,6 +130,7 @@ class coll_current_filters_Widget extends ComponentWidget
 
 		if( empty( $params['ItemList'] ) )
 		{ // Empty ItemList object
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is an empty param "ItemList".' );
 			return false;
 		}
 
@@ -180,7 +183,8 @@ class coll_current_filters_Widget extends ComponentWidget
 			) ) );
 
 		if( empty( $filters ) && ! $this->disp_params['display_empty_filter'] )
-		{ // No filters
+		{	// No filters
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there are no filters.' );
 			return;
 		}
 

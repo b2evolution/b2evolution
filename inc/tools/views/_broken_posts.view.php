@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -23,7 +23,7 @@ $SQL->WHERE( 'post_main_cat_ID NOT IN (SELECT cat_ID FROM T_categories )' );
 $Results = new Results( $SQL->get(), 'broken_posts_' );
 
 $Results->title = T_( 'Broken items with no matching category' );
-$Results->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
+$Results->global_icon( T_('Cancel').'!', 'close', regenerate_url( 'action' ) );
 
 $Results->cols[] = array(
 	'th' => T_('Item ID'),

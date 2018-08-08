@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -21,7 +21,7 @@ class infodots_plugin extends Plugin
 	var $code = 'b2evoDot';
 	var $name = 'Info dots renderer';
 	var $priority = 95;
-	var $version = '6.7.9';
+	var $version = '7.0.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -190,6 +190,11 @@ class infodots_plugin extends Plugin
 	 */
 	function RenderItemAsHtml( & $params )
 	{
+		if( empty( $params['Item'] ) )
+		{	// This plugin can works only with items:
+			return false;
+		}
+
 		$params['data'] = $this->render_infodot_captions( 'itm_'.$params['Item']->ID, $params['data'] );
 
 		return true;

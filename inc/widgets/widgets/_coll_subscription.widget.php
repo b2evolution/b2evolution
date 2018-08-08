@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_subscription_Widget extends ComponentWidget
 {
+	var $icon = 'envelope-open-o';
+
 	/**
 	 * Constructor
 	 */
@@ -132,7 +134,7 @@ class coll_subscription_Widget extends ComponentWidget
 		$allow_comment_subscriptions = $Blog->get_setting( 'allow_comment_subscriptions' );
 
 		if( $current_User && ( $allow_subscriptions || $allow_comment_subscriptions ) )
-		{
+		{	// If subscriptions are allowed on current collection:
 			$current_htsrv_url = get_htsrv_url();
 			$subscriptions = get_user_subscription( $current_User->ID, $Blog->ID );
 			if( $subscriptions )
@@ -249,7 +251,8 @@ class coll_subscription_Widget extends ComponentWidget
 			return true;
 		}
 		else
-		{
+		{	// If subscriptions are not allowed on current collection:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because any subscriptions are not allowed for current collection.' );
 			return false;
 		}
 	}

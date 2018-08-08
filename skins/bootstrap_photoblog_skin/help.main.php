@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_photoblog_skin
@@ -46,17 +46,16 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <header class="row">
 
-	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
 		<?php
-		if( $Skin->is_visible_container( 'page_top' ) )
-		{ // Display 'Page Top' widget container
-		?>
-		<div class="evo_container evo_container__page_top">
-		<?php
+		if( $Skin->show_container_when_access_denied( 'page_top' ) )
+		{	// Display 'Page Top' widget container:
 			// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
-			skin_container( NT_('Page Top'), array(
+			widget_container( 'page_top', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => true, // Display container anyway even if no widget
+					'container_start'     => '<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8"><div class="evo_container $wico_class$">',
+					'container_end'       => '</div></div>',
 					'block_start'         => '<div class="evo_widget $wi_class$">',
 					'block_end'           => '</div>',
 					'block_display_title' => false,
@@ -66,50 +65,40 @@ siteskin_include( '_site_body_header.inc.php' );
 					'item_end'            => '</li>',
 				) );
 			// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
-		?>
-		</div>
-		<?php } ?>
-	</div><!-- .col -->
+		} ?>
 
-	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 		<?php
-		if( $Skin->is_visible_container( 'header' ) )
-		{ // Display 'Header' widget container
-		?>
-		<div class="evo_container evo_container__header">
-		<?php
+		if( $Skin->show_container_when_access_denied( 'header' ) )
+		{	// Display 'Header' widget container:
 			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
-			skin_container( NT_('Header'), array(
+			widget_container( 'header', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => true, // Display container anyway even if no widget
+					'container_start'   => '<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4"><div class="evo_container $wico_class$">',
+					'container_end'     => '</div></div>',
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
 					'block_title_start' => '<h1>',
 					'block_title_end'   => '</h1>',
 				) );
 			// ----------------------------- END OF "Header" CONTAINER -----------------------------
-		?>
-		</div>
-		<?php } ?>
-	</div><!-- .col -->
+		} ?>
 
 </header><!-- .row -->
 
-
 <?php
-if( $Skin->is_visible_container( 'menu' ) )
-{ // Display 'Menu' widget container
-?>
-<nav class="row">
+if( $Skin->show_container_when_access_denied( 'menu' ) )
+{	// Display 'Menu' widget container:
 
-	<div class="col-md-12">
-		<ul class="nav nav-tabs evo_container evo_container__menu">
-		<?php
 			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
 			// Note: this container is designed to be a single <ul> list
-			skin_container( NT_('Menu'), array(
+			widget_container( 'menu', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => false, // If no widget, don't display container at all
+					'container_start'     => '<nav class="row"><div class="col-md-12"><ul class="nav nav-tabs evo_container $wico_class$">',
+					'container_end'       => '</ul></div></nav>',
 					'block_start'         => '',
 					'block_end'           => '',
 					'block_display_title' => false,
@@ -123,13 +112,8 @@ if( $Skin->is_visible_container( 'menu' ) )
 					'item_title_after'    => '',
 				) );
 			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
-		?>
-		</ul>
-	</div><!-- .col -->
 
-</nav><!-- .row -->
-<?php } ?>
-
+} ?>
 
 <div class="row">
 	<div class="<?php echo $Skin->get_column_class(); ?>">
@@ -144,17 +128,6 @@ if( $Skin->is_visible_container( 'menu' ) )
 					'block_end'   => '</div>',
 				) );
 			// --------------------------------- END OF MESSAGES ---------------------------------
-		?>
-
-		<?php
-			// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
-			request_title( array(
-					'title_before'      => '<h2 class="page_title">',
-					'title_after'       => '</h2>',
-					'title_none'        => '',
-					'glue'              => ' - ',
-				) );
-			// ----------------------------- END OF REQUEST TITLE ----------------------------
 		?>
 
 		<?php
@@ -175,26 +148,22 @@ if( $Skin->is_visible_container( 'menu' ) )
 <footer class="row">
 
 	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 center">
+	<div class="col-md-12">
 
 		<?php
-		if( $Skin->is_visible_container( 'footer' ) )
-		{ // Display 'Footer' widget container
-		?>
-		<div class="evo_container evo_container__footer">
-		<?php
-			// Display container and contents:
-			skin_container( NT_("Footer"), array(
+		if( $Skin->show_container_when_access_denied( 'footer' ) )
+		{	// Display 'Footer' widget container:
+			widget_container( 'footer', array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'       => '<div class="evo_widget $wi_class$">',
-					'block_end'         => '</div>',
+					'container_display_if_empty' => false, // If no widget, don't display container at all
+					'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
+					'container_end'   => '</div>',
+					'block_start'     => '<div class="evo_widget $wi_class$">',
+					'block_end'       => '</div>',
 				) );
-			// Note: Double quotes have been used around "Footer" only for test purposes.
-		?>
-		</div>
-		<?php } ?>
+		} ?>
 
-		<p>
+		<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(

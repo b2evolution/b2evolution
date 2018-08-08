@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -97,7 +97,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 	// In case we send this to the blog for a preview :
 	$Form->hidden( 'preview', 0 );
 	$Form->hidden( 'more', 1 );
-	$Form->hidden( 'preview_userid', $current_User->ID );
 
 	// Add hidden required fields or fields that were set in the init_inskin_editing() function
 	$Form->hidden( 'item_typ_ID', $edited_Item->ityp_ID );
@@ -126,7 +125,10 @@ $Form->begin_form( 'inskin', '', $form_params );
 			$Form->hidden( 'item_priority', $edited_Item->priority );
 			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
 			$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
-			$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
+			if( $Blog->get_setting( 'use_deadline' ) )
+			{	// If deadline is enabled for collection:
+				$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
+			}
 		}
 		$Form->hidden( 'trackback_url', $trackback_url );
 		$Form->hidden( 'item_featured', $edited_Item->featured );
@@ -141,7 +143,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 	elseif( !isset( $edited_Item->status ) )
 	{
-		$highest_publish_status = get_highest_publish_status( 'post', $Blog->ID, false );
+		$highest_publish_status = get_highest_publish_status( 'post', $Blog->ID, false, '', $edited_Item );
 		$edited_Item->set( 'status', $highest_publish_status );
 	}
 
@@ -198,7 +200,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 	$Form->output = false;
 	$edit_links = $Form->begin_fieldset( get_request_title( array_merge( array(
 			'edit_links_template' => array(
-				'before'              => '<span class="pull-right">',
+				'before'              => '<span class="pull-right panel_heading_action_icons">',
 				'after'               => '</span>',
 				'advanced_link_class' => 'btn btn-info btn-sm',
 				'close_link_class'    => 'btn btn-default btn-sm',
@@ -216,14 +218,10 @@ $Form->begin_form( 'inskin', '', $form_params );
 	$use_title = $edited_Item->get_type_setting( 'use_title' );
 	if( $use_title != 'never' )
 	{
-		$Form->switch_layout( 'none' );
-		echo '<table width="100%" class="compose_layout"><tr>';
-		$Form->labelstart = '<th width="1%" class="label">';
-		$Form->labelend = '</th>';
-		$Form->inputstart = '<td>';
-		$Form->inputend = '</td>';
+		$Form->switch_layout( 'fields_table' );
+		$Form->begin_fieldset();
 		$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array( 'maxlength' => 255, 'style' => 'width: 100%;', 'required' => ( $use_title == 'required' ) ) );
-		echo '</tr></table>';
+		$Form->end_fieldset();
 		$Form->switch_layout( NULL );
 	}
 
@@ -340,40 +338,16 @@ if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
 	$Form->hidden( 'google_map_type', $edited_Item->get_setting( 'map_type' ) );
 }
 
-// ################### PROPERTIES ###################
-if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
-{ // Custom fields are hidden by otem type
-	display_hidden_custom_fields( $Form, $edited_Item );
-}
-else
-{ // Custom fields should be displayed
-	$custom_fields = $edited_Item->get_type_custom_fields();
+// ################### CUSTOM FIELDS ###################
+$custom_fields = $edited_Item->get_type_custom_fields();
+if( count( $custom_fields ) > 0 )
+{
+	$Form->begin_fieldset( T_('Additional fields'), array( 'id' => 'itemform_custom_fields' ) );
 
-	if( count( $custom_fields ) > 0 )
-	{
-		$Form->begin_fieldset( T_('Additional fields') );
+	// Display inputs to edit custom fields:
+	display_editable_custom_fields( $Form, $edited_Item );
 
-		foreach( $custom_fields as $custom_field )
-		{	// Display each custom field:
-			switch( $custom_field['type'] )
-			{
-				case 'double':
-					$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, $custom_field['label'], T_('can be decimal') );
-					break;
-				case 'varchar':
-					$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, $custom_field['label'], '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
-					break;
-				case 'text':
-					$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, $custom_field['label'] );
-					break;
-				case 'html':
-					$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => T_('This field allows HTML code') ) );
-					break;
-			}
-		}
-
-		$Form->end_fieldset();
-	}
+	$Form->end_fieldset();
 }
 
 // ####################### ATTACHMENTS/LINKS #########################

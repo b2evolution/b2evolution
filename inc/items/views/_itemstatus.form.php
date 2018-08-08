@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -19,14 +19,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_ItemStatus;
 
-global $action;
+global $action, $admin_url;
+
+$ityp_usage = param( 'ityp_usage', 'string' );
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'itemstatus_checkchanges', 'post' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', ( $creating ?  T_('New post status') : T_('Post status') ).get_manual_link( 'managing-item-statuses-form' ) );
 
@@ -36,6 +38,43 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New post status') : T_('Post stat
 $Form->begin_fieldset( T_('General') );
 	$Form->text_input( 'pst_name', $edited_ItemStatus->get( 'name' ), 30, T_('Name'), '', array( 'required' => true ) );
 $Form->end_fieldset();
+
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_itemtypes_results_block( & $Form )
+{
+	$ityp_usage = param( 'ityp_usage', 'string' );
+
+	$Form->switch_layout( 'blockspan' );
+	echo '<div class="form-inline">';
+
+	$ItemTypeCache = & get_ItemTypeCache();
+	$item_usage_options = array(
+			T_('All') => '',
+		) + $ItemTypeCache->get_usage_option_array();
+
+	$options_str = '';
+	foreach( $item_usage_options as $usage_group => $rows )
+	{
+		$group_key = str_replace( ' ', '_', strtolower( $usage_group ) );
+		$options_str .= '<option style="font-weight: bold; font-style: italic;" value="'.$group_key.'"'.
+				( $ityp_usage == $group_key ? ' selected="selected"': '' ).'>'.$usage_group.'</option>';
+		if( ! empty( $rows ) )
+		{
+			foreach( $rows as $key => $value )
+			{
+				$options_str .= '<option value="'.$key.'"'.( $ityp_usage == $key ? ' selected="selected"': '' ).'>&nbsp;&nbsp;&nbsp;&nbsp;'.$value.'</option>';
+			}
+		}
+	}
+
+	$Form->select_input_options( 'ityp_usage', $options_str, T_('Usage') );
+	echo '</div>';
+	$Form->switch_layout( NULL );
+}
 
 $SQL = new SQL();
 if( $edited_ItemStatus->ID )
@@ -51,9 +90,58 @@ else
 	$SQL->SELECT( 'ityp_ID, ityp_name, NULL AS its_pst_ID' );
 	$SQL->FROM( 'T_items__type' );
 }
+if( ! empty( $ityp_usage ) )
+{
+	$ItemTypeCache = & get_ItemTypeCache();
+	$item_usage_options = array(
+			T_('All') => '',
+		) + $ItemTypeCache->get_usage_option_array();
+
+	$options = array();
+	foreach( $item_usage_options as $usage_group => $rows )
+	{
+		$group_key = str_replace( ' ', '_', strtolower( $usage_group ) );
+		$options[$group_key] = array();
+		if( ! empty( $rows ) )
+		{
+			foreach( $rows as $key => $value )
+			{
+				$options[$group_key][] = $key;
+			}
+		}
+	}
+
+	if( array_key_exists( $ityp_usage, $options ) )
+	{
+		$usage = $options[$ityp_usage];
+	}
+	else
+	{
+		$usage = $ityp_usage;
+	}
+
+	if( ! empty( $usage ) )
+	{
+		if( is_array( $usage ) )
+		{
+			$SQL->WHERE_and( 'ityp_usage IN ('.$DB->quote( $usage ).')' );
+		}
+		else
+		{
+			$SQL->WHERE_and( 'ityp_usage = '.$DB->quote( $usage ) );
+		}
+	}
+}
 
 $Results = new Results( $SQL->get(), 'ityp_' );
 $Results->title = T_('Item Types allowed for this Item Status').get_manual_link( 'item-statuses-allowed-per-item-type' );
+$Results->Form = $Form;
+
+$Results->filter_area = array(
+	'callback' => 'filter_itemtypes_results_block'
+);
+
+
 $Results->cols[] = array(
 		'th' => T_('ID'),
 		'th_class' => 'shrinkwrap',
@@ -105,10 +193,13 @@ $Results->cols[] = array(
 		'td' => '%get_name_for_itemtype( #ityp_ID#, #ityp_name# )%'
 	);
 
+$Results->display_init();
+
 $display_params = array(
-		'page_url' => 'admin.php?ctrl=itemstatuses&pst_ID='.$edited_ItemStatus->ID.'&action=edit'
+		'page_url' => 'admin.php?ctrl=itemstatuses&pst_ID='.$edited_ItemStatus->ID.'&action=edit',
 	);
 
+$Results->checkbox_toggle_selectors = 'input[name^=type_]:checkbox';
 $Results->display( $display_params );
 
 
@@ -117,6 +208,7 @@ foreach( $Results->rows as $row )
 {
 	$item_type_IDs[] = $row->ityp_ID;
 }
+$Form->hidden( 'action', 'edit' ); // This parameter will be overriden by actionArray parameter below
 $Form->hidden( 'item_type_IDs', implode( ',', $item_type_IDs ) );
 
 if( $creating )

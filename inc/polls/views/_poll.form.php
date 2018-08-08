@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -25,7 +25,7 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'poll_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,pqst_ID' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,pqst_ID' ) );
 
 $Form->begin_form( 'fform', ( $creating ?  T_('New poll') : T_('Poll') ).get_manual_link( 'poll-form' ) );
 
@@ -51,6 +51,11 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New poll') : T_('Poll') ).get_man
 		$Form->info( T_('Question'), $edited_Poll->get( 'question_text' ) );
 	}
 
+	if( $perm_poll_edit )
+	{
+		$Form->select_input_array( 'pqst_max_answers', $edited_Poll->get( 'max_answers'), range( 1, 10 ), T_('Allowed answers per user') );
+	}
+
 	if( $creating )
 	{	// Suggest to enter 10 answer options on creating new poll:
 		$answer_options = param( 'answer_options', 'array:string', array() );
@@ -70,24 +75,16 @@ $Form->end_form( $buttons );
 
 // ---- Poll Answers - START ---- //
 if( $edited_Poll->ID > 0 )
-{	// Display the answers table only when poll question is already exist in DB:
+{	// Display the answers table only when poll question already exists in the DB:
 
-	// Get an options count of the edited poll which has at least one answer:
-	$count_SQL = new SQL();
-	$count_SQL->SELECT( 'COUNT( pans_ID )' );
-	$count_SQL->FROM( 'T_polls__answer' );
-	$count_SQL->WHERE( 'pans_pqst_ID = '.$edited_Poll->ID );
-	$poll_options_count = $DB->get_var( $count_SQL->get(), 0, NULL, 'Get an options count of the edited poll which has at least one answer' );
-	if( $poll_options_count == 0 )
-	{	// To don't devide by zero
-		$poll_options_count = 1;
-	}
+	// Get numbers of votes and voters for the edited poll:
+	$poll_vote_nums = $edited_Poll->get_vote_nums();
 
 	// Get all options of the edited poll:
 	$SQL = new SQL();
 	$SQL->SELECT( 'popt_ID, popt_pqst_ID, popt_option_text, popt_order,' );
-	$SQL->SELECT_add( 'COUNT( pans_ID ) AS answers_count,' );
-	$SQL->SELECT_add( 'ROUND( COUNT( pans_ID ) / '.$poll_options_count.' * 100 ) AS answers_percent' );
+	$SQL->SELECT_add( 'COUNT( pans_pqst_ID ) AS answers_count,' );
+	$SQL->SELECT_add( 'ROUND( COUNT( pans_pqst_ID ) / '.( $poll_vote_nums['voters'] == 0 ? 1 : $poll_vote_nums['voters'] ).' * 100 ) AS answers_percent' );
 	$SQL->FROM( 'T_polls__option' );
 	$SQL->FROM_add( 'LEFT JOIN T_polls__answer ON pans_popt_ID = popt_ID' );
 	$SQL->WHERE( 'popt_pqst_ID = '.$edited_Poll->ID );
@@ -102,7 +99,7 @@ if( $edited_Poll->ID > 0 )
 	// Create result set:
 	$Results = new Results( $SQL->get(), 'pans_', 'A', NULL, $count_SQL->get() );
 
-	$Results->title = T_('Answers').' ('.$Results->get_total_rows().')'.get_manual_link( 'polls-answers-list' );
+	$Results->title = sprintf( T_('%d votes from %d users on %d possible answers'), $poll_vote_nums['votes'], $poll_vote_nums['voters'], $Results->get_total_rows() ).get_manual_link( 'polls-answers-list' );
 	$Results->Cache = get_PollOptionCache();
 
 	$Results->cols[] = array(
@@ -139,12 +136,25 @@ if( $edited_Poll->ID > 0 )
 			'td'    => '%poll_option_td_option( {Obj} )%',
 		);
 
+	/**
+	 * Get the Poll answer as link
+	 *
+	 * @param integer Poll option ID
+	 * @param integer Count of votes for this option
+	 * @return string
+	 */
+	function poll_option_td_answers( $option_ID, $answers_count )
+	{
+		global $edited_Poll, $admin_url;
+		return '<a href="'.$admin_url.'?ctrl=polls&amp;pqst_ID='.$edited_Poll->ID.'&amp;action=edit&amp;popt_ID='.$option_ID.'">'.$answers_count.'</a>';
+	}
+
 	$Results->cols[] = array(
 			'th'       => T_('Answers'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'right',
 			'order'    => 'answers_count',
-			'td'       => '$answers_count$',
+			'td'       => '%poll_option_td_answers( #popt_ID#, #answers_count# )%',
 		);
 
 	/**
@@ -192,4 +202,108 @@ if( $edited_Poll->ID > 0 )
 	$Results->display();
 }
 // ---- Poll Answers - END ---- //
+
+// ---- Detailed Poll Answers - START ---- //
+if( $edited_Poll->ID > 0 )
+{	// Display the detailed answers table only when poll question already exists in the DB:
+
+	// Get all options of the edited poll:
+	$option_IDs = $Results->Cache->get_ID_array();
+
+	$popt_ID = param( 'popt_ID', 'integer', NULL );
+
+	$r = array();
+	$options = array();
+
+	foreach( $option_IDs as $key => $option_ID )
+	{
+		$option = $Results->Cache->get_by_ID( $option_ID );
+		$r[] = 'SUM( IF( pans_popt_ID = '.$option_ID.', 1, 0 ) ) AS opt'.$key;
+		$options[] = $option;
+	}
+	$r = implode( ', ', $r );
+
+	$answer_SQL = new SQL();
+	$answer_SQL->SELECT( 'pans_user_ID, user_login,'.$r );
+	$answer_SQL->FROM( 'T_polls__answer' );
+	$answer_SQL->FROM_add( 'LEFT JOIN T_users ON user_ID = pans_user_ID' );
+	$answer_SQL->WHERE( 'pans_pqst_ID = '.$edited_Poll->ID );
+	$answer_SQL->GROUP_BY( 'pans_user_ID, user_login' );
+
+	$answer_count_SQL = new SQL();
+	$answer_count_SQL->SELECT( 'COUNT( DISTINCT pans_user_ID )' );
+	$answer_count_SQL->FROM( 'T_polls__answer' );
+	$answer_count_SQL->WHERE( 'pans_pqst_ID = '.$edited_Poll->ID );
+	if( $popt_ID )
+	{
+		$option = $Results->Cache->get_by_ID( $popt_ID );
+		$answer_SQL->WHERE( 'pans_popt_ID = '.$DB->quote( $popt_ID ) );
+		$answer_count_SQL->WHERE( 'pans_popt_ID = '.$DB->quote( $popt_ID ) );
+		$option_text = $option->get( 'option_text' );
+	}
+
+	// Create result set:
+	$answer_Results = new Results( $answer_SQL->get(), 'dpans_', '-A', NULL, $answer_count_SQL->get() );
+	$answer_Results->title = T_('Detailed answers').( empty( $option_text ) ? '' : ' - '.$option_text ).get_manual_link( 'poll-detailed-answers' );
+
+	$answer_Results->cols[] = array(
+		'th'       => T_('Picture'),
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap',
+		'order'    => 'pans_user_ID',
+		'td'       => '%user_td_avatar( #pans_user_ID# )%',
+	);
+
+	$answer_Results->cols[] = array(
+		'td_class' => 'nowrap',
+		'th'    => T_('Login'),
+		'order' => 'user_login',
+		'td' => '%get_user_identity_link( #user_login#, #pans_user_ID#, "profile", "login" )%',
+	);
+
+	/**
+	 * Get the Poll answer as checkmark
+	 *
+	 * @param boolean Poll answer
+	 * @return string
+	 */
+	function poll_answer_td_option( $answer )
+	{
+		if( $answer )
+		{
+			return get_icon( 'allowback' );
+		}
+
+		return NULL;
+	}
+
+
+	/**
+	 * Sort poll options based on order
+	 */
+	function sort_poll_options( $a, $b )
+	{
+		if( $a->get( 'order' ) == $b->get( 'order' ) )
+		{
+			return $a->ID < $b->ID ? -1 : 1;
+		}
+
+		return ( $a->get('order') < $b->get('order') ? -1 : 1 );
+	}
+
+	uasort( $options, 'sort_poll_options' ); // This ensures that the column order follows the order of the previous result
+	foreach( $options as $key => $option )
+	{
+		$answer_Results->cols[] = array(
+			'th'       => '<span title="'.$option->get( 'option_text' ).'">'.$option->get( 'order' ).'</span>',
+			'th_class' => '',
+			'td_class' => 'center',
+			'order'    => 'opt'.$key,
+			'td'       => '%poll_answer_td_option( #opt'.$key.'# )%',
+		);
+	}
+
+	$answer_Results->display();
+}
+// ---- Detailed Poll Answers - END ---- //
 ?>

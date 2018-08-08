@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -935,19 +935,19 @@ function locale_updateDB()
 		{
 			if( $lfield == 'datefmt' && empty( $pval ) )
 			{
-				param_error( $pkey, sprintf( T_('Locale %s date format cannot be empty'), $plocale ) );
+				param_error( $pkey, T_('Date format cannot be empty.').' ('.$plocale.')' );
 			}
 			elseif( $lfield == 'input_datefmt' && empty( $pval ) )
 			{
-				param_error( $pkey, sprintf( T_('Locale %s input date format cannot be empty'), $plocale ) );
+				param_error( $pkey, T_('Input date format cannot be empty.').' ('.$plocale.')' );
 			}
 			elseif( $lfield == 'timefmt' && empty( $pval ) )
 			{
-				param_error( $pkey, sprintf( T_('Locale %s time format cannot be empty'), $plocale ) );
+				param_error( $pkey, T_('Time format cannot be empty.').' ('.$plocale.')' );
 			}
 			elseif( $lfield == 'input_timefmt' && empty( $pval ) )
 			{
-				param_error( $pkey, sprintf( T_('Locale %s input time format cannot be empty'), $plocale ) );
+				param_error( $pkey, T_('Input time format cannot be empty.').' ('.$plocale.')' );
 			}
 
 			if( $lfield == 'startofweek' && ( $pval < 0 || $pval > 6 ) )
@@ -1285,7 +1285,7 @@ function init_charsets( $req_io_charset )
 	// Make sure the DB send us text in the same charset as $evo_charset (override whatever may have been set before)
 	if( isset($DB) ) // not available in /install/index.php
 	{	// Set encoding for MySQL connection:
-		$DB->set_connection_charset( $evo_charset );
+		$DB->connection_charset = $evo_charset;
 	}
 
 	$Debuglog->add( 'evo_charset: '.$evo_charset, 'locale' );
@@ -1331,7 +1331,7 @@ function locales_load_available_defs()
 		$locale_def_files = get_filenames( $ad_locale_folder, $filename_params );
 		if( $locale_def_files === false )
 		{	// Impossible to read the locale folder:
-			$Messages->add( sprintf( T_('The locale %s is not readable. Please check file permissions.'), $locale_folder ), 'warning' );
+			$Messages->add( sprintf( /* No trans for debug messages */ 'The locale %s is not readable. Please check file permissions.', $locale_folder ), 'warning' );
 			continue;
 		}
 		// Go through files in locale folder:
@@ -1522,10 +1522,10 @@ function locale_insert_default()
 
 	if( ! empty( $activate_locales ) )
 	{ // Insert locales into DB
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get locales' );
 		$SQL->SELECT( 'loc_locale' );
 		$SQL->FROM( 'T_locales' );
-		$existing_locales = $DB->get_col( $SQL->get() );
+		$existing_locales = $DB->get_col( $SQL );
 
 		$insert_data = array();
 		foreach( $activate_locales as $a_locale )
@@ -1645,11 +1645,11 @@ function locale_check_default()
 	}
 
 	// Get a row of current default locale in order to check if it is enabled:
-	$SQL = new SQL();
+	$SQL = new SQL( 'Check if current default locale is enabled' );
 	$SQL->SELECT( 'loc_enabled' );
 	$SQL->FROM( 'T_locales' );
 	$SQL->WHERE( 'loc_locale = '.$DB->quote( $current_default_locale ) );
-	$current_default_locale_enabled = $DB->get_var( $SQL->get() );
+	$current_default_locale_enabled = $DB->get_var( $SQL );
 
 	if( $current_default_locale_enabled !== NULL )
 	{	// Current default locale exists in DB
@@ -1718,7 +1718,7 @@ function locale_get( $field, $locale = NULL, $default = NULL )
 		$default_values = array(
 			'datefmt' => 'Y-m-d',
 			'longdatefmt' => 'Y-m-d',
-			'extdatefmt' => 'M d Y',
+			'extdatefmt' => 'M d, Y',
 			'input_datefmt' => 'Y-m-d',
 			'timefmt' => 'H:i:s',
 			'shorttimefmt' => 'H:i',
@@ -1913,4 +1913,49 @@ if( ! function_exists( 'normalizer_normalize' ) )
 	}
 }
 
+
+/**
+ * Get currency data from locale
+ *
+ * @param string Locale code, '#' - to use current currency
+ * @param string What return: 'code', 'symbol', 'ID'
+ * @return string|boolean Currency data depending on param $return OR FALSE on failed
+ */
+function locale_currency( $locale = '#', $return = 'code' )
+{
+	global $current_locale;
+
+	if( $locale == '#' )
+	{	// Use current locale:
+		$locale = $current_locale;
+	}
+
+	// Extract country code from locale code:
+	$country_code = strtolower( substr( $locale, 3, 2 ) );
+
+	$CountryCache = & get_CountryCache();
+	if( ! ( $locale_Country = & $CountryCache->get_by_name( $country_code, false, false ) ) )
+	{	// Couldn't detect country by code:
+		return false;
+	}
+
+	if( ! ( $country_Currency = & $locale_Country->get_Currency() ) )
+	{	// Couldn't detect currency for the locale country:
+		return false;
+	}
+
+	// Return currency code depending on param $return:
+	switch( $return )
+	{
+		case 'symbol':
+			return $country_Currency->get( 'shortcut' );
+
+		case 'ID':
+			return $country_Currency->ID;
+
+		case 'code':
+		default:
+			return $country_Currency->get( 'code' );
+	}
+}
 ?>

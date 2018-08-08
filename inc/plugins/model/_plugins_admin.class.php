@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package plugins
@@ -69,6 +69,7 @@ class Plugins_admin extends Plugins
 	 *  - PluginUserSettingsUpdateAction (Called as action before updating the plugin's user settings)
 	 *  - PluginUserSettingsEditDisplayAfter (Called after displaying normal user settings)
 	 *  - PluginUserSettingsValidateSet (Called before setting a plugin's user setting in the backoffice)
+	 *  - PluginGroupSettingsValidateSet (Called before setting a plugin's group setting in the backoffice)
 	 *  - PluginVersionChanged (Called when we detect a version change)
 	 *  - PluginCollSettingsUpdateAction (Called as action before updating the collection/blog's settings)
 	 *
@@ -176,6 +177,7 @@ class Plugins_admin extends Plugins
 				'AfterUserDelete' => 'This gets called after an user has been deleted from the database.',
 				'AfterUserInsert' => 'This gets called after an user has been inserted into the database.',
 				'AfterUserUpdate' => 'This gets called after an user has been updated in the database.',
+				'AdminAfterUsersList' => 'This gets called right after displaying the admin users list.',
 
 				// fp> This is actually RENDERing, right?
 				// TODO: Rename to "DispRender"
@@ -224,9 +226,8 @@ class Plugins_admin extends Plugins
 				'GetSpamKarmaForComment' => 'Asks plugin for the spam karma of a comment/trackback.',
 
 				// Other Plugins can use this:
-				'CaptchaValidated' => 'Validate the test from CaptchaPayload to detect humans.',
-				'CaptchaValidatedCleanup' => 'Cleanup data used for CaptchaValidated.',
-				'CaptchaPayload' => 'Provide a turing test to detect humans.',
+				'RequestCaptcha' => 'Return data to display captcha html code.',
+				'ValidateCaptcha' => 'Validate the test from RequestCaptcha to detect humans.',
 
 				'RegisterFormSent' => 'Called when the "Register" form has been submitted.',
 				'ValidateAccountFormSent' => 'Called when the "Validate account" form has been submitted.',
@@ -675,13 +676,17 @@ class Plugins_admin extends Plugins
 
 		$DB->begin();
 
-		// Delete Plugin settings (constraints)
-		$DB->query( "DELETE FROM T_pluginsettings
-		              WHERE pset_plug_ID = $plugin_ID" );
+		// Delete Plugin settings (constraints):
+		$DB->query( 'DELETE FROM T_pluginsettings
+			WHERE pset_plug_ID = '.$plugin_ID );
 
-		// Delete Plugin user settings (constraints)
-		$DB->query( "DELETE FROM T_pluginusersettings
-		              WHERE puset_plug_ID = $plugin_ID" );
+		// Delete Plugin user settings (constraints):
+		$DB->query( 'DELETE FROM T_pluginusersettings
+			WHERE puset_plug_ID = '.$plugin_ID );
+
+		// Delete Plugin group settings (constraints):
+		$DB->query( 'DELETE FROM T_plugingroupsettings
+			WHERE pgset_plug_ID = '.$plugin_ID );
 
 		// Delete Plugin events (constraints)
 		$plugin_events = $DB->get_col( '
@@ -1007,7 +1012,7 @@ class Plugins_admin extends Plugins
 		if( $result )
 		{ // Update references to code:
 			// Widgets
-			$DB->query( 'UPDATE T_widget
+			$DB->query( 'UPDATE T_widget__widget
 				  SET wi_code = '.$DB->quote( $code ).'
 				WHERE wi_code = '.$DB->quote( $old_code ) );
 			// Update the renderer fields in the tables of Items, Comments and Messages:

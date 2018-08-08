@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -30,13 +30,33 @@ $count_SQL->FROM( 'T_antispam__iprange' );
 
 if( !empty( $ip_address ) )
 { // Filter by IP address
-	$ip_address = ip2int( $ip_address );
+	if( is_valid_ip_format( $ip_address ) )
+	{	// If full IP address is entered:
+		$start_ip_address = ip2int( $ip_address );
+		$end_ip_address = $start_ip_address;
+	}
+	elseif( preg_match( '/^\d{1,3}(\.\d{1,3}){0,2}\.?$/', $ip_address, $part_ip_address ) )
+	{	// Part of IP address is entered like "127.0", we should find "127.0.*.*":
+		$part_ip_address = explode( '.', rtrim( $part_ip_address[0], '.' ) );
+		$start_ip_address = $part_ip_address;
+		$end_ip_address = $part_ip_address;
+		for( $i = 0; $i < 4 - count( $part_ip_address ); $i++ )
+		{
+			$start_ip_address[] = '255';
+			$end_ip_address[] = '0';
+		}
+		$start_ip_address = ip2int( implode( '.', $start_ip_address ) );
+		$end_ip_address = ip2int( implode( '.', $end_ip_address ) );
+	}
 
-	$SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $ip_address ) );
-	$SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $ip_address ) );
+	if( isset( $start_ip_address, $end_ip_address ) )
+	{	// Filter only with correct entered IP address:
+		$SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $start_ip_address ) );
+		$SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $end_ip_address ) );
 
-	$count_SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $ip_address ) );
-	$count_SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $ip_address ) );
+		$count_SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $start_ip_address ) );
+		$count_SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $end_ip_address ) );
+	}
 }
 
 // Create result set:
@@ -74,7 +94,7 @@ $Results->cols[] = array(
 		'td' => /* Check permission: */$current_User->check_perm( 'spamblacklist', 'edit' ) ?
 			/* Current user can edit IP ranges */'<a href="#" rel="$aipr_status$">%aipr_status_title( #aipr_status# )%</a>' :
 			/* No edit, only view the status */'%aipr_status_title( #aipr_status# )%',
-		'td_class' => 'iprange_status_edit',
+		'td_class' => 'jeditable_cell iprange_status_edit',
 		'order' => 'aipr_status',
 		'extra' => array ( 'style' => 'background-color: %aipr_status_color( "#aipr_status#" )%;', 'format_to_output' => false )
 	);
@@ -82,7 +102,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('IP Range Start'),
 		'td' => /* Check permission: */$current_User->check_perm( 'spamblacklist', 'edit' ) ?
-			/* Current user can edit IP ranges */'<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;iprange_ID=$aipr_ID$&amp;action=iprange_edit">%int2ip( #aipr_IPv4start# )%</a>' :
+			/* Current user can edit IP ranges */'<a href="'.$admin_url.'?ctrl=antispam'.$tab_param.'&amp;tab3=ipranges&amp;iprange_ID=$aipr_ID$&amp;action=iprange_edit&amp;filter=new">%int2ip( #aipr_IPv4start# )%</a>' :
 			/* No edit, only view the IP address */'%int2ip( #aipr_IPv4start# )%',
 		'order' => 'aipr_IPv4start',
 	);
@@ -90,7 +110,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('IP Range End'),
 		'td' => /* Check permission: */$current_User->check_perm( 'spamblacklist', 'edit' ) ?
-			/* Current user can edit IP ranges */'<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;iprange_ID=$aipr_ID$&amp;action=iprange_edit">%int2ip( #aipr_IPv4end# )%</a>' :
+			/* Current user can edit IP ranges */'<a href="'.$admin_url.'?ctrl=antispam'.$tab_param.'&amp;tab3=ipranges&amp;iprange_ID=$aipr_ID$&amp;action=iprange_edit&amp;filter=new">%int2ip( #aipr_IPv4end# )%</a>' :
 			/* No edit, only view the IP address */'%int2ip( #aipr_IPv4end# )%',
 		'order' => 'aipr_IPv4end',
 	);
@@ -138,7 +158,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 		
 		// A link to edit IP range
 		$r = action_icon( T_('Edit this IP range...'), 'properties',
-						$admin_url.'?ctrl=antispam'.$tab_param.'&amp;tab3=ipranges&amp;iprange_ID='.$aipr_ID.'&amp;action=iprange_edit' );
+						$admin_url.'?ctrl=antispam'.$tab_param.'&amp;tab3=ipranges&amp;iprange_ID='.$aipr_ID.'&amp;action=iprange_edit&amp;filter=new' );
 
 		// A link to delete IP range
 		$r .= action_icon( T_('Delete this IP range!'), 'delete',
@@ -155,7 +175,10 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 		);
 }
 
-$Results->global_icon( T_('Add a new IP range...'), 'new', regenerate_url( 'action', 'action=iprange_new'), T_('New IP range').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+{	// Check permission to edit IP ranges:
+	$Results->global_icon( T_('Add a new IP range...'), 'new', regenerate_url( 'action', 'action=iprange_new'), T_('New IP range').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+}
 
 $Results->display();
 

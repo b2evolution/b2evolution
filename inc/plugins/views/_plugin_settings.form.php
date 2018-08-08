@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -140,8 +140,8 @@ $Form->end_fieldset();
 if( $current_User->check_perm( 'options', 'edit', false ) )
 {
 	$Form->buttons_input( array(
-		array( 'type' => 'submit', 'name' => 'actionArray[update_edit_settings]', 'value' => T_('Save & Edit...') ),
 		array( 'type' => 'submit', 'name' => 'actionArray[update_settings]', 'value' => T_('Save Changes!'), 'class' => 'SaveButton' ),
+		array( 'type' => 'submit', 'name' => 'actionArray[update_edit_settings]', 'value' => T_('Save & edit').'...' ),
 		) );
 }
 $Form->end_form();

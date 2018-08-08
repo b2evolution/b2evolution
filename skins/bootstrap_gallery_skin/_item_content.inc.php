@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -28,10 +28,10 @@ $params = array_merge( array(
 		// Wrap images and text:
 		'content_start_excerpt'    => '<section class="evo_post__excerpt">',		// In case of compact display
 		'content_end_excerpt'      => '</section>',
-		'content_start_full'       => '<section class="evo_post__full panel panel-default">',		// In case of full display
+		'content_start_full'       => in_array( $disp_detail, array( 'help', 'register' ) ) ? '' : '<section class="evo_post__full panel panel-default">',		// In case of full display
 		'content_title_start'      => '<div class="panel-heading gallery-single-content">',			// Wraps title and number of photos in the album
-		'content_title_end'         => '</div>',
-		'content_end_full'         => '</section>',
+		'content_title_end'        => '</div>',
+		'content_end_full'         => in_array( $disp_detail, array( 'help', 'register' ) ) ? '' : '</section>',
 
 		// In case we display a compact version of the post:
 		'excerpt_before_text'      => '<div class="evo_post__excerpt_text">',
@@ -42,8 +42,8 @@ $params = array_merge( array(
 		'excerpt_more_text'        => T_('more').' &raquo;',
 
 		// In case we display a full version of the post:
-		'content_start_full_text'  => '<div class="evo_post__full_text panel-body">',
-		'content_end_full_text'    => '</div>',
+		'content_start_full_text'  => in_array( $disp_detail, array( 'help', 'register' ) ) ? '' : '<div class="evo_post__full_text panel-body">',
+		'content_end_full_text'    => in_array( $disp_detail, array( 'help', 'register' ) ) ? '' : '</div>',
 
 		'before_content_teaser'    => '',
 		'after_content_teaser'     => '',
@@ -79,7 +79,7 @@ $params = array_merge( array(
 		'gallery_colls'            => 5,
 		'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
 
-		'before_url_link'          => '<p class="evo_post_link">'.T_('Link:').' ',
+		'before_url_link'          => '<p class="evo_post_link">'.T_('Link').': ',
 		'after_url_link'           => '</p>',
 		'url_link_text_template'   => '$url$', // If evaluates to empty, nothing will be displayed (except player if podcast)
 		'url_link_url_template'    => '$url$', // $url$ will be replaced with saved URL address
@@ -91,7 +91,7 @@ $params = array_merge( array(
 		'more_link_to'             => 'single#anchor', // Can be 'single' or 'single#anchor' which is permalink + "#more55" where 55 is item ID
 		'anchor_text'              => '<p class="evo_post_more_anchor">...</p>', // Text to display as the more anchor (once the more link has been clicked, '#' defaults to "Follow up:")
 
-		'page_links_start'         => '<p class="evo_post_pagination">'.T_('Pages:').' ',
+		'page_links_start'         => '<p class="evo_post_pagination">'.T_('Pages').': ',
 		'page_links_end'           => '</p>',
 		'page_links_separator'     => '&middot; ',
 		'page_links_single'        => '',
@@ -216,7 +216,8 @@ switch( $content_mode )
 		// Normal dislpay:  (and Full display if force_more is true)
 		echo $params['content_start_full'];
 
-			// Title and number of photos in album
+		if( ! in_array( $disp_detail, array( 'help', 'register' ) ) )
+		{	// Title and number of photos in album
 			echo $params['content_title_start'];
 				// Flag:
 				$Item->flag( array(
@@ -233,6 +234,7 @@ switch( $content_mode )
 					printf( T_(' (%s photos)'), $Item->get_number_of_images() );
 				echo '</h4>';
 			echo $params['content_title_end'];
+		}
 
 		if( ! empty($params['image_size']) )
 		{
@@ -270,16 +272,6 @@ switch( $content_mode )
 
 			echo $params['content_start_full_text'];
 
-			// URL link, if the post has one:
-			$Item->url_link( array(
-					'before'        => $params['before_url_link'],
-					'after'         => $params['after_url_link'],
-					'text_template' => $params['url_link_text_template'],
-					'url_template'  => $params['url_link_url_template'],
-					'target'        => $params['url_link_target'],
-					'podcast'       => '#', // Auto display mp3 player if post type is podcast (=> false, to disable)
-				) );
-
 			// Display CONTENT (at least the TEASER part):
 			$Item->content_teaser( array(
 					'before'              => $params['before_content_teaser'],
@@ -292,6 +284,18 @@ switch( $content_mode )
 					'image_size'          => $params['image_size'],
 					'limit'               => $params['image_limit'],
 					'image_link_to'       => $params['image_link_to'],
+					'before_gallery'      => $params['before_gallery'],
+					'after_gallery'       => $params['after_gallery'],
+					'gallery_table_start' => $params['gallery_table_start'],
+					'gallery_table_end'   => $params['gallery_table_end'],
+					'gallery_row_start'   => $params['gallery_row_start'],
+					'gallery_row_end'     => $params['gallery_row_end'],
+					'gallery_cell_start'  => $params['gallery_cell_start'],
+					'gallery_cell_end'    => $params['gallery_cell_end'],
+					'gallery_image_size'  => $params['gallery_image_size'],
+					'gallery_image_limit' => $params['gallery_image_limit'],
+					'gallery_colls'       => $params['gallery_colls'],
+					'gallery_order'       => $params['gallery_order'],
 				) );
 
 			// Display either the "Read more"/"Full story" link OR the #anchor for #direct linking to the "after more" part:
@@ -366,16 +370,6 @@ switch( $content_mode )
 					'block_start' => $params['footer_text_start'],
 					'block_end'   => $params['footer_text_end'],
 				) );
-
-				// URL link, if the post has one:
-				$Item->url_link( array(
-						'before'        => '<div class="small evo_print text-muted">'.T_('Link').': ',
-						'after'         => '</div>',
-						'text_template' => '$url$',
-						'url_template'  => '$url$',
-						'target'        => '',
-						'podcast'       => false,        // DO NOT display mp3 player if post type is podcast
-					) );
 
 			echo $params['content_end_full_text'];
 		}

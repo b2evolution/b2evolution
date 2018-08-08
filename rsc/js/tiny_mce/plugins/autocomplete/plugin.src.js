@@ -234,10 +234,10 @@
 
 				for (var i in matches) {
 					if (matches[i].key != null) {
-						matchesList += "<li data-value='" + matches[i].key + "'>" + matches[i].key.replace(highlightRegex, "<mark>$1</mark>") + " " + matches[i].description + "</li>";
+						matchesList += "<li data-value='" + matches[i].key + "'><a>" + matches[i].key.replace(highlightRegex, "<mark>$1</mark>") + " " + matches[i].description + "</a></li>";
 					}
 					else if( typeof( matches[i] ) == 'string' ) {
-						matchesList += "<li data-value='" + matches[i] + "'>" + matches[i].replace(highlightRegex, "<mark>$1</mark>") + "</li>";
+						matchesList += "<li data-value='" + matches[i] + "'><a>" + matches[i].replace(highlightRegex, "<mark>$1</mark>") + "</a></li>";
 					}
 				}
 				jQuery(autocomplete_data.list).html(matchesList);
@@ -278,7 +278,7 @@
 
 			function createOptionList() {
 				var ulContainer = document.createElement("ul");
-				jQuery(ulContainer).addClass("textcomplete-list");
+				jQuery(ulContainer).addClass("dropdown-menu textcomplete-dropdown");
 				document.body.appendChild(ulContainer);
 				return ulContainer;
 			}

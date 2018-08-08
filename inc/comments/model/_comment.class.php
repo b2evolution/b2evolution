@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -131,6 +131,16 @@ class Comment extends DataObject
 	 * @var boolean
 	 */
 	var $allow_msgform;
+	/**
+	 * Does an anonymous commentator notify of replies?
+	 * @var boolean
+	 */
+	var $anon_notify;
+	/**
+	 * Last time and count of email notifications per day for anonymous author
+	 * @var string
+	 */
+	var $anon_notify_last;
 
 	var $nofollow;
 	/**
@@ -162,6 +172,13 @@ class Comment extends DataObject
 	 * @var integer
 	 */
 	var $in_reply_to_cmt_ID;
+
+	/**
+	 * Parent Comment
+	 *
+	 * @var object
+	 */
+	var $parent_Comment;
 
 	/**
 	 * Voting result of all votes in system helpfulness
@@ -242,6 +259,8 @@ class Comment extends DataObject
 			$this->nofollow = $db_row->comment_nofollow;
 			$this->spam_karma = $db_row->comment_spam_karma;
 			$this->allow_msgform = $db_row->comment_allow_msgform;
+			$this->anon_notify = $db_row->comment_anon_notify;
+			$this->anon_notify_last = $db_row->comment_anon_notify_last;
 			$this->secret = $db_row->comment_secret;
 			$this->notif_status = $db_row->comment_notif_status;
 			$this->notif_ctsk_ID = $db_row->comment_notif_ctsk_ID;
@@ -299,13 +318,12 @@ class Comment extends DataObject
 	 * Delete those comments from the database which corresponds to the given condition or to the given ids array
 	 * Note: the delete cascade arrays are handled!
 	 *
-	 * @param string the name of this class
-	 *   Note: This is required until min phpversion will be 5.3. Since PHP 5.3 we can use static::function_name to achieve late static bindings
 	 * @param string where condition
 	 * @param array object ids
+	 * @param array additional params if required
 	 * @return mixed # of rows affected or false if error
 	 */
-	static function db_delete_where( $class_name, $sql_where, $object_ids = NULL, $params = NULL )
+	static function db_delete_where( $sql_where, $object_ids = NULL, $params = NULL )
 	{
 		global $DB;
 
@@ -334,7 +352,7 @@ class Comment extends DataObject
 			WHERE link_cmt_ID IN ( '.implode( ', ', $object_ids ).' )';
 		$attached_file_ids = $DB->get_col( $query_get_attached_file_ids );
 
-		$result = parent::db_delete_where( $class_name, $sql_where, $object_ids );
+		$result = parent::db_delete_where( $sql_where, $object_ids );
 
 		if( ( $result !== false ) && ( ! empty( $attached_file_ids ) ) )
 		{ // Delete orphan attachments and empty comment attachment folders
@@ -382,6 +400,51 @@ class Comment extends DataObject
 		}
 
 		return $this->Item;
+	}
+
+
+	/**
+	 * Get the Item this comment relates to
+	 *
+	 * @return Item
+	 */
+	function & get_parent_Comment()
+	{
+		if( ! isset( $this->parent_Comment ) )
+		{
+			$CommentCache = & get_CommentCache();
+			$this->parent_Comment = & $CommentCache->get_by_ID( $this->in_reply_to_cmt_ID, false, false );
+		}
+
+		return $this->parent_Comment;
+	}
+
+
+	/**
+	 * Fix parent Comment to top possible Comment from the same Item/Post
+	 */
+	function set_correct_parent_comment()
+	{
+		if( empty( $this->in_reply_to_cmt_ID ) )
+		{	// Nothing to fix because this comment has no parent Comment:
+			return;
+		}
+
+		// Use NULL to set comment in root if no found a proper top parent comment:
+		$correct_in_reply_to_cmt_ID = NULL;
+
+		$parent_Comment = & $this->get_parent_Comment();
+		while( $parent_Comment )
+		{
+			if( $parent_Comment->get( 'item_ID' ) == $this->get( 'item_ID' ) )
+			{	// This comment is located in same new created Item then we should use this as parent:
+				$correct_in_reply_to_cmt_ID = $parent_Comment->ID;
+				break;
+			}
+			$parent_Comment = & $parent_Comment->get_parent_Comment();
+		}
+
+		$this->set( 'in_reply_to_cmt_ID', $correct_in_reply_to_cmt_ID, true );
 	}
 
 
@@ -449,7 +512,10 @@ class Comment extends DataObject
 				// We need to set a reminder here to later check if the new status is allowed at dbinsert or dbupdate time ( $this->restrict_status( true ) )
 				// We cannot check immediately because we may be setting the status before having set a main cat_ID -> a collection ID to check the status possibilities
 				// Save previous status temporarily to make some changes on dbinsert(), dbupdate() & dbdelete()
-				$this->previous_status = $this->get( 'status' );
+				if( ! isset( $this->previous_status ) )
+				{	// Set once previous status to know what status was original on several rewriting per same page request:
+					$this->previous_status = $this->get( 'status' );
+				}
 				return parent::set( 'status', $parvalue, $make_null );
 
 			default:
@@ -540,7 +606,7 @@ class Comment extends DataObject
 		$SQL->FROM( 'T_comments__votes' );
 		$SQL->WHERE( 'cmvt_cmt_ID = '.$DB->quote( $this->ID ) );
 		$SQL->WHERE_and( 'cmvt_user_ID = '.$DB->quote( $current_User->ID ) );
-		$existing_vote = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
+		$existing_vote = $DB->get_row( $SQL );
 
 		if( $existing_vote === NULL )
 		{	// Add a new vote for first time:
@@ -621,7 +687,7 @@ class Comment extends DataObject
 			$SQL->FROM( 'T_comments__votes' );
 			$SQL->WHERE( 'cmvt_cmt_ID = '.$DB->quote( $this->ID ) );
 			$SQL->WHERE_and( 'cmvt_user_ID = '.$DB->quote( $current_User->ID ) );
-			$cache_comments_vote_statuses[ $this->ID ] = $DB->get_row( $SQL->get(), ARRAY_A, NULL, $SQL->title );
+			$cache_comments_vote_statuses[ $this->ID ] = $DB->get_row( $SQL, ARRAY_A );
 		}
 
 		if( isset( $cache_comments_vote_statuses[ $this->ID ][ $type ] ) )
@@ -1077,7 +1143,7 @@ class Comment extends DataObject
 
 		if( $this->get_author_User() )
 		{ // Author is a registered user:
-			if( $params['after_user'] == '#' ) $params['after_user'] = ' <span class="bUser-member-tag">['.T_('Member').']</span>';
+			if( $params['after_user'] == '#' ) $params['after_user'] = ' '.$this->get_author_label( $params );
 
 			$r = $this->author_User->get_identity_link( $params );
 
@@ -1085,7 +1151,7 @@ class Comment extends DataObject
 		}
 		else
 		{ // Not a registered user, display info recorded at edit time:
-			if( $params['after'] == '#' ) $params['after'] = ' <span class="bUser-anonymous-tag">['.T_('Visitor').']</span>';
+			if( $params['after'] == '#' ) $params['after'] = ' '.$this->get_author_label( $params );
 
 			if( utf8_strlen( $this->author_url ) <= 10 )
 			{ // URL is too short anyways...
@@ -1125,6 +1191,52 @@ class Comment extends DataObject
 		);
 
 		$Plugins->trigger_event( 'FilterCommentAuthor', $hook_params );
+
+		return $r;
+	}
+
+
+	/**
+	 * Get author label
+	 *
+	 * @param array Params
+	 */
+	function get_author_label( $params = array() )
+	{
+		global $Skin;
+
+		// Default params:
+		if( is_admin_page() || ( isset( $Skin ) && $Skin->get_css_framework() == 'bootstrap' ) )
+		{	// for v6 bootstrap skins:
+			$default_params = array(
+					'member_before'  => '<span class="label label-info">',
+					'member_after'   => '</span>',
+					'visitor_before' => '<span class="label label-warning">',
+					'visitor_after'  => '</span>',
+				);
+		}
+		else
+		{	// for v5 skins:
+			$default_params = array(
+					'member_before'  => '<span class="bUser-member-tag">[',
+					'member_after'   => ']</span>',
+					'visitor_before' => '<span class="bUser-anonymous-tag">[',
+					'visitor_after'  => ']</span>',
+				);
+		}
+		$params = array_merge( $default_params, $params );
+
+		$r = '';
+
+		// Type of author:
+		if( $this->get_author_User() )
+		{	// If author is a registered user:
+			$r .= $params['member_before'].T_('Member').$params['member_after'];
+		}
+		else
+		{	// If author is not a registered user:
+			$r .= $params['visitor_before'].T_('Visitor').$params['visitor_after'];
+		}
 
 		return $r;
 	}
@@ -1314,8 +1426,10 @@ class Comment extends DataObject
 	/**
 	 * Display author url, delete icon and ban icon if user has proper rights
 	 *
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 * @param boolean true to use ajax button
 	 * @param boolean true to check user permission to edit this comment and antispam screen
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 */
 	function author_url_with_actions( $redirect_to = NULL, $ajax_button = false, $check_perms = true, $save_context = true )
 	{
@@ -1326,7 +1440,7 @@ class Comment extends DataObject
 			{ // Author is anonymous user and we have permission to edit this comment...
 				if( $redirect_to == NULL )
 				{
-					$redirect_to = rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
+					$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 				}
 				$this->deleteurl_link( $redirect_to, $ajax_button, false, '&amp;', $save_context );
 				$this->banurl_link( $redirect_to, $ajax_button, true, '&amp;', $save_context );
@@ -1354,7 +1468,7 @@ class Comment extends DataObject
 		{
 			if( ! isset($template_unknown) )
 			{
-				echo /* TRANS: "not available" */ T_('N/A');
+				echo /* TRANS: "Not Available" */ T_('N/A');
 			}
 			else
 			{
@@ -1373,8 +1487,8 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param string Glue string for url params
-	 * @param boolean TRUE - to save context(memorized params)
-	 * @param string Redirect url
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 * @return boolean
 	 */
 	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $redirect_to = NULL )
@@ -1408,15 +1522,12 @@ class Comment extends DataObject
 			echo '<a href="'.$admin_url.'?ctrl=comments'.$glue.'blog='.$item_Blog->ID.$glue.'action=edit'.$glue.'comment_ID='.$this->ID;
 		}
 		if( $save_context )
-		{
-			if( $redirect_to != NULL )
-			{
-				echo $glue.'redirect_to='.$redirect_to;
+		{	// Use a param to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Get current url for redirect:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			else
-			{
-				echo $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
-			}
+			echo $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 		echo '" title="'.$title.'"';
 		echo empty( $class ) ? '' : ' class="'.$class.'"';
@@ -1433,9 +1544,12 @@ class Comment extends DataObject
 
 	/**
 	 * Display delete icon for deleting author_url if user has proper rights
+	 *
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 * @param boolean true if create ajax button
 	 * @param boolean true if need permission check, because it wasn't checked before
-	 * @param glue between url params
+	 * @param string glue between url params
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @return link on success, false otherwise
 	 */
 	function deleteurl_link( $redirect_to, $ajax_button = false, $check_perm = true, $glue = '&amp;', $save_context = true )
@@ -1450,19 +1564,19 @@ class Comment extends DataObject
 		}
 
 		if( $save_context )
-		{
-			if( $redirect_to == NULL )
-			{
-				$redirect_to = rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
+		{	// Use a param to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Get current url for redirect:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			$redirect_to = $glue.'redirect_to='.$redirect_to;
+			$redirect_to = $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 		else
-		{
+		{	// Don't allow a redirect after action:
 			$redirect_to = '';
 		}
 
-		$delete_url = $admin_url.'?ctrl=comments&amp;action=delete_url&amp;comment_ID='.$this->ID.'&amp;'.url_crumb('comment').$redirect_to;
+		$delete_url = $admin_url.'?ctrl=comments'.$glue.'action=delete_url'.$glue.'comment_ID='.$this->ID.$glue.url_crumb( 'comment' ).$redirect_to;
 		if( $ajax_button )
 		{
 			echo ' <a href="'.$delete_url.'" onclick="delete_comment_url('.$this->ID.'); return false;">'.get_icon( 'remove' ).'</a>';
@@ -1477,9 +1591,11 @@ class Comment extends DataObject
 	/**
 	 * Display ban icon, which goes to the antispam screen with keyword=author_url
 	 *
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 * @param boolean true if create ajax button
 	 * @param boolean true if need permission check, because it wasn't check before
-	 * @param glue between url params
+	 * @param string glue between url params
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @return link on success, false otherwise
 	 */
 	function banurl_link( $redirect_to, $ajax_button = false, $check_perm = true, $glue = '&amp;', $save_context = true )
@@ -1496,21 +1612,21 @@ class Comment extends DataObject
 		}
 
 		if( $save_context )
-		{
-			if( $redirect_to == NULL )
-			{
-				$redirect_to = rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
+		{	// Use a param to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Get current url for redirect:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			$redirect_to = $glue.'redirect_to='.$redirect_to;
+			$redirect_to = $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 		else
-		{
+		{	// Don't allow a redirect after action:
 			$redirect_to = '';
 		}
 
 		// TODO: really ban the base domain! - not by keyword
 		$ban_domain = get_ban_domain( $this->get_author_url() );
-		$ban_url = $admin_url.'?ctrl=antispam&amp;action=ban&amp;keyword='.rawurlencode( $ban_domain ).$redirect_to.'&amp;'.url_crumb('antispam');
+		$ban_url = $admin_url.'?ctrl=antispam'.$glue.'action=ban'.$glue.'keyword='.rawurlencode( $ban_domain ).$redirect_to.$glue.url_crumb( 'antispam' );
 
 		if( $ajax_button )
 		{
@@ -1533,10 +1649,10 @@ class Comment extends DataObject
 	 * @param string class name
 	 * @param boolean true to make this a button instead of a link
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
 	 * @param string confirmation text
-	 * @param string Redirect url
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 */
 	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button = false, $glue = '&amp;', $save_context = true, $ajax_button = false, $confirm_text = '#', $redirect_to = NULL )
 	{
@@ -1558,7 +1674,7 @@ class Comment extends DataObject
 
 		if( $text == '#' )
 		{ // Use icon+text as default, if not displayed as button (otherwise just the text)
-			$text = ( $this->status == 'trash' || $this->is_meta() ) ? T_('Delete!') : T_('Recycle!');
+			$text = ( $this->status == 'trash' || $this->is_meta() ) ? T_('Delete').'!' : T_('Recycle').'!';
 			if( ! $button )
 			{ // Append icon before text
 				$text = ( $this->status == 'trash' || $this->is_meta() ? get_icon( 'delete' ) : get_icon( 'recycle' ) ).' '.$text;
@@ -1571,15 +1687,12 @@ class Comment extends DataObject
 
 		$url = $admin_url.'?ctrl=comments'.$glue.'action=delete'.$glue.'comment_ID='.$this->ID.$glue.url_crumb('comment');
 		if( $save_context )
-		{
-			if( $redirect_to != NULL )
-			{
-				$url .= $glue.'redirect_to='.$redirect_to;
+		{	// Use a param to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Get current url for redirect:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			else
-			{
-				$url .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
-			}
+			$url .= $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 
 		echo $before;
@@ -1636,8 +1749,10 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
+	 * @return string A link to deprecate this comment
 	 */
 	function get_deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
@@ -1671,7 +1786,7 @@ class Comment extends DataObject
 		$params = array(
 			'before' => $before,
 			'after'  => $after,
-			'text'   => ( ( $text == '#' ) ?  get_icon( 'move_down_'.$status_icon_color ).' '.T_('Deprecate!') : $text ),
+			'text'   => ( ( $text == '#' ) ?  get_icon( 'move_down_'.$status_icon_color ).' '.T_('Deprecate').'!' : $text ),
 			'title'  => $title,
 			'class'  => $class,
 			'glue'   => $glue,
@@ -1693,7 +1808,7 @@ class Comment extends DataObject
 	 * @param string a vote value
 	 * @param string class name
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
 	 * @param array Params
 	 */
@@ -1707,7 +1822,7 @@ class Comment extends DataObject
 				'title_ok'            => T_('Cast an OK vote!'),
 				'title_ok_voted'      => T_('You sent an OK vote.'),
 				'title_yes'           => T_('Cast a helpful vote!'),
-				'title_yes_voted'     => T_('You sent helpful vote.'),
+				'title_yes_voted'     => T_('You sent a "helpful" vote.'),
 				'title_no'            => T_('Cast a "not helpful" vote!'),
 				'title_no_voted'      => T_('You sent a "not helpful" vote.'),
 			), $params );
@@ -1770,7 +1885,7 @@ class Comment extends DataObject
 
 		$r = '<a href="'.$admin_url.'?ctrl=comments'.$glue.'action='.$vote_type.$glue.'value='.$vote_value.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
 		if( $save_context )
-		{
+		{	// Use a param to redirect after action:
 			$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
 		}
 		$r .= '"';
@@ -1795,8 +1910,9 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 */
 	function deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
@@ -1819,7 +1935,7 @@ class Comment extends DataObject
 	 * @param string to display before link
 	 * @param string to display after link
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
 	 * @param array Params
 	 */
@@ -1898,7 +2014,7 @@ class Comment extends DataObject
 	 * @param string to display before link
 	 * @param string to display after link
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
 	 * @param array Params
 	 */
@@ -1909,7 +2025,7 @@ class Comment extends DataObject
 				'skin_ID'               => 0,
 				'helpful_text'          => T_('Is this comment helpful?'),
 				'title_yes'             => T_('Cast a helpful vote!'),
-				'title_yes_voted'       => T_('You sent helpful vote.'),
+				'title_yes_voted'       => T_('You sent a "helpful" vote.'),
 				'title_noopinion'       => T_('Cast a "no opinion" vote!'),
 				'title_noopinion_voted' => T_('You sent a "no opinion" vote.'),
 				'title_no'              => T_('Cast a "not helpful" vote!'),
@@ -2054,8 +2170,9 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 */
 	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
@@ -2078,24 +2195,17 @@ class Comment extends DataObject
 		$r = $before;
 		$r .= '<a href="'.$admin_url.'?ctrl=comments'.$glue.'action=publish'.$glue.'publish_status='.$publish_status.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
 		if( $save_context )
-		{
-			if( $redirect_to != NULL )
-			{
-				$r .= $glue.'redirect_to='.$redirect_to;
+		{	// Use a param to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Get current url for redirect:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			else
-			{
-				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
-			}
+			$r .= $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 		$r .= '"';
 
 		if( $ajax_button )
-		{
-			if( $save_context && ( $redirect_to == NULL ) )
-			{
-				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
-			}
+		{	// This is AJAX button:
 			$r .= ' onclick="setCommentStatus('.$this->ID.', \''.$publish_status.'\', \''.request_from().'\', \''.$redirect_to.'\'); return false;"';
 		}
 
@@ -2120,6 +2230,7 @@ class Comment extends DataObject
 	{
 		global $admin_url;
 
+		// Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside:
 		$redirect_to = $params['redirect_to'];
 		$new_status = $params['status'];
 		$action = $params['action'];
@@ -2129,24 +2240,17 @@ class Comment extends DataObject
 		$r = $params['before'];
 		$r .= '<a href="'.$admin_url.'?ctrl=comments'.$glue.'action='.$action.$glue.$status_param.'='.$new_status.$glue.'comment_ID='.$this->ID.'&amp;'.url_crumb('comment');
 		if( $params['save_context'] )
-		{
-			if( $redirect_to != NULL )
-			{
-				$r .= $glue.'redirect_to='.$redirect_to;
+		{	// Allow to redirect after action:
+			if( $redirect_to === NULL )
+			{	// Use current url to redirect ater action:
+				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
 			}
-			else
-			{
-				$r .= $glue.'redirect_to='.rawurlencode( regenerate_url( '', 'filter=restore', '', '&' ) );
-			}
+			$r .= $glue.'redirect_to='.rawurlencode( $redirect_to );
 		}
 		$r .= '"';
 
 		if( $params['ajax_button'] )
-		{
-			if( $params['save_context'] && ( $redirect_to == NULL ) )
-			{
-				$redirect_to = regenerate_url( '', 'filter=restore', '', '&' );
-			}
+		{	// This is AJAX button:
 			$comment_type = $this->is_meta() ? 'meta' : 'feedback';
 			$r .= ' onclick="setCommentStatus('.$this->ID.', \''.$new_status.'\', \''.request_from().'\', \''.$redirect_to.'\' ); return false;"';
 		}
@@ -2171,8 +2275,9 @@ class Comment extends DataObject
 	 * @param string link title
 	 * @param string class name
 	 * @param string glue between url params
-	 * @param boolean save context?
+	 * @param boolean TRUE - to save context(memorized params), to allow append redirect_to param to url
 	 * @param boolean true if create AJAX button
+	 * @param string Redirect url. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
 	 * @return boolean TRUE - if the publish link is available
 	 */
 	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
@@ -2282,6 +2387,11 @@ class Comment extends DataObject
 			), $params
 		);
 
+		if( $params['text'] == '#' )
+		{
+			$params['text'] = $action_icon;
+		}
+
 		echo $this->get_moderation_link( $params );
 		return true;
 	}
@@ -2319,8 +2429,6 @@ class Comment extends DataObject
 	 */
 	function moderation_links( $params )
 	{
-		global $blog;
-
 		if( ! is_logged_in( false ) )
 		{
 			return false;
@@ -2338,7 +2446,7 @@ class Comment extends DataObject
 		$statuses = get_visibility_statuses( 'ordered-array' );
 		$statuses = array_reverse( $statuses );
 
-		$inskin_statuses = get_inskin_statuses( $blog, 'comment' );
+		$frontoffice_statuses = $this->get_frontoffice_statuses();
 
 		// Get first and last statuses that will be visible buttons
 		$first_status_in_row = $this->get_next_status( true, $this->status );
@@ -2370,7 +2478,7 @@ class Comment extends DataObject
 				{
 					$tmp_params['class'] .= ' btn_next_status';
 				}
-				if( ! in_array( $next_status_in_row[0], $inskin_statuses ) )
+				if( ! in_array( $next_status_in_row[0], $frontoffice_statuses ) )
 				{ // Don't make ajax button for those statuses which are not allowed in the front office
 					$tmp_params = array_merge( $tmp_params, array( 'ajax_button' => false ) );
 				}
@@ -2400,7 +2508,7 @@ class Comment extends DataObject
 				{
 					$tmp_params['class'] .= ' btn_next_status';
 				}
-				if( ! in_array( $next_status_in_row[0], $inskin_statuses ) )
+				if( ! in_array( $next_status_in_row[0], $frontoffice_statuses ) )
 				{ // Don't make ajax button for those statuses which are not allowed in the front office
 					$tmp_params = array_merge( $tmp_params, array( 'ajax_button' => false ) );
 				}
@@ -2445,9 +2553,10 @@ class Comment extends DataObject
 				return false;
 			}
 			$msg_type = 'email';
+			$form_url = url_add_param( $form_url, 'recipient_id=0' );
 		}
 
-		$form_url = url_add_param( $form_url, 'recipient_id=0&amp;comment_id='.$this->ID.'&amp;post_id='.$this->item_ID
+		$form_url = url_add_param( $form_url, 'comment_id='.$this->ID.'&amp;post_id='.$this->item_ID
 				.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $form_url)) );
 
 		if( $title == '#' )
@@ -2518,8 +2627,7 @@ class Comment extends DataObject
 	 */
 	function get_permanent_link( $text = '#', $title = '#', $class = '', $nofollow = false, $restrict_status = true )
 	{
-		$comment_Item = & $this->get_Item();
-		if( $restrict_status && ! in_array( $this->status, get_inskin_statuses( $comment_Item->get_blog_ID(), 'comment' ) ) )
+		if( $restrict_status && ! $this->may_be_seen_in_frontoffice() )
 		{
 			return '';
 		}
@@ -2539,6 +2647,7 @@ class Comment extends DataObject
 				break;
 
 			case '#item#':
+				$comment_Item = & $this->get_Item();
 				$text = $comment_Item->get_title( array( 'link_type' => 'none' ) );
 				break;
 		}
@@ -2618,20 +2727,24 @@ class Comment extends DataObject
 				{ // only do the prefetch loading once.
 					$CommentPrerenderingCache[$format] = array();
 
-					$SQL = new SQL();
+					$SQL = new SQL( 'Preload prerendered comments content ('.$format.')' );
 					$SQL->SELECT( 'cmpr_cmt_ID, cmpr_format, cmpr_renderers, cmpr_content_prerendered' );
 					$SQL->FROM( 'T_comments__prerendering' );
 					if( empty( $CommentList ) )
-					{  // load prerendered cache for each comment which belongs to this comments Item
+					{	// Load prerendered cache for each comment which belongs to this comments Item:
 						$SQL->FROM_add( 'INNER JOIN T_comments ON cmpr_cmt_ID = comment_ID' );
 						$SQL->WHERE( 'comment_item_ID = '.$this->Item->ID );
 					}
 					else
-					{ // load prerendered cache for each comment from the CommentList
-						$SQL->WHERE( 'cmpr_cmt_ID IN ( '.implode( ',', $CommentList->get_page_ID_array() ).' )' );
+					{	// Load prerendered cache for each comment from the CommentList:
+						$comments_page_ID_array = $CommentList->get_page_ID_array();
+						if( ! empty( $comments_page_ID_array ) )
+						{	// If at least one comment is loaded in current comments list:
+							$SQL->WHERE( 'cmpr_cmt_ID IN ( '.implode( ',', $comments_page_ID_array ).' )' );
+						}
 					}
 					$SQL->WHERE_and( 'cmpr_format = '.$DB->quote( $format ) );
-					$rows = $DB->get_results( $SQL->get(), OBJECT, 'Preload prerendered comments content ('.$format.')' );
+					$rows = $DB->get_results( $SQL );
 					foreach($rows as $row)
 					{
 						$row_cache_key = $row->cmpr_format.'/'.$row->cmpr_renderers;
@@ -2837,13 +2950,13 @@ class Comment extends DataObject
 
 				if( empty( $this->ID ) )
 				{ // PREVIEW mode
-					$r = $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $image_link_to, T_('Posted by ').$this->get_author_name(), $image_link_rel, $params['image_class'], '', '', '#' );
+					$r = $File->get_tag( $params['before_image'], $params['before_image_legend'], $params['after_image_legend'], $params['after_image'], $params['image_size'], $image_link_to, T_('Posted by').' '.$this->get_author_name(), $image_link_rel, $params['image_class'], '', '', '#' );
 				}
 				else
 				{
 					$r = $Link->get_tag( array_merge( array(
 						'image_link_to'    => $image_link_to,
-						'image_link_title' => T_('Posted by ').$this->get_author_name(),
+						'image_link_title' => T_('Posted by').' '.$this->get_author_name(),
 						'image_link_rel'   => $image_link_rel,
 					), $params ) );
 				}
@@ -2899,7 +3012,7 @@ class Comment extends DataObject
 			$after_docs = '';
 			if( count( $attachments ) > 0 )
 			{
-				echo '<br /><b>'.T_( 'Attachments:' ).'</b>';
+				echo '<br /><b>'.T_( 'Attachments' ).':</b>';
 				echo '<ul class="bFiles">';
 				$after_docs = '</ul>';
 			}
@@ -3714,14 +3827,18 @@ class Comment extends DataObject
 		}
 
 		$notify_users = array();
+		$notify_anon_users = array();
 
 		if( ! $this->is_meta() )
 		{	// Get the notify users for NORMAL comments:
-			$except_condition = '';
 
+			// Send only for active users:
+			$active_users_condition = 'AND user_status IN ( "activated", "autoactivated", "manualactivated" )';
+
+			$except_condition = '';
 			if( ! empty( $already_notified_user_IDs ) )
 			{	// Set except moderators condition. Exclude moderators who already got a notification email:
-				$except_condition = ' AND user_ID NOT IN ( "'.implode( '", "', $already_notified_user_IDs ).'" )';
+				$except_condition .= ' AND user_ID NOT IN ( "'.implode( '", "', $already_notified_user_IDs ).'" )';
 			}
 
 			// Check if we need to include the item creator user:
@@ -3732,15 +3849,70 @@ class Comment extends DataObject
 				$notify_users[$creator_User->ID] = 'creator';
 			}
 
+			// Get list of users who want to be notified when his login is mentioned in the comment content by @user's_login:
+			$mentioned_user_IDs = get_mentioned_user_IDs( 'comment', $this->get( 'content' ), $already_notified_user_IDs );
+			foreach( $mentioned_user_IDs as $mentioned_user_ID )
+			{
+				$notify_users[ $mentioned_user_ID ] = 'comment_mentioned';
+			}
+
 			// Get list of users who want to be notified about the this post comments:
 			if( $comment_item_Blog->get_setting( 'allow_item_subscriptions' ) )
 			{	// If item subscriptions is allowed:
-				$sql = 'SELECT DISTINCT user_ID
-									FROM T_items__subscriptions INNER JOIN T_users ON isub_user_ID = user_ID
-								 WHERE isub_item_ID = '.$comment_Item->ID.'
-									 AND isub_comments <> 0
-									 AND LENGTH(TRIM(user_email)) > 0'.$except_condition;
-				$notify_list = $DB->get_results( $sql, OBJECT, 'Get list of users who want to be notified about comments of the the post #'.$comment_Item->ID );
+				$sql = 'SELECT user_ID
+						FROM (
+							SELECT DISTINCT isub_user_ID AS user_ID
+							FROM T_items__subscriptions
+							INNER JOIN T_users ON ( user_ID = isub_user_ID '.$active_users_condition.' )
+							WHERE isub_item_ID = '.$comment_Item->ID.'
+							AND isub_comments <> 0
+
+							UNION
+
+							SELECT user_ID
+							FROM T_coll_settings AS opt
+							INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
+							LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+							INNER JOIN T_users ON ( user_grp_ID = bloggroup_group_ID '.$active_users_condition.' )
+							LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$comment_Item->ID.' AND isub_user_ID = user_ID )
+							WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
+								AND opt.cset_name = "opt_out_item_subscription"
+								AND opt.cset_value = 1
+								AND NOT user_ID IS NULL
+								AND ( isub_comments IS NULL OR isub_comments = 1 )
+
+							UNION
+
+							SELECT sug_user_ID
+							FROM T_coll_settings AS opt
+							INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
+							LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+							LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
+							LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$comment_Item->ID.' AND isub_user_ID = sug_user_ID )
+							INNER JOIN T_users ON ( user_ID = isub_user_ID '.$active_users_condition.' )
+							WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
+								AND opt.cset_name = "opt_out_item_subscription"
+								AND opt.cset_value = 1
+								AND NOT sug_user_ID IS NULL
+								AND ( isub_comments IS NULL OR isub_comments = 1 )
+
+							UNION
+
+							SELECT bloguser_user_ID
+							FROM T_coll_settings AS opt
+							INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
+							LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
+							LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$comment_Item->ID.' AND isub_user_ID = bloguser_user_ID )
+							INNER JOIN T_users ON ( user_ID = isub_user_ID '.$active_users_condition.' )
+							WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
+								AND opt.cset_name = "opt_out_item_subscription"
+								AND opt.cset_value = 1
+								AND NOT bloguser_user_ID IS NULL
+								AND ( isub_comments IS NULL OR isub_comments = 1 )
+						) AS users
+						WHERE user_ID IS NOT NULL'.$except_condition;
+
+				$notify_list = $DB->get_results( $sql, OBJECT, 'Get list of registered users who want to be notified about comments of the the post #'.$comment_Item->ID );
 
 				// Preprocess list:
 				foreach( $notify_list as $notification )
@@ -3750,16 +3922,89 @@ class Comment extends DataObject
 						$notify_users[ $notification->user_ID ] = 'item_subscription';
 					}
 				}
+
+				// Find anonymous users which are subscribed on the comment's post:
+				$SQL = new SQL( 'Get list of anonymous users who want to be notified about comments of the the post #'.$comment_Item->ID );
+				$SQL->SELECT( 'comment_author_email, comment_ID' );
+				$SQL->FROM( 'T_comments' );
+				$SQL->FROM_add( 'INNER JOIN T_items__item ON comment_item_ID = post_ID' );
+				$SQL->WHERE( 'comment_item_ID = '.$comment_Item->ID );
+				$SQL->WHERE_and( 'comment_author_user_ID IS NULL' );
+				$SQL->WHERE_and( 'comment_anon_notify = 1' );
+				$SQL->ORDER_BY( 'comment_anon_notify_last DESC' );
+				$SQL->GROUP_BY( 'comment_author_email' );
+
+				$notify_list = $DB->get_assoc( $SQL );
+
+				// Preprocess list:
+				foreach( $notify_list as $anon_email => $anon_comment_ID )
+				{
+					if( ! isset( $notify_anon_users[ 'cmnt_'.$anon_comment_ID ] ) )
+					{	// Don't rewrite a notify type if user already is notified by other type before:
+						$notify_anon_users[ 'cmnt_'.$anon_comment_ID ] = 'anon_subscription';
+					}
+				}
 			}
 
 			// Get list of users who want to be notified about this blog comments:
 			if( $comment_item_Blog->get_setting( 'allow_comment_subscriptions' ) )
 			{	// If blog subscription is allowed:
-				$sql = 'SELECT DISTINCT user_ID
-								FROM T_subscriptions INNER JOIN T_users ON sub_user_ID = user_ID
-							 WHERE sub_coll_ID = '.$comment_item_Blog->ID.'
-								 AND sub_comments <> 0
-								 AND LENGTH(TRIM(user_email)) > 0'.$except_condition;
+				$sql = 'SELECT user_ID
+								FROM (
+									SELECT DISTINCT sub_user_ID AS user_ID
+									FROM T_subscriptions
+									INNER JOIN T_users ON ( user_ID = sub_user_ID '.$active_users_condition.' )
+									WHERE sub_coll_ID = '.$comment_item_Blog->ID.'
+									AND sub_comments <> 0
+
+									UNION
+
+									SELECT user_ID
+									FROM T_coll_settings AS opt
+									INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+									LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+									INNER JOIN T_users ON ( user_grp_ID = bloggroup_group_ID '.$active_users_condition.' )
+									LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = user_ID )
+									WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
+										AND opt.cset_name = "opt_out_comment_subscription"
+										AND opt.cset_value = 1
+										AND NOT user_ID IS NULL
+										AND ( ( sub_comments IS NULL OR sub_comments = 1 ) )
+
+									UNION
+
+									SELECT sug_user_ID
+									FROM T_coll_settings AS opt
+									INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+									LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
+									LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
+									LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
+									INNER JOIN T_users ON ( user_ID = sub_user_ID '.$active_users_condition.' )
+									WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
+										AND opt.cset_name = "opt_out_comment_subscription"
+										AND opt.cset_value = 1
+										AND NOT sug_user_ID IS NULL
+										AND ( ( sub_comments IS NULL OR sub_comments = 1 ) )
+
+									UNION
+
+									SELECT bloguser_user_ID
+									FROM T_coll_settings AS opt
+									INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
+									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
+									LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
+									LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = bloguser_user_ID )
+									INNER JOIN T_users ON ( user_ID = sub_user_ID '.$active_users_condition.' )
+									WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
+										AND opt.cset_name = "opt_out_comment_subscription"
+										AND opt.cset_value = 1
+										AND NOT bloguser_user_ID IS NULL
+										AND ( ( sub_comments IS NULL OR sub_comments = 1 ) )
+								) AS users
+								WHERE NOT user_ID IS NULL'.$except_condition;
+
 				$notify_list = $DB->get_results( $sql, OBJECT, 'Get list of users who want to be notified about comments of the collection #'.$comment_item_Blog->ID );
 
 				// Preprocess list:
@@ -3788,6 +4033,8 @@ class Comment extends DataObject
 			$meta_SQL->WHERE( '( gset_value = "normal" OR gset_value = "restricted" )' );
 			// Check if the users would like to receive notifications about new meta comments:
 			$meta_SQL->WHERE_and( 'uset_value = "1"'.( $Settings->get( 'def_notify_meta_comments' ) ? ' OR uset_value IS NULL' : '' ) );
+			// Check if users are activated:
+			$meta_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 			// Check if the users have permission to edit this Item:
 			$users_with_item_edit_perms = '( user_ID = '.$DB->quote( $comment_item_Blog->owner_user_ID ).' )';
 			$users_with_item_edit_perms .= ' OR ( grp_perm_blogs = "editall" )';
@@ -3814,7 +4061,7 @@ class Comment extends DataObject
 			$meta_SQL->WHERE_and( $users_with_item_edit_perms );
 
 			// Select users which have permission to the edited_Item meta comments and would like to recieve notifications:
-			$notify_users = $DB->get_assoc( $meta_SQL->get(), $meta_SQL->title );
+			$notify_users = $DB->get_assoc( $meta_SQL );
 		}
 
 		if( $executed_by_userid !== NULL && isset( $notify_users[ $executed_by_userid ] ) )
@@ -3882,12 +4129,12 @@ class Comment extends DataObject
 			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note', T_('Sending notifications:') );
 		}
 
-		if( empty( $notify_users ) )
+		if( empty( $notify_users ) && empty( $notify_anon_users ) )
 		{	// No-one to notify:
 			return $notified_flags;
 		}
 
-		$this->send_email_messages( $notify_users, $is_new_comment );
+		$this->send_email_messages( $notify_users + $notify_anon_users, $is_new_comment );
 
 		return $notified_flags;
 	}
@@ -3896,17 +4143,18 @@ class Comment extends DataObject
 	/**
 	 * Send email notifications to users
 	 *
-	 * @param array Array of users which should be notified, where key is User ID and value is a notify type:
+	 * @param array Array of users which should be notified, where key is User ID or Comment ID with prefix 'cmnt_' of anonymous user and value is a notify type:
 	 *              - 'moderator'
 	 *              - 'creator'
 	 *              - 'blog_subscription'
 	 *              - 'item_subscription'
+	 *              - 'anon_subscription'
 	 *              - 'meta_comment'
 	 * @param boolean TRUE if it is notification about new comment, FALSE - for edited comment
 	 */
 	function send_email_messages( $notify_users, $is_new_comment = false )
 	{
-		global $debug, $Debuglog;
+		global $debug, $Debuglog, $default_locale;
 
 		$UserCache = & get_UserCache();
 
@@ -3945,24 +4193,48 @@ class Comment extends DataObject
 			$author_user_ID = NULL;
 		}
 
-		// Load all users who will be notified, becasuse another way the send_mail_to_User funtion would load them one by one:
-		$UserCache->load_list( array_keys( $notify_users ) );
+		$load_users_IDs = array();
+		foreach( $notify_users as $notify_user_ID => $notify_type )
+		{
+			if( is_integer( $notify_user_ID ) )
+			{	// Get only ID of the registered Users and skip emails of anonymous users:
+				$load_users_IDs[] = $notify_user_ID;
+			}
+		}
 
-		// Load a list with the blocked emails  in cache
-		load_blocked_emails( array_keys( $notify_users ) );
+		// Load all users who will be notified, becasuse another way the send_mail_to_User funtion would load them one by one:
+		$UserCache->load_list( $load_users_IDs );
+
+		// Load a list with the blocked emails in cache
+		load_blocked_emails( $load_users_IDs );
 
 		// Send emails:
 		foreach( $notify_users as $notify_user_ID => $notify_type )
 		{
-			// get data content
-			$notify_User = $UserCache->get_by_ID( $notify_user_ID );
-			$notify_email = $notify_User->get( 'email' );
+			if( $notify_type == 'anon_subscription' )
+			{	// Get data of anonymous user:
+				$notify_comment_ID = intval( substr( $notify_user_ID, 5 ) );
+				$CommentCache = & get_CommentCache();
+				$anon_Comment = & $CommentCache->get_by_ID( $notify_comment_ID );
+				$anon_comment_Item = $anon_Comment->get_Item();
+				$notify_User = NULL;
+				$notify_email = $anon_Comment->get( 'author_email' );
+				$notify_user_name = $anon_Comment->get( 'author' );
+				$notify_locale = $anon_comment_Item->get( 'locale' );
+				$notify_full = false;
+			}
+			else
+			{	// Get data of registered user:
+				$notify_User = $UserCache->get_by_ID( $notify_user_ID );
+				$notify_email = $notify_User->get( 'email' );
+				$notify_user_Group = $notify_User->get_Group();
+				$notify_locale = $notify_User->get( 'locale' );
+				$notify_full = ( ( $notify_type == 'moderator' ) && ( $notify_user_Group->check_perm( 'comment_moderation_notif', 'full' ) )
+								|| ( $notify_user_Group->check_perm( 'comment_subscription_notif', 'full' ) ) );
+			}
 
 			// init notification setting
-			locale_temp_switch( $notify_User->get( 'locale' ) );
-			$notify_user_Group = $notify_User->get_Group();
-			$notify_full = ( ( $notify_type == 'moderator' ) && ( $notify_user_Group->check_perm( 'comment_moderation_notif', 'full' ) )
-							|| ( $notify_user_Group->check_perm( 'comment_subscription_notif', 'full' ) ) );
+			locale_temp_switch( $notify_locale );
 
 			switch( $this->type )
 			{
@@ -3992,8 +4264,21 @@ class Comment extends DataObject
 					}
 					else
 					{	// Subject for subscribed users:
-						/* TRANS: Subject of the mail to send on new comments to subscribed users. First %s is blog name, the second %s is the item's title. */
-						$subject = T_('[%s] New comment on "%s"');
+						switch( $this->get_author_type( $notify_User, $notify_email ) )
+						{	// Set email title depending on author type:
+							case 'parent':
+								/* TRANS: Subject of the mail to send on new comments to subscribed users. First %s is blog name, the second %s is the item's title. */
+								$subject = T_('[%s] Someone replied to your comment on "%s"');
+								break;
+							case 'normal':
+								/* TRANS: Subject of the mail to send on new comments to subscribed users. First %s is blog name, the second %s is the item's title. */
+								$subject = T_('[%s] Someone else commented after you on "%s"');
+								break;
+							case 'none':
+							default:
+								/* TRANS: Subject of the mail to send on new comments to subscribed users. First %s is blog name, the second %s is the item's title. */
+								$subject = T_('[%s] New comment on "%s"');
+						}
 					}
 					$subject = sprintf( $subject, $comment_item_Blog->get('shortname'), $comment_Item->get('title') );
 			}
@@ -4006,7 +4291,9 @@ class Comment extends DataObject
 					break;
 
 				case 'blog_subscription': // blog subscription
-				case 'item_subscription': // item subscription
+				case 'comment_mentioned': // user was mentioned in the comment content
+				case 'item_subscription': // item subscription for registered user
+				case 'anon_subscription': // item subscription for anonymous user
 				case 'meta_comment': // meta comment notification
 					$user_reply_to = NULL;
 					break;
@@ -4040,16 +4327,94 @@ class Comment extends DataObject
 				$Debuglog->add( $mail_dump, 'notification' );
 			}
 
-			// Send the email:
-			// Note: Note activated users won't get notification email
-			send_mail_to_User( $notify_user_ID, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+			if( $notify_User )
+			{	// Send the email to registered User:
+				// Note: Note activated users won't get notification email
+				send_mail_to_User( $notify_user_ID, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+			}
+			else
+			{	// Send the email to anonymous user:
+				$email_template_params['comment_ID'] = $anon_Comment->ID;
+				$email_template_params['anonymous_unsubscribe_key'] = md5( $anon_Comment->ID.$anon_Comment->get( 'secret' ) );
+				send_mail_to_anonymous_user( $notify_email, $notify_user_name, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+			}
 
-			blocked_emails_memorize( $notify_User->email );
+			blocked_emails_memorize( $notify_email );
 
 			locale_restore_previous();
 		}
 
 		blocked_emails_display();
+	}
+
+
+	/**
+	 * Get author type depending on where he posted a comment in the same item as this comment
+	 *
+	 * @param object Author User (for registered User)
+	 * @param object Author email address (for anonymous user)
+	 * @return string 'parent' - user is owner of some comment's parent,
+	 *                'normal' - author posted at least one comment in the comment's item,
+	 *                'none' - author didn't post any comment in the comment's item.
+	 */
+	function get_author_type( $author_User, $author_email = NULL )
+	{
+		if( ! isset( $this->item_authors ) )
+		{	// Load it once and store into a cache array to don't load twice:
+			global $DB;
+
+			$comment_Item = & $this->get_Item();
+			$comment_item_Blog = & $comment_Item->get_Blog();
+
+			$this->item_authors = array();
+
+			if( $comment_item_Blog->get_setting( 'threaded_comments' ) )
+			{	// If the threaded comments are enabled for the collection:
+				$parent_comment_ID = $this->get( 'in_reply_to_cmt_ID' );
+				while( $parent_comment_ID !== NULL )
+				{	// Find all parents from this comment to root:
+					$SQL = new SQL( 'Get parent of comment #'.$this->ID.' to decide email notification title' );
+					$SQL->SELECT( 'comment_in_reply_to_cmt_ID as ID, IFNULL( comment_author_user_ID, comment_author_email ) AS author_ID_or_email' );
+					$SQL->FROM( 'T_comments' );
+					$SQL->WHERE( 'comment_ID = '.$DB->quote( $parent_comment_ID ) );
+					if( $parent_comment = $DB->get_row( $SQL ) )
+					{	// If parent comment is detected:
+						$parent_comment_ID = $parent_comment->ID;
+						// Mark such author as commenter of parent comment:
+						$this->item_authors[ $parent_comment->author_ID_or_email ] = 'parent';
+					}
+					else
+					{	// No parent comment:
+						$parent_comment_ID = NULL;
+					}
+				}
+			}
+
+			$SQL = new SQL( 'Get all comments authors from item of the comment #'.$this->ID );
+			$SQL->SELECT( 'DISTINCT IFNULL( comment_author_user_ID, comment_author_email ) AS author_ID_or_email' );
+			$SQL->FROM( 'T_comments' );
+			$SQL->WHERE( 'comment_item_ID = '.$DB->quote( $this->get( 'item_ID' ) ) );
+			$other_authors = $DB->get_col( $SQL );
+			foreach( $other_authors as $other_author_ID_or_email )
+			{
+				if( ! isset( $this->item_authors[ $other_author_ID_or_email ] ) )
+				{	// Mark such author as normal commenter:
+					$this->item_authors[ $other_author_ID_or_email ] = 'normal';
+				}
+			}
+		}
+
+		if( $author_User && isset( $this->item_authors[ $author_User->ID ] ) )
+		{	// If a registered user posted at least one comment in the same item where this comment is posted:
+			return $this->item_authors[ $author_User->ID ];
+		}
+		elseif( $author_email && isset( $this->item_authors[ $author_email ] ) )
+		{	// If anonymous user posted at least one comment in the same item where this comment is posted:
+			return $this->item_authors[ $author_email ];
+		}
+
+		// User is not posted a comment in the same item where this comment is posted yet:
+		return 'none';
 	}
 
 
@@ -4142,46 +4507,33 @@ class Comment extends DataObject
 
 
 	/**
-	 * Check if this comment is published to some of the public statuses ( 'published', 'community', 'protected' )
-	 *
-	 * @return boolean true ir the item status is public or limited public, false otherwise
-	 */
-	function is_published()
+	* Get a list of those comment statuses which can be displayed in the front office
+	*
+	* @return array Front office statuses in the comment's collection
+	*/
+	function get_frontoffice_statuses()
 	{
-		$permvalue = get_status_permvalue( $this->status );
-		$published_statuses_permvalue = get_status_permvalue( 'published_statuses' );
-		return ( $permvalue & $published_statuses_permvalue ) ? true : false;
+		if( ! ( $comment_Item = & $this->get_Item() ) ||
+		    ! ( $comment_blog_ID = $comment_Item->get_blog_ID() ) )
+		{	// Comment's collection ID must be detected to get front-office comment statuses:
+			return array();
+		}
+
+		return get_inskin_statuses( $comment_blog_ID, 'comment' );
 	}
 
 
 	/**
-	 * Check if comment public or limited public status was changed. Limited public status is like community or protected.
+	 * Check if this comment may be seen in front office
 	 *
-	 * @return boolean false if status was not changed or neither the previous nor current status is public or limited public, true otherwise
+	 * @return boolean true if the comment status is used to display on front office, false otherwise
 	 */
-	function check_publish_status_changed()
+	function may_be_seen_in_frontoffice()
 	{
-		if( !isset( $this->previous_status ) || $this->previous_status == $this->status )
-		{ // Status was not changed
-			return false;
-		}
-
-		$previous_status_permvalue = get_status_permvalue( $this->previous_status );
 		$current_status_permvalue = get_status_permvalue( $this->status );
-		$published_statuses_permvalue = get_status_permvalue( 'published_statuses' );
+		$frontoffice_statuses_permvalue = get_status_permvalue( $this->get_frontoffice_statuses() );
 
-		if( $current_status_permvalue & $published_statuses_permvalue )
-		{ // status has been changed to another public or limited public status
-			return true;
-		}
-
-		if( $previous_status_permvalue & $published_statuses_permvalue )
-		{ // previous status was public or limited public status, but current status is not
-			return true;
-		}
-
-		// This comment was not published before and it is not published now either
-		return false;
+		return ( $current_status_permvalue & $frontoffice_statuses_permvalue ) ? true : false;
 	}
 
 
@@ -4209,30 +4561,59 @@ class Comment extends DataObject
 
 		$DB->begin();
 
+		// Check previous comment status was visible on front-office:
+		$was_front_office_visible = ( isset( $this->previous_status ) &&
+			$this->can_be_displayed( $this->previous_status ) );
+
+		// Check we should refresh contents last updated date of the PARENT Item
+		// if this Comment was the latest FRONT-OFFICE VISIBLE Comment of the parent Item:
+		$refresh_parent_item_contents_last_updated_date = ( $was_front_office_visible && // This Comment was FRONT-OFFICE VISIBLE
+			( ! $this->may_be_seen_in_frontoffice() ) && // This Comment is NOT FRONT-OFFICE VISIBLE currently
+			( $comment_Item = & $this->get_Item() ) && // Get parent Item
+			( $item_latest_Comment = & $comment_Item->get_latest_Comment() ) && // Get the latest Comment of the parent Item
+			( $item_latest_Comment->ID == $this->ID ) ); // This Comment is the latest comment of the parent Item
+
+		$ItemCache = & get_ItemCache();
+		$ItemCache->clear();
+
+		// Check we should refresh contents last updated date of the PREVIOUS Item
+		// if this Comment was the latest FRONT-OFFICE VISIBLE Comment of the previous Item:
+		$refresh_previous_item_contents_last_updated_date = ( ! empty( $this->previous_item_ID ) && // This Comment is moving to another Item
+			( $was_front_office_visible ) && // This Comment was FRONT-OFFICE VISIBLE for previous Item
+			( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) ) && // Get the previous Item
+			( $previous_item_latest_Comment = & $previous_Item->get_latest_Comment() ) && // Get the latest Comment of the previous Item
+			( $previous_item_latest_Comment->ID == $this->ID ) ); // This Comment was the latest comment of the previous Item
+
 		if( ( $r = parent::dbupdate() ) !== false )
 		{
-			$update_item_last_touched_date = false;
 			if( isset( $dbchanges['comment_content'] ) || isset( $dbchanges['comment_renderers'] ) )
-			{ // Content is updated
+			{	// Delete a prerendered content if content or text renderers have been updated:
 				$this->delete_prerendered_content();
-				$update_item_last_touched_date = true;
 			}
 
-			if( $this->check_publish_status_changed() )
-			{ // Comment is updated into/out some public status
-				$update_item_last_touched_date = true;
-			}
-
-			if( !empty( $this->previous_item_ID ) )
-			{ // Comment is moved from another post
-				$ItemCache = & get_ItemCache();
-				$ItemCache->clear();
-				if( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) )
-				{ // Update last touched date of previous item
-					$previous_Item->update_last_touched_date( false );
+			$update_item_contents_last_updated_date = false;
+			if( $this->may_be_seen_in_frontoffice() )
+			{	// Update contents last update date of the comment's post ONLY when the updated comment may be seen in frontoffice:
+				if( isset( $dbchanges['comment_content'] ) ||
+				    isset( $dbchanges['comment_rating'] ) ||
+				    isset( $dbchanges['comment_item_ID'] ) ||
+				    ( isset( $dbchanges['comment_status'] ) && isset( $this->previous_status ) && ! $this->can_be_displayed( $this->previous_status ) ) )
+				{	// AND if content, rating or parent Item have been updated
+					//     or status has been updated from NOT front-office status into some front-office status:
+					$update_item_contents_last_updated_date = true;
 				}
-				// Also update new post
-				$update_item_last_touched_date = true;
+			}
+
+			if( ! empty( $this->previous_item_ID ) )
+			{	// If comment has been moved from another post:
+				if( $previous_Item = & $ItemCache->get_by_ID( $this->previous_item_ID, false, false ) )
+				{	// Update ONLY last touched date of previous item:
+					$previous_Item->update_last_touched_date( false, true );
+					if( $refresh_previous_item_contents_last_updated_date )
+					{	// Refresh contents last updated ts of the previous parent Item if this Comment was the latest FRONT-OFFICE VISIBLE Comment of the previous parent Item:
+						$previous_Item->refresh_contents_last_updated_ts();
+					}
+				}
 
 				// Also move all child comments to new post
 				$child_comment_IDs = $this->get_child_comment_IDs();
@@ -4244,7 +4625,12 @@ class Comment extends DataObject
 				}
 			}
 
-			$this->update_last_touched_date( $update_item_last_touched_date );
+			if( $refresh_parent_item_contents_last_updated_date )
+			{	// Refresh contents last updated ts of the parent Item:
+				$comment_Item->refresh_contents_last_updated_ts();
+			}
+
+			$this->update_last_touched_date( true, $update_item_contents_last_updated_date );
 
 			$DB->commit();
 
@@ -4311,10 +4697,16 @@ class Comment extends DataObject
 
 		if( $r = parent::dbinsert() )
 		{
-			if( $this->is_published() )
-			{ // Update last touched date of item if comment is created in published status
-				$this->update_last_touched_date();
+			if( isset( $this->user_notify ) && $this->user_notify && $this->author_user_ID > 0 )
+			{	// Subscribe user to the comment's post replies if such option has been selected on the comment submitted form:
+				global $DB;
+				$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
+					VALUES ( '.$DB->quote( $this->item_ID ).', '.$DB->quote( $this->author_user_ID ).', 1 )' );
 			}
+			// Update last touched date of item if comment is created with ANY status,
+			// But update contents last updated date of item if comment is created ONLY in published status(Public, Community or Members):
+			$this->update_last_touched_date( true, $this->may_be_seen_in_frontoffice() );
+			// Plugin event to call after new comment insert:
 			$Plugins->trigger_event( 'AfterCommentInsert', $params = array( 'Comment' => & $this, 'dbchanges' => $dbchanges ) );
 		}
 
@@ -4338,7 +4730,6 @@ class Comment extends DataObject
 			$DB->begin();
 		}
 
-		$was_published = $this->is_published();
 		if( $this->status != 'trash' )
 		{ // The comment was not recycled yet
 			if( $this->has_replies() )
@@ -4349,6 +4740,12 @@ class Comment extends DataObject
 				  WHERE comment_in_reply_to_cmt_ID = '.$this->ID );
 			}
 		}
+
+		// Check we should refresh contents last updated date of the parent Item after
+		// deleting of this Comment because it was the latest comment of the parent Item:
+		$refresh_parent_item_contents_last_updated_date = ( ( $comment_Item = & $this->get_Item() ) &&
+			( $item_latest_Comment = & $comment_Item->get_latest_Comment() ) &&
+			( $item_latest_Comment->ID == $this->ID ) );
 
 		if( $force_permanent_delete || ( $this->status == 'trash' ) || $this->is_meta() )
 		{	// Permamently delete comment from DB:
@@ -4373,13 +4770,20 @@ class Comment extends DataObject
 
 		if( $r )
 		{
-			if( $was_published )
-			{ // Update last touched date of item if a published comment was deleted
+			if( $this->ID == 0 )
+			{	// Update only last touched date of item if comment was deleted from DB,
+				// Don't call this when comment was recycled because we already called this on dbupdate() above:
 				$this->update_last_touched_date();
 			}
+
 			if( $use_transaction )
 			{
 				$DB->commit();
+			}
+
+			if( $refresh_parent_item_contents_last_updated_date )
+			{	// Refresh contents last updated ts of parent Item if this Comment was the latest Comment of parent Item:
+				$comment_Item->refresh_contents_last_updated_ts();
 			}
 		}
 		else
@@ -4405,11 +4809,6 @@ class Comment extends DataObject
 	 */
 	function reply_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '' )
 	{
-		if( ! is_logged_in( false ) )
-		{
-			return false;
-		}
-
 		if( empty( $this->ID ) )
 		{	// Happens in Preview
 			return false;
@@ -4423,8 +4822,8 @@ class Comment extends DataObject
 			return false;
 		}
 
-		if( !$this->Item->can_comment() )
-		{	// The comments are disabled
+		if( ! $this->Item->can_comment( NULL ) )
+		{	// If current User cannot create a comment for the Item:
 			return false;
 		}
 
@@ -4515,8 +4914,9 @@ class Comment extends DataObject
 	 * Update field last_touched_ts
 	 *
 	 * @param boolean update comment's post last touched ts as well or not
+	 * @param boolean Use TRUE to update field contents_last_updated_ts of the comment's item
 	 */
-	function update_last_touched_date( $update_item_date = true )
+	function update_last_touched_date( $update_item_last_touched_ts = true, $update_item_contents_last_updated_ts = false )
 	{
 		global $localtimenow, $current_User;
 
@@ -4540,9 +4940,9 @@ class Comment extends DataObject
 			$this->dbupdate();
 		}
 
-		if( $update_item_date )
-		{ // Update last touched data of the Item
-			$comment_Item->update_last_touched_date();
+		if( $update_item_last_touched_ts || $update_item_contents_last_updated_ts )
+		{	// Update last touched timestamp or content last update timestamp of the Item:
+			$comment_Item->update_last_touched_date( true, $update_item_last_touched_ts, $update_item_contents_last_updated_ts );
 		}
 	}
 
@@ -4632,7 +5032,7 @@ class Comment extends DataObject
 		}
 
 		// Restrict status to max allowed for item collection:
-		$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->get( 'status' ) );
+		$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->get( 'status' ), $comment_Item );
 		if( empty( $item_restricted_status ) )
 		{	// If max allowed status is not detected because for example current User has no perm to item status,
 			// then use current status of the Item in order to restrict max comment status below:
@@ -4734,7 +5134,7 @@ class Comment extends DataObject
 				// Get max allowed for item collection:
 				$comment_Item = & $this->get_Item();
 				$item_Blog = & $comment_Item->get_Blog();
-				$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->status );
+				$item_restricted_status = $item_Blog->get_allowed_item_status( $comment_Item->status, $comment_Item );
 
 				// Get all visibility status titles:
 				$visibility_statuses = get_visibility_statuses();
@@ -4767,9 +5167,10 @@ class Comment extends DataObject
 	/**
 	 * Check if this comment can be displayed for current user on front-office
 	 *
+	 * @param string|NULL Status | NULL to use current status of this comment
 	 * @return boolean
 	 */
-	function can_be_displayed()
+	function can_be_displayed( $status = NULL )
 	{
 		if( empty( $this->ID ) )
 		{	// Comment is not created yet, so it cannot be displayed:
@@ -4779,7 +5180,42 @@ class Comment extends DataObject
 		// Load Item of this comment to get a collection ID:
 		$Item = & $this->get_Item();
 
-		return can_be_displayed_with_status( $this->get( 'status' ), 'comment', $Item->get_blog_ID(), $this->author_user_ID );
+		if( $status === NULL )
+		{	// Use current status of this comment:
+			$status = $this->get( 'status' );
+		}
+
+		return can_be_displayed_with_status( $status, 'comment', $Item->get_blog_ID(), $this->author_user_ID );
+	}
+
+
+	/**
+	 * Get comment order numbers for current filtered list (global $CommentList)
+	 *
+	 * @return integer|NULL
+	 */
+	function get_inlist_order()
+	{
+		if( empty( $this->ID ) )
+		{	// This comment must exist in DB
+			return NULL;
+		}
+
+		global $CommentList;
+
+		if( empty( $CommentList ) )
+		{	// Comment list must be initialized globally
+			return NULL;
+		}
+
+		if( ! isset( $CommentList->inlist_orders[ $this->ID ] ) )
+		{	// Order number is not found in list for this comment:
+			return NULL;
+		}
+
+		$inlist_order = intval( $CommentList->inlist_orders[ $this->ID ] );
+
+		return $inlist_order < 0 ? 0 : $inlist_order;
 	}
 }
 

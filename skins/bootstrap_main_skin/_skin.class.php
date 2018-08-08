@@ -21,7 +21,7 @@ class bootstrap_main_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.0';
+	var $version = '7.0.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -43,7 +43,7 @@ class bootstrap_main_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -99,6 +99,39 @@ class bootstrap_main_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		// Note: second param below is the ORDER
+		return array(
+				'page_top'                  => array( NT_('Page Top'), 2 ),
+				'header'                    => array( NT_('Header'), 10 ),
+				'menu'                      => array( NT_('Menu'), 15 ),
+				'front_page_main_area'      => array( NT_('Front Page Main Area'), 40 ),
+				'front_page_secondary_area' => array( NT_('Front Page Secondary Area'), 45 ),
+				'item_single'               => array( NT_('Item Single'), 50 ),
+				'item_page'                 => array( NT_('Item Page'), 55 ),
+				'contact_page_main_area'    => array( NT_('Contact Page Main Area'), 60 ),
+				'footer'                    => array( NT_('Footer'), 100 ),
+				'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
+				'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
+				'404_page'                  => array( NT_('404 Page'), 130 ),
+				'login_required'            => array( NT_('Login Required'), 140 ),
+				'access_denied'             => array( NT_('Access Denied'), 150 ),
+				'help'                      => array( NT_('Help'), 160 ),
+				'register'                  => array( NT_('Register'), 170 ),
+				'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
+			);
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -113,7 +146,8 @@ class bootstrap_main_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -127,13 +161,11 @@ class bootstrap_main_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Image section')
 				),
-					'front_bg_image' => array(
+					'front_bg_image_file_ID' => array(
 						'label' => T_('Background image'),
-						'note' => T_('Set background image in Main Area section.'),
-						'defaultvalue' => 'shared/global/sunset/sunset.jpg',
-						'type' => 'text',
-						'size' => '50',
-						'allow_empty' => true,
+						'type' => 'fileselect',
+						'initialize_with' => 'shared/global/sunset/sunset.jpg',
+						'thumbnail_size' => 'fit-320x320'
 					),
 					'front_bg_color' => array(
 						'label' => T_('Background color'),
@@ -173,7 +205,8 @@ class bootstrap_main_Skin extends Skin
 					),
 					'front_bg_opacity' => array(
 						'label' => T_('Background opacity'),
-						'note' => '%. ' . T_('Adjust the background transparency level.'),
+						'input_suffix' => ' % ',
+						'note' => T_('Adjust the background transparency level.'),
 						'size' => '7',
 						'maxlength' => '3',
 						'defaultvalue' => '10',
@@ -369,7 +402,7 @@ class bootstrap_main_Skin extends Skin
 	 */
 	function display_init()
 	{
-		global $Messages, $disp, $debug;
+		global $Messages, $disp, $debug, $Session, $blog;
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
@@ -398,16 +431,21 @@ class bootstrap_main_Skin extends Skin
 
 		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
 		{
-			global $media_url, $media_path;
+			$FileCache = & get_FileCache();
 
-			$bg_image = $this->get_setting( 'front_bg_image' );
-			if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
+			if( $this->get_setting( 'front_bg_image_file_ID' ) )
+			{
+				$bg_image_File = & $FileCache->get_by_ID( $this->get_setting( 'front_bg_image_file_ID' ), false, false );
+			}
+
+			if( !empty( $bg_image_File ) && $bg_image_File->exists() )
 			{ // Custom body background image:
-				$custom_css .= '#bg_picture { background-image: url('.$media_url.$bg_image.") }\n";
-			} else
+				$custom_css .= '.evo_pictured_layout { background-image: url('.$bg_image_File->get_url().") }\n";
+			}
+			else
 			{
 				$color = $this->get_setting( 'front_bg_color' );
-				$custom_css .= '#bg_picture { background: '.$color." }\n";
+				$custom_css .= '.evo_pictured_layout { background: '.$color." }\n";
 			}
 
 			if( $color = $this->get_setting( 'pict_title_color' ) )
@@ -448,7 +486,7 @@ class bootstrap_main_Skin extends Skin
 			$icon_color = $this->get_setting( 'front_icon_color' );
 			if( $link_color )
 			{ // Custom link color:
-				$custom_css .= 'body.pictured .main_page_wrapper .front_main_area a,
+				$custom_css .= 'body.pictured .main_page_wrapper .front_main_area a:not(.btn),
 				body.pictured .main_page_wrapper .front_main_area div.evo_withteaser div.item_content > a { color: '.$link_color.' }
 				body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_item_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a,
 				body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_post_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a { color: '.$link_color." }\n";
@@ -487,7 +525,7 @@ class bootstrap_main_Skin extends Skin
 				$custom_css .= 'section.secondary_area, .widget_core_org_members { color: '.$color." !important }\n";
 			}
 		}
-		
+
 
 		if( $color = $this->get_setting( 'bgimg_text_color' ) )
 		{	// Custom text color on background image:
@@ -500,30 +538,6 @@ class bootstrap_main_Skin extends Skin
 		if( $color = $this->get_setting( 'bgimg_hover_link_color' ) )
 		{	// Custom link hover color on background image:
 			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
-		}
-
-		if( $disp == 'front' )
-		{ // Initialize script to scroll down to widget container with users team:
-			add_js_headline( '
-jQuery( document ).ready( function()
-{
-// Scroll to Top
-// This skin needs to override the default scroll-top script because the `height: 100%` and `overflow: hidden` both exist on disp=front
-// ======================================================================== /
-// hide or show the "scroll to top" link
-$( "body, html, #skin_wrapper" ).scroll( function() {
-	( $(this).scrollTop() > offset ) ? $slide_top.addClass("slide-top-visible") : $slide_top.removeClass("slide-top-visible");
-});
-
-// Smooth scroll to top
-$slide_top.on( "click", function(event) {
-	event.preventDefault();
-	$( "body, html, #skin_wrapper" ).animate({
-		scrollTop: 0,
-	}, scroll_top_duration );
-});
-	
-} );' );
 		}
 		
 		if( ! empty( $custom_css ) )
@@ -542,30 +556,18 @@ $slide_top.on( "click", function(event) {
 </style>';
 		add_headline( $custom_css );
 		}
-	}
 
-
-	/**
-	 * Check if we can display a widget container
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function is_visible_container( $container_key )
-	{
-		global $Collection, $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
+		if( $Session->get( 'designer_mode_'.$blog ) )
+		{	// On enabled designer mode we should set full window height for pictured layout in pixel instead of 100% percents to avoid issues on scroll page:
+			add_js_headline( 'jQuery( document ).ready( function()
+			{	// On enabled designer mode we should set full window height for pictured layout in pixel instead of 100% percents to avoid issues on scroll page:
+				jQuery( ".evo_pictured_layout" ).height( jQuery( window ).height() );
+				jQuery( window ).resize( function()
+				{	// Update height on window resizing:
+					jQuery( ".evo_pictured_layout" ).height( jQuery( window ).height() );
+				} );
+			} );' );
 		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
-
 }
-
 ?>

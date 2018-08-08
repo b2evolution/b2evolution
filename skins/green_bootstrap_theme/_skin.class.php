@@ -113,7 +113,8 @@ class green_bootstrap_theme_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -166,7 +167,8 @@ class green_bootstrap_theme_Skin extends Skin
 					),
 					'front_bg_opacity' => array(
 						'label' => T_('Background opacity'),
-						'note' => '%. ' . T_('Adjust the background transparency level.'),
+						'input_suffix' => ' % ',
+						'note' => T_('Adjust the background transparency level.'),
 						'size' => '7',
 						'maxlength' => '3',
 						'defaultvalue' => '10',
@@ -354,7 +356,8 @@ class green_bootstrap_theme_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'allow_empty' => true,
@@ -557,7 +560,8 @@ class green_bootstrap_theme_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max comment image height'),
-						'note' => 'px. ' . T_('Set maximum height for comment images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for comment images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -774,7 +778,8 @@ class green_bootstrap_theme_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -968,7 +973,8 @@ class green_bootstrap_theme_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -1239,7 +1245,7 @@ jQuery( document ).ready( function()
 	{
 		jQuery( "html, body, #skin_wrapper" ).animate(
 		{
-			scrollTop: jQuery( ".evo_container__front_page_secondary" ).offset().top
+			scrollTop: jQuery( ".evo_container__front_page_secondary_area" ).offset().top
 		}, 1500 );
 	} );
 } );' );
@@ -1722,28 +1728,6 @@ jQuery( document ).ready( function()
 
 		// Delegate to parent class:
 		return parent::get_template( $name );
-	}
-
-
-	/**
-	 * Check if we can display a widget container
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function is_visible_container( $container_key )
-	{
-		global $Collection, $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
 
 

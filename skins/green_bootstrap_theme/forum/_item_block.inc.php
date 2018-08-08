@@ -99,9 +99,10 @@ skin_widget( array(
 
 		// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
-		skin_container( /* TRANS: Widget container name */ NT_('Item Single Header'), array(
+		widget_container( 'item_single_header', array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
 			// This will enclose each widget in a block:
 			'block_start' => '<div class="$wi_class$">',
 			'block_end' => '</div>',
@@ -162,14 +163,12 @@ skin_widget( array(
 				<?php
 				if( $disp == 'single' )
 				{
-					?>
-					<div class="evo_container evo_container__item_single">
-					<?php
 					// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
 					// Display container contents:
-					skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+					widget_container( 'item_single', array(
 						'widget_context' => 'item',	// Signal that we are displaying within an Item
 						// The following (optional) params will be used as defaults for widgets included in this container:
+						'container_display_if_empty' => false, // If no widget, don't display container at all
 						// This will enclose each widget in a block:
 						'block_start' => '<div class="$wi_class$">',
 						'block_end' => '</div>',
@@ -197,9 +196,6 @@ skin_widget( array(
 						'widget_item_tags_after'     => '</nav>',
 					) );
 					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
-					?>
-					</div>
-					<?php
 				}
 				else
 				{
@@ -330,14 +326,13 @@ skin_widget( array(
 		<?php
 		if( $Skin->is_visible_sidebar( 'single' ) )
 		{	// Display sidebar:
-		?>
-		<aside class="col-md-3<?php echo ( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left' : '' ); ?>">
-			<div class="evo_container evo_container__sidebar_single">
-			<?php
 				// ------------------------- "Sidebar Single" CONTAINER EMBEDDED HERE --------------------------
 				// Display container contents:
-				skin_container( NT_('Sidebar Single'), array(
+				widget_container( 'sidebar_single', array(
 						// The following (optional) params will be used as defaults for widgets included in this container:
+						'container_display_if_empty' => false, // If no widget, don't display container at all
+						'container_start' => '<aside class="col-md-3'.( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left' : '' ).'"><div class="evo_container $wico_class$">',
+						'container_end'   => '</div></aside>',
 						// This will enclose each widget in a block:
 						'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
 						'block_end' => '</div>',
@@ -367,10 +362,7 @@ skin_widget( array(
 						'search_submit_after'  => '</span></div>',
 					) );
 				// ----------------------------- END OF "Sidebar Single" CONTAINER -----------------------------
-			?>
-			</div>
-		</aside><!-- .col -->
-		<?php } ?>
+		} ?>
 	</div><!-- .row -->
 
 </div><!-- ../forums_list single_topic -->

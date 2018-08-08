@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -37,7 +37,7 @@ $Form->switch_template_parts(
 		'inputstart_checkbox' => '<div class="controls col-lg-8 col-md-8 col-sm-9"><div class="checkbox"><label>' )
 );
 
-$link_attribs = array( 'style' => 'margin-left:1ex', 'class' => 'btn btn-sm btn-default action_icon' ); // Avoid misclicks by all means!
+$link_attribs = array( 'style' => 'margin-left:1ex', 'class' => 'btn btn-sm btn-default' ); // Avoid misclicks by all means!
 if( $current_User->check_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
 {
 	$Form->global_icon( T_( 'Post as a quote' ), 'elevate', '?ctrl=comments&amp;action=elevate&amp;type=quote&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment'),
@@ -60,7 +60,7 @@ else
 }
 $Form->global_icon( $delete_title, 'recycle', $delete_url, $delete_text, 4, 3, $link_attribs );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', str_replace( '&', '&amp;', $redirect_to), T_('cancel'), 4, 1, $link_attribs );
+$Form->global_icon( T_('Cancel editing').'!', 'close', str_replace( '&', '&amp;', $redirect_to), T_('cancel'), 4, 1, $link_attribs );
 
 $Form->begin_form( 'eform' );
 
@@ -125,8 +125,9 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		else
 		{	// This is not a member comment
 			$Form->text_input( 'newcomment_author', $edited_Comment->author, 20, T_('Author'), '', array( 'maxlength' => 100, 'style' => 'width:100%' ) );
-			$Form->text_input( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), '', array( 'maxlength' => 255, 'style' => 'width:100%' ) );
+			$Form->email_input( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), array( 'maxlength' => 255, 'style' => 'width:100%' ) );
 			$Form->checkbox( 'comment_allow_msgform', $edited_Comment->allow_msgform, T_('Allow contact'), T_('If checked, the comment author can be contacted through a form that will send him en email.') );
+			$Form->checkbox( 'comment_anon_notify', $edited_Comment->anon_notify, T_('Notify me of replies') );
 			$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('Website URL'), '', array( 'maxlength' => 255, 'style' => 'width:100%' ) );
 		}
 

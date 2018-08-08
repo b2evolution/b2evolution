@@ -51,11 +51,9 @@ div.filters .filter_item {
 		display: inline-block;
 	}
 	.evo_cat_meta {
-		font-weight: bold;
-		color: #000;
 		list-style: square;
 		margin-left: 20px;
-		label, a {
+		> label, > a {
 			font-weight: bold;
 			color: #000;
 		}
@@ -97,6 +95,9 @@ div.filters .filter_item {
 	.panel-body {
 		background-color: @status_color_meta_bg;
 	}
+	.btn-toolbar {
+		background-color: darken(@status_color_meta_bg, 10%) !important;
+	}
 }
 
 // Voting panel on items, comments and etc.:
@@ -104,5 +105,37 @@ div.filters .filter_item {
 	> span.fa {
 		margin-right: 4px;
 		margin-left: 2px;
+	}
+}
+
+// Button toolbar label
+.btn-toolbar {
+	.btn-toolbar-title {
+		margin-top: 1px;
+		margin-bottom: 2px;
+	}
+}
+
+// Style for comment quick moderation
+.evo_form__comment_review {
+	.comment_avatar {
+		float: left;
+		margin: 0 10px 10px 0;
+		img.user {
+			border-radius: 50%;
+		}
+	}
+	h3.comment_title {
+		font-size: 16px;
+		margin: 0;
+	}
+}
+
+// Affixed messages
+.msg_wrapper {
+	.affix {
+		div.alert {
+			box-shadow: 1px 10px 35px rgba(75, 75, 75, 0.75);
+		}
 	}
 }

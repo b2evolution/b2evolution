@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -181,10 +181,13 @@ function init_inskin_editing()
 
 		load_class( 'items/model/_item.class.php', 'Item' );
 		$edited_Item = new Item();
-		$def_status = get_highest_publish_status( 'post', $Blog->ID, false );
+		$def_status = get_highest_publish_status( 'post', $Blog->ID, false, '', $edited_Item );
 		$edited_Item->set( 'status', $def_status );
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
-		$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
+		$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
+		// Prefill data from url:
+		$edited_Item->set( 'title', param( 'post_title', 'string' ) );
+		$edited_Item->set( 'urltitle', param( 'post_urltitle', 'string' ) );
 
 		// Set default locations from current user
 		$edited_Item->set_creator_location( 'country' );
@@ -224,7 +227,7 @@ function init_inskin_editing()
 	// Get an url for a link 'Go to advanced edit screen'
 	$advanced_edit_link = array(
 			'href'    => $admin_url.'?ctrl=items&amp;action='.$action.'&amp;'.$tab_switch_params,
-			'onclick' => 'return b2edit_reload( document.getElementById(\'item_checkchanges\'), \''.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'\' );',
+			'onclick' => 'return b2edit_reload( \'#item_checkchanges\', \''.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'\' );',
 		);
 
 	$form_action = get_htsrv_url().'item_edit.php';
@@ -242,12 +245,14 @@ function init_inskin_editing()
  *                 "*": all blogs
  *                 "1,2,3":blog IDs separated by comma
  *                 "-": current blog only and exclude the aggregated blogs
+ * @param boolean FALSE if FeaturedList cursor should move, TRUE otherwise
+ * @param boolean Load featured post together with requested post types like intro but order the featured post below intro posts
  * @return Item
  */
-function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
+function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $preview = false, $load_featured = false )
 {
 	global $Collection, $Blog, $cat;
-	global $disp, $disp_detail, $MainList, $FeaturedList;
+	global $disp, $disp_detail, $MainList, $FeaturedList, $featured_list_type;
 	global $featured_displayed_item_IDs;
 
 	if( $disp != $restrict_disp || !isset($MainList) )
@@ -255,6 +260,14 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 		$Item = NULL;
 		return $Item;
 	}
+
+	if( $featured_list_type != $load_featured )
+	{	// Reset a featured list if previous request was to load another type:
+		$FeaturedList = NULL;
+	}
+
+	// Save current list type in global var:
+	$featured_list_type = $load_featured;
 
 	if( !isset( $FeaturedList ) )
 	{	// Don't repeat if we've done this already -- Initialize the featured list only first time this function is called in a skin:
@@ -318,7 +331,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 
 		$FeaturedList->set_filters( array(
 				'coll_IDs' => $coll_IDs,
-				'itemtype_usage' => $restrict_to_types_usage,
+				'itemtype_usage' => $restrict_to_types_usage.( $load_featured ? ',*featured*' : '' ),
 			), false /* Do NOT memorize!! */ );
 		// pre_dump( $FeaturedList->filters );
 		// Run the query:
@@ -327,12 +340,11 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 
 		// SECOND: If no Intro, try to find an Featured post:
 
-		if( isset($Blog) )
-
-		if( $FeaturedList->result_num_rows == 0 && $restrict_disp != 'front'
-			&& isset($Blog)
-			&& $Blog->get_setting('disp_featured_above_list') )
-		{ // No Intro page was found, try to find a featured post instead:
+		if( ! $load_featured && // Don't try to load featured posts twice,
+		    $FeaturedList->result_num_rows == 0 && // If no intro post has been load above,
+		    $restrict_disp != 'front' && // Exclude front page,
+		    $Blog->get_setting( 'disp_featured_above_list' ) ) // If the collection setting "Featured post above list" is enabled.
+		{	// No Intro page was found, try to find a featured post instead:
 
 			$FeaturedList->reset();
 
@@ -348,11 +360,18 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
 	}
 
 	// Get first Item in the result set.
-	$Item = $FeaturedList->get_item();
+	if( $preview )
+	{ // We only want want a preview of the first item
+		$Item = $FeaturedList->get_by_idx( 0 );
+	}
+	else
+	{
+		$Item = $FeaturedList->get_item();
 
-	if( $Item )
-	{	// Memorize that ID so that it can later be filtered out of normal display:
-		$featured_displayed_item_IDs[] = $Item->ID;
+		if( $Item )
+		{	// Memorize that ID so that it can later be filtered out of normal display:
+			$featured_displayed_item_IDs[] = $Item->ID;
+		}
 	}
 
 	return $Item;
@@ -374,11 +393,12 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL )
  * @param string The name of the post ID column
  * @param string The name of the DB table to use
  * @param NULL|string The post locale or NULL if there is no specific locale.
+ * @param NULL|string The name of the DB table to use in the message
  * @return string validated url title
  */
 function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false,
 									$dbSlugFieldName = 'post_urltitle', $dbIDname = 'post_ID',
-									$dbtable = 'T_items__item', $post_locale = NULL )
+									$dbtable = 'T_items__item', $post_locale = NULL, $msg_dbtable = NULL )
 {
 	global $DB, $Messages;
 
@@ -415,17 +435,17 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	{ // this should only happen when the slug is auto generated
 		global $Collection, $Blog;
 		if( isset( $Blog ) )
-		{ // Get max length of slug from current blog setting
+		{	// Get max length of slug from current blog setting:
 			$count_of_words = $Blog->get_setting('slug_limit');
 		}
 		if( empty( $count_of_words ) )
-		{ // Use 5 words to limit slug by default
+		{	// Use 5 words to limit slug by default:
 			$count_of_words = 5;
 		}
 
-		$title_words = array();
+		// Limit slug with max count of words:
 		$title_words = explode( '-', $urltitle );
-		if( count($title_words) > $count_of_words )
+		if( count( $title_words ) > $count_of_words )
 		{
 			$urltitle = '';
 			for( $i = 0; $i < $count_of_words; $i++ )
@@ -433,20 +453,18 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 				$urltitle .= $title_words[$i].'-';
 			}
 			//delete last '-'
-			$urltitle = substr( $urltitle, 0, strlen($urltitle) - 1 );
+			$urltitle = substr( $urltitle, 0, strlen( $urltitle ) - 1 );
 		}
-
-		// echo 'leaving 5 words: '.$urltitle.'<br />';
 	}
 
-	// Normalize to 200 chars + a number
+	// Normalize to 200 chars + a number:
 	preg_match( '/^(.*?)((-|_)+([0-9]+))?$/', $urltitle, $matches );
 	$urlbase = substr( $matches[1], 0, 200 );
 	// strip a possible dash at the end of the URL title:
 	$urlbase = rtrim( $urlbase, '-' );
 	$urltitle = $urlbase;
-	if( ! empty( $matches[4] ) )
-	{
+	if( isset( $matches[4] ) && $matches[4] !== '' )
+	{	// Append only NOT empty string after last dash:
 		$urltitle .= '-'.$matches[4];
 	}
 
@@ -509,7 +527,38 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	if( !empty($orig_title) && $urltitle != $orig_title )
 	{
-		$Messages->add( sprintf(T_('Warning: the URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'note' );
+		$msg_table = ! empty( $msg_dbtable ) ? $msg_dbtable : $dbtable;
+		switch( $msg_table )
+		{
+			case 'T_items__item':
+				// post_urltitle
+				$field_type = T_('Post');
+				break;
+
+			case 'T_categories':
+				// cat_urlname
+				$field_type = T_('Category');
+				break;
+
+			case 'T_blogs':
+				// blog_urlname
+				$field_type = T_('Collection');
+				break;
+
+			case 'T_slug':
+				// slug_title
+				$field_type = T_('Slug');
+				break;
+		}
+
+		if( isset( $field_type ) )
+		{
+			$Messages->add_to_group( sprintf( /* TRANS: First %s gets replaced by field type, 2nd %s by title, 3rd %s by urltitle */ T_('URL slug for %s &laquo;%s&raquo; has been changed to &laquo;%s&raquo;.'), $field_type, $title, $urltitle ), 'note', T_('Warning: URL slugs changed:' ) );
+		}
+		else
+		{
+			$Messages->add_to_group( sprintf( T_('URL slug has been changed to &laquo;%s&raquo;.'), $urltitle ), 'note', T_('Warning: URL slugs changed:' ) );
+		}
 	}
 
 	return $urltitle;
@@ -861,7 +910,7 @@ function statuses_where_clause( $show_statuses = NULL, $dbprefix = 'post_', $req
 			$where[] = $allowed_statuses_cond;
 		}
 	}
-	elseif( count( $show_statuses ) )
+	elseif( is_array( $show_statuses ) && count( $show_statuses ) )
 	{ // we are not filtering so all status are allowed, add allowed statuses condition
 		$where[] = $dbprefix.'status IN ( \''.implode( '\',\'', $show_statuses ).'\' )';
 	}
@@ -1640,6 +1689,9 @@ function get_tab_by_item_type_usage( $type_usage )
 		case 'intro-all':
 			$type_tab = array( 'intro', NT_('Intros') );
 			break;
+		case 'content-block':
+			$type_tab = array( 'content-block', NT_('Content Blocks') );
+			break;
 
 		default:
 			// Unknown item type usage:
@@ -1668,6 +1720,9 @@ function get_item_type_usage_by_tab( $tab_name )
 		case 'intro':
 			$type_usages = array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all' );
 			break;
+		case 'content-block':
+			$type_usages = array( 'content-block' );
+			break;
 		case 'post':
 		default:
 			$type_usages = array( 'post' );
@@ -1675,6 +1730,50 @@ function get_item_type_usage_by_tab( $tab_name )
 	}
 
 	return $type_usages;
+}
+
+
+/**
+ * Get options for setting "Link to" of item type custom field
+ *
+ * @return array
+ */
+function get_item_type_field_linkto_options( $field_type )
+{
+	switch( $field_type )
+	{
+		case 'image':
+			$options = array(
+				'linkpermzoom' => T_('Link to / Permalink / Zoom'),
+				'permzoom'     => T_('Permalink / Zoom'),
+				'linkto'       => T_('Always "Link to"'),
+				'permalink'    => T_('Always Permalink'),
+				'zoom'         => T_('Always Zoom'),
+				'nolink'       => T_('No Link'),
+			);
+			break;
+		case 'url':
+			$options = array(
+				'fieldurl' => T_('This field URL'),
+				'nolink'   => T_('No Link'),
+			);
+			break;
+		case 'double':
+		case 'varchar':
+		case 'computed':
+		case 'separator':
+			$options = array(
+				'linkperm'  => T_('Link to / Permalink'),
+				'linkto'    => T_('Always "Link to"'),
+				'permalink' => T_('Always Permalink'),
+				'nolink'    => T_('No Link'),
+			);
+			break;
+		default:
+			$options = array();
+	}
+
+	return $options;
 }
 
 
@@ -1846,7 +1945,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	global $Collection, $Blog, $current_User, $UserSettings;
 	global $next_action, $highest_publish_status; // needs to be passed out for echo_publishnowbutton_js( $action )
 
-	list( $highest_publish_status, $publish_text ) = get_highest_publish_status( 'post', $Blog->ID );
+	list( $highest_publish_status, $publish_text ) = get_highest_publish_status( 'post', $Blog->ID, true, '', $edited_Item );
 	if( ! isset( $edited_Item->status ) )
 	{
 		$edited_Item->status = $highest_publish_status;
@@ -1856,7 +1955,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	if( ! $inskin || $display_preview )
 	{
 		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
-		$Form->button( array( 'button', '', T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
+		$Form->button( array( 'button', '', /* TRANS: Verb */ T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
 	}
 
 	// ---------- VISIBILITY ----------
@@ -1867,7 +1966,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		echo '<span class="edit_actions_text">'.T_('Visibility').get_manual_link( 'visibility-status' ).': </span>';
 
 		// Get those statuses which are not allowed for the current User to create posts in this blog
-		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status ), array( 'trash' ) );
+		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status, '', $edited_Item ), array( 'trash' ) );
 		// Get allowed visibility statuses
 		$status_options = get_visibility_statuses( '', $exclude_statuses );
 
@@ -1875,7 +1974,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		{ // Use dropdown for bootstrap skin
 			$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 			$Form->hidden( 'post_status', $edited_Item->status );
-			echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="top" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
+			echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
 			echo '<button type="button" class="btn btn-status-'.$edited_Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
 							.'<span>'.$status_options[ $edited_Item->status ].'</span>'
 						.' <span class="caret"></span></button>';
@@ -1934,7 +2033,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 
 		$Form->submit( array(
 			'actionArray['.$next_action.'_publish]',
-			/* TRANS: This is the value of an input submit button */ T_('Publish!'),
+			/* TRANS: This is the value of an input submit button */ T_('Publish').'!',
 			'SaveButton btn-status-published quick-publish',
 			'',
 			$publish_style
@@ -1954,7 +2053,7 @@ function echo_item_status_buttons( $Form, $edited_Item )
 	global $next_action, $action, $Collection, $Blog;
 
 	// Get those statuses which are not allowed for the current User to create posts in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status ), array( 'trash' ) );
+	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status, '', $edited_Item ), array( 'trash' ) );
 	// Get allowed visibility statuses
 	$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
 	$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
@@ -2178,19 +2277,464 @@ function echo_item_content_position_js( $height, $scroll_position )
 
 
 /**
+ * JS Behaviour: Output JavaScript code to merge an item with another item
+ */
+function echo_item_merge_js()
+{
+	global $Blog, $admin_url, $evo_item_merge_js_initialized;
+
+	if( ! empty( $evo_item_merge_js_initialized ) )
+	{	// Don't initialize this JS code twice on same page:
+		return;
+	}
+
+	// Set flag to know this is initialized:
+	$evo_item_merge_js_initialized = true;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+?>
+<script type="text/javascript">
+function evo_merge_load_window( item_ID )
+{
+	openModalWindow( '<div id="evo_merge_wrapper"></div>', 'auto', '', true,
+		'<?php echo TS_('Select destination Post...'); ?>', // Window title
+		[ '-', 'evo_merge_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back", "Merge with original dates",  "Append to this post with new dates"
+		true );
+
+	// Load collections:
+	var current_coll_urlname = '<?php echo empty( $Blog ) ? '' : format_to_js( $Blog->get( 'urlname' ) ); ?>';
+	evo_rest_api_start_loading( '#evo_merge_wrapper' );
+	evo_rest_api_request( 'collections', function( data )
+	{	// Display the colllections on success request:
+		var coll_urlname = '';
+		var coll_name = '';
+
+		// Initialize html code to view the loaded collections:
+		var r = '<div id="evo_merge_colls_list">'
+			+ '<h2><?php echo TS_('Collections'); ?></h2>'
+			+ '<select class="form-control">';
+		for( var c in data.colls )
+		{
+			var coll = data.colls[c];
+			r += '<option value="' + coll.urlname + '"'
+				+ ( current_coll_urlname == coll.urlname ? ' selected="selected"' : '' )+ '>'
+				+ coll.name + '</option>';
+			if( coll_urlname == '' || coll.urlname == current_coll_urlname )
+			{	// Set these vars to load posts of the selected or first collection:
+				coll_urlname = coll.urlname;
+				coll_name = coll.name;
+			}
+		}
+		r += '</select>'
+			+ '</div>'
+			+ '<div id="evo_merge_posts_block"></div>'
+			+ '<div id="evo_merge_post_block"></div>'
+			+ '<input type="hidden" id="evo_merge_post_ID" value="' + item_ID + '" />'
+			+ '<input type="hidden" id="evo_merge_dest_post_ID" />';
+
+		evo_rest_api_end_loading( '#evo_merge_wrapper', r );
+
+		if( coll_urlname != '' )
+		{	// Load posts list of the current or first collection:
+			evo_merge_load_coll_posts( coll_urlname, coll_name );
+		}
+	} );
+
+	// Set max-height to keep the action buttons on screen:
+	var modal_window = jQuery( '#evo_item_merge_wrapper' ).parent();
+	var modal_height = jQuery( window ).height() - 20;
+	if( modal_window.hasClass( 'modal-body' ) )
+	{	// Extract heights of header and footer:
+		modal_height -= 55 + 64 +
+			parseInt( modal_window.css( 'padding-top' ) ) + parseInt( modal_window.css( 'padding-bottom' ) );
+	}
+	modal_window.css( {
+		'display': 'block',
+		'overflow': 'auto',
+		'max-height': modal_height
+	} );
+
+	// To prevent link default event:
+	return false;
+}
+
+
+/**
+ * Load posts list with search form of the collection:
+ *
+ * @param string Collection urlname
+ * @param string Collection name
+ * @param string Predefined Search keyword
+ */
+function evo_merge_display_search_form( coll_urlname, coll_name, search_keyword )
+{
+	var r = '<h2>' + coll_name + '</h2>' +
+		'<form class="form-inline" id="evo_merge_search__form" data-urlname="' + coll_urlname + '">' +
+			'<div class="input-group">' +
+				'<input type="text" id="evo_merge_search__input" class="form-control" value="' + ( typeof( search_keyword ) == 'undefined' ? '' : search_keyword ) + '">' +
+				'<span class="input-group-btn"><button id="evo_merge_search__submit" class="btn btn-primary"><?php echo TS_('Search'); ?></button></span>' +
+			'</div> ' +
+			'<button id="evo_merge_search__clear" class="btn btn-default"><?php echo TS_('Clear'); ?></button>' +
+		'</form>' +
+		'<div id="evo_merge_posts_list"></div>';
+
+	jQuery( '#evo_merge_posts_block' ).html( r );
+}
+
+
+/**
+ * Load posts list with search form of the collection:
+ *
+ * @param string Collection urlname
+ * @param string Collection name
+ * @param integer Page
+ */
+function evo_merge_load_coll_posts( coll_urlname, coll_name, page )
+{
+	if( typeof( coll_name ) != 'undefined' && coll_name !== false )
+	{
+		evo_merge_display_search_form( coll_urlname, coll_name );
+	}
+
+	var current_post_exclude_param = '&pl=-' + jQuery( '#evo_merge_post_ID' ).val();
+
+	var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&paged=' + page;
+
+	evo_rest_api_start_loading( '#evo_merge_posts_list' );
+	evo_rest_api_request( 'collections/' + coll_urlname + '/items&orderby=datemodified&order=DESC' + current_post_exclude_param +page_param, function( data )
+	{	// Display the posts on success request:
+		var r = '<ul>';
+		for( var p in data.items )
+		{
+			var post = data.items[p];
+			r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + coll_urlname + '">' + post.title + '</a></li>';
+		}
+		r += '</ul>';
+		r += evo_merge_get_pagination( data );
+		evo_rest_api_end_loading( '#evo_merge_posts_list', r );
+	} );
+}
+
+
+/**
+ * Build a pagination from response data
+ *
+ * @param array Response data
+ * @param string Search keyword
+ * @return string Pagination
+ */
+function evo_merge_get_pagination( data, search_keyword )
+{
+	var r = '';
+
+	if( typeof( data.pages_total ) == 'undefined' || data.pages_total < 2 )
+	{	// No page for this request:
+		return r;
+	}
+
+	var search_keyword_attr = typeof( search_keyword ) == 'undefined' ? '' :
+		' data-search="' + search_keyword.replace( '"', '\"' ) + '"';
+
+	var current_page = data.page;
+	var total_pages = data.pages_total;
+	var page_list_span = 11; // Number of visible pages on navigation line
+	var page_list_start, page_list_end;
+
+	// Initialize a start of pages list:
+	if( current_page <= parseInt( page_list_span / 2 ) )
+	{	// the current page number is small
+		page_list_start = 1;
+	}
+	else if( current_page > total_pages - parseInt( page_list_span / 2 ) )
+	{	// the current page number is big
+		page_list_start = Math.max( 1, total_pages - page_list_span + 1 );
+	}
+	else
+	{	// the current page number can be centered
+		page_list_start = current_page - parseInt( page_list_span / 2 );
+	}
+
+	// Initialize an end of pages list:
+	if( current_page > total_pages - parseInt( page_list_span / 2 ) )
+	{ //the current page number is big
+		page_list_end = total_pages;
+	}
+	else
+	{
+		page_list_end = Math.min( total_pages, page_list_start + page_list_span - 1 );
+	}
+
+	r += '<ul class="evo_merge_pagination pagination"' + search_keyword_attr + '>';
+
+	if( current_page > 1 )
+	{	// A link to previous page:
+		r += '<li><a href="#" data-page="' + ( current_page - 1 ) + '">&lt;&lt;</a></li>';
+	}
+
+	if( page_list_start > 1 )
+	{ // The pages list doesn't contain the first page
+		// Display a link to first page:
+		r += '<li><a href="#" data-page="1">1</a></li>';
+
+		if( page_list_start > 2 )
+		{ // Display a link to previous pages range:
+			r += '<li><a href="#" data-page="' + Math.ceil( page_list_start / 2 ) + '">...</a></li>';
+		}
+	}
+
+	for( p = page_list_start; p <= page_list_end; p++ )
+	{
+		if( current_page == p )
+		{	// Current page:
+			r += '<li class="active"><span>' + p + '</span></li>';
+		}
+		else
+		{
+			r += '<li><a href="#" data-page="' + p + '">' + p + '</a></li>';
+		}
+	}
+
+	if( page_list_end < total_pages )
+	{	// The pages list doesn't contain the last page
+		if( page_list_end < total_pages - 1 )
+		{	// Display a link to next pages range:
+			r += '<li><a href="#" data-page="' + ( page_list_end + Math.floor( ( total_pages - page_list_end ) / 2 ) ) + '">...</a></li>';
+		}
+
+		// Display a link to last page:
+		r += '<li><a href="#" data-page="' + total_pages + '">' + total_pages + '</a></li>';
+	}
+
+	if( current_page < total_pages )
+	{	// A link to next page:
+		r += '<li><a href="#" data-page="' + ( current_page + 1 ) + '">&gt;&gt;</a></li>';
+	}
+
+	r += '</ul>';
+
+	return r;
+}
+
+
+/**
+ * Load the searched posts list:
+ *
+ * @param string Collection urlname
+ * @param string Search keyword
+ * @param integer Page
+ */
+function evo_merge_load_coll_search( coll_urlname, search_keyword, page )
+{
+	var current_post_exclude_param = '&exclude_posts=' + jQuery( '#evo_merge_post_ID' ).val();
+
+	var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&page=' + page;
+
+	evo_rest_api_start_loading( '#evo_merge_posts_list' );
+	evo_rest_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword + '&kind=item' + current_post_exclude_param + page_param, function( data )
+	{	// Display the post data in third column on success request:
+		if( typeof( data.code ) != 'undefined' )
+		{	// Error code was responsed:
+			evo_rest_api_print_error( '#evo_merge_posts_list', data );
+			return;
+		}
+
+		var r = '<ul>';
+		for( var s in data.results )
+		{
+			var search_item = data.results[s];
+			if( search_item.kind != 'item' )
+			{	// Dsiplay only items and skip all other:
+				continue;
+			}
+			r += '<li>';
+			r += '<a href="#" data-id="' + search_item.id + '" data-urlname="' + coll_urlname + '">' + search_item.title + '</a>';
+			r += '</li>';
+		}
+		r += '</ul>';
+		r += evo_merge_get_pagination( data, search_keyword );
+		evo_rest_api_end_loading( '#evo_merge_posts_list', r );
+	} );
+}
+
+// Load the posts of the selected collection:
+jQuery( document ).on( 'change', '#evo_merge_colls_list select', function()
+{
+	evo_merge_load_coll_posts( jQuery( this ).val(), jQuery( 'option:selected', this ).text() );
+
+	// To prevent link default event:
+	return false;
+} );
+
+// Submit a search form:
+jQuery( document ).on( 'submit', '#evo_merge_search__form', function()
+{
+	var coll_urlname = jQuery( this ).data( 'urlname' );
+	var search_keyword = jQuery( '#evo_merge_search__input' ).val();
+
+	evo_merge_load_coll_search( coll_urlname, search_keyword );
+
+	// To prevent link default event:
+	return false;
+} );
+
+// Clear the search results:
+jQuery( document ).on( 'click', '#evo_merge_search__clear', function()
+{
+	evo_merge_load_coll_posts( jQuery( this ).closest( 'form' ).data( 'urlname' ) );
+
+	// Clear search input field:
+	jQuery( '#evo_merge_search__input' ).val( '' );
+
+	// To prevent link default event:
+	return false;
+} );
+
+// Switch page:
+jQuery( document ).on( 'click', '.evo_merge_pagination a', function()
+{
+	var coll_selector = jQuery( '#evo_merge_colls_list select' );
+	var pages_list = jQuery( this ).closest( '.evo_merge_pagination' );
+
+	if( pages_list.data( 'search' ) == undefined )
+	{	// Load posts/items for selected page:
+		evo_merge_load_coll_posts( coll_selector.val(), false, jQuery( this ).data( 'page' ) );
+	}
+	else
+	{	// Load search list for selected page:
+		evo_merge_load_coll_search( coll_selector.val(), pages_list.data( 'search' ), jQuery( this ).data( 'page' ) );
+	}
+
+	// To prevent link default event:
+	return false;
+} );
+
+
+// Load the data of the selected post:
+jQuery( document ).on( 'click', '#evo_merge_posts_list a[data-id]', function()
+{
+	var coll_urlname = jQuery( this ).data( 'urlname' );
+	var post_id = jQuery( this ).data( 'id' );
+
+	// Hide the lists of collectionss and posts:
+	jQuery( '#evo_merge_colls_list, #evo_merge_posts_block' ).hide();
+
+	// Show the post preview block, because it can be hidded after prevous preview:
+	jQuery( '#evo_merge_post_block' ).show();
+
+	if( jQuery( '#evo_merge_post_block' ).data( 'post' ) == post_id )
+	{	// If user loads the same post, just display the cached content to save ajax calls:
+		// Show the action buttons:
+		jQuery( '#evo_merge_btn_back_to_list, #evo_merge_btns_group' ).show();
+	}
+	else
+	{	// Load new post:
+		jQuery( '#evo_merge_post_block' ).html( '' ); // Clear previous cached content
+		evo_rest_api_start_loading( '#evo_merge_post_block' );
+		evo_rest_api_request( 'collections/' + coll_urlname + '/items/' + post_id, function( post )
+		{	// Display the post data on success request:
+			jQuery( '#evo_merge_post_block' ).data( 'post', post.id );
+
+			// Store item field values in hidden inputs to use on insert complex link:
+			jQuery( '#evo_merge_dest_post_ID' ).val( post.id );
+
+			// Item title:
+			var item_content = '<h2>' + post.title + '</h2>';
+			// Item attachments, Only images and on teaser positions:
+			if( typeof( post.attachments ) == 'object' && post.attachments.length > 0 )
+			{
+				item_content += '<div id="evo_merge_post_attachments">';
+				for( var a in post.attachments )
+				{
+					var attachment = post.attachments[a];
+					if( attachment.type == 'image' &&
+							( attachment.position == 'teaser' ||
+								attachment.position == 'teaserperm' ||
+								attachment.position == 'teaserlink' )
+						)
+					{
+						item_content += '<img src="' + attachment.url + '" />';
+					}
+				}
+				item_content += '</div>';
+			}
+			// Item content:
+			item_content += '<div id="evo_merge_post_content">' + post.content + '</div>';
+
+			evo_rest_api_end_loading( '#evo_merge_post_block', item_content );
+
+			jQuery( '.modal-title' ).html( '<?php echo T_('Destination Post:'); ?>' );
+
+			// Display the buttons to back and merge/append a post:
+			var buttons_side_obj = jQuery( '.evo_merge_post_buttons' ).length ?
+				jQuery( '.evo_merge_post_buttons' ) :
+				jQuery( '#evo_merge_post_content' );
+			jQuery( '#evo_merge_btn_back_to_list, #evo_merge_btns_group, #evo_merge_btn_form' ).remove();
+			buttons_side_obj.after( '<button id="evo_merge_btn_back_to_list" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
+				+ '<span id="evo_merge_btns_group" style="margin:0 5px">'
+				+ '<?php echo TS_('Move source post & comments'); ?>: '
+				+ '<div class="btn-group">'
+				+ '<button id="evo_merge_btn_merge" class="btn btn-primary"><?php echo TS_('by keeping original dates (merge)'); ?></button>'
+				+ '<button id="evo_merge_btn_append" class="btn btn-default"><?php echo TS_('by assigning new dates (append)'); ?></button>'
+				+ '</div>'
+				+ '</span>' );
+		} );
+	}
+
+	// To prevent link default event:
+	return false;
+} );
+
+// Submit form to merge/append a post:
+jQuery( document ).on( 'click', '#evo_merge_btn_merge, #evo_merge_btn_append', function()
+{
+	var action = jQuery( this ).attr( 'id' ) == 'evo_merge_btn_merge' ? 'merge' : 'append';
+
+	location.href = '<?php echo $admin_url; ?>?ctrl=items&action=' + action
+		+ '&post_ID=' + jQuery( '#evo_merge_post_ID' ).val()
+		+ '&dest_post_ID=' + jQuery( '#evo_merge_dest_post_ID' ).val()
+		+ '&<?php echo url_crumb( 'item' ); ?>';
+} );
+
+// Back to previous list:
+jQuery( document ).on( 'click', '#evo_merge_btn_back_to_list', function()
+{
+	jQuery( '.modal-title' ).html( '<?php echo T_('Select destination Post...'); ?>' );
+
+	// Show the lists of collections and posts:
+	jQuery( '#evo_merge_colls_list, #evo_merge_posts_block' ).show();
+
+	// Hide the post preview block and action buttons:
+	jQuery( '#evo_merge_post_block, #evo_merge_btn_back_to_list, #evo_merge_btns_group' ).hide();
+
+	// To prevent link default event:
+	return false;
+} );
+</script>
+<?php
+}
+
+
+/**
  * Output Javascript for tags autocompletion.
  * @todo dh> a more facebook like widget would be: http://plugins.jquery.com/project/facelist
  *           "ListBuilder" is being planned for jQuery UI: http://wiki.jqueryui.com/ListBuilder
+ *
+ * @param array Params
  */
-function echo_autocomplete_tags()
+function echo_autocomplete_tags( $params = array() )
 {
+	$params = array_merge( array(
+			'item_ID'        => NULL,
+			'update_by_ajax' => false,
+		), $params );
 ?>
 	<script type="text/javascript">
 	function init_autocomplete_tags( selector )
 	{
 		var tags = jQuery( selector ).val();
 		var tags_json = new Array();
-		if( tags.length > 0 )
+		if( tags && tags.length > 0 )
 		{ // Get tags from <input>
 			tags = tags.split( ',' );
 			for( var t in tags )
@@ -2211,12 +2755,46 @@ function echo_autocomplete_tags()
 			noResultsText: '<?php echo TS_('No results') ?>',
 			searchingText: '<?php echo TS_('Searching...') ?>',
 			jsonContainer: 'tags',
+			<?php if( $params['update_by_ajax'] ) { ?>
+			onAdd: function() { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector ) },
+			onDelete: function() { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector ) },
+			<?php } ?>
 		} );
 	}
 
+	<?php if( $params['update_by_ajax'] ) { ?>
+	function evo_update_item_tags_by_ajax( item_ID, tags_selector )
+	{
+		// Mark input background with yellow color during AJAX updating:
+		var token_input = jQuery( '.token-input-' + tags_selector.substr( 1 ) );
+		token_input.removeClass( 'token-input-list-error' ).addClass( 'token-input-list-process' );
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url(); ?>action.php',
+			data:
+			{
+				'mname': 'collections',
+				'action': 'update_tags',
+				'item_ID': item_ID,
+				'item_tags': jQuery( tags_selector ).val(),
+				'crumb_collections_update_tags': '<?php echo get_crumb( 'collections_update_tags' ); ?>'
+			},
+			success: function()
+			{	// Remove yellow background from input after success AJAX updating:
+				token_input.removeClass( 'token-input-list-process' );
+			},
+			error: function()
+			{	// Mark input background with red color after fail AJAX updating:
+				token_input.removeClass( 'token-input-list-process' ).addClass( 'token-input-list-error' );
+			}
+		} );
+	}
+	<?php } ?>
+
 	jQuery( document ).ready( function()
 	{
-		if( jQuery( '#suggest_item_tags' ).is( ':checked' ) )
+		if( jQuery( '#suggest_item_tags' ).length == 0 || jQuery( '#suggest_item_tags' ).is( ':checked' ) )
 		{
 			init_autocomplete_tags( '#item_tags' );
 		}
@@ -2666,7 +3244,7 @@ function echo_slug_filler()
 		{
 			if(!slug_changed)
 			{
-				jQuery( '#post_urltitle' ).val( jQuery( '#post_title' ).val() );
+				jQuery( '#post_urltitle' ).val( jQuery( '#post_title' ).val().replace( /,/g, ' ' ) );
 			}
 		} );
 
@@ -2832,12 +3410,14 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 	}
 
 	// Get ready for display (runs the query):
-	$CommentList->display_init();
+	$CommentList->display_init( array(
+			'init_order_numbers_mode' => ( $comment_type == 'meta' ? 'date' : false )
+		) );
 
 	$CommentList->display_if_empty( array(
 		'before'    => '<div class="evo_comment"><p>',
 		'after'     => '</p></div>',
-		'msg_empty' => T_('No feedback for this post yet...'),
+		'msg_empty' => ( $item_ID > 0 ? T_('No feedback for this post yet...') : T_('No comment yet...') ),
 	) );
 
 	// Display comments:
@@ -2849,15 +3429,15 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  * Display a comment corresponding the given comment id
  *
  * @param object Comment object
- * @param string where to redirect after comment edit
+ * @param string where to redirect after comment edit. NOTE: This param MUST NOT be encoded before sending to this func, because it is executed by this func inside.
  * @param boolean true to set the new redirect param, false otherwise
- * @param integer Comment index in the current list, FALSE - to don't display a comment index
+ * @param integer Comment order number in the current list, FALSE - to don't display a comment order
  * @param integer A reply level (Used on mode "Threaded comments" to shift a comment block to right)
  * @param boolean TRUE to display info for meta comment
  */
-function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $comment_index = NULL, $display_meta_title = false, $reply_level = 0 )
+function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $inlist_order = NULL, $display_meta_title = false, $reply_level = 0 )
 {
-	global $current_User, $localtimenow;
+	global $current_User, $localtimenow, $item_id;
 
 	$Item = & $Comment->get_Item();
 	$Collection = $Blog = & $Item->get_Blog();
@@ -2897,9 +3477,9 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 
 		if( $Comment->is_meta() )
 		{ // Meta comment
-			if( $comment_index !== false )
-			{	// Display ID for each meta comment
-				echo '<span class="badge badge-info">'.$comment_index.'</span> ';
+			if( $inlist_order !== false )
+			{	// Display order of meta comment in current list:
+				echo '<span class="badge badge-info">'.$inlist_order.'</span> ';
 			}
 
 			if( $display_meta_title )
@@ -2922,9 +3502,14 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 			echo '</div>';
 		}
 
+		if( $Comment->ID > 0 && ! $Comment->is_meta() )
+		{	// Display checkbox to select normal existing comments for action only on view item page:
+			echo '<input type="checkbox" name="selected_comments[]" value="'.$Comment->ID.'" /> ';
+		}
+
 		echo '<span class="bDate">';
 		$Comment->date();
-		echo '</span>@<span class = "bTime">';
+		echo '</span> @ <span class = "bTime">';
 		$Comment->time( '#short_time' );
 		echo '</span>';
 
@@ -2938,6 +3523,10 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 			echo ' &middot; <span class="bKarma">';
 			$Comment->spam_karma( T_('Spam Karma').': %s%', T_('No Spam Karma') );
 			echo '</span>';
+
+			// Last touched date:
+			echo ' <span class="text-nowrap">&middot; '.T_('Last touched').': '
+				.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Comment->get( 'last_touched_ts' ) ).'</span>';
 
 			echo '</div>';
 			echo '<div style="padding-top:3px">';
@@ -3044,6 +3633,11 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $co
 		$Comment->status();
 		echo '</span>';
 		echo '</div>';
+
+		if( ! empty( $item_id ) && $Comment->ID > 0 && ! $Comment->is_meta() )
+		{	// Display checkbox to select normal existing comments for action only on view item page:
+			echo '<input type="checkbox" name="selected_comments[]" value="'.$Comment->ID.'" /> ';
+		}
 
 		echo '<span class="bDate">';
 		$Comment->date();
@@ -3443,7 +4037,123 @@ function display_hidden_custom_fields( & $Form, & $edited_Item )
 	$custom_fields = $edited_Item->get_type_custom_fields();
 	foreach( $custom_fields as $custom_field )
 	{ // For each custom field with type $type:
-		$Form->hidden( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'] ) );
+		$Form->hidden( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ) );
+	}
+}
+
+
+/**
+ * Display custom field settings as editable input fields
+ *
+ * @param object Form
+ * @param object edited Item
+ */
+function display_editable_custom_fields( & $Form, & $edited_Item )
+{
+	$custom_fields = $edited_Item->get_type_custom_fields();
+
+	if( empty( $custom_fields ) )
+	{	// No custom fields
+		return;
+	}
+
+	$parent_Item = & $edited_Item->get_parent_Item();
+
+	$c = 0;
+	foreach( $custom_fields as $custom_field )
+	{	// Loop through custom fields:
+		$custom_field_note = '';
+		if( ! empty( $custom_field['note'] ) )
+		{	// Display a not of the custon field if it is filled:
+			$custom_field_note .= $custom_field['note'];
+		}
+		if( $custom_field['type'] != 'separator' )
+		{	// Display a field name/code:
+			$custom_field_note .= empty( $custom_field_note ) ? '' : ' &middot; ';
+			$custom_field_note .= T_('Field name').': <code>'.$custom_field['name'].'</code>';
+		}
+		if( $parent_Item )
+		{	// Display a value of parent post custom field:
+			$parent_custom_field_value = $parent_Item->get_custom_field_value( $custom_field['name'], $custom_field['type'] );
+			if( $parent_custom_field_value !== false )
+			{	// If parent post realy has a custom field with same code and type
+				$preview_parent_custom_field_value = $parent_custom_field_value;
+				if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) )
+				{	// Use a formatted value to preview a double custom field:
+					$preview_parent_custom_field_value = $parent_Item->get_custom_field_formatted( $custom_field['name'], array( 'restrict_type' => $custom_field['type'] ) );
+				}
+				if( $custom_field['type'] == 'html' || $custom_field['type'] == 'text' )
+				{	// Cut long values of multiline fields:
+					$preview_parent_custom_field_value = explode( "\n", $parent_custom_field_value );
+					$preview_parent_custom_field_value = strmaxlen( $preview_parent_custom_field_value[0], 23, '...' );
+				}
+				if( $custom_field['type'] != 'computed' )
+				{	// The computed fields cannot be updated from parent here because we update them by formula on updating automatically,
+					// Also parent field may has a different formula so we should not display a value of the parent field:
+					$custom_field_note .= ' &middot; '.T_('Parent Item Field value').': '
+						.$parent_Item->get_edit_link( array( 'text' => format_to_output( $preview_parent_custom_field_value, ( $custom_field['type'] == 'double' ? 'raw' : 'htmlspecialchars' ) ) ) )
+						.action_icon( '', 'refresh', '#', NULL, NULL, NULL, array(
+						'data-child-input-id' => 'item_'.$custom_field['type'].'_'.$custom_field['ID'],
+						'data-parent-value'   => $parent_custom_field_value,
+					) );
+				}
+			}
+		}
+
+		switch( $custom_field['type'] )
+		{
+			case 'double':
+				$Form->text_input( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) );
+				break;
+			case 'computed':
+				$Form->info( $custom_field['label'], $edited_Item->get_custom_field_formatted( $custom_field['name'] ), $custom_field_note );
+				break;
+			case 'varchar':
+				$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) );
+				break;
+			case 'text':
+				$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field['label'], array( 'note' => $custom_field_note ) );
+				break;
+			case 'html':
+				$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field['label'], array( 'note' => $custom_field_note ) );
+				break;
+			case 'url':
+				$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) );
+				break;
+			case 'image':
+				$Form->text_input( 'item_image_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) );
+				break;
+			case 'separator':
+				if( is_admin_page() && $c > 0 )
+				{	// This is a hack for back-office because there is a css table layout:
+					$Form->end_fieldset();
+				}
+				echo '<h3>'.$custom_field['label'].'</h3>';
+				if( ! empty( $custom_field_note ) )
+				{
+					echo '<p class="note">'.$custom_field_note.'</p>';
+				}
+				if( is_admin_page() && $c > 0 && $c < count( $custom_fields ) - 1 )
+				{	// This is a hack for back-office because there is a css table layout:
+					$Form->begin_fieldset();
+				}
+				break;
+		}
+
+		$c++;
+	}
+
+	if( $parent_Item )
+	{	// JS to refresh custom field values from parent post custom fields:
+?>
+<script type="text/javascript">
+jQuery( 'a[data-child-input-id]' ).click( function()
+{	// Update custom field value with value from parent post:
+	jQuery( '#' + jQuery( this ).data( 'child-input-id' ) ).val( jQuery( this ).data( 'parent-value' ) );
+	return false;
+} );
+</script>
+<?php
 	}
 }
 
@@ -3480,16 +4190,17 @@ function set_session_Item( $Item )
  * Get object Item from Session
  *
  * @param integer Item ID
+ * @param boolean TRUE - to force a creating of new Item if it is not saved in Session yet
  * @return object Item
  */
-function get_session_Item( $item_ID = 0 )
+function get_session_Item( $item_ID = 0, $force_new = false )
 {
 	global $Session;
 
 	$edited_items = $Session->get( 'edited_items' );
 
-	if( isset( $edited_items[ $item_ID ] ) && is_object( $edited_items[ $item_ID ] ) )
-	{
+	if( isset( $edited_items[ $item_ID ] ) && ( $edited_items[ $item_ID ] instanceof Item ) )
+	{	// Get Item from Session:
 		$edited_Item = $edited_items[ $item_ID ];
 
 		// Reload main Chapter
@@ -3499,6 +4210,17 @@ function get_session_Item( $item_ID = 0 )
 		// Reload Post Type
 		$edited_Item->ItemType = NULL;
 		$edited_Item->get_ItemType();
+
+		return $edited_Item;
+	}
+	elseif( $force_new )
+	{	// Force to create new Item:
+		load_class( 'items/model/_item.class.php', 'Item' );
+		$edited_Item = new Item();
+		$edited_Item->set( 'main_cat_ID', get_param( 'cat' ) );
+		// Prefill data from url:
+		$edited_Item->set( 'title', param( 'post_title', 'string' ) );
+		$edited_Item->set( 'urltitle', param( 'post_urltitle', 'string' ) );
 
 		return $edited_Item;
 	}
@@ -3730,7 +4452,7 @@ function items_manual_results_block( $params = array() )
 
 	$Table = new Table( 'Results', $params['results_param_prefix'] );
 
-	$Table->title = T_('Manual view');
+	$Table->title = T_('Manual view').get_manual_link( 'manual-pages-editor' );
 
 	// Redirect to manual pages after adding chapter
 	$redirect_page = '&amp;redirect_page=manual';
@@ -3784,7 +4506,7 @@ function items_manual_results_block( $params = array() )
 	$Table->display_list_end();
 
 	// Flush fadeout
-	$Session->delete( 'fadeout_array');
+	$Session->delete( 'fadeout_array' );
 
 	echo $Table->params['content_end'];
 
@@ -3810,6 +4532,7 @@ function items_created_results_block( $params = array() )
 			'results_param_prefix' => 'actv_postown_',
 			'results_title'        => T_('Posts created by the user'),
 			'results_no_text'      => T_('User has not created any posts'),
+			'action'               => '',
 		), $params );
 
 	if( !is_logged_in() )
@@ -3855,8 +4578,8 @@ function items_created_results_block( $params = array() )
 	$created_items_Results->no_results_text = $params['results_no_text'];
 
 	// Get a count of the post which current user can delete
-	$deleted_posts_created_count = count( $edited_User->get_deleted_posts( 'created' ) );
-	if( ( $created_items_Results->get_total_rows() > 0 ) && ( $deleted_posts_created_count > 0 ) )
+	$deleted_posts_created_count = $edited_User->get_deleted_posts2( 'created', true );
+	if( $params['action'] != 'view' && ( $created_items_Results->get_total_rows() > 0 ) && ( $deleted_posts_created_count > 0 ) )
 	{	// Display action icon to delete all records if at least one record exists & current user can delete at least one item created by user
 		$created_items_Results->global_icon( sprintf( T_('Delete all post created by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_posts_created&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
 	}
@@ -3937,6 +4660,8 @@ function items_edited_results_block( $params = array() )
 	param( 'user_tab', 'string', '', true );
 	param( 'user_ID', 'integer', 0, true );
 
+	/*
+	// erhsatingin > This query can be quite slow with very large datasets
 	$edited_versions_SQL = new SQL();
 	$edited_versions_SQL->SELECT( 'DISTINCT( iver_itm_ID )' );
 	$edited_versions_SQL->FROM( 'T_items__version' );
@@ -3947,6 +4672,16 @@ function items_edited_results_block( $params = array() )
 	$SQL->FROM( 'T_items__item ' );
 	$SQL->WHERE( '( ( post_lastedit_user_ID = '.$DB->quote( $edited_User->ID ).' ) OR ( post_ID IN ( '.$edited_versions_SQL->get().' ) ) )' );
 	$SQL->WHERE_and( 'post_creator_user_ID != '.$DB->quote( $edited_User->ID ) );
+	*/
+
+	// erhsatingin > still slow but faster than above query
+	$SQL = new SQL();
+	$SQL->SELECT( '*' );
+	$SQL->FROM( 'T_items__item' );
+	$SQL->FROM_add( 'LEFT JOIN ( SELECT iver_itm_ID, COUNT(*) AS counter FROM T_items__version WHERE iver_edit_user_ID = '
+			.$DB->quote( $edited_User->ID ).' GROUP BY iver_itm_ID ) AS a ON a.iver_itm_ID = post_ID' );
+	$SQL->WHERE( '( post_lastedit_user_ID = '.$DB->quote( $edited_User->ID ).' OR a.counter IS NOT NULL )' );
+	$SQL->WHERE_and( 'post_creator_user_ID != '.$DB->quote( $edited_User->ID ) );
 
 	// Create result set:
 	$edited_items_Results = new Results( $SQL->get(), $params['results_param_prefix'], 'D' );
@@ -3955,7 +4690,7 @@ function items_edited_results_block( $params = array() )
 	$edited_items_Results->no_results_text = $params['results_no_text'];
 
 	// Get a count of the post which current user can delete
-	$deleted_posts_edited_count = count( $edited_User->get_deleted_posts( 'edited' ) );
+	$deleted_posts_edited_count = $edited_User->get_deleted_posts2( 'edited', true );
 	if( ( $edited_items_Results->get_total_rows() > 0 ) && ( $deleted_posts_edited_count > 0 ) )
 	{	// Display actino icon to delete all records if at least one record exists & current user can delete at least one item created by user
 		$edited_items_Results->global_icon( sprintf( T_('Delete all post edited by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_posts_edited&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
@@ -4082,7 +4817,7 @@ function load_user_data_for_items( $post_ids = NULL )
 	$SQL->WHERE( 'itud_user_ID = '.$DB->quote( $current_User->ID ) );
 	$SQL->WHERE_and( $post_condition );
 	// Set those post read statuses which were opened before:
-	$data_rows = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+	$data_rows = $DB->get_results( $SQL, ARRAY_A );
 
 	if( empty( $post_ids ) )
 	{	// The load was not requested for specific posts, so we have loaded all information what we have, ther rest of the posts were not read by this user:
@@ -4126,7 +4861,7 @@ function get_item_numviews( $Item )
 	$SQL->FROM( 'T_items__user_data' );
 	$SQL->WHERE( 'itud_item_ID = '.$Item->ID );
 
-	return $DB->get_var( $SQL->get() );
+	return $DB->get_var( $SQL );
 }
 
 
@@ -4145,7 +4880,6 @@ function items_results( & $items_Results, $params = array() )
 			'tab'                        => '',
 			'field_prefix'               => '',
 			'display_date'               => true,
-			'display_permalink'          => true,
 			'display_blog'               => true,
 			'display_author'             => true,
 			'display_type'               => true,
@@ -4162,18 +4896,13 @@ function items_results( & $items_Results, $params = array() )
 
 	if( $params['display_date'] )
 	{	// Display Date column
-		$td = '<span class="date">@get_issue_date()@</span>';
-		if( $params['display_permalink'] )
-		{
-			$td = '@get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\' )@ '.$td;
-		}
 		$items_Results->cols[] = array(
 				'th' => T_('Date'),
 				'order' => $params['field_prefix'].'datestart',
 				'default_dir' => 'D',
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
-				'td' => $td,
+				'td' => '<span class="date">@get_issue_date()@</span>',
 			);
 	}
 
@@ -4194,8 +4923,8 @@ function items_results( & $items_Results, $params = array() )
 	{ // Display Author column:
 		$items_Results->cols[] = array(
 				'th' => T_('Author'),
-				'th_class' => 'nowrap',
-				'td_class' => 'nowrap',
+				'th_class' => 'nowrap hidden-xs',
+				'td_class' => 'nowrap hidden-xs',
 				'order' => $params['field_prefix'].'creator_user_ID',
 				'td' => '%get_user_identity_link( NULL, #post_creator_user_ID# )%',
 			);
@@ -4205,8 +4934,8 @@ function items_results( & $items_Results, $params = array() )
 	{ // Display Type column:
 		$items_Results->cols[] = array(
 				'th' => T_('Type'),
-				'th_class' => 'shrinkwrap',
-				'td_class' => 'shrinkwrap',
+				'th_class' => 'shrinkwrap hidden-xs',
+				'td_class' => 'shrinkwrap hidden-xs',
 				'order' => $params['field_prefix'].'ityp_ID',
 				'td' => '%item_row_type( {Obj} )%',
 			);
@@ -4218,7 +4947,8 @@ function items_results( & $items_Results, $params = array() )
 				'th' => T_('Title'),
 				'order' => $params['field_prefix'].'title',
 				'td_class' => 'tskst_$post_pst_ID$',
-				'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, '.(int)$params['display_title_flag'].' )%</strong>',
+				'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, '.(int)$params['display_title_flag'].' )%</strong>'.
+				        ( is_admin_page() ? ' @get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\', \'\', NULL, array( \'none\' ) )@' : '' ),
 			);
 	}
 
@@ -4237,9 +4967,9 @@ function items_results( & $items_Results, $params = array() )
 	{ // Display Ord column
 		$items_Results->cols[] = array(
 				'th' => T_('Ord'),
-				'th_class' => 'shrinkwrap',
+				'th_class' => 'shrinkwrap hidden-xs',
 				'order' => $params['field_prefix'].'order',
-				'td_class' => 'right item_order_edit',
+				'td_class' => 'right jeditable_cell item_order_edit hidden-xs',
 				'td' => '%item_row_order( {Obj} )%',
 				'extra' => array( 'rel' => '#post_ID#' ),
 			);
@@ -4252,8 +4982,8 @@ function items_results( & $items_Results, $params = array() )
 				'th_title' => T_('Item history information'),
 				'order' => $params['field_prefix'].'datemodified',
 				'default_dir' => 'D',
-				'th_class' => 'shrinkwrap',
-				'td_class' => 'shrinkwrap',
+				'th_class' => 'shrinkwrap hidden-xs',
+				'td_class' => 'shrinkwrap hidden-xs',
 				'td' => '@get_history_link()@',
 			);
 	}
@@ -4262,7 +4992,8 @@ function items_results( & $items_Results, $params = array() )
 	{ // Display Actions column
 		$items_Results->cols[] = array(
 				'th' => T_('Actions'),
-				'td_class' => 'shrinkwrap',
+				'th_class' => 'shrinkwrap hidden-xs',
+				'td_class' => 'shrinkwrap hidden-xs',
 				'td' => '%item_edit_actions( {Obj} )%',
 			);
 	}
@@ -4295,25 +5026,54 @@ function item_type_global_icons( $object_Widget )
 		$count_item_types = count( $item_types );
 		if( $count_item_types > 0 )
 		{
+			// Group buttons of item types:
+			$icon_group_create_type = 'type_create';
 			if( $count_item_types > 1 )
-			{ // Group only if moer than one item type for selected back-office tab
-				$icon_group_create_type = 'type_create';
+			{	// Group only if moer than one item type for selected back-office tab:
 				$icon_group_create_mass = 'mass_create';
 			}
 			else
-			{ // No group
-				$icon_group_create_type = NULL;
+			{	// No group:
 				$icon_group_create_mass = NULL;
 			}
 
-			$object_Widget->global_icon( T_('Mass edit the current post list...'), 'edit', $admin_url.'?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'action', '', '', '&' ) ), T_('Mass edit'), 3, 4 );
+			$object_Widget->global_icon( T_('Mass edit the current post list').'...', 'edit',
+				$admin_url.'?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'action', '', '', '&' ) ),
+				T_('Mass edit'), 3, 4,
+				array( 'class' => 'action_icon btn-default hidden-xs' ),
+				NULL,
+				array(
+					'parent'    => $icon_group_create_type,
+					'item_class' => 'visible-xs',
+				)
+			);
 
 			foreach( $item_types as $item_type )
 			{
 				if( $current_User->check_perm( 'blog_item_type_'.$item_type->perm_level, 'edit', false, $Blog->ID ) )
 				{ // We have the permission to create posts with this post type:
-					$object_Widget->global_icon( T_('Create multiple posts...'), 'new', $admin_url.'?ctrl=items&amp;action=new_mass&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_type->ID, ' '.sprintf( T_('Mass create "%s"'), $item_type->name ), 3, 4, array( 'class' => 'action_icon btn-default' ), $icon_group_create_mass );
-					$object_Widget->global_icon( T_('Write a new post...'), 'new', $admin_url.'?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_type->ID, ' '.$item_type->name, 3, 4, array( 'class' => 'action_icon btn-primary' ), $icon_group_create_type );
+					$object_Widget->global_icon( T_('Create multiple posts...'), 'new',
+						$admin_url.'?ctrl=items&amp;action=new_mass&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_type->ID,
+						' '.sprintf( T_('Mass create "%s"'), $item_type->name ), 3, 4,
+						array( 'class' => 'action_icon btn-default hidden-xs' ),
+						$icon_group_create_mass,
+						array(
+							'parent'     => $icon_group_create_type,
+							'class'      => 'hidden-xs',
+							'item_class' => 'visible-xs',
+						)
+					);
+					$object_Widget->global_icon( T_('Write a new post...'), 'new',
+						$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_type->ID,
+						' '.$item_type->name, 3, 4,
+						array( 'class' => 'action_icon btn-primary' ),
+						$icon_group_create_type,
+						( $count_item_types == 1 ? array(
+								'class'     => 'single-group-xs',
+								'btn_class' => 'visible-xs'
+							) : ''
+						)
+					);
 				}
 			}
 		}
@@ -4345,6 +5105,44 @@ function callback_filter_item_list_table( & $Form )
 			'display_empty_filter' => true,
 		) );
 	// ---------------------------------- END OF CURRENT FILTERS ---------------------------------
+}
+
+
+/**
+ * Get schema titles of item type
+ *
+ * @param boolean TRUE - to include false statuses, which don't exist in DB
+ * @return array Status titles
+ */
+function ityp_schema_titles( $include_false_schema = true )
+{
+	$schema_titles = array();
+	if( $include_false_schema )
+	{ // Include Unknown status
+		$schema_titles[''] = T_('None');
+	}
+	$schema_titles['Article'] = T_('Article');
+	$schema_titles['WebPage'] = T_('Web Page');
+	$schema_titles['BlogPosting'] = T_('Blog Posting');
+	$schema_titles['ImageGallery'] = T_('Image Gallery');
+	$schema_titles['DiscussionForumPosting'] = T_('Discussion Forum Posting');
+	$schema_titles['TechArticle'] = T_('Technical Article');
+
+	return $schema_titles;
+}
+
+
+/**
+ * Get schema title of item type by schema value
+ *
+ * @param string Status value
+ * @return string Status title
+ */
+function ityp_schema_title( $schema )
+{
+	$aipr_statuses = aipr_status_titles();
+
+	return isset( $aipr_statuses[ $status ] ) ? $aipr_statuses[ $status ] : $status;
 }
 
 
@@ -4471,7 +5269,7 @@ function item_row_status( $Item, $index )
 	$blog_ID = $Item->Blog->ID;
 
 	// Get those statuses which are not allowed for the current User to create posts in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $blog_ID, 'blog_post!', 'create', $Item->status ), array( 'trash' ) );
+	$exclude_statuses = array_merge( get_restricted_statuses( $blog_ID, 'blog_post!', 'create', $Item->status, '', $Item ), array( 'trash' ) );
 	// Get allowed visibility statuses
 	$status_options = get_visibility_statuses( '', $exclude_statuses );
 
@@ -4484,10 +5282,11 @@ function item_row_status( $Item, $index )
 						.'<span>'.$status_options[ $Item->status ].'</span>'
 					.' <span class="caret"></span></button>'
 				.'<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
+		$tab_param = ( get_param( 'tab' ) == '' ? '' : '&amp;tab='.get_param( 'tab' ) );
 		foreach( $status_options as $status_key => $status_title )
 		{
 			$r .= '<li rel="'.$status_key.'" role="presentation"><a href="'
-					.$admin_url.'?ctrl=items&amp;blog='.$blog_ID.'&amp;action=update_status&amp;post_ID='.$Item->ID.'&amp;status='.$status_key.'&amp;'.url_crumb( 'item' )
+					.$admin_url.'?ctrl=items'.$tab_param.'&amp;blog='.$blog_ID.'&amp;action=update_status&amp;post_ID='.$Item->ID.'&amp;status='.$status_key.'&amp;'.url_crumb( 'item' )
 					.'" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
 		}
 		$r .= '</ul>'
@@ -4629,7 +5428,11 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 	// Redirect to manual pages after adding/editing chapter
 	$redirect_page = '&amp;redirect_page=manual';
 
-	$r = '<tr id="cat-'.$Chapter->ID.'" class="'.$line_class.( isset( $result_fadeout ) && in_array( $Chapter->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">';
+	// Check if current item's row should be highlighted:
+	$is_highlighted = ( param( 'highlight_cat_id', 'integer', NULL ) == $Chapter->ID ) ||
+		( isset( $result_fadeout ) && in_array( $Chapter->ID, $result_fadeout ) );
+
+	$r = '<tr id="cat-'.$Chapter->ID.'" class="'.$line_class.( $is_highlighted ? ' evo_highlight' : '' ).'">';
 
 	$open_url = $admin_url.'?ctrl=items&amp;tab=manual&amp;blog='.$Chapter->blog_ID;
 	// Name
@@ -4646,9 +5449,9 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 		$cat_icon = get_icon( 'filters_show' );
 		$open_url .= '&amp;cat_ID='.$Chapter->ID;
 	}
-	$r .= '<td class="firstcol">'
+	$r .= '<td class="firstcol nowrap">'
 					.'<strong style="padding-left: '.($level).'em;">'
-						.'<a href="'.$open_url.'">'.$cat_icon.' '.$Chapter->dget('name').'</a> ';
+						.'<a href="'.$open_url.'">'.$cat_icon.'&nbsp;<span style="white-space:normal">'.$Chapter->dget('name').'</span></a>&nbsp;';
 	if( $perm_edit )
 	{ // Current user can edit the chapters of the blog
 		$edit_url = $admin_url.'?ctrl=chapters&amp;blog='.$Chapter->blog_ID.'&amp;cat_ID='.$Chapter->ID.'&amp;action=edit'.$redirect_page;
@@ -4739,7 +5542,11 @@ function manual_display_post_row( $Item, $level, $params = array() )
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 
-	$r = '<tr id="item-'.$Item->ID.'" class="'.$line_class.( isset( $result_fadeout ) && in_array( 'item-'.$Item->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">';
+	// Check if current item's row should be highlighted:
+	$is_highlighted = ( param( 'highlight_id', 'integer', NULL ) == $Item->ID ) ||
+		( isset( $result_fadeout ) && in_array( 'item-'.$Item->ID, $result_fadeout ) );
+
+	$r = '<tr id="item-'.$Item->ID.'" class="'.$line_class.( $is_highlighted ? ' evo_highlight' : '' ).'">';
 
 	// Title
 	$edit_url = $Item->ID;
@@ -4771,10 +5578,13 @@ function manual_display_post_row( $Item, $level, $params = array() )
 
 	// URL "slug"
 	$edit_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Item->ID.'&amp;action=edit' );
-	$r .= '<td>'.$Item->get_title( $params );
+	$r .= '<td>'.$Item->get_title( array_merge( $params, array(
+			'post_navigation' => 'same_category', // set a navigating through category
+			'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
+		) ) );
 	if( $current_User->check_perm( 'slugs', 'view', false ) )
 	{ // Display icon to view all slugs of this item if current user has permission
-		$r .= ' '.action_icon( T_('Edit slugs...'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
+		$r .= ' '.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
 	}
 	$r .= '</td>';
 
@@ -4873,7 +5683,7 @@ function item_td_task_class( $post_ID, $post_pst_ID, $editable_class )
 	$ItemCache = & get_ItemCache();
 	$Item = & $ItemCache->get_by_ID( $post_ID );
 
-	$class = 'center nowrap tskst_'.$post_pst_ID;
+	$class = 'shrinkwrap tskst_'.$post_pst_ID;
 	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{ // Current user can edit this item, Add a class to edit a priority by click from view list
 		$class .= ' '.$editable_class;

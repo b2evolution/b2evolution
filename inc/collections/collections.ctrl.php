@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -19,6 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 param( 'tab', 'string', '', true );
+param( 'skin_type', 'string', 'normal' );
 
 param_action( 'list' );
 
@@ -84,10 +85,18 @@ switch( $action )
 			}
 		}
 
-		// Check permissions:
+		// Check permissions to create new collection:
 		if( ! $current_User->check_perm( 'blogs', 'create', false, $sec_ID ) )
 		{
 			$Messages->add( T_('You don\'t have permission to create a collection.'), 'error' );
+			$redirect_to = param( 'redirect_to', 'url', $admin_url );
+			header_redirect( $redirect_to );
+		}
+
+		// Check permissions to copy the selected collection:
+		if( $action == 'copy' && ! $current_User->check_perm( 'blog_properties', 'copy', false, $edited_Blog->ID ) )
+		{
+			$Messages->add( sprintf( T_('You don\'t have a permission to copy the collection "%s".'), $edited_Blog->get( 'shortname' ) ), 'error' );
 			$redirect_to = param( 'redirect_to', 'url', $admin_url );
 			header_redirect( $redirect_to );
 		}
@@ -101,6 +110,11 @@ switch( $action )
 			$Messages->add( sprintf( T_('You already own %d collection/s. You are not currently allowed to create any more.'), $user_blog_count ) );
 			$redirect_to = param( 'redirect_to', 'url', $admin_url );
 			header_redirect( $redirect_to );
+		}
+
+		if( $action == 'copy' )
+		{	// Get name of the duplicating collection to display on the form:
+			$duplicating_collection_name = $edited_Blog->get( 'shortname' );
 		}
 
 		$AdminUI->append_path_level( 'new', array( 'text' => T_('New') ) );
@@ -160,18 +174,34 @@ switch( $action )
 		$edited_Blog->set( 'owner_user_ID', $current_User->ID );
 
 		param( 'kind', 'string', true );
+		param( 'blog_urlname', 'string', true );
+
+		if( $kind == 'main' && ! $current_User->check_perm( 'blog_admin', 'editAll', false ) )
+		{ // Non-collection admins should not be able to create home/main collections
+			$Messages->add( sprintf( T_('You don\'t have permission to create a collection of kind %s.'), '<b>&laquo;'.$kind.'&raquo;</b>' ), 'error' );
+			header_redirect( $admin_url.'?ctrl=dashboard' ); // will EXIT
+			// We have EXITed already at this point!!
+		}
+
 		$edited_Blog->init_by_kind( $kind );
 		if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		{ // validate the urlname, which was already set by init_by_kind() function
 		 	// It needs to validated, because the user can not set the blog urlname, and every new blog would have the same urlname without validation.
 		 	// When user has edit permission to blog admin part, the urlname will be validated in load_from_request() function.
-			$edited_Blog->set( 'urlname', urltitle_validate( $edited_Blog->get( 'urlname' ) , '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
+			$edited_Blog->set( 'urlname', urltitle_validate( empty( $blog_urlname ) ? $edited_Blog->get( 'urlname' ) : $blog_urlname, '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
 		}
 
 		param( 'skin_ID', 'integer', true );
-		$edited_Blog->set_setting( 'normal_skin_ID', $skin_ID );
+		$edited_Blog->set( 'normal_skin_ID', $skin_ID );
 
-		if( $edited_Blog->load_from_Request( array() ) )
+		// Check how new content should be created for new collection:
+		param( 'create_demo_contents', 'boolean', NULL );
+		if( $create_demo_contents === NULL )
+		{
+			param_error( 'create_demo_contents', T_('Please select an option for "New contents"') );
+		}
+
+		if( $edited_Blog->load_from_Request() )
 		{
 			// create the new blog
 			$edited_Blog->create( $kind );
@@ -196,29 +226,31 @@ switch( $action )
 			}
 			$Settings->dbupdate();
 
-			// create demo contents for the new blog
-			param( 'create_demo_contents', 'boolean' );
-			param( 'blog_locale', 'string' );
+			// Create demo contents for the new collection:
 			if( $create_demo_contents )
 			{
 				global $user_org_IDs;
 
 				load_funcs( 'collections/_demo_content.funcs.php' );
-				param( 'create_demo_org', 'boolean', false );
-				param( 'create_demo_users', 'boolean', false );
+				if( $current_User->check_perm( 'blog_admin', 'editall', false ) )
+				{ // Only collection admins can create demo organization and users
+					param( 'create_demo_org', 'boolean', false );
+					param( 'create_demo_users', 'boolean', false );
+				}
+				else
+				{
+					set_param( 'create_demo_org', false );
+					set_param( 'create_demo_users', false );
+				}
 				$user_org_IDs = NULL;
 
 				if( $create_demo_org && $current_User->check_perm( 'orgs', 'create', true ) )
 				{ // Create the demo organization
 					$user_org_IDs = array( create_demo_organization( $edited_Blog->owner_user_ID )->ID );
 				}
-				if( $create_demo_users )
-				{ // Create demo users
-					get_demo_users( true, NULL, $user_org_IDs );
-				}
 
 				// Switch locale to translate content
-				locale_temp_switch( $blog_locale );
+				locale_temp_switch( param( 'blog_locale', 'string' ) );
 				create_sample_content( $kind, $edited_Blog->ID, $edited_Blog->owner_user_ID, $create_demo_users );
 				locale_restore_previous();
 			}
@@ -239,16 +271,24 @@ switch( $action )
 		param( 'sec_ID', 'integer', 0 );
 
 		// Check permissions:
-		$current_User->check_perm( 'blogs', 'create', true, $sec_ID );
+		$current_User->check_perm( 'blog_properties', 'copy', true, $edited_Blog->ID );
 
-		if( $edited_Blog->duplicate() )
+		// Get name of the duplicating collection to display on the form:
+		$duplicating_collection_name = $edited_Blog->get( 'shortname' );
+
+		$duplicate_params = array(
+				'duplicate_items'    => param( 'duplicate_items', 'integer', 0 ),
+				'duplicate_comments' => param( 'duplicate_comments', 'integer', 0 ),
+			);
+
+		if( $edited_Blog->duplicate( $duplicate_params ) )
 		{	// The collection has been duplicated successfully:
 			$Messages->add( T_('The collection has been duplicated.'), 'success' );
 
 			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
 
-		//
+		// Set action back to "copy" in order to display the edit form with errors:
 		$action = 'copy';
 		break;
 
@@ -339,7 +379,7 @@ switch( $action )
 		// Subscribing to new blogs:
 		$Settings->set( 'subscribe_new_blogs', param( 'subscribe_new_blogs', 'string', 'public' ) );
 
-		// Default skins:
+		// Default Skins for New Collections:
 		if( param( 'def_normal_skin_ID', 'integer', NULL ) !== NULL )
 		{ // this can't be NULL
 			$Settings->set( 'def_normal_skin_ID', get_param( 'def_normal_skin_ID' ) );
@@ -347,14 +387,16 @@ switch( $action )
 		$Settings->set( 'def_mobile_skin_ID', param( 'def_mobile_skin_ID', 'integer', 0 ) );
 		$Settings->set( 'def_tablet_skin_ID', param( 'def_tablet_skin_ID', 'integer', 0 ) );
 
-		// Comment recycle bin
-		param( 'auto_empty_trash', 'integer', $Settings->get_default('auto_empty_trash'), false, false, true, false );
-		$Settings->set( 'auto_empty_trash', get_param('auto_empty_trash') );
+		// Default URL for New Collections:
+		if( param( 'coll_access_type', 'string', NULL ) !== NULL )
+		{	// Update only if this param has been sent by submitted form:
+			$Settings->set( 'coll_access_type', get_param( 'coll_access_type' ) );
+		}
 
 		if( ! $Messages->has_errors() )
 		{
 			$Settings->dbupdate();
-			$Messages->add( T_('Blog settings updated.'), 'success' );
+			$Messages->add( T_('The collection settings have been updated.'), 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=collections&tab=blog_settings', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
@@ -398,6 +440,10 @@ switch( $action )
 		// Small site logo
 		param( 'notification_logo_file_ID', 'integer', NULL );
 		$Settings->set( 'notification_logo_file_ID', get_param( 'notification_logo_file_ID' ) );
+
+		// Social media boilerplate logo
+		param( 'social_media_image_file_ID', 'integer', NULL );
+		$Settings->set( 'social_media_image_file_ID', get_param( 'social_media_image_file_ID' ) );
 
 		// Site footer text
 		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );
@@ -599,32 +645,36 @@ switch( $action )
 				}
 				else
 				{	// Redirect to admin skins page if we change the skin for another device type:
-					header_redirect( $admin_url.'?ctrl=collections&tab=site_skin' );
+					header_redirect( $admin_url.'?ctrl=collections&tab=site_skin&skin_type='.$updated_skin_type );
 				}
 			}
 		}
 		else
 		{	// Update site skin settings:
+			if( ! in_array( $skin_type, array( 'normal', 'mobile', 'tablet' ) ) )
+			{
+				debug_die( 'Wrong skin type: '.$skin_type );
+			}
+
 			$SkinCache = & get_SkinCache();
-			$normal_Skin = & $SkinCache->get_by_ID( $Settings->get( 'normal_skin_ID' ) );
-			$mobile_Skin = & $SkinCache->get_by_ID( $Settings->get( 'mobile_skin_ID' ) );
-			$tablet_Skin = & $SkinCache->get_by_ID( $Settings->get( 'tablet_skin_ID' ) );
+			$edited_Skin = & $SkinCache->get_by_ID( $Settings->get( $skin_type.'_skin_ID', ( $skin_type != 'normal' ) ), false, false );
 
 			// Unset global blog vars in order to work with site skin:
 			unset( $Blog, $blog, $global_param_list['blog'], $edited_Blog );
 
-			$normal_Skin->load_params_from_Request();
-			$mobile_Skin->load_params_from_Request();
-			$tablet_Skin->load_params_from_Request();
+			if( ! $edited_Skin )
+			{	// Redirect to don't try update empty skin params:
+				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin&skin_type='.$skin_type, 303 ); // Will EXIT
+			}
+
+			$edited_Skin->load_params_from_Request();
 
 			if(	! param_errors_detected() )
 			{	// Update settings:
-				$normal_Skin->dbupdate_settings();
-				$mobile_Skin->dbupdate_settings();
-				$tablet_Skin->dbupdate_settings();
+				$edited_Skin->dbupdate_settings();
 				$Messages->add( T_('Skin settings have been updated'), 'success' );
 				// Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin', 303 ); // Will EXIT
+				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin&skin_type='.$skin_type, 303 ); // Will EXIT
 			}
 		}
 		break;
@@ -638,13 +688,13 @@ switch( $tab )
 			// Check minimum permission:
 			$current_User->check_perm( 'options', 'view', true );
 
-			$AdminUI->set_path( 'site', 'skin', 'site_skin' );
+			$AdminUI->set_path( 'site', 'skin', 'skin_'.$skin_type );
 
 			$AdminUI->breadcrumbpath_init( false );
 			$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
 			$AdminUI->breadcrumbpath_add( T_('Site skin'), $admin_url.'?ctrl=collections&amp;tab=site_skin' );
 
-			$AdminUI->set_page_manual_link( 'site-skin' );
+			$AdminUI->set_page_manual_link( 'site-skin-settings' );
 
 			// Init JS to select colors in skin settings:
 			init_colorpicker_js();

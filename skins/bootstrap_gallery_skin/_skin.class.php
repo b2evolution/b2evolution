@@ -21,7 +21,7 @@ class bootstrap_gallery_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.0';
+	var $version = '7.0.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -42,7 +42,7 @@ class bootstrap_gallery_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -98,6 +98,40 @@ class bootstrap_gallery_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		// Note: second param below is the ORDER
+		return array(
+				'page_top'                  => array( NT_('Page Top'), 2 ),
+				'header'                    => array( NT_('Header'), 10 ),
+				'menu'                      => array( NT_('Menu'), 15 ),
+				'front_page_main_area'      => array( NT_('Front Page Main Area'), 40 ),
+				'front_page_secondary_area' => array( NT_('Front Page Secondary Area'), 45 ),
+				'item_single_header'        => array( NT_('Item Single Header'), 50 ),
+				'item_single'               => array( NT_('Item Single'), 51 ),
+				'item_page'                 => array( NT_('Item Page'), 55 ),
+				'contact_page_main_area'    => array( NT_('Contact Page Main Area'), 60 ),
+				'footer'                    => array( NT_('Footer'), 100 ),
+				'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
+				'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
+				'404_page'                  => array( NT_('404 Page'), 130 ),
+				'login_required'            => array( NT_('Login Required'), 140 ),
+				'access_denied'             => array( NT_('Access Denied'), 150 ),
+				'help'                      => array( NT_('Help'), 160 ),
+				'register'                  => array( NT_('Register'), 170 ),
+				'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
+			);
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -116,7 +150,8 @@ class bootstrap_gallery_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max comment image height'),
-						'note' => 'px. ' . T_('Set maximum height for comment images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for comment images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -333,16 +368,16 @@ class bootstrap_gallery_Skin extends Skin
 // fp> TODO: the following code WORKS but produces UGLY CSS with tons of repetitions. It needs a full rewrite.
 
 		// ===== Custom page styles: =====
-		$custom_styles = array();
 
 		// Text size <=== THIS IS A WORK IN PROGRESS
+		$custom_styles = array();
 		if( $text_size = $this->get_setting( 'page_text_size' ) )
 		{
 			$custom_styles[] = 'font-size: '.$text_size;
 		}
 		if( ! empty( $custom_styles ) )
 		{
-			$custom_css .= '	body { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= '	#skin_wrapper { '.implode( ';', $custom_styles )." }\n";
 		}
 
 		$custom_styles = array();
@@ -353,23 +388,25 @@ class bootstrap_gallery_Skin extends Skin
 		}
 		if( ! empty( $custom_styles ) )
 		{
-			$custom_css .= '	body { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= '	#skin_wrapper { '.implode( ';', $custom_styles )." }\n";
 		}
 
 		// Link color
+		$custom_styles = array();
 		if( $text_color = $this->get_setting( 'page_link_color' ) )
 		{
 			$custom_styles[] = 'color: '.$text_color;
 		}
 		if( ! empty( $custom_styles ) )
 		{
-			$custom_css .= '	body .container a { '.implode( ';', $custom_styles )." }\n";
-			$custom_css .= '	ul li a { '.implode( ';', $custom_styles )." }\n";
-			$custom_css .= "	ul li a {background-color: transparent;}\n";
-			$custom_css .= "	.ufld_icon_links a {color: #fff !important;}\n";
+			$custom_css .= '	#skin_wrapper .container a:not(.btn) { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= '	ul li a:not(.btn) { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= "	ul li a:not(.btn) {background-color: transparent;}\n";
+			$custom_css .= "	.ufld_icon_links a:not(.btn) {color: #fff !important;}\n";
 		}
 
 		// Current tab text color
+		$custom_styles = array();
 		if( $text_color = $this->get_setting( 'current_tab_text_color' ) )
 		{
 			$custom_styles[] = 'color: '.$text_color;
@@ -380,13 +417,14 @@ class bootstrap_gallery_Skin extends Skin
 		}
 
 		// Page background color
+		$custom_styles = array();
 		if( $bg_color = $this->get_setting( 'page_bg_color' ) )
 		{
 			$custom_styles[] = 'background-color: '.$bg_color;
 		}
 		if( ! empty( $custom_styles ) )
 		{
-			$custom_css .= 'body { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= '#skin_wrapper { '.implode( ';', $custom_styles )." }\n";
 		}
 
 		global $thumbnail_sizes;
@@ -465,29 +503,5 @@ class bootstrap_gallery_Skin extends Skin
 				return parent::get_template( $name );
 		}
 	}
-
-
-	/**
-	 * Check if we can display a widget container
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function is_visible_container( $container_key )
-	{
-		global $Collection, $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
-	}
-
 }
-
 ?>

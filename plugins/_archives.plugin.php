@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -35,10 +35,11 @@ class archives_plugin extends Plugin
 	var $name;
 	var $code = 'evo_Arch';
 	var $priority = 50;
-	var $version = '6.7.9';
+	var $version = '7.0.0';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'navigation';
+	var $widget_icon = 'archive';
 
 
 	/**
@@ -150,7 +151,7 @@ class archives_plugin extends Plugin
 				// Number of archive entries to display:
 				'limit'             => 12,
 				// More link text:
-				'more_link'         => T_('More...'),
+				'more_link'         => T_('More').'...',
 			), $params );
 
 		// Sort order (used only in postbypost mode):
@@ -537,7 +538,7 @@ class ArchiveList extends Results
 		// See http://forums.b2evolution.net/viewtopic.php?p=42529#42529
 		if( in_array($this->archive_mode, array('monthly', 'daily', 'weekly')) )
 		{
-			$sql_version = $DB->get_version();
+			$sql_version = $DB->version;
 			if( version_compare($sql_version, '4', '>') )
 			{
 				$sql = 'SELECT SQL_CALC_FOUND_ROWS '.substr( $sql, 7 ); // "SQL_CALC_FOUND_ROWS" available since MySQL 4

@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -17,7 +17,7 @@ emailskin_include( '_email_header.inc.html.php', $params );
 /**
  * @var Session
  */
-global $Session;
+global $Session, $admin_url;
 
 global $dummy_fields;
 
@@ -40,7 +40,7 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 	{ // Several accounts with the given email address, display last used date for each
 		$message_content .= '<div style="margin: 1em 0; border: 1px solid #ccc; border-radius: 4px; padding: 1em 1em 1ex;">';
 
-		$message_content .= '<p'.emailskin_style( '.p' ).'>'.T_( 'Login:' ).' '.$iterator_User->get_colored_login( array( 'mask' => '$login$', 'protocol' => 'http:' ) )."</p>\n";
+		$message_content .= '<p'.emailskin_style( '.p' ).'>'.T_( 'Login' ).': '.$iterator_User->get_colored_login( array( 'mask' => '$login$', 'protocol' => 'http:' ) )."</p>\n";
 		$user_lastseen_ts = $iterator_User->get( 'lastseen_ts' );
 		if( empty( $user_lastseen_ts ) )
 		{ // user has never logged in
@@ -53,7 +53,7 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 	}
 	else
 	{
-		$message_content .= '<p'.emailskin_style( '.p' ).'>'.T_( 'Login:' ).' '.$iterator_User->get_colored_login( array( 'mask' => '$login$', 'protocol' => 'http:' ) )."</p>\n";
+		$message_content .= '<p'.emailskin_style( '.p' ).'>'.T_( 'Login' ).': '.$iterator_User->get_colored_login( array( 'mask' => '$login$', 'protocol' => 'http:' ) )."</p>\n";
 	}
 
 	$url_change_password = get_htsrv_url( true ).'login.php?action=changepwd'
@@ -66,12 +66,17 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 
 	// Buttons:
 	$message_content .= '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
-	$message_content .= get_link_tag( $url_change_password, T_( 'Reset your password NOW' ), 'div.buttons a+a.button_yellow' )."\n";
+	$message_content .= get_link_tag( $url_change_password, T_( 'Reset your password NOW' ), 'div.buttons a+a.btn-primary' )."\n";
 	$message_content .= "</div>\n";
 
 	if( $params['user_count'] > 1 )
 	{ // Several accounts with the given email address, display last used date for each
 		$message_content .= '</div>';
+	}
+
+	if( empty( $stats_perm ) && ! empty( $iterator_User ) && $iterator_User->check_perm( 'stats', 'view' ) )
+	{
+		$stats_perm = true;
 	}
 }
 
@@ -93,6 +98,16 @@ echo $message_content;
 echo '<p'.emailskin_style( '.p+.note' ).'>'.T_('Please note:').' '.$message_note."</p>\n";
 
 echo '<p'.emailskin_style( '.p' ).'><i'.emailskin_style( '.note' ).'>'.T_('If you did not request this password reset, simply ignore this email.').'</i></p>';
+
+if( isset( $stats_perm ) && $stats_perm )
+{
+	$session_ID = '<a href="'.$admin_url.'?ctrl=stats&amp;tab=hits&amp;blog=0&amp;sess_ID='.$Session->ID.'">'.$Session->ID.'</a>';
+}
+else
+{
+	$session_ID = $Session->ID;
+}
+echo '<p'.emailskin_style( '.p+.note' ).'>'.sprintf( T_('Session ID').': %s', $session_ID ).'</p>';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.html.php', $params );

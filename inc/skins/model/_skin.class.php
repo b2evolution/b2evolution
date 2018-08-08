@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -28,6 +28,7 @@ class Skin extends DataObject
 	var $name;
 	var $folder;
 	var $type;
+	var $class;
 
 	/**
 	 * Skin version
@@ -55,7 +56,6 @@ class Skin extends DataObject
 	 */
 	var $_trans = array();
 
-
 	/**
 	 * Constructor
 	 *
@@ -71,6 +71,7 @@ class Skin extends DataObject
 			$this->set( 'folder', $skin_folder );
 			$this->set( 'name', $this->get_default_name() );
 			$this->set( 'type', $this->get_default_type() );
+			$this->set( 'class', get_class( $this ) );
 		}
 		else
 		{	// Wa are loading an object:
@@ -78,7 +79,19 @@ class Skin extends DataObject
 			$this->name = $db_row->skin_name;
 			$this->folder = $db_row->skin_folder;
 			$this->type = $db_row->skin_type;
+			$this->class = $db_row->skin_class;
 		}
+	}
+
+
+	/**
+	 * Get param prefix with is used on edit forms and submit data
+	 *
+	 * @return string
+	 */
+	function get_param_prefix()
+	{
+		return 'edit_skin_'.( empty( $this->ID ) ? '0' : $this->ID ).'_set_';
 	}
 
 
@@ -90,25 +103,13 @@ class Skin extends DataObject
 	static function get_delete_restrictions()
 	{
 		return array(
-				array( 'table'=>'T_coll_settings', 'fk'=>'cset_value', 'msg'=>T_('%d blogs using this skin'),
-						'and_condition' => '( cset_name = "normal_skin_ID" OR cset_name = "mobile_skin_ID" OR cset_name = "tablet_skin_ID" )' ),
+				array( 'table'=>'T_blogs', 'fk'=>'blog_normal_skin_ID', 'fk_short'=>'normal_skin_ID', 'msg'=>T_('%d blogs using this skin') ),
+				array( 'table'=>'T_blogs', 'fk'=>'blog_mobile_skin_ID', 'fk_short'=>'mobile_skin_ID', 'msg'=>T_('%d blogs using this skin') ),
+				array( 'table'=>'T_blogs', 'fk'=>'blog_tablet_skin_ID', 'fk_short'=>'tablet_skin_ID', 'msg'=>T_('%d blogs using this skin') ),
 				array( 'table'=>'T_settings', 'fk'=>'set_value', 'msg'=>T_('This skin is set as default skin.'),
 						'and_condition' => '( set_name = "def_normal_skin_ID" OR set_name = "def_mobile_skin_ID" OR set_name = "def_tablet_skin_ID" )' ),
 				array( 'table'=>'T_settings', 'fk'=>'set_value', 'msg'=>T_('The site is using this skin.'),
 						'and_condition' => '( set_name = "normal_skin_ID" OR set_name = "mobile_skin_ID" OR set_name = "tablet_skin_ID" )' ),
-			);
-	}
-
-
-	/**
-	 * Get delete cascade settings
-	 *
-	 * @return array
-	 */
-	static function get_delete_cascades()
-	{
-		return array(
-				array( 'table'=>'T_skins__container', 'fk'=>'sco_skin_ID', 'msg'=>T_('%d linked containers') ),
 			);
 	}
 
@@ -288,10 +289,11 @@ class Skin extends DataObject
 	 * fp> Do we need Skin objects in the frontoffice at all? -- Do we want to include the dispatcher into the Skin object? WARNING: globals
 	 * fp> We might want to customize the container defaults. -- Per blog or per skin?
 	 *
-	 * @param string
-	 * @param array
+	 * @param string Container name
+	 * @param array Additional params
+	 * @param string Container code
 	 */
-	function container( $sco_name, $params = array() )
+	function container( $sco_name, $params = array(), $container_code = NULL )
 	{
 		/**
 		 * Blog currently displayed
@@ -299,25 +301,59 @@ class Skin extends DataObject
 		 */
 		global $Collection, $Blog;
 		global $admin_url, $rsc_url;
-		global $Timer, $Session;
+		global $Timer, $Session, $debug, $current_User;
+
+		$params = array_merge( array(
+				'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
+				'container_start' => '',
+				'container_end'   => '',
+			), $params );
+
+		if( $container_code === NULL )
+		{	// Try to detect container in DB by name:
+			global $DB;
+			$SQL = new SQL( 'Get widget container of collection #'.$Blog->ID.' by name for current skin type' );
+			$SQL->SELECT( 'wico_code' );
+			$SQL->FROM( 'T_widget__container' );
+			$SQL->WHERE( 'wico_name = '.$DB->quote( $sco_name ) );
+			$SQL->WHERE_and( 'wico_coll_ID = '.$Blog->ID );
+			$SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $Blog->get_skin_type() ) );
+			$SQL->ORDER_BY( 'wico_ID' );
+			$SQL->LIMIT( '1' );
+			$container_code = $DB->get_var( $SQL );
+		}
 
 		$timer_name = 'skin_container('.$sco_name.')';
 		$Timer->start( $timer_name );
 
-		$display_containers = $Session->get( 'display_containers_'.$Blog->ID ) == 1;
+		// Customize params with widget container properties:
+		$container_params = widget_container_customize_params( $params, $container_code, $sco_name );
 
-		if( $display_containers )
+		// Start to get content of widgets:
+		ob_start();
+
+		$display_debug_containers = ( $debug == 2 ) || ( is_logged_in() && $Session->get( 'display_containers_'.$Blog->ID ) );
+
+		if( $display_debug_containers )
 		{ // Wrap container in visible container:
-			echo '<div class="dev-blocks dev-blocks--container">';
-			echo '<div class="dev-blocks-name"><span class="dev-blocks-action"><a href="'
-						.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'">Edit</a></span>Container: <b>'.$sco_name.'</b></div>';
+			echo '<div class="dev-blocks dev-blocks--container"><div class="dev-blocks-name">';
+			if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			{	// Display a link to edit this widget only if current user has a permission:
+				echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'">Edit</a></span>';
+			}
+			echo 'Container: <b>'.$sco_name.'</b></div>';
+
+			// Force to display container even if no widget:
+			$container_params['container_display_if_empty'] = true;
 		}
 
 		/**
 		 * @var EnabledWidgetCache
 		 */
 		$EnabledWidgetCache = & get_EnabledWidgetCache();
-		$Widget_array = & $EnabledWidgetCache->get_by_coll_container( $Blog->ID, $sco_name );
+		$Widget_array = & $EnabledWidgetCache->get_by_coll_container( $Blog->ID,
+			( $container_code === NULL ? $sco_name : $container_code ),// Use container code if it is defined, otherwise use container name
+			( $container_code !== NULL ) );// Get by container code if it is defined
 
 		if( ! empty( $Widget_array ) )
 		{
@@ -325,14 +361,14 @@ class Skin extends DataObject
 			{ // Let the Widget display itself (with contextual params):
 				if( $w == 0 )
 				{ // Use special params for first widget in the current container
-					$orig_params = $params;
-					if( isset( $params['block_first_title_start'] ) )
+					$orig_params = $container_params;
+					if( isset( $container_params['block_first_title_start'] ) )
 					{
-						$params['block_title_start'] = $params['block_first_title_start'];
+						$container_params['block_title_start'] = $container_params['block_first_title_start'];
 					}
-					if( isset( $params['block_first_title_end'] ) )
+					if( isset( $container_params['block_first_title_end'] ) )
 					{
-						$params['block_title_end'] = $params['block_first_title_end'];
+						$container_params['block_title_end'] = $container_params['block_first_title_end'];
 					}
 				}
 				$widget_timer_name = 'Widget->display('.$ComponentWidget->code.')';
@@ -342,17 +378,37 @@ class Skin extends DataObject
 					) );
 				if( $w == 0 )
 				{ // Restore the params for next widgets after first
-					$params = $orig_params;
+					$container_params = $orig_params;
 					unset( $orig_params );
 				}
 				$Timer->pause( $widget_timer_name );
 			}
 		}
 
-		if( $display_containers )
-		{ // End of visible container:
-			//echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
+		if( $display_debug_containers )
+		{	// End of visible debug container:
 			echo '</div>';
+		}
+
+		// Store content of widgets to var in order to display them in container wrapper:
+		$container_widgets_content = ob_get_clean();
+
+		if( $container_params['container_display_if_empty'] || ! empty( $Widget_array ) )
+		{	// Display container wrapper with widgets content if it is not empty or we should display it anyway:
+
+			// Display start of container wrapper:
+			echo $container_params['container_start'];
+
+			// Display widgets of the container:
+			echo $container_widgets_content;
+
+			if( empty( $Widget_array ) && is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
+			{	// Display text for empty container on designer mode:
+				echo '<div class="red">'.T_('Empty Container').'</div>';
+			}
+
+			// Display end of container wrapper:
+			echo $container_params['container_end'];
 		}
 
 		$Timer->pause( $timer_name );
@@ -362,17 +418,51 @@ class Skin extends DataObject
 	/**
 	 * Discover containers included in skin files only in the given folder
 	 *
-	 * @param string Folder name
+	 * @param string Folder path or type:
+	 *                  - '#skin_folder#' - Use skin folder of this skin
+	 *                  - '#fallback_folders#' - Use fallback folders depending on skin version
+	 *                  - real path on disk
 	 * @param array Exclude the files
+	 * @param boolean TRUE to display messages
 	 * @return array Files that were prepared
 	 */
-	function discover_containers_by_folder( $folder, $exclude_files = array() )
+	function discover_containers_by_folder( $folder, $exclude_files = array(), $display_messages = true )
 	{
-		global $skins_path, $Messages;
+		global $Messages;
 
-		if( ! $dir = @opendir( $skins_path.$folder ) )
+		switch( $folder )
+		{
+			case '#skin_folder#':
+				// Get files from folder of this skin:
+				global $skins_path;
+				$skin_folder = $this->folder;
+				$skin_path = $skins_path.$skin_folder.'/';
+				break;
+
+			case '#fallback_folders#':
+				// Get files from fallback skin folders such as "skins_fallback_v5", "skins_fallback_v6", "skins_fallback_v7" and etc:
+				for( $v = $this->get_api_version(); $v >= 5; $v-- )
+				{	// Start with fallback files of current skin version and go down to find other fallback from older versions:
+					if( $skin_fallback_path = skin_fallback_path( '', $v ) )
+					{	// If fallback folder is detected for the version:
+						$exclude_files = array_merge( $exclude_files, $this->discover_containers_by_folder( $skin_fallback_path, $exclude_files, $display_messages ) );
+					}
+				}
+				return $exclude_files;
+
+			default:
+				// Use real path on disk:
+				$skin_path = $folder;
+				$skin_folder = basename( $skin_path );
+				break;
+		}
+
+		if( ! $dir = @opendir( $skin_path ) )
 		{ // Skin directory not found!
-			$Messages->add( T_('Cannot open skin directory.'), 'error' ); // No trans
+			if( $display_messages )
+			{
+				$Messages->add( T_('Cannot open skin directory.'), 'error' ); // No trans
+			}
 			return false;
 		}
 
@@ -387,8 +477,7 @@ class Skin extends DataObject
 				continue;
 			}
 
-			$rf_main_subpath = trim( $folder.'/'.$file, '/' );
-			$af_main_path = $skins_path.$rf_main_subpath;
+			$af_main_path = $skin_path.$file;
 
 			if( !is_file( $af_main_path ) || ! preg_match( '~\.php$~', $file ) )
 			{ // Not a php template file, go to next:
@@ -397,51 +486,65 @@ class Skin extends DataObject
 
 			if( ! is_readable( $af_main_path ) )
 			{ // Cannot open PHP file:
-				$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error', T_('File read error:') );
+				if( $display_messages )
+				{
+					$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $skin_folder.'/'.$file ), 'error', T_('File read error:') );
+				}
 				continue;
 			}
 
 			$file_contents = @file_get_contents( $af_main_path );
 			if( ! is_string( $file_contents ) )
 			{ // Cannot get contents:
-				$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $rf_main_subpath ), 'error', T_('File read error:') );
+				if( $display_messages )
+				{
+					$Messages->add_to_group( sprintf( T_('Cannot read skin file &laquo;%s&raquo;!'), $skin_folder.'/'.$file ), 'error', T_('File read error:') );
+				}
 				continue;
 			}
 
-			$files[] = $files;
+			$files[] = $file;
 
 			// DETECT if the file contains containers:
 			// if( ! preg_match_all( '~ \$Skin->container\( .*? (\' (.+?) \' )|(" (.+?) ") ~xmi', $file_contents, $matches ) )
-			if( ! preg_match_all( '~ (\$Skin->|skin_)container\( .*? ((\' (.+?) \')|(" (.+?) ")) ~xmi', $file_contents, $matches ) )
+			if( ! preg_match_all( '~ (\$Skin->|skin_|widget_)container\( .*? ([\'"] (.+?) [\'"]) ~xmi', $file_contents, $matches ) )
 			{ // No containers in this file, go to next:
 				continue;
 			}
 
-			// Merge matches from the two regexp parts (due to regexp "|" )
-			$container_list = array_merge( $matches[4], $matches[6] );
-
 			$c = 0;
-			foreach( $container_list as $container )
+			foreach( $matches[3] as $container )
 			{
 				if( empty( $container ) )
 				{ // regexp empty match -- NOT a container:
 					continue;
 				}
 
-				// We have one more container:
-				$c++;
+				if( $matches[1][ $c ] == 'widget_' )
+				{	// Function widget_container() already uses container code as first param:
+					$container_code = $container;
+					// We should create container name from container code:
+					$container = ucwords( str_replace( '_', ' ', $container_code ) );
+				}
+				else
+				{	// Old functions $Skin->container() and skin_container() use container name, so we should auto convert it to code:
+					$container_code = preg_replace( '/[^a-z\d]+/', '_', strtolower( $container ) );
+				}
 
-				if( in_array( $container, $this->container_list ) )
+				if( in_array( $container_code, $this->container_list ) )
 				{ // we already have that one
 					continue;
 				}
 
-				$this->container_list[] = $container;
+				// We have one more container:
+				$c++;
+
+				$this->container_list[ $container_code ] = array( $container, $c );
 			}
 
-			if( $c )
+			if( $c && $display_messages )
 			{
-				$Messages->add_to_group( sprintf( T_('%d containers have been found in skin template &laquo;%s&raquo;.'), $c, $rf_main_subpath ), 'success', sprintf( T_('Containers found in skin "%s":'), $folder ) );
+				$Messages->add_to_group( sprintf( T_('%d containers have been found in skin template &laquo;%s&raquo;.'), $c, $skin_folder.'/'.$file ), 'success', sprintf( T_('Containers found in skin "%s":'), $skin_folder ) );
 			}
 		}
 
@@ -451,22 +554,27 @@ class Skin extends DataObject
 
 	/**
 	 * Discover containers included in skin files
+	 *
+	 * @param boolean TRUE to display messages
 	 */
-	function discover_containers()
+	function discover_containers( $display_messages = true )
 	{
 		global $Messages;
 
 		$this->container_list = array();
 
-		// Find the containers in the current skin folder
-		$skin_files = $this->discover_containers_by_folder( $this->folder );
+		// Find the containers in the current skin folder:
+		$skin_files = $this->discover_containers_by_folder( '#skin_folder#', array(), $display_messages );
 
-		// Find the containers in the root skins folder with excluding the files that are contained in the skin folder
-		$this->discover_containers_by_folder( '', $skin_files );
+		// Find the containers in the fallback skin folders with excluding the files that are contained in the skin folder:
+		$this->discover_containers_by_folder( '#fallback_folders#', $skin_files, $display_messages );
 
 		if( empty( $this->container_list ) )
 		{
-			$Messages->add( T_('No containers found in this skin!'), 'error' );
+			if( $display_messages )
+			{
+				$Messages->add( T_('No containers found in this skin!'), 'error' );
+			}
 			return false;
 		}
 
@@ -481,110 +589,40 @@ class Skin extends DataObject
 	 */
 	function get_containers()
 	{
-		/**
-		 * @var DB
-		 */
-		global $DB;
-
 		if( is_null( $this->container_list ) )
 		{
-			$this->container_list = $DB->get_col(
-				'SELECT sco_name
-					 FROM T_skins__container
-					WHERE sco_skin_ID = '.$this->ID, 0, 'get list of containers for skin' );
+			$this->container_list = array();
+
+			$skin_containers = array();
+			if( method_exists( $this, 'get_declared_containers' ) )
+			{	// Get containers what declared by this skin:
+				$skin_containers = $this->get_declared_containers();
+			}
+			else
+			{	// Get containers from skin files:
+				$this->discover_containers( false );
+			}
+
+			if( ! empty( $skin_containers ) )
+			{
+				// Create ordered array with unique items from the skin containers:
+				$ordered_containers = array();
+				foreach( $skin_containers as $container_code => $container_data )
+				{
+					$container_order = isset( $container_data[1] ) ? $container_data[1] : 0;
+					$ordered_containers[ $container_order ] = $container_code;
+				}
+				ksort( $ordered_containers );
+
+				// Fill final container list:
+				foreach( $ordered_containers as $container_code )
+				{
+					$this->container_list[ $container_code ] = $skin_containers[ $container_code ];
+				}
+			}
 		}
 
 		return $this->container_list;
-	}
-
-
-	/**
-	 * Update the DB based on previously recorded changes
-	 *
-	 * @return boolean true
-	 */
-	function dbupdate()
-	{
-		global $DB;
-
-		$DB->begin();
-
-		if( parent::dbupdate() !== false )
-		{	// Skin updated, also save containers:
-			$this->db_save_containers();
-		}
-
-		$DB->commit();
-
-		return true;
-	}
-
-
-	/**
-	 * Insert object into DB based on previously recorded changes.
-	 *
-	 * @return boolean true
-	 */
-	function dbinsert()
-	{
-		global $DB;
-
-		$DB->begin();
-
-		if( parent::dbinsert() )
-		{	// Skin saved, also save containers:
-			$this->db_save_containers();
-		}
-
-		$DB->commit();
-
-		return true;
-	}
-
-
-	/**
-	 * Save containers
-	 *
-	 * to be called by dbinsert / dbupdate
-	 */
-	function db_save_containers()
-	{
-		global $DB;
-
-		// Get a list of all currently empty containers:
-		$sql = 'SELECT sco_name
-						  FROM T_skins__container LEFT JOIN T_widget ON ( sco_name = wi_sco_name )
-						 WHERE sco_skin_ID = '.$this->ID.'
-						 GROUP BY sco_name
-						HAVING COUNT(wi_ID) = 0';
-		$empty_containers_list = $DB->get_col( $sql, 0, 'Get empty containers' );
-		//pre_dump( $empty_containers_list );
-
-		// Look for containers in skin file:
-		$this->discover_containers();
-
-		// Delete empty containers:
-		foreach( $empty_containers_list as $empty_container )
-		{
-			if( !in_array( $empty_container, $this->container_list ) )
-			{	// This container has been removed from the skin + it's empty, so delete it from DB:
-				$DB->query( 'DELETE FROM T_skins__container
-									WHERE sco_name = '.$DB->quote($empty_container) );
-			}
-		}
-
-		// Make sure new containers are added:
-		if( ! empty( $this->container_list ) )
-		{
-			$values = array();
-			foreach( $this->container_list as $container_name )
-			{
-				$values [] = '( '.$this->ID.', '.$DB->quote($container_name).' )';
-			}
-
-			$DB->query( 'REPLACE INTO T_skins__container( sco_skin_ID, sco_name )
-										VALUES '.implode( ',', $values ), 'Insert containers' );
-		}
 	}
 
 
@@ -628,7 +666,7 @@ class Skin extends DataObject
 		}
 
 		// Display skinshot:
-		echo '<div class="'.$disp_params['skinshot_class'].'"'.( $disp_params['highlighted'] ? ' id="fadeout-'.$skin_folder : '' ).'">';
+		echo '<div class="'.$disp_params['skinshot_class'].( $disp_params['highlighted'] ? ' evo_highlight' : '' ).'">';
 		echo '<div class="skinshot_placeholder';
 		if( $disp_params[ 'selected' ] )
 		{
@@ -662,14 +700,14 @@ class Skin extends DataObject
 
 		//
 		echo '<div class="legend">';
-		if( isset( $disp_params[ 'function' ] ) )
+		if( isset( $disp_params['function'] ) )
 		{
 			echo '<div class="actions">';
-			switch( $disp_params[ 'function' ] )
+			switch( $disp_params['function'] )
 			{
 				case 'broken':
 					echo '<span class="text-danger">';
-					if( !empty($disp_params[ 'msg' ]) )
+					if( ! empty( $disp_params['msg'] ) )
 					{
 						echo $disp_params[ 'msg' ];
 					}
@@ -678,31 +716,41 @@ class Skin extends DataObject
 						echo T_('Broken.');
 					}
 					echo '</span>';
+
+					if( ! empty( $disp_params['help_info'] ) )
+					{
+						echo ' '.get_icon( 'help', 'imgtag', array( 'title' => $disp_params['help_info'] ) );
+					}
 					break;
 
 				case 'install':
 					// Display a link to install the skin
-					if( $disp_params[ 'skin_compatible' ] )
-					{ // If skin is compatible for current selected type
-						if( ! empty( $skin_url ) )
-						{
-							echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'">';
-							echo T_('Install NOW!').'</a>';
-						}
-						if( empty( $kind ) && get_param( 'tab' ) != 'coll_skin' && get_param( 'tab' ) != 'site_skin' )
-						{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
-							$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
-							$skin_name_after = '</label>';
-						}
+					if( ! empty( $skin_url ) )
+					{
+						echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'">';
+						echo T_('Install NOW!').'</a>';
 					}
-					else
-					{ // Inform about skin type is wrong for current case
-						if( ! empty( $skin_url ) )
-						{
-							echo '<a href="'.$skin_url.'" title="'.T_('Install NOW!').'" class="red">';
-							echo T_('Wrong Type!').'</a> ';
-						}
-						echo get_icon( 'help', 'imgtag', array( 'title' => T_('This skin does not fit the blog type you are trying to create.') ) );
+					if( empty( $kind ) && get_param( 'tab' ) != 'coll_skin' && get_param( 'tab' ) != 'site_skin' )
+					{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
+						$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
+						$skin_name_after = '</label>';
+					}
+					break;
+
+				case 'upgrade':
+					$link_text = T_('Upgrade NOW!');
+				case 'downgrade':
+					if( empty( $link_text ) ) $link_text = T_('Downgrade NOW!');
+
+					if( ! empty( $skin_url ) )
+					{
+						echo '<a href="'.$skin_url.'" title="'.$link_text.'">';
+						echo $link_text.'</a>';
+					}
+					if( empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
+					{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
+						$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
+						$skin_name_after = '</label>';
 					}
 					break;
 
@@ -711,7 +759,7 @@ class Skin extends DataObject
 					if( ! empty( $disp_params['function_url'] ) )
 					{
 						echo '<a href="'.$disp_params['function_url'].'" target="_blank" title="'.T_('Preview blog with this skin in a new window').'">';
-						echo T_('Preview').'</a>';
+						echo /* TRANS: Verb */ T_('Preview').'</a>';
 					}
 					break;
 			}
@@ -757,14 +805,20 @@ class Skin extends DataObject
 	 * Get a skin specific param value from current Blog
 	 *
 	 * @param string Setting name
+	 * @param string Input group name
 	 * @return string|array|NULL
 	 */
-	function get_setting( $parname )
+	function get_setting( $parname, $group = NULL )
 	{
 		global $Collection, $Blog, $Settings;
 
-		// Name of the setting in the settings:
-		$setting_name = 'skin'.$this->ID.'_'.$parname;
+		if( ! empty( $group ) )
+		{ // $parname is prefixed with $group, we'll remove the group prefix
+			$parname = substr( $parname, strlen( $group ) );
+		}
+
+		// Name of the setting in the blog settings:
+		$setting_name = 'skin'.$this->ID.'_'.$group.$parname;
 
 		if( isset( $Blog ) && $this->provides_collection_skin() )
 		{	// Get skin settings of the current collection only if skin is provided for collections:
@@ -782,6 +836,24 @@ class Skin extends DataObject
 		if( ! is_null( $value ) )
 		{	// We have a value for this param:
 			return $value;
+		}
+
+		return $this->get_setting_default_value( $group.$parname, $group );
+	}
+
+
+	/**
+	 * Get a skin specific param default value
+	 *
+	 * @param string Setting name
+	 * @param string Input group name
+	 * @return string|array|NULL
+	 */
+	function get_setting_default_value( $parname, $group = NULL )
+	{
+		if( ! empty ( $group ) )
+		{
+			$parname = substr( $parname, strlen( $group ) );
 		}
 
 		// Try default values:
@@ -803,6 +875,21 @@ class Skin extends DataObject
 				}
 			}
 			return $options;
+		}
+		elseif( isset( $params[ $parname ]['type'] ) &&
+						$params[ $parname ]['type'] == 'fileselect' &&
+						! empty( $params[ $parname ]['initialize_with'] ) &&
+						$default_File = & get_file_by_abspath( $params[ $parname ]['initialize_with'], true ) )
+		{ // Get default value for fileselect
+			return $default_File->ID;
+		}
+		elseif( ! empty( $group ) &&
+						isset( $params[ $group ]['type'] ) &&
+						$params[ $group ]['type'] == 'input_group' &&
+						! empty( $params[ $group ]['inputs'] ) &&
+						isset( $params[ $group ]['inputs'][ $parname ] ) )
+		{
+			return $params[ $group ]['inputs'][ $parname ]['defaultvalue'];
 		}
 
 		return NULL;
@@ -862,6 +949,12 @@ class Skin extends DataObject
 		// Name of the setting in the settings:
 		$setting_name = 'skin'.$this->ID.'_'.$parname;
 
+		// Convert array values into string for DB storage
+		if( is_array( $parvalue ) )
+		{
+			$parvalue = serialize( $parvalue );
+		}
+
 		if( isset( $Blog ) )
 		{	// Set collection skin setting:
 			$Blog->set_setting( $setting_name, $parvalue );
@@ -905,7 +998,7 @@ class Skin extends DataObject
 	 */
 	function display_init( /*optional: $features = array() */ )
 	{
-		global $debug, $Messages, $disp, $UserSettings, $Blog;
+		global $debug, $Messages, $disp, $UserSettings, $Blog, $Session;
 
 		// We get the optional arg this way for PHP7 comaptibility:
 		@list( $features ) = func_get_args();
@@ -1084,6 +1177,8 @@ class Skin extends DataObject
 					// Used to add new search field "Specific criteria":
 					require_js( '#jqueryUI#', 'blog' );
 					require_css( '#jqueryUI_css#', 'blog' );
+					// Load jQuery QueryBuilder plugin files for user list filters:
+					init_querybuilder_js( 'blog' );
 
 					// Require results.css to display thread query results in a table:
 					if( ! in_array( 'bootstrap', $features ) )
@@ -1164,6 +1259,11 @@ class Skin extends DataObject
 					require_once $inc_path.'_filters.inc.php';
 					break;
 
+				case 'disp_search':
+					// Used to suggest usernames for the field "Recipients":
+					init_tokeninput_js( 'blog' );
+					break;
+
 				case 'disp_login':
 				case 'disp_access_requires_login':
 					// Specific features for disp=login and disp=access_requires_login:
@@ -1215,6 +1315,8 @@ class Skin extends DataObject
 					// Specific features for disp=userprefs:
 				case 'disp_subs':
 					// Specific features for disp=subs:
+				case 'disp_register_finish':
+					// Specific features for disp=register_finish:
 
 					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
@@ -1255,9 +1357,10 @@ class Skin extends DataObject
 						require_js( 'bozo_validator.js', 'blog' );
 					}
 
-					// Require File Uploader js and css:
-					require_js( 'multiupload/fileuploader.js', 'blog' );
-					require_css( 'fileuploader.css', 'blog' );
+					// Require Fine Uploader js and css:
+					init_fineuploader_js_lang_strings();
+					require_js( 'multiupload/fine-uploader.js', 'blog' );
+					require_css( 'fine-uploader.css', 'blog' );
 					// Load JS files to make the links table sortable:
 					require_js( '#jquery#' );
 					require_js( 'jquery/jquery.sortable.min.js' );
@@ -1304,6 +1407,32 @@ class Skin extends DataObject
 					require_once $inc_path.'_filters.inc.php';
 					break;
 
+				case 'disp_download':
+					// Specific features for disp=download:
+					global $Collection, $Blog;
+
+					require_js( '#jquery#', 'blog' );
+
+					// Initialize JavaScript to download file after X seconds
+					add_js_headline( '
+jQuery( document ).ready( function ()
+{
+	jQuery( "#download_timer_js" ).show();
+} );
+
+var b2evo_download_timer = '.intval( $Blog->get_setting( 'download_delay' ) ).';
+var downloadInterval = setInterval( function()
+{
+	jQuery( "#download_timer" ).html( b2evo_download_timer );
+	if( b2evo_download_timer == 0 )
+	{	// Stop timer and download a file:
+		clearInterval( downloadInterval );
+		jQuery( "#download_help_url" ).show();
+	}
+	b2evo_download_timer--;
+}, 1000 );' );
+					break;
+
 				default:
 					// We no longer want to do this because of 'disp_auto':
 					// debug_die( 'This skin has requested an unknown feature: \''.$feature.'\'. Maybe this skin requires a more recent version of b2evolution.' );
@@ -1318,6 +1447,33 @@ class Skin extends DataObject
 		else
 		{ // Standard skin
 			require_js( 'build/evo_frontoffice.bmin.js', 'blog' );
+		}
+
+		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
+		{	// If desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode":
+			global $current_User;
+			require_js( '#jquery#', 'blog' );
+			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			{	// Initialize this url var only when current user has a permission to edit widgets:
+				global $admin_url;
+				add_js_headline( 'var b2evo_widget_edit_url = "'.$admin_url.'?ctrl=widgets&action=edit&wi_ID=$wi_ID$&mode=customizer";'
+					.'var b2evo_widget_add_url = "'.$admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=add_list&container=$container$&container_code=$container_code$&mode=customizer";'
+					.'var b2evo_widget_list_url = "'.$admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=customize&container=$container$&container_code=$container_code$&mode=customizer";'
+					.'var b2evo_widget_blog = \''.$Blog->ID.'\';'
+					.'var b2evo_widget_crumb = \''.get_crumb( 'widget' ).'\';'
+					.'var b2evo_widget_icon_up = \''.format_to_js( get_icon( 'designer_widget_up', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_order_up' ) ) ).'\';'
+					.'var b2evo_widget_icon_down = \''.format_to_js( get_icon( 'designer_widget_down', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_order_down' ) ) ).'\';'
+					.'var b2evo_widget_icon_disable = \''.format_to_js( get_icon( 'minus', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_disable', 'title' => T_('Disable') ) ) ).'\';'
+					.'var b2evo_widget_icon_add = \''.format_to_js( get_icon( 'add', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_add', 'title' => T_('Add Widget to container') ) ) ).'\';'
+					.'var b2evo_widget_icon_list = \''.format_to_js( get_icon( 'designer_widget_list', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_list', 'title' => T_('Manage Widgets of container') ) ) ).'\';'
+					.'var evo_js_lang_close = \''.TS_('Close').'\';'
+					.'var evo_js_lang_loading = \''.TS_('Loading...').'\';'
+					.'var evo_js_lang_title_available_widgets = \''.sprintf( TS_('Widgets available for insertion into &laquo;%s&raquo;'), '$container_name$' ).'\';'
+					.'var evo_js_lang_title_edit_widget = \''.sprintf( TS_('Edit widget "%s" in container "%s"'), '$widget_name$', '$container_name$' ).'\';'
+					.'var evo_js_lang_error_communicating = \''.TS_('There was an error communicating with the server. Please reload the page to be in sync with the server.').'\';' );
+			}
+			require_js( 'src/evo_widget_designer.js', 'blog' );
+			require_js( 'communication.js', 'blog' );
 		}
 
 		// Skin v7 specific initializations for kind of current collection:
@@ -1415,7 +1571,7 @@ class Skin extends DataObject
 									.'</ul></div>',
 								'header_text_single' => '',
 							'header_end' => '',
-							'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
+							'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 							'global_icons_class' => 'btn btn-default btn-sm',
 							'filters_start'        => '<div class="filters panel-body">',
 							'filters_end'          => '</div>',
@@ -1488,8 +1644,8 @@ class Skin extends DataObject
 								'next_text' => T_('Next'),
 								'no_prev_text' => '',
 								'no_next_text' => '',
-								'list_prev_text' => T_('...'),
-								'list_next_text' => T_('...'),
+								'list_prev_text' => '...',
+								'list_next_text' => '...',
 								'list_span' => 11,
 								'scroll_list_range' => 5,
 							'footer_end' => "\n\n",
@@ -1539,6 +1695,7 @@ class Skin extends DataObject
 							'customstart'    => '<div class="custom_content">',
 							'customend'      => "</div>\n",
 							'note_format'    => ' <span class="help-inline">%s</span>',
+							'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 							// Additional params depending on field type:
 							// - checkbox
 							'fieldstart_checkbox'    => '<div class="form-group form-group-sm checkbox" $ID$>'."\n",
@@ -1574,7 +1731,7 @@ class Skin extends DataObject
 							'fieldend'       => "</div>\n\n",
 							'labelclass'     => 'control-label col-sm-3',
 							'labelstart'     => '',
-							'labelend'       => "\n",
+							'labelend'       => '',
 							'labelempty'     => '<label class="control-label col-sm-3"></label>',
 							'inputstart'     => '<div class="controls col-sm-9">',
 							'inputend'       => "</div>\n",
@@ -1585,6 +1742,7 @@ class Skin extends DataObject
 							'customstart'    => '<div class="custom_content">',
 							'customend'      => "</div>\n",
 							'note_format'    => ' <span class="help-inline">%s</span>',
+							'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 							// Additional params depending on field type:
 							// - checkbox
 							'inputclass_checkbox'    => '',
@@ -1630,6 +1788,7 @@ class Skin extends DataObject
 							'customstart'    => '<div class="custom_content">',
 							'customend'      => "</div>\n",
 							'note_format'    => ' <span class="help-inline">%s</span>',
+							'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 							// Additional params depending on field type:
 							// - checkbox
 							'inputclass_checkbox'    => '',
@@ -1679,6 +1838,7 @@ class Skin extends DataObject
 							'customstart'    => '<div class="custom_content">',
 							'customend'      => "</div>\n",
 							'note_format'    => ' <span class="help-inline">%s</span>',
+							'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 							// Additional params depending on field type:
 							// - checkbox
 							'inputclass_checkbox'    => '',
@@ -1696,6 +1856,21 @@ class Skin extends DataObject
 							'radio_oneline_start'    => '<label class="radio-inline">',
 							'radio_oneline_end'      => "</label>\n",
 						);
+
+					case 'fields_table_form':
+						return array_merge( $this->get_template( 'Form' ), array(
+								'fieldset_begin' => '<div class="evo_fields_table $class$" id="fieldset_wrapper_$id$" $fieldset_attribs$>'."\n",
+								'fieldset_end'   => '</div>'."\n",
+								'fieldstart'     => '<div class="evo_fields_table__field" $ID$>'."\n",
+								'fieldend'       => "</div>\n\n",
+								'labelclass'     => 'evo_fields_table__label',
+								'labelstart'     => '',
+								'labelend'       => "\n",
+								'labelempty'     => '',
+								'inputstart'     => '<div class="evo_fields_table__input">',
+								'inputend'       => "</div>\n",
+							) );
+						break;
 
 					case 'user_navigation':
 						// The Prev/Next links of users (Used on disp=user to navigate between users):
@@ -1736,7 +1911,7 @@ class Skin extends DataObject
 						// Template for plugins:
 						return array(
 								// This template is used to build a plugin toolbar with action buttons above edit item/comment area:
-								'toolbar_before'       => '<div class="btn-toolbar $toolbar_class$" role="toolbar">',
+								'toolbar_before'       => '<div class="btn-toolbar plugin-toolbar $toolbar_class$" data-plugin-toolbar="$toolbar_class$" role="toolbar">',
 								'toolbar_after'        => '</div>',
 								'toolbar_title_before' => '<div class="btn-toolbar-title">',
 								'toolbar_title_after'  => '</div>',
@@ -1748,6 +1923,10 @@ class Skin extends DataObject
 					case 'modal_window_js_func':
 						// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
 						return 'echo_modalwindow_js_bootstrap';
+
+					case 'colorbox_css_file':
+						// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+						return 'colorbox-bootstrap.min.css';
 				}
 				break;
 		}
@@ -1829,8 +2008,8 @@ class Skin extends DataObject
 						'next_text' => T_('Next'),
 						'no_prev_text' => '',
 						'no_next_text' => '',
-						'list_prev_text' => T_('...'),
-						'list_next_text' => T_('...'),
+						'list_prev_text' => '...',
+						'list_next_text' => '...',
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
@@ -1874,6 +2053,7 @@ class Skin extends DataObject
 					'customstart' => '',
 					'customend' => "\n",
 					'note_format' => ' <span class="notes">%s</span>',
+					'bottom_note_format' => ' <div><span class="notes">%s</span></div>',
 					'formend' => '',
 				);
 
@@ -1882,6 +2062,10 @@ class Skin extends DataObject
 				//   - 'children' - Get items from current category and from all its sub-categories recirsively
 				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
 				return 'children';
+
+			case 'colorbox_css_file':
+				// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+				return 'colorbox-regular.min.css';
 
 			case 'autocomplete_plugin':
 				// Plugin name to autocomplete user logins: 'hintbox', 'typeahead'
@@ -1917,6 +2101,130 @@ class Skin extends DataObject
 	{
 		global $app_version_long;
 		require_js( $js_file, 'relative', false, false, $this->folder.'+'.$this->version.'+'.$app_version_long );
+	}
+
+
+	/**
+	 * Web safe fonts for default skin usage
+	 *
+	 * Used for font customization
+	 */
+	private $font_definitions = array(
+			'system_arial' => array( 'Arial', 'Arial, Helvetica, sans-serif' ),
+			'system_arialblack' => array( 'Arial Black', '\'Arial Black\', Gadget, sans-serif' ),
+			'system_arialnarrow' => array( 'Arial Narrow', '\'Arial Narrow\', sans-serif' ),
+			'system_centrygothic' => array( 'Century Gothic', 'Century Gothic, sans-serif' ),
+			'system_copperplategothiclight' => array( 'Copperplate Gothic Light', 'Copperplate Gothic Light, sans-serif' ),
+			'system_couriernew' => array( 'Courier New', '\'Courier New\', Courier, monospace' ),
+			'system_georgia' => array( 'Georgia', 'Georgia, Serif' ),
+			'system_helveticaneue' => array( 'Helvetica Neue', '\'Helvetica Neue\',Helvetica,Arial,sans-serif' ),
+			'system_impact' => array( 'Impact', 'Impact, Charcoal, sans-serif' ),
+			'system_lucidaconsole' => array( 'Lucida Console', '\'Lucida Console\', Monaco, monospace' ),
+			'system_lucidasansunicode' => array( 'Lucida Sans Unicode', '\'Lucida Sans Unicode\', \'Lucida Grande\', sans-serif' ),
+			'system_palatinolinotype' => array( 'Palatino Linotype', '\'Palatino Linotype\', \'Book Antiqua\', Palatino, serif' ),
+			'system_tahoma' => array( 'Tahoma', 'Tahoma, Geneva, sans-serif' ),
+			'system_timesnewroman' => array( 'Times New Roman', '\'Times New Roman\', Times, serif' ),
+			'system_trebuchetms' => array( 'Trebuchet MS', '\'Trebuchet MS\', Helvetica, sans-serif' ),
+			'system_verdana' => array( 'Verdana', 'Verdana, Geneva, sans-serif' ),
+		);
+
+
+	/**
+	 * Returns an option list for font customization
+	 *
+	 * Uses: $this->font_definitions
+	 */
+	function get_font_definitions()
+	{
+		// Pull font array keys
+		$font_options = array_keys($this->font_definitions);
+
+		// Pull first value from each array key
+		$font_names = array();
+		foreach ($this->font_definitions as $f) {
+				$font_names[] = current($f);
+		}
+
+		// Create array in format: 'system_arial' => 'arial', etc.
+		$dropdown_option_list = array_combine($font_options, $font_names);
+
+		return $dropdown_option_list;
+	}
+
+
+	/**
+	 * Returns a CSS code for font customization
+	 *
+	 * Uses: $this->font_definitions
+	 */
+	function apply_selected_font( $target_element, $font_family_param, $text_size_param = NULL, $font_weight_param = NULL, $group = NULL )
+	{
+		$font_css = array();
+
+		// Get default font family and font-weight
+		$default_font_family = $this->get_setting_default_value( $font_family_param, $group );
+		$default_font_weight = $this->get_setting_default_value( $font_weight_param, $group );
+
+		// Select the font family CSS string
+		$selected_font_family = $this->get_setting( $font_family_param, $group );
+		if( $selected_font_family != $default_font_family )
+		{
+			$selected_font_definition = isset( $this->font_definitions[$selected_font_family] ) ? $this->font_definitions[$selected_font_family] : $this->font_definitions[$default_font_family];
+			$font_css[] = "font-family: $selected_font_definition[1];";
+		}
+
+		// If $text_size_param is passed, add font-size property
+		if( ! is_null( $text_size_param ) )
+		{
+			$selected_text_size = $this->get_setting( $text_size_param, $group );
+			$font_css[] = 'font-size: '.$selected_text_size.';';
+		}
+
+		// If $font_weight_param is passed, add font-weight property
+		if( ! is_null( $font_weight_param ) )
+		{
+			$selected_font_weight = $this->get_setting( $font_weight_param, $group );
+			if( $selected_font_weight != $default_font_weight )
+			{
+				$font_css[] = 'font-weight: '.$selected_font_weight.';';
+			}
+		}
+
+		// Prepare the complete CSS for font customization
+		if( ! empty( $font_css ) )
+		{
+			$custom_css = $target_element.' { '.implode( ' ', $font_css )." }\n";
+		}
+		else
+		{
+			$custom_css = '';
+		}
+
+		return $custom_css;
+	}
+
+
+	/**
+	 * Check if we can display a widget container when access is denied to collection by current user
+	 *
+	 * NOTE: To use this function your skin must has a checklist setting 'access_login_containers' with options of widget container keys
+	 *
+	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
+	 * @return boolean TRUE to display
+	 */
+	function show_container_when_access_denied( $container_key )
+	{
+		global $Collection, $Blog;
+
+		if( $Blog->has_access() )
+		{	// If current user has an access to this collection then don't restrict containers:
+			return true;
+		}
+
+		// Get what containers are available for this skin when access is denied or requires login:
+		$access = $this->get_setting( 'access_login_containers' );
+
+		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
 }
 

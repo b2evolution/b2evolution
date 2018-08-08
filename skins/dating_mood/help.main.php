@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage dating_mood
@@ -97,19 +97,6 @@ siteskin_include( '_site_body_header.inc.php' );
 ?>
 
 <?php
-	// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
-	request_title( array(
-			'title_before'=> '<h2>',
-			'title_after' => '</h2>',
-			'title_none'  => '',
-			'glue'        => ' - ',
-			'title_single_disp' => true,
-			'format'      => 'htmlbody',
-		) );
-	// ------------------------------ END OF REQUEST TITLE -----------------------------
-?>
-
-<?php
 	// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 	skin_include( '$disp$' );
 	// Note: you can customize any of the sub templates included here by
@@ -145,7 +132,7 @@ siteskin_include( '_site_body_header.inc.php' );
 <div id="pageFooter">
 	<?php
 		// Display container and contents:
-		skin_container( NT_("Footer"), array(
+		skin_container( NT_('Footer'), array(
 				// The following params will be used as defaults for widgets included in this container:
 			) );
 		// Note: Double quotes have been used around "Footer" only for test purposes.

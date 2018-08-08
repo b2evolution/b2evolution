@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
@@ -86,7 +86,10 @@ skin_widget( array(
 	?>
 
 <div class="forums_list single_topic evo_content_block">
-	<?php /* This empty row is used to fix columns width, when table has css property "table-layout:fixed" */ ?>
+	<?php /* This empty row is used to fix columns width, when table has css property "table-layout:fixed" */
+	if( $disp != 'page' )
+	{
+	?>
 
 	<div class="single_page_title">
 		<?php
@@ -99,11 +102,12 @@ skin_widget( array(
 
 		// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
-		skin_container( /* TRANS: Widget container name */ NT_('Item Single Header'), array(
+		widget_container( 'item_single_header', array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
 			// This will enclose each widget in a block:
-			'block_start' => '<div class="$wi_class$">',
+			'block_start' => '<div class="evo_widget $wi_class$">',
 			'block_end' => '</div>',
 			// This will enclose the title of each widget:
 			'block_title_start' => '<h3>',
@@ -112,8 +116,11 @@ skin_widget( array(
 			'author_link_text' => $params['author_link_text'],
 		) );
 		// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
-		?>
+
+	?>
 	</div>
+
+	<?php } ?>
 
 	<div class="row">
 		<div class="<?php echo $Skin->get_column_class( 'single' ); ?>">
@@ -162,20 +169,21 @@ skin_widget( array(
 				<?php
 				if( $disp == 'single' )
 				{
-					?>
-					<div class="evo_container evo_container__item_single">
-					<?php
 					// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
 					// Display container contents:
-					skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+					widget_container( 'item_single', array(
 						'widget_context' => 'item',	// Signal that we are displaying within an Item
 						// The following (optional) params will be used as defaults for widgets included in this container:
+						'container_display_if_empty' => false, // If no widget, don't display container at all
 						// This will enclose each widget in a block:
-						'block_start' => '<div class="$wi_class$">',
+						'block_start' => '<div class="evo_widget $wi_class$">',
 						'block_end' => '</div>',
 						// This will enclose the title of each widget:
 						'block_title_start' => '<h3>',
 						'block_title_end' => '</h3>',
+						// Template params for "Item Link" widget
+						'widget_item_link_before'    => '<p class="evo_post_link">',
+						'widget_item_link_after'     => '</p>',
 						// Template params for "Item Tags" widget
 						'widget_item_tags_before'    => '<nav class="small post_tags">',
 						'widget_item_tags_after'     => '</nav>',
@@ -197,9 +205,35 @@ skin_widget( array(
 						'widget_item_tags_after'     => '</nav>',
 					) );
 					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
-					?>
-					</div>
-					<?php
+				}
+				elseif( $disp == 'page' )
+				{
+					// ------------------------- "Item Page" CONTAINER EMBEDDED HERE --------------------------
+					// Display container contents:
+					widget_container( 'item_page', array(
+						'widget_context' => 'item',	// Signal that we are displaying within an Item
+						// The following (optional) params will be used as defaults for widgets included in this container:
+						'container_display_if_empty' => false, // If no widget, don't display container at all
+						// This will enclose each widget in a block:
+						'block_start' => '<div class="evo_widget $wi_class$">',
+						'block_end' => '</div>',
+						// This will enclose the title of each widget:
+						'block_title_start' => '<h3>',
+						'block_title_end' => '</h3>',
+						// Params for skin file "_item_content.inc.php"
+						'widget_item_content_params' => $params,
+						// Template params for "Item Attachments" widget:
+						'widget_item_attachments_params' => array(
+								'limit_attach'       => 1000,
+								'before'             => '<div class="evo_post_attachments"><h3>'.T_('Attachments').':</h3><ul class="evo_files">',
+								'after'              => '</ul></div>',
+								'before_attach'      => '<li class="evo_file">',
+								'after_attach'       => '</li>',
+								'before_attach_size' => ' <span class="evo_file_size">(',
+								'after_attach_size'  => ')</span>',
+							),
+					) );
+					// ----------------------------- END OF "Item Page" CONTAINER -----------------------------
 				}
 				else
 				{
@@ -223,8 +257,10 @@ skin_widget( array(
 		</div><!-- ../panel-body -->
 
 		<div class="panel-footer clearfix small">
+			<?php if( $disp != 'page' ) { ?>
 			<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
 			<?php
+			}
 				// Check if BBcode plugin is enabled for current blog
 				$bbcode_plugin_is_enabled = false;
 				if( class_exists( 'bbcode_plugin' ) )
@@ -241,8 +277,10 @@ skin_widget( array(
 					echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
 				}
 
-				// Display a panel with voting buttons for item:
-				$Skin->display_item_voting_panel( $Item );
+				if( $disp != 'page' )
+				{	// Display a panel with voting buttons for item:
+					$Skin->display_item_voting_panel( $Item );
+				}
 
 				echo '<span class="pull-left">';
 					$Item->edit_link( array(
@@ -339,14 +377,13 @@ skin_widget( array(
 		<?php
 		if( $Skin->is_visible_sidebar( 'single' ) )
 		{	// Display sidebar:
-		?>
-		<aside class="col-md-3<?php echo ( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left' : '' ); ?>">
-			<div class="evo_container evo_container__sidebar_single">
-			<?php
 				// ------------------------- "Sidebar Single" CONTAINER EMBEDDED HERE --------------------------
 				// Display container contents:
-				skin_container( NT_('Sidebar Single'), array(
+				widget_container( 'sidebar_single', array(
 						// The following (optional) params will be used as defaults for widgets included in this container:
+						'container_display_if_empty' => false, // If no widget, don't display container at all
+						'container_start' => '<aside class="col-md-3'.( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left' : '' ).'"><div class="evo_container $wico_class$">',
+						'container_end'   => '</div></aside>',
 						// This will enclose each widget in a block:
 						'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
 						'block_end' => '</div>',
@@ -376,10 +413,7 @@ skin_widget( array(
 						'search_submit_after'  => '</span></div>',
 					) );
 				// ----------------------------- END OF "Sidebar Single" CONTAINER -----------------------------
-			?>
-			</div>
-		</aside><!-- .col -->
-		<?php } ?>
+		} ?>
 	</div><!-- .row -->
 
 </div><!-- ../forums_list single_topic -->

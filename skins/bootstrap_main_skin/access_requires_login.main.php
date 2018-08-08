@@ -36,13 +36,18 @@ siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
 
 // Display a picture from skin setting as background image
-global $media_path, $media_url;
-$bg_image = $Skin->get_setting( 'front_bg_image' );
-echo '<div id="bg_picture">';
-if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
-{ // If it exists in media folder
-	echo '<img src="'.$media_url.$bg_image.'" />';
+$FileCache = & get_FileCache();
+$bg_File = NULL;
+if( $bg_File_ID = $Skin->get_setting( 'front_bg_image_file_ID' ) )
+{
+	$bg_File = & $FileCache->get_by_ID( $bg_File_ID, false, false );
 }
+echo '<div class="evo_pictured_layout">';
+if( $bg_File && $bg_File->exists() )
+{ // If it exists in media folder
+	echo '<img class="evo_pictured__image" src="'.$bg_File->get_url().'" />';
+}
+
 ?>
 
 
@@ -50,17 +55,16 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 
 <header class="row">
 
-	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
 		<?php
-// disabled because implementation is broken:	if( $Skin->is_visible_container( 'page_top' ) )
-		{ // Display 'Page Top' widget container
-		?>
-		<div class="evo_container evo_container__page_top">
-		<?php
+		if( $Skin->show_container_when_access_denied( 'page_top' ) )
+		{	// Display 'Page Top' widget container:
 			// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
-			skin_container( NT_('Page Top'), array(
+			widget_container( 'page_top', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => true, // Display container anyway even if no widget
+					'container_start'     => '<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8"><div class="evo_container $wico_class$">',
+					'container_end'       => '</div></div>',
 					'block_start'         => '<div class="evo_widget $wi_class$">',
 					'block_end'           => '</div>',
 					'block_display_title' => false,
@@ -70,50 +74,40 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 					'item_end'            => '</li>',
 				) );
 			// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
-		?>
-		</div>
-		<?php } ?>
-	</div><!-- .col -->
+		} ?>
 
-	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 		<?php
-//		if( $Skin->is_visible_container( 'header' ) )
-		{ // Display 'Header' widget container
-		?>
-		<div class="evo_container evo_container__header">
-		<?php
+		if( $Skin->show_container_when_access_denied( 'header' ) )
+		{	// Display 'Header' widget container:
 			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
-			skin_container( NT_('Header'), array(
+			widget_container( 'header', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => true, // Display container anyway even if no widget
+					'container_start'   => '<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4"><div class="evo_container $wico_class$">',
+					'container_end'     => '</div></div>',
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
 					'block_title_start' => '<h1>',
 					'block_title_end'   => '</h1>',
 				) );
 			// ----------------------------- END OF "Header" CONTAINER -----------------------------
-		?>
-		</div>
-		<?php } ?>
-	</div><!-- .col -->
+		} ?>
 
 </header><!-- .row -->
 
-
 <?php
-if( $Skin->is_visible_container( 'menu' ) )
-{ // Display 'Menu' widget container
-?>
-<nav class="row">
+if( $Skin->show_container_when_access_denied( 'menu' ) )
+{	// Display 'Menu' widget container:
 
-	<div class="col-md-12">
-		<ul class="nav nav-tabs evo_container evo_container__menu">
-		<?php
 			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
 			// Note: this container is designed to be a single <ul> list
-			skin_container( NT_('Menu'), array(
+			widget_container( 'menu', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => false, // If no widget, don't display container at all
+					'container_start'     => '<nav class="row"><div class="col-md-12"><ul class="nav nav-tabs evo_container $wico_class$">',
+					'container_end'       => '</ul></div></nav>',
 					'block_start'         => '',
 					'block_end'           => '',
 					'block_display_title' => false,
@@ -127,13 +121,8 @@ if( $Skin->is_visible_container( 'menu' ) )
 					'item_title_after'    => '',
 				) );
 			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
-		?>
-		</ul>
-	</div><!-- .col -->
 
-</nav><!-- .row -->
-<?php } ?>
-
+} ?>
 
 <div class="row">
 	<div class="col-md-12">
@@ -143,27 +132,7 @@ if( $Skin->is_visible_container( 'menu' ) )
 
 		<?php
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
-			skin_include( '$disp$', array(
-					// Form params for the forms below: login, register, lostpassword, activateinfo and msgform
-					'skin_form_before'      => '<div class="panel panel-default skin-form">'
-																				.'<div class="panel-heading">'
-																					.'<h3 class="panel-title">$form_title$</h3>'
-																				.'</div>'
-																				.'<div class="panel-body">',
-					'skin_form_after'       => '</div></div>',
-					// Login
-					'display_form_messages' => true,
-					'form_title_login'      => T_('Log in to your account').'$form_links$',
-					'form_title_lostpass'   => get_request_title().'$form_links$',
-					'lostpass_page_class'   => 'evo_panel__lostpass',
-					'login_form_inskin'     => false,
-					'login_page_class'      => 'evo_panel__login',
-					'login_page_before'     => '<div class="$form_class$">',
-					'login_page_after'      => '</div>',
-					'display_reg_link'      => true,
-					'abort_link_position'   => 'form_title',
-					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-				) );
+			skin_include( '$disp$' );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.
 			// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
@@ -176,7 +145,9 @@ if( $Skin->is_visible_container( 'menu' ) )
 </div><!-- .row -->
 
 </div><!-- .container -->
-</div><!-- #bg_picture -->
+
+</div><!-- .evo_pictured_layout -->
+
 
 <!-- =================================== START OF SECONDARY AREA =================================== -->
 <section class="secondary_area"><!-- white background -->
@@ -184,25 +155,22 @@ if( $Skin->is_visible_container( 'menu' ) )
 
 	<div class="row">
 
-		<footer class="col-md-12 center">
-	
+		<footer class="col-md-12">
+
 			<?php
-//			if( $Skin->is_visible_container( 'footer' ) )
-			{ // Display 'Footer' widget container
-			?>
-			<div class="evo_container evo_container__footer">
-			<?php
+			if( $Skin->show_container_when_access_denied( 'footer' ) )
+			{	// Display 'Footer' widget container:
 				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
-				// Display container and contents:
-				skin_container( NT_('Footer'), array(
+				widget_container( 'footer', array(
 						// The following params will be used as defaults for widgets included in this container:
+						'container_display_if_empty' => false, // If no widget, don't display container at all
+						'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
+						'container_end'   => '</div>',
 					) );
 				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
-			?>
-			</div>
-			<?php } ?>
-	
-			<p>
+			} ?>
+
+			<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(

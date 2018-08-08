@@ -25,8 +25,9 @@ $Form->hidden( 'ctrl', 'campaigns' );
 $Form->hidden( 'current_tab', $tab );
 $Form->hidden( 'ecmp_ID', $edited_EmailCampaign->ID );
 
-$Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCampaign->dget( 'name' ) ).get_manual_link( 'creating-an-email-campaign' ) );
-	$Form->text_input( 'ecmp_email_title', $edited_EmailCampaign->get( 'email_title' ), 60, T_('Email title'), '', array( 'maxlength' => 255, 'required' => true ) );
+$Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCampaign->dget( 'name' ) ).get_manual_link( 'campaign-compose-panel' ) );
+	$Form->text_input( 'ecmp_email_title', $edited_EmailCampaign->get( 'email_title' ), 60, T_('Email title'), T_('as it will appear in your subscriber\'s inboxes'), array( 'maxlength' => 255, 'required' => true ) );
+	$Form->text_input( 'ecmp_email_defaultdest', $edited_EmailCampaign->get( 'email_defaultdest' ), 60, T_('Default destination'), '', array( 'maxlength' => 255 ) );
 
 	// Plugin toolbars:
 	ob_start();

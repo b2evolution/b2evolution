@@ -84,7 +84,7 @@ else
 			// Call widget directly (without container):
 			skin_widget( array_merge( $right_menu_params, array(
 				// CODE for the widget:
-				'widget' => 'menu_link',
+				'widget' => 'basic_menu_link',
 				// Optional display params
 				'link_type' => 'logout',
 			) ) );
@@ -96,7 +96,7 @@ else
 			// Call widget directly (without container):
 			skin_widget( array_merge( $right_menu_params, array(
 				// CODE for the widget:
-				'widget' => 'menu_link',
+				'widget' => 'basic_menu_link',
 				// Optional display params
 				'link_type' => 'login',
 			) ) );
@@ -105,7 +105,7 @@ else
 			// Call widget directly (without container):
 			skin_widget( array_merge( $right_menu_params, array(
 				// CODE for the widget:
-				'widget' => 'menu_link',
+				'widget' => 'basic_menu_link',
 				// Optional display params
 				'link_type' => 'register',
 				'link_selected_class' => 'swhead_item_white '.$right_menu_params['link_selected_class'],
@@ -117,7 +117,7 @@ else
 
 				<ul class="nav nav-tabs pull-left">
 <?php
-				if( $site_has_logo_file )
+				if( ! $site_has_logo_file )
 				{	// Display site name:
 ?>
 					<li class="swhead_sitename no_logo<?php echo $site_title_class; ?>">
@@ -192,7 +192,7 @@ else
 				// Call widget directly (without container):
 				skin_widget( array(
 									// CODE for the widget:
-									'widget' => 'menu_link',
+									'widget' => 'basic_menu_link',
 									// Optional display params
 									'block_start' => '',
 									'block_end' => '',
@@ -271,3 +271,38 @@ if( $site_Skin->get_setting( 'grouping' ) &&
 
 	</div><?php // END OF <div class="swhead_menus"> ?>
 </div><?php // END OF <div class="swhead_wrapper"> ?>
+
+<?php if( $site_Skin->get_setting( 'back_to_top_button' ) )
+{ // Check if "Back to Top" button is enabled
+?>
+<a href="#" class="btn btn-primary slide-top<?php echo ( is_logged_in() ? ' logged_in_margin_top' : '' ); ?>"><i class="fa fa-angle-double-up"></i></a>
+
+<script type="text/javascript">
+	// Scroll to Top
+	// ======================================================================== /
+	// browser window scroll ( in pixels ) after which the "scroll to top" link is show
+	var offset = 400,
+	// browser window scroll (in pixels) after which the "scroll to top" link opacity is reduced
+	offset_opacity = 1200,
+	// duration of the top scrolling animatiion (in ms)
+	scroll_top_duration = 700,
+	// grab the "back to top" link
+	$slide_top = jQuery( '.slide-top' );
+	
+	// hide or show the "scroll to top" link
+	jQuery( window ).scroll( function()
+	{
+		( jQuery( this ).scrollTop() > offset ) ? $slide_top.addClass( 'slide-top-visible' ) : $slide_top.removeClass( 'slide-top-visible' );
+	});
+
+	// Smooth scroll to top
+	$slide_top.on( 'click', function(event)
+	{
+		event.preventDefault();
+		jQuery( 'body, html' ).animate(
+		{
+			scrollTop: 0,
+		}, scroll_top_duration );
+	} );
+</script>
+<?php } ?>

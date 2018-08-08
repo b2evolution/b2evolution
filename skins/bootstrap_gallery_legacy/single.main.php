@@ -42,13 +42,13 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <header class="row">
 
-	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
-		<div class="evo_container evo_container__page_top">
+	<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8">
 		<?php
 			// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
-			skin_container( NT_('Page Top'), array(
+			widget_container( 'page_top', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => false, // If no widget, don't display container at all
 					'block_start'         => '<div class="evo_widget $wi_class$">',
 					'block_end'           => '</div>',
 					'block_display_title' => false,
@@ -65,20 +65,22 @@ siteskin_include( '_site_body_header.inc.php' );
 				// CODE for the widget:
 				'widget' => 'coll_member_count',
 				// Optional display params
-				'before' => '(',
-				'after'  => ')',
+				'block_start' => '<span>',
+				'block_end'   => '</span>',
+				'before'      => '(',
+				'after'       => ')',
 			) );
 		?>
-		</div>
 	</div><!-- .col -->
 
-	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
-		<div class="evo_container evo_container__header">
 		<?php
 			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
-			skin_container( NT_('Header'), array(
+			widget_container( 'header', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => true, // Display container anyway even if no widget
+					'container_start'   => '<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4"><div class="evo_container $wico_class$">',
+					'container_end'     => '</div></div>',
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
 					'block_title_start' => '<h1>',
@@ -86,23 +88,18 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 			// ----------------------------- END OF "Header" CONTAINER -----------------------------
 		?>
-		</div>
-
-	</div><!-- .col -->
 
 </header><!-- .row -->
 
-
-<nav class="row">
-
-	<div class="col-xs-12">
-		<ul class="nav nav-tabs evo_container evo_container__menu">
 		<?php
 			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
 			// Note: this container is designed to be a single <ul> list
-			skin_container( NT_('Menu'), array(
+			widget_container( 'menu', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => false, // If no widget, don't display container at all
+					'container_start'     => '<nav class="row"><div class="col-xs-12"><ul class="nav nav-tabs evo_container $wico_class$">',
+					'container_end'       => '</ul></div></nav>',
 					'block_start'         => '',
 					'block_end'           => '',
 					'block_display_title' => false,
@@ -117,10 +114,6 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 		?>
-		</ul>
-	</div><!-- .col -->
-
-</nav><!-- .row -->
 
 <main><!-- This is were a link like "Jump to main content" would land -->
 
@@ -234,15 +227,15 @@ siteskin_include( '_site_body_header.inc.php' );
 
 		<div class="evo_details">
 
-			<div class="evo_container evo_container__item_single">
 				<?php
 				// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
 				// Display container contents:
-				skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+				widget_container( 'item_single', array(
 					'widget_context' => 'item',	// Signal that we are displaying within an Item
 					// The following (optional) params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => false, // If no widget, don't display container at all
 					// This will enclose each widget in a block:
-					'block_start' => '<div class="$wi_class$">',
+					'block_start' => '<div class="evo_widget $wi_class$">',
 					'block_end' => '</div>',
 					// This will enclose the title of each widget:
 					'block_title_start' => '<h3>',
@@ -257,10 +250,12 @@ siteskin_include( '_site_body_header.inc.php' );
 							'image_size'             => '', // Do not display images in content block - Image is handled separately
 							'url_link_text_template' => '', // link will be displayed (except player if podcast)
 						),
+						// Template params for "Item Link" widget
+						'widget_item_link_before'    => '<p class="evo_post_link">',
+						'widget_item_link_after'     => '</p>',
 				) );
 				// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 				?>
-			</div>
 
 			<div class="item_comments">
 				<?php
@@ -326,21 +321,21 @@ siteskin_include( '_site_body_header.inc.php' );
 <footer class="row">
 
 	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 center">
+	<div class="col-md-12">
 
-		<div class="evo_container evo_container__footer">
 		<?php
 			// Display container and contents:
-			skin_container( NT_("Footer"), array(
+			widget_container( 'footer', array(
 					// The following params will be used as defaults for widgets included in this container:
-					'block_start'       => '<div class="evo_widget $wi_class$">',
-					'block_end'         => '</div>',
+					'container_display_if_empty' => false, // If no widget, don't display container at all
+					'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
+					'container_end'   => '</div>',
+					'block_start'     => '<div class="evo_widget $wi_class$">',
+					'block_end'       => '</div>',
 				) );
-			// Note: Double quotes have been used around "Footer" only for test purposes.
 		?>
-		</div>
 
-		<p>
+		<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(

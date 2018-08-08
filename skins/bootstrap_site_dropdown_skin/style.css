@@ -4,11 +4,22 @@
 .bootstrap_site_navbar_header .navbar {
   margin-bottom: 0;
 }
+.bootstrap_site_navbar_header .navbar .navbar-header.navbar-header-with-logo .navbar-brand {
+  padding: 0;
+}
+.bootstrap_site_navbar_header .navbar .navbar-header.navbar-header-with-logo .navbar-brand img {
+  max-height: 100%;
+  max-width: 270px;
+}
 .bootstrap_site_navbar_header .navbar .navbar-collapse {
   padding: 0;
 }
 .bootstrap_site_navbar_header .navbar .navbar-collapse .nav {
   margin: 0;
+}
+.bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right {
+  border-top: 1px solid;
+  padding-top: 9px;
 }
 .bootstrap_site_navbar_header .navbar .navbar-collapse .nav .login {
   padding-top: 4px;
@@ -23,11 +34,6 @@
   border-radius: 0;
   padding: 0;
 }
-.bootstrap_site_navbar_header .navbar .navbar-collapse .nav li .dropdown-menu > .active > a,
-.bootstrap_site_navbar_header .navbar .navbar-collapse .nav li .dropdown-menu > .active > a:focus,
-.bootstrap_site_navbar_header .navbar .navbar-collapse .nav li .dropdown-menu > .active > a:hover {
-  background-color: #eee;
-}
 .bootstrap_site_navbar_header .navbar .navbar-collapse .nav li .dropdown-menu li a {
   padding: 10px 20px;
   color: #555;
@@ -39,15 +45,25 @@
   .bootstrap_site_navbar_header .navbar .container-fluid.level1 {
     padding-right: 0;
   }
+  .bootstrap_site_navbar_header .navbar .navbar-header.navbar-header-with-logo .navbar-brand {
+    margin-left: -15px;
+  }
   .bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-left {
     margin-right: 15px;
   }
+  .bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right {
+    border-top: none;
+    padding: 0;
+  }
   .bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right .login {
-    padding-top: 9px;
+    padding-top: 8px;
     padding-bottom: 9px;
   }
 }
 @media (max-width: 768px) {
+  .bootstrap_site_navbar_header .navbar .navbar-header.navbar-header-with-logo {
+    margin-left: -15px;
+  }
   .bootstrap_site_navbar_header .navbar .navbar-collapse .nav li .dropdown-menu {
     background-color: #f8f8f8;
   }

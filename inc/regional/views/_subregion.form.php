@@ -27,7 +27,7 @@ $creating = is_create_action( $action );
 $Form = new Form( NULL, 'subregion_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Delete this sub-region!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('subregion') ) );
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', ( $creating ?  T_('New sub-region') : T_('Sub-region') ).get_manual_link( 'subregions-editing' ) );
 

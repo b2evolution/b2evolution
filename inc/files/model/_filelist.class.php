@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -415,8 +415,10 @@ class Filelist
 			$this->_total_files++;
 		}
 
-		// Count total bytes in this dir
-		$this->_total_bytes += $this->get_File_size($File);
+		if( ! $File->is_dir() )
+		{	// Count total bytes of files in this dir:
+			$this->_total_bytes += $this->get_File_size($File);
+		}
 
 		return true;
 	}

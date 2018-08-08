@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}
  * Parts of this file are copyright (c)2005 by Jason EDGECOMBE
  *
@@ -131,6 +131,7 @@ function create_default_data()
 
 	task_begin( 'Creating user field definitions... ' );
 	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
+	// erwin > When adding anything to the list below don't forget to update the params for the Social Links widget!
 	$DB->query( "
 		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_duplicated, ufdf_order, ufdf_suggest, ufdf_code, ufdf_icon_name)
 		 VALUES ( 1, 'text',   'Micro bio',     NULL, 'recommended', 'forbidden', '1',  '0', 'microbio',     'fa fa-info-circle' ),
@@ -141,6 +142,7 @@ function create_default_data()
 						( 2, 'word',   'AOL AIM',       NULL, 'optional',    'allowed',   '3',  '0', 'aolaim',       NULL ),
 						( 2, 'number', 'ICQ ID',        NULL, 'optional',    'allowed',   '4',  '0', 'icqid',        NULL ),
 						( 2, 'phone',  'Skype',         NULL, 'optional',    'allowed',   '5',  '0', 'skype',        'fa fa-skype' ),
+						( 2, 'phone',  'WhatsApp',      NULL, 'optional',    'allowed',   '6',  '0', 'whatsapp',     'fa fa-whatsapp' ),
 						( 3, 'phone',  'Main phone',    NULL, 'optional',    'forbidden', '1',  '0', 'mainphone',    'fa fa-phone' ),
 						( 3, 'phone',  'Cell phone',    NULL, 'optional',    'allowed',   '2',  '0', 'cellphone',    'fa fa-mobile-phone' ),
 						( 3, 'phone',  'Office phone',  NULL, 'optional',    'allowed',   '3',  '0', 'officephone',  'fa fa-phone' ),
@@ -160,6 +162,13 @@ function create_default_data()
 						( 4, 'url',    'Digg',          NULL, 'optional',    'forbidden', '11', '0', 'digg',         'fa fa-digg' ),
 						( 4, 'url',    'StumbleUpon',   NULL, 'optional',    'forbidden', '12', '0', 'stumbleupon',  'fa fa-stumbleupon' ),
 						( 4, 'url',    'Pinterest',     NULL, 'optional',    'forbidden', '13', '0', 'pinterest',    'fa fa-pinterest-p' ),
+						( 4, 'url',    'SoundCloud',    NULL, 'optional',    'forbidden', '14', '0', 'soundcloud',   'fa fa-soundcloud' ),
+						( 4, 'url',    'Yelp',          NULL, 'optional',    'forbidden', '15', '0', 'yelp',         'fa fa-yelp' ),
+						( 4, 'url',    'PayPal',        NULL, 'optional',    'forbidden', '16', '0', 'paypal',       'fa fa-paypal' ),
+						( 4, 'url',    '500px',         NULL, 'optional',    'forbidden', '17', '0', '500px',        'fa fa-500px' ),
+						( 4, 'url',    'Amazon',        NULL, 'optional',    'forbidden', '18', '0', 'amazon',       'fa fa-amazon' ),
+						( 4, 'url',    'Instagram',     NULL, 'optional',    'forbidden', '19', '0', 'instagram',    'fa fa-instagram' ),
+						( 4, 'url',    'Vimeo',         NULL, 'optional',    'forbidden', '20', '0', 'vimeo',        'fa fa-vimeo' ),
 						( 5, 'text',   'Main address',  NULL, 'optional',    'forbidden', '1',  '0', 'mainaddress',  'fa fa-building' ),
 						( 5, 'text',   'Home address',  NULL, 'optional',    'forbidden', '2',  '0', 'homeaddress',  'fa fa-home' )" );
 	task_end();
@@ -207,9 +216,10 @@ function create_default_data()
 			'lastname'  => 'Admin',
 			'level'     => 10,
 			'gender'    => 'M',
-			'Group'     => $admins_Group,
+			'group_ID'  => $admins_Group->ID,
 			'org_IDs'   => $user_org_IDs,
 			'org_roles' => array( 'King of Spades' ),
+			'org_priorities' => array( 0 ),
 			'fields'    => array(
 					'Micro bio'   => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
 					'Website'     => 'http://b2evolution.net/',
@@ -238,6 +248,7 @@ function create_default_data()
 	$post_types = array();
 	$post_types[] = array(
 			'name'           => 'Post',
+			'schema'         => 'Article',
 		);
 	$post_types[] = array(
 			'name'           => 'Podcast Episode',
@@ -266,6 +277,7 @@ function create_default_data()
 			'usage'          => 'page',
 			'template_name'  => 'page',
 			'perm_level'     => 'restricted',
+			'use_comments'   => 0,
 		);
 	$post_types[] = array(
 			'name'           => 'Intro-Front',
@@ -322,10 +334,19 @@ function create_default_data()
 			'allow_disabling_comments' => 1,
 		);
 	$post_types[] = array(
+			'name'           => 'Content Block',
+			'usage'          => 'content-block',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'use_comments'   => 0,
+		);
+	$post_types[] = array(
 			'name'           => 'Sidebar link',
 			'usage'          => 'special',
 			'template_name'  => NULL,
 			'perm_level'     => 'admin',
+			'allow_disabling_comments' => 1,
 		);
 	$post_types[] = array(
 			'name'           => 'Advertisement',
@@ -352,7 +373,6 @@ function create_default_data()
 			'use_comments'           => 0,
 			'allow_closing_comments' => 0,
 			'use_comment_expiration' => 'never',
-			'use_custom_fields'      => 0,
 		);
 	$post_types[] = array(
 			'name' => 'Bug Report',
@@ -381,7 +401,7 @@ function create_default_data()
 			'allow_closing_comments'   => 1,
 			'allow_disabling_comments' => 0,
 			'use_comment_expiration'   => 'optional',
-			'use_custom_fields'        => 1,
+			'schema'                   => NULL,
 		);
 	$post_types_sql = 'INSERT INTO T_items__type ( ityp_'.implode( ', ityp_', array_keys( $post_type_default_settings ) ).' ) VALUES ';
 	foreach( $post_types as $p => $post_type )
@@ -396,13 +416,155 @@ function create_default_data()
 	// Insert item types:
 	$DB->query( $post_types_sql );
 
-	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type )
-			VALUES ( 3, "First numeric field", "first_numeric_field", "double" ),
-						 ( 3, "Second numeric field", "second_numeric_field", "double" ),
-						 ( 3, "First string field", "first_string_field", "varchar" ),
-						 ( 3, "Define you own labels", "define_you_own_labels", "varchar" ),
-						 ( 3, "Multiline plain text field", "multiline_plain_text_field", "text" ),
-						 ( 3, "Multiline HTML field", "multiline_html_field", "html" )' );
+	// Item type custom fields:
+	$parent_ityp_ID = 3;
+	$child_ityp_ID = 4;
+	$custom_fields = array(
+		// for Item Type "Post with Custom Fields":
+		array(
+			'label'           => T_('Image 1'),
+			'name'            => 'image_1',
+			'type'            => 'image',
+			'order'           => 1,
+			'note'            => T_('Enter a link ID'),
+			'format'          => 'fit-192x192',
+			'link'            => 'linkpermzoom',
+			'line_highlight'  => 'never',
+			'green_highlight' => 'never',
+		),
+		array(
+			'label'           => T_('First numeric field'),
+			'name'            => 'first_numeric_field',
+			'type'            => 'double',
+			'order'           => 2,
+			'note'            => T_('Enter a number'),
+		),
+		array(
+			'label'           => T_('Second numeric field'),
+			'name'            => 'second_numeric_field',
+			'type'            => 'double',
+			'order'           => 4,
+			'note'            => T_('Enter a number'),
+		),
+		array(
+			'label'           => T_('USD Price'),
+			'name'            => 'usd_price',
+			'type'            => 'double',
+			'order'           => 8,
+			'note'            => T_('Enter a number'),
+			'format'          => '$ 0 0.00',
+			'green_highlight' => 'lowest',
+		),
+		array(
+			'label'           => T_('EUR Price'),
+			'name'            => 'eur_price',
+			'type'            => 'double',
+			'order'           => 9,
+			'note'            => T_('Enter a number'),
+			'format'          => '0 0.00 €',
+			'green_highlight' => 'lowest',
+		),
+		array(
+			'label'           => T_('First string field'),
+			'name'            => 'first_string_field',
+			'type'            => 'varchar',
+			'order'           => 3,
+			'note'            => T_('Enter a string'),
+		),
+		array(
+			'label'           => T_('Multiline plain text field'),
+			'name'            => 'multiline_plain_text_field',
+			'type'            => 'text',
+			'order'           => 6,
+			'note'            => T_('Enter multiple lines'),
+		),
+		array(
+			'label'           => T_('Multiline HTML field'),
+			'name'            => 'multiline_html_field',
+			'type'            => 'html',
+			'order'           => 5,
+			'note'            => T_('Enter HTML code'),
+		),
+		array(
+			'label'           => T_('URL field'),
+			'name'            => 'url_field',
+			'type'            => 'url',
+			'order'           => 7,
+			'note'            => T_('Enter an URL (absolute or relative)'),
+			'link'            => 'fieldurl',
+		),
+		array(
+			'label'           => T_('Checkmark field'),
+			'name'            => 'checkmark_field',
+			'type'            => 'double',
+			'order'           => 10,
+			'note'            => T_('1 = Yes; 0 = No'),
+			'format'          => '#yes#;;#no#;n/a',
+		),
+		// for Item Type "Child Post":
+		array(
+			'ityp_ID'         => $child_ityp_ID,
+			'label'           => T_('Image 1'),
+			'name'            => 'image_1',
+			'type'            => 'image',
+			'order'           => 1,
+			'note'            => T_('Enter a link ID'),
+			'format'          => 'fit-192x192',
+			'link'            => 'linkpermzoom',
+			'line_highlight'  => 'never',
+			'green_highlight' => 'never',
+		),
+		array(
+			'ityp_ID'         => $child_ityp_ID,
+			'label'           => T_('First numeric field'),
+			'name'            => 'first_numeric_field',
+			'type'            => 'double',
+			'order'           => 2,
+			'note'            => T_('Enter a number'),
+		),
+		array(
+			'ityp_ID'         => $child_ityp_ID,
+			'label'           => T_('First string field'),
+			'name'            => 'first_string_field',
+			'type'            => 'varchar',
+			'order'           => 3,
+			'note'            => T_('Enter a string'),
+		),
+		array(
+			'ityp_ID'         => $child_ityp_ID,
+			'label'           => T_('Checkmark field'),
+			'name'            => 'checkmark_field',
+			'type'            => 'double',
+			'order'           => 4,
+			'note'            => T_('1 = Yes; 0 = No'),
+			'format'          => '#yes#;;#no#;n/a',
+		),
+	);
+	// Default settings for custom fields:
+	$custom_field_default_settings = array(
+			'ityp_ID'         => $parent_ityp_ID,
+			'label'           => '',
+			'name'            => '',
+			'type'            => 'double',
+			'order'           => '',
+			'note'            => NULL,
+			'format'          => NULL,
+			'link'            => 'nolink',
+			'line_highlight'  => 'differences',
+			'green_highlight' => 'never',
+		);
+	// Insert item type custom fields:
+	$custom_fields_sql = 'INSERT INTO T_items__type_custom_field ( itcf_'.implode( ', itcf_', array_keys( $custom_field_default_settings ) ).' ) VALUES ';
+	foreach( $custom_fields as $c => $custom_field )
+	{
+		$custom_field = array_merge( $custom_field_default_settings, $custom_field );
+		$custom_fields_sql .= '( '.$DB->quote( $custom_field ).' )';
+		if( $c != count( $custom_fields ) - 1 )
+		{
+			$custom_fields_sql .= ',';
+		}
+	}
+	$DB->query( $custom_fields_sql );
 	task_end();
 
 
@@ -490,6 +652,7 @@ function create_default_data()
 
 	return true;
 }
+
 
 /**
  * Create default currencies
@@ -669,6 +832,7 @@ function create_default_currencies( $table_name = 'T_regional__currency' )
 			" );
 	task_end();
 }
+
 
 /**
  * Create default countries with relations to currencies
@@ -936,11 +1100,12 @@ function create_default_countries( $table_name = 'T_regional__country', $set_pre
 		preg_match('#.*?-(.*)#', strtolower($current_locale),$result);
 
 		$DB->query( "UPDATE $table_name
-			SET ctry_preferred = 1, ctry_status = 'trusted'
+			SET ctry_preferred = 1
 			WHERE ctry_code = '".$DB->escape($result[1])."'" );
 	}
 	task_end();
 }
+
 
 /**
  * Create default regions
@@ -1038,6 +1203,7 @@ function create_default_regions()
 
 	task_end();
 }
+
 
 /**
  * Create default sub-regions
@@ -1162,6 +1328,7 @@ function create_default_subregions()
 	task_end();
 }
 
+
 /**
  * Create default scheduled jobs that don't exist yet:
  * - Prune page cache
@@ -1175,11 +1342,13 @@ function create_default_jobs( $is_upgrade = false )
 	global $DB, $localtimenow;
 
 	// get tomorrow date
-	$date = date2mysql( $localtimenow + 86400 );
+	$today = date2mysql( $localtimenow );
+	$tomorrow = date2mysql( $localtimenow + 86400 );
 	$ctsk_params = $DB->quote( 'N;' );
 	$next_sunday = date2mysql( strtotime( 'next Sunday',  $localtimenow + 86400 ) );
 
 	$cleanup_jobs_key         = 'cleanup-scheduled-jobs';
+	$cleanup_email_logs_key   = 'cleanup-email-logs';
 	$heavy_db_maintenance_key = 'heavy-db-maintenance';
 	$light_db_maintenance_key = 'light-db-maintenance';
 	$poll_antispam_key        = 'poll-antispam-blacklist';
@@ -1188,28 +1357,33 @@ function create_default_jobs( $is_upgrade = false )
 	$prune_sessions_key       = 'prune-old-hits-and-sessions';
 	$prune_comments_key       = 'prune-recycled-comments';
 	$activate_reminder_key    = 'send-non-activated-account-reminders';
+	$inactive_reminder_key    = 'send-inactive-account-reminders';
 	$comment_reminder_key     = 'send-unmoderated-comments-reminders';
 	$messages_reminder_key    = 'send-unread-messages-reminders';
 	$post_reminder_key        = 'send-unmoderated-posts-reminders';
 	$alert_old_contents_key   = 'monthly-alert-old-contents';
+	$execute_automations_key  = 'execute-automations';
 
 	// init insert values
 	$insert_values = array(
 			// run unread messages reminder in every 29 minutes
-			$messages_reminder_key    => "( ".$DB->quote( form_date( $date, '01:00:00' ) ).", 1740,  ".$DB->quote( $messages_reminder_key ).", ".$ctsk_params." )",
+			$messages_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '01:00:00' ) ).", 1740,  ".$DB->quote( $messages_reminder_key ).", ".$ctsk_params." )",
 			// run activate account reminder in every 31 minutes
-			$activate_reminder_key    => "( ".$DB->quote( form_date( $date, '01:30:00' ) ).", 1860,  ".$DB->quote( $activate_reminder_key ).", ".$ctsk_params." )",
-			$prune_pagecache_key      => "( ".$DB->quote( form_date( $date, '02:00:00' ) ).", 86400, ".$DB->quote( $prune_pagecache_key ).", ".$ctsk_params." )",
-			$process_hitlog_key       => "( ".$DB->quote( form_date( $date, '02:30:00' ) ).", 86400, ".$DB->quote( $process_hitlog_key ).", ".$ctsk_params." )",
-			$prune_sessions_key       => "( ".$DB->quote( form_date( $date, '03:00:00' ) ).", 86400, ".$DB->quote( $prune_sessions_key ).", ".$ctsk_params." )",
-			$poll_antispam_key        => "( ".$DB->quote( form_date( $date, '04:00:00' ) ).", 86400, ".$DB->quote( $poll_antispam_key ).", ".$ctsk_params." )",
-			$comment_reminder_key     => "( ".$DB->quote( form_date( $date, '04:30:00' ) ).", 86400, ".$DB->quote( $comment_reminder_key ).", ".$ctsk_params." )",
-			$cleanup_jobs_key         => "( ".$DB->quote( form_date( $date, '05:00:00' ) ).", 86400, ".$DB->quote( $cleanup_jobs_key ).", ".$ctsk_params." )",
-			$prune_comments_key       => "( ".$DB->quote( form_date( $date, '05:30:00' ) ).", 86400, ".$DB->quote( $prune_comments_key ).", ".$ctsk_params." )",
-			$light_db_maintenance_key => "( ".$DB->quote( form_date( $date, '06:00:00' ) ).", 86400, ".$DB->quote( $light_db_maintenance_key ).", ".$ctsk_params." )",
+			$activate_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '01:30:00' ) ).", 1860,  ".$DB->quote( $activate_reminder_key ).", ".$ctsk_params." )",
+			$prune_pagecache_key      => "( ".$DB->quote( form_date( $tomorrow, '02:00:00' ) ).", 86400, ".$DB->quote( $prune_pagecache_key ).", ".$ctsk_params." )",
+			$process_hitlog_key       => "( ".$DB->quote( form_date( $tomorrow, '02:30:00' ) ).", 86400, ".$DB->quote( $process_hitlog_key ).", ".$ctsk_params." )",
+			$prune_sessions_key       => "( ".$DB->quote( form_date( $tomorrow, '03:00:00' ) ).", 86400, ".$DB->quote( $prune_sessions_key ).", ".$ctsk_params." )",
+			$poll_antispam_key        => "( ".$DB->quote( form_date( $tomorrow, '04:00:00' ) ).", 86400, ".$DB->quote( $poll_antispam_key ).", ".$ctsk_params." )",
+			$comment_reminder_key     => "( ".$DB->quote( form_date( $tomorrow, '04:30:00' ) ).", 86400, ".$DB->quote( $comment_reminder_key ).", ".$ctsk_params." )",
+			$cleanup_jobs_key         => "( ".$DB->quote( form_date( $tomorrow, '05:00:00' ) ).", 86400, ".$DB->quote( $cleanup_jobs_key ).", ".$ctsk_params." )",
+			$prune_comments_key       => "( ".$DB->quote( form_date( $tomorrow, '05:30:00' ) ).", 86400, ".$DB->quote( $prune_comments_key ).", ".$ctsk_params." )",
+			$light_db_maintenance_key => "( ".$DB->quote( form_date( $tomorrow, '06:00:00' ) ).", 86400, ".$DB->quote( $light_db_maintenance_key ).", ".$ctsk_params." )",
 			$heavy_db_maintenance_key => "( ".$DB->quote( form_date( $next_sunday, '06:30:00' ) ).", 604800, ".$DB->quote( $heavy_db_maintenance_key ).", ".$ctsk_params." )",
-			$post_reminder_key        => "( ".$DB->quote( form_date( $date, '07:00:00' ) ).", 86400, ".$DB->quote( $post_reminder_key ).", ".$ctsk_params." )",
+			$post_reminder_key        => "( ".$DB->quote( form_date( $tomorrow, '07:00:00' ) ).", 86400, ".$DB->quote( $post_reminder_key ).", ".$ctsk_params." )",
 			$alert_old_contents_key   => "( ".$DB->quote( form_date( $next_sunday, '07:30:00' ) ).", 604800, ".$DB->quote( $alert_old_contents_key ).", ".$ctsk_params." )",
+			$execute_automations_key  => "( ".$DB->quote( form_date( $today, '00:00:00' ) ).", 300, ".$DB->quote( $execute_automations_key ).", ".$ctsk_params." )",
+			$inactive_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '08:00:00' ) ).", 86400, ".$DB->quote( $inactive_reminder_key ).", ".$ctsk_params." )",
+			$cleanup_email_logs_key   => "( ".$DB->quote( form_date( $tomorrow, '08:30:00' ) ).", 86400, ".$DB->quote( $cleanup_email_logs_key ).", ".$ctsk_params." )",
 		);
 	if( $is_upgrade )
 	{ // Check if these jobs already exist, and don't create another
@@ -1250,7 +1424,7 @@ function create_sample_organization()
 	task_end();
 
 	task_begin( 'Adding admin user to sample organization...' );
-	$admin_user->update_organizations( $user_org_IDs, array( 'King of Spades' ), true );
+	$admin_user->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
 	task_end();
 }
 
@@ -1312,29 +1486,203 @@ function create_demo_users()
 	task_end();
 
 	task_begin('Creating demo user mary... ');
-	$mary_moderator_ID = get_demo_user( 'mary', true, $moderators_Group, $user_org_IDs )->ID;
-	task_end();
+	$mary_moderator = get_demo_user( 'mary', true, $moderators_Group->ID, $user_org_IDs );
+	if( $mary_moderator )
+	{
+		$mary_moderator_ID = $mary_moderator->ID;
+		task_end();
+	}
+	else
+	{
+		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
+	}
+
 
 	task_begin('Creating demo user jay... ');
-	$jay_moderator_ID = get_demo_user( 'jay', true, $moderators_Group, $user_org_IDs )->ID;
-	task_end();
+	$jay_moderator = get_demo_user( 'jay', true, $moderators_Group->ID, $user_org_IDs );
+	if( $jay_moderator )
+	{
+		$jay_moderator_ID = $jay_moderator->ID;
+		task_end();
+	}
+	else
+	{
+		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
+	}
 
 	task_begin('Creating demo user dave... ');
-	$dave_blogger_ID = get_demo_user( 'dave', true, $editors_Group, $user_org_IDs )->ID;
-	task_end();
+	$dave_blogger = get_demo_user( 'dave', true, $editors_Group->ID, $user_org_IDs );
+	if( $dave_blogger )
+	{
+		$dave_blogger_ID = $dave_blogger->ID;
+		task_end();
+	}
+	else
+	{
+		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
+	}
 
 	task_begin('Creating demo user paul... ');
-	$paul_blogger_ID = get_demo_user( 'paul', true, $editors_Group, $user_org_IDs )->ID;
-	task_end();
+	$paul_blogger = get_demo_user( 'paul', true, $editors_Group->ID, $user_org_IDs );
+	if( $paul_blogger )
+	{
+		$paul_blogger_ID = $paul_blogger->ID;
+		task_end();
+	}
+	else
+	{
+		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
+	}
 
 	task_begin('Creating demo user larry... ');
-	$larry_user_ID = get_demo_user( 'larry', true, $users_Group, NULL )->ID;
-	task_end();
+	$larry_user = get_demo_user( 'larry', true, $users_Group->ID, NULL );
+	if( $larry_user )
+	{
+		$larry_user_ID = $larry_user->ID;
+		task_end();
+	}
+	else
+	{
+		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
+	}
 
 	task_begin('Creating demo user kate... ');
-	$kate_user_ID = get_demo_user( 'kate', true, $users_Group, NULL )->ID;
+	$kate_user = get_demo_user( 'kate', true, $users_Group->ID, NULL );
+	if( $kate_user )
+	{
+		$kate_user_ID = $kate_user->ID;
+		task_end();
+	}
+	else
+	{
+		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
+	}
+}
+
+
+/**
+ * Creates sample private messages between admin and existing users
+ *
+ */
+function create_demo_messages()
+{
+	task_begin('Creating sample private messages... ');
+	global $UserSettings, $DB, $now, $localtimenow;
+
+	load_class( 'messaging/model/_thread.class.php', 'Thread' );
+	load_class( 'messaging/model/_message.class.php', 'Message' );
+	load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+	$UserSettings = new UserSettings();
+	$UserCache = & get_UserCache();
+
+	$users_SQL = new SQL();
+	$users_SQL->SELECT( 'user_ID, user_login' );
+	$users_SQL->FROM( 'T_users' );
+	$users_SQL->WHERE( 'NOT user_ID  = 1' );
+	$users_SQL->ORDER_BY( 'user_ID' );
+	$users = $DB->get_results( $users_SQL->get() );
+
+	for( $i = 0; $i < count( $users ); $i++ )
+	{
+		if( $i % 2 == 0 )
+		{
+			$author_ID = 1;
+			$recipient_ID = $users[$i]->user_ID;
+		}
+		else
+		{
+			$author_ID = $users[$i]->user_ID;
+			$recipient_ID = 1;
+		}
+
+		$author_User = & $UserCache->get_by_ID( $author_ID );
+		$recipient_User = & $UserCache->get_by_ID( $recipient_ID );
+
+		$loop_Thread = new Thread();
+		$loop_Message = new Message();
+
+		// Initial message
+		$loop_Message->Thread = $loop_Thread;
+		$loop_Message->Thread->set_param( 'datemodified', 'string', date( 'Y-m-d H:i:s', $localtimenow - 60 ) );
+		$loop_Message->Thread->set( 'title', sprintf( T_('Demo private conversation #%s'), $i + 1 ) );
+		$loop_Message->Thread->recipients_list = array( $recipient_ID );
+		$loop_Message->set( 'author_user_ID', $author_ID );
+		$loop_Message->creator_user_ID = $author_ID;
+		$loop_Message->set( 'text', sprintf( T_('This is a demo private message to %s.'), $recipient_User->login ) );
+
+		$DB->begin();
+		$conversation_saved = false;
+		if( $loop_Message->Thread->dbinsert() )
+		{
+			$loop_Message->set_param( 'thread_ID', 'integer', $loop_Message->Thread->ID );
+			if( $loop_Message->dbinsert() )
+			{
+				if( $loop_Message->dbinsert_threadstatus( $loop_Message->Thread->recipients_list ) )
+				{
+					if( $loop_Message->dbinsert_contacts( $loop_Message->Thread->recipients_list ) )
+					{
+						if( $loop_Message->dbupdate_last_contact_datetime() )
+						{
+							$conversation_saved = true;
+						}
+					}
+				}
+			}
+		}
+
+		if( $conversation_saved )
+		{
+			$conversation_saved = false;
+
+			// Reply message
+			$loop_reply_Message = new Message();
+			$loop_reply_Message->Thread = $loop_Thread;
+			$loop_reply_Message->set( 'author_user_ID', $recipient_ID );
+			$loop_reply_Message->creator_user_ID = $author_ID;
+			$loop_reply_Message->set( 'text', sprintf( T_('This is a demo private reply to %s.'), $author_User->login ) );
+			$loop_reply_Message->set_param( 'thread_ID', 'integer', $loop_reply_Message->Thread->ID );
+
+			if( $loop_reply_Message->dbinsert() )
+			{
+				// Mark reply message as unread by initiator
+				$sql = 'UPDATE T_messaging__threadstatus
+						SET tsta_first_unread_msg_ID = '.$loop_reply_Message->ID.'
+						WHERE tsta_thread_ID = '.$loop_reply_Message->Thread->ID.'
+							AND tsta_user_ID = '.$author_ID.'
+							AND tsta_first_unread_msg_ID IS NULL';
+				$DB->query( $sql, 'Insert thread statuses' );
+
+				// Mark all messages as read by recipient
+				$sql = 'UPDATE T_messaging__threadstatus
+						SET tsta_first_unread_msg_ID = NULL
+						WHERE tsta_thread_ID = '.$loop_reply_Message->Thread->ID.'
+							AND tsta_user_ID = '.$recipient_ID;
+				$DB->query( $sql, 'Insert thread statuses' );
+
+				// check if contact pairs between sender and recipients exists
+				$recipient_list = $loop_reply_Message->Thread->load_recipients();
+				// remove author user from recipient list
+				$recipient_list = array_diff( $recipient_list, array( $loop_reply_Message->author_user_ID ) );
+				// insert missing contact pairs if required
+				if( $loop_reply_Message->dbinsert_contacts( $recipient_list ) )
+				{
+					if( $loop_reply_Message->dbupdate_last_contact_datetime() )
+					{
+						$DB->commit();
+						$conversation_saved = true;
+					}
+				}
+			}
+		}
+
+		if( ! $conversation_saved )
+		{
+			$DB->rollback();
+		}
+	}
 	task_end();
 }
+
 
 /**
  * This is called only for fresh installs and fills the tables with
@@ -1354,6 +1702,18 @@ function create_demo_contents()
 	global $mary_moderator_ID, $jay_moderator_ID, $dave_blogger_ID, $paul_blogger_ID, $larry_user_ID, $kate_user_ID;
 	global $admin_user;
 	global $create_demo_users;
+
+	// Global exception handler function
+	function demo_content_error_handler( $errno, $errstr, $errfile, $errline )
+	{ // handle only E_USER_NOTICE
+		if( $errno == E_USER_NOTICE )
+		{
+			echo get_install_format_text( '<span class="text-warning"><evo:warning>'.$errstr.'</evo:warning></span> ' );
+		}
+	}
+
+	// Set global exception handler
+	set_error_handler( "demo_content_error_handler" );
 
 	if( ! isset( $mary_moderator_ID ) )
 	{
@@ -1384,6 +1744,7 @@ function create_demo_contents()
 	{
 		$kate_user_ID = $admin_user->ID;
 	}
+
 
 	/**
 	 * @var FileRootCache
@@ -1490,7 +1851,7 @@ function create_demo_contents()
 	{ // Install Tracker blog
 		$timeshift += 86400;
 		task_begin( 'Creating Tracker collection...' );
-		create_demo_collection( 'group', $admin_user->ID, $create_demo_users, $timeshift, 1 );
+		create_demo_collection( 'group', $jay_moderator_ID, $create_demo_users, $timeshift, 5 );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1534,23 +1895,23 @@ function create_demo_contents()
 
 
 	task_begin( 'Creating default polls... ' );
-	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text )
-		VALUES ( 1, "What is your favorite b2evolution feature?" )' );
+	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text, pqst_max_answers )
+		VALUES ( 1, "What are your favorite b2evolution features?", 3 )' );
 	$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
 		VALUES ( 1, "Multiple blogs",          1 ),
 		       ( 1, "Photo Galleries",         2 ),
 		       ( 1, "Forums",                  3 ),
 		       ( 1, "Online Manuals",          4 ),
-		       ( 1, "Newsletters / E-mailing", 5 ),
+		       ( 1, "Lists / E-mailing", 5 ),
 		       ( 1, "Easy Maintenance",        6 )' );
 	$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
-		VALUES ( 1, 5, 1 ),
-		       ( 1, 6, 2 ),
-		       ( 1, 7, 2 ),
-		       ( 1, 2, 2 ),
-		       ( 1, 3, 3 ),
-		       ( 1, 4, 3 ),
-		       ( 1, 1, 6 )' );
+		VALUES ( 1, 5, 1 ), ( 1, 5, 5 ), ( 1, 5, 6 ),
+		       ( 1, 6, 2 ), ( 1, 6, 5 ), ( 1, 6, 1 ),
+		       ( 1, 7, 2 ), ( 1, 7, 5 ), ( 1, 6, 3 ),
+		       ( 1, 2, 2 ), ( 1, 2, 5 ), ( 1, 2, 4 ),
+		       ( 1, 3, 3 ), ( 1, 3, 5 ), ( 1, 3, 1 ),
+		       ( 1, 4, 3 ), ( 1, 4, 6 ), ( 1, 4, 2 ),
+		       ( 1, 1, 6 ), ( 1, 1, 5 ), ( 1, 1, 3 )' );
 	task_end();
 
 
@@ -1564,6 +1925,8 @@ function create_demo_contents()
 
 	load_funcs( 'tools/model/_system.funcs.php' );
 	system_init_caches( true, true ); // Outputs messages
+
+	restore_error_handler();
 }
 
 
@@ -1589,23 +1952,48 @@ function create_default_posts_location()
 
 
 /**
+ * Create default newsletters
+ */
+function create_default_newsletters()
+{
+	global $DB, $create_sample_contents;
+
+	task_begin( 'Creating default lists... ' );
+
+	if( $create_sample_contents )
+	{
+		// Insert default newsletters:
+		$DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label, enlt_order )
+			VALUES ( "News", "Send me news about this site.", 1 ),
+			       ( "Promotions", "I want to receive ADs that may be relevant to my interests.", 2 )' );
+
+		// Insert default subscriptions for each user on first newsletter:
+		$DB->query( 'REPLACE INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
+			SELECT user_ID, 1 FROM T_users' );
+	}
+
+	task_end();
+}
+
+
+/**
  * Create default email campaigns
  */
 function create_default_email_campaigns()
 {
-	global $DB, $create_sample_contents;
+	global $DB, $create_sample_contents, $baseurl;
 
 	task_begin( 'Creating default email campaigns... ' );
 
-	load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
-	load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
-
 	if( $create_sample_contents )
 	{
-		$EmailCampaign = new EmailCampaign();
-		$EmailCampaign->set( 'name', T_('Markdown Example') );
-		$EmailCampaign->set( 'email_title', T_('Markdown Example') );
-		$EmailCampaign->set( 'email_text', T_('Heading
+		load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
+		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+		$email_campaigns = array(
+			array(
+				'name' => T_('Markdown Example'),
+				'text' => T_('Heading
 =======
 
 Sub-heading
@@ -1640,15 +2028,112 @@ Shopping list:
 * oranges
 * pears
 
-The rain---not the reign---in Spain.') );
+The rain---not the reign---in Spain.').
+"\n".
+T_('Button examples:
+[button]This is a button[/button]
+[like]I like this[/like] [dislike]I don\'t like this[/dislike]
+[cta:1:info]Call to action 1 info button[/cta] [cta:2:warning]Call to action 2 warning button[/cta] [cta:3:default]Call to action 3 default button[/cta]
+[cta:1:link]Call to action 1 link only[/cta]'),
+			),
+			array(
+				'name' => T_('Another example'),
+				'text' => sprintf( T_('Hello %s!'), '$firstname_and_login$' )."\r\n\r\n".T_('Here are some news...'),
+			),
+		);
 
-		if( $EmailCampaign->dbinsert() )
-		{	// Add recipients after successfull email campaign creating:
-			$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
-			if( ! empty( $user_IDs ) )
-			{	// Only if we have found the users in DB
-				$EmailCampaign->add_users( $user_IDs );
+		$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
+		foreach( $email_campaigns as $email_campaign )
+		{
+			$EmailCampaign = new EmailCampaign();
+			$EmailCampaign->set( 'enlt_ID', 1 );
+			$EmailCampaign->set( 'name', $email_campaign['name'] );
+			$EmailCampaign->set( 'email_title', $email_campaign['name'] );
+			$EmailCampaign->set( 'email_defaultdest', $baseurl );
+			$EmailCampaign->set( 'email_text', $email_campaign['text'] );
+
+			if( $EmailCampaign->dbinsert() && ! empty( $user_IDs ) )
+			{	// Add recipients after successfull email campaign creating,
+				// only if we have found the users in DB:
+				$EmailCampaign->add_recipients( $user_IDs );
 			}
+		}
+	}
+
+	task_end();
+}
+
+
+/**
+ * Create default automations
+ */
+function create_default_automations()
+{
+	global $DB, $create_sample_contents, $baseurl;
+
+	task_begin( 'Creating default automations... ' );
+
+	if( $create_sample_contents )
+	{
+		//load_funcs( 'automations/model/_automation.funcs.php' );
+		load_class( 'automations/model/_automation.class.php', 'Automation' );
+		load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
+
+		$Automation = new Automation();
+		$Automation->set( 'name', T_('Sample Automation') );
+		$Automation->set( 'owner_user_ID', 1 );
+		$Automation->update_newsletters = true;
+		$Automation->newsletters = array( array(
+				'ID'        => 1,
+				'autostart' => 1,
+				'autoexit'  => 1,
+			) );
+
+		if( $Automation->dbinsert() )
+		{	// Add steps after successfull creating of the automation:
+			$AutomationStep = new AutomationStep();
+			$AutomationStep->set( 'autm_ID', $Automation->ID );
+			$AutomationStep->set( 'order', 1 );
+			$AutomationStep->set( 'label', 'admin' );
+			$AutomationStep->set( 'type', 'notify_owner' );
+			$AutomationStep->set( 'info', 'The User $login$ has reached step $step_number$ (ID: $step_ID$) in automation $automation_name$ (ID: $automation_ID$)' );
+			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'yes_next_step_delay', 86400 ); // 1 day
+			$AutomationStep->set( 'error_next_step_ID', 1 ); // Loop
+			$AutomationStep->set( 'error_next_step_delay', 14400 ); // 4 hours
+			$AutomationStep->dbinsert();
+
+			$AutomationStep = new AutomationStep();
+			$AutomationStep->set( 'autm_ID', $Automation->ID );
+			$AutomationStep->set( 'order', 2 );
+			$AutomationStep->set( 'label', 'Markdown Example' );
+			$AutomationStep->set( 'type', 'send_campaign' );
+			$AutomationStep->set( 'info', '1' ); // Email Campaign ID
+			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'yes_next_step_delay', 259200 ); // 3 days
+			$AutomationStep->set( 'no_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
+			$AutomationStep->set( 'error_next_step_ID', 2 ); // Loop
+			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
+			$AutomationStep->dbinsert();
+
+			$AutomationStep = new AutomationStep();
+			$AutomationStep->set( 'autm_ID', $Automation->ID );
+			$AutomationStep->set( 'order', 3 );
+			$AutomationStep->set( 'label', 'Another example' );
+			$AutomationStep->set( 'type', 'send_campaign' );
+			$AutomationStep->set( 'info', '2' ); // Email Campaign ID
+			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'yes_next_step_delay', 259200 ); // 3 days
+			$AutomationStep->set( 'no_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
+			$AutomationStep->set( 'error_next_step_ID', 3 ); // Loop
+			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
+			$AutomationStep->dbinsert();
+
+			// Add users to this automation:
+			$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
+			$Automation->add_users( $user_IDs );
 		}
 	}
 

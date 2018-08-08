@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
  *
  * @package admin
@@ -33,7 +33,14 @@ param( 'confirm', 'string' );
 param( 'keyword', 'string', '', true );
 param( 'domain', 'string' );
 param( 'filteron', 'string', '', true );
-param( 'filter', 'array:string', array() );
+if( $action == 'iprange_edit' )
+{	// Memorize action for users and sessions list below edit form:
+	memorize_param( 'action', 'string', '', $action );
+}
+else
+{	// Don't initialize this param as array because it must be string for UserList:
+	param( 'filter', 'array:string', array() );
+}
 
 $tab = param( 'tab', 'string', '', true );
 $tab3 = param( 'tab3', 'string', '', true );
@@ -46,8 +53,11 @@ if( isset($filter['off']) )
 }
 
 // Check permission:
-$current_User->check_perm( 'options', 'view', true );
-$current_User->check_perm( 'spamblacklist', 'view', true );
+if( ! ( $current_User->check_perm( 'admin', 'normal' ) && $current_User->check_perm( 'spamblacklist', 'view' ) ) &&
+		! ( $current_User->check_perm( 'users', 'moderate' ) && ( ( $tab3 == 'tools' && $tool == 'whois' && empty( $action ) ) || $action == 'whois' ) ) )
+{
+	debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name ) );
+}
 
 
 if( param( 'iprange_ID', 'integer', '', true) )
@@ -123,7 +133,7 @@ switch( $action )
 			$deleted_ids = implode( ',', $deleted_ids );
 
 			// Delete all comments data from DB
-			Comment::db_delete_where( 'Comment', $keyword_cond.$del_condition );
+			Comment::db_delete_where( $keyword_cond.$del_condition );
 
 			$Messages->add_to_group( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
 		}
@@ -164,11 +174,7 @@ switch( $action )
 			{
 				$javascript_messages['refreshAfterBan'] = array( $deleted_ids );
 			}
-			$javascript_messages['updateModalAfterBan'] = array( array(
-					'title' => T_('Open Antispam Blacklist'),
-					'url'   => $admin_url.'?ctrl=antispam',
-					'class' => 'btn btn-info'
-				) );
+			$javascript_messages['closeModalAfterBan'] = array();
 		}
 
 		// We'll ask the user later what to do, if no "sub-action" given.
@@ -373,7 +379,7 @@ switch( $action )
 			$Messages->add( T_('New IP Range created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=antispam&tab='.$tab.'&tab3=ipranges', 303 ); // Will EXIT
+			header_redirect( '?ctrl=antispam&tab3=ipranges&iprange_ID='.$edited_IPRange->ID.'&action=iprange_edit&filter=new', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'iprange_new';
@@ -399,7 +405,7 @@ switch( $action )
 			$Messages->add( T_('IP Range updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=antispam&tab='.$tab.'&tab3=ipranges', 303 ); // Will EXIT
+			header_redirect( '?ctrl=antispam&tab='.$tab.'&tab3=ipranges&iprange_ID='.$edited_IPRange->ID.'&action=iprange_edit', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'iprange_edit';
@@ -450,6 +456,21 @@ switch( $action )
 			@ini_set( 'output_buffering', 'off' );
 			// Set this to start deleting in the template file
 			$delete_bankruptcy_blogs = true;
+		}
+		break;
+
+	case 'whois':
+		$tab = '';
+		$tab3 = 'tools';
+		$tool = 'whois';
+		$query = param( 'query', 'string', NULL );
+		if( empty( $query ) )
+		{
+			param_error( 'query', T_('You must specify an IP address or domain to query') );
+		}
+		else
+		{
+			$template_action = 'whois';
 		}
 		break;
 }
@@ -528,6 +549,7 @@ if( $display_mode != 'js' )
 			// Set an url for manual page:
 			if( $action == 'iprange_new' || $action == 'iprange_edit' )
 			{
+				init_tokeninput_js();
 				$AdminUI->set_page_manual_link( 'ip-range-editing' );
 			}
 			else
@@ -570,6 +592,13 @@ if( $display_mode != 'js' )
 	}
 }
 
+if( in_array( $action, array( 'iprange_edit' ) ) )
+{ // Initialize date picker
+	init_datepicker_js();
+	// Load jQuery QueryBuilder plugin files for user list filters:
+	init_querybuilder_js( 'rsc_url' );
+}
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -587,13 +616,20 @@ switch( $tab3 )
 
 	case 'tools':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		if( $tool != 'whois' )
+		{
+			$current_User->check_perm( 'options', 'edit', true );
+		}
 
 		switch( $tool )
 		{
 			case 'bankruptcy':
 				$comment_status = param( 'comment_status', 'string', 'draft' );
 				$AdminUI->disp_view( 'antispam/views/_antispam_tools_bankruptcy.view.php' );
+				break;
+
+			case 'whois';
+				$AdminUI->disp_view( 'antispam/views/_antispam_whois.view.php' );
 				break;
 
 			default:
@@ -612,11 +648,24 @@ switch( $tab3 )
 				}
 				// Set IP Start and End from _GET request
 				$ip = param( 'ip', 'string', '' );
+				$ip_start = param( 'ip_start', 'string', '' );
+				$ip_end = param( 'ip_end', 'string', '' );
 				if( ! empty( $ip ) && is_valid_ip_format( $ip ) &&
 				    ( $ip = explode( '.', $ip ) ) && count( $ip ) == 4 )
-				{
+				{	// Prefill from single IP address:
 					$edited_IPRange->set( 'IPv4start', ip2int( implode( '.', array( $ip[0], $ip[1], $ip[2], 0 ) ) ) );
 					$edited_IPRange->set( 'IPv4end', ip2int( implode( '.', array( $ip[0], $ip[1], $ip[2], 255 ) ) ) );
+				}
+				else
+				{	// Prefill from start and end IP addresses:
+					if( ! empty( $ip_start ) && is_valid_ip_format( $ip_start ) )
+					{
+						$edited_IPRange->set( 'IPv4start', ip2int( $ip_start ) );
+					}
+					if( ! empty( $ip_end ) && is_valid_ip_format( $ip_end ) )
+					{
+						$edited_IPRange->set( 'IPv4end', ip2int( $ip_end ) );
+					}
 				}
 				$AdminUI->disp_view( 'antispam/views/_antispam_ipranges.form.php' );
 				break;

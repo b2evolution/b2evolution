@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -107,7 +107,7 @@ function display_pluggable_permissions( &$Form, $perm_block )
 
 $Form = new Form( NULL, 'group_checkchanges' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'ctrl,grp_ID,action', 'ctrl=groups' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'ctrl,grp_ID,action', 'ctrl=groups' ) );
 
 if( $edited_Group->ID == 0 )
 {
@@ -217,6 +217,10 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('File permissions').get_manual_link('group_properties_file_permissions'), array( 'id' => 'file', 'style' => $primary_panels_style ) );
+	display_pluggable_permissions( $Form, 'file' );
+$Form->end_fieldset();
+
 $Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_properties_system_permissions'), array( 'id' => 'system', 'style' => $primary_panels_style ) );
 
 	// Display pluggable permissions:
@@ -240,7 +244,54 @@ $Form->begin_fieldset( T_( 'Notification options').get_manual_link('notification
 $Form->end_fieldset();
 
 if( $action != 'view' )
-{
+{	// If current User can edit this group:
+
+	// Display plugin settings per group:
+	global $Plugins;
+	load_funcs( 'plugins/_plugin.funcs.php' );
+
+	$Plugins->restart();
+	while( $loop_Plugin = & $Plugins->get_next() )
+	{
+		if( ! $loop_Plugin->GroupSettings )
+		{	// Skip plugin without group settings:
+			continue;
+		}
+
+		// We use output buffers here to display the fieldset only, if there's content in there (either from PluginUserSettings or PluginSettingsEditDisplayAfter).
+		ob_start();
+		$Form->begin_fieldset( $loop_Plugin->name.' '.$loop_Plugin->get_help_link( '$help_url' ) );
+
+		ob_start();
+		$tmp_params = array(
+				'for_editing' => true,
+				'group_ID'    => $edited_Group->ID
+			);
+		$plugin_group_settings = $loop_Plugin->GetDefaultGroupSettings( $tmp_params );
+		if( is_array( $plugin_group_settings ) )
+		{
+			foreach( $plugin_group_settings as $l_name => $l_meta )
+			{	// Display form field for this setting:
+				autoform_display_field( $l_name, $l_meta, $Form, 'GroupSettings', $loop_Plugin, $edited_Group );
+			}
+		}
+
+		$has_contents = strlen( ob_get_contents() );
+		$Form->end_fieldset();
+
+		if( $has_contents )
+		{	// Print out plugin group settings:
+			ob_end_flush();
+			ob_end_flush();
+		}
+		else
+		{	// No content, discard output buffers:
+			ob_end_clean();
+			ob_end_clean();
+		}
+	}
+
+	// Display a button to save changes:
 	$Form->buttons( array( array( '', '', T_('Save Changes!'), 'SaveButton' ) ) );
 }
 
@@ -250,6 +301,7 @@ $Form->end_form();
 ?>
 <script type="text/javascript">
 <?php
+global $Settings;
 if( $Settings->get('fm_enable_roots_shared') )
 {	// asimo> this may belong to the pluggable permissions display
 	// javascript to handle shared root permissions, when file permission was changed:
@@ -319,20 +371,20 @@ jQuery( 'input[name=edited_grp_usage]' ).click( function()
 	}
 } );
 
-function set_activity_default_section()
+function set_activity_default_section( set_default_section )
 {
-	if( jQuery( 'input[name=edited_grp_perm_createblog], input[name=edited_grp_perm_getblog]' ).is( ':checked' ) )
-	{	// Enable if at least one checkbox is checked:
-		jQuery( 'select[name=edited_grp_perm_default_sec_ID]' ).removeAttr( 'disabled' );
-	}
-	else
-	{	// Disable otherwise:
-		jQuery( 'select[name=edited_grp_perm_default_sec_ID]' ).attr( 'disabled', 'disabled' );
+	var checked_new_coll = jQuery( 'input[name=edited_grp_perm_createblog], input[name=edited_grp_perm_getblog]' ).is( ':checked' );
+	// Enable/Disable if at least one checkbox(to create new collection) is checked:
+	jQuery( 'select[name=edited_grp_perm_default_sec_ID], input[type=checkbox][name="edited_grp_perm_allowed_sections[]"]' ).prop( 'disabled', ! checked_new_coll );
+	if( set_default_section && checked_new_coll )
+	{	// Auto select allowed section from current default section:
+		var selected_default_section_ID = jQuery( 'select[name=edited_grp_perm_default_sec_ID] option:selected' ).val();
+		jQuery( 'input[type=checkbox][name="edited_grp_perm_allowed_sections[]"][value=' + selected_default_section_ID + ']' ).prop( 'checked', true );
 	}
 }
 jQuery( 'input[name=edited_grp_perm_createblog], input[name=edited_grp_perm_getblog]' ).click( function()
 {	// Enable/Disable setting "Default Section" depending on checkboxes of "Creating new blogs":
-	set_activity_default_section();
+	set_activity_default_section( true );
 } );
-set_activity_default_section();
+set_activity_default_section( false );
 </script>

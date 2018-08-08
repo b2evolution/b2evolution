@@ -50,7 +50,7 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'item_checkchanges', 'post' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ), 4, 2 );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ), 4, 2 );
 
 $Form->labelstart = '<strong>';
 $Form->labelend = "</strong>\n";
@@ -74,7 +74,6 @@ $Form->begin_form( '', '', $params );
 	// In case we send this to the blog for a preview :
 	$Form->hidden( 'preview', 1 );
 	$Form->hidden( 'more', 1 );
-	$Form->hidden( 'preview_userid', $current_User->ID );
 
 	// Fields used in "advanced" form, but not here:
 	$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
@@ -92,7 +91,10 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'item_priority', $edited_Item->priority );
 		$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
 		$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
-		$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
+		if( $Blog->get_setting( 'use_deadline' ) )
+		{	// If deadline is enabled for collection:
+			$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
+		}
 	}
 	$Form->hidden( 'trackback_url', $trackback_url );
 	$Form->hidden( 'item_featured', $edited_Item->featured );
@@ -132,7 +134,7 @@ $Form->begin_form( '', '', $params );
 	echo '<br />';
 
 	// ------------------------------- SETTINGS ---------------------------------
-	$Form->checkbox( 'paragraphs_linebreak', false, '', T_( 'Create paragraphs at each line break' ), 'compose_layout' );
+	$Form->checkbox( 'paragraphs_linebreak', false, '', T_( 'Create paragraphs at each line break' ) );
 
 	$Form->switch_layout( NULL );
 

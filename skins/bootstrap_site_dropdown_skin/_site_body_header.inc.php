@@ -167,7 +167,7 @@ else
 					// Call widget directly (without container):
 					skin_widget( array(
 										// CODE for the widget:
-										'widget' => 'menu_link',
+										'widget' => 'basic_menu_link',
 										// Optional display params
 										'block_start' => '',
 										'block_end' => '',
@@ -230,7 +230,7 @@ else
 						// Call widget directly (without container):
 						skin_widget( array_merge( $right_menu_params, array(
 							// CODE for the widget:
-							'widget' => 'menu_link',
+							'widget' => 'basic_menu_link',
 							// Optional display params
 							'link_type' => 'logout',
 						) ) );
@@ -242,7 +242,7 @@ else
 						// Call widget directly (without container):
 						skin_widget( array_merge( $right_menu_params, array(
 							// CODE for the widget:
-							'widget' => 'menu_link',
+							'widget' => 'basic_menu_link',
 							// Optional display params
 							'link_type' => 'login',
 						) ) );
@@ -251,7 +251,7 @@ else
 						// Call widget directly (without container):
 						skin_widget( array_merge( $right_menu_params, array(
 							// CODE for the widget:
-							'widget' => 'menu_link',
+							'widget' => 'basic_menu_link',
 							// Optional display params
 							'link_type' => 'register',
 						) ) );
@@ -264,6 +264,9 @@ else
 	</nav><?php // END OF <nav class="navbar navbar-default"> ?>
 </div><?php // END OF <div class="bootstrap_site_header"> ?>
 
+<?php if( $site_Skin->get_setting( 'back_to_top_button' ) )
+{ // Check if "Back to Top" button is enabled
+?>
 <a href="#" class="btn btn-primary slide-top<?php echo ( is_logged_in() ? ' logged_in_margin_top' : '' ); ?>"><i class="fa fa-angle-double-up"></i></a>
 
 <script type="text/javascript">
@@ -294,3 +297,4 @@ else
 		}, scroll_top_duration );
 	} );
 </script>
+<?php } ?>

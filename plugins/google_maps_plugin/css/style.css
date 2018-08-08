@@ -1,0 +1,18 @@
+.evo_plugin__google_maps_no_key {
+	position: relative;
+}
+.evo_plugin__google_maps_no_key > div {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba( 255, 255, 255, 0.75 );
+}
+.evo_plugin__google_maps_no_key > div > div {
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	text-align: center;
+}

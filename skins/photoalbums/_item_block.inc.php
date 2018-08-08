@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage photoalbums
@@ -68,6 +68,9 @@ $params = array_merge( array(
 				// This will enclose the title of each widget:
 				'block_title_start' => '<h3>',
 				'block_title_end' => '</h3>',
+				// Template params for "Item Link" widget
+				'widget_item_link_before'    => '<p class="evo_post_link">',
+				'widget_item_link_after'     => '</p>',
 				// Template params for "Item Tags" widget
 				'widget_item_tags_before'    => '<nav class="small post_tags">',
 				'widget_item_tags_after'     => '</nav>',
@@ -85,18 +88,6 @@ $params = array_merge( array(
 			// /skins/_item_content.inc.php file into the current skin folder.
 			// -------------------------- END OF POST CONTENT -------------------------
 		}
-		?>
-
-		<?php
-			// URL link, if the post has one:
-			$Item->url_link( array(
-					'before'        => '<div class="bSmallPrint">'.T_('Link').': ',
-					'after'         => '</div>',
-					'text_template' => '$url$',
-					'url_template'  => '$url$',
-					'target'        => '',
-					'podcast'       => false,        // DO NOT display mp3 player if post type is podcast
-				) );
 		?>
 
 		<div class="item_comments">
@@ -143,25 +134,25 @@ function change_position_nav()
 
 	if( nav_size )
 	{ // Navigation bar
-		if( !$nav.hasClass( 'fixed' ) && jQuery( window ).scrollTop() > $nav.offset().top - nav_top )
+		if( !$nav_album.hasClass( 'fixed' ) && jQuery( window ).scrollTop() > $nav_album.offset().top - nav_top )
 		{ // Make nav as fixed if we scroll down
-			$nav.before( $navSpacer );
-			$nav.addClass( 'fixed' ).css( 'top', nav_top + 'px' );
+			$nav_album.before( $navSpacer );
+			$nav_album.addClass( 'fixed' ).css( 'top', nav_top + 'px' );
 		}
-		else if( $nav.hasClass( 'fixed' ) && jQuery( window ).scrollTop() < $navSpacer.offset().top - nav_top )
+		else if( $nav_album.hasClass( 'fixed' ) && jQuery( window ).scrollTop() < $navSpacer.offset().top - nav_top )
 		{ // Remove 'fixed' class from nav if we scroll to the top of page
-			$nav.removeClass( 'fixed' ).css( 'top', '' );
+			$nav_album.removeClass( 'fixed' ).css( 'top', '' );
 			$navSpacer.remove();
 		}
 	}
 }
 
-var $nav = jQuery( '.nav_album' );
-var nav_size = $nav.size();
-var nav_top = <?php echo ( show_toolbar() ? 23 : 0 ) ; ?>;
+var $nav_album = jQuery( '.nav_album' );
+var nav_size = $nav_album.size();
+var nav_top = <?php echo ( show_toolbar() ? 27 : 0 ) ; ?>;
 var $navSpacer = $( '<div />', {
 		'class':  'nav_album_spacer',
-		'height': $nav.outerHeight( true ),
+		'height': $nav_album.outerHeight( true ),
 	} );
 
 jQuery( window ).resize( function()

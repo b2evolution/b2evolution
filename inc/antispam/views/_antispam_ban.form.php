@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  *
@@ -63,7 +63,7 @@ if( $redirect_to == NULL )
 	$redirect_to = regenerate_url( 'action' );
 }
 
-$Form->global_icon( T_('Cancel!'), 'close', $redirect_to, '', 3, 2, array( 'class'=>'action_icon', 'id'=>'close_button' ) );
+$Form->global_icon( T_('Cancel').'!', 'close', $redirect_to, '', 3, 2, array( 'class'=>'action_icon', 'id'=>'close_button' ) );
 
 $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delete') );
 
@@ -98,7 +98,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 			<?php printf ( T_('Delete the following %s <strong>referer hits</strong>:'), $DB->num_rows == 500 ? '500+' : $DB->num_rows ) ?>
 			</label>
 		</p>
-		<table class="grouped" cellspacing="0">
+		<table class="grouped table table-striped table-bordered table-hover table-condensed" cellspacing="0">
 			<thead>
 			<tr>
 				<th class="firstcol"><?php echo T_('Date') ?></th>
@@ -116,9 +116,9 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 			{
 				?>
 				<tr class="<?php echo ($count%2 == 1) ? 'odd' : 'even' ?>">
-					<td class="firstcol"><?php stats_time() ?></td>
-					<td><a href="<?php stats_referer() ?>"><?php stats_basedomain() ?></a></td>
-					<td class="center"><?php stats_hit_remote_addr() ?></td>
+					<td class="firstcol"><?php echo date_i18n( locale_datefmt().' '.locale_timefmt(), $row_stats['hit_datetime'] ); ?></td>
+					<td><a href="<?php echo htmlentities( trim( $row_stats['hit_referer'] ) ); ?>"><?php echo htmlentities( $row_stats['dom_name'] ); ?></a></td>
+					<td class="center"><?php echo $row_stats['hit_remote_addr']; ?></td>
 					<td><?php echo format_to_output( $row_stats['blog_shortname'], 'htmlbody' ); ?></td>
 					<td><?php disp_url( $row_stats['hit_uri'], 50 ); ?></td>
 				</tr>
@@ -129,6 +129,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 		</table>
 	<?php
 	}
+	evo_flush();
 
 	// Check for potentially affected comments:
 	$sql = 'SELECT *
@@ -169,10 +170,11 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 		foreach( $comments_by_status as $status => $comments )
 		{
 			echo_affected_comments( $comments, $status, $keyword, $no_perms_count[$status] );
+			evo_flush();
 		}
 	}
 
-	// Check for potentially affected comments:
+	// Check for potentially affected users:
 	$quoted_keyword = $DB->quote('%'.$keyword.'%');
 	$sql = 'SELECT DISTINCT T_users.*
 				FROM T_users
@@ -199,9 +201,9 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 		{ // matching found, and current user has permission to view -> display users table
 			?>
 			<p><label><strong><?php echo( T_('Affected users').':' )?></strong></label></p>
-			<table class="grouped" cellspacing="0">
+			<table class="grouped table table-striped table-bordered table-hover table-condensed" cellspacing="0">
 				<thead><tr>
-				<th class="firstcol"><?php printf( T_('Login') )?></th>
+				<th class="firstcol"><?php printf( /* TRANS: noun */ T_('Login') )?></th>
 				<th><?php echo( T_('First name') )?></th>
 				<th><?php echo( T_('Last name') )?></th>
 				<th><?php echo( T_('Nickname') )?></th>
@@ -245,6 +247,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 	{ // There is no affected users
 		printf( '<p>'.T_('No <strong>users</strong> match the keyword %s').'</p>', '<code>'.$keyword.'</code>' );
 	}
+	evo_flush();
 
 	// Check if the string is already in the blacklist:
 	if( antispam_check($keyword) )

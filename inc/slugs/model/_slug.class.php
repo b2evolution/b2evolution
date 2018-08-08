@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -105,6 +105,11 @@ class Slug extends DataObject
 		if( $this->dbexists( 'slug_title', $slug_title ) )
 		{
 			$Messages->add( sprintf( T_('The slug &laquo;%s&raquo; already exists.'), $slug_title ), 'error' );
+		}
+		// Added in May 2017; but old slugs are not converted yet.
+		elseif( preg_match( '#^\d+$#i', $slug_title ) )
+		{	// Display error if slug title contains only digits:
+			param_error( 'slug_title', T_('All slugs must contain at least one letter.') );
 		}
 		$this->set( 'title', $slug_title );
 
@@ -208,7 +213,9 @@ class Slug extends DataObject
 	 * Used when try to delete a slug, which is another object slug
 	 *
 	 * @param array restriction
-	 * @return string message with links to objects
+	 * @return string|boolean Message with link to objects,
+	 *                        Empty string if no restriction for current table,
+	 *                        FALSE - if no rule for current table
 	 */
 	function get_restriction_link( $restriction )
 	{

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -261,9 +261,10 @@ switch( $action )
 			}
 
 			// Delete from DB:
-			$edited_Domain->dbdelete();
-
-			$Messages->add( T_('Domain has been deleted.'), 'success' );
+			if( $edited_Domain->dbdelete() )
+			{
+				$Messages->add( T_('Domain has been deleted.'), 'success' );
+			}
 
 			header_redirect( $admin_url.'?ctrl=stats&tab=domains&tab3='.$tab3.'&blog='.$blog );
 		}
@@ -310,7 +311,7 @@ switch( $action )
 		break;
 }
 
-if( isset($collections_Module) && $tab_from != 'antispam' )
+if( isset( $collections_Module ) && $tab_from != 'antispam' )
 { // Display list of blogs:
 	if( $perm_view_all )
 	{
@@ -343,7 +344,7 @@ switch( $tab )
 
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Summary'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
-		if( empty($tab3) )
+		if( empty( $tab3 ) )
 		{
 			$tab3 = 'global';
 		}
@@ -415,7 +416,7 @@ switch( $tab )
 	case 'refsearches':
 		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Incoming searches'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
-		if( empty($tab3) )
+		if( empty( $tab3 ) )
 		{
 			$tab3 = 'hits';
 		}
@@ -528,6 +529,11 @@ if( in_array( $tab , array( 'hits', 'other', 'referers' ) ) ||
 	init_datepicker_js();
 }
 
+if( in_array( $tab, array( 'referers', 'other', 'hits' ) ) || ( $tab == 'refsearches' && $tab3 == 'hits' ) )
+{ // Initialize WHOIS query window
+	echo_whois_js_bootstrap();
+}
+
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -539,7 +545,7 @@ $AdminUI->disp_payload_begin();
 
 evo_flush();
 
-switch( $AdminUI->get_path(1) )
+switch( $AdminUI->get_path( 1 ) )
 {
 	case 'summary':
 		// Display VIEW:

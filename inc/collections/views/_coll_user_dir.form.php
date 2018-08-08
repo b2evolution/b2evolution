@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  *
@@ -33,6 +33,14 @@ $Form->hidden( 'blog', $edited_Blog->ID );
 
 $Form->begin_fieldset( T_('User directory').get_manual_link( 'user-directory-other' ) );
 
+	$Form->checklist( array(
+			array( 'userdir_filter_gender', 1, T_('Gender'), $edited_Blog->get_setting( 'userdir_filter_gender' ) ),
+			array( 'userdir_filter_level', 1, T_('User level'), $edited_Blog->get_setting( 'userdir_filter_level' ) ),
+			array( 'userdir_filter_org', 1, T_('Organization'), $edited_Blog->get_setting( 'userdir_filter_org' ) ),
+			array( 'userdir_filter_criteria', 1, T_('Specific Criteria'), $edited_Blog->get_setting( 'userdir_filter_criteria' ) ),
+			array( 'userdir_filter_lastseen', 1, T_('User last seen'), $edited_Blog->get_setting( 'userdir_filter_lastseen' ) ),
+		), 'userdir_filters', T_('Filters') );
+
 if( isset( $GLOBALS['files_Module'] ) )
 {
 	load_funcs( 'files/model/_image.funcs.php' );
@@ -43,7 +51,7 @@ if( isset( $GLOBALS['files_Module'] ) )
 	$Form->end_line();
 }
 
-$Form->checkbox( 'userdir_login', $edited_Blog->get_setting( 'userdir_login' ), T_('Login') );
+$Form->checkbox( 'userdir_login', $edited_Blog->get_setting( 'userdir_login' ), /* TRANS: noun */ T_('Login') );
 $Form->checkbox( 'userdir_firstname', $edited_Blog->get_setting( 'userdir_firstname' ), T_('First name') );
 $Form->checkbox( 'userdir_lastname', $edited_Blog->get_setting( 'userdir_lastname' ), T_('Last name') );
 $Form->checkbox( 'userdir_nickname', $edited_Blog->get_setting( 'userdir_nickname' ), T_('Nickname') );

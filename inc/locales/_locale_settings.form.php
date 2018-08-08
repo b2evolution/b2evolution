@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -31,7 +31,7 @@ if( $action == 'edit' )
 { // Edit a locale:
 	$Form = new Form( NULL, 'loc_checkchanges', 'post', 'compact' );
 
-	$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,template' ) );
+	$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,template' ) );
 
 	$Form->begin_form( 'fform', T_('Locale settings').get_manual_link('locale-form') );
 

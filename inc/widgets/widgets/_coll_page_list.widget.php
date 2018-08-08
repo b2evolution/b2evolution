@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,8 @@ load_class( 'widgets/widgets/_coll_item_list.widget.php','coll_item_list_Widget'
  */
 class coll_page_list_Widget extends coll_item_list_Widget
 {
+	var $icon = 'list-ul';
+
 	/**
 	 * Constructor
 	 */
@@ -60,7 +62,7 @@ class coll_page_list_Widget extends coll_item_list_Widget
 		$r['title']['defaultvalue'] = T_('Pages');
 		$r['title_link']['no_edit'] = true;
 		$r['item_type_usage']['no_edit'] = true;
-		$r['featured']['no_edit'] = true;
+		$r['flagged']['no_edit'] = true;
 		$r['follow_mainlist']['no_edit'] = true;
 		$r['blog_ID']['no_edit'] = true;
 		$r['blog_ID']['defaultvalue'] = '-'; // Display the pages only of the current blog and exclude the aggregated blogs

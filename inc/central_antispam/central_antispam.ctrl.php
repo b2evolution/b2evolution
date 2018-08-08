@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author fplanque: Francois PLANQUE.
@@ -57,6 +57,84 @@ switch( $tab )
 
 switch( $action )
 {
+	case 'keyword_new':
+		// Check permission:
+		$current_User->check_perm( 'centralantispam', 'create', true );
+
+		if( ! isset( $edited_CaKeyword ) )
+		{ // We don't have a model to use, start with blank object:
+			$edited_CaKeyword = new CaKeyword();
+			$edited_CaKeyword->set( 'status', 'published' );
+		}
+		break;
+
+	case 'keyword_create':
+		$edited_CaKeyword = new CaKeyword();
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'cakeyword' );
+
+		// Check permission:
+		$current_User->check_perm( 'centralantispam', 'edit', true );
+
+		// load data from request
+		if( $edited_CaKeyword->load_from_Request() )
+		{	// We could load data from form without errors:
+
+			$DB->begin();
+
+			$duplicated_keyword_ID = $edited_CaKeyword->dbexists( 'cakw_keyword', $edited_CaKeyword->keyword );
+			if( $duplicated_keyword_ID && $duplicated_keyword_ID != $edited_CaKeyword->ID )
+			{ // We have a duplicate entry:
+				param_error( 'cakw_keyword',
+					sprintf( T_('This keyword already exists. Do you want to <a %s>edit the existing keyword</a>?'),
+						'href="?ctrl=central_antispam&amp;tab=keywords&amp;action=keyword_edit&amp;cakw_ID='.$duplicated_keyword_ID.'"' ) );
+				$action = 'keyword_new';
+			}
+			else
+			{
+				$edited_CaKeyword->set( 'lastreport_ts', $edited_CaKeyword->get( 'statuschange_ts' ) );
+				$edited_CaKeyword->dbinsert();
+
+				// Check if the Reporter/Source already exists in DB
+				$source_SQL = new SQL( 'Get source of current baseurl for central antispam' );
+				$source_SQL->SELECT( 'casrc_ID, casrc_status' );
+				$source_SQL->FROM( 'T_centralantispam__source' );
+				$source_SQL->WHERE( 'casrc_baseurl = '.$DB->quote( $baseurl ) );
+				$source_row = $DB->get_row( $source_SQL, ARRAY_A );
+				$source_ID = empty( $source_row ) ? 0 : intval( $source_row['casrc_ID'] );
+
+				if( empty( $source_ID ) )
+				{	// Create new reporter if it doesn't exist in DB yet:
+					$DB->query( 'INSERT INTO T_centralantispam__source
+							( casrc_baseurl, casrc_status ) VALUES
+							( '.$DB->quote( $baseurl ).', "trusted" )' );
+					$source_ID = $DB->insert_id;
+				}
+				elseif( $source_row['casrc_status'] != 'trusted' )
+				{	// Make current baseurl as trusted source:
+					$DB->query( 'UPDATE T_centralantispam__source
+						SET   casrc_status = "trusted"
+						WHERE casrc_ID = '.$source_ID );
+				}
+
+				// Insert reports to know from what host new keyword was added:
+				$DB->query( 'INSERT INTO T_centralantispam__report ( carpt_cakw_ID, carpt_casrc_ID, carpt_ts )
+						VALUES ( '.$edited_CaKeyword->ID.', '.$source_ID.', '.$DB->quote( $edited_CaKeyword->get( 'statuschange_ts' ) ).' )' );
+
+				$Messages->add( T_('New keyword added.'), 'success' );
+			}
+
+			$DB->commit();
+
+			if( ! param_errors_detected() )
+			{
+				header_redirect( $admin_url.'?ctrl=central_antispam&tab=keywords', 303 );
+				break;
+			}
+		}
+		break;
+
 	case 'keyword_save':
 		// Update keyword record:
 
@@ -69,9 +147,19 @@ switch( $action )
 		// load data from request
 		if( $edited_CaKeyword->load_from_Request() )
 		{	// We could load data from form without errors:
-			$edited_CaKeyword->dbupdate();
-			$Messages->add( T_('The keyword has been saved.'), 'success' );
-			header_redirect( $admin_url.'?ctrl=central_antispam&tab=keywords', 303 );
+			$duplicated_keyword_ID = $edited_CaKeyword->dbexists( 'cakw_keyword', $edited_CaKeyword->keyword );
+			if( $duplicated_keyword_ID && $duplicated_keyword_ID != $edited_CaKeyword->ID )
+			{ // We have a duplicate entry:
+				param_error( 'cakw_keyword',
+					sprintf( T_('This keyword already exists. Do you want to <a %s>edit the existing keyword</a>?'),
+						'href="?ctrl=central_antispam&amp;tab=keywords&amp;action=keyword_edit&amp;cakw_ID='.$duplicated_keyword_ID.'"' ) );
+			}
+			else
+			{
+				$edited_CaKeyword->dbupdate();
+				$Messages->add( T_('The keyword has been saved.'), 'success' );
+				header_redirect( $admin_url.'?ctrl=central_antispam&tab=keywords', 303 );
+			}
 		}
 		$action = 'keyword_edit';
 		break;
@@ -111,7 +199,7 @@ switch( $action )
 
 		if( empty( $import_keywords ) )
 		{	// No selected keywords to import:
-			$Messages->add( T_('Please select what keywords should be imported.'), 'error' );
+			$Messages->add( T_('Please select keywords to import.'), 'error' );
 			$action = 'import';
 			break;
 		}
@@ -137,7 +225,7 @@ switch( $action )
 		$keywords_SQL->FROM( 'T_antispam__keyword' );
 		$keywords_SQL->WHERE( 'askw_string NOT IN ( SELECT cakw_keyword FROM T_centralantispam__keyword )' );
 		$keywords_SQL->WHERE_and( 'askw_source IN( '.$DB->quote( $import_keywords ).' )' );
-		$new_keywords = $DB->get_results( $keywords_SQL->get(), ARRAY_A, $keywords_SQL->title );
+		$new_keywords = $DB->get_results( $keywords_SQL, ARRAY_A );
 
 		$keywords_imported_count = array();
 		if( count( $new_keywords ) )
@@ -148,7 +236,7 @@ switch( $action )
 			$source_SQL->SELECT( 'casrc_ID, casrc_status' );
 			$source_SQL->FROM( 'T_centralantispam__source' );
 			$source_SQL->WHERE( 'casrc_baseurl = '.$DB->quote( $baseurl ) );
-			$source_row = $DB->get_row( $source_SQL->get(), ARRAY_A, NULL, $source_SQL->title );
+			$source_row = $DB->get_row( $source_SQL, ARRAY_A );
 			$source_ID = empty( $source_row ) ? 0 : intval( $source_row['casrc_ID'] );
 
 			if( empty( $source_ID ) )
@@ -251,6 +339,10 @@ $AdminUI->disp_body_top();
 $AdminUI->disp_payload_begin();
 switch( $action )
 {
+	case 'keyword_new':
+		$AdminUI->disp_view( 'central_antispam/views/_keywords.form.php' );
+		break;
+
 	case 'keyword_edit':
 		$AdminUI->disp_view( 'central_antispam/views/_keywords.form.php' );
 		break;

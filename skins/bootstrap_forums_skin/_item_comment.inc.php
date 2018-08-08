@@ -6,12 +6,12 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
-global $comment_template_counter, $cat;
+global $cat;
 
 // Default params:
 $params = array_merge( array(
@@ -55,14 +55,8 @@ if( $current_cat == 0 )
 	$current_cat = $Item->main_cat_ID;
 }
 
-if( ! isset( $comment_template_counter ) )
-{	// Initialize global comment counter:
-	$comment_template_counter = isset( $params['comment_number'] ) ? $params['comment_number'] : 1;
-	if( $disp == 'single' || $disp == 'post' )
-	{	// Increase a number, because Item has 1st number:
-		$comment_template_counter++;
-	}
-}
+// Increase a number, because Item has 1st number:
+$comment_order_shift = ( $disp == 'single' || $disp == 'page' ) ? 1 : 0;
 
 /**
  * @var Comment
@@ -92,7 +86,7 @@ switch( $Comment->get( 'type' ) )
 {
 	// ON *DISP = COMMENTS* SHOW THE FOLLOWING TITLE FOR EACH COMMENT
 	case $disp == 'comments': // Display a comment:
-	?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="permalink">#<?php echo $comment_template_counter; ?></a> <?php
+	?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="permalink">#<?php echo $Comment->get_inlist_order() + $comment_order_shift; ?></a> <?php
 		if( empty($Comment->ID) )
 		{	// PREVIEW comment
 			echo '<span class="evo_comment_type_preview">'.T_('PREVIEW Comment from:').'</span> ';
@@ -126,7 +120,7 @@ switch( $Comment->get( 'type' ) )
 		if( $params['comment_post_display'] )
 		{
 			echo $params['comment_post_before'];
-			echo ' '.T_('in response to:').' ';
+			echo ' '.T_('in response to').': ';
 			$Comment->Item->title( array(
 					'link_type' => 'permalink',
 				) );
@@ -142,14 +136,13 @@ switch( $Comment->get( 'type' ) )
 	// ON *DISP = SINGLE* SHOW THE FOLLOWING TITLE FOR EACH COMMENT
 	case 'comment': // Display a comment:
 	case 'meta': // Display a meta comment:
-
 		if( $Comment->is_meta() )
 		{	// Meta comment:
-			?><span class="badge badge-info"><?php echo $comment_template_counter; ?></span> <?php
+			?><span class="badge badge-info"><?php echo $Comment->get_inlist_order(); ?></span> <?php
 		}
 		else
 		{	// Normal comment:
-			?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="permalink">#<?php echo $comment_template_counter; ?></a> <?php
+			?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="permalink">#<?php echo $Comment->get_inlist_order() + $comment_order_shift; ?></a> <?php
 		}
 		if( empty($Comment->ID) )
 		{	// PREVIEW comment
@@ -231,7 +224,8 @@ echo $params['comment_avatar_before'];
 $Comment->author2( array(
 					'link_text'  => 'only_avatar',
 					'thumb_size' => 'crop-top-80x80',
-					'after_user' => ''
+					'after_user' => '', // After registered user
+					'after'      => '', // After anonymous user
 				) );
 echo $params['comment_avatar_after'];
 
@@ -291,7 +285,7 @@ echo $params['comment_body_after'];
 	$Comment->vote_spam( '', '', '&amp;', true, true );
 
 	echo '<span class="pull-left">';
-		$comment_redirect_url = rawurlencode( $Comment->get_permanent_url() );
+		$comment_redirect_url = $Comment->get_permanent_url();
 		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ).' comment_edit_btn', '&amp;', true, $comment_redirect_url ); /* Link for editing */
 	echo '</span>';
 	echo '<div class="action_btn_group">';
@@ -304,7 +298,7 @@ echo $params['comment_body_after'];
 				'redirect_to' => $comment_redirect_url,
 				'detect_last' => !$delete_button_is_displayed,
 			) );
-		$Comment->delete_link( '', '', '#', T_('Delete this reply'), button_class( 'text' ), false, '&amp;', true, false, '#', rawurlencode( $commented_Item->get_permanent_url() ) ); /* Link to backoffice for deleting */
+		$Comment->delete_link( '', '', '#', T_('Delete this reply'), button_class( 'text' ), false, '&amp;', true, false, '#', $commented_Item->get_permanent_url() ); /* Link to backoffice for deleting */
 
 		echo '</span>';
 	echo '</div>';
@@ -312,13 +306,4 @@ echo $params['comment_body_after'];
 </div>
 
 <?php echo $params['comment_end'];
-
-if( $Comment->is_meta() )
-{	// Decrease a counter for meta comments:
-	$comment_template_counter--;
-}
-else
-{	// Increase a counter for normal comments:
-	$comment_template_counter++;
-}
 ?>

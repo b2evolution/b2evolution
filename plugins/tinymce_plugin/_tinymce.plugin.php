@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '6.7.9';
+	var $version = '7.0.0';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -364,7 +364,7 @@ class tinymce_plugin extends Plugin
 				<script type="text/javascript">
 					var quicksetting_switch = jQuery( '#<?php echo $params['quicksetting_item_id'];?>' );
 					jQuery( document ).on( 'wysiwyg_warning_changed', function( event, state ) {
-							quicksetting_switch.html( state ? '<?php echo $activate_warning_link;?>' : '<?php echo $deactivate_warning_link;?>' );
+							quicksetting_switch.html( state ? '<?php echo format_to_js( $activate_warning_link );?>' : '<?php echo format_to_js( $deactivate_warning_link ); ?>' );
 						} );
 				</script>
 				<?php
@@ -421,7 +421,7 @@ class tinymce_plugin extends Plugin
 									+ '</form>',
 									'500px', '', true,
 									'<span class="text-danger"><?php echo TS_('WARNING');?></span>',
-									[ '<?php echo TS_('OK');?>', 'btn-primary' ] );
+									[ '<?php echo TS_('OK');?>', 'btn-primary' ], true );
 							}
 							else
 							{
@@ -528,9 +528,7 @@ class tinymce_plugin extends Plugin
 						{
 							if( ! tinymce_plugin_displayed_error )
 							{
-								alert( '<?php echo str_replace("'", "\'",
-									sprintf( $this->T_('TinyMCE javascript could not be loaded. Check the "%s" plugin setting.'),
-									$this->T_('URL to TinyMCE') ) ) ?>' );
+								alert( '<?php echo sprintf( $this->TS_('TinyMCE javascript could not be loaded. Check the "%s" plugin setting.'), $this->TS_('URL to TinyMCE') ); ?>' );
 								tinymce_plugin_displayed_error = true;
 							}
 						}
@@ -677,7 +675,8 @@ class tinymce_plugin extends Plugin
 		global $UserSettings;
 		global $ReqHost;
 
-		$tmce_plugins_array = array( 'image', 'importcss', 'link', 'pagebreak', 'morebreak', 'textcolor', 'media', 'nonbreaking', 'charmap', 'fullscreen', 'table', 'searchreplace', 'autocomplete' );
+		$tmce_plugins_array = array( 'image', 'importcss', 'link', 'pagebreak', 'morebreak', 'textcolor', 'media',
+				'nonbreaking', 'charmap', 'fullscreen', 'table', 'searchreplace', 'autocomplete', 'lists', 'advlist' );
 
 		if( function_exists( 'enchant_broker_init' ) )
 		{ // Requires Enchant spelling library
@@ -825,6 +824,7 @@ class tinymce_plugin extends Plugin
 
 		// Configuration: -- http://wiki.moxiecode.com/index.php/TinyMCE:Configuration
 		$init_options = array();
+		$init_options[] = 'cache_suffix: "?v='.$this->version.'"';
 		$init_options[] = 'selector: "textarea#'.$content_id.'"';
 		if( $this->Settings->get( 'use_gzip_compressor' ) )
 		{	// Load script to use gzip compressor:
@@ -907,6 +907,12 @@ class tinymce_plugin extends Plugin
 
 		// remove_linebreaks : false,
 		// not documented:	auto_cleanup_word : true,
+
+		// Enable advanced tab for images:
+		$init_options[] = 'image_advtab : true';
+
+		// Disable branding:
+		$init_options[] = 'branding : false';
 
 		$init = implode( ",\n", $init_options );
 

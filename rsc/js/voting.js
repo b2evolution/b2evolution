@@ -17,15 +17,6 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 	// Update the colorbox width and position when new voting panel is loaded
 	function update_colorbox_position()
 	{
-		if( voting_layout.closest( '#colorbox' ).width() <= 480 )
-		{
-			jQuery( '#colorbox .vote_title_text' ).hide();
-		}
-		else
-		{
-			jQuery( '#colorbox .vote_title_text' ).show();
-		}
-
 		if( voting_layout.attr( 'id' ) == 'cboxVoting' )
 		{
 			var colorbox_width = jQuery( '#colorbox' ).width();
@@ -51,6 +42,7 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 			{
 				voting_layout.html( ajax_debug_clear( result ) );
 				update_colorbox_position();
+				votingAdjust();
 			}
 		} );
 	}
@@ -115,6 +107,7 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
 						update_colorbox_position();
 					}
 					votingFadeIn( voting_layout, voting_bg_color );
+					votingAdjust();
 				}
 			} );
 		}
@@ -154,7 +147,7 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
  *
  * @param object Layout
  * @param string Color
- * 
+ *
  */
 function votingFadeIn( obj, color )
 {
@@ -174,4 +167,33 @@ function votingFadeIn( obj, color )
 		}
 	}
 	obj.animate( { backgroundColor: color }, 200 );
+}
+
+
+/**
+ * Adjusts voting layout depending on wrapper width after voting.
+ */
+function votingAdjust()
+{
+	$prev = jQuery("#cboxPrevious");
+	$wrap = jQuery("#cboxWrapper");
+	$voting = jQuery("#cboxVoting");
+
+	var prevWidth = $prev.width();
+	var voting_wrapper = $('#colorbox .voting_wrapper');
+	var voting_buttons = $('#colorbox .voting_wrapper > .btn-group');
+	var voting_title = $('#colorbox .vote_title_panel');
+	var voting_others = $('#colorbox .vote_others');
+	var voting_separator = $('#colorbox .separator');
+
+	var w = $wrap.parent().width();
+
+	// reset
+	voting_wrapper.removeClass( 'compact' );
+
+	if( w <= 700 )
+	{ // voting button, title and others will not fit in 1 line
+		voting_wrapper.addClass( 'compact' );
+	}
+
 }

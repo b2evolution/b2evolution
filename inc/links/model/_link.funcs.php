@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -21,6 +21,7 @@ load_class( 'links/model/_linkuser.class.php', 'LinkUser' );
 load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
 load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
 load_class( 'links/model/_temporaryid.class.php', 'TemporaryID' );
+load_class( 'messaging/model/_message.class.php', 'Message' );
 
 /**
  * Get a link owner object from link_type and object ID
@@ -74,6 +75,7 @@ function & get_link_owner( $link_type, $object_ID )
 			switch( $TemporaryID->get( 'type' ) )
 			{
 				case 'message':
+					load_class( 'messaging/model/_message.class.php', 'Message' );
 					$LinkOwner = new LinkMessage( new Message(), $object_ID );
 					break;
 
@@ -194,7 +196,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 				array( 'target' => '_blank' ) );
 	}
 
-	$fieldset_title .= '<span class="floatright">&nbsp;'
+	$fieldset_title .= '<span class="floatright panel_heading_action_icons">&nbsp;'
 
 			.action_icon( T_('Refresh'), 'refresh', $LinkOwner->get_edit_url(),
 				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) )
@@ -456,22 +458,32 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 
 
 /**
- * Display link position edit action
+ * Display link position edit actions
  *
- * @param $row
+ * @param object Row of SQL query from T_links and T_files
+ * @return string
  */
 function display_link_position( & $row )
 {
-	global $LinkOwner;
-	global $current_File;
+	global $LinkOwner, $current_File;
 
-	$r = '<select id="display_position_'.$row->link_ID.'">'
-			.Form::get_select_options_string( $LinkOwner->get_positions( $row->file_ID ), $row->link_position, true)
-		.'</select>';
+	$r = '';
 
-	if( $current_File )
-	{ // Display icon to insert image|video into post inline
-		$type = $current_File->get_file_type();
+	// Get available link position for current link owner and file:
+	$available_positions = $LinkOwner->get_positions( $row->file_ID );
+
+	if( count( $available_positions ) > 1 )
+	{	// Display a selector for link positions only if owner can has several positions:
+		// (e.g. Message and EmailCampaign support only one position "Inline", so we don't need to display this selector there)
+		$r .= '<select id="display_position_'.$row->link_ID.'">'
+				.Form::get_select_options_string( $available_positions, $row->link_position, true)
+			.'</select>';
+	}
+
+	if( isset( $available_positions['inline'] ) )
+	{	// If link owner support inline position,
+		// Display icon to insert image, audio, video or file inline tag into content:
+		$type = isset( $row->file_type ) ? $row->file_type : 'file';
 
 		// valid file types: audio, video, image, other. See @link File::set_file_type()
 		switch( $type )
@@ -497,26 +509,30 @@ function display_link_position( & $row )
 						'onclick' => 'evo_link_insert_inline( \'image\', '.$row->link_ID.', \'\' )',
 						'style'   => 'cursor:default;'
 					) );
-		}
 
-		if( $type == 'image' )
-		{
 			$r .= ' '.get_icon( 'add__yellow', 'imgtag', array(
 						'title'   => T_('Insert [thumbnail:] tag into the post'),
 						'onclick' => 'evo_link_insert_inline( \'thumbnail\', '.$row->link_ID.', \'medium:left\' )',
 						'style'   => 'cursor:default;'
 					) );
 		}
-
-		if( $type == 'audio' || $type == 'video'  || $type == 'file' )
+		elseif( $type == 'audio' || $type == 'video' || $type == 'file' )
 		{
 			$r .= ' '.get_icon( 'add__blue', 'imgtag', array(
 						'title'   => sprintf( T_('Insert %s tag into the post'), '['.$type.':]' ),
 						'onclick' => 'evo_link_insert_inline( \''.$type.'\', '.$row->link_ID.', \'\' )',
 						'style'   => 'cursor:default;'
 					) );
-		}
 
+			if( $current_File->is_dir() )
+			{
+				$r .= ' '.get_icon( 'add__cyan', 'imgtag', array(
+							'title'   => sprintf( T_('Insert %s tag into the post'), '[folder:]' ),
+							'onclick' => 'evo_link_insert_inline( \'folder\', '.$row->link_ID.', \'\' )',
+							'style'   => 'cursor:default;'
+						) );
+			}
+		}
 	}
 
 	return str_replace( array( "\r", "\n" ), '', $r );
@@ -541,7 +557,7 @@ jQuery( document ).on( 'change', 'select[id^=display_position_]', {
 {
 	if( this.value == 'inline' && displayInlineReminder && !deferInlineReminder )
 	{ // Display inline position reminder
-		alert( '<?php echo T_('You can use the (+) icons to change the position to inline and automatically insert a short tag at the current cursor position.');?>' );
+		alert( '<?php echo TS_('You can use the (+) icons to change the position to inline and automatically insert a short tag at the current cursor position.');?>' );
 		displayInlineReminder = false;
 	}
 	evo_link_change_position( this, event.data.url, event.data.crumb );
@@ -583,7 +599,7 @@ jQuery( document ).ready( function()
 			var link_IDs = '';
 			jQuery( '#attachments_fieldset_table table tr' ).each( function()
 			{
-				var link_ID_cell = jQuery( this ).find( '.link_id_cell' );
+				var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
 				if( link_ID_cell.length > 0 )
 				{
 					link_IDs += link_ID_cell.html() + ',';
@@ -601,8 +617,18 @@ jQuery( document ).ready( function()
 					'links': link_IDs,
 					'crumb_link': '<?php echo get_crumb( 'link' ); ?>',
 				},
-				success: function()
+				success: function( data )
 				{
+					link_data = JSON.parse( ajax_debug_clear( data ) );
+					// Update data-order attributes
+					jQuery( '#attachments_fieldset_table table tr' ).each( function()
+					{
+						var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
+						if( link_ID_cell.length > 0 )
+						{
+							link_ID_cell.attr( 'data-order', link_data[link_ID_cell.html()] );
+						}
+					} );
 					evoFadeSuccess( $item );
 				}
 			} );
@@ -821,7 +847,7 @@ function link_vote( $link_ID, $user_ID, $vote_action, $checked = 1 )
 	$SQL->FROM( 'T_links__vote' );
 	$SQL->WHERE( 'lvot_link_ID = '.$DB->quote( $link_ID ) );
 	$SQL->WHERE_and( 'lvot_user_ID = '.$DB->quote( $user_ID ) );
-	$existing_vote = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
+	$existing_vote = $DB->get_row( $SQL );
 
 	// Save a voting results in DB:
 	if( empty( $existing_vote ) )
@@ -856,24 +882,33 @@ function link_vote( $link_ID, $user_ID, $vote_action, $checked = 1 )
 }
 
 
-function sort_links_by_filename( $a, $b )
+/**
+ * Callback for function usort() to sort link objects by their file names
+ *
+ * @param object First Link object
+ * @param object Second Link object
+ * @return integer -1 if first file name is less than second,
+ *                  1 if first file name is greater than second,
+ *                  0 if they are equal.
+ */
+function sort_links_by_filename( $a_Link, $b_Link )
 {
-	$a_File = $a->get_File();
-	$b_File = $b->get_File();
+	$a_File = $a_Link->get_File();
+	$b_File = $b_Link->get_File();
 
-	$a_type = $a_File->dir_or_file();
-	$b_type = $b_File->dir_or_file();
+	$a_type = $a_File->dir_or_file( 'directory', 'file' );
+	$b_type = $b_File->dir_or_file( 'directory', 'file' );
 
 	if( $a_type === $b_type )
-	{
+	{	// Compare only two equal types:
 		$r = strnatcmp( $a_File->_name, $b_File->_name );
 	}
 	elseif( $a_type == 'directory' )
-	{
+	{	// Directories must be before(on the top) files:
 		$r = -1;
 	}
 	else
-	{
+	{	// Files must be after(at the bottom) directories:
 		$r = 1;
 	}
 

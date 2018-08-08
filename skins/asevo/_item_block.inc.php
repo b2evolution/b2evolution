@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -105,6 +105,9 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			'block_title_end' => '</h3>',
 			// Params for skin file "_item_content.inc.php"
 			'widget_item_content_params' => $params,
+			// Template params for "Item Link" widget
+			'widget_item_link_before'    => '<p class="evo_post_link">',
+			'widget_item_link_after'     => '</p>',
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 	}

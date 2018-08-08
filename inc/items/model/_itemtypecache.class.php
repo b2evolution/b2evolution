@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -55,9 +55,9 @@ class ItemTypeCache extends DataObjectCache
 	 * post types, the current blog must grant the blog_page, blog_intro,
 	 * blog_podcast and blog_sidebar permission, respectively (see blog
 	 * user/group permissions).
-	 * 
+	 *
 	 * @deprecated
-	 * 
+	 *
 	 * @param integer The selected ID.
 	 * @param boolean Provide a choice for "none" with ID ''
 	 * @param string  Callback method name.
@@ -90,11 +90,12 @@ class ItemTypeCache extends DataObjectCache
 	{
 		return array(
 				T_('In content flow') => array(
-						'post' => T_('Post')
+						'post' => /* TRANS: noun */ T_('Post')
 					),
 				T_('Out of content flow') => array(
 						'page'    => T_('Page'),
 						'special' => T_('Special'),
+						'content-block' => T_('Content Block'),
 					),
 				T_('Intros') => array(
 						'intro-front' => T_('Intro-Front'),

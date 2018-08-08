@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class free_html_Widget extends ComponentWidget
 {
+	var $icon = 'code';
+
 	/**
 	 * Constructor
 	 */
@@ -77,7 +79,7 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Custom text/HTML of your choice.');
+		return T_('Display any HTML snippet of your choice.');
 	}
 
 
@@ -121,7 +123,7 @@ class free_html_Widget extends ComponentWidget
 		// Collection common links:
 		echo $this->disp_params['block_start'];
 
-		$this->disp_title( $this->disp_params['title'] );
+		$this->disp_title();
 
 		echo $this->disp_params['block_body_start'];
 

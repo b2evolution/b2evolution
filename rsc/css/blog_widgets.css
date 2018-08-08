@@ -11,19 +11,29 @@ margin:0 2em 0 0;
 	padding:0;
 	list-style:none;
 	border: 1px solid #9DB0BC;
+	display: table;
+	width: 100%;
 }
 
 .widget_container li{
 	margin:0;
 	padding: 3px 10px;
-	/* border-top:1px solid #ccc; */
+	display: table-row;
+}
+.widget_container li > span {
+	display: table-cell;
+	width: 1%;
+	white-space: nowrap;
+}
+.widget_container li > span.widget_title {
+	width: 100%;
+	white-space: normal;
 }
 
 .widget_state, .widget_checkbox {
 	border-right: 1px solid #9DB0BC;
 	margin-right: 10px;
 	padding-right: 10px;
-	/*float: left;*/
 }
 
 .widget_actions, span.widget_cache_status {
@@ -31,7 +41,10 @@ margin:0 2em 0 0;
 	margin-left:10px;
 	padding-left:10px;
 	cursor:default;
-	float:right;
+}
+#customizer_wrapper .widget_container li > span.widget_actions {
+	white-space: normal;
+	text-align: center;
 }
 td.widget_cache_status, span.widget_cache_status {
 	width: 40px;
@@ -71,11 +84,11 @@ color:#444;
 background:#ee8;
 }
 */
-.widget_container li.droppable-hover,
+.widget_container li.droppable-hover > span,
 #current_widgets div.ui-droppable.droppable-hover {
 	position: relative;
 }
-.widget_container li.droppable-hover:before,
+.widget_container li.droppable-hover > span:first-child::before,
 div.ui-droppable.droppable-hover:before {
 	content: "";
 	position: absolute;
@@ -87,15 +100,18 @@ div.ui-droppable.droppable-hover:before {
 	left: 0;
 	bottom: -7px;
 }
-.widget_container li.droppable-hover:after,
+.widget_container li.droppable-hover > span:after,
 div.ui-droppable.droppable-hover:after {
 	content: "";
 	position: absolute;
-	width: 100%;
+	width: 102%;
 	height: 2px;
 	background: #F00;
 	left: 0;
 	bottom: -2px;
+}
+div.ui-droppable.droppable-hover:after {
+	width: 100%;
 }
 
 .add_widget{

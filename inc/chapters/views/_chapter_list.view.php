@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -35,7 +35,7 @@ global $Session, $AdminUI;
 
 $result_fadeout = $Session->get( 'fadeout_array' );
 
-$current_default_cat_ID = $Blog->get_setting('default_cat_ID');
+$current_default_cat_ID = $Blog->get_default_cat_ID();
 
 $line_class = 'odd';
 
@@ -58,22 +58,29 @@ function cat_line( $Chapter, $level )
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 
+	// Check if current item's row should be highlighted:
+	$is_highlighted = ( param( 'highlight_id', 'integer', NULL ) == $Chapter->ID ) ||
+		( isset( $result_fadeout ) && in_array( $Chapter->ID, $result_fadeout ) );
+
 	// ID
 	$r = '<tr id="tr-'.$Chapter->ID.'"class="'.$line_class.
 					' chapter_parent_'.( $Chapter->parent_ID ? $Chapter->parent_ID : '0' ).
-					// Fadeout?
-					( isset($result_fadeout) && in_array( $Chapter->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">
+					( $is_highlighted ? ' evo_highlight' : '' ).'">
 					<td class="firstcol shrinkwrap">'.
 						$Chapter->ID.'
 				</td>';
 
 	// Default
-	if( $current_default_cat_ID == $Chapter->ID )
-	{
+	if( $Chapter->get( 'meta' ) )
+	{	// Deny to use meta chapter as default:
+		$makedef_icon = '';
+	}
+	elseif( $current_default_cat_ID == $Chapter->ID )
+	{	// This chapter is default currently:
 		$makedef_icon = get_icon( 'enabled', 'imgtag', array( 'title' => format_to_output( T_( 'This is the default category' ), 'htmlattr' ) ) );
 	}
 	else
-	{
+	{	// Display action icon to make this chapter default:
 		$makedef_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=make_default&amp;'.url_crumb('element') );
 		$makedef_title = format_to_output( T_('Click to make this the default category'), 'htmlattr' );
 		$makedef_icon = '<a href="'.$makedef_url.'" title="'.$makedef_title.'">'.get_icon( 'disabled', 'imgtag', array( 'title' => $makedef_title ) ).'</a>';
@@ -105,7 +112,7 @@ function cat_line( $Chapter, $level )
 	// Order
 	if( $Chapter->get_parent_subcat_ordering() == 'manual' )
 	{ // Manual ordering
-		$r .= '<td class="center cat_order_edit" rel="'.$Chapter->ID.'">'
+		$r .= '<td class="center jeditable_cell cat_order_edit" rel="'.$Chapter->ID.'">'
 						.'<a href="#">'.( $Chapter->get( 'order' ) === NULL ? '-' : $Chapter->dget( 'order' ) ).'</a>'
 					.'</td>';
 	}
@@ -117,21 +124,32 @@ function cat_line( $Chapter, $level )
 	if( $permission_to_edit )
 	{	// We have permission permission to edit, so display these columns:
 
-		if( $Chapter->meta )
-		{
+		// Meta
+		if( $current_default_cat_ID == $Chapter->ID )
+		{	// Deny to use default chapter as meta:
+			$makemeta_icon = false;
+		}
+		elseif( $Chapter->meta )
+		{	// This chapter is meta:
 			$makemeta_icon = 'enabled';
 			$makemeta_title = format_to_output( T_('Click to revert this from meta category'), 'htmlattr' );
 			$action = 'unset_meta';
 		}
 		else
-		{
+		{	// This chapter is NOT meta:
 			$makemeta_icon = 'disabled';
 			$makemeta_title = format_to_output( T_('Click to make this as meta category'), 'htmlattr' );
 			$action = 'set_meta';
 		}
-		// Meta
-		$makemeta_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action='.$action.'&amp;'.url_crumb('element') );
-		$r .= '<td class="center"><a href="'.$makemeta_url.'" title="'.$makemeta_title.'">'.get_icon( $makemeta_icon, 'imgtag', array( 'title' => $makemeta_title ) ).'</a></td>';
+		if( $makemeta_icon )
+		{	// Display action icon to change meta property of this chapter:
+			$makemeta_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action='.$action.'&amp;'.url_crumb('element') );
+			$r .= '<td class="center"><a href="'.$makemeta_url.'" title="'.$makemeta_title.'">'.get_icon( $makemeta_icon, 'imgtag', array( 'title' => $makemeta_title ) ).'</a></td>';
+		}
+		else
+		{
+			$r .= '<td></td>';
+		}
 
 		// Lock
 		if( $Chapter->lock )
@@ -169,8 +187,8 @@ function cat_line( $Chapter, $level )
 		{ // If moving cats between blogs is allowed:
 			$r .= action_icon( T_('Move to a different blog...'), 'file_move', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=move' ), T_('Move') );
 		}
-		$r .= action_icon( T_('New...'), 'new', regenerate_url( 'action,cat_ID,cat_parent_ID', 'cat_parent_ID='.$Chapter->ID.'&amp;action=new' ) )
-					.action_icon( T_('Delete...'), 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete&amp;'.url_crumb('element') ) );
+		$r .= action_icon( T_('New').'...', 'new', regenerate_url( 'action,cat_ID,cat_parent_ID', 'cat_parent_ID='.$Chapter->ID.'&amp;action=new' ) )
+					.action_icon( T_('Delete').'...', 'delete', regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=delete&amp;'.url_crumb('element') ) );
 	}
 	$r .= '</td>';
 	$r .=	'</tr>';

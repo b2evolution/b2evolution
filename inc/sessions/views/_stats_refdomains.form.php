@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -22,7 +22,7 @@ $creating = $action == 'domain_new';
 
 $Form = new Form( NULL, 'domain_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,domain_ID' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,domain_ID' ) );
 
 $Form->begin_form( 'fform', $creating ?  T_('New Domain') : T_('Domain') );
 

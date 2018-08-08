@@ -27,7 +27,7 @@ $creating = is_create_action( $action );
 $Form = new Form( NULL, 'userfieldgroup_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Delete this user field group!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('userfieldgroup') ) );
-$Form->global_icon( T_('Cancel editing!'), 'close', '?ctrl=userfields' );
+$Form->global_icon( T_('Cancel editing').'!', 'close', '?ctrl=userfields' );
 
 $Form->begin_form( 'fform', $creating ?  T_('New user field group') : T_('User field group') );
 

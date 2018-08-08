@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -160,7 +160,8 @@ $current_charset = $evo_charset;
 init_charsets( $current_charset );
 
 // Check minimum memory limit for successful using:
-if( system_check_memory_limit() < get_php_bytes_size( '48M' ) )
+$memory_limit = system_check_memory_limit();
+if( $memory_limit != -1 && $memory_limit < get_php_bytes_size( '48M' ) )
 { // Deny to use on server with small memory limit size:
 	$install_memory_limit_allow = false;
 	if( $action != 'localeinfo' )
@@ -194,7 +195,6 @@ switch( $action )
 {
 	case 'evoupgrade':
 	case 'auto_upgrade':
-	case 'svn_upgrade':
 	case 'newdb':
 	case 'cafelogupgrade':
 	case 'deletedb':
@@ -266,7 +266,7 @@ if( $config_is_done || $try_db_connect )
 		$DB->show_errors = true;    // From now on, show errors (they're helpful in case of errors!).
 
 		// Check MySQL version
-		$mysql_version = $DB->get_version();
+		$mysql_version = $DB->version;
 		foreach( $required_mysql_version as $key => $value )
 		{ // check required MySQL version for the whole application and for each module
 			if( version_compare( $mysql_version, $value, '<' ) )
@@ -321,7 +321,6 @@ switch( $action )
 {
 	case 'evoupgrade':
 	case 'auto_upgrade':
-	case 'svn_upgrade':
 		$title = T_('Upgrade from a previous version');
 		break;
 
@@ -372,6 +371,7 @@ $booststrap_install_form_params = array(
 		'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-4 col-sm-8">',
 		'buttonsend'     => "</div></div>\n\n",
 		'note_format'    => ' <span class="help-inline text-muted small">%s</span>',
+		'bottom_note_format' => ' <div><span class="help-inline text-muted small">%s</span></div>',
 		// - checkbox
 		'fieldstart_checkbox'    => '<div class="form-group" $ID$>'."\n",
 		'fieldend_checkbox'      => "</div>\n\n",
@@ -518,8 +518,9 @@ switch( $action )
 				'baseurl'        => $conf_baseurl,
 				'admin_email'    => $conf_admin_email,
 			);
-		if( ! update_basic_config_file( $basic_config_params ) )
+		if( ! update_basic_config_file( $basic_config_params ) && $action == 'conf' )
 		{ // Break here if some error on creating/updating basic config file
+			// and action has not been switched to display another page from case below:
 			break;
 		}
 		// ATTENTION: we continue here...
@@ -864,14 +865,22 @@ switch( $action )
 				<label>
 					<input type="checkbox" name="create_sample_organization" id="create_sample_organization" value="1" checked="checked" />
 					<?php echo T_('Create a sample organization');?>
-					</label>
+				</label>
 			</div>
 
 			<div class="checkbox" style="margin-top: 15px">
 				<label>
 					<input type="checkbox" name="create_demo_users" id="create_demo_users" value="1" checked="checked" />
 					<?php echo T_('Create demo users (in addition to the admin account)');?>
-					</label>
+				</label>
+				<div id="create_demo_users_options" style="margin:10px 0 0 20px">
+					<div class="checkbox" style="margin-left: 1em">
+						<label>
+							<input type="checkbox" name="create_sample_private_messages" id="create_sameple_private_messages" value="1" checked="checked" />
+							<?php echo T_('Create sample private messages between users');?>
+						</label>
+					</div>
+				</div>
 			</div>
 
 			<?php
@@ -920,6 +929,11 @@ switch( $action )
 			jQuery( '#create_sample_contents' ).click( function()
 			{
 				jQuery( '#create_sample_contents_options' ).toggle();
+			} );
+
+			jQuery( '#create_demo_users' ).click( function()
+			{
+				jQuery( '#create_demo_users_options' ).toggle();
 			} );
 		</script>
 		<?php
@@ -972,11 +986,13 @@ switch( $action )
 		$create_sample_contents = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
 		$create_sample_organization = param( 'create_sample_organization', 'boolean', false, true );
 		$create_demo_users = param( 'create_demo_users', 'boolean', false, true );
+		$create_demo_messages = param( 'create_sample_private_messages', 'boolean', false, true );
 
 		if( $create_sample_contents == 'all' )
 		{ // Override create sample organization and demo user setting
 			$create_sample_organization = true;
 			$create_demo_users = true;
+			$create_demo_messages = true;
 		}
 
 		if( $allow_install_test_features )
@@ -1068,7 +1084,6 @@ switch( $action )
 
 	case 'evoupgrade':
 	case 'auto_upgrade':
-	case 'svn_upgrade':
 		/*
 		 * -----------------------------------------------------------------------------------
 		 * EVO UPGRADE: Upgrade data from existing b2evolution database
@@ -1082,6 +1097,12 @@ switch( $action )
 		start_install_progress_bar( T_('Upgrade in progress'), get_upgrade_steps_count() );
 
 		echo get_install_format_text( '<h2>'.T_('Upgrading b2evolution...').'</h2>', 'h2' );
+
+		display_install_messages( sprintf( '<p>%s<ol><li>%s</li><li>%s</li><li>%s</li></ol></p>',
+				T_('IMPORTANT: if this upgrade procedure fails, do this:'),
+				T_('Make a screenshot showing as much context as possible, and save it in case you need support.'),
+				T_('Reload the page. The upgrade script is designed to recover from unexpected stops and may be able to pick up where it left off.'),
+				sprintf( T_('If needed, see <a %s>this man page &raquo;</a>' ), 'href="http://b2evolution.net/man/auto-upgrade-procedure"' ) ), 'info' );
 
 		if( $htaccess != 'skip' )
 		{
@@ -1115,7 +1136,7 @@ switch( $action )
 		if( $is_automated_upgrade && $upgrade_result !== 'need-fix' )
 		{
 			if( $upgrade_result === true )
-			{	// After successful auto_upgrade or svn_upgrade we must remove files/folder based on the upgrade_policy.conf
+			{	// After successful auto_upgrade we must remove files/folder based on the upgrade_policy.conf
 				remove_after_upgrade();
 			}
 			// Disable maintenance mode at the end of the upgrade script:
@@ -1304,10 +1325,7 @@ switch( $action )
 
 	default:
 		// This should not happen!
-		pre_dump($action);
 }
-
-// pre_dump($action);
 
 block_close();
 

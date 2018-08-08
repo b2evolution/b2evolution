@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -63,14 +63,14 @@ if( $recipient_User->check_perm( 'pm_notif', 'full' ) )
 
 	// Buttons:
 	echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
-	echo get_link_tag( $params['message_link'], T_( 'Read full conversation' ), 'div.buttons a+a.button_green' )."\n";
+	echo get_link_tag( $params['message_link'], T_( 'Read full conversation' ), 'div.buttons a+a.btn-primary' )."\n";
 	echo "</div>\n";
 }
 else
 {
 	// Buttons:
 	echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
-	echo get_link_tag( $params['message_link'], T_( 'Read full message' ), 'div.buttons a+a.button_green' )."\n";
+	echo get_link_tag( $params['message_link'], T_( 'Read full message' ), 'div.buttons a+a.btn-primary' )."\n";
 	echo "</div>\n";
 }
 

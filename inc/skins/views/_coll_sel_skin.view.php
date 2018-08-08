@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -34,7 +34,7 @@ if( $action == 'new-selskin' )
 	$skins = array();
 	while( ( $iterator_Skin = & $SkinCache->get_next() ) != NULL )
 	{
-		if( $iterator_Skin->type != 'normal' )
+		if( $iterator_Skin->type != 'normal' && $iterator_Skin->type != 'rwd' )
 		{	// This skin cannot be used here...
 			continue;
 		}

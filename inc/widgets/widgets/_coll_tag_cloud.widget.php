@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_tag_cloud_Widget extends ComponentWidget
 {
+	var $icon = 'tags';
+
 	/**
 	 * Constructor
 	 */
@@ -228,7 +230,8 @@ class coll_tag_cloud_Widget extends ComponentWidget
 
 			if( empty( $blog ) && empty( $blog_ids ) )
 			{	// Nothing to display
-				return;
+				$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there are no selected collections.' );
+				return false;
 			}
 			elseif( empty( $blog_ids ) )
 			{	// Use current Blog
@@ -258,7 +261,8 @@ class coll_tag_cloud_Widget extends ComponentWidget
 		$results = get_tags( $blog_ids, $this->disp_params['max_tags'], /* $this->disp_params['filter_list'] */ NULL, false, $filter_inskin_statuses, is_null( $destination_Blog ) );
 		if( empty( $results ) )
 		{	// No tags!
-			return;
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there are no tags.' );
+			return false;
 		}
 
 		$max_count = $results[0]->tag_count;
@@ -337,6 +341,26 @@ class coll_tag_cloud_Widget extends ComponentWidget
 	function tag_cloud_cmp( $a, $b )
 	{
 		return strcasecmp( $a->tag_name, $b->tag_name );
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			echo $this->disp_params['block_start'];
+			echo $this->disp_params['block_body_start'];
+			echo $this->disp_params['tag_cloud_start'];
+			echo $message;
+			echo $this->disp_params['tag_cloud_end'];
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
+		}
 	}
 }
 ?>

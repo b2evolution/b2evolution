@@ -21,7 +21,7 @@ class bootstrap_photoblog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.0';
+	var $version = '7.0.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -45,7 +45,7 @@ class bootstrap_photoblog_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -77,8 +77,8 @@ class bootstrap_photoblog_Skin extends Skin
 	{
 		$supported_kinds = array(
 				'main' => 'no',
-				'std' => 'no',		// Blog
-				'photo' => 'yes',
+				'std' => 'yes',		// Blog
+				'photo' => 'maybe',
 				'forum' => 'no',
 				'manual' => 'no',
 				'group' => 'no',  // Tracker
@@ -97,6 +97,40 @@ class bootstrap_photoblog_Skin extends Skin
 	function get_css_framework()
 	{
 		return 'bootstrap';
+	}
+
+
+	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		// Note: second param below is the ORDER
+		return array(
+				'page_top'                  => array( NT_('Page Top'), 2 ),
+				'header'                    => array( NT_('Header'), 10 ),
+				'menu'                      => array( NT_('Menu'), 15 ),
+				'front_page_main_area'      => array( NT_('Front Page Main Area'), 40 ),
+				'front_page_secondary_area' => array( NT_('Front Page Secondary Area'), 45 ),
+				'item_single_header'        => array( NT_('Item Single Header'), 50 ),
+				'item_single'               => array( NT_('Item Single'), 51 ),
+				'item_page'                 => array( NT_('Item Page'), 55 ),
+				'contact_page_main_area'    => array( NT_('Contact Page Main Area'), 60 ),
+				'footer'                    => array( NT_('Footer'), 100 ),
+				'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
+				'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
+				'404_page'                  => array( NT_('404 Page'), 130 ),
+				'login_required'            => array( NT_('Login Required'), 140 ),
+				'access_denied'             => array( NT_('Access Denied'), 150 ),
+				'help'                      => array( NT_('Help'), 160 ),
+				'register'                  => array( NT_('Register'), 170 ),
+				'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
+			);
 	}
 
 
@@ -130,7 +164,8 @@ class bootstrap_photoblog_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'allow_empty' => true,
@@ -159,31 +194,31 @@ class bootstrap_photoblog_Skin extends Skin
 					'label'  => T_('Page Color Settings')
 				),
 					'background_color' => array(
-						'label' => T_('Page background color'),
+						'label' => T_('Background color'),
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
 					),
 					'page_text_color' => array(
-						'label' => T_('Page text color'),
+						'label' => T_('Text color'),
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_link_color' => array(
-						'label' => T_('Page link color'),
+						'label' => T_('Link color'),
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'page_link_h_color' => array(
-						'label' => T_('Page link hover color'),
+						'label' => T_('Link hover color'),
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#23527c',
 						'type' => 'color',
 					),
 					'well_color' => array(
-						'label' => T_('Post background color'),
+						'label' => T_('Background color'),
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#f5f5f5',
 						'type' => 'color',
@@ -427,19 +462,24 @@ class bootstrap_photoblog_Skin extends Skin
 
 		// Page background color
 		if ( $background_color = $this->get_setting( 'background_color' ) ) {
-			$custom_css .= 'body, .nav li.active a { background-color: '.$background_color."; }\n";
+			$custom_css .= '#skin_wrapper, .nav li.active a { background-color: '.$background_color."; }\n";
 		}
 		// Page text color
 		if ( $page_text_color = $this->get_setting( 'page_text_color' ) ) {
-			$custom_css .= 'body { color: '.$page_text_color."; }\n";
+			$custom_css .= '#skin_wrapper { color: '.$page_text_color."; }\n";
 		}
 		// Page link color
 		if ( $page_link_color = $this->get_setting( 'page_link_color' ) ) {
-			$custom_css .= 'body a, .evo_comment_title a, .panel-title .evo_comment_type { color: '.$page_link_color."; }\n";
+			$custom_css .= 'a, .evo_comment_title a, .panel-title .evo_comment_type { color: '.$page_link_color."; }\n";
+			// Pagination links:
+			$custom_css .= '.pagination > li > a, .pagination > li > span { color: '.$page_link_color."; }\n";
+			$custom_css .= '.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus { background-color: '.$page_link_color.'; border-color: '.$page_link_color."; }\n";
 		}
 		// Page link hover color
 		if ( $page_link_h_color = $this->get_setting( 'page_link_h_color' ) ) {
-			$custom_css .= 'body a:hover, .panel-title .evo_comment_type:hover { color: '.$page_link_h_color."; }\n";
+			$custom_css .= 'a:hover, .panel-title .evo_comment_type:hover { color: '.$page_link_h_color."; }\n";
+			// Pagination links:
+			$custom_css .= '.pagination > li > a:hover, .pagination > li > span:hover, .pagination > li > a:focus, .pagination > li > span:focus { color: '.$page_link_h_color."; }\n";
 		}
 		// Posts background color
 		if ( $well_color = $this->get_setting( 'well_color' ) ) {
@@ -474,28 +514,6 @@ class bootstrap_photoblog_Skin extends Skin
 		</style>';
 		add_headline( $custom_css );
 		}
-	}
-
-
-	/**
-	 * Check if we can display a widget container
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function is_visible_container( $container_key )
-	{
-		global $Collection, $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
 
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -73,6 +73,46 @@ function bytesreadable( $bytes, $htmlabbr = true, $display_size_type = true )
 	// $r .= ' '.$precision;
 
 	return $r;
+}
+
+
+/**
+ * Converts readable bytes to bytes
+ *
+ * @param string readable bytes
+ * @return integer bytes
+ */
+function return_bytes( $val ) {
+    $val = trim( $val );
+		$re = '/([0-9]+)([a-zA-Z]*)/';
+		preg_match( $re, $val, $matches );
+
+		if( $matches )
+		{
+			$last = strtolower( $matches[2] );
+
+			$val = intval( $matches[1] );
+			switch( $last ) {
+				// The 'G' modifier is available since PHP 5.1.0
+				case 'tb':
+					$val *= 1024;
+				case 'g':
+				case 'gb':
+					$val *= 1024;
+				case 'm':
+				case 'mb':
+					$val *= 1024;
+				case 'k':
+				case 'kb':
+					$val *= 1024;
+			}
+
+    	return $val;
+		}
+		else
+		{
+			return false;
+		}
 }
 
 
@@ -1073,6 +1113,52 @@ function copy_r( $source, $dest, $new_folder_name = NULL, $exclude_dirs = array(
 
 
 /**
+ * Move files from one folder to another recursively
+ *
+ * @param string Source folder path
+ * @param string Destination folder path
+ * @return boolean TRUE on success, FALSE when no permission
+ */
+function move_files_r( $source_dir_path, $dest_dir_path )
+{
+	$result = false;
+
+	if( ! ( $dir_handle = @opendir( $source_dir_path ) ) )
+	{	// Unable to open dir:
+		return $result;
+	}
+
+	$source_dir_path = rtrim( $source_dir_path, '/' );
+	$dest_dir_path = rtrim( $dest_dir_path, '/' );
+
+	while( $file = readdir( $dir_handle ) )
+	{
+		if( $file == '.' || $file == '..' )
+		{	// Skip reserved folders:
+			continue;
+		}
+		if( is_dir( $source_dir_path.'/'.$file ) )
+		{	// Copy a folder recursively:
+			$result = copy_r( $source_dir_path.'/'.$file, $dest_dir_path ) && $result;
+			// Remove a folder recursively:
+			$result = rmdir_r( $source_dir_path.'/'.$file ) && $result;
+		}
+		else
+		{	// Copy a file:
+			$result = @copy( $source_dir_path.'/'.$file, $dest_dir_path.'/'.$file ) && $result;
+			// Remove a file:
+			$result = @unlink( $source_dir_path.'/'.$file ) && $result;
+		}
+	}
+
+	// Close the folder handler:
+	$result = closedir( $dir_handle ) && $result;
+
+	return $result;
+}
+
+
+/**
  * Is the given path absolute (non-relative)?
  *
  * @return boolean
@@ -1093,29 +1179,6 @@ function is_absolute_pathname($path)
 	{ // unix
 		return ( $path[0] == '/' );
 	}
-}
-
-
-/**
- * Define sys_get_temp_dir, if not available (PHP 5 >= 5.2.1)
- * @link http://us2.php.net/manual/en/function.sys-get-temp-dir.php#93390
- * @return string NULL on failure
- */
-if ( !function_exists('sys_get_temp_dir'))
-{
-  function sys_get_temp_dir()
-	{
-    if (!empty($_ENV['TMP'])) { return realpath($_ENV['TMP']); }
-    if (!empty($_ENV['TMPDIR'])) { return realpath( $_ENV['TMPDIR']); }
-    if (!empty($_ENV['TEMP'])) { return realpath( $_ENV['TEMP']); }
-    $tempfile=tempnam(__FILE__,'');
-    if (file_exists($tempfile))
-		{
-      unlink($tempfile);
-      return realpath(dirname($tempfile));
-    }
-    return null;
-  }
 }
 
 
@@ -1666,38 +1729,14 @@ function prepare_uploaded_image( $File, $mimetype )
 	$resized_imh = null;
 	if( $do_resize )
 	{ // Resize image
-		list( $err, $src_imh ) = load_image( $File->get_full_path(), $mimetype );
-		if( empty( $err ) )
-		{
-			list( $err, $resized_imh ) = generate_thumb( $src_imh, 'fit', $thumb_width, $thumb_height );
-		}
-
-		if( empty( $err ) )
-		{ // Image was rezised successfully
-			$Messages->add( sprintf( T_( '%s was resized to %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', imagesx( $resized_imh ), imagesy( $resized_imh ) ), 'success' );
-		}
-		else
-		{ // Image was not rezised
-			$Messages->add( sprintf( T_( '%s could not be resized to target resolution of %dx%d pixels.' ), '<b>'.$File->get('name').'</b>', $thumb_width, $thumb_height ), 'error' );
-			// Error exists, exit here
-			return;
-		}
+		resize_image( $File, $thumb_width, $thumb_height, $mimetype, $thumb_quality );
 	}
-
-	if( $mimetype == 'image/jpeg' )
-	{	// JPEG, do autorotate if EXIF Orientation tag is defined
-		$save_image = !$do_resize; // If image was be resized, we should save file only in the end of this function
-		exif_orientation( $File->get_full_path(), $resized_imh, $save_image );
-	}
-
-	if( !$resized_imh )
-	{	// Image resource is incorrect
-		return;
-	}
-
-	if( $do_resize && empty( $err ) )
-	{	// Save resized image ( and also rotated image if this operation was done )
-		save_image( $resized_imh, $File->get_full_path(), $mimetype, $thumb_quality );
+	else
+	{
+		if( $mimetype == 'image/jpeg' )
+		{	// JPEG, do autorotate if EXIF Orientation tag is defined
+			exif_orientation( $File->get_full_path(), $resized_imh, true );
+		}
 	}
 }
 
@@ -1710,10 +1749,31 @@ function prepare_uploaded_image( $File, $mimetype )
 function report_user_upload( $File )
 {
 	global $current_User;
+
 	load_funcs( 'files/model/_file.funcs.php' );
 
-	syslog_insert( sprintf( 'User %s has uploaded the file %s -- Size: %s',
-			$current_User->login, '[['.$File->get_full_path().']]', bytesreadable( $File->get_size(), false ) ), 'info', 'file', $File->ID );
+	syslog_insert( sprintf( '%s has uploaded the file %s -- Size: %s',
+		( is_logged_in() ? 'User #'.$current_User->ID.'([['.$current_User->login.']])' : 'Anonymous user' ),
+		'[['.$File->get_full_path().']]', bytesreadable( $File->get_size(), false ) ), 'info', 'file', $File->ID );
+}
+
+
+/**
+ * Handles warnings and errors when attempting to read EXIF data
+ */
+function exif_read_data_error_handler( $errno, $errstr )
+{
+	global $Messages;
+
+	switch( $errno )
+	{
+		case E_WARNING:
+			$Messages->add( T_('Unable to read EXIF data'), 'warning' );
+			break;
+
+		default:
+			$Messages->add( T_('Unknown error').': <code>'.$errstr.'</code>', 'error' );
+	}
 }
 
 
@@ -1745,10 +1805,12 @@ function exif_orientation( $file_name, & $imh/* = null*/, $save_image = false )
 		return;
 	}
 
+	set_error_handler( 'exif_read_data_error_handler' );
 	if( ( $exif_data = exif_read_data( $file_name ) ) === false )
 	{ // Could not read Exif data
 		return;
 	}
+	restore_error_handler();
 
 	if( !( isset( $exif_data['Orientation'] ) && in_array( $exif_data['Orientation'], array( 3, 6, 8 ) ) ) )
 	{ // Exif Orientation tag is not defined OR we don't interested in current value
@@ -1812,6 +1874,9 @@ function check_file_exists( $fm_FileRoot, $path, $newName, $image_info = NULL )
 	// Get File object for requested target location:
 	$FileCache = & get_FileCache();
 	$newFile = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash($path).$newName, true );
+
+	// Unset this flag to check for each file even if it is the same from cache:
+	unset( $newFile->_exists );
 
 	$num_ext = 0;
 	$oldName = $newName;
@@ -2216,7 +2281,7 @@ function create_htaccess_deny( $dir )
  */
 function display_dragdrop_upload_button( $params = array() )
 {
-	global $blog, $Settings, $current_User, $b2evo_icons_type;
+	global $blog, $Settings, $current_User, $b2evo_icons_type, $DB;
 
 	$params = array_merge( array(
 			'before'           => '',
@@ -2225,18 +2290,62 @@ function display_dragdrop_upload_button( $params = array() )
 			'path'             => '', // Subpath for the file/folder
 			'listElement'      => 'null',
 			'list_style'       => 'list',  // 'list' or 'table'
-			'template_button'  => '<div class="qq-uploader">'
-					.'<div class="qq-upload-drop-area"><span>'.TS_('Drop files here to upload').'</span></div>'
-					.'<div class="qq-upload-button">#button_text#</div>'
-					.'<ul class="qq-upload-list"></ul>'
-				.'</div>',
-			'template_filerow' => '<li>'
-					.'<span class="qq-upload-file"></span>'
-					.'<span class="qq-upload-spinner"></span>'
-					.'<span class="qq-upload-size"></span>'
-					.'<a class="qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
-					.'<span class="qq-upload-failed-text">'.TS_('Failed').'</span>'
-				.'</li>',
+			'template'         => '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="'.TS_('Drop files here').'">
+																<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
+																		<div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-total-progress-bar-selector qq-progress-bar qq-total-progress-bar"></div>
+																</div>
+																<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>
+																		<span class="qq-upload-drop-area-text-selector"></span>
+																</div>
+																<div class="qq-upload-button-selector qq-upload-button">
+																		<div>'.TS_('Upload a file').'</div>
+																</div>
+																<span class="qq-drop-processing-selector qq-drop-processing">
+																		<span>'.TS_('Processing dropped files...').'</span>
+																		<span class="qq-drop-processing-spinner-selector qq-drop-processing-spinner"></span>
+																</span>
+																<ul class="qq-upload-list-selector qq-upload-list" aria-live="polite" aria-relevant="additions removals">
+																		<li>
+																				<div class="qq-progress-bar-container-selector">
+																						<div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
+																				</div>
+																				<span class="qq-upload-spinner-selector qq-upload-spinner"></span>
+																				<img class="qq-thumbnail-selector" qq-max-size="100" qq-server-scale>
+																				<span class="qq-upload-file-selector qq-upload-file"></span>
+																				<span class="qq-edit-filename-icon-selector qq-edit-filename-icon" aria-label="Edit filename"></span>
+																				<input class="qq-edit-filename-selector qq-edit-filename" tabindex="0" type="text">
+																				<span class="qq-upload-size-selector qq-upload-size"></span>
+																				<button type="button" class="qq-btn qq-upload-cancel-selector qq-upload-cancel">'.TS_('Cancel').'</button>
+																				<button type="button" class="qq-btn qq-upload-retry-selector qq-upload-retry">'.TS_('Retry').'</button>
+																				<button type="button" class="qq-btn qq-upload-delete-selector qq-upload-delete">'.TS_('Delete').'</button>
+																				<span role="status" class="qq-upload-status-text-selector qq-upload-status-text"></span>
+																		</li>
+																</ul>
+
+																<dialog class="qq-alert-dialog-selector">
+																		<div class="qq-dialog-message-selector"></div>
+																		<div class="qq-dialog-buttons">
+																				<button type="button" class="qq-cancel-button-selector">'.TS_('Close').'</button>
+																		</div>
+																</dialog>
+
+																<dialog class="qq-confirm-dialog-selector">
+																		<div class="qq-dialog-message-selector"></div>
+																		<div class="qq-dialog-buttons">
+																				<button type="button" class="qq-cancel-button-selector">'.TS_('No').'</button>
+																				<button type="button" class="qq-ok-button-selector">'.TS_('Yes').'</button>
+																		</div>
+																</dialog>
+
+																<dialog class="qq-prompt-dialog-selector">
+																		<div class="qq-dialog-message-selector"></div>
+																		<input type="text">
+																		<div class="qq-dialog-buttons">
+																				<button type="button" class="qq-cancel-button-selector">'.TS_('Cancel').'</button>
+																				<button type="button" class="qq-ok-button-selector">'.TS_('Ok').'</button>
+																		</div>
+																</dialog>
+														</div>',
 			'display_support_msg'    => true, // Display info under button about that current supports drag&drop
 			'additional_dropzone'    => '', // jQuery selector of additional drop zone
 			'filename_before'        => '', // Append this text before file name on success uploading of new file,
@@ -2249,6 +2358,7 @@ function display_dragdrop_upload_button( $params = array() )
 			'conflict_file_format'   => 'simple', // 'simple' - file name text, 'full_path_link' - a link with text as full file path
 			'resize_frame'           => false, // Resize frame on upload new image
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
+			'noresults'              => '',
 			'filename_select'        => '', // Append this text before file name on success uploading of new file
 		), $params );
 
@@ -2271,6 +2381,25 @@ function display_dragdrop_upload_button( $params = array() )
 	{	// Use this field to know a form is submitted with temporary link owner(when object is creating and still doesn't exist in DB):
 		echo '<input type="hidden" name="temp_link_owner_ID" value="'.$params['LinkOwner']->get_ID().'" />';
 	}
+
+	// Get list of allowed filetype extensions
+	if( is_logged_in( false ) )
+	{
+		$condition = ( $current_User->check_perm( 'files', 'all' ) ) ? '' : 'ftyp_allowed <> "admin"';
+	}
+	else
+	{
+		$condition = 'ftyp_allowed = "any"';
+	}
+
+	if( !empty( $condition ) )
+	{
+		$condition = ' WHERE '.$condition;
+	}
+	$allowed_extensions = $DB->get_col( 'SELECT ftyp_extensions FROM T_filetypes'.$condition );
+	$allowed_extensions = implode( ' ', $allowed_extensions );
+	$allowed_extensions = explode( ' ', $allowed_extensions );
+	sort( $allowed_extensions );
 
 	?>
 	<div id="file-uploader" style="width:100%">
@@ -2310,10 +2439,18 @@ function display_dragdrop_upload_button( $params = array() )
 
 		jQuery( document ).ready( function()
 		{
-			uploader = new qq.FileUploader(
+			uploader = new qq.FineUploader(
 			{
+				request: {
+					endpoint: url,
+					params: { root_and_path: root_and_path }
+				},
+				template: document.getElementById( 'qq-template'),
 				element: document.getElementById( 'file-uploader' ),
 				listElement: <?php echo $params['listElement']; ?>,
+				dragAndDrop: {
+					extraDropzones: <?php echo $params['additional_dropzone'];?>
+				},
 				list_style: '<?php echo $params['list_style']; ?>',
 				additional_dropzone: '<?php echo $params['additional_dropzone']; ?>',
 				action: url,
@@ -2326,6 +2463,13 @@ function display_dragdrop_upload_button( $params = array() )
 					emptyError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} is empty. Please select non-empty files.'); ?>',
 					onLeave: '<?php echo TS_('Files are currently being uploaded. If you leave this page now, the upload will be cancelled.'); ?>'
 				},
+				text: {
+					formatProgress: '<?php echo /* TRANS: strings in {] must NOT be translated */ TS_('Uploading {total_size}...');?>',
+				},
+				validation: {
+					sizeLimit: <?php echo min( array( return_bytes( ini_get('post_max_size') ), return_bytes( ini_get('upload_max_filesize') ), $Settings->get( 'upload_maxkb') * 1024 ) );?>,
+					allowedExtensions: <?php echo json_encode( $allowed_extensions );?>
+				},
 				onSubmit: function( id, fileName )
 				{
 					var noresults_row = jQuery( 'tr.noresults' );
@@ -2335,171 +2479,252 @@ function display_dragdrop_upload_button( $params = array() )
 						if( $params['table_headers'] != '' )
 						{ // Append table headers if they are defined
 						?>
-						noresults_row.parent().parent().prepend( '<?php echo str_replace( array( "'", "\n" ), array( "\'", '' ), $params['table_headers'] ); ?>' );
+						noresults_row.parent().parent().prepend( '<?php echo format_to_js( $params['table_headers'] ); ?>' );
 						<?php } ?>
 						noresults_row.remove();
 					}
 				},
-				onComplete: function( id, fileName, responseJSON )
-				{
-					if( responseJSON.success != undefined )
+				callbacks: {
+					onSubmit: function( id, fileName )
 					{
-						if( responseJSON.success.status == 'fatal' )
+						var noresults_row = jQuery( 'tr.noresults' );
+						if( noresults_row.length )
+						{ // Add table headers and remove "No results" row
+							<?php
+							if( $params['table_headers'] != '' )
+							{ // Append table headers if they are defined
+							?>
+							noresults_row.parent().parent().prepend( '<?php echo str_replace( array( "'", "\n" ), array( "\'", '' ), $params['table_headers'] ); ?>' );
+							<?php } ?>
+							noresults_row.remove();
+						}
+
+						setTimeout( function()
+							{
+								evo_link_fix_wrapper_height();
+								<?php
+								if( $params['resize_frame'] )
+								{ // Resize frame after upload new image
+								?>
+								update_iframe_height();
+								jQuery( 'img' ).on( 'load', function() { update_iframe_height(); } );
+								<?php } ?>
+							}, 10 );
+					},
+					onProgress: function( id, fileName, uploadedBytes, totalBytes )
+					{
+						var progressbar = jQuery( 'tr[qq-file-id=' + id + '] .progress-bar' );
+						var percentCompleted = Math.round( uploadedBytes / totalBytes * 100 ) + '%';
+
+						//progressbar.style.width = percentCompleted;
+						progressbar.get(0).style.width = percentCompleted; // This should fix jQuery's .css() issue with some browsers
+
+						progressbar.text( percentCompleted );
+						<?php
+						if( $params['resize_frame'] )
 						{
-							var text = responseJSON.success.text;
+							echo 'update_iframe_height();';
+						}
+						?>
+					},
+					onComplete: function( id, fileName, responseJSON )
+					{
+						if( responseJSON != undefined )
+						{
+							var text;
+							if( responseJSON.data.text )
+							{
+								if( responseJSON.specialchars == 1 )
+								{
+									text = htmlspecialchars_decode( responseJSON.data.text );
+								}
+								else
+								{
+									text = responseJSON.data.text;
+								}
+							}
+							text = base64_decode( text );
+
+							<?php
+							if( $params['list_style'] == 'list' )
+							{ // List view
+							?>
+							if( responseJSON.data.status != undefined && responseJSON.data.status == 'rename' )
+							{
+								jQuery( '#saveBtn' ).show();
+							}
+							<?php } ?>
+						}
+						<?php
+						if( $params['list_style'] == 'table' )
+						{ // Table view
+						?>
+						var this_row = jQuery( 'tr[qq-file-id=' + id + ']' );
+
+						if( responseJSON == undefined || responseJSON.data == undefined || responseJSON.data.status == 'error' || responseJSON.data.status == 'fatal' )
+						{ // Failed
+							this_row.find( '.qq-upload-status' ).html( '<span class="red"><?php echo TS_('Upload ERROR'); ?></span>' );
+							if( responseJSON.error )
+							{
+								text = responseJSON.error;
+							}
+							else if( typeof( text ) == 'undefined' || text == '' )
+							{ // Message for unknown error
+								text = '<?php echo TS_('Server dropped the connection.'); ?>';
+							}
+							this_row.find( '.qq-upload-file-selector' ).append( ' <span class="result_error">' + text + '</span>' );
+							this_row.find( '.qq-upload-image-selector, td.size' ).prepend( '<?php echo get_icon( 'warning_yellow' ); ?>' );
 						}
 						else
-						{
-							var text = base64_decode( responseJSON.success.text );
-							if( responseJSON.success.specialchars == 1 )
-							{
-								text = htmlspecialchars_decode( text );
-							}
-						}
+						{ // Success/Conflict
+							var table_view = typeof( responseJSON.data.link_ID ) != 'undefined' ? 'link' : 'file';
 
+							var filename_before = '<?php echo str_replace( "'", "\'", $params['filename_before'] ); ?>';
+							if( filename_before != '' )
+							{
+								filename_before = filename_before.replace( '$file_path$', responseJSON.data.path );
+							}
+
+							var warning = '';
+							if( responseJSON.data.warning != '' )
+							{
+								warning = '<div class="orange">' + responseJSON.data.warning + '</div>';
+							}
+							// File name or url to view file
+							var file_name = ( typeof( responseJSON.data.link_url ) != 'undefined' ) ? responseJSON.data.link_url : responseJSON.data.newname;
+
+							this_row.find( '.qq-upload-checkbox' ).html( responseJSON.data.checkbox );
+
+							if( responseJSON.data.status == 'success' )
+							{ // Success upload
+								<?php
+								if( $params['display_status_success'] )
+								{ // Display this message only if it is enabled
+								?>
+								this_row.find( '.qq-upload-status-text-selector' ).html( '<span class="green"><?php echo TS_('Upload OK'); ?></span>' );
+								<?php } else { ?>
+								this_row.find( '.qq-upload-status-text-selector' ).html( '' );
+								<?php } ?>
+								this_row.find( '.qq-upload-image' ).html( text );
+								this_row.find( '.qq-upload-file-selector' ).html( filename_before
+									+ '<input type="hidden" value="' + responseJSON.data.newpath + '" />'
+									+ '<span class="fname">' + file_name + '</span>' + warning );
+								this_row.find( '.qq-upload-size-selector' ).html( responseJSON.data.filesize );
+
+								if( responseJSON.data.filetype )
+								{
+									this_row.find( '.qq-upload-file-type' ).html( responseJSON.data.filetype );
+								}
+
+								if( responseJSON.data.creator )
+								{
+									this_row.find( '.qq-upload-file-creator' ).html( responseJSON.data.creator );
+								}
+
+								if( responseJSON.data.downloads != null )
+								{
+									this_row.find( '.qq-upload-downloads' ).html( responseJSON.data.downloads );
+								}
+
+								if( responseJSON.data.owner )
+								{
+									this_row.find( '.fsowner' ).html( responseJSON.data.owner );
+								}
+
+								if( responseJSON.data.group )
+								{
+									this_row.find( '.fsgroup' ).html( responseJSON.data.group );
+								}
+							}
+							else if( responseJSON.data.status == 'rename' )
+							{ // Conflict on upload
+								<?php
+								$status_conflict_message = '<span class="orange">'.TS_('Upload Conflict').'</span>';
+								if( $params['status_conflict_place'] == 'default' )
+								{ // Default place for a conflict message
+								?>
+								this_row.find( '.qq-upload-status-text-selector' ).html( '<?php echo $status_conflict_message; ?>' );
+								<?php } else { ?>
+								this_row.find( '.qq-upload-status-text-selector' ).html( '' );
+								<?php } ?>
+								this_row.find( '.qq-upload-image-selector' ).append( htmlspecialchars_decode( responseJSON.data.file ) );
+								this_row.find( '.qq-upload-file-selector' ).html( filename_before
+									+ '<input type="hidden" value="' + responseJSON.data.newpath + '" />'
+									+ '<span class="fname">' + file_name + '</span>'
+									<?php echo ( $params['status_conflict_place'] == 'before_button' ) ? "+ ' - ".$status_conflict_message."'" : ''; ?>
+									+ ' - <a href="#" '
+									+ 'class="<?php echo button_class( 'text' ); ?> roundbutton_text_noicon qq-conflict-replace" '
+									+ 'old="' + responseJSON.data.oldname + '" '
+									+ 'new="' + responseJSON.data.newname + '">'
+									+ '<div><?php echo TS_('Use this new file to replace the old file'); ?></div>'
+									+ '<div style="display:none"><?php echo TS_('Revert'); ?></div>'
+									+ '</a>'
+									+ warning );
+								var old_file_obj = jQuery( 'input[type=hidden][value="' + responseJSON.data.oldpath + '"]' );
+								if( old_file_obj.length > 0 )
+								{
+									old_file_obj.parent().append( ' <span class="orange"><?php echo TS_('(Old File)'); ?></span>' );
+								}
+							}
+							if( table_view == 'link' )
+							{ // Update the cells for link view, because these data exist in response
+								this_row.find( '.qq-upload-link-id' ).html( '<span data-order="' + responseJSON.data.link_order
+										+ '">' + responseJSON.data.link_ID + '</span>' );
+								this_row.find( '.qq-upload-image' ).html( responseJSON.data.link_preview );
+								this_row.find( '.qq-upload-link-actions' ).prepend( responseJSON.data.link_actions );
+								if( typeof( responseJSON.data.link_position ) != 'undefined' )
+								{
+									this_row.find( '.qq-upload-link-position' ).html( responseJSON.data.link_position );
+								}
+								init_colorbox( this_row.find( '.qq-upload-image a[rel^="lightbox"]' ) );
+							}
+							evo_link_sort_list();
+						}
 						<?php
-						if( $params['list_style'] == 'list' )
-						{ // List view
+						}
+						else
+						{ // Simple list
 						?>
-						if( responseJSON.success.status != undefined && responseJSON.success.status == 'rename' )
-						{
-							jQuery('#saveBtn').show();
+							jQuery( uploader.getItemByFileId( id ) ).append( text );
+							if( responseJSON.data == undefined && responseJSON != '' )
+							{ // Display the fatal errors
+								jQuery( uploader.getItemByFileId( id ) ).append( responseJSON );
+							}
+						<?php
 						}
+
+						if( $params['resize_frame'] )
+						{ // Resize frame after upload new image
+						?>
+						update_iframe_height();
+						jQuery( 'img' ).on( 'load', function() { update_iframe_height(); } );
 						<?php } ?>
-					}
-
-					<?php
-					if( $params['list_style'] == 'table' )
-					{ // Table view
-					?>
-					var this_row = jQuery( 'tr[rel=file_upload_' + id + ']' );
-
-					if( responseJSON.success == undefined || responseJSON.success.status == 'error' || responseJSON.success.status == 'fatal' )
-					{ // Failed
-						this_row.find( '.qq-upload-status' ).html( '<span class="red"><?php echo TS_('Upload ERROR'); ?></span>' );
-						if( typeof( text ) == 'undefined' || text == '' )
-						{ // Message for unknown error
-							text = '<?php echo TS_('Server dropped the connection.'); ?>';
-						}
-						this_row.find( '.qq-upload-file' ).append( ' <span class="result_error">' + text + '</span>' );
-						this_row.find( '.qq-upload-image, td.size' ).prepend( '<?php echo get_icon( 'warning_yellow' ); ?>' );
-					}
-					else
-					{ // Success/Conflict
-						var table_view = typeof( responseJSON.success.link_ID ) != 'undefined' ? 'link' : 'file';
-
-						var filename_before = '<?php echo str_replace( "'", "\'", $params['filename_before'] ); ?>';
-						var filename_select = '<?php echo str_replace( "'", "\'", $params['filename_select'] ); ?>';
-						if( filename_before != '' )
+					},
+					onCancel: function( id, fileName )
+					{
+						<?php
+						if( $params['list_style'] == 'table' )
 						{
-							filename_before = filename_before.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
+						?>
+							setTimeout( function()
+							{ // allow some time to remove cancelled row first before determining the number of rows
+								var container = jQuery( '#filelist_tbody' );
+								var rows = container.find( 'tr' );
+								if( !rows.length )
+								{
+									var noresult = '<?php echo preg_replace( "/\s+/", " ", $params['noresults'] );?>';
+									container.append( noresult );
+								}
+							}, 10 );
+						<?php
 						}
-
-						if( filename_select != '' )
-						{
-							if( responseJSON.success.filetype == 'image' )
-							{
-								filename_select = filename_select.replace( '$file_path$', decodeURIComponent( responseJSON.success.path ) );
-							}
-							else
-							{
-								filename_select = '';
-							}
-						}
-
-						var warning = '';
-						if( responseJSON.success.warning != '' )
-						{
-							warning = '<div class="orange">' + responseJSON.success.warning + '</div>';
-						}
-
-						// File name or url to view file
-						var file_name = ( typeof( responseJSON.success.link_url ) != 'undefined' ) ? responseJSON.success.link_url : responseJSON.success.newname;
-
-						this_row.find( '.qq-upload-checkbox' ).html( responseJSON.success.checkbox );
-
-						if( responseJSON.success.status == 'success' )
-						{ // Success upload
-							<?php
-							if( $params['display_status_success'] )
-							{ // Display this message only if it is enabled
-							?>
-							this_row.find( '.qq-upload-status' ).html( '<span class="green"><?php echo TS_('Upload OK'); ?></span>' );
-							<?php } else { ?>
-							this_row.find( '.qq-upload-status' ).html( '' );
-							<?php } ?>
-							this_row.find( '.qq-upload-image' ).html( text );
-							this_row.find( '.qq-upload-file' ).html( filename_before + filename_select
-								+ '<input type="hidden" value="' + responseJSON.success.newpath + '" />'
-								+ '<span class="fname">' + file_name + '</span>' + warning );
-						}
-						else if( responseJSON.success.status == 'rename' )
-						{ // Conflict on upload
-							<?php
-							$status_conflict_message = '<span class="orange">'.TS_('Upload Conflict').'</span>';
-							if( $params['status_conflict_place'] == 'default' )
-							{ // Default place for a conflict message
-							?>
-							this_row.find( '.qq-upload-status' ).html( '<?php echo $status_conflict_message; ?>' );
-							<?php } else { ?>
-							this_row.find( '.qq-upload-status' ).html( '' );
-							<?php } ?>
-							this_row.find( '.qq-upload-image' ).append( htmlspecialchars_decode( responseJSON.success.file ) );
-							this_row.find( '.qq-upload-file' ).html( filename_before
-								+ '<input type="hidden" value="' + responseJSON.success.newpath + '" />'
-								+ '<span class="fname">' + file_name + '</span>'
-								<?php echo ( $params['status_conflict_place'] == 'before_button' ) ? "+ ' - ".$status_conflict_message."'" : ''; ?>
-								+ ' - <a href="#" '
-								+ 'class="<?php echo button_class( 'text_warning' ); ?> btn-sm roundbutton_text_noicon qq-conflict-replace" '
-								+ 'old="' + responseJSON.success.oldname + '" '
-								+ 'new="' + responseJSON.success.newname + '">'
-								+ '<div><?php echo TS_('Use this new file to replace the old file'); ?></div>'
-								+ '<div style="display:none"><?php echo TS_('Revert'); ?></div>'
-								+ '</a>'
-								+ warning );
-							var old_file_obj = jQuery( 'input[type=hidden][value="' + responseJSON.success.oldpath + '"]' );
-							if( old_file_obj.length > 0 )
-							{
-								old_file_obj.parent().append( ' <span class="orange"><?php echo TS_('(Old File)'); ?></span>' );
-							}
-						}
-
-						if( table_view == 'link' )
-						{ // Update the cells for link view, because these data exist in response
-							this_row.find( '.qq-upload-link-id' ).html( responseJSON.success.link_ID );
-							this_row.find( '.qq-upload-image' ).html( responseJSON.success.link_preview );
-							this_row.find( '.qq-upload-link-actions' ).prepend( responseJSON.success.link_actions );
-							if( typeof( responseJSON.success.link_position ) != 'undefined' )
-							{
-								this_row.find( '.qq-upload-link-position' ).html( responseJSON.success.link_position );
-							}
-							init_colorbox( this_row.find( '.qq-upload-image a[rel^="lightbox"]' ) );
-						}
+						?>
 					}
-					<?php
-					}
-					else
-					{ // Simple list
-					?>
-						jQuery( uploader._getItemByFileId( id ) ).append( text );
-						if( responseJSON.success == undefined && responseJSON != '' )
-						{ // Disppay the fatal errors
-							jQuery( uploader._getItemByFileId( id ) ).append( responseJSON );
-						}
-					<?php
-					}
-
-					if( $params['resize_frame'] )
-					{ // Resize frame after upload new image
-					?>
-					update_iframe_height();
-					jQuery( 'img' ).on( 'load', function() { update_iframe_height(); } );
-					<?php } ?>
-				},
-				template: '<?php echo str_replace( '#button_text#', "' + button_text + '", $params['template_button'] ); ?>',
-				fileTemplate: '<?php echo $params['template_filerow']; ?>',
-				params: { root_and_path: root_and_path }
+				}
 			} );
+
+			// Update upload button text
+			jQuery( 'div.qq-upload-button-selector > div' ).html( button_text );
 		} );
 
 		<?php
@@ -2616,6 +2841,11 @@ function display_dragdrop_upload_button( $params = array() )
 		document.write( '<p class="note">' + file_uploader_note_text + '</p>' );
 		<?php } ?>
 	</script>
+
+	<script type="text/template" id="qq-template">
+	<?php echo $params['template'];?>
+	</script>
+
 	<?php
 
 	echo $params['after'];
@@ -2641,7 +2871,7 @@ function replace_old_file_with_new( $root_type, $root_in_type_ID, $path, $new_na
 	{
 		$error_message = T_( 'The new file name is empty!' );
 	}
-	elseif( empty( $new_name ) )
+	elseif( empty( $old_name ) )
 	{
 		$error_message = T_( 'The old file name is empty!' );
 	}
@@ -2852,9 +3082,22 @@ function echo_file_properties()
  * Get root and relative file path by absolute path
  *
  * @param string Absolute path
+ * @param boolean TRUE - to extract data from cache path like 'blogs/home/_evocache/image.jpg/fit-80x80.jpg'
  * @return boolean|array FALSE - if root and path are not detected, Array with keys 'root' and 'path'
+ *
+ * Examples:
+ * get_root_path_by_abspath( 'shared/global/sunset/sunset.jpg' ) => array( root => 'shared_0', path => 'sunset/sunset.jpg' )
+ * get_root_path_by_abspath( 'users/admin/admin.jpg' ) => array( root => 'user_1', path => 'admin.jpg' )
+ * get_root_path_by_abspath( 'blogs/home/backgrounds/background1.jpg' ) => array( root => 'collection_1', path => 'backgrounds/background1.jpg' )
+ * get_root_path_by_abspath( 'skins/bootstrap_main_skin/skinshot.png' ) => array( root => 'skins_0', path => 'bootstrap_main_skin/skinshot.png' )
+ * - for cache paths (used to restored missing cached images which are loaded with old url):
+ * get_root_path_by_abspath( 'shared/global/sunset/_evocache/sunset.jpg/fit-80x80.jpg?mtime=1486119491', true ) => array( root => 'shared_0', path => 'sunset/sunset.jpg' )
+ * get_root_path_by_abspath( 'users/admin/_evocache/admin.jpg/crop-top-320x320.jpg?mtime=1486119491', true ) => array( root => 'user_1', path => 'admin.jpg' )
+ * get_root_path_by_abspath( 'blogs/home/_evocache/image.jpg/fit-80x80.jpg?mtime=1486969646', true ) => array( root => 'collection_1', path => 'image.jpg' )
+ * get_root_path_by_abspath( 'skins/bootstrap_main_skin/_evocache/skinshot.png/fit-80x80.png?mtime=1486969005', true ) => array( root => 'skins_0', path => 'bootstrap_main_skin/skinshot.png' )
+ *
  */
-function get_root_path_by_abspath( $abspath )
+function get_root_path_by_abspath( $abspath, $is_cache_path = false )
 {
 	if( empty( $abspath ) )
 	{	// If absolute path is empty do NOT try to decode it:
@@ -2863,7 +3106,7 @@ function get_root_path_by_abspath( $abspath )
 
 	load_class( 'files/model/_fileroot.class.php', 'FileRoot' );
 
-	$abspath = explode( DIRECTORY_SEPARATOR, $abspath );
+	$abspath = preg_split( '#[/\\\\]#', $abspath );
 
 	switch( $abspath[0] )
 	{
@@ -2885,6 +3128,12 @@ function get_root_path_by_abspath( $abspath )
 				$root = FileRoot::gen_ID( 'collection', $file_Blog->ID );
 				$start_relpath = 2;
 			}
+			break;
+
+		case 'skins':
+			// Skins dir:
+			$root = FileRoot::gen_ID( 'skins', 0 );
+			$start_relpath = 1;
 			break;
 
 		case 'shared':
@@ -2914,13 +3163,16 @@ function get_root_path_by_abspath( $abspath )
 	{	// Get relative path only if root is detected:
 		$relpath = '';
 		$abspath_length = count( $abspath );
-		for( $f = $start_relpath; $f < $abspath_length - 1; $f++ )
+		// For cache path like 'blogs/home/_evocache/image.jpg/fit-80x80.jpg' exclude the last because it is a not path part and just a size info:
+		$last_path_index = ( $is_cache_path ? $abspath_length - 1 : $abspath_length );
+
+		for( $f = $start_relpath; $f < $last_path_index; $f++ )
 		{
-			if( $f == $abspath_length - 3 )
-			{	// Skip this because it is a evocache folder:
+			if( $is_cache_path && $f == $abspath_length - 3 )
+			{	// Skip this because it is a evocache folder in the abspath like 'blogs/home/_evocache/image.jpg/fit-80x80.jpg':
 				continue;
 			}
-			$relpath .= $abspath[ $f ].( $f < $abspath_length - 2 ? DIRECTORY_SEPARATOR : '' );
+			$relpath .= $abspath[ $f ].( $f < $last_path_index - 1 ? DIRECTORY_SEPARATOR : '' );
 		}
 
 		if( ! empty( $relpath ) )
@@ -2934,5 +3186,180 @@ function get_root_path_by_abspath( $abspath )
 
 	// Data are not found correctly:
 	return false;
+}
+
+
+/**
+ * Get a File object or create one given an absolute path
+ *
+ * @param string Absolute path of file
+ * @param boolean create meta data in DB if it doesn't exist yet? (generates a $File->ID)
+ * @return mixed File a {@link File} object OR NULL if file does not exist
+ */
+function & get_file_by_abspath( $abspath, $force_create_meta = false )
+{
+	$root_path = get_root_path_by_abspath( $abspath );
+	if( $root_path )
+	{
+		$FileRootCache = & get_FileRootCache();
+		if( $FileRoot = $FileRootCache->get_by_ID( $root_path['root'] ) )
+		{
+			$FileCache = & get_FileCache();
+			if( $File = & $FileCache->get_by_root_and_path( $FileRoot->type, $FileRoot->in_type_ID, $root_path['path'] ) && $File->exists() )
+			{
+				$File->load_meta( $force_create_meta );
+				return $File;
+			}
+		}
+	}
+
+	$r = NULL;
+	return $r;
+}
+
+
+function get_social_tag_image_file( $disp )
+{
+	global $social_tag_image_File, $Settings;
+
+	if( isset( $social_tag_image_File ) )
+	{
+		return $social_tag_image_File;
+	}
+
+	switch( $disp )
+	{
+		case 'single':
+		case 'page':
+			global $MainList;
+
+			$Item = & $MainList->get_by_idx( 0 );
+			// Get info for og:image tag
+			if( ! is_null( $Item ) )
+			{
+				$LinkOwner = new LinkItem( $Item );
+				if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink,inline', 'image', array(
+						'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+						'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
+				{ // Item has linked files
+					while( $Link = & $LinkList->get_next() )
+					{
+						if( ! ( $File = & $Link->get_File() ) )
+						{ // No File object
+							global $Debuglog;
+							$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
+							continue;
+						}
+
+						if( ! $File->exists() )
+						{ // File doesn't exist
+							global $Debuglog;
+							$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+							continue;
+						}
+
+						if( $File->is_image() )
+						{ // Use only image files for og:image tag
+							$social_tag_image_File = $File;
+							break;
+						}
+					}
+				}
+			}
+			break;
+
+		case 'posts':
+			$intro_Item = & get_featured_Item( $disp, NULL, true );
+			if( $intro_Item )
+			{
+				if( $intro_Item->is_intro() )
+				{
+					$LinkOwner = new LinkItem( $intro_Item );
+					if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink,inline', 'image', array(
+							'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+							'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
+					{ // Item has linked files
+						while( $Link = & $LinkList->get_next() )
+						{
+							if( ! ( $File = & $Link->get_File() ) )
+							{ // No File object
+								global $Debuglog;
+								$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
+								continue;
+							}
+
+							if( ! $File->exists() )
+							{ // File doesn't exist
+								global $Debuglog;
+								$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+								continue;
+							}
+
+							if( $File->is_image() )
+							{ // Use only image files for og:image tag
+								$social_tag_image_File = $File;
+								break;
+							}
+						}
+					}
+				}
+			}
+
+			if( empty( $social_tag_image_File ) )
+			{
+				global $Blog, $disp_detail;
+				$FileCache = & get_FileCache();
+
+				if( $disp_detail == 'posts-topcat' || $disp_detail == 'posts-subcat' )
+				{
+					$ChapterCache = & get_ChapterCache();
+					$default_cat_ID = $Blog->get_default_cat_ID();
+					if( $default_cat_ID && $default_Chapter = & $ChapterCache->get_by_ID( $default_cat_ID ) )
+					{ // Try social media boilerplate image
+						$social_media_image_file_ID = $default_Chapter->get( 'social_media_image_file_ID', false );
+						if( $social_media_image_file_ID > 0 && $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) && $File->is_image() )
+						{
+							$social_tag_image_File = $File;
+						}
+						else
+						{ // Try category image
+							$cat_image_file_ID = $default_Chapter->get( 'image_file_ID', false );
+							if( $cat_image_file_ID > 0 && $File = & $FileCache->get_by_ID( $cat_image_file_ID ) && $File->is_image() )
+							{
+								$social_tag_image_File = $File;
+							}
+						}
+					}
+				}
+			}
+			break;
+
+		default:
+			// Other disps
+	}
+
+	if( empty( $social_tag_image_File ) )
+	{ // Use social media boilerplate logo if configured
+		$FileCache = & get_FileCache();
+		$social_media_image_file_ID = intval( $Settings->get( 'social_media_image_file_ID' ) );
+		if( $social_media_image_file_ID > 0
+				&& ( $File = $FileCache->get_by_ID( $social_media_image_file_ID, false ) )
+				&& $File->is_image() )
+		{
+			$social_tag_image_File = $File;
+		}
+		else
+		{ // Use site logo as fallback if configured
+			$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
+			if( $notification_logo_file_ID > 0
+					&& ( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) )
+					&& $File->is_image() )
+			{
+				$social_tag_image_File = $File;
+			}
+		}
+	}
+
+	return $social_tag_image_File;
 }
 ?>

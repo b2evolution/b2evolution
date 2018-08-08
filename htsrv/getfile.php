@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package htsrv
@@ -39,7 +39,7 @@ if( ! isset($GLOBALS['files_Module']) )
 
 if( param( 'abspath', 'string', NULL ) !== NULL )
 {	// If absolute path is requested then try to decode it to root and relative path:
-	if( $decoded_data = get_root_path_by_abspath( $abspath ) )
+	if( $decoded_data = get_root_path_by_abspath( $abspath, true ) )
 	{	// Root and path are decoded, Use them:
 		set_param( 'root', $decoded_data['root'] );
 		set_param( 'path', $decoded_data['path'] );

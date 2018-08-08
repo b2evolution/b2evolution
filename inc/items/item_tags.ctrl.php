@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -37,7 +37,7 @@ if( param( 'tag_ID', 'integer', '', true) )
 	{ // We could not find the goal to edit:
 		unset( $edited_ItemTag );
 		forget_param( 'tag_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Tag') ), 'error' );
+		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), /* TRANS: noun */ T_('Tag') ), 'error' );
 		$action = 'nil';
 	}
 }

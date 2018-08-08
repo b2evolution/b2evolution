@@ -14,14 +14,6 @@
 	}
 }
 
-// Footer
-.evo_container__footer {
-	text-align: right;
-	color: #A1A9B7;
-	font-size: 13px;
-	font-weight: bold;
-	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
-}
 // Powered By image background
 .powered_by {
 	a {
@@ -75,11 +67,29 @@ ol.breadcrumb {
 	}
 }
 
+.fa.icon_new {
+	text-align: center;
+	background: #FFF;
+	border: 2px solid #FF6600;
+	.border-radius(50%);
+	width: 21px;
+	height: 21px;
+	line-height: 18px;
+	font-size: 12px;
+	&.big {
+		width: 28px;
+		height: 28px;
+		line-height: 25px;
+		font-size: 16px;
+	}
+}
+
 // Forums table list
 .forums_list {
 	//Disp=posts pagination
 	.comments_link__pagination {
-			text-align: center;
+		text-align: center;
+		margin-bottom: 15px;
 		.post_button {
 			float: left;
 			vertical-align: top;
@@ -88,7 +98,6 @@ ol.breadcrumb {
 			display: inline-block;
 			vertical-align: top;
 			margin: 0 auto;
-			margin-left: -76px;
 		}
 	}
 	box-shadow: none;
@@ -178,13 +187,20 @@ ol.breadcrumb {
 	.ft_status_topic {
 		width: 30px;
 		padding: 0px;
-		//margin-top: 5px;
 		float: left;
-		.fa.fa-comments {
-			color: #000000;
-		}
-		.fa.fa-comments:hover {
-			color: inherit;
+		.fa {
+			&.fa-comments {
+				color: #000000;
+			}
+			&.updated {
+				color: #990000;
+			}
+			&.new {
+				color: #FF6600;
+			}
+			&:hover {
+				color: inherit;
+			}
 		}
 	}
 	.ft_count {
@@ -255,9 +271,11 @@ ol.breadcrumb {
 			display: inline-block;
 		}
 	}
-	// .ft_date margin is set separately because we handle the same CSS for both .ft_date and .ft_workflow_info, only margin is different
 	.ft_date {
-		margin-top: 17px;
+		// .ft_date margin is set separately because we handle the same CSS for both .ft_date and .ft_workflow_info, only margin is different
+		margin-top: 10px;
+		text-align: center;
+		white-space: nowrap;
 	}
 	// When Enabled "Workflow" option, we use .ft_workflow_info instead of .ft_date
 	.ft_workflow_info {
@@ -282,10 +300,6 @@ ol.breadcrumb {
 			float: none;
 			margin-right: 0;
 		}
-	}
-	.ft_date {
-		text-align: center;
-		white-space: nowrap;
 	}
 	.ft_date_shrinked, .ft_date_shrinked_more {
 		display: none;
@@ -335,8 +349,6 @@ ol.breadcrumb {
 	.panel-heading {
 		.evo_comment_title {
 			display: inline;
-			a {
-			}
 			a.user:hover {
 				background: #f8e0e0 none repeat scroll 0 0;
 				border-radius: 2px;
@@ -355,6 +367,12 @@ ol.breadcrumb {
 		&:hover {
 			color: #23527c;
 		}
+	}
+	.label {
+		display: inline-block;
+		padding-top: .3em;
+		position: relative;
+		top: -1px;
 	}
 }
 .bCommentAvatar {
@@ -406,6 +424,17 @@ ol.breadcrumb {
 .legend-item {
 	margin: 0px 5px 12px 5px;
 	display: inline-block;
+	.fa {
+		&.fa-comments {
+			color: #000000;
+		}
+		&.updated {
+			color: #990000;
+		}
+		&.new {
+			color: #FF6600;
+		}
+	}
 }
 ul.legend {
 	list-style: none;
@@ -477,6 +506,7 @@ ul.legend {
 }
 .evo_panel__login {
 	max-width: 400px;
+	min-width: auto;
 }
 .evo_panel__lostpass {
 	max-width: 480px;
@@ -490,18 +520,39 @@ ul.legend {
 		text-align: left;
 	}
 }
+
 .evo_panel__register {
 	max-width: 580px;
-	.control-buttons{
-		text-align: left;
-	}
-	&.register-disabled {
-		width: 350px;
-	}
 	.form-control {
 		&#country, &#u {
 			width: 100%;
 		}
+	}
+	#fieldset_wrapper_captcha_qstn .panel {
+		margin: 0;
+		div[id$=_answer] .control-label {
+			padding-right: 14px;
+		}
+	}
+	.panel-body {
+		padding: 15px;
+		p:last-child {
+			margin-bottom: 0;
+		}
+	}
+}
+@media (min-width: 768px) {
+	#fieldset_wrapper_captcha_qstn .panel div[id$=_answer] {
+		max-height: 34px;
+	}
+}
+.evo_register_buttons {
+	text-align: center;
+	input.btn {
+		margin: 0 0 15px 0;
+	}
+	a.btn {
+		margin: 0;
 	}
 }
 .evo_form__login_links {
@@ -705,6 +756,41 @@ aside .widget_core_coll_search_form {
 	}
 }
 
+// Register widget form
+.widget_core_user_register_quick {
+	#register_form {
+		.form-group {
+			margin: 0;
+		}
+		label {
+			text-align: left;
+			width: 160px;
+			padding-left: 0;
+		}
+		.controls {
+			padding: 0;
+			width: 100%;
+		}
+		.form_text_input.form-control {
+			width: 100%;
+		}
+	}
+
+	.field_register_btn {
+		.panel {
+			margin: 0;
+			border: none;
+			border-radius: 0;
+			box-shadow: none;
+			.panel-body {
+				padding-left: 0;
+				padding-right: 0;
+				padding-bottom: 0;
+			}
+		}
+	}
+}
+
 // Search disp
 .extended_search_form {
 	width: 100%;
@@ -782,6 +868,11 @@ aside .widget_core_coll_search_form {
 	.forums_list .pagination {
 		float: right;
 		margin-left: 10px;
+	}
+	// Remove float properties from main and sidebar columns because they use 100% width on current screen size:
+	// (it was done to fix issue with .ellipsis when sidebar on the left)
+	div.col-md-9.pull-right, aside.col-md-3.pull-left {
+		float: none !important;
 	}
 }
 //@media screen and (min-width: 600px) and (max-width: 767px) {
@@ -1117,10 +1208,14 @@ aside .widget_core_coll_search_form {
 			float: none !important;
 			display: inline;
 		}
+		.evo_status.badge {
+			top: 0;
+		}
 	}
 }
 .cell1, .cell2 {
 	display: table-cell;
+	vertical-align: middle;
 }
 
 // Comment-footer link TO TOP size FIX
@@ -1166,7 +1261,11 @@ a.to_top {
 }
 
 // Fix styles for message that appears instead of a button to post when user must activate account:
-.comments_link__pagination .alert {
+.alert.alert-item-new {
 	margin: 0;
-	text-align: left;
+}
+
+// Wrapper for form to create new post by anonymous user:
+.panel.evo_item_new_form {
+	margin-bottom: 0;
 }

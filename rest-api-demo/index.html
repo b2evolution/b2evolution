@@ -205,29 +205,30 @@ jQuery( document ).on( 'submit', '#api_search__form', function()
 
 	rest_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword, '#api_posts_list', function( data )
 	{	// Display the post data in third column on success request:
-		if( typeof( data.code ) != 'undefined' )
-		{	// Error code was responsed:
-			rest_api_print_message( '#api_posts_list', data );
-			return;
+		if( data.found === 0 || data.results.length === 0 )
+		{	// empty search result
+			r = '<h4 class="text-message">Sorry, we could not find anything matching your request, please try to broaden your search.</h4>';
 		}
-
-		var r = '<ul>';
-		for( var s in data.results )
+		else
 		{
-			var search_item = data.results[s];
-			r += '<li>' + search_item.kind + ': ';
-			if( search_item.kind == 'item' )
-			{ // item: (Display this as link to load data in third column)
-				r += '<a href="#" data-id="' + search_item.id + '" data-urlname="' + coll_urlname + '">' + search_item.title + '</a>';
+			var r = '<ul>';
+			for( var s in data.results )
+			{
+				var search_item = data.results[s];
+				r += '<li>' + search_item.kind + ': ';
+				if( search_item.kind == 'item' )
+				{ // item: (Display this as link to load data in third column)
+					r += '<a href="#" data-id="' + search_item.id + '" data-urlname="' + coll_urlname + '">' + search_item.title + '</a>';
+				}
+				else
+				{	// category, comment, tag:
+					r += search_item.title;
+				}
+				r += ' <a href="' + search_item.permalink + '" target="_blank"><span class="fa fa-external-link"></span></a> ';
+				r += '</li>';
 			}
-			else
-			{	// category, comment, tag:
-				r += search_item.title;
-			}
-			r += ' <a href="' + search_item.permalink + '" target="_blank"><span class="fa fa-external-link"></span></a> ';
-			r += '</li>';
+			r += '</ul>';
 		}
-		r += '</ul>';
 		rest_api_end_loading( '#api_posts_list', r );
 	} );
 
@@ -263,11 +264,11 @@ jQuery( document ).on( 'click', '#api_search__clear', function()
 </head>
 <body>
 	<div class="container">
-	
+
 		<h1>b2evolution REST API demo</h1>
 
 		<h4 class="api_documentation"><a href="http://b2evolution.net/man/rest-api" title="b2evolution API Documentation">API Documentation</a></h4>
-		
+
 			<div class="col-lg-3 col-sm-6 col-xs-12" id="api_column_1">
 				<h2>Collections</h2>
 				<div id="api_collections_list">loading...</div>
@@ -276,7 +277,7 @@ jQuery( document ).on( 'click', '#api_search__clear', function()
 			<div class="col-lg-4 col-sm-6 col-xs-12" id="api_column_2"></div>
 
 			<div class="col-lg-5 col-sm-12 col-xs-12" id="api_column_3"></div>
-		
+
 	</div>
 </body>
 </html>

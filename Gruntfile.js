@@ -22,14 +22,14 @@ module.exports = function(grunt) {
 				files: {
 					// target.css file: source.less file
 					'rsc/build/testless.css': 'rsc/less/test.less',
-					
+
 					// Basic styles:
 					'rsc/css/basic_styles.css': 'rsc/less/basic_styles.less',
 					'rsc/css/basic.css':        'rsc/less/basic.less',
 					'rsc/css/blog_base.css':    'rsc/less/blog_base.less',
 					'rsc/css/item_base.css':    'rsc/less/item_base.less',
 
-					// Fp> the following probaly needs to be merged with the font and back office bundles below					
+					// Fp> the following probaly needs to be merged with the font and back office bundles below
 					'rsc/css/bootstrap-blog_base.css': 'rsc/less/bootstrap-blog_base.less', // Used on several back-office pages
 
 
@@ -58,19 +58,25 @@ module.exports = function(grunt) {
 					'skins/green_bootstrap_theme/photo/style.css':  'skins/green_bootstrap_theme/photo/style.less',
 					'skins/green_bootstrap_theme/forum/style.css':  'skins/green_bootstrap_theme/forum/style.less',
 					'skins/green_bootstrap_theme/manual/style.css': 'skins/green_bootstrap_theme/manual/style.less',
-					'skins/bootstrap_blog_skin/style.css':    'skins/bootstrap_blog_skin/style.less',
-					'skins/bootstrap_catalog_skin/style.css':    'skins/bootstrap_catalog_skin/style.less',
-					'skins/bootstrap_main_skin/style.css':    'skins/bootstrap_main_skin/style.less',
-					'skins/bootstrap_forums_skin/style.css':  'skins/bootstrap_forums_skin/style.less',
-					'skins/bootstrap_gallery_legacy/style.css': 'skins/bootstrap_gallery_legacy/style.less',
-					'skins/bootstrap_gallery_skin/style.css': 'skins/bootstrap_gallery_skin/style.less',
-					'skins/bootstrap_manual_skin/style.css':  'skins/bootstrap_manual_skin/style.less',
-					'skins/bootstrap_site_navbar_skin/style.css': 'skins/bootstrap_site_navbar_skin/style.less',
-					'skins/bootstrap_site_tabs_skin/style.css':   'skins/bootstrap_site_tabs_skin/style.less',
-					'skins_adm/bootstrap/rsc/css/style.css':  'skins_adm/bootstrap/rsc/css/style.less',
+					'skins/bootstrap_blog_skin/style.css':          'skins/bootstrap_blog_skin/style.less',
+					'skins/bootstrap_catalog_skin/style.css':       'skins/bootstrap_catalog_skin/style.less',
+					'skins/bootstrap_main_skin/style.css':          'skins/bootstrap_main_skin/style.less',
+					'skins/bootstrap_forums_skin/style.css':        'skins/bootstrap_forums_skin/style.less',
+					'skins/bootstrap_gallery_legacy/style.css':     'skins/bootstrap_gallery_legacy/style.less',
+					'skins/bootstrap_gallery_skin/style.css':       'skins/bootstrap_gallery_skin/style.less',
+					'skins/bootstrap_manual_skin/style.css':        'skins/bootstrap_manual_skin/style.less',
+					'skins/bootstrap_photoblog_skin/style.css':     'skins/bootstrap_photoblog_skin/style.less',
+					'skins/bootstrap_site_dropdown_skin/style.css': 'skins/bootstrap_site_dropdown_skin/style.less',
+					'skins/bootstrap_site_navbar_skin/style.css':   'skins/bootstrap_site_navbar_skin/style.less',
+					'skins/bootstrap_site_tabs_skin/style.css':     'skins/bootstrap_site_tabs_skin/style.less',
+					'skins_adm/bootstrap/rsc/css/style.css':        'skins_adm/bootstrap/rsc/css/style.less',
 
 					// Helper pages
 					'rsc/build/b2evo_helper_screens.css':    'rsc/less/b2evo_helper_screens.less',
+
+					// Colorbox
+					'rsc/css/colorbox/colorbox-regular.css':   'rsc/css/colorbox/colorbox-regular.less',
+					'rsc/css/colorbox/colorbox-bootstrap.css': 'rsc/css/colorbox/colorbox-bootstrap.less',
 				}
 			},
 
@@ -103,7 +109,7 @@ module.exports = function(grunt) {
 
 		// Configuration for the concatenate tasks:
 		concat: {
-			options: { 
+			options: {
 				// The following will appear on top of the created files:
 				// banner: '/*! <%= pkg.name %> v<%= pkg.version %> */\n',
 			},
@@ -160,21 +166,29 @@ module.exports = function(grunt) {
 					'skins/green_bootstrap_theme/photo/style.min.css':  'skins/green_bootstrap_theme/photo/style.css',
 					'skins/green_bootstrap_theme/forum/style.min.css':  'skins/green_bootstrap_theme/forum/style.css',
 					'skins/green_bootstrap_theme/manual/style.min.css': 'skins/green_bootstrap_theme/manual/style.css',
-					'skins/bootstrap_blog_skin/style.min.css':    'skins/bootstrap_blog_skin/style.css',
-					'skins/bootstrap_catalog_skin/style.min.css':    'skins/bootstrap_catalog_skin/style.css',
-					'skins/bootstrap_main_skin/style.min.css':    'skins/bootstrap_main_skin/style.css',
-					'skins/bootstrap_forums_skin/style.min.css':  'skins/bootstrap_forums_skin/style.css',
-					'skins/bootstrap_gallery_legacy/style.min.css': 'skins/bootstrap_gallery_legacy/style.css',
-					'skins/bootstrap_gallery_skin/style.min.css': 'skins/bootstrap_gallery_skin/style.css',
-					'skins/bootstrap_manual_skin/style.min.css':  'skins/bootstrap_manual_skin/style.css',
-					'skins/bootstrap_site_navbar_skin/style.min.css': 'skins/bootstrap_site_navbar_skin/style.css',
-					'skins/bootstrap_site_tabs_skin/style.min.css':   'skins/bootstrap_site_tabs_skin/style.css',
-					'skins_adm/bootstrap/rsc/css/style.min.css':  'skins_adm/bootstrap/rsc/css/style.css',
-				}	
+					'skins/bootstrap_blog_skin/style.min.css':          'skins/bootstrap_blog_skin/style.css',
+					'skins/bootstrap_catalog_skin/style.min.css':       'skins/bootstrap_catalog_skin/style.css',
+					'skins/bootstrap_main_skin/style.min.css':          'skins/bootstrap_main_skin/style.css',
+					'skins/bootstrap_forums_skin/style.min.css':        'skins/bootstrap_forums_skin/style.css',
+					'skins/bootstrap_gallery_legacy/style.min.css':     'skins/bootstrap_gallery_legacy/style.css',
+					'skins/bootstrap_gallery_skin/style.min.css':       'skins/bootstrap_gallery_skin/style.css',
+					'skins/bootstrap_manual_skin/style.min.css':        'skins/bootstrap_manual_skin/style.css',
+					'skins/bootstrap_photoblog_skin/style.min.css':     'skins/bootstrap_photoblog_skin/style.css',
+					'skins/bootstrap_site_dropdown_skin/style.min.css': 'skins/bootstrap_site_dropdown_skin/style.css',
+					'skins/bootstrap_site_navbar_skin/style.min.css':   'skins/bootstrap_site_navbar_skin/style.css',
+					'skins/bootstrap_site_tabs_skin/style.min.css':     'skins/bootstrap_site_tabs_skin/style.css',
+					'skins_adm/bootstrap/rsc/css/style.min.css':        'skins_adm/bootstrap/rsc/css/style.css',
+				}
 			},
 			skin_evopress: {
 				src: 'skins/evopress/evopress.bundle.css',
 				dest: 'skins/evopress/evopress.bmin.css',
+			},
+			colorbox: {
+				files: {
+					'rsc/build/colorbox-regular.min.css':   'rsc/css/colorbox/colorbox-regular.css',
+					'rsc/build/colorbox-bootstrap.min.css': 'rsc/css/colorbox/colorbox-bootstrap.css',
+				}
 			},
 		},
 
@@ -210,7 +224,7 @@ module.exports = function(grunt) {
 				},
 				nonull: true, // Display missing files
 				// fp>yura: why isn't jquery.bubbletip.js bundled into this?
-				// if plugins.js is used only for editing we should probably move it to a textedit.bundle		
+				// if plugins.js is used only for editing we should probably move it to a textedit.bundle
 				src: ['rsc/js/bubbletip.js', 'rsc/js/plugins.js', 'rsc/js/userfields.js', 'rsc/js/colorpicker.js'],
 				dest: 'rsc/js/build/bubbletip.bmin.js'
 			},
@@ -288,6 +302,8 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_report.js',
 							'rsc/js/src/evo_user_deldata.js',
 							'rsc/js/src/evo_user_org.js',
+							'rsc/js/src/evo_automation.js',
+							'rsc/js/src/evo_user_tags.js',
 							'rsc/js/src/evo_rest_api.js',
 							'rsc/js/src/evo_links.js'],
 				dest: 'rsc/js/build/evo_backoffice.bmin.js'
@@ -314,6 +330,8 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_report.js',
 							'rsc/js/src/evo_user_deldata.js',
 							'rsc/js/src/evo_user_org.js',
+							'rsc/js/src/evo_automation.js',
+							'rsc/js/src/evo_user_tags.js',
 							'rsc/js/src/evo_rest_api.js',
 							'rsc/js/src/evo_links.js'],
 				dest: 'rsc/js/build/bootstrap-evo_backoffice.bmin.js'

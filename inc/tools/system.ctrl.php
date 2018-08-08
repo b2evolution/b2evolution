@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package admin
@@ -17,6 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_funcs( 'tools/model/_system.funcs.php' );
 
 // Check minimum permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'view', true );
 
 if( $current_User->check_perm( 'options', 'edit' ) && system_check_charset_update() )
@@ -49,6 +50,7 @@ function init_system_check( $name, $value, $info = '' )
 	$syscheck_name = $name;
 	$syscheck_value = $value;
 	$syscheck_info = $info;
+	evo_flush();
 }
 
 function disp_system_check( $condition, $message = '' )
@@ -229,7 +231,7 @@ if( ! $system_stats['install_removed'] )
 	disp_system_check( 'warning', T_('For maximum security, it is recommended that you delete your /blogs/install/ folder once you are done with install or upgrade.') );
 
 	// Database reset allowed?
-	init_system_check( T_( 'Database reset' ), $allow_evodb_reset ?  T_('Allowed!') : T_('Forbidden') );
+	init_system_check( T_( 'Database reset' ), $allow_evodb_reset ?  T_('Allowed').'!' : T_('Forbidden') );
 	if( $allow_evodb_reset )
 	{
   	disp_system_check( 'error', '<p>'.T_('Currently, anyone who accesses your install folder could entirely reset your b2evolution database.')."</p>\n"
@@ -375,11 +377,10 @@ if( version_compare( $system_stats['php_version'], $required_php_version['applic
 {
 	disp_system_check( 'error', T_('This version is too old. b2evolution will not run correctly. You must ask your host to upgrade PHP before you can run b2evolution.') );
 }
-elseif( version_compare( $system_stats['php_version'], '5.2', '<' ) )
+elseif( version_compare( $system_stats['php_version'], '5.6', '<' ) )
 {
 	disp_system_check( 'warning', T_('This version is old. b2evolution may run but some features may fail. You should ask your host to upgrade PHP before running b2evolution.')
-		// Display a message about httpOnly for PHP < 5.2
-		.'<br />'.T_( 'PHP 5.2 or greater is recommended for maximum security, especially for "httpOnly" cookies support.' ) );
+		.'<br />'.T_( 'PHP 5.6 or greater is recommended for maximum security.' ) );
 }
 else
 {
@@ -398,38 +399,17 @@ else
 }
 
 
-// allow_url_include? (since 5.2, supercedes allow_url_fopen for require()/include())
-if( version_compare(PHP_VERSION, '5.2', '>=') )
+// allow_url_include? (since PHP 5.2, supercedes allow_url_fopen for require()/include())
+init_system_check( 'PHP allow_url_include', $system_stats['php_allow_url_include'] ?  T_('On') : T_('Off') );
+if( $system_stats['php_allow_url_include'] )
 {
-	init_system_check( 'PHP allow_url_include', $system_stats['php_allow_url_include'] ?  T_('On') : T_('Off') );
-	if( $system_stats['php_allow_url_include'] )
-	{
-		disp_system_check( 'warning', $facilitate_exploits.' '.sprintf( $change_ini, 'allow_url_include = Off' )  );
-	}
-	else
-	{
-		disp_system_check( 'ok' );
-	}
+	disp_system_check( 'warning', $facilitate_exploits.' '.sprintf( $change_ini, 'allow_url_include = Off' )  );
 }
 else
 {
-	/*
-	 * allow_url_fopen
-	 * Note: this allows including of remote files (PHP 4 only) as well as opening remote files with fopen() (all versions of PHP)
-	 * Both have potential for exploits. (The first is easier to exploit than the second).
-	 * dh> Should we check for curl etc then also and warn the user until there's no method for us anymore to open remote files?
-	 * fp> Yes
-	 */
-	init_system_check( 'PHP allow_url_fopen', $system_stats['php_allow_url_fopen'] ?  T_('On') : T_('Off') );
-	if( $system_stats['php_allow_url_fopen'] )
-	{
-		disp_system_check( 'warning', $facilitate_exploits.' '.sprintf( $change_ini, 'allow_url_fopen = Off' )  );
-	}
-	else
-	{
-		disp_system_check( 'ok' );
-	}
+	disp_system_check( 'ok' );
 }
+
 
 // Magic quotes:
 if( !strcasecmp( ini_get('magic_quotes_sybase'), 'on' ) )
@@ -484,13 +464,17 @@ else
 $memory_limit = system_check_memory_limit();
 if( empty($memory_limit) )
 {
-	init_system_check( 'PHP memory_limit', T_('n.a.') );
+	init_system_check( 'PHP memory_limit', /* TRANS: "Not Available" */ T_('N/A') );
 	disp_system_check( 'note' );
 }
 else
 {
-	init_system_check( 'PHP memory_limit', ini_get('memory_limit') );
-	if( $memory_limit < get_php_bytes_size( '256M' ) )
+	init_system_check( 'PHP memory_limit', $memory_limit == -1 ? T_('Unlimited') : ini_get('memory_limit') );
+	if( $memory_limit == -1 )
+	{
+		disp_system_check( 'ok' );
+	}
+	elseif( $memory_limit < get_php_bytes_size( '256M' ) )
 	{
 		disp_system_check( 'error', T_('The memory_limit is too low. Some features like image manipulation will fail to work.') );
 	}
@@ -520,7 +504,7 @@ else
 		$forced_max_execution_time = system_check_max_execution_time();
 		init_system_check( 'PHP forced max_execution_time', sprintf( T_('%s seconds'), $forced_max_execution_time ) );
 		disp_system_check( 'ok', sprintf( T_('b2evolution was able to request more time (than the default %s seconds) to execute complex tasks.'), $max_execution_time ) );
-	}	
+	}
 	elseif( $max_execution_time <= 5 * 60 )
 	{
 		init_system_check( 'PHP max_execution_time', sprintf( T_('%s seconds'), $max_execution_time ) );
@@ -701,8 +685,8 @@ $json_response = fetch_remote_page( $api_url, $api_info );
 $api_result = false;
 if( $json_response !== false )
 {	// Try to decode REST API json data:
-	json_decode( $json_response );
-	$api_result = ( json_last_error() === JSON_ERROR_NONE );
+	$decoded_response = @json_decode( $json_response );
+	$api_result = ! empty( $decoded_response );
 }
 if( $api_result )
 {	// Response is correct json data:
@@ -713,7 +697,7 @@ else
 {	// Response is not json data:
 	if( ! empty( $api_info['error'] ) )
 	{	// Display error message from function fetch_remote_page():
-		$api_error = ' <b>'.sprintf( T_('Error: %s'), $info['error'] ).'; '.sprintf( T_('Status code: %s'), $info['status'] ).'</b>';
+		$api_error = ' <b>'.sprintf( T_('Error: %s'), $api_info['error'] ).'; '.sprintf( T_('Status code: %s'), $api_info['status'] ).'</b>';
 	}
 	else
 	{	// Display error message from other places:
@@ -722,7 +706,7 @@ else
 	}
 	init_system_check( $api_title, T_('Failed'), $api_url );
 	disp_system_check( 'warning', T_('This API doesn\'t work properly on this server.' )
-		.' '.sprintf( T_('Probably you should update a file %s to the latest version or check permissions to use this file.'), '<code>.htaccess</code>' )
+		.' '.T_('You should probably update your <code>.htaccess</code> file to the latest version and check the file permissions of this file.')
 		.$api_error );
 }
 
@@ -731,10 +715,19 @@ $api_title = 'XML-RPC';
 $api_file = 'xmlrpc.php';
 $api_url = $baseurl.$api_file;
 load_funcs( 'xmlrpc/model/_xmlrpc.funcs.php' );
-$url_data = parse_url( $api_url );
-$client = new xmlrpc_client( $api_file, $url_data['host'], ( isset( $url_data['port'] ) ? $url_data['port'] : '' ) );
-$message = new xmlrpcmsg( 'system.listMethods' );
-$result = $client->send( $message );
+if( defined( 'CANUSEXMLRPC' ) && CANUSEXMLRPC === true )
+{	// Try XML-RPC API only if current server can use it:
+	$client = new xmlrpc_client( $api_url );
+	$message = new xmlrpcmsg( 'system.listMethods' );
+	$result = $client->send( $message );
+	$api_error_type = T_('This API doesn\'t work properly on this server.');
+}
+else
+{	// Get an error message if current server cannot use XML-RPC client:
+	$result = false;
+	$xmlrpc_error_message = CANUSEXMLRPC;
+	$api_error_type = T_('This server cannot use XML-RPC client.');
+}
 if( $result && ! $result->faultCode() )
 {	// XML-RPC request is successful:
 	init_system_check( $api_title, 'OK', $api_url );
@@ -742,7 +735,10 @@ if( $result && ! $result->faultCode() )
 }
 else
 {	// Some error on XML-RPC request:
-	$xmlrpc_error_message = $result->faultString();
+	if( $result )
+	{	// Get an error message of XML-RPC request:
+		$xmlrpc_error_message = $result->faultString();
+	}
 	if( $xmlrpc_error_message == 'XML-RPC services are disabled on this system.' )
 	{	// Exception for this error:
 		$api_status_title = T_('Disabled');
@@ -754,7 +750,7 @@ else
 		$api_status_type = 'warning';
 	}
 	init_system_check( $api_title, $api_status_title, $api_url );
-	disp_system_check( $api_status_type, T_('This API doesn\'t work properly on this server.').' <b>'.sprintf( T_( 'Error: %s' ), $xmlrpc_error_message ).'</b>' );
+	disp_system_check( $api_status_type, $api_error_type.' <b>'.sprintf( T_( 'Error: %s' ), $xmlrpc_error_message ).'</b>' );
 }
 
 // AJAX anon_async.php:

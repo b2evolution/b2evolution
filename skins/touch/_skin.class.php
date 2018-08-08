@@ -21,9 +21,9 @@ class touch_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.9';
+	var $version = '7.0.0';
 
-  /**
+	/**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
 	 */
@@ -33,12 +33,41 @@ class touch_Skin extends Skin
 	}
 
 
-  /**
+	/**
 	 * Get default type for the skin.
 	 */
 	function get_default_type()
 	{
 		return 'mobile';
+	}
+
+
+	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		// Note: second param below is the ORDER
+		return array(
+				'front_page_main_area'   => array( NT_('Front Page Main Area'), 40 ),
+				'item_single'            => array( NT_('Item Single'), 50 ),
+				'item_page'              => array( NT_('Item Page'), 55 ),
+				'contact_page_main_area' => array( NT_('Contact Page Main Area'), 60 ),
+				'mobile_footer'          => array( NT_('Mobile: Footer'), 110 ),
+				'mobile_navigation_menu' => array( NT_('Mobile: Navigation Menu'), 120 ),
+				'mobile_tools_menu'      => array( NT_('Mobile: Tools Menu'), 130 ),
+				'404_page'               => array( NT_('404 Page'), 140 ),
+				'login_required'         => array( NT_('Login Required'), 150 ),
+				'access_denied'          => array( NT_('Access Denied'), 160 ),
+				'help'                   => array( NT_('Help'), 170 ),
+				'register'               => array( NT_('Register'), 180 ),
+				'compare_main_area'      => array( NT_('Compare Main Area'), 190 ),
+			);
 	}
 
 

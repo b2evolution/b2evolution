@@ -216,13 +216,14 @@ echo '</div>';
 
 	<div class="row">
 
-		<div class="col-md-12">
-			<div class="evo_container evo_container__front_page_secondary">
 			<?php
 				// ------------------------- "Front Page Secondary Area" CONTAINER EMBEDDED HERE --------------------------
 				// Display container and contents:
-				skin_container( NT_('Front Page Secondary Area'), array(
+				widget_container( 'front_page_secondary_area', array(
 						// The following params will be used as defaults for widgets included in this container:
+						'container_display_if_empty' => false, // If no widget, don't display container at all
+						'container_start'   => '<div class="col-md-12"><div class="evo_container $wico_class$">',
+						'container_end'     => '</div></div>',
 						'block_start'       => '<div class="widget $wi_class$">',
 						'block_end'         => '</div>',
 						'block_title_start' => '<h2 class="page-header">',
@@ -230,21 +231,18 @@ echo '</div>';
 					) );
 				// ----------------------------- END OF "Front Page Secondary Area" CONTAINER -----------------------------
 			?>
-			</div>
-		</div><!-- .col -->
 
 		<footer class="col-md-12 center">
 
-			<div class="evo_container evo_container__footer">
 			<?php
-				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
-				// Display container and contents:
-				skin_container( NT_('Footer'), array(
-						// The following params will be used as defaults for widgets included in this container:
-					) );
-				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
+			// Display container and contents:
+			widget_container( 'footer', array(
+					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => false, // If no widget, don't display container at all
+					'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
+					'container_end'   => '</div>',
+				) );
 			?>
-			</div>
 
 			<p>
 			<?php

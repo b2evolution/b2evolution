@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -17,12 +17,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for sessions module to function properly
  */
-$required_php_version[ 'sessions' ] = '5.2';
+$required_php_version[ 'sessions' ] = '5.4';
 
 /**
  * Minimum MYSQL version required for sessions module to function properly
  */
-$required_mysql_version[ 'sessions' ] = '5.0.3';
+$required_mysql_version[ 'sessions' ] = '5.1';
 
 /**
  * Aliases for table names:
@@ -173,10 +173,6 @@ class sessions_Module extends Module
 
 		if( $current_User->check_perm( 'stats', 'view' ) )
 		{	// We have permission to view all stats
-
-			// TODO: this is hackish and would require a proper function call
-			$topleft_Menu->_menus['entries']['tools']['disabled'] = false;
-
 			$entries = array(
 				'stats_separator' => array( 'separator' => true ),
 				'stats' => array(
@@ -214,16 +210,23 @@ class sessions_Module extends Module
 						)
 				) );
 
-			if( !is_admin_page() )
-			{
-				$blog_ID = empty( $Blog ) ? 0 : $Blog->ID;
-				$entries['stats_page'] = array(
-						'text' => T_('Page stats').'&hellip;',
-						'href' => $admin_url.'?ctrl=stats&tab=hits&blog='.$blog_ID.'&reqURI='.rawurlencode( $_SERVER['REQUEST_URI'] ),
-					);
-			}
+			$topleft_Menu->add_menu_entries( 'site', $entries );
 
-			$topleft_Menu->add_menu_entries( 'tools', $entries );
+			if( !is_admin_page() )
+			{	// Only for front-office:
+				$page_menus = array();
+				if( $topleft_Menu->get_node_by_path( array( 'page', 'edit_front' ) ) ||
+				    $topleft_Menu->get_node_by_path( array( 'page', 'edit_back' ) ) ||
+				    $topleft_Menu->get_node_by_path( array( 'page', 'view_back' ) ) )
+				{
+					$page_menus['stats_sep'] = array( 'separator' => true );
+				}
+				$page_menus['stats_page'] = array(
+					'text' => T_('Page Analytics').'&hellip;',
+					'href' => $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog='.( empty( $Blog ) ? 0 : $Blog->ID ).'&amp;reqURI='.rawurlencode( $_SERVER['REQUEST_URI'] ),
+				);
+				$topleft_Menu->add_menu_entries( 'page', $page_menus );
+			}
 		}
 	}
 
