@@ -201,7 +201,7 @@ class item_title_Widget extends ComponentWidget
 						) );
 			}
 
-			echo $this->params['widget_item_title_line_after'];
+			echo $params['widget_item_title_line_after'];
 
 			echo $this->disp_params['block_body_end'];
 			echo $this->disp_params['block_end'];
