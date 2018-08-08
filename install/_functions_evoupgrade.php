@@ -10376,20 +10376,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 13190, 'Inserting widget containers...' ) )
 	{ // part of 7.0.0-alpha
 
-		// Create Item Single containers and a content widget to make sure item contents will be displayed in every collection:
+		// Create Item List containers and an item list pages widget:
 		$widget_containers_sql_rows = array();
-		$widgets_insert_sql_rows = array();
-
-		// Select those blog ids where Item Single container not exists yet:
+		// Select those blog ids where Item List container does not exists yet:
 		$blog_ids = $DB->get_col( 'SELECT blog_ID FROM T_blogs WHERE blog_ID NOT IN (
 			SELECT wico_coll_ID FROM T_widget__container WHERE wico_code = "item_list" )
 			AND blog_type IN ( "std", "forum", "manual", "group" )' );
 		foreach( $blog_ids as $blog_ID )
-		{	// Create Item single container rows:
+		{	// Create Item List container rows:
 			$widget_containers_sql_rows[] = '( "item_list", "Item List", '.$blog_ID.', 10 )';
 		}
 		if( ! empty( $widget_containers_sql_rows ) )
-		{	// Insert Item Single containers:
+		{	// Insert Item List containers:
 			$DB->query( 'UPDATE T_widget__container SET wico_order = wico_order + 10
 					WHERE wico_coll_ID IN ( '.implode( ', ', $blog_ids ).' )
 					AND wico_order >= 10
@@ -10397,7 +10395,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order ) VALUES'
 					.implode( ', ', $widget_containers_sql_rows ) );
 
-			// Get those Item Single Header containers where the item title widget doesn't exist:
+			// Insert Item List Pages widgets
+			$widgets_insert_sql_rows = array();
+			// Get those Item List containers where the item title widget doesn't exist:
 			$item_list_containers = $DB->get_col( 'SELECT wico_ID FROM T_widget__container
 					WHERE wico_code = "item_list" AND wico_ID NOT IN (
 						SELECT wi_wico_ID FROM T_widget__widget WHERE wi_code = "coll_item_list_pages" )' );
@@ -10415,6 +10415,65 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			}
 		}
 
+		// Create Item in List containers:
+		$widget_containers_sql_rows = array();
+		// Select those blog ids where Item List container does not exists yet:
+		$blog_ids = $DB->get_col( 'SELECT blog_ID FROM T_blogs WHERE blog_ID NOT IN (
+			SELECT wico_coll_ID FROM T_widget__container WHERE wico_code = "item_in_list" )
+			AND blog_type = "std"' );
+		foreach( $blog_ids as $blog_ID )
+		{	// Create Item List container rows:
+			$widget_containers_sql_rows[] = '( "item_in_list", "Item in List", '.$blog_ID.', 10 )';
+		}
+		if( ! empty( $widget_containers_sql_rows ) )
+		{	// Insert Item in List containers:
+			$DB->query( 'UPDATE T_widget__container SET wico_order = wico_order + 10
+					WHERE wico_coll_ID IN ( '.implode( ', ', $blog_ids ).' )
+					AND wico_order >= 10
+					ORDER BY wico_ID, wico_order DESC' );
+			$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order ) VALUES'
+					.implode( ', ', $widget_containers_sql_rows ) );
+
+			// Insert Item Title and Item Info Line widgets:
+			$widgets_insert_sql_rows = array();
+			// Get those empty Item in List containers:
+			$item_list_containers = $DB->get_col( 'SELECT wico_ID FROM T_widget__container
+					WHERE wico_code = "item_in_list"' );
+			foreach( $item_list_containers as $wico_ID )
+			{
+				$widgets_insert_sql_rows[] = '( '.$wico_ID.', 10, "core", "item_title", NULL )';
+				$widgets_insert_sql_rows[] = '( '.$wico_ID.', 20, "core", "item_visibility_badge", NULL )';
+				$widgets_insert_sql_rows[] = '( '.$wico_ID.', 30, "core", "item_info_line", NULL )';
+
+			}
+			if( ! empty( $widgets_insert_sql_rows ) )
+			{
+				$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_type, wi_code, wi_params ) VALUES'
+						.implode( ', ', $widgets_insert_sql_rows ) );
+			}
+		}
+
+		// Insert Item Visibility Badge widgets
+		$widgets_insert_sql_rows = array();
+		// Get those Item Single Header containers where the item visibility badge widget doesn't exist:
+		$item_single_header_containers = $DB->get_col( 'SELECT wico_ID FROM T_widget__container
+				LEFT JOIN T_blogs ON wico_coll_ID = blog_ID
+				WHERE wico_code = "item_single_header" AND blog_type = "std" AND wico_ID NOT IN (
+					SELECT wi_wico_ID FROM T_widget__widget WHERE wi_code = "item_visibility_badge" )' );
+		foreach( $item_single_header_containers as $wico_ID )
+		{
+			$widgets_insert_sql_rows[] = '( '.$wico_ID.', 1, "core", "item_visibility_badge", NULL )';
+		}
+		if( ! empty( $widgets_insert_sql_rows ) )
+		{	// There are widgets to create, insert previously built widget records:
+			$DB->query( 'UPDATE T_widget__widget SET wi_order = wi_order + 1
+					WHERE wi_wico_ID IN ( '.implode( ', ', $item_single_header_containers ).' )
+					ORDER BY wi_wico_ID, wi_order DESC' );
+			$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_type, wi_code, wi_params ) VALUES'
+					.implode( ', ', $widgets_insert_sql_rows ) );
+		}
+
+		// Insert Item Title widgets
 		$widgets_insert_sql_rows = array();
 		// Get those Item Single Header containers where the item title widget doesn't exist:
 		$item_single_header_containers = $DB->get_col( 'SELECT wico_ID FROM T_widget__container
@@ -10433,6 +10492,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 					.implode( ', ', $widgets_insert_sql_rows ) );
 		}
 
+		// Insert Item Next/Previous widgets
 		$widgets_insert_sql_rows = array();
 		// Get those Item Single Header containers in blog collections where the item next previous widget doesn't exist:
 		$item_single_header_containers = $DB->get_col( 'SELECT wico_ID FROM T_widget__container
@@ -10442,6 +10502,26 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		foreach( $item_single_header_containers as $wico_ID )
 		{
 			$widgets_insert_sql_rows[] = '( '.$wico_ID.', 1, "core", "item_next_previous", NULL )';
+		}
+		if( ! empty( $widgets_insert_sql_rows ) )
+		{	// There are widgets to create, insert previously built widget records:
+			$DB->query( 'UPDATE T_widget__widget SET wi_order = wi_order + 1
+					WHERE wi_wico_ID IN ( '.implode( ', ', $item_single_header_containers ).' )
+					ORDER BY wi_wico_ID, wi_order DESC' );
+			$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_type, wi_code, wi_params ) VALUES'
+					.implode( ', ', $widgets_insert_sql_rows ) );
+		}
+
+		// Insert Item Title widgets in Manual Skin's Item Single container
+		$widgets_insert_sql_rows = array();
+		// Get those Item Single containers in blog collections where the item title widget doesn't exist:
+		$item_single_header_containers = $DB->get_col( 'SELECT wico_ID FROM T_widget__container
+				LEFT JOIN T_blogs ON wico_coll_ID = blog_ID
+				WHERE wico_code = "item_single" AND blog_type = "manual" AND wico_ID NOT IN (
+					SELECT wi_wico_ID FROM T_widget__widget WHERE wi_code = "item_title" )' );
+		foreach( $item_single_header_containers as $wico_ID )
+		{
+			$widgets_insert_sql_rows[] = '( '.$wico_ID.', 1, "core", "item_title", NULL )';
 		}
 		if( ! empty( $widgets_insert_sql_rows ) )
 		{	// There are widgets to create, insert previously built widget records:

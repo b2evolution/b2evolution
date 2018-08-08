@@ -219,16 +219,6 @@ class item_info_line_Widget extends ComponentWidget
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
-		if( ! $Item->is_intro() )
-		{
-			if( $Item->status != 'published' )
-			{
-				$Item->format_status( array(
-						'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
-					) );
-			}
-		}
-
 		echo '<span class="small text-muted">';
 		// Flag:
 		if( $this->disp_params['flag_icon'] )

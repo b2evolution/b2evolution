@@ -132,27 +132,5 @@ if( ! $list_is_empty )
 ?>
 </div>
 <?php
-	// ------------------------- "Item List" CONTAINER EMBEDDED HERE --------------------------
-	// Display container contents:
-	widget_container( 'item_list', array(
-		// The following (optional) params will be used as defaults for widgets included in this container:
-		'container_display_if_empty' => false, // If no widget, don't display container at all
-		// This will enclose each widget in a block:
-		'block_start'           => '<div class="center"><ul class="pagination">',
-		'block_end'             => '</ul></div>',
-		// This will enclose the title of each widget:
-		'block_title_start'     => '<h3>',
-		'block_title_end'       => '</h3>',
-		// The following params will be used as default for widgets
-		'page_item_before'      => '<li>',
-		'page_item_after'       => '</li>',
-		'page_item_current_before' => '<li class="active">',
-		'page_item_current_after'  => '</li>',
-		'page_current_template' => '<span>$page_num$</span>',
-		'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
-		'next_text'             => '<i class="fa fa-angle-double-right"></i>',
-	) );
-// ----------------------------- END OF "Item List" CONTAINER -----------------------------
-
 }
 ?>

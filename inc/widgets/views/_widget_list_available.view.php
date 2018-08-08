@@ -121,6 +121,7 @@ $core_componentwidget_defs = array(
 	'infoitem' => array(
 			'item_title',
 			'item_info_line',
+			'item_visibility_badge',
 			'item_content',
 			'item_attachments',
 			'item_link',

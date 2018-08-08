@@ -120,7 +120,7 @@ skin_widget( array(
 				'author_link_text' => $params['author_link_text'],
 
 				// Controlling the title:
-				'widget_disp_title'                 => true,
+				'widget_item_title_display'         => true,
 				'widget_item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
 					'widget_item_title_before'          => '<h2>',
 					'widget_item_title_after'           => '</h2>',

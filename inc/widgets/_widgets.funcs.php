@@ -195,6 +195,15 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		add_basic_widget( $wico_id, 'coll_item_list_pages', 'core', 10 );
 	}
 
+	/* Item in List */
+	if( array_key_exists( 'item_in_list', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['item_in_list']['wico_ID'];
+		add_basic_widget( $wico_id, 'item_title', 'core', 10 );
+		add_basic_widget( $wico_id, 'item_visibility_badge', 'core', 20 );
+		add_basic_widget( $wico_id, 'item_info_line', 'core', 30 );
+	}
+
 	/* Item Single Header */
 	if( array_key_exists( 'item_single_header', $blog_containers ) )
 	{
@@ -212,6 +221,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		}
 		elseif( $kind != 'manual' )
 		{
+			add_basic_widget( $wico_id, 'item_visibility_badge', 'core', 8 );
 			add_basic_widget( $wico_id, 'item_info_line', 'core', 10 );
 		}
 	}
@@ -220,6 +230,10 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'item_single', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['item_single']['wico_ID'];
+		if( $kind == 'manual' )
+		{
+			add_basic_widget( $wico_id, 'item_title', 'core', 5 );
+		}
 		add_basic_widget( $wico_id, 'item_content', 'core', 10 );
 		add_basic_widget( $wico_id, 'item_attachments', 'core', 15 );
 		add_basic_widget( $wico_id, 'item_link', 'core', 17 );

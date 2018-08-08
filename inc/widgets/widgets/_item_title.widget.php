@@ -34,7 +34,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_title_Widget extends ComponentWidget
 {
-	var $icon = 'window-minimize';
+	var $icon = 'header';
 
 	/**
 	 * Constructor
@@ -124,7 +124,7 @@ class item_title_Widget extends ComponentWidget
 		global $Item, $disp;
 
 		$params = array_merge( array(
-				'widget_disp_title'                 => true,
+				'widget_item_title_display'         => true,
 				'widget_item_title_line_before'     => '',
 					'widget_item_title_before'        => '',
 					'widget_item_title_after'         => '',
@@ -151,13 +151,13 @@ class item_title_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		if( $this->disp_params['widget_disp_title'] )
+		if( $this->disp_params['widget_item_title_display'] )
 		{
 			echo $this->disp_params['block_start'];
 			$this->disp_title();
 			echo $this->disp_params['block_body_start'];
 
-			echo $this->params['widget_item_title_line_before'];
+			echo $params['widget_item_title_line_before'];
 
 			if( $disp == 'single' || $disp == 'page' )
 			{

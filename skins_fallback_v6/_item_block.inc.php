@@ -102,7 +102,38 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		}
 		*/
 
-		if( $disp != 'page' )
+		if( $disp == 'posts' )
+		{
+			// ------------------------- "Item in List" CONTAINER EMBEDDED HERE --------------------------
+			// Display container contents:
+			widget_container( 'item_in_list', array(
+				'widget_context' => 'item',	// Signal that we are displaying within an Item
+				// The following (optional) params will be used as defaults for widgets included in this container:
+				'container_display_if_empty' => false, // If no widget, don't display container at all
+				// This will enclose each widget in a block:
+				'block_start' => '<div class="evo_widget $wi_class$">',
+				'block_end' => '</div>',
+				// This will enclose the title of each widget:
+				'block_title_start' => '<h3>',
+				'block_title_end' => '</h3>',
+
+				'author_link_text' => $params['author_link_text'],
+
+				// Controlling the title:
+				'widget_item_title_display'         => true,
+				'widget_item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
+				'widget_item_title_before'          => '<h2>',
+				'widget_item_title_after'           => '</h2>',
+				'widget_item_title_single_before'   => '<h1>',	// This replaces the above in case of disp=single or disp=page
+				'widget_item_title_single_after'    => '</h1>',
+				'widget_item_title_line_after'      => '</div>',
+				// Item Visibility Badge widge template
+				'widget_item_visibility_badge_display'  => ( ! $Item->is_intro() && $Item->status != 'published' ),
+				'widget_item_visibility_badge_template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+			) );
+			// ----------------------------- END OF "Item in List" CONTAINER -----------------------------
+		}
+		elseif( $disp != 'page' )
 		{
 			// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
 			// Display container contents:
@@ -120,7 +151,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'author_link_text' => $params['author_link_text'],
 
 				// Controlling the title:
-				'widget_disp_title'                 => true,
+				'widget_item_title_display'         => true,
 				'widget_item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
 					'widget_item_title_before'          => '<h2>',
 					'widget_item_title_after'           => '</h2>',
@@ -134,11 +165,15 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 					'widget_item_next_previous_next_start'  => '<li class="next">',
 					'widget_item_next_previous_next_end'    => '</li>',
 				'widget_item_next_previous_block_end'   => '</ul></nav>',
+				// Item Visibility Badge widge template
+				'widget_item_visibility_badge_display'  => ( ! $Item->is_intro() && $Item->status != 'published' ),
+				'widget_item_visibility_badge_template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 			) );
 			// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
 		}
 	?>
-	
+	<div class="small text-muted"></div>
+
 	<?php
 	}
 	?>
@@ -213,7 +248,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 					'after_attach_size'  => ')</span>',
 				),
 			// Controlling the title:
-			'widget_disp_title'                 => true,
+			'widget_item_title_display'         => true,
 			'widget_item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
 				'widget_item_title_before'          => '<h2>',
 				'widget_item_title_after'           => '</h2>',
