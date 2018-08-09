@@ -307,8 +307,8 @@ class ComponentWidget extends DataObject
 
 		if( $use_tooltip )
 		{ // Add these data only for tooltip
-			$link_attrs['class']  = 'action_icon help_plugin_icon';
-			$link_attrs['rel']    = format_to_output( $this->get_desc(), 'htmlattr' );
+			$link_attrs['class'] = 'action_icon help_plugin_icon';
+			$link_attrs['data-tooltip'] = format_to_output( $this->get_desc(), 'htmlattr' );
 		}
 
 		return action_icon( '', $icon, $widget_url, NULL, NULL, NULL, $link_attrs );

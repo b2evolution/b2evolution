@@ -161,7 +161,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				'fields_compare_row_start'         => '<tr>',
 				'fields_compare_empty_cell'        => '<td style="border:none"></td>',
 				'fields_compare_post'              => '<th class="center">$post_link$</th>',
-				'fields_compare_field_title'       => '<th class="right">$field_title$:</th>',
+				'fields_compare_field_title'       => '<th class="right">$field_title$$field_description_icon$:</th>',
 				'fields_compare_field_value'       => '<td class="center">$field_value$</td>',
 				'fields_compare_field_value_diff'  => '<td class="center bg-warning">$field_value$</td>',
 				'fields_compare_field_value_green' => '<td class="center bg-success">$field_value$</td>',
@@ -178,7 +178,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				'fields_compare_computed_field_value_diff'  => '<td class="right bg-warning">$field_value$</td>',
 				'fields_compare_computed_field_value_green' => '<td class="right bg-success">$field_value$</td>',
 				'fields_compare_computed_field_value_red'   => '<td class="right bg-danger">$field_value$</td>',
-				'fields_compare_separator_field_title'      => '<th class="center" colspan="$cols_count$">$field_title$</th>',
+				'fields_compare_separator_field_title'      => '<th class="center" colspan="$cols_count$">$field_title$$field_description_icon$</th>',
 			), $params );
 
 		// Get IDs of items which should be compared:
@@ -422,9 +422,21 @@ class item_fields_compare_Widget extends ComponentWidget
 		$ItemCache = & get_ItemCache();
 
 		echo $this->get_field_template( 'row_start', $custom_field['type'] );
+
+		if( empty( $custom_field['description'] ) )
+		{	// The custom field has no description:
+			$field_description_icon = '';
+		}
+		else
+		{	// Display a description in tooltip of the help icon:
+			$field_description_icon = ' '.get_icon( 'help', 'imgtag', array(
+					'data-tooltip' => nl2br( format_to_output( $custom_field['description'], 'htmlspecialchars' ) ),
+				) );
+		}
+
 		// Custom field title:
-		echo str_replace( array( '$field_title$', '$cols_count$' ),
-			array( $custom_field['label'], count( $items ) + 1 ),
+		echo str_replace( array( '$field_title$', '$cols_count$', '$field_description_icon$' ),
+			array( $custom_field['label'], count( $items ) + 1, $field_description_icon ),
 			$this->get_field_template( 'field_title', $custom_field['type'] ) );
 
 		if( $custom_field['type'] != 'separator' )

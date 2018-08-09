@@ -1,30 +1,22 @@
 /**
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
- * @version $Id: plugins.js 8846 2015-04-30 15:01:55Z yura $
  */
 
-	/** Init popover for help icon of plugins **/
+/** Init popover for help icon of plugins, widgets, custom fields **/
 
-var plugin_number = 1;
-jQuery( document ).on( 'mouseover', 'a.help_plugin_icon', function()
+jQuery( document ).on( 'mouseover', '[data-tooltip]', function()
 {
-	if( jQuery( this ).hasClass( 'popoverplugin' ) )
-	{ // Popover is already initialized on this help icon
+	if( jQuery( this ).data( 'tooltip-init' ) )
+	{	// Tooltip is already initialized on this help icon
 		return true;
 	}
 
 	jQuery( this ).attr( 'title', '' );
 	jQuery( this ).find( 'span' ).removeAttr( 'title' );
 
-	var tip_text = jQuery( this ).attr( 'rel' );
-	var info_suffix_text = jQuery( this ).attr( 'data-info-suffix-text' );
-	var placement = jQuery( this ).attr( 'data-tooltip-placement' );
-
-	if( info_suffix_text )
-	{ // Append additional info
-		tip_text += info_suffix_text;
-	}
+	var tip_text = jQuery( this ).data( 'tooltip' );
+	var placement = jQuery( this ).data( 'tooltip-placement' );
 
 	if( ! placement )
 	{
@@ -49,7 +41,6 @@ jQuery( document ).on( 'mouseover', 'a.help_plugin_icon', function()
 		} );
 	jQuery( this ).popover( 'show' );
 
-	// Add this class to avoid of the repeating of init bubbletip
-	jQuery( this ).addClass( 'popoverplugin' );
-	plugin_number++;
+	// Add this data to avoid of the repeating of init tooltip:
+	jQuery( this ).data( 'tooltip-init', 1 );
 } );

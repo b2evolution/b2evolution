@@ -72,5 +72,8 @@ if( get_param( 'itcf_type' ) != 'separator' )
 	$Form->select_input_array( 'itcf_red_highlight', get_param( 'itcf_red_highlight' ), get_item_type_field_highlight_options( 'red' ), T_('Red highlight'), '', array( 'force_keys_as_values' => true ) );
 }
 
+// Description:
+$Form->textarea( 'itcf_description', get_param( 'itcf_description' ), 3, T_('Description') );
+
 $Form->end_form( array( array( 'submit', 'actionArray[select_custom_fields]', T_('Update'), 'SaveButton' ) ) );
 ?>

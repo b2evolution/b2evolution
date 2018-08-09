@@ -9839,6 +9839,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				'itcf_line_highlight'  => 'ENUM( "never", "differences" ) COLLATE ascii_general_ci NULL DEFAULT NULL',
 				'itcf_green_highlight' => 'ENUM( "never", "lowest", "highest" ) COLLATE ascii_general_ci NULL DEFAULT NULL',
 				'itcf_red_highlight'   => 'ENUM( "never", "lowest", "highest" ) COLLATE ascii_general_ci NULL DEFAULT NULL',
+				'itcf_description'     => 'TEXT NULL',
 			),
 			'MODIFY' => array(
 				'itcf_type' => 'ENUM( "double", "varchar", "text", "html", "url", "image", "computed", "separator" ) COLLATE ascii_general_ci NOT NULL',

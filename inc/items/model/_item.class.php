@@ -2413,7 +2413,7 @@ class Item extends ItemLight
 			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
 			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, iset_value AS value, ' );
 			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_link AS link, ' );
-			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight' );
+			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description' );
 			$SQL->FROM( 'T_items__type_custom_field' );
 			$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON itcf_name = SUBSTRING( iset_name, 8 ) AND iset_item_ID = '.$this->ID );
 			$SQL->WHERE_and( 'itcf_ityp_ID = '.$DB->quote( $this->get( 'ityp_ID' ) ) );
@@ -2887,14 +2887,14 @@ class Item extends ItemLight
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'before'       => '<table class="item_custom_fields">',
-				'field_format' => '<tr><th class="right">$title$:</th><td class="center">$value$</td></tr>', // $title$ $value$
+				'field_format' => '<tr><th class="right">$title$$description_icon$:</th><td class="center">$value$</td></tr>', // $title$ $description_icon$ $value$
 				'after'        => '</table>',
 				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
 				// Separate template for numeric and separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
-				'field_numeric_format'   => '<tr><th class="right">$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
-				'field_computed_format'  => '<tr><th class="right">$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
-				'field_separator_format' => '<tr><th colspan="2" class="center">$title$</th></tr>', // $title$
+				'field_numeric_format'   => '<tr><th class="right">$title$$description_icon$:</th><td class="right">$value$</td></tr>', // $title$ $description_icon$ $value$
+				'field_computed_format'  => '<tr><th class="right">$title$$description_icon$:</th><td class="right">$value$</td></tr>', // $title$ $description_icon$ $value$
+				'field_separator_format' => '<tr><th colspan="2" class="center">$title$$description_icon$</th></tr>', // $title$ $description_icon$
 			), $params );
 
 		// Get all custom fields by item ID:
@@ -2916,21 +2916,17 @@ class Item extends ItemLight
 
 		$html = '';
 
-		$mask = array( '$title$', '$value$' );
 		foreach( $display_fields as $field_name )
 		{
-			$field_name = trim( $field_name );
+			// Get HTML code of the custom field:
+			$html .= $this->get_custom_field_template( $field_name, $params );
+
 			if( ! isset( $custom_fields[ $field_name ] ) )
-			{	// Wrong field:
-				$values = array( $field_name, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>' );
-				$html .= str_replace( $mask, $values, $params['field_format'] );
+			{	// Skip unknown field:
 				continue;
 			}
 
 			$field = $custom_fields[ $field_name ];
-
-			// Get HTML code of the custom field:
-			$html .= $this->get_custom_field_template( $field, $params );
 
 			if( $field['type'] == 'separator' &&
 					! empty( $field['format'] ) &&
@@ -2951,7 +2947,7 @@ class Item extends ItemLight
 						continue;
 					}
 					// Get HTML code of the repeated custom field:
-					$html .= $this->get_custom_field_template( $custom_fields[ $repeat_field_name ], $params );
+					$html .= $this->get_custom_field_template( $repeat_field_name, $params );
 				}
 			}
 		}
@@ -2969,23 +2965,47 @@ class Item extends ItemLight
 	/**
 	 * Get HTML code of the requested field
 	 *
-	 * @param array Custom field data
+	 * @param string Custom field name
 	 * @param array Additional parameters
 	 */
-	function get_custom_field_template( $field, $params = array() )
+	function get_custom_field_template( $field_name, $params = array() )
 	{
+		$custom_fields = $this->get_custom_fields_defs();
+
+		$mask_vars = array( '$title$', '$description_icon$', '$value$' );
+
+		$field_name = trim( $field_name );
+		if( ! isset( $custom_fields[ $field_name ] ) )
+		{	// Wrong field:
+			$mask_values = array( $field_name, '', '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>' );
+			return str_replace( $mask_vars, $mask_values, $params['field_format'] );
+		}
+
+		$field = $custom_fields[ $field_name ];
+
 		// Use field format depending on type:
 		$field_type = ( $field['type'] == 'double' ? 'numeric' : ( $field['type'] == 'varchar' ? 'string' : $field['type'] ) );
 		$field_format = isset( $params['field_'.$field_type.'_format'] ) ? $params['field_'.$field_type.'_format'] : $params['field_format'];
 
-		$mask = array( '$title$', '$value$' );
+		$mask_values = array( $field['label'] );
+
+		if( empty( $field['description'] ) )
+		{	// The custom field has no description:
+			$mask_values[] = '';
+		}
+		else
+		{	// Display a description in tooltip of the help icon:
+			$mask_values[] = ' '.get_icon( 'help', 'imgtag', array(
+					'data-tooltip' => nl2br( format_to_output( $field['description'], 'htmlspecialchars' ) ),
+				) );
+		}
 
 		if( ! $field['public'] )
 		{	// Not public field:
 			if( ! empty( $params['fields'] ) )
 			{	// Display an error message only when fields are called by names:
-				$values = array( $field['label'], '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field['name'] ).'</span>' );
-				return str_replace( $mask, $values, $field_format );
+				$mask_values[] = '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field['name'] ).'</span>';
+				return str_replace( $mask_vars, $mask_values, $field_format );
 				$fields_exist = true;
 			}
 			return '';
@@ -2996,7 +3016,8 @@ class Item extends ItemLight
 				$field['type'] == 'separator' ||
 				( ( $field['type'] == 'double' || $field['type'] == 'computed' ) && $custom_field_value == '0' ) )
 		{	// Display only the filled field AND also numeric field with '0' value:
-			return str_replace( $mask, array( $field['label'], $custom_field_value ), $field_format );
+			$mask_values[] = $custom_field_value;
+			return str_replace( $mask_vars, $mask_values, $field_format );
 		}
 	}
 

@@ -355,7 +355,7 @@ switch( $action )
 		break;
 
 	case 'edit_custom_field':
-		param( 'itcf_ID', 'integer', true );
+		param( 'itcf_ID', 'string', true );
 		param( 'itcf_type', 'string', true );
 		param( 'itcf_order', 'integer' );
 		param( 'itcf_label', 'string' );
@@ -368,6 +368,7 @@ switch( $action )
 		param( 'itcf_line_highlight', 'string' );
 		param( 'itcf_green_highlight', 'string' );
 		param( 'itcf_red_highlight', 'string' );
+		param( 'itcf_description', 'text' );
 		$AdminUI->disp_view( 'items/views/_itemtype_edit_field.form.php' );
 		break;
 

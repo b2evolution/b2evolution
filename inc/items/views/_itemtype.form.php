@@ -152,6 +152,7 @@ echo '<input type="hidden" name="custom_field_ID$cf_num$" value="$cf_ID$" />';
 echo '<input type="hidden" name="custom_field_type$cf_num$" value="$cf_type$" />';
 echo '<input type="hidden" name="custom_field_note$cf_num$" value="$cf_note$" />';
 echo '<input type="hidden" name="custom_field_formula$cf_num$" value="$cf_formula$" />';
+echo '<input type="hidden" name="custom_field_description$cf_num$" value="$cf_description$" />';
 // Create this <hidden> to know this custom field is new created field:
 echo '<input type="hidden" name="custom_field_new$cf_num$" value="$cf_new$" />';
 $Table->display_col_end();
@@ -273,7 +274,7 @@ $Table->display_col_end();
 $Table->display_col_start();
 echo get_icon( 'minus', 'imgtag', array( 'title' => T_('Remove custom field'), 'class' => 'delete_custom_field action_icon' ) ).' ';
 echo get_icon( 'add', 'imgtag', array( 'title' => T_('Duplicate custom field'), 'class' => 'duplicate_custom_field action_icon' ) ).' ';
-echo get_icon( 'edit', 'imgtag', array( 'title' => T_('Edit custom field'), 'class' => 'edit_custom_field action_icon $edit_custom_field_class$', 'style' => 'color:#337ab7' ) );
+echo get_icon( 'edit', 'imgtag', array( 'title' => T_('Edit custom field'), 'class' => 'edit_custom_field action_icon', 'style' => 'color:#337ab7' ) );
 $Table->display_col_end();
 
 $Table->display_line_end();
@@ -373,6 +374,7 @@ foreach( $custom_fields as $custom_field )
 		'$cf_format$'      => format_to_output( $custom_field['format'], 'htmlattr' ),
 		'$cf_formula$'     => format_to_output( $custom_field['formula'], 'htmlattr' ),
 		'$cf_note$'        => format_to_output( $custom_field['note'], 'htmlattr' ),
+		'$cf_description$' => format_to_output( $custom_field['description'], 'htmlattr' ),
 	);
 	$cf_select_replacements = array( 'format', 'link', 'line_highlight', 'green_highlight', 'red_highlight' );
 	$custom_field_type_template = str_replace( array_keys( $cf_input_replacements ), $cf_input_replacements, $custom_field_type_template );
@@ -558,6 +560,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 	var field_value_green_highlight = '';
 	var field_value_red_highlight = '';
 	var field_value_public = '';
+	var field_value_description = '';
 	if( typeof( duplicated_field_obj ) != 'undefined' && duplicated_field_obj !== false && duplicated_field_obj.length > 0 )
 	{	// Get data from duplicated field of the current editing Item Type:
 		if( typeof( duplicated_count_custom_field ) == 'undefined' )
@@ -576,6 +579,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		field_value_green_highlight = duplicated_field_obj.find( 'select[name^="custom_field_green_highlight"]' ).val();
 		field_value_red_highlight = duplicated_field_obj.find( 'select[name^="custom_field_red_highlight"]' ).val();
 		field_value_public = duplicated_field_obj.find( 'input[name^="custom_field_public"]' ).is( ':checked' );
+		field_value_description = duplicated_field_obj.find( 'input[name^="custom_field_description"]' ).val();
 	}
 	else if( typeof( duplicated_field_data ) != 'undefined' && duplicated_field_data.length > 0 )
 	{	// Get data from duplicated field from another selected Item Type:
@@ -590,6 +594,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		field_value_green_highlight = duplicated_field_data.data( 'green_highlight' );
 		field_value_red_highlight = duplicated_field_data.data( 'red_highlight' );
 		field_value_public = duplicated_field_data.data( 'public' );
+		field_value_description = duplicated_field_data.data( 'description' );
 	}
 
 	var count_custom = jQuery( 'input[name=count_custom_fields]' ).val();
@@ -632,7 +637,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		.replace( '$cf_format$', field_value_format )
 		.replace( '$cf_formula$', field_value_formula )
 		.replace( '$cf_note$', field_value_note )
-		.replace( '$edit_custom_field_class$', 'hidden' );
+		.replace( '$cf_description$', field_value_description );
 	if( typeof( duplicated_field_obj ) == 'undefined' || duplicated_field_obj === false || duplicated_field_obj.length == 0 )
 	{	// Add new field:
 		var cf_select_defaults = {
@@ -848,6 +853,7 @@ jQuery( document ).on( 'submit', 'form#itemtype_select_fields', function()
 			field_row.find( 'select[name^="custom_field_green_highlight"]' ).val( field_data_obj.data( 'green_highlight' ) );
 			field_row.find( 'select[name^="custom_field_red_highlight"]' ).val( field_data_obj.data( 'red_highlight' ) );
 			field_row.find( 'input[name^="custom_field_public"]' ).prop( 'checked', field_data_obj.data( 'public' ) );
+			field_row.find( 'input[name^="custom_field_description"]' ).val( field_data_obj.data( 'description' ) );
 		}
 		else
 		{	// If the selected custom field doens't exist then duplicate it to current editing Item Type:
