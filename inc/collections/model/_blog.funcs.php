@@ -454,6 +454,11 @@ function get_collection_kinds( $kind = NULL )
 				'desc' => T_('A collection optimized for issue tracking or collaborative editing. Look for the workflow properties on the post editing form.'),
 				'note' => T_('Use this if several users need to collaborate on resolving issues or publishing articles...'),
 			),
+		'catalog' => array(
+				'name' => T_('Catalog'),
+				'desc' => T_('A collection optimized for listing items or products.'),
+				'note' => T_('Use this if you want to showcase products.'),
+			),
 		);
 
 	// Define blog kinds, their names and description.
@@ -2487,12 +2492,13 @@ function blog_row_type( $coll_type, $coll_ID )
 	global $current_User, $admin_url, $Settings;
 
 	$type_titles = array(
-			'main'   => T_('Main'),
-			'std'    => T_('Blog'),
-			'photo'  => T_('Gallery'),
-			'group'  => T_('Collab'),
-			'forum'  => T_('Forum'),
-			'manual' => T_('Manual'),
+			'main'    => T_('Main'),
+			'std'     => T_('Blog'),
+			'photo'   => T_('Gallery'),
+			'group'   => T_('Collab'),
+			'forum'   => T_('Forum'),
+			'manual'  => T_('Manual'),
+			'catalog' => T_('Catalog'),
 		);
 
 	$type_title = isset( $type_titles[ $coll_type ] ) ? $type_titles[ $coll_type ] : $coll_type;

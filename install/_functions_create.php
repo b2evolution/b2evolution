@@ -1766,6 +1766,7 @@ function create_demo_contents()
 		$install_collection_forums =  1;
 		$install_collection_manual =  1;
 		$install_collection_tracker = 1;
+		$install_collection_catalog = 1;
 	}
 	else
 	{	// Array contains which collections should be installed
@@ -1777,6 +1778,7 @@ function create_demo_contents()
 		$install_collection_forums = in_array( 'forums', $collections );
 		$install_collection_manual = in_array( 'manual', $collections );
 		$install_collection_tracker = in_array( 'group', $collections );
+		$install_collection_catalog = in_array( 'catalog', $collections );
 	}
 
 	task_begin( 'Creating default sections... ' );
@@ -1785,7 +1787,8 @@ function create_demo_contents()
 		       ( 3, "Blogs",  3, '.$jay_moderator_ID.' ),
 		       ( 4, "Photos", 4, '.$dave_blogger_ID.' ),
 		       ( 5, "Forums", 5, '.$paul_blogger_ID.' ),
-		       ( 6, "Manual", 6, '.$dave_blogger_ID.' )' );
+		       ( 6, "Manual", 6, '.$dave_blogger_ID.' ),
+		       ( 7, "Catalogs", 7, '.$mary_moderator_ID.' )' );
 	task_end();
 
 	// Store the item IDs in this array in order to create additional comments
@@ -1795,7 +1798,7 @@ function create_demo_contents()
 	$timeshift = 0;
 
 	if( $install_collection_home )
-	{ // Install Home blog
+	{ // Install Home collection
 		task_begin( 'Creating Home collection...' );
 		create_demo_collection( 'main', $jay_moderator_ID, $create_demo_users, $timeshift, 2 );
 		update_install_progress_bar();
@@ -1803,7 +1806,7 @@ function create_demo_contents()
 	}
 
 	if( $install_collection_bloga )
-	{ // Install Blog A
+	{ // Install Blog A collection
 		$timeshift += 86400;
 		task_begin( 'Creating Blog A collection...' );
 		create_demo_collection( 'blog_a', $jay_moderator_ID, $create_demo_users, $timeshift, 3 );
@@ -1812,7 +1815,7 @@ function create_demo_contents()
 	}
 
 	if( $install_collection_blogb )
-	{ // Install Blog B
+	{ // Install Blog B collection
 		$timeshift += 86400;
 		task_begin( 'Creating Blog B collection...' );
 		create_demo_collection( 'blog_b', $paul_blogger_ID, $create_demo_users, $timeshift, 3 );
@@ -1821,7 +1824,7 @@ function create_demo_contents()
 	}
 
 	if( $install_collection_photos )
-	{ // Install Photos blog
+	{ // Install Photos collection
 		$timeshift += 86400;
 		task_begin( 'Creating Photos collection...' );
 		create_demo_collection( 'photo', $dave_blogger_ID, $create_demo_users, $timeshift, 4 );
@@ -1830,7 +1833,7 @@ function create_demo_contents()
 	}
 
 	if( $install_collection_forums )
-	{ // Install Forums blog
+	{ // Install Forums collection
 		$timeshift += 86400;
 		task_begin( 'Creating Forums collection...' );
 		create_demo_collection( 'forum', $paul_blogger_ID, $create_demo_users, $timeshift, 5 );
@@ -1839,7 +1842,7 @@ function create_demo_contents()
 	}
 
 	if( $install_collection_manual )
-	{ // Install Manual blog
+	{ // Install Manual collection
 		$timeshift += 86400;
 		task_begin( 'Creating Manual collection...' );
 		create_demo_collection( 'manual', $dave_blogger_ID, $create_demo_users, $timeshift, 6 );
@@ -1848,10 +1851,19 @@ function create_demo_contents()
 	}
 
 	if( $install_collection_tracker )
-	{ // Install Tracker blog
+	{ // Install Tracker collection
 		$timeshift += 86400;
 		task_begin( 'Creating Tracker collection...' );
 		create_demo_collection( 'group', $jay_moderator_ID, $create_demo_users, $timeshift, 5 );
+		update_install_progress_bar();
+		task_end();
+	}
+
+	if( $install_collection_catalog )
+	{ // Install Catalog collection
+		$timeshift += 86400;
+		task_begin( 'Creating Catalog collection...' );
+		create_demo_collection( 'catalog', $mary_moderator_ID, $create_demo_users, $timeshift, 7 );
 		update_install_progress_bar();
 		task_end();
 	}

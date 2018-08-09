@@ -80,6 +80,7 @@ class bootstrap_forums_Skin extends Skin
 				'forum' => 'yes',
 				'manual' => 'no',
 				'group' => 'partial',  // Tracker
+				'catalog' => 'no',
 				// Any kind that is not listed should be considered as "maybe" supported
 			);
 

@@ -188,7 +188,7 @@ class Blog extends DataObject
 	var $default_cat_ID;
 
 	/**
-	 * @var string Type of blog ( 'std', 'photo', 'group', 'forum', 'manual' )
+	 * @var string Type of blog ( 'std', 'photo', 'group', 'forum', 'manual', 'catalog' )
 	 */
 	var $type;
 
@@ -339,7 +339,7 @@ class Blog extends DataObject
 	/**
 	 * Initialize blog setting by kind
 	 *
-	 * @param string Kind: 'main', 'std', 'photo', 'group', 'forum', 'manual'
+	 * @param string Kind: 'main', 'std', 'photo', 'group', 'forum', 'manual', 'catalog'
 	 * @param string Name
 	 * @param string Short name
 	 * @param string Url/slug
@@ -447,6 +447,13 @@ class Blog extends DataObject
 				{ // Set default post type as "Manual Page"
 					$this->set_setting( 'default_post_type', $manual_page_type_ID );
 				}
+				break;
+
+			case 'catalog':
+				$this->set( 'type', 'catalog' );
+				$this->set( 'name', empty( $name ) ? T_('Catalog Title') : $name );
+				$this->set( 'shortname', empty( $shortname ) ? T_('Catalog') : $shortname );
+				$this->set( 'urlname', empty( $urlname ) ? 'catalog' : $urlname );
 				break;
 
 			case 'std':
@@ -3465,7 +3472,7 @@ class Blog extends DataObject
 	/**
 	 * Create a new blog...
 	 *
-	 * @param string Kind of blog ( 'std', 'photo', 'group', 'forum' )
+	 * @param string Kind of blog ( 'std', 'photo', 'group', 'forum', 'catalog' )
 	 */
 	function create( $kind = '' )
 	{
@@ -5515,6 +5522,10 @@ class Blog extends DataObject
 
 			case 'group':
 				$default_post_types = array( 'Forum Topic', 'Bug Report' );
+				break;
+
+			case 'catalog':
+				$default_post_types = array( 'Post' ); // Create new post type for this collection?
 				break;
 
 			default: // 'std'

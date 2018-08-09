@@ -82,10 +82,45 @@ class bootstrap_catalog_Skin extends Skin
 				'forum' => 'no',
 				'manual' => 'no',
 				'group' => 'maybe',  // Tracker
+				'catalog' => 'yes',
 				// Any kind that is not listed should be considered as "maybe" supported
 			);
 
 		return $supported_kinds;
+	}
+
+	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array
+	 */
+	function get_declared_containers()
+	{
+		// Note: second param below is the ORDER
+		return array(
+				'page_top'                  => array( NT_('Page Top'), 2 ),
+				'header'                    => array( NT_('Header'), 10 ),
+				'menu'                      => array( NT_('Menu'), 15 ),
+				'item_list'                 => array( NT_('Item List'), 48 ),
+				'item_in_list'              => array( NT_('Item in List'), 49 ),
+				'item_single_header'        => array( NT_('Item Single Header'), 50 ),
+				'item_single'               => array( NT_('Item Single'), 51 ),
+				'item_page'                 => array( NT_('Item Page'), 55 ),
+				'sidebar'                   => array( NT_('Sidebar'), 80 ),
+				'sidebar_2'                 => array( NT_('Sidebar 2'), 90 ),
+				'footer'                    => array( NT_('Footer'), 100 ),
+				'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
+				'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
+				'404_page'                  => array( NT_('404 Page'), 130 ),
+				'login_required'            => array( NT_('Login Required'), 140 ),
+				'access_denied'             => array( NT_('Access Denied'), 150 ),
+				'help'                      => array( NT_('Help'), 160 ),
+				'register'                  => array( NT_('Register'), 170 ),
+				'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
+			);
 	}
 
 
@@ -151,8 +186,8 @@ class bootstrap_catalog_Skin extends Skin
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),
-				
-				
+
+
 				'section_posts_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Articles Settings')
@@ -563,8 +598,8 @@ class bootstrap_catalog_Skin extends Skin
 				return 'col-md-9';
 		}
 	}
-	
-	
+
+
 	/**
 	 * Get value for attbiute "class" of column block
 	 * depending on skin setting "Layout"

@@ -573,21 +573,24 @@ function install_basic_skins( $install_mobile_skins = true )
 
 	task_begin( 'Installing default skins... ' );
 
-	// Note: Skin #1 will we used by Blog A and Blog B
+	// Note: Skin #1 will be used by Blog A and Blog B
 	// Install this skin firstly in order to use it by default for all collections with wrong skin ID on upgrade process:
 	skin_install( 'bootstrap_blog_skin' );
 
-	// Note: Skin #2 will we used by Home
+	// Note: Skin #2 will be used by Home:
 	skin_install( 'bootstrap_main_skin' );
 
-	// Note: Skin #3 will we used by Photos
+	// Note: Skin #3 will be used by Photos:
 	skin_install( 'bootstrap_gallery_skin' );
 
-	// Note: Skin #4 will we used by Forums
+	// Note: Skin #4 will be used by Forums:
 	skin_install( 'bootstrap_forums_skin' );
 
-	// Note: Skin #5 will we used by Manual
+	// Note: Skin #5 will be used by Manual:
 	skin_install( 'bootstrap_manual_skin' );
+
+	// Note: Skin #6 will be used by Catalog:
+	skin_install( 'bootstrap_catalog_skin' );
 
 	// skin_install( 'asevo' );
 	// skin_install( 'dating_mood' );
@@ -1437,6 +1440,7 @@ function get_install_steps_count()
 			$install_collection_forums = in_array( 'forums', $collections );
 			$install_collection_manual = in_array( 'manual', $collections );
 			$install_collection_tracker = in_array( 'group', $collections );
+			$install_collection_catalog = in_array( 'catalog', $collections );
 		}
 
 		if( $install_collection_home )

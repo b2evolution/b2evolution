@@ -62,6 +62,7 @@ class dating_mood_Skin extends Skin
 				'forum' => 'no',
 				'manual' => 'no',
 				'group' => 'no',  // Tracker
+				'catalog' => 'no',
 				// Any kind that is not listed should be considered as "maybe" supported
 			);
 

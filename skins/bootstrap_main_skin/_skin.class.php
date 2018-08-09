@@ -80,6 +80,7 @@ class bootstrap_main_Skin extends Skin
 				'forum' => 'no',
 				'manual' => 'no',
 				'group' => 'maybe',  // Tracker
+				'catalog' => 'no',
 				// Any kind that is not listed should be considered as "maybe" supported
 			);
 
@@ -539,7 +540,7 @@ class bootstrap_main_Skin extends Skin
 		{	// Custom link hover color on background image:
 			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
 		}
-		
+
 		if( ! empty( $custom_css ) )
 		{
 			if( $disp == 'front' )

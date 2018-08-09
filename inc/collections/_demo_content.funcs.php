@@ -1095,6 +1095,24 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			$blog_ID = $blog_group_ID;
 			break;
 
+		// =======================================================================================================
+		case 'catalog':
+				$blog_shortname = 'Catalog';
+				$blog_stub = 'catalog';
+				$blog_catalog_ID = create_blog(
+					T_('Catalog Title'),
+					$blog_shortname,
+					$blog_stub,
+					T_('Tagline for Catalog'),
+					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
+					6, // Skin ID
+					'catalog', 'any',	1, '#', true, 'public',
+					$owner_ID,
+					'public',
+					$section_ID );
+				$blog_ID = $blog_catalog_ID;
+				break;
+
 		default:
 			// do nothing
 	}
@@ -2626,6 +2644,208 @@ Hello
 					}
 				}
 			}
+			break;
+
+		case 'catalog':
+			$post_count = 13;
+			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
+
+			// Sample categories
+			$cat_catalog_book = cat_create( T_('Books'), 'NULL', $blog_ID, NULL, true );
+			$cat_catalog_stationery = cat_create( T_('Stationery'), 'NULL', $blog_ID, NULL, true );
+				$cat_catalog_paper = cat_create( T_('Paper Supplies'), $cat_catalog_stationery, $blog_ID, NULL, true );
+					$cat_catalog_envelope = cat_create( T_('Envelopes'), $cat_catalog_paper, $blog_ID, NULL, true );
+					$cat_catalog_journal = cat_create( T_('Journals'), $cat_catalog_paper, $blog_ID, NULL, true );
+					$cat_catalog_notebook = cat_create( T_('Notebooks & Pads'), $cat_catalog_paper, $blog_ID, NULL, true );
+					$cat_catalog_office_paper = cat_create( T_('Office Paper'), $cat_catalog_paper, $blog_ID, NULL, true );
+					$cat_catalog_specialty = cat_create( T_('Specialty Paper'), $cat_catalog_paper, $blog_ID, NULL, true );
+					$cat_catalog_writing_stationery = cat_create( T_('Writing Stationery'), $cat_catalog_paper, $blog_ID, NULL, true );
+
+				$cat_catalog_writing = cat_create( T_('Writing Supplies'), $cat_catalog_stationery, $blog_ID, NULL, true );
+					$cat_catalog_pencil = cat_create( T_('Pencils'), $cat_catalog_writing, $blog_ID, NULL, true );
+					$cat_catalog_pen = cat_create( T_('Pens'), $cat_catalog_writing, $blog_ID, NULL, true );
+					$cat_catalog_marker = cat_create( T_('Markers & Highlighters'), $cat_catalog_writing, $blog_ID, NULL, true );
+			$cat_catalog_equipment = cat_create( T_('Office Equipment'), 'NULL', $blog_ID, NULL, true );
+			$cat_catalog_new = cat_create( T_('New Arrivals'), 'NULL', $blog_ID, NULL, true );
+			$cat_catalog_bestseller = cat_create( T_('Bestsellers'), 'NULL', $blog_ID, NULL, true );
+
+			if( $edited_Blog = $BlogCache->get_by_ID( $blog_ID, false, false ) )
+			{
+				$edited_Blog->set_setting( 'default_cat_ID', $cat_catalog_new );
+				$edited_Blog->dbupdate();
+			}
+
+			$pen_desc = array(
+					T_('Visible, long-lasting ink supply.'),
+					T_('Grip designed for comfort and control'),
+					T_('Description 3'),
+				);
+
+			$envelope_desc = array(
+					T_('Withstands extra handling and wear and tear.'),
+					T_('Ideal for business or personal correspondence.'),
+					T_('Sold as 250 per box'),
+				);
+
+			// Sample posts
+			if( is_available_item_type( $blog_ID, '#' ) )
+			{
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$desc = '<ul><li>'.$pen_desc[0]."</li>\n<li>".$pen_desc[1]."</li>\n<li>".$pen_desc[2].'</li></ul>';
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'pen' );
+				$edited_Item->insert( $owner_ID, T_('Retractable ballpoint pen, medium point, black'), $desc,
+						$now, $cat_catalog_pen, array( $cat_catalog_bestseller ), 'published','en-US' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File = new File( 'shared', 0, 'products/black-ballpoint-pen.jpg' );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$desc = '<ul><li>'.$pen_desc[1]."</li>\n<li>".$pen_desc[2]."</li>\n<li>".$pen_desc[0].'</li></ul>';
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'pen' );
+				$edited_Item->insert( $owner_ID, T_('Black gel ink pen, extra fine point, 8/pack'), $desc,
+						$now, $cat_catalog_pen, array( $cat_catalog_bestseller ), 'published','en-US' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File = new File( 'shared', 0, 'products/black-sign-pen.jpg' );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$desc = '<ul><li>'.$pen_desc[2]."</li>\n<li>".$pen_desc[0]."</li>\n<li>".$pen_desc[1].'</li></ul>';
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'pen' );
+				$edited_Item->insert( $owner_ID, T_('Blue ballpoint pen, medium point, 4/pack'), $desc,
+						$now, $cat_catalog_pen, array(), 'published','en-US' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File = new File( 'shared', 0, 'products/blue-ballpoint-pen.jpg' );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$desc = '<ul><li>'.$pen_desc[2]."</li>\n<li>".$pen_desc[1]."</li>\n<li>".$pen_desc[0].'</li></ul>';
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'pen' );
+				$edited_Item->insert( $owner_ID, T_('Ballpoint pens 1.0mm point, assorted colors, 6/pack'), $desc,
+						$now, $cat_catalog_pen, array( $cat_catalog_new ), 'published','en-US' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File = new File( 'shared', 0, 'products/colored-ballpoint-pens.jpg' );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$desc = '<ul><li>'.$pen_desc[1]."</li>\n<li>".$pen_desc[0]."</li>\n<li>".$pen_desc[2].'</li></ul>';
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'pen, marker' );
+				$edited_Item->insert( $owner_ID, T_('Crayola dry-erase markers, 10 color pack'), $desc,
+						$now, $cat_catalog_marker, array( $cat_catalog_pen, $cat_catalog_bestseller ), 'published','en-US' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File = new File( 'shared', 0, 'products/crayola-markers.jpg' );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$desc = '<ul><li>'.$pen_desc[0]."</li>\n<li>".$pen_desc[2]."</li>\n<li>".$pen_desc[1].'</li></ul>';
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'pen, felt tip' );
+				$edited_Item->insert( $owner_ID, T_('Felt tip pens, fine point, assorted colors'), $desc,
+						$now, $cat_catalog_marker, array( $cat_catalog_pen ), 'published','en-US' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File = new File( 'shared', 0, 'products/felt-tip-pens.jpg' );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$desc = '<ul><li>'.$envelope_desc[0]."</li>\n<li>".$envelope_desc[1]."</li>\n<li>".$envelope_desc[2].'</li></ul>';
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'envelope' );
+				$edited_Item->insert( $owner_ID, T_('#14, Brown gummed envelope'), $desc,
+						$now, $cat_catalog_envelope, array( $cat_catalog_bestseller ), 'published','en-US' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File = new File( 'shared', 0, 'products/brown-gummed-envelope.jpg' );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$desc = '<ul><li>'.$envelope_desc[1]."</li>\n<li>".$envelope_desc[2]."</li>\n<li>".$envelope_desc[0].'</li></ul>';
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'envelope' );
+				$edited_Item->insert( $owner_ID, T_('Brown Kraft clasp envelopes, 9" x 12"'), $desc,
+						$now, $cat_catalog_envelope, array(), 'published','en-US' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File = new File( 'shared', 0, 'products/brown-kraft-envelope.jpg' );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$desc = '<ul><li>'.$envelope_desc[2]."</li>\n<li>".$envelope_desc[0]."</li>\n<li>".$envelope_desc[1].'</li></ul>';
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'envelope' );
+				$edited_Item->insert( $owner_ID, T_('CD/DVD envelopes with clear display window, white'), $desc,
+						$now, $cat_catalog_envelope, array(), 'published','en-US' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File = new File( 'shared', 0, 'products/cd-envelope.jpg' );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$desc = '<ul><li>'.$envelope_desc[2]."</li>\n<li>".$envelope_desc[1]."</li>\n<li>".$envelope_desc[0].'</li></ul>';
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'envelope' );
+				$edited_Item->insert( $owner_ID, T_('Assorted color gummed invitation envelopes'), $desc,
+						$now, $cat_catalog_envelope, array(), 'published','en-US' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File = new File( 'shared', 0, 'products/colored-envelope.jpg' );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$desc = '<ul><li>'.$envelope_desc[1]."</li>\n<li>".$envelope_desc[2]."</li>\n<li>".$envelope_desc[0].'</li></ul>';
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'envelope' );
+				$edited_Item->insert( $owner_ID, T_('Gummed security tint envelopes, 3 5/8" x 6 1/2", white'), $desc,
+						$now, $cat_catalog_envelope, array(), 'published','en-US' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File = new File( 'shared', 0, 'products/gummed-security-envelope.jpg' );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$desc = '<ul><li>'.$envelope_desc[2]."</li>\n<li>".$envelope_desc[1]."</li>\n<li>".$envelope_desc[0].'</li></ul>';
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'envelope' );
+				$edited_Item->insert( $owner_ID, T_('Tear resistant privacy-tinted #10 business envelopes, white'), $desc,
+						$now, $cat_catalog_envelope, array(), 'published','en-US' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File = new File( 'shared', 0, 'products/sticker-strip-envelope.jpg' );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'intro' );
+				$edited_Item->insert( $owner_ID, T_('New Arrivals'), T_('This is the main intro post. It appears on the homepage only.'),
+					$now, $cat_catalog_pen, array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Main' );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+			}
+
+
 			break;
 
 		default:

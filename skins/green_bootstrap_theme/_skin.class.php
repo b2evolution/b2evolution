@@ -80,6 +80,7 @@ class green_bootstrap_theme_Skin extends Skin
 				'forum' => 'yes',
 				'manual' => 'yes',
 				'group' => 'maybe',  // Tracker
+				'catalog' => 'no',
 				// Any kind that is not listed should be considered as "maybe" supported
 			);
 

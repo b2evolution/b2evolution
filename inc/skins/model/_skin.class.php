@@ -199,12 +199,13 @@ class Skin extends DataObject
 	public function get_supported_coll_kinds()
 	{
 		$supported_kinds = array(
-				'main' => 'maybe',
-				'std' => 'maybe',		// Blog
-				'photo' => 'maybe',
-				'forum' => 'no',
-				'manual' => 'no',
-				'group' => 'maybe',  // Tracker
+				'main'    => 'maybe',
+				'std'     => 'maybe',		// Blog
+				'photo'   => 'maybe',
+				'forum'   => 'no',
+				'manual'  => 'no',
+				'group'   => 'maybe',  // Tracker
+				'catalog' => 'maybe',
 				// Any kind that is not listed should be considered as "maybe" supported
 			);
 
@@ -1110,7 +1111,7 @@ class Skin extends DataObject
 					if( $this->get_api_version() == 7 )
 					{	// Get skin css file from folder of collection kind:
 						$skin_css_folder = $Blog->get( 'type' ).'/';
-						if( file_exists( $this->get_path().$skin_css_folder.'style.css' ) && 
+						if( file_exists( $this->get_path().$skin_css_folder.'style.css' ) &&
 							( $this->use_min_css == false
 							|| $debug
 							|| ( $this->use_min_css == 'check' && ! file_exists( $this->get_path().$skin_css_folder.'style.min.css' ) ) ) )

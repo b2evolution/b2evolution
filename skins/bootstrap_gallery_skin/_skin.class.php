@@ -79,6 +79,7 @@ class bootstrap_gallery_Skin extends Skin
 				'forum' => 'no',
 				'manual' => 'no',
 				'group' => 'no',  // Tracker
+				'catalog' => 'partial',
 				// Any kind that is not listed should be considered as "maybe" supported
 			);
 

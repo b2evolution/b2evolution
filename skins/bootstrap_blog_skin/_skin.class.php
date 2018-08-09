@@ -82,6 +82,7 @@ class bootstrap_blog_Skin extends Skin
 				'forum' => 'no',
 				'manual' => 'no',
 				'group' => 'maybe',  // Tracker
+				'catalog' => 'partial',
 				// Any kind that is not listed should be considered as "maybe" supported
 			);
 
