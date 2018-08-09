@@ -1734,6 +1734,66 @@ function get_item_type_usage_by_tab( $tab_name )
 
 
 /**
+ * Get item type custom field types
+ *
+ * @return array
+ */
+function get_item_type_field_types()
+{
+	return array(
+		'double'    => T_('Numeric'),
+		'computed'  => T_('Computed'),
+		'varchar'   => T_('String'),
+		'text'      => T_('Text'),
+		'html'      => 'HTML',
+		'url'       => T_('URL'),
+		'image'     => T_('Image'),
+		'separator' => T_('Separator'),
+	);
+}
+
+
+/**
+ * Get item type custom field types
+ *
+ * @param string Custom field type
+ * @return array
+ */
+function get_item_type_field_type_title( $field_type )
+{
+	$custom_field_types = get_item_type_field_types();
+
+	return isset( $custom_field_types[ $field_type ] ) ? $custom_field_types[ $field_type ] : $field_type;
+}
+
+
+/**
+ * Get item type custom field line/green/red highlight options
+ *
+ * @param string Type: line/green/red
+ * @return array
+ */
+function get_item_type_field_highlight_options( $type )
+{
+	switch( $type )
+	{
+		case 'line':
+			return array(
+				'never'       => T_('Never'),
+				'differences' => T_('If different')
+			);
+		case 'green':
+		case 'red':
+			return array(
+				'never'   => T_('Never'),
+				'lowest'  => T_('Lowest'),
+				'highest' => T_('Highest'),
+			);
+	}
+}
+
+
+/**
  * Get options for setting "Link to" of item type custom field
  *
  * @return array

@@ -124,9 +124,7 @@ $Table->cols = array(
 	array( 'th' => T_('Name'), 'th_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Type'), 'th_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Format'), 'th_class' => 'shrinkwrap' ),
-	array( 'th' => T_('Formula'), 'th_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Link'), 'th_class' => 'shrinkwrap' ),
-	array( 'th' => T_('Note'), 'th_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Public'), 'td_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Line highlight'), 'th_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Green highlight'), 'th_class' => 'shrinkwrap' ),
@@ -134,25 +132,7 @@ $Table->cols = array(
 	array( 'th' => T_('Actions'), 'td_class' => 'shrinkwrap' ),
 );
 
-$custom_field_types = array(
-	'double'    => T_('Numeric'),
-	'computed'  => T_('Computed'),
-	'varchar'   => T_('String'),
-	'text'      => T_('Text'),
-	'html'      => 'HTML',
-	'url'       => T_('URL'),
-	'image'     => T_('Image'),
-	'separator' => T_('Separator'),
-);
-$line_highlight_options = array(
-	'never'       => T_('Never'),
-	'differences' => T_('If different')
-);
-$color_highlight_options = array(
-	'never'   => T_('Never'),
-	'lowest'  => T_('Lowest'),
-	'highest' => T_('Highest'),
-);
+$custom_field_types = get_item_type_field_types();
 
 $Table->display_init();
 
@@ -166,11 +146,14 @@ $Table->display_line_start();
 
 // Order
 $Table->display_col_start();
+echo '<input type="text" name="custom_field_order$cf_num$" value="$cf_order$" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />';
+// Hidden options which are stored in DB or used as additional data:
 echo '<input type="hidden" name="custom_field_ID$cf_num$" value="$cf_ID$" />';
 echo '<input type="hidden" name="custom_field_type$cf_num$" value="$cf_type$" />';
+echo '<input type="hidden" name="custom_field_note$cf_num$" value="$cf_note$" />';
+echo '<input type="hidden" name="custom_field_formula$cf_num$" value="$cf_formula$" />';
 // Create this <hidden> to know this custom field is new created field:
 echo '<input type="hidden" name="custom_field_new$cf_num$" value="$cf_new$" />';
-echo '<input type="text" name="custom_field_order$cf_num$" value="$cf_order$" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />';
 $Table->display_col_end();
 
 // Title
@@ -180,7 +163,7 @@ $Table->display_col_end();
 
 // Name
 $Table->display_col_start();
-echo '<input type="text" name="custom_field_name$cf_num$" value="$cf_name$" class="form_text_input form-control custom_field_name $cf_name_class$" maxlength="36" />';
+echo '<input type="text" name="custom_field_name$cf_num$" value="$cf_name$" class="form_text_input form-control custom_field_name $cf_name_class$" maxlength="255" />';
 $Table->display_col_end();
 
 // Type
@@ -217,13 +200,6 @@ $c++;
 ob_start();
 $Table->display_col_end();
 
-// Formula
-$Table->display_col_start();
-$custom_field_templates[ $c++ ] = ob_get_clean();
-$custom_field_templates[ $c++ ]['computed'] = '<input type="text" name="custom_field_formula$cf_num$" value="$cf_formula$" class="form_text_input form-control custom_field_formula" size="45" maxlength="2000" />';
-ob_start();
-$Table->display_col_end();
-
 // Link
 $Table->display_col_start();
 $custom_field_templates[ $c++ ] = ob_get_clean();
@@ -240,11 +216,6 @@ $c++;
 ob_start();
 $Table->display_col_end();
 
-// Note
-$Table->display_col_start();
-echo '<input type="text" name="custom_field_note$cf_num$" value="$cf_note$" class="form_text_input form-control custom_field_note" size="30" maxlength="255" />';
-$Table->display_col_end();
-
 // Public
 $Table->display_col_start();
 echo '<input type="checkbox" name="custom_field_public$cf_num$" value="1" />';
@@ -258,7 +229,7 @@ foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
 	if( $custom_field_type != 'separator' )
 	{
 		$custom_field_templates[ $c ][ $custom_field_type ] = '<select name="custom_field_line_highlight$cf_num$" class="form-control custom_field_line_highlight">'
-				.Form::get_select_options_string( $line_highlight_options, NULL, true )
+				.Form::get_select_options_string( get_item_type_field_highlight_options( 'line' ), NULL, true )
 			.'</select>';
 	}
 }
@@ -274,7 +245,7 @@ foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
 	if( $custom_field_type != 'separator' )
 	{
 		$custom_field_templates[ $c ][ $custom_field_type ] = '<select name="custom_field_green_highlight$cf_num$" class="form-control custom_field_green_highlight">'
-				.Form::get_select_options_string( $color_highlight_options, NULL, true )
+				.Form::get_select_options_string( get_item_type_field_highlight_options( 'green' ), NULL, true )
 			.'</select>';
 	}
 }
@@ -290,7 +261,7 @@ foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
 	if( $custom_field_type != 'separator' )
 	{
 		$custom_field_templates[ $c ][ $custom_field_type ] = '<select name="custom_field_red_highlight$cf_num$" class="form-control custom_field_red_highlight">'
-				.Form::get_select_options_string( $color_highlight_options, NULL, true )
+				.Form::get_select_options_string( get_item_type_field_highlight_options( 'red' ), NULL, true )
 			.'</select>';
 	}
 }
@@ -300,13 +271,9 @@ $Table->display_col_end();
 
 // Actions
 $Table->display_col_start();
-echo get_icon( 'minus', 'imgtag', array( 'id' => 'delete_custom_field_$cf_num$', 'style' => 'cursor:pointer', 'title' => T_('Remove custom field') ) );
-echo ' '.get_icon( 'add', 'imgtag', array(
-		'class'     => 'duplicate_custom_field',
-		'data-type' => '$cf_type$',
-		'style'     => 'cursor:pointer',
-		'title'     => T_('Duplicate custom field')
-	) );
+echo get_icon( 'minus', 'imgtag', array( 'title' => T_('Remove custom field'), 'class' => 'delete_custom_field action_icon' ) ).' ';
+echo get_icon( 'add', 'imgtag', array( 'title' => T_('Duplicate custom field'), 'class' => 'duplicate_custom_field action_icon' ) ).' ';
+echo get_icon( 'edit', 'imgtag', array( 'title' => T_('Edit custom field'), 'class' => 'edit_custom_field action_icon $edit_custom_field_class$', 'style' => 'color:#337ab7' ) );
 $Table->display_col_end();
 
 $Table->display_line_end();
@@ -557,7 +524,8 @@ if( $creating )
 }
 else
 {
-	$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ),
+													array( 'submit', 'actionArray[update_edit]', T_('Save and continue editing...'), 'SaveButton' ) ) );
 }
 
 load_funcs( 'regional/model/_regional.funcs.php' );
@@ -655,7 +623,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		.replace( '$cf_ID$', guidGenerator() )
 		.replace( '$cf_new$', 1 )
 		.replace( /\$cf_num\$/g, count_custom )
-		.replace( /\$cf_type\$/g, type )
+		.replace( '$cf_type$', type )
 		.replace( '$cf_order$', field_value_order )
 		.replace( '$cf_label$', field_value_label )
 		.replace( '$cf_name$', field_value_name )
@@ -663,7 +631,8 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		.replace( '$cf_name_class$', '' )
 		.replace( '$cf_format$', field_value_format )
 		.replace( '$cf_formula$', field_value_formula )
-		.replace( '$cf_note$', field_value_note );
+		.replace( '$cf_note$', field_value_note )
+		.replace( '$edit_custom_field_class$', 'hidden' );
 	if( typeof( duplicated_field_obj ) == 'undefined' || duplicated_field_obj === false || duplicated_field_obj.length == 0 )
 	{	// Add new field:
 		var cf_select_defaults = {
@@ -712,35 +681,93 @@ jQuery( '#add_custom_field [data-type]' ).click( function()
 	return false;
 } );
 
+// Duplicate custom field:
 jQuery( document ).on( 'click', '.duplicate_custom_field', function()
 {
-	add_new_custom_field( jQuery( this ).data( 'type' ), jQuery( this ).closest( 'tr' ) );
+	var field_row_obj = jQuery( this ).closest( 'tr' );
+	var field_type = field_row_obj.find( '[name^=custom_field_type]' ).val();
+	add_new_custom_field( field_type, field_row_obj );
 } );
 
-jQuery( document ).on( 'click', '[id^="delete_custom_field_"]', function()
+// Delete custom field:
+jQuery( document ).on( 'click', '.delete_custom_field', function()
 {
 	if( confirm( '<?php echo TS_('Are you sure want to delete this custom field?\nThe update will be performed when you will click on the \'Save Changes!\' button.'); ?>' ) )
 	{ // Delete custom field only from html form, This field will be removed after saving of changes
-		if( jQuery( this ).closest( 'tr' ).find( 'input[name^=custom_field_new][value=0]' ).length )
+		var field_row_obj = jQuery( this ).closest( 'tr' );
+		if( field_row_obj.find( 'input[name^=custom_field_new][value=0]' ).length )
 		{
-			var delete_action_id = jQuery( this ).attr('id');
-			var field_parts = delete_action_id.split( '_' );
-			var field_index = field_parts[3];
-			var field_ID = jQuery( '[name="custom_field_ID' + field_index + '"]' ).val();
-			var deleted_fields = '[name="deleted_custom_fields"]';
-			var deleted_fields_value = jQuery( deleted_fields ).val();
+			var deleted_fields_value = jQuery( '[name=deleted_custom_fields]' ).val();
 			if( deleted_fields_value )
 			{
 				deleted_fields_value = deleted_fields_value + ',';
 			}
-			jQuery( deleted_fields ).val( deleted_fields_value + field_ID );
+			jQuery( '[name=deleted_custom_fields]' ).val( deleted_fields_value + field_row_obj.find( '[name^=custom_field_ID]' ).val() );
 		}
-		jQuery( this ).closest( 'tr' ).remove();
+		field_row_obj.remove();
 		if( jQuery( '.custom_fields_edit_table table tbody tr' ).length == 0 )
 		{
 			jQuery( '.custom_fields_edit_table table thead' ).hide();
 		}
 	}
+} );
+
+// Edit custom field:
+jQuery( document ).on( 'click', '.edit_custom_field', function()
+{
+	var field_row_obj = jQuery( this ).closest( 'tr' );
+	openModalWindow( '<span class="loader_img absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
+		'80%', '', true,
+		'<?php echo TS_('Edit custom field'); ?>: ' + field_row_obj.find( '[name^=custom_field_label]' ).val(),
+		'<?php echo TS_('Update'); ?>', true, true );
+	var field_options = {};
+	field_row_obj.find( '[name^=custom_field_]' ).each( function()
+	{
+		var option_val = jQuery( this ).attr( 'type' ) == 'checkbox' ? ( jQuery( this ).prop( 'checked' ) ? 1 : 0 ) : jQuery( this ).val();
+		field_options[ 'itcf_' + jQuery( this ).attr( 'name' ).replace( /^custom_field_([^\d]+)\d+$/, '$1' ) ] = option_val;
+	} );
+	jQuery.ajax(
+	{
+		type: 'GET',
+		url: '<?php echo $admin_url; ?>',
+		data: jQuery.extend(
+		{
+			'ctrl': 'itemtypes',
+			'action': 'edit_custom_field',
+			'display_mode': 'js',
+		}, field_options ),
+		success: function( result )
+		{
+			openModalWindow( result, '80%', '', true,
+				'<?php echo TS_('Edit custom field'); ?>: ' + field_row_obj.find( '[name^=custom_field_label]' ).val(),
+				'<?php echo TS_('Update'); ?>', false, true );
+		}
+	} );
+	field_row_obj.removeClass( 'evo_highlight' );
+	return false;
+} );
+jQuery( document ).on( 'submit', 'form#itemtype_edit_field', function()
+{
+	var field_ID = jQuery( '[name=itcf_ID]', this ).val();
+	var field_row_obj = jQuery( '[name^=custom_field_ID][value=' + field_ID + ']' ).closest( 'tr' );
+	if( field_row_obj.length > 0 )
+	{	// Update field options:
+		jQuery( '[name^=itcf_]', this ).each( function()
+		{
+			var option_name = jQuery( this ).attr( 'name' ).replace( 'itcf_', '' );
+			if( jQuery( this ).attr( 'type' ) == 'checkbox' )
+			{	// Checkbox:
+				field_row_obj.find( '[name^=custom_field_' + option_name + ']' ).prop( 'checked', jQuery( this ).prop( 'checked' ) );
+			}
+			else
+			{	// Input, select, textarea:
+				field_row_obj.find( '[name^=custom_field_' + option_name + ']' ).val( jQuery( this ).val() );
+			}
+		} );
+		field_row_obj.addClass( 'evo_highlight' );
+	}
+	closeModalWindow();
+	return false;
 } );
 
 jQuery( document ).on( 'keyup', '.new_custom_field_title', function()

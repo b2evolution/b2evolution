@@ -133,6 +133,7 @@ switch( $action )
 		break;
 
 	case 'update':
+	case 'update_edit':
 		// Edit post type form...:
 
 		// Check that this action request is not a CSRF hacked request:
@@ -157,9 +158,19 @@ switch( $action )
 
 			$DB->commit();
 
-			header_redirect( $admin_url.'?ctrl=itemtypes&blog='.$blog.'&tab='.$tab.'&tab3='.$tab3.'', 303 ); // Will EXIT
+			if( $action == 'update_edit' )
+			{	// Redirect to the edit form back:
+				$redirect_to = $admin_url.'?ctrl=itemtypes&action=edit&ityp_ID='.$edited_Itemtype->ID.'&blog='.$blog;
+			}
+			else
+			{	// Redirect to the item types list:
+				$redirect_to = $admin_url.'?ctrl=itemtypes&blog='.$blog.'&tab='.$tab.'&tab3='.$tab3;
+			}
+
+			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
+		$action = 'update';
 		break;
 
 	case 'delete':
@@ -341,6 +352,23 @@ switch( $action )
 	case 'edit':
 	case 'update':	// we return in this state after a validation error
 		$AdminUI->disp_view( 'items/views/_itemtype.form.php' );
+		break;
+
+	case 'edit_custom_field':
+		param( 'itcf_ID', 'integer', true );
+		param( 'itcf_type', 'string', true );
+		param( 'itcf_order', 'integer' );
+		param( 'itcf_label', 'string' );
+		param( 'itcf_name', 'string' );
+		param( 'itcf_format', 'string' );
+		param( 'itcf_formula', 'string' );
+		param( 'itcf_link', 'string' );
+		param( 'itcf_note', 'string' );
+		param( 'itcf_public', 'integer' );
+		param( 'itcf_line_highlight', 'string' );
+		param( 'itcf_green_highlight', 'string' );
+		param( 'itcf_red_highlight', 'string' );
+		$AdminUI->disp_view( 'items/views/_itemtype_edit_field.form.php' );
 		break;
 
 	case 'select_custom_fields':
