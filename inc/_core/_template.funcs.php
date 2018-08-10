@@ -1570,14 +1570,14 @@ function init_userfields_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 /**
  * Registers headlines required to display a bubbletip to the right of plugin help icon.
  *
- * @deprecated Use function init_tooltips_js()
+ * @deprecated Use function init_popover_js()
  *
  * @param string alias, url or filename (relative to rsc/css, rsc/js) for JS/CSS files
  * @param string Library: 'bubbletip', 'popover'
  */
 function init_plugins_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 {
-	init_tooltips_js( $relative_to, $library );
+	init_popover_js( $relative_to, $library );
 }
 
 
@@ -1587,7 +1587,7 @@ function init_plugins_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
  * @param string alias, url or filename (relative to rsc/css, rsc/js) for JS/CSS files
  * @param string Library: 'bubbletip', 'popover'
  */
-function init_tooltips_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
+function init_popover_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 {
 	require_js( '#jquery#', $relative_to );
 

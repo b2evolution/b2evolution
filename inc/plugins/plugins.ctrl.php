@@ -871,7 +871,7 @@ switch( $action )
 		break;
 }
 
-init_tooltips_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
+init_popover_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

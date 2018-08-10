@@ -3,9 +3,11 @@
  * See also {@link https://github.com/b2evolution/b2evolution}.
  */
 
-/** Init popover for help icon of plugins, widgets, custom fields **/
+/** Init popover for help icon of plugins, widgets **/
+// Note: This is not just backoffice, this is also used to display a bubbletip over help plugin icon e.g. on the edit post/comment pages.
+// Also it may be used for other icons in future.
 
-jQuery( document ).on( 'mouseover', '[data-tooltip]', function()
+jQuery( document ).on( 'mouseover', '[data-popover]', function()
 {
 	if( jQuery( this ).data( 'tooltip-init' ) )
 	{	// Tooltip is already initialized on this help icon
@@ -15,8 +17,8 @@ jQuery( document ).on( 'mouseover', '[data-tooltip]', function()
 	jQuery( this ).attr( 'title', '' );
 	jQuery( this ).find( 'span' ).removeAttr( 'title' );
 
-	var tip_text = jQuery( this ).data( 'tooltip' );
-	var placement = jQuery( this ).data( 'tooltip-placement' );
+	var tip_text = jQuery( this ).data( 'popover' );
+	var placement = jQuery( this ).data( 'placement' );
 
 	if( ! placement )
 	{

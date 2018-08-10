@@ -1096,7 +1096,7 @@ class Skin extends DataObject
 					init_voting_comment_js( 'blog' );
 
 					// Used to display a tooltip to the right of plugin help icon:
-					init_tooltips_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
+					init_popover_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
 					// Used to autocomplete usernames in textarea:
 					init_autocomplete_usernames_js( 'blog' );
@@ -1111,13 +1111,6 @@ class Skin extends DataObject
 						init_autocomplete_login_js( 'blog', $this->get_template( 'autocomplete_plugin' ) );
 						init_datepicker_js( 'blog' );
 					}
-					break;
-
-				case 'disp_compare':
-					// Specific features for disp=compare:
-
-					// Used to display a tooltip to the right of custom fields description icon:
-					init_tooltips_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 					break;
 
 				case 'disp_users':
@@ -1147,7 +1140,7 @@ class Skin extends DataObject
 					// Specific features for disp=messages:
 
 					// Used to display a tooltip to the right of plugin help icon:
-					init_tooltips_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
+					init_popover_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
 					// Require results.css to display message query results in a table
 					if( ! in_array( 'bootstrap', $features ) )
@@ -1192,7 +1185,7 @@ class Skin extends DataObject
 					}
 
 					// Used to display a tooltip to the right of plugin help icon:
-					init_tooltips_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
+					init_popover_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
 					// Require results.css to display thread query results in a table:
 					if( ! in_array( 'bootstrap', $features ) )
@@ -1289,7 +1282,7 @@ class Skin extends DataObject
 					init_datepicker_js( 'blog' );
 
 					// Used to display a tooltip to the right of plugin help icon:
-					init_tooltips_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
+					init_popover_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
 					// Used to switch to advanced editing:
 					require_js( 'backoffice.js', 'blog' );
@@ -1331,7 +1324,7 @@ class Skin extends DataObject
 					init_datepicker_js( 'blog' );
 
 					// Used to display a tooltip to the right of plugin help icon:
-					init_tooltips_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
+					init_popover_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
 					// Used to autocomplete usernames in textarea:
 					init_autocomplete_usernames_js( 'blog' );

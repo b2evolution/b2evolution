@@ -3640,8 +3640,8 @@ class Plugin
 				$link_attribs['class'] = 'action_icon help_plugin_icon';
 				$tooltip_text = isset( $this->{$params['tooltip_field']} ) ? $this->{$params['tooltip_field']} : $this->long_desc;
 				$tooltip_text .= $params['info_suffix_text'];
-				$link_attribs['data-tooltip'] = format_to_output( $tooltip_text, 'htmlspecialchars' );
-				$link_attribs['data-tooltip-placement'] = $params['tooltip_placement'];
+				$link_attribs['data-popover'] = format_to_output( $tooltip_text, 'htmlspecialchars' );
+				$link_attribs['data-placement'] = $params['tooltip_placement'];
 				if( isset( $params['icon_color'] ) )
 				{
 					$link_attribs['style'] = 'color: '.$params['icon_color'].';';

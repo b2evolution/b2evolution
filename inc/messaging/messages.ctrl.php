@@ -194,7 +194,7 @@ else
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'messages-view-thread' );
 
-init_tooltips_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
+init_popover_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
 // Require colorbox js:
 require_js_helper( 'colorbox' );

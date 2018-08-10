@@ -175,7 +175,7 @@ switch( $action )
 		break;
 }
 
-init_tooltips_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
+init_popover_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
