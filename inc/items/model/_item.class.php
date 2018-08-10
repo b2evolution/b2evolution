@@ -2889,6 +2889,7 @@ class Item extends ItemLight
 				'before'       => '<table class="item_custom_fields">',
 				'field_format' => '<tr><th class="right">$title$$description_icon$:</th><td class="center">$value$</td></tr>', // $title$ $description_icon$ $value$
 				'after'        => '</table>',
+				'field_description_icon_class' => 'grey',
 				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
 				// Separate template for numeric and separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
@@ -2996,8 +2997,10 @@ class Item extends ItemLight
 		else
 		{	// Display a description in tooltip of the help icon:
 			$mask_values[] = ' '.get_icon( 'help', 'imgtag', array(
-					'data-tooltip' => nl2br( format_to_output( $field['description'], 'htmlspecialchars' ) ),
-				) );
+					'data-toggle' => 'tooltip',
+					'title'       => nl2br( $field['description'] ),
+					'class'       => $params['field_description_icon_class'],
+				) ).' ';
 		}
 
 		if( ! $field['public'] )

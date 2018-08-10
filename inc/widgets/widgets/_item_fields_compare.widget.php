@@ -168,6 +168,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				'fields_compare_field_value_red'   => '<td class="center bg-danger">$field_value$</td>',
 				'fields_compare_row_end'           => '</tr>',
 				'fields_compare_table_end'         => '</table></div>',
+				'fields_compare_description_icon_class' => 'grey',
 				// Separate template for numeric and separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
 				'fields_compare_numeric_field_value'        => '<td class="right">$field_value$</td>',
@@ -372,7 +373,7 @@ class item_fields_compare_Widget extends ComponentWidget
 		foreach( $all_custom_fields as $custom_field )
 		{
 			// Display a row of one compared field between all selected items:
-			$this->display_field_row_template( $custom_field, $items, $params );
+			$this->display_field_row_template( $custom_field, $items, $this->disp_params );
 
 			// Display the repeated fields after separator:
 			if( $custom_field['type'] == 'separator' &&
@@ -395,7 +396,7 @@ class item_fields_compare_Widget extends ComponentWidget
 					}
 
 					// Display a row of the repeated custom field between all selected items:
-					$this->display_field_row_template( $all_custom_fields[ $repeat_field_name ], $items, $params );
+					$this->display_field_row_template( $all_custom_fields[ $repeat_field_name ], $items, $this->disp_params );
 				}
 			}
 		}
@@ -430,8 +431,10 @@ class item_fields_compare_Widget extends ComponentWidget
 		else
 		{	// Display a description in tooltip of the help icon:
 			$field_description_icon = ' '.get_icon( 'help', 'imgtag', array(
-					'data-tooltip' => nl2br( format_to_output( $custom_field['description'], 'htmlspecialchars' ) ),
-				) );
+					'data-toggle' => 'tooltip',
+					'title'       => nl2br( $custom_field['description'] ),
+					'class'       => $params['fields_compare_description_icon_class'],
+				) ).' ';
 		}
 
 		// Custom field title:
