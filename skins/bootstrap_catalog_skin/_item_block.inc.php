@@ -36,7 +36,7 @@ $params = array_merge( array(
 		'image_class'                => 'img-responsive',
 		'image_size'                 => 'fit-1280x720',
 		'author_link_text'           => 'auto',
-		
+
 		// 'before_images'            => '<div class="col-lg-6"><div class="evo_post_images">',
 		// 'before_image'             => '<figure class="evo_image_block">',
 		// 'before_image_legend'      => '<figcaption class="evo_image_legend">',
@@ -67,7 +67,8 @@ $params = array_merge( array(
 		// 'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
 	), $params );
 
-/* Beginning of post display */ ?>
+/* Beginning of post display */
+?>
 <div class="evo_content_block<?php echo !$Item->is_intro() ? ' ' . $Skin->get_post_columns_count() : ''; ?>">
 <article id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>"<?php
 	echo empty( $params['item_style'] ) ? '' : ' style="'.format_to_output( $params['item_style'], 'htmlattr' ).'"' ?>>
@@ -103,7 +104,7 @@ if( $disp == 'single' )
 						'gallery_colls'            => 1000,
 
 						// We want ONLY cover image to display here
-						// 'restrict_to_image_position' => 'cover',
+						'restrict_to_image_position' => 'cover,teaser',
 					) );
 			} else {	// If current item does not have cover image
 				echo '<div class="noimage_wrapper"><i class="fa fa-file-image-o" aria-hidden="true"></i></div>';
@@ -132,33 +133,37 @@ if( $disp == 'single' )
 				echo $params['item_title_line_after'];
 			}
 			?>
-			
+
 			<p><b>Condition:</b> New product</p>
 			<p>Section for short product description. Excerpt here maybe?</p>
 			<?php
-			
+
 				skin_widget( array(
 						// CODE for the widget:
 						'widget' => 'item_vote',
 						'before' => '<p>',
 						'after' => '</p>',
 					) );
-				
-				
+
+
 				$Item->tags( array(
 						'before'    => '<p class="small post_tags"> ' . T_( 'Tags' ) . ': ',
 						'after'     => '</p>',
 						'separator' => ' ',
 					) );
 			?>
-			<p class="evo_post__price"><b>Price:</b> <span class="regularprice">24.99 $</span><span class="oldprice">19.99 $</span><span class="newprice">12.99 $</span></p>
+			<p class="evo_post__price">
+				<b>Price:</b> <span class="regularprice">$<?php echo $Item->get_setting( 'custom:price_usd' );?></span>
+				<span class="oldprice">19.99 $</span>
+				<span class="newprice">12.99 $</span>
+			</p>
 		</header>
 	</div><div class="clearfix"></div>
 	<div class="col-md-12">
 			<div class="panel panel-default single_item_details_wrapper">
 				<div class="panel-heading"><h4 class="panel-title">Data Sheet</h4></div>
 				<!--<div class="panel-body">-->
-				
+
 					<table class="table table-hover">
 						<tr>
 							<th>Styles</th>
@@ -187,10 +192,10 @@ if( $disp == 'single' )
 						</div>
 					</section>
 					-->
-				
+
 				<!--</div>-->
 			</div>
-			
+
 			<div class="panel panel-default single_item_details_wrapper">
 				<div class="panel-heading"><h4 class="panel-title">More Info</h4></div>
 				<div class="panel-body">
@@ -198,24 +203,24 @@ if( $disp == 'single' )
 						<div class="panel-body">
 						<p>Here goes dinamic content widget, but probably without images?</p>
 						</div>
-				
+
 				</div>
 			</div>
 	</div>
 </div>
 <?php }
-		
+
 ?>
 	<header>
-	
+
 		<?php
-		if( ! $Item->is_intro() ) : 
+		if( ! $Item->is_intro() ) :
 		// Do not display "Sale" icon on Intro posts ?>
 		<div class="floatright price_note"><span class="note status_private" data-toggle="tooltip" data-placement="top" title="This article is on sale!"><span>Sale!</span></span></div>
 		<?php endif;
-		
+
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
-		
+
 		if( ! $Item->is_intro() && ! in_array( $disp, array( 'single', 'page' ) ) )
 		{
 			if( $Item->get_cover_image_url() )
@@ -281,9 +286,10 @@ if( $disp == 'single' )
 						'class'  => button_class( 'text' ),
 					) );
 
-			echo $params['item_title_line_after'];
+				echo $params['item_title_line_after'];
 			}
-			else {
+			else
+			{
 				// POST TITLE:
 				$Item->title( array(
 						'before'    => $title_before,
@@ -291,12 +297,14 @@ if( $disp == 'single' )
 					) );
 
 				// EDIT LINK
+				/*
 				$Item->edit_link( array(
 						'before' => '<div class="'.button_class( 'group' ).'">',
 						'after'  => '</div>',
-						'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : get_icon( 'edit' ).' '.T_('Edit'),
+						'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : get_icon( 'edit' ),
 						'class'  => button_class( 'text' ),
 					) );
+				*/
 
 			echo $title_after . $params['item_title_line_after'];
 			}
@@ -354,12 +362,27 @@ if( $disp == 'single' )
 	}
 	?>
 
-	<?php  if( ! in_array( $disp, array( 'single', 'page' ) ) ) { ?> 
+	<?php
+	if( ! in_array( $disp, array( 'single', 'page' ) ) )
+	{
+	?>
 	<footer>
-	
+
 		<?php if( ! $Item->is_intro() )
 		{ // Do not display "Sale" icon on Intro posts ?>
-		<div class="evo_post__price center"><span class="regularprice">24.99 $</span><span class="oldprice">19.99 $</span><span class="newprice">12.99 $</span></div>
+		<div class="evo_post__price center">
+			<span class="regularprice"><?php echo '$'.$Item->get_setting( 'custom:price_usd' ).' ';?></span>
+			<span class="oldprice">$19.99 </span>
+			<span class="newprice">$12.99 </span>
+			<?php
+			$Item->edit_link( array(
+					'before' => '<div class="'.button_class( 'group' ).'">',
+					'after'  => '</div>',
+					'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : get_icon( 'edit' ),
+					'class'  => button_class( 'text' ),
+				) );
+			?>
+		</div>
 		<?php }	?>
 
 		<!--<nav class="post_comments_link">
@@ -391,7 +414,7 @@ if( $disp == 'single' )
 			*/
 		?>
 		</nav>-->
-		<?php			
+		<?php
 			// if( ! $Item->is_intro() && $disp != 'posts' ) : // Link to edit
 			// $Item->edit_link( array( // Link to backoffice for editing
 				// 'before' => '<div class="edit-link-wrapper"><div class="'.button_class( 'group' ).'">',

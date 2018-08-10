@@ -2707,7 +2707,7 @@ Hello
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/pilot-v-razor-point-pen-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				// Image 2
 				$edit_File = new File( 'shared', 0, 'products/pilot-v-razor-point-pen-2.jpg' );
 				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2 );
@@ -2730,7 +2730,7 @@ Hello
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/pilot-varsity-fountain-pen-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				// Image 2
 				$edit_File = new File( 'shared', 0, 'products/pilot-varsity-fountain-pen-2.jpg' );
 				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2 );
@@ -2753,7 +2753,7 @@ Hello
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/bic-xtra-comfort-round-stic-pen-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				// Image 2
 				$edit_File = new File( 'shared', 0, 'products/bic-xtra-comfort-round-stic-pen-2.jpg' );
 				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2 );
@@ -2776,7 +2776,7 @@ Hello
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/sharpie-fine-point-permanent-marker-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				// Image 2
 				$edit_File = new File( 'shared', 0, 'products/sharpie-fine-point-permanent-marker-2.jpg' );
 				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2 );
@@ -2802,7 +2802,7 @@ Hello
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/bic-atlantis-retractable-pen-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				$post_count--;
@@ -2822,7 +2822,7 @@ Hello
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/sharpie-accent-tank-highlighter-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				// Image 2
 				$edit_File = new File( 'shared', 0, 'products/sharpie-accent-tank-highlighter-2.jpg' );
 				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2 );
@@ -2848,7 +2848,7 @@ Hello
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/quality-park-redi-seal-business-envelope-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				$post_count--;
@@ -2868,7 +2868,7 @@ Hello
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/jam-paper-window-envelope-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				$post_count--;
@@ -2888,7 +2888,7 @@ Hello
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/jam-paper-commercial-envelope-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				// Image 2
 				$edit_File = new File( 'shared', 0, 'products/jam-paper-commercial-envelope-2.jpg' );
 				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2 );
@@ -2911,7 +2911,7 @@ Hello
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/simply-quickstrip-security-tint-envelope-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				$post_count--;
@@ -2931,7 +2931,7 @@ Hello
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/jam-paper-a7-invitation-envelope-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				// Image 2
 				$edit_File = new File( 'shared', 0, 'products/jam-paper-a7-invitation-envelope-2.jpg' );
 				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2 );
@@ -2954,7 +2954,7 @@ Hello
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/quality-park-redi-strip-disk-envelope-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1 );
+				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				// Insert a post:
