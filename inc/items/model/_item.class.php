@@ -7213,9 +7213,10 @@ class Item extends ItemLight
 	 * @param boolean Update slug? - We want to PREVENT updating slug when item dbupdate is called,
 	 * 	because of the item canonical url title was changed on the slugs edit form, so slug update is already done.
 	 *  If slug update wasn't done already, then this param has to be true.
+	 * @param boolean Update custom fields of child posts?
 	 * @return boolean true on success
 	 */
-	function dbupdate( $auto_track_modification = true, $update_slug = true, $dummy = true )
+	function dbupdate( $auto_track_modification = true, $update_slug = true, $update_child_custom_fields = true )
 	{
 		global $DB, $Plugins, $Messages;
 
@@ -7263,8 +7264,10 @@ class Item extends ItemLight
 				global $localtimenow;
 				$this->set_param( $this->datemodified_field, 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
 			}
+		}
 
-			// Update custom fields of all child posts of this post:
+		if( $update_child_custom_fields )
+		{	// Update custom fields of all child posts of this post:
 			$custom_fields = $this->get_type_custom_fields();
 			if( ! empty( $custom_fields ) )
 			{	// If this post has at least one custom field
