@@ -234,7 +234,7 @@ if( $disp == 'single' )
 						'after_images'             => '</div>',
 						'image_class'              => 'img-responsive',
 						'image_size'               => 'crop-480x600',
-						'image_limit'              =>  1,
+						'limit'                    =>  1,
 						'image_link_to'            => 'original', // Can be 'original', 'single' or empty          <i class="fa fa-link" aria-hidden="true"></i>
 
 						// We DO NOT want to display galleries here, only one cover image
@@ -295,16 +295,6 @@ if( $disp == 'single' )
 						'before'    => $title_before,
 						'link_type' => '#'
 					) );
-
-				// EDIT LINK
-				/*
-				$Item->edit_link( array(
-						'before' => '<div class="'.button_class( 'group' ).'">',
-						'after'  => '</div>',
-						'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : get_icon( 'edit' ),
-						'class'  => button_class( 'text' ),
-					) );
-				*/
 
 			echo $title_after . $params['item_title_line_after'];
 			}
