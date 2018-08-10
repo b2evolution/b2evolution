@@ -4935,7 +4935,8 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				// Format title and alt attributes because they may contain the unexpected chars from translatable strings:
 				if( isset( $params['title'] ) )
 				{
-					$params['title'] = format_to_output( $params['title'], 'htmlattr' );
+					// Use 'htmlspecialchars' format instead of 'htmlattr' because html tags should not be stripped e.g. in bootsrap tooltips:
+					$params['title'] = format_to_output( $params['title'], 'htmlspecialchars' );
 				}
 				if( isset( $params['alt'] ) )
 				{
