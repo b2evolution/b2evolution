@@ -8053,7 +8053,7 @@ class Item extends ItemLight
 			}
 		}
 
-		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt:
+		// Save the new processing status to DB, but do not update last edited by user, slug or child custom fields:
 		$this->dbupdate( false, false, false );
 
 		return true;
@@ -8181,7 +8181,7 @@ class Item extends ItemLight
 
 		// Record that we have notified the moderators (for info only):
 		$this->set( 'notifications_flags', 'moderators_notified' );
-		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt:
+		// Save the new processing status to DB, but do not update last edited by user, slug or child custom fields:
 		$this->dbupdate( false, false, false );
 
 		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), count( $notified_user_IDs ) ), 'note', T_('Sending notifications:')  );
