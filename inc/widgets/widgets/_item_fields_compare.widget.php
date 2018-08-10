@@ -135,10 +135,20 @@ class item_fields_compare_Widget extends ComponentWidget
 					'note' => sprintf( T_('Check to allow filtering/ordering with URL params such as %s etc.'), '<code>cat=</code>, <code>tag=</code>, <code>orderby=</code>' ),
 					'defaultvalue' => 0,
 				),
+				'fields_source' => array(
+					'label' => T_('Fields to show'),
+					'type' => 'select',
+					'options' => array(
+						'all'     => T_('All'),
+						'exclude' => T_('All except fields listed below'),
+						'include' => T_('Only fields listed below'),
+					),
+					'defaultvalue' => 'all',
+				),
 				'fields' => array(
 					'type' => 'textarea',
 					'label' => T_('Specific fields to compare'),
-					'note' => T_('Enter one field name per line.').' '.T_('Leave empty to compare all fields.'),
+					'note' => T_('Enter one field name per line.'),
 					'rows' => 10,
 				),
 			), parent::get_param_definitions( $params ) );
@@ -195,9 +205,13 @@ class item_fields_compare_Widget extends ComponentWidget
 		// Load all requested posts into the cache:
 		$ItemCache->load_list( $items );
 
-		// Check what fields should be displayed for this widget:
-		$widget_fields = trim( $this->disp_params['fields'] );
-		$widget_fields = empty( $widget_fields ) ? false : preg_split( '#[\s\n\r]+#', $widget_fields );
+		$fields_source = $this->disp_params['fields_source'];
+
+		if( $fields_source == 'exclude' || $fields_source == 'include' )
+		{	// Check what fields should be excluded/included for this widget:
+			$widget_fields = trim( $this->disp_params['fields'] );
+			$widget_fields = empty( $widget_fields ) ? array() : preg_split( '#[\s\n\r]+#', $widget_fields );
+		}
 
 		$all_custom_fields = array();
 		foreach( $items as $i => $item_ID )
@@ -210,8 +224,24 @@ class item_fields_compare_Widget extends ComponentWidget
 
 			// Load all custom fields of the Item in cache:
 			$item_custom_fields = $widget_Item->get_custom_fields_defs();
+
 			// Use either all custom fields of the Item or only specified fields in config of this Widget:
-			$search_custom_fields = $widget_fields ? $widget_fields : array_keys( $item_custom_fields );
+			switch( $fields_source )
+			{
+				case 'exclude':
+					// Exclude custom fields from the specific list:
+					$search_custom_fields = array_diff( array_keys( $item_custom_fields ), $widget_fields );
+					break;
+				case 'include':
+					// Include custom fields from the specific list:
+					$search_custom_fields = $widget_fields;
+					break;
+				case 'all':
+				default:
+					// Use all custom fields:
+					$search_custom_fields = array_keys( $item_custom_fields );
+					break;
+			}
 
 			foreach( $search_custom_fields as $search_custom_field_key )
 			{
@@ -248,7 +278,7 @@ class item_fields_compare_Widget extends ComponentWidget
 			}
 		}
 
-		if( $widget_fields === false )
+		if( $fields_source == 'all' || $fields_source == 'exclude' )
 		{	// Sort custom fields from all requested posts by custom field order:
 			uasort( $all_custom_fields, array( $this, 'sort_custom_fields' ) );
 		}
@@ -282,7 +312,7 @@ class item_fields_compare_Widget extends ComponentWidget
 			// Compare values:
 			$prev_custom_field_value = NULL;
 			$i = 0;
-			$all_string_values_are_empty = ! $widget_fields;
+			$all_string_values_are_empty = ( $fields_source == 'all' || $fields_source == 'exclude' );
 			foreach( $custom_field['items'] as $item_ID )
 			{
 				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
@@ -378,7 +408,7 @@ class item_fields_compare_Widget extends ComponentWidget
 			// Display the repeated fields after separator:
 			if( $custom_field['type'] == 'separator' &&
 			    ! empty( $custom_field['format'] ) &&
-			    ! $widget_fields )
+			    ( $fields_source == 'all' || $fields_source == 'exclude' ) )
 			{	// Repeat fields after separator in case of displaying of all fields:
 				$separator_format = explode( ':', $custom_field['format'] );
 				if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
