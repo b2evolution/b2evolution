@@ -1563,6 +1563,25 @@ function skin_init( $disp )
 				$Messages->add( T_('The requested items don\'t exist.'), 'error' );
 			}
 			break;
+
+		case 'cart':
+			// Shopping cart:
+			$action = param_action();
+			switch( $action )
+			{
+				case 'add':
+				case 'update':
+				case 'remove':
+					// Add/Update/Delete a product to/from cart:
+					if( $Cart = & get_Cart() )
+					{
+						$qty = ( $action == 'remove' ? 0 : NULL );
+						$Cart->update( $qty );
+					}
+					header_redirect( $Blog->get( 'carturl', array( 'glue' => '&' ) ) );
+					break;
+			}
+			break;
 	}
 
 	$Debuglog->add('skin_init: $disp='.$disp. ' / $disp_detail='.$disp_detail.' / $seo_page_type='.$seo_page_type, 'skins' );
@@ -1840,6 +1859,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_usercomments'          => '_usercomments.disp.php',
 				'disp_users'                 => '_users.disp.php',
 				'disp_compare'               => '_compare.disp.php',
+				'disp_cart'                  => '_cart.disp.php',
 			);
 
 		// Add plugin disp handlers:

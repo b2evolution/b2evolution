@@ -124,6 +124,7 @@ class bootstrap_blog_Skin extends Skin
 				'help'                      => array( NT_('Help'), 160 ),
 				'register'                  => array( NT_('Register'), 170 ),
 				'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
+				'shopping_cart'             => array( NT_('Shopping Cart'), 190 ),
 			);
 	}
 

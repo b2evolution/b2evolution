@@ -118,6 +118,7 @@ $core_componentwidget_defs = array(
 			'coll_featured_intro',    // Featured/Intro Post
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
+			'cart_table',             // Shopping cart
 		),
 	'infoitem' => array(
 			'item_title',

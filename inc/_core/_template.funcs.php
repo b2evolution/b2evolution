@@ -477,6 +477,7 @@ function get_request_title( $params = array() )
 			'help_text'           => T_('In case of issues with this site...'),
 			'compare_text'           => /* TRANS: title for disp=compare */ T_('%s compared'),
 			'compare_text_separator' => /* TRANS: title separator for disp=compare */ ' '.T_('vs').' ',
+			'cart_text'           => T_('Shopping cart'),
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -859,6 +860,11 @@ function get_request_title( $params = array() )
 				$r[] = sprintf( $params['compare_text'], implode( $params['compare_text_separator'], $compare_item_titles ) );
 			}
 
+			break;
+
+		case 'cart':
+			// We are requesting a shopping cart:
+			$r[] = $params['cart_text'];
 			break;
 
 		case 'posts':

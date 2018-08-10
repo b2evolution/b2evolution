@@ -3067,6 +3067,10 @@ class Blog extends DataObject
 				$disp_param = 'flagged';
 				break;
 
+			case 'carturl':
+				$disp_param = 'cart';
+				break;
+
 			case 'helpurl':
 				if( $this->get_setting( 'help_link' ) == 'slug' )
 				{
