@@ -364,6 +364,7 @@ class ItemType extends DataObject
 			$custom_field_line_highlight = param( 'custom_field_line_highlight'.$i, 'string', NULL );
 			$custom_field_green_highlight = param( 'custom_field_green_highlight'.$i, 'string', NULL );
 			$custom_field_red_highlight = param( 'custom_field_red_highlight'.$i, 'string', NULL );
+			$custom_field_description = param( 'custom_field_description'.$i, 'text', NULL );
 
 			// Add each new/existing custom field in this array
 			// in order to see all them on the form when post type is not updated because some errors
@@ -383,6 +384,7 @@ class ItemType extends DataObject
 					'line_highlight'  => $custom_field_line_highlight,
 					'green_highlight' => $custom_field_green_highlight,
 					'red_highlight'   => $custom_field_red_highlight,
+					'description'     => $custom_field_description,
 				);
 
 			if( empty( $custom_field_label ) )
@@ -399,7 +401,7 @@ class ItemType extends DataObject
 			}
 			elseif( in_array( $custom_field_name, $field_names ) )
 			{ // Field name must be identical
-				$Messages->add( sprintf( T_('The field name "%s" is not identical, please use another.'), $custom_field_name ) );
+				$Messages->add( sprintf( T_('The field name "%s" is used more than once. Each field name must be unique.'), $custom_field_name ) );
 			}
 			else
 			{
@@ -418,6 +420,7 @@ class ItemType extends DataObject
 				'line_highlight'  => $custom_field_line_highlight,
 				'green_highlight' => $custom_field_green_highlight,
 				'red_highlight'   => $custom_field_red_highlight,
+				'description'     => $custom_field_description,
 			);
 			if( $custom_field_is_new )
 			{ // Insert custom field
@@ -519,6 +522,17 @@ class ItemType extends DataObject
 	{
 		global $DB;
 
+		if( ! empty( $this->delete_custom_fields ) )
+		{	// Delete custom fields:
+			$sql_data = array();
+			foreach( $this->delete_custom_fields as $itcf_ID )
+			{
+				$sql_data[] = '( itcf_ityp_ID = '.$DB->quote( $this->ID ).' AND itcf_ID = '.$DB->quote( $itcf_ID ).' )';
+			}
+			$DB->query( 'DELETE FROM T_items__type_custom_field
+				WHERE '.implode( ' OR ', $sql_data ) );
+		}
+
 		if( ! empty( $this->insert_custom_fields ) )
 		{	// Insert new custom fields:
 			$sql_data = array();
@@ -536,9 +550,10 @@ class ItemType extends DataObject
 						.$DB->quote( $custom_field['link'] ).', '
 						.$DB->quote( $custom_field['line_highlight'] ).', '
 						.$DB->quote( $custom_field['green_highlight'] ).', '
-						.$DB->quote( $custom_field['red_highlight'] ).' )';
+						.$DB->quote( $custom_field['red_highlight'] ).', '
+						.( empty( $custom_field['description'] ) ? 'NULL' : $DB->quote( $custom_field['description'] ) ).' )';
 			}
-			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format, itcf_formula, itcf_link, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight )
+			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format, itcf_formula, itcf_link, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight, itcf_description )
 					VALUES '.implode( ', ', $sql_data ) );
 		}
 
@@ -560,7 +575,8 @@ class ItemType extends DataObject
 						itcf_link = '.$DB->quote( $custom_field['link'] ).',
 						itcf_line_highlight = '.$DB->quote( $custom_field['line_highlight'] ).',
 						itcf_green_highlight = '.$DB->quote( $custom_field['green_highlight'] ).',
-						itcf_red_highlight = '.$DB->quote( $custom_field['red_highlight'] ).'
+						itcf_red_highlight = '.$DB->quote( $custom_field['red_highlight'] ).',
+						itcf_description = '.( empty( $custom_field['description'] ) ? 'NULL' : $DB->quote( $custom_field['description'] ) ).'
 					WHERE itcf_ityp_ID = '.$DB->quote( $this->ID ).'
 						AND itcf_ID = '.$DB->quote( $itcf_ID ).'
 						AND itcf_type = '.$DB->quote( $custom_field['type'] ) );
@@ -571,17 +587,6 @@ class ItemType extends DataObject
 						WHERE iset_name = '.$DB->quote( 'custom:'.$old_custom_fields[ $itcf_ID ]['name'] ) );
 				}
 			}
-		}
-
-		if( ! empty( $this->delete_custom_fields ) )
-		{ // Delete custom fields
-			$sql_data = array();
-			foreach( $this->delete_custom_fields as $itcf_ID )
-			{
-				$sql_data[] = '( itcf_ityp_ID = '.$DB->quote( $this->ID ).' AND itcf_ID = '.$DB->quote( $itcf_ID ).' )';
-			}
-			$DB->query( 'DELETE FROM T_items__type_custom_field
-				WHERE '.implode( ' OR ', $sql_data ) );
 		}
 	}
 
@@ -643,7 +648,7 @@ class ItemType extends DataObject
 				$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->ID );
 				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
 				$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_link AS link, ' );
-				$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight' );
+				$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description' );
 				$SQL->FROM( 'T_items__type_custom_field' );
 				$SQL->WHERE( 'itcf_ityp_ID = '.$DB->quote( $this->ID ) );
 				$SQL->ORDER_BY( 'itcf_order, itcf_ID' );
