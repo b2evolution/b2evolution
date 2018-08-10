@@ -454,6 +454,16 @@ class Blog extends DataObject
 				$this->set( 'name', empty( $name ) ? T_('Catalog Title') : $name );
 				$this->set( 'shortname', empty( $shortname ) ? T_('Catalog') : $shortname );
 				$this->set( 'urlname', empty( $urlname ) ? 'catalog' : $urlname );
+
+				// Try to find post type "Product" in DB:
+				global $DB;
+				$product_type_ID = $DB->get_var( 'SELECT ityp_ID
+					 FROM T_items__type
+					WHERE ityp_name = "Product"' );
+				if( $product_type_ID )
+				{	// Set default post type as "Product":
+					$this->set_setting( 'default_post_type', $product_type_ID );
+				}
 				break;
 
 			case 'std':
@@ -3412,7 +3422,7 @@ class Blog extends DataObject
 			$BlogCache->all_loaded = false;
 
 			if( $set_default_blog_ID )
-			{ // Use this blog as default because it is probably first created
+			{ // Use this blog as default because it is probably first created:
 				$Settings->set( 'default_blog_ID', $this->ID );
 				$Settings->dbupdate();
 			}
@@ -3440,10 +3450,10 @@ class Blog extends DataObject
 			// Enable default item types for the inserted collection:
 			$this->enable_default_item_types();
 
-			// Owner automatically favorite the collection
+			// Owner automatically favorite the collection:
 			$this->favorite( $this->owner_user_ID, 1 );
 
-			// All users automatically favorite the new blog if collection count < 5 and user count <= 10
+			// All users automatically favorite the new blog if collection count < 5 and user count <= 10:
 			load_funcs( 'tools/model/_system.funcs.php' );
 			$blog_count = count( system_get_blog_IDs( false ) );
 			$user_IDs = system_get_user_IDs();
@@ -5525,7 +5535,7 @@ class Blog extends DataObject
 				break;
 
 			case 'catalog':
-				$default_post_types = array( 'Post' ); // Create new post type for this collection?
+				$default_post_types = array( 'Product' );
 				break;
 
 			default: // 'std'
