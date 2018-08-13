@@ -82,9 +82,6 @@ body.pictured .container.main_page_wrapper {
   height: 100%;
   min-height: 100%;
 }
-body.pictured .container.main_page_wrapper .panel {
-  color: #333;
-}
 body.pictured .container.main_page_wrapper .panel a:not([class]) {
   color: #337ab7;
   text-decoration: none;
