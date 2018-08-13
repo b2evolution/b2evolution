@@ -390,15 +390,18 @@ class item_fields_compare_Widget extends ComponentWidget
 		// Start a table to display differences of all custom fields for selected posts:
 		echo $this->get_field_template( 'table_start' );
 
-		echo $this->get_field_template( 'row_start' );
-		echo $this->get_field_template( 'empty_cell' );
-		foreach( $items as $item_ID )
-		{
-			$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
-			// Permanent post link:
-			echo str_replace( '$post_link$', $widget_Item->get_title(), $this->get_field_template( 'post' ) );
+		if( ! isset( $this->display_item_headers ) || $this->display_item_headers !== false )
+		{	// Display item headers row only when it is not disabled e.g. from child class item_custom_fields_Widget:
+			echo $this->get_field_template( 'row_start' );
+			echo $this->get_field_template( 'empty_cell' );
+			foreach( $items as $item_ID )
+			{
+				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
+				// Permanent post link:
+				echo str_replace( '$post_link$', $widget_Item->get_title(), $this->get_field_template( 'post' ) );
+			}
+			echo $this->get_field_template( 'row_end' );
 		}
-		echo $this->get_field_template( 'row_end' );
 
 		foreach( $all_custom_fields as $custom_field )
 		{
