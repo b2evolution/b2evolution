@@ -82,7 +82,7 @@ class item_custom_fields_Widget extends item_fields_compare_Widget
 	 */
 	function get_param_definitions( $params )
 	{
-		// This is derived from coll_post_list_Widget, so we DO NOT ADD ANY param here!
+		// This is derived from item_fields_compare_Widget, so we DO NOT ADD ANY param here!
 		$generic_params = parent::get_param_definitions( $params );
 
 		// We only change the defaults and hide some params:
