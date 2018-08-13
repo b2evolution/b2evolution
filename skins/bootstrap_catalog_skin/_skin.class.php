@@ -144,6 +144,9 @@ class bootstrap_catalog_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
+		// Load to use function get_available_thumb_sizes()
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array_merge( array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
@@ -203,6 +206,13 @@ class bootstrap_catalog_Skin extends Skin
 								'four_columns'  	=> T_('Four columns'),
 							),
 						'type' => 'select',
+					),
+					'thumbnail_size' => array(
+						'label' => T_('Thumbnail size'),
+						'note' => T_('Cropping and sizing of thumbnails'),
+						'type' => 'select',
+						'options' => get_available_thumb_sizes(),
+						'defaultvalue' => 'fit-480x600',
 					),
 				'section_posts_end' => array(
 					'layout' => 'end_fieldset',

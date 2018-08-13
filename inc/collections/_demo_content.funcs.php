@@ -1110,6 +1110,13 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					$owner_ID,
 					'public',
 					$section_ID );
+
+				$BlogCache = & get_BlogCache();
+				if( $catalog_Blog = $BlogCache->get_by_ID( $blog_catalog_ID, false, false ) )
+				{
+					$catalog_Blog->set_setting( 'posts_per_page', 6 );
+					$catalog_Blog->dbupdate();
+				}
 				$blog_ID = $blog_catalog_ID;
 				break;
 
@@ -2710,7 +2717,7 @@ Hello
 				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				// Image 2
 				$edit_File = new File( 'shared', 0, 'products/pilot-v-razor-point-pen-2.jpg' );
-				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2 );
+				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2, 'aftermore' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				$post_count--;
@@ -2733,7 +2740,7 @@ Hello
 				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				// Image 2
 				$edit_File = new File( 'shared', 0, 'products/pilot-varsity-fountain-pen-2.jpg' );
-				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2 );
+				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2, 'aftermore' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				$post_count--;
@@ -2779,10 +2786,10 @@ Hello
 				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				// Image 2
 				$edit_File = new File( 'shared', 0, 'products/sharpie-fine-point-permanent-marker-2.jpg' );
-				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2 );
+				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2, 'aftermore' );
 				// Image 3
 				$edit_File = new File( 'shared', 0, 'products/sharpie-fine-point-permanent-marker-3.jpg' );
-				$photo_link_3_ID = $edit_File->link_to_Object( $LinkOwner, 3 );
+				$photo_link_3_ID = $edit_File->link_to_Object( $LinkOwner, 3, 'aftermore' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				$post_count--;
@@ -2825,10 +2832,10 @@ Hello
 				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				// Image 2
 				$edit_File = new File( 'shared', 0, 'products/sharpie-accent-tank-highlighter-2.jpg' );
-				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2 );
+				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2, 'aftermore' );
 				// Image 3
 				$edit_File = new File( 'shared', 0, 'products/sharpie-accent-tank-highlighter-3.jpg' );
-				$photo_link_3_ID = $edit_File->link_to_Object( $LinkOwner, 3 );
+				$photo_link_3_ID = $edit_File->link_to_Object( $LinkOwner, 3, 'aftermore' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				$post_count--;
@@ -2891,7 +2898,7 @@ Hello
 				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				// Image 2
 				$edit_File = new File( 'shared', 0, 'products/jam-paper-commercial-envelope-2.jpg' );
-				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2 );
+				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2, 'aftermore' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				$post_count--;
@@ -2934,7 +2941,7 @@ Hello
 				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				// Image 2
 				$edit_File = new File( 'shared', 0, 'products/jam-paper-a7-invitation-envelope-2.jpg' );
-				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2 );
+				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2, 'aftermore' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				$post_count--;

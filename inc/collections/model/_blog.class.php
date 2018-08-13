@@ -454,6 +454,7 @@ class Blog extends DataObject
 				$this->set( 'name', empty( $name ) ? T_('Catalog Title') : $name );
 				$this->set( 'shortname', empty( $shortname ) ? T_('Catalog') : $shortname );
 				$this->set( 'urlname', empty( $urlname ) ? 'catalog' : $urlname );
+				$this->set_setting( 'posts_per_page', 6 );
 
 				// Try to find post type "Product" in DB:
 				global $DB;

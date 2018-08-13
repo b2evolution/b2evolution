@@ -85,7 +85,7 @@ if( $disp == 'single' )
 <div class="row">
 	<div class="col-sm-6">
 		<?php
-			if( $Item->get_cover_image_url() )
+			if( $Item->get_number_of_images() )
 			{	// If current item has cover image
 					$Item->images( array(
 						'before_images'            => '<div class="evo_post_images">',
@@ -96,7 +96,7 @@ if( $disp == 'single' )
 						'after_images'             => '</div>',
 						'image_class'              => 'img-responsive',
 						'image_size'               => 'fit-1280x720',
-						'image_limit'              =>  1,
+						'limit'                    =>  1,
 						'image_link_to'            => 'original', // Can be 'original', 'single' or empty          <i class="fa fa-link" aria-hidden="true"></i>
 
 						// We DO NOT want to display galleries here, only one cover image
@@ -104,7 +104,16 @@ if( $disp == 'single' )
 						'gallery_colls'            => 1000,
 
 						// We want ONLY cover image to display here
-						'restrict_to_image_position' => 'cover,teaser',
+						'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore,inline',
+
+						'links_sql_select'           => ', CASE '
+								.'WHEN link_position = "cover"     THEN "1" '
+								.'WHEN link_position IN ("teaser","teaserperm","teaserlink") THEN "2" '
+								.'WHEN link_position = "aftermore" THEN "3" '
+								.'WHEN link_position = "inline"    THEN "4" '
+								// .'ELSE "99999999"' // Use this line only if you want to put the other position types at the end
+							.'END AS position_order',
+						'links_sql_orderby'          => 'position_order, link_order',
 					) );
 			} else {	// If current item does not have cover image
 				echo '<div class="noimage_wrapper"><i class="fa fa-file-image-o" aria-hidden="true"></i></div>';
@@ -223,7 +232,7 @@ if( $disp == 'single' )
 
 		if( ! $Item->is_intro() && ! in_array( $disp, array( 'single', 'page' ) ) )
 		{
-			if( $Item->get_cover_image_url() )
+			if( $Item->get_number_of_images() )
 			{	// If current item has cover image
 					$Item->images( array(
 						'before_images'            => '<div class="evo_post_images">',
@@ -233,8 +242,8 @@ if( $disp == 'single' )
 						'after_image'              => '</figure></div>',
 						'after_images'             => '</div>',
 						'image_class'              => 'img-responsive',
-						'image_size'               => 'crop-480x600',
-						'limit'                    =>  1,
+						'image_size'               => $Skin->get_setting( 'thumbnail_size'),
+						'limit'                    => 1,
 						'image_link_to'            => 'original', // Can be 'original', 'single' or empty          <i class="fa fa-link" aria-hidden="true"></i>
 
 						// We DO NOT want to display galleries here, only one cover image
@@ -242,7 +251,16 @@ if( $disp == 'single' )
 						'gallery_colls'            => 0,
 
 						// We want ONLY cover image to display here
-						'restrict_to_image_position' => 'cover',
+						'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore,inline',
+
+						'links_sql_select'           => ', CASE '
+								.'WHEN link_position = "cover" THEN "1" '
+								.'WHEN link_position IN ("teaser","teaserperm","teaserlink") THEN "2" '
+								.'WHEN link_position = "aftermore" THEN "3" '
+								.'WHEN link_position = "inline" THEN "4" '
+								// .'ELSE "99999999"' // Use this line only if you want to put the other position types at the end
+							.'END AS position_order',
+						'links_sql_orderby'          => 'position_order, link_order',
 					) );
 			}
 			else
