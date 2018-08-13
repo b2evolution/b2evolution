@@ -147,7 +147,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				),
 				'fields' => array(
 					'type' => 'textarea',
-					'label' => T_('Specific fields to compare'),
+					'label' => '',
 					'note' => T_('Enter one field name per line.'),
 					'rows' => 10,
 				),
