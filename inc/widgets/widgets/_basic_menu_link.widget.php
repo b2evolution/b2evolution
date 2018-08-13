@@ -51,6 +51,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			'mediaidx' => T_('Photo index'),
 			'sitemap' => T_('Site Map'),
 			'latestcomments' => T_('Latest comments'),
+			'cart' => T_('Shopping cart'),
 
 			'ownercontact' => T_('Blog owner contact form'),
 			'owneruserinfo' => T_('Blog owner profile'),
@@ -356,6 +357,13 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 				$text = T_('Latest comments');
 				// Check if current menu item must be highlighted:
 				$highlight_current = ( $highlight_current && $disp == 'comments' );
+				break;
+
+			case 'cart':
+				$url = $current_Blog->get( 'carturl' );
+				$text = T_('Shopping cart');
+				// Check if current menu item must be highlighted:
+				$highlight_current = ( $highlight_current && $disp == 'cart' );
 				break;
 
 			case 'owneruserinfo':

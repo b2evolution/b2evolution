@@ -874,6 +874,7 @@ if( !empty( $skin ) )
 					'usercomments'          => 'usercomments.main.php',
 					'users'                 => 'users.main.php',
 					'compare'               => 'compare.main.php',
+					'cart'                  => 'cart.main.php',
 					// All others will default to index.main.php
 				);
 

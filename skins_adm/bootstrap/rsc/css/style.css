@@ -62,6 +62,9 @@ div.status_icon {
   font-weight: bold;
   margin: 2px;
 }
+span.action_icon {
+  cursor: pointer;
+}
 .btn-group .action_icon {
   margin-left: 0;
   margin-right: 0;

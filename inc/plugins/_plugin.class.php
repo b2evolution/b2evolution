@@ -3700,20 +3700,15 @@ class Plugin
 			if( $use_tooltip )
 			{ // Add these data only for tooltip
 				$link_attribs['class'] = 'action_icon help_plugin_icon';
-				$link_attribs['rel'] = format_to_output( isset( $this->{$params['tooltip_field']} ) ? $this->{$params['tooltip_field']} : $this->long_desc, 'htmlspecialchars' );
+				$tooltip_text = isset( $this->{$params['tooltip_field']} ) ? $this->{$params['tooltip_field']} : $this->long_desc;
+				$tooltip_text .= $params['info_suffix_text'];
+				$link_attribs['data-popover'] = format_to_output( $tooltip_text, 'htmlspecialchars' );
+				$link_attribs['data-placement'] = $params['tooltip_placement'];
 				if( isset( $params['icon_color'] ) )
 				{
 					$link_attribs['style'] = 'color: '.$params['icon_color'].';';
 				}
-				if( ! empty( $params['info_suffix_text'] ) )
-				{
-					$link_attribs['data-info-suffix-text'] = format_to_output( $params['info_suffix_text'], 'htmlspecialchars' );
-				}
-				$link_attribs['data-tooltip-placement'] = $params['tooltip_placement'];
 			}
-
-			// Display additional info for help plugin icon only one time. It is used on plugins.js
-			//$info_suffix_text = $params['info_suffix_text'];
 		}
 		elseif( $target == '$readme' )
 		{ // README

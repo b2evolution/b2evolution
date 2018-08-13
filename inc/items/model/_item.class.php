@@ -2413,7 +2413,7 @@ class Item extends ItemLight
 			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
 			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, iset_value AS value, ' );
 			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_link AS link, ' );
-			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight' );
+			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description' );
 			$SQL->FROM( 'T_items__type_custom_field' );
 			$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON itcf_name = SUBSTRING( iset_name, 8 ) AND iset_item_ID = '.$this->ID );
 			$SQL->WHERE_and( 'itcf_ityp_ID = '.$DB->quote( $this->get( 'ityp_ID' ) ) );
@@ -2887,14 +2887,15 @@ class Item extends ItemLight
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'before'       => '<table class="item_custom_fields">',
-				'field_format' => '<tr><th class="right">$title$:</th><td class="center">$value$</td></tr>', // $title$ $value$
+				'field_format' => '<tr><th class="right">$title$$description_icon$:</th><td class="center">$value$</td></tr>', // $title$ $description_icon$ $value$
 				'after'        => '</table>',
+				'field_description_icon_class' => 'grey',
 				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
 				// Separate template for numeric and separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
-				'field_numeric_format'   => '<tr><th class="right">$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
-				'field_computed_format'  => '<tr><th class="right">$title$:</th><td class="right">$value$</td></tr>', // $title$ $value$
-				'field_separator_format' => '<tr><th colspan="2" class="center">$title$</th></tr>', // $title$
+				'field_numeric_format'   => '<tr><th class="right">$title$$description_icon$:</th><td class="right">$value$</td></tr>', // $title$ $description_icon$ $value$
+				'field_computed_format'  => '<tr><th class="right">$title$$description_icon$:</th><td class="right">$value$</td></tr>', // $title$ $description_icon$ $value$
+				'field_separator_format' => '<tr><th colspan="2" class="center">$title$$description_icon$</th></tr>', // $title$ $description_icon$
 			), $params );
 
 		// Get all custom fields by item ID:
@@ -2916,21 +2917,17 @@ class Item extends ItemLight
 
 		$html = '';
 
-		$mask = array( '$title$', '$value$' );
 		foreach( $display_fields as $field_name )
 		{
-			$field_name = trim( $field_name );
+			// Get HTML code of the custom field:
+			$html .= $this->get_custom_field_template( $field_name, $params );
+
 			if( ! isset( $custom_fields[ $field_name ] ) )
-			{	// Wrong field:
-				$values = array( $field_name, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>' );
-				$html .= str_replace( $mask, $values, $params['field_format'] );
+			{	// Skip unknown field:
 				continue;
 			}
 
 			$field = $custom_fields[ $field_name ];
-
-			// Get HTML code of the custom field:
-			$html .= $this->get_custom_field_template( $field, $params );
 
 			if( $field['type'] == 'separator' &&
 					! empty( $field['format'] ) &&
@@ -2951,7 +2948,7 @@ class Item extends ItemLight
 						continue;
 					}
 					// Get HTML code of the repeated custom field:
-					$html .= $this->get_custom_field_template( $custom_fields[ $repeat_field_name ], $params );
+					$html .= $this->get_custom_field_template( $repeat_field_name, $params );
 				}
 			}
 		}
@@ -2969,23 +2966,49 @@ class Item extends ItemLight
 	/**
 	 * Get HTML code of the requested field
 	 *
-	 * @param array Custom field data
+	 * @param string Custom field name
 	 * @param array Additional parameters
 	 */
-	function get_custom_field_template( $field, $params = array() )
+	function get_custom_field_template( $field_name, $params = array() )
 	{
+		$custom_fields = $this->get_custom_fields_defs();
+
+		$mask_vars = array( '$title$', '$description_icon$', '$value$' );
+
+		$field_name = trim( $field_name );
+		if( ! isset( $custom_fields[ $field_name ] ) )
+		{	// Wrong field:
+			$mask_values = array( $field_name, '', '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>' );
+			return str_replace( $mask_vars, $mask_values, $params['field_format'] );
+		}
+
+		$field = $custom_fields[ $field_name ];
+
 		// Use field format depending on type:
 		$field_type = ( $field['type'] == 'double' ? 'numeric' : ( $field['type'] == 'varchar' ? 'string' : $field['type'] ) );
 		$field_format = isset( $params['field_'.$field_type.'_format'] ) ? $params['field_'.$field_type.'_format'] : $params['field_format'];
 
-		$mask = array( '$title$', '$value$' );
+		$mask_values = array( $field['label'] );
+
+		if( empty( $field['description'] ) )
+		{	// The custom field has no description:
+			$mask_values[] = '';
+		}
+		else
+		{	// Display a description in tooltip of the help icon:
+			$mask_values[] = ' '.get_icon( 'help', 'imgtag', array(
+					'data-toggle' => 'tooltip',
+					'title'       => nl2br( $field['description'] ),
+					'class'       => $params['field_description_icon_class'],
+				) ).' ';
+		}
 
 		if( ! $field['public'] )
 		{	// Not public field:
 			if( ! empty( $params['fields'] ) )
 			{	// Display an error message only when fields are called by names:
-				$values = array( $field['label'], '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field['name'] ).'</span>' );
-				return str_replace( $mask, $values, $field_format );
+				$mask_values[] = '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field['name'] ).'</span>';
+				return str_replace( $mask_vars, $mask_values, $field_format );
 				$fields_exist = true;
 			}
 			return '';
@@ -2996,7 +3019,8 @@ class Item extends ItemLight
 				$field['type'] == 'separator' ||
 				( ( $field['type'] == 'double' || $field['type'] == 'computed' ) && $custom_field_value == '0' ) )
 		{	// Display only the filled field AND also numeric field with '0' value:
-			return str_replace( $mask, array( $field['label'], $custom_field_value ), $field_format );
+			$mask_values[] = $custom_field_value;
+			return str_replace( $mask_vars, $mask_values, $field_format );
 		}
 	}
 
@@ -7189,9 +7213,10 @@ class Item extends ItemLight
 	 * @param boolean Update slug? - We want to PREVENT updating slug when item dbupdate is called,
 	 * 	because of the item canonical url title was changed on the slugs edit form, so slug update is already done.
 	 *  If slug update wasn't done already, then this param has to be true.
+	 * @param boolean Update custom fields of child posts?
 	 * @return boolean true on success
 	 */
-	function dbupdate( $auto_track_modification = true, $update_slug = true, $dummy = true )
+	function dbupdate( $auto_track_modification = true, $update_slug = true, $update_child_custom_fields = true )
 	{
 		global $DB, $Plugins, $Messages;
 
@@ -7239,8 +7264,10 @@ class Item extends ItemLight
 				global $localtimenow;
 				$this->set_param( $this->datemodified_field, 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
 			}
+		}
 
-			// Update custom fields of all child posts of this post:
+		if( $update_child_custom_fields )
+		{	// Update custom fields of all child posts of this post:
 			$custom_fields = $this->get_type_custom_fields();
 			if( ! empty( $custom_fields ) )
 			{	// If this post has at least one custom field
@@ -8026,7 +8053,7 @@ class Item extends ItemLight
 			}
 		}
 
-		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt:
+		// Save the new processing status to DB, but do not update last edited by user, slug or child custom fields:
 		$this->dbupdate( false, false, false );
 
 		return true;
@@ -8154,7 +8181,7 @@ class Item extends ItemLight
 
 		// Record that we have notified the moderators (for info only):
 		$this->set( 'notifications_flags', 'moderators_notified' );
-		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt:
+		// Save the new processing status to DB, but do not update last edited by user, slug or child custom fields:
 		$this->dbupdate( false, false, false );
 
 		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), count( $notified_user_IDs ) ), 'note', T_('Sending notifications:')  );

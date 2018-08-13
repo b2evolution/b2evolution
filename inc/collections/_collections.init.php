@@ -444,6 +444,25 @@ function & get_EnabledWidgetCache()
 
 
 /**
+ * Get Shopping Cart
+ *
+ * @return object Cart
+ */
+function & get_Cart()
+{
+	global $Cart;
+
+	if( ! isset( $Cart ) )
+	{	// Initialize object for shopping cart:
+		load_class( 'collections/model/_cart.class.php', 'Cart' );
+		$Cart = new Cart();
+	}
+
+	return $Cart;
+}
+
+
+/**
  * adsense_Module definition
  */
 class collections_Module extends Module

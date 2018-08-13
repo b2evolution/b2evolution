@@ -98,6 +98,11 @@ class cart_button_Widget extends ComponentWidget
 					'size' => 40,
 					'defaultvalue' => 'btn btn-lg btn-success'
 				),
+				'icon_class' => array(
+					'label' => T_('Icon class'),
+					'size' => 40,
+					'defaultvalue' => 'fa fa-cart-plus'
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -119,6 +124,12 @@ class cart_button_Widget extends ComponentWidget
 			return false;
 		}
 
+		if( ! $Item->can_be_displayed() )
+		{	// Don't display the button if current Item cannot be displayed for current User on front-office:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because current Item is not defined.' );
+			return false;
+		}
+
 		$this->init_display( $params );
 
 		echo $this->disp_params['block_start'];
@@ -128,10 +139,11 @@ class cart_button_Widget extends ComponentWidget
 		echo $this->disp_params['block_body_start'];
 
 		// Initialize URL to add a product to cart:
-		$add_cart_url = url_add_param( $Blog->get( 'url' ), 'disp=cart&amp;action=add&amp;item_ID='.$Item->ID.'&amp;qty=1' );
+		$add_cart_url = $Blog->get( 'carturl', array( 'url_suffix' => 'action=add&amp;item_ID='.$Item->ID.'&amp;qty=1' ) );
 
 		// Display a buttton to add a product to cart:
 		echo '<a href="'.$add_cart_url.'" class="'.format_to_output( $this->disp_params['btn_class'], 'htmlattr' ).'">'
+				.'<i class="'.format_to_output( $this->disp_params['icon_class'], 'htmlattr' ).'"></i> '
 				.format_to_output( $this->disp_params['btn_title'], 'htmlbody' )
 			.'</a>';
 
