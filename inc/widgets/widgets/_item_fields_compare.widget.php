@@ -24,7 +24,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_fields_compare_Widget extends ComponentWidget
 {
-	var $icon = 'file-text-o';
+	var $icon = 'balance-scale';
 
 	/**
 	 * Constructor

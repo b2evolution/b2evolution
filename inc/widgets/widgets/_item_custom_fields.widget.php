@@ -24,7 +24,7 @@ load_class( 'widgets/widgets/_item_fields_compare.widget.php', 'item_fields_comp
  */
 class item_custom_fields_Widget extends item_fields_compare_Widget
 {
-	var $icon = 'file-text-o';
+	var $icon = 'list';
 
 	/**
 	 * Constructor
