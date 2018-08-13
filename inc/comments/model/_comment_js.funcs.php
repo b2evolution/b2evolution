@@ -556,7 +556,7 @@ function get_show_statuses()
 function get_expiry_status()
 {
 	var expiry_status = 'active';
-	if( jQuery('#show_expiry_all') && jQuery('#show_expiry_all').attr('checked') )
+	if( jQuery('#show_expiry_all') && jQuery('#show_expiry_all').prop('checked') )
 	{
 		expiry_status = 'all';
 	}
