@@ -2887,14 +2887,12 @@ class Item extends ItemLight
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'before'       => '<table class="item_custom_fields">',
-				'field_format' => '<tr><th class="right">$title$$description_icon$:</th><td class="center">$value$</td></tr>', // $title$ $description_icon$ $value$
+				'field_format' => '<tr><th class="right">$title$$description_icon$:</th><td class="$class$">$value$</td></tr>', // $title$ $description_icon$ $class$ $value$
 				'after'        => '</table>',
 				'field_description_icon_class' => 'grey',
 				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
-				// Separate template for numeric and separator fields:
+				// Separate template for separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
-				'field_numeric_format'   => '<tr><th class="right">$title$$description_icon$:</th><td class="right">$value$</td></tr>', // $title$ $description_icon$ $value$
-				'field_computed_format'  => '<tr><th class="right">$title$$description_icon$:</th><td class="right">$value$</td></tr>', // $title$ $description_icon$ $value$
 				'field_separator_format' => '<tr><th colspan="2" class="center">$title$$description_icon$</th></tr>', // $title$ $description_icon$
 			), $params );
 
@@ -2973,12 +2971,12 @@ class Item extends ItemLight
 	{
 		$custom_fields = $this->get_custom_fields_defs();
 
-		$mask_vars = array( '$title$', '$description_icon$', '$value$' );
+		$mask_vars = array( '$title$', '$description_icon$', '$class$', '$value$' );
 
 		$field_name = trim( $field_name );
 		if( ! isset( $custom_fields[ $field_name ] ) )
 		{	// Wrong field:
-			$mask_values = array( $field_name, '', '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>' );
+			$mask_values = array( $field_name, '', '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), '', $field_name ).'</span>' );
 			return str_replace( $mask_vars, $mask_values, $params['field_format'] );
 		}
 
@@ -3002,6 +3000,9 @@ class Item extends ItemLight
 					'class'       => $params['field_description_icon_class'],
 				) ).' ';
 		}
+
+		// Alignment class for cell with value depending on custom field type:
+		$mask_values[] = in_array( $field['type'], array( 'double', 'computed' ) ) ? 'right' : 'center';
 
 		if( ! $field['public'] )
 		{	// Not public field:

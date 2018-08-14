@@ -167,29 +167,21 @@ class item_fields_compare_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		$this->disp_params = array_merge( $this->disp_params, array(
-				'fields_compare_table_start'       => '<div class="evo_content_block"><table class="item_custom_fields">',
-				'fields_compare_row_start'         => '<tr>',
-				'fields_compare_empty_cell'        => '<td style="border:none"></td>',
-				'fields_compare_post'              => '<th class="center">$post_link$</th>',
-				'fields_compare_field_title'       => '<th class="right">$field_title$$field_description_icon$:</th>',
-				'fields_compare_field_value'       => '<td class="center">$field_value$</td>',
-				'fields_compare_field_value_diff'  => '<td class="center bg-warning">$field_value$</td>',
-				'fields_compare_field_value_green' => '<td class="center bg-success">$field_value$</td>',
-				'fields_compare_field_value_red'   => '<td class="center bg-danger">$field_value$</td>',
-				'fields_compare_row_end'           => '</tr>',
-				'fields_compare_table_end'         => '</table></div>',
-				'fields_compare_description_icon_class' => 'grey',
-				// Separate template for numeric and separator fields:
+				'custom_fields_table_start'                => '<div class="evo_content_block"><table class="item_custom_fields">',
+				'custom_fields_row_start'                  => '<tr>',
+				'custom_fields_topleft_cell'               => '<td style="border:none"></td>',
+				'custom_fields_col_header_item'            => '<th class="center">$item_link$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
+				'custom_fields_row_header_field'           => '<th class="right">$field_title$$field_description_icon$:</th>',
+				'custom_fields_value_default'              => '<td class="$class$">$field_value$</td>',
+				'custom_fields_value_difference_highlight' => '<td class="$class$ bg-warning">$field_value$</td>',
+				'custom_fields_value_green'                => '<td class="$class$ bg-success">$field_value$</td>',
+				'custom_fields_value_red'                  => '<td class="$class$ bg-danger">$field_value$</td>',
+				'custom_fields_row_end'                    => '</tr>',
+				'custom_fields_table_end'                  => '</table></div>',
+				'custom_fields_description_icon_class'     => 'grey',
+				// Separate template for separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
-				'fields_compare_numeric_field_value'        => '<td class="right">$field_value$</td>',
-				'fields_compare_numeric_field_value_diff'   => '<td class="right bg-warning">$field_value$</td>',
-				'fields_compare_numeric_field_value_green'  => '<td class="right bg-success">$field_value$</td>',
-				'fields_compare_numeric_field_value_red'    => '<td class="right bg-danger">$field_value$</td>',
-				'fields_compare_computed_field_value'       => '<td class="right">$field_value$</td>',
-				'fields_compare_computed_field_value_diff'  => '<td class="right bg-warning">$field_value$</td>',
-				'fields_compare_computed_field_value_green' => '<td class="right bg-success">$field_value$</td>',
-				'fields_compare_computed_field_value_red'   => '<td class="right bg-danger">$field_value$</td>',
-				'fields_compare_separator_field_title'      => '<th class="center" colspan="$cols_count$">$field_title$$field_description_icon$</th>',
+				'custom_fields_separator_row_header_field' => '<th class="center" colspan="$cols_count$">$field_title$$field_description_icon$</th>',
 			), $params );
 
 		// Get IDs of items which should be compared:
@@ -393,12 +385,12 @@ class item_fields_compare_Widget extends ComponentWidget
 		if( ! isset( $this->display_item_headers ) || $this->display_item_headers !== false )
 		{	// Display item headers row only when it is not disabled e.g. from child class item_custom_fields_Widget:
 			echo $this->get_field_template( 'row_start' );
-			echo $this->get_field_template( 'empty_cell' );
+			echo $this->get_field_template( 'topleft_cell' );
 			foreach( $items as $item_ID )
 			{
 				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 				// Permanent post link:
-				echo str_replace( '$post_link$', $widget_Item->get_title(), $this->get_field_template( 'post' ) );
+				echo str_replace( '$item_link$', $widget_Item->get_title(), $this->get_field_template( 'col_header_item' ) );
 			}
 			echo $this->get_field_template( 'row_end' );
 		}
@@ -466,14 +458,14 @@ class item_fields_compare_Widget extends ComponentWidget
 			$field_description_icon = ' '.get_icon( 'help', 'imgtag', array(
 					'data-toggle' => 'tooltip',
 					'title'       => nl2br( $custom_field['description'] ),
-					'class'       => $params['fields_compare_description_icon_class'],
+					'class'       => $params['custom_fields_description_icon_class'],
 				) ).' ';
 		}
 
 		// Custom field title:
 		echo str_replace( array( '$field_title$', '$cols_count$', '$field_description_icon$' ),
 			array( $custom_field['label'], count( $items ) + 1, $field_description_icon ),
-			$this->get_field_template( 'field_title', $custom_field['type'] ) );
+			$this->get_field_template( 'row_header_field', $custom_field['type'] ) );
 
 		if( $custom_field['type'] != 'separator' )
 		{	// Separator fields have no values:
@@ -493,11 +485,12 @@ class item_fields_compare_Widget extends ComponentWidget
 				}
 
 				// Default template for field value:
-				$field_value_template = $this->get_field_template( 'field_value', $custom_field['type'] );
+				$field_value_template = $this->get_field_template( 'value_default', $custom_field['type'] );
+				$custom_field_class = in_array( $custom_field['type'], array( 'double', 'computed' ) ) ? 'right' : 'center';
 
 				if( $custom_field['is_different'] && $custom_field['line_highlight'] == 'differences' )
 				{	// Mark the field value as different only when it is defined in the settings of the custom field:
-					$field_value_template = $this->get_field_template( 'field_value_diff', $custom_field['type'] );
+					$field_value_template = $this->get_field_template( 'value_difference_highlight', $custom_field['type'] );
 				}
 
 				if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) &&
@@ -508,11 +501,11 @@ class item_fields_compare_Widget extends ComponentWidget
 					{	// Check if we should mark the highest field:
 						if( $custom_field['green_highlight'] == 'highest' )
 						{	// The highest value must be marked as green:
-							$field_value_template = $this->get_field_template( 'field_value_green', $custom_field['type'] );
+							$field_value_template = $this->get_field_template( 'value_green', $custom_field['type'] );
 						}
 						elseif( $custom_field['red_highlight'] == 'highest' )
 						{	// The highest value must be marked as red:
-							$field_value_template = $this->get_field_template( 'field_value_red', $custom_field['type'] );
+							$field_value_template = $this->get_field_template( 'value_red', $custom_field['type'] );
 						}
 					}
 
@@ -521,16 +514,16 @@ class item_fields_compare_Widget extends ComponentWidget
 					{	// Check if we should mark the lowest field:
 						if( $custom_field['green_highlight'] == 'lowest' )
 						{	// The lowest value must be marked as green:
-							$field_value_template = $this->get_field_template( 'field_value_green', $custom_field['type'] );
+							$field_value_template = $this->get_field_template( 'value_green', $custom_field['type'] );
 						}
 						elseif( $custom_field['red_highlight'] == 'lowest' )
 						{	// The lowest value must be marked as red:
-							$field_value_template = $this->get_field_template( 'field_value_red', $custom_field['type'] );
+							$field_value_template = $this->get_field_template( 'value_red', $custom_field['type'] );
 						}
 					}
 				}
 
-				echo str_replace( '$field_value$', $custom_field_value, $field_value_template );
+				echo str_replace( array( '$class$', '$field_value$' ), array( $custom_field_class, $custom_field_value ), $field_value_template );
 			}
 		}
 
@@ -680,13 +673,13 @@ class item_fields_compare_Widget extends ComponentWidget
 		// Convert field types to non-devs names:
 		$field_type = ( $field_type == 'double' ? 'numeric' : ( $field_type == 'varchar' ? 'string' : $field_type ) );
 
-		if( isset( $this->disp_params['fields_compare_'.$field_type.'_'.$template_name] ) )
+		if( isset( $this->disp_params['custom_fields_'.$field_type.'_'.$template_name] ) )
 		{	// Use special template for current type if it is defined:
-			return $this->disp_params['fields_compare_'.$field_type.'_'.$template_name];
+			return $this->disp_params['custom_fields_'.$field_type.'_'.$template_name];
 		}
-		elseif( isset( $this->disp_params['fields_compare_'.$template_name] ) )
+		elseif( isset( $this->disp_params['custom_fields_'.$template_name] ) )
 		{	// Use generic template for all types:
-			return $this->disp_params['fields_compare_'.$template_name];
+			return $this->disp_params['custom_fields_'.$template_name];
 		}
 
 		// Unknown template:
