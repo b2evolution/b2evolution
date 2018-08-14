@@ -212,39 +212,41 @@ switch( $content_mode )
 		/* continue down */
 	case 'normal':
 	default:
-		// Normal dislpay:  (and Full display if force_more is true)
+		// Normal display:  (and Full display if force_more is true)
 		echo $params['content_start_full'];
 
-		// if( ! empty($params['image_size']) )
-		// {
-			// Display images that are linked to this post:
-			// $Item->images( array(
-					// 'before'              => $params['before_images'],
-					// 'before_image'        => $params['before_image'],
-					// 'before_image_legend' => $params['before_image_legend'],
-					// 'after_image_legend'  => $params['after_image_legend'],
-					// 'after_image'         => $params['after_image'],
-					// 'after'               => $params['after_images'],
-					// 'image_class'         => $params['image_class'],
-					// 'image_size'          => $params['image_size'],
-					// 'limit'               => $params['image_limit'],
-					// 'image_link_to'       => $params['image_link_to'],
-					// 'before_gallery'      => $params['before_gallery'],
-					// 'after_gallery'       => $params['after_gallery'],
-					// 'gallery_table_start' => $params['gallery_table_start'],
-					// 'gallery_table_end'   => $params['gallery_table_end'],
-					// 'gallery_row_start'   => $params['gallery_row_start'],
-					// 'gallery_row_end'     => $params['gallery_row_end'],
-					// 'gallery_cell_start'  => $params['gallery_cell_start'],
-					// 'gallery_cell_end'    => $params['gallery_cell_end'],
-					// 'gallery_image_size'  => $params['gallery_image_size'],
-					// 'gallery_image_limit' => $params['gallery_image_limit'],
-					// 'gallery_colls'       => $params['gallery_colls'],
-					// 'gallery_order'       => $params['gallery_order'],
-					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
-					// 'restrict_to_image_position' => $teaser_image_positions,
-				// ) );
-		// }
+		/*
+		if( ! empty($params['image_size']) )
+		{
+			Display images that are linked to this post:
+			$Item->images( array(
+					'before'              => $params['before_images'],
+					'before_image'        => $params['before_image'],
+					'before_image_legend' => $params['before_image_legend'],
+					'after_image_legend'  => $params['after_image_legend'],
+					'after_image'         => $params['after_image'],
+					'after'               => $params['after_images'],
+					'image_class'         => $params['image_class'],
+					'image_size'          => $params['image_size'],
+					'limit'               => $params['image_limit'],
+					'image_link_to'       => $params['image_link_to'],
+					'before_gallery'      => $params['before_gallery'],
+					'after_gallery'       => $params['after_gallery'],
+					'gallery_table_start' => $params['gallery_table_start'],
+					'gallery_table_end'   => $params['gallery_table_end'],
+					'gallery_row_start'   => $params['gallery_row_start'],
+					'gallery_row_end'     => $params['gallery_row_end'],
+					'gallery_cell_start'  => $params['gallery_cell_start'],
+					'gallery_cell_end'    => $params['gallery_cell_end'],
+					'gallery_image_size'  => $params['gallery_image_size'],
+					'gallery_image_limit' => $params['gallery_image_limit'],
+					'gallery_colls'       => $params['gallery_colls'],
+					'gallery_order'       => $params['gallery_order'],
+					Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+					'restrict_to_image_position' => $teaser_image_positions,
+				) );
+		}
+		*/
 
 		if( $params['content_display_full'] )
 		{	// We want to display text, not just images:
@@ -264,59 +266,62 @@ switch( $content_mode )
 					) );
 			}
 
-			if( $Item->is_intro() || in_array( $disp, array( 'single', 'page' ) ) ) {
-			$Item->content_teaser( array(
-					'before'              => $params['before_content_teaser'],
-					'after'               => $params['after_content_teaser'],
-					'before_image'        => $params['before_image'],
-					'before_image_legend' => $params['before_image_legend'],
-					'after_image_legend'  => $params['after_image_legend'],
-					'after_image'         => $params['after_image'],
-					'image_class'         => $params['image_class'],
-					'image_size'          => $params['image_size'],
-					'limit'               => $params['image_limit'],
-					'image_link_to'       => $params['image_link_to'],
-				) );
-
-			// Display either the "Read more"/"Full story" link OR the #anchor for #direct linking to the "after more" part:
-			$Item->more_link( array(
-					'force_more'  => $params['force_more'],
-					'before'      => $params['before_more_link'],
-					'after'       => $params['after_more_link'],
-					'link_text'   => $params['more_link_text'],		// text to display as the more link
-					'anchor_text' => $params['anchor_text'],			// text to display as the more anchor (once the more link has been clicked, # defaults to "Follow up:")
-					'link_to'     => $params['more_link_to'],
-				) );
-
-			if( ! empty( $params['image_size'] ) && ( $more || $params['force_more'] ) && $Item->has_content_parts( $params ) )
-			{	// Display images that are linked "after more" to this post:
-				$Item->images( array(
-						'before'              => $params['before_images'],
+			if( $Item->is_intro() || in_array( $disp, array( 'single', 'page' ) ) )
+			{
+				$Item->content_teaser( array(
+						'before'              => $params['before_content_teaser'],
+						'after'               => $params['after_content_teaser'],
 						'before_image'        => $params['before_image'],
 						'before_image_legend' => $params['before_image_legend'],
 						'after_image_legend'  => $params['after_image_legend'],
 						'after_image'         => $params['after_image'],
-						'after'               => $params['after_images'],
 						'image_class'         => $params['image_class'],
 						'image_size'          => $params['image_size'],
 						'limit'               => $params['image_limit'],
 						'image_link_to'       => $params['image_link_to'],
-						'before_gallery'      => $params['before_gallery'],
-						'after_gallery'       => $params['after_gallery'],
-						'gallery_table_start' => $params['gallery_table_start'],
-						'gallery_table_end'   => $params['gallery_table_end'],
-						'gallery_row_start'   => $params['gallery_row_start'],
-						'gallery_row_end'     => $params['gallery_row_end'],
-						'gallery_cell_start'  => $params['gallery_cell_start'],
-						'gallery_cell_end'    => $params['gallery_cell_end'],
-						'gallery_image_size'  => $params['gallery_image_size'],
-						'gallery_image_limit' => $params['gallery_image_limit'],
-						'gallery_colls'       => $params['gallery_colls'],
-						'gallery_order'       => $params['gallery_order'],
-						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
-						'restrict_to_image_position' => 'aftermore',
 					) );
-			}
+
+				// Display either the "Read more"/"Full story" link OR the #anchor for #direct linking to the "after more" part:
+				$Item->more_link( array(
+						'force_more'  => $params['force_more'],
+						'before'      => $params['before_more_link'],
+						'after'       => $params['after_more_link'],
+						'link_text'   => $params['more_link_text'],		// text to display as the more link
+						'anchor_text' => $params['anchor_text'],			// text to display as the more anchor (once the more link has been clicked, # defaults to "Follow up:")
+						'link_to'     => $params['more_link_to'],
+					) );
+
+				/*
+				if( ! empty( $params['image_size'] ) && ( $more || $params['force_more'] ) && $Item->has_content_parts( $params ) )
+				{	// Display images that are linked "after more" to this post:
+					$Item->images( array(
+							'before'              => $params['before_images'],
+							'before_image'        => $params['before_image'],
+							'before_image_legend' => $params['before_image_legend'],
+							'after_image_legend'  => $params['after_image_legend'],
+							'after_image'         => $params['after_image'],
+							'after'               => $params['after_images'],
+							'image_class'         => $params['image_class'],
+							'image_size'          => $params['image_size'],
+							'limit'               => $params['image_limit'],
+							'image_link_to'       => $params['image_link_to'],
+							'before_gallery'      => $params['before_gallery'],
+							'after_gallery'       => $params['after_gallery'],
+							'gallery_table_start' => $params['gallery_table_start'],
+							'gallery_table_end'   => $params['gallery_table_end'],
+							'gallery_row_start'   => $params['gallery_row_start'],
+							'gallery_row_end'     => $params['gallery_row_end'],
+							'gallery_cell_start'  => $params['gallery_cell_start'],
+							'gallery_cell_end'    => $params['gallery_cell_end'],
+							'gallery_image_size'  => $params['gallery_image_size'],
+							'gallery_image_limit' => $params['gallery_image_limit'],
+							'gallery_colls'       => $params['gallery_colls'],
+							'gallery_order'       => $params['gallery_order'],
+							// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+							'restrict_to_image_position' => 'aftermore',
+						) );
+				}
+				*/
 			}
 
 			// Display the "after more" part of the text: (part after "[teaserbreak]")
@@ -333,7 +338,7 @@ switch( $content_mode )
 					'image_link_to'       => $params['image_link_to'],
 					'force_more'          => $params['force_more'],
 				) );
-			
+
 			// Links to post pages (for multipage posts):
 			$Item->page_links( array(
 					'before'      => $params['page_links_start'],
@@ -356,6 +361,5 @@ switch( $content_mode )
 		}
 
 		echo $params['content_end_full'];
-
 }
 ?>

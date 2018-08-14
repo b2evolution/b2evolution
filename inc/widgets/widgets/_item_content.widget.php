@@ -166,7 +166,7 @@ class item_content_Widget extends ComponentWidget
 		if( isset($this->disp_params['widget_coll_item_content_params']) )
 		{	// The new correct stuff gets precedence over the old stuff:
 			$widget_item_content_params = array_merge( $widget_item_content_params, $this->disp_params['widget_coll_item_content_params'] );
-		}		
+		}
 
 		echo $this->disp_params['block_start'];
 		$this->disp_title();

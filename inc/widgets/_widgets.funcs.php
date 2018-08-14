@@ -93,6 +93,11 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	$blog_containers['front_page_column_a'] = array( 'Front Page Column A', 1, 0 );
 	$blog_containers['front_page_column_b'] = array( 'Front Page Column B', 2, 0 );
 	$blog_containers['user_page_reputation'] = array( 'User Page - Reputation', 100, 0 );
+	if( $kind == 'catalog' )
+	{
+		$blog_containers['product_page_column_a'] = array( 'Product Page Column A', 10, 0 );
+		$blog_containers['product_page_column_b'] = array( 'Product Page Column B', 11, 0 );
+	}
 
 	// Create rows to insert for all collection containers:
 	$widget_containers_sql_rows = array();
@@ -234,13 +239,22 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		{
 			add_basic_widget( $wico_id, 'item_title', 'core', 5 );
 		}
+		if( $kind == 'catalog' )
+		{
+			add_basic_widget( $wico_id, 'subcontainer_row', 'core', 8, array(
+				'column1_container' => 'product_page_column_a',
+				'column1_class'     => ( 'col-sm-6 col-xs-12' ),
+				'column2_container' => 'product_page_column_b',
+				'column2_class'     => 'col-sm-6 col-xs-12',
+			) );
+		}
 		add_basic_widget( $wico_id, 'item_content', 'core', 10 );
 		add_basic_widget( $wico_id, 'item_attachments', 'core', 15 );
 		if( $kind != 'catalog' )
 		{ // Item Link
 			add_basic_widget( $wico_id, 'item_link', 'core', 17 );
 		}
-		if( $blog_id != $blog_a_ID && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) && ! in_array( $kind, array( 'forum', 'group' ) ) )
+		if( $blog_id != $blog_a_ID && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) && ! in_array( $kind, array( 'forum', 'group', 'catalog' ) ) )
 		{ // Item Tags
 			add_basic_widget( $wico_id, 'item_tags', 'core', 20 );
 		}
@@ -260,9 +274,34 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		{ // Seen by
 			add_basic_widget( $wico_id, 'item_seen_by', 'core', 50 );
 		}
-		if( $kind != 'forum' )
+		if( ! in_array( $kind,  array( 'forum', 'catalog' ) ) )
 		{	// Item voting panel:
 			add_basic_widget( $wico_id, 'item_vote', 'core', 60 );
+		}
+	}
+
+	/* Product Page Column A */
+	if( array_key_exists( 'product_page_column_a', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['product_page_column_a']['wico_ID'];
+		if( $kind == 'catalog' )
+		{
+			// Item Image widget # 1
+			// Item Image widget # 2
+		}
+	}
+
+	/* Product Page Column B */
+	if( array_key_exists( 'product_page_column_b', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['product_page_column_b']['wico_ID'];
+		if( $kind == 'catalog' )
+		{
+			// Item Excerpt widget
+			add_basic_widget( $wico_id, 'item_vote', 'core', 10 );
+			add_basic_widget( $wico_id, 'item_tags', 'core', 15 );
+			// Custom Field widget: Price
+			add_basic_widget( $wico_id, 'cart_button', 'core', 25 );
 		}
 	}
 

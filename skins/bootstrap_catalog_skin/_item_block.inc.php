@@ -75,7 +75,8 @@ $params = array_merge( array(
 
 <?php
 if( $disp == 'single' )
-{ ?>
+{
+?>
 <nav>
 	<ol class="breadcrumb">
 		<li><a href="http://localhost/b2evolution-core-css/index.php/a/">Public Blog</a></li>
@@ -83,91 +84,6 @@ if( $disp == 'single' )
 	</ol>
 </nav>
 <div class="row">
-	<div class="col-sm-6">
-		<?php
-			if( $Item->get_number_of_images() )
-			{	// If current item has cover image
-					$Item->images( array(
-						'before_images'            => '<div class="evo_post_images">',
-						'before_image'             => '<div class="evo_post_images"><figure class="evo_image_block cover_image_wrapper">',
-						'before_image_legend'      => '<figcaption class="evo_image_legend">',
-						'after_image_legend'       => '</figcaption>',
-						'after_image'              => '</figure></div>',
-						'after_images'             => '</div>',
-						'image_class'              => 'img-responsive',
-						'image_size'               => 'fit-1280x720',
-						'limit'                    =>  1,
-						'image_link_to'            => 'original', // Can be 'original', 'single' or empty          <i class="fa fa-link" aria-hidden="true"></i>
-
-						// We DO NOT want to display galleries here, only one cover image
-						'gallery_image_limit'      => 1000,
-						'gallery_colls'            => 1000,
-
-						// We want ONLY cover image to display here
-						'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore,inline',
-
-						'links_sql_select'           => ', CASE '
-								.'WHEN link_position = "cover"     THEN "1" '
-								.'WHEN link_position IN ("teaser","teaserperm","teaserlink") THEN "2" '
-								.'WHEN link_position = "aftermore" THEN "3" '
-								.'WHEN link_position = "inline"    THEN "4" '
-								// .'ELSE "99999999"' // Use this line only if you want to put the other position types at the end
-							.'END AS position_order',
-						'links_sql_orderby'          => 'position_order, link_order',
-					) );
-			} else {	// If current item does not have cover image
-				echo '<div class="noimage_wrapper"><i class="fa fa-file-image-o" aria-hidden="true"></i></div>';
-			}
-		?>
-	</div>
-	<div class="col-sm-6">
-		<header>
-			<?php
-			// ------- Title -------
-			if( $params['disp_title'] )
-			{
-				echo $params['item_title_line_before'];
-				// POST TITLE:
-				$Item->title( array(
-						'before'    => $params['item_title_single_before'],
-						'after'     => $params['item_title_single_after'],
-						'link_type' => '#'
-					) );
-				$Item->edit_link( array( // Link to backoffice for editing
-					'before' => '<div class="'.button_class( 'group' ).'">',
-					'after'  => '</div>',
-					'text'   => get_icon( 'edit' ).' '.T_('Edit'),
-					'class'  => button_class( 'text' ),
-				) );
-				echo $params['item_title_line_after'];
-			}
-			?>
-
-			<p><b>Condition:</b> New product</p>
-			<p>Section for short product description. Excerpt here maybe?</p>
-			<?php
-
-				skin_widget( array(
-						// CODE for the widget:
-						'widget' => 'item_vote',
-						'before' => '<p>',
-						'after' => '</p>',
-					) );
-
-
-				$Item->tags( array(
-						'before'    => '<p class="small post_tags"> ' . T_( 'Tags' ) . ': ',
-						'after'     => '</p>',
-						'separator' => ' ',
-					) );
-			?>
-			<p class="evo_post__price">
-				<b>Price:</b> <span class="regularprice">$<?php echo $Item->get_setting( 'custom:price_usd' );?></span>
-				<span class="oldprice">19.99 $</span>
-				<span class="newprice">12.99 $</span>
-			</p>
-		</header>
-	</div><div class="clearfix"></div>
 	<div class="col-md-12">
 			<div class="panel panel-default single_item_details_wrapper">
 				<div class="panel-heading"><h4 class="panel-title">Data Sheet</h4></div>
@@ -203,17 +119,6 @@ if( $disp == 'single' )
 					-->
 
 				<!--</div>-->
-			</div>
-
-			<div class="panel panel-default single_item_details_wrapper">
-				<div class="panel-heading"><h4 class="panel-title">More Info</h4></div>
-				<div class="panel-body">
-
-						<div class="panel-body">
-						<p>Here goes dinamic content widget, but probably without images?</p>
-						</div>
-
-				</div>
 			</div>
 	</div>
 </div>
@@ -328,7 +233,7 @@ if( $disp == 'single' )
 		<?php
 		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
-		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+		widget_container( 'item_single', array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
 			// This will enclose each widget in a block:
