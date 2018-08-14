@@ -236,7 +236,10 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		}
 		add_basic_widget( $wico_id, 'item_content', 'core', 10 );
 		add_basic_widget( $wico_id, 'item_attachments', 'core', 15 );
-		add_basic_widget( $wico_id, 'item_link', 'core', 17 );
+		if( $kind != 'catalog' )
+		{ // Item Link
+			add_basic_widget( $wico_id, 'item_link', 'core', 17 );
+		}
 		if( $blog_id != $blog_a_ID && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) && ! in_array( $kind, array( 'forum', 'group' ) ) )
 		{ // Item Tags
 			add_basic_widget( $wico_id, 'item_tags', 'core', 20 );
@@ -253,7 +256,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		{ // Small Print
 			add_basic_widget( $wico_id, 'item_small_print', 'core', 40, array( 'format' => ( $blog_id == $blog_a_ID ? 'standard' : 'revision' ) ) );
 		}
-		if( ! in_array( $kind, array( 'forum', 'group' ) ) )
+		if( ! in_array( $kind, array( 'forum', 'group', 'catalog' ) ) )
 		{ // Seen by
 			add_basic_widget( $wico_id, 'item_seen_by', 'core', 50 );
 		}
