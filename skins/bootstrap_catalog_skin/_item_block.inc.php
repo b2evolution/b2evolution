@@ -88,45 +88,7 @@ if( $disp == 'single' )
 		<li class="active">Fun</li>
 	</ol>
 </nav>
-<div class="row">
-	<div class="col-md-12">
-			<div class="panel panel-default single_item_details_wrapper">
-				<div class="panel-heading"><h4 class="panel-title">Data Sheet</h4></div>
-				<!--<div class="panel-body">-->
 
-					<table class="table table-hover">
-						<tr>
-							<th>Styles</th>
-							<td>Girly</td>
-						</tr>
-						<tr>
-							<th>Composition</th>
-							<td>Cotton</td>
-						</tr>
-						<tr>
-							<th>Properties</th>
-							<td>Colorful Dress</td>
-						</tr>
-					</table>
-
-					<!--
-					<section class="table table-hover">
-						<div class="detail_row">
-							<div class="col-xs-5 col-sm-3 col-md-3 col-lg-2 detail_title">Styles</div><div class="col-xs-7 col-sm-9 col-md-9 col-lg-10">Girly</div>
-						</div>
-						<div class="detail_row">
-							<div class="col-xs-5 col-sm-3 col-md-3 col-lg-2 detail_title">Composition</div><div class="col-xs-7 col-sm-9 col-md-9 col-lg-10">Cotton</div>
-						</div>
-						<div class="detail_row">
-							<div class="col-xs-5 col-sm-3 col-md-3 col-lg-2 detail_title">Properties</div><div class="col-xs-7 col-sm-9 col-md-9 col-lg-10">Colorful Dress</div>
-						</div>
-					</section>
-					-->
-
-				<!--</div>-->
-			</div>
-	</div>
-</div>
 <?php }
 
 ?>
@@ -252,6 +214,13 @@ if( $disp == 'single' )
 			'widget_item_tags_after'     => '</nav>',
 			// Params for skin file "_item_content.inc.php"
 			'widget_item_content_params' => $params,
+			// Template paras for "Custom Fields" widget:
+			/*
+			'custom_fields_table_start' => '<div class="evo_content_block panel panel-default">
+					<div class="panel-heading"><h4 class="panel-title">'.T_('Data Sheet').'</h4></div>
+					<table class="table table-hover">',
+			'custom_fields_table_end'   => '</table></div>',
+			*/
 			// Template params for "Item Attachments" widget:
 			'widget_item_attachments_params' => array(
 					'limit_attach'       => 1000,

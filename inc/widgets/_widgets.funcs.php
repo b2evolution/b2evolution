@@ -250,6 +250,10 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 			) );
 		}
 		add_basic_widget( $wico_id, 'item_content', 'core', 10 );
+		if( $kind == 'catalog' )
+		{
+			add_basic_widget( $wico_id, 'item_custom_fields', 'core', 11, array( 'fields_source' => 'exclude', 'fields' => 'price_usd', 'widget_css_class' => 'product_datasheet' ) );
+		}
 		add_basic_widget( $wico_id, 'item_attachments', 'core', 15 );
 		if( $kind != 'catalog' )
 		{ // Item Link
@@ -301,7 +305,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 			// Item Excerpt widget
 			add_basic_widget( $wico_id, 'item_vote', 'core', 10 );
 			add_basic_widget( $wico_id, 'item_tags', 'core', 15 );
-			// Custom Field widget: Price
+			add_basic_widget( $wico_id, 'item_custom_fields', 'core', 20, array( 'fields_source' => 'include', 'fields' => 'price_usd' ) );
 			add_basic_widget( $wico_id, 'cart_button', 'core', 25 );
 		}
 	}

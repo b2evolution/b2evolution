@@ -142,7 +142,7 @@ class item_images_Widget extends ComponentWidget
 					'defaultvalue' => 'cover',
 				),
 			'invert_display_type' => array(
-					'label' => T_('All the images except selected above'),
+					'label' => T_('All images except the one selected above'),
 					'type' => 'checkbox',
 					'defaultvalue' => 0,
 				),
