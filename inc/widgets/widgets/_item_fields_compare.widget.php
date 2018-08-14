@@ -82,12 +82,14 @@ class item_fields_compare_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		global $Blog;
+
 		$ItemTypeCache = & get_ItemTypeCache();
 		$item_type_options = array(
 				'default' => T_('Default types shown for this collection')
 			) + $ItemTypeCache->get_option_array();
 
-		$r = array_merge( array(
+		$r = array(
 				'title' => array(
 					'label' => T_( 'Title' ),
 					'size' => 40,
@@ -135,6 +137,39 @@ class item_fields_compare_Widget extends ComponentWidget
 					'note' => sprintf( T_('Check to allow filtering/ordering with URL params such as %s etc.'), '<code>cat=</code>, <code>tag=</code>, <code>orderby=</code>' ),
 					'defaultvalue' => 0,
 				),
+			);
+		for( $order_index = 0; $order_index <= 2; $order_index++ )
+		{	// Default order settings:
+			$field_suffix = ( $order_index == 0 ? '' : '_'.$order_index );
+			$coll_item_sort_options = get_available_sort_options( $Blog->ID, $order_index > 0, true );
+			$r = array_merge( $r, array(
+				'order_begin_line'.$field_suffix => array(
+					'type' => 'begin_line',
+					'label' => ( $order_index == 0 ? T_('Default order') : '' ),
+				),
+					'orderby'.$field_suffix => array(
+						'type' => 'select',
+						'options' => array_merge(
+								array( 'coll_default' => T_('Use collection\'s default'), ),
+								$coll_item_sort_options['general'],
+								array( T_('Custom fields') => $coll_item_sort_options['custom'] )
+							),
+						'defaultvalue' => 'coll_default',
+					),
+					'orderdir'.$field_suffix => array(
+						'type' => 'select',
+						'options' => array(
+							'ASC'  => T_('Ascending'),
+							'DESC' => T_('Descending'),
+						),
+						'defaultvalue' => 'ASC',
+					),
+				'order_end_line'.$field_suffix => array(
+					'type' => 'end_line',
+				),
+			) );
+		}
+		$r = array_merge( $r, array(
 				'fields_source' => array(
 					'label' => T_('Fields to show'),
 					'type' => 'select',
@@ -630,7 +665,7 @@ class item_fields_compare_Widget extends ComponentWidget
 		{	// Use ItemList when we need a filter or when all items are requested from collection:
 			$ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $items_limit );
 			// Set additional debug info prefix for SQL queries in order to know what code executes it:
-			$ItemList->query_title_prefix = 'item_fields_compare_Widget';
+			$ItemList->query_title_prefix = get_class().' #'.$this->ID;
 
 			if( $this->disp_params['items_type'] == 'default' )
 			{	// Exclude items with types which are hidden by collection setting "Show post types":
@@ -640,9 +675,36 @@ class item_fields_compare_Widget extends ComponentWidget
 			{	// Filter by selected Item Type:
 				$filter_item_type = intval( $this->disp_params['items_type'] );
 			}
+
+			// Set default orders:
+			$default_orders = array();
+			$default_dirs = array();
+			for( $order_index = 0; $order_index <= 2; $order_index++ )
+			{
+				$field_suffix = ( $order_index == 0 ? '' : '_'.$order_index );
+				$widget_orderby = $this->disp_params['orderby'.$field_suffix];
+				if( $widget_orderby == 'coll_default' )
+				{	// Use order from collection:
+					$coll_orderby = $Blog->get_setting( 'orderby'.$field_suffix );
+					if( ! empty( $coll_orderby ) )
+					{
+						$default_orders[] = $coll_orderby;
+						$default_dirs[] = $Blog->get_setting( 'orderdir'.$field_suffix );
+					}
+				}
+				elseif( ! empty( $widget_orderby ) )
+				{	// Use order from widget settings:
+					$default_orders[] = $widget_orderby;
+					$default_dirs[] = $this->disp_params['orderdir'.$field_suffix];
+				}
+			}
+
+			// Set default filters:
 			$ItemList->set_default_filters( array(
 				'types'        => $filter_item_type,
 				'post_ID_list' => is_array( $items ) ? implode( ',', $items ) : NULL,
+				'orderby'      => implode( ',', $default_orders ),
+				'order'        => implode( ',', $default_dirs ),
 			) );
 
 			if( $this->disp_params['allow_filter'] )
