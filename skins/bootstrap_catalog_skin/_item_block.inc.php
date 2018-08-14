@@ -272,7 +272,7 @@ if( $disp == 'single' )
 
 
 		// ------- Title -------
-		if( $params['disp_title'] )
+		if( ! in_array( $disp, array( 'single', 'page' ) ) && $params['disp_title'] )
 		{
 			echo $params['item_title_line_before'];
 

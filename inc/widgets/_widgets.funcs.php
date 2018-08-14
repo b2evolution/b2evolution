@@ -230,7 +230,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'item_single', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['item_single']['wico_ID'];
-		if( $kind == 'manual' )
+		if( in_array( $kind, array( 'manual', 'catalog' ) ) )
 		{
 			add_basic_widget( $wico_id, 'item_title', 'core', 5 );
 		}
