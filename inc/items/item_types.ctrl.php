@@ -370,7 +370,7 @@ switch( $action )
 		param( 'itcf_line_highlight', 'string' );
 		param( 'itcf_green_highlight', 'string' );
 		param( 'itcf_red_highlight', 'string' );
-		param( 'itcf_description', 'text' );
+		param( 'itcf_description', 'html' );
 		$AdminUI->disp_view( 'items/views/_itemtype_edit_field.form.php' );
 		break;
 

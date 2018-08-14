@@ -360,7 +360,7 @@ class ItemType extends DataObject
 			$custom_field_line_highlight = param( 'custom_field_line_highlight'.$i, 'string', NULL );
 			$custom_field_green_highlight = param( 'custom_field_green_highlight'.$i, 'string', NULL );
 			$custom_field_red_highlight = param( 'custom_field_red_highlight'.$i, 'string', NULL );
-			$custom_field_description = param( 'custom_field_description'.$i, 'text', NULL );
+			$custom_field_description = param( 'custom_field_description'.$i, 'html', NULL );
 
 			// Add each new/existing custom field in this array
 			// in order to see all them on the form when post type is not updated because some errors

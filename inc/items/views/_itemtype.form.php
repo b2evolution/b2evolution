@@ -373,7 +373,7 @@ foreach( $custom_fields as $custom_field )
 		'$cf_link$'        => format_to_output( $custom_field['link'], 'htmlattr' ),
 		'$cf_link_class$'  => format_to_output( $custom_field['link_class'], 'htmlattr' ),
 		'$cf_note$'        => format_to_output( $custom_field['note'], 'htmlattr' ),
-		'$cf_description$' => format_to_output( $custom_field['description'], 'htmlattr' ),
+		'$cf_description$' => format_to_output( $custom_field['description'], 'htmlspecialchars' ),
 	);
 	$cf_select_replacements = array( 'format', 'link', 'line_highlight', 'green_highlight', 'red_highlight' );
 	$custom_field_type_template = str_replace( array_keys( $cf_input_replacements ), $cf_input_replacements, $custom_field_type_template );
