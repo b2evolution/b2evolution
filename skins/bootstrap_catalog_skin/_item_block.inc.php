@@ -37,6 +37,11 @@ $params = array_merge( array(
 		'image_size'                 => 'fit-1280x720',
 		'author_link_text'           => 'auto',
 
+		'content_start_full_text'    => '<div class="evo_post__full_text panel panel-default clearfix">
+					<div class="panel-heading"><h4 class="panel-title">'.T_('More Info').'</h4></div>
+					<div class="panel-body">',
+		'content_end_full_text'      => '</div></div>',
+
 		// 'before_images'            => '<div class="col-lg-6"><div class="evo_post_images">',
 		// 'before_image'             => '<figure class="evo_image_block">',
 		// 'before_image_legend'      => '<figcaption class="evo_image_legend">',
@@ -243,7 +248,7 @@ if( $disp == 'single' )
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
 			// Template params for "Item Tags" widget
-			'widget_item_tags_before'    => '<nav class="small post_tags">'.T_('Tags').': ',
+			'widget_item_tags_before'    => '<nav class="small post_tags">',
 			'widget_item_tags_after'     => '</nav>',
 			// Params for skin file "_item_content.inc.php"
 			'widget_item_content_params' => $params,

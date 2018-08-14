@@ -246,6 +246,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 				'column1_class'     => ( 'col-sm-6 col-xs-12' ),
 				'column2_container' => 'product_page_column_b',
 				'column2_class'     => 'col-sm-6 col-xs-12',
+				'widget_css_class'  => 'widget_core_subcontainer_row product_info',
 			) );
 		}
 		add_basic_widget( $wico_id, 'item_content', 'core', 10 );
@@ -286,8 +287,8 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		$wico_id = $blog_containers['product_page_column_a']['wico_ID'];
 		if( $kind == 'catalog' )
 		{
-			// Item Image widget # 1
-			// Item Image widget # 2
+			add_basic_widget( $wico_id, 'item_images', 'core', 10, array( 'display_type' => 'cover_with_fallback', 'image_limit' => 1, 'image_size' => 'fit-480x600', 'widget_css_class' => 'main_product_image' ) );
+			add_basic_widget( $wico_id, 'item_images', 'core', 20, array( 'display_type' => 'cover', 'invert_display_type' => 1, 'image_limit' => 20, 'image_size' => 'fit-80x80', 'widget_css_class' => 'product_image_gallery' ) );
 		}
 	}
 

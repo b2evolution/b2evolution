@@ -477,3 +477,23 @@ main .row .evo_content_block:nth-child(3) .price_note {
 .panel.single_item_details_wrapper > .table tbody tr:last-child td {
   border-bottom: 0;
 }
+.widget_core_subcontainer_row.product_info {
+  margin-bottom: 20px;
+}
+.evo_container.evo_container__product_page_column_a .main_image {
+  text-align: center;
+}
+.evo_container.evo_container__product_page_column_a .product_image_gallery .image_block {
+  margin-top: 3px;
+  margin-right: 3px;
+  margin-bottom: 3px;
+  display: inline-block;
+  border: 1px solid #cccccc;
+  border-radius: 3px;
+}
+.evo_container.evo_container__product_page_column_a .product_image_gallery .image_block + .image_block {
+  margin-left: 3px;
+}
+.evo_container.evo_container__product_page_column_a .product_image_gallery .image_block:last-child {
+  margin-right: 0;
+}

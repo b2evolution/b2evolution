@@ -153,7 +153,7 @@ class item_content_Widget extends ComponentWidget
 			), $this->disp_params );
 
 		// Get the params to be transmitted to this widget:
-		if( isset($this->disp_params['widget_item_content_params']) )
+		if( isset( $this->disp_params['widget_item_content_params'] ) )
 		{	// We have an array, with the new name:
 			$widget_item_content_params = $this->disp_params['widget_item_content_params'];
 		}
