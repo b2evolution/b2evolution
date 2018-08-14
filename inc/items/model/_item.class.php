@@ -2412,7 +2412,7 @@ class Item extends ItemLight
 
 			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
 			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, iset_value AS value, ' );
-			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_link AS link, ' );
+			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_cell_class AS cell_class, itcf_link AS link, itcf_link_class AS link_class, ' );
 			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description' );
 			$SQL->FROM( 'T_items__type_custom_field' );
 			$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON itcf_name = SUBSTRING( iset_name, 8 ) AND iset_item_ID = '.$this->ID );
@@ -2664,6 +2664,7 @@ class Item extends ItemLight
 			if( isset( $link_fallbacks[ $custom_field['link'] ] ) )
 			{
 				$fallback_count = count( $link_fallbacks[ $custom_field['link'] ] );
+				$link_class_attr = empty( $custom_field['link_class'] ) ? '' : ' class="'.format_to_output( $custom_field['link_class'], 'htmlattr' ).'"';
 				foreach( $link_fallbacks[ $custom_field['link'] ] as $l => $link_fallback )
 				{
 					switch( $link_fallback )
@@ -2672,7 +2673,7 @@ class Item extends ItemLight
 							// Link to "URL":
 							if( $this->get( 'url' ) != '' )
 							{	// If this post has a specified setting "Link to url":
-								$custom_field_value = '<a href="'.$this->get( 'url' ).'" target="_blank">'.$custom_field_value.'</a>';
+								$custom_field_value = '<a href="'.$this->get( 'url' ).'" target="_blank"'.$link_class_attr.'>'.$custom_field_value.'</a>';
 								break 2;
 							}
 							// else fallback to other points:
@@ -2685,7 +2686,7 @@ class Item extends ItemLight
 							    $Item->ID != $this->ID ||
 							    $fallback_count == $l + 1 )
 							{	// Use permalink if it is not last point and we don't view this current post:
-								$custom_field_value = $this->get_permanent_link( $custom_field_value );
+								$custom_field_value = $this->get_permanent_link( $custom_field_value, '#', $custom_field['link_class'] );
 								break 2;
 							}
 							// else fallback to other points:
@@ -2698,14 +2699,14 @@ class Item extends ItemLight
 							    $Link = & $LinkCache->get_by_ID( $orig_custom_field_value, false, false ) &&
 							    $File = & $Link->get_File() )
 							{	// Link to original file:
-								$custom_field_value = '<a href="'.$File->get_url().'"'.( $File->is_image() ? ' rel="lightbox[p'.$this->ID.']"' : '' ).'>'.$custom_field_value.'</a>';
+								$custom_field_value = '<a href="'.$File->get_url().'"'.( $File->is_image() ? ' rel="lightbox[p'.$this->ID.']"' : '' ).$link_class_attr.'>'.$custom_field_value.'</a>';
 							}
 							// else fallback to other points:
 							break;
 
 						case 'url':
 							// Use value of url fields as URL to the link:
-							$custom_field_value = '<a href="'.$custom_field_value.'">'.$custom_field_value.'</a>';
+							$custom_field_value = '<a href="'.$custom_field_value.'"'.$link_class_attr.'>'.$custom_field_value.'</a>';
 							break 2;
 					}
 				}
@@ -3001,8 +3002,8 @@ class Item extends ItemLight
 				) ).' ';
 		}
 
-		// Alignment class for cell with value depending on custom field type:
-		$mask_values[] = in_array( $field['type'], array( 'double', 'computed' ) ) ? 'right' : 'center';
+		// Alignment class for cell with value from DB:
+		$mask_values[] = $field['cell_class'];
 
 		if( ! $field['public'] )
 		{	// Not public field:

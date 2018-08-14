@@ -362,7 +362,9 @@ switch( $action )
 		param( 'itcf_name', 'string' );
 		param( 'itcf_format', 'string' );
 		param( 'itcf_formula', 'string' );
+		param( 'itcf_cell_class', 'string' );
 		param( 'itcf_link', 'string' );
+		param( 'itcf_link_class', 'string' );
 		param( 'itcf_note', 'string' );
 		param( 'itcf_public', 'integer' );
 		param( 'itcf_line_highlight', 'string' );

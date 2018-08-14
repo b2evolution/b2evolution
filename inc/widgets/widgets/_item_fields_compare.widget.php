@@ -216,7 +216,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				'custom_fields_description_icon_class'     => 'grey',
 				// Separate template for separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
-				'custom_fields_separator_row_header_field' => '<th class="center" colspan="$cols_count$">$field_title$$field_description_icon$</th>',
+				'custom_fields_separator_row_header_field' => '<th class="$class$" colspan="$cols_count$">$field_title$$field_description_icon$</th>',
 			), $params );
 
 		// Get IDs of items which should be compared:
@@ -498,8 +498,8 @@ class item_fields_compare_Widget extends ComponentWidget
 		}
 
 		// Custom field title:
-		echo str_replace( array( '$field_title$', '$cols_count$', '$field_description_icon$' ),
-			array( $custom_field['label'], count( $items ) + 1, $field_description_icon ),
+		echo str_replace( array( '$field_title$', '$cols_count$', '$field_description_icon$', '$class$' ),
+			array( $custom_field['label'], count( $items ) + 1, $field_description_icon, $custom_field['cell_class'] ),
 			$this->get_field_template( 'row_header_field', $custom_field['type'] ) );
 
 		if( $custom_field['type'] != 'separator' )
@@ -521,7 +521,6 @@ class item_fields_compare_Widget extends ComponentWidget
 
 				// Default template for field value:
 				$field_value_template = $this->get_field_template( 'value_default', $custom_field['type'] );
-				$custom_field_class = in_array( $custom_field['type'], array( 'double', 'computed' ) ) ? 'right' : 'center';
 
 				if( $custom_field['is_different'] && $custom_field['line_highlight'] == 'differences' )
 				{	// Mark the field value as different only when it is defined in the settings of the custom field:
@@ -558,7 +557,7 @@ class item_fields_compare_Widget extends ComponentWidget
 					}
 				}
 
-				echo str_replace( array( '$class$', '$field_value$' ), array( $custom_field_class, $custom_field_value ), $field_value_template );
+				echo str_replace( array( '$class$', '$field_value$' ), array( $custom_field['cell_class'], $custom_field_value ), $field_value_template );
 			}
 		}
 

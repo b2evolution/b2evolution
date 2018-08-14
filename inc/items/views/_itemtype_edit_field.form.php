@@ -52,17 +52,23 @@ if( get_param( 'itcf_type' ) == 'computed' )
 	$Form->text( 'itcf_formula', get_param( 'itcf_formula' ), 100, T_('Formula'), '', 2000 );
 }
 
-// Link:
-if( ! in_array( get_param( 'itcf_type' ), array( 'text', 'html', 'separator' ) ) )
-{
-	$Form->select_input_array( 'itcf_link', get_param( 'itcf_link' ), get_item_type_field_linkto_options( get_param( 'itcf_type' ) ), T_('Link'), '', array( 'force_keys_as_values' => true ) );
-}
-
 // Note:
 $Form->text( 'itcf_note', get_param( 'itcf_note' ), 60, T_('Note'), '', 255 );
 
 // Public:
 $Form->checkbox( 'itcf_public', get_param( 'itcf_public' ), T_('Public') );
+
+// Cell class:
+$Form->text( 'itcf_cell_class', get_param( 'itcf_cell_class' ), 60, T_('Cell class'), sprintf( T_('Enter class names such as %s etc. (Separate with space)'), '<code>left</code> <code>center</code> <code>right</code> <code>red</code>' ), 255 );
+
+// Link:
+if( ! in_array( get_param( 'itcf_type' ), array( 'text', 'html', 'separator' ) ) )
+{
+	$Form->select_input_array( 'itcf_link', get_param( 'itcf_link' ), get_item_type_field_linkto_options( get_param( 'itcf_type' ) ), T_('Link'), '', array( 'force_keys_as_values' => true ) );
+
+	// Link class:
+	$Form->text( 'itcf_link_class', get_param( 'itcf_link_class' ), 60, T_('Link class'), sprintf( T_('Enter class names such as %s etc. (Separate with space)'), '<code>btn btn-sm btn-info</code>' ), 255 );
+}
 
 // Highlight options:
 if( get_param( 'itcf_type' ) != 'separator' )

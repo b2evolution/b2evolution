@@ -87,7 +87,7 @@ function upg_task_start( $version, $title = '' )
 
 		// Begin a transaction for the upgrade block:
 		global $DB;
-		$DB->begin();
+		//$DB->begin();
 
 		return true;
 	}
@@ -112,7 +112,7 @@ function upg_task_end( $print_result = true )
 
 		// End current transaction of the upgrade block:
 		global $DB;
-		$DB->commit();
+		//$DB->commit();
 
 		if( $print_result )
 		{	// Print out the end of task:
@@ -9828,14 +9828,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12920, 'Upgrading post type custom fields table...' ) )
+	if( upg_task_start( 912920, 'Upgrading post type custom fields table...' ) )
 	{	// part of 6.10.3-stable
 		db_upgrade_cols( 'T_items__type_custom_field', array(
 			'ADD' => array(
 				'itcf_public'          => 'TINYINT DEFAULT 1',
 				'itcf_format'          => 'VARCHAR(2000) NULL',
 				'itcf_formula'         => 'VARCHAR(2000) COLLATE ascii_general_ci NULL',
+				'itcf_cell_class'      => 'VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL',
 				'itcf_link'            => 'ENUM( "nolink", "linkto", "permalink", "zoom", "linkpermzoom", "permzoom", "linkperm", "fieldurl" ) COLLATE ascii_general_ci NOT NULL default "nolink"',
+				'itcf_link_class'      => 'VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL',
 				'itcf_line_highlight'  => 'ENUM( "never", "differences" ) COLLATE ascii_general_ci NULL DEFAULT NULL',
 				'itcf_green_highlight' => 'ENUM( "never", "lowest", "highest" ) COLLATE ascii_general_ci NULL DEFAULT NULL',
 				'itcf_red_highlight'   => 'ENUM( "never", "lowest", "highest" ) COLLATE ascii_general_ci NULL DEFAULT NULL',
@@ -9849,13 +9851,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			itcf_line_highlight = "differences",
 			itcf_green_highlight = "never",
 			itcf_red_highlight = "never",
+			itcf_cell_class = CASE
+				WHEN itcf_type IN( "double", "computed" ) THEN "right"
+				WHEN itcf_type = "separator"              THEN "left"
+				ELSE "center"
+			END,
 			itcf_link = CASE
 				WHEN itcf_type = "image" THEN "linkpermzoom"
 				WHEN itcf_type = "url"   THEN "fieldurl"
 				ELSE "nolink"
 			END' );
 		db_drop_col( 'T_items__type', 'ityp_use_custom_fields' );
-		upg_task_end();
+		//upg_task_end();
 	}
 
 	if( upg_task_start( 12930, 'Update setting names of item custom fields...' ) )

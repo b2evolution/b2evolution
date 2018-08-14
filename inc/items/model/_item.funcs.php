@@ -4193,7 +4193,7 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 				{
 					echo '<p class="note">'.$custom_field_note.'</p>';
 				}
-				if( is_admin_page() && $c > 0 && $c < count( $custom_fields ) - 1 )
+				if( is_admin_page() && $c > 0 && $c < count( $custom_fields ) )
 				{	// This is a hack for back-office because there is a css table layout:
 					$Form->begin_fieldset();
 				}
