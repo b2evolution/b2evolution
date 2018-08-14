@@ -125,11 +125,11 @@ class item_title_Widget extends ComponentWidget
 
 		$params = array_merge( array(
 				'widget_item_title_display'         => true,
-				'widget_item_title_line_before'     => '',
-					'widget_item_title_before'        => '',
-					'widget_item_title_after'         => '',
-					'widget_item_title_single_before' => '',
-					'widget_item_title_single_after'  => '',
+				'widget_item_title_line_before'     => '<div class="evo_post_title">',
+					'widget_item_title_before'        => '<h2',
+					'widget_item_title_after'         => '</h2>',
+					'widget_item_title_single_before' => '<h1>',
+					'widget_item_title_single_after'  => '</h1>',
 					'widget_lnk_type'                 => '#',
 
 					'widget_item_title_before_title'        => '',
@@ -151,7 +151,7 @@ class item_title_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		if( $this->params['widget_item_title_display'] )
+		if( $params['widget_item_title_display'] )
 		{
 			echo $this->disp_params['block_start'];
 			$this->disp_title();
