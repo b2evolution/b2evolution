@@ -151,7 +151,7 @@ class item_title_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		if( $this->disp_params['widget_item_title_display'] )
+		if( $this->params['widget_item_title_display'] )
 		{
 			echo $this->disp_params['block_start'];
 			$this->disp_title();
