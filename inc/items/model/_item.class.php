@@ -3041,12 +3041,16 @@ class Item extends ItemLight
 				'render_links'          => true,
 				'render_custom_fields'  => true,
 				'render_other_item'     => true,
-				'render_parent'         => true,
 				'render_collection'     => true,
 				'render_content_blocks' => true,
 				'render_inline_widgets' => true,
 				'render_date'           => true,
 			), $params );
+
+		if( $params['render_inline_widgets'] )
+		{	// Render widget tags (subscribe, emailcapture, compare, fields):
+			$content = $this->render_inline_widgets( $content, $params );
+		}
 
 		if( $params['render_inline_files'] )
 		{	// Render inline file tags like [image:123:caption] or [file:123:caption]:
@@ -3064,7 +3068,7 @@ class Item extends ItemLight
 		}
 
 		if( $params['render_other_item'] )
-		{	// Render parent/other item data [parent], [parent:fields], [item:123:fields], [item:slug-title:fields] and etc.:
+		{	// Render parent/other item data [parent:titlelink], [parent:url], [parent:field:first_string_field], [item:123:titlelink], [item:slug:titlelink] and etc.:
 			$content = $this->render_other_item_data( $content, $params );
 		}
 
@@ -3078,11 +3082,6 @@ class Item extends ItemLight
 			$content = $this->render_content_blocks( $content, $params );
 		}
 
-		if( $params['render_inline_widgets'] )
-		{	// Render widget tags (subscribe, emailcapture, compare):
-			$content = $this->render_inline_widgets( $content, $params );
-		}
-
 		if( $params['render_date'] )
 		{	// Render date tags:
 			$content = $this->render_date( $content, $params );
@@ -3093,7 +3092,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Convert inline widget tags like [subscribe], [emailcapture], [compare] into HTML tags
+	 * Convert inline widget tags like [subscribe], [emailcapture], [compare], [fields], [parent:fields], [item:123:fields], [item:slug:fields] into HTML tags
 	 *
 	 * @param string Source content
 	 * @param array Params
@@ -3114,7 +3113,7 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of widgets:
-		preg_match_all( '/\[(subscribe|emailcapture|compare):([^\]]*)\]/i', $content, $tags );
+		preg_match_all( '/\[(parent:|item:[^:\]]+:)?(subscribe|emailcapture|compare|fields):?([^\]]*)\]/i', $content, $tags );
 
 		if( count( $tags[0] ) > 0 )
 		{	// If at least one widget tag is found in content:
@@ -3123,8 +3122,10 @@ class Item extends ItemLight
 				$field_Item = $this;
 				$widget_params = false;
 				$widget_html = false;
-				$tag_params = explode( ':', $tags[2][$t] );
-				switch( $tags[1][$t] )
+				$tag_prefix = $tags[1][$t];
+				$widget_name = $tags[2][$t];
+				$tag_params = explode( ':', $tags[3][$t] );
+				switch( $widget_name )
 				{
 					case 'subscribe':
 						// Widget "Newsletter/Email list subscription":
@@ -3267,24 +3268,73 @@ class Item extends ItemLight
 						$compare_fields = isset( $tag_params[1] ) ? str_replace( ',', "\n", trim( $tag_params[1], ', ' ) ) : '';
 						// Set widget params to display:
 						$widget_params = array(
-							'widget' => 'item_fields_compare',
-							'items_source' => 'list',
-							'items'  => $compare_items,
-							'fields' => $compare_fields,
+							'widget'        => 'item_fields_compare',
+							'items_source'  => 'list',
+							'items'         => $compare_items,
+							'fields_source' => empty( $compare_fields ) ? 'all' : 'include',
+							'fields'        => $compare_fields,
+						);
+						break;
+
+					case 'fields':
+						// Widget "Item Custom Fields":
+						if( $tag_prefix == 'parent:' )
+						{	// Use parent item:
+							$widget_item_ID = '$parent$';
+							if( ! ( $widget_Item = & $this->get_parent_Item() ) )
+							{	// Display error message if parent doesn't exist:
+								$widget_html = '<span class="text-danger">'.T_('This Item has no parent.').'</span>';
+								break;
+							}
+						}
+						elseif( strpos( $tag_prefix, 'item:' ) === 0 )
+						{	// Use other item by ID or slug:
+							$widget_item_ID_slug = substr( $tag_prefix, 5, -1 );
+							$widget_item_data_is_number = is_number( $widget_item_ID_slug );
+							$ItemCache = & get_ItemCache();
+							if( ! ( $widget_item_data_is_number && $widget_Item = & $ItemCache->get_by_ID( $widget_item_ID_slug, false, false ) ) &&
+									! ( ! $widget_item_data_is_number && $widget_Item = & $ItemCache->get_by_urltitle( $widget_item_ID_slug, false, false ) ) )
+							{	// Display error message if other item is not found by ID and slug:
+								$widget_html = '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$widget_item_ID_slug.'</code>' ).'</span>';
+								break;
+							}
+							$widget_item_ID = $widget_Item->ID;
+						}
+						else
+						{	// Use current Item:
+							$widget_item_ID = '$this$';
+							$widget_Item = $this;
+						}
+
+						$custom_fields = $widget_Item->get_custom_fields_defs();
+						if( ! $custom_fields )
+						{	// Fields don't exist for this Item:
+							$widget_html = '<span class="text-danger">'.T_('The Item has no custom fields.').'</span>';
+							break;
+						}
+
+						// Set fields to display:
+						$custom_fields = isset( $tag_params[0] ) ? str_replace( ',', "\n", trim( $tag_params[0], ', ' ) ) : '';
+						// Set widget params to display:
+						$widget_params = array(
+							'widget'        => 'item_custom_fields',
+							'fields_source' => empty( $custom_fields ) ? 'all' : 'include',
+							'fields'        => $custom_fields,
+							'items'         => $widget_item_ID,
 						);
 						break;
 				}
 
-				if( $widget_params !== false )
-				{	// If widget display params are initialized for the inline tag:
-					if( $widget_html === false )
-					{	// Call widget with params only when content is not generated yet above:
-						ob_start();
-						skin_widget( array_merge( $params, $widget_params ) );
-						$widget_html = ob_get_contents();
-						ob_end_clean();
-					}
-					// Replace inline widget tag with content generated by requested widget:
+				// If widget display params are initialized for the inline tag:
+				if( $widget_params !== false && $widget_html === false )
+				{	// Call widget with params only when content is not generated yet above:
+					ob_start();
+					skin_widget( array_merge( $params, $widget_params ) );
+					$widget_html = ob_get_contents();
+					ob_end_clean();
+				}
+				if( $widget_html !== false )
+				{	// Replace inline widget tag with content generated by requested widget:
 					$content = substr_replace( $content, $widget_html, strpos( $content, $source_tag ), strlen( $source_tag ) );
 				}
 			}
@@ -3295,7 +3345,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Convert inline custom field tags like [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field] into HTML tags
+	 * Convert inline custom field tags like [field:first_string_field] into HTML tags
 	 *
 	 * @param string Source content
 	 * @param array Params
@@ -3313,47 +3363,28 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of custom fields:
-		preg_match_all( '/\[(fields?):?([^\]]*)?\]/i', $content, $tags );
+		preg_match_all( '/\[field:([^\]]*)?\]/i', $content, $tags );
 
 		foreach( $tags[0] as $t => $source_tag )
 		{
-			switch( $tags[1][ $t ] )
-			{
-				case 'fields':
-					// Render several fields as HTML table:
-					$custom_fields_params = array( 'fields' => trim( $tags[2][ $t ] ) );
-					$field_value = $this->get_custom_fields( $custom_fields_params );
-					if( empty( $field_value ) )
-					{	// Fields don't exist:
-						$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The Item has no custom fields.').'</span>', $content );
-					}
-					else
-					{	// Display fields:
-						$content = str_replace( $source_tag, $field_value, $content );
-					}
-					break;
-
-				case 'field':
-					// Render single field as text:
-					$field_index = trim( $tags[2][ $t ] );
-					$field_value = $this->get_custom_field_formatted( $field_index, $params );
-					if( $field_value === false )
-					{	// Wrong field request, display error:
-						$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_index ).'</span>', $content );
-					}
-					else
-					{	// Display field value:
-						$custom_fields = $this->get_custom_fields_defs();
-						if( $custom_fields[ $field_index ]['public'] )
-						{	// Display value only if custom field is public:
-							$content = str_replace( $source_tag, $field_value, $content );
-						}
-						else
-						{	// Display an error for not public custom field:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_index ).'</span>', $content );
-						}
-					}
-					break;
+			// Render single field as text:
+			$field_index = trim( $tags[1][ $t ] );
+			$field_value = $this->get_custom_field_formatted( $field_index, $params );
+			if( $field_value === false )
+			{	// Wrong field request, display error:
+				$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_index ).'</span>', $content );
+			}
+			else
+			{	// Display field value:
+				$custom_fields = $this->get_custom_fields_defs();
+				if( $custom_fields[ $field_index ]['public'] )
+				{	// Display value only if custom field is public:
+					$content = str_replace( $source_tag, $field_value, $content );
+				}
+				else
+				{	// Display an error for not public custom field:
+					$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_index ).'</span>', $content );
+				}
 			}
 		}
 
@@ -3363,11 +3394,15 @@ class Item extends ItemLight
 
 	/**
 	 * Convert inline parent/other item tags into HTML tags like:
-	 *    [parent]
 	 *    [parent:titlelink]
 	 *    [parent:url]
-	 *    [parent:fields:second_numeric_field,first_string_field]
 	 *    [parent:field:first_string_field]
+	 *    [item:123:titlelink]
+	 *    [item:123:url]
+	 *    [item:123:field:first_string_field]
+	 *    [item:slug:titlelink]
+	 *    [item:slug:url]
+	 *    [item:slug:field:first_string_field]
 	 *
 	 * @param string Source content
 	 * @param array Params
@@ -3414,21 +3449,6 @@ class Item extends ItemLight
 
 				switch( $tags[2][ $t ] )
 				{
-					case 'fields':
-						// Render several parent custom fields as HTML table:
-						$field_value = $other_Item->get_custom_fields( array(
-								'fields' => trim( $tags[3][ $t ] )
-							) );
-						if( empty( $field_value ) )
-						{	// Fields don't exist:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The parent Item has no custom fields.').'</span>', $content );
-						}
-						else
-						{	// Display fields:
-							$content = str_replace( $source_tag, $field_value, $content );
-						}
-						break;
-
 					case 'field':
 						// Render single parent custom field as text:
 						$field_index = trim( $tags[3][ $t ] );
