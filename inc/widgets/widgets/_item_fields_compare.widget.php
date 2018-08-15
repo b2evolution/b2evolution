@@ -285,13 +285,59 @@ class item_fields_compare_Widget extends ComponentWidget
 				{	// Skip not public custom field:
 					continue;
 				}
+				if( isset( $all_custom_fields[ $search_custom_field_key ]['display_mode'] ) &&
+				    $all_custom_fields[ $search_custom_field_key ]['display_mode'] == 'repeat' )
+				{	// Reinitialize custom field with correct order if it was initialized before as repeat field of some separator above this custom field:
+					unset( $all_custom_fields[ $search_custom_field_key ] );
+				}
 				if( empty( $all_custom_fields[ $search_custom_field_key ] ) )
 				{	// Initialize array to store items which really have this custom field:
 					$all_custom_fields[ $search_custom_field_key ] = $item_custom_field;
+					$all_custom_fields[ $search_custom_field_key ]['display_mode'] = 'normal';
 					$all_custom_fields[ $search_custom_field_key ]['items'] = array();
 				}
-				// Store ID of the post which has this custom field:
-				$all_custom_fields[ $search_custom_field_key ]['items'][] = $item_ID;
+				if( ! in_array( $item_ID , $all_custom_fields[ $search_custom_field_key ]['items'] ) )
+				{	// Store ID of the post which has this custom field:
+					$all_custom_fields[ $search_custom_field_key ]['items'][] = $item_ID;
+				}
+
+				// Initialize the repeat fields of separator fields:
+				if( $item_custom_field['type'] == 'separator' &&
+				    ! empty( $item_custom_field['format'] ) )
+				{	// Try to find the repeat fields:
+					$separator_format = explode( ':', $item_custom_field['format'] );
+					if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
+					{	// Skip wrong separator format:
+						continue;
+					}
+					$repeat_fields = explode( ',', $separator_format[1] );
+					foreach( $repeat_fields as $r => $repeat_field_name )
+					{
+						$repeat_field_name = trim( $repeat_field_name );
+						if( ! isset( $item_custom_fields[ $repeat_field_name ] ) )
+						{	// Skip unknown field:
+							unset( $repeat_fields[ $r ] );
+							continue;
+						}
+						$repeat_fields[ $r ] = $repeat_field_name;
+						$item_custom_field = $item_custom_fields[ $repeat_field_name ];
+						if( empty( $all_custom_fields[ $repeat_field_name ] ) )
+						{	// Initialize array to store items which really have this custom field:
+							$all_custom_fields[ $repeat_field_name ] = $item_custom_field;
+							$all_custom_fields[ $repeat_field_name ]['display_mode'] = 'repeat'; // Special display mode in order to display this only after the separator
+							$all_custom_fields[ $repeat_field_name ]['items'] = array();
+						}
+						if( ! in_array( $item_ID , $all_custom_fields[ $repeat_field_name ]['items'] ) )
+						{	// Store ID of the post which has this custom field:
+							$all_custom_fields[ $repeat_field_name ]['items'][] = $item_ID;
+						}
+					}
+					if( ! isset( $all_custom_fields[ $search_custom_field_key ]['repeat_fields'] ) &&
+					    ! empty( $repeat_fields ) )
+					{	// Initialize array to store the repeat fields of the separator:
+						$all_custom_fields[ $search_custom_field_key ]['repeat_fields'] = $repeat_fields;
+					}
+				}
 			}
 		}
 
@@ -433,30 +479,15 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		foreach( $all_custom_fields as $custom_field )
 		{
-			// Display a row of one compared field between all selected items:
-			$this->display_field_row_template( $custom_field, $items, $this->disp_params );
-
-			// Display the repeated fields after separator:
-			if( $custom_field['type'] == 'separator' &&
-			    ! empty( $custom_field['format'] ) &&
-			    ( $fields_source == 'all' || $fields_source == 'exclude' ) )
-			{	// Repeat fields after separator in case of displaying of all fields:
-				$separator_format = explode( ':', $custom_field['format'] );
-				if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
-				{	// Skip wrong separator format:
-					continue;
-				}
-				$repeat_fields = explode( ',', $separator_format[1] );
-				foreach( $repeat_fields as $repeat_field_name )
-				{
-					$repeat_field_name = trim( $repeat_field_name );
-					if( ! isset( $all_custom_fields[ $repeat_field_name ] ) ||
-					    $all_custom_fields[ $repeat_field_name ]['type'] == 'separator' )
-					{	// Skip unknown field and a separator field to avoid recursion:
-						continue;
-					}
-
-					// Display a row of the repeated custom field between all selected items:
+			if( $custom_field['display_mode'] == 'normal' )
+			{	// Display a row of one compared field between all selected items:
+				// Note: skip fields with display mode "repeat" which should be displayed after specific separator below:
+				$this->display_field_row_template( $custom_field, $items, $this->disp_params );
+			}
+			if( ! empty( $custom_field['repeat_fields'] ) )
+			{	// Display the repeated fields after separator if it has them:
+				foreach( $custom_field['repeat_fields'] as $repeat_field_name )
+				{	// Display a row of the repeated custom field between all selected items:
 					$this->display_field_row_template( $all_custom_fields[ $repeat_field_name ], $items, $this->disp_params );
 				}
 			}

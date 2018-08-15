@@ -2944,8 +2944,7 @@ class Item extends ItemLight
 			$field = $custom_fields[ $field_name ];
 
 			if( $field['type'] == 'separator' &&
-					! empty( $field['format'] ) &&
-					empty( $params['fields'] ) )
+					! empty( $field['format'] ) )
 			{	// Repeat fields after separator in case of displaying of all fields:
 				$separator_format = explode( ':', $field['format'] );
 				if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
@@ -2956,9 +2955,8 @@ class Item extends ItemLight
 				foreach( $repeat_fields as $repeat_field_name )
 				{
 					$repeat_field_name = trim( $repeat_field_name );
-					if( ! isset( $custom_fields[ $repeat_field_name ] ) ||
-						$custom_fields[ $repeat_field_name ]['type'] == 'separator' )
-					{	// Skip unknown field and a separator field to avoid recursion:
+					if( ! isset( $custom_fields[ $repeat_field_name ] ) )
+					{	// Skip unknown field:
 						continue;
 					}
 					// Get HTML code of the repeated custom field:
