@@ -2474,10 +2474,16 @@ class Item extends ItemLight
 	function get_custom_field_formatted( $field_index, $params = array() )
 	{
 		$params = array_merge( array(
-				'field_value_yes'     => '<span class="fa fa-check green"></span>', // Used to replace a mask #yes# in values of all types
-				'field_value_no'      => '<span class="fa fa-times red"></span>', // Used to replace a mask #no# in values of all types
 				'field_value_format'  => '', // Format for custom field, Leave empty to use a format from DB
 				'field_restrict_type' => false, // Restrict field by type(double, varchar, html, text, url, image, computed, separator), FALSE - to don't restrict
+				// The following masks are used to replace in custom field values and formats:
+				'field_value_yes'     => '<span class="fa fa-check green"></span>', // #yes#
+				'field_value_no'      => '<span class="fa fa-times red"></span>', // #no#
+				'field_value_plus'    => '<span class="fa fa-plus-circle green"></span>', // (+)
+				'field_value_minus'   => '<span class="fa fa-minus-circle red"></span>', // (-)
+				'field_value_warning' => '<span class="fa fa-exclamation-triangle text-warning"></span>', // (!)
+				'field_value_newline' => '<br />', // ||
+				'field_value_note'    => '<span class="note">$note_text$</span>', // {note text}
 			), $params );
 
 		// Try to get an original value of the requested custom field:
@@ -2509,12 +2515,21 @@ class Item extends ItemLight
 			$format = $params['field_value_format'];
 		}
 
+		$value_masks = array(
+			'#yes#' => $params['field_value_yes'],
+			'#no#'  => $params['field_value_no'],
+			'(+)'   => $params['field_value_plus'],
+			'(-)'   => $params['field_value_minus'],
+			'(!)'   => $params['field_value_warning'],
+			'||'    => $params['field_value_newline'],
+		);
+
 		switch( $custom_field['type'] )
 		{
 			case 'double':
 			case 'computed':
 				// Format double/computed field value:
-				if( empty( $format ) )
+				if( $format === NULL || $format === '' )
 				{	// No format:
 					break;
 				}
@@ -2542,7 +2557,7 @@ class Item extends ItemLight
 				{	// If value is empty string or NULL
 					if( empty( $formats[3] ) )
 					{	// Use default for empty values:
-						$custom_field_value = /* TRANS: "Not Available" */ T_('N/A');
+						$custom_field_value = /* TRANS: "Not Available" */ '{'.T_('N/A').'}';
 					}
 					else
 					{	// Use a special format for empty values:
@@ -2567,8 +2582,7 @@ class Item extends ItemLight
 					$format = $formats[1];
 				}
 
-				if( $format == '#yes#' ||
-				    $format == '#no#' ||
+				if( isset( $value_masks[ $format ] ) ||
 				    strpos( $format, '#stars' ) !== false ||
 				    ( $format !== '' && ! preg_match( '/\d/', $format ) ) )
 				{	// Use special formats:
@@ -2637,7 +2651,8 @@ class Item extends ItemLight
 		}
 
 		// Replace special masks in value with template:
-		$custom_field_value = str_replace( array( '#yes#', '#no#' ), array( $params['field_value_yes'], $params['field_value_no'] ), $custom_field_value );
+		$custom_field_value = str_replace( array_keys( $value_masks ), $value_masks, $custom_field_value );
+		$custom_field_value = preg_replace( '/\{([^}]+)\}/', str_replace( '$note_text$', '$1', $params['field_value_note'] ), $custom_field_value );
 
 		if( preg_match_all( '/(#stars(\/\d+)?)#/', $custom_field_value, $star_matches ) )
 		{	// Use stars template:

@@ -558,7 +558,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 	var field_value_formula = '';
 	var field_value_header_class = ( type == 'separator' ? 'left' : 'right' ) + ' nowrap';
 	var field_value_cell_class = ( type == 'double' || type == 'computed' ) ? 'right' : ( type == 'separator' ? '' : 'center' );
-	var field_value_link = '';
+	var field_value_link = 'nolink';
 	var field_value_link_class = '';
 	var field_value_line_highlight = '';
 	var field_value_green_highlight = '';

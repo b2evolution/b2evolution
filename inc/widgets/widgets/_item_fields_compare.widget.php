@@ -402,8 +402,9 @@ class item_fields_compare_Widget extends ComponentWidget
 				$i++;
 			}
 
-			if( $all_string_values_are_empty )
-			{	// Don't display row of custom field if values from all compared items are empty:
+			if( $all_string_values_are_empty && $items_count > 1 )
+			{	// Don't display row of custom field if values from all compared items are empty,
+				// But display all empty fields when only single items is displayed, e.g. in child item_custom_fields_Widget:
 				unset( $all_custom_fields[ $c ] );
 			}
 		}
