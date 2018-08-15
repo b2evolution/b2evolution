@@ -1471,7 +1471,7 @@ class _core_Module extends Module
 					}
 
 					$entries['blog']['entries']['posts'] = array(
-							'text' => T_('Posts').'&hellip;',
+							'text' => T_('Contents').'&hellip;',
 							'href' => $items_url,
 						);
 					$display_separator = true;
@@ -1601,11 +1601,11 @@ class _core_Module extends Module
 					if( $current_User->check_perm( 'options', 'view', false, $Blog->ID ) )
 					{ // Post Types & Statuses
 						$entries['blog']['entries']['general']['entries']['item_types'] = array(
-								'text' => T_('Post Types').'&hellip;',
+								'text' => T_('Item Types').'&hellip;',
 								'href' => $admin_url.'?ctrl=itemtypes&amp;tab=settings&amp;tab3=types'.$blog_param,
 							);
 						$entries['blog']['entries']['general']['entries']['item_statuses'] = array(
-								'text' => T_('Post Statuses').'&hellip;',
+								'text' => T_('Item Statuses').'&hellip;',
 								'href' => $admin_url.'?ctrl=itemstatuses&amp;tab=settings&amp;tab3=statuses'.$blog_param,
 							);
 					}
