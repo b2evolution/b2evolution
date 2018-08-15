@@ -120,15 +120,11 @@ $params = array_merge( array(
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
 			// Template params for "Item Title" widget:
-			'widget_item_title_display'         => true,
-			'widget_item_title_line_before'     => '',	// Note: we use an extra class because it facilitates styling
-				'widget_item_title_before'          => '<div class="evo_post_title"><h1>',
-				'widget_item_title_after'           => '</h1>'.$action_links.'</div>',
-				'widget_item_title_single_before'   => '<div class="evo_post_title"><h1>',
-				'widget_item_title_single_after'    => '</h1>'.$action_links.'</div>',
-				'widget_item_title_link_type'       => $params['item_link_type'],
-				'widget_item_title_show_edit_intro' => false,
-			'widget_item_title_line_after'      => '',
+			'widget_item_title_params'  => array(
+					'before' => '<div class="evo_post_title"><h1>',
+					'after' => '</h1>'.$action_links.'</div>',
+					'link_type' => $params['item_link_type'],
+				),
 			// Template params for "Item Link" widget
 			'widget_item_link_before'    => '<p class="evo_post_link">',
 			'widget_item_link_after'     => '</p>',

@@ -93,15 +93,6 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	<?php
 	if( ! $Item->is_intro() )
 	{ // Don't display the following for intro posts
-		/* To be removed. Transferred to Item Info Line widget in Item Single Header container:
-		if( $Item->status != 'published' )
-		{
-			$Item->format_status( array(
-					'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
-				) );
-		}
-		*/
-
 		if( $disp == 'posts' )
 		{
 			// ------------------------- "Item in List" CONTAINER EMBEDDED HERE --------------------------
@@ -120,13 +111,10 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'author_link_text' => $params['author_link_text'],
 
 				// Controlling the title:
-				'widget_item_title_display'         => true,
-				'widget_item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
-				'widget_item_title_before'          => '<h2>',
-				'widget_item_title_after'           => '</h2>',
-				'widget_item_title_single_before'   => '<h1>',	// This replaces the above in case of disp=single or disp=page
-				'widget_item_title_single_after'    => '</h1>',
-				'widget_item_title_line_after'      => '</div>',
+				'widget_item_title_params'  => array(
+					'before' => '<div class="evo_post_title">'.( in_array( $disp, array( 'single', 'page' ) ) ? '<h1>' : '<h2>' ),
+					'after' => ( in_array( $disp, array( 'single', 'page' ) ) ? '</h1>' : '</h2>' ).'</div>',
+				),
 				// Item Visibility Badge widge template
 				'widget_item_visibility_badge_display'  => ( ! $Item->is_intro() && $Item->status != 'published' ),
 				'widget_item_visibility_badge_template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
@@ -151,13 +139,10 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'author_link_text' => $params['author_link_text'],
 
 				// Controlling the title:
-				'widget_item_title_display'         => true,
-				'widget_item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
-					'widget_item_title_before'          => '<h2>',
-					'widget_item_title_after'           => '</h2>',
-					'widget_item_title_single_before'   => '<h1>',	// This replaces the above in case of disp=single or disp=page
-					'widget_item_title_single_after'    => '</h1>',
-				'widget_item_title_line_after'      => '</div>',
+				'widget_item_title_params'  => array(
+						'before' => '<div class="evo_post_title">'.( in_array( $disp, array( 'single', 'page' ) ) ? '<h1>' : '<h2>' ),
+						'after' => ( in_array( $disp, array( 'single', 'page' ) ) ? '</h1>' : '</h2>' ).'</div>',
+					),
 				// Item Previous Next widget
 				'widget_item_next_previous_block_start' => '<nav><ul class="pager">',
 					'widget_item_next_previous_prev_start'  => '<li class="previous">',
@@ -248,13 +233,10 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 					'after_attach_size'  => ')</span>',
 				),
 			// Controlling the title:
-			'widget_item_title_display'         => true,
-			'widget_item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
-				'widget_item_title_before'          => '<h2>',
-				'widget_item_title_after'           => '</h2>',
-				'widget_item_title_single_before'   => '<h1>',	// This replaces the above in case of disp=single or disp=page
-				'widget_item_title_single_after'    => '</h1>',
-			'widget_item_title_line_after'      => '</div>',
+			'widget_item_title_params'  => array(
+				'before' => '<div class="evo_post_title">'.( in_array( $disp, array( 'single', 'page' ) ) ? '<h1>' : '<h2>' ),
+				'after' => ( in_array( $disp, array( 'single', 'page' ) ) ? '</h1>' : '</h2>' ).'</div>',
+			),
 		) );
 		// ----------------------------- END OF "Item Page" CONTAINER -----------------------------
 	}
