@@ -123,93 +123,29 @@ class item_title_Widget extends ComponentWidget
 	{
 		global $Item, $disp;
 
-		$params = array_merge( array(
-				'widget_item_title_display'         => true,
-				'widget_item_title_line_before'     => '<div class="evo_post_title">',
-					'widget_item_title_before'        => '<h2',
-					'widget_item_title_after'         => '</h2>',
-					'widget_item_title_single_before' => '<h1>',
-					'widget_item_title_single_after'  => '</h1>',
-					'widget_lnk_type'                 => '#',
-
-					'widget_item_title_before_title'        => '',
-					'widget_item_title_after_title'         => '',
-					'widget_item_title_single_before_title' => '',
-					'widget_item_title_single_after_title'  => '',
-					'widget_item_title_format'              => 'htmlbody',
-					'widget_item_title_link_type'           => '#',
-					'widget_item_title_link_class'          => '#',
-					'widget_item_title_max_length'          => '',
-					'widget_item_title_target_blog'         => '',
-					'widget_item_title_nav_target'          => NULL,
-					'widget_item_title_title_field'         => 'title', // '#' for custom title
-					'widget_item_title_custom_title'        => $Item->title,
-				'widget_item_title_line_after'            => '</div>',
-
-				'widget_item_title_show_edit_intro'       => false,
-			), $params );
+		if( empty( $Item ) )
+		{ // Don't display this widget when there is no Item object:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
+			return false;
+		}
 
 		$this->init_display( $params );
 
-		if( $params['widget_item_title_display'] )
-		{
-			echo $this->disp_params['block_start'];
-			$this->disp_title();
-			echo $this->disp_params['block_body_start'];
+		$this->disp_params = array_merge( array(
+				'widget_item_title_params' => array(),
+				'widget_item_title_link_params' => array(),
+			), $this->disp_params );
 
-			echo $params['widget_item_title_line_before'];
+		echo $this->disp_params['block_start'];
+		$this->disp_title();
+		echo $this->disp_params['block_body_start'];
 
-			if( $disp == 'single' || $disp == 'page' )
-			{
-				$title_before       = $params['widget_item_title_single_before'];
-				$title_after        = $params['widget_item_title_single_after'];
-				$title_before_title = $params['widget_item_title_single_before_title'];
-				$title_after_title  = $params['widget_item_title_single_after_title'];
-			}
-			else
-			{
-				$title_before       = $params['widget_item_title_before'];
-				$title_after        = $params['widget_item_title_after'];
-				$title_before_title = $params['widget_item_title_before_title'];
-				$title_after_title  = $params['widget_item_title_after_title'];
-			}
+		$Item->title( $this->disp_params['widget_item_title_params'] );
 
-			// POST TITLE:
-			$Item->title( array(
-					'before'          => $title_before,
-					'after'           => $title_after,
-					'before_title'    => $title_before_title,
-					'after_title'     => $title_after_title,
-					'format'          => $params['widget_item_title_format'],
-					'link_type'       => $params['widget_item_title_link_type'],
-					'link_class'      => $params['widget_item_title_link_class'],
-					'max_length'      => $params['widget_item_title_max_length'],
-					'target_blog'     => $params['widget_item_title_target_blog'],
-					'nav_target'      => $params['widget_item_title_nav_target'],
-					'title_field'     => $params['widget_item_title_title_field'],
-					'custom_title'    => $params['widget_item_title_custom_title'],
-				) );
+		echo $this->disp_params['block_body_end'];
+		echo $this->disp_params['block_end'];
 
-			// EDIT LINK:
-			if( $Item->is_intro() && $params['widget_item_title_show_edit_intro'] )
-			{ // Display edit link only for intro posts, because for all other posts the link is displayed on the info line.
-				$Item->edit_link( array(
-							'before' => '<div class="'.button_class( 'group' ).'">',
-							'after'  => '</div>',
-							'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
-							'class'  => button_class( 'text' ),
-						) );
-			}
-
-			echo $params['widget_item_title_line_after'];
-
-			echo $this->disp_params['block_body_end'];
-			echo $this->disp_params['block_end'];
-
-			return true;
-		}
-
-		return false;
+		return true;
 	}
 }
 

@@ -107,27 +107,22 @@ skin_widget( array(
 		// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
 		$widget_container_params = array(
-				'widget_context' => 'item',	// Signal that we are displaying within an Item
+				'widget_context'             => 'item',	// Signal that we are displaying within an Item
 				// The following (optional) params will be used as defaults for widgets included in this container:
 				'container_display_if_empty' => false, // If no widget, don't display container at all
 				// This will enclose each widget in a block:
-				'block_start' => '<div class="evo_widget $wi_class$">',
-				'block_end' => '</div>',
+				'block_start'                => '<div class="evo_widget $wi_class$">',
+				'block_end'                  => '</div>',
 				// This will enclose the title of each widget:
-				'block_title_start' => '<h3>',
-				'block_title_end' => '</h3>',
-
-				'author_link_text' => $params['author_link_text'],
-
+				'block_title_start'          => '<h3>',
+				'block_title_end'            => '</h3>',
+				'author_link_text'           => $params['author_link_text'],
 				// Controlling the title:
-				'widget_item_title_display'         => true,
-				'widget_item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
-					'widget_item_title_before'          => '<h2>',
-					'widget_item_title_after'           => '</h2>',
-					'widget_item_title_single_before'   => '<h2>',	// This replaces the above in case of disp=single or disp=page
-					'widget_item_title_single_after'    => '</h2>',
-					'widget_item_title_link_type'       => 'permalink',
-				'widget_item_title_line_after'      => '</div>',
+				'widget_item_title_params'  => array(
+						'before'    => '<div class="evo_post_title">'.( in_array( $disp, array( 'single', 'page' ) ) ? '<h1>' : '<h2>' ),
+						'after'     => ( in_array( $disp, array( 'single', 'page' ) ) ? '</h1>' : '</h2>' ).'</div>',
+						'link_type' => 'permalink',
+					),
 				// Item Next Previous widget
 				'widget_item_next_previous_block_start'     => '<ul class="pager col-lg-12 post_nav">',
 				'widget_item_next_previous_prev_start'      => '<li class="previous">',
