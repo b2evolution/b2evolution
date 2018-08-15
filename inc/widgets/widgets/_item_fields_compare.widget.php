@@ -206,17 +206,17 @@ class item_fields_compare_Widget extends ComponentWidget
 				'custom_fields_row_start'                  => '<tr>',
 				'custom_fields_topleft_cell'               => '<td style="border:none"></td>',
 				'custom_fields_col_header_item'            => '<th class="center">$item_link$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
-				'custom_fields_row_header_field'           => '<th class="right">$field_title$$field_description_icon$:</th>',
-				'custom_fields_value_default'              => '<td class="$class$">$field_value$</td>',
-				'custom_fields_value_difference_highlight' => '<td class="$class$ bg-warning">$field_value$</td>',
-				'custom_fields_value_green'                => '<td class="$class$ bg-success">$field_value$</td>',
-				'custom_fields_value_red'                  => '<td class="$class$ bg-danger">$field_value$</td>',
+				'custom_fields_row_header_field'           => '<th class="$header_cell_class$">$field_title$$field_description_icon$:</th>',
+				'custom_fields_value_default'              => '<td class="$data_cell_class$">$field_value$</td>',
+				'custom_fields_value_difference_highlight' => '<td class="$data_cell_class$ bg-warning">$field_value$</td>',
+				'custom_fields_value_green'                => '<td class="$data_cell_class$ bg-success">$field_value$</td>',
+				'custom_fields_value_red'                  => '<td class="$data_cell_class$ bg-danger">$field_value$</td>',
 				'custom_fields_row_end'                    => '</tr>',
 				'custom_fields_table_end'                  => '</table></div>',
 				'custom_fields_description_icon_class'     => 'grey',
 				// Separate template for separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
-				'custom_fields_separator_row_header_field' => '<th class="$class$" colspan="$cols_count$">$field_title$$field_description_icon$</th>',
+				'custom_fields_separator_row_header_field' => '<th class="$header_cell_class$" colspan="$cols_count$">$field_title$$field_description_icon$</th>',
 			), $params );
 
 		// Get IDs of items which should be compared:
@@ -498,8 +498,8 @@ class item_fields_compare_Widget extends ComponentWidget
 		}
 
 		// Custom field title:
-		echo str_replace( array( '$field_title$', '$cols_count$', '$field_description_icon$', '$class$' ),
-			array( $custom_field['label'], count( $items ) + 1, $field_description_icon, $custom_field['cell_class'] ),
+		echo str_replace( array( '$field_title$', '$cols_count$', '$field_description_icon$', '$header_cell_class$' ),
+			array( $custom_field['label'], count( $items ) + 1, $field_description_icon, $custom_field['header_class'] ),
 			$this->get_field_template( 'row_header_field', $custom_field['type'] ) );
 
 		if( $custom_field['type'] != 'separator' )
@@ -557,7 +557,7 @@ class item_fields_compare_Widget extends ComponentWidget
 					}
 				}
 
-				echo str_replace( array( '$class$', '$field_value$' ), array( $custom_field['cell_class'], $custom_field_value ), $field_value_template );
+				echo str_replace( array( '$data_cell_class$', '$field_value$' ), array( $custom_field['cell_class'], $custom_field_value ), $field_value_template );
 			}
 		}
 

@@ -2412,7 +2412,7 @@ class Item extends ItemLight
 
 			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
 			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, iset_value AS value, ' );
-			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_cell_class AS cell_class, itcf_link AS link, itcf_link_class AS link_class, ' );
+			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, itcf_link AS link, itcf_link_class AS link_class, ' );
 			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description' );
 			$SQL->FROM( 'T_items__type_custom_field' );
 			$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON itcf_name = SUBSTRING( iset_name, 8 ) AND iset_item_ID = '.$this->ID );
@@ -2888,13 +2888,13 @@ class Item extends ItemLight
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'before'       => '<table class="item_custom_fields">',
-				'field_format' => '<tr><th class="right">$title$$description_icon$:</th><td class="$class$">$value$</td></tr>', // $title$ $description_icon$ $class$ $value$
+				'field_format' => '<tr><th class="$header_cell_class$">$title$$description_icon$:</th><td class="$data_cell_class$">$value$</td></tr>', // $title$ $description_icon$ $class$ $value$
 				'after'        => '</table>',
 				'field_description_icon_class' => 'grey',
 				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
 				// Separate template for separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
-				'field_separator_format' => '<tr><th colspan="2" class="center">$title$$description_icon$</th></tr>', // $title$ $description_icon$
+				'field_separator_format' => '<tr><th colspan="2" class="$header_cell_class$">$title$$description_icon$</th></tr>', // $title$ $description_icon$
 			), $params );
 
 		// Get all custom fields by item ID:
@@ -2972,7 +2972,7 @@ class Item extends ItemLight
 	{
 		$custom_fields = $this->get_custom_fields_defs();
 
-		$mask_vars = array( '$title$', '$description_icon$', '$class$', '$value$' );
+		$mask_vars = array( '$title$', '$description_icon$', '$header_cell_class$', '$data_cell_class$', '$value$' );
 
 		$field_name = trim( $field_name );
 		if( ! isset( $custom_fields[ $field_name ] ) )
@@ -3002,7 +3002,8 @@ class Item extends ItemLight
 				) ).' ';
 		}
 
-		// Alignment class for cell with value from DB:
+		// Alignment classes for header and data cells:
+		$mask_values[] = $field['header_class'];
 		$mask_values[] = $field['cell_class'];
 
 		if( ! $field['public'] )

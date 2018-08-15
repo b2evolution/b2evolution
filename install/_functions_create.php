@@ -554,6 +554,7 @@ function create_default_data()
 			'order'           => '',
 			'note'            => NULL,
 			'format'          => NULL,
+			'header_class'    => 'right nowrap',
 			'cell_class'      => 'center',
 			'link'            => 'nolink',
 			'line_highlight'  => 'differences',

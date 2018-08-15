@@ -58,8 +58,11 @@ $Form->text( 'itcf_note', get_param( 'itcf_note' ), 60, T_('Note'), '', 255 );
 // Public:
 $Form->checkbox( 'itcf_public', get_param( 'itcf_public' ), T_('Public') );
 
-// Cell class:
-$Form->text( 'itcf_cell_class', get_param( 'itcf_cell_class' ), 60, T_('Cell class'), sprintf( T_('Enter class names such as %s etc. (Separate with space)'), '<code>left</code> <code>center</code> <code>right</code> <code>red</code>' ), 255 );
+// Header cell class:
+$Form->text( 'itcf_header_class', get_param( 'itcf_header_class' ), 60, T_('Header cell class'), sprintf( T_('Enter class names such as %s etc. (Separate with space)'), '<code>left</code> <code>center</code> <code>right</code> <code>nowrap</code>' ), 255 );
+
+// Data cell class:
+$Form->text( 'itcf_cell_class', get_param( 'itcf_cell_class' ), 60, T_('Data cell class'), sprintf( T_('Enter class names such as %s etc. (Separate with space)'), '<code>left</code> <code>center</code> <code>right</code> <code>red</code>' ), 255 );
 
 // Link:
 if( ! in_array( get_param( 'itcf_type' ), array( 'text', 'html', 'separator' ) ) )
