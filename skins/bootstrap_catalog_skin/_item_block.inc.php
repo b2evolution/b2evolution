@@ -224,8 +224,10 @@ if( $disp == 'single' )
 			// Template params for subcontainer
 			'override_params_for_subcontainer_row' => array(
 					'override_params_for_item_custom_fields' => array(
-							'custom_fields_table_start' => '<table>',
-							'custom_fields_table_end'   => '</table>'
+							'custom_fields_table_start'      => '<table>',
+							'custom_fields_table_end'        => '</table>',
+							'custom_fields_row_header_field' => '<th>$field_title$$field_description_icon$:</th>',
+							'custom_fields_value_default'    => '<td>$field_value$</td>',
 						)
 				),
 
@@ -236,6 +238,17 @@ if( $disp == 'single' )
 					<div class="panel-heading"><h4 class="panel-title">'.T_('Data Sheet').'</h4></div>
 					<table class="table table-hover">',
 			'custom_fields_table_end'   => '</table></div>',
+
+			'custom_fields_topleft_cell'               => '<td style="border:none"></td>',
+			'custom_fields_col_header_item'            => '<th>$item_link$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
+			'custom_fields_row_header_field'           => '<th>$field_title$$field_description_icon$:</th>',
+			'custom_fields_value_default'              => '<td>$field_value$</td>',
+			'custom_fields_value_difference_highlight' => '<td class="$class$ bg-warning">$field_value$</td>',
+			'custom_fields_value_green'                => '<td class="$class$ bg-success">$field_value$</td>',
+			'custom_fields_value_red'                  => '<td class="$class$ bg-danger">$field_value$</td>',
+			'custom_fields_row_end'                    => '</tr>',
+
+			'custom_fields_description_icon_class'     => 'grey',
 			// Template params for "Item Attachments" widget:
 			'widget_item_attachments_params' => array(
 					'limit_attach'       => 1000,

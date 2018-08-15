@@ -497,6 +497,42 @@ main .row .evo_content_block:nth-child(3) .price_note {
 .evo_container .evo_container__item_single .evo_container__product_page_column_a .product_image_gallery .image_block:last-child {
   margin-right: 0;
 }
-.evo_container .evo_container__item_single .panel .table {
+.evo_container .evo_container__item_single .product_datasheet table {
   margin: 0;
+}
+.evo_container .evo_container__item_single .product_datasheet table tr td {
+  border-right: 0;
+}
+.evo_container .evo_container__item_single .product_datasheet table tr th {
+  background-color: transparent;
+  border-left: 0;
+  border-bottom: 0;
+  width: 200px;
+}
+.evo_container .evo_container__item_single .product_datasheet table tr:last-child td {
+  border-bottom: 0;
+}
+.evo_container .evo_container__item_single .widget_core_item_custom_fields.product_price table tr th {
+  background-color: transparent;
+  border: 0;
+  font-weight: normal;
+  padding-left: 0;
+}
+.evo_container .evo_container__item_single .widget_core_item_custom_fields.product_price table tr td {
+  background-color: transparent;
+  border: 0;
+  font-size: 1.5em;
+}
+.evo_content_block .evo_comment .panel-heading .panel-title .evo_status {
+  margin-top: 10px;
+}
+.evo_content_block .evo_comment .evo_comment_footer .action_btn_group {
+  float: right;
+}
+.evo_content_block .evo_comment .comment_edit_btn {
+  margin-right: 5px;
+}
+.evo_content_block .evo_comment .btn-group > .btn.first-child {
+  border-top-left-radius: 3px !important;
+  border-bottom-left-radius: 3px !important;
 }

@@ -306,7 +306,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 			add_basic_widget( $wico_id, 'item_excerpt', 'core', 5 );
 			add_basic_widget( $wico_id, 'item_tags', 'core', 10 );
 			add_basic_widget( $wico_id, 'item_vote', 'core', 15 );
-			add_basic_widget( $wico_id, 'item_custom_fields', 'core', 20, array( 'fields_source' => 'include', 'fields' => 'price_usd' ) );
+			add_basic_widget( $wico_id, 'item_custom_fields', 'core', 20, array( 'fields_source' => 'include', 'fields' => 'price_usd', 'widget_css_class' => 'product_price' ) );
 			add_basic_widget( $wico_id, 'cart_button', 'core', 25 );
 		}
 	}

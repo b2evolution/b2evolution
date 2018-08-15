@@ -132,7 +132,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// --------------------------------- END OF MESSAGES ---------------------------------
 		}
 		?>
-		
+
 		<?php
 			if( ! empty( $cat ) )
 			{ // Display breadcrumbs if some category is selected
@@ -299,27 +299,27 @@ siteskin_include( '_site_body_header.inc.php' );
 	<aside class="col-md-3<?php echo ( $Skin->get_setting( 'layout' ) == 'left_sidebar' ? ' pull-left' : '' ); ?>">
 		<!-- =================================== START OF SIDEBAR =================================== -->
 		<div class="evo_container evo_container__sidebar">
-		
+
 			<div class="panel panel-default evo_custom_widget evo_widget_articles_filter">
 				<div class="panel-heading"><h4 class="panel-title">Browse Catalog</h4></div>
 				<div class="panel-body">
-				
+
 					<h5>Categories</h5>
 					<input type="checkbox" id="cbox1" value="first_checkbox"> In real life<br />
 					<input type="checkbox" id="cbox2" value="second_checkbox"> On the web
-					
+
 					<h5>Size</h5>
 					<input type="checkbox" id="cbox1" value="first_checkbox"> S<br />
 					<input type="checkbox" id="cbox1" value="first_checkbox"> M<br />
 					<input type="checkbox" id="cbox2" value="second_checkbox"> L
-					
+
 					<h5>Compositions</h5>
 					<input type="checkbox" id="cbox1" value="first_checkbox"> Cotton<br />
 					<input type="checkbox" id="cbox1" value="first_checkbox"> Polyester<br />
 					<input type="checkbox" id="cbox2" value="second_checkbox"> Viscose<br />
-					
+
 					<div class="btn-group"><button class="btn btn-primary">Filter</button></div>
-					
+
 					<!--
 					<div class="row"><h5>Color</h5></div>
 					<input type="checkbox" id="cbox1" value="first_checkbox"> Baige<br />
@@ -330,11 +330,11 @@ siteskin_include( '_site_body_header.inc.php' );
 					<input type="checkbox" id="cbox2" value="second_checkbox"> Green<br />
 					<input type="checkbox" id="cbox2" value="second_checkbox"> Yellow
 					-->
-					
+
 				</div>
 			</div>
 			<?php
-		
+
 			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 			// Display container contents:
 			skin_container( NT_('Sidebar'), array(
@@ -371,7 +371,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 		</div>
 
-		<div class="evo_container evo_container__sidebar2">
+		<div class="evo_container evo_container__sidebar_2">
 		<?php
 			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 			// Display container contents:
@@ -482,7 +482,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 		?>
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

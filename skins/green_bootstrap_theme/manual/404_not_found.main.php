@@ -126,7 +126,7 @@ siteskin_include( '_site_body_header.inc.php' );
 						'block_end'   => '</div>',
 					) );
 				// --------------------------------- END OF MESSAGES ---------------------------------
-			}	
+			}
 
 			if( ! empty( $cat ) )
 			{ // Display breadcrumbs if some category is selected
@@ -298,7 +298,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 				?>
 
-				<div class="evo_container evo_container__sidebar2">
+				<div class="evo_container evo_container__sidebar_2">
 				<?php
 					// <div data-spy="affix" data-offset-top="165" class="affix_block">
 					// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
@@ -413,7 +413,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		</p>
 
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

@@ -222,7 +222,7 @@ if( $Skin->is_visible_container( 'menu' ) )
 		if( $Skin->is_visible_container( 'sidebar2' ) )
 		{ // Display 'Sidebar 2' widget container
 		?>
-		<div class="evo_container evo_container__sidebar2">
+		<div class="evo_container evo_container__sidebar_2">
 		<?php
 			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 			// Display container contents:
@@ -342,7 +342,7 @@ if( $Skin->is_visible_container( 'menu' ) )
 				) );
 		?>
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

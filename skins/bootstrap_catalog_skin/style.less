@@ -595,8 +595,63 @@ main .row .evo_content_block:nth-child(3) {
 		}
 
 		// Data Sheet
-		.panel .table {
-			margin: 0;
+		.product_datasheet {
+			table {
+				margin: 0;
+				tr td {
+					border-right: 0;
+				}
+				tr th {
+					background-color: transparent;
+					border-left: 0;
+					border-bottom: 0;
+					width: 200px;
+				}
+				tr:last-child td {
+					border-bottom: 0;
+				}
+			}
 		}
+		.widget_core_item_custom_fields.product_price {
+			table {
+				tr th {
+					background-color: transparent;
+					border: 0;
+					font-weight: normal;
+					padding-left: 0;
+				}
+				tr td {
+					background-color: transparent;
+					border: 0;
+					font-size: 1.5em;
+				}
+			}
+		}
+	}
+}
+
+// Comment
+.evo_content_block .evo_comment {
+	.panel-heading {
+		.panel-title {
+			.evo_status {
+				margin-top: 10px;
+			}
+		}
+	}
+	.evo_comment_footer {
+		.action_btn_group {
+			float: right;
+		}
+	}
+
+	.comment_edit_btn {
+		margin-right: 5px;
+	}
+
+	// Fix buttons for comment actions
+	.btn-group>.btn.first-child {
+		border-top-left-radius: 3px !important;
+		border-bottom-left-radius: 3px !important;
 	}
 }
