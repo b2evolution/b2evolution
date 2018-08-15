@@ -2481,7 +2481,7 @@ class Item extends ItemLight
 				'field_value_no'      => '<span class="fa fa-times red"></span>', // #no#
 				'field_value_plus'    => '<span class="fa fa-plus-circle green"></span>', // (+)
 				'field_value_minus'   => '<span class="fa fa-minus-circle red"></span>', // (-)
-				'field_value_warning' => '<span class="fa fa-exclamation-triangle text-warning"></span>', // (!)
+				'field_value_warning' => '<span class="fa fa-exclamation-triangle orange"></span>', // (!)
 				'field_value_newline' => '<br />', // ||
 				'field_value_note'    => '<span class="note">$note_text$</span>', // {note text}
 			), $params );
