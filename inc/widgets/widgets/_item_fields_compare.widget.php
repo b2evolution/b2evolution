@@ -272,15 +272,27 @@ class item_fields_compare_Widget extends ComponentWidget
 
 			foreach( $search_custom_fields as $search_custom_field_key )
 			{
-				if( ! isset( $all_custom_fields[ $search_custom_field_key ] ) )
-				{	// Initialize array to keep fields in the requested order:
-					$all_custom_fields[ $search_custom_field_key ] = array();
+				$search_custom_field_name = $search_custom_field_key;
+				$field_options = '';
+				if( $fields_source == 'include' && strpos( $search_custom_field_key, '+' ) !== false )
+				{	// Parse additional field options, e.g. separators may have names as 'separator+repeat', 'separator+fields', 'separator+repeat+fields':
+					$search_custom_field_options = explode( '+', $search_custom_field_key, 2 );
+					if( isset( $search_custom_field_options[1] ) )
+					{	// The field has additional options:
+						$field_options = $search_custom_field_options[1];
+					}
+					// Set real name of separator field from key like 'separator+repeat+fields':
+					$search_custom_field_name = $search_custom_field_options[0];
 				}
-				if( ! isset( $item_custom_fields[ $search_custom_field_key ] ) )
+				if( ! isset( $all_custom_fields[ $search_custom_field_name ] ) )
+				{	// Initialize array to keep fields in the requested order:
+					$all_custom_fields[ $search_custom_field_name ] = array();
+				}
+				if( ! isset( $item_custom_fields[ $search_custom_field_name ] ) )
 				{	// Skip because the post has no this custom field:
 					continue;
 				}
-				$item_custom_field = $item_custom_fields[ $search_custom_field_key ];
+				$item_custom_field = $item_custom_fields[ $search_custom_field_name ];
 				if( ! $item_custom_field['public'] )
 				{	// Skip not public custom field:
 					continue;
@@ -301,10 +313,13 @@ class item_fields_compare_Widget extends ComponentWidget
 					$all_custom_fields[ $search_custom_field_key ]['items'][] = $item_ID;
 				}
 
-				
 				if( $item_custom_field['type'] == 'separator' )
 				{	// Initialize the repeat fields and fields under separator field until next separtor:
-					if( ! empty( $item_custom_field['format'] ) )
+					if( ! empty( $item_custom_field['format'] ) &&
+					    ( strpos( $field_options, 'repeat' ) !== false || // if field is requested with name like 'separator+repeat' or 'separator+repeat+fields'
+					      $fields_source != 'include' // also get all repeat fields when fields list is full
+					    )
+					  )
 					{	// Try to find the repeat fields:
 						$separator_format = explode( ':', $item_custom_field['format'] );
 						if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
@@ -318,13 +333,14 @@ class item_fields_compare_Widget extends ComponentWidget
 						$repeat_fields = array();
 					}
 
-					if( $fields_source == 'include' )
+					if( $fields_source == 'include' &&
+					    strpos( $field_options, 'fields' ) !== false ) // if field is requested with name like 'separator+fields' or 'separator+repeat+fields'
 					{	// Try to find fields under separator only when we request a specific fields list,
 						// in full list the fields under separator are displayed automatically, se we should not get them to avoid duplicated view:
 						$is_under_separator_field = false;
 						foreach( $item_custom_fields as $ic_field_name => $ic_field )
 						{
-							if( $ic_field_name == $search_custom_field_key )
+							if( $ic_field_name == $search_custom_field_name )
 							{	// We found the current separtor, set flag to use next fields:
 								$is_under_separator_field = true;
 								continue;

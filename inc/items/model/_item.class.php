@@ -2931,8 +2931,21 @@ class Item extends ItemLight
 
 		$html = '';
 
-		foreach( $display_fields as $field_name )
+		foreach( $display_fields as $field_key )
 		{
+			$field_name = $field_key;
+			$field_options = '';
+			if( ! empty( $params['fields'] ) && strpos( $field_key, '+' ) !== false )
+			{	// Parse additional field options, e.g. separators may have names as 'separator+repeat', 'separator+fields', 'separator+repeat+fields':
+				$field_options_arr = explode( '+', $field_key, 2 );
+				if( isset( $field_options_arr[1] ) )
+				{	// The field has additional options:
+					$field_options = $field_options_arr[1];
+				}
+				// Set real name of separator field from key like 'separator+repeat+fields':
+				$field_name = $field_options_arr[0];
+			}
+
 			// Get HTML code of the custom field:
 			$html .= $this->get_custom_field_template( $field_name, $params );
 
@@ -2945,7 +2958,11 @@ class Item extends ItemLight
 
 			if( $field['type'] == 'separator' )
 			{	// Repeat fields and fields under separator field until next separtor:
-				if( ! empty( $field['format'] ) )
+				if( ! empty( $field['format'] )  &&
+				    ( strpos( $field_options, 'repeat' ) !== false || // if field is requested with name like 'separator+repeat' or 'separator+repeat+fields'
+				      empty( $params['fields'] ) // also get all repeat fields when fields list is full
+				    )
+				  )
 				{	// Try to find the repeat fields:
 					$separator_format = explode( ':', $field['format'] );
 					if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
@@ -2959,7 +2976,8 @@ class Item extends ItemLight
 					$repeat_fields = array();
 				}
 
-				if( ! empty( $params['fields'] ) )
+				if( ! empty( $params['fields'] ) &&
+				    strpos( $field_options, 'fields' ) !== false ) // if field is requested with name like 'separator+fields' or 'separator+repeat+fields')
 				{	// Try to find fields under separator only when we request a specific fields list,
 					// in full list the fields under separator are displayed automatically, se we should not get them to avoid duplicated view:
 					$is_under_separator_field = false;
@@ -3019,7 +3037,7 @@ class Item extends ItemLight
 		$field_name = trim( $field_name );
 		if( ! isset( $custom_fields[ $field_name ] ) )
 		{	// Wrong field:
-			$mask_values = array( $field_name, '', '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), '', $field_name ).'</span>' );
+			$mask_values = array( $field_name, '', '', '', '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>' );
 			return str_replace( $mask_vars, $mask_values, $params['field_format'] );
 		}
 
