@@ -36,40 +36,6 @@ $params = array_merge( array(
 		'image_class'                => 'img-responsive',
 		'image_size'                 => 'fit-1280x720',
 		'author_link_text'           => 'auto',
-
-		'content_start_full_text'    => $disp == 'single' ? '<div class="evo_post__full_text panel panel-default clearfix">
-					<div class="panel-heading"><h4 class="panel-title">'.T_('More Info').'</h4></div>
-					<div class="panel-body">' : '',
-		'content_end_full_text'      => $disp == 'single' ? '</div></div>' : '',
-
-		// 'before_images'            => '<div class="col-lg-6"><div class="evo_post_images">',
-		// 'before_image'             => '<figure class="evo_image_block">',
-		// 'before_image_legend'      => '<figcaption class="evo_image_legend">',
-		// 'after_image_legend'       => '</figcaption>',
-		// 'after_image'              => '</figure>',
-		// 'after_images'             => '</div>',
-		// 'image_class'              => 'img-responsive',
-		// 'image_size'               => 'fit-1280x720',
-		// 'image_limit'              =>  1000,
-		// 'image_link_to'            => 'original', // Can be 'original', 'single' or empty
-		// 'excerpt_image_class'      => '',
-		// 'excerpt_image_size'       => 'fit-80x80',
-		// 'excerpt_image_limit'      => 0,
-		// 'excerpt_image_link_to'    => 'single',
-		// 'include_cover_images'     => false, // Set to true if you want cover images to appear with teaser images.
-
-		// 'before_gallery'           => '<div class="evo_post_gallery">',
-		// 'after_gallery'            => '</div></div>',
-		// 'gallery_table_start'      => '',
-		// 'gallery_table_end'        => '',
-		// 'gallery_row_start'        => '',
-		// 'gallery_row_end'          => '',
-		// 'gallery_cell_start'       => '<div class="evo_post_gallery__image">',
-		// 'gallery_cell_end'         => '</div>',
-		// 'gallery_image_size'       => 'crop-80x80',
-		// 'gallery_image_limit'      => 1000,
-		// 'gallery_colls'            => 5,
-		// 'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
 	), $params );
 
 /* Beginning of post display */
@@ -232,7 +198,12 @@ if( $disp == 'single' )
 				),
 
 			// Params for skin file "_item_content.inc.php"
-			'widget_item_content_params' => $params,
+			'widget_item_content_params' => array(
+					'content_start_full_text'    => $disp == 'single' ? '<div class="evo_post__full_text panel panel-default clearfix">
+							<div class="panel-heading"><h4 class="panel-title">'.T_('More Info').'</h4></div>
+							<div class="panel-body">' : '',
+					'content_end_full_text'      => $disp == 'single' ? '</div></div>' : '',
+				),
 			// Template params for "Custom Fields" widget:
 			'custom_fields_table_start' => '<div class="evo_content_block panel panel-default">
 					<div class="panel-heading"><h4 class="panel-title">'.T_('Data Sheet').'</h4></div>

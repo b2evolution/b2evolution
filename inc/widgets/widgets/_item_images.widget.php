@@ -144,7 +144,7 @@ class item_images_Widget extends ComponentWidget
 			'invert_display_type' => array(
 					'label' => T_('Invert'),
 					'type' => 'checkbox',
-					'note' => T_('Actually display images <b>except</b> the one(s) selected above.'),
+					'note' => T_('Actually display all images <b>except</b> the one(s) selected above.'),
 					'defaultvalue' => 0,
 				),
 			'image_limit' => array(
