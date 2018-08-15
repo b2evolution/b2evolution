@@ -37,10 +37,10 @@ $params = array_merge( array(
 		'image_size'                 => 'fit-1280x720',
 		'author_link_text'           => 'auto',
 
-		'content_start_full_text'    => '<div class="evo_post__full_text panel panel-default clearfix">
+		'content_start_full_text'    => $disp == 'single' ? '<div class="evo_post__full_text panel panel-default clearfix">
 					<div class="panel-heading"><h4 class="panel-title">'.T_('More Info').'</h4></div>
-					<div class="panel-body">',
-		'content_end_full_text'      => '</div></div>',
+					<div class="panel-body">' : '',
+		'content_end_full_text'      => $disp == 'single' ? '</div></div>' : '',
 
 		// 'before_images'            => '<div class="col-lg-6"><div class="evo_post_images">',
 		// 'before_image'             => '<figure class="evo_image_block">',
@@ -204,23 +204,38 @@ if( $disp == 'single' )
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
 			// This will enclose each widget in a block:
-			'block_start' => '<div class="$wi_class$">',
+			'block_start' => '<div class="evo_widget $wi_class$">',
 			'block_end' => '</div>',
 			// This will enclose the title of each widget:
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
+			// Template params for "Item Title" widget
+			'widget_item_title_params'  => array(
+				'before' => '<div class="evo_post_title">'.( in_array( $disp, array( 'single', 'page' ) ) ? '<h1>' : '<h2>' ),
+				'after' => ( in_array( $disp, array( 'single', 'page' ) ) ? '</h1>' : '</h2>' ).'</div>',
+			),
+			// Template params for "Item Excerpt" widget
+			'widget_item_excerpt_params' => array(
+					'excerpt_more_text' => NULL
+				),
 			// Template params for "Item Tags" widget
 			'widget_item_tags_before'    => '<nav class="small post_tags">',
 			'widget_item_tags_after'     => '</nav>',
+			// Template params for subcontainer
+			'override_params_for_subcontainer_row' => array(
+					'override_params_for_item_custom_fields' => array(
+							'custom_fields_table_start' => '<table>',
+							'custom_fields_table_end'   => '</table>'
+						)
+				),
+
 			// Params for skin file "_item_content.inc.php"
 			'widget_item_content_params' => $params,
-			// Template paras for "Custom Fields" widget:
-			/*
+			// Template params for "Custom Fields" widget:
 			'custom_fields_table_start' => '<div class="evo_content_block panel panel-default">
 					<div class="panel-heading"><h4 class="panel-title">'.T_('Data Sheet').'</h4></div>
 					<table class="table table-hover">',
 			'custom_fields_table_end'   => '</table></div>',
-			*/
 			// Template params for "Item Attachments" widget:
 			'widget_item_attachments_params' => array(
 					'limit_attach'       => 1000,

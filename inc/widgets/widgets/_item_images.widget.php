@@ -135,15 +135,16 @@ class item_images_Widget extends ComponentWidget
 					'type' => 'radio',
 					'field_lines' => true,
 					'options' => array(
-							array( 'cover', T_('Cover image') ),
-							array( 'cover_with_fallback', T_('Cover image (or Teaser image if no Cover)') ),
+							array( 'cover', T_('Cover images') ),
+							array( 'cover_with_fallback', T_('Cover images (or Teaser image if no Cover)') ),
 							array( 'teaser', T_('Teaser images') ),
 							array( 'aftermore', T_('"After more" images') ) ),
 					'defaultvalue' => 'cover',
 				),
 			'invert_display_type' => array(
-					'label' => T_('All images except the one selected above'),
+					'label' => T_('Invert'),
 					'type' => 'checkbox',
+					'note' => T_('Actually display images <b>except</b> the one(s) selected above.'),
 					'defaultvalue' => 0,
 				),
 			'image_limit' => array(
