@@ -301,16 +301,45 @@ class item_fields_compare_Widget extends ComponentWidget
 					$all_custom_fields[ $search_custom_field_key ]['items'][] = $item_ID;
 				}
 
-				// Initialize the repeat fields of separator fields:
-				if( $item_custom_field['type'] == 'separator' &&
-				    ! empty( $item_custom_field['format'] ) )
-				{	// Try to find the repeat fields:
-					$separator_format = explode( ':', $item_custom_field['format'] );
-					if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
-					{	// Skip wrong separator format:
-						continue;
+				
+				if( $item_custom_field['type'] == 'separator' )
+				{	// Initialize the repeat fields and fields under separator field until next separtor:
+					if( ! empty( $item_custom_field['format'] ) )
+					{	// Try to find the repeat fields:
+						$separator_format = explode( ':', $item_custom_field['format'] );
+						if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
+						{	// Skip wrong separator format:
+							continue;
+						}
+						$repeat_fields = explode( ',', $separator_format[1] );
 					}
-					$repeat_fields = explode( ',', $separator_format[1] );
+					else
+					{	// The separator has no repeat fields:
+						$repeat_fields = array();
+					}
+
+					if( $fields_source == 'include' )
+					{	// Try to find fields under separator only when we request a specific fields list,
+						// in full list the fields under separator are displayed automatically, se we should not get them to avoid duplicated view:
+						$is_under_separator_field = false;
+						foreach( $item_custom_fields as $ic_field_name => $ic_field )
+						{
+							if( $ic_field_name == $search_custom_field_key )
+							{	// We found the current separtor, set flag to use next fields:
+								$is_under_separator_field = true;
+								continue;
+							}
+							if( $is_under_separator_field )
+							{	// This is a field under current separator:
+								if( $ic_field['type'] == 'separator' )
+								{	// Stop here because it is another separator:
+									break;
+								}
+								$repeat_fields[] = $ic_field_name;
+							}
+						}
+					}
+
 					foreach( $repeat_fields as $r => $repeat_field_name )
 					{
 						$repeat_field_name = trim( $repeat_field_name );

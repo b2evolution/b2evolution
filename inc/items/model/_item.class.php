@@ -2943,15 +2943,44 @@ class Item extends ItemLight
 
 			$field = $custom_fields[ $field_name ];
 
-			if( $field['type'] == 'separator' &&
-					! empty( $field['format'] ) )
-			{	// Repeat fields after separator in case of displaying of all fields:
-				$separator_format = explode( ':', $field['format'] );
-				if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
-				{	// Skip wrong separator format:
-					continue;
+			if( $field['type'] == 'separator' )
+			{	// Repeat fields and fields under separator field until next separtor:
+				if( ! empty( $field['format'] ) )
+				{	// Try to find the repeat fields:
+					$separator_format = explode( ':', $field['format'] );
+					if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
+					{	// Skip wrong separator format:
+						continue;
+					}
+					$repeat_fields = explode( ',', $separator_format[1] );
 				}
-				$repeat_fields = explode( ',', $separator_format[1] );
+				else
+				{	// The separator has no repeat fields:
+					$repeat_fields = array();
+				}
+
+				if( ! empty( $params['fields'] ) )
+				{	// Try to find fields under separator only when we request a specific fields list,
+					// in full list the fields under separator are displayed automatically, se we should not get them to avoid duplicated view:
+					$is_under_separator_field = false;
+					foreach( $custom_fields as $ic_field_name => $ic_field )
+					{
+						if( $ic_field_name == $field_name )
+						{	// We found the current separtor, set flag to use next fields:
+							$is_under_separator_field = true;
+							continue;
+						}
+						if( $is_under_separator_field )
+						{	// This is a field under current separator:
+							if( $ic_field['type'] == 'separator' )
+							{	// Stop here because it is another separator:
+								break;
+							}
+							$repeat_fields[] = $ic_field_name;
+						}
+					}
+				}
+
 				foreach( $repeat_fields as $repeat_field_name )
 				{
 					$repeat_field_name = trim( $repeat_field_name );
