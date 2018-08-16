@@ -1135,6 +1135,9 @@ div.coll-selector {
 div.coll-selector .btn-group {
   margin-right: 4px;
 }
+div.coll-selector .btn-group .dropdown-toggle .caret {
+  margin-left: 6px;
+}
 div.level2 {
   padding-top: 17px;
   background-color: #ddd;

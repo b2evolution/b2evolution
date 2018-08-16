@@ -9864,7 +9864,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				'itcf_public'          => 'TINYINT DEFAULT 1',
 				'itcf_format'          => 'VARCHAR(2000) NULL',
 				'itcf_formula'         => 'VARCHAR(2000) COLLATE ascii_general_ci NULL',
+				'itcf_header_class'    => 'VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL',
+				'itcf_cell_class'      => 'VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL',
 				'itcf_link'            => 'ENUM( "nolink", "linkto", "permalink", "zoom", "linkpermzoom", "permzoom", "linkperm", "fieldurl" ) COLLATE ascii_general_ci NOT NULL default "nolink"',
+				'itcf_link_class'      => 'VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL',
 				'itcf_line_highlight'  => 'ENUM( "never", "differences" ) COLLATE ascii_general_ci NULL DEFAULT NULL',
 				'itcf_green_highlight' => 'ENUM( "never", "lowest", "highest" ) COLLATE ascii_general_ci NULL DEFAULT NULL',
 				'itcf_red_highlight'   => 'ENUM( "never", "lowest", "highest" ) COLLATE ascii_general_ci NULL DEFAULT NULL',
@@ -9878,6 +9881,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			itcf_line_highlight = "differences",
 			itcf_green_highlight = "never",
 			itcf_red_highlight = "never",
+			itcf_header_class = "right nowrap",
+			itcf_cell_class = CASE
+				WHEN itcf_type IN( "double", "computed" ) THEN "right"
+				ELSE "center"
+			END,
 			itcf_link = CASE
 				WHEN itcf_type = "image" THEN "linkpermzoom"
 				WHEN itcf_type = "url"   THEN "fieldurl"

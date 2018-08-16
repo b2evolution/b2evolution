@@ -90,6 +90,14 @@ class item_custom_fields_Widget extends item_fields_compare_Widget
 		$generic_params['items_type']['no_edit'] = true;
 		$generic_params['items_limit']['no_edit'] = true;
 		$generic_params['allow_filter']['no_edit'] = true;
+		for( $order_index = 0; $order_index <= 2; $order_index++ )
+		{
+			$field_suffix = ( $order_index == 0 ? '' : '_'.$order_index );
+			$generic_params['order_begin_line'.$field_suffix]['no_edit'] = true;
+			$generic_params['orderby'.$field_suffix]['no_edit'] = true;
+			$generic_params['orderdir'.$field_suffix]['no_edit'] = true;
+			$generic_params['order_end_line'.$field_suffix]['no_edit'] = true;
+		}
 
 		// Change title and note for the param "Specific Item IDs":
 		$generic_params['items']['label'] = T_('Item ID to show');

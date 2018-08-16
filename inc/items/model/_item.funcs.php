@@ -2121,7 +2121,7 @@ function echo_item_status_buttons( $Form, $edited_Item )
 	$next_action = ( is_create_action( $action ) ? 'create' : 'update' );
 
 	$Form->hidden( 'post_status', $edited_Item->status );
-	echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="top" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
+	echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
 	echo '<button type="submit" class="btn btn-status-'.$edited_Item->status.'" name="actionArray['.$next_action.']">'
 				.'<span>'.T_( $status_options[ $edited_Item->status ] ).'</span>'
 			.'</button>'
@@ -4122,6 +4122,7 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 	$c = 0;
 	foreach( $custom_fields as $custom_field )
 	{	// Loop through custom fields:
+		$custom_field_input_params = array();
 		$custom_field_note = '';
 		if( ! empty( $custom_field['note'] ) )
 		{	// Display a not of the custon field if it is filled:
@@ -4156,6 +4157,7 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 						'data-child-input-id' => 'item_'.$custom_field['type'].'_'.$custom_field['ID'],
 						'data-parent-value'   => $parent_custom_field_value,
 					) );
+					$custom_field_input_params['disabled'] = 'disabled';
 				}
 			}
 		}
@@ -4163,25 +4165,25 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 		switch( $custom_field['type'] )
 		{
 			case 'double':
-				$Form->text_input( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) );
+				$Form->text_input( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
 				break;
 			case 'computed':
 				$Form->info( $custom_field['label'], $edited_Item->get_custom_field_formatted( $custom_field['name'] ), $custom_field_note );
 				break;
 			case 'varchar':
-				$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) );
+				$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
 				break;
 			case 'text':
-				$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field['label'], array( 'note' => $custom_field_note ) );
+				$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field['label'], array( 'note' => $custom_field_note ) + $custom_field_input_params );
 				break;
 			case 'html':
-				$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field['label'], array( 'note' => $custom_field_note ) );
+				$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field['label'], array( 'note' => $custom_field_note ) + $custom_field_input_params );
 				break;
 			case 'url':
-				$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) );
+				$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
 				break;
 			case 'image':
-				$Form->text_input( 'item_image_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) );
+				$Form->text_input( 'item_image_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
 				break;
 			case 'separator':
 				if( is_admin_page() && $c > 0 )
@@ -4193,7 +4195,7 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 				{
 					echo '<p class="note">'.$custom_field_note.'</p>';
 				}
-				if( is_admin_page() && $c > 0 && $c < count( $custom_fields ) - 1 )
+				if( is_admin_page() && $c > 0 && $c < count( $custom_fields ) )
 				{	// This is a hack for back-office because there is a css table layout:
 					$Form->begin_fieldset();
 				}
@@ -4209,7 +4211,17 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 <script type="text/javascript">
 jQuery( 'a[data-child-input-id]' ).click( function()
 {	// Update custom field value with value from parent post:
-	jQuery( '#' + jQuery( this ).data( 'child-input-id' ) ).val( jQuery( this ).data( 'parent-value' ) );
+	var child_field_obj = jQuery( '[name=' + jQuery( this ).data( 'child-input-id' ) + '][type!=hidden]' );
+	if( child_field_obj.length > 0 )
+	{
+		child_field_obj.val( jQuery( this ).data( 'parent-value' ) );
+		if( child_field_obj.prop( 'disabled' ) )
+		{	// If the field is disabled we should create additional hidden input in order to save new value in DB,
+			// because the disabled inputs cannot be submitted:
+			child_field_obj.after( '<input type="hidden" name="' + child_field_obj.attr( 'name' ) + '" value="' + child_field_obj.val() + '" />' );
+			child_field_obj.attr( 'name', child_field_obj.attr( 'name' ) + '_disabled' );
+		}
+	}
 	return false;
 } );
 </script>

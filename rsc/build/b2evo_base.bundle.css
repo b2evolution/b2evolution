@@ -4208,6 +4208,7 @@ div.other_profile_pictures img {
 }
 .evo_content_block table.item_custom_fields th,
 .evo_content_block table.item_custom_fields td {
+  vertical-align: middle;
   padding: 0 10px 0 0;
 }
 .evo_post_gallery__image {

@@ -833,7 +833,7 @@ class collections_Module extends Module
 
 		// Posts
 		$collection_menu_entries['posts'] = array(
-				'text' => T_('Posts'),
+				'text' => T_('Contents'),
 				'href' => $admin_url.'?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$blog,
 			);
 		$last_group_menu_entry = 'posts';
@@ -968,13 +968,13 @@ class collections_Module extends Module
 			{ // Post Types & Statuses
 				$AdminUI->add_menu_entries( array( 'collections', 'settings' ), array(
 					'types' => array(
-						'text' => T_('Post Types'),
-						'title' => T_('Post Types Management'),
+						'text' => T_('Item Types'),
+						'title' => T_('Item Types Management'),
 						'href' => $admin_url.'?ctrl=itemtypes&amp;tab=settings&amp;tab3=types&amp;blog='.$blog
 						),
 					'statuses' => array(
-						'text' => T_('Post Statuses'),
-						'title' => T_('Post Statuses Management'),
+						'text' => T_('Item Statuses'),
+						'title' => T_('Item Statuses Management'),
 						'href' => $admin_url.'?ctrl=itemstatuses&amp;tab=settings&amp;tab3=statuses&amp;blog='.$blog
 						),
 					)

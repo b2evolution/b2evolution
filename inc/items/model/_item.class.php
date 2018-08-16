@@ -2412,7 +2412,7 @@ class Item extends ItemLight
 
 			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
 			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, iset_value AS value, ' );
-			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_link AS link, ' );
+			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, itcf_link AS link, itcf_link_class AS link_class, ' );
 			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description' );
 			$SQL->FROM( 'T_items__type_custom_field' );
 			$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON itcf_name = SUBSTRING( iset_name, 8 ) AND iset_item_ID = '.$this->ID );
@@ -2474,10 +2474,16 @@ class Item extends ItemLight
 	function get_custom_field_formatted( $field_index, $params = array() )
 	{
 		$params = array_merge( array(
-				'field_value_yes'     => '<span class="fa fa-check green"></span>', // Used to replace a mask #yes# in values of all types
-				'field_value_no'      => '<span class="fa fa-times red"></span>', // Used to replace a mask #no# in values of all types
 				'field_value_format'  => '', // Format for custom field, Leave empty to use a format from DB
 				'field_restrict_type' => false, // Restrict field by type(double, varchar, html, text, url, image, computed, separator), FALSE - to don't restrict
+				// The following masks are used to replace in custom field values and formats:
+				'field_value_yes'     => '<span class="fa fa-check green"></span>', // #yes#
+				'field_value_no'      => '<span class="fa fa-times red"></span>', // #no#
+				'field_value_plus'    => '<span class="fa fa-plus-circle green"></span>', // (+)
+				'field_value_minus'   => '<span class="fa fa-minus-circle red"></span>', // (-)
+				'field_value_warning' => '<span class="fa fa-exclamation-triangle orange"></span>', // (!)
+				'field_value_newline' => '<br />', // ||
+				'field_value_note'    => '<span class="note">$note_text$</span>', // {note text}
 			), $params );
 
 		// Try to get an original value of the requested custom field:
@@ -2509,12 +2515,21 @@ class Item extends ItemLight
 			$format = $params['field_value_format'];
 		}
 
+		$value_masks = array(
+			'#yes#' => $params['field_value_yes'],
+			'#no#'  => $params['field_value_no'],
+			'(+)'   => $params['field_value_plus'],
+			'(-)'   => $params['field_value_minus'],
+			'(!)'   => $params['field_value_warning'],
+			'||'    => $params['field_value_newline'],
+		);
+
 		switch( $custom_field['type'] )
 		{
 			case 'double':
 			case 'computed':
 				// Format double/computed field value:
-				if( empty( $format ) )
+				if( $format === NULL || $format === '' )
 				{	// No format:
 					break;
 				}
@@ -2542,7 +2557,7 @@ class Item extends ItemLight
 				{	// If value is empty string or NULL
 					if( empty( $formats[3] ) )
 					{	// Use default for empty values:
-						$custom_field_value = /* TRANS: "Not Available" */ T_('N/A');
+						$custom_field_value = /* TRANS: "Not Available" */ '{'.T_('N/A').'}';
 					}
 					else
 					{	// Use a special format for empty values:
@@ -2567,8 +2582,7 @@ class Item extends ItemLight
 					$format = $formats[1];
 				}
 
-				if( $format == '#yes#' ||
-				    $format == '#no#' ||
+				if( isset( $value_masks[ $format ] ) ||
 				    strpos( $format, '#stars' ) !== false ||
 				    ( $format !== '' && ! preg_match( '/\d/', $format ) ) )
 				{	// Use special formats:
@@ -2637,7 +2651,8 @@ class Item extends ItemLight
 		}
 
 		// Replace special masks in value with template:
-		$custom_field_value = str_replace( array( '#yes#', '#no#' ), array( $params['field_value_yes'], $params['field_value_no'] ), $custom_field_value );
+		$custom_field_value = str_replace( array_keys( $value_masks ), $value_masks, $custom_field_value );
+		$custom_field_value = preg_replace( '/\{([^}]+)\}/', str_replace( '$note_text$', '$1', $params['field_value_note'] ), $custom_field_value );
 
 		if( preg_match_all( '/(#stars(\/\d+)?)#/', $custom_field_value, $star_matches ) )
 		{	// Use stars template:
@@ -2664,6 +2679,7 @@ class Item extends ItemLight
 			if( isset( $link_fallbacks[ $custom_field['link'] ] ) )
 			{
 				$fallback_count = count( $link_fallbacks[ $custom_field['link'] ] );
+				$link_class_attr = empty( $custom_field['link_class'] ) ? '' : ' class="'.format_to_output( $custom_field['link_class'], 'htmlattr' ).'"';
 				foreach( $link_fallbacks[ $custom_field['link'] ] as $l => $link_fallback )
 				{
 					switch( $link_fallback )
@@ -2672,7 +2688,7 @@ class Item extends ItemLight
 							// Link to "URL":
 							if( $this->get( 'url' ) != '' )
 							{	// If this post has a specified setting "Link to url":
-								$custom_field_value = '<a href="'.$this->get( 'url' ).'" target="_blank">'.$custom_field_value.'</a>';
+								$custom_field_value = '<a href="'.$this->get( 'url' ).'" target="_blank"'.$link_class_attr.'>'.$custom_field_value.'</a>';
 								break 2;
 							}
 							// else fallback to other points:
@@ -2685,7 +2701,7 @@ class Item extends ItemLight
 							    $Item->ID != $this->ID ||
 							    $fallback_count == $l + 1 )
 							{	// Use permalink if it is not last point and we don't view this current post:
-								$custom_field_value = $this->get_permanent_link( $custom_field_value );
+								$custom_field_value = $this->get_permanent_link( $custom_field_value, '#', $custom_field['link_class'] );
 								break 2;
 							}
 							// else fallback to other points:
@@ -2698,14 +2714,14 @@ class Item extends ItemLight
 							    $Link = & $LinkCache->get_by_ID( $orig_custom_field_value, false, false ) &&
 							    $File = & $Link->get_File() )
 							{	// Link to original file:
-								$custom_field_value = '<a href="'.$File->get_url().'"'.( $File->is_image() ? ' rel="lightbox[p'.$this->ID.']"' : '' ).'>'.$custom_field_value.'</a>';
+								$custom_field_value = '<a href="'.$File->get_url().'"'.( $File->is_image() ? ' rel="lightbox[p'.$this->ID.']"' : '' ).$link_class_attr.'>'.$custom_field_value.'</a>';
 							}
 							// else fallback to other points:
 							break;
 
 						case 'url':
 							// Use value of url fields as URL to the link:
-							$custom_field_value = '<a href="'.$custom_field_value.'">'.$custom_field_value.'</a>';
+							$custom_field_value = '<a href="'.$custom_field_value.'"'.$link_class_attr.'>'.$custom_field_value.'</a>';
 							break 2;
 					}
 				}
@@ -2887,13 +2903,13 @@ class Item extends ItemLight
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'before'       => '<table class="item_custom_fields">',
-				'field_format' => '<tr><th class="right">$title$$description_icon$:</th><td class="$class$">$value$</td></tr>', // $title$ $description_icon$ $class$ $value$
+				'field_format' => '<tr><th class="$header_cell_class$">$title$$description_icon$:</th><td class="$data_cell_class$">$value$</td></tr>', // $title$ $description_icon$ $class$ $value$
 				'after'        => '</table>',
 				'field_description_icon_class' => 'grey',
 				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
 				// Separate template for separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
-				'field_separator_format' => '<tr><th colspan="2" class="center">$title$$description_icon$</th></tr>', // $title$ $description_icon$
+				'field_separator_format' => '<tr><th colspan="2" class="$header_cell_class$">$title$$description_icon$</th></tr>', // $title$ $description_icon$
 			), $params );
 
 		// Get all custom fields by item ID:
@@ -2915,8 +2931,21 @@ class Item extends ItemLight
 
 		$html = '';
 
-		foreach( $display_fields as $field_name )
+		foreach( $display_fields as $field_key )
 		{
+			$field_name = $field_key;
+			$field_options = '';
+			if( ! empty( $params['fields'] ) && strpos( $field_key, '+' ) !== false )
+			{	// Parse additional field options, e.g. separators may have names as 'separator+repeat', 'separator+fields', 'separator+repeat+fields':
+				$field_options_arr = explode( '+', $field_key, 2 );
+				if( isset( $field_options_arr[1] ) )
+				{	// The field has additional options:
+					$field_options = $field_options_arr[1];
+				}
+				// Set real name of separator field from key like 'separator+repeat+fields':
+				$field_name = $field_options_arr[0];
+			}
+
 			// Get HTML code of the custom field:
 			$html .= $this->get_custom_field_template( $field_name, $params );
 
@@ -2927,22 +2956,54 @@ class Item extends ItemLight
 
 			$field = $custom_fields[ $field_name ];
 
-			if( $field['type'] == 'separator' &&
-					! empty( $field['format'] ) &&
-					empty( $params['fields'] ) )
-			{	// Repeat fields after separator in case of displaying of all fields:
-				$separator_format = explode( ':', $field['format'] );
-				if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
-				{	// Skip wrong separator format:
-					continue;
+			if( $field['type'] == 'separator' )
+			{	// Repeat fields and fields under separator field until next separtor:
+				if( ! empty( $field['format'] )  &&
+				    ( strpos( $field_options, 'repeat' ) !== false || // if field is requested with name like 'separator+repeat' or 'separator+repeat+fields'
+				      empty( $params['fields'] ) // also get all repeat fields when fields list is full
+				    )
+				  )
+				{	// Try to find the repeat fields:
+					$separator_format = explode( ':', $field['format'] );
+					if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
+					{	// Skip wrong separator format:
+						continue;
+					}
+					$repeat_fields = explode( ',', $separator_format[1] );
 				}
-				$repeat_fields = explode( ',', $separator_format[1] );
+				else
+				{	// The separator has no repeat fields:
+					$repeat_fields = array();
+				}
+
+				if( ! empty( $params['fields'] ) &&
+				    strpos( $field_options, 'fields' ) !== false ) // if field is requested with name like 'separator+fields' or 'separator+repeat+fields')
+				{	// Try to find fields under separator only when we request a specific fields list,
+					// in full list the fields under separator are displayed automatically, se we should not get them to avoid duplicated view:
+					$is_under_separator_field = false;
+					foreach( $custom_fields as $ic_field_name => $ic_field )
+					{
+						if( $ic_field_name == $field_name )
+						{	// We found the current separtor, set flag to use next fields:
+							$is_under_separator_field = true;
+							continue;
+						}
+						if( $is_under_separator_field )
+						{	// This is a field under current separator:
+							if( $ic_field['type'] == 'separator' )
+							{	// Stop here because it is another separator:
+								break;
+							}
+							$repeat_fields[] = $ic_field_name;
+						}
+					}
+				}
+
 				foreach( $repeat_fields as $repeat_field_name )
 				{
 					$repeat_field_name = trim( $repeat_field_name );
-					if( ! isset( $custom_fields[ $repeat_field_name ] ) ||
-						$custom_fields[ $repeat_field_name ]['type'] == 'separator' )
-					{	// Skip unknown field and a separator field to avoid recursion:
+					if( ! isset( $custom_fields[ $repeat_field_name ] ) )
+					{	// Skip unknown field:
 						continue;
 					}
 					// Get HTML code of the repeated custom field:
@@ -2971,12 +3032,12 @@ class Item extends ItemLight
 	{
 		$custom_fields = $this->get_custom_fields_defs();
 
-		$mask_vars = array( '$title$', '$description_icon$', '$class$', '$value$' );
+		$mask_vars = array( '$title$', '$description_icon$', '$header_cell_class$', '$data_cell_class$', '$value$' );
 
 		$field_name = trim( $field_name );
 		if( ! isset( $custom_fields[ $field_name ] ) )
 		{	// Wrong field:
-			$mask_values = array( $field_name, '', '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), '', $field_name ).'</span>' );
+			$mask_values = array( $field_name, '', '', '', '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>' );
 			return str_replace( $mask_vars, $mask_values, $params['field_format'] );
 		}
 
@@ -3001,8 +3062,9 @@ class Item extends ItemLight
 				) ).' ';
 		}
 
-		// Alignment class for cell with value depending on custom field type:
-		$mask_values[] = in_array( $field['type'], array( 'double', 'computed' ) ) ? 'right' : 'center';
+		// Alignment classes for header and data cells:
+		$mask_values[] = $field['header_class'];
+		$mask_values[] = $field['cell_class'];
 
 		if( ! $field['public'] )
 		{	// Not public field:
@@ -3041,12 +3103,16 @@ class Item extends ItemLight
 				'render_links'          => true,
 				'render_custom_fields'  => true,
 				'render_other_item'     => true,
-				'render_parent'         => true,
 				'render_collection'     => true,
 				'render_content_blocks' => true,
 				'render_inline_widgets' => true,
 				'render_date'           => true,
 			), $params );
+
+		if( $params['render_inline_widgets'] )
+		{	// Render widget tags (subscribe, emailcapture, compare, fields):
+			$content = $this->render_inline_widgets( $content, $params );
+		}
 
 		if( $params['render_inline_files'] )
 		{	// Render inline file tags like [image:123:caption] or [file:123:caption]:
@@ -3064,7 +3130,7 @@ class Item extends ItemLight
 		}
 
 		if( $params['render_other_item'] )
-		{	// Render parent/other item data [parent], [parent:fields], [item:123:fields], [item:slug-title:fields] and etc.:
+		{	// Render parent/other item data [parent:titlelink], [parent:url], [parent:field:first_string_field], [item:123:titlelink], [item:slug:titlelink] and etc.:
 			$content = $this->render_other_item_data( $content, $params );
 		}
 
@@ -3078,11 +3144,6 @@ class Item extends ItemLight
 			$content = $this->render_content_blocks( $content, $params );
 		}
 
-		if( $params['render_inline_widgets'] )
-		{	// Render widget tags (subscribe, emailcapture, compare):
-			$content = $this->render_inline_widgets( $content, $params );
-		}
-
 		if( $params['render_date'] )
 		{	// Render date tags:
 			$content = $this->render_date( $content, $params );
@@ -3093,7 +3154,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Convert inline widget tags like [subscribe], [emailcapture], [compare] into HTML tags
+	 * Convert inline widget tags like [subscribe], [emailcapture], [compare], [fields], [parent:fields], [item:123:fields], [item:slug:fields] into HTML tags
 	 *
 	 * @param string Source content
 	 * @param array Params
@@ -3114,7 +3175,7 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of widgets:
-		preg_match_all( '/\[(subscribe|emailcapture|compare):([^\]]*)\]/i', $content, $tags );
+		preg_match_all( '/\[(parent:|item:[^:\]]+:)?(subscribe|emailcapture|compare|fields):?([^\]]*)\]/i', $content, $tags );
 
 		if( count( $tags[0] ) > 0 )
 		{	// If at least one widget tag is found in content:
@@ -3123,8 +3184,10 @@ class Item extends ItemLight
 				$field_Item = $this;
 				$widget_params = false;
 				$widget_html = false;
-				$tag_params = explode( ':', $tags[2][$t] );
-				switch( $tags[1][$t] )
+				$tag_prefix = $tags[1][$t];
+				$widget_name = $tags[2][$t];
+				$tag_params = explode( ':', $tags[3][$t] );
+				switch( $widget_name )
 				{
 					case 'subscribe':
 						// Widget "Newsletter/Email list subscription":
@@ -3267,24 +3330,73 @@ class Item extends ItemLight
 						$compare_fields = isset( $tag_params[1] ) ? str_replace( ',', "\n", trim( $tag_params[1], ', ' ) ) : '';
 						// Set widget params to display:
 						$widget_params = array(
-							'widget' => 'item_fields_compare',
-							'items_source' => 'list',
-							'items'  => $compare_items,
-							'fields' => $compare_fields,
+							'widget'        => 'item_fields_compare',
+							'items_source'  => 'list',
+							'items'         => $compare_items,
+							'fields_source' => empty( $compare_fields ) ? 'all' : 'include',
+							'fields'        => $compare_fields,
+						);
+						break;
+
+					case 'fields':
+						// Widget "Item Custom Fields":
+						if( $tag_prefix == 'parent:' )
+						{	// Use parent item:
+							$widget_item_ID = '$parent$';
+							if( ! ( $widget_Item = & $this->get_parent_Item() ) )
+							{	// Display error message if parent doesn't exist:
+								$widget_html = '<span class="text-danger">'.T_('This Item has no parent.').'</span>';
+								break;
+							}
+						}
+						elseif( strpos( $tag_prefix, 'item:' ) === 0 )
+						{	// Use other item by ID or slug:
+							$widget_item_ID_slug = substr( $tag_prefix, 5, -1 );
+							$widget_item_data_is_number = is_number( $widget_item_ID_slug );
+							$ItemCache = & get_ItemCache();
+							if( ! ( $widget_item_data_is_number && $widget_Item = & $ItemCache->get_by_ID( $widget_item_ID_slug, false, false ) ) &&
+									! ( ! $widget_item_data_is_number && $widget_Item = & $ItemCache->get_by_urltitle( $widget_item_ID_slug, false, false ) ) )
+							{	// Display error message if other item is not found by ID and slug:
+								$widget_html = '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$widget_item_ID_slug.'</code>' ).'</span>';
+								break;
+							}
+							$widget_item_ID = $widget_Item->ID;
+						}
+						else
+						{	// Use current Item:
+							$widget_item_ID = '$this$';
+							$widget_Item = $this;
+						}
+
+						$custom_fields = $widget_Item->get_custom_fields_defs();
+						if( ! $custom_fields )
+						{	// Fields don't exist for this Item:
+							$widget_html = '<span class="text-danger">'.T_('The Item has no custom fields.').'</span>';
+							break;
+						}
+
+						// Set fields to display:
+						$custom_fields = isset( $tag_params[0] ) ? str_replace( ',', "\n", trim( $tag_params[0], ', ' ) ) : '';
+						// Set widget params to display:
+						$widget_params = array(
+							'widget'        => 'item_custom_fields',
+							'fields_source' => empty( $custom_fields ) ? 'all' : 'include',
+							'fields'        => $custom_fields,
+							'items'         => $widget_item_ID,
 						);
 						break;
 				}
 
-				if( $widget_params !== false )
-				{	// If widget display params are initialized for the inline tag:
-					if( $widget_html === false )
-					{	// Call widget with params only when content is not generated yet above:
-						ob_start();
-						skin_widget( array_merge( $params, $widget_params ) );
-						$widget_html = ob_get_contents();
-						ob_end_clean();
-					}
-					// Replace inline widget tag with content generated by requested widget:
+				// If widget display params are initialized for the inline tag:
+				if( $widget_params !== false && $widget_html === false )
+				{	// Call widget with params only when content is not generated yet above:
+					ob_start();
+					skin_widget( array_merge( $params, $widget_params ) );
+					$widget_html = ob_get_contents();
+					ob_end_clean();
+				}
+				if( $widget_html !== false )
+				{	// Replace inline widget tag with content generated by requested widget:
 					$content = substr_replace( $content, $widget_html, strpos( $content, $source_tag ), strlen( $source_tag ) );
 				}
 			}
@@ -3295,7 +3407,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Convert inline custom field tags like [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field] into HTML tags
+	 * Convert inline custom field tags like [field:first_string_field] into HTML tags
 	 *
 	 * @param string Source content
 	 * @param array Params
@@ -3313,47 +3425,28 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of custom fields:
-		preg_match_all( '/\[(fields?):?([^\]]*)?\]/i', $content, $tags );
+		preg_match_all( '/\[field:([^\]]*)?\]/i', $content, $tags );
 
 		foreach( $tags[0] as $t => $source_tag )
 		{
-			switch( $tags[1][ $t ] )
-			{
-				case 'fields':
-					// Render several fields as HTML table:
-					$custom_fields_params = array( 'fields' => trim( $tags[2][ $t ] ) );
-					$field_value = $this->get_custom_fields( $custom_fields_params );
-					if( empty( $field_value ) )
-					{	// Fields don't exist:
-						$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The Item has no custom fields.').'</span>', $content );
-					}
-					else
-					{	// Display fields:
-						$content = str_replace( $source_tag, $field_value, $content );
-					}
-					break;
-
-				case 'field':
-					// Render single field as text:
-					$field_index = trim( $tags[2][ $t ] );
-					$field_value = $this->get_custom_field_formatted( $field_index, $params );
-					if( $field_value === false )
-					{	// Wrong field request, display error:
-						$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_index ).'</span>', $content );
-					}
-					else
-					{	// Display field value:
-						$custom_fields = $this->get_custom_fields_defs();
-						if( $custom_fields[ $field_index ]['public'] )
-						{	// Display value only if custom field is public:
-							$content = str_replace( $source_tag, $field_value, $content );
-						}
-						else
-						{	// Display an error for not public custom field:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_index ).'</span>', $content );
-						}
-					}
-					break;
+			// Render single field as text:
+			$field_index = trim( $tags[1][ $t ] );
+			$field_value = $this->get_custom_field_formatted( $field_index, $params );
+			if( $field_value === false )
+			{	// Wrong field request, display error:
+				$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_index ).'</span>', $content );
+			}
+			else
+			{	// Display field value:
+				$custom_fields = $this->get_custom_fields_defs();
+				if( $custom_fields[ $field_index ]['public'] )
+				{	// Display value only if custom field is public:
+					$content = str_replace( $source_tag, $field_value, $content );
+				}
+				else
+				{	// Display an error for not public custom field:
+					$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_index ).'</span>', $content );
+				}
 			}
 		}
 
@@ -3363,11 +3456,15 @@ class Item extends ItemLight
 
 	/**
 	 * Convert inline parent/other item tags into HTML tags like:
-	 *    [parent]
 	 *    [parent:titlelink]
 	 *    [parent:url]
-	 *    [parent:fields:second_numeric_field,first_string_field]
 	 *    [parent:field:first_string_field]
+	 *    [item:123:titlelink]
+	 *    [item:123:url]
+	 *    [item:123:field:first_string_field]
+	 *    [item:slug:titlelink]
+	 *    [item:slug:url]
+	 *    [item:slug:field:first_string_field]
 	 *
 	 * @param string Source content
 	 * @param array Params
@@ -3414,21 +3511,6 @@ class Item extends ItemLight
 
 				switch( $tags[2][ $t ] )
 				{
-					case 'fields':
-						// Render several parent custom fields as HTML table:
-						$field_value = $other_Item->get_custom_fields( array(
-								'fields' => trim( $tags[3][ $t ] )
-							) );
-						if( empty( $field_value ) )
-						{	// Fields don't exist:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The parent Item has no custom fields.').'</span>', $content );
-						}
-						else
-						{	// Display fields:
-							$content = str_replace( $source_tag, $field_value, $content );
-						}
-						break;
-
 					case 'field':
 						// Render single parent custom field as text:
 						$field_index = trim( $tags[3][ $t ] );
