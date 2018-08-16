@@ -4236,7 +4236,7 @@ jQuery( 'a[data-child-input-id]' ).click( function()
 /**
  * Render special masks in custom field labels and values
  *
- * Possible masks: #yes#, #no#, (+), (-), (!), ||, {note_sample_text}, #stars/5#
+ * Possible masks: #yes#, #no#, (+), (-), (!), ||, {note_sample_text}, #stars/5#, #stars:2.3/5#
  *
  * @param string Custom field value or label
  * @param array Additional parameters
@@ -4271,14 +4271,20 @@ function render_custom_field( $value, $params = array() )
 	$value = preg_replace( '/\{([^}]+)\}/', str_replace( '$note_text$', '$1', $params['field_value_note'] ), $value );
 
 	// Render stars:
-	if( preg_match_all( '/(#stars(\/\d+)?)#/', $value, $star_matches ) )
+	if( preg_match_all( '/(#stars(:\d+.?\d+?)?(\/\d+)?)#/', $value, $star_matches ) )
 	{	// If at least one star template is found:
 		foreach( $star_matches[0] as $s => $star_match )
 		{
 			// Set number of stars, 5 stars by default:
-			$stars_num = ( isset( $star_matches[2][ $s ] ) && $star_matches[2][ $s ] !== '' ) ? intval( trim( $star_matches[2][ $s ], '/' ) ) : 5;
-			// Use a number of active stars from params if it is a numeric really, else make active all stars by default:
-			$stars_value = ( $params['stars_value'] === NULL || ! is_numeric( $params['stars_value'] ) ) ? $stars_num : floatval( $params['stars_value'] );
+			$stars_num = ( isset( $star_matches[3][ $s ] ) && $star_matches[3][ $s ] !== '' ) ? intval( trim( $star_matches[3][ $s ], '/' ) ) : 5;
+			if( $params['stars_value'] === NULL || ! is_numeric( $params['stars_value'] ) )
+			{	// Make active all stars by default or get active stars e.g. '2.3' from stars mask like #stars:2.3/5#:
+				$stars_value = empty( $star_matches[2][ $s ] ) ? $stars_num : floatval( substr( $star_matches[2][ $s ], 1 ) );
+			}
+			else
+			{	// Use a number of active stars from params if it is a numeric really
+				$stars_value = floatval( $params['stars_value'] );
+			}
 			// Render stars:
 			$value = str_replace( $star_match, get_stars_template( $stars_value, $stars_num, $params ), $value );
 		}
