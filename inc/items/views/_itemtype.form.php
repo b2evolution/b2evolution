@@ -28,13 +28,13 @@ if( $edited_Itemtype->ID > 0 )
 {
 	$default_ids = ItemType::get_default_ids();
 	if( ! in_array( $edited_Itemtype->ID, $default_ids ) )
-	{	// Allow delete post type only if it is not default of blogs:
-		$Form->global_icon( T_('Delete this Post Type!'), 'delete', regenerate_url( 'action', 'action=delete&amp;crumb_itemtype='.get_crumb( 'itemtype' ) ) );
+	{	// Allow delete item type only if it is not default of blogs:
+		$Form->global_icon( T_('Delete this Item Type!'), 'delete', regenerate_url( 'action', 'action=delete&amp;crumb_itemtype='.get_crumb( 'itemtype' ) ) );
 	}
 }
 $Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,ityp_ID' ) );
 
-$Form->begin_form( 'fform', ( $edited_Itemtype->ID > 0 ? T_('Edit post type') : T_('New post type') ) );
+$Form->begin_form( 'fform', ( $edited_Itemtype->ID > 0 ? T_('Edit item type') : T_('New item type') ) );
 
 $Form->add_crumb( 'itemtype' );
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',ityp_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
@@ -510,7 +510,7 @@ $Results->display( $display_params );
 
 $item_status_IDs = array();
 if( $Results->result_num_rows > 0 )
-{	// If at least one post status exists in DB:
+{	// If at least one item status exists in DB:
 	foreach( $Results->rows as $row )
 	{
 		$item_status_IDs[] = $row->pst_ID;
