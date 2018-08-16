@@ -150,9 +150,27 @@ echo '<input type="text" name="custom_field_order$cf_num$" value="$cf_order$" cl
 echo '<input type="hidden" name="custom_field_ID$cf_num$" value="$cf_ID$" />';
 echo '<input type="hidden" name="custom_field_type$cf_num$" value="$cf_type$" />';
 echo '<input type="hidden" name="custom_field_note$cf_num$" value="$cf_note$" />';
-echo '<input type="hidden" name="custom_field_formula$cf_num$" value="$cf_formula$" />';
+$custom_field_templates[ $c++ ] = ob_get_clean();
+foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
+{
+	if( $custom_field_type == 'computed' )
+	{
+		$custom_field_templates[ $c ][ $custom_field_type ] = '<input type="hidden" name="custom_field_formula$cf_num$" value="$cf_formula$" />';;
+	}
+}
+$c++;
+ob_start();
 echo '<input type="hidden" name="custom_field_header_class$cf_num$" value="$cf_header_class$" />';
-echo '<input type="hidden" name="custom_field_cell_class$cf_num$" value="$cf_cell_class$" />';
+$custom_field_templates[ $c++ ] = ob_get_clean();
+foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
+{
+	if( $custom_field_type != 'separator' )
+	{
+		$custom_field_templates[ $c ][ $custom_field_type ] = '<input type="hidden" name="custom_field_cell_class$cf_num$" value="$cf_cell_class$" />';
+	}
+}
+$c++;
+ob_start();
 // Link
 $custom_field_templates[ $c++ ] = ob_get_clean();
 foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
