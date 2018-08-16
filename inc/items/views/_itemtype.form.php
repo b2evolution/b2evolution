@@ -138,7 +138,53 @@ $Table->display_init();
 // ******** START OF Custom Field Templates,
 // Used for existing custom field row in the table below and also for JS code to add new custom field:
 $custom_field_templates = array();
-$c = 0;
+
+/**
+ * Store input elements depending on custom field type in the array
+ *
+ * @param string|array New template
+ * @param string|array Include field types
+ * @param array All templates
+ */
+function custom_field_edit_form_template( $new_templates, $limit_field_types, & $custom_field_templates )
+{
+	$custom_field_types = get_item_type_field_types();
+	$c = count( $custom_field_templates ) + 1;
+	// End previous template:
+	$custom_field_templates[ $c - 1 ] = ob_get_clean();
+
+	if( ! is_array( $new_templates ) )
+	{
+		$new_templates = array( $new_templates );
+		$limit_field_types = array( $limit_field_types );
+	}
+
+	foreach( $new_templates as $n => $new_template )
+	{
+		$exclude_field_types = array();
+		$include_field_types = explode( ',', $limit_field_types[ $n ] );
+		foreach( $include_field_types as $i => $field_type )
+		{	// Find which types should be excluded:
+			if( substr( $field_type, 0, 1 ) == '-' )
+			{	// Exclude this field type:
+				$exclude_field_types[] = substr( $field_type, 1 );
+				unset( $include_field_types[ $i ] );
+			}
+		}
+		foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
+		{
+			if( in_array( $custom_field_type, $include_field_types ) ||
+			    ( ! empty( $exclude_field_types ) && ! in_array( $custom_field_type, $exclude_field_types ) ) )
+			{	// The given template is applied for the field type:
+				$custom_field_templates[ $c ][ $custom_field_type ] = ( $new_template == '$custom_field_type_title$' ? $custom_field_type_title : $new_template );
+			}
+		}
+	}
+
+	// Start next template:
+	ob_start();
+}
+
 ob_start();
 
 $Table->display_line_start();
@@ -150,39 +196,11 @@ echo '<input type="text" name="custom_field_order$cf_num$" value="$cf_order$" cl
 echo '<input type="hidden" name="custom_field_ID$cf_num$" value="$cf_ID$" />';
 echo '<input type="hidden" name="custom_field_type$cf_num$" value="$cf_type$" />';
 echo '<input type="hidden" name="custom_field_note$cf_num$" value="$cf_note$" />';
-$custom_field_templates[ $c++ ] = ob_get_clean();
-foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
-{
-	if( $custom_field_type == 'computed' )
-	{
-		$custom_field_templates[ $c ][ $custom_field_type ] = '<input type="hidden" name="custom_field_formula$cf_num$" value="$cf_formula$" />';;
-	}
-}
-$c++;
-ob_start();
+custom_field_edit_form_template( '<input type="hidden" name="custom_field_formula$cf_num$" value="$cf_formula$" />', 'computed', $custom_field_templates );
 echo '<input type="hidden" name="custom_field_header_class$cf_num$" value="$cf_header_class$" />';
-$custom_field_templates[ $c++ ] = ob_get_clean();
-foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
-{
-	if( $custom_field_type != 'separator' )
-	{
-		$custom_field_templates[ $c ][ $custom_field_type ] = '<input type="hidden" name="custom_field_cell_class$cf_num$" value="$cf_cell_class$" />';
-	}
-}
-$c++;
-ob_start();
-// Link
-$custom_field_templates[ $c++ ] = ob_get_clean();
-foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
-{
-	if( ! in_array( $custom_field_type, array( 'text', 'html', 'separator' ) ) )
-	{
-		$custom_field_templates[ $c ][ $custom_field_type ] = '<input type="hidden" name="custom_field_link$cf_num$" value="$cf_link$" />'
-			.'<input type="hidden" name="custom_field_link_class$cf_num$" value="$cf_link_class$" />';
-	}
-}
-$c++;
-ob_start();
+custom_field_edit_form_template( '<input type="hidden" name="custom_field_cell_class$cf_num$" value="$cf_cell_class$" />', '-separator', $custom_field_templates );
+custom_field_edit_form_template( '<input type="hidden" name="custom_field_link$cf_num$" value="$cf_link$" />'
+	.'<input type="hidden" name="custom_field_link_class$cf_num$" value="$cf_link_class$" />', '-text,-html,-separator', $custom_field_templates );
 echo '<input type="hidden" name="custom_field_description$cf_num$" value="$cf_description$" />';
 // Create this <hidden> to know this custom field is new created field:
 echo '<input type="hidden" name="custom_field_new$cf_num$" value="$cf_new$" />';
@@ -200,36 +218,15 @@ $Table->display_col_end();
 
 // Type
 $Table->display_col_start();
-$custom_field_templates[ $c++ ] = ob_get_clean();
-foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
-{
-	$custom_field_templates[ $c ][ $custom_field_type ] = $custom_field_type_title;
-}
-$c++;
-ob_start();
+custom_field_edit_form_template( '$custom_field_type_title$', '-', $custom_field_templates );
 $Table->display_col_end();
 
 // Format
 $Table->display_col_start();
-$custom_field_templates[ $c++ ] = ob_get_clean();
-foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
-{
-	switch( $custom_field_type )
-	{
-		case 'double':
-		case 'computed':
-		case 'separator':
-			$custom_field_templates[ $c ][ $custom_field_type ] = '<input type="text" name="custom_field_format$cf_num$" value="$cf_format$" class="form_text_input form-control custom_field_format" size="20" maxlength="2000" />';
-			break;
-		case 'image':
-			$custom_field_templates[ $c ][ $custom_field_type ] = '<select name="custom_field_format$cf_num$" class="form-control custom_field_format">'
-					.Form::get_select_options_string( array_keys( $thumbnail_sizes ) )
-				.'</select>';
-			break;
-	}
-}
-$c++;
-ob_start();
+custom_field_edit_form_template( array(
+		'<input type="text" name="custom_field_format$cf_num$" value="$cf_format$" class="form_text_input form-control custom_field_format" size="20" maxlength="2000" />',
+		'<select name="custom_field_format$cf_num$" class="form-control custom_field_format">'.Form::get_select_options_string( array_keys( $thumbnail_sizes ) ).'</select>'
+	), array( 'double,computed,separator', 'image' ), $custom_field_templates );
 $Table->display_col_end();
 
 // Public
@@ -239,50 +236,23 @@ $Table->display_col_end();
 
 // Line highlight
 $Table->display_col_start();
-$custom_field_templates[ $c++ ] = ob_get_clean();
-foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
-{
-	if( $custom_field_type != 'separator' )
-	{
-		$custom_field_templates[ $c ][ $custom_field_type ] = '<select name="custom_field_line_highlight$cf_num$" class="form-control custom_field_line_highlight">'
-				.Form::get_select_options_string( get_item_type_field_highlight_options( 'line' ), NULL, true )
-			.'</select>';
-	}
-}
-$c++;
-ob_start();
+custom_field_edit_form_template( '<select name="custom_field_line_highlight$cf_num$" class="form-control custom_field_line_highlight">'
+		.Form::get_select_options_string( get_item_type_field_highlight_options( 'line' ), NULL, true )
+	.'</select>', '-separator', $custom_field_templates );
 $Table->display_col_end();
 
 // Green highlight
 $Table->display_col_start();
-$custom_field_templates[ $c++ ] = ob_get_clean();
-foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
-{
-	if( $custom_field_type != 'separator' )
-	{
-		$custom_field_templates[ $c ][ $custom_field_type ] = '<select name="custom_field_green_highlight$cf_num$" class="form-control custom_field_green_highlight">'
-				.Form::get_select_options_string( get_item_type_field_highlight_options( 'green' ), NULL, true )
-			.'</select>';
-	}
-}
-$c++;
-ob_start();
+custom_field_edit_form_template( '<select name="custom_field_green_highlight$cf_num$" class="form-control custom_field_green_highlight">'
+		.Form::get_select_options_string( get_item_type_field_highlight_options( 'green' ), NULL, true )
+	.'</select>', '-separator', $custom_field_templates );
 $Table->display_col_end();
 
 // Red highlight
 $Table->display_col_start();
-$custom_field_templates[ $c++ ] = ob_get_clean();
-foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
-{
-	if( $custom_field_type != 'separator' )
-	{
-		$custom_field_templates[ $c ][ $custom_field_type ] = '<select name="custom_field_red_highlight$cf_num$" class="form-control custom_field_red_highlight">'
-				.Form::get_select_options_string( get_item_type_field_highlight_options( 'red' ), NULL, true )
-			.'</select>';
-	}
-}
-$c++;
-ob_start();
+custom_field_edit_form_template( '<select name="custom_field_red_highlight$cf_num$" class="form-control custom_field_red_highlight">'
+		.Form::get_select_options_string( get_item_type_field_highlight_options( 'red' ), NULL, true )
+	.'</select>', '-separator', $custom_field_templates );
 $Table->display_col_end();
 
 // Actions
@@ -294,7 +264,7 @@ $Table->display_col_end();
 
 $Table->display_line_end();
 
-$custom_field_templates[ $c ] = ob_get_clean();
+$custom_field_templates[] = ob_get_clean();
 // ******** END OF Custom Field Templates.
 
 echo '<div class="custom_fields_edit_table">';
