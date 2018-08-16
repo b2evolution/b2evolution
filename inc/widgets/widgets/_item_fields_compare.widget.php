@@ -82,12 +82,14 @@ class item_fields_compare_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		global $Blog;
+
 		$ItemTypeCache = & get_ItemTypeCache();
 		$item_type_options = array(
 				'default' => T_('Default types shown for this collection')
 			) + $ItemTypeCache->get_option_array();
 
-		$r = array_merge( array(
+		$r = array(
 				'title' => array(
 					'label' => T_( 'Title' ),
 					'size' => 40,
@@ -135,6 +137,39 @@ class item_fields_compare_Widget extends ComponentWidget
 					'note' => sprintf( T_('Check to allow filtering/ordering with URL params such as %s etc.'), '<code>cat=</code>, <code>tag=</code>, <code>orderby=</code>' ),
 					'defaultvalue' => 0,
 				),
+			);
+		for( $order_index = 0; $order_index <= 2; $order_index++ )
+		{	// Default order settings:
+			$field_suffix = ( $order_index == 0 ? '' : '_'.$order_index );
+			$coll_item_sort_options = get_available_sort_options( $Blog->ID, $order_index > 0, true );
+			$r = array_merge( $r, array(
+				'order_begin_line'.$field_suffix => array(
+					'type' => 'begin_line',
+					'label' => ( $order_index == 0 ? T_('Default order') : '' ),
+				),
+					'orderby'.$field_suffix => array(
+						'type' => 'select',
+						'options' => array_merge(
+								array( 'coll_default' => T_('Use collection\'s default'), ),
+								$coll_item_sort_options['general'],
+								array( T_('Custom fields') => $coll_item_sort_options['custom'] )
+							),
+						'defaultvalue' => 'coll_default',
+					),
+					'orderdir'.$field_suffix => array(
+						'type' => 'select',
+						'options' => array(
+							'ASC'  => T_('Ascending'),
+							'DESC' => T_('Descending'),
+						),
+						'defaultvalue' => 'ASC',
+					),
+				'order_end_line'.$field_suffix => array(
+					'type' => 'end_line',
+				),
+			) );
+		}
+		$r = array_merge( $r, array(
 				'fields_source' => array(
 					'label' => T_('Fields to show'),
 					'type' => 'select',
@@ -166,26 +201,23 @@ class item_fields_compare_Widget extends ComponentWidget
 	{
 		$this->init_display( $params );
 
-		// Update $params with values from $this->disp_params, otherwise we will be overriding the already initialized params:
-		$params = array_merge( $params, array_intersect_key( $this->disp_params, $params ) );
-
-		$this->disp_params = array_merge( $this->disp_params, array(
+		$this->disp_params = array_merge( array(
 				'custom_fields_table_start'                => '<div class="evo_content_block"><table class="item_custom_fields">',
 				'custom_fields_row_start'                  => '<tr>',
 				'custom_fields_topleft_cell'               => '<td style="border:none"></td>',
 				'custom_fields_col_header_item'            => '<th class="center">$item_link$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
-				'custom_fields_row_header_field'           => '<th class="right">$field_title$$field_description_icon$:</th>',
-				'custom_fields_value_default'              => '<td class="$class$">$field_value$</td>',
-				'custom_fields_value_difference_highlight' => '<td class="$class$ bg-warning">$field_value$</td>',
-				'custom_fields_value_green'                => '<td class="$class$ bg-success">$field_value$</td>',
-				'custom_fields_value_red'                  => '<td class="$class$ bg-danger">$field_value$</td>',
+				'custom_fields_row_header_field'           => '<th class="$header_cell_class$">$field_title$$field_description_icon$:</th>',
+				'custom_fields_value_default'              => '<td class="$data_cell_class$">$field_value$</td>',
+				'custom_fields_value_difference_highlight' => '<td class="$data_cell_class$ bg-warning">$field_value$</td>',
+				'custom_fields_value_green'                => '<td class="$data_cell_class$ bg-success">$field_value$</td>',
+				'custom_fields_value_red'                  => '<td class="$data_cell_class$ bg-danger">$field_value$</td>',
 				'custom_fields_row_end'                    => '</tr>',
 				'custom_fields_table_end'                  => '</table></div>',
 				'custom_fields_description_icon_class'     => 'grey',
 				// Separate template for separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
-				'custom_fields_separator_row_header_field' => '<th class="center" colspan="$cols_count$">$field_title$$field_description_icon$</th>',
-				), $params );
+				'custom_fields_separator_row_header_field' => '<th class="$header_cell_class$" colspan="$cols_count$">$field_title$$field_description_icon$</th>',
+			), $this->disp_params );
 
 		// Get IDs of items which should be compared:
 		$items = $this->get_items_IDs();
@@ -240,26 +272,117 @@ class item_fields_compare_Widget extends ComponentWidget
 
 			foreach( $search_custom_fields as $search_custom_field_key )
 			{
-				if( ! isset( $all_custom_fields[ $search_custom_field_key ] ) )
-				{	// Initialize array to keep fields in the requested order:
-					$all_custom_fields[ $search_custom_field_key ] = array();
+				$search_custom_field_name = $search_custom_field_key;
+				$field_options = '';
+				if( $fields_source == 'include' && strpos( $search_custom_field_key, '+' ) !== false )
+				{	// Parse additional field options, e.g. separators may have names as 'separator+repeat', 'separator+fields', 'separator+repeat+fields':
+					$search_custom_field_options = explode( '+', $search_custom_field_key, 2 );
+					if( isset( $search_custom_field_options[1] ) )
+					{	// The field has additional options:
+						$field_options = $search_custom_field_options[1];
+					}
+					// Set real name of separator field from key like 'separator+repeat+fields':
+					$search_custom_field_name = $search_custom_field_options[0];
 				}
-				if( ! isset( $item_custom_fields[ $search_custom_field_key ] ) )
+				if( ! isset( $all_custom_fields[ $search_custom_field_name ] ) )
+				{	// Initialize array to keep fields in the requested order:
+					$all_custom_fields[ $search_custom_field_name ] = array();
+				}
+				if( ! isset( $item_custom_fields[ $search_custom_field_name ] ) )
 				{	// Skip because the post has no this custom field:
 					continue;
 				}
-				$item_custom_field = $item_custom_fields[ $search_custom_field_key ];
+				$item_custom_field = $item_custom_fields[ $search_custom_field_name ];
 				if( ! $item_custom_field['public'] )
 				{	// Skip not public custom field:
 					continue;
 				}
+				if( isset( $all_custom_fields[ $search_custom_field_key ]['display_mode'] ) &&
+				    $all_custom_fields[ $search_custom_field_key ]['display_mode'] == 'repeat' )
+				{	// Reinitialize custom field with correct order if it was initialized before as repeat field of some separator above this custom field:
+					unset( $all_custom_fields[ $search_custom_field_key ] );
+				}
 				if( empty( $all_custom_fields[ $search_custom_field_key ] ) )
 				{	// Initialize array to store items which really have this custom field:
 					$all_custom_fields[ $search_custom_field_key ] = $item_custom_field;
+					$all_custom_fields[ $search_custom_field_key ]['display_mode'] = 'normal';
 					$all_custom_fields[ $search_custom_field_key ]['items'] = array();
 				}
-				// Store ID of the post which has this custom field:
-				$all_custom_fields[ $search_custom_field_key ]['items'][] = $item_ID;
+				if( ! in_array( $item_ID , $all_custom_fields[ $search_custom_field_key ]['items'] ) )
+				{	// Store ID of the post which has this custom field:
+					$all_custom_fields[ $search_custom_field_key ]['items'][] = $item_ID;
+				}
+
+				if( $item_custom_field['type'] == 'separator' )
+				{	// Initialize the repeat fields and fields under separator field until next separtor:
+					if( ! empty( $item_custom_field['format'] ) &&
+					    ( strpos( $field_options, 'repeat' ) !== false || // if field is requested with name like 'separator+repeat' or 'separator+repeat+fields'
+					      $fields_source != 'include' // also get all repeat fields when fields list is full
+					    )
+					  )
+					{	// Try to find the repeat fields:
+						$separator_format = explode( ':', $item_custom_field['format'] );
+						if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
+						{	// Skip wrong separator format:
+							continue;
+						}
+						$repeat_fields = explode( ',', $separator_format[1] );
+					}
+					else
+					{	// The separator has no repeat fields:
+						$repeat_fields = array();
+					}
+
+					if( $fields_source == 'include' &&
+					    strpos( $field_options, 'fields' ) !== false ) // if field is requested with name like 'separator+fields' or 'separator+repeat+fields'
+					{	// Try to find fields under separator only when we request a specific fields list,
+						// in full list the fields under separator are displayed automatically, se we should not get them to avoid duplicated view:
+						$is_under_separator_field = false;
+						foreach( $item_custom_fields as $ic_field_name => $ic_field )
+						{
+							if( $ic_field_name == $search_custom_field_name )
+							{	// We found the current separtor, set flag to use next fields:
+								$is_under_separator_field = true;
+								continue;
+							}
+							if( $is_under_separator_field )
+							{	// This is a field under current separator:
+								if( $ic_field['type'] == 'separator' )
+								{	// Stop here because it is another separator:
+									break;
+								}
+								$repeat_fields[] = $ic_field_name;
+							}
+						}
+					}
+
+					foreach( $repeat_fields as $r => $repeat_field_name )
+					{
+						$repeat_field_name = trim( $repeat_field_name );
+						if( ! isset( $item_custom_fields[ $repeat_field_name ] ) )
+						{	// Skip unknown field:
+							unset( $repeat_fields[ $r ] );
+							continue;
+						}
+						$repeat_fields[ $r ] = $repeat_field_name;
+						$item_custom_field = $item_custom_fields[ $repeat_field_name ];
+						if( empty( $all_custom_fields[ $repeat_field_name ] ) )
+						{	// Initialize array to store items which really have this custom field:
+							$all_custom_fields[ $repeat_field_name ] = $item_custom_field;
+							$all_custom_fields[ $repeat_field_name ]['display_mode'] = 'repeat'; // Special display mode in order to display this only after the separator
+							$all_custom_fields[ $repeat_field_name ]['items'] = array();
+						}
+						if( ! in_array( $item_ID , $all_custom_fields[ $repeat_field_name ]['items'] ) )
+						{	// Store ID of the post which has this custom field:
+							$all_custom_fields[ $repeat_field_name ]['items'][] = $item_ID;
+						}
+					}
+					if( ! isset( $all_custom_fields[ $search_custom_field_key ]['repeat_fields'] ) &&
+					    ! empty( $repeat_fields ) )
+					{	// Initialize array to store the repeat fields of the separator:
+						$all_custom_fields[ $search_custom_field_key ]['repeat_fields'] = $repeat_fields;
+					}
+				}
 			}
 		}
 
@@ -370,8 +493,9 @@ class item_fields_compare_Widget extends ComponentWidget
 				$i++;
 			}
 
-			if( $all_string_values_are_empty )
-			{	// Don't display row of custom field if values from all compared items are empty:
+			if( $all_string_values_are_empty && $items_count > 1 )
+			{	// Don't display row of custom field if values from all compared items are empty,
+				// But display all empty fields when only single items is displayed, e.g. in child item_custom_fields_Widget:
 				unset( $all_custom_fields[ $c ] );
 			}
 		}
@@ -400,30 +524,15 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		foreach( $all_custom_fields as $custom_field )
 		{
-			// Display a row of one compared field between all selected items:
-			$this->display_field_row_template( $custom_field, $items, $this->disp_params );
-
-			// Display the repeated fields after separator:
-			if( $custom_field['type'] == 'separator' &&
-			    ! empty( $custom_field['format'] ) &&
-			    ( $fields_source == 'all' || $fields_source == 'exclude' ) )
-			{	// Repeat fields after separator in case of displaying of all fields:
-				$separator_format = explode( ':', $custom_field['format'] );
-				if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
-				{	// Skip wrong separator format:
-					continue;
-				}
-				$repeat_fields = explode( ',', $separator_format[1] );
-				foreach( $repeat_fields as $repeat_field_name )
-				{
-					$repeat_field_name = trim( $repeat_field_name );
-					if( ! isset( $all_custom_fields[ $repeat_field_name ] ) ||
-					    $all_custom_fields[ $repeat_field_name ]['type'] == 'separator' )
-					{	// Skip unknown field and a separator field to avoid recursion:
-						continue;
-					}
-
-					// Display a row of the repeated custom field between all selected items:
+			if( $custom_field['display_mode'] == 'normal' )
+			{	// Display a row of one compared field between all selected items:
+				// Note: skip fields with display mode "repeat" which should be displayed after specific separator below:
+				$this->display_field_row_template( $custom_field, $items, $this->disp_params );
+			}
+			if( ! empty( $custom_field['repeat_fields'] ) )
+			{	// Display the repeated fields after separator if it has them:
+				foreach( $custom_field['repeat_fields'] as $repeat_field_name )
+				{	// Display a row of the repeated custom field between all selected items:
 					$this->display_field_row_template( $all_custom_fields[ $repeat_field_name ], $items, $this->disp_params );
 				}
 			}
@@ -466,8 +575,8 @@ class item_fields_compare_Widget extends ComponentWidget
 		}
 
 		// Custom field title:
-		echo str_replace( array( '$field_title$', '$cols_count$', '$field_description_icon$' ),
-			array( $custom_field['label'], count( $items ) + 1, $field_description_icon ),
+		echo str_replace( array( '$field_title$', '$cols_count$', '$field_description_icon$', '$header_cell_class$' ),
+			array( $custom_field['label'], count( $items ) + 1, $field_description_icon, $custom_field['header_class'] ),
 			$this->get_field_template( 'row_header_field', $custom_field['type'] ) );
 
 		if( $custom_field['type'] != 'separator' )
@@ -489,7 +598,6 @@ class item_fields_compare_Widget extends ComponentWidget
 
 				// Default template for field value:
 				$field_value_template = $this->get_field_template( 'value_default', $custom_field['type'] );
-				$custom_field_class = in_array( $custom_field['type'], array( 'double', 'computed' ) ) ? 'right' : 'center';
 
 				if( $custom_field['is_different'] && $custom_field['line_highlight'] == 'differences' )
 				{	// Mark the field value as different only when it is defined in the settings of the custom field:
@@ -526,7 +634,7 @@ class item_fields_compare_Widget extends ComponentWidget
 					}
 				}
 
-				echo str_replace( array( '$class$', '$field_value$' ), array( $custom_field_class, $custom_field_value ), $field_value_template );
+				echo str_replace( array( '$data_cell_class$', '$field_value$' ), array( $custom_field['cell_class'], $custom_field_value ), $field_value_template );
 			}
 		}
 
@@ -633,7 +741,7 @@ class item_fields_compare_Widget extends ComponentWidget
 		{	// Use ItemList when we need a filter or when all items are requested from collection:
 			$ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $items_limit );
 			// Set additional debug info prefix for SQL queries in order to know what code executes it:
-			$ItemList->query_title_prefix = 'item_fields_compare_Widget';
+			$ItemList->query_title_prefix = get_class().' #'.$this->ID;
 
 			if( $this->disp_params['items_type'] == 'default' )
 			{	// Exclude items with types which are hidden by collection setting "Show post types":
@@ -643,9 +751,36 @@ class item_fields_compare_Widget extends ComponentWidget
 			{	// Filter by selected Item Type:
 				$filter_item_type = intval( $this->disp_params['items_type'] );
 			}
+
+			// Set default orders:
+			$default_orders = array();
+			$default_dirs = array();
+			for( $order_index = 0; $order_index <= 2; $order_index++ )
+			{
+				$field_suffix = ( $order_index == 0 ? '' : '_'.$order_index );
+				$widget_orderby = $this->disp_params['orderby'.$field_suffix];
+				if( $widget_orderby == 'coll_default' )
+				{	// Use order from collection:
+					$coll_orderby = $Blog->get_setting( 'orderby'.$field_suffix );
+					if( ! empty( $coll_orderby ) )
+					{
+						$default_orders[] = $coll_orderby;
+						$default_dirs[] = $Blog->get_setting( 'orderdir'.$field_suffix );
+					}
+				}
+				elseif( ! empty( $widget_orderby ) )
+				{	// Use order from widget settings:
+					$default_orders[] = $widget_orderby;
+					$default_dirs[] = $this->disp_params['orderdir'.$field_suffix];
+				}
+			}
+
+			// Set default filters:
 			$ItemList->set_default_filters( array(
 				'types'        => $filter_item_type,
 				'post_ID_list' => is_array( $items ) ? implode( ',', $items ) : NULL,
+				'orderby'      => implode( ',', $default_orders ),
+				'order'        => implode( ',', $default_dirs ),
 			) );
 
 			if( $this->disp_params['allow_filter'] )

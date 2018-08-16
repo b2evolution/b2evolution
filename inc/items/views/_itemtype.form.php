@@ -28,13 +28,13 @@ if( $edited_Itemtype->ID > 0 )
 {
 	$default_ids = ItemType::get_default_ids();
 	if( ! in_array( $edited_Itemtype->ID, $default_ids ) )
-	{	// Allow delete post type only if it is not default of blogs:
-		$Form->global_icon( T_('Delete this Post Type!'), 'delete', regenerate_url( 'action', 'action=delete&amp;crumb_itemtype='.get_crumb( 'itemtype' ) ) );
+	{	// Allow delete item type only if it is not default of blogs:
+		$Form->global_icon( T_('Delete this Item Type!'), 'delete', regenerate_url( 'action', 'action=delete&amp;crumb_itemtype='.get_crumb( 'itemtype' ) ) );
 	}
 }
 $Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,ityp_ID' ) );
 
-$Form->begin_form( 'fform', ( $edited_Itemtype->ID > 0 ? T_('Edit post type') : T_('New post type') ) );
+$Form->begin_form( 'fform', ( $edited_Itemtype->ID > 0 ? T_('Edit item type') : T_('New item type') ) );
 
 $Form->add_crumb( 'itemtype' );
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',ityp_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
@@ -125,7 +125,6 @@ $Table->cols = array(
 	array( 'th' => T_('Name'), 'th_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Type'), 'th_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Format'), 'th_class' => 'shrinkwrap' ),
-	array( 'th' => T_('Link'), 'th_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Public'), 'td_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Line highlight'), 'th_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Green highlight'), 'th_class' => 'shrinkwrap' ),
@@ -153,6 +152,20 @@ echo '<input type="hidden" name="custom_field_ID$cf_num$" value="$cf_ID$" />';
 echo '<input type="hidden" name="custom_field_type$cf_num$" value="$cf_type$" />';
 echo '<input type="hidden" name="custom_field_note$cf_num$" value="$cf_note$" />';
 echo '<input type="hidden" name="custom_field_formula$cf_num$" value="$cf_formula$" />';
+echo '<input type="hidden" name="custom_field_header_class$cf_num$" value="$cf_header_class$" />';
+echo '<input type="hidden" name="custom_field_cell_class$cf_num$" value="$cf_cell_class$" />';
+// Link
+$custom_field_templates[ $c++ ] = ob_get_clean();
+foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
+{
+	if( ! in_array( $custom_field_type, array( 'text', 'html', 'separator' ) ) )
+	{
+		$custom_field_templates[ $c ][ $custom_field_type ] = '<input type="hidden" name="custom_field_link$cf_num$" value="$cf_link$" />'
+			.'<input type="hidden" name="custom_field_link_class$cf_num$" value="$cf_link_class$" />';
+	}
+}
+$c++;
+ob_start();
 echo '<input type="hidden" name="custom_field_description$cf_num$" value="$cf_description$" />';
 // Create this <hidden> to know this custom field is new created field:
 echo '<input type="hidden" name="custom_field_new$cf_num$" value="$cf_new$" />';
@@ -196,22 +209,6 @@ foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
 					.Form::get_select_options_string( array_keys( $thumbnail_sizes ) )
 				.'</select>';
 			break;
-	}
-}
-$c++;
-ob_start();
-$Table->display_col_end();
-
-// Link
-$Table->display_col_start();
-$custom_field_templates[ $c++ ] = ob_get_clean();
-foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
-{
-	if( ! in_array( $custom_field_type, array( 'text', 'html', 'separator' ) ) )
-	{
-		$custom_field_templates[ $c ][ $custom_field_type ] = '<select name="custom_field_link$cf_num$" class="form-control custom_field_link">'
-				.Form::get_select_options_string( get_item_type_field_linkto_options( $custom_field_type ), NULL, true )
-			.'</select>';
 	}
 }
 $c++;
@@ -273,9 +270,9 @@ $Table->display_col_end();
 
 // Actions
 $Table->display_col_start();
+echo get_icon( 'edit', 'imgtag', array( 'title' => T_('Edit custom field'), 'class' => 'edit_custom_field action_icon', 'style' => 'color:#337ab7' ) ).' ';
 echo get_icon( 'minus', 'imgtag', array( 'title' => T_('Remove custom field'), 'class' => 'delete_custom_field action_icon' ) ).' ';
-echo get_icon( 'add', 'imgtag', array( 'title' => T_('Duplicate custom field'), 'class' => 'duplicate_custom_field action_icon' ) ).' ';
-echo get_icon( 'edit', 'imgtag', array( 'title' => T_('Edit custom field'), 'class' => 'edit_custom_field action_icon', 'style' => 'color:#337ab7' ) );
+echo get_icon( 'add', 'imgtag', array( 'title' => T_('Duplicate custom field'), 'class' => 'duplicate_custom_field action_icon' ) );
 $Table->display_col_end();
 
 $Table->display_line_end();
@@ -374,8 +371,12 @@ foreach( $custom_fields as $custom_field )
 		'$cf_name_class$'  => $custom_field_name_class,
 		'$cf_format$'      => format_to_output( $custom_field['format'], 'htmlattr' ),
 		'$cf_formula$'     => format_to_output( $custom_field['formula'], 'htmlattr' ),
+		'$cf_header_class$'=> format_to_output( $custom_field['header_class'], 'htmlattr' ),
+		'$cf_cell_class$'  => format_to_output( $custom_field['cell_class'], 'htmlattr' ),
+		'$cf_link$'        => format_to_output( $custom_field['link'], 'htmlattr' ),
+		'$cf_link_class$'  => format_to_output( $custom_field['link_class'], 'htmlattr' ),
 		'$cf_note$'        => format_to_output( $custom_field['note'], 'htmlattr' ),
-		'$cf_description$' => format_to_output( $custom_field['description'], 'htmlattr' ),
+		'$cf_description$' => format_to_output( $custom_field['description'], 'htmlspecialchars' ),
 	);
 	$cf_select_replacements = array( 'format', 'link', 'line_highlight', 'green_highlight', 'red_highlight' );
 	$custom_field_type_template = str_replace( array_keys( $cf_input_replacements ), $cf_input_replacements, $custom_field_type_template );
@@ -510,7 +511,7 @@ $Results->display( $display_params );
 
 $item_status_IDs = array();
 if( $Results->result_num_rows > 0 )
-{	// If at least one post status exists in DB:
+{	// If at least one item status exists in DB:
 	foreach( $Results->rows as $row )
 	{
 		$item_status_IDs[] = $row->pst_ID;
@@ -556,7 +557,10 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 	var field_value_note = '';
 	var field_value_format = '';
 	var field_value_formula = '';
-	var field_value_link = '';
+	var field_value_header_class = ( type == 'separator' ? 'left' : 'right' ) + ' nowrap';
+	var field_value_cell_class = ( type == 'double' || type == 'computed' ) ? 'right' : ( type == 'separator' ? '' : 'center' );
+	var field_value_link = 'nolink';
+	var field_value_link_class = '';
 	var field_value_line_highlight = '';
 	var field_value_green_highlight = '';
 	var field_value_red_highlight = '';
@@ -575,7 +579,10 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		field_value_note = duplicated_field_obj.find( 'input[name^="custom_field_note"]' ).val();
 		field_value_format = duplicated_field_obj.find( '[name^="custom_field_format"]' ).val();
 		field_value_formula = duplicated_field_obj.find( 'input[name^="custom_field_formula"]' ).val();
-		field_value_link = duplicated_field_obj.find( 'select[name^="custom_field_link"]' ).val();
+		field_value_header_class = duplicated_field_obj.find( 'input[name^="custom_field_header_class"]' ).val();
+		field_value_cell_class = duplicated_field_obj.find( 'input[name^="custom_field_cell_class"]' ).val();
+		field_value_link = duplicated_field_obj.find( 'input[name^="custom_field_link"]' ).val();
+		field_value_link_class = duplicated_field_obj.find( 'input[name^="custom_field_link_class"]' ).val();
 		field_value_line_highlight = duplicated_field_obj.find( 'select[name^="custom_field_line_highlight"]' ).val();
 		field_value_green_highlight = duplicated_field_obj.find( 'select[name^="custom_field_green_highlight"]' ).val();
 		field_value_red_highlight = duplicated_field_obj.find( 'select[name^="custom_field_red_highlight"]' ).val();
@@ -590,7 +597,10 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		field_value_note = duplicated_field_data.data( 'note' );
 		field_value_format = duplicated_field_data.data( 'format' );
 		field_value_formula = duplicated_field_data.data( 'formula' );
+		field_value_header_class = duplicated_field_data.data( 'header_class' );
+		field_value_cell_class = duplicated_field_data.data( 'cell_class' );
 		field_value_link = duplicated_field_data.data( 'link' );
+		field_value_link_class = duplicated_field_data.data( 'link_class' );
 		field_value_line_highlight = duplicated_field_data.data( 'line_highlight' );
 		field_value_green_highlight = duplicated_field_data.data( 'green_highlight' );
 		field_value_red_highlight = duplicated_field_data.data( 'red_highlight' );
@@ -637,6 +647,10 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		.replace( '$cf_name_class$', '' )
 		.replace( '$cf_format$', field_value_format )
 		.replace( '$cf_formula$', field_value_formula )
+		.replace( '$cf_header_class$', field_value_header_class )
+		.replace( '$cf_cell_class$', field_value_cell_class )
+		.replace( '$cf_link$', field_value_link )
+		.replace( '$cf_link_class$', field_value_link_class )
 		.replace( '$cf_note$', field_value_note )
 		.replace( '$cf_description$', field_value_description );
 	if( typeof( duplicated_field_obj ) == 'undefined' || duplicated_field_obj === false || duplicated_field_obj.length == 0 )
@@ -667,7 +681,6 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		duplicated_field_obj.after( custom_field_type_inputs );
 		var new_field_obj = duplicated_field_obj.next();
 		new_field_obj.find( 'select[name^="custom_field_format"]' ).val( field_value_format );
-		new_field_obj.find( 'select[name^="custom_field_link"]' ).val( field_value_link );
 		new_field_obj.find( 'select[name^="custom_field_line_highlight"]' ).val( field_value_line_highlight );
 		new_field_obj.find( 'select[name^="custom_field_green_highlight"]' ).val( field_value_green_highlight );
 		new_field_obj.find( 'select[name^="custom_field_red_highlight"]' ).val( field_value_red_highlight );
@@ -732,6 +745,7 @@ jQuery( document ).on( 'click', '.edit_custom_field', function()
 		var option_val = jQuery( this ).attr( 'type' ) == 'checkbox' ? ( jQuery( this ).prop( 'checked' ) ? 1 : 0 ) : jQuery( this ).val();
 		field_options[ 'itcf_' + jQuery( this ).attr( 'name' ).replace( /^custom_field_([^\d]+)\d+$/, '$1' ) ] = option_val;
 	} );
+	console.log( field_options );
 	jQuery.ajax(
 	{
 		type: 'GET',
@@ -849,7 +863,10 @@ jQuery( document ).on( 'submit', 'form#itemtype_select_fields', function()
 			field_row.find( 'input[name^="custom_field_note"]' ).val( field_data_obj.data( 'note' ) );
 			field_row.find( '[name^="custom_field_format"]' ).val( field_data_obj.data( 'format' ) );
 			field_row.find( 'input[name^="custom_field_formula"]' ).val( field_data_obj.data( 'formula' ) );
-			field_row.find( 'select[name^="custom_field_link"]' ).val( field_data_obj.data( 'link' ) );
+			field_row.find( 'input[name^="custom_field_header_class"]' ).val( field_data_obj.data( 'header_class' ) );
+			field_row.find( 'input[name^="custom_field_cell_class"]' ).val( field_data_obj.data( 'cell_class' ) );
+			field_row.find( 'input[name^="custom_field_link"]' ).val( field_data_obj.data( 'link' ) );
+			field_row.find( 'input[name^="custom_field_link_class"]' ).val( field_data_obj.data( 'link_class' ) );
 			field_row.find( 'select[name^="custom_field_line_highlight"]' ).val( field_data_obj.data( 'line_highlight' ) );
 			field_row.find( 'select[name^="custom_field_green_highlight"]' ).val( field_data_obj.data( 'green_highlight' ) );
 			field_row.find( 'select[name^="custom_field_red_highlight"]' ).val( field_data_obj.data( 'red_highlight' ) );

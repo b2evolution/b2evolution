@@ -429,6 +429,8 @@ function create_default_data()
 			'order'           => '',
 			'note'            => NULL,
 			'format'          => NULL,
+			'header_class'    => 'right nowrap',
+			'cell_class'      => 'center',
 			'link'            => 'nolink',
 			'line_highlight'  => 'differences',
 			'green_highlight' => 'never',
@@ -455,6 +457,7 @@ function create_default_data()
 			'type'            => 'double',
 			'order'           => 2,
 			'note'            => T_('Enter a number'),
+			'cell_class'      => 'right',
 		),
 		array(
 			'label'           => T_('Second numeric field'),
@@ -462,6 +465,7 @@ function create_default_data()
 			'type'            => 'double',
 			'order'           => 4,
 			'note'            => T_('Enter a number'),
+			'cell_class'      => 'right',
 		),
 		array(
 			'label'           => T_('USD Price'),
@@ -470,6 +474,7 @@ function create_default_data()
 			'order'           => 8,
 			'note'            => T_('Enter a number'),
 			'format'          => '$ 0 0.00',
+			'cell_class'      => 'right',
 			'green_highlight' => 'lowest',
 		),
 		array(
@@ -479,6 +484,7 @@ function create_default_data()
 			'order'           => 9,
 			'note'            => T_('Enter a number'),
 			'format'          => '0 0.00 €',
+			'cell_class'      => 'right',
 			'green_highlight' => 'lowest',
 		),
 		array(
@@ -517,6 +523,7 @@ function create_default_data()
 			'order'           => 10,
 			'note'            => T_('1 = Yes; 0 = No'),
 			'format'          => '#yes#;;#no#;n/a',
+			'cell_class'      => 'right',
 		),
 		// for Item Type "Child Post":
 		array(
@@ -538,6 +545,7 @@ function create_default_data()
 			'type'            => 'double',
 			'order'           => 2,
 			'note'            => T_('Enter a number'),
+			'cell_class'      => 'right',
 		),
 		array(
 			'ityp_ID'         => $child_ityp_ID,
@@ -555,6 +563,7 @@ function create_default_data()
 			'order'           => 4,
 			'note'            => T_('1 = Yes; 0 = No'),
 			'format'          => '#yes#;;#no#;n/a',
+			'cell_class'      => 'right',
 		),
 	);
 

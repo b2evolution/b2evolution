@@ -362,13 +362,16 @@ switch( $action )
 		param( 'itcf_name', 'string' );
 		param( 'itcf_format', 'string' );
 		param( 'itcf_formula', 'string' );
+		param( 'itcf_header_class', 'string' );
+		param( 'itcf_cell_class', 'string' );
 		param( 'itcf_link', 'string' );
+		param( 'itcf_link_class', 'string' );
 		param( 'itcf_note', 'string' );
 		param( 'itcf_public', 'integer' );
 		param( 'itcf_line_highlight', 'string' );
 		param( 'itcf_green_highlight', 'string' );
 		param( 'itcf_red_highlight', 'string' );
-		param( 'itcf_description', 'text' );
+		param( 'itcf_description', 'html' );
 		$AdminUI->disp_view( 'items/views/_itemtype_edit_field.form.php' );
 		break;
 

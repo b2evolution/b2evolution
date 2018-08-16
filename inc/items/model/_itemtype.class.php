@@ -359,12 +359,15 @@ class ItemType extends DataObject
 			$custom_field_public = param( 'custom_field_public'.$i, 'integer', 0 );
 			$custom_field_format = param( 'custom_field_format'.$i, 'string', NULL );
 			$custom_field_formula = param( 'custom_field_formula'.$i, 'string', NULL );
+			$custom_field_header_class = param( 'custom_field_header_class'.$i, 'string', NULL );
+			$custom_field_cell_class = param( 'custom_field_cell_class'.$i, 'string', NULL );
 			$custom_field_link = param( 'custom_field_link'.$i, 'string', 'nolink' );
+			$custom_field_link_class = param( 'custom_field_link_class'.$i, 'string', NULL );
 			$custom_field_is_new = param( 'custom_field_new'.$i, 'integer', 0 );
 			$custom_field_line_highlight = param( 'custom_field_line_highlight'.$i, 'string', NULL );
 			$custom_field_green_highlight = param( 'custom_field_green_highlight'.$i, 'string', NULL );
 			$custom_field_red_highlight = param( 'custom_field_red_highlight'.$i, 'string', NULL );
-			$custom_field_description = param( 'custom_field_description'.$i, 'text', NULL );
+			$custom_field_description = param( 'custom_field_description'.$i, 'html', NULL );
 
 			// Add each new/existing custom field in this array
 			// in order to see all them on the form when post type is not updated because some errors
@@ -380,7 +383,10 @@ class ItemType extends DataObject
 					'public'          => $custom_field_public,
 					'format'          => $custom_field_format,
 					'formula'         => $custom_field_formula,
+					'header_class'    => $custom_field_header_class,
+					'cell_class'      => $custom_field_cell_class,
 					'link'            => $custom_field_link,
+					'link_class'      => $custom_field_link_class,
 					'line_highlight'  => $custom_field_line_highlight,
 					'green_highlight' => $custom_field_green_highlight,
 					'red_highlight'   => $custom_field_red_highlight,
@@ -416,7 +422,10 @@ class ItemType extends DataObject
 				'public'          => $custom_field_public,
 				'format'          => $custom_field_format,
 				'formula'         => $custom_field_formula,
+				'header_class'    => $custom_field_header_class,
+				'cell_class'      => $custom_field_cell_class,
 				'link'            => $custom_field_link,
+				'link_class'      => $custom_field_link_class,
 				'line_highlight'  => $custom_field_line_highlight,
 				'green_highlight' => $custom_field_green_highlight,
 				'red_highlight'   => $custom_field_red_highlight,
@@ -547,13 +556,16 @@ class ItemType extends DataObject
 						.$DB->quote( $custom_field['public'] ).', '
 						.$DB->quote( $custom_field['format'] ).', '
 						.$DB->quote( $custom_field['formula'] ).', '
+						.$DB->quote( $custom_field['header_class'] ).', '
+						.$DB->quote( $custom_field['cell_class'] ).', '
 						.$DB->quote( $custom_field['link'] ).', '
+						.$DB->quote( $custom_field['link_class'] ).', '
 						.$DB->quote( $custom_field['line_highlight'] ).', '
 						.$DB->quote( $custom_field['green_highlight'] ).', '
 						.$DB->quote( $custom_field['red_highlight'] ).', '
 						.( empty( $custom_field['description'] ) ? 'NULL' : $DB->quote( $custom_field['description'] ) ).' )';
 			}
-			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format, itcf_formula, itcf_link, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight, itcf_description )
+			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format, itcf_formula, itcf_header_class, itcf_cell_class, itcf_link, itcf_link_class, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight, itcf_description )
 					VALUES '.implode( ', ', $sql_data ) );
 		}
 
@@ -572,7 +584,10 @@ class ItemType extends DataObject
 						itcf_public = '.$DB->quote( $custom_field['public'] ).',
 						itcf_format = '.$DB->quote( $custom_field['format'] ).',
 						itcf_formula = '.$DB->quote( $custom_field['formula'] ).',
+						itcf_cell_class = '.$DB->quote( $custom_field['cell_class'] ).',
+						itcf_header_class = '.$DB->quote( $custom_field['header_class'] ).',
 						itcf_link = '.$DB->quote( $custom_field['link'] ).',
+						itcf_link_class = '.$DB->quote( $custom_field['link_class'] ).',
 						itcf_line_highlight = '.$DB->quote( $custom_field['line_highlight'] ).',
 						itcf_green_highlight = '.$DB->quote( $custom_field['green_highlight'] ).',
 						itcf_red_highlight = '.$DB->quote( $custom_field['red_highlight'] ).',
@@ -647,7 +662,7 @@ class ItemType extends DataObject
 				global $DB;
 				$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->ID );
 				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
-				$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_link AS link, ' );
+				$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, itcf_link AS link, itcf_link_class AS link_class, ' );
 				$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description' );
 				$SQL->FROM( 'T_items__type_custom_field' );
 				$SQL->WHERE( 'itcf_ityp_ID = '.$DB->quote( $this->ID ) );
