@@ -2684,8 +2684,8 @@ Hello
 
 			$pen_desc = array(
 					T_('Visible, long-lasting ink supply.'),
-					T_('Grip designed for comfort and control'),
-					T_('Vivid colors'),
+					T_('Grip designed for comfort and control.'),
+					T_('Vivid colors.'),
 				);
 
 			$envelope_desc = array(
