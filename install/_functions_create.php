@@ -419,25 +419,10 @@ function create_default_data()
 	// Insert item types:
 	$DB->query( $post_types_sql );
 
-	// Custom Fields:
-	// Default settings for custom fields:
-	$custom_field_default_settings = array(
-			'ityp_ID'         => NULL,
-			'label'           => '',
-			'name'            => '',
-			'type'            => 'double',
-			'order'           => '',
-			'note'            => NULL,
-			'format'          => NULL,
-			'header_class'    => 'right nowrap',
-			'cell_class'      => 'center',
-			'link'            => 'nolink',
-			'line_highlight'  => 'differences',
-			'green_highlight' => 'never',
-		);
-	// Post with Custom Fields:
-	$custom_field_default_settings['ityp_ID'] = 3; // Item Type "Post with Custom Fields"
-	$child_ityp_ID = 4; // Item Type "Child Post"
+	// Item type custom fields:
+	$parent_ityp_ID = 3;
+	$child_ityp_ID = 4;
+	$product_ityp_ID = 20;
 	$custom_fields = array(
 		// for Item Type "Post with Custom Fields":
 		array(
@@ -565,75 +550,84 @@ function create_default_data()
 			'format'          => '#yes#;;#no#;n/a',
 			'cell_class'      => 'right',
 		),
-	);
-
-	// Insert item type custom fields:
-	$custom_fields_sql = 'INSERT INTO T_items__type_custom_field ( itcf_'.implode( ', itcf_', array_keys( $custom_field_default_settings ) ).' ) VALUES ';
-	foreach( $custom_fields as $c => $custom_field )
-	{
-		$custom_field = array_merge( $custom_field_default_settings, $custom_field );
-		$custom_fields_sql .= '( '.$DB->quote( $custom_field ).' )';
-		if( $c != count( $custom_fields ) - 1 )
-		{
-			$custom_fields_sql .= ',';
-		}
-	}
-	$DB->query( $custom_fields_sql );
-
-	// Product:
-	$custom_field_default_settings['ityp_ID'] = 20; // Item Type "Product"
-	$custom_fields = array(
+		// for Item Type "Product":
 		array(
+			'ityp_ID'         => $product_ityp_ID,
 			'label'           => T_('Price USD'),
 			'name'            => 'price_usd',
 			'type'            => 'double',
 			'order'           => 1,
 			'note'            => T_('USD'),
 			'format'          => '$ 0 000.00',
+			'cell_class'      => 'right',
 		),
 		array(
+			'ityp_ID'         => $product_ityp_ID,
 			'label'           => T_('Brand'),
 			'name'            => 'brand_name',
 			'type'            => 'varchar',
 			'order'           => 2,
 		),
 		array(
+			'ityp_ID'         => $product_ityp_ID,
 			'label'           => T_('Color'),
 			'name'            => 'item_color',
 			'type'            => 'varchar',
 			'order'           => 3,
 		),
 		array(
+			'ityp_ID'         => $product_ityp_ID,
 			'label'           => T_('Package total weight'),
 			'name'            => 'package_total_weight',
 			'type'            => 'double',
 			'order'           => 4,
 			'note'            => T_('Kg'),
+			'cell_class'      => 'right',
 		),
 		array(
+			'ityp_ID'         => $product_ityp_ID,
 			'label'           => T_('Package length'),
 			'name'            => 'package_length',
 			'type'            => 'double',
 			'order'           => 5,
 			'note'            => T_('cm'),
+			'cell_class'      => 'right',
 		),
 		array(
+			'ityp_ID'         => $product_ityp_ID,
 			'label'           => T_('Package width'),
 			'name'            => 'package_width',
 			'type'            => 'double',
 			'order'           => 6,
 			'note'            => T_('cm'),
+			'cell_class'      => 'right',
 		),
 		array(
+			'ityp_ID'         => $product_ityp_ID,
 			'label'           => T_('Package height'),
 			'name'            => 'package_height',
 			'type'            => 'double',
 			'order'           => 7,
 			'note'            => T_('cm'),
+			'cell_class'      => 'right',
 		),
 	);
-
-	// Insert Product custom fields:
+	// Default settings for custom fields:
+	$custom_field_default_settings = array(
+			'ityp_ID'         => $parent_ityp_ID,
+			'label'           => '',
+			'name'            => '',
+			'type'            => 'double',
+			'order'           => '',
+			'note'            => NULL,
+			'format'          => NULL,
+			'header_class'    => 'right nowrap',
+			'cell_class'      => 'center',
+			'link'            => 'nolink',
+			'line_highlight'  => 'differences',
+			'green_highlight' => 'never',
+	);
+	// Insert item type custom fields:
 	$custom_fields_sql = 'INSERT INTO T_items__type_custom_field ( itcf_'.implode( ', itcf_', array_keys( $custom_field_default_settings ) ).' ) VALUES ';
 	foreach( $custom_fields as $c => $custom_field )
 	{
