@@ -2476,14 +2476,6 @@ class Item extends ItemLight
 		$params = array_merge( array(
 				'field_value_format'  => '', // Format for custom field, Leave empty to use a format from DB
 				'field_restrict_type' => false, // Restrict field by type(double, varchar, html, text, url, image, computed, separator), FALSE - to don't restrict
-				// The following masks are used to replace in custom field values and formats:
-				'field_value_yes'     => '<span class="fa fa-check green"></span>', // #yes#
-				'field_value_no'      => '<span class="fa fa-times red"></span>', // #no#
-				'field_value_plus'    => '<span class="fa fa-plus-circle green"></span>', // (+)
-				'field_value_minus'   => '<span class="fa fa-minus-circle red"></span>', // (-)
-				'field_value_warning' => '<span class="fa fa-exclamation-triangle orange"></span>', // (!)
-				'field_value_newline' => '<br />', // ||
-				'field_value_note'    => '<span class="note">$note_text$</span>', // {note text}
 			), $params );
 
 		// Try to get an original value of the requested custom field:
@@ -2514,15 +2506,6 @@ class Item extends ItemLight
 		{	// Use a format from params:
 			$format = $params['field_value_format'];
 		}
-
-		$value_masks = array(
-			'#yes#' => $params['field_value_yes'],
-			'#no#'  => $params['field_value_no'],
-			'(+)'   => $params['field_value_plus'],
-			'(-)'   => $params['field_value_minus'],
-			'(!)'   => $params['field_value_warning'],
-			'||'    => $params['field_value_newline'],
-		);
 
 		switch( $custom_field['type'] )
 		{
@@ -2582,7 +2565,7 @@ class Item extends ItemLight
 					$format = $formats[1];
 				}
 
-				if( isset( $value_masks[ $format ] ) ||
+				if( in_array( $format, array( '#yes#', '#no#', '(+)', '(-)', '(!)', '||' ) ) ||
 				    strpos( $format, '#stars' ) !== false ||
 				    ( $format !== '' && ! preg_match( '/\d/', $format ) ) )
 				{	// Use special formats:
@@ -2650,18 +2633,9 @@ class Item extends ItemLight
 				break;
 		}
 
-		// Replace special masks in value with template:
-		$custom_field_value = str_replace( array_keys( $value_masks ), $value_masks, $custom_field_value );
-		$custom_field_value = preg_replace( '/\{([^}]+)\}/', str_replace( '$note_text$', '$1', $params['field_value_note'] ), $custom_field_value );
-
-		if( preg_match_all( '/(#stars(\/\d+)?)#/', $custom_field_value, $star_matches ) )
-		{	// Use stars template:
-			foreach( $star_matches[0] as $s => $star_match )
-			{
-				$stars_num = ( isset( $star_matches[2][ $s ] ) && $star_matches[2][ $s ] !== '' ) ? intval( trim( $star_matches[2][ $s ], '/' ) ) : 5;
-				$custom_field_value = str_replace( $star_match, get_stars_template( $orig_custom_field_value, $stars_num, $params ), $custom_field_value );
-			}
-		}
+		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
+		$params['stars_value'] = $orig_custom_field_value;
+		$custom_field_value = render_custom_field( $custom_field_value, $params );
 
 		// Apply setting "Link to":
 		if( $custom_field['link'] != 'nolink' && ! empty( $custom_field_value ) )
@@ -3047,7 +3021,8 @@ class Item extends ItemLight
 		$field_type = ( $field['type'] == 'double' ? 'numeric' : ( $field['type'] == 'varchar' ? 'string' : $field['type'] ) );
 		$field_format = isset( $params['field_'.$field_type.'_format'] ) ? $params['field_'.$field_type.'_format'] : $params['field_format'];
 
-		$mask_values = array( $field['label'] );
+		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
+		$mask_values = array( render_custom_field( $field['label'], $params ) );
 
 		if( empty( $field['description'] ) )
 		{	// The custom field has no description:

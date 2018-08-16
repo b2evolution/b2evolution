@@ -574,9 +574,12 @@ class item_fields_compare_Widget extends ComponentWidget
 				) ).' ';
 		}
 
+		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
+		$custom_field_label = render_custom_field( $custom_field['label'], $params );
+
 		// Custom field title:
 		echo str_replace( array( '$field_title$', '$cols_count$', '$field_description_icon$', '$header_cell_class$' ),
-			array( $custom_field['label'], count( $items ) + 1, $field_description_icon, $custom_field['header_class'] ),
+			array( $custom_field_label, count( $items ) + 1, $field_description_icon, $custom_field['header_class'] ),
 			$this->get_field_template( 'row_header_field', $custom_field['type'] ) );
 
 		if( $custom_field['type'] != 'separator' )

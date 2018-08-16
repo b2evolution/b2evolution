@@ -4231,6 +4231,61 @@ jQuery( 'a[data-child-input-id]' ).click( function()
 
 
 /**
+ * Render special masks in custom field labels and values
+ *
+ * Possible masks: #yes#, #no#, (+), (-), (!), ||, {note_sample_text}, #stars/5#
+ *
+ * @param string Custom field value or label
+ * @param array Additional parameters
+ * @return string
+ */
+function render_custom_field( $value, $params = array() )
+{
+	$params = array_merge( array(
+			'stars_value'         => NULL, // NULL to fill all stars by default
+			// The following masks are used to replace in custom field values and formats:
+			'field_value_yes'     => '<span class="fa fa-check green"></span>', // #yes#
+			'field_value_no'      => '<span class="fa fa-times red"></span>', // #no#
+			'field_value_plus'    => '<span class="fa fa-plus-circle green"></span>', // (+)
+			'field_value_minus'   => '<span class="fa fa-minus-circle red"></span>', // (-)
+			'field_value_warning' => '<span class="fa fa-exclamation-triangle orange"></span>', // (!)
+			'field_value_newline' => '<br />', // ||
+			'field_value_note'    => '<span class="note">$note_text$</span>', // {note text}
+		), $params );
+
+	// Render special masks:
+	$value_masks = array(
+			'#yes#' => $params['field_value_yes'],
+			'#no#'  => $params['field_value_no'],
+			'(+)'   => $params['field_value_plus'],
+			'(-)'   => $params['field_value_minus'],
+			'(!)'   => $params['field_value_warning'],
+			'||'    => $params['field_value_newline'],
+		);
+	$value = str_replace( array_keys( $value_masks ), $value_masks, $value );
+
+	// Render a note text:
+	$value = preg_replace( '/\{([^}]+)\}/', str_replace( '$note_text$', '$1', $params['field_value_note'] ), $value );
+
+	// Render stars:
+	if( preg_match_all( '/(#stars(\/\d+)?)#/', $value, $star_matches ) )
+	{	// If at least one star template is found:
+		foreach( $star_matches[0] as $s => $star_match )
+		{
+			// Set number of stars, 5 stars by default:
+			$stars_num = ( isset( $star_matches[2][ $s ] ) && $star_matches[2][ $s ] !== '' ) ? intval( trim( $star_matches[2][ $s ], '/' ) ) : 5;
+			// Use a number of active stars from params if it is a numeric really, else make active all stars by default:
+			$stars_value = ( $params['stars_value'] === NULL || ! is_numeric( $params['stars_value'] ) ) ? $stars_num : floatval( $params['stars_value'] );
+			// Render stars:
+			$value = str_replace( $star_match, get_stars_template( $stars_value, $stars_num, $params ), $value );
+		}
+	}
+
+	return $value;
+}
+
+
+/**
  * Save object Item into Session
  *
  * @param object Item
