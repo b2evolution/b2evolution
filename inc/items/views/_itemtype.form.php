@@ -34,7 +34,7 @@ if( $edited_Itemtype->ID > 0 )
 }
 $Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,ityp_ID' ) );
 
-$Form->begin_form( 'fform', ( $edited_Itemtype->ID > 0 ? T_('Edit item type') : T_('New item type') ) );
+$Form->begin_form( 'fform', ( $edited_Itemtype->ID > 0 ? T_('Edit Item Type') : T_('New Item Type') ) );
 
 $Form->add_crumb( 'itemtype' );
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',ityp_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
@@ -61,6 +61,8 @@ $Form->begin_fieldset( T_('General').get_manual_link('item-type-general') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Use of Instructions').get_manual_link( 'item-type-instructions' ), array( 'id' => 'itemtype_instructions' ) );
+	$Form->text_input( 'ityp_evobar_link_text', $edited_Itemtype->evobar_link_text, 25, T_('New Item link in evobar'), T_('Leave empty for default') );
+	$Form->text_input( 'ityp_skin_btn_text', $edited_Itemtype->skin_btn_text, 25, T_('New Item button in skin'), T_('Leave empty for default') );
 	$Form->checklist( array(
 		array( 'ityp_front_instruction', 1, T_('In front-office edit screen'),$edited_Itemtype->front_instruction ),
 		array( 'ityp_back_instruction', 1, T_('In back-office edit screen'), $edited_Itemtype->back_instruction )

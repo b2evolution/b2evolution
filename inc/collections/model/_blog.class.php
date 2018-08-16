@@ -6106,6 +6106,37 @@ class Blog extends DataObject
 
 		return $default_ItemType ? $default_ItemType->get_name() : T_('Post');
 	}
+
+
+	/**
+	 * Get default new item type based on the collection's default category
+	 *
+	 * @return mixed ItemType object, false if default item type is disabled
+	 */
+	function get_default_new_ItemType()
+	{
+		global $cat;
+
+		$working_cat = $cat;
+		if( empty( $cat ) )
+		{
+			$working_cat = $this->get_setting( 'default_cat_ID' );
+		}
+		$default_new_ItemType = $this->get_setting( 'default_item_type_cat_'.$working_cat );
+		if( $default_new_ItemType == 'disabled' )
+		{
+			return false;
+		}
+		elseif( empty( $default_new_ItemType ) )
+		{
+			return $this->get_default_ItemType();
+		}
+		else
+		{
+			$ItemTypeCache = & get_ItemTypeCache();
+			return $ItemTypeCache->get_by_ID( $default_new_ItemType, false, false );
+		}
+	}
 }
 
 ?>

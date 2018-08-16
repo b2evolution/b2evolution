@@ -57,6 +57,8 @@ class ItemType extends DataObject
 	var $allow_disabling_comments = 0;
 	var $use_comment_expiration = 'optional';
 	var $perm_level = 'standard';
+	var $evobar_link_text = NULL;
+	var $skin_btn_text = NULL;
 
 	/**
 	 * Custom fields
@@ -126,6 +128,8 @@ class ItemType extends DataObject
 			$this->allow_disabling_comments = $db_row->ityp_allow_disabling_comments;
 			$this->use_comment_expiration = $db_row->ityp_use_comment_expiration;
 			$this->perm_level = $db_row->ityp_perm_level;
+			$this->evobar_link_text = $db_row->ityp_evobar_link_text;
+			$this->skin_btn_text = $db_row->ityp_skin_btn_text;
 		}
 	}
 
@@ -190,6 +194,14 @@ class ItemType extends DataObject
 		// Schema
 		param( 'ityp_schema', 'string' );
 		$this->set_from_Request( 'schema', NULL, true );
+
+		// New item link in evobar text
+		param( 'ityp_evobar_link_text', 'string' );
+		$this->set_from_Request( 'evobar_link_text' );
+
+		// New item button in skin text
+		param( 'ityp_skin_btn_text', 'string' );
+		$this->set_from_Request( 'skin_btn_text' );
 
 		// Show instruction in front-office
 		param( 'ityp_front_instruction', 'integer' );
