@@ -201,7 +201,7 @@ class item_fields_compare_Widget extends ComponentWidget
 	{
 		$this->init_display( $params );
 
-		$this->disp_params = array_merge( $this->disp_params, array(
+		$this->disp_params = array_merge( array(
 				'custom_fields_table_start'                => '<div class="evo_content_block"><table class="item_custom_fields">',
 				'custom_fields_row_start'                  => '<tr>',
 				'custom_fields_topleft_cell'               => '<td style="border:none"></td>',
@@ -217,7 +217,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				// Separate template for separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
 				'custom_fields_separator_row_header_field' => '<th class="$header_cell_class$" colspan="$cols_count$">$field_title$$field_description_icon$</th>',
-			), $params );
+			), $this->disp_params );
 
 		// Get IDs of items which should be compared:
 		$items = $this->get_items_IDs();
