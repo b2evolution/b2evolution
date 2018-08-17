@@ -6137,6 +6137,56 @@ class Blog extends DataObject
 			return $ItemTypeCache->get_by_ID( $default_new_ItemType, false, false );
 		}
 	}
+
+
+	/**
+	 * Get default item denomination depending on current collection type
+	 *
+	 * @param string Position where denomination will be used, can be one of the following: 'evobar_new', 'inskin_new_btn', 'title_new', 'title_update'
+	 * @return string Item denomination
+	 */
+	function get_item_denomination( $position = 'evobar_new' )
+	{
+		switch( $this->get( 'type' ) )
+		{
+			case 'photo':
+				$denominations = array(
+						'evobar_new'     => T_('Album'),
+						'inskin_new_btn' => T_('New album'),
+						'title_new'      => T_('New album'),
+						'title_updated'  => T_('Updated album'),
+					);
+				break;
+
+			case 'group':
+				$denominations = array(
+						'evobar_new'     => T_('Task'),
+						'inskin_new_btn' => T_('New task'),
+						'title_new'      => T_('New task'),
+						'title_updated'  => T_('Updated task'),
+					);
+				break;
+
+			case 'forum':
+				$denominations = array(
+						'evobar_new'     => T_('Topic'),
+						'inskin_new_btn' => T_('New topic'),
+						'title_new'      => T_('New topic'),
+						'title_updated'  => T_('Updated topic'),
+					);
+				break;
+
+			default:
+				$denominations = array(
+						'evobar_new'     => T_('Post'),
+						'inskin_new_btn' => T_('New post'),
+						'title_new'      => T_('New post'),
+						'title_updated'  => T_('Updated post'),
+					);
+		}
+
+		return $denominations[$position];
+	}
 }
 
 ?>

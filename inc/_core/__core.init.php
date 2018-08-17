@@ -1360,10 +1360,12 @@ class _core_Module extends Module
 			// ---- "Post"/"Edit" MENU ----
 			if( $perm_admin_normal )
 			{	// Only for normal access display a menu item to create new:
+				$menu_text = /* TRANS: noun */ T_('Post');
 				if( isset( $default_new_ItemType ) && $default_new_ItemType !== false )
 				{
+					$menu_text = $default_new_ItemType->get_item_denomination( 'evobar_new' );
 					$entries['post'] = array(
-							'text' => get_icon( 'new' ).' '.( empty( $default_new_ItemType->get( 'evobar_link_text' ) ) ? /* TRANS: noun */ T_('Post') : $default_new_ItemType->get( 'evobar_link_text' ) ),
+							'text' => get_icon( 'new' ).' '.$menu_text,
 							//'text' => get_icon( 'new' ).' './* TRANS: noun */ T_('Post'),
 							'title' => T_('No blog is currently selected'),
 							'disabled' => true,
@@ -1424,6 +1426,7 @@ class _core_Module extends Module
 					$menu_text = /* TRANS: noun */ T_('Post');
 					if( ! empty( $default_new_ItemType ) )
 					{
+						$menu_text = $default_new_ItemType->get_item_denomination( 'evobar_new' );
 						// The get_write_url() function above does not allow specifying the item type ID we'll manually add it:
 						$write_item_url = url_add_param( $write_item_url, 'item_typ_ID='.$default_new_ItemType->ID );
 

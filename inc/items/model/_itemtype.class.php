@@ -798,6 +798,42 @@ class ItemType extends DataObject
 					AND its_pst_ID IN ('.implode( ',', $remove_values ).')' );
 		}
 	}
+
+
+	/**
+	 * Get item denomination
+	 *
+	 * @param string Position where denomination will be used, can be one of the following: 'evobar_new', 'inskin_new_btn', 'title_new', 'title_update'
+	 * @return string Item denomination
+	 */
+	function get_item_denomination( $position = 'evobar_new' )
+	{
+		switch( $position )
+		{
+			case 'evobar_new':
+				if( ! empty( $this->evobar_link_text ) )
+				{
+					return $this->evobar_link_text;
+				}
+				break;
+
+			case 'inskin_new_btn':
+				if( ! empty( $this->skin_btn_text ) )
+				{
+					return $this->skin_btn_text;
+				}
+				break;
+		}
+
+		global $Collection, $Blog;
+
+		if( ! empty( $Blog  ) )
+		{
+			return $Blog->get_item_denomination( $position );
+		}
+
+		return NULL;
+	}
 }
 
 ?>

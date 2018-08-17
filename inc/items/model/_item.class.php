@@ -2436,7 +2436,7 @@ class Item extends ItemLight
 	 *
 	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
 	 * @param string Restrict field by type(double, varchar, html, text, url, image, computed, separator), FALSE - to don't restrict
-	 * @param boolean ****DEPRECATED**** Format value depending on field type 
+	 * @param boolean ****DEPRECATED**** Format value depending on field type
 	 * @return string|boolean FALSE if the field doesn't exist
 	 */
 	function get_custom_field_value( $field_index, $restrict_type = false, $format_value = false )
@@ -10019,16 +10019,9 @@ class Item extends ItemLight
 		}
 
 		// Set titles by Blog type:
-		if( $this->Blog->get( 'type' ) == 'forum' )
-		{
-			$title_new = T_('New topic');
-			$title_updated = T_('Updated topic');
-		}
-		else
-		{
-			$title_new = T_('New post');
-			$title_updated = T_('Updated post');
-		}
+		$this->get_ItemType();
+		$title_new = $this->ItemType->get_item_denomination( 'title_new' );
+		$title_updated = $this->ItemType->get_item_denomination( 'title_updated' );
 
 		// Merge params
 		$params = array_merge( array(

@@ -1997,6 +1997,7 @@ jQuery( document ).ready( function()
 			$button_text = T_('New topic');
 			if( ! empty( $default_new_ItemType ) )
 			{
+				$button_text = $default_new_ItemType->get_item_denomination( 'inskin_new_btn' );
 				// The get_write_url() function above does not allow specifying the item type ID we'll manually add it:
 				$write_new_post_url = url_add_param( $write_new_post_url, 'item_typ_ID='.$default_new_ItemType->ID );
 
