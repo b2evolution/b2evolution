@@ -2437,10 +2437,9 @@ class Item extends ItemLight
 	 *
 	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
 	 * @param string Restrict field by type(double, varchar, html, text, url, image, computed, separator), FALSE - to don't restrict
-	 * @param boolean ****DEPRECATED**** Format value depending on field type 
 	 * @return string|boolean FALSE if the field doesn't exist
 	 */
-	function get_custom_field_value( $field_index, $restrict_type = false, $format_value = false )
+	function get_custom_field_value( $field_index, $restrict_type = false )
 	{
 		// Get all custom fields by item ID:
 		$custom_fields = $this->get_custom_fields_defs();
@@ -2453,11 +2452,6 @@ class Item extends ItemLight
 		if( $restrict_type !== false && $custom_fields[ $field_index ]['type'] != $restrict_type )
 		{	// The requested field is detected but it has another type:
 			return false;
-		}
-
-		if( $format_value )
-		{	// Format value:
-			return $this->get_custom_field_formatted( $field_index );
 		}
 
 		// Use a value from DB:
@@ -2815,13 +2809,8 @@ class Item extends ItemLight
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'before'        => ' ',
-				'after'         => ' ',
-				'format'        => 'htmlbody',
-				// The 3 params are deprecated, use new option "Format" of the item type custom field instead:
-				// 'decimals'      => 2,
-				// 'dec_point'     => '.',
-				// 'thousands_sep' => ',',
+				'before' => ' ',
+				'after'  => ' ',
 			), $params );
 
 		if( empty( $params['field'] ) )
