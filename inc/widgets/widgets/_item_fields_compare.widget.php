@@ -213,14 +213,15 @@ class item_fields_compare_Widget extends ComponentWidget
 				'custom_fields_topleft_cell'               => '<td style="border:none"></td>',
 				'custom_fields_col_header_item'            => '<th class="center">$item_link$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
 				'custom_fields_row_header_field'           => '<th class="$header_cell_class$">$field_title$$field_description_icon$:</th>',
+				'custom_fields_description_icon_class'     => 'grey',
 				'custom_fields_value_default'              => '<td class="$data_cell_class$">$field_value$</td>',
 				'custom_fields_value_difference_highlight' => '<td class="$data_cell_class$ bg-warning">$field_value$</td>',
 				'custom_fields_value_green'                => '<td class="$data_cell_class$ bg-success">$field_value$</td>',
 				'custom_fields_value_red'                  => '<td class="$data_cell_class$ bg-danger">$field_value$</td>',
+				'custom_fields_edit_link_cell'             => '<td class="center">$edit_link$</td>',
+				'custom_fields_edit_link_class'            => 'btn btn-xs btn-default',
 				'custom_fields_row_end'                    => '</tr>',
 				'custom_fields_table_end'                  => '</table></div>',
-				'custom_fields_description_icon_class'     => 'grey',
-				'custom_fields_edit_link_class'            => 'btn btn-xs btn-default',
 				// Separate template for separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
 				'custom_fields_separator_row_header_field' => '<th class="$header_cell_class$" colspan="$cols_count$">$field_title$$field_description_icon$</th>',
@@ -284,14 +285,13 @@ class item_fields_compare_Widget extends ComponentWidget
 			$items_can_be_edited = false;
 			foreach( $items as $item_ID )
 			{
-				if( isset( $Item ) && $Item->ID == $item_ID )
-				{
+				if( isset( $Item ) && $Item->ID == $item_ID && count( $items ) == 1 )
+				{	// Don't display an edit link when this is a page of currently displayed Item:
 					$items_edit_links[] = '';
 				}
 				else
-				{
+				{	// Try to display an edit link depending on permissions of current User:
 					$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
-					// Try to get an edit link depending on permissions of current User:
 					$items_edit_link = $widget_Item->get_edit_link( array( 'class' => $this->disp_params['custom_fields_edit_link_class'] ) );
 					if( $items_edit_link === false )
 					{	// The edit link is not available for current User:
@@ -314,7 +314,7 @@ class item_fields_compare_Widget extends ComponentWidget
 
 				foreach( $items_edit_links as $items_edit_link )
 				{
-					echo str_replace( array( '$data_cell_class$', '$field_value$' ), array( 'center', $items_edit_link ), $this->get_field_template( 'value_default' ) );
+					echo str_replace( '$edit_link$', $items_edit_link, $this->get_field_template( 'edit_link_cell' ) );
 				}
 
 				echo $this->get_field_template( 'row_end' );
