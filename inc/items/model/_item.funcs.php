@@ -1780,7 +1780,8 @@ function get_item_type_field_highlight_options( $type )
 		case 'line':
 			return array(
 				'never'       => T_('Never'),
-				'differences' => T_('If different')
+				'differences' => T_('If different'),
+				'always'      => T_('Always'),
 			);
 		case 'green':
 		case 'red':

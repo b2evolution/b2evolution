@@ -676,7 +676,8 @@ class item_fields_compare_Widget extends ComponentWidget
 				// Default template for field value:
 				$field_value_template = $this->get_field_template( 'value_default', $custom_field['type'] );
 
-				if( $custom_field['is_different'] && $custom_field['line_highlight'] == 'differences' )
+				if( ( $custom_field['is_different'] && $custom_field['line_highlight'] == 'differences' ) ||
+				    ( $custom_field['line_highlight'] == 'always' && count( $items ) > 1 ) )
 				{	// Mark the field value as different only when it is defined in the settings of the custom field:
 					$field_value_template = $this->get_field_template( 'value_difference_highlight', $custom_field['type'] );
 				}

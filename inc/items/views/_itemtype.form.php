@@ -200,6 +200,7 @@ custom_field_edit_form_template( '<input type="hidden" name="custom_field_formul
 echo '<input type="hidden" name="custom_field_header_class$cf_num$" value="$cf_header_class$" />';
 custom_field_edit_form_template( '<input type="hidden" name="custom_field_cell_class$cf_num$" value="$cf_cell_class$" />', '-separator', $custom_field_templates );
 custom_field_edit_form_template( '<input type="hidden" name="custom_field_link$cf_num$" value="$cf_link$" />'
+	.'<input type="hidden" name="custom_field_link_nofollow$cf_num$" value="$cf_link_nofollow$" />'
 	.'<input type="hidden" name="custom_field_link_class$cf_num$" value="$cf_link_class$" />', '-text,-html,-separator', $custom_field_templates );
 echo '<input type="hidden" name="custom_field_description$cf_num$" value="$cf_description$" />';
 // Create this <hidden> to know this custom field is new created field:
@@ -347,25 +348,26 @@ foreach( $custom_fields as $custom_field )
 	}
 	// Replace masks with values of the custom field:
 	$cf_input_replacements = array(
-		'$cf_ID$'          => $custom_ID,
-		'$cf_new$'         => param( 'custom_field_new'.$i, 'integer', 0 ),
-		'$cf_num$'         => $i,
-		'$cf_type$'        => format_to_output( $custom_field['type'], 'htmlattr' ),
-		'$cf_order$'       => format_to_output( $custom_field['order'], 'htmlattr' ),
-		'$cf_label$'       => format_to_output( $custom_field['label'], 'htmlattr' ),
-		'$cf_name$'        => format_to_output( $custom_field_name, 'htmlattr' ),
-		'$cf_label_class$' => $custom_field_label_class,
-		'$cf_name_class$'  => $custom_field_name_class,
-		'$cf_format$'      => format_to_output( $custom_field['format'], 'htmlattr' ),
-		'$cf_formula$'     => format_to_output( $custom_field['formula'], 'htmlattr' ),
-		'$cf_header_class$'=> format_to_output( $custom_field['header_class'], 'htmlattr' ),
-		'$cf_cell_class$'  => format_to_output( $custom_field['cell_class'], 'htmlattr' ),
-		'$cf_link$'        => format_to_output( $custom_field['link'], 'htmlattr' ),
-		'$cf_link_class$'  => format_to_output( $custom_field['link_class'], 'htmlattr' ),
-		'$cf_note$'        => format_to_output( $custom_field['note'], 'htmlattr' ),
-		'$cf_description$' => format_to_output( $custom_field['description'], 'htmlspecialchars' ),
+		'$cf_ID$'            => $custom_ID,
+		'$cf_new$'           => param( 'custom_field_new'.$i, 'integer', 0 ),
+		'$cf_num$'           => $i,
+		'$cf_type$'          => format_to_output( $custom_field['type'], 'htmlattr' ),
+		'$cf_order$'         => format_to_output( $custom_field['order'], 'htmlattr' ),
+		'$cf_label$'         => format_to_output( $custom_field['label'], 'htmlattr' ),
+		'$cf_name$'          => format_to_output( $custom_field_name, 'htmlattr' ),
+		'$cf_label_class$'   => $custom_field_label_class,
+		'$cf_name_class$'    => $custom_field_name_class,
+		'$cf_format$'        => format_to_output( $custom_field['format'], 'htmlattr' ),
+		'$cf_formula$'       => format_to_output( $custom_field['formula'], 'htmlattr' ),
+		'$cf_header_class$'  => format_to_output( $custom_field['header_class'], 'htmlattr' ),
+		'$cf_cell_class$'    => format_to_output( $custom_field['cell_class'], 'htmlattr' ),
+		'$cf_link$'          => format_to_output( $custom_field['link'], 'htmlattr' ),
+		'$cf_link_nofollow$' => format_to_output( $custom_field['link_nofollow'], 'htmlattr' ),
+		'$cf_link_class$'    => format_to_output( $custom_field['link_class'], 'htmlattr' ),
+		'$cf_note$'          => format_to_output( $custom_field['note'], 'htmlattr' ),
+		'$cf_description$'   => format_to_output( $custom_field['description'], 'htmlspecialchars' ),
 	);
-	$cf_select_replacements = array( 'format', 'link', 'line_highlight', 'green_highlight', 'red_highlight' );
+	$cf_select_replacements = array( 'format', 'line_highlight', 'green_highlight', 'red_highlight' );
 	$custom_field_type_template = str_replace( array_keys( $cf_input_replacements ), $cf_input_replacements, $custom_field_type_template );
 	foreach( $cf_select_replacements as $cf_select_field )
 	{	// Set a selected option:
@@ -547,6 +549,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 	var field_value_header_class = ( type == 'separator' ? 'left' : 'right' ) + ' nowrap';
 	var field_value_cell_class = ( type == 'double' || type == 'computed' ) ? 'right' : ( type == 'separator' ? '' : 'center' );
 	var field_value_link = 'nolink';
+	var field_value_link_nofollow = 0;
 	var field_value_link_class = '';
 	var field_value_line_highlight = '';
 	var field_value_green_highlight = '';
@@ -569,6 +572,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		field_value_header_class = duplicated_field_obj.find( 'input[name^="custom_field_header_class"]' ).val();
 		field_value_cell_class = duplicated_field_obj.find( 'input[name^="custom_field_cell_class"]' ).val();
 		field_value_link = duplicated_field_obj.find( 'input[name^="custom_field_link"]' ).val();
+		field_value_link_nofollow = duplicated_field_obj.find( 'input[name^="custom_field_link_nofollow"]' ).is( ':checked' );
 		field_value_link_class = duplicated_field_obj.find( 'input[name^="custom_field_link_class"]' ).val();
 		field_value_line_highlight = duplicated_field_obj.find( 'select[name^="custom_field_line_highlight"]' ).val();
 		field_value_green_highlight = duplicated_field_obj.find( 'select[name^="custom_field_green_highlight"]' ).val();
@@ -587,6 +591,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		field_value_header_class = duplicated_field_data.data( 'header_class' );
 		field_value_cell_class = duplicated_field_data.data( 'cell_class' );
 		field_value_link = duplicated_field_data.data( 'link' );
+		field_value_link_nofollow = duplicated_field_data.data( 'link_nofollow' );
 		field_value_link_class = duplicated_field_data.data( 'link_class' );
 		field_value_line_highlight = duplicated_field_data.data( 'line_highlight' );
 		field_value_green_highlight = duplicated_field_data.data( 'green_highlight' );
@@ -637,6 +642,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		.replace( '$cf_header_class$', field_value_header_class )
 		.replace( '$cf_cell_class$', field_value_cell_class )
 		.replace( '$cf_link$', field_value_link )
+		.replace( '$cf_link_nofollow$', field_value_link_nofollow )
 		.replace( '$cf_link_class$', field_value_link_class )
 		.replace( '$cf_note$', field_value_note )
 		.replace( '$cf_description$', field_value_description );
@@ -764,7 +770,14 @@ jQuery( document ).on( 'submit', 'form#itemtype_edit_field', function()
 			var option_name = jQuery( this ).attr( 'name' ).replace( 'itcf_', '' );
 			if( jQuery( this ).attr( 'type' ) == 'checkbox' )
 			{	// Checkbox:
-				field_row_obj.find( '[name^=custom_field_' + option_name + ']' ).prop( 'checked', jQuery( this ).prop( 'checked' ) );
+				if( field_row_obj.find( '[name^=custom_field_' + option_name + ']' ).attr( 'type' ) == 'checkbox' )
+				{
+					field_row_obj.find( '[name^=custom_field_' + option_name + ']' ).prop( 'checked', jQuery( this ).prop( 'checked' ) );
+				}
+				else
+				{
+					field_row_obj.find( '[name^=custom_field_' + option_name + ']' ).val( jQuery( this ).prop( 'checked' ) ? 1 : 0 );
+				}
 			}
 			else
 			{	// Input, select, textarea:
@@ -853,6 +866,7 @@ jQuery( document ).on( 'submit', 'form#itemtype_select_fields', function()
 			field_row.find( 'input[name^="custom_field_header_class"]' ).val( field_data_obj.data( 'header_class' ) );
 			field_row.find( 'input[name^="custom_field_cell_class"]' ).val( field_data_obj.data( 'cell_class' ) );
 			field_row.find( 'input[name^="custom_field_link"]' ).val( field_data_obj.data( 'link' ) );
+			field_row.find( 'input[name^="custom_field_link_nofollow"]' ).val( field_data_obj.data( 'link_nofollow' ) );
 			field_row.find( 'input[name^="custom_field_link_class"]' ).val( field_data_obj.data( 'link_class' ) );
 			field_row.find( 'select[name^="custom_field_line_highlight"]' ).val( field_data_obj.data( 'line_highlight' ) );
 			field_row.find( 'select[name^="custom_field_green_highlight"]' ).val( field_data_obj.data( 'green_highlight' ) );
