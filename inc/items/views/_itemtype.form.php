@@ -539,6 +539,7 @@ function guidGenerator()
 
 function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data )
 {
+	var new_field_mode = 'new';
 	// Set values:
 	var field_value_label = '';
 	var field_value_name = '';
@@ -558,6 +559,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 	var field_value_description = '';
 	if( typeof( duplicated_field_obj ) != 'undefined' && duplicated_field_obj !== false && duplicated_field_obj.length > 0 )
 	{	// Get data from duplicated field of the current editing Item Type:
+		new_field_mode = 'duplicate_empty';
 		if( typeof( duplicated_count_custom_field ) == 'undefined' )
 		{
 			duplicated_count_custom_field = 0;
@@ -582,6 +584,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 	}
 	else if( typeof( duplicated_field_data ) != 'undefined' && duplicated_field_data.length > 0 )
 	{	// Get data from duplicated field from another selected Item Type:
+		new_field_mode = 'duplicate_from';
 		field_value_label = duplicated_field_data.data( 'label' );
 		field_value_name = duplicated_field_data.data( 'name' );
 		field_value_order = duplicated_field_data.data( 'order' );
@@ -642,12 +645,13 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		.replace( '$cf_header_class$', field_value_header_class )
 		.replace( '$cf_cell_class$', field_value_cell_class )
 		.replace( '$cf_link$', field_value_link )
-		.replace( '$cf_link_nofollow$', field_value_link_nofollow )
+		.replace( '$cf_link_nofollow$', field_value_link_nofollow ? 1 : 0 )
 		.replace( '$cf_link_class$', field_value_link_class )
 		.replace( '$cf_note$', field_value_note )
 		.replace( '$cf_description$', field_value_description );
-	if( typeof( duplicated_field_obj ) == 'undefined' || duplicated_field_obj === false || duplicated_field_obj.length == 0 )
-	{	// Add new field:
+
+	if( new_field_mode == 'new' )
+	{	// Set values of the select and hidden inputs for new creating field:
 		var cf_select_defaults = {
 		// Default values for select options depending on custom field type:
 			double:   { line_highlight: 'differences', link: 'nolink' },
@@ -667,22 +671,35 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 			}
 		}
 		custom_field_type_inputs = custom_field_type_inputs.replace( /(<input type="checkbox"[^>]+name="custom_field_public[^"]+")/, '$1 checked="checked"' );
+	}
+
+	// Insert a row of new adding field:
+	if( new_field_mode == 'new' || new_field_mode == 'duplicate_from' )
+	{	// Insert in the end of the custom fields table:
 		jQuery( '.custom_fields_edit_table table tbody' ).append( custom_field_type_inputs );
 	}
 	else
-	{	// Duplicate an existing field:
+	{	// Insert right after the duplicated field:
 		duplicated_field_obj.after( custom_field_type_inputs );
-		var new_field_obj = duplicated_field_obj.next();
+	}
+
+	if( new_field_mode == 'duplicate_empty' || new_field_mode == 'duplicate_from' )
+	{	// Set values of the select and hidden inputs for new duplicated field:
+		var new_field_obj = ( new_field_mode == 'duplicate_empty' ?
+			duplicated_field_obj.next() :
+			jQuery( '.custom_fields_edit_table table tbody tr:last' ) );
 		new_field_obj.find( 'select[name^="custom_field_format"]' ).val( field_value_format );
 		new_field_obj.find( 'select[name^="custom_field_line_highlight"]' ).val( field_value_line_highlight );
 		new_field_obj.find( 'select[name^="custom_field_green_highlight"]' ).val( field_value_green_highlight );
 		new_field_obj.find( 'select[name^="custom_field_red_highlight"]' ).val( field_value_red_highlight );
 		new_field_obj.find( 'input[name^="custom_field_public"]' ).prop( 'checked', field_value_public );
 	}
+
+	// Update a count of custom fields:
 	jQuery( 'input[name=count_custom_fields]' ).attr( 'value', count_custom );
 
 	if( jQuery( '.custom_fields_edit_table table thead' ).is( ':hidden' ) )
-	{
+	{	// Display table column headers when first row has been added:
 		jQuery( '.custom_fields_edit_table table thead' ).show();
 	}
 }
@@ -738,7 +755,6 @@ jQuery( document ).on( 'click', '.edit_custom_field', function()
 		var option_val = jQuery( this ).attr( 'type' ) == 'checkbox' ? ( jQuery( this ).prop( 'checked' ) ? 1 : 0 ) : jQuery( this ).val();
 		field_options[ 'itcf_' + jQuery( this ).attr( 'name' ).replace( /^custom_field_([^\d]+)\d+$/, '$1' ) ] = option_val;
 	} );
-	console.log( field_options );
 	jQuery.ajax(
 	{
 		type: 'GET',
