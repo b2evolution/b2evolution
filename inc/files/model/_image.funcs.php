@@ -152,7 +152,8 @@ function load_image( $path, $mimetype )
 	{
 		$FiletypeCache = get_Cache('FiletypeCache');
 		$correct_Filetype = $FiletypeCache->get_by_mimetype($image_info['mime']);
-		$correct_extension = array_shift($correct_Filetype->get_extensions());
+		$extensions = $correct_Filetype->get_extensions();
+		$correct_extension = array_shift( $extensions );
 
 		$path_info = pathinfo($path);
 		$wrong_extension = $path_info['extension'];
