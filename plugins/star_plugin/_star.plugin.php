@@ -160,7 +160,7 @@ class star_plugin extends Plugin
 
 		if( empty( $this->force_img_stars ) && isset( $b2evo_icons_type ) && strpos( $b2evo_icons_type, 'fontawesome' ) !== false )
 		{	// Use font-awesome stars if it is allowed for current skin:
-			return get_stars_template( $active_stars, $number_stars );
+			return get_star_rating( $active_stars, $number_stars );
 		}
 
 		// Use image stars:

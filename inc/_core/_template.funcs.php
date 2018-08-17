@@ -2222,26 +2222,6 @@ function credits( $params = array() )
 
 
 /**
- * Get rating as 5 stars
- *
- * @param integer Number of stars
- * @param string Class name
- * @return string Template for star rating
- */
-function get_star_rating( $stars, $class = 'not-used-any-more' )
-{
-	if( is_null( $stars ) )
-	{
-		return;
-	}
-
-	$average = ceil( ( $stars ) / 5 * 100 );
-
-	return '<div class="star_rating"><div style="width:'.$average.'%">'.$stars.' stars</div></div>';
-}
-
-
-/**
  * Display rating as 5 stars
  *
  * @param integer Number of stars
@@ -2249,7 +2229,7 @@ function get_star_rating( $stars, $class = 'not-used-any-more' )
  */
 function star_rating( $stars, $class = 'not-used-any-more' )
 {
-	echo get_star_rating( $stars, $class );
+	echo get_star_rating( $stars );
 }
 
 
@@ -3703,7 +3683,7 @@ function init_fineuploader_js_lang_strings()
  * @param array Additional parameters
  * @return string HTML of stars
  */
-function get_stars_template( $value, $stars_num = 5, $params = array() )
+function get_star_rating( $value, $stars_num = 5, $params = array() )
 {
 	$params = array_merge( array(
 			'stars_before'       => '<span class="evo_stars">',
@@ -3712,6 +3692,11 @@ function get_stars_template( $value, $stars_num = 5, $params = array() )
 			'stars_star_empty'   => '<i class="fa fa-star evo_star_empty"></i>',
 			'stars_after'        => '</span>',
 		), $params );
+
+	if( ! is_numeric( $stars_num ) )
+	{	// Fix for old function where second param was a string:
+		$stars_num = 5;
+	}
 
 	$stars_num = intval( $stars_num );
 

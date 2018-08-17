@@ -579,10 +579,6 @@ ul.legend span.note {
   display: inline-block;
   vertical-align: middle;
 }
-.single_topic .star_rating {
-  display: inline-block;
-  margin: 0 10px;
-}
 .single_topic .evo_content_block {
   width: 100%;
 }

@@ -5306,7 +5306,7 @@ class Item extends ItemLight
 		$table .= '<div class="rating_summary_total">
 			'.$ratings_count.' '.( $ratings_count > 1 ? T_('ratings') : T_('rating') ).'
 			<div class="average_rating">'.T_('Average user rating').':<br />
-			'.get_star_rating( $average_real ).'<span>('.$average_real.')</span>
+			'.get_star_rating( $average_real ).'<span class="average_rating_score">('.$average_real.')</span>
 			</div></div><div class="clear"></div>';
 
 		return $table;

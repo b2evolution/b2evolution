@@ -4287,7 +4287,7 @@ function render_custom_field( $value, $params = array() )
 				$stars_value = floatval( $params['stars_value'] );
 			}
 			// Render stars:
-			$value = str_replace( $star_match, get_stars_template( $stars_value, $stars_num, $params ), $value );
+			$value = str_replace( $star_match, get_star_rating( $stars_value, $stars_num, $params ), $value );
 		}
 	}
 
