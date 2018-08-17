@@ -4253,9 +4253,8 @@ function render_custom_field( $value, $params = array() )
 			'field_value_plus'    => '<span class="fa fa-plus-circle green"></span>', // (+)
 			'field_value_minus'   => '<span class="fa fa-minus-circle red"></span>', // (-)
 			'field_value_warning' => '<span class="fa fa-exclamation-triangle orange"></span>', // (!)
-			'field_value_newline' => '<br />', // ||
 			'field_value_note'    => '<span class="note">$note_text$</span>', // {note text}
-			'expansion'           => 'default', // 'vertical': convert '| |' to '<br />', 'horizontal'/'default': convert '| |' to space ' '
+			'expansion'           => 'default', // 'default': || = '<br />', | | = space; 'vertical': both = '<br />'; 'horizontal': both = space.
 		), $params );
 
 	// Render special masks:
@@ -4267,7 +4266,7 @@ function render_custom_field( $value, $params = array() )
 			'(+)'   => $params['field_value_plus'],
 			'(-)'   => $params['field_value_minus'],
 			'(!)'   => $params['field_value_warning'],
-			'||'    => $params['field_value_newline'],
+			'||'    => ( $params['expansion'] == 'horizontal' ? ' ' : '<br />' ),
 			'| |'   => ( $params['expansion'] == 'vertical' ? '<br />' : ' ' ),
 		);
 	$value = str_replace( array_keys( $value_masks ), $value_masks, $value );

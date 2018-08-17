@@ -2471,7 +2471,7 @@ class Item extends ItemLight
 		$params = array_merge( array(
 				'field_value_format'  => '', // Format for custom field, Leave empty to use a format from DB
 				'field_restrict_type' => false, // Restrict field by type(double, varchar, html, text, url, image, computed, separator), FALSE - to don't restrict
-				'expansion'           => 'default', // 'vertical': convert '| |' to '<br />', 'horizontal'/'default': convert '| |' to space ' '
+				'expansion'           => 'default', // 'default': || = '<br />', | | = space; 'vertical': both = '<br />'; 'horizontal': both = space.
 			), $params );
 
 		// Try to get an original value of the requested custom field:
