@@ -3009,6 +3009,9 @@ div.results {
 .pager li a {
   margin-bottom: 4px;
 }
+.evo_instruction {
+  margin: 20px 10px 10px;
+}
 form.inskin {
   padding: 10px;
 }

@@ -1114,6 +1114,9 @@ div.results {
   width: 100%;
   overflow: auto;
 }
+.evo_instruction {
+  margin: 20px 10px;
+}
 form.inskin {
   padding: 10px;
 }
