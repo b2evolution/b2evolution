@@ -2282,26 +2282,6 @@ function credits( $params = array() )
 
 
 /**
- * Get rating as 5 stars
- *
- * @param integer Number of stars
- * @param string Class name
- * @return string Template for star rating
- */
-function get_star_rating( $stars, $class = 'not-used-any-more' )
-{
-	if( is_null( $stars ) )
-	{
-		return;
-	}
-
-	$average = ceil( ( $stars ) / 5 * 100 );
-
-	return '<div class="star_rating"><div style="width:'.$average.'%">'.$stars.' stars</div></div>';
-}
-
-
-/**
  * Display rating as 5 stars
  *
  * @param integer Number of stars
@@ -2309,7 +2289,7 @@ function get_star_rating( $stars, $class = 'not-used-any-more' )
  */
 function star_rating( $stars, $class = 'not-used-any-more' )
 {
-	echo get_star_rating( $stars, $class );
+	echo get_star_rating( $stars );
 }
 
 
@@ -3763,15 +3743,39 @@ function init_fineuploader_js_lang_strings()
  * @param array Additional parameters
  * @return string HTML of stars
  */
-function get_stars_template( $value, $stars_num = 5, $params = array() )
+function get_star_rating( $value, $stars_num = 5, $params = array() )
 {
-	$params = array_merge( array(
+	global $b2evo_icons_type;
+
+	if( isset( $b2evo_icons_type ) && strpos( $b2evo_icons_type, 'fontawesome' ) !== false )
+	{	// Use font-awesome stars if it is allowed for current skin:
+		$icon_type = 'fa';
+		$default_params = array(
 			'stars_before'       => '<span class="evo_stars">',
 			'stars_star_full'    => '<i class="fa fa-star"></i>',
 			'stars_star_percent' => '<i class="fa fa-star evo_star_percent"><i class="fa fa-star" style="width:$percent$"></i></i>', // $percent$ is replaced with values like 10%, 67%
 			'stars_star_empty'   => '<i class="fa fa-star evo_star_empty"></i>',
 			'stars_after'        => '</span>',
-		), $params );
+		);
+	}
+	else
+	{	// Use image stars for v5 skins:
+		$icon_type = 'img';
+		$default_params = array(
+			'stars_before'       => '<span class="evo_stars_img" style="width:$stars_width$px">',
+			'stars_star_full'    => '<i>*</i>',
+			'stars_star_percent' => '<i class="evo_stars_img_empty"><i style="width:$percent$">%</i></i>', // $percent$ is replaced with values like 10%, 67%
+			'stars_star_empty'   => '<i class="evo_stars_img_empty">-</i>',
+			'stars_after'        => '</span>',
+		);
+	}
+
+	$params = array_merge( $default_params, $params );
+
+	if( ! is_numeric( $stars_num ) )
+	{	// Fix for old function where second param was a string:
+		$stars_num = 5;
+	}
 
 	$stars_num = intval( $stars_num );
 
@@ -3780,7 +3784,15 @@ function get_stars_template( $value, $stars_num = 5, $params = array() )
 		return '';
 	}
 
-	$stars_template = $params['stars_before'];
+	if( $icon_type == 'fa' )
+	{
+		$stars_template = $params['stars_before'];
+	}
+	else
+	{	// Image icons must have a specific width depending on number of stars:
+		// (16px is width of one image star icon)
+		$stars_template = str_replace( '$stars_width$', $stars_num * 16, $params['stars_before'] );
+	}
 
 	$full_stars_max = floor( $value );
 	$percents = round( ( $value - $full_stars_max ) * 100 );

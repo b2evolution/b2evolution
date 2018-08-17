@@ -57,6 +57,8 @@ class ItemType extends DataObject
 	var $allow_disabling_comments = 0;
 	var $use_comment_expiration = 'optional';
 	var $perm_level = 'standard';
+	var $evobar_link_text = NULL;
+	var $skin_btn_text = NULL;
 
 	/**
 	 * Custom fields
@@ -126,6 +128,8 @@ class ItemType extends DataObject
 			$this->allow_disabling_comments = $db_row->ityp_allow_disabling_comments;
 			$this->use_comment_expiration = $db_row->ityp_use_comment_expiration;
 			$this->perm_level = $db_row->ityp_perm_level;
+			$this->evobar_link_text = $db_row->ityp_evobar_link_text;
+			$this->skin_btn_text = $db_row->ityp_skin_btn_text;
 		}
 	}
 
@@ -190,6 +194,14 @@ class ItemType extends DataObject
 		// Schema
 		param( 'ityp_schema', 'string' );
 		$this->set_from_Request( 'schema', NULL, true );
+
+		// New item link in evobar text
+		param( 'ityp_evobar_link_text', 'string' );
+		$this->set_from_Request( 'evobar_link_text' );
+
+		// New item button in skin text
+		param( 'ityp_skin_btn_text', 'string' );
+		$this->set_from_Request( 'skin_btn_text' );
 
 		// Show instruction in front-office
 		param( 'ityp_front_instruction', 'integer' );
@@ -362,6 +374,7 @@ class ItemType extends DataObject
 			$custom_field_header_class = param( 'custom_field_header_class'.$i, 'string', NULL );
 			$custom_field_cell_class = param( 'custom_field_cell_class'.$i, 'string', NULL );
 			$custom_field_link = param( 'custom_field_link'.$i, 'string', 'nolink' );
+			$custom_field_link_nofollow = param( 'custom_field_link_nofollow'.$i, 'integer', NULL );
 			$custom_field_link_class = param( 'custom_field_link_class'.$i, 'string', NULL );
 			$custom_field_is_new = param( 'custom_field_new'.$i, 'integer', 0 );
 			$custom_field_line_highlight = param( 'custom_field_line_highlight'.$i, 'string', NULL );
@@ -386,6 +399,7 @@ class ItemType extends DataObject
 					'header_class'    => $custom_field_header_class,
 					'cell_class'      => $custom_field_cell_class,
 					'link'            => $custom_field_link,
+					'link_nofollow'   => $custom_field_link_nofollow,
 					'link_class'      => $custom_field_link_class,
 					'line_highlight'  => $custom_field_line_highlight,
 					'green_highlight' => $custom_field_green_highlight,
@@ -425,6 +439,7 @@ class ItemType extends DataObject
 				'header_class'    => $custom_field_header_class,
 				'cell_class'      => $custom_field_cell_class,
 				'link'            => $custom_field_link,
+				'link_nofollow'   => $custom_field_link_nofollow,
 				'link_class'      => $custom_field_link_class,
 				'line_highlight'  => $custom_field_line_highlight,
 				'green_highlight' => $custom_field_green_highlight,
@@ -559,13 +574,14 @@ class ItemType extends DataObject
 						.$DB->quote( $custom_field['header_class'] ).', '
 						.$DB->quote( $custom_field['cell_class'] ).', '
 						.$DB->quote( $custom_field['link'] ).', '
+						.$DB->quote( $custom_field['link_nofollow'] ).', '
 						.$DB->quote( $custom_field['link_class'] ).', '
 						.$DB->quote( $custom_field['line_highlight'] ).', '
 						.$DB->quote( $custom_field['green_highlight'] ).', '
 						.$DB->quote( $custom_field['red_highlight'] ).', '
 						.( empty( $custom_field['description'] ) ? 'NULL' : $DB->quote( $custom_field['description'] ) ).' )';
 			}
-			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format, itcf_formula, itcf_header_class, itcf_cell_class, itcf_link, itcf_link_class, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight, itcf_description )
+			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format, itcf_formula, itcf_header_class, itcf_cell_class, itcf_link, itcf_link_nofollow, itcf_link_class, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight, itcf_description )
 					VALUES '.implode( ', ', $sql_data ) );
 		}
 
@@ -587,6 +603,7 @@ class ItemType extends DataObject
 						itcf_cell_class = '.$DB->quote( $custom_field['cell_class'] ).',
 						itcf_header_class = '.$DB->quote( $custom_field['header_class'] ).',
 						itcf_link = '.$DB->quote( $custom_field['link'] ).',
+						itcf_link_nofollow = '.$DB->quote( $custom_field['link_nofollow'] ).',
 						itcf_link_class = '.$DB->quote( $custom_field['link_class'] ).',
 						itcf_line_highlight = '.$DB->quote( $custom_field['line_highlight'] ).',
 						itcf_green_highlight = '.$DB->quote( $custom_field['green_highlight'] ).',
@@ -662,7 +679,8 @@ class ItemType extends DataObject
 				global $DB;
 				$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->ID );
 				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
-				$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, itcf_link AS link, itcf_link_class AS link_class, ' );
+				$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
+				$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
 				$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description' );
 				$SQL->FROM( 'T_items__type_custom_field' );
 				$SQL->WHERE( 'itcf_ityp_ID = '.$DB->quote( $this->ID ) );
@@ -785,6 +803,42 @@ class ItemType extends DataObject
 					WHERE its_ityp_ID = '.$this->ID.'
 					AND its_pst_ID IN ('.implode( ',', $remove_values ).')' );
 		}
+	}
+
+
+	/**
+	 * Get item denomination
+	 *
+	 * @param string Position where denomination will be used, can be one of the following: 'evobar_new', 'inskin_new_btn', 'title_new', 'title_update'
+	 * @return string Item denomination
+	 */
+	function get_item_denomination( $position = 'evobar_new' )
+	{
+		switch( $position )
+		{
+			case 'evobar_new':
+				if( ! empty( $this->evobar_link_text ) )
+				{
+					return $this->evobar_link_text;
+				}
+				break;
+
+			case 'inskin_new_btn':
+				if( ! empty( $this->skin_btn_text ) )
+				{
+					return $this->skin_btn_text;
+				}
+				break;
+		}
+
+		global $Collection, $Blog;
+
+		if( ! empty( $Blog  ) )
+		{
+			return $Blog->get_item_denomination( $position );
+		}
+
+		return NULL;
 	}
 }
 

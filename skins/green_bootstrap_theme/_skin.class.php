@@ -1985,11 +1985,30 @@ jQuery( document ).ready( function()
 		$post_button = '';
 
 		$chapter_is_locked = false;
+		$default_new_ItemType = $Blog->get_default_new_ItemType();
+
+		if( $default_new_ItemType === false )
+		{ // Do not show button on disabled default item type for new items:
+			return '';
+		}
 
 		$write_new_post_url = $Blog->get_write_item_url( $chapter_ID );
 		if( $write_new_post_url != '' )
 		{ // Display button to write a new post
-			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post new topic').'"><i class="fa fa-pencil"></i> '.T_('New topic').'</a>';
+			$button_text = T_('New topic');
+			if( ! empty( $default_new_ItemType ) )
+			{
+				$button_text = $default_new_ItemType->get_item_denomination( 'inskin_new_btn' );
+				// The get_write_url() function above does not allow specifying the item type ID we'll manually add it:
+				$write_new_post_url = url_add_param( $write_new_post_url, 'item_typ_ID='.$default_new_ItemType->ID );
+
+				if( ! empty( $default_new_ItemType->get( 'skin_btn_text' ) ) )
+				{
+					$button_text = $default_new_ItemType->get( 'skin_btn_text' );
+				}
+			}
+
+			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post new topic').'"><i class="fa fa-pencil"></i> '.$button_text.'</a>';
 		}
 		else
 		{ // If a creating of new post is unavailable

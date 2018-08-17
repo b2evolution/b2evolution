@@ -1156,10 +1156,15 @@ class ItemLight extends DataObject
 	 * @param string Post navigation type: same_category, same_tag, same_author, same_blog
 	 * @param integer|NULL ID of post navigation target
 	 * @param array What permanent types should be ignored to don't return a permanent URL
+	 * @param array Additional parameters
 	 */
-	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '', $post_navigation = '', $nav_target = NULL, $ignore_types = array() )
+	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '', $post_navigation = '', $nav_target = NULL, $ignore_types = array(), $params = array() )
 	{
 		global $Collection, $Blog;
+
+		$params = array_merge( array(
+				'nofollow' => false,
+			), $params );
 
 		$blogurl = '';
 		$permalink_type = '';
@@ -1207,6 +1212,7 @@ class ItemLight extends DataObject
 		$r = '<a href="'.$url.'"'
 				.( empty( $title ) ? '' : ' title="'.format_to_output( $title, 'htmlattr' ).'"' )
 				.( empty( $class ) ? '' : ' class="'.format_to_output( $class, 'htmlattr' ).'"' )
+				.( $params['nofollow'] ? ' rel="nofollow"' : '' )
 			.'>'
 				.str_replace( '$title$', format_to_output( $this->title ), $text )
 			.'</a>';

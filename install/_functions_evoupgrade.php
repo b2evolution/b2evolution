@@ -9867,8 +9867,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				'itcf_header_class'    => 'VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL',
 				'itcf_cell_class'      => 'VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL',
 				'itcf_link'            => 'ENUM( "nolink", "linkto", "permalink", "zoom", "linkpermzoom", "permzoom", "linkperm", "fieldurl" ) COLLATE ascii_general_ci NOT NULL default "nolink"',
+				'itcf_link_nofollow'   => 'TINYINT DEFAULT 0',
 				'itcf_link_class'      => 'VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL',
-				'itcf_line_highlight'  => 'ENUM( "never", "differences" ) COLLATE ascii_general_ci NULL DEFAULT NULL',
+				'itcf_line_highlight'  => 'ENUM( "never", "differences", "always" ) COLLATE ascii_general_ci NULL DEFAULT NULL',
 				'itcf_green_highlight' => 'ENUM( "never", "lowest", "highest" ) COLLATE ascii_general_ci NULL DEFAULT NULL',
 				'itcf_red_highlight'   => 'ENUM( "never", "lowest", "highest" ) COLLATE ascii_general_ci NULL DEFAULT NULL',
 				'itcf_description'     => 'TEXT NULL',
@@ -10541,6 +10542,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 					.implode( ', ', $widgets_insert_sql_rows ) );
 		}
 
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13200, 'Upgrade table item types...' ) )
+	{ // part of 7.0.0-alpha
+		db_add_col( 'T_items__type', 'ityp_evobar_link_text', 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_perm_level' );
+		db_add_col( 'T_items__type', 'ityp_skin_btn_text', 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_evobar_link_text' );
 		upg_task_end();
 	}
 

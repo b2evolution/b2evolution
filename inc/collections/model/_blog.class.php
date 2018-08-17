@@ -6132,6 +6132,87 @@ class Blog extends DataObject
 
 		return $default_ItemType ? $default_ItemType->get_name() : T_('Post');
 	}
+
+
+	/**
+	 * Get default new item type based on the collection's default category
+	 *
+	 * @return mixed ItemType object, false if default item type is disabled
+	 */
+	function get_default_new_ItemType()
+	{
+		global $cat;
+
+		$working_cat = $cat;
+		if( empty( $cat ) )
+		{
+			$working_cat = $this->get_setting( 'default_cat_ID' );
+		}
+		$default_new_ItemType = $this->get_setting( 'default_item_type_cat_'.$working_cat );
+		if( $default_new_ItemType == 'disabled' )
+		{
+			return false;
+		}
+		elseif( empty( $default_new_ItemType ) )
+		{
+			return $this->get_default_ItemType();
+		}
+		else
+		{
+			$ItemTypeCache = & get_ItemTypeCache();
+			return $ItemTypeCache->get_by_ID( $default_new_ItemType, false, false );
+		}
+	}
+
+
+	/**
+	 * Get default item denomination depending on current collection type
+	 *
+	 * @param string Position where denomination will be used, can be one of the following: 'evobar_new', 'inskin_new_btn', 'title_new', 'title_update'
+	 * @return string Item denomination
+	 */
+	function get_item_denomination( $position = 'evobar_new' )
+	{
+		switch( $this->get( 'type' ) )
+		{
+			case 'photo':
+				$denominations = array(
+						'evobar_new'     => T_('Album'),
+						'inskin_new_btn' => T_('New album'),
+						'title_new'      => T_('New album'),
+						'title_updated'  => T_('Updated album'),
+					);
+				break;
+
+			case 'group':
+				$denominations = array(
+						'evobar_new'     => T_('Task'),
+						'inskin_new_btn' => T_('New task'),
+						'title_new'      => T_('New task'),
+						'title_updated'  => T_('Updated task'),
+					);
+				break;
+
+			case 'forum':
+				$denominations = array(
+						'evobar_new'     => T_('Topic'),
+						'inskin_new_btn' => T_('New topic'),
+						'title_new'      => T_('New topic'),
+						'title_updated'  => T_('Updated topic'),
+					);
+				break;
+
+			default:
+				$denominations = array(
+						'evobar_new'     => T_('Post'),
+						'inskin_new_btn' => T_('New post'),
+						'title_new'      => T_('New post'),
+						'title_updated'  => T_('Updated post'),
+					);
+		}
+
+		return $denominations[$position];
+	}
 }
 
 ?>

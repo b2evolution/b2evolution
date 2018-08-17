@@ -2412,7 +2412,8 @@ class Item extends ItemLight
 
 			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
 			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, iset_value AS value, ' );
-			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, itcf_link AS link, itcf_link_class AS link_class, ' );
+			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
+			$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
 			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description' );
 			$SQL->FROM( 'T_items__type_custom_field' );
 			$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON itcf_name = SUBSTRING( iset_name, 8 ) AND iset_item_ID = '.$this->ID );
@@ -2436,10 +2437,9 @@ class Item extends ItemLight
 	 *
 	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
 	 * @param string Restrict field by type(double, varchar, html, text, url, image, computed, separator), FALSE - to don't restrict
-	 * @param boolean ****DEPRECATED**** Format value depending on field type 
 	 * @return string|boolean FALSE if the field doesn't exist
 	 */
-	function get_custom_field_value( $field_index, $restrict_type = false, $format_value = false )
+	function get_custom_field_value( $field_index, $restrict_type = false )
 	{
 		// Get all custom fields by item ID:
 		$custom_fields = $this->get_custom_fields_defs();
@@ -2452,11 +2452,6 @@ class Item extends ItemLight
 		if( $restrict_type !== false && $custom_fields[ $field_index ]['type'] != $restrict_type )
 		{	// The requested field is detected but it has another type:
 			return false;
-		}
-
-		if( $format_value )
-		{	// Format value:
-			return $this->get_custom_field_formatted( $field_index );
 		}
 
 		// Use a value from DB:
@@ -2476,14 +2471,7 @@ class Item extends ItemLight
 		$params = array_merge( array(
 				'field_value_format'  => '', // Format for custom field, Leave empty to use a format from DB
 				'field_restrict_type' => false, // Restrict field by type(double, varchar, html, text, url, image, computed, separator), FALSE - to don't restrict
-				// The following masks are used to replace in custom field values and formats:
-				'field_value_yes'     => '<span class="fa fa-check green"></span>', // #yes#
-				'field_value_no'      => '<span class="fa fa-times red"></span>', // #no#
-				'field_value_plus'    => '<span class="fa fa-plus-circle green"></span>', // (+)
-				'field_value_minus'   => '<span class="fa fa-minus-circle red"></span>', // (-)
-				'field_value_warning' => '<span class="fa fa-exclamation-triangle orange"></span>', // (!)
-				'field_value_newline' => '<br />', // ||
-				'field_value_note'    => '<span class="note">$note_text$</span>', // {note text}
+				'expansion'           => 'default', // 'default': || = '<br />', | | = space; 'vertical': both = '<br />'; 'horizontal': both = space.
 			), $params );
 
 		// Try to get an original value of the requested custom field:
@@ -2514,15 +2502,6 @@ class Item extends ItemLight
 		{	// Use a format from params:
 			$format = $params['field_value_format'];
 		}
-
-		$value_masks = array(
-			'#yes#' => $params['field_value_yes'],
-			'#no#'  => $params['field_value_no'],
-			'(+)'   => $params['field_value_plus'],
-			'(-)'   => $params['field_value_minus'],
-			'(!)'   => $params['field_value_warning'],
-			'||'    => $params['field_value_newline'],
-		);
 
 		switch( $custom_field['type'] )
 		{
@@ -2582,7 +2561,7 @@ class Item extends ItemLight
 					$format = $formats[1];
 				}
 
-				if( isset( $value_masks[ $format ] ) ||
+				if( in_array( $format, array( '#yes#', '(yes)', '#no#', '(no)', '(+)', '(-)', '(!)', '||', '| |' ) ) ||
 				    strpos( $format, '#stars' ) !== false ||
 				    ( $format !== '' && ! preg_match( '/\d/', $format ) ) )
 				{	// Use special formats:
@@ -2650,18 +2629,9 @@ class Item extends ItemLight
 				break;
 		}
 
-		// Replace special masks in value with template:
-		$custom_field_value = str_replace( array_keys( $value_masks ), $value_masks, $custom_field_value );
-		$custom_field_value = preg_replace( '/\{([^}]+)\}/', str_replace( '$note_text$', '$1', $params['field_value_note'] ), $custom_field_value );
-
-		if( preg_match_all( '/(#stars(\/\d+)?)#/', $custom_field_value, $star_matches ) )
-		{	// Use stars template:
-			foreach( $star_matches[0] as $s => $star_match )
-			{
-				$stars_num = ( isset( $star_matches[2][ $s ] ) && $star_matches[2][ $s ] !== '' ) ? intval( trim( $star_matches[2][ $s ], '/' ) ) : 5;
-				$custom_field_value = str_replace( $star_match, get_stars_template( $orig_custom_field_value, $stars_num, $params ), $custom_field_value );
-			}
-		}
+		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
+		$params['stars_value'] = $orig_custom_field_value;
+		$custom_field_value = render_custom_field( $custom_field_value, $params );
 
 		// Apply setting "Link to":
 		if( $custom_field['link'] != 'nolink' && ! empty( $custom_field_value ) )
@@ -2680,6 +2650,7 @@ class Item extends ItemLight
 			{
 				$fallback_count = count( $link_fallbacks[ $custom_field['link'] ] );
 				$link_class_attr = empty( $custom_field['link_class'] ) ? '' : ' class="'.format_to_output( $custom_field['link_class'], 'htmlattr' ).'"';
+				$nofollow_attr = $custom_field['link_nofollow'] ? ' rel="nofollow"' : '';
 				foreach( $link_fallbacks[ $custom_field['link'] ] as $l => $link_fallback )
 				{
 					switch( $link_fallback )
@@ -2688,7 +2659,7 @@ class Item extends ItemLight
 							// Link to "URL":
 							if( $this->get( 'url' ) != '' )
 							{	// If this post has a specified setting "Link to url":
-								$custom_field_value = '<a href="'.$this->get( 'url' ).'" target="_blank"'.$link_class_attr.'>'.$custom_field_value.'</a>';
+								$custom_field_value = '<a href="'.$this->get( 'url' ).'" target="_blank"'.$nofollow_attr.$link_class_attr.'>'.$custom_field_value.'</a>';
 								break 2;
 							}
 							// else fallback to other points:
@@ -2701,7 +2672,7 @@ class Item extends ItemLight
 							    $Item->ID != $this->ID ||
 							    $fallback_count == $l + 1 )
 							{	// Use permalink if it is not last point and we don't view this current post:
-								$custom_field_value = $this->get_permanent_link( $custom_field_value, '#', $custom_field['link_class'] );
+								$custom_field_value = $this->get_permanent_link( $custom_field_value, '#', $custom_field['link_class'], '', '', NULL, array(), array( 'nofollow' => $custom_field['link_nofollow'] ) );
 								break 2;
 							}
 							// else fallback to other points:
@@ -2721,7 +2692,7 @@ class Item extends ItemLight
 
 						case 'url':
 							// Use value of url fields as URL to the link:
-							$custom_field_value = '<a href="'.$custom_field_value.'"'.$link_class_attr.'>'.$custom_field_value.'</a>';
+							$custom_field_value = '<a href="'.$custom_field_value.'"'.$nofollow_attr.$link_class_attr.'>'.$custom_field_value.'</a>';
 							break 2;
 					}
 				}
@@ -2839,13 +2810,8 @@ class Item extends ItemLight
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'before'        => ' ',
-				'after'         => ' ',
-				'format'        => 'htmlbody',
-				// The 3 params are deprecated, use new option "Format" of the item type custom field instead:
-				// 'decimals'      => 2,
-				// 'dec_point'     => '.',
-				// 'thousands_sep' => ',',
+				'before' => ' ',
+				'after'  => ' ',
 			), $params );
 
 		if( empty( $params['field'] ) )
@@ -2864,20 +2830,9 @@ class Item extends ItemLight
 			return;
 		}
 
-		// Get value and type:
-		$value = $custom_fields[ $field_index ]['value'];
-		$type = $custom_fields[ $field_index ]['type'];
-
-		if( !empty( $params['max'] ) && ( $type == 'double' ) && ( $value == 9999999999 ) )
-		{
-			echo $params['max'];
-		}
-		elseif( !empty( $value ) )
-		{
-			echo $params['before'];
-			echo $this->get_custom_field_formatted( $field_index, $params );
-			echo $params['after'];
-		}
+		echo $params['before'];
+		echo $this->get_custom_field_formatted( $field_index, $params );
+		echo $params['after'];
 	}
 
 
@@ -3047,7 +3002,8 @@ class Item extends ItemLight
 		$field_type = ( $field['type'] == 'double' ? 'numeric' : ( $field['type'] == 'varchar' ? 'string' : $field['type'] ) );
 		$field_format = isset( $params['field_'.$field_type.'_format'] ) ? $params['field_'.$field_type.'_format'] : $params['field_format'];
 
-		$mask_values = array( $field['label'] );
+		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
+		$mask_values = array( render_custom_field( $field['label'], $params ) );
 
 		if( empty( $field['description'] ) )
 		{	// The custom field has no description:
@@ -5351,7 +5307,7 @@ class Item extends ItemLight
 		$table .= '<div class="rating_summary_total">
 			'.$ratings_count.' '.( $ratings_count > 1 ? T_('ratings') : T_('rating') ).'
 			<div class="average_rating">'.T_('Average user rating').':<br />
-			'.get_star_rating( $average_real ).'<span>('.$average_real.')</span>
+			'.get_star_rating( $average_real ).'<span class="average_rating_score">('.$average_real.')</span>
 			</div></div><div class="clear"></div>';
 
 		return $table;
@@ -10019,16 +9975,9 @@ class Item extends ItemLight
 		}
 
 		// Set titles by Blog type:
-		if( $this->Blog->get( 'type' ) == 'forum' )
-		{
-			$title_new = T_('New topic');
-			$title_updated = T_('Updated topic');
-		}
-		else
-		{
-			$title_new = T_('New post');
-			$title_updated = T_('Updated post');
-		}
+		$this->get_ItemType();
+		$title_new = $this->ItemType->get_item_denomination( 'title_new' );
+		$title_updated = $this->ItemType->get_item_denomination( 'title_updated' );
 
 		// Merge params
 		$params = array_merge( array(

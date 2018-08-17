@@ -64,7 +64,7 @@ $Form->switch_template_parts( $params['edit_form_params'] );
 $ItemType = & $edited_Item->get_ItemType();
 if( $ItemType && ( $ItemType->get( 'front_instruction' ) == 1 ) && $ItemType->get( 'instruction' ) )
 {
-	echo '<div class="alert alert-info fade in">'.$ItemType->get( 'instruction' ).'</div>';
+	echo '<div class="alert alert-info fade in evo_instruction">'.$ItemType->get( 'instruction' ).'</div>';
 }
 
 // ================================ START OF EDIT FORM ================================
