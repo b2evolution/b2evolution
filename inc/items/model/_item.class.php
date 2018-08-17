@@ -2840,20 +2840,9 @@ class Item extends ItemLight
 			return;
 		}
 
-		// Get value and type:
-		$value = $custom_fields[ $field_index ]['value'];
-		$type = $custom_fields[ $field_index ]['type'];
-
-		if( !empty( $params['max'] ) && ( $type == 'double' ) && ( $value == 9999999999 ) )
-		{
-			echo $params['max'];
-		}
-		elseif( !empty( $value ) )
-		{
-			echo $params['before'];
-			echo $this->get_custom_field_formatted( $field_index, $params );
-			echo $params['after'];
-		}
+		echo $params['before'];
+		echo $this->get_custom_field_formatted( $field_index, $params );
+		echo $params['after'];
 	}
 
 
