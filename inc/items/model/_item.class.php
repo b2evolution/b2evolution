@@ -2471,6 +2471,7 @@ class Item extends ItemLight
 		$params = array_merge( array(
 				'field_value_format'  => '', // Format for custom field, Leave empty to use a format from DB
 				'field_restrict_type' => false, // Restrict field by type(double, varchar, html, text, url, image, computed, separator), FALSE - to don't restrict
+				'expansion'           => 'default', // 'vertical': convert '| |' to '<br />', 'horizontal'/'default': convert '| |' to space ' '
 			), $params );
 
 		// Try to get an original value of the requested custom field:
@@ -2560,7 +2561,7 @@ class Item extends ItemLight
 					$format = $formats[1];
 				}
 
-				if( in_array( $format, array( '#yes#', '#no#', '(+)', '(-)', '(!)', '||' ) ) ||
+				if( in_array( $format, array( '#yes#', '(yes)', '#no#', '(no)', '(+)', '(-)', '(!)', '||', '| |' ) ) ||
 				    strpos( $format, '#stars' ) !== false ||
 				    ( $format !== '' && ! preg_match( '/\d/', $format ) ) )
 				{	// Use special formats:
