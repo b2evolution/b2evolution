@@ -365,6 +365,7 @@ switch( $action )
 		param( 'itcf_header_class', 'string' );
 		param( 'itcf_cell_class', 'string' );
 		param( 'itcf_link', 'string' );
+		param( 'itcf_link_nofollow', 'integer', NULL );
 		param( 'itcf_link_class', 'string' );
 		param( 'itcf_note', 'string' );
 		param( 'itcf_public', 'integer' );

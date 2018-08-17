@@ -1045,7 +1045,8 @@ class DB
 
 					// Get time information from PROFILING table (which corresponds to "SHOW PROFILE")
 					$this->result = $this->dbhandle->query( 'SELECT FORMAT(SUM(DURATION), 6) AS DURATION FROM INFORMATION_SCHEMA.PROFILING GROUP BY QUERY_ID ORDER BY QUERY_ID DESC LIMIT 1' );
-					$this->queries[$this->num_queries-1]['time_profile'] = array_shift($this->result->fetch_row());
+					$time_profile_durations = $this->result->fetch_row();
+					$this->queries[$this->num_queries-1]['time_profile'] = array_shift( $time_profile_durations );
 				}
 
 				// Free "PROFILE" result:

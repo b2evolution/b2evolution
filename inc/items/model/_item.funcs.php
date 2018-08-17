@@ -1784,7 +1784,8 @@ function get_item_type_field_highlight_options( $type )
 		case 'line':
 			return array(
 				'never'       => T_('Never'),
-				'differences' => T_('If different')
+				'differences' => T_('If different'),
+				'always'      => T_('Always'),
 			);
 		case 'green':
 		case 'red':
@@ -4166,35 +4167,38 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 			}
 		}
 
+		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
+		$custom_field_label = render_custom_field( $custom_field['label'] );
+
 		switch( $custom_field['type'] )
 		{
 			case 'double':
-				$Form->text_input( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
+				$Form->text_input( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
 				break;
 			case 'computed':
-				$Form->info( $custom_field['label'], $edited_Item->get_custom_field_formatted( $custom_field['name'] ), $custom_field_note );
+				$Form->info( $custom_field_label, $edited_Item->get_custom_field_formatted( $custom_field['name'] ), $custom_field_note );
 				break;
 			case 'varchar':
-				$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
+				$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
 				break;
 			case 'text':
-				$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field['label'], array( 'note' => $custom_field_note ) + $custom_field_input_params );
+				$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
 				break;
 			case 'html':
-				$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field['label'], array( 'note' => $custom_field_note ) + $custom_field_input_params );
+				$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
 				break;
 			case 'url':
-				$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
+				$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
 				break;
 			case 'image':
-				$Form->text_input( 'item_image_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field['label'], $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
+				$Form->text_input( 'item_image_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
 				break;
 			case 'separator':
 				if( is_admin_page() && $c > 0 )
 				{	// This is a hack for back-office because there is a css table layout:
 					$Form->end_fieldset();
 				}
-				echo '<h3>'.$custom_field['label'].'</h3>';
+				echo '<h3>'.$custom_field_label.'</h3>';
 				if( ! empty( $custom_field_note ) )
 				{
 					echo '<p class="note">'.$custom_field_note.'</p>';
@@ -4231,6 +4235,70 @@ jQuery( 'a[data-child-input-id]' ).click( function()
 </script>
 <?php
 	}
+}
+
+
+/**
+ * Render special masks in custom field labels and values
+ *
+ * Possible masks: #yes#, (yes), #no#, (no), (+), (-), (!), ||, | |, {note_sample_text}, #stars/5#, #stars:2.3/5#
+ *
+ * @param string Custom field value or label
+ * @param array Additional parameters
+ * @return string
+ */
+function render_custom_field( $value, $params = array() )
+{
+	$params = array_merge( array(
+			'stars_value'         => NULL, // NULL to fill all stars by default
+			// The following masks are used to replace in custom field values and formats:
+			'field_value_yes'     => '<span class="fa fa-check green"></span>', // #yes#, (yes)
+			'field_value_no'      => '<span class="fa fa-times red"></span>', // #no#, (no)
+			'field_value_plus'    => '<span class="fa fa-plus-circle green"></span>', // (+)
+			'field_value_minus'   => '<span class="fa fa-minus-circle red"></span>', // (-)
+			'field_value_warning' => '<span class="fa fa-exclamation-triangle orange"></span>', // (!)
+			'field_value_note'    => '<span class="note">$note_text$</span>', // {note text}
+			'expansion'           => 'default', // 'default': || = '<br />', | | = space; 'vertical': both = '<br />'; 'horizontal': both = space.
+		), $params );
+
+	// Render special masks:
+	$value_masks = array(
+			'#yes#' => $params['field_value_yes'],
+			'(yes)' => $params['field_value_yes'],
+			'#no#'  => $params['field_value_no'],
+			'(no)'  => $params['field_value_no'],
+			'(+)'   => $params['field_value_plus'],
+			'(-)'   => $params['field_value_minus'],
+			'(!)'   => $params['field_value_warning'],
+			'||'    => ( $params['expansion'] == 'horizontal' ? ' ' : '<br />' ),
+			'| |'   => ( $params['expansion'] == 'vertical' ? '<br />' : ' ' ),
+		);
+	$value = str_replace( array_keys( $value_masks ), $value_masks, $value );
+
+	// Render a note text:
+	$value = preg_replace( '/\{([^}]+)\}/', str_replace( '$note_text$', '$1', $params['field_value_note'] ), $value );
+
+	// Render stars:
+	if( preg_match_all( '/(#stars(:\d+.?\d+?)?(\/\d+)?)#/', $value, $star_matches ) )
+	{	// If at least one star template is found:
+		foreach( $star_matches[0] as $s => $star_match )
+		{
+			// Set number of stars, 5 stars by default:
+			$stars_num = ( isset( $star_matches[3][ $s ] ) && $star_matches[3][ $s ] !== '' ) ? intval( trim( $star_matches[3][ $s ], '/' ) ) : 5;
+			if( $params['stars_value'] === NULL || ! is_numeric( $params['stars_value'] ) )
+			{	// Make active all stars by default or get active stars e.g. '2.3' from stars mask like #stars:2.3/5#:
+				$stars_value = empty( $star_matches[2][ $s ] ) ? $stars_num : floatval( substr( $star_matches[2][ $s ], 1 ) );
+			}
+			else
+			{	// Use a number of active stars from params if it is a numeric really
+				$stars_value = floatval( $params['stars_value'] );
+			}
+			// Render stars:
+			$value = str_replace( $star_match, get_star_rating( $stars_value, $stars_num, $params ), $value );
+		}
+	}
+
+	return $value;
 }
 
 

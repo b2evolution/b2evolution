@@ -62,12 +62,20 @@ $Form->checkbox( 'itcf_public', get_param( 'itcf_public' ), T_('Public') );
 $Form->text( 'itcf_header_class', get_param( 'itcf_header_class' ), 60, T_('Header cell class'), sprintf( T_('Enter class names such as %s etc. (Separate with space)'), '<code>left</code> <code>center</code> <code>right</code> <code>nowrap</code>' ), 255 );
 
 // Data cell class:
-$Form->text( 'itcf_cell_class', get_param( 'itcf_cell_class' ), 60, T_('Data cell class'), sprintf( T_('Enter class names such as %s etc. (Separate with space)'), '<code>left</code> <code>center</code> <code>right</code> <code>red</code>' ), 255 );
+if( get_param( 'itcf_type' ) != 'separator' )
+{
+	$Form->text( 'itcf_cell_class', get_param( 'itcf_cell_class' ), 60, T_('Data cell class'), sprintf( T_('Enter class names such as %s etc. (Separate with space)'), '<code>left</code> <code>center</code> <code>right</code> <code>red</code>' ), 255 );
+}
 
-// Link:
+// Link options:
 if( ! in_array( get_param( 'itcf_type' ), array( 'text', 'html', 'separator' ) ) )
 {
-	$Form->select_input_array( 'itcf_link', get_param( 'itcf_link' ), get_item_type_field_linkto_options( get_param( 'itcf_type' ) ), T_('Link'), '', array( 'force_keys_as_values' => true ) );
+	$Form->begin_line( T_('Link') );
+		// Link:
+		$Form->select_input_array( 'itcf_link', get_param( 'itcf_link' ), get_item_type_field_linkto_options( get_param( 'itcf_type' ) ), '', '', array( 'force_keys_as_values' => true ) );
+		// No follow:
+		$Form->checkbox_input( 'itcf_link_nofollow', get_param( 'itcf_link_nofollow' ), '', array( 'input_prefix' => '<label class="text-normal">', 'input_suffix' => ' '.T_('No Follow').'</label>' ) );
+	$Form->end_line();
 
 	// Link class:
 	$Form->text( 'itcf_link_class', get_param( 'itcf_link_class' ), 60, T_('Link class'), sprintf( T_('Enter class names such as %s etc. (Separate with space)'), '<code>btn btn-sm btn-info</code>' ), 255 );

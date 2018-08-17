@@ -186,6 +186,12 @@ class item_fields_compare_Widget extends ComponentWidget
 					'note' => T_('Enter one field name per line.'),
 					'rows' => 10,
 				),
+				'edit_links' => array(
+					'type' => 'checkbox',
+					'label' => T_('Edit Links'),
+					'note' => T_('Check to add a row with edit buttons for editors who have permission.'),
+					'defaultvalue' => 1,
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -207,13 +213,15 @@ class item_fields_compare_Widget extends ComponentWidget
 				'custom_fields_topleft_cell'               => '<td style="border:none"></td>',
 				'custom_fields_col_header_item'            => '<th class="center">$item_link$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
 				'custom_fields_row_header_field'           => '<th class="$header_cell_class$">$field_title$$field_description_icon$:</th>',
+				'custom_fields_description_icon_class'     => 'grey',
 				'custom_fields_value_default'              => '<td class="$data_cell_class$">$field_value$</td>',
 				'custom_fields_value_difference_highlight' => '<td class="$data_cell_class$ bg-warning">$field_value$</td>',
 				'custom_fields_value_green'                => '<td class="$data_cell_class$ bg-success">$field_value$</td>',
 				'custom_fields_value_red'                  => '<td class="$data_cell_class$ bg-danger">$field_value$</td>',
+				'custom_fields_edit_link_cell'             => '<td class="center">$edit_link$</td>',
+				'custom_fields_edit_link_class'            => 'btn btn-xs btn-default',
 				'custom_fields_row_end'                    => '</tr>',
 				'custom_fields_table_end'                  => '</table></div>',
-				'custom_fields_description_icon_class'     => 'grey',
 				// Separate template for separator fields:
 				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
 				'custom_fields_separator_row_header_field' => '<th class="$header_cell_class$" colspan="$cols_count$">$field_title$$field_description_icon$</th>',
@@ -222,14 +230,124 @@ class item_fields_compare_Widget extends ComponentWidget
 		// Get IDs of items which should be compared:
 		$items = $this->get_items_IDs();
 
-		if( empty( $items ) )
-		{	// No items to compare:
+		// Get custom fields with compared data:
+		$custom_fields = $this->get_custom_fields( $items );
+
+		if( empty( $custom_fields ) )
+		{	// Nothing to compare:
 			return;
 		}
 
 		$ItemCache = & get_ItemCache();
 
+		echo $this->disp_params['block_start'];
+
+		$this->disp_title();
+
+		echo $this->disp_params['block_body_start'];
+
+		// Start a table to display differences of all custom fields for selected posts:
+		echo $this->get_field_template( 'table_start' );
+
+		if( ! isset( $this->display_item_headers ) || $this->display_item_headers !== false )
+		{	// Display item headers row only when it is not disabled e.g. from child class item_custom_fields_Widget:
+			echo $this->get_field_template( 'row_start' );
+			echo $this->get_field_template( 'topleft_cell' );
+			foreach( $items as $item_ID )
+			{
+				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
+				// Permanent post link:
+				echo str_replace( '$item_link$', $widget_Item->get_title(), $this->get_field_template( 'col_header_item' ) );
+			}
+			echo $this->get_field_template( 'row_end' );
+		}
+
+		foreach( $custom_fields as $custom_field )
+		{
+			if( $custom_field['display_mode'] == 'normal' )
+			{	// Display a row of one compared field between all selected items:
+				// Note: skip fields with display mode "repeat" which should be displayed after specific separator below:
+				$this->display_field_row_template( $custom_field, $items, $this->disp_params );
+			}
+			if( ! empty( $custom_field['repeat_fields'] ) )
+			{	// Display the repeated fields after separator if it has them:
+				foreach( $custom_field['repeat_fields'] as $repeat_field_name )
+				{	// Display a row of the repeated custom field between all selected items:
+					$this->display_field_row_template( $custom_fields[ $repeat_field_name ], $items, $this->disp_params );
+				}
+			}
+		}
+
+		if( $this->disp_params['edit_links'] && is_logged_in() )
+		{	// Display buttons to edit the compared items if user has a permission:
+			global $Item;
+			$items_edit_links = array();
+			$items_can_be_edited = false;
+			foreach( $items as $item_ID )
+			{
+				if( isset( $Item ) && $Item->ID == $item_ID && count( $items ) == 1 )
+				{	// Don't display an edit link when this is a page of currently displayed Item:
+					$items_edit_links[] = '';
+				}
+				else
+				{	// Try to display an edit link depending on permissions of current User:
+					$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
+					$items_edit_link = $widget_Item->get_edit_link( array( 'class' => $this->disp_params['custom_fields_edit_link_class'] ) );
+					if( $items_edit_link === false )
+					{	// The edit link is not available for current User:
+						$items_edit_links[] = '';
+					}
+					else
+					{	// The Item can be edited by current User:
+						$items_edit_links[] = $items_edit_link;
+						// Set flag to know at least one compared item can be edited by current User:
+						$items_can_be_edited = true;
+					}
+				}
+			}
+
+			if( $items_can_be_edited )
+			{	// Display the footer row with edit links if at least one compared item can be edited by current User:
+				echo $this->get_field_template( 'row_start' );
+
+				echo $this->get_field_template( 'topleft_cell' );
+
+				foreach( $items_edit_links as $items_edit_link )
+				{
+					echo str_replace( '$edit_link$', $items_edit_link, $this->get_field_template( 'edit_link_cell' ) );
+				}
+
+				echo $this->get_field_template( 'row_end' );
+			}
+		}
+
+		echo $this->get_field_template( 'table_end' );
+
+		echo $this->disp_params['block_body_end'];
+
+		echo $this->disp_params['block_end'];
+
+		return true;
+	}
+
+
+	/**
+	 * Get custom fields between the requested items with additional compare data
+	 *
+	 * @param array Item IDs, updated by referene
+	 * @return array
+	 */
+	function get_custom_fields( & $items )
+	{
+		if( empty( $items ) )
+		{	// No items to compare:
+			return false;
+		}
+
+		$ItemCache = & get_ItemCache();
+
 		// Load all requested posts into the cache:
+		$ItemCache->clear();
 		$ItemCache->load_list( $items );
 
 		$fields_source = $this->disp_params['fields_source'];
@@ -403,7 +521,7 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		if( empty( $all_custom_fields ) )
 		{	// Don't display widget if all selected items have no custom fields:
-			return;
+			return false;
 		}
 
 		// Compare custom field values:
@@ -500,51 +618,7 @@ class item_fields_compare_Widget extends ComponentWidget
 			}
 		}
 
-		echo $this->disp_params['block_start'];
-
-		$this->disp_title();
-
-		echo $this->disp_params['block_body_start'];
-
-		// Start a table to display differences of all custom fields for selected posts:
-		echo $this->get_field_template( 'table_start' );
-
-		if( ! isset( $this->display_item_headers ) || $this->display_item_headers !== false )
-		{	// Display item headers row only when it is not disabled e.g. from child class item_custom_fields_Widget:
-			echo $this->get_field_template( 'row_start' );
-			echo $this->get_field_template( 'topleft_cell' );
-			foreach( $items as $item_ID )
-			{
-				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
-				// Permanent post link:
-				echo str_replace( '$item_link$', $widget_Item->get_title(), $this->get_field_template( 'col_header_item' ) );
-			}
-			echo $this->get_field_template( 'row_end' );
-		}
-
-		foreach( $all_custom_fields as $custom_field )
-		{
-			if( $custom_field['display_mode'] == 'normal' )
-			{	// Display a row of one compared field between all selected items:
-				// Note: skip fields with display mode "repeat" which should be displayed after specific separator below:
-				$this->display_field_row_template( $custom_field, $items, $this->disp_params );
-			}
-			if( ! empty( $custom_field['repeat_fields'] ) )
-			{	// Display the repeated fields after separator if it has them:
-				foreach( $custom_field['repeat_fields'] as $repeat_field_name )
-				{	// Display a row of the repeated custom field between all selected items:
-					$this->display_field_row_template( $all_custom_fields[ $repeat_field_name ], $items, $this->disp_params );
-				}
-			}
-		}
-
-		echo $this->get_field_template( 'table_end' );
-
-		echo $this->disp_params['block_body_end'];
-
-		echo $this->disp_params['block_end'];
-
-		return true;
+		return $all_custom_fields;
 	}
 
 
@@ -574,9 +648,12 @@ class item_fields_compare_Widget extends ComponentWidget
 				) ).' ';
 		}
 
+		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
+		$custom_field_label = render_custom_field( $custom_field['label'], $params );
+
 		// Custom field title:
 		echo str_replace( array( '$field_title$', '$cols_count$', '$field_description_icon$', '$header_cell_class$' ),
-			array( $custom_field['label'], count( $items ) + 1, $field_description_icon, $custom_field['header_class'] ),
+			array( $custom_field_label, count( $items ) + 1, $field_description_icon, $custom_field['header_class'] ),
 			$this->get_field_template( 'row_header_field', $custom_field['type'] ) );
 
 		if( $custom_field['type'] != 'separator' )
@@ -599,7 +676,8 @@ class item_fields_compare_Widget extends ComponentWidget
 				// Default template for field value:
 				$field_value_template = $this->get_field_template( 'value_default', $custom_field['type'] );
 
-				if( $custom_field['is_different'] && $custom_field['line_highlight'] == 'differences' )
+				if( ( $custom_field['is_different'] && $custom_field['line_highlight'] == 'differences' ) ||
+				    ( $custom_field['line_highlight'] == 'always' && count( $items ) > 1 ) )
 				{	// Mark the field value as different only when it is defined in the settings of the custom field:
 					$field_value_template = $this->get_field_template( 'value_difference_highlight', $custom_field['type'] );
 				}
@@ -857,6 +935,13 @@ class item_fields_compare_Widget extends ComponentWidget
 				'items'        => implode( ',', $items ), // Have the compared items changed? (Check firstly widget setting and then param from request) (this is important in case the same items are compared in different order)
 				'meta_settings'=> 1, // Have meta settings(any item type) changed?
 			);
+
+		if( $this->disp_params['edit_links'] )
+		{	// When the edit links setting is enabled we should invalidate keys per user,
+			// because each user may has different permissions to edit the compared posts:
+			global $current_User;
+			$cache_keys['user_ID'] = ( is_logged_in() ? $current_User->ID : 0 ); // Has the current User changed?
+		}
 
 		// Add 1 cache key for each item that is being compared, in order to detect changes on each one:
 		foreach( $items as $item_ID )

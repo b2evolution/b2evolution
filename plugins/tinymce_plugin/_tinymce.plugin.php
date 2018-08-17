@@ -1090,7 +1090,8 @@ class tinymce_plugin extends Plugin
 		$blog = $params['blog'];
 		$BlogCache = get_BlogCache($blog);
 		$Collection = $Blog = $BlogCache->get_by_ID($blog);
-		$path = array_shift($this->get_item_css_path_and_url($Blog));
+		$item_css_path_and_url = $this->get_item_css_path_and_url($Blog);
+		$path = array_shift( $item_css_path_and_url );
 		$r = file_get_contents($path);
 		if( $r )
 		{

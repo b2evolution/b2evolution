@@ -212,7 +212,8 @@ function _wp_mw_newmediaobject($m)
 			if( $correct_Filetype && $correct_Filetype->is_allowed() )
 			{	// A FileType with the given mime type exists in database and it is an allowed file type for current User
 				// The "correct" extension is a plausible one, proceed...
-				$correct_extension = array_shift($correct_Filetype->get_extensions());
+				$extensions = $correct_Filetype->get_extensions();
+				$correct_extension = array_shift( $extensions );
 				$path_info = pathinfo($filename);
 				$current_extension = $path_info['extension'];
 

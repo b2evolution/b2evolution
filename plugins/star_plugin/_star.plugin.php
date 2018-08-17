@@ -42,28 +42,6 @@ class star_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
-	 *
-	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
-	 *
-	 * @param array Associative array of parameters
-	 */
-	function SkinBeginHtmlHead( & $params )
-	{
-		global $Collection, $Blog;
-
-		if( ! isset( $Blog ) || (
-		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
-		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
-		{ // Don't load css/js files when plugin is not enabled
-			return;
-		}
-
-		$this->require_css( 'star.css' );
-	}
-
-
-	/**
 	 * Event handler: Called when ending the admin html head section.
 	 *
 	 * @param array Associative array of parameters
@@ -113,14 +91,12 @@ class star_plugin extends Plugin
 
 	/**
 	 * Render stars template from [[stars:3/7]
-	 *  to <span class="star_plugin" style="width:112px">
-	 *       <span>*</span>
-	 *       <span>*</span>
-	 *       <span>*</span>
-	 *       <span class="empty">-</span>
-	 *       <span class="empty">-</span>
-	 *       <span class="empty">-</span>
-	 *       <span class="empty">-</span>
+	 *  to <span class="evo_stars_img" style="width:112px">
+	 *       <i>*</i>
+	 *       <i>*</i>
+	 *       <i class="evo_stars_img_empty"><i style="width:50%">%</i></i>
+	 *       <i class="evo_stars_img_empty">-</i>
+	 *       <i class="evo_stars_img_empty">-</i>
 	 *     </span>
 	 *
 	 * @param string Source content
@@ -158,36 +134,7 @@ class star_plugin extends Plugin
 			$number_stars = 5;
 		}
 
-		if( empty( $this->force_img_stars ) && isset( $b2evo_icons_type ) && strpos( $b2evo_icons_type, 'fontawesome' ) !== false )
-		{	// Use font-awesome stars if it is allowed for current skin:
-			return get_stars_template( $active_stars, $number_stars );
-		}
-
-		// Use image stars:
-		$active_stars_max = floor( $active_stars );
-		$percents = round( ( $active_stars - $active_stars_max ) * 100 );
-		$template = '<span class="star_plugin"'.( $number_stars != 5 ? ' style="width:'.( $number_stars * 16 ).'px"' : '' ).'>';
-		for( $s = 1; $s <= $number_stars; $s++ )
-		{
-			$attrs = '';
-			if( $s > $active_stars_max )
-			{ // Class for empty stars
-				$attrs .= ' class="empty"';
-			}
-			$template .= '<span'.$attrs.'>';
-			if( $s == $active_stars_max + 1 && $percents > 0 )
-			{ // Star with a percent fill
-				$template .= '<span style="width:'.$percents.'%">%</span>';
-			}
-			else
-			{
-				$template .= $s <= $active_stars_max ? '*' : '-';
-			}
-			$template .= '</span>';
-		}
-		$template .= '</span>';
-
-		return $template;
+		return get_star_rating( $active_stars, $number_stars );
 	}
 }
 
