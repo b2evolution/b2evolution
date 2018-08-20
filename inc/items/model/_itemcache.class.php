@@ -63,7 +63,14 @@ class ItemCache extends DataObjectCache
 	}
 
 
-	function get_by_cat_ID( $cat_ID, $sorted = false )
+	/**
+	 * Get Item by category ID
+	 *
+	 * @param integer Category ID
+	 * @param string Function to order/compare items for case when their category uses alphabetical sorting
+	 * @return object Item
+	 */
+	function get_by_cat_ID( $cat_ID, $order_alpha_func = 'compare_items_by_title' )
 	{
 		$ChapterCache = & get_ChapterCache();
 		$Chapter = $ChapterCache->get_by_ID( $cat_ID );
@@ -75,7 +82,14 @@ class ItemCache extends DataObjectCache
 
 		if( ! ( isset( $this->items_by_cat_map[$cat_ID]['sorted'] ) && $this->items_by_cat_map[$cat_ID]['sorted'] ) )
 		{ // Not sorted yet
-			$compare_method = $Chapter->get_subcat_ordering() == 'alpha' ? 'compare_items_by_title' : 'compare_items_by_order';
+			if( $Chapter->get_subcat_ordering() == 'alpha' )
+			{	// Alphabetical sorting by title or short title:
+				$compare_method =  $order_alpha_func;
+			}
+			else
+			{	// Manual sorting by order field:
+				$compare_method =  'compare_items_by_order';
+			}
 			usort( $this->items_by_cat_map[$cat_ID]['items'], array( 'Item', $compare_method ) );
 			$this->items_by_cat_map[$cat_ID]['sorted'] = true;
 		}

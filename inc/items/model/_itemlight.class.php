@@ -44,6 +44,8 @@ class ItemLight extends DataObject
 	 */
 	var $datemodified;
 
+	var $short_title;
+
 	var $title;
 
 	var $excerpt;
@@ -150,6 +152,7 @@ class ItemLight extends DataObject
 			$this->urltitle = $db_row->post_urltitle;
 			$this->canonical_slug_ID = $db_row->post_canonical_slug_ID;
 			$this->tiny_slug_ID = $db_row->post_tiny_slug_ID;
+			$this->short_title = isset( $db_row->post_short_title ) ? $db_row->post_short_title : '';
 			$this->title = $db_row->post_title;
 			$this->excerpt = $db_row->post_excerpt;
 			$this->ityp_ID = $db_row->post_ityp_ID;
@@ -1290,7 +1293,7 @@ class ItemLight extends DataObject
 				'target_blog'     => '',
 				'nav_target'      => NULL,
 				'post_navigation' => $def_post_navigation,
-				'title_field'     => 'title', // '#' for custom title
+				'title_field'     => 'title', // '#' for custom title. May be several fields separated by comma. Only first not empty field is displayed. E-g: 'short_title,title,#'
 				'custom_title'    => $this->title,
 			), $params );
 
@@ -1303,18 +1306,24 @@ class ItemLight extends DataObject
 			$blogurl = $Blog->gen_blogurl();
 		}
 
-		if( $params['title_field'] == '#' )
+		$title_fields = explode( ',', $params['title_field'] );
+		foreach( $title_fields as $title_field )
 		{
-			$title = format_to_output( $params['custom_title'], $params['format'] );
-		}
-		else
-		{
-			$title = format_to_output( $this->{$params['title_field']}, $params['format'] );
+			if( $title_field == 'short_title' && $this->get_type_setting( 'use_short_title' ) == 'never' )
+			{	// Allow to use short title only if it is enabled by item type:
+				continue;
+			}
+			$title = ( $title_field == '#' ? $params['custom_title'] : $this->$title_field );
+			$title = format_to_output( $title, $params['format'] );
+			if( ! empty( $title ) )
+			{	// Use first not empty field:
+				break;
+			}
 		}
 
 		if( $params['max_length'] != '' )
-		{	// Crop long title
-			$title = strmaxlen( $title, intval($params['max_length']) );
+		{	// Crop long title:
+			$title = strmaxlen( $title, intval( $params['max_length'] ) );
 		}
 
 		if( empty( $title ) )
