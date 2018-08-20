@@ -93,7 +93,7 @@ class Cart
 		{	// Delete item from cart:
 			unset( $this->item_IDs[ $item_ID ] );
 			$cart_is_updated = true;
-			$Messages->add( sprintf( T_('Product "%s" has been deleted from cart.'), $cart_Item->get( 'title' ) ), 'success' );
+			$Messages->add( sprintf( T_('Product "%s" has been removed from the cart.'), $cart_Item->get( 'title' ) ), 'success' );
 		}
 		elseif( $qty > 0 )
 		{	// Add/Update quantity of items in cart:
@@ -101,13 +101,13 @@ class Cart
 			{
 				$this->item_IDs[ $item_ID ] = $qty;
 				$cart_is_updated = true;
-				$Messages->add( sprintf( T_('Product "%s" has been added to cart.'), $cart_Item->get( 'title' ) ), 'success' );
+				$Messages->add( sprintf( T_('Product "%s" has been added to the cart.'), $cart_Item->get( 'title' ) ), 'success' );
 			}
 			elseif( $this->item_IDs[ $item_ID ] != $qty )
 			{
 				$this->item_IDs[ $item_ID ] = $qty;
 				$cart_is_updated = true;
-				$Messages->add( sprintf( T_('Quantity of product "%s" has been updated in cart.'), $cart_Item->get( 'title' ) ), 'success' );
+				$Messages->add( sprintf( T_('Quantity for product "%s" has been changed.'), $cart_Item->get( 'title' ) ), 'success' );
 			}
 		}
 

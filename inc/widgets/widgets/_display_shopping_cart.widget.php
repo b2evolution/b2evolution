@@ -70,7 +70,7 @@ class display_shopping_cart_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display a shopping cart table.');
+		return T_('Display the contents of the shopping cart.');
 	}
 
 
@@ -198,12 +198,25 @@ class display_shopping_cart_Widget extends ComponentWidget
 	{
 		global $Collection, $Blog, $current_User, $Session;
 
-		return array(
+		$cache_keys = array(
 				'wi_ID'       => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID' => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'user_ID'     => ( is_logged_in() ? $current_User->ID : 0 ), // Has the current User changed?
 				'cart'        => $Session->ID, // Has the cart updated for current session?
 			);
+
+		// Get items form the current cart:
+		$Cart = & get_Cart();
+		$cart_items = $Cart->get_items();
+
+		// Add 1 cache key for each item that is in shopping card, in order to detect changes on each one:
+		foreach( $cart_items as $cart_item_ID => $cart_Item )
+		{
+			// 1 is a dummy value, only the key name is really important
+			$cache_keys['item_'.$cart_item_ID] = 1;
+		}
+
+		return $cache_keys;
 	}
 }
 ?>
