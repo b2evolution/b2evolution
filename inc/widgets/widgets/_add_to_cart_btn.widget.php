@@ -22,7 +22,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class cart_button_Widget extends ComponentWidget
+class add_to_cart_btn_Widget extends ComponentWidget
 {
 	var $icon = 'cart-plus';
 
@@ -32,7 +32,7 @@ class cart_button_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'cart_button' );
+		parent::__construct( $db_row, 'core', 'add_to_cart_btn' );
 	}
 
 

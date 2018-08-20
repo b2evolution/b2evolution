@@ -118,7 +118,7 @@ $core_componentwidget_defs = array(
 			'coll_featured_intro',    // Featured/Intro Post
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
-			'cart_table',             // Shopping cart
+			'display_shopping_cart',  // Shopping cart
 		),
 	'infoitem' => array(
 			'item_title',
@@ -136,7 +136,7 @@ $core_componentwidget_defs = array(
 			'item_seen_by',
 			'item_vote',
 			'item_next_previous',
-			'cart_button',
+			'add_to_cart_btn',
 			'item_custom_fields',
 		),
 	'collection' => array(
