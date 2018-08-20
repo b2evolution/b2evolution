@@ -74,6 +74,7 @@ class bootstrap_main_Skin extends Skin
 	public function get_supported_coll_kinds()
 	{
 		$supported_kinds = array(
+				'minisite' => 'maybe',  // Not necessarily a good choice because there is no menu container on the homepage, minisites typically need a menu to switch pages
 				'main' => 'yes',
 				'std' => 'no',		// Blog
 				'photo' => 'no',

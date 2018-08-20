@@ -76,6 +76,7 @@ class bootstrap_blog_Skin extends Skin
 	public function get_supported_coll_kinds()
 	{
 		$supported_kinds = array(
+				'minisite' => 'partial',
 				'main' => 'partial',
 				'std' => 'yes',		// Blog
 				'photo' => 'no',
