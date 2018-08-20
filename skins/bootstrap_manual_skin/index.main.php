@@ -220,6 +220,7 @@ siteskin_include( '_site_body_header.inc.php' );
 							'item_before_opened'   => get_icon( 'collapse' ),
 							'item_before_closed'   => get_icon( 'expand' ),
 							'item_before_post'     => get_icon( 'file_message' ),
+							'item_title_fields'    => 'short_title,title',
 							'expand_all'           => false,
 							'sorted'               => true
 						) );
@@ -256,6 +257,7 @@ siteskin_include( '_site_body_header.inc.php' );
 							'item_before_opened'   => get_icon( 'collapse' ),
 							'item_before_closed'   => get_icon( 'expand' ),
 							'item_before_post'     => get_icon( 'file_message' ),
+							'item_title_fields'    => 'short_title,title',
 							'expand_all'           => false,
 							'sorted'               => true
 						) );

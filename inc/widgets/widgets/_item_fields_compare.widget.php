@@ -257,7 +257,7 @@ class item_fields_compare_Widget extends ComponentWidget
 			{
 				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 				// Permanent post link:
-				echo str_replace( '$item_link$', $widget_Item->get_title(), $this->get_field_template( 'col_header_item' ) );
+				echo str_replace( '$item_link$', $widget_Item->get_title( array( 'title_field' => 'short_title,title' ) ), $this->get_field_template( 'col_header_item' ) );
 			}
 			echo $this->get_field_template( 'row_end' );
 		}
