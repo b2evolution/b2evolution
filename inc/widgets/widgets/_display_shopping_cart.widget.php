@@ -88,6 +88,26 @@ class display_shopping_cart_Widget extends ComponentWidget
 					'note' => T_('Title to display in your skin.'),
 					'size' => 40,
 				),
+				'class_image' => array(
+					'label' => T_('Classes for Image'),
+					'size' => 60,
+					'defaultvalue' => 'col-lg-1 col-md-2 col-sm-2 col-xs-12 center',
+				),
+				'class_product' => array(
+					'label' => T_('Classes for Product'),
+					'size' => 60,
+					'defaultvalue' => 'col-lg-7 col-md-6 col-sm-6 col-xs-12',
+				),
+				'class_quantity' => array(
+					'label' => T_('Classes for Quantity'),
+					'size' => 60,
+					'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 col-xs-12 center',
+				),
+				'class_actions' => array(
+					'label' => T_('Classes for Actions'),
+					'size' => 60,
+					'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 col-xs-12 center',
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -107,12 +127,12 @@ class display_shopping_cart_Widget extends ComponentWidget
 
 		$this->disp_params = array_merge( $this->disp_params, array(
 				'shopping_cart_empty'       => '<p>'.T_('Your shopping cart is empty.').'</p>',
-				'shopping_cart_table_start' => '<table class="evo_shopping_cart table">',
-				'shopping_cart_row_start'   => '<tr>',
-				'shopping_cart_cell_header' => '<th$header_attrs$>$header_title$</th>',
-				'shopping_cart_cell_value'  => '<td$product_attrs$>$product_value$</td>',
-				'shopping_cart_row_end'     => '</tr>',
-				'shopping_cart_table_end'   => '</table>',
+				'shopping_cart_table_start' => '<div class="evo_shopping_cart">',
+				'shopping_cart_row_start'   => '<div class="row">',
+				'shopping_cart_cell_header' => '<div class="$class$"><b>$header$</b></div>',
+				'shopping_cart_cell_value'  => '<div class="$class$">$value$</div>',
+				'shopping_cart_row_end'     => '</div>',
+				'shopping_cart_table_end'   => '</div>',
 			), $params );
 
 		// Get items form the current cart:
@@ -136,21 +156,21 @@ class display_shopping_cart_Widget extends ComponentWidget
 			// Table header columns:
 			echo $this->disp_params['shopping_cart_row_start'];
 			$cols = array(
-				array( T_('Image'), ' class="shrinkwrap"' ),
-				array( T_('Product'), '' ),
-				array( T_('Quantity'), ' class="shrinkwrap"' ),
-				array( T_('Remove'), ' class="shrinkwrap"' ),
+				array( T_('Image'), $this->disp_params['class_image'] ),
+				array( T_('Product'), $this->disp_params['class_product'] ),
+				array( T_('Quantity'), $this->disp_params['class_quantity'] ),
+				array( T_('Remove'), $this->disp_params['class_actions'] ),
 			);
 			foreach( $cols as $col_title => $col_data )
 			{
-				echo str_replace( array( '$header_title$', '$header_attrs$' ), $col_data, $this->disp_params['shopping_cart_cell_header'] );
+				echo str_replace( array( '$header$', '$class$' ), $col_data, $this->disp_params['shopping_cart_cell_header'] );
 			}
 			echo $this->disp_params['shopping_cart_row_end'];
 
 			// Display products:
 			foreach( $cart_items as $cart_item_ID => $cart_Item )
 			{
-				$product_cell_masks = array( '$product_value$', '$product_attrs$' );
+				$product_cell_masks = array( '$value$', '$class$' );
 				echo $this->disp_params['shopping_cart_row_start'];
 
 				// Image:
@@ -158,10 +178,10 @@ class display_shopping_cart_Widget extends ComponentWidget
 						'limit'      => 1,
 						'image_size' => 'crop-top-48x48',
 					) );
-				echo str_replace( $product_cell_masks, array( $first_item_image, '' ), $this->disp_params['shopping_cart_cell_value'] );
+				echo str_replace( $product_cell_masks, array( $first_item_image, $this->disp_params['class_image'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				// Title:
-				echo str_replace( $product_cell_masks, array( $cart_Item->get_title(), '' ), $this->disp_params['shopping_cart_cell_value'] );
+				echo str_replace( $product_cell_masks, array( $cart_Item->get_title(), $this->disp_params['class_product'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				// Quantity:
 				$item_qty = $Cart->get_quantity( $cart_item_ID );
@@ -169,11 +189,11 @@ class display_shopping_cart_Widget extends ComponentWidget
 				$qty_cell = action_icon( '', 'minus', $cart_action_url.( $item_qty - 1 ), NULL, NULL, NULL, array( 'class' => '' ) ).' ';
 				$qty_cell .= $item_qty.' ';
 				$qty_cell .= action_icon( '', 'add', $cart_action_url.( $item_qty + 1 ), NULL, NULL, NULL, array( 'class' => '' ) );
-				echo str_replace( $product_cell_masks, array( $qty_cell, ' class="center"' ), $this->disp_params['shopping_cart_cell_value'] );
+				echo str_replace( $product_cell_masks, array( $qty_cell, $this->disp_params['class_quantity'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				// Quantity:
 				$remove_cell = action_icon( '', 'remove', $Blog->get( 'carturl', array( 'url_suffix' => 'action=remove&amp;item_ID='.$cart_item_ID ) ), NULL, NULL, NULL, array( 'class' => '' ) ).' ';
-				echo str_replace( $product_cell_masks, array( $remove_cell, ' class="center"' ), $this->disp_params['shopping_cart_cell_value'] );
+				echo str_replace( $product_cell_masks, array( $remove_cell, $this->disp_params['class_actions'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				echo $this->disp_params['shopping_cart_row_end'];
 			}
