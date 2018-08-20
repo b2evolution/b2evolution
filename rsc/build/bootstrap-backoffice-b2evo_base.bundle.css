@@ -2345,10 +2345,6 @@ div.podplayer {
 
 /* This file is used to fix the style issues on all bootstrap skins of b2evolution */
 @media (min-width: 768px) {
-  div.radio:last-of-type,
-  div.checkbox:last-of-type {
-    padding-bottom: 7px;
-  }
   .text-left-sm {
     text-align: left;
   }
