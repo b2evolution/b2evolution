@@ -95,6 +95,7 @@ class asevo_Skin extends Skin
 				'help'                   => array( NT_('Help'), 110 ),
 				'register'               => array( NT_('Register'), 120 ),
 				'compare_main_area'      => array( NT_('Compare Main Area'), 130 ),
+				'shopping_cart'          => array( NT_('Shopping Cart'), 140 ),
 			);
 	}
 

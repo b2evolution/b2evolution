@@ -608,6 +608,14 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	}
 
 
+	/* Shopping Cart */
+	if( array_key_exists( 'shopping_cart', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['shopping_cart']['wico_ID'];
+		add_basic_widget( $wico_id, 'display_shopping_cart', 'core', 10 );
+	}
+
+
 	/* Mobile Footer */
 	if( array_key_exists( 'mobile_footer', $blog_containers ) )
 	{

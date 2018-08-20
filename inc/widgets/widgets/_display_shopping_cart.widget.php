@@ -230,6 +230,10 @@ class display_shopping_cart_Widget extends ComponentWidget
 		$cart_items = $Cart->get_items();
 
 		// Add 1 cache key for each item that is in shopping card, in order to detect changes on each one:
+		// NOTE: This key is used to invalidate cache when current User was updated,
+		//       for example, user was in group "VIP client" and then he was moved to "Problem client"
+		//       which cannot see/buy items/products with status "Members", so in such case at the user updating moment
+		//       we should invalidate widget cache in order to hide some items/products for the updated user.
 		foreach( $cart_items as $cart_item_ID => $cart_Item )
 		{
 			// 1 is a dummy value, only the key name is really important

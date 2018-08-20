@@ -67,6 +67,7 @@ class touch_Skin extends Skin
 				'help'                   => array( NT_('Help'), 170 ),
 				'register'               => array( NT_('Register'), 180 ),
 				'compare_main_area'      => array( NT_('Compare Main Area'), 190 ),
+				'shopping_cart'          => array( NT_('Shopping Cart'), 200 ),
 			);
 	}
 
