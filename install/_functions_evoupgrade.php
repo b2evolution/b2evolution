@@ -9364,7 +9364,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$SQL->SELECT( 'blog_ID, cat_ID' );
 		$SQL->FROM( 'T_blogs' );
 		$SQL->FROM_add( 'LEFT JOIN T_categories ON cat_blog_ID = blog_ID AND cat_meta = 0' );
-		$SQL->WHERE( '( SELECT COUNT( wi_coll_ID ) FROM T_widget WHERE wi_coll_ID = blog_ID AND wi_sco_name IN ( "Login Required", "Access Denied" ) AND wi_code = "content_block" ) = 0' );
+		$SQL->WHERE( '( SELECT COUNT( wi_coll_ID ) FROM '.$tableprefix.'widget WHERE wi_coll_ID = blog_ID AND wi_sco_name IN ( "Login Required", "Access Denied" ) AND wi_code = "content_block" ) = 0' );
 		$SQL->ORDER_BY( 'blog_ID, cat_ID DESC' );
 		$collections = $DB->get_assoc( $SQL );
 		if( count( $collections ) > 0 )
@@ -9456,7 +9456,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		if( ! empty( $basic_widgets_insert_sql_rows ) )
 		{	// Insert the widget records by single SQL query:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+			$DB->query( 'INSERT INTO '.$tableprefix.'widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
 								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
 		}
 		/* ---- Install basic widgets for containers "Login Required" and "Access Denied": ---- END */
@@ -9506,7 +9506,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	{	// part of 6.10.1-stable
 		$SQL = new SQL( 'Get widgets "User log in" to upgrade' );
 		$SQL->SELECT( 'wi_ID, wi_coll_ID, wi_sco_name, wi_order, wi_params' );
-		$SQL->FROM( 'T_widget' );
+		$SQL->FROM( $tableprefix.'widget' );
 		$SQL->WHERE( 'wi_code = "user_login"' );
 		$login_widgets = $DB->get_results( $SQL );
 		foreach( $login_widgets as $login_widget )
@@ -9521,14 +9521,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			{	// Make form buttons larger only for login widgets of the container "Login Required":
 				$login_widget_params['login_button_class'] = 'btn btn-success btn-lg';
 				$login_widget_params['register_link_class'] = 'btn btn-primary btn-lg pull-right';
-				$DB->query( 'UPDATE T_widget
+				$DB->query( 'UPDATE '.$tableprefix.'widget
 					  SET wi_params = '.$DB->quote( serialize( $login_widget_params ) ).'
 					WHERE wi_ID = '.$DB->quote( $login_widget->wi_ID ) );
 			}
 			else
 			{	// Add greetings widget after each login widget from any other container:
 				// Firstly we should increase an order of next widgets to avoid error of unique order column:
-				$DB->query( 'UPDATE T_widget
+				$DB->query( 'UPDATE '.$tableprefix.'widget
 					  SET wi_order = wi_order + 1
 					WHERE wi_coll_ID = '.$DB->quote( $login_widget->wi_coll_ID ).'
 					  AND wi_sco_name = '.$DB->quote( $login_widget->wi_sco_name ).'
@@ -9536,7 +9536,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 					ORDER BY wi_order DESC' );
 				// Insert the widget:
 				$login_widget_params['title'] = '';
-				$DB->query( 'INSERT INTO T_widget ( wi_coll_ID, wi_sco_name, wi_order, wi_code, wi_params )
+				$DB->query( 'INSERT INTO '.$tableprefix.'widget ( wi_coll_ID, wi_sco_name, wi_order, wi_code, wi_params )
 					VALUES ( '.$DB->quote( $login_widget->wi_coll_ID ).', '
 					.$DB->quote( $login_widget->wi_sco_name ).', '
 					.$DB->quote( $login_widget->wi_order + 1 ).', '
@@ -9695,7 +9695,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$SQL->SELECT( 'blog_ID, cat_ID' );
 		$SQL->FROM( 'T_blogs' );
 		$SQL->FROM_add( 'LEFT JOIN T_categories ON cat_blog_ID = blog_ID AND cat_meta = 0' );
-		$SQL->WHERE( '( SELECT COUNT( wi_coll_ID ) FROM T_widget WHERE wi_coll_ID = blog_ID AND wi_sco_name IN ( "Help", "Register" ) AND wi_code = "content_block" ) = 0' );
+		$SQL->WHERE( '( SELECT COUNT( wi_coll_ID ) FROM '.$tableprefix.'widget WHERE wi_coll_ID = blog_ID AND wi_sco_name IN ( "Help", "Register" ) AND wi_code = "content_block" ) = 0' );
 		$SQL->ORDER_BY( 'blog_ID, cat_ID DESC' );
 		$collections = $DB->get_assoc( $SQL );
 		if( count( $collections ) > 0 )
@@ -9814,7 +9814,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		if( ! empty( $basic_widgets_insert_sql_rows ) )
 		{	// Insert the widget records by single SQL query:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+			$DB->query( 'INSERT INTO '.$tableprefix.'widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
 								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
 		}
 		/* ---- Install basic widgets for containers "Help" and "Register": ---- END */
@@ -9824,10 +9824,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 12870, 'Renaming registration widgets...' ) )
 	{	// part of 6.10.1-stable
-		$DB->query( 'UPDATE T_widget
+		$DB->query( 'UPDATE '.$tableprefix.'widget
 			  SET wi_code = "user_register_quick"
 			WHERE wi_code = "user_register"' );
-		$DB->query( 'UPDATE T_widget
+		$DB->query( 'UPDATE '.$tableprefix.'widget
 			  SET wi_code = "user_register_standard"
 			WHERE wi_code = "user_normal_register"' );
 		upg_task_end();
@@ -9976,7 +9976,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$SQL->SELECT( 'blog_ID, cat_ID' );
 		$SQL->FROM( 'T_blogs' );
 		$SQL->FROM_add( 'LEFT JOIN T_categories ON cat_blog_ID = blog_ID AND cat_meta = 0' );
-		$SQL->WHERE( '( SELECT COUNT( wi_coll_ID ) FROM T_widget WHERE wi_coll_ID = blog_ID AND wi_sco_name = "Compare Main Area" AND wi_code = "item_fields_compare" ) = 0' );
+		$SQL->WHERE( '( SELECT COUNT( wi_coll_ID ) FROM '.$tableprefix.'widget WHERE wi_coll_ID = blog_ID AND wi_sco_name = "Compare Main Area" AND wi_code = "item_fields_compare" ) = 0' );
 		$SQL->ORDER_BY( 'blog_ID, cat_ID DESC' );
 		$collections = $DB->get_assoc( $SQL );
 		if( count( $collections ) > 0 )
@@ -9992,12 +9992,19 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		if( ! empty( $basic_widgets_insert_sql_rows ) )
 		{	// Insert the widget records by single SQL query:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+			$DB->query( 'INSERT INTO '.$tableprefix.'widget ( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
 								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
 		}
 		/* ---- Install basic widgets for containers "Help" and "Register": ---- END */
 
 		upg_task_end( false );
+	}
+
+	if( upg_task_start( 12950, 'Upgrade items and item types tables to support short title...' ) )
+	{	// part of 6.10.3-stable
+		db_add_col( 'T_items__item', 'post_short_title', 'VARCHAR(50) NULL AFTER post_excerpt_autogenerated' );
+		db_add_col( 'T_items__type', 'ityp_use_short_title', 'ENUM( "optional", "never" ) COLLATE ascii_general_ci DEFAULT "never"' );
+		upg_task_end();
 	}
 
 	if( upg_task_start( 13000, 'Creating sections table...' ) )

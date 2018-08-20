@@ -152,6 +152,21 @@ $Form->begin_form( '', '', $params );
 			array( 'id' => 'itemform_content' ) );
 
 	$Form->switch_layout( 'fields_table' );
+
+	if( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' )
+	{	// Display short title:
+		$Form->begin_fieldset( '', array( 'class' => 'evo_fields_table__single_row' ) );
+		if( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' )
+		{	// Display a post short title field:
+			$Form->text_input( 'post_short_title', $edited_Item->get( 'short_title' ), 50, T_('Short title'), '', array( 'maxlength' => 50 ) );
+		}
+		else
+		{	// Hide a post short title field:
+			$Form->hidden( 'post_short_title', $edited_Item->get( 'short_title' ) );
+		}
+		$Form->end_fieldset();
+	}
+
 	$Form->begin_fieldset( '', array( 'class' => 'evo_fields_table__single_row' ) );
 	if( $edited_Item->get_type_setting( 'use_title' ) != 'never' )
 	{	// Display a post title field:
@@ -447,7 +462,7 @@ $Form->begin_form( '', '', $params );
 		if( $edited_Item->get_type_setting( 'use_meta_keywds' ) != 'never' )
 		{	// Display <meta> keywords:
 			$Form->text_input( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ), 40, T_('&lt;meta&gt; keywds'), '', array(
-					'maxlength' => 255, 
+					'maxlength' => 255,
 					'required'  => ( $edited_Item->get_type_setting( 'use_meta_keywds' ) == 'required' )
 				) );
 		}
@@ -904,7 +919,53 @@ $Form->begin_form( '', '', $params );
 	echo action_icon( '', 'refresh', $quick_setting_url.'reset_quick_settings', T_('Reset defaults for this screen.'), 3, 4 );
 	echo '</p>';
 
+
+	echo '<div id="publish_buttons">';
+	echo_publish_buttons( $Form, $creating, $edited_Item );
+	echo '</div>';
 	?>
+	<script type="text/javascript">
+	jQuery( document ).ready( function()
+	{
+		var affix_obj = jQuery( "#publish_buttons" );
+		var affix_offset = 50;
+
+		if( affix_obj.length == 0 )
+		{ // No Messages, exit
+			return;
+		}
+
+		affix_obj.wrap( "<div class=\"publish_buttons_wrapper\"></div>" );
+		var wrapper = affix_obj.parent();
+
+		affix_obj.affix( {
+				offset: {
+					top: function() {
+						return wrapper.offset().top - affix_offset - parseInt( affix_obj.css( "margin-top" ) );
+					}
+				}
+			} );
+
+		affix_obj.on( "affix.bs.affix", function()
+			{
+				wrapper.css( { "min-height": affix_obj.outerHeight( true ) } );
+
+				affix_obj.css( { "width": affix_obj.outerWidth(), "top": affix_offset, "z-index": 99999 } );
+
+				jQuery( window ).on( "resize", function()
+					{
+						affix_obj.css( { "width": wrapper.css( "width" ) } );
+					});
+			} );
+
+		affix_obj.on( "affixed-top.bs.affix", function()
+			{
+				wrapper.css( { "min-height": "" } );
+				affix_obj.css( { "width": "", "top": "", "z-index": "" } );
+			} );
+	} );
+	</script>
+
 
 </div>
 

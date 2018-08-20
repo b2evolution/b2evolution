@@ -31,6 +31,7 @@ class ItemType extends DataObject
 	var $front_instruction = 0;
 	var $back_instruction = 0;
 	var $instruction = '';
+	var $use_short_title = 'never';
 	var $use_title = 'required';
 	var $use_url = 'optional';
 	var $podcast = 0;
@@ -98,10 +99,11 @@ class ItemType extends DataObject
 			$this->description = $db_row->ityp_description;
 			$this->usage = $db_row->ityp_usage;
 			$this->template_name = $db_row->ityp_template_name;
-			$this->schema = $db_row->ityp_schema;
+			$this->schema = isset( $db_row->ityp_schema ) ? $db_row->ityp_schema : $this->schema;
 			$this->front_instruction = $db_row->ityp_front_instruction;
 			$this->back_instruction = $db_row->ityp_back_instruction;
 			$this->instruction = $db_row->ityp_instruction;
+			$this->use_short_title = isset( $db_row->ityp_use_short_title ) ? $db_row->ityp_use_short_title : $this->use_short_title;
 			$this->use_title = $db_row->ityp_use_title;
 			$this->use_url = $db_row->ityp_use_url;
 			$this->podcast = $db_row->ityp_podcast;
@@ -128,8 +130,8 @@ class ItemType extends DataObject
 			$this->allow_disabling_comments = $db_row->ityp_allow_disabling_comments;
 			$this->use_comment_expiration = $db_row->ityp_use_comment_expiration;
 			$this->perm_level = $db_row->ityp_perm_level;
-			$this->evobar_link_text = $db_row->ityp_evobar_link_text;
-			$this->skin_btn_text = $db_row->ityp_skin_btn_text;
+			$this->evobar_link_text = isset( $db_row->ityp_evobar_link_text ) ? $db_row->ityp_evobar_link_text : $this->evobar_link_text;
+			$this->skin_btn_text = isset( $db_row->ityp_skin_btn_text ) ? $db_row->ityp_skin_btn_text : $this->skin_btn_text;
 		}
 	}
 
@@ -217,6 +219,10 @@ class ItemType extends DataObject
 			param_check_html( 'ityp_instruction', T_('Invalid instruction format.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'posting' );
 			$this->set_from_Request( 'instruction', NULL, true );
 		}
+
+		// Use short title
+		param( 'ityp_use_short_title', 'string' );
+		$this->set_from_Request( 'use_short_title' );
 
 		// Use title
 		param( 'ityp_use_title', 'string' );
