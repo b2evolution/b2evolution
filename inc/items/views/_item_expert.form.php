@@ -143,7 +143,7 @@ $Form->begin_form( '', '', $params );
 	$Form->switch_layout( 'none' );
 
 	// Check if short title field is displayed:
-	$display_short_title_field = $edited_Item->get_type_setting( 'use_short_title' );
+	$display_short_title_field = ( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' );
 	// Check if title field is displayed:
 	$display_title_field = ( $edited_Item->get_type_setting( 'use_title' ) != 'never' );
 	// Check if locale field is displayed:

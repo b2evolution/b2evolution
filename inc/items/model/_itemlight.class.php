@@ -1263,7 +1263,7 @@ class ItemLight extends DataObject
 		$title_fields = explode( ',', $params['title_field'] );
 		foreach( $title_fields as $title_field )
 		{
-			if( $title_field == 'short_title' && ! $this->get_type_setting( 'use_short_title' ) )
+			if( $title_field == 'short_title' && $this->get_type_setting( 'use_short_title' ) == 'never' )
 			{	// Allow to use short title only if it is enabled by item type:
 				continue;
 			}

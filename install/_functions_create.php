@@ -252,7 +252,7 @@ function create_default_data()
 		);
 	$post_types[] = array(
 			'name'           => 'Manual Page',
-			'use_short_title'=> 1,
+			'use_short_title'=> 'optional',
 			'allow_html'     => 0,
 		);
 	$post_types[] = array(
@@ -375,7 +375,7 @@ function create_default_data()
 			'usage'                    => 'post',
 			'template_name'            => 'single',
 			'perm_level'               => 'standard',
-			'use_short_title'          => 0,
+			'use_short_title'          => 'never',
 			'allow_html'               => 1,
 			'allow_breaks'             => 1,
 			'allow_featured'           => 1,

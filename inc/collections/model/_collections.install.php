@@ -294,7 +294,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_front_instruction TINYINT DEFAULT 0,
 			ityp_back_instruction  TINYINT DEFAULT 0,
 			ityp_instruction       TEXT NULL DEFAULT NULL,
-			ityp_use_short_title   TINYINT DEFAULT 0,
+			ityp_use_short_title   ENUM( 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
 			ityp_use_title         ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'required',
 			ityp_use_url           ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
 			ityp_podcast           TINYINT(1) DEFAULT 0,

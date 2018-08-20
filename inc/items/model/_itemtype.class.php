@@ -30,7 +30,7 @@ class ItemType extends DataObject
 	var $front_instruction = 0;
 	var $back_instruction = 0;
 	var $instruction = '';
-	var $use_short_title = 0;
+	var $use_short_title = 'never';
 	var $use_title = 'required';
 	var $use_url = 'optional';
 	var $podcast = 0;
@@ -205,7 +205,7 @@ class ItemType extends DataObject
 		}
 
 		// Use short title
-		param( 'ityp_use_short_title', 'integer', 0 );
+		param( 'ityp_use_short_title', 'string' );
 		$this->set_from_Request( 'use_short_title' );
 
 		// Use title
