@@ -10559,6 +10559,82 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13210 ) )
+	{	// part of 7.0.0-alpha
+
+		/* ---- Install basic widgets for containers "Shopping Cart": ---- START */
+		global $basic_widgets_insert_sql_rows;
+		$basic_widgets_insert_sql_rows = array();
+
+		/**
+		 * Add a widget to global array in order to insert it in DB by single SQL query later
+		 *
+		 * @param integer Container ID
+		 * @param string Type
+		 * @param string Code
+		 * @param integer Order
+		 * @param array|string|NULL Widget params
+		 * @param integer 1 - enabled, 0 - disabled
+		 */
+		function add_basic_widget_13210( $container_ID, $code, $type, $order, $params = NULL, $enabled = 1 )
+		{
+			global $basic_widgets_insert_sql_rows, $DB;
+
+			if( is_null( $params ) )
+			{ // NULL
+				$params = 'NULL';
+			}
+			elseif( is_array( $params ) )
+			{ // array
+				$params = $DB->quote( serialize( $params ) );
+			}
+			else
+			{ // string
+				$params = $DB->quote( $params );
+			}
+
+			$basic_widgets_insert_sql_rows[] = '( '
+				.$container_ID.', '
+				.$order.', '
+				.$enabled.', '
+				.$DB->quote( $type ).', '
+				.$DB->quote( $code ).', '
+				.$params.' )';
+		}
+
+		$SQL = new SQL();
+		$SQL->SELECT( 'blog_ID, wico_ID' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->FROM_add( 'LEFT JOIN T_widget__container ON wico_coll_ID = blog_ID AND wico_code = "shopping_cart"' );
+		$SQL->WHERE( '( SELECT COUNT( wi_ID ) FROM T_widget__widget INNER JOIN T_widget__container ON wi_wico_ID = wico_ID WHERE wico_coll_ID = blog_ID AND wico_code = "shopping_cart" AND wi_code = "display_shopping_cart" ) = 0' );
+		$SQL->ORDER_BY( 'blog_ID DESC' );
+		$collections = $DB->get_assoc( $SQL );
+		if( count( $collections ) > 0 )
+		{	// If at least one collection exists:
+			foreach( $collections as $coll_ID => $wico_ID )
+			{
+				task_begin( 'Installing default "Shopping Cart" widgets for collection #'.$coll_ID.'... ' );
+				if( empty( $wico_ID ) )
+				{	// Create new widgets container for collections which have no it yet:
+					$DB->query( 'INSERT INTO T_widget__container ( wico_code, wico_name, wico_coll_ID, wico_order, wico_main ) '
+						.'VALUES ( "shopping_cart", "Shopping Cart", '.$coll_ID.', 200, 1 )' );
+					$wico_ID = $DB->insert_id;
+				}
+				add_basic_widget_13210( $wico_ID, 'display_shopping_cart', 'core', 10 );
+				task_end();
+			}
+		}
+
+		if( ! empty( $basic_widgets_insert_sql_rows ) )
+		{	// Insert the widget records by single SQL query:
+			$DB->query( 'INSERT INTO T_widget__widget ( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
+		}
+		/* ---- Install basic widgets for containers "Shopping Cart": ---- END */
+
+		upg_task_end( false );
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
