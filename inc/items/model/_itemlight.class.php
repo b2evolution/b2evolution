@@ -1293,8 +1293,10 @@ class ItemLight extends DataObject
 				'target_blog'     => '',
 				'nav_target'      => NULL,
 				'post_navigation' => $def_post_navigation,
-				'title_field'     => 'title', // '#' for custom title. May be several fields separated by comma. Only first not empty field is displayed. E-g: 'short_title,title,#'
-				'custom_title'    => $this->title,
+				'title_field'     => 'title', // Possible values: 'title', 'short_title', 'title_override' for value from param 'title_override' below.
+																			// May be several fields separated by comma. Only first not empty field is displayed,
+																			// e.g. 'short_title,title,title_override' or 'short_title,title_override,title' etc.
+				'title_override'  => $this->title,
 			), $params );
 
 		// Set post navigation target
@@ -1313,7 +1315,7 @@ class ItemLight extends DataObject
 			{	// Allow to use short title only if it is enabled by item type:
 				continue;
 			}
-			$title = ( $title_field == '#' ? $params['custom_title'] : $this->$title_field );
+			$title = ( $title_field == 'title_override' ? $params['title_override'] : $this->$title_field );
 			$title = format_to_output( $title, $params['format'] );
 			if( ! empty( $title ) )
 			{	// Use first not empty field:

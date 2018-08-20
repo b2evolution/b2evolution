@@ -163,7 +163,13 @@ class display_item_Widget extends ComponentWidget
 
 		parent::init_display( $params );
 
+		// Get item by ID or slug:
 		$widget_Item = & $this->get_widget_Item();
+
+		if( ! $widget_Item )
+		{	// No correct Item:
+			return;
+		}
 
 		if( ! in_array( $widget_Item->get( 'status' ), get_inskin_statuses( $Blog->ID, 'post' ) ) )
 		{	// Disable block caching for this widget because target Item is not public for current collection:
@@ -181,14 +187,19 @@ class display_item_Widget extends ComponentWidget
 	{
 		$this->init_display( $params );
 
+		// Get item by ID or slug:
+		$widget_Item = & $this->get_widget_Item();
+
+		if( ! $widget_Item )
+		{	// No correct Item:
+			return;
+		}
+
 		echo $this->disp_params['block_start'];
 
 		$this->disp_title();
 
 		echo $this->disp_params['block_body_start'];
-
-		// Get item by ID or slug:
-		$widget_Item = & $this->get_widget_Item();
 
 		if( ! $widget_Item || ! in_array( $widget_Item->get_type_setting( 'usage' ), array( 'post', 'page' ) ) )
 		{	// Item is not found by ID and slug or it is not a post or page:
@@ -233,8 +244,8 @@ class display_item_Widget extends ComponentWidget
 				);
 			if( $this->disp_params['title_display'] == 'custom_title' )
 			{
-				$title_params['title_field'] = '#';
-				$title_params['custom_title'] = $this->disp_params['custom_title'];
+				$title_params['title_field'] = 'title_override';
+				$title_params['title_override'] = $this->disp_params['custom_title'];
 			}
 
 			$Item->title( $title_params );
