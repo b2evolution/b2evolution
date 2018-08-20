@@ -1000,6 +1000,16 @@ div.filters .filter_item div {
 .msg_wrapper .affix div.alert {
   box-shadow: 1px 10px 35px rgba(75, 75, 75, 0.75);
 }
+div#publish_buttons {
+  border-radius: 3px;
+  padding: 5px;
+  text-align: center;
+}
+.publish_buttons_wrapper div#publish_buttons.affix {
+  background-color: #ffffff;
+  box-shadow: 1px 10px 35px rgba(75, 75, 75, 0.75);
+  z-index: 99999;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.
