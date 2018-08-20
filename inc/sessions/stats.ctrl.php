@@ -520,11 +520,6 @@ if( in_array( $tab , array( 'hits', 'other', 'referers' ) ) ||
 	init_datepicker_js();
 }
 
-if( in_array( $tab, array( 'referers', 'other', 'hits' ) ) || ( $tab == 'refsearches' && $tab3 == 'hits' ) )
-{ // Initialize WHOIS query window
-	echo_whois_js_bootstrap();
-}
-
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
 
@@ -569,6 +564,8 @@ switch( $AdminUI->get_path( 1 ) )
 	case 'referers':
 		// Display hits results table:
 		hits_results_block();
+		// Initialize WHOIS query window
+		echo_whois_js_bootstrap();
 		break;
 
 	case 'refsearches':
@@ -578,6 +575,8 @@ switch( $AdminUI->get_path( 1 ) )
 			case 'hits':
 				// Display hits results table:
 				hits_results_block();
+				// Initialize WHOIS query window
+				echo_whois_js_bootstrap();
 				break;
 
 			case 'keywords':
