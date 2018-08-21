@@ -826,13 +826,14 @@ switch( $action )
 
 					// Display the collections to select which install
 					$collections = array(
-							'home'   => T_('Home'),
-							'a'      => T_('Blog A'),
-							'b'      => T_('Blog B'),
-							'photos' => T_('Photos'),
-							'forums' => T_('Forums'),
-							'manual' => T_('Manual'),
-							'group'  => T_('Tracker'),
+						  'minisite' => T_('Mini-Site'),
+							'home'     => T_('Home'),
+							'a'        => T_('Blog A'),
+							'b'        => T_('Blog B'),
+							'photos'   => T_('Photos'),
+							'forums'   => T_('Forums'),
+							'manual'   => T_('Manual'),
+							'group'    => T_('Tracker'),
 						);
 
 					// Allow all modules to set what collections should be installed
@@ -853,7 +854,7 @@ switch( $action )
 					?>
 					<div class="checkbox" style="margin-left:1em">
 						<label>
-							<input type="checkbox" name="collections[]" id="collection_<?php echo $coll_index; ?>" value="<?php echo $coll_index; ?>" checked="checked" />
+							<input type="checkbox" name="collections[]" id="collection_<?php echo $coll_index; ?>" value="<?php echo $coll_index; ?>" <?php echo $coll_index == 'minisite' ? '' : 'checked="checked"';?> />
 							<?php echo $coll_title; ?>
 						</label>
 					</div>

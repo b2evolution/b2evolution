@@ -106,13 +106,14 @@ if( $kind === NULL && isset( $Blog ) )
 if( isset( $Blog ) )
 {	// Display a filter by collection kind:
 	$Form->select_input_array( 'collection_kind', $kind, array(
-			'' => T_('All'),
-			'main' => T_('Main'),
-			'std' => T_('Blog'),
-			'photo' => T_('Photos'),
-			'forum' => T_('Forums'),
-			'manual' => T_('Manual'),
-			'group' => T_('Tracker')
+			''         => T_('All'),
+			'minisite' => T_('Mini-Site'),
+			'main'     => T_('Main'),
+			'std'      => T_('Blog'),
+			'photo'    => T_('Photos'),
+			'forum'    => T_('Forums'),
+			'manual'   => T_('Manual'),
+			'group'    => T_('Tracker')
 		), T_('Collection kind'), '', array(
 			'force_keys_as_values' => true,
 			'onchange' => 'this.form.submit()'

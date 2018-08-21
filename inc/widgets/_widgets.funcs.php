@@ -401,13 +401,13 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'front_page_main_area', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['front_page_main_area']['wico_ID'];
-		if( $kind == 'main' )
+		if( in_array( $kind, array( 'main', 'minisite' ) ) )
 		{ // Display blog title and tagline for main blogs
 			add_basic_widget( $wico_id, 'coll_title', 'core', 1 );
 			add_basic_widget( $wico_id, 'coll_tagline', 'core', 2 );
 		}
 
-		if( $kind == 'main' )
+		if( in_array( $kind, array( 'main', 'minisite' ) ) )
 		{ // Hide a title of the front intro post
 			$featured_intro_params = array( 'disp_title' => 0 );
 		}
@@ -466,7 +466,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'front_page_column_b', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['front_page_column_b']['wico_ID'];
-		if( $kind != 'main' )
+		if( ! in_array( $kind, array( 'main', 'minisite' ) ) )
 		{	// Don't install the "Recent Commnets" widget for Main collections:
 			add_basic_widget( $wico_id, 'coll_comment_list', 'core', 10 );
 		}
@@ -477,7 +477,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	if( array_key_exists( 'front_page_secondary_area', $blog_containers ) )
 	{
 		$wico_id = $blog_containers['front_page_secondary_area']['wico_ID'];
-		if( $kind == 'main' )
+		if( in_array( $kind, array( 'main', 'minisite' ) ) )
 		{	// Install the "Organization Members" widget only for Main collections:
 			add_basic_widget( $wico_id, 'org_members', 'core', 10 );
 		}

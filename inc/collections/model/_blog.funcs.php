@@ -422,11 +422,17 @@ function get_collection_kinds( $kind = NULL )
 	global $Plugins;
 
 	$kinds = array(
+		'minisite' => array(
+				'name' => T_('Mini-Site'),
+				'class' => 'btn-primary',
+				'desc' => T_('A collection optimized to be used as a minisite with a home page and a few additional pages.'),
+				'note' => T_('Use this to build a simple site that will have only a few pages. If your site grows can always switch this to a "Home / Main" collection later.'),
+			),
 		'main' => array(
 				'name' => T_('Home / Main'),
 				'class' => 'btn-primary',
-				'desc' => T_('A collection optimized to be used as a site homepage and/or for generic functions such as messaging, user profiles, etc.'),
-				'note' => T_('Besides displaying a nice homepage, this can also be used as a central home for cross-collection features such as private messaging, user profile editing, etc.'),
+				'desc' => T_('Use this as a site homepage if you build a large site which uses several other collections as site sections.'),
+				'note' => T_('Besides displaying a global homepage, this collection can also be used to display all cross-collection features such as registration, log in, user profile editing, private messaging, etc.'),
 			),
 		'std' => array(
 				'name' => T_('Blog'), // NOTE: this is a REAL usage of the word 'Blog'. Do NOT change to 'collection'.
@@ -2487,12 +2493,13 @@ function blog_row_type( $coll_type, $coll_ID )
 	global $current_User, $admin_url, $Settings;
 
 	$type_titles = array(
-			'main'   => T_('Main'),
-			'std'    => T_('Blog'),
-			'photo'  => T_('Gallery'),
-			'group'  => T_('Collab'),
-			'forum'  => T_('Forum'),
-			'manual' => T_('Manual'),
+			'minisite' => T_('Mini-Site'),
+			'main'     => T_('Main'),
+			'std'      => T_('Blog'),
+			'photo'    => T_('Gallery'),
+			'group'    => T_('Collab'),
+			'forum'    => T_('Forum'),
+			'manual'   => T_('Manual'),
 		);
 
 	$type_title = isset( $type_titles[ $coll_type ] ) ? $type_titles[ $coll_type ] : $coll_type;

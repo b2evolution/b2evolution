@@ -589,6 +589,9 @@ function install_basic_skins( $install_mobile_skins = true )
 	// Note: Skin #5 will we used by Manual
 	skin_install( 'bootstrap_manual_skin' );
 
+	// Note: Skin #6 will be used by Mini-Site
+	skin_install( 'jared_skin' );
+
 	// skin_install( 'asevo' );
 	// skin_install( 'dating_mood' );
 	// skin_install( 'evopress' );

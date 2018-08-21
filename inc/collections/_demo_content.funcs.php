@@ -913,6 +913,38 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 	switch( $collection_type )
 	{
 		// =======================================================================================================
+		case 'minisite':
+			$blog_shortname = T_('Mini-Site');
+			$blog_more_longdesc = '<br />
+<br />
+<strong>'.T_('The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.').'</strong>';
+
+			$blog_minisite_ID = create_blog(
+					T_('Mini-Site Title'),
+					$blog_shortname,
+					'minisite',
+					T_('Change this as you like'),
+					sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
+					6, // Skin ID
+					'minisite',
+					'any',
+					1,
+					'default',
+					true,
+					'never',
+					$owner_ID,
+					'public',
+					$section_ID );
+
+			if( ! $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = '.$DB->quote( 'info_blog_ID' ) ) && ! empty( $blog_minisite_ID ) )
+			{ // Save ID of this blog in settings table, It is used on top menu, file "/skins_site/_site_body_header.inc.php"
+				$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
+						VALUES ( '.$DB->quote( 'info_blog_ID' ).', '.$DB->quote( $blog_minisite_ID ).' )' );
+			}
+			$blog_ID = $blog_minisite_ID;
+			break;
+
+		// =======================================================================================================
 		case 'main':
 			$blog_shortname = T_('Home');
 			$blog_more_longdesc = '<br />
@@ -936,7 +968,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					'public',
 					$section_ID );
 
-			if( ! empty( $blog_home_ID ) )
+			if( ! $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = '.$DB->quote( 'info_blog_ID' ) ) && ! empty( $blog_home_ID ) )
 			{ // Save ID of this blog in settings table, It is used on top menu, file "/skins_site/_site_body_header.inc.php"
 				$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
 						VALUES ( '.$DB->quote( 'info_blog_ID' ).', '.$DB->quote( $blog_home_ID ).' )' );
@@ -1128,6 +1160,57 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 	switch( $collection_type )
 	{
+		// =======================================================================================================
+		case 'minisite':
+			$post_count = 3;
+			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
+
+			// Sample categories:
+			$cat_minisite_b2evo = cat_create( 'b2evolution', 'NULL', $blog_ID, NULL, true );
+			$cat_minisite_contrib = cat_create( T_('Contributors'), 'NULL', $blog_ID, NULL, true );
+
+			if( $edited_Blog = $BlogCache->get_by_ID( $blog_ID, false, false ) )
+			{
+				$edited_Blog->set_setting( 'default_cat_ID', $cat_minisite_b2evo );
+				$edited_Blog->dbupdate();
+			}
+
+			// Sample content:
+			if( is_available_item_type( $blog_ID, 'Intro-Front' ) )
+			{
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'intro' );
+				$edited_Item->insert( $owner_ID, T_('Homepage post'), T_('<p>This is the Home page of this site.</p>
+
+<p>More specifically it is the "Front page" of the first collection of this site. This first collection is called "Mini-Site". Other sample collections have been created. You can access them by clicking "Blog A", "Blog B", "Photos", etc. in the menu bar at the top of this page.</p>
+
+<p>You can add collections at will. You can also remove them (including this "Mini-Site" collection) if you don\'t need one.</p>'),
+						$now, $cat_minisite_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 'Intro-Front' );
+			}
+
+			if( is_available_item_type( $blog_ID, 'Standalone Page' ) )
+			{
+				// Insert a PAGE:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->insert( $owner_ID, T_('About Minisite'), sprintf( get_filler_text( 'info_page' ), T_('Mini-Site') ), $now, $cat_minisite_b2evo,
+						array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				// Insert a PAGE:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->insert( $owner_ID, T_('More info'), T_('This is a standalone page.'), $now, $cat_minisite_b2evo,
+						array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+			}
+			break;
+
 		// =======================================================================================================
 		case 'main':
 			$post_count = 17;

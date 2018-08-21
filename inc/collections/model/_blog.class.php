@@ -339,7 +339,7 @@ class Blog extends DataObject
 	/**
 	 * Initialize blog setting by kind
 	 *
-	 * @param string Kind: 'main', 'std', 'photo', 'group', 'forum', 'manual'
+	 * @param string Kind: 'minisite', 'main', 'std', 'photo', 'group', 'forum', 'manual'
 	 * @param string Name
 	 * @param string Short name
 	 * @param string Url/slug
@@ -348,6 +348,14 @@ class Blog extends DataObject
 	{
 		switch( $kind )
 		{
+			case 'minisite':
+				$this->set( 'type', 'minisite' );
+				$this->set( 'name', empty( $name ) ? T_('Minisite Title') : $name );
+				$this->set( 'shortname', empty( $shortname ) ? T_('Mini-Site') : $shortname );
+				$this->set( 'urlname', empty( $urlname ) ? 'minisite' : $urlname );
+				$this->set_setting( 'front_disp', 'front' );
+				break;
+
 			case 'main':
 				$this->set( 'type', 'main' );
 				$this->set( 'name', empty( $name ) ? T_('Homepage Title') : $name );
