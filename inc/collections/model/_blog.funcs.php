@@ -426,13 +426,15 @@ function get_collection_kinds( $kind = NULL )
 				'name' => T_('Mini-Site'),
 				'class' => 'btn-primary',
 				'desc' => T_('Use this to build a <b>small site</b> consisting of a home page and only a few additional pages.'),
-				'note' => T_('If your site grows, you can always switch this to a "Home / Main" collection later.'),
+				'note' => T_('Use this if you want to start with a relatively simple "page builder".')
+								.'<br />'.T_('If your site grows, you can always switch this to a "Home / Main" collection later.'),
 			),
 		'main' => array(
 				'name' => T_('Home / Main'),
 				'class' => 'btn-primary',
 				'desc' => T_('Use this as a site homepage to build a <b>large site</b> consisting of a home page <b>plus</b> several sections (where each section is a separate collection).'),
-				'note' => T_('Besides displaying a global homepage, this collection can also be used to display all cross-collection features such as registration, login, user profiles, private messaging, etc.'),
+				'note' => T_('Use this to display a global/aggregated homepage for the various collections/sections of your site.')
+								.'<br />'.T_('This collection can also be used to display all the cross-collection site features such as registration, login, user profiles, private messaging, etc.'),
 			),
 		'std' => array(
 				'name' => T_('Blog'), // NOTE: this is a REAL usage of the word 'Blog'. Do NOT change to 'collection'.
