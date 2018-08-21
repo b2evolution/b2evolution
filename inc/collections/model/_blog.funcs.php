@@ -425,40 +425,49 @@ function get_collection_kinds( $kind = NULL )
 		'minisite' => array(
 				'name' => T_('Mini-Site'),
 				'class' => 'btn-primary',
-				'desc' => T_('A collection optimized to be used as a minisite with a home page and a few additional pages.'),
-				'note' => T_('Use this to build a simple site that will have only a few pages. If your site grows can always switch this to a "Home / Main" collection later.'),
+				'desc' => T_('Use this to build a <b>small site</b> consisting of a home page and only a few additional pages.'),
+				'note' => T_('If your site grows, you can always switch this to a "Home / Main" collection later.'),
 			),
 		'main' => array(
 				'name' => T_('Home / Main'),
 				'class' => 'btn-primary',
-				'desc' => T_('Use this as a site homepage if you build a large site which uses several other collections as site sections.'),
-				'note' => T_('Besides displaying a global homepage, this collection can also be used to display all cross-collection features such as registration, log in, user profile editing, private messaging, etc.'),
+				'desc' => T_('Use this as a site homepage to build a <b>large site</b> consisting of a home page <b>plus</b> several sections (where each section is a separate collection).'),
+				'note' => T_('Besides displaying a global homepage, this collection can also be used to display all cross-collection features such as registration, login, user profiles, private messaging, etc.'),
 			),
 		'std' => array(
 				'name' => T_('Blog'), // NOTE: this is a REAL usage of the word 'Blog'. Do NOT change to 'collection'.
 				'class' => 'btn-info',
-				'desc' => T_('A collection optimized to be used as a standard blog (with the most common features).'),
-				'note' => T_('Many users start with a blog and add other features later.'),
-			),
-		'photo' => array(
-				'name' => T_('Gallery'),
-				'desc' => T_('A collection optimized for publishing photo albums.'),
-				'note' => T_('Use this if you want to publish images without much text.'),
-			),
-		'forum' => array(
-				'name' => T_('Forum'),
-				'desc' => T_('A collection optimized to be used as a forum. (This should be used with a forums skin)'),
-				'note' => T_('Use this if you want a place for your user community to interact.'),
+				'desc' => T_('A collection of Posts, optimized to present <b>articles or news</b>, sorted primarily by date.'),
+				'note' => T_('Use this is you are going to publish fresh content on a regular basis.')
+								.'<br />'.T_('Can be used as a section of a larger site.'),
 			),
 		'manual' => array(
 				'name' => T_('Manual'),
-				'desc' => T_('A collection optimized to be used as an online manual, book or guide. (This should be used with a manual skin)'),
-				'note' => T_('Use this if you want to publish organized information with chapters, sub-chapters, etc.'),
+				'class' => 'btn-info',
+				'desc' => T_('A collection of Pages, optimized to present <b>reference material</b> organized into chapters, sub-chapters, etc.'),
+				'note' => T_('Use this if you want to publish an online manual, a reference section, a book or a guide.')
+								.'<br />'.T_('Can be used as a section of a larger site.').' '.T_('Should be used with a "manual" skin.'),
+			),
+		'photo' => array(
+				'name' => T_('Gallery'),
+				'class' => 'btn-info',
+				'desc' => T_('A collection of Albums, optimized to present <b>photos</b> grouped into small <b>albums</b>.'),
+				'note' => T_('Use this if you want to publish several images at a time, without much text.')
+								.'<br />'.T_('Can be used as a section of a larger site.').' '.T_('This should be used with a "gallery" skin.'),
+			),
+		'forum' => array(
+				'name' => T_('Forum'),
+				'class' => 'btn-info',
+				'desc' => T_('A collection of Topics (and replies), optimized to be used as an <b>interactive discussion forum</b>.'),
+				'note' => T_('Users will be able to post new topics and replies from the front-office.')
+								.'<br />'.T_('Can be used as a section of a larger site.').' '.T_('This should be used with a "forums" skin.'),
 			),
 		'group' => array(
 				'name' => T_('Tracker'),
-				'desc' => T_('A collection optimized for issue tracking or collaborative editing. Look for the workflow properties on the post editing form.'),
-				'note' => T_('Use this if several users need to collaborate on resolving issues or publishing articles...'),
+				'class' => 'btn-info',
+				'desc' => T_('A collection of Issues, optimized for <b>issue tracking</b> or <b>collaborative editing</b> between multiple users.'),
+				'note' => T_('Look for the workflow properties on the post editing form.')
+								.'<br />'.T_('Can be used as a section of a larger site.').' '.T_('Should be used with a "tracker" skin. May also be used only in back-office.'),
 			),
 		);
 
