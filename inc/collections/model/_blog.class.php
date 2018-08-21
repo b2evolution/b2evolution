@@ -4616,9 +4616,8 @@ class Blog extends DataObject
 	 *
 	 * @param boolean TRUE to display result messages
 	 * @param string Skin type: 'all', 'normal', 'mobile', 'tablet'
-	 * @param boolean Delete widget containers from DB if they are declared in Skin to be deleted
 	 */
-	function db_save_main_containers( $verbose = false, $skin_type = 'all', $delete_null_containers = false )
+	function db_save_main_containers( $verbose = false, $skin_type = 'all' )
 	{
 		global $DB, $Messages;
 
@@ -4639,10 +4638,12 @@ class Blog extends DataObject
 
 		// Get currently saved collection containers from DB:
 		$SQL = new SQL( 'Get widget containers for collection #'.$this->ID.' for skin types: "'.implode( '", "', $skin_types ).'"' );
-		$SQL->SELECT( 'wico_skin_type, wico_code, wico_ID, wico_name, wico_order' );
+		$SQL->SELECT( 'wico_skin_type, wico_code, wico_ID, wico_name, wico_order, COUNT( wi_ID ) AS widgets_count' );
 		$SQL->FROM( 'T_widget__container' );
+		$SQL->FROM_add( 'LEFT JOIN T_widget__widget ON wi_wico_ID = wico_ID' );
 		$SQL->WHERE( 'wico_coll_ID = '.$this->ID );
 		$SQL->WHERE_and( 'wico_skin_type IN ( '.$DB->quote( $skin_types ).' )' );
+		$SQL->GROUP_BY( 'wico_ID' );
 		$coll_containers = $DB->get_results( $SQL );
 		// Group containers with skin type:
 		$coll_containers_skin_types = array();
@@ -4652,6 +4653,7 @@ class Blog extends DataObject
 					'ID'    => $coll_container->wico_ID,
 					'name'  => $coll_container->wico_name,
 					'order' => $coll_container->wico_order,
+					'count' => $coll_container->widgets_count,
 				);
 		}
 
@@ -4702,16 +4704,15 @@ class Blog extends DataObject
 				}
 			}
 
-			if( $delete_null_containers )
-			{	// Delete default containers if they are not declared in the Skin:
-				$delete_widget_containers = array();
-				foreach( $skin_default_containers as $wico_code => $wico_data )
-				{
-					if( ! isset( $skin_containers[ $wico_code ] ) &&
-							isset( $coll_containers_skin_types[ $skin_type ][ $wico_code ] ) )
-					{	// Delete default container if it exists in DB but not declared in the Skin (or cannot be found in fallback files of old skins):
-						$delete_widget_containers[] = $coll_containers_skin_types[ $skin_type ][ $wico_code ]['ID'];
-					}
+			// Delete empty default containers if they are not declared in the Skin:
+			$delete_widget_containers = array();
+			foreach( $skin_default_containers as $wico_code => $wico_data )
+			{
+				if( ! isset( $skin_containers[ $wico_code ] ) &&
+				    isset( $coll_containers_skin_types[ $skin_type ][ $wico_code ] ) &&
+				    $coll_containers_skin_types[ $skin_type ][ $wico_code ]['count'] == 0 )
+				{	// Delete ONLY EMPTY default container if it exists in DB but not declared in the Skin (or cannot be found in fallback files of old skins):
+					$delete_widget_containers[] = $coll_containers_skin_types[ $skin_type ][ $wico_code ]['ID'];
 				}
 			}
 
@@ -4735,15 +4736,11 @@ class Blog extends DataObject
 					'Insert new widget containers for collection #'.$this->ID );
 			}
 
-			if( $delete_null_containers && ! empty( $delete_widget_containers ) )
-			{	// Delete containers and their widgets which are not used by Skin:
+			if( ! empty( $delete_widget_containers ) )
+			{	// Delete containers which are not used by Skin:
 				$deleted_containers_num += $DB->query( 'DELETE FROM T_widget__container
 					WHERE wico_ID IN ( '.$DB->quote( $delete_widget_containers ).' )',
-					'Delete unused widget containers from collection #'.$this->ID );
-				// Delete widgets of the deleted containers:
-				$DB->query( 'DELETE FROM T_widget__widget
-					WHERE wi_wico_ID IN ( '.$DB->quote( $delete_widget_containers ).' )',
-					'Delete unused widgets from collection #'.$this->ID );
+					'Delete unwanted empty widget containers from collection #'.$this->ID );
 			}
 		}
 
