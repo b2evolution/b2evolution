@@ -4616,10 +4616,13 @@ class Blog extends DataObject
 	 *
 	 * @param boolean TRUE to display result messages
 	 * @param string Skin type: 'all', 'normal', 'mobile', 'tablet'
+	 * @param boolean Delete widget containers from DB if they are declared in Skin to be deleted
 	 */
-	function db_save_main_containers( $verbose = false, $skin_type = 'all' )
+	function db_save_main_containers( $verbose = false, $skin_type = 'all', $delete_null_containers = false )
 	{
 		global $DB, $Messages;
+
+		$DB->begin();
 
 		if( $skin_type == 'all' )
 		{	// Use all skin types:
@@ -4636,7 +4639,7 @@ class Blog extends DataObject
 
 		// Get currently saved collection containers from DB:
 		$SQL = new SQL( 'Get widget containers for collection #'.$this->ID.' for skin types: "'.implode( '", "', $skin_types ).'"' );
-		$SQL->SELECT( 'wico_skin_type, wico_code' );
+		$SQL->SELECT( 'wico_skin_type, wico_code, wico_ID, wico_name, wico_order' );
 		$SQL->FROM( 'T_widget__container' );
 		$SQL->WHERE( 'wico_coll_ID = '.$this->ID );
 		$SQL->WHERE_and( 'wico_skin_type IN ( '.$DB->quote( $skin_types ).' )' );
@@ -4645,11 +4648,17 @@ class Blog extends DataObject
 		$coll_containers_skin_types = array();
 		foreach( $coll_containers as $coll_container )
 		{
-			$coll_containers_skin_types[ $coll_container->wico_skin_type ][] = $coll_container->wico_code;
+			$coll_containers_skin_types[ $coll_container->wico_skin_type ][ $coll_container->wico_code ] = array(
+					'ID'    => $coll_container->wico_ID,
+					'name'  => $coll_container->wico_name,
+					'order' => $coll_container->wico_order,
+				);
 		}
 
 		$SkinCache = & get_SkinCache();
-		$newly_created = 0;
+		$created_containers_num = 0;
+		$updated_containers_num = 0;
+		$deleted_containers_num = 0;
 
 		foreach( $skin_types as $skin_type )
 		{
@@ -4658,17 +4667,51 @@ class Blog extends DataObject
 				continue;
 			}
 
+			// Get default widget containers which are recommended for all skins:
+			$skin_default_containers = get_skin_default_containers();
+
 			// Get skin containers either from declared function or from scaned skin files:
 			$skin_containers = $coll_Skin->get_containers();
 
-			// Check all main containers and create insert rows for those which are not saved yet:
-			$widget_containers_sql_rows = array();
+			// Check all main containers and create insert rows for those which are not saved yet,
+			$update_widget_containers_sql_rows = array();
 			foreach( $skin_containers as $wico_code => $wico_data )
 			{
-				if( ! isset( $coll_containers_skin_types[ $skin_type ] ) ||
-				    ! in_array( $wico_code, $coll_containers_skin_types[ $skin_type ] ) )
+				if( ! isset( $coll_containers_skin_types[ $skin_type ][ $wico_code ] ) )
 				{	// Create only those containers which are not saved yet:
-					$widget_containers_sql_rows[] = '( '.$DB->quote( $wico_code ).', '.$DB->quote( $skin_type ).', '.$DB->quote( $wico_data[0] ).', '.$this->ID.', '.$DB->quote( $wico_data[1] ).', 1 )';
+					$update_widget_containers_sql_rows[] = '( '.$DB->quote( $wico_code ).', '.$DB->quote( $skin_type ).', '.$DB->quote( $wico_data[0] ).', '.$this->ID.', '.$DB->quote( $wico_data[1] ).', 1 )';
+				}
+				else
+				{	// Check if we should update some container data:
+					$update_widget_container_sql_data = array();
+					if( $coll_containers_skin_types[ $skin_type ][ $wico_code ]['name'] != $wico_data[0] )
+					{	// Update if name is different:
+						$update_widget_container_sql_data[] = 'wico_name = '.$DB->quote( $wico_data[0] );
+					}
+					if( $coll_containers_skin_types[ $skin_type ][ $wico_code ]['order'] != $wico_data[1] )
+					{	// Update if order is different:
+						$update_widget_container_sql_data[] = 'wico_order = '.$DB->quote( $wico_data[1] );
+					}
+					if( ! empty( $update_widget_container_sql_data ) )
+					{	// Update different data of the container:
+						$updated_containers_num += $DB->query( 'UPDATE T_widget__container
+							  SET '.implode( ', ', $update_widget_container_sql_data ).'
+							WHERE wico_ID = '.$coll_containers_skin_types[ $skin_type ][ $wico_code ]['ID'],
+							'Update widget #'.$coll_containers_skin_types[ $skin_type ][ $wico_code ]['ID'].' "'.$wico_code.'" of collection #'.$this->ID.' for skin type "'.$skin_type.'"' );
+					}
+				}
+			}
+
+			if( $delete_null_containers )
+			{	// Delete default containers if they are not declared in the Skin:
+				$delete_widget_containers = array();
+				foreach( $skin_default_containers as $wico_code => $wico_data )
+				{
+					if( ! isset( $skin_containers[ $wico_code ] ) &&
+							isset( $coll_containers_skin_types[ $skin_type ][ $wico_code ] ) )
+					{	// Delete default container if it exists in DB but not declared in the Skin (or cannot be found in fallback files of old skins):
+						$delete_widget_containers[] = $coll_containers_skin_types[ $skin_type ][ $wico_code ]['ID'];
+					}
 				}
 			}
 
@@ -4680,28 +4723,51 @@ class Blog extends DataObject
 				}
 				else
 				{	// If skin scans widget containers from skin and fallback files:
+					$Messages->add( sprintf( T_('WARNING: This is an old skin which provides no container declarations (%s). Falling back to scanning all skin files.'), '<code>function get_declared_containers()</code>' ), 'warning' );
 					$Messages->add( sprintf( T_('%d containers found by scanning templates of skin "%s" (including fall-back templates).'), count( $skin_containers ), $coll_Skin->get_name() ), 'note' );
 				}
 			}
 
-			if( ! empty( $widget_containers_sql_rows ) )
+			if( ! empty( $update_widget_containers_sql_rows ) )
 			{ // Insert all containers defined by the blog skins into the database
-				$newly_created += $DB->query( 'REPLACE INTO T_widget__container( wico_code, wico_skin_type, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES'
-						.implode( ', ', $widget_containers_sql_rows ) );
+				$created_containers_num += $DB->query( 'REPLACE INTO T_widget__container( wico_code, wico_skin_type, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES'
+						.implode( ', ', $update_widget_containers_sql_rows ),
+					'Insert new widget containers for collection #'.$this->ID );
+			}
+
+			if( $delete_null_containers && ! empty( $delete_widget_containers ) )
+			{	// Delete containers and their widgets which are not used by Skin:
+				$deleted_containers_num += $DB->query( 'DELETE FROM T_widget__container
+					WHERE wico_ID IN ( '.$DB->quote( $delete_widget_containers ).' )',
+					'Delete unused widget containers from collection #'.$this->ID );
+				// Delete widgets of the deleted containers:
+				$DB->query( 'DELETE FROM T_widget__widget
+					WHERE wi_wico_ID IN ( '.$DB->quote( $delete_widget_containers ).' )',
+					'Delete unused widgets from collection #'.$this->ID );
 			}
 		}
 
 		if( $verbose )
 		{
-			if( $newly_created > 0 )
+			if( $created_containers_num > 0 )
 			{
-				$Messages->add( sprintf( T_('%d new container(s) were created.'), $newly_created ), 'success' );
+				$Messages->add( sprintf( T_('%d new container(s) were created.'), $created_containers_num ), 'success' );
 			}
 			else
 			{
 				$Messages->add( T_('All containers were already created.'), 'success' );
 			}
+			if( $updated_containers_num > 0 )
+			{
+				$Messages->add( sprintf( T_('%d container(s) were updated.'), $updated_containers_num ), 'success' );
+			}
+			if( $deleted_containers_num > 0 )
+			{
+				$Messages->add( sprintf( T_('%d container(s) were deleted.'), $deleted_containers_num ), 'success' );
+			}
 		}
+
+		$DB->commit();
 	}
 
 

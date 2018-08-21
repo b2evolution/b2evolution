@@ -104,36 +104,21 @@ class bootstrap_forums_Skin extends Skin
 	 * This should NOT be protected. It should be used INSTEAD of file parsing.
 	 * File parsing should only be used if this function is not defined (which will be the case for older v6- skins)
 	 *
-	 * @todo maybe define a default implementation that returns NULL
-	 *
-	 * @return array
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
 	 */
 	function get_declared_containers()
 	{
-		// Note: second param below is the ORDER
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it will be deleted together with its widgets from DB on changing of collection skin or on reload container definitions.
 		return array(
-				'page_top'                   => array( NT_('Page Top'), 2 ),
-				'header'                     => array( NT_('Header'), 10 ),
-				'menu'                       => array( NT_('Menu'), 15 ),
-				'front_page_main_area'       => array( NT_('Front Page Main Area'), 40 ),
-				'front_page_secondary_area'  => array( NT_('Front Page Secondary Area'), 45 ),
+				'front_page_main_area'       => NULL,
+				'front_page_secondary_area'  => NULL,
 				'forum_front_secondary_area' => array( NT_('Forum Front Secondary Area'), 47 ),
-				'item_single_header'         => array( NT_('Item Single Header'), 50 ),
-				'item_single'                => array( NT_('Item Single'), 51 ),
-				'item_page'                  => array( NT_('Item Page'), 55 ),
-				'contact_page_main_area'     => array( NT_('Contact Page Main Area'), 60 ),
-				'sidebar'                    => array( NT_('Sidebar'), 80 ),
-				'sidebar_2'                  => array( NT_('Sidebar 2'), 90 ),
+				'item_list'                  => NULL,
+				'item_in_list'               => NULL,
 				'sidebar_single'             => array( NT_('Sidebar Single'), 95 ),
-				'footer'                     => array( NT_('Footer'), 100 ),
-				'user_profile_left'          => array( NT_('User Profile - Left'), 110 ),
-				'user_profile_right'         => array( NT_('User Profile - Right'), 120 ),
-				'404_page'                   => array( NT_('404 Page'), 130 ),
-				'login_required'             => array( NT_('Login Required'), 140 ),
-				'access_denied'              => array( NT_('Access Denied'), 150 ),
-				'help'                       => array( NT_('Help'), 160 ),
-				'register'                   => array( NT_('Register'), 170 ),
-				'compare_main_area'          => array( NT_('Compare Main Area'), 180 ),
 			);
 	}
 

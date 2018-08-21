@@ -595,16 +595,17 @@ class Skin extends DataObject
 
 			$skin_containers = array();
 			if( method_exists( $this, 'get_declared_containers' ) )
-			{	// Get containers what declared by this skin:
-				$skin_containers = $this->get_declared_containers();
-			}
-			else
-			{	// Get containers from skin files:
-				$this->discover_containers( false );
-			}
+			{	// Get default containers and containers what declared by this skin:
+				$skin_containers = array_merge( get_skin_default_containers(), $this->get_declared_containers() );
 
-			if( ! empty( $skin_containers ) )
-			{
+				foreach( $skin_containers as $wico_code => $wico_data )
+				{
+					if( $wico_data === NULL )
+					{	// Exclude containers which are not used in the current Skin:
+						unset( $skin_containers[ $wico_code ] );
+					}
+				}
+
 				// Create ordered array with unique items from the skin containers:
 				$ordered_containers = array();
 				foreach( $skin_containers as $container_code => $container_data )
@@ -619,6 +620,10 @@ class Skin extends DataObject
 				{
 					$this->container_list[ $container_code ] = $skin_containers[ $container_code ];
 				}
+			}
+			else
+			{	// Get containers from skin files:
+				$this->discover_containers( false );
 			}
 		}
 

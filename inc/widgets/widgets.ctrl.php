@@ -641,11 +641,12 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
- 		// Check permission:
+		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		// Save to DB, and display correpsonding messages
-		$Blog->db_save_main_containers( true, $skin_type );
+		// Save to DB, and display correpsonding messages:
+		// NOTE: 3rd param TRUE means to delete widget containers(together with their widgets) which are declared to be deleted:
+		$Blog->db_save_main_containers( true, $skin_type, true );
 
 		header_redirect( '?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$skin_type, 303 );
 		break;

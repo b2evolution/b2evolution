@@ -2693,6 +2693,40 @@ function get_skin_containers( $skin_ids )
 
 
 /**
+ * Get default skin/widget containers
+ * They may be overridden by each Skin class in the function get_declared_containers()
+ *
+ * @return array Array of default containers: Key is widget container code, Value is array( 0 - container name, 1 - container order )
+ */
+function get_skin_default_containers()
+{
+	return array(
+			'page_top'                  => array( NT_('Page Top'), 2 ),
+			'header'                    => array( NT_('Header'), 10 ),
+			'menu'                      => array( NT_('Menu'), 15 ),
+			'front_page_main_area'      => array( NT_('Front Page Main Area'), 40 ),
+			'front_page_secondary_area' => array( NT_('Front Page Secondary Area'), 45 ),
+			'item_list'                 => array( NT_('Item List'), 48 ),
+			'item_in_list'              => array( NT_('Item in List'), 49 ),
+			'item_single_header'        => array( NT_('Item Single Header'), 50 ),
+			'item_single'               => array( NT_('Item Single'), 51 ),
+			'item_page'                 => array( NT_('Item Page'), 55 ),
+			'contact_page_main_area'    => array( NT_('Contact Page Main Area'), 60 ),
+			'sidebar'                   => array( NT_('Sidebar'), 80 ),
+			'sidebar_2'                 => array( NT_('Sidebar 2'), 90 ),
+			'footer'                    => array( NT_('Footer'), 100 ),
+			'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
+			'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
+			'404_page'                  => array( NT_('404 Page'), 130 ),
+			'login_required'            => array( NT_('Login Required'), 140 ),
+			'access_denied'             => array( NT_('Access Denied'), 150 ),
+			'help'                      => array( NT_('Help'), 160 ),
+			'register'                  => array( NT_('Register'), 170 ),
+			'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
+		);
+}
+
+/**
  * Install a skin
  *
  * @todo do not install if skin doesn't exist. Important for upgrade. Need to NOT fail if ZERO skins installed though :/
