@@ -999,7 +999,7 @@ div.filters .filter_item div {
   box-shadow: 1px 10px 35px rgba(75, 75, 75, 0.75);
 }
 div#publish_buttons {
-  border-radius: 3px;
+  border-radius: 4px;
   padding: 5px;
   text-align: center;
 }

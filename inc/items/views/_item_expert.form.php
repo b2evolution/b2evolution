@@ -928,7 +928,7 @@ $Form->begin_form( '', '', $params );
 	jQuery( document ).ready( function()
 	{
 		var affix_obj = jQuery( "#publish_buttons" );
-		var affix_offset = 50;
+		var affix_offset = 110;
 
 		if( affix_obj.length == 0 )
 		{ // No Messages, exit
