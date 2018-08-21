@@ -645,8 +645,7 @@ switch( $action )
 		$current_User->check_perm( 'options', 'edit', true );
 
 		// Save to DB, and display correpsonding messages:
-		// NOTE: 3rd param TRUE means to delete widget containers(together with their widgets) which are declared to be deleted:
-		$Blog->db_save_main_containers( true, $skin_type, true );
+		$Blog->db_save_main_containers( true, $skin_type );
 
 		header_redirect( '?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$skin_type, 303 );
 		break;

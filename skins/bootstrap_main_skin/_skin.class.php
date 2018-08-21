@@ -112,7 +112,7 @@ class bootstrap_main_Skin extends Skin
 		// Array to override default containers from function get_skin_default_containers():
 		// - Key is widget container code;
 		// - Value: array( 0 - container name, 1 - container order ),
-		//          NULL - means don't use the container, WARNING: it will be deleted together with its widgets from DB on changing of collection skin or on reload container definitions.
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
 		return array();
 	}
 

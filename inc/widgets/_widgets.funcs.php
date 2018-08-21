@@ -824,7 +824,8 @@ function display_container( $WidgetContainer, $is_included = true, $params = arr
 
 	if( ! $is_included )
 	{	// Allow to destroy sub-container when it is not included into the selected skin:
-		$Table->global_icon( T_('Destroy sub-container'), 'delete', $destroy_container_url, T_('Destroy sub-container'), $mode == 'customizer' ? 0 : 3, $mode == 'customizer' ? 0 : 4 );
+		$destroy_btn_title = ( $WidgetContainer->main ? T_('Destroy container') : T_('Destroy sub-container') );
+		$Table->global_icon( $destroy_btn_title, 'delete', $destroy_container_url, $destroy_btn_title, $mode == 'customizer' ? 0 : 3, $mode == 'customizer' ? 0 : 4, array( 'onclick' => 'return confirm( \''.TS_('Are you sure you want to destroy this container?').'\' )') );
 	}
 
 	$widget_container_name = T_( $WidgetContainer->get( 'name' ) );
