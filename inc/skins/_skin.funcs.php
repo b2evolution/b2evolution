@@ -204,6 +204,15 @@ function skin_init( $disp )
 				break;
 			}
 
+			// Check if the post has allowed to view by current User:
+			if( ! $Item->can_be_displayed() )
+			{
+				global $disp;
+				$disp = '403';
+				$disp_detail = '403-disallowed-post-status';
+				break;
+			}
+
 			// Check if we want to redirect to a canonical URL for the post
 			// Please document encountered problems.
 			if( ! $preview
