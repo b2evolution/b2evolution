@@ -1841,3 +1841,8 @@ div.query-builder .rule-container .rule-value-container {
 .evo_customizer__buttons.evo_customizer__buttons_widget_actions .btn-group {
   margin: 0;
 }
+.evo_customizer__content form .panel-heading .panel-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

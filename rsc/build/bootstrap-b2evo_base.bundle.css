@@ -5041,14 +5041,15 @@ div.message_toolbars {
   min-height: auto;
 }
 .accordion-caret .accordion-toggler:before {
-  padding-right: 3px;
   font-size: 14px;
   font-family: FontAwesome;
 }
 .accordion-caret .accordion-toggler:not(.collapsed):before {
+  padding-right: 3px;
   content: '\f0d7';
 }
 .accordion-caret .accordion-toggler.collapsed:before {
+  padding-right: 6px;
   content: '\f0da';
 }
 .disp_access_requires_login .evo_widget.widget_core_content_block.panel {
