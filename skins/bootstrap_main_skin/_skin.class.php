@@ -394,7 +394,7 @@ class bootstrap_main_Skin extends Skin
 		// Add custom CSS:
 		$custom_css = '';
 
-		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
+		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'content_requires_login' ) ) )
 		{
 			$FileCache = & get_FileCache();
 

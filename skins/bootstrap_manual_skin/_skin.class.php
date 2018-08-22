@@ -385,7 +385,7 @@ class bootstrap_manual_Skin extends Skin
 	{
 		global $disp;
 
-		if( in_array( $disp, array( 'access_requires_login', 'access_denied' ) ) )
+		if( in_array( $disp, array( 'access_requires_login', 'content_requires_login', 'access_denied' ) ) )
 		{ // Display left navigation column on this page when at least one sidebar container is visible:
 			return $this->show_container_when_access_denied( 'sidebar' ) || $this->show_container_when_access_denied( 'sidebar2' );
 		}

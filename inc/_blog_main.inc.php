@@ -627,22 +627,41 @@ if( $disp == 'page' || $disp == 'single' )
 	{	// If Item is not defined/not found in DB
 		// Note: The 'preview' action is the only one exception, but that is handled above in this if statement
 		$disp = '404';
-		$disp_detail = '404-post_not_found';
+		$disp_detail = '404-item-not-found';
 	}
 	elseif( $Item->status == 'deprecated' )
 	{	// If the requested Item is deprecated
 		$disp = '404';
-		$disp_detail = '404-deprecated-post' ;
+		$disp_detail = '404-item-deprecated';
 	}
 	elseif( ! $preview && ! in_array( $Item->status, get_inskin_statuses( $Blog->ID, 'post' ) ) )
 	{	// If the requested Item is not allowed to be displayed on front-office
 		$disp = '404';
-		$disp_detail = '404-disallowed-post-status';
+		$disp_detail = '404-item-disallowed-for-frontoffice';
+	}
+	elseif( ! is_logged_in() && in_array( $Item->status, array( 'community', 'protected' ) ) )
+	{	// If the requested Item is allowed only for community or members:
+		$login_Blog = & get_setting_Blog( 'login_blog_ID' );
+		if( $login_Blog && $login_Blog->ID != $Blog->ID )
+		{	// If current collection is not used for login actions,
+			// Redirect to login form on "access_requires_login.main.php":
+			header_redirect( get_login_url( '403 item requires login', NULL, false, NULL, 'content_requires_loginurl' ), 302 );
+			// will have exited
+		}
+		else
+		{	// Current collection is used for login actions
+			// Don't redirect, just display a login form of the collection:
+			$disp = 'content_requires_login';
+			$disp_detail = '403-item-requires-login';
+			// Set redirect_to param to current url in order to display a requested page after login action:
+			global $ReqURI;
+			param( 'redirect_to', 'url', $ReqURI );
+		}
 	}
 	elseif( ! $preview && ! $Item->can_be_displayed() )
 	{	// If current User has no permission to view the requested Item
 		$disp = '403';
-		$disp_detail = '403-disallowed-post-status';
+		$disp_detail = '403-item-disallowed-for-user';
 	}
 }
 
@@ -850,6 +869,7 @@ if( !empty( $skin ) )
 					'404'                   => '404_not_found.main.php',
 					'access_denied'         => 'access_denied.main.php',
 					'access_requires_login' => 'access_requires_login.main.php',
+					'content_requires_login'=> 'content_requires_login.main.php',
 					'activateinfo'          => 'activateinfo.main.php',
 					'anonpost'              => 'anonpost.main.php',
 					'arcdir'                => 'arcdir.main.php',

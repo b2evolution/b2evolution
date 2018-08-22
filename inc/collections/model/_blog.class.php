@@ -2779,6 +2779,7 @@ class Blog extends DataObject
 			case 'lostpasswordurl':
 			case 'activateinfourl':
 			case 'access_requires_loginurl':
+			case 'content_requires_loginurl':
 				$url_disp = str_replace( 'url', '', $parname );
 				if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $this ) )
 				{ // Use special blog for login/register actions if it is defined in general settings
@@ -4754,7 +4755,7 @@ class Blog extends DataObject
 			return true;
 		}
 
-		if( in_array( $disp, array( 'login', 'lostpassword', 'register', 'help', 'msgform', 'access_requires_login' ) ) )
+		if( in_array( $disp, array( 'login', 'lostpassword', 'register', 'help', 'msgform', 'access_requires_login', 'content_requires_login' ) ) )
 		{ // Don't restrict these pages
 			return true;
 		}
