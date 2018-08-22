@@ -158,6 +158,7 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 					else
 					{
 						other_field.hide();
+						other_field.val( null );
 					}
 				}
 
