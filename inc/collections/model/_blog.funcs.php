@@ -433,7 +433,7 @@ function get_collection_kinds( $kind = NULL )
 				'name' => T_('Home / Main'),
 				'class' => 'btn-primary',
 				'desc' => T_('Use this as a site homepage to build a <b>large site</b> consisting of a home page <b>plus</b> several sections (where each section is a separate collection).'),
-				'note' => T_('Use this to display a global/aggregated homepage for the various collections/sections of your site.')
+				'note' => T_('By default, this home collection will aggregate the contents of all your other collections.')
 								.'<br />'.T_('This collection can also be used to display all the cross-collection site features such as registration, login, user profiles, private messaging, etc.'),
 			),
 		'std' => array(
