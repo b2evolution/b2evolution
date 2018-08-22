@@ -138,11 +138,34 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 		}
 		else
 		{	// Display a select with text input field for subject:
-			$subject_options = array_merge( array( '' => '---' ), $subject_options );
+			$subject_options = array_merge( array( '' => '---' ), $subject_options, array( '_other' => T_('Other') ) );
 			$Form->begin_line( T_('Subject'), NULL, '', array( 'required'  => $Blog->get_setting( 'msgform_require_subject' ) ) );
-				$Form->select_input_array( $dummy_fields['subject'], $subject, $subject_options, '' );
-				$Form->text_input( $dummy_fields['subject'].'_other', $subject_other, 50, T_('Other').': ', '', array( 'maxlength' => 255 ) );
+		$Form->select_input_array( $dummy_fields['subject'], $subject, $subject_options, ''/*, NULL, array( 'onchange' => 'return onSubjectChange( this );' )*/ );
+				$Form->text_input( $dummy_fields['subject'].'_other', $subject_other, 50, '', '', array( 'maxlength' => 255, 'style' => 'display: none;' ) );
 			$Form->end_line();
+			?>
+			<script type="text/javascript">
+			jQuery( document ).ready( function() {
+				var select_field = jQuery( '#<?php echo $dummy_fields['subject'];?>' );
+				var other_field = jQuery( '#<?php echo $dummy_fields['subject'];?>_other' );
+
+				function onSubjectChange( obj )
+				{
+					if( select_field.val() == '_other' )
+					{
+						other_field.show();
+					}
+					else
+					{
+						other_field.hide();
+					}
+				}
+
+				onSubjectChange();
+				select_field.on( 'change', onSubjectChange );
+			} );
+			</script>
+			<?php
 		}
 	}
 
