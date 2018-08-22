@@ -2028,6 +2028,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	{ // Only for back-office
 		global $AdminUI;
 
+		echo '<span class="edit_actions_visibility">';
 		echo '<span class="edit_actions_text">'.T_('Visibility').get_manual_link( 'visibility-status' ).': </span>';
 
 		// Get those statuses which are not allowed for the current User to create posts in this blog
@@ -2064,6 +2065,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 			}
 			echo '</select>';
 		}
+		echo '</span>';
 	}
 
 	echo '<span class="btn-group">';
