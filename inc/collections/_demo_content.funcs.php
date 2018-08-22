@@ -942,6 +942,26 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 						VALUES ( '.$DB->quote( 'info_blog_ID' ).', '.$DB->quote( $blog_minisite_ID ).' )' );
 			}
 			$blog_ID = $blog_minisite_ID;
+
+			$BlogCache = & get_BlogCache();
+			if( $minisite_Blog = $BlogCache->get_by_ID( $blog_minisite_ID, false, false ) )
+			{
+				$blog_skin_ID = $minisite_Blog->get_skin_ID();
+				if( ! empty( $blog_skin_ID ) )
+				{
+					$SkinCache = & get_SkinCache();
+					$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+					$Skin->set_setting( 'section_2_image_file_ID', NULL );
+					$Skin->set_setting( 'section_3_display', 1 );
+					$Skin->set_setting( 'section_3_title_color', '#FFFFFF' );
+					$Skin->set_setting( 'section_3_text_color', '#FFFFFF' );
+					$Skin->set_setting( 'section_3_link_color', '#FFFFFF' );
+					$Skin->set_setting( 'section_3_link_h_color', '#FFFFFF' );
+					$Skin->dbupdate_settings();
+				}
+			}
+
+
 			break;
 
 		// =======================================================================================================
@@ -1197,16 +1217,22 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
-				$edited_Item->insert( $owner_ID, T_('About Minisite'), sprintf( get_filler_text( 'info_page' ), T_('Mini-Site') ), $now, $cat_minisite_b2evo,
+				$edited_Item->insert( $owner_ID, T_('More info'), T_('This is a standalone page.'), $now, $cat_minisite_b2evo,
 						array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
+				$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				// Insert a PAGE:
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
-				$edited_Item->insert( $owner_ID, T_('More info'), T_('This is a standalone page.'), $now, $cat_minisite_b2evo,
+				$edited_Item->insert( $owner_ID, T_('About Minisite'), sprintf( get_filler_text( 'info_page' ), T_('Mini-Site') ), $now, $cat_minisite_b2evo,
 						array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
+				$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
 			break;

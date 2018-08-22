@@ -1810,7 +1810,7 @@ function create_demo_contents()
 	if( $install_collection_minisite )
 	{ // Install Mini-site collection
 		task_begin( 'Creating Mini-Site collection...' );
-		create_demo_collection( 'minisite', $jay_moderator_ID, $create_demo_users, $timeshift, 2 );
+		create_demo_collection( 'minisite', $jay_moderator_ID, $create_demo_users, $timeshift, 1 );
 		update_install_progress_bar();
 		task_end();
 	}

@@ -136,7 +136,10 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		if( $kind != 'main' )
 		{ // Don't add widgets to Menu container for Main collections
 			// Home page
-			add_basic_widget( $wico_id, 'basic_menu_link', 'core', 5, array( 'link_type' => 'home' ) );
+			if( $kind != 'minisite' )
+			{ // Home page
+				add_basic_widget( $wico_id, 'basic_menu_link', 'core', 5, array( 'link_type' => 'home' ) );
+			}
 			if( $blog_id == $blog_b_ID )
 			{ // Recent Posts
 				add_basic_widget( $wico_id, 'basic_menu_link', 'core', 10, array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) );
@@ -179,7 +182,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 				add_basic_widget( $wico_id, 'basic_menu_link', 'core', 37, array( 'link_type' => 'latestcomments' ) );
 			}
 			add_basic_widget( $wico_id, 'msg_menu_link', 'core', 50, array( 'link_type' => 'messages' ), 0 );
-			add_basic_widget( $wico_id, 'msg_menu_link', 'core', 60, array( 'link_type' => 'contacts', 'show_badge' => 0 ), 0 );
+			add_basic_widget( $wico_id, 'msg_menu_link', 'core', 60, array( 'link_type' => 'contacts', 'show_badge' => 0 ), $kind == 'minisite' );
 			add_basic_widget( $wico_id, 'basic_menu_link', 'core', 70, array( 'link_type' => 'login' ), 0 );
 			if( $kind == 'forum' )
 			{ // Register
@@ -485,6 +488,17 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		if( $kind == 'main' )
 		{	// Install the "Content Block" widget only for Main collections:
 			add_basic_widget( $wico_id, 'content_block', 'core', 30, array( 'item_slug' => 'this-is-a-content-block' ) );
+		}
+	}
+
+	/* Minisite Front Page Area 3 */
+	if( array_key_exists( 'front_page_area_3', $blog_containers ) )
+	{
+		$wico_id = $blog_containers['front_page_area_3']['wico_ID'];
+		if( $kind == 'minisite' )
+		{
+			add_basic_widget( $wico_id, 'coll_search_form', 'core', 10 );
+			add_basic_widget( $wico_id, 'coll_tag_cloud', 'core', 20 );
 		}
 	}
 
