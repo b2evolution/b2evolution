@@ -229,7 +229,7 @@ class PageCache
 			return false;
 		}
 
-		if( $disp == 'login' || $disp == 'access_requires_login' || $disp == 'register' || $disp == 'lostpassword' || $disp == 'anonpost' )
+		if( in_array( $disp, array( 'login', 'access_requires_login', 'content_requires_login', 'register', 'lostpassword', 'anonpost' ) ) )
 		{	// We do NOT want caching for in-skin login, register, lostpassord pages and new item anonymous form:
 			$Debuglog->add( 'Never cache the in-skin login, register and anonymous new item pages!', 'pagecache' );
 			return false;
