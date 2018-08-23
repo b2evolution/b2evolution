@@ -138,10 +138,10 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 		}
 		else
 		{	// Display a select with text input field for subject:
-			$subject_options = array_merge( array( '' => '---' ), $subject_options, array( '_other' => T_('Other') ) );
+			$subject_options = array_merge( array( '' => '---' ), $subject_options, array( '_other' => T_('Other').':' ) );
 			$Form->begin_line( T_('Subject'), NULL, '', array( 'required'  => $Blog->get_setting( 'msgform_require_subject' ) ) );
-		$Form->select_input_array( $dummy_fields['subject'], $subject, $subject_options, ''/*, NULL, array( 'onchange' => 'return onSubjectChange( this );' )*/ );
-				$Form->text_input( $dummy_fields['subject'].'_other', $subject_other, 50, '', '', array( 'maxlength' => 255, 'style' => 'display: none;' ) );
+				$Form->select_input_array( $dummy_fields['subject'], $subject, $subject_options, '' );
+				$Form->text_input( $dummy_fields['subject'].'_other', $subject_other, 50, '', '', array( 'maxlength' => 255, 'style' => 'margin-left: 5px; display: none;' ) );
 			$Form->end_line();
 			?>
 			<script type="text/javascript">
