@@ -895,6 +895,7 @@ Admins and moderators can very quickly approve or reject comments from the colle
 function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = true, $timeshift = 86400 )
 {
 	global $install_test_features, $DB, $admin_url, $timestamp;
+	global $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
 
 	$default_blog_longdesc = T_('This is the long description for the blog named \'%s\'. %s');
 	$default_blog_access_type = 'relative';
