@@ -9069,4 +9069,32 @@ function fill_empty_days( $data, $default_data, $start_date, $end_date )
 
 	return $fixed_data;
 }
+
+
+/**
+ * Check if the given allowed
+ *
+ * @param string The options which should be checked
+ * @param string String of options separated by comma, '*' - allow all options, use '-' before options if they should be excluded/denied
+ * @return boolean
+ */
+function is_allowed_option( $checked_option, $allowed_options )
+{
+	if( $allowed_options === '*' )
+	{	// All options are allowed:
+		return true;
+	}
+
+	$is_allowed_options = true;
+	$allowed_options = $allowed_options;
+	if( substr( $allowed_options, 0, 1 ) == '-' )
+	{	// The options should excluded/denied:
+		$allowed_options = substr( $allowed_options, 1 );
+		$is_allowed_options = false;
+	}
+	$allowed_options = explode( ',', $allowed_options );
+	$is_in_checked_array = in_array( $checked_option, $allowed_options );
+
+	return ( $is_allowed_options ? $is_in_checked_array : ! $is_in_checked_array );
+}
 ?>
