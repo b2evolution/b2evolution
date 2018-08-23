@@ -182,7 +182,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 				add_basic_widget( $wico_id, 'basic_menu_link', 'core', 37, array( 'link_type' => 'latestcomments' ) );
 			}
 			add_basic_widget( $wico_id, 'msg_menu_link', 'core', 50, array( 'link_type' => 'messages' ), 0 );
-			add_basic_widget( $wico_id, 'msg_menu_link', 'core', 60, array( 'link_type' => 'contacts', 'show_badge' => 0 ), $kind == 'minisite' );
+			add_basic_widget( $wico_id, 'msg_menu_link', 'core', 60, array( 'link_type' => 'contacts', 'show_badge' => 0 ), ( $kind == 'minisite' ? 1 : 0 ) );
 			add_basic_widget( $wico_id, 'basic_menu_link', 'core', 70, array( 'link_type' => 'login' ), 0 );
 			if( $kind == 'forum' )
 			{ // Register
