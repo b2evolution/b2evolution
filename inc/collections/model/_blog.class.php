@@ -4597,18 +4597,47 @@ class Blog extends DataObject
 	/**
 	 * Get blog main containers
 	 *
-	 * @return array main container codes => array( name, order )
+	 * @param boolean TRUE to initialize IDs of containers
+	 * @return array main container codes => array( name, order, id(optional) )
 	 */
-	function get_main_containers()
+	function get_main_containers( $load_container_ids = false )
 	{
-		load_funcs( 'skins/_skin.funcs.php' );
-		// Get all skins of the blog and get the merge of main containers from each skin:
-		$skin_ids = $this->get_skin_ids();
+		if( ! isset( $this->widget_containers ) )
+		{
+			load_funcs( 'skins/_skin.funcs.php' );
+			// Get all skins of the blog and get the merge of main containers from each skin:
+			$skin_ids = $this->get_skin_ids();
 
-		// Get containers of all collection skins:
-		$blog_containers = get_skin_containers( $skin_ids );
+			// Get containers of all collection skins:
+			$this->widget_containers = get_skin_containers( $skin_ids );
+		}
 
-		return $blog_containers;
+		if( $load_container_ids &&
+		    $this->ID > 0 &&
+		    empty( $this->widget_containers_ids_loaded ) &&
+		    ! empty( $this->widget_containers ) )
+		{	// Initialize IDs of containers:
+			global $DB;
+
+			$SQL = new SQL( 'Load widget containers data of collection #'.$this->ID );
+			$SQL->SELECT( 'wico_code, wico_ID' );
+			$SQL->FROM( 'T_widget__container' );
+			$SQL->WHERE( 'wico_coll_ID = '.$this->ID );
+			$SQL->WHERE_and( 'wico_skin_type = "normal"' );
+			$SQL->WHERE_and( 'wico_code IN ( '.$DB->quote( array_keys( $this->widget_containers ) ).' )' );
+			$containers_data = $DB->get_assoc( $SQL );
+			foreach( $containers_data as $container_code => $container_ID )
+			{
+				if( isset( $this->widget_containers[ $container_code ] ) )
+				{
+					$this->widget_containers[ $container_code ]['ID'] = $container_ID;
+				}
+			}
+			// Set flag to don't load these data twice:
+			$this->widget_containers_ids_loaded = true;
+		}
+
+		return $this->widget_containers;
 	}
 
 

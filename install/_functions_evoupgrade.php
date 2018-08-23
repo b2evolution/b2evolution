@@ -512,6 +512,157 @@ function convert_lang_to_locale( $table, $columnlang, $columnID )
 
 
 /**
+ * Install new default widgets
+ *
+ * @param string Container code
+ * @param string Widget codes, separated by comma
+ */
+function install_new_default_widgets( $new_container_code, $new_widget_codes = '*' )
+{
+	global $DB, $Settings;
+
+	load_funcs( 'widgets/_widgets.funcs.php' );
+
+	// We're going to need some environment in order to init item type cache and create item:
+	$use_temp_settings_object = false;
+	if( ! is_object( $Settings ) )
+	{	// Create temporary Settings object WITHOUT version checking:
+		load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+		$Settings = new GeneralSettings( false );
+		$use_temp_settings_object = true;
+	}
+
+	$BlogCache = & get_BlogCache();
+	$BlogCache->load_all();
+
+	if( empty( $BlogCache->cache ) )
+	{	// No collections in DB:
+		return;
+	}
+
+	$new_widgets_insert_sql_rows = array();
+	foreach( $BlogCache->cache as $widget_Blog )
+	{
+		// Get all containers declared in the given blog's skins
+		$coll_containers = $widget_Blog->get_main_containers( true );
+
+		// Get config of default widgets:
+		$default_widgets = get_default_widgets( $widget_Blog->get( 'type' ) );
+
+		foreach( $default_widgets as $wico_code => $container_widgets )
+		{
+			if( $wico_code != $new_container_code )
+			{	// Skip not requested container:
+				continue;
+			}
+
+			if( ! isset( $coll_containers[ $wico_code ] ) )
+			{	// Skip container which is not supported by current collection's skin:
+				continue;
+			}
+
+			$coll_container = $coll_containers[ $wico_code ];
+
+			if( isset( $container_widgets['coll_type'] ) )
+			{	// Handle special condition key:
+				if( ! is_allowed_option( $widget_Blog->get( 'type' ), $container_widgets['coll_type'] ) )
+				{	// Skip container because it should not be installed for the given collection kind:
+					continue;
+				}
+				// Remove this config data which is not really widget:
+				unset( $container_widgets['coll_type'] );
+			}
+
+			if( ! isset( $coll_container['ID'] ) )
+			{	// Create new container if it is not installed yet:
+				if( ! isset( $coll_container[0] ) || ! isset( $coll_container[1] ) )
+				{	// We cannot create a container without name and order, Skip it:
+					continue;
+				}
+				pre_dump( $widget_Blog->widget_containers );
+				// Insert new widget container into DB:
+				$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main )
+					VALUES ( '.$DB->quote( $wico_code ).', '.$DB->quote( $coll_container[0] ).', '.$widget_Blog->ID.', '.$DB->quote( $coll_container[1] ).', 1 )' );
+				// Update ID of new inserted widget container:
+				$coll_container['ID'] = $DB->insert_id;
+				// Also update ID in collection cache for next calls:
+				$widget_Blog->widget_containers[ $wico_code ]['ID'] = $coll_container['ID'];
+			}
+			elseif( ! isset( $widget_orders_in_containers ) )
+			{	// For existing containers we should get all widget orders in order to avoid duplicate error on insert new widgets:
+				$SQL = new SQL( 'Get widget orders in container #'.$coll_container['ID'].' of collection #'.$widget_Blog->ID );
+				$SQL->SELECT( 'wi_wico_ID, GROUP_CONCAT( wi_order )' );
+				$SQL->FROM( 'T_widget__widget' );
+				$SQL->GROUP_BY( 'wi_wico_ID' );
+				$SQL->ORDER_BY( 'wi_wico_ID, wi_order' );
+				$widget_orders_in_containers = $DB->get_assoc( $SQL );
+				foreach( $widget_orders_in_containers as $order_wico_ID => $widget_orders_in_container )
+				{
+					$widget_orders_in_containers[ $order_wico_ID ] = explode( ',', $widget_orders_in_container );
+				}
+			}
+
+			// Create array to cache widget orders per container:
+			if( ! isset( $widget_orders_in_containers ) )
+			{
+				$widget_orders_in_containers = array();
+			}
+			if( ! isset( $widget_orders_in_containers[ $coll_container['ID'] ] ) )
+			{
+				$widget_orders_in_containers[ $coll_container['ID'] ] = array();
+			}
+
+			foreach( $container_widgets as $widget )
+			{
+				if( ! is_allowed_option( $widget[1], $new_widget_codes ) )
+				{	// Skip not requested widget:
+					continue;
+				}
+
+				if( isset( $widget['install'] ) && ! $widget['install'] )
+				{	// Skip widget because it should not be installed by condition from config:
+					continue;
+				}
+
+				if( isset( $widget['coll_type'] ) && ! is_allowed_option( $widget_Blog->get( 'type' ), $widget['coll_type'] ) )
+				{	// Skip widget because it should not be installed for the given collection kind:
+					continue;
+				}
+
+				// Initialize a widget row to insert into DB below by single query:
+				$widget_type = isset( $widget['type'] ) ? $widget['type'] : 'core';
+				$widget_params = isset( $widget['params'] ) ? ( is_array( $widget['params'] ) ? serialize( $widget['params'] ) : $widget['params'] ) : NULL;
+				$widget_enabled = isset( $widget['enabled'] ) ? intval( $widget['enabled'] ) : 1;
+				// Fix a widget order to avoid mysql error of duplicated rows with same order per container:
+				$widget_order = intval( $widget[0] );
+				while( in_array( $widget_order, $widget_orders_in_containers[ $coll_container['ID'] ] ) )
+				{	// Search next free order inside the container:
+					$widget_order++;
+				}
+				if( $widget_order != $widget[0] )
+				{	// Update widget order in cache:
+					$widget_orders_in_containers[ $coll_container['ID'] ][] = $widget_order;
+				}
+				// A row with new widget values:
+				$new_widgets_insert_sql_rows[] = '( '.$coll_container['ID'].', '.$widget_order.', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[1] ).', '.$DB->quote( $widget_params ).' )';
+			}
+		}
+	}
+
+	if( ! empty( $new_widgets_insert_sql_rows ) )
+	{	// Insert the widget rows by single SQL query:
+		$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params )
+			VALUES '.implode( ', ', $new_widgets_insert_sql_rows ) );
+	}
+
+	if( $use_temp_settings_object )
+	{	// Reset the temporary Settings object because it is used WITHOUT version checking,
+		// Some code below may be required in normal Settings object WITH version checking:
+		$Settings = false;
+	}
+}
+
+/**
  * upgrade_b2evo_tables(-)
  *
  * @param string the action param value corresponding the current upgrade process ( evoupgrade, auto_upgrade )
@@ -10396,164 +10547,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 13190, 'Inserting widget containers...' ) )
-	{ // part of 7.0.0-alpha
-
-		// Create Item List containers and an item list pages widget:
-		$widget_containers_sql_rows = array();
-		// Select those blog ids where Item List container does not exists yet:
-		$blog_ids = $DB->get_col( 'SELECT blog_ID FROM T_blogs WHERE blog_ID NOT IN (
-			SELECT wico_coll_ID FROM T_widget__container WHERE wico_code = "item_list" )
-			AND blog_type IN ( "std", "forum", "manual", "group" )' );
-		foreach( $blog_ids as $blog_ID )
-		{	// Create Item List container rows:
-			$widget_containers_sql_rows[] = '( "item_list", "Item List", '.$blog_ID.', 10 )';
-		}
-		if( ! empty( $widget_containers_sql_rows ) )
-		{	// Insert Item List containers:
-			$DB->query( 'UPDATE T_widget__container SET wico_order = wico_order + 10
-					WHERE wico_coll_ID IN ( '.implode( ', ', $blog_ids ).' )
-					AND wico_order >= 10
-					ORDER BY wico_ID, wico_order DESC' );
-			$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order ) VALUES'
-					.implode( ', ', $widget_containers_sql_rows ) );
-
-			// Insert Item List Pages widgets
-			$widgets_insert_sql_rows = array();
-			// Get those Item List containers where the item title widget doesn't exist:
-			$item_list_containers = $DB->get_col( 'SELECT wico_ID FROM T_widget__container
-					WHERE wico_code = "item_list" AND wico_ID NOT IN (
-						SELECT wi_wico_ID FROM T_widget__widget WHERE wi_code = "coll_item_list_pages" )' );
-			foreach( $item_list_containers as $wico_ID )
-			{
-				$widgets_insert_sql_rows[] = '( '.$wico_ID.', 1, "core", "coll_item_list_pages", NULL )';
-			}
-			if( ! empty( $widgets_insert_sql_rows ) )
-			{	// There are widgets to create, insert previously built widget records:
-				$DB->query( 'UPDATE T_widget__widget SET wi_order = wi_order + 1
-						WHERE wi_wico_ID IN ( '.implode( ', ', $item_list_containers ).' )
-						ORDER BY wi_wico_ID, wi_order DESC' );
-				$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_type, wi_code, wi_params ) VALUES'
-						.implode( ', ', $widgets_insert_sql_rows ) );
-			}
-		}
-
-		// Create Item in List containers:
-		$widget_containers_sql_rows = array();
-		// Select those blog ids where Item List container does not exists yet:
-		$blog_ids = $DB->get_col( 'SELECT blog_ID FROM T_blogs WHERE blog_ID NOT IN (
-			SELECT wico_coll_ID FROM T_widget__container WHERE wico_code = "item_in_list" )
-			AND blog_type = "std"' );
-		foreach( $blog_ids as $blog_ID )
-		{	// Create Item List container rows:
-			$widget_containers_sql_rows[] = '( "item_in_list", "Item in List", '.$blog_ID.', 10 )';
-		}
-		if( ! empty( $widget_containers_sql_rows ) )
-		{	// Insert Item in List containers:
-			$DB->query( 'UPDATE T_widget__container SET wico_order = wico_order + 10
-					WHERE wico_coll_ID IN ( '.implode( ', ', $blog_ids ).' )
-					AND wico_order >= 10
-					ORDER BY wico_ID, wico_order DESC' );
-			$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order ) VALUES'
-					.implode( ', ', $widget_containers_sql_rows ) );
-
-			// Insert Item Title and Item Info Line widgets:
-			$widgets_insert_sql_rows = array();
-			// Get those empty Item in List containers:
-			$item_list_containers = $DB->get_col( 'SELECT wico_ID FROM T_widget__container
-					WHERE wico_code = "item_in_list"' );
-			foreach( $item_list_containers as $wico_ID )
-			{
-				$widgets_insert_sql_rows[] = '( '.$wico_ID.', 10, "core", "item_title", NULL )';
-				$widgets_insert_sql_rows[] = '( '.$wico_ID.', 20, "core", "item_visibility_badge", NULL )';
-				$widgets_insert_sql_rows[] = '( '.$wico_ID.', 30, "core", "item_info_line", NULL )';
-
-			}
-			if( ! empty( $widgets_insert_sql_rows ) )
-			{
-				$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_type, wi_code, wi_params ) VALUES'
-						.implode( ', ', $widgets_insert_sql_rows ) );
-			}
-		}
-
-		// Insert Item Visibility Badge widgets
-		$widgets_insert_sql_rows = array();
-		// Get those Item Single Header containers where the item visibility badge widget doesn't exist:
-		$item_single_header_containers = $DB->get_col( 'SELECT wico_ID FROM T_widget__container
-				LEFT JOIN T_blogs ON wico_coll_ID = blog_ID
-				WHERE wico_code = "item_single_header" AND blog_type = "std" AND wico_ID NOT IN (
-					SELECT wi_wico_ID FROM T_widget__widget WHERE wi_code = "item_visibility_badge" )' );
-		foreach( $item_single_header_containers as $wico_ID )
-		{
-			$widgets_insert_sql_rows[] = '( '.$wico_ID.', 1, "core", "item_visibility_badge", NULL )';
-		}
-		if( ! empty( $widgets_insert_sql_rows ) )
-		{	// There are widgets to create, insert previously built widget records:
-			$DB->query( 'UPDATE T_widget__widget SET wi_order = wi_order + 1
-					WHERE wi_wico_ID IN ( '.implode( ', ', $item_single_header_containers ).' )
-					ORDER BY wi_wico_ID, wi_order DESC' );
-			$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_type, wi_code, wi_params ) VALUES'
-					.implode( ', ', $widgets_insert_sql_rows ) );
-		}
-
-		// Insert Item Title widgets
-		$widgets_insert_sql_rows = array();
-		// Get those Item Single Header containers where the item title widget doesn't exist:
-		$item_single_header_containers = $DB->get_col( 'SELECT wico_ID FROM T_widget__container
-				WHERE wico_code = "item_single_header" AND wico_ID NOT IN (
-					SELECT wi_wico_ID FROM T_widget__widget WHERE wi_code = "item_title" )' );
-		foreach( $item_single_header_containers as $wico_ID )
-		{
-			$widgets_insert_sql_rows[] = '( '.$wico_ID.', 1, "core", "item_title", NULL )';
-		}
-		if( ! empty( $widgets_insert_sql_rows ) )
-		{	// There are widgets to create, insert previously built widget records:
-			$DB->query( 'UPDATE T_widget__widget SET wi_order = wi_order + 1
-					WHERE wi_wico_ID IN ( '.implode( ', ', $item_single_header_containers ).' )
-					ORDER BY wi_wico_ID, wi_order DESC' );
-			$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_type, wi_code, wi_params ) VALUES'
-					.implode( ', ', $widgets_insert_sql_rows ) );
-		}
-
-		// Insert Item Next/Previous widgets
-		$widgets_insert_sql_rows = array();
-		// Get those Item Single Header containers in blog collections where the item next previous widget doesn't exist:
-		$item_single_header_containers = $DB->get_col( 'SELECT wico_ID FROM T_widget__container
-				LEFT JOIN T_blogs ON wico_coll_ID = blog_ID
-				WHERE wico_code = "item_single_header" AND blog_type = "std" AND wico_ID NOT IN (
-					SELECT wi_wico_ID FROM T_widget__widget WHERE wi_code = "item_next_previous" )' );
-		foreach( $item_single_header_containers as $wico_ID )
-		{
-			$widgets_insert_sql_rows[] = '( '.$wico_ID.', 1, "core", "item_next_previous", NULL )';
-		}
-		if( ! empty( $widgets_insert_sql_rows ) )
-		{	// There are widgets to create, insert previously built widget records:
-			$DB->query( 'UPDATE T_widget__widget SET wi_order = wi_order + 1
-					WHERE wi_wico_ID IN ( '.implode( ', ', $item_single_header_containers ).' )
-					ORDER BY wi_wico_ID, wi_order DESC' );
-			$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_type, wi_code, wi_params ) VALUES'
-					.implode( ', ', $widgets_insert_sql_rows ) );
-		}
-
-		// Insert Item Title widgets in Manual Skin's Item Single container
-		$widgets_insert_sql_rows = array();
-		// Get those Item Single containers in blog collections where the item title widget doesn't exist:
-		$item_single_header_containers = $DB->get_col( 'SELECT wico_ID FROM T_widget__container
-				LEFT JOIN T_blogs ON wico_coll_ID = blog_ID
-				WHERE wico_code = "item_single" AND blog_type = "manual" AND wico_ID NOT IN (
-					SELECT wi_wico_ID FROM T_widget__widget WHERE wi_code = "item_title" )' );
-		foreach( $item_single_header_containers as $wico_ID )
-		{
-			$widgets_insert_sql_rows[] = '( '.$wico_ID.', 1, "core", "item_title", NULL )';
-		}
-		if( ! empty( $widgets_insert_sql_rows ) )
-		{	// There are widgets to create, insert previously built widget records:
-			$DB->query( 'UPDATE T_widget__widget SET wi_order = wi_order + 1
-					WHERE wi_wico_ID IN ( '.implode( ', ', $item_single_header_containers ).' )
-					ORDER BY wi_wico_ID, wi_order DESC' );
-			$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_type, wi_code, wi_params ) VALUES'
-					.implode( ', ', $widgets_insert_sql_rows ) );
-		}
-
+	{	// part of 7.0.0-alpha
+		install_new_default_widgets( 'item_list' );
+		install_new_default_widgets( 'item_in_list' );
+		install_new_default_widgets( 'item_single_header', 'item_visibility_badge,item_title,item_next_previous' );
+		install_new_default_widgets( 'item_single', 'item_title' );
 		upg_task_end();
 	}
 
