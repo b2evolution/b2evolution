@@ -10250,7 +10250,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			'Front Page Main Area'      => 'front_page_main_area',
 			'Front Page Secondary Area' => 'front_page_secondary_area',
 			'Forum Front Secondary Area'=> 'forum_front_secondary_area',
-			'Contact Page Main Area'    => 'contact_page_main_area',
 			'404 Page'                  => '404_page',
 			'Login Required'            => 'login_required',
 			'Access Denied'             => 'access_denied',
