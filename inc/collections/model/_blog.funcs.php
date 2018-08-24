@@ -1550,16 +1550,20 @@ function & get_setting_Blog( $setting_name, $current_Blog = NULL, $halt_on_error
 		return $setting_Blog;
 	}
 
-	if( $setting_name == 'login_blog_ID' && $current_Blog !== NULL && $current_Blog->get( 'access_type' ) == 'absolute' )
-	{	// Don't allow to use main login collection if current collection has an external domain:
-		return $setting_Blog;
-	}
-
 	$blog_ID = intval( $Settings->get( $setting_name ) );
 	if( $blog_ID > 0 )
 	{ // Check if blog really exists in DB
 		$BlogCache = & get_BlogCache();
 		$setting_Blog = & $BlogCache->get_by_ID( $blog_ID, $halt_on_error, $halt_on_empty );
+	}
+
+	if( $setting_name == 'login_blog_ID' &&
+	    $current_Blog !== NULL &&
+	    $current_Blog->get( 'access_type' ) == 'absolute' &&
+	    ! empty( $setting_Blog ) &&
+	    ! url_check_same_domain( $current_Blog->gen_baseurl(), $setting_Blog->gen_baseurl() ) )
+	{	// Don't allow to use main login collection if current collection has a DIFFERENT external domain:
+		$setting_Blog = NULL;
 	}
 
 	return $setting_Blog;
