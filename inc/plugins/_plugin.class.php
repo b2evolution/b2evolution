@@ -3407,7 +3407,7 @@ class Plugin
 	 * Get the URL to call a plugin method through http. This links to the /htsrv/call_plugin.php
 	 * file.
 	 *
-	 * It uses either {@link $htsrv_url} or {@link $htsrv_url_sensitive} (if {@link $ReqHost} is on https).
+	 * It uses either {@link $htsrv_url} or {@link https version of $htsrv_url} (if {@link $ReqHost} is on https).
 	 *
 	 * NOTE: AJAX callbacks are required to be on the same domain/protocol, so if you're using absolute
 	 *       blog URLs on different domains you must set {@link $htsrv_url} dynamically, to use the same domain!

@@ -275,6 +275,12 @@ div.delete_messages ul li {
   padding: 10px;
   color: #5bc0de;
 }
+.evo_content_summary .evo_post .bTitle {
+  font-weight: bold;
+}
+.evo_content_summary .evo_post .bText {
+  padding-left: 420px;
+}
 #comment_filter_form fieldset {
   margin-bottom: 20px;
 }

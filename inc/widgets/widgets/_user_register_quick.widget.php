@@ -278,7 +278,7 @@ class user_register_quick_Widget extends ComponentWidget
 			echo '<p>'.$this->disp_params['intro'].'</p>';
 		}
 
-		$Form = new Form( get_htsrv_url( true ).'register.php', 'register_form', 'post' );
+		$Form = new Form( get_htsrv_url( 'login' ).'register.php', 'register_form', 'post' );
 
 		$Form->begin_form( NULL, '', array( 'class' => 'widget_register_form') );
 

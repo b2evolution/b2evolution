@@ -53,7 +53,7 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 	$message_content .= T_( 'Link to reset your password:' )
 						."\n"
 						.'$secret_content_start$'
-						.get_htsrv_url( true ).'login.php?action=changepwd'
+						.get_htsrv_url( 'login' ).'login.php?action=changepwd'
 							.'&'.$dummy_fields[ 'login' ].'='.rawurlencode( $iterator_User->login )
 							.'&reqID='.$params['request_id']
 							.$params['blog_param']

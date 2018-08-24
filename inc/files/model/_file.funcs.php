@@ -3218,6 +3218,13 @@ function & get_file_by_abspath( $abspath, $force_create_meta = false )
 }
 
 
+/**
+ * Get image file for use in social media tag
+ *
+ * @param string $disp
+ * @param boolean Force to look through attachments
+ * @return obj File object
+ */
 function get_social_tag_image_file( $disp )
 {
 	global $social_tag_image_File, $Settings;
@@ -3237,34 +3244,7 @@ function get_social_tag_image_file( $disp )
 			// Get info for og:image tag
 			if( ! is_null( $Item ) )
 			{
-				$LinkOwner = new LinkItem( $Item );
-				if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink,inline', 'image', array(
-						'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
-						'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
-				{ // Item has linked files
-					while( $Link = & $LinkList->get_next() )
-					{
-						if( ! ( $File = & $Link->get_File() ) )
-						{ // No File object
-							global $Debuglog;
-							$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
-							continue;
-						}
-
-						if( ! $File->exists() )
-						{ // File doesn't exist
-							global $Debuglog;
-							$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
-							continue;
-						}
-
-						if( $File->is_image() )
-						{ // Use only image files for og:image tag
-							$social_tag_image_File = $File;
-							break;
-						}
-					}
-				}
+				$social_tag_image_File = $Item->get_social_media_image();
 			}
 			break;
 
@@ -3274,39 +3254,12 @@ function get_social_tag_image_file( $disp )
 			{
 				if( $intro_Item->is_intro() )
 				{
-					$LinkOwner = new LinkItem( $intro_Item );
-					if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink,inline', 'image', array(
-							'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
-							'sql_order_by' => 'link_priority ASC, link_order ASC' ) ) )
-					{ // Item has linked files
-						while( $Link = & $LinkList->get_next() )
-						{
-							if( ! ( $File = & $Link->get_File() ) )
-							{ // No File object
-								global $Debuglog;
-								$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
-								continue;
-							}
-
-							if( ! $File->exists() )
-							{ // File doesn't exist
-								global $Debuglog;
-								$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
-								continue;
-							}
-
-							if( $File->is_image() )
-							{ // Use only image files for og:image tag
-								$social_tag_image_File = $File;
-								break;
-							}
-						}
-					}
+					$social_tag_image_File = $intro_Item->get_social_media_image();
 				}
 			}
 
 			if( empty( $social_tag_image_File ) )
-			{
+			{ // No intro post or intro post has no image, use default category social media boiler plate or category image as fallback:
 				global $Blog, $disp_detail;
 				$FileCache = & get_FileCache();
 
@@ -3315,14 +3268,14 @@ function get_social_tag_image_file( $disp )
 					$ChapterCache = & get_ChapterCache();
 					$default_cat_ID = $Blog->get_default_cat_ID();
 					if( $default_cat_ID && $default_Chapter = & $ChapterCache->get_by_ID( $default_cat_ID ) )
-					{ // Try social media boilerplate image
+					{ // Try social media boilerplate image first:
 						$social_media_image_file_ID = $default_Chapter->get( 'social_media_image_file_ID', false );
 						if( $social_media_image_file_ID > 0 && $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) && $File->is_image() )
 						{
 							$social_tag_image_File = $File;
 						}
 						else
-						{ // Try category image
+						{ // Try category image:
 							$cat_image_file_ID = $default_Chapter->get( 'image_file_ID', false );
 							if( $cat_image_file_ID > 0 && $File = & $FileCache->get_by_ID( $cat_image_file_ID ) && $File->is_image() )
 							{
@@ -3339,7 +3292,7 @@ function get_social_tag_image_file( $disp )
 	}
 
 	if( empty( $social_tag_image_File ) )
-	{ // Use social media boilerplate logo if configured
+	{ // Use site social media boilerplate logo if configured:
 		$FileCache = & get_FileCache();
 		$social_media_image_file_ID = intval( $Settings->get( 'social_media_image_file_ID' ) );
 		if( $social_media_image_file_ID > 0
@@ -3349,7 +3302,7 @@ function get_social_tag_image_file( $disp )
 			$social_tag_image_File = $File;
 		}
 		else
-		{ // Use site logo as fallback if configured
+		{ // Use site logo as fallback if configured:
 			$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
 			if( $notification_logo_file_ID > 0
 					&& ( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) )

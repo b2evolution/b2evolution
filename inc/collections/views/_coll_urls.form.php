@@ -298,7 +298,7 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{ // Permission to edit advanced admin settings
-		global $rsc_url, $media_url, $skins_url, $plugins_url, $htsrv_url, $htsrv_url_sensitive;
+		global $rsc_url, $media_url, $skins_url, $plugins_url, $htsrv_url;
 
 		$assets_url_data = array();
 		// media url:
@@ -347,9 +347,10 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 				'local_url'    => $edited_Blog->get_local_plugins_url( 'relative' )
 			);
 		// htsrv url:
+		$htsrv_url_https = force_https_url( $htsrv_url, true );
 		$assets_url_data['htsrv_assets_url_type'] = array(
 				'label'        => sprintf( T_('Link to %s through'), '<code>/htsrv/</code>' ),
-				'url'          => $htsrv_url.( $htsrv_url !=  $htsrv_url_sensitive ? ', '.$htsrv_url_sensitive : '' ),
+				'url'          => $htsrv_url.( $htsrv_url != $htsrv_url_https ? ', '.$htsrv_url_https : '' ),
 				'absolute_url' => 'htsrv_assets_absolute_url',
 				'folder'       => '/htsrv/',
 				'local_url'    => $edited_Blog->get_htsrv_url()

@@ -146,7 +146,7 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	 * @var Hit
 	 */
 	global $Hit;
-	global $baseurl, $Collection, $Blog, $htsrv_url_sensitive, $ReqHost, $ReqURL, $dispatcher;
+	global $baseurl, $Collection, $Blog, $htsrv_url, $ReqHost, $ReqURL, $dispatcher;
 	global $Session, $Debuglog, $Messages;
 	global $http_response_code, $allow_redirects_to_different_domain;
 
@@ -174,9 +174,9 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 		$Debuglog->add( 'Redirecting within $baseurl, all is fine.', 'request' );
 		$external_redirect = false;
 	}
-	elseif( strpos( $redirect_to, $htsrv_url_sensitive ) === 0 )
+	elseif( strpos($redirect_to, force_https_url( $htsrv_url, true ) ) === 0 )
 	{
-		$Debuglog->add( 'Redirecting within $htsrv_url_sensitive, all is fine.', 'request' );
+		$Debuglog->add('Redirecting within https of $htsrv_url, all is fine.', 'request' );
 		$external_redirect = false;
 	}
 	elseif( ! empty( $Blog ) && strpos( $redirect_to, $Blog->gen_baseurl() ) === 0 )
@@ -457,7 +457,7 @@ function get_request_title( $params = array() )
 			'userprefs_text'      => T_('User preferences'),
 			'user_text'           => T_('User: %s'),
 			'users_text'          => T_('Users'),
-			'closeaccount_text'   => T_('Close account'),
+			'closeaccount_text'   => T_('Account closure'),
 			'subs_text'           => T_('Notifications & Subscriptions'),
 			'visits_text'         => T_('Who visited my profile?'),
 			'comments_text'       => T_('Latest Comments'),
@@ -2810,7 +2810,7 @@ function display_login_js_handler( $params )
 
 		jQuery.ajax({
 			type: 'POST',
-			url: '<?php echo get_htsrv_url(); ?>anon_async.php',
+			url: '<?php echo get_htsrv_url( 'login' ); ?>anon_async.php',
 			data: {
 				'<?php echo $dummy_fields[ 'login' ]; ?>': username,
 				'action': 'get_user_salt',
@@ -2896,7 +2896,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 	$params = array_merge( array(
 			'form_before'     => '',
 			'form_after'      => '',
-			'form_action'     => get_htsrv_url( true ).'login.php',
+			'form_action'     => get_htsrv_url( 'login' ).'login.php',
 			'form_name'       => 'lostpass_form',
 			'form_class'      => 'fform',
 			'form_template'   => NULL,
@@ -3006,7 +3006,7 @@ function display_activateinfo( $params )
 			'use_form_wrapper' => true,
 			'form_before'      => '',
 			'form_after'       => '',
-			'form_action'      => get_htsrv_url( true ).'login.php',
+			'form_action'      => get_htsrv_url( 'login' ).'login.php',
 			'form_name'        => 'form_validatemail',
 			'form_class'       => 'fform',
 			'form_layout'      => 'fieldset',
@@ -3135,7 +3135,7 @@ function display_activateinfo( $params )
 
 		echo $params['use_form_wrapper'] ? $params['form_before'] : '';
 
-		$Form = new Form( get_htsrv_url( true ).'login.php', 'form_validatemail', 'post', 'fieldset' );
+		$Form = new Form( get_htsrv_url( 'login' ).'login.php', 'form_validatemail', 'post', 'fieldset' );
 
 		if( ! empty( $params['form_template'] ) )
 		{ // Switch layout to template from array
@@ -3146,7 +3146,7 @@ function display_activateinfo( $params )
 
 		$Form->add_crumb( 'validateform' );
 		$Form->hidden( 'action', 'activateacc_sec' );
-		$Form->hidden( 'redirect_to', url_rel_to_same_host( $redirect_to, get_htsrv_url( true ) ) );
+		$Form->hidden( 'redirect_to', url_rel_to_same_host( $redirect_to, get_htsrv_url( 'login' ) ) );
 		$Form->hidden( 'reqID', 1 );
 		$Form->hidden( 'sessID', $Session->ID );
 
@@ -3189,7 +3189,7 @@ function display_password_indicator( $params = array() )
 
 	echo "<script type='text/javascript'>
 	// Load password strength estimation library
-	(function(){var a;a=function(){var a,b;b=document.createElement('script');b.src='".$rsc_url."js/zxcvbn.js';b.type='text/javascript';b.async=!0;a=document.getElementsByTagName('script')[0];return a.parentNode.insertBefore(b,a)};null!=window.attachEvent?window.attachEvent('onload',a):window.addEventListener('load',a,!1)}).call(this);
+	(function(){var a;a=function(){var a,b;b=document.createElement('script');b.src='".force_https_url( $rsc_url, 'login' )."js/zxcvbn.js';b.type='text/javascript';b.async=!0;a=document.getElementsByTagName('script')[0];return a.parentNode.insertBefore(b,a)};null!=window.attachEvent?window.attachEvent('onload',a):window.addEventListener('load',a,!1)}).call(this);
 
 	// Call 'passcheck' function when document is loaded
 	if( document.addEventListener )
@@ -3488,7 +3488,7 @@ function display_login_validator( $params = array() )
 			jQuery( "#login_status" ).html( login_icon_load );
 			jQuery.ajax( {
 				type: "POST",
-				url: "'.get_htsrv_url().'anon_async.php",
+				url: "'.get_htsrv_url( 'login' ).'anon_async.php",
 				data: "action=validate_login&login=" + jQuery( this ).val(),
 				success: function( result )
 				{

@@ -6773,6 +6773,31 @@ function get_restapi_url()
 
 
 /**
+ * Force URL from http to https protocol
+ *
+ * @param string Original URL
+ * @param boolean|string FALSE to keep original URL without forcing,
+ *                       'login' - Force only when it is enabled by setting "Require SSL"
+ * @return string Forced URL
+ */
+function force_https_url( $url, $force_https = true )
+{
+	if( $force_https === 'login' )
+	{	// Force url to use https if it is defiend in the setting "Require SSL":
+		global $Settings;
+		$force_https = (boolean)$Settings->get( 'require_ssl' );
+	}
+
+	if( $force_https === true )
+	{	// Force URL only when it is requested by param or enabled by setting checking above:
+		$url = preg_replace( '#^http://#i', 'https://', $url );
+	}
+
+	return $url;
+}
+
+
+/**
  * Get URL to htsrv folder depending on current collection base url from front-office or site base url from back-office
  *
  * Note: For back-office or no collection page _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
@@ -6800,21 +6825,15 @@ function get_htsrv_url( $force_https = false )
  *
  * Note: _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
  *
- * @param boolean TRUE to use https URL
+ * @param boolean|string TRUE to use https URL
  * @return string URL to htsrv folder
  */
-function get_samedomain_htsrv_url( $secure = false )
+function get_samedomain_htsrv_url( $force_https = false )
 {
-	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir, $Collection, $Blog;
+	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_subdir, $Collection, $Blog;
 
-	if( $secure )
-	{
-		$req_htsrv_url = $htsrv_url_sensitive;
-	}
-	else
-	{
-		$req_htsrv_url = $htsrv_url;
-	}
+	// Force URL if it is reauired and enabled by settings:
+	$req_htsrv_url = force_https_url( $htsrv_url, $force_https );
 
 	// Cut htsrv folder from end of the URL:
 	$req_htsrv_url = substr( $req_htsrv_url, 0, strlen( $req_htsrv_url ) - strlen( $htsrv_subdir ) );

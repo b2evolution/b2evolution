@@ -221,7 +221,7 @@ echo $params['review_page_before'];
 
 echo $params['review_form_before'];
 
-$Form = new Form( get_htsrv_url( true ).'comment_review.php', 'review', 'post' );
+$Form = new Form( get_htsrv_url().'comment_review.php', 'review', 'post' );
 
 // Display unsubscribe form
 $Form->begin_form( $params['form_class_review'] );

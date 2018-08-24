@@ -1921,6 +1921,17 @@ function init_list_mode()
 			$AdminUI->breadcrumbpath_add( T_('All'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
 			break;
 
+		case 'summary':
+			$ItemList->set_default_filters( array(
+					'itemtype_usage' => NULL // All types
+				) );
+
+			// require colorbox js
+			require_js_helper( 'colorbox' );
+
+			$AdminUI->breadcrumbpath_add( T_('Summary'), '?ctrl=items&amp;blog=$blog$&amp;tab=summary&amp;filter=restore' );
+			break;
+
 		case 'manual':
 			if( $Blog->get( 'type' ) != 'manual' )
 			{	// Display this tab only for manual blogs
@@ -2168,7 +2179,7 @@ else
 	$AdminUI->append_path_level( empty( $tab ) ? 'full' : $tab );
 }
 
-if( ( isset( $tab ) && in_array( $tab, array( 'full', 'type', 'tracker' ) ) ) || strpos( $action, 'edit' ) === 0 )
+if( ( isset( $tab ) && in_array( $tab, array( 'full', 'summary', 'type', 'tracker' ) ) ) || strpos( $action, 'edit' ) === 0 )
 { // Init JS to autcomplete the user logins
 	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 	// Initialize date picker for _item_expert.form.php
@@ -2474,6 +2485,11 @@ switch( $action )
 				case 'full':
 					// Display VIEW:
 					$AdminUI->disp_view( 'items/views/_item_list_full.view.php' );
+					break;
+
+				case 'summary':
+					// Display VIEW:
+					$AdminUI->disp_view( 'items/views/_item_list_summary.view.php' );
 					break;
 
 				case 'manual':

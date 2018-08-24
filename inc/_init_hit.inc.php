@@ -76,13 +76,6 @@ $Debuglog->add( 'vars: $ReqPath: '.$ReqPath, 'request' );
  */
 $samedomain_htsrv_url = get_samedomain_htsrv_url();
 
-/**
- * Secure htsrv url.
- *
- * @global string
- */
-$secure_htsrv_url = get_secure_htsrv_url();
-
 // on which page are we ?
 /* old:
 $pagenow = explode( '/', $_SERVER['PHP_SELF'] );

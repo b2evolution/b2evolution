@@ -1549,7 +1549,11 @@ function attach_browse_tabs( $display_tabs3 = true )
 		'full' => array(
 			'text' => T_('All'),
 			'href' => $admin_url.'?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$Blog->ID,
-		)
+		),
+		'summary' => array(
+			'text' => T_('Summary'),
+			'href' => $admin_url.'?ctrl=items&amp;tab=summary&amp;filter=restore&amp;blog='.$Blog->ID,
+		),
 	);
 
 	if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )

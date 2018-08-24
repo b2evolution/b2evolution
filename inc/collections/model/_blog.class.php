@@ -2115,25 +2115,16 @@ class Blog extends DataObject
 	 */
 	function get_htsrv_url( $force_https = false )
 	{
-		$force_https = intval( $force_https );
-
 		if( ! isset( $this->htsrv_urls[ $force_https ] ) )
 		{	// Initialize collection htsrv URL only first time and store in cache:
-			global $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir;
+			global $htsrv_url, $htsrv_subdir;
 
 			if( ! is_array( $this->htsrv_urls ) )
 			{
 				$this->htsrv_urls = array();
 			}
 
-			if( $force_https )
-			{	// If secure htsrv URL is required:
-				$required_htsrv_url = $htsrv_url_sensitive;
-			}
-			else
-			{	// If normal htsrv URL is required:
-				$required_htsrv_url = $htsrv_url;
-			}
+			$required_htsrv_url = force_https_url( $htsrv_url, $force_https );
 
 			// Cut htsrv folder from end of the URL:
 			$required_htsrv_url = substr( $required_htsrv_url, 0, strlen( $required_htsrv_url ) - strlen( $htsrv_subdir ) );
@@ -2158,6 +2149,7 @@ class Blog extends DataObject
 				.( empty( $htsrv_url_parts['path'] ) ? '' : $htsrv_url_parts['path'] );
 
 			if( isset( $coll_url_parts['scheme'], $htsrv_url_parts['scheme'] ) &&
+			    $htsrv_url_parts['scheme'] != 'https' && // Don't force htsrv back to http when it was already forced to https above by force_https_url()
 			    $coll_url_parts['scheme'] != $htsrv_url_parts['scheme'] )
 			{	// If this collection uses an url with scheme like "https://" then
 				// htsrv url must also uses the same url scheme to avoid restriction by secure reason:
@@ -2192,12 +2184,12 @@ class Blog extends DataObject
 		}
 		elseif( $url_type == 'absolute' )
 		{	// Absolute URL:
-			return $this->get_setting( 'htsrv_assets_absolute_url' );
+			return force_https_url( $this->get_setting( 'htsrv_assets_absolute_url' ), $force_https );
 		}
 		else// == 'basic'
 		{	// Basic Config URL from config:
-			global $htsrv_url_sensitive, $htsrv_url;
-			return $force_https ? $htsrv_url_sensitive : $htsrv_url;
+			global $htsrv_url;
+			return force_https_url( $htsrv_url, $force_https );
 		}
 	}
 
@@ -3041,6 +3033,7 @@ class Blog extends DataObject
 				{ // Append url suffix
 					$url = url_add_param( $url, $params['url_suffix'], $params['glue'] );
 				}
+				$url = force_https_url( $url, 'login' );
 				return $url;
 
 			case 'threadsurl':
@@ -3180,6 +3173,12 @@ class Blog extends DataObject
 			{ // Add disp param to blog's url when current disp is not a front page
 				$url = url_add_param( $this_Blog->gen_blogurl(), 'disp='.$disp_param, $params['glue'] );
 			}
+
+			if( $disp_param == 'pwdchange' )
+			{	// Force a change password page to https if it is required by setting "Require SSL":
+				$url = force_https_url( $url, 'login' );
+			}
+
 			if( ! empty( $params['url_suffix'] ) )
 			{ // Append url suffix
 				$url = url_add_param( $url, $params['url_suffix'], $params['glue'] );
