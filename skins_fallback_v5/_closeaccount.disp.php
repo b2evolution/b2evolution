@@ -23,7 +23,7 @@ if( ! empty( $account_closing_success ) )
 else
 { // Display a form to close an account
 
-	$Form = new Form( get_htsrv_url( true ).'login.php' );
+	$Form = new Form( get_htsrv_url( 'login' ).'login.php' );
 
 	$Form->begin_form( 'inskin' );
 

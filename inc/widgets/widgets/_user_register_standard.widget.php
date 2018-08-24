@@ -207,7 +207,7 @@ class user_register_standard_Widget extends ComponentWidget
 				$Session->delete( 'core.register_user' );
 			}
 
-			$Form = new Form( get_htsrv_url( true ).'register.php', 'register_form', 'post' );
+			$Form = new Form( get_htsrv_url( 'login' ).'register.php', 'register_form', 'post' );
 
 			if( ! is_null( $params['register_form_params'] ) )
 			{	// Use another template param from skin:

@@ -48,8 +48,8 @@ if( ! empty( $login_Blog ) )
 }
 else
 { // Use standard login/lost password urls
-	$login_url = get_htsrv_url( true ).'login.php';
-	$lostpassword_url = get_htsrv_url( true ).'login.php?action=lostpassword';
+	$login_url = get_htsrv_url( 'login' ).'login.php';
+	$lostpassword_url = get_htsrv_url( 'login' ).'login.php?action=lostpassword';
 }
 
 // Buttons:

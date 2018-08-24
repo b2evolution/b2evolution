@@ -56,7 +56,7 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 		$message_content .= '<p'.emailskin_style( '.p' ).'>'.T_( 'Login' ).': '.$iterator_User->get_colored_login( array( 'mask' => '$login$', 'protocol' => 'http:' ) )."</p>\n";
 	}
 
-	$url_change_password = get_htsrv_url( true ).'login.php?action=changepwd'
+	$url_change_password = get_htsrv_url( 'login' ).'login.php?action=changepwd'
 		.'&'.$dummy_fields[ 'login' ].'='.rawurlencode( $iterator_User->login )
 		.'&reqID='.$params['request_id']
 		.$params['blog_param'];

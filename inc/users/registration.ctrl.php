@@ -95,6 +95,7 @@ switch ( $action )
 		{	// Force to accept HTTP authentication headers when it is required:
 			$http_auth_accept = 1;
 		}
+		param( 'require_ssl', 'integer', 0 );
 		param( 'js_passwd_hashing', 'integer', 0 );
 		param( 'passwd_special', 'integer', 0 );
 		param( 'strict_logins', 'integer', 0 );
@@ -157,6 +158,7 @@ switch ( $action )
 					 array( 'after_registration', $after_registration ),
 					 array( 'after_registration_slug', $after_registration_slug ),
 					 array( 'user_minpwdlen', $user_minpwdlen ),
+					 array( 'require_ssl', $require_ssl ),
 					 array( 'js_passwd_hashing', $js_passwd_hashing ),
 					 array( 'http_auth_require', $http_auth_require ),
 					 array( 'http_auth_accept', $http_auth_accept ),
