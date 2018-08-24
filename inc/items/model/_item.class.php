@@ -306,6 +306,10 @@ class Item extends ItemLight
 	 * @var integer
 	 */
 	var $countvotes;
+	/**
+	 * Lazy filled, use {@link get_social_media_image()} to access it.
+	 */
+	var $social_media_image_File = NULL;
 
 	/**
 	 * Constructor
@@ -11162,6 +11166,98 @@ class Item extends ItemLight
 				WHERE post_ID = '.$this->ID );
 
 		return true;
+	}
+
+
+	/**
+	 * Get image file used for social media
+	 *
+	 * @param boolean Use category social media boiler plate or category image as fallback
+	 * @param boolean Use site social media boiler plate or site logo as fallback
+	 * @return object Image File or Link object
+	 */
+	function get_social_media_image( $use_category_fallback = false, $use_site_fallback = false, $return_as_link = false )
+	{
+		if( ! empty( $this->social_media_image_File ) && ! $return_as_link )
+		{
+			return $this->social_media_image_File;
+		}
+
+		$LinkOwner = new LinkItem( $this );
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink,inline', 'image', array(
+				'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+				'sql_order_by'   => 'link_priority ASC, link_order ASC' ) ) )
+		{ // Item has linked files
+			while( $Link = & $LinkList->get_next() )
+			{
+				if( ! ( $File = & $Link->get_File() ) )
+				{ // No File object
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+					continue;
+				}
+
+				if( ! $File->exists() )
+				{ // File doesn't exist
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+					continue;
+				}
+
+				if( $File->is_image() )
+				{ // Use only image files for og:image tag
+					$this->social_media_image_File = $File;
+					if( $return_as_link )
+					{
+						return $Link;
+					}
+					break;
+				}
+			}
+		}
+
+		if( empty( $this->social_media_image_File ) && $use_category_fallback )
+		{
+			$FileCache = & get_FileCache();
+			if( $default_Chapter = & $this->get_main_Chapter() )
+			{ // Try social media boilerplate image
+				$social_media_image_file_ID = $default_Chapter->get( 'social_media_image_file_ID', false );
+				if( $social_media_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) ) && $File->is_image() )
+				{
+					$this->social_media_image_File = $File;
+				}
+				else
+				{ // Try category image
+					$cat_image_file_ID = $default_Chapter->get( 'image_file_ID', false );
+					if( $cat_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $cat_image_file_ID ) ) && $File->is_image() )
+					{
+						$this->social_media_image_File = $File;
+					}
+				}
+			}
+		}
+
+		if( empty( $this->social_media_image_File ) && $use_site_fallback )
+		{ // Use social media boilerplate logo if configured
+			global $Settings;
+
+			$FileCache = & get_FileCache();
+			$social_media_image_file_ID = intval( $Settings->get( 'social_media_image_file_ID' ) );
+			if( $social_media_image_file_ID > 0 && ( $File = $FileCache->get_by_ID( $social_media_image_file_ID, false ) ) && $File->is_image() )
+			{
+				$this->social_media_image_File = $File;
+			}
+			else
+			{ // Use site logo as fallback if configured
+				$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
+				if( $notification_logo_file_ID > 0 && ( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) ) && $File->is_image() )
+				{
+					$this->social_media_image_File = $File;
+				}
+			}
+		}
+
+		return $this->social_media_image_File;
 	}
 }
 ?>

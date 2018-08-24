@@ -708,6 +708,11 @@ class AdminUI extends AdminUI_general
 					'text_danger'  => 'btn btn-danger',
 					'text_warning' => 'btn btn-warning',
 					'group'        => 'btn-group',
+					'small_text'   => 'btn btn-default btn-sm',
+					'small_text_primary' => 'btn btn-primary btn-sm',
+					'small_text_success' => 'btn btn-success btn-sm',
+					'small_text_danger'  => 'btn btn-danger btn-sm',
+					'small_text_warning' => 'btn btn-warning btn-sm',
 				);
 
 			case 'table_browse':
