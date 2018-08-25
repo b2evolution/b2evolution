@@ -394,7 +394,8 @@ if( ! $is_creating )
 
 		$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is typically displayed by a widget right under the collection name in the front-office.'), 250 );
 
-		$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This may be displayed in several places of the front-office. This may also be included in the XML feeds. You may use HTML markup here.'), 50 );
+		$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This will be used in Open Graph tags and XML feeds. This may also be displayed by widgets in the front-office.')
+			.' '.T_(' HTML markup possible but not recommended.'), 50 );
 
 	$Form->end_fieldset();
 }
