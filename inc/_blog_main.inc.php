@@ -634,6 +634,12 @@ if( $disp == 'page' || $disp == 'single' )
 		$disp = '404';
 		$disp_detail = '404-item-deprecated';
 	}
+	elseif( ! $preview && $Item->status == 'redirected' && $redir == 'yes' )
+	{	// $redir=no here allows to force a 'single post' URL for commenting
+		// Redirect to the URL specified in the post:
+		$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'].' );
+		header_redirect( $Item->url, true, true );
+	}
 	elseif( ! $preview && ! in_array( $Item->status, get_inskin_statuses( $Blog->ID, 'post' ) ) )
 	{	// If the requested Item is not allowed to be displayed on front-office
 		$disp = '404';

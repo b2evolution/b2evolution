@@ -177,14 +177,6 @@ function skin_init( $disp )
 				$Item->check_goal();
 			}
 
-			// Check if the post has 'redirected' status:
-			if( ! $preview && $Item->status == 'redirected' && $redir == 'yes' )
-			{	// $redir=no here allows to force a 'single post' URL for commenting
-				// Redirect to the URL specified in the post:
-				$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'].' );
-				header_redirect( $Item->url, true, true );
-			}
-
 			// Check if we want to redirect to a canonical URL for the post
 			// Please document encountered problems.
 			if( ! $preview
