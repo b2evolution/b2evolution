@@ -6776,7 +6776,7 @@ function get_restapi_url()
  *                       'login' - Force only when it is enabled by setting "Require SSL"
  * @return string Forced URL
  */
-function force_https_url( $url, $force_https = false )
+function force_https_url( $url, $force_https = true )
 {
 	if( $force_https === 'login' )
 	{	// Force url to use https if it is defiend in the setting "Require SSL":
