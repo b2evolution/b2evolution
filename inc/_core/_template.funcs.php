@@ -169,19 +169,24 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	{ // $dispatcher is DEPRECATED and pages should use $admin_url URL instead, but at least we're staying on the same site:
 		$external_redirect = false;
 	}
-	elseif( strpos( preg_replace( '/^https?/', '', $redirect_to ), preg_replace( '/^https?/', '', $baseurl ) ) === 0)
-	{ // redirecting between HTTP and HTTPS on the same domain should not be considered an external redirect
-		$Debuglog->add( 'Redirecting within $baseurl, all is fine.', 'request' );
+	elseif( strpos( $redirect_to, $baseurl ) === 0 )
+	{
+		$Debuglog->add('Redirecting within $baseurl, all is fine.', 'request' );
 		$external_redirect = false;
 	}
-	elseif( strpos($redirect_to, force_https_url( $htsrv_url, true ) ) === 0 )
-	{
-		$Debuglog->add('Redirecting within https of $htsrv_url, all is fine.', 'request' );
+	elseif( strpos( $redirect_to, force_https_url( $baseurl ) ) === 0 )
+	{	// Protocol https may be forced for all login, registration and etc. pages:
+		$Debuglog->add('Redirecting within https of $baseurl, all is fine.', 'request' );
 		$external_redirect = false;
 	}
 	elseif( ! empty( $Blog ) && strpos( $redirect_to, $Blog->gen_baseurl() ) === 0 )
 	{
 		$Debuglog->add( 'Redirecting within current collection URL, all is fine.', 'request' );
+		$external_redirect = false;
+	}
+	elseif( ! empty( $Blog ) && strpos( $redirect_to, force_https_url( $Blog->gen_baseurl() ) ) === 0 )
+	{	// Protocol https may be forced for all login, registration and etc. pages:
+		$Debuglog->add('Redirecting within https of current collection URL, all is fine.', 'request' );
 		$external_redirect = false;
 	}
 
