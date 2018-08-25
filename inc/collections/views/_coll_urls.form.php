@@ -334,7 +334,7 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 				'local_url'    => $edited_Blog->get_local_plugins_url( 'relative' )
 			);
 		// htsrv url:
-		$htsrv_url_https = force_https_url( $htsrv_url, true );
+		$htsrv_url_https = force_https_url( $htsrv_url );
 		$assets_url_data['htsrv_assets_url_type'] = array(
 				'label'        => sprintf( T_('Link to %s through'), '<code>/htsrv/</code>' ),
 				'url'          => $htsrv_url.( $htsrv_url != $htsrv_url_https ? ', '.$htsrv_url_https : '' ),

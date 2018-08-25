@@ -6771,11 +6771,12 @@ function get_restapi_url()
  * Force URL from http to https protocol
  *
  * @param string Original URL
- * @param boolean|string FALSE to keep original URL without forcing,
+ * @param boolean|string TRUE to force without settings checking,
+ *                       FALSE to keep original URL without forcing,
  *                       'login' - Force only when it is enabled by setting "Require SSL"
  * @return string Forced URL
  */
-function force_https_url( $url, $force_https = true )
+function force_https_url( $url, $force_https = false )
 {
 	if( $force_https === 'login' )
 	{	// Force url to use https if it is defiend in the setting "Require SSL":
@@ -6865,17 +6866,6 @@ function get_samedomain_htsrv_url( $force_https = false )
 	*/
 
 	return $samedomain_htsrv_url;
-}
-
-
-/**
- * Get secure htsrv url on the same domain as the http request came from
- * It is important on login and register calls
- * _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
- */
-function get_secure_htsrv_url()
-{
-	return get_samedomain_htsrv_url( true );
 }
 
 
