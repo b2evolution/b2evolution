@@ -815,9 +815,6 @@ class Blog extends DataObject
 		{	// HTML notes:
 			param_check_html( 'blog_notes', T_('Invalid Blog Notes') );
 			$this->set( 'notes', get_param( 'blog_notes' ) );
-
-			param_integer_range( 'max_footer_credits', 0, 3, T_('Max credits must be between %d and %d.') );
-			$this->set_setting( 'max_footer_credits', get_param( 'max_footer_credits' ) );
 		}
 
 
@@ -1200,6 +1197,9 @@ class Blog extends DataObject
 			{	// HTML header includes:
 				param_check_html( 'blog_head_includes', T_('Invalid Custom meta tag/css section.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'head_extension' );
 				$this->set_setting( 'head_includes', get_param( 'blog_head_includes' ) );
+
+				param_integer_range( 'max_footer_credits', 0, 3, T_('Max credits must be between %d and %d.') );
+				$this->set_setting( 'max_footer_credits', get_param( 'max_footer_credits' ) );
 			}
 
 			if( param( 'blog_body_includes', 'html', NULL ) !== NULL )

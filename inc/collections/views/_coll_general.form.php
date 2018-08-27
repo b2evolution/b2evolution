@@ -394,6 +394,10 @@ if( ! $is_creating )
 
 		$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is typically displayed by a widget right under the collection name in the front-office.'), 250 );
 
+		$shortdesc_chars_count = utf8_strlen( html_entity_decode( $edited_Blog->get( 'shortdesc' ) ) );
+		$Form->text( 'blog_shortdesc', $edited_Blog->get( 'shortdesc' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!')
+			.' ('.sprintf( T_('%s characters'), '<span id="blog_shortdesc_chars_count">'.$shortdesc_chars_count.'</span>' ).')', 250, 'large' );
+
 		$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This will be used in Open Graph tags and XML feeds. This may also be displayed by widgets in the front-office.')
 			.' '.T_(' HTML markup possible but not recommended.'), 50 );
 
@@ -404,7 +408,32 @@ else
 	$Form->hidden( 'blog_order', $edited_Blog->get( 'order' ) );
 	$Form->hidden( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ) );
 	$Form->hidden( 'blog_tagline', $edited_Blog->get( 'tagline' ) );
+	$Form->hidden( 'blog_shortdesc', $edited_Blog->get( 'shortdesc' ) );
 	$Form->hidden( 'blog_longdesc', $edited_Blog->get( 'longdesc' ) );
+}
+
+if( ! $is_creating )
+{
+	$Form->begin_fieldset( T_('Meta data').get_manual_link('blog_meta_data') );
+		$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
+		$Form->text( 'blog_footer_text', $edited_Blog->get_setting( 'blog_footer_text' ), 60, T_('Blog footer'), sprintf(
+			T_('Use &lt;br /&gt; to insert a line break. You might want to put your copyright or <a href="%s" target="_blank">creative commons</a> notice here.'),
+			'http://creativecommons.org/license/' ), 1000, 'large' );
+		$Form->textarea( 'single_item_footer_text', $edited_Blog->get_setting( 'single_item_footer_text' ), 2, T_('Single post footer'),
+			T_('This will be displayed after each post in single post view.').' '.sprintf( T_('Available variables: %s.'), '<b>$perm_url$</b>, <b>$title$</b>, <b>$excerpt$</b>, <b>$author$</b>, <b>$author_login$</b>' ), 50 );
+		$Form->textarea( 'xml_item_footer_text', $edited_Blog->get_setting( 'xml_item_footer_text' ), 2, T_('Post footer in RSS/Atom'),
+			T_('This will be appended to each post in your RSS/Atom feeds.').' '.sprintf( T_('Available variables: %s.'), T_('same as above') ), 50 );
+		$Form->textarea( 'blog_notes', $edited_Blog->get( 'notes' ), 5, T_('Notes'),
+			T_('Additional info. Appears in the backoffice.'), 50 );
+	$Form->end_fieldset();
+}
+else
+{
+	$Form->hidden( 'blog_keywords', $edited_Blog->get( 'keywords' ) );
+	$Form->hidden( 'blog_footer_text', $edited_Blog->get_setting( 'blog_footer_text' ) );
+	$Form->hidden( 'single_item_footer_text', $edited_Blog->get_setting( 'single_item_footer_text' ) );
+	$Form->hidden( 'xml_item_footer_text', $edited_Blog->get_setting( 'xml_item_footer_text' ) );
+	$Form->hidden( 'blog_notes', $edited_Blog->get( 'notes' ) );
 }
 
 
@@ -455,4 +484,8 @@ jQuery( '#duplicate_items' ).click( function()
 	jQuery( '#duplicate_comments' ).prop( 'disabled', ! jQuery( this ).is( ':checked' ) );
 } );
 
+jQuery( '#blog_shortdesc' ).keyup( function()
+{	// Count characters of meta short description(each html entity is counted as single char):
+	jQuery( '#blog_shortdesc_chars_count' ).html( jQuery( this ).val().replace( /&[^;\s]+;/g, '&' ).length );
+} );
 </script>
