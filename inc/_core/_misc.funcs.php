@@ -9006,4 +9006,119 @@ function fill_empty_days( $data, $default_data, $start_date, $end_date )
 
 	return $fixed_data;
 }
+
+
+/**
+ * Get image file used for social media
+ *
+ * @param boolean Use category social media boiler plate or category image as fallback
+ * @param boolean Use site social media boiler plate or site logo as fallback
+ * @return object Image File or Link object
+ */
+function get_social_media_image( $Item = NULL, $use_category_fallback = true, $use_site_fallback = true, $return_as_link = false )
+{
+	$social_media_image = NULL;
+
+	if( ! empty( $Item ) )
+	{
+		$LinkOwner = new LinkItem( $Item );
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink,inline', 'image', array(
+				'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+				'sql_order_by'   => 'link_priority ASC, link_order ASC' ) ) )
+		{ // Item has linked files:
+			while( $Link = & $LinkList->get_next() )
+			{
+				if( ! ( $File = & $Link->get_File() ) )
+				{ // No File object:
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
+					continue;
+				}
+
+				if( ! $File->exists() )
+				{ // File doesn't exist:
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+					continue;
+				}
+
+				if( $File->is_image() )
+				{ // Use only image files for og:image tag:
+					$social_media_image = $File;
+					if( $return_as_link )
+					{
+						return $Link;
+					}
+					break;
+				}
+			}
+		}
+
+		if( empty( $social_media_image ) && $use_category_fallback )
+		{ // No social media image from Item, let's try getting one from the default chapter
+			$FileCache = & get_FileCache();
+			if( $default_Chapter = & $Item->get_main_Chapter() )
+			{ // Try social media boilerplate image first:
+				$social_media_image_file_ID = $default_Chapter->get( 'social_media_image_file_ID', false );
+				if( $social_media_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) ) && $File->is_image() )
+				{
+					$social_media_image = $File;
+				}
+				else
+				{ // Try category image:
+					$cat_image_file_ID = $default_Chapter->get( 'image_file_ID', false );
+					if( $cat_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $cat_image_file_ID ) ) && $File->is_image() )
+					{
+						$social_media_image = $File;
+					}
+				}
+			}
+		}
+	}
+
+	global $Blog;
+	if( empty( $social_media_image ) && $use_category_fallback && $Blog )
+	{ // No social media image from Item, the Item's main category or no Item was provided. We'll try the collection default category:
+		$ChapterCache = & get_ChapterCache();
+		$default_cat_ID = $Blog->get_default_cat_ID();
+		if( $default_cat_ID && $default_Chapter = & $ChapterCache->get_by_ID( $default_cat_ID ) )
+		{ // Try social media boilerplate image first:
+			$social_media_image_file_ID = $default_Chapter->get( 'social_media_image_file_ID', false );
+			if( $social_media_image_file_ID > 0 && $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) && $File->is_image() )
+			{
+				$social_tag_image = $File;
+			}
+			else
+			{ // Try category image:
+				$cat_image_file_ID = $default_Chapter->get( 'image_file_ID', false );
+				if( $cat_image_file_ID > 0 && $File = & $FileCache->get_by_ID( $cat_image_file_ID ) && $File->is_image() )
+				{
+					$social_tag_image = $File;
+				}
+			}
+		}
+	}
+
+	if( empty( $social_media_image ) && $use_site_fallback )
+	{ // Use social media boilerplate logo if configured
+		global $Settings;
+
+		$FileCache = & get_FileCache();
+		$social_media_image_file_ID = intval( $Settings->get( 'social_media_image_file_ID' ) );
+		if( $social_media_image_file_ID > 0 && ( $File = $FileCache->get_by_ID( $social_media_image_file_ID, false ) ) && $File->is_image() )
+		{
+			$social_media_image = $File;
+		}
+		else
+		{ // Use site logo as fallback if configured
+			$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
+			if( $notification_logo_file_ID > 0 && ( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) ) && $File->is_image() )
+			{
+				$social_media_image = $File;
+			}
+		}
+	}
+
+	return $social_media_image;
+}
 ?>
