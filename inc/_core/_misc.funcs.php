@@ -9020,7 +9020,6 @@ function get_social_media_image( $Item = NULL, $params = array() )
 	$params = array_merge( array(
 			'use_item_cat_fallback'      => true,
 			'use_coll_fallback'          => true,
-			'use_coll_dflt_cat_fallback' => true,
 			'use_site_fallback'          => true,
 			'return_as_link'             => false,
 		), $params );
@@ -9030,7 +9029,7 @@ function get_social_media_image( $Item = NULL, $params = array() )
 	if( ! empty( $Item ) )
 	{ // Try to get attached images
 		$LinkOwner = new LinkItem( $Item );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink,inline', 'image', array(
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink', 'image', array(
 				'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
 				'sql_order_by'   => 'link_priority ASC, link_order ASC' ) ) )
 		{ // Item has linked files:
@@ -9075,14 +9074,6 @@ function get_social_media_image( $Item = NULL, $params = array() )
 				{
 					return $File;
 				}
-				else
-				{ // Try category image:
-					$cat_image_file_ID = $default_Chapter->get( 'image_file_ID', false );
-					if( $cat_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $cat_image_file_ID ) ) && $File->is_image() )
-					{
-						return $File;
-					}
-				}
 			}
 		}
 	}
@@ -9097,34 +9088,6 @@ function get_social_media_image( $Item = NULL, $params = array() )
 
 			return $File;
 		}
-		elseif( $coll_image_file_ID = $Blog->get_setting( 'collection_logo_file_ID', false ) )
-		{ // Try collection image:
-			if( $coll_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $coll_image_file_ID, false, false ) ) && $File->is_image() )
-			{
-				return $File;
-			}
-		}
-	}
-
-	if( $params['use_coll_dflt_cat_fallback'] && $Blog )
-	{ // Try to get collection's default category:
-		$ChapterCache = & get_ChapterCache();
-		$default_cat_ID = $Blog->get_default_cat_ID();
-		if( $default_cat_ID && $default_Chapter = & $ChapterCache->get_by_ID( $default_cat_ID ) )
-		{ // Try social media boilerplate image first:
-			$social_media_image_file_ID = $default_Chapter->get( 'social_media_image_file_ID', false );
-			if( $social_media_image_file_ID > 0 && $File = & $FileCache->get_by_ID( $social_media_image_file_ID, false, false  ) && $File->is_image() )
-			{
-				return $File;
-			}
-			elseif( $cat_image_file_ID = $default_Chapter->get( 'image_file_ID', false ) )
-			{ // Try category image:
-				if( $cat_image_file_ID > 0 && $File = & $FileCache->get_by_ID( $cat_image_file_ID, false, false ) && $File->is_image() )
-				{
-					return $File;
-				}
-			}
-		}
 	}
 
 	if( $params['use_site_fallback'] )
@@ -9136,14 +9099,6 @@ function get_social_media_image( $Item = NULL, $params = array() )
 		if( $social_media_image_file_ID > 0 && ( $File = $FileCache->get_by_ID( $social_media_image_file_ID, false ) ) && $File->is_image() )
 		{
 			return $File;
-		}
-		else
-		{ // Use site logo as fallback if configured
-			$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
-			if( $notification_logo_file_ID > 0 && ( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) ) && $File->is_image() )
-			{
-				return $File;
-			}
 		}
 	}
 
