@@ -178,6 +178,9 @@ if( in_array( $action, array( 'create', 'new-name' ) ) && $ctrl = 'collections' 
 
 $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_parameters' ), array( 'class'=>'fieldset clear' ) );
 
+	$collection_logo_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select collection logo/image'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
+	$Form->fileselect( 'collection_logo_file_ID', $edited_Blog->get_setting( 'collection_logo_file_ID' ), T_('Collection logo/image'), NULL, $collection_logo_params );
+
 	$name_chars_count = utf8_strlen( html_entity_decode( $edited_Blog->get( 'name' ) ) );
 	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Title'), T_('Will be displayed on top of the blog.')
 		.' ('.sprintf( T_('%s characters'), '<span id="blog_name_chars_count">'.$name_chars_count.'</span>' ).')', 255 );
@@ -415,6 +418,8 @@ else
 if( ! $is_creating )
 {
 	$Form->begin_fieldset( T_('Meta data').get_manual_link('blog_meta_data') );
+		$social_media_boilerplate_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select logo for social media boilerplate'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
+		$Form->fileselect( 'social_media_image_file_ID', $edited_Blog->get_setting( 'social_media_image_file_ID' ), T_('Social media boilerplate'), NULL, $social_media_boilerplate_params );
 		$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
 		$Form->text( 'blog_footer_text', $edited_Blog->get_setting( 'blog_footer_text' ), 60, T_('Blog footer'), sprintf(
 			T_('Use &lt;br /&gt; to insert a line break. You might want to put your copyright or <a href="%s" target="_blank">creative commons</a> notice here.'),

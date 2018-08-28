@@ -473,6 +473,9 @@ class Blog extends DataObject
 
 		if( param( 'blog_name', 'string', NULL ) !== NULL )
 		{ // General params:
+
+			$this->set_setting( 'collection_logo_file_ID', param( 'collection_logo_file_ID', 'integer', NULL ) );
+
 			$this->set_from_Request( 'name' );
 			$this->set( 'shortname', param( 'blog_shortname', 'string', true ) );
 
@@ -780,6 +783,8 @@ class Blog extends DataObject
 		{	// Description:
 			$this->set_from_Request( 'shortdesc' );
 		}
+
+		$this->set_setting( 'social_media_image_file_ID', param( 'social_media_image_file_ID', 'integer', NULL ) );
 
 		if( param( 'blog_keywords', 'string', NULL ) !== NULL )
 		{	// Keywords:
@@ -2900,6 +2905,17 @@ class Blog extends DataObject
 					}
 				}
 				return $result;
+
+			case 'collection_image':
+				$FileCache = & get_FileCache();
+				if( $collection_image_ID = $this->get_setting( 'collection_logo_file_ID' ) )
+				{
+					if( $collection_image_File = & $FileCache->get_by_ID( $collection_image_ID, false, false ) )
+					{
+						return $collection_image_File;
+					}
+				}
+				return NULL;
 
 			default:
 				// All other params:

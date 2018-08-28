@@ -547,11 +547,17 @@ if( $action == 'dashboard' )
 		echo '<div class="first_payload_block">'."\n";
 
 		$AdminUI->disp_payload_begin();
+		$collection_image = $Blog->get( 'collection_image' );
 		echo '<div class="row">';
 			echo '<div class="col-xs-12 col-sm-3 col-sm-push-9 col-lg-2 col-lg-push-10 text-right">';
 			echo action_icon( TS_('View in Front-Office'), '', $Blog->get( 'url' ), T_('View in Front-Office'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
 			echo '</div>';
-			echo '<h2 class="col-xs-12 col-sm-9 col-sm-pull-3 col-lg-10 col-lg-pull-2 page-title">'.get_coll_fav_icon( $Blog->ID, array( 'class' => 'coll-fav' ) ).'&nbsp;'.$Blog->dget( 'name' ).' <span class="text-muted" style="font-size: 0.6em;">('./* TRANS: abbr. for "Collection" */ T_('Collection').' #'.$Blog->ID.')</span>'.'</h2>';
+			echo '<h2 class="col-xs-12 col-sm-9 col-sm-pull-3 col-lg-10 col-lg-pull-2 page-title">'
+					.get_coll_fav_icon( $Blog->ID, array( 'class' => 'coll-fav' ) ).'&nbsp;'
+					.( ! empty( $collection_image ) ? $collection_image->get_tag( '', '', '', '', 'crop-32x32' ).'&nbsp;' : '' )
+					.$Blog->dget( 'name' )
+					.' <span class="text-muted" style="font-size: 0.6em;">('./* TRANS: abbr. for "Collection" */ T_('Collection').' #'.$Blog->ID.')</span>'
+					.'</h2>';
 		echo '</div>';
 		load_funcs( 'collections/model/_blog_js.funcs.php' );
 		echo '<div class="row browse">';
