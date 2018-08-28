@@ -10158,6 +10158,47 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12960, 'Upgrade collections table...' ) )
+	{	// part of 6.10.3-stable
+		$SQL = new SQL( 'Get collections settings to upgrade url protocol' );
+		$SQL->SELECT( 'blog_ID, blog_http_protocol, blog_access_type, blog_siteurl' );
+		$SQL->FROM( 'T_blogs' );
+		$colls = $DB->get_results( $SQL );
+
+		// Remove column "SSL" from collections table and use it as value of the collection settings table instead:
+		db_drop_col( 'T_blogs', 'blog_http_protocol' );
+
+		if( ! empty( $colls ) )
+		{	// If there are collections to update
+			$is_https_baseurl = preg_match( '#^https://#', $baseurl );
+			$coll_protocol_insert_values = array();
+			foreach( $colls as $coll )
+			{	// Check what protocol is used by the collection:
+				if( $coll->blog_http_protocol == 'allow_both' )
+				{	// Use same value from collections table:
+					$http_protocol_value = 'allow_both';
+				}
+				elseif( ( $is_https_baseurl && $coll->blog_access_type != 'absolute' ) || // If base URL use https protocol then all collection without absolute urls use https too
+				        ( $coll->blog_access_type == 'absolute' && preg_match( '#^https://#', $coll->blog_siteurl ) ) ) // If collection absolute url uses https url
+				{	// This collection should always use https:
+					$http_protocol_value = 'always_https';
+				}
+				else
+				{	// Don't insert collection setting with default values "always_http":
+					continue;
+				}
+				// Set sql data to insert collections settings by single query below:
+				$coll_protocol_insert_values[] = '( '.$coll->blog_ID.', "http_protocol", "'.$http_protocol_value.'" )';
+			}
+			if( ! empty( $coll_protocol_insert_values ) )
+			{	// Insert new settings only if at least collection has a not default setting "SSL":
+				$DB->query( 'INSERT INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+					VALUES '.implode( ', ', $coll_protocol_insert_values ) );
+			}
+		}
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '

@@ -556,11 +556,17 @@ if( $action == 'dashboard' )
 		echo '<div class="first_payload_block">'."\n";
 
 		$AdminUI->disp_payload_begin();
+		$collection_image = $Blog->get( 'collection_image' );
 		echo '<div class="row">';
 			echo '<div class="col-xs-12 col-sm-3 col-sm-push-9 col-lg-2 col-lg-push-10 text-right">';
 			echo action_icon( TS_('View in Front-Office'), '', $Blog->get( 'url' ), T_('View in Front-Office'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
 			echo '</div>';
-			echo '<h2 class="col-xs-12 col-sm-9 col-sm-pull-3 col-lg-10 col-lg-pull-2 page-title">'.get_coll_fav_icon( $Blog->ID, array( 'class' => 'coll-fav' ) ).'&nbsp;'.$Blog->dget( 'name' ).' <span class="text-muted" style="font-size: 0.6em;">('./* TRANS: abbr. for "Collection" */ T_('Collection').' #'.$Blog->ID.')</span>'.'</h2>';
+			echo '<h2 class="col-xs-12 col-sm-9 col-sm-pull-3 col-lg-10 col-lg-pull-2 page-title">'
+					.get_coll_fav_icon( $Blog->ID, array( 'class' => 'coll-fav' ) ).'&nbsp;'
+					.( ! empty( $collection_image ) ? $collection_image->get_tag( '', '', '', '', 'crop-32x32' ).'&nbsp;' : '' )
+					.$Blog->dget( 'name' )
+					.' <span class="text-muted" style="font-size: 0.6em;">('./* TRANS: abbr. for "Collection" */ T_('Collection').' #'.$Blog->ID.')</span>'
+					.'</h2>';
 		echo '</div>';
 		load_funcs( 'collections/model/_blog_js.funcs.php' );
 		echo '<div class="row browse">';
@@ -616,9 +622,24 @@ if( $action == 'dashboard' )
 				$side_item_Widget->disp_template_raw( 'block_end' );
 				echo '</div>';
 			}
-			echo '</div><!-- End of Block Group 1 -->';
-
 			$Timer->stop( 'Panel: Collection Metrics' );
+
+			if( $Blog->get( 'notes' ) )
+			{
+				$edit_link = '';
+				if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
+				{
+					$edit_link = action_icon( T_('Edit').'...', 'edit_button', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID, ' '.T_('Edit').'...', 3, 4, array( 'class' => 'btn btn-primary btn-sm' ) );
+				}
+
+				$block_item_Widget = new Widget( 'block_item' );
+				$block_item_Widget->title = '<span class="pull-right panel_heading_action_icons">'.$edit_link.'</span>'.T_('Notes');
+				$block_item_Widget->disp_template_replaced( 'block_start' );
+				$Blog->disp( 'notes', 'htmlbody' );
+				$block_item_Widget->disp_template_replaced( 'block_end' );
+			}
+
+			echo '</div><!-- End of Block Group 1 -->';
 			evo_flush();
 		}
 

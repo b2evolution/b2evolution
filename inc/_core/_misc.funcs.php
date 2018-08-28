@@ -9081,6 +9081,149 @@ function fill_empty_days( $data, $default_data, $start_date, $end_date )
 
 
 /**
+ * Get image file used for social media
+ *
+ * @param object Item object
+ * @param array Params
+ * @return object Image File or Link object
+ */
+function get_social_media_image( $Item = NULL, $params = array() )
+{
+	$params = array_merge( array(
+			'use_item_cat_fallback'      => true,
+			'use_coll_fallback'          => true,
+			'use_coll_dflt_cat_fallback' => true,
+			'use_site_fallback'          => true,
+			'return_as_link'             => false,
+		), $params );
+
+	$social_media_image = NULL;
+
+	if( ! empty( $Item ) )
+	{ // Try to get attached images
+		$LinkOwner = new LinkItem( $Item );
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink,inline', 'image', array(
+				'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+				'sql_order_by'   => 'link_priority ASC, link_order ASC' ) ) )
+		{ // Item has linked files:
+			while( $Link = & $LinkList->get_next() )
+			{
+				if( ! ( $File = & $Link->get_File() ) )
+				{ // No File object:
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
+					continue;
+				}
+
+				if( ! $File->exists() )
+				{ // File doesn't exist:
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+					continue;
+				}
+
+				if( $File->is_image() )
+				{ // Use only image files for og:image tag:
+					if( $params['return_as_link'] )
+					{
+						return $Link;
+					}
+					else
+					{
+						return $File;
+					}
+					break;
+				}
+			}
+		}
+
+		if( $params['use_item_cat_fallback'] )
+		{ // No attached image from Item, let's try getting one from the Item's default chapter
+			$FileCache = & get_FileCache();
+			if( $default_Chapter = & $Item->get_main_Chapter() )
+			{ // Try social media boilerplate image first:
+				$social_media_image_file_ID = $default_Chapter->get( 'social_media_image_file_ID', false );
+				if( $social_media_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) ) && $File->is_image() )
+				{
+					return $File;
+				}
+				else
+				{ // Try category image:
+					$cat_image_file_ID = $default_Chapter->get( 'image_file_ID', false );
+					if( $cat_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $cat_image_file_ID ) ) && $File->is_image() )
+					{
+						return $File;
+					}
+				}
+			}
+		}
+	}
+
+	global $Blog;
+
+	if( $params['use_coll_fallback'] && $Blog )
+	{ // Try to get collection social media boiler plate and collection image/logo:
+		$social_media_image_file_ID = $Blog->get_setting( 'social_media_image_file_ID', false );
+		if( $social_media_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) ) && $File->is_image() )
+		{ // Try social media boiler plate first:
+
+			return $File;
+		}
+		elseif( $coll_image_file_ID = $Blog->get_setting( 'collection_logo_file_ID', false ) )
+		{ // Try collection image:
+			if( $coll_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $coll_image_file_ID, false, false ) ) && $File->is_image() )
+			{
+				return $File;
+			}
+		}
+	}
+
+	if( $params['use_coll_dflt_cat_fallback'] && $Blog )
+	{ // Try to get collection's default category:
+		$ChapterCache = & get_ChapterCache();
+		$default_cat_ID = $Blog->get_default_cat_ID();
+		if( $default_cat_ID && $default_Chapter = & $ChapterCache->get_by_ID( $default_cat_ID ) )
+		{ // Try social media boilerplate image first:
+			$social_media_image_file_ID = $default_Chapter->get( 'social_media_image_file_ID', false );
+			if( $social_media_image_file_ID > 0 && $File = & $FileCache->get_by_ID( $social_media_image_file_ID, false, false  ) && $File->is_image() )
+			{
+				return $File;
+			}
+			elseif( $cat_image_file_ID = $default_Chapter->get( 'image_file_ID', false ) )
+			{ // Try category image:
+				if( $cat_image_file_ID > 0 && $File = & $FileCache->get_by_ID( $cat_image_file_ID, false, false ) && $File->is_image() )
+				{
+					return $File;
+				}
+			}
+		}
+	}
+
+	if( $params['use_site_fallback'] )
+	{ // Use social media boilerplate logo if configured
+		global $Settings;
+
+		$FileCache = & get_FileCache();
+		$social_media_image_file_ID = intval( $Settings->get( 'social_media_image_file_ID' ) );
+		if( $social_media_image_file_ID > 0 && ( $File = $FileCache->get_by_ID( $social_media_image_file_ID, false ) ) && $File->is_image() )
+		{
+			return $File;
+		}
+		else
+		{ // Use site logo as fallback if configured
+			$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
+			if( $notification_logo_file_ID > 0 && ( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) ) && $File->is_image() )
+			{
+				return $File;
+			}
+		}
+	}
+
+	return NULL;
+}
+
+
+/**
  * Check if the given allowed
  *
  * @param string The options which should be checked

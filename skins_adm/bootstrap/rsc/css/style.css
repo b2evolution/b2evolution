@@ -193,6 +193,12 @@ div.delete_messages ul {
 div.delete_messages ul li {
   list-style: inherit;
 }
+.evo_panel {
+  margin-bottom: 20px;
+}
+.evo_panel__footer {
+  padding: 10px 15px;
+}
 /*
  * Browse pages of items and comments ( ?ctrl=items and ?ctrl=comments - full views )
  */

@@ -3219,7 +3219,7 @@ function & get_file_by_abspath( $abspath, $force_create_meta = false )
 
 
 /**
- * Get image file for use in social media tag
+ * Get image file for use in social media tag based on $disp
  *
  * @param string $disp
  * @param boolean Force to look through attachments
@@ -3227,12 +3227,9 @@ function & get_file_by_abspath( $abspath, $force_create_meta = false )
  */
 function get_social_tag_image_file( $disp )
 {
-	global $social_tag_image_File, $Settings;
+	global $Settings;
 
-	if( isset( $social_tag_image_File ) )
-	{
-		return $social_tag_image_File;
-	}
+	$social_tag_image_File = NULL;
 
 	switch( $disp )
 	{
@@ -3244,39 +3241,42 @@ function get_social_tag_image_file( $disp )
 			// Get info for og:image tag
 			if( ! is_null( $Item ) )
 			{
-				$social_tag_image_File = $Item->get_social_media_image();
+				$social_tag_image_File = get_social_media_image( $Item );
 			}
 			break;
 
 		case 'posts':
 			$intro_Item = & get_featured_Item( $disp, NULL, true );
-			if( $intro_Item )
+			if( $intro_Item && $intro_Item->is_intro() )
 			{
-				if( $intro_Item->is_intro() )
-				{
-					$social_tag_image_File = $intro_Item->get_social_media_image();
-				}
+				$social_tag_image_File = get_social_media_image( $intro_Item, array(
+						'use_item_cat_fallback' => false,
+						'use_coll_fallback' => false,
+						'use_coll_dflt_cat_fallback' => false,
+						'use_site_fallback' => false ) );
 			}
 
 			if( empty( $social_tag_image_File ) )
-			{ // No intro post or intro post has no image, use default category social media boiler plate or category image as fallback:
-				global $Blog, $disp_detail;
-				$FileCache = & get_FileCache();
+			{
+				global $disp_detail;
 
 				if( $disp_detail == 'posts-topcat' || $disp_detail == 'posts-subcat' )
-				{
+				{ // No intro post or intro post has no image, use current category's social media boiler plate or category image as fallback:
+					global $MainList;
+					// Get current category ID:
+					$cat_ID = $MainList->filters['cat_single'];
 					$ChapterCache = & get_ChapterCache();
-					$default_cat_ID = $Blog->get_default_cat_ID();
-					if( $default_cat_ID && $default_Chapter = & $ChapterCache->get_by_ID( $default_cat_ID ) )
+					$FileCache = & get_FileCache();
+					if( $cat_ID && $current_Chapter = & $ChapterCache->get_by_ID( $cat_ID ) )
 					{ // Try social media boilerplate image first:
-						$social_media_image_file_ID = $default_Chapter->get( 'social_media_image_file_ID', false );
+						$social_media_image_file_ID = $current_Chapter->get( 'social_media_image_file_ID', false );
 						if( $social_media_image_file_ID > 0 && $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) && $File->is_image() )
 						{
 							$social_tag_image_File = $File;
 						}
 						else
 						{ // Try category image:
-							$cat_image_file_ID = $default_Chapter->get( 'image_file_ID', false );
+							$cat_image_file_ID = $current_Chapter->get( 'image_file_ID', false );
 							if( $cat_image_file_ID > 0 && $File = & $FileCache->get_by_ID( $cat_image_file_ID ) && $File->is_image() )
 							{
 								$social_tag_image_File = $File;
@@ -3285,32 +3285,16 @@ function get_social_tag_image_file( $disp )
 					}
 				}
 			}
+
+			if( empty( $social_tag_image_File ) )
+			{ // Use site social media boiler plate or logo:
+				$social_tag_image_File = get_social_media_image();
+			}
+
 			break;
 
 		default:
 			// Other disps
-	}
-
-	if( empty( $social_tag_image_File ) )
-	{ // Use site social media boilerplate logo if configured:
-		$FileCache = & get_FileCache();
-		$social_media_image_file_ID = intval( $Settings->get( 'social_media_image_file_ID' ) );
-		if( $social_media_image_file_ID > 0
-				&& ( $File = $FileCache->get_by_ID( $social_media_image_file_ID, false ) )
-				&& $File->is_image() )
-		{
-			$social_tag_image_File = $File;
-		}
-		else
-		{ // Use site logo as fallback if configured:
-			$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
-			if( $notification_logo_file_ID > 0
-					&& ( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) )
-					&& $File->is_image() )
-			{
-				$social_tag_image_File = $File;
-			}
-		}
 	}
 
 	return $social_tag_image_File;

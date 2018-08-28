@@ -906,7 +906,8 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 	global $install_test_features, $DB, $admin_url, $timestamp;
 	global $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
 
-	$default_blog_longdesc = T_('This is the long description for the blog named \'%s\'. %s');
+	$default_blog_longdesc = T_('This is the long description for the collection named \'%s\'. %s');
+	$default_blog_access_type = 'relative';
 
 	$timestamp = time();
 	$blog_ID = NULL;
@@ -968,9 +969,8 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 		// =======================================================================================================
 		case 'main':
 			$blog_shortname = T_('Home');
-			$blog_more_longdesc = '<br />
-<br />
-<strong>'.T_('The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.').'</strong>';
+			$blog_home_access_type = ( $install_test_features ) ? 'default' : $default_blog_access_type;
+			$blog_more_longdesc = '';
 
 			$blog_home_ID = create_blog(
 					T_('Homepage Title'),
@@ -1077,8 +1077,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 		case 'photo':
 			$blog_shortname = 'Photos';
 			$blog_stub = 'photos';
-			$blog_more_longdesc = '<br /><br />
-					<strong>'.T_('This is a photoblog, optimized for displaying photos.').'</strong>';
+			$blog_more_longdesc = '';
 
 			$blog_photoblog_ID = create_blog(
 					'Photos',

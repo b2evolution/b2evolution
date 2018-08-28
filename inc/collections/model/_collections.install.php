@@ -51,7 +51,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			blog_longdesc        TEXT COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			blog_locale          VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT 'en-EU',
 			blog_access_type     VARCHAR(10) COLLATE ascii_general_ci NOT NULL DEFAULT 'extrapath',
-			blog_http_protocol   ENUM( 'always_redirect', 'allow_both' ) COLLATE ascii_general_ci DEFAULT 'always_redirect',
 			blog_siteurl         varchar(120) NOT NULL default '',
 			blog_urlname         VARCHAR(255) COLLATE ascii_general_ci NOT NULL DEFAULT 'urlname',
 			blog_notes           TEXT COLLATE utf8mb4_unicode_ci NULL,

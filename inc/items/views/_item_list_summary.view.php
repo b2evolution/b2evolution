@@ -133,7 +133,7 @@ while( $Item = & $ItemList->get_item() )
 					'template' => '<div class="pull-right"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 				) );
 
-			$post_image = $Item->get_social_media_image( false, true, true );
+			$post_image = get_social_media_image( $Item, array( 'return_as_link' => true ) );
 
 			if( ! empty( $post_image ) )
 			{
