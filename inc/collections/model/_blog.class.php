@@ -65,7 +65,6 @@ class Blog extends DataObject
 	var $locale;
 	var $order;
 	var $access_type;
-	var $http_protocol;
 
 	/*
 	 * ?> TODO: we should have an extra DB column that either defines type of blog_siteurl
@@ -219,7 +218,6 @@ class Blog extends DataObject
 			$this->longdesc = $db_row->blog_longdesc;
 			$this->locale = $db_row->blog_locale;
 			$this->access_type = $db_row->blog_access_type;
-			$this->http_protocol = isset( $db_row->blog_http_protocol ) ? $db_row->blog_http_protocol : 'always_redirect';
 			$this->siteurl = $db_row->blog_siteurl;
 			$this->urlname = $db_row->blog_urlname;
 			$this->links_blog_ID = $db_row->blog_links_blog_ID; // DEPRECATED
@@ -1304,9 +1302,9 @@ class Blog extends DataObject
 				}
 			}
 
-			if( ( $http_protocol = param( 'blog_http_protocol', 'string', 'always_redirect' ) ) !== NULL )
-			{
-				$this->set( 'http_protocol', $http_protocol );
+			if( ( $http_protocol = param( 'http_protocol', 'string', NULL ) ) !== NULL )
+			{	// SSL:
+				$this->set_setting( 'http_protocol', $http_protocol );
 			}
 
 			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
@@ -1666,35 +1664,35 @@ class Blog extends DataObject
 					// or if we call by absolute URL
 					if( $this->get( 'access_type' ) == 'default' )
 					{
-						return $baseurl.$this->siteurl.'index.php';
+						return $this->get_protocol_url( $baseurl ).$this->siteurl.'index.php';
 					}
 					else
 					{
-						return $baseurl.$this->siteurl;
+						return $this->get_protocol_url( $baseurl ).$this->siteurl;
 					}
 				}
 				// ... otherwise, we add the blog ID:
 
 			case 'index.php':
 				// Access through index.php + blog qualifier
-				return $baseurl.$this->siteurl.'index.php?blog='.$this->ID;
+				return $this->get_protocol_url( $baseurl ).$this->siteurl.'index.php?blog='.$this->ID;
 
 			case 'extrabase':
 				// We want to use extra path on base url, use the blog urlname:
-				return $baseurl.$this->siteurl.$this->urlname.'/';
+				return $this->get_protocol_url( $baseurl ).$this->siteurl.$this->urlname.'/';
 
 			case 'extrapath':
 				// We want to use extra path on index.php, use the blog urlname:
-				return $baseurl.$this->siteurl.'index.php/'.$this->urlname.'/';
+				return $this->get_protocol_url( $baseurl ).$this->siteurl.'index.php/'.$this->urlname.'/';
 
 			case 'relative':
-				return $baseurl.$this->siteurl;
+				return $this->get_protocol_url( $baseurl ).$this->siteurl;
 
 			case 'subdom':
-				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.$baseport.'/';
+				return $this->get_protocol_url( $baseprotocol.'://' ).$this->urlname.'.'.$basehost.$baseport.'/';
 
 			case 'absolute':
-				return $this->siteurl;
+				return $this->get_protocol_url( $this->siteurl );
 
 			default:
 				debug_die( 'Unhandled Blog access type ['.$this->get( 'access_type' ).']' );
@@ -1713,29 +1711,29 @@ class Blog extends DataObject
 		switch( $this->get( 'access_type' ) )
 		{
 			case 'baseurl':
-				return $baseurl.$this->siteurl;
+				return $this->get_protocol_url( $baseurl ).$this->siteurl;
 
 			case 'default':
 			case 'index.php':
-				return $baseurl.$this->siteurl.'index.php/';
+				return $this->get_protocol_url( $baseurl ).$this->siteurl.'index.php/';
 
 			case 'extrabase':
 				// We want to use extra path on base url, use the blog urlname:
-				return $baseurl.$this->siteurl.$this->urlname.'/';
+				return $this->get_protocol_url( $baseurl ).$this->siteurl.$this->urlname.'/';
 
 			case 'extrapath':
 				// We want to use extra path on index.php, use the blog urlname:
-				return $baseurl.$this->siteurl.'index.php/'.$this->urlname.'/';
+				return $this->get_protocol_url( $baseurl ).$this->siteurl.'index.php/'.$this->urlname.'/';
 
 			case 'relative':
-				$url = $baseurl.$this->siteurl;
+				$url = $this->get_protocol_url( $baseurl ).$this->siteurl;
 				break;
 
 			case 'subdom':
-				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.$baseport.'/';
+				return $this->get_protocol_url( $baseprotocol.'://' ).$this->urlname.'.'.$basehost.$baseport.'/';
 
 			case 'absolute':
-				$url = $this->siteurl;
+				$url = $this->get_protocol_url( $this->siteurl );
 				break;
 
 			default:
@@ -1795,6 +1793,9 @@ class Blog extends DataObject
 			{	// Build url from base and sub path:
 				$this->basepath_url = $this->get_baseurl_root().$this->get_basepath();
 			}
+
+			// Get URL with protocol which is defined by collection setting "SSL":
+			$this->basepath_url = $this->get_protocol_url( $this->basepath_url );
 		}
 
 		return $this->basepath_url;
@@ -1922,7 +1923,11 @@ class Blog extends DataObject
 				$this->htsrv_urls = array();
 			}
 
-			$required_htsrv_url = force_https_url( $htsrv_url, $force_https );
+			// Get URL with protocol which is defined by collection setting "SSL":
+			$required_htsrv_url = $this->get_protocol_url( $htsrv_url );
+
+			// Force URL to https depending on the param $force_https:
+			$required_htsrv_url = force_https_url( $required_htsrv_url, $force_https );
 
 			// Cut htsrv folder from end of the URL:
 			$required_htsrv_url = substr( $required_htsrv_url, 0, strlen( $required_htsrv_url ) - strlen( $htsrv_subdir ) );
@@ -1982,12 +1987,18 @@ class Blog extends DataObject
 		}
 		elseif( $url_type == 'absolute' )
 		{	// Absolute URL:
-			return force_https_url( $this->get_setting( 'htsrv_assets_absolute_url' ), $force_https );
+			// Get URL with protocol which is defined by collection setting "SSL":
+			$htsrv_assets_absolute_url = $this->get_protocol_url( $this->get_setting( 'htsrv_assets_absolute_url' ) );
+			// Force URL to https depending on the param $force_https:
+			return force_https_url( $htsrv_assets_absolute_url, $force_https );
 		}
 		else// == 'basic'
 		{	// Basic Config URL from config:
 			global $htsrv_url;
-			return force_https_url( $htsrv_url, $force_https );
+			// Get URL with protocol which is defined by collection setting "SSL":
+			$basic_htsrv_url = $this->get_protocol_url( $htsrv_url );
+			// Force URL to https depending on the param $force_https:
+			return force_https_url( $basic_htsrv_url, $force_https );
 		}
 	}
 
@@ -2008,23 +2019,26 @@ class Blog extends DataObject
 			if( ! $force_normal_using && is_admin_page() )
 			{	// Force to absolute base URL on back-office side and email template:
 				global $media_url;
-				return $media_url;
+				$local_media_url = $media_url;
 			}
 			else
 			{	// Use absolute URL relative to collection media folder:
 				global $media_subdir;
-				return $this->get_baseurl_root().$this->get_basepath().$media_subdir;
+				$local_media_url = $this->get_baseurl_root().$this->get_basepath().$media_subdir;
 			}
 		}
 		elseif( $url_type == 'absolute' )
 		{	// Absolute URL:
-			return $this->get_setting( 'media_assets_absolute_url' );
+			$local_media_url = $this->get_setting( 'media_assets_absolute_url' );
 		}
 		else// == 'basic'
 		{	// Basic URL from config:
 			global $media_url;
-			return $media_url;
+			$local_media_url = $media_url;
 		}
+
+		// Get URL with protocol which is defined by collection setting "SSL":
+		return $this->get_protocol_url( $local_media_url );
 	}
 
 
@@ -2041,17 +2055,20 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $rsc_subdir;
-			return $this->get_basepath().$rsc_subdir;
+			$local_rsc_url = $this->get_basepath().$rsc_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
-			return $this->get_setting( 'rsc_assets_absolute_url' );
+			$local_rsc_url = $this->get_setting( 'rsc_assets_absolute_url' );
 		}
 		else// == 'basic'
 		{ // Basic URL from config
 			global $rsc_url;
-			return $rsc_url;
+			$local_rsc_url = $rsc_url;
 		}
+
+		// Get URL with protocol which is defined by collection setting "SSL":
+		return $this->get_protocol_url( $local_rsc_url );
 	}
 
 
@@ -2068,17 +2085,20 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $skins_subdir;
-			return $this->get_basepath().$skins_subdir;
+			$local_skins_url = $this->get_basepath().$skins_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
-			return $this->get_setting( 'skins_assets_absolute_url' );
+			$local_skins_url = $this->get_setting( 'skins_assets_absolute_url' );
 		}
 		else// == 'basic'
 		{ // Basic URL from config
 			global $skins_url;
-			return $skins_url;
+			$local_skins_url = $skins_url;
 		}
+
+		// Get URL with protocol which is defined by collection setting "SSL":
+		return $this->get_protocol_url( $local_skins_url );
 	}
 
 
@@ -2095,17 +2115,20 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{	// Relative URL:
 			global $plugins_subdir;
-			return $this->get_basepath().$plugins_subdir;
+			$local_plugins_url = $this->get_basepath().$plugins_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{	// Absolute URL:
-			return $this->get_setting( 'plugins_assets_absolute_url' );
+			$local_plugins_url = $this->get_setting( 'plugins_assets_absolute_url' );
 		}
 		else// == 'basic'
 		{	// Basic Config URL from config:
 			global $plugins_url;
-			return $plugins_url;
+			$local_plugins_url = $plugins_url;
 		}
+
+		// Get URL with protocol which is defined by collection setting "SSL":
+		return $this->get_protocol_url( $local_plugins_url );
 	}
 
 
@@ -2539,7 +2562,7 @@ class Blog extends DataObject
 				break;
 
 			case 'custom':
-				return $this->media_url;
+				return $this->get_protocol_url( $this->media_url );
 
 			case 'none':
 			default:
@@ -5646,6 +5669,33 @@ class Blog extends DataObject
 		$default_ItemType = $this->get_default_ItemType();
 
 		return $default_ItemType ? $default_ItemType->get_name() : T_('Post');
+	}
+
+
+	/**
+	 * Get URL with protocol which is defined by collection setting "SSL"
+	 *
+	 * @param string Requested URL
+	 * @param string Forced URL
+	 */
+	function get_protocol_url( $url )
+	{
+		if( empty( $this->ID ) )
+		{
+			return $url;
+		}
+
+		switch( $this->get_setting( 'http_protocol' ) )
+		{	// Force URL's protocol depending on collection setting "SSL":
+			case 'always_http':
+				$url = preg_replace( '#^https://#', 'http://', $url );
+				break;
+			case 'always_https':
+				$url = preg_replace( '#^http://#', 'https://', $url );
+				break;
+		}
+
+		return $url;
 	}
 }
 

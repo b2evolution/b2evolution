@@ -241,6 +241,15 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveBut
 				break;
 			case 'custom':
 				url_preview = jQuery( 'input[name=blog_media_url]' ).val();
+				switch( '<?php echo $edited_Blog->get_setting( 'http_protocol' ) ?>' )
+				{	// Force base URL to http or https for the edited collection:
+					case 'always_http':
+						url_preview = url_preview.replace( /^https:/, 'http:' );
+						break;
+					case 'always_https':
+						url_preview = url_preview.replace( /^http:/, 'https:' );
+						break;
+				}
 				break;
 		}
 		jQuery( '#blog_media_url_preview' ).html( url_preview );

@@ -885,6 +885,10 @@ function is_absolute_url( $url )
  * This converts all urlencoded chars (e.g. "%AA") to lowercase.
  * It appears that some webservers use lowercase for the chars (Apache),
  * while others use uppercase (lighttpd).
+ *
+ * @param string First URL
+ * @param string Second URL
+ * @param boolean TRUE to make the compared URLs same even if have a different protocols http or https
  * @return boolean
  */
 function is_same_url( $a, $b, $ignore_http_protocol = FALSE )
