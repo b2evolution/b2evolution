@@ -620,7 +620,7 @@ if( $action == 'dashboard' )
 				$edit_link = '';
 				if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
 				{
-					$edit_link = action_icon( T_('Edit').'...', 'edit_button', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID, ' '.T_('Edit').'...', 3, 4, array( 'class' => 'btn btn-primary btn-sm' ) );
+					$edit_link = action_icon( T_('Edit').'...', 'edit_button', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID, ' '.T_('Edit').'...', 3, 4, array( 'class' => 'btn btn-default btn-sm' ) );
 				}
 
 				$block_item_Widget = new Widget( 'block_item' );
