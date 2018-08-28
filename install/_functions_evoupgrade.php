@@ -10586,7 +10586,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13190, 'Inserting widget containers...' ) )
+	if( upg_task_start( 13190, 'Installing new widgets/containers...' ) )
 	{	// part of 7.0.0-alpha
 		install_new_default_widgets( 'item_list' );
 		install_new_default_widgets( 'item_in_list' );
