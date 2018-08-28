@@ -669,6 +669,30 @@ if( $disp == 'page' || $disp == 'single' )
 		$disp = '403';
 		$disp_detail = '403-item-disallowed-for-user';
 	}
+	elseif( ! $preview )
+	{	// Check single/page view:
+		switch( $Item->get_setting( 'single_view' ) )
+		{
+			case '404':
+				// Force to 404 page:
+				$disp = '404';
+				$disp_detail = '404-item-single-view';
+				break;
+			case 'redirected':
+				// Try to force a redirect:
+				if( empty( $Item->url ) )
+				{	// Display 404 page if no url is provided to redirect:
+					$disp = '404';
+					$disp_detail = '404-item-single-view-redirected';
+				}
+				else
+				{	// Redirect only with filled URL:
+					$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'] because of single/page view.' );
+					header_redirect( $Item->url, true, true );
+				}
+				break;
+		}
+	}
 }
 
 param( 'user_ID', 'integer', NULL );

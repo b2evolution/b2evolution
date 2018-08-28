@@ -888,6 +888,20 @@ class Item extends ItemLight
 			}
 		}
 
+		// Single/page view:
+		if( ( $single_view = param( 'single_view', 'string', NULL ) ) !== NULL )
+		{
+			if( $this->get( 'status' ) == 'redirected' )
+			{	// Single view of "Redirected" item can be only redirected as well:
+				$single_view = 'redirected';
+			}
+			elseif( $this->previous_status == 'redirected' )
+			{	// Set single view to normal mode when item status is updating from redirected to another status:
+				$single_view = 'normal';
+			}
+			$this->set_setting( 'single_view', $single_view );
+		}
+
 		// ORDER:
 		param( 'item_order', 'double', NULL );
 		$this->set_from_Request( 'order', 'item_order', true );
