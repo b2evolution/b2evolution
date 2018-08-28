@@ -607,9 +607,24 @@ if( $action == 'dashboard' )
 				$side_item_Widget->disp_template_raw( 'block_end' );
 				echo '</div>';
 			}
-			echo '</div><!-- End of Block Group 1 -->';
-
 			$Timer->stop( 'Panel: Collection Metrics' );
+
+			if( $Blog->get( 'notes' ) )
+			{
+				$edit_link = '';
+				if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
+				{
+					$edit_link = action_icon( T_('Edit').'...', 'edit_button', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID, ' '.T_('Edit').'...', 3, 4, array( 'class' => 'btn btn-primary btn-sm' ) );
+				}
+
+				$block_item_Widget = new Widget( 'block_item' );
+				$block_item_Widget->title = '<span class="pull-right panel_heading_action_icons">'.$edit_link.'</span>'.T_('Notes');
+				$block_item_Widget->disp_template_replaced( 'block_start' );
+				$Blog->disp( 'notes', 'htmlbody' );
+				$block_item_Widget->disp_template_replaced( 'block_end' );
+			}
+
+			echo '</div><!-- End of Block Group 1 -->';
 			evo_flush();
 		}
 

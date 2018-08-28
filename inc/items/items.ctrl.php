@@ -2508,13 +2508,13 @@ switch( $action )
 			// would be used for moderation rules.
 			if( $Blog->get( 'notes' ) )
 			{
-				$block_item_Widget = new Widget( 'block_item' );
-				$block_item_Widget->title = T_('Notes');
-				// show a quicklink to edit if user has permission:
-/* fp> TODO: use an action icon (will appear on the right)
+				$edit_link = '';
 				if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
-					$block_item_Widget->title .=	' <a href="?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#ffield_blog_notes">'.get_icon( 'edit' ).'</a>';
-*/
+				{
+					$edit_link = action_icon( T_('Edit').'...', 'edit_button', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID, ' '.T_('Edit').'...', 3, 4, array( 'class' => 'btn btn-primary btn-sm' ) );
+				}
+				$block_item_Widget = new Widget( 'block_item' );
+				$block_item_Widget->title = '<span class="pull-right panel_heading_action_icons">'.$edit_link.'</span>'.T_('Notes');
 				$block_item_Widget->disp_template_replaced( 'block_start' );
 				$Blog->disp( 'notes', 'htmlbody' );
 				$block_item_Widget->disp_template_replaced( 'block_end' );
