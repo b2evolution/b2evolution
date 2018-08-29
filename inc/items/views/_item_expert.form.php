@@ -697,7 +697,7 @@ $Form->begin_form( '', '', $params );
 	{	// We don't need this setting for intro, content block and special items:
 		echo '<div id="itemform_edit_single_view">';
 		echo '<label>'.T_('Single/page view').':</label><br />';
-		$Form->radio( 'single_view', $edited_Item->get_setting( 'single_view' ), array(
+		$Form->radio( 'post_single_view', $edited_Item->get( 'single_view' ), array(
 				array( 'normal', T_('Normal') ),
 				array( '404', '404' ),
 				array( 'redirected', T_('Redirected') ),

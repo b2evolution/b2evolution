@@ -773,20 +773,20 @@ class Item extends ItemLight
 		}
 
 		// Single/page view:
-		if( ( $single_view = param( 'single_view', 'string', NULL ) ) !== NULL )
+		if( ( $single_view = param( 'post_single_view', 'string', NULL ) ) !== NULL )
 		{
 			if( $this->get( 'status' ) == 'redirected' )
 			{	// Single view of "Redirected" item can be only redirected as well:
 				$single_view = 'redirected';
 			}
-			elseif( $this->previous_status == 'redirected' )
+			elseif( $this->previous_status == 'redirected' && $single_view == 'redirected' )
 			{	// Set single view to normal mode when item status is updating from redirected to another status:
 				$single_view = 'normal';
 			}
-			$this->set_setting( 'single_view', $single_view );
+			$this->set( 'single_view', $single_view );
 		}
 
-		if( ( $this->status == 'redirected' || $this->get_setting( 'single_view' ) == 'redirected' ) && empty( $this->url ) )
+		if( ( $this->status == 'redirected' || $this->get( 'single_view' ) == 'redirected' ) && empty( $this->url ) )
 		{ // Note: post_url is not part of the simple form, so this message can be a little bit awkward there
 			param_error( 'post_url',
 				T_('If you want to redirect this post, you must specify an URL!').' ('.T_('Advanced properties panel').')',

@@ -807,9 +807,10 @@ class coll_item_list_Widget extends ComponentWidget
 		{ // Display excerpt
 			$excerpt = $disp_Item->get_excerpt();
 
-			if( ! $this->disp_params['disp_teaser'] )
+			$item_permanent_url = $disp_Item->get_permanent_url();
+			if( ! $this->disp_params['disp_teaser'] && $item_permanent_url !== false )
 			{ // only display if there is no teaser to display
-				$excerpt .= ' <a href="'.$disp_Item->get_permanent_url().'" class="'.$this->disp_params['item_readmore_class'].'">'.$this->disp_params['item_readmore_text'].'</a>';
+				$excerpt .= ' <a href="'.$item_permanent_url.'" class="'.$this->disp_params['item_readmore_class'].'">'.$this->disp_params['item_readmore_text'].'</a>';
 			}
 
 			if( !empty($excerpt) )

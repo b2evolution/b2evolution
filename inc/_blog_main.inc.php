@@ -671,7 +671,7 @@ if( $disp == 'page' || $disp == 'single' )
 	}
 	elseif( ! $preview )
 	{	// Check single/page view:
-		switch( $Item->get_setting( 'single_view' ) )
+		switch( $Item->get( 'single_view' ) )
 		{
 			case '404':
 				// Force to 404 page:
