@@ -477,8 +477,9 @@ class item_fields_compare_Widget extends ComponentWidget
 					foreach( $repeat_fields as $r => $repeat_field_name )
 					{
 						$repeat_field_name = trim( $repeat_field_name );
-						if( ! isset( $item_custom_fields[ $repeat_field_name ] ) )
-						{	// Skip unknown field:
+						if( ! isset( $item_custom_fields[ $repeat_field_name ] ) ||
+						    ! $item_custom_fields[ $repeat_field_name ]['public'] )
+						{	// Skip unknown or not public field:
 							unset( $repeat_fields[ $r ] );
 							continue;
 						}

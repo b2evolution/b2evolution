@@ -3015,8 +3015,9 @@ class Item extends ItemLight
 				foreach( $repeat_fields as $repeat_field_name )
 				{
 					$repeat_field_name = trim( $repeat_field_name );
-					if( ! isset( $custom_fields[ $repeat_field_name ] ) )
-					{	// Skip unknown field:
+					if( ! isset( $custom_fields[ $repeat_field_name ] ) ||
+					    ! $custom_fields[ $repeat_field_name ]['public'] )
+					{	// Skip unknown or not public field:
 						continue;
 					}
 					// Get HTML code of the repeated custom field:
@@ -10293,8 +10294,9 @@ class Item extends ItemLight
 	 */
 	function & get_parent_Item()
 	{
-		if( ! empty( $this->parent_Item ) )
-		{	// Return the initialized parent Item:
+		if( ! empty( $this->parent_Item ) &&
+		    $this->parent_Item->ID == $this->parent_ID )
+		{	// Return the initialized parent Item and if it is really parent of this Item:
 			return $this->parent_Item;
 		}
 
