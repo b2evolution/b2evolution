@@ -3252,7 +3252,6 @@ function get_social_tag_image_file( $disp )
 				$social_tag_image_File = get_social_media_image( $intro_Item, array(
 						'use_item_cat_fallback' => false,
 						'use_coll_fallback' => false,
-						'use_coll_dflt_cat_fallback' => false,
 						'use_site_fallback' => false ) );
 			}
 
