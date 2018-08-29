@@ -4557,7 +4557,8 @@ class Blog extends DataObject
 
 		if( $skin_type == 'mobile' || $skin_type == 'tablet' )
 		{	// Check if collection use different mobile/tablet skin or same as normal skin:
-			if( $this->get( $skin_type.'_skin_ID', array( 'real_value' => true ) ) === '0' )
+			$skin_ID = $this->get( $skin_type.'_skin_ID', array( 'real_value' => true ) );
+			if( empty( $skin_ID ) )
 			{	// Force to use widgets for normal skin because collection doesn't use different skin for mobile/tablet session:
 				$skin_type = 'normal';
 			}
