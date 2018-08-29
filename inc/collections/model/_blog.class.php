@@ -3163,11 +3163,6 @@ class Blog extends DataObject
 			case 'mobile_skin_ID':
 			case 'tablet_skin_ID':
 				$result = parent::get( $parname );
-				if( $result === NULL && ! empty( $Settings ) )
-				{ // Try to get default from the global settings
-					$result = $Settings->get( 'def_'.$parname );
-				}
-
 				if( $parname == 'mobile_skin_ID' || $parname == 'tablet_skin_ID' )
 				{
 					if( empty( $result ) && ! ( isset( $params['real_value'] ) && $params['real_value'] ) )
@@ -3427,6 +3422,21 @@ class Blog extends DataObject
 	function dbinsert()
 	{
 		global $DB, $Plugins, $Settings;
+
+		// Set default skins on creating new collection:
+		$skin_types = array( 'normal', 'mobile', 'tablet' );
+		foreach( $skin_types as $skin_type )
+		{
+			$skin_ID = $this->get( $skin_type.'_skin_ID', array( 'real_value' => true ) );
+			if( empty( $skin_ID ) )
+			{	// Only if skin is not selected during creating:
+				$default_skin_ID = $Settings->get( 'def_'.$skin_type.'_skin_ID' );
+				if( ! empty( $default_skin_ID ) )
+				{	// And if default skin is defined for the skin type:
+					$this->set( $skin_type.'_skin_ID', $default_skin_ID );
+				}
+			}
+		}
 
 		$DB->begin();
 

@@ -2841,7 +2841,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 
 	if( !$skin_ID )
 	{ // The skin ID is empty use the same as normal skin ID
-		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as normal skin').'.</div>';
+		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as standard skin').'.</div>';
 	}
 	else
 	{

@@ -39,10 +39,10 @@ $block_item_Widget = new Widget( 'block_item' );
 switch( $sel_skin_type )
 {
 	case 'normal':
-		$skin_type_title = /* TRANS: Skin type name */ T_('Normal');
+		$skin_type_title = /* TRANS: Skin type name */ T_('Standard');
 		break;
 	case 'mobile':
-		$skin_type_title = /* TRANS: Skin type name */ T_('Mobile');
+		$skin_type_title = /* TRANS: Skin type name */ T_('Phone');
 		break;
 	case 'tablet':
 		$skin_type_title = /* TRANS: Skin type name */ T_('Tablet');
@@ -87,8 +87,8 @@ $Form->hidden( 'tab', $tab );
 $Form->begin_form( 'skin_selector_filters' );
 $Form->select_input_array( 'sel_skin_type', $sel_skin_type, array(
 		''        => T_('All skins'),
-		'normal'  => T_('Normal skins'),
-		'mobile'  => T_('Mobile skins'),
+		'normal'  => T_('Standard skins'),
+		'mobile'  => T_('Phone skins'),
 		'tablet'  => T_('Tablet skins'),
 		'feed'    => T_('Feed skins'),
 		'sitemap' => T_('Sitemap skins'),

@@ -772,7 +772,21 @@ class Item extends ItemLight
 			}
 		}
 
-		if( $this->status == 'redirected' && empty( $this->url ) )
+		// Single/page view:
+		if( ( $single_view = param( 'single_view', 'string', NULL ) ) !== NULL )
+		{
+			if( $this->get( 'status' ) == 'redirected' )
+			{	// Single view of "Redirected" item can be only redirected as well:
+				$single_view = 'redirected';
+			}
+			elseif( $this->previous_status == 'redirected' )
+			{	// Set single view to normal mode when item status is updating from redirected to another status:
+				$single_view = 'normal';
+			}
+			$this->set_setting( 'single_view', $single_view );
+		}
+
+		if( ( $this->status == 'redirected' || $this->get_setting( 'single_view' ) == 'redirected' ) && empty( $this->url ) )
 		{ // Note: post_url is not part of the simple form, so this message can be a little bit awkward there
 			param_error( 'post_url',
 				T_('If you want to redirect this post, you must specify an URL!').' ('.T_('Advanced properties panel').')',
@@ -886,20 +900,6 @@ class Item extends ItemLight
 			{	// Save only if it is provided:
 				$this->set_setting( 'goal_ID', $goal_ID, true );
 			}
-		}
-
-		// Single/page view:
-		if( ( $single_view = param( 'single_view', 'string', NULL ) ) !== NULL )
-		{
-			if( $this->get( 'status' ) == 'redirected' )
-			{	// Single view of "Redirected" item can be only redirected as well:
-				$single_view = 'redirected';
-			}
-			elseif( $this->previous_status == 'redirected' )
-			{	// Set single view to normal mode when item status is updating from redirected to another status:
-				$single_view = 'normal';
-			}
-			$this->set_setting( 'single_view', $single_view );
 		}
 
 		// ORDER:
@@ -3015,8 +3015,9 @@ class Item extends ItemLight
 				foreach( $repeat_fields as $repeat_field_name )
 				{
 					$repeat_field_name = trim( $repeat_field_name );
-					if( ! isset( $custom_fields[ $repeat_field_name ] ) )
-					{	// Skip unknown field:
+					if( ! isset( $custom_fields[ $repeat_field_name ] ) ||
+					    ! $custom_fields[ $repeat_field_name ]['public'] )
+					{	// Skip unknown or not public field:
 						continue;
 					}
 					// Get HTML code of the repeated custom field:
@@ -10286,8 +10287,9 @@ class Item extends ItemLight
 	 */
 	function & get_parent_Item()
 	{
-		if( ! empty( $this->parent_Item ) )
-		{	// Return the initialized parent Item:
+		if( ! empty( $this->parent_Item ) &&
+		    $this->parent_Item->ID == $this->parent_ID )
+		{	// Return the initialized parent Item and if it is really parent of this Item:
 			return $this->parent_Item;
 		}
 
