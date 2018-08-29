@@ -634,7 +634,7 @@ if( $disp == 'page' || $disp == 'single' )
 		$disp = '404';
 		$disp_detail = '404-item-deprecated';
 	}
-	elseif( ! $preview && $Item->status == 'redirected' && $redir == 'yes' )
+	elseif( ! $preview && $Item->status == 'redirected' )
 	{	// $redir=no here allows to force a 'single post' URL for commenting
 		// Redirect to the URL specified in the post:
 		$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'].' );
