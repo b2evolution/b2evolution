@@ -81,8 +81,8 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 			$Form->radio( 'skin_type',
 										$edited_Skin->type,
 										 array(
-														array( 'normal', T_( 'Normal' ), T_( 'Normal skin for general browsing' ) ),
-														array( 'mobile', T_( 'Mobile' ), T_( 'Mobile skin for mobile phones browsers' ) ),
+														array( 'normal', T_( 'Standard' ), T_( 'Standard skin for general browsing' ) ),
+														array( 'mobile', T_( 'Phone' ), T_( 'Mobile skin for mobile phones browsers' ) ),
 														array( 'tablet', T_( 'Tablet' ), T_( 'Tablet skin for tablet browsers' ) ),
 														array( 'rwd', T_( 'RWD' ), T_( 'Skin can be used for general, mobile phones and tablet browsers' ) ),
 														array( 'feed', T_( 'XML Feed' ), T_( 'Special system skin for XML feeds like RSS and Atom' ) ),
@@ -147,10 +147,10 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 				switch( $skin_type )
 				{
 					case 'normal':
-						return T_('Normal');
+						return T_('Standard');
 
 					case 'mobile':
-						return T_('Mobile');
+						return T_('Phone');
 
 					case 'tablet':
 						return T_('Tablet');

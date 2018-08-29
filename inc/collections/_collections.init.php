@@ -800,7 +800,7 @@ class collections_Module extends Module
 						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
 						'entries' => array(
 							'skin_normal' => array(
-								'text' => T_('Default'),
+								'text' => T_('Standard'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog
 							),
 							'skin_mobile' => array(

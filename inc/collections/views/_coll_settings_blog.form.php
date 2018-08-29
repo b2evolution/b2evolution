@@ -102,10 +102,10 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Default skins').get_manual_link('collections-default-skins') );
+$Form->begin_fieldset( T_('Default Skins for New Collections').get_manual_link( 'collections-default-skins' ) );
 	$normal_skins = array();
-	$mobile_skins = array( 0 => T_('Same as normal skin') );
-	$tablet_skins = array( 0 => T_('Same as normal skin') );
+	$mobile_skins = array( 0 => T_('Same as standard skin') );
+	$tablet_skins = array( 0 => T_('Same as standard skin') );
 
 	$SkinCache = & get_SkinCache();
 	$SkinCache->load_all();
@@ -133,7 +133,7 @@ $Form->begin_fieldset( T_('Default skins').get_manual_link('collections-default-
 		}
 	}
 	$field_params = array( 'force_keys_as_values' => true );
-	$Form->select_input_array( 'def_normal_skin_ID', $Settings->get( 'def_normal_skin_ID' ), $normal_skins, T_('Default normal skin'), NULL, $field_params );
+	$Form->select_input_array( 'def_normal_skin_ID', $Settings->get( 'def_normal_skin_ID' ), $normal_skins, T_('Default standard skin'), NULL, $field_params );
 	$Form->select_input_array( 'def_mobile_skin_ID', $Settings->get( 'def_mobile_skin_ID' ), $mobile_skins, T_('Default mobile phone skin'), NULL, $field_params );
 	$Form->select_input_array( 'def_tablet_skin_ID', $Settings->get( 'def_tablet_skin_ID' ), $tablet_skins, T_('Default tablet skin'), NULL, $field_params );
 $Form->end_fieldset();
