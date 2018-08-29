@@ -32,7 +32,6 @@ class ItemSettings extends AbstractSettings
 	var $_defaults = array(
 		'editor_code'          => NULL, // Plugin code of the editor which was last used to edit this post
 		'hide_teaser'          => '0',  // Setting to show/hide teaser when displaying -- more --
-		'single_view'          => 'normal', // Single/page view: 'normal', '404', 'redirected'
 		'metakeywords'         => NULL, // Meta keywords for this post
 		'metadesc'             => NULL, // Meta Description tag for this post
 		'comment_expiry_delay' => NULL, // Post comments are not displayed and post ratings are not counted after they are older then this expiry delay value. If this value is null then comments will never expire.

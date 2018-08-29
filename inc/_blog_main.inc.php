@@ -631,7 +631,7 @@ if( $disp == 'page' || $disp == 'single' )
 		$disp = '404';
 		$disp_detail = '404-item-deprecated';
 	}
-	elseif( ! $preview && $Item->status == 'redirected' && $redir == 'yes' )
+	elseif( ! $preview && $Item->status == 'redirected' )
 	{	// $redir=no here allows to force a 'single post' URL for commenting
 		// Redirect to the URL specified in the post:
 		$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'].' );
@@ -668,7 +668,7 @@ if( $disp == 'page' || $disp == 'single' )
 	}
 	elseif( ! $preview )
 	{	// Check single/page view:
-		switch( $Item->get_setting( 'single_view' ) )
+		switch( $Item->get( 'single_view' ) )
 		{
 			case '404':
 				// Force to 404 page:

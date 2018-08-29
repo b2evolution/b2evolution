@@ -10199,6 +10199,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12970, 'Upgrade items tables...' ) )
+	{	// part of 6.10.3-stable
+		db_add_col( 'T_items__item', 'post_single_view', 'ENUM("normal","404","redirected") COLLATE ascii_general_ci NOT NULL DEFAULT "normal" AFTER post_status' );
+		// All items with status "Redirected" must have single view as "Redirected" too:
+		$DB->query( 'UPDATE T_items__item
+			SET post_single_view = "redirected"
+			WHERE post_status = "redirected"' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '
