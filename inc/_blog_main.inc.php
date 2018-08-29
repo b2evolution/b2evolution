@@ -676,14 +676,14 @@ if( $disp == 'page' || $disp == 'single' )
 			case '404':
 				// Force to 404 page:
 				$disp = '404';
-				$disp_detail = '404-item-single-view';
+				$disp_detail = '404-item-disallowed-single-view';
 				break;
 			case 'redirected':
 				// Try to force a redirect:
 				if( empty( $Item->url ) )
 				{	// Display 404 page if no url is provided to redirect:
 					$disp = '404';
-					$disp_detail = '404-item-single-view-redirected';
+					$disp_detail = '404-item-missing-redirect-url';
 				}
 				else
 				{	// Redirect only with filled URL:
