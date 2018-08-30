@@ -2182,7 +2182,7 @@ class Plugins
 			case 'coll_apply_rendering':
 			default:
 				// Get Item renderer plugins
-				$RendererPlugins = $this->get_list_by_events( array('RenderItemAsHtml', 'RenderItemAsXml', 'RenderItemAsText') );
+				$RendererPlugins = $this->get_list_by_events( array( 'RenderItemAsHtml', 'RenderItemAsXml', 'RenderItemAsText', 'DisplayItemAsHtml', 'DisplayItemAsXml', 'DisplayItemAsText' ) );
 				break;
 		}
 

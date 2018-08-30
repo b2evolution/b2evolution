@@ -21,6 +21,13 @@
 .disabled {
   color: #999 !important;
 }
+.evo_param_error {
+  color: #F00;
+  background-color: #fcf8e3;
+  border-radius: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
+}
 .note,
 .notes {
   font-size: 84%;

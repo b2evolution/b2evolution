@@ -3121,7 +3121,6 @@ class Item extends ItemLight
 				'render_collection'     => true,
 				'render_content_blocks' => true,
 				'render_inline_widgets' => true,
-				'render_date'           => true,
 			), $params );
 
 		if( $params['render_inline_widgets'] )
@@ -3157,11 +3156,6 @@ class Item extends ItemLight
 		if( $params['render_content_blocks'] )
 		{	// Render Content block tags like [include:123], [include:item-slug]:
 			$content = $this->render_content_blocks( $content, $params );
-		}
-
-		if( $params['render_date'] )
-		{	// Render date tags:
-			$content = $this->render_date( $content, $params );
 		}
 
 		return $content;
@@ -3825,83 +3819,6 @@ class Item extends ItemLight
 
 			// Remove
 			array_shift( $content_block_items );
-		}
-
-		return $content;
-	}
-
-
-	/**
-	 * Convert inline date tags into HTML tags like:
-	 *    [date]
-	 *    [date:server]
-	 *    [date:server:F d, Y]
-	 *    [date:server:F d, Y:-03.30]
-	 * url_field is code of custom item field with type "URL"
-	 *
-	 * @param string Source content
-	 * @param array Params
-	 * @return string Content
-	 */
-	function render_date( $content, $params = array() )
-	{
-		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
-		{	// Call $this->render_link_data() on everything outside code/pre:
-			$params['check_code_block'] = false;
-			$content = callback_on_non_matching_blocks( $content,
-				'~<(code|pre)[^>]*>.*?</\1>~is',
-				array( $this, 'render_date' ), array( $params ) );
-			return $content;
-		}
-
-		// Find all matches with tags of link data:
-		preg_match_all( '/\[date(:([^\]]+))?\]/i', $content, $tags );
-
-		if( count( $tags[0] ) > 0 )
-		{	// If at least one date tag is found in content:
-			foreach( $tags[0] as $t => $source_tag )
-			{	// Render date tag as text:
-				$options = trim( $tags[2][ $t ] );
-				$options = empty( $options ) ? false : preg_split( '/(?<!\\\):/', $options );
-				$date_source = isset( $options[0] ) ? $options[0] : 'server';
-				$date_format = isset( $options[1] ) ? $options[1] : locale_datefmt( $this->get( 'locale' ) );
-				$date_offset = isset( $options[2] ) ? $options[2] : 0;
-
-				switch( $date_source )
-				{
-					case 'issued':
-						$date_source = strtotime( $this->get( 'datestart' ) );
-						break;
-					case 'modified':
-						$date_source = strtotime( $this->get( 'datemodified' ) );
-						break;
-					case 'touched':
-						$date_source = strtotime( $this->get( 'last_touched_ts' ) );
-						break;
-					default: // 'server'
-						global $servertimenow;
-						$date_source = $servertimenow;
-				}
-
-				if( preg_match( '/-?\d{1,2}([\.,:]\d{1,2})?/', $date_offset ) && ! empty( $date_offset ) )
-				{	// Shift date:
-					$date_offset = preg_split( '/[\.,:]/', $date_offset );
-					$o_date_source = $date_source;
-					// Shift with hours:
-					$date_source += rtrim( $date_offset[0], '\\' ) * 3600;
-					if( isset( $date_offset[1] ) )
-					{	// Shift with minutes:
-						if( $date_offset[0] < 0 )
-						{	// Use correct sign for minutes as hours have:
-							$date_offset[1] = -$date_offset[1];
-						}
-						$date_source += $date_offset[1] * 60;
-					}
-				}
-
-				// Replace inline date tag with date text:
-				$content = substr_replace( $content, date( $date_format, $date_source ), strpos( $content, $source_tag ), strlen( $source_tag ) );
-			}
 		}
 
 		return $content;
