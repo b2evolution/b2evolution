@@ -439,10 +439,7 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 						size="50" maxlength="120" onfocus="document.getElementsByName(\''.$asset_url_type.'\')[2].checked=true;" value="'.$edited_Blog->get_setting( $asset_url_data['absolute_url'] ).'" />
 						<span class="notes">'.sprintf( $absolute_url_note, '<code>'.$asset_url_data['folder'].'</code>' ).'</span>'
 					)
-				), $asset_url_data['label'], true,
-					sprintf( T_('Note: Login, Registration and Password operations are controlled by the following settings: <a %s>Inskin login</a> and <a %s>Use SSL for login</a>'),
-						'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$edited_Blog->ID.'#inskin_actions"',
-						'href="'.$admin_url.'?ctrl=registration#security_options"' ) );
+				), $asset_url_data['label'], true );
 			}
 		}
 	}
@@ -454,6 +451,10 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 		$Form->info( sprintf( T_('Load %s assets from'), '<code>/plugins/</code>' ), $edited_Blog->get_local_plugins_url() );
 		$Form->info( sprintf( T_('Link to %s through'), '<code>/htsrv/</code>' ), $edited_Blog->get_local_htsrv_url() );
 	}
+
+	$Form->info( 'Note', sprintf( T_('Login, Registration and Password operations are controlled by the following settings: <a %s>In-skin login</a> and <a %s>Require SSL for login</a>'),
+		'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$edited_Blog->ID.'#inskin_actions"',
+		'href="'.$admin_url.'?ctrl=registration#security_options"' ) );
 
 $Form->end_fieldset();
 
