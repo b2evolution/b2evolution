@@ -2783,7 +2783,7 @@ class Comment extends DataObject
 		}
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
-		$r = $Plugins->render( $r, $this->get_renderers_validated(), $format, array( 'Item' => $this->get_Item() ), 'Display' );
+		$r = $Plugins->render( $r, $this->get_renderers_validated(), $format, array( 'Comment' => $this, 'Item' => $this->get_Item() ), 'Display' );
 
 		return $r;
 	}
