@@ -106,12 +106,6 @@ class item_fields_compare_Widget extends ComponentWidget
 					),
 					'defaultvalue' => 'param',
 				),
-				'items_type' => array(
-					'label' => T_('Restrict to Post Type'),
-					'type' => 'select',
-					'options' => $item_type_options,
-					'defaultvalue' => 'default',
-				),
 				'items' => array(
 					'label' => T_('Specific Item IDs'),
 					'note' => sprintf( T_('Separate Item IDs or slugs or %s or %s with %s.'), '<code>$this$</code>', '<code>$parent$</code>', '<code>,</code>' ),
@@ -120,6 +114,17 @@ class item_fields_compare_Widget extends ComponentWidget
 						'error'   => sprintf( T_('Items to compare must be specified by ID, by slug or as %s or %s.'), '<code>$this$</code>', '<code>$parent$</code>' ),
 					),
 					'size' => 80,
+				),
+				'items_type' => array(
+					'label' => T_('Restrict to Post Type'),
+					'type' => 'select',
+					'options' => $item_type_options,
+					'defaultvalue' => 'default',
+				),
+				'restrict_featured' => array(
+					'label' => T_('Restrict to featured'),
+					'type' => 'checkbox',
+					'defaultvalue' => 0,
 				),
 				'items_limit' => array(
 					'label' => T_('Limit'),
@@ -860,6 +865,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				'post_ID_list' => is_array( $items ) ? implode( ',', $items ) : NULL,
 				'orderby'      => implode( ',', $default_orders ),
 				'order'        => implode( ',', $default_dirs ),
+				'featured'     => ( $this->disp_params['restrict_featured'] ? true : NULL ),
 			) );
 
 			if( $this->disp_params['allow_filter'] )

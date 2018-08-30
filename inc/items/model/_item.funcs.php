@@ -1884,59 +1884,6 @@ function visibility_select( & $Form, $post_status, $mass_create = false, $labels
 
 
 /**
- * Selection of the issue date
- *
- * @todo dh> should display erroneous values (e.g. when giving invalid date) as current (form) value, too.
- * @param Form
- * @param boolean Break line
- * @param string Title
- */
-function issue_date_control( $Form, $break = false, $field_title = '' )
-{
-	global $edited_Item;
-
-	if( $field_title == '' )
-	{
-		$field_title = T_('Issue date');
-	}
-
-	echo $field_title.':<br />';
-
-	echo '<label><input type="radio" name="item_dateset" id="set_issue_date_now" value="0" '
-				.( ($edited_Item->dateset == 0) ? 'checked="checked"' : '' )
-				.'/><strong>'.T_('Update to NOW').'</strong></label>';
-
-	if( $break )
-	{
-		echo '<br />';
-	}
-
-	echo '<label><input type="radio" name="item_dateset" id="set_issue_date_to" value="1" '
-				.( ($edited_Item->dateset == 1) ? 'checked="checked"' : '' )
-				.'/><strong>'.T_('Set to').':</strong></label>';
-	$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), '' );
-	echo ' '; // allow wrapping!
-	$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '', 'hh:mm:ss', '' );
-	echo ' '; // allow wrapping!
-
-	// Autoselect "change date" is the date is changed.
-	?>
-	<script>
-	jQuery( function()
-			{
-				jQuery('#item_issue_date, #item_issue_time').change(function()
-				{
-					jQuery('#set_issue_date_to').attr("checked", "checked")
-				})
-			}
-		)
-	</script>
-	<?php
-
-}
-
-
-/**
  * Template tag: Link to an item identified by its url title / slug / name
  *
  * Note: this will query the database. Thus, in most situations it will make more sense
@@ -4216,6 +4163,14 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 				break;
 		}
 
+		if( empty( $edited_Item->ID ) && // New object is creating or copying
+		    isset( $custom_field_input_params['disabled'] ) && // The custom field is disabled
+		    ! in_array( $custom_field['type'], array( 'computed', 'separator' ) ) ) // Theese fields don't have an editable value
+		{	// When input field is disabled and new item is creating
+			// we should create additional hidden input field because the disabled inputs are not submitted:
+			$Form->hidden( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ) );
+		}
+
 		$c++;
 	}
 
@@ -4232,6 +4187,7 @@ jQuery( 'a[data-child-input-id]' ).click( function()
 		if( child_field_obj.prop( 'disabled' ) )
 		{	// If the field is disabled we should create additional hidden input in order to save new value in DB,
 			// because the disabled inputs cannot be submitted:
+			jQuery( '[name=' + jQuery( this ).data( 'child-input-id' ) + '][type=hidden]' ).remove(); // this hidden field is used on duplicate action
 			child_field_obj.after( '<input type="hidden" name="' + child_field_obj.attr( 'name' ) + '" value="' + child_field_obj.val() + '" />' );
 			child_field_obj.attr( 'name', child_field_obj.attr( 'name' ) + '_disabled' );
 		}

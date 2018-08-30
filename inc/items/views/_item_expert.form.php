@@ -695,20 +695,27 @@ $Form->begin_form( '', '', $params );
 	// Single/page view:
 	if( ! in_array( $edited_Item->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all', 'content-block', 'special' ) ) )
 	{	// We don't need this setting for intro, content block and special items:
-		echo '<div id="itemform_edit_single_view">';
-		echo '<label>'.T_('Single/page view').':</label><br />';
+		echo '<div class="itemform_extra_radio">';
 		$Form->radio( 'post_single_view', $edited_Item->get( 'single_view' ), array(
 				array( 'normal', T_('Normal') ),
 				array( '404', '404' ),
 				array( 'redirected', T_('Redirected') ),
-			), '', true );
+			), T_('Single/page view'), true );
 		echo '</div>';
 	}
 
+	// Issue date:
 	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
-	{ // ------------------------------------ TIME STAMP -------------------------------------
-		echo '<div id="itemform_edit_timestamp" class="edit_fieldgroup">';
-		issue_date_control( $Form, true );
+	{	// If user has a permission to edit time of items:
+		echo '<div class="itemform_extra_radio">';
+		$Form->output = false;
+		$item_issue_date_time = $Form->date( 'item_issue_date', $edited_Item->get( 'issue_date' ), '' );
+		$item_issue_date_time .= $Form->time( 'item_issue_time', $edited_Item->get( 'issue_date' ), '', 'hh:mm:ss', '' );
+		$Form->output = true;
+		$Form->radio( 'item_dateset', $edited_Item->get( 'dateset' ), array(
+				array( 0, T_('Update to NOW') ),
+				array( 1, T_('Set to').': ', '', $item_issue_date_time ),
+			), T_('Issue date'), array( 'lines' => true ) );
 		echo '</div>';
 	}
 

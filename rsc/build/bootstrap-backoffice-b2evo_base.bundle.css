@@ -2522,37 +2522,24 @@ a.btn.action_icon.hoverlink {
   margin: 0;
   border: none;
 }
-.form-horizontal #itemform_edit_timestamp > input[type=text] {
-  display: inline-block;
-  width: auto;
-}
-.form-horizontal #itemform_extra #itemform_edit_timestamp,
-.form-horizontal #itemform_edit_timestamp #itemform_edit_timestamp {
-  padding: 10px 0;
-}
-.form-horizontal #itemform_extra label,
-.form-horizontal #itemform_edit_timestamp label {
+.form-horizontal #itemform_extra label {
   padding-left: 20px;
   margin-right: 5px;
   position: relative;
 }
-.form-horizontal #itemform_extra label input[type=radio],
-.form-horizontal #itemform_edit_timestamp label input[type=radio] {
+.form-horizontal #itemform_extra label input[type=radio] {
   margin: 4px 0 0;
   position: absolute;
   left: 0;
 }
-.form-horizontal #itemform_extra .form-group,
-.form-horizontal #itemform_edit_timestamp .form-group {
+.form-horizontal #itemform_extra .form-group {
   display: inline-block;
   margin: 0 0 2px;
 }
-.form-horizontal #itemform_extra .form-group input[type=text]:not( #item_issue_date ),
-.form-horizontal #itemform_edit_timestamp .form-group input[type=text]:not( #item_issue_date ) {
+.form-horizontal #itemform_extra .form-group input[type=text]:not( #item_issue_date ) {
   max-width: 85px;
 }
-.form-horizontal #itemform_extra td,
-.form-horizontal #itemform_edit_timestamp td {
+.form-horizontal #itemform_extra td {
   vertical-align: middle;
   padding-right: 5px;
 }
@@ -2891,13 +2878,11 @@ a:hover .glyphicon {
   margin-top: 0;
 }
 #itemform_renderers label,
-#itemform_edit_timestamp label,
 table.catselect label {
   display: inline-block;
   margin-right: 5px;
 }
 #itemform_renderers label input,
-#itemform_edit_timestamp label input,
 table.catselect label input {
   margin: 0 2px 4px 0;
 }
