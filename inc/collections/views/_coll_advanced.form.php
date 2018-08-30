@@ -115,7 +115,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		$Form->checkbox_input( 'cache_enabled_widgets', $edited_Blog->get_setting('cache_enabled_widgets'), get_icon( 'block_cache_on' ).' '.T_('Enable widget/block cache'), array( 'note'=>T_('Cache rendered widgets') ) );
 	$Form->end_fieldset();
 
-	$Form->begin_fieldset( T_('In-skin Actions').get_admin_badge().get_manual_link('in_skin_action_settings') );
+	$Form->begin_fieldset( T_('In-skin Actions').get_admin_badge().get_manual_link('in_skin_action_settings'), array( 'id' => 'inskin_actions' ) );
 		if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $edited_Blog ) )
 		{ // The login blog is defined in general settings
 			$Form->info( T_( 'In-skin login' ), sprintf( T_('All login/registration functions are delegated to the collection: %s'), '<a href="'.$admin_url.'?ctrl=collections&tab=site_settings">'.$login_Blog->get( 'shortname' ).'</a>' ) );

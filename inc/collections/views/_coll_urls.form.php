@@ -80,8 +80,8 @@ else
 $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_link('collection-base-url-settings') );
 
 	$http_protocol_options = array(
-			array( 'always_http', T_('Always use http') ),
-			array( 'always_https', T_('Always use https') ),
+			array( 'always_http', sprintf( T_('Always use %s'), '<code>http</code>' ) ),
+			array( 'always_https', sprintf( T_('Always use %s'), '<code>https</code>' ) ),
 			array( 'allow_both', sprintf( T_('Allow both %s and %s as valid URLs'), '<code>http</code>', '<code>https</code>' ) )
 		);
 
@@ -439,7 +439,10 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 						size="50" maxlength="120" onfocus="document.getElementsByName(\''.$asset_url_type.'\')[2].checked=true;" value="'.$edited_Blog->get_setting( $asset_url_data['absolute_url'] ).'" />
 						<span class="notes">'.sprintf( $absolute_url_note, '<code>'.$asset_url_data['folder'].'</code>' ).'</span>'
 					)
-				), $asset_url_data['label'], true );
+				), $asset_url_data['label'], true,
+					sprintf( T_('Note: Login, Registration and Password operations are controlled by the following settings: <a %s>Inskin login</a> and <a %s>Use SSL for login</a>'),
+						'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$edited_Blog->ID.'#inskin_actions"',
+						'href="'.$admin_url.'?ctrl=registration#security_options"' ) );
 			}
 		}
 	}
