@@ -4159,6 +4159,14 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 				break;
 		}
 
+		if( empty( $edited_Item->ID ) && // New object is creating or copying
+		    isset( $custom_field_input_params['disabled'] ) && // The custom field is disabled
+		    ! in_array( $custom_field['type'], array( 'computed', 'separator' ) ) ) // Theese fields don't have an editable value
+		{	// When input field is disabled and new item is creating
+			// we should create additional hidden input field because the disabled inputs are not submitted:
+			$Form->hidden( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ) );
+		}
+
 		$c++;
 	}
 
@@ -4175,6 +4183,7 @@ jQuery( 'a[data-child-input-id]' ).click( function()
 		if( child_field_obj.prop( 'disabled' ) )
 		{	// If the field is disabled we should create additional hidden input in order to save new value in DB,
 			// because the disabled inputs cannot be submitted:
+			jQuery( '[name=' + jQuery( this ).data( 'child-input-id' ) + '][type=hidden]' ).remove(); // this hidden field is used on duplicate action
 			child_field_obj.after( '<input type="hidden" name="' + child_field_obj.attr( 'name' ) + '" value="' + child_field_obj.val() + '" />' );
 			child_field_obj.attr( 'name', child_field_obj.attr( 'name' ) + '_disabled' );
 		}
