@@ -10019,7 +10019,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12970, 'Upgrade items tables...' ) )
+	if( upg_task_start( 12963, 'Upgrade items tables...' ) )
 	{	// part of 6.10.3-stable
 		db_add_col( 'T_items__item', 'post_single_view', 'ENUM("normal","404","redirected") COLLATE ascii_general_ci NOT NULL DEFAULT "normal" AFTER post_status' );
 		// All items with status "Redirected" must have single view as "Redirected" too:
@@ -10042,7 +10042,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	 * ALL DB CHANGES MUST BE EXPLICITLY CARRIED OUT. DO NOT RELY ON SCHEMA UPDATES!
 	 * Schema updates do not survive after several incremental changes.
 	 *
-	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 10).
+	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 3).
 	 */
 
 	// Execute general upgrade tasks.
