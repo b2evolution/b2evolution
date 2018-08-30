@@ -56,7 +56,7 @@ $Results->cols[] = array(
 						'th' => T_('Skin type'),
 						'order' => 'skin_type',
 						'td_class' => 'center',
-						'td' => '$skin_type$',
+						'td' => '%get_skin_type_title( #skin_type# )%',
 					);
 
 $Results->cols[] = array(

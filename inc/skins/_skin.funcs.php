@@ -2639,7 +2639,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 		// Skin type
 		echo '<div class="skin_setting_row">';
 			echo '<label>'.T_('Skin type').':</label>';
-			echo '<span>'.$edited_Skin->type.'</span>';
+			echo '<span>'.get_skin_type_title( $edited_Skin->type ).'</span>';
 		echo '</div>';
 
 		// Containers
@@ -2835,5 +2835,36 @@ function get_skin_folder_base_version( $skin_folder )
 	}
 
 	return array( $base_skin, $skin_version );
+}
+
+
+/**
+ * Get skin types
+ *
+ * @return array
+ */
+function get_skin_types()
+{
+	return array(
+		'normal'  => array( T_('Standard'), T_('Standard skin for general browsing') ),
+		'mobile'  => array( T_('Phone'), T_('Mobile skin for mobile phones browsers') ),
+		'tablet'  => array( T_('Tablet'), T_('Tablet skin for tablet browsers') ),
+		'rwd'     => array( T_('RWD'), T_('Skin can be used for general, mobile phones and tablet browsers') ),
+		'feed'    => array( T_('XML Feed'), T_('Special system skin for XML feeds like RSS and Atom') ),
+		'sitemap' => array( T_('XML Sitemap'), T_('Special system skin for XML sitemaps') ),
+	);
+}
+
+
+/**
+ * Get title of skin type
+ *
+ * @param string Skin type
+ * @return string Skin title
+ */
+function get_skin_type_title( $skin_type )
+{
+	$skin_types = get_skin_types();
+	return ( isset( $skin_types[ $skin_type ] ) ? $skin_types[ $skin_type ][0] : $skin_type );
 }
 ?>
