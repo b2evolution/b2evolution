@@ -1498,8 +1498,8 @@ class ComponentWidget extends DataObject
 		$Plugins_admin->filter_contents( $fake_title /* by ref */, $content /* by ref */, $widget_renderers, $params /* by ref */ );
 
 		// Render block content with selected plugins:
-		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Render' );
-		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Display' );
+		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog, 'Widget' => $this ), 'Render' );
+		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog, 'Widget' => $this ), 'Display' );
 
 		return $content;
 	}
