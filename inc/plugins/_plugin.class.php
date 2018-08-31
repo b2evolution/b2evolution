@@ -1596,6 +1596,10 @@ class Plugin
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}.
 	 *   - 'Item': The {@link Item} that gets displayed (by reference).
+	 *   - 'Comment': The {@link Comment} that gets displayed (by reference).
+	 *   - 'Message': The {@link Message} that gets displayed (by reference).
+	 *   - 'EmailCampaign': The {@link EmailCampaign} that gets displayed (by reference).
+	 *   - 'Widget': The {@link Widget} that gets displayed (by reference).
 	 *   - 'preview': Is this only a preview?
 	 *   - 'dispmore': Does this include the "more" text (if available), which means "full post"?
 	 *   - 'view_type': What part of a post are we displaying: 'teaser', 'extension' or 'full'

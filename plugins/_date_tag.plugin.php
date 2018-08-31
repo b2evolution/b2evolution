@@ -2,7 +2,7 @@
 /**
  * This file implements the Date renderer plugin for b2evolution
  *
- * Date formatting, like [date:server:F d, Y:-03.30]
+ * Date formatting, like [date:server:F d, Y:-03.30.badge]
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -16,16 +16,16 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @package plugins
  */
-class date_plugin extends Plugin
+class date_tag_plugin extends Plugin
 {
-	var $code = 'b2evDate';
+	var $code = 'evo_datetag';
 	var $name = 'Date tag';
 	var $priority = 57;
 	var $version = '6.10.3';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $help_topic = 'date-plugin';
+	var $help_topic = 'date-tag-plugin';
 	var $number_of_installs = 1;
 
 
@@ -34,19 +34,18 @@ class date_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->short_desc = sprintf( T_('Date formatting e-g %s'), '<code>[date:server:F d, Y:-03.30]</code>' );
-		$this->long_desc = sprintf( T_('This plugin allows to render date inside blog posts and comments by using the syntax %s for example'), '<code>[date:server:F d, Y:-03.30]</code>' );
+		$this->short_desc = sprintf( T_('Date formatting e-g %s'), '<code>[date:server:F d, Y H\:i\:s:-03.30.badge]</code>' );
+		$this->long_desc = sprintf( T_('This plugin allows to render date inside collection posts and comments by using the syntax %s for example'), '<code>[date:server:F d, Y H\:i\:s:-03.30.badge]</code>' );
 	}
 
 
 	/**
 	 * Perform rendering
 	 *
-	 * @see Plugin::RenderItemAsHtml()
+	 * @see Plugin::DisplayItemAsHtml()
 	 */
 	function DisplayItemAsHtml( & $params )
 	{
-		$this->rendering_Object = NULL;
 		if( isset( $params['Comment'] ) )
 		{	// Render for Comment:
 			$this->rendering_Object = $params['Comment'];
@@ -67,7 +66,12 @@ class date_plugin extends Plugin
 		{	// Render for Widget:
 			$this->rendering_Object = $params['Widget'];
 		}
+		else
+		{	// Don't render if no proper object is provided:
+			return false;
+		}
 
+		// Render date tag:
 		$params['data'] = $this->render_dates( $params['data'] );
 
 		return true;
@@ -77,7 +81,7 @@ class date_plugin extends Plugin
 	/**
 	 * Do the same as for HTML.
 	 *
-	 * @see RenderItemAsHtml()
+	 * @see Plugin::DisplayItemAsXml()
 	 */
 	function DisplayItemAsXml( & $params )
 	{
@@ -102,6 +106,7 @@ class date_plugin extends Plugin
 	 *    [date:server]
 	 *    [date:server:F d, Y]
 	 *    [date:server:F d, Y:-03.30]
+	 *    [date:server:F d, Y:-03.30:.badge]
 	 *    [date:issued:Y-m-d H\:i\:s]
 	 *    [date:issued:F d, Y H\:i\:s:+1\:04]
 	 *    [date:modified:Y-m-d H\:i\:s]
@@ -114,11 +119,6 @@ class date_plugin extends Plugin
 	 */
 	function render_dates( $content )
 	{
-		if( empty( $this->rendering_Object ) )
-		{	// Don't render if no object is provided:
-			return $content;
-		}
-
 		return replace_content_outcode( '#\[date(:([^\]]+))?\]#i', array( $this, 'get_date_text' ), $content, 'replace_content_callback' );
 	}
 
@@ -172,6 +172,16 @@ class date_plugin extends Plugin
 
 		// Date offset/shifting:
 		$date_offset = isset( $options[2] ) ? $options[2] : 0;
+
+		// Date class:
+		if( isset( $options[3] ) )
+		{	// Check class:
+			$date_class = trim( str_replace( '.', ' ', $options[3] ) );
+		}
+		else
+		{	// No class:
+			$date_class = false;
+		}
 
 		switch( $date_source )
 		{
@@ -250,7 +260,15 @@ class date_plugin extends Plugin
 			}
 		}
 
-		return date( $date_format, $date_source );
+		// Get date:
+		$date_text = date( $date_format, $date_source );
+
+		if( ! empty( $date_class ) )
+		{	// Apply class to date text if it is provided:
+			$date_text = '<span class="'.format_to_output( $date_class, 'htmlattr' ).'">'.$date_text.'</span>';
+		}
+
+		return $date_text;
 	}
 }
 
