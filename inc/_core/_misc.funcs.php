@@ -6217,32 +6217,26 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 
 
 /**
- * Basic tidy up of strings
+ * Basic tidy up of strings for using in JavaScript
  *
  * @author Yabba
  * @author Tblue
  *
- * @param string $unformatted raw data
- * @return string formatted data
+ * @param string Unformatted raw data
+ * @return string Formatted data
  */
 function format_to_js( $unformatted )
 {
-	return str_replace( array(
-							'\'',
-							'\n',
-							'\r',
-							'\t',
-							"\n",
-							"\r",
-						),
-						array(
-							'\\\'',
-							'\\\\n',
-							'\\\\r',
-							'\\\\t',
-							'\n',
-							'\r',
-						), $unformatted );
+	// Convert the following chars:
+	// \               => \\
+	// '               => \'
+	// \n              => \\n
+	// newline         => \n
+	// \r              => \\r
+	// carriage return => \r
+	// \t              => \\t
+	// tab space       => \t
+	return addcslashes( $unformatted, "\n\r\t".'\'\\' );
 }
 
 
