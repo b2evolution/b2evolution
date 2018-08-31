@@ -591,35 +591,20 @@ class Skin extends DataObject
 	{
 		if( is_null( $this->container_list ) )
 		{
-			$this->container_list = array();
-
-			$skin_containers = array();
 			if( method_exists( $this, 'get_declared_containers' ) )
 			{	// Get default containers and containers what declared by this skin:
-				$skin_containers = array_merge( get_skin_default_containers(), $this->get_declared_containers() );
+				$this->container_list = array_merge( get_skin_default_containers(), $this->get_declared_containers() );
 
-				foreach( $skin_containers as $wico_code => $wico_data )
+				foreach( $this->container_list as $wico_code => $wico_data )
 				{
 					if( $wico_data === NULL )
 					{	// Exclude containers which are not used in the current Skin:
-						unset( $skin_containers[ $wico_code ] );
+						unset( $this->container_list[ $wico_code ] );
 					}
 				}
 
-				// Create ordered array with unique items from the skin containers:
-				$ordered_containers = array();
-				foreach( $skin_containers as $container_code => $container_data )
-				{
-					$container_order = isset( $container_data[1] ) ? $container_data[1] : 0;
-					$ordered_containers[ $container_order ] = $container_code;
-				}
-				ksort( $ordered_containers );
-
-				// Fill final container list:
-				foreach( $ordered_containers as $container_code )
-				{
-					$this->container_list[ $container_code ] = $skin_containers[ $container_code ];
-				}
+				// Sort skin containers by order field:
+				uasort( $this->container_list, array( $this, 'sort_containers' ) );
 			}
 			else
 			{	// Get containers from skin files:
@@ -628,6 +613,23 @@ class Skin extends DataObject
 		}
 
 		return $this->container_list;
+	}
+
+
+	/**
+	 * Callback function to sort widget containers by order field
+	 *
+	 * @param array Container data: 0 - name, 1 - order
+	 * @param array Container data: 0 - name, 1 - order
+	 * @return boolean
+	 */
+	function sort_containers( $a_container, $b_container )
+	{
+		// Use 0 if order field is not defined:
+		$a_container_order = isset( $a_container[1] ) ? $a_container[1] : 0;
+		$b_container_order = isset( $b_container[1] ) ? $b_container[1] : 0;
+
+		return $a_container_order > $b_container_order;
 	}
 
 
