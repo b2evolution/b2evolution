@@ -91,22 +91,22 @@ class display_shopping_cart_Widget extends ComponentWidget
 				'class_image' => array(
 					'label' => T_('Classes for Image'),
 					'size' => 60,
-					'defaultvalue' => 'col-lg-1 col-md-2 col-sm-2 col-xs-12 center',
+					'defaultvalue' => 'col-lg-1 col-md-2 col-sm-2 col-xs-3',
 				),
 				'class_product' => array(
 					'label' => T_('Classes for Product'),
 					'size' => 60,
-					'defaultvalue' => 'col-lg-7 col-md-6 col-sm-6 col-xs-12',
+					'defaultvalue' => 'col-lg-7 col-md-6 col-sm-6 col-xs-9',
 				),
 				'class_quantity' => array(
 					'label' => T_('Classes for Quantity'),
 					'size' => 60,
-					'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 col-xs-12 center',
+					'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 col-xs-3 center',
 				),
 				'class_actions' => array(
 					'label' => T_('Classes for Actions'),
 					'size' => 60,
-					'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 col-xs-12 center',
+					'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 col-xs-3 center',
 				),
 			), parent::get_param_definitions( $params ) );
 
