@@ -6236,7 +6236,7 @@ function format_to_js( $unformatted )
 	// carriage return => \r
 	// \t              => \\t
 	// tab space       => \t
-	return addcslashes( $unformatted, "\n\r\t".'\'\\' );
+	return addcslashes( $unformatted, "\\'\n\r\t" );
 }
 
 
