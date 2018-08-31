@@ -231,7 +231,7 @@ class Skin extends DataObject
 	 */
 	function get_skin_default_widgets( $coll_kind, $context = array() )
 	{
-		return array( '*' => true );
+		return array( '*' => true ); // For all containers, use b2evo defaults.
 	}
 
 
