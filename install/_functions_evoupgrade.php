@@ -10606,9 +10606,32 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 13200, 'Upgrade table item types...' ) )
-	{ // part of 7.0.0-alpha
-		db_add_col( 'T_items__type', 'ityp_evobar_link_text', 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_perm_level' );
-		db_add_col( 'T_items__type', 'ityp_skin_btn_text', 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_evobar_link_text' );
+	{	// part of 7.0.0-alpha
+		db_upgrade_cols( 'T_items__type', array(
+			'ADD' => array(
+				'ityp_evobar_link_text' => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_perm_level',
+				'ityp_skin_btn_text'    => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_evobar_link_text',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13210, 'Update free html widgets...' ) )
+	{	// part of 7.0.0-alpha
+		$SQL = new SQL( 'Get free html widget to update new option "renderers"' );
+		$SQL->SELECT( 'wi_ID, wi_params' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->WHERE( 'wi_code = "free_html"' );
+		$free_html_widgets = $DB->get_assoc( $SQL );
+		foreach( $free_html_widgets as $free_html_widget_ID => $free_html_widget_params )
+		{
+			$free_html_widget_params = ( $free_html_widget_params === NULL ? array() : unserialize( $free_html_widget_params ) );
+			// Turn off all renderer plugins for old widgets:
+			$free_html_widget_params['renderers'] = array();
+			$DB->query( 'UPDATE T_widget__widget
+				  SET wi_params = '.$DB->quote( serialize( $free_html_widget_params ) ).'
+				WHERE wi_ID = '.$free_html_widget_ID );
+		}
 		upg_task_end();
 	}
 
