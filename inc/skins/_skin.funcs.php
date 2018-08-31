@@ -2514,26 +2514,10 @@ function skin_structured_data()
 				list( $ratings, $active_ratings ) = $Item->get_ratings();
 				if( $ratings['all_ratings'] > 0 )
 				{
-					$worst_rating = NULL;
-					$best_rating = NULL;
-					for( $i = 1; $i <= 5; $i++ )
-					{
-						if( $ratings[$i] > 0 )
-						{
-							if( is_null( $worst_rating ) )
-							{
-								$worst_rating = $i;
-							}
-							$best_rating = $i;
-						}
-					}
-
 					$markup['aggregateRating'] = array(
 							'@type' => 'AggregateRating',
 							'ratingValue' => round( $ratings["summary"] / $ratings['all_ratings'], 2 ),
 							'ratingCount' => $ratings['all_ratings'],
-							'bestRating' => $best_rating,
-							'worstRating' => $worst_rating,
 						);
 				}
 
