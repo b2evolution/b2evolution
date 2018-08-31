@@ -27,7 +27,7 @@ skin_init( $disp );
 
 
 // Check if current page has a big picture as background
-$is_pictured_page = in_array( $disp, array( 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) );
+$is_pictured_page = in_array( $disp, array( 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'content_requires_login' ) );
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
@@ -132,7 +132,7 @@ if( $is_pictured_page )
 		<!-- ================================= START OF MAIN AREA ================================== -->
 
 		<?php
-		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login' ) ) )
+		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login', 'content_requires_login' ) ) )
 		{ // Don't display the messages here because they are displayed inside wrapper to have the same width as form
 			// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
 			messages( array(

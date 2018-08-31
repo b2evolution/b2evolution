@@ -404,35 +404,6 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
 	}
 
-	if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
-	{	// Display parent ID:
-		if( $parent_Item = & $edited_Item->get_parent_Item() )
-		{	// Get parent item info if it is defined:
-			$parent_info = '';
-			$status_icons = get_visibility_statuses( 'icons' );
-			if( isset( $status_icons[ $parent_Item->get( 'status' ) ] ) )
-			{	// Status colored icon:
-				$parent_info .= $status_icons[ $parent_Item->get( 'status' ) ];
-			}
-			// Title with link to permament url:
-			$parent_info .= ' '.$parent_Item->get_title( array( 'link_type' => 'permalink' ) );
-			// Icon to edit:
-			$parent_info .= ' '.$parent_Item->get_edit_link( array( 'text' => '#icon#' ) );
-		}
-		else
-		{	// No parent item defined
-			$parent_info = '';
-		}
-		$Form->text_input( 'post_parent_ID', $edited_Item->get( 'parent_ID' ), 11, T_('Parent ID'), $parent_info, array(
-				'required' => ( $edited_Item->get_type_setting( 'use_parent' ) == 'required' ),
-				'style'    => 'width:115px',
-			) );
-	}
-	else
-	{	// Hide parent ID:
-		$Form->hidden( 'post_parent_ID', $edited_Item->get( 'parent_ID' ) );
-	}
-
 	if( $is_not_content_block )
 	{	// Display title tag, meta description and meta keywords for item with type usage except of content block:
 		if( $edited_Item->get_type_setting( 'use_title_tag' ) != 'never' )
@@ -646,28 +617,38 @@ $Form->begin_form( '', '', $params );
 
 	$Form->switch_layout( 'linespan' );
 
-	if( $edited_Item->get_type_setting( 'allow_featured' ) )
-	{ // Display featured
-		$Form->checkbox_basic_input( 'item_featured', $edited_Item->featured, '<strong>'.T_('Featured post').'</strong>' );
+	echo '<table>';
+
+	if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
+	{	// Display parent ID:
+		if( $parent_Item = & $edited_Item->get_parent_Item() )
+		{	// Get parent item info if it is defined:
+			$parent_info = '';
+			$status_icons = get_visibility_statuses( 'icons' );
+			if( isset( $status_icons[ $parent_Item->get( 'status' ) ] ) )
+			{	// Status colored icon:
+				$parent_info .= $status_icons[ $parent_Item->get( 'status' ) ];
+			}
+			// Title with link to permament url:
+			$parent_info .= ' '.$parent_Item->get_title( array( 'link_type' => 'permalink' ) );
+			// Icon to edit:
+			$parent_info .= ' '.$parent_Item->get_edit_link( array( 'text' => '#icon#' ) );
+		}
+		else
+		{	// No parent item defined
+			$parent_info = '';
+		}
+		echo '<tr><td><strong>'.T_('Parent ID').':</strong></td><td>';
+		$Form->text_input( 'post_parent_ID', $edited_Item->get( 'parent_ID' ), 11, '', $parent_info, array(
+				'required' => ( $edited_Item->get_type_setting( 'use_parent' ) == 'required' ),
+				'style'    => 'width:115px',
+			) );
+		echo '</td></tr>';
 	}
 	else
-	{ // Hide featured
-		$Form->hidden( 'item_featured', $edited_Item->featured );
+	{	// Hide parent ID:
+		$Form->hidden( 'post_parent_ID', $edited_Item->get( 'parent_ID' ) );
 	}
-
-	if( $is_not_content_block )
-	{	// Display "hide teaser" checkbox for item with type usage except of content block:
-		$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.sprintf( T_('Hide teaser when displaying part after %s'), '<code>[teaserbreak]</code>' ).'</strong>' );
-	}
-
-	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
-	{ // ------------------------------------ TIME STAMP -------------------------------------
-		echo '<div id="itemform_edit_timestamp" class="edit_fieldgroup">';
-		issue_date_control( $Form, true );
-		echo '</div>';
-	}
-
-	echo '<table>';
 
 	echo '<tr><td><strong>'.T_('Order').':</strong></td><td>';
 	$Form->text( 'item_order', $edited_Item->order, 10, '', T_('can be decimal') );
@@ -696,6 +677,47 @@ $Form->begin_form( '', '', $params );
 	}
 
 	echo '</table>';
+
+	if( $edited_Item->get_type_setting( 'allow_featured' ) )
+	{ // Display featured
+		$Form->checkbox_basic_input( 'item_featured', $edited_Item->featured, '<strong>'.T_('Featured post').'</strong>' );
+	}
+	else
+	{ // Hide featured
+		$Form->hidden( 'item_featured', $edited_Item->featured );
+	}
+
+	if( $is_not_content_block )
+	{	// Display "hide teaser" checkbox for item with type usage except of content block:
+		$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.sprintf( T_('Hide teaser when displaying part after %s'), '<code>[teaserbreak]</code>' ).'</strong>' );
+	}
+
+	// Single/page view:
+	if( ! in_array( $edited_Item->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all', 'content-block', 'special' ) ) )
+	{	// We don't need this setting for intro, content block and special items:
+		echo '<div class="itemform_extra_radio">';
+		$Form->radio( 'post_single_view', $edited_Item->get( 'single_view' ), array(
+				array( 'normal', T_('Normal') ),
+				array( '404', '404' ),
+				array( 'redirected', T_('Redirected') ),
+			), T_('Single/page view'), true );
+		echo '</div>';
+	}
+
+	// Issue date:
+	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	{	// If user has a permission to edit time of items:
+		echo '<div class="itemform_extra_radio">';
+		$Form->output = false;
+		$item_issue_date_time = $Form->date( 'item_issue_date', $edited_Item->get( 'issue_date' ), '' );
+		$item_issue_date_time .= $Form->time( 'item_issue_time', $edited_Item->get( 'issue_date' ), '', 'hh:mm:ss', '' );
+		$Form->output = true;
+		$Form->radio( 'item_dateset', $edited_Item->get( 'dateset' ), array(
+				array( 0, T_('Update to NOW') ),
+				array( 1, T_('Set to').': ', '', $item_issue_date_time ),
+			), T_('Issue date'), array( 'lines' => true ) );
+		echo '</div>';
+	}
 
 	$Form->switch_layout( NULL );
 
@@ -928,7 +950,7 @@ $Form->begin_form( '', '', $params );
 	jQuery( document ).ready( function()
 	{
 		var affix_obj = jQuery( "#publish_buttons" );
-		var affix_offset = 50;
+		var affix_offset = 110;
 
 		if( affix_obj.length == 0 )
 		{ // No Messages, exit

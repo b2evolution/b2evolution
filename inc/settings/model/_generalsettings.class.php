@@ -332,7 +332,7 @@ C message size exceeds',
 		// Account closing options:
 		'account_close_enabled' => 1, // Allow users to close their account themselves
 		'account_close_intro'   => "We are sorry to see you leave.\n\nWe value your feedback. Please be so kind and tell us in a few words why you are leaving us. This will help us to improve the site for the future.",
-		'account_close_reasons' => "I don't need this account any more.\nI do not like this site.", // Reasons to close an account, separated by new line
+		'account_close_reasons' => "I don't need this account any more.\nI do not like this site.\nI am getting spam from this site.", // Reasons to close an account, separated by new line
 		'account_close_byemsg'  => 'Your account has now been closed. If you ever want to log in again, you will need to create a new account.',
 
 	// Back-end settings, these can't be modified by the users:

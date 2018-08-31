@@ -422,37 +422,54 @@ function get_collection_kinds( $kind = NULL )
 	global $Plugins;
 
 	$kinds = array(
+		'minisite' => array(
+				'name' => T_('Mini-Site'),
+				'class' => 'btn-primary',
+				'desc' => T_('Use this to build a <b>small site</b> consisting of a home page and only a few additional pages.'),
+				'note' => T_('Use this if you want to start with a relatively simple "page builder".')
+								.'<br />'.T_('If your site grows, you can always switch this to a "Home / Main" collection later.'),
+			),
 		'main' => array(
 				'name' => T_('Home / Main'),
 				'class' => 'btn-primary',
-				'desc' => T_('A collection optimized to be used as a site homepage and/or for generic functions such as messaging, user profiles, etc.'),
-				'note' => T_('Besides displaying a nice homepage, this can also be used as a central home for cross-collection features such as private messaging, user profile editing, etc.'),
+				'desc' => T_('Use this as a site homepage to build a <b>large site</b> consisting of a home page <b>plus</b> several sections (where each section is a separate collection).'),
+				'note' => T_('By default, this home collection will aggregate the contents of all your other collections.')
+								.'<br />'.T_('This collection can also be used to display all the cross-collection site features such as registration, login, user profiles, private messaging, etc.'),
 			),
 		'std' => array(
 				'name' => T_('Blog'), // NOTE: this is a REAL usage of the word 'Blog'. Do NOT change to 'collection'.
 				'class' => 'btn-info',
-				'desc' => T_('A collection optimized to be used as a standard blog (with the most common features).'),
-				'note' => T_('Many users start with a blog and add other features later.'),
-			),
-		'photo' => array(
-				'name' => T_('Gallery'),
-				'desc' => T_('A collection optimized for publishing photo albums.'),
-				'note' => T_('Use this if you want to publish images without much text.'),
-			),
-		'forum' => array(
-				'name' => T_('Forum'),
-				'desc' => T_('A collection optimized to be used as a forum. (This should be used with a forums skin)'),
-				'note' => T_('Use this if you want a place for your user community to interact.'),
+				'desc' => T_('A collection of Posts, optimized to present <b>articles or news</b>, sorted primarily by date.'),
+				'note' => T_('Use this is you are going to publish fresh content on a regular basis.')
+								.'<br />'.T_('Can be used as a section of a larger site.'),
 			),
 		'manual' => array(
 				'name' => T_('Manual'),
-				'desc' => T_('A collection optimized to be used as an online manual, book or guide. (This should be used with a manual skin)'),
-				'note' => T_('Use this if you want to publish organized information with chapters, sub-chapters, etc.'),
+				'class' => 'btn-info',
+				'desc' => T_('A collection of Pages, optimized to present <b>reference material</b> organized into chapters, sub-chapters, etc.'),
+				'note' => T_('Use this if you want to publish an online manual, a reference section, a book or a guide.')
+								.'<br />'.T_('Can be used as a section of a larger site.').' '.T_('Should be used with a "manual" skin.'),
+			),
+		'photo' => array(
+				'name' => T_('Gallery'),
+				'class' => 'btn-info',
+				'desc' => T_('A collection of Albums, optimized to present <b>photos</b> grouped into small <b>albums</b>.'),
+				'note' => T_('Use this if you want to publish several images at a time, without much text.')
+								.'<br />'.T_('Can be used as a section of a larger site.').' '.T_('This should be used with a "gallery" skin.'),
+			),
+		'forum' => array(
+				'name' => T_('Forum'),
+				'class' => 'btn-info',
+				'desc' => T_('A collection of Topics (and replies), optimized to be used as an <b>interactive discussion forum</b>.'),
+				'note' => T_('Users will be able to post new topics and replies from the front-office.')
+								.'<br />'.T_('Can be used as a section of a larger site.').' '.T_('This should be used with a "forums" skin.'),
 			),
 		'group' => array(
 				'name' => T_('Tracker'),
-				'desc' => T_('A collection optimized for issue tracking or collaborative editing. Look for the workflow properties on the post editing form.'),
-				'note' => T_('Use this if several users need to collaborate on resolving issues or publishing articles...'),
+				'class' => 'btn-info',
+				'desc' => T_('A collection of Issues, optimized for <b>issue tracking</b> or <b>collaborative editing</b> between multiple users.'),
+				'note' => T_('Look for the workflow properties on the post editing form.')
+								.'<br />'.T_('Can be used as a section of a larger site.').' '.T_('Should be used with a "tracker" skin. May also be used only in back-office.'),
 			),
 		'catalog' => array(
 				'name' => T_('Catalog'),
@@ -1578,16 +1595,20 @@ function & get_setting_Blog( $setting_name, $current_Blog = NULL, $halt_on_error
 		return $setting_Blog;
 	}
 
-	if( $setting_name == 'login_blog_ID' && $current_Blog !== NULL && $current_Blog->get( 'access_type' ) == 'absolute' )
-	{	// Don't allow to use main login collection if current collection has an external domain:
-		return $setting_Blog;
-	}
-
 	$blog_ID = intval( $Settings->get( $setting_name ) );
 	if( $blog_ID > 0 )
 	{ // Check if blog really exists in DB
 		$BlogCache = & get_BlogCache();
 		$setting_Blog = & $BlogCache->get_by_ID( $blog_ID, $halt_on_error, $halt_on_empty );
+	}
+
+	if( $setting_name == 'login_blog_ID' &&
+	    $current_Blog !== NULL &&
+	    $current_Blog->get( 'access_type' ) == 'absolute' &&
+	    ! empty( $setting_Blog ) &&
+	    ! url_check_same_domain( $current_Blog->gen_baseurl(), $setting_Blog->gen_baseurl() ) )
+	{	// Don't allow to use main login collection if current collection has a DIFFERENT external domain:
+		$setting_Blog = NULL;
 	}
 
 	return $setting_Blog;
@@ -1965,7 +1986,7 @@ function blogs_all_results_block( $params = array() )
 	}
 
 	$SQL = new SQL();
-	$SQL->SELECT( 'DISTINCT blog_ID, T_blogs.*, user_login, IF( cufv_user_id IS NULL, 0, 1 ) AS blog_favorite' );
+	$SQL->SELECT( 'DISTINCT blog_ID, T_blogs.*, user_login, IF( cufv_user_id IS NULL, 0, 1 ) AS blog_favorite, cset_value AS collection_logo_file_ID' );
 	if( $params['grouped'] )
 	{	// Get collections with groups:
 		$SQL->SELECT_add( ', sec_ID, sec_name, sec_order, sec_owner_user_ID' );
@@ -1981,6 +2002,7 @@ function blogs_all_results_block( $params = array() )
 		$SQL->FROM_add( 'INNER JOIN T_users ON blog_owner_user_ID = user_ID' );
 	}
 	$SQL->FROM_add( 'LEFT JOIN T_coll_user_favs ON ( cufv_blog_ID = blog_ID AND cufv_user_ID = '.$current_User->ID.' )' );
+	$SQL->FROM_add( 'LEFT JOIN T_coll_settings ON blog_ID = cset_coll_ID AND cset_name = "collection_logo_file_ID"' );
 
 	if( ! $current_User->check_perm( 'blogs', 'view' ) )
 	{ // We do not have perm to view all blogs... we need to restrict to those we're a member of:
@@ -2150,6 +2172,7 @@ function blogs_model_results_block( $params = array() )
 	// Initialize Results object
 	blogs_results( $blogs_Results, array(
 		'display_fav' => false,
+		'display_logo' => false,
 		'display_url' => $is_coll_admin,
 		'display_locale' => $is_coll_admin,
 		'display_plist' => false,
@@ -2196,6 +2219,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 			'display_locale'   => true,
 			'display_plist'    => true,
 			'display_fav'      => true,
+			'display_logo'     => true,
 			'display_order'    => true,
 			'display_caching'  => true,
 			'display_actions'  => true,
@@ -2228,6 +2252,17 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'td' => '%blog_row_setting( #blog_ID#, "fav", #blog_favorite# )%',
 			);
 		$cols_num++;
+	}
+
+	if( $params['display_logo'] )
+	{ // Display collection logo
+		$blogs_Results->cols[] = array(
+				'th' => T_('Image'),
+				'th_title' => T_('Image'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'td' => '%blog_row_setting( #blog_ID#, "logo", #collection_logo_file_ID# )%',
+			);
 	}
 
 	if( $params['display_name'] )
@@ -2492,13 +2527,14 @@ function blog_row_type( $coll_type, $coll_ID )
 	global $current_User, $admin_url, $Settings;
 
 	$type_titles = array(
-			'main'    => T_('Main'),
-			'std'     => T_('Blog'),
-			'photo'   => T_('Gallery'),
-			'group'   => T_('Collab'),
-			'forum'   => T_('Forum'),
-			'manual'  => T_('Manual'),
-			'catalog' => T_('Catalog'),
+			'minisite' => T_('Mini-Site'),
+			'main'     => T_('Main'),
+			'std'      => T_('Blog'),
+			'photo'    => T_('Gallery'),
+			'group'    => T_('Collab'),
+			'forum'    => T_('Forum'),
+			'manual'   => T_('Manual'),
+			'catalog'  => T_('Catalog'),
 		);
 
 	$type_title = isset( $type_titles[ $coll_type ] ) ? $type_titles[ $coll_type ] : $coll_type;
@@ -2743,8 +2779,16 @@ function blog_row_setting( $blog_ID, $setting_name, $setting_value )
 
 	switch( $setting_name )
 	{
-		case'fav':
+		case 'fav':
 			return get_coll_fav_icon( $blog_ID, array( 'class' => 'coll-fav' ) );
+
+		case 'logo':
+			$FileCache = & get_FileCache();
+			if( $image_File = & $FileCache->get_by_ID( $setting_value, false, false ) )
+			{
+				return $image_File->get_tag( '', '', '', '', 'crop-32x32', 'original', '', 'lightbox[c'.$image_File->ID.']' );
+			}
+			return;
 
 		default:
 			// Incorrect setting name

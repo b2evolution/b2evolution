@@ -74,6 +74,7 @@ class bootstrap_main_Skin extends Skin
 	public function get_supported_coll_kinds()
 	{
 		$supported_kinds = array(
+				'minisite' => 'maybe',  // Not necessarily a good choice because there is no menu container on the homepage, minisites typically need a menu to switch pages
 				'main' => 'yes',
 				'std' => 'no',		// Blog
 				'photo' => 'no',
@@ -105,31 +106,15 @@ class bootstrap_main_Skin extends Skin
 	 * This should NOT be protected. It should be used INSTEAD of file parsing.
 	 * File parsing should only be used if this function is not defined
 	 *
-	 * @return array
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
 	 */
 	function get_declared_containers()
 	{
-		// Note: second param below is the ORDER
-		return array(
-				'page_top'                  => array( NT_('Page Top'), 2 ),
-				'header'                    => array( NT_('Header'), 10 ),
-				'menu'                      => array( NT_('Menu'), 15 ),
-				'front_page_main_area'      => array( NT_('Front Page Main Area'), 40 ),
-				'front_page_secondary_area' => array( NT_('Front Page Secondary Area'), 45 ),
-				'item_single'               => array( NT_('Item Single'), 50 ),
-				'item_page'                 => array( NT_('Item Page'), 55 ),
-				'contact_page_main_area'    => array( NT_('Contact Page Main Area'), 60 ),
-				'footer'                    => array( NT_('Footer'), 100 ),
-				'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
-				'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
-				'404_page'                  => array( NT_('404 Page'), 130 ),
-				'login_required'            => array( NT_('Login Required'), 140 ),
-				'access_denied'             => array( NT_('Access Denied'), 150 ),
-				'help'                      => array( NT_('Help'), 160 ),
-				'register'                  => array( NT_('Register'), 170 ),
-				'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
-				'shopping_cart'             => array( NT_('Shopping Cart'), 190 ),
-			);
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
+		return array();
 	}
 
 
@@ -431,7 +416,7 @@ class bootstrap_main_Skin extends Skin
 		// Add custom CSS:
 		$custom_css = '';
 
-		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
+		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'content_requires_login' ) ) )
 		{
 			$FileCache = & get_FileCache();
 
@@ -481,7 +466,7 @@ class bootstrap_main_Skin extends Skin
 
 			if( $color = $this->get_setting( 'front_text_color' ) )
 			{ // Custom text color:
-				$custom_css .= 'body.pictured .main_page_wrapper { color: '.$color." }\n";
+				$custom_css .= 'body.pictured .front_main_content, body.pictured .front_main_content h1 small, .evo_container__header, .evo_container__page_top, body.pictured:not(.disp_register) .evo_widget.widget_core_content_block { color: '.$color." }\n";
 			}
 
 			$link_color = $this->get_setting( 'front_link_color' );

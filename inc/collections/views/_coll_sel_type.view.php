@@ -21,6 +21,8 @@ echo '<div class="panel-heading">'
 
 echo '<div class="panel-body">';
 
+echo '<p>'.T_('A collection is basically a box collecting items (articles, photos, products...) that go together. A collection may be a whole website in itself. It can also be just a section of a larger site.').'</p>';
+
 echo '<p>'.T_('Your selection here will pre-configure your collection in order to optimize it for a particular use. Nothing is final though. You can change all the settings at any time and any kind of collection can be transformed into any other at any time.').'</p>';
 
 echo '<table class="coll_kind">';

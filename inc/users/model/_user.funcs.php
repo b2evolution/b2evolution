@@ -207,7 +207,7 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 	$return_url = param( 'return_to', 'url', '' );
 	if( empty( $return_url ) )
 	{
-		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), get_htsrv_url( true ) );
+		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), get_htsrv_url( 'login' ) );
 	}
 
 	if( ! $force_normal_login && use_in_skin_login() )
@@ -228,18 +228,19 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 			$return_url = url_rel_to_same_host( $return_url, $Blog->get( $blog_page, array( 'glue' => '&' ) ) );
 		}
 		$url = $Blog->get( $blog_page, array( 'glue' => '&' ) );
+		//$url = force_https_url( $url, 'login' );
 	}
 	else
 	{ // Use normal/basic login form (without blog skin)
 		if( ! empty( $redirect_url ) )
 		{
-			$redirect_url = url_rel_to_same_host( $redirect_url, get_htsrv_url( true ) );
+			$redirect_url = url_rel_to_same_host( $redirect_url, get_htsrv_url( 'login' ) );
 		}
 		if( ! empty( $redirect_url ) )
 		{
-			$return_url = url_rel_to_same_host( $return_url, get_htsrv_url( true ) );
+			$return_url = url_rel_to_same_host( $return_url, get_htsrv_url( 'login' ) );
 		}
-		$url = get_htsrv_url( true ).'login.php';
+		$url = get_htsrv_url( 'login' ).'login.php';
 	}
 
 	return url_add_param( $url, 'redirect_to='.rawurlencode( $redirect_url )
@@ -262,13 +263,13 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to 
 
 	if( empty( $redirect_to ) && $redirect_to !== false )
 	{ // Redirect back to current URL
-		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( true ) );
+		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( 'login' ) );
 	}
 
 	// This URL is used to redirect after ABORT login action:
 	if( empty( $return_to ) && $return_to !== false  )
 	{
-		$return_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( true ) );
+		$return_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( 'login' ) );
 	}
 
 	if( use_in_skin_login() )
@@ -277,7 +278,7 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to 
 	}
 	else
 	{ // Use normal/standard lostpassword form (without blog skin)
-		$lostpassword_url = get_htsrv_url( true ).'login.php?action=lostpassword';
+		$lostpassword_url = get_htsrv_url( 'login' ).'login.php?action=lostpassword';
 	}
 
 	if( $redirect_to !== false )
@@ -307,7 +308,7 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 
 	if( empty( $redirect_to ) )
 	{ // Redirect back to current URL
-		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( true ) );
+		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( 'login' ) );
 	}
 
 	if( use_in_skin_login() )
@@ -316,7 +317,7 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 	}
 	else
 	{ // Use normal/standard lostpassword form (without blog skin)
-		$activateinfo_url = get_htsrv_url( true ).'login.php?action=req_activate_email';
+		$activateinfo_url = get_htsrv_url( 'login' ).'login.php?action=req_activate_email';
 	}
 
 	return url_add_param( $activateinfo_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue ) ;
@@ -765,7 +766,7 @@ function get_user_register_url( $redirect_to = NULL, $default_source_string = ''
 	}
 	else
 	{ // Use normal/standard register form (without blog skin)
-		$register_url = get_htsrv_url( true ).'register.php';
+		$register_url = get_htsrv_url( 'login' ).'register.php';
 	}
 
 	// Source
@@ -786,14 +787,14 @@ function get_user_register_url( $redirect_to = NULL, $default_source_string = ''
 
 	if( ! empty( $redirect_to ) )
 	{
-		$register_url = url_add_param( $register_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, get_htsrv_url( true ) ) ), $glue );
+		$register_url = url_add_param( $register_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, get_htsrv_url( 'login' ) ) ), $glue );
 	}
 
 	// This URL is used to redirect after ABORT login action
 	$return_url = param( 'return_to', 'url', '' );
 	if( empty( $return_url ) )
 	{
-		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), get_htsrv_url( true ) );
+		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), get_htsrv_url( 'login' ) );
 	}
 
 	$register_url = url_add_param( $register_url, 'return_to='.rawurlencode( $return_url ), $glue );
@@ -857,7 +858,7 @@ function get_user_logout_url( $blog_ID = NULL )
 		return false;
 	}
 
-	$redirect_to = url_rel_to_same_host( regenerate_url( 'disp,action','','','&' ), get_htsrv_url( true ) );
+	$redirect_to = url_rel_to_same_host( regenerate_url( 'disp,action','','','&' ), get_htsrv_url( 'login' ) );
 	if( require_login( $redirect_to, true ) )
 	{ // if redirect_to page is a login page, or also require login ( e.g. admin.php )
 		if( ! empty( $blog_ID ) )
@@ -878,11 +879,11 @@ function get_user_logout_url( $blog_ID = NULL )
 		}
 		else
 		{ // Blog is empty, set abort url to baseurl
-			$redirect_to =  url_rel_to_same_host( $baseurl, get_htsrv_url( true ) );
+			$redirect_to =  url_rel_to_same_host( $baseurl, get_htsrv_url( 'login' ) );
 		}
 	}
 
-	return get_htsrv_url( true ).'login.php?action=logout&amp;redirect_to='.rawurlencode($redirect_to);
+	return get_htsrv_url( 'login' ).'login.php?action=logout&amp;redirect_to='.rawurlencode( $redirect_to );
 }
 
 
@@ -1276,6 +1277,10 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL, $gl
 	{ // Use home page of the current blog
 		$blog_url = $current_Blog->gen_blogurl();
 	}
+	if( $user_tab == 'pwdchange' )
+	{	// Force a change password page to https if it is required by setting "Require SSL":
+		$blog_url = force_https_url( $blog_url, 'login' );
+	}
 
 	if( $is_admin_page || $is_admin_tab || empty( $current_Blog ) || $current_User->ID != $user_ID )
 	{
@@ -1294,6 +1299,10 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL, $gl
 					if( $current_Blog = & $BlogCache->get_next() )
 					{
 						$blog_url = $current_Blog->gen_blogurl();
+						if( $user_tab == 'pwdchange' )
+						{	// Force a change password page to https if it is required by setting "Require SSL":
+							$blog_url = force_https_url( $blog_url, 'login' );
+						}
 					}
 				}
 			}
@@ -1322,7 +1331,12 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL, $gl
 		{ // Only users of the first group can use the admin tab
 			$user_tab = 'profile';
 		}
-		return $admin_url.'?ctrl=user'.$glue.'user_tab='.$user_tab.$glue.'user_ID='.$user_ID;
+		$user_url = $admin_url.'?ctrl=user'.$glue.'user_tab='.$user_tab.$glue.'user_ID='.$user_ID;
+		if( $user_tab == 'pwdchange' )
+		{	// Force a change password page to https if it is required by setting "Require SSL":
+			$user_url = force_https_url( $user_url, 'login' );
+		}
+		return $user_url;
 	}
 
 	if( ! empty( $current_Blog ) && in_array( $user_tab, array( 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish' ) ) )
@@ -2506,9 +2520,10 @@ function get_user_sub_entries( $is_admin, $user_ID )
 
 	if( $is_admin )
 	{
+		global $admin_url;
 		$ctrl_param = 'ctrl=user&amp;user_tab=';
 		$user_param = '&amp;user_ID='.$user_ID;
-		$base_url = '';
+		$base_url = $admin_url;
 	}
 	else
 	{
@@ -2536,7 +2551,7 @@ function get_user_sub_entries( $is_admin, $user_ID )
 		{
 			$users_sub_entries['pwdchange'] = array(
 								'text' => T_('Password'),
-								'href' => url_add_param( $base_url, $ctrl_param.'pwdchange'.$user_param ) );
+								'href' => force_https_url( url_add_param( $base_url, $ctrl_param.'pwdchange'.$user_param ), 'login' ) );
 		}
 
 		$users_sub_entries['userprefs'] = array(

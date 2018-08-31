@@ -999,7 +999,7 @@ class Message extends DataObject
 		}
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
-		$r = $Plugins->render( $r, $this->get_renderers_validated(), $format, array(), 'Display' );
+		$r = $Plugins->render( $r, $this->get_renderers_validated(), $format, array( 'Message' => $this ), 'Display' );
 
 		return $r;
 	}

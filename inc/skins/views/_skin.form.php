@@ -68,7 +68,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 			// Skin format:
 			echo '<div class="skin_setting_row">';
 				echo '<label>'.T_('Skin format').':</label>';
-				echo '<span>'.$edited_Skin->type.'</span>';
+				echo '<span>'.get_skin_type_title( $edited_Skin->type ).'</span>';
 			echo '</div>';
 
 			// Containers
@@ -96,19 +96,13 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 
 			$Form->text_input( 'skin_name', $edited_Skin->name, 32, T_('Skin name'), T_('As seen by blog owners'), array( 'required'=>true ) );
 
-			$Form->radio( 'skin_type',
-										$edited_Skin->type,
-										 array(
-														array( 'normal', T_( 'Normal' ), T_( 'Normal skin for general browsing' ) ),
-														array( 'mobile', T_( 'Mobile' ), T_( 'Mobile skin for mobile phones browsers' ) ),
-														array( 'tablet', T_( 'Tablet' ), T_( 'Tablet skin for tablet browsers' ) ),
-														array( 'rwd', T_( 'RWD' ), T_( 'Skin can be used for general, mobile phones and tablet browsers' ) ),
-														array( 'feed', T_( 'XML Feed' ), T_( 'Special system skin for XML feeds like RSS and Atom' ) ),
-														array( 'sitemap', T_( 'XML Sitemap' ), T_( 'Special system skin for XML sitemaps' ) ),
-													),
-											T_( 'Skin type' ),
-											true // separate lines
-									 );
+			$skin_types = get_skin_types();
+			$skin_types_options = array();
+			foreach( $skin_types as $skin_type_key => $skin_type_data )
+			{
+				$skin_types_options[] = array( $skin_type_key, $skin_type_data[0], $skin_type_data[1] );
+			}
+			$Form->radio( 'skin_type', $edited_Skin->type, $skin_types_options, T_( 'Skin type' ), true );
 			$Form->end_fieldset();
 
 			$SQL = 'SELECT a.* FROM(
@@ -160,24 +154,9 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 				'td' => '%display_skin_setting_link( {row} )%',
 			);
 
-			function display_skin_type( $skin_type )
-			{
-				switch( $skin_type )
-				{
-					case 'normal':
-						return T_('Normal');
-
-					case 'mobile':
-						return T_('Mobile');
-
-					case 'tablet':
-						return T_('Tablet');
-				}
-			}
-
 			$Results->cols[] = array(
 				'th' => T_('Skin type'),
-				'td' => '%display_skin_type( #skin_type# )%',
+				'td' => '%get_skin_type_title( #skin_type# )%',
 				'td_class' => 'text-center'
 			);
 

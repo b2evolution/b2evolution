@@ -904,8 +904,10 @@ Admins and moderators can very quickly approve or reject comments from the colle
 function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = true, $timeshift = 86400, $section_ID = 1 )
 {
 	global $install_test_features, $DB, $admin_url, $timestamp;
+	global $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
 
-	$default_blog_longdesc = T_('This is the long description for the blog named \'%s\'. %s');
+	$default_blog_longdesc = T_('This is the long description for the collection named \'%s\'. %s');
+	$default_blog_access_type = 'relative';
 
 	$timestamp = time();
 	$blog_ID = NULL;
@@ -913,11 +915,62 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 	switch( $collection_type )
 	{
 		// =======================================================================================================
-		case 'main':
-			$blog_shortname = T_('Home');
+		case 'minisite':
+			$blog_shortname = T_('Mini-Site');
 			$blog_more_longdesc = '<br />
 <br />
 <strong>'.T_('The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.').'</strong>';
+
+			$blog_minisite_ID = create_blog(
+					T_('Mini-Site Title'),
+					$blog_shortname,
+					'minisite',
+					T_('Change this as you like'),
+					sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
+					6, // Skin ID
+					'minisite',
+					'any',
+					1,
+					'default',
+					true,
+					'never',
+					$owner_ID,
+					'public',
+					$section_ID );
+
+			if( ! $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = '.$DB->quote( 'info_blog_ID' ) ) && ! empty( $blog_minisite_ID ) )
+			{ // Save ID of this blog in settings table, It is used on top menu, file "/skins_site/_site_body_header.inc.php"
+				$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
+						VALUES ( '.$DB->quote( 'info_blog_ID' ).', '.$DB->quote( $blog_minisite_ID ).' )' );
+			}
+			$blog_ID = $blog_minisite_ID;
+
+			$BlogCache = & get_BlogCache();
+			if( $minisite_Blog = $BlogCache->get_by_ID( $blog_minisite_ID, false, false ) )
+			{
+				$blog_skin_ID = $minisite_Blog->get_skin_ID();
+				if( ! empty( $blog_skin_ID ) )
+				{
+					$SkinCache = & get_SkinCache();
+					$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+					$Skin->set_setting( 'section_2_image_file_ID', NULL );
+					$Skin->set_setting( 'section_3_display', 1 );
+					$Skin->set_setting( 'section_3_title_color', '#FFFFFF' );
+					$Skin->set_setting( 'section_3_text_color', '#FFFFFF' );
+					$Skin->set_setting( 'section_3_link_color', '#FFFFFF' );
+					$Skin->set_setting( 'section_3_link_h_color', '#FFFFFF' );
+					$Skin->dbupdate_settings();
+				}
+			}
+
+
+			break;
+
+		// =======================================================================================================
+		case 'main':
+			$blog_shortname = T_('Home');
+			$blog_home_access_type = ( $install_test_features ) ? 'default' : $default_blog_access_type;
+			$blog_more_longdesc = '';
 
 			$blog_home_ID = create_blog(
 					T_('Homepage Title'),
@@ -936,7 +989,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					'public',
 					$section_ID );
 
-			if( ! empty( $blog_home_ID ) )
+			if( ! $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = '.$DB->quote( 'info_blog_ID' ) ) && ! empty( $blog_home_ID ) )
 			{ // Save ID of this blog in settings table, It is used on top menu, file "/skins_site/_site_body_header.inc.php"
 				$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
 						VALUES ( '.$DB->quote( 'info_blog_ID' ).', '.$DB->quote( $blog_home_ID ).' )' );
@@ -1024,8 +1077,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 		case 'photo':
 			$blog_shortname = 'Photos';
 			$blog_stub = 'photos';
-			$blog_more_longdesc = '<br /><br />
-					<strong>'.T_('This is a photoblog, optimized for displaying photos.').'</strong>';
+			$blog_more_longdesc = '';
 
 			$blog_photoblog_ID = create_blog(
 					'Photos',
@@ -1153,6 +1205,63 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 	switch( $collection_type )
 	{
+		// =======================================================================================================
+		case 'minisite':
+			$post_count = 3;
+			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
+
+			// Sample categories:
+			$cat_minisite_b2evo = cat_create( 'b2evolution', 'NULL', $blog_ID, NULL, true );
+			$cat_minisite_contrib = cat_create( T_('Contributors'), 'NULL', $blog_ID, NULL, true );
+
+			if( $edited_Blog = $BlogCache->get_by_ID( $blog_ID, false, false ) )
+			{
+				$edited_Blog->set_setting( 'default_cat_ID', $cat_minisite_b2evo );
+				$edited_Blog->dbupdate();
+			}
+
+			// Sample content:
+			if( is_available_item_type( $blog_ID, 'Intro-Front' ) )
+			{
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'intro' );
+				$edited_Item->insert( $owner_ID, T_('Homepage post'), T_('<p>This is the Home page of this site.</p>
+
+<p>More specifically it is the "Front page" of the first collection of this site. This first collection is called "Mini-Site". Other sample collections have been created. You can access them by clicking "Blog A", "Blog B", "Photos", etc. in the menu bar at the top of this page.</p>
+
+<p>You can add collections at will. You can also remove them (including this "Mini-Site" collection) if you don\'t need one.</p>'),
+						$now, $cat_minisite_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 'Intro-Front' );
+			}
+
+			if( is_available_item_type( $blog_ID, 'Standalone Page' ) )
+			{
+				// Insert a PAGE:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->insert( $owner_ID, T_('More info'), T_('This is a standalone page.'), $now, $cat_minisite_b2evo,
+						array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
+				$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				// Insert a PAGE:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->insert( $owner_ID, T_('About Minisite'), sprintf( get_filler_text( 'info_page' ), T_('Mini-Site') ), $now, $cat_minisite_b2evo,
+						array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
+				$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+			}
+			break;
+
 		// =======================================================================================================
 		case 'main':
 			$post_count = 17;

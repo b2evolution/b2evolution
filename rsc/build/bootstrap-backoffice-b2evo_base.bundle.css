@@ -3,22 +3,29 @@
  * These are included in basic.css but also in item_base.css so they are available in WYSIWYG editors
  */
 .red {
-  color: #f00;
+  color: #f00 !important;
 }
 .orange {
-  color: #f60;
+  color: #f60 !important;
 }
 .green {
-  color: #00cc00;
+  color: #0c0 !important;
 }
 .black {
-  color: #000;
+  color: #000 !important;
 }
 .gray,
 .grey,
 .dimmed,
 .disabled {
-  color: #999;
+  color: #999 !important;
+}
+.evo_param_error {
+  color: #F00;
+  background-color: #fcf8e3;
+  border-radius: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 .note,
 .notes {
@@ -27,16 +34,16 @@
   font-weight: normal;
 }
 .left {
-  text-align: left;
+  text-align: left !important;
 }
 .center {
-  text-align: center;
+  text-align: center !important;
 }
 .right {
-  text-align: right;
+  text-align: right !important;
 }
 .justify {
-  text-align: justify;
+  text-align: justify !important;
 }
 .nobr,
 .nowrap,
@@ -77,20 +84,22 @@ img {
   height: auto;
 }
 .top {
-  vertical-align: top;
+  vertical-align: top !important;
 }
 .middle {
-  vertical-align: middle;
+  vertical-align: middle !important;
 }
-.bottom,
-img.icon {
-  vertical-align: bottom;
+.bottom {
+  vertical-align: bottom !important;
 }
 .baseline {
-  vertical-align: baseline;
+  vertical-align: baseline !important;
 }
 .text-bottom {
-  vertical-align: text-bottom;
+  vertical-align: text-bottom !important;
+}
+img.icon {
+  vertical-align: bottom;
 }
 img.raised,
 .image_block.raised img,
@@ -999,7 +1008,7 @@ div.filters .filter_item div {
   box-shadow: 1px 10px 35px rgba(75, 75, 75, 0.75);
 }
 div#publish_buttons {
-  border-radius: 3px;
+  border-radius: 4px;
   padding: 5px;
   text-align: center;
 }
@@ -2520,37 +2529,24 @@ a.btn.action_icon.hoverlink {
   margin: 0;
   border: none;
 }
-.form-horizontal #itemform_edit_timestamp > input[type=text] {
-  display: inline-block;
-  width: auto;
-}
-.form-horizontal #itemform_extra #itemform_edit_timestamp,
-.form-horizontal #itemform_edit_timestamp #itemform_edit_timestamp {
-  padding: 10px 0;
-}
-.form-horizontal #itemform_extra label,
-.form-horizontal #itemform_edit_timestamp label {
+.form-horizontal #itemform_extra label {
   padding-left: 20px;
   margin-right: 5px;
   position: relative;
 }
-.form-horizontal #itemform_extra label input[type=radio],
-.form-horizontal #itemform_edit_timestamp label input[type=radio] {
+.form-horizontal #itemform_extra label input[type=radio] {
   margin: 4px 0 0;
   position: absolute;
   left: 0;
 }
-.form-horizontal #itemform_extra .form-group,
-.form-horizontal #itemform_edit_timestamp .form-group {
+.form-horizontal #itemform_extra .form-group {
   display: inline-block;
   margin: 0 0 2px;
 }
-.form-horizontal #itemform_extra .form-group input[type=text]:not( #item_issue_date ),
-.form-horizontal #itemform_edit_timestamp .form-group input[type=text]:not( #item_issue_date ) {
+.form-horizontal #itemform_extra .form-group input[type=text]:not( #item_issue_date ) {
   max-width: 85px;
 }
-.form-horizontal #itemform_extra td,
-.form-horizontal #itemform_edit_timestamp td {
+.form-horizontal #itemform_extra td {
   vertical-align: middle;
   padding-right: 5px;
 }
@@ -2889,13 +2885,11 @@ a:hover .glyphicon {
   margin-top: 0;
 }
 #itemform_renderers label,
-#itemform_edit_timestamp label,
 table.catselect label {
   display: inline-block;
   margin-right: 5px;
 }
 #itemform_renderers label input,
-#itemform_edit_timestamp label input,
 table.catselect label input {
   margin: 0 2px 4px 0;
 }
@@ -3289,32 +3283,40 @@ div.message_toolbars {
   min-height: auto;
 }
 .accordion-caret .accordion-toggler:before {
-  padding-right: 3px;
   font-size: 14px;
   font-family: FontAwesome;
 }
 .accordion-caret .accordion-toggler:not(.collapsed):before {
+  padding-right: 3px;
   content: '\f0d7';
 }
 .accordion-caret .accordion-toggler.collapsed:before {
+  padding-right: 6px;
   content: '\f0da';
 }
-.disp_access_requires_login .evo_widget.widget_core_content_block.panel {
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel,
+.disp_content_requires_login .evo_widget.widget_core_content_block.panel {
   background: none;
   border: none;
   box-shadow: none;
   margin: 0;
 }
-.disp_access_requires_login .evo_widget.widget_core_content_block.panel .panel-body {
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel .panel-body,
+.disp_content_requires_login .evo_widget.widget_core_content_block.panel .panel-body {
   padding: 0;
 }
 .disp_access_requires_login .evo_widget.widget_core_content_block.panel .panel-body:before,
+.disp_content_requires_login .evo_widget.widget_core_content_block.panel .panel-body:before,
 .disp_access_requires_login .evo_widget.widget_core_content_block.panel .evo_post__full_text.clearfix:before,
+.disp_content_requires_login .evo_widget.widget_core_content_block.panel .evo_post__full_text.clearfix:before,
 .disp_access_requires_login .evo_widget.widget_core_content_block.panel .panel-body:after,
-.disp_access_requires_login .evo_widget.widget_core_content_block.panel .evo_post__full_text.clearfix:after {
+.disp_content_requires_login .evo_widget.widget_core_content_block.panel .panel-body:after,
+.disp_access_requires_login .evo_widget.widget_core_content_block.panel .evo_post__full_text.clearfix:after,
+.disp_content_requires_login .evo_widget.widget_core_content_block.panel .evo_post__full_text.clearfix:after {
   display: block;
 }
-.disp_access_requires_login .evo_widget.widget_core_user_login {
+.disp_access_requires_login .evo_widget.widget_core_user_login,
+.disp_content_requires_login .evo_widget.widget_core_user_login {
   min-width: 290px;
   max-width: 400px;
   margin: 10px auto;

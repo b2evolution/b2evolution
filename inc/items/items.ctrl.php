@@ -1921,6 +1921,17 @@ function init_list_mode()
 			$AdminUI->breadcrumbpath_add( T_('All'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
 			break;
 
+		case 'summary':
+			$ItemList->set_default_filters( array(
+					'itemtype_usage' => NULL // All types
+				) );
+
+			// require colorbox js
+			require_js_helper( 'colorbox' );
+
+			$AdminUI->breadcrumbpath_add( T_('Summary'), '?ctrl=items&amp;blog=$blog$&amp;tab=summary&amp;filter=restore' );
+			break;
+
 		case 'manual':
 			if( $Blog->get( 'type' ) != 'manual' )
 			{	// Display this tab only for manual blogs
@@ -2168,7 +2179,7 @@ else
 	$AdminUI->append_path_level( empty( $tab ) ? 'full' : $tab );
 }
 
-if( ( isset( $tab ) && in_array( $tab, array( 'full', 'type', 'tracker' ) ) ) || strpos( $action, 'edit' ) === 0 )
+if( ( isset( $tab ) && in_array( $tab, array( 'full', 'summary', 'type', 'tracker' ) ) ) || strpos( $action, 'edit' ) === 0 )
 { // Init JS to autcomplete the user logins
 	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 	// Initialize date picker for _item_expert.form.php
@@ -2476,6 +2487,11 @@ switch( $action )
 					$AdminUI->disp_view( 'items/views/_item_list_full.view.php' );
 					break;
 
+				case 'summary':
+					// Display VIEW:
+					$AdminUI->disp_view( 'items/views/_item_list_summary.view.php' );
+					break;
+
 				case 'manual':
 					// Display VIEW:
 					$AdminUI->disp_view( 'items/views/_item_list_manual.view.php' );
@@ -2492,13 +2508,13 @@ switch( $action )
 			// would be used for moderation rules.
 			if( $Blog->get( 'notes' ) )
 			{
-				$block_item_Widget = new Widget( 'block_item' );
-				$block_item_Widget->title = T_('Notes');
-				// show a quicklink to edit if user has permission:
-/* fp> TODO: use an action icon (will appear on the right)
+				$edit_link = '';
 				if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
-					$block_item_Widget->title .=	' <a href="?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#ffield_blog_notes">'.get_icon( 'edit' ).'</a>';
-*/
+				{
+					$edit_link = action_icon( T_('Edit').'...', 'edit_button', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID, ' '.T_('Edit').'...', 3, 4, array( 'class' => 'btn btn-default btn-sm' ) );
+				}
+				$block_item_Widget = new Widget( 'block_item' );
+				$block_item_Widget->title = '<span class="pull-right panel_heading_action_icons">'.$edit_link.'</span>'.T_('Notes');
 				$block_item_Widget->disp_template_replaced( 'block_start' );
 				$Blog->disp( 'notes', 'htmlbody' );
 				$block_item_Widget->disp_template_replaced( 'block_end' );

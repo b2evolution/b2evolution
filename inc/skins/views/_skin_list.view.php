@@ -82,7 +82,7 @@ $Results->cols[] = array(
 						'th_class' => 'shrinkwrap',
 						'order' => 'skin_type',
 						'td_class' => 'shrinkwrap',
-						'td' => '$skin_type$',
+						'td' => '%get_skin_type_title( #skin_type# )%',
 					);
 
 $Results->cols[] = array(

@@ -180,33 +180,6 @@ function skin_init( $disp )
 				$Item->check_goal();
 			}
 
-			// Check if the post has 'redirected' status:
-			if( ! $preview && $Item->status == 'redirected' && $redir == 'yes' )
-			{	// $redir=no here allows to force a 'single post' URL for commenting
-				// Redirect to the URL specified in the post:
-				$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'].' );
-				header_redirect( $Item->url, true, true );
-			}
-
-			// Check if the post has 'deprecated' status:
-			if( isset( $Item->status ) && $Item->status == 'deprecated' )
-			{ // If the post is deprecated
-				global $disp;
-				$disp = '404';
-				$disp_detail = '404-deprecated-post' ;
-				break;
-			}
-
-			// Check if the post has allowed front office statuses
-			$allowed_statuses = get_inskin_statuses( $Blog->ID, 'post' );
-			if( ! $preview && ! in_array( $Item->status, $allowed_statuses ) )
-			{
-				global $disp;
-				$disp = '404';
-				$disp_detail = '404-disallowed-post-status';
-				break;
-			}
-
 			// Check if we want to redirect to a canonical URL for the post
 			// Please document encountered problems.
 			if( ! $preview
@@ -224,7 +197,7 @@ function skin_init( $disp )
 					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
 				}
 
-				if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+				if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 				{	// The requested URL does not look like the canonical URL for this post...
 					// url difference was resolved
 					$url_resolved = false;
@@ -242,7 +215,7 @@ function skin_init( $disp )
 								$MainList->nav_target = $cat_param[1];
 							}
 						}
-						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get( 'http_protocol' ) != 'always_redirect' );
+						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 					}
 					if( preg_match( '|[&?]tag=([^&A-Z]+)|', $ReqURI, $tag_param ) )
 					{ // A tag post navigation param is set
@@ -257,7 +230,7 @@ function skin_init( $disp )
 								$MainList->nav_target = $tag_param[1];
 							}
 						}
-						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get( 'http_protocol' ) != 'always_redirect' );
+						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 					}
 
 					if( !$url_resolved && $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' && ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) ) )
@@ -378,7 +351,7 @@ function skin_init( $disp )
 								}
 
 								$canonical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
-								if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+								if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 								{	// fp> TODO: we're going to lose the additional params, it would be better to keep them...
 									// fp> what additional params actually?
 									if( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
@@ -419,7 +392,7 @@ function skin_init( $disp )
 							|| $Blog->get_setting( 'relcanonical_tag_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
-						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{
 							if( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
 							{	// REDIRECT TO THE CANONICAL URL:
@@ -448,7 +421,7 @@ function skin_init( $disp )
 							|| $Blog->get_setting( 'relcanonical_archive_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w, '&', $MainList->get_active_filter('page') );
-						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{
 							if( $Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
 							{	// REDIRECT TO THE CANONICAL URL:
@@ -1052,6 +1025,7 @@ function skin_init( $disp )
 			break;
 
 		case 'access_requires_login':
+		case 'content_requires_login':
 			global $login_mode;
 
 			if( is_logged_in() )
@@ -1070,6 +1044,11 @@ function skin_init( $disp )
 			if( ! empty( $login_mode ) && $login_mode == 'http_basic_auth' )
 			{	// Display this error if user already tried to log in by HTTP basic authentication and it was failed:
 				$Messages->add( T_('Wrong Login/Password provided by browser (HTTP Auth).'), 'error' );
+			}
+
+			if( $disp == 'content_requires_login' )
+			{	// Set default details for this disp:
+				$disp_detail = '403-item-requires-login';
 			}
 			break;
 
@@ -1817,6 +1796,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_404'                   => '_404_not_found.disp.php',
 				'disp_access_denied'         => '_access_denied.disp.php',
 				'disp_access_requires_login' => '_access_requires_login.disp.php',
+				'disp_content_requires_login'=> '_content_requires_login.disp.php',
 				'disp_activateinfo'          => '_activateinfo.disp.php',
 				'disp_anonpost'              => '_anonpost.disp.php',
 				'disp_arcdir'                => '_arcdir.disp.php',
@@ -2469,6 +2449,111 @@ function skin_twitter_tags()
 
 
 /**
+ * Add structured data markup using JSON-LD format
+ */
+function skin_structured_data()
+{
+	global $Collection, $Blog, $disp, $MainList;
+
+	if( empty( $Blog ) )
+	{ // Structured data markup is not allowed
+		return;
+	}
+
+	switch( $disp )
+	{
+		case 'single':
+		case 'page':
+			$Item = & $MainList->get_by_idx( 0 );
+
+			if( $Item && ( $item_schema = $Item->get_type_setting( 'schema' ) ) )
+			{
+				$markup = array(
+					'@context' => 'http://schema.org',
+					'@type' => $item_schema,
+					'mainEntityOfPage' => array(
+							'@type' => 'WebPage',
+							'@id' => $Item->get_permanent_url(),
+						),
+					'headline' => $Item->title,
+					'datePublished' => date( 'c', mysql2timestamp( $Item->datestart ) ),
+					'dateModified' => date( 'c', mysql2timestamp( $Item->datemodified ) ),
+					'author' => array(
+							'@type' => 'Person',
+							'name' => $Item->get_creator_User()->get_preferred_name(),
+						),
+					'description' => $Item->get_excerpt(),
+				);
+
+				// Get publisher info:
+				$FileCache = & get_FileCache();
+				$publisher_name = $Blog->get_setting( 'publisher_name' );
+				$publisher_logo_file_ID = $Blog->get_setting( 'publisher_logo_file_ID' );
+				$publisher_logo_File = & $FileCache->get_by_ID( $publisher_logo_file_ID, false, false );
+				if( $publisher_logo_File && $publisher_logo_File->is_image() )
+				{
+					$publisher_logo_url = $publisher_logo_File->get_url();
+				}
+				if( empty( $publisher_logo_url ) )
+				{ // No publisher logo found, fallback to collection logo:
+					$collection_logo_file_ID = $Blog->get_setting( 'logo_file_ID' );
+					$collection_logo_File = & $FileCache->get_by_ID( $collection_logo_file_ID, false, false );
+					if( $collection_logo_File && $collection_logo_File->is_image() )
+					{
+						$publisher_logo_url = $collection_logo_File->get_url();
+						$publisher_logo_File = $collection_logo_File;
+					}
+				}
+
+				if( ! empty( $publisher_name ) || ! empty( $publisher_logo_url ) )
+				{ // Add publisher data to markup:
+					$markup['publisher'] = array( '@type' => 'Organization' );
+					if( ! empty( $publisher_name ) )
+					{
+						$markup['publisher']['name'] = $publisher_name;
+					}
+					if( ! empty( $publisher_logo_url ) )
+					{
+						$markup['publisher']['logo'] = array(
+								'@type' => 'ImageObject',
+								'url' => $publisher_logo_url,
+								'height' => $publisher_logo_File->get_image_size( 'height' ).'px',
+								'width' => $publisher_logo_File->get_image_size( 'width' ).'px',
+							);
+					}
+				}
+
+				// Add article image:
+				$article_image_File = get_social_media_image( $Item );
+				if( $article_image_File )
+				{
+					$markup['image'] = $article_image_File->get_url();
+				}
+
+				// Add aggregate rating:
+				list( $ratings, $active_ratings ) = $Item->get_ratings();
+				if( $ratings['all_ratings'] > 0 )
+				{
+					$markup['aggregateRating'] = array(
+							'@type' => 'AggregateRating',
+							'ratingValue' => round( $ratings["summary"] / $ratings['all_ratings'], 2 ),
+							'ratingCount' => $ratings['all_ratings'],
+						);
+				}
+
+				// Output the markup:
+				echo '<script type="application/ld+json">'."\n";
+				echo json_encode( $markup, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES )."\n";
+				echo '</script>'."\n";
+			}
+			break;
+
+		default:
+			// Do nothing
+	}
+}
+
+/**
  * Sends the desired HTTP response header in case of a "404".
  */
 function skin_404_header()
@@ -2713,6 +2798,40 @@ function get_skin_containers( $skin_ids )
 
 
 /**
+ * Get default skin/widget containers
+ * They may be overridden by each Skin class in the function get_declared_containers()
+ *
+ * @return array Array of default containers: Key is widget container code, Value is array( 0 - container name, 1 - container order )
+ */
+function get_skin_default_containers()
+{
+	return array(
+			'page_top'                  => array( NT_('Page Top'), 2 ),
+			'header'                    => array( NT_('Header'), 10 ),
+			'menu'                      => array( NT_('Menu'), 15 ),
+			'front_page_main_area'      => array( NT_('Front Page Main Area'), 40 ),
+			'front_page_secondary_area' => array( NT_('Front Page Secondary Area'), 45 ),
+			'item_list'                 => array( NT_('Item List'), 48 ),
+			'item_in_list'              => array( NT_('Item in List'), 49 ),
+			'item_single_header'        => array( NT_('Item Single Header'), 50 ),
+			'item_single'               => array( NT_('Item Single'), 51 ),
+			'item_page'                 => array( NT_('Item Page'), 55 ),
+			'sidebar'                   => array( NT_('Sidebar'), 80 ),
+			'sidebar_2'                 => array( NT_('Sidebar 2'), 90 ),
+			'footer'                    => array( NT_('Footer'), 100 ),
+			'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
+			'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
+			'404_page'                  => array( NT_('404 Page'), 130 ),
+			'login_required'            => array( NT_('Login Required'), 140 ),
+			'access_denied'             => array( NT_('Access Denied'), 150 ),
+			'help'                      => array( NT_('Help'), 160 ),
+			'register'                  => array( NT_('Register'), 170 ),
+			'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
+			'shopping_cart'             => array( NT_('Shopping Cart'), 190 ),
+		);
+}
+
+/**
  * Install a skin
  *
  * @todo do not install if skin doesn't exist. Important for upgrade. Need to NOT fail if ZERO skins installed though :/
@@ -2848,7 +2967,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 
 	if( !$skin_ID )
 	{ // The skin ID is empty use the same as normal skin ID
-		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as normal skin').'.</div>';
+		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as standard skin').'.</div>';
 	}
 	else
 	{
@@ -2888,7 +3007,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 			// Skin format:
 			echo '<div class="skin_setting_row">';
 				echo '<label>'.T_('Skin format').':</label>';
-				echo '<span>'.$edited_Skin->type.'</span>';
+				echo '<span>'.get_skin_type_title( $edited_Skin->type ).'</span>';
 			echo '</div>';
 
 			// Containers
@@ -3140,5 +3259,36 @@ function get_skin_folder_base_version( $skin_folder )
 	}
 
 	return array( $base_skin, $skin_version );
+}
+
+
+/**
+ * Get skin types
+ *
+ * @return array
+ */
+function get_skin_types()
+{
+	return array(
+		'normal'  => array( T_('Standard'), T_('Standard skin for general browsing') ),
+		'mobile'  => array( T_('Phone'), T_('Mobile skin for mobile phones browsers') ),
+		'tablet'  => array( T_('Tablet'), T_('Tablet skin for tablet browsers') ),
+		'rwd'     => array( T_('RWD'), T_('Skin can be used for general, mobile phones and tablet browsers') ),
+		'feed'    => array( T_('XML Feed'), T_('Special system skin for XML feeds like RSS and Atom') ),
+		'sitemap' => array( T_('XML Sitemap'), T_('Special system skin for XML sitemaps') ),
+	);
+}
+
+
+/**
+ * Get title of skin type
+ *
+ * @param string Skin type
+ * @return string Skin title
+ */
+function get_skin_type_title( $skin_type )
+{
+	$skin_types = get_skin_types();
+	return ( isset( $skin_types[ $skin_type ] ) ? $skin_types[ $skin_type ][0] : $skin_type );
 }
 ?>

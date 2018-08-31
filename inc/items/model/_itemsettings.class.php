@@ -61,13 +61,13 @@ class ItemSettings extends AbstractSettings
 	 *
 	 * @access protected
 	 * @param string First column key
-	 * @param string Second column key
+	 * @param string Second column key, NULL - to load all settings of the requested Item
 	 * @param string NOT USED (provided for compatibility with parent class)
 	 * @return boolean
 	 */
 	function _load( $item_ID = NULL, $arg = NULL, $arg3 = NULL )
 	{
-		if( empty( $item_ID ) || empty( $arg ) )
+		if( empty( $item_ID ) || ( empty( $arg ) && $arg !== NULL ) )
 		{
 			return false;
 		}

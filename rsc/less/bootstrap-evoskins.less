@@ -225,14 +225,7 @@ a.btn.action_icon {
 		}
 	}
 	// Properties block on edit post form
-	#itemform_edit_timestamp > input[type=text] {
-		display: inline-block;
-		width: auto;
-	}
-	#itemform_extra, #itemform_edit_timestamp {
-		#itemform_edit_timestamp {
-			padding: 10px 0;
-		}
+	#itemform_extra {
 		label {
 			padding-left: 20px;
 			margin-right: 5px;
@@ -629,7 +622,7 @@ a:hover .glyphicon {
 }
 
 // Make a label inline
-#itemform_renderers, #itemform_edit_timestamp, table.catselect {
+#itemform_renderers, table.catselect {
 	label {
 		display: inline-block;
 		margin-right: 5px;
@@ -1082,21 +1075,22 @@ div.edit_toolbars, div.message_toolbars {
 .accordion-caret {
 	.accordion-toggler {
 		&:before {
-			padding-right: 3px;
 			font-size: 14px;
 			font-family: FontAwesome;
 		}
 		&:not(.collapsed):before {
+			padding-right: 3px;
 			content: '\f0d7';
 		}
 		&.collapsed:before {
+			padding-right: 6px;
 			content: '\f0da';
 		}
 	}
 }
 
 // Widgets of container "Login Required" on disp=access_requires_login:
-.disp_access_requires_login {
+.disp_access_requires_login, .disp_content_requires_login {
 	.evo_widget {
 		&.widget_core_content_block.panel {
 			background: none;

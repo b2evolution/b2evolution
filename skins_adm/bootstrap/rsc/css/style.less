@@ -205,6 +205,11 @@ div.avatartag {
 	}
 }
 
+.edit_actions_visibility {
+	white-space: nowrap;
+	margin-right: 5px;
+}
+
 div.log_container {
 	margin: 0;
 }
@@ -224,6 +229,14 @@ div.delete_messages ul {
 	li {
 		list-style: inherit;
 	}
+}
+
+.evo_panel {
+	margin-bottom: 20px;
+}
+
+.evo_panel__footer {
+	padding: 10px 15px;
 }
 
 /*
@@ -301,6 +314,16 @@ div.delete_messages ul {
 			text-align: center;
 			padding: 10px;
 			color: #5bc0de;
+		}
+	}
+}
+.evo_content_summary {
+	.evo_post {
+		.bTitle {
+			font-weight: bold;
+		}
+		.bText {
+			padding-left: 420px;
 		}
 	}
 }
@@ -1046,6 +1069,22 @@ h2.user_title::first-line {
 	label.ffield_item_create_user {
 		padding: 0;
 		font-weight: normal;
+	}
+	.itemform_extra_radio {
+		padding-top: 10px;
+		> label {
+			padding: 0;
+			margin: 0;
+		}
+		input[type=radio][name=item_dateset][value="1"] {
+			margin-top: 11px;
+		}
+		.form-group {
+			vertical-align: middle;
+			input {
+				margin-left: 0;
+			}
+		}
 	}
 }
 
@@ -1893,6 +1932,17 @@ div.query-builder .rule-container .rule-value-container {
 		padding: 10px;
 		.btn-group {
 			margin: 0;
+		}
+	}
+}
+.evo_customizer__content {
+	form {
+		.panel-heading {
+			.panel-title {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
 		}
 	}
 }

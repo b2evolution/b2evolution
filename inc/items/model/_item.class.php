@@ -306,6 +306,10 @@ class Item extends ItemLight
 	 * @var integer
 	 */
 	var $countvotes;
+	/**
+	 * Lazy filled, use {@link get_social_media_image()} to access it.
+	 */
+	var $social_media_image_File = NULL;
 
 	/**
 	 * Constructor
@@ -768,7 +772,21 @@ class Item extends ItemLight
 			}
 		}
 
-		if( $this->status == 'redirected' && empty( $this->url ) )
+		// Single/page view:
+		if( ( $single_view = param( 'post_single_view', 'string', NULL ) ) !== NULL )
+		{
+			if( $this->get( 'status' ) == 'redirected' )
+			{	// Single view of "Redirected" item can be only redirected as well:
+				$single_view = 'redirected';
+			}
+			elseif( $this->previous_status == 'redirected' && $single_view == 'redirected' )
+			{	// Set single view to normal mode when item status is updating from redirected to another status:
+				$single_view = 'normal';
+			}
+			$this->set( 'single_view', $single_view );
+		}
+
+		if( ( $this->status == 'redirected' || $this->get( 'single_view' ) == 'redirected' ) && empty( $this->url ) )
 		{ // Note: post_url is not part of the simple form, so this message can be a little bit awkward there
 			param_error( 'post_url',
 				T_('If you want to redirect this post, you must specify an URL!').' ('.T_('Advanced properties panel').')',
@@ -2997,8 +3015,9 @@ class Item extends ItemLight
 				foreach( $repeat_fields as $repeat_field_name )
 				{
 					$repeat_field_name = trim( $repeat_field_name );
-					if( ! isset( $custom_fields[ $repeat_field_name ] ) )
-					{	// Skip unknown field:
+					if( ! isset( $custom_fields[ $repeat_field_name ] ) ||
+					    ! $custom_fields[ $repeat_field_name ]['public'] )
+					{	// Skip unknown or not public field:
 						continue;
 					}
 					// Get HTML code of the repeated custom field:
@@ -3102,7 +3121,6 @@ class Item extends ItemLight
 				'render_collection'     => true,
 				'render_content_blocks' => true,
 				'render_inline_widgets' => true,
-				'render_date'           => true,
 			), $params );
 
 		if( $params['render_inline_widgets'] )
@@ -3138,11 +3156,6 @@ class Item extends ItemLight
 		if( $params['render_content_blocks'] )
 		{	// Render Content block tags like [include:123], [include:item-slug]:
 			$content = $this->render_content_blocks( $content, $params );
-		}
-
-		if( $params['render_date'] )
-		{	// Render date tags:
-			$content = $this->render_date( $content, $params );
 		}
 
 		return $content;
@@ -3806,83 +3819,6 @@ class Item extends ItemLight
 
 			// Remove
 			array_shift( $content_block_items );
-		}
-
-		return $content;
-	}
-
-
-	/**
-	 * Convert inline date tags into HTML tags like:
-	 *    [date]
-	 *    [date:server]
-	 *    [date:server:F d, Y]
-	 *    [date:server:F d, Y:-03.30]
-	 * url_field is code of custom item field with type "URL"
-	 *
-	 * @param string Source content
-	 * @param array Params
-	 * @return string Content
-	 */
-	function render_date( $content, $params = array() )
-	{
-		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
-		{	// Call $this->render_link_data() on everything outside code/pre:
-			$params['check_code_block'] = false;
-			$content = callback_on_non_matching_blocks( $content,
-				'~<(code|pre)[^>]*>.*?</\1>~is',
-				array( $this, 'render_date' ), array( $params ) );
-			return $content;
-		}
-
-		// Find all matches with tags of link data:
-		preg_match_all( '/\[date(:([^\]]+))?\]/i', $content, $tags );
-
-		if( count( $tags[0] ) > 0 )
-		{	// If at least one date tag is found in content:
-			foreach( $tags[0] as $t => $source_tag )
-			{	// Render date tag as text:
-				$options = trim( $tags[2][ $t ] );
-				$options = empty( $options ) ? false : preg_split( '/(?<!\\\):/', $options );
-				$date_source = isset( $options[0] ) ? $options[0] : 'server';
-				$date_format = isset( $options[1] ) ? $options[1] : locale_datefmt( $this->get( 'locale' ) );
-				$date_offset = isset( $options[2] ) ? $options[2] : 0;
-
-				switch( $date_source )
-				{
-					case 'issued':
-						$date_source = strtotime( $this->get( 'datestart' ) );
-						break;
-					case 'modified':
-						$date_source = strtotime( $this->get( 'datemodified' ) );
-						break;
-					case 'touched':
-						$date_source = strtotime( $this->get( 'last_touched_ts' ) );
-						break;
-					default: // 'server'
-						global $servertimenow;
-						$date_source = $servertimenow;
-				}
-
-				if( preg_match( '/-?\d{1,2}([\.,:]\d{1,2})?/', $date_offset ) && ! empty( $date_offset ) )
-				{	// Shift date:
-					$date_offset = preg_split( '/[\.,:]/', $date_offset );
-					$o_date_source = $date_source;
-					// Shift with hours:
-					$date_source += rtrim( $date_offset[0], '\\' ) * 3600;
-					if( isset( $date_offset[1] ) )
-					{	// Shift with minutes:
-						if( $date_offset[0] < 0 )
-						{	// Use correct sign for minutes as hours have:
-							$date_offset[1] = -$date_offset[1];
-						}
-						$date_source += $date_offset[1] * 60;
-					}
-				}
-
-				// Replace inline date tag with date text:
-				$content = substr_replace( $content, date( $date_format, $date_source ), strpos( $content, $source_tag ), strlen( $source_tag ) );
-			}
 		}
 
 		return $content;
@@ -10268,8 +10204,9 @@ class Item extends ItemLight
 	 */
 	function & get_parent_Item()
 	{
-		if( ! empty( $this->parent_Item ) )
-		{	// Return the initialized parent Item:
+		if( ! empty( $this->parent_Item ) &&
+		    $this->parent_Item->ID == $this->parent_ID )
+		{	// Return the initialized parent Item and if it is really parent of this Item:
 			return $this->parent_Item;
 		}
 
@@ -11155,6 +11092,98 @@ class Item extends ItemLight
 				WHERE post_ID = '.$this->ID );
 
 		return true;
+	}
+
+
+	/**
+	 * Get image file used for social media
+	 *
+	 * @param boolean Use category social media boiler plate or category image as fallback
+	 * @param boolean Use site social media boiler plate or site logo as fallback
+	 * @return object Image File or Link object
+	 */
+	function get_social_media_image( $use_category_fallback = false, $use_site_fallback = false, $return_as_link = false )
+	{
+		if( ! empty( $this->social_media_image_File ) && ! $return_as_link )
+		{
+			return $this->social_media_image_File;
+		}
+
+		$LinkOwner = new LinkItem( $this );
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink,inline', 'image', array(
+				'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+				'sql_order_by'   => 'link_priority ASC, link_order ASC' ) ) )
+		{ // Item has linked files
+			while( $Link = & $LinkList->get_next() )
+			{
+				if( ! ( $File = & $Link->get_File() ) )
+				{ // No File object
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+					continue;
+				}
+
+				if( ! $File->exists() )
+				{ // File doesn't exist
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+					continue;
+				}
+
+				if( $File->is_image() )
+				{ // Use only image files for og:image tag
+					$this->social_media_image_File = $File;
+					if( $return_as_link )
+					{
+						return $Link;
+					}
+					break;
+				}
+			}
+		}
+
+		if( empty( $this->social_media_image_File ) && $use_category_fallback )
+		{
+			$FileCache = & get_FileCache();
+			if( $default_Chapter = & $this->get_main_Chapter() )
+			{ // Try social media boilerplate image
+				$social_media_image_file_ID = $default_Chapter->get( 'social_media_image_file_ID', false );
+				if( $social_media_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) ) && $File->is_image() )
+				{
+					$this->social_media_image_File = $File;
+				}
+				else
+				{ // Try category image
+					$cat_image_file_ID = $default_Chapter->get( 'image_file_ID', false );
+					if( $cat_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $cat_image_file_ID ) ) && $File->is_image() )
+					{
+						$this->social_media_image_File = $File;
+					}
+				}
+			}
+		}
+
+		if( empty( $this->social_media_image_File ) && $use_site_fallback )
+		{ // Use social media boilerplate logo if configured
+			global $Settings;
+
+			$FileCache = & get_FileCache();
+			$social_media_image_file_ID = intval( $Settings->get( 'social_media_image_file_ID' ) );
+			if( $social_media_image_file_ID > 0 && ( $File = $FileCache->get_by_ID( $social_media_image_file_ID, false ) ) && $File->is_image() )
+			{
+				$this->social_media_image_File = $File;
+			}
+			else
+			{ // Use site logo as fallback if configured
+				$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
+				if( $notification_logo_file_ID > 0 && ( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) ) && $File->is_image() )
+				{
+					$this->social_media_image_File = $File;
+				}
+			}
+		}
+
+		return $this->social_media_image_File;
 	}
 }
 ?>

@@ -904,7 +904,7 @@ require $adminskins_path.'/login/_html_header.inc.php';
 $unsubscribe_form_params['formstart'] = str_replace( '$form_title$', $page_title, $unsubscribe_form_params['formstart'] );
 $params['unsubscribe_form_params'] = $unsubscribe_form_params;
 
-$Form = new Form( get_htsrv_url( true ).'quick_unsubscribe.php', 'unsubscribe_form', 'post' );
+$Form = new Form( get_htsrv_url().'quick_unsubscribe.php', 'unsubscribe_form', 'post' );
 
 if( ! is_null( $params['unsubscribe_form_params'] ) )
 { // Use another template param from skin

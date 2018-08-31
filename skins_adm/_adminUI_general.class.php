@@ -1630,7 +1630,7 @@ class AdminUI_general extends Menu
 			<div id="headinfo">
 				<span id="headfunctions">'
 					// Note: if we log in with another user, we may not have the perms to come back to the same place any more, thus: redirect to admin home.
-					.'<a href="'.get_htsrv_url( true ).'login.php?action=logout&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $admin_url, get_htsrv_url( true ) ) ).'">'.T_('Log out').'</a>
+					.'<a href="'.get_htsrv_url( 'login' ).'login.php?action=logout&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $admin_url, get_htsrv_url( 'login' ) ) ).'">'.T_('Log out').'</a>
 					<img src="'.$rsc_url.'icons/close.gif" width="14" height="14" border="0" class="top" alt="" title="'
 					.T_('Log out').'" /></a>
 				</span>

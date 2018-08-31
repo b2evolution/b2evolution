@@ -210,8 +210,8 @@ class user_login_Widget extends ComponentWidget
 		if( empty( $redirect_to ) )
 		{	// Set redirect URL if it is not set in general settings:
 			global $disp;
-			if( $disp == 'access_requires_login' )
-			{	// Use a collection main page for disp "access_requires_login":
+			if( $disp == 'access_requires_login' || $disp == 'content_requires_login' )
+			{	// Use a collection main page for disp "access_requires_login" and "content_requires_login":
 				$redirect_to = $Blog->get( 'url' );
 			}
 			else

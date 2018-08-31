@@ -65,6 +65,15 @@ class ItemLight extends DataObject
 	var $ityp_ID;
 
 	/**
+	 * Single/page view
+	 *
+	 * 'normal', '404', 'redirected'
+	 *
+	 * @var string
+	 */
+	var $single_view = 'normal';
+
+	/**
 	 * ID of the main category.
 	 * Use {@link ItemLight::set()} to set it, since other vars get lazily derived from it.
 	 * @var integer
@@ -157,6 +166,7 @@ class ItemLight extends DataObject
 			$this->excerpt = $db_row->post_excerpt;
 			$this->ityp_ID = $db_row->post_ityp_ID;
 			$this->url = $db_row->post_url;
+			$this->single_view = isset( $db_row->post_single_view ) ? $db_row->post_single_view : $this->single_view;
 		}
 	}
 
@@ -436,6 +446,22 @@ class ItemLight extends DataObject
 		if( ! empty( $ignore_types ) && in_array( $permalink_type, $ignore_types ) )
 		{	// This permanent type must be ignored:
 			return false;
+		}
+
+		switch( $this->get( 'single_view' ) )
+		{	// Force permanent url depending on item setting "Single/page view":
+			case '404':
+				// Don't allow permanent url for Item with 404 page instead of single view:
+				return false;
+			case 'redirected':
+				if( empty( $this->url ) )
+				{	// Force to 404 page when url is not provided for this Item:
+					return false;
+				}
+				else
+				{	// Use a specified url instead of original permanent url of this Item:
+					return $this->url;
+				}
 		}
 
 		switch( $permalink_type )

@@ -1637,6 +1637,10 @@ class Plugin
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}.
 	 *   - 'Item': The {@link Item} that gets displayed (by reference).
+	 *   - 'Comment': The {@link Comment} that gets displayed (by reference).
+	 *   - 'Message': The {@link Message} that gets displayed (by reference).
+	 *   - 'EmailCampaign': The {@link EmailCampaign} that gets displayed (by reference).
+	 *   - 'Widget': The {@link Widget} that gets displayed (by reference).
 	 *   - 'preview': Is this only a preview?
 	 *   - 'dispmore': Does this include the "more" text (if available), which means "full post"?
 	 *   - 'view_type': What part of a post are we displaying: 'teaser', 'extension' or 'full'
@@ -3407,7 +3411,7 @@ class Plugin
 	 * Get the URL to call a plugin method through http. This links to the /htsrv/call_plugin.php
 	 * file.
 	 *
-	 * It uses either {@link $htsrv_url} or {@link $htsrv_url_sensitive} (if {@link $ReqHost} is on https).
+	 * It uses either {@link $htsrv_url} or {@link https version of $htsrv_url} (if {@link $ReqHost} is on https).
 	 *
 	 * NOTE: AJAX callbacks are required to be on the same domain/protocol, so if you're using absolute
 	 *       blog URLs on different domains you must set {@link $htsrv_url} dynamically, to use the same domain!

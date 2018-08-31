@@ -71,7 +71,6 @@ class Blog extends DataObject
 	var $locale;
 	var $order;
 	var $access_type;
-	var $http_protocol;
 
 	/*
 	 * ?> TODO: we should have an extra DB column that either defines type of blog_siteurl
@@ -244,7 +243,6 @@ class Blog extends DataObject
 			$this->longdesc = $db_row->blog_longdesc;
 			$this->locale = $db_row->blog_locale;
 			$this->access_type = $db_row->blog_access_type;
-			$this->http_protocol = isset( $db_row->blog_http_protocol ) ? $db_row->blog_http_protocol : 'always_redirect';
 			$this->siteurl = $db_row->blog_siteurl;
 			$this->urlname = $db_row->blog_urlname;
 			$this->links_blog_ID = $db_row->blog_links_blog_ID; // DEPRECATED
@@ -339,7 +337,7 @@ class Blog extends DataObject
 	/**
 	 * Initialize blog setting by kind
 	 *
-	 * @param string Kind: 'main', 'std', 'photo', 'group', 'forum', 'manual', 'catalog'
+	 * @param string Kind: 'minisite', 'main', 'std', 'photo', 'group', 'forum', 'manual', 'catalog'
 	 * @param string Name
 	 * @param string Short name
 	 * @param string Url/slug
@@ -348,6 +346,14 @@ class Blog extends DataObject
 	{
 		switch( $kind )
 		{
+			case 'minisite':
+				$this->set( 'type', 'minisite' );
+				$this->set( 'name', empty( $name ) ? T_('Minisite Title') : $name );
+				$this->set( 'shortname', empty( $shortname ) ? T_('Mini-Site') : $shortname );
+				$this->set( 'urlname', empty( $urlname ) ? 'minisite' : $urlname );
+				$this->set_setting( 'front_disp', 'front' );
+				break;
+
 			case 'main':
 				$this->set( 'type', 'main' );
 				$this->set( 'name', empty( $name ) ? T_('Homepage Title') : $name );
@@ -518,6 +524,9 @@ class Blog extends DataObject
 
 		if( param( 'blog_name', 'string', NULL ) !== NULL )
 		{ // General params:
+
+			$this->set_setting( 'collection_logo_file_ID', param( 'collection_logo_file_ID', 'integer', NULL ) );
+
 			$this->set_from_Request( 'name' );
 			$this->set( 'shortname', param( 'blog_shortname', 'string', true ) );
 
@@ -880,6 +889,8 @@ class Blog extends DataObject
 			$this->set_from_Request( 'shortdesc' );
 		}
 
+		$this->set_setting( 'social_media_image_file_ID', param( 'social_media_image_file_ID', 'integer', NULL ) );
+
 		if( param( 'blog_keywords', 'string', NULL ) !== NULL )
 		{	// Keywords:
 			$this->set_from_Request( 'keywords' );
@@ -914,9 +925,6 @@ class Blog extends DataObject
 		{	// HTML notes:
 			param_check_html( 'blog_notes', T_('Invalid Blog Notes') );
 			$this->set( 'notes', get_param( 'blog_notes' ) );
-
-			param_integer_range( 'max_footer_credits', 0, 3, T_('Max credits must be between %d and %d.') );
-			$this->set_setting( 'max_footer_credits', get_param( 'max_footer_credits' ) );
 		}
 
 
@@ -1331,6 +1339,9 @@ class Blog extends DataObject
 			{	// HTML header includes:
 				param_check_html( 'blog_head_includes', T_('Invalid Custom meta tag/css section.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'head_extension' );
 				$this->set_setting( 'head_includes', get_param( 'blog_head_includes' ) );
+
+				param_integer_range( 'max_footer_credits', 0, 3, T_('Max credits must be between %d and %d.') );
+				$this->set_setting( 'max_footer_credits', get_param( 'max_footer_credits' ) );
 			}
 
 			if( param( 'blog_body_includes', 'html', NULL ) !== NULL )
@@ -1401,9 +1412,9 @@ class Blog extends DataObject
 				}
 			}
 
-			if( ( $http_protocol = param( 'blog_http_protocol', 'string', 'always_redirect' ) ) !== NULL )
-			{
-				$this->set( 'http_protocol', $http_protocol );
+			if( ( $http_protocol = param( 'http_protocol', 'string', NULL ) ) !== NULL )
+			{	// SSL:
+				$this->set_setting( 'http_protocol', $http_protocol );
 			}
 
 			if( ( $url_aliases = param( 'blog_url_alias', 'array', NULL ) ) !== NULL )
@@ -1878,35 +1889,35 @@ class Blog extends DataObject
 					// or if we call by absolute URL
 					if( $this->get( 'access_type' ) == 'default' )
 					{
-						return $baseurl.$coll_siteurl.'index.php';
+						return $this->get_protocol_url( $baseurl ).$coll_siteurl.'index.php';
 					}
 					else
 					{
-						return $baseurl.$coll_siteurl;
+						return $this->get_protocol_url( $baseurl ).$coll_siteurl;
 					}
 				}
 				// ... otherwise, we add the blog ID:
 
 			case 'index.php':
 				// Access through index.php + blog qualifier
-				return $baseurl.$coll_siteurl.'index.php?blog='.$this->ID;
+				return $this->get_protocol_url( $baseurl ).$coll_siteurl.'index.php?blog='.$this->ID;
 
 			case 'extrabase':
 				// We want to use extra path on base url, use the blog urlname:
-				return $baseurl.$coll_siteurl.$this->urlname.'/';
+				return $this->get_protocol_url( $baseurl ).$coll_siteurl.$this->urlname.'/';
 
 			case 'extrapath':
 				// We want to use extra path on index.php, use the blog urlname:
-				return $baseurl.$coll_siteurl.'index.php/'.$this->urlname.'/';
+				return $this->get_protocol_url( $baseurl ).$coll_siteurl.'index.php/'.$this->urlname.'/';
 
 			case 'relative':
-				return $baseurl.$coll_siteurl;
+				return $this->get_protocol_url( $baseurl ).$coll_siteurl;
 
 			case 'subdom':
-				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.$baseport.'/';
+				return $this->get_protocol_url( $baseprotocol.'://' ).$this->urlname.'.'.$basehost.$baseport.'/';
 
 			case 'absolute':
-				return $coll_siteurl;
+				return $this->get_protocol_url( $coll_siteurl );
 
 			default:
 				debug_die( 'Unhandled Blog access type ['.$this->get( 'access_type' ).']' );
@@ -1925,29 +1936,29 @@ class Blog extends DataObject
 		switch( $this->get( 'access_type' ) )
 		{
 			case 'baseurl':
-				return $baseurl.$this->siteurl;
+				return $this->get_protocol_url( $baseurl ).$this->siteurl;
 
 			case 'default':
 			case 'index.php':
-				return $baseurl.$this->siteurl.'index.php/';
+				return $this->get_protocol_url( $baseurl ).$this->siteurl.'index.php/';
 
 			case 'extrabase':
 				// We want to use extra path on base url, use the blog urlname:
-				return $baseurl.$this->siteurl.$this->urlname.'/';
+				return $this->get_protocol_url( $baseurl ).$this->siteurl.$this->urlname.'/';
 
 			case 'extrapath':
 				// We want to use extra path on index.php, use the blog urlname:
-				return $baseurl.$this->siteurl.'index.php/'.$this->urlname.'/';
+				return $this->get_protocol_url( $baseurl ).$this->siteurl.'index.php/'.$this->urlname.'/';
 
 			case 'relative':
-				$url = $baseurl.$this->siteurl;
+				$url = $this->get_protocol_url( $baseurl ).$this->siteurl;
 				break;
 
 			case 'subdom':
-				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.$baseport.'/';
+				return $this->get_protocol_url( $baseprotocol.'://' ).$this->urlname.'.'.$basehost.$baseport.'/';
 
 			case 'absolute':
-				$url = $this->siteurl;
+				$url = $this->get_protocol_url( $this->siteurl );
 				break;
 
 			default:
@@ -2007,6 +2018,9 @@ class Blog extends DataObject
 			{	// Build url from base and sub path:
 				$this->basepath_url = $this->get_baseurl_root().$this->get_basepath();
 			}
+
+			// Get URL with protocol which is defined by collection setting "SSL":
+			$this->basepath_url = $this->get_protocol_url( $this->basepath_url );
 		}
 
 		return $this->basepath_url;
@@ -2125,25 +2139,20 @@ class Blog extends DataObject
 	 */
 	function get_htsrv_url( $force_https = false )
 	{
-		$force_https = intval( $force_https );
-
 		if( ! isset( $this->htsrv_urls[ $force_https ] ) )
 		{	// Initialize collection htsrv URL only first time and store in cache:
-			global $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir;
+			global $htsrv_url, $htsrv_subdir;
 
 			if( ! is_array( $this->htsrv_urls ) )
 			{
 				$this->htsrv_urls = array();
 			}
 
-			if( $force_https )
-			{	// If secure htsrv URL is required:
-				$required_htsrv_url = $htsrv_url_sensitive;
-			}
-			else
-			{	// If normal htsrv URL is required:
-				$required_htsrv_url = $htsrv_url;
-			}
+			// Get URL with protocol which is defined by collection setting "SSL":
+			$required_htsrv_url = $this->get_protocol_url( $htsrv_url );
+
+			// Force URL to https depending on the param $force_https:
+			$required_htsrv_url = force_https_url( $required_htsrv_url, $force_https );
 
 			// Cut htsrv folder from end of the URL:
 			$required_htsrv_url = substr( $required_htsrv_url, 0, strlen( $required_htsrv_url ) - strlen( $htsrv_subdir ) );
@@ -2168,6 +2177,7 @@ class Blog extends DataObject
 				.( empty( $htsrv_url_parts['path'] ) ? '' : $htsrv_url_parts['path'] );
 
 			if( isset( $coll_url_parts['scheme'], $htsrv_url_parts['scheme'] ) &&
+			    $htsrv_url_parts['scheme'] != 'https' && // Don't force htsrv back to http when it was already forced to https above by force_https_url()
 			    $coll_url_parts['scheme'] != $htsrv_url_parts['scheme'] )
 			{	// If this collection uses an url with scheme like "https://" then
 				// htsrv url must also uses the same url scheme to avoid restriction by secure reason:
@@ -2202,12 +2212,18 @@ class Blog extends DataObject
 		}
 		elseif( $url_type == 'absolute' )
 		{	// Absolute URL:
-			return $this->get_setting( 'htsrv_assets_absolute_url' );
+			// Get URL with protocol which is defined by collection setting "SSL":
+			$htsrv_assets_absolute_url = $this->get_protocol_url( $this->get_setting( 'htsrv_assets_absolute_url' ) );
+			// Force URL to https depending on the param $force_https:
+			return force_https_url( $htsrv_assets_absolute_url, $force_https );
 		}
 		else// == 'basic'
 		{	// Basic Config URL from config:
-			global $htsrv_url_sensitive, $htsrv_url;
-			return $force_https ? $htsrv_url_sensitive : $htsrv_url;
+			global $htsrv_url;
+			// Get URL with protocol which is defined by collection setting "SSL":
+			$basic_htsrv_url = $this->get_protocol_url( $htsrv_url );
+			// Force URL to https depending on the param $force_https:
+			return force_https_url( $basic_htsrv_url, $force_https );
 		}
 	}
 
@@ -2228,23 +2244,26 @@ class Blog extends DataObject
 			if( ! $force_normal_using && is_admin_page() )
 			{	// Force to absolute base URL on back-office side and email template:
 				global $media_url;
-				return $media_url;
+				$local_media_url = $media_url;
 			}
 			else
 			{	// Use absolute URL relative to collection media folder:
 				global $media_subdir;
-				return $this->get_baseurl_root().$this->get_basepath().$media_subdir;
+				$local_media_url = $this->get_baseurl_root().$this->get_basepath().$media_subdir;
 			}
 		}
 		elseif( $url_type == 'absolute' )
 		{	// Absolute URL:
-			return $this->get_setting( 'media_assets_absolute_url' );
+			$local_media_url = $this->get_setting( 'media_assets_absolute_url' );
 		}
 		else// == 'basic'
 		{	// Basic URL from config:
 			global $media_url;
-			return $media_url;
+			$local_media_url = $media_url;
 		}
+
+		// Get URL with protocol which is defined by collection setting "SSL":
+		return $this->get_protocol_url( $local_media_url );
 	}
 
 
@@ -2261,17 +2280,20 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $rsc_subdir;
-			return $this->get_basepath().$rsc_subdir;
+			$local_rsc_url = $this->get_basepath().$rsc_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
-			return $this->get_setting( 'rsc_assets_absolute_url' );
+			$local_rsc_url = $this->get_setting( 'rsc_assets_absolute_url' );
 		}
 		else// == 'basic'
 		{ // Basic URL from config
 			global $rsc_url;
-			return $rsc_url;
+			$local_rsc_url = $rsc_url;
 		}
+
+		// Get URL with protocol which is defined by collection setting "SSL":
+		return $this->get_protocol_url( $local_rsc_url );
 	}
 
 
@@ -2288,17 +2310,20 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $skins_subdir;
-			return $this->get_basepath().$skins_subdir;
+			$local_skins_url = $this->get_basepath().$skins_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
-			return $this->get_setting( 'skins_assets_absolute_url' );
+			$local_skins_url = $this->get_setting( 'skins_assets_absolute_url' );
 		}
 		else// == 'basic'
 		{ // Basic URL from config
 			global $skins_url;
-			return $skins_url;
+			$local_skins_url = $skins_url;
 		}
+
+		// Get URL with protocol which is defined by collection setting "SSL":
+		return $this->get_protocol_url( $local_skins_url );
 	}
 
 
@@ -2315,17 +2340,20 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{	// Relative URL:
 			global $plugins_subdir;
-			return $this->get_basepath().$plugins_subdir;
+			$local_plugins_url = $this->get_basepath().$plugins_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{	// Absolute URL:
-			return $this->get_setting( 'plugins_assets_absolute_url' );
+			$local_plugins_url = $this->get_setting( 'plugins_assets_absolute_url' );
 		}
 		else// == 'basic'
 		{	// Basic Config URL from config:
 			global $plugins_url;
-			return $plugins_url;
+			$local_plugins_url = $plugins_url;
 		}
+
+		// Get URL with protocol which is defined by collection setting "SSL":
+		return $this->get_protocol_url( $local_plugins_url );
 	}
 
 
@@ -2759,7 +2787,7 @@ class Blog extends DataObject
 				break;
 
 			case 'custom':
-				return $this->media_url;
+				return $this->get_protocol_url( $this->media_url );
 
 			case 'none':
 			default:
@@ -3037,6 +3065,7 @@ class Blog extends DataObject
 			case 'lostpasswordurl':
 			case 'activateinfourl':
 			case 'access_requires_loginurl':
+			case 'content_requires_loginurl':
 				$url_disp = str_replace( 'url', '', $parname );
 				if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $this ) )
 				{ // Use special blog for login/register actions if it is defined in general settings
@@ -3050,6 +3079,7 @@ class Blog extends DataObject
 				{ // Append url suffix
 					$url = url_add_param( $url, $params['url_suffix'], $params['glue'] );
 				}
+				$url = force_https_url( $url, 'login' );
 				return $url;
 
 			case 'threadsurl':
@@ -3155,11 +3185,6 @@ class Blog extends DataObject
 			case 'mobile_skin_ID':
 			case 'tablet_skin_ID':
 				$result = parent::get( $parname );
-				if( $result === NULL && ! empty( $Settings ) )
-				{ // Try to get default from the global settings
-					$result = $Settings->get( 'def_'.$parname );
-				}
-
 				if( $parname == 'mobile_skin_ID' || $parname == 'tablet_skin_ID' )
 				{
 					if( empty( $result ) && ! ( isset( $params['real_value'] ) && $params['real_value'] ) )
@@ -3168,6 +3193,17 @@ class Blog extends DataObject
 					}
 				}
 				return $result;
+
+			case 'collection_image':
+				$FileCache = & get_FileCache();
+				if( $collection_image_ID = $this->get_setting( 'collection_logo_file_ID' ) )
+				{
+					if( $collection_image_File = & $FileCache->get_by_ID( $collection_image_ID, false, false ) )
+					{
+						return $collection_image_File;
+					}
+				}
+				return NULL;
 
 			default:
 				// All other params:
@@ -3193,6 +3229,12 @@ class Blog extends DataObject
 			{ // Add disp param to blog's url when current disp is not a front page
 				$url = url_add_param( $this_Blog->gen_blogurl(), 'disp='.$disp_param, $params['glue'] );
 			}
+
+			if( $disp_param == 'pwdchange' )
+			{	// Force a change password page to https if it is required by setting "Require SSL":
+				$url = force_https_url( $url, 'login' );
+			}
+
 			if( ! empty( $params['url_suffix'] ) )
 			{ // Append url suffix
 				$url = url_add_param( $url, $params['url_suffix'], $params['glue'] );
@@ -3402,6 +3444,21 @@ class Blog extends DataObject
 	function dbinsert()
 	{
 		global $DB, $Plugins, $Settings;
+
+		// Set default skins on creating new collection:
+		$skin_types = array( 'normal', 'mobile', 'tablet' );
+		foreach( $skin_types as $skin_type )
+		{
+			$skin_ID = $this->get( $skin_type.'_skin_ID', array( 'real_value' => true ) );
+			if( empty( $skin_ID ) )
+			{	// Only if skin is not selected during creating:
+				$default_skin_ID = $Settings->get( 'def_'.$skin_type.'_skin_ID' );
+				if( ! empty( $default_skin_ID ) )
+				{	// And if default skin is defined for the skin type:
+					$this->set( $skin_type.'_skin_ID', $default_skin_ID );
+				}
+			}
+		}
 
 		$DB->begin();
 
@@ -4532,7 +4589,8 @@ class Blog extends DataObject
 
 		if( $skin_type == 'mobile' || $skin_type == 'tablet' )
 		{	// Check if collection use different mobile/tablet skin or same as normal skin:
-			if( $this->get( $skin_type.'_skin_ID', array( 'real_value' => true ) ) === '0' )
+			$skin_ID = $this->get( $skin_type.'_skin_ID', array( 'real_value' => true ) );
+			if( empty( $skin_ID ) )
 			{	// Force to use widgets for normal skin because collection doesn't use different skin for mobile/tablet session:
 				$skin_type = 'normal';
 			}
@@ -4610,18 +4668,47 @@ class Blog extends DataObject
 	/**
 	 * Get blog main containers
 	 *
-	 * @return array main container codes => array( name, order )
+	 * @param boolean TRUE to initialize IDs of containers
+	 * @return array main container codes => array( name, order, id(optional) )
 	 */
-	function get_main_containers()
+	function get_main_containers( $load_container_ids = false )
 	{
-		load_funcs( 'skins/_skin.funcs.php' );
-		// Get all skins of the blog and get the merge of main containers from each skin:
-		$skin_ids = $this->get_skin_ids();
+		if( ! isset( $this->widget_containers ) )
+		{
+			load_funcs( 'skins/_skin.funcs.php' );
+			// Get all skins of the blog and get the merge of main containers from each skin:
+			$skin_ids = $this->get_skin_ids();
 
-		// Get containers of all collection skins:
-		$blog_containers = get_skin_containers( $skin_ids );
+			// Get containers of all collection skins:
+			$this->widget_containers = get_skin_containers( $skin_ids );
+		}
 
-		return $blog_containers;
+		if( $load_container_ids &&
+		    $this->ID > 0 &&
+		    empty( $this->widget_containers_ids_loaded ) &&
+		    ! empty( $this->widget_containers ) )
+		{	// Initialize IDs of containers:
+			global $DB;
+
+			$SQL = new SQL( 'Load widget containers data of collection #'.$this->ID );
+			$SQL->SELECT( 'wico_code, wico_ID' );
+			$SQL->FROM( 'T_widget__container' );
+			$SQL->WHERE( 'wico_coll_ID = '.$this->ID );
+			$SQL->WHERE_and( 'wico_skin_type = "normal"' );
+			$SQL->WHERE_and( 'wico_code IN ( '.$DB->quote( array_keys( $this->widget_containers ) ).' )' );
+			$containers_data = $DB->get_assoc( $SQL );
+			foreach( $containers_data as $container_code => $container_ID )
+			{
+				if( isset( $this->widget_containers[ $container_code ] ) )
+				{
+					$this->widget_containers[ $container_code ]['ID'] = $container_ID;
+				}
+			}
+			// Set flag to don't load these data twice:
+			$this->widget_containers_ids_loaded = true;
+		}
+
+		return $this->widget_containers;
 	}
 
 
@@ -4634,6 +4721,8 @@ class Blog extends DataObject
 	function db_save_main_containers( $verbose = false, $skin_type = 'all' )
 	{
 		global $DB, $Messages;
+
+		$DB->begin();
 
 		if( $skin_type == 'all' )
 		{	// Use all skin types:
@@ -4650,20 +4739,29 @@ class Blog extends DataObject
 
 		// Get currently saved collection containers from DB:
 		$SQL = new SQL( 'Get widget containers for collection #'.$this->ID.' for skin types: "'.implode( '", "', $skin_types ).'"' );
-		$SQL->SELECT( 'wico_skin_type, wico_code' );
+		$SQL->SELECT( 'wico_skin_type, wico_code, wico_ID, wico_name, wico_order, COUNT( wi_ID ) AS widgets_count' );
 		$SQL->FROM( 'T_widget__container' );
+		$SQL->FROM_add( 'LEFT JOIN T_widget__widget ON wi_wico_ID = wico_ID' );
 		$SQL->WHERE( 'wico_coll_ID = '.$this->ID );
 		$SQL->WHERE_and( 'wico_skin_type IN ( '.$DB->quote( $skin_types ).' )' );
+		$SQL->GROUP_BY( 'wico_ID' );
 		$coll_containers = $DB->get_results( $SQL );
 		// Group containers with skin type:
 		$coll_containers_skin_types = array();
 		foreach( $coll_containers as $coll_container )
 		{
-			$coll_containers_skin_types[ $coll_container->wico_skin_type ][] = $coll_container->wico_code;
+			$coll_containers_skin_types[ $coll_container->wico_skin_type ][ $coll_container->wico_code ] = array(
+					'ID'    => $coll_container->wico_ID,
+					'name'  => $coll_container->wico_name,
+					'order' => $coll_container->wico_order,
+					'count' => $coll_container->widgets_count,
+				);
 		}
 
 		$SkinCache = & get_SkinCache();
-		$newly_created = 0;
+		$created_containers_num = 0;
+		$updated_containers_num = 0;
+		$deleted_containers_num = 0;
 
 		foreach( $skin_types as $skin_type )
 		{
@@ -4672,17 +4770,50 @@ class Blog extends DataObject
 				continue;
 			}
 
+			// Get default widget containers which are recommended for all skins:
+			$skin_default_containers = get_skin_default_containers();
+
 			// Get skin containers either from declared function or from scaned skin files:
 			$skin_containers = $coll_Skin->get_containers();
 
-			// Check all main containers and create insert rows for those which are not saved yet:
-			$widget_containers_sql_rows = array();
+			// Check all main containers and create insert rows for those which are not saved yet,
+			$update_widget_containers_sql_rows = array();
 			foreach( $skin_containers as $wico_code => $wico_data )
 			{
-				if( ! isset( $coll_containers_skin_types[ $skin_type ] ) ||
-				    ! in_array( $wico_code, $coll_containers_skin_types[ $skin_type ] ) )
+				if( ! isset( $coll_containers_skin_types[ $skin_type ][ $wico_code ] ) )
 				{	// Create only those containers which are not saved yet:
-					$widget_containers_sql_rows[] = '( '.$DB->quote( $wico_code ).', '.$DB->quote( $skin_type ).', '.$DB->quote( $wico_data[0] ).', '.$this->ID.', '.$DB->quote( $wico_data[1] ).', 1 )';
+					$update_widget_containers_sql_rows[] = '( '.$DB->quote( $wico_code ).', '.$DB->quote( $skin_type ).', '.$DB->quote( $wico_data[0] ).', '.$this->ID.', '.$DB->quote( $wico_data[1] ).', 1 )';
+				}
+				else
+				{	// Check if we should update some container data:
+					$update_widget_container_sql_data = array();
+					if( $coll_containers_skin_types[ $skin_type ][ $wico_code ]['name'] != $wico_data[0] )
+					{	// Update if name is different:
+						$update_widget_container_sql_data[] = 'wico_name = '.$DB->quote( $wico_data[0] );
+					}
+					if( $coll_containers_skin_types[ $skin_type ][ $wico_code ]['order'] != $wico_data[1] )
+					{	// Update if order is different:
+						$update_widget_container_sql_data[] = 'wico_order = '.$DB->quote( $wico_data[1] );
+					}
+					if( ! empty( $update_widget_container_sql_data ) )
+					{	// Update different data of the container:
+						$updated_containers_num += $DB->query( 'UPDATE T_widget__container
+							  SET '.implode( ', ', $update_widget_container_sql_data ).'
+							WHERE wico_ID = '.$coll_containers_skin_types[ $skin_type ][ $wico_code ]['ID'],
+							'Update widget #'.$coll_containers_skin_types[ $skin_type ][ $wico_code ]['ID'].' "'.$wico_code.'" of collection #'.$this->ID.' for skin type "'.$skin_type.'"' );
+					}
+				}
+			}
+
+			// Delete empty default containers if they are not declared in the Skin:
+			$delete_widget_containers = array();
+			foreach( $skin_default_containers as $wico_code => $wico_data )
+			{
+				if( ! isset( $skin_containers[ $wico_code ] ) &&
+				    isset( $coll_containers_skin_types[ $skin_type ][ $wico_code ] ) &&
+				    $coll_containers_skin_types[ $skin_type ][ $wico_code ]['count'] == 0 )
+				{	// Delete ONLY EMPTY default container if it exists in DB but not declared in the Skin (or cannot be found in fallback files of old skins):
+					$delete_widget_containers[] = $coll_containers_skin_types[ $skin_type ][ $wico_code ]['ID'];
 				}
 			}
 
@@ -4694,28 +4825,47 @@ class Blog extends DataObject
 				}
 				else
 				{	// If skin scans widget containers from skin and fallback files:
+					$Messages->add( sprintf( T_('WARNING: This is an old skin which provides no container declarations (%s). Falling back to scanning all skin files.'), '<code>function get_declared_containers()</code>' ), 'warning' );
 					$Messages->add( sprintf( T_('%d containers found by scanning templates of skin "%s" (including fall-back templates).'), count( $skin_containers ), $coll_Skin->get_name() ), 'note' );
 				}
 			}
 
-			if( ! empty( $widget_containers_sql_rows ) )
+			if( ! empty( $update_widget_containers_sql_rows ) )
 			{ // Insert all containers defined by the blog skins into the database
-				$newly_created += $DB->query( 'REPLACE INTO T_widget__container( wico_code, wico_skin_type, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES'
-						.implode( ', ', $widget_containers_sql_rows ) );
+				$created_containers_num += $DB->query( 'REPLACE INTO T_widget__container( wico_code, wico_skin_type, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES'
+						.implode( ', ', $update_widget_containers_sql_rows ),
+					'Insert new widget containers for collection #'.$this->ID );
+			}
+
+			if( ! empty( $delete_widget_containers ) )
+			{	// Delete containers which are not used by Skin:
+				$deleted_containers_num += $DB->query( 'DELETE FROM T_widget__container
+					WHERE wico_ID IN ( '.$DB->quote( $delete_widget_containers ).' )',
+					'Delete unwanted empty widget containers from collection #'.$this->ID );
 			}
 		}
 
 		if( $verbose )
 		{
-			if( $newly_created > 0 )
+			if( $created_containers_num > 0 )
 			{
-				$Messages->add( sprintf( T_('%d new container(s) were created.'), $newly_created ), 'success' );
+				$Messages->add( sprintf( T_('%d new container(s) were created.'), $created_containers_num ), 'success' );
 			}
 			else
 			{
 				$Messages->add( T_('All containers were already created.'), 'success' );
 			}
+			if( $updated_containers_num > 0 )
+			{
+				$Messages->add( sprintf( T_('%d container(s) were updated.'), $updated_containers_num ), 'success' );
+			}
+			if( $deleted_containers_num > 0 )
+			{
+				$Messages->add( sprintf( T_('%d container(s) were deleted.'), $deleted_containers_num ), 'success' );
+			}
 		}
+
+		$DB->commit();
 	}
 
 
@@ -5229,7 +5379,7 @@ class Blog extends DataObject
 			return true;
 		}
 
-		if( in_array( $disp, array( 'login', 'lostpassword', 'register', 'help', 'msgform', 'access_requires_login' ) ) )
+		if( in_array( $disp, array( 'login', 'lostpassword', 'register', 'help', 'msgform', 'access_requires_login', 'content_requires_login' ) ) )
 		{ // Don't restrict these pages
 			return true;
 		}
@@ -6131,6 +6281,33 @@ class Blog extends DataObject
 		$default_ItemType = $this->get_default_ItemType();
 
 		return $default_ItemType ? $default_ItemType->get_name() : T_('Post');
+	}
+
+
+	/**
+	 * Get URL with protocol which is defined by collection setting "SSL"
+	 *
+	 * @param string Requested URL
+	 * @param string Forced URL
+	 */
+	function get_protocol_url( $url )
+	{
+		if( empty( $this->ID ) )
+		{
+			return $url;
+		}
+
+		switch( $this->get_setting( 'http_protocol' ) )
+		{	// Force URL's protocol depending on collection setting "SSL":
+			case 'always_http':
+				$url = preg_replace( '#^https://#', 'http://', $url );
+				break;
+			case 'always_https':
+				$url = preg_replace( '#^http://#', 'https://', $url );
+				break;
+		}
+
+		return $url;
 	}
 
 

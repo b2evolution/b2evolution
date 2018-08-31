@@ -22,17 +22,17 @@ switch( $skin_type )
 {
 	case 'normal':
 		$skin_ID = isset( $Blog ) ? $Blog->get( 'normal_skin_ID' ) : $Settings->get( 'normal_skin_ID' );
-		$fieldset_title = isset( $Blog ) ? T_('Default Collection skin') : T_('Default Site skin');
+		$fieldset_title = isset( $Blog ) ? T_('Standard skin for this collection') : T_('Standard skin for this site');
 		break;
 
 	case 'mobile':
 		$skin_ID = isset( $Blog ) ? $Blog->get( 'mobile_skin_ID', array( 'real_value' => true ) ) : $Settings->get( 'mobile_skin_ID', true );
-		$fieldset_title = isset( $Blog ) ? T_('Default Collection mobile phone skin') : T_('Default Site mobile phone skin');
+		$fieldset_title = isset( $Blog ) ? T_('Phone skin for this collection') : T_('Phone skin for this site');
 		break;
 
 	case 'tablet':
 		$skin_ID = isset( $Blog ) ? $Blog->get( 'tablet_skin_ID', array( 'real_value' => true ) ) : $Settings->get( 'tablet_skin_ID', true );
-		$fieldset_title = isset( $Blog ) ? T_('Default Collection tablet skin') : T_('Default Site tablet skin');
+		$fieldset_title = isset( $Blog ) ? T_('Tablet skin for this collection') : T_('Tablet skin for this site');
 		break;
 
 	default:

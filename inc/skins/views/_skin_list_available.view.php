@@ -39,10 +39,10 @@ $block_item_Widget = new Widget( 'block_item' );
 switch( $sel_skin_type )
 {
 	case 'normal':
-		$skin_type_title = /* TRANS: Skin type name */ T_('Normal');
+		$skin_type_title = /* TRANS: Skin type name */ T_('Standard');
 		break;
 	case 'mobile':
-		$skin_type_title = /* TRANS: Skin type name */ T_('Mobile');
+		$skin_type_title = /* TRANS: Skin type name */ T_('Phone');
 		break;
 	case 'tablet':
 		$skin_type_title = /* TRANS: Skin type name */ T_('Tablet');
@@ -87,8 +87,8 @@ $Form->hidden( 'tab', $tab );
 $Form->begin_form( 'skin_selector_filters' );
 $Form->select_input_array( 'sel_skin_type', $sel_skin_type, array(
 		''        => T_('All skins'),
-		'normal'  => T_('Normal skins'),
-		'mobile'  => T_('Mobile skins'),
+		'normal'  => T_('Standard skins'),
+		'mobile'  => T_('Phone skins'),
 		'tablet'  => T_('Tablet skins'),
 		'feed'    => T_('Feed skins'),
 		'sitemap' => T_('Sitemap skins'),
@@ -106,14 +106,15 @@ if( $kind === NULL && isset( $Blog ) )
 if( isset( $Blog ) )
 {	// Display a filter by collection kind:
 	$Form->select_input_array( 'collection_kind', $kind, array(
-			'' => T_('All'),
-			'main'    => T_('Main'),
-			'std'     => T_('Blog'),
-			'photo'   => T_('Photos'),
-			'forum'   => T_('Forums'),
-			'manual'  => T_('Manual'),
-			'group'   => T_('Tracker'),
-			'catalog' => T_('Catalog'),
+			''         => T_('All'),
+			'minisite' => T_('Mini-Site'),
+			'main'     => T_('Main'),
+			'std'      => T_('Blog'),
+			'photo'    => T_('Photos'),
+			'forum'    => T_('Forums'),
+			'manual'   => T_('Manual'),
+			'group'    => T_('Tracker'),
+			'catalog'  => T_('Catalog'),
 		), T_('Collection kind'), '', array(
 			'force_keys_as_values' => true,
 			'onchange' => 'this.form.submit()'

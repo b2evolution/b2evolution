@@ -589,7 +589,10 @@ function install_basic_skins( $install_mobile_skins = true )
 	// Note: Skin #5 will be used by Manual:
 	skin_install( 'bootstrap_manual_skin' );
 
-	// Note: Skin #6 will be used by Catalog:
+	// Note: Skin #6 will be used by Mini-Site
+	skin_install( 'jared_skin' );
+
+	// Note: Skin #7 will be used by Catalog:
 	skin_install( 'bootstrap_catalog_skin' );
 
 	// skin_install( 'asevo' );

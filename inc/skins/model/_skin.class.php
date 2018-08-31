@@ -592,38 +592,45 @@ class Skin extends DataObject
 	{
 		if( is_null( $this->container_list ) )
 		{
-			$this->container_list = array();
-
-			$skin_containers = array();
 			if( method_exists( $this, 'get_declared_containers' ) )
-			{	// Get containers what declared by this skin:
-				$skin_containers = $this->get_declared_containers();
+			{	// Get default containers and containers what declared by this skin:
+				$this->container_list = array_merge( get_skin_default_containers(), $this->get_declared_containers() );
+
+				foreach( $this->container_list as $wico_code => $wico_data )
+				{
+					if( $wico_data === NULL )
+					{	// Exclude containers which are not used in the current Skin:
+						unset( $this->container_list[ $wico_code ] );
+					}
+				}
+
+				// Sort skin containers by order field:
+				uasort( $this->container_list, array( $this, 'sort_containers' ) );
 			}
 			else
 			{	// Get containers from skin files:
 				$this->discover_containers( false );
 			}
-
-			if( ! empty( $skin_containers ) )
-			{
-				// Create ordered array with unique items from the skin containers:
-				$ordered_containers = array();
-				foreach( $skin_containers as $container_code => $container_data )
-				{
-					$container_order = isset( $container_data[1] ) ? $container_data[1] : 0;
-					$ordered_containers[ $container_order ] = $container_code;
-				}
-				ksort( $ordered_containers );
-
-				// Fill final container list:
-				foreach( $ordered_containers as $container_code )
-				{
-					$this->container_list[ $container_code ] = $skin_containers[ $container_code ];
-				}
-			}
 		}
 
 		return $this->container_list;
+	}
+
+
+	/**
+	 * Callback function to sort widget containers by order field
+	 *
+	 * @param array Container data: 0 - name, 1 - order
+	 * @param array Container data: 0 - name, 1 - order
+	 * @return boolean
+	 */
+	function sort_containers( $a_container, $b_container )
+	{
+		// Use 0 if order field is not defined:
+		$a_container_order = isset( $a_container[1] ) ? $a_container[1] : 0;
+		$b_container_order = isset( $b_container[1] ) ? $b_container[1] : 0;
+
+		return $a_container_order > $b_container_order;
 	}
 
 
@@ -694,7 +701,7 @@ class Skin extends DataObject
 		}
 		else
 		{
-			echo '<div class="skinshot_noshot">'.T_('No skinshot available for').'</div>';
+			echo '<div class="skinshot_noshot">'.( empty( $disp_params['same_skin'] ) ? T_('No skinshot available for') : '' ).'</div>';
 			echo '<div class="skinshot_name">'.$select_a_begin.$skin_folder.$select_a_end.'</div>';
 		}
 		echo '</div>';
@@ -1267,6 +1274,7 @@ class Skin extends DataObject
 
 				case 'disp_login':
 				case 'disp_access_requires_login':
+				case 'disp_content_requires_login':
 					// Specific features for disp=login and disp=access_requires_login:
 
 					global $Settings, $Plugins;

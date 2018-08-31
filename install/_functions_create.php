@@ -1835,6 +1835,7 @@ function create_demo_contents()
 	$create_sample_contents = param( 'create_sample_contents', 'string', '' );
 	if( $create_sample_contents == 'all' )
 	{	// Array contains which collections should be installed
+		$install_collection_minisite = 0;
 		$install_collection_home =    1;
 		$install_collection_bloga =   1;
 		$install_collection_blogb =   1;
@@ -1847,6 +1848,7 @@ function create_demo_contents()
 	else
 	{	// Array contains which collections should be installed
 		$collections = param( 'collections', 'array:string', array() );
+		$install_collection_minisite = in_array( 'minisite', $collections );
 		$install_collection_home = in_array( 'home', $collections );
 		$install_collection_bloga = in_array( 'a', $collections );
 		$install_collection_blogb = in_array( 'b', $collections );
@@ -1872,6 +1874,14 @@ function create_demo_contents()
 
 	// Use this var to shift the posts of the collections in time below:
 	$timeshift = 0;
+
+	if( $install_collection_minisite )
+	{ // Install Mini-site collection
+		task_begin( 'Creating Mini-Site collection...' );
+		create_demo_collection( 'minisite', $jay_moderator_ID, $create_demo_users, $timeshift, 1 );
+		update_install_progress_bar();
+		task_end();
+	}
 
 	if( $install_collection_home )
 	{ // Install Home collection

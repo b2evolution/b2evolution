@@ -169,6 +169,10 @@ h2 .glyphicon {
   margin-top: 14px;
   display: inline-block;
 }
+.edit_actions_visibility {
+  white-space: nowrap;
+  margin-right: 5px;
+}
 div.log_container {
   margin: 0;
 }
@@ -188,6 +192,12 @@ div.delete_messages ul {
 }
 div.delete_messages ul li {
   list-style: inherit;
+}
+.evo_panel {
+  margin-bottom: 20px;
+}
+.evo_panel__footer {
+  padding: 10px 15px;
 }
 /*
  * Browse pages of items and comments ( ?ctrl=items and ?ctrl=comments - full views )
@@ -270,6 +280,12 @@ div.delete_messages ul li {
   text-align: center;
   padding: 10px;
   color: #5bc0de;
+}
+.evo_content_summary .evo_post .bTitle {
+  font-weight: bold;
+}
+.evo_content_summary .evo_post .bText {
+  padding-left: 420px;
 }
 #comment_filter_form fieldset {
   margin-bottom: 20px;
@@ -980,6 +996,22 @@ h2.user_title::first-line {
 #itemform_extra label.ffield_item_create_user {
   padding: 0;
   font-weight: normal;
+}
+#itemform_extra .itemform_extra_radio {
+  padding-top: 10px;
+}
+#itemform_extra .itemform_extra_radio > label {
+  padding: 0;
+  margin: 0;
+}
+#itemform_extra .itemform_extra_radio input[type=radio][name=item_dateset][value="1"] {
+  margin-top: 11px;
+}
+#itemform_extra .itemform_extra_radio .form-group {
+  vertical-align: middle;
+}
+#itemform_extra .itemform_extra_radio .form-group input {
+  margin-left: 0;
 }
 span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
@@ -1840,4 +1872,9 @@ div.query-builder .rule-container .rule-value-container {
 }
 .evo_customizer__buttons.evo_customizer__buttons_widget_actions .btn-group {
   margin: 0;
+}
+.evo_customizer__content form .panel-heading .panel-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

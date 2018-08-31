@@ -6222,32 +6222,26 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 
 
 /**
- * Basic tidy up of strings
+ * Basic tidy up of strings for using in JavaScript
  *
  * @author Yabba
  * @author Tblue
  *
- * @param string $unformatted raw data
- * @return string formatted data
+ * @param string Unformatted raw data
+ * @return string Formatted data
  */
 function format_to_js( $unformatted )
 {
-	return str_replace( array(
-							'\'',
-							'\n',
-							'\r',
-							'\t',
-							"\n",
-							"\r",
-						),
-						array(
-							'\\\'',
-							'\\\\n',
-							'\\\\r',
-							'\\\\t',
-							'\n',
-							'\r',
-						), $unformatted );
+	// Convert the following chars:
+	// \               => \\
+	// '               => \'
+	// \n              => \\n
+	// newline         => \n
+	// \r              => \\r
+	// carriage return => \r
+	// \t              => \\t
+	// tab space       => \t
+	return addcslashes( $unformatted, "\\'\n\r\t" );
 }
 
 
@@ -6773,6 +6767,32 @@ function get_restapi_url()
 
 
 /**
+ * Force URL from http to https protocol
+ *
+ * @param string Original URL
+ * @param boolean|string TRUE to force without settings checking,
+ *                       FALSE to keep original URL without forcing,
+ *                       'login' - Force only when it is enabled by setting "Require SSL"
+ * @return string Forced URL
+ */
+function force_https_url( $url, $force_https = true )
+{
+	if( $force_https === 'login' )
+	{	// Force url to use https if it is defiend in the setting "Require SSL":
+		global $Settings;
+		$force_https = (boolean)$Settings->get( 'require_ssl' );
+	}
+
+	if( $force_https === true )
+	{	// Force URL only when it is requested by param or enabled by setting checking above:
+		$url = preg_replace( '#^http://#i', 'https://', $url );
+	}
+
+	return $url;
+}
+
+
+/**
  * Get URL to htsrv folder depending on current collection base url from front-office or site base url from back-office
  *
  * Note: For back-office or no collection page _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
@@ -6800,21 +6820,15 @@ function get_htsrv_url( $force_https = false )
  *
  * Note: _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
  *
- * @param boolean TRUE to use https URL
+ * @param boolean|string TRUE to use https URL
  * @return string URL to htsrv folder
  */
-function get_samedomain_htsrv_url( $secure = false )
+function get_samedomain_htsrv_url( $force_https = false )
 {
-	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir, $Collection, $Blog;
+	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_subdir, $Collection, $Blog;
 
-	if( $secure )
-	{
-		$req_htsrv_url = $htsrv_url_sensitive;
-	}
-	else
-	{
-		$req_htsrv_url = $htsrv_url;
-	}
+	// Force URL if it is reauired and enabled by settings:
+	$req_htsrv_url = force_https_url( $htsrv_url, $force_https );
 
 	// Cut htsrv folder from end of the URL:
 	$req_htsrv_url = substr( $req_htsrv_url, 0, strlen( $req_htsrv_url ) - strlen( $htsrv_subdir ) );
@@ -6851,17 +6865,6 @@ function get_samedomain_htsrv_url( $secure = false )
 	*/
 
 	return $samedomain_htsrv_url;
-}
-
-
-/**
- * Get secure htsrv url on the same domain as the http request came from
- * It is important on login and register calls
- * _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized
- */
-function get_secure_htsrv_url()
-{
-	return get_samedomain_htsrv_url( true );
 }
 
 
@@ -9068,5 +9071,131 @@ function fill_empty_days( $data, $default_data, $start_date, $end_date )
 	}
 
 	return $fixed_data;
+}
+
+
+/**
+ * Get image file used for social media
+ *
+ * @param object Item object
+ * @param array Params
+ * @return object Image File or Link object
+ */
+function get_social_media_image( $Item = NULL, $params = array() )
+{
+	$params = array_merge( array(
+			'use_item_cat_fallback'      => true,
+			'use_coll_fallback'          => true,
+			'use_site_fallback'          => true,
+			'return_as_link'             => false,
+		), $params );
+
+	$social_media_image = NULL;
+
+	if( ! empty( $Item ) )
+	{ // Try to get attached images
+		$LinkOwner = new LinkItem( $Item );
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink', 'image', array(
+				'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+				'sql_order_by'   => 'link_priority ASC, link_order ASC' ) ) )
+		{ // Item has linked files:
+			while( $Link = & $LinkList->get_next() )
+			{
+				if( ! ( $File = & $Link->get_File() ) )
+				{ // No File object:
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
+					continue;
+				}
+
+				if( ! $File->exists() )
+				{ // File doesn't exist:
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+					continue;
+				}
+
+				if( $File->is_image() )
+				{ // Use only image files for og:image tag:
+					if( $params['return_as_link'] )
+					{
+						return $Link;
+					}
+					else
+					{
+						return $File;
+					}
+					break;
+				}
+			}
+		}
+
+		if( $params['use_item_cat_fallback'] )
+		{ // No attached image from Item, let's try getting one from the Item's default chapter
+			$FileCache = & get_FileCache();
+			if( $default_Chapter = & $Item->get_main_Chapter() )
+			{ // Try social media boilerplate image first:
+				$social_media_image_file_ID = $default_Chapter->get( 'social_media_image_file_ID', false );
+				if( $social_media_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) ) && $File->is_image() )
+				{
+					return $File;
+				}
+			}
+		}
+	}
+
+	global $Blog;
+
+	if( $params['use_coll_fallback'] && $Blog )
+	{ // Try to get collection social media boiler plate and collection image/logo:
+		$social_media_image_file_ID = $Blog->get_setting( 'social_media_image_file_ID', false );
+		if( $social_media_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) ) && $File->is_image() )
+		{ // Try social media boiler plate first:
+
+			return $File;
+		}
+	}
+
+	if( $params['use_site_fallback'] )
+	{ // Use social media boilerplate logo if configured
+		global $Settings;
+
+		$FileCache = & get_FileCache();
+		$social_media_image_file_ID = intval( $Settings->get( 'social_media_image_file_ID' ) );
+		if( $social_media_image_file_ID > 0 && ( $File = $FileCache->get_by_ID( $social_media_image_file_ID, false ) ) && $File->is_image() )
+		{
+			return $File;
+		}
+	}
+
+	return NULL;
+}
+
+
+/**
+ * Check if the given allowed
+ *
+ * @param string The options which should be checked
+ * @param string String of options separated by comma, '*' - allow all options, use '-' before options if they should be excluded/denied
+ * @return boolean
+ */
+function is_allowed_option( $checked_option, $allowed_options )
+{
+	if( $allowed_options === '*' )
+	{	// All options are allowed:
+		return true;
+	}
+
+	$is_allowed_options = true;
+	$allowed_options = $allowed_options;
+	if( substr( $allowed_options, 0, 1 ) == '-' )
+	{	// The options should excluded/denied:
+		$allowed_options = substr( $allowed_options, 1 );
+		$is_allowed_options = false;
+	}
+	$allowed_options = explode( ',', $allowed_options );
+	$is_in_checked_array = in_array( $checked_option, $allowed_options );
+
+	return ( $is_allowed_options ? $is_in_checked_array : ! $is_in_checked_array );
 }
 ?>

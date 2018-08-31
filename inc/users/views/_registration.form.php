@@ -207,7 +207,9 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Security options').get_manual_link('registration-security-settings') );
+$Form->begin_fieldset( T_('Security options').get_manual_link('registration-security-settings'), array( 'id' => 'security_options' ) );
+
+	$Form->checkbox( 'require_ssl', (bool)$Settings->get( 'require_ssl' ), T_('Require SSL'), T_('Force all login, registration, password recovery & password change forms to use <code>https</code>, even if they would normally use <code>http</code>.') );
 
 	$plugins_note = '';
 	$plugin_params = $Plugins->trigger_event_first_true( 'LoginAttemptNeedsRawPassword' );
