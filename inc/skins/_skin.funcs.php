@@ -2519,7 +2519,6 @@ function widget_container( $container_code, $params = array() )
 			'container_end'   => '</div>',
 			// Restriction for Page Containers:
 			'container_item_ID' => NULL,
-			'container_ityp_ID' => NULL,
 		), $params );
 
 	// Try to find widget container by code for current collection and skin type:

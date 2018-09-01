@@ -27,7 +27,6 @@ if( $Item = & mainlist_get_item() )
 			'container_display_if_empty' => false, // If no widget, don't display container at all
 			// Restrict Page Container with these item ID and item type ID:
 			'container_item_ID' => $Item->ID,
-			'container_ityp_ID' => $Item->get_type_setting( 'ID' ),
 			// This will enclose each widget in a block:
 			'block_start' => '<div class="evo_widget $wi_class$">',
 			'block_end' => '</div>',

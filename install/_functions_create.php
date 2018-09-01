@@ -282,6 +282,7 @@ function create_default_data()
 			'usage'          => 'widget-page',
 			'template_name'  => 'widget_page',
 			'perm_level'     => 'admin',
+			'use_text'       => 'never',
 			'use_comments'   => 0,
 			'use_coordinates'=> 'optional',
 		);

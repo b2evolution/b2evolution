@@ -52,13 +52,7 @@ function display_container( $WidgetContainer, $is_included = true )
 	{
 		$widget_container_name = '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.'">'.$widget_container_name.'</a>';
 		// Display additional info for Page Container:
-		if( $WidgetContainer->get( 'ityp_ID' ) > 0 )
-		{	// If Page Container depends on Item Type:
-			$ItemTypeCache = & get_ItemTypeCache();
-			$wico_ItemType = $ItemTypeCache->get_by_ID( $WidgetContainer->get( 'ityp_ID' ), false, false );
-			$widget_container_name .= ' '.sprintf( T_('on Page Type "%s"'), $wico_ItemType ? $wico_ItemType->get_name() : '<span class="red">'.T_('Not Found').'</span>' );
-		}
-		elseif( $WidgetContainer->get( 'item_ID' ) > 0 )
+		if( $WidgetContainer->get( 'item_ID' ) > 0 )
 		{	// If Page Container depends on Item:
 			$widget_container_name .= ' '.sprintf( T_('on Page #%s'), $WidgetContainer->get( 'item_ID' ) );
 		}
@@ -251,11 +245,11 @@ function display_containers( $skin_type, $main = true, $shared = false, $paged =
 	{	// Display SUB containers:
 		if( $paged )
 		{	// Set SQL condition to select all page containers:
-			$pages_where_sql = 'wico_item_ID IS NOT NULL OR wico_ityp_ID IS NOT NULL';
+			$pages_where_sql = 'wico_item_ID IS NOT NULL';
 		}
 		else
 		{	// Set SQL condition to select not page containers:
-			$pages_where_sql = 'wico_item_ID IS NULL AND wico_ityp_ID IS NULL';
+			$pages_where_sql = 'wico_item_ID IS NULL';
 		}
 		$WidgetContainerCache->clear();
 		$WidgetContainerCache->load_where( 'wico_main = 0
@@ -300,7 +294,7 @@ echo '<div class="col-md-4 col-sm-12">';
 	if( $current_User->check_perm( 'options', 'edit', false ) )
 	{	// Display a button to add new sub-container if current User has a permission:
 		echo action_icon( T_('Add container'), 'add',
-			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;skin_type='.get_param( 'skin_type' ), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=sub&amp;skin_type='.get_param( 'skin_type' ), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
 	}
 	echo '<div class="clearfix"></div>';
 	display_containers( get_param( 'skin_type' ), false, false );
@@ -310,7 +304,7 @@ echo '<div class="col-md-4 col-sm-12">';
 	if( $current_User->check_perm( 'options', 'edit', false ) )
 	{	// Display a button to add new sub-container if current User has a permission:
 		echo action_icon( T_('Add container'), 'add',
-			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;skin_type='.get_param( 'skin_type' ), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=page&amp;skin_type='.get_param( 'skin_type' ), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
 	}
 	echo '<div class="clearfix"></div>';
 	display_containers( get_param( 'skin_type' ), false, false, true );

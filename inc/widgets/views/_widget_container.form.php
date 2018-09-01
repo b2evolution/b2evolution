@@ -27,29 +27,7 @@ $Form = new Form( NULL, 'form' );
 
 $Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
-if( $edited_WidgetContainer->get( 'coll_ID' ) > 0 )
-{	// Collection/skin container:
-	if( $edited_WidgetContainer->get( 'main' ) )
-	{	// Main container:
-		$form_title = T_('Skin container');
-	}
-	else
-	{	// Sub container:
-		$form_title = $creating ? T_('New sub-container') : T_('Sub-container');
-	}
-}
-else
-{	// Shared container:
-	if( $edited_WidgetContainer->get( 'main' ) )
-	{	// Shared Main container:
-		$form_title = $creating ? T_('New shared container') : T_('Shared container');
-	}
-	else
-	{	// Shared sub-container:
-		$form_title = $creating ? T_('New shared sub-container') : T_('Shared sub-container');
-	}
-}
-$Form->begin_form( 'fform', $form_title );
+$Form->begin_form( 'fform', $edited_WidgetContainer->get_type_title( get_param( 'container_type' ) ) );
 
 $Form->add_crumb( 'widget_container' );
 $Form->hidden( 'action', $creating ? 'create_container' : 'update_container' );
@@ -58,7 +36,15 @@ $Form->hidden( 'wico_coll_ID', intval( $edited_WidgetContainer->get( 'coll_ID' )
 
 $Form->begin_fieldset( T_('Properties') );
 
-	if( $edited_WidgetContainer->get( 'coll_ID' ) == 0 )
+	$container_type = get_param( 'container_type' );
+	if( $edited_WidgetContainer->ID > 0 || $container_type === NULL )
+	{	// Use type of the edited container or if it is not defined for new creating container:
+		$container_type = $edited_WidgetContainer->get_type();
+	}
+
+	$Form->hidden( 'container_type', $container_type );
+
+	if( $container_type == 'shared' || $container_type == 'shared-sub' )
 	{	// Suggect to select container type only for shared containers:
 		$Form->radio( 'wico_container_type',
 				$edited_WidgetContainer->get( 'main' ) ? 'main' : 'sub',
@@ -69,13 +55,8 @@ $Form->begin_fieldset( T_('Properties') );
 				T_( 'Container type' ), true, '', true
 			);
 	}
-	else
+	elseif( $container_type == 'page' )
 	{	// Selector for Page Container:
-		$page_type = param( 'wico_page_type', 'string', NULL );
-		if( $page_type === NULL )
-		{
-			$page_type = ( $edited_WidgetContainer->get( 'ityp_ID' ) > 0 ? 'type' : ( $edited_WidgetContainer->get( 'item_ID' ) > 0 ? 'item' : 'no' ) );
-		}
 		$Form->output = false;
 		$Form->switch_layout( 'none' );
 		$ItemTypeCache = & get_ItemTypeCache();
@@ -86,21 +67,23 @@ $Form->begin_fieldset( T_('Properties') );
 		{
 			$item_types[ $ItemType->ID ] = $ItemType->get_name();
 		}
-		$wico_ityp_ID_select_input = $Form->select_input_array( 'wico_ityp_ID', $edited_WidgetContainer->get( 'ityp_ID' ), $item_types, '', '', array( 'force_keys_as_values' => true ) );
+		$container_ityp_ID_select_input = $Form->select_input_array( 'container_ityp_ID', get_param( 'container_ityp_ID' ), $item_types, '', '', array( 'force_keys_as_values' => true ) );
 		$wico_item_ID_text_input = $Form->text( 'wico_item_ID', $edited_WidgetContainer->get( 'item_ID' ), 5, '' );
 		$Form->switch_layout( NULL );
 		$Form->output = true;
-		$Form->radio_input( 'wico_page_type', $page_type, array(
-				array(
-					'value' => 'no',
-					'label' => T_('No page container') ),
+		$container_page_type = get_param( 'container_page_type' );
+		if( empty( $container_page_type ) && $edited_WidgetContainer->ID > 0 )
+		{	// For editing of page container we should select this option by default:
+			$container_page_type = 'item';
+		}
+		$Form->radio_input( 'container_page_type', $container_page_type, array(
 				array(
 					'value' => 'type',
-					'label' => T_('For a new page of type').': '.$wico_ityp_ID_select_input ),
+					'label' => T_('For a new page of type').': '.$container_ityp_ID_select_input ),
 				array(
 					'value' => 'item',
 					'label' => T_('For an existing page').': '.$wico_item_ID_text_input ),
-			), T_('Page container type'), array( 'lines' => true ) );
+			), T_('Page container type'), array( 'lines' => true, 'required' => true ) );
 	}
 
 	$Form->text_input( 'wico_name', $edited_WidgetContainer->get( 'name' ), 40, T_('Name'), '', array( 'required' => true, 'maxlength' => 255 ) );

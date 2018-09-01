@@ -192,10 +192,14 @@ switch( $action )
 
 	case 'new_container':
 		// Initialize widget container for creating form:
-		param( 'container_type', 'string' );
+		param( 'container_type', 'string', NULL );
 		$edited_WidgetContainer = new WidgetContainer();
-		if( $container_type != 'shared' )
-		{	//
+		if( $container_type == 'shared' )
+		{	// Default settings for new shared container:
+			$edited_WidgetContainer->set( 'main', 1 );
+		}
+		else
+		{	// Default settings for new container:
 			$edited_WidgetContainer->set( 'coll_ID', $Blog->ID );
 		}
 		$edited_WidgetContainer->set( 'skin_type', $skin_type );
@@ -632,7 +636,10 @@ switch( $action )
 		}
 		if( $edited_WidgetContainer->load_from_Request() )
 		{
-			$edited_WidgetContainer->dbsave();
+			if( $edited_WidgetContainer->dbsave() )
+			{
+				$Messages->add( sprintf( T_('%s has been saved.'), $edited_WidgetContainer->get_type_title().' "'.$edited_WidgetContainer->get( 'name' ).'"' ), 'success' );
+			}
 			header_redirect( '?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$edited_WidgetContainer->get( 'skin_type' ), 303 );
 		}
 		break;
