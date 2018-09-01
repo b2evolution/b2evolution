@@ -88,25 +88,77 @@ class display_shopping_cart_Widget extends ComponentWidget
 					'note' => T_('Title to display in your skin.'),
 					'size' => 40,
 				),
-				'class_image' => array(
+				// Classes for Image:
+				'class_image_line' => array(
+					'type' => 'begin_line',
 					'label' => T_('Classes for Image'),
-					'size' => 60,
-					'defaultvalue' => 'col-lg-1 col-md-2 col-sm-2 col-xs-3',
 				),
-				'class_product' => array(
+					'class_image_header' => array(
+						'label' => T_('Header').':',
+						'size' => 60,
+						'defaultvalue' => 'col-lg-1 col-md-1 col-sm-1 col-xs-3',
+					),
+					'class_image_cell' => array(
+						'label' => T_('Cell').':',
+						'size' => 60,
+						'defaultvalue' => 'col-lg-1 col-md-1 col-sm-1 col-xs-3',
+					),
+				'class_image_end_line' => array(
+					'type' => 'end_line',
+				),
+				// Classes for Product:
+				'class_product_line' => array(
+					'type' => 'begin_line',
 					'label' => T_('Classes for Product'),
-					'size' => 60,
-					'defaultvalue' => 'col-lg-7 col-md-6 col-sm-6 col-xs-9',
 				),
-				'class_quantity' => array(
+					'class_product_header' => array(
+						'label' => T_('Header').':',
+						'size' => 60,
+						'defaultvalue' => 'col-lg-7 col-md-7 col-sm-7 col-xs-9',
+					),
+					'class_product_cell' => array(
+						'label' => T_('Cell').':',
+						'size' => 60,
+						'defaultvalue' => 'col-lg-7 col-md-7 col-sm-7 col-xs-9',
+					),
+				'class_product_end_line' => array(
+					'type' => 'end_line',
+				),
+				// Classes for Quantity:
+				'class_quantity_line' => array(
+					'type' => 'begin_line',
 					'label' => T_('Classes for Quantity'),
-					'size' => 60,
-					'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 col-xs-3 center',
 				),
-				'class_actions' => array(
+					'class_quantity_header' => array(
+						'label' => T_('Header').':',
+						'size' => 60,
+						'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 hidden-xs center',
+					),
+					'class_quantity_cell' => array(
+						'label' => T_('Cell').':',
+						'size' => 60,
+						'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 col-xs-3 center',
+					),
+				'class_quantity_end_line' => array(
+					'type' => 'end_line',
+				),
+				// Classes for Actions:
+				'class_actions_line' => array(
+					'type' => 'begin_line',
 					'label' => T_('Classes for Actions'),
-					'size' => 60,
-					'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 col-xs-3 center',
+				),
+					'class_actions_header' => array(
+						'label' => T_('Header').':',
+						'size' => 60,
+						'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 hidden-xs center',
+					),
+					'class_actions_cell' => array(
+						'label' => T_('Cell').':',
+						'size' => 60,
+						'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 col-xs-3 center',
+					),
+				'class_actions_end_line' => array(
+					'type' => 'end_line',
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -156,10 +208,10 @@ class display_shopping_cart_Widget extends ComponentWidget
 			// Table header columns:
 			echo $this->disp_params['shopping_cart_row_start'];
 			$cols = array(
-				array( T_('Image'), $this->disp_params['class_image'] ),
-				array( T_('Product'), $this->disp_params['class_product'] ),
-				array( T_('Quantity'), $this->disp_params['class_quantity'] ),
-				array( T_('Remove'), $this->disp_params['class_actions'] ),
+				array( T_('Image'), $this->disp_params['class_image_header'] ),
+				array( T_('Product'), $this->disp_params['class_product_header'] ),
+				array( T_('Quantity'), $this->disp_params['class_quantity_header'] ),
+				array( T_('Remove'), $this->disp_params['class_actions_header'] ),
 			);
 			foreach( $cols as $col_title => $col_data )
 			{
@@ -178,10 +230,10 @@ class display_shopping_cart_Widget extends ComponentWidget
 						'limit'      => 1,
 						'image_size' => 'crop-top-48x48',
 					) );
-				echo str_replace( $product_cell_masks, array( $first_item_image, $this->disp_params['class_image'] ), $this->disp_params['shopping_cart_cell_value'] );
+				echo str_replace( $product_cell_masks, array( $first_item_image, $this->disp_params['class_image_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				// Title:
-				echo str_replace( $product_cell_masks, array( $cart_Item->get_title(), $this->disp_params['class_product'] ), $this->disp_params['shopping_cart_cell_value'] );
+				echo str_replace( $product_cell_masks, array( $cart_Item->get_title(), $this->disp_params['class_product_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				// Quantity:
 				$item_qty = $Cart->get_quantity( $cart_item_ID );
@@ -189,11 +241,11 @@ class display_shopping_cart_Widget extends ComponentWidget
 				$qty_cell = action_icon( '', 'minus', $cart_action_url.( $item_qty - 1 ), NULL, NULL, NULL, array( 'class' => '' ) ).' ';
 				$qty_cell .= $item_qty.' ';
 				$qty_cell .= action_icon( '', 'add', $cart_action_url.( $item_qty + 1 ), NULL, NULL, NULL, array( 'class' => '' ) );
-				echo str_replace( $product_cell_masks, array( $qty_cell, $this->disp_params['class_quantity'] ), $this->disp_params['shopping_cart_cell_value'] );
+				echo str_replace( $product_cell_masks, array( $qty_cell, $this->disp_params['class_quantity_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				// Quantity:
 				$remove_cell = action_icon( '', 'remove', $Blog->get( 'carturl', array( 'url_suffix' => 'action=remove&amp;item_ID='.$cart_item_ID ) ), NULL, NULL, NULL, array( 'class' => '' ) ).' ';
-				echo str_replace( $product_cell_masks, array( $remove_cell, $this->disp_params['class_actions'] ), $this->disp_params['shopping_cart_cell_value'] );
+				echo str_replace( $product_cell_masks, array( $remove_cell, $this->disp_params['class_actions_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				echo $this->disp_params['shopping_cart_row_end'];
 			}
