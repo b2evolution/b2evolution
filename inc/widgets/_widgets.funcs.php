@@ -719,10 +719,11 @@ function insert_shared_widgets()
 
 	// Declare default shared widget containers:
 	$shared_containers = array(
-			'site_header'      => array( NT_('Site Header'), 1 ),
-			'site_footer'      => array( NT_('Site Footer'), 1 ),
-			'main_navigation'  => array( NT_('Main Navigation'), 0 ),
-			'right_navigation' => array( NT_('Right Navigation'), 0 ),
+			'site_header'          => array( NT_('Site Header'), 1 ),
+			'site_footer'          => array( NT_('Site Footer'), 1 ),
+			'main_navigation'      => array( NT_('Main Navigation'), 0 ),
+			'right_navigation'     => array( NT_('Right Navigation'), 0 ),
+			'navigation_hamburger' => array( NT_('Navigation Hamburger'), 1 ),
 		);
 
 	$order = 1;
@@ -776,16 +777,20 @@ function insert_shared_widgets()
 	{
 		global $installed_about_this_site_item_ID;
 		$wico_id = $shared_containers['main_navigation'];
-		add_basic_widget( $wico_id, 'colls_list_public', 'core', 10 );
+		add_basic_widget( $wico_id, 'colls_list_public', 'core', 10, array(
+				'widget_css_class' => 'hidden-xs',
+			) );
 		if( ! empty( $installed_about_this_site_item_ID ) )
 		{	// If new page item "About this site" has been created during curren install process:
 			add_basic_widget( $wico_id, 'basic_menu_link', 'core', 20, array(
-					'link_type' => 'item',
-					'item_ID'   => $installed_about_this_site_item_ID,
+					'link_type'        => 'item',
+					'item_ID'          => $installed_about_this_site_item_ID,
+					'widget_css_class' => 'hidden-sm hidden-xs',
 				) );
 		}
 		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 30, array(
-				'link_type' => 'ownercontact',
+				'link_type'        => 'ownercontact',
+				'widget_css_class' => 'hidden-sm hidden-xs',
 			) );
 	}
 
@@ -799,14 +804,56 @@ function insert_shared_widgets()
 			) );
 		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 20, array(
 				'link_type' => 'register',
-				'widget_css_class' => 'swhead_item_white',
+				'widget_css_class' => 'swhead_item_white hidden-xs',
 			) );
 		add_basic_widget( $wico_id, 'profile_menu_link', 'core', 30, array(
 				'profile_picture_size' => 'crop-top-32x32',
 			) );
-		add_basic_widget( $wico_id, 'msg_menu_link', 'core', 40 );
+		add_basic_widget( $wico_id, 'msg_menu_link', 'core', 40, array(
+				'widget_css_class' => 'hidden-xs',
+			) );
 		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 50, array(
-				'link_type' => 'logout',
+				'link_type'        => 'logout',
+				'widget_css_class' => 'hidden-xs',
+			) );
+		add_basic_widget( $wico_id, 'free_html', 'core', 60, array(
+				'content' => '<label for="nav-trigger" class="visible-sm visible-xs"></label>',
+			) );
+	}
+
+	/* Navigation Hamburger */
+	if( isset( $shared_containers['navigation_hamburger'] ) )
+	{
+		global $installed_about_this_site_item_ID;
+		$wico_id = $shared_containers['navigation_hamburger'];
+		add_basic_widget( $wico_id, 'colls_list_public', 'core', 10, array(
+				'widget_css_class' => 'visible-xs',
+			) );
+		if( ! empty( $installed_about_this_site_item_ID ) )
+		{	// If new page item "About this site" has been created during curren install process:
+			add_basic_widget( $wico_id, 'basic_menu_link', 'core', 20, array(
+					'link_type'        => 'item',
+					'item_ID'          => $installed_about_this_site_item_ID,
+					'widget_css_class' => 'visible-sm visible-xs',
+				) );
+		}
+		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 30, array(
+				'link_type'        => 'ownercontact',
+				'widget_css_class' => 'visible-sm visible-xs',
+			) );
+		add_basic_widget( $wico_id, 'free_html', 'core', 40, array(
+				'content' => '<hr style="margin:0;border-color:#696c72" class="visible-xs">',
+			) );
+		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 50, array(
+				'link_type' => 'register',
+				'widget_css_class' => 'swhead_item_white visible-xs',
+			) );
+		add_basic_widget( $wico_id, 'msg_menu_link', 'core', 60, array(
+				'widget_css_class' => 'visible-xs',
+			) );
+		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 70, array(
+				'link_type'        => 'logout',
+				'widget_css_class' => 'visible-xs',
 			) );
 	}
 

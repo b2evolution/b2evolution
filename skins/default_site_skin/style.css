@@ -25,7 +25,6 @@ body {
 	mask: url("data:image/svg+xml;utf8,	<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' x='0px' y='0px' width='24px' height='24px' viewBox='0 0 24 24' enable-background='new 0 0 24 24' xml:space='preserve'><rect y='1' width='24' height='4'/><rect y='9' width='24' height='4'/><rect y='17' width='24' height='4'/></svg>");
 	background-size: contain;
 	margin: 1px 10px 1px 5px;
-	display: none;
 }
 
 input#nav-trigger {
@@ -34,7 +33,6 @@ input#nav-trigger {
 }
 
 .sitewide_header_menu_wrapper {
-	display: none;
 	background-color: #1b1b1c;
 	height: auto;
 	max-height: 0;
@@ -68,16 +66,12 @@ input#nav-trigger {
 	padding: 5px 12px;
 }
 
-.sitewide_header_menu > li > .swhead_item_white a {
+.sitewide_header_menu .swhead_item_white a {
 	display: inline-block;
 }
 
 .nav-trigger:checked ~ .sitewide_header_menu_wrapper {
 	max-height: 1000px;
-}
-
-.sitewide_header_menu_wrapper li {
-	display: none;
 }
 
 .nav-trigger + .sitewide_header_menu_wrapper {
@@ -99,43 +93,6 @@ input#nav-trigger {
 	div#skin_wrapper .sitewide_header {
 		position: inherit;
 		width: 100%;
-	}
-}
-
-@media only screen and (max-width: 991px) {
-	.sitewide_header label[for="nav-trigger"] {
-		display: inline-block;
-	}
-
-	.sitewide_header .swhead_item.swhead_item_nav_md {
-		display: none;
-	}
-
-	.sitewide_header_menu_wrapper {
-		display: block;
-	}
-
-	.sitewide_header_menu_wrapper li.swhead_item_menu_md {
-		display: block;
-	}
-}
-
-@media only screen and (max-width: 767px) {
-	.sitewide_header .swhead_item:not(.swhead_item_selected):not(.login):not(.swhead_item_login),
-	.sitewide_header .swhead_item_white a {
-		display: none;
-	}
-
-	.sitewide_header .swhead_item.swhead_item_selected {
-		display: inline-block;
-	}
-
-	.sitewide_header .swhead_item_nav_sm {
-		display: none;
-	}
-
-	.sitewide_header_menu_wrapper li.swhead_item_menu_sm {
-		display: block;
 	}
 }
 
@@ -225,8 +182,7 @@ a.swhead_item.evo_widget__site_logo_image img {
 	text-decoration: underline;
 	background: none;
 	text-shadow: none;
-	-webkit-filter: none;
-	        filter: none;
+	filter: none;
 }
 .sitewide_header .swhead_item_white a.swhead_item, .sitewide_header_menu .swhead_item_white a {
 	background: #FFF;
