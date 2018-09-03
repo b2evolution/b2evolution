@@ -1447,32 +1447,35 @@ function get_install_steps_count()
 		}
 
 		if( $install_collection_home )
-		{ // After installing of the blog "Home"
+		{ // After installing of the collection "Home"
 			$steps++;
 		}
 		if( $install_collection_bloga )
-		{ // After installing of the blog "Blog A"
+		{ // After installing of the collection "Blog A"
 			$steps++;
 		}
 		if( $install_collection_blogb )
-		{ // After installing of the blog "Blog B"
+		{ // After installing of the collection "Blog B"
 			$steps++;
 		}
 		if( $install_collection_photos )
-		{ // After installing of the blog "Photos"
+		{ // After installing of the collection "Photos"
 			$steps++;
 		}
 		if( $install_collection_forums )
-		{ // After installing of the blog "Forums"
+		{ // After installing of the collection "Forums"
 			$steps++;
 		}
 		if( $install_collection_manual )
-		{ // After installing of the blog "Manual"
+		{ // After installing of the collection "Manual"
 			$steps++;
 		}
-
 		if( $install_collection_tracker )
-		{ // After installing of the blog "Tracker"
+		{ // After installing of the collection "Tracker"
+			$steps++;
+		}
+		if( $install_collection_catalog )
+		{ // After installing of the collection "Catalog"
 			$steps++;
 		}
 	}

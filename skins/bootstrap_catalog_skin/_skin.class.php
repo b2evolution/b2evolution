@@ -104,30 +104,7 @@ class bootstrap_catalog_Skin extends Skin
 		// - Key is widget container code;
 		// - Value: array( 0 - container name, 1 - container order ),
 		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
-		return array(
-				'page_top'                  => array( NT_('Page Top'), 2 ),
-				'header'                    => array( NT_('Header'), 10 ),
-				'menu'                      => array( NT_('Menu'), 15 ),
-				'item_list'                 => array( NT_('Item List'), 20 ),
-				'item_in_list'              => array( NT_('Item in List'), 30 ),
-				'product_page_column_a'     => array( NT_('Product Page Column A'), 40 ),
-				'product_page_column_b'     => array( NT_('Product Page Column B'), 41 ),
-				'item_single_header'        => array( NT_('Item Single Header'), 50 ),
-				'item_single'               => array( NT_('Item Single'), 51 ),
-				'item_page'                 => array( NT_('Item Page'), 55 ),
-				'sidebar'                   => array( NT_('Sidebar'), 80 ),
-				'sidebar_2'                 => array( NT_('Sidebar 2'), 90 ),
-				'footer'                    => array( NT_('Footer'), 100 ),
-				'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
-				'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
-				'404_page'                  => array( NT_('404 Page'), 130 ),
-				'login_required'            => array( NT_('Login Required'), 140 ),
-				'access_denied'             => array( NT_('Access Denied'), 150 ),
-				'help'                      => array( NT_('Help'), 160 ),
-				'register'                  => array( NT_('Register'), 170 ),
-				'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
-				'shopping_cart'             => array( NT_('Shopping Cart'), 190 ),
-			);
+		return array();
 	}
 
 

@@ -1157,7 +1157,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					$blog_stub,
 					T_('Tagline for Catalog'),
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-					6, // Skin ID
+					7, // Skin ID
 					'catalog', 'any',	1, '#', true, 'public',
 					$owner_ID,
 					'public',

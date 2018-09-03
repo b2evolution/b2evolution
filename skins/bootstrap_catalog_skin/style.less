@@ -567,64 +567,62 @@ main .row .evo_content_block:nth-child(3) {
 	margin-bottom: 20px;
 }
 
-.evo_container {
-	.evo_container__item_single {
-		// Product images
-		.evo_container__product_page_column_a {
+.evo_container.evo_container__item_single {
+	// Product images
+	.evo_container__product_page_column_a {
 
-			.main_image {
-				text-align: center;
-			}
-
-			.product_image_gallery {
-				.image_block {
-					margin-top: 3px;
-					margin-right: 3px;
-					margin-bottom: 3px;
-					display: inline-block;
-					border: 1px solid #cccccc;
-					border-radius: 3px;
-				}
-				.image_block+.image_block {
-					margin-left: 3px;
-				}
-				.image_block:last-child {
-					margin-right: 0;
-				}
-			}
+		.main_image {
+			text-align: center;
 		}
 
-		// Data Sheet
-		.product_datasheet {
-			table {
-				margin: 0;
-				tr td {
-					border-right: 0;
-				}
-				tr th {
-					background-color: transparent;
-					border-left: 0;
-					border-bottom: 0;
-					width: 200px;
-				}
-				tr:last-child td {
-					border-bottom: 0;
-				}
+		.product_image_gallery {
+			.image_block {
+				margin-top: 3px;
+				margin-right: 3px;
+				margin-bottom: 3px;
+				display: inline-block;
+				border: 1px solid #cccccc;
+				border-radius: 3px;
+			}
+			.image_block+.image_block {
+				margin-left: 3px;
+			}
+			.image_block:last-child {
+				margin-right: 0;
 			}
 		}
-		.widget_core_item_custom_fields.product_price {
-			table {
-				tr th {
-					background-color: transparent;
-					border: 0;
-					font-weight: normal;
-					padding-left: 0;
-				}
-				tr td {
-					background-color: transparent;
-					border: 0;
-					font-size: 1.5em;
-				}
+	}
+
+	// Data Sheet
+	.product_datasheet {
+		table {
+			margin: 0;
+			tr td {
+				border-right: 0;
+			}
+			tr th {
+				background-color: transparent;
+				border-left: 0;
+				border-bottom: 0;
+				width: 200px;
+			}
+			tr:last-child td {
+				border-bottom: 0;
+			}
+		}
+	}
+	.widget_core_item_custom_fields.product_price {
+		table {
+			tr th {
+				background-color: transparent;
+				border: 0;
+				font-weight: normal;
+				padding-left: 0;
+			}
+			tr td {
+				background-color: transparent;
+				border: 0;
+				font-size: 1.5em;
 			}
 		}
 	}

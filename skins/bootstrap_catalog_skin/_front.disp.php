@@ -34,11 +34,9 @@ $params = array_merge( array(
 
 // ------------------ "Front Page Main Area" CONTAINER EMBEDDED HERE -------------------
 // Display container and contents:
-?>
-<div class="evo_container evo_container__front_page_primary">
-<?php
-skin_container( NT_('Front Page Main Area'), array(
+widget_container( 'front_page_main_area', array(
 		// The following params will be used as defaults for widgets included in this container:
+		'container_display_if_empty' => false, // If no widget, don't display container at all
 		'author_link_text'        => $params['author_link_text'],
 		'featured_intro_before'   => $params['featured_intro_before'],
 		'featured_intro_after'    => $params['featured_intro_after'],
@@ -50,10 +48,7 @@ skin_container( NT_('Front Page Main Area'), array(
 		'block_title_end'         => $params['front_block_title_end'],
 	) );
 // --------------------- END OF "Front Page Main Area" CONTAINER -----------------------
-?>
-</div>
 
-<?php
 // ------------------------------- START OF INTRO-FRONT POST -------------------------------
 // Go Grab the featured post:
 if( $Item = & get_featured_Item( 'front' ) )
@@ -119,7 +114,7 @@ if( count( $chapters ) > 0 )
 echo '<section class="maincategories_section">';
 	echo '<h3 class="maincategories_section__title">' . T_( 'Categories' ) . '</h3>';
 	$section_is_started = false;
-	
+
 	echo '<div class="row">';
 	foreach( $chapters as $root_Chapter )
 	{ // Loop through categories:
@@ -147,12 +142,10 @@ while( mainlist_get_item() )
 echo '</section>';
 // ------------------------------- END OF FEATURED PRODUCTS --------------------------------
 
-
-?>
-<div class="evo_container evo_container__front_page_secondary">
-<?php // ------------------ "Front Page Secondary Area" CONTAINER EMBEDDED HERE -------------------
-skin_container( NT_('Front Page Secondary Area'), array(
+// ------------------ "Front Page Secondary Area" CONTAINER EMBEDDED HERE -------------------
+widget_container( 'front_page_secondary_area', array(
 		// The following params will be used as defaults for widgets included in this container:
+		'container_display_if_empty' => false, // If no widget, don't display container at all,
 		'block_start'             => $params['front_block_start'],
 		'block_end'               => $params['front_block_end'],
 		'block_first_title_start' => $params['front_block_first_title_start'],
