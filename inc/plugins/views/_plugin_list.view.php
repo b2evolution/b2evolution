@@ -32,8 +32,6 @@ global $Session;
 
 $fadeout_id = $Session->get('fadeout_id');
 
-load_funcs('plugins/_plugin.funcs.php');
-
 $SQL = new SQL();
 $SQL->SELECT( 'plug_status, plug_ID, plug_priority, plug_code' );
 $SQL->FROM( 'T_plugins' );

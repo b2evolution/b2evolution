@@ -2112,7 +2112,15 @@ class _core_Module extends Module
 					'href' => '?ctrl=skins&amp;tab=system' ),
 				'plugins' => array(
 					'text' => T_('Plugins'),
-					'href' => '?ctrl=plugins'),
+					'href' => '?ctrl=plugins',
+					'entries' => array(
+						'general' => array(
+							'text' => T_('General settings'),
+							'href' => '?ctrl=plugins' ),
+						'shared' => array(
+							'text' => T_('Settings for shared containers'),
+							'href' => '?ctrl=plugins&amp;tab=shared' )
+					) ),
 				'remotepublish' => array(
 					'text' => T_('Remote Publishing'),
 					'href' => '?ctrl=remotepublish',

@@ -20,14 +20,16 @@ global $dispatcher;
 // Check permission to display:
 $current_User->check_perm( 'options', 'view', true );
 
+load_funcs( 'plugins/_plugin.funcs.php' );
+
 // Memorize this as the last "tab" used in the Blog Settings:
 $UserSettings->set( 'pref_glob_settings_tab', $ctrl );
 $UserSettings->dbupdate();
 
-
-$AdminUI->set_path( 'options', 'plugins' );
-
 $action = param_action( 'list' );
+$tab = param( 'tab', 'string', 'general' );
+
+$AdminUI->set_path( 'options', 'plugins', $tab );
 
 $UserSettings->param_Request( 'plugins_disp_avail', 'plugins_disp_avail', 'integer', 0 );
 
@@ -42,7 +44,6 @@ while( $loop_Plugin = & $admin_Plugins->get_next() )
 {
 	if( $loop_Plugin->status == 'broken' && ! isset( $admin_Plugins->plugin_errors[$loop_Plugin->ID] ) )
 	{ // The plugin is not "broken" anymore or it has only some required db changes (either the problem got fixed or it was "broken" from a canceled "install_db_schema" action)
-		load_funcs('plugins/_plugin.funcs.php');
 		if( install_plugin_db_schema_action( $loop_Plugin, false ) )
 		{ // There are no required db changes and no error detected so this plugin is not broken any more
 			// TODO: set this to the previous status (dh)
@@ -64,7 +65,6 @@ switch( $action )
 
 		$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 
-		load_funcs('plugins/_plugin.funcs.php');
 		_set_setting_by_path( $edit_Plugin, 'Settings', $set_path, NULL );
 
 		// Don't delete from the db yet. It will be updated in the db when Save button is clicked. It works similar as the async pair of this action
@@ -81,7 +81,6 @@ switch( $action )
 
 		$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 
-		load_funcs('plugins/_plugin.funcs.php');
 		_set_setting_by_path( $edit_Plugin, 'Settings', $set_path, array() );
 
 		// Don't update the db, before it is not filled. It will be saved when Save button is clicked.
@@ -187,7 +186,6 @@ switch( $action )
 			break;
 		}
 
-		load_funcs('plugins/_plugin.funcs.php');
 		if( install_plugin_db_schema_action( $edit_Plugin ) )
 		{ // Changes are done, or no changes
 			$action = 'list';
@@ -305,7 +303,6 @@ switch( $action )
 			}
 		}
 
-		load_funcs('plugins/_plugin.funcs.php');
 		if( install_plugin_db_schema_action( $edit_Plugin ) )
 		{ // Changes are done, or no changes
 			$action = 'list';
@@ -574,8 +571,6 @@ switch( $action )
 		// Plugin specific settings:
 		if( $edit_Plugin->Settings )
 		{
-			load_funcs('plugins/_plugin.funcs.php');
-
 			// Loop through settings for this plugin:
 			$dummy = array( 'for_editing' => true );
 			foreach( $edit_Plugin->GetDefaultSettings( $dummy ) as $set_name => $set_meta )
@@ -644,7 +639,6 @@ switch( $action )
 			break;
 		}
 
-		load_funcs('plugins/_plugin.funcs.php');
 		if( $edit_Plugin->status == 'broken' && ! install_plugin_db_schema_action( $edit_Plugin ) )
 		{ // If the plugin is in broken status and has some required db changes then display the db changes
 			$action = 'install_db_schema';
@@ -770,6 +764,49 @@ switch( $action )
 
 		break;
 
+	case 'update_shared_settings':
+		// Update plugin settings for shared containers:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'shared_settings' );
+
+		$Plugins->restart();
+		while( $loop_Plugin = & $Plugins->get_next() )
+		{
+			$tmp_params = array( 'for_editing' => true );
+			$pluginsettings = $loop_Plugin->get_shared_setting_definitions( $tmp_params );
+			if( empty( $pluginsettings ) )
+			{
+				continue;
+			}
+
+			// Loop through settings for this plugin:
+			foreach( $pluginsettings as $set_name => $set_meta )
+			{
+				autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'SharedSettings' );
+			}
+
+			// Let the plugin handle custom fields:
+			// We use call_method to keep track of this call, although calling the plugins PluginSettingsUpdateAction method directly _might_ work, too.
+			$tmp_params = array();
+			$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params );
+
+			if( $ok_to_update === false )
+			{	// The plugin has said they should not get updated, Rollback settings:
+				$loop_Plugin->Settings->reset();
+			}
+			else
+			{	// Update message settings of the Plugin:
+				$loop_Plugin->Settings->dbupdate();
+			}
+		}
+
+		$Messages->add( T_('Settings updated.'), 'success' );
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $admin_url.'?ctrl=plugins&tab=shared', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 
 	case 'info':
 	case 'disp_help':
@@ -1001,8 +1038,6 @@ switch( $action )
 		}
 
 		// Display plugin info:
-		load_funcs('plugins/_plugin.funcs.php');
-
 		$Form = new Form( $pagenow );
 
 		if( $edit_Plugin->ID > 0 && $current_User->check_perm( 'options', 'edit', false ) )
@@ -1070,7 +1105,14 @@ switch( $action )
 {
 	case 'list':
 		// Display VIEW:
-		$AdminUI->disp_view( 'plugins/views/_plugin_list.view.php' );
+		switch( $tab )
+		{
+			case 'shared':
+				$AdminUI->disp_view( 'plugins/views/_plugin_shared_settings.form.php' );
+				break;
+			default:
+				$AdminUI->disp_view( 'plugins/views/_plugin_list.view.php' );
+		}
 		break;
 
 	case 'list_available':

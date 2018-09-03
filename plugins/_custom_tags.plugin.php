@@ -30,6 +30,7 @@ class custom_tags_plugin extends Plugin
 	var $configurable_comment_list = true;
 	var $configurable_message_list = true;
 	var $configurable_email_list = true;
+	var $configurable_shared_list = true;
 
 	var $post_search_list;
 	var $post_replace_list;
@@ -39,6 +40,8 @@ class custom_tags_plugin extends Plugin
 	var $msg_replace_list;
 	var $email_search_list;
 	var $email_replace_list;
+	var $shared_search_list;
+	var $shared_replace_list;
 
 	var $default_search_list = '[warning] #\[warning](.+?)\[/warning]#is
 [info] #\[info](.+?)\[/info]#is
@@ -255,6 +258,41 @@ class custom_tags_plugin extends Plugin
 		return array_merge( parent::get_email_setting_definitions( $params ), $plugin_params );
 	}
 
+
+	/**
+	 * Define here the default shared settings that are to be made available in the backoffice
+	 *
+	 * @param array Associative array of parameters
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_shared_setting_definitions( & $params )
+	{
+		$plugin_params = array();
+
+		if( $this->configurable_shared_list )
+		{
+			$plugin_params['shared_search_list'] = array(
+				'label' => $this->T_('Search list for shared container widgets'),
+				'type' => 'html_textarea',
+				'note' => $this->T_('This is the search array for shared container widgets (one per line) ONLY CHANGE THESE IF YOU KNOW WHAT YOU\'RE DOING.'),
+				'rows' => 10,
+				'cols' => 60,
+				'defaultvalue' => $this->default_search_list
+			);
+			$plugin_params['shared_replace_list'] = array(
+				'label' => $this->T_('Replace list for shared container widgets'),
+				'type' => 'html_textarea',
+				'note' => $this->T_('This is the replace array for shared container widgets (one per line) it must match the exact order of the search array'),
+				'rows' => 10,
+				'cols' => 60,
+				'defaultvalue' => $this->default_replace_list
+			);
+		}
+
+		return array_merge( parent::get_shared_setting_definitions( $params ), $plugin_params );
+	}
+
+
 	/**
 	 * Perform rendering of item
 	 *
@@ -264,33 +302,60 @@ class custom_tags_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		// Get collection from given params:
-		$setting_Blog = $this->get_Blog_from_params( $params );
-
-		if( ! isset( $this->post_search_list ) )
-		{
-			$search_list = $this->get_coll_setting( 'coll_post_search_list', $setting_Blog );
-			if( ! $search_list )
-			{
-				$search_list = $this->default_search_list;
-			}
-			$this->post_search_list = $this->prepare_search_list( $search_list );
-		}
-
-		if( ! isset( $this->post_replace_list ) )
-		{
-			$replace_list = $this->get_coll_setting( 'coll_post_replace_list', $setting_Blog );
-			if( ! $replace_list )
-			{
-				$replace_list = $this->default_replace_list;
-			}
-			$this->post_replace_list = $this->prepare_replace_list( $replace_list );
-		}
-
 		$callback = array( $this, 'replace_callback' );
 
-		// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
-		$content = replace_content_outcode( $this->post_search_list, $this->post_replace_list, $content, $callback );
+		if( $this->is_shared_widget( $params ) )
+		{	// Use settings for shared container widgets:
+			if( ! isset( $this->shared_search_list ) )
+			{
+				$search_list = $this->get_shared_setting( 'shared_search_list' );
+				if( ! $search_list )
+				{
+					$search_list = $this->default_search_list;
+				}
+				$this->shared_search_list = $this->prepare_search_list( $search_list );
+			}
+
+			if( ! isset( $this->shared_replace_list ) )
+			{
+				$replace_list = $this->get_shared_setting( 'shared_replace_list' );
+				if( ! $replace_list )
+				{
+					$replace_list = $this->default_replace_list;
+				}
+				$this->shared_replace_list = $this->prepare_replace_list( $replace_list );
+			}
+
+			// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
+			$content = replace_content_outcode( $this->shared_search_list, $this->shared_replace_list, $content, $callback );
+		}
+		else
+		{	// Use settings for collection:
+			$setting_Blog = $this->get_Blog_from_params( $params );
+
+			if( ! isset( $this->post_search_list ) )
+			{
+				$search_list = $this->get_coll_setting( 'coll_post_search_list', $setting_Blog );
+				if( ! $search_list )
+				{
+					$search_list = $this->default_search_list;
+				}
+				$this->post_search_list = $this->prepare_search_list( $search_list );
+			}
+
+			if( ! isset( $this->post_replace_list ) )
+			{
+				$replace_list = $this->get_coll_setting( 'coll_post_replace_list', $setting_Blog );
+				if( ! $replace_list )
+				{
+					$replace_list = $this->default_replace_list;
+				}
+				$this->post_replace_list = $this->prepare_replace_list( $replace_list );
+			}
+
+			// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
+			$content = replace_content_outcode( $this->post_search_list, $this->post_replace_list, $content, $callback );
+		}
 
 		return true;
 	}

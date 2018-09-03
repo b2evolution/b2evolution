@@ -692,13 +692,14 @@ class Plugins
 		$Timer->pause( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 
 		if( $set_type == 'Settings' )
-		{	// If general settings are requested we should also append messages and emails settings:
+		{	// If general settings are requested we should also append messages, emails and shared settings:
 			if( empty( $defaults ) )
 			{
 				$defaults = array();
 			}
 			$defaults = array_merge( $defaults, $Plugin->get_msg_setting_definitions( $params ) );
 			$defaults = array_merge( $defaults, $Plugin->get_email_setting_definitions( $params ) );
+			$defaults = array_merge( $defaults, $Plugin->get_shared_setting_definitions( $params ) );
 		}
 
 		if( empty( $defaults ) )
@@ -2159,6 +2160,10 @@ class Plugins
 		{	// get EmailCampaign apply_rendering setting:
 			$setting_name = $params['setting_name'];
 		}
+		elseif( isset( $params['setting_name'] ) && $params['setting_name'] == 'shared_apply_rendering' )
+		{	// get apply_rendering setting for widget from sharaed container:
+			$setting_name = $params['setting_name'];
+		}
 		elseif( isset( $params['Comment'] ) && !empty( $params['Comment'] ) )
 		{ // get Comment apply_rendering setting
 			$Comment = & $params['Comment'];
@@ -2236,7 +2241,7 @@ class Plugins
 			}
 			elseif( $setting_name == 'shared_apply_rendering' )
 			{	// get rendering setting from plugin shared settings:
-				$apply_rendering = 'opt-in';
+				$apply_rendering = $loop_RendererPlugin->get_shared_setting( $setting_name );
 			}
 			else
 			{ // get rendering setting from plugin coll settings
@@ -2384,8 +2389,15 @@ class Plugins
 
 						case 'email_apply_rendering':
 							if( $current_User->check_perm( 'perm_messaging', 'reply' ) && $current_User->check_perm( 'options', 'edit' ) )
-							{ // Check if current user can edit the messaging settings
+							{ // Check if current user can edit the email settings
 								$settings_url = $admin_url.'?ctrl=email&amp;tab=settings&amp;tab3=renderers';
+							}
+							break;
+
+						case 'shared_apply_rendering':
+							if( $current_User->check_perm( 'options', 'edit' ) )
+							{	// Check if current user can edit the plugin settings for shared container:
+								$settings_url = $admin_url.'?ctrl=plugins&amp;tab=shared';
 							}
 							break;
 

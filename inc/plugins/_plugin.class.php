@@ -814,6 +814,44 @@ class Plugin
 
 
 	/**
+	 * Define here default shared settings that are to be made available in the backoffice.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$UserSettings}.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_shared_setting_definitions( & $params )
+	{
+		if( $this->group != 'rendering' )
+		{
+			return $this->get_custom_setting_definitions( $params );
+		}
+
+		$render_note = '';
+		if( empty( $this->code ) )
+		{
+			$render_note .= T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
+		}
+		$admin_Plugins = & get_Plugins_admin();
+		$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
+		$default_shared_rendering = ( isset( $params['default_shared_rendering'] ) && in_array( $params['default_shared_rendering'], $rendering_options ) ) ? $params['default_shared_rendering'] : 'never';
+		$r = array(
+			'shared_apply_rendering' => array(
+					'label' => T_('Apply rendering to shared container widgets'),
+					'type' => 'select',
+					'options' => $rendering_options,
+					'defaultvalue' => $default_shared_rendering,
+					'note' => $render_note,
+				),
+			);
+
+		return array_merge( $r, $this->get_custom_setting_definitions( $params ) );
+	}
+
+
+	/**
 	 * Get definitions for widget specific editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -2724,6 +2762,18 @@ class Plugin
 
 	// }}}
 
+	// PluginSharedSettings {{{
+	/**
+	 * Event handler: Called as action just before updating plugin's shared campaign settings.
+	 *
+	 * Use this to add notes/errors through {@link Plugin::msg()} or to process saved settings.
+	 */
+	function PluginSharedSettingsUpdateAction()
+	{
+	}
+
+	// }}}
+
 
 	// User related events, including registration and login (procedure): {{{
 
@@ -4276,6 +4326,73 @@ class Plugin
 		}
 
 		return NULL;
+	}
+
+	/**
+	 * Get a shared specific param value
+	 *
+	 * @param string Setting name
+	 * @param string Input group name
+	 * @return string Setting value
+	 */
+	function get_shared_setting( $parname, $group = NULL )
+	{
+		if( empty( $this->Settings ) )
+		{
+			global $Plugins;
+			$Plugins->instantiate_Settings( $this, 'Settings' );
+		}
+
+		// Use prefix 'shared_' for all message settings except of "shared_apply_rendering":
+		$value = $this->Settings->get( $parname == 'shared_apply_rendering' ? $parname : 'shared_'.$parname );
+
+		if( ! is_null( $value ) )
+		{	// We have a value for this param:
+			return $value;
+		}
+
+		// Try default values:
+		$tmp_params = array( 'for_editing' => true );
+		$params = $this->get_shared_setting_definitions( $tmp_params );
+		if( $group === NULL )
+		{	// Get default value from sinple field:
+			if( isset( $params[$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$parname]['defaultvalue'] ;
+			}
+		}
+		else
+		{	// Get default value from input group field:
+			$parname = substr( $parname, strlen( $group ) );
+			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
+			}
+		}
+
+		return NULL;
+	}
+
+
+	/**
+	 * Check if plugin is rendering to widget from shared container
+	 *
+	 * @return boolean
+	 */
+	function is_shared_widget( $params )
+	{
+		if( ! is_array( $params ) || ! isset( $params['Widget'] ) )
+		{	// This is a not request for widget rendering:
+			return false;
+		}
+
+		if( ( $plugin_WidgetContainer = & $params['Widget']->get_WidgetContainer() ) &&
+		    ( $plugin_WidgetContainer->get( 'coll_ID' ) == 0 ) )
+		{	// This is a request to render widget from shared container:
+			return true;
+		}
+
+		return false;
 	}
 
 

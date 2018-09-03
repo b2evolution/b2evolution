@@ -83,6 +83,20 @@ class polls_plugin extends Plugin
 
 
 	/**
+	 * Define here default shared settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_shared_setting_definitions( & $params )
+	{
+		// set params to allow rendering for shared container widgets by default:
+		$default_params = array_merge( $params, array( 'default_shared_rendering' => 'never' ) );
+		return parent::get_shared_setting_definitions( $default_params );
+	}
+
+
+	/**
 	 * Dummy placeholder. Without it the plugin would ne be considered to be a renderer...
 	 *
 	 * @see Plugin::RenderItemAsHtml
