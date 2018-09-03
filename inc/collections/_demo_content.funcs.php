@@ -1080,7 +1080,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
  */
 function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo_user = true, $timeshift = 86400 )
 {
-	global $DB, $install_test_features, $timestamp, $Settings, $admin_url;
+	global $DB, $install_test_features, $timestamp, $Settings, $admin_url, $installed_about_this_site_item_ID;
 
 	$timestamp = time();
 	$item_IDs = array();
@@ -1181,7 +1181,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 			$edited_Item = new Item();
 			$edited_Item->set_tags_from_string( 'photo' );
-			$edited_Item->insert( $owner_ID, T_('About this site'), T_('<p>This blog platform is powered by b2evolution.</p>
+			$installed_about_this_site_item_ID = $edited_Item->insert( $owner_ID, T_('About this site'), T_('<p>This blog platform is powered by b2evolution.</p>
 
 <p>You are currently looking at an info page about this site.</p>
 

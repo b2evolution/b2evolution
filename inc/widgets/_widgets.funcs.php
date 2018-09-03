@@ -774,11 +774,16 @@ function insert_shared_widgets()
 	/* Main Navigation */
 	if( isset( $shared_containers['main_navigation'] ) )
 	{
+		global $installed_about_this_site_item_ID;
 		$wico_id = $shared_containers['main_navigation'];
 		add_basic_widget( $wico_id, 'colls_list_public', 'core', 10 );
-		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 20, array(
-				'link_type' => 'aboutsite',
-			) );
+		if( ! empty( $installed_about_this_site_item_ID ) )
+		{	// If new page item "About this site" has been created during curren install process:
+			add_basic_widget( $wico_id, 'basic_menu_link', 'core', 20, array(
+					'link_type' => 'item',
+					'item_ID'   => $installed_about_this_site_item_ID,
+				) );
+		}
 		add_basic_widget( $wico_id, 'basic_menu_link', 'core', 30, array(
 				'link_type' => 'ownercontact',
 			) );
