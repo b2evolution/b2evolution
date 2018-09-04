@@ -470,7 +470,131 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 			) ),
 	);
 
+	// **** SHARED CONTAINERS ***** //
+
+	/* Site Header */
+	$default_widgets['site_header'] = array(
+		'type'      => 'shared',
+		'container' => NT_('Site Header'),
+		array( 10, 'site_logo' ),
+		array( 20, 'subcontainer', 'params' => array(
+				'title'     => T_('Main Navigation'),
+				'container' => 'main_navigation',
+			) ),
+		array( 30, 'subcontainer', 'params' => array(
+				'title'            => T_('Right Navigation'),
+				'container'        => 'right_navigation',
+				'widget_css_class' => 'floatright',
+			) ),
+	);
+
+	/* Site Footer */
+	$default_widgets['site_footer'] = array(
+		'type'      => 'shared',
+		'container' => NT_('Site Footer'),
+		array( 10, 'free_text', 'params' => array(
+				'content' => T_('Cookies are required to enable core site functionality.'),
+			) ),
+	);
+
+	/* Navigation Hamburger */
+	$default_widgets['navigation_hamburger'] = array(
+		'type'      => 'shared',
+		'container' => NT_('Navigation Hamburger'),
+		array( 10, 'colls_list_public', 'params' => array(
+				'widget_css_class' => 'visible-xs',
+			) ),
+		array( 20, 'basic_menu_link', 'params' => array(
+				'link_type'        => 'item',
+				'item_ID'          => isset( $installed_about_this_site_item_ID ) ? $installed_about_this_site_item_ID : '',
+				'widget_css_class' => 'visible-sm visible-xs',
+				'install'          => ! empty( $installed_about_this_site_item_ID ),
+			) ),
+		array( 30, 'basic_menu_link', 'params' => array(
+				'link_type'        => 'ownercontact',
+				'widget_css_class' => 'visible-sm visible-xs',
+			) ),
+		array( 40, 'free_html', 'params' => array(
+				'content' => '<hr class="swhead_item_separator visible-xs" />',
+			) ),
+		array( 50, 'basic_menu_link', 'params' => array(
+				'link_type' => 'register',
+				'widget_css_class' => 'swhead_item_white visible-xs',
+			) ),
+		array( 60, 'msg_menu_link', 'params' => array(
+				'widget_css_class' => 'visible-xs',
+			) ),
+		array( 70, 'basic_menu_link', 'params' => array(
+				'link_type'        => 'logout',
+				'widget_css_class' => 'visible-xs',
+			) ),
+	);
+
+	/* Main Navigation */
+	$default_widgets['main_navigation'] = array(
+		'type'      => 'shared',
+		'container' => array( NT_('Main Navigation'), 'sub' ),
+		array( 10, 'colls_list_public', 'params' => array(
+				'widget_css_class' => 'hidden-xs',
+			) ),
+		array( 20, 'basic_menu_link', 'params' => array(
+				'link_type'        => 'item',
+				'item_ID'          => isset( $installed_about_this_site_item_ID ) ? $installed_about_this_site_item_ID : '',
+				'widget_css_class' => 'hidden-sm hidden-xs',
+				'install'          => ! empty( $installed_about_this_site_item_ID ),
+			) ),
+		array( 30, 'basic_menu_link', 'params' => array(
+				'link_type'        => 'ownercontact',
+				'widget_css_class' => 'hidden-sm hidden-xs',
+			) ),
+	);
+
+	/* Right Navigation */
+	$default_widgets['right_navigation'] = array(
+		'type'      => 'shared',
+		'container' => array( NT_('Right Navigation'), 'sub' ),
+		array( 10, 'basic_menu_link', 'params' => array(
+				'link_type'        => 'login', 
+				'widget_css_class' => 'swhead_item_login',
+			) ),
+		array( 20, 'basic_menu_link', 'params' => array(
+				'link_type' => 'register',
+				'widget_css_class' => 'swhead_item_white hidden-xs',
+			) ),
+		array( 30, 'profile_menu_link', 'params' => array(
+				'profile_picture_size' => 'crop-top-32x32',
+			) ),
+		array( 40, 'msg_menu_link', 'params' => array(
+				'widget_css_class' => 'hidden-xs',
+			) ),
+		array( 50, 'basic_menu_link', 'params' => array(
+				'link_type'        => 'logout',
+				'widget_css_class' => 'hidden-xs',
+			) ),
+		array( 60, 'free_html', 'params' => array(
+				'content' => '<label for="nav-trigger"></label>',
+				'widget_css_class' => 'visible-sm-inline-block visible-xs-inline-block',
+			) ),
+	);
+
 	return $default_widgets;
+}
+
+
+/**
+ * Get config array of default widgets on one container
+ *
+ * @param string Container code
+ * @param string Collection kind
+ * @param integer Collection ID
+ * @param boolean Should be true only when it's called after initial install
+ * @return array|boolean FALSE if no widgets for a requested container
+ */
+function get_default_widgets_by_container( $container_code, $kind = '', $blog_id = NULL, $initial_install = false )
+{
+	$default_widgets = get_default_widgets( $kind, $blog_id, $initial_install );
+
+	return isset( $default_widgets[ $container_code ] ) ? $default_widgets[ $container_code ] : false;
 }
 
 
@@ -544,6 +668,16 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		if( ! isset( $blog_containers[ $wico_code ] ) )
 		{	// Skip container which is not supported by current colelction's skin:
 			continue;
+		}
+
+		if( ! empty( $container_widgets['type'] ) &&
+		    $container_widgets['type'] != 'collection' )
+		{	// Skip not collection container:
+			continue;
+		}
+		if( isset( $container_widgets['type'] ) )
+		{	// Remove this config data which is not really widget:
+			unset( $container_widgets['type'] );
 		}
 
 		if( isset( $container_widgets['coll_type'] ) )
@@ -627,120 +761,6 @@ function & get_widget_container( $coll_ID, $container_fieldset_id )
 	return $WidgetContainer;
 }
 
-/**
- * Get config array of default shared widgets
- *
- * @return array
- */
-function get_default_shared_widgets()
-{
-	global $installed_about_this_site_item_ID;
-
-	$default_widgets = array();
-
-	/* Site Header */
-	$default_widgets['site_header'] = array(
-		'container' => NT_('Site Header'),
-		array( 10, 'site_logo' ),
-		array( 20, 'subcontainer', 'params' => array(
-				'title'     => T_('Main Navigation'),
-				'container' => 'main_navigation',
-			) ),
-		array( 30, 'subcontainer', 'params' => array(
-				'title'            => T_('Right Navigation'),
-				'container'        => 'right_navigation',
-				'widget_css_class' => 'floatright',
-			) ),
-	);
-
-	/* Site Footer */
-	$default_widgets['site_footer'] = array(
-		'container' => NT_('Site Footer'),
-		array( 10, 'free_text', 'params' => array(
-				'content' => T_('Cookies are required to enable core site functionality.'),
-			) ),
-	);
-
-	/* Navigation Hamburger */
-	$default_widgets['navigation_hamburger'] = array(
-		'container' => NT_('Navigation Hamburger'),
-		array( 10, 'colls_list_public', 'params' => array(
-				'widget_css_class' => 'visible-xs',
-			) ),
-		array( 20, 'basic_menu_link', 'params' => array(
-				'link_type'        => 'item',
-				'item_ID'          => isset( $installed_about_this_site_item_ID ) ? $installed_about_this_site_item_ID : '',
-				'widget_css_class' => 'visible-sm visible-xs',
-				'install'          => ! empty( $installed_about_this_site_item_ID ),
-			) ),
-		array( 30, 'basic_menu_link', 'params' => array(
-				'link_type'        => 'ownercontact',
-				'widget_css_class' => 'visible-sm visible-xs',
-			) ),
-		array( 40, 'free_html', 'params' => array(
-				'content' => '<hr class="swhead_item_separator visible-xs" />',
-			) ),
-		array( 50, 'basic_menu_link', 'params' => array(
-				'link_type' => 'register',
-				'widget_css_class' => 'swhead_item_white visible-xs',
-			) ),
-		array( 60, 'msg_menu_link', 'params' => array(
-				'widget_css_class' => 'visible-xs',
-			) ),
-		array( 70, 'basic_menu_link', 'params' => array(
-				'link_type'        => 'logout',
-				'widget_css_class' => 'visible-xs',
-			) ),
-	);
-
-	/* Main Navigation */
-	$default_widgets['main_navigation'] = array(
-		'container' => array( NT_('Main Navigation'), 'sub' ),
-		array( 10, 'colls_list_public', 'params' => array(
-				'widget_css_class' => 'hidden-xs',
-			) ),
-		array( 20, 'basic_menu_link', 'params' => array(
-				'link_type'        => 'item',
-				'item_ID'          => isset( $installed_about_this_site_item_ID ) ? $installed_about_this_site_item_ID : '',
-				'widget_css_class' => 'hidden-sm hidden-xs',
-				'install'          => ! empty( $installed_about_this_site_item_ID ),
-			) ),
-		array( 30, 'basic_menu_link', 'params' => array(
-				'link_type'        => 'ownercontact',
-				'widget_css_class' => 'hidden-sm hidden-xs',
-			) ),
-	);
-
-	/* Right Navigation */
-	$default_widgets['right_navigation'] = array(
-		'container' => array( NT_('Right Navigation'), 'sub' ),
-		array( 10, 'basic_menu_link', 'params' => array(
-				'link_type'        => 'login', 
-				'widget_css_class' => 'swhead_item_login',
-			) ),
-		array( 20, 'basic_menu_link', 'params' => array(
-				'link_type' => 'register',
-				'widget_css_class' => 'swhead_item_white hidden-xs',
-			) ),
-		array( 30, 'profile_menu_link', 'params' => array(
-				'profile_picture_size' => 'crop-top-32x32',
-			) ),
-		array( 40, 'msg_menu_link', 'params' => array(
-				'widget_css_class' => 'hidden-xs',
-			) ),
-		array( 50, 'basic_menu_link', 'params' => array(
-				'link_type'        => 'logout',
-				'widget_css_class' => 'hidden-xs',
-			) ),
-		array( 60, 'free_html', 'params' => array(
-				'content' => '<label for="nav-trigger"></label>',
-				'widget_css_class' => 'visible-sm-inline-block visible-xs-inline-block',
-			) ),
-	);
-
-	return $default_widgets;
-}
-
 
 /**
  * Insert shared widget containers
@@ -750,13 +770,23 @@ function insert_shared_widgets()
 	global $DB;
 
 	// Get config of default shared widgets:
-	$default_shared_widgets = get_default_shared_widgets();
+	$default_widgets = get_default_widgets();
 
 	$shared_widgets_insert_sql_rows = array();
 	$shared_containers = array();
 	$shared_container_order = 1;
-	foreach( $default_shared_widgets as $wico_code => $container_widgets )
+	foreach( $default_widgets as $wico_code => $container_widgets )
 	{
+		if( ! isset( $container_widgets['type'] ) ||
+		    $container_widgets['type'] != 'shared' )
+		{	// Skip not shared container:
+			continue;
+		}
+		if( isset( $container_widgets['type'] ) )
+		{	// Remove this config data which is not really widget:
+			unset( $container_widgets['type'] );
+		}
+
 		if( isset( $container_widgets['container'] ) )
 		{	// Handle special array item with container data:
 			if( ! isset( $shared_containers[ $wico_code ] ) )
