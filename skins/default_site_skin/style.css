@@ -41,6 +41,7 @@ input#nav-trigger {
 
 .sitewide_header_menu {
 	margin: 0;
+	padding: 0;
 	list-style: none;
 	text-align: right;
 	z-index: 1;
