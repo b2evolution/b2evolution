@@ -56,8 +56,12 @@ $Form->begin_fieldset( T_('General').get_manual_link('item-type-general') );
 			array( 'admin',      T_('Admin') )
 		), T_('Permission level') );
 	$Form->text_input( 'ityp_template_name', $edited_Itemtype->template_name, 25, T_('Template name'), T_('b2evolution will automatically append .main.php or .disp.php'), array( 'maxlength' => 40 ) );
-	$Form->select_input_array( 'ityp_schema', $edited_Itemtype->get( 'schema' ), ityp_schema_titles(), T_('Schema'), '', array( 'force_keys_as_values' => true ) );
 
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Structured Data').get_manual_link( 'item-type-structured-data' ) );
+	$Form->select_input_array( 'ityp_schema', $edited_Itemtype->get( 'schema' ), ityp_schema_titles( true, true ), T_('Schema'), '', array( 'force_keys_as_values' => true ) );
+	$Form->checkbox( 'ityp_add_aggregate_rating', $edited_Itemtype->add_aggregate_rating, '', T_('Add Aggregate Rating') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Use of Instructions').get_manual_link( 'item-type-instructions' ), array( 'id' => 'itemtype_instructions' ) );

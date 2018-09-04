@@ -28,6 +28,7 @@ class ItemType extends DataObject
 	var $usage;
 	var $template_name;
 	var $schema = '';
+	var $add_aggregate_rating = 1;
 	var $front_instruction = 0;
 	var $back_instruction = 0;
 	var $instruction = '';
@@ -100,6 +101,7 @@ class ItemType extends DataObject
 			$this->usage = $db_row->ityp_usage;
 			$this->template_name = $db_row->ityp_template_name;
 			$this->schema = isset( $db_row->ityp_schema ) ? $db_row->ityp_schema : $this->schema;
+			$this->add_aggregate_rating = isset( $db_row->ityp_add_aggregate_rating ) ? $db_row->ityp_add_aggregate_rating : $this->add_aggregate_rating;
 			$this->front_instruction = $db_row->ityp_front_instruction;
 			$this->back_instruction = $db_row->ityp_back_instruction;
 			$this->instruction = $db_row->ityp_instruction;
@@ -196,6 +198,10 @@ class ItemType extends DataObject
 		// Schema
 		param( 'ityp_schema', 'string' );
 		$this->set_from_Request( 'schema', NULL, true );
+
+		// Add aggregateRating
+		param( 'ityp_add_aggregate_rating', 'integer', 0 );
+		$this->set_from_Request( 'add_aggregate_rating' );
 
 		// New item link in evobar text
 		param( 'ityp_evobar_link_text', 'string' );

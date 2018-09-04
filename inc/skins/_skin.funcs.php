@@ -2435,7 +2435,7 @@ function skin_structured_data()
 {
 	global $Collection, $Blog, $disp, $MainList;
 
-	if( empty( $Blog ) )
+	if( empty( $Blog ) || ! $Blog->get_setting( 'tags_structured_data' ) )
 	{ // Structured data markup is not allowed
 		return;
 	}
@@ -2445,86 +2445,111 @@ function skin_structured_data()
 		case 'single':
 		case 'page':
 			$Item = & $MainList->get_by_idx( 0 );
+			$creative_works_schema = array( 'Article', 'WebPage', 'BlogPosting', 'ImageGallery', 'DiscussionForumPosting', 'TechArticle' );
+			$products_schema = array( 'Product' );
 
 			if( $Item && ( $item_schema = $Item->get_type_setting( 'schema' ) ) )
 			{
 				$markup = array(
 					'@context' => 'http://schema.org',
 					'@type' => $item_schema,
-					'mainEntityOfPage' => array(
-							'@type' => 'WebPage',
-							'@id' => $Item->get_permanent_url(),
-						),
-					'headline' => $Item->title,
-					'datePublished' => date( 'c', mysql2timestamp( $Item->datestart ) ),
-					'dateModified' => date( 'c', mysql2timestamp( $Item->datemodified ) ),
-					'author' => array(
-							'@type' => 'Person',
-							'name' => $Item->get_creator_User()->get_preferred_name(),
-						),
-					'description' => $Item->get_excerpt(),
 				);
 
-				// Get publisher info:
-				$FileCache = & get_FileCache();
-				$publisher_name = $Blog->get_setting( 'publisher_name' );
-				$publisher_logo_file_ID = $Blog->get_setting( 'publisher_logo_file_ID' );
-				$publisher_logo_File = & $FileCache->get_by_ID( $publisher_logo_file_ID, false, false );
-				if( $publisher_logo_File && $publisher_logo_File->is_image() )
+				// Markup for CreativeWork schema:
+				if( in_array( $item_schema, $creative_works_schema ) )
 				{
-					$publisher_logo_url = $publisher_logo_File->get_url();
-				}
-				if( empty( $publisher_logo_url ) )
-				{ // No publisher logo found, fallback to collection logo:
-					$collection_logo_file_ID = $Blog->get_setting( 'logo_file_ID' );
-					$collection_logo_File = & $FileCache->get_by_ID( $collection_logo_file_ID, false, false );
-					if( $collection_logo_File && $collection_logo_File->is_image() )
+					$markup['mainEntityOfPage'] = array(
+							'@type' => 'WebPage',
+							'@id' => $Item->get_permanent_url(),
+						);
+					$markup['headline'] = $Item->title;
+					$markup['datePublished'] = date( 'c', mysql2timestamp( $Item->datestart ) );
+					$markup['dateModified'] = date( 'c', mysql2timestamp( $Item->datemodified ) );
+					$markup['author'] = array(
+							'@type' => 'Person',
+							'name' => $Item->get_creator_User()->get_preferred_name(),
+						);
+					$markup['description'] = $Item->get_excerpt();
+
+					// Get publisher info:
+					$FileCache = & get_FileCache();
+					$publisher_name = $Blog->get_setting( 'publisher_name' );
+					$publisher_logo_file_ID = $Blog->get_setting( 'publisher_logo_file_ID' );
+					$publisher_logo_File = & $FileCache->get_by_ID( $publisher_logo_file_ID, false, false );
+					if( $publisher_logo_File && $publisher_logo_File->is_image() )
 					{
-						$publisher_logo_url = $collection_logo_File->get_url();
-						$publisher_logo_File = $collection_logo_File;
+						$publisher_logo_url = $publisher_logo_File->get_url();
+					}
+					if( empty( $publisher_logo_url ) )
+					{ // No publisher logo found, fallback to collection logo:
+						$collection_logo_file_ID = $Blog->get_setting( 'logo_file_ID' );
+						$collection_logo_File = & $FileCache->get_by_ID( $collection_logo_file_ID, false, false );
+						if( $collection_logo_File && $collection_logo_File->is_image() )
+						{
+							$publisher_logo_url = $collection_logo_File->get_url();
+							$publisher_logo_File = $collection_logo_File;
+						}
+					}
+
+					if( ! empty( $publisher_name ) || ! empty( $publisher_logo_url ) )
+					{ // Add publisher data to markup:
+						$markup['publisher'] = array( '@type' => 'Organization' );
+						if( ! empty( $publisher_name ) )
+						{
+							$markup['publisher']['name'] = $publisher_name;
+						}
+						if( ! empty( $publisher_logo_url ) )
+						{
+							$markup['publisher']['logo'] = array(
+									'@type' => 'ImageObject',
+									'url' => $publisher_logo_url,
+									'height' => $publisher_logo_File->get_image_size( 'height' ).'px',
+									'width' => $publisher_logo_File->get_image_size( 'width' ).'px',
+								);
+						}
+					}
+
+					// Add article image:
+					$article_image_File = get_social_media_image( $Item );
+					if( $article_image_File )
+					{
+						$markup['image'] = $article_image_File->get_url();
 					}
 				}
 
-				if( ! empty( $publisher_name ) || ! empty( $publisher_logo_url ) )
-				{ // Add publisher data to markup:
-					$markup['publisher'] = array( '@type' => 'Organization' );
-					if( ! empty( $publisher_name ) )
+				// Markup for Product schema:
+				if( in_array( $item_schema, $products_schema ) )
+				{
+					$markup['name'] = $Item->title;
+					$product_image_File = get_social_media_image( $Item );
+					if( $product_image_File )
 					{
-						$markup['publisher']['name'] = $publisher_name;
+						$markup['image'] = $product_image_File->get_url();
 					}
-					if( ! empty( $publisher_logo_url ) )
+
+					// Add product description:
+					$markup['description'] = $Item->get_excerpt();
+				}
+
+				if( $Item->get_type_setting( 'add_aggregate_rating' ) )
+				{ // Add aggregate rating:
+					list( $ratings, $active_ratings ) = $Item->get_ratings();
+					if( $ratings['all_ratings'] > 0 )
 					{
-						$markup['publisher']['logo'] = array(
-								'@type' => 'ImageObject',
-								'url' => $publisher_logo_url,
-								'height' => $publisher_logo_File->get_image_size( 'height' ).'px',
-								'width' => $publisher_logo_File->get_image_size( 'width' ).'px',
+						$markup['aggregateRating'] = array(
+								'@type' => 'AggregateRating',
+								'ratingValue' => round( $ratings["summary"] / $ratings['all_ratings'], 2 ),
+								'ratingCount' => $ratings['all_ratings'],
 							);
 					}
 				}
 
-				// Add article image:
-				$article_image_File = get_social_media_image( $Item );
-				if( $article_image_File )
-				{
-					$markup['image'] = $article_image_File->get_url();
-				}
-
-				// Add aggregate rating:
-				list( $ratings, $active_ratings ) = $Item->get_ratings();
-				if( $ratings['all_ratings'] > 0 )
-				{
-					$markup['aggregateRating'] = array(
-							'@type' => 'AggregateRating',
-							'ratingValue' => round( $ratings["summary"] / $ratings['all_ratings'], 2 ),
-							'ratingCount' => $ratings['all_ratings'],
-						);
-				}
-
 				// Output the markup:
+				echo '<!-- Start of Structured Data -->'."\n";
 				echo '<script type="application/ld+json">'."\n";
 				echo json_encode( $markup, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES )."\n";
 				echo '</script>'."\n";
+				echo '<!-- End of Structured Data -->'."\n";
 			}
 			break;
 

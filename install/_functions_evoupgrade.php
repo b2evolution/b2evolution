@@ -10635,6 +10635,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13220, 'Updating table item types... ' ) )
+	{ // part of 7.0.0-alpha
+		db_add_col( 'T_items__type', 'ityp_add_aggregate_rating', 'TINYINT DEFAULT 1 AFTER ityp_schema' );
+		db_modify_col( 'T_items__type', 'ityp_schema', 'ENUM( "Article", "WebPage", "BlogPosting", "ImageGallery", "DiscussionForumPosting", "TechArticle", "Product" ) COLLATE ascii_general_ci NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

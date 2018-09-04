@@ -123,10 +123,13 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 			T_('Meta Keywords'), T_('When no meta keywords are provided for an item, use tags instead.') );
 
 	$Form->checkbox( 'tags_open_graph', $edited_Blog->get_setting( 'tags_open_graph' ),
-			T_('Open Graph'), T_('Open Graph tags').' (og:title, og:url, og:description, og:type and og:image)' );
+			T_('Open Graph'), sprintf( /* TRANS: %s replaced with <code><head></code> */ T_('Include Open Graph tags in the %s section'), '<code>&lt;head&gt;</code>' ).' (og:title, og:url, og:description, og:type and og:image)' );
 
 	$Form->checkbox( 'tags_twitter_card', $edited_Blog->get_setting( 'tags_twitter_card' ),
-			T_('Twitter Card'), T_('Include Twitter Summary card') );
+			T_('Twitter Card'), sprintf( /* TRANS: %s replaced with <code><head></code> */ T_('Include Twitter Summary card in the %s section'), '<code>&lt;head&gt;</code>' ) );
+
+	$Form->checkbox( 'tags_structured_data', $edited_Blog->get_setting( 'tags_structured_data' ),
+			T_('Structured Data'), sprintf( /* TRANS: %s replaced with <code></body></code> */ T_('Include Structured Data before %s'), '<code>&lt;/body&gt;</code>' ) );
 
 $Form->end_fieldset();
 
