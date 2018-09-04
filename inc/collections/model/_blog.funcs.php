@@ -2250,7 +2250,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 	}
 
 	if( $params['display_logo'] )
-	{ // Display collection logo
+	{	// Display collection logo:
 		$blogs_Results->cols[] = array(
 				'th' => T_('Image'),
 				'th_title' => T_('Image'),
@@ -2258,6 +2258,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'td_class' => 'shrinkwrap',
 				'td' => '%blog_row_setting( #blog_ID#, "logo", #collection_logo_file_ID# )%',
 			);
+		$cols_num++;
 	}
 
 	if( $params['display_name'] )
