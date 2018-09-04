@@ -245,15 +245,14 @@ function display_containers( $skin_type, $main = true, $shared = false, $paged =
 	{	// Display SUB containers:
 		if( $paged )
 		{	// Set SQL condition to select all page containers:
-			$pages_where_sql = 'wico_item_ID IS NOT NULL';
+			$pages_where_sql = 'wico_main = 1 AND wico_item_ID IS NOT NULL';
 		}
 		else
 		{	// Set SQL condition to select not page containers:
-			$pages_where_sql = 'wico_item_ID IS NULL';
+			$pages_where_sql = 'wico_main = 0 AND wico_item_ID IS NULL';
 		}
 		$WidgetContainerCache->clear();
-		$WidgetContainerCache->load_where( 'wico_main = 0
-			AND wico_coll_ID '.( $shared ? 'IS NULL' : ' = '.$Blog->ID ).'
+		$WidgetContainerCache->load_where( 'wico_coll_ID '.( $shared ? 'IS NULL' : ' = '.$Blog->ID ).'
 			AND wico_skin_type = '.$DB->quote( $skin_type ).'
 			AND ( '.$pages_where_sql.' )' );
 

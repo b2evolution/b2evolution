@@ -279,13 +279,13 @@ class WidgetContainer extends DataObject
 	{
 		if( $this->get( 'coll_ID' ) )
 		{	// Collection/skin container:
-			if( $this->get( 'main' ) )
-			{	// Main container:
-				return 'main';
-			}
-			elseif( $this->get( 'item_ID' ) )
+			if( $this->get( 'item_ID' ) )
 			{	// Page container:
 				return 'page';
+			}
+			elseif( $this->get( 'main' ) )
+			{	// Main container:
+				return 'main';
 			}
 			else
 			{	// Sub container:
