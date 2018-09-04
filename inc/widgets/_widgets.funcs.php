@@ -240,11 +240,17 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Front Page Column A */
 	$default_widgets['front_page_column_a'] = array(
+		'type'  => 'sub',
+		'name'  => NT_('Front Page Column A'),
+		'order' => 1,
 		array( 10, 'coll_post_list', 'params' => array( 'title' => T_('More Posts'), 'featured' => 'other' ) ),
 	);
 
 	/* Front Page Column B */
 	$default_widgets['front_page_column_b'] = array(
+		'type'  => 'sub',
+		'name'  => NT_('Front Page Column B'),
+		'order' => 2,
 		array( 10, 'coll_comment_list', 'coll_type' => '-main,minisite' ),
 	);
 
@@ -255,7 +261,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 30, 'content_block', 'coll_type' => 'main', 'params' => array( 'item_slug' => 'this-is-a-content-block' ) ),
 	);
 
-	/* Minisite Front Page Area 3 */
+	/* Front Page Area 3 */
 	$default_widgets['front_page_area_3'] = array(
 		'coll_type' => 'minisite',
 		array( 10, 'coll_search_form' ),
@@ -428,6 +434,9 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* User Page - Reputation */
 	$default_widgets['user_page_reputation'] = array(
+		'type'  => 'sub',
+		'name'  => NT_('User Page - Reputation'),
+		'order' => 100,
 		// User info / Joined:
 		array( 10, 'user_info', 'params' => array(
 				'title' => T_('Joined'),
@@ -475,6 +484,23 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 
 /**
+ * Get config array of default widgets on one container
+ *
+ * @param string Container code
+ * @param string Collection kind
+ * @param integer Collection ID
+ * @param boolean Should be true only when it's called after initial install
+ * @return array|boolean FALSE if no widgets for a requested container
+ */
+function get_default_widgets_by_container( $container_code, $kind = '', $blog_id = NULL, $initial_install = false )
+{
+	$default_widgets = get_default_widgets( $kind, $blog_id, $initial_install );
+
+	return isset( $default_widgets[ $container_code ] ) ? $default_widgets[ $container_code ] : false;
+}
+
+
+/**
  * Insert the basic widgets for a collection
  *
  * @param integer should never be 0
@@ -502,13 +528,25 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	$blog_manual_ID = intval( $blog_manual_ID );
 	$events_blog_ID = intval( $events_blog_ID );
 
+	// Get config of default widgets:
+	$default_widgets = get_default_widgets( $kind, $blog_id, $initial_install );
+
 	// Get all containers declared in the given blog's skins
 	$blog_containers = get_skin_containers( $skin_ids );
 
-	// Additional sub containers:
-	$blog_containers['front_page_column_a'] = array( 'Front Page Column A', 1, 0 );
-	$blog_containers['front_page_column_b'] = array( 'Front Page Column B', 2, 0 );
-	$blog_containers['user_page_reputation'] = array( 'User Page - Reputation', 100, 0 );
+	// Install additional sub containers from default config:
+	foreach( $default_widgets as $wico_code => $container_widgets )
+	{
+		if( isset( $container_widgets['type'] ) &&
+		    $container_widgets['type'] == 'sub' )
+		{	// If it is a sub-container:
+			$blog_containers[ $wico_code ] = array(
+					isset( $container_widgets['name'] ) ? $container_widgets['name'] : $wico_code,
+					isset( $container_widgets['order'] ) ? $container_widgets['order'] : 1,
+					0, // wico_main = 0
+				);
+		}
+	}
 
 	// Create rows to insert for all collection containers:
 	$widget_containers_sql_rows = array();
@@ -528,16 +566,6 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		$insert_id++;
 	}
 
-	// Init insert widget query and default params
-	$default_blog_param = 's:7:"blog_ID";s:0:"";';
-	if( $initial_install && ! empty( $blog_photoblog_ID ) )
-	{ // In the case of initial install, we grab photos out of the photoblog (Blog #4)
-		$default_blog_param = 's:7:"blog_ID";s:1:"'.intval( $blog_photoblog_ID ).'";';
-	}
-
-	// Get config of default widgets:
-	$default_widgets = get_default_widgets( $kind, $blog_id, $initial_install );
-
 	$basic_widgets_insert_sql_rows = array();
 	foreach( $default_widgets as $wico_code => $container_widgets )
 	{
@@ -552,11 +580,27 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 			{	// Skip container because it should not be installed for the given collection kind:
 				continue;
 			}
-			// Remove this config data which is not really widget:
-			unset( $container_widgets['coll_type'] );
 		}
 
 		$wico_id = $blog_containers[ $wico_code ]['wico_ID'];
+
+		// Remove the config data which is used as additional info for container:
+		if( isset( $container_widgets['type'] ) )
+		{	// Container type
+			unset( $container_widgets['type'] );
+		}
+		if( isset( $container_widgets['name'] ) )
+		{	// Container name
+			unset( $container_widgets['name'] );
+		}
+		if( isset( $container_widgets['order'] ) )
+		{	// Container order
+			unset( $container_widgets['order'] );
+		}
+		if( isset( $container_widgets['coll_type'] ) )
+		{	// Collection type where the container should be installed:
+			unset( $container_widgets['coll_type'] );
+		}
 
 		foreach( $container_widgets as $widget )
 		{
