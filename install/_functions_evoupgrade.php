@@ -536,12 +536,13 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 	$container_widgets = get_default_widgets_by_container( $new_container_code );
 
 	// Get container type:
-	$container_type = isset( $container_widgets['type'] ) ? $container_widgets['type'] : 'collection';
+	$container_type = isset( $container_widgets['type'] ) ? $container_widgets['type'] : 'skin';
 
 	$new_widgets_insert_sql_rows = array();
 	switch( $container_type )
 	{
-		case 'collection':
+		case 'skin':
+		case 'sub':
 			// Install widgets for collection/skin container:
 			$BlogCache = & get_BlogCache();
 			$BlogCache->load_all();
@@ -559,29 +560,48 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 				// Get again config of default widgets for the requested container because several settings depend on collection type/kind:
 				$container_widgets = get_default_widgets_by_container( $new_container_code, $widget_Blog->get( 'type' ) );
 
+				if( isset( $container_widgets['coll_type'] ) )
+				{	// Handle special condition key:
+					if( ! is_allowed_option( $widget_Blog->get( 'type' ), $container_widgets['coll_type'] ) )
+					{	// Skip container because it should not be installed for the given collection kind:
+						continue;
+					}
+				}
+
+				if( $container_type == 'sub' )
+				{	// Initialize sub-container data in order to install it below:
+					$coll_containers[ $new_container_code ] = array(
+							isset( $container_widgets['name'] ) ? $container_widgets['name'] : $new_container_code,
+							isset( $container_widgets['order'] ) ? $container_widgets['order'] : 1,
+						);
+				}
+
+				// Remove the config data which is used as additional info for container:
 				if( isset( $container_widgets['type'] ) )
-				{	// Remove this config data which is not really widget:
+				{	// Container type
 					unset( $container_widgets['type'] );
+				}
+				if( isset( $container_widgets['name'] ) )
+				{	// Container name
+					unset( $container_widgets['name'] );
+				}
+				if( isset( $container_widgets['order'] ) )
+				{	// Container order
+					unset( $container_widgets['order'] );
+				}
+				if( isset( $container_widgets['coll_type'] ) )
+				{	// Collection type where the container should be installed:
+					unset( $container_widgets['coll_type'] );
 				}
 
 				if( ! empty( $container_widgets ) )
-				{	// If the requested 
+				{	// If the requested container has at least one widget:
 					if( ! isset( $coll_containers[ $new_container_code ] ) )
 					{	// Skip container which is not supported by current collection's skin:
 						continue;
 					}
 
 					$coll_container = $coll_containers[ $new_container_code ];
-
-					if( isset( $container_widgets['coll_type'] ) )
-					{	// Handle special condition key:
-						if( ! is_allowed_option( $widget_Blog->get( 'type' ), $container_widgets['coll_type'] ) )
-						{	// Skip container because it should not be installed for the given collection kind:
-							continue;
-						}
-						// Remove this config data which is not really widget:
-						unset( $container_widgets['coll_type'] );
-					}
 
 					if( ! isset( $coll_container['ID'] ) )
 					{	// Create new container if it is not installed yet:
@@ -591,7 +611,7 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 						}
 						// Insert new widget container into DB:
 						$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main )
-							VALUES ( '.$DB->quote( $new_container_code ).', '.$DB->quote( $coll_container[0] ).', '.$widget_Blog->ID.', '.$DB->quote( $coll_container[1] ).', 1 )' );
+								VALUES ( '.$DB->quote( $new_container_code ).', '.$DB->quote( $coll_container[0] ).', '.$widget_Blog->ID.', '.$DB->quote( $coll_container[1] ).', '.( $container_type == 'skin' ? 1 : 0 ).' )' );
 						// Update ID of new inserted widget container:
 						$coll_container['ID'] = $DB->insert_id;
 						// Also update ID in collection cache for next calls:
@@ -660,6 +680,7 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 			break;
 
 		case 'shared':
+		case 'shared-sub':
 			// Install widgets for shared container:
 			global $cache_installed_shared_containers, $cache_installed_shared_container_order;
 			if( ! isset( $cache_installed_shared_containers ) )
@@ -679,22 +700,18 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 				$cache_installed_shared_container_order = intval( $DB->get_var( $max_order_SQL ) );
 			}
 
-			if( isset( $container_widgets['container'] ) )
+			if( isset( $container_widgets['name'] ) )
 			{	// Handle special array item with container data:
 				if( ! isset( $cache_installed_shared_containers[ $new_container_code ] ) )
 				{	// Insert new shared container:
-					$new_container_title = is_array( $container_widgets['container'] ) ? $container_widgets['container'][0] : $container_widgets['container'];
-					$new_container_is_main = is_array( $container_widgets['container'] ) && isset( $container_widgets['container'][1] ) && $container_widgets['container'][1] == 'sub' ? 0 : 1;
 					$insert_result = $DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES '
-						.'( '.$DB->quote( $new_container_code ).', '.$DB->quote( $new_container_title ).', '.'NULL, '.( ++$cache_installed_shared_container_order ).', '.$DB->quote( $new_container_is_main ).' )',
+						.'( '.$DB->quote( $new_container_code ).', '.$DB->quote( $container_widgets['name'] ).', '.'NULL, '.( ++$cache_installed_shared_container_order ).', '.$DB->quote( $container_type == 'shared' ? 1 : 0 ).' )',
 						'Insert default shared widget container' );
 					if( $insert_result && $DB->insert_id > 0 )
 					{
 						$cache_installed_shared_containers[ $new_container_code ] = $DB->insert_id;
 					}
 				}
-				// Remove this config data which is not really widget:
-				unset( $container_widgets['container'] );
 			}
 
 			if( ! isset( $cache_installed_shared_containers[ $new_container_code ] ) )
@@ -702,9 +719,22 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 				break;
 			}
 
+			// Remove the config data which is used as additional info for container:
 			if( isset( $container_widgets['type'] ) )
-			{	// Remove this config data which is not really widget:
+			{	// Container type
 				unset( $container_widgets['type'] );
+			}
+			if( isset( $container_widgets['name'] ) )
+			{	// Container name
+				unset( $container_widgets['name'] );
+			}
+			if( isset( $container_widgets['order'] ) )
+			{	// Container order
+				unset( $container_widgets['order'] );
+			}
+			if( isset( $container_widgets['coll_type'] ) )
+			{	// Collection type where the container should be installed:
+				unset( $container_widgets['coll_type'] );
 			}
 
 			foreach( $container_widgets as $widget )
@@ -10716,7 +10746,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13230, 'Installing new shared widgets/containers...' ) )
+	if( upg_task_start( 13230, 'Installing new widgets/containers...' ) )
+	{	// part of 7.0.0-alpha
+		install_new_default_widgets( 'front_page_column_a' );
+		install_new_default_widgets( 'front_page_column_b' );
+		install_new_default_widgets( 'front_page_area_3' );
+		install_new_default_widgets( 'user_profile_left' );
+		install_new_default_widgets( 'user_profile_right' );
+		install_new_default_widgets( 'user_page_reputation' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13240, 'Installing new shared widgets/containers...' ) )
 	{	// part of 7.0.0-alpha
 		install_new_default_widgets( 'site_header' );
 		install_new_default_widgets( 'site_footer' );

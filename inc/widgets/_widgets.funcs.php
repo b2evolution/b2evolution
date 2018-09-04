@@ -19,7 +19,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 
 /**
- * Get config array of default widgets
+ * Get config array of default widgets for install, upgrade and new collections
  *
  * @param string Collection kind
  * @param integer Collection ID
@@ -240,11 +240,17 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Front Page Column A */
 	$default_widgets['front_page_column_a'] = array(
+		'type'  => 'sub',
+		'name'  => NT_('Front Page Column A'),
+		'order' => 1,
 		array( 10, 'coll_post_list', 'params' => array( 'title' => T_('More Posts'), 'featured' => 'other' ) ),
 	);
 
 	/* Front Page Column B */
 	$default_widgets['front_page_column_b'] = array(
+		'type'  => 'sub',
+		'name'  => NT_('Front Page Column B'),
+		'order' => 2,
 		array( 10, 'coll_comment_list', 'coll_type' => '-main,minisite' ),
 	);
 
@@ -255,7 +261,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 30, 'content_block', 'coll_type' => 'main', 'params' => array( 'item_slug' => 'this-is-a-content-block' ) ),
 	);
 
-	/* Minisite Front Page Area 3 */
+	/* Front Page Area 3 */
 	$default_widgets['front_page_area_3'] = array(
 		'coll_type' => 'minisite',
 		array( 10, 'coll_search_form' ),
@@ -428,6 +434,9 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* User Page - Reputation */
 	$default_widgets['user_page_reputation'] = array(
+		'type'  => 'sub',
+		'name'  => NT_('User Page - Reputation'),
+		'order' => 100,
 		// User info / Joined:
 		array( 10, 'user_info', 'params' => array(
 				'title' => T_('Joined'),
@@ -474,8 +483,8 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Site Header */
 	$default_widgets['site_header'] = array(
-		'type'      => 'shared',
-		'container' => NT_('Site Header'),
+		'type' => 'shared',
+		'name' => NT_('Site Header'),
 		array( 10, 'site_logo' ),
 		array( 20, 'subcontainer', 'params' => array(
 				'title'     => T_('Main Navigation'),
@@ -490,8 +499,8 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Site Footer */
 	$default_widgets['site_footer'] = array(
-		'type'      => 'shared',
-		'container' => NT_('Site Footer'),
+		'type' => 'shared',
+		'name' => NT_('Site Footer'),
 		array( 10, 'free_text', 'params' => array(
 				'content' => T_('Cookies are required to enable core site functionality.'),
 			) ),
@@ -499,8 +508,8 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Navigation Hamburger */
 	$default_widgets['navigation_hamburger'] = array(
-		'type'      => 'shared',
-		'container' => NT_('Navigation Hamburger'),
+		'type' => 'shared',
+		'name' => NT_('Navigation Hamburger'),
 		array( 10, 'colls_list_public', 'params' => array(
 				'widget_css_class' => 'visible-xs',
 			) ),
@@ -532,8 +541,8 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Main Navigation */
 	$default_widgets['main_navigation'] = array(
-		'type'      => 'shared',
-		'container' => array( NT_('Main Navigation'), 'sub' ),
+		'type' => 'shared-sub',
+		'name' => NT_('Main Navigation'),
 		array( 10, 'colls_list_public', 'params' => array(
 				'widget_css_class' => 'hidden-xs',
 			) ),
@@ -551,8 +560,8 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Right Navigation */
 	$default_widgets['right_navigation'] = array(
-		'type'      => 'shared',
-		'container' => array( NT_('Right Navigation'), 'sub' ),
+		'type' => 'shared-sub',
+		'name' => NT_('Right Navigation'),
 		array( 10, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'login', 
 				'widget_css_class' => 'swhead_item_login',
@@ -626,13 +635,25 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	$blog_manual_ID = intval( $blog_manual_ID );
 	$events_blog_ID = intval( $events_blog_ID );
 
+	// Get config of default widgets:
+	$default_widgets = get_default_widgets( $kind, $blog_id, $initial_install );
+
 	// Get all containers declared in the given blog's skins
 	$blog_containers = get_skin_containers( $skin_ids );
 
-	// Additional sub containers:
-	$blog_containers['front_page_column_a'] = array( 'Front Page Column A', 1, 0 );
-	$blog_containers['front_page_column_b'] = array( 'Front Page Column B', 2, 0 );
-	$blog_containers['user_page_reputation'] = array( 'User Page - Reputation', 100, 0 );
+	// Install additional sub containers from default config:
+	foreach( $default_widgets as $wico_code => $container_widgets )
+	{
+		if( isset( $container_widgets['type'] ) &&
+		    $container_widgets['type'] == 'sub' )
+		{	// If it is a sub-container:
+			$blog_containers[ $wico_code ] = array(
+					isset( $container_widgets['name'] ) ? $container_widgets['name'] : $wico_code,
+					isset( $container_widgets['order'] ) ? $container_widgets['order'] : 1,
+					0, // wico_main = 0
+				);
+		}
+	}
 
 	// Create rows to insert for all collection containers:
 	$widget_containers_sql_rows = array();
@@ -652,16 +673,6 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		$insert_id++;
 	}
 
-	// Init insert widget query and default params
-	$default_blog_param = 's:7:"blog_ID";s:0:"";';
-	if( $initial_install && ! empty( $blog_photoblog_ID ) )
-	{ // In the case of initial install, we grab photos out of the photoblog (Blog #4)
-		$default_blog_param = 's:7:"blog_ID";s:1:"'.intval( $blog_photoblog_ID ).'";';
-	}
-
-	// Get config of default widgets:
-	$default_widgets = get_default_widgets( $kind, $blog_id, $initial_install );
-
 	$basic_widgets_insert_sql_rows = array();
 	foreach( $default_widgets as $wico_code => $container_widgets )
 	{
@@ -671,7 +682,8 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		}
 
 		if( ! empty( $container_widgets['type'] ) &&
-		    $container_widgets['type'] != 'collection' )
+		    $container_widgets['type'] != 'skin' &&
+		    $container_widgets['type'] != 'sub' )
 		{	// Skip not collection container:
 			continue;
 		}
@@ -686,11 +698,27 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 			{	// Skip container because it should not be installed for the given collection kind:
 				continue;
 			}
-			// Remove this config data which is not really widget:
-			unset( $container_widgets['coll_type'] );
 		}
 
 		$wico_id = $blog_containers[ $wico_code ]['wico_ID'];
+
+		// Remove the config data which is used as additional info for container:
+		if( isset( $container_widgets['type'] ) )
+		{	// Container type
+			unset( $container_widgets['type'] );
+		}
+		if( isset( $container_widgets['name'] ) )
+		{	// Container name
+			unset( $container_widgets['name'] );
+		}
+		if( isset( $container_widgets['order'] ) )
+		{	// Container order
+			unset( $container_widgets['order'] );
+		}
+		if( isset( $container_widgets['coll_type'] ) )
+		{	// Collection type where the container should be installed:
+			unset( $container_widgets['coll_type'] );
+		}
 
 		foreach( $container_widgets as $widget )
 		{
@@ -778,31 +806,42 @@ function insert_shared_widgets()
 	foreach( $default_widgets as $wico_code => $container_widgets )
 	{
 		if( ! isset( $container_widgets['type'] ) ||
-		    $container_widgets['type'] != 'shared' )
+		    ( $container_widgets['type'] != 'shared' &&
+		      $container_widgets['type'] != 'shared-sub' ) )
 		{	// Skip not shared container:
 			continue;
 		}
-		if( isset( $container_widgets['type'] ) )
-		{	// Remove this config data which is not really widget:
-			unset( $container_widgets['type'] );
-		}
 
-		if( isset( $container_widgets['container'] ) )
+		if( isset( $container_widgets['name'] ) )
 		{	// Handle special array item with container data:
 			if( ! isset( $shared_containers[ $wico_code ] ) )
 			{	// Insert new shared container:
-				$new_container_title = is_array( $container_widgets['container'] ) ? $container_widgets['container'][0] : $container_widgets['container'];
-				$new_container_is_main = is_array( $container_widgets['container'] ) && isset( $container_widgets['container'][1] ) && $container_widgets['container'][1] == 'sub' ? 0 : 1;
 				$insert_result = $DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES '
-					.'( '.$DB->quote( $wico_code ).', '.$DB->quote( $new_container_title ).', '.'NULL, '.$shared_container_order++.', '.$DB->quote( $new_container_is_main ).' )',
+					.'( '.$DB->quote( $wico_code ).', '.$DB->quote( $container_widgets['name'] ).', '.'NULL, '.$shared_container_order++.', '.$DB->quote( $container_widgets['type'] == 'shared' ? 1 : 0 ).' )',
 					'Insert default shared widget container' );
 				if( $insert_result && $DB->insert_id > 0 )
 				{
 					$shared_containers[ $wico_code ] = $DB->insert_id;
 				}
 			}
-			// Remove this config data which is not really widget:
-			unset( $container_widgets['container'] );
+		}
+
+		// Remove the config data which is used as additional info for container:
+		if( isset( $container_widgets['type'] ) )
+		{	// Container type
+			unset( $container_widgets['type'] );
+		}
+		if( isset( $container_widgets['name'] ) )
+		{	// Container name
+			unset( $container_widgets['name'] );
+		}
+		if( isset( $container_widgets['order'] ) )
+		{	// Container order
+			unset( $container_widgets['order'] );
+		}
+		if( isset( $container_widgets['coll_type'] ) )
+		{	// Collection type where the container should be installed:
+			unset( $container_widgets['coll_type'] );
 		}
 
 		if( ! isset( $shared_containers[ $wico_code ] ) )
