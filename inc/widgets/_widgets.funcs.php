@@ -19,7 +19,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 
 /**
- * Get config array of default widgets
+ * Get config array of default widgets for install, upgrade and new collections
  *
  * @param string Collection kind
  * @param integer Collection ID
