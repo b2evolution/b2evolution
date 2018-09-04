@@ -106,25 +106,19 @@ class bootstrap_photoblog_Skin extends Skin
 	 * This should NOT be protected. It should be used INSTEAD of file parsing.
 	 * File parsing should only be used if this function is not defined
 	 *
-	 * @return array
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
 	 */
 	function get_declared_containers()
 	{
-		// Note: second param below is the ORDER
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
 		return array(
-				'page_top'                  => array( NT_('Page Top'), 2 ),
-				'header'                    => array( NT_('Header'), 10 ),
-				'menu'                      => array( NT_('Menu'), 15 ),
-				'front_page_main_area'      => array( NT_('Front Page Main Area'), 40 ),
-				'front_page_secondary_area' => array( NT_('Front Page Secondary Area'), 45 ),
-				'item_single_header'        => array( NT_('Item Single Header'), 50 ),
-				'item_single'               => array( NT_('Item Single'), 51 ),
-				'item_page'                 => array( NT_('Item Page'), 55 ),
-				'contact_page_main_area'    => array( NT_('Contact Page Main Area'), 60 ),
-				'footer'                    => array( NT_('Footer'), 100 ),
-				'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
-				'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
-				'404_page'                  => array( NT_('404 Page'), 130 ),
+				'front_page_secondary_area' => NULL,
+				'item_list'                 => NULL,
+				'item_in_list'              => NULL,
+				'item_single_header'        => NULL,
 			);
 	}
 
@@ -159,7 +153,8 @@ class bootstrap_photoblog_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'allow_empty' => true,
@@ -465,10 +460,15 @@ class bootstrap_photoblog_Skin extends Skin
 		// Page link color
 		if ( $page_link_color = $this->get_setting( 'page_link_color' ) ) {
 			$custom_css .= 'a, .evo_comment_title a, .panel-title .evo_comment_type { color: '.$page_link_color."; }\n";
+			// Pagination links:
+			$custom_css .= '.pagination > li > a, .pagination > li > span { color: '.$page_link_color."; }\n";
+			$custom_css .= '.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus { background-color: '.$page_link_color.'; border-color: '.$page_link_color."; }\n";
 		}
 		// Page link hover color
 		if ( $page_link_h_color = $this->get_setting( 'page_link_h_color' ) ) {
 			$custom_css .= 'a:hover, .panel-title .evo_comment_type:hover { color: '.$page_link_h_color."; }\n";
+			// Pagination links:
+			$custom_css .= '.pagination > li > a:hover, .pagination > li > span:hover, .pagination > li > a:focus, .pagination > li > span:focus { color: '.$page_link_h_color."; }\n";
 		}
 		// Posts background color
 		if ( $well_color = $this->get_setting( 'well_color' ) ) {

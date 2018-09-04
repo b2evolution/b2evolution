@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -573,6 +573,8 @@ switch( $AdminUI->get_path( 1 ) )
 	case 'referers':
 		// Display hits results table:
 		hits_results_block();
+		// Initialize WHOIS query window
+		echo_whois_js_bootstrap();
 		break;
 
 	case 'refsearches':
@@ -582,6 +584,8 @@ switch( $AdminUI->get_path( 1 ) )
 			case 'hits':
 				// Display hits results table:
 				hits_results_block();
+				// Initialize WHOIS query window
+				echo_whois_js_bootstrap();
 				break;
 
 			case 'keywords':

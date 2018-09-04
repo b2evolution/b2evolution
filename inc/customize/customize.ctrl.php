@@ -24,6 +24,10 @@ $mode = 'customizer';
 
 param( 'view', 'string', '' );
 
+// Store last used view of customizer mode per collection for current User:
+$UserSettings->set( 'customizer_view_'.$blog, $view );
+$UserSettings->dbupdate();
+
 switch( $view )
 {
 	case 'site_skin':

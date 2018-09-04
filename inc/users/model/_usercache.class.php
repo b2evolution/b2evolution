@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -200,7 +200,7 @@ class UserCache extends DataObjectCache
 			}
 			// a user with matched password was found
 			$first_matched_index = $index;
-			if( ( $row->user_status == 'activated' ) || ( $row->user_status == 'autoactivated' ) )
+			if( ( $row->user_status == 'activated' ) || ( $row->user_status == 'autoactivated' ) || ( $row->user_status == 'manualactivated' ) )
 			{ // an activated user was found, break from the iteration
 				$User = new User( $row );
 				break;

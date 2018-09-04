@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package htsrv
  */
@@ -105,6 +105,7 @@ if( is_logged_in( false ) )
 	$url = null;
 	$comment_cookies = null;
 	$comment_allow_msgform = null;
+	param( 'comment_user_notify', 'integer', 0 );
 }
 else
 {	// User is not logged in (registered users), we need some id info from him:
@@ -120,6 +121,7 @@ else
 	}
 	param( 'comment_cookies', 'integer', 0 );
 	param( 'comment_allow_msgform', 'integer', 0 ); // checkbox
+	param( 'comment_anon_notify', 'integer', 0 );
 }
 
 param( 'comment_rating', 'integer', NULL );
@@ -151,6 +153,7 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 		'rating' => & $comment_rating,
 		'anon_allow_msgform' => & $comment_allow_msgform,
 		'anon_cookies' => & $comment_cookies,
+		'anon_notify' => & $comment_anon_notify,
 		'User' => & $User,
 		'redirect_to' => & $redirect_to,
 		'crumb_comment' => & $crumb_comment,
@@ -159,6 +162,21 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'comment' );
+
+$workflow_is_updated = false;
+if( $action != 'preview' && $commented_Item->load_workflow_from_Request() )
+{	// Update workflow properties if they are loaded from request without errors and at least one of them has been changed:
+	if( $commented_Item->dbupdate() )
+	{	// Display a message on success result:
+		$Messages->add( T_('The workflow properties have been updated.'), 'success' );
+		$workflow_is_updated = true;
+
+		if( $commented_Item->assigned_to_new_user && ! empty( $commented_Item->assigned_user_ID ) )
+		{ // Send post assignment notification
+			$commented_Item->send_assignment_notification();
+		}
+	}
+}
 
 $comments_email_is_detected = false;
 
@@ -251,6 +269,7 @@ $Comment->set_Item( $commented_Item );
 if( $User )
 { // User is logged in, we'll use his ID
 	$Comment->set_author_User( $User );
+	$Comment->user_notify = $comment_user_notify;
 }
 else
 {	// User is not logged in:
@@ -258,6 +277,7 @@ else
 	$Comment->set( 'author_email', $email );
 	$Comment->set( 'author_url', $url );
 	$Comment->set( 'allow_msgform', $comment_allow_msgform );
+	$Comment->set( 'anon_notify', $comment_anon_notify );
 }
 
 if( ! $Comment->is_meta() && $commented_Item->can_rate() )
@@ -355,8 +375,10 @@ if( $commented_Item->can_attach() && !empty( $_FILES['uploadfile'] ) && !empty( 
 	}
 }
 
-if( empty( $comment ) && $checked_attachments_count == 0 )
-{ // comment should not be empty!
+$is_empty_comment = ( empty( $comment ) && $checked_attachments_count == 0 );
+if( $is_empty_comment && ! $workflow_is_updated )
+{	// Comment text should not be empty!
+	// (exception if at least one file has been attached or if at least one workflow properties has been updated)
 	$Messages->add_to_group( T_('Please do not send empty comments.'), 'error', T_('Validation errors:') );
 }
 
@@ -368,11 +390,18 @@ $Plugins->trigger_event('BeforeCommentFormInsert', array(
 	'is_preview' => ($action == 'preview'),
 	'action' => & $action ) );
 
+// Validate first enabled captcha plugin:
+$Plugins->trigger_event_first_return( 'ValidateCaptcha', array(
+	'form_type'  => 'comment',
+	'Comment'    => & $Comment,
+	'is_preview' => ( $action == 'preview' ),
+) );
 
-/*
- * Display error messages:
- */
-if( $Messages->has_errors() && $action != 'preview' )
+// Redirect and:
+// Display error messages for the comment form OR
+// Display success message when workflow has been updated but comment text has not been filled:
+if( ( $Messages->has_errors() && $action != 'preview' ) ||
+    ( $workflow_is_updated && $is_empty_comment ) )
 {
 	$Comment->set( 'preview_attachments', $preview_attachments );
 	$Comment->set( 'checked_attachments', $checked_attachments );
@@ -424,7 +453,7 @@ if( $action == 'preview' )
 
 	// This message serves the purpose that the next page will not even try to retrieve preview from cache... (and won't collect data to be cached)
 	// This is session based, so it's not 100% safe to prevent caching. We are also using explicit caching prevention whenever personal data is displayed
-	$Messages->add_to_group( T_('This is a preview only! Do not forget to send your comment!'), 'error', T_('Preview:') );
+	$Messages->add_to_group( T_('This is a preview only! Do not forget to send your comment!'), 'error', /* TRANS: Noun */ T_('Preview:') );
 
 	if( $comments_email_is_detected )
 	{ // Comment contains an email address, We should show an error about this
@@ -436,7 +465,7 @@ if( $action == 'preview' )
 			}
 			$link_log_in = 'href="'.get_login_url( 'blocked comment email', $commented_Item->get_url( 'public_view' ) ).'"';
 			$link_register = 'href="'.get_user_register_url( $commented_Item->get_url( 'public_view' ), 'blocked comment email' ).'"';
-			$Messages->add_to_group( sprintf( T_('Your comment contains an email address. Please <a %s>log in</a> or <a %s>create an account now</a> instead. This will allow people to send you private messages without revealing your email address to SPAM robots.'), $link_log_in, $link_register ), 'error', T_('Preview:') );
+			$Messages->add_to_group( sprintf( T_('Your comment contains an email address. Please <a %s>log in</a> or <a %s>create an account now</a> instead. This will allow people to send you private messages without revealing your email address to SPAM robots.'), $link_log_in, $link_register ), 'error', /* TRANS: Noun */ T_('Preview:') );
 
 			// Save the user data if he will go to register form after this action
 			$register_user = array(
@@ -447,7 +476,7 @@ if( $action == 'preview' )
 		}
 		else
 		{	// No registration
-			$Messages->add_to_group( T_('Your comment contains an email address. We recommend you check the box "Allow message form." below instead. This will allow people to contact you without revealing your email address to SPAM robots.'), 'error', T_('Preview:') );
+			$Messages->add_to_group( T_('Your comment contains an email address. We recommend you check the box "Allow message form." below instead. This will allow people to contact you without revealing your email address to SPAM robots.'), 'error', /* TRANS: Noun */ T_('Preview:') );
 		}
 	}
 
@@ -558,6 +587,9 @@ if( !is_logged_in() )
 	}
 }
 
+// Send the predefined cookies:
+evo_sendcookies();
+
 // Note: we don't give any clue that we have automatically deleted a comment. It would only give spammers the perfect tool to find out how to pass the filter.
 
 if( $Comment->ID )
@@ -608,7 +640,7 @@ if( $Comment->ID )
 	{
 		if( $Settings->get( 'newusers_canregister' ) == 'yes' && $Settings->get( 'registration_is_public' ) && $Comment->Item->Blog->get_setting( 'comments_register' ) )
 		{ // Redirect to the registration form
-			$Messages->add( T_('ATTENTION: Create a user account now so that other users can contact you after reading your comment.'), 'error' );
+			$Messages->add( T_('ATTENTION: Register a user account now so that you can get notified of replies to your comments.'), 'error' );
 
 			$register_user = array(
 				'name' => $Comment->author,

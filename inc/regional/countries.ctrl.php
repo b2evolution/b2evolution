@@ -21,6 +21,7 @@ load_class( 'regional/model/_country.class.php', 'Country' );
 global $current_User;
 
 // Check minimum permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'view', true );
 
 // Memorize this as the last "tab" used in the Global Settings:
@@ -123,11 +124,6 @@ switch( $action )
 		{	// Enable country by setting flag to true.
 			$edited_Country->set( 'preferred', 1 );
 			$Messages->add( sprintf( T_('Added to preferred countries (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
-
-			if( ! $edited_Country->get( 'status' ) )
-			{ // If the country status is empty ( which means 'unknown' ) and the coutnry was marked as prefrerred, than the status must be changed to 'trusted'
-				$edited_Country->set( 'status', 'trusted' );
-			}
 		}
 
 		// Update db with new flag value.

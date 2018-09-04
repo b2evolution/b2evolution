@@ -104,27 +104,18 @@ class bootstrap_manual_Skin extends Skin
 	 * This should NOT be protected. It should be used INSTEAD of file parsing.
 	 * File parsing should only be used if this function is not defined
 	 *
-	 * @return array
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
 	 */
 	function get_declared_containers()
 	{
-		// Note: second param below is the ORDER
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
 		return array(
-				'page_top'                  => array( NT_('Page Top'), 2 ),
-				'header'                    => array( NT_('Header'), 10 ),
-				'menu'                      => array( NT_('Menu'), 15 ),
-				'front_page_main_area'      => array( NT_('Front Page Main Area'), 40 ),
-				'front_page_secondary_area' => array( NT_('Front Page Secondary Area'), 45 ),
-				'item_single_header'        => array( NT_('Item Single Header'), 50 ),
-				'item_single'               => array( NT_('Item Single'), 51 ),
-				'item_page'                 => array( NT_('Item Page'), 55 ),
-				'contact_page_main_area'    => array( NT_('Contact Page Main Area'), 60 ),
-				'sidebar'                   => array( NT_('Sidebar'), 80 ),
-				'sidebar_2'                 => array( NT_('Sidebar 2'), 90 ),
-				'footer'                    => array( NT_('Footer'), 100 ),
-				'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
-				'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
-				'404_page'                  => array( NT_('404 Page'), 130 ),
+				'front_page_secondary_area' => NULL,
+				'item_in_list'              => NULL,
+				'item_single_header'        => NULL,
 			);
 	}
 
@@ -144,7 +135,8 @@ class bootstrap_manual_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -379,15 +371,6 @@ class bootstrap_manual_Skin extends Skin
 					'display_reg_link'      => true,
 					'abort_link_position'   => 'form_title',
 					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-					// Register
-					'register_page_before'      => '<div class="evo_panel__register">',
-					'register_page_after'       => '</div>',
-					'register_form_title'       => T_('Register'),
-					'register_links_attrs'      => '',
-					'register_use_placeholders' => true,
-					'register_field_width'      => 252,
-					'register_disabled_page_before' => '<div class="evo_panel__register register-disabled">',
-					'register_disabled_page_after'  => '</div>',
 					// Activate form
 					'activate_form_title'  => T_('Account activation'),
 					'activate_page_before' => '<div class="evo_panel__activation">',
@@ -425,7 +408,7 @@ class bootstrap_manual_Skin extends Skin
 	{
 		global $disp;
 
-		if( in_array( $disp, array( 'access_requires_login', 'access_denied' ) ) )
+		if( in_array( $disp, array( 'access_requires_login', 'content_requires_login', 'access_denied' ) ) )
 		{ // Display left navigation column on this page when at least one sidebar container is visible:
 			return $this->show_container_when_access_denied( 'sidebar' ) || $this->show_container_when_access_denied( 'sidebar2' );
 		}

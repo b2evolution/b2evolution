@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -200,7 +200,7 @@ class coll_comment_list_Widget extends ComponentWidget
 
 		if( $count )
 		{
-			echo $this->disp_params[ 'block_start'];
+			echo $this->disp_params['block_start'];
 
 			// Display title if requested
 			$this->disp_title();
@@ -253,7 +253,7 @@ class coll_comment_list_Widget extends ComponentWidget
 
 			echo $this->disp_params['block_body_end'];
 
-			echo $this->disp_params[ 'block_end' ];
+			echo $this->disp_params['block_end'];
 
 			return true;
 		}

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -208,7 +208,9 @@ class item_info_line_Widget extends ComponentWidget
 		global $Item;
 
 		$params = array_merge( array(
-			'author_link_text' => 'preferredname'
+			'author_link_text' => 'preferredname',
+			'block_body_start' => '<div class="small text-muted">',
+			'block_body_end'   => '</div>',
 		), $params );
 
 		$this->init_display( $params );
@@ -217,6 +219,7 @@ class item_info_line_Widget extends ComponentWidget
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
+		echo '<span class="small text-muted">';
 		// Flag:
 		if( $this->disp_params['flag_icon'] )
 		{
@@ -351,6 +354,7 @@ class item_info_line_Widget extends ComponentWidget
 			) );
 		}
 
+		echo '</span>';
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
 

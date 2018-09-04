@@ -263,9 +263,10 @@ function textarea_str_replace( myField, search, replace, target_document )
  *  - _uiwidget.class.php
  *
  * @param string html id of the element to toggle
+ * @param string Force toggle action: 'collapse', 'expand'
  * @return false
  */
-function toggle_filter_area( filter_name )
+function toggle_filter_area( filter_name, force_toggle_action )
 {
 	// Find objects to toggle:
 	var clickdiv = jQuery( '#clickdiv_'+filter_name );
@@ -304,12 +305,16 @@ function toggle_filter_area( filter_name )
 		clickimg.css( 'background-position', ( parseInt( xy[0] ) + ( !clickdiv.is( ':hidden' ) ? 16 : - 16 ) ) + 'px ' + parseInt( xy[1] ) + 'px' );
 	}
 
-	if( !clickdiv.is( ':hidden' ) )
+	var toggle_action = typeof( force_toggle_action ) == 'undefined'
+		? ( clickdiv.is( ':hidden' ) ? 'expand' : 'collapse' )
+		: force_toggle_action;
+
+	if( toggle_action == 'collapse' )
 	{	// Hide/collapse filters:
 		clickdiv.slideUp( 500 );
 		jQuery.post( htsrv_url+'anon_async.php?action=collapse_filter&target='+filter_name );
 	}
-	else
+	else if( toggle_action == 'expand' )
 	{	// Show/expand filters
 		clickdiv.slideDown( 500 );
 		jQuery.post( htsrv_url+'anon_async.php?action=expand_filter&target='+filter_name );

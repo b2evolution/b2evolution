@@ -76,6 +76,7 @@ class bootstrap_blog_Skin extends Skin
 	public function get_supported_coll_kinds()
 	{
 		$supported_kinds = array(
+				'minisite' => 'partial',
 				'main' => 'partial',
 				'std' => 'yes',		// Blog
 				'photo' => 'no',
@@ -95,28 +96,15 @@ class bootstrap_blog_Skin extends Skin
 	 * This should NOT be protected. It should be used INSTEAD of file parsing.
 	 * File parsing should only be used if this function is not defined
 	 *
-	 * @return array
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
 	 */
 	function get_declared_containers()
 	{
-		// Note: second param below is the ORDER
-		return array(
-				'page_top'                  => array( NT_('Page Top'), 2 ),
-				'header'                    => array( NT_('Header'), 10 ),
-				'menu'                      => array( NT_('Menu'), 15 ),
-				'front_page_main_area'      => array( NT_('Front Page Main Area'), 40 ),
-				'front_page_secondary_area' => array( NT_('Front Page Secondary Area'), 45 ),
-				'item_single_header'        => array( NT_('Item Single Header'), 50 ),
-				'item_single'               => array( NT_('Item Single'), 51 ),
-				'item_page'                 => array( NT_('Item Page'), 55 ),
-				'contact_page_main_area'    => array( NT_('Contact Page Main Area'), 60 ),
-				'sidebar'                   => array( NT_('Sidebar'), 80 ),
-				'sidebar_2'                 => array( NT_('Sidebar 2'), 90 ),
-				'footer'                    => array( NT_('Footer'), 100 ),
-				'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
-				'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
-				'404_page'                  => array( NT_('404 Page'), 130 ),
-			);
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
+		return array();
 	}
 
 
@@ -161,7 +149,8 @@ class bootstrap_blog_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'allow_empty' => true,
@@ -205,6 +194,14 @@ class bootstrap_blog_Skin extends Skin
 								'type' => 'select',
 							)
 						)
+					),
+
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
 					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
@@ -564,7 +561,7 @@ class bootstrap_blog_Skin extends Skin
 		}
 
 		// Font family customization
-		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family', NULL, 'font_weight' );
+		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family', NULL, 'font_weight', 'font' );
 
 		if( ! empty( $custom_css ) )
 		{	// Function for custom_css:
@@ -574,6 +571,7 @@ class bootstrap_blog_Skin extends Skin
 -->
 		</style>';
 			add_headline( $custom_css );
+			init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 		}
 	}
 

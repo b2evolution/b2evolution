@@ -93,7 +93,8 @@ class default_site_Skin extends Skin
 				),
 					'menu_bar_logo_padding' => array(
 						'label' => T_('Menu bar logo padding'),
-						'note' => 'px. ' . T_('Set the padding around the logo.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set the padding around the logo.'),
 						'defaultvalue' => '2',
 						'type' => 'integer',
 						'size' => 1,

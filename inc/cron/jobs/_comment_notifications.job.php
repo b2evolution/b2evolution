@@ -11,7 +11,7 @@ global $Settings, $Messages, $UserSettings;
 // Get the ID of the comment we are supposed notify:
 if( empty( $job_params['comment_ID'] ) )
 {
-	$result_message = 'No comment_ID parameter received.'; // No trans.
+	cron_log_append( 'No comment_ID parameter received.', 'error' ); // No trans.
 	return 3;
 }
 
@@ -34,7 +34,7 @@ $DB->query( 'UPDATE T_comments
 
 if( $DB->rows_affected != 1 )
 {	// We would not "lock" the requested post
-	$result_message = sprintf( T_('Could not lock comment #%d. It is probably being processed or has already been processed by another scheduled task.'), $comment_ID );
+	cron_log_append( sprintf( T_('Could not lock comment #%d. It is probably being processed or has already been processed by another scheduled task.'), $comment_ID ), 'error' );
 	return 4;
 }
 
@@ -75,12 +75,15 @@ while( $edited_Comment->get( 'status' ) != $previous_comment_visibility_status )
 	// Destroy current Comment to get most recent comment from DB:
 	unset( $CommentCache->cache[ $edited_Comment->ID ] );
 	$edited_Comment = & $CommentCache->get_by_ID( $comment_ID );
+
+	// Store messages of the comment sending email notifications:
+	cron_log_action_end( $Messages->get_string( '', '', "\n", '' ) );
+	$Messages->clear();
 }
 
-$result_message = $Messages->get_string( '', '', "\n" );
 if( empty( $result_message ) )
 {
-	$result_message = T_('Done').'.';
+	cron_log_append( T_('Done').'.' );
 }
 
 return 1; /* ok */

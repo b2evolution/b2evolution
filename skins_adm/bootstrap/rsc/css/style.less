@@ -3,7 +3,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -68,6 +68,16 @@ td.shrinkwrap {
 	margin: 0;
 }
 
+// Fix vertical alignment for radio with text inputs:
+div.radio.radio-input label {
+	input[type=radio] {
+		margin-top: 10px;
+	}
+	input[type=text].form_text_input {
+		vertical-align: middle;
+	}
+}
+
 // A colored status icon before <select>
 div.status_icon {
 	display: inline-block;
@@ -78,6 +88,9 @@ div.status_icon {
 .action_icon, .widget_actions a, .no_icon {
 	font-weight: bold;
 	margin: 2px;
+}
+span.action_icon {
+	cursor: pointer;
 }
 // Remove spaces between the spam voting buttons
 .btn-group .action_icon {
@@ -115,11 +128,11 @@ div.avatartag {
 }
 .avatar_main_frame {
 	>a:first-child {
-		margin-right: 25px;
+		margin-right: 0;
 	}
 	.avatar_actions {
 		text-align: center;
-		padding: 0 25px 0 0;
+		padding: 0 25px;
 		float: none;
 		display: table-cell;
 		vertical-align: middle;
@@ -192,25 +205,9 @@ div.avatartag {
 	}
 }
 
-.compose_layout{
-	margin-bottom: 15px;
-	td.label {
-		font-size: 100%;
-		padding-right: 10px;
-		color: #333;
-	}
-	#post_locale {
-		width: 180px !important;
-	}
-	td {
-		white-space: nowrap;
-		vertical-align: middle;
-	}
-}
-#itemform_custom_fields, #itemform_adv_props {
-	.compose_layout {
-		margin-bottom: 0;
-	}
+.edit_actions_visibility {
+	white-space: nowrap;
+	margin-right: 5px;
 }
 
 div.log_container {
@@ -232,6 +229,14 @@ div.delete_messages ul {
 	li {
 		list-style: inherit;
 	}
+}
+
+.evo_panel {
+	margin-bottom: 20px;
+}
+
+.evo_panel__footer {
+	padding: 10px 15px;
 }
 
 /*
@@ -309,6 +314,16 @@ div.delete_messages ul {
 			text-align: center;
 			padding: 10px;
 			color: #5bc0de;
+		}
+	}
+}
+.evo_content_summary {
+	.evo_post {
+		.bTitle {
+			font-weight: bold;
+		}
+		.bText {
+			padding-left: 420px;
 		}
 	}
 }
@@ -645,6 +660,16 @@ fieldset ul {
 	font-weight: normal;
 }
 
+// Form elements on user edit page
+.user_admin_tags {
+	width: 500px;
+	max-width: 100%;
+	ul.token-input-list-facebook {
+		width: 100%;
+		max-width: 100%;
+	}
+}
+
 // Form elements on item edit page
 #item_locations {
 	label {
@@ -721,6 +746,23 @@ fieldset ul {
 }
 #itemform_goals td {
 	padding-bottom: 2px;
+}
+
+// Form elements on item type edit page
+.custom_fields_edit_table {
+	.results {
+		overflow: initial;
+	}
+	.table_scroll {
+		margin-bottom: 20px;
+	}
+	.form-control {
+		width: auto;
+		&.custom_field_label {
+			width: 100%;
+			min-width: 200px;
+		}
+	}
 }
 
 // Attachments / links
@@ -1009,6 +1051,43 @@ h2.user_title::first-line {
 	}
 }
 
+#itemform_extra {
+	td.flabel_item_owner_login {
+		vertical-align: top;
+		padding-top: 6px;
+	}
+	#ffield_item_owner_login {
+		.help-inline {
+			display: inline-block;
+			vertical-align: middle;
+			margin-top: 10px;
+		}
+		#item_owner_login {
+			vertical-align: middle !important;
+		}
+	}
+	label.ffield_item_create_user {
+		padding: 0;
+		font-weight: normal;
+	}
+	.itemform_extra_radio {
+		padding-top: 10px;
+		> label {
+			padding: 0;
+			margin: 0;
+		}
+		input[type=radio][name=item_dateset][value="1"] {
+			margin-top: 11px;
+		}
+		.form-group {
+			vertical-align: middle;
+			input {
+				margin-left: 0;
+			}
+		}
+	}
+}
+
 // Loader animation
 span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
@@ -1117,13 +1196,27 @@ div.available_widgets {
 		background: #FFF;
 		padding: 10px 15px;
 	}
-	.widget_list {
-		list-style: none;
-		margin: 0;
-	}
 	#available_widgets_inner {
 		top: 87px;
 	}
+}
+.widget_list {
+	list-style: none;
+	margin: 0;
+	li {
+		text-indent: -25px;
+		padding-left: 25px;
+		a {
+			text-indent: initial;
+		}
+	}
+}
+
+// Widget icon:
+.evo_widget_icon {
+	display: inline-block;
+	min-width: 22px;
+	padding: .2em;
 }
 
 // Table to select a collection type
@@ -1174,6 +1267,9 @@ div.coll-selector {
 	margin-bottom: -3px; // in this case we don't want level 2 to have it's 18 px top padding
 	.btn-group {
 		margin-right: 4px;
+		.dropdown-toggle .caret {
+			margin-left: 6px;
+		}
 	}
 }
 div.level2 {
@@ -1569,9 +1665,6 @@ table.diff {
 .timestamp .time {
 	font-size: 84%;
 }
-.compact_data {
-	white-space: nowrap;
-}
 
 // Style fixes for email preview from back-office:
 #skin_wrapper {
@@ -1669,8 +1762,20 @@ table.diff {
 	}
 }
 
+// Fix styles for jQuery plugin "QueryBuilder":
+div.query-builder .rule-container .rule-value-container {
+	border: none;
+	padding-left: 0;
+}
+
+// Style for a trasfering object, e-g when a comment is moving to a recycle bin:
+.ui-effects-transfer {
+	border: 1px solid #F00;
+}
+
 // Skin Customizer Mode:
 #customizer_wrapper {
+	padding-top: 140px;
 	.page-content {
 		margin: 0;
 		padding: 0;
@@ -1679,7 +1784,9 @@ table.diff {
 		margin-bottom: 0;
 	}
 	form {
-		> .panel-group > .panel, > div.fieldset_wrapper > fieldset > .panel {
+		> .panel-group > .panel,
+		> fieldset > .panel-group > .panel,
+		> div.fieldset_wrapper > fieldset > .panel {
 			border-top: none;
 			border-left: none;
 			border-right: none;
@@ -1705,12 +1812,9 @@ table.diff {
 			padding: 0;
 		}
 	}
-	.evo_customizer__tabs + .evo_customizer__content {
-		margin-top: 140px;
-	}
 	.evo_customizer__available_widgets {
 		padding: 15px;
-		ul {
+		ul.widget_list {
 			list-style: none;
 			margin: 0 0 0 2px;
 		}
@@ -1721,6 +1825,51 @@ table.diff {
 	.evo_customizer__other_lists {
 		margin: 0 0 10px 31px;
 		padding-top: 10px;
+	}
+	#fieldset_wrapper_widget_info .control-label {
+		display: none;
+	}
+	.controls .help-inline {
+		display: inline-block;
+	}
+	.file_select_item {
+		margin: 0;
+		.item_actions {
+			margin: 0;
+			display: block;
+			width: 100%;
+			text-align: center;
+			.btn {
+				margin-right: 3px;
+			}
+			.btn:last-child {
+				margin-right: 0;
+			}
+		}
+	}
+	#current_widgets {
+		.panel {
+			border-top: none;
+			border-left: none;
+			border-right: none;
+			border-radius: 0;
+			margin-bottom: 0;
+		}
+		h4 + .panel, .panel:first-child {
+			border-top: 1px solid #ddd;
+		}
+		> p {
+			margin: 10px 5px;
+		}
+		.panel_heading_action_icons a.action_icon span.fa {
+			margin: 0;
+		}
+		.panel-group {
+			margin: 0;
+			> h4 {
+				margin: 10px;
+			}
+		}
 	}
 }
 .evo_customizer__tabs {
@@ -1760,9 +1909,6 @@ table.diff {
 		position: absolute;
 		top: 13px;
 		right: 12px;
-		.btn {
-			margin-right: 3px;
-		}
 		.fa-backward {
 			top: 1px;
 			right: 1px;
@@ -1781,5 +1927,22 @@ table.diff {
 	.form-group, .control-buttons {
 		margin: 0;
 		padding: 0;
+	}
+	&.evo_customizer__buttons_widget_actions {
+		padding: 10px;
+		.btn-group {
+			margin: 0;
+		}
+	}
+}
+.evo_customizer__content {
+	form {
+		.panel-heading {
+			.panel-title {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+		}
 	}
 }

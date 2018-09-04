@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
@@ -63,6 +63,7 @@ skin_widget( array(
 <a name="p<?php echo $Item->ID; ?>"></a>
 
 	<?php
+		/* To be removed. Replaced by Item Next Previous widget in Item Single Header container:
 		// Buttons to prev/next post on single disp
 		if( !$Item->is_featured() )
 		{
@@ -83,6 +84,7 @@ skin_widget( array(
 				) );
 			// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 		}
+		*/
 	?>
 
 <div class="forums_list single_topic evo_content_block">
@@ -93,32 +95,63 @@ skin_widget( array(
 
 	<div class="single_page_title">
 		<?php
+		/* To be removed. Replaced by Item Title widget in Item Single Header container:
 		// Page title
 		$Item->title( array(
 				'before'    => '<h2>',
 				'after'     => '</h2>',
 				'link_type' => 'permalink'
 			) );
+		*/
 
 		// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
-		widget_container( 'item_single_header', array(
-			'widget_context' => 'item',	// Signal that we are displaying within an Item
-			// The following (optional) params will be used as defaults for widgets included in this container:
-			'container_display_if_empty' => false, // If no widget, don't display container at all
-			// This will enclose each widget in a block:
-			'block_start' => '<div class="evo_widget $wi_class$">',
-			'block_end' => '</div>',
-			// This will enclose the title of each widget:
-			'block_title_start' => '<h3>',
-			'block_title_end' => '</h3>',
+		$widget_container_params = array(
+				'widget_context'             => 'item',	// Signal that we are displaying within an Item
+				// The following (optional) params will be used as defaults for widgets included in this container:
+				'container_display_if_empty' => false, // If no widget, don't display container at all
+				// This will enclose each widget in a block:
+				'block_start'                => '<div class="evo_widget $wi_class$">',
+				'block_end'                  => '</div>',
+				// This will enclose the title of each widget:
+				'block_title_start'          => '<h3>',
+				'block_title_end'            => '</h3>',
+				'author_link_text'           => $params['author_link_text'],
+				// Controlling the title:
+				'widget_item_title_params'  => array(
+						'before'    => '<div class="evo_post_title">'.( in_array( $disp, array( 'single', 'page' ) ) ? '<h1>' : '<h2>' ),
+						'after'     => ( in_array( $disp, array( 'single', 'page' ) ) ? '</h1>' : '</h2>' ).'</div>',
+						'link_type' => 'permalink',
+					),
+				// Item Next Previous widget
+				'widget_item_next_previous_block_start'     => '<ul class="pager col-lg-12 post_nav">',
+				'widget_item_next_previous_prev_start'      => '<li class="previous">',
+				'widget_item_next_previous_prev_text'       => '<span aria-hidden="true">&larr;</span> $title$',
+				'widget_item_next_previous_prev_end'        => '</li>',
+				'widget_item_next_previous_separator'       => ' ',
+				'widget_item_next_previous_next_start'      => '<li class="next">',
+				'widget_item_next_previous_next_text'       => '$title$ <span aria-hidden="true">&rarr;</span>',
+				'widget_item_next_previous_next_end'        => '</li>',
+				'widget_item_next_previous_block_end'       => '</ul>',
+				'widget_item_next_previous_target_blog'     => $Blog->ID,	// this forces to stay in the same blog, should the post be cross posted in multiple blogs
+				'widget_item_next_previous_post_navigation' => 'same_category', // force to stay in the same category in this skin
+				'widget_item_next_previous_featured'        => false, // don't include the featured posts into navigation list
 
-			'author_link_text' => $params['author_link_text'],
-		) );
+				'ignored_widgets'                           => array()
+				);
+
+		if( $Item->is_featured() )
+		{ // Do not show Item Next Previous widget if featured item
+			$widget_container_params['ignored_widgets'][] = 'item_next_previous';
+		}
+
+		widget_container( 'item_single_header', $widget_container_params );
 		// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
 
-	} ?>
+	?>
 	</div>
+
+	<?php } ?>
 
 	<div class="row">
 		<div class="<?php echo $Skin->get_column_class( 'single' ); ?>">
@@ -255,8 +288,10 @@ skin_widget( array(
 		</div><!-- ../panel-body -->
 
 		<div class="panel-footer clearfix small">
+			<?php if( $disp != 'page' ) { ?>
 			<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
 			<?php
+			}
 				// Check if BBcode plugin is enabled for current blog
 				$bbcode_plugin_is_enabled = false;
 				if( class_exists( 'bbcode_plugin' ) )
@@ -273,8 +308,10 @@ skin_widget( array(
 					echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
 				}
 
-				// Display a panel with voting buttons for item:
-				$Skin->display_item_voting_panel( $Item );
+				if( $disp != 'page' )
+				{	// Display a panel with voting buttons for item:
+					$Skin->display_item_voting_panel( $Item );
+				}
 
 				echo '<span class="pull-left">';
 					$Item->edit_link( array(

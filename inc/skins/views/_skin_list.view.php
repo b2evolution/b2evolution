@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -82,7 +82,7 @@ $Results->cols[] = array(
 						'th_class' => 'shrinkwrap',
 						'order' => 'skin_type',
 						'td_class' => 'shrinkwrap',
-						'td' => '$skin_type$',
+						'td' => '%get_skin_type_title( #skin_type# )%',
 					);
 
 $Results->cols[] = array(

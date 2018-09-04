@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -156,7 +156,7 @@ class mobile_skin_switcher_Widget extends ComponentWidget
 		}
 		else
 		{ // Desktop skin is enabled now, Display a link to switch back on mobile/tablet skin
-			$this->disp_title( $this->disp_params['title'] );
+			$this->disp_title();
 
 			$switch_url = url_add_param( $ReqURI, 'force_skin=auto' );
 			if( $is_mobile_session )

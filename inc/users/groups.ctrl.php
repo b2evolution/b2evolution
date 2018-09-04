@@ -85,7 +85,7 @@ if( $grp_ID !== NULL )
 			$Messages->add( T_('You have no permission to edit groups!'), 'error' );
 			$action = 'view';
 		}
-		elseif( $demo_mode && ( $edited_Group->ID <= 4 ) && ( $edited_Group->ID > 0 ) )
+		elseif( $demo_mode && ( $edited_Group->ID <= 7 ) )
 		{ // Demo mode restrictions: groups created by install process cannot be edited
 			$Messages->add( T_('You cannot edit the default groups in demo mode!'), 'error' );
 			$action = 'view';
@@ -216,7 +216,7 @@ switch ( $action )
 
 		// Update group permissions for each colleciton:
 		blog_update_perms( $edited_Group->ID, 'coll' );
-		$Messages->add( T_('The blog permissions have been updated'), 'success' );
+		$Messages->add( T_('The collection permissions have been updated.'), 'success' );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $admin_url.'?ctrl=groups&action=edit&tab=collection&grp_ID='.$edited_Group->ID, 303 ); // Will EXIT

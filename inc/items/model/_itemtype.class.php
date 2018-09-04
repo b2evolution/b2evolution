@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -27,9 +27,11 @@ class ItemType extends DataObject
 	var $description;
 	var $usage;
 	var $template_name;
+	var $schema = '';
 	var $front_instruction = 0;
 	var $back_instruction = 0;
 	var $instruction = '';
+	var $use_short_title = 'never';
 	var $use_title = 'required';
 	var $use_url = 'optional';
 	var $podcast = 0;
@@ -49,7 +51,6 @@ class ItemType extends DataObject
 	var $use_sub_region = 'never';
 	var $use_city = 'never';
 	var $use_coordinates = 'never';
-	var $use_custom_fields = 1;
 	var $use_comments = 1;
 	var $comment_form_msg = '';
 	var $allow_comment_form_msg = 0;
@@ -57,6 +58,8 @@ class ItemType extends DataObject
 	var $allow_disabling_comments = 0;
 	var $use_comment_expiration = 'optional';
 	var $perm_level = 'standard';
+	var $evobar_link_text = NULL;
+	var $skin_btn_text = NULL;
 
 	/**
 	 * Custom fields
@@ -96,9 +99,11 @@ class ItemType extends DataObject
 			$this->description = $db_row->ityp_description;
 			$this->usage = $db_row->ityp_usage;
 			$this->template_name = $db_row->ityp_template_name;
+			$this->schema = isset( $db_row->ityp_schema ) ? $db_row->ityp_schema : $this->schema;
 			$this->front_instruction = $db_row->ityp_front_instruction;
 			$this->back_instruction = $db_row->ityp_back_instruction;
 			$this->instruction = $db_row->ityp_instruction;
+			$this->use_short_title = isset( $db_row->ityp_use_short_title ) ? $db_row->ityp_use_short_title : $this->use_short_title;
 			$this->use_title = $db_row->ityp_use_title;
 			$this->use_url = $db_row->ityp_use_url;
 			$this->podcast = $db_row->ityp_podcast;
@@ -118,7 +123,6 @@ class ItemType extends DataObject
 			$this->use_sub_region = $db_row->ityp_use_sub_region;
 			$this->use_city = $db_row->ityp_use_city;
 			$this->use_coordinates = $db_row->ityp_use_coordinates;
-			$this->use_custom_fields = $db_row->ityp_use_custom_fields;
 			$this->use_comments = $db_row->ityp_use_comments;
 			$this->comment_form_msg = $db_row->ityp_comment_form_msg;
 			$this->allow_comment_form_msg = $db_row->ityp_allow_comment_form_msg;
@@ -126,6 +130,8 @@ class ItemType extends DataObject
 			$this->allow_disabling_comments = $db_row->ityp_allow_disabling_comments;
 			$this->use_comment_expiration = $db_row->ityp_use_comment_expiration;
 			$this->perm_level = $db_row->ityp_perm_level;
+			$this->evobar_link_text = isset( $db_row->ityp_evobar_link_text ) ? $db_row->ityp_evobar_link_text : $this->evobar_link_text;
+			$this->skin_btn_text = isset( $db_row->ityp_skin_btn_text ) ? $db_row->ityp_skin_btn_text : $this->skin_btn_text;
 		}
 	}
 
@@ -187,6 +193,18 @@ class ItemType extends DataObject
 		param( 'ityp_template_name', 'string' );
 		$this->set_from_Request( 'template_name', NULL, true );
 
+		// Schema
+		param( 'ityp_schema', 'string' );
+		$this->set_from_Request( 'schema', NULL, true );
+
+		// New item link in evobar text
+		param( 'ityp_evobar_link_text', 'string' );
+		$this->set_from_Request( 'evobar_link_text' );
+
+		// New item button in skin text
+		param( 'ityp_skin_btn_text', 'string' );
+		$this->set_from_Request( 'skin_btn_text' );
+
 		// Show instruction in front-office
 		param( 'ityp_front_instruction', 'integer' );
 		$this->set_from_Request( 'front_instruction' );
@@ -201,6 +219,10 @@ class ItemType extends DataObject
 			param_check_html( 'ityp_instruction', T_('Invalid instruction format.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'posting' );
 			$this->set_from_Request( 'instruction', NULL, true );
 		}
+
+		// Use short title
+		param( 'ityp_use_short_title', 'string' );
+		$this->set_from_Request( 'use_short_title' );
 
 		// Use title
 		param( 'ityp_use_title', 'string' );
@@ -284,10 +306,6 @@ class ItemType extends DataObject
 		param( 'ityp_use_coordinates', 'string' );
 		$this->set_from_Request( 'use_coordinates' );
 
-		// Use custom fields
-		param( 'ityp_use_custom_fields', 'integer', 0 );
-		$this->set_from_Request( 'use_custom_fields' );
-
 		// Use comments
 		param( 'ityp_use_comments', 'integer', 0 );
 		$this->set_from_Request( 'use_comments' );
@@ -329,12 +347,7 @@ class ItemType extends DataObject
 		// Initialize the arrays
 		$this->update_custom_fields = array();
 		$this->insert_custom_fields = array();
-		$this->delete_custom_fields = trim(
-			param( 'deleted_custom_double', 'string', '' ).','.
-			param( 'deleted_custom_varchar', 'string', '' ).','.
-			param( 'deleted_custom_text', 'string', '' ).','.
-			param( 'deleted_custom_html', 'string', '' ).','.
-			param( 'deleted_custom_url', 'string', '' ), ',' );
+		$this->delete_custom_fields = trim( param( 'deleted_custom_fields', 'string', '' ), ', ' );
 		$this->delete_custom_fields = empty( $this->delete_custom_fields ) ? array() : explode( ',', $this->delete_custom_fields );
 
 		// Field names array is used to check the diplicates
@@ -343,79 +356,109 @@ class ItemType extends DataObject
 		// Empty and Initialize the custom fields from POST data
 		$this->custom_fields = array();
 
-		$types = array( 'double', 'varchar', 'text', 'html', 'url' );
-		foreach( $types as $type )
+		$empty_title_error = false; // use this to display empty title fields error message only ones
+		$custom_field_count = param( 'count_custom_fields', 'integer', 0 ); // all custom fields count ( contains even deleted fields )
+
+		for( $i = 1 ; $i <= $custom_field_count; $i++ )
 		{
-			$empty_title_error = false; // use this to display empty title fields error message only ones
-			$custom_field_count = param( 'count_custom_'.$type, 'integer', 0 ); // all custom fields count ( contains even deleted fields )
+			// Note: this param contains ID of existing custom field from DB
+			//       or random value like d63d5d53-df3d-5299-8c85-35f69b77 for new creating field:
+			$custom_field_ID = param( 'custom_field_ID'.$i, '/^[a-z0-9\-_]+$/', NULL );
+			if( empty( $custom_field_ID ) || in_array( $custom_field_ID, $this->delete_custom_fields ) )
+			{ // This field was deleted, don't neeed to update
+				continue;
+			}
 
-			for( $i = 1 ; $i <= $custom_field_count; $i++ )
+			$custom_field_type = param( 'custom_field_type'.$i, 'string', NULL );
+			$custom_field_label = param( 'custom_field_label'.$i, 'string', NULL );
+			$custom_field_name = param( 'custom_field_name'.$i, '/^[a-z0-9\-_]+$/', NULL );
+			$custom_field_order = param( 'custom_field_order'.$i, 'integer', NULL );
+			$custom_field_note = param( 'custom_field_note'.$i, 'string', NULL );
+			$custom_field_public = param( 'custom_field_public'.$i, 'integer', 0 );
+			$custom_field_format = param( 'custom_field_format'.$i, 'string', NULL );
+			$custom_field_formula = param( 'custom_field_formula'.$i, 'string', NULL );
+			$custom_field_header_class = param( 'custom_field_header_class'.$i, 'string', NULL );
+			$custom_field_cell_class = param( 'custom_field_cell_class'.$i, 'string', NULL );
+			$custom_field_link = param( 'custom_field_link'.$i, 'string', 'nolink' );
+			$custom_field_link_nofollow = param( 'custom_field_link_nofollow'.$i, 'integer', NULL );
+			$custom_field_link_class = param( 'custom_field_link_class'.$i, 'string', NULL );
+			$custom_field_is_new = param( 'custom_field_new'.$i, 'integer', 0 );
+			$custom_field_line_highlight = param( 'custom_field_line_highlight'.$i, 'string', NULL );
+			$custom_field_green_highlight = param( 'custom_field_green_highlight'.$i, 'string', NULL );
+			$custom_field_red_highlight = param( 'custom_field_red_highlight'.$i, 'string', NULL );
+			$custom_field_description = param( 'custom_field_description'.$i, 'html', NULL );
+
+			// Add each new/existing custom field in this array
+			// in order to see all them on the form when post type is not updated because some errors
+			$this->custom_fields[] = array(
+					'temp_i'          => $i, // Used only on submit form to know the number of the field on the form
+					'ID'              => $custom_field_ID,
+					'ityp_ID'         => $this->ID,
+					'label'           => $custom_field_label,
+					'name'            => $custom_field_name,
+					'type'            => $custom_field_type,
+					'order'           => $custom_field_order,
+					'note'            => $custom_field_note,
+					'public'          => $custom_field_public,
+					'format'          => $custom_field_format,
+					'formula'         => $custom_field_formula,
+					'header_class'    => $custom_field_header_class,
+					'cell_class'      => $custom_field_cell_class,
+					'link'            => $custom_field_link,
+					'link_nofollow'   => $custom_field_link_nofollow,
+					'link_class'      => $custom_field_link_class,
+					'line_highlight'  => $custom_field_line_highlight,
+					'green_highlight' => $custom_field_green_highlight,
+					'red_highlight'   => $custom_field_red_highlight,
+					'description'     => $custom_field_description,
+				);
+
+			if( empty( $custom_field_label ) )
+			{ // Field title can't be emtpy
+				if( ! $empty_title_error )
+				{ // This message was not displayed yet
+					$Messages->add( T_('Custom field titles can\'t be empty!') );
+					$empty_title_error = true;
+				}
+			}
+			elseif( empty( $custom_field_name ) )
+			{ // Field identical name can't be emtpy
+				$Messages->add( sprintf( T_('Please enter name for custom field "%s"'), $custom_field_label ) );
+			}
+			elseif( in_array( $custom_field_name, $field_names ) )
+			{ // Field name must be identical
+				$Messages->add( sprintf( T_('The field name "%s" is used more than once. Each field name must be unique.'), $custom_field_name ) );
+			}
+			else
 			{
-				$custom_field_ID = param( 'custom_'.$type.'_ID'.$i, '/^[a-z0-9\-_]+$/', NULL );
-				if( empty( $custom_field_ID ) || in_array( $custom_field_ID, $this->delete_custom_fields ) )
-				{ // This field was deleted, don't neeed to update
-					continue;
-				}
-
-				$custom_field_label = param( 'custom_'.$type.'_'.$i, 'string', NULL );
-				$custom_field_name = param( 'custom_'.$type.'_fname'.$i, '/^[a-z0-9\-_]+$/', NULL );
-				$custom_field_order = param( 'custom_'.$type.'_order'.$i, 'integer', NULL );
-				$custom_field_note = param( 'custom_'.$type.'_note'.$i, 'string', NULL );
-				$custom_field_is_new = param( 'custom_'.$type.'_new'.$i, 'integer', 0 );
-
-				// Add each new/existing custom field in this array
-				// in order to see all them on the form when post type is not updated because some errors
-				$this->custom_fields[] = array(
-						'temp_i'  => $i, // Used only on submit form to know the number of the field on the form
-						'ID'      => $custom_field_ID,
-						'ityp_ID' => $this->ID,
-						'label'   => $custom_field_label,
-						'name'    => $custom_field_name,
-						'type'    => $type,
-						'order'   => $custom_field_order,
-						'note'    => $custom_field_note,
-					);
-
-				if( empty( $custom_field_label ) )
-				{ // Field title can't be emtpy
-					if( ! $empty_title_error )
-					{ // This message was not displayed yet
-						$Messages->add( T_('Custom field titles can\'t be empty!') );
-						$empty_title_error = true;
-					}
-				}
-				elseif( empty( $custom_field_name ) )
-				{ // Field identical name can't be emtpy
-					$Messages->add( sprintf( T_('Please enter name for custom field "%s"'), $custom_field_label ) );
-				}
-				elseif( in_array( $custom_field_name, $field_names ) )
-				{ // Field name must be identical
-					$Messages->add( sprintf( T_('The field name "%s" is not identical, please use another.'), $custom_field_name ) );
-				}
-				else
-				{
-					$field_names[] = $custom_field_name;
-				}
-				if( $custom_field_is_new )
-				{ // Insert custom field
-					$this->insert_custom_fields[ $custom_field_ID ] = array(
-						'type'  => $type,
-						'name'  => $custom_field_name,
-						'label' => $custom_field_label,
-						'order' => $custom_field_order,
-						'note'  => $custom_field_note,
-					);
-				}
-				else
-				{ // Update custom field
-					$this->update_custom_fields[ $custom_field_ID ] = array(
-						'type'  => $type,
-						'name'  => $custom_field_name,
-						'label' => $custom_field_label,
-						'order' => $custom_field_order,
-						'note'  => $custom_field_note,
-					);
-				}
+				$field_names[] = $custom_field_name;
+			}
+			$custom_field_data = array(
+				'type'            => $custom_field_type,
+				'name'            => $custom_field_name,
+				'label'           => $custom_field_label,
+				'order'           => $custom_field_order,
+				'note'            => $custom_field_note,
+				'public'          => $custom_field_public,
+				'format'          => $custom_field_format,
+				'formula'         => $custom_field_formula,
+				'header_class'    => $custom_field_header_class,
+				'cell_class'      => $custom_field_cell_class,
+				'link'            => $custom_field_link,
+				'link_nofollow'   => $custom_field_link_nofollow,
+				'link_class'      => $custom_field_link_class,
+				'line_highlight'  => $custom_field_line_highlight,
+				'green_highlight' => $custom_field_green_highlight,
+				'red_highlight'   => $custom_field_red_highlight,
+				'description'     => $custom_field_description,
+			);
+			if( $custom_field_is_new )
+			{ // Insert custom field
+				$this->insert_custom_fields[ $custom_field_ID ] = $custom_field_data;
+			}
+			else
+			{ // Update custom field
+				$this->update_custom_fields[ $custom_field_ID ] = $custom_field_data;
 			}
 		}
 	}
@@ -474,6 +517,9 @@ class ItemType extends DataObject
 		$this->dbsave_custom_fields();
 
 		$DB->commit();
+
+		// BLOCK CACHE INVALIDATION:
+		BlockCache::invalidate_key( 'meta_settings', 1 ); // Meta settings(any item type) have changed
 	}
 
 
@@ -506,39 +552,8 @@ class ItemType extends DataObject
 	{
 		global $DB;
 
-		if( ! empty( $this->insert_custom_fields ) )
-		{ // Insert new custom fields
-			$sql_data = array();
-			foreach( $this->insert_custom_fields as $itcf_ID => $custom_field )
-			{
-				$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note )
-					VALUES ( '.$DB->quote( $this->ID ).', '
-						.$DB->quote( $custom_field['label'] ).', '
-						.$DB->quote( $custom_field['name'] ).', '
-						.$DB->quote( $custom_field['type'] ).', '
-						.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).', '
-						.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).' )' );
-			}
-		}
-
-		if( ! empty( $this->update_custom_fields ) )
-		{ // Update custom fields
-			foreach( $this->update_custom_fields as $itcf_ID => $custom_field )
-			{
-				$DB->query( 'UPDATE T_items__type_custom_field
-					SET
-						itcf_label = '.$DB->quote( $custom_field['label'] ).',
-						itcf_name = '.$DB->quote( $custom_field['name'] ).',
-						itcf_order = '.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).',
-						itcf_note = '.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).'
-					WHERE itcf_ityp_ID = '.$DB->quote( $this->ID ).'
-						AND itcf_ID = '.$DB->quote( $itcf_ID ).'
-						AND itcf_type = '.$DB->quote( $custom_field['type'] ) );
-			}
-		}
-
 		if( ! empty( $this->delete_custom_fields ) )
-		{ // Delete custom fields
+		{	// Delete custom fields:
 			$sql_data = array();
 			foreach( $this->delete_custom_fields as $itcf_ID )
 			{
@@ -546,6 +561,70 @@ class ItemType extends DataObject
 			}
 			$DB->query( 'DELETE FROM T_items__type_custom_field
 				WHERE '.implode( ' OR ', $sql_data ) );
+		}
+
+		if( ! empty( $this->insert_custom_fields ) )
+		{	// Insert new custom fields:
+			$sql_data = array();
+			foreach( $this->insert_custom_fields as $itcf_ID => $custom_field )
+			{
+				$sql_data[] = '( '.$DB->quote( $this->ID ).', '
+						.$DB->quote( $custom_field['label'] ).', '
+						.$DB->quote( $custom_field['name'] ).', '
+						.$DB->quote( $custom_field['type'] ).', '
+						.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).', '
+						.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).', '
+						.$DB->quote( $custom_field['public'] ).', '
+						.$DB->quote( $custom_field['format'] ).', '
+						.$DB->quote( $custom_field['formula'] ).', '
+						.$DB->quote( $custom_field['header_class'] ).', '
+						.$DB->quote( $custom_field['cell_class'] ).', '
+						.$DB->quote( $custom_field['link'] ).', '
+						.$DB->quote( $custom_field['link_nofollow'] ).', '
+						.$DB->quote( $custom_field['link_class'] ).', '
+						.$DB->quote( $custom_field['line_highlight'] ).', '
+						.$DB->quote( $custom_field['green_highlight'] ).', '
+						.$DB->quote( $custom_field['red_highlight'] ).', '
+						.( empty( $custom_field['description'] ) ? 'NULL' : $DB->quote( $custom_field['description'] ) ).' )';
+			}
+			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format, itcf_formula, itcf_header_class, itcf_cell_class, itcf_link, itcf_link_nofollow, itcf_link_class, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight, itcf_description )
+					VALUES '.implode( ', ', $sql_data ) );
+		}
+
+		if( ! empty( $this->update_custom_fields ) )
+		{	// Update custom fields:
+			unset( $this->custom_fields );
+			$old_custom_fields = $this->get_custom_fields( 'all', 'ID' );
+			foreach( $this->update_custom_fields as $itcf_ID => $custom_field )
+			{
+				$DB->query( 'UPDATE T_items__type_custom_field
+					SET
+						itcf_label = '.$DB->quote( $custom_field['label'] ).',
+						itcf_name = '.$DB->quote( $custom_field['name'] ).',
+						itcf_order = '.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).',
+						itcf_note = '.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).',
+						itcf_public = '.$DB->quote( $custom_field['public'] ).',
+						itcf_format = '.$DB->quote( $custom_field['format'] ).',
+						itcf_formula = '.$DB->quote( $custom_field['formula'] ).',
+						itcf_cell_class = '.$DB->quote( $custom_field['cell_class'] ).',
+						itcf_header_class = '.$DB->quote( $custom_field['header_class'] ).',
+						itcf_link = '.$DB->quote( $custom_field['link'] ).',
+						itcf_link_nofollow = '.$DB->quote( $custom_field['link_nofollow'] ).',
+						itcf_link_class = '.$DB->quote( $custom_field['link_class'] ).',
+						itcf_line_highlight = '.$DB->quote( $custom_field['line_highlight'] ).',
+						itcf_green_highlight = '.$DB->quote( $custom_field['green_highlight'] ).',
+						itcf_red_highlight = '.$DB->quote( $custom_field['red_highlight'] ).',
+						itcf_description = '.( empty( $custom_field['description'] ) ? 'NULL' : $DB->quote( $custom_field['description'] ) ).'
+					WHERE itcf_ityp_ID = '.$DB->quote( $this->ID ).'
+						AND itcf_ID = '.$DB->quote( $itcf_ID ).'
+						AND itcf_type = '.$DB->quote( $custom_field['type'] ) );
+				if( isset( $old_custom_fields[ $itcf_ID ] ) )
+				{	// Update item setting names of custom field to use new field name:
+					$DB->query( 'UPDATE T_items__item_settings
+						  SET iset_name = '.$DB->quote( 'custom:'.$custom_field['name'] ).'
+						WHERE iset_name = '.$DB->quote( 'custom:'.$old_custom_fields[ $itcf_ID ]['name'] ) );
+				}
+			}
 		}
 	}
 
@@ -587,10 +666,10 @@ class ItemType extends DataObject
 
 
 	/**
-	 * Get the custom feilds
+	 * Get the custom fields
 	 *
-	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url'. Use comma separator to get several types
-	 * @param string Field name that is used as key of array: 'ID', 'ityp_ID', 'label', 'name', 'type', 'order'
+	 * @param string Type of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url', 'image', 'computed', 'separator'. Use comma separator to get several types
+	 * @param string Field name that is used as key of array: 'ID', 'ityp_ID', 'label', 'name', 'type', 'order', 'public'
 	 * @return array Custom fields
 	 */
 	function get_custom_fields( $type = 'all', $array_key = 'name' )
@@ -604,12 +683,15 @@ class ItemType extends DataObject
 			else
 			{ // Get the custom fields from DB
 				global $DB;
-				$SQL = new SQL();
-				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note' );
+				$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->ID );
+				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
+				$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
+				$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
+				$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description' );
 				$SQL->FROM( 'T_items__type_custom_field' );
 				$SQL->WHERE( 'itcf_ityp_ID = '.$DB->quote( $this->ID ) );
 				$SQL->ORDER_BY( 'itcf_order, itcf_ID' );
-				$this->custom_fields = $DB->get_results( $SQL->get(), ARRAY_A );
+				$this->custom_fields = $DB->get_results( $SQL, ARRAY_A );
 			}
 		}
 
@@ -727,6 +809,42 @@ class ItemType extends DataObject
 					WHERE its_ityp_ID = '.$this->ID.'
 					AND its_pst_ID IN ('.implode( ',', $remove_values ).')' );
 		}
+	}
+
+
+	/**
+	 * Get item denomination
+	 *
+	 * @param string Position where denomination will be used, can be one of the following: 'evobar_new', 'inskin_new_btn', 'title_new', 'title_update'
+	 * @return string Item denomination
+	 */
+	function get_item_denomination( $position = 'evobar_new' )
+	{
+		switch( $position )
+		{
+			case 'evobar_new':
+				if( ! empty( $this->evobar_link_text ) )
+				{
+					return $this->evobar_link_text;
+				}
+				break;
+
+			case 'inskin_new_btn':
+				if( ! empty( $this->skin_btn_text ) )
+				{
+					return $this->skin_btn_text;
+				}
+				break;
+		}
+
+		global $Collection, $Blog;
+
+		if( ! empty( $Blog  ) )
+		{
+			return $Blog->get_item_denomination( $position );
+		}
+
+		return NULL;
 	}
 }
 

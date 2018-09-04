@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -91,7 +91,25 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		// Demo data:
+		global $Plugins;
+
+		// Initialize checkboxes options for text renderers setting:
+		$renderers = $Plugins->get_renderer_options( 'default', array(
+				'Blog'         => $this->get_Blog(),
+				'setting_name' => 'coll_apply_rendering',
+			) );
+		$renderer_checkbox_options = array();
+		foreach( $renderers as $renderer )
+		{
+			$renderer_checkbox_options[] = array(
+				$renderer['code'],
+				$renderer['name'].' '.$renderer['help_link'],
+				$renderer['checked'],
+				'',
+				$renderer['disabled']
+			);
+		}
+
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_('Block title'),
@@ -101,6 +119,11 @@ class free_html_Widget extends ComponentWidget
 					'type' => 'html_textarea',
 					'label' => T_('Block content'),
 					'rows' => 10,
+				),
+				'renderers' => array(
+					'label' => T_('Text Renderers'),
+					'type' => 'checklist',
+					'options' => $renderer_checkbox_options,
 				),
 			), parent::get_param_definitions( $params )	);
 
@@ -123,11 +146,12 @@ class free_html_Widget extends ComponentWidget
 		// Collection common links:
 		echo $this->disp_params['block_start'];
 
-		$this->disp_title( $this->disp_params['title'] );
+		$this->disp_title();
 
 		echo $this->disp_params['block_body_start'];
 
-		echo format_to_output( $this->disp_params['content'] );
+		// Display the rendered block content:
+		echo $this->get_rendered_content( $this->disp_params['content'] );
 
 		echo $this->disp_params['block_body_end'];
 

@@ -306,6 +306,7 @@ function deleteComment( commentId, request_from, comment_type )
 			data:
 				{ 'action': 'get_opentrash_link',
 					'blog': '<?php echo $Blog->ID; ?>',
+					'request_from': request_from,
 					'crumb_comment': '<?php echo get_crumb('comment'); ?>',
 				},
 			success: function(result)
@@ -335,7 +336,7 @@ function deleteComment( commentId, request_from, comment_type )
 	success: function(result)
 		{
 			var target_selector = ( comment_type == 'meta' ? '#comments' : '#recycle_bin' );
-			jQuery( selector ).effect( 'transfer', { to: jQuery( target_selector ) }, 700, function() {
+			jQuery( selector ).transfer( { to: target_selector, duration: 700 }, function() {
 				delete modifieds[divid];
 				if( request_from == 'dashboard' || request_from == 'coll_settings' ) {
 					updateCommentsList( divid );
@@ -393,17 +394,12 @@ function refreshAfterBan( deleted_ids )
 	refresh_item_comments( item_id );
 }
 
-function updateModalAfterBan( button )
+function closeModalAfterBan()
 {
-	var modal_window = jQuery( '#modal_window' );
-
-	if( modal_window.length == 0 )
-	{	// Modal windown is not found on page:
-		return;
-	}
-
-	// Add button in modal bottom:
-	jQuery( '.modal-footer', modal_window ).prepend( '<button type="button" class="' + button.class + '" onclick="location.href=\'' + button.url + '\'">' + button.title + '</button>' );
+	// Copy messages from modal to the page:
+	jQuery( '#server_messages' ).html( '' ).append( jQuery( '#modal_window_frame_ban').contents().find( '.action_messages' ) );
+	// Close modal window:
+	closeModalWindow();
 }
 
 //Process result after publish/deprecate/delete action has been completed
@@ -560,7 +556,7 @@ function get_show_statuses()
 function get_expiry_status()
 {
 	var expiry_status = 'active';
-	if( jQuery('#show_expiry_all') && jQuery('#show_expiry_all').attr('checked') )
+	if( jQuery('#show_expiry_all') && jQuery('#show_expiry_all').prop('checked') )
 	{
 		expiry_status = 'all';
 	}

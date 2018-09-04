@@ -103,25 +103,16 @@ class bootstrap_gallery_Skin extends Skin
 	 * This should NOT be protected. It should be used INSTEAD of file parsing.
 	 * File parsing should only be used if this function is not defined
 	 *
-	 * @return array
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
 	 */
 	function get_declared_containers()
 	{
-		// Note: second param below is the ORDER
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
 		return array(
-				'page_top'                  => array( NT_('Page Top'), 2 ),
-				'header'                    => array( NT_('Header'), 10 ),
-				'menu'                      => array( NT_('Menu'), 15 ),
-				'front_page_main_area'      => array( NT_('Front Page Main Area'), 40 ),
-				'front_page_secondary_area' => array( NT_('Front Page Secondary Area'), 45 ),
-				'item_single_header'        => array( NT_('Item Single Header'), 50 ),
-				'item_single'               => array( NT_('Item Single'), 51 ),
-				'item_page'                 => array( NT_('Item Page'), 55 ),
-				'contact_page_main_area'    => array( NT_('Contact Page Main Area'), 60 ),
-				'footer'                    => array( NT_('Footer'), 100 ),
-				'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
-				'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
-				'404_page'                  => array( NT_('404 Page'), 130 ),
+				'front_page_secondary_area' => NULL,
 			);
 	}
 
@@ -145,7 +136,8 @@ class bootstrap_gallery_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max comment image height'),
-						'note' => 'px. ' . T_('Set maximum height for comment images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for comment images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -362,9 +354,9 @@ class bootstrap_gallery_Skin extends Skin
 // fp> TODO: the following code WORKS but produces UGLY CSS with tons of repetitions. It needs a full rewrite.
 
 		// ===== Custom page styles: =====
-		$custom_styles = array();
 
 		// Text size <=== THIS IS A WORK IN PROGRESS
+		$custom_styles = array();
 		if( $text_size = $this->get_setting( 'page_text_size' ) )
 		{
 			$custom_styles[] = 'font-size: '.$text_size;
@@ -386,19 +378,21 @@ class bootstrap_gallery_Skin extends Skin
 		}
 
 		// Link color
+		$custom_styles = array();
 		if( $text_color = $this->get_setting( 'page_link_color' ) )
 		{
 			$custom_styles[] = 'color: '.$text_color;
 		}
 		if( ! empty( $custom_styles ) )
 		{
-			$custom_css .= '	#skin_wrapper .container a { '.implode( ';', $custom_styles )." }\n";
-			$custom_css .= '	ul li a { '.implode( ';', $custom_styles )." }\n";
-			$custom_css .= "	ul li a {background-color: transparent;}\n";
-			$custom_css .= "	.ufld_icon_links a {color: #fff !important;}\n";
+			$custom_css .= '	#skin_wrapper .container a:not(.btn .active) { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= '	ul li a:not(.btn) { '.implode( ';', $custom_styles )." }\n";
+			$custom_css .= "	ul li a:not(.btn) {background-color: transparent;}\n";
+			$custom_css .= "	.ufld_icon_links a:not(.btn) {color: #fff !important;}\n";
 		}
 
 		// Current tab text color
+		$custom_styles = array();
 		if( $text_color = $this->get_setting( 'current_tab_text_color' ) )
 		{
 			$custom_styles[] = 'color: '.$text_color;
@@ -409,6 +403,7 @@ class bootstrap_gallery_Skin extends Skin
 		}
 
 		// Page background color
+		$custom_styles = array();
 		if( $bg_color = $this->get_setting( 'page_bg_color' ) )
 		{
 			$custom_styles[] = 'background-color: '.$bg_color;

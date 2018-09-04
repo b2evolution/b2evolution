@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -371,20 +371,20 @@ jQuery( 'input[name=edited_grp_usage]' ).click( function()
 	}
 } );
 
-function set_activity_default_section()
+function set_activity_default_section( set_default_section )
 {
-	if( jQuery( 'input[name=edited_grp_perm_createblog], input[name=edited_grp_perm_getblog]' ).is( ':checked' ) )
-	{	// Enable if at least one checkbox is checked:
-		jQuery( 'select[name=edited_grp_perm_default_sec_ID]' ).removeAttr( 'disabled' );
-	}
-	else
-	{	// Disable otherwise:
-		jQuery( 'select[name=edited_grp_perm_default_sec_ID]' ).attr( 'disabled', 'disabled' );
+	var checked_new_coll = jQuery( 'input[name=edited_grp_perm_createblog], input[name=edited_grp_perm_getblog]' ).is( ':checked' );
+	// Enable/Disable if at least one checkbox(to create new collection) is checked:
+	jQuery( 'select[name=edited_grp_perm_default_sec_ID], input[type=checkbox][name="edited_grp_perm_allowed_sections[]"]' ).prop( 'disabled', ! checked_new_coll );
+	if( set_default_section && checked_new_coll )
+	{	// Auto select allowed section from current default section:
+		var selected_default_section_ID = jQuery( 'select[name=edited_grp_perm_default_sec_ID] option:selected' ).val();
+		jQuery( 'input[type=checkbox][name="edited_grp_perm_allowed_sections[]"][value=' + selected_default_section_ID + ']' ).prop( 'checked', true );
 	}
 }
 jQuery( 'input[name=edited_grp_perm_createblog], input[name=edited_grp_perm_getblog]' ).click( function()
 {	// Enable/Disable setting "Default Section" depending on checkboxes of "Creating new blogs":
-	set_activity_default_section();
+	set_activity_default_section( true );
 } );
-set_activity_default_section();
+set_activity_default_section( false );
 </script>

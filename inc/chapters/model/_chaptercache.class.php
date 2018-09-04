@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -846,7 +846,8 @@ class ChapterCache extends DataObjectCache
 				'sorted'    => false,
 				'level'     => 0,
 				'max_level' => 0,
-				'subset_ID' => $Chapter->blog_ID
+				'subset_ID' => $Chapter->blog_ID,
+				'items_order_alpha_func' => 'compare_items_by_title',
 			), $params );
 
 		if( $params['sorted'] && $has_sub_cats )
@@ -856,7 +857,7 @@ class ChapterCache extends DataObjectCache
 		if( ! empty( $callbacks['posts'] ) )
 		{
 			$ItemCache = & get_ItemCache();
-			$cat_items = $ItemCache->get_by_cat_ID( $Chapter->ID, $params['sorted'] );
+			$cat_items = $ItemCache->get_by_cat_ID( $Chapter->ID, $params['items_order_alpha_func'] );
 		}
 
 		if( $has_sub_cats || !empty( $cat_items ) )
@@ -987,6 +988,9 @@ class ChapterCache extends DataObjectCache
 		{	// Get all parent categorie:
 			$Cat_array = $this->root_cats;
 		}
+
+		// Sort categories alphabetically or manually depending on settings:
+		usort( $Cat_array, array( 'Chapter', 'compare_chapters' ) );
 
 		$r = '';
 

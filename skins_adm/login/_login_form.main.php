@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package htsrv
  */
@@ -73,7 +73,7 @@ $params = array(
 	'login_page_class'         => 'evo_panel__login',
 	'login_page_before'        => '',
 	'login_page_after'         => '',
-	'login_form_action'        => get_htsrv_url( true ).'login.php',
+	'login_form_action'        => get_htsrv_url( 'login' ).'login.php',
 	'login_form_name'          => 'login_form',
 	'login_form_title'         => '',
 	'login_form_layout'        => 'fieldset',

@@ -24,7 +24,7 @@ $SQL->FROM( 'T_items__status' );
 // Create result set:
 $Results = new Results( $SQL->get(), 'pst_' );
 
-$Results->title = T_('Post Statuses').get_manual_link( 'managing-item-statuses' );
+$Results->title = T_('Item Statuses').get_manual_link( 'managing-item-statuses' );
 
 
 $Results->cols[] = array(
@@ -48,13 +48,13 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 			'th' => T_('Actions'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
-			'td' => action_icon( T_('Edit this post status...'), 'edit', $admin_url.'?ctrl=itemstatuses&amp;pst_ID=$pst_ID$&amp;action=edit' )
-					.action_icon( T_('Duplicate this post status...'), 'copy', $admin_url.'?ctrl=itemstatuses&amp;pst_ID=$pst_ID$&amp;action=new' )
-					.action_icon( T_('Delete this post status!'), 'delete', regenerate_url( 'pst_ID,action', 'pst_ID=$pst_ID$&amp;action=delete&amp;'.url_crumb( 'itemstatus' ) ) ),
+			'td' => action_icon( T_('Edit this item status...'), 'edit', $admin_url.'?ctrl=itemstatuses&amp;pst_ID=$pst_ID$&amp;action=edit' )
+					.action_icon( T_('Duplicate this item status...'), 'copy', $admin_url.'?ctrl=itemstatuses&amp;pst_ID=$pst_ID$&amp;action=new' )
+					.action_icon( T_('Delete this item status!'), 'delete', regenerate_url( 'pst_ID,action', 'pst_ID=$pst_ID$&amp;action=delete&amp;'.url_crumb( 'itemstatus' ) ) ),
 		);
 
-	$Results->global_icon( T_('Create a new post status...'), 'new',
-		regenerate_url( 'action', 'action=new' ), T_('New post status').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+	$Results->global_icon( T_('Create a new item status...'), 'new',
+		regenerate_url( 'action', 'action=new' ), T_('New item status').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 // Display results:

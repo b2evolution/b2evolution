@@ -393,7 +393,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	* NB: in fact a user defined error handler can only handle WARNING, NOTICE and USER_* errors.
 	*
 	*/
-	function _xmlrpcs_errorHandler($errcode, $errstring, $filename=null, $lineno=null, $context=null)
+	function _xmlrpcs_errorHandler($errcode, $errstring, $filename=null, $lineno=null)
 	{
 		// obey the @ protocol
 		if (error_reporting() == 0)
@@ -424,11 +424,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				if(is_array($GLOBALS['_xmlrpcs_prev_ehandler']))
 				{
 					// the following works both with static class methods and plain object methods as error handler
-					call_user_func_array($GLOBALS['_xmlrpcs_prev_ehandler'], array($errcode, $errstring, $filename, $lineno, $context));
+					call_user_func_array($GLOBALS['_xmlrpcs_prev_ehandler'], array($errcode, $errstring, $filename, $lineno));
 				}
 				else
 				{
-					$GLOBALS['_xmlrpcs_prev_ehandler']($errcode, $errstring, $filename, $lineno, $context);
+					$GLOBALS['_xmlrpcs_prev_ehandler']($errcode, $errstring, $filename, $lineno);
 				}
 			}
 		}

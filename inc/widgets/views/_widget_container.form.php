@@ -18,14 +18,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var WidgetContainer
  */
-global $edited_WidgetContainer, $Blog;
+global $edited_WidgetContainer, $Blog, $AdminUI, $mode;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
-
-$Form = new Form( NULL, 'form' );
-
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 
 if( $edited_WidgetContainer->get( 'coll_ID' ) > 0 )
 {	// Collection/skin container:
@@ -49,6 +45,26 @@ else
 		$form_title = $creating ? T_('New shared sub-container') : T_('Shared sub-container');
 	}
 }
+
+if( $mode == 'customizer' )
+{	// Display customizer tabs to switch between skin and widgets in special div on customizer mode:
+	$AdminUI->display_customizer_tabs( array(
+			'path' => array( 'coll', 'widgets' ),
+		) );
+
+	// Start of customizer content:
+	echo '<div class="evo_customizer__content">';
+
+	$form_title = '';
+}
+
+$Form = new Form( NULL, 'form' );
+
+if( $mode != 'customizer' )
+{
+	$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+}
+
 $Form->begin_form( 'fform', $form_title );
 
 $Form->add_crumb( 'widget_container' );
@@ -56,7 +72,7 @@ $Form->hidden( 'action', $creating ? 'create_container' : 'update_container' );
 $Form->hiddens_by_key( get_memorized( 'action' ) );
 $Form->hidden( 'wico_coll_ID', intval( $edited_WidgetContainer->get( 'coll_ID' ) ) );
 
-$Form->begin_fieldset( T_('Properties') );
+$Form->begin_fieldset( T_('Container Properties') );
 
 	if( $edited_WidgetContainer->get( 'coll_ID' ) == 0 )
 	{	// Suggect to select container type only for shared containers:
@@ -74,20 +90,38 @@ $Form->begin_fieldset( T_('Properties') );
 
 	$Form->text_input( 'wico_code', $edited_WidgetContainer->get( 'code' ), 40, T_('Code'), T_('Used for calling from skins. Must be unique.'), array( 'required' => true, 'maxlength' => 255 ) );
 
-	$Form->radio( 'wico_skin_type',
-			$edited_WidgetContainer->get( 'skin_type' ),
-			array(
-					array( 'normal', T_('Normal'), T_('Normal skin for general browsing') ),
-					array( 'mobile', T_('Mobile'), T_('Mobile skin for mobile phones browsers') ),
-					array( 'tablet', T_('Tablet'), T_('Tablet skin for tablet browsers') ),
-				),
-			T_( 'Skin type' ), true, '', true
-		);
+	if( $edited_WidgetContainer->ID == 0 )
+	{	// Allow to set skin type only on creating new widget container:
+		$Form->radio( 'wico_skin_type',
+				$edited_WidgetContainer->get( 'skin_type' ),
+				array(
+						array( 'normal', T_('Standard'), T_('Standard skin for general browsing') ),
+						array( 'mobile', T_('Phone'), T_('Mobile skin for mobile phones browsers') ),
+						array( 'tablet', T_('Tablet'), T_('Tablet skin for tablet browsers') ),
+					),
+				T_( 'Skin type' ), true, '', true
+			);
+	}
 
-	$Form->text_input( 'wico_order', $edited_WidgetContainer->get( 'order' ), 40, T_('Order'), T_('For manual ordering of the containers,'), array( 'required' => !$creating, 'maxlength' => 255 ) );
+	$Form->text_input( 'wico_order', $edited_WidgetContainer->get( 'order' ), 40, T_('Order'), T_('For manual ordering of the containers.'), array( 'required' => !$creating, 'maxlength' => 255 ) );
 
 $Form->end_fieldset();
 
-$Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
+$buttons = array();
+$buttons[] = array( 'submit', 'save', ( $creating ? T_('Record') : ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ) ), 'SaveButton' );
+if( $mode == 'customizer' )
+{	// Display buttons in special div on customizer mode:
+	echo '<div class="evo_customizer__buttons">';
+	$Form->buttons( $buttons );
+	echo '</div>';
+	// Clear buttons to don't display them twice:
+	$buttons = array();
+}
 
+$Form->end_form( $buttons );
+
+if( $mode == 'customizer' )
+{	// End of customizer content:
+	echo '</div>';
+}
 ?>

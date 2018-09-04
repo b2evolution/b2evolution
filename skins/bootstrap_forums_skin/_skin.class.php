@@ -104,31 +104,21 @@ class bootstrap_forums_Skin extends Skin
 	 * This should NOT be protected. It should be used INSTEAD of file parsing.
 	 * File parsing should only be used if this function is not defined (which will be the case for older v6- skins)
 	 *
-	 * @todo maybe define a default implementation that returns NULL
-	 *
-	 * @return array
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
 	 */
 	function get_declared_containers()
 	{
-		// Note: second param below is the ORDER
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
 		return array(
-				'page_top'                   => array( NT_('Page Top'), 2 ),
-				'header'                     => array( NT_('Header'), 10 ),
-				'menu'                       => array( NT_('Menu'), 15 ),
-				'front_page_main_area'       => array( NT_('Front Page Main Area'), 40 ),
-				'front_page_secondary_area'  => array( NT_('Front Page Secondary Area'), 45 ),
+				'front_page_main_area'       => NULL,
+				'front_page_secondary_area'  => NULL,
 				'forum_front_secondary_area' => array( NT_('Forum Front Secondary Area'), 47 ),
-				'item_single_header'         => array( NT_('Item Single Header'), 50 ),
-				'item_single'                => array( NT_('Item Single'), 51 ),
-				'item_page'                  => array( NT_('Item Page'), 55 ),
-				'contact_page_main_area'     => array( NT_('Contact Page Main Area'), 60 ),
-				'sidebar'                    => array( NT_('Sidebar'), 80 ),
-				'sidebar_2'                  => array( NT_('Sidebar 2'), 90 ),
+				'item_list'                  => NULL,
+				'item_in_list'               => NULL,
 				'sidebar_single'             => array( NT_('Sidebar Single'), 95 ),
-				'footer'                     => array( NT_('Footer'), 100 ),
-				'user_profile_left'          => array( NT_('User Profile - Left'), 110 ),
-				'user_profile_right'         => array( NT_('User Profile - Right'), 120 ),
-				'404_page'                   => array( NT_('404 Page'), 130 ),
 			);
 	}
 
@@ -170,7 +160,8 @@ class bootstrap_forums_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -401,40 +392,6 @@ class bootstrap_forums_Skin extends Skin
 			// Initialize date picker for _item_expert.form.php
 			init_datepicker_js( 'blog' );
 		}
-
-		// Add custom CSS:
-		$custom_css = '';
-
-
-		// If sidebar == true + col-lg
-		if( $layout = $this->get_setting( 'layout_general' ) != 'no_sidebar' )
-		{
-			$custom_css = "@media screen and (min-width: 1200px) {
-				.forums_list .ft_date {
-					white-space: normal;
-					margin-top: 3px;
-				}
-				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full,
-				.disp_single .evo_comment .panel-body .evo_comment_text p,
-				.disp_single .post_tags,
-				.disp_single .evo_voting_panel,
-				.disp_single .evo_seen_by
-				{
-					padding-left: 15px;
-				}
-				\n
-			}";
-		}
-
-		if( ! empty( $custom_css ) )
-		{ // Function for custom_css:
-		$custom_css = '<style type="text/css">
-<!--
-'.$custom_css.'
--->
-		</style>';
-		add_headline( $custom_css );
-		}
 	}
 
 
@@ -470,11 +427,30 @@ class bootstrap_forums_Skin extends Skin
 		$post_button = '';
 
 		$chapter_is_locked = false;
+		$default_new_ItemType = $Blog->get_default_new_ItemType();
+
+		if( $default_new_ItemType === false )
+		{ // Do not show button on disabled default item type for new items:
+			return '';
+		}
 
 		$write_new_post_url = $Blog->get_write_item_url( $chapter_ID );
 		if( $write_new_post_url != '' )
 		{ // Display button to write a new post
-			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post a new topic').'"><i class="fa fa-pencil"></i> '.T_('New topic').'</a>';
+			$button_text = T_('New topic');
+			if( ! empty( $default_new_ItemType ) )
+			{
+				$button_text = $default_new_ItemType->get_item_denomination( 'inskin_new_btn' );
+				// The get_write_url() function above does not allow specifying the item type ID we'll manually add it:
+				$write_new_post_url = url_add_param( $write_new_post_url, 'item_typ_ID='.$default_new_ItemType->ID );
+
+				if( ! empty( $default_new_ItemType->get( 'skin_btn_text' ) ) )
+				{
+					$button_text = $default_new_ItemType->get( 'skin_btn_text' );
+				}
+			}
+
+			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post a new topic').'"><i class="fa fa-pencil"></i> '.$button_text.'</a>';
 		}
 		else
 		{ // If a creating of new post is unavailable

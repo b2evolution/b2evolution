@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -111,33 +111,54 @@ $Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_te
 
 $Form->begin_fieldset( $is_admin ? T_('Other preferences').get_manual_link('user_preferences') : '', array( 'class'=>'fieldset clear' ) );
 
+// Enable/disable multiple sessions for the current user
+$multiple_sessions = $Settings->get( 'multiple_sessions' );
+switch( $multiple_sessions )
+{
+	case 'never':
+	case 'always':
+		$multiple_sessions_field_hidden = true;
+		$multiple_sessions_field_disabled = true;
+		break;
+	default:
+		$multiple_sessions_field_hidden = false;
+		if( ( $multiple_sessions == 'adminset_default_no' || $multiple_sessions == 'adminset_default_yes' ) && !$current_User->check_perm( 'users', 'edit' ) )
+		{
+			$multiple_sessions_field_disabled = true;
+		}
+		else
+		{
+			$multiple_sessions_field_disabled = false;
+		}
+}
+$multiple_sessions_value = $UserSettings->get( 'login_multiple_sessions', $edited_User->ID );
+
+// Session time out for the current user
+$timeout_sessions = $UserSettings->get( 'timeout_sessions', $edited_User->ID );
+$def_timeout_session = $Settings->get( 'timeout_sessions' );
+
+if( empty( $timeout_sessions ) )
+{
+	$timeout_sessions_selected = 'default';
+	$timeout_sessions = $def_timeout_session;
+}
+else
+{
+	$timeout_sessions_selected = 'custom';
+}
+
+$oldest_session_period = seconds_to_period( max( $Settings->get( 'auto_prune_stats' ) * 86400, $def_timeout_session ) );
+$timeout_sessions_note = T_('Cannot exceed the default').' ('.$oldest_session_period.')';
+if( $timeout_sessions > $Settings->get( 'auto_prune_stats' ) * 86400 &&
+		$timeout_sessions > $def_timeout_session )
+{	// Display a warning if the user session can be deleted earlier:
+	$timeout_sessions_note .= '<br /><span class="red">'.sprintf( T_('WARNING: The session will actually die earlier because the sessions table is pruned after %s.'), $oldest_session_period ).'</span>';
+}
+
 if( $action != 'view' )
 { // We can edit the values:
 
 	$Form->select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options_return', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
-
-	// Enable/disable multiple sessions for the current user
-	$multiple_sessions = $Settings->get( 'multiple_sessions' );
-	switch( $multiple_sessions )
-	{
-		case 'never':
-		case 'always':
-			$multiple_sessions_field_hidden = true;
-			$multiple_sessions_field_disabled = true;
-			break;
-		default:
-			$multiple_sessions_field_hidden = false;
-			if( ( $multiple_sessions == 'adminset_default_no' || $multiple_sessions == 'adminset_default_yes' ) && !$current_User->check_perm( 'users', 'edit' ) )
-			{
-				$multiple_sessions_field_disabled = true;
-			}
-			else
-			{
-				$multiple_sessions_field_disabled = false;
-			}
-	}
-
-	$multiple_sessions_value = $UserSettings->get( 'login_multiple_sessions', $edited_User->ID );
 
 	if( $multiple_sessions_field_hidden )
 	{
@@ -150,27 +171,13 @@ if( $action != 'view' )
 				'', 1, $multiple_sessions_field_disabled );
 	}
 
-	// Session time out for the current user
-	$timeout_sessions = $UserSettings->get( 'timeout_sessions', $edited_User->ID );
-	$def_timeout_session = $Settings->get( 'timeout_sessions' );
-
-	if( empty( $timeout_sessions ) )
-	{
-		$timeout_sessions_selected = 'default';
-		$timeout_sessions = $def_timeout_session;
-	}
-	else
-	{
-		$timeout_sessions_selected = 'custom';
-	}
-
 	if( ( $current_User->ID == $edited_User->ID ) || ( $current_User->check_perm( 'users', 'edit' ) ) )
 	{
 		$Form->radio_input( 'edited_user_timeout_sessions', $timeout_sessions_selected, array(
 					array(
 						'value'   => 'default',
 						'label'   => T_('Use default duration.'),
-						'note'    => duration_format( $def_timeout_session ),
+						'note'    => $oldest_session_period,
 						'onclick' => 'jQuery("[id$=timeout_sessions]").hide();' ),
 					array(
 						'value'   => 'custom',
@@ -185,16 +192,7 @@ if( $action != 'view' )
 		{ // Hide the field to customize a session duration when default duration is selected
 			$Form->fieldstart = str_replace( '>', ' style="display:none">', $Form->fieldstart );
 		}
-		if( $timeout_sessions > $Settings->get( 'auto_prune_stats' ) * 86400 &&
-		    $timeout_sessions > $def_timeout_session )
-		{ // Display a warning if the user session can be deleted earlier
-			$timeout_sessions_warning = '<br /><span class="red">'.sprintf( T_('WARNING: The session will actually die earlier because the sessions table is pruned after %d days.'), intval( $Settings->get( 'auto_prune_stats' ) ) ).'</span>';
-		}
-		else
-		{ // No warning, because the custom user session duration will be used
-			$timeout_sessions_warning = '';
-		}
-		$Form->duration_input( 'timeout_sessions', $timeout_sessions, T_('Custom duration'), 'months', 'seconds', array( 'minutes_step' => 1, 'note' => $timeout_sessions_warning ) );
+		$Form->duration_input( 'timeout_sessions', $timeout_sessions, T_('Custom duration'), 'months', 'seconds', array( 'minutes_step' => 1, 'note' => $timeout_sessions_note ) );
 		$Form->fieldstart = $fieldstart;
 	}
 	else
@@ -207,7 +205,18 @@ if( $action != 'view' )
 else
 { // display only
 	$Form->info( T_('Preferred locale'), $edited_User->get('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
-	$Form->info( T_('Show online'), ( $UserSettings->get( 'show_online', $edited_User->ID ) ) ? T_('yes') : T_('no') );
+	$Form->info( T_('Multiple sessions'), ( $multiple_sessions_value ? T_('yes') : T_('no') ), T_('Check this if you want to be able to log in from different computers/browsers at the same time. Otherwise, logging in from a new computer/browser will automatically disconnect you on the previous one.') );
+	if( $timeout_sessions_selected == 'default' )
+	{
+		$Form->info( T_('Session timeout'), T_('Use default duration.'), $oldest_session_period );
+	}
+	else
+	{
+		$Form->info( T_('Session timeout'), T_('Use custom duration...') );
+		$Form->info( T_('Custom duration'), seconds_to_period( $timeout_sessions ), $timeout_sessions_note );
+	}
+	
+	$Form->info( T_('Show online'), ( $UserSettings->get( 'show_online', $edited_User->ID ) ? T_('yes') : T_('no') ), T_('Check this to be displayed as online when visiting the site.') );
 }
 
 $Form->end_fieldset();
@@ -230,7 +239,7 @@ if( $Settings->get( 'account_close_enabled' ) && isset( $Blog ) &&
     ( $current_User->ID == $edited_User->ID ) && ! $current_User->check_perm( 'users', 'edit', false ) )
 { // Display a linkt to close account
   // Admins cannot close own accounts from front office
-	$Form->info( '', '<a href="'.url_add_param( $Blog->gen_blogurl(), 'disp=closeaccount' ).'">'.T_( 'I want to close my account...' ).'</a>' );
+	$Form->info( '', '<a href="'.$Blog->get( 'closeaccounturl' ).'">'.T_( 'I want to close my account...' ).'</a>' );
 }
 
 $Form->end_form();

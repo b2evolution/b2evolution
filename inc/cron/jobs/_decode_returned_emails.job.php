@@ -28,7 +28,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Settings, $DB, $result_message;
+global $Settings, $DB;
 global $dre_messages, $dre_emails, $email_cntr, $del_cntr, $is_cron_mode;
 
 // Are we in cron job mode?
@@ -48,7 +48,6 @@ if( ! extension_loaded('imap') )
 	return 2; // error
 }
 
-load_funcs( '_core/_param.funcs.php' );
 load_class( '_ext/mime_parser/rfc822_addresses.php', 'rfc822_addresses_class' );
 load_class( '_ext/mime_parser/mime_parser.php', 'mime_parser_class' );
 

@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -17,7 +17,7 @@ emailskin_include( '_email_header.inc.txt.php', $params );
 /**
  * @var Session
  */
-global $Session;
+global $Session, $admin_url;
 
 global $dummy_fields;
 
@@ -53,12 +53,17 @@ while( ( $iterator_User = & $UserCache->get_next() ) != NULL )
 	$message_content .= T_( 'Link to reset your password:' )
 						."\n"
 						.'$secret_content_start$'
-						.get_htsrv_url( true ).'login.php?action=changepwd'
+						.get_htsrv_url( 'login' ).'login.php?action=changepwd'
 							.'&'.$dummy_fields[ 'login' ].'='.rawurlencode( $iterator_User->login )
 							.'&reqID='.$params['request_id']
 							.$params['blog_param']
 						.'$secret_content_end$'
 						."\n";
+
+	if( empty( $stats_perm ) && ! empty( $iterator_User ) && $iterator_User->check_perm( 'stats', 'view' ) )
+	{
+		$stats_perm = true;
+	}
 }
 
 if( $params['user_count'] > 1 )
@@ -80,6 +85,17 @@ echo T_('Please note:').' '.$message_note;
 echo "\n\n";
 
 echo T_('If you did not request this password reset, simply ignore this email.');
+echo "\n\n";
+
+if( isset( $stats_perm ) && $stats_perm )
+{
+	$session_ID = $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog=0&amp;sess_ID='.$Session->ID;
+}
+else
+{
+	$session_ID = $Session->ID;
+}
+echo sprintf( T_('Session ID').': %s', $session_ID ) . "\n";
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

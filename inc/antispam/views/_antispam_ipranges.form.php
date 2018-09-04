@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -47,7 +47,7 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New IP Range') : T_('IP Range') )
 
 	$Form->info( T_('Block count'), (int)$edited_IPRange->get( 'block_count' ) );
 
-$Form->end_form( array( array( 'submit', 'save', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'save', ( $creating ? /* TRANS: Verb */ T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
 
 if( $edited_IPRange->ID > 0 )
 {	// Display Users registered through this IP Range:

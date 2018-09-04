@@ -38,7 +38,7 @@ set_param( 'customizer_mode', 'enable' );
 
 param( 'customizing_url', 'url', NULL, true );
 param( 'blog', 'integer', true, true );
-param( 'view', 'string', true, true );
+param( 'view', 'string', '', true );
 
 // Getting current blog info:
 $BlogCache = & get_BlogCache();
@@ -53,6 +53,27 @@ if( empty( $Blog ) )
 	siteskin_include( '_404_blog_not_found.main.php' ); // error
 	exit(0);
 	// EXIT.
+}
+
+// Try to get a collection access type in order to know if it has been changed temporarily for fix:
+$coll_access_type = $Blog->get( 'access_type' );
+if( isset( $Blog->orig_access_type, $Blog->orig_siteurl ) )
+{	// Fix frame origin blocking when collection used another domain than base site URL:
+	$forced_coll_url = $Blog->gen_blogurl();
+	$orig_coll_url = $Blog->gen_blogurl( 'original' );
+
+	// Use forced collection URL with same domain in order to avoid restriction of frame origin:
+	$customizing_url = url_add_param( $forced_coll_url, preg_replace( '#^'.preg_quote( $orig_coll_url ).'[/\?]?#', '', $customizing_url ) );
+}
+
+if( empty( $view ) )
+{	// If view is not defined try to get it from user settings per collection or set default:
+	$view = $UserSettings->get( 'customizer_view_'.$blog );
+	if( empty( $view ) )
+	{	// Display collection skin settings by default:
+		$view = 'coll_skin';
+	}
+	memorize_param( 'view', 'string', '', $view );
 }
 
 // Allow to enable widgets designer mode only when user opens sub menu "Widgets" from the left panel of customer mode:
@@ -104,6 +125,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		</div>
 		<div class="evo_customizer__right">
 			<iframe id="evo_customizer__frontoffice" src="<?php echo url_add_param( $customizing_url, 'customizer_mode=enable&amp;show_toolbar=hidden&amp;redir=no' ); ?>" data-coll-url="<?php echo format_to_output( $Blog->get( 'url' ), 'htmlattr' ); ?>"></iframe>
+			<div id="evo_customizer__frontoffice_loader"></div>
 		</div>
 		<iframe id="evo_customizer__updater" name="evo_customizer__updater" style="display:none"></iframe>
 		<div id="evo_customizer__vtoggler" class="evo_customizer__vtoggler"></div>

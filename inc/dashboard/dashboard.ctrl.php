@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -64,6 +64,9 @@ init_field_editor_js( array(
 		'field_prefix' => 'order-section-',
 		'action_url' => $admin_url.'?ctrl=dashboard&order_action=update_section&order_data=',
 	) );
+
+// Init JS to autcomplete the user logins
+init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -149,10 +149,6 @@ class FileRoot
 				if( ! $Settings->get( 'fm_enable_roots_skins' ) )
 				{ // Skins root is disabled:
 					$Debuglog->add( 'Attempt to access skins dir, but this feature is globally disabled', 'files' );
-				}
-				elseif( empty( $current_User ) || ( ! $current_User->check_perm( 'skins_root', 'view' ) ) )
-				{ // No perm to access templates:
-					$Debuglog->add( 'Attempt to access skins dir, but no permission', 'files' );
 				}
 				else
 				{

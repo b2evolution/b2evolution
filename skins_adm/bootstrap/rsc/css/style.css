@@ -3,7 +3,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -46,6 +46,12 @@ td.shrinkwrap {
   padding: 0;
   margin: 0;
 }
+div.radio.radio-input label input[type=radio] {
+  margin-top: 10px;
+}
+div.radio.radio-input label input[type=text].form_text_input {
+  vertical-align: middle;
+}
 div.status_icon {
   display: inline-block;
   padding: 2px 5px 0 0;
@@ -55,6 +61,9 @@ div.status_icon {
 .no_icon {
   font-weight: bold;
   margin: 2px;
+}
+span.action_icon {
+  cursor: pointer;
 }
 .btn-group .action_icon {
   margin-left: 0;
@@ -87,11 +96,11 @@ div.avatartag.main .avatar_actions {
   margin-right: 25px;
 }
 .avatar_main_frame > a:first-child {
-  margin-right: 25px;
+  margin-right: 0;
 }
 .avatar_main_frame .avatar_actions {
   text-align: center;
-  padding: 0 25px 0 0;
+  padding: 0 25px;
   float: none;
   display: table-cell;
   vertical-align: middle;
@@ -160,24 +169,9 @@ h2 .glyphicon {
   margin-top: 14px;
   display: inline-block;
 }
-.compose_layout {
-  margin-bottom: 15px;
-}
-.compose_layout td.label {
-  font-size: 100%;
-  padding-right: 10px;
-  color: #333;
-}
-.compose_layout #post_locale {
-  width: 180px !important;
-}
-.compose_layout td {
+.edit_actions_visibility {
   white-space: nowrap;
-  vertical-align: middle;
-}
-#itemform_custom_fields .compose_layout,
-#itemform_adv_props .compose_layout {
-  margin-bottom: 0;
+  margin-right: 5px;
 }
 div.log_container {
   margin: 0;
@@ -198,6 +192,12 @@ div.delete_messages ul {
 }
 div.delete_messages ul li {
   list-style: inherit;
+}
+.evo_panel {
+  margin-bottom: 20px;
+}
+.evo_panel__footer {
+  padding: 10px 15px;
 }
 /*
  * Browse pages of items and comments ( ?ctrl=items and ?ctrl=comments - full views )
@@ -280,6 +280,12 @@ div.delete_messages ul li {
   text-align: center;
   padding: 10px;
   color: #5bc0de;
+}
+.evo_content_summary .evo_post .bTitle {
+  font-weight: bold;
+}
+.evo_content_summary .evo_post .bText {
+  padding-left: 420px;
 }
 #comment_filter_form fieldset {
   margin-bottom: 20px;
@@ -615,6 +621,14 @@ fieldset ul {
   color: #000;
   font-weight: normal;
 }
+.user_admin_tags {
+  width: 500px;
+  max-width: 100%;
+}
+.user_admin_tags ul.token-input-list-facebook {
+  width: 100%;
+  max-width: 100%;
+}
 #item_locations label {
   width: auto;
   float: right;
@@ -687,6 +701,19 @@ fieldset ul {
 }
 #itemform_goals td {
   padding-bottom: 2px;
+}
+.custom_fields_edit_table .results {
+  overflow: initial;
+}
+.custom_fields_edit_table .table_scroll {
+  margin-bottom: 20px;
+}
+.custom_fields_edit_table .form-control {
+  width: auto;
+}
+.custom_fields_edit_table .form-control.custom_field_label {
+  width: 100%;
+  min-width: 200px;
 }
 #attachments_fieldset_wrapper {
   width: 100%;
@@ -954,6 +981,38 @@ h2.user_title::first-line {
 #itemform_edit_workflow .form-group .controls {
   display: inline-block;
 }
+#itemform_extra td.flabel_item_owner_login {
+  vertical-align: top;
+  padding-top: 6px;
+}
+#itemform_extra #ffield_item_owner_login .help-inline {
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: 10px;
+}
+#itemform_extra #ffield_item_owner_login #item_owner_login {
+  vertical-align: middle !important;
+}
+#itemform_extra label.ffield_item_create_user {
+  padding: 0;
+  font-weight: normal;
+}
+#itemform_extra .itemform_extra_radio {
+  padding-top: 10px;
+}
+#itemform_extra .itemform_extra_radio > label {
+  padding: 0;
+  margin: 0;
+}
+#itemform_extra .itemform_extra_radio input[type=radio][name=item_dateset][value="1"] {
+  margin-top: 11px;
+}
+#itemform_extra .itemform_extra_radio .form-group {
+  vertical-align: middle;
+}
+#itemform_extra .itemform_extra_radio .form-group input {
+  margin-left: 0;
+}
 span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
   background-image: url("../../../../rsc/img/ajax-loader/fff.gif");
@@ -1046,12 +1105,24 @@ div.available_widgets .available_widgets_toolbar {
   background: #FFF;
   padding: 10px 15px;
 }
-div.available_widgets .widget_list {
+div.available_widgets #available_widgets_inner {
+  top: 87px;
+}
+.widget_list {
   list-style: none;
   margin: 0;
 }
-div.available_widgets #available_widgets_inner {
-  top: 87px;
+.widget_list li {
+  text-indent: -25px;
+  padding-left: 25px;
+}
+.widget_list li a {
+  text-indent: initial;
+}
+.evo_widget_icon {
+  display: inline-block;
+  min-width: 22px;
+  padding: .2em;
 }
 table.coll_kind {
   max-width: 960px;
@@ -1095,6 +1166,9 @@ div.coll-selector {
 }
 div.coll-selector .btn-group {
   margin-right: 4px;
+}
+div.coll-selector .btn-group .dropdown-toggle .caret {
+  margin-left: 6px;
 }
 div.level2 {
   padding-top: 17px;
@@ -1443,9 +1517,6 @@ table.diff td.diff-title-addedline {
 .timestamp .time {
   font-size: 84%;
 }
-.compact_data {
-  white-space: nowrap;
-}
 #skin_wrapper .email_wrap .email_payload > p:first-child {
   margin-top: 10px;
 }
@@ -1637,6 +1708,16 @@ table.diff td.diff-title-addedline {
 .jeditable_cell input {
   max-width: 100%;
 }
+div.query-builder .rule-container .rule-value-container {
+  border: none;
+  padding-left: 0;
+}
+.ui-effects-transfer {
+  border: 1px solid #F00;
+}
+#customizer_wrapper {
+  padding-top: 140px;
+}
 #customizer_wrapper .page-content {
   margin: 0;
   padding: 0;
@@ -1645,6 +1726,7 @@ table.diff td.diff-title-addedline {
   margin-bottom: 0;
 }
 #customizer_wrapper form > .panel-group > .panel,
+#customizer_wrapper form > fieldset > .panel-group > .panel,
 #customizer_wrapper form > div.fieldset_wrapper > fieldset > .panel {
   border-top: none;
   border-left: none;
@@ -1654,10 +1736,12 @@ table.diff td.diff-title-addedline {
   box-shadow: none;
 }
 #customizer_wrapper form > .panel-group > .panel > .panel-heading,
+#customizer_wrapper form > fieldset > .panel-group > .panel > .panel-heading,
 #customizer_wrapper form > div.fieldset_wrapper > fieldset > .panel > .panel-heading {
   border-radius: 0;
 }
 #customizer_wrapper form > .panel-group > .panel > .panel-body .form-group:last-child,
+#customizer_wrapper form > fieldset > .panel-group > .panel > .panel-body .form-group:last-child,
 #customizer_wrapper form > div.fieldset_wrapper > fieldset > .panel > .panel-body .form-group:last-child {
   margin-bottom: 0;
 }
@@ -1670,13 +1754,10 @@ table.diff td.diff-title-addedline {
 #customizer_wrapper .row .col-md-12 {
   padding: 0;
 }
-#customizer_wrapper .evo_customizer__tabs + .evo_customizer__content {
-  margin-top: 140px;
-}
 #customizer_wrapper .evo_customizer__available_widgets {
   padding: 15px;
 }
-#customizer_wrapper .evo_customizer__available_widgets ul {
+#customizer_wrapper .evo_customizer__available_widgets ul.widget_list {
   list-style: none;
   margin: 0 0 0 2px;
 }
@@ -1686,6 +1767,50 @@ table.diff td.diff-title-addedline {
 #customizer_wrapper .evo_customizer__other_lists {
   margin: 0 0 10px 31px;
   padding-top: 10px;
+}
+#customizer_wrapper #fieldset_wrapper_widget_info .control-label {
+  display: none;
+}
+#customizer_wrapper .controls .help-inline {
+  display: inline-block;
+}
+#customizer_wrapper .file_select_item {
+  margin: 0;
+}
+#customizer_wrapper .file_select_item .item_actions {
+  margin: 0;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+#customizer_wrapper .file_select_item .item_actions .btn {
+  margin-right: 3px;
+}
+#customizer_wrapper .file_select_item .item_actions .btn:last-child {
+  margin-right: 0;
+}
+#customizer_wrapper #current_widgets .panel {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  margin-bottom: 0;
+}
+#customizer_wrapper #current_widgets h4 + .panel,
+#customizer_wrapper #current_widgets .panel:first-child {
+  border-top: 1px solid #ddd;
+}
+#customizer_wrapper #current_widgets > p {
+  margin: 10px 5px;
+}
+#customizer_wrapper #current_widgets .panel_heading_action_icons a.action_icon span.fa {
+  margin: 0;
+}
+#customizer_wrapper #current_widgets .panel-group {
+  margin: 0;
+}
+#customizer_wrapper #current_widgets .panel-group > h4 {
+  margin: 10px;
 }
 .evo_customizer__tabs {
   position: fixed;
@@ -1723,9 +1848,6 @@ table.diff td.diff-title-addedline {
   top: 13px;
   right: 12px;
 }
-.evo_customizer__tabs .evo_customizer__tab_buttons .btn {
-  margin-right: 3px;
-}
 .evo_customizer__tabs .evo_customizer__tab_buttons .fa-backward {
   top: 1px;
   right: 1px;
@@ -1744,4 +1866,15 @@ table.diff td.diff-title-addedline {
 .evo_customizer__buttons .control-buttons {
   margin: 0;
   padding: 0;
+}
+.evo_customizer__buttons.evo_customizer__buttons_widget_actions {
+  padding: 10px;
+}
+.evo_customizer__buttons.evo_customizer__buttons_widget_actions .btn-group {
+  margin: 0;
+}
+.evo_customizer__content form .panel-heading .panel-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

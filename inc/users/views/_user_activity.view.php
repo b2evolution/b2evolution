@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -47,7 +47,7 @@ echo '<div class="row">';
 if( !$user_profile_only )
 { // echo user edit action icons
 	$Widget = new Widget();
-	echo_user_actions( $Widget, $edited_User, 'edit' );
+	echo_user_actions( $Widget, $edited_User, $action );
 	echo '<span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">'.$Widget->gen_global_icons().'</span>';
 }
 
@@ -59,44 +59,65 @@ echo '<div style="margin-top:25px;font-weight:bold;"><span>'.T_( 'User created f
 
 /**** Reports from edited user  ****/
 user_reports_results_block( array(
-		'edited_User'       => $edited_User,
+		'edited_User' => $edited_User,
 	) );
 evo_flush();
 
 /**** Blogs owned by the user ****/
 blogs_user_results_block( array(
-		'edited_User'       => $edited_User,
+		'edited_User' => $edited_User,
+		'action'      => $action,
 	) );
 evo_flush();
 
 /**** Posts created by the user  ****/
 items_created_results_block( array(
-		'edited_User'       => $edited_User,
+		'edited_User' => $edited_User,
+		'action'      => $action,
 	) );
 evo_flush();
 
 /**** Posts edited by the user ****/
 items_edited_results_block( array(
-		'edited_User'       => $edited_User,
+		'edited_User' => $edited_User,
+		'action'      => $action,
 	) );
 evo_flush();
 
 /**** Comments posted by the user ****/
 comments_results_block( array(
-		'edited_User'       => $edited_User,
+		'edited_User' => $edited_User,
+		'action'      => $action,
 	) );
 evo_flush();
 
 /**** Private messages sent by the user ****/
 threads_results_block( array(
-		'edited_User'       => $edited_User,
+		'edited_User' => $edited_User,
+		'action'      => $action,
+	) );
+evo_flush();
+
+/**** Polls owned by the user ****/
+polls_results_block( array(
+		'edited_User'          => $edited_User,
+		'action'               => $action,
+		'results_title'        => T_('Polls owned by the user'),
+		'manual_link'          => '',
+		'display_filters'      => false,
+		'display_owner'        => false,
+		'display_btn_add'      => false,
+		'display_btn_user_del' => true,
 	) );
 evo_flush();
 
 
-if( $current_User->ID != $edited_User->ID && $edited_User->ID != 1 && $current_User->check_perm( 'users', 'edit' ) )
+if( $action != 'view' && $current_User->ID != $edited_User->ID && $edited_User->ID != 1 && $current_User->check_perm( 'users', 'edit' ) )
 { // User can NOT delete admin and own account
-	echo '<div style="margin:25px 0">'.action_icon( T_('Delete User and All his contributions'), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_userdata&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete User and All his contributions'), 3, 4, array( 'class' => 'btn btn-danger' ) ).'</div>';
+	echo '<div style="margin:25px 0">';
+	echo action_icon( T_('Delete User and All his contributions'), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_userdata&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete User and All his contributions'), 3, 4, array( 'class' => 'btn btn-danger' ) );
+	echo action_icon( T_('Delete User and All his contributions').' + '.T_('Mark as email Spammer'), 'delete', '?ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete User and All his contributions').' + '.T_('Mark as email Spammer'), 3, 4, array( 'class' => 'btn btn-danger', 'style' => 'margin-left: 1ex;' ) );
+	echo '</div>';
 }
 
 ?>

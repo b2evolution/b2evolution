@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -24,6 +24,7 @@ echo '<ul>';
 echo '<li><a href="'.regenerate_url('action', 'action=find_spam_comments&amp;'.url_crumb('antispam')).'">'.T_('Find and delete comments matching antispam blacklist!').'</a></li>';
 echo '<li><a href="'.regenerate_url('action', 'action=find_spam_referers&amp;'.url_crumb('antispam')).'">'.T_('Find and delete all banned hit-log entries!').'</a></li>';
 echo '<li><a href="'.regenerate_url('action,tool', 'tool=bankruptcy').'">'.T_('Declare comment spam bankruptcy...').'</a></li>';
+echo '<li><a href="'.regenerate_url('action,tool', 'tool=whois').'">'.T_('Check domain registration (WHOIS)...').'</a></li>';
 echo '</ul>';
 $block_item_Widget->disp_template_raw( 'block_end' );
 

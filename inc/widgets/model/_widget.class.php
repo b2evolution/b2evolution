@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -279,7 +279,7 @@ class ComponentWidget extends DataObject
 			return '';
 		}
 
-		return '<span class="fa fa-'.$this->icon.'"></span>';
+		return '<span class="label label-info evo_widget_icon"><span class="fa fa-'.$this->icon.'"></span></span>';
 	}
 
 
@@ -294,14 +294,21 @@ class ComponentWidget extends DataObject
 		if( $this->type == 'plugin' )
 		{	// Plugin widget:
 			$widget_Plugin = & $this->get_Plugin();
-			$icon = '<span class="fa fa-'.$widget_Plugin->widget_icon.'"></span>';
 
-			if( isset( $this->disp_params['title'] ) && ! empty( $this->disp_params['title'] ) )
+			if( $widget_Plugin )
 			{
-				return $icon.' <strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
-			}
+				if( isset( $this->disp_params['title'] ) && ! empty( $this->disp_params['title'] ) )
+				{
+					return $widget_Plugin->get_widget_icon().' <strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
+				}
 
-			return $icon.' <strong>'.$name.'</strong> ('.T_('Plugin').')';
+				return $widget_Plugin->get_widget_icon().' <strong>'.$name.'</strong> ('.T_('Plugin').')';
+			}
+			else
+			{
+				$icon = '<span class="label label-info evo_widget_icon"><span class="fa fa-warning"></span></span>';
+				return $icon.' <strong>'.$name.'</strong> ('.T_('Plugin').')';
+			}
 		}
 
 		// Normal widget:
@@ -378,8 +385,8 @@ class ComponentWidget extends DataObject
 
 		if( $use_tooltip )
 		{ // Add these data only for tooltip
-			$link_attrs['class']  = 'action_icon help_plugin_icon';
-			$link_attrs['rel']    = format_to_output( $this->get_desc(), 'htmlattr' );
+			$link_attrs['class'] = 'action_icon help_plugin_icon';
+			$link_attrs['data-popover'] = format_to_output( $this->get_desc(), 'htmlattr' );
 		}
 
 		return action_icon( '', $icon, $widget_url, NULL, NULL, NULL, $link_attrs );
@@ -406,8 +413,33 @@ class ComponentWidget extends DataObject
 			}
 		}
 
+		if( ! isset( $r['widget_css_class'] ) ||
+		    ! isset( $r['widget_ID'] ) ||
+		    ! isset( $r['allow_blockcache'] ) )
+		{	// Start fieldset of advanced settings:
+			$r['advanced_layout_start'] = array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Advanced'),
+				);
+			$advanced_layout_is_started = true;
+		}
+
+		if( get_parent_class( $this ) == 'generic_menu_link_Widget' )
+		{	// Widget link/button CSS classes for menu link widgets:
+			$r['widget_link_class'] = array(
+					'label' => '<span class="dimmed">'.T_('Link/Button Class').'</span>',
+					'size' => 20,
+					'note' => T_('Replaces $link_class$ in class attribute of link/button.'),
+				);
+			$r['widget_active_link_class'] = array(
+					'label' => '<span class="dimmed">'.T_('Active Link/Button Class').'</span>',
+					'size' => 20,
+					'note' => T_('Replaces $link_class$ in class attribute of active link/button.'),
+				);
+		}
+
 		if( ! isset( $r['widget_css_class'] ) )
-		{
+		{	// Widget CSS class:
 			$r['widget_css_class'] = array(
 					'label' => '<span class="dimmed">'.T_( 'CSS Class' ).'</span>',
 					'size' => 20,
@@ -416,7 +448,7 @@ class ComponentWidget extends DataObject
 		}
 
 		if( ! isset( $r['widget_ID'] ) )
-		{
+		{	// Widget ID:
 			$r['widget_ID'] = array(
 					'label' => '<span class="dimmed">'.T_( 'DOM ID' ).'</span>',
 					'size' => 20,
@@ -425,7 +457,7 @@ class ComponentWidget extends DataObject
 		}
 
 		if( ! isset( $r['allow_blockcache'] ) )
-		{
+		{	// Allow widget/block caching:
 			$widget_Blog = & $this->get_Blog();
 			$r['allow_blockcache'] = array(
 					'label' => T_( 'Allow caching' ),
@@ -435,6 +467,14 @@ class ComponentWidget extends DataObject
 					'type' => 'checkbox',
 					'defaultvalue' => true,
 				);
+		}
+
+		if( ! empty( $advanced_layout_is_started ) )
+		{	// End fieldset of advanced settings:
+			$r['advanced_layout_end'] = array(
+					'layout' => 'end_fieldset',
+				);
+			$advanced_layout_is_started = false;
 		}
 
 		return $r;
@@ -533,7 +573,7 @@ class ComponentWidget extends DataObject
 	{
 		$params = $this->get_param_definitions( NULL );
 
-		if( isset( $params[$parname] ) || 
+		if( isset( $params[$parname] ) ||
 		    ( $group !== NULL && isset( $params[ $group ]['inputs'][ substr( $parname, strlen( $group ) ) ] ) ) )
 		{ // This is a widget specific param:
 			// Make sure param_array is loaded before set the param value
@@ -1484,12 +1524,28 @@ class ComponentWidget extends DataObject
 				$message = 'Widget "'.$this->get_name().'" is hidden because there is nothing to display.';
 			}
 
-			echo $this->disp_params['block_start'];
-			$this->disp_title();
-			echo $this->disp_params['block_body_start'];
-			echo $message;
-			echo $this->disp_params['block_body_end'];
-			echo $this->disp_params['block_end'];
+			if( preg_match( '#class="[^"]*evo_widget[^"]*"#i', $this->disp_params['block_start'].$this->disp_params['block_body_start'] ) )
+			{	// If standard widget wrappers have special style class "evo_widget" we can use it:
+				echo $this->disp_params['block_start'];
+				$this->disp_title();
+				echo $this->disp_params['block_body_start'];
+				echo $message;
+				echo $this->disp_params['block_body_end'];
+				echo $this->disp_params['block_end'];
+			}
+			else
+			{	// Otherwise we should use more wrappers to design widgets correctly, e-g for Menu container:
+				echo $this->disp_params['block_start'];
+				$this->disp_title();
+				echo $this->disp_params['block_body_start'];
+				echo $this->get_layout_start();
+				echo $this->get_layout_item_start();
+				echo '<a href="#">(...)</a>';
+				echo $this->get_layout_item_end();
+				echo $this->get_layout_end();
+				echo $this->disp_params['block_body_end'];
+				echo $this->disp_params['block_end'];
+			}
 		}
 	}
 }

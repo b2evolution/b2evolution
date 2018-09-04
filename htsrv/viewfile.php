@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -110,7 +110,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<title><?php echo $selected_File->dget('name').' ('.T_('Preview').')'; ?></title>
+	<title><?php echo $selected_File->dget('name').' ('./* TRANS: Noun */ T_('Preview').')'; ?></title>
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 <?php if( isset( $JS_additional ) ) { ?>
 	<script type="text/javascript"><?php echo $JS_additional; ?></script>

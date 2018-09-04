@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -25,9 +25,12 @@ param( 'user_ID', 'integer', NULL );	// Note: should NOT be memorized (would kil
 
 param_action( 'list' );
 
-$tab = param( 'tab', 'string', '' );
+param( 'display_mode', 'string', 'normal' );
 
-$AdminUI->set_path( 'users', $tab == 'stats' ? 'stats' : 'users' );
+$tab = param( 'tab', 'string', '' );
+$tab3 = param( 'tab3', 'string', '', true );
+
+$AdminUI->set_path( 'users', $tab == 'stats' ? 'stats' : 'users', $tab3 == 'duplicates' ? 'duplicates' : 'list' );
 
 if( !$current_User->check_perm( 'users', 'view' ) )
 { // User has no permissions to view: he can only edit his profile
@@ -79,9 +82,9 @@ if( ! is_null($user_ID) )
 		    && $edited_User->ID != $current_User->ID )
 		{ // user is only allowed to _view_ other user's profiles
 			$Messages->add( T_('You have no permission to edit other users!'), 'error' );
-			header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&amp;action=view&amp;user_ID='.$user_ID ) );
+			header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&action=view&user_ID='.$user_ID, '', '&' ) );
 		}
-		elseif( $demo_mode && $edited_User->ID <= 3 )
+		elseif( $demo_mode && ( $edited_User->ID <= 7 ) )
 		{ // Demo mode restrictions: users created by install process cannot be edited
 			$Messages->add( T_('You cannot edit the admin and demo users profile in demo mode!'), 'error' );
 
@@ -91,7 +94,7 @@ if( ! is_null($user_ID) )
 			}
 			else
 			{
-				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&amp;action=view&amp;user_ID='.$user_ID ) );
+				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=user&action=view&user_ID='.$user_ID, '', '&' ) );
 			}
 		}
 	}
@@ -372,12 +375,177 @@ if( !$Messages->has_errors() )
 			/* EXITED */
 			break;
 
-		case 'newsletter':
-			// This is a redirect from email campaign controller to select the recipients:
+		case 'campaign':
+			// Select the recipients for email campaign:
 
 			$current_User->check_perm( 'emails', 'edit', true );
 
+			// Memorize action param to keep newsletter mode on change filters:
+			memorize_param( 'action', 'string', true, $action );
+
 			$Messages->add( T_('Please select new recipients for this email campaign.'), 'success' );
+
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+			if( ! ( $edited_EmailCampaign = & get_session_EmailCampaign() ) )
+			{	// Initialize Email Campaign once and store in Session:
+
+				// ID of Email Campaign is required and should be memorized:
+				param( 'ecmp_ID', 'integer', true );
+
+				// Get Email Campaign by ID:
+				$EmailCampaignCache = & get_EmailCampaignCache();
+				$edited_EmailCampaign = & $EmailCampaignCache->get_by_ID( $ecmp_ID );
+
+				// Save Email Campaign ID in Session:
+				$Session->set( 'edited_campaign_ID', $edited_EmailCampaign->ID );
+			}
+
+			// Set users filter "Subscribed to":
+			set_param( 'newsletter', $edited_EmailCampaign->get( 'enlt_ID' ) );
+			set_param( 'filter', 'new' );
+			break;
+
+		case 'add_automation':
+			// Add selected users to automation:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'options', 'view', true );
+
+			param( 'autm_ID', 'integer', true );
+			param( 'enlt_ID', 'integer', true );
+
+			$AutomationCache = & get_AutomationCache();
+			$Automation = & $AutomationCache->get_by_ID( $autm_ID );
+
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+			$added_users_num = $Automation->add_users( get_filterset_user_IDs(), array(
+					'users_no_subs'   => param( 'users_no_subs', 'string', 'ignore' ),
+					'users_automated' => param( 'users_automated', 'string', 'ignore' ),
+					'users_new'       => param( 'users_new', 'string', 'ignore' ),
+					'newsletter_IDs'  => $enlt_ID,
+				) );
+
+			$Messages->add( sprintf( T_('%d users have been added or requeued for automation "%s"'), $added_users_num, $Automation->get( 'name' ) ), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=users&autm_ID='.$Automation->ID, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
+
+		case 'update_tags':
+			// Add/Remove tag to /from selected users:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'users', 'edit', true );
+
+			param( 'add_user_tags', 'string', '' );
+			param( 'remove_user_tags', 'string', '' );
+
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+			$UserCache = & get_UserCache();
+			$UserCache->clear();
+			$UserCache->load_list( get_filterset_user_IDs() );
+
+			$updated_users_num = 0;
+			foreach( $UserCache->cache as $filtered_User )
+			{	// Update tags of each filtered User:
+				$filtered_User->add_usertags( $add_user_tags );
+				$filtered_User->remove_usertags( $remove_user_tags );
+				if( $filtered_User->dbupdate() )
+				{
+					$updated_users_num++;
+				}
+			}
+
+			$Messages->add( sprintf( T_('Tags of %d users have been updated'), $updated_users_num ), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=users', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
+
+		case 'merge':
+			// Select user for merging and Merge:
+			$merging_user_ID = param( 'merging_user_ID', 'integer', true, true );
+			$selected_user_ID = param( 'selected_user_ID', 'integer' );
+
+			if( $merging_user_ID == 1 )
+			{	// User #1 cannot be deleted so we should not allow to merge it as well:
+				// Don't translate because this must not occurs:
+				debug_die( 'You can\'t merge User #1!' );
+			}
+
+			// Check edit permissions:
+			$current_User->can_moderate_user( $merging_user_ID, true );
+
+			if( empty( $selected_user_ID ) )
+			{	// Inform to select a remaining account if it is not selected yet:
+				$Messages->add( sprintf( T_('User data from account %s will be merged to the account you select below. Check a radio button and click the orange button at the bottom.'), get_user_identity_link( '', $merging_user_ID ) ), 'warning' );
+			}
+			else
+			{	// Check edit permissions for remaining user as well:
+				$current_User->can_moderate_user( $selected_user_ID, true );
+			}
+
+			// The merging process is executed in the template below by function display_users_merging_process().
+			break;
+
+		case 'delete_spammers':
+			// Delete selected users as spammers:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'users', 'edit', true );
+
+			$users = explode( ',', param( 'users', 'string' ) );
+
+			// Set this param in order to delete the users as spammer:
+			set_param( 'deltype', 'spammer' );
+
+			$deleted_spam_logins = array();
+			$not_deleted_spam_logins = array();
+			$UserCache = & get_UserCache();
+			$delspam_Messages = new Messages();
+			foreach( $users as $u => $user_ID )
+			{
+				if( ! ( $deleted_spam_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
+				{	// Skip if user is not found in DB by requested ID:
+					continue;
+				}
+				$deleted_spam_login = $deleted_spam_User->get( 'login' );
+				// Delete user as spammer:
+				if( $deleted_spam_User->dbdelete( $delspam_Messages ) )
+				{	// If user has been deleted:
+					$deleted_spam_logins[] = $deleted_spam_login;
+				}
+				else
+				{	// If user cannot be deleted by some reason:
+					$not_deleted_spam_logins[] = $deleted_spam_User->get_identity_link();
+				}
+			}
+
+			if( count( $deleted_spam_logins ) > 0 )
+			{	// Display a message if at least one spammer have been deleted:
+				$Messages->add( sprintf( T_('Spammers %s have been deleted.'), implode( ', ', $deleted_spam_logins ) ), 'success' );
+			}
+			if( count( $not_deleted_spam_logins ) > 0 )
+			{	// Display a message if at least one spammer have NOT been deleted:
+				$Messages->add( sprintf( T_('Spammers %s could not been deleted.'), implode( ', ', $not_deleted_spam_logins ) ), 'error' );
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=users'.( count( $not_deleted_spam_logins ) > 0 ? '&action=spammers' : '' ), 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 			break;
 	}
 }
@@ -407,23 +575,53 @@ if( $tab == 'stats' )
 }
 else
 {	// Users list
-	$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users' );
-	$AdminUI->top_block = get_user_quick_search_form();
-	if( $current_User->check_perm( 'users', 'moderate', false ) )
-	{	// Include to edit user level
-		require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
-	}
-	load_funcs( 'regional/model/_regional.funcs.php' );
+	init_tokeninput_js();
+	// Load jQuery QueryBuilder plugin files for user list filters:
+	init_querybuilder_js( 'rsc_url' );
 
-	// Set an url for manual page:
-	$AdminUI->set_page_manual_link( 'users-users' );
+	$entries = array(
+		'list' => array(
+			'text' => T_('List'),
+			'href' => '?ctrl=users' ),
+		'duplicates' => array(
+			'text' => T_('Find duplicates'),
+			'href' => '?ctrl=users&amp;tab3=duplicates' ) );
+	$AdminUI->add_menu_entries( array( 'users', 'users' ), $entries );
+
+	switch( $tab3 )
+	{
+		case 'duplicates':
+			$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users&amp;tab3='.$tab3 );
+			break;
+
+		default:
+			// Initialize user tag input
+
+			$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users' );
+			$AdminUI->top_block = get_user_quick_search_form();
+			if( $current_User->check_perm( 'users', 'moderate', false ) )
+			{	// Include to edit user level
+				require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			}
+			load_funcs( 'regional/model/_regional.funcs.php' );
+
+			// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'users-users' );
+	}
+
 }
 
-// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-$AdminUI->disp_html_head();
+// Initialize date picker
+init_datepicker_js();
 
-// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-$AdminUI->disp_body_top();
+if( $display_mode != 'js')
+{
+	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
+
+	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+	$AdminUI->disp_body_top();
+}
 
 /*
  * Display appropriate payload:
@@ -486,12 +684,55 @@ switch( $action )
 
 		$edited_User->confirm_delete( $msg, 'user', $action, get_memorized( 'action' ), $confirm_messages, $delete_form_params );
 
-		// Display user identity form:
-		$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
+		if( $deltype == 'spammer' )
+		{	// Display user activity lists:
+			$user_tab = 'activity';
+			$AdminUI->disp_view( 'users/views/_user_activity.view.php' );
+		}
+		else
+		{	// Display user identity form:
+			$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
+		}
 		$AdminUI->disp_payload_end();
 
 		// Init JS for user reporting
 		echo_user_report_window();
+		break;
+
+	case 'automation':
+		// Display a form to add users selection to automation:
+
+		// Do not append Debuglog & Debug JSlog to response!
+		$debug = false;
+		$debug_jslog = false;
+
+		$AdminUI->disp_payload_begin();
+
+		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+		$AdminUI->disp_view( 'users/views/_user_list_automation.form.php' );
+
+		$AdminUI->disp_payload_end();
+		break;
+
+	case 'edit_tags':
+		// Display a form to add/remove tags to/from users selection:
+
+		// Do not append Debuglog & Debug JSlog to response!
+		$debug = false;
+		$debug_jslog = false;
+
+		$AdminUI->disp_payload_begin();
+
+		$AdminUI->disp_view( 'users/views/_user_list_tags.form.php' );
+
+		$AdminUI->disp_payload_end();
+		break;
+
+	case 'spammers':
+		memorize_param( 'action', 'string', '', $action );
+		$AdminUI->disp_payload_begin();
+		$AdminUI->disp_view( 'users/views/_user_list_spammers.view.php' );
+		$AdminUI->disp_payload_end();
 		break;
 
 	case 'promote':
@@ -505,13 +746,23 @@ switch( $action )
 		}
 		else
 		{
-			$AdminUI->disp_view( 'users/views/_user_list.view.php' );
+			switch( $tab3 )
+			{
+				case 'duplicates':
+					$AdminUI->disp_view( 'users/views/_duplicate_email_user_list.view.php' );
+					break;
+
+				default:
+					$AdminUI->disp_view( 'users/views/_user_list.view.php' );
+			}
+
 		}
 		$AdminUI->disp_payload_end();
 }
 
-
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
-
+if( $display_mode != 'js')
+{
+	// Display body bottom, debug info and close </html>:
+	$AdminUI->disp_global_footer();
+}
 ?>

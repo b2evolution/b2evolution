@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -82,7 +82,7 @@ $Form->begin_fieldset( T_('Cross posting').get_manual_link('collections-cross-po
 	$Form->checklist( array(
 		array( 'cross_posting', 1, T_('Allow admins to cross-post to several collections'), $Settings->get('cross_posting'), false, T_('(Extra cats in different blogs)').get_admin_badge() ),
 		array( 'cross_posting_blogs', 1, T_('Allow admins to move posts between collections'), $Settings->get('cross_posting_blogs'), false, T_('(Main cat can move to different blog)').get_admin_badge() ) ),
-		'allow_cross_posting', T_('Cross Posting') );
+		'allow_cross_posting', T_('Cross posting') );
 
 	$Form->checkbox_input( 'redirect_moved_posts', $Settings->get('redirect_moved_posts'), T_('Redirect if post has moved'), array( 'note'=>T_('check to allow redirects to the correct blog when a post was found in a different blog.') ) );
 $Form->end_fieldset();
@@ -102,10 +102,10 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Default skins').get_manual_link('collections-default-skins') );
+$Form->begin_fieldset( T_('Default Skins for New Collections').get_manual_link( 'collections-default-skins' ) );
 	$normal_skins = array();
-	$mobile_skins = array( 0 => T_('Same as normal skin') );
-	$tablet_skins = array( 0 => T_('Same as normal skin') );
+	$mobile_skins = array( 0 => T_('Same as standard skin') );
+	$tablet_skins = array( 0 => T_('Same as standard skin') );
 
 	$SkinCache = & get_SkinCache();
 	$SkinCache->load_all();
@@ -114,14 +114,17 @@ $Form->begin_fieldset( T_('Default skins').get_manual_link('collections-default-
 	{
 		switch( $iterator_Skin->get( 'type' ) )
 		{
+			case 'rwd':
 			case 'normal':
 				$normal_skins[ $iterator_Skin->ID ] = $iterator_Skin->get( 'name' );
 				break;
 
+			case 'rwd':
 			case 'mobile':
 				$mobile_skins[ $iterator_Skin->ID ] = $iterator_Skin->get( 'name' );
 				break;
 
+			case 'rwd':
 			case 'tablet':
 				$tablet_skins[ $iterator_Skin->ID ] = $iterator_Skin->get( 'name' );
 				break;
@@ -130,16 +133,42 @@ $Form->begin_fieldset( T_('Default skins').get_manual_link('collections-default-
 		}
 	}
 	$field_params = array( 'force_keys_as_values' => true );
-	$Form->select_input_array( 'def_normal_skin_ID', $Settings->get( 'def_normal_skin_ID' ), $normal_skins, T_('Default normal skin'), NULL, $field_params );
+	$Form->select_input_array( 'def_normal_skin_ID', $Settings->get( 'def_normal_skin_ID' ), $normal_skins, T_('Default standard skin'), NULL, $field_params );
 	$Form->select_input_array( 'def_mobile_skin_ID', $Settings->get( 'def_mobile_skin_ID' ), $mobile_skins, T_('Default mobile phone skin'), NULL, $field_params );
 	$Form->select_input_array( 'def_tablet_skin_ID', $Settings->get( 'def_tablet_skin_ID' ), $tablet_skins, T_('Default tablet skin'), NULL, $field_params );
 $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Comment recycle bin').get_manual_link('recycle-bin-settings') );
+$Form->begin_fieldset( T_('Default URL for New Collections').get_manual_link( 'default-url-for-new -collections' ) );
 
-	$Form->text_input( 'auto_empty_trash', $Settings->get('auto_empty_trash'), 5, T_('Prune recycled comments after'), T_('days').'.' );
+	global $baseurl, $basehost, $baseprotocol, $baseport;
+	$access_type_options = array(
+		array( 'index.php', T_('Explicit param on index.php'),
+				'<code>'.$baseurl.'index.php?blog=1</code>',
+			),
+		array( 'extrabase', T_('Extra path on baseurl'),
+				'<code>'.$baseurl.'<span class="blog_url_text">urlname</span>/</code> ('.T_('Requires mod_rewrite').')',
+			),
+		array( 'extrapath', T_('Extra path on index.php'),
+				'<code>'.$baseurl.'index.php/<span class="blog_url_text">urlname</span>/</code>',
+			),
+	);
+	if( ! is_valid_ip_format( $basehost ) )
+	{	// Not an IP address, we can use subdomains:
+		$access_type_options[] = array( 'subdom', T_('Subdomain of basehost'),
+				'<code>'.$baseprotocol.'://<span class="blog_url_text">urlname</span>.'.$basehost.$baseport.'/</code>',
+			);
+	}
+	else
+	{	// Don't allow subdomain for IP address:
+		$access_type_options[] = array( 'subdom', T_('Subdomain').':',
+				sprintf( T_('(Not possible for %s)'), $basehost ),
+				'',
+				'disabled="disabled"'
+			);
+	}
+	$Form->radio( 'coll_access_type', $Settings->get( 'coll_access_type' ), $access_type_options, T_('Collection base URL'), true );
 
 $Form->end_fieldset();
 

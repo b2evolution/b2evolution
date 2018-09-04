@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
@@ -20,6 +20,8 @@ echo '<div class="panel-heading">'
 		.'</div>';
 
 echo '<div class="panel-body">';
+
+echo '<p>'.T_('A collection is basically a box collecting items (articles, photos, products...) that go together. A collection may be a whole website in itself. It can also be just a section of a larger site.').'</p>';
 
 echo '<p>'.T_('Your selection here will pre-configure your collection in order to optimize it for a particular use. Nothing is final though. You can change all the settings at any time and any kind of collection can be transformed into any other at any time.').'</p>';
 

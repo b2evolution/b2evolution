@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -50,9 +50,6 @@ if( check_comment_mass_delete( $CommentList ) )
 	$block_item_Widget->global_icon( T_('Delete all comments!'), 'recycle', regenerate_url( 'action', 'action=mass_delete' ), T_('Mass delete...'), 3, 3 );
 }
 
-$emptytrash_link = '';
-// Display recycle bin placeholder, because users may have rights to recycle particular comments
-$opentrash_link = '<span id="recycle_bin" class="pull-right"></span>';
 if( $tab3 != 'meta' && $current_User->check_perm( 'blogs', 'editall' ) )
 {
 	if( $CommentList->is_trashfilter() )
@@ -70,7 +67,7 @@ if( $tab3 != 'meta' && $current_User->check_perm( 'blogs', 'editall' ) )
 			) );
 	}
 }
-$block_item_Widget->title = $opentrash_link.$emptytrash_link.( $tab3 == 'meta' ? T_('Meta comments') : T_('Feedback (Comments, Trackbacks...)') );
+$block_item_Widget->title = ( $tab3 == 'meta' ? T_('Meta comments') : T_('Feedback (Comments, Trackbacks...)') );
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Display filters title

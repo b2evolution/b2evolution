@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_manual
@@ -92,12 +92,16 @@ $params = array_merge( array(
 				'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 			) );
 	}
-	$Item->title( array(
-			'link_type'  => $params['item_link_type'],
-			'before'     => '<div class="evo_post_title"><h1>',
-			'after'      => '</h1>'.$action_links.'</div>',
-			'nav_target' => false,
-		) );
+
+	if( ! in_array( $disp, array( 'single', 'page' ) ) )
+	{
+		$Item->title( array(
+				'link_type'  => $params['item_link_type'],
+				'before'     => '<div class="evo_post_title"><h1>',
+				'after'      => '</h1>'.$action_links.'</div>',
+				'nav_target' => false,
+			) );
+	}
 	?>
 
 	<?php
@@ -115,6 +119,12 @@ $params = array_merge( array(
 			// This will enclose the title of each widget:
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
+			// Template params for "Item Title" widget:
+			'widget_item_title_params'  => array(
+					'before' => '<div class="evo_post_title"><h1>',
+					'after' => '</h1>'.$action_links.'</div>',
+					'link_type' => $params['item_link_type'],
+				),
 			// Template params for "Item Link" widget
 			'widget_item_link_before'    => '<p class="evo_post_link">',
 			'widget_item_link_after'     => '</p>',

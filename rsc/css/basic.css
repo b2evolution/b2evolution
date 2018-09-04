@@ -90,6 +90,7 @@ div.dev-blocks--belowtoolbar {
   background: #666;
   color: #FFF;
   font-size: 11px;
+  line-height: 1.42857143;
   text-align: left;
   white-space: nowrap;
 }
@@ -108,14 +109,25 @@ div.dev-blocks--belowtoolbar {
   padding: 1px 5px;
   cursor: pointer;
   font-size: 18px;
+  line-height: 1.42857143;
 }
-.evo_designer.evo_designer__container {
+.evo_designer.evo_designer__widget.evo_widget__outside .evo_designer__title,
+.evo_designer.evo_designer__widget.evo_widget__outside .evo_designer__actions {
+  left: -3px;
+}
+.evo_designer.evo_designer__container,
+.evo_designer.evo_designer__subcontainer_active,
+.evo_designer.evo_designer__subcontainer_inactive {
   border-color: #DDD;
 }
-.evo_designer.evo_designer__container > div {
+.evo_designer.evo_designer__container > div,
+.evo_designer.evo_designer__subcontainer_active > div,
+.evo_designer.evo_designer__subcontainer_inactive > div {
   height: 100%;
 }
-.evo_designer.evo_designer__container .evo_designer__title {
+.evo_designer.evo_designer__container .evo_designer__title,
+.evo_designer.evo_designer__subcontainer_active .evo_designer__title,
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__title {
   top: auto;
   left: auto;
   bottom: -19px;
@@ -125,7 +137,9 @@ div.dev-blocks--belowtoolbar {
   color: #333;
   text-align: right;
 }
-.evo_designer.evo_designer__container .evo_designer__actions {
+.evo_designer.evo_designer__container .evo_designer__actions,
+.evo_designer.evo_designer__subcontainer_active .evo_designer__actions,
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__actions {
   top: auto;
   left: auto;
   bottom: 0;
@@ -133,8 +147,34 @@ div.dev-blocks--belowtoolbar {
   background: #DDD;
   border-radius: 4px 4px 0 0;
 }
-.evo_designer.evo_designer__container .evo_designer__actions .evo_designer__action {
+.evo_designer.evo_designer__container .evo_designer__actions .evo_designer__action,
+.evo_designer.evo_designer__subcontainer_active .evo_designer__actions .evo_designer__action,
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__actions .evo_designer__action {
   color: #333 !important;
+}
+.evo_designer.evo_designer__subcontainer_active,
+.evo_designer.evo_designer__subcontainer_inactive {
+  border-color: #00F;
+}
+.evo_designer.evo_designer__subcontainer_active .evo_designer__title,
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__title,
+.evo_designer.evo_designer__subcontainer_active .evo_designer__actions,
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__actions {
+  background: #00F;
+  color: #FFF;
+}
+.evo_designer.evo_designer__subcontainer_active .evo_designer__title .evo_designer__action,
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__title .evo_designer__action,
+.evo_designer.evo_designer__subcontainer_active .evo_designer__actions .evo_designer__action,
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__actions .evo_designer__action {
+  color: #FFF !important;
+}
+.evo_designer.evo_designer__subcontainer_inactive {
+  border-color: #99F;
+}
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__title,
+.evo_designer.evo_designer__subcontainer_inactive .evo_designer__actions {
+  background: #99F;
 }
 .evo_designer.evo_designer__status_process {
   border-color: #F60;
@@ -157,12 +197,12 @@ div.dev-blocks--belowtoolbar {
 .evo_designer.evo_designer__status_failed .evo_designer__actions {
   background: #E00;
 }
-.evo_container[data-name],
+.evo_container[data-code],
 .evo_widget[data-id] {
   min-width: 5px;
   min-height: 5px;
 }
-.evo_container[data-name] {
+.evo_container[data-code] {
   z-index: 10000;
 }
 .evo_designer__container {
@@ -216,6 +256,26 @@ div.dev-blocks--belowtoolbar {
   height: 100%;
   position: relative;
 }
+#evo_customizer__frontoffice_loader {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3) url(../img/ajax-loader/999.gif) no-repeat center;
+}
+#evo_customizer__form_loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 32px;
+  height: 32px;
+  background: url(../img/ajax-loader/999.gif) no-repeat center;
+}
 .evo_customizer__vtoggler {
   position: absolute;
   top: 0;
@@ -227,6 +287,7 @@ div.dev-blocks--belowtoolbar {
 }
 .evo_customizer__collapsed .evo_customizer__vtoggler {
   cursor: e-resize;
+  left: 0;
 }
 .evo_customizer__vtoggler.evo_customizer__vtoggler_resizing {
   width: 100%;
@@ -638,18 +699,6 @@ ul.jslog_error {
   background: #fbf2ee;
   color: #e00;
 }
-.item_custom_fields {
-  border: none;
-  margin-bottom: 10px;
-  border-collapse: collapse;
-}
-.item_custom_fields th,
-.item_custom_fields td {
-  padding: 0 10px 0 0;
-}
-.item_custom_fields th {
-  text-align: left;
-}
 .b2evo_alert {
   width: 270px;
   position: fixed;
@@ -753,6 +802,9 @@ a.selected {
   -khtml-border-radius-topright: 2px;
   border-radius: 2px 2px 0 0;
   margin-bottom: 2px;
+}
+.avatar_rounded.no_avatar_actions img {
+  margin-bottom: 0;
 }
 .avatar_actions {
   float: left;

@@ -27,6 +27,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	$Plugins->trigger_event( 'SkinEndHtmlBody' );
 
 	$Blog->disp_setting( 'footer_includes', 'raw' );
+
+	// Add structured data at the end
+	skin_structured_data();
 ?>
 </body>
 </html>

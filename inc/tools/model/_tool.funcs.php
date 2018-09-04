@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
  */
@@ -262,6 +262,103 @@ function tool_create_sample_posts( $blog_ID, $num_posts )
 		// Note: This message should not appear offten, so it doesn't need translation
 		$Messages->add( sprintf( 'Creation of %d post(s) failed becuase of concurrent modification error.', $num_posts - $num_posts_created ), 'note' );
 	}
+}
+
+
+/**
+ * Create random number of sample revisions of existing posts and display a process of creating
+ *
+ * @param integer Blog ID
+ * @param integer Minimum number of revision per post
+ * @param integer Maximum number of revision per post
+ */
+function tool_create_sample_revisions( $blog_ID, $min_revisions = 1, $max_revisions = 3 )
+{
+	global $Messages, $DB, $Debuglog;
+
+	$BlogCache = & get_BlogCache();
+	$selected_Blog = & $BlogCache->get_by_ID( $blog_ID );
+	if( $selected_Blog == NULL )
+	{ // Incorrect blog ID, Exit here
+		return;
+	}
+
+	echo T_('Creating of the sample revisions...');
+	evo_flush();
+
+	/**
+	 * Disable log queries because it increases the memory and stops the process with error "Allowed memory size of X bytes exhausted..."
+	 */
+	$DB->log_queries = false;
+
+	load_class( 'users/model/_userlist.class.php', 'UserList' );
+	$UserList = new UserList( '', 1000 );
+	$UserList->query();
+
+	// Get users who can edit posts in the selected collection
+	$editor_Users = array();
+	while( $loop_User = & $UserList->get_next() )
+	{
+		if( $loop_User->check_perm( 'blog_edit', 'edit', false, $selected_Blog ) )
+		{
+			$editor_Users[] = $loop_User->ID;
+		}
+	}
+
+	$ItemList = new ItemList2( $selected_Blog, NULL, NULL, 0 );
+	$ItemList->query();
+
+	$revisions_created = 0;
+	$editors_count = count( $editor_Users );
+
+	$count = 1;
+	while( $Item = & $ItemList->get_item() )
+	{
+		// Get next version ID
+		$iver_SQL = new SQL();
+		$iver_SQL->SELECT( 'MAX( iver_ID )' );
+		$iver_SQL->FROM( 'T_items__version' );
+		$iver_SQL->WHERE( 'iver_itm_ID = '.$Item->ID );
+		$iver_ID = ( int ) $DB->get_var( $iver_SQL->get() ) + 1;
+
+		$num_revisions = rand( $min_revisions, $max_revisions );
+		for( $i = 0; $i < $num_revisions; $i++ )
+		{
+			if( $i === 0 )
+			{ // Original author
+				$editor_user_id = 'post_lastedit_user_ID';
+			}
+			else
+			{
+				$editor_user_id = $editor_Users[rand( 0, $editors_count - 1 )];
+			}
+
+			$sql = 'INSERT INTO T_items__version( iver_ID, iver_itm_ID, iver_edit_user_ID, iver_edit_datetime, iver_status, iver_title, iver_content )
+				SELECT "'.$iver_ID.'" AS iver_ID, post_ID, '.$editor_user_id.', post_datemodified, post_status, CONCAT( post_title, " - revision '.$iver_ID.'" ), post_content
+					FROM T_items__item
+				WHERE post_ID = '.$Item->ID;
+
+			$revisions_created++;
+			$result = $DB->query( $sql, 'Save a version of the Item' ) !== false;
+
+			$iver_ID += 1;
+		}
+
+		if( $count % 100 == 0 )
+		{
+			echo ' .';
+			//pre_dump( memory_get_usage() );
+			evo_flush();
+		}
+		$count++;
+
+		// Clear all debug messages, To avoid an error about full memory
+		$Debuglog->clear( 'all' );
+	}
+
+	echo ' OK.';
+
+	$Messages->add( sprintf( T_('Created %d revisions.'), $revisions_created ), 'success' );
 }
 
 
@@ -658,6 +755,194 @@ function tool_create_sample_messages( $num_loops, $num_messages, $num_words, $ma
 	echo ' OK.';
 
 	$Messages->add( sprintf( T_('%d threads and %d messages have been created.'), $count_threads, $count_messages ), 'success' );
+}
+
+
+/**
+ * Create sample email campaigns and display a process of creating
+ *
+ * @param integer Number of email campaigns
+ * @param array Newsletter IDs
+ */
+function tool_create_sample_campaigns( $num_campaigns, $campaign_lists, $send_campaign_emails )
+{
+	global $Messages, $DB, $Debuglog, $Settings, $UserSettings, $baseurl, $email_send_simulate_only;
+
+	load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
+
+	echo T_('Creating sample email campaigns...');
+	evo_flush();
+
+	/**
+	 * Disable log queries because it increases the memory and stops the process with error "Allowed memory size of X bytes exhausted..."
+	 */
+	$DB->log_queries = false;
+
+	// Load all users IDs:
+	$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users WHERE user_status IN ( "activated", "autoactivated", "manualactivated" )' );
+
+	// Load all selected lists in cache:
+	$NewsletterCache = & get_NewsletterCache();
+	$NewsletterCache->load_list( $campaign_lists );
+
+	$count = 1;
+	$campaign_lists_max_index = count( $campaign_lists ) - 1;
+
+	$DB->begin();
+
+	// Temporarily simulate email sending
+	$temp_email_send_simulate_only = $email_send_simulate_only;
+	$email_send_simulate_only = true;
+
+	// Temporarily increase email campaign chunk size
+	$temp_email_campaign_chunk_size = $Settings->get( 'email_campaign_chunk_size' );
+	$Settings->set( 'email_campaign_chunk_size', 10000 );
+	$Settings->dbupdate();
+
+	for( $i = 1; $i <= $num_campaigns; $i++ )
+	{
+		$EmailCampaign = new EmailCampaign();
+		$EmailCampaign->set( 'enlt_ID', $campaign_lists[rand( 0, $campaign_lists_max_index )] );
+		$EmailCampaign->set( 'name', T_('Markdown Example').' '.$i );
+		$EmailCampaign->set( 'email_defaultdest', $baseurl );
+		$EmailCampaign->set( 'email_text', T_('Heading
+=======
+
+Sub-heading
+-----------
+
+### H3 header
+
+#### H4 header ####
+
+> Email-style angle brackets
+> are used for blockquotes.
+
+> > And, they can be nested.
+
+> ##### Headers in blockquotes
+>
+> * You can quote a list.
+> * Etc.
+
+[This is a link](http://b2evolution.net/) if Links are turned on in the markdown plugin settings
+
+Paragraphs are separated by a blank line.
+
+    This is a preformatted
+    code block.
+
+Text attributes *Italic*, **bold**, `monospace`.
+
+Shopping list:
+
+* apples
+* oranges
+* pears
+
+The rain---not the reign---in Spain.').
+"\n".
+T_('Button examples:
+[button]This is a button[/button]
+[like]I like this[/like] [dislike]I don\'t like this[/dislike]
+[cta:1:info]Call to action 1 info button[/cta] [cta:2:warning]Call to action 2 warning button[/cta] [cta:3:default]Call to action 3 default button[/cta]
+[cta:1:link]Call to action 1 link only[/cta]') );
+
+		if( $EmailCampaign->dbinsert() )
+		{	// Send email after successfull email campaign creating:
+			$count++;
+			$loop_user_IDs = array_rand( array_flip( $user_IDs ), rand( 1, count( $user_IDs) ) );
+			if( ! is_array( $loop_user_IDs ) )
+			{
+				$loop_user_IDs = array( $loop_user_IDs );
+			}
+			if( ! empty( $loop_user_IDs ) )
+			{	// Only if we have found the users in DB
+				if( $send_campaign_emails )
+				{
+					$EmailCampaign->send_all_emails( false, $loop_user_IDs );
+					// Randomly set values
+					$DB->query( 'UPDATE T_email__campaign_send
+							SET
+								csnd_clicked_unsubscribe = IF( RAND() > 0.95, 1, 0 ),
+								csnd_last_open_ts = IF( RAND() > 0.7, NOW(), NULL ),
+								csnd_last_click_ts = IF( RAND() > 0.7, NOW(), NULL ),
+								csnd_like = IF( RAND() > 0.75, 1, IF( RAND() > 0.8, -1, 0 ) ),
+								csnd_cta1 = IF( RAND() > 0.85, 1, 0 ),
+								csnd_cta2 = IF( RAND() > 0.85, 1, 0 ),
+								csnd_cta3 = IF( RAND() > 0.85, 1, 0 )
+							WHERE
+								csnd_camp_ID = '.$EmailCampaign->ID );
+
+					// Decrement last email count part in 'last_newsletter' user setting. This will bypass the newsletter limit setting of the users.
+					$DB->query( 'UPDATE T_users__usersettings
+							SET uset_value = CONCAT( SUBSTRING_INDEX( uset_value, "_", 1 ), "_", CONVERT( SUBSTRING_INDEX( uset_value, "_", -1 ), SIGNED INTEGER ) - 1 )
+							WHERE uset_name = "last_newsletter" AND uset_user_ID IN ('.$DB->quote( $loop_user_IDs ).')' );
+
+					// We need to reset the user settings so the above update query changes are used
+					$UserSettings->reset();
+				}
+				else
+				{
+					$EmailCampaign->add_recipients( $loop_user_IDs );
+				}
+			}
+		}
+
+		if( $count % 20 == 0 )
+		{	// Display a process of creating by one dot for 20 campaigns:
+			echo ' .';
+			evo_flush();
+		}
+
+		// Clear all debug messages, To avoid an error about full memory:
+		$Debuglog->clear( 'all' );
+	}
+
+	// Update email campaign counters
+	$DB->query( 'UPDATE T_email__campaign
+			LEFT JOIN (
+				SELECT
+					csnd_camp_ID,
+					SUM( IF( csnd_last_sent_ts IS NULL, 0, 1 ) ) AS send_count,
+					SUM( IF( csnd_cta1 = 1, 1, 0 ) ) AS cta1_clicks,
+					SUM( IF( csnd_cta2 = 1, 1, 0 ) ) AS cta2_clicks,
+					SUM( IF( csnd_cta3 = 1, 1, 0 ) ) AS cta3_clicks,
+					SUM( IF( csnd_like = 1, 1, 0 ) ) AS like_count,
+					SUM( IF( csnd_like = -1, 1, 0 ) ) AS dislike_count,
+					SUM( COALESCE( csnd_clicked_unsubscribe, 0 ) ) AS unsub_clicks,
+					SUM( IF( csnd_last_open_ts IS NULL, 0, 1 ) ) AS img_loads,
+					SUM( IF( csnd_last_click_ts IS NULL, 0, 1 ) ) AS link_clicks,
+					SUM( IF( csnd_last_open_ts IS NOT NULL OR csnd_last_click_ts IS NOT NULL OR
+						csnd_like IS NOT NULL OR csnd_cta1 IS NOT NULL OR csnd_cta2 IS NOT NULL OR csnd_cta3 IS NOT NULL, 1, 0 ) ) AS open_count
+				FROM T_email__campaign_send
+				WHERE csnd_emlog_ID IS NOT NULL
+				GROUP BY csnd_camp_ID
+			) AS a ON a.csnd_camp_ID = ecmp_ID
+			SET
+				ecmp_send_count = COALESCE( a.send_count, 0 ),
+				ecmp_open_count = COALESCE( a.open_count, 0 ),
+				ecmp_img_loads = COALESCE( a.img_loads, 0 ),
+				ecmp_link_clicks = COALESCE( a.link_clicks, 0 ),
+				ecmp_cta1_clicks = COALESCE( a.cta1_clicks, 0 ),
+				ecmp_cta2_clicks = COALESCE( a.cta2_clicks, 0 ),
+				ecmp_cta3_clicks = COALESCE( a.cta3_clicks, 0 ),
+				ecmp_like_count = COALESCE( a.like_count, 0 ),
+				ecmp_dislike_count = COALESCE( a.dislike_count, 0 ),
+				ecmp_unsub_clicks = COALESCE( a.unsub_clicks, 0 )' );
+
+	// Restore simulate email sending setting
+	$email_send_simulate_only = $temp_email_send_simulate_only;
+
+	// Restore emaili campaign chunk size
+	$Settings->set( 'email_campaign_chunk_size', $temp_email_campaign_chunk_size );
+	$Settings->dbupdate();
+
+	$DB->commit();
+
+	echo ' OK.';
+
+	$Messages->add( sprintf( T_('Created %d email campaigns.'), $count - 1 ), 'success' );
 }
 
 

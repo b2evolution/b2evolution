@@ -146,7 +146,7 @@ class free_text_Widget extends ComponentWidget
 		// Collection common links:
 		echo $this->disp_params['block_start'];
 
-		$this->disp_title( $this->disp_params['title'] );
+		$this->disp_title();
 
 		echo $this->disp_params['block_body_start'];
 

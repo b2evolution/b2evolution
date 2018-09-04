@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -46,7 +46,7 @@ class polls_plugin extends Plugin
 	function get_coll_setting_definitions( & $params )
 	{
 		$default_params = array_merge( $params, array(
-				'default_comment_rendering' => 'opt-out',
+				'default_comment_rendering' => 'never',
 				'default_post_rendering' => 'opt-out'
 			) );
 
@@ -77,7 +77,7 @@ class polls_plugin extends Plugin
 	function get_email_setting_definitions( & $params )
 	{
 		// set params to allow rendering for messages by default
-		$default_params = array_merge( $params, array( 'default_email_rendering' => 'never' ) );
+		$default_params = array_merge( $params, array( 'default_email_rendering' => 'opt-out' ) );
 		return parent::get_email_setting_definitions( $default_params );
 	}
 
@@ -108,6 +108,23 @@ class polls_plugin extends Plugin
 
 
 	/**
+	 * Perform rendering of email
+	 *
+	 * @see Plugin::RenderEmailAsHtml()
+	 */
+	function RenderEmailAsHtml( & $params )
+	{
+		$content = & $params['data'];
+
+		$params['check_code_block'] = true; // TRUE to find inline tags only outside of codeblocks
+
+		$content = $this->render_polls_data( $content, $params, 'email' );
+
+		return true;
+	}
+
+
+	/**
 	 * Perform rendering
 	 *
 	 * @see Plugin::DisplayrItemAsHtml()
@@ -116,61 +133,100 @@ class polls_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		$search_pattern = '#\[poll:(\d+)(:?)(.*?)]#';
-		preg_match_all( $search_pattern, $content, $inlines );
+		$params['check_code_block'] = true; // TRUE to find inline tags only outside of codeblocks
 
-		if( ! empty( $inlines[0] ) )
-		{
-			foreach( $inlines[0] as $i => $current_poll_tag )
-			{
-				$poll_ID = $inlines[1][$i];
-				$poll_title = 'Poll';
-				if( ! empty( $inlines[2][$i] ) && ! empty( $inlines[3][$i] ) )
-				{
-					$poll_title = $inlines[3][$i];
-				}
-
-				$poll = $this->renderPoll( $poll_ID, $poll_title );
-				if( ! $poll )
-				{
-					$poll = $current_poll_tag;
-				}
-
-				$content = str_replace( $current_poll_tag, $poll, $content );
-			}
-		}
+		$content = $this->render_polls_data( $content, $params );
 
 		return true;
 	}
 
 
 	/**
-	 * Delegates rendering of poll to poll widget
+	 * Convert inline poll tags into HTML tags like:
+	 *    [poll:123] - Display a widget "Poll" with poll ID #123
+	 *    [poll:123:Panel Title] - Use custom panel title instead of default T_('Poll')
+	 *    [poll:123:-] - No title and panel are displayed at all
+	 *    [poll:123:Panel Title:Question message?] - Custom title + Replace poll question from DB with custom question text
+	 *    [poll:123:Panel Title:-] - Custom title + Hide question
+	 *    [poll:123:-:-] - Hide title + Hide question
 	 *
-	 * @param integer Poll ID to render
-	 * @param string Optional poll title to display
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
 	 */
-	function renderPoll( $poll_ID, $poll_title = NULL )
+	function render_polls_data( $content, $params = array(), $format = 'html' )
 	{
-		load_class( 'widgets/widgets/_poll.widget.php', 'poll_Widget' );
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->render_polls_data() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_polls_data' ), array( $params ) );
+			return $content;
+		}
 
-		$Poll = new poll_Widget();
+		// Find all matches with tags of poll data:
+		preg_match_all( '#\[poll:(\d+):?([^:\]]*):?([^:\]]*):?(.*?)\]#', $content, $tags );
 
-		ob_start();
-		$Poll->display( array(
-				'poll_ID' => $poll_ID,
-				'title' => $poll_title,
-				'block_display_title' => true,
-				'block_start' => '<div class="panel panel-default">',
-				'block_end' => '</div>',
-				'block_title_start' => '<div class="panel-heading">',
-				'block_title_end' => '</div>',
-				'block_body_start' => '<div class="panel-body">',
-				'block_body_end' => '</div>'
-			) );
-		$output = ob_get_clean();
+		if( count( $tags[0] ) > 0 )
+		{	// If at least one poll inline tag is found in content:
 
-		return $output;
+			// Initialize widget "Poll" in order to render poll blocks:
+			load_class( 'widgets/widgets/_poll.widget.php', 'poll_Widget' );
+			$poll_Widget = new poll_Widget();
+
+			foreach( $tags[0] as $t => $source_tag )
+			{	// Render poll inline tag as html with widget "Poll":
+				$poll_ID = $tags[1][$t];
+				$poll_title = ( empty( $tags[2][ $t ] ) ? T_('Poll') : $tags[2][ $t ] );
+				$poll_question = ( empty( $tags[3][ $t ] ) ? NULL : $tags[3][ $t ] );
+				$redirect_to = ( empty( $tags[4][ $t ] ) ? NULL : $tags[4][ $t ] );
+
+				// Display title only when it doesn't equal "-":
+				$display_title = ( $poll_title !== '-' );
+
+				ob_start();
+				switch( $format )
+				{
+					case 'email':
+						$this->render_email( array(
+								'poll_ID'             => $poll_ID,
+								'title'               => $poll_title,
+								'poll_question'       => $poll_question,
+								'redirect_to'         => $redirect_to,
+								'block_display_title' => $display_title,
+								'block_start'         => $display_title ? '<div>' : '',
+								'block_end'           => $display_title ? '</div>' : '',
+								'block_title_start'   => $display_title ? '<h3>' : '',
+								'block_title_end'     => $display_title ? '</h3>' : '',
+								'block_body_start'    => $display_title ? '<div>' : '',
+								'block_body_end'      => $display_title ? '</div>' : '',
+							) );
+						break;
+
+					case 'html':
+					default:
+						$poll_Widget->display( array(
+								'poll_ID'             => $poll_ID,
+								'title'               => $poll_title,
+								'poll_question'       => $poll_question,
+								'block_display_title' => $display_title,
+								'block_start'         => $display_title ? '<div class="panel panel-default">' : '',
+								'block_end'           => $display_title ? '</div>' : '',
+								'block_title_start'   => $display_title ? '<div class="panel-heading">' : '',
+								'block_title_end'     => $display_title ? '</div>' : '',
+								'block_body_start'    => $display_title ? '<div class="panel-body">' : '',
+								'block_body_end'      => $display_title ? '</div>' : '',
+							) );
+				}
+				$poll_Widget->disp_params = NULL;
+
+				// Replace poll inline tag with the rendered poll html block:
+				$content = substr_replace( $content, ob_get_clean(), strpos( $content, $source_tag ), strlen( $source_tag ) );
+			}
+		}
+
+		return $content;
 	}
 
 
@@ -216,7 +272,6 @@ class polls_plugin extends Plugin
 	 */
 	function DisplayCommentToolbar( & $params )
 	{
-/*
 		if( ! empty( $params['Comment'] ) )
 		{	// Comment is set, get Blog from comment:
 			$Comment = & $params['Comment'];
@@ -241,7 +296,7 @@ class polls_plugin extends Plugin
 		{	// Plugin is not enabled for current case, so don't display a toolbar:
 			return false;
 		}
-*/
+
 		// Print toolbar on screen
 		return $this->DisplayCodeToolbar( $params );
 	}
@@ -256,6 +311,23 @@ class polls_plugin extends Plugin
 	function DisplayMessageToolbar( & $params )
 	{
 		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
+		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
+		{	// Print toolbar on screen:
+			return $this->DisplayCodeToolbar( $params );
+		}
+		return false;
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{	// Print toolbar on screen:
 			return $this->DisplayCodeToolbar( $params );
@@ -410,6 +482,40 @@ class polls_plugin extends Plugin
 		<?php
 
 		return true;
+	}
+
+
+	/**
+	 * Render poll for email
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function render_email( $params = array() )
+	{
+		$PollCache = & get_PollCache();
+		$Poll = $PollCache->get_by_ID( $params['poll_ID'], false, false );
+
+		$poll_question = empty( $params['poll_question'] ) ? $Poll->get( 'question_text' ) : $params['poll_question'];
+		$poll_options = $Poll->get_poll_options();
+
+		if( count( $poll_options ) > 0 )
+		{
+			if( $params['block_display_title'] )
+			{
+				echo $params['block_title_start'].$params['title'].$params['block_title_end'];
+			}
+			echo '<ul>'.$poll_question == '-' ? '' : '<b>'.$poll_question.'</b>';
+			foreach( $poll_options as $poll_option )
+			{
+				$vote_url = get_htsrv_url().'action.php?mname=polls&action=email_vote&poll_ID='.$params['poll_ID'].'&poll_answer='.$poll_option->ID.'&email_ID=$mail_log_ID$&email_key=$email_key$';
+				if( ! empty( $params['redirect_to'] ) )
+				{
+					$vote_url = url_add_param( $vote_url, 'redirect_to='.rawurlencode( $params['redirect_to'] ) );
+				}
+				echo '<li'.emailskin_style('li.evo_poll_option').'><a href="'.$vote_url.'">'.$poll_option->option_text.'</a></li>';
+			}
+			echo '</ul>';
+		}
 	}
 }
 ?>

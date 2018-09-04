@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -40,6 +40,8 @@ $Form->begin_form( 'fform' );
 			), T_('Membership'), true );
 
 	$Form->text_input( 'role', '', 32, T_('Role'), '', array( 'maxlength' => 255 ) );
+
+	$Form->text_input( 'priority', '', 32, T_('Priority'), '', array( 'maxlength' => 255, 'type' => 'number' ) );
 
 $buttons = array();
 if( $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -18,6 +18,7 @@ global $dispatcher;
 
 
 // Check permission to display:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'view', true );
 
 load_funcs( 'plugins/_plugin.funcs.php' );
@@ -473,6 +474,9 @@ switch( $action )
 		param( 'edited_plugin_displayed_events', 'array:string', array() );
 		param( 'edited_plugin_events', 'array:integer', array() );
 
+		// Update the folding states for current user:
+		save_fieldset_folding_values();
+
 		$default_Plugin = & $admin_Plugins->register( $edit_Plugin->classname );
 
 		// Update plugin name:
@@ -904,7 +908,7 @@ switch( $action )
 		break;
 }
 
-init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
+init_popover_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

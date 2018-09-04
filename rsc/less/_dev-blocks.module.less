@@ -96,6 +96,7 @@ div.dev-blocks--belowtoolbar {
 		background: #666;
 		color: #FFF;
 		font-size: 11px;
+		line-height: 1.42857143;
 		text-align: left;
 		white-space: nowrap;
 	}
@@ -113,10 +114,17 @@ div.dev-blocks--belowtoolbar {
 			padding: 1px 5px;
 			cursor: pointer;
 			font-size: 18px;
+			line-height: 1.42857143;
 		}
 	}
+	&.evo_designer__widget.evo_widget__outside {
+		.evo_designer__title, .evo_designer__actions {
+			left: -3px;
+		}
+	}
+
 	// Small different styles for container designer block:
-	&.evo_designer__container {
+	&.evo_designer__container, &.evo_designer__subcontainer_active, &.evo_designer__subcontainer_inactive {
 		border-color: #DDD;
 		> div {
 			height: 100%;
@@ -143,6 +151,25 @@ div.dev-blocks--belowtoolbar {
 			}
 		}
 	}
+
+	// Style with blur border for sub-container designer block:
+	&.evo_designer__subcontainer_active, &.evo_designer__subcontainer_inactive {
+		border-color: #00F;
+		.evo_designer__title, .evo_designer__actions {
+			background: #00F;
+			color: #FFF;
+			.evo_designer__action {
+				color: #FFF !important;
+			}
+		}
+	}
+	&.evo_designer__subcontainer_inactive {
+		border-color: #99F;
+		.evo_designer__title, .evo_designer__actions {
+			background: #99F;
+		}
+	}
+
 	// Color designer block on AJAX processing:
 	&.evo_designer__status_process {
 		border-color: #F60;
@@ -167,12 +194,12 @@ div.dev-blocks--belowtoolbar {
 	}
 }
 // Set min sizes in order to manage empty containers/widgets:
-.evo_container[data-name], .evo_widget[data-id] {
+.evo_container[data-code], .evo_widget[data-id] {
 	min-width: 5px;
 	min-height: 5px;
 }
 // Set z-index for designer mode elements for proper work:
-.evo_container[data-name] {
+.evo_container[data-code] {
 	z-index: 10000;
 }
 .evo_designer__container {
@@ -231,6 +258,26 @@ div.dev-blocks--belowtoolbar {
 	height: 100%;
 	position: relative;
 }
+#evo_customizer__frontoffice_loader {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba( 0, 0, 0, 0.3 ) url(../img/ajax-loader/999.gif) no-repeat center;
+}
+#evo_customizer__form_loader {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;
+	width: 32px;
+	height: 32px;
+	background: url(../img/ajax-loader/999.gif) no-repeat center;
+}
 .evo_customizer__vtoggler {
 	position: absolute;
 	top: 0;
@@ -241,6 +288,7 @@ div.dev-blocks--belowtoolbar {
 	cursor: w-resize;
 	.evo_customizer__collapsed & {
 		cursor: e-resize;
+		left: 0;
 	}
 	&.evo_customizer__vtoggler_resizing {
 		// Take full window place by vertical toggler to make resizing event properly:

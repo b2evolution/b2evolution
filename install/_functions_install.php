@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -272,7 +272,13 @@ function install_newdb()
 	}
 
 	evo_flush();
+	create_default_newsletters();
+
+	evo_flush();
 	create_default_email_campaigns();
+
+	evo_flush();
+	create_default_automations();
 
 	// Update the progress bar status
 	update_install_progress_bar();
@@ -583,6 +589,9 @@ function install_basic_skins( $install_mobile_skins = true )
 	// Note: Skin #5 will we used by Manual
 	skin_install( 'bootstrap_manual_skin' );
 
+	// Note: Skin #6 will be used by Mini-Site
+	skin_install( 'jared_skin' );
+
 	// skin_install( 'asevo' );
 	// skin_install( 'dating_mood' );
 	// skin_install( 'evopress' );
@@ -789,6 +798,16 @@ function install_basic_plugins( $old_db_version = 0 )
 	if( $old_db_version < 11730 )
 	{
 		install_plugin( 'custom_tags_plugin', true );
+	}
+
+	if( $old_db_version < 11760 )
+	{
+		install_plugin( 'polls_plugin' );
+	}
+
+	if( $old_db_version < 12580 )
+	{
+		install_plugin( 'email_elements_plugin' );
 	}
 }
 
@@ -1267,7 +1286,7 @@ function display_install_back_link()
  */
 function start_install_progress_bar( $title, $steps = NULL )
 {
-	global $install_progress_bar_counter, $install_progress_bar_total, $display;
+	global $install_progress_bar_counter, $install_progress_bar_total, $install_progress_bar_status, $display;
 
 	if( ! empty( $display ) && $display != 'normal' )
 	{ // Exit here, because we can use progress bar on normal mode (Hide on compact mode)
@@ -1284,6 +1303,8 @@ function start_install_progress_bar( $title, $steps = NULL )
 	{ // Progress bar has no steps for update
 		$bar_width = '100%';
 	}
+
+	$install_progress_bar_status = 'success';
 
 	echo '<div class="progress">'
 			.'<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:'.$bar_width.'">'
@@ -1308,7 +1329,7 @@ function start_install_progress_bar( $title, $steps = NULL )
  */
 function stop_install_progress_bar()
 {
-	global $display;
+	global $install_progress_bar_status, $display;
 
 	if( ! empty( $display ) && $display != 'normal' )
 	{ // Exit here, because we can use progress bar on normal mode (Hide on compact mode)
@@ -1317,7 +1338,7 @@ function stop_install_progress_bar()
 
 	echo '<script type="text/javascript">'
 		.'jQuery( ".progress-bar" ).css( "width", "100%" ).removeClass( "active progress-bar-striped" );'
-		.'setTimeout( function() { jQuery( ".progress-bar" ).addClass( "progress-bar-success" ); }, 600 );'
+		.'setTimeout( function() { jQuery( ".progress-bar" ).addClass( "progress-bar-'.$install_progress_bar_status.'" ); }, 600 );'
 	.'</script>';
 }
 

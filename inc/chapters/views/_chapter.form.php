@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -81,6 +81,16 @@ $Form->begin_fieldset( T_('Properties').get_manual_link( 'categories-tab' ) );
 
 	$Form->checkbox_input( 'cat_lock', $edited_Chapter->lock, T_('Locked category'), array( 'note' => T_('Check this to lock all posts under this category. (Note: for posts with multiple categories, the post is only locked if *all* its categories are locked.)') ) );
 
+	$item_type_options = array( NULL => T_('Default of this collection'), 'disabled' => T_('Disabled') );
+	$item_types_SQL = new SQL();
+	$item_types_SQL->SELECT( 'ityp_ID, ityp_name' );
+	$item_types_SQL->FROM( 'T_items__type' );
+	$item_types_SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID AND itc_coll_ID = '.$edited_Blog->ID );
+	$item_types_SQL->ORDER_BY( 'ityp_ID' );
+	$item_types = $DB->get_assoc( $item_types_SQL->get() );
+	$item_type_options = $item_type_options + $item_types;
+	$Form->select_input_array( 'cat_default_item_type_ID', $edited_Blog->get_setting( 'default_item_type_cat_'.$edited_Chapter->ID ),
+			$item_type_options, T_('Default Item type for new items'), NULL, array( 'force_keys_as_values' => true ) );
 
 $Form->end_fieldset();
 

@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -816,8 +816,8 @@ class ItemListLight extends DataObjectList2
 		}
 
 		// QUERY:
-		$this->sql = 'SELECT DISTINCT '.$this->Cache->dbIDname.', post_datestart, post_datemodified, post_title, post_url,
-									post_excerpt, post_urltitle, post_canonical_slug_ID, post_tiny_slug_ID, post_main_cat_ID, post_ityp_ID '
+		$this->sql = 'SELECT DISTINCT '.$this->Cache->dbIDname.', post_datestart, post_datemodified, post_title, post_short_title, post_url,
+									post_excerpt, post_urltitle, post_canonical_slug_ID, post_tiny_slug_ID, post_main_cat_ID, post_ityp_ID, post_single_view '
 									.$this->ItemQuery->get_from()
 									.$this->ItemQuery->get_where()
 									.$this->ItemQuery->get_group_by()

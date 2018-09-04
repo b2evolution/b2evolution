@@ -48,20 +48,32 @@ class touch_Skin extends Skin
 	 * This should NOT be protected. It should be used INSTEAD of file parsing.
 	 * File parsing should only be used if this function is not defined
 	 *
-	 * @return array
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
 	 */
 	function get_declared_containers()
 	{
-		// Note: second param below is the ORDER
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
 		return array(
-				'front_page_main_area'   => array( NT_('Front Page Main Area'), 40 ),
-				'item_single'            => array( NT_('Item Single'), 50 ),
-				'item_page'              => array( NT_('Item Page'), 55 ),
-				'contact_page_main_area' => array( NT_('Contact Page Main Area'), 60 ),
-				'mobile_footer'          => array( NT_('Mobile: Footer'), 110 ),
-				'mobile_navigation_menu' => array( NT_('Mobile: Navigation Menu'), 120 ),
-				'mobile_tools_menu'      => array( NT_('Mobile: Tools Menu'), 130 ),
-				'404_page'               => array( NT_('404 Page'), 140 ),
+				'page_top'                  => NULL,
+				'header'                    => NULL,
+				'menu'                      => NULL,
+				'front_page_secondary_area' => NULL,
+				'item_list'                 => NULL,
+				'item_in_list'              => NULL,
+				'item_single_header'        => NULL,
+				'item_page'                 => NULL,
+				'sidebar'                   => NULL,
+				'sidebar_2'                 => NULL,
+				'footer'                    => NULL,
+				'user_profile_left'         => NULL,
+				'user_profile_right'        => NULL,
+				'mobile_footer'             => array( NT_('Mobile: Footer'), 110 ),
+				'mobile_navigation_menu'    => array( NT_('Mobile: Navigation Menu'), 120 ),
+				'mobile_tools_menu'         => array( NT_('Mobile: Tools Menu'), 130 ),
+				
 			);
 	}
 
