@@ -678,7 +678,7 @@ function get_default_shared_widgets()
 				'widget_css_class' => 'visible-sm visible-xs',
 			) ),
 		array( 40, 'free_html', 'params' => array(
-				'content' => '<hr style="margin:0;border-color:#696c72" class="visible-xs">',
+				'content' => '<hr class="swhead_item_separator visible-xs" />',
 			) ),
 		array( 50, 'basic_menu_link', 'params' => array(
 				'link_type' => 'register',
@@ -733,7 +733,8 @@ function get_default_shared_widgets()
 				'widget_css_class' => 'hidden-xs',
 			) ),
 		array( 60, 'free_html', 'params' => array(
-				'content' => '<label for="nav-trigger" class="visible-sm visible-xs"></label>',
+				'content' => '<label for="nav-trigger"></label>',
+				'widget_css_class' => 'visible-sm-inline-block visible-xs-inline-block',
 			) ),
 	);
 

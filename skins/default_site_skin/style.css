@@ -49,6 +49,7 @@ input#nav-trigger {
 
 .sitewide_header_menu > li {
 	padding: 0;
+	display: block;
 }
 
 .sitewide_header_menu > li:hover {
@@ -144,6 +145,10 @@ a.swhead_item.evo_widget__site_logo_image {
 a.swhead_item.evo_widget__site_logo_image img {
 	max-height: 42px;
 	max-width: 270px;
+}
+.swhead_item_separator {
+	margin: 0;
+	border-color: #696c72;
 }
 .sitewide_header .widget_core_site_logo a.swhead_item {
 	color: #FFF;

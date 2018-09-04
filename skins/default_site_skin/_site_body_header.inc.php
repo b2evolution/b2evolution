@@ -10,17 +10,13 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $baseurl, $Settings;
-?>
 
-<nav class="sitewide_header">
-<?php
 	// ------------------------- "Site Header" CONTAINER EMBEDDED HERE --------------------------
 	widget_container( 'site_header', array(
 			// The following params will be used as defaults for widgets included in this container:
-			'container_display_if_empty' => true, // Display container anyway even if no widget
-			'container_start'     => '<div class="evo_container $wico_class$">',
-			'container_end'       => '</div>',
+			'container_display_if_empty' => false, // If no widget, don't display container at all
+			'container_start'     => '<nav class="sitewide_header evo_container $wico_class$">',
+			'container_end'       => '<div class="clear"></div></nav>',
 			'block_start'         => '<span class="evo_widget $wi_class$">',
 			'block_end'           => '</span>',
 			'block_display_title' => false,
@@ -34,19 +30,15 @@ global $baseurl, $Settings;
 			'link_default_class'  => 'swhead_item',
 		) );
 	// ----------------------------- END OF "Site Header" CONTAINER -----------------------------
-?>
-	<div class="clear"></div>
-</nav>
 
-<input type="checkbox" id="nav-trigger" class="nav-trigger">
-<div class="sitewide_header_menu_wrapper visible-sm visible-xs">
-<?php
 	// ------------------------- "Navigation Hamburger" CONTAINER EMBEDDED HERE --------------------------
 	widget_container( 'navigation_hamburger', array(
 			// The following params will be used as defaults for widgets included in this container:
-			'container_display_if_empty' => true, // Display container anyway even if no widget
-			'container_start'     => '<ul class="evo_container sitewide_header_menu $wico_class$">',
-			'container_end'       => '</ul>',
+			'container_display_if_empty' => false, // If no widget, don't display container at all
+			'container_start'     => '<input type="checkbox" id="nav-trigger" class="nav-trigger">'
+					.'<div class="sitewide_header_menu_wrapper evo_container $wico_class$">'
+					.'<ul class="sitewide_header_menu">',
+			'container_end'       => '</ul></div>',
 			'block_start'         => '',
 			'block_end'           => '',
 			'block_display_title' => false,
@@ -61,4 +53,3 @@ global $baseurl, $Settings;
 		) );
 	// ----------------------------- END OF "Navigation Hamburger" CONTAINER -----------------------------
 ?>
-</div>
