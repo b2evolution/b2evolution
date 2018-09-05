@@ -1395,7 +1395,7 @@ class _core_Module extends Module
 						);
 				}
 				if( ! is_admin_page() &&
-				    in_array( $disp, array( 'single', 'page', 'edit' ) ) &&
+				    in_array( $disp, array( 'single', 'page', 'edit', 'widget_page' ) ) &&
 				    $perm_admin_restricted )
 				{	// If curent user has a permission to edit a current editing/viewing post:
 					if( $disp != 'edit' &&

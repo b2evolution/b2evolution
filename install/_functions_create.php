@@ -281,6 +281,15 @@ function create_default_data()
 			'use_comments'   => 0,
 		);
 	$post_types[] = array(
+			'name'           => 'Widget Page',
+			'usage'          => 'widget-page',
+			'template_name'  => 'widget_page',
+			'perm_level'     => 'admin',
+			'use_text'       => 'never',
+			'use_comments'   => 0,
+			'use_coordinates'=> 'optional',
+		);
+	$post_types[] = array(
 			'name'           => 'Intro-Front',
 			'usage'          => 'intro-front',
 			'template_name'  => NULL,
@@ -412,6 +421,7 @@ function create_default_data()
 			'allow_disabling_comments' => 0,
 			'use_comment_expiration'   => 'optional',
 			'schema'                   => NULL,
+			'use_coordinates'          => 'never',
 		);
 	$post_types_sql = 'INSERT INTO T_items__type ( ityp_'.implode( ', ityp_', array_keys( $post_type_default_settings ) ).' ) VALUES ';
 	foreach( $post_types as $p => $post_type )

@@ -97,6 +97,7 @@ function skin_init( $disp )
 		case 'posts':
 		case 'single':
 		case 'page':
+		case 'widget_page':
 		case 'terms':
 		case 'download':
 		case 'feedback-popup':
@@ -1798,6 +1799,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_module_form'           => '_module_form.disp.php',
 				'disp_msgform'               => '_msgform.disp.php',
 				'disp_page'                  => '_page.disp.php',
+				'disp_widget_page'           => '_widget_page.disp.php',
 				'disp_postidx'               => '_postidx.disp.php',
 				'disp_posts'                 => '_posts.disp.php',
 				'disp_profile'               => '_profile.disp.php',
@@ -2672,6 +2674,8 @@ function widget_container( $container_code, $params = array() )
 			'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
 			'container_start' => '<div class="evo_container $wico_class$">',
 			'container_end'   => '</div>',
+			// Restriction for Page Containers:
+			'container_item_ID' => NULL,
 		), $params );
 
 	// Try to find widget container by code for current collection and skin type:

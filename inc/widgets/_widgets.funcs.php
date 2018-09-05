@@ -586,6 +586,38 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 			) ),
 	);
 
+	// **** PAGE CONTAINERS ***** //
+
+	/* Widget Page Section 1 */
+	$default_widgets['widget_page_section_1'] = array(
+		'type'    => 'page',
+		'name'    => NT_('Widget Page Section 1'),
+		'order'   => 10,
+		'item_ID' => 11,
+		array( 10, 'coll_featured_posts' ),
+	);
+
+	/* Widget Page Section 2 */
+	$default_widgets['widget_page_section_2'] = array(
+		'type'    => 'page',
+		'name'    => NT_('Widget Page Section 2'),
+		'order'   => 20,
+		'item_ID' => 11,
+		array( 10, 'org_members' ),
+	);
+
+	/* Widget Page Section 3 */
+	$default_widgets['widget_page_section_3'] = array(
+		'type'    => 'page',
+		'name'    => NT_('Widget Page Section 3'),
+		'order'   => 30,
+		'item_ID' => 11,
+		array( 10, 'evo_Gmaps', 'type' => 'plugin', 'params' => array(
+				'latitude'  => '48.8566573582',
+				'longitude' => '2.35195398331',
+			) ),
+	);
+
 	return $default_widgets;
 }
 
@@ -641,16 +673,18 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	// Get all containers declared in the given blog's skins
 	$blog_containers = get_skin_containers( $skin_ids );
 
-	// Install additional sub containers from default config:
+	// Install additional sub-containers and page containers from default config,
+	// which are not declared as main containers but should be installed too:
 	foreach( $default_widgets as $wico_code => $container_widgets )
 	{
 		if( isset( $container_widgets['type'] ) &&
-		    $container_widgets['type'] == 'sub' )
-		{	// If it is a sub-container:
+		    ( $container_widgets['type'] == 'sub' || $container_widgets['type'] == 'page' ) )
+		{	// If it is a sub-container or page container:
 			$blog_containers[ $wico_code ] = array(
 					isset( $container_widgets['name'] ) ? $container_widgets['name'] : $wico_code,
 					isset( $container_widgets['order'] ) ? $container_widgets['order'] : 1,
-					0, // wico_main = 0
+					( $container_widgets['type'] == 'sub' ? 0 : 1 ), // Main or Sub-container
+					isset( $container_widgets['item_ID'] ) ? $container_widgets['item_ID'] : NULL,
 				);
 		}
 	}
@@ -659,11 +693,11 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	$widget_containers_sql_rows = array();
 	foreach( $blog_containers as $wico_code => $wico_data )
 	{
-		$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$wico_data[0].'", '.$blog_id.', '.$wico_data[1].', '.( isset( $wico_data[2] ) ? intval( $wico_data[2] ) : '1' ).' )';
+		$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$wico_data[0].'", '.$blog_id.', '.$wico_data[1].', '.( isset( $wico_data[2] ) ? intval( $wico_data[2] ) : '1' ).', '.( isset( $wico_data[3] ) ? intval( $wico_data[3] ) : 'NULL' ).' )';
 	}
 
 	// Insert widget containers records by one SQL query
-	$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES'
+	$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main, wico_item_ID ) VALUES'
 		.implode( ', ', $widget_containers_sql_rows ) );
 
 	$insert_id = $DB->insert_id;
@@ -682,46 +716,26 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		}
 
 		if( ! empty( $container_widgets['type'] ) &&
-		    $container_widgets['type'] != 'skin' &&
-		    $container_widgets['type'] != 'sub' )
+		    ! in_array( $container_widgets['type'], array( 'skin', 'sub', 'page' ) ) )
 		{	// Skip not collection container:
 			continue;
 		}
-		if( isset( $container_widgets['type'] ) )
-		{	// Remove this config data which is not really widget:
-			unset( $container_widgets['type'] );
-		}
 
-		if( isset( $container_widgets['coll_type'] ) )
-		{	// Handle special condition key:
-			if( ! is_allowed_option( $kind, $container_widgets['coll_type'] ) )
-			{	// Skip container because it should not be installed for the given collection kind:
-				continue;
-			}
+		if( isset( $container_widgets['coll_type'] ) &&
+		    ! is_allowed_option( $kind, $container_widgets['coll_type'] ) )
+		{	// Skip container because it should not be installed for the given collection kind:
+			continue;
 		}
 
 		$wico_id = $blog_containers[ $wico_code ]['wico_ID'];
 
-		// Remove the config data which is used as additional info for container:
-		if( isset( $container_widgets['type'] ) )
-		{	// Container type
-			unset( $container_widgets['type'] );
-		}
-		if( isset( $container_widgets['name'] ) )
-		{	// Container name
-			unset( $container_widgets['name'] );
-		}
-		if( isset( $container_widgets['order'] ) )
-		{	// Container order
-			unset( $container_widgets['order'] );
-		}
-		if( isset( $container_widgets['coll_type'] ) )
-		{	// Collection type where the container should be installed:
-			unset( $container_widgets['coll_type'] );
-		}
-
-		foreach( $container_widgets as $widget )
+		foreach( $container_widgets as $key => $widget )
 		{
+			if( ! is_number( $key ) )
+			{	// Skip the config data which is used as additional info for container like 'type', 'name', 'order', 'item_ID', 'coll_type':
+				continue;
+			}
+
 			if( isset( $widget['install'] ) && ! $widget['install'] )
 			{	// Skip widget because it should not be installed by condition from config:
 				continue;
@@ -806,8 +820,7 @@ function insert_shared_widgets()
 	foreach( $default_widgets as $wico_code => $container_widgets )
 	{
 		if( ! isset( $container_widgets['type'] ) ||
-		    ( $container_widgets['type'] != 'shared' &&
-		      $container_widgets['type'] != 'shared-sub' ) )
+		    ! in_array( $container_widgets['type'], array( 'shared', 'shared-sub' ) ) )
 		{	// Skip not shared container:
 			continue;
 		}
@@ -826,24 +839,6 @@ function insert_shared_widgets()
 			}
 		}
 
-		// Remove the config data which is used as additional info for container:
-		if( isset( $container_widgets['type'] ) )
-		{	// Container type
-			unset( $container_widgets['type'] );
-		}
-		if( isset( $container_widgets['name'] ) )
-		{	// Container name
-			unset( $container_widgets['name'] );
-		}
-		if( isset( $container_widgets['order'] ) )
-		{	// Container order
-			unset( $container_widgets['order'] );
-		}
-		if( isset( $container_widgets['coll_type'] ) )
-		{	// Collection type where the container should be installed:
-			unset( $container_widgets['coll_type'] );
-		}
-
 		if( ! isset( $shared_containers[ $wico_code ] ) )
 		{	// Skip container which is not installed as shared:
 			continue;
@@ -851,8 +846,13 @@ function insert_shared_widgets()
 
 		$wico_id = $shared_containers[ $wico_code ];
 
-		foreach( $container_widgets as $widget )
+		foreach( $container_widgets as $key => $widget )
 		{
+			if( ! is_number( $key ) )
+			{	// Skip the config data which is used as additional info for container like 'type', 'name', 'order', 'item_ID', 'coll_type':
+				continue;
+			}
+
 			if( isset( $widget['install'] ) && ! $widget['install'] )
 			{	// Skip widget because it should not be installed by condition from config:
 				continue;
@@ -932,6 +932,10 @@ function display_container( $WidgetContainer, $is_included = true, $params = arr
 		if( ! empty( $WidgetContainer->ID ) )
 		{
 			$widget_container_name = '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.( $mode == 'customizer' ? '&amp;mode='.$mode : '' ).'">'.$widget_container_name.'</a>';
+			if( $WidgetContainer->get_type() == 'page' )
+			{	// Display additional info for Page Container:
+				$widget_container_name .= ' '.sprintf( T_('on Page #%s'), $WidgetContainer->get( 'item_ID' ) );
+			}
 		}
 		$Table->title = '<span class="dimmed">'.$WidgetContainer->get( 'order' ).'</span> '
 			.'<span class="container_name" data-wico_id="'.$widget_container_id.'">'.$widget_container_name.'</span> '
@@ -1130,8 +1134,9 @@ function display_container( $WidgetContainer, $is_included = true, $params = arr
  * @param string Skin type: 'normal', 'mobile', 'tablet'
  * @param boolean TRUE to display main containers, FALSE - sub containers
  * @param boolean TRUE to display collection containers, FALSE - shared containers
+ * @param boolean TRUE to display page containers, FALSE - for all others
  */
-function display_containers( $skin_type, $main = true, $shared = false )
+function display_containers( $skin_type, $main = true, $shared = false, $paged = false )
 {
 	global $Blog, $DB, $blog_container_list;
 
@@ -1176,10 +1181,18 @@ function display_containers( $skin_type, $main = true, $shared = false )
 	}
 	else
 	{	// Display SUB containers:
+		if( $paged )
+		{	// Set SQL condition to select all page containers:
+			$pages_where_sql = 'wico_main = 1 AND wico_item_ID IS NOT NULL';
+		}
+		else
+		{	// Set SQL condition to select not page containers:
+			$pages_where_sql = 'wico_main = 0 AND wico_item_ID IS NULL';
+		}
 		$WidgetContainerCache->clear();
-		$WidgetContainerCache->load_where( 'wico_main = 0
-			AND wico_coll_ID '.( $shared ? 'IS NULL' : ' = '.$Blog->ID ).'
-			AND wico_skin_type = '.$DB->quote( $skin_type ) );
+		$WidgetContainerCache->load_where( 'wico_coll_ID '.( $shared ? 'IS NULL' : ' = '.$Blog->ID ).'
+			AND wico_skin_type = '.$DB->quote( $skin_type ).'
+			AND ( '.$pages_where_sql.' )' );
 
 		foreach( $WidgetContainerCache->cache as $WidgetContainer )
 		{

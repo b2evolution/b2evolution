@@ -543,6 +543,7 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 	{
 		case 'skin':
 		case 'sub':
+		case 'page':
 			// Install widgets for collection/skin container:
 			$BlogCache = & get_BlogCache();
 			$BlogCache->load_all();
@@ -560,38 +561,18 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 				// Get again config of default widgets for the requested container because several settings depend on collection type/kind:
 				$container_widgets = get_default_widgets_by_container( $new_container_code, $widget_Blog->get( 'type' ) );
 
-				if( isset( $container_widgets['coll_type'] ) )
-				{	// Handle special condition key:
-					if( ! is_allowed_option( $widget_Blog->get( 'type' ), $container_widgets['coll_type'] ) )
-					{	// Skip container because it should not be installed for the given collection kind:
-						continue;
-					}
+				if( isset( $container_widgets['coll_type'] ) &&
+				    ! is_allowed_option( $widget_Blog->get( 'type' ), $container_widgets['coll_type'] ) )
+				{	// Skip container because it should not be installed for the given collection kind:
+					continue;
 				}
 
-				if( $container_type == 'sub' )
-				{	// Initialize sub-container data in order to install it below:
+				if( $container_type == 'sub' || $container_type == 'page' )
+				{	// Initialize sub-container and page containers data in order to install it below:
 					$coll_containers[ $new_container_code ] = array(
 							isset( $container_widgets['name'] ) ? $container_widgets['name'] : $new_container_code,
 							isset( $container_widgets['order'] ) ? $container_widgets['order'] : 1,
 						);
-				}
-
-				// Remove the config data which is used as additional info for container:
-				if( isset( $container_widgets['type'] ) )
-				{	// Container type
-					unset( $container_widgets['type'] );
-				}
-				if( isset( $container_widgets['name'] ) )
-				{	// Container name
-					unset( $container_widgets['name'] );
-				}
-				if( isset( $container_widgets['order'] ) )
-				{	// Container order
-					unset( $container_widgets['order'] );
-				}
-				if( isset( $container_widgets['coll_type'] ) )
-				{	// Collection type where the container should be installed:
-					unset( $container_widgets['coll_type'] );
 				}
 
 				if( ! empty( $container_widgets ) )
@@ -610,8 +591,19 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 							continue;
 						}
 						// Insert new widget container into DB:
-						$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main )
-								VALUES ( '.$DB->quote( $new_container_code ).', '.$DB->quote( $coll_container[0] ).', '.$widget_Blog->ID.', '.$DB->quote( $coll_container[1] ).', '.( $container_type == 'skin' ? 1 : 0 ).' )' );
+						$new_container_fields = array(
+							'wico_code'    => $new_container_code,
+							'wico_name'    => $coll_container[0],
+							'wico_coll_ID' => $widget_Blog->ID,
+							'wico_order'   => $coll_container[1],
+							'wico_main'    => $container_type == 'sub' ? 0 : 1,
+						);
+						if( $container_type == 'page' && isset( $container_widgets['item_ID'] ) )
+						{	// Page container has an additional field for Item:
+							$new_container_fields['wico_item_ID'] = $container_widgets['item_ID'];
+						}
+						$DB->query( 'INSERT INTO T_widget__container ( '.implode( ', ', array_keys( $new_container_fields ) ).' )
+								VALUES ( '.$DB->quote( $new_container_fields ).' )' );
 						// Update ID of new inserted widget container:
 						$coll_container['ID'] = $DB->insert_id;
 						// Also update ID in collection cache for next calls:
@@ -641,8 +633,13 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 						$widget_orders_in_containers[ $coll_container['ID'] ] = array();
 					}
 
-					foreach( $container_widgets as $widget )
+					foreach( $container_widgets as $key => $widget )
 					{
+						if( ! is_number( $key ) )
+						{	// Skip the config data which is used as additional info for container like 'type', 'name', 'order', 'item_ID', 'coll_type':
+							continue;
+						}
+
 						if( ! is_allowed_option( $widget[1], $new_widget_codes ) )
 						{	// Skip not requested widget:
 							continue;
@@ -719,26 +716,13 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 				break;
 			}
 
-			// Remove the config data which is used as additional info for container:
-			if( isset( $container_widgets['type'] ) )
-			{	// Container type
-				unset( $container_widgets['type'] );
-			}
-			if( isset( $container_widgets['name'] ) )
-			{	// Container name
-				unset( $container_widgets['name'] );
-			}
-			if( isset( $container_widgets['order'] ) )
-			{	// Container order
-				unset( $container_widgets['order'] );
-			}
-			if( isset( $container_widgets['coll_type'] ) )
-			{	// Collection type where the container should be installed:
-				unset( $container_widgets['coll_type'] );
-			}
-
-			foreach( $container_widgets as $widget )
+			foreach( $container_widgets as $key => $widget )
 			{
+				if( ! is_number( $key ) )
+				{	// Skip the config data which is used as additional info for container like 'type', 'name', 'order', 'item_ID', 'coll_type':
+					continue;
+				}
+
 				if( isset( $widget['install'] ) && ! $widget['install'] )
 				{	// Skip widget because it should not be installed by condition from config:
 					continue;
@@ -10776,6 +10760,20 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		install_new_default_widgets( 'navigation_hamburger' );
 		install_new_default_widgets( 'main_navigation' );
 		install_new_default_widgets( 'right_navigation' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13270, 'Upgrading widget containers table...' ) )
+	{	// part of 7.0.0-alpha
+		db_add_col( 'T_widget__container', 'wico_item_ID', 'INT(11) UNSIGNED NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13280, 'Installing new page widgets/containers...' ) )
+	{	// part of 7.0.0-alpha
+		install_new_default_widgets( 'widget_page_section_1' );
+		install_new_default_widgets( 'widget_page_section_2' );
+		install_new_default_widgets( 'widget_page_section_3' );
 		upg_task_end();
 	}
 
