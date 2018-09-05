@@ -5231,12 +5231,12 @@ function ityp_schema_titles( $include_false_schema = true, $recurse_format = fal
 	if( $recurse_format )
 	{
 		$indent = '&nbsp;&nbsp;';
-		$schema_titles['Article'] = $indent.T_('Article');
-		$schema_titles['BlogPosting'] = $indent.$indent.$indent.T_('BlogPosting');
-		$schema_titles['DiscussionForumPosting'] = $indent.$indent.$indent.T_('DiscussionForumPosting');
-		$schema_titles['TechArticle'] = $indent.$indent.T_('TechArticle');
-		$schema_titles['WebPage'] = $indent.T_('WebPage');
-		$schema_titles['ImageGallery'] = $indent.$indent.$indent.T_('ImageGallery');
+		$schema_titles['Article'] = T_('Article');
+		$schema_titles['BlogPosting'] = $indent.T_('BlogPosting');
+		$schema_titles['DiscussionForumPosting'] = $indent.T_('DiscussionForumPosting');
+		$schema_titles['TechArticle'] = $indent.T_('TechArticle');
+		$schema_titles['WebPage'] = T_('WebPage');
+		$schema_titles['ImageGallery'] = $indent.T_('ImageGallery');
 		$schema_titles['Product'] = T_('Product');
 	}
 	else
