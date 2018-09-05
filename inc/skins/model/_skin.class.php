@@ -307,6 +307,8 @@ class Skin extends DataObject
 				'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
 				'container_start' => '',
 				'container_end'   => '',
+				// Restriction for Page Containers:
+				'container_item_ID' => NULL,
 			), $params );
 
 		$WidgetContainer = isset( $params['WidgetContainer'] ) ? $params['WidgetContainer'] : NULL;
