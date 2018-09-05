@@ -5235,6 +5235,7 @@ function ityp_schema_titles( $include_false_schema = true, $recurse_format = fal
 		$schema_titles['BlogPosting'] = $indent.T_('BlogPosting');
 		$schema_titles['DiscussionForumPosting'] = $indent.T_('DiscussionForumPosting');
 		$schema_titles['TechArticle'] = $indent.T_('TechArticle');
+		$schema_titles['Review'] = T_('Review');
 		$schema_titles['WebPage'] = T_('WebPage');
 		$schema_titles['ImageGallery'] = $indent.T_('ImageGallery');
 		$schema_titles['Product'] = T_('Product');
@@ -5245,6 +5246,7 @@ function ityp_schema_titles( $include_false_schema = true, $recurse_format = fal
 		$schema_titles['BlogPosting'] = T_('BlogPosting');
 		$schema_titles['DiscussionForumPosting'] = T_('DiscussionForumPosting');
 		$schema_titles['TechArticle'] = T_('TechArticle');
+		$schema_titles['Review'] = T_('Review');
 		$schema_titles['WebPage'] = T_('WebPage');
 		$schema_titles['ImageGallery'] = T_('ImageGallery');
 		$schema_titles['Product'] = T_('Product');
