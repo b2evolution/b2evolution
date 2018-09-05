@@ -312,7 +312,7 @@ class WidgetContainer extends DataObject
 	{
 		if( $this->get( 'coll_ID' ) )
 		{	// Collection/skin container:
-			if( $this->get( 'item_ID' ) )
+			if( $this->get( 'item_ID' ) !== NULL )
 			{	// Page container:
 				return 'page';
 			}

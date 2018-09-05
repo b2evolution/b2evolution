@@ -1360,7 +1360,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'demo' );
-				$installed_collection_info_pages[] = $edited_Item->insert( $owner_ID, T_('Widget Page'), T_('Widget Page'), $now, $cat_home_b2evo,
+				$installed_collection_info_pages['widget_page'] = $edited_Item->insert( $owner_ID, T_('Widget Page'), T_('Widget Page'), $now, $cat_home_b2evo,
 						array( $cat_home_b2evo ), 'published', '#', '', '', 'open', array( 'default' ), 'Widget Page' );
 			}
 

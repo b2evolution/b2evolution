@@ -611,7 +611,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'type'    => 'page',
 		'name'    => NT_('Widget Page Section 1'),
 		'order'   => 10,
-		'item_ID' => 11,
+		'item_ID' => isset( $installed_collection_info_pages['widget_page'] ) ? $installed_collection_info_pages['widget_page'] : '',
 		array( 10, 'coll_featured_posts' ),
 	);
 
@@ -620,7 +620,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'type'    => 'page',
 		'name'    => NT_('Widget Page Section 2'),
 		'order'   => 20,
-		'item_ID' => 11,
+		'item_ID' => isset( $installed_collection_info_pages['widget_page'] ) ? $installed_collection_info_pages['widget_page'] : '',
 		array( 10, 'org_members' ),
 	);
 
@@ -629,7 +629,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'type'    => 'page',
 		'name'    => NT_('Widget Page Section 3'),
 		'order'   => 30,
-		'item_ID' => 11,
+		'item_ID' => isset( $installed_collection_info_pages['widget_page'] ) ? $installed_collection_info_pages['widget_page'] : '',
 		array( 10, 'evo_Gmaps', 'type' => 'plugin', 'params' => array(
 				'latitude'  => '48.8566573582',
 				'longitude' => '2.35195398331',
