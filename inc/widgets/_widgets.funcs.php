@@ -564,7 +564,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 			$default_widgets['main_navigation'][] = array( $tmp_widget_order++, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'item',
 				'item_ID'          => $installed_collection_info_page_item_ID,
-				'widget_css_class' => 'hidden-sm hidden-xs',
+				'widget_link_class'=> 'swhead_item hidden-sm hidden-xs',
 			) );
 		}
 	}
@@ -572,7 +572,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['main_navigation'] = array_merge( $default_widgets['main_navigation'], array(
 		array( $tmp_widget_order + 10, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'ownercontact',
-				'widget_css_class' => 'hidden-sm hidden-xs',
+				'widget_link_class'=> 'swhead_item hidden-sm hidden-xs',
 			) ),
 	) );
 
@@ -586,13 +586,14 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 			) ),
 		array( 20, 'basic_menu_link', 'params' => array(
 				'link_type' => 'register',
-				'widget_css_class' => 'swhead_item_white hidden-xs',
+				'widget_css_class'  => 'swhead_item_white',
+				'widget_link_class' => 'swhead_item hidden-xs',
 			) ),
 		array( 30, 'profile_menu_link', 'params' => array(
 				'profile_picture_size' => 'crop-top-32x32',
 			) ),
 		array( 40, 'msg_menu_link', 'params' => array(
-				'widget_css_class' => 'hidden-xs',
+				'widget_link_class' => 'hidden-xs',
 			) ),
 		array( 50, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'logout',
