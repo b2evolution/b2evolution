@@ -376,8 +376,16 @@ function create_default_data()
 			'use_comment_expiration' => 'never',
 		);
 	$post_types[] = array(
-			'name' => 'Bug Report',
-			'allow_html'     => 0,
+			'name'       => 'Bug Report',
+			'allow_html' => 0,
+		);
+	$post_types[] = array(
+			'name'   => 'Product',
+			'schema' => 'Product',
+		);
+	$post_types[] = array(
+			'name'   => 'Review',
+			'schema' => 'Review',
 		);
 	// Default settings:
 	$post_type_default_settings = array(
@@ -421,6 +429,8 @@ function create_default_data()
 	// Item type custom fields:
 	$parent_ityp_ID = 3;
 	$child_ityp_ID = 4;
+	$product_ityp_ID = 20;
+	$review_ityp_ID = 21;
 	$custom_fields = array(
 		// for Item Type "Post with Custom Fields":
 		array(
@@ -548,12 +558,74 @@ function create_default_data()
 			'format'          => '#yes#;;#no#;n/a',
 			'cell_class'      => 'right',
 		),
+		// for Item Type "Product":
+		array(
+			'ityp_ID'         => $product_ityp_ID,
+			'label'           => T_('Brand'),
+			'name'            => 'brand',
+			'schema_prop'     => 'brand',
+			'type'            => 'varchar',
+			'order'           => 1,
+		),
+		array(
+			'ityp_ID'         => $product_ityp_ID,
+			'label'           => T_('SKU'),
+			'name'            => 'sku',
+			'schema_prop'     => 'sku',
+			'type'            => 'varchar',
+			'order'           => 2,
+		),
+		array(
+			'ityp_ID'         => $product_ityp_ID,
+			'label'           => T_('Price'),
+			'name'            => 'price',
+			'schema_prop'     => 'offers.price',
+			'type'            => 'double',
+			'order'           => 3,
+			'format'          => '$ 0 0.00',
+		),
+		array(
+			'ityp_ID'         => $product_ityp_ID,
+			'label'           => T_('Currency'),
+			'name'            => 'currency',
+			'schema_prop'     => 'offers.priceCurrency',
+			'type'            => 'varchar',
+			'order'           => 4,
+			'note'            => T_('in three-letter ISO 4217 format'),
+		),
+		array(
+			'ityp_ID'         => $product_ityp_ID,
+			'label'           => T_('Availability'),
+			'name'            => 'availability',
+			'schema_prop'     => 'offers.availability',
+			'type'            => 'varchar',
+			'order'           => 5,
+		),
+		// for Item Type "Review":
+		array(
+			'ityp_ID'         => $review_ityp_ID,
+			'label'           => T_('Item reviewed'),
+			'name'            => 'item_reviewed_name',
+			'schema_prop'     => 'itemReviewed.name',
+			'type'            => 'varchar',
+			'order'           => 1,
+		),
+		array(
+			'ityp_ID'         => $review_ityp_ID,
+			'label'           => T_('Rating value'),
+			'name'            => 'review_rating_value',
+			'schema_prop'     => 'reviewRating.ratingValue',
+			'type'            => 'double',
+			'order'           => 2,
+			'note'            => T_('Rating must be a value between 1 and 5 with 5 being the highest.'),
+		),
 	);
 	// Default settings for custom fields:
 	$custom_field_default_settings = array(
 			'ityp_ID'         => $parent_ityp_ID,
 			'label'           => '',
 			'name'            => '',
+			'schema_prop'     => NULL,
 			'type'            => 'double',
 			'order'           => '',
 			'note'            => NULL,

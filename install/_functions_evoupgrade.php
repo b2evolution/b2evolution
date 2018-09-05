@@ -10684,9 +10684,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13240, 'Updating table item types... ' ) )
+	if( upg_task_start( 13240, 'Updating table item types...' ) )
 	{ // part of 7.0.0-alpha
 		db_modify_col( 'T_items__type', 'ityp_schema', 'ENUM( "Article", "WebPage", "BlogPosting", "ImageGallery", "DiscussionForumPosting", "TechArticle", "Product", "Review" ) COLLATE ascii_general_ci NULL DEFAULT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13250, 'Updating table item custom fields...' ) )
+	{ // part of 7.0.0-alpha
+		db_add_col( 'T_items__type_custom_field', 'itcf_schema_prop', 'VARCHAR(255) COLLATE ascii_general_ci NULL AFTER itcf_name' );
 		upg_task_end();
 	}
 
