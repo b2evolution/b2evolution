@@ -2544,6 +2544,18 @@ function skin_structured_data()
 					}
 				}
 
+				// Add markup from custom fields:
+				$custom_fields = $Item->get_custom_fields_defs();
+				$custom_markup = array();
+				foreach( $custom_fields as $custom_field )
+				{
+					if( ! empty( $custom_field['schema_prop'] ) )
+					{
+						$custom_markup = array_merge_recursive( $custom_markup, convert_path_to_array( $custom_field['schema_prop'], $custom_field['value'] ) );
+					}
+				}
+				$markup = array_merge( $markup, $custom_markup );
+
 				// Output the markup:
 				echo '<!-- Start of Structured Data -->'."\n";
 				echo '<script type="application/ld+json">'."\n";

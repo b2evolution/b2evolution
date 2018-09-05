@@ -9198,4 +9198,32 @@ function is_allowed_option( $checked_option, $allowed_options )
 
 	return ( $is_allowed_options ? $is_in_checked_array : ! $is_in_checked_array );
 }
+
+
+/**
+ * Converts path into an array
+ *
+ * @param string Path usually in dot notation
+ * @param string Value of the path property
+ * @param string Separator string
+ * @return array Schema property array
+ */
+function convert_path_to_array( $property, $value, $separator = '.' )
+{
+	$output = NULL;
+
+	foreach( array_reverse( explode( $separator, $property ) ) as $key )
+	{
+		if( empty( $output ) )
+		{
+			$output = array( $key => $value );
+		}
+		else
+		{
+			$output = array( $key => $output );
+		}
+	}
+
+	return $output;
+}
 ?>
