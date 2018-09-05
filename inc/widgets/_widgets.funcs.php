@@ -28,7 +28,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = false )
 {
-	global $DB, $install_test_features;
+	global $DB, $install_test_features, $installed_collection_info_pages;
 	// Handle all blog IDs which can go from function create_demo_contents()
 	global $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
 	$blog_home_ID = intval( $blog_home_ID );
@@ -513,31 +513,40 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 10, 'colls_list_public', 'params' => array(
 				'widget_css_class' => 'visible-xs',
 			) ),
-		array( 20, 'basic_menu_link', 'params' => array(
+	);
+	$tmp_widget_order = 20;
+	if( ! empty( $installed_collection_info_pages ) && is_array( $installed_collection_info_pages ) )
+	{	// Install additional menu items for each page from info collection:
+		foreach( $installed_collection_info_pages as $installed_collection_info_page_item_ID )
+		{
+			$default_widgets['navigation_hamburger'][] = array( $tmp_widget_order++, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'item',
-				'item_ID'          => isset( $installed_about_this_site_item_ID ) ? $installed_about_this_site_item_ID : '',
+				'item_ID'          => $installed_collection_info_page_item_ID,
 				'widget_css_class' => 'visible-sm visible-xs',
-				'install'          => ! empty( $installed_about_this_site_item_ID ),
-			) ),
-		array( 30, 'basic_menu_link', 'params' => array(
+			) );
+		}
+	}
+	$tmp_widget_order = intval( $tmp_widget_order / 10 ) * 10;
+	$default_widgets['navigation_hamburger'] = array_merge( $default_widgets['navigation_hamburger'], array(
+		array( $tmp_widget_order + 10, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'ownercontact',
 				'widget_css_class' => 'visible-sm visible-xs',
 			) ),
-		array( 40, 'free_html', 'params' => array(
+		array( $tmp_widget_order + 20, 'free_html', 'params' => array(
 				'content' => '<hr class="swhead_item_separator visible-xs" />',
 			) ),
-		array( 50, 'basic_menu_link', 'params' => array(
+		array( $tmp_widget_order + 30, 'basic_menu_link', 'params' => array(
 				'link_type' => 'register',
 				'widget_css_class' => 'swhead_item_white visible-xs',
 			) ),
-		array( 60, 'msg_menu_link', 'params' => array(
+		array( $tmp_widget_order + 40, 'msg_menu_link', 'params' => array(
 				'widget_css_class' => 'visible-xs',
 			) ),
-		array( 70, 'basic_menu_link', 'params' => array(
+		array( $tmp_widget_order + 50, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'logout',
 				'widget_css_class' => 'visible-xs',
 			) ),
-	);
+	) );
 
 	/* Main Navigation */
 	$default_widgets['main_navigation'] = array(
@@ -545,18 +554,27 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'name' => NT_('Main Navigation'),
 		array( 10, 'colls_list_public', 'params' => array(
 				'widget_css_class' => 'hidden-xs',
-			) ),
-		array( 20, 'basic_menu_link', 'params' => array(
+			) )
+	);
+	$tmp_widget_order = 20;
+	if( ! empty( $installed_collection_info_pages ) && is_array( $installed_collection_info_pages ) )
+	{	// Install additional menu items for each page from info collection:
+		foreach( $installed_collection_info_pages as $installed_collection_info_page_item_ID )
+		{
+			$default_widgets['main_navigation'][] = array( $tmp_widget_order++, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'item',
-				'item_ID'          => isset( $installed_about_this_site_item_ID ) ? $installed_about_this_site_item_ID : '',
+				'item_ID'          => $installed_collection_info_page_item_ID,
 				'widget_css_class' => 'hidden-sm hidden-xs',
-				'install'          => ! empty( $installed_about_this_site_item_ID ),
-			) ),
-		array( 30, 'basic_menu_link', 'params' => array(
+			) );
+		}
+	}
+	$tmp_widget_order = intval( $tmp_widget_order / 10 ) * 10;
+	$default_widgets['main_navigation'] = array_merge( $default_widgets['main_navigation'], array(
+		array( $tmp_widget_order + 10, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'ownercontact',
 				'widget_css_class' => 'hidden-sm hidden-xs',
 			) ),
-	);
+	) );
 
 	/* Right Navigation */
 	$default_widgets['right_navigation'] = array(

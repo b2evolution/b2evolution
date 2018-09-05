@@ -10755,6 +10755,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 13260, 'Installing new shared widgets/containers...' ) )
 	{	// part of 7.0.0-alpha
+		// Set all pages from info collection in order to create menu items in shared widget containers "Main Navigation" and "Navigation Hamburger":
+		global $installed_collection_info_pages;
+		$SQL = new SQL( 'Get all pages from Collection for info pages' );
+		$SQL->SELECT( 'post_ID' );
+		$SQL->FROM( 'T_items__item' );
+		$SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
+		$SQL->FROM_add( 'INNER JOIN T_blogs ON cat_blog_ID = blog_ID' );
+		$SQL->FROM_add( 'INNER JOIN T_settings ON set_name = "info_blog_ID" AND set_value = blog_ID' );
+		$SQL->FROM_add( 'INNER JOIN T_items__type ON post_ityp_ID = ityp_ID' );
+		$SQL->WHERE( 'ityp_usage = "page"' );
+		$installed_collection_info_pages = $DB->get_col( $SQL );
+		// Install new shared widgets/containers:
 		install_new_default_widgets( 'site_header' );
 		install_new_default_widgets( 'site_footer' );
 		install_new_default_widgets( 'navigation_hamburger' );
