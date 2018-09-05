@@ -54,6 +54,17 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'seo' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
+$Form->begin_fieldset( T_('General').get_manual_link( 'general_seo' ) );
+	$Form->checkbox( 'tags_open_graph', $edited_Blog->get_setting( 'tags_open_graph' ), T_('Open Graph'),
+			sprintf( /* TRANS: %s replaced with <code><head></code> */ T_('Include Open Graph tags in the %s section'), '<code>&lt;head&gt;</code>' ).' (og:title, og:url, og:description, og:type and og:image)' );
+
+	$Form->checkbox( 'tags_twitter_card', $edited_Blog->get_setting( 'tags_twitter_card' ), T_('Twitter Card'),
+			sprintf( /* TRANS: %s replaced with <code><head></code> */ T_('Include Twitter Summary card in the %s section'), '<code>&lt;head&gt;</code>' ) );
+
+	$Form->checkbox( 'tags_structured_data', $edited_Blog->get_setting( 'tags_structured_data' ), T_('Structured Data'),
+			sprintf( /* TRANS: %s replaced with <code></body></code> */ T_('Include Structured Data before %s'), '<code>&lt;/body&gt;</code>' ) );
+$Form->end_fieldset();
+
 $Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(disp=posts)</span>'.get_manual_link('main_page_seo') );
 	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Default blog page'), T_('META NOINDEX') );
 	$Form->checklist( array(
@@ -121,13 +132,6 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 
 	$Form->checkbox( 'tags_meta_keywords', $edited_Blog->get_setting( 'tags_meta_keywords' ),
 			T_('Meta Keywords'), T_('When no meta keywords are provided for an item, use tags instead.') );
-
-	$Form->checkbox( 'tags_open_graph', $edited_Blog->get_setting( 'tags_open_graph' ),
-			T_('Open Graph'), T_('Open Graph tags').' (og:title, og:url, og:description, og:type and og:image)' );
-
-	$Form->checkbox( 'tags_twitter_card', $edited_Blog->get_setting( 'tags_twitter_card' ),
-			T_('Twitter Card'), T_('Include Twitter Summary card') );
-
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_seo') );

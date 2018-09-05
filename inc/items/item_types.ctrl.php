@@ -360,6 +360,7 @@ switch( $action )
 		param( 'itcf_order', 'integer' );
 		param( 'itcf_label', 'string' );
 		param( 'itcf_name', 'string' );
+		param( 'itcf_schema_prop', 'string' );
 		param( 'itcf_format', 'string' );
 		param( 'itcf_formula', 'string' );
 		param( 'itcf_header_class', 'string' );

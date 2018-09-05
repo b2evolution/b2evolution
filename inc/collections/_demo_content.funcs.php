@@ -2806,18 +2806,22 @@ Hello
 			// Sample posts
 			if( is_available_item_type( $blog_ID, '#' ) )
 			{
+				$availability = array( 'Discontinued', 'InStock', 'InStoreOnly', 'LimitedAvailability', 'OnlineOnly', 'OutOfStock', 'PreOrder', 'PreSale', 'SoldOut' );
+
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$desc = '<ul><li>'.$pen_desc[0]."</li>\n<li>".$pen_desc[1]."</li>\n<li>".$pen_desc[2].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'pen, marker' );
-				$edited_Item->set_setting( 'custom:price_usd', '12.99' );
-				$edited_Item->set_setting( 'custom:brand_name', 'Pilot' );
+				$edited_Item->set_setting( 'custom:price', '12.99' );
+				$edited_Item->set_setting( 'custom:brand', 'Pilot' );
 				$edited_Item->set_setting( 'custom:item_color', 'assorted' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.1' );
 				$edited_Item->set_setting( 'custom:package_length', '14.22' );
 				$edited_Item->set_setting( 'custom:package_width', '9.40' );
 				$edited_Item->set_setting( 'custom:package_height', '1.8' );
+				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
+				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('Pilot V Razor Point Liquid Ink Marker Pens, extra fine point, 8/pack'), $desc,
 						$now, $cat_catalog_marker, array( $cat_catalog_bestseller ), 'published','en-US' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -2834,13 +2838,16 @@ Hello
 				$desc = '<ul><li>'.$pen_desc[1]."</li>\n<li>".$pen_desc[2]."</li>\n<li>".$pen_desc[0].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'pen' );
-				$edited_Item->set_setting( 'custom:price_usd', '16.99' );
-				$edited_Item->set_setting( 'custom:brand_name', 'Pilot' );
+				$edited_Item->set_setting( 'custom:price', '16.99' );
+				$edited_Item->set_setting( 'custom:currency', 'USD' );
+				$edited_Item->set_setting( 'custom:brand', 'Pilot' );
 				$edited_Item->set_setting( 'custom:item_color', 'assorted' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.15' );
 				$edited_Item->set_setting( 'custom:package_length', '13.97' );
 				$edited_Item->set_setting( 'custom:package_width', '9.65' );
 				$edited_Item->set_setting( 'custom:package_height', '0.76' );
+				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
+				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('Pilot Varsity Fountain Pens, 0.1mm medium nib, 7/pack'), $desc,
 						$now, $cat_catalog_pen, array( $cat_catalog_new ), 'published','en-US' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -2857,13 +2864,16 @@ Hello
 				$desc = '<ul><li>'.$pen_desc[2]."</li>\n<li>".$pen_desc[0]."</li>\n<li>".$pen_desc[1].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'pen' );
-				$edited_Item->set_setting( 'custom:price_usd', '12.99' );
-				$edited_Item->set_setting( 'custom:brand_name', 'BIC' );
+				$edited_Item->set_setting( 'custom:price', '12.99' );
+				$edited_Item->set_setting( 'custom:currency', 'USD' );
+				$edited_Item->set_setting( 'custom:brand', 'BIC' );
 				$edited_Item->set_setting( 'custom:item_color', 'black' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.16' );
 				$edited_Item->set_setting( 'custom:package_length', '14.22' );
 				$edited_Item->set_setting( 'custom:package_width', '9.40' );
 				$edited_Item->set_setting( 'custom:package_height', '1.8' );
+				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
+				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('BIC&reg; Xtra Comfort Round Stic&reg; Grip Ballpoint Pens, medium point, 12/pack'), $desc,
 						$now, $cat_catalog_pen, array( $cat_catalog_bestseller ), 'published','en-US' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -2880,13 +2890,16 @@ Hello
 				$desc = '<ul><li>'.$pen_desc[2]."</li>\n<li>".$pen_desc[1]."</li>\n<li>".$pen_desc[0].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'pen, marker' );
-				$edited_Item->set_setting( 'custom:price_usd', '11.79' );
-				$edited_Item->set_setting( 'custom:brand_name', 'Sharpie' );
+				$edited_Item->set_setting( 'custom:price', '11.79' );
+				$edited_Item->set_setting( 'custom:currency', 'USD' );
+				$edited_Item->set_setting( 'custom:brand', 'Sharpie' );
 				$edited_Item->set_setting( 'custom:item_color', 'black' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.25' );
 				$edited_Item->set_setting( 'custom:package_length', '15.24' );
 				$edited_Item->set_setting( 'custom:package_width', '7.12' );
 				$edited_Item->set_setting( 'custom:package_height', '2.79' );
+				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
+				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('Sharpie&reg; Fine Point Permanent Markers, 12/pack'), $desc,
 						$now, $cat_catalog_marker, array( $cat_catalog_bestseller ), 'published','en-US' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -2906,13 +2919,16 @@ Hello
 				$desc = '<ul><li>'.$pen_desc[1]."</li>\n<li>".$pen_desc[0]."</li>\n<li>".$pen_desc[2].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'pen, retractable' );
-				$edited_Item->set_setting( 'custom:price_usd', '23.99' );
-				$edited_Item->set_setting( 'custom:brand_name', 'BIC' );
+				$edited_Item->set_setting( 'custom:price', '23.99' );
+				$edited_Item->set_setting( 'custom:currency', 'USD' );
+				$edited_Item->set_setting( 'custom:brand', 'BIC' );
 				$edited_Item->set_setting( 'custom:item_color', 'black/blue' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.23' );
 				$edited_Item->set_setting( 'custom:package_length', '15.24' );
 				$edited_Item->set_setting( 'custom:package_width', '6.99' );
 				$edited_Item->set_setting( 'custom:package_height', '6.05' );
+				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
+				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('BIC&reg; Atlantis&reg; Retractable Ballpoint Pens, medium point 1.0mm, 24/pack'), $desc,
 						$now, $cat_catalog_pen, array( $cat_catalog_bestseller ), 'published','en-US' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -2926,13 +2942,16 @@ Hello
 				$desc = '<ul><li>'.$pen_desc[0]."</li>\n<li>".$pen_desc[2]."</li>\n<li>".$pen_desc[1].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'pen, highlighter' );
-				$edited_Item->set_setting( 'custom:price_usd', '5.79' );
-				$edited_Item->set_setting( 'custom:brand_name', 'Sharpie' );
+				$edited_Item->set_setting( 'custom:price', '5.79' );
+				$edited_Item->set_setting( 'custom:currency', 'USD' );
+				$edited_Item->set_setting( 'custom:brand', 'Sharpie' );
 				$edited_Item->set_setting( 'custom:item_color', 'assorted' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.19' );
 				$edited_Item->set_setting( 'custom:package_length', '13.21' );
 				$edited_Item->set_setting( 'custom:package_width', '11.94' );
 				$edited_Item->set_setting( 'custom:package_height', '1.78' );
+				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
+				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('Sharpie&reg; Accent&reg; Tank Highlighters, chisel tip, 6/pack'), $desc,
 						$now, $cat_catalog_marker, array( $cat_catalog_pen ), 'published','en-US' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -2952,13 +2971,16 @@ Hello
 				$desc = '<ul><li>'.$envelope_desc[0]."</li>\n<li>".$envelope_desc[1]."</li>\n<li>".$envelope_desc[2].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:price_usd', '76.79' );
-				$edited_Item->set_setting( 'custom:brand_name', 'Quality Park' );
+				$edited_Item->set_setting( 'custom:price', '76.79' );
+				$edited_Item->set_setting( 'custom:currency', 'USD' );
+				$edited_Item->set_setting( 'custom:brand', 'Quality Park' );
 				$edited_Item->set_setting( 'custom:item_color', 'white' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.15' );
 				$edited_Item->set_setting( 'custom:package_length', '21.91' );
 				$edited_Item->set_setting( 'custom:package_width', '0.40' );
 				$edited_Item->set_setting( 'custom:package_height', '9.21' );
+				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
+				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('Quality Park&reg; Redi-Seal&trade; Double Window Security Business Envelopes, #8-5/8, 500/box'), $desc,
 						$now, $cat_catalog_envelope, array( $cat_catalog_bestseller ), 'published','en-US' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -2972,13 +2994,16 @@ Hello
 				$desc = '<ul><li>'.$envelope_desc[1]."</li>\n<li>".$envelope_desc[2]."</li>\n<li>".$envelope_desc[0].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:price_usd', '5.49' );
-				$edited_Item->set_setting( 'custom:brand_name', 'JAM Paper' );
+				$edited_Item->set_setting( 'custom:price', '5.49' );
+				$edited_Item->set_setting( 'custom:currency', 'USD' );
+				$edited_Item->set_setting( 'custom:brand', 'JAM Paper' );
 				$edited_Item->set_setting( 'custom:item_color', 'yellow' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.08' );
 				$edited_Item->set_setting( 'custom:package_length', '24.13' );
 				$edited_Item->set_setting( 'custom:package_width', '0.04' );
 				$edited_Item->set_setting( 'custom:package_height', '10.48' );
+				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
+				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('JAM Paper&reg; #10 Window Envelopes, 4 1/8 x 9 1/2, Bright Hue yellow recyled, 25/pack'), $desc,
 						$now, $cat_catalog_envelope, array(), 'published','en-US' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -2992,13 +3017,16 @@ Hello
 				$desc = '<ul><li>'.$envelope_desc[2]."</li>\n<li>".$envelope_desc[0]."</li>\n<li>".$envelope_desc[1].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:price_usd', '29.99' );
-				$edited_Item->set_setting( 'custom:brand_name', 'JAM Paper' );
+				$edited_Item->set_setting( 'custom:price', '29.99' );
+				$edited_Item->set_setting( 'custom:currency', 'USD' );
+				$edited_Item->set_setting( 'custom:brand', 'JAM Paper' );
 				$edited_Item->set_setting( 'custom:item_color', 'white' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.20' );
 				$edited_Item->set_setting( 'custom:package_length', '16.51' );
 				$edited_Item->set_setting( 'custom:package_width', '1.20' );
 				$edited_Item->set_setting( 'custom:package_height', '9.21' );
+				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
+				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('JAM Paper&reg; #6 3/4 Commercial Envelopes, 250/box'), $desc,
 						$now, $cat_catalog_envelope, array(), 'published','en-US' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -3015,13 +3043,16 @@ Hello
 				$desc = '<ul><li>'.$envelope_desc[2]."</li>\n<li>".$envelope_desc[1]."</li>\n<li>".$envelope_desc[0].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:price_usd', '29.99' );
-				$edited_Item->set_setting( 'custom:brand_name', 'Simply Quickstrip' );
+				$edited_Item->set_setting( 'custom:price', '29.99' );
+				$edited_Item->set_setting( 'custom:currency', 'USD' );
+				$edited_Item->set_setting( 'custom:brand', 'Simply Quickstrip' );
 				$edited_Item->set_setting( 'custom:item_color', 'white' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.20' );
 				$edited_Item->set_setting( 'custom:package_length', '16.51' );
 				$edited_Item->set_setting( 'custom:package_width', '0.50' );
 				$edited_Item->set_setting( 'custom:package_height', '9.21' );
+				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
+				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('Simply QuickStrip Security Tint #6 3/4 Envelope, 50/box'), $desc,
 						$now, $cat_catalog_envelope, array(), 'published','en-US' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -3035,13 +3066,16 @@ Hello
 				$desc = '<ul><li>'.$envelope_desc[1]."</li>\n<li>".$envelope_desc[2]."</li>\n<li>".$envelope_desc[0].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:price_usd', '5.99' );
-				$edited_Item->set_setting( 'custom:brand_name', 'JAM Paper' );
+				$edited_Item->set_setting( 'custom:price', '5.99' );
+				$edited_Item->set_setting( 'custom:currency', 'USD' );
+				$edited_Item->set_setting( 'custom:brand', 'JAM Paper' );
 				$edited_Item->set_setting( 'custom:item_color', 'dark red' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.10' );
 				$edited_Item->set_setting( 'custom:package_length', '18.42' );
 				$edited_Item->set_setting( 'custom:package_width', '0.13' );
 				$edited_Item->set_setting( 'custom:package_height', '13.34' );
+				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
+				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('JAM Paper&reg; A7 Invitation Envelopes, 25/pack'), $desc,
 						$now, $cat_catalog_envelope, array(), 'published','en-US' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -3058,13 +3092,16 @@ Hello
 				$desc = '<ul><li>'.$envelope_desc[2]."</li>\n<li>".$envelope_desc[1]."</li>\n<li>".$envelope_desc[0].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:price_usd', '12.29' );
-				$edited_Item->set_setting( 'custom:brand_name', 'Quality Park' );
+				$edited_Item->set_setting( 'custom:price', '12.29' );
+				$edited_Item->set_setting( 'custom:currency', 'USD' );
+				$edited_Item->set_setting( 'custom:brand', 'Quality Park' );
 				$edited_Item->set_setting( 'custom:item_color', 'white' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.10' );
 				$edited_Item->set_setting( 'custom:package_length', '15.24' );
 				$edited_Item->set_setting( 'custom:package_width', '0.18' );
 				$edited_Item->set_setting( 'custom:package_height', '21.29' );
+				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
+				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('Quality Park Redi-Strip&trade; Anti-Static Disk Mailers Envelopes, 25/box'), $desc,
 						$now, $cat_catalog_envelope, array(), 'published','en-US' );
 				$LinkOwner = new LinkItem( $edited_Item );

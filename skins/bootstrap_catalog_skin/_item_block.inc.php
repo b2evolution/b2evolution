@@ -257,7 +257,7 @@ if( $disp == 'single' )
 		<?php if( ! $Item->is_intro() )
 		{ // Do not display "Sale" icon on Intro posts ?>
 		<div class="evo_post__price center">
-			<span class="regularprice"><?php echo '$'.$Item->get_setting( 'custom:price_usd' ).' ';?></span>
+			<span class="regularprice"><?php echo '$'.$Item->get_setting( 'custom:price' ).' ';?></span>
 			<span class="oldprice">$19.99 </span>
 			<span class="newprice">$12.99 </span>
 			<?php

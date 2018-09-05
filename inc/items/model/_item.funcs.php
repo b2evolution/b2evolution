@@ -5220,19 +5220,37 @@ function callback_filter_item_list_table( & $Form )
  * @param boolean TRUE - to include false statuses, which don't exist in DB
  * @return array Status titles
  */
-function ityp_schema_titles( $include_false_schema = true )
+function ityp_schema_titles( $include_false_schema = true, $recurse_format = false )
 {
 	$schema_titles = array();
 	if( $include_false_schema )
 	{ // Include Unknown status
 		$schema_titles[''] = T_('None');
 	}
-	$schema_titles['Article'] = T_('Article');
-	$schema_titles['WebPage'] = T_('Web Page');
-	$schema_titles['BlogPosting'] = T_('Blog Posting');
-	$schema_titles['ImageGallery'] = T_('Image Gallery');
-	$schema_titles['DiscussionForumPosting'] = T_('Discussion Forum Posting');
-	$schema_titles['TechArticle'] = T_('Technical Article');
+
+	if( $recurse_format )
+	{
+		$indent = '&nbsp;&nbsp;';
+		$schema_titles['Article'] = T_('Article');
+		$schema_titles['BlogPosting'] = $indent.T_('BlogPosting');
+		$schema_titles['DiscussionForumPosting'] = $indent.T_('DiscussionForumPosting');
+		$schema_titles['TechArticle'] = $indent.T_('TechArticle');
+		$schema_titles['Review'] = T_('Review');
+		$schema_titles['WebPage'] = T_('WebPage');
+		$schema_titles['ImageGallery'] = $indent.T_('ImageGallery');
+		$schema_titles['Product'] = T_('Product');
+	}
+	else
+	{
+		$schema_titles['Article'] = T_('Article');
+		$schema_titles['BlogPosting'] = T_('BlogPosting');
+		$schema_titles['DiscussionForumPosting'] = T_('DiscussionForumPosting');
+		$schema_titles['TechArticle'] = T_('TechArticle');
+		$schema_titles['Review'] = T_('Review');
+		$schema_titles['WebPage'] = T_('WebPage');
+		$schema_titles['ImageGallery'] = T_('ImageGallery');
+		$schema_titles['Product'] = T_('Product');
+	}
 
 	return $schema_titles;
 }

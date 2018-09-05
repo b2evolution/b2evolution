@@ -1270,6 +1270,7 @@ class Blog extends DataObject
 			$this->set_setting( 'tags_meta_keywords', param( 'tags_meta_keywords', 'integer', 0 ) );
 			$this->set_setting( 'tags_open_graph', param( 'tags_open_graph', 'integer', 0 ) );
 			$this->set_setting( 'tags_twitter_card', param( 'tags_twitter_card', 'integer', 0 ) );
+			$this->set_setting( 'tags_structured_data', param( 'tags_structured_data', 'integer', 0 ) );
 			$this->set_setting( 'download_noindex', param( 'download_noindex', 'integer', 0 ) );
 			$this->set_setting( 'download_nofollowto', param( 'download_nofollowto', 'integer', 0 ) );
 		}
