@@ -378,6 +378,7 @@ class ItemType extends DataObject
 			$custom_field_type = param( 'custom_field_type'.$i, 'string', NULL );
 			$custom_field_label = param( 'custom_field_label'.$i, 'string', NULL );
 			$custom_field_name = param( 'custom_field_name'.$i, '/^[a-z0-9\-_]+$/', NULL );
+			$custom_field_schema_prop = param( 'custom_field_schema_prop'.$i, 'string', NULL );
 			$custom_field_order = param( 'custom_field_order'.$i, 'integer', NULL );
 			$custom_field_note = param( 'custom_field_note'.$i, 'string', NULL );
 			$custom_field_public = param( 'custom_field_public'.$i, 'integer', 0 );
@@ -402,6 +403,7 @@ class ItemType extends DataObject
 					'ityp_ID'         => $this->ID,
 					'label'           => $custom_field_label,
 					'name'            => $custom_field_name,
+					'schema_prop'     => $custom_field_schema_prop,
 					'type'            => $custom_field_type,
 					'order'           => $custom_field_order,
 					'note'            => $custom_field_note,
@@ -442,6 +444,7 @@ class ItemType extends DataObject
 			$custom_field_data = array(
 				'type'            => $custom_field_type,
 				'name'            => $custom_field_name,
+				'schema_prop'     => $custom_field_schema_prop,
 				'label'           => $custom_field_label,
 				'order'           => $custom_field_order,
 				'note'            => $custom_field_note,
@@ -577,6 +580,7 @@ class ItemType extends DataObject
 				$sql_data[] = '( '.$DB->quote( $this->ID ).', '
 						.$DB->quote( $custom_field['label'] ).', '
 						.$DB->quote( $custom_field['name'] ).', '
+						.$DB->quote( $custom_field['schema_prop'] ).', '
 						.$DB->quote( $custom_field['type'] ).', '
 						.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).', '
 						.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).', '
@@ -593,7 +597,7 @@ class ItemType extends DataObject
 						.$DB->quote( $custom_field['red_highlight'] ).', '
 						.( empty( $custom_field['description'] ) ? 'NULL' : $DB->quote( $custom_field['description'] ) ).' )';
 			}
-			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format, itcf_formula, itcf_header_class, itcf_cell_class, itcf_link, itcf_link_nofollow, itcf_link_class, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight, itcf_description )
+			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_schema_prop, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format, itcf_formula, itcf_header_class, itcf_cell_class, itcf_link, itcf_link_nofollow, itcf_link_class, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight, itcf_description )
 					VALUES '.implode( ', ', $sql_data ) );
 		}
 
@@ -607,6 +611,7 @@ class ItemType extends DataObject
 					SET
 						itcf_label = '.$DB->quote( $custom_field['label'] ).',
 						itcf_name = '.$DB->quote( $custom_field['name'] ).',
+						itcf_schema_prop = '.$DB->quote( $custom_field['schema_prop'] ).',
 						itcf_order = '.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).',
 						itcf_note = '.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).',
 						itcf_public = '.$DB->quote( $custom_field['public'] ).',
@@ -690,7 +695,7 @@ class ItemType extends DataObject
 			{ // Get the custom fields from DB
 				global $DB;
 				$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->ID );
-				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
+				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_schema_prop as schema_prop, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
 				$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
 				$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
 				$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description' );

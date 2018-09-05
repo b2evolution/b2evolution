@@ -2445,7 +2445,7 @@ function skin_structured_data()
 		case 'single':
 		case 'page':
 			$Item = & $MainList->get_by_idx( 0 );
-			$creative_works_schema = array( 'Article', 'WebPage', 'BlogPosting', 'ImageGallery', 'DiscussionForumPosting', 'TechArticle' );
+			$creative_works_schema = array( 'Article', 'WebPage', 'BlogPosting', 'ImageGallery', 'DiscussionForumPosting', 'TechArticle', 'Review' );
 			$products_schema = array( 'Product' );
 
 			if( $Item && ( $item_schema = $Item->get_type_setting( 'schema' ) ) )

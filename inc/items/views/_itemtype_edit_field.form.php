@@ -29,6 +29,9 @@ $Form->text( 'itcf_label', get_param( 'itcf_label' ), 120, T_('Title'), '', 255 
 // Name:
 $Form->text( 'itcf_name', get_param( 'itcf_name' ), 60, T_('Name'), '', 255 );
 
+// Schema Property Name:
+$Form->text( 'itcf_schema_prop', get_param( 'itcf_schema_prop' ), 60, T_('Schema Property Name'), '', 255 );
+
 // Type:
 $Form->info( T_('Type'), get_item_type_field_type_title( get_param( 'itcf_type' ) ) );
 

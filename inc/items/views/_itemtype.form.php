@@ -204,6 +204,7 @@ $Table->display_line_start();
 $Table->display_col_start();
 echo '<input type="text" name="custom_field_order$cf_num$" value="$cf_order$" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />';
 // Hidden options which are stored in DB or used as additional data:
+echo '<input type="hidden" name="custom_field_schema_prop$cf_num$" value="$cf_schema_prop$" />';
 echo '<input type="hidden" name="custom_field_ID$cf_num$" value="$cf_ID$" />';
 echo '<input type="hidden" name="custom_field_type$cf_num$" value="$cf_type$" />';
 echo '<input type="hidden" name="custom_field_note$cf_num$" value="$cf_note$" />';
@@ -366,6 +367,7 @@ foreach( $custom_fields as $custom_field )
 		'$cf_order$'         => format_to_output( $custom_field['order'], 'htmlattr' ),
 		'$cf_label$'         => format_to_output( $custom_field['label'], 'htmlattr' ),
 		'$cf_name$'          => format_to_output( $custom_field_name, 'htmlattr' ),
+		'$cf_schema_prop$'   => format_to_output( $custom_field['schema_prop'], 'htmlattr' ),
 		'$cf_label_class$'   => $custom_field_label_class,
 		'$cf_name_class$'    => $custom_field_name_class,
 		'$cf_format$'        => format_to_output( $custom_field['format'], 'htmlattr' ),
@@ -554,6 +556,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 	// Set values:
 	var field_value_label = '';
 	var field_value_name = '';
+	var field_value_schema_prop = '';
 	var field_value_order = '';
 	var field_value_note = '';
 	var field_value_format = '';
@@ -578,6 +581,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		duplicated_count_custom_field++;
 		field_value_label = duplicated_field_obj.find( 'input[name^="custom_field_label"]' ).val();
 		field_value_name = duplicated_field_obj.find( 'input[name^="custom_field_name"]' ).val() + '_' + duplicated_count_custom_field;
+		field_value_schema_prop = duplicated_field_obj.find( 'input[name^="custom_field_schema_prop"]' ).val();
 		field_value_order = duplicated_field_obj.find( 'input[name^="custom_field_order"]' ).val();
 		field_value_note = duplicated_field_obj.find( 'input[name^="custom_field_note"]' ).val();
 		field_value_format = duplicated_field_obj.find( '[name^="custom_field_format"]' ).val();
@@ -598,6 +602,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		new_field_mode = 'duplicate_from';
 		field_value_label = duplicated_field_data.data( 'label' );
 		field_value_name = duplicated_field_data.data( 'name' );
+		field_value_schema_prop = duplicated_field_data.data( 'schema_prop' );
 		field_value_order = duplicated_field_data.data( 'order' );
 		field_value_note = duplicated_field_data.data( 'note' );
 		field_value_format = duplicated_field_data.data( 'format' );
@@ -649,6 +654,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		.replace( '$cf_order$', field_value_order )
 		.replace( '$cf_label$', field_value_label )
 		.replace( '$cf_name$', field_value_name )
+		.replace( '$cf_schema_prop$', field_value_schema_prop )
 		.replace( '$cf_label_class$', 'new_custom_field_title' )
 		.replace( '$cf_name_class$', '' )
 		.replace( '$cf_format$', field_value_format )
@@ -889,6 +895,7 @@ jQuery( document ).on( 'submit', 'form#itemtype_select_fields', function()
 			field_row.find( 'input[name^="custom_field_order"]' ).val( field_data_obj.data( 'order' ) );
 			field_row.find( 'input[name^="custom_field_note"]' ).val( field_data_obj.data( 'note' ) );
 			field_row.find( '[name^="custom_field_format"]' ).val( field_data_obj.data( 'format' ) );
+			field_row.find( 'input[name^="custom_field_schema_prop"]' ).val( field_data_obj.data( 'schema_prop' ) );
 			field_row.find( 'input[name^="custom_field_formula"]' ).val( field_data_obj.data( 'formula' ) );
 			field_row.find( 'input[name^="custom_field_header_class"]' ).val( field_data_obj.data( 'header_class' ) );
 			field_row.find( 'input[name^="custom_field_cell_class"]' ).val( field_data_obj.data( 'cell_class' ) );
