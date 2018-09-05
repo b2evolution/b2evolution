@@ -75,7 +75,7 @@ else
 		display_containers( get_param( 'skin_type' ), false, false, true );
 	echo '</div>';
 
-	// Shared Containers:
+	// Shared Main and Sub Containers:
 	echo '<div class="col-md-4 col-sm-12">';
 		echo '<h4 class="pull-left">'.T_('Shared Containers').'</h4>';
 		if( $current_User->check_perm( 'options', 'edit', false ) )
@@ -85,6 +85,9 @@ else
 		}
 		echo '<div class="clearfix"></div>';
 		display_containers( get_param( 'skin_type' ), true, true );
+
+		echo '<h4 class="pull-left">'.T_('Shared Sub-Containers').'</h4>';
+		echo '<div class="clearfix"></div>';
 		display_containers( get_param( 'skin_type' ), false, true );
 	echo '</div>';
 
