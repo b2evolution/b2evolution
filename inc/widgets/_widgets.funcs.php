@@ -593,7 +593,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 				'profile_picture_size' => 'crop-top-32x32',
 			) ),
 		array( 40, 'msg_menu_link', 'params' => array(
-				'widget_link_class' => 'hidden-xs',
+				'widget_link_class' => 'swhead_item hidden-xs',
 			) ),
 		array( 50, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'logout',

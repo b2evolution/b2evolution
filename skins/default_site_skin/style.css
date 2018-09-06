@@ -12,6 +12,10 @@ body {
 	float: right;
 }
 
+.sitewide_header .evo_widget {
+	padding: 0;
+}
+
 /* Hamburger Menu */
 .sitewide_header label[for="nav-trigger"] {
 	position: relative;
