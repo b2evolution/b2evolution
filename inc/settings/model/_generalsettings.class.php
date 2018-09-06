@@ -94,6 +94,7 @@ class GeneralSettings extends AbstractSettings
 		'fm_enable_roots_user' => '1',
 		'fm_enable_roots_shared' => '1',
 		'fm_enable_roots_skins' => '1',
+		'fm_enable_roots_plugins' => '1',
 
 		'fm_showtypes' => '0',
 		'fm_showfsperms' => '0',
