@@ -517,7 +517,7 @@ footer.bootstrap_site_navbar_footer .container a {
 			}
 
 			if( $current_disp == 'page' && $Settings->get( 'info_blog_ID' ) == $Blog->ID )
-			{	// If this menu contains the links to pages of the info collection:
+			{	// If this menu contains the links to pages of the info/shared collection:
 				$this->header_tab_active = $level0_index;
 			}
 

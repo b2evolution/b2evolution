@@ -516,7 +516,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	);
 	$tmp_widget_order = 20;
 	if( ! empty( $installed_collection_info_pages ) && is_array( $installed_collection_info_pages ) )
-	{	// Install additional menu items for each page from info collection:
+	{	// Install additional menu items for each page from info/shared collection:
 		foreach( $installed_collection_info_pages as $installed_collection_info_page_item_ID )
 		{
 			$default_widgets['navigation_hamburger'][] = array( $tmp_widget_order++, 'basic_menu_link', 'params' => array(
@@ -558,7 +558,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	);
 	$tmp_widget_order = 20;
 	if( ! empty( $installed_collection_info_pages ) && is_array( $installed_collection_info_pages ) )
-	{	// Install additional menu items for each page from info collection:
+	{	// Install additional menu items for each page from info/shared collection:
 		foreach( $installed_collection_info_pages as $installed_collection_info_page_item_ID )
 		{
 			$default_widgets['main_navigation'][] = array( $tmp_widget_order++, 'basic_menu_link', 'params' => array(

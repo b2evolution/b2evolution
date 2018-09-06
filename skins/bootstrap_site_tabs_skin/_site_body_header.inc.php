@@ -163,7 +163,7 @@ else
 				// ---------------------------------- END OF COLLECTION LIST ---------------------------------
 
 				if( $Settings->get( 'info_blog_ID' ) > 0 )
-				{	// We have a collection for info pages:
+				{	// We have a collection for shared content blocks:
 					// --------------------------------- START OF PAGES LIST --------------------------------
 					// Call widget directly (without container):
 					skin_widget( array(
@@ -236,7 +236,7 @@ if( $site_Skin->get_setting( 'grouping' ) &&
 <?php
 		}
 		elseif( $menu_item == 'pages' )
-		{	// Display menu item for Pages of the info collection:
+		{	// Display menu item for Pages of the info/shared collection:
 			// --------------------------------- START OF PAGES LIST --------------------------------
 			// Call widget directly (without container):
 			skin_widget( array(

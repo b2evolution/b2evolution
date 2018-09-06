@@ -87,12 +87,6 @@ $Form->begin_fieldset( T_('Default collections').get_manual_link('default-collec
 				)
 	) );
 
-	$BlogCache->none_option_text = T_('No info pages');
-	$Form->select_input_object( 'info_blog_ID', $Settings->get( 'info_blog_ID' ), $BlogCache, get_icon( 'coll_info' ).' '.T_('Collection for info pages'), array(
-		'note' => T_('The pages in this collection will be added to the site menu.').$create_new_blog_link,
-		'allow_none' => true,
-		'loop_object_method' => 'get_maxlen_name' ) );
-
 	$BlogCache->none_option_text = T_('Current collection');
 	$Form->select_input_object( 'login_blog_ID', $Settings->get( 'login_blog_ID' ), $BlogCache, get_icon( 'coll_login' ).' '.T_('Collection for login/registration'), array(
 		'note' => T_('This collection will be used for all login/registration functions.').$create_new_blog_link,
@@ -101,6 +95,12 @@ $Form->begin_fieldset( T_('Default collections').get_manual_link('default-collec
 
 	$Form->select_input_object( 'msg_blog_ID', $Settings->get( 'msg_blog_ID' ), $BlogCache, get_icon( 'coll_message' ).' '.T_('Collection for profiles/messaging'), array(
 		'note' => T_('This collection will be used for all messaging, profile viewing and profile editing functions.').$create_new_blog_link,
+		'allow_none' => true,
+		'loop_object_method' => 'get_maxlen_name' ) );
+
+	$BlogCache->none_option_text = T_('No shared collection');
+	$Form->select_input_object( 'info_blog_ID', $Settings->get( 'info_blog_ID' ), $BlogCache, get_icon( 'coll_info' ).' '.T_('Collection for shared content blocks'), array(
+		'note' => T_('The pages in this collection will be added to the site menu.').$create_new_blog_link,
 		'allow_none' => true,
 		'loop_object_method' => 'get_maxlen_name' ) );
 

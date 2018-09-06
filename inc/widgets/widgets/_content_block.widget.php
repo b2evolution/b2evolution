@@ -209,7 +209,7 @@ class content_block_Widget extends ComponentWidget
 		{	// Display a content block item ONLY if at least one condition:
 			//  - Content block Item is in same collection as this widget,
 			//  - Content block Item has same owner as owner of this widget's collection,
-			//  - Content block Item from collection for info pages:
+			//  - Content block Item from collection for shared content blocks:
 			global $Item;
 
 			// Save current dispalying Item in temp var:
