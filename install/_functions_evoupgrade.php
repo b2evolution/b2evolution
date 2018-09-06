@@ -10777,7 +10777,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 13270, 'Upgrading widget containers table...' ) )
 	{	// part of 7.0.0-alpha
+		// Add new column for Page Widget Containers:
 		db_add_col( 'T_widget__container', 'wico_item_ID', 'INT(11) UNSIGNED NULL DEFAULT NULL' );
+		// Insert default Item Type which items should be used for Page Containers:
+		$widget_page_result = $DB->query( 'INSERT INTO T_items__type ( ityp_name, ityp_usage, ityp_template_name, ityp_use_text, ityp_use_coordinates, ityp_use_comments, ityp_perm_level )
+			VALUES ( "Widget Page", "widget-page", "widget_page", "never", "optional", 0, "admin")' );
+		if( $widget_page_result && $DB->insert_id > 0 )
+		{	// Enable new inserted Item Type "Widget Page" for all collections:
+			$DB->query( 'INSERT INTO T_items__type_coll ( itc_ityp_ID, itc_coll_ID )
+				SELECT '.$DB->insert_id.', blog_ID FROM T_blogs' );
+		}
 		upg_task_end();
 	}
 
