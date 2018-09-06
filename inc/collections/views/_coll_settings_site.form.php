@@ -100,7 +100,7 @@ $Form->begin_fieldset( T_('Default collections').get_manual_link('default-collec
 
 	$BlogCache->none_option_text = T_('No shared collection');
 	$Form->select_input_object( 'info_blog_ID', $Settings->get( 'info_blog_ID' ), $BlogCache, get_icon( 'coll_info' ).' '.T_('Collection for shared content blocks'), array(
-		'note' => T_('The pages in this collection will be added to the site menu.').$create_new_blog_link,
+		'note' => T_('The content blocks of this collections can be included anywhere.').$create_new_blog_link,
 		'allow_none' => true,
 		'loop_object_method' => 'get_maxlen_name' ) );
 
