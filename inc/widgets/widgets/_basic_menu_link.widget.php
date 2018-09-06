@@ -474,8 +474,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 				*/
 				$item_ID = intval( $this->disp_params['item_ID'] );
 				$disp_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
-				if( empty( $disp_Item ) )
-				{ // Item not found
+				if( empty( $disp_Item ) || ! $disp_Item->can_be_displayed() )
+				{	// Item is not found or it cannot be displayed for current user on front-office:
 					return false;
 				}
 				$url = $disp_Item->get_permanent_url();
@@ -577,7 +577,14 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			case 'avatar':
 				// This link also depends on whether or not someone is logged in:
 				$keys['loggedin'] = (is_logged_in() ? 1 : 0);
+				break;
 
+			case 'item':
+				// Visibility of the Item menu depends on permission of current User:
+				$keys['user_ID'] = ( is_logged_in() ? $current_User->ID : 0 ); // Has the current User changed?
+				// Item title may be changed so we should update it in the menu as well:
+				$keys['item_ID'] = $this->disp_params['item_ID']; // Has the Item page changed?
+				break;
 		}
 
 		return $keys;
