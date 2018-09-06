@@ -287,6 +287,25 @@ class WidgetContainer extends DataObject
 
 
 	/**
+	 * Get a member param by its name
+	 *
+	 * @param mixed Name of parameter
+	 * @return mixed Value of parameter
+	 */
+	function get( $parname )
+	{
+		switch( $parname )
+		{
+			case 'type':
+				return $this->get_type();
+
+			default:
+				return parent::get( $parname );
+		}
+	}
+
+
+	/**
 	 * Get the Collection object for this Widget Container
 	 *
 	 * @return object Collection

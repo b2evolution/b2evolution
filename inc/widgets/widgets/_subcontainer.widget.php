@@ -81,43 +81,27 @@ class subcontainer_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $DB, $Blog;
+		$container_type = $this->get_container_param( 'type' );
 
-		$container_options = array(
-				T_('Sub-containers')        => array(),
-				T_('Main containers')       => array(),
-				T_('Shared containers')     => array(),
-				T_('Shared sub-containers') => array(),
-			);
+		if( $container_type == 'shared' || $container_type == 'shared-sub' )
+		{	// For shared containers allow only shared sub-containers:
+			$coll_ID = '';
+		}
+		else
+		{	// For collection containers allow only collection sub-containers:
+			global $Blog;
+			$coll_ID = $Blog->ID;
+		}
 
 		$WidgetContainerCache = & get_WidgetContainerCache();
-
-		// Collection skin containers:
-		$coll_containers = $WidgetContainerCache->get_by_coll_ID( $Blog->ID );
-		foreach( $coll_containers as $WidgetContainer )
+		$coll_widget_containers = $WidgetContainerCache->get_by_coll_ID( $coll_ID );
+		$container_options = array( '' => T_('None') );
+		foreach( $coll_widget_containers as $WidgetContainer )
 		{
-			$widget_group = $WidgetContainer->get( 'main' ) ? T_('Main containers') : T_('Sub-containers');
-			$container_options[ $widget_group ][ $WidgetContainer->get( 'code' ) ] = $WidgetContainer->get( 'name' );
-		}
-		if( empty( $container_options[ T_('Sub-containers') ] ) )
-		{
-			unset( $container_options[ T_('Sub-containers') ] );
-		}
-
-		// Shared container:
-		$shared_containers = $WidgetContainerCache->get_by_coll_ID( '' );
-		foreach( $shared_containers as $WidgetContainer )
-		{
-			$widget_group = $WidgetContainer->get( 'main' ) ? T_('Shared containers') : T_('Shared sub-containers');
-			$container_options[ $widget_group ][ $WidgetContainer->get( 'code' ) ] = $WidgetContainer->get( 'name' );
-		}
-		if( empty( $container_options[ T_('Shared containers') ] ) )
-		{
-			unset( $container_options[ T_('Shared containers') ] );
-		}
-		if( empty( $container_options[ T_('Shared sub-containers') ] ) )
-		{
-			unset( $container_options[ T_('Shared sub-containers') ] );
+			if( ! $WidgetContainer->get( 'main' ) )
+			{	// Allow only sub-containers:
+				$container_options[ $WidgetContainer->get( 'code' ) ] = $WidgetContainer->get( 'name' );
+			}
 		}
 
 		$r = array_merge( array(
