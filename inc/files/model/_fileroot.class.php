@@ -168,7 +168,7 @@ class FileRoot
 
 			case 'siteskins':
 				if( ! $Settings->get( 'fm_enable_roots_skins' ) )
-				{ // Skins root is disabled:
+				{	// Skins root is disabled:
 					$Debuglog->add( 'Attempt to access skins dir, but this feature is globally disabled', 'files' );
 				}
 				else
@@ -223,7 +223,7 @@ class FileRoot
 			case 'plugins':
 				// Plugins dir
 				if( ! $Settings->get( 'fm_enable_roots_plugins' ) )
-				{ // Plugins root is disabled:
+				{	// Plugins root is disabled:
 					$Debuglog->add( 'Attempt to access plugins dir, but this feature is globally disabled', 'files' );
 				}
 				else

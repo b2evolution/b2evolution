@@ -10029,8 +10029,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12970, 'Upgrade files table...' ) )
-	{ // part of 6.10.3-stable
+	if( upg_task_start( 12966, 'Upgrade files table...' ) )
+	{	// part of 6.10.3-stable
 		db_modify_col( 'T_files', 'file_root_type', 'enum("absolute","user","collection","shared","skins","siteskins","plugins","import","emailcampaign") COLLATE ascii_general_ci NOT NULL DEFAULT "absolute"' );
 		upg_task_end();
 	}

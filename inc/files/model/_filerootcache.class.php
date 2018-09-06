@@ -104,7 +104,7 @@ class FileRootCache
 			// Plugins root, Don't allow files of this root to link to objects:
 			$plugins_FileRoot = & $FileRootCache->get_by_type_and_ID( 'plugins', 0, false );
 			if( $plugins_FileRoot )
-			{ // We got a plugins dir:
+			{	// We got a plugins dir:
 				$r[ $plugins_FileRoot->ID ] = & $plugins_FileRoot;
 			}
 		}
