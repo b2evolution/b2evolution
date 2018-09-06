@@ -512,6 +512,73 @@ function convert_lang_to_locale( $table, $columnlang, $columnID )
 
 
 /**
+ * Initialize some environment global variables like $Setting, $Plugins and etc.
+ * which are used to work with objects like Blog, Item, ItemType and etc.
+ *
+ * @param string Name of environment global variables separated by comma, possible values: 'Settings', 'Plugins'
+ */
+function upg_init_environment( $env_vars = 'Settings' )
+{
+	global $upg_initialized_env_vars;
+
+	if( ! is_array( $upg_initialized_env_vars ) )
+	{	// Initialize array to know what objects were already initialized:
+		$upg_initialized_env_vars = array();
+	}
+
+	$env_vars = explode( ',', $env_vars );
+
+	foreach( $env_vars as $env_var )
+	{
+		if( in_array( $env_var, $upg_initialized_env_vars ) ||
+		    ( isset( $GLOBALS[ $env_var ] ) && is_object( $GLOBALS[ $env_var ] ) ) )
+		{	// Don't initialize same environment global variable twice:
+			continue;
+		}
+
+		switch( $env_var )
+		{
+			case 'Settings':
+				global $Settings;
+				load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+				// Create Settings object WITHOUT version checking:
+				$Settings = new GeneralSettings( false/* Do NOT check version*/ );
+				break;
+
+			case 'Plugins':
+				// Create Plugins object:
+				global $Plugins;
+				load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+				$Plugins = new Plugins();
+				break;
+		}
+
+		// Store the iniatlized object to don't iniatlize it twice:
+		$upg_initialized_env_vars[] = $env_var;
+	}
+}
+
+
+/**
+ * Clear all environment global variables which were temporary initialized for upgrade process
+ */
+function upg_clear_environment()
+{
+	global $upg_initialized_env_vars;
+
+	if( empty( $upg_initialized_env_vars ) )
+	{	// No temp environment global variables:
+		return;
+	}
+
+	foreach( $upg_initialized_env_vars as $env_var )
+	{	// Reset each temporary initialized environment global variable:
+		$GLOBALS[ $env_var ] = NULL;
+	}
+}
+
+
+/**
  * Install new default widgets
  *
  * @param string Container code
@@ -524,13 +591,7 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 	load_funcs( 'widgets/_widgets.funcs.php' );
 
 	// We're going to need some environment in order to init item type cache and create item:
-	$use_temp_settings_object = false;
-	if( ! is_object( $Settings ) )
-	{	// Create temporary Settings object WITHOUT version checking:
-		load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
-		$Settings = new GeneralSettings( false );
-		$use_temp_settings_object = true;
-	}
+	upg_init_environment();
 
 	// Get config of default widgets for the requested container:
 	$container_widgets = get_default_widgets_by_container( $new_container_code );
@@ -741,12 +802,6 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 	{	// Insert the widget rows by single SQL query:
 		$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params )
 			VALUES '.implode( ', ', $new_widgets_insert_sql_rows ) );
-	}
-
-	if( $use_temp_settings_object )
-	{	// Reset the temporary Settings object because it is used WITHOUT version checking,
-		// Some code below may be required in normal Settings object WITH version checking:
-		$Settings = false;
 	}
 }
 
@@ -9618,18 +9673,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 			// We're going to need some environment in order to init item type cache and create item:
 			load_class( 'items/model/_item.class.php', 'Item' );
-			$use_temp_settings_object = false;
-			if( ! is_object( $Settings ) )
-			{	// Create temporary Settings object WITHOUT version checking:
-				load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
-				$Settings = new GeneralSettings( false );
-				$use_temp_settings_object = true;
-			}
-			if( ! is_object( $Plugins ) )
-			{	// Create Plugins object:
-				load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
-				$Plugins = new Plugins();
-			}
+			upg_init_environment( 'Settings,Plugins' );
 
 			// Get collection for info pages in order to create a help and a register content block items below:
 			$info_Blog = & get_setting_Blog( 'info_blog_ID' );
@@ -9684,12 +9728,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				/* Access Denied */
 				add_basic_widget_12740( $coll_ID, 'Access Denied', 'content_block', 'core', 10, array( 'item_slug' => $access_denied_Item->get( 'urltitle' ) ) );
 				task_end();
-			}
-
-			if( $use_temp_settings_object )
-			{	// Reset the temporary Settings object because it is used WITHOUT version checking,
-				// Some code below may be required in normal Settings object WITH version checking:
-				$Settings = false;
 			}
 		}
 
@@ -9950,18 +9988,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 			// We're going to need some environment in order to init item type cache and create item:
 			load_class( 'items/model/_item.class.php', 'Item' );
-			$use_temp_settings_object = false;
-			if( ! is_object( $Settings ) )
-			{	// Create temporary Settings object WITHOUT version checking:
-				load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
-				$Settings = new GeneralSettings( false );
-				$use_temp_settings_object = true;
-			}
-			if( ! is_object( $Plugins ) )
-			{	// Create Plugins object:
-				load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
-				$Plugins = new Plugins();
-			}
+			upg_init_environment( 'Settings,Plugins' );
 
 			// Get collection for info pages in order to create a help and a register content block items below:
 			$info_Blog = & get_setting_Blog( 'info_blog_ID' );
@@ -10042,12 +10069,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 						'item_slug' => ( isset( $register_Item ) ? $register_Item->get( 'urltitle' ) : 'register-content' )
 					) );
 				task_end();
-			}
-
-			if( $use_temp_settings_object )
-			{	// Reset the temporary Settings object because it is used WITHOUT version checking,
-				// Some code below may be required in normal Settings object WITH version checking:
-				$Settings = false;
 			}
 		}
 
@@ -10761,17 +10782,24 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 13260, 'Installing new shared widgets/containers...' ) )
 	{	// part of 7.0.0-alpha
-		// Set all pages from info collection in order to create menu items in shared widget containers "Main Navigation" and "Navigation Hamburger":
-		global $installed_collection_info_pages;
-		$SQL = new SQL( 'Get all pages from Collection for info pages' );
-		$SQL->SELECT( 'post_ID' );
-		$SQL->FROM( 'T_items__item' );
-		$SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
-		$SQL->FROM_add( 'INNER JOIN T_blogs ON cat_blog_ID = blog_ID' );
-		$SQL->FROM_add( 'INNER JOIN T_settings ON set_name = "info_blog_ID" AND set_value = blog_ID' );
-		$SQL->FROM_add( 'INNER JOIN T_items__type ON post_ityp_ID = ityp_ID' );
-		$SQL->WHERE( 'ityp_usage = "page"' );
-		$installed_collection_info_pages = $DB->get_col( $SQL );
+		// Initialize environment variable $Settings in order to work with collection objects:
+		upg_init_environment();
+		if( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) )
+		{	// If site uses collection for info pages:
+			global $installed_collection_info_pages;
+			$SQL = new SQL( 'Get all pages from Collection for info pages' );
+			$SQL->SELECT( 'post_ID' );
+			$SQL->FROM( 'T_items__item' );
+			$SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
+			$SQL->FROM_add( 'INNER JOIN T_items__type ON post_ityp_ID = ityp_ID' );
+			$SQL->WHERE( 'cat_blog_ID = '.$info_Blog->ID );
+			$SQL->WHERE_and( 'ityp_usage = "page"' );
+			// Get only pages which are allowed to be displayed on front-office:
+			$SQL->WHERE_and( 'post_status IN ( '.$DB->quote( get_inskin_statuses( $info_Blog->ID, 'post' ) ).' )' );
+			// Set pages from info collection in order to create menu items in shared widget containers "Main Navigation" and "Navigation Hamburger":
+			$installed_collection_info_pages = $DB->get_col( $SQL );
+		}
+
 		// Install new shared widgets/containers:
 		install_new_default_widgets( 'site_header' );
 		install_new_default_widgets( 'site_footer' );
@@ -10819,6 +10847,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	 *
 	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 10).
 	 */
+
+	// Clear environment global variables like $Settings, $Plugins
+	// which probably were initialized for upgrade process temporary
+	// in order to work with objects like $Blog, $Item, $itemType and etc.:
+	upg_clear_environment();
 
 	// Execute general upgrade tasks.
 	// These tasks needs to be called after every upgrade process, except if they were already executed but the upgrade was not finished because of the max execution time check.
