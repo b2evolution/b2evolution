@@ -2960,8 +2960,8 @@ class Blog extends DataObject
 				$url = url_add_param( $this_Blog->gen_blogurl(), 'disp='.$disp_param, $params['glue'] );
 			}
 
-			if( $disp_param == 'pwdchange' )
-			{	// Force a change password page to https if it is required by setting "Require SSL":
+			if( $disp_param == 'pwdchange' || $disp_param == 'register_finish' )
+			{	// Force these pages to https if it is required by setting "Require SSL":
 				$url = force_https_url( $url, 'login' );
 			}
 

@@ -6788,6 +6788,36 @@ function force_https_url( $url, $force_https = true )
 
 
 /**
+ * Check and redirect if the requested URL must be used as https instead of http
+ *
+ * @param boolean|string TRUE to force without settings checking,
+ *                       FALSE to keep original URL without forcing,
+ *                       'login' - Force only when it is enabled by setting "Require SSL"
+ * @param string Original URL, NULL - to use current URL = $ReqURL
+ */
+function check_https_url( $force_https = true, $url = NULL )
+{
+	if( $url === NULL )
+	{	// Use current URL by default:
+		global $ReqURL;
+		if( empty( $ReqURL ) )
+		{	// If this URL is not defined yet:
+			return;
+		}
+		$url = $ReqURL;
+	}
+
+	// Try to force the requested URL:
+	$forced_url = force_https_url( $url, $force_https );
+
+	if( $forced_url != $url )
+	{	// If the requested is wrong then redirect to correct what must be used instead:
+		header_redirect( $forced_url );
+	}
+}
+
+
+/**
  * Get URL to htsrv folder depending on current collection base url from front-office or site base url from back-office
  *
  * Note: For back-office or no collection page _init_hit.inc.php should be called before this call, because ReqHost and ReqPath must be initialized

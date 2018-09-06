@@ -25,6 +25,9 @@ $is_login_page = true;
 
 require_once $inc_path.'_main.inc.php';
 
+// Check and redirect if current URL must be used as https instead of http:
+check_https_url( 'login' );
+
 $login = param( $dummy_fields['login'], 'string', '' );
 param_action( 'req_login' );
 param( 'mode', 'string', '' );

@@ -20,6 +20,9 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
+// Check and redirect if current URL must be used as https instead of http:
+check_https_url( 'login' );
+
 // Login is not required on the register page:
 $login_required = false;
 
