@@ -1257,6 +1257,11 @@ class Blog extends DataObject
 			$this->set_setting( 'download_nofollowto', param( 'download_nofollowto', 'integer', 0 ) );
 		}
 
+		if( in_array( 'credits', $groups ) )
+		{	// We want to load the software credits settings:
+			param_integer_range( 'max_footer_credits', 0, 3, T_('Max credits must be between %d and %d.') );
+			$this->set_setting( 'max_footer_credits', get_param( 'max_footer_credits' ) );
+		}
 
 		/*
 		 * ADVANCED ADMIN SETTINGS
@@ -1322,9 +1327,6 @@ class Blog extends DataObject
 			{	// HTML header includes:
 				param_check_html( 'blog_head_includes', T_('Invalid Custom meta tag/css section.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'head_extension' );
 				$this->set_setting( 'head_includes', get_param( 'blog_head_includes' ) );
-
-				param_integer_range( 'max_footer_credits', 0, 3, T_('Max credits must be between %d and %d.') );
-				$this->set_setting( 'max_footer_credits', get_param( 'max_footer_credits' ) );
 			}
 
 			if( param( 'blog_body_includes', 'html', NULL ) !== NULL )

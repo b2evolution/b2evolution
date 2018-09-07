@@ -96,11 +96,11 @@ if( $edited_UserTag->ID > 0 )
 	{
 		global $current_User, $edited_UserTag;
 
-		// Display the edit icon if current user has the rights:
-		$r = action_icon( T_('Edit this user...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=user&amp;user_ID='.$User->ID.'&amp;user_tab=admin' ) );
+		$r = '';
 
-		if( $current_User->check_perm( 'users', 'moderate', false, $User ) )
-		{ // Display the unlink icon if current user has the rights:
+		if( $current_User->can_moderate_user( $User->ID ) )
+		{	// Display the action icons if current User has the rights to moderate the User:
+			$r = action_icon( T_('Edit this user...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=user&amp;user_ID='.$User->ID.'&amp;user_tab=marketing' ) );
 			$r .= action_icon( T_('Unlink this tag from user!'), 'unlink',
 				regenerate_url( 'utag_ID,action,utag_filter', 'utag_ID='.$edited_UserTag->ID.'&amp;user_ID='.$User->ID.'&amp;action=unlink&amp;return_to='.urlencode( regenerate_url( 'action', '', '', '&' ) ).'&amp;'.url_crumb( 'usertag' ) ),
 				NULL, NULL, NULL,
