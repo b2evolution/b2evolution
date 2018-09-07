@@ -26,8 +26,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			'item_end'            => '',
 			'item_selected_start' => '',
 			'item_selected_end'   => '',
-			'link_selected_class' => 'swhead_item swhead_item_selected',
-			'link_default_class'  => 'swhead_item',
 		) );
 	// ----------------------------- END OF "Site Header" CONTAINER -----------------------------
 
@@ -44,12 +42,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			'block_display_title' => false,
 			'list_start'          => '',
 			'list_end'            => '',
-			'item_start'          => '<li class="swhead_item $wi_class$">',
+			'item_start'          => '<li class="$wi_class$">',
 			'item_end'            => '</li>',
-			'item_selected_start' => '<li class="swhead_item $wi_class$">',
+			'item_selected_start' => '<li class="$wi_class$">',
 			'item_selected_end'   => '</li>',
-			'link_selected_class' => 'swhead_item_selected',
-			'link_default_class'  => '',
 		) );
 	// ----------------------------- END OF "Navigation Hamburger" CONTAINER -----------------------------
 ?>

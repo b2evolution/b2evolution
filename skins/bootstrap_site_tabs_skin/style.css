@@ -109,13 +109,6 @@ div.level1 nav div.pull-right .btn.btn-default {
 div.level1 nav div.pull-right .btn.btn-default:hover {
   border: 1px solid #ccc;
 }
-div.level1 .swhead_item.login.user {
-  padding: 4px;
-}
-div.level1 .swhead_item.login.user img {
-  vertical-align: middle;
-  margin-right: 3px;
-}
 div.level2 {
   padding: 6px 15px 15px 6px;
   background: #FFF;

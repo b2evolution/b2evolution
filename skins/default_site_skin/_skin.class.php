@@ -122,7 +122,7 @@ class default_site_Skin extends Skin
 		$menu_bar_logo_padding = $this->get_setting( 'menu_bar_logo_padding' );
 
 		add_css_headline( '
-.sitewide_header a.swhead_item.evo_widget__site_logo_image img {
+.sitewide_header a.evo_widget__site_logo_image img {
 	padding: '.$menu_bar_logo_padding.'px;
 }
 ' );
