@@ -78,6 +78,7 @@ user_prevnext_links( array(
 // ------------- END OF PREV/NEXT USER LINKS -------------------
 
 $has_full_access = $current_User->check_perm( 'users', 'edit' );
+$has_moderate_access = $current_User->can_moderate_user( $edited_User->ID );
 $edited_user_perms = array( 'edited-user', 'edited-user-required' );
 $new_user_creating = ( $edited_User->ID == 0 );
 
@@ -251,25 +252,25 @@ if( $action != 'view' )
 	$Form->text_input( 'edited_user_login', $edited_User->login, 20, /* TRANS: noun */ T_('Login'), '', array( 'maxlength' => 60, 'required' => true ) );
 
 	$firstname_editing = $Settings->get( 'firstname_editing' );
-	if( ( in_array( $firstname_editing, $edited_user_perms ) && $edited_User->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $has_full_access ) )
+	if( ( in_array( $firstname_editing, $edited_user_perms ) && $edited_User->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $has_moderate_access ) )
 	{
 		$Form->text_input( 'edited_user_firstname', $edited_User->firstname, 20, T_('First name'), '', array( 'maxlength' => 50, 'required' => ( $firstname_editing == 'edited-user-required' ) ) );
 	}
 
 	$lastname_editing = $Settings->get( 'lastname_editing' );
-	if( ( in_array( $lastname_editing, $edited_user_perms ) && $edited_User->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $has_full_access ) )
+	if( ( in_array( $lastname_editing, $edited_user_perms ) && $edited_User->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $has_moderate_access ) )
 	{
 		$Form->text_input( 'edited_user_lastname', $edited_User->lastname, 20, T_('Last name'), '', array( 'maxlength' => 50, 'required' => ( $lastname_editing == 'edited-user-required' ) ) );
 	}
 
 	$nickname_editing = $Settings->get( 'nickname_editing' );
-	if( ( in_array( $nickname_editing, $edited_user_perms ) && $edited_User->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $has_full_access ) )
+	if( ( in_array( $nickname_editing, $edited_user_perms ) && $edited_User->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $has_moderate_access ) )
 	{
 		$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => ( $nickname_editing == 'edited-user-required' ) ) );
 	}
 
 	$gender_editing = $Settings->get( 'registration_require_gender' );
-	if( $gender_editing != 'hidden' && ( $edited_User->ID == $current_User->ID || $has_full_access ) )
+	if( $gender_editing != 'hidden' && ( $edited_User->ID == $current_User->ID || $has_moderate_access ) )
 	{
 		$Form->radio( 'edited_user_gender', $edited_User->get('gender'), array(
 				array( 'M', T_('A man') ),
@@ -291,7 +292,7 @@ if( $action != 'view' )
 				array(	// field params
 						'required' => ( $Settings->get( 'location_country' ) == 'required' ? 'mark_only' : false ), // true if Country is required
 						'allow_none' => // Allow none value:
-						                $has_full_access || // Current user has permission to edit users
+						                $has_moderate_access || // Current user has permission to moderate users
 						                empty( $edited_User->ctry_ID ) || // Country is not defined yet
 						                ( !empty( $edited_User->ctry_ID ) && $Settings->get( 'location_country' ) != 'required' ) // Country is defined but this field is not required
 					)

@@ -72,6 +72,10 @@ if( ! is_null( $user_ID ) )
 		    && $edited_User->ID != $current_User->ID )
 		{ // user is only allowed to _view_ other user's profiles
 			$Messages->add( T_('You have no permission to edit other users!'), 'error' );
+			if( in_array( $user_tab, array( 'pwdchange', 'marketing', 'admin', 'sessions', 'activity' ) ) )
+			{	// Don't allow the restricted pages for view:
+				$user_tab = 'profile';
+			}
 			$action = 'view';
 		}
 		elseif( $demo_mode && ( $edited_User->ID <= 7 ) )

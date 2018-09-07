@@ -155,8 +155,8 @@ switch( $action )
 		$UserCache = & get_UserCache();
 		$edited_User = & $UserCache->get_by_ID( $user_ID );
 
-		// Check permission based on DB status:
-		$current_User->check_perm( 'user', 'edit', true, $edited_User );
+		// Check permission of current User if he can moderate the editing User:
+		$current_User->can_moderate_user( $edited_User->ID, true );
 
 		$result = $DB->query( 'DELETE FROM T_users__usertag
 			WHERE uutg_user_ID = '.$DB->quote( $edited_User->ID ).'

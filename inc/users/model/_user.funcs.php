@@ -2526,11 +2526,9 @@ function get_user_sub_entries( $is_admin, $user_ID )
 		$user_param = '';
 		$base_url = $Blog->gen_blogurl();
 	}
-	$edit_perm = ( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'edit' ) );
-	$view_perm = ( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'view' ) );
 
-	if( $view_perm )
-	{
+	if( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'view' ) )
+	{	// If user is viewing own profile or has a permission to view all other users:
 		$users_sub_entries['profile'] = array(
 							'text' => T_('Profile'),
 							'href' => url_add_param( $base_url, $ctrl_param.'profile'.$user_param ) );
@@ -2542,8 +2540,8 @@ function get_user_sub_entries( $is_admin, $user_ID )
 							'href' => url_add_param( $base_url, $ctrl_param.'avatar'.$user_param ) );
 		}
 
-		if( $edit_perm )
-		{
+		if( $user_ID == $current_User->ID || $current_User->can_moderate_user( $user_ID ) )
+		{	// If user is editing own profile or has a permission to moderate the user:
 			$users_sub_entries['pwdchange'] = array(
 								'text' => T_('Password'),
 								'href' => force_https_url( url_add_param( $base_url, $ctrl_param.'pwdchange'.$user_param ), 'login' ) );
@@ -6840,7 +6838,7 @@ function users_results( & $UserList, $params = array() )
 			);
 	}
 
-	if( is_logged_in() && ! $current_User->check_perm( 'users', 'moderate', false ) )
+	if( is_logged_in() && ! $current_User->check_perm( 'users', 'moderate' ) )
 	{ // Current user has no permissions to moderate the users
 		if( isset( $userlist_col_reputaion ) )
 		{ // Display the reported users
