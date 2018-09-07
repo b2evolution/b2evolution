@@ -310,6 +310,20 @@ class Item extends ItemLight
 	 * Lazy filled, use {@link get_social_media_image()} to access it.
 	 */
 	var $social_media_image_File = NULL;
+	/**
+	 * Item pricing
+	 *
+	 * @var array
+	 */
+	var $item_pricing = NULL;
+	/**
+	 * What fields should be updated/inserted/deleted
+	 *
+	 * @var array
+	 */
+	var $update_item_pricing = NULL;
+	var $insert_item_pricing = NULL;
+	var $delete_item_pricing = NULL;
 
 	/**
 	 * Constructor
@@ -883,6 +897,9 @@ class Item extends ItemLight
 			}
 		}
 
+		// ITEM PRICING stuff:
+		$this->load_item_pricing_from_Request();
+
 		// WORKFLOW stuff:
 		$this->load_workflow_from_Request();
 
@@ -967,6 +984,9 @@ class Item extends ItemLight
 				param_check_not_empty( 'item_longitude', T_('Please provide a longitude.'), '' );
 			}
 		}
+
+		// ITEM PRICING:
+		$item_pricing = $this->get_item_pricing();
 
 		// CUSTOM FIELDS:
 		$custom_fields = $this->get_type_custom_fields();
@@ -1204,6 +1224,91 @@ class Item extends ItemLight
 		}
 
 		return ! param_errors_detected();
+	}
+
+
+	/**
+	 * Load item pricing from request
+	 */
+	function load_item_pricing_from_Request()
+	{
+		global $Messages;
+
+		// Initialize the arrays
+		$this->update_item_pricing = array();
+		$this->insert_item_pricing = array();
+		$this->delete_item_pricing = trim( param( 'deleted_item_pricing', 'string', '' ), ', ' );
+		$this->delete_item_pricing = empty( $this->delete_item_pricing ) ? array() : explode( ',', $this->delete_item_pricing );
+
+		// Empty and Initialize the custom fields from POST data
+		$this->item_pricing = array();
+
+		$empty_curr_ID = false;
+		$item_pricing_count = param( 'count_item_pricing', 'integer', 0 ); // all item pricing count ( contains even deleted ones )
+
+		for( $i = 1; $i <= $item_pricing_count; $i++ )
+		{
+			// Note: this param contains ID of existing item pricing from DB
+			//       or random value like d63d5d53-df3d-5299-8c85-35f69b77 for new item pricing:
+			$item_pricing_ID = param( 'item_pricing_ID'.$i, '/^[a-z0-9\-_]+$/', NULL );
+			if( empty( $item_pricing_ID ) || in_array( $item_pricing_ID, $this->delete_item_pricing ) )
+			{ // This pricing was deleted, don't neeed to update
+				continue;
+			}
+
+			$item_pricing_is_new          = param( 'item_pricing_new'.$i, 'integer', 0 );
+			$item_pricing_price           = param( 'item_pricing_price'.$i, 'double', NULL );
+			$item_pricing_curr_ID         = param( 'item_pricing_curr_ID'.$i, 'integer', NULL );
+			$item_pricing_min_qty         = param( 'item_pricing_min_qty'.$i, 'integer', NULL );
+			$item_pricing_grp_ID          = param( 'item_pricing_grp_ID'.$i, 'integer', NULL );
+			$item_pricing_date_start      = param_date( 'item_pricing_date_start'.$i, sprintf( T_('Please enter a valid date using the following format: %s'), '<code>'.locale_input_datefmt().'</code>' ), false );
+			$item_pricing_date_end        = param_date( 'item_pricing_date_end'.$i, sprintf( T_('Please enter a valid date using the following format: %s'), '<code>'.locale_input_datefmt().'</code>' ), false );
+			$item_pricing_date_start_time = param_time( 'item_pricing_date_start_time'.$i, '', false, false, false, true );
+			$item_pricing_date_end_time   = param_time( 'item_pricing_date_end_time'.$i, '', false, false, false, true );
+
+			$item_pricing_date_start      = empty( $item_pricing_date_start ) || empty( $item_pricing_date_start_time ) ? NULL : form_date( $item_pricing_date_start, $item_pricing_date_start_time );
+			$item_pricing_date_end        = empty( $item_pricing_date_end ) || empty( $item_pricing_date_end_time ) ? NULL : form_date( $item_pricing_date_end, $item_pricing_date_end_time );
+
+			// Add each new/existing item pricing in this array
+			// in order to see all of them on the form when item is not updated because of some errors
+			$this->item_pricing[] = array(
+					'temp_i'          => $i, // Used only on submit form to know the number of the field on the form
+					'ID'              => $item_pricing_ID,
+					'itm_ID'          => $this->ID,
+					'price'           => $item_pricing_price,
+					'curr_ID'         => $item_pricing_curr_ID,
+					'min_qty'         => $item_pricing_min_qty,
+					'grp_ID'          => $item_pricing_grp_ID,
+					'date_start'      => $item_pricing_date_start,
+					'date_end'        => $item_pricing_date_end,
+				);
+
+			if( empty( $item_pricing_curr_ID ) )
+			{ // Currency can't be emtpy
+				if( ! $empty_curr_ID )
+				{ // This message was not displayed yet
+					$Messages->add( T_('Currency can\'t be empty!') );
+					$empty_curr_ID = true;
+				}
+			}
+
+			$item_pricing_data = array(
+				'price'      => $item_pricing_price,
+				'curr_ID'    => $item_pricing_curr_ID,
+				'min_qty'    => $item_pricing_min_qty,
+				'grp_ID'     => $item_pricing_grp_ID,
+				'date_start' => $item_pricing_date_start,
+				'date_end'   => $item_pricing_date_end,
+			);
+			if( $item_pricing_is_new )
+			{ // Insert custom field
+				$this->insert_item_pricing[ $item_pricing_ID ] = $item_pricing_data;
+			}
+			else
+			{ // Update custom field
+				$this->update_item_pricing[ $item_pricing_ID ] = $item_pricing_data;
+			}
+		}
 	}
 
 	/**
@@ -2454,6 +2559,37 @@ class Item extends ItemLight
 	{
 		// We always return false, since counting views feature was removed.
 		return false;
+	}
+
+
+	/**
+	 * Get item pricing
+	 *
+	 * @return array Item pricing
+	 */
+	function get_item_pricing()
+	{
+		if( ! isset( $this->item_pricing ) )
+		{
+			if( empty( $this->ID ) )
+			{ // Set an empty array for new creating post type
+				$this->item_pricing = array();
+			}
+			else
+			{
+				global $DB;
+
+				$SQL = new SQL( 'Load all item pricing definitions of Item #'.$this->ID );
+				$SQL->SELECT( 'iprc_ID AS ID, iprc_itm_ID AS itm_ID, iprc_price AS price, iprc_curr_ID AS curr_ID, iprc_min_qty AS min_qty,
+						iprc_grp_ID AS grp_ID, iprc_date_start AS date_start, iprc_date_end AS date_end' );
+				$SQL->FROM( 'T_items__pricing' );
+				$SQL->WHERE( 'iprc_itm_ID = '.$DB->quote( $this->ID ) );
+				$SQL->ORDER_BY( 'iprc_ID' );
+				$this->item_pricing = $DB->get_results( $SQL, ARRAY_A );
+			}
+		}
+
+		return $this->item_pricing;
 	}
 
 
@@ -7140,6 +7276,9 @@ class Item extends ItemLight
 				}
 			}
 
+			// Update/Insert/Delete custom fields:
+			$this->dbsave_item_pricing();
+
 			// Update last touched date of this Item and also all categories of this Item
 			$this->update_last_touched_date( false, false );
 		}
@@ -7491,6 +7630,9 @@ class Item extends ItemLight
 				}
 			}
 
+			// Update/Insert/Delete custom fields:
+			$this->dbsave_item_pricing();
+
 			// Update last touched date of this Item and also all categories of this Item
 			$this->update_last_touched_date( false, false );
 		}
@@ -7695,6 +7837,71 @@ class Item extends ItemLight
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Update/Insert/Delete custom fields
+	 */
+	function dbsave_item_pricing()
+	{
+		global $DB;
+
+		if( ! empty( $this->delete_item_pricing ) )
+		{	// Delete item pricing:
+			$sql_data = array();
+			foreach( $this->delete_item_pricing as $iprc_ID )
+			{
+				$sql_data[] = '( iprc_itm_ID = '.$DB->quote( $this->ID ).' AND iprc_ID = '.$DB->quote( $iprc_ID ).' )';
+			}
+			$DB->query( 'DELETE FROM T_items__pricing	WHERE '.implode( ' OR ', $sql_data ) );
+		}
+
+		if( ! empty( $this->insert_item_pricing ) )
+		{	// Insert new item pricings:
+			$sql_data = array();
+			foreach( $this->insert_item_pricing as $iprc_ID => $item_pricing )
+			{
+				$sql_data[] = '( '.$DB->quote( $this->ID ).', '
+						.$DB->quote( $item_pricing['price'] ).', '
+						.$DB->quote( $item_pricing['curr_ID'] ).', '
+						.( empty( $item_pricing['min_qty'] ) ? 'NULL' : $DB->quote( $item_pricing['min_qty'] ) ).', '
+						.( empty( $item_pricing['grp_ID'] ) ? 'NULL' : $DB->quote( $item_pricing['grp_ID'] ) ).', '
+						.( empty( $item_pricing['date_start'] ) ? 'NULL': $DB->quote( $item_pricing['date_start'] ) ).', '
+						.( empty( $item_pricing['date_end'] ) ? 'NULL' : $DB->quote( $item_pricing['date_end'] ) ).' )';
+			}
+			$result = $DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID, iprc_min_qty, iprc_grp_ID, iprc_date_start, iprc_date_end )
+					VALUES '.implode( ', ', $sql_data ) );
+
+			if( $result !== false )
+			{
+				$this->insert_item_pricing = array();
+			}
+		}
+
+		if( ! empty( $this->update_item_pricing ) )
+		{	// Update custom fields:
+			unset( $this->item_pricing );
+			$old_item_pricing = $this->get_item_pricing();
+			foreach( $this->update_item_pricing as $iprc_ID => $item_pricing )
+			{
+				$result = $DB->query( 'UPDATE T_items__pricing
+					SET
+						iprc_price = '.$DB->quote( $item_pricing['price'] ).',
+						iprc_curr_ID = '.$DB->quote( $item_pricing['curr_ID'] ).',
+						iprc_min_qty = '.( empty( $item_pricing['min_qty'] ) ? 'NULL' : $DB->quote( $item_pricing['min_qty'] ) ).',
+						iprc_grp_ID = '.( empty( $item_pricing['grp_ID'] ) ? 'NULL' : $DB->quote( $item_pricing['grp_ID'] ) ).',
+						iprc_date_start = '.( empty( $item_pricing['date_start'] ) ? 'NULL' : $DB->quote( $item_pricing['date_start'] ) ).',
+						iprc_date_end = '.( empty( $item_pricing['date_end'] ) ? 'NULL' : $DB->quote( $item_pricing['date_end'] ) ).'
+					WHERE iprc_itm_ID = '.$DB->quote( $this->ID ).'
+						AND iprc_ID = '.$DB->quote( $iprc_ID ) );
+
+				if( $result !== false )
+				{
+					unset( $this->update_item_pricing[$iprc_ID] );
+				}
+			}
+		}
 	}
 
 

@@ -280,6 +280,176 @@ $Form->begin_form( '', '', $params );
 		display_attachments_fieldset( $Form, $LinkOwner, false, $fold_images_attachments_block );
 	}
 
+	// ############################ ITEM PRICING #############################
+	// Custom fields:
+	global $thumbnail_sizes;
+	$Table = new Table( 'Results' );
+	$Table->title = T_('Pricing').get_manual_link( 'item-pricing' );
+	if( $current_User->check_perm( 'options', 'edit' ) )
+	{	// Display an icon to edit add pricing if current user has a permission:
+		$Table->title .= '<span class="floatright panel_heading_action_icons">'
+				.'<button type="button" class="btn btn-primary btn-sm" id="add_item_pricing" title="'.T_('Add new price rule').'">'.get_icon( 'new' ).' '.T_('Add new price rule').'</button>'
+			.'</span>';
+	}
+
+	$Table->cols = array(
+		array( 'th' => T_('Price') ),
+		array( 'th' => T_('Currency') ),
+		array( 'th' => T_('Min Qty') ),
+		array( 'th' => T_('User Group') ),
+		array( 'th' => T_('Date start') ),
+		array( 'th' => T_('Date end') ),
+		array( 'th' => T_('Actions'), 'td_class' => 'shrinkwrap' ),
+	);
+
+	$Table->display_init();
+
+	// ******** START OF Item Pricing Template,
+	// Used for existing item pricing row in the table below and also for JS code to add new item pricing rule:
+	$item_pricing_template = NULL;
+
+	ob_start();
+
+	$Table->display_line_start();
+
+	// Price
+	$Table->display_col_start();
+	echo '<input type="text" name="item_pricing_price$iprc_num$" value="$iprc_price$" class="form_text_input form-control item_price_price" size="10" />';
+	// Create this <hidden> to know this custom field is new created field:
+	echo '<input type="hidden" name="item_pricing_new$iprc_num$" value="$iprc_new$" />';
+	echo '<input type="hidden" name="item_pricing_ID$iprc_num$" value="$iprc_ID$" />';
+	$Table->display_col_end();
+
+	// Currency
+	$Table->display_col_start();
+	$CurrencyCache = & get_CurrencyCache();
+	echo '<select name="item_pricing_curr_ID$iprc_num$" class="form-control item_price_currency">'.$CurrencyCache->get_option_list().'</select>';
+	$Table->display_col_end();
+
+	// Minimum Quantity
+	$Table->display_col_start();
+	echo '<input type="text" name="item_pricing_min_qty$iprc_num$" value="$iprc_min_qty$" class="form_text_input form-control item_price_min_quantity" size="6" />';
+	$Table->display_col_end();
+
+	// User Group
+	$Table->display_col_start();
+	$GroupCache = new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name', 'grp_level DESC, grp_name ASC' );
+	$GroupCache->load_where( 'grp_usage = "primary"' );
+	$GroupCache->all_loaded = true;
+	$group_options_array = array(	'0' => T_('All') ) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
+	//pre_dump( $group_options_array );
+	//echo '<select name="item_pricing_grp_ID$iprc_num$" class="form-control item_price_user_group">'.Form::get_select_options_string( $group_options_array ).'</select>';
+	echo '<select name="item_pricing_grp_ID$iprc_num$" class="form-control item_price_user_group">'.Form::get_select_options_string( $group_options_array, NULL, true ).'</select>';
+	$Table->display_col_end();
+
+	// Date Start
+	$Table->display_col_start();
+	echo '<input type="text" name="item_pricing_date_start$iprc_num$" value="$iprc_date_start$" class="form_date_input form-control item_price_date_start" size="4">';
+	echo '<input type="text" name="item_pricing_date_start_time$iprc_num$" value="$iprc_date_start_time$" class=" form-control item_price_date_start" size="4">';
+	$Table->display_col_end();
+
+	// Date End
+	$Table->display_col_start();
+	echo '<input type="text" name="item_pricing_date_end$iprc_num$" value="$iprc_date_end$" class="form_date_input form-control item_price_date_end" size="4">';
+	echo '<input type="text" name="item_pricing_date_end_time$iprc_num$" value="$iprc_date_end_time$" class="form-control item_price_date_end" size="4">';
+	$Table->display_col_end();
+
+	// Actions
+	$Table->display_col_start();
+	echo get_icon( 'minus', 'imgtag', array( 'title' => T_('Remove item pricing'), 'class' => 'delete_item_pricing action_icon' ) ).' ';
+	echo get_icon( 'add', 'imgtag', array( 'title' => T_('Duplicate item pricing'), 'class' => 'duplicate_item_pricing action_icon' ) );
+	$Table->display_col_end();
+
+	$Table->display_line_end();
+
+	$item_pricing_template = ob_get_clean();
+	// ******** END OF Item Pricing Templates.
+
+	echo '<div class="item_pricing_edit_table">';
+
+	echo $Table->params['before'];
+
+	$deleted_item_pricing = param( 'deleted_item_pricing', 'string', '' );
+	$i = 1;
+
+	// TITLE:
+	$Table->display_head();
+
+	$item_pricing = $edited_Item->get_item_pricing( 'all', 'ID' );
+
+	// TABLE START:
+	$Table->display_list_start();
+
+	if( empty( $item_pricing ) )
+	{	// Hide table header when no custom fields yet:
+		$Table->params['head_start'] = update_html_tag_attribs( $Table->params['head_start'], array( 'style' => 'display:none' ) );
+	}
+	// COLUMN HEADERS:
+	$Table->display_col_headers();
+
+	// BODY START:
+	$Table->display_body_start();
+
+	foreach( $item_pricing as $item_price )
+	{
+
+		if( isset( $item_price['temp_i'] ) )
+		{ // Get i from this temp number when form was is submitted
+			$i = $item_price['temp_i'];
+		}
+		$price_ID = $item_price['ID'];
+		if( !empty( $deleted_item_pricing ) && ( strpos( $deleted_item_pricing, $price_ID ) !== false ) )
+		{
+			continue;
+		}
+		$item_pricing_price = $item_price['price'];
+		$item_pricing_curr_ID = $item_price['curr_ID'];
+		$custom_field_label_class = '';
+		$custom_field_name_class = '';
+
+		// Replace masks with values of the custom field:
+		$iprc_input_replacements = array(
+			'$iprc_ID$'              => $price_ID,
+			'$iprc_new$'             => param( 'input_pricing_new'.$i, 'integer', 0 ),
+			'$iprc_num$'             => $i,
+			'$iprc_price$'           => format_to_output( $item_price['price'], 'htmlattr' ),
+			'$iprc_curr_ID$'         => format_to_output( $item_price['curr_ID'], 'htmlattr' ),
+			'$iprc_min_qty$'         => format_to_output( $item_price['min_qty'], 'htmlattr' ),
+			'$iprc_grp_ID$'          => format_to_output( $item_price['grp_ID'], 'htmlattr' ),
+			'$iprc_date_start$'      => empty( $item_price['date_start'] ) ? NULL : format_to_output( date( locale_input_datefmt(), strtotime( $item_price['date_start'] ) ), 'htmlattr' ),
+			'$iprc_date_start_time$' => empty( $item_price['date_start'] ) ? NULL : format_to_output( date( locale_input_timefmt(), strtotime( $item_price['date_start'] ) ), 'htmlattr' ),
+			'$iprc_date_end$'        => empty( $item_price['date_end'] ) ? NULL : format_to_output( date( locale_input_datefmt(), strtotime( $item_price['date_end'] ) ), 'htmlattr' ),
+			'$iprc_date_end_time$'   => empty( $item_price['date_end'] ) ? NULL : format_to_output( date( locale_input_timefmt(), strtotime( $item_price['date_end'] ) ), 'htmlattr' ),
+		);
+
+		$iprc_select_replacements = array( 'curr_ID', 'grp_ID' );
+		$item_price_template = str_replace( array_keys( $iprc_input_replacements ), $iprc_input_replacements, $item_pricing_template );
+
+		foreach( $iprc_select_replacements as $iprc_select_field )
+		{	// Set a selected option:
+			//pre_dump( '(<select[^>]+name="item_pricing_'.$iprc_select_field.'.+?<option value="'.preg_quote( $item_price[ $iprc_select_field ], '/' ).'")' );
+			$item_price_template = str_replace( array("\n", "\r"), " ", $item_price_template ); // Remove new lines for the following line to work
+			$item_price_template = preg_replace( '/(<select[^>]+name="item_pricing_'.$iprc_select_field.'.+?<option value="'.preg_quote( $item_price[ $iprc_select_field ], '/' ).'")/', '$1 selected="selected"', $item_price_template );
+		}
+
+		echo $item_price_template;
+
+		$i++;
+		evo_flush();
+	}
+
+
+	// BODY END:
+	$Table->display_body_end();
+
+	// TABLE END:
+	$Table->display_list_end();
+
+	echo '<input type="hidden" name="count_item_pricing'.'" value='.( $i - 1 ).' />';
+	echo '<input type="hidden" name="deleted_item_pricing" value="'.$deleted_item_pricing.'" />';
+
+	echo $Table->params['after'];
+	echo '</div>';
 
 	// ############################ CUSTOM FIELDS #############################
 	$custom_fields = $edited_Item->get_type_custom_fields();
@@ -1031,6 +1201,149 @@ jQuery( '#post_excerpt' ).on( 'keyup', function()
 	// Disable excerpt auto-generation on any changing and enable if excerpt field is empty:
 	jQuery( 'input[name=post_excerpt_autogenerated]' ).prop( 'checked', ( jQuery( this ).val() == '' ) );
 } );
+
+function guidGenerator()
+{
+	var S4 = function()
+	{
+		return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+	};
+	return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4());
+}
+
+function add_new_item_pricing( duplicated_pricing_obj )
+{
+	var new_field_mode = 'new';
+	// Set values:
+	var pricing_value_price = 0.00;
+	var pricing_value_curr_ID = <?php echo format_to_js( locale_currency( '#', 'ID' ) );?>;
+	var pricing_value_min_qty = 1;
+	var pricing_value_grp_ID = '';
+	var pricing_value_date_start = '';
+	var pricing_value_date_start_time = '';
+	var pricing_value_date_end = '';
+	var pricing_value_date_end_time = '';
+	if( typeof( duplicated_pricing_obj ) != 'undefined' && duplicated_pricing_obj !== false && duplicated_pricing_obj.length > 0 )
+	{	// Get data from duplicated field
+		new_field_mode = 'duplicate_empty';
+		pricing_value_price           = duplicated_pricing_obj.find( 'input[name^="item_pricing_price"]' ).val();
+		pricing_value_curr_ID         = duplicated_pricing_obj.find( 'select[name^="item_pricing_curr_ID"]' ).val();
+		pricing_value_min_qty         = duplicated_pricing_obj.find( 'input[name^="item_pricing_min_qty"]' ).val();
+		pricing_value_grp_ID          = duplicated_pricing_obj.find( 'select[name^="item_pricing_grp_ID"]' ).val();
+		pricing_value_date_start      = duplicated_pricing_obj.find( 'input[name^="item_pricing_date_start"]' ).val();
+		pricing_value_date_start_time = duplicated_pricing_obj.find( 'input[name^="item_pricing_date_start_time"]' ).val();
+		pricing_value_date_end        = duplicated_pricing_obj.find( 'input[name^="item_pricing_date_end"]' ).val();
+		pricing_value_date_end_time   = duplicated_pricing_obj.find( 'input[name^="item_pricing_date_end_time"]' ).val();
+	}
+
+	var count_pricing = jQuery( 'input[name=count_item_pricing]' ).val();
+	count_pricing++;
+
+	var item_pricing_inputs = {};
+
+	<?php
+	$item_pricing_template = str_replace( array("\n", "\r"), " ", $item_pricing_template );
+	echo 'item_pricing_template = \''.format_to_js( $item_pricing_template )."';\r\n";
+	?>
+
+
+	// Replace masks with values:
+	var item_pricing_inputs = item_pricing_template
+		.replace( '$iprc_ID$', guidGenerator() )
+		.replace( '$iprc_new$', 1 )
+		.replace( /\$iprc_num\$/g, count_pricing )
+		.replace( '$iprc_price$', pricing_value_price )
+		.replace( '$iprc_curr_ID$', pricing_value_curr_ID )
+		.replace( '$iprc_min_qty$', pricing_value_min_qty )
+		.replace( '$iprc_grp_ID$', pricing_value_grp_ID )
+		.replace( '$iprc_date_start$', pricing_value_date_start )
+		.replace( '$iprc_date_end$', pricing_value_date_end )
+		.replace( '$iprc_date_start_time$', pricing_value_date_start_time )
+		.replace( '$iprc_date_end_time$', pricing_value_date_end_time );
+
+	if( new_field_mode == 'new' )
+	{
+		var iprc_select_defaults = {
+		// Default values for select options depending on custom field type:
+			curr_ID: pricing_value_curr_ID,
+			grp_ID: 0,
+		};
+
+		for( var iprc_select_field in iprc_select_defaults )
+		{	// Set default value for select options:
+			var iprc_regexp = new RegExp( '(<select[^>]+name="item_pricing_' + iprc_select_field + '.+?<option value="' + iprc_select_defaults[iprc_select_field] + '")' );
+			item_pricing_inputs = item_pricing_inputs.replace( iprc_regexp, '$1 selected="selected"' );
+		}
+	}
+
+	// Insert a row of new adding field:
+	if( new_field_mode == 'new' )
+	{	// Insert in the end of the custom fields table:
+		jQuery( '.item_pricing_edit_table table tbody' ).append( item_pricing_inputs );
+	}
+	else
+	{ // Insert right after the duplicated field:
+		duplicated_pricing_obj.after( item_pricing_inputs );
+	}
+
+	if( new_field_mode == 'duplicate_empty' )
+	{	// Set values of the select and hidden inputs for new duplicated field:
+		var new_field_obj = duplicated_pricing_obj.next();
+		new_field_obj.find( 'select[name^="item_pricing_curr_ID"]' ).val( pricing_value_curr_ID );
+		new_field_obj.find( 'select[name^="item_pricing_grp_ID"]' ).val( pricing_value_grp_ID );
+	}
+
+	// Add date picker:
+	jQuery( '.form_date_input', '.item_pricing_edit_table table tbody' ).datepicker({
+			dateFormat: '<?php echo  jquery_datepicker_datefmt();?>',
+			monthNames: <?php echo  jquery_datepicker_month_names();?>,
+			dayNamesMin: <?php echo  jquery_datepicker_day_names();?>,
+			firstDay: '<?php echo locale_startofweek();?>'
+		});
+
+	// Update a count of item pricing:
+	jQuery( 'input[name=count_item_pricing]' ).attr( 'value', count_pricing );
+
+	if( jQuery( '.item_pricing_edit_table table thead' ).is( ':hidden' ) )
+	{	// Display table column headers when first row has been added:
+		jQuery( '.item_pricing_edit_table table thead' ).show();
+	}
+}
+
+jQuery( '#add_item_pricing' ).click( function()
+	{
+		add_new_item_pricing();
+	} );
+
+// Duplicate custom field:
+jQuery( document ).on( 'click', '.duplicate_item_pricing', function()
+{
+	var field_row_obj = jQuery( this ).closest( 'tr' );
+	add_new_item_pricing( field_row_obj );
+} );
+
+// Delete custom field:
+jQuery( document ).on( 'click', '.delete_item_pricing', function()
+	{
+		if( confirm( '<?php echo TS_('Are you sure want to delete this item price?\nThe update will be performed when you will save the current post.'); ?>' ) )
+		{ // Delete item price only from html form, This field will be removed after saving of changes
+			var field_row_obj = jQuery( this ).closest( 'tr' );
+			if( field_row_obj.find( 'input[name^=item_pricing_new][value=0]' ).length )
+			{
+				var deleted_pricing_value = jQuery( '[name=deleted_item_pricing]' ).val();
+				if( deleted_pricing_value )
+				{
+					deleted_pricing_value = deleted_pricing_value + ',';
+				}
+				jQuery( '[name=deleted_item_pricing]' ).val( deleted_pricing_value + field_row_obj.find( '[name^=item_pricing_ID]' ).val() );
+			}
+			field_row_obj.remove();
+			if( jQuery( '.item_pricing_edit_table table tbody tr' ).length == 0 )
+			{
+				jQuery( '.item_pricing_edit_table table thead' ).hide();
+			}
+		}
+	} );
 </script>
 <?php
 

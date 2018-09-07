@@ -205,6 +205,7 @@ class ItemLight extends DataObject
 				array( 'table'=>'T_items__subscriptions', 'fk'=>'isub_item_ID', 'msg'=>T_('%d items subscriptions') ),
 				array( 'table'=>'T_items__prerendering', 'fk'=>'itpr_itm_ID', 'msg'=>T_('%d prerendered content') ),
 				array( 'table'=>'T_items__user_data', 'fk'=>'itud_item_ID', 'msg'=>T_('%d recordings of user data for a specific post') ),
+				array( 'table'=>'T_items__pricing', 'fk'=>'iprc_itm_ID', 'msg'=>T_('%d item pricing') ),
 			);
 	}
 

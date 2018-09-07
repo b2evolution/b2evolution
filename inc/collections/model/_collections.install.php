@@ -466,6 +466,21 @@ $schema_queries = array_merge( $schema_queries, array(
 			KEY itvt_user_ID (itvt_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	'T_items__pricing' => array(
+		'Creating item pricing table',
+		"CREATE TABLE T_items__pricing (
+			iprc_ID         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			iprc_itm_ID    INT UNSIGNED NOT NULL,
+			iprc_price      DOUBLE NOT NULL,
+			iprc_curr_ID    INT UNSIGNED NOT NULL,
+			iprc_min_qty    INT UNSIGNED NULL,
+			iprc_grp_ID     INT UNSIGNED NULL,
+			iprc_date_start TIMESTAMP NULL,
+			iprc_date_end   TIMESTAMP NULL,
+			PRIMARY KEY ( iprc_ID ),
+			INDEX iprc_item_ID( iprc_itm_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
 	'T_subscriptions' => array(
 		'Creating table for subscriptions',
 		"CREATE TABLE T_subscriptions (

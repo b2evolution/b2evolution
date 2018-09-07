@@ -10778,6 +10778,22 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end( false );
 	}
 
+	if( upg_task_start( 13270, 'Creating table for item pricing...' ) )
+	{	// part of 7.0.0-alpha
+		db_create_table( 'T_items__pricing', "
+			iprc_ID         INT UNSIGNED NOT NULL,
+			iprc_itm_ID    INT UNSIGNED NOT NULL,
+			iprc_price      DOUBLE NOT NULL,
+			iprc_curr_ID    INT UNSIGNED NOT NULL,
+			iprc_min_qty    INT UNSIGNED,
+			iprc_grp_ID     INT UNSIGNED,
+			iprc_date_start TIMESTAMP NULL,
+			iprc_date_end   TIMESTAMP NULL,
+			PRIMARY KEY ( iprc_ID ),
+			INDEX iprc_item_ID( iprc_itm_ID )" );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
