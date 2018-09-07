@@ -938,6 +938,9 @@ if( $display_mode != 'js')
 			require_css( '#jcrop_css#', 'rsc_url' );
 			break;
 		case 'pwdchange':
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
 			$AdminUI->breadcrumbpath_add( T_('Change password'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 
 			// Set an url for manual page:
