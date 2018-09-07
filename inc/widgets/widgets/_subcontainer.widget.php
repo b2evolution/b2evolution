@@ -34,7 +34,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class subcontainer_Widget extends ComponentWidget
 {
-	var $icon = 'cubes';
+	var $icon = 'cube';
 
 	/**
 	 * Constructor
@@ -51,8 +51,7 @@ class subcontainer_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		$title = T_( 'Sub-container' );
-		return $title;
+		return T_('Embed Sub-Container');
 	}
 
 
@@ -70,7 +69,7 @@ class subcontainer_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Embed any container into a widget. Useful to use widget containers embedded into others.');
+		return T_('Allows to re-use a block of widgets in several places.');
 	}
 
 
@@ -100,8 +99,8 @@ class subcontainer_Widget extends ComponentWidget
 					'size' => 60,
 				),
 				'container' => array(
-					'label' => T_('Container'),
-					'note' => T_( 'The container which will be embedded.' ),
+					'label' => T_('Sub-Container'),
+					'note' => T_('All widgets from this Sub-Container will be displayed.'),
 					'type' => 'select',
 					'options' => $container_options,
 					'defaultvalue' => ''

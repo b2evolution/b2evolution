@@ -95,7 +95,7 @@ jQuery( document ).on( 'ready', function()
 		} );
 
 		// Open links from widget edit form on top window:
-		backoffice_content.find( 'form#widget_checkchanges a' ).attr( 'target', '_top' );
+		backoffice_content.find( 'form#widget_checkchanges a:not([target])' ).attr( 'target', '_top' );
 	} );
 
 	jQuery( '#evo_customizer__updater' ).on( 'load', function()

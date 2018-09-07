@@ -48,8 +48,7 @@ class subcontainer_row_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		$title = T_( 'Sub-container row' );
-		return $title;
+		return T_('Columns(Sub-Containers)');
 	}
 
 
@@ -67,7 +66,7 @@ class subcontainer_row_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Embed any container into a widget. Useful to use widget containers embedded into others.');
+		return T_('Arrange several Sub-Containers into columns.');
 	}
 
 
@@ -99,15 +98,15 @@ class subcontainer_row_Widget extends ComponentWidget
 		for( $i = 1; $i <= 6; $i++ )
 		{	// 6 columns for widget containers:
 			$widget_params['column'.$i.'_container'] = array(
-				'label' => sprintf( T_('Column %d Container'), $i ),
-				'note' => T_('The container which will be embedded.'),
+				'label' => sprintf( T_('Sub-Container for Column %d'), $i ),
+				'note' => T_('This Sub-Container will hold the widgets/contents for this column.'),
 				'type' => 'select',
 				'options' => $container_options,
 				'defaultvalue' => ''
 			);
 			$widget_params['column'.$i.'_class'] = array(
-				'label' => sprintf( T_('Column %d Classes'), $i ),
-				'note' => T_('The style classes for container above.'),
+				'label' => sprintf( T_('CSS Classes for Column %d'), $i ),
+				'note' => T_('Use to determine column arrangement.'),
 				'size' => 60,
 				'defaultvalue' => 'col-lg-4 col-md-6 col-sm-6 col-xs-12'
 			);
