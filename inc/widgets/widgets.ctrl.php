@@ -340,6 +340,10 @@ switch( $action )
 					else
 					{	// Scroll to messages after update:
 						$methods['showMessagesWidgetSettings'] = array( 'success' );
+						if( ! empty( $edited_ComponentWidget->reload_page_after_update ) )
+						{	// Reload page because it is required to update widget form with some new content which was created during updating:
+							$methods['location.reload'] = array();
+						}
 					}
 					send_javascript_message( $methods, true );
 					break;
