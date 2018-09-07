@@ -26,6 +26,9 @@ class colls_list_public_Widget extends ComponentWidget
 {
 	var $icon = 'list';
 
+	// Enable additional params for classes of Link/Button:
+	var $allow_link_css_params = true;
+
 	/**
 	 * Constructor
 	 */

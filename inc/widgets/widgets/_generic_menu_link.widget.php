@@ -25,6 +25,9 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class generic_menu_link_Widget extends ComponentWidget
 {
+	// Enable additional params for classes of Link/Button:
+	var $allow_link_css_params = true;
+
 	/**
 	 * Get a layout for menu link
 	 *

@@ -424,8 +424,8 @@ class ComponentWidget extends DataObject
 			$advanced_layout_is_started = true;
 		}
 
-		if( get_parent_class( $this ) == 'generic_menu_link_Widget' )
-		{	// Widget link/button CSS classes for menu link widgets:
+		if( ! empty( $this->allow_link_css_params ) )
+		{	// Enable link/button CSS classes only for specific widgets like menu widgets:
 			$r['widget_link_class'] = array(
 					'label' => '<span class="dimmed">'.T_('Link/Button Class').'</span>',
 					'size' => 20,
@@ -1094,13 +1094,13 @@ class ComponentWidget extends DataObject
 
 				if( $Blog && $l_blog_ID == $Blog->ID )
 				{ // This is the blog being displayed on this page:
-				echo $this->disp_params['item_selected_start'];
-					$link_class = $this->disp_params['link_selected_class'];
+					echo $this->disp_params['item_selected_start'];
+					$link_class = empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['link_selected_class'] : $this->disp_params['widget_active_link_class'];
 				}
 				else
 				{
 					echo $this->disp_params['item_start'];
-					$link_class = $this->disp_params['link_default_class'];;
+					$link_class = empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['link_default_class'] : $this->disp_params['widget_link_class'];
 				}
 
 				echo '<a href="'.$l_Blog->gen_blogurl().'" class="'.$link_class.'" title="'

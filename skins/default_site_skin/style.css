@@ -64,7 +64,7 @@ input#nav-trigger {
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#696c72', endColorstr='#333334');
 }
 
-.sitewide_header_menu > li > a {
+.sitewide_header_menu a.default, .sitewide_header_menu a.selected {
 	color: #cccccc;
 	font-size: 16px;
 	font-weight: 300;
