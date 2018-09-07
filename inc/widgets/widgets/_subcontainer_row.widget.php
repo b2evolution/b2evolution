@@ -151,7 +151,7 @@ class subcontainer_row_Widget extends ComponentWidget
 					$SQL->FROM( 'T_widget__container' );
 					$SQL->WHERE( 'wico_coll_ID = '.$this->get_coll_ID() );
 					$SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $this->get_container_param( 'skin_type' ) ) );
-					$existing_containers = $DB->get_col( $SQL );
+					$existing_containers = array_map( 'strtolower', $DB->get_col( $SQL ) );
 				}
 				// Set data for new creating sub-container:
 				$new_WidgetContainer = new WidgetContainer();
