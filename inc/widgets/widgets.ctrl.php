@@ -657,9 +657,6 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget_container' );
 
-		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
-
 		if( $wico_ID > 0 )
 		{	// Get the existing widget container:
 			$edited_WidgetContainer = & $WidgetContainerCache->get_by_ID( $wico_ID );
@@ -677,8 +674,8 @@ switch( $action )
 				$Messages->add( T_('Widget container has been updated.'), 'success' );
 			}
 			else
-			{	// New widget container has been created:
-				$Messages->add( T_('New widget has been created.'), 'success' );
+			{	// New widget sub-container has been created:
+				$Messages->add( T_('New widget sub-container has been created.'), 'success' );
 			}
 			if( $mode == 'customizer' )
 			{	// Redirect back to customizer mode:

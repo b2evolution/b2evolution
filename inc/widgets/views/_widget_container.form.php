@@ -23,7 +23,7 @@ global $edited_WidgetContainer, $Blog, $AdminUI, $mode;
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
 
-$form_title = $creating ?  T_('New container') : T_('Container');
+$form_title = $creating ?  T_('New Sub-Container') : (  $edited_WidgetContainer->get( 'main' ) ? T_('Skin Container') : T_('Sub-Container') );
 
 if( $mode == 'customizer' )
 {	// Display customizer tabs to switch between skin and widgets in special div on customizer mode:
