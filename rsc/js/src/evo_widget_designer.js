@@ -81,11 +81,13 @@ function evo_widget_initialize_designer_block( widget )
 	// Fix z-index issue:
 	evo_widget_fix_parent_zindex( widget );
 
+	// Get all same widgets from the same container:
+	var same_widgets = evo_widget_get_duplicates( widget );
+
 	// Initialize a widget designer block only first time:
-	jQuery( 'body' ).append( '<div class="evo_designer evo_designer__widget" data-id="' + widget.data( 'id' ) + '" data-container="' + widget.data( 'container' ) + '">' +
-			'<div><div class="evo_designer__title">' + widget.data( 'type' ) + '</div></div>' +
-		'</div>' );
-	evo_widget_update_designer_position( widget );
+	var designer_block_start = '<div class="evo_designer evo_designer__widget" data-id="' + widget.data( 'id' ) + '" data-container="' + widget.data( 'container' ) + '">';
+	var designer_block_end = '</div>';
+	jQuery( 'body' ).append( designer_block_start + '<div><div class="evo_designer__title">' + widget.data( 'type' ) + '</div></div>' + designer_block_end );
 	if( widget.data( 'can-edit' ) == '1' )
 	{	// Display a panel with actions if current user has a permission to edit widget:
 		jQuery( '>div', designer_block_selector ).append( '<div class="evo_designer__actions">' +
@@ -93,15 +95,21 @@ function evo_widget_initialize_designer_block( widget )
 				b2evo_widget_icon_down +
 				b2evo_widget_icon_disable +
 			'</div>' );
-		if( widget.next( '.evo_widget' ).length == 0 )
+		if( same_widgets.eq( same_widgets.length - 1 ).next( '.evo_widget' ).length == 0 )
 		{	// Hide action icon to move widget down if it is the last widget in container:
 			jQuery( designer_block_selector ).find( '.evo_designer__action_order_down' ).hide();
 		}
-		if( widget.prev( '.evo_widget' ).length == 0 )
+		if( same_widgets.eq( 0 ).prev( '.evo_widget' ).length == 0 )
 		{	// Hide action icon to move widget up if it is the first widget in container:
 			jQuery( designer_block_selector ).find( '.evo_designer__action_order_up' ).hide();
 		}
 	}
+	for( var w = 2; w <= same_widgets.length; w++ )
+	{	// Initialize additional designer blocks for blocks of the same widget, e.g. for items/posts list widget in Menu container:
+		jQuery( 'body' ).append( designer_block_start + designer_block_end );
+	}
+	// Set correct position for new created designer block:
+	evo_widget_update_designer_position( widget );
 
 	if( widget.hasClass( 'widget_core_subcontainer' ) )
 	{	// If widget is a subcontainer,
@@ -267,6 +275,9 @@ jQuery( document ).on( 'click', '.evo_designer__action_order_up, .evo_designer__
 	var widget = jQuery( evo_widget_selector( designer_block ) );
 	var order_type = jQuery( this ).hasClass( 'evo_designer__action_order_up' ) ? 'up' : 'down';
 
+	// Re-select designer block because it may be several blocks for some widgets, e.g. for items/posts list widget in Menu container:
+	designer_block = jQuery( evo_widget_designer_block_selector( widget ) );
+
 	// Mark current widget with process class:
 	designer_block.removeClass( 'evo_designer__status_failed' ).addClass( 'evo_designer__status_process' );
 
@@ -277,7 +288,10 @@ jQuery( document ).on( 'click', '.evo_designer__action_order_up, .evo_designer__
 	var container_wrapper = evo_widget_container_wrapper( widget );
 	container_wrapper.children( '.evo_widget[data-id]' ).each( function()
 	{
-		widgets_ids.push( jQuery( this ).data( 'id' ) );
+		if( widgets_ids.indexOf( jQuery( this ).data( 'id' ) ) == -1 )
+		{	// Don't send ID of the same widget:
+			widgets_ids.push( jQuery( this ).data( 'id' ) );
+		}
 	} );
 
 	jQuery.ajax(
@@ -379,6 +393,18 @@ jQuery( document ).on( 'ready', function()
 
 
 /**
+ * Get all duplicates of the same widget in the container, e.g. for items/posts list widget in Menu container
+ *
+ * @param object Widget
+ * @return object Widgets
+ */
+function evo_widget_get_duplicates( widget )
+{
+	return widget.closest( '.evo_container' ).find( '.evo_widget[data-id=' + widget.data( 'id' ) + ']' );
+}
+
+
+/**
  * Get jQuery selector for widget by designer block
  *
  * @param object Designer block
@@ -454,19 +480,17 @@ function evo_widget_display_error( error, widget, action )
  */
 function evo_widget_reorder( widget, direction )
 {
-	if( widget.length > 1 )
-	{	// Delete duplicted object if it was created e-g on sub-container:
-		delete( widget[1] );
-	}
+	var curr_widget = widget.eq( 0 );
+
 	if( direction == 'up' )
 	{	// Move HTML of the widget before previous widget:
-		var near_widget = widget.prev();
-		near_widget.before( widget );
+		var near_widget = evo_widget_get_duplicates( curr_widget.prev() );
+		near_widget.eq( 0 ).before( widget );
 	}
 	else
 	{	// Move HTML of the widget after next widget:
-		var near_widget = widget.next();
-		near_widget.after( widget );
+		var near_widget = evo_widget_get_duplicates( widget.eq( widget.length - 1 ).next() );
+		near_widget.eq( near_widget.length - 1 ).after( widget );
 	}
 
 	// Update visibility of up/down action icons of first/last widgets:
@@ -486,20 +510,25 @@ function evo_widget_update_order_actions( container )
 {
 	var container_widgets = container.children( '.evo_widget' );
 	var widget_num = 1;
+	var prev_widget_ID = 0;
 	container_widgets.each( function()
 	{
-		var designer_block = jQuery( evo_widget_designer_block_selector( jQuery( this ) ) );
+		var designer_block = jQuery( evo_widget_designer_block_selector( jQuery( this ) ) ).eq( 0 );
 		if( designer_block.length )
 		{	// If designer block is initialized:
-			designer_block.find( '.evo_designer__action_order_up, .evo_designer__action_order_down' ).show();
+			if( prev_widget_ID != designer_block.data( 'id' ) )
+			{	// If it is block for next different widget:
+				designer_block.find( '.evo_designer__action_order_up, .evo_designer__action_order_down' ).show();
+			}
 			if( widget_num == 1 )
 			{	// Hide action icon to move widget up for the first widget in container:
 				designer_block.find( '.evo_designer__action_order_up' ).hide();
 			}
 			if( widget_num == container_widgets.length )
-			{	// Hide action icon to move widget up for the last widget in container:
+			{	// Hide action icon to move widget down for the last widget in container:
 				designer_block.find( '.evo_designer__action_order_down' ).hide();
 			}
+			prev_widget_ID = designer_block.data( 'id' );
 		}
 		widget_num++;
 	} );
@@ -514,33 +543,41 @@ function evo_widget_update_order_actions( container )
  */
 function evo_widget_update_designer_position( widget, show )
 {
-	var widget_class = '';
-	var widget_left = widget.offset().left - 3;
-	var widget_width = widget.outerWidth() + 5;
-	var window_width = jQuery( window ).width();
-	if( widget_left < 0 )
-	{	// Limit container designer block left podition to left window border;
-		widget_left = 0;
-	}
-	if( widget_width > window_width - widget_left - 27 )
-	{	// Limit container designer block width to right window border:
-		widget_width = window_width - widget_left - 27;
-		// Additional class to fix style for outside container designer block:
-		widget_class = 'evo_widget__outside';
-	}
+	var w = 0;
+	var designer_blocks = jQuery( evo_widget_designer_block_selector( widget ) );
+	evo_widget_get_duplicates( widget ).each( function()
+	{	// We should display several designer blocks for widget blocks with same ID, e.g. for items/posts list widget in Menu container:
+		var curr_widget = jQuery( this );
+		var widget_class = '';
+		var widget_left = curr_widget.offset().left - 3;
+		var widget_width = curr_widget.outerWidth() + 5;
+		var window_width = jQuery( window ).width();
+		if( widget_left < 0 )
+		{	// Limit container designer block left podition to left window border;
+			widget_left = 0;
+		}
+		if( widget_width > window_width - widget_left - 27 )
+		{	// Limit container designer block width to right window border:
+			widget_width = window_width - widget_left - 27;
+			// Additional class to fix style for outside container designer block:
+			widget_class = 'evo_widget__outside';
+		}
 
-	var designer_block = jQuery( evo_widget_designer_block_selector( widget ) );
-	designer_block.css( {
-			'top': widget.offset().top - 3,
-			'left': widget_left,
-			'width': widget_width,
-			'height': widget.outerHeight() + 5,
-		} )
-		.addClass( widget_class );
-	if( typeof( show ) == 'undefined' || show )
-	{	// Show widget desginer block:
-		designer_block.show();
-	}
+		var designer_block = designer_blocks.eq( w );
+		designer_block.css( {
+				'top': curr_widget.offset().top - 3,
+				'left': widget_left,
+				'width': widget_width,
+				'height': curr_widget.outerHeight() + 5,
+			} )
+			.addClass( widget_class );
+		if( typeof( show ) == 'undefined' || show )
+		{	// Show widget desginer block:
+			designer_block.show();
+		}
+
+		w++;
+	} );
 
 	// Also update container position:
 	evo_widget_update_container_position( widget.parent() );
@@ -587,7 +624,7 @@ function evo_widget_hide_designer_block( designer_block )
 	if( ! designer_block.hasClass( 'evo_designer__status_process' ) &&
 	    ! designer_block.hasClass( 'evo_designer__status_failed' ) )
 	{	// Hide only when widget is not in process:
-		designer_block.hide();
+		jQuery( evo_widget_designer_block_selector( jQuery( evo_widget_selector( designer_block ) ) ) ).hide();
 	}
 }
 
