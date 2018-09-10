@@ -1430,9 +1430,10 @@ class _core_Module extends Module
 						// The get_write_url() function above does not allow specifying the item type ID we'll manually add it:
 						$write_item_url = url_add_param( $write_item_url, 'item_typ_ID='.$default_new_ItemType->ID );
 
-						if( ! empty( $default_new_ItemType->get( 'evobar_link_text' ) ) )
+						$evobar_link_text = $default_new_ItemType->get( 'evobar_link_text' );
+						if( ! empty( $evobar_link_text ) )
 						{
-							$menu_text = $default_new_ItemType->get( 'evobar_link_text' );
+							$menu_text = $evobar_link_text;
 						}
 					}
 					if( ! $perm_admin_normal )
