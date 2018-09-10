@@ -1930,14 +1930,6 @@ function create_demo_contents()
 	// Use this var to shift the posts of the collections in time below:
 	$timeshift = 0;
 
-	if( $install_collection_minisite )
-	{ // Install Mini-site collection
-		task_begin( 'Creating Mini-Site collection...' );
-		create_demo_collection( 'minisite', $jay_moderator_ID, $create_demo_users, $timeshift, 1 );
-		update_install_progress_bar();
-		task_end();
-	}
-
 	if( $install_collection_home )
 	{ // Install Home collection
 		task_begin( 'Creating Home collection...' );
@@ -2005,6 +1997,14 @@ function create_demo_contents()
 		$timeshift += 86400;
 		task_begin( 'Creating Catalog collection...' );
 		create_demo_collection( 'catalog', $mary_moderator_ID, $create_demo_users, $timeshift, 7 );
+		update_install_progress_bar();
+		task_end();
+	}
+
+	if( $install_collection_minisite )
+	{ // Install Mini-site collection
+		task_begin( 'Creating Mini-Site collection...' );
+		create_demo_collection( 'minisite', $jay_moderator_ID, $create_demo_users, $timeshift, 1 );
 		update_install_progress_bar();
 		task_end();
 	}

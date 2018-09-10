@@ -136,6 +136,7 @@ class WidgetContainer extends DataObject
 		$this->set_from_Request( 'name' );
 
 		param_string_not_empty( 'wico_code', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Code') ) );
+		param_check_regexp( 'wico_code', '#^[A-Za-z0-9\-_]{1,32}$#', sprintf( T_('The field "%s" must be from %d to %d letters, digits or signs %s.'), T_('Code'), 1, 32, '<code>_</code>, <code>-</code>' ) );
 		$this->set_from_Request( 'code' );
 
 		if( $this->ID == 0 )

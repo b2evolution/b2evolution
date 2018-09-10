@@ -167,6 +167,14 @@ $buttons[] = array( 'submit', 'submit', ( $mode == 'customizer' ? T_('Apply Chan
 if( $mode == 'customizer' )
 {	// Display buttons in special div on customizer mode:
 	echo '<div class="evo_customizer__buttons">';
+	if( $mode == 'customizer' )
+	{	// Display a button-link to go back (only in customizer mode):
+		$buttons[] = array( 'button', 'button', T_('Cancel'),
+			'tag'    => 'link',
+			'href'   => $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=customize&container_code='.urlencode( $edited_ComponentWidget->get_container_param( 'code' ) ).'&mode=customizer',
+			'target' => '_self',
+		);
+	}
 	$Form->buttons( $buttons );
 	echo '</div>';
 	// Clear buttons to don't display them twice:

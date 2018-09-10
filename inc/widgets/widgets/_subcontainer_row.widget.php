@@ -48,8 +48,7 @@ class subcontainer_row_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		$title = T_( 'Sub-container row' );
-		return $title;
+		return T_('Columns(Sub-Containers)');
 	}
 
 
@@ -67,7 +66,7 @@ class subcontainer_row_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Embed any container into a widget. Useful to use widget containers embedded into others.');
+		return T_('Arrange several Sub-Containers into columns.');
 	}
 
 
@@ -82,7 +81,10 @@ class subcontainer_row_Widget extends ComponentWidget
 
 		$WidgetContainerCache = & get_WidgetContainerCache();
 		$coll_widget_containers = $WidgetContainerCache->get_by_coll_ID( $Blog->ID );
-		$container_options = array( '' => T_('None') );
+		$container_options = array(
+				''            => T_('None'),
+				'!create_new' => T_('Create New'),
+			);
 		foreach( $coll_widget_containers as $WidgetContainer )
 		{
 			if( ! $WidgetContainer->get( 'main' ) )
@@ -99,15 +101,15 @@ class subcontainer_row_Widget extends ComponentWidget
 		for( $i = 1; $i <= 6; $i++ )
 		{	// 6 columns for widget containers:
 			$widget_params['column'.$i.'_container'] = array(
-				'label' => sprintf( T_('Column %d Container'), $i ),
-				'note' => T_('The container which will be embedded.'),
+				'label' => sprintf( T_('Sub-Container for Column %d'), $i ),
+				'note' => T_('This Sub-Container will hold the widgets/contents for this column.'),
 				'type' => 'select',
 				'options' => $container_options,
 				'defaultvalue' => ''
 			);
 			$widget_params['column'.$i.'_class'] = array(
-				'label' => sprintf( T_('Column %d Classes'), $i ),
-				'note' => T_('The style classes for container above.'),
+				'label' => sprintf( T_('CSS Classes for Column %d'), $i ),
+				'note' => T_('Use to determine column arrangement.'),
 				'size' => 60,
 				'defaultvalue' => 'col-lg-4 col-md-6 col-sm-6 col-xs-12'
 			);
@@ -123,6 +125,79 @@ class subcontainer_row_Widget extends ComponentWidget
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 */
+	function dbupdate()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		$result = true;
+
+		for( $i = 1; $i <= 6; $i++ )
+		{
+			if( $this->get_param( 'column'.$i.'_container' ) == '!create_new' )
+			{	// This is a request to create new sub-container:
+				if( ! isset( $existing_containers ) )
+				{	// Get existing containers to avoid duplicate error on inserting:
+					global $DB;
+					$SQL = new SQL( 'Get existing widget containers before auto create new' );
+					$SQL->SELECT( 'wico_code' );
+					$SQL->FROM( 'T_widget__container' );
+					$SQL->WHERE( 'wico_coll_ID = '.$this->get_coll_ID() );
+					$SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $this->get_container_param( 'skin_type' ) ) );
+					$existing_containers = array_map( 'strtolower', $DB->get_col( $SQL ) );
+				}
+				// Set data for new creating sub-container:
+				$new_WidgetContainer = new WidgetContainer();
+				$new_WidgetContainer->set( 'coll_ID', $this->get_coll_ID() );
+				$auto_container_name = $this->get_container_param( 'name' ).' Column '.$i;
+				$new_container_name = $auto_container_name;
+				$auto_container_code = strtolower( preg_replace( '/[^0-9a-z\-]+/i', '_', $new_container_name ) );
+				$new_container_code = $auto_container_code;
+				$c = 1;
+				while( in_array( $new_container_code, $existing_containers ) )
+				{	// Find unique container code per collection and skin type:
+					$new_container_code = $auto_container_code.'_'.$c;
+					$new_container_name = $auto_container_name.' '.$c;
+					$c++;
+				}
+				$new_WidgetContainer->set( 'code', $new_container_code );
+				$new_WidgetContainer->set( 'name', $new_container_name );
+				$new_WidgetContainer->set( 'skin_type', $this->get_container_param( 'skin_type' ) );
+				$new_WidgetContainer->set( 'main', 0 );
+				// Insert new sub-container:
+				$result = $new_WidgetContainer->dbinsert();
+				if( ! $result )
+				{	// Stop updating if some new container cannot be created:
+					break;
+				}
+				$existing_containers[] = $new_container_code;
+				// Use new created sub-container for this updating widget:
+				$this->set( 'column'.$i.'_container', $new_WidgetContainer->get( 'code' ) );
+				// Set this temp flag to update widget form with new created sub-container:
+				$this->reload_page_after_update = true;
+			}
+		}
+
+		// Do update only if all requested sub-containers have been created successfully:
+		$result = $result && parent::dbupdate();
+
+		if( $result )
+		{
+			$DB->commit();
+		}
+		else
+		{
+			$DB->rollback();
+		}
+
+		return $result;
 	}
 
 

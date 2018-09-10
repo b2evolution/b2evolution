@@ -54,11 +54,9 @@ else
 
 	echo '<div class="col-md-6 col-sm-12">';
 		echo '<h4 class="pull-left">'.T_('Sub-Containers').'</h4>';
-		if( $current_User->check_perm( 'options', 'edit', false ) )
-		{	// Display a button to add new sub-container if current User has a permission:
-			echo action_icon( T_('Add container'), 'add',
-				$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;skin_type='.get_param( 'skin_type' ), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
-		}
+		// Display a button to add new sub-container:
+		echo action_icon( T_('Add Sub-Container'), 'add',
+				$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;skin_type='.get_param( 'skin_type' ), T_('Add Sub-Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
 		echo '<div class="clearfix"></div>';
 		display_containers( get_param( 'skin_type' ), false );
 	echo '</div>';

@@ -1193,13 +1193,16 @@ class ComponentWidget extends DataObject
 	 */
 	function dbupdate()
 	{
-		global $DB;
+		$result = parent::dbupdate();
 
-		parent::dbupdate();
+		if( $result )
+		{	// If widget has been really updated
+			// BLOCK CACHE INVALIDATION:
+			// This widget has been modified, cached content depending on it should be invalidated:
+			BlockCache::invalidate_key( 'wi_ID', $this->ID );
+		}
 
-		// BLOCK CACHE INVALIDATION:
-		// This widget has been modified, cached content depending on it should be invalidated:
-		BlockCache::invalidate_key( 'wi_ID', $this->ID );
+		return $result;
 	}
 
 

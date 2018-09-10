@@ -1207,7 +1207,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 	{
 		// =======================================================================================================
 		case 'minisite':
-			$post_count = 3;
+			$post_count = 2;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories:
@@ -1221,21 +1221,6 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			}
 
 			// Sample content:
-			if( is_available_item_type( $blog_ID, 'Intro-Front' ) )
-			{
-				// Insert a post:
-				$post_count--;
-				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
-				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'intro' );
-				$edited_Item->insert( $owner_ID, T_('Homepage post'), T_('<p>This is the Home page of this site.</p>
-
-<p>More specifically it is the "Front page" of the first collection of this site. This first collection is called "Mini-Site". Other sample collections have been created. You can access them by clicking "Blog A", "Blog B", "Photos", etc. in the menu bar at the top of this page.</p>
-
-<p>You can add collections at will. You can also remove them (including this "Mini-Site" collection) if you don\'t need one.</p>'),
-						$now, $cat_minisite_b2evo, array(), 'published', '#', '', '', 'open', array( 'default' ), 'Intro-Front' );
-			}
-
 			if( is_available_item_type( $blog_ID, 'Standalone Page' ) )
 			{
 				// Insert a PAGE:
