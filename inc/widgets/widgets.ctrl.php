@@ -356,6 +356,11 @@ switch( $action )
 			{	// If $action == 'update'
 				// Redirect to widgets list:
 				$Session->set( 'fadeout_id', $edited_ComponentWidget->ID );
+				if( $mode == 'customizer' && ! empty( $edited_ComponentWidget->reload_page_after_update ) )
+				{	// Set flag to refresh customizer page because it is required to update widget form with some new content which was created during updating:
+					// (e.g. used to display new auto created sub-container by widget "Columns(Sub-Containers)" - subcontainer_row_Widget)
+					$Session->set( 'refresh_customizer_window', 1 );
+				}
 				header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
 			}
 		}
@@ -770,6 +775,13 @@ if( $display_mode == 'normal' )
 	require_css( 'blog_widgets.css' );
 	init_tokeninput_js();
 
+	if( $action == 'list' && $Session->get( 'refresh_customizer_window' ) )
+	{	// This is a request to refresh customizer back-office window:
+		// (e.g. used to display new auto created sub-container by widget "Columns(Sub-Containers)" - subcontainer_row_Widget)
+		add_js_headline( 'window.parent.document.getElementById( "evo_customizer__backoffice" ).contentDocument.location.reload();' );
+		// Clear temp variable:
+		$Session->delete( 'refresh_customizer_window' );
+	}
 
 	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 	$AdminUI->breadcrumbpath_add( T_('Widgets'), $admin_url.'?ctrl=widgets&amp;blog=$blog$' );
