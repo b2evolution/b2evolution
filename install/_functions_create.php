@@ -1924,14 +1924,6 @@ function create_demo_contents()
 	// Use this var to shift the posts of the collections in time below:
 	$timeshift = 0;
 
-	if( $install_collection_minisite )
-	{ // Install Mini-site collection
-		task_begin( 'Creating Mini-Site collection...' );
-		create_demo_collection( 'minisite', $jay_moderator_ID, $create_demo_users, $timeshift, 1 );
-		update_install_progress_bar();
-		task_end();
-	}
-
 	if( $install_collection_home )
 	{ // Install Home blog
 		task_begin( 'Creating Home collection...' );
@@ -1990,6 +1982,14 @@ function create_demo_contents()
 		$timeshift += 86400;
 		task_begin( 'Creating Tracker collection...' );
 		create_demo_collection( 'group', $jay_moderator_ID, $create_demo_users, $timeshift, 5 );
+		update_install_progress_bar();
+		task_end();
+	}
+
+	if( $install_collection_minisite )
+	{ // Install Mini-site collection
+		task_begin( 'Creating Mini-Site collection...' );
+		create_demo_collection( 'minisite', $jay_moderator_ID, $create_demo_users, $timeshift, 1 );
 		update_install_progress_bar();
 		task_end();
 	}
