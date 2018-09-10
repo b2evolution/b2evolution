@@ -1266,8 +1266,31 @@ class Item extends ItemLight
 			$item_pricing_date_start_time = param_time( 'item_pricing_date_start_time'.$i, '', false, false, false, true );
 			$item_pricing_date_end_time   = param_time( 'item_pricing_date_end_time'.$i, '', false, false, false, true );
 
-			$item_pricing_date_start      = empty( $item_pricing_date_start ) || empty( $item_pricing_date_start_time ) ? NULL : form_date( $item_pricing_date_start, $item_pricing_date_start_time );
-			$item_pricing_date_end        = empty( $item_pricing_date_end ) || empty( $item_pricing_date_end_time ) ? NULL : form_date( $item_pricing_date_end, $item_pricing_date_end_time );
+			if( empty( $item_pricing_date_start ) )
+			{
+				$item_pricing_date_start = NULL;
+			}
+			elseif( empty( $item_pricing_date_start_time ) )
+			{
+				$item_pricing_date_start = form_date( $item_pricing_date_start, '00:00:00' );
+			}
+			else
+			{
+				$item_pricing_date_start = form_date( $item_pricing_date_start, $item_pricing_date_start_time );
+			}
+
+			if( empty( $item_pricing_date_end ) )
+			{
+				$item_pricing_date_end = NULL;
+			}
+			elseif( empty( $item_pricing_date_end_time ) )
+			{
+				$item_pricing_date_end = form_date( $item_pricing_date_end, '23:59:59' );
+			}
+			else
+			{
+				$item_pricing_date_end = form_date( $item_pricing_date_end, $item_pricing_date_end_time );
+			}
 
 			// Add each new/existing item pricing in this array
 			// in order to see all of them on the form when item is not updated because of some errors
