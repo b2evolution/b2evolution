@@ -84,12 +84,15 @@ class subcontainer_Widget extends ComponentWidget
 
 		$WidgetContainerCache = & get_WidgetContainerCache();
 		$coll_widget_containers = $WidgetContainerCache->get_by_coll_ID( $Blog->ID );
-		$container_options = array( '' => T_('None') );
+		$container_options = array(
+				'' => T_('None'),
+				T_('Existing Sub-Containers') => array(),
+			);
 		foreach( $coll_widget_containers as $WidgetContainer )
 		{
 			if( ! $WidgetContainer->get( 'main' ) )
 			{	// Allow only sub-containers:
-				$container_options[ $WidgetContainer->get( 'code' ) ] = $WidgetContainer->get( 'name' );
+				$container_options[ T_('Existing Sub-Containers') ][ $WidgetContainer->get( 'code' ) ] = $WidgetContainer->get( 'name' );
 			}
 		}
 

@@ -84,12 +84,13 @@ class subcontainer_row_Widget extends ComponentWidget
 		$container_options = array(
 				''            => T_('None'),
 				'!create_new' => T_('Create New'),
+				T_('Existing Sub-Containers') => array(),
 			);
 		foreach( $coll_widget_containers as $WidgetContainer )
 		{
 			if( ! $WidgetContainer->get( 'main' ) )
 			{	// Allow only sub-containers:
-				$container_options[ $WidgetContainer->get( 'code' ) ] = $WidgetContainer->get( 'name' );
+				$container_options[ T_('Existing Sub-Containers') ][ $WidgetContainer->get( 'code' ) ] = $WidgetContainer->get( 'name' );
 			}
 		}
 
