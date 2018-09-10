@@ -177,10 +177,28 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 			// Mark current subcontainer widget to active status by temp class:
 			widget.addClass( 'evo_widget__subcontainer_active' );
 
-			// Store coordinates of all child widgets to know when cursor over and out,
+			// Store coordinates of all child widgets(and sub-containers) to know when cursor over and out,
 			// because z-index doesn't work properly with child element if parent already has z-index:
 			evo_subcontainer_widgets = new Array();
-			var subcontainer_wrapper = widget.hasClass( 'widget_core_subcontainer' ) ? widget : widget.find( '.evo_container' );
+			evo_subcontainer_containers = new Array();
+			var subcontainer_wrapper = widget;
+			if( widget.hasClass( 'widget_core_subcontainer_row' ) )
+			{	// This widget contains several sub-containers:
+				subcontainer_wrapper = widget.find( '.evo_container' );
+				subcontainer_wrapper.each( function()
+				{	// We need these data to display sub-containers without widgets:
+					if( jQuery( this ).find( '.evo_widget' ).length > 0 )
+					{	// Skip not empty containers, because they are visible by event of child widgets:
+						return;
+					}
+					evo_subcontainer_containers.push( new Array(
+						jQuery( this ).data( 'code' ),
+						jQuery( this ).offset().top - 3,
+						jQuery( this ).offset().left - 3,
+						jQuery( this ).offset().top + jQuery( this ).height() + 3,
+						jQuery( this ).offset().left + jQuery( this ).width() + 3 ) );
+				} );
+			}
 			subcontainer_wrapper.children( '.evo_widget' ).each( function()
 			{
 				evo_subcontainer_widgets.push( new Array(
@@ -224,14 +242,21 @@ jQuery( document ).on( 'mousemove', function( e )
 	}
 
 	if( jQuery( '.evo_designer__subcontainer_active' ).length > 0 &&
-	    typeof( evo_subcontainer_widgets ) != 'undefined' &&
-	    evo_subcontainer_widgets.length > 0 )
+	    ( ( typeof( evo_subcontainer_widgets ) != 'undefined' && evo_subcontainer_widgets.length > 0 ) || 
+	      ( typeof( evo_subcontainer_containers ) != 'undefined' && evo_subcontainer_containers.length > 0 ) ) )
 	{	// If sub-container is selected to edit its widgets:
-		var active_subcontainer_widget = jQuery( '.evo_widget.evo_widget__subcontainer_active' );
-		active_subcontainer_widget = active_subcontainer_widget.hasClass( 'widget_core_subcontainer' ) ? active_subcontainer_widget : active_subcontainer_widget.find( '.evo_container' );
+		var active_subcontainer_designer_block = jQuery( '.evo_designer__subcontainer_active' );
+		var subcontainer_zindex = active_subcontainer_designer_block.css( 'z-index' );
+		var active_subcontainer_widgets = jQuery( '.evo_widget.evo_widget__subcontainer_active' );
+		var one_subcontainer_is_displayed = true; // Single sub-container widget doesn't contain other sub-containers, Set TRUE in order to don't try to search empty sub-containers below.
+		if( active_subcontainer_widgets.hasClass( 'widget_core_subcontainer_row' ) )
+		{	// This widget may contains sub-containers:
+			active_subcontainer_widgets = active_subcontainer_widgets.find( '.evo_container' );
+			one_subcontainer_is_displayed = false;
+		}
 		for( var i = 0; i < evo_subcontainer_widgets.length; i++ )
 		{	// Detect what widget designer block should be visible depending on current cursor position:
-			var widget = active_subcontainer_widget.children( '.evo_widget[data-id="' + evo_subcontainer_widgets[i][0] + '"]' );
+			var widget = active_subcontainer_widgets.children( '.evo_widget[data-id="' + evo_subcontainer_widgets[i][0] + '"]' );
 			if( widget.length == 0 ||
 			    widget.data( 'id' ) == jQuery( e.target ).data( 'id' ) ||
 			    jQuery( e.target ).closest( '.evo_designer__widget[data-id=' + widget.data( 'id' ) + ']' ).length > 0 )
@@ -239,17 +264,16 @@ jQuery( document ).on( 'mousemove', function( e )
 				continue;
 			}
 
-			var designer_block = jQuery( evo_widget_designer_block_selector( widget ) );
 			if( e.pageX >= evo_subcontainer_widgets[i][2] && e.pageY >= evo_subcontainer_widgets[i][1] && // top-left point
 			    e.pageX <= evo_subcontainer_widgets[i][4] && e.pageY <= evo_subcontainer_widgets[i][3] ) // bottom-right point
-			{	// Initialize and display designer block because cursor is over current widget:
+			{	// Initialize and display widget designer block because cursor is over current widget:
 				evo_widget_initialize_designer_block( widget );
 				// Set z-index to make it over designer block of current sub-container:
-				var subcontainer_zindex = jQuery( '.evo_designer__subcontainer_active' ).css( 'z-index' );
-				designer_block.css( 'z-index', subcontainer_zindex + 2  );
+				jQuery( evo_widget_designer_block_selector( widget ) ).css( 'z-index', subcontainer_zindex + 2  );
 				if( widget.parent().hasClass( 'evo_container' ) )
 				{	// Initialize and display also designer block for container:
 					evo_widget_initialize_designer_container_block( widget.parent() );
+					one_subcontainer_is_displayed = true;
 					jQuery( evo_widget_container_block_selector( widget.data( 'container' ) ) ).css( 'z-index', subcontainer_zindex + 1 );
 					// Hide designer block of another container from the same current active subcontainer:
 					jQuery( '.evo_widget.evo_widget__subcontainer_active .evo_container' ).each( function()
@@ -263,7 +287,33 @@ jQuery( document ).on( 'mousemove', function( e )
 			}
 			else
 			{	// Hide designer block:
-				designer_block.hide();
+				jQuery( evo_widget_designer_block_selector( widget ) ).hide();
+			}
+		}
+		if( ! one_subcontainer_is_displayed )
+		{	// This widget may contains sub-containers but currently it is empty so we should probably display it right now:
+			for( var i = 0; i < evo_subcontainer_containers.length; i++ )
+			{	// Detect what sub-container designer block should be visible depending on current cursor position:
+				var subcontainer = active_subcontainer_widgets.filter( '.evo_container[data-code="' + evo_subcontainer_containers[i][0] + '"]' );
+				if( subcontainer.length == 0 ||
+				    subcontainer.data( 'code' ) == jQuery( e.target ).data( 'code' ) ||
+				    jQuery( e.target ).closest( '.evo_designer__container[data-code=' + subcontainer.data( 'code' ) + ']' ).length > 0 )
+				{	// Skip it because currently cursor is over displayed designer block of one of sub-containers:
+					continue;
+				}
+
+				if( e.pageX >= evo_subcontainer_containers[i][2] && e.pageY >= evo_subcontainer_containers[i][1] && // top-left point
+						e.pageX <= evo_subcontainer_containers[i][4] && e.pageY <= evo_subcontainer_containers[i][3] ) // bottom-right point
+				{	// Initialize and display sub-container designer block because cursor is over it:
+					evo_widget_initialize_designer_container_block( subcontainer );
+					// Set z-index to make it over designer block of current sub-container:
+					jQuery( evo_widget_container_block_selector( subcontainer.data( 'code' ) ) ).css( 'z-index', subcontainer_zindex + 1 );
+					active_subcontainer_designer_block.show();
+				}
+				else
+				{
+					jQuery( evo_widget_container_block_selector( subcontainer.data( 'code' ) ) ).hide();
+				}
 			}
 		}
 	}
@@ -622,7 +672,8 @@ function evo_widget_update_container_position( container )
 function evo_widget_hide_designer_block( designer_block )
 {
 	if( ! designer_block.hasClass( 'evo_designer__status_process' ) &&
-	    ! designer_block.hasClass( 'evo_designer__status_failed' ) )
+	    ! designer_block.hasClass( 'evo_designer__status_failed' ) &&
+	    ! designer_block.hasClass( 'evo_designer__subcontainer_active' ) )
 	{	// Hide only when widget is not in process:
 		jQuery( evo_widget_designer_block_selector( jQuery( evo_widget_selector( designer_block ) ) ) ).hide();
 	}
