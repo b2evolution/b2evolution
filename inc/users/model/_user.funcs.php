@@ -6435,9 +6435,9 @@ function users_results( & $UserList, $params = array() )
 	}
 
 	if( $params['display_priority'] )
-	{	// Display organizational priority:
+	{	// Display organizational order:
 		$UserList->cols[] = array(
-			'th' => T_('Priority'),
+			'th' => T_('Order'),
 			'th_class' => 'small',
 			'td_class' => 'small',
 			'order' => 'uorg_priority',
