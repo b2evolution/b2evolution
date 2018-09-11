@@ -2789,6 +2789,7 @@ Hello
 				);
 
 			// Sample posts
+			$currency_ID = locale_currency( '#', 'ID' );
 			if( is_available_item_type( $blog_ID, '#' ) )
 			{
 				$availability = array( 'Discontinued', 'InStock', 'InStoreOnly', 'LimitedAvailability', 'OnlineOnly', 'OutOfStock', 'PreOrder', 'PreSale', 'SoldOut' );
@@ -2798,7 +2799,6 @@ Hello
 				$desc = '<ul><li>'.$pen_desc[0]."</li>\n<li>".$pen_desc[1]."</li>\n<li>".$pen_desc[2].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'pen, marker' );
-				$edited_Item->set_setting( 'custom:price', '12.99' );
 				$edited_Item->set_setting( 'custom:brand', 'Pilot' );
 				$edited_Item->set_setting( 'custom:item_color', 'assorted' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.1' );
@@ -2809,6 +2809,8 @@ Hello
 				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('Pilot V Razor Point Liquid Ink Marker Pens, extra fine point, 8/pack'), $desc,
 						$now, $cat_catalog_marker, array( $cat_catalog_bestseller ), 'published','en-US' );
+				// Item pricing
+				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 12.99, '.$DB->quote( $currency_ID ).')' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/pilot-v-razor-point-pen-1.jpg' );
@@ -2823,8 +2825,6 @@ Hello
 				$desc = '<ul><li>'.$pen_desc[1]."</li>\n<li>".$pen_desc[2]."</li>\n<li>".$pen_desc[0].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'pen' );
-				$edited_Item->set_setting( 'custom:price', '16.99' );
-				$edited_Item->set_setting( 'custom:currency', 'USD' );
 				$edited_Item->set_setting( 'custom:brand', 'Pilot' );
 				$edited_Item->set_setting( 'custom:item_color', 'assorted' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.15' );
@@ -2835,6 +2835,8 @@ Hello
 				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('Pilot Varsity Fountain Pens, 0.1mm medium nib, 7/pack'), $desc,
 						$now, $cat_catalog_pen, array( $cat_catalog_new ), 'published','en-US' );
+				// Item pricing
+				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 16.99, '.$DB->quote( $currency_ID ).')' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/pilot-varsity-fountain-pen-1.jpg' );
@@ -2849,8 +2851,6 @@ Hello
 				$desc = '<ul><li>'.$pen_desc[2]."</li>\n<li>".$pen_desc[0]."</li>\n<li>".$pen_desc[1].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'pen' );
-				$edited_Item->set_setting( 'custom:price', '12.99' );
-				$edited_Item->set_setting( 'custom:currency', 'USD' );
 				$edited_Item->set_setting( 'custom:brand', 'BIC' );
 				$edited_Item->set_setting( 'custom:item_color', 'black' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.16' );
@@ -2861,6 +2861,8 @@ Hello
 				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('BIC&reg; Xtra Comfort Round Stic&reg; Grip Ballpoint Pens, medium point, 12/pack'), $desc,
 						$now, $cat_catalog_pen, array( $cat_catalog_bestseller ), 'published','en-US' );
+				// Item pricing
+				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 12.99, '.$DB->quote( $currency_ID ).')' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/bic-xtra-comfort-round-stic-pen-1.jpg' );
@@ -2875,8 +2877,6 @@ Hello
 				$desc = '<ul><li>'.$pen_desc[2]."</li>\n<li>".$pen_desc[1]."</li>\n<li>".$pen_desc[0].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'pen, marker' );
-				$edited_Item->set_setting( 'custom:price', '11.79' );
-				$edited_Item->set_setting( 'custom:currency', 'USD' );
 				$edited_Item->set_setting( 'custom:brand', 'Sharpie' );
 				$edited_Item->set_setting( 'custom:item_color', 'black' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.25' );
@@ -2887,6 +2887,8 @@ Hello
 				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('Sharpie&reg; Fine Point Permanent Markers, 12/pack'), $desc,
 						$now, $cat_catalog_marker, array( $cat_catalog_bestseller ), 'published','en-US' );
+				// Item pricing
+				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 11.79, '.$DB->quote( $currency_ID ).')' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/sharpie-fine-point-permanent-marker-1.jpg' );
@@ -2904,8 +2906,6 @@ Hello
 				$desc = '<ul><li>'.$pen_desc[1]."</li>\n<li>".$pen_desc[0]."</li>\n<li>".$pen_desc[2].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'pen, retractable' );
-				$edited_Item->set_setting( 'custom:price', '23.99' );
-				$edited_Item->set_setting( 'custom:currency', 'USD' );
 				$edited_Item->set_setting( 'custom:brand', 'BIC' );
 				$edited_Item->set_setting( 'custom:item_color', 'black/blue' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.23' );
@@ -2916,6 +2916,8 @@ Hello
 				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('BIC&reg; Atlantis&reg; Retractable Ballpoint Pens, medium point 1.0mm, 24/pack'), $desc,
 						$now, $cat_catalog_pen, array( $cat_catalog_bestseller ), 'published','en-US' );
+				// Item pricing
+				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 23.99, '.$DB->quote( $currency_ID ).')' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/bic-atlantis-retractable-pen-1.jpg' );
@@ -2927,8 +2929,6 @@ Hello
 				$desc = '<ul><li>'.$pen_desc[0]."</li>\n<li>".$pen_desc[2]."</li>\n<li>".$pen_desc[1].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'pen, highlighter' );
-				$edited_Item->set_setting( 'custom:price', '5.79' );
-				$edited_Item->set_setting( 'custom:currency', 'USD' );
 				$edited_Item->set_setting( 'custom:brand', 'Sharpie' );
 				$edited_Item->set_setting( 'custom:item_color', 'assorted' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.19' );
@@ -2939,6 +2939,8 @@ Hello
 				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('Sharpie&reg; Accent&reg; Tank Highlighters, chisel tip, 6/pack'), $desc,
 						$now, $cat_catalog_marker, array( $cat_catalog_pen ), 'published','en-US' );
+				// Item pricing
+				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 5.79, '.$DB->quote( $currency_ID ).')' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/sharpie-accent-tank-highlighter-1.jpg' );
@@ -2956,8 +2958,6 @@ Hello
 				$desc = '<ul><li>'.$envelope_desc[0]."</li>\n<li>".$envelope_desc[1]."</li>\n<li>".$envelope_desc[2].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:price', '76.79' );
-				$edited_Item->set_setting( 'custom:currency', 'USD' );
 				$edited_Item->set_setting( 'custom:brand', 'Quality Park' );
 				$edited_Item->set_setting( 'custom:item_color', 'white' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.15' );
@@ -2968,6 +2968,8 @@ Hello
 				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('Quality Park&reg; Redi-Seal&trade; Double Window Security Business Envelopes, #8-5/8, 500/box'), $desc,
 						$now, $cat_catalog_envelope, array( $cat_catalog_bestseller ), 'published','en-US' );
+				// Item pricing
+				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 76.79, '.$DB->quote( $currency_ID ).')' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/quality-park-redi-seal-business-envelope-1.jpg' );
@@ -2979,8 +2981,6 @@ Hello
 				$desc = '<ul><li>'.$envelope_desc[1]."</li>\n<li>".$envelope_desc[2]."</li>\n<li>".$envelope_desc[0].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:price', '5.49' );
-				$edited_Item->set_setting( 'custom:currency', 'USD' );
 				$edited_Item->set_setting( 'custom:brand', 'JAM Paper' );
 				$edited_Item->set_setting( 'custom:item_color', 'yellow' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.08' );
@@ -2991,6 +2991,8 @@ Hello
 				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('JAM Paper&reg; #10 Window Envelopes, 4 1/8 x 9 1/2, Bright Hue yellow recyled, 25/pack'), $desc,
 						$now, $cat_catalog_envelope, array(), 'published','en-US' );
+				// Item pricing
+				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 5.49, '.$DB->quote( $currency_ID ).')' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/jam-paper-window-envelope-1.jpg' );
@@ -3002,8 +3004,6 @@ Hello
 				$desc = '<ul><li>'.$envelope_desc[2]."</li>\n<li>".$envelope_desc[0]."</li>\n<li>".$envelope_desc[1].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:price', '29.99' );
-				$edited_Item->set_setting( 'custom:currency', 'USD' );
 				$edited_Item->set_setting( 'custom:brand', 'JAM Paper' );
 				$edited_Item->set_setting( 'custom:item_color', 'white' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.20' );
@@ -3014,6 +3014,8 @@ Hello
 				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('JAM Paper&reg; #6 3/4 Commercial Envelopes, 250/box'), $desc,
 						$now, $cat_catalog_envelope, array(), 'published','en-US' );
+				// Item pricing
+				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 29.99, '.$DB->quote( $currency_ID ).')' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/jam-paper-commercial-envelope-1.jpg' );
@@ -3028,8 +3030,6 @@ Hello
 				$desc = '<ul><li>'.$envelope_desc[2]."</li>\n<li>".$envelope_desc[1]."</li>\n<li>".$envelope_desc[0].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:price', '29.99' );
-				$edited_Item->set_setting( 'custom:currency', 'USD' );
 				$edited_Item->set_setting( 'custom:brand', 'Simply Quickstrip' );
 				$edited_Item->set_setting( 'custom:item_color', 'white' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.20' );
@@ -3040,6 +3040,8 @@ Hello
 				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('Simply QuickStrip Security Tint #6 3/4 Envelope, 50/box'), $desc,
 						$now, $cat_catalog_envelope, array(), 'published','en-US' );
+				// Item pricing
+				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 29.99, '.$DB->quote( $currency_ID ).')' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/simply-quickstrip-security-tint-envelope-1.jpg' );
@@ -3051,8 +3053,6 @@ Hello
 				$desc = '<ul><li>'.$envelope_desc[1]."</li>\n<li>".$envelope_desc[2]."</li>\n<li>".$envelope_desc[0].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:price', '5.99' );
-				$edited_Item->set_setting( 'custom:currency', 'USD' );
 				$edited_Item->set_setting( 'custom:brand', 'JAM Paper' );
 				$edited_Item->set_setting( 'custom:item_color', 'dark red' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.10' );
@@ -3063,6 +3063,8 @@ Hello
 				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('JAM Paper&reg; A7 Invitation Envelopes, 25/pack'), $desc,
 						$now, $cat_catalog_envelope, array(), 'published','en-US' );
+				// Item pricing
+				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 5.99, '.$DB->quote( $currency_ID ).')' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/jam-paper-a7-invitation-envelope-1.jpg' );
@@ -3077,8 +3079,6 @@ Hello
 				$desc = '<ul><li>'.$envelope_desc[2]."</li>\n<li>".$envelope_desc[1]."</li>\n<li>".$envelope_desc[0].'</li></ul>';
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:price', '12.29' );
-				$edited_Item->set_setting( 'custom:currency', 'USD' );
 				$edited_Item->set_setting( 'custom:brand', 'Quality Park' );
 				$edited_Item->set_setting( 'custom:item_color', 'white' );
 				$edited_Item->set_setting( 'custom:package_total_weight', '0.10' );
@@ -3089,6 +3089,8 @@ Hello
 				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
 				$edited_Item->insert( $owner_ID, T_('Quality Park Redi-Strip&trade; Anti-Static Disk Mailers Envelopes, 25/box'), $desc,
 						$now, $cat_catalog_envelope, array(), 'published','en-US' );
+				// Item pricing
+				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 12.29, '.$DB->quote( $currency_ID ).')' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/quality-park-redi-strip-disk-envelope-1.jpg' );

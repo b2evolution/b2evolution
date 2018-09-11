@@ -2576,6 +2576,24 @@ function skin_structured_data()
 
 					// Add product description:
 					$markup['description'] = $Item->get_excerpt();
+
+					// Add offers:
+					$best_pricing = $Item->get_current_best_pricing();
+					if( $best_pricing )
+					{
+						$CurrencyCache = & get_currencyCache();
+						$markup['offers'] = array(
+								'price' => $best_pricing['iprc_price'],
+							);
+						if( $currency = $CurrencyCache->get_by_ID( $best_pricing['iprc_curr_ID'], false, false ) )
+						{
+							$markup['offers']['priceCurrency'] = $currency->get( 'code' );
+						}
+						if( isset( $best_pricing['iprc_date_end'] ) )
+						{
+							$markup['offers']['priceValidUntil'] = date( 'c', mysql2timestamp( $best_pricing['iprc_date_end'] ) );
+						}
+					}
 				}
 
 				if( $Item->get_type_setting( 'add_aggregate_rating' ) )
@@ -2601,7 +2619,9 @@ function skin_structured_data()
 						$custom_markup = array_merge_recursive( $custom_markup, convert_path_to_array( $custom_field['schema_prop'], $custom_field['value'] ) );
 					}
 				}
-				$markup = array_merge( $markup, $custom_markup );
+
+				$markup = array_merge_recursive( $markup, $custom_markup );
+
 
 				// Output the markup:
 				echo '<!-- Start of Structured Data -->'."\n";
