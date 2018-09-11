@@ -8889,23 +8889,10 @@ function initialize_debug_modes()
 	{	// Allow debug info only for logged-in users OR when debug == 2:
 		global $blog, $Session;
 
-		// Enable/Disable customizer mode:
-		$customizer_mode = param( 'customizer_mode', 'string' );
-		if( $customizer_mode == 'enable' )
-		{
-			$Session->set( 'customizer_mode_'.$blog, 1 );
-		}
-		elseif( $customizer_mode == 'disable' )
-		{
-			$Session->delete( 'customizer_mode_'.$blog );
-			// Disable widgets designer mode together with customizer mode:
-			set_param( 'designer_mode', 'disable' );
-		}
-
 		// Enable/Disable designer mode:
 		$designer_mode = param( 'designer_mode', 'string' );
-		if( $designer_mode == 'enable' )
-		{
+		if( $designer_mode == 'enable' && $Session->get( 'customizer_mode_'.$blog ) )
+		{	// Allow to enable designer mode only together with enabled customizer mode:
 			$Session->set( 'designer_mode_'.$blog, 1 );
 			// Force to disable debug widget containers and file includes when user enables designer mode:
 			set_param( 'display_containers', 'hide' );
