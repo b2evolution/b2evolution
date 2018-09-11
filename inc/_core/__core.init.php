@@ -1689,7 +1689,7 @@ class _core_Module extends Module
 				$customizer_mode = $Session->get( 'customizer_mode_'.$Blog->ID );
 				$entries['skin'] = array(
 					'text'        => '<span class="fa fa-sliders"></span> '.T_('Customize'),
-					'href'        => $Blog->get( 'customizer_url', array( 'mode' => ( $customizer_mode ? 'disable' : 'enable' ) ) ),
+					'href'        => $Blog->get( 'customizer_url', ( $customizer_mode ? array( 'mode' => 'disable' ) : array() ) ),
 					'entry_class' => 'rwdhide',
 					'class'       => 'evo_customizer__toggler'.( $customizer_mode ? ' active' : '' ),
 				);

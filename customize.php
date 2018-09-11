@@ -55,6 +55,11 @@ if( empty( $Blog ) )
 	// EXIT.
 }
 
+if( ! is_logged_in() )
+{	// Anonymous user has no access to customize collection, Redirect to collection front page:
+	header_redirect( $Blog->get( 'url' ) );
+}
+
 // Try to get a collection access type in order to know if it has been changed temporarily for fix:
 $coll_access_type = $Blog->get( 'access_type' );
 if( isset( $Blog->orig_access_type, $Blog->orig_siteurl ) )
@@ -76,14 +81,25 @@ if( empty( $view ) )
 	memorize_param( 'view', 'string', '', $view );
 }
 
-// Allow to enable widgets designer mode only when user opens sub menu "Widgets" from the left panel of customer mode:
-set_param( 'designer_mode', $view == 'coll_widgets' ? 'enable' : 'disable' );
+if( $customizer_mode == 'enable' )
+{	// Enable customizer mode:
+	$Session->set( 'customizer_mode_'.$blog, 1 );
+	if( $view == 'coll_widgets' )
+	{	// Allow to enable widgets designer mode only when user opens sub menu "Widgets" from the left panel of customizer mode:
+		$Session->set( 'designer_mode_'.$blog, 1 );
+	}
+	else
+	{	// Disable widgets designer mode for all other opened tabs:
+		$Session->delete( 'designer_mode_'.$blog );
+	}
+}
+elseif( $customizer_mode == 'disable' )
+{	// Disable customizer mode:
+	$Session->delete( 'customizer_mode_'.$blog );
+	// Disable widgets designer mode together with customizer mode:
+	$Session->delete( 'designer_mode_'.$blog );
 
-// Initialize modes to debug and customize collection settings:
-initialize_debug_modes();
-
-if( $customizer_mode == 'disable' )
-{	// This is a request to disable customizer mode:
+	// This is a request to disable customizer mode:
 	if( empty( $customizing_url ) )
 	{	// Use collection base URL if no customizing URL is provided:
 		$redirect_to = $Blog->get( 'url' );
