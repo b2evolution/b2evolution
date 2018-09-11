@@ -137,12 +137,13 @@ class org_members_Widget extends ComponentWidget
 					'note' => T_('Field used to determine the order in which the members are displayed'),
 					'type' => 'select',
 					'options' => array(
-							'user_id' => 'User ID', 
-							'user_level' => 'User Level',
-							'org_role' => 'Role in Organization',
-							'username' => 'Username',
-							'lastname' => 'Last Name, First Name',
-							'firstname' => 'First Name, Last Name'
+							'user_id'      => T_('User ID'),
+							'user_level'   => T_('User Level'),
+							'org_role'     => T_('Role in organization'),
+							'org_priority' => T_('Priority in organization'),
+							'username'     => T_('Username'),
+							'lastname'     => T_('Last Name').', '.T_('First Name'),
+							'firstname'    => T_('First Name').', '.T_('Last Name'),
 					),
 					'defaultvalue' => 'user_id',
 				),
@@ -162,7 +163,7 @@ class org_members_Widget extends ComponentWidget
 					'label' => T_('Priority in organization'),
 					'note' => T_('Check this to display the priority of the members in the organization'),
 					'type' => 'checkbox',
-					'defaultvalue' => 1,
+					'defaultvalue' => 0,
 				),
 				'display_icons' => array(
 					'label' => T_('Contact icons'),
