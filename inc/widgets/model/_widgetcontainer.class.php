@@ -216,6 +216,7 @@ class WidgetContainer extends DataObject
 			case 'shared-sub':
 				// Only shared containers may be switched between main and sub:
 				$this->set( 'main', param( 'wico_container_type', 'string' ) == 'sub' ? '0' : '1' );
+				set_param( 'container_type', $this->get_type() );
 				break;
 
 			case 'page':
@@ -252,6 +253,7 @@ class WidgetContainer extends DataObject
 		$this->set_from_Request( 'name' );
 
 		param_string_not_empty( 'wico_code', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Code') ) );
+		param_check_regexp( 'wico_code', '#^[A-Za-z0-9\-_]{1,32}$#', sprintf( T_('The field "%s" must be from %d to %d letters, digits or signs %s.'), T_('Code'), 1, 32, '<code>_</code>, <code>-</code>' ) );
 		$this->set_from_Request( 'code' );
 
 		if( $this->ID == 0 )

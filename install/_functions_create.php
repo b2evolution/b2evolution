@@ -1898,25 +1898,40 @@ function create_demo_contents()
 	if( $create_sample_contents == 'all' )
 	{	// Array contains which collections should be installed
 		$install_collection_minisite = 0;
-		$install_collection_home =    1;
-		$install_collection_bloga =   1;
-		$install_collection_blogb =   1;
-		$install_collection_photos =  1;
-		$install_collection_forums =  1;
-		$install_collection_manual =  1;
-		$install_collection_tracker = 1;
+		$install_collection_home     = 1;
+		$install_collection_bloga    = 1;
+		$install_collection_blogb    = 1;
+		$install_collection_photos   = 1;
+		$install_collection_forums   = 1;
+		$install_collection_manual   = 1;
+		$install_collection_tracker  = 1;
 	}
 	else
 	{	// Array contains which collections should be installed
-		$collections = param( 'collections', 'array:string', array() );
-		$install_collection_minisite = in_array( 'minisite', $collections );
-		$install_collection_home = in_array( 'home', $collections );
-		$install_collection_bloga = in_array( 'a', $collections );
-		$install_collection_blogb = in_array( 'b', $collections );
-		$install_collection_photos = in_array( 'photos', $collections );
-		$install_collection_forums = in_array( 'forums', $collections );
-		$install_collection_manual = in_array( 'manual', $collections );
-		$install_collection_tracker = in_array( 'group', $collections );
+		$demo_content_type = param( 'demo_content_type', 'string', NULL );
+		if( $demo_content_type == 'minisite' )
+		{
+			$install_collection_minisite = 1;
+			$install_collection_home     = 0;
+			$install_collection_bloga    = 0;
+			$install_collection_blogb    = 0;
+			$install_collection_photos   = 0;
+			$install_collection_forums   = 0;
+			$install_collection_manual   = 0;
+			$install_collection_tracker  = 0;
+		}
+		else
+		{
+			$collections = param( 'collections', 'array:string', array() );
+			$install_collection_minisite = 0;
+			$install_collection_home     = in_array( 'home', $collections );
+			$install_collection_bloga    = in_array( 'a', $collections );
+			$install_collection_blogb    = in_array( 'b', $collections );
+			$install_collection_photos   = in_array( 'photos', $collections );
+			$install_collection_forums   = in_array( 'forums', $collections );
+			$install_collection_manual   = in_array( 'manual', $collections );
+			$install_collection_tracker  = in_array( 'group', $collections );
+		}
 	}
 
 	task_begin( 'Creating default sections... ' );
@@ -1933,14 +1948,6 @@ function create_demo_contents()
 
 	// Use this var to shift the posts of the collections in time below:
 	$timeshift = 0;
-
-	if( $install_collection_minisite )
-	{ // Install Mini-site collection
-		task_begin( 'Creating Mini-Site collection...' );
-		create_demo_collection( 'minisite', $jay_moderator_ID, $create_demo_users, $timeshift, 1 );
-		update_install_progress_bar();
-		task_end();
-	}
 
 	if( $install_collection_home )
 	{ // Install Home blog
@@ -2004,13 +2011,31 @@ function create_demo_contents()
 		task_end();
 	}
 
+	if( $install_collection_minisite )
+	{ // Install Mini-site collection
+		task_begin( 'Creating Mini-Site collection...' );
+		create_demo_collection( 'minisite', $jay_moderator_ID, $create_demo_users, $timeshift, 1 );
+		update_install_progress_bar();
+		task_end();
+	}
+
 	task_begin( 'Setting default login and default messaging collection...' );
 	$BlogCache = & get_BlogCache();
-	if( $first_Blog = & $BlogCache->get_by_ID( 1, false, false ) )
-	{ // Set first blog as default login and default messaging collection
+	if( $demo_content_type == 'minisite' )
+	{
 		$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
-			VALUES ( '.$DB->quote( 'login_blog_ID' ).', '.$DB->quote( $first_Blog->ID ).' ),
-						 ( '.$DB->quote( 'msg_blog_ID' ).', '.$DB->quote( $first_Blog->ID ).' )' );
+			VALUES ( '.$DB->quote( 'site_skins_enabled' ).', 0 ),
+						( '.$DB->quote( 'login_blog_ID' ).', 0 ),
+						( '.$DB->quote( 'msg_blog_ID' ).', 0 )' );
+	}
+	else
+	{
+		if( $first_Blog = & $BlogCache->get_by_ID( 1, false, false ) )
+		{ // Set first blog as default login and default messaging collection
+			$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
+				VALUES ( '.$DB->quote( 'login_blog_ID' ).', '.$DB->quote( $first_Blog->ID ).' ),
+							( '.$DB->quote( 'msg_blog_ID' ).', '.$DB->quote( $first_Blog->ID ).' )' );
+		}
 	}
 	update_install_progress_bar();
 	task_end();

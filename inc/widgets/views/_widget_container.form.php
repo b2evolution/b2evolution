@@ -110,9 +110,9 @@ $Form->begin_fieldset( T_('Container Properties') );
 			break;
 	}
 
-	$Form->text_input( 'wico_name', $edited_WidgetContainer->get( 'name' ), 40, T_('Name'), '', array( 'required' => true, 'maxlength' => 255 ) );
+	$Form->text_input( 'wico_name', $edited_WidgetContainer->get( 'name' ), 40, T_('Name'), '', array( 'required' => true, 'maxlength' => 40 ) );
 
-	$Form->text_input( 'wico_code', $edited_WidgetContainer->get( 'code' ), 40, T_('Code'), T_('Used for calling from skins. Must be unique.'), array( 'required' => true, 'maxlength' => 255 ) );
+	$Form->text_input( 'wico_code', $edited_WidgetContainer->get( 'code' ), 40, T_('Code'), T_('Used for calling from skins. Must be unique.'), array( 'required' => true, 'maxlength' => 32 ) );
 
 	if( $edited_WidgetContainer->ID == 0 )
 	{	// Allow to set skin type only on creating new widget container:
@@ -127,7 +127,7 @@ $Form->begin_fieldset( T_('Container Properties') );
 			);
 	}
 
-	$Form->text_input( 'wico_order', $edited_WidgetContainer->get( 'order' ), 40, T_('Order'), T_('For manual ordering of the containers.'), array( 'required' => !$creating, 'maxlength' => 255 ) );
+	$Form->text_input( 'wico_order', $edited_WidgetContainer->get( 'order' ), 10, T_('Order'), T_('For manual ordering of the containers.'), array( 'required' => !$creating, 'maxlength' => 10 ) );
 
 $Form->end_fieldset();
 

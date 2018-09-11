@@ -1430,9 +1430,10 @@ class _core_Module extends Module
 						// The get_write_url() function above does not allow specifying the item type ID we'll manually add it:
 						$write_item_url = url_add_param( $write_item_url, 'item_typ_ID='.$default_new_ItemType->ID );
 
-						if( ! empty( $default_new_ItemType->get( 'evobar_link_text' ) ) )
+						$evobar_link_text = $default_new_ItemType->get( 'evobar_link_text' );
+						if( ! empty( $evobar_link_text ) )
 						{
-							$menu_text = $default_new_ItemType->get( 'evobar_link_text' );
+							$menu_text = $evobar_link_text;
 						}
 					}
 					if( ! $perm_admin_normal )
@@ -1684,23 +1685,13 @@ class _core_Module extends Module
 			      $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			  )
 			{	// If current user has an access to back-office and to edit site or collection properties:
-				global $customizer_url, $Session;
-				if( $Session->get( 'customizer_mode_'.$Blog->ID ) )
-				{	// If skin customizer mode is enabled:
-					$customizing_url = get_param( 'customizing_url' );
-					$menu_entry_customize_href = url_add_param( ( empty( $customizing_url ) ? get_current_url( 'customizer_mode,designer_mode,show_toolbar,redir' ) : $customizing_url ), 'customizer_mode=disable' );
-					$menu_entry_customize_class = 'active';
-				}
-				else
-				{	// If skin customizer mode is disabled:
-					$menu_entry_customize_href = $Blog->get( 'customizer_url' );
-					$menu_entry_customize_class = '';
-				}
+				global $Session;
+				$customizer_mode = $Session->get( 'customizer_mode_'.$Blog->ID );
 				$entries['skin'] = array(
 					'text'        => '<span class="fa fa-sliders"></span> '.T_('Customize'),
-					'href'        => $menu_entry_customize_href,
+					'href'        => $Blog->get( 'customizer_url', array( 'mode' => ( $customizer_mode ? 'disable' : 'enable' ) ) ),
 					'entry_class' => 'rwdhide',
-					'class'       => 'evo_customizer__toggler '.$menu_entry_customize_class,
+					'class'       => 'evo_customizer__toggler'.( $customizer_mode ? ' active' : '' ),
 				);
 			}
 

@@ -1788,8 +1788,9 @@ function blogs_user_results_block( $params = array() )
 	param( 'user_ID', 'integer', 0, true );
 
 	$SQL = new SQL();
-	$SQL->SELECT( '*' );
+	$SQL->SELECT( '*, cset_value AS collection_logo_file_ID' );
 	$SQL->FROM( 'T_blogs' );
+	$SQL->FROM_add( 'LEFT JOIN T_coll_settings ON blog_ID = cset_coll_ID AND cset_name = "collection_logo_file_ID"' );
 	$SQL->WHERE( 'blog_owner_user_ID = '.$DB->quote( $edited_User->ID ) );
 
 	// Create result set:

@@ -216,7 +216,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['front_page_main_area'] = array(
 		array(  1, 'coll_title', 'coll_type' => 'main,minisite' ),
 		array(  2, 'coll_tagline', 'coll_type' => 'main,minisite' ),
-		array( 10, 'coll_featured_intro', 'params' => ( in_array( $kind, array( 'main', 'minisite' ) ) ? array(
+		array( 10, 'coll_featured_intro', 'coll_type' => '-minisite', 'params' => ( $kind == 'main' ? array(
 			// Hide a title of the front intro post:
 				'disp_title' => 0,
 			) : NULL ) ),

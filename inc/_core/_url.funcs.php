@@ -1097,11 +1097,24 @@ function get_current_url( $exclude_params = NULL )
 
 	if( $exclude_params !== NULL )
 	{	// Exclude params from current url:
-		$exclude_params = str_replace( ',', '|', preg_quote( $exclude_params ) );
-		$current_url = preg_replace( '/(\?|&|&amp;)('.$exclude_params.')=[^&]+/i', '$1', $current_url );
-		$current_url = rtrim( preg_replace( '/\?&+/', '?', $current_url ), '?&' );
+		$current_url = clear_url( $current_url, $exclude_params );
 	}
 
 	return $current_url;
+}
+
+
+/**
+ * Remove parameters from URL
+ *
+ * @param string Original URL
+ * @param string Parameters which should be removed from URL (separated by comma)
+ * @return string Cleared URL
+ */
+function clear_url( $url, $exclude_params )
+{
+	$exclude_params = str_replace( ',', '|', preg_quote( $exclude_params ) );
+	$url = preg_replace( '/((\?)|&(amp;)?)('.$exclude_params.')=[^&]+/i', '$2', $url );
+	return rtrim( preg_replace( '/\?(&(amp;)?)+/', '?', $url ), '?' );
 }
 ?>

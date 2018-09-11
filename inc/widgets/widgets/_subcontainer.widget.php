@@ -34,7 +34,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class subcontainer_Widget extends ComponentWidget
 {
-	var $icon = 'cubes';
+	var $icon = 'cube';
 
 	/**
 	 * Constructor
@@ -51,8 +51,7 @@ class subcontainer_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		$title = T_( 'Sub-container' );
-		return $title;
+		return T_('Embed Sub-Container');
 	}
 
 
@@ -70,7 +69,7 @@ class subcontainer_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Embed any container into a widget. Useful to use widget containers embedded into others.');
+		return T_('Allows to re-use a block of widgets in several places.');
 	}
 
 
@@ -95,12 +94,15 @@ class subcontainer_Widget extends ComponentWidget
 
 		$WidgetContainerCache = & get_WidgetContainerCache();
 		$coll_widget_containers = $WidgetContainerCache->get_by_coll_ID( $coll_ID );
-		$container_options = array( '' => T_('None') );
+		$container_options = array(
+				'' => T_('None'),
+				T_('Existing Sub-Containers') => array(),
+			);
 		foreach( $coll_widget_containers as $WidgetContainer )
 		{
 			if( ! $WidgetContainer->get( 'main' ) )
 			{	// Allow only sub-containers:
-				$container_options[ $WidgetContainer->get( 'code' ) ] = $WidgetContainer->get( 'name' );
+				$container_options[ T_('Existing Sub-Containers') ][ $WidgetContainer->get( 'code' ) ] = $WidgetContainer->get( 'name' );
 			}
 		}
 
@@ -110,8 +112,8 @@ class subcontainer_Widget extends ComponentWidget
 					'size' => 60,
 				),
 				'container' => array(
-					'label' => T_('Container'),
-					'note' => T_( 'The container which will be embedded.' ),
+					'label' => T_('Sub-Container'),
+					'note' => T_('All widgets from this Sub-Container will be displayed.'),
 					'type' => 'select',
 					'options' => $container_options,
 					'defaultvalue' => ''
@@ -136,7 +138,7 @@ class subcontainer_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Blog, $Timer, $displayed_subcontainers;
+		global $Blog, $Timer, $displayed_subcontainers, $Session;
 
 		// Set the subcontainer code which will be displayed:
 		$subcontainer_code = $this->disp_params['container'];
@@ -195,6 +197,10 @@ class subcontainer_Widget extends ComponentWidget
 				$ComponentWidget->display_with_cache( $params );
 				$Timer->pause( $widget_timer_name );
 			}
+		}
+		elseif( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
+		{	// Display text for empty container on designer mode:
+			echo '<div class="red">'.T_('Empty Sub-Container').'</div>';
 		}
 
 		echo $this->disp_params['block_body_end'];

@@ -43,11 +43,9 @@ else
 	// Skin Containers:
 	echo '<div class="col-md-4 col-sm-12">';
 		echo '<h4 class="pull-left">'.T_('Skin Containers').'</h4>';
-		if( $current_User->check_perm( 'options', 'edit', false ) )
-		{	// Display a button to scan skin for widgets if current User has a permission:
-			echo action_icon( T_('Reload container definitions'), 'reload',
-				$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;skin_type='.get_param( 'skin_type' ).'&amp;'.url_crumb('widget'), T_('Reload container definitions'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info pull-right' ) );
-		}
+		// Display a button to scan skin for widgets:
+		echo action_icon( T_('Reload container definitions'), 'reload',
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;skin_type='.get_param( 'skin_type' ).'&amp;'.url_crumb('widget'), T_('Reload container definitions'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info pull-right' ) );
 		echo '<div class="clearfix"></div>';
 		display_containers( get_param( 'skin_type' ), true, false );
 	echo '</div>';
@@ -56,11 +54,9 @@ else
 	echo '<div class="col-md-4 col-sm-12">';
 		// Sub-Containers:
 		echo '<h4 class="pull-left">'.T_('Sub-Containers').'</h4>';
-		if( $current_User->check_perm( 'options', 'edit', false ) )
-		{	// Display a button to add new sub-container if current User has a permission:
-			echo action_icon( T_('Add container'), 'add',
-			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=sub&amp;skin_type='.get_param( 'skin_type' ), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
-		}
+		// Display a button to add new sub-container:
+		echo action_icon( T_('Add container'), 'add',
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=sub&amp;skin_type='.get_param( 'skin_type' ), T_('Add Sub-Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
 		echo '<div class="clearfix"></div>';
 		display_containers( get_param( 'skin_type' ), false, false );
 
@@ -69,7 +65,7 @@ else
 		if( $current_User->check_perm( 'options', 'edit', false ) )
 		{	// Display a button to add new sub-container if current User has a permission:
 			echo action_icon( T_('Add container'), 'add',
-				$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=page&amp;skin_type='.get_param( 'skin_type' ), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
+				$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=page&amp;skin_type='.get_param( 'skin_type' ), T_('Add Page Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
 		}
 		echo '<div class="clearfix"></div>';
 		display_containers( get_param( 'skin_type' ), false, false, true );
@@ -81,7 +77,7 @@ else
 		if( $current_User->check_perm( 'options', 'edit', false ) )
 		{	// Display a button to add new sub-container if current User has a permission:
 			echo action_icon( T_('Add container'), 'add',
-				$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=shared&amp;skin_type='.get_param( 'skin_type' ), T_('Add container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
+				$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=shared&amp;skin_type='.get_param( 'skin_type' ), T_('Add Shared Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
 		}
 		echo '<div class="clearfix"></div>';
 		display_containers( get_param( 'skin_type' ), true, true );

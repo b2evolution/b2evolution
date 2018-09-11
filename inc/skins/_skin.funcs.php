@@ -1029,6 +1029,9 @@ function skin_init( $disp )
 		case 'content_requires_login':
 			global $login_mode;
 
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
 			if( is_logged_in() )
 			{	// Don't display this page for already logged in user:
 				global $Blog;
@@ -1054,7 +1057,11 @@ function skin_init( $disp )
 			break;
 
 		case 'login':
+			// Log in form:
 			global $Plugins, $login_mode;
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
 
 			if( is_logged_in() )
 			{ // User is already logged in
@@ -1094,6 +1101,11 @@ function skin_init( $disp )
 			break;
 
 		case 'register':
+			// Register form:
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
 			if( is_logged_in() )
 			{	// If user is logged in the register form should not be displayed,
 				// Redirect to the collection home page or to a specified url:
@@ -1131,6 +1143,11 @@ function skin_init( $disp )
 			break;
 
 		case 'lostpassword':
+			// Lost password form:
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
 			if( is_logged_in() )
 			{ // If user is logged in the lost password form should not be displayed. In this case redirect to the blog home page.
 				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
@@ -1147,6 +1164,11 @@ function skin_init( $disp )
 			break;
 
 		case 'activateinfo':
+			// Activate info page:
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
 			if( !is_logged_in() )
 			{ // Redirect to the login page for anonymous users
 				$Messages->add( T_( 'You must log in before you can activate your account.' ) );
@@ -1195,7 +1217,6 @@ function skin_init( $disp )
 			break;
 
 		case 'profile':
-		case 'register_finish':
 		case 'avatar':
 			$action = param_action();
 			if( $action == 'crop' && is_logged_in() )
@@ -1207,9 +1228,15 @@ function skin_init( $disp )
 					set_param( 'action', '' );
 				}
 			}
+		case 'register_finish':
 		case 'pwdchange':
 		case 'userprefs':
 		case 'subs':
+			if( $disp == 'pwdchange' || $disp == 'register_finish' )
+			{	// Check and redirect if current URL must be used as https instead of http:
+				check_https_url( 'login' );
+			}
+
 			$seo_page_type = 'Special feature page';
 			if( $Blog->get_setting( 'special_noindex' ) )
 			{	// We prefer robots not to index these pages:

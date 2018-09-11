@@ -599,7 +599,7 @@ else
 
 			$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users' );
 			$AdminUI->top_block = get_user_quick_search_form();
-			if( $current_User->check_perm( 'users', 'moderate', false ) )
+			if( $current_User->check_perm( 'users', 'moderate' ) )
 			{	// Include to edit user level
 				require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 			}
