@@ -33,8 +33,8 @@ require_once $inc_path.'_main.inc.php';
 
 $Timer->start( 'customize.php' );
 
-// Enable customizer mode:
-set_param( 'customizer_mode', 'enable' );
+// Get customizer mode:
+param( 'customizer_mode', 'string', 'enable' );
 
 param( 'customizing_url', 'url', NULL, true );
 param( 'blog', 'integer', true, true );
@@ -81,6 +81,20 @@ set_param( 'designer_mode', $view == 'coll_widgets' ? 'enable' : 'disable' );
 
 // Initialize modes to debug and customize collection settings:
 initialize_debug_modes();
+
+if( $customizer_mode == 'disable' )
+{	// This is a request to disable customizer mode:
+	if( empty( $customizing_url ) )
+	{	// Use collection base URL if no customizing URL is provided:
+		$redirect_to = $Blog->get( 'url' );
+	}
+	else
+	{	// Use current customizing URL, but remove params which are used only for enabled customizer mode:
+		$redirect_to = clear_url( $customizing_url, 'customizer_mode,designer_mode,show_toolbar,redir' );
+	}
+	// 303 Redirect to normal page:
+	header_redirect( $redirect_to );
+}
 
 load_funcs( 'skins/_skin.funcs.php' );
 
