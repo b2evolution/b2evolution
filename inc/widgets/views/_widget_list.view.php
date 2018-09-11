@@ -62,11 +62,9 @@ else
 
 		// Page Containers:
 		echo '<h4 class="pull-left">'.T_('Page Containers').'</h4>';
-		if( $current_User->check_perm( 'options', 'edit', false ) )
-		{	// Display a button to add new sub-container if current User has a permission:
-			echo action_icon( T_('Add container'), 'add',
-				$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=page&amp;skin_type='.get_param( 'skin_type' ), T_('Add Page Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
-		}
+		// Display a button to add new page container:
+		echo action_icon( T_('Add container'), 'add',
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=page&amp;skin_type='.get_param( 'skin_type' ), T_('Add Page Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
 		echo '<div class="clearfix"></div>';
 		display_containers( get_param( 'skin_type' ), false, false, true );
 	echo '</div>';
@@ -74,11 +72,9 @@ else
 	// Shared Main and Sub Containers:
 	echo '<div class="col-md-4 col-sm-12">';
 		echo '<h4 class="pull-left">'.T_('Shared Containers').'</h4>';
-		if( $current_User->check_perm( 'options', 'edit', false ) )
-		{	// Display a button to add new sub-container if current User has a permission:
-			echo action_icon( T_('Add container'), 'add',
-				$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=shared&amp;skin_type='.get_param( 'skin_type' ), T_('Add Shared Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
-		}
+		// Display a button to add new shared container:
+		echo action_icon( T_('Add container'), 'add',
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=shared&amp;skin_type='.get_param( 'skin_type' ), T_('Add Shared Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
 		echo '<div class="clearfix"></div>';
 		display_containers( get_param( 'skin_type' ), true, true );
 
