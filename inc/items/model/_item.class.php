@@ -7881,7 +7881,7 @@ class Item extends ItemLight
 		}
 
 		if( ! empty( $this->insert_item_pricing ) )
-		{	// Insert new item pricings:
+		{	// Insert new item pricing:
 			$sql_data = array();
 			foreach( $this->insert_item_pricing as $iprc_ID => $item_pricing )
 			{
@@ -7903,9 +7903,8 @@ class Item extends ItemLight
 		}
 
 		if( ! empty( $this->update_item_pricing ) )
-		{	// Update custom fields:
+		{	// Update item pricing:
 			unset( $this->item_pricing );
-			$old_item_pricing = $this->get_item_pricing();
 			foreach( $this->update_item_pricing as $iprc_ID => $item_pricing )
 			{
 				$result = $DB->query( 'UPDATE T_items__pricing
@@ -11414,6 +11413,102 @@ class Item extends ItemLight
 		}
 
 		return $this->social_media_image_File;
+	}
+
+
+	/**
+	 * Get default pricing
+	 *
+	 * @param integer Currency ID
+	 * @return object Item pricing object
+	 */
+	function get_default_pricing( $curr_ID = NULL )
+	{
+		global $DB, $current_User, $servertimenow;
+
+		$SQL = new SQL();
+		$SQL->SELECT( 'iprc_ID, iprc_itm_ID, iprc_price, iprc_curr_ID, iprc_min_qty, iprc_grp_ID, iprc_date_start, iprc_date_end' );
+		$SQL->FROM( 'T_items__pricing' );
+		$SQL->WHERE( 'iprc_itm_ID = '.$DB->quote( $this->ID ) );
+		$SQL->WHERE_and( 'iprc_min_qty IS NULL' );
+		$SQL->WHERE_and( 'iprc_grp_ID IS NULL' );
+		$SQL->WHERE_and( 'iprc_date_start IS NULL' );
+		$SQL->WHERE_and( 'iprc_date_end IS NULL' );
+		if( empty( $curr_ID ) )
+		{
+			$SQL->WHERE_and( 'iprc_curr_ID = '.$DB->quote( locale_currency( '#', 'ID' ) ) );
+		}
+		else
+		{
+			$SQL->WHERE_and( 'iprc_curr_ID = '.$DB->quote( $curr_ID ) );
+		}
+
+		$SQL->ORDER_BY( 'iprc_price ASC' );
+		$SQL->LIMIT( 1 );
+
+		return $DB->get_row( $SQL, ARRAY_A );
+	}
+
+
+	/**
+	 * Get current best price available to user
+	 *
+	 * @param integer Currency ID
+	 * @param integer Group ID
+	 * @param integer Quantity
+	 * @return object Item pricing object
+	 */
+	function get_current_best_pricing( $curr_ID = NULL, $grp_ID = NULL, $qty = 1 )
+	{
+		global $DB, $current_User, $servertimenow;
+
+		$SQL = new SQL();
+		$SQL->SELECT( 'iprc_ID, iprc_itm_ID, iprc_price, iprc_curr_ID, iprc_min_qty, iprc_grp_ID, iprc_date_start, iprc_date_end' );
+		$SQL->FROM( 'T_items__pricing' );
+		$SQL->WHERE( 'iprc_itm_ID = '.$DB->quote( $this->ID ) );
+		$SQL->WHERE_and( 'iprc_date_start IS NULL OR ( iprc_date_start < '.$DB->quote( date2mysql( $servertimenow ) ).' )' );
+		$SQL->WHERE_and( 'iprc_date_end IS NULL OR ( iprc_date_end > '.$DB->quote( date2mysql( $servertimenow ) ).' )' );
+
+		// Currency:
+		if( empty( $curr_ID ) )
+		{
+			$SQL->WHERE_and( 'iprc_curr_ID = '.$DB->quote( locale_currency( '#', 'ID' ) ) );
+		}
+		else
+		{
+			$SQL->WHERE_and( 'iprc_curr_ID = '.$DB->quote( $curr_ID ) );
+		}
+
+		// Group:
+		if( empty( $grp_ID ) )
+		{
+			if( $current_User )
+			{
+				$current_User->get_Group();
+				$SQL->WHERE_and( 'iprc_grp_ID IS NULL OR ( iprc_grp_ID = '.$DB->quote( $current_User->Group->ID ).' )' );
+			}
+			else
+			{
+				$SQL->WHERE_and( 'iprc_grp_ID IS NULL' );
+			}
+		}
+		else
+		{
+			$SQL->WHERE_and( 'iprc_grp_ID IS NULL OR iprc_grp_ID = '.$DB->quote( $grp_ID ) );
+		}
+
+		// Quantity:
+		if( empty( $qty ) )
+		{
+			$qty = 1;
+		}
+		$SQL->WHERE_and( 'iprc_min_qty IS NULL OR ( iprc_min_qty <= '.$DB->quote( $qty ).' )' );
+
+
+		$SQL->ORDER_BY( 'iprc_price ASC' );
+		$SQL->LIMIT( 1 );
+
+		return $DB->get_row( $SQL, ARRAY_A );
 	}
 }
 ?>

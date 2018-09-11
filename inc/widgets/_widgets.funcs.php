@@ -144,7 +144,8 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array(  5, 'item_excerpt' ),
 		array( 10, 'item_tags' ),
 		array( 15, 'item_vote' ),
-		array( 20, 'item_custom_fields', 'params' => array( 'fields_source' => 'include', 'fields' => 'price', 'widget_css_class' => 'product_price' ) ),
+		//array( 20, 'item_custom_fields', 'params' => array( 'fields_source' => 'include', 'fields' => 'price', 'widget_css_class' => 'product_price' ) ),
+		array( 20, 'item_price' ),
 		array( 25, 'add_to_cart_btn' ),
 	);
 

@@ -257,9 +257,32 @@ if( $disp == 'single' )
 		<?php if( ! $Item->is_intro() )
 		{ // Do not display "Sale" icon on Intro posts ?>
 		<div class="evo_post__price center">
-			<span class="regularprice"><?php echo '$'.$Item->get_setting( 'custom:price' ).' ';?></span>
-			<span class="oldprice">$19.99 </span>
-			<span class="newprice">$12.99 </span>
+			<span class="regularprice">
+			<?php
+			$CurrencyCache = & get_currencyCache();
+			//echo '$'.$Item->get_setting( 'custom:price' ).' ';
+			$current_Currency = $CurrencyCache->get_by_ID( locale_currency( '#', 'ID' ), false, false );
+			$default_pricing = $Item->get_default_pricing( $current_Currency->ID );
+			$current_best_pricing = $Item->get_current_best_pricing();
+			if( $default_pricing && $current_best_pricing && ( $default_pricing['iprc_price'] != $current_best_pricing['iprc_price'] ) )
+			{
+				if( $current_best_pricing )
+				{
+					echo '<span style="text-decoration: line-through;">';
+					echo $current_Currency->get( 'shortcut' ).number_format( $default_pricing['iprc_price'], 2 );
+					echo '</span>&nbsp;';
+				}
+				else
+				{
+					echo $current_Currency->get( 'shortcut' ).number_format( $default_pricing['iprc_price'], 2 );
+				}
+			}
+			if( $current_best_pricing )
+			{
+				echo $current_Currency->get( 'shortcut' ).number_format( $current_best_pricing['iprc_price'], 2 );
+			}
+			?>
+			</span>
 			<?php
 			$Item->edit_link( array(
 					'before' => '<div class="'.button_class( 'group' ).'">',

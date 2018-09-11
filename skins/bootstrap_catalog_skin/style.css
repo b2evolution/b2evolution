@@ -287,16 +287,21 @@ footer.row {
 .price_note > span > span {
   box-shadow: 0px 0px 20px -9px rgba(0, 0, 0, 0.75);
 }
-main .row .evo_content_block:nth-child(3) .evo_post__price .oldprice,
-main .row .evo_content_block:nth-child(3) .evo_post__price .newprice {
-  display: inline !important;
+/*
+main .row .evo_content_block:nth-child(3) {
+	.evo_post__price {
+		.oldprice, .newprice {
+			display: inline !important;
+		}
+		.regularprice {
+			display: none !important;
+		}
+	}
+	.price_note {
+		display: block !important;
+	}
 }
-main .row .evo_content_block:nth-child(3) .evo_post__price .regularprice {
-  display: none !important;
-}
-main .row .evo_content_block:nth-child(3) .price_note {
-  display: block !important;
-}
+*/
 .jumbotron .evo_post_title h2,
 .jumbotron .evo_post_title h2 > a {
   font-size: 30px;
@@ -522,6 +527,14 @@ main .row .evo_content_block:nth-child(3) .price_note {
   background-color: transparent;
   border: 0;
   font-size: 1.5em;
+}
+.evo_container.evo_container__item_single .widget_core_item_price .evo_price__default {
+  font-size: 1em;
+  color: #767676;
+}
+.evo_container.evo_container__item_single .widget_core_item_price .evo_price__best {
+  font-size: 1.2em;
+  font-weight: bold;
 }
 .evo_content_block .evo_comment .panel-heading .panel-title .evo_status {
   margin-top: 10px;

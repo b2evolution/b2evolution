@@ -337,8 +337,6 @@ $Form->begin_form( '', '', $params );
 	$GroupCache->load_where( 'grp_usage = "primary"' );
 	$GroupCache->all_loaded = true;
 	$group_options_array = array(	'0' => T_('All') ) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
-	//pre_dump( $group_options_array );
-	//echo '<select name="item_pricing_grp_ID$iprc_num$" class="form-control item_price_user_group">'.Form::get_select_options_string( $group_options_array ).'</select>';
 	echo '<select name="item_pricing_grp_ID$iprc_num$" class="form-control item_price_user_group">'.Form::get_select_options_string( $group_options_array, NULL, true ).'</select>';
 	$Table->display_col_end();
 
@@ -1217,7 +1215,7 @@ function add_new_item_pricing( duplicated_pricing_obj )
 	// Set values:
 	var pricing_value_price = 0.00;
 	var pricing_value_curr_ID = <?php echo format_to_js( locale_currency( '#', 'ID' ) );?>;
-	var pricing_value_min_qty = 1;
+	var pricing_value_min_qty = '';
 	var pricing_value_grp_ID = '';
 	var pricing_value_date_start = '';
 	var pricing_value_date_start_time = '';
