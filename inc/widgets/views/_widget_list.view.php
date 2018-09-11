@@ -55,7 +55,7 @@ else
 		// Sub-Containers:
 		echo '<h4 class="pull-left">'.T_('Sub-Containers').'</h4>';
 		// Display a button to add new sub-container:
-		echo action_icon( T_('Add container'), 'add',
+		echo action_icon( T_('Add Sub-Container'), 'add',
 			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=sub&amp;skin_type='.get_param( 'skin_type' ), T_('Add Sub-Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
 		echo '<div class="clearfix"></div>';
 		display_containers( get_param( 'skin_type' ), false, false );
@@ -63,7 +63,7 @@ else
 		// Page Containers:
 		echo '<h4 class="pull-left">'.T_('Page Containers').'</h4>';
 		// Display a button to add new page container:
-		echo action_icon( T_('Add container'), 'add',
+		echo action_icon( T_('Add Page container'), 'add',
 			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=page&amp;skin_type='.get_param( 'skin_type' ), T_('Add Page Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
 		echo '<div class="clearfix"></div>';
 		display_containers( get_param( 'skin_type' ), false, false, true );
@@ -73,12 +73,15 @@ else
 	echo '<div class="col-md-4 col-sm-12">';
 		echo '<h4 class="pull-left">'.T_('Shared Containers').'</h4>';
 		// Display a button to add new shared container:
-		echo action_icon( T_('Add container'), 'add',
+		echo action_icon( T_('Add Shared Container'), 'add',
 			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=shared&amp;skin_type='.get_param( 'skin_type' ), T_('Add Shared Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
 		echo '<div class="clearfix"></div>';
 		display_containers( get_param( 'skin_type' ), true, true );
 
 		echo '<h4 class="pull-left">'.T_('Shared Sub-Containers').'</h4>';
+		// Display a button to add new shared container:
+		echo action_icon( T_('Add Shared Sub-Container'), 'add',
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=shared-sub&amp;skin_type='.get_param( 'skin_type' ), T_('Add Shared Sub-Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
 		echo '<div class="clearfix"></div>';
 		display_containers( get_param( 'skin_type' ), false, true );
 	echo '</div>';
