@@ -51,12 +51,10 @@ if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm 
 else
 {	// We could not find a blog we have edit perms on...
 	// Note: we may still have permission to edit categories!!
-	// redirect to blog list:
+	$Messages->add( T_('Sorry, you have no permission to edit collection properties.'), 'error' );
+	// Redirect to collections list:
 	header_redirect( $admin_url.'?ctrl=dashboard' );
-	// EXITED:
-	$Messages->add( T_('Sorry, you have no permission to edit blog properties.'), 'error' );
-	$action = 'nil';
-	$tab = '';
+	// EXITED.
 }
 
 param( 'skin_type', 'string', 'normal' );
@@ -639,9 +637,9 @@ switch( $action )
 
 		$DB->commit();
 
- 		$Messages->add( T_( 'Widgets updated' ), 'success' );
- 		send_javascript_message( array( 'sendWidgetOrderCallback' => array( 'blog='.$Blog->ID ) ) ); // exits() automatically
- 		break;
+		$Messages->add( T_( 'Widgets updated' ), 'success' );
+		send_javascript_message( array( 'sendWidgetOrderCallback' => array( 'blog='.$Blog->ID ) ) ); // exits() automatically
+		break;
 
 
 	case 'reload':
@@ -649,9 +647,6 @@ switch( $action )
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
-
-		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
 
 		// Save to DB, and display correpsonding messages:
 		$Blog->db_save_main_containers( true, $skin_type );
