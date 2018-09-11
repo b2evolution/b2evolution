@@ -823,10 +823,22 @@ switch( $action )
 				<div id="create_sample_contents_options" style="margin:10px 0 0 20px">
 					<?php
 					echo T_('Which demo collections would you like to install?');
-
+					?>
+					<div class="radio" style="margin-left:1em">
+						<label>
+							<input type="radio" name="demo_content_type" id="minisite_demo" value="minisite" />
+							<?php echo T_('Mini-Site');?>
+						</label>
+					</div>
+					<div class="radio" style="margin-left:1em">
+						<label>
+							<input type="radio" name="demo_content_type" id="complex_site_demo" value="complex_site" checked="checked" />
+							<?php echo T_('Complex Site, including:');?>
+						</label>
+					</div>
+					<?php
 					// Display the collections to select which install
 					$collections = array(
-						  'minisite' => T_('Mini-Site'),
 							'home'     => T_('Home'),
 							'a'        => T_('Blog A'),
 							'b'        => T_('Blog B'),
@@ -852,9 +864,9 @@ switch( $action )
 					foreach( $collections as $coll_index => $coll_title )
 					{ // Display the checkboxes to select what demo collection to install
 					?>
-					<div class="checkbox" style="margin-left:1em">
+					<div class="checkbox" style="margin-left:2em">
 						<label>
-							<input type="checkbox" name="collections[]" id="collection_<?php echo $coll_index; ?>" value="<?php echo $coll_index; ?>" <?php echo $coll_index == 'minisite' ? '' : 'checked="checked"';?> />
+							<input type="checkbox" name="collections[]" id="collection_<?php echo $coll_index; ?>" value="<?php echo $coll_index; ?>" checked="checked" />
 							<?php echo $coll_title; ?>
 						</label>
 					</div>
@@ -935,6 +947,17 @@ switch( $action )
 			jQuery( '#create_demo_users' ).click( function()
 			{
 				jQuery( '#create_demo_users_options' ).toggle();
+			} );
+			jQuery( 'input[name="demo_content_type"]').click( function()
+			{
+				if( jQuery( this ).val() == 'minisite' )
+				{
+					jQuery( 'input[name="collections[]"]' ).attr( 'disabled', true );
+				}
+				else
+				{
+					jQuery( 'input[name="collections[]"]' ).removeAttr( 'disabled' );
+				}
 			} );
 		</script>
 		<?php

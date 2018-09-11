@@ -938,11 +938,6 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					'public',
 					$section_ID );
 
-			if( ! $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = '.$DB->quote( 'info_blog_ID' ) ) && ! empty( $blog_minisite_ID ) )
-			{ // Save ID of this blog in settings table, It is used on top menu, file "/skins_site/_site_body_header.inc.php"
-				$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
-						VALUES ( '.$DB->quote( 'info_blog_ID' ).', '.$DB->quote( $blog_minisite_ID ).' )' );
-			}
 			$blog_ID = $blog_minisite_ID;
 
 			$BlogCache = & get_BlogCache();
