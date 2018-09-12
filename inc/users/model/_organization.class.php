@@ -51,12 +51,6 @@ class Organization extends DataObject
 	var $perm_role = 'owner and member';
 
 	/**
-	 * Edit Priority
-	 * @var string: 'owner and member', 'owner'
-	 */
-	var $perm_priority = 'owner and member';
-
-	/**
 	 * Constructor
 	 *
 	 * @param object DB row
@@ -74,7 +68,6 @@ class Organization extends DataObject
 			$this->url           = $db_row->org_url;
 			$this->accept        = $db_row->org_accept;
 			$this->perm_role     = $db_row->org_perm_role;
-			$this->perm_priority = $db_row->org_perm_priority;
 		}
 		else
 		{	// Set default organization data for new object:
@@ -152,10 +145,6 @@ class Organization extends DataObject
 		// Edit Role Permission:
 		param( 'org_perm_role', 'string' );
 		$this->set_from_Request( 'perm_role' );
-
-		// Edit Priority Permission:
-		param( 'org_perm_priority', 'string' );
-		$this->set_from_Request( 'perm_priority' );
 
 		return ! param_errors_detected();
 	}

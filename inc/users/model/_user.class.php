@@ -7295,7 +7295,7 @@ class User extends DataObject
 					$insert_orgs[ $organization_ID ]['role'] = $curr_orgs[ $organization_ID ]['role'];
 				}
 
-				if( $user_Organization->perm_priority == 'owner and member' ||
+				if( $perm_edit_orgs ||
 				    $user_Organization->owner_user_ID == $current_User->ID ||
 				    ! $curr_orgs[ $organization_ID ]['accepted'] )
 				{	// Update priority if current user has permission or it is not accepted yet by admin
