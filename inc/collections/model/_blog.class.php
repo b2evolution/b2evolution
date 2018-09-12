@@ -6271,6 +6271,7 @@ class Blog extends DataObject
 		}
 
 		// Get the declarations of the widgets that the skin wants to use:
+		$context['current_coll_ID'] = $this->ID;
 		$skin_widgets = $coll_Skin->get_default_widgets( $this->get( 'type' ), $context );
 
 		// Check if the skin wants to use all b2evolution default widgets:
@@ -6290,30 +6291,30 @@ class Blog extends DataObject
 		$b2evo_default_widgets = get_default_widgets( $this->get( 'type' ), $this->ID, $context );
 
 		// Merge the skin widget declarations with b2evolution default widgets:
-		foreach( $b2evo_default_widgets as $container_name => $widgets )
+		foreach( $b2evo_default_widgets as $container_code => $widgets )
 		{
 			if( // The skin has no widget declarations for this container and it allows to use b2evolution default widgets:
-			    ( ! isset( $skin_widgets[ $container_name ] ) &&
+			    ( ! isset( $skin_widgets[ $container_code ] ) &&
 			      $use_all_b2evo_default_widgets )
 			    ||
 			    // The skin wants to use default widget declarations for this container:
-			    ( isset( $skin_widgets[ $container_name ] ) &&
-			      $skin_widgets[ $container_name ] === true ) )
+			    ( isset( $skin_widgets[ $container_code ] ) &&
+			      $skin_widgets[ $container_code ] === true ) )
 			{	// Merge widgets from b2evolution default declarations to the skin:
-				$skin_widgets[ $container_name ] = $widgets;
+				$skin_widgets[ $container_code ] = $widgets;
 			}
 		}
 
 		// Check all skin widget containers to be sure they all are proper arrays and not other values like true, false and etc.:
-		foreach( $skin_widgets as $container_name => $widgets )
+		foreach( $skin_widgets as $container_code => $widgets )
 		{
 			if( $widgets === true )
 			{	// Set empty container if it has not been detected in b2evolution default widget declrations above:
-				$skin_widgets[ $container_name ] = array();
+				$skin_widgets[ $container_code ] = array();
 			}
 			elseif( ! is_array( $widgets ) )
 			{	// Ignore all other not array, probably it is a boolean false or some other string value which should be ignored indeed:
-				unset( $skin_widgets[ $container_name ] );
+				unset( $skin_widgets[ $container_code ] );
 			}
 		}
 
@@ -6329,13 +6330,13 @@ class Blog extends DataObject
 		$blog_containers = get_skin_containers( $this->get_skin_ids() );
 
 		// Install additional sub containers from default config:
-		foreach( $skin_widgets as $wico_code => $container_widgets )
+		foreach( $skin_widgets as $container_code => $container_widgets )
 		{
 			if( isset( $container_widgets['type'] ) &&
 					$container_widgets['type'] == 'sub' )
 			{	// If it is a sub-container:
-				$blog_containers[ $wico_code ] = array(
-						isset( $container_widgets['name'] ) ? $container_widgets['name'] : $wico_code,
+				$blog_containers[ $container_code ] = array(
+						isset( $container_widgets['name'] ) ? $container_widgets['name'] : $container_code,
 						isset( $container_widgets['order'] ) ? $container_widgets['order'] : 1,
 						0, // wico_main = 0
 					);
@@ -6344,39 +6345,39 @@ class Blog extends DataObject
 
 		// Create rows to insert for all collection containers:
 		$widget_containers_sql_rows = array();
-		foreach( $blog_containers as $wico_code => $wico_data )
+		foreach( $blog_containers as $container_code => $wico_data )
 		{
-			$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$wico_data[0].'", '.$this->ID.', '.$wico_data[1].', '.( isset( $wico_data[2] ) ? intval( $wico_data[2] ) : '1' ).' )';
+			$widget_containers_sql_rows[] = '( "'.$container_code.'", "'.$wico_data[0].'", '.$this->ID.', '.$wico_data[1].', '.( isset( $wico_data[2] ) ? intval( $wico_data[2] ) : '1' ).' )';
 		}
 
 		// Insert widget containers records by one SQL query
-		$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES'
+		$DB->query( 'INSERT INTO T_widget__container ( wico_code, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES'
 			.implode( ', ', $widget_containers_sql_rows ) );
 
 		$insert_id = $DB->insert_id;
-		foreach( $blog_containers as $wico_code => $wico_data )
+		foreach( $blog_containers as $container_code => $wico_data )
 		{
-			$blog_containers[ $wico_code ]['wico_ID'] = $insert_id;
+			$blog_containers[ $container_code ]['wico_ID'] = $insert_id;
 			$insert_id++;
 		}
 
 		$basic_widgets_insert_sql_rows = array();
-		foreach( $skin_widgets as $wico_code => $container_widgets )
+		foreach( $skin_widgets as $container_code => $container_widgets )
 		{
-			if( ! isset( $blog_containers[ $wico_code ] ) )
+			if( ! isset( $blog_containers[ $container_code ] ) )
 			{	// Skip container which is not supported by current colelction's skin:
 				continue;
 			}
 
 			if( isset( $container_widgets['coll_type'] ) )
 			{	// Handle special condition key:
-				if( ! is_allowed_option( $kind, $container_widgets['coll_type'] ) )
+				if( ! is_allowed_option( $this->get( 'type' ), $container_widgets['coll_type'] ) )
 				{	// Skip container because it should not be installed for the given collection kind:
 					continue;
 				}
 			}
 
-			$wico_id = $blog_containers[ $wico_code ]['wico_ID'];
+			$wico_id = $blog_containers[ $container_code ]['wico_ID'];
 
 			// Remove the config data which is used as additional info for container:
 			if( isset( $container_widgets['type'] ) )
@@ -6403,7 +6404,7 @@ class Blog extends DataObject
 					continue;
 				}
 
-				if( isset( $widget['coll_type'] ) && ! is_allowed_option( $kind, $widget['coll_type'] ) )
+				if( isset( $widget['coll_type'] ) && ! is_allowed_option( $this->get( 'type' ), $widget['coll_type'] ) )
 				{	// Skip widget because it should not be installed for the given collection kind:
 					continue;
 				}
@@ -6424,7 +6425,7 @@ class Blog extends DataObject
 		// Check if there are widgets to create:
 		if( ! empty( $basic_widgets_insert_sql_rows ) )
 		{	// Insert the widget records by single SQL query:
-			$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+			$DB->query( 'INSERT INTO T_widget__widget ( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
 								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
 		}
 	}

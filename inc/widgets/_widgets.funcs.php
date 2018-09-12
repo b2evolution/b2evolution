@@ -56,13 +56,6 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
 			'install_test_features' => false,
 		), $context );
 
-	// Init insert widget query and default params
-	$default_blog_param = 's:7:"blog_ID";s:0:"";';
-	if( ! empty( $context['coll_photoblog_ID'] ) )
-	{ // In the case of initial install, we grab photos out of the photoblog (Blog #4)
-		$default_blog_param = 's:7:"blog_ID";s:1:"'.intval( $context['coll_photoblog_ID'] ).'";';
-	}
-
 	$default_widgets = array();
 
 	/* Header */
@@ -112,7 +105,12 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
 	$default_widgets['item_single_header'] = array(
 		array(  4, 'item_next_previous', 'coll_type' => '-manual' ),
 		array(  5, 'item_title' ),
-		array( 10, 'item_info_line', 'coll_type' => 'forum,group', 'params' => 'a:14:{s:5:"title";s:0:"";s:9:"flag_icon";i:1;s:14:"permalink_icon";i:0;s:13:"before_author";s:10:"started_by";s:11:"date_format";s:8:"extended";s:9:"post_time";i:1;s:12:"last_touched";i:1;s:8:"category";i:0;s:9:"edit_link";i:0;s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;s:11:"time_format";s:4:"none";s:12:"display_date";s:12:"date_created";}' ),
+		array( 10, 'item_info_line', 'coll_type' => 'forum,group', 'params' => array(
+				'before_author' => 'started_by',
+				'last_touched'  => 1,
+				'category'      => 0,
+				'display_date'  => 'date_created',
+			) ),
 		array( 20, 'item_tags', 'coll_type' => 'forum,group' ),
 		array( 30, 'item_seen_by', 'coll_type' => 'forum,group' ),
 		array(  8, 'item_visibility_badge', 'coll_type' => '-manual,forum,group' ),
@@ -194,7 +192,17 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
 					'item_pic_link_type' => 'linkto_url',
 					'thumb_size' => 'fit-160x160',
 				) ),
-			array( 80, 'coll_media_index', 'install' => ( $install_not_forum && ! $context['init_as_blog_b'] ), 'params' => 'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
+			array( 80, 'coll_media_index', 'install' => ( $install_not_forum && ! $context['init_as_blog_b'] ), 'params' => array(
+					'title'        => 'Random photo',
+					'thumb_size'   => 'fit-160x120',
+					'thumb_layout' => 'grid',
+					'grid_nb_cols' => 1,
+					'limit'        => 1,
+					'order_by'     => 'RAND',
+					'order_dir'    => 'ASC',
+					// In the case of initial install, we grab photos out of the photoblog:
+					'blog_ID'      => ( empty( $context['coll_photoblog_ID'] ) ? '' : intval( $context['coll_photoblog_ID'] ) ),
+				) ),
 			array( 90, 'coll_item_list', 'install' => ( $install_not_forum && ! $context['init_as_blog_a'] && ! $context['init_as_blog_b'] ), 'params' => array(
 					'blog_ID'              => $context['coll_home_ID'],
 					'item_type'            => empty( $sidebar_type_ID ) ? '#' : $sidebar_type_ID,
@@ -225,8 +233,21 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
 				'item_type_usage'      => 'special',
 			) ),
 		array( 10, 'coll_comment_list' ),
-		array( 15, 'coll_media_index', 'params' => 'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";'.$default_blog_param.'s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
-		array( 20, 'free_html', 'params' => 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
+		array( 15, 'coll_media_index', 'params' =>  array(
+				'title'        => 'Recent photos',
+				'thumb_size'   => 'crop-80x80',
+				'thumb_layout' => 'flow',
+				'grid_nb_cols' => 3,
+				'limit'        => 9,
+				'order_by'     => 'datestart',
+				'order_dir'    => 'DESC',
+				// In the case of initial install, we grab photos out of the photoblog:
+				'blog_ID'      => ( empty( $context['coll_photoblog_ID'] ) ? '' : intval( $context['coll_photoblog_ID'] ) ),
+			) ),
+		array( 20, 'free_html', 'params' => array(
+				'title'   => 'Sidebar 2',
+				'content' => 'This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".',
+			) ),
 	);
 
 	/* Front Page Main Area */

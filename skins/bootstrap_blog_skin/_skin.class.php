@@ -145,6 +145,7 @@ class bootstrap_blog_Skin extends Skin
 		global $DB;
 
 		$context = array_merge( array(
+				'current_coll_ID'       => NULL,
 				'coll_home_ID'          => NULL,
 				'coll_blog_a_ID'        => NULL,
 				'coll_photoblog_ID'     => NULL,
@@ -155,13 +156,6 @@ class bootstrap_blog_Skin extends Skin
 				'init_as_events'        => false,
 				'install_test_features' => false,
 			), $context );
-
-		// Init insert widget query and default params
-		$default_blog_param = 's:7:"blog_ID";s:0:"";';
-		if( ! empty( $context['coll_photoblog_ID'] ) )
-		{ // In the case of initial install, we grab photos out of the photoblog (Blog #4)
-			$default_blog_param = 's:7:"blog_ID";s:1:"'.intval( $context['coll_photoblog_ID'] ).'";';
-		}
 
 		$default_widgets = array();
 
@@ -176,24 +170,13 @@ class bootstrap_blog_Skin extends Skin
 			'coll_type' => '-main', // Don't add widgets to Menu container for Main collections
 			array(  5, 'basic_menu_link', 'coll_type' => '-minisite', 'params' => array( 'link_type' => 'home' ) ),
 			array( 10, 'basic_menu_link', 'install' => $context['init_as_blog_b'], 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) ),
-			array( 13, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('Latest topics') ) ),
-			array( 15, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest replies') ) ),
-			array( 17, 'flag_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Flagged topics') ) ),
-			array( 13, 'basic_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('Latest pages') ) ),
-			array( 15, 'basic_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest comments') ) ),
-			array( 17, 'flag_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Flagged pages') ) ),
-			array( 18, 'basic_menu_link', 'coll_type' => 'photo', 'params' => array( 'link_type' => 'mediaidx', 'link_text' => T_('Index') ) ),
-			array( 20, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'users' ) ),
-			array( 21, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'visits' ) ),
 			array( 25, 'coll_page_list' ),
-			array( 30, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'myprofile' ), 'enabled' => 0 ),
 			array( 33, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'catdir' ) ),
 			array( 35, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'arcdir' ) ),
 			array( 37, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'latestcomments' ) ),
 			array( 50, 'msg_menu_link', 'params' => array( 'link_type' => 'messages' ), 'enabled' => 0 ),
 			array( 60, 'msg_menu_link', 'params' => array( 'link_type' => 'contacts', 'show_badge' => 0 ), 'enabled' => ( $kind == 'minisite' ) ),
 			array( 70, 'basic_menu_link', 'params' => array( 'link_type' => 'login' ), 'enabled' => 0 ),
-			array( 80, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'register' ) ),
 		);
 
 		/* Item List */
@@ -210,28 +193,23 @@ class bootstrap_blog_Skin extends Skin
 
 		/* Item Single Header */
 		$default_widgets['item_single_header'] = array(
-			array(  4, 'item_next_previous', 'coll_type' => '-manual' ),
+			array(  4, 'item_next_previous' ),
 			array(  5, 'item_title' ),
-			array( 10, 'item_info_line', 'coll_type' => 'forum,group', 'params' => 'a:14:{s:5:"title";s:0:"";s:9:"flag_icon";i:1;s:14:"permalink_icon";i:0;s:13:"before_author";s:10:"started_by";s:11:"date_format";s:8:"extended";s:9:"post_time";i:1;s:12:"last_touched";i:1;s:8:"category";i:0;s:9:"edit_link";i:0;s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;s:11:"time_format";s:4:"none";s:12:"display_date";s:12:"date_created";}' ),
-			array( 20, 'item_tags', 'coll_type' => 'forum,group' ),
-			array( 30, 'item_seen_by', 'coll_type' => 'forum,group' ),
-			array(  8, 'item_visibility_badge', 'coll_type' => '-manual,forum,group' ),
-			array( 10, 'item_info_line', 'coll_type' => '-manual,forum,group' ),
+			array(  8, 'item_visibility_badge' ),
+			array( 10, 'item_info_line' ),
 		);
 
 		/* Item Single */
 		$default_widgets['item_single'] = array(
-			array(  5, 'item_title', 'coll_type' => 'manual' ),
 			array( 10, 'item_content' ),
 			array( 15, 'item_attachments' ),
 			array( 17, 'item_link' ),
-			array( 20, 'item_tags', 'coll_type' => '-forum,group', 'install' => ! $context['init_as_blog_a'] && ! $context['init_as_events'] ),
+			array( 20, 'item_tags', 'install' => ! $context['init_as_blog_a'] && ! $context['init_as_events'] ),
 			array( 25, 'item_about_author', 'install' => $context['init_as_blog_b'] ),
 			array( 30, 'evo_Gmaps', 'type' => 'plugin', 'install' => $context['install_test_features'] && ( $context['init_as_blog_a'] || $context['init_as_events'] ) ),
 			array( 40, 'item_small_print', 'install' => $context['init_as_blog_a'], 'params' => array( 'format' => 'standard' ) ),
-			array( 40, 'item_small_print', 'coll_type' => 'manual', 'params' => array( 'format' => 'revision' ) ),
-			array( 50, 'item_seen_by', 'coll_type' => '-forum,group' ),
-			array( 60, 'item_vote', 'coll_type' => '-forum' ),
+			array( 50, 'item_seen_by' ),
+			array( 60, 'item_vote' ),
 		);
 
 		/* Item Page */
@@ -242,81 +220,64 @@ class bootstrap_blog_Skin extends Skin
 			array( 60, 'item_vote' ),
 		);
 
-		/* Sidebar Single */
-		$default_widgets['sidebar_single'] = array(
-			array(  1, 'coll_related_post_list', 'coll_type' => 'forum' ),
-		);
-
 		/* Page Top */
 		$default_widgets['page_top'] = array(
 			array( 10, 'user_links' ),
 		);
 
 		/* Sidebar */
-		if( $kind == 'manual' )
-		{
-			$default_widgets['sidebar'] = array(
-				'coll_type' => 'manual',
-				array( 10, 'coll_search_form', 'params' => array( 'title' => T_('Search this manual:') ) ),
-				array( 20, 'content_hierarchy' ),
-			);
-		}
-		else
-		{
-			// Special checking to don't install several Sidebar widgets below for collection 'Forums':
-			$install_not_forum = ( ! $context['init_as_forums'] && $kind != 'forum' );
-			if( $context['init_as_home'] )
-			{	// Advertisements, Install only for collection #1 home collection:
-				$advertisement_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_name = "Advertisement"' );
-			}
-			if( ! empty( $context['coll_home_ID'] ) && ( $context['init_as_blog_a'] || $context['init_as_blog_b'] ) )
-			{
-				$sidebar_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_name = "Sidebar link"' );
-			}
-			$default_widgets['sidebar'] = array(
-				array(  5, 'coll_current_filters', 'coll_type' => '-forum', 'install' => $context['install_test_features'] ),
-				array( 10, 'user_login', 'install' => $context['install_test_features'] ),
-				array( 15, 'user_greetings', 'install' => $context['install_test_features'] ),
-				array( 20, 'user_profile_pics', 'install' => $install_not_forum ),
-				array( 30, 'evo_Calr', 'type' => 'plugin', 'install' => ( $install_not_forum && $blog_id > $context['coll_blog_a_ID'] ) ),
-				array( 40, 'coll_longdesc', 'install' => $install_not_forum, 'params' => array( 'title' => '$title$' ) ),
-				array( 50, 'coll_search_form', 'install' => $install_not_forum ),
-				array( 60, 'coll_category_list', 'install' => $install_not_forum ),
-				array( 70, 'coll_item_list', 'install' => $install_not_forum && $context['init_as_home'], 'params' => array(
-						'title' => 'Advertisement (Demo)',
-						'item_type' => empty( $advertisement_type_ID ) ? '#' : $advertisement_type_ID,
-						'blog_ID' => $blog_id,
-						'order_by' => 'RAND',
-						'limit' => 1,
-						'disp_title' => false,
-						'item_title_link_type' => 'linkto_url',
-						'attached_pics' => 'first',
-						'item_pic_link_type' => 'linkto_url',
-						'thumb_size' => 'fit-160x160',
-					) ),
-				array( 80, 'coll_media_index', 'install' => ( $install_not_forum && ! $context['init_as_blog_b'] ), 'params' => 'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
-				array( 90, 'coll_item_list', 'install' => ( $install_not_forum && ! $context['init_as_blog_a'] && ! $context['init_as_blog_b'] ), 'params' => array(
-						'blog_ID'              => $context['coll_home_ID'],
-						'item_type'            => empty( $sidebar_type_ID ) ? '#' : $sidebar_type_ID,
-						'title'                => 'Linkblog',
-						'item_group_by'        => 'chapter',
-						'item_title_link_type' => 'auto',
-						'item_type_usage'      => 'special',
-					) ),
-				array( 90, 'user_avatars', 'coll_type' => 'forum', 'params' => array(
-						'title'           => 'Most Active Users',
-						'limit'           => 6,
-						'order_by'        => 'numposts',
-						'rwd_block_class' => 'col-lg-3 col-md-3 col-sm-4 col-xs-6'
-					) ),
-				array( 100, 'coll_xml_feeds' ),
-				array( 110, 'mobile_skin_switcher' ),
-			);
-		}
+		$default_widgets['sidebar'] = array(
+			array(  5, 'coll_current_filters', 'install' => $context['install_test_features'] ),
+			array( 10, 'user_login', 'install' => $context['install_test_features'] ),
+			array( 15, 'user_greetings', 'install' => $context['install_test_features'] ),
+			array( 20, 'user_profile_pics' ),
+			array( 30, 'evo_Calr', 'type' => 'plugin', 'install' => ( $context['current_coll_ID'] > $context['coll_blog_a_ID'] ) ),
+			array( 40, 'coll_longdesc', 'params' => array( 'title' => '$title$' ) ),
+			array( 50, 'coll_search_form' ),
+			array( 60, 'coll_category_list' ),
+			array( 70, 'coll_item_list', 'install' => $context['init_as_home'], 'params' => array(
+					'title' => 'Advertisement (Demo)',
+					'item_type' => '#',
+					'blog_ID' => $context['current_coll_ID'],
+					'order_by' => 'RAND',
+					'limit' => 1,
+					'disp_title' => false,
+					'item_title_link_type' => 'linkto_url',
+					'attached_pics' => 'first',
+					'item_pic_link_type' => 'linkto_url',
+					'thumb_size' => 'fit-160x160',
+				) ),
+			array( 80, 'coll_media_index', 'install' => ( ! $context['init_as_blog_b'] ), 'params' => array(
+					'title'        => 'Random photo',
+					'thumb_size'   => 'fit-160x120',
+					'thumb_layout' => 'grid',
+					'grid_nb_cols' => 1,
+					'limit'        => 1,
+					'order_by'     => 'RAND',
+					'order_dir'    => 'ASC',
+					// In the case of initial install, we grab photos out of the photoblog:
+					'blog_ID'      => ( empty( $context['coll_photoblog_ID'] ) ? '' : intval( $context['coll_photoblog_ID'] ) ),
+				) ),
+			array( 90, 'coll_item_list', 'install' => ( ! $context['init_as_blog_a'] && ! $context['init_as_blog_b'] ), 'params' => array(
+					'blog_ID'              => $context['coll_home_ID'],
+					'item_type'            => '#',
+					'title'                => 'Linkblog',
+					'item_group_by'        => 'chapter',
+					'item_title_link_type' => 'auto',
+					'item_type_usage'      => 'special',
+				) ),
+			array( 90, 'user_avatars', 'coll_type' => 'forum', 'params' => array(
+					'title'           => 'Most Active Users',
+					'limit'           => 6,
+					'order_by'        => 'numposts',
+					'rwd_block_class' => 'col-lg-3 col-md-3 col-sm-4 col-xs-6'
+				) ),
+			array( 100, 'coll_xml_feeds' ),
+			array( 110, 'mobile_skin_switcher' ),
+		);
 
 		/* Sidebar 2 */
 		$default_widgets['sidebar_2'] = array(
-			'coll_type' => '-forum',
 			array(  1, 'coll_post_list' ),
 			array(  5, 'coll_item_list', 'install' => $context['init_as_blog_b'], 'params' => array(
 					'title'                => 'Sidebar links',
@@ -325,15 +286,28 @@ class bootstrap_blog_Skin extends Skin
 					'item_type_usage'      => 'special',
 				) ),
 			array( 10, 'coll_comment_list' ),
-			array( 15, 'coll_media_index', 'params' => 'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";'.$default_blog_param.'s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
-			array( 20, 'free_html', 'params' => 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
+			array( 15, 'coll_media_index', 'params' =>  array(
+					'title'        => 'Recent photos',
+					'thumb_size'   => 'crop-80x80',
+					'thumb_layout' => 'flow',
+					'grid_nb_cols' => 3,
+					'limit'        => 9,
+					'order_by'     => 'datestart',
+					'order_dir'    => 'DESC',
+					// In the case of initial install, we grab photos out of the photoblog:
+					'blog_ID'      => ( empty( $context['coll_photoblog_ID'] ) ? '' : intval( $context['coll_photoblog_ID'] ) ),
+				) ),
+			array( 20, 'free_html', 'params' => array(
+					'title'   => 'Sidebar 2',
+					'content' => 'This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".',
+				) ),
 		);
 
 		/* Front Page Main Area */
 		$default_widgets['front_page_main_area'] = array(
 			array(  1, 'coll_title', 'coll_type' => 'main,minisite' ),
 			array(  2, 'coll_tagline', 'coll_type' => 'main,minisite' ),
-			array( 10, 'coll_featured_intro', 'coll_type' => '-minisite', 'params' => ( $kind == 'main' ? array(
+			array( 10, 'coll_featured_intro', 'params' => ( $kind == 'main' ? array(
 				// Hide a title of the front intro post:
 					'disp_title' => 0,
 				) : NULL ) ),
@@ -383,12 +357,6 @@ class bootstrap_blog_Skin extends Skin
 			'coll_type' => 'minisite',
 			array( 10, 'coll_search_form' ),
 			array( 20, 'coll_tag_cloud' ),
-		);
-
-		/* Forum Front Secondary Area */
-		$default_widgets['forum_front_secondary_area'] = array(
-			'coll_type' => 'forum',
-			array( 10, 'coll_activity_stats' ),
 		);
 
 		/* Compare Main Area */
@@ -444,7 +412,6 @@ class bootstrap_blog_Skin extends Skin
 			array( 10, 'coll_page_list' ),
 			array( 20, 'basic_menu_link', 'params' => array( 'link_type' => 'ownercontact' ) ),
 			array( 30, 'basic_menu_link', 'params' => array( 'link_type' => 'home' ) ),
-			array( 30, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'users' ) ),
 		);
 
 		/* Mobile Tools Menu */
