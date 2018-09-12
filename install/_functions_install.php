@@ -873,41 +873,33 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
 
 
 /**
- * Install basic widgets.
+ * Installing default widgets for all collections
  */
-function install_basic_widgets( $old_db_version = 0 )
+function install_basic_widgets()
 {
-	/**
-	* @var DB
-	*/
-	global $DB;
+	global $install_test_features, $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
 
-	load_funcs( 'widgets/_widgets.funcs.php' );
+	// Load all collections:
+	$BlogCache = & get_BlogCache();
+	$BlogCache->load_all();
 
-	$blog_type = ( $old_db_version < 11010 ) ? '"std"' : 'blog_type';
-	$SQL = new SQL( 'Get all collections with their skins before install basic widgets' );
-	$SQL->SELECT( 'blog_ID, '.$blog_type.', blog_normal_skin_ID, blog_mobile_skin_ID, blog_tablet_skin_ID' );
-	$SQL->FROM( 'T_blogs' );
-	$SQL->GROUP_BY( 'blog_ID, blog_type' );
-	$blogs_data = $DB->get_results( $SQL );
-
-	foreach( $blogs_data as $blog_data )
+	foreach( $BlogCache->cache as $Blog )
 	{
-		task_begin( 'Installing default widgets for collection #'.$blog_data->blog_ID.'... ' );
-		$skin_IDs = array( $blog_data->blog_normal_skin_ID );
-		if( ! empty( $blog_data->blog_mobile_skin_ID ) )
-		{
-			$skin_IDs[] = $blog_data->blog_mobile_skin_ID;
-		}
-		if( ! empty( $blog_data->blog_tablet_skin_ID ) )
-		{
-			$skin_IDs[] = $blog_data->blog_tablet_skin_ID;
-		}
-		insert_basic_widgets( $blog_data->blog_ID, $skin_IDs, true, $blog_data->blog_type );
+		task_begin( 'Installing default widgets for collection #'.$Blog->ID.'... ' );
+		$Blog->setup_default_widgets( 'normal', array(
+				'coll_home_ID'          => $blog_home_ID,
+				'coll_blog_a_ID'        => $blog_a_ID,
+				'coll_photoblog_ID'     => $blog_photoblog_ID,
+				'init_as_home'          => ( $blog_home_ID == $Blog->ID ),
+				'init_as_blog_a'        => ( $blog_a_ID == $Blog->ID ),
+				'init_as_blog_b'        => ( $blog_b_ID == $Blog->ID ),
+				'init_as_forums'        => ( $blog_forums_ID == $Blog->ID ),
+				'init_as_events'        => ( $events_blog_ID == $Blog->ID ),
+				'install_test_features' => $install_test_features,
+			) );
 		task_end();
 	}
 }
-
 
 
 function advanced_properties()

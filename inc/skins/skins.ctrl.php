@@ -99,6 +99,11 @@ switch( $action )
 			// Re-scan and create widget containers from new switched skin if they don't exist for the edited collection:
 			$edited_Blog->db_save_main_containers();
 
+			if( param( 'reset_widgets', 'integer', 0 ) )
+			{	// Reset previous widgets with new from skin default widget declarations:
+				$edited_Blog->reset_widgets( $edited_Skin->type );
+			}
+
 			$Messages->add( T_('The blog skin has been changed.')
 								.' <a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
 			if( ( !$Session->is_mobile_session() && !$Session->is_tablet_session() && $skin_type == 'normal' ) ||

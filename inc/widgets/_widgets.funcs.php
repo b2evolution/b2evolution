@@ -23,27 +23,44 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  *
  * @param string Collection kind
  * @param integer Collection ID
- * @param boolean Should be true only when it's called after initial install
- * @return array
+ * @param array Context
+ * @return array Array of default widgets:
+ *          - Key - Container code,
+ *          - Value - array of widget arrays OR SPECIAL VALUES:
+ *             - 'coll_type': Include this container only for collection kinds separated by comma, first char "-" means to exclude,
+ *             - 'type': Container type, empty - main container, other values: 'sub', 'page', 'shared', 'shared-sub',
+ *             - 'name': Container name,
+ *             - 'order': Container order,
+ *             - widget data array():
+ *                - 0: Widget order (*mandatory field*),
+ *                - 1: Widget code (*mandatory field*),
+ *                - 'params' - Widget params(array or serialized string),
+ *                - 'type' - Widget type(default = 'core', another value - 'plugin'),
+ *                - 'enabled' - Boolean value; default is TRUE; FALSE to install the widget as disabled,
+ *                - 'coll_type': Include this widget only for collection kinds separated by comma, first char "-" means to exclude,
+ *                - 'install' - Boolean value; default is TRUE; FALSE to skip this widget on install.
  */
-function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = false )
+function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
 {
-	global $DB, $install_test_features;
-	// Handle all blog IDs which can go from function create_demo_contents()
-	global $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
-	$blog_home_ID = intval( $blog_home_ID );
-	$blog_a_ID = intval( $blog_a_ID );
-	$blog_b_ID = intval( $blog_b_ID );
-	$blog_photoblog_ID = intval( $blog_photoblog_ID );
-	$blog_forums_ID = intval( $blog_forums_ID );
-	$blog_manual_ID = intval( $blog_manual_ID );
-	$events_blog_ID = intval( $events_blog_ID );
+	global $DB;
+
+	$context = array_merge( array(
+			'coll_home_ID'          => NULL,
+			'coll_blog_a_ID'        => NULL,
+			'coll_photoblog_ID'     => NULL,
+			'init_as_home'          => false,
+			'init_as_blog_a'        => false,
+			'init_as_blog_b'        => false,
+			'init_as_forums'        => false,
+			'init_as_events'        => false,
+			'install_test_features' => false,
+		), $context );
 
 	// Init insert widget query and default params
 	$default_blog_param = 's:7:"blog_ID";s:0:"";';
-	if( $initial_install && ! empty( $blog_photoblog_ID ) )
+	if( ! empty( $context['coll_photoblog_ID'] ) )
 	{ // In the case of initial install, we grab photos out of the photoblog (Blog #4)
-		$default_blog_param = 's:7:"blog_ID";s:1:"'.intval( $blog_photoblog_ID ).'";';
+		$default_blog_param = 's:7:"blog_ID";s:1:"'.intval( $context['coll_photoblog_ID'] ).'";';
 	}
 
 	$default_widgets = array();
@@ -58,7 +75,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['menu'] = array(
 		'coll_type' => '-main', // Don't add widgets to Menu container for Main collections
 		array(  5, 'basic_menu_link', 'coll_type' => '-minisite', 'params' => array( 'link_type' => 'home' ) ),
-		array( 10, 'basic_menu_link', 'coll_ID' => $blog_b_ID, 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) ),
+		array( 10, 'basic_menu_link', 'install' => $context['init_as_blog_b'], 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) ),
 		array( 13, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('Latest topics') ) ),
 		array( 15, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest replies') ) ),
 		array( 17, 'flag_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Flagged topics') ) ),
@@ -108,10 +125,10 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 10, 'item_content' ),
 		array( 15, 'item_attachments' ),
 		array( 17, 'item_link' ),
-		array( 20, 'item_tags', 'coll_type' => '-forum,group', 'coll_ID' => '-'.$blog_a_ID.','.$events_blog_ID ),
-		array( 25, 'item_about_author', 'coll_ID' => $blog_b_ID ),
-		array( 30, 'evo_Gmaps', 'coll_ID' => $blog_a_ID.','.$events_blog_ID, 'type' => 'plugin', 'install' => $install_test_features ),
-		array( 40, 'item_small_print', 'coll_ID' => $blog_a_ID, 'params' => array( 'format' => 'standard' ) ),
+		array( 20, 'item_tags', 'coll_type' => '-forum,group', 'install' => ! $context['init_as_blog_a'] && ! $context['init_as_events'] ),
+		array( 25, 'item_about_author', 'install' => $context['init_as_blog_b'] ),
+		array( 30, 'evo_Gmaps', 'type' => 'plugin', 'install' => $context['install_test_features'] && ( $context['init_as_blog_a'] || $context['init_as_events'] ) ),
+		array( 40, 'item_small_print', 'install' => $context['init_as_blog_a'], 'params' => array( 'format' => 'standard' ) ),
 		array( 40, 'item_small_print', 'coll_type' => 'manual', 'params' => array( 'format' => 'revision' ) ),
 		array( 50, 'item_seen_by', 'coll_type' => '-forum,group' ),
 		array( 60, 'item_vote', 'coll_type' => '-forum' ),
@@ -147,25 +164,25 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	else
 	{
 		// Special checking to don't install several Sidebar widgets below for collection 'Forums':
-		$install_not_forum = ( ( ! $initial_install || $blog_id != $blog_forums_ID ) && $kind != 'forum' );
-		if( $blog_id == $blog_home_ID )
+		$install_not_forum = ( ! $context['init_as_forums'] && $kind != 'forum' );
+		if( $context['init_as_home'] )
 		{	// Advertisements, Install only for collection #1 home collection:
 			$advertisement_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_name = "Advertisement"' );
 		}
-		if( ! empty( $blog_home_ID ) && ( $blog_id == $blog_a_ID || $blog_id == $blog_b_ID ) )
+		if( ! empty( $context['coll_home_ID'] ) && ( $context['init_as_blog_a'] || $context['init_as_blog_b'] ) )
 		{
 			$sidebar_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_name = "Sidebar link"' );
 		}
 		$default_widgets['sidebar'] = array(
-			array(  5, 'coll_current_filters', 'coll_type' => '-forum', 'install' => $install_test_features ),
-			array( 10, 'user_login', 'install' => $install_test_features ),
-			array( 15, 'user_greetings', 'install' => $install_test_features ),
+			array(  5, 'coll_current_filters', 'coll_type' => '-forum', 'install' => $context['install_test_features'] ),
+			array( 10, 'user_login', 'install' => $context['install_test_features'] ),
+			array( 15, 'user_greetings', 'install' => $context['install_test_features'] ),
 			array( 20, 'user_profile_pics', 'install' => $install_not_forum ),
-			array( 30, 'evo_Calr', 'type' => 'plugin', 'install' => ( $install_not_forum && $blog_id > $blog_a_ID ) ),
+			array( 30, 'evo_Calr', 'type' => 'plugin', 'install' => ( $install_not_forum && $blog_id > $context['coll_blog_a_ID'] ) ),
 			array( 40, 'coll_longdesc', 'install' => $install_not_forum, 'params' => array( 'title' => '$title$' ) ),
 			array( 50, 'coll_search_form', 'install' => $install_not_forum ),
 			array( 60, 'coll_category_list', 'install' => $install_not_forum ),
-			array( 70, 'coll_item_list', 'coll_ID' => $blog_home_ID, 'install' => $install_not_forum, 'params' => array(
+			array( 70, 'coll_item_list', 'install' => $install_not_forum && $context['init_as_home'], 'params' => array(
 					'title' => 'Advertisement (Demo)',
 					'item_type' => empty( $advertisement_type_ID ) ? '#' : $advertisement_type_ID,
 					'blog_ID' => $blog_id,
@@ -177,9 +194,9 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 					'item_pic_link_type' => 'linkto_url',
 					'thumb_size' => 'fit-160x160',
 				) ),
-			array( 80, 'coll_media_index', 'coll_ID' => '-'.$blog_b_ID, 'install' => $install_not_forum, 'params' => 'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
-			array( 90, 'coll_item_list', 'coll_ID' => $blog_a_ID.','.$blog_b_ID, 'install' => $install_not_forum, 'params' => array(
-					'blog_ID'              => $blog_home_ID,
+			array( 80, 'coll_media_index', 'install' => ( $install_not_forum && ! $context['init_as_blog_b'] ), 'params' => 'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
+			array( 90, 'coll_item_list', 'install' => ( $install_not_forum && ! $context['init_as_blog_a'] && ! $context['init_as_blog_b'] ), 'params' => array(
+					'blog_ID'              => $context['coll_home_ID'],
 					'item_type'            => empty( $sidebar_type_ID ) ? '#' : $sidebar_type_ID,
 					'title'                => 'Linkblog',
 					'item_group_by'        => 'chapter',
@@ -201,7 +218,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['sidebar_2'] = array(
 		'coll_type' => '-forum',
 		array(  1, 'coll_post_list' ),
-		array(  5, 'coll_item_list', 'coll_ID' => $blog_b_ID, 'params' => array(
+		array(  5, 'coll_item_list', 'install' => $context['init_as_blog_b'], 'params' => array(
 				'title'                => 'Sidebar links',
 				'order_by'             => 'RAND',
 				'item_title_link_type' => 'auto',
@@ -229,7 +246,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 				'thumb_size' => 'crop-80x80',
 			) : NULL ) ),
 		// Install widget "Poll" only for Blog B on install:
-		array( 40, 'poll', 'coll_ID' => $blog_b_ID, 'params' => array( 'poll_ID' => 1 ) ),
+		array( 40, 'poll', 'install' => $context['init_as_blog_b'], 'params' => array( 'poll_ID' => 1 ) ),
 		array( 50, 'subcontainer_row', 'params' => array(
 				'column1_container' => 'front_page_column_a',
 				'column1_class'     => ( $kind == 'main' ? 'col-xs-12' : 'col-sm-6 col-xs-12' ),
@@ -489,150 +506,14 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
  * @param string Container code
  * @param string Collection kind
  * @param integer Collection ID
- * @param boolean Should be true only when it's called after initial install
+ * @param array Context
  * @return array|boolean FALSE if no widgets for a requested container
  */
-function get_default_widgets_by_container( $container_code, $kind = '', $blog_id = NULL, $initial_install = false )
+function get_default_widgets_by_container( $container_code, $kind = '', $blog_id = NULL, $context = array() )
 {
-	$default_widgets = get_default_widgets( $kind, $blog_id, $initial_install );
+	$default_widgets = get_default_widgets( $kind, $blog_id, $context );
 
 	return isset( $default_widgets[ $container_code ] ) ? $default_widgets[ $container_code ] : false;
-}
-
-
-/**
- * Insert the basic widgets for a collection
- *
- * @param integer should never be 0
- * @param array the list of skin ids which are set for the given blog ( normal, mobile and tablet skin ids )
- * @param boolean should be true only when it's called after initial install
- * fp> TODO: $initial_install is used to know if we want to trust globals like $blog_photoblog_ID and $blog_forums_ID. We don't want that.
- *           We should pass a $context array with values like 'photo_source_coll_ID' => 4.
- *           Also, checking $blog_forums_ID is unnecessary complexity. We can check the colleciton kind == forum
- * @param string Kind of blog ( 'std', 'photo', 'group', 'forum' )
- */
-function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $kind = '' )
-{
-	global $DB, $install_test_features;
-
-	// Load skin functions needed to get the skin containers
-	load_funcs( 'skins/_skin.funcs.php' );
-
-	// Handle all blog IDs which can go from function create_demo_contents()
-	global $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
-	$blog_home_ID = intval( $blog_home_ID );
-	$blog_a_ID = intval( $blog_a_ID );
-	$blog_b_ID = intval( $blog_b_ID );
-	$blog_photoblog_ID = intval( $blog_photoblog_ID );
-	$blog_forums_ID = intval( $blog_forums_ID );
-	$blog_manual_ID = intval( $blog_manual_ID );
-	$events_blog_ID = intval( $events_blog_ID );
-
-	// Get config of default widgets:
-	$default_widgets = get_default_widgets( $kind, $blog_id, $initial_install );
-
-	// Get all containers declared in the given blog's skins
-	$blog_containers = get_skin_containers( $skin_ids );
-
-	// Install additional sub containers from default config:
-	foreach( $default_widgets as $wico_code => $container_widgets )
-	{
-		if( isset( $container_widgets['type'] ) &&
-		    $container_widgets['type'] == 'sub' )
-		{	// If it is a sub-container:
-			$blog_containers[ $wico_code ] = array(
-					isset( $container_widgets['name'] ) ? $container_widgets['name'] : $wico_code,
-					isset( $container_widgets['order'] ) ? $container_widgets['order'] : 1,
-					0, // wico_main = 0
-				);
-		}
-	}
-
-	// Create rows to insert for all collection containers:
-	$widget_containers_sql_rows = array();
-	foreach( $blog_containers as $wico_code => $wico_data )
-	{
-		$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$wico_data[0].'", '.$blog_id.', '.$wico_data[1].', '.( isset( $wico_data[2] ) ? intval( $wico_data[2] ) : '1' ).' )';
-	}
-
-	// Insert widget containers records by one SQL query
-	$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES'
-		.implode( ', ', $widget_containers_sql_rows ) );
-
-	$insert_id = $DB->insert_id;
-	foreach( $blog_containers as $wico_code => $wico_data )
-	{
-		$blog_containers[ $wico_code ]['wico_ID'] = $insert_id;
-		$insert_id++;
-	}
-
-	$basic_widgets_insert_sql_rows = array();
-	foreach( $default_widgets as $wico_code => $container_widgets )
-	{
-		if( ! isset( $blog_containers[ $wico_code ] ) )
-		{	// Skip container which is not supported by current colelction's skin:
-			continue;
-		}
-
-		if( isset( $container_widgets['coll_type'] ) )
-		{	// Handle special condition key:
-			if( ! is_allowed_option( $kind, $container_widgets['coll_type'] ) )
-			{	// Skip container because it should not be installed for the given collection kind:
-				continue;
-			}
-		}
-
-		$wico_id = $blog_containers[ $wico_code ]['wico_ID'];
-
-		// Remove the config data which is used as additional info for container:
-		if( isset( $container_widgets['type'] ) )
-		{	// Container type
-			unset( $container_widgets['type'] );
-		}
-		if( isset( $container_widgets['name'] ) )
-		{	// Container name
-			unset( $container_widgets['name'] );
-		}
-		if( isset( $container_widgets['order'] ) )
-		{	// Container order
-			unset( $container_widgets['order'] );
-		}
-		if( isset( $container_widgets['coll_type'] ) )
-		{	// Collection type where the container should be installed:
-			unset( $container_widgets['coll_type'] );
-		}
-
-		foreach( $container_widgets as $widget )
-		{
-			if( isset( $widget['install'] ) && ! $widget['install'] )
-			{	// Skip widget because it should not be installed by condition from config:
-				continue;
-			}
-
-			if( isset( $widget['coll_type'] ) && ! is_allowed_option( $kind, $widget['coll_type'] ) )
-			{	// Skip widget because it should not be installed for the given collection kind:
-				continue;
-			}
-
-			if( isset( $widget['coll_ID'] ) && ! is_allowed_option( $blog_id, $widget['coll_ID'] ) )
-			{	// Skip widget because it should not be installed for the given collection ID:
-				continue;
-			}
-
-			// Initialize a widget row to insert into DB below by single query:
-			$widget_type = isset( $widget['type'] ) ? $widget['type'] : 'core';
-			$widget_params = isset( $widget['params'] ) ? ( is_array( $widget['params'] ) ? serialize( $widget['params'] ) : $widget['params'] ) : NULL;
-			$widget_enabled = isset( $widget['enabled'] ) ? intval( $widget['enabled'] ) : 1;
-			$basic_widgets_insert_sql_rows[] = '( '.$wico_id.', '.$widget[0].', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[1] ).', '.$DB->quote( $widget_params ).' )';
-		}
-	}
-
-	// Check if there are widgets to create
-	if( ! empty( $basic_widgets_insert_sql_rows ) )
-	{ // Insert the widget records by single SQL query
-		$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
-		           .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
-	}
 }
 
 

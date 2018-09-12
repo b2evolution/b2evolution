@@ -2361,8 +2361,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			*/
 			global $DB;
 
-			load_funcs( 'widgets/_widgets.funcs.php' );
-
 			$blog_ids = $DB->get_assoc( 'SELECT blog_ID, "std" FROM T_blogs' );
 
 			foreach( $blog_ids as $blog_id => $blog_type )
@@ -10705,6 +10703,55 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 13250, 'Updating table item custom fields...' ) )
 	{ // part of 7.0.0-alpha
 		db_add_col( 'T_items__type_custom_field', 'itcf_schema_prop', 'VARCHAR(255) COLLATE ascii_general_ci NULL AFTER itcf_name' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13260, 'Upgrade widget "Social links"...' ) )
+	{	// part of 7.0.0-alpha
+		// Old version of widget "Social links" had the user field definition IDs in the params "link1",
+		// but new version must has the user field definition codes instead:
+		$social_links_SQL = new SQL( 'Get all widgets "Social links" to upgrade params of user field IDs to user field codes' );
+		$social_links_SQL->SELECT( 'wi_ID, wi_params' );
+		$social_links_SQL->FROM( 'T_widget' );
+		$social_links_SQL->WHERE( 'wi_code = "social_links"' );
+		$social_links_SQL->WHERE_and( 'wi_params IS NOT NULL' );
+		$social_links_widgets = $DB->get_assoc( $social_links_SQL->get(), $social_links_SQL->title );
+
+		if( ! empty( $social_links_widgets ) )
+		{	// If at least one widget "Social links" is installed
+			$user_fields_SQL = new SQL( 'Get all user field with type "url"' );
+			$user_fields_SQL->SELECT( 'ufdf_ID, ufdf_code' );
+			$user_fields_SQL->FROM( 'T_users__fielddefs' );
+			$user_fields_SQL->WHERE( 'ufdf_type = "url"' );
+			$user_fields = $DB->get_assoc( $user_fields_SQL->get(), $user_fields_SQL->title );
+
+			foreach( $social_links_widgets as $social_links_widget_ID => $social_links_widget_params )
+			{
+				$social_links_widget_params = unserialize( $social_links_widget_params );
+				if( empty( $social_links_widget_params ) )
+				{	// Skip empty or wrong params:
+					continue;
+				}
+				foreach( $social_links_widget_params as $wi_param_key => $wi_param_value )
+				{
+					if( ! empty( $wi_param_value ) && preg_match( '/^link\d+$/', $wi_param_key ) )
+					{	// This is param which must be updated from field ID to field code
+						if( isset( $user_fields[ $wi_param_value ] ) )
+						{	// We have found user field code by ID, Use new value as code instead of ID:
+							$social_links_widget_params[ $wi_param_key ] = $user_fields[ $wi_param_value ];
+						}
+						else
+						{	// We have not found, Clear the wrong value:
+							$social_links_widget_params[ $wi_param_key ] = '';
+						}
+					}
+				}
+				// Update widget with new params:
+				$DB->query( 'UPDATE T_widget
+					  SET wi_params = '.$DB->quote( serialize( $social_links_widget_params ) ).'
+					WHERE wi_ID = '.$social_links_widget_ID );
+			}
+		}
 		upg_task_end();
 	}
 

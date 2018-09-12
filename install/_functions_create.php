@@ -1818,7 +1818,7 @@ function create_demo_messages()
  */
 function create_demo_contents()
 {
-	global $baseurl, $admin_url, $new_db_version;
+	global $baseurl, $admin_url;
 	global $random_password, $query;
 	global $timestamp, $admin_email;
 	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $blogb_Group;
@@ -1830,6 +1830,7 @@ function create_demo_contents()
 	global $mary_moderator_ID, $jay_moderator_ID, $dave_blogger_ID, $paul_blogger_ID, $larry_user_ID, $kate_user_ID;
 	global $admin_user;
 	global $create_demo_users;
+	global $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $blog_tracker_ID;
 
 	// Global exception handler function
 	function demo_content_error_handler( $errno, $errstr, $errfile, $errline )
@@ -1942,7 +1943,7 @@ function create_demo_contents()
 	if( $install_collection_home )
 	{ // Install Home blog
 		task_begin( 'Creating Home collection...' );
-		create_demo_collection( 'main', $jay_moderator_ID, $create_demo_users, $timeshift, 2 );
+		$blog_home_ID = create_demo_collection( 'main', $jay_moderator_ID, $create_demo_users, $timeshift, 2 );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1951,7 +1952,7 @@ function create_demo_contents()
 	{ // Install Blog A
 		$timeshift += 86400;
 		task_begin( 'Creating Blog A collection...' );
-		create_demo_collection( 'blog_a', $jay_moderator_ID, $create_demo_users, $timeshift, 3 );
+		$blog_a_ID = create_demo_collection( 'blog_a', $jay_moderator_ID, $create_demo_users, $timeshift, 3 );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1960,7 +1961,7 @@ function create_demo_contents()
 	{ // Install Blog B
 		$timeshift += 86400;
 		task_begin( 'Creating Blog B collection...' );
-		create_demo_collection( 'blog_b', $paul_blogger_ID, $create_demo_users, $timeshift, 3 );
+		$blog_b_ID = create_demo_collection( 'blog_b', $paul_blogger_ID, $create_demo_users, $timeshift, 3 );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1969,7 +1970,7 @@ function create_demo_contents()
 	{ // Install Photos blog
 		$timeshift += 86400;
 		task_begin( 'Creating Photos collection...' );
-		create_demo_collection( 'photo', $dave_blogger_ID, $create_demo_users, $timeshift, 4 );
+		$blog_photoblog_ID = create_demo_collection( 'photo', $dave_blogger_ID, $create_demo_users, $timeshift, 4 );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1978,7 +1979,7 @@ function create_demo_contents()
 	{ // Install Forums blog
 		$timeshift += 86400;
 		task_begin( 'Creating Forums collection...' );
-		create_demo_collection( 'forum', $paul_blogger_ID, $create_demo_users, $timeshift, 5 );
+		$blog_forums_ID = create_demo_collection( 'forum', $paul_blogger_ID, $create_demo_users, $timeshift, 5 );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1987,7 +1988,7 @@ function create_demo_contents()
 	{ // Install Manual blog
 		$timeshift += 86400;
 		task_begin( 'Creating Manual collection...' );
-		create_demo_collection( 'manual', $dave_blogger_ID, $create_demo_users, $timeshift, 6 );
+		$blog_manual_ID = create_demo_collection( 'manual', $dave_blogger_ID, $create_demo_users, $timeshift, 6 );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -1996,7 +1997,7 @@ function create_demo_contents()
 	{ // Install Tracker blog
 		$timeshift += 86400;
 		task_begin( 'Creating Tracker collection...' );
-		create_demo_collection( 'group', $jay_moderator_ID, $create_demo_users, $timeshift, 5 );
+		$blog_tracker_ID = create_demo_collection( 'group', $jay_moderator_ID, $create_demo_users, $timeshift, 5 );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -2004,7 +2005,7 @@ function create_demo_contents()
 	if( $install_collection_minisite )
 	{ // Install Mini-site collection
 		task_begin( 'Creating Mini-Site collection...' );
-		create_demo_collection( 'minisite', $jay_moderator_ID, $create_demo_users, $timeshift, 1 );
+		$blog_minisite_ID = create_demo_collection( 'minisite', $jay_moderator_ID, $create_demo_users, $timeshift, 1 );
 		update_install_progress_bar();
 		task_end();
 	}
@@ -2084,7 +2085,8 @@ function create_demo_contents()
 	// Set default locations for each post in test mode installation
 	create_default_posts_location();
 
-	install_basic_widgets( $new_db_version );
+	// Installing default widgets for all collections:
+	install_basic_widgets();
 
 	load_funcs( 'tools/model/_system.funcs.php' );
 	system_init_caches( true, true ); // Outputs messages

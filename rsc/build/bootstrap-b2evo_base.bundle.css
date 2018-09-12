@@ -4156,6 +4156,11 @@ p.margin-top {
 .btn.btn-danger .fa {
   color: #FFF !important;
 }
+.btn.btn-danger-hover:hover {
+  color: #fff;
+  background-color: #c9302c;
+  border-color: #ac2925;
+}
 .evo_widget .btn {
   margin-top: 4px;
   margin-bottom: 4px;

@@ -177,7 +177,28 @@ switch( $action )
 					{ // Commit update to the DB:
 						$edited_Blog->dbupdate();
 						// Re-scan and create widget containers from new switched skin if they don't exist for the edited collection:
-						$edited_Blog->db_save_main_containers();
+						// ???? $edited_Blog->db_save_main_containers();
+
+						if( param( 'reset_widgets', 'integer', 0 ) )
+						{	// Widget must be reseted:
+							$updated_skin_type = '';
+							if( get_param( 'normal_skin_ID' ) !== NULL )
+							{	// Normal skin has been changed:
+								$updated_skin_type = 'normal';
+							}
+							elseif( get_param( 'tablet_skin_ID' ) !== NULL )
+							{	// Tablet skin has been changed:
+								$updated_skin_type = 'tablet';
+							}
+							elseif( get_param( 'mobile_skin_ID' ) !== NULL )
+							{	// Mobile skin has been changed:
+								$updated_skin_type = 'mobile';
+							}
+							if( ! empty( $updated_skin_type ) )
+							{	// Reset previous widgets with new from skin default widget declarations:
+								$edited_Blog->reset_widgets( $updated_skin_type );
+							}
+						}
 
 						$Messages->add( T_('The blog skin has been changed.')
 											.' <a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
@@ -340,19 +361,13 @@ switch( $action )
 		}
 
 		if( $reset )
-		{ // Reset all settings
-			// Remove previous widgets, widget containers, plugin and skin settings
-			$DB->query( 'DELETE wico, wi
-				FROM T_widget__container AS wico
-			 	LEFT JOIN T_widget__widget AS wi ON wi_wico_ID = wico_ID
-			 	WHERE wico_coll_ID = '.$DB->quote( $edited_Blog->ID ) );
-
+		{	// Reset all settings:
+			// Remove previous plugin and skin settings:
 			$DB->query( 'DELETE FROM T_coll_settings
 				WHERE cset_coll_ID = '.$DB->quote( $edited_Blog->ID ).'
 				AND ( cset_name LIKE "skin%" OR cset_name LIKE "plugin%" )' );
-			// ADD DEFAULT WIDGETS:
-			load_funcs( 'widgets/_widgets.funcs.php' );
-			insert_basic_widgets( $edited_Blog->ID, $edited_Blog->get_skin_ids(), false, $type );
+			// Reset previous widgets with new from normal skin default widget declarations:
+			$edited_Blog->reset_widgets();
 		}
 
 		$edited_Blog->init_by_kind( $type, $edited_Blog->get( 'name' ), $edited_Blog->get( 'shortname' ), $edited_Blog->get( 'urlname' ) );

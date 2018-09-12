@@ -242,6 +242,35 @@ class Skin extends DataObject
 
 
 	/**
+	 * Get the declarations of the widgets that the skin recommends by default.
+	 *
+	 * The skin class defines a default set of widgets to used. Skins should override this.
+	 *
+	 * @param string Collection kind: 'std', 'main', 'photo', 'group', 'forum', 'manual'
+	 * @param array Additional params. Example value 'init_as_blog_b' => true
+	 * @return array Array of default widgets:
+	 *          - Key - Container code,
+	 *          - Value - array of widget arrays OR SPECIAL VALUES:
+	 *             - 'coll_type': Include this container only for collection kinds separated by comma, first char "-" means to exclude,
+	 *             - 'type': Container type, empty - main container, other values: 'sub', 'page', 'shared', 'shared-sub',
+	 *             - 'name': Container name,
+	 *             - 'order': Container order,
+	 *             - widget data array():
+	 *                - 0: Widget order (*mandatory field*),
+	 *                - 1: Widget code (*mandatory field*),
+	 *                - 'params' - Widget params(array or serialized string),
+	 *                - 'type' - Widget type(default = 'core', another value - 'plugin'),
+	 *                - 'enabled' - Boolean value; default is TRUE; FALSE to install the widget as disabled,
+	 *                - 'coll_type': Include this widget only for collection kinds separated by comma, first char "-" means to exclude,
+	 *                - 'install' - Boolean value; default is TRUE; FALSE to skip this widget on install.
+	 */
+	function get_default_widgets( $coll_kind, $context = array() )
+	{
+		return array( '*' => true ); // For all containers, use b2evo defaults.
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.
@@ -653,20 +682,24 @@ class Skin extends DataObject
 				'highlighted'     => false,
 			), $disp_params );
 
-		if( isset( $disp_params[ 'select_url' ] ) )
-		{
-			$skin_url = $disp_params[ 'select_url' ];
-			$select_a_begin = '<a href="'.$disp_params[ 'select_url' ].'" title="'.T_('Select this skin!').'">';
+		if( isset( $disp_params['select_url'] ) )
+		{	// Initialize params for link to SELECT new skin for collection:
+			$skin_url = $disp_params['select_url'];
+			$select_a_begin = '<a href="'.format_to_output( $disp_params['select_url'], 'htmlattr' ).'"'
+					.( isset( $disp_params['onclick'] ) ? ' onclick="'.format_to_output( $disp_params['onclick'] , 'htmlattr' ).'"' : '' )
+					.' title="'.format_to_output( T_('Select this skin!'), 'htmlattr' ).'">';
 			$select_a_end = '</a>';
 		}
-		elseif( isset( $disp_params[ 'function_url' ] ) )
-		{
-			$skin_url = $disp_params[ 'function_url' ];
-			$select_a_begin = '<a href="'.$disp_params[ 'function_url' ].'" title="'.T_('Install NOW!').'">';
+		elseif( isset( $disp_params['function_url'] ) )
+		{	// Initialize params for link to INSTALL new skin and probably select this automatically for collection:
+			$skin_url = $disp_params['function_url'];
+			$select_a_begin = '<a href="'.$disp_params['function_url'].'"'
+				.( isset( $disp_params['onclick'] ) ? ' onclick="'.format_to_output( $disp_params['onclick'] , 'htmlattr' ).'"' : '' )
+				.' title="'.format_to_output( T_('Install NOW!'), 'htmlattr' ).'">';
 			$select_a_end = '</a>';
 		}
 		else
-		{
+		{	// No link:
 			$skin_url = '';
 			$select_a_begin = '';
 			$select_a_end = '';

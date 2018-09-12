@@ -43,8 +43,8 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link('collection-change-
 	$Form->radio( 'type', $edited_Blog->get( 'type' ), $radio_options, T_('Type'), true );
 
 	$Form->checkbox_input( 'reset', 0, T_('Reset'), array(
-			'input_suffix' => ' '.T_('Reset all parameters as for a new collection.'),
-			'note' => T_('(Only keep collection name, owner, URL, categories and content).')
+			'input_suffix' => ' '.T_('Reset all Widgets, Skin settings and Plugins settings as for a new collection.'),
+			'note' => T_('(Only keep collection name, owner, URL, categories, content, users and groups permissions, features and collection settings).')
 		) );
 
 $Form->end_fieldset();
