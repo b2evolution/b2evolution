@@ -1669,7 +1669,7 @@ function init_affix_messages_js( $offset = 50 )
 	add_js_headline( '
 	jQuery( document ).ready( function()
 	{
-		var msg_obj = jQuery( ".action_messages" );
+		var msg_obj = jQuery( ".affixed_messages" );
 		var msg_offset = '.format_to_js( $offset == '' ? 50 : $offset ).';
 
 		if( msg_obj.length == 0 )
