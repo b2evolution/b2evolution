@@ -494,7 +494,11 @@ class AdminUI_general extends Menu
 	{
 		global $app_shortname;
 
-		if( $htmltitle = $this->get_prop_for_node( $this->path, array( 'htmltitle' ) ) )
+		if( ! empty( $this->htmltitle ) )
+		{	// Get html title which is specified for current page:
+			$r = $this->htmltitle;
+		}
+		elseif( $htmltitle = $this->get_prop_for_node( $this->path, array( 'htmltitle' ) ) )
 		{	// Explicit htmltitle set:
 			$r = $htmltitle;
 		}
