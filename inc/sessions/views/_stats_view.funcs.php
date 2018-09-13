@@ -56,20 +56,11 @@ function hits_results( & $Results, $params = array() )
 		'presets' => $filter_presets
 		);
 
-	if( $sess_ID == NULL )
-	{
-		$session_link = '%stat_session_hits( #sess_ID#, #sess_ID# )%';
-	}
-	else
-	{
-		$session_link = '<a href="?ctrl=stats&amp;tab='.$tab.'&amp;blog='.$blog.'" title="'.T_( 'Show all sessions' ).'">$sess_ID$</a>';
-	}
-
 	$Results->cols[] = array(
 			'th' => T_('Session'),
 			'order' => 'hit_sess_ID',
 			'td_class' => 'right nowrap',
-			'td' => $session_link,
+			'td' => '%stat_session_hits( #sess_ID#, #sess_ID# )%',
 		);
 
 	$Results->cols[] = array(
@@ -354,7 +345,7 @@ function stat_session_login( $login )
  */
 function stat_session_hits( $sess_ID, $link_text )
 {
-	global $blog, $admin_url;
+	global $admin_url;
 
 	$tab = get_param( 'tab' );
 	if( empty( $tab ) )
@@ -362,7 +353,7 @@ function stat_session_hits( $sess_ID, $link_text )
 		$tab = 'hits';
 	}
 
-	return '<strong><a href="'.$admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;sess_ID='.$sess_ID.'&amp;blog='.$blog.'">'.$link_text.'</a></strong>';
+	return '<strong><a href="'.$admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;sess_ID='.$sess_ID.'&amp;blog=0">'.$link_text.'</a></strong>';
 }
 
 
@@ -373,7 +364,7 @@ function stat_session_hits( $sess_ID, $link_text )
  */
 function disp_clickable_log_IP( $hit_remote_addr )
 {
-	global $current_User, $blog, $admin_url;
+	global $current_User, $admin_url;
 	static $perm = NULL;
 
 	if( empty( $perm ) )
@@ -383,7 +374,7 @@ function disp_clickable_log_IP( $hit_remote_addr )
 
 	if( $perm == true )
 	{
-		return '<a href="?ctrl=stats&tab='.get_param( 'tab' ).'&colselect_submit=Filter+list&sess_ID=&remote_IP='.$hit_remote_addr.'&blog='.$blog.'">'.$hit_remote_addr.'</a>'
+		return '<a href="?ctrl=stats&tab='.get_param( 'tab' ).'&colselect_submit=Filter+list&sess_ID=&remote_IP='.$hit_remote_addr.'&blog=0">'.$hit_remote_addr.'</a>'
 				.' <a href="'.$admin_url.'?ctrl=antispam&amp;action=whois&amp;query='.$hit_remote_addr.'" onclick="return get_whois_info(\''.$hit_remote_addr.'\');">'
 				.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Check domain registration (WHOIS)...') ) ).'</a>';
 	}

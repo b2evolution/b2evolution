@@ -13,28 +13,21 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $sec_ID, $admin_url, $AdminUI, $referer_type_color, $hit_type_color, $Hit, $Settings, $localtimenow;
+global $blog, $admin_url, $AdminUI, $referer_type_color, $hit_type_color, $Hit, $Settings, $localtimenow;
 
 // All diagarm and table columns for current page:
 $diagram_columns = array(
-	'search'  => array( 'title' => T_('Referring searches'), 'link_data' => array( 'search',  '' ) ),
-	'referer' => array( 'title' => T_('Referers'),           'link_data' => array( 'referer', '' ) ),
-	'direct'  => array( 'title' => T_('Direct accesses'),    'link_data' => array( 'direct',  '' ) ),
-	'self'    => array( 'title' => T_('Self referred'),      'link_data' => array( 'self',    '' ) ),
-	'ajax'    => array( 'title' => T_('Ajax'),               'link_data' => array( '',        'ajax' ) ),
-	'special' => array( 'title' => T_('Special referrers'),  'link_data' => array( 'special', '' ) ),
-	'spam'    => array( 'title' => T_('Referer spam'),       'link_data' => array( 'spam',    '' ) ),
-	'admin'   => array( 'title' => T_('Admin'),              'link_data' => array( '',        'admin' ) ),
-	'session' => array( 'title' => T_('Sessions'),           'link_data' => false ),
+	'search'  => array( 'title' => T_('Referring searches'), 'link_data' => array( 'search' ) ),
+	'referer' => array( 'title' => T_('Referers'),           'link_data' => array( 'referer' ) ),
 );
 
-echo '<h2 class="page-title">'.T_('Hits from web browsers - Summary').get_manual_link('browser_hits_summary').'</h2>';
+echo '<h2 class="page-title">'.T_('Hits from search and referers - Summary').get_manual_link( 'search-referers-hits-summary' ).'</h2>';
 
 // Display panel with buttons to control a view of hits summary pages:
 display_hits_summary_panel( $diagram_columns );
 
 // Filter diagram columns by seleated types:
-$diagram_columns = get_filtered_hits_diagram_columns( 'browser', $diagram_columns );
+$diagram_columns = get_filtered_hits_diagram_columns( 'search_referers', $diagram_columns );
 
 // Check if it is a mode to display a live data:
 $is_live_mode = ( get_hits_summary_mode() == 'live' );
@@ -66,13 +59,6 @@ if( $is_live_mode )
 	$sessions_SQL->FROM( 'T_hitlog' );
 	$sessions_SQL->WHERE( 'hit_agent_type = "browser"' );
 
-	if( ! empty( $sec_ID ) )
-	{	// Filter by section:
-		$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
-		$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
-		$sessions_SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
-		$sessions_SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
-	}
 	if( $blog > 0 )
 	{	// Filter by collection:
 		$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
@@ -99,13 +85,6 @@ else
 	$sessions_SQL->SELECT( 'hags_date AS hit_date, hags_count_browser' );
 	$sessions_SQL->FROM( 'T_hits__aggregate_sessions' );
 
-	if( ! empty( $sec_ID ) )
-	{	// Filter by section:
-		$SQL->FROM_add( 'LEFT JOIN T_blogs ON hagg_coll_ID = blog_ID' );
-		$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
-		$sessions_SQL->FROM_add( 'LEFT JOIN T_blogs ON hags_coll_ID = blog_ID' );
-		$sessions_SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
-	}
 	if( $blog > 0 )
 	{	// Filter by collection:
 		$SQL->WHERE_and( 'hagg_coll_ID = '.$DB->quote( $blog ) );
@@ -132,7 +111,6 @@ $sessions = $DB->get_assoc( $sessions_SQL );
  */
 if( count( $res_hits ) )
 {
-
 	// Initialize params to filter by selected collection and/or group:
 	$section_params = empty( $blog ) ? '' : '&blog='.$blog;
 	$section_params .= empty( $sec_ID ) ? '' : '&sec_ID='.$sec_ID;
@@ -144,7 +122,7 @@ if( count( $res_hits ) )
 
 	// Initialize the data to open an url by click on bar item:
 	$chart['link_data'] = array();
-	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&agent_type=browser&referer_type=$param1$&hit_type=$param2$';
+	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&agent_type=browser&referer_type=$param1$';
 	$chart['link_data']['params'] = array();
 
 	$col_mapping = array();
@@ -185,10 +163,9 @@ if( count( $res_hits ) )
 			array_unshift( $chart['dates'], $last_date );
 		}
 
-		$hit_key = in_array( $row_stats['hit_type'], array( 'ajax', 'admin' ) ) ? $row_stats['hit_type'] : $row_stats['referer_type'];
-		if( isset( $col_mapping[ $hit_key ] ) )
+		if( isset( $col_mapping[ $row_stats['referer_type'] ] ) )
 		{
-			$chart['chart_data'][ $col_mapping[ $hit_key ] ][0] += $row_stats['hits'];
+			$chart['chart_data'][ $col_mapping[ $row_stats['referer_type'] ] ][0] += $row_stats['hits'];
 		}
 
 		if( isset( $col_mapping['session'] ) )
@@ -286,7 +263,6 @@ if( count( $res_hits ) )
 							if( $is_live_data )
 							{
 								$diagram_col_url_params = empty( $diagram_column_data['link_data'][0] ) ? '' : '&amp;referer_type='.$diagram_column_data['link_data'][0];
-								$diagram_col_url_params .= empty( $diagram_column_data['link_data'][1] ) ? '' : '&amp;hit_type='.$diagram_column_data['link_data'][1];
 								echo '<a href="'.$link_text.$diagram_col_url_params.'">'.$hits[ $diagram_column_key ].'</a>';
 							}
 							else
@@ -306,11 +282,10 @@ if( count( $res_hits ) )
 			}
 
 			// Increment hitcounter:
-			$hit_key = in_array( $row_stats['hit_type'], array( 'ajax', 'admin' ) ) ? $row_stats['hit_type'] : $row_stats['referer_type'];
-			if( isset( $hits[ $hit_key ] ) )
+			if( isset( $hits[ $row_stats['referer_type'] ] ) )
 			{
-				$hits[ $hit_key ] += $row_stats['hits'];
-				$hits_total[ $hit_key ] += $row_stats['hits'];
+				$hits[ $row_stats['referer_type'] ] += $row_stats['hits'];
+				$hits_total[ $row_stats['referer_type'] ] += $row_stats['hits'];
 			}
 		}
 
@@ -349,7 +324,6 @@ if( count( $res_hits ) )
 						if( $is_live_data )
 						{
 							$diagram_col_url_params = empty( $diagram_column_data['link_data'][0] ) ? '' : '&amp;referer_type='.$diagram_column_data['link_data'][0];
-							$diagram_col_url_params .= empty( $diagram_column_data['link_data'][1] ) ? '' : '&amp;hit_type='.$diagram_column_data['link_data'][1];
 							echo '<a href="'.$link_text.$diagram_col_url_params.'">'.$hits[ $diagram_column_key ].'</a>';
 						}
 						else
@@ -384,7 +358,6 @@ if( count( $res_hits ) )
 					if( $is_live_data )
 					{
 						$diagram_col_url_params = empty( $diagram_column_data['link_data'][0] ) ? '' : '&amp;referer_type='.$diagram_column_data['link_data'][0];
-						$diagram_col_url_params .= empty( $diagram_column_data['link_data'][1] ) ? '' : '&amp;hit_type='.$diagram_column_data['link_data'][1];
 						echo '<a href="'.$link_text_total.$diagram_col_url_params.'">'.$hits_total[ $diagram_column_key ].'</a>';
 					}
 					else
