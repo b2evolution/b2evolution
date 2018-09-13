@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $sec_ID, $admin_url, $AdminUI, $agent_type_color, $hit_type_color, $Hit, $Settings, $localtimenow;
+global $blog, $sec_ID, $admin_url, $AdminUI, $hit_type_color, $Hit, $Settings, $localtimenow;
 
 // All diagarm and table columns for current page:
 $diagram_columns = array(
@@ -26,6 +26,10 @@ $diagram_columns = array(
 	'api'              => array( 'title' => T_('API'),               'link_data' => array( 'api',      '' ) ),
 	'unknown'          => array( 'title' => T_('Other'),             'link_data' => array( '',         'unknown' ) ),
 );
+foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
+{
+	$diagram_columns[ $diagram_column_key ]['color'] = $hit_type_color[ $diagram_column_key ];
+}
 
 echo '<h2 class="page-title">'.T_('Global hits - Summary').get_manual_link('global_hits_summary').'</h2>';
 
@@ -172,7 +176,7 @@ if( count( $res_hits ) )
 	$chart['series_color'] = array();
 	foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
 	{
-		$chart['series_color'][ $col_num ] = $hit_type_color[ $diagram_column_key ];
+		$chart['series_color'][ $col_num ] = $diagram_column_data['color'];
 		array_unshift( $chart[ 'chart_data' ][ $col_num++ ], $diagram_column_data['title'] );
 	}
 
@@ -201,7 +205,7 @@ if( count( $res_hits ) )
 	{
 		$diagram_col_url_params = empty( $diagram_column_data['link_data'][0] ) ? '' : '&amp;hit_type='.$diagram_column_data['link_data'][0];
 		$diagram_col_url_params .= empty( $diagram_column_data['link_data'][1] ) ? '' : '&amp;agent_type='.$diagram_column_data['link_data'][1];
-		echo '<th style="background-color:#'.$hit_type_color[ $diagram_column_key ].'"><a href="'.$admin_url.'?ctrl=stats&amp;tab=hits'.$diagram_col_url_params.$section_params.'">'.$diagram_column_data['title'].'</a></th>';
+		echo '<th style="background-color:#'.$diagram_column_data['color'].'"><a href="'.$admin_url.'?ctrl=stats&amp;tab=hits'.$diagram_col_url_params.$section_params.'">'.$diagram_column_data['title'].'</a></th>';
 	}
 	echo '<th class="lastcol">'.T_('Total').'</th>';
 	echo '</tr>';

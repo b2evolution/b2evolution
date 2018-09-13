@@ -13,13 +13,17 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $AdminUI, $referer_type_color, $hit_type_color, $Hit, $Settings, $localtimenow;
+global $blog, $admin_url, $AdminUI, $referer_type_color, $Hit, $Settings, $localtimenow;
 
 // All diagarm and table columns for current page:
 $diagram_columns = array(
 	'search'  => array( 'title' => T_('Referring searches'), 'link_data' => array( 'search' ) ),
 	'referer' => array( 'title' => T_('Referers'),           'link_data' => array( 'referer' ) ),
 );
+foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
+{
+	$diagram_columns[ $diagram_column_key ]['color'] = $referer_type_color[ $diagram_column_key ];
+}
 
 echo '<h2 class="page-title">'.T_('Hits from search and referers - Summary').get_manual_link( 'search-referers-hits-summary' ).'</h2>';
 
@@ -180,7 +184,7 @@ if( count( $res_hits ) )
 	$chart['series_color'] = array();
 	foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
 	{
-		$chart['series_color'][ $col_num ] = $referer_type_color[ $diagram_column_key ];
+		$chart['series_color'][ $col_num ] = $diagram_column_data['color'];
 		array_unshift( $chart[ 'chart_data' ][ $col_num++ ], $diagram_column_data['title'] );
 	}
 
@@ -209,13 +213,13 @@ if( count( $res_hits ) )
 			<?php
 			if( isset( $diagram_columns['session'] ) )
 			{
-				echo '<th style="background-color:#'.$referer_type_color['session'].'">'.$diagram_columns['session']['title'].'</th>';
+				echo '<th style="background-color:#'.$diagram_columns['session']['color'].'">'.$diagram_columns['session']['title'].'</th>';
 			}
 			foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
 			{
 				if( $diagram_column_key != 'session' )
 				{
-					echo '<th style="background-color:#'.$referer_type_color[ $diagram_column_key ].'">'.$diagram_column_data['title'].'</th>';
+					echo '<th style="background-color:#'.$diagram_column_data['color'].'">'.$diagram_column_data['title'].'</th>';
 				}
 			}
 			?>

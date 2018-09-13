@@ -312,7 +312,11 @@ switch( $action )
 		{
 			$filter_hits_diagram_cols = array();
 		}
-		$filter_hits_diagram_cols[ $tab3 ] = param( 'filter_types', 'array:string' );
+		$filter_hits_diagram_cols[ $tab3 ] = param( 'filter_types', 'array:string', NULL );
+		if( empty( $filter_hits_diagram_cols[ $tab3 ] ) )
+		{
+			unset( $filter_hits_diagram_cols[ $tab3 ] );
+		}
 		$UserSettings->set( 'filter_hits_diagram_cols', serialize( $filter_hits_diagram_cols ) );
 
 		// Save the filter data in settings of current user:
