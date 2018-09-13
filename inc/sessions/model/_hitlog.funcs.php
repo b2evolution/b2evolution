@@ -1097,6 +1097,7 @@ function display_hits_summary_panel( $diagram_columns = array() )
 		$Form->hidden( 'tab', get_param( 'tab' ) );
 		$Form->hidden( 'tab3', get_param( 'tab3' ) );
 		$Form->hidden( 'blog', get_param( 'blog' ) );
+		$Form->hidden( 'sec_ID', get_param( 'sec_ID' ) );
 		$Form->hidden( 'action', 'filter_hits_diagram' );
 		$Form->add_crumb( 'filterhitsdiagram' );
 

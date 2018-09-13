@@ -319,7 +319,7 @@ switch( $action )
 		$UserSettings->dbupdate();
 
 		// Redirect to referer page:
-		header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog, 303 ); // Will EXIT
+		header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog.( empty( $sec_ID ) ? '' : '&sec_ID='.$sec_ID ), 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 }
