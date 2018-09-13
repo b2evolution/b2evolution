@@ -91,7 +91,7 @@ $skin_type_options = array(
 		'mobile'  => T_('Phone skins'),
 		'tablet'  => T_('Tablet skins'),
 	);
-if( get_param( 'tab' ) != 'current_skin' )
+if( get_param( 'tab' ) != 'coll_skin' && get_param( 'tab' ) != 'site_skin' )
 {	// Allow install feed and sitemap skins only on normal mode and don't allow when we select new skin for collection:
 	$skin_type_options['feed'] = T_('Feed skins');
 	$skin_type_options['sitemap'] = T_('Sitemap skins');
@@ -390,7 +390,7 @@ foreach( $skin_folders_data as $skin_folder => $data )
 															.'&amp;skin_folder='.rawurlencode( $skin_folder )
 															.'&amp;redirect_to='.rawurlencode( $redirect_to_after_install )
 															.'&amp;'.url_crumb( 'skin' ),
-					'onclick'         => ( $tab == 'current_skin' ? 'return confirm_skin_selection( this, "'.$folder_Skin->type.'" )' : '' ),
+					'onclick'         => ( $tab == 'coll_skin' ? 'return confirm_skin_selection( this, "'.$folder_Skin->type.'" )' : '' ),
 				);
 				$skin_folders_data[$skin_folder]['status'] = 'ok';
 			}
@@ -471,7 +471,7 @@ $Form->end_form( $form_buttons );
 
 $block_item_Widget->disp_template_replaced( 'block_end' );
 
-if( $tab == 'current_skin' )
+if( $tab == 'coll_skin' )
 {	// JavaScript code to confirm skin selection:
 	echo_confirm_skin_selection_js();
 }

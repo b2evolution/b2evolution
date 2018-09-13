@@ -6554,9 +6554,9 @@ class Blog extends DataObject
 	/**
 	 * Reset widgets for this collection
 	 *
-	 * @param string Skin type: 'normal', 'tablet', 'mobile'
+	 * @param string Skin type: 'all', 'normal', 'mobile', 'tablet'
 	 */
-	function reset_widgets( $skin_type = 'normal' )
+	function reset_widgets( $skin_type = 'all' )
 	{
 		if( empty( $this->ID ) )
 		{	// This function should be called only for created collection:
@@ -6565,11 +6565,33 @@ class Blog extends DataObject
 
 		global $DB;
 
-		// Remove previous widgets:
-		$DB->query( 'DELETE FROM T_widget__widget WHERE wi_coll_ID = '.$DB->quote( $this->ID ) );
+		$all_skin_types = array( 'normal', 'mobile', 'tablet' );
 
-		// Add default widgets:
-		$this->setup_default_widgets( $skin_type );
+		if( $skin_type == 'all' )
+		{	// Reset widgets for all skin types:
+			$skin_types = $all_skin_types;
+		}
+		elseif( in_array( $skin_type, $all_skin_types ) )
+		{	// Reset widgets only for requested skin type:
+			$skin_types = array( $skin_type );
+		}
+		else
+		{	// No correct skin type is requested:
+			return;
+		}
+
+		foreach( $skin_types as $skin_type )
+		{	// Remove previous widgets:
+			$DB->query( 'DELETE T_widget__container, T_widget__widget
+				 FROM T_widget__container
+				 LEFT JOIN T_widget__widget ON wico_ID = wi_wico_ID
+				WHERE wico_coll_ID = '.$DB->quote( $this->ID )
+					.( empty( $skin_type ) ? '' :
+				' AND wico_skin_type = '.$DB->quote( $skin_type ) ) );
+
+			// Add default widgets:
+			$this->setup_default_widgets( $skin_type );
+		}
 	}
 }
 

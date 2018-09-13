@@ -176,8 +176,6 @@ switch( $action )
 					if( $edited_Blog->load_from_Request( array() ) )
 					{ // Commit update to the DB:
 						$edited_Blog->dbupdate();
-						// Re-scan and create widget containers from new switched skin if they don't exist for the edited collection:
-						// ???? $edited_Blog->db_save_main_containers();
 
 						if( param( 'reset_widgets', 'integer', 0 ) )
 						{	// Widget must be reseted:

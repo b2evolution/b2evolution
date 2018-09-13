@@ -96,12 +96,10 @@ switch( $action )
 			// Set new installed skins for the selected collection:
 			$edited_Blog->set( $skin_type.'_skin_ID', $edited_Skin->ID );
 			$edited_Blog->dbupdate();
-			// Re-scan and create widget containers from new switched skin if they don't exist for the edited collection:
-			$edited_Blog->db_save_main_containers();
 
 			if( param( 'reset_widgets', 'integer', 0 ) )
 			{	// Reset previous widgets with new from skin default widget declarations:
-				$edited_Blog->reset_widgets( $edited_Skin->type );
+				$edited_Blog->reset_widgets( $skin_type );
 			}
 
 			$Messages->add( T_('The blog skin has been changed.')
