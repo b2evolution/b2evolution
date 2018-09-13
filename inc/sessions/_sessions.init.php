@@ -275,6 +275,9 @@ class sessions_Module extends Module
 										'api' => array(
 											'text' => T_('API hits'),
 											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=api&amp;blog='.$blog ),
+										'search_referers' => array(
+											'text' => T_('Search & Referers'),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=search_referers&amp;blog='.$blog ),
 										'robot' => array(
 											'text' => T_('Robot hits'),
 											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=robot&amp;blog='.$blog ),

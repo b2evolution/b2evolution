@@ -282,19 +282,32 @@ switch( $action )
 		// We have EXITed already at this point!!
 		break;
 
-	case 'filter_aggregated':
-		// Filter the aggregated data by date:
+	case 'filter_hits_diagram':
+		// Filter hits diagram:
 
 		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'aggfilter' );
+		$Session->assert_received_crumb( 'filterhitsdiagram' );
+
+		if( param( 'agg_period', 'string', NULL ) !== NULL )
+		{	// Filter the aggregated data by date:
+			$UserSettings->set( 'agg_period', $agg_period );
+			if( $agg_period == 'specific_month' )
+			{
+				$UserSettings->set( 'agg_month', param( 'agg_month', 'integer' ) );
+				$UserSettings->set( 'agg_year', param( 'agg_year', 'integer' ) );
+			}
+		}
+
+		// Filter hits diagram by types:
+		$filter_hits_diagram_cols = $UserSettings->get( 'filter_hits_diagram_cols' );
+		if( empty( $filter_hits_diagram_cols ) )
+		{
+			$filter_hits_diagram_cols = array();
+		}
+		$filter_hits_diagram_cols[ $tab3 ] = param( 'filter_types', 'array:string' );
+		$UserSettings->set( 'filter_hits_diagram_cols', serialize( $filter_hits_diagram_cols ) );
 
 		// Save the filter data in settings of current user:
-		$UserSettings->set( 'agg_period', param( 'agg_period', 'string' ) );
-		if( $agg_period == 'specific_month' )
-		{
-			$UserSettings->set( 'agg_month', param( 'agg_month', 'integer' ) );
-			$UserSettings->set( 'agg_year', param( 'agg_year', 'integer' ) );
-		}
 		$UserSettings->dbupdate();
 
 		// Redirect to referer page:
@@ -360,6 +373,13 @@ switch( $tab )
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'api-hits-summary' );
+				break;
+
+			case 'search_referers':
+				$AdminUI->breadcrumbpath_add( T_('Search & Referers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'search-referers-hits-summary' );
 				break;
 
 			case 'robot':
@@ -543,6 +563,10 @@ switch( $AdminUI->get_path( 1 ) )
 
 			case 'api':
 				$AdminUI->disp_view( 'sessions/views/_stats_api.view.php' );
+				break;
+
+			case 'search_referers':
+				$AdminUI->disp_view( 'sessions/views/_stats_search_referers.view.php' );
 				break;
 
 			case 'robot':
