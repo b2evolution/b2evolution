@@ -1144,8 +1144,10 @@ function display_hits_summary_panel( $diagram_columns = array() )
 		$filter_hits_diagram_cols = $UserSettings->get( 'filter_hits_diagram_cols' );
 		foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
 		{	// Filter hits by type:
-			$is_checked = ! isset( $filter_hits_diagram_cols[ $tab3 ] ) || in_array( $diagram_column_key, $filter_hits_diagram_cols[ $tab3 ] );
-			$Form->checkbox_basic_input( 'filter_types[]', $is_checked, $diagram_column_data['title'], array( 'value' => $diagram_column_key ) );
+			$Form->checkbox_basic_input( 'filter_types[]',
+				( ! isset( $filter_hits_diagram_cols[ $tab3 ] ) || empty( $filter_hits_diagram_cols[ $tab3 ] ) || in_array( $diagram_column_key, $filter_hits_diagram_cols[ $tab3 ] ) ), // Is checked?
+				'<span style="color:#'.$diagram_column_data['color'].'">'.$diagram_column_data['title'].'</span>', // Colored title
+				array( 'value' => $diagram_column_key ) ); // Value
 		}
 
 		$Form->end_form( array( array( 'submit', 'submit', T_('Filter'), 'btn-info' ) ) );
@@ -1231,6 +1233,11 @@ function get_filtered_hits_diagram_columns( $diagram_type, $diagram_columns )
 
 	if( ! isset( $filter_hits_diagram_cols[ $diagram_type ] ) )
 	{	// No filter is defiend yet:
+		return $diagram_columns;
+	}
+
+	if( empty( $filter_hits_diagram_cols[ $diagram_type ] ) )
+	{	// If all options are unchecked then check them all:
 		return $diagram_columns;
 	}
 
