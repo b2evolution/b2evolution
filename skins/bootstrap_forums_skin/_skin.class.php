@@ -141,6 +141,13 @@ class bootstrap_forums_Skin extends Skin
 						'size' => '7',
 						'allow_empty' => true,
 					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -360,12 +367,15 @@ class bootstrap_forums_Skin extends Skin
 		}
 
 		if( in_array( $disp, array( 'single', 'page' ) ) )
-		{	// Init JS to autcomplete the user logins
+		{	// Init JS to autcomplete the user logins:
 			require_js( '#bootstrap_typeahead#', 'blog' );
 			init_autocomplete_login_js( 'blog', 'typeahead' );
-			// Initialize date picker for _item_expert.form.php
+			// Initialize date picker for _item_expert.form.php:
 			init_datepicker_js( 'blog' );
 		}
+
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
 
 

@@ -119,6 +119,13 @@ class bootstrap_manual_Skin extends Skin
 						'size' => '7',
 						'allow_empty' => true,
 					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '100',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
 					'page_navigation' => array(
 						'label' => T_('Page navigation'),
 						'note' => T_('(EXPERIMENTAL)').' '.T_('Check this to show previous/next page links to navigate inside the <b>current</b> chapter.'),
@@ -294,6 +301,9 @@ class bootstrap_manual_Skin extends Skin
 		{ // Include JS code for left navigation panel only when it is displayed:
 			$this->require_js( 'left_navigation.js' );
 		}
+
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
 
 
