@@ -6326,8 +6326,8 @@ class Blog extends DataObject
 		// Load skin functions needed to get the skin containers
 		load_funcs( 'skins/_skin.funcs.php' );
 
-		// Get all containers declared in the given blog's skins:
-		$blog_containers = get_skin_containers( $this->get_skin_ids() );
+		// Get all containers declared in the requested collection's skin:
+		$blog_containers = get_skin_containers( array( $coll_skin_ID ) );
 
 		// Install additional sub containers from default config:
 		foreach( $skin_widgets as $container_code => $container_widgets )
@@ -6338,7 +6338,7 @@ class Blog extends DataObject
 				$blog_containers[ $container_code ] = array(
 						isset( $container_widgets['name'] ) ? $container_widgets['name'] : $container_code,
 						isset( $container_widgets['order'] ) ? $container_widgets['order'] : 1,
-						0, // wico_main = 0
+						0, // wico_main = 0 (Sub-Container)
 					);
 			}
 		}
@@ -6347,11 +6347,11 @@ class Blog extends DataObject
 		$widget_containers_sql_rows = array();
 		foreach( $blog_containers as $container_code => $wico_data )
 		{
-			$widget_containers_sql_rows[] = '( "'.$container_code.'", "'.$wico_data[0].'", '.$this->ID.', '.$wico_data[1].', '.( isset( $wico_data[2] ) ? intval( $wico_data[2] ) : '1' ).' )';
+			$widget_containers_sql_rows[] = '( '.$DB->quote( $container_code ).', '.$DB->quote( $skin_type ).', '.$DB->quote( $wico_data[0] ).', '.$this->ID.', '.$DB->quote( $wico_data[1] ).', '.( isset( $wico_data[2] ) ? intval( $wico_data[2] ) : '1' ).' )';
 		}
 
 		// Insert widget containers records by one SQL query
-		$DB->query( 'INSERT INTO T_widget__container ( wico_code, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES'
+		$DB->query( 'INSERT INTO T_widget__container ( wico_code, wico_skin_type, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES'
 			.implode( ', ', $widget_containers_sql_rows ) );
 
 		$insert_id = $DB->insert_id;
@@ -6370,7 +6370,7 @@ class Blog extends DataObject
 			}
 
 			if( isset( $container_widgets['coll_type'] ) &&
-			    ! is_allowed_option( $kind, $container_widgets['coll_type'] ) )
+			    ! is_allowed_option( $this->get( 'type' ), $container_widgets['coll_type'] ) )
 			{	// Skip container because it should not be installed for the given collection kind:
 				continue;
 			}
