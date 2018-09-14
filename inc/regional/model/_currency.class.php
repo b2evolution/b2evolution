@@ -24,6 +24,7 @@ class Currency extends DataObject
 	var $shortcut = '';
 	var $name = '';
 	var $enabled = 1;
+	var $default = 0;
 
 	/**
 	 * Constructor
@@ -42,6 +43,7 @@ class Currency extends DataObject
 			$this->shortcut      = $db_row->curr_shortcut;
 			$this->name          = $db_row->curr_name;
 			$this->enabled       = $db_row->curr_enabled;
+			$this->default       = $db_row->curr_default;
 		}
 	}
 
@@ -56,6 +58,41 @@ class Currency extends DataObject
 		return array(
 				array( 'table'=>'T_regional__country', 'fk'=>'ctry_curr_ID', 'msg'=>T_('%d related countries') ),
 			);
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+ 	 *
+	 * This will be typically overriden by child classses.
+	 *
+	 * @return boolean true on success, false on failure to update, NULL if no update necessary
+	 */
+	function dbupdate()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		$r = parent::dbupdate();
+
+		if( $r && $this->get( 'default' ) && isset( $this->previous_default ) && ! $this->previous_default )
+		{	// If this currency has been changed to default from not default,
+			// We should remove this option from all other currency to keep only single default currency in system:
+			$DB->query( 'UPDATE T_regional__currency
+				  SET curr_default = 0
+				WHERE curr_default = 1
+				  AND curr_ID != '.$this->ID );
+		}
+
+		if( $r )
+		{
+			$DB->commit();
+		}
+		else
+		{
+			$DB->rollback();
+		}
 	}
 
 
@@ -107,13 +144,14 @@ class Currency extends DataObject
 		switch( $parname )
 		{
 			case 'code':
-				$parvalue = strtoupper($parvalue);
-			case 'shortcut':
-			case 'name':
-			case 'enabled':
-			default:
-				return $this->set_param( $parname, 'string', $parvalue, $make_null );
+				$parvalue = strtoupper( $parvalue );
+				break;
+			case 'default':
+				$this->previous_default = $this->get( $parname );
+				break;
 		}
+
+		return parent::set( $parname, $parvalue, $make_null );
 	}
 
 

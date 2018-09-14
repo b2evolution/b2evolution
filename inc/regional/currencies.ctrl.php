@@ -50,6 +50,7 @@ switch( $action )
 {
 	case 'disable_currency':
 	case 'enable_currency':
+	case 'default_currency':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'currency' );
 
@@ -63,15 +64,22 @@ switch( $action )
 			break;
 		}
 
-		if ( $action == 'disable_currency' )
-		{	// Disable this currency by setting flag to false.
+		if( $action == 'disable_currency' )
+		{	// Disable this currency by setting flag to false:
 			$edited_Currency->set( 'enabled', 0 );
 			$Messages->add( sprintf( T_('Disabled currency (%s, #%d).'), $edited_Currency->name, $edited_Currency->ID ), 'success' );
 		}
-		elseif ( $action == 'enable_currency' )
-		{	// Enable currency by setting flag to true.
+		elseif( $action == 'enable_currency' )
+		{	// Enable currency by setting flag to true:
 			$edited_Currency->set( 'enabled', 1 );
 			$Messages->add( sprintf( T_('Enabled currency (%s, #%d).'), $edited_Currency->name, $edited_Currency->ID ), 'success' );
+		}
+		elseif( $action == 'default_currency' )
+		{	// Make this currency to using by default:
+			$edited_Currency->set( 'default', 1 );
+			// Force this currency to be enabled automatically:
+			$edited_Currency->set( 'enabled', 1 );
+			$Messages->add( sprintf( T_('Currency (%s, #%d) has been changed to default.'), $edited_Currency->name, $edited_Currency->ID ), 'success' );
 		}
 
 		// Update db with new flag value.

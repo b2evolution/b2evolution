@@ -464,6 +464,7 @@ $schema_queries = array(
 			curr_shortcut varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
 			curr_name varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
 			curr_enabled tinyint(1) NOT NULL DEFAULT 1,
+			curr_default tinyint(1) NOT NULL DEFAULT 0,
 			PRIMARY KEY curr_ID (curr_ID),
 			UNIQUE curr_code (curr_code)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

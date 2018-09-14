@@ -35,6 +35,34 @@ $Results->Cache = & get_CurrencyCache();
 
 $Results->title = T_('Currencies list').get_manual_link('currencies_list');
 
+/**
+ * Display icon to set default currency
+ *
+ * @param integer Is default currency?
+ * @param integer Currency ID
+ * @return string
+ */
+function curr_td_default( $curr_default, $curr_ID )
+{
+	if( $curr_default )
+	{
+		return get_icon( 'bullet_full', 'imgtag', array( 'title' => T_('This is a default currency') ) );
+	}
+	else
+	{
+		return action_icon( T_('Make this currency as default!'), 'bullet_empty',
+			regenerate_url( 'action', 'action=default_currency&amp;curr_ID='.$curr_ID.'&amp;'.url_crumb( 'currency' ) ) );
+	}
+}
+$Results->cols[] = array(
+		'th' => T_('Default'),
+		'order' => 'curr_default',
+		'default_dir' => 'D',
+		'td' => '%curr_td_default( #curr_default#, #curr_ID# )%',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap',
+	);
+
 /*
  * STATUS TD:
  */
@@ -62,8 +90,10 @@ $Results->cols[] = array(
 		'th' => /* TRANS: shortcut for enabled */ T_('En'),
 		'th_title' => T_('Enabled'),
 		'order' => 'curr_enabled',
+		'default_dir' => 'D',
 		'td' => '%curr_td_enabled( #curr_enabled#, #curr_ID# )%',
-		'td_class' => 'center'
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'shrinkwrap',
 	);
 
 /**

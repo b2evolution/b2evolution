@@ -10813,6 +10813,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13280, 'Upgrade table currencies...' ) )
+	{	// part of 7.0.0-alpha
+		db_add_col( 'T_regional__currency', 'curr_default', 'tinyint(1) NOT NULL DEFAULT 0' );
+		$DB->query( 'UPDATE T_regional__currency
+			  SET curr_default = 1
+			WHERE curr_code = "USD"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
