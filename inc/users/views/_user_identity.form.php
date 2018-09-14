@@ -408,7 +408,7 @@ if( $action != 'view' )
 				$Form->infostart = $Form->infostart.$inputstart_icon;
 				$org_role_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'] ).' &nbsp; '
 					.'<input type="hidden" name="org_roles[]" value="" />';
-				$org_priority_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Priority').':</strong> '.$org_data['priority'] ).' &nbsp; '
+				$org_priority_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Order').':</strong> '.$org_data['priority'] ).' &nbsp; '
 						.'<input type="hidden" name="org_priorities[]" value="" />';
 				$org_hidden_fields = '<input type="hidden" name="organizations[]" value="'.$org_ID.'" />';
 				$Form->info_field( T_('Organization'), $org_data['name'], array(
@@ -423,7 +423,7 @@ if( $action != 'view' )
 				if( ! empty( $org_ID ) )
 				{
 					$perm_edit_org_role = ( $user_Organization->owner_user_ID == $current_User->ID ) || ( $user_Organization->perm_role == 'owner and member' && $org_data['accepted'] );
-					$perm_edit_org_priority = ( $user_Organization->owner_user_ID == $current_User->ID ) || ( $user_Organization->perm_priority == 'owner and member' && $org_data['accepted'] );
+					$perm_edit_org_priority = ( $user_Organization->owner_user_ID == $current_User->ID || $perm_edit_orgs );
 				}
 
 				$Form->output = false;
@@ -440,12 +440,12 @@ if( $action != 'view' )
 				}
 				if( $perm_edit_org_priority )
 				{
-					$org_priority_input = ' &nbsp; <strong>'.T_('Priority').':</strong> '.
+					$org_priority_input = ' &nbsp; <strong>'.T_('Order').':</strong> '.
 							$Form->text_input( 'org_priorities[]', $org_data['priority'], 10, '', '', array( 'type' => 'number', 'min' => -2147483648, 'max' => 2147483647 ) ).' &nbsp; ';
 				}
 				else
 				{
-					$org_priority_input = ( empty( $org_data['priority'] ) ? '' : ' &nbsp; <strong>'.T_('Priority').':</strong> '.$org_data['priority'] ).' &nbsp; '
+					$org_priority_input = ( empty( $org_data['priority'] ) ? '' : ' &nbsp; <strong>'.T_('Order').':</strong> '.$org_data['priority'] ).' &nbsp; '
 						.'<input type="hidden" name="org_priorities[]" value="" />';
 				}
 				$Form->switch_layout( NULL );

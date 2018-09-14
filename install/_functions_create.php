@@ -1935,12 +1935,15 @@ function create_demo_contents()
 	}
 
 	task_begin( 'Creating default sections... ' );
-	$DB->query( 'INSERT INTO T_section ( sec_ID, sec_name, sec_order, sec_owner_user_ID )
-		VALUES ( 2, "Home",   2, 1 ),
-		       ( 3, "Blogs",  3, '.$jay_moderator_ID.' ),
-		       ( 4, "Photos", 4, '.$dave_blogger_ID.' ),
-		       ( 5, "Forums", 5, '.$paul_blogger_ID.' ),
-		       ( 6, "Manual", 6, '.$dave_blogger_ID.' )' );
+	if( $demo_content_type != 'minisite' )
+	{
+		$DB->query( 'INSERT INTO T_section ( sec_ID, sec_name, sec_order, sec_owner_user_ID )
+			VALUES ( 2, "Home",   2, 1 ),
+			       ( 3, "Blogs",  3, '.$jay_moderator_ID.' ),
+			       ( 4, "Photos", 4, '.$dave_blogger_ID.' ),
+			       ( 5, "Forums", 5, '.$paul_blogger_ID.' ),
+			       ( 6, "Manual", 6, '.$dave_blogger_ID.' )' );
+	}
 	task_end();
 
 	// Store the item IDs in this array in order to create additional comments

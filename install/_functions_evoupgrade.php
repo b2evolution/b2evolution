@@ -10324,6 +10324,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12969, 'Upgrade user organizations table...' ) )
+	{	// part of 6.10.3-stable
+		db_drop_col( 'T_users__organization', 'org_perm_priority' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '

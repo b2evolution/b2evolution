@@ -6435,9 +6435,9 @@ function users_results( & $UserList, $params = array() )
 	}
 
 	if( $params['display_priority'] )
-	{	// Display organizational priority:
+	{	// Display organizational order:
 		$UserList->cols[] = array(
-			'th' => T_('Priority'),
+			'th' => T_('Order'),
 			'th_class' => 'small',
 			'td_class' => 'small',
 			'order' => 'uorg_priority',
@@ -7405,8 +7405,10 @@ function user_td_org_actions( $org_ID, $user_ID )
 	global $current_User;
 
 	$r = '';
-	if( $current_User->can_moderate_user( $user_ID ) )
-	{ // Current user can moderate this user
+	$OrganizationCache = & get_OrganizationCache();
+	if( ( $user_Organization = & $OrganizationCache->get_by_ID( $org_ID, false, false ) ) &&
+	    $current_User->check_perm( 'orgs', 'edit', true, $user_Organization ) )
+	{ // Current user can edit membership information:
 		$link_params = array(
 				'onclick' => 'return user_edit( '.$org_ID.', '.$user_ID.' );'
 			);

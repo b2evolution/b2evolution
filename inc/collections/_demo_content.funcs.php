@@ -954,6 +954,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					$Skin->set_setting( 'section_3_text_color', '#FFFFFF' );
 					$Skin->set_setting( 'section_3_link_color', '#FFFFFF' );
 					$Skin->set_setting( 'section_3_link_h_color', '#FFFFFF' );
+					$Skin->set_setting( 'section_4_image_file_ID', NULL );
 					$Skin->dbupdate_settings();
 				}
 			}

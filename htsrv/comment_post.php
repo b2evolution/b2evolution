@@ -454,6 +454,8 @@ if( $action == 'preview' )
 	// This message serves the purpose that the next page will not even try to retrieve preview from cache... (and won't collect data to be cached)
 	// This is session based, so it's not 100% safe to prevent caching. We are also using explicit caching prevention whenever personal data is displayed
 	$Messages->add_to_group( T_('This is a preview only! Do not forget to send your comment!'), 'error', /* TRANS: Noun */ T_('Preview:') );
+	// Set affixed variable to float the Messages:
+	$Messages->affixed = true;
 
 	if( $comments_email_is_detected )
 	{ // Comment contains an email address, We should show an error about this
@@ -635,6 +637,9 @@ if( $Comment->ID )
 			break;
 	}
 	$Messages->add( $success_message, 'success' );
+
+	// Set affixed variable to float the Messages:
+	$Messages->affixed = true;
 
 	if( !is_logged_in() )
 	{

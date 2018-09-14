@@ -135,7 +135,7 @@ jQuery( document ).on( 'click', '.evo_designer__action_add, .evo_designer__actio
 	if( typeof( b2evo_widget_add_url ) != 'undefined' )
 	{	// If global widget add form url is defined:
 		var container_block = jQuery( this ).closest( '.evo_designer__container' );
-		var container = jQuery( '.evo_container[data-code="' + container_block.data( 'code' ) + '"]' );
+		var container = jQuery( evo_widget_container_selector( container_block ) );
 		if( container.length && container.data( 'can-edit' ) == '1' )
 		{	// Load widget adding list only if it is allowed for current user:
 			var widget_action_url = jQuery( this ).hasClass( 'evo_designer__action_add' ) ? b2evo_widget_add_url : b2evo_widget_list_url;
@@ -146,9 +146,25 @@ jQuery( document ).on( 'click', '.evo_designer__action_add, .evo_designer__actio
 	}
 } );
 
+jQuery( document ).on( 'click', '.evo_designer__container', function( e )
+{	// Link to add new widget to empty container:
+	if( jQuery( e.target ).is( '.evo_designer__action' ) )
+	{	// Ignore if click is on action icons:
+		return;
+	}
+
+	if( jQuery( evo_widget_container_selector( jQuery( this ) ) ).find( '.evo_widget' ).length > 0 )
+	{	// Skip not empty container:
+		return;
+	}
+
+	// Call event to add new widget:
+	jQuery( this ).find( '.evo_designer__action_add' ).click();
+} );
+
 jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 {	// Link to edit widget:
-	if( jQuery( e.target ).is( '.evo_designer__action' )  )
+	if( jQuery( e.target ).is( '.evo_designer__action' ) )
 	{	// Ignore if click is on action icons:
 		return;
 	}
@@ -489,6 +505,18 @@ function evo_widget_designer_block_selector( widget )
 	}
 
 	return '.evo_designer__widget[data-id=' + widget.data( 'id' ) + ']' + additional_select;
+}
+
+
+/**
+ * Get jQuery selector for widget container by containerdesigner block
+ *
+ * @param object Container designer block
+ * @returns string
+ */
+function evo_widget_container_selector( container_block )
+{
+	return '.evo_container[data-code="' + container_block.data( 'code' ) + '"]';
 }
 
 
