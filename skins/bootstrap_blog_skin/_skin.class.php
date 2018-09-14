@@ -222,7 +222,18 @@ class bootstrap_blog_Skin extends Skin
 
 		/* Page Top */
 		$default_widgets['page_top'] = array(
-			array( 10, 'user_links' ),
+			array( 10, 'social_links', 'params' => array(
+					'link1'      => 'twitter',
+					'link1_href' => 'https://twitter.com/b2evolution/',
+					'link2'      => 'facebook',
+					'link2_href' => 'https://www.facebook.com/b2evolution',
+					'link3'      => 'googleplus',
+					'link3_href' => 'https://plus.google.com/+b2evolution/posts',
+					'link4'      => 'linkedin',
+					'link4_href' => 'https://www.linkedin.com/company/b2evolution-net',
+					'link5'      => 'github',
+					'link5_href' => 'https://github.com/b2evolution/b2evolution',
+				) ),
 		);
 
 		/* Sidebar */

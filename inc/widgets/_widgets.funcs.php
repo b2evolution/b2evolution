@@ -148,15 +148,15 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
 	/* Page Top */
 	$default_widgets['page_top'] = array(
 		array( 10, 'social_links', 'params' => array(
-				'link1'      => 16,
+				'link1'      => 'twitter',
 				'link1_href' => 'https://twitter.com/b2evolution/',
-				'link2'      => 17,
+				'link2'      => 'facebook',
 				'link2_href' => 'https://www.facebook.com/b2evolution',
-				'link3'      => 18,
+				'link3'      => 'googleplus',
 				'link3_href' => 'https://plus.google.com/+b2evolution/posts',
-				'link4'      => 19,
+				'link4'      => 'linkedin',
 				'link4_href' => 'https://www.linkedin.com/company/b2evolution-net',
-				'link5'      => 20,
+				'link5'      => 'github',
 				'link5_href' => 'https://github.com/b2evolution/b2evolution',
 			) ),
 	);
