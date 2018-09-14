@@ -1920,7 +1920,7 @@ function create_demo_contents()
 			       ( 4, "Photos", 4, '.$dave_blogger_ID.' ),
 			       ( 5, "Forums", 5, '.$paul_blogger_ID.' ),
 			       ( 6, "Manual", 6, '.$dave_blogger_ID.' ),
-			       ( 7, "Catalogs", 7, '.$mary_moderator_ID.' )' );' );
+			       ( 7, "Catalogs", 7, '.$mary_moderator_ID.' )' );
 	}
 	task_end();
 

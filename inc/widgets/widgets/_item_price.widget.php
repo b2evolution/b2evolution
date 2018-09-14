@@ -110,6 +110,12 @@ class item_price_Widget extends ComponentWidget
 					'options' => $currency_options,
 					'defaultvalue' => locale_currency( '#', 'ID' ),
 				),
+				'display_original_price' => array(
+					'label' => T_('Display original price'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
+					'note' => T_('If user is awarded a reduced price, the original price will be displayed with strikethrough style.'),
+				)
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
@@ -156,7 +162,9 @@ class item_price_Widget extends ComponentWidget
 		$CurrencyCache = & get_currencyCache();
 		$currency = $CurrencyCache->get_by_ID( $this->disp_params['currency_ID'], false, false );
 
-		if( $default_pricing )
+		if( $default_pricing
+				&& !( $best_pricing && ( $best_pricing['iprc_price'] == $default_pricing['iprc_price'] ) )
+				&& $this->disp_params['display_original_price'] )
 		{
 			echo $this->disp_params['widget_item_price_before_default'];
 			echo $currency->get( 'code' ).'&nbsp;'.number_format( $default_pricing['iprc_price'], 2 );

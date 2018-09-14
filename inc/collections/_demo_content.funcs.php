@@ -96,6 +96,60 @@ function get_post_timestamp_data( $num_posts = 1, $min = 30, $max = 720, $base_t
 }
 
 
+/**
+ * Insert item pricing
+ *
+ * @param integer Item ID
+ * @param integer Currency ID
+ * @param double Item price
+ * @param boolean True to also add sale pricing
+ */
+function add_item_pricing( $item_ID, $currency_ID, $base_price, $add_sale_pricing = true )
+{
+	global $DB;
+
+	$base_timestamp = time();
+
+	$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID )
+			VALUES ( '.$item_ID.', '.$DB->quote( $base_price ).', '.$DB->quote( $currency_ID ).')' );
+
+	if( $add_sale_pricing )
+	{
+		$min_qty_values = array( NULL, NULL, NULL, NULL, 5, 10, 20, 30 );
+		$sale_percentages = array( 0.5, 0.10, 0.20, 0.25, 0.50 );
+		$n = rand( 0, 10 );
+		if( $n > 3 )
+		{
+			$start_date = date( 'Y-m-d', strtotime( '-'.rand( 0, 7 ).' days' ) ).' 00:00:00';
+			$end_date = date( 'Y-m-d', strtotime( '+'.rand( 0, 7  ).' days' ) ).' 23:59:59';
+		}
+		elseif( $n < 3 )
+		{
+			$start_date = date( 'Y-m-d', strtotime( '-'.rand( 0, 14 ).' days' ) ).' 00:00:00';
+			$end_date = date( 'Y-m-d', strtotime( '+'.rand( 0, 14 ).' days' ) ).' 23:59:59';
+		}
+		else
+		{
+			$start_date = date( 'Y-m-d', strtotime( ( rand( 0, 1 ) == 1 ? '+' : '-' ).rand( 0, 30 ).'days' ) ).' 00:00:00';
+			$end_date = date( 'Y-m-d', strtotime( $start_date ) ).' 23:59:59';
+		}
+
+		$min_qty = $min_qty_values[ mt_rand( 0, count( $min_qty_values ) - 1 ) ];
+		$sale_price = number_format( $base_price - ( $base_price * $sale_percentages[mt_rand( 0, count( $sale_percentages ) - 1 )] ), 2 );
+		$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID, iprc_min_qty, iprc_date_start, iprc_date_end )
+				VALUES ( '.$DB->quote( $item_ID ).', '.$DB->quote( $sale_price ).', '.$DB->quote( $currency_ID ).', '.$DB->quote( $min_qty ).' , '.$DB->quote( $start_date ).', '.$DB->quote( $end_date ).' )' );
+	}
+}
+
+
+
+/**
+ * Check if item type is available
+ *
+ * @param integer Blog ID
+ * @param string Item type name
+ * @return boolean True if item type is available, False otherwise
+ */
 function is_available_item_type( $blog_ID, $item_type_name = '#', $item_types = array() )
 {
 	global $DB, $available_item_types;
@@ -2806,7 +2860,7 @@ Hello
 				$edited_Item->insert( $owner_ID, T_('Pilot V Razor Point Liquid Ink Marker Pens, extra fine point, 8/pack'), $desc,
 						$now, $cat_catalog_marker, array( $cat_catalog_bestseller ), 'published','en-US' );
 				// Item pricing
-				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 12.99, '.$DB->quote( $currency_ID ).')' );
+				add_item_pricing( $edited_Item->ID, $currency_ID, 12.99 );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/pilot-v-razor-point-pen-1.jpg' );
@@ -2832,7 +2886,7 @@ Hello
 				$edited_Item->insert( $owner_ID, T_('Pilot Varsity Fountain Pens, 0.1mm medium nib, 7/pack'), $desc,
 						$now, $cat_catalog_pen, array( $cat_catalog_new ), 'published','en-US' );
 				// Item pricing
-				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 16.99, '.$DB->quote( $currency_ID ).')' );
+				add_item_pricing( $edited_Item->ID, $currency_ID, 16.99 );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/pilot-varsity-fountain-pen-1.jpg' );
@@ -2858,7 +2912,7 @@ Hello
 				$edited_Item->insert( $owner_ID, T_('BIC&reg; Xtra Comfort Round Stic&reg; Grip Ballpoint Pens, medium point, 12/pack'), $desc,
 						$now, $cat_catalog_pen, array( $cat_catalog_bestseller ), 'published','en-US' );
 				// Item pricing
-				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 12.99, '.$DB->quote( $currency_ID ).')' );
+				add_item_pricing( $edited_Item->ID, $currency_ID, 12.99 );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/bic-xtra-comfort-round-stic-pen-1.jpg' );
@@ -2884,7 +2938,7 @@ Hello
 				$edited_Item->insert( $owner_ID, T_('Sharpie&reg; Fine Point Permanent Markers, 12/pack'), $desc,
 						$now, $cat_catalog_marker, array( $cat_catalog_bestseller ), 'published','en-US' );
 				// Item pricing
-				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 11.79, '.$DB->quote( $currency_ID ).')' );
+				add_item_pricing( $edited_Item->ID, $currency_ID, 11.79 );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/sharpie-fine-point-permanent-marker-1.jpg' );
@@ -2913,7 +2967,7 @@ Hello
 				$edited_Item->insert( $owner_ID, T_('BIC&reg; Atlantis&reg; Retractable Ballpoint Pens, medium point 1.0mm, 24/pack'), $desc,
 						$now, $cat_catalog_pen, array( $cat_catalog_bestseller ), 'published','en-US' );
 				// Item pricing
-				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 23.99, '.$DB->quote( $currency_ID ).')' );
+				add_item_pricing( $edited_Item->ID, $currency_ID, 23.99 );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/bic-atlantis-retractable-pen-1.jpg' );
@@ -2936,7 +2990,7 @@ Hello
 				$edited_Item->insert( $owner_ID, T_('Sharpie&reg; Accent&reg; Tank Highlighters, chisel tip, 6/pack'), $desc,
 						$now, $cat_catalog_marker, array( $cat_catalog_pen ), 'published','en-US' );
 				// Item pricing
-				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 5.79, '.$DB->quote( $currency_ID ).')' );
+				add_item_pricing( $edited_Item->ID, $currency_ID, 5.79 );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/sharpie-accent-tank-highlighter-1.jpg' );
@@ -2965,7 +3019,7 @@ Hello
 				$edited_Item->insert( $owner_ID, T_('Quality Park&reg; Redi-Seal&trade; Double Window Security Business Envelopes, #8-5/8, 500/box'), $desc,
 						$now, $cat_catalog_envelope, array( $cat_catalog_bestseller ), 'published','en-US' );
 				// Item pricing
-				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 76.79, '.$DB->quote( $currency_ID ).')' );
+				add_item_pricing( $edited_Item->ID, $currency_ID, 76.79 );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/quality-park-redi-seal-business-envelope-1.jpg' );
@@ -2988,7 +3042,7 @@ Hello
 				$edited_Item->insert( $owner_ID, T_('JAM Paper&reg; #10 Window Envelopes, 4 1/8 x 9 1/2, Bright Hue yellow recyled, 25/pack'), $desc,
 						$now, $cat_catalog_envelope, array(), 'published','en-US' );
 				// Item pricing
-				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 5.49, '.$DB->quote( $currency_ID ).')' );
+				add_item_pricing( $edited_Item->ID, $currency_ID, 5.49 );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/jam-paper-window-envelope-1.jpg' );
@@ -3011,7 +3065,7 @@ Hello
 				$edited_Item->insert( $owner_ID, T_('JAM Paper&reg; #6 3/4 Commercial Envelopes, 250/box'), $desc,
 						$now, $cat_catalog_envelope, array(), 'published','en-US' );
 				// Item pricing
-				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 29.99, '.$DB->quote( $currency_ID ).')' );
+				add_item_pricing( $edited_Item->ID, $currency_ID, 29.99 );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/jam-paper-commercial-envelope-1.jpg' );
@@ -3037,7 +3091,7 @@ Hello
 				$edited_Item->insert( $owner_ID, T_('Simply QuickStrip Security Tint #6 3/4 Envelope, 50/box'), $desc,
 						$now, $cat_catalog_envelope, array(), 'published','en-US' );
 				// Item pricing
-				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 29.99, '.$DB->quote( $currency_ID ).')' );
+				add_item_pricing( $edited_Item->ID, $currency_ID, 29.99 );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/simply-quickstrip-security-tint-envelope-1.jpg' );
@@ -3060,7 +3114,7 @@ Hello
 				$edited_Item->insert( $owner_ID, T_('JAM Paper&reg; A7 Invitation Envelopes, 25/pack'), $desc,
 						$now, $cat_catalog_envelope, array(), 'published','en-US' );
 				// Item pricing
-				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 5.99, '.$DB->quote( $currency_ID ).')' );
+				add_item_pricing( $edited_Item->ID, $currency_ID, 5.99 );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/jam-paper-a7-invitation-envelope-1.jpg' );
@@ -3086,7 +3140,7 @@ Hello
 				$edited_Item->insert( $owner_ID, T_('Quality Park Redi-Strip&trade; Anti-Static Disk Mailers Envelopes, 25/box'), $desc,
 						$now, $cat_catalog_envelope, array(), 'published','en-US' );
 				// Item pricing
-				$DB->query( 'INSERT INTO T_items__pricing ( iprc_itm_ID, iprc_price, iprc_curr_ID ) VALUES ( '.$edited_Item->ID.', 12.29, '.$DB->quote( $currency_ID ).')' );
+				add_item_pricing( $edited_Item->ID, $currency_ID, 12.29 );
 				$LinkOwner = new LinkItem( $edited_Item );
 				// Image 1
 				$edit_File = new File( 'shared', 0, 'products/quality-park-redi-strip-disk-envelope-1.jpg' );
