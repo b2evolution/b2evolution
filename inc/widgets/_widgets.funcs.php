@@ -74,7 +74,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 35, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'arcdir' ) ),
 		array( 37, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'latestcomments' ) ),
 		array( 50, 'msg_menu_link', 'params' => array( 'link_type' => 'messages' ), 'enabled' => 0 ),
-		array( 60, 'msg_menu_link', 'params' => array( 'link_type' => 'contacts', 'show_badge' => 0 ), 'enabled' => ( $kind == 'minisite' ) ),
+		array( 60, 'basic_menu_link', 'params' => array( 'link_type' => 'ownercontact', 'show_badge' => 0 ), 'enabled' => ( $kind == 'minisite' ) ),
 		array( 70, 'basic_menu_link', 'params' => array( 'link_type' => 'login' ), 'enabled' => 0 ),
 		array( 80, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'register' ) ),
 	);
@@ -253,7 +253,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 				'disp_title' => 0,
 			) : NULL ) ),
 		array( 15, 'user_links', 'coll_type' => 'main' ),
-		array( 20, 'coll_featured_posts', 'params' => ( $kind == 'main' ? array(
+		array( 20, 'coll_featured_posts', 'coll_type' => '-minisite', 'params' => ( $kind == 'main' ? array(
 			// Display the posts from all other blogs if it is allowed by blogs setting "Collections to aggregate":
 				'blog_ID'    => '',
 				'limit'      => 5,
@@ -275,7 +275,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'type'  => 'sub',
 		'name'  => NT_('Front Page Column A'),
 		'order' => 1,
-		array( 10, 'coll_post_list', 'params' => array( 'title' => T_('More Posts'), 'featured' => 'other' ) ),
+		array( 10, 'coll_post_list', 'coll_type' => '-minisite', 'params' => array( 'title' => T_('More Posts'), 'featured' => 'other' ) ),
 	);
 
 	/* Front Page Column B */
@@ -289,15 +289,15 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	/* Front Page Secondary Area */
 	$default_widgets['front_page_secondary_area'] = array(
 		array( 10, 'org_members', 'coll_type' => 'main,minisite' ),
-		array( 20, 'coll_flagged_list' ),
+		array( 20, 'coll_flagged_list', 'coll_type' => '-minisite' ),
 		array( 30, 'content_block', 'coll_type' => 'main', 'params' => array( 'item_slug' => 'this-is-a-content-block' ) ),
 	);
 
 	/* Front Page Area 3 */
 	$default_widgets['front_page_area_3'] = array(
 		'coll_type' => 'minisite',
-		array( 10, 'coll_search_form' ),
-		array( 20, 'coll_tag_cloud' ),
+		array( 10, 'free_text', 'params' => 'a:6:{s:5:"title";s:0:"";s:7:"content";s:446:"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";s:9:"renderers";a:10:{s:11:"escape_code";i:1;s:8:"b2evMark";i:1;s:8:"b2evWiLi";i:1;s:8:"b2evCTag";i:1;s:8:"b2evGMco";i:1;s:8:"b2evALnk";i:1;s:8:"evo_poll";i:1;s:13:"evo_videoplug";i:1;s:8:"b2WPAutP";i:1;s:14:"evo_widescroll";i:1;}s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' ),
+		array( 20, 'user_links' ),
 	);
 
 	/* Forum Front Secondary Area */

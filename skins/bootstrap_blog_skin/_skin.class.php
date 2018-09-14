@@ -572,6 +572,7 @@ class bootstrap_blog_Skin extends Skin
 -->
 		</style>';
 			add_headline( $custom_css );
+			// Init JS to affix Messages:
 			init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 		}
 	}

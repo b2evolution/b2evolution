@@ -1343,12 +1343,7 @@ div.level3 nav .nav > li + li {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.coll_settings_skinshot .skinshot {
-  padding: 0;
-  float: none;
-  margin: -1ex -1ex 1ex -1ex;
-}
-.skinshot_new {
+.skinshot.skinshot_new {
   text-align: center;
   font-size: 20px;
   background: none;
@@ -1356,14 +1351,22 @@ div.level3 nav .nav > li + li {
   width: 267px;
   height: 247px;
 }
-.skinshot_new:hover {
+.skinshot.skinshot_new:hover {
   background: #F5F5F5;
   text-decoration: none;
 }
-.skinshot_new .fa {
+.skinshot.skinshot_new .fa {
   display: block;
   font-size: 100px;
   margin: 20px 0 10px;
+}
+.skinshot.skinshot_current {
+  border-color: #D00;
+}
+.coll_settings_skinshot .skinshot {
+  padding: 0;
+  float: none;
+  margin: -1ex -1ex 1ex -1ex;
 }
 form#thread_checkchanges ul.token-input-list-facebook {
   width: 97%;
@@ -1689,15 +1692,24 @@ table.diff td.diff-title-addedline {
 .evo_checkbox_status__meta {
   background-color: #5bc0de;
 }
-.evo_aggregate_filter {
+.evo_filter_diagram_hits {
   white-space: nowrap;
+  float: left;
+  padding-left: 15px;
 }
-.evo_aggregate_filter label {
-  padding-top: 5px;
-  padding-right: 5px;
+.evo_filter_diagram_hits label {
+  float: none;
+  padding: 0 5px 0 0;
   width: auto;
+  font-weight: normal;
 }
-.evo_aggregate_filter select {
+.evo_filter_diagram_hits label.control-label {
+  font-weight: bold;
+}
+.evo_filter_diagram_hits label input {
+  display: inline;
+}
+.evo_filter_diagram_hits select {
   display: inline;
   width: auto;
 }

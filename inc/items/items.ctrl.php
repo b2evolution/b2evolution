@@ -2033,6 +2033,13 @@ switch( $action )
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'filter' => 'restore' ) );
 
+		// Display item's title and ID in <title> tag instead of default breadcrumb path:
+		$AdminUI->htmltitle = $edited_Item->get_title( array(
+				'title_field' => 'short_title,title',
+				'link_type'   => 'none',
+			) );
+		$AdminUI->htmltitle .= ' (#'.$edited_Item->ID.')';
+
 		switch( $action )
 		{
 			case 'edit':

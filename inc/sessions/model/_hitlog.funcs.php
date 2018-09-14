@@ -1060,10 +1060,12 @@ function stats_goal_hit_extra_params( $ghit_params )
  * Display panel with buttons to control a view of hits summary pages:
  *     - Two buttons to toggle between type of hits summary data(Live or Aggregate)
  *     - Button to aggregate hits and sessions right now
+ *
+ * @param array Diagram columns: key - code of column, value - title of column
  */
-function display_hits_summary_panel()
+function display_hits_summary_panel( $diagram_columns = array() )
 {
-	global $ReqURL, $current_User;
+	global $ReqURL, $current_User, $tab3;
 
 	$hits_summary_mode = get_hits_summary_mode();
 
@@ -1085,66 +1087,79 @@ function display_hits_summary_panel()
 
 	echo '</div>';
 
-	if( $hits_summary_mode == 'aggregate' )
-	{	// Filter the aggregated data by date period:
+	if( $hits_summary_mode == 'aggregate' || ! empty( $diagram_columns ) )
+	{
 		global $UserSettings;
 
-		echo '<div class="evo_aggregate_filter pull-left">';
+		echo '<div class="evo_filter_diagram_hits">';
 		$Form = new Form();
 		$Form->hidden_ctrl();
 		$Form->hidden( 'tab', get_param( 'tab' ) );
 		$Form->hidden( 'tab3', get_param( 'tab3' ) );
 		$Form->hidden( 'blog', get_param( 'blog' ) );
-		$Form->hidden( 'action', 'filter_aggregated' );
-		$Form->add_crumb( 'aggfilter' );
+		$Form->hidden( 'sec_ID', get_param( 'sec_ID' ) );
+		$Form->hidden( 'action', 'filter_hits_diagram' );
+		$Form->add_crumb( 'filterhitsdiagram' );
 
 		$Form->switch_layout( 'none' );
 
 		$Form->begin_form();
 
-		$Form->select_input_array( 'agg_period', $UserSettings->get( 'agg_period' ), array(
-				'last_30_days'   => sprintf( T_('Last %d days'), 30 ),
-				'last_60_days'   => sprintf( T_('Last %d days'), 60 ),
-				'current_month'  => T_( 'Current Month to date' ),
-				'specific_month' => T_( 'Specific Month:' ),
-			), T_('Show') );
+		if( $hits_summary_mode == 'aggregate' )
+		{	// Filter the aggregated data by date period:
+			$Form->select_input_array( 'agg_period', $UserSettings->get( 'agg_period' ), array(
+					'last_30_days'   => sprintf( T_('Last %d days'), 30 ),
+					'last_60_days'   => sprintf( T_('Last %d days'), 60 ),
+					'current_month'  => T_( 'Current Month to date' ),
+					'specific_month' => T_( 'Specific Month:' ),
+				), T_('Show') );
 
-		$months_years_params = array( 'force_keys_as_values' => true );
-		if( $UserSettings->get( 'agg_period' ) != 'specific_month' )
-		{
-			$months_years_params['style'] = 'display:none';
-		}
-		$months = array();
-		for( $m = 1; $m <= 12; $m++ )
-		{
-			$months[ $m ] = T_( date( 'F', mktime( 0, 0, 0, $m ) ) );
-		}
-		$agg_month = $UserSettings->get( 'agg_month' );
-		$Form->select_input_array( 'agg_month', ( empty( $agg_month ) ? date( 'n' ) : $agg_month ), $months, '', NULL, $months_years_params );
+			$months_years_params = array( 'force_keys_as_values' => true );
+			if( $UserSettings->get( 'agg_period' ) != 'specific_month' )
+			{
+				$months_years_params['style'] = 'display:none';
+			}
+			$months = array();
+			for( $m = 1; $m <= 12; $m++ )
+			{
+				$months[ $m ] = T_( date( 'F', mktime( 0, 0, 0, $m ) ) );
+			}
+			$agg_month = $UserSettings->get( 'agg_month' );
+			$Form->select_input_array( 'agg_month', ( empty( $agg_month ) ? date( 'n' ) : $agg_month ), $months, '', NULL, $months_years_params );
 
-		$years = array();
-		for( $y = date( 'Y' ) - 20; $y <= date( 'Y' ); $y++ )
-		{
-			$years[ $y ] = $y;
+			$years = array();
+			for( $y = date( 'Y' ) - 20; $y <= date( 'Y' ); $y++ )
+			{
+				$years[ $y ] = $y;
+			}
+			$agg_year = $UserSettings->get( 'agg_year' );
+			$Form->select_input_array( 'agg_year', ( empty( $agg_year ) ? date( 'Y' ) : $agg_year ), $years, '', NULL, $months_years_params );
+
+			echo '<script type="text/javascript">
+				jQuery( "#agg_period" ).change( function()
+				{
+					if( jQuery( this ).val() == "specific_month" )
+					{
+						jQuery( "#agg_month, #agg_year" ).show();
+					}
+					else
+					{
+						jQuery( "#agg_month, #agg_year" ).hide();
+					}
+				} );
+				</script>';
 		}
-		$agg_year = $UserSettings->get( 'agg_year' );
-		$Form->select_input_array( 'agg_year', ( empty( $agg_year ) ? date( 'Y' ) : $agg_year ), $years, '', NULL, $months_years_params );
+
+		$filter_hits_diagram_cols = $UserSettings->get( 'filter_hits_diagram_cols' );
+		foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
+		{	// Filter hits by type:
+			$Form->checkbox_basic_input( 'filter_types[]',
+				( ! isset( $filter_hits_diagram_cols[ $tab3 ] ) || empty( $filter_hits_diagram_cols[ $tab3 ] ) || in_array( $diagram_column_key, $filter_hits_diagram_cols[ $tab3 ] ) ), // Is checked?
+				'<span style="color:#'.$diagram_column_data['color'].'">'.$diagram_column_data['title'].'</span>', // Colored title
+				array( 'value' => $diagram_column_key ) ); // Value
+		}
 
 		$Form->end_form( array( array( 'submit', 'submit', T_('Filter'), 'btn-info' ) ) );
-
-		echo '<script type="text/javascript">
-			jQuery( "#agg_period" ).change( function()
-			{
-				if( jQuery( this ).val() == "specific_month" )
-				{
-					jQuery( "#agg_month, #agg_year" ).show();
-				}
-				else
-				{
-					jQuery( "#agg_month, #agg_year" ).hide();
-				}
-			} );
-			</script>';
 
 		echo '</div>';
 	}
@@ -1205,6 +1220,46 @@ function get_filter_aggregated_hits_dates()
 	}
 
 	return array( $start_date, $end_date );
+}
+
+
+/**
+ * Get dates for filter the aggregated hits
+ *
+ * @param array All possible hits diagram columns
+ * @return array Filtered hits diagram columns
+ */
+function get_filtered_hits_diagram_columns( $diagram_type, $diagram_columns )
+{
+	global $UserSettings;
+
+	if( empty( $diagram_type ) )
+	{	// Unknown diagram type:
+		return $diagram_columns;
+	}
+
+	$filter_hits_diagram_cols = $UserSettings->get( 'filter_hits_diagram_cols' );
+
+	if( ! isset( $filter_hits_diagram_cols[ $diagram_type ] ) )
+	{	// No filter is defiend yet:
+		return $diagram_columns;
+	}
+
+	if( empty( $filter_hits_diagram_cols[ $diagram_type ] ) )
+	{	// If all options are unchecked then check them all:
+		return $diagram_columns;
+	}
+
+	$filtered_cols = array();
+	foreach( $filter_hits_diagram_cols[ $diagram_type ] as $filter_diagram_col )
+	{
+		if( isset( $diagram_columns[ $filter_diagram_col ] ) )
+		{
+			$filtered_cols[ $filter_diagram_col ] = $diagram_columns[ $filter_diagram_col ];
+		}
+	}
+
+	return $filtered_cols;
 }
 
 

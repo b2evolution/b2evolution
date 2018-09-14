@@ -140,6 +140,13 @@ class bootstrap_main_Skin extends Skin
 						'size' => '7',
 						'allow_empty' => true,
 					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -543,6 +550,9 @@ class bootstrap_main_Skin extends Skin
 </style>';
 		add_headline( $custom_css );
 		}
+
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 
 		if( $Session->get( 'designer_mode_'.$blog ) )
 		{	// On enabled designer mode we should set full window height for pictured layout in pixel instead of 100% percents to avoid issues on scroll page:

@@ -2967,8 +2967,9 @@ class Blog extends DataObject
 					{	// Use base URL of this collection:
 						$customizing_url = $this->get( 'baseurl' );
 					}
+					$customizer_mode_param = ( isset( $params['mode'] ) ? 'customizer_mode='.$params['mode'].$params['glue'] : '' );
 					$customizer_view_param = ( isset( $params['view'] ) ? 'view='.$params['view'].$params['glue'] : '' );
-					return $customizer_url.'?'.$customizer_view_param.'blog='.$this->ID.$params['glue'].'customizing_url='.urlencode( $customizing_url );
+					return $customizer_url.'?'.$customizer_mode_param.$customizer_view_param.'blog='.$this->ID.$params['glue'].'customizing_url='.urlencode( $customizing_url );
 				}
 				else
 				{	// Return this collection URL instead:

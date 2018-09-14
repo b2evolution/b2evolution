@@ -84,12 +84,13 @@ class subcontainer_row_Widget extends ComponentWidget
 		$container_options = array(
 				''            => T_('None'),
 				'!create_new' => T_('Create New'),
+				T_('Existing Sub-Containers') => array(),
 			);
 		foreach( $coll_widget_containers as $WidgetContainer )
 		{
 			if( ! $WidgetContainer->get( 'main' ) )
 			{	// Allow only sub-containers:
-				$container_options[ $WidgetContainer->get( 'code' ) ] = $WidgetContainer->get( 'name' );
+				$container_options[ T_('Existing Sub-Containers') ][ $WidgetContainer->get( 'code' ) ] = $WidgetContainer->get( 'name' );
 			}
 		}
 
@@ -258,7 +259,7 @@ class subcontainer_row_Widget extends ComponentWidget
 	 */
 	function display_column_container( $subcontainer_code, $params )
 	{
-		global $Blog, $Timer, $displayed_subcontainers;
+		global $Blog, $Timer, $displayed_subcontainers, $Session;
 
 		// Get subcontainer name:
 		$WidgetContainerCache = & get_WidgetContainerCache();
@@ -300,6 +301,10 @@ class subcontainer_row_Widget extends ComponentWidget
 				$ComponentWidget->display_with_cache( $params );
 				$Timer->pause( $widget_timer_name );
 			}
+		}
+		elseif( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
+		{	// Display text for empty container on designer mode:
+			echo '<div class="red">'.T_('Empty Sub-Container').'</div>';
 		}
 
 		echo $subcontainer_params['container_end'];
