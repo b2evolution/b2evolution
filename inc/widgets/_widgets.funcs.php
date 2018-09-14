@@ -585,36 +585,21 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 			continue;
 		}
 
-		if( isset( $container_widgets['coll_type'] ) )
-		{	// Handle special condition key:
-			if( ! is_allowed_option( $kind, $container_widgets['coll_type'] ) )
-			{	// Skip container because it should not be installed for the given collection kind:
-				continue;
-			}
+		if( isset( $container_widgets['coll_type'] ) &&
+		    ! is_allowed_option( $kind, $container_widgets['coll_type'] ) )
+		{	// Skip container because it should not be installed for the given collection kind:
+			continue;
 		}
 
 		$wico_id = $blog_containers[ $wico_code ]['wico_ID'];
 
-		// Remove the config data which is used as additional info for container:
-		if( isset( $container_widgets['type'] ) )
-		{	// Container type
-			unset( $container_widgets['type'] );
-		}
-		if( isset( $container_widgets['name'] ) )
-		{	// Container name
-			unset( $container_widgets['name'] );
-		}
-		if( isset( $container_widgets['order'] ) )
-		{	// Container order
-			unset( $container_widgets['order'] );
-		}
-		if( isset( $container_widgets['coll_type'] ) )
-		{	// Collection type where the container should be installed:
-			unset( $container_widgets['coll_type'] );
-		}
-
-		foreach( $container_widgets as $widget )
+		foreach( $container_widgets as $key => $widget )
 		{
+			if( ! is_number( $key ) )
+			{	// Skip the config data which is used as additional info for container like 'type', 'name', 'order', 'item_ID', 'coll_type':
+				continue;
+			}
+
 			if( isset( $widget['install'] ) && ! $widget['install'] )
 			{	// Skip widget because it should not be installed by condition from config:
 				continue;
