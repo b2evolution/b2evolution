@@ -1743,13 +1743,22 @@ table.diff {
 	background-color: @status_color_meta;
 }
 
-// Aggregate filter form:
-.evo_aggregate_filter {
+// Hits diagarm filter form:
+.evo_filter_diagram_hits {
 	white-space: nowrap;
+	float: left;
+	padding-left: 15px;
 	label {
-		padding-top: 5px;
-		padding-right: 5px;
+		float: none;
+		padding: 0 5px 0 0;
 		width: auto;
+		font-weight: normal;
+		&.control-label {
+			font-weight: bold;
+		}
+		input {
+			display: inline;
+		}
 	}
 	select {
 		display: inline;

@@ -369,6 +369,7 @@ foreach( $skin_folders_data as $skin_folder => $data )
 			if( ( $tab == 'coll_skin' && ! $folder_Skin->provides_collection_skin() ) ||
 					( $tab == 'site_skin' && ! $folder_Skin->provides_site_skin() ) )
 			{	// This skin cannot be used because it is not provided for collection or site:
+				$skin_folders_data[$skin_folder]['status'] = 'ignore';
 				continue;
 			}
 

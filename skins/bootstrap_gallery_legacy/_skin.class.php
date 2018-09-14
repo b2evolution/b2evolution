@@ -170,6 +170,13 @@ class bootstrap_gallery_legacy_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
 				'section_image_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -440,7 +447,12 @@ class bootstrap_gallery_legacy_Skin extends Skin
 	</style>';
 			add_headline( $custom_css );
 		}
+
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
+
+
 	/**
 	 * Determine to display status banner or to don't display
 	 *

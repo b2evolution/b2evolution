@@ -159,6 +159,13 @@ class bootstrap_photoblog_Skin extends Skin
 						'type' => 'integer',
 						'allow_empty' => true,
 					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
 					'font_size' => array(
 						'label' => T_('Font size'),
 						'note' => T_('Select content font size.'),
@@ -503,6 +510,9 @@ class bootstrap_photoblog_Skin extends Skin
 		</style>';
 		add_headline( $custom_css );
 		}
+
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
 
 
