@@ -229,6 +229,7 @@ class display_shopping_cart_Widget extends ComponentWidget
 				$first_item_image = $cart_Item->get_images( array(
 						'limit'      => 1,
 						'image_size' => 'crop-top-48x48',
+						'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore,inline',
 					) );
 				echo str_replace( $product_cell_masks, array( $first_item_image, $this->disp_params['class_image_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
