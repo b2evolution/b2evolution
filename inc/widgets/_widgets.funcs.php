@@ -745,7 +745,7 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 		}
 
 		if( ! empty( $container_widgets['type'] ) &&
-		    ! in_array( $container_widgets['type'], array( 'skin', 'sub', 'page' ) ) )
+		    ! in_array( $container_widgets['type'], array( 'main', 'sub', 'page' ) ) )
 		{	// Skip not collection container:
 			continue;
 		}

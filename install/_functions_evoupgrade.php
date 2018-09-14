@@ -597,12 +597,12 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 	$container_widgets = get_default_widgets_by_container( $new_container_code );
 
 	// Get container type:
-	$container_type = isset( $container_widgets['type'] ) ? $container_widgets['type'] : 'skin';
+	$container_type = isset( $container_widgets['type'] ) ? $container_widgets['type'] : 'main';
 
 	$new_widgets_insert_sql_rows = array();
 	switch( $container_type )
 	{
-		case 'skin':
+		case 'main':
 		case 'sub':
 		case 'page':
 			// Install widgets for collection/skin container:
