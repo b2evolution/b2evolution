@@ -164,7 +164,18 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Page Top */
 	$default_widgets['page_top'] = array(
-		array( 10, 'user_links' ),
+		array( 10, 'social_links', 'params' => array(
+				'link1'      => 16,
+				'link1_href' => 'https://twitter.com/b2evolution/',
+				'link2'      => 17,
+				'link2_href' => 'https://www.facebook.com/b2evolution',
+				'link3'      => 18,
+				'link3_href' => 'https://plus.google.com/+b2evolution/posts',
+				'link4'      => 19,
+				'link4_href' => 'https://www.linkedin.com/company/b2evolution-net',
+				'link5'      => 20,
+				'link5_href' => 'https://github.com/b2evolution/b2evolution',
+			) ),
 	);
 
 	/* Sidebar */
@@ -610,36 +621,21 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 			continue;
 		}
 
-		if( isset( $container_widgets['coll_type'] ) )
-		{	// Handle special condition key:
-			if( ! is_allowed_option( $kind, $container_widgets['coll_type'] ) )
-			{	// Skip container because it should not be installed for the given collection kind:
-				continue;
-			}
+		if( isset( $container_widgets['coll_type'] ) &&
+		    ! is_allowed_option( $kind, $container_widgets['coll_type'] ) )
+		{	// Skip container because it should not be installed for the given collection kind:
+			continue;
 		}
 
 		$wico_id = $blog_containers[ $wico_code ]['wico_ID'];
 
-		// Remove the config data which is used as additional info for container:
-		if( isset( $container_widgets['type'] ) )
-		{	// Container type
-			unset( $container_widgets['type'] );
-		}
-		if( isset( $container_widgets['name'] ) )
-		{	// Container name
-			unset( $container_widgets['name'] );
-		}
-		if( isset( $container_widgets['order'] ) )
-		{	// Container order
-			unset( $container_widgets['order'] );
-		}
-		if( isset( $container_widgets['coll_type'] ) )
-		{	// Collection type where the container should be installed:
-			unset( $container_widgets['coll_type'] );
-		}
-
-		foreach( $container_widgets as $widget )
+		foreach( $container_widgets as $key => $widget )
 		{
+			if( ! is_number( $key ) )
+			{	// Skip the config data which is used as additional info for container like 'type', 'name', 'order', 'item_ID', 'coll_type':
+				continue;
+			}
+
 			if( isset( $widget['install'] ) && ! $widget['install'] )
 			{	// Skip widget because it should not be installed by condition from config:
 				continue;
