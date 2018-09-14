@@ -10712,7 +10712,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		// but new version must has the user field definition codes instead:
 		$social_links_SQL = new SQL( 'Get all widgets "Social links" to upgrade params of user field IDs to user field codes' );
 		$social_links_SQL->SELECT( 'wi_ID, wi_params' );
-		$social_links_SQL->FROM( 'T_widget' );
+		$social_links_SQL->FROM( 'T_widget__widget' );
 		$social_links_SQL->WHERE( 'wi_code = "social_links"' );
 		$social_links_SQL->WHERE_and( 'wi_params IS NOT NULL' );
 		$social_links_widgets = $DB->get_assoc( $social_links_SQL->get(), $social_links_SQL->title );
@@ -10747,7 +10747,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 					}
 				}
 				// Update widget with new params:
-				$DB->query( 'UPDATE T_widget
+				$DB->query( 'UPDATE T_widget__widget
 					  SET wi_params = '.$DB->quote( serialize( $social_links_widget_params ) ).'
 					WHERE wi_ID = '.$social_links_widget_ID );
 			}
