@@ -214,7 +214,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
 					// In the case of initial install, we grab photos out of the photoblog:
 					'blog_ID'      => ( empty( $context['coll_photoblog_ID'] ) ? '' : intval( $context['coll_photoblog_ID'] ) ),
 				) ),
-			array( 90, 'coll_item_list', 'install' => ( $install_not_forum && ! $context['init_as_blog_a'] && ! $context['init_as_blog_b'] ), 'params' => array(
+			array( 90, 'coll_item_list', 'install' => ( $install_not_forum && ( $context['init_as_blog_a'] || $context['init_as_blog_b'] ) ), 'params' => array(
 					'blog_ID'              => $context['coll_home_ID'],
 					'item_type'            => empty( $sidebar_type_ID ) ? '#' : $sidebar_type_ID,
 					'title'                => 'Linkblog',
