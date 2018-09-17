@@ -134,6 +134,23 @@ class ComponentWidget extends DataObject
 
 
 	/**
+	 * Get a member param by its name
+	 *
+	 * @param mixed Name of parameter
+	 * @return mixed Value of parameter
+	 */
+	function get( $parname )
+	{
+		if( $parname == 'coll_ID' )
+		{
+			return $this->get_coll_ID();
+		}
+
+		return parent::get( $parname );
+	}
+
+
+	/**
 	 * Get param prefix with is used on edit forms and submit data
 	 *
 	 * @return string
