@@ -3970,7 +3970,7 @@ function evo_get_filter_user_tags( rule )
 	} );
 
 	<?php echo get_prevent_key_enter_js( 'input[name=" + input_name + "]' ); ?>
-	
+
 	jQuery( selector ).prev().before( jQuery( selector ) );
 
 	initialized_filter_user_tags.push( input_name );
@@ -5728,7 +5728,7 @@ function merge_users( $merging_user_ID, $remaining_user_ID )
 		array( T_('User visits'),                'T_users__profile_visits', 'upv_visitor_user_ID' ),
 		array( T_('Plugin settings'),            'T_pluginusersettings', 'puset_user_ID' ),
 		array( T_('Collections'),                'T_blogs', 'blog_owner_user_ID' ),
-		array( T_('Collection permissions'),     'T_coll_user_perms', 'bloguser_user_ID' ),
+		array( T_('Collection Permissions'),     'T_coll_user_perms', 'bloguser_user_ID' ),
 		array( T_('Collection subscriptions'),   'T_subscriptions', 'sub_user_ID' ),
 		array( T_('Favorite collections'),       'T_coll_user_favs', 'cufv_user_ID' ),
 		array( T_('Own Posts'),                  'T_items__item', 'post_creator_user_ID' ),
