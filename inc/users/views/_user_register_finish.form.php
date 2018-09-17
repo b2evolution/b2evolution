@@ -160,7 +160,7 @@ if( $Settings->get( 'registration_ask_locale' ) )
 }
 
 $Form->end_form( array(
-		array( '', 'actionArray[update]', T_('Finish Registration!'), 'SaveButton' ),
+		array( '', 'actionArray[update]', T_('Finish Registration').'!', 'SaveButton' ),
 	) );
 
 // Display javascript password strength indicator bar
