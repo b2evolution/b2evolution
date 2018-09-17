@@ -249,7 +249,7 @@ if( $notifications_mode != 'off' )
 							LEFT JOIN T_users__secondary_user_groups ON (sug_grp_ID = bloggroup_group_ID AND sug_user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
 							WHERE ( ( sub.cset_value = 1 OR sub.cset_value IS NULL ) OR ( subc.cset_value = 1 OR subc.cset_value IS NULL ) )
 								AND ( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' OR sub_user_ID = '.$edited_User->ID.' )
-								AND ( sub_items <> 0 OR sub_comments <> 0 OR sub_coll_ID IS NULL )
+								AND ( sub_items <> 0 OR sub_items_mod <> 0 OR sub_comments <> 0 OR sub_coll_ID IS NULL )
 								AND ( CASE opt.cset_value WHEN 1 THEN blog_advanced_perms = 1 ELSE TRUE END )
 							GROUP BY blog_ID, blog_shortname';
 			$blog_subs = $DB->get_results( $sql );
@@ -264,7 +264,7 @@ if( $notifications_mode != 'off' )
 				}
 				if( ! ( $sub_Blog->get_setting( 'allow_subscriptions' ) && $blog_sub->sub_items ) &&
 						! ( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) && $blog_sub->sub_comments ) &&
-						! ( $sub_Blog->get_setting( 'allow_item_mod_subscriptions' ) && $blog_sub->sub_items ) )
+						! ( $sub_Blog->get_setting( 'allow_item_mod_subscriptions' ) && $blog_sub->sub_items_mod ) )
 				{	// Skip because the collection doesn't allow any subscription:
 					continue;
 				}
