@@ -293,7 +293,7 @@ if( $notifications_mode != 'off' )
 		$Form->checklist( array(
 				array( 'allow_subscriptions', 1, T_('Allow users to subscribe and receive email notifications for each new post.'), $edited_Blog->get_setting( 'allow_subscriptions' ) ),
 				array( 'allow_item_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ), $edited_Blog->get_setting( 'allow_item_subscriptions' ) ),
-				array( 'allow_item_mod_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications when post is modified and user has a permissions to moderate it.' ), $edited_Blog->get_setting( 'allow_item_mod_subscriptions' ) ),
+				array( 'allow_item_mod_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications when post is modified and user has permission to moderate it.' ), $edited_Blog->get_setting( 'allow_item_mod_subscriptions' ) ),
 			), 'allow_coll_subscriptions', T_('Email subscriptions') );
 	$Form->end_fieldset();
 }
