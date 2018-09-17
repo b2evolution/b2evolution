@@ -321,33 +321,45 @@ switch( $action )
 
 		$user_domain = $Hit->get_remote_host( true );
 
-		// Check if quick registration request is suspected by IP address or domain:
-		if( $is_quick && antispam_suspect_check_by_data( array( 'IP' => $Hit->IP, 'domain' => $user_domain ) ) )
-		{	// Current request is suspected by IP or domain, we should not allow quick registration for such users, redirect to normal registration form:
-			$prefilled_params = array();
-			if( ! empty( $login ) )
-			{
-				$prefilled_params[ $dummy_fields['login'] ] = $login;
+		if( $is_quick )
+		{	// Check quick registration for suspected data:
+			$check_suspect_data = array(
+				'IP'     => $Hit->IP,
+				'domain' => $user_domain,
+			);
+			$Plugins_admin = & get_Plugins_admin();
+			if( ( $geoip_Plugin = & $Plugins_admin->get_by_code( 'evo_GeoIP' ) ) &&
+			    ( $Country = $geoip_Plugin->get_country_by_IP( $Hit->IP ) ) )
+			{	// Also check country if it is found by GeoIP plugin:
+				$check_suspect_data['country'] = $Country->ID;
 			}
-			if( ! empty( $email ) )
-			{
-				$prefilled_params[ $dummy_fields['email'] ] = $email;
+			if( antispam_suspect_check_by_data( $check_suspect_data ) )
+			{	//Current request is suspected by IP, domain or country, we should not allow quick registration for such users, redirect to normal registration form:
+				$prefilled_params = array();
+				if( ! empty( $login ) )
+				{
+					$prefilled_params[ $dummy_fields['login'] ] = $login;
+				}
+				if( ! empty( $email ) )
+				{
+					$prefilled_params[ $dummy_fields['email'] ] = $email;
+				}
+				if( ! empty( $firstname ) )
+				{
+					$prefilled_params['firstname'] = $firstname;
+				}
+				if( ! empty( $lastname ) )
+				{
+					$prefilled_params['lastname'] = $lastname;
+				}
+				if( ! empty( $widget ) )
+				{
+					$prefilled_params['widget'] = $widget;
+				}
+				// Redirect to normal registration form with prefilled data from quick registration form:
+				header_redirect( url_add_param( get_user_register_url( $redirect_to, $source, false, '&' ), $prefilled_params, '&' ) );
+				// Exit here.
 			}
-			if( ! empty( $firstname ) )
-			{
-				$prefilled_params['firstname'] = $firstname;
-			}
-			if( ! empty( $lastname ) )
-			{
-				$prefilled_params['lastname'] = $lastname;
-			}
-			if( ! empty( $widget ) )
-			{
-				$prefilled_params['widget'] = $widget;
-			}
-			// Redirect to normal registration form with prefilled data from quick registration form:
-			header_redirect( url_add_param( get_user_register_url( $redirect_to, $source, false, '&' ), $prefilled_params, '&' ) );
-			// Exit here.
 		}
 
 		$DB->begin();

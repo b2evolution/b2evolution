@@ -830,15 +830,9 @@ function antispam_suspect_check_by_data( $data = array() )
 		{
 			case 'IP':
 				// Check by IP address:
-				global $DB;
-				$IP_address_int = ip2int( $data_item );
-				$SQL = new SQL( 'Get IP range by address "'.$data_item.'" to check if it is suspected' );
-				$SQL->SELECT( 'aipr_ID' );
-				$SQL->FROM( 'T_antispam__iprange' );
-				$SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $IP_address_int ) );
-				$SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $IP_address_int ) );
-				$SQL->WHERE_and( 'aipr_status = "suspect"' );
-				$is_suspected = ( $DB->get_row( $SQL ) !== NULL );
+				$IPRangeCache = & get_IPRangeCache();
+				$IPRange = & $IPRangeCache->get_by_ip( $data_item, false, false );
+				$is_suspected = ( $IPRange && $IPRange->get( 'status' ) == 'suspect' );
 				break;
 
 			case 'domain':
@@ -850,13 +844,9 @@ function antispam_suspect_check_by_data( $data = array() )
 
 			case 'country':
 				// Check by country ID:
-				global $DB;
-				$SQL = new SQL( 'Check suspected country with ID #'.$data_item );
-				$SQL->SELECT( 'ctry_ID' );
-				$SQL->FROM( 'T_regional__country' );
-				$SQL->WHERE( 'ctry_ID = '.$DB->quote( $data_item ) );
-				$SQL->WHERE_and( 'ctry_status = "suspect"' );
-				$is_suspected = ( $DB->get_var( $SQL ) !== NULL );
+				$CountryCache = & get_CountryCache();
+				$Country = & $CountryCache->get_by_ID( $data_item, false, false );
+				$is_suspected = ( $Country && $Country->get( 'status' ) == 'suspect' );
 				break;
 		}
 
