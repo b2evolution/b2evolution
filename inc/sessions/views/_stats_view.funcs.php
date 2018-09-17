@@ -300,6 +300,10 @@ function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp 
 		if( $hit_disp != NULL )
 		{
 			$hit_uri .= '[disp=<a href="'.$full_url.'">'.$hit_disp.'</a>]';
+			if( $hit_disp == 'single' || $hit_disp == 'page' )
+			{	// Display item slug:
+				$hit_uri .= ' <a href="'.$full_url.'">'.preg_replace( '#^.+/([^/]+)$#', '$1', $full_url ).'</a>';
+			}
 		}
 		if( $hit_ctrl != NULL )
 		{
