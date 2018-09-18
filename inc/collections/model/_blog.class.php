@@ -1439,7 +1439,7 @@ class Blog extends DataObject
 						$re = "/^https?(.*)/i";
 						$subst = "https?$1";
 						$sec_alias = trim( $sec_alias );
-						$r =  count( $alias ) - count( $sec_alias );
+						$r =  strlen( $alias ) - strlen( $sec_alias );
 						if( $r < 0 )
 						{
 							$alias = rtrim( $alias, "/\\" );
