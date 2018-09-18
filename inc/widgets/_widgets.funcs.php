@@ -904,11 +904,10 @@ function insert_shared_widgets()
 }
 
 /*
- * @param string Title of the container. This gets passed to T_()!
- * @param boolean Is included in collection skin
+ * @param object Widget Container
  * @param array Params
  */
-function display_container( $WidgetContainer, $is_included = true, $params = array() )
+function display_container( $WidgetContainer, $params = array() )
 {
 	global $Collection, $Blog, $admin_url, $embedded_containers, $mode;
 	global $Session;
@@ -941,7 +940,7 @@ function display_container( $WidgetContainer, $is_included = true, $params = arr
 		$destroy_container_url .= '&amp;mode='.$mode;
 	}
 
-	if( ! $is_included )
+	if( $WidgetContainer->get_type() != 'main' )
 	{	// Allow to destroy sub-container when it is not included into the selected skin:
 		$destroy_btn_title = ( $WidgetContainer->main ? T_('Destroy container') : T_('Destroy sub-container') );
 		$Table->global_icon( $destroy_btn_title, 'delete', $destroy_container_url, $destroy_btn_title, $mode == 'customizer' ? 0 : 3, $mode == 'customizer' ? 0 : 4, array( 'onclick' => 'return confirm( \''.TS_('Are you sure you want to destroy this container?').'\' )') );
@@ -1161,29 +1160,22 @@ function display_container( $WidgetContainer, $is_included = true, $params = arr
  * Display containers
  *
  * @param string Skin type: 'normal', 'mobile', 'tablet'
- * @param boolean TRUE to display main containers, FALSE - sub containers
- * @param boolean TRUE to display collection containers, FALSE - shared containers
- * @param boolean TRUE to display page containers, FALSE - for all others
+ * @param string Container type: 'main', 'sub', 'page', 'shared', 'shared-sub'
+ * @param array Params
  */
-function display_containers( $skin_type, $main = true, $shared = false, $paged = false )
+function display_containers( $skin_type, $container_type, $params = array() )
 {
-	global $Blog, $DB, $blog_container_list;
+	global $Blog, $DB;
 
 	$WidgetContainerCache = & get_WidgetContainerCache();
+	$WidgetContainerCache->clear();
 
-	if( $main )
-	{	// Display MAIN containers:
-		if( $shared )
-		{	// Get shared containers:
-			$WidgetContainerCache->clear();
-			$WidgetContainerCache->load_where( 'wico_main = 1
-				AND wico_coll_ID IS NULL
-				AND wico_skin_type = '.$DB->quote( $skin_type ) );
-			$main_containers = $WidgetContainerCache->cache;
-		}
-		else
-		{	// Get collection/skin containers:
-			$main_containers = array();
+	$containers = array();
+
+	switch( $container_type )
+	{
+		case 'main':
+			// Get main/skin containers:
 			$coll_containers = $Blog->get_main_containers();
 			foreach( $coll_containers as $container_code => $container_data )
 			{
@@ -1200,33 +1192,46 @@ function display_containers( $skin_type, $main = true, $shared = false, $paged =
 				{	// Skip this container because another type is requested:
 					continue;
 				}
-				$main_containers[] = $WidgetContainer;
+				$containers[] = $WidgetContainer;
 			}
-		}
-		foreach( $main_containers as $WidgetContainer )
-		{
-			display_container( $WidgetContainer );
-		}
-	}
-	else
-	{	// Display SUB containers:
-		if( $paged )
-		{	// Set SQL condition to select all page containers:
-			$pages_where_sql = 'wico_main = 1 AND wico_item_ID IS NOT NULL';
-		}
-		else
-		{	// Set SQL condition to select not page containers:
-			$pages_where_sql = 'wico_main = 0 AND wico_item_ID IS NULL';
-		}
-		$WidgetContainerCache->clear();
-		$WidgetContainerCache->load_where( 'wico_coll_ID '.( $shared ? 'IS NULL' : ' = '.$Blog->ID ).'
-			AND wico_skin_type = '.$DB->quote( $skin_type ).'
-			AND ( '.$pages_where_sql.' )' );
+			break;
 
-		foreach( $WidgetContainerCache->cache as $WidgetContainer )
-		{
-			display_container( $WidgetContainer, false );
-		}
+		case 'sub':
+			// Get sub-containers:
+			$containers = $WidgetContainerCache->load_where( 'wico_coll_ID = '.$Blog->ID.'
+				AND wico_skin_type = '.$DB->quote( $skin_type ).'
+				AND wico_main = 0
+				AND wico_item_ID IS NULL' );
+			break;
+
+		case 'page':
+			// Get page containers:
+			$containers = $WidgetContainerCache->load_where( 'wico_coll_ID = '.$Blog->ID.'
+				AND wico_skin_type = '.$DB->quote( $skin_type ).'
+				AND wico_main = 1
+				AND wico_item_ID IS NOT NULL' );
+			break;
+
+		case 'shared':
+			// Get shared main containers:
+			$containers = $WidgetContainerCache->load_where( 'wico_coll_ID IS NULL
+				AND wico_skin_type = '.$DB->quote( $skin_type ).'
+				AND wico_main = 1
+				AND wico_item_ID IS NULL' );
+			break;
+
+		case 'shared-sub':
+			// Get shared sub-containers:
+			$containers = $WidgetContainerCache->load_where( 'wico_coll_ID IS NULL
+				AND wico_skin_type = '.$DB->quote( $skin_type ).'
+				AND wico_main = 0
+				AND wico_item_ID IS NULL' );
+			break;
+	}
+
+	foreach( $containers as $WidgetContainer )
+	{	// Display each found container:
+		display_container( $WidgetContainer, $params );
 	}
 }
 
