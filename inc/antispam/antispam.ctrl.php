@@ -566,6 +566,8 @@ if( $display_mode != 'js' )
 
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'countries-list' );
+
+			$AdminUI->breadcrumbpath_add( T_('Countries'), '?ctrl=antispam&amp;tab3='.$tab3 );
 			break;
 
 		case 'domains':

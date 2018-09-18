@@ -1409,7 +1409,7 @@ class collections_Module extends Module
 
 			case 'create_post':
 				// Create new post from front-office by anonymous user:
-				global $dummy_fields, $Plugins;
+				global $dummy_fields, $Plugins, $Settings, $Hit;
 
 				load_class( 'items/model/_item.class.php', 'Item' );
 
@@ -1509,6 +1509,94 @@ class collections_Module extends Module
 				{	// Insert system log about user's registration
 					syslog_insert( 'User auto registration on new item', 'info', 'user', $new_User->ID );
 					report_user_create( $new_User );
+				}
+
+				// Save trigger page:
+				$session_registration_trigger_url = $Session->get( 'registration_trigger_url' );
+				if( empty( $session_registration_trigger_url ) && isset( $_SERVER['HTTP_REFERER'] ) )
+				{	// Trigger page still is not defined
+					$session_registration_trigger_url = $_SERVER['HTTP_REFERER'];
+					$Session->set( 'registration_trigger_url', $session_registration_trigger_url );
+				}
+
+				$UserCache = & get_UserCache();
+				$UserCache->add( $new_User );
+
+				// Get user domain data:
+				$user_domain = $Hit->get_remote_host( true );
+				load_funcs( 'sessions/model/_hitlog.funcs.php' );
+				$DomainCache = & get_DomainCache();
+				$Domain = & get_Domain_by_subdomain( $user_domain );
+				$dom_status_titles = stats_dom_status_titles();
+				$dom_status = $dom_status_titles[ $Domain ? $Domain->get( 'status' ) : 'unknown' ];
+
+				$initial_hit = $Session->get_first_hit_params();
+				if( ! empty ( $initial_hit ) )
+				{	// Save User Settings:
+					$UserSettings->set( 'initial_sess_ID' , $initial_hit->hit_sess_ID, $new_User->ID );
+					$UserSettings->set( 'initial_blog_ID' , $initial_hit->hit_coll_ID, $new_User->ID );
+					$UserSettings->set( 'initial_URI' , $initial_hit->hit_uri, $new_User->ID );
+					$UserSettings->set( 'initial_referer' , $initial_hit->hit_referer , $new_User->ID );
+				}
+				if( ! empty( $session_registration_trigger_url ) )
+				{	// Save Trigger page:
+					$UserSettings->set( 'registration_trigger_url' , $session_registration_trigger_url, $new_User->ID );
+				}
+				$UserSettings->set( 'created_fromIPv4', ip2int( $Hit->IP ), $new_User->ID );
+				$UserSettings->set( 'user_registered_from_domain', $user_domain, $new_User->ID );
+				$UserSettings->set( 'user_browser', substr( $Hit->get_user_agent(), 0 , 200 ), $new_User->ID );
+				$UserSettings->dbupdate();
+
+				// Send notification email about new user registrations to users with edit users permission
+				$email_template_params = array(
+						'country'     => $new_User->get( 'ctry_ID' ),
+						'reg_country' => $new_User->get( 'reg_ctry_ID' ),
+						'reg_domain'  => $user_domain.' ('.$dom_status.')',
+						'user_domain' => $user_domain,
+						'firstname'   => $new_User->get( 'firstname' ),
+						'lastname'    => $new_User->get( 'lastname' ),
+						'fullname'    => $new_User->get( 'fullname' ),
+						'gender'      => $new_User->get( 'gender' ),
+						'locale'      => $new_User->get( 'locale' ),
+						'source'      => $new_User->get( 'source' ),
+						'trigger_url' => $session_registration_trigger_url,
+						'initial_hit' => $initial_hit,
+						'level'       => $new_User->get( 'level' ),
+						'group'       => ( ( $user_Group = & $new_User->get_Group() ) ? $user_Group->get_name() : '' ),
+						'login'       => $new_User->get( 'login' ),
+						'email'       => $new_User->get( 'email' ),
+						'new_user_ID' => $new_User->ID,
+					);
+				send_admin_notification( NT_('New user registration'), 'account_new', $email_template_params );
+
+				$Plugins->trigger_event( 'AfterUserRegistration', array( 'User' => & $new_User ) );
+				// Move user to suspect group by IP address and reverse DNS domain and email address domain:
+				// Make this move even if during the registration it was added to a trusted group:
+				antispam_suspect_user_by_IP( '', $new_User->ID, false );
+				antispam_suspect_user_by_reverse_dns_domain( $new_User->ID, false );
+				antispam_suspect_user_by_email_domain( $new_User->ID, false );
+
+				if( $Settings->get( 'newusers_mustvalidate' ) )
+				{	// We want that the user validates his email address:
+					if( $new_User->send_validate_email( $redirect_to, $item_Blog->ID ) )
+					{
+						$activateinfo_link = 'href="'.get_activate_info_url( NULL, '&amp;' ).'"';
+						$Messages->add( sprintf( T_('An email has been sent to your email address. Please click on the link therein to activate your account. <a %s>More info &raquo;</a>'), $activateinfo_link ), 'success' );
+					}
+					elseif( $demo_mode )
+					{
+						$Messages->add( 'Sorry, could not send email. Sending email in demo mode is disabled.', 'error' );
+					}
+					else
+					{
+						$Messages->add( T_('Sorry, the email with the link to activate your account could not be sent.')
+							.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
+						// fp> TODO: allow to enter a different email address (just in case it's that kind of problem)
+					}
+				}
+				else
+				{	// Display this message after successful registration and without validation email:
+					$Messages->add( T_('You have successfully registered on this site. Welcome!'), 'success' );
 				}
 
 				// Autologin the user. This is more comfortable for the user and avoids

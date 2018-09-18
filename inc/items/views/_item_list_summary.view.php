@@ -155,10 +155,77 @@ while( $Item = & $ItemList->get_item() )
 			}
 			?>
 			<div class="bText">
-					<span class="bTitle"><?php $Item->title( array( 'target_blog' => '' ) );?></span>
+					<span class="bTitle">
+					<?php
+					$title_length = mb_strlen( $Item->title );
+					$label = 'default';
+					if( $title_length <= 55 )
+					{
+						$label = 'success';
+					}
+					elseif( $title_length <= 60 )
+					{
+						$label = 'warning';
+					}
+					else
+					{
+						$label = 'danger';
+					}
+					echo $Item->title( array( 'target_blog' => '' ) ).'</span> <span class="label label-'.$label.'">'.$title_length.'</span>';
+					?>
 					<p>
-					<?php echo format_to_output( $Item->get_excerpt2(), 'htmlattr' );?>
+					<?php
+					$excerpt = format_to_output( $Item->get_excerpt2(), 'htmlbody' );
+					$excerpt_length = mb_strlen( $excerpt );
+					$label = 'default';
+					if( $excerpt_length <= 55 )
+					{
+						$label = 'success';
+					}
+					elseif( $excerpt_length <= 60 )
+					{
+						$label = 'warning';
+					}
+					else
+					{
+						$label = 'danger';
+					}
+					echo $excerpt.' <span class="label label-'.$label.'">'.$excerpt_length.'</span>';
+					?>
 					</p>
+
+					<?php
+					if( $post_image )
+					{
+						echo '<p class="note">';
+						if( get_class( $post_image ) == 'Link' )
+						{
+							$image = & $post_image->get_File();
+						}
+						else
+						{
+							$image = $post_image;
+						}
+						$image_size = $image->get_image_size( 'widthheight_assoc' );
+						$image_ratio = $image_size['width'] / $image_size['height'];
+						$image_size = $image->get_image_size( 'widthxheight' );
+						$label = 'default';
+						if( ( $image_ratio >= 1.90 ) && ( $image_ratio <= 1.92 ) )
+						{
+							$label = 'success';
+						}
+						elseif( ( $image_ratio >= 1.90 ) && ( $image_ratio <= 1.92 ) )
+						{
+							$label = 'warning';
+						}
+						else
+						{
+							$label = 'danger';
+						}
+						echo sprintf( T_('Image dimensions: %s - Ratio: %s'), $image_size, '<span class="label label-'.$label.'">'.number_format( $image_ratio, 2 ).'</span>' );
+						echo '</p>';
+					}
+					?>
 
 				<div>
 					<?php

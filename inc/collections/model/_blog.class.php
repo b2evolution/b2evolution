@@ -1439,7 +1439,7 @@ class Blog extends DataObject
 						$re = "/^https?(.*)/i";
 						$subst = "https?$1";
 						$sec_alias = trim( $sec_alias );
-						$r =  count( $alias ) - count( $sec_alias );
+						$r =  strlen( $alias ) - strlen( $sec_alias );
 						if( $r < 0 )
 						{
 							$alias = rtrim( $alias, "/\\" );
@@ -3693,6 +3693,11 @@ class Blog extends DataObject
 			// When user has edit permission to blog admin part, the urlname will be validated in load_from_request() function.
 			$this->set( 'urlname', urltitle_validate( empty( $blog_urlname ) ? $this->get( 'urlname' ) : $blog_urlname, '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
 		}
+
+		// Duplicated collection should not have the same siteurl as original collection, set access type to default extrapath
+		// and empty the siteurl, similar to what a new blank collection have:
+		$this->set( 'access_type', 'extrapath' );
+		$this->set( 'siteurl', '' );
 
 		// Set collection owner to current user
 		$this->set( 'owner_user_ID', $current_User->ID );

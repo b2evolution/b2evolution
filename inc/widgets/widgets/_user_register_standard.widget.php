@@ -192,10 +192,12 @@ class user_register_standard_Widget extends ComponentWidget
 			$login = param( $dummy_fields['login'], 'string', '' );
 			$email = utf8_strtolower( param( $dummy_fields['email'], 'string', '' ) );
 			$firstname = param( 'firstname', 'string', '' );
+			$lastname = param( 'lastname', 'string', '' );
 			$gender = param( 'gender', 'string', false );
 			$source = param( 'source', 'string', 'register form' );
 			$redirect_to = param( 'redirect_to', 'url', '' );
 			$return_to = param( 'return_to', 'url', '' );
+			$widget = param( 'widget', 'integer' );
 
 			if( $register_user = $Session->get('core.register_user') )
 			{	// Get an user data from predefined session (after adding of a comment):
@@ -228,6 +230,14 @@ class user_register_standard_Widget extends ComponentWidget
 			$Form->hidden( 'action', 'register' );
 			$Form->hidden( 'source', $source );
 			$Form->hidden( 'redirect_to', $redirect_to );
+			if( ! empty( $lastname ) )
+			{	// Last name may be used on this form when user cannot be quickly registered because of suspected data:
+				$Form->hidden( 'lastname', $lastname );
+			}
+			if( ! empty( $widget ) )
+			{	// Widget ID may be used on this form when user cannot be quickly registered because of suspected data:
+				$Form->hidden( 'widget', $widget );
+			}
 
 			if( $invitation_code_status == 'input' )
 			{ // Display an input field to enter invitation code manually or to change incorrect code
@@ -300,6 +310,10 @@ class user_register_standard_Widget extends ComponentWidget
 			if( $Settings->get( 'registration_require_firstname' ) )
 			{	// If firstname is required
 				$Form->text_input( 'firstname', $firstname, 18, T_('First name'), T_('Your real first name.'), array( 'maxlength' => 50, 'class' => 'input_text', 'required' => true ) );
+			}
+			elseif( ! empty( $firstname ) )
+			{	// First name may be used on this form when user cannot be quickly registered because of suspected data:
+				$Form->hidden( 'firstname', $firstname );
 			}
 
 			$registration_require_gender = $Settings->get( 'registration_require_gender' );
