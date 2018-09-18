@@ -523,7 +523,7 @@ switch( $action )
 		send_admin_notification( NT_('New user registration'), 'account_new', $email_template_params );
 
 		$Plugins->trigger_event( 'AfterUserRegistration', array( 'User' => & $new_User ) );
-		// Move user to suspect group by IP address and reverse DNS domain:
+		// Move user to suspect group by IP address and reverse DNS domain and email address domain:
 		// Make this move even if during the registration it was added to a trusted group:
 		antispam_suspect_user_by_IP( '', $new_User->ID, false );
 		antispam_suspect_user_by_reverse_dns_domain( $new_User->ID, false );
