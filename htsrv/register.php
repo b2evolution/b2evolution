@@ -323,18 +323,15 @@ switch( $action )
 
 		if( $is_quick )
 		{	// Check quick registration for suspected data:
-			$check_suspect_data = array(
-				'IP'     => $Hit->IP,
-				'domain' => $user_domain,
-			);
-			$Plugins_admin = & get_Plugins_admin();
-			if( ( $geoip_Plugin = & $Plugins_admin->get_by_code( 'evo_GeoIP' ) ) &&
-			    ( $Country = $geoip_Plugin->get_country_by_IP( $Hit->IP ) ) )
-			{	// Also check country if it is found by GeoIP plugin:
-				$check_suspect_data['country'] = $Country->ID;
-			}
-			if( antispam_suspect_check_by_data( $check_suspect_data ) )
-			{	//Current request is suspected by IP, domain or country, we should not allow quick registration for such users, redirect to normal registration form:
+			$is_suspected_request = antispam_suspect_check_by_data( array(
+				'IP_address'   => $Hit->IP,
+				'domain'       => $user_domain,
+				'email_domain' => $email,
+				'country_IP'   => $Hit->IP,
+			) );
+			if( $is_suspected_request )
+			{	// Current request is suspected by IP address, domain, domain of email address or country of current IP address,
+				// We should not allow quick registration for such users, Redirect to normal registration form:
 				$prefilled_params = array();
 				if( ! empty( $login ) )
 				{
@@ -530,6 +527,7 @@ switch( $action )
 		// Make this move even if during the registration it was added to a trusted group:
 		antispam_suspect_user_by_IP( '', $new_User->ID, false );
 		antispam_suspect_user_by_reverse_dns_domain( $new_User->ID, false );
+		antispam_suspect_user_by_email_domain( $new_User->ID, false );
 
 		if( $Settings->get('newusers_mustvalidate') )
 		{ // We want that the user validates his email address:
