@@ -446,12 +446,12 @@ class ComponentWidget extends DataObject
 			$r['widget_link_class'] = array(
 					'label' => '<span class="dimmed">'.T_('Link/Button Class').'</span>',
 					'size' => 20,
-					'note' => T_('Replaces $link_class$ in class attribute of link/button.'),
+					'note' => sprintf( T_('Replaces %s in class attribute of link/button.'), '<code>$link_class$</code>' ).' '.T_('Leave empty to use default values from skin or from widget.'),
 				);
 			$r['widget_active_link_class'] = array(
 					'label' => '<span class="dimmed">'.T_('Active Link/Button Class').'</span>',
 					'size' => 20,
-					'note' => T_('Replaces $link_class$ in class attribute of active link/button.'),
+					'note' => sprintf( T_('Replaces %s in class attribute of active link/button.'), '<code>$link_class$</code>' ).' '.T_('Leave empty to use default values from skin or from widget.'),
 				);
 		}
 
@@ -460,7 +460,7 @@ class ComponentWidget extends DataObject
 			$r['widget_css_class'] = array(
 					'label' => '<span class="dimmed">'.T_( 'CSS Class' ).'</span>',
 					'size' => 20,
-					'note' => T_( 'Replaces $wi_class$ in your skins containers.'),
+					'note' => sprintf( T_('Will be injected into %s in your skin containers (along with required system classes).'), '<code>$wi_class$</code>' ),
 				);
 		}
 
@@ -469,7 +469,7 @@ class ComponentWidget extends DataObject
 			$r['widget_ID'] = array(
 					'label' => '<span class="dimmed">'.T_( 'DOM ID' ).'</span>',
 					'size' => 20,
-					'note' => T_( 'Replaces $wi_ID$ in your skins containers.'),
+					'note' => sprintf( T_('Replaces %s in your skins containers.'), '<code>$wi_ID$</code>' ).' '.sprintf( T_('Leave empty to use default value: %s.'), '<code>widget_'.$this->type.'_'.$this->code.'_'.$this->ID.'</code>' ),
 				);
 		}
 
