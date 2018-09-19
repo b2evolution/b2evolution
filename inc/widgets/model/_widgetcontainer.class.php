@@ -148,7 +148,7 @@ class WidgetContainer extends DataObject
 		{	// We should create new Item automatically for selected Item Type on the form of Page Container:
 			$ItemTypeCache = & get_ItemTypeCache();
 			if( ( $widget_page_ItemType = & $ItemTypeCache->get_by_ID( $this->container_ityp_ID, false, false ) ) &&
-					( $widget_page_ItemType->get( 'usage' ) == 'widget-page' ) &&
+					( $widget_page_ItemType->get( 'page_container' ) ) &&
 					( $widget_container_Blog = & $this->get_Blog() ) )
 			{	// Allow to create new Item only with usage "Widget Page" of Item Type:
 				load_class( 'items/model/_item.class.php', 'Item' );
@@ -239,9 +239,9 @@ class WidgetContainer extends DataObject
 							// Check for corrent Item:
 							$ItemCache = &get_ItemCache();
 							if( ! ( $widget_page_Item = & $ItemCache->get_by_ID( $wico_item_ID, false, false ) ) || 
-									$widget_page_Item->get_type_setting( 'usage' ) != 'widget-page' )
+									! $widget_page_Item->get_type_setting( 'page_container' ) )
 							{	// Display error for unavailable item:
-								param_error( 'wico_item_ID', T_('Item can be used for page container only with Item Type usage "Widget Page"!') );
+								param_error( 'wico_item_ID', T_('Item can be used for page container only with enabled setting "Page containers" of Item Type!') );
 							}
 						}
 						break;
