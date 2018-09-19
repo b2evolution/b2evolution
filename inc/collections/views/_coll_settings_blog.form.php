@@ -140,7 +140,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Default URL for New Collections').get_manual_link( 'default-url-for-new -collections' ) );
+$Form->begin_fieldset( T_('Default URL for New Collections').get_manual_link( 'default-url-for-new-collections' ) );
 
 	global $baseurl, $basehost, $baseprotocol, $baseport;
 	$access_type_options = array(

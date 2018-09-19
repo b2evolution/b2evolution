@@ -3696,7 +3696,8 @@ class Blog extends DataObject
 
 		// Duplicated collection should not have the same siteurl as original collection, set access type to default extrapath
 		// and empty the siteurl, similar to what a new blank collection have:
-		$this->set( 'access_type', 'extrapath' );
+		global $Settings;
+		$this->set( 'access_type', $Settings->get( 'coll_access_type' ) );
 		$this->set( 'siteurl', '' );
 
 		// Set collection owner to current user

@@ -126,6 +126,21 @@ class item_fields_compare_Widget extends ComponentWidget
 					'type' => 'checkbox',
 					'defaultvalue' => 0,
 				),
+				'restrict_cats' => array(
+					'label' => T_('Restrict to Category'),
+					'note' => T_('List category IDs separated by ,'),
+					'defaultvalue' => '',
+					'size' => 80,
+					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
+																		'error'   => T_('Invalid list of Category IDs.') ),
+				),
+				'restrict_tags' => array(
+					'label' => T_('Restrict to Tags'),
+					'note'  => T_('Items must have ALL the tags listed here.'),
+					'type' => 'itemtag',
+					'defaultvalue' => '',
+					'size' => 80,
+				),
 				'items_limit' => array(
 					'label' => T_('Limit'),
 					'type' => 'integer',
@@ -860,13 +875,23 @@ class item_fields_compare_Widget extends ComponentWidget
 			}
 
 			// Set default filters:
-			$ItemList->set_default_filters( array(
+			$default_filters = array(
 				'types'        => $filter_item_type,
 				'post_ID_list' => is_array( $items ) ? implode( ',', $items ) : NULL,
 				'orderby'      => implode( ',', $default_orders ),
 				'order'        => implode( ',', $default_dirs ),
 				'featured'     => ( $this->disp_params['restrict_featured'] ? true : NULL ),
-			) );
+			);
+			if( ! empty( $this->disp_params['restrict_cats'] ) )
+			{	// Restrict by categories:
+				$default_filters['cat_array'] = explode( ',', $this->disp_params['restrict_cats'] );
+			}
+			if( ! empty( $this->disp_params['restrict_tags'] ) )
+			{	// Restrict by tags:
+				$default_filters['tags'] = $this->disp_params['restrict_tags'];
+				$default_filters['tags_operator'] = 'AND';
+			}
+			$ItemList->set_default_filters( $default_filters );
 
 			if( $this->disp_params['allow_filter'] )
 			{	// Filter items from request:

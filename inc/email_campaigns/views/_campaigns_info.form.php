@@ -49,62 +49,37 @@ $Form->begin_fieldset( T_('List recipients').get_manual_link( 'campaign-recipien
 			           .'<a href="'.$admin_url.'?ctrl=users&amp;action=campaign&amp;ecmp_ID='.$edited_EmailCampaign->ID.'" class="btn btn-default">'.T_('Change filter').'</a>',
 		) );
 	$Form->info( T_('Already received'), $edited_EmailCampaign->get_recipients_count( 'receive', true ), '('.T_('Accounts which have already been sent this campaign').')' );
-	$Form->begin_line( T_('Skip users who have any of these tags'), 'ecmp_user_tag_sendskip' );
-		$Form->usertag_input( 'ecmp_user_tag_sendskip', param( 'ecmp_user_tag_sendskip', 'string', $edited_EmailCampaign->get( 'user_tag_sendskip' ) ), 60, '',
-				'', array(
+	$Form->usertag_input( 'ecmp_user_tag_sendskip', param( 'ecmp_user_tag_sendskip', 'string', $edited_EmailCampaign->get( 'user_tag_sendskip' ) ), 60, T_('Skip users who have any of these tags'),
+		T_('users will be skipped').' '.action_icon( T_('Refresh'), 'refresh', '#', NULL, NULL, NULL, array( 'onclick' => 'return update_campaign_recipients_count( '.$edited_EmailCampaign->ID.' )' ) ),
+		array(
 			'maxlength' => 255,
-			'style'     => 'width: 100%;',
-			'input_prefix' => '<span id="user_admin_tags_sendskip" class="input-group user_admin_tags">',
-			'input_suffix' => '</span>',
+			'input_prefix' => '<div class="evo_input__tags">',
+			'input_suffix' => '</div><span id="skipped_tag_count">'.$edited_EmailCampaign->get_recipients_count( 'skipped_tag' ).'</span>',
 		) );
-		$Form->info( '', '<span id="skipped_tag_count">'.$edited_EmailCampaign->get_recipients_count( 'skipped_tag' ).'</span>', T_('users will be skipped').' '.
-				action_icon( T_('Refresh'), 'refresh', '#', NULL, NULL, NULL, array( 'onclick' => 'return update_campaign_recipients_count( '.$edited_EmailCampaign->ID.' )' ) ) );
-	$Form->end_line();
 	$Form->info( T_('Ready to send'), '<span id="ready_to_send_count">'.$edited_EmailCampaign->get_recipients_count( 'wait', true ).'</span>', '('.T_('Accounts which meet all criteria to receive this campaign').')' );
 	$Form->usertag_input( 'ecmp_user_tag_sendsuccess', param( 'ecmp_user_tag_sendsuccess', 'string', $edited_EmailCampaign->get( 'user_tag_sendsuccess' ) ), 60, T_('On successful send, tag users with'), '', array(
 		'maxlength' => 255,
-		'style'     => 'width: 100%;',
-		'input_prefix' => '<div id="user_admin_tags_sendsuccess" class="input-group user_admin_tags">',
-		'input_suffix' => '</div>',
 	) );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Click tagging').get_manual_link( 'campaign-tagging-panel' ) );
 	$Form->usertag_input( 'ecmp_user_tag', param( 'ecmp_user_tag', 'string', $edited_EmailCampaign->get( 'user_tag' ) ), 60, T_('Tag users who click on content links with'), '', array(
 		'maxlength' => 255,
-		'style'     => 'width: 100%;',
-		'input_prefix' => '<div id="user_admin_tags" class="input-group user_admin_tags">',
-		'input_suffix' => '</div>',
 	) );
 	$Form->usertag_input( 'ecmp_user_tag_cta1', param( 'ecmp_user_tag_cta1', 'string', $edited_EmailCampaign->get( 'user_tag_cta1' ) ), 60, /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 1 with'), '', array(
 		'maxlength' => 255,
-		'style'     => 'width: 100%;',
-		'input_prefix' => '<div id="user_admin_tags_cta1" class="input-group user_admin_tags">',
-		'input_suffix' => '</div>',
 	) );
 	$Form->usertag_input( 'ecmp_user_tag_cta2', param( 'ecmp_user_tag_cta2', 'string', $edited_EmailCampaign->get( 'user_tag_cta2' ) ), 60, /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 2 with'), '', array(
 		'maxlength' => 255,
-		'style'     => 'width: 100%;',
-		'input_prefix' => '<div id="user_admin_tags_cta2" class="input-group user_admin_tags">',
-		'input_suffix' => '</div>',
 	) );
 	$Form->usertag_input( 'ecmp_user_tag_cta3', param( 'ecmp_user_tag_cta3', 'string', $edited_EmailCampaign->get( 'user_tag_cta3' ) ), 60, /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 3 with'), '', array(
 		'maxlength' => 255,
-		'style'     => 'width: 100%;',
-		'input_prefix' => '<div id="user_admin_tags_cta3" class="input-group user_admin_tags">',
-		'input_suffix' => '</div>',
 	) );
 	$Form->usertag_input( 'ecmp_user_tag_like', param( 'ecmp_user_tag_like', 'string', $edited_EmailCampaign->get( 'user_tag_like' ) ), 60, T_('Tag users who liked the email with'), '', array(
 		'maxlength' => 255,
-		'style'     => 'width: 100%;',
-		'input_prefix' => '<div id="user_admin_tags_like" class="input-group user_admin_tags">',
-		'input_suffix' => '</div>',
 	) );
 	$Form->usertag_input( 'ecmp_user_tag_dislike', param( 'ecmp_user_tag_dislike', 'string', $edited_EmailCampaign->get( 'user_tag_dislike' ) ), 60, T_('Tag users who disliked the email with'), '', array(
 		'maxlength' => 255,
-		'style'     => 'width: 100%;',
-		'input_prefix' => '<div id="user_admin_tags_dislike" class="input-group user_admin_tags">',
-		'input_suffix' => '</div>',
 	) );
 
 	?>
