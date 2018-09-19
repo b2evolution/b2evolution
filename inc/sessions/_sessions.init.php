@@ -277,12 +277,12 @@ class sessions_Module extends Module
 										'browser' => array(
 											'text' => T_('Browser hits'),
 											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=browser'.$section_params ),
-										'api' => array(
-											'text' => T_('API hits'),
-											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=api'.$section_params ),
 										'search_referers' => array(
 											'text' => T_('Search & Referers'),
 											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=search_referers'.$section_params ),
+										'api' => array(
+											'text' => T_('API hits'),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=api'.$section_params ),
 										'robot' => array(
 											'text' => T_('Robot hits'),
 											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=robot'.$section_params ),
