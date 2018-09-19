@@ -200,14 +200,14 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 			$sidebar_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_name = "Sidebar link"' );
 		}
 		$default_widgets['sidebar'] = array(
-			array(  5, 'coll_current_filters', 'coll_type' => '-forum', 'install' => $install_test_features ),
-			array( 10, 'user_login', 'install' => $install_test_features ),
-			array( 15, 'user_greetings', 'install' => $install_test_features ),
-			array( 20, 'user_profile_pics', 'install' => $install_not_forum ),
-			array( 30, 'evo_Calr', 'type' => 'plugin', 'install' => ( $install_not_forum && $blog_id > $blog_a_ID ) ),
-			array( 40, 'coll_longdesc', 'install' => $install_not_forum, 'params' => array( 'title' => '$title$' ) ),
-			array( 50, 'coll_search_form', 'install' => $install_not_forum ),
-			array( 60, 'coll_category_list', 'install' => $install_not_forum ),
+			array(  5, 'coll_current_filters', 'coll_type' => '-forum,catalog', 'install' => $install_test_features ),
+			array( 10, 'user_login', 'coll_type' => '-catalog', 'install' => $install_test_features ),
+			array( 15, 'user_greetings', 'coll_type' => '-catalog', 'install' => $install_test_features ),
+			array( 20, 'user_profile_pics', 'coll_type' => '-catalog', 'install' => $install_not_forum ),
+			array( 30, 'evo_Calr', 'type' => 'plugin', 'coll_type' => '-catalog', 'install' => ( $install_not_forum && $blog_id > $blog_a_ID ) ),
+			array( $kind == 'catalog' ? 60 : 40, 'coll_longdesc', 'install' => $install_not_forum, 'params' => array( 'title' => '$title$' ) ),
+			array( $kind == 'catalog' ? 40 : 50, 'coll_search_form', 'install' => $install_not_forum ),
+			array( $kind == 'catalog' ? 50 : 60, 'coll_category_list', 'install' => $install_not_forum ),
 			array( 70, 'coll_item_list', 'coll_ID' => $blog_home_ID, 'install' => $install_not_forum, 'params' => array(
 					'title' => 'Advertisement (Demo)',
 					'item_type' => empty( $advertisement_type_ID ) ? '#' : $advertisement_type_ID,
@@ -220,7 +220,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 					'item_pic_link_type' => 'linkto_url',
 					'thumb_size' => 'fit-160x160',
 				) ),
-			array( 80, 'coll_media_index', 'coll_ID' => '-'.$blog_b_ID, 'install' => $install_not_forum, 'params' => 'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
+			array( 80, 'coll_media_index', 'coll_type' => '-catalog', 'coll_ID' => '-'.$blog_b_ID, 'install' => $install_not_forum, 'params' => 'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
 			array( 90, 'coll_item_list', 'coll_ID' => $blog_a_ID.','.$blog_b_ID, 'install' => $install_not_forum, 'params' => array(
 					'blog_ID'              => $blog_home_ID,
 					'item_type'            => empty( $sidebar_type_ID ) ? '#' : $sidebar_type_ID,
@@ -235,14 +235,14 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 					'order_by'        => 'numposts',
 					'rwd_block_class' => 'col-lg-3 col-md-3 col-sm-4 col-xs-6'
 				) ),
-			array( 100, 'coll_xml_feeds' ),
-			array( 110, 'mobile_skin_switcher' ),
+			array( 100, 'coll_xml_feeds', 'coll_type' => '-catalog' ),
+			array( 110, 'mobile_skin_switcher', 'coll_type' => '-catalog' ),
 		);
 	}
 
 	/* Sidebar 2 */
 	$default_widgets['sidebar_2'] = array(
-		'coll_type' => '-forum',
+		'coll_type' => '-forum,catalog',
 		array(  1, 'coll_post_list' ),
 		array(  5, 'coll_item_list', 'coll_ID' => $blog_b_ID, 'params' => array(
 				'title'                => 'Sidebar links',
