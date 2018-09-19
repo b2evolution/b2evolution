@@ -390,8 +390,9 @@ class ItemQuery extends SQL
 	 * Restrict to specific tags
 	 *
 	 * @param string List of tags to restrict to
+	 * @param string Condition to search by tags, 'OR' - if item has at least one tag, 'AND' - item must has all tags from the list
 	 */
-	function where_tags( $tags )
+	function where_tags( $tags, $tags_operator = 'OR' )
 	{
 		global $DB;
 
@@ -404,8 +405,20 @@ class ItemQuery extends SQL
 
 		$tags = explode( ',', $tags );
 
-		$this->FROM_add( 'INNER JOIN T_items__itemtag ON post_ID = itag_itm_ID
-								INNER JOIN T_items__tag ON (itag_tag_ID = tag_ID AND tag_name IN ('.$DB->quote($tags).') )' );
+		if( $tags_operator == 'AND' )
+		{	// Search items with ALL tags from the restriction list:
+			$this->WHERE_and( '( SELECT COUNT( itag_tag_ID )
+				 FROM T_items__tag
+				INNER JOIN T_items__itemtag ON tag_ID = itag_tag_ID
+				WHERE itag_itm_ID = post_ID
+				  AND tag_name IN ( '.$DB->quote( $tags ).' )
+				) = '.count( $tags ) );
+		}
+		else // 'OR'
+		{	// Search items with at least one tag from the restriction list:
+			$this->FROM_add( 'INNER JOIN T_items__itemtag ON post_ID = itag_itm_ID' );
+			$this->FROM_add( 'INNER JOIN T_items__tag ON itag_tag_ID = tag_ID AND tag_name IN ( '.$DB->quote( $tags ).' )' );
+		}
 	}
 
 

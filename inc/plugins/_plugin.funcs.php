@@ -617,16 +617,13 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			break;
 
 		case 'usertag':
-			if( isset( $parmeta['size'] ) )
-			{
-				$size = (int) $parmeta['size'];
-			}
-			else
-			{
-				$size = 30;
-			}
-
+			$size = isset( $parmeta['size'] ) ? intval( $parmeta['size'] ) : 30;
 			$Form->usertag_input( $input_name, $set_value, $size, $set_label, '', $params );
+			break;
+
+		case 'itemtag':
+			$size = isset( $parmeta['size'] ) ? intval( $parmeta['size'] ) : 30;
+			$Form->tag_input( $input_name, $set_value, $size, $set_label, '', $params );
 			break;
 
 		case 'info':
