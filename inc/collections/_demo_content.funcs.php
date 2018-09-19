@@ -2842,7 +2842,9 @@ Hello
 			$currency_ID = locale_currency( '#', 'ID' );
 			if( is_available_item_type( $blog_ID, '#' ) )
 			{
-				$availability = array( 'Discontinued', 'InStock', 'InStoreOnly', 'LimitedAvailability', 'OnlineOnly', 'OutOfStock', 'PreOrder', 'PreSale', 'SoldOut' );
+				// Temporarily set availability of all items to 'InStock':
+				//$availability = array( 'Discontinued', 'InStock', 'InStoreOnly', 'LimitedAvailability', 'OnlineOnly', 'OutOfStock', 'PreOrder', 'PreSale', 'SoldOut' );
+				$availability = array( 'InStock' );
 
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
