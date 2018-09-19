@@ -254,7 +254,7 @@ $Form->begin_form( '', '', $params );
 		echo get_manual_link( 'post-allow-html' );
 		echo '</span>';
 	}
-	if( $edited_Item->get_type_setting( 'page_container' ) &&
+	if( $edited_Item->get_type_setting( 'usage' ) == 'widget-page' &&
 	    $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 	{	// Display a button to edit widgets only if item type is used for page containers and current user has permission to edit widgets:
 		echo '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'" class="btn btn-primary">'.T_('Edit widgets now').'</a>';

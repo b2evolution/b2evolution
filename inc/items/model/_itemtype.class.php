@@ -27,7 +27,6 @@ class ItemType extends DataObject
 	var $description;
 	var $usage;
 	var $template_name;
-	var $page_container = 0;
 	var $schema = '';
 	var $add_aggregate_rating = 1;
 	var $front_instruction = 0;
@@ -101,7 +100,6 @@ class ItemType extends DataObject
 			$this->description = $db_row->ityp_description;
 			$this->usage = $db_row->ityp_usage;
 			$this->template_name = $db_row->ityp_template_name;
-			$this->page_container = $db_row->ityp_page_container;
 			$this->schema = isset( $db_row->ityp_schema ) ? $db_row->ityp_schema : $this->schema;
 			$this->add_aggregate_rating = isset( $db_row->ityp_add_aggregate_rating ) ? $db_row->ityp_add_aggregate_rating : $this->add_aggregate_rating;
 			$this->front_instruction = $db_row->ityp_front_instruction;
@@ -196,10 +194,6 @@ class ItemType extends DataObject
 		// Template name
 		param( 'ityp_template_name', 'string' );
 		$this->set_from_Request( 'template_name', NULL, true );
-
-		// Page containers:
-		param( 'ityp_page_container', 'integer', 0 );
-		$this->set_from_Request( 'page_container' );
 
 		// Schema
 		param( 'ityp_schema', 'string' );

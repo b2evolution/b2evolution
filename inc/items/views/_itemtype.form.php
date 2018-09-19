@@ -56,7 +56,6 @@ $Form->begin_fieldset( T_('General').get_manual_link('item-type-general') );
 			array( 'admin',      T_('Admin') )
 		), T_('Permission level') );
 	$Form->text_input( 'ityp_template_name', $edited_Itemtype->template_name, 25, T_('Template name'), T_('b2evolution will automatically append .main.php or .disp.php'), array( 'maxlength' => 40 ) );
-	$Form->checkbox( 'ityp_page_container', $edited_Itemtype->page_container, T_('Page containers'), T_('Check to inform b2evolution that this Item Type expects to use Page Containers.' ) );
 
 $Form->end_fieldset();
 

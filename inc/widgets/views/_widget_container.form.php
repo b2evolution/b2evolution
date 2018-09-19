@@ -84,7 +84,7 @@ $Form->begin_fieldset( T_('Container Properties') );
 			$Form->switch_layout( 'none' );
 			$ItemTypeCache = & get_ItemTypeCache();
 			$ItemTypeCache->clear();
-			$ItemTypeCache->load_where( 'ityp_page_container = 1' );
+			$ItemTypeCache->load_where( 'ityp_usage = "widget-page"' );
 			$item_types = array( '' => T_('None') );
 			foreach( $ItemTypeCache->cache as $ItemType )
 			{

@@ -326,7 +326,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_description       TEXT COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			ityp_usage             VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT 'post',
 			ityp_template_name     VARCHAR(40) NULL DEFAULT NULL,
-			ityp_page_container    TINYINT(1) DEFAULT 0,
 			ityp_schema            ENUM( 'Article', 'WebPage', 'BlogPosting', 'ImageGallery', 'DiscussionForumPosting', 'TechArticle', 'Product', 'Review' ) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			ityp_add_aggregate_rating TINYINT DEFAULT 1,
 			ityp_front_instruction TINYINT DEFAULT 0,
