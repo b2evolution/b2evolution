@@ -1012,7 +1012,7 @@ class UserQuery extends FilterSQL
 
 
 	/**
-	 * Restrict with user newsletter
+	 * Restrict with user tags
 	 *
 	 * @param string Value
 	 * @param string Operator

@@ -615,11 +615,11 @@ fieldset ul {
   color: #000;
   font-weight: normal;
 }
-.user_admin_tags {
-  width: 500px;
+.evo_input__tags {
+  width: 100%;
   max-width: 100%;
 }
-.user_admin_tags ul.token-input-list-facebook {
+.evo_input__tags ul.token-input-list-facebook {
   width: 100%;
   max-width: 100%;
 }

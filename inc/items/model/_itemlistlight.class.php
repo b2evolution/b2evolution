@@ -129,6 +129,7 @@ class ItemListLight extends DataObjectList2
 				'cat_modifier' => NULL,
 				'cat_focus' => 'wide',					// Search in extra categories, not just main cat
 				'tags' => NULL,
+				'tags_operator' => 'OR',
 				'authors' => NULL,
 				'authors_login' => NULL,
 				'assignees' => NULL,
@@ -608,7 +609,7 @@ class ItemListLight extends DataObjectList2
 			$this->ItemQuery->Blog = $this->Blog;
 		}
 
-		$this->ItemQuery->where_tags( $this->filters['tags'] );
+		$this->ItemQuery->where_tags( $this->filters['tags'], $this->filters['tags_operator'] );
 		$this->ItemQuery->where_author( $this->filters['authors'] );
 		$this->ItemQuery->where_author_logins( $this->filters['authors_login'] );
 		$this->ItemQuery->where_assignees( $this->filters['assignees'] );
