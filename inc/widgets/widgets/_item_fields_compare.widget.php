@@ -127,7 +127,7 @@ class item_fields_compare_Widget extends ComponentWidget
 					'defaultvalue' => 0,
 				),
 				'restrict_cats' => array(
-					'label' => T_('Restrict to Category'),
+					'label' => T_('Restrict to Categories'),
 					'note' => T_('List category IDs separated by ,'),
 					'defaultvalue' => '',
 					'size' => 80,
