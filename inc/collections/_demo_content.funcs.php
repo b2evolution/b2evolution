@@ -1197,19 +1197,22 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			}
 
 			// Sample content:
-			if( is_available_item_type( $blog_ID, 'Standalone Page' ) )
+			if( is_available_item_type( $blog_ID, 'Widget Page' ) )
 			{
 				// Insert a PAGE:
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
-				$edited_Item->insert( $owner_ID, T_('More info'), T_('This is a standalone page.'), $now, $cat_minisite_b2evo,
-						array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
+				$installed_collection_info_pages['widget_page'] = $edited_Item->insert( $owner_ID, T_('More info'), '', $now, $cat_minisite_b2evo,
+						array(), 'published', '#', '', '', 'open', array('default'), 'Widget Page' );
 				$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				$edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
+			}
 
+			if( is_available_item_type( $blog_ID, 'Standalone Page' ) )
+			{
 				// Insert a PAGE:
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );

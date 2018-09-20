@@ -803,8 +803,14 @@ class ComponentWidget extends DataObject
 				{
 					return true;
 				}
-				// Plugin failed (happens when a plugin has been disabled for example):
-				return false;
+				else
+				{	// Plugin failed (happens when a plugin has been disabled for example):
+					if( $this->mode == 'designer' )
+					{	// Display red text in customizer widget designer mode in order to make this plugin visible for editing:
+						echo $this->disp_params['block_start'].'<span class="red">'.T_('Inactive / Uninstalled plugin').'</span>'.$this->disp_params['block_end'];
+					}
+					return false;
+				}
 		}
 
 		echo "Widget $this->type : $this->code did not provide a display() method! ";

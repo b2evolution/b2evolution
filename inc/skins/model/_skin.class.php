@@ -363,7 +363,7 @@ class Skin extends DataObject
 		if( $params['container_item_ID'] !== NULL )
 		{	// Check restriction for page containers:
 			if( empty( $WidgetContainer ) ||
-			    ( $params['container_item_ID'] !== NULL && $WidgetContainer->get( 'item_ID' ) > 0 && $WidgetContainer->get( 'item_ID' ) != $params['container_item_ID'] ) )
+			    ( $WidgetContainer->get_type() == 'page' && $WidgetContainer->get( 'item_ID' ) != $params['container_item_ID'] ) )
 			{	// We should not try to get widgets from this container, because it is a not proper page container:
 				$Widget_array = array();
 			}
