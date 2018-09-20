@@ -95,7 +95,7 @@ class item_price_Widget extends ComponentWidget
 		global $Blog;
 
 		$CurrencyCache = & get_currencyCache();
-		$currency_options = $CurrencyCache->get_option_array();
+		$currency_options = array( NULL => T_('Default') ) + $CurrencyCache->get_option_array();
 
 		$r = array_merge( array(
 				'title' => array(
@@ -108,7 +108,7 @@ class item_price_Widget extends ComponentWidget
 					'label' => T_('Currency'),
 					'type' => 'select',
 					'options' => $currency_options,
-					'defaultvalue' => locale_currency( '#', 'ID' ),
+					'defaultvalue' => NULL,
 				),
 				'display_original_price' => array(
 					'label' => T_('Display original price'),
@@ -157,10 +157,17 @@ class item_price_Widget extends ComponentWidget
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
-		$default_pricing = $Item->get_default_pricing( $this->disp_params['currency_ID'] );
-		$best_pricing = $Item->get_current_best_pricing( $this->disp_params['currency_ID'] );
+		$curr_ID = $this->disp_params['currency_ID'];
+		if( empty( $curr_ID ) )
+		{
+			$Cart = & get_Cart();
+			$curr_ID = $Cart->get_curr_ID();
+		}
+
+		$default_pricing = $Item->get_default_pricing( $curr_ID );
+		$best_pricing = $Item->get_current_best_pricing( $curr_ID );
 		$CurrencyCache = & get_currencyCache();
-		$currency = $CurrencyCache->get_by_ID( $this->disp_params['currency_ID'], false, false );
+		$currency = $CurrencyCache->get_by_ID( $curr_ID, false, false );
 
 		if( $default_pricing
 				&& !( $best_pricing && ( $best_pricing['iprc_price'] == $default_pricing['iprc_price'] ) )

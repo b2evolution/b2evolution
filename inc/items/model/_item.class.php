@@ -11472,7 +11472,10 @@ class Item extends ItemLight
 		// Currency:
 		if( empty( $curr_ID ) )
 		{
-			$SQL->WHERE_and( 'iprc_curr_ID = '.$DB->quote( locale_currency( '#', 'ID' ) ) );
+			$Cart = & get_Cart();
+			$cart_curr_ID = $Cart->get_curr_ID();
+			load_funcs( 'regional/model/_regional.funcs.php' );
+			$SQL->WHERE_and( 'iprc_curr_ID = '.$DB->quote( $cart_curr_ID ) );
 		}
 		else
 		{

@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 /**
  * Get regional option list from given array
- * 
+ *
  * @param array rows
  * @param integer ID of selected row
  * @param array field params
@@ -100,7 +100,7 @@ function get_regional_option_list( $rows, $selected = 0, $params = array() )
 
 /**
  * Get option list with regions by country ID
- * 
+ *
  * @param integer country ID
  * @param integer selected region ID
  * @param array field params
@@ -127,7 +127,7 @@ function get_regions_option_list( $country_ID, $region_ID = 0, $params = array()
 
 /**
  * Get option list with sub-regions by region ID
- * 
+ *
  * @param integer region ID
  * @param integer selected sub-region ID
  * @param array field params
@@ -154,7 +154,7 @@ function get_subregions_option_list( $region_ID, $subregion_ID = 0, $params = ar
 
 /**
  * Get option list with cities by country, region or subregion
- * 
+ *
  * @param integer country ID
  * @param integer region ID
  * @param integer subregion ID
@@ -242,9 +242,9 @@ function get_cities_option_list( $country_ID, $region_ID = 0, $subregion_ID = 0,
 
 /**
  * Import cities from CSV file
- * 
+ *
  * @param integer country ID
- * @param string 
+ * @param string
  * @return array (
  *   'inserted' => Count of inserted cities,
  *   'updated'  => Count of updated cities );
@@ -811,6 +811,25 @@ function ctry_status_color( $status )
 	$status_colors = ctry_status_colors();
 
 	return isset( $status_colors[ $status ] ) ? '#'.$status_colors[ $status ] : 'none';
+}
+
+
+/**
+ * Get default currency ID
+ *
+ * @return integer Currency ID
+ */
+function get_default_currency_ID()
+{
+	global $DB, $default_curr_ID;
+
+
+	if( empty( $default_curr_ID ) )
+	{
+		$default_curr_ID = $DB->get_var( 'SELECT curr_ID FROM T_regional__currency WHERE curr_default = 1 LIMIT 1' );
+	}
+
+	return $default_curr_ID;
 }
 
 ?>

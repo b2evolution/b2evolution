@@ -114,12 +114,12 @@ class display_shopping_cart_Widget extends ComponentWidget
 					'class_product_header' => array(
 						'label' => T_('Header').':',
 						'size' => 60,
-						'defaultvalue' => 'col-lg-7 col-md-7 col-sm-7 col-xs-9',
+						'defaultvalue' => 'col-lg-4 col-md-4 col-sm-4 col-xs-9',
 					),
 					'class_product_cell' => array(
 						'label' => T_('Cell').':',
 						'size' => 60,
-						'defaultvalue' => 'col-lg-7 col-md-7 col-sm-7 col-xs-9',
+						'defaultvalue' => 'col-lg-4 col-md-4 col-sm-4 col-xs-9',
 					),
 				'class_product_end_line' => array(
 					'type' => 'end_line',
@@ -137,11 +137,47 @@ class display_shopping_cart_Widget extends ComponentWidget
 					'class_quantity_cell' => array(
 						'label' => T_('Cell').':',
 						'size' => 60,
-						'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 col-xs-3 center',
+						'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 col-xs-2 center',
 					),
 				'class_quantity_end_line' => array(
 					'type' => 'end_line',
 				),
+				// Classes for Unit Price:
+				'class_unit_price_line' => array(
+					'type' => 'begin_line',
+					'label' => T_('Classes for Unit Price'),
+				),
+					'class_unit_price_header' => array(
+						'label' => T_('Header').':',
+						'size' => 60,
+						'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 hidden-xs right',
+					),
+					'class_unit_price_cell' => array(
+						'label' => T_('Cell').':',
+						'size' => 60,
+						'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 col-xs-3 right',
+					),
+				'class_unit_price_end_line' => array(
+					'type' => 'end_line',
+				),
+				// Classes for Total Price:
+					'class_total_price_line' => array(
+						'type' => 'begin_line',
+						'label' => T_('Classes for Unit Price'),
+					),
+						'class_total_price_header' => array(
+							'label' => T_('Header').':',
+							'size' => 60,
+							'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 hidden-xs right',
+						),
+						'class_total_price_cell' => array(
+							'label' => T_('Cell').':',
+							'size' => 60,
+							'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 col-xs-3 right',
+						),
+					'class_total_price_end_line' => array(
+						'type' => 'end_line',
+					),
 				// Classes for Actions:
 				'class_actions_line' => array(
 					'type' => 'begin_line',
@@ -150,12 +186,12 @@ class display_shopping_cart_Widget extends ComponentWidget
 					'class_actions_header' => array(
 						'label' => T_('Header').':',
 						'size' => 60,
-						'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 hidden-xs center',
+						'defaultvalue' => 'col-lg-1 col-md-1 col-sm-1 hidden-xs center',
 					),
 					'class_actions_cell' => array(
 						'label' => T_('Cell').':',
 						'size' => 60,
-						'defaultvalue' => 'col-lg-2 col-md-2 col-sm-2 col-xs-3 center',
+						'defaultvalue' => 'col-lg-1 col-md-1 col-sm-1 col-xs-1 center',
 					),
 				'class_actions_end_line' => array(
 					'type' => 'end_line',
@@ -178,13 +214,15 @@ class display_shopping_cart_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		$this->disp_params = array_merge( $this->disp_params, array(
-				'shopping_cart_empty'       => '<p>'.T_('Your shopping cart is empty.').'</p>',
-				'shopping_cart_table_start' => '<div class="evo_shopping_cart">',
-				'shopping_cart_row_start'   => '<div class="row">',
-				'shopping_cart_cell_header' => '<div class="$class$"><b>$header$</b></div>',
-				'shopping_cart_cell_value'  => '<div class="$class$">$value$</div>',
-				'shopping_cart_row_end'     => '</div>',
-				'shopping_cart_table_end'   => '</div>',
+				'shopping_cart_empty'           => '<p>'.T_('Your shopping cart is empty.').'</p>',
+				'shopping_cart_table_start'     => '<div class="evo_shopping_cart">',
+				'shopping_cart_row_start'       => '<div class="row">',
+				'shopping_cart_cell_header'     => '<div class="$class$"><b>$header$</b></div>',
+				'shopping_cart_cell_value'      => '<div class="$class$">$value$</div>',
+				'shopping_cart_row_end'         => '</div>',
+				'shopping_cart_total_row_start' => '<div class="row total_row">',
+				'shopping_cart_total_row_end'   => '</div>',
+				'shopping_cart_table_end'       => '</div>',
 			), $params );
 
 		// Get items form the current cart:
@@ -211,6 +249,8 @@ class display_shopping_cart_Widget extends ComponentWidget
 				array( T_('Image'), $this->disp_params['class_image_header'] ),
 				array( T_('Product'), $this->disp_params['class_product_header'] ),
 				array( T_('Quantity'), $this->disp_params['class_quantity_header'] ),
+				array( T_('Unit Price'), $this->disp_params['class_unit_price_header'] ),
+				array( T_('Total Price'), $this->disp_params['class_total_price_header'] ),
 				array( T_('Remove'), $this->disp_params['class_actions_header'] ),
 			);
 			foreach( $cols as $col_title => $col_data )
@@ -220,6 +260,7 @@ class display_shopping_cart_Widget extends ComponentWidget
 			echo $this->disp_params['shopping_cart_row_end'];
 
 			// Display products:
+			$total = 0.00;
 			foreach( $cart_items as $cart_item_ID => $cart_Item )
 			{
 				$product_cell_masks = array( '$value$', '$class$' );
@@ -239,17 +280,39 @@ class display_shopping_cart_Widget extends ComponentWidget
 				// Quantity:
 				$item_qty = $Cart->get_quantity( $cart_item_ID );
 				$cart_action_url = $Blog->get( 'carturl', array( 'url_suffix' => 'action=update&amp;item_ID='.$cart_item_ID.'&amp;qty=' ) );
-				$qty_cell = action_icon( '', 'minus', $cart_action_url.( $item_qty - 1 ), NULL, NULL, NULL, array( 'class' => '' ) ).' ';
+				$qty_cell = '<span class="nowrap">';
+				$qty_cell .= action_icon( '', 'minus', $cart_action_url.( $item_qty - 1 ), NULL, NULL, NULL, array( 'class' => '' ) ).' ';
 				$qty_cell .= $item_qty.' ';
 				$qty_cell .= action_icon( '', 'add', $cart_action_url.( $item_qty + 1 ), NULL, NULL, NULL, array( 'class' => '' ) );
+				$qty_cell .= '</span>';
 				echo str_replace( $product_cell_masks, array( $qty_cell, $this->disp_params['class_quantity_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
-				// Quantity:
+				// Unit Price:
+				$currency_shortcut = $Cart->currency->get( 'shortcut' ).'&nbsp';
+				$unit_price = $Cart->get_unit_price( $cart_item_ID );
+				echo str_replace( $product_cell_masks, array( $currency_shortcut.number_format( $unit_price, 2 ), $this->disp_params['class_unit_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
+
+				// Total Price:
+				$total_price = $Cart->get_total_price( $cart_item_ID );
+				$total += $total_price;
+				echo str_replace( $product_cell_masks, array( $currency_shortcut.number_format( $total_price, 2 ), $this->disp_params['class_total_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
+
+				// Remove:
 				$remove_cell = action_icon( '', 'remove', $Blog->get( 'carturl', array( 'url_suffix' => 'action=remove&amp;item_ID='.$cart_item_ID ) ), NULL, NULL, NULL, array( 'class' => '' ) ).' ';
 				echo str_replace( $product_cell_masks, array( $remove_cell, $this->disp_params['class_actions_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				echo $this->disp_params['shopping_cart_row_end'];
 			}
+
+			// Totals:
+			echo $this->disp_params['shopping_cart_total_row_start'];
+			echo str_replace( $product_cell_masks, array( NULL, $this->disp_params['class_image_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
+			echo str_replace( $product_cell_masks, array( T_('Total'), $this->disp_params['class_product_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
+			echo str_replace( $product_cell_masks, array( NULL, $this->disp_params['class_quantity_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
+			echo str_replace( $product_cell_masks, array( NULL, $this->disp_params['class_unit_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
+			echo str_replace( $product_cell_masks, array( $currency_shortcut.number_format( $total, 2 ), $this->disp_params['class_total_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
+			echo str_replace( $product_cell_masks, array( NULL, $this->disp_params['class_actions_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
+			echo $this->disp_params['shopping_cart_total_row_end'];
 
 			echo $this->disp_params['shopping_cart_table_end'];
 		}

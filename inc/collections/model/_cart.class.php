@@ -39,17 +39,36 @@ class Cart
 	var $items = NULL;
 
 	/**
+	 * @var integer Currency ID
+	 */
+	var $curr_ID;
+
+	/**
+	 * @var object Currency object
+	 */
+	var $currency = NULL;
+
+	/**
 	 * Constructor
 	 */
 	function __construct()
 	{
 		global $Session;
 
+		load_funcs( 'regional/model/_regional.funcs.php' );
+
 		// Get shopping cart from Session:
-		$cart_items = $Session->get( 'cart' );
+		$cart_data = $Session->get( 'cart' );
+		$cart_items = $cart_data['items'];
+		$cart_curr_ID = $cart_data['curr_ID'];
 
 		// Initialize items/products:
 		$this->item_IDs = is_array( $cart_items ) ? $cart_items : array();
+
+		// Initialize cart currency:
+		$CurrencyCache = & get_CurrencyCache();
+		$this->curr_ID = empty( $cart_curr_ID ) ? get_default_currency_ID() : $cart_curr_ID;
+		$this->currency = $CurrencyCache->get_by_ID( $this->curr_ID, false, false );
 	}
 
 
@@ -97,15 +116,28 @@ class Cart
 		}
 		elseif( $qty > 0 )
 		{	// Add/Update quantity of items in cart:
+			$best_pricing = $cart_Item->get_current_best_pricing( $this->curr_ID );
+
+			if( empty( $best_pricing ) )
+			{
+				$Messages->add( sprintf( T_('This product cannot be added to the cart because it has no price in the cart currency (%s).'), $this->currency->get( 'code' ) ), 'error' );
+				return false;
+			}
+
+			$unit_price = floatval( $best_pricing['iprc_price'] );
+
 			if( ! isset( $this->item_IDs[ $item_ID ] ) )
 			{
-				$this->item_IDs[ $item_ID ] = $qty;
+				$this->item_IDs[ $item_ID ] = array(
+					'qty' => $qty,
+					'unit_price' => $unit_price );
 				$cart_is_updated = true;
 				$Messages->add( sprintf( T_('Product "%s" has been added to the cart.'), $cart_Item->get( 'title' ) ), 'success' );
 			}
-			elseif( $this->item_IDs[ $item_ID ] != $qty )
+			elseif( $this->item_IDs[ $item_ID ]['qty'] != $qty || $this->item_IDs[ $item_ID ]['unit_price'] != $unit_price )
 			{
-				$this->item_IDs[ $item_ID ] = $qty;
+				$this->item_IDs[ $item_ID ]['qty'] = $qty;
+				$this->item_IDs[ $item_ID ]['unit_price'] = $unit_price;
 				$cart_is_updated = true;
 				$Messages->add( sprintf( T_('Quantity for product "%s" has been changed.'), $cart_Item->get( 'title' ) ), 'success' );
 			}
@@ -113,7 +145,10 @@ class Cart
 
 		if( $cart_is_updated )
 		{	// Update shopping cart with items data:
-			$Session->set( 'cart', $this->item_IDs );
+			$cart_data = array(
+					'curr_ID' => $this->curr_ID,
+					'items' => $this->item_IDs );
+			$Session->set( 'cart', $cart_data );
 			$Session->dbsave();
 
 			// BLOCK CACHE INVALIDATION:
@@ -138,7 +173,7 @@ class Cart
 			if( ! empty( $this->item_IDs ) )
 			{	// Load all cart items in single query:
 				$ItemCache->load_list( array_keys( $this->item_IDs ) );
-				foreach( $this->item_IDs as $item_ID => $qty )
+				foreach( $this->item_IDs as $item_ID => $row )
 				{
 					if( ( $cart_Item = & $ItemCache->get_by_ID( $item_ID, false, false ) ) &&
 					    $cart_Item->can_be_displayed() )
@@ -161,7 +196,63 @@ class Cart
 	 */
 	function get_quantity( $item_ID )
 	{
-		return isset( $this->item_IDs[ $item_ID ] ) ? $this->item_IDs[ $item_ID ] : 0;
+		return isset( $this->item_IDs[ $item_ID ] ) ? $this->item_IDs[ $item_ID ]['qty'] : 0;
+	}
+
+
+	/**
+	 * Get unit price of requested item in this shopping cart
+	 *
+	 * @param integer Item ID
+	 * @return float unit price
+	 */
+	function get_unit_price( $item_ID )
+	{
+		return isset( $this->item_IDs[ $item_ID ] ) ? $this->item_IDs[ $item_ID ]['unit_price'] : 0;
+	}
+
+
+	/**
+	 * Get total price of requested item in this shopping cart
+	 *
+	 * @param integer Item ID
+	 * @return float total item price
+	 */
+	function get_total_price( $item_ID )
+	{
+		return isset( $this->item_IDs[ $item_ID ] ) ? $this->item_IDs[ $item_ID ]['unit_price'] * $this->item_IDs[ $item_ID ]['qty'] : 0;
+	}
+
+
+	/**
+	 * Get shopping cart currency ID
+	 *
+	 * @return integer Currency ID
+	 */
+	function get_curr_ID()
+	{
+		load_funcs( 'regional/model/_regional.funcs.php' );
+		return isset( $this->curr_ID ) ? $this->curr_ID : get_default_currency_ID();
+	}
+
+
+	/**
+	 * Get total price of all items in this shopping cart
+	 *
+	 * @return float total cart price
+	 */
+	function get_cart_total()
+	{
+		$cart_total = 0.00;
+		foreach( $this->item_IDs as $cart_Item )
+		{
+			if( $cart_Item->can_be_displayed() )
+			{
+				$cart_total += $cart_Item['unit_price'] * $cart_Item['qty'];
+			}
+		}
+
+		return $cart_total;
 	}
 }
 
