@@ -76,9 +76,8 @@ if( $use_db )
 
 
 if( ! $is_cli )
-{	// Move user to suspect group by IP address or by domain of email address:
+{	// Move user to suspect group by IP address:
 	antispam_suspect_user_by_IP();
-	antispam_suspect_user_by_email_domain();
 }
 
 
