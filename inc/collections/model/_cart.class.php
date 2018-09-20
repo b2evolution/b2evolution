@@ -116,7 +116,7 @@ class Cart
 		}
 		elseif( $qty > 0 )
 		{	// Add/Update quantity of items in cart:
-			$best_pricing = $cart_Item->get_current_best_pricing( $this->curr_ID );
+			$best_pricing = $cart_Item->get_current_best_pricing( $this->curr_ID, NULL, $qty );
 
 			if( empty( $best_pricing ) )
 			{
