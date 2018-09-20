@@ -946,15 +946,6 @@ function locate()
 
 		$api_key = $this->get_coll_setting( 'api_key', $Blog );
 
-		if( empty( $api_key ) )
-		{	// Display message if google API key is not defined:
-			echo '<div class="evo_plugin__google_maps_no_key">'
-					.'<img src="'.$this->get_plugin_url().'/img/google_maps.jpg" />'
-					.'<div><div>'.T_('Please configure an API key to see a live map.').'</div></div>'
-				.'</div>';
-			return;
-		}
-
 		/**
 		 * Default params:
 		 */
@@ -969,6 +960,15 @@ function locate()
 				'block_body_start'  => '',
 				'block_body_end'    => '',
 			), $params );
+
+		if( empty( $api_key ) )
+		{	// Display message if google API key is not defined:
+			echo $params['block_start'].'<div class="evo_plugin__google_maps_no_key">'
+					.'<img src="'.$this->get_plugin_url().'/img/google_maps.jpg" />'
+					.'<div><div>'.T_('Please configure an API key to see a live map.').'</div></div>'
+				.'</div>'.$params['block_end'];
+			return;
+		}
 
 		$widget_title = $this->get_widget_setting( 'map_title', $params );
 		$params['title'] = $widget_title;
