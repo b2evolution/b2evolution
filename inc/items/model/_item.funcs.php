@@ -1158,24 +1158,37 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 	if( $current_User->check_perm( 'blog_admin', '', false, $blog ) &&
 		( get_allow_cross_posting() >= 2 ||
 	  ( isset( $blog) && get_post_cat_setting( $blog ) > 1 && get_allow_cross_posting() == 1 ) ) )
-	{ // If BLOG cross posting enabled, go through all blogs with cats:
-		/**
-		 * @var BlogCache
-		 */
+	{	// If collection cross posting is enabled, go through collections where current Item Type is enabled or current Item already uses categories of those collections:
 		$BlogCache = & get_BlogCache();
-		$ChapterCache->reveal_children( NULL, true );
+		$BlogCache->clear();
+		$cats_coll_SQL = $BlogCache->get_SQL_object( 'Load collections which categories are used by Item #'.$edited_Item->ID );
+		// Load collections only where current Item Type is enabled:
+		$item_type_coll_SQL = $BlogCache->get_SQL_object( 'Load collections where Item Type #'.$edited_Item->get( 'ityp_ID' ).' is enabled' );
+		$item_type_coll_SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_coll_ID = blog_ID' );
+		$item_type_coll_SQL->WHERE_and( 'itc_ityp_ID = '.$edited_Item->get( 'ityp_ID' ) );
+		$BlogCache->load_by_sql( $item_type_coll_SQL );
+		// Load collections which categories are used by current Item:
+		$cats_coll_SQL->FROM_add( 'INNER JOIN T_categories ON cat_blog_ID = blog_ID' );
+		$cats_coll_SQL->FROM_add( 'INNER JOIN T_postcats ON postcat_cat_ID = cat_ID' );
+		$cats_coll_SQL->WHERE_and( 'postcat_post_ID = '.$edited_Item->ID );
+		$BlogCache->load_by_sql( $cats_coll_SQL );
 
-		/**
-		 * @var Blog
-		 */
-		for( $l_Blog = & $BlogCache->get_first(); !is_null($l_Blog); $l_Blog = & $BlogCache->get_next() )
-		{ // run recursively through the cats
+		foreach( $BlogCache->cache as $l_Blog )
+		{	// Run recursively through the categories of the detected collections:
+			if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) ||
+			    ! $current_User->check_perm( 'blog_admin', '', false, $l_Blog->ID ) )
+			{	// Skip collection if current user has no appropriate permissions:
+				continue;
+			}
+
 			if( ! blog_has_cats( $l_Blog->ID ) )
+			{	// Skip collection without categories:
 				continue;
+			}
 
-			// Skip collection if current user do not have the appropriate permissions
-			if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) || ! $current_User->check_perm( 'blog_admin', '', false, $l_Blog->ID ) )
-				continue;
+			// Load all child categories:
+			$ChapterCache->reveal_children( $l_Blog->ID, true );
+
 			$r .= '<tbody data-toggle="collapse" style="cursor: pointer;" data-target="#cat_sel_'.$l_Blog->ID.'" data-parent="#cat_sel_group">';
 			$r .= '<tr class="group'.( $blog == $l_Blog->ID ? ' catselect_blog__current' : '' ).'" id="catselect_blog'.$l_Blog->ID.'">';
 			$r .= '<td colspan="3">'.$l_Blog->dget('name')."</td></tr>\n";
