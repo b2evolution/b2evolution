@@ -1185,7 +1185,7 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 
 			$r .= '<tbody data-toggle="collapse" style="cursor: pointer;" data-target="#cat_sel_'.$l_Blog->ID.'" data-parent="#cat_sel_group">';
 			$r .= '<tr class="group'.( $blog == $l_Blog->ID ? ' catselect_blog__current' : '' ).'" id="catselect_blog'.$l_Blog->ID.'">';
-			$r .= '<td colspan="3">'.$l_Blog->dget('name')."</td></tr>\n";
+			$r .= '<td colspan="4">'.$l_Blog->dget('name')."</td></tr>\n";
 			$r .= '</tbody>';
 			$r .= '<tbody class="accordion_panel '.( $blog == $l_Blog->ID ? 'collapse in' : 'collapse' ).'" id="cat_sel_'.$l_Blog->ID.'">';
 
