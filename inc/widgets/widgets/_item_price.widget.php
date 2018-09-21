@@ -160,8 +160,8 @@ class item_price_Widget extends ComponentWidget
 		$curr_ID = $this->disp_params['currency_ID'];
 		if( empty( $curr_ID ) )
 		{
-			$Cart = & get_Cart();
-			$curr_ID = $Cart->get_curr_ID();
+			$currency = get_currency();
+			$curr_ID = $currency->ID;
 		}
 
 		$default_pricing = $Item->get_default_pricing( $curr_ID );

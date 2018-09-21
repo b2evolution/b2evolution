@@ -248,8 +248,8 @@ class display_shopping_cart_Widget extends ComponentWidget
 			$cols = array(
 				array( T_('Image'), $this->disp_params['class_image_header'] ),
 				array( T_('Product'), $this->disp_params['class_product_header'] ),
-				array( T_('Quantity'), $this->disp_params['class_quantity_header'] ),
 				array( T_('Unit Price'), $this->disp_params['class_unit_price_header'] ),
+				array( T_('Quantity'), $this->disp_params['class_quantity_header'] ),
 				array( T_('Total Price'), $this->disp_params['class_total_price_header'] ),
 				array( T_('Remove'), $this->disp_params['class_actions_header'] ),
 			);
@@ -277,6 +277,11 @@ class display_shopping_cart_Widget extends ComponentWidget
 				// Title:
 				echo str_replace( $product_cell_masks, array( $cart_Item->get_title(), $this->disp_params['class_product_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
+				// Unit Price:
+				$currency_shortcut = $Cart->currency->get( 'shortcut' ).'&nbsp';
+				$unit_price = $Cart->get_unit_price( $cart_item_ID );
+				echo str_replace( $product_cell_masks, array( $currency_shortcut.number_format( $unit_price, 2 ), $this->disp_params['class_unit_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
+
 				// Quantity:
 				$item_qty = $Cart->get_quantity( $cart_item_ID );
 				$cart_action_url = $Blog->get( 'carturl', array( 'url_suffix' => 'action=update&amp;item_ID='.$cart_item_ID.'&amp;qty=' ) );
@@ -286,11 +291,6 @@ class display_shopping_cart_Widget extends ComponentWidget
 				$qty_cell .= action_icon( '', 'add', $cart_action_url.( $item_qty + 1 ), NULL, NULL, NULL, array( 'class' => '' ) );
 				$qty_cell .= '</span>';
 				echo str_replace( $product_cell_masks, array( $qty_cell, $this->disp_params['class_quantity_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
-
-				// Unit Price:
-				$currency_shortcut = $Cart->currency->get( 'shortcut' ).'&nbsp';
-				$unit_price = $Cart->get_unit_price( $cart_item_ID );
-				echo str_replace( $product_cell_masks, array( $currency_shortcut.number_format( $unit_price, 2 ), $this->disp_params['class_unit_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				// Total Price:
 				$total_price = $Cart->get_total_price( $cart_item_ID );
@@ -308,8 +308,8 @@ class display_shopping_cart_Widget extends ComponentWidget
 			echo $this->disp_params['shopping_cart_total_row_start'];
 			echo str_replace( $product_cell_masks, array( NULL, $this->disp_params['class_image_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 			echo str_replace( $product_cell_masks, array( T_('Total'), $this->disp_params['class_product_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
-			echo str_replace( $product_cell_masks, array( NULL, $this->disp_params['class_quantity_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 			echo str_replace( $product_cell_masks, array( NULL, $this->disp_params['class_unit_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
+			echo str_replace( $product_cell_masks, array( NULL, $this->disp_params['class_quantity_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 			echo str_replace( $product_cell_masks, array( $currency_shortcut.number_format( $total, 2 ), $this->disp_params['class_total_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 			echo str_replace( $product_cell_masks, array( NULL, $this->disp_params['class_actions_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 			echo $this->disp_params['shopping_cart_total_row_end'];

@@ -9189,4 +9189,31 @@ function convert_path_to_array( $property, $value, $separator = '.' )
 
 	return $output;
 }
+
+
+/**
+ * Get current active currency
+ *
+ * @return object Currency object
+ */
+function get_currency()
+{
+	global $Session;
+	$CurrencyCache = & get_CurrencyCache();
+
+	$curr_ID = $Session->get( 'currency_ID' );
+	if( empty( $curr_ID ) )
+	{ // No currency defined in session, use default currency:
+		load_funcs( 'regional/model/_regional.funcs.php' );
+		$curr_ID = get_default_currency_ID();
+		$Session->set( 'currency_ID', $curr_ID );
+	}
+
+	if( empty( $curr_ID ) )
+	{ // In the case that no default currency is found (should not happen) use locale currency:
+		$curr_ID = locale_currency( '#', 'ID' );
+	}
+
+	return $CurrencyCache->get_by_ID( $curr_ID, false, false );
+}
 ?>

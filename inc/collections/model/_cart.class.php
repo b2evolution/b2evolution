@@ -39,36 +39,18 @@ class Cart
 	var $items = NULL;
 
 	/**
-	 * @var integer Currency ID
-	 */
-	var $curr_ID;
-
-	/**
-	 * @var object Currency object
-	 */
-	var $currency = NULL;
-
-	/**
 	 * Constructor
 	 */
 	function __construct()
 	{
 		global $Session;
 
-		load_funcs( 'regional/model/_regional.funcs.php' );
-
 		// Get shopping cart from Session:
 		$cart_data = $Session->get( 'cart' );
 		$cart_items = $cart_data['items'];
-		$cart_curr_ID = $cart_data['curr_ID'];
 
 		// Initialize items/products:
 		$this->item_IDs = is_array( $cart_items ) ? $cart_items : array();
-
-		// Initialize cart currency:
-		$CurrencyCache = & get_CurrencyCache();
-		$this->curr_ID = empty( $cart_curr_ID ) ? get_default_currency_ID() : $cart_curr_ID;
-		$this->currency = $CurrencyCache->get_by_ID( $this->curr_ID, false, false );
 	}
 
 
@@ -85,7 +67,10 @@ class Cart
 	 */
 	function update( $qty = NULL, $item_ID = NULL )
 	{
-		global $Session, $Messages;
+		global $Messages;
+
+		// Get shopping cart currency
+		$cart_currency = get_currency();
 
 		if( $item_ID === NULL )
 		{	// Use default item ID from request param:
@@ -116,11 +101,11 @@ class Cart
 		}
 		elseif( $qty > 0 )
 		{	// Add/Update quantity of items in cart:
-			$best_pricing = $cart_Item->get_current_best_pricing( $this->curr_ID, NULL, $qty );
+			$best_pricing = $cart_Item->get_current_best_pricing( $cart_currency->ID, NULL, $qty );
 
 			if( empty( $best_pricing ) )
 			{
-				$Messages->add( sprintf( T_('This product cannot be added to the cart because it has no price in the cart currency (%s).'), $this->currency->get( 'code' ) ), 'error' );
+				$Messages->add( sprintf( T_('This product cannot be added to the cart because it has no price in the cart currency (%s).'), $cart_currency->get( 'code' ) ), 'error' );
 				return false;
 			}
 
@@ -221,18 +206,6 @@ class Cart
 	function get_total_price( $item_ID )
 	{
 		return isset( $this->item_IDs[ $item_ID ] ) ? $this->item_IDs[ $item_ID ]['unit_price'] * $this->item_IDs[ $item_ID ]['qty'] : 0;
-	}
-
-
-	/**
-	 * Get shopping cart currency ID
-	 *
-	 * @return integer Currency ID
-	 */
-	function get_curr_ID()
-	{
-		load_funcs( 'regional/model/_regional.funcs.php' );
-		return isset( $this->curr_ID ) ? $this->curr_ID : get_default_currency_ID();
 	}
 
 
