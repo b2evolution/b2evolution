@@ -10041,7 +10041,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 12972, 'Upgrade Categories-to-Posts relationships table...' ) )
+	if( upg_task_start( 12972, 'Move Order from Posts table to Categories-to-Posts relationships table...' ) )
 	{	// part of 6.10.3-stable
 		db_add_col( 'T_postcats', 'postcat_order', 'DOUBLE NULL' );
 		$DB->query( 'UPDATE T_postcats
