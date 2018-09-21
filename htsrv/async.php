@@ -620,6 +620,7 @@ switch( $action )
 
 		$item_order = param( 'new_item_order', 'string' );
 		$post_ID = param( 'post_ID', 'integer' );
+		$cat_ID = param( 'cat_ID', 'integer', NULL );
 
 		$ItemCache = & get_ItemCache();
 		$Item = & $ItemCache->get_by_ID( $post_ID );
@@ -632,12 +633,11 @@ switch( $action )
 			$item_order = NULL;
 		}
 		else
-		{	// Make an order to integer:
-			$item_order = intval( $item_order );
+		{	// Make an order to double:
+			$item_order = floatval( $item_order );
 		}
 
-		$Item->set( 'order', $item_order, true );
-		$Item->dbupdate();
+		$Item->update_order( $item_order, $cat_ID );
 
 		// Return a link to make the cell editable on next time:
 		echo '<a href="#" rel="'.$Item->ID.'">'.( $item_order === NULL ? '-' : $item_order ).'</a>';

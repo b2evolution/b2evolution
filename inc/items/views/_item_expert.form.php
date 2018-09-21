@@ -650,10 +650,6 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'post_parent_ID', $edited_Item->get( 'parent_ID' ) );
 	}
 
-	echo '<tr><td><strong>'.T_('Order').':</strong></td><td>';
-	$Form->text( 'item_order', $edited_Item->order, 10, '', T_('can be decimal') );
-	echo '</td></tr>';
-
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{	// If current User has full access to edit other users,
 		// Display item's owner:

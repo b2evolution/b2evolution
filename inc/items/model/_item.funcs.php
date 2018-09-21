@@ -1243,18 +1243,25 @@ function cat_select_header( $params = array() )
 {
 	$params = array_merge( array(
 			'category_name'        => T_('Category'),
+			'category_main_text'   => T_('Main'),
 			'category_main_title'  => T_('Main category'),
+			'category_extra_text'  => T_('Ext'),
 			'category_extra_title' => T_('Additional category'),
+			'category_order_text'  => T_('Ord'),
+			'category_order_title' => T_('Order'),
 		), $params );
 
-	// main cat header
-	$r = '<thead><tr><th class="selector catsel_main" title="'.$params['category_main_title'].'">'.T_('Main').'</th>';
+	// Radio option for main category:
+	$r = '<thead><tr><th class="catsel_main col-narrow" title="'.format_to_output( $params['category_main_title'], 'htmlattr' ).'">'.format_to_output( $params['category_main_text'] ).'</th>';
 
-	// extra cat header
-	$r .= '<th class="selector catsel_extra" title="'.$params['category_extra_title'].'">'.T_('Extra').'</th>';
+	// Checkbox for extra category:
+	$r .= '<th class="catsel_extra col-narrow" title="'.format_to_output( $params['category_extra_title'], 'htmlattr' ).'">'.format_to_output( $params['category_extra_text'] ).'</th>';
 
-	// category header
-	$r .= '<th class="catsel_name">'.$params['category_name'].'</th>'
+	// Category name:
+	$r .= '<th class="catsel_name">'.$params['category_name'].'</th>';
+
+	// Item order per category:
+	$r .= '<th class="catsel_order col-narrow" title="'.format_to_output( $params['category_order_title'], 'htmlattr' ).'">'.format_to_output( $params['category_order_text'] ).'</th>'
 		.'</tr></thead>';
 
 	return $r;
@@ -1453,8 +1460,11 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 				.$chapter_lock_status
 				.' <a href="'.htmlspecialchars($thisChapter->get_permanent_url()).'" title="'.htmlspecialchars(T_('View category in blog.')).'">'
 				.'&nbsp;&raquo;&nbsp;' // TODO: dh> provide an icon instead? // fp> maybe the A(dmin)/B(log) icon from the toolbar? And also use it for permalinks to posts?
-				.'</a></td>'
-			.'</tr>'."\n";
+				.'</a></td>';
+
+	$r .= '<td class="catsel_order"><input type="text" name="post_cat_orders['.$cat_ID.']" class="form_text_input form-control" value="'.$edited_Item->get_order( $cat_ID ).'" title="'.format_to_output( T_('can be decimal'), 'htmlattr' ).'" /></td>';
+
+	$r .= '</tr>'."\n";
 
 	return $r;
 }
@@ -1495,10 +1505,12 @@ function cat_select_new( & $cat_display_params )
 	if( $new_maincat || $new_extracat )
 	{
 		$category_name = param( 'category_name', 'string', '' );
+		$category_order = param( 'category_order', 'integer', '' );
 	}
 	else
 	{
 		$category_name = '';
+		$category_order = '';
 	}
 
 	$cat_display_params['total_count'] = $cat_display_params['total_count']  + 1;
@@ -1508,7 +1520,7 @@ function cat_select_new( & $cat_display_params )
 	{
 		// RADIO for new main cat:
 		$r .= '<td class="selector catsel_main"><input type="radio" name="post_category" class="checkbox" title="'
-							.T_('Select as MAIN category').'" value="0"';
+							.format_to_output( T_('Select as MAIN category'), 'htmlattr' ).'" value="0"';
 		if( $new_maincat )
 		{
 			$r.= ' checked="checked"';
@@ -1522,7 +1534,7 @@ function cat_select_new( & $cat_display_params )
 	{
 		// CHECKBOX
 		$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
-							.T_('Select as an additional category').'" value="0"';
+							.format_to_output( T_('Select as an additional category'), 'htmlattr' ).'" value="0"';
 		if( $new_extracat )
 		{
 			$r.= ' checked="checked"';
@@ -1532,9 +1544,15 @@ function cat_select_new( & $cat_display_params )
 
 	// INPUT TEXT for new category name
 	$r .= '<td class="catsel_name">'
-				.'<input maxlength="255" style="width: 100%;" value="'.$category_name.'" size="20" type="text" name="category_name" id="new_category_name" />'
-				.'</td>'
-			.'</tr>';
+				.'<input maxlength="255" style="width:100%" value="'.format_to_output( $category_name, 'htmlattr' ).'" size="20" type="text" name="category_name" id="new_category_name" class="form_text_input form-control" />'
+				.'</td>';
+
+	// INPUT TEXT for otem order in new category:
+	$r .= '<td class="catsel_order">'
+				.'<input type="text" name="post_cat_orders[0]" value="'.format_to_output( $category_order, 'htmlattr' ).'" name="category_order" class="form_text_input form-control" title="'.format_to_output( T_('can be decimal'), 'htmlattr' ).'" />'
+				.'</td>';
+
+	$r .= '</tr>';
 
 	return $r;
 }
@@ -3116,6 +3134,15 @@ function check_categories( & $post_category, & $post_extracats, $Item = NULL, $f
 				$post_extracats[] = $new_Chapter->ID;
 			}
 
+			// Set order for new created category:
+			$post_cat_orders = param( 'post_cat_orders', 'array:string' );
+			if( isset( $post_cat_orders[0] ) )
+			{
+				$post_cat_orders[ $new_Chapter->ID ] = $post_cat_orders[0];
+				unset( $post_cat_orders[0] );
+				set_param( 'post_cat_orders', $post_cat_orders );
+			}
+
 			$ChapterCache->add( $new_Chapter );
 		}
 		else
@@ -4524,7 +4551,7 @@ function items_manual_results_block( $params = array() )
 
 		if( $order_action == 'update' )
 		{ // Update an order to new value
-			$new_value = (int)param( 'new_value', 'string', 0 );
+			$new_value = param( 'new_value', 'string', '' );
 			$order_data = param( 'order_data', 'string' );
 			$order_data = explode( '-', $order_data );
 			$order_obj_ID = (int)$order_data[2];
@@ -4539,7 +4566,7 @@ function items_manual_results_block( $params = array() )
 						{
 							if( $current_User->check_perm( 'blog_cats', '', false, $updated_Chapter->blog_ID ) )
 							{ // Check permission to edit this Chapter
-								$updated_Chapter->set( 'order', $new_value );
+								$updated_Chapter->set( 'order', intval( $new_value ) );
 								$updated_Chapter->dbupdate();
 								$ChapterCache->clear();
 							}
@@ -4553,8 +4580,7 @@ function items_manual_results_block( $params = array() )
 						{
 							if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $updated_Item ) )
 							{ // Check permission to edit this Item
-								$updated_Item->set( 'order', $new_value );
-								$updated_Item->dbupdate();
+								$updated_Item->update_order( $new_value, $cat_ID );
 							}
 						}
 						break;
@@ -5388,13 +5414,25 @@ function item_row_status( $Item, $index )
  */
 function item_row_order( $Item )
 {
-	global $current_User;
+	global $current_User, $ItemList;
 
-	$item_order = $Item->get( 'order' );
+	if( isset( $ItemList, $ItemList->filters['cat_array'] ) &&
+	    count ( $ItemList->filters['cat_array'] ) == 1 )
+	{	// Use order of single filtered category:
+		$order_cat_ID = $ItemList->filters['cat_array'][0];
+		$order_cat_attr = ' data-cat-id="'.$order_cat_ID.'"';
+	}
+	else
+	{	// Use order of main category:
+		$order_cat_ID = NULL;
+		$order_cat_attr = '';
+	}
+
+	$item_order = $Item->get_order( $order_cat_ID );
 
 	if( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{	// If current user can edit the Item then allow to edit an order by AJAX:
-		return '<a href="#" rel="'.$Item->ID.'">'.( $item_order === NULL ? '-' : $item_order ).'</a>';
+		return '<a href="#" rel="'.$Item->ID.'"'.$order_cat_attr.'>'.( $item_order === NULL ? '-' : $item_order ).'</a>';
 	}
 	else
 	{	// If current user cannot edit the Item then display a static text
@@ -5672,11 +5710,11 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	{
 		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 		{ // Add availability to edit an order if current user can edit this item
-			$order_attrs .= ' id="order-item-'.$Item->ID.'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
+			$order_attrs .= ' id="order-item-'.$Item->ID.'" data-cat="'.$params['chapter_ID'].'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
 		}
-		$order_value = $Item->dget('order');
+		$order_value = $Item->get_order( $params['chapter_ID'] );
 	}
-	$r .= '<td'.$order_attrs.'><span style="padding-left:'.$level.'em">'.$order_value.'</span></td>';
+	$r .= '<td'.$order_attrs.'><span style="padding-left:'.$level.'em">'.format_to_output( $order_value ).'</span></td>';
 
 	// Actions
 	$r .= '<td class="lastcol shrinkwrap">'.item_edit_actions( $Item ).'</td>';

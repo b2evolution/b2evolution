@@ -396,7 +396,7 @@ function _wp_mw_get_item_struct( & $Item )
 			'wp_author'					=> new xmlrpcval( $Item->get('t_author') ),
 			'wp_page_parent_id'			=> new xmlrpcval( (isset($Item->parent_ID) ? $Item->parent_ID : 0), 'int' ),
 			'wp_page_parent_title'		=> new xmlrpcval( $parent_title ),
-			'wp_page_order'				=> new xmlrpcval( $Item->order ), // We don't use 'int' here because b2evolution "order" is stored as double while WP uses integer values
+			'wp_page_order'				=> new xmlrpcval( $Item->get_order() ), // We don't use 'int' here because b2evolution "order" is stored as double while WP uses integer values
 			'wp_author_id'				=> new xmlrpcval( $Item->creator_user_ID, 'string' ),
 			'wp_author_display_name'	=> new xmlrpcval( $Item->get('t_author') ),
 			'wp_post_format'			=> new xmlrpcval( $Item->ityp_ID ),
@@ -1569,7 +1569,7 @@ function xmlrpcs_edit_item( & $edited_Item, $params )
 	}
 	if( !is_null($params['order']) )
 	{
-		if( ! (empty($params['order']) && ! $edited_Item->order) )
+		if( ! (empty($params['order']) && ! $edited_Item->get_order()) )
 		{	// Do not allow 0 order if there was no order set before
 			$edited_Item->set('order', $params['order']);
 		}

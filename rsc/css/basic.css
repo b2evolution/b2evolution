@@ -537,6 +537,13 @@ img.avatar_above_login {
   white-space: nowrap;
   text-align: center;
 }
+.col-narrow {
+  width: 1px;
+  white-space: nowrap;
+  text-align: center;
+  padding-left: 1px !important;
+  padding-right: 1px !important;
+}
 .filename {
   font-family: monospace;
   font-size: larger;

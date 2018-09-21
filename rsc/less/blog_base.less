@@ -478,41 +478,39 @@ table.catselect {
 	border-spacing:0;
 	width:100%;
 	border: 1px solid #bbb;
-}
-table.catselect th {
-	padding: .3ex 1ex;
-	background-color: #ddd;
-	border-bottom: 1px solid #bbb;
-}
-table.catselect td {
-	padding: .2ex 1ex;
-}
-table.catselect tr.group td {
-	border-top: 1px solid #bbb;
-	border-bottom: 1px solid #bbb;
-	background-color: #ccc;
-	font-weight: bold;
-}
-table.catselect tr.odd,
-table.catselect tr.odd input {
-	background-color: #eee;
-}
-table.catselect tr.even,
-table.catselect tr.even input {
-	background-color:#ddd;
-}
-table.catselect tr:hover,
-table.catselect tr:hover input {
-	background-color:#ccc;
-}
-table.catselect th.selector,
-table.catselect td.selector {
-	width: 1%;
-	text-align:center;
-	border-right: 1px solid #bbb;
-}
-table.catselect #new_category_name {
-	background-color:white;
+	th {
+		padding: .3ex 1ex;
+		background-color: #ddd;
+		border-bottom: 1px solid #bbb;
+	}
+	td {
+		padding: .2ex 1ex;
+	}
+	th, td {
+		border-right: 1px solid #bbb;
+		&:last-child {
+			border-right: none;
+		}
+	}
+	tr.group td {
+		border-top: 1px solid #bbb;
+		border-bottom: 1px solid #bbb;
+		background-color: #ccc;
+		font-weight: bold;
+	}
+	tr.odd {
+		background-color: #eee;
+	}
+	tr.even {
+		background-color:#ddd;
+	}
+	tr:hover,
+	tr:hover input {
+		background-color:#ccc;
+	}
+	.catsel_order input {
+		width: 40px;
+	}
 }
 
 // Raty icons (stars)

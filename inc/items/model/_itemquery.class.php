@@ -1093,6 +1093,20 @@ class ItemQuery extends SQL
 		$available_fields[] = 'T_categories.cat_name';
 		$available_fields[] = 'T_categories.cat_order';
 
+		if( in_array( 'order', $orderby_array ) )
+		{	// If list is ordered by field 'order':
+			if( ( $order_i = array_search( 'order', $available_fields ) ) !== false )
+			{	// Use an order per category instead of old field 'post_order':
+				$available_fields[ $order_i ] = 'T_postcats.postcat_order';
+			}
+			if( ! preg_match( '#T_postcats#', $this->get_from( '' ) ) )
+			{	// Join table of categories for field 'postcat_order':
+				$this->FROM_add( 'INNER JOIN T_postcats ON postcat_post_ID = post_ID AND post_main_cat_ID = postcat_cat_ID' );
+			}
+			// Replace field to real name:
+			$order_by = str_replace( 'order', 'T_postcats.postcat_order', $order_by );
+		}
+
 		$order_clause = gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname, $available_fields );
 
 		// asimo> The following commented code parts handles the nullable fields order, to move them NULL values into the end of the result

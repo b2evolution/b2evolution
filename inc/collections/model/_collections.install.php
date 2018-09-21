@@ -166,7 +166,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_renderers              VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			post_priority               int(11) unsigned null COMMENT 'Task priority in workflow',
 			post_featured               tinyint(1) NOT NULL DEFAULT 0,
-			post_order                  DOUBLE NULL,
 			post_ctry_ID                INT(10) UNSIGNED NULL,
 			post_rgn_ID                 INT(10) UNSIGNED NULL,
 			post_subrg_ID               INT(10) UNSIGNED NULL,
@@ -182,8 +181,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			INDEX post_parent_ID( post_parent_ID ),
 			INDEX post_assigned_user_ID( post_assigned_user_ID ),
 			INDEX post_ityp_ID( post_ityp_ID ),
-			INDEX post_pst_ID( post_pst_ID ),
-			INDEX post_order( post_order )
+			INDEX post_pst_ID( post_pst_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_postcats' => array(
@@ -191,6 +189,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_postcats (
 			postcat_post_ID int(11) unsigned NOT NULL,
 			postcat_cat_ID int(11) unsigned NOT NULL,
+			postcat_order DOUBLE NULL,
 			PRIMARY KEY postcat_pk (postcat_post_ID,postcat_cat_ID),
 			UNIQUE catpost ( postcat_cat_ID, postcat_post_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

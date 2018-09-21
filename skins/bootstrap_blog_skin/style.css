@@ -86,9 +86,6 @@ div.extended_search_form .search_options .search_option {
   display: inline-block;
   margin-right: 10px;
 }
-table.catselect input#new_category_name {
-  width: 98% !important;
-}
 label.control-label[for=post_title] {
   width: auto;
 }
