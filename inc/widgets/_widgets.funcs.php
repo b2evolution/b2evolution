@@ -360,7 +360,8 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Shopping Cart */
 	$default_widgets['shopping_cart'] = array(
-		array( 10, 'display_shopping_cart' ),
+		array( 10, 'currency_selector' ),
+		array( 20, 'display_shopping_cart' ),
 	);
 
 	/* Mobile Footer */

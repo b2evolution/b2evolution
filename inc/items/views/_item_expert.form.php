@@ -425,7 +425,6 @@ $Form->begin_form( '', '', $params );
 
 		foreach( $iprc_select_replacements as $iprc_select_field )
 		{	// Set a selected option:
-			//pre_dump( '(<select[^>]+name="item_pricing_'.$iprc_select_field.'.+?<option value="'.preg_quote( $item_price[ $iprc_select_field ], '/' ).'")' );
 			$item_price_template = str_replace( array("\n", "\r"), " ", $item_price_template ); // Remove new lines for the following line to work
 			$item_price_template = preg_replace( '/(<select[^>]+name="item_pricing_'.$iprc_select_field.'.+?<option value="'.preg_quote( $item_price[ $iprc_select_field ], '/' ).'")/', '$1 selected="selected"', $item_price_template );
 		}

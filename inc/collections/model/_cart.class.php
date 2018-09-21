@@ -45,12 +45,34 @@ class Cart
 	{
 		global $Session;
 
+		$ItemCache = & get_ItemCache();
+
 		// Get shopping cart from Session:
 		$cart_data = $Session->get( 'cart' );
 		$cart_items = $cart_data['items'];
 
 		// Initialize items/products:
+		$curr_ID = get_currency()->ID;
 		$this->item_IDs = is_array( $cart_items ) ? $cart_items : array();
+		foreach( $this->item_IDs as $cart_item_ID => $cart_item_data )
+		{
+			if( $curr_ID != $cart_item_data['curr_ID'] )
+			{
+				if( $cart_Item = & $ItemCache->get_by_ID( $cart_item_ID, false, false ) )
+				{
+					if( $new_pricing = $cart_Item->get_current_best_pricing( $curr_ID, NULL, $this->item_IDs[ $cart_item_ID ]['qty'] ) )
+					{
+						$this->item_IDs[ $cart_item_ID ]['unit_price'] = $new_pricing['iprc_price'];
+					}
+					else
+					{
+						$this->item_IDs[ $cart_item_ID ]['unit_price'] = -1;
+					}
+				}
+
+				$this->item_IDs[ $cart_item_ID ]['curr_ID'] = $curr_ID;
+			}
+		}
 	}
 
 
@@ -65,12 +87,9 @@ class Cart
 	 * @return boolean TRUE on successful updating,
 	 *                 FALSE on failed e.g. if a requested item doesn't exist
 	 */
-	function update( $qty = NULL, $item_ID = NULL )
+	function update( $qty = NULL, $item_ID = NULL, $curr_ID = NULL )
 	{
-		global $Messages;
-
-		// Get shopping cart currency
-		$cart_currency = get_currency();
+		global $Session, $Messages;
 
 		if( $item_ID === NULL )
 		{	// Use default item ID from request param:
@@ -82,6 +101,11 @@ class Cart
 		    ! $cart_Item->can_be_displayed() )
 		{	// No requested item in DB or it cannot be displayed on front-office for current user:
 			return false;
+		}
+
+		if( $curr_ID === NULL )
+		{
+			$curr_ID = get_currency()->ID;
 		}
 
 		if( $qty === NULL )
@@ -101,10 +125,14 @@ class Cart
 		}
 		elseif( $qty > 0 )
 		{	// Add/Update quantity of items in cart:
-			$best_pricing = $cart_Item->get_current_best_pricing( $cart_currency->ID, NULL, $qty );
+
+			// Get best pricing for item:
+			$best_pricing = $cart_Item->get_current_best_pricing( $curr_ID, NULL, $qty );
 
 			if( empty( $best_pricing ) )
 			{
+				$CurrencyCache = & get_CurrencyCache();
+				$cart_currency = $CurrencyCache->get_by_ID( $curr_ID, false, false );
 				$Messages->add( sprintf( T_('This product cannot be added to the cart because it has no price in the cart currency (%s).'), $cart_currency->get( 'code' ) ), 'error' );
 				return false;
 			}
@@ -115,24 +143,34 @@ class Cart
 			{
 				$this->item_IDs[ $item_ID ] = array(
 					'qty' => $qty,
-					'unit_price' => $unit_price );
+					'unit_price' => $unit_price,
+					'curr_ID' => $best_pricing['iprc_curr_ID'] );
 				$cart_is_updated = true;
 				$Messages->add( sprintf( T_('Product "%s" has been added to the cart.'), $cart_Item->get( 'title' ) ), 'success' );
 			}
-			elseif( $this->item_IDs[ $item_ID ]['qty'] != $qty || $this->item_IDs[ $item_ID ]['unit_price'] != $unit_price )
+			else
 			{
-				$this->item_IDs[ $item_ID ]['qty'] = $qty;
-				$this->item_IDs[ $item_ID ]['unit_price'] = $unit_price;
-				$cart_is_updated = true;
-				$Messages->add( sprintf( T_('Quantity for product "%s" has been changed.'), $cart_Item->get( 'title' ) ), 'success' );
+				if( $this->item_IDs[ $item_ID ]['qty'] != $qty )
+				{
+					$this->item_IDs[ $item_ID ]['qty'] = $qty;
+					$cart_is_updated = true;
+					$Messages->add( sprintf( T_('Quantity for product "%s" has been changed.'), $cart_Item->get( 'title' ) ), 'success' );
+				}
+
+				if( $this->item_IDs[ $item_ID ]['unit_price'] != $unit_price )
+				{
+					$this->item_IDs[ $item_ID ]['unit_price'] = $unit_price;
+					$this->item_IDs[ $item_ID ]['curr_ID'] = $best_pricing['iprc_curr_ID'];
+					$cart_is_updated = true;
+					$Messages->add( sprintf( T_('Unit price for product "%s" has been changed.'), $cart_Item->get( 'title' ) ), 'success' );
+				}
 			}
 		}
 
 		if( $cart_is_updated )
 		{	// Update shopping cart with items data:
 			$cart_data = array(
-					'curr_ID' => $this->curr_ID,
-					'items' => $this->item_IDs );
+					'items' => $this->item_IDs, );
 			$Session->set( 'cart', $cart_data );
 			$Session->dbsave();
 
@@ -174,6 +212,30 @@ class Cart
 
 
 	/**
+	 * Get title of the requested item in this shopping cart
+	 *
+	 * @param integer Item ID
+	 * @return integer quantity
+	 */
+	function get_title( $item_ID )
+	{
+		if( empty( $this->items ) )
+		{
+			$this->get_items();
+		}
+		$currency = $this->get_currency( $item_ID );
+		$title = isset( $this->items[ $item_ID ] ) ? $this->items[ $item_ID ]->get_title() : NULL;
+
+		if( isset( $this->item_IDs[ $item_ID ] ) && $this->item_IDs[ $item_ID ]['unit_price'] < 0 )
+		{
+			$title .= "\n".get_icon( 'warning_yellow' ).' <span class="text-danger">'.sprintf( T_('This product cannot be purchased in %s.'), $currency->get( 'code' ) ).'</span>';
+		}
+
+		return nl2br( format_to_output( $title, 'htmlbody' ) );
+	}
+
+
+	/**
 	 * Get quantity of the requested item in this shopping cart
 	 *
 	 * @param integer Item ID
@@ -191,9 +253,35 @@ class Cart
 	 * @param integer Item ID
 	 * @return float unit price
 	 */
+	function get_currency( $item_ID )
+	{
+		if( isset( $this->item_IDs[ $item_ID ] ) )
+		{
+			$CurrencyCache = & get_CurrencyCache();
+			return $CurrencyCache->get_by_ID( $this->item_IDs[ $item_ID ]['curr_ID'], false, false );
+		}
+
+		return NULL;
+	}
+
+
+	/**
+	 * Get unit price of requested item in this shopping cart
+	 *
+	 * @param integer Item ID
+	 * @return float unit price
+	 */
 	function get_unit_price( $item_ID )
 	{
-		return isset( $this->item_IDs[ $item_ID ] ) ? $this->item_IDs[ $item_ID ]['unit_price'] : 0;
+		$currency = $this->get_currency( $item_ID );
+		$unit_price = isset( $this->item_IDs[ $item_ID ] ) ? $this->item_IDs[ $item_ID ]['unit_price'] : 0;
+
+		if( $unit_price < 0 )
+		{
+			return get_icon( 'warning_yellow', 'imgtag', array( 'title' => sprintf( T_('This product cannot be purchased in %s.'), $currency->get( 'code' ) ) ) );
+		}
+
+		return $currency->get( 'shortcut' ).'&nbsp;'.number_format( $unit_price, 2 );
 	}
 
 
@@ -205,7 +293,16 @@ class Cart
 	 */
 	function get_total_price( $item_ID )
 	{
-		return isset( $this->item_IDs[ $item_ID ] ) ? $this->item_IDs[ $item_ID ]['unit_price'] * $this->item_IDs[ $item_ID ]['qty'] : 0;
+		$currency = $this->get_currency( $item_ID );
+		$unit_price = isset( $this->item_IDs[ $item_ID ] ) ? $this->item_IDs[ $item_ID ]['unit_price'] : 0;
+		if( $unit_price < 0 )
+		{
+			return get_icon( 'warning_yellow', 'imgtag', array( 'title' => sprintf( T_('This product cannot be purchased in %s.'), $currency->get( 'code' ) ) ) );
+		}
+
+		$total_price = isset( $this->item_IDs[ $item_ID ] ) ? $unit_price * $this->item_IDs[ $item_ID ]['qty'] : 0;
+
+		return $currency->get( 'shortcut' ).'&nbsp;'.number_format( $total_price, 2 );
 	}
 
 
@@ -217,11 +314,11 @@ class Cart
 	function get_cart_total()
 	{
 		$cart_total = 0.00;
-		foreach( $this->item_IDs as $cart_Item )
+		foreach( $this->items as $cart_item_ID => $cart_Item )
 		{
-			if( $cart_Item->can_be_displayed() )
+			if( $cart_Item->can_be_displayed() && $this->item_IDs[ $cart_item_ID ]['unit_price'] >= 0 )
 			{
-				$cart_total += $cart_Item['unit_price'] * $cart_Item['qty'];
+				$cart_total += $this->item_IDs[ $cart_item_ID ]['unit_price'] * $this->item_IDs[ $cart_item_ID ]['qty'];
 			}
 		}
 

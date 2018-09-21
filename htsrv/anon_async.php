@@ -1638,6 +1638,19 @@ switch( $action )
 			$Form->text_input( 'blog_url_alias[]', '', 50, T_('Alias URL'), $alias_field_note, array( 'class' => 'evo_url_alias' ) );
 			break;
 
+	case 'set_currency':
+			global $Session;
+			$curr_ID = param( 'currency', 'integer', true );
+			$redirect_to = param( 'redirect_to', 'url', '' );
+			$Session->set( 'currency_ID', $curr_ID );
+
+			if( !empty( $redirect_to ) )
+			{ // Redirect to back page, It is used by browsers without JavaScript
+				header_redirect( $redirect_to, 303 ); // Will EXIT
+				// We have EXITed already at this point!!
+			}
+			break;
+
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
 		break;

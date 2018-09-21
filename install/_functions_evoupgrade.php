@@ -10822,6 +10822,83 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13290 ) )
+	{
+		global $basic_widgets_insert_sql_rows;
+		$basic_widgets_insert_sql_rows = array();
+
+		/**
+		 * Add a widget to global array in order to insert it in DB by single SQL query later
+		 *
+		 * @param integer Container ID
+		 * @param string Type
+		 * @param string Code
+		 * @param integer Order
+		 * @param array|string|NULL Widget params
+		 * @param integer 1 - enabled, 0 - disabled
+		 */
+		function add_basic_widget_13290( $container_ID, $code, $type, $order, $params = NULL, $enabled = 1 )
+		{
+			global $basic_widgets_insert_sql_rows, $DB;
+
+			if( is_null( $params ) )
+			{ // NULL
+				$params = 'NULL';
+			}
+			elseif( is_array( $params ) )
+			{ // array
+				$params = $DB->quote( serialize( $params ) );
+			}
+			else
+			{ // string
+				$params = $DB->quote( $params );
+			}
+
+			$basic_widgets_insert_sql_rows[] = '( '
+				.$container_ID.', '
+				.$order.', '
+				.$enabled.', '
+				.$DB->quote( $type ).', '
+				.$DB->quote( $code ).', '
+				.$params.' )';
+		}
+
+		// Get all collections with shopping cart container
+		$SQL = new SQL();
+		$SQL->SELECT( 'wico_ID, wico_coll_ID, wi_order' );
+		$SQL->FROM( 'T_widget__container' );
+		$SQL->FROM_add( 'INNER JOIN T_widget__widget ON wico_ID = wi_wico_ID AND wi_code = "display_shopping_cart"' );
+		$SQL->WHERE( 'wico_code = "shopping_cart"' );
+		$SQL->ORDER_BY( 'wico_coll_ID ASC, wi_order ASC' );
+		$containers = $DB->get_results( $SQL, ARRAY_A );
+		if( count( $containers ) > 0 )
+		{	// If at least one collection exists:
+			$orders = array();
+			foreach( $containers as $container )
+			{
+				task_begin( 'Installing default "Shopping Cart" widgets for collection #'.$container['wico_coll_ID'].'... ' );
+				if( ! isset( $orders['_'.$container['wico_ID']] ) )
+				{
+					$orders['_'.$container['wico_ID']] = 0;
+				}
+				$wi_order = intval( $container['wi_order'] ) + $orders['_'.$container['wico_ID']];
+				$DB->query( 'UPDATE T_widget__widget SET wi_order = '.( $container['wi_order'] + 10 )
+						.' WHERE wi_wico_ID = '.$container['wico_ID'].' AND wi_order >= '.$wi_order );
+				add_basic_widget_13290( $container['wico_ID'], 'currency_selector', 'core', $wi_order );
+				$orders['_'.$container['wico_ID']] += 10;
+				task_end();
+			}
+		}
+
+		if( ! empty( $basic_widgets_insert_sql_rows ) )
+		{	// Insert the widget records by single SQL query:
+			$DB->query( 'INSERT INTO T_widget__widget ( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
+		}
+
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

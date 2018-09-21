@@ -275,12 +275,15 @@ class display_shopping_cart_Widget extends ComponentWidget
 				echo str_replace( $product_cell_masks, array( $first_item_image, $this->disp_params['class_image_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				// Title:
-				echo str_replace( $product_cell_masks, array( $cart_Item->get_title(), $this->disp_params['class_product_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
+				echo str_replace( $product_cell_masks, array( $Cart->get_title( $cart_item_ID ), $this->disp_params['class_product_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
+
+				// Currency:
+				$currency = $Cart->get_currency( $cart_item_ID );
 
 				// Unit Price:
-				$currency_shortcut = $Cart->currency->get( 'shortcut' ).'&nbsp';
+				$currency_shortcut = empty( $currency ) ? '' : $currency->get( 'shortcut' ).'&nbsp';
 				$unit_price = $Cart->get_unit_price( $cart_item_ID );
-				echo str_replace( $product_cell_masks, array( $currency_shortcut.number_format( $unit_price, 2 ), $this->disp_params['class_unit_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
+				echo str_replace( $product_cell_masks, array( $unit_price, $this->disp_params['class_unit_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				// Quantity:
 				$item_qty = $Cart->get_quantity( $cart_item_ID );
@@ -294,8 +297,7 @@ class display_shopping_cart_Widget extends ComponentWidget
 
 				// Total Price:
 				$total_price = $Cart->get_total_price( $cart_item_ID );
-				$total += $total_price;
-				echo str_replace( $product_cell_masks, array( $currency_shortcut.number_format( $total_price, 2 ), $this->disp_params['class_total_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
+				echo str_replace( $product_cell_masks, array( $total_price, $this->disp_params['class_total_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				// Remove:
 				$remove_cell = action_icon( '', 'remove', $Blog->get( 'carturl', array( 'url_suffix' => 'action=remove&amp;item_ID='.$cart_item_ID ) ), NULL, NULL, NULL, array( 'class' => '' ) ).' ';
@@ -310,7 +312,7 @@ class display_shopping_cart_Widget extends ComponentWidget
 			echo str_replace( $product_cell_masks, array( T_('Total'), $this->disp_params['class_product_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 			echo str_replace( $product_cell_masks, array( NULL, $this->disp_params['class_unit_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 			echo str_replace( $product_cell_masks, array( NULL, $this->disp_params['class_quantity_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
-			echo str_replace( $product_cell_masks, array( $currency_shortcut.number_format( $total, 2 ), $this->disp_params['class_total_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
+			echo str_replace( $product_cell_masks, array( $currency_shortcut.number_format( $Cart->get_cart_total(), 2 ), $this->disp_params['class_total_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 			echo str_replace( $product_cell_masks, array( NULL, $this->disp_params['class_actions_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 			echo $this->disp_params['shopping_cart_total_row_end'];
 
@@ -342,6 +344,7 @@ class display_shopping_cart_Widget extends ComponentWidget
 				//       which cannot see/buy items/products with status "Members", so in such case at the user updating moment
 				//       we should invalidate widget cache in order to hide some items/products for the updated user.
 				'user_ID'     => ( is_logged_in() ? $current_User->ID : 0 ), // Has the current User changed?
+				'curr_ID'     => $Session->get( 'currency_ID' ), // Has the active currency changed?
 				'cart'        => $Session->ID, // Has the cart updated for current session?
 			);
 

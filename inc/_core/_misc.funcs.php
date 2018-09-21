@@ -9216,4 +9216,16 @@ function get_currency()
 
 	return $CurrencyCache->get_by_ID( $curr_ID, false, false );
 }
+
+
+/**
+ * Set current active currency
+ *
+ * @param integer Currency ID
+ */
+function set_currency( $curr_ID )
+{
+	global $Session;
+	$Session->set( 'currency_ID', $curr_ID );
+}
 ?>

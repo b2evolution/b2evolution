@@ -168,6 +168,7 @@ $core_componentwidget_defs = array(
 			'poll',
 			'colls_list_public',
 			'colls_list_owner',
+			'currency_selector',
 			'mobile_skin_switcher',
 			'page_404_not_found',
 		),
