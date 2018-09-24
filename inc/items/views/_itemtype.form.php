@@ -231,7 +231,7 @@ $Table->display_col_start();
 custom_field_edit_form_template( array(
 		'<input type="text" name="custom_field_format$cf_num$" value="$cf_format$" class="form_text_input form-control custom_field_format" size="20" maxlength="2000" />',
 		'<select name="custom_field_format$cf_num$" class="form-control custom_field_format">'.Form::get_select_options_string( array_keys( $thumbnail_sizes ) ).'</select>'
-	), array( 'double,computed,separator', 'image' ), $custom_field_templates );
+	), array( 'double,computed,separator,url', 'image' ), $custom_field_templates );
 $Table->display_col_end();
 
 // Public
