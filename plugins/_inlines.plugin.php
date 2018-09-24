@@ -59,7 +59,7 @@ class inlines_plugin extends Plugin
 		global $Hit;
 
 		if( $Hit->is_lynx() )
-		{ // let's deactivate quicktags on Lynx, because they don't work there.
+		{	// let's deactivate quicktags on Lynx, because they don't work there.
 			return false;
 		}
 
@@ -117,7 +117,7 @@ class inlines_plugin extends Plugin
 			}
 
 			if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
-			{ // tinyMCE plugin is active now, we should focus cursor to the edit area
+			{	// tinyMCE plugin is active now, we should focus cursor to the edit area
 				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
 				tinyMCE.execCommand( 'evo_view_edit_inline', false, tinyMCE.activeEditor.id );
 			}
@@ -163,13 +163,13 @@ class inlines_plugin extends Plugin
 		$AdminUI = new AdminUI();
 		load_funcs( 'links/model/_link.funcs.php' );
 
-		if( ! isset( $Item->ID ) )
+		if( ! isset( $params['post_ID'] ) )
 		{
 			return;
 		}
 
 		$ItemCache = & get_ItemCache();
-		$edited_Item = & $ItemCache->get_by_ID( $Item->ID );
+		$edited_Item = & $ItemCache->get_by_ID( $params['post_ID'] );
 
 		if( empty( $blog ) )
 		{
@@ -177,9 +177,9 @@ class inlines_plugin extends Plugin
 		}
 
 		if( isset( $GLOBALS['files_Module'] )
-		&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
-		&& $current_User->check_perm( 'files', 'view', false ) )
-		{ // Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
+				&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
+				&& $current_User->check_perm( 'files', 'view', false ) )
+		{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
 			load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
 			global $LinkOwner; // Initialize this object as global because this is used in many link functions
 			$LinkOwner = new LinkItem( $edited_Item );

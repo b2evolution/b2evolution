@@ -108,7 +108,7 @@ function evo_link_insert_inline( type, link_ID, option, replace )
 	}
 
 	if( typeof( b2evoCanvas ) != 'undefined' )
-	{ // Canvas exists
+	{	// Canvas exists
 		var insert_tag = '[' + type + ':' + link_ID;
 
 		if( option.length )
@@ -122,7 +122,7 @@ function evo_link_insert_inline( type, link_ID, option, replace )
 		if( $position_selector.length != 0 )
 		{
 			if( $position_selector.val() != 'inline' )
-			{ // Not yet inline, change the position to 'Inline'
+			{	// Not yet inline, change the position to 'Inline'
 				deferInlineReminder = true;
 				// We have to change the link position in the DB before we insert the image tag
 				// otherwise the inline tag will not render because it is not yet in the 'inline' position
@@ -139,7 +139,7 @@ function evo_link_insert_inline( type, link_ID, option, replace )
 				deferInlineReminder = false;
 			}
 			else
-			{ // Already an inline, insert image tag
+			{	// Already an inline, insert image tag
 				textarea_wrap_selection( b2evoCanvas, insert_tag, '', replace, window.document );
 			}
 		}
