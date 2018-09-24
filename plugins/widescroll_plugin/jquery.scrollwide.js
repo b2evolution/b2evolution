@@ -115,17 +115,17 @@
 				scroll_left.show();
 				obj.css( { // Move main div to clear a space for the left scroll control
 					position: 'relative',
-					marginLeft: options.width + options.margin + 2
+					marginLeft: options.width + options.margin
 				} );
 			}
 
 			if( scroll_right.is(':visible') && scroll_left.is(':visible') )
 			{	// When left & right scroll controls are visible
-				obj.css( 'width', obj_orig_width - 2 * ( options.width + options.margin ) - 2 );
+				obj.css( 'width', obj_orig_width - 2 * ( options.width + options.margin ) );
 			}
 			else
 			{	// Only one control is visible
-				obj.css( 'width', obj_orig_width - options.width - options.margin - 1 );
+				obj.css( 'width', obj_orig_width - options.width - options.margin );
 			}
 		} );
 
@@ -227,5 +227,5 @@
 // Initialize for div.wide_scroll:
 jQuery( document ).ready( function()
 {
-	jQuery( 'div.wide_scroll' ).scrollWide( { scroll_time: 100 } );
+	jQuery( 'div.wide_scroll' ).scrollWide( { scroll_time: 100, margin: 0 } );
 } )
