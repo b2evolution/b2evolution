@@ -2563,7 +2563,7 @@ class Item extends ItemLight
 		$custom_field = $custom_fields[ $field_index ];
 
 		if( ( $custom_field_value === '' || $custom_field_value === NULL ) && // don't format empty value
-		    ! in_array( $custom_field['type'], array( 'double', 'computed' ) ) ) // double and computed fields may have a special format even for empty value
+		    ! in_array( $custom_field['type'], array( 'double', 'computed', 'url' ) ) ) // double, computed and url fields may have a special format even for empty value
 		{	// Don't format value in such cases:
 			return $custom_field_value;
 		}
@@ -2701,6 +2701,37 @@ class Item extends ItemLight
 					$custom_field_value = '<span class="text-danger">'.T_('Invalid link ID:').' '.$custom_field_value.'</span>';
 				}
 				break;
+
+			case 'url':
+				// Format URL field value:
+				if( $format === NULL || $format === '' )
+				{	// No format:
+					break;
+				}
+
+				$formats = explode( ';', $format );
+
+				if( $custom_field_value === '' || $custom_field_value === NULL )
+				{	// Use second format option for empty url:
+					if( ! isset( $formats[1] ) || $formats[1] === '' )
+					{	// No format for empty URL:
+						return $custom_field_value;
+					}
+					else
+					{	// Set a format for empty URL:
+						$format_value = $formats[1];
+					}
+				}
+				else
+				{	// Use first format option for not empty url:
+					$format_value = $formats[0];
+				}
+
+				if( $format_value != '#url#' )
+				{	// Use specific text for link from format if it is not requested to use original url as link text:
+					$custom_field_value = $format_value;
+				}
+				break;
 		}
 
 		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
@@ -2766,7 +2797,10 @@ class Item extends ItemLight
 
 						case 'url':
 							// Use value of url fields as URL to the link:
-							$custom_field_value = '<a href="'.$custom_field_value.'"'.$nofollow_attr.$link_class_attr.'>'.$custom_field_value.'</a>';
+							if( ! empty( $orig_custom_field_value ) )
+							{	// Format URL to link only with not empty URL otherwise display URL as simple text if special text is defined in format for empty URL:
+								$custom_field_value = '<a href="'.$orig_custom_field_value.'"'.$nofollow_attr.$link_class_attr.'>'.$custom_field_value.'</a>';
+							}
 							break 2;
 					}
 				}
