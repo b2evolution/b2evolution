@@ -1244,7 +1244,12 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
  */
 function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo_user = true, $timeshift = 86400 )
 {
-	global $DB, $install_test_features, $timestamp, $Settings, $admin_url;
+	global $DB, $install_test_features, $timestamp, $Settings, $admin_url, $installed_collection_info_pages;
+
+	if( ! isset( $installed_collection_info_pages ) )
+	{	// Array for item IDs which should be used in default shared widget containers "Main Navigation" and "Navigation Hamburger":
+		$installed_collection_info_pages = array();
+	}
 
 	$timestamp = time();
 	$item_IDs = array();
@@ -1271,19 +1276,22 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			}
 
 			// Sample content:
-			if( is_available_item_type( $blog_ID, 'Standalone Page' ) )
+			if( is_available_item_type( $blog_ID, 'Widget Page' ) )
 			{
 				// Insert a PAGE:
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
-				$edited_Item->insert( $owner_ID, T_('More info'), T_('This is a standalone page.'), $now, $cat_minisite_b2evo,
-						array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
+				$installed_collection_info_pages['widget_page'] = $edited_Item->insert( $owner_ID, T_('More info'), '', $now, $cat_minisite_b2evo,
+						array(), 'published', '#', '', '', 'open', array('default'), 'Widget Page' );
 				$edit_File = new File( 'shared', 0, 'monument-valley/monuments.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				$edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
+			}
 
+			if( is_available_item_type( $blog_ID, 'Standalone Page' ) )
+			{
 				// Insert a PAGE:
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
@@ -1299,7 +1307,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 		// =======================================================================================================
 		case 'main':
-			$post_count = 17;
+			$post_count = 18;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -1395,7 +1403,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'photo' );
-				$edited_Item->insert( $owner_ID, T_('About this site'), T_('<p>This blog platform is powered by b2evolution.</p>
+				$installed_collection_info_pages[] = $edited_Item->insert( $owner_ID, T_('About this site'), T_('<p>This blog platform is powered by b2evolution.</p>
 
 <p>You are currently looking at an info page about this site.</p>
 
@@ -1406,6 +1414,17 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$edit_File = new File( 'shared', 1, 'logos/b2evolution_1016x208_wbg.png' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				$edit_File->link_to_Object( $LinkOwner );
+			}
+
+			if( is_available_item_type( $blog_ID, 'Widget Page' ) )
+			{
+				// Insert a WIDGET PAGE:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$installed_collection_info_pages['widget_page'] = $edited_Item->insert( $owner_ID, T_('Widget Page'), '', $now, $cat_home_b2evo,
+						array( $cat_home_b2evo ), 'published', '#', '', '', 'open', array( 'default' ), 'Widget Page' );
 			}
 
 			if( is_available_item_type( $blog_ID, 'Intro-Front' ) )

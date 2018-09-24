@@ -441,8 +441,8 @@ class ComponentWidget extends DataObject
 			$advanced_layout_is_started = true;
 		}
 
-		if( get_parent_class( $this ) == 'generic_menu_link_Widget' )
-		{	// Widget link/button CSS classes for menu link widgets:
+		if( ! empty( $this->allow_link_css_params ) )
+		{	// Enable link/button CSS classes only for specific widgets like menu widgets:
 			$r['widget_link_class'] = array(
 					'label' => '<span class="dimmed">'.T_('Link/Button Class').'</span>',
 					'size' => 20,
@@ -803,8 +803,14 @@ class ComponentWidget extends DataObject
 				{
 					return true;
 				}
-				// Plugin failed (happens when a plugin has been disabled for example):
-				return false;
+				else
+				{	// Plugin failed (happens when a plugin has been disabled for example):
+					if( $this->mode == 'designer' )
+					{	// Display red text in customizer widget designer mode in order to make this plugin visible for editing:
+						echo $this->disp_params['block_start'].'<span class="red">'.T_('Inactive / Uninstalled plugin').'</span>'.$this->disp_params['block_end'];
+					}
+					return false;
+				}
 		}
 
 		echo "Widget $this->type : $this->code did not provide a display() method! ";
@@ -1111,13 +1117,13 @@ class ComponentWidget extends DataObject
 
 				if( $Blog && $l_blog_ID == $Blog->ID )
 				{ // This is the blog being displayed on this page:
-				echo $this->disp_params['item_selected_start'];
-					$link_class = $this->disp_params['link_selected_class'];
+					echo $this->disp_params['item_selected_start'];
+					$link_class = empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['link_selected_class'] : $this->disp_params['widget_active_link_class'];
 				}
 				else
 				{
 					echo $this->disp_params['item_start'];
-					$link_class = $this->disp_params['link_default_class'];;
+					$link_class = empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['link_default_class'] : $this->disp_params['widget_link_class'];
 				}
 
 				echo '<a href="'.$l_Blog->gen_blogurl().'" class="'.$link_class.'" title="'
@@ -1478,7 +1484,7 @@ class ComponentWidget extends DataObject
 
 			$this->renderers_validated = $Plugins->validate_renderer_list( $widget_renderers, array(
 					'Blog'         => & $widget_Blog,
-					'setting_name' => 'coll_apply_rendering'
+					'setting_name' => 'shared_apply_rendering'
 				) );
 		}
 
@@ -1502,6 +1508,11 @@ class ComponentWidget extends DataObject
 		global $Plugins;
 
 		$widget_Blog = & $this->get_Blog();
+		if( empty( $widget_Blog ) )
+		{	// Use current collection if it is not defined, e.g. for shared widget containers:
+			global $Blog;
+			$widget_Blog = $Blog;
+		}
 		$widget_renderers = $this->get_renderers_validated();
 
 		// Do some optional filtering on the content

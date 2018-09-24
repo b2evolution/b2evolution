@@ -77,10 +77,20 @@ class subcontainer_row_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $Blog;
+		$container_type = $this->get_container_param( 'type' );
+
+		if( $container_type == 'shared' || $container_type == 'shared-sub' )
+		{	// For shared containers allow only shared sub-containers:
+			$coll_ID = '';
+		}
+		else
+		{	// For collection containers allow only collection sub-containers:
+			global $Blog;
+			$coll_ID = $Blog->ID;
+		}
 
 		$WidgetContainerCache = & get_WidgetContainerCache();
-		$coll_widget_containers = $WidgetContainerCache->get_by_coll_ID( $Blog->ID );
+		$coll_widget_containers = $WidgetContainerCache->get_by_coll_ID( $coll_ID );
 		$container_options = array(
 				''            => T_('None'),
 				'!create_new' => T_('Create New'),

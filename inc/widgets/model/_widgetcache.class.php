@@ -65,7 +65,7 @@ class WidgetCache extends DataObjectCache
 	/**
 	 * Get widgets by collection ID
 	 *
-	 * @param integer Collection (blog) ID
+	 * @param integer Collection (blog) ID or NULL to get widgets from shared container
 	 * @param boolean TRUE to return array grouped by container code, FALSE - by container name
 	 * @param string Skin type: 'all', 'auto', 'normal', 'mobile', 'tablet'
 	 * @return array of coll_ID => array of container_name => array of Widget
@@ -78,7 +78,7 @@ class WidgetCache extends DataObjectCache
 		{	// Not in Cache yet:
 			$sql = 'SELECT wi_ID, wi_wico_ID, wico_name, wico_code, wico_skin_type, wi_order, wi_enabled, wi_type, wi_code, wi_params
 					      FROM T_widget__widget INNER JOIN T_widget__container ON wi_wico_ID = wico_ID
-					     WHERE wico_coll_ID = '.$coll_ID;
+					     WHERE wico_coll_ID '.( empty( $coll_ID ) ? 'IS NULL' : '= '.$coll_ID );
 			if ( $this->load_enabled_only )
 			{	// We want to load enabled widgets only:
 				$sql .= ' AND wi_enabled = 1';
@@ -110,8 +110,16 @@ class WidgetCache extends DataObjectCache
 
 		if( $skin_type == 'auto' )
 		{	// Auto detect skin type:
-			$BlogCache = & get_BlogCache();
-			$widget_Blog = & $BlogCache->get_by_ID( $coll_ID );
+			global $Blog;
+			if( empty( $coll_ID ) )
+			{	// Widgets of shared container:
+				$widget_Blog = $Blog;
+			}
+			else
+			{	// Widgets of collection/skin container:
+				$BlogCache = & get_BlogCache();
+				$widget_Blog = & $BlogCache->get_by_ID( $coll_ID );
+			}
 			$skin_type = $widget_Blog->get_skin_type();
 		}
 

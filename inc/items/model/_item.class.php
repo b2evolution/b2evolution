@@ -3917,7 +3917,7 @@ class Item extends ItemLight
 				//  - Content block Item has same owner as owner of parent Item,
 				//  - Content block Item has same owner as owner of parent Item's collection,
 				//  - Content block Item is in same collection as parent Item,
-				//  - Content block Item from collection for info pages:
+				//  - Content block Item from collection for shared content blocks:
 				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
 				continue;
 			}

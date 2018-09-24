@@ -30,6 +30,9 @@ class WidgetContainer extends DataObject
 	var $coll_ID;
 	var $order;
 	var $main;
+	var $item_ID;
+
+	var $Blog = NULL;
 
 	/**
 	 * Constructor
@@ -50,6 +53,7 @@ class WidgetContainer extends DataObject
 			$this->coll_ID = $db_row->wico_coll_ID;
 			$this->order = $db_row->wico_order;
 			$this->main = $db_row->wico_main;
+			$this->item_ID = $db_row->wico_item_ID;
 		}
 	}
 
@@ -108,13 +112,12 @@ class WidgetContainer extends DataObject
 		$DB->begin();
 
 		if( ( !isset( $this->order ) ) || ( $this->order <= 0 ) )
-		{ // Set the order of the container only if it was not defined explicitly
-			$order_max = $DB->get_var(
-				'SELECT MAX(wico_order)
-					 FROM T_widget__container
-					WHERE wico_coll_ID = '.$this->coll_ID, 0, 0, 'Get current max order' );
-
-			$this->set( 'order', $order_max + 1 );
+		{	// Set the order of the container only if it was not defined explicitly
+			$SQL = new SQL( 'Get max order of '.( $this->get( 'coll_ID' ) == 0 ? 'shared containers' : 'containers in collection #'.$this->get( 'coll_ID' ) ) );
+			$SQL->SELECT( 'MAX( wico_order )' );
+			$SQL->FROM( 'T_widget__container' );
+			$SQL->WHERE( 'wico_coll_ID '.( $this->get( 'coll_ID' ) == 0 ? 'IS NULL' : '= '.$this->get( 'coll_ID' ) ) );
+			$this->set( 'order', $DB->get_var( $SQL ) + 1 );
 		}
 
 		$res = parent::dbinsert();
@@ -126,12 +129,126 @@ class WidgetContainer extends DataObject
 
 
 	/**
+	 * Inserts or Updates depending on object state.
+	 *
+	 * @uses dbinsert()
+	 * @uses dbupdate()
+	 * @return boolean true on success, false on failure
+	 */
+	function dbsave()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		$result = true;
+
+		// Page Container:
+		if( isset( $this->container_ityp_ID ) )
+		{	// We should create new Item automatically for selected Item Type on the form of Page Container:
+			$ItemTypeCache = & get_ItemTypeCache();
+			if( ( $widget_page_ItemType = & $ItemTypeCache->get_by_ID( $this->container_ityp_ID, false, false ) ) &&
+					( $widget_page_ItemType->get( 'usage' ) == 'widget-page' ) &&
+					( $widget_container_Blog = & $this->get_Blog() ) )
+			{	// Allow to create new Item only with usage "Widget Page" of Item Type:
+				load_class( 'items/model/_item.class.php', 'Item' );
+				$widget_page_Item = new Item();
+				$widget_page_Item->set( 'ityp_ID', $widget_page_ItemType->ID );
+				$widget_page_Item->set( 'title', 'Widget Page for container "'.$this->get( 'name' ).'"' );
+				$widget_page_Item->set( 'main_cat_ID', $widget_container_Blog->get_default_cat_ID() );
+				if( $widget_page_Item->dbinsert() )
+				{	// Update widget container with new inserted item ID:
+					$this->set( 'item_ID', $widget_page_Item->ID );
+					$result_message = sprintf( T_('New item %s has been created.'), '#'.$widget_page_Item->ID.'('.$widget_page_Item->get_title().')' );
+				}
+				else
+				{	// New Item cannot be createed by some reason:
+					$result = false;
+				}
+			}
+			else
+			{	// Wrong Item Type has been selected:
+				$result = false;
+			}
+		}
+
+		if( $result&& ( $result = parent::dbsave() ) )
+		{	// If container has been saved successfully:
+			$DB->commit();
+			if( isset( $result_message ) )
+			{	// Display message only after success widget container saving:
+				global $Messages;
+				$Messages->add( $result_message, 'success' );
+			}
+		}
+		else
+		{	// Rollback changes because of some error above:
+			$DB->rollback();
+		}
+
+		return $result;
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.
 	 */
 	function load_from_Request()
 	{
+		if( empty( $this->ID ) )
+		{	// For new creating container we shoud get a type from hidden field:
+			$container_type = param( 'container_type', 'string' );
+		}
+		else
+		{	// For existing container we should get current type and don't change it:
+			// (Only shared container may be changed to sub-container and reverse)
+			$container_type = $this->get_type();
+		}
+
+		$wico_coll_ID = param( 'wico_coll_ID', 'integer', NULL );
+		$this->set( 'coll_ID', ( empty( $wico_coll_ID ) ? NULL : $wico_coll_ID ), true );
+
+		switch( $container_type )
+		{
+			case 'shared':
+			case 'shared-sub':
+				// Only shared containers may be switched between main and sub:
+				$this->set( 'main', param( 'wico_container_type', 'string' ) == 'sub' ? '0' : '1' );
+				set_param( 'container_type', $this->get_type() );
+				break;
+
+			case 'page':
+				$container_page_type = param( 'container_page_type', 'string', NULL );
+				param_check_not_empty( 'container_page_type', T_('Please select page container type.') );
+				switch( $container_page_type )
+				{
+					case 'type':
+						$container_ityp_ID = param( 'container_ityp_ID', 'integer', true );
+						param_check_not_empty( 'container_ityp_ID', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('For a new page of type') ) );
+						// Set temp var to know what Item Type use on creating new Item in the WidgetContainer::dbsave():
+						$this->container_ityp_ID = $container_ityp_ID;
+						break;
+
+					case 'item':
+						$wico_item_ID = param( 'wico_item_ID', 'integer', true );
+						if( param_check_not_empty( 'wico_item_ID', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('For an existing page') ) ) )
+						{
+							$this->set_from_Request( 'item_ID' );
+							// Check for corrent Item:
+							$ItemCache = &get_ItemCache();
+							if( ! ( $widget_page_Item = & $ItemCache->get_by_ID( $wico_item_ID, false, false ) ) || 
+									$widget_page_Item->get_type_setting( 'usage' ) != 'widget-page' )
+							{	// Display error for unavailable item:
+								param_error( 'wico_item_ID', T_('Item can be used for page container only with Item Type usage "Widget Page"!') );
+							}
+						}
+						break;
+				}
+				break;
+		}
+
 		param_string_not_empty( 'wico_name', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Name') ) );
 		$this->set_from_Request( 'name' );
 
@@ -168,6 +285,107 @@ class WidgetContainer extends DataObject
 		}
 
 		return !param_errors_detected();
+	}
+
+
+	/**
+	 * Get a member param by its name
+	 *
+	 * @param mixed Name of parameter
+	 * @return mixed Value of parameter
+	 */
+	function get( $parname )
+	{
+		switch( $parname )
+		{
+			case 'type':
+				return $this->get_type();
+
+			default:
+				return parent::get( $parname );
+		}
+	}
+
+
+	/**
+	 * Get the Collection object for this Widget Container
+	 *
+	 * @return object Collection
+	 */
+	function & get_Blog()
+	{
+		if( $this->Blog === NULL )
+		{	// Load collection once:
+			$BlogCache = & get_BlogCache();
+			$this->Blog = & $BlogCache->get_by_ID( $this->coll_ID, false, false );
+		}
+
+		return $this->Blog;
+	}
+
+
+	/**
+	 * Get widget container type
+	 *
+	 * @return string Container type: 'main', 'sub', 'page', 'shared', 'shared-sub'
+	 */
+	function get_type()
+	{
+		if( $this->get( 'coll_ID' ) )
+		{	// Collection/skin container:
+			if( $this->get( 'item_ID' ) !== NULL )
+			{	// Page container:
+				return 'page';
+			}
+			elseif( $this->get( 'main' ) )
+			{	// Main container:
+				return 'main';
+			}
+			else
+			{	// Sub container:
+				return 'sub';
+			}
+		}
+		else
+		{	// Shared container for ALL collections:
+			if( $this->get( 'main' ) )
+			{	// Shared main container:
+				return 'shared';
+			}
+			else
+			{	// Shared sub-container:
+				return 'shared-sub';
+			}
+		}
+	}
+
+
+	/**
+	 * Get title of container type
+	 *
+	 * @param string Type key: 'main', 'sub', 'page', 'shared', 'shared-sub', NULL - to use current type of this container
+	 * @return string
+	 */
+	function get_type_title( $type = NULL )
+	{
+		if( $type === NULL )
+		{	// Use current type of this container:
+			$type = $this->get_type();
+		}
+
+		switch( $type )
+		{
+			case 'main':
+				return T_('Skin container');
+			case 'sub':
+				return $this->ID ? T_('Sub-container') : T_('New sub-container');
+			case 'page':
+				return $this->ID ? T_('Page container') : T_('New page container');
+			case 'shared':
+				return $this->ID ? T_('Shared main container') : T_('New shared main container');
+			case 'shared-sub':
+				return $this->ID ? T_('Shared sub-container') : T_('New shared sub-container');
+		}
 	}
 }
 ?>

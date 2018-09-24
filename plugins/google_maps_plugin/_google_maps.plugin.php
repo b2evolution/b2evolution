@@ -149,6 +149,16 @@ class google_maps_plugin extends Plugin
 				'defaultvalue' => 'map',
 				'note' => ''
 				),
+			'latitude' => array(
+				'label' => T_('Latitude'),
+				'type'  => 'float',
+				'note'  => T_('Leave empty to use coordinates of current post.'),
+				),
+			'longitude' => array(
+				'label' => T_('Longitude'),
+				'type'  => 'float',
+				'note'  => T_('Leave empty to use coordinates of current post.'),
+				),
 			), parent::get_widget_param_definitions( $params ) );
 
 		if( $preview && isset( $r['allow_blockcache'] ) )
@@ -936,15 +946,6 @@ function locate()
 
 		$api_key = $this->get_coll_setting( 'api_key', $Blog );
 
-		if( empty( $api_key ) )
-		{	// Display message if google API key is not defined:
-			echo '<div class="evo_plugin__google_maps_no_key">'
-					.'<img src="'.$this->get_plugin_url().'/img/google_maps.jpg" />'
-					.'<div><div>'.T_('Please configure an API key to see a live map.').'</div></div>'
-				.'</div>';
-			return;
-		}
-
 		/**
 		 * Default params:
 		 */
@@ -959,6 +960,15 @@ function locate()
 				'block_body_start'  => '',
 				'block_body_end'    => '',
 			), $params );
+
+		if( empty( $api_key ) )
+		{	// Display message if google API key is not defined:
+			echo $params['block_start'].'<div class="evo_plugin__google_maps_no_key">'
+					.'<img src="'.$this->get_plugin_url().'/img/google_maps.jpg" />'
+					.'<div><div>'.T_('Please configure an API key to see a live map.').'</div></div>'
+				.'</div>'.$params['block_end'];
+			return;
+		}
 
 		$widget_title = $this->get_widget_setting( 'map_title', $params );
 		$params['title'] = $widget_title;
@@ -977,11 +987,18 @@ function locate()
 			return;
 		}
 
+		// Try to get coordinates from the current Item:
 		$lat = $Item->get_setting( 'latitude' );
 		$lng = $Item->get_setting( 'longitude' );
 		if( empty( $lat ) && empty( $lng ) )
-		{	// Coordinates must be defined for the viewed Item:
-			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because coordinates must be defined for the viewed Item.', $params );
+		{	// Try to get coordinates from widget params:
+			$lat = $this->get_widget_setting( 'latitude', $params );
+			$lng = $this->get_widget_setting( 'longitude', $params );
+		}
+
+		if( empty( $lat ) || empty( $lng ) )
+		{	// Coordinates must be defined for the viewed Item or widget:
+			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because coordinates must be defined for the viewed Item or for the Widget.', $params );
 			return;
 		}
 

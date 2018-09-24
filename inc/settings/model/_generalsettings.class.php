@@ -190,7 +190,6 @@ class GeneralSettings extends AbstractSettings
 		'system_lock' => 0,
 		'site_code' => 'b2evo',
 		'site_color' => '#ff8c0f',
-		'site_footer_text' => 'Cookies are required to enable core site functionality. &copy;$year$ by $short_site_name$.',
 		'site_skins_enabled' => 1, // Enables a sitewide header and footer
 		'info_blog_ID' => 0, // Blog for info pages
 		'general_cache_enabled' => 0,

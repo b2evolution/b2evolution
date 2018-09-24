@@ -238,8 +238,8 @@ $Form->begin_form( '', '', $params );
 			'edit_layout'   => 'expert',
 		) );
 	$plugin_button = ob_get_flush();
-	if( empty( $plugin_button ) )
-	{	// If button is not displayed by any plugin
+	if( empty( $plugin_button ) && $edited_Item->get_type_setting( 'use_text' ) != 'never')
+	{	// If button is not displayed by any plugin and text is allowed for current item type:
 		// Display a current status of HTML allowing for the edited item:
 		echo '<span class="html_status">';
 		if( $edited_Item->get_type_setting( 'allow_html' ) )
@@ -253,6 +253,11 @@ $Form->begin_form( '', '', $params );
 		// Display manual link for more info:
 		echo get_manual_link( 'post-allow-html' );
 		echo '</span>';
+	}
+	if( $edited_Item->get_type_setting( 'usage' ) == 'widget-page' &&
+	    $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+	{	// Display a button to edit widgets only if item type is used for page containers and current user has permission to edit widgets:
+		echo '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'" class="btn btn-primary">'.T_('Edit widgets now').'</a>';
 	}
 	echo '</div>';
 

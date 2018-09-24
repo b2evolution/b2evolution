@@ -176,18 +176,6 @@ switch( $display_mode )
 		init_colorpicker_js();
 }
 
-// Get Skin used by current Blog:
-$blog_skin_ID = $Blog->get( $skin_type.'_skin_ID' );
-$SkinCache = & get_SkinCache();
-$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
-// Make sure containers are loaded for that skin:
-$skins_container_list = $Blog->get_main_containers();
-// Get widget containers from database
-$WidgetContainerCache = & get_WidgetContainerCache();
-$WidgetContainerCache->load_where( 'wico_coll_ID = '.$Blog->ID.' AND wico_skin_type = '.$DB->quote( $skin_type ) );
-$blog_container_list = $WidgetContainerCache->get_ID_array();
-
-
 /**
  * Perform action:
  */
@@ -203,13 +191,22 @@ switch( $action )
 
 	case 'new_container':
 		// Initialize widget container for creating form:
+		param( 'container_type', 'string', NULL );
 		$edited_WidgetContainer = new WidgetContainer();
-		$edited_WidgetContainer->set( 'coll_ID', $Blog->ID );
+		if( $container_type == 'shared' )
+		{	// Default settings for new shared container:
+			$edited_WidgetContainer->set( 'main', 1 );
+		}
+		else
+		{	// Default settings for new container:
+			$edited_WidgetContainer->set( 'coll_ID', $Blog->ID );
+		}
 		$edited_WidgetContainer->set( 'skin_type', $skin_type );
 		break;
 
 	case 'edit_container':
 		// Initialize widget container for editing form:
+		$WidgetContainerCache = & get_WidgetContainerCache();
 		$edited_WidgetContainer = $WidgetContainerCache->get_by_ID( $wico_ID );
 		break;
 
@@ -220,7 +217,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'widget' );
 
 		$WidgetContainer = & get_widget_container( $Blog->ID, $container );
-		if( !in_array( $WidgetContainer->get( 'code' ), array_keys( $skins_container_list ) ) )
+		if( ! in_array( $WidgetContainer->get( 'code' ), array_keys( $Blog->get_main_containers() ) ) )
 		{ // The container is not part of the current skin
 			$Messages->add( T_('WARNING: you are adding to a container that does not seem to be part of the current skin.'), 'error' );
 		}
@@ -598,42 +595,53 @@ switch( $action )
 
 		if( $wico_ID > 0 )
 		{	// Re-order widgets of ONE given container:
-			$blog_container_ids = $wico_ID;
+			$blog_container_IDs = array( $wico_ID );
 		}
 		else
 		{	// Re-order widgets of ALL containers:
-			$blog_container_ids = implode( ',', $blog_container_list );
+			$SQL = new SQL( 'Get IDs of all widget containers of collection #'.$Blog->ID );
+			$SQL->SELECT( 'wico_ID' );
+			$SQL->FROM( 'T_widget__container' );
+			$SQL->WHERE( '( wico_coll_ID = '.$Blog->ID.' OR wico_coll_ID IS NULL )' );
+			$SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $skin_type ) );
+			$blog_container_IDs = $DB->get_col( $SQL );
 		}
-		// Reset the current orders to avoid duplicate entry errors:
-		$DB->query( 'UPDATE T_widget__widget
-			SET wi_order = wi_order * -1
-			WHERE wi_wico_ID IN ( '.$blog_container_ids.' )' );
 
-		foreach( $containers as $container_fieldset_id => $widgets )
-		{ // loop through each container and set new order
-			$WidgetContainer = & get_widget_container( $Blog->ID, $container_fieldset_id );
-			if( ( $WidgetContainer->ID == 0 ) && ( count( $widgets ) > 0 ) )
-			{ // Widget was moved to an empty main widget container, it needs to be created
-				$WidgetContainer->dbinsert();
-			}
-			$order = 0; // reset counter for this container
-			foreach( $widgets as $widget )
-			{ // loop through each widget
-				if( $widget = preg_replace( '~[^0-9]~', '', $widget ) )
-				{ // valid widget id
-					$order++;
-					$DB->query( 'UPDATE T_widget__widget
-						SET wi_order = '.$order.',
-							wi_wico_ID = '.$WidgetContainer->ID.'
-						WHERE wi_ID = '.$widget.' AND wi_wico_ID IN ( '.$blog_container_ids.' )' );	// Doh! Don't trust the client request!!
+		if( $blog_container_IDs )
+		{
+			$blog_container_IDs = $DB->quote( $blog_container_IDs );
+
+			// Reset the current orders to avoid duplicate entry errors
+			$DB->query( 'UPDATE T_widget__widget
+				SET wi_order = wi_order * -1
+				WHERE wi_wico_ID IN ( '.$blog_container_IDs.' )' );
+
+			foreach( $containers as $container_fieldset_id => $widgets )
+			{ // loop through each container and set new order
+				$WidgetContainer = & get_widget_container( $Blog->ID, $container_fieldset_id );
+				if( ( $WidgetContainer->ID == 0 ) && ( count( $widgets ) > 0 ) )
+				{ // Widget was moved to an empty main widget container, it needs to be created
+					$WidgetContainer->dbinsert();
+				}
+				$order = 0; // reset counter for this container
+				foreach( $widgets as $widget )
+				{ // loop through each widget
+					if( $widget = preg_replace( '~[^0-9]~', '', $widget ) )
+					{ // valid widget id
+						$order++;
+						$DB->query( 'UPDATE T_widget__widget
+							SET wi_order = '.$order.',
+								wi_wico_ID = '.$WidgetContainer->ID.'
+							WHERE wi_ID = '.$widget.' AND wi_wico_ID IN ( '.$blog_container_IDs.' )' );	// Doh! Don't trust the client request!!
+					}
 				}
 			}
-		}
 
-		// Cleanup deleted widgets and empty temp containers
-		$DB->query( 'DELETE FROM T_widget__widget
-			WHERE wi_order < 1
-			AND wi_wico_ID IN ( '.$blog_container_ids.' )' ); // Doh! Don't touch other blogs!
+			// Cleanup deleted widgets and empty temp containers
+			$DB->query( 'DELETE FROM T_widget__widget
+				WHERE wi_order < 1
+				AND wi_wico_ID IN ( '.$blog_container_IDs.' )' ); // Doh! Don't touch other blogs!
+		}
 
 		$DB->commit();
 
@@ -663,23 +671,18 @@ switch( $action )
 
 		if( $wico_ID > 0 )
 		{	// Get the existing widget container:
+			$WidgetContainerCache = & get_WidgetContainerCache();
 			$edited_WidgetContainer = & $WidgetContainerCache->get_by_ID( $wico_ID );
 		}
 		else
 		{	// Get new widget container:
 			$edited_WidgetContainer = new WidgetContainer();
-			$edited_WidgetContainer->set( 'coll_ID', $Blog->ID );
 		}
 		if( $edited_WidgetContainer->load_from_Request() )
 		{	// If widget container has been saved successfully:
-			$edited_WidgetContainer->dbsave();
-			if( $wico_ID > 0 )
-			{	// The existing widget container has been updated:
-				$Messages->add( T_('Widget container has been updated.'), 'success' );
-			}
-			else
-			{	// New widget sub-container has been created:
-				$Messages->add( T_('New widget sub-container has been created.'), 'success' );
+			if( $edited_WidgetContainer->dbsave() )
+			{
+				$Messages->add( sprintf( T_('%s has been saved.'), $edited_WidgetContainer->get_type_title().' "'.$edited_WidgetContainer->get( 'name' ).'"' ), 'success' );
 			}
 			if( $mode == 'customizer' )
 			{	// Redirect back to customizer mode:

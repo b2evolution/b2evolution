@@ -1395,7 +1395,7 @@ class _core_Module extends Module
 						);
 				}
 				if( ! is_admin_page() &&
-				    in_array( $disp, array( 'single', 'page', 'edit' ) ) &&
+				    in_array( $disp, array( 'single', 'page', 'edit', 'widget_page' ) ) &&
 				    $perm_admin_restricted )
 				{	// If curent user has a permission to edit a current editing/viewing post:
 					if( $disp != 'edit' &&
@@ -2301,7 +2301,15 @@ class _core_Module extends Module
 					'href' => '?ctrl=skins&amp;tab=system' ),
 				'plugins' => array(
 					'text' => T_('Plugins'),
-					'href' => '?ctrl=plugins'),
+					'href' => '?ctrl=plugins',
+					'entries' => array(
+						'general' => array(
+							'text' => T_('General settings'),
+							'href' => '?ctrl=plugins' ),
+						'shared' => array(
+							'text' => T_('Settings for shared containers'),
+							'href' => '?ctrl=plugins&amp;tab=shared' )
+					) ),
 				'remotepublish' => array(
 					'text' => T_('Remote Publishing'),
 					'href' => '?ctrl=remotepublish',

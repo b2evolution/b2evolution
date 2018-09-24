@@ -61,7 +61,6 @@ $Form->begin_fieldset( T_('Global Site Settings').get_manual_link('global-site-s
 	$Form->fileselect( 'notification_logo_file_ID', $Settings->get( 'notification_logo_file_ID' ), T_('Site logo'), NULL, $site_logo_params );
 	$social_media_boilerplate_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select logo for social media boilerplate'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
 	$Form->fileselect( 'social_media_image_file_ID', $Settings->get( 'social_media_image_file_ID' ), T_('Social media boilerplate'), NULL, $social_media_boilerplate_params );
-	$Form->text_input( 'site_footer_text', $Settings->get( 'site_footer_text' ), 50, T_('Site footer text'), '', array( 'maxlength' => 5000 ) );
 	$Form->checkbox_input( 'site_skins_enabled', $Settings->get( 'site_skins_enabled' ), T_('Enable site skins'), array( 'note' => T_('Enables a sitewide header and footer') ) );
 	$Form->begin_line( T_('Terms & Conditions'), 'site_terms_enabled' );
 		$Form->checkbox_input( 'site_terms_enabled', $Settings->get( 'site_terms_enabled' ), '' );
@@ -88,12 +87,6 @@ $Form->begin_fieldset( T_('Default collections').get_manual_link('default-collec
 				)
 	) );
 
-	$BlogCache->none_option_text = T_('No info pages');
-	$Form->select_input_object( 'info_blog_ID', $Settings->get( 'info_blog_ID' ), $BlogCache, get_icon( 'coll_info' ).' '.T_('Collection for info pages'), array(
-		'note' => T_('The pages in this collection will be added to the site menu.').$create_new_blog_link,
-		'allow_none' => true,
-		'loop_object_method' => 'get_maxlen_name' ) );
-
 	$BlogCache->none_option_text = T_('Current collection');
 	$Form->select_input_object( 'login_blog_ID', $Settings->get( 'login_blog_ID' ), $BlogCache, get_icon( 'coll_login' ).' '.T_('Collection for login/registration'), array(
 		'note' => T_('This collection will be used for all login/registration functions.').$create_new_blog_link,
@@ -102,6 +95,12 @@ $Form->begin_fieldset( T_('Default collections').get_manual_link('default-collec
 
 	$Form->select_input_object( 'msg_blog_ID', $Settings->get( 'msg_blog_ID' ), $BlogCache, get_icon( 'coll_message' ).' '.T_('Collection for profiles/messaging'), array(
 		'note' => T_('This collection will be used for all messaging, profile viewing and profile editing functions.').$create_new_blog_link,
+		'allow_none' => true,
+		'loop_object_method' => 'get_maxlen_name' ) );
+
+	$BlogCache->none_option_text = T_('No shared collection');
+	$Form->select_input_object( 'info_blog_ID', $Settings->get( 'info_blog_ID' ), $BlogCache, get_icon( 'coll_info' ).' '.T_('Collection for shared content blocks'), array(
+		'note' => T_('The content blocks of this collections can be included anywhere.').$create_new_blog_link,
 		'allow_none' => true,
 		'loop_object_method' => 'get_maxlen_name' ) );
 

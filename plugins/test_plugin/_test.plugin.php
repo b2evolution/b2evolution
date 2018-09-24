@@ -311,6 +311,37 @@ class test_plugin extends Plugin
 
 
 	/**
+	 * Define here default shared settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_shared_setting_definitions( & $params )
+	{
+		// set params to allow rendering for shared container widgets by default:
+		$default_params = array_merge( $params, array( 'default_shared_rendering' => 'stealth' ) );
+
+		$r = array_merge( parent::get_shared_setting_definitions( $default_params ),
+				array(
+					'custom_shared' => array(
+							'label' => 'Shared setting',
+							'note' => 'Custom plugin setting ONLY for shared container widgets.',
+							'defaultvalue' => 'Shared value',
+						),
+					'shared_color' => array(
+							'label' => 'Shared color',
+							'type' => 'color',
+							'note' => 'Click on the field to display a color selector.',
+							'defaultvalue' => '#DDF',
+						),
+				)
+			);
+
+		return $r;
+	}
+
+
+	/**
 	 * Get definitions for widget specific editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()

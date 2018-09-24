@@ -1531,10 +1531,16 @@ switch( $action )
 		// Widgets IDs:
 		param( 'widgets', 'array:integer' );
 
-		$SQL = new SQL( 'Get widget container by code, collection ID and current skin type before reordering (Designer Mode)' );
+		if( empty( $widgets ) )
+		{	// No widgets to reorder:
+			break;
+		}
+
+		$SQL = new SQL( 'Get widget container by code, first widget ID and current skin type before reordering (Designer Mode)' );
 		$SQL->SELECT( 'wico_ID' );
 		$SQL->FROM( 'T_widget__container' );
-		$SQL->WHERE( 'wico_coll_ID = '.$Blog->ID );
+		$SQL->FROM_add( 'INNER JOIN T_widget__widget ON wi_wico_ID = wico_ID' );
+		$SQL->WHERE( 'wi_ID = '.$DB->quote( $widgets[0] ) );
 		$SQL->WHERE_and( 'wico_code = '.$DB->quote( $container ) );
 		$SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $Blog->get_skin_type() ) );
 		$container_ID = $DB->get_var( $SQL );

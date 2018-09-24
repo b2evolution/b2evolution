@@ -622,33 +622,35 @@ function evo_widget_update_order_actions( container )
 function evo_widget_update_designer_position( widget, show )
 {
 	var w = 0;
+	var border = 3;
 	var designer_blocks = jQuery( evo_widget_designer_block_selector( widget ) );
 	evo_widget_get_duplicates( widget ).each( function()
 	{	// We should display several designer blocks for widget blocks with same ID, e.g. for items/posts list widget in Menu container:
 		var curr_widget = jQuery( this );
-		var widget_class = '';
-		var widget_left = curr_widget.offset().left - 3;
-		var widget_width = curr_widget.outerWidth() + 5;
-		var window_width = jQuery( window ).width();
-		if( widget_left < 0 )
-		{	// Limit container designer block left podition to left window border;
-			widget_left = 0;
-		}
-		if( widget_width > window_width - widget_left - 27 )
-		{	// Limit container designer block width to right window border:
-			widget_width = window_width - widget_left - 27;
-			// Additional class to fix style for outside container designer block:
-			widget_class = 'evo_widget__outside';
+		var widget_top = curr_widget.offset().top - border;
+		var widget_left = curr_widget.offset().left - border;
+		var designer_block = designer_blocks.eq( w );
+
+		var designer_block_actions_width = designer_block.find( '.evo_designer__actions' ).outerWidth() + 1;
+		if( widget_left < designer_block_actions_width - border )
+		{	// Fix body left margin space in order to display widget actions panel:
+			jQuery( 'body' ).css( 'margin-left', designer_block_actions_width + 'px' );
+			widget_left = designer_block_actions_width - border;
 		}
 
-		var designer_block = designer_blocks.eq( w );
+		var designer_block_title_height = designer_block.find( '.evo_designer__title' ).outerHeight() + 1;
+		if( widget_top < designer_block_title_height - border )
+		{	// Fix body top margin space in order to display widget title:
+			jQuery( 'body' ).css( 'margin-top', designer_block_title_height + 'px' );
+			widget_top = designer_block_title_height - border;
+		}
+
 		designer_block.css( {
-				'top': curr_widget.offset().top - 3,
+				'top': widget_top,
 				'left': widget_left,
-				'width': widget_width,
-				'height': curr_widget.outerHeight() + 5,
-			} )
-			.addClass( widget_class );
+				'width': curr_widget.outerWidth() + border + 2,
+				'height': curr_widget.outerHeight() + border + 2,
+			} );
 		if( typeof( show ) == 'undefined' || show )
 		{	// Show widget desginer block:
 			designer_block.show();
@@ -669,24 +671,37 @@ function evo_widget_update_designer_position( widget, show )
  */
 function evo_widget_update_container_position( container )
 {
-	var container_left = container.offset().left - 3;
-	var container_width = container.outerWidth() + 5;
-	var window_width = jQuery( window ).width();
+	var border = 3;
+	var container_block = jQuery( evo_widget_container_block_selector( container.data( 'code' ) ) );
+	var container_top = container.offset().top - border;
+	var container_left = container.offset().left - border;
+	var container_width = container.outerWidth() + border + 2;
+	var container_height = container.outerHeight() + border + 2;
 	if( container_left < 0 )
-	{	// Limit container designer block left podition to left window border:
+	{	// Limit container designer block left position to the left window border:
 		container_left = 0;
 	}
-	if( container_width > window_width - container_left )
-	{	// Limit container designer block width to right window border:
-		container_width = window_width - container_left - 27;
+	var container_right = container_left + container_width;
+	var container_bottom = container_top + container_height;
+
+	var container_block_actions_width = container_block.find( '.evo_designer__actions' ).outerWidth();
+	if( container_right + container_block_actions_width > jQuery( window ).width() + 2*border )
+	{	// Fix body right margin space in order to display container actions panel:
+		jQuery( 'body' ).css( 'margin-right', ( container_block_actions_width + border ) + 'px' );
+		container_width -= container_block_actions_width;
 	}
 
-	jQuery( evo_widget_container_block_selector( container.data( 'code' ) ) )
-		.css( {
-			'top': container.offset().top - 3,
+	var container_block_title_height = container_block.find( '.evo_designer__title' ).outerHeight();
+	if( container_block_title_height > 0 && container_bottom + container_block_title_height > jQuery( 'body' ).height() - border )
+	{	// Fix body bottom margin space in order to display container title:
+		jQuery( 'body' ).css( 'margin-bottom', container_block_title_height + 'px' );
+	}
+
+	container_block.css( {
+			'top': container_top,
 			'left': container_left,
 			'width': container_width,
-			'height': container.outerHeight() + 5,
+			'height': container_height,
 		} )
 		.show();
 }
