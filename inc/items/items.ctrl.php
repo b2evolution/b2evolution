@@ -2038,7 +2038,11 @@ switch( $action )
 				'title_field' => 'short_title,title',
 				'link_type'   => 'none',
 			) );
-		$AdminUI->htmltitle .= ' (#'.$edited_Item->ID.')';
+		if( empty( $AdminUI->htmltitle ) )
+		{	// Display collection short name when item has no yet e.g. on creating or when titles are disabled for current Item Type:
+			$AdminUI->htmltitle = $Blog->get( 'shortname' );
+		}
+		$AdminUI->htmltitle .= ' ('.( empty( $edited_Item->ID ) ? T_('New') : '#'.$edited_Item->ID ).')';
 
 		switch( $action )
 		{
