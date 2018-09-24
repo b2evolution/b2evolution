@@ -4009,6 +4009,14 @@ div#fileuploader_form {
 #filelist_tbody tr:last-child .action_icon_link_move_down {
   visibility: hidden;
 }
+.widget_core_currency_selector label {
+  width: auto;
+  padding: 0 15px 0 0;
+}
+.widget_core_currency_selector select {
+  width: auto;
+  display: inline-block;
+}
 
 /**
  * item_base.css 
