@@ -128,7 +128,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				),
 				'restrict_cats' => array(
 					'label' => T_('Restrict to Categories'),
-					'note' => T_('List category IDs separated by ,'),
+					'note' => sprintf( T_('List category IDs separated by %s.'), '<code>,</code>' ),
 					'defaultvalue' => '',
 					'size' => 80,
 					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
