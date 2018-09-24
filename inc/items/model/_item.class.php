@@ -2511,7 +2511,7 @@ class Item extends ItemLight
 	 *
 	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
 	 * @param string Restrict field by type(double, varchar, html, text, url, image, computed, separator), FALSE - to don't restrict
-	 * @return string|boolean FALSE if the field doesn't exist
+	 * @return string|boolean FALSE if the field doesn't exist; NULL if the field exists but no value has been entered yet, '' (empty string) if field has been left blank
 	 */
 	function get_custom_field_value( $field_index, $restrict_type = false )
 	{

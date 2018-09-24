@@ -1314,6 +1314,7 @@ class ItemLight extends DataObject
 				'after_title'     => '',
 				'format'          => 'htmlbody',
 				'link_type'       => '#',
+				'custom_url'		=> '',
 				'link_class'      => '#',
 				'max_length'      => '',
 				'target_blog'     => '',
@@ -1396,6 +1397,10 @@ class ItemLight extends DataObject
 
 			case 'admin_view':
 				$url = '?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID;
+				break;
+
+			case 'custom_url':
+				$url = $params['custom_url'];
 				break;
 
 			case 'none':
