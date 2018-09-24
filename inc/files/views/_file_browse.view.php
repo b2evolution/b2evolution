@@ -359,8 +359,8 @@ jQuery( document ).ready( function()
 			evo_rest_api_request( 'collections',
 			{
 				'per_page': 20,
-				'filter'  : 'all',
-				'restrict': 'available_fileroots',
+				'list_in_frontoffice' : 'all',
+				'restrict_to_available_fileroots': 1,
 				'fields'  : 'id,shortname',
 				'q'       : jQuery( '#new_root_selector_field' ).val()
 			},
@@ -389,7 +389,7 @@ jQuery( document ).ready( function()
 			evo_rest_api_request( 'users',
 			{
 				'per_page': 20,
-				'restrict': 'available_fileroots',
+				'restrict_to_available_fileroots': 1,
 				'filter'  : 'new',
 				'list_params': { 'keywords_fields': 'user_login', 'order_by_login_length': 'D' },
 				'keywords': jQuery( '#new_root_selector_field' ).val()

@@ -2350,7 +2350,7 @@ function evo_merge_load_window( item_ID )
 	// Load collections:
 	var current_coll_urlname = '<?php echo empty( $Blog ) ? '' : format_to_js( $Blog->get( 'urlname' ) ); ?>';
 	evo_rest_api_start_loading( '#evo_merge_wrapper' );
-	evo_rest_api_request( 'collections', { per_page: 0, filter: 'all' }, function( data )
+	evo_rest_api_request( 'collections', { per_page: 0, list_in_frontoffice: 'all' }, function( data )
 	{	// Display the colllections on success request:
 		var coll_urlname = '';
 		var coll_name = '';
