@@ -12,7 +12,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -197,6 +197,7 @@ class Session
 							{
 								// dh> TODO: "old" messages should rather get prepended to any existing ones from the current request, rather than appended
 								$Messages->add_messages( $sess_Messages );
+								$Messages->affixed = $sess_Messages->affixed;
 								$Debuglog->add( 'Session: Added Messages from session data.', 'request' );
 								$this->delete( 'Messages' );
 							}
@@ -280,9 +281,12 @@ class Session
 	/**
 	 * Delete sessions from database based on where condition or by object ids
 	 *
-	 * @return array
+	 * @param string where condition
+	 * @param array object ids
+	 * @param array additional params if required
+	 * @return mixed # of rows affected or false if error
 	 */
-	static function db_delete_where( $class_name, $sql_where, $object_ids = NULL, $params = NULL )
+	static function db_delete_where( $sql_where, $object_ids = NULL, $params = NULL )
 	{
 		global $DB;
 

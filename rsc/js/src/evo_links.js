@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois PLANQUE - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois PLANQUE - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -257,7 +257,7 @@ function evo_link_attach( type, object_ID, root, path )
 	},
 	function( data )
 	{
-		var table_obj = jQuery( '#attachments_fieldset_table table', window.parent.document );
+		var table_obj = jQuery( '#attachments_fieldset_table .results table', window.parent.document );
 		var table_parent = table_obj.parent;
 		var results_obj = jQuery( data.list_content );
 		table_obj.replaceWith( jQuery( 'table', results_obj ) ).promise().done( function( e ) {

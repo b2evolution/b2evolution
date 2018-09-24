@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -76,9 +76,14 @@ $AdminUI->disp_payload_end();
 
 
 /*
-	* DashboardGlobalMain to be added here (anyone?)
-	*/
-
+ * DashboardGlobalMain to be added here (anyone?)
+ */
+if( $current_User->check_perm( 'blogs', 'create' ) )
+{
+	$AdminUI->disp_payload_begin();
+	$AdminUI->disp_view( 'collections/views/_coll_model_list.view.php' );
+	$AdminUI->disp_payload_end();
+}
 
 /*
  * Administrative tasks

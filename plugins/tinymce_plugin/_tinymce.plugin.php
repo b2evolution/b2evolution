@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '6.9.4';
+	var $version = '6.10.3';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -714,7 +714,9 @@ class tinymce_plugin extends Plugin
 			'table',
 			'searchreplace',
 			'autocomplete',
-			'evo_view'
+			'lists',
+			'advlist',
+			'evo_view',
 			//'b2evo_shorttags',
 			//'b2evo_attachments'
 		);
@@ -866,6 +868,7 @@ class tinymce_plugin extends Plugin
 		// Configuration: -- http://wiki.moxiecode.com/index.php/TinyMCE:Configuration
 		$init_options = array();
 		$init_options[] = 'blog_ID: '.( !empty($Blog) ? $Blog->ID : 'null' );
+		$init_options[] = 'cache_suffix: "?v='.$this->version.'"';
 		$init_options[] = 'selector: "textarea#'.$content_id.'"';
 		if( $this->Settings->get( 'use_gzip_compressor' ) )
 		{	// Load script to use gzip compressor:
@@ -985,6 +988,13 @@ class tinymce_plugin extends Plugin
 
 		// Prevent auto generated <p> that wrap around the views
 		//$init_options[] = 'forced_root_block: ""';
+
+		// Enable advanced tab for images:
+		$init_options[] = 'image_advtab : true';
+
+		// Disable branding:
+		$init_options[] = 'branding : false';
+
 
 		$init = implode( ",\n", $init_options );
 
@@ -1201,7 +1211,8 @@ class tinymce_plugin extends Plugin
 		$blog = $params['blog'];
 		$BlogCache = get_BlogCache($blog);
 		$Collection = $Blog = $BlogCache->get_by_ID($blog);
-		$path = array_shift($this->get_item_css_path_and_url($Blog));
+		$item_css_path_and_url = $this->get_item_css_path_and_url($Blog);
+		$path = array_shift( $item_css_path_and_url );
 		$r = file_get_contents($path);
 		if( $r )
 		{

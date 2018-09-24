@@ -116,6 +116,13 @@ img.avatar_above_login {
 .shrinkwrap.left {
 	text-align: left;
 }
+.col-narrow {
+	width: 1px;
+	white-space: nowrap;
+	text-align: center;
+	padding-left: 1px !important;
+	padding-right: 1px !important;
+}
 
 .block {
 	margin: 1ex;
@@ -138,16 +145,19 @@ a.selected {
 	border-radius: 4px;
 	text-align: center;
 	box-sizing: content-box;
-}
-.avatar_rounded:hover {
-	text-decoration: none;
-}
-.avatar_rounded img {
-	-moz-border-radius-topleft: 2px; -moz-border-radius-topright: 2px;
-	-webkit-border-radius: 2px 2px 0 0;
-	-khtml-border-radius-topleft: 2px; -khtml-border-radius-topright: 2px;
-	border-radius: 2px 2px 0 0;
-	margin-bottom: 2px;
+	&:hover {
+		text-decoration: none;
+	}
+	img {
+		-moz-border-radius-topleft: 2px; -moz-border-radius-topright: 2px;
+		-webkit-border-radius: 2px 2px 0 0;
+		-khtml-border-radius-topleft: 2px; -khtml-border-radius-topright: 2px;
+		border-radius: 2px 2px 0 0;
+		margin-bottom: 2px;
+	}
+	&.no_avatar_actions img {
+		margin-bottom: 0;
+	}
 }
 // ---------------- //
 

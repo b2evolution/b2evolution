@@ -21,7 +21,7 @@ class bootstrap_photoblog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.4';
+	var $version = '6.10.3';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -77,8 +77,8 @@ class bootstrap_photoblog_Skin extends Skin
 	{
 		$supported_kinds = array(
 				'main' => 'no',
-				'std' => 'no',		// Blog
-				'photo' => 'yes',
+				'std' => 'yes',		// Blog
+				'photo' => 'maybe',
 				'forum' => 'no',
 				'manual' => 'no',
 				'group' => 'no',  // Tracker
@@ -131,6 +131,13 @@ class bootstrap_photoblog_Skin extends Skin
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
 						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'allow_empty' => true,
@@ -436,10 +443,15 @@ class bootstrap_photoblog_Skin extends Skin
 		// Page link color
 		if ( $page_link_color = $this->get_setting( 'page_link_color' ) ) {
 			$custom_css .= 'a, .evo_comment_title a, .panel-title .evo_comment_type { color: '.$page_link_color."; }\n";
+			// Pagination links:
+			$custom_css .= '.pagination > li > a, .pagination > li > span { color: '.$page_link_color."; }\n";
+			$custom_css .= '.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus { background-color: '.$page_link_color.'; border-color: '.$page_link_color."; }\n";
 		}
 		// Page link hover color
 		if ( $page_link_h_color = $this->get_setting( 'page_link_h_color' ) ) {
 			$custom_css .= 'a:hover, .panel-title .evo_comment_type:hover { color: '.$page_link_h_color."; }\n";
+			// Pagination links:
+			$custom_css .= '.pagination > li > a:hover, .pagination > li > span:hover, .pagination > li > a:focus, .pagination > li > span:focus { color: '.$page_link_h_color."; }\n";
 		}
 		// Posts background color
 		if ( $well_color = $this->get_setting( 'well_color' ) ) {
@@ -474,6 +486,9 @@ class bootstrap_photoblog_Skin extends Skin
 		</style>';
 		add_headline( $custom_css );
 		}
+
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
 
 

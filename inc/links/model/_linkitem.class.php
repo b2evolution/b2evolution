@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -330,7 +330,7 @@ class LinkItem extends LinkOwner
 	{
 		if( ! empty( $this->Item ) && ! $this->is_temp() )
 		{	// Update Item if it exists
-			$this->Item->update_last_touched_date();
+			$this->Item->update_last_touched_date( true, true, false, true );
 		}
 	}
 

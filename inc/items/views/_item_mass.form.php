@@ -91,14 +91,16 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'item_priority', $edited_Item->priority );
 		$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
 		$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
-		$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
+		if( $Blog->get_setting( 'use_deadline' ) )
+		{	// If deadline is enabled for collection:
+			$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
+		}
 	}
 	$Form->hidden( 'trackback_url', $trackback_url );
 	$Form->hidden( 'item_featured', $edited_Item->featured );
 	$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
 	$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
 	$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
-	$Form->hidden( 'item_order', $edited_Item->order );
 	// CUSTOM FIELDS
 	display_hidden_custom_fields( $Form, $edited_Item );
 
@@ -131,7 +133,7 @@ $Form->begin_form( '', '', $params );
 	echo '<br />';
 
 	// ------------------------------- SETTINGS ---------------------------------
-	$Form->checkbox( 'paragraphs_linebreak', false, '', T_( 'Create paragraphs at each line break' ), 'compose_layout' );
+	$Form->checkbox( 'paragraphs_linebreak', false, '', T_( 'Create paragraphs at each line break' ) );
 
 	$Form->switch_layout( NULL );
 

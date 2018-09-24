@@ -21,7 +21,7 @@ class bootstrap_manual_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.4';
+	var $version = '6.10.3';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -117,6 +117,13 @@ class bootstrap_manual_Skin extends Skin
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
+						'allow_empty' => true,
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '100',
+						'type' => 'integer',
 						'allow_empty' => true,
 					),
 					'page_navigation' => array(
@@ -294,6 +301,9 @@ class bootstrap_manual_Skin extends Skin
 		{ // Include JS code for left navigation panel only when it is displayed:
 			$this->require_js( 'left_navigation.js' );
 		}
+
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
 
 
@@ -348,15 +358,6 @@ class bootstrap_manual_Skin extends Skin
 					'display_reg_link'      => true,
 					'abort_link_position'   => 'form_title',
 					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-					// Register
-					'register_page_before'      => '<div class="evo_panel__register">',
-					'register_page_after'       => '</div>',
-					'register_form_title'       => T_('Register'),
-					'register_links_attrs'      => '',
-					'register_use_placeholders' => true,
-					'register_field_width'      => 252,
-					'register_disabled_page_before' => '<div class="evo_panel__register register-disabled">',
-					'register_disabled_page_after'  => '</div>',
 					// Activate form
 					'activate_form_title'  => T_('Account activation'),
 					'activate_page_before' => '<div class="evo_panel__activation">',
@@ -394,7 +395,7 @@ class bootstrap_manual_Skin extends Skin
 	{
 		global $disp;
 
-		if( in_array( $disp, array( 'access_requires_login', 'access_denied' ) ) )
+		if( in_array( $disp, array( 'access_requires_login', 'content_requires_login', 'access_denied' ) ) )
 		{ // Display left navigation column on this page when at least one sidebar container is visible:
 			return $this->show_container_when_access_denied( 'sidebar' ) || $this->show_container_when_access_denied( 'sidebar2' );
 		}

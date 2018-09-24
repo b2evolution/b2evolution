@@ -21,7 +21,7 @@ class bootstrap_forums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.4';
+	var $version = '6.10.3';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -139,6 +139,13 @@ class bootstrap_forums_Skin extends Skin
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
+						'allow_empty' => true,
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
 						'allow_empty' => true,
 					),
 				'section_layout_end' => array(
@@ -360,46 +367,15 @@ class bootstrap_forums_Skin extends Skin
 		}
 
 		if( in_array( $disp, array( 'single', 'page' ) ) )
-		{	// Init JS to autcomplete the user logins
+		{	// Init JS to autcomplete the user logins:
 			require_js( '#bootstrap_typeahead#', 'blog' );
 			init_autocomplete_login_js( 'blog', 'typeahead' );
-			// Initialize date picker for _item_expert.form.php
+			// Initialize date picker for _item_expert.form.php:
 			init_datepicker_js( 'blog' );
 		}
 
-		// Add custom CSS:
-		$custom_css = '';
-
-
-		// If sidebar == true + col-lg
-		if( $layout = $this->get_setting( 'layout_general' ) != 'no_sidebar' )
-		{
-			$custom_css = "@media screen and (min-width: 1200px) {
-				.forums_list .ft_date {
-					white-space: normal;
-					margin-top: 3px;
-				}
-				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full,
-				.disp_single .evo_comment .panel-body .evo_comment_text p,
-				.disp_single .post_tags,
-				.disp_single .evo_voting_panel,
-				.disp_single .evo_seen_by
-				{
-					padding-left: 15px;
-				}
-				\n
-			}";
-		}
-
-		if( ! empty( $custom_css ) )
-		{ // Function for custom_css:
-		$custom_css = '<style type="text/css">
-<!--
-'.$custom_css.'
--->
-		</style>';
-		add_headline( $custom_css );
-		}
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
 
 

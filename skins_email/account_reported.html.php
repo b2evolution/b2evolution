@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -55,7 +55,7 @@ echo empty( $user_pictures ) ? '<p'.emailskin_style( '.p' ).'><b>'.T_('No pictur
 
 // Buttons:
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
-echo get_link_tag( $admin_url.'?ctrl=user&user_tab=admin&user_ID='.$params['user_ID'], T_( 'Edit User account' ), 'div.buttons a+a.button_yellow' )."\n";
+echo get_link_tag( $admin_url.'?ctrl=user&user_tab=admin&user_ID='.$params['user_ID'], T_( 'Edit User account' ), 'div.buttons a+a.btn-primary' )."\n";
 echo "</div>\n";
 
 // Footer vars:

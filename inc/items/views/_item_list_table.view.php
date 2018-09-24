@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -102,10 +102,21 @@ jQuery(document).ready( function()
 		}
 	} );
 <?php
+
+if( isset( $ItemList->filters['cat_array'] ) &&
+    count ( $ItemList->filters['cat_array'] ) == 1 )
+{	// Set param to update item order per filtered category:
+	$order_cat_param = '&cat_ID='.$ItemList->filters['cat_array'][0];
+}
+else
+{	// Update item order per main category by default:
+	$order_cat_param = '';
+}
+
 // Print JS to edit an item order:
 echo_editable_column_js( array(
 	'column_selector' => '.item_order_edit',
-	'ajax_url'        => get_htsrv_url().'async.php?action=item_order_edit&'.url_crumb( 'itemorder' ),
+	'ajax_url'        => get_htsrv_url().'async.php?action=item_order_edit'.$order_cat_param.'&'.url_crumb( 'itemorder' ),
 	'field_type'      => 'text',
 	'new_field_name'  => 'new_item_order',
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',

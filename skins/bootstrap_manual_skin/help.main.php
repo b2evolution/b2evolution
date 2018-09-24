@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_manual_skin
@@ -45,7 +45,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <header id="header" class="row<?php echo $Settings->get( 'site_skins_enabled' ) ? ' site_skins' : ''; ?>">
 
-	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
+	<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8">
 		<?php
 		if( $Skin->show_container_when_access_denied( 'page_top' ) )
 		{ // Display 'Page Top' widget container
@@ -70,7 +70,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		<?php } ?>
 	</div><!-- .col -->
 
-	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
+	<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 		<?php
 		if( $Skin->show_container_when_access_denied( 'header' ) )
 		{ // Display 'Header' widget container
@@ -161,31 +161,6 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 			}
 		?>
 
-		<?php
-			// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
-			request_title( array(
-					'title_before'      => '<h1 class="page_title">',
-					'title_after'       => '</h1>',
-					'title_single_disp' => false,
-					'title_page_disp'   => false,
-					'format'            => 'htmlbody',
-					'category_text'     => '',
-					'categories_text'   => '',
-					'catdir_text'       => '',
-					'front_text'        => '',
-					'posts_text'        => '',
-					'register_text'     => '',
-					'login_text'        => '',
-					'lostpassword_text' => '',
-					'account_activation' => '',
-					'msgform_text'      => '',
-					'user_text'         => '',
-					'users_text'        => '',
-					'display_edit_links'=> false,
-				) );
-			// ----------------------------- END OF REQUEST TITLE ----------------------------
-?>
-
 
 <?php
 // -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
@@ -243,6 +218,7 @@ skin_include( '$disp$' );
 							'item_before_opened'   => get_icon( 'collapse' ),
 							'item_before_closed'   => get_icon( 'expand' ),
 							'item_before_post'     => get_icon( 'file_message' ),
+							'item_title_fields'    => 'short_title,title',
 							'expand_all'           => false,
 							'sorted'               => true
 						) );
@@ -285,6 +261,7 @@ skin_include( '$disp$' );
 							'item_before_opened'   => get_icon( 'collapse' ),
 							'item_before_closed'   => get_icon( 'expand' ),
 							'item_before_post'     => get_icon( 'file_message' ),
+							'item_title_fields'    => 'short_title,title',
 							'expand_all'           => false,
 							'sorted'               => true
 						) );

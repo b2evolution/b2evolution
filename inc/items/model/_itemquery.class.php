@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -390,8 +390,9 @@ class ItemQuery extends SQL
 	 * Restrict to specific tags
 	 *
 	 * @param string List of tags to restrict to
+	 * @param string Condition to search by tags, 'OR' - if item has at least one tag, 'AND' - item must has all tags from the list
 	 */
-	function where_tags( $tags )
+	function where_tags( $tags, $tags_operator = 'OR' )
 	{
 		global $DB;
 
@@ -404,8 +405,20 @@ class ItemQuery extends SQL
 
 		$tags = explode( ',', $tags );
 
-		$this->FROM_add( 'INNER JOIN T_items__itemtag ON post_ID = itag_itm_ID
-								INNER JOIN T_items__tag ON (itag_tag_ID = tag_ID AND tag_name IN ('.$DB->quote($tags).') )' );
+		if( $tags_operator == 'AND' )
+		{	// Search items with ALL tags from the restriction list:
+			$this->WHERE_and( '( SELECT COUNT( itag_tag_ID )
+				 FROM T_items__tag
+				INNER JOIN T_items__itemtag ON tag_ID = itag_tag_ID
+				WHERE itag_itm_ID = post_ID
+				  AND tag_name IN ( '.$DB->quote( $tags ).' )
+				) = '.count( $tags ) );
+		}
+		else // 'OR'
+		{	// Search items with at least one tag from the restriction list:
+			$this->FROM_add( 'INNER JOIN T_items__itemtag ON post_ID = itag_itm_ID' );
+			$this->FROM_add( 'INNER JOIN T_items__tag ON itag_tag_ID = tag_ID AND tag_name IN ( '.$DB->quote( $tags ).' )' );
+		}
 	}
 
 
@@ -632,7 +645,8 @@ class ItemQuery extends SQL
 	 * Restrict to specific post types usage
 	 *
 	 * @param string List of types usage to restrict to (must have been previously validated):
-	 *               Allowed values: post, page, intro-front, intro-main, intro-cat, intro-tag, intro-sub, intro-all, special
+	 *               Allowed values: post, page, intro-front, intro-main, intro-cat, intro-tag, intro-sub, intro-all, special,
+	 *                               *featured* - to get also featured posts
 	 */
 	function where_itemtype_usage( $itemtype_usage )
 	{
@@ -645,22 +659,31 @@ class ItemQuery extends SQL
 			return;
 		}
 
+		$featured_sql_where = '';
+		$not_featured_sql_where = '';
+		if( strpos( $itemtype_usage, '*featured*' ) !== false )
+		{	// Get also featured posts:
+			$itemtype_usage = preg_replace( '#,?\*featured\*,?#', '', $itemtype_usage );
+			$featured_sql_where .= ' OR post_featured = 1';
+			$not_featured_sql_where .= ' AND post_featured != 1';
+		}
+
 		$this->FROM_add( 'LEFT JOIN T_items__type ON ityp_ID = '.$this->dbprefix.'ityp_ID' );
 
 		if( $itemtype_usage == '-' )
 		{	// List is ONLY a MINUS sign (we want only those not assigned)
-			$this->WHERE_and( $this->dbprefix.'ityp_ID IS NULL' );
+			$this->WHERE_and( $this->dbprefix.'ityp_ID IS NULL'.$not_featured_sql_where );
 		}
 		elseif( substr( $itemtype_usage, 0, 1 ) == '-' )
 		{	// List starts with MINUS sign:
 			$itemtype_usage = explode( ',', substr( $itemtype_usage, 1 ) );
 			$this->WHERE_and( '( '.$this->dbprefix.'ityp_ID IS NULL
-			                  OR ityp_usage NOT IN ( '.$DB->quote( $itemtype_usage ).' ) )' );
+			                  OR ( ityp_usage NOT IN ( '.$DB->quote( $itemtype_usage ).' )'.$not_featured_sql_where.' ) )' );
 		}
 		else
 		{
 			$itemtype_usage = explode( ',', $itemtype_usage );
-			$this->WHERE_and( 'ityp_usage IN ( '.$DB->quote( $itemtype_usage ).' )' );
+			$this->WHERE_and( '( ityp_usage IN ( '.$DB->quote( $itemtype_usage ).' )'.$featured_sql_where.' )' );
 		}
 	}
 
@@ -1070,6 +1093,20 @@ class ItemQuery extends SQL
 		$available_fields[] = 'T_categories.cat_name';
 		$available_fields[] = 'T_categories.cat_order';
 
+		if( in_array( 'order', $orderby_array ) )
+		{	// If list is ordered by field 'order':
+			if( ( $order_i = array_search( 'order', $available_fields ) ) !== false )
+			{	// Use an order per category instead of old field 'post_order':
+				$available_fields[ $order_i ] = 'T_postcats.postcat_order';
+			}
+			if( ! preg_match( '#T_postcats#', $this->get_from( '' ) ) )
+			{	// Join table of categories for field 'postcat_order':
+				$this->FROM_add( 'INNER JOIN T_postcats ON postcat_post_ID = post_ID AND post_main_cat_ID = postcat_cat_ID' );
+			}
+			// Replace field to real name:
+			$order_by = str_replace( 'order', 'T_postcats.postcat_order', $order_by );
+		}
+
 		$order_clause = gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname, $available_fields );
 
 		// asimo> The following commented code parts handles the nullable fields order, to move them NULL values into the end of the result
@@ -1098,6 +1135,11 @@ class ItemQuery extends SQL
 //			$additional_clause++;
 //		}
 //		$order_clause = implode( ',', $orderby_fields );
+
+		if( strpos( $this->itemtype_usage, '*featured*' ) !== false )
+		{	// If we get featured posts together with other post types(like intro) then we should order featured posts below not featured posts:
+			$order_clause = trim( 'post_featured, '.$order_clause, ', ' );
+		}
 
 		return $order_clause;
 	}

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -137,12 +137,13 @@ class org_members_Widget extends ComponentWidget
 					'note' => T_('Field used to determine the order in which the members are displayed'),
 					'type' => 'select',
 					'options' => array(
-							'user_id' => 'User ID', 
-							'user_level' => 'User Level',
-							'org_role' => 'Role in Organization',
-							'username' => 'Username',
-							'lastname' => 'Last Name, First Name',
-							'firstname' => 'First Name, Last Name'
+							'user_id'      => T_('User ID'),
+							'user_level'   => T_('User Level'),
+							'org_role'     => T_('Role in organization'),
+							'org_priority' => T_('Order in organization'),
+							'username'     => T_('Username'),
+							'lastname'     => T_('Last Name').', '.T_('First Name'),
+							'firstname'    => T_('First Name').', '.T_('Last Name'),
 					),
 					'defaultvalue' => 'user_id',
 				),
@@ -280,7 +281,7 @@ class org_members_Widget extends ComponentWidget
 					{ // End of user link, see above
 						echo '</a>';
 					}
-					
+
 					// Organizational role
 					if( $this->disp_params['display_role'] == 1 )
 					{

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -141,7 +141,7 @@ class Organization extends DataObject
 		// Accept level:
 		param( 'org_accept', 'string' );
 		$this->set_from_Request( 'accept' );
-		
+
 		// Edit Role Permission:
 		param( 'org_perm_role', 'string' );
 		$this->set_from_Request( 'perm_role' );
@@ -194,6 +194,9 @@ class Organization extends DataObject
 				break;
 			case 'org_role':
 				$users_SQL->ORDER_BY( 'uorg_role ASC, user_ID ASC' );
+				break;
+			case 'org_priority':
+				$users_SQL->ORDER_BY( 'uorg_priority ASC, user_ID ASC' );
 				break;
 			case 'username':
 				$users_SQL->ORDER_BY( 'user_login ASC, user_ID ASC' );

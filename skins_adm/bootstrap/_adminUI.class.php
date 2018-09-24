@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin-skin
@@ -51,7 +51,7 @@ class AdminUI extends AdminUI_general
 		require_js( '#bootstrap_typeahead#', 'rsc_url' );
 
 		// JS to init Bootstrap tooltips (E.g. on badges with title "Admin"):
-		add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip() } )' );
+		add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip( {html: true} ) } )' );
 
 		if( $debug )
 		{	// Use readable CSS:
@@ -165,13 +165,13 @@ class AdminUI extends AdminUI_general
 	 *
 	 * @param boolean Whether or not to display messages.
 	 */
-	function disp_body_top( $display_messages = true )
+	function disp_body_top( $display_messages = true, $params = array() )
 	{
 		global $Messages;
 
 		parent::disp_body_top( $display_messages );
 
-		parent::disp_payload_begin();
+		parent::disp_payload_begin( $params );
 
 		if( $display_messages )
 		{ // Display info & error messages:
@@ -326,12 +326,12 @@ class AdminUI extends AdminUI_general
 					'page_url' => '', // All generated links will refer to the current page
 					'before' => '<div class="results panel panel-default">',
 					'content_start' => '<div id="$prefix$ajax_content">',
-					'header_start' => '',
+					'header_start' => '<div class="evo_panel">',
 						'header_text' => '<div class="center"><ul class="pagination">'
 								.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 							.'</ul></div>',
 						'header_text_single' => '',
-					'header_end' => '',
+					'header_end' => '</div>',
 					'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 					'global_icons_class' => 'btn btn-default btn-sm',
 					'filters_start'        => '<div class="filters panel-body">',
@@ -387,7 +387,7 @@ class AdminUI extends AdminUI_general
 							'total_col_end' => "</td>\n",
 						'total_line_end' => "</tr>\n\n",
 					'list_end' => "</table></div>\n\n",
-					'footer_start' => '<div class="panel-footer">',
+					'footer_start' => '<div class="evo_panel evo_panel__footer">',
 					'footer_text' => '<div class="center"><ul class="pagination">'
 							.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 						.'</ul></div><div class="center page_size_selector">$page_size$</div>'
@@ -456,6 +456,7 @@ class AdminUI extends AdminUI_general
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="help-inline">%s</span>',
+					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
 					'fieldstart_checkbox'    => '<div class="form-group form-group-sm checkbox" $ID$>'."\n",
@@ -505,6 +506,7 @@ class AdminUI extends AdminUI_general
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="help-inline">%s</span>',
+					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
 					'inputclass_checkbox'    => '',
@@ -552,6 +554,7 @@ class AdminUI extends AdminUI_general
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="help-inline">%s</span>',
+					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
 					'inputclass_checkbox'    => '',
@@ -589,7 +592,7 @@ class AdminUI extends AdminUI_general
 									 '</div>' // End of <div class="panel-body...>
 								.'</div>' // End of <div id="$group_item_id$...>
 							.'</div>'."\n", // End of <div class="panel panel-default...>
-					
+
 					) );
 
 			case 'linespan_form':
@@ -619,6 +622,7 @@ class AdminUI extends AdminUI_general
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="help-inline">%s</span>',
+					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
 					'inputclass_checkbox'    => '',
@@ -640,6 +644,21 @@ class AdminUI extends AdminUI_general
 					'radio_oneline_start'    => '<label class="radio-inline">',
 					'radio_oneline_end'      => "</label>\n",
 				);
+
+			case 'fields_table_form':
+				return array_merge( $this->get_template( 'Form' ), array(
+						'fieldset_begin' => '<div class="evo_fields_table $class$" id="fieldset_wrapper_$id$" $fieldset_attribs$>'."\n",
+						'fieldset_end'   => '</div>'."\n",
+						'fieldstart'     => '<div class="evo_fields_table__field" $ID$>'."\n",
+						'fieldend'       => "</div>\n\n",
+						'labelclass'     => 'evo_fields_table__label',
+						'labelstart'     => '',
+						'labelend'       => "\n",
+						'labelempty'     => '',
+						'inputstart'     => '<div class="evo_fields_table__input">',
+						'inputend'       => "</div>\n",
+					) );
+				break;
 
 			case 'file_browser':
 				return array(
@@ -689,6 +708,11 @@ class AdminUI extends AdminUI_general
 					'text_danger'  => 'btn btn-danger',
 					'text_warning' => 'btn btn-warning',
 					'group'        => 'btn-group',
+					'small_text'   => 'btn btn-default btn-xs',
+					'small_text_primary' => 'btn btn-primary btn-xs',
+					'small_text_success' => 'btn btn-success btn-xs',
+					'small_text_danger'  => 'btn btn-danger btn-xs',
+					'small_text_warning' => 'btn btn-warning btn-xs',
 				);
 
 			case 'table_browse':
@@ -813,7 +837,7 @@ class AdminUI extends AdminUI_general
 			{ // If blog is favorute OR current blog, Add blog as a button:
 				$buttons .= $template[ $l_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
 
-				$buttons .= '<a href="'.$url_params.'blog='.$l_blog_ID
+				$buttons .= '<a href="'.format_to_output( $url_params.'blog='.$l_blog_ID, 'htmlattr' )
 							.'" class="btn btn-default'.( $l_blog_ID == $blog ? ' active' : '' ).'"';
 
 				if( !is_null($this->coll_list_onclick) )
@@ -841,8 +865,8 @@ class AdminUI extends AdminUI_general
 				{
 					//$select_options .= ' selected="selected"';
 				}
-				$select_options .= '<a href="'.$url_params.'blog='.$l_blog_ID.'">'
-					.$l_Blog->dget( 'shortname', 'formvalue' ).'</a></li>';
+				$select_options .= '<a href="'.format_to_output( $url_params.'blog='.$l_blog_ID, 'htmlattr' ).'">'
+					.$l_Blog->dget( 'shortname', 'htmlbody' ).'</a></li>';
 			}
 		}
 
@@ -853,9 +877,9 @@ class AdminUI extends AdminUI_general
 		if( !empty( $this->coll_list_all_title ) )
 		{ // We want to add an "all" button
 			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
-			$r .= '<a href="'.$this->coll_list_all_url
+			$r .= '<a href="'.format_to_output( $this->coll_list_all_url, 'htmlattr' )
 						.'" class="btn btn-default'.( $blog == 0 ? ' active' : '' ).'">'
-						.$this->coll_list_all_title.'</a> ';
+						.format_to_output( $this->coll_list_all_title, 'htmlbody' ).'</a> ';
 			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
 		}
 

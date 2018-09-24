@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -153,7 +153,7 @@ class CollectionSettings extends AbstractSettings
 			'enable_sitemaps' => 1,
 
 		// General settings:
-			'ajax_form_enabled' => 0,					// Comment and contacts forms will be fetched by javascript
+			'ajax_form_enabled' => 1,					// Comment and contacts forms will be fetched by javascript
 			'ajax_form_loggedin_enabled' => 0,			// Also use JS forms for logged in users
 			'cache_enabled' => 0,
 			'cache_enabled_widgets' => 0,
@@ -166,14 +166,20 @@ class CollectionSettings extends AbstractSettings
 			'allow_subscriptions' => 1,         // Allow email subscriptions for new post by default
 			'allow_comment_subscriptions' => 1, // Allow email subscriptions for new comment by default
 			'allow_item_subscriptions' => 1,    // Allow email subscriptions for a specific post by default
+			'allow_anon_subscriptions' => 1,    // Allow email subscriptions for replies to anonymous users comments
+			'default_anon_comment_notify' => 0, // Default option to subscribe anonymous users for replies notification
+			'anon_notification_email_limit' => 3, // Max # of email notifications an anonymous user may receive per day
 			'use_workflow' => 0,						// Don't use workflow by default
+			'use_deadline' => 1,						// Use deadline for workflow by default
 			'aggregate_coll_IDs' => '',
 			'blog_footer_text' => 'This collection &copy;$year$ by $owner$',
 			'max_footer_credits' => 3,
 			'enable_goto_blog' => 'blog',  // 'no' - No redirect, 'blog' - Go to blog after publishing post, 'post' - Redirect to permanent post url
 			'editing_goto_blog' => 'post', // 'no' - No redirect, 'blog' - Go to blog after editing post, 'post' - Redirect to permanent post url
 			'default_post_type' => '1', // Default type for new posts, value is ID of post type from table T_items__type
-			// 'default_post_status' => 'draft',		// Default status for new posts ("published", "community", "protected", "private", "review", "draft", "deprecated", "redirected"). We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
+			'post_anonymous' => 0, // Allow to create new posts by anonymous users
+			// 'default_post_status' => 'draft',		// Default status for new posts in backoffice ("published", "community", "protected", "private", "review", "draft", "deprecated", "redirected"). We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
+			'default_post_status_anon' => 'review', // Default status for new posts from anonymous user ("published", "community", "protected", "private", "review", "draft", "deprecated", "redirected").
 			'post_categories' => 'main_extra_cat_post', // Post category setting
 			'post_navigation' => 'same_blog',           // Default post by post navigation should stay in the same blog, category, author or tag
 			'blog_head_includes' => '',
@@ -182,6 +188,7 @@ class CollectionSettings extends AbstractSettings
 			'allow_html_comment' => 1, // Allow HTML in comments
 			'track_unread_content' => 0, // Should we track unread content on the specific blog. It can be modified on the Features/Other settings form.
 			'allow_access' => 'public', // Allow access to blog; Values: 'public' - Everyone (Public Blog), 'users' - Logged in users, 'members' - Members of the blog
+			'http_protocol' => 'always_http', // SSL; Values: 'always_http' - Always use http, 'always_https' - Always use https, 'allow_both' - Allow both http and https as valid URLs.
 			// Assets URLs:
 			'rsc_assets_url_type' => 'relative', // Load generic /rsc/ assets from: 'basic', 'relative', 'absolute'
 			'rsc_assets_absolute_url' => '', // Absolute URL for setting 'rsc_assets_url_type' with selected option 'absolute'
@@ -200,7 +207,24 @@ class CollectionSettings extends AbstractSettings
 			'cookie_domain_type' => 'auto', // Cookie domain type: 'auto', 'custom'
 			'cookie_path_type' => 'auto', // Cookie path type: 'auto', 'custom'
 
+		// Contact form settings (disp=msgform):
+			'msgform_display_recipient' => 1, // Display a "Message to:" line
+			'msgform_user_name' => 'none', // Name input for logged in users
+			'msgform_display_avatar' => 1, // Display recipient avatar
+			'msgform_avatar_size' => 'crop-top-48x48', // Recipient avatar size
+			'msgform_require_name' => 1, // Require name
+			'msgform_display_subject' => 1, // Display subject
+			'msgform_require_subject' => 1, // Require subject
+			'msgform_contact_method' => 1, // Require a preferred contact method
+			'msgform_display_message' => 1, // Display message
+			'msgform_require_message' => 1, // Require message
+
 		// User directory:
+			'userdir_filter_gender' => 1,
+			'userdir_filter_level' => 1,
+			'userdir_filter_org' => 1,
+			'userdir_filter_criteria' => 1,
+			'userdir_filter_lastseen' => 1,
 			'userdir_picture' => 1,
 			'image_size_user_list' => 'crop-top-48x48',
 			'userdir_login' => 1,
@@ -225,8 +249,8 @@ class CollectionSettings extends AbstractSettings
 			'search_include_posts' => 1, // Include posts to results on disp=search
 			'search_include_cmnts' => 1, // Include comments to results on disp=search
 			'search_include_tags'  => 1, // Include tags to results on disp=search
+			'search_include_files' => 1, // Include files to results on disp=search
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
-			'msgform_display_recipient' => 1, // Display a "Message to:" line on disp=msgform
 
 		// Time frame settings:
 			'timestamp_min' => 'yes',
@@ -306,6 +330,19 @@ class CollectionSettings extends AbstractSettings
 	 */
 	function set( $col_key1, $col_key2, $value )
 	{
+		if( is_array( $value ) )
+		{	// Don't crop a serialized value if value is an array,
+			// e-g plugin setting with type "checklist":
+			if( strlen( serialize( $value  ) ) > 10000 )
+			{	// Stop here to avoid DB error on inserting of long value:
+				debug_die( 'Impossible to store long data(>10000 chars) of collection setting "'.$col_key2.'"!' );
+			}
+		}
+		else
+		{	// Limit value with max possible length:
+			$value = utf8_substr( $value, 0, 10000 );
+		}
+
 		return parent::setx( $col_key1, $col_key2, $value );
 	}
 }

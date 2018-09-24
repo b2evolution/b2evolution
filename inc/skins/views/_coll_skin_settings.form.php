@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -32,18 +32,18 @@ $Form->begin_form( 'fform' );
 	switch( $skin_type )
 	{
 		case 'normal':
-			$skin_ID = $Blog->get_setting( 'normal_skin_ID' );
-			$fieldset_title = T_('Default skin');
+			$skin_ID = $Blog->get( 'normal_skin_ID' );
+			$fieldset_title = T_('Standard skin for this collection');
 			break;
 
 		case 'mobile':
-			$skin_ID = $Blog->get_setting( 'mobile_skin_ID', true );
-			$fieldset_title = T_('Default mobile phone skin');
+			$skin_ID = $Blog->get( 'mobile_skin_ID', array( 'real_value' => true ) );
+			$fieldset_title = T_('Phone skin for this collection');
 			break;
 
 		case 'tablet':
-			$skin_ID = $Blog->get_setting( 'tablet_skin_ID', true );
-			$fieldset_title = T_('Default tablet skin');
+			$skin_ID = $Blog->get( 'tablet_skin_ID', array( 'real_value' => true ) );
+			$fieldset_title = T_('Tablet skin for this collection');
 			break;
 
 		default:
@@ -65,10 +65,12 @@ $Form->begin_form( 'fform' );
 
 $buttons = array();
 if( $skin_ID )
-{	// Allow to update skin params only when it is really selected (Don't display this button to case "Same as normal skin."):
+{	// Allow to update skin params only when it is really selected (Don't display this button to case "Same as standard skin."):
 	$buttons[] = array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' );
 }
 
 $Form->end_form( $buttons );
 
+// Enable JS for fieldset folding:
+echo_fieldset_folding_js();
 ?>

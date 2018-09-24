@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -22,7 +22,7 @@ param( 'tab', 'string', 'site_settings', true );
 
 param_action( 'list' );
 
-if( strpos( $action, 'new' ) !== false )
+if( strpos( $action, 'new' ) !== false || $action == 'copy' )
 { // Simulate tab to value 'new' for actions to create new blog
 	$tab = 'new';
 }
@@ -66,6 +66,11 @@ switch( $action )
 			$Messages->add( sprintf( T_('You already own %d collection/s. You are not currently allowed to create any more.'), $user_blog_count ) );
 			$redirect_to = param( 'redirect_to', 'url', $admin_url );
 			header_redirect( $redirect_to );
+		}
+
+		if( $action == 'copy' )
+		{	// Get name of the duplicating collection to display on the form:
+			$duplicating_collection_name = $edited_Blog->get( 'shortname' );
 		}
 
 		$AdminUI->append_path_level( 'new', array( 'text' => T_('New') ) );
@@ -113,16 +118,25 @@ switch( $action )
 		$edited_Blog->set( 'owner_user_ID', $current_User->ID );
 
 		param( 'kind', 'string', true );
+		param( 'blog_urlname', 'string', true );
+
+		if( $kind == 'main' && ! $current_User->check_perm( 'blog_admin', 'editAll', false ) )
+		{ // Non-collection admins should not be able to create home/main collections
+			$Messages->add( sprintf( T_('You don\'t have permission to create a collection of kind %s.'), '<b>&laquo;'.$kind.'&raquo;</b>' ), 'error' );
+			header_redirect( $admin_url.'?ctrl=dashboard' ); // will EXIT
+			// We have EXITed already at this point!!
+		}
+
 		$edited_Blog->init_by_kind( $kind );
 		if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		{ // validate the urlname, which was already set by init_by_kind() function
 		 	// It needs to validated, because the user can not set the blog urlname, and every new blog would have the same urlname without validation.
 		 	// When user has edit permission to blog admin part, the urlname will be validated in load_from_request() function.
-			$edited_Blog->set( 'urlname', urltitle_validate( $edited_Blog->get( 'urlname' ) , '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
+			$edited_Blog->set( 'urlname', urltitle_validate( empty( $blog_urlname ) ? $edited_Blog->get( 'urlname' ) : $blog_urlname, '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
 		}
 
 		param( 'skin_ID', 'integer', true );
-		$edited_Blog->set_setting( 'normal_skin_ID', $skin_ID );
+		$edited_Blog->set( 'normal_skin_ID', $skin_ID );
 
 		// Check how new content should be created for new collection:
 		param( 'create_demo_contents', 'boolean', NULL );
@@ -162,8 +176,16 @@ switch( $action )
 				global $user_org_IDs;
 
 				load_funcs( 'collections/_demo_content.funcs.php' );
-				param( 'create_demo_org', 'boolean', false );
-				param( 'create_demo_users', 'boolean', false );
+				if( $current_User->check_perm( 'blog_admin', 'editall', false ) )
+				{ // Only collection admins can create demo organization and users
+					param( 'create_demo_org', 'boolean', false );
+					param( 'create_demo_users', 'boolean', false );
+				}
+				else
+				{
+					set_param( 'create_demo_org', false );
+					set_param( 'create_demo_users', false );
+				}
 				$user_org_IDs = NULL;
 
 				if( $create_demo_org && $current_User->check_perm( 'orgs', 'create', true ) )
@@ -193,14 +215,22 @@ switch( $action )
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
 
-		if( $edited_Blog->duplicate() )
+		// Get name of the duplicating collection to display on the form:
+		$duplicating_collection_name = $edited_Blog->get( 'shortname' );
+
+		$duplicate_params = array(
+				'duplicate_items'    => param( 'duplicate_items', 'integer', 0 ),
+				'duplicate_comments' => param( 'duplicate_comments', 'integer', 0 ),
+			);
+
+		if( $edited_Blog->duplicate( $duplicate_params ) )
 		{	// The collection has been duplicated successfully:
 			$Messages->add( T_('The collection has been duplicated.'), 'success' );
 
 			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
 
-		//
+		// Set action back to "copy" in order to display the edit form with errors:
 		$action = 'copy';
 		break;
 
@@ -299,14 +329,10 @@ switch( $action )
 		$Settings->set( 'def_mobile_skin_ID', param( 'def_mobile_skin_ID', 'integer', 0 ) );
 		$Settings->set( 'def_tablet_skin_ID', param( 'def_tablet_skin_ID', 'integer', 0 ) );
 
-		// Comment recycle bin
-		param( 'auto_empty_trash', 'integer', $Settings->get_default('auto_empty_trash'), false, false, true, false );
-		$Settings->set( 'auto_empty_trash', get_param('auto_empty_trash') );
-
 		if( ! $Messages->has_errors() )
 		{
 			$Settings->dbupdate();
-			$Messages->add( T_('Blog settings updated.'), 'success' );
+			$Messages->add( T_('The collection settings have been updated.'), 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=collections&tab=blog_settings', 303 ); // Will EXIT
 			// We have EXITed already at this point!!

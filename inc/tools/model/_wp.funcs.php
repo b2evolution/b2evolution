@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -51,7 +51,7 @@ function wpxml_get_import_data( $XML_file_path )
 		if( unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
 		{	// If ZIP archive is unpacked successfully:
 
-			// 
+			//
 			$XML_file_path = false;
 
 			// Find valid XML file in ZIP package:
@@ -325,7 +325,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 	{
 		global $Settings, $UserSettings;
 
-		echo T_('Importing the users... ');
+		echo T_('Importing users... ');
 		evo_flush();
 
 		// Get existing users
@@ -338,7 +338,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		foreach( $xml_data['authors'] as $author )
 		{
 			// Replace unauthorized chars of username:
-			$author_login = preg_replace( '/([^a-z0-9_])/i', '_', $author['author_login'] );
+			$author_login = preg_replace( '/([^a-z0-9_\-\.])/i', '_', $author['author_login'] );
 			$author_login = utf8_substr( utf8_strtolower( $author_login ), 0, 20 );
 
 			if( empty( $existing_users[ $author_login ] ) )
@@ -381,8 +381,8 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$User->set( 'firstname', $author['author_first_name'] );
 				$User->set( 'lastname', $author['author_last_name'] );
 				$User->set( 'pass', $author['author_pass'] );
-				$User->set( 'salt', '' );
-				$User->set( 'pass_driver', 'evo$md5' );
+				$User->set( 'salt', $author['author_salt'] );
+				$User->set( 'pass_driver', $author['author_pass_driver'] );
 				$User->set_Group( $UserGroup );
 				$User->set( 'status', !empty( $author['author_status'] ) ? $author['author_status'] : 'autoactivated' );
 				$User->set( 'nickname', $author['author_nickname'] );
@@ -1163,6 +1163,8 @@ function wpxml_parser( $file )
 			'author_first_name'           => wpxml_convert_value( $a->author_first_name ),
 			'author_last_name'            => wpxml_convert_value( $a->author_last_name ),
 			'author_pass'                 => (string) $ae->author_pass,
+			'author_salt'                 => isset( $ae->author_salt ) ? (string) $ae->author_salt : '',
+			'author_pass_driver'          => isset( $ae->author_pass_driver ) ? (string) $ae->author_pass_driver : 'evo$md5',
 			'author_group'                => (string) $ae->author_group,
 			'author_status'               => (string) $ae->author_status,
 			'author_nickname'             => wpxml_convert_value( $ae->author_nickname ),
@@ -1576,7 +1578,7 @@ function wp_get_regional_data( $country_code, $region, $subregion, $city )
 
 /**
  * Get available files to import from the folder /media/import/
- * 
+ *
  * @return array Files
  */
 function wpxml_get_import_files()

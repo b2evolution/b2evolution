@@ -146,6 +146,9 @@ class GroupSettings extends AbstractSettings
 	 */
 	function set( $permission, $value, $grp_ID )
 	{
+		// Limit value with max possible length:
+		$value = utf8_substr( $value, 0, 10000 );
+
 		if( $grp_ID != 0 )
 		{	// We can set permission, because the current group is already in database
 			$this->permission_values[$permission] = $value;

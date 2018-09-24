@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -51,6 +51,24 @@ class GeneralSettings extends AbstractSettings
 		'auto_prune_stats' => '15',         // days (T_hitlog and T_sessions)
 		'auto_empty_trash' => '15',         // days (How many days to keep recycled comments)
 
+		'cleanup_jobs_threshold' => 45, // days (Cleanup scheduled jobs threshold)
+		'cleanup_email_logs_threshold' => 59616000, // seconds (Cleanup email logs threshold)
+		'activate_account_reminder_threshold' => 86400, // seconds (Account activation reminder threshold)
+		'activate_account_reminder_config' => '86400,129600,345600,604800', // seconds (Account activation reminder settings), Defaults: one day, 1.5 days, 4 days, 7 days
+		'inactive_account_reminder_threshold' => 31536000, // seconds (Inactive account reminder threshold)
+		'comment_moderation_reminder_threshold' => 86400, // seconds (Comment moderation reminder threshold)
+		'post_moderation_reminder_threshold' => 86400, // seconds (Post moderation reminder threshold)
+		'unread_message_reminder_threshold' => 86400, // seconds (Unread private messages reminder threshold)
+		'unread_message_reminder_delay' => '10:3,30:6,90:15,180:30,365:60,730:120',// Unread message reminder is sent in every y days in case when a user last logged in date is below x days.
+			/* The default values are in x:y format:
+				less than 10 days ->   3 days spacing
+				   10 to  30 days ->   6 days spacing
+				   30 to  90 days ->  15 days spacing
+				   90 to 180 days ->  30 days spacing
+				  180 to 365 days ->  60 days spacing
+				  365 to 730 days -> 120 days spacing
+				more => "The user has not logged in for x days, so we will not send him notifications any more"*/
+
 		'email_service' => 'mail', // Preferred email service: 'mail', 'smtp'
 		'force_email_sending' => '0', // Force email sending
 
@@ -67,7 +85,8 @@ class GeneralSettings extends AbstractSettings
 
 		'email_campaign_send_mode' => 'immediate', // Sending mode for campaign
 		'email_campaign_chunk_size' => 50, // Chunk size of emails to send a campaign at a time
-		'email_campaign_cron_repeat' => 300, // Delay between chunks on scheduled campaign job runs
+		'email_campaign_cron_repeat' => 300, // 5 minutes: Delay between chunks on scheduled campaign job runs
+		'email_campaign_cron_limited' => 21600, // 6 hours: Delay between chunks on scheduled campaign job runs in case all remaining recipients have reached max # of emails for the current day
 
 		'fm_enable_create_dir' => '1',
 		'fm_enable_create_file' => '1',
@@ -75,6 +94,7 @@ class GeneralSettings extends AbstractSettings
 		'fm_enable_roots_user' => '1',
 		'fm_enable_roots_shared' => '1',
 		'fm_enable_roots_skins' => '1',
+		'fm_enable_roots_plugins' => '1',
 
 		'fm_showtypes' => '0',
 		'fm_showfsperms' => '0',
@@ -98,27 +118,32 @@ class GeneralSettings extends AbstractSettings
 		'activate_requests_limit' => '300', // Only one activation email can be sent to the same email address in the given interval ( value is in seconds )
 		'newusers_findcomments' => '1',
 		'after_email_validation' => 'return_to_original', // where to redirect after account activation. Values: return_to_original, or the previously set specific url
-		'after_registration' => 'return_to_original', // where to redirect after new user registration. Values: return_to_original redirect_to url, or return to the previously set specific url
+		'after_registration' => 'return_to_original', // where to redirect after new user registration. Values: 'return_to_original' redirect_to url, or 'slug', or return to the previously set specific url
+		'after_registration_slug' => '', // Slug value for after_registration == 'slug'
 		'newusers_level' => '1',
+		'registration_after_quick' => 'regform',
 		'registration_require_gender' => 'hidden',
 		'registration_ask_locale' => '0',
+		'pass_after_quick_reg' => '1',
 
 		// Default user settings
 		'def_enable_PM' => '1',
 		'def_enable_email' => '0',
 		'def_notify_messages' => '1',
 		'def_notify_unread_messages' => '1',
+		'def_notify_comment_mentioned' => '1',
 		'def_notify_published_comments' => '1',
 		'def_notify_comment_moderation' => '1',
 		'def_notify_edit_cmt_moderation' => '1',
 		'def_notify_spam_cmt_moderation' => '1',
 		'def_notify_meta_comments' => '1',
+		'def_notify_post_mentioned' => '1',
 		'def_notify_post_moderation' => '1',
 		'def_notify_edit_pst_moderation' => '1',
-		'def_newsletter_news' => '1',
-		'def_newsletter_ads' => '0',
+		'def_notify_post_assignment' => '1',
+		'def_newsletters' => '1',
 		'def_notification_email_limit' => '3',
-		'def_newsletter_limit' => '1',
+		'def_newsletter_limit' => '3',
 
 		'allow_avatars' => 1,
 		'min_picture_size' => 160, // minimum profile picture dimensions in pixels (width and height)
@@ -175,8 +200,8 @@ class GeneralSettings extends AbstractSettings
 
 		//Default blogs skin setting
 		'def_normal_skin_ID' => '1',                // Default normal skin ID
-		'def_mobile_skin_ID' => '0',                // 0 means same as normal skin
-		'def_tablet_skin_ID' => '0',                // 0 means same as normal skin
+		'def_mobile_skin_ID' => NULL,               // NULL means same as normal skin
+		'def_tablet_skin_ID' => NULL,               // NULL means same as normal skin
 
 		// Post by Email
 		'eblog_enabled' => 0,
@@ -305,7 +330,7 @@ C message size exceeds',
 		// Account closing options:
 		'account_close_enabled' => 1, // Allow users to close their account themselves
 		'account_close_intro'   => "We are sorry to see you leave.\n\nWe value your feedback. Please be so kind and tell us in a few words why you are leaving us. This will help us to improve the site for the future.",
-		'account_close_reasons' => "I don't need this account any more.\nI do not like this site.", // Reasons to close an account, separated by new line
+		'account_close_reasons' => "I don't need this account any more.\nI do not like this site.\nI am getting spam from this site.", // Reasons to close an account, separated by new line
 		'account_close_byemsg'  => 'Your account has now been closed. If you ever want to log in again, you will need to create a new account.',
 
 	// Back-end settings, these can't be modified by the users:
@@ -323,8 +348,9 @@ C message size exceeds',
 	 *
 	 * Because the {@link $DB DB object} itself creates a connection when it gets
 	 * created "Error selecting database" occurs before we can check for it here.
+	 * @param boolean TRUE to check current DB version
 	 */
-	function __construct()
+	function __construct( $check_version = true )
 	{
 		global $new_db_version, $DB, $demo_mode, $instance_name, $basehost;
 
@@ -337,7 +363,7 @@ C message size exceeds',
 		parent::__construct( 'T_settings', array( 'set_name' ), 'set_value', 0 );
 
 		// check DB version:
-		if( $this->get( 'db_version' ) != $new_db_version )
+		if( $check_version && $this->get( 'db_version' ) != $new_db_version )
 		{ // Database is not up to date:
 			if( $DB->last_error )
 			{
@@ -412,8 +438,37 @@ C message size exceeds',
 				return ( parent::getx( $parname ) && isset($GLOBALS['files_Module']) );
 				break;
 
+			case 'activate_account_reminder_config':
+				$value = parent::getx( $parname );
+				if( ! is_array( $value ) )
+				{	// Convert the setting value to array because it is used as array but stored as values separated by comma:
+					$value = explode( ',', $value );
+				}
+				return $value;
+
+			case 'unread_message_reminder_delay':
+				$value = parent::getx( $parname );
+				if( ! is_array( $value ) )
+				{	// Convert the setting value to array because it is used as array but stored as values separated by comma and colon:
+					$values = array();
+					if( preg_match_all( '/(\d+):(\d+)(,|$)/', $value, $matches ) )
+					{
+						foreach( $matches[1] as $m => $v )
+						{
+							$values[ intval( $v ) ] = intval( $matches[2][ $m ] );
+						}
+					}
+					$value = $values;
+				}
+				return $value;
+
 			default:
-				return parent::getx( $parname );
+				$value = parent::getx( $parname );
+				if( $value === NULL && strpos( $parname, 'cjob_timeout_' ) === 0 )
+				{	// Set default 10 minutes for max execution time of each cron job type:
+					$value = 600;
+				}
+				return $value;
 		}
 	}
 
@@ -427,6 +482,9 @@ C message size exceeds',
 	 */
 	function set( $setting, $value )
 	{
+		// Limit value with max possible length:
+		$value = utf8_substr( $value, 0, 10000 );
+
 		return parent::setx( $setting, $value );
 	}
 

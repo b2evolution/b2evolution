@@ -172,7 +172,12 @@ function prepareModalWindow( modal_document, button_form, use_buttons, keep_pane
 		jQuery( '#modal_window .modal-footer button[type=submit]' ).off( 'click' );
 		jQuery( '#modal_window .modal-footer button[type=submit]' ).on( 'click', function()
 		{ // Copy a click event from real submit input to button of footer
+			if( jQuery( this ).data( 'click_init' ) === 1 )
+			{	// Don't initialize same event twice:
+				return;
+			}
 			jQuery( button_form + ' input[type=submit]', modal_document ).click();
+			jQuery( this ).data( 'click_init', 1 );
 		} );
 	}
 

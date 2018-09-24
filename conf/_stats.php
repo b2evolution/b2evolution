@@ -279,7 +279,8 @@ $referer_type_color = array(
 	'direct'  => '00FFCC',
 	'spam'    => 'FF0000',
 	'self'    => '00FF99',
-	'admin'   => '999999'
+	'admin'   => '999999',
+	'ajax'    => '339966',
 	);
 
 $agent_type_array = array (
@@ -314,7 +315,8 @@ $hit_type_color = array(
 	'admin'            => 'AAE0E0',
 	'standard_robot'   => 'FF9900',
 	'standard_browser' => 'FFCC00',
-	'api'              => '5BC0DE'
+	'api'              => '5BC0DE',
+	'unknown'          => 'CCCCCC',
 );
 
 $hit_method_color = array(

@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  * @ignore
@@ -22,7 +22,7 @@ class shortlinks_plugin extends Plugin
 	var $code = 'b2evWiLi';
 	var $name = 'Short Links';
 	var $priority = 35;
-	var $version = '6.9.4';
+	var $version = '6.10.3';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -114,6 +114,26 @@ class shortlinks_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called when displaying an item/post's content as HTML.
+	 *
+	 * This is different from {@link RenderItemAsHtml()}, because it gets called
+	 * on every display (while rendering gets cached).
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean Have we changed something?
+	 */
+	function DisplayItemAsHtml( & $params )
+	{
+		$content = & $params['data'];
+
+		// Replace the create post links with simple text if current user has no perm to create a post:
+		$content = replace_content_outcode( '#<a[^>]+href="([^"]+)"[^>]+data-function="create_post" data-coll="(\d+)"[^>]*>(.+?)</a>#i', array( $this, 'callback_replace_post_links' ), $content, 'replace_content_callback' );
+
+		return true;
+	}
+
+
+	/**
 	 * Perform rendering
 	 *
 	 * @param array Associative array of parameters
@@ -162,6 +182,7 @@ class shortlinks_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
+		$this->render_type = 'email';
 		$this->link_types = $this->get_email_setting( 'link_types' );
 
 		return $this->render_content( $content );
@@ -290,7 +311,7 @@ class shortlinks_plugin extends Plugin
 					}
 					else
 					{	// Replace WikiWord with broken link if Item and Chapter are not found:
-						$replace_links[] = $this->get_broken_link( $WikiWord, $wiki_word, $WikiWord );
+						$replace_links[] = $this->get_broken_link( $wiki_word, $WikiWord );
 					}
 				}
 			}
@@ -525,7 +546,7 @@ class shortlinks_plugin extends Plugin
 			}
 			else
 			{	// Display a link to suggest to create new post from wiki word:
-				return $this->get_broken_link( $WikiWord, $this->current_wiki_word, ( empty( $custom_link_text ) ? $link_text : $custom_link_text ), $custom_link_class );
+				return $this->get_broken_link( $this->current_wiki_word, ( empty( $custom_link_text ) ? $link_text : $custom_link_text ), $custom_link_class );
 			}
 		}
 	}
@@ -534,15 +555,20 @@ class shortlinks_plugin extends Plugin
 	/**
 	 * Get HTML code for broken link
 	 *
-	 * @param string Post title
 	 * @param string Post slug
 	 * @param string Link/Span text
 	 * @param string Link/Span class
 	 * @return string
 	 */
-	function get_broken_link( $post_title, $post_slug, $text, $class = '' )
+	function get_broken_link( $post_slug, $text, $class = '' )
 	{
 		global $blog, $admin_url, $evo_charset;
+
+		if( isset( $this->render_type ) && $this->render_type == 'email' )
+		{	// Don't render broken link for Email Campaign because it is impossible
+			// to check user permission when content will be viewed on email inbox:
+			return $text;
+		}
 
 		// Add regexp modifier 'u' to work with UTF-8 strings correctly:
 		$regexp_modifier = ( $evo_charset == 'utf-8' ) ? 'u' : '';
@@ -552,18 +578,15 @@ class shortlinks_plugin extends Plugin
 		if( is_numeric( $post_slug ) && ! is_numeric( $text ) )
 		{	// Try to use custom text if it is provided instead of post ID to suggest a link to create new post:
 			$post_slug = preg_replace( array( '*([^\p{Lu}#_])([\p{Lu}#])*'.$regexp_modifier, '*([^0-9])([0-9])*'.$regexp_modifier ), '$1-$2', utf8_strtolower( $text ) );
-			$post_title = $text;
 		}
 
 		if( isset( $blog ) && ! is_numeric( $post_slug ) )
 		{	// Suggest to create new post from given word:
-			$post_title = preg_replace( '*([^\p{Lu}_])([\p{Lu}])*'.$regexp_modifier, '$1 $2', $post_title );
-			$post_title = ucfirst( str_replace( '-', ' ', $post_title ) );
-
 			$before_wikiword = '<a'
-				.' href="'.$admin_url.'?ctrl=items&amp;action=new&amp;blog='.$blog.'&amp;post_title='.urlencode( $post_title ).'&amp;post_urltitle='.urlencode( $post_slug ).'"'
-				.' title="'.format_to_output( T_('Create').'...', 'htmlattr' ).'"'
-				.' class="'.$class.'evo_shortlink_broken">';
+				.' href="#"'
+				.' class="'.$class.'evo_shortlink_broken"'
+				// Add these data attributes in order to display this link only for user who can really create a post:
+				.' data-function="create_post" data-coll="'.$blog.'">';
 			$after_wikiword = '</a>';
 		}
 		else
@@ -573,6 +596,40 @@ class shortlinks_plugin extends Plugin
 		}
 
 		return $before_wikiword.$text.$after_wikiword;
+	}
+
+
+	/**
+	 * Callback function to replace the links for creating new posts if current user has no permission
+	 *
+	 * @param array Matches
+	 * @return string
+	 */
+	function callback_replace_post_links( $matches )
+	{
+		if( ! isset( $matches[1], $matches[2], $matches[3] ) )
+		{	// Return a source string when no enough data to check user permissions:
+			return $matches[0];
+		}
+
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $matches[2], false, false );
+
+		// Get an URL to create new post,
+		// If this function return an empty string then current user has no permission:
+		$new_post_url = $Blog ? $Blog->get_write_item_url( 0, $matches[3] ) : false;
+
+		if( ! $new_post_url )
+		{	// If user has no permission to create a post for the collection,
+			// display only a link text without providing a link to create new post:
+			return $matches[3];
+		}
+
+		// If user has a permission to create a post for the collection,
+		// display the source link but replace the source URL with new generated,
+		// because it may be different between back- and front-office and also between
+		// anonymous and logged in users (disp=edit vs disp=anonpost):
+		return preg_replace( '# href="[^"]+"#i', ' href="'.$new_post_url.'" title="'.format_to_output( T_('Create').'...', 'htmlattr' ).'"', $matches[0] );
 	}
 
 

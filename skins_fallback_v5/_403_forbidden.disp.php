@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -17,9 +17,9 @@ global $disp_detail, $baseurl, $app_name;
 
 echo '<div class="error_403">';
 
-echo '<h2>403 Forbidden</h2>';
+echo '<h2>'.T_('403 Forbidden').'</h2>';
 
-echo '<p><a href="'.$baseurl.'">'.$app_name.'</a> cannot resolve the requested URL.</p>';
+echo '<p>'.T_('You are not allowed to view the requested URL.').'</p>';
 
 // You may use this to further customize this page:
 // echo $disp_detail;

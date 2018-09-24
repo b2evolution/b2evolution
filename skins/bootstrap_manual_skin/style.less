@@ -109,13 +109,6 @@ div.extended_search_form {
 	}
 }
 
-// Table for select categories of item
-table.catselect {
-	input#new_category_name {
-		width: 98% !important;
-	}
-}
-
 // Form elements on item edit page
 label.control-label[for=post_title] {
 	width: auto;
@@ -182,6 +175,7 @@ div.bSideItem {
 }
 .evo_panel__login {
 	max-width: 400px;
+	min-width: auto;
 }
 .evo_panel__lostpass {
 	max-width: 480px;
@@ -197,16 +191,36 @@ div.bSideItem {
 }
 .evo_panel__register {
 	max-width: 580px;
-	.control-buttons{
-		text-align: left;
-	}
-	&.register-disabled {
-		width: 350px;
-	}
 	.form-control {
 		&#country, &#u {
 			width: 100%;
 		}
+	}
+	#fieldset_wrapper_captcha_qstn .panel {
+		margin: 0;
+		div[id$=_answer] .control-label {
+			padding-right: 14px;
+		}
+	}
+	.panel-body {
+		padding: 15px;
+		p:last-child {
+			margin-bottom: 0;
+		}
+	}
+}
+@media (min-width: 768px) {
+	#fieldset_wrapper_captcha_qstn .panel div[id$=_answer] {
+		max-height: 34px;
+	}
+}
+.evo_register_buttons {
+	text-align: center;
+	input.btn {
+		margin: 0 0 15px 0;
+	}
+	a.btn {
+		margin: 0;
 	}
 }
 .evo_form__login_links {
@@ -336,5 +350,24 @@ ol.breadcrumb {
 		.btn {
 			float: none;
 		}
+	}
+}
+
+// Comment footer
+.evo_content_block .evo_comment {
+	.evo_comment_footer {
+		.action_btn_group {
+			float: right;
+		}
+	}
+
+	.comment_edit_btn {
+		margin-right: 5px;
+	}
+
+	// Fix buttons for comment actions
+	.btn-group>.btn.first-child {
+		border-top-left-radius: 3px !important;
+		border-bottom-left-radius: 3px !important;
 	}
 }

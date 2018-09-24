@@ -3,7 +3,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -56,6 +56,9 @@ div.status_icon {
   font-weight: bold;
   margin: 2px;
 }
+span.action_icon {
+  cursor: pointer;
+}
 .btn-group .action_icon {
   margin-left: 0;
   margin-right: 0;
@@ -87,11 +90,11 @@ div.avatartag.main .avatar_actions {
   margin-right: 25px;
 }
 .avatar_main_frame > a:first-child {
-  margin-right: 25px;
+  margin-right: 0;
 }
 .avatar_main_frame .avatar_actions {
   text-align: center;
-  padding: 0 25px 0 0;
+  padding: 0 25px;
   float: none;
   display: table-cell;
   vertical-align: middle;
@@ -160,24 +163,9 @@ h2 .glyphicon {
   margin-top: 14px;
   display: inline-block;
 }
-.compose_layout {
-  margin-bottom: 15px;
-}
-.compose_layout td.label {
-  font-size: 100%;
-  padding-right: 10px;
-  color: #333;
-}
-.compose_layout #post_locale {
-  width: 180px !important;
-}
-.compose_layout td {
+.edit_actions_visibility {
   white-space: nowrap;
-  vertical-align: middle;
-}
-#itemform_custom_fields .compose_layout,
-#itemform_adv_props .compose_layout {
-  margin-bottom: 0;
+  margin-right: 5px;
 }
 div.log_container {
   margin: 0;
@@ -198,6 +186,12 @@ div.delete_messages ul {
 }
 div.delete_messages ul li {
   list-style: inherit;
+}
+.evo_panel {
+  margin-bottom: 20px;
+}
+.evo_panel__footer {
+  padding: 10px 15px;
 }
 /*
  * Browse pages of items and comments ( ?ctrl=items and ?ctrl=comments - full views )
@@ -280,6 +274,12 @@ div.delete_messages ul li {
   text-align: center;
   padding: 10px;
   color: #5bc0de;
+}
+.evo_content_summary .evo_post .bTitle {
+  font-weight: bold;
+}
+.evo_content_summary .evo_post .bText {
+  padding-left: 420px;
 }
 #comment_filter_form fieldset {
   margin-bottom: 20px;
@@ -615,6 +615,14 @@ fieldset ul {
   color: #000;
   font-weight: normal;
 }
+.evo_input__tags {
+  width: 100%;
+  max-width: 100%;
+}
+.evo_input__tags ul.token-input-list-facebook {
+  width: 100%;
+  max-width: 100%;
+}
 #item_locations label {
   width: auto;
   float: right;
@@ -687,6 +695,19 @@ fieldset ul {
 }
 #itemform_goals td {
   padding-bottom: 2px;
+}
+.custom_fields_edit_table .results {
+  overflow: initial;
+}
+.custom_fields_edit_table .table_scroll {
+  margin-bottom: 20px;
+}
+.custom_fields_edit_table .form-control {
+  width: auto;
+}
+.custom_fields_edit_table .form-control.custom_field_label {
+  width: 100%;
+  min-width: 200px;
 }
 #attachments_fieldset_wrapper {
   width: 100%;
@@ -887,7 +908,6 @@ h2.user_title::first-line {
   font-weight: normal;
   color: #999;
   margin: 40px 0 30px;
-  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;
@@ -954,6 +974,38 @@ h2.user_title::first-line {
 }
 #itemform_edit_workflow .form-group .controls {
   display: inline-block;
+}
+#itemform_extra td.flabel_item_owner_login {
+  vertical-align: top;
+  padding-top: 6px;
+}
+#itemform_extra #ffield_item_owner_login .help-inline {
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: 10px;
+}
+#itemform_extra #ffield_item_owner_login #item_owner_login {
+  vertical-align: middle !important;
+}
+#itemform_extra label.ffield_item_create_user {
+  padding: 0;
+  font-weight: normal;
+}
+#itemform_extra .itemform_extra_radio {
+  padding-top: 10px;
+}
+#itemform_extra .itemform_extra_radio > label {
+  padding: 0;
+  margin: 0;
+}
+#itemform_extra .itemform_extra_radio input[type=radio][name=item_dateset][value="1"] {
+  margin-top: 11px;
+}
+#itemform_extra .itemform_extra_radio .form-group {
+  vertical-align: middle;
+}
+#itemform_extra .itemform_extra_radio .form-group input {
+  margin-left: 0;
 }
 span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
@@ -1027,7 +1079,6 @@ ul.widget_container li:hover {
 }
 ul.widget_container li > span,
 ul.widget_container li > a {
-  display: inline-block;
   padding: 3px 10px;
   margin: 0;
   border-color: #ddd;
@@ -1097,6 +1148,9 @@ div.coll-selector {
 }
 div.coll-selector .btn-group {
   margin-right: 4px;
+}
+div.coll-selector .btn-group .dropdown-toggle .caret {
+  margin-left: 6px;
 }
 div.level2 {
   padding-top: 17px;
@@ -1445,9 +1499,6 @@ table.diff td.diff-title-addedline {
 .timestamp .time {
   font-size: 84%;
 }
-.compact_data {
-  white-space: nowrap;
-}
 #skin_wrapper .email_wrap .email_payload > p:first-child {
   margin-top: 10px;
 }
@@ -1620,15 +1671,24 @@ table.diff td.diff-title-addedline {
 .evo_checkbox_status__meta {
   background-color: #5bc0de;
 }
-.evo_aggregate_filter {
+.evo_filter_diagram_hits {
   white-space: nowrap;
+  float: left;
+  padding-left: 15px;
 }
-.evo_aggregate_filter label {
-  padding-top: 5px;
-  padding-right: 5px;
+.evo_filter_diagram_hits label {
+  float: none;
+  padding: 0 5px 0 0;
   width: auto;
+  font-weight: normal;
 }
-.evo_aggregate_filter select {
+.evo_filter_diagram_hits label.control-label {
+  font-weight: bold;
+}
+.evo_filter_diagram_hits label input {
+  display: inline;
+}
+.evo_filter_diagram_hits select {
   display: inline;
   width: auto;
 }
@@ -1638,4 +1698,11 @@ table.diff td.diff-title-addedline {
 .jeditable_cell select,
 .jeditable_cell input {
   max-width: 100%;
+}
+div.query-builder .rule-container .rule-value-container {
+  border: none;
+  padding-left: 0;
+}
+.ui-effects-transfer {
+  border: 1px solid #F00;
 }

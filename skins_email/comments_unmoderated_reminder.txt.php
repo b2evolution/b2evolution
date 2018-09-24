@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $baseurl, $comment_moderation_reminder_threshold;
+global $admin_url, $baseurl, $Settings;
 
 $BlogCache = & get_BlogCache();
 
@@ -24,7 +24,7 @@ $params = array_merge( array(
 		'comments' => array(),
 	), $params );
 
-echo sprintf( T_('There have been comments awaiting moderation for more than %s in the following blogs:'), seconds_to_period( $comment_moderation_reminder_threshold ) );
+echo sprintf( T_('There have been comments awaiting moderation for more than %s in the following blogs:'), seconds_to_period( $Settings->get( 'comment_moderation_reminder_threshold' ) ) );
 echo "\n\n";
 
 foreach( $params['blogs'] as $blog_ID )

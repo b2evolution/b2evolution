@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package htsrv
@@ -24,6 +24,9 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 $is_login_page = true;
 
 require_once $inc_path.'_main.inc.php';
+
+// Check and redirect if current URL must be used as https instead of http:
+check_https_url( 'login' );
 
 $login = param( $dummy_fields['login'], 'string', '' );
 param_action( 'req_login' );
@@ -58,7 +61,7 @@ switch( $action )
 		/* exited */
 		break;
 
-	case 'closeaccount': 
+	case 'closeaccount':
 		// Close current user account and log out:
 
 		global $Session, $Messages, $UserSettings;
@@ -103,14 +106,14 @@ switch( $action )
 		}
 		else
 		{ // db update was unsuccessful
-			$Messages->add( T_( 'Unable to close your account. Please contact to system administrator.' ) );
+			$Messages->add_to_group( 'Unexpected error. Unable to close your account.', 'error', T_('Close account').':' );
 		}
 
 		header_redirect();
 		/* exited */
 		break;
 
-	case 'resetpassword': 
+	case 'resetpassword':
 		// Send password reset request by email:
 
 		global $servertimenow;
@@ -256,7 +259,7 @@ switch( $action )
 		break;
 
 
-	case 'changepwd': 
+	case 'changepwd':
 		// User clicked "Reset password NOW" link from an password reset email:
 
 		param( 'reqID', 'string', '' );
@@ -354,9 +357,9 @@ switch( $action )
 		break;
 
 
-	case 'activateacc_ez': 
+	case 'activateacc_ez':
 		// User clicked 'Activate NOW' or 'Reactivate NOW' from an account activation email with EASY activation process (first email or reminder):
-	
+
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
 
@@ -407,11 +410,11 @@ switch( $action )
 		$User->activate_from_Request();
 		$Messages->add( T_('Your account is now activated.'), 'success' );
 
-		header_redirect( redirect_after_account_activation() );
+		header_redirect( htmlspecialchars_decode( redirect_after_account_activation() ) );
 		/* exited */
 		break;
 
-	case 'activateacc_sec': 
+	case 'activateacc_sec':
 		// User clicked 'Activate NOW' or 'Reactivate NOW' from an account activation email with SECURE activation process (first email or reminder):
 		// fp> NOTE: I am not sure secure process works allows reminders.
 
@@ -469,15 +472,8 @@ switch( $action )
 			$Messages->add( T_( 'Your account is now activated.' ), 'success' );
 		}
 
-		// init redirect_to
-		$redirect_to = redirect_after_account_activation();
-
-		// Cleanup:
-		$Session->delete('core.activateacc.request_ids');
-		$Session->delete('core.activateacc.redirect_to');
-
 		// redirect Will save $Messages into Session:
-		header_redirect( $redirect_to );
+		header_redirect( htmlspecialchars_decode( redirect_after_account_activation() ) );
 		/* exited */
 		break;
 
@@ -587,7 +583,7 @@ switch( $action )
 
 if( strlen( $redirect_to ) )
 { // Make it relative to the form's target, in case it has been set absolute (and can be made relative).
-	$redirect_to = url_rel_to_same_host( $redirect_to, get_htsrv_url( true ) );
+	$redirect_to = url_rel_to_same_host( $redirect_to, get_htsrv_url( 'login' ) );
 }
 if( preg_match( '#/login.php([&?].*)?$#', $redirect_to ) )
 { // avoid "endless loops"
@@ -599,7 +595,7 @@ $Debuglog->add( 'redirect_to: '.$redirect_to );
 
 if( strlen( $return_to ) )
 { // Make it relative to the form's target, in case it has been set absolute (and can be made relative).
-	$return_to = url_rel_to_same_host( $return_to, get_htsrv_url( true ) );
+	$return_to = url_rel_to_same_host( $return_to, get_htsrv_url( 'login' ) );
 }
 if( preg_match( '#/login.php([&?].*)?$#', $return_to ) )
 { // avoid "endless loops"
@@ -657,14 +653,14 @@ if( $inskin && use_in_skin_login() )
 
 
 /**
- * Display one of the standard login management screens:
+ * Display one of the basic login management screens:
  */
 switch( $action )
 {
 	case 'lostpassword':
 		// Lost password:
 		$page_title = T_('Lost your password?');
-		$hidden_params = array( 'redirect_to' => url_rel_to_same_host( $redirect_to, get_htsrv_url( true ) ) );
+		$hidden_params = array( 'redirect_to' => url_rel_to_same_host( $redirect_to, get_htsrv_url( 'login' ) ) );
 		$wrap_width = '480px';
 
 		// Use the links in the form title

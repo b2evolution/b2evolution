@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -65,6 +65,8 @@ $core_componentwidget_defs = array(
 			'spacer',
 			'image',
 			'social_links',
+			'content_block', // Content Block
+			'display_item',  // Display Item
 		),
 	'about_user' => array(
 			'coll_avatar',		// Avatar of User
@@ -92,10 +94,10 @@ $core_componentwidget_defs = array(
 			'coll_related_post_list', // Simple Related Posts list
 			'coll_flagged_list',      // Simplified UIL: Flagged Items
 			'coll_item_list',         // Universal Item list
+			'item_fields_compare',    // Compare Item Fields
 			'coll_featured_intro',    // Featured/Intro Post
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
-			'content_block',          // Content Block
 		),
 	'infoitem' => array(
 			'item_info_line',
@@ -108,6 +110,7 @@ $core_componentwidget_defs = array(
 			'item_about_author',
 			'item_seen_by',
 			'item_vote',
+			'item_custom_fields',
 		),
 	'collection' => array(
 			'coll_logo',
@@ -123,7 +126,10 @@ $core_componentwidget_defs = array(
 			'user_avatars',
 			'org_members',
 			'user_login',
-			'user_register',
+			'user_greetings',
+			'user_register_quick',
+			'user_register_standard',
+			'newsletter_subscription',
 			'user_tools',
 			'online_users',
 		),

@@ -32,58 +32,14 @@ jQuery( document ).on( 'change', 'select[id^=criteria_type]', function()
 	userfield_criteria_autocomplete( jQuery( this ) );
 } );
 
-if( jQuery( 'select[id^=criteria_type]:first' ).val() == '' )
-{	// Pre-select a random option
-	var count_options = parseInt( jQuery( 'select[id^=criteria_type]:first option' ).length );
-	var index = Math.ceil( Math.random() * count_options );
-	if( index == count_options )
-	{	// Exclude empty value
-		index = 1;
-	}
-	jQuery( 'select[id^=criteria_type]:first option:eq(' + index + ')' ).attr( 'selected', 'selected' );
-}
-
 for(var c = 0; c < jQuery( 'select[id^=criteria_type]' ).length; c++ )
 {	// Bind autocomplete event for each Specific criteria
 	userfield_criteria_autocomplete( jQuery( 'select[id^=criteria_type]:eq(' + c + ')' ) );
 }
 
-jQuery( document ).on( 'click', 'span[rel=add_criteria]', function()
-{ // Add new criteria to search
-	var params = '<?php
-			global $b2evo_icons_type, $blog;
-			echo empty( $b2evo_icons_type ) ? '' : '&b2evo_icons_type='.$b2evo_icons_type;
-			echo is_admin_page() ? '&is_backoffice=1' : '&blog='.$blog;
-		?>';
-
-	obj_this = jQuery( this ).parent().parent();
-	jQuery.ajax({
-	type: 'POST',
-	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
-	data: 'action=get_userfields_criteria' + params,
-	success: function( result )
-		{	// Display fieldset of new Specific criteria
-			obj_this.after( ajax_debug_clear( result ) );
-
-			// Preselect a random option
-			obj_new = obj_this.next().next();
-			var count_options = parseInt( obj_new.find( 'option' ).length );
-			var index = Math.ceil( Math.random() * count_options );
-			if( index == count_options )
-			{	// Exclude empty value
-				index = 1;
-			}
-			obj_new.find( 'option:eq(' + index + ')' ).attr( 'selected', 'selected' );
-
-			// Bind auto complete event to the new select
-			userfield_criteria_autocomplete( obj_new.find( 'select' ) );
-		}
-	});
-} );
-
 <?php
 global $current_User;
-if( is_admin_page() && is_logged_in() && $current_User->check_perm( 'users', 'moderate', false ) )
+if( is_admin_page() && is_logged_in() && $current_User->check_perm( 'users', 'moderate' ) )
 {	// If user can edit the users - Init js to edit user level by AJAX
 ?>
 jQuery(document).ready( function()
@@ -113,4 +69,19 @@ jQuery(document).ready( function()
 ?>
 });
 <?php } ?>
+
+/**
+ * Merge two users from duplicated users list
+ */
+function merge_duplicated_users( link_obj )
+{
+	var selected_user_ID = jQuery( '[name=selected_user_ID]:checked' );
+	if( selected_user_ID.length == 0 )
+	{
+		alert( '<?php echo TS_('Please select a remaining account!'); ?>' );
+		return false;
+	}
+	location.href = jQuery( link_obj ).attr( 'href' ) + '&selected_user_ID=' + selected_user_ID.val();
+	return false;
+}
 </script>

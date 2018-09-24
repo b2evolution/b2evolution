@@ -13,7 +13,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -366,6 +366,7 @@ if( $params['disp_comment_form'] && // if enabled by skin param
 			'action' => 'get_comment_form',
 			'p' => $Item->ID,
 			'blog' => $Blog->ID,
+			'reply_ID' => param( 'reply_ID', 'integer', 0 ),
 			'disp' => $disp,
 			'params' => $params );
 		display_ajax_form( $json_params );

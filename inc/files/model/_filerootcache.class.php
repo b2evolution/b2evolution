@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -92,6 +92,20 @@ class FileRootCache
 			if( $skins_FileRoot )
 			{ // We got a skins dir:
 				$r[ $skins_FileRoot->ID ] = & $skins_FileRoot;
+			}
+
+			// Site skins root, Don't allow files of this root to link to objects:
+			$siteskins_FileRoot = & $FileRootCache->get_by_type_and_ID( 'siteskins', 0, false );
+			if( $siteskins_FileRoot )
+			{
+				$r[ $siteskins_FileRoot->ID ] = & $siteskins_FileRoot;
+			}
+
+			// Plugins root, Don't allow files of this root to link to objects:
+			$plugins_FileRoot = & $FileRootCache->get_by_type_and_ID( 'plugins', 0, false );
+			if( $plugins_FileRoot )
+			{	// We got a plugins dir:
+				$r[ $plugins_FileRoot->ID ] = & $plugins_FileRoot;
 			}
 		}
 

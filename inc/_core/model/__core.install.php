@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -52,15 +52,15 @@ $schema_queries = array(
 		"CREATE TABLE T_groups__groupsettings (
 			gset_grp_ID INT(11) UNSIGNED NOT NULL,
 			gset_name VARCHAR(30) COLLATE ascii_general_ci NOT NULL,
-			gset_value VARCHAR(255) NULL,
+			gset_value VARCHAR(10000) NULL,
 			PRIMARY KEY (gset_grp_ID, gset_name)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_settings' => array(
 		'Creating table for Settings',
 		"CREATE TABLE T_settings (
-			set_name VARCHAR(30) COLLATE ascii_general_ci NOT NULL,
-			set_value VARCHAR(5000) NULL,
+			set_name VARCHAR(64) COLLATE ascii_general_ci NOT NULL,
+			set_value VARCHAR(10000) NULL,
 			PRIMARY KEY ( set_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -82,7 +82,7 @@ $schema_queries = array(
 			user_pass_driver VARCHAR(16) NOT NULL default 'evo\$md5',
 			user_grp_ID int(4) NOT NULL default 1,
 			user_email varchar(255) COLLATE ascii_general_ci NOT NULL,
-			user_status enum( 'activated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new',
+			user_status enum( 'activated', 'manualactivated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new',
 			user_avatar_file_ID int(10) unsigned default NULL,
 			user_firstname varchar(50) NULL,
 			user_lastname varchar(50) NULL,
@@ -145,6 +145,7 @@ $schema_queries = array(
 			uf_ufdf_ID int(10) unsigned NOT NULL,
 			uf_varchar varchar(10000) NOT NULL,
 			PRIMARY KEY (uf_ID),
+			INDEX uf_user_ID ( uf_user_ID ),
 			INDEX uf_ufdf_ID ( uf_ufdf_ID ),
 			INDEX uf_varchar ( uf_varchar (255) )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -193,6 +194,7 @@ $schema_queries = array(
 			uorg_org_ID   INT(11) UNSIGNED NOT NULL,
 			uorg_accepted TINYINT(1) DEFAULT 0,
 			uorg_role     VARCHAR(255) NULL,
+			uorg_priority INT(11) NULL,
 			PRIMARY KEY ( uorg_user_ID, uorg_org_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -205,12 +207,40 @@ $schema_queries = array(
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_users__profile_visits' => array(
-		'Crating table for profile visits',
+		'Creating table for profile visits',
 		"CREATE TABLE T_users__profile_visits (
 			upv_visited_user_ID INT(11) UNSIGNED NOT NULL,
 			upv_visitor_user_ID INT(11) UNSIGNED NOT NULL,
 			upv_last_visit_ts   TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY ( upv_visited_user_ID, upv_visitor_user_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_users__profile_visit_counters' => array(
+		'Creating table for profile visit counters',
+		"CREATE TABLE T_users__profile_visit_counters (
+			upvc_user_ID  INT(11) UNSIGNED NOT NULL,
+			upvc_total_unique_visitors INT(10) UNSIGNED NOT NULL DEFAULT 0,
+			upvc_last_view_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			upvc_new_unique_visitors INT(10) UNSIGNED NOT NULL DEFAULT 0,
+			PRIMARY KEY (upvc_user_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_users__tag' => array(
+		'Creating table for user tags',
+		"CREATE TABLE T_users__tag (
+			utag_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			utag_name VARCHAR(200) NOT NULL,
+			PRIMARY KEY (utag_ID),
+			UNIQUE  utag_name(utag_name)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_users__usertag' => array(
+		'Creating table for User-to-Tag relationships',
+		"CREATE TABLE T_users__usertag (
+			uutg_user_ID INT(11) UNSIGNED NOT NULL,
+			uutg_emtag_ID INT(11)  UNSIGNED NOT NULL,
+			PRIMARY KEY (uutg_user_ID, uutg_emtag_ID),
+			UNIQUE taguser(uutg_emtag_ID, uutg_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_i18n_original_string' => array(
@@ -283,8 +313,8 @@ $schema_queries = array(
 		'Creating user settings table',
 		"CREATE TABLE T_users__usersettings (
 			uset_user_ID INT(11) UNSIGNED NOT NULL,
-			uset_name    VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL,
-			uset_value   VARCHAR( 255 ) NULL,
+			uset_name    VARCHAR(50) COLLATE ascii_general_ci NOT NULL,
+			uset_value   VARCHAR(10000) NULL,
 			PRIMARY KEY ( uset_user_ID, uset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -353,7 +383,8 @@ $schema_queries = array(
 			clog_realstart_datetime   TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			clog_realstop_datetime    TIMESTAMP NULL,
 			clog_status               enum('started','finished','error','timeout','warning') COLLATE ascii_general_ci not null default 'started',
-			clog_messages             text,
+			clog_messages             MEDIUMTEXT,
+			clog_actions_num          INT UNSIGNED NULL,
 			PRIMARY KEY (clog_ctsk_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -441,15 +472,20 @@ $schema_queries = array(
 	'T_email__log' => array(
 		'Creating email log table',
 		"CREATE TABLE T_email__log (
-			emlog_ID        INT(10) UNSIGNED NOT NULL auto_increment,
-			emlog_timestamp TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			emlog_user_ID   INT(10) UNSIGNED DEFAULT NULL,
-			emlog_to        VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
-			emlog_result    ENUM( 'ok', 'error', 'blocked', 'simulated' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ok',
-			emlog_subject   VARCHAR(255) DEFAULT NULL,
-			emlog_headers   TEXT DEFAULT NULL,
-			emlog_message   MEDIUMTEXT DEFAULT NULL,
-			PRIMARY KEY     (emlog_ID)
+			emlog_ID            INT(10) UNSIGNED NOT NULL auto_increment,
+			emlog_key           CHAR(32) NULL DEFAULT NULL,
+			emlog_timestamp     TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			emlog_user_ID       INT(10) UNSIGNED DEFAULT NULL,
+			emlog_to            VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
+			emlog_result        ENUM( 'ok', 'error', 'blocked', 'simulated', 'ready_to_send' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ok',
+			emlog_subject       VARCHAR(255) DEFAULT NULL,
+			emlog_headers       TEXT DEFAULT NULL,
+			emlog_message       MEDIUMTEXT DEFAULT NULL,
+			emlog_last_open_ts  TIMESTAMP NULL,
+			emlog_last_click_ts TIMESTAMP NULL,
+			emlog_camp_ID       INT UNSIGNED NULL DEFAULT NULL,
+			emlog_autm_ID       INT UNSIGNED DEFAULT NULL,
+			PRIMARY KEY         (emlog_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
 	'T_email__returns' => array(
@@ -483,31 +519,141 @@ $schema_queries = array(
 			UNIQUE                      emadr_address (emadr_address)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
+	'T_email__newsletter' => array(
+		'Creating email newsletters table',
+		"CREATE TABLE T_email__newsletter (
+			enlt_ID     INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			enlt_name   VARCHAR(255) NOT NULL,
+			enlt_label  VARCHAR(255) NULL,
+			enlt_active TINYINT(1) UNSIGNED DEFAULT 1,
+			enlt_order  INT NULL DEFAULT NULL,
+			PRIMARY KEY (enlt_ID)
+		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_email__newsletter_subscription' => array(
+		'Creating email newsletter subscriptions table',
+		"CREATE TABLE T_email__newsletter_subscription (
+			enls_user_ID             INT UNSIGNED NOT NULL,
+			enls_enlt_ID             INT UNSIGNED NOT NULL,
+			enls_last_sent_manual_ts TIMESTAMP NULL,
+			enls_last_open_ts        TIMESTAMP NULL,
+			enls_last_click_ts       TIMESTAMP NULL,
+			enls_send_count          INT UNSIGNED NOT NULL DEFAULT 0,
+			enls_subscribed          TINYINT(1) UNSIGNED DEFAULT 1,
+			enls_subscribed_ts       TIMESTAMP NULL,
+			enls_unsubscribed_ts     TIMESTAMP NULL,
+			PRIMARY KEY (enls_user_ID, enls_enlt_ID)
+		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	// When adding fields to this table do not forget to check EmailCampaign::duplicate() for fields that should not be duplicated!
 	'T_email__campaign' => array(
 		'Creating email campaigns table',
 		"CREATE TABLE T_email__campaign (
-			ecmp_ID              INT NOT NULL AUTO_INCREMENT,
-			ecmp_date_ts         TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
-			ecmp_name            VARCHAR(255) NOT NULL,
-			ecmp_email_title     VARCHAR(255) NULL,
-			ecmp_email_html      TEXT NULL,
-			ecmp_email_text      TEXT NULL,
-			ecmp_email_plaintext TEXT NULL,
-			ecmp_sent_ts         TIMESTAMP NULL,
-			ecmp_renderers       VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
-			ecmp_use_wysiwyg     TINYINT(1) NOT NULL DEFAULT 0,
-			ecmp_send_ctsk_ID    INT(10) UNSIGNED NULL DEFAULT NULL,
-			PRIMARY KEY          (ecmp_ID)
+			ecmp_ID                   INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			ecmp_date_ts              TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			ecmp_enlt_ID              INT UNSIGNED NOT NULL,
+			ecmp_name                 VARCHAR(255) NOT NULL,
+			ecmp_email_title          VARCHAR(255) NULL,
+			ecmp_email_defaultdest    VARCHAR(255) NULL,
+			ecmp_email_html           TEXT NULL,
+			ecmp_email_text           TEXT NULL,
+			ecmp_email_plaintext      TEXT NULL,
+			ecmp_sync_plaintext       TINYINT(1) NOT NULL DEFAULT 1,
+			ecmp_sent_ts              TIMESTAMP NULL,
+			ecmp_auto_sent_ts         TIMESTAMP NULL,
+			ecmp_renderers            VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			ecmp_use_wysiwyg          TINYINT(1) NOT NULL DEFAULT 0,
+			ecmp_send_ctsk_ID         INT(10) UNSIGNED NULL DEFAULT NULL,
+			ecmp_welcome              TINYINT(1) NOT NULL DEFAULT 0,
+			ecmp_user_tag_sendskip    VARCHAR(255) NULL,
+			ecmp_user_tag_sendsuccess VARCHAR(255) NULL,
+			ecmp_user_tag             VARCHAR(255) NULL,
+			ecmp_user_tag_cta1        VARCHAR(255) NULL,
+			ecmp_user_tag_cta2        VARCHAR(255) NULL,
+			ecmp_user_tag_cta3        VARCHAR(255) NULL,
+			ecmp_user_tag_like        VARCHAR(255) NULL,
+			ecmp_user_tag_dislike     VARCHAR(255) NULL,
+			ecmp_send_count           INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_open_count           INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_img_loads            INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_link_clicks          INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_cta1_clicks          INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_cta2_clicks          INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_cta3_clicks          INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_like_count           INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_dislike_count        INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_unsub_clicks         INT UNSIGNED NOT NULL DEFAULT 0,
+			PRIMARY KEY               (ecmp_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
 	'T_email__campaign_send' => array(
 		'Creating email campaign send data table',
 		"CREATE TABLE T_email__campaign_send (
-			csnd_camp_ID  INT(11) UNSIGNED NOT NULL,
-			csnd_user_ID  INT(11) UNSIGNED NOT NULL,
-			csnd_emlog_ID INT(11) UNSIGNED NULL,
+			csnd_camp_ID             INT(11) UNSIGNED NOT NULL,
+			csnd_user_ID             INT(11) UNSIGNED NOT NULL,
+			csnd_status              ENUM('ready_to_send', 'ready_to_resend', 'sent', 'send_error', 'skipped' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ready_to_send',
+			csnd_emlog_ID            INT(11) UNSIGNED NULL,
+			csnd_clicked_unsubscribe TINYINT(1) UNSIGNED DEFAULT 0,
+			csnd_last_sent_ts        TIMESTAMP NULL,
+			csnd_last_open_ts        TIMESTAMP NULL,
+			csnd_last_click_ts       TIMESTAMP NULL,
+			csnd_like                TINYINT(1) NULL DEFAULT NULL,
+			csnd_cta1                TINYINT(1) NULL DEFAULT NULL,
+			csnd_cta2                TINYINT(1) NULL DEFAULT NULL,
+			csnd_cta3                TINYINT(1) NULL DEFAULT NULL,
 			PRIMARY KEY   csnd_PK ( csnd_camp_ID, csnd_user_ID )
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_automation__automation' => array(
+		'Creating automation table',
+		"CREATE TABLE T_automation__automation (
+			autm_ID            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			autm_name          VARCHAR(255) NOT NULL,
+			autm_status        ENUM('paused', 'active') DEFAULT 'paused',
+			autm_owner_user_ID INT UNSIGNED NOT NULL,
+			PRIMARY KEY        (autm_ID)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_automation__newsletter' => array(
+		'Creating automation newsletter table',
+		"CREATE TABLE T_automation__newsletter (
+			aunl_autm_ID   INT UNSIGNED NOT NULL,
+			aunl_enlt_ID   INT UNSIGNED NOT NULL,
+			aunl_autostart TINYINT(1) UNSIGNED DEFAULT 1,
+			aunl_autoexit  TINYINT(1) UNSIGNED DEFAULT 1,
+			aunl_order     INT NOT NULL DEFAULT 1,
+			PRIMARY KEY    (aunl_autm_ID, aunl_enlt_ID)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_automation__step' => array(
+		'Creating automation step table',
+		"CREATE TABLE T_automation__step (
+			step_ID                    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			step_autm_ID               INT UNSIGNED NOT NULL,
+			step_order                 INT NOT NULL DEFAULT 1,
+			step_label                 VARCHAR(500) NULL,
+			step_type                  ENUM('if_condition', 'send_campaign', 'notify_owner', 'add_usertag', 'remove_usertag', 'subscribe', 'unsubscribe', 'start_automation') COLLATE ascii_general_ci NOT NULL DEFAULT 'if_condition',
+			step_info                  TEXT NULL,
+			step_yes_next_step_ID      INT NULL,
+			step_yes_next_step_delay   INT UNSIGNED NULL,
+			step_no_next_step_ID       INT NULL,
+			step_no_next_step_delay    INT UNSIGNED NULL,
+			step_error_next_step_ID    INT NULL,
+			step_error_next_step_delay INT UNSIGNED NULL,
+			step_diagram               VARCHAR(64) NULL,
+			PRIMARY KEY                (step_ID),
+			UNIQUE                     step_autm_ID_order (step_autm_ID, step_order)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
+
+	'T_automation__user_state' => array(
+		'Creating automation user state table',
+		"CREATE TABLE T_automation__user_state (
+			aust_autm_ID      INT UNSIGNED NOT NULL,
+			aust_user_ID      INT UNSIGNED NOT NULL,
+			aust_next_step_ID INT UNSIGNED NULL,
+			aust_next_exec_ts TIMESTAMP NULL,
+			PRIMARY KEY       (aust_autm_ID, aust_user_ID)
+		) ENGINE = innodb DEFAULT CHARACTER SET = $db_storage_charset" ),
 
 	'T_syslog' => array(
 		'Creating system log table',
@@ -518,7 +664,7 @@ $schema_queries = array(
 			slg_type      ENUM('info', 'warning', 'error', 'critical_error') COLLATE ascii_general_ci NOT NULL DEFAULT 'info',
 			slg_origin    ENUM('core', 'plugin') COLLATE ascii_general_ci,
 			slg_origin_ID INT UNSIGNED NULL,
-			slg_object    ENUM('comment', 'item', 'user', 'file') COLLATE ascii_general_ci,
+			slg_object    ENUM('comment', 'item', 'user', 'file', 'email_log') COLLATE ascii_general_ci,
 			slg_object_ID INT UNSIGNED NULL,
 			slg_message   VARCHAR(255) NOT NULL,
 			PRIMARY KEY   (slg_ID),

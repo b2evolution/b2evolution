@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -102,7 +102,7 @@ $cron_job_name_query = cron_job_sql_query();
  * Create result set :
  */
 $SQL = new SQL();
-$SQL->SELECT( 'ctsk_ID, ctsk_start_datetime, ctsk_key, ctsk_name, ctsk_params, ctsk_repeat_after,
+$SQL->SELECT( 'ctsk_ID, ctsk_start_datetime, ctsk_key, ctsk_name, ctsk_params, ctsk_repeat_after, ctsk_repeat_variation, clog_actions_num,
   IFNULL( clog_status, "pending" ) as status,
   IF( clog_realstop_datetime IS NULL, -1, UNIX_TIMESTAMP( clog_realstop_datetime ) - UNIX_TIMESTAMP( clog_realstart_datetime ) ) as duration,
   IFNULL( ctsk_name, task_name ) as final_name' );
@@ -248,6 +248,15 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
+						'th'          => T_('# actions'),
+						'order'       => 'clog_actions_num',
+						'td'          => '$clog_actions_num$',
+						'default_dir' => 'D',
+						'th_class'    => 'shrinkwrap',
+						'td_class'    => 'right',
+					);
+
+$Results->cols[] = array(
 						'th' => T_('Status'),
 						'order' => 'status',
 						'td_class' => 'shrinkwrap',
@@ -281,11 +290,32 @@ $Results->cols[] = array(
 						'td' => '%crontab_duration( #duration# )%',
 					);
 
+/**
+ * Get a title for cron execution time
+ *
+ * @param integer Repeat every X seconds
+ * @param integer Variation in seconds
+ * @return string
+ */
+function crontab_repeat( $ctsk_repeat_after, $ctsk_repeat_variation, $ctsk_key )
+{
+	if( $ctsk_repeat_after > 0 )
+	{	// Display a repeat period with variation:
+		return seconds_to_period( $ctsk_repeat_after ).' ± '
+			.( $ctsk_key == 'poll-antispam-blacklist'
+				? T_('Auto')
+				: seconds_to_period( $ctsk_repeat_variation ) );
+	}
+	else
+	{	// If cron job is not repeated:
+		return '-';
+	}
+}
 $Results->cols[] = array(
 						'th' => T_('Repeat'),
 						'order' => 'ctsk_repeat_after',
 						'td_class' => 'shrinkwrap',
-						'td' => '%seconds_to_period( #ctsk_repeat_after# )%',
+						'td' => '%crontab_repeat( #ctsk_repeat_after#, #ctsk_repeat_variation#, #ctsk_key# )%',
 					);
 
 function crontab_actions( $ctsk_ID, $status )

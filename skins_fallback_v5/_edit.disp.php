@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -111,6 +111,10 @@ $Form->begin_form( 'inskin', '', $form_params );
 	{ // DO NOT ADD HIDDEN FIELDS IF THEY ARE NOT SET
 		// These fields will be set only in case when switch tab from admin editing to in-skin editing
 		// Fields used in "advanced" form, but not here:
+		if( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' )
+		{
+			$Form->hidden( 'post_short_title', $edited_Item->get( 'short_title' ) );
+		}
 		$Form->hidden( 'post_comment_status', $edited_Item->get( 'comment_status' ) );
 		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
@@ -126,14 +130,16 @@ $Form->begin_form( 'inskin', '', $form_params );
 			$Form->hidden( 'item_priority', $edited_Item->priority );
 			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
 			$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
-			$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
+			if( $Blog->get_setting( 'use_deadline' ) )
+			{	// If deadline is enabled for collection:
+				$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
+			}
 		}
 		$Form->hidden( 'trackback_url', $trackback_url );
 		$Form->hidden( 'item_featured', $edited_Item->featured );
 		$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
 		$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
 		$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
-		$Form->hidden( 'item_order', $edited_Item->order );
 
 		$creator_User = $edited_Item->get_creator_User();
 		$Form->hidden( 'item_owner_login', $creator_User->login );
@@ -141,7 +147,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 	elseif( !isset( $edited_Item->status ) )
 	{
-		$highest_publish_status = get_highest_publish_status( 'post', $Blog->ID, false );
+		$highest_publish_status = get_highest_publish_status( 'post', $Blog->ID, false, '', $edited_Item );
 		$edited_Item->set( 'status', $highest_publish_status );
 	}
 
@@ -264,7 +270,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 	{
 		// ################### VISIBILITY / SHARING ###################
 		// Get those statuses which are not allowed for the current User to create posts in this blog
-		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status ), array( 'trash' ) );
+		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status, '', $edited_Item ), array( 'trash' ) );
 		// Get allowed visibility statuses
 		$sharing_options = get_visibility_statuses( 'radio-options', $exclude_statuses );
 		if( count( $sharing_options ) == 1 )
@@ -317,46 +323,26 @@ if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
 	$Form->hidden( 'google_map_type', $edited_Item->get_setting( 'map_type' ) );
 }
 
-// ################### PROPERTIES ###################
-if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
-{ // Custom fields are hidden by otem type
-	display_hidden_custom_fields( $Form, $edited_Item );
-}
-else
-{ // Custom fields should be displayed
-	$custom_fields = $edited_Item->get_type_custom_fields();
+// ################### CUSTOM FIELDS ###################
+$custom_fields = $edited_Item->get_type_custom_fields();
+if( count( $custom_fields ) > 0 )
+{
+	$Form->begin_fieldset( T_('Additional fields') );
 
-	if( count( $custom_fields ) > 0 )
-	{
-		$Form->begin_fieldset( T_('Properties') );
+	$Form->switch_layout( 'table' );
+	$Form->labelstart = '<td class="right"><strong>';
+	$Form->labelend = '</strong></td>';
 
-		$Form->switch_layout( 'table' );
-		$Form->labelstart = '<td class="right"><strong>';
-		$Form->labelend = '</strong></td>';
+	echo $Form->formstart;
 
-		echo $Form->formstart;
+	// Display inputs to edit custom fields:
+	display_editable_custom_fields( $Form, $edited_Item );
 
-		foreach( $custom_fields as $field )
-		{ // Display each custom field
-			if( $field['type'] == 'varchar' )
-			{
-				$field_note = '';
-				$field_params = array( 'maxlength' => 255, 'style' => 'width:100%' );
-			}
-			else
-			{	// type == double
-				$field_note = T_('can be decimal');
-				$field_params = array();
-			}
-			$Form->text_input( 'item_'.$field['type'].'_'.$field['ID'], $edited_Item->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] ), 10, $field['label'], $field_note, $field_params );
-		}
+	echo $Form->formend;
 
-		echo $Form->formend;
+	$Form->switch_layout( NULL );
 
-		$Form->switch_layout( NULL );
-
-		$Form->end_fieldset();
-	}
+	$Form->end_fieldset();
 }
 
 if( $edited_Item->get_type_setting( 'allow_attachments' ) && $edited_Item->ID > 0 )

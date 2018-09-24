@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  *
@@ -162,7 +162,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			$output .= '<a href="'.regenerate_url( 'action,keyword', 'action=report&amp;keyword='
 				.rawurlencode( $row->askw_string ) ).'&amp;'.url_crumb( 'antispam' ).'" title="'.
 				T_('Report abuse to centralized ban blacklist!').'" class="btn btn-warning btn-xs">'.
-				T_('Report').'</a> ';
+				/* TRANS: Verb */ T_('Report').'</a> ';
 		}
 
 		$output .= '<a href="'.regenerate_url( 'action,keyword', 'action=ban&amp;keyword='

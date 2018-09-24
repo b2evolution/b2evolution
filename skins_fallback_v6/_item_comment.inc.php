@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -51,7 +51,10 @@ $Comment->get_Item();
 
 
 $Comment->anchor();
-echo $params['comment_start'];
+echo update_html_tag_attribs( $params['comment_start'], array(
+	'class' => 'vs_'.$Comment->status.( $Comment->is_meta() ? ' evo_comment__meta' : '' ), // Add style class for proper comment status
+	'id'    => 'comment_'.$Comment->ID // Add id to know what comment is used on AJAX status changing
+), array( 'id' => 'skip' ) );
 
 // Post title
 if( $params['comment_post_display'] )
@@ -159,12 +162,27 @@ echo $params['comment_text_after'];
 echo $params['comment_info_before'];
 
 $commented_Item = & $Comment->get_Item();
-$Comment->edit_link( '', '', '#', '#', 'permalink_right', '&amp;', true, $Comment->get_permanent_url() ); /* Link to backoffice for editing */
-$Comment->delete_link( '', '', '#', '#', 'permalink_right', false, '&amp;', true, false, '#', $commented_Item->get_permanent_url() ); /* Link to backoffice for deleting */
+$comment_redirect_url = $Comment->get_permanent_url();
 
+echo '<span class="pull-left">';
 $Comment->date(); echo ' @ '; $Comment->time( '#short_time' );
 $Comment->reply_link(); /* Link for replying to the Comment */
 $Comment->vote_helpful( '', '', '&amp;', true, true );
+echo '</span>';
+
+echo '<div class="action_btn_group">';
+	$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ).' comment_edit_btn', '&amp;', true, $comment_redirect_url ); /* Link for editing */
+	echo '<span class="'.button_class( 'group' ).'">';
+		$delete_button_is_displayed = is_logged_in() && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
+		$Comment->moderation_links( array(
+			'ajax_button' => true,
+			'class'       => button_class( 'text' ),
+			'redirect_to' => $comment_redirect_url,
+			'detect_last' => !$delete_button_is_displayed,
+		) );
+		$Comment->delete_link( '', '', '#', T_('Delete this reply'), button_class( 'text' ), false, '&amp;', true, false, '#', $commented_Item->get_permanent_url() ); /* Link to backoffice for deleting */
+	echo '</span>';
+echo '</div>';
 
 echo $params['comment_info_after'];
 

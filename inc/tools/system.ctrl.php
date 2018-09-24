@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package admin
@@ -17,6 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_funcs( 'tools/model/_system.funcs.php' );
 
 // Check minimum permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'view', true );
 
 if( $current_User->check_perm( 'options', 'edit' ) && system_check_charset_update() )
@@ -376,11 +377,10 @@ if( version_compare( $system_stats['php_version'], $required_php_version['applic
 {
 	disp_system_check( 'error', T_('This version is too old. b2evolution will not run correctly. You must ask your host to upgrade PHP before you can run b2evolution.') );
 }
-elseif( version_compare( $system_stats['php_version'], '5.2', '<' ) )
+elseif( version_compare( $system_stats['php_version'], '5.6', '<' ) )
 {
 	disp_system_check( 'warning', T_('This version is old. b2evolution may run but some features may fail. You should ask your host to upgrade PHP before running b2evolution.')
-		// Display a message about httpOnly for PHP < 5.2
-		.'<br />'.T_( 'PHP 5.2 or greater is recommended for maximum security, especially for "httpOnly" cookies support.' ) );
+		.'<br />'.T_( 'PHP 5.6 or greater is recommended for maximum security.' ) );
 }
 else
 {
@@ -399,38 +399,17 @@ else
 }
 
 
-// allow_url_include? (since 5.2, supercedes allow_url_fopen for require()/include())
-if( version_compare(PHP_VERSION, '5.2', '>=') )
+// allow_url_include? (since PHP 5.2, supercedes allow_url_fopen for require()/include())
+init_system_check( 'PHP allow_url_include', $system_stats['php_allow_url_include'] ?  T_('On') : T_('Off') );
+if( $system_stats['php_allow_url_include'] )
 {
-	init_system_check( 'PHP allow_url_include', $system_stats['php_allow_url_include'] ?  T_('On') : T_('Off') );
-	if( $system_stats['php_allow_url_include'] )
-	{
-		disp_system_check( 'warning', $facilitate_exploits.' '.sprintf( $change_ini, 'allow_url_include = Off' )  );
-	}
-	else
-	{
-		disp_system_check( 'ok' );
-	}
+	disp_system_check( 'warning', $facilitate_exploits.' '.sprintf( $change_ini, 'allow_url_include = Off' )  );
 }
 else
 {
-	/*
-	 * allow_url_fopen
-	 * Note: this allows including of remote files (PHP 4 only) as well as opening remote files with fopen() (all versions of PHP)
-	 * Both have potential for exploits. (The first is easier to exploit than the second).
-	 * dh> Should we check for curl etc then also and warn the user until there's no method for us anymore to open remote files?
-	 * fp> Yes
-	 */
-	init_system_check( 'PHP allow_url_fopen', $system_stats['php_allow_url_fopen'] ?  T_('On') : T_('Off') );
-	if( $system_stats['php_allow_url_fopen'] )
-	{
-		disp_system_check( 'warning', $facilitate_exploits.' '.sprintf( $change_ini, 'allow_url_fopen = Off' )  );
-	}
-	else
-	{
-		disp_system_check( 'ok' );
-	}
+	disp_system_check( 'ok' );
 }
+
 
 // Magic quotes:
 if( !strcasecmp( ini_get('magic_quotes_sybase'), 'on' ) )
@@ -485,13 +464,17 @@ else
 $memory_limit = system_check_memory_limit();
 if( empty($memory_limit) )
 {
-	init_system_check( 'PHP memory_limit', T_('n.a.') );
+	init_system_check( 'PHP memory_limit', /* TRANS: "Not Available" */ T_('N/A') );
 	disp_system_check( 'note' );
 }
 else
 {
-	init_system_check( 'PHP memory_limit', ini_get('memory_limit') );
-	if( $memory_limit < get_php_bytes_size( '256M' ) )
+	init_system_check( 'PHP memory_limit', $memory_limit == -1 ? T_('Unlimited') : ini_get('memory_limit') );
+	if( $memory_limit == -1 )
+	{
+		disp_system_check( 'ok' );
+	}
+	elseif( $memory_limit < get_php_bytes_size( '256M' ) )
 	{
 		disp_system_check( 'error', T_('The memory_limit is too low. Some features like image manipulation will fail to work.') );
 	}

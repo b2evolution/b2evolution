@@ -31,13 +31,14 @@ if( ! is_logged_in() )
 }
 
 $UserCache = & get_UserCache();
-if( empty( $user_ID ) )
-{
+if( empty( $user_ID ) || $user_ID !== $current_User->ID )
+{ // Users can only view their own visit profiles in the Front-office
 	$user_ID = $current_User->ID;
 }
 
 $viewed_User = & $UserCache->get_by_ID( $user_ID );
-$view_perm = $current_User->ID == $viewed_User->ID || $current_User->check_perm( 'users', 'view', false, $viewed_User );
+//$view_perm = $current_User->ID == $viewed_User->ID || $current_User->check_perm( 'users', 'view', false, $viewed_User );
+$view_perm = $current_User->ID == $viewed_User->ID;
 
 // Check if admin, moderator or user with 'view details' permission
 if( ! $view_perm )

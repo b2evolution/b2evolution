@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package htsrv
  */
@@ -389,7 +389,7 @@ if( $upload )
 		}
 
 		$message['warning'] = $warning;
-		$message['path'] = rawurlencode( $newFile->get_rdfp_rel_path() );
+		$message['path'] = $newFile->get_rdfp_rel_path();
 		$message['checkbox'] = '<span name="surround_check" class="checkbox_surround_init">'
 				.'<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"'
 				.' name="fm_selected[]" value="'.format_to_output( $newFile->get_rdfp_rel_path(), 'formvalue' ).'" id="cb_filename_u'.$newFile->ID.'" />'

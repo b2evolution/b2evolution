@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  *
@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $edited_Blog, $AdminUI, $Settings;
+global $edited_Blog, $AdminUI, $Settings, $admin_url;
 $notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 $Form = new Form( NULL, 'coll_features_checkchanges' );
@@ -30,6 +30,7 @@ $Form->hidden_ctrl();
 $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'features' );
 $Form->hidden( 'blog', $edited_Blog->ID );
+
 
 $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 
@@ -176,6 +177,8 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' ) );
 
+	$Form->checkbox( 'post_anonymous', $edited_Blog->get_setting( 'post_anonymous' ), T_('New posts by anonymous users'), T_('Check to allow anonymous users to create new posts (useful for Forums). NOTE: a user account will be automatically created when they post.') );
+
 	// Get max allowed visibility status:
 	$max_allowed_status = get_highest_publish_status( 'comment', $edited_Blog->ID, false );
 
@@ -195,13 +198,22 @@ $Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' 
 				'title_format'     => 'notes-string',
 				'exclude_statuses' => $exclude_statuses,
 			) );
-		$Form->info( T_('Default status'), $default_status_field, T_('Default status for new posts') );
+		$Form->info( T_('Default status for new posts in backoffice'), $default_status_field, T_('Typically Draft if you want to make sure you don\'t publish by mistake.') );
 		$Form->hidden( 'default_post_status', $edited_Blog->get_setting('default_post_status') );
+		$default_status_field_anon = get_status_dropdown_button( array(
+				'name'             => 'default_post_status_anon',
+				'value'            => $edited_Blog->get_setting( 'default_post_status_anon' ),
+				'title_format'     => 'notes-string',
+				'exclude_statuses' => $exclude_statuses,
+			) );
+		$Form->info( T_('Default status for new anonymous posts'), $default_status_field_anon, T_('Typically Review if you want to prevent Spam.') );
+		$Form->hidden( 'default_post_status_anon', $edited_Blog->get_setting( 'default_post_status_anon' ) );
 		echo_form_dropdown_js();
 	}
 	else
 	{	// Use standard select element for other skins:
-		$Form->select_input_array( 'default_post_status', $edited_Blog->get_setting('default_post_status'), get_visibility_statuses( 'notes-string', $exclude_statuses ), T_('Default status'), T_('Default status for new posts') );
+		$Form->select_input_array( 'default_post_status', $edited_Blog->get_setting( 'default_post_status' ), get_visibility_statuses( 'notes-string', $exclude_statuses ), T_('Default status for new posts in backoffice'), T_('Typically Draft if you want to make sure you don\'t publish by mistake.') );
+		$Form->select_input_array( 'default_post_status_anon', $edited_Blog->get_setting( 'default_post_status_anon' ), get_visibility_statuses( 'notes-string', $exclude_statuses ), T_('Default status for new anonymous posts'), T_('Typically Review if you want to prevent Spam.') );
 	}
 
 	// Moderation statuses setting:
@@ -278,12 +290,39 @@ $Form->end_fieldset();
 if( $notifications_mode != 'off' )
 {
 	$Form->begin_fieldset( T_('Subscriptions').get_manual_link( 'item-subscriptions' ) );
-		$Form->checkbox( 'allow_subscriptions', $edited_Blog->get_setting( 'allow_subscriptions' ), T_('Email subscriptions'), T_('Allow users to subscribe and receive email notifications for each new post.') );
-		$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), '', T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
+		$Form->checklist( array(
+				array( 'allow_subscriptions', 1, T_('Allow users to subscribe and receive email notifications for each new post.'), $edited_Blog->get_setting( 'allow_subscriptions' ) ),
+				array( 'allow_item_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ), $edited_Blog->get_setting( 'allow_item_subscriptions' ) ),
+				array( 'allow_item_mod_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications when post is modified and user has permission to moderate it.' ), $edited_Blog->get_setting( 'allow_item_mod_subscriptions' ) ),
+			), 'allow_coll_subscriptions', T_('Email subscriptions') );
 	$Form->end_fieldset();
 }
 
+$Form->begin_fieldset( T_('Aggregation').get_admin_badge().get_manual_link('collection_aggregation_settings') );
+	$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Collections to aggregate'), T_('List collection IDs separated by \',\', \'*\' for all collections or leave empty for current collection.').'<br />'.T_('Note: Current collection is always part of the aggregation.'), 255 );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Workflow').get_manual_link( 'coll-workflow-settings' ) );
+
+	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
+
+	$Form->checkbox( 'blog_use_deadline', $edited_Blog->get_setting( 'use_deadline' ), T_('Options'), T_('Use deadline.'), '', 1, ! $edited_Blog->get_setting( 'use_workflow' ) );
+
+$Form->end_fieldset();
+
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+
+
+echo '<div class="well">';
+echo '<p>'.sprintf( T_('You can find more settings in the <a %s>Post Types</a>, including:'), 'href="'.$admin_url.'?blog='.$edited_Blog->ID.'&amp;ctrl=itemtypes&amp;ityp_ID='.$edited_Blog->get_setting( 'default_post_type' ).'&amp;action=edit"' ).'</p>';
+echo '<ul>';
+echo '<li>'.T_('Display instructions').'</li>';
+echo '<li>'.T_('Use title').', '.T_('Use text').', '.T_('Allow HTML').'...</li>';
+echo '<li>'.T_('Use of Advanced Properties').' ('.T_('Tags').', '.T_('Excerpt').'...)</li>';
+echo '<li>'.T_('Use of Location').'</li>';
+echo '<li>'.T_('Use of Custom Fields').'</li>';
+echo '</ul>';
+echo '</div>';
 
 ?>
 <script type="text/javascript">
@@ -355,4 +394,9 @@ function disable_selected_orderby_options()
 		}
 	} );
 }
+
+jQuery( 'input[name=blog_use_workflow]' ).click( function()
+{	// Disable setting "Use deadline" when setting "Use workflow" is unchecked:
+	jQuery( 'input[name=blog_use_deadline]' ).prop( 'disabled', ! jQuery( this ).is( ':checked' ) );
+} );
 </script>

@@ -76,8 +76,7 @@ input#nav-trigger {
 }
 
 .nav-trigger + .sitewide_header_menu_wrapper {
-	-webkit-transition: max-height 0.5s ease-in-out;
-	        transition: max-height 0.5s ease-in-out;
+	transition: max-height 0.5s ease-in-out;
 }
 
 .sitewide_header,
@@ -216,8 +215,7 @@ a.swhead_sitename.swhead_logo img {
 	text-decoration: underline;
 	background: none;
 	text-shadow: none;
-	-webkit-filter: none;
-	        filter: none;
+	filter: none;
 }
 .sitewide_header a.swhead_item.swhead_item_white, .sitewide_header_menu a.swhead_item_white {
 	background: #FFF;

@@ -80,10 +80,12 @@ else
 		if( jQuery( this ).val() == 'list' )
 		{
 			jQuery( '#div_ufdf_options' ).show();
+			jQuery( '#ufdf_options' ).attr( 'required', 'required' );
 		}
 		else
 		{
 			jQuery( '#div_ufdf_options' ).hide();
+			jQuery( '#ufdf_options' ).removeAttr( 'required' );
 		}
 		// Suggest values only for field type with "Single word"
 		if( jQuery( this ).val() == 'word' )

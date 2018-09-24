@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -133,7 +133,7 @@ while( $Item = & $ItemList->get_item() )
 		}
 		?>">
 			<?php
-				echo '<div class="pull-right">';
+				echo '<div class="pull-right text-right">';
 				$Item->permanent_link( array(
 						'before' => '',
 						'text'   => get_icon( 'permalink' ).' '.T_('Permalink'),
@@ -149,10 +149,28 @@ while( $Item = & $ItemList->get_item() )
 					echo '&nbsp;'.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
 						NULL, NULL, NULL, array( 'class' => 'small' ) );
 				}
-				If( !empty( $Item->order ) )
+				$order_cat_ID = ( isset( $ItemList->filters['cat_array'] ) && count ( $ItemList->filters['cat_array'] ) == 1 ) ? $ItemList->filters['cat_array'][0] : NULL;
+				$item_order = $Item->get_order( $order_cat_ID );
+				if( $item_order !== NULL )
 				{
-					echo T_('Order').': '.$Item->order;
+					echo T_('Order').': '.$item_order;
 				}
+				echo '<br>';
+				echo T_('Item ID').': '.$Item->ID;
+				if( $parent_Item = $Item->get_parent_Item() )
+				{	// Display parent ID if the Item has it:
+					echo ' &middot; '.T_('Parent ID').': ';
+					if( $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $parent_Item ) )
+					{	// Display parent ID as link to view the parent post if current user has a permission:
+						echo '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$parent_Item->get_blog_ID().'&amp;p='.$parent_Item->ID.'" title="'.$parent_Item->dget( 'title', 'htmlattr' ).'">'.$parent_Item->ID.'</a>';
+					}
+					else
+					{	// Display parent ID as text if current user has a permission to view the parent post:
+						echo $parent_Item->ID;
+					}
+				}
+				echo '<br>';
+				echo $Item->get( 'locale' ).' ';
 				$Item->locale_flag( array(' class' => 'flagtop' ) );
 				echo '</div>';
 
@@ -171,6 +189,10 @@ while( $Item = & $ItemList->get_item() )
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 				echo ' ', T_('by'), ' ', $Item->creator_User->get_identity_link( array( 'link_text' => 'name' ) );
 
+				// Last modified date:
+				echo ' <span class="text-nowrap">&middot; '.T_('Last modified').': '
+					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'datemodified' ) ).'</span>';
+
 				// Last touched date:
 				echo ' <span class="text-nowrap">&middot; '.T_('Last touched').': '
 					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'last_touched_ts' ) ).'</span>';
@@ -178,7 +200,12 @@ while( $Item = & $ItemList->get_item() )
 				// Contents updated date:
 				echo ' <span class="text-nowrap">&middot; '.T_('Contents updated').': '
 					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'contents_last_updated_ts' ) )
-					.$Item->get_refresh_contents_last_updated_link().'</span>';
+					.$Item->get_refresh_contents_last_updated_link()
+					.$Item->get_refresh_contents_last_updated_link( array(
+							'title' => T_('Reset the "contents last updated" date to the date of the latest reply on this thread'),
+							'type'  => 'created',
+						) )
+					.'</span>';
 
 				echo '<br />';
 				$Item->type( T_('Type').': <span class="bType">', '</span> &nbsp; ' );
@@ -188,7 +215,7 @@ while( $Item = & $ItemList->get_item() )
 					$Item->priority( T_('Priority').': <span class="bPriority">', '</span> &nbsp; ' );
 					$Item->assigned_to( T_('Assigned to').': <span class="bAssignee">', '</span> &nbsp; ' );
 					$Item->extra_status( T_('Task Status').': <span class="bExtStatus">', '</span> &nbsp; ' );
-					if( ! empty( $Item->datedeadline ) )
+					if( $Blog->get_setting( 'use_deadline' ) && ! empty( $Item->datedeadline ) )
 					{ // Display deadline date
 						echo T_('Deadline').': <span class="bDate">';
 						$Item->deadline_date();
@@ -258,6 +285,16 @@ while( $Item = & $ItemList->get_item() )
 							'after_image_legend'  => '</figcaption>',
 							'after_image'         => '</figure>',
 							'image_size'          => 'fit-320x320',
+							'before_gallery'      => '<div class="evo_post_gallery">',
+							'after_gallery'       => '</div>',
+							'gallery_table_start' => '',
+							'gallery_table_end'   => '',
+							'gallery_row_start'   => '',
+							'gallery_row_end'     => '',
+							'gallery_cell_start'  => '<div class="evo_post_gallery__image">',
+							'gallery_cell_end'    => '</div>',
+							'gallery_image_limit' => 1000,
+							'gallery_link_rel'    => 'lightbox[p'.$Item->ID.']',
 						) );
 					$Item->more_link();
 					$Item->content_extension( array(
@@ -309,7 +346,7 @@ while( $Item = & $ItemList->get_item() )
 			if( $Blog->get_setting( 'allow_comments' ) != 'never' )
 			{
 				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'#comments" class="'.button_class( 'text' ).'">';
-				$comments_number = generic_ctp_number( $Item->ID, 'comments', 'total' );
+				$comments_number = generic_ctp_number( $Item->ID, 'comments', 'total', true );
 				echo get_icon( $comments_number > 0 ? 'comments' : 'nocomment' ).' ';
 				// TRANS: Link to comments for current post
 				comments_number( T_('no comment'), T_('1 comment'), T_('%d comments'), $Item->ID );
@@ -417,11 +454,11 @@ while( $Item = & $ItemList->get_item() )
 			if( $Item->can_see_meta_comments() )
 			{ // Display tabs to switch between user and meta comments Only if current user can views meta comments
 				$switch_comment_type_url = $admin_url.'?ctrl=items&amp;blog='.$blog.'&amp;p='.$Item->ID;
-				$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
+				$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total', true );
 				$switch_comment_type_tabs = array(
 						'feedback' => array(
 							'url'   => $switch_comment_type_url.'&amp;comment_type=feedback#comments',
-							'title' => T_('User comments').' <span class="badge">'.generic_ctp_number( $Item->ID, 'feedbacks', 'total' ).'</span>' ),
+							'title' => T_('User comments').' <span class="badge">'.generic_ctp_number( $Item->ID, 'feedbacks', 'total', true ).'</span>' ),
 						'meta' => array(
 							'url'   => $switch_comment_type_url.'&amp;comment_type=meta#comments',
 							'title' => T_('Meta discussion').' <span class="badge'.( $metas_count > 0 ? ' badge-important' : '' ).'">'.$metas_count.'</span>' )
@@ -443,8 +480,8 @@ while( $Item = & $ItemList->get_item() )
 			$comment_moderation_statuses = explode( ',', $Blog->get_setting( 'moderation_statuses' ) );
 
 			$currentpage = param( 'currentpage', 'integer', 1 );
-			$total_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), 'total' );
-			$moderation_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), $comment_moderation_statuses );
+			$total_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), 'total', true );
+			$moderation_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), $comment_moderation_statuses, true );
 			// Decide to show all comments, or only which require moderation:
 			if( ( $comment_type != 'meta' ) && // Display all comments in meta mode by default
 			    ( $total_comments_number > 5 && $moderation_comments_number > 0 ) )
@@ -679,7 +716,7 @@ while( $Item = & $ItemList->get_item() )
 					'setting_name' => 'coll_apply_comment_rendering'
 				) ) );
 
-			$preview_text = ( $Item->can_attach() ) ? T_('Preview/Add file') : T_('Preview');
+			$preview_text = ( $Item->can_attach() ) ? T_('Preview/Add file') : /* TRANS: Verb */ T_('Preview');
 			$Form->buttons_input( array(
 					array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview btn-info', 'value' => $preview_text ),
 					array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit SaveButton', 'value' => T_('Send comment') )
@@ -779,7 +816,18 @@ while( $Item = & $ItemList->get_item() )
 				$ItemStatusCache->load_all();
 				$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $Item->pst_ID, true ), T_('Task status') );
 
-				$Form->date( 'item_deadline', $Item->get('datedeadline'), T_('Deadline') );
+				if( $Blog->get_setting( 'use_deadline' ) )
+				{	// Display deadline fields only if it is enabled for collection:
+					$Form->begin_line( T_('Deadline'), 'item_deadline' );
+
+						$datedeadline = $Item->get( 'datedeadline' );
+						$Form->date( 'item_deadline', $datedeadline, '' );
+
+						$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
+						$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
+
+					$Form->end_line();
+				}
 
 				$Form->button( array( 'submit', 'actionArray[update_workflow]', T_('Update'), 'SaveButton' ) );
 

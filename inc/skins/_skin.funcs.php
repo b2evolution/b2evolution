@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -77,6 +77,14 @@ function skin_init( $disp )
 	}
 
 	$Debuglog->add('skin_init: $disp='.$disp, 'skins' );
+
+	if( in_array( $disp, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish', 'visits', 'closeaccount' ) ) &&
+	    $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) &&
+	    $Blog->ID != $msg_Blog->ID )
+	{	// Redirect to collection which should be used for profile/messaging pages:
+		header_redirect( $msg_Blog->get( $disp.'url', array( 'glue' => '&' ) ) );
+		// Exit here.
+	}
 
 	// This is the main template; it may be used to display very different things.
 	// Do inits depending on current $disp:
@@ -169,33 +177,6 @@ function skin_init( $disp )
 				$Item->check_goal();
 			}
 
-			// Check if the post has 'redirected' status:
-			if( ! $preview && $Item->status == 'redirected' && $redir == 'yes' )
-			{	// $redir=no here allows to force a 'single post' URL for commenting
-				// Redirect to the URL specified in the post:
-				$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'].' );
-				header_redirect( $Item->url, true, true );
-			}
-
-			// Check if the post has 'deprecated' status:
-			if( isset( $Item->status ) && $Item->status == 'deprecated' )
-			{ // If the post is deprecated
-				global $disp;
-				$disp = '404';
-				$disp_detail = '404-deprecated-post' ;
-				break;
-			}
-
-			// Check if the post has allowed front office statuses
-			$allowed_statuses = get_inskin_statuses( $Blog->ID, 'post' );
-			if( ! $preview && ! in_array( $Item->status, $allowed_statuses ) )
-			{
-				global $disp;
-				$disp = '404';
-				$disp_detail = '404-disallowed-post-status';
-				break;
-			}
-
 			// Check if we want to redirect to a canonical URL for the post
 			// Please document encountered problems.
 			if( ! $preview
@@ -213,7 +194,7 @@ function skin_init( $disp )
 					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
 				}
 
-				if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+				if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 				{	// The requested URL does not look like the canonical URL for this post...
 					// url difference was resolved
 					$url_resolved = false;
@@ -231,7 +212,7 @@ function skin_init( $disp )
 								$MainList->nav_target = $cat_param[1];
 							}
 						}
-						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get( 'http_protocol' ) != 'always_redirect' );
+						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 					}
 					if( preg_match( '|[&?]tag=([^&A-Z]+)|', $ReqURI, $tag_param ) )
 					{ // A tag post navigation param is set
@@ -246,7 +227,7 @@ function skin_init( $disp )
 								$MainList->nav_target = $tag_param[1];
 							}
 						}
-						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get( 'http_protocol' ) != 'always_redirect' );
+						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 					}
 
 					if( !$url_resolved && $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' && ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) ) )
@@ -367,7 +348,7 @@ function skin_init( $disp )
 								}
 
 								$canonical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
-								if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+								if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 								{	// fp> TODO: we're going to lose the additional params, it would be better to keep them...
 									// fp> what additional params actually?
 									if( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
@@ -408,7 +389,7 @@ function skin_init( $disp )
 							|| $Blog->get_setting( 'relcanonical_tag_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
-						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{
 							if( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
 							{	// REDIRECT TO THE CANONICAL URL:
@@ -437,7 +418,7 @@ function skin_init( $disp )
 							|| $Blog->get_setting( 'relcanonical_archive_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w, '&', $MainList->get_active_filter('page') );
-						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{
 							if( $Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
 							{	// REDIRECT TO THE CANONICAL URL:
@@ -525,6 +506,7 @@ function skin_init( $disp )
 			$comment_id = param( 'comment_id', 'integer', 0, true );
 			$post_id = param( 'post_id', 'integer', 0, true );
 			$subject = param( 'subject', 'string', '' );
+			$redirect_to = param( 'redirect_to', 'url', regenerate_url(), true, true );
 
 			// try to init recipient_User
 			if( !empty( $recipient_id ) )
@@ -566,15 +548,10 @@ function skin_init( $disp )
 
 				if( $allow_msgform == 'login' )
 				{ // user must login first to be able to send a message to this User
-					$disp = 'login';
-					param( 'action', 'string', 'req_login' );
-					// override redirect to param
-					$redirect_to = param( 'redirect_to', 'url', regenerate_url(), true, true );
-					if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && $Blog->ID != $msg_Blog->ID )
-					{ // Redirect to special blog for messaging actions if it is defined in general settings
-						header_redirect( url_add_param( $msg_Blog->get( 'msgformurl', array( 'glue' => '&' ) ), 'redirect_to='.rawurlencode( $redirect_to ), '&' ) );
-					}
-					$Messages->add( T_( 'You must log in before you can contact this user' ) );
+					$Messages->add( sprintf( T_( 'You must log in before you can contact "%s".' ), $recipient_User->get( 'login' ) ) );
+					// Redirect to special blog for login actions:
+					header_redirect( url_add_param( $Blog->get( 'loginurl', array( 'glue' => '&' ) ), 'redirect_to='.rawurlencode( $redirect_to ), '&' ) );
+					// Exit here.
 				}
 				elseif( ( $allow_msgform == 'PM' ) && check_user_status( 'can_be_validated' ) )
 				{ // user is not activated
@@ -598,42 +575,6 @@ function skin_init( $disp )
 					{
 						$Messages->add( T_( 'You cannot send a private message to yourself. However you can send yourself an email if you\'d like.' ), 'warning' );
 					}
-					else
-					{
-						$Messages->add( sprintf( T_( 'You cannot send a private message to %s. However you can send them an email if you\'d like.' ), $recipient_User->get( 'login' ) ), 'warning' );
-					}
-				}
-				elseif( ( $msg_type != 'email' ) && ( $allow_msgform == 'PM' ) )
-				{ // private message form should be displayed, change display to create new individual thread with the given recipient user
-					// check if creating new PM is allowed
-					if( check_create_thread_limit( true ) )
-					{ // thread limit reached
-						header_redirect();
-						// exited here
-					}
-
-					global $edited_Thread, $edited_Message, $recipients_selected;
-
-					// Load classes
-					load_class( 'messaging/model/_thread.class.php', 'Thread' );
-					load_class( 'messaging/model/_message.class.php', 'Message' );
-
-					// Set global variable to auto define the FB autocomplete plugin field
-					$recipients_selected = array( array(
-							'id'    => $recipient_User->ID,
-							'login' => $recipient_User->login,
-							'fullname' => $recipient_User->get_username()
-						) );
-
-					init_tokeninput_js( 'blog' );
-
-					$disp = 'threads';
-					$edited_Thread = new Thread();
-					$edited_Message = new Message();
-					$edited_Message->Thread = & $edited_Thread;
-					$edited_Thread->recipients = $recipient_User->login;
-					param( 'action', 'string', 'new', true );
-					param( 'thrdtype', 'string', 'individual', true );
 				}
 
 				if( $allow_msgform == 'email' )
@@ -653,9 +594,8 @@ function skin_init( $disp )
 					$Messages->add( T_( 'This commentator does not want to get contacted through the message form.' ), 'error' );
 				}
 
-				$blogurl = $Blog->gen_blogurl();
 				// If it was a front page request or the front page is set to 'msgform' then we must not redirect to the front page because it is forbidden for the current User
-				$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'msgform' ) ) ? url_add_param( $blogurl, 'disp=403', '&' ) : $blogurl;
+				$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'msgform' ) ) ? url_add_param( $Blog->gen_blogurl(), 'disp=403', '&' ) : $redirect_to;
 				header_redirect( $redirect_to, 302 );
 				// exited here
 			}
@@ -1082,7 +1022,18 @@ function skin_init( $disp )
 			break;
 
 		case 'access_requires_login':
+		case 'content_requires_login':
 			global $login_mode;
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
+			if( is_logged_in() )
+			{	// Don't display this page for already logged in user:
+				global $Blog;
+				header_redirect( $Blog->get( 'url' ) );
+				// Exit here.
+			}
 
 			if( $Settings->get( 'http_auth_require' ) && ! isset( $_SERVER['PHP_AUTH_USER'] ) )
 			{	// Require HTTP authentication:
@@ -1094,10 +1045,19 @@ function skin_init( $disp )
 			{	// Display this error if user already tried to log in by HTTP basic authentication and it was failed:
 				$Messages->add( T_('Wrong Login/Password provided by browser (HTTP Auth).'), 'error' );
 			}
+
+			if( $disp == 'content_requires_login' )
+			{	// Set default details for this disp:
+				$disp_detail = '403-item-requires-login';
+			}
 			break;
 
 		case 'login':
+			// Log in form:
 			global $Plugins, $login_mode;
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
 
 			if( is_logged_in() )
 			{ // User is already logged in
@@ -1140,6 +1100,11 @@ function skin_init( $disp )
 			break;
 
 		case 'register':
+			// Register form:
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
 			if( is_logged_in() )
 			{ // If user is logged in the register form should not be displayed. In this case redirect to the blog home page.
 				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
@@ -1154,12 +1119,32 @@ function skin_init( $disp )
 			$seo_page_type = 'Register form';
 			$robots_index = false;
 
-			// Check invitation code if it exists and registration is enabled
-			global $display_invitation;
-			$display_invitation = check_invitation_code();
+			$comment_ID = param( 'comment_ID', 'integer', 0 );
+			if( $comment_ID > 0 )
+			{	// Suggestion to register for anonymous user:
+				$CommentCache = & get_CommentCache();
+				$Comment = & $CommentCache->get_by_ID( $comment_ID, false, false );
+				if( $Comment && $Comment->get( 'author_email' ) !== '' )
+				{	// If comment is really from anonymous user:
+					// Display info message:
+					$Messages->add( T_('In order to manage all the comments you posted, please create a user account with the same email address.'), 'note' );
+					// Prefill the registration form with data from anonymous comment:
+					global $dummy_fields;
+					set_param( $dummy_fields['email'], $Comment->get( 'author_email' ) );
+					set_param( $dummy_fields['login'], $Comment->get( 'author' ) );
+					set_param( 'firstname', $Comment->get( 'author' ) );
+					$comment_Item = & $Comment->get_Item();
+					set_param( 'locale', $comment_Item->get( 'locale' ) );
+				}
+			}
 			break;
 
 		case 'lostpassword':
+			// Lost password form:
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
 			if( is_logged_in() )
 			{ // If user is logged in the lost password form should not be displayed. In this case redirect to the blog home page.
 				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
@@ -1176,6 +1161,11 @@ function skin_init( $disp )
 			break;
 
 		case 'activateinfo':
+			// Activate info page:
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
 			if( !is_logged_in() )
 			{ // Redirect to the login page for anonymous users
 				$Messages->add( T_( 'You must log in before you can activate your account.' ) );
@@ -1235,9 +1225,15 @@ function skin_init( $disp )
 					set_param( 'action', '' );
 				}
 			}
+		case 'register_finish':
 		case 'pwdchange':
 		case 'userprefs':
 		case 'subs':
+			if( $disp == 'pwdchange' || $disp == 'register_finish' )
+			{	// Check and redirect if current URL must be used as https instead of http:
+				check_https_url( 'login' );
+			}
+
 			$seo_page_type = 'Special feature page';
 			if( $Blog->get_setting( 'special_noindex' ) )
 			{	// We prefer robots not to index these pages:
@@ -1246,6 +1242,14 @@ function skin_init( $disp )
 
 			// Display messages depending on user email status
 			display_user_email_status_message();
+
+			global $current_User, $demo_mode;
+			if( $demo_mode && ( $current_User->ID <= 7 ) )
+			{	// Demo mode restrictions: users created by install process cannot be edited:
+				$Messages->add( T_('You cannot edit the admin and demo users profile in demo mode!'), 'error' );
+				// Set action to 'view' in order to switch all form input elements to read mode:
+				set_param( 'action', 'view' );
+			}
 			break;
 
 		case 'users':
@@ -1273,6 +1277,32 @@ function skin_init( $disp )
 			$UserList->load_from_Request();
 
 			$seo_page_type = 'User display';
+			break;
+
+		case 'anonpost':
+			// New item form for anonymous user:
+			if( is_logged_in() )
+			{	// The logged in user has another page to create a post:
+				header_redirect( url_add_param( $Blog->get( 'url', array( 'glue' => '&' ) ), 'disp=edit', '&' ), 302 );
+				// will have exited
+			}
+			elseif( ! $Blog->get_setting( 'post_anonymous' ) )
+			{	// Redirect to the login page if current collection doesn't allow to post by anonymous user:
+				$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit' );
+				$Messages->add( T_( 'You must log in to create & edit posts.' ) );
+				header_redirect( get_login_url( 'cannot create posts', $redirect_to ), 302 );
+				// will have exited
+			}
+
+			// Check if the requested category can be used for new post on the current collection:
+			$ChapterCache = & get_ChapterCache();
+			$Chapter = & $ChapterCache->get_by_ID( param( 'cat', 'integer' ), false, false );
+			if( ! $Chapter || // Not found
+			    $Chapter->get( 'blog_ID' ) != $Blog->ID || // Category from another collection
+			    $Chapter->get( 'meta' ) ) // Meta category cannot be used as post category
+			{	// Use default category instead of the wrong requested:
+				set_param( 'cat', $Blog->get_default_cat_ID() );
+			}
 			break;
 
 		case 'edit':
@@ -1480,15 +1510,21 @@ function skin_init( $disp )
 			break;
 
 		case 'closeaccount':
-			global $current_User;
-			if( ! $Settings->get( 'account_close_enabled' ) ||
-			    ( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) ) ||
-			    ( ! is_logged_in() && ! $Session->get( 'account_closing_success' ) ) )
-			{ // If an account closing page is disabled - Display 404 page with error message
-			  // Don't allow admins close own accounts from front office
-			  // Don't display this message for not logged in users, except of one case to display a bye message after account closing
-				global $disp;
-				$disp = '404';
+			global $current_User, $disp;
+			if( ! $Settings->get( 'account_close_enabled' ) )
+			{	// If an account closing page is disabled - Display 404 page with error message:
+				$disp = is_logged_in() ? 'profile' : 'login';
+				$Messages->add( T_('The account closing feature is disabled.'), 'error' );
+			}
+			elseif( ! is_logged_in() && ! $Session->get( 'account_closing_success' ) )
+			{	// Don't display this message for not logged in users, except of one case to display a bye message after account closing:
+				$disp = 'login';
+				$Messages->add( T_('You must log in before you can close your account.'), 'error' );
+			}
+			elseif( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
+			{	// Don't allow admins close own accounts from front office:
+				$disp = 'profile';
+				$Messages->add( T_('You have user moderation privileges. In order to prevent mistakes, you cannot close your own account. Please ask the admin (or another admin) to remove your user moderation privileges before closing your account.'), 'error' );
 			}
 			elseif( $Session->get( 'account_close_reason' ) )
 			{
@@ -1514,6 +1550,21 @@ function skin_init( $disp )
 			if( $Blog->get_setting( $disp.'_noindex' ) )
 			{	// We prefer robots not to index these pages:
 				$robots_index = false;
+			}
+			break;
+
+		case 'compare':
+			$items = trim( param( 'items', '/^[\d,]*$/' ), ',' );
+			if( ! empty( $items ) )
+			{	// Check if at least one item exist in DB:
+				$ItemCache = & get_ItemCache();
+				$items = $ItemCache->load_list( explode( ',', $items ) );
+			}
+			if( empty( $items ) )
+			{	// Display 404 page when no items to compare:
+				global $disp;
+				$disp = '404';
+				$Messages->add( T_('The requested items don\'t exist.'), 'error' );
 			}
 			break;
 	}
@@ -1706,7 +1757,9 @@ function skin_include( $template_name, $params = array() )
 				'disp_404'                   => '_404_not_found.disp.php',
 				'disp_access_denied'         => '_access_denied.disp.php',
 				'disp_access_requires_login' => '_access_requires_login.disp.php',
+				'disp_content_requires_login'=> '_content_requires_login.disp.php',
 				'disp_activateinfo'          => '_activateinfo.disp.php',
+				'disp_anonpost'              => '_anonpost.disp.php',
 				'disp_arcdir'                => '_arcdir.disp.php',
 				'disp_catdir'                => '_catdir.disp.php',
 				'disp_closeaccount'          => '_closeaccount.disp.php',
@@ -1732,6 +1785,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_pwdchange'             => '_profile.disp.php',
 				'disp_userprefs'             => '_profile.disp.php',
 				'disp_subs'                  => '_profile.disp.php',
+				'disp_register_finish'       => '_profile.disp.php',
 				'disp_visits'                => '_visits.disp.php',
 				'disp_register'              => '_register.disp.php',
 				'disp_search'                => '_search.disp.php',
@@ -1745,6 +1799,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_useritems'             => '_useritems.disp.php',
 				'disp_usercomments'          => '_usercomments.disp.php',
 				'disp_users'                 => '_users.disp.php',
+				'disp_compare'               => '_compare.disp.php',
 			);
 
 		// Add plugin disp handlers:
@@ -2198,6 +2253,18 @@ function skin_opengraph_tags()
 			echo '<meta property="og:url" content="'.format_to_output( $Item->get_url( 'public_view' ), 'htmlattr' )."\" />\n";
 			echo '<meta property="og:description" content="'.format_to_output( $Item->get_excerpt2(), 'htmlattr' )."\" />\n";
 			echo '<meta property="og:site_name" content="'.format_to_output( $Item->get_Blog()->get( 'name' ), 'htmlattr' )."\" />\n";
+
+			if( $Item->get_type_setting( 'use_coordinates' ) != 'never' )
+			{
+				if( $latitude = $Item->get_setting( 'latitude' ) )
+				{
+					echo '<meta property="og:latitude" content="'.$latitude."\" />\n";
+				}
+				if( $longitude = $Item->get_setting( 'longitude' ) )
+				{
+					echo '<meta property="og:latitude" content="'.$longitude."\" />\n";
+				}
+			}
 			break;
 
 		case 'posts':
@@ -2210,18 +2277,18 @@ function skin_opengraph_tags()
 					echo '<meta property="og:url" content="'.format_to_output( $intro_Item->get_url( 'public_view' ), 'htmlattr' )."\" />\n";
 					echo '<meta property="og:description" content="'.format_to_output( $intro_Item->get_excerpt2(), 'htmlattr' )."\" />\n";
 					echo '<meta property="og:site_name" content="'.format_to_output( $intro_Item->get_Blog()->get( 'name' ), 'htmlattr' )."\" />\n";
+					break;
 				}
 			}
-			break;
 
 		default:
-			/*
-			echo '<meta property="og:title" content="'.format_to_output( $Blog->name, 'htmlattr' )."\" />\n";
-			echo '<meta property="og:url" content="'.format_to_output( $Blog->get( 'url' ), 'htmlattr' )."\" />\n";
-			echo '<meta property="og:description" content="'.format_to_output( $Blog->longdesc, 'htmlattr' )."\" />\n";
-			echo '<meta property="og:site_name" content="'.format_to_output( $Blog->get( 'name' ), 'htmlattr' )."\" />\n";
-			*/
-			return;
+			if( $Blog )
+			{
+				echo '<meta property="og:title" content="'.format_to_output( $Blog->name, 'htmlattr' )."\" />\n";
+				echo '<meta property="og:url" content="'.format_to_output( $Blog->get( 'url' ), 'htmlattr' )."\" />\n";
+				echo '<meta property="og:description" content="'.format_to_output( $Blog->longdesc, 'htmlattr' )."\" />\n";
+				echo '<meta property="og:site_name" content="'.format_to_output( $Blog->get( 'name' ), 'htmlattr' )."\" />\n";
+			}
 	}
 
 	$og_image_File = get_social_tag_image_file( $disp );
@@ -2299,13 +2366,11 @@ function skin_twitter_tags()
 			break;
 
 		default:
-			/*
 			if( ! isset( $open_tags_enabled ) )
 			{
 				echo '<meta property="twitter:title" content="'.format_to_output( $Blog->name, 'htmlattr' )."\" />\n";
 				echo '<meta property="twitter:description" content="'.format_to_output( $Blog->longdesc, 'htmlattr' )."\" />\n";
 			}
-			*/
 			return;
 	}
 
@@ -2575,7 +2640,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 
 	if( !$skin_ID )
 	{ // The skin ID is empty use the same as normal skin ID
-		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as normal skin').'.</div>';
+		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as standard skin').'.</div>';
 	}
 	else
 	{
@@ -2601,7 +2666,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 		// Skin type
 		echo '<div class="skin_setting_row">';
 			echo '<label>'.T_('Skin type').':</label>';
-			echo '<span>'.$edited_Skin->type.'</span>';
+			echo '<span>'.get_skin_type_title( $edited_Skin->type ).'</span>';
 		echo '</div>';
 
 		// Containers
@@ -2756,6 +2821,12 @@ function skin_body_attrs( $params = array() )
 }
 
 
+/**
+ * Get a skin's version
+ *
+ * @param Integer skin's ID
+ * @return String skin's version
+ */
 function get_skin_version( $skin_ID )
 {
 	$SkinCache = & get_SkinCache();
@@ -2767,5 +2838,60 @@ function get_skin_version( $skin_ID )
 	}
 
 	return 'unknown';
+}
+
+
+/**
+ * Get a skins base skin and version
+ *
+ * @param String skin name (directory name)
+ * @return Array of base skin and version
+ */
+function get_skin_folder_base_version( $skin_folder )
+{
+	preg_match( '/-((\d+\.)?(\d+\.)?(\*|\d+))$/', $skin_folder, $matches );
+	if( ! empty( $matches ) )
+	{
+		$base_skin = substr( $skin_folder, 0, strlen( $matches[0] ) * -1 );
+		$skin_version = isset( $matches[2] ) ? $matches[1] : 0;
+	}
+	else
+	{
+		$base_skin = $skin_folder;
+		$skin_version = 0;
+	}
+
+	return array( $base_skin, $skin_version );
+}
+
+
+/**
+ * Get skin types
+ *
+ * @return array
+ */
+function get_skin_types()
+{
+	return array(
+		'normal'  => array( T_('Standard'), T_('Standard skin for general browsing') ),
+		'mobile'  => array( T_('Phone'), T_('Mobile skin for mobile phones browsers') ),
+		'tablet'  => array( T_('Tablet'), T_('Tablet skin for tablet browsers') ),
+		'rwd'     => array( T_('RWD'), T_('Skin can be used for general, mobile phones and tablet browsers') ),
+		'feed'    => array( T_('XML Feed'), T_('Special system skin for XML feeds like RSS and Atom') ),
+		'sitemap' => array( T_('XML Sitemap'), T_('Special system skin for XML sitemaps') ),
+	);
+}
+
+
+/**
+ * Get title of skin type
+ *
+ * @param string Skin type
+ * @return string Skin title
+ */
+function get_skin_type_title( $skin_type )
+{
+	$skin_types = get_skin_types();
+	return ( isset( $skin_types[ $skin_type ] ) ? $skin_types[ $skin_type ][0] : $skin_type );
 }
 ?>

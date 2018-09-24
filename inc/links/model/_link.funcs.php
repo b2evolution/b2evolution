@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -566,6 +566,7 @@ function display_link_position( & $row, $show_actions = true )
 						'onclick' => 'return evo_item_image_insert( '.$blog.', \'image\', '.$row->link_ID.' );',
 						'style'   => 'cursor:pointer;'
 					) );
+
 			}
 			elseif( $type == 'audio' || $type == 'video' || $type == 'file' )
 			{
@@ -573,6 +574,15 @@ function display_link_position( & $row, $show_actions = true )
 							'title'   => sprintf( T_('Insert %s tag into the post'), '['.$type.':]' ),
 							'onclick' => 'evo_link_insert_inline( \''.$type.'\', '.$row->link_ID.', \'\' )',
 							'style'   => 'cursor:pointer;'
+						) );
+
+			}
+			elseif( $current_File->is_dir() )
+			{
+				$r .= ' '.get_icon( 'add__cyan', 'imgtag', array(
+							'title'   => sprintf( T_('Insert %s tag into the post'), '[folder:]' ),
+							'onclick' => 'evo_link_insert_inline( \'folder\', '.$row->link_ID.', \'\' )',
+							'style'   => 'cursor:default;'
 						) );
 			}
 		}

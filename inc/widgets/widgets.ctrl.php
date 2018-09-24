@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -48,12 +48,10 @@ if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm 
 else
 {	// We could not find a blog we have edit perms on...
 	// Note: we may still have permission to edit categories!!
-	// redirect to blog list:
+	$Messages->add( T_('Sorry, you have no permission to edit collection properties.'), 'error' );
+	// Redirect to collections list:
 	header_redirect( $admin_url.'?ctrl=dashboard' );
-	// EXITED:
-	$Messages->add( T_('Sorry, you have no permission to edit blog properties.'), 'error' );
-	$action = 'nil';
-	$tab = '';
+	// EXITED.
 }
 
 $action = param_action( 'list' );
@@ -159,7 +157,7 @@ switch( $display_mode )
 }
 
 // Get Skin used by current Blog:
-$blog_normal_skin_ID = $Blog->get_setting( 'normal_skin_ID' );
+$blog_normal_skin_ID = $Blog->get( 'normal_skin_ID' );
 $SkinCache = & get_SkinCache();
 $Skin = & $SkinCache->get_by_ID( $blog_normal_skin_ID );
 // Make sure containers are loaded for that skin:
@@ -227,6 +225,14 @@ switch( $action )
 		{
 			case 'js' :	// this is a js call, lets return the settings page -- fp> what do you mean "settings page" ?
 				// fp> wthis will visually live insert the new widget into the container; it probably SHOULD open the edit properties right away
+				if( $edited_ComponentWidget->type == 'plugin' && $edited_ComponentWidget->get_Plugin() == false )
+				{
+					$plugin_disabled = 1;
+				}
+				else
+				{
+					$plugin_disabled = 0;
+				}
 				send_javascript_message( array(
 					'addNewWidgetCallback' => array(
 						$edited_ComponentWidget->ID,
@@ -235,6 +241,7 @@ switch( $action )
 						'<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$edited_ComponentWidget->ID ).'" class="widget_name">'
 							.$edited_ComponentWidget->get_desc_for_list()
 						.'</a> '.$edited_ComponentWidget->get_help_link(),
+						$plugin_disabled,
 						$edited_ComponentWidget->get_cache_status( true ),
 					),
 					// Open widget settings:
@@ -259,9 +266,12 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
+		// Update the folding states for current user:
+		save_fieldset_folding_values( $Blog->ID );
+
 		$edited_ComponentWidget->load_from_Request();
 
-		if(	! param_errors_detected() )
+		if( ! param_errors_detected() )
 		{ // Update settings:
 			$edited_ComponentWidget->dbupdate();
 			$Messages->add( T_('Widget settings have been updated'), 'success' );
@@ -383,6 +393,15 @@ switch( $action )
 		$edited_ComponentWidget->set( 'enabled', (int)! $enabled );
 		$edited_ComponentWidget->dbupdate();
 
+		if( $edited_ComponentWidget->type == 'plugin' && $edited_ComponentWidget->get_Plugin() == false )
+		{
+			$plugin_disabled = 1;
+		}
+		else
+		{
+			$plugin_disabled = 0;
+		}
+
 		if ( $enabled )
 		{
 			$msg = T_( 'Widget has been disabled.' );
@@ -396,7 +415,7 @@ switch( $action )
 		if ( $display_mode == 'js' )
 		{
 			// EXITS:
-			send_javascript_message( array( 'doToggle' => array( $edited_ComponentWidget->ID, (int)! $enabled ) ) );
+			send_javascript_message( array( 'doToggle' => array( $edited_ComponentWidget->ID, (int)! $enabled, $plugin_disabled ) ) );
 		}
 		header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
 		break;
@@ -497,16 +516,16 @@ switch( $action )
 		}
 		break;
 
- 	case 'list':
+	case 'list':
 		break;
 
- 	case 're-order' : // js request
- 		// Check that this action request is not a CSRF hacked request:
+	case 're-order' : // js request
+		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
- 		$DB->begin();
+		$DB->begin();
 
- 		// Reset the current orders and make container names temp to avoid duplicate entry errors
+		// Reset the current orders and make container names temp to avoid duplicate entry errors
 		$DB->query( 'UPDATE T_widget
 										SET wi_order = wi_order * -1,
 												wi_sco_name = CONCAT( \'temp_\', wi_sco_name )
@@ -536,9 +555,9 @@ switch( $action )
 
 		$DB->commit();
 
- 		$Messages->add( T_( 'Widgets updated' ), 'success' );
- 		send_javascript_message( array( 'sendWidgetOrderCallback' => array( 'blog='.$Blog->ID ) ) ); // exits() automatically
- 		break;
+		$Messages->add( T_( 'Widgets updated' ), 'success' );
+		send_javascript_message( array( 'sendWidgetOrderCallback' => array( 'blog='.$Blog->ID ) ) ); // exits() automatically
+		break;
 
 
 	case 'reload':
@@ -546,9 +565,6 @@ switch( $action )
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
-
- 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
 
 		$SkinCache = & get_SkinCache();
 		/**
@@ -598,6 +614,7 @@ if( $display_mode == 'normal' )
 	 */
 	var enabled_icon_tag = \''.get_icon( 'bullet_green', 'imgtag', array( 'title' => T_( 'The widget is enabled.' ) ) ).'\';
 	var disabled_icon_tag = \''.get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_( 'The widget is disabled.' ) ) ).'\';
+	var disabled_plugin_tag = \''.get_icon( 'warning', 'imgtag', array( 'title' => T_('Inactive / Uninstalled plugin') ) ).'\';
 	var activate_icon_tag = \''.get_icon( 'activate', 'imgtag', array( 'title' => T_( 'Enable this widget!' ) ) ).'\';
 	var deactivate_icon_tag = \''.get_icon( 'deactivate', 'imgtag', array( 'title' => T_( 'Disable this widget!' ) ) ).'\';
 	var cache_enabled_icon_tag = \''.get_icon( 'block_cache_on', 'imgtag', array( 'title' => T_( 'Caching is enabled. Click to disable.' ) ) ).'\';
@@ -608,6 +625,7 @@ if( $display_mode == 'normal' )
 	var b2evo_dispatcher_url = "'.$admin_url.'";' );
 	require_js( '#jqueryUI#' ); // auto requires jQuery
 	require_css( 'blog_widgets.css' );
+	init_tokeninput_js();
 
 
 	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );

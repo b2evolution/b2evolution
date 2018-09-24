@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -29,7 +29,7 @@ $Table = new Table();
 
 $Table->title = T_('Plugins available for installation').get_manual_link('plugins_available_for_installation');
 
-$Table->global_icon( T_('Cancel install!'), 'close', regenerate_url(), T_('Cancel'), 3, 4 );
+$Table->global_icon( T_('Cancel installation!'), 'close', regenerate_url(), T_('Cancel'), 3, 4 );
 
 $Table->cols = array(
 		array( 'th' => T_('Plugin') ),

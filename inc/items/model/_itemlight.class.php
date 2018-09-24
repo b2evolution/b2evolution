@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -44,6 +44,8 @@ class ItemLight extends DataObject
 	 */
 	var $datemodified;
 
+	var $short_title;
+
 	var $title;
 
 	var $excerpt;
@@ -61,6 +63,15 @@ class ItemLight extends DataObject
 	var $url;
 
 	var $ityp_ID;
+
+	/**
+	 * Single/page view
+	 *
+	 * 'normal', '404', 'redirected'
+	 *
+	 * @var string
+	 */
+	var $single_view = 'normal';
 
 	/**
 	 * ID of the main category.
@@ -150,10 +161,12 @@ class ItemLight extends DataObject
 			$this->urltitle = $db_row->post_urltitle;
 			$this->canonical_slug_ID = $db_row->post_canonical_slug_ID;
 			$this->tiny_slug_ID = $db_row->post_tiny_slug_ID;
+			$this->short_title = isset( $db_row->post_short_title ) ? $db_row->post_short_title : '';
 			$this->title = $db_row->post_title;
 			$this->excerpt = $db_row->post_excerpt;
 			$this->ityp_ID = $db_row->post_ityp_ID;
 			$this->url = $db_row->post_url;
+			$this->single_view = isset( $db_row->post_single_view ) ? $db_row->post_single_view : $this->single_view;
 		}
 	}
 
@@ -433,6 +446,22 @@ class ItemLight extends DataObject
 		if( ! empty( $ignore_types ) && in_array( $permalink_type, $ignore_types ) )
 		{	// This permanent type must be ignored:
 			return false;
+		}
+
+		switch( $this->get( 'single_view' ) )
+		{	// Force permanent url depending on item setting "Single/page view":
+			case '404':
+				// Don't allow permanent url for Item with 404 page instead of single view:
+				return false;
+			case 'redirected':
+				if( empty( $this->url ) )
+				{	// Force to 404 page when url is not provided for this Item:
+					return false;
+				}
+				else
+				{	// Use a specified url instead of original permanent url of this Item:
+					return $this->url;
+				}
 		}
 
 		switch( $permalink_type )
@@ -810,7 +839,7 @@ class ItemLight extends DataObject
 					$url_to_edit_post .= '&amp;blog='.$Blog->ID;
 					if( is_admin_page() )
 					{	// Try to set a main category
-						$default_cat_ID = $Blog->get_setting( 'default_cat_ID' );
+						$default_cat_ID = $Blog->get_default_cat_ID();
 						if( !empty( $default_cat_ID ) )
 						{	// If default category is set
 							$this->main_cat_ID = $default_cat_ID;
@@ -1156,10 +1185,15 @@ class ItemLight extends DataObject
 	 * @param string Post navigation type: same_category, same_tag, same_author, same_blog
 	 * @param integer|NULL ID of post navigation target
 	 * @param array What permanent types should be ignored to don't return a permanent URL
+	 * @param array Additional parameters
 	 */
-	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '', $post_navigation = '', $nav_target = NULL, $ignore_types = array() )
+	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '', $post_navigation = '', $nav_target = NULL, $ignore_types = array(), $params = array() )
 	{
 		global $Collection, $Blog;
+
+		$params = array_merge( array(
+				'nofollow' => false,
+			), $params );
 
 		$blogurl = '';
 		$permalink_type = '';
@@ -1207,6 +1241,7 @@ class ItemLight extends DataObject
 		$r = '<a href="'.$url.'"'
 				.( empty( $title ) ? '' : ' title="'.format_to_output( $title, 'htmlattr' ).'"' )
 				.( empty( $class ) ? '' : ' class="'.format_to_output( $class, 'htmlattr' ).'"' )
+				.( $params['nofollow'] ? ' rel="nofollow"' : '' )
 			.'>'
 				.str_replace( '$title$', format_to_output( $this->title ), $text )
 			.'</a>';
@@ -1284,7 +1319,10 @@ class ItemLight extends DataObject
 				'target_blog'     => '',
 				'nav_target'      => NULL,
 				'post_navigation' => $def_post_navigation,
-				'title_field'     => 'title',
+				'title_field'     => 'title', // Possible values: 'title', 'short_title', 'title_override' for value from param 'title_override' below.
+																			// May be several fields separated by comma. Only first not empty field is displayed,
+																			// e.g. 'short_title,title,title_override' or 'short_title,title_override,title' etc.
+				'title_override'  => $this->title,
 			), $params );
 
 		// Set post navigation target
@@ -1296,11 +1334,24 @@ class ItemLight extends DataObject
 			$blogurl = $Blog->gen_blogurl();
 		}
 
-		$title = format_to_output( $this->{$params['title_field']}, $params['format'] );
+		$title_fields = explode( ',', $params['title_field'] );
+		foreach( $title_fields as $title_field )
+		{
+			if( $title_field == 'short_title' && $this->get_type_setting( 'use_short_title' ) == 'never' )
+			{	// Allow to use short title only if it is enabled by item type:
+				continue;
+			}
+			$title = ( $title_field == 'title_override' ? $params['title_override'] : $this->$title_field );
+			$title = format_to_output( $title, $params['format'] );
+			if( ! empty( $title ) )
+			{	// Use first not empty field:
+				break;
+			}
+		}
 
 		if( $params['max_length'] != '' )
-		{	// Crop long title
-			$title = strmaxlen( $title, intval($params['max_length']) );
+		{	// Crop long title:
+			$title = strmaxlen( $title, intval( $params['max_length'] ) );
 		}
 
 		if( empty( $title ) )

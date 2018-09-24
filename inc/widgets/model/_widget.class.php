@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -215,11 +215,19 @@ class ComponentWidget extends DataObject
 		if( $this->type == 'plugin' )
 		{	// Plugin widget:
 			$widget_Plugin = & $this->get_Plugin();
-			$icon = '<span class="fa fa-'.$widget_Plugin->widget_icon.'"></span>';
-
-			if( isset( $this->disp_params['title'] ) && ! empty( $this->disp_params['title'] ) )
+			if( $widget_Plugin )
 			{
-				return $icon.' <strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
+				$icon = '<span class="fa fa-'.$widget_Plugin->widget_icon.'"></span>';
+
+				if( isset( $this->disp_params['title'] ) && ! empty( $this->disp_params['title'] ) )
+				{
+					return $icon.' <strong>'.$this->disp_params['title'].'</strong> ('.$name. ' - ' .T_('Plugin').')';
+				}
+			}
+			else
+			{
+				$icon = '<span class="fa fa-warning"></span>';
+				return $icon.' <strong>'.$name.'</strong> ('.T_('Plugin').')';
 			}
 
 			return $icon.' <strong>'.$name.'</strong> ('.T_('Plugin').')';
@@ -299,8 +307,8 @@ class ComponentWidget extends DataObject
 
 		if( $use_tooltip )
 		{ // Add these data only for tooltip
-			$link_attrs['class']  = 'action_icon help_plugin_icon';
-			$link_attrs['rel']    = format_to_output( $this->get_desc(), 'htmlattr' );
+			$link_attrs['class'] = 'action_icon help_plugin_icon';
+			$link_attrs['data-popover'] = format_to_output( $this->get_desc(), 'htmlattr' );
 		}
 
 		return action_icon( '', $icon, $widget_url, NULL, NULL, NULL, $link_attrs );
@@ -327,26 +335,36 @@ class ComponentWidget extends DataObject
 			}
 		}
 
+		if( ! isset( $r['widget_css_class'] ) ||
+		    ! isset( $r['widget_ID'] ) ||
+		    ! isset( $r['allow_blockcache'] ) )
+		{	// Start fieldset of advanced settings:
+			$r['advanced_layout_start'] = array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Advanced'),
+				);
+		}
+
 		if( ! isset( $r['widget_css_class'] ) )
-		{
+		{	// Widget CSS class:
 			$r['widget_css_class'] = array(
 					'label' => '<span class="dimmed">'.T_( 'CSS Class' ).'</span>',
 					'size' => 20,
-					'note' => T_( 'Replaces $wi_class$ in your skins containers.'),
+					'note' => sprintf( T_('Will be injected into %s in your skin containers (along with required system classes).'), '<code>$wi_class$</code>' ),
 				);
 		}
 
 		if( ! isset( $r['widget_ID'] ) )
-		{
+		{	// Widget ID:
 			$r['widget_ID'] = array(
 					'label' => '<span class="dimmed">'.T_( 'DOM ID' ).'</span>',
 					'size' => 20,
-					'note' => T_( 'Replaces $wi_ID$ in your skins containers.'),
+					'note' => sprintf( T_('Replaces %s in your skins containers.'), '<code>$wi_ID$</code>' ).' '.sprintf( T_('Leave empty to use default value: %s.'), '<code>widget_'.$this->type.'_'.$this->code.'_'.$this->ID.'</code>' ),
 				);
 		}
 
 		if( ! isset( $r['allow_blockcache'] ) )
-		{
+		{	// Allow widget/block caching:
 			$widget_Blog = & $this->get_Blog();
 			$r['allow_blockcache'] = array(
 					'label' => T_( 'Allow caching' ),
@@ -355,6 +373,15 @@ class ComponentWidget extends DataObject
 							T_('Block caching is disabled for this collection.'),
 					'type' => 'checkbox',
 					'defaultvalue' => true,
+				);
+		}
+
+		if( ! isset( $r['widget_css_class'] ) ||
+		    ! isset( $r['widget_ID'] ) ||
+		    ! isset( $r['allow_blockcache'] ) )
+		{	// End fieldset of advanced settings:
+			$r['advanced_layout_end'] = array(
+					'layout' => 'end_fieldset',
 				);
 		}
 
@@ -389,9 +416,33 @@ class ComponentWidget extends DataObject
 	function get_param( $parname, $check_infinite_loop = false, $group = NULL )
 	{
 		$this->load_param_array();
-		if( isset( $this->param_array[$parname] ) )
-		{	// We have a value for this param:
-			return $this->param_array[$parname];
+
+		if( strpos( $parname, '[' ) !== false )
+		{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
+			$setting_names = explode( '[', $parname );
+			if( isset( $this->param_array[ $setting_names[0] ] ) )
+			{
+				$setting_value = $this->param_array[ $setting_names[0] ];
+				unset( $setting_names[0] );
+				foreach( $setting_names as $setting_name )
+				{
+					$setting_name = trim( $setting_name, ']' );
+					if( isset( $setting_value[ $setting_name ] ) )
+					{
+						$setting_value = $setting_value[ $setting_name ];
+					}
+					else
+					{
+						$setting_value = NULL;
+						break;
+					}
+				}
+				return $setting_value;
+			}
+		}
+		elseif( isset( $this->param_array[ $parname ] ) )
+		{	// Get normal(not array) setting value:
+			return $this->param_array[ $parname ];
 		}
 
 		// Try default values:
@@ -430,7 +481,7 @@ class ComponentWidget extends DataObject
 	{
 		$params = $this->get_param_definitions( NULL );
 
-		if( isset( $params[$parname] ) || 
+		if( isset( $params[$parname] ) ||
 		    ( $group !== NULL && isset( $params[ $group ]['inputs'][ substr( $parname, strlen( $group ) ) ] ) ) )
 		{ // This is a widget specific param:
 			// Make sure param_array is loaded before set the param value
@@ -1242,8 +1293,8 @@ class ComponentWidget extends DataObject
 		$Plugins_admin->filter_contents( $fake_title /* by ref */, $content /* by ref */, $widget_renderers, $params /* by ref */ );
 
 		// Render block content with selected plugins:
-		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Render' );
-		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Display' );
+		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog, 'Widget' => $this ), 'Render' );
+		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog, 'Widget' => $this ), 'Display' );
 
 		return $content;
 	}

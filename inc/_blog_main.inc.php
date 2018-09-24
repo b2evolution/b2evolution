@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package main
@@ -56,6 +56,8 @@ if( empty( $Blog ) )
 	// EXIT.
 }
 
+// Set a selected collection in user settings in order to use a correct last viewed collection URL in back-office:
+set_working_blog( $blog );
 
 if( $debug == 2 || is_logged_in() )
 {	// Allow debug info only for logged-in users OR when debug == 2:
@@ -143,16 +145,16 @@ if( ! isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
 if( $resolve_extra_path )
 {
 	// Check and Remove blog base URI from ReqPath:
+
+	// BaseURI is the part after the domain name and it will always end with / :
 	$blog_baseuri = substr( $Blog->gen_baseurl(), strlen( $Blog->get_baseurl_root() ) );
 	$Debuglog->add( 'blog_baseuri: "'.$blog_baseuri.'"', 'params' );
 
-	// Remove trailer:
-	$blog_baseuri_regexp = preg_replace( '~(\.php[0-9]?)?/?$~', '', $blog_baseuri );
-	// Read possibilities in order to get a broad match:
-	$blog_baseuri_regexp = '~^'.preg_quote( $blog_baseuri_regexp, '~' ).'(\.php[0-9]?)?/(.+)$~';
-	// pre_dump( '', 'blog_baseuri_regexp: "', $blog_baseuri_regexp );
-
-	if( preg_match( $blog_baseuri_regexp, $ReqPath, $matches ) )
+	// Check if we have one of these:
+	// - Either the ReqPath starts with collection base URI (always including trailing slash)
+	// - Or the ReqPath contains a .php file (which will be the case when using any slug, including old slug aliases)
+	// ... followed by some extra path info.
+	if( preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) )
 	{ // We have extra path info
 		$path_string = $matches[2];
 
@@ -375,7 +377,9 @@ if( !empty($p) || !empty($title) )
 		{ // We have found an Item object, but it doesn't belong to the current blog!
 			// Check if we want to redirect moved posts:
 			if( $Settings->get( 'redirect_moved_posts' ) )
-			{ // Redirect to the item current permanent url
+			{	// Set disp to 'redirect' in order to store this value in hitlog table:
+				$disp = 'redirect';
+				// Redirect to the item current permanent url:
 				header_redirect( $Item->get_permanent_url(), 301 );
 				// already exited
 			}
@@ -493,9 +497,10 @@ param( 'cat', 'string', NULL );
 param( 'tag', 'string', NULL );
 param( 'm', 'string', NULL );
 if( empty( $Item ) &&
+		$disp != 'compare' && // This disp uses a filter like cat=, tag=, orderby= etc. so we should not force it to disp=post
 		(
 			! is_null( $catsel ) || // Filter by many categories
-			( $disp != 'edit' && ! is_null( $cat ) ) || // Filter by one category
+			( $disp != 'edit' && $disp != 'anonpost' && ! is_null( $cat ) ) || // Filter by one category
 			! is_null( $tag ) || // Filter by tag
 			! empty( $m ) // Filter by date like '201410' (urls from ?disp=arcdir)
 	) )
@@ -574,7 +579,7 @@ elseif( $disp == '-' )
 			|| $Blog->get_setting( 'relcanonical_homepage' ) )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
-		if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+		if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 		{	// We are not on the canonicial blog url:
 			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:
@@ -598,7 +603,6 @@ elseif( $disp == '-' )
 		if( empty( $Item ) )
 		{	// If item is not found, display 404 page with below error message:
 			$Messages->add( sprintf( T_('Front page is set to display first post but there is nothing to display.'), $p ), 'error' );
-			$disp = '404';
 		}
 	}
 
@@ -613,22 +617,92 @@ elseif( $disp == '-' )
 		if( empty($Item) )
 		{
 			$Messages->add( sprintf( T_('Front page is set to display page ID=%d but it does not exist.'), $p ), 'error' );
-			$disp = '404';
 		}
 	}
-
 }
-elseif( ( ( $disp == 'page' ) || ( $disp == 'single' ) ) && empty( $Item ) )
-{ // 'page' and 'single' are not valid display params if $Item is not set
-	// Note: The 'preview' action is the only one exception, but that is handled above in this if statement
-	$disp = '404';
-	$disp_detail = '404-post_not_found';
+
+if( $disp == 'page' || $disp == 'single' )
+{	// Check if the requested Item can be correctly displayed for disp 'page' and 'single':
+	if( empty( $Item ) )
+	{	// If Item is not defined/not found in DB
+		// Note: The 'preview' action is the only one exception, but that is handled above in this if statement
+		$disp = '404';
+		$disp_detail = '404-item-not-found';
+	}
+	elseif( $Item->status == 'deprecated' )
+	{	// If the requested Item is deprecated
+		$disp = '404';
+		$disp_detail = '404-item-deprecated';
+	}
+	elseif( ! $preview && $Item->status == 'redirected' )
+	{	// $redir=no here allows to force a 'single post' URL for commenting
+		// Redirect to the URL specified in the post:
+		$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'].' );
+		header_redirect( $Item->url, true, true );
+	}
+	elseif( ! $preview && ! in_array( $Item->status, get_inskin_statuses( $Blog->ID, 'post' ) ) )
+	{	// If the requested Item is not allowed to be displayed on front-office
+		$disp = '404';
+		$disp_detail = '404-item-disallowed-for-frontoffice';
+	}
+	elseif( ! is_logged_in() && in_array( $Item->status, array( 'community', 'protected' ) ) )
+	{	// If the requested Item is allowed only for community or members:
+		$login_Blog = & get_setting_Blog( 'login_blog_ID' );
+		if( $login_Blog && $login_Blog->ID != $Blog->ID )
+		{	// If current collection is not used for login actions,
+			// Redirect to login form on "access_requires_login.main.php":
+			header_redirect( get_login_url( '403 item requires login', NULL, false, NULL, 'content_requires_loginurl' ), 302 );
+			// will have exited
+		}
+		else
+		{	// Current collection is used for login actions
+			// Don't redirect, just display a login form of the collection:
+			$disp = 'content_requires_login';
+			$disp_detail = '403-item-requires-login';
+			// Set redirect_to param to current url in order to display a requested page after login action:
+			global $ReqURI;
+			param( 'redirect_to', 'url', $ReqURI );
+		}
+	}
+	elseif( ! $preview && ! $Item->can_be_displayed() )
+	{	// If current User has no permission to view the requested Item
+		$disp = '403';
+		$disp_detail = '403-item-disallowed-for-user';
+	}
+	elseif( ! $preview )
+	{	// Check single/page view:
+		switch( $Item->get( 'single_view' ) )
+		{
+			case '404':
+				// Force to 404 page:
+				$disp = '404';
+				$disp_detail = '404-item-disallowed-single-view';
+				break;
+			case 'redirected':
+				// Try to force a redirect:
+				if( empty( $Item->url ) )
+				{	// Display 404 page if no url is provided to redirect:
+					$disp = '404';
+					$disp_detail = '404-item-missing-redirect-url';
+				}
+				else
+				{	// Redirect only with filled URL:
+					$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'] because of single/page view.' );
+					header_redirect( $Item->url, true, true );
+				}
+				break;
+		}
+	}
 }
 
 param( 'user_ID', 'integer', NULL );
 if( ( $disp == 'user' ) && isset( $user_ID ) && isset( $current_User ) && ( $user_ID != $current_User->ID ) && ( $Settings->get( 'enable_visit_tracking') == 1 ) )
 { // add or increment to user profile visit
 	add_user_profile_visit( $user_ID, $current_User->ID );
+}
+elseif( ( $disp == 'visits' ) && isset( $user_ID ) && isset( $current_User ) && ( $user_ID == $current_User->ID ) && ( $Settings->get( 'enable_visit_tracking') == 1 ) )
+{
+	reset_user_profile_view_ts( $user_ID );
 }
 
 
@@ -825,7 +899,9 @@ if( !empty( $skin ) )
 					'404'                   => '404_not_found.main.php',
 					'access_denied'         => 'access_denied.main.php',
 					'access_requires_login' => 'access_requires_login.main.php',
+					'content_requires_login'=> 'content_requires_login.main.php',
 					'activateinfo'          => 'activateinfo.main.php',
+					'anonpost'              => 'anonpost.main.php',
 					'arcdir'                => 'arcdir.main.php',
 					'catdir'                => 'catdir.main.php',
 					'closeaccount'          => 'closeaccount.main.php',
@@ -854,6 +930,7 @@ if( !empty( $skin ) )
 					'subs'                  => 'subs.main.php',
 					'visits'                => 'visits.main.php',
 					'register'              => 'register.main.php',
+					'register_finish'       => 'register_finish.main.php',
 					'search'                => 'search.main.php',
 					'single'                => 'single.main.php',
 					'sitemap'               => 'sitemap.main.php',
@@ -865,6 +942,7 @@ if( !empty( $skin ) )
 					'useritems'             => 'useritems.main.php',
 					'usercomments'          => 'usercomments.main.php',
 					'users'                 => 'users.main.php',
+					'compare'               => 'compare.main.php',
 					// All others will default to index.main.php
 				);
 
