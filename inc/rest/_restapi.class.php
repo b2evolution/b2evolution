@@ -518,7 +518,7 @@ class RestApi
 		}
 
 		// Prepare pagination:
-		if( $result_count > $api_per_page )
+		if( $api_per_page > 0 && $result_count > $api_per_page )
 		{	// We will have multiple search result pages:
 			if( $api_page < 1 )
 			{	// Limit by min page:
@@ -532,7 +532,7 @@ class RestApi
 		}
 		else
 		{	// Only one page of results:
-			$current_page = 1;
+			$api_page = 1;
 			$total_pages = 1;
 		}
 
@@ -541,7 +541,10 @@ class RestApi
 
 		if( $result_count > 0 )
 		{	// Select collections only from current page:
-			$SQL->LIMIT( ( ( $api_page - 1 ) * $api_per_page ).', '.$api_per_page );
+			if( $api_per_page > 0 )
+			{	// Limit results by page size only when this is no unlimitted request:
+				$SQL->LIMIT( ( ( $api_page - 1 ) * $api_per_page ).', '.$api_per_page );
+			}
 			$BlogCache->load_by_sql( $SQL );
 		}
 
