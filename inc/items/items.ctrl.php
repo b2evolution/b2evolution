@@ -1793,7 +1793,18 @@ switch( $action )
 			$Comment->set( 'date', $edited_Item->get( 'datestart' ) );
 		}
 		$Comment->set( 'notif_status', $edited_Item->get( 'notifications_status' ) );
-		$Comment->set( 'notif_flags', $edited_Item->get( 'notifications_flags' ) );
+		$notifications_flags = $edited_Item->get( 'notifications_flags' );
+		if( is_array( $notifications_flags ) )
+		{
+			foreach( $notifications_flags as $n => $notifications_flag )
+			{
+				if( ! in_array( $notifications_flag, array( 'moderators_notified', 'members_notified', 'community_notified' ) ) )
+				{	// Skip values which are not allowed for comment:
+					unset( $notifications_flags[ $n ] );
+				}
+			}
+		}
+		$Comment->set( 'notif_flags', $notifications_flags );
 		if( $Comment->dbinsert() )
 		{	// If comment has been created try to copy all attachments from source Item:
 			$DB->query( 'UPDATE T_links
