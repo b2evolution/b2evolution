@@ -844,100 +844,64 @@ class tinymce_plugin extends Plugin
 			$tmce_plugins_array[] = 'contextmenu';
 		}
 
-		if( $edit_layout == 'inskin' )
-		{ // In-skin editing mode
+		/* ----------- button row 1 : paragraph related styles ------------ */
+		$tmce_theme_advanced_buttons1_array = array(
+			'formatselect styleselect',
+			'alignleft aligncenter alignright alignjustify',
+			'bullist numlist',
+			'outdent indent'
+		);
+		/* ----------- button row 2 : font related styles ------------ */
+		$tmce_theme_advanced_buttons2_array = array(
+			'bold italic strikethrough forecolor backcolor',
+			'subscript superscript',
+			'fontselect fontsizeselect',
+			'removeformat',
+		);
+		/* ----------- button row 3 : tools + insert buttons ------------ */
+		$tmce_theme_advanced_buttons3_array = array(
+			'undo redo',
+			'searchreplace',
+			'fullscreen',
 
-			/* ----------- button row 1 ------------ */
+			'evo_image image media',   // can evo_image work in front office?
+			'link unlink',
+			'nonbreaking charmap',
+			'table',
+		);
 
-			$tmce_theme_advanced_buttons1_array = array(
-				'bold italic strikethrough forecolor backcolor',
-				'removeformat',
-				'nonbreaking charmap',
-				'image media',
-				'fontselect fontsizeselect',
-				'bullist numlist',
-				'outdent indent'
-			);
+// fp>erwin: add code to use the followign only for posts (not comments):
+		$tmce_theme_advanced_buttons3_array[] = 'morebreak pagebreak';
 
-			/* ----------- button row 2 ------------ */
+		if( $edit_layout != 'inskin' )
+		{ // Additional toolbar for BACK-OFFICE only:
+			/* ----------- button row 4 ------------ */
 
-			$tmce_theme_advanced_buttons2_array = array(
-				'formatselect styleselect',
-				'alignleft aligncenter alignright alignjustify',
-				'pagebreak'
-			);
-
-			/* ----------- button row 3 ------------ */
-
-			$tmce_theme_advanced_buttons3_array = array(
-				'link unlink',
-				'undo redo',
-				'searchreplace',
-				'fullscreen'
-			);
-		}
-		else
-		{ // Simple & Expert modes
-
-			/* ----------- button row 1 ------------ */
-
-			$tmce_theme_advanced_buttons1_array = array(
-				'bold italic strikethrough forecolor backcolor',
-				'fontselect fontsizeselect',
-				'removeformat',
-				'nonbreaking charmap',
-				'evo_image image media',
-				'link unlink',
-				'fullscreen'
-			);
-
-			/* ----------- button row 2 ------------ */
-
-			$tmce_theme_advanced_buttons2_array = array(
-				'formatselect styleselect',
-				'bullist numlist',
-				'outdent indent',
-				'alignleft aligncenter alignright alignjustify',
-				'morebreak pagebreak',
-				'undo redo',
-				'searchreplace'
-			);
-		}
-
-		if( $edit_layout == 'expert' )
-		{ // Simple needs to be simpler than expert
-			$tmce_plugins_array[] = 'visualchars code';
-
-			/* ----------- button row 3 ------------ */
-
-			$tmce_theme_advanced_buttons3_array = array(
+// fp>erwin: please test visualchars.
+			$tmce_plugins_array[] = 'visualchars';
+			$tmce_theme_advanced_buttons4_array = array(
 				'visualchars',
-				'table',
-				'subscript superscript'
 			);
 
 			if( $this->UserSettings->get('tmce_options_directionality') == 1 )
 			{
 				$tmce_plugins_array[] = 'directionality';
-				array_push($tmce_theme_advanced_buttons3_array, 'ltr rtl');
+				array_push($tmce_theme_advanced_buttons4_array, 'ltr rtl');
 			}
 
 			if( $this->UserSettings->get('tmce_options_paste') == 1 )
 			{
 				$tmce_plugins_array[] = 'paste';
-				$tmce_theme_advanced_buttons3_array[] = 'pastetext';
+				$tmce_theme_advanced_buttons4_array[] = 'pastetext';
 			}
 
 			if( function_exists( 'enchant_broker_init' ) )
 			{ // Requires Enchant spelling library
-				$tmce_theme_advanced_buttons3_array[] = 'spellchecker';
+				$tmce_theme_advanced_buttons4_array[] = 'spellchecker';
 			}
 
-			$tmce_theme_advanced_buttons3_array[] = 'code';
-
-			/* ----------- button row 4 ------------ */
-
-			$tmce_theme_advanced_buttons4_array = array();
+			$tmce_plugins_array[] = 'code';
+			$tmce_theme_advanced_buttons4_array[] = 'code';
 
 			$tmce_theme_advanced_buttons4_array =
 				$Plugins->get_trigger_event("tinymce_extend_buttons",
