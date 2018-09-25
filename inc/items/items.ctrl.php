@@ -1764,7 +1764,7 @@ switch( $action )
 		}
 
 		if( $action == 'append' )
-		{	// If we should append
+		{	// If we should append item and comments at the end with new dates
 			$SQL = new SQL( 'Get the latest comment of Item #'.$dest_Item->ID.' to append Item #'.$edited_Item->ID );
 			$SQL->SELECT( 'MAX( comment_date )' );
 			$SQL->FROM( 'T_comments' );
@@ -1813,8 +1813,8 @@ switch( $action )
 			$DB->query( 'UPDATE T_links
 				  SET link_position = "aftermore"
 				WHERE link_cmt_ID = '.$Comment->ID.'
-					AND link_position != "teaser"
-					AND link_position != "aftermore"' );
+				  AND link_position != "teaser"
+				  AND link_position != "aftermore"' );
 		}
 		// Move all comments of the source Item to the target Item:
 		if( isset( $append_comment_timestamp ) )
@@ -1828,8 +1828,8 @@ switch( $action )
 			foreach( $source_comment_IDs as $source_comment_ID )
 			{
 				$DB->query( 'UPDATE T_comments
-						SET comment_item_ID = '.$dest_Item->ID.',
-						    comment_date = '.$DB->quote( date2mysql( $append_comment_timestamp ) ).'
+					  SET comment_item_ID = '.$dest_Item->ID.',
+					      comment_date = '.$DB->quote( date2mysql( $append_comment_timestamp ) ).'
 					WHERE comment_ID = '.$source_comment_ID );
 				// Increment 1 minute for each next appending comment:
 				$append_comment_timestamp += 60;
@@ -1838,9 +1838,13 @@ switch( $action )
 		else
 		{	// Merge comments with saving their dates:
 			$DB->query( 'UPDATE T_comments
-						SET comment_item_ID = '.$dest_Item->ID.'
-					WHERE comment_item_ID = '.$edited_Item->ID );
+				  SET comment_item_ID = '.$dest_Item->ID.'
+				WHERE comment_item_ID = '.$edited_Item->ID );
 		}
+		// Copy all slugs from source Item to destination Item:
+		$DB->query( 'UPDATE T_slug
+				  SET slug_itm_ID = '.$dest_Item->ID.'
+				WHERE slug_itm_ID = '.$edited_Item->ID );
 		// Delete the source Item completely:
 		$edited_Item_ID = $edited_Item->ID;
 		$edited_Item->dbdelete();
