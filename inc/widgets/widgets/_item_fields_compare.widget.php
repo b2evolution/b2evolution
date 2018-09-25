@@ -190,27 +190,50 @@ class item_fields_compare_Widget extends ComponentWidget
 			) );
 		}
 		$r = array_merge( $r, array(
-				'fields_source' => array(
-					'label' => T_('Fields to show'),
-					'type' => 'select',
-					'options' => array(
-						'all'     => T_('All'),
-						'exclude' => T_('All except fields listed below'),
-						'include' => T_('Only fields listed below'),
+				'lines_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Lines to show')
+				),
+					'show_headers' => array(
+						'type' => 'checkbox',
+						'label' => T_('Show column headers'),
+						'defaultvalue' => 1,
 					),
-					'defaultvalue' => 'all',
-				),
-				'fields' => array(
-					'type' => 'textarea',
-					'label' => '',
-					'note' => T_('Enter one field name per line.'),
-					'rows' => 10,
-				),
-				'edit_links' => array(
-					'type' => 'checkbox',
-					'label' => T_('Edit Links'),
-					'note' => T_('Check to add a row with edit buttons for editors who have permission.'),
-					'defaultvalue' => 1,
+					'show_status' => array(
+						'type' => 'radio',
+						'label' => T_('Show item visibility status'),
+						'options' => array(
+								array( 'always', T_('Always') ),
+								array( 'never', T_('Never') ),
+								array( 'differences', T_('Only if differences') ),
+								array( 'not_public', T_('Only if not public') ) ),
+						'defaultvalue' => 'not_public',
+						'field_lines' => true,
+					),
+					'fields_source' => array(
+						'label' => T_('Fields to show'),
+						'type' => 'select',
+						'options' => array(
+							'all'     => T_('All'),
+							'exclude' => T_('All except fields listed below'),
+							'include' => T_('Only fields listed below'),
+						),
+						'defaultvalue' => 'all',
+					),
+					'fields' => array(
+						'type' => 'textarea',
+						'label' => '',
+						'note' => T_('Enter one field name per line.'),
+						'rows' => 10,
+					),
+					'edit_links' => array(
+						'type' => 'checkbox',
+						'label' => T_('Edit Links'),
+						'note' => T_('Check to add a row with edit buttons for editors who have permission.'),
+						'defaultvalue' => 1,
+					),
+				'lines_layout_end' => array(
+					'layout' => 'end_fieldset',
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -231,8 +254,10 @@ class item_fields_compare_Widget extends ComponentWidget
 				'custom_fields_table_start'                => '<div class="evo_content_block"><table class="item_custom_fields">',
 				'custom_fields_row_start'                  => '<tr>',
 				'custom_fields_topleft_cell'               => '<td style="border:none"></td>',
-				'custom_fields_col_header_item'            => '<th class="center">$item_link$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
+				'custom_fields_col_header_item'            => '<th class="center">$item_link$$item_status$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
 				'custom_fields_row_header_field'           => '<th class="$header_cell_class$">$field_title$$field_description_icon$:</th>',
+				'custom_fields_item_status_template'       => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+				'custom_fields_item_title_status_separator'=> '<br />',
 				'custom_fields_description_icon_class'     => 'grey',
 				'custom_fields_value_default'              => '<td class="$data_cell_class$">$field_value$</td>',
 				'custom_fields_value_difference_highlight' => '<td class="$data_cell_class$ bg-warning">$field_value$</td>',
@@ -258,6 +283,9 @@ class item_fields_compare_Widget extends ComponentWidget
 			return;
 		}
 
+		// Check if headers for item statuses should be displayed
+		$show_status = $this->check_show_status( $items );
+
 		$ItemCache = & get_ItemCache();
 
 		echo $this->disp_params['block_start'];
@@ -269,15 +297,43 @@ class item_fields_compare_Widget extends ComponentWidget
 		// Start a table to display differences of all custom fields for selected posts:
 		echo $this->get_field_template( 'table_start' );
 
-		if( ! isset( $this->display_item_headers ) || $this->display_item_headers !== false )
-		{	// Display item headers row only when it is not disabled e.g. from child class item_custom_fields_Widget:
+		if( $this->disp_params['show_headers'] || $show_status !== false )
+		{	// Display item column headers row if it is enabled by widget settings:
 			echo $this->get_field_template( 'row_start' );
 			echo $this->get_field_template( 'topleft_cell' );
 			foreach( $items as $item_ID )
 			{
 				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
-				// Permanent post link:
-				echo str_replace( '$item_link$', $widget_Item->get_title( array( 'title_field' => 'short_title,title' ) ), $this->get_field_template( 'col_header_item' ) );
+
+				if( $this->disp_params['show_headers'] )
+				{	// Get permanent item link:
+					$item_title = $widget_Item->get_title( array( 'title_field' => 'short_title,title' ) );
+				}
+				else
+				{	// Item title should not be displayed:
+					$item_title = '';
+				}
+
+				if( $show_status == 'always' ||
+				    $show_status == 'differences' ||
+				    ( $show_status == 'not_public' && $widget_Item->get( 'status' ) != 'published' ) )
+				{	// Get item status:
+					$item_status = $widget_Item->get_format_status( array( 'template' => $this->disp_params['custom_fields_item_status_template'] ) );
+				}
+				else
+				{	// Don't display item status:
+					$item_status = '';
+				}
+
+				$col_header_item_template = $this->get_field_template( 'col_header_item' );
+				if( ! empty( $item_title ) && ! empty( $item_status ) )
+				{	// Insert separator between item title and status:
+					$col_header_item_template = str_replace(
+						array( '$item_link$$item_status$', '$item_status$$item_link$' ),
+						array( '$item_link$'.$this->disp_params['custom_fields_item_title_status_separator'].'$item_status$', '$item_status$'.$this->disp_params['custom_fields_item_title_status_separator'].'$item_link$' ),
+						$col_header_item_template );
+				}
+				echo str_replace( array( '$item_link$', '$item_status$' ), array( $item_title, $item_status ), $col_header_item_template );
 			}
 			echo $this->get_field_template( 'row_end' );
 		}
@@ -354,7 +410,7 @@ class item_fields_compare_Widget extends ComponentWidget
 	/**
 	 * Get custom fields between the requested items with additional compare data
 	 *
-	 * @param array Item IDs, updated by referene
+	 * @param array Item IDs, updated by reference
 	 * @return array
 	 */
 	function get_custom_fields( & $items )
@@ -945,6 +1001,54 @@ class item_fields_compare_Widget extends ComponentWidget
 	function sort_custom_fields( $custom_field_a, $custom_field_b )
 	{
 		return $custom_field_a['order'] > $custom_field_b['order'];
+	}
+
+
+	/**
+	 * Check if headers for item statuses should be displayed
+	 *
+	 * @param array Item IDs
+	 * @return boolean|string FALSE when all statuses should not be displayed, 'always', 'differences', 'not_public'
+	 */
+	function check_show_status( $items )
+	{
+		switch( $this->disp_params['show_status'] )
+		{
+			case 'always':
+				// All statuses should be displayed:
+				return $this->disp_params['show_status'];
+
+			case 'differences':
+				// Check when at least one status should be displayed:
+				$diff_item_statuses = array();
+				$ItemCache = & get_ItemCache();
+				foreach( $items as $item_ID )
+				{
+					$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
+					$diff_item_statuses[ $widget_Item->get( 'status' ) ] = true;
+					if( count( $diff_item_statuses ) > 1 )
+					{	// When we find second different status we can stop here:
+						return $this->disp_params['show_status'];
+					}
+				}
+				break;
+
+			case 'not_public':
+				// Check when at least one status should be displayed:
+				$ItemCache = & get_ItemCache();
+				foreach( $items as $item_ID )
+				{
+					$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
+					if( $widget_Item->get( 'status' ) != 'published' )
+					{	// We found first status which should be displayed, stop search others:
+						return $this->disp_params['show_status'];
+					}
+				}
+				break;
+		}
+
+		// Statuses are never displayed or no items with expecting statuses:
+		return false;
 	}
 
 
