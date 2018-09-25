@@ -9051,30 +9051,30 @@ function get_social_media_image( $Item = NULL, $params = array() )
 	$social_media_image = NULL;
 
 	if( ! empty( $Item ) )
-	{ // Try to get attached images
+	{	// Try to get attached images
 		$LinkOwner = new LinkItem( $Item );
 		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink', 'image', array(
 				'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
 				'sql_order_by'   => 'link_priority ASC, link_order ASC' ) ) )
-		{ // Item has linked files:
+		{	// Item has linked files:
 			while( $Link = & $LinkList->get_next() )
 			{
 				if( ! ( $File = & $Link->get_File() ) )
-				{ // No File object:
+				{	// No File object:
 					global $Debuglog;
 					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
 					continue;
 				}
 
 				if( ! $File->exists() )
-				{ // File doesn't exist:
+				{	// File doesn't exist:
 					global $Debuglog;
-					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $File->ID, $File->get_full_path() ), array( 'error', 'files' ) );
 					continue;
 				}
 
 				if( $File->is_image() )
-				{ // Use only image files for og:image tag:
+				{	// Use only image files for og:image tag:
 					if( $params['return_as_link'] )
 					{
 						return $Link;
@@ -9089,10 +9089,10 @@ function get_social_media_image( $Item = NULL, $params = array() )
 		}
 
 		if( $params['use_item_cat_fallback'] )
-		{ // No attached image from Item, let's try getting one from the Item's default chapter
+		{	// No attached image from Item, let's try getting one from the Item's default chapter
 			$FileCache = & get_FileCache();
 			if( $default_Chapter = & $Item->get_main_Chapter() )
-			{ // Try social media boilerplate image first:
+			{	// Try social media boilerplate image first:
 				$social_media_image_file_ID = $default_Chapter->get( 'social_media_image_file_ID', false );
 				if( $social_media_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) ) && $File->is_image() )
 				{
@@ -9105,17 +9105,16 @@ function get_social_media_image( $Item = NULL, $params = array() )
 	global $Blog;
 
 	if( $params['use_coll_fallback'] && $Blog )
-	{ // Try to get collection social media boiler plate and collection image/logo:
+	{	// Try to get collection social media boiler plate and collection image/logo:
 		$social_media_image_file_ID = $Blog->get_setting( 'social_media_image_file_ID', false );
 		if( $social_media_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) ) && $File->is_image() )
-		{ // Try social media boiler plate first:
-
+		{	// Try social media boiler plate first:
 			return $File;
 		}
 	}
 
 	if( $params['use_site_fallback'] )
-	{ // Use social media boilerplate logo if configured
+	{	// Use social media boilerplate logo if configured
 		global $Settings;
 
 		$FileCache = & get_FileCache();
