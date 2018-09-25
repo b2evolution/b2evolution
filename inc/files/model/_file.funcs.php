@@ -2274,7 +2274,9 @@ function display_dragdrop_upload_button( $params = array() )
 
 	if( $LinkOwner !== NULL && $LinkOwner->is_temp() )
 	{	// Use this field to know a form is submitted with temporary link owner(when object is creating and still doesn't exist in DB):
-		echo '<input type="hidden" name="temp_link_owner_ID" value="'.$LinkOwner->get_ID().'" />';
+		echo '<input type="hidden" name="temp_link_owner_ID_nojs" value="'.$LinkOwner->get_ID().'" />';
+		// Set correct name only when JS is enabled:
+		echo '<script type="text/javascript">jQuery( "input[name=temp_link_owner_ID_nojs]" ).attr( "name", "temp_link_owner_ID" )</script>';
 	}
 
 	?>

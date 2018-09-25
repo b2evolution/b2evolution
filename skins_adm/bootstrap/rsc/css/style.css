@@ -665,12 +665,14 @@ fieldset ul {
 }
 #itemform_links .panel,
 #cmntform_links .panel,
+#meta_cmntform_links .panel,
 #ecmpform_links .panel,
 #msgform_links .panel {
   overflow: hidden;
 }
 #itemform_links .panel-body,
 #cmntform_links .panel-body,
+#meta_cmntform_links .panel-body,
 #ecmpform_links .panel-body,
 #msgform_links .panel-body {
   padding: 0;

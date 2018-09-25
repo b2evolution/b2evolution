@@ -3164,15 +3164,18 @@ input.btn-lg {
 .evo_form__comment .bg-warning {
   margin: 0px !important;
 }
-#cmntform_links .panel {
+#cmntform_links .panel,
+#meta_cmntform_links .panel {
   margin-bottom: 20px;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
-#cmntform_links .panel .panel-body {
+#cmntform_links .panel .panel-body,
+#meta_cmntform_links .panel .panel-body {
   padding: 0;
 }
-#cmntform_links table {
+#cmntform_links table,
+#meta_cmntform_links table {
   margin: 0;
 }
 .form-horizontal .form-group,

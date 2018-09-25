@@ -1979,7 +1979,7 @@ class RestApi
 		$root = param( 'root', 'string' );
 		$file_path = param( 'path', 'string' );
 
-		$LinkOwner = & get_LinkOwner( $link_type, $link_object_ID );
+		$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 
 		if( ! $LinkOwner->check_perm( 'edit', false ) )
 		{	// Current user has no permission to unlink the requested link:
@@ -2005,12 +2005,9 @@ class RestApi
 			// Use the glyph or font-awesome icons if requested by skin
 			param( 'b2evo_icons_type', 'string', 'fontawesome-glyphicons' );
 
-			global $LinkOwner, $current_File, $disable_evo_flush;
+			global $disable_evo_flush;
 
-			$link_type = param( 'type', 'string' );
-			$link_object_ID = param( 'object_ID', 'string' );
-
-			$LinkOwner = & get_LinkOwner( $link_type, $link_object_ID );
+			$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 
 			// Initialize admin skin:
 			global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI;

@@ -270,7 +270,31 @@ class LinkComment extends LinkOwner
 	 */
 	function get_view_url()
 	{
-		return $this->Comment->get_permanent_url();
+		if( is_admin_page() )
+		{	// Back-office:
+			global $admin_url;
+			$comment_Item = & $this->get_Item();
+			if( $this->is_temp() )
+			{	// New creating Comment:
+				return $admin_url.'?ctrl=items&amp;blog='.$comment_Item->get_blog_ID().'&amp;p='.$comment_Item->ID.'#form_p'.$comment_Item->ID;
+			}
+			else
+			{	// The editing Comment:
+				return $admin_url.'?ctrl=items&amp;blog='.$comment_Item->get_blog_ID().'&amp;p='.$comment_Item->ID.'#c'.$this->get_ID();
+			}
+		}
+		else
+		{	// Front-office:
+			if( $this->is_temp() )
+			{	// New creating Comment:
+				$comment_Item = & $this->get_Item();
+				return $comment_Item->get_permanent_url();
+			}
+			else
+			{	// The editing Comment:
+				return $this->Comment->get_permanent_url();
+			}
+		}
 	}
 
 

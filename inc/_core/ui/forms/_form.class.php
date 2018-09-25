@@ -4531,7 +4531,7 @@ class Form extends Widget
 		}
 
 		// Display attachments fieldset:
-		display_attachments_fieldset( $this, $LinkOwner, false, $fold, $fieldset_prefix );
+		display_attachments_fieldset( $this, $LinkOwner, $fold, $fieldset_prefix );
 	}
 }
 

@@ -615,6 +615,11 @@ while( $Item = & $ItemList->get_item() )
 			// Set b2evoCanvas for plugins:
 			echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
 
+			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( $comment_renderers, array(
+					'Blog'         => & $Blog,
+					'setting_name' => 'coll_apply_comment_rendering'
+				) ) );
+
 			// Attach files:
 			if( !empty( $comment_attachments ) )
 			{	// display already attached files checkboxes
@@ -644,14 +649,8 @@ while( $Item = & $ItemList->get_item() )
 			// Display attachments fieldset:
 			$Form->attachments_fieldset( $Comment );
 
-			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( $comment_renderers, array(
-					'Blog'         => & $Blog,
-					'setting_name' => 'coll_apply_comment_rendering'
-				) ) );
-
-			$preview_text = ( $Item->can_attach() ) ? T_('Preview/Add file') : T_('Preview');
 			$Form->buttons_input( array(
-					array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview btn-info', 'value' => $preview_text ),
+					array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview btn-info', 'value' => T_('Preview') ),
 					array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit SaveButton', 'value' => T_('Send comment') )
 				) );
 

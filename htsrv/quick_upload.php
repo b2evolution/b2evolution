@@ -267,7 +267,7 @@ if( ! empty( $link_owner ) )
 	$link_owner_ID = intval( $link_owner_ID );
 }
 // Try to get LinkOwner by type and ID:
-$LinkOwner = & get_LinkOwner( ( $link_owner_is_temp ? 'temporary' : $link_owner_type ), $link_owner_ID );
+$LinkOwner = get_LinkOwner( ( $link_owner_is_temp ? 'temporary' : $link_owner_type ), $link_owner_ID );
 
 if( $upload && ! check_perm_upload_files( $LinkOwner, $fm_FileRoot ) )
 {

@@ -122,11 +122,10 @@ function & get_LinkOwner( $link_type, $object_ID )
  *
  * @param object Form
  * @param object LinkOwner object
- * @param boolean true if creating new owner object, false otherwise
  * @param boolean true to allow folding for this fieldset, false otherwise
  * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
  */
-function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false, $fold = false, $fieldset_prefix = '' )
+function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fieldset_prefix = '' )
 {
 	global $admin_url, $inc_path;
 	global $current_User, $action;
@@ -172,24 +171,6 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 
 	$fieldset_title = T_( 'Images &amp; Attachments' );
 
-	if( $creating )
-	{ // Creating new Item
-		$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' ).' - <a id="title_file_add" href="#" class="action_icon">'.get_icon( 'folder' ).' '.T_('Attach existing files').'</a>';
-
-		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks', 'fold' => $fold ) );
-
-		$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save post to start uploading files'), 'SaveEditButton' ) );
-
-		if( get_param( 'p' ) > 0 )
-		{	// Display a button to duplicate the attachments to new item:
-			$Form->submit( array( 'actionArray[create_link]', /* TRANS: This is the value of an input submit button */ T_('Save & Link files from original'), 'SaveEditButton' ) );
-		}
-
-		$Form->end_fieldset();
-
-		return;
-	}
-
 	if( is_admin_page() )
 	{	// Display a link to manual page only on back-office:
 		$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' );
@@ -211,10 +192,13 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 		$fieldset_title .= ' - '
 			.action_icon( T_('Attach existing files'), 'folder', $attach_files_url,
 				T_('Attach existing files'), 3, 4,
-				array( 'onclick' => 'return link_attachment_window( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) )
-			.action_icon( T_('Attach existing files'), 'permalink', $attach_files_url,
+				array( 'onclick' => 'return link_attachment_window( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) );
+		if( ! $LinkOwner->is_temp() )
+		{	// Don't allow this option for new creating objects:
+			$fieldset_title .= action_icon( T_('Attach existing files'), 'permalink', $attach_files_url,
 				T_('Attach existing files'), 1, 0,
 				array( 'target' => '_blank' ) );
+		}
 	}
 
 	$fieldset_title .= '<span class="floatright">&nbsp;'
@@ -233,7 +217,8 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	$links_count = count( $LinkOwner->get_Links() );
 
 	$Form->begin_fieldset( $fieldset_title, array(
-			'id' => $form_id,
+			'id' => $fieldset_prefix.$form_id,
+			'style' => 'display:none', // Show this uploader fieldset only when JS is enabled
 			'fold' => $fold,
 			'deny_fold' => ( $links_count > 0 )
 		) );
@@ -247,6 +232,9 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	echo '</div>';
 
 	$Form->end_fieldset();
+
+	// Show fieldset of quick uploader only when JS is enabled:
+	echo '<script type="text/javascript">jQuery( "#'.$fieldset_prefix.$form_id.'" ).show()</script>';
 
 	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) )
 	{	// Check if current user has a permission to back-office files manager:
