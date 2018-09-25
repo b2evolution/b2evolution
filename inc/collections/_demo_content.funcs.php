@@ -270,7 +270,7 @@ function create_blog(
 		echo_install_log( 'TEST FEATURE: Activating in-skin editing on collection #'.$Blog->ID );
 
 		if( $kind == 'manual' )
-		{	// Set a posts ordering by 'post_order ASC'
+		{	// Set a posts ordering by 'postcat_order ASC'
 			$Blog->set_setting( 'orderby', 'order' );
 			$Blog->set_setting( 'orderdir', 'ASC' );
 			echo_install_log( 'TEST FEATURE: Setting a posts ordering by asceding post order field on collection #'.$Blog->ID );

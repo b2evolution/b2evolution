@@ -420,10 +420,10 @@ class RestApi
 		$api_per_page = param( 'per_page', 'integer', 10 );
 		$api_q = param( 'q', 'string', '' );
 		$api_fields = param( 'fields', 'string', 'shortname' ); // 'id', 'shortname'
-		$api_restrict = param( 'restrict', 'string', '' ); // 'available_fileroots' - Load only collections with available file roots for current user
-		$api_filter = param( 'filter', 'string', 'public' ); // 'public' - Load only collections which can be viewed for current user
+		$api_restrict_to_available_fileroots = param( 'restrict_to_available_fileroots', 'integer', 0 ); // 1 - Load only collections with available file roots for current user
+		$api_list_in_frontoffice = param( 'list_in_frontoffice', 'string', 'public' ); // 'public' - Load only collections which can be viewed for current user
 
-		if( $api_filter == 'public' )
+		if( $api_list_in_frontoffice == 'public' )
 		{	// SQL to get ONLY public collections:
 			$BlogCache = & get_BlogCache();
 			$SQL = $BlogCache->get_public_colls_SQL();
@@ -467,7 +467,7 @@ class RestApi
 		}
 
 		$collections = array();
-		if( $api_restrict == 'available_fileroots' &&
+		if( $api_restrict_to_available_fileroots &&
 		    (
 		      ! is_logged_in() ||
 		      ! $current_User->check_perm( 'admin', 'restricted' ) ||
@@ -478,7 +478,7 @@ class RestApi
 		}
 		else
 		{
-			if( $api_restrict == 'available_fileroots' )
+			if( $api_restrict_to_available_fileroots )
 			{	// Restrict collections by available file roots for current user:
 
 				// SQL analog for $current_User->check_perm( 'blogs', 'view' ) || $current_User->check_perm( 'files', 'edit' ):
@@ -518,7 +518,7 @@ class RestApi
 		}
 
 		// Prepare pagination:
-		if( $result_count > $api_per_page )
+		if( $api_per_page > 0 && $result_count > $api_per_page )
 		{	// We will have multiple search result pages:
 			if( $api_page < 1 )
 			{	// Limit by min page:
@@ -532,7 +532,7 @@ class RestApi
 		}
 		else
 		{	// Only one page of results:
-			$current_page = 1;
+			$api_page = 1;
 			$total_pages = 1;
 		}
 
@@ -541,7 +541,10 @@ class RestApi
 
 		if( $result_count > 0 )
 		{	// Select collections only from current page:
-			$SQL->LIMIT( ( ( $api_page - 1 ) * $api_per_page ).', '.$api_per_page );
+			if( $api_per_page > 0 )
+			{	// Limit results by page size only when this is no unlimitted request:
+				$SQL->LIMIT( ( ( $api_page - 1 ) * $api_per_page ).', '.$api_per_page );
+			}
 			$BlogCache->load_by_sql( $SQL );
 		}
 
@@ -1282,9 +1285,9 @@ class RestApi
 	{
 		global $Settings;
 
-		$api_restrict = param( 'restrict', 'string', '' );
+		$api_restrict_to_available_fileroots = param( 'restrict_to_available_fileroots', 'integer', 0 ); // 1 - Load only users with available file roots for current user
 
-		if( $api_restrict == 'available_fileroots' )
+		if( $api_restrict_to_available_fileroots )
 		{	// Check if current user has an access to file roots of other users:
 			global $current_User;
 			if( is_logged_in() )

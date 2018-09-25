@@ -41,6 +41,7 @@ switch( get_param( 'itcf_type' ) )
 	case 'double':
 	case 'computed':
 	case 'separator':
+	case 'url':
 		$Form->text( 'itcf_format', get_param( 'itcf_format' ), 60, T_('Format'), '', 2000 );
 		break;
 	case 'image':

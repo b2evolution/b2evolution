@@ -1036,6 +1036,17 @@ table.catselect thead tr th {
 table.catselect > thead:first-child > tr:first-child > th {
   border-top: 1px solid #bbb;
 }
+table.catselect th,
+table.catselect td {
+  border-right: 1px solid #bbb;
+}
+table.catselect th:last-child,
+table.catselect td:last-child {
+  border-right: none;
+}
+table.catselect.table > thead > tr > th {
+  border-color: #bbb;
+}
 table.catselect td {
   padding: .2ex 1ex;
   background: none;
@@ -1045,23 +1056,17 @@ table.catselect tr.group td {
   border-bottom: 1px solid #bbb;
   font-weight: bold;
 }
-table.catselect tr.odd,
-table.catselect tr.odd input {
+table.catselect tr.odd {
   background-color: #eee;
 }
 table.catselect tr.even,
 table.catselect tr.even input {
   background: none !important;
 }
-table.catselect th.selector,
 table.catselect td.selector {
   width: 1%;
   text-align: center;
-  border-right: 1px solid #bbb;
-}
-table.catselect #new_category_name {
-  background-color: white;
-  width: 92% !important;
+  vertical-align: middle;
 }
 table.catselect tbody tr.group.catselect_blog__current td {
   background: #31b0d5;
@@ -1069,6 +1074,14 @@ table.catselect tbody tr.group.catselect_blog__current td {
 }
 table.catselect .catsel_name label {
   font-weight: normal;
+}
+table.catselect .catsel_order input {
+  width: 40px;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+table.catselect input[type=text] {
+  height: 25px;
 }
 .raty_star_on,
 .raty_star_off,

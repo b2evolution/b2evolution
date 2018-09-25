@@ -89,6 +89,10 @@ class ItemCache extends DataObjectCache
 			else
 			{	// Manual sorting by order field:
 				$compare_method =  'compare_items_by_order';
+				foreach( $this->items_by_cat_map[$cat_ID]['items'] as $i => $sorted_Item )
+				{	// Set temp var in order to know what category order use to compare:
+					$sorted_Item->sort_current_cat_ID = $cat_ID;
+				}
 			}
 			usort( $this->items_by_cat_map[$cat_ID]['items'], array( 'Item', $compare_method ) );
 			$this->items_by_cat_map[$cat_ID]['sorted'] = true;

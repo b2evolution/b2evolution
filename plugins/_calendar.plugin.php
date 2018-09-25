@@ -116,7 +116,7 @@ class calendar_plugin extends Plugin
 			),
 			'cat_IDs' => array(
 				'label' => T_('Categories'),
-				'note' => T_('List category IDs separated by ,'),
+				'note' => sprintf( T_('List category IDs separated by %s.'), '<code>,</code>' ),
 				'size' => 15,
 				'type' => 'text',
 				'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',

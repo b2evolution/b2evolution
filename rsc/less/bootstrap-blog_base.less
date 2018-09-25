@@ -427,6 +427,15 @@ table.catselect {
 	> thead:first-child > tr:first-child > th {
 		border-top: 1px solid #bbb;
 	}
+	th, td {
+		border-right: 1px solid #bbb;
+		&:last-child {
+			border-right: none;
+		}
+	}
+	&.table > thead > tr > th {
+		border-color: #bbb;
+	}
 	td {
 		padding: .2ex 1ex;
 		background: none;
@@ -436,20 +445,16 @@ table.catselect {
 		border-bottom: 1px solid #bbb;
 		font-weight: bold;
 	}
-	tr.odd, tr.odd input {
+	tr.odd {
 		background-color: #eee;
 	}
 	tr.even, tr.even input {
 		background: none !important;
 	}
-	th.selector, td.selector {
+	td.selector {
 		width: 1%;
-		text-align:center;
-		border-right: 1px solid #bbb;
-	}
-	#new_category_name {
-		background-color: white;
-		width: 92% !important;
+		text-align: center;
+		vertical-align: middle;
 	}
 	tbody tr.group.catselect_blog__current td {
 		background: #31b0d5;
@@ -457,6 +462,14 @@ table.catselect {
 	}
 	.catsel_name label {
 		font-weight: normal;
+	}
+	.catsel_order input {
+		width: 40px;
+		padding-left: 3px;
+		padding-right: 3px;
+	}
+	input[type=text] {
+		height: 25px;
 	}
 }
 

@@ -1764,7 +1764,7 @@ switch( $action )
 		}
 
 		if( $action == 'append' )
-		{	// If we should append
+		{	// If we should append item and comments at the end with new dates
 			$SQL = new SQL( 'Get the latest comment of Item #'.$dest_Item->ID.' to append Item #'.$edited_Item->ID );
 			$SQL->SELECT( 'MAX( comment_date )' );
 			$SQL->FROM( 'T_comments' );
@@ -1793,7 +1793,18 @@ switch( $action )
 			$Comment->set( 'date', $edited_Item->get( 'datestart' ) );
 		}
 		$Comment->set( 'notif_status', $edited_Item->get( 'notifications_status' ) );
-		$Comment->set( 'notif_flags', $edited_Item->get( 'notifications_flags' ) );
+		$notifications_flags = $edited_Item->get( 'notifications_flags' );
+		if( is_array( $notifications_flags ) )
+		{
+			foreach( $notifications_flags as $n => $notifications_flag )
+			{
+				if( ! in_array( $notifications_flag, array( 'moderators_notified', 'members_notified', 'community_notified' ) ) )
+				{	// Skip values which are not allowed for comment:
+					unset( $notifications_flags[ $n ] );
+				}
+			}
+		}
+		$Comment->set( 'notif_flags', $notifications_flags );
 		if( $Comment->dbinsert() )
 		{	// If comment has been created try to copy all attachments from source Item:
 			$DB->query( 'UPDATE T_links
@@ -1802,8 +1813,8 @@ switch( $action )
 			$DB->query( 'UPDATE T_links
 				  SET link_position = "aftermore"
 				WHERE link_cmt_ID = '.$Comment->ID.'
-					AND link_position != "teaser"
-					AND link_position != "aftermore"' );
+				  AND link_position != "teaser"
+				  AND link_position != "aftermore"' );
 		}
 		// Move all comments of the source Item to the target Item:
 		if( isset( $append_comment_timestamp ) )
@@ -1817,8 +1828,8 @@ switch( $action )
 			foreach( $source_comment_IDs as $source_comment_ID )
 			{
 				$DB->query( 'UPDATE T_comments
-						SET comment_item_ID = '.$dest_Item->ID.',
-						    comment_date = '.$DB->quote( date2mysql( $append_comment_timestamp ) ).'
+					  SET comment_item_ID = '.$dest_Item->ID.',
+					      comment_date = '.$DB->quote( date2mysql( $append_comment_timestamp ) ).'
 					WHERE comment_ID = '.$source_comment_ID );
 				// Increment 1 minute for each next appending comment:
 				$append_comment_timestamp += 60;
@@ -1827,9 +1838,13 @@ switch( $action )
 		else
 		{	// Merge comments with saving their dates:
 			$DB->query( 'UPDATE T_comments
-						SET comment_item_ID = '.$dest_Item->ID.'
-					WHERE comment_item_ID = '.$edited_Item->ID );
+				  SET comment_item_ID = '.$dest_Item->ID.'
+				WHERE comment_item_ID = '.$edited_Item->ID );
 		}
+		// Copy all slugs from source Item to destination Item:
+		$DB->query( 'UPDATE T_slug
+				  SET slug_itm_ID = '.$dest_Item->ID.'
+				WHERE slug_itm_ID = '.$edited_Item->ID );
 		// Delete the source Item completely:
 		$edited_Item_ID = $edited_Item->ID;
 		$edited_Item->dbdelete();
@@ -2038,7 +2053,11 @@ switch( $action )
 				'title_field' => 'short_title,title',
 				'link_type'   => 'none',
 			) );
-		$AdminUI->htmltitle .= ' (#'.$edited_Item->ID.')';
+		if( empty( $AdminUI->htmltitle ) )
+		{	// Display collection short name when item has no yet e.g. on creating or when titles are disabled for current Item Type:
+			$AdminUI->htmltitle = $Blog->get( 'shortname' );
+		}
+		$AdminUI->htmltitle .= ' ('.( empty( $edited_Item->ID ) ? T_('New') : '#'.$edited_Item->ID ).')';
 
 		switch( $action )
 		{
@@ -2134,10 +2153,17 @@ switch( $action )
 	break;
 
 	case 'view':
+	case 'history_compare':
+	case 'history_details':
 		// We're displaying a SINGLE specific post:
 		$item_ID = param( 'p', 'integer', true );
 
 		$AdminUI->title_titlearea = T_('View post & comments');
+
+		if( ! isset( $tab ) )
+		{
+			$tab = 'full';
+		}
 
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'tab' => $tab, 'filter' => 'restore' ) );

@@ -1806,6 +1806,13 @@ img.avatar_above_login {
 .shrinkwrap.left {
   text-align: left;
 }
+.col-narrow {
+  width: 1px;
+  white-space: nowrap;
+  text-align: center;
+  padding-left: 1px !important;
+  padding-right: 1px !important;
+}
 .block {
   margin: 1ex;
   white-space: nowrap;

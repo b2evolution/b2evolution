@@ -190,9 +190,9 @@ class Item extends ItemLight
 	var $priority;
 
 	/**
-	 * @var float
+	 * @var array Item orders per category
 	 */
-	var $order;
+	var $orders;
 	/**
 	 * @var boolean
 	 */
@@ -417,7 +417,6 @@ class Item extends ItemLight
 			$this->notifications_ctsk_ID = $db_row->post_notifications_ctsk_ID;
 			$this->notifications_flags = $db_row->post_notifications_flags;
 			$this->comment_status = $db_row->post_comment_status;			// Comments status
-			$this->order = $db_row->post_order;
 			$this->featured = $db_row->post_featured;
 			$this->parent_ID = $db_row->post_parent_ID === NULL ? NULL : intval( $db_row->post_parent_ID );
 
@@ -526,16 +525,20 @@ class Item extends ItemLight
 			debug_die('Invalid item objects received to compare.');
 		}
 
-		if( $a_Item->order == NULL )
+		// Get item orders depending on current category:
+		$a_item_order = isset( $a_Item->sort_current_cat_ID ) ? $a_Item->sort_current_cat_ID : NULL;
+		$b_item_order = isset( $b_Item->sort_current_cat_ID ) ? $b_Item->sort_current_cat_ID : NULL;
+
+		if( $a_Item->get_order( $a_item_order ) == NULL )
 		{
-			return $b_Item->order == NULL ? 0 : 1;
+			return $b_Item->get_order( $b_item_order ) == NULL ? 0 : 1;
 		}
-		elseif( $b_Item->order == NULL )
+		elseif( $b_Item->get_order( $b_item_order ) == NULL )
 		{
 			return -1;
 		}
 
-		return ( $a_Item->order < $b_Item->order ) ? -1 : ( ( $a_Item->order > $b_Item->order ) ? 1 : 0 );
+		return ( $a_Item->get_order( $a_item_order ) < $b_Item->get_order( $b_item_order ) ) ? -1 : ( ( $a_Item->get_order( $a_item_order ) > $b_Item->get_order( $b_item_order ) ) ? 1 : 0 );
 	}
 
 
@@ -1201,6 +1204,19 @@ class Item extends ItemLight
 					&& cities_exist( $country_ID, $region_ID, $subregion_ID );
 			param_check_number( 'item_city_ID', T_('Please select a city'), $city_is_required );
 			$this->set_from_Request( 'city_ID', 'item_city_ID', true );
+		}
+
+		// Item orders per category:
+		$post_cat_orders = param( 'post_cat_orders', 'array:string' );
+		$this->orders = array();
+		foreach( $post_cat_orders as $post_cat_ID => $post_cat_order )
+		{
+			if( isset( $this->extra_cat_IDs ) &&
+			    is_array( $this->extra_cat_IDs ) &&
+			    in_array( $post_cat_ID, $this->extra_cat_IDs ) )
+			{	// Set order only for selected category:
+				$this->orders[ $post_cat_ID ] = ( $post_cat_order === '' ? NULL : floatval( $post_cat_order ) );
+			}
 		}
 
 		return ! param_errors_detected();
@@ -2495,7 +2511,7 @@ class Item extends ItemLight
 	 *
 	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
 	 * @param string Restrict field by type(double, varchar, html, text, url, image, computed, separator), FALSE - to don't restrict
-	 * @return string|boolean FALSE if the field doesn't exist
+	 * @return string|boolean FALSE if the field doesn't exist; NULL if the field exists but no value has been entered yet, '' (empty string) if field has been left blank
 	 */
 	function get_custom_field_value( $field_index, $restrict_type = false )
 	{
@@ -2547,7 +2563,7 @@ class Item extends ItemLight
 		$custom_field = $custom_fields[ $field_index ];
 
 		if( ( $custom_field_value === '' || $custom_field_value === NULL ) && // don't format empty value
-		    ! in_array( $custom_field['type'], array( 'double', 'computed' ) ) ) // double and computed fields may have a special format even for empty value
+		    ! in_array( $custom_field['type'], array( 'double', 'computed', 'url' ) ) ) // double, computed and url fields may have a special format even for empty value
 		{	// Don't format value in such cases:
 			return $custom_field_value;
 		}
@@ -2685,6 +2701,37 @@ class Item extends ItemLight
 					$custom_field_value = '<span class="text-danger">'.T_('Invalid link ID:').' '.$custom_field_value.'</span>';
 				}
 				break;
+
+			case 'url':
+				// Format URL field value:
+				if( $format === NULL || $format === '' )
+				{	// No format:
+					break;
+				}
+
+				$formats = explode( ';', $format );
+
+				if( $custom_field_value === '' || $custom_field_value === NULL )
+				{	// Use second format option for empty url:
+					if( ! isset( $formats[1] ) || $formats[1] === '' )
+					{	// No format for empty URL:
+						return $custom_field_value;
+					}
+					else
+					{	// Set a format for empty URL:
+						$format_value = $formats[1];
+					}
+				}
+				else
+				{	// Use first format option for not empty url:
+					$format_value = $formats[0];
+				}
+
+				if( $format_value != '#url#' )
+				{	// Use specific text for link from format if it is not requested to use original url as link text:
+					$custom_field_value = $format_value;
+				}
+				break;
 		}
 
 		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
@@ -2750,7 +2797,10 @@ class Item extends ItemLight
 
 						case 'url':
 							// Use value of url fields as URL to the link:
-							$custom_field_value = '<a href="'.$custom_field_value.'"'.$nofollow_attr.$link_class_attr.'>'.$custom_field_value.'</a>';
+							if( ! empty( $orig_custom_field_value ) )
+							{	// Format URL to link only with not empty URL otherwise display URL as simple text if special text is defined in format for empty URL:
+								$custom_field_value = '<a href="'.$orig_custom_field_value.'"'.$nofollow_attr.$link_class_attr.'>'.$custom_field_value.'</a>';
+							}
 							break 2;
 					}
 				}
@@ -3993,9 +4043,9 @@ class Item extends ItemLight
 	 */
 	function get_titletag()
 	{
-		if( empty($this->titletag) )
+		if( empty( $this->titletag ) )
 		{
-			return $this->title;
+			return $this->get( 'title' );
 		}
 
 		return $this->titletag;
@@ -4353,7 +4403,7 @@ class Item extends ItemLight
 					'image_link_to'    => $link_to,
 					'image_link_title' => $link_title,
 					'image_link_rel'   => $link_rel,
-					'image_alt'        => $this->title,
+					'image_alt'        => $this->get( 'title' ),
 				) ) );
 	}
 
@@ -6779,7 +6829,17 @@ class Item extends ItemLight
 				return $this->set_param( 'datedeadline', 'date', $parvalue, true );
 
 			case 'order':
-				return $this->set_param( 'order', 'number', $parvalue, true );
+				// Field 'post_order' is deprecated,
+				// but we can set it per each category:
+				if( is_array( $this->extra_cat_IDs ) )
+				{	// Update order per each item category:
+					$this->orders = array();
+					foreach( $this->extra_cat_IDs as $extra_cat_ID )
+					{
+						$this->orders[ $extra_cat_ID ] = $parvalue;
+					}
+				}
+				return false;
 
 			case 'renderers': // deprecated
 				return $this->set_renderers( $parvalue );
@@ -6899,7 +6959,7 @@ class Item extends ItemLight
 		$post_renderers = array('default'),
 		$item_type_name_or_ID = '#', // Use 'Page', 'Post' and etc. OR '#' to use default post type OR integer to use post type by ID
 		$item_st_ID = NULL,
-		$post_order = NULL )
+		$postcat_order = NULL )
 	{
 		global $DB, $query, $UserCache;
 		global $default_locale;
@@ -6981,7 +7041,7 @@ class Item extends ItemLight
 		$this->set_renderers( $post_renderers );
 		$this->set( 'ityp_ID', $item_typ_ID );
 		$this->set( 'pst_ID', $item_st_ID );
-		$this->set( 'order', $post_order );
+		$this->set( 'order', $postcat_order );
 
 		// INSERT INTO DB:
 		$this->dbinsert();
@@ -7773,14 +7833,13 @@ class Item extends ItemLight
 			}
 
 			// insert new extracats:
-			$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
+			$query = 'INSERT INTO T_postcats ( postcat_post_ID, postcat_cat_ID, postcat_order ) VALUES ';
 			foreach( $this->extra_cat_IDs as $extra_cat_ID )
 			{
-				//echo "extracat: $extracat_ID <br />";
-				$query .= "( $this->ID, $extra_cat_ID ),";
+				$query .= '( '.$this->ID.', '.$extra_cat_ID.', '.$DB->quote( $this->get_order( $extra_cat_ID ) ).' ),';
 			}
 			$query = substr( $query, 0, strlen( $query ) - 1 );
-			$DB->query( $query, 'insert new extracats' );
+			$DB->query( $query, 'insert new extracats fro Item #'.$this->ID );
 
 			$DB->commit();
 		}
@@ -8821,7 +8880,7 @@ class Item extends ItemLight
 
 			case 'title':
 			case 'item_title':
-				return $this->title;
+				return $this->get( 'title' );
 
 			case 'excerpt':
 				return $this->get_excerpt();
@@ -8897,9 +8956,77 @@ class Item extends ItemLight
 
 			case 'notifications_flags':
 				return empty( $this->notifications_flags ) ? array() : explode( ',', $this->notifications_flags );
+
+			case 'order':
+				// Get item order in main category:
+				return $this->get_order();
 		}
 
 		return parent::get( $parname );
+	}
+
+
+	/**
+	 * Get item order per category
+	 *
+	 * @param integer Category ID, NULL - for main category
+	 * @return double|NULL Order or NULL if an order is not defined for requested category
+	 */
+	function get_order( $cat_ID = NULL )
+	{
+		if( ! isset( $this->orders ) && $this->ID > 0 )
+		{	// Initialize item orders in all assigned categories:
+			global $DB;
+			$SQL = new SQL( 'Get all orders per categories of Item #'.$this->ID );
+			$SQL->SELECT( 'postcat_cat_ID, postcat_order' );
+			$SQL->FROM( 'T_postcats' );
+			$SQL->WHERE( 'postcat_post_ID = '.$this->ID );
+			$this->orders = $DB->get_assoc( $SQL );
+		}
+
+		if( $cat_ID === NULL )
+		{	// Use main category:
+			$cat_ID = $this->get( 'main_cat_ID' );
+		}
+
+		return isset( $this->orders[ $cat_ID ] ) ? $this->orders[ $cat_ID ] : NULL;
+	}
+
+
+	/**
+	 * Update item order per category
+	 *
+	 * @param double New order value
+	 * @param integer Category ID, NULL - for main category
+	 * @return boolean 
+	 */
+	function update_order( $order, $cat_ID = NULL )
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// Item must be created:
+			return false;
+		}
+
+		if( $cat_ID === NULL )
+		{	// Use main category:
+			$cat_ID = $this->get( 'main_cat_ID' );
+		}
+
+		// Change order to correct value:
+		$order = ( $order === '' ? NULL : floatval( $order ) );
+
+		// Insert/Update order per category:
+		$r = $DB->query( 'REPLACE INTO T_postcats ( postcat_post_ID, postcat_cat_ID, postcat_order )
+			VALUES ( '.$this->ID.', '.intval( $cat_ID ).', '.$DB->quote( $order ).' ) ' );
+
+		if( $r )
+		{	// Update last touched date:
+			$this->update_last_touched_date();
+		}
+
+		return $r;
 	}
 
 

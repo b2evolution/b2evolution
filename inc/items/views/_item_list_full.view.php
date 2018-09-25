@@ -149,9 +149,11 @@ while( $Item = & $ItemList->get_item() )
 					echo '&nbsp;'.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
 						NULL, NULL, NULL, array( 'class' => 'small' ) );
 				}
-				If( !empty( $Item->order ) )
+				$order_cat_ID = ( isset( $ItemList->filters['cat_array'] ) && count ( $ItemList->filters['cat_array'] ) == 1 ) ? $ItemList->filters['cat_array'][0] : NULL;
+				$item_order = $Item->get_order( $order_cat_ID );
+				if( $item_order !== NULL )
 				{
-					echo T_('Order').': '.$Item->order;
+					echo T_('Order').': '.$item_order;
 				}
 				echo '<br>';
 				echo T_('Item ID').': '.$Item->ID;
