@@ -2153,10 +2153,17 @@ switch( $action )
 	break;
 
 	case 'view':
+	case 'history_compare':
+	case 'history_details':
 		// We're displaying a SINGLE specific post:
 		$item_ID = param( 'p', 'integer', true );
 
 		$AdminUI->title_titlearea = T_('View post & comments');
+
+		if( ! isset( $tab ) )
+		{
+			$tab = 'full';
+		}
 
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'tab' => $tab, 'filter' => 'restore' ) );

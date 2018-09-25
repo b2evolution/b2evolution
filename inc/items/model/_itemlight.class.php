@@ -1228,7 +1228,7 @@ class ItemLight extends DataObject
 				break;
 
 			case '#title#':
-				$text = format_to_output( $this->title );
+				$text = format_to_output( $this->get( 'title' ) );
 				break;
 		}
 
@@ -1243,7 +1243,7 @@ class ItemLight extends DataObject
 				.( empty( $class ) ? '' : ' class="'.format_to_output( $class, 'htmlattr' ).'"' )
 				.( $params['nofollow'] ? ' rel="nofollow"' : '' )
 			.'>'
-				.str_replace( '$title$', format_to_output( $this->title ), $text )
+				.str_replace( '$title$', format_to_output( $this->get( 'title' ) ), $text )
 			.'</a>';
 
 		return $r;
@@ -1323,7 +1323,7 @@ class ItemLight extends DataObject
 				'title_field'     => 'title', // Possible values: 'title', 'short_title', 'title_override' for value from param 'title_override' below.
 																			// May be several fields separated by comma. Only first not empty field is displayed,
 																			// e.g. 'short_title,title,title_override' or 'short_title,title_override,title' etc.
-				'title_override'  => $this->title,
+				'title_override'  => $this->get( 'title' ),
 			), $params );
 
 		// Set post navigation target
@@ -1342,7 +1342,7 @@ class ItemLight extends DataObject
 			{	// Allow to use short title only if it is enabled by item type:
 				continue;
 			}
-			$title = ( $title_field == 'title_override' ? $params['title_override'] : $this->$title_field );
+			$title = ( $title_field == 'title_override' ? $params['title_override'] : $this->get( $title_field ) );
 			$title = format_to_output( $title, $params['format'] );
 			if( ! empty( $title ) )
 			{	// Use first not empty field:
@@ -1475,6 +1475,30 @@ class ItemLight extends DataObject
 	{
 		// Character conversions + old DBs may have tags in excerpts, so we strip them:
 		return format_to_output( utf8_strip_tags( $this->excerpt ), $format );
+	}
+
+
+	/**
+	 * Get a member param by its name
+	 *
+	 * @param mixed Name of parameter
+	 * @return mixed Value of parameter
+	 */
+	function get( $parname )
+	{
+		switch( $parname )
+		{
+			case 'title':
+				$title = parent::get( $parname );
+				if( empty( $title ) && is_admin_page() && ! empty( $this->ID ) )
+				{	// Display item ID when title is disabled or optional and empty, only on back-office:
+					$title = '#'.$this->ID;
+				}
+				return $title;
+
+			default:
+				return parent::get( $parname );
+		}
 	}
 
 
