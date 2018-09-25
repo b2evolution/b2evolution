@@ -9069,7 +9069,7 @@ function get_social_media_image( $Item = NULL, $params = array() )
 				if( ! $File->exists() )
 				{ // File doesn't exist:
 					global $Debuglog;
-					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
 					continue;
 				}
 
