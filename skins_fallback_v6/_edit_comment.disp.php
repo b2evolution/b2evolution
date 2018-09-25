@@ -18,6 +18,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $Collection, $Blog, $edited_Comment, $comment_Item, $comment_content;
 global $display_params, $admin_url, $dummy_fields;
 
+echo_image_insert_modal();
+
 if( empty( $comment_Item ) )
 {
 	$comment_Item = & $edited_Comment->get_Item();
@@ -110,6 +112,16 @@ $Form->begin_form( 'evo_comment' );
 	// set b2evoCanvas for plugins
 	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
 
+	// CALL PLUGINS NOW:
+	ob_start();
+	$Plugins->trigger_event( 'DisplayEditorButton', array(
+		'target_type'   => 'Comment',
+		'target_object' => $edited_Comment,
+		'content_id'    => $dummy_fields[ 'content' ],
+		'edit_layout'   => 'inskin'
+	) );
+	$quick_setting_switch = ob_get_flush();
+
 	// Display renderers checkboxes ( Note: This contains inputs )
 	$comment_renderer_checkboxes = $edited_Comment->renderer_checkboxes( NULL, false );
 	if( !empty( $comment_renderer_checkboxes ) )
@@ -155,6 +167,11 @@ $Form->end_form();
 		}
 		return false;
 	}
+
+	jQuery( document ).ready( function() {
+		// Align TinyMCE toggle buttons:
+		jQuery( '.evo_tinymce_toggle_buttons' ).addClass( 'col-sm-offset-3' );
+	} );
 </script>
 <?php
 

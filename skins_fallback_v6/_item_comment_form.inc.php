@@ -436,6 +436,18 @@ function validateCommentForm(form)
 	// Set canvas object for plugins:
 	echo '<script type="text/javascript">var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
 
+	/*
+	// CALL PLUGINS NOW:
+	ob_start();
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+		'target_type'   => 'Comment',
+		'target_object' => $Comment,
+		'content_id'    => $content_id,
+		'edit_layout'   => 'inskin',
+	) );
+	$quick_setting_switch = ob_get_flush();
+	*/
+
 	// Attach files:
 	if( !empty( $comment_attachments ) )
 	{	// display already attached files checkboxes

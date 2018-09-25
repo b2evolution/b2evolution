@@ -58,9 +58,63 @@ class tinymce_plugin extends Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
-		$default_params = array_merge( $params, array( 'default_comment_using' => 'disabled' ) );
+		//$default_params = array_merge( $params, array( 'default_comment_using' => 'disabled' ) );
 
-		return parent::get_coll_setting_definitions( $default_params );
+		//return parent::get_coll_setting_definitions( $default_params );
+		return $this->get_custom_setting_definitions( $params );
+	}
+
+
+	/**
+	 * Define here default custom settings that are to be made available
+	 *     in the backoffice for collections, private messages and newsletters.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_custom_setting_definitions()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array(
+			'back_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label' => T_('Back-office'),
+				),
+			'coll_use_for_posts' => array(
+					'label' => T_( 'Use for posts' ),
+					'type' => 'checkbox',
+					'note' => '',
+					'defaultvalue' => 1,
+				),
+			'coll_use_for_comments' => array(
+					'label' => T_( 'Use for comments' ),
+					'type' => 'checkbox',
+					'note' => '',
+					'defaultvalue' => 1,
+				),
+			'back_layout_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
+			'front_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label' => T_('Front-office'),
+				),
+			'coll_use_for_posts_front' => array(
+					'label' => T_( 'Use for posts' ),
+					'type' => 'checkbox',
+					'note' => '',
+					'defaultvalue' => 1,
+				),
+			'coll_use_for_comments_front' => array(
+					'label' => T_( 'Use for comments' ),
+					'type' => 'checkbox',
+					'note' => '',
+					'defaultvalue' => 1,
+				),
+			'front_layout_end' => array(
+					'layout' => 'end_fieldset',
+				),
+		);
 	}
 
 
@@ -287,7 +341,7 @@ class tinymce_plugin extends Plugin
 		global $wysiwyg_toggle_switch_js_initialized;
 
 		if( empty( $params['content_id'] ) )
-		{	// Value of html attribute "id" of textarea where tibymce is applied
+		{	// Value of html attribute "id" of textarea where tinymce is applied
 			// Don't allow empty id:
 			return false;
 		}
@@ -309,9 +363,19 @@ class tinymce_plugin extends Plugin
 
 				$item_Blog = & $edited_Item->get_Blog();
 
-				if( ! $this->get_coll_setting( 'coll_use_for_posts', $item_Blog ) )
-				{	// This plugin is disabled to use for posts:
-					return false;
+				if( $params['edit_layout'] == 'inskin' )
+				{	// Front-office:
+					if( ! $this->get_coll_setting( 'coll_use_for_posts_front', $item_Blog ) )
+					{
+						return false;
+					}
+				}
+				else
+				{
+					if( ! $this->get_coll_setting( 'coll_use_for_posts', $item_Blog ) )
+					{	// This plugin is disabled to use for posts:
+						return false;
+					}
 				}
 
 				$show_wysiwyg_warning = $this->UserSettings->get( 'show_wysiwyg_warning_'.$Blog->ID );
@@ -337,6 +401,46 @@ class tinymce_plugin extends Plugin
 					);
 				break;
 
+			case 'Comment':
+				// Initialize settings for item:
+				global $Collection, $Blog;
+
+				$edited_Comment = & $params['target_object'];
+				$edited_Item = & $edited_Comment->get_Item();
+
+				if( ! empty( $Blog ) && ! $Blog->get_setting( 'allow_html_comment' ) )
+				{	// Only when HTML is allowed in comment:
+					return false;
+				}
+
+				$item_Blog = & $edited_Item->get_Blog();
+
+				if( $params['edit_layout'] == 'inskin' )
+				{	// Front-office:
+					if( ! $this->get_coll_setting( 'coll_use_for_comments_front', $item_Blog ) )
+					{
+						return false;
+					}
+				}
+				else
+				{
+					if( ! $this->get_coll_setting( 'coll_use_for_comments', $item_Blog ) )
+					{	// This plugin is disabled to use for comments:
+						return false;
+					}
+				}
+
+				$show_wysiwyg_warning = $this->UserSettings->get( 'show_wysiwyg_warning_'.$Blog->ID );
+				$wysiwyg_checkbox_label = TS_("Don't show this again for this Collection");
+
+				// Currently shares the same editor state as Item above:
+				$state_params = array(
+						'type' => $params['target_type'],
+						'blog' => $Blog->ID,
+						'item' => $edited_Item->ID,
+					);
+				break;
+
 			default:
 				// Don't allow this plugin for another things:
 				return false;
@@ -353,8 +457,7 @@ class tinymce_plugin extends Plugin
 				var deactivate_link = '<?php echo $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 0 ) ), '&' );?>';
 				jQuery.get( ( state ? activate_link : deactivate_link ),
 						function( data )
-						{
-							// Fire wysiwyg warning state change event
+						{	// Fire wysiwyg warning state change event
 							jQuery( document ).trigger( 'wysiwyg_warning_changed', [ state ] );
 						} );
 			}
@@ -397,7 +500,7 @@ class tinymce_plugin extends Plugin
 
 				?>
 
-				<div class="btn-group">
+				<div class="btn-group evo_tinymce_toggle_buttons">
 					<input id="tinymce_plugin_toggle_button_html" type="button" value="<?php echo format_to_output( $this->T_('Markup'), 'htmlattr' ); ?>" class="btn btn-default active" disabled="disabled"
 						title="<?php echo format_to_output( $this->T_('Toggle to the markup/pro editor.'), 'htmlattr' ); ?>" />
 					<input id="tinymce_plugin_toggle_button_wysiwyg" type="button" value="WYSIWYG" class="btn btn-default"
@@ -877,7 +980,7 @@ class tinymce_plugin extends Plugin
 
 		// B2evo plugin options
 		$init_options[] = 'collection: "'.$this->collection.'"';
-		$init_options[] = 'postID: '.$this->post_ID;
+		$init_options[] = 'postID: '.( empty( $this->post_ID ) ? 'undefined' : $this->post_ID );
 		$init_options[] = 'rest_url: "'.get_htsrv_url().'rest.php"';
 		$init_options[] = 'anon_async_url: "'.get_htsrv_url().'anon_async.php"';
 		$init_options[] = 'modal_url: "'.$this->get_htsrv_url( 'insert_inline', array( 'post_ID' => $this->post_ID ), '&' ).'"';
@@ -1058,6 +1161,7 @@ class tinymce_plugin extends Plugin
 		switch( $params['type'] )
 		{
 			case 'Item':
+			case 'Comment':
 				// Save an edit state for item edit form:
 
 				if( ! empty( $params['blog'] ) )
@@ -1135,6 +1239,7 @@ class tinymce_plugin extends Plugin
 		switch( $params['type'] )
 		{
 			case 'Item':
+			case 'Comment':
 				$this->UserSettings->set( 'show_wysiwyg_warning_'.intval( $params['blog'] ), intval( $params['on'] ) );
 				break;
 
@@ -1157,6 +1262,7 @@ class tinymce_plugin extends Plugin
 		switch( $params['type'] )
 		{
 			case 'Item':
+			case 'Comment':
 				// Get an edit state for item edit form:
 
 				$ItemCache = & get_ItemCache();
@@ -1191,6 +1297,7 @@ class tinymce_plugin extends Plugin
 				{
 					return $EmailCampaign->get( 'use_wysiwyg' );
 				}
+				break;
 		}
 
 		return 0;

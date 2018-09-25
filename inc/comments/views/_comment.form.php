@@ -168,7 +168,14 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	}
 
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Comment', 'edit_layout' => NULL ) );
+	ob_start();
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+			'target_type'   => 'Comment',
+			'target_object' => $edited_Comment,
+			'content_id'    => 'commentform_post_content',
+			'edit_layout'   => NULL
+		) );
+	$quick_setting_switch = ob_get_flush();
 
 	echo '<div class="pull-right">';
 	echo_comment_buttons( $Form, $edited_Comment );
