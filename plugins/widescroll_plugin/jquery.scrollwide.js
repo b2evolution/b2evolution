@@ -176,7 +176,7 @@
 
 		var scroll_control_obj = $( '#' + control_id );
 
-		var control_css_left = 0;
+		var control_css_left = parseFloat( obj.parent().css( 'padding-left' ) );
 		if( type == 'right' )
 		{
 			control_css_left += obj.outerWidth() + options.margin;
