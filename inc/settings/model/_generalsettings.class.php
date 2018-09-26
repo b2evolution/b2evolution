@@ -165,25 +165,25 @@ class GeneralSettings extends AbstractSettings
 		'regexp_dirname' => '^[a-zA-Z0-9\-_]+$', // TODO: accept spaces and special chars / do full testing on this
 		'reloadpage_timeout' => '300',
 		'time_difference' => '0',
-		'timeout_sessions' => '604800',             // seconds (604800 == 7 days)
-		'timeout_online' => '1200',                 // seconds (1200 == 20 minutes)
+		'timeout_sessions' => '604800',			// seconds (604800 == 7 days)
+		'timeout_online' => '1200',				// seconds (1200 == 20 minutes)
 		'upload_enabled' => '1',
 		'upload_maxkb' => '32000',					// 32 MB
 		'evocache_foldername' => '.evocache',
 		'blogs_order_by' => 'order',				// blogs order in backoffice menu and other places
-		'blogs_order_dir' => 'ASC',					// blogs order direction in backoffice menu and other places
+		'blogs_order_dir' => 'ASC',				// blogs order direction in backoffice menu and other places
 
 		'user_minpwdlen' => '5',
-		'js_passwd_hashing' => '1',					// Use JS password hashing by default
+		'js_passwd_hashing' => '1',				// Use JS password hashing by default
 		'passwd_special' => '0',					// Do not require a special character in password by default
 		'strict_logins' => 1,						// Allow only plain ACSII characters in user login
 
-		'allow_moving_chapters' => '0',				// Do not allow moving chapters by default
+		'allow_moving_chapters' => '0',			// Do not allow moving chapters by default
 
 		'cross_posting' => 0,						// Allow additional categories from other blogs
 		'cross_posting_blog' => 0,					// Allow to choose main category from another blog
-		'redirect_moved_posts' => 0,                // Allow to redirect moved posts link to the correct blog
-		'cross_post_nav_in_same_coll' => 1, // Allow item URLs in other collections
+		'redirect_moved_posts' => 0,				// Allow to redirect moved posts link to the correct blog
+		'cross_post_nav_in_same_coll' => 1,		// Stay in current coll if requested Item Slug is only cross posted in current coll (do not redirect to Canonial)
 
 		'subscribe_new_blogs' => 'public', // Subscribing to new blogs: 'page', 'public', 'all'
 
