@@ -301,14 +301,16 @@ class ItemLight extends DataObject
 	}
 
 
-  /**
-	 * Generate a single post link for the item
+	/**
+	 * Generate a single URL for this Item
 	 *
 	 * @param boolean allow redir to permalink, true | false | 'auto' to prevent redit only if single isn't the current permalink type
- 	 * @param string base url to use
+	 * @param string base url to use
 	 * @param string glue between url params
+	 * @param integer Collection ID, to use URL of first category of this Item from the collection
+	 * @return string
 	 */
-	function get_single_url( $allow_redir = true, $blogurl = '', $glue = '&amp;' )
+	function get_single_url( $allow_redir = true, $blogurl = '', $glue = '&amp;', $blog_ID = NULL )
 	{
 		$this->get_Blog();
 
@@ -350,13 +352,25 @@ class ItemLight extends DataObject
 				break;
 
 			case 'subchap':
-				$main_Chapter = & $this->get_main_Chapter();
-				$permalink = url_add_tail( $blogurl, '/'.$main_Chapter->urlname.'/'.$urltail );
-				break;
-
 			case 'chapters':
-				$main_Chapter = & $this->get_main_Chapter();
-				$permalink = url_add_tail( $blogurl, '/'.$main_Chapter->get_url_path().$urltail );
+				if( $blog_ID !== NULL )
+				{	// Try to get first category of this Item from the requested collection:
+					$item_chapters = $this->get_Chapters();
+					foreach( $item_chapters as $item_Chapter )
+					{
+						if( $item_Chapter->get( 'blog_ID' ) == $blog_ID )
+						{	// Use first found category of this Item from the requested collection:
+							$url_Chapter = $item_Chapter;
+							break;
+						}
+					}
+				}
+				if( empty( $url_Chapter ) )
+				{	// Use main category if another is not requested or cannot be detected above:
+					$url_Chapter = & $this->get_main_Chapter();
+				}
+				$chapter_url = ( $single_links == 'subchap' ? $url_Chapter->urlname : $url_Chapter->get_url_path() );
+				$permalink = url_add_tail( $blogurl, '/'.$chapter_url.$urltail );
 				break;
 
 			case 'short':
@@ -436,9 +450,10 @@ class ItemLight extends DataObject
 	 * @param string Base url to use
 	 * @param string Glue between url params
 	 * @param array What permanent types should be ignored to don't return a permanent URL
+	 * @param integer Collection ID, to use URL of first category of this Item from the collection
 	 * @return string|boolean Permalink URL | FALSE when some permanent type must be ignored
 	 */
-	function get_permanent_url( $permalink_type = '', $blogurl = '', $glue = '&amp;', $ignore_types = array() )
+	function get_permanent_url( $permalink_type = '', $blogurl = '', $glue = '&amp;', $ignore_types = array(), $blog_ID = NULL )
 	{
 		// Get permalink type depending on this item settings:
 		$permalink_type = $this->get_permalink_type( $permalink_type );
@@ -487,7 +502,7 @@ class ItemLight extends DataObject
 
 			case 'single':
 			default:
-				return $this->get_single_url( true, $blogurl, $glue );
+				return $this->get_single_url( true, $blogurl, $glue, $blog_ID );
 		}
 	}
 
