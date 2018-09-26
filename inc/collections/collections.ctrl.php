@@ -376,6 +376,9 @@ switch( $action )
 		// Redirect moved posts:
 		$Settings->set( 'redirect_moved_posts', param( 'redirect_moved_posts', 'integer', 0 ) );
 
+		// Allow item URLs in other collections:
+		$Settings->set( 'cross_post_nav_in_same_coll', param( 'cross_post_nav_in_same_coll', 'integer', 0 ) );
+
 		// Subscribing to new blogs:
 		$Settings->set( 'subscribe_new_blogs', param( 'subscribe_new_blogs', 'string', 'public' ) );
 
