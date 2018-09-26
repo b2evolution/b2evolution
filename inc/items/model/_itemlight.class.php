@@ -1136,7 +1136,7 @@ class ItemLight extends DataObject
 	 */
 	function check_cross_post_nav( $target_blog, $blog_ID )
 	{
-		global $cross_post_nav_in_same_blog;
+		global $Settings;
 
 		if( $target_blog != 'auto' )
 		{ // target_blog is not set to auto, we have to navigate to the item's main cat's blog.
@@ -1149,7 +1149,7 @@ class ItemLight extends DataObject
 			return false;
 		}
 
-		if( ! $cross_post_nav_in_same_blog )
+		if( ! $Settings->get( 'cross_post_nav_in_same_coll' ) )
 		{ // we have to navigate to the item's main cat's blog.
 			return false;
 		}
