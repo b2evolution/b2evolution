@@ -282,7 +282,7 @@ class coll_item_list_Widget extends ComponentWidget
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
-		{ // Disable "allow blockcache" because this widget uses the selected items
+		{	// Disable "allow blockcache" because this widget uses the selected items
 			$r['allow_blockcache']['defaultvalue'] = false;
 			$r['allow_blockcache']['disabled'] = 'disabled';
 			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
@@ -401,11 +401,11 @@ class coll_item_list_Widget extends ComponentWidget
 		$limit = intval( $this->disp_params['limit'] );
 
 		if( $this->disp_params['disp_teaser'] )
-		{ // We want to show some of the post content, we need to load more info: use ItemList2
+		{	// We want to show some of the post content, we need to load more info: use ItemList2
 			$ItemList = new ItemList2( $listBlog, $listBlog->get_timestamp_min(), $listBlog->get_timestamp_max(), $limit, 'ItemCache', $this->code.'_' );
 		}
 		else
-		{ // no excerpts, use ItemListLight
+		{	// no excerpts, use ItemListLight
 			load_class( 'items/model/_itemlistlight.class.php', 'ItemListLight' );
 			$ItemList = new ItemListLight( $listBlog, $listBlog->get_timestamp_min(), $listBlog->get_timestamp_max(), $limit, 'ItemCacheLight', $this->code.'_' );
 		}
@@ -424,7 +424,7 @@ class coll_item_list_Widget extends ComponentWidget
 				'coll_IDs'  => $this->disp_params['blog_ID'],
 			);
 		if( $this->disp_params['item_visibility'] == 'public' )
-		{ // Get only the public items
+		{	// Get only the public items
 			$filters['visibility_array'] = array( 'published' );
 		}
 
@@ -558,7 +558,7 @@ class coll_item_list_Widget extends ComponentWidget
 			$prev_chapter_blog_ID = NULL;
 
 			while( $iterator_Item = & $ItemList->get_item() )
-			{ // Display contents of the Item depending on widget params:
+			{	// Display contents of the Item depending on widget params:
 				$Chapter = & $iterator_Item->get_main_Chapter();
 				if( ! isset( $items_map_by_chapter[$Chapter->ID] ) )
 				{
@@ -568,7 +568,7 @@ class coll_item_list_Widget extends ComponentWidget
 				$items_map_by_chapter[$Chapter->ID][] = $iterator_Item;
 				// Group by blogs if there are chapters from multiple blogs
 				if( ! $group_by_blogs && ( $Chapter->blog_ID != $prev_chapter_blog_ID ) )
-				{ // group by blogs is not decided yet
+				{	// group by blogs is not decided yet
 					$group_by_blogs = ( $prev_chapter_blog_ID != NULL );
 					$prev_chapter_blog_ID = $Chapter->blog_ID;
 				}
@@ -578,11 +578,11 @@ class coll_item_list_Widget extends ComponentWidget
 			$displayed_blog_ID = NULL;
 
 			if( $group_by_blogs && isset( $this->disp_params['collist_start'] ) )
-			{ // Start list of blogs
+			{	// Start list of blogs
 				echo $this->disp_params['collist_start'];
 			}
 			else
-			{ // Display list start, all chapters are in the same group ( not grouped by blogs )
+			{	// Display list start, all chapters are in the same group ( not grouped by blogs )
 				echo $this->get_layout_start();
 			}
 
@@ -593,7 +593,7 @@ class coll_item_list_Widget extends ComponentWidget
 				{
 					$Chapter->get_Blog();
 					if( $displayed_blog_ID != NULL )
-					{ // Display the end of the previous blog's chapter list
+					{	// Display the end of the previous blog's chapter list
 						echo $this->get_layout_end( $item_index );
 					}
 					echo $this->disp_params['coll_start'].$Chapter->Blog->get('shortname'). $this->disp_params['coll_end'];
@@ -607,18 +607,18 @@ class coll_item_list_Widget extends ComponentWidget
 			}
 
 			if( $content_is_displayed )
-			{ // End of a chapter list - if some content was displayed this is always required
+			{	// End of a chapter list - if some content was displayed this is always required
 				echo $this->get_layout_end( $item_index );
 			}
 
 			if( $group_by_blogs && isset( $this->disp_params['collist_end'] ) )
-			{ // End of blog list
+			{	// End of blog list
 				echo $this->disp_params['collist_end'];
 			}
 
 		}
 		else
-		{ // Plain list: (not grouped by category)
+		{	// Plain list: (not grouped by category)
 
 			echo $this->get_layout_start();
 
@@ -652,11 +652,11 @@ class coll_item_list_Widget extends ComponentWidget
 		echo $this->disp_params['block_end'];
 
 		if( $content_is_displayed )
-		{ // Some content is displayed, Print out widget
+		{	// Some content is displayed, Print out widget
 			ob_end_flush();
 		}
 		else
-		{ // No content, Don't display widget
+		{	// No content, Don't display widget
 			ob_end_clean();
 		}
 
@@ -676,7 +676,7 @@ class coll_item_list_Widget extends ComponentWidget
 		$content_is_displayed = false;
 
 		if( isset( $items_map_by_chapter[$Chapter->ID] ) && ( count( $items_map_by_chapter[$Chapter->ID] ) > 0 ) )
-		{ // Display Chapter only if it has some items
+		{	// Display Chapter only if it has some items
 			echo $this->get_layout_item_start();
 			$Chapter->get_Blog();
 			echo '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get('name').'</a>';
@@ -685,7 +685,7 @@ class coll_item_list_Widget extends ComponentWidget
 
 			$item_index = 0;
 			foreach( $items_map_by_chapter[$Chapter->ID] as $iterator_Item )
-			{ // Display contents of the Item depending on widget params:
+			{	// Display contents of the Item depending on widget params:
 				$content_is_displayed = $this->disp_item_contents( $iterator_Item, true, $item_index ) || $content_is_displayed;
 			}
 
@@ -791,7 +791,7 @@ class coll_item_list_Widget extends ComponentWidget
 		// DISPLAY ITEM TITLE:
 
 		if( $this->disp_params['disp_title'] )
-		{ // Display title
+		{	// Display title
 			$disp_Item->title( array(
 					'before'     => $this->disp_params['disp_only_title'] ? $this->disp_params['item_title_single_before'] : $this->disp_params['item_title_before'],
 					'after'      => $this->disp_params['disp_only_title'] ? $this->disp_params['item_title_single_after'] : $this->disp_params['item_title_after'],
@@ -804,7 +804,7 @@ class coll_item_list_Widget extends ComponentWidget
 		// DISPLAY EXCERPT:
 
 		if( $this->disp_params['disp_excerpt'] )
-		{ // Display excerpt
+		{	// Display excerpt
 			$excerpt = $disp_Item->get_excerpt();
 
 			$item_permanent_url = $disp_Item->get_permanent_url();
@@ -823,7 +823,7 @@ class coll_item_list_Widget extends ComponentWidget
 		// DISPLAY TEASER:
 
 		if( $this->disp_params['disp_teaser'] )
-		{ // we want to show some or all of the post content
+		{	// we want to show some or all of the post content
 			$content = $disp_Item->get_content_teaser( 1, false, 'htmlbody' );
 
 			if( $words = $this->disp_params['disp_teaser_maxwords'] )
@@ -836,7 +836,7 @@ class coll_item_list_Widget extends ComponentWidget
 						'always_continue' => true, // Because Item::has_content_parts() is not optimized, we cannot be sure if the content has been cut because of max words or becaus eof [teaserbreak], so in doubt, we display a read more link all the time. Additionally: if there are images "after more", we also need the "more "link.
 					 ) );
 			}
-			
+
 			echo $this->disp_params['item_content_before'].$content.$this->disp_params['item_content_after'];
 			$content_is_displayed = true;
 		}
@@ -846,7 +846,7 @@ class coll_item_list_Widget extends ComponentWidget
 		if( $this->disp_params['attached_pics'] == 'all' ||
 		   ( $this->disp_params['attached_pics'] == 'first' && $this->disp_params['disp_first_image'] == 'normal' ) ||
 			 ( $this->disp_params['attached_pics'] == 'category' && $this->disp_params['disp_first_image'] == 'normal' ) )
-		{ // Display attached pictures
+		{	// Display attached pictures
 			if( $this->disp_params['attached_pics'] == 'first' || $this->disp_params['attached_pics'] == 'category' )
 			{	// Display only one first image:
 				$picture_limit = 1;
@@ -953,7 +953,7 @@ class coll_item_list_Widget extends ComponentWidget
 						}
 
 						// Print attached picture
-						$images .= $File->get_tag( '', '', '', '', $this->disp_params['thumb_size'], $pic_url );
+						$images .= $File->get_tag( '', '', '', '', $this->disp_params['thumb_size'], $pic_url, '', '', '', '', '', '' );
 
 						$content_is_displayed = true;
 
