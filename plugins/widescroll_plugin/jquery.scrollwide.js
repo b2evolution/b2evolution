@@ -81,7 +81,7 @@
 	function initialize( obj )
 	{
 		var options = obj.data('options'),
-			obj_orig_width = obj.width();
+			obj_orig_width = obj.outerWidth();
 
 		obj.css( {
 			width: obj_orig_width - options.width - options.margin,
@@ -99,10 +99,12 @@
 			if( $( this ).scrollLeft() == maxScrollLeft )
 			{	// Hide right scroll control if scrollbar is located in the right position
 				scroll_right.hide();
+				obj.css( 'marginRight', '0' );
 			}
 			else
 			{	// Show right scroll control
 				scroll_right.show();
+				obj.css( 'marginRight', options.width + options.margin );
 			}
 
 			if( $( this ).scrollLeft() == 0 )
@@ -157,6 +159,14 @@
 		{	// Bind action to scroll to the left
 			var scroll_value = obj.scrollLeft() - Math.floor( obj.width() * options.scroll_step / 100 );
 			obj.animate( { scrollLeft: scroll_value + 'px' }, options.scroll_time );
+		} );
+
+		$( window ).bind( 'resize', function()
+		{	// Update box width and right control position:
+			obj.css( 'width', 'auto' );
+			obj_orig_width = obj.outerWidth( true );
+			obj.css( 'width', obj_orig_width - obj.css( 'marginLeft' ) - obj.css( 'marginRight' ) );
+			scroll_right.css( 'left', parseFloat( obj.parent().css( 'padding-left' ) ) + obj.outerWidth() + options.margin + ( scroll_left.is(':visible') && scroll_right.is(':visible') ? options.width : 0 ) );
 		} );
 	}
 
