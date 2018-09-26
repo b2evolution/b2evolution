@@ -1,7 +1,7 @@
 tinymce.PluginManager.add( 'b2evo_attachments', function( editor ) {
 
-	// This plugin requires the postID parameter
-	if( typeof editor.settings.postID === 'undefined' )
+	// This plugin requires the target_ID parameter
+	if( typeof editor.settings.target_ID === 'undefined' )
 	{
 		return;
 	}
@@ -40,11 +40,11 @@ tinymce.PluginManager.add( 'b2evo_attachments', function( editor ) {
 	function loadAttachments()
 	{
 		var collection = editor.getParam( 'collection' );
-		var postID = editor.getParam( 'postID' );
+		var target_ID = editor.getParam( 'target_ID' );
 		var restUrl = editor.getParam( 'rest_url' );
 
 		tinymce.util.XHR.send({
-			url: restUrl + '?api_version=1&api_request=collections/' + collection + '/items/' + postID,
+			url: restUrl + '?api_version=1&api_request=collections/' + collection + '/items/' + target_ID,
 			success: function( text ) {
 				var attachmentList = tinymce.util.JSON.parse( text ).attachments;
 				editor.settings.attachments = [];

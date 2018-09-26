@@ -43,6 +43,7 @@ global $edited_Item, $item_tags, $item_title, $item_content;
 global $post_category, $post_extracats;
 global $admin_url, $redirect_to, $form_action;
 
+echo_image_insert_modal();
 
 // Default params:
 $params = array_merge( array(

@@ -44,6 +44,9 @@ class tinymce_plugin extends Plugin
 	var $post_ID = NULL;
 	var $blog_ID = NULL;
 
+	var $target_type = NULL;
+	var $target_ID = NULL;
+
 	function PluginInit( & $params )
 	{
 		$this->short_desc = $this->T_('Javascript WYSIWYG editor');
@@ -354,7 +357,8 @@ class tinymce_plugin extends Plugin
 
 				$this->collection = $Blog->get( 'urlname' );
 				$edited_Item = & $params['target_object'];
-				$this->post_ID = $edited_Item->ID;
+				$this->target_type = 'Item';
+				$this->target_ID = $edited_Item->ID;
 
 				if( ! empty( $edited_Item ) && ! $edited_Item->get_type_setting( 'allow_html' ) )
 				{	// Only when HTML is allowed in post:
@@ -391,6 +395,8 @@ class tinymce_plugin extends Plugin
 			case 'EmailCampaign':
 				// Initialize settings for email campaign:
 				$edited_EmailCampaign = & $params['target_object'];
+				$this->target_type = 'EmailCampaign';
+				$this->target_ID = $edited_EmailCampaign->ID;
 
 				$show_wysiwyg_warning = $this->UserSettings->get( 'show_wysiwyg_warning_emailcampaign' );
 				$wysiwyg_checkbox_label = TS_("Don't show this again when composing email campaigns");
@@ -407,6 +413,8 @@ class tinymce_plugin extends Plugin
 
 				$edited_Comment = & $params['target_object'];
 				$edited_Item = & $edited_Comment->get_Item();
+				$this->target_type = 'Comment';
+				$this->target_ID = $edited_Comment->ID;
 
 				if( ! empty( $Blog ) && ! $Blog->get_setting( 'allow_html_comment' ) )
 				{	// Only when HTML is allowed in comment:
@@ -414,6 +422,11 @@ class tinymce_plugin extends Plugin
 				}
 
 				$item_Blog = & $edited_Item->get_Blog();
+
+				if( $edited_Comment->is_meta() )
+				{	// Do not use TinyMCE for meta comments, never!
+					return false;
+				}
 
 				if( $params['edit_layout'] == 'inskin' )
 				{	// Front-office:
@@ -496,7 +509,7 @@ class tinymce_plugin extends Plugin
 
 			default:
 				// Get init params, depending on edit mode: simple|expert
-				$tmce_init = $this->get_tmce_init( $params['edit_layout'], $params['content_id'] );
+				$tmce_init = $this->get_tmce_init( $params['edit_layout'], $params['content_id'], $params['target_type'] );
 
 				?>
 
@@ -790,14 +803,15 @@ class tinymce_plugin extends Plugin
 	 * @todo fp> valid_elements to try to generate less validation errors
 	 *
 	 * @param string simple|expert
-	 * @param string ID of the edidted content (value of html attribure "id")
+	 * @param string ID of the edited content (value of html attribure "id")
+	 * @param string Item | EmailCampaign | Comment
 	 * @return string|false
 	 */
-	function get_tmce_init( $edit_layout, $content_id )
+	function get_tmce_init( $edit_layout, $content_id, $target_type )
 	{
 		global $Collection, $Blog;
 		global $Plugins;
-		global $localtimenow, $debug, $rsc_url, $rsc_path, $skins_url;
+		global $localtimenow, $debug, $rsc_url, $rsc_path, $skins_path, $skins_url;
 		global $UserSettings;
 		global $ReqHost;
 
@@ -859,19 +873,23 @@ class tinymce_plugin extends Plugin
 			'removeformat',
 		);
 		/* ----------- button row 3 : tools + insert buttons ------------ */
+		$image_media_buttons = ( $target_type == 'Item' ? 'evo_image image media' : 'image media' );
 		$tmce_theme_advanced_buttons3_array = array(
 			'undo redo',
 			'searchreplace',
 			'fullscreen',
 
-			'evo_image image media',   // can evo_image work in front office?
+			$image_media_buttons,   // can evo_image work in front office?
 			'link unlink',
 			'nonbreaking charmap',
 			'table',
 		);
 
 // fp>erwin: add code to use the followign only for posts (not comments):
-		$tmce_theme_advanced_buttons3_array[] = 'morebreak pagebreak';
+		if( $target_type == 'Item' )
+		{
+			$tmce_theme_advanced_buttons3_array[] = 'morebreak pagebreak';
+		}
 
 		if( $edit_layout != 'inskin' )
 		{ // Additional toolbar for BACK-OFFICE only:
@@ -914,6 +932,35 @@ class tinymce_plugin extends Plugin
 		$tmce_theme_advanced_buttons3 = implode( ' | ' , $tmce_theme_advanced_buttons3_array );
 		$tmce_theme_advanced_buttons4 = implode( ' | ' , $tmce_theme_advanced_buttons4_array );
 
+		// Style formats:
+		$tmce_style_formats = array(
+			array(
+					'title' => 'Download Link',
+					'selector' => 'a',
+					'classes' => 'download'
+					),
+			array(
+					'title' => 'My Test',
+					'selector' => 'p',
+					'classes' => 'mytest',
+			),
+			array(
+					'title' => 'AlertBox',
+					'block' => 'div',
+					'classes' => 'alert_box',
+					'wrapper' => true
+			),
+			array(
+					'title' => 'Red Uppercase Text',
+					'inline' => 'span',
+					'styles' => array(
+							'color'         => 'red', // or hex value #ff0000
+							'fontWeight'    => 'bold',
+							'textTransform' => 'uppercase'
+					)
+			)
+		);
+
 		// PLUGIN EXTENSIONS:
 		$tmce_plugins_array =
 			$Plugins->get_trigger_event("tinymce_extend_plugins",
@@ -944,16 +991,20 @@ class tinymce_plugin extends Plugin
 
 		// B2evo plugin options
 		$init_options[] = 'collection: "'.$this->collection.'"';
-		$init_options[] = 'postID: '.( empty( $this->post_ID ) ? 'undefined' : $this->post_ID );
+		//$init_options[] = 'postID: '.( empty( $this->post_ID ) ? 'undefined' : $this->post_ID );
+		$init_options[] = 'target_ID: '.( empty( $this->target_ID ) ? 'undefined' : $this->target_ID );
+		$init_options[] = 'target_type: "'.( empty( $this->target_type ) ? 'undefined' : format_to_js( $this->target_type ) ).'"';
+
 		$init_options[] = 'rest_url: "'.get_htsrv_url().'rest.php"';
 		$init_options[] = 'anon_async_url: "'.get_htsrv_url().'anon_async.php"';
-		$init_options[] = 'modal_url: "'.$this->get_htsrv_url( 'insert_inline', array( 'post_ID' => $this->post_ID ), '&' ).'"';
+		$init_options[] = 'modal_url: "'.$this->get_htsrv_url( 'insert_inline', array( 'target_type' => $this->target_type, 'target_ID' => $this->target_ID ), '&' ).'"';
 
 		$init_options[] = 'fontsize_formats: "8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt"';
 
 		// TinyMCE Theme+Skin+Variant to use:
 		$init_options[] = 'theme : "modern"';
 		$init_options[] = 'menubar : false';
+
 		// comma separated list of plugins: -- http://wiki.moxiecode.com/index.php/TinyMCE:Plugins
 		$init_options[] = 'plugins : "'.$tmce_plugins.'"';
 		$init_options[] = 'external_plugins: {
@@ -1000,7 +1051,8 @@ class tinymce_plugin extends Plugin
 
 		$init_options[] = 'extended_valid_elements : "figure[class],figcaption[class]"';
 
-		$content_css = '';
+		// Content CSS:
+		$content_css = array();
 		if( ! empty( $Blog ) )
 		{	// Load the appropriate ITEM/POST styles depending on the blog's skin:
 			// Note: we are not aiming for perfect wysiwyg (too heavy), just for a relevant look & feel.
@@ -1012,15 +1064,16 @@ class tinymce_plugin extends Plugin
 				 * @var Skin
 				 */
 				$Skin = $SkinCache->get_by_ID( $blog_skin_ID );
-				$item_css_url = $skins_url.$Skin->folder.'/item.css';
+				$item_css_path = $skins_path.$Skin->folder.'/style.css';
+				$item_css_url = $skins_url.$Skin->folder.'/style.min.css';
 				// else: $item_css_url = $rsc_url.'css/item_base.css';
-				if( file_exists( $item_css_url ) )
+				if( file_exists( $item_css_path ) )
 				{
-					$content_css .= ','.$item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
+					$content_css[] = $item_css_url;		// fp> TODO: this needs to be a param... "of course" -- if none: else item_default.css ?
 				}
 
 				// Load b2evo base css
-				$content_css .= ','.$baseurl.'rsc/build/bootstrap-b2evo_base.bmin.css';
+				$content_css[] = $baseurl.'rsc/build/bootstrap-b2evo_base.bmin.css';
 			}
 			// else item_default.css -- is it still possible to have no skin ?
 		}
@@ -1032,11 +1085,19 @@ class tinymce_plugin extends Plugin
 
 		if( is_array( $tinymce_content_css ) && count( $tinymce_content_css ) )
 		{
-			$content_css .= ','.implode( ',', $tinymce_content_css );
+			$content_css = implode( ',', array_merge( $content_css, $tinymce_content_css ) );
 		}
 
+		/*
 		$init_options[] = 'content_css : "'.$this->get_plugin_url().'editor.css?v='.( $debug ? $localtimenow : $this->version.'+'.$app_version_long )
 									.$content_css.'"';
+		*/
+
+		$init_options[] = 'content_css : "'.$content_css.'"';
+
+		// Style formats:
+		$init_options[] = 'style_formats : '.json_encode( $tmce_style_formats );
+		$init_options[] = 'style_formats_merge : false';
 
 		// Generated HTML code options:
 		// Do not make the path relative to "document_base_url":
@@ -1159,31 +1220,42 @@ class tinymce_plugin extends Plugin
 		$AdminUI = new AdminUI();
 		load_funcs( 'links/model/_link.funcs.php' );
 
-		if( ! isset( $params['post_ID'] ) )
+		if( ! isset( $params['target_ID'] ) || ! isset( $params['target_type'] ) )
 		{
 			return;
 		}
-		$ItemCache = & get_ItemCache();
-		$edited_Item = & $ItemCache->get_by_ID( $params['post_ID'] );
 
-		if( empty( $blog ) )
+		switch( $params['target_type'] )
 		{
-			$blog = $edited_Item->get_Blog()->ID;
-		}
+			case 'Item':
+				$ItemCache = & get_ItemCache();
+				$edited_Item = & $ItemCache->get_by_ID( $params['target_ID'] );
 
-		if( isset( $GLOBALS['files_Module'] )
-		&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
-		&& $current_User->check_perm( 'files', 'view', false ) )
-		{ // Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
-			load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
-			global $LinkOwner; // Initialize this object as global because this is used in many link functions
-			$LinkOwner = new LinkItem( $edited_Item );
+				if( empty( $blog ) )
+				{
+					$blog = $edited_Item->get_Blog()->ID;
+				}
 
-			// Set a different dragand drop button ID
-			global $dragdropbutton_ID, $fm_mode;
-			$fm_mode = 'file_select';
-			$dragdropbutton_ID = 'file-uploader-modal';
-			$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+				if( isset( $GLOBALS['files_Module'] )
+					&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
+					&& $current_User->check_perm( 'files', 'view', false ) )
+				{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
+					load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+					global $LinkOwner; // Initialize this object as global because this is used in many link functions
+					$LinkOwner = new LinkItem( $edited_Item );
+
+					// Set a different dragand drop button ID
+					global $dragdropbutton_ID, $fm_mode;
+					$fm_mode = 'file_select';
+					$dragdropbutton_ID = 'file-uploader-modal';
+					$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+				}
+				break;
+
+			case 'EmailCampaign':
+			case 'Comment':
+			default:
+				return;
 		}
 	}
 

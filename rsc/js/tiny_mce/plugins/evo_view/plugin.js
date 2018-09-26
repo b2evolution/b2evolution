@@ -777,7 +777,7 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 		icon: false,
 		tooltip: evo_js_lang_edit_image,
 		onclick: function() {
-			if( ! editor.getParam( 'postID' ) )	{
+			if( ! editor.getParam( 'target_ID' ) )	{
 				alert( evo_js_lang_alert_before_insert );
 				return false;
 			}

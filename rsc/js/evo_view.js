@@ -775,7 +775,7 @@
 			}
 			this.getEditors( function( editor ) {
 				tinymce.util.XHR.send({
-					url: editor.getParam( 'anon_async_url' ) + '?action=render_inlines&p=' + editor.getParam( 'postID' ),
+					url: editor.getParam( 'anon_async_url' ) + '?action=render_inlines&p=' + editor.getParam( 'target_ID' ),
 					content_type : 'application/x-www-form-urlencoded',
 					data: params,
 					success: function( data ) {

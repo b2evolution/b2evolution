@@ -1383,6 +1383,7 @@ switch( $action )
 
 	case 'get_insert_image_form':
 	case 'get_edit_image_form':
+		// TODO: Make Collection/Blog optional? Why do we even need the Skin here?
 		$BlogCache = & get_BlogCache();
 		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
 		$skin_ID = $Blog->get_skin_ID();
@@ -1418,16 +1419,16 @@ switch( $action )
 			$tag_type = $parts[0];
 			$link_ID = $parts[1];
 
-			$image_caption = $tag_type == 'image' && isset( $parts[2] ) ? $parts[2] : NULL;
-			$image_class = $tag_type == 'image' && isset( $parts[3] ) ? $parts[3] : NULL;
-			$image_disable_caption = $tag_type == 'image' && ( isset( $image_caption ) && $image_caption == '-' );
-			$image_caption = $tag_type == 'image' && $image_caption == '-' ? NULL : $image_caption; // disable caption, reset caption to empty string
+			$image_caption = ( $tag_type == 'image' && isset( $parts[2] ) ? $parts[2] : NULL );
+			$image_class = ( $tag_type == 'image' && isset( $parts[3] ) ? $parts[3] : NULL );
+			$image_disable_caption = ( $tag_type == 'image' && ( isset( $image_caption ) && $image_caption == '-' ) );
+			$image_caption = ( $tag_type == 'image' && $image_caption == '-' ? NULL : $image_caption ); // disable caption, reset caption to empty string
 
-			$thumbnail_size = $tag_type == 'thumbnail' && isset( $parts[2] ) ? $parts[2] : 'medium';
-			$thumbnail_alignment = $tag_type == 'thumbnail' && isset( $parts[3] ) ? $parts[3] : 'left';
-			$thumbnail_class = $tag_type == 'thumbnail' && isset( $parts[4] ) ? $parts[4] : NULL;
+			$thumbnail_size = ( $tag_type == 'thumbnail' && isset( $parts[2] ) ? $parts[2] : 'medium' );
+			$thumbnail_alignment = ( $tag_type == 'thumbnail' && isset( $parts[3] ) ? $parts[3] : 'left' );
+			$thumbnail_class = ( $tag_type == 'thumbnail' && isset( $parts[4] ) ? $parts[4] : NULL );
 
-			$inline_class = $tag_type == 'inline' && isset( $parts[2] ) ? $parts[2] : NULL;
+			$inline_class = ( $tag_type == 'inline' && isset( $parts[2] ) ? $parts[2] : NULL );
 		}
 
 		$LinkCache = & get_LinkCache();

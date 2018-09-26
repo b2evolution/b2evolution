@@ -391,20 +391,22 @@ function select_link_button( $link_ID, $file_type = 'image' )
 	}
 
 	$link_attribs = array();
-	$link_attribs['target'] = '_parent';
-	$link_attribs['class'] = 'action_icon select_file btn btn-primary btn-xs';
+	$link_attribs['class'] = 'evo_select_file btn btn-primary btn-xs';
 
 	// Call evo_item_image_insert only after closing the current modal window to prevent
 	// modal overlay not getting removed after closing the second modal window
 	$link_attribs['onclick'] = 'closeModalWindow( window.document, function() {
-		evo_item_image_insert( '.$Blog->ID.', \'image\', '.$link_ID.' );
+		evo_item_image_insert( '.( empty( $Blog ) ? 'undefined' : $Blog->ID ).', \'image\', '.$link_ID.' );
 	} );';
+
+	$link_attribs['type'] = 'button';
+	$link_attribs['title'] = T_('Select file');
 
 	$r = '';
 
 	if( $linked_File->get_file_type() == $file_type )
 	{
-		$r .= action_icon( T_('Select file'), '', '#', ' '.T_('Select'), NULL, 5, $link_attribs );
+		$r .= '<button'.get_field_attribs_as_string( $link_attribs, false ).'>'.T_('Select').'</button>';
 		$r .= ' ';
 	}
 
@@ -519,7 +521,7 @@ function display_link_position( & $row, $show_actions = true )
 	if( empty( $blog ) )
 	{
 		$Blog = $LinkOwner->get_Blog();
-		$blog = $Blog->ID;
+		$blog = empty( $Blog ) ? NULL : $Blog->ID;
 	}
 
 	// Get available link position for current link owner and file:

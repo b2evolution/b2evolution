@@ -99,7 +99,7 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 		icon: false,
 		tooltip: 'Edit image',
 		onclick: function() {
-			if( ! editor.getParam( 'postID' ) )	{
+			if( ! editor.getParam( 'target_ID' ) )	{
 				alert( 'Please save post first to start uploading files.' );
 				return false;
 			}
@@ -141,7 +141,7 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 		icon: false,
 		tooltip: 'Edit thumbnail',
 		onclick: function() {
-			if( ! editor.getParam( 'postID' ) )	{
+			if( ! editor.getParam( 'target_ID' ) )	{
 				alert( 'Please save post first to start uploading files.' );
 				return false;
 			}
@@ -267,7 +267,7 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 		icon: false,
 		tooltip: 'Edit inline',
 		onclick: function() {
-			if( ! editor.getParam( 'postID' ) )	{
+			if( ! editor.getParam( 'target_ID' ) )	{
 				alert( 'Please save post first to start uploading files.' );
 				return false;
 			}
@@ -396,7 +396,7 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 			tagsParam = tagsParam.join( '&' );
 
 			tinymce.util.XHR.send({
-				url: editor.getParam( 'anon_async_url' ) + '?action=render_inlines&p=' + editor.getParam( 'postID' ),
+				url: editor.getParam( 'anon_async_url' ) + '?action=render_inlines&p=' + editor.getParam( 'target_ID' ),
 				content_type : 'application/x-www-form-urlencoded',
 				data: tagsParam,
 				success: function( data ) {

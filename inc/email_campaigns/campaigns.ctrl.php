@@ -571,7 +571,7 @@ switch( $action )
 				$AdminUI->set_page_manual_link( 'creating-an-email-campaign' );
 				break;
 		}
-		
+
 		$AdminUI->display_breadcrumbpath_add( T_('Campaigns'), $admin_url.'?ctrl=campaigns' );
 		$AdminUI->display_breadcrumbpath_add( isset( $edited_EmailCampaign ) ? $edited_EmailCampaign->get( 'name' ) : T_('New campaign') );
 		break;

@@ -436,7 +436,6 @@ function validateCommentForm(form)
 	// Set canvas object for plugins:
 	echo '<script type="text/javascript">var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
 
-	/*
 	// CALL PLUGINS NOW:
 	ob_start();
 	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
@@ -446,7 +445,6 @@ function validateCommentForm(form)
 		'edit_layout'   => 'inskin',
 	) );
 	$quick_setting_switch = ob_get_flush();
-	*/
 
 	// Attach files:
 	if( !empty( $comment_attachments ) )
@@ -532,7 +530,12 @@ function validateCommentForm(form)
 		echo $Form->buttonsend;
 	$Form->end_fieldset();
 	?>
-
+	<script type="text/javascript">
+	jQuery( document ).ready( function() {
+		// Align TinyMCE toggle buttons:
+		jQuery( '.evo_tinymce_toggle_buttons' ).addClass( 'col-sm-offset-3' );
+	} );
+	</script>
 	<div class="clear"></div>
 
 	<?php
