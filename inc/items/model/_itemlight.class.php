@@ -307,7 +307,7 @@ class ItemLight extends DataObject
 	 * @param boolean allow redir to permalink, true | false | 'auto' to prevent redit only if single isn't the current permalink type
 	 * @param string base url to use
 	 * @param string glue between url params
-	 * @param integer Collection ID, to use URL of first category of this Item from the collection
+	 * @param integer Collection ID, to use URL of first category of this Item from the collection, NULL - use current collection when it is allowed to stay in same collection when cross-posted
 	 * @return string
 	 */
 	function get_single_url( $allow_redir = true, $blogurl = '', $glue = '&amp;', $blog_ID = NULL )
@@ -353,6 +353,14 @@ class ItemLight extends DataObject
 
 			case 'subchap':
 			case 'chapters':
+				if( $blog_ID === NULL )
+				{	// Try to get current collection only when it is allowed to stay in same collection when cross-posted:
+					global $blog, $Settings;
+					if( ! empty( $blog ) && $Settings->get( 'cross_post_nav_in_same_coll' ) )
+					{
+						$blog_ID = $blog;
+					}
+				}
 				if( $blog_ID !== NULL )
 				{	// Try to get first category of this Item from the requested collection:
 					$item_chapters = $this->get_Chapters();
@@ -1125,18 +1133,23 @@ class ItemLight extends DataObject
 	 */
 	function is_part_of_blog( $blog_ID )
 	{
-		global $DB;
-		$cat_count = $DB->get_var( '
-				SELECT count( cat_ID )
-				FROM T_categories, T_postcats
-				WHERE
-					T_categories.cat_ID = T_postcats.postcat_cat_ID
-					and T_categories.cat_blog_ID = '.$blog_ID.'
-					and T_postcats.postcat_post_ID = '.$this->ID
-		);
+		if( empty( $this->ID ) )
+		{
+			return false;
+		}
 
-		// $cat_count>0 means that this item has at least one category that belongs to the target blog.
-		return $cat_count > 0;
+		if( ! isset( $this->part_of_colls ) )
+		{	// Initialize array of collections where this Item has at least one category:
+			global $DB;
+			$SQL = new SQL( 'Select collections where Item #'.$this->ID.' has at least one category' );
+			$SQL->SELECT( 'DISTINCT cat_blog_ID' );
+			$SQL->FROM( 'T_postcats' );
+			$SQL->FROM_add( 'INNER JOIN T_categories ON cat_ID = postcat_cat_ID' );
+			$SQL->WHERE( 'postcat_post_ID = '.$this->ID );
+			$this->part_of_colls = $DB->get_col( $SQL );
+		}
+
+		return in_array( $blog_ID, $this->part_of_colls );
 	}
 
 
