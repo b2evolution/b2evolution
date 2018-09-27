@@ -341,79 +341,34 @@ class ItemType extends DataObject
 		$empty_title_error = false; // use this to display empty title fields error message only ones
 		$custom_field_count = param( 'count_custom_fields', 'integer', 0 ); // all custom fields count ( contains even deleted fields )
 
-		if( empty( $custom_field_count ) )
-		{	// No custom fields to insert/update:
-			return;
-		}
-
-		// Decode data of all custom fields which were posted as single JSON encoded hidden input by JavaScript:
-		$custom_fields_data = json_decode( param( 'custom_fields_data', 'string' ) );
-
-		$inputs = array(
-			'ID'              => '/^[a-z0-9\-_]+$/',
-			'new'             => array( 'integer', 0 ),
-			'label'           => 'string',
-			'name'            => '/^[a-z0-9\-_]+$/',
-			'type'            => 'string',
-			'order'           => 'integer',
-			'note'            => 'string',
-			'public'          => array( 'integer', 0 ),
-			'format'          => 'string',
-			'formula'         => 'string',
-			'header_class'    => 'string',
-			'cell_class'      => 'string',
-			'link'            => array( 'string', 'nolink' ),
-			'link_nofollow'   => 'integer',
-			'link_class'      => 'string',
-			'line_highlight'  => 'string',
-			'green_highlight' => 'string',
-			'red_highlight'   => 'string',
-			'description'     => 'html',
-		);
-
 		for( $i = 1 ; $i <= $custom_field_count; $i++ )
 		{
-			$custom_field_data = array();
-			foreach( $inputs as $input_name => $input_data )
-			{
-				// Get input data:
-				$input_type = is_array( $input_data ) ? $input_data[0] : $input_data;
-				$input_default_value = is_array( $input_data )  ? $input_data[1] : NULL;
-				$input_value = isset( $custom_fields_data->{'custom_field_'.$input_name.$i} ) ? $custom_fields_data->{'custom_field_'.$input_name.$i} : $input_default_value;
-
-				if( $input_value !== $input_default_value )
-				{	// Format input value to requested type only when it is not default value:
-					if( substr( $input_type, 0, 1 ) == '/' )
-					{	// Check value by regexp:
-						if( ! empty( $input_value ) && ! preg_match( $input_type, $input_value ) )
-						{	// Don't allow wrong value:
-							bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $input_name ) );
-						}
-						$input_type = 'string';
-					}
-					$input_value = param_format( $input_value, $input_type );
-				}
-
-				switch( $input_name )
-				{
-					case 'ID':
-						$custom_field_ID = $input_value;
-						break;
-					case 'new':
-						$custom_field_is_new = $input_value;
-						break;
-					default:
-						$custom_field_data[ $input_name ] = $input_value;
-						break;
-				}
-			}
-
 			// Note: this param contains ID of existing custom field from DB
 			//       or random value like d63d5d53-df3d-5299-8c85-35f69b77 for new creating field:
+			$custom_field_ID = param( 'custom_field_ID'.$i, '/^[a-z0-9\-_]+$/', NULL );
 			if( empty( $custom_field_ID ) || in_array( $custom_field_ID, $this->delete_custom_fields ) )
 			{ // This field was deleted, don't neeed to update
 				continue;
 			}
+
+			$custom_field_type = param( 'custom_field_type'.$i, 'string', NULL );
+			$custom_field_label = param( 'custom_field_label'.$i, 'string', NULL );
+			$custom_field_name = param( 'custom_field_name'.$i, '/^[a-z0-9\-_]+$/', NULL );
+			$custom_field_order = param( 'custom_field_order'.$i, 'integer', NULL );
+			$custom_field_note = param( 'custom_field_note'.$i, 'string', NULL );
+			$custom_field_public = param( 'custom_field_public'.$i, 'integer', 0 );
+			$custom_field_format = param( 'custom_field_format'.$i, 'string', NULL );
+			$custom_field_formula = param( 'custom_field_formula'.$i, 'string', NULL );
+			$custom_field_header_class = param( 'custom_field_header_class'.$i, 'string', NULL );
+			$custom_field_cell_class = param( 'custom_field_cell_class'.$i, 'string', NULL );
+			$custom_field_link = param( 'custom_field_link'.$i, 'string', 'nolink' );
+			$custom_field_link_nofollow = param( 'custom_field_link_nofollow'.$i, 'integer', NULL );
+			$custom_field_link_class = param( 'custom_field_link_class'.$i, 'string', NULL );
+			$custom_field_is_new = param( 'custom_field_new'.$i, 'integer', 0 );
+			$custom_field_line_highlight = param( 'custom_field_line_highlight'.$i, 'string', NULL );
+			$custom_field_green_highlight = param( 'custom_field_green_highlight'.$i, 'string', NULL );
+			$custom_field_red_highlight = param( 'custom_field_red_highlight'.$i, 'string', NULL );
+			$custom_field_description = param( 'custom_field_description'.$i, 'html', NULL );
 
 			// Add each new/existing custom field in this array
 			// in order to see all them on the form when post type is not updated because some errors
@@ -421,9 +376,26 @@ class ItemType extends DataObject
 					'temp_i'          => $i, // Used only on submit form to know the number of the field on the form
 					'ID'              => $custom_field_ID,
 					'ityp_ID'         => $this->ID,
-				) + $custom_field_data;
+					'label'           => $custom_field_label,
+					'name'            => $custom_field_name,
+					'type'            => $custom_field_type,
+					'order'           => $custom_field_order,
+					'note'            => $custom_field_note,
+					'public'          => $custom_field_public,
+					'format'          => $custom_field_format,
+					'formula'         => $custom_field_formula,
+					'header_class'    => $custom_field_header_class,
+					'cell_class'      => $custom_field_cell_class,
+					'link'            => $custom_field_link,
+					'link_nofollow'   => $custom_field_link_nofollow,
+					'link_class'      => $custom_field_link_class,
+					'line_highlight'  => $custom_field_line_highlight,
+					'green_highlight' => $custom_field_green_highlight,
+					'red_highlight'   => $custom_field_red_highlight,
+					'description'     => $custom_field_description,
+				);
 
-			if( empty( $custom_field_data['label'] ) )
+			if( empty( $custom_field_label ) )
 			{ // Field title can't be emtpy
 				if( ! $empty_title_error )
 				{ // This message was not displayed yet
@@ -431,18 +403,37 @@ class ItemType extends DataObject
 					$empty_title_error = true;
 				}
 			}
-			elseif( empty( $custom_field_data['name'] ) )
+			elseif( empty( $custom_field_name ) )
 			{ // Field identical name can't be emtpy
-				$Messages->add( sprintf( T_('Please enter name for custom field "%s"'), $custom_field_data['label'] ) );
+				$Messages->add( sprintf( T_('Please enter name for custom field "%s"'), $custom_field_label ) );
 			}
-			elseif( in_array( $custom_field_data['name'], $field_names ) )
+			elseif( in_array( $custom_field_name, $field_names ) )
 			{ // Field name must be identical
-				$Messages->add( sprintf( T_('The field name "%s" is used more than once. Each field name must be unique.'), $custom_field_data['name'] ) );
+				$Messages->add( sprintf( T_('The field name "%s" is used more than once. Each field name must be unique.'), $custom_field_name ) );
 			}
 			else
 			{
-				$field_names[] = $custom_field_data['name'];
+				$field_names[] = $custom_field_name;
 			}
+			$custom_field_data = array(
+				'type'            => $custom_field_type,
+				'name'            => $custom_field_name,
+				'label'           => $custom_field_label,
+				'order'           => $custom_field_order,
+				'note'            => $custom_field_note,
+				'public'          => $custom_field_public,
+				'format'          => $custom_field_format,
+				'formula'         => $custom_field_formula,
+				'header_class'    => $custom_field_header_class,
+				'cell_class'      => $custom_field_cell_class,
+				'link'            => $custom_field_link,
+				'link_nofollow'   => $custom_field_link_nofollow,
+				'link_class'      => $custom_field_link_class,
+				'line_highlight'  => $custom_field_line_highlight,
+				'green_highlight' => $custom_field_green_highlight,
+				'red_highlight'   => $custom_field_red_highlight,
+				'description'     => $custom_field_description,
+			);
 			if( $custom_field_is_new )
 			{ // Insert custom field
 				$this->insert_custom_fields[ $custom_field_ID ] = $custom_field_data;
