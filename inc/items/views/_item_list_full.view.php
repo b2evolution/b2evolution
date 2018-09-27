@@ -133,7 +133,7 @@ while( $Item = & $ItemList->get_item() )
 		}
 		?>">
 			<?php
-				echo '<div class="pull-right">';
+				echo '<div class="pull-right text-right">';
 				$Item->permanent_link( array(
 						'before' => '',
 						'text'   => get_icon( 'permalink' ).' '.T_('Permalink'),
@@ -149,10 +149,28 @@ while( $Item = & $ItemList->get_item() )
 					echo '&nbsp;'.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
 						NULL, NULL, NULL, array( 'class' => 'small' ) );
 				}
-				If( !empty( $Item->order ) )
+				$order_cat_ID = ( isset( $ItemList->filters['cat_array'] ) && count ( $ItemList->filters['cat_array'] ) == 1 ) ? $ItemList->filters['cat_array'][0] : NULL;
+				$item_order = $Item->get_order( $order_cat_ID );
+				if( $item_order !== NULL )
 				{
-					echo T_('Order').': '.$Item->order;
+					echo T_('Order').': '.$item_order;
 				}
+				echo '<br>';
+				echo T_('Item ID').': '.$Item->ID;
+				if( $parent_Item = $Item->get_parent_Item() )
+				{	// Display parent ID if the Item has it:
+					echo ' &middot; '.T_('Parent ID').': ';
+					if( $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $parent_Item ) )
+					{	// Display parent ID as link to view the parent post if current user has a permission:
+						echo '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$parent_Item->get_blog_ID().'&amp;p='.$parent_Item->ID.'" title="'.$parent_Item->dget( 'title', 'htmlattr' ).'">'.$parent_Item->ID.'</a>';
+					}
+					else
+					{	// Display parent ID as text if current user has a permission to view the parent post:
+						echo $parent_Item->ID;
+					}
+				}
+				echo '<br>';
+				echo $Item->get( 'locale' ).' ';
 				$Item->locale_flag( array(' class' => 'flagtop' ) );
 				echo '</div>';
 
@@ -184,7 +202,7 @@ while( $Item = & $ItemList->get_item() )
 					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'contents_last_updated_ts' ) )
 					.$Item->get_refresh_contents_last_updated_link()
 					.$Item->get_refresh_contents_last_updated_link( array(
-							'title' => T_('Reset the "contents last updated" date to the date of the lasted reply on this thread'),
+							'title' => T_('Reset the "contents last updated" date to the date of the latest reply on this thread'),
 							'type'  => 'created',
 						) )
 					.'</span>';
@@ -328,7 +346,7 @@ while( $Item = & $ItemList->get_item() )
 			if( $Blog->get_setting( 'allow_comments' ) != 'never' )
 			{
 				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'#comments" class="'.button_class( 'text' ).'">';
-				$comments_number = generic_ctp_number( $Item->ID, 'comments', 'total' );
+				$comments_number = generic_ctp_number( $Item->ID, 'comments', 'total', true );
 				echo get_icon( $comments_number > 0 ? 'comments' : 'nocomment' ).' ';
 				// TRANS: Link to comments for current post
 				comments_number( T_('no comment'), T_('1 comment'), T_('%d comments'), $Item->ID );
@@ -436,11 +454,11 @@ while( $Item = & $ItemList->get_item() )
 			if( $Item->can_see_meta_comments() )
 			{ // Display tabs to switch between user and meta comments Only if current user can views meta comments
 				$switch_comment_type_url = $admin_url.'?ctrl=items&amp;blog='.$blog.'&amp;p='.$Item->ID;
-				$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
+				$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total', true );
 				$switch_comment_type_tabs = array(
 						'feedback' => array(
 							'url'   => $switch_comment_type_url.'&amp;comment_type=feedback#comments',
-							'title' => T_('User comments').' <span class="badge">'.generic_ctp_number( $Item->ID, 'feedbacks', 'total' ).'</span>' ),
+							'title' => T_('User comments').' <span class="badge">'.generic_ctp_number( $Item->ID, 'feedbacks', 'total', true ).'</span>' ),
 						'meta' => array(
 							'url'   => $switch_comment_type_url.'&amp;comment_type=meta#comments',
 							'title' => T_('Meta discussion').' <span class="badge'.( $metas_count > 0 ? ' badge-important' : '' ).'">'.$metas_count.'</span>' )
@@ -462,8 +480,8 @@ while( $Item = & $ItemList->get_item() )
 			$comment_moderation_statuses = explode( ',', $Blog->get_setting( 'moderation_statuses' ) );
 
 			$currentpage = param( 'currentpage', 'integer', 1 );
-			$total_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), 'total' );
-			$moderation_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), $comment_moderation_statuses );
+			$total_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), 'total', true );
+			$moderation_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), $comment_moderation_statuses, true );
 			// Decide to show all comments, or only which require moderation:
 			if( ( $comment_type != 'meta' ) && // Display all comments in meta mode by default
 			    ( $total_comments_number > 5 && $moderation_comments_number > 0 ) )

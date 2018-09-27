@@ -51,7 +51,7 @@ class AdminUI extends AdminUI_general
 		require_js( '#bootstrap_typeahead#', 'rsc_url' );
 
 		// JS to init Bootstrap tooltips (E.g. on badges with title "Admin"):
-		add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip() } )' );
+		add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip( {html: true} ) } )' );
 
 		if( $debug )
 		{	// Use readable CSS:
@@ -326,12 +326,12 @@ class AdminUI extends AdminUI_general
 					'page_url' => '', // All generated links will refer to the current page
 					'before' => '<div class="results panel panel-default">',
 					'content_start' => '<div id="$prefix$ajax_content">',
-					'header_start' => '',
+					'header_start' => '<div class="evo_panel">',
 						'header_text' => '<div class="center"><ul class="pagination">'
 								.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 							.'</ul></div>',
 						'header_text_single' => '',
-					'header_end' => '',
+					'header_end' => '</div>',
 					'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 					'global_icons_class' => 'btn btn-default btn-sm',
 					'filters_start'        => '<div class="filters panel-body">',
@@ -387,7 +387,7 @@ class AdminUI extends AdminUI_general
 							'total_col_end' => "</td>\n",
 						'total_line_end' => "</tr>\n\n",
 					'list_end' => "</table></div>\n\n",
-					'footer_start' => '<div class="panel-footer">',
+					'footer_start' => '<div class="evo_panel evo_panel__footer">',
 					'footer_text' => '<div class="center"><ul class="pagination">'
 							.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 						.'</ul></div><div class="center page_size_selector">$page_size$</div>'
@@ -708,6 +708,11 @@ class AdminUI extends AdminUI_general
 					'text_danger'  => 'btn btn-danger',
 					'text_warning' => 'btn btn-warning',
 					'group'        => 'btn-group',
+					'small_text'   => 'btn btn-default btn-xs',
+					'small_text_primary' => 'btn btn-primary btn-xs',
+					'small_text_success' => 'btn btn-success btn-xs',
+					'small_text_danger'  => 'btn btn-danger btn-xs',
+					'small_text_warning' => 'btn btn-warning btn-xs',
 				);
 
 			case 'table_browse':

@@ -58,8 +58,12 @@ $params = array_merge( array(
 			) ),
 		'comment_mode'         => '', // Can be 'quote' from GET request
 		'comment_type'         => 'comment',
+		'comment_title_before'  => '<div class="panel-heading"><h4 class="evo_comment_title panel-title">',
+		'comment_title_after'   => '</h4></div><div class="panel-body">',
 		'comment_rating_before' => '<div class="evo_comment_rating">',
 		'comment_rating_after'  => '</div>',
+		'comment_text_before'   => '<div class="evo_comment_text">',
+		'comment_text_after'    => '</div>',
 		'comment_info_before'   => '<footer class="evo_comment_footer clear text-muted"><small>',
 		'comment_info_after'    => '</small></footer></div>',
 	), $params );
@@ -397,6 +401,13 @@ function validateCommentForm(form)
 	// Set prefix for js code in plugins:
 	$plugin_js_prefix = ( $params['comment_type'] == 'meta' ? 'meta_' : '' );
 
+	// Display plugin captcha for comment form before textarea:
+	$Plugins->display_captcha( array(
+			'Form'          => & $Form,
+			'form_type'     => 'comment',
+			'form_position' => 'before_textarea',
+		) );
+
 	ob_start();
 	echo '<div class="comment_toolbars">';
 	// CALL PLUGINS NOW:
@@ -489,6 +500,13 @@ function validateCommentForm(form)
 	}
 
 	$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
+
+	// Display plugin captcha for comment form before submit button:
+	$Plugins->display_captcha( array(
+			'Form'          => & $Form,
+			'form_type'     => 'comment',
+			'form_position' => 'before_submit_button',
+		) );
 
 	$Form->begin_fieldset();
 		echo $Form->buttonsstart;

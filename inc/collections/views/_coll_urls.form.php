@@ -79,8 +79,16 @@ else
 
 $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_link('collection-base-url-settings') );
 
+	$http_protocol_options = array(
+			array( 'always_http', sprintf( T_('Always use %s'), '<code>http</code>' ) ),
+			array( 'always_https', sprintf( T_('Always use %s'), '<code>https</code>' ) ),
+			array( 'allow_both', sprintf( T_('Allow both %s and %s as valid URLs'), '<code>http</code>', '<code>https</code>' ) )
+		);
+
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// Permission to edit advanced admin settings
+
+		$Form->radio( 'http_protocol', $edited_Blog->get_setting( 'http_protocol' ), $http_protocol_options, T_('SSL'), true );
 
 		$Form->text( 'blog_urlname', $edited_Blog->get( 'urlname' ), 20, T_('Collection URL name'), T_('Used to uniquely identify this collection. Appears in URLs and gets used as default for the media location (see the advanced tab).'), 255 );
 
@@ -106,6 +114,8 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 			$siteurl_absolute_warning = ' <span class="note red">'.T_('WARNING: it is highly recommended that this ends in with a / or .php !').'</span>';
 		}
 
+		// Initialize html code which is used below to display and update on switching between http and https protocols:
+		$baseurl_html = '<span data-protocol-url="'.format_to_output( $baseurl, 'htmlattr' ).'">'.$edited_Blog->get_protocol_url( $baseurl ).'</span>';
 
 		$access_type_options = array(
 			/* TODO: Tblue> This option only should be available if the
@@ -121,15 +131,15 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 			 * less that there are 2 ways to do the same thing.
 			 */
 			array( 'baseurl', T_('Default collection on baseurl'),
-											$baseurl.' ('.( !isset($defblog)
+											$baseurl_html.' ('.( !isset($defblog)
 												?	/* TRANS: NO current default blog */ T_('No default collection is currently set')
 												: /* TRANS: current default blog */ T_('Current default :').' '.$defblog ).
 											')',
 										'',
-										'onclick="update_urlpreview( \''.$baseurl.'\', \'index.php\' );"'
+										'onclick="update_urlpreview( \''.$baseurl.'\', \'\' );"'
 			),
 			array( 'default', T_('Default collection in index.php'),
-											$baseurl.'index.php ('.( !isset($defblog)
+											$baseurl_html.'index.php ('.( !isset($defblog)
 												?	/* TRANS: NO current default blog */ T_('No default collection is currently set')
 												: /* TRANS: current default blog */ T_('Current default :').' '.$defblog ).
 											')',
@@ -137,23 +147,23 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 										'onclick="update_urlpreview( \''.$baseurl.'\', \'index.php\' );"'
 			),
 			array( 'index.php', T_('Explicit param on index.php'),
-										$baseurl.'index.php?blog='.$edited_Blog->ID,
+										$baseurl_html.'index.php?blog='.$edited_Blog->ID,
 										'',
 										'onclick="update_urlpreview( \''.$baseurl.'\', \'index.php?blog='.$edited_Blog->ID.'\' )"',
 			),
 			array( 'extrabase', T_('Extra path on baseurl'),
-										$baseurl.'<span class="blog_url_text">'.$edited_Blog->get( 'urlname' ).'</span>/ ('.T_('Requires mod_rewrite').')',
+										$baseurl_html.'<span class="blog_url_text">'.$edited_Blog->get( 'urlname' ).'</span>/ ('.T_('Requires mod_rewrite').')',
 										'',
 										'onclick="update_urlpreview( \''.$baseurl.'\', document.getElementById( \'blog_urlname\' ).value+\'/\' )"'
 			),
 			array( 'extrapath', T_('Extra path on index.php'),
-										$baseurl.'index.php/<span class="blog_url_text">'.$edited_Blog->get( 'urlname' ).'</span>/',
+										$baseurl_html.'index.php/<span class="blog_url_text">'.$edited_Blog->get( 'urlname' ).'</span>/',
 										'',
 										'onclick="update_urlpreview( \''.$baseurl.'\', \'index.php/\'+document.getElementById( \'blog_urlname\' ).value+\'/\' )"'
 			),
 			array( 'relative', T_('Relative to baseurl').':',
 										'',
-										'<span class="nobr"><code>'.$baseurl.'</code>'
+										'<span class="nobr"><code>'.$baseurl_html.'</code>'
 										.'<input type="text" id="blog_siteurl_relative" class="form_text_input form-control" name="blog_siteurl_relative" size="35" maxlength="120" value="'
 										.format_to_output( $blog_siteurl_relative, 'formvalue' )
 										.'" onkeyup="update_urlpreview( \''.$baseurl.'\', this.value );"
@@ -165,7 +175,7 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 		if( ! is_valid_ip_format( $basehost ) )
 		{// Not an IP address, we can use subdomains:
 			$access_type_options[] = array( 'subdom', T_('Subdomain of basehost'),
-										$baseprotocol.'://<span class="blog_url_text">'.$edited_Blog->urlname.'</span>.'.$basehost.$baseport.'/',
+										'<span data-protocol-url="'.format_to_output( $baseprotocol.'://', 'htmlattr' ).'">'.$edited_Blog->get_protocol_url( $baseprotocol.'://' ).'</span><span class="blog_url_text">'.$edited_Blog->urlname.'</span>.'.$basehost.$baseport.'/',
 										'',
 										'onclick="update_urlpreview( \''.$baseprotocol.'://\'+document.getElementById( \'blog_urlname\' ).value+\'.'.$basehost.$baseport.'/\' )"'
 			);
@@ -213,6 +223,14 @@ function update_urlpreview( baseurl, url_path )
 	jQuery( '#skins_assets_url_type_relative' ).html( basepath + 'skins/' );
 	jQuery( '#plugins_assets_url_type_relative' ).html( basepath + 'plugins/' );
 	jQuery( '#htsrv_assets_url_type_relative' ).html( baseurl + 'htsrv/' );
+
+	// Update data with protocol urls in order to display them on select "SSL" == "Allow both http and https as valid URLs":
+	jQuery( '#urlpreview' ).data( 'protocol-url', baseurl + url_path );
+	jQuery( '#media_assets_url_type_relative' ).data( 'protocol-url', baseurl + 'media/' );
+	jQuery( '#htsrv_assets_url_type_relative' ).data( 'protocol-url', baseurl + 'htsrv/' );
+
+	// Update protocols of the urls:
+	force_http_protocols();
 }
 
 // Update blog url name in several places on the page:
@@ -233,20 +251,53 @@ jQuery( '[id$=_assets_absolute_url]' ).focus( function()
 	var radio_field_name = jQuery( this ).attr( 'id' ).replace( '_absolute_url', '_url_type' );
 	jQuery( '[name=' + radio_field_name + ']' ).attr( 'checked', 'checked' );
 } );
+
+// Update blog urls depending on selected setting "SSL":
+jQuery( '[name=http_protocol]' ).click( function()
+{
+	force_http_protocols();
+} );
+function force_http_protocols()
+{
+	jQuery( '[data-protocol-url]' ).each( function()
+	{
+		var url = jQuery( this ).html();
+		switch( jQuery( '[name=http_protocol]:checked' ).val() )
+		{	// Force base URL to http or https for the edited collection:
+			case 'always_http':
+				url = url.replace( /^https:/, 'http:' );
+				break;
+			case 'always_https':
+				url = url.replace( /^http:/, 'https:' );
+				break;
+			case 'allow_both':
+				url = jQuery( this ).data( 'protocol-url' );
+				break;
+		}
+		jQuery( this ).html( url );
+	} );
+}
 </script>
 <?php
 
 	}
+	else
+	{	// Display only current values as text if user has no permission to edit:
+		$current_http_protocol_option = '';
+		foreach( $http_protocol_options as $http_protocol_option )
+		{
+			if( $http_protocol_option[0] == $edited_Blog->get_setting( 'http_protocol' ) )
+			{	// Get title of current option:
+				$current_http_protocol_option = $http_protocol_option[1];
+				break;
+			}
+		}
+		$Form->info( T_('SSL'), $current_http_protocol_option );
+	}
 
 	// URL Preview (always displayed)
 	$blogurl = $edited_Blog->gen_blogurl();
-	$Form->info( T_('URL preview'), '<span id="urlpreview">'.$blogurl.'</span>' );
-
-	$http_protocol_options = array(
-		array( 'always_redirect', T_('Always redirect to URL above') ),
-		array( 'allow_both', sprintf( T_('Allow both %s and %s as valid URLs'), '<code>http</code>', '<code>https</code>' ) ) );
-
-		$Form->radio( 'blog_http_protocol', $edited_Blog->get( 'http_protocol' ), $http_protocol_options, T_('SSL'), true );
+	$Form->info( T_('URL preview'), '<code id="urlpreview" data-protocol-url="'.format_to_output( $blogurl, 'htmlattr' ).'">'.$blogurl.'</code>' );
 
 $Form->end_fieldset();
 
@@ -285,7 +336,7 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{ // Permission to edit advanced admin settings
-		global $rsc_url, $media_url, $skins_url, $plugins_url, $htsrv_url, $htsrv_url_sensitive;
+		global $rsc_url, $media_url, $skins_url, $plugins_url, $htsrv_url;
 
 		$assets_url_data = array();
 		// media url:
@@ -336,7 +387,7 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 		// htsrv url:
 		$assets_url_data['htsrv_assets_url_type'] = array(
 				'label'        => sprintf( T_('Link to %s through'), '<code>/htsrv/</code>' ),
-				'url'          => $htsrv_url.( $htsrv_url !=  $htsrv_url_sensitive ? ', '.$htsrv_url_sensitive : '' ),
+				'url'          => $htsrv_url,
 				'absolute_url' => 'htsrv_assets_absolute_url',
 				'folder'       => '/htsrv/',
 				'local_url'    => $edited_Blog->get_htsrv_url()
@@ -350,7 +401,7 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 			}
 			else
 			{ // Display options full list
-				$basic_asset_url_note = $asset_url_data['url'];
+				$basic_asset_url_note = '<span data-protocol-url="'.format_to_output( $asset_url_data['url'], 'htmlattr' ).'">'.$edited_Blog->get_protocol_url( $asset_url_data['url'] ).'</span>';
 				if( ! in_array( $asset_url_type, array( 'media_assets_url_type', 'htsrv_assets_url_type' ) ) &&
 				    $edited_Blog->get( 'access_type' ) == 'absolute' &&
 				    $edited_Blog->get_setting( $asset_url_type ) == 'basic' )
@@ -361,7 +412,7 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 						.'</span>';
 				}
 
-				$relative_asset_url_note = '<span id="'.$asset_url_type.'_relative">'.$asset_url_data['local_url'].'</span>';
+				$relative_asset_url_note = '<span id="'.$asset_url_type.'_relative" data-protocol-url="'.format_to_output( $asset_url_data['local_url'], 'htmlattr' ).'">'.$edited_Blog->get_protocol_url( $asset_url_data['local_url'] ).'</span>';
 				if( ! in_array( $asset_url_type, array( 'skins_assets_url_type', 'media_assets_url_type', 'htsrv_assets_url_type' ) ) &&
 				    $edited_Blog->get_setting( 'skins_assets_url_type' ) != 'relative' &&
 				    $edited_Blog->get_setting( $asset_url_type ) == 'relative' )
@@ -400,6 +451,10 @@ $Form->begin_fieldset( T_('Assets URLs / CDN support').get_admin_badge().get_man
 		$Form->info( sprintf( T_('Load %s assets from'), '<code>/plugins/</code>' ), $edited_Blog->get_local_plugins_url() );
 		$Form->info( sprintf( T_('Link to %s through'), '<code>/htsrv/</code>' ), $edited_Blog->get_local_htsrv_url() );
 	}
+
+	$Form->info( 'Note', sprintf( T_('Login, Registration and Password operations are controlled by the following settings: <a %s>In-skin login</a> and <a %s>Require SSL for login</a>'),
+		'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$edited_Blog->ID.'#inskin_actions"',
+		'href="'.$admin_url.'?ctrl=registration#security_options"' ) );
 
 $Form->end_fieldset();
 

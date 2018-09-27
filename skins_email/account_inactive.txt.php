@@ -46,8 +46,8 @@ if( ! empty( $login_Blog ) )
 }
 else
 { // Use standard login/lost password urls
-	$login_url = get_htsrv_url( true ).'login.php';
-	$lostpassword_url = get_htsrv_url( true ).'login.php?action=lostpassword';
+	$login_url = get_htsrv_url( 'login' ).'login.php';
+	$lostpassword_url = get_htsrv_url( 'login' ).'login.php?action=lostpassword';
 }
 
 echo T_('Log in now!').': '.url_add_param( $login_url, $dummy_fields['login'].'='.format_to_output( $inactive_User->login, 'urlencoded' ) )."\n";

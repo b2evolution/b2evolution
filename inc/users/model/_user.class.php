@@ -310,7 +310,7 @@ class User extends DataObject
 				//array( 'table'=>'T_items__item', 'fk'=>'post_lastedit_user_ID', 'msg'=>T_('%d posts last edited by this user') ),
 				array( 'table'=>'T_items__item', 'fk'=>'post_assigned_user_ID', 'msg'=>T_('%d posts assigned to this user') ),
 				array( 'table'=>'T_users__organization', 'fk'=>'org_owner_user_ID', 'msg'=>T_('%d organizations') ),
-				array( 'table'=>'T_polls__question', 'fk'=>'pqst_owner_user_ID', 'msg'=>T_('%d poll questions') ),
+				array( 'table'=>'T_polls__question', 'fk'=>'pqst_owner_user_ID', 'msg'=>T_('%d polls owned by this user') ),
 				array( 'table'=>'T_automation__automation', 'fk'=>'autm_owner_user_ID', 'msg'=>T_('%d automations') ),
 				// Do not delete user private messages
 				//array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('The user has authored %d message(s)') ),
@@ -434,6 +434,25 @@ class User extends DataObject
 
 
 	/**
+	 * Check relations for restrictions before deleting
+	 *
+	 * @param string
+	 * @param array list of foreign keys to ignore
+	 * @param boolean TRUE to display restriction as link to edit the record
+	 * @return boolean true if no restriction prevents deletion
+	 */
+	function check_delete( $restrict_title, $ignore = array(), $addlink = false )
+	{
+		// Prepend user login before restriction messages to know what user is deleting:
+		$user_login_link = $this->get_identity_link( array(
+				'link_text' => 'login',
+			) );
+
+		return parent::check_delete( $user_login_link.': '.$restrict_title, $ignore, true );
+	}
+
+
+	/**
 	 * Load data from registration form
 	 *
 	 * @return boolean true if loaded data seems valid.
@@ -452,7 +471,6 @@ class User extends DataObject
 		$request_password_confirmation = ! ( $is_api_request && $is_new_user );
 
 		$has_full_access = $current_User->check_perm( 'users', 'edit' );
-		$has_moderate_access = $current_User->check_perm( 'users', 'moderate' );
 
 		// ---- Login checking / START ----
 		// TODO: Must be factorized with code from $this->load_from_Request()!
@@ -469,7 +487,7 @@ class User extends DataObject
 				if( $edited_user_login != $this->get( 'login' ) &&
 				    ! empty( $reserved_logins ) &&
 				    in_array( $edited_user_login, $reserved_logins ) &&
-				    ( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit', false ) ) )
+				    ( ! is_logged_in() || ! $has_full_access ) )
 				{	// If login has been changed and new entered login is reserved and current User cannot use this:
 					param_error( 'edited_user_login', T_('You cannot use this login because it is reserved.') );
 				}
@@ -486,7 +504,7 @@ class User extends DataObject
 		if( $UserLogin && $UserLogin->ID != $this->ID )
 		{	// The login is already registered
 			$login_error_message = T_( 'This login already exists.' );
-			if( $current_User->check_perm( 'users', 'edit' ) )
+			if( $has_full_access )
 			{
 				$login_error_message = sprintf( T_( 'This login &laquo;%s&raquo; already exists. Do you want to <a %s>edit the existing user</a>?' ),
 					$edited_user_login,
@@ -648,6 +666,9 @@ class User extends DataObject
 		global $current_User, $Session, $localtimenow;
 		global $is_api_request;
 
+		$has_full_access = $current_User->check_perm( 'users', 'edit' );
+		$has_moderate_access = $current_User->can_moderate_user( $this->ID );
+
 		// TRUE when we create new user:
 		$is_new_user = ( $this->ID == 0 );
 
@@ -669,7 +690,7 @@ class User extends DataObject
 				if( $edited_user_login != $this->get( 'login' ) &&
 				    ! empty( $reserved_logins ) &&
 				    in_array( $edited_user_login, $reserved_logins ) &&
-				    ( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit', false ) ) )
+				    ( ! is_logged_in() || ! $has_full_access ) )
 				{	// If login has been changed and new entered login is reserved and current User cannot use this:
 					param_error( 'edited_user_login', T_('You cannot use this login because it is reserved.') );
 				}
@@ -686,7 +707,7 @@ class User extends DataObject
 		if( $UserLogin && $UserLogin->ID != $this->ID )
 		{	// The login is already registered
 			$login_error_message = T_( 'This login already exists.' );
-			if( $current_User->check_perm( 'users', 'edit' ) )
+			if( $has_full_access )
 			{
 				$login_error_message = sprintf( T_( 'This login &laquo;%s&raquo; already exists. Do you want to <a %s>edit the existing user</a>?' ),
 					$edited_user_login,
@@ -703,8 +724,6 @@ class User extends DataObject
 
 		$is_identity_form = param( 'identity_form', 'boolean', false );
 		$is_admin_form = param( 'admin_form', 'boolean', false );
-		$has_full_access = $current_User->check_perm( 'users', 'edit' );
-		$has_moderate_access = $current_User->check_perm( 'users', 'moderate' );
 
 		// ******* Admin form or new user create ******* //
 		// In both cases current user must have users edit permission!
@@ -885,8 +904,8 @@ class User extends DataObject
 			}
 		}
 
-		if( $has_full_access )
-		{	// If current user has full access to edit other users:
+		if( $has_moderate_access )
+		{	// If current user can moderate other users:
 			if( param( 'edited_user_tags', 'string', NULL ) !== NULL )
 			{	// Update user tags if they has been submitted:
 				$this->set_usertags_from_string( get_param( 'edited_user_tags' ) );
@@ -896,7 +915,6 @@ class User extends DataObject
 		// ******* Identity form ******* //
 		if( $is_identity_form || ( $is_api_request && $is_new_user ) )
 		{
-			$can_edit_users = $current_User->check_perm( 'users', 'edit' );
 			$edited_user_perms = array( 'edited-user', 'edited-user-required' );
 
 			global $edited_user_age_min, $edited_user_age_max;
@@ -916,7 +934,7 @@ class User extends DataObject
 			}
 
 			$firstname_editing = $Settings->get( 'firstname_editing' );
-			if( ( in_array( $firstname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $can_edit_users ) )
+			if( ( in_array( $firstname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $has_moderate_access ) )
 			{	// User has a permissions to save Firstname
 				$edited_user_firstname = param( 'edited_user_firstname', 'string', ! $is_api_request || $firstname_editing == 'edited-user-required' ? true : NULL );
 				if( isset( $edited_user_firstname ) || $is_identity_form )
@@ -930,7 +948,7 @@ class User extends DataObject
 			}
 
 			$lastname_editing = $Settings->get( 'lastname_editing' );
-			if( ( in_array( $lastname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $can_edit_users ) )
+			if( ( in_array( $lastname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $has_moderate_access ) )
 			{	// User has a permissions to save Lastname
 				$edited_user_lastname = param( 'edited_user_lastname', 'string', ! $is_api_request || $lastname_editing == 'edited-user-required' ? true : NULL );
 				if( isset( $edited_user_lastname ) || $is_identity_form )
@@ -944,7 +962,7 @@ class User extends DataObject
 			}
 
 			$nickname_editing = $Settings->get( 'nickname_editing' );
-			if( ( in_array( $nickname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $can_edit_users ) )
+			if( ( in_array( $nickname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $has_moderate_access ) )
 			{	// User has a permissions to save Nickname
 				$edited_user_nickname = param( 'edited_user_nickname', 'string', ! $is_api_request || $nickname_editing == 'edited-user-required' ? true : NULL );
 				if( isset( $edited_user_nickname ) || $is_identity_form )
@@ -958,7 +976,7 @@ class User extends DataObject
 			}
 
 			$gender_editing = $Settings->get( 'registration_require_gender' );
-			if( $this->ID == $current_User->ID || ( $gender_editing != 'hidden' && $can_edit_users ) )
+			if( $this->ID == $current_User->ID || ( $gender_editing != 'hidden' && $has_moderate_access ) )
 			{
 				$edited_user_gender = param( 'edited_user_gender', 'string' );
 				if( isset( $edited_user_gender ) || $is_identity_form )
@@ -977,7 +995,7 @@ class User extends DataObject
 				$edited_user_ctry_ID = param( 'edited_user_ctry_ID', 'integer', ! $is_api_request || $country_is_required ? true : NULL );
 				if( isset( $edited_user_ctry_ID ) || $is_identity_form )
 				{
-					if( $country_is_required && $can_edit_users && $edited_user_ctry_ID == 0 )
+					if( $country_is_required && $has_moderate_access && $edited_user_ctry_ID == 0 )
 					{ // Display a note message if user can edit all users
 						param_add_message_to_Log( 'edited_user_ctry_ID', T_('Please select a country').'.', 'note' );
 					}
@@ -995,7 +1013,7 @@ class User extends DataObject
 				$edited_user_rgn_ID = param( 'edited_user_rgn_ID', 'integer', ! $is_api_request || $region_is_required ? true : NULL );
 				if( isset( $edited_user_rgn_ID ) || $is_identity_form  )
 				{
-					if( $region_is_required && $can_edit_users && $edited_user_rgn_ID == 0 )
+					if( $region_is_required && $has_moderate_access && $edited_user_rgn_ID == 0 )
 					{ // Display a note message if user can edit all users
 						param_add_message_to_Log( 'edited_user_rgn_ID', T_('Please select a region').'.', 'note' );
 					}
@@ -1013,7 +1031,7 @@ class User extends DataObject
 				$edited_user_subrg_ID = param( 'edited_user_subrg_ID', 'integer', ! $is_api_request || $subregion_is_required ? true : NULL );
 				if( isset( $edited_user_subrg_ID ) || $is_identity_form  )
 				{
-					if( $subregion_is_required && $can_edit_users && $edited_user_subrg_ID == 0 )
+					if( $subregion_is_required && $has_moderate_access && $edited_user_subrg_ID == 0 )
 					{ // Display a note message if user can edit all users
 						param_add_message_to_Log( 'edited_user_subrg_ID', T_('Please select a sub-region').'.', 'note' );
 					}
@@ -1031,7 +1049,7 @@ class User extends DataObject
 				$edited_user_city_ID = param( 'edited_user_city_ID', 'integer', ! $is_api_request || $city_is_required ? true : NULL );
 				if( isset( $edited_user_city_ID ) || $is_identity_form )
 				{
-					if( $city_is_required && $can_edit_users && $edited_user_city_ID == 0 )
+					if( $city_is_required && $has_moderate_access && $edited_user_city_ID == 0 )
 					{ // Display a note message if user can edit all users
 						param_add_message_to_Log( 'edited_user_city_ID', T_('Please select a city').'.', 'note' );
 					}
@@ -1092,7 +1110,7 @@ class User extends DataObject
 
 				if( empty( $uf_val ) && $this->userfield_defs[$userfield->uf_ufdf_ID][2] == 'require' )
 				{	// Display error for empty required field
-					if( $current_User->check_perm( 'users', 'edit' ) )
+					if( $has_full_access )
 					{	// Display a note message if user can edit all users
 						param_add_message_to_Log( 'uf_'.$userfield->uf_ID, sprintf( T_('Please enter a value for the field "%s".'), $this->userfield_defs[$userfield->uf_ufdf_ID][1] ), 'note' );
 					}
@@ -1298,7 +1316,7 @@ class User extends DataObject
 							}
 							elseif( empty( $uf_new_val ) && $this->userfield_defs[$uf_new_id][2] == 'require' )
 							{	// Display error for empty required field & new adding field
-								if( $current_User->check_perm( 'users', 'edit' ) )
+								if( $has_full_access )
 								{	// Display a note message if user can edit all users
 									param_add_message_to_Log( 'uf_'.$uf_type.'['.$uf_new_id.'][]', sprintf( T_('Please enter a value for the field "%s".'), $this->userfield_defs[$uf_new_id][1] ), 'note' );
 								}
@@ -1437,7 +1455,7 @@ class User extends DataObject
 
 			// Session timeout
 			$edited_user_timeout_sessions = param( 'edited_user_timeout_sessions', 'string', NULL );
-			if( isset( $edited_user_timeout_sessions ) && ( $current_User->ID == $this->ID  || $current_User->check_perm( 'users', 'edit' ) ) )
+			if( isset( $edited_user_timeout_sessions ) && ( $current_User->ID == $this->ID  || $has_full_access ) )
 			{
 				switch( $edited_user_timeout_sessions )
 				{
@@ -1473,7 +1491,7 @@ class User extends DataObject
 					$subscribe_blog_ID = param( 'subscribe_blog', 'integer', 0 );
 
 					$sub_items    = 1;
-					$sub_items_mod = 1;
+					$sub_items_mod = 0;
 					$sub_comments = 0; // We normally subscribe to new posts only
 
 					// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
@@ -1527,7 +1545,7 @@ class User extends DataObject
 					$UserSettings->set( 'enable_PM', $enable_PM, $this->ID );
 				}
 				$emails_msgform = $Settings->get( 'emails_msgform' );
-				if( ( $emails_msgform == 'userset' ) || ( ( $emails_msgform == 'adminset' ) && ( $current_User->check_perm( 'users', 'edit' ) ) ) )
+				if( ( $emails_msgform == 'userset' ) || ( ( $emails_msgform == 'adminset' ) && $has_full_access ) )
 				{ // enable email option is displayed only if user can set or if admin can set and current User is an administrator
 					$UserSettings->set( 'enable_email', param( 'enable_email', 'integer', 0 ), $this->ID );
 				}
@@ -1541,6 +1559,7 @@ class User extends DataObject
 					$UserSettings->set( 'notify_messages', param( 'edited_user_notify_messages', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'notify_unread_messages', param( 'edited_user_notify_unread_messages', 'integer', 0 ), $this->ID );
 				}
+				$UserSettings->set( 'notify_comment_mentioned', param( 'edited_user_notify_comment_mentioned', 'integer', 0 ), $this->ID );
 				if( $this->check_role( 'post_owner' ) )
 				{ // update 'notify_published_comments' only if user has at least one post or user has right to create new post
 					$UserSettings->set( 'notify_published_comments', param( 'edited_user_notify_publ_comments', 'integer', 0 ), $this->ID );
@@ -1560,6 +1579,7 @@ class User extends DataObject
 				{ // update 'send_cmt_moderation_reminder' only if user is comment moderator at least in one blog
 					$UserSettings->set( 'send_cmt_moderation_reminder', param( 'edited_user_send_cmt_moderation_reminder', 'integer', 0 ), $this->ID );
 				}
+				$UserSettings->set( 'notify_post_mentioned', param( 'edited_user_notify_post_mentioned', 'integer', 0 ), $this->ID );
 				if( $this->check_role( 'post_moderator' ) )
 				{	// update 'notify_post_moderation', 'notify_edit_pst_moderation' and 'send_cmt_moderation_reminder' only if user is post moderator at least in one collection:
 					$UserSettings->set( 'notify_post_moderation', param( 'edited_user_notify_post_moderation', 'integer', 0 ), $this->ID );
@@ -1571,7 +1591,7 @@ class User extends DataObject
 				{
 					$UserSettings->set( 'notify_post_assignment', param( 'edited_user_notify_post_assignment', 'integer', 0 ), $this->ID );
 				}
-				if( $current_User->check_perm( 'users', 'edit' ) )
+				if( $has_full_access )
 				{
 					$UserSettings->set( 'send_activation_reminder', param( 'edited_user_send_activation_reminder', 'integer', 0 ), $this->ID );
 				}
@@ -1594,7 +1614,7 @@ class User extends DataObject
 					$UserSettings->set( 'notify_cronjob_error', param( 'edited_user_notify_cronjob_error', 'integer', 0 ), $this->ID );
 				}
 
-				if( $current_User->check_perm( 'users', 'edit' ) && $this->check_perm( 'options', 'view' ) )
+				if( $has_full_access && $this->check_perm( 'options', 'view' ) )
 				{	// current User is an administrator and the edited user has a permission to automations:
 					$UserSettings->set( 'notify_automation_owner', param( 'edited_user_notify_automation_owner', 'integer', 0 ), $this->ID );
 				}
@@ -1638,7 +1658,7 @@ class User extends DataObject
 							$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
 							$sub_items_mod = param( 'sub_items_mod_'.$loop_blog_ID, 'integer', 0 );
 
-							if( $sub_items || $sub_comments )
+							if( $sub_items || $sub_comments || $sub_items_mod )
 							{	// We have a subscription for this blog
 								$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_items_mod, $sub_comments )";
 							}
@@ -1771,7 +1791,7 @@ class User extends DataObject
 		if( $is_preferences_form || ( $is_identity_form && $is_new_user ) )
 		{	// Multiple session
 			$multiple_sessions = $Settings->get( 'multiple_sessions' );
-			if( ( $multiple_sessions != 'adminset_default_no' && $multiple_sessions != 'adminset_default_yes' ) || $current_User->check_perm( 'users', 'edit' ) )
+			if( ( $multiple_sessions != 'adminset_default_no' && $multiple_sessions != 'adminset_default_yes' ) || $has_full_access )
 			{
 				$login_multiple_sessions = param( 'edited_user_set_login_multiple_sessions', 'integer' );
 				if( ! $is_api_request || ( $is_api_request && isset( $login_multiple_sessions ) ) )
@@ -2415,13 +2435,35 @@ class User extends DataObject
 	function get_num_edited_posts()
 	{
 		global $DB;
-		global $collections_Module;
 
 		return $DB->get_var( 'SELECT COUNT( DISTINCT( post_ID ) )
 									FROM T_items__item
 									INNER JOIN T_items__version ON post_ID = iver_itm_ID
 									WHERE post_creator_user_ID <> '.$this->ID.' AND
 										( iver_edit_user_ID = '.$this->ID.' OR post_lastedit_user_ID = '.$this->ID.' )' );
+	}
+
+
+	/**
+	 * Get the number of polls owned by this user
+	 *
+	 * @return integer the number of owned polls
+	 */
+	function get_num_polls()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{
+			return 0;
+		}
+
+		$SQL = new SQL( 'Get polls owned by user #'.$this->ID );
+		$SQL->SELECT( 'COUNT( pqst_ID )' );
+		$SQL->FROM( 'T_polls__question' );
+		$SQL->WHERE( 'pqst_owner_user_ID = '.$this->ID );
+
+		return $DB->get_var( $SQL );
 	}
 
 
@@ -4213,9 +4255,15 @@ class User extends DataObject
 	 */
 	function dbdelete( & $Log = array() )
 	{
-		global $DB, $Plugins;
+		global $DB, $Plugins, $current_User;
 
 		if( $this->ID == 0 ) debug_die( 'Non persistant object cannot be deleted!' );
+
+		if( $this->ID == 1 ||
+		    ( is_logged_in() && $this->ID == $current_User->ID ) )
+		{	// Don't allow to delete first admin user and current logged in user:
+			return false;
+		}
 
 		$deltype = param( 'deltype', 'string', '' ); // spammer
 
@@ -6590,6 +6638,52 @@ class User extends DataObject
 
 
 	/**
+	 * Delete polls of the user
+	 *
+	 * @return boolean True on success
+	 */
+	function delete_polls()
+	{
+		global $DB, $current_User;
+
+		// If current user can moderate this user then it is allowed to delete all user data even if it wouldn't be allowed otherwise.
+		$current_user_can_moderate = $current_User->can_moderate_user( $this->ID );
+
+		$DB->begin();
+
+		$PollCache = & get_PollCache();
+		$PollCache->clear();
+		$PollCache->load_where( 'pqst_owner_user_ID = '.$this->ID );
+
+		$result = false;
+		while( ( $iterator_Poll = & $PollCache->get_next() ) != NULL )
+		{	// Iterate through PollCache:
+			if( $current_user_can_moderate ||
+			    $current_User->check_perm( 'polls', 'edit', false, $iterator_Poll ) )
+			{ // Current user has a permission to delete this poll
+				// Delete the poll from DB:
+				$result = $iterator_Poll->dbdelete();
+				if( ! $result )
+				{
+					break;
+				}
+			}
+		}
+
+		if( $result )
+		{
+			$DB->commit();
+		}
+		else
+		{
+			$DB->rollback();
+		}
+
+		return $result;
+	}
+
+
+	/**
 	 * Get number of posts and percent of published posts by this user
 	 *
 	 * @param array Params
@@ -7201,7 +7295,7 @@ class User extends DataObject
 					$insert_orgs[ $organization_ID ]['role'] = $curr_orgs[ $organization_ID ]['role'];
 				}
 
-				if( $user_Organization->perm_priority == 'owner and member' ||
+				if( $perm_edit_orgs ||
 				    $user_Organization->owner_user_ID == $current_User->ID ||
 				    ! $curr_orgs[ $organization_ID ]['accepted'] )
 				{	// Update priority if current user has permission or it is not accepted yet by admin
@@ -7279,11 +7373,8 @@ class User extends DataObject
 			return;
 		}
 
-		$has_full_access = $current_User->check_perm( 'users', 'edit' );
-		$has_moderate_access = $current_User->check_perm( 'users', 'moderate' );
-
-		if( ! $has_full_access && ! $has_moderate_access )
-		{	// Use has no permission to edit users:
+		if( ! $current_User->can_moderate_user( $this->ID ) )
+		{	// Current User has no permission to moderate this User:
 			return;
 		}
 

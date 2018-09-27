@@ -44,6 +44,8 @@ class ItemLight extends DataObject
 	 */
 	var $datemodified;
 
+	var $short_title;
+
 	var $title;
 
 	var $excerpt;
@@ -61,6 +63,15 @@ class ItemLight extends DataObject
 	var $url;
 
 	var $ityp_ID;
+
+	/**
+	 * Single/page view
+	 *
+	 * 'normal', '404', 'redirected'
+	 *
+	 * @var string
+	 */
+	var $single_view = 'normal';
 
 	/**
 	 * ID of the main category.
@@ -150,10 +161,12 @@ class ItemLight extends DataObject
 			$this->urltitle = $db_row->post_urltitle;
 			$this->canonical_slug_ID = $db_row->post_canonical_slug_ID;
 			$this->tiny_slug_ID = $db_row->post_tiny_slug_ID;
+			$this->short_title = isset( $db_row->post_short_title ) ? $db_row->post_short_title : '';
 			$this->title = $db_row->post_title;
 			$this->excerpt = $db_row->post_excerpt;
 			$this->ityp_ID = $db_row->post_ityp_ID;
 			$this->url = $db_row->post_url;
+			$this->single_view = isset( $db_row->post_single_view ) ? $db_row->post_single_view : $this->single_view;
 		}
 	}
 
@@ -288,14 +301,16 @@ class ItemLight extends DataObject
 	}
 
 
-  /**
-	 * Generate a single post link for the item
+	/**
+	 * Generate a single URL for this Item
 	 *
 	 * @param boolean allow redir to permalink, true | false | 'auto' to prevent redit only if single isn't the current permalink type
- 	 * @param string base url to use
+	 * @param string base url to use
 	 * @param string glue between url params
+	 * @param integer Collection ID, to use URL of first category of this Item from the collection, NULL - use current collection when it is allowed to stay in same collection when cross-posted
+	 * @return string
 	 */
-	function get_single_url( $allow_redir = true, $blogurl = '', $glue = '&amp;' )
+	function get_single_url( $allow_redir = true, $blogurl = '', $glue = '&amp;', $blog_ID = NULL )
 	{
 		$this->get_Blog();
 
@@ -337,13 +352,33 @@ class ItemLight extends DataObject
 				break;
 
 			case 'subchap':
-				$main_Chapter = & $this->get_main_Chapter();
-				$permalink = url_add_tail( $blogurl, '/'.$main_Chapter->urlname.'/'.$urltail );
-				break;
-
 			case 'chapters':
-				$main_Chapter = & $this->get_main_Chapter();
-				$permalink = url_add_tail( $blogurl, '/'.$main_Chapter->get_url_path().$urltail );
+				if( $blog_ID === NULL )
+				{	// Try to get current collection only when it is allowed to stay in same collection when cross-posted:
+					global $blog, $Settings;
+					if( ! empty( $blog ) && $Settings->get( 'cross_post_nav_in_same_coll' ) )
+					{
+						$blog_ID = $blog;
+					}
+				}
+				if( $blog_ID !== NULL )
+				{	// Try to get first category of this Item from the requested collection:
+					$item_chapters = $this->get_Chapters();
+					foreach( $item_chapters as $item_Chapter )
+					{
+						if( $item_Chapter->get( 'blog_ID' ) == $blog_ID )
+						{	// Use first found category of this Item from the requested collection:
+							$url_Chapter = $item_Chapter;
+							break;
+						}
+					}
+				}
+				if( empty( $url_Chapter ) )
+				{	// Use main category if another is not requested or cannot be detected above:
+					$url_Chapter = & $this->get_main_Chapter();
+				}
+				$chapter_url = ( $single_links == 'subchap' ? $url_Chapter->urlname : $url_Chapter->get_url_path() );
+				$permalink = url_add_tail( $blogurl, '/'.$chapter_url.$urltail );
 				break;
 
 			case 'short':
@@ -423,9 +458,10 @@ class ItemLight extends DataObject
 	 * @param string Base url to use
 	 * @param string Glue between url params
 	 * @param array What permanent types should be ignored to don't return a permanent URL
+	 * @param integer Collection ID, to use URL of first category of this Item from the collection
 	 * @return string|boolean Permalink URL | FALSE when some permanent type must be ignored
 	 */
-	function get_permanent_url( $permalink_type = '', $blogurl = '', $glue = '&amp;', $ignore_types = array() )
+	function get_permanent_url( $permalink_type = '', $blogurl = '', $glue = '&amp;', $ignore_types = array(), $blog_ID = NULL )
 	{
 		// Get permalink type depending on this item settings:
 		$permalink_type = $this->get_permalink_type( $permalink_type );
@@ -433,6 +469,22 @@ class ItemLight extends DataObject
 		if( ! empty( $ignore_types ) && in_array( $permalink_type, $ignore_types ) )
 		{	// This permanent type must be ignored:
 			return false;
+		}
+
+		switch( $this->get( 'single_view' ) )
+		{	// Force permanent url depending on item setting "Single/page view":
+			case '404':
+				// Don't allow permanent url for Item with 404 page instead of single view:
+				return false;
+			case 'redirected':
+				if( empty( $this->url ) )
+				{	// Force to 404 page when url is not provided for this Item:
+					return false;
+				}
+				else
+				{	// Use a specified url instead of original permanent url of this Item:
+					return $this->url;
+				}
 		}
 
 		switch( $permalink_type )
@@ -458,7 +510,7 @@ class ItemLight extends DataObject
 
 			case 'single':
 			default:
-				return $this->get_single_url( true, $blogurl, $glue );
+				return $this->get_single_url( true, $blogurl, $glue, $blog_ID );
 		}
 	}
 
@@ -1081,18 +1133,23 @@ class ItemLight extends DataObject
 	 */
 	function is_part_of_blog( $blog_ID )
 	{
-		global $DB;
-		$cat_count = $DB->get_var( '
-				SELECT count( cat_ID )
-				FROM T_categories, T_postcats
-				WHERE
-					T_categories.cat_ID = T_postcats.postcat_cat_ID
-					and T_categories.cat_blog_ID = '.$blog_ID.'
-					and T_postcats.postcat_post_ID = '.$this->ID
-		);
+		if( empty( $this->ID ) )
+		{
+			return false;
+		}
 
-		// $cat_count>0 means that this item has at least one category that belongs to the target blog.
-		return $cat_count > 0;
+		if( ! isset( $this->part_of_colls ) )
+		{	// Initialize array of collections where this Item has at least one category:
+			global $DB;
+			$SQL = new SQL( 'Select collections where Item #'.$this->ID.' has at least one category' );
+			$SQL->SELECT( 'DISTINCT cat_blog_ID' );
+			$SQL->FROM( 'T_postcats' );
+			$SQL->FROM_add( 'INNER JOIN T_categories ON cat_ID = postcat_cat_ID' );
+			$SQL->WHERE( 'postcat_post_ID = '.$this->ID );
+			$this->part_of_colls = $DB->get_col( $SQL );
+		}
+
+		return in_array( $blog_ID, $this->part_of_colls );
 	}
 
 
@@ -1107,7 +1164,7 @@ class ItemLight extends DataObject
 	 */
 	function check_cross_post_nav( $target_blog, $blog_ID )
 	{
-		global $cross_post_nav_in_same_blog;
+		global $Settings;
 
 		if( $target_blog != 'auto' )
 		{ // target_blog is not set to auto, we have to navigate to the item's main cat's blog.
@@ -1120,7 +1177,7 @@ class ItemLight extends DataObject
 			return false;
 		}
 
-		if( ! $cross_post_nav_in_same_blog )
+		if( ! $Settings->get( 'cross_post_nav_in_same_coll' ) )
 		{ // we have to navigate to the item's main cat's blog.
 			return false;
 		}
@@ -1156,10 +1213,15 @@ class ItemLight extends DataObject
 	 * @param string Post navigation type: same_category, same_tag, same_author, same_blog
 	 * @param integer|NULL ID of post navigation target
 	 * @param array What permanent types should be ignored to don't return a permanent URL
+	 * @param array Additional parameters
 	 */
-	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '', $post_navigation = '', $nav_target = NULL, $ignore_types = array() )
+	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '', $post_navigation = '', $nav_target = NULL, $ignore_types = array(), $params = array() )
 	{
 		global $Collection, $Blog;
+
+		$params = array_merge( array(
+				'nofollow' => false,
+			), $params );
 
 		$blogurl = '';
 		$permalink_type = '';
@@ -1194,7 +1256,7 @@ class ItemLight extends DataObject
 				break;
 
 			case '#title#':
-				$text = format_to_output( $this->title );
+				$text = format_to_output( $this->get( 'title' ) );
 				break;
 		}
 
@@ -1207,8 +1269,9 @@ class ItemLight extends DataObject
 		$r = '<a href="'.$url.'"'
 				.( empty( $title ) ? '' : ' title="'.format_to_output( $title, 'htmlattr' ).'"' )
 				.( empty( $class ) ? '' : ' class="'.format_to_output( $class, 'htmlattr' ).'"' )
+				.( $params['nofollow'] ? ' rel="nofollow"' : '' )
 			.'>'
-				.str_replace( '$title$', format_to_output( $this->title ), $text )
+				.str_replace( '$title$', format_to_output( $this->get( 'title' ) ), $text )
 			.'</a>';
 
 		return $r;
@@ -1279,13 +1342,16 @@ class ItemLight extends DataObject
 				'after_title'     => '',
 				'format'          => 'htmlbody',
 				'link_type'       => '#',
+				'custom_url'		=> '',
 				'link_class'      => '#',
 				'max_length'      => '',
 				'target_blog'     => '',
 				'nav_target'      => NULL,
 				'post_navigation' => $def_post_navigation,
-				'title_field'     => 'title', // '#' for custom title
-				'custom_title'    => $this->title,
+				'title_field'     => 'title', // Possible values: 'title', 'short_title', 'title_override' for value from param 'title_override' below.
+																			// May be several fields separated by comma. Only first not empty field is displayed,
+																			// e.g. 'short_title,title,title_override' or 'short_title,title_override,title' etc.
+				'title_override'  => $this->get( 'title' ),
 			), $params );
 
 		// Set post navigation target
@@ -1297,18 +1363,24 @@ class ItemLight extends DataObject
 			$blogurl = $Blog->gen_blogurl();
 		}
 
-		if( $params['title_field'] == '#' )
+		$title_fields = explode( ',', $params['title_field'] );
+		foreach( $title_fields as $title_field )
 		{
-			$title = format_to_output( $params['custom_title'], $params['format'] );
-		}
-		else
-		{
-			$title = format_to_output( $this->{$params['title_field']}, $params['format'] );
+			if( $title_field == 'short_title' && $this->get_type_setting( 'use_short_title' ) == 'never' )
+			{	// Allow to use short title only if it is enabled by item type:
+				continue;
+			}
+			$title = ( $title_field == 'title_override' ? $params['title_override'] : $this->get( $title_field ) );
+			$title = format_to_output( $title, $params['format'] );
+			if( ! empty( $title ) )
+			{	// Use first not empty field:
+				break;
+			}
 		}
 
 		if( $params['max_length'] != '' )
-		{	// Crop long title
-			$title = strmaxlen( $title, intval($params['max_length']) );
+		{	// Crop long title:
+			$title = strmaxlen( $title, intval( $params['max_length'] ) );
 		}
 
 		if( empty( $title ) )
@@ -1353,6 +1425,10 @@ class ItemLight extends DataObject
 
 			case 'admin_view':
 				$url = '?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID;
+				break;
+
+			case 'custom_url':
+				$url = $params['custom_url'];
 				break;
 
 			case 'none':
@@ -1427,6 +1503,30 @@ class ItemLight extends DataObject
 	{
 		// Character conversions + old DBs may have tags in excerpts, so we strip them:
 		return format_to_output( utf8_strip_tags( $this->excerpt ), $format );
+	}
+
+
+	/**
+	 * Get a member param by its name
+	 *
+	 * @param mixed Name of parameter
+	 * @return mixed Value of parameter
+	 */
+	function get( $parname )
+	{
+		switch( $parname )
+		{
+			case 'title':
+				$title = parent::get( $parname );
+				if( empty( $title ) && is_admin_page() && ! empty( $this->ID ) )
+				{	// Display item ID when title is disabled or optional and empty, only on back-office:
+					$title = '#'.$this->ID;
+				}
+				return $title;
+
+			default:
+				return parent::get( $parname );
+		}
 	}
 
 

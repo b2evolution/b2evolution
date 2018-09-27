@@ -20,6 +20,9 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
+// Check and redirect if current URL must be used as https instead of http:
+check_https_url( 'login' );
+
 // Login is not required on the register page:
 $login_required = false;
 
@@ -48,10 +51,6 @@ $registration_require_lastname = false;
 $registration_require_gender = $Settings->get('registration_require_gender');
 // Check if registration ask for locale
 $registration_ask_locale = $Settings->get('registration_ask_locale');
-// Check what subscriptions should be activated (It can be used for quick registration by widget)
-$auto_subscribe_posts = false;
-$auto_subscribe_comments = false;
-$auto_subscribe_posts_mod = false;
 
 $login = param( $dummy_fields[ 'login' ], 'string', '' );
 $email = utf8_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
@@ -114,10 +113,8 @@ switch( $action )
 		// Check email:
 		param_check_new_user_email( $dummy_fields['email'], $email );
 
-		if( $is_quick || $is_inline )
-		{	// We will need the following parameter for the session data that will be set later:
-			param( 'widget', 'integer', 0 );
-		}
+		// We will need the following parameter for the session data that will be set later:
+		param( 'widget', 'integer', 0 );
 
 		// Stop a request from the blocked email address or its domain:
 		antispam_block_by_email( $email );
@@ -142,12 +139,12 @@ switch( $action )
 			if( empty( $widget ) && $is_inline )
 			{	// Set params for a request from inline tag "[emailcapture:]" :
 				$source = param( 'source', 'string', true );
-				$ask_firstname = param( 'ask_firstname', 'string', true );
-				$ask_lastname = param( 'ask_lastname', 'string', true );
+				$registration_require_firstname = ( param( 'ask_firstname', 'string', true ) == 'required' );
+				$registration_require_lastname = ( param( 'ask_lastname', 'string', true ) == 'required' );
 				$user_tags = param( 'usertags', 'string', NULL );
-				$subscribe_posts = param( 'subscribe_post', 'integer', true );
-				$subscribe_comments = param( 'subscribe_comment', 'integer', true );
-				$subscribe_posts_mod = param( 'subscribe_post_mod', 'integer', true );
+				$auto_subscribe_posts = param( 'subscribe_post', 'integer', true );
+				$auto_subscribe_comments = param( 'subscribe_comment', 'integer', true );
+				$auto_subscribe_posts_mod = param( 'subscribe_post_mod', 'integer', true );
 				$newsletters = param( 'newsletters', 'string', true );
 				$newsletters = explode( ',', $newsletters );
 				$widget_newsletters = array();
@@ -156,44 +153,42 @@ switch( $action )
 					$widget_newsletters[$loop_newsletter_ID] = 1;
 				}
 				$widget_redirect_to = param( 'redirect_to', 'string', true );
-			}
-			else
-			{	// Set params for a request from widget quick registration:
-				$WidgetCache = & get_WidgetCache();
-				$user_register_quick_Widget = & $WidgetCache->get_by_ID( $widget, false, false );
-				if( ! $user_register_quick_Widget ||
-						$user_register_quick_Widget->code != 'user_register_quick' ||
-						$user_register_quick_Widget->get( 'coll_ID' ) != $Blog->ID )
-				{ // Wrong or hacked request!
-					debug_die( 'Quick registration is currently disabled on this system.' );
-					break;
-				}
-
-				// Initialize the widget settings
-				$user_register_quick_Widget->init_display( array() );
-
-				// Get a source from widget setting
-				$source = $user_register_quick_Widget->disp_params['source'];
-				$ask_firstname = $user_register_quick_Widget->disp_params['ask_firstname'];
-				$ask_lastname = $user_register_quick_Widget->disp_params['ask_lastname'];
-				$subscribe_posts = $user_register_quick_Widget->disp_params['subscribe_post'];
-				$subscribe_comments = $user_register_quick_Widget->disp_params['subscribe_comment'];
-				$subscribe_posts_mod = $user_register_quick_Widget->disp_params['subscribe_post_mod'];
-				$widget_newsletters = $user_register_quick_Widget->disp_params['newsletters'];
-				$user_tags = $user_register_quick_Widget->disp_params['usertags'];
-				$widget_redirect_to = trim( $user_register_quick_Widget->disp_params['redirect_to'] );
+				// Use current collection to subscribe:
+				$subscribe_coll_ID = $Blog->ID;
 			}
 
-			// Check what fields should be required by current widget
+			// Check what fields should be required by current widget:
 			$registration_require_country = false;
 			$registration_require_gender = false;
-			$registration_require_firstname = ( $ask_firstname == 'required' );
-			$registration_require_lastname = ( $ask_lastname == 'required' );
+		}
 
-			// Check what subscriptions should be activated by current widget
-			$auto_subscribe_posts = ! empty( $subscribe_posts );
-			$auto_subscribe_comments = ! empty( $subscribe_comments );
-			$auto_subscribe_posts_mod = ! empty( $subscribe_posts_mod );
+		if( ! empty( $widget ) && ! $is_inline )
+		{	// Set params for a request from widget quick registration:
+			$WidgetCache = & get_WidgetCache();
+			$user_register_quick_Widget = & $WidgetCache->get_by_ID( $widget, false, false );
+			if( ! $user_register_quick_Widget ||
+					$user_register_quick_Widget->code != 'user_register_quick' ||
+					( $is_quick && $user_register_quick_Widget->get( 'coll_ID' ) != $Blog->ID ) )
+			{ // Wrong or hacked request!
+				debug_die( 'Quick registration is currently disabled on this system.' );
+				break;
+			}
+
+			// Initialize the widget settings:
+			$user_register_quick_Widget->init_display( array() );
+
+			// Get params from widget settings:
+			$source = $user_register_quick_Widget->disp_params['source'];
+			$registration_require_firstname = ( $user_register_quick_Widget->disp_params['ask_firstname'] == 'required' );
+			$registration_require_lastname = ( $user_register_quick_Widget->disp_params['ask_lastname'] == 'required' );
+			$auto_subscribe_posts = $user_register_quick_Widget->disp_params['subscribe_post'];
+			$auto_subscribe_comments = $user_register_quick_Widget->disp_params['subscribe_comment'];
+			$auto_subscribe_posts_mod = $user_register_quick_Widget->disp_params['subscribe_post_mod'];
+			$widget_newsletters = $user_register_quick_Widget->disp_params['newsletters'];
+			$user_tags = $user_register_quick_Widget->disp_params['usertags'];
+			$widget_redirect_to = trim( $user_register_quick_Widget->disp_params['redirect_to'] );
+			// Use collection of the widget to subscribe:
+			$subscribe_coll_ID = $user_register_quick_Widget->get( 'coll_ID' );
 		}
 
 		if( ! $is_quick )
@@ -219,6 +214,9 @@ switch( $action )
 					'pass1'     => & $pass1,
 					'pass2'     => & $pass2,
 				) );
+
+			// Validate first enabled captcha plugin:
+			$Plugins->trigger_event_first_return( 'ValidateCaptcha', array( 'form_type' => 'register' ) );
 		}
 
 		// Set params:
@@ -321,16 +319,53 @@ switch( $action )
 			break;
 		}
 
+		$user_domain = $Hit->get_remote_host( true );
+
+		if( $is_quick )
+		{	// Check quick registration for suspected data:
+			$is_suspected_request = antispam_suspect_check_by_data( array(
+				'IP_address'   => $Hit->IP,
+				'domain'       => $user_domain,
+				'email_domain' => $email,
+				'country_IP'   => $Hit->IP,
+			) );
+			if( $is_suspected_request )
+			{	// Current request is suspected by IP address, domain, domain of email address or country of current IP address,
+				// We should not allow quick registration for such users, Redirect to normal registration form:
+				$prefilled_params = array();
+				if( ! empty( $login ) )
+				{
+					$prefilled_params[ $dummy_fields['login'] ] = $login;
+				}
+				if( ! empty( $email ) )
+				{
+					$prefilled_params[ $dummy_fields['email'] ] = $email;
+				}
+				if( ! empty( $firstname ) )
+				{
+					$prefilled_params['firstname'] = $firstname;
+				}
+				if( ! empty( $lastname ) )
+				{
+					$prefilled_params['lastname'] = $lastname;
+				}
+				if( ! empty( $widget ) )
+				{
+					$prefilled_params['widget'] = $widget;
+				}
+				// Redirect to normal registration form with prefilled data from quick registration form:
+				header_redirect( url_add_param( get_user_register_url( $redirect_to, $source, false, '&' ), $prefilled_params, '&' ) );
+				// Exit here.
+			}
+		}
+
 		$DB->begin();
 
 		$new_User = new User();
 		$new_User->set( 'login', $login );
-		if( $is_quick )
-		{	// Don't save password for quick registration:
-			$new_User->set( 'pass', '' );
-			$new_User->set( 'salt', '' );
-			$new_User->set( 'pass_driver', 'nopass' );
-			// Set newsletters subscriptions from current widget "Email capture / Quick registration":
+
+		if( ! empty( $widget_newsletters ) )
+		{	// Set newsletters subscriptions from current widget "Email capture / Quick registration":
 			foreach( $widget_newsletters as $widget_newsletter_ID => $widget_newsletter_is_enabled )
 			{
 				if( ! $widget_newsletter_is_enabled )
@@ -351,12 +386,18 @@ switch( $action )
 			{	// If at least one newsletter is selected in widget params:
 				$new_User->set_newsletter_subscriptions( array_keys( $widget_newsletters ) );
 			}
+		}
 
-			// Set user tags from current widget "Email capture / Quick registration":
-			if( ! empty( $user_tags ) )
-			{
-				$new_User->add_usertags( $user_tags );
-			}
+		if( ! empty( $user_tags ) )
+		{	// Set user tags from current widget "Email capture / Quick registration":
+			$new_User->add_usertags( $user_tags );
+		}
+
+		if( $is_quick )
+		{	// Don't save password for quick registration:
+			$new_User->set( 'pass', '' );
+			$new_User->set( 'salt', '' );
+			$new_User->set( 'pass_driver', 'nopass' );
 		}
 		else
 		{	// Save an entered password from normal registration form:
@@ -441,16 +482,15 @@ switch( $action )
 			$UserSettings->set( 'registration_trigger_url' , $session_registration_trigger_url, $new_User->ID );
 		}
 		$UserSettings->set( 'created_fromIPv4', ip2int( $Hit->IP ), $new_User->ID );
-		$user_domain = $Hit->get_remote_host( true );
 		$UserSettings->set( 'user_registered_from_domain', $user_domain, $new_User->ID );
 		$UserSettings->set( 'user_browser', substr( $Hit->get_user_agent(), 0 , 200 ), $new_User->ID );
 		$UserSettings->dbupdate();
 
 		// Auto subscribe new user to current collection posts/comments:
-		if( $auto_subscribe_posts || $auto_subscribe_comments || $auto_subscribe_posts_mod )
+		if( ! empty( $subscribe_coll_ID ) && ( ! empty( $auto_subscribe_posts ) || ! empty( $auto_subscribe_comments ) || ! empty( $auto_subscribe_posts_mod ) ) )
 		{ // If at least one option is enabled
 			$DB->query( 'REPLACE INTO T_subscriptions ( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
-					VALUES ( '.$DB->quote( $Blog->ID ).', '.$DB->quote( $new_User->ID ).', '.$DB->quote( intval( $auto_subscribe_posts ) ).', '.$DB->quote( intval( $auto_subscribe_posts_mod ) ).', '.$DB->quote( intval( $auto_subscribe_comments ) ).' )' );
+					VALUES ( '.$DB->quote( $subscribe_coll_ID ).', '.$DB->quote( $new_User->ID ).', '.$DB->quote( intval( $auto_subscribe_posts ) ).', '.$DB->quote( intval( $auto_subscribe_posts_mod ) ).', '.$DB->quote( intval( $auto_subscribe_comments ) ).' )' );
 		}
 
 		// Get user domain status:
@@ -483,10 +523,11 @@ switch( $action )
 		send_admin_notification( NT_('New user registration'), 'account_new', $email_template_params );
 
 		$Plugins->trigger_event( 'AfterUserRegistration', array( 'User' => & $new_User ) );
-		// Move user to suspect group by IP address and reverse DNS domain:
+		// Move user to suspect group by IP address and reverse DNS domain and email address domain:
 		// Make this move even if during the registration it was added to a trusted group:
 		antispam_suspect_user_by_IP( '', $new_User->ID, false );
 		antispam_suspect_user_by_reverse_dns_domain( $new_User->ID, false );
+		antispam_suspect_user_by_email_domain( $new_User->ID, false );
 
 		if( $Settings->get('newusers_mustvalidate') )
 		{ // We want that the user validates his email address:

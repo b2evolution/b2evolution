@@ -212,7 +212,8 @@ function _wp_mw_newmediaobject($m)
 			if( $correct_Filetype && $correct_Filetype->is_allowed() )
 			{	// A FileType with the given mime type exists in database and it is an allowed file type for current User
 				// The "correct" extension is a plausible one, proceed...
-				$correct_extension = array_shift($correct_Filetype->get_extensions());
+				$extensions = $correct_Filetype->get_extensions();
+				$correct_extension = array_shift( $extensions );
 				$path_info = pathinfo($filename);
 				$current_extension = $path_info['extension'];
 
@@ -395,7 +396,7 @@ function _wp_mw_get_item_struct( & $Item )
 			'wp_author'					=> new xmlrpcval( $Item->get('t_author') ),
 			'wp_page_parent_id'			=> new xmlrpcval( (isset($Item->parent_ID) ? $Item->parent_ID : 0), 'int' ),
 			'wp_page_parent_title'		=> new xmlrpcval( $parent_title ),
-			'wp_page_order'				=> new xmlrpcval( $Item->order ), // We don't use 'int' here because b2evolution "order" is stored as double while WP uses integer values
+			'wp_page_order'				=> new xmlrpcval( $Item->get_order() ), // We don't use 'int' here because b2evolution "order" is stored as double while WP uses integer values
 			'wp_author_id'				=> new xmlrpcval( $Item->creator_user_ID, 'string' ),
 			'wp_author_display_name'	=> new xmlrpcval( $Item->get('t_author') ),
 			'wp_post_format'			=> new xmlrpcval( $Item->ityp_ID ),
@@ -1155,6 +1156,13 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 			'action' => & $action
 		) );
 
+	// Validate first enabled captcha plugin:
+	$Plugins->trigger_event_first_return( 'ValidateCaptcha', array(
+		'form_type'  => 'comment',
+		'Comment'    => & $Comment,
+		'is_preview' => ( $action == 'preview' ),
+	) );
+
 	if( $Messages->has_errors() )
 	{
 		return xmlrpcs_resperror( 5, $Messages->get_string( 'Cannot create comment, please correct these errors:'."\n", '', "  //  \n", 'xmlrpc' ) );
@@ -1561,7 +1569,7 @@ function xmlrpcs_edit_item( & $edited_Item, $params )
 	}
 	if( !is_null($params['order']) )
 	{
-		if( ! (empty($params['order']) && ! $edited_Item->order) )
+		if( ! (empty($params['order']) && ! $edited_Item->get_order()) )
 		{	// Do not allow 0 order if there was no order set before
 			$edited_Item->set('order', $params['order']);
 		}

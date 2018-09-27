@@ -748,6 +748,10 @@ class Plugins
 			{
 				$set_Obj->_defaults[$l_name] = array();
 			}
+			elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'checklist' )
+			{
+				$set_Obj->_defaults[$l_name] = NULL;
+			}
 			elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'input_group' && is_array( $l_meta['inputs'] ) )
 			{	// Get default values from input group fields:
 				foreach( $l_meta['inputs'] as $l_meta_input_key => $l_meta_input_data )
@@ -1841,7 +1845,7 @@ class Plugins
 	 *
 	 * @param array|string A single event or a list thereof
 	 * @param boolean Make sure there's at least one plugin that provides them all?
-	 *                This is useful for event pairs like "CaptchaPayload" and "CaptchaValidated", which
+	 *                This is useful for event pairs like "RequestCaptcha" and "ValidateCaptcha", which
 	 *                should be served by the same plugin.
 	 * @return boolean
 	 */
@@ -2178,7 +2182,7 @@ class Plugins
 			case 'coll_apply_rendering':
 			default:
 				// Get Item renderer plugins
-				$RendererPlugins = $this->get_list_by_events( array('RenderItemAsHtml', 'RenderItemAsXml', 'RenderItemAsText') );
+				$RendererPlugins = $this->get_list_by_events( array( 'RenderItemAsHtml', 'RenderItemAsXml', 'RenderItemAsText', 'DisplayItemAsHtml', 'DisplayItemAsXml', 'DisplayItemAsText' ) );
 				break;
 		}
 
@@ -2382,6 +2386,71 @@ class Plugins
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Display captcha
+	 *
+	 * @param array Associative array of parameters:
+	 *   - 'Form':                   Form object
+	 *   - 'form_type':              Form type
+	 *   - 'form_position':          Current form position where this function is called
+	 *   - 'captcha_info':           Info under the captcha field in note style
+	 *   - 'captcha_info_anonymous': Captcha info for not logged in user when the plugin knows it will NOT ask for captcha in case of logged in users
+	 */
+	function display_captcha( $params = array() )
+	{
+		if( ! isset( $params['Form'] ) ||
+		    ! isset( $params['form_type'] ) ||
+		    ! isset( $params['form_position'] ) )
+		{	// Exit here if the mandatory params are not defined:
+			return;
+		}
+
+		$params = array_merge( array(
+				'captcha_template_question' => '<span class="evo_captcha_question">$captcha_question$</span><br>',
+				'captcha_template_answer'   => '<span class="evo_captcha_answer">$captcha_answer$</span><br>',
+				// Default captcha info text(can be customized by plugin):
+				'captcha_info' => T_('We ask for this in order to slow down spammers.')
+													.'<br>'.T_('Sorry for the inconvenience.')
+													.( is_logged_in() ? '' : '<br>'.T_('Please log in to avoid this antispam check.') ),
+			), $params );
+
+		$form_type = $params['form_type'];
+
+		if( ! isset( $this->captcha_data ) )
+		{	// Initialize array to cache captcha data per current page request:
+			$this->captcha_data = array();
+		}
+
+		if( ! isset( $this->captcha_data[ $form_type ] ) )
+		{	// Load once captcha data per form type and use this for all next calls of this function:
+			$plugin_data = $this->trigger_event_first_return( 'RequestCaptcha', $params );
+			$this->captcha_data[ $form_type ] = isset( $plugin_data['plugin_return'] ) ? $plugin_data['plugin_return'] : false;
+		}
+
+		$captcha_data = $this->captcha_data[ $form_type ];
+
+		if( isset( $captcha_data['captcha_position'], $captcha_data['captcha_html'] ) &&
+		    $captcha_data['captcha_position'] == $params['form_position'] )
+		{	// Display captcha html code only for requested form type and position:
+			$Form = & $params['Form'];
+			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
+			{	// Begin fieldset if it is required from skin file:
+				$Form->begin_fieldset();
+			}
+
+			$Form->info_field( T_('Antispam'), $captcha_data['captcha_html'], array(
+				'note'     => ( isset( $captcha_data['captcha_info'] ) ? $captcha_data['captcha_info'] : $params['captcha_info'] ),
+				'required' => true,
+			) );
+
+			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
+			{	// End fieldset if it is required from skin file:
+				$Form->end_fieldset();
+			}
+		}
 	}
 
 

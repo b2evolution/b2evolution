@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var back up configuration
  */
-global $backup_paths, $backup_tables, $backup_path, $backup_exclude_folders;
+global $backup_paths, $backup_tables, $backup_path, $backup_exclude_folders, $admin_url;
 
 /**
  * @var action
@@ -35,12 +35,49 @@ $Form = new Form( NULL, 'backup_settings', 'post' );
 
 $Form->begin_form( 'fform', T_('Backup application files and data') );
 
-echo '<p>Your backups will be saved into the directory: <b>'.$backup_path.'</b> (on your web server).</p>';
-
 $Form->hiddens_by_key( get_memorized( 'action' ) );
 
+$Form->begin_fieldset( T_( 'Existing Backups' ).get_manual_link( 'existing-backups' ) );
+
+	$Form->info( T_('Folder'), '<code>'.$backup_path.'</code>' );
+
+	// Get all backup folders:
+	$backup_folders = array();
+	if( $dir_handle = @opendir( $backup_path ) )
+	{
+		while( ( $dir_name = readdir( $dir_handle ) ) !== false )
+		{
+			if( $dir_name != '.' && $dir_name != '..' && is_dir( $backup_path.'/'.$dir_name ) )
+			{
+				$backup_folders[] = $dir_name;
+			}
+		}
+		closedir( $dir_handle );
+	}
+
+	if( count( $backup_folders ) )
+	{
+		// Sort files:
+		natsort( $backup_folders );
+		$backup_folders = array_reverse( $backup_folders );
+
+		// Display backup folders:
+		foreach( $backup_folders as $f => $dir_name )
+		{
+			$backup_folders[ $f ] = '<code>'.$dir_name.'</code> '
+				.'<a href="'.$admin_url.'?ctrl=backup&amp;action=delete&amp;folder='.rawurlencode( $dir_name ).'&amp;'.url_crumb( 'backup' ).'"'
+						.' class="btn btn-danger btn-xs"'
+						.' onclick="return confirm(\''.TS_('Are you sure want to delete this folder?').'\')">'
+					.T_('Delete')
+				.'</a>';
+		}
+		$Form->info( T_('Subfolders'), implode( '<br>', $backup_folders ) );
+	}
+
+$Form->end_fieldset();
+
 // Backup settings for folders and files
-$Form->begin_fieldset( T_( 'Folders & files' ).get_manual_link( 'backup-tab' ), array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( T_( 'Folders & files' ).get_manual_link( 'backup-tab' ) );
 
 // Display checkboxes to include the paths:
 foreach( $backup_paths as $name => $settings )

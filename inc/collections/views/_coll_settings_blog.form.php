@@ -82,9 +82,11 @@ $Form->begin_fieldset( T_('Cross posting').get_manual_link('collections-cross-po
 	$Form->checklist( array(
 		array( 'cross_posting', 1, T_('Allow admins to cross-post to several collections'), $Settings->get('cross_posting'), false, T_('(Extra cats in different blogs)').get_admin_badge() ),
 		array( 'cross_posting_blogs', 1, T_('Allow admins to move posts between collections'), $Settings->get('cross_posting_blogs'), false, T_('(Main cat can move to different blog)').get_admin_badge() ) ),
-		'allow_cross_posting', T_('Cross Posting') );
+		'allow_cross_posting', T_('Cross posting') );
 
-	$Form->checkbox_input( 'redirect_moved_posts', $Settings->get('redirect_moved_posts'), T_('Redirect if post has moved'), array( 'note'=>T_('check to allow redirects to the correct blog when a post was found in a different blog.') ) );
+	$Form->checkbox_input( 'redirect_moved_posts', $Settings->get('redirect_moved_posts'), T_('Redirect if post has moved'), array( 'note'=>T_('check to allow redirects to the correct Collection if the requested Item Slug was found in a different collection.') ) );
+
+	$Form->checkbox_input( 'cross_post_nav_in_same_coll', $Settings->get( 'cross_post_nav_in_same_coll' ), T_('Stay in same collection when cross-posted'), array( 'note' => T_('check to stay in the current Collection if the requested Item Slug is only cross-posted in the current Collection. (No redirect to Canoncial)') ) );
 $Form->end_fieldset();
 
 // --------------------------------------------
@@ -102,10 +104,10 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Default skins').get_manual_link('collections-default-skins') );
+$Form->begin_fieldset( T_('Default Skins for New Collections').get_manual_link( 'collections-default-skins' ) );
 	$normal_skins = array();
-	$mobile_skins = array( 0 => T_('Same as normal skin') );
-	$tablet_skins = array( 0 => T_('Same as normal skin') );
+	$mobile_skins = array( 0 => T_('Same as standard skin') );
+	$tablet_skins = array( 0 => T_('Same as standard skin') );
 
 	$SkinCache = & get_SkinCache();
 	$SkinCache->load_all();
@@ -133,7 +135,7 @@ $Form->begin_fieldset( T_('Default skins').get_manual_link('collections-default-
 		}
 	}
 	$field_params = array( 'force_keys_as_values' => true );
-	$Form->select_input_array( 'def_normal_skin_ID', $Settings->get( 'def_normal_skin_ID' ), $normal_skins, T_('Default normal skin'), NULL, $field_params );
+	$Form->select_input_array( 'def_normal_skin_ID', $Settings->get( 'def_normal_skin_ID' ), $normal_skins, T_('Default standard skin'), NULL, $field_params );
 	$Form->select_input_array( 'def_mobile_skin_ID', $Settings->get( 'def_mobile_skin_ID' ), $mobile_skins, T_('Default mobile phone skin'), NULL, $field_params );
 	$Form->select_input_array( 'def_tablet_skin_ID', $Settings->get( 'def_tablet_skin_ID' ), $tablet_skins, T_('Default tablet skin'), NULL, $field_params );
 $Form->end_fieldset();

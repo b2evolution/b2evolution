@@ -195,7 +195,6 @@ switch( $action )
 {
 	case 'evoupgrade':
 	case 'auto_upgrade':
-	case 'svn_upgrade':
 	case 'newdb':
 	case 'cafelogupgrade':
 	case 'deletedb':
@@ -322,7 +321,6 @@ switch( $action )
 {
 	case 'evoupgrade':
 	case 'auto_upgrade':
-	case 'svn_upgrade':
 		$title = T_('Upgrade from a previous version');
 		break;
 
@@ -1086,7 +1084,6 @@ switch( $action )
 
 	case 'evoupgrade':
 	case 'auto_upgrade':
-	case 'svn_upgrade':
 		/*
 		 * -----------------------------------------------------------------------------------
 		 * EVO UPGRADE: Upgrade data from existing b2evolution database
@@ -1139,7 +1136,7 @@ switch( $action )
 		if( $is_automated_upgrade && $upgrade_result !== 'need-fix' )
 		{
 			if( $upgrade_result === true )
-			{	// After successful auto_upgrade or svn_upgrade we must remove files/folder based on the upgrade_policy.conf
+			{	// After successful auto_upgrade we must remove files/folder based on the upgrade_policy.conf
 				remove_after_upgrade();
 			}
 			// Disable maintenance mode at the end of the upgrade script:
@@ -1345,7 +1342,7 @@ if( $display != 'cli' )
 			<footer class="footer" id="sticky_footer">
 				<p class="pull-right"><a href="https://github.com/b2evolution/b2evolution" class="text-nowrap"><?php echo T_('GitHub page'); ?></a></p>
 				<p><a href="http://b2evolution.net/" class="text-nowrap">b2evolution.net</a>
-				&bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" class="text-nowrap"><?php echo T_('Find a host'); ?></a>
+				&bull; <a href="https://b2evolution.net/web-hosting/cheap-plans/" class="text-nowrap"><?php echo T_('Find a host'); ?></a>
 				&bull; <a href="http://b2evolution.net/man/" class="text-nowrap"><?php echo T_('Online manual'); ?></a>
 				&bull; <a href="http://forums.b2evolution.net" class="text-nowrap"><?php echo T_('Help forums'); ?></a>
 				</p>

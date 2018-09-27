@@ -94,6 +94,7 @@ class GeneralSettings extends AbstractSettings
 		'fm_enable_roots_user' => '1',
 		'fm_enable_roots_shared' => '1',
 		'fm_enable_roots_skins' => '1',
+		'fm_enable_roots_plugins' => '1',
 
 		'fm_showtypes' => '0',
 		'fm_showfsperms' => '0',
@@ -130,11 +131,13 @@ class GeneralSettings extends AbstractSettings
 		'def_enable_email' => '0',
 		'def_notify_messages' => '1',
 		'def_notify_unread_messages' => '1',
+		'def_notify_comment_mentioned' => '1',
 		'def_notify_published_comments' => '1',
 		'def_notify_comment_moderation' => '1',
 		'def_notify_edit_cmt_moderation' => '1',
 		'def_notify_spam_cmt_moderation' => '1',
 		'def_notify_meta_comments' => '1',
+		'def_notify_post_mentioned' => '1',
 		'def_notify_post_moderation' => '1',
 		'def_notify_edit_pst_moderation' => '1',
 		'def_notify_post_assignment' => '1',
@@ -162,24 +165,25 @@ class GeneralSettings extends AbstractSettings
 		'regexp_dirname' => '^[a-zA-Z0-9\-_]+$', // TODO: accept spaces and special chars / do full testing on this
 		'reloadpage_timeout' => '300',
 		'time_difference' => '0',
-		'timeout_sessions' => '604800',             // seconds (604800 == 7 days)
-		'timeout_online' => '1200',                 // seconds (1200 == 20 minutes)
+		'timeout_sessions' => '604800',			// seconds (604800 == 7 days)
+		'timeout_online' => '1200',				// seconds (1200 == 20 minutes)
 		'upload_enabled' => '1',
 		'upload_maxkb' => '32000',					// 32 MB
 		'evocache_foldername' => '.evocache',
 		'blogs_order_by' => 'order',				// blogs order in backoffice menu and other places
-		'blogs_order_dir' => 'ASC',					// blogs order direction in backoffice menu and other places
+		'blogs_order_dir' => 'ASC',				// blogs order direction in backoffice menu and other places
 
 		'user_minpwdlen' => '5',
-		'js_passwd_hashing' => '1',					// Use JS password hashing by default
+		'js_passwd_hashing' => '1',				// Use JS password hashing by default
 		'passwd_special' => '0',					// Do not require a special character in password by default
 		'strict_logins' => 1,						// Allow only plain ACSII characters in user login
 
-		'allow_moving_chapters' => '0',				// Do not allow moving chapters by default
+		'allow_moving_chapters' => '0',			// Do not allow moving chapters by default
 
 		'cross_posting' => 0,						// Allow additional categories from other blogs
 		'cross_posting_blog' => 0,					// Allow to choose main category from another blog
-		'redirect_moved_posts' => 0,                // Allow to redirect moved posts link to the correct blog
+		'redirect_moved_posts' => 0,				// Allow to redirect moved posts link to the correct blog
+		'cross_post_nav_in_same_coll' => 1,		// Stay in current coll if requested Item Slug is only cross posted in current coll (do not redirect to Canonial)
 
 		'subscribe_new_blogs' => 'public', // Subscribing to new blogs: 'page', 'public', 'all'
 
@@ -327,7 +331,7 @@ C message size exceeds',
 		// Account closing options:
 		'account_close_enabled' => 1, // Allow users to close their account themselves
 		'account_close_intro'   => "We are sorry to see you leave.\n\nWe value your feedback. Please be so kind and tell us in a few words why you are leaving us. This will help us to improve the site for the future.",
-		'account_close_reasons' => "I don't need this account any more.\nI do not like this site.", // Reasons to close an account, separated by new line
+		'account_close_reasons' => "I don't need this account any more.\nI do not like this site.\nI am getting spam from this site.", // Reasons to close an account, separated by new line
 		'account_close_byemsg'  => 'Your account has now been closed. If you ever want to log in again, you will need to create a new account.',
 
 	// Back-end settings, these can't be modified by the users:

@@ -114,7 +114,7 @@ class Poll extends DataObject
 			}
 		}
 		elseif( empty( $this->ID ) )
-		{	// Set onwer user ID on creating new poll:
+		{	// Set owner user ID on creating new poll:
 			$this->set( 'owner_user_ID', $current_User->ID );
 			$this->owner_User = & $current_User;
 		}
@@ -334,25 +334,36 @@ class Poll extends DataObject
 
 
 	/**
-	 * Get a vote of the current user
+	 * Get vote of the user
 	 *
+	 * @param integer User ID of specific user
 	 * @return integer|boolean Poll option ID OR FALSE if current user didn't vote on this poll yet
 	 */
-	function get_user_vote()
+	function get_user_vote( $user_ID = NULL )
 	{
-		if( empty( $this->ID ) || ! is_logged_in() )
-		{	// User must be logged in and poll question must exists in DB
+		global $current_User, $DB;
+
+		if( ! empty( $user_ID ) )
+		{
+			$UserCache = & get_UserCache();
+			$user = & $UserCache->get_by_ID( $user_ID, false, false );
+		}
+		elseif( is_logged_in() )
+		{
+			$user = $current_User;
+		}
+
+		if( empty( $user ) )
+		{
 			return false;
 		}
 
-		global $DB, $current_User;
-
-		// Get answer of current user for this poll:
+		// Get answer of user for this poll:
 		$poll_option_SQL = new SQL( 'Get answer of current user on the poll question' );
 		$poll_option_SQL->SELECT( 'pans_popt_ID' );
 		$poll_option_SQL->FROM( 'T_polls__answer' );
 		$poll_option_SQL->WHERE( 'pans_pqst_ID = '.$this->ID );
-		$poll_option_SQL->WHERE_and( 'pans_user_ID = '.$current_User->ID );
+		$poll_option_SQL->WHERE_and( 'pans_user_ID = '.$user->ID );
 		$poll_option_IDs = $DB->get_col( $poll_option_SQL );
 
 		return empty( $poll_option_IDs ) ? false : $poll_option_IDs;
@@ -360,18 +371,30 @@ class Poll extends DataObject
 
 
 	/**
-	 * Clears all votes of the current user
+	 * Clears all votes of the user
+	 *
+	 * @param integer User ID of specific user
 	 */
-	function clear_user_votes()
+	function clear_user_votes( $user_ID = NULL )
 	{
-		if( empty( $this->ID ) || ! is_logged_in() )
-		{ // User must be logged in and poll question must exists in DB
+		global $current_User, $DB;
+
+		if( ! empty( $user_ID ) )
+		{
+			$UserCache = & get_UserCache();
+			$user = & $UserCache->get_by_ID( $user_ID, false, false );
+		}
+		elseif( is_logged_in() )
+		{
+			$user = $current_User;
+		}
+
+		if( empty( $user ) )
+		{
 			return false;
 		}
 
-		global $DB, $current_User;
-
-		$DB->query( 'DELETE FROM T_polls__answer WHERE pans_user_ID = '.$current_User->ID.' AND pans_pqst_ID = '.$this->ID );
+		$DB->query( 'DELETE FROM T_polls__answer WHERE pans_user_ID = '.$user->ID.' AND pans_pqst_ID = '.$this->ID );
 
 		return true;
 	}

@@ -1152,27 +1152,40 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 	if( $current_User->check_perm( 'blog_admin', '', false, $blog ) &&
 		( get_allow_cross_posting() >= 2 ||
 	  ( isset( $blog) && get_post_cat_setting( $blog ) > 1 && get_allow_cross_posting() == 1 ) ) )
-	{ // If BLOG cross posting enabled, go through all blogs with cats:
-		/**
-		 * @var BlogCache
-		 */
+	{	// If collection cross posting is enabled, go through collections where current Item Type is enabled or current Item already uses categories of those collections:
 		$BlogCache = & get_BlogCache();
-		$ChapterCache->reveal_children( NULL, true );
+		$BlogCache->clear();
+		$cats_coll_SQL = $BlogCache->get_SQL_object( 'Load collections which categories are used by Item #'.$edited_Item->ID );
+		// Load collections only where current Item Type is enabled:
+		$item_type_coll_SQL = $BlogCache->get_SQL_object( 'Load collections where Item Type #'.$edited_Item->get( 'ityp_ID' ).' is enabled' );
+		$item_type_coll_SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_coll_ID = blog_ID' );
+		$item_type_coll_SQL->WHERE_and( 'itc_ityp_ID = '.$edited_Item->get( 'ityp_ID' ) );
+		$BlogCache->load_by_sql( $item_type_coll_SQL );
+		// Load collections which categories are used by current Item:
+		$cats_coll_SQL->FROM_add( 'INNER JOIN T_categories ON cat_blog_ID = blog_ID' );
+		$cats_coll_SQL->FROM_add( 'INNER JOIN T_postcats ON postcat_cat_ID = cat_ID' );
+		$cats_coll_SQL->WHERE_and( 'postcat_post_ID = '.$edited_Item->ID );
+		$BlogCache->load_by_sql( $cats_coll_SQL );
 
-		/**
-		 * @var Blog
-		 */
-		for( $l_Blog = & $BlogCache->get_first(); !is_null($l_Blog); $l_Blog = & $BlogCache->get_next() )
-		{ // run recursively through the cats
+		foreach( $BlogCache->cache as $l_Blog )
+		{	// Run recursively through the categories of the detected collections:
+			if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) ||
+			    ! $current_User->check_perm( 'blog_admin', '', false, $l_Blog->ID ) )
+			{	// Skip collection if current user has no appropriate permissions:
+				continue;
+			}
+
 			if( ! blog_has_cats( $l_Blog->ID ) )
+			{	// Skip collection without categories:
 				continue;
+			}
 
-			// Skip collection if current user do not have the appropriate permissions
-			if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) || ! $current_User->check_perm( 'blog_admin', '', false, $l_Blog->ID ) )
-				continue;
+			// Load all child categories:
+			$ChapterCache->reveal_children( $l_Blog->ID, true );
+
 			$r .= '<tbody data-toggle="collapse" style="cursor: pointer;" data-target="#cat_sel_'.$l_Blog->ID.'" data-parent="#cat_sel_group">';
 			$r .= '<tr class="group'.( $blog == $l_Blog->ID ? ' catselect_blog__current' : '' ).'" id="catselect_blog'.$l_Blog->ID.'">';
-			$r .= '<td colspan="3">'.$l_Blog->dget('name')."</td></tr>\n";
+			$r .= '<td colspan="4">'.$l_Blog->dget('name')."</td></tr>\n";
 			$r .= '</tbody>';
 			$r .= '<tbody class="accordion_panel '.( $blog == $l_Blog->ID ? 'collapse in' : 'collapse' ).'" id="cat_sel_'.$l_Blog->ID.'">';
 
@@ -1230,18 +1243,25 @@ function cat_select_header( $params = array() )
 {
 	$params = array_merge( array(
 			'category_name'        => T_('Category'),
+			'category_main_text'   => T_('Main'),
 			'category_main_title'  => T_('Main category'),
+			'category_extra_text'  => T_('Ext'),
 			'category_extra_title' => T_('Additional category'),
+			'category_order_text'  => T_('Ord'),
+			'category_order_title' => T_('Order'),
 		), $params );
 
-	// main cat header
-	$r = '<thead><tr><th class="selector catsel_main" title="'.$params['category_main_title'].'">'.T_('Main').'</th>';
+	// Radio option for main category:
+	$r = '<thead><tr><th class="catsel_main col-narrow" title="'.format_to_output( $params['category_main_title'], 'htmlattr' ).'">'.format_to_output( $params['category_main_text'] ).'</th>';
 
-	// extra cat header
-	$r .= '<th class="selector catsel_extra" title="'.$params['category_extra_title'].'">'.T_('Extra').'</th>';
+	// Checkbox for extra category:
+	$r .= '<th class="catsel_extra col-narrow" title="'.format_to_output( $params['category_extra_title'], 'htmlattr' ).'">'.format_to_output( $params['category_extra_text'] ).'</th>';
 
-	// category header
-	$r .= '<th class="catsel_name">'.$params['category_name'].'</th>'
+	// Category name:
+	$r .= '<th class="catsel_name">'.$params['category_name'].'</th>';
+
+	// Item order per category:
+	$r .= '<th class="catsel_order col-narrow" title="'.format_to_output( $params['category_order_title'], 'htmlattr' ).'">'.format_to_output( $params['category_order_text'] ).'</th>'
 		.'</tr></thead>';
 
 	return $r;
@@ -1440,8 +1460,11 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 				.$chapter_lock_status
 				.' <a href="'.htmlspecialchars($thisChapter->get_permanent_url()).'" title="'.htmlspecialchars(T_('View category in blog.')).'">'
 				.'&nbsp;&raquo;&nbsp;' // TODO: dh> provide an icon instead? // fp> maybe the A(dmin)/B(log) icon from the toolbar? And also use it for permalinks to posts?
-				.'</a></td>'
-			.'</tr>'."\n";
+				.'</a></td>';
+
+	$r .= '<td class="catsel_order"><input type="text" name="post_cat_orders['.$cat_ID.']" class="form_text_input form-control" value="'.$edited_Item->get_order( $cat_ID ).'" title="'.format_to_output( T_('can be decimal'), 'htmlattr' ).'" /></td>';
+
+	$r .= '</tr>'."\n";
 
 	return $r;
 }
@@ -1482,10 +1505,12 @@ function cat_select_new( & $cat_display_params )
 	if( $new_maincat || $new_extracat )
 	{
 		$category_name = param( 'category_name', 'string', '' );
+		$category_order = param( 'category_order', 'integer', '' );
 	}
 	else
 	{
 		$category_name = '';
+		$category_order = '';
 	}
 
 	$cat_display_params['total_count'] = $cat_display_params['total_count']  + 1;
@@ -1495,7 +1520,7 @@ function cat_select_new( & $cat_display_params )
 	{
 		// RADIO for new main cat:
 		$r .= '<td class="selector catsel_main"><input type="radio" name="post_category" class="checkbox" title="'
-							.T_('Select as MAIN category').'" value="0"';
+							.format_to_output( T_('Select as MAIN category'), 'htmlattr' ).'" value="0"';
 		if( $new_maincat )
 		{
 			$r.= ' checked="checked"';
@@ -1509,7 +1534,7 @@ function cat_select_new( & $cat_display_params )
 	{
 		// CHECKBOX
 		$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
-							.T_('Select as an additional category').'" value="0"';
+							.format_to_output( T_('Select as an additional category'), 'htmlattr' ).'" value="0"';
 		if( $new_extracat )
 		{
 			$r.= ' checked="checked"';
@@ -1519,9 +1544,15 @@ function cat_select_new( & $cat_display_params )
 
 	// INPUT TEXT for new category name
 	$r .= '<td class="catsel_name">'
-				.'<input maxlength="255" style="width: 100%;" value="'.$category_name.'" size="20" type="text" name="category_name" id="new_category_name" />'
-				.'</td>'
-			.'</tr>';
+				.'<input maxlength="255" style="width:100%" value="'.format_to_output( $category_name, 'htmlattr' ).'" size="20" type="text" name="category_name" id="new_category_name" class="form_text_input form-control" />'
+				.'</td>';
+
+	// INPUT TEXT for otem order in new category:
+	$r .= '<td class="catsel_order">'
+				.'<input type="text" name="post_cat_orders[0]" value="'.format_to_output( $category_order, 'htmlattr' ).'" name="category_order" class="form_text_input form-control" title="'.format_to_output( T_('can be decimal'), 'htmlattr' ).'" />'
+				.'</td>';
+
+	$r .= '</tr>';
 
 	return $r;
 }
@@ -1545,7 +1576,11 @@ function attach_browse_tabs( $display_tabs3 = true )
 		'full' => array(
 			'text' => T_('All'),
 			'href' => $admin_url.'?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$Blog->ID,
-		)
+		),
+		'summary' => array(
+			'text' => T_('Summary'),
+			'href' => $admin_url.'?ctrl=items&amp;tab=summary&amp;filter=restore&amp;blog='.$Blog->ID,
+		),
 	);
 
 	if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
@@ -1734,6 +1769,111 @@ function get_item_type_usage_by_tab( $tab_name )
 
 
 /**
+ * Get item type custom field types
+ *
+ * @return array
+ */
+function get_item_type_field_types()
+{
+	return array(
+		'double'    => T_('Numeric'),
+		'computed'  => T_('Computed'),
+		'varchar'   => T_('String'),
+		'text'      => T_('Text'),
+		'html'      => 'HTML',
+		'url'       => T_('URL'),
+		'image'     => T_('Image'),
+		'separator' => T_('Separator'),
+	);
+}
+
+
+/**
+ * Get item type custom field types
+ *
+ * @param string Custom field type
+ * @return array
+ */
+function get_item_type_field_type_title( $field_type )
+{
+	$custom_field_types = get_item_type_field_types();
+
+	return isset( $custom_field_types[ $field_type ] ) ? $custom_field_types[ $field_type ] : $field_type;
+}
+
+
+/**
+ * Get item type custom field line/green/red highlight options
+ *
+ * @param string Type: line/green/red
+ * @return array
+ */
+function get_item_type_field_highlight_options( $type )
+{
+	switch( $type )
+	{
+		case 'line':
+			return array(
+				'never'       => T_('Never'),
+				'differences' => T_('If different'),
+				'always'      => T_('Always'),
+			);
+		case 'green':
+		case 'red':
+			return array(
+				'never'   => T_('Never'),
+				'lowest'  => T_('Lowest'),
+				'highest' => T_('Highest'),
+			);
+	}
+}
+
+
+/**
+ * Get options for setting "Link to" of item type custom field
+ *
+ * @return array
+ */
+function get_item_type_field_linkto_options( $field_type )
+{
+	switch( $field_type )
+	{
+		case 'image':
+			$options = array(
+				'linkpermzoom' => T_('Link to / Permalink / Zoom'),
+				'permzoom'     => T_('Permalink / Zoom'),
+				'linkto'       => T_('Always "Link to"'),
+				'permalink'    => T_('Always Permalink'),
+				'zoom'         => T_('Always Zoom'),
+				'nolink'       => T_('No Link'),
+			);
+			break;
+		case 'url':
+			$options = array(
+				'fieldurl' => T_('This field URL'),
+				'nolink'   => T_('No Link'),
+			);
+			break;
+		case 'double':
+		case 'varchar':
+		case 'computed':
+		case 'separator':
+			$options = array(
+				'linkperm'  => T_('Link to / Permalink'),
+				'linkto'    => T_('Always "Link to"'),
+				'permalink' => T_('Always Permalink'),
+				'nolink'    => T_('No Link'),
+			);
+			break;
+		default:
+			$options = array();
+	}
+
+	return $options;
+}
+
+
+/**
  * Allow to select status/visibility
  *
  * @param object Form
@@ -1767,59 +1907,6 @@ function visibility_select( & $Form, $post_status, $mass_create = false, $labels
 	}
 
 	$Form->radio( 'post_status', $post_status, $sharing_options, $field_label, true );
-}
-
-
-/**
- * Selection of the issue date
- *
- * @todo dh> should display erroneous values (e.g. when giving invalid date) as current (form) value, too.
- * @param Form
- * @param boolean Break line
- * @param string Title
- */
-function issue_date_control( $Form, $break = false, $field_title = '' )
-{
-	global $edited_Item;
-
-	if( $field_title == '' )
-	{
-		$field_title = T_('Issue date');
-	}
-
-	echo $field_title.':<br />';
-
-	echo '<label><input type="radio" name="item_dateset" id="set_issue_date_now" value="0" '
-				.( ($edited_Item->dateset == 0) ? 'checked="checked"' : '' )
-				.'/><strong>'.T_('Update to NOW').'</strong></label>';
-
-	if( $break )
-	{
-		echo '<br />';
-	}
-
-	echo '<label><input type="radio" name="item_dateset" id="set_issue_date_to" value="1" '
-				.( ($edited_Item->dateset == 1) ? 'checked="checked"' : '' )
-				.'/><strong>'.T_('Set to').':</strong></label>';
-	$Form->date( 'item_issue_date', $edited_Item->get('issue_date'), '' );
-	echo ' '; // allow wrapping!
-	$Form->time( 'item_issue_time', $edited_Item->get('issue_date'), '', 'hh:mm:ss', '' );
-	echo ' '; // allow wrapping!
-
-	// Autoselect "change date" is the date is changed.
-	?>
-	<script>
-	jQuery( function()
-			{
-				jQuery('#item_issue_date, #item_issue_time').change(function()
-				{
-					jQuery('#set_issue_date_to').attr("checked", "checked")
-				})
-			}
-		)
-	</script>
-	<?php
-
 }
 
 
@@ -1919,6 +2006,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	{ // Only for back-office
 		global $AdminUI;
 
+		echo '<span class="edit_actions_visibility">';
 		echo '<span class="edit_actions_text">'.T_('Visibility').get_manual_link( 'visibility-status' ).': </span>';
 
 		// Get those statuses which are not allowed for the current User to create posts in this blog
@@ -1955,6 +2043,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 			}
 			echo '</select>';
 		}
+		echo '</span>';
 	}
 
 	echo '<span class="btn-group">';
@@ -2017,7 +2106,7 @@ function echo_item_status_buttons( $Form, $edited_Item )
 	$next_action = ( is_create_action( $action ) ? 'create' : 'update' );
 
 	$Form->hidden( 'post_status', $edited_Item->status );
-	echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="top" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
+	echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
 	echo '<button type="submit" class="btn btn-status-'.$edited_Item->status.'" name="actionArray['.$next_action.']">'
 				.'<span>'.T_( $status_options[ $edited_Item->status ] ).'</span>'
 			.'</button>'
@@ -2261,7 +2350,7 @@ function evo_merge_load_window( item_ID )
 	// Load collections:
 	var current_coll_urlname = '<?php echo empty( $Blog ) ? '' : format_to_js( $Blog->get( 'urlname' ) ); ?>';
 	evo_rest_api_start_loading( '#evo_merge_wrapper' );
-	evo_rest_api_request( 'collections', function( data )
+	evo_rest_api_request( 'collections', { per_page: 0, list_in_frontoffice: 'all' }, function( data )
 	{	// Display the colllections on success request:
 		var coll_urlname = '';
 		var coll_name = '';
@@ -2675,16 +2764,22 @@ jQuery( document ).on( 'click', '#evo_merge_btn_back_to_list', function()
  * Output Javascript for tags autocompletion.
  * @todo dh> a more facebook like widget would be: http://plugins.jquery.com/project/facelist
  *           "ListBuilder" is being planned for jQuery UI: http://wiki.jqueryui.com/ListBuilder
+ *
+ * @param array Params
  */
-function echo_autocomplete_tags()
+function echo_autocomplete_tags( $params = array() )
 {
+	$params = array_merge( array(
+			'item_ID'        => NULL,
+			'update_by_ajax' => false,
+		), $params );
 ?>
 	<script type="text/javascript">
 	function init_autocomplete_tags( selector )
 	{
 		var tags = jQuery( selector ).val();
 		var tags_json = new Array();
-		if( tags.length > 0 )
+		if( tags && tags.length > 0 )
 		{ // Get tags from <input>
 			tags = tags.split( ',' );
 			for( var t in tags )
@@ -2705,12 +2800,46 @@ function echo_autocomplete_tags()
 			noResultsText: '<?php echo TS_('No results') ?>',
 			searchingText: '<?php echo TS_('Searching...') ?>',
 			jsonContainer: 'tags',
+			<?php if( $params['update_by_ajax'] ) { ?>
+			onAdd: function() { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector ) },
+			onDelete: function() { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector ) },
+			<?php } ?>
 		} );
 	}
 
+	<?php if( $params['update_by_ajax'] ) { ?>
+	function evo_update_item_tags_by_ajax( item_ID, tags_selector )
+	{
+		// Mark input background with yellow color during AJAX updating:
+		var token_input = jQuery( '.token-input-' + tags_selector.substr( 1 ) );
+		token_input.removeClass( 'token-input-list-error' ).addClass( 'token-input-list-process' );
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url(); ?>action.php',
+			data:
+			{
+				'mname': 'collections',
+				'action': 'update_tags',
+				'item_ID': item_ID,
+				'item_tags': jQuery( tags_selector ).val(),
+				'crumb_collections_update_tags': '<?php echo get_crumb( 'collections_update_tags' ); ?>'
+			},
+			success: function()
+			{	// Remove yellow background from input after success AJAX updating:
+				token_input.removeClass( 'token-input-list-process' );
+			},
+			error: function()
+			{	// Mark input background with red color after fail AJAX updating:
+				token_input.removeClass( 'token-input-list-process' ).addClass( 'token-input-list-error' );
+			}
+		} );
+	}
+	<?php } ?>
+
 	jQuery( document ).ready( function()
 	{
-		if( jQuery( '#suggest_item_tags' ).is( ':checked' ) )
+		if( jQuery( '#suggest_item_tags' ).length == 0 || jQuery( '#suggest_item_tags' ).is( ':checked' ) )
 		{
 			init_autocomplete_tags( '#item_tags' );
 		}
@@ -3003,6 +3132,15 @@ function check_categories( & $post_category, & $post_extracats, $Item = NULL, $f
 					unset($post_extracats[0]);
 				}
 				$post_extracats[] = $new_Chapter->ID;
+			}
+
+			// Set order for new created category:
+			$post_cat_orders = param( 'post_cat_orders', 'array:string' );
+			if( isset( $post_cat_orders[0] ) )
+			{
+				$post_cat_orders[ $new_Chapter->ID ] = $post_cat_orders[0];
+				unset( $post_cat_orders[0] );
+				set_param( 'post_cat_orders', $post_cat_orders );
 			}
 
 			$ChapterCache->add( $new_Chapter );
@@ -3953,8 +4091,212 @@ function display_hidden_custom_fields( & $Form, & $edited_Item )
 	$custom_fields = $edited_Item->get_type_custom_fields();
 	foreach( $custom_fields as $custom_field )
 	{ // For each custom field with type $type:
-		$Form->hidden( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'] ) );
+		$Form->hidden( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ) );
 	}
+}
+
+
+/**
+ * Display custom field settings as editable input fields
+ *
+ * @param object Form
+ * @param object edited Item
+ */
+function display_editable_custom_fields( & $Form, & $edited_Item )
+{
+	$custom_fields = $edited_Item->get_type_custom_fields();
+
+	if( empty( $custom_fields ) )
+	{	// No custom fields
+		return;
+	}
+
+	$parent_Item = & $edited_Item->get_parent_Item();
+
+	$c = 0;
+	foreach( $custom_fields as $custom_field )
+	{	// Loop through custom fields:
+		$custom_field_input_params = array();
+		$custom_field_note = '';
+		if( ! empty( $custom_field['note'] ) )
+		{	// Display a not of the custon field if it is filled:
+			$custom_field_note .= $custom_field['note'];
+		}
+		if( $custom_field['type'] != 'separator' )
+		{	// Display a field name/code:
+			$custom_field_note .= empty( $custom_field_note ) ? '' : ' &middot; ';
+			$custom_field_note .= T_('Field name').': <code>'.$custom_field['name'].'</code>';
+		}
+		if( $parent_Item )
+		{	// Display a value of parent post custom field:
+			$parent_custom_field_value = $parent_Item->get_custom_field_value( $custom_field['name'], $custom_field['type'] );
+			if( $parent_custom_field_value !== false )
+			{	// If parent post realy has a custom field with same code and type
+				$preview_parent_custom_field_value = $parent_custom_field_value;
+				if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) )
+				{	// Use a formatted value to preview a double custom field:
+					$preview_parent_custom_field_value = $parent_Item->get_custom_field_formatted( $custom_field['name'], array( 'restrict_type' => $custom_field['type'] ) );
+				}
+				if( $custom_field['type'] == 'html' || $custom_field['type'] == 'text' )
+				{	// Cut long values of multiline fields:
+					$preview_parent_custom_field_value = explode( "\n", $parent_custom_field_value );
+					$preview_parent_custom_field_value = strmaxlen( $preview_parent_custom_field_value[0], 23, '...' );
+				}
+				if( $custom_field['type'] != 'computed' )
+				{	// The computed fields cannot be updated from parent here because we update them by formula on updating automatically,
+					// Also parent field may has a different formula so we should not display a value of the parent field:
+					$custom_field_note .= ' &middot; '.T_('Parent Item Field value').': '
+						.$parent_Item->get_edit_link( array( 'text' => format_to_output( $preview_parent_custom_field_value, ( $custom_field['type'] == 'double' ? 'raw' : 'htmlspecialchars' ) ) ) )
+						.action_icon( '', 'refresh', '#', NULL, NULL, NULL, array(
+						'data-child-input-id' => 'item_'.$custom_field['type'].'_'.$custom_field['ID'],
+						'data-parent-value'   => $parent_custom_field_value,
+					) );
+					$custom_field_input_params['disabled'] = 'disabled';
+				}
+			}
+		}
+
+		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
+		$custom_field_label = render_custom_field( $custom_field['label'] );
+
+		switch( $custom_field['type'] )
+		{
+			case 'double':
+				$Form->text_input( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
+				break;
+			case 'computed':
+				$Form->info( $custom_field_label, $edited_Item->get_custom_field_formatted( $custom_field['name'] ), $custom_field_note );
+				break;
+			case 'varchar':
+				$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
+				break;
+			case 'text':
+				$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
+				break;
+			case 'html':
+				$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
+				break;
+			case 'url':
+				$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
+				break;
+			case 'image':
+				$Form->text_input( 'item_image_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
+				break;
+			case 'separator':
+				if( is_admin_page() && $c > 0 )
+				{	// This is a hack for back-office because there is a css table layout:
+					$Form->end_fieldset();
+				}
+				echo '<h3>'.$custom_field_label.'</h3>';
+				if( ! empty( $custom_field_note ) )
+				{
+					echo '<p class="note">'.$custom_field_note.'</p>';
+				}
+				if( is_admin_page() && $c > 0 && $c < count( $custom_fields ) )
+				{	// This is a hack for back-office because there is a css table layout:
+					$Form->begin_fieldset();
+				}
+				break;
+		}
+
+		if( empty( $edited_Item->ID ) && // New object is creating or copying
+		    isset( $custom_field_input_params['disabled'] ) && // The custom field is disabled
+		    ! in_array( $custom_field['type'], array( 'computed', 'separator' ) ) ) // Theese fields don't have an editable value
+		{	// When input field is disabled and new item is creating
+			// we should create additional hidden input field because the disabled inputs are not submitted:
+			$Form->hidden( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ) );
+		}
+
+		$c++;
+	}
+
+	if( $parent_Item )
+	{	// JS to refresh custom field values from parent post custom fields:
+?>
+<script type="text/javascript">
+jQuery( 'a[data-child-input-id]' ).click( function()
+{	// Update custom field value with value from parent post:
+	var child_field_obj = jQuery( '[name=' + jQuery( this ).data( 'child-input-id' ) + '][type!=hidden]' );
+	if( child_field_obj.length > 0 )
+	{
+		child_field_obj.val( jQuery( this ).data( 'parent-value' ) );
+		if( child_field_obj.prop( 'disabled' ) )
+		{	// If the field is disabled we should create additional hidden input in order to save new value in DB,
+			// because the disabled inputs cannot be submitted:
+			jQuery( '[name=' + jQuery( this ).data( 'child-input-id' ) + '][type=hidden]' ).remove(); // this hidden field is used on duplicate action
+			child_field_obj.after( '<input type="hidden" name="' + child_field_obj.attr( 'name' ) + '" value="' + child_field_obj.val() + '" />' );
+			child_field_obj.attr( 'name', child_field_obj.attr( 'name' ) + '_disabled' );
+		}
+	}
+	return false;
+} );
+</script>
+<?php
+	}
+}
+
+
+/**
+ * Render special masks in custom field labels and values
+ *
+ * Possible masks: #yes#, (yes), #no#, (no), (+), (-), (!), ||, | |, {note_sample_text}, #stars/5#, #stars:2.3/5#
+ *
+ * @param string Custom field value or label
+ * @param array Additional parameters
+ * @return string
+ */
+function render_custom_field( $value, $params = array() )
+{
+	$params = array_merge( array(
+			'stars_value'         => NULL, // NULL to fill all stars by default
+			// The following masks are used to replace in custom field values and formats:
+			'field_value_yes'     => '<span class="fa fa-check green"></span>', // #yes#, (yes)
+			'field_value_no'      => '<span class="fa fa-times red"></span>', // #no#, (no)
+			'field_value_plus'    => '<span class="fa fa-plus-circle green"></span>', // (+)
+			'field_value_minus'   => '<span class="fa fa-minus-circle red"></span>', // (-)
+			'field_value_warning' => '<span class="fa fa-exclamation-triangle orange"></span>', // (!)
+			'field_value_note'    => '<span class="note">$note_text$</span>', // {note text}
+			'expansion'           => 'default', // 'default': || = '<br />', | | = space; 'vertical': both = '<br />'; 'horizontal': both = space.
+		), $params );
+
+	// Render special masks:
+	$value_masks = array(
+			'#yes#' => $params['field_value_yes'],
+			'(yes)' => $params['field_value_yes'],
+			'#no#'  => $params['field_value_no'],
+			'(no)'  => $params['field_value_no'],
+			'(+)'   => $params['field_value_plus'],
+			'(-)'   => $params['field_value_minus'],
+			'(!)'   => $params['field_value_warning'],
+			'||'    => ( $params['expansion'] == 'horizontal' ? ' ' : '<br />' ),
+			'| |'   => ( $params['expansion'] == 'vertical' ? '<br />' : ' ' ),
+		);
+	$value = str_replace( array_keys( $value_masks ), $value_masks, $value );
+
+	// Render a note text:
+	$value = preg_replace( '/\{([^}]+)\}/', str_replace( '$note_text$', '$1', $params['field_value_note'] ), $value );
+
+	// Render stars:
+	if( preg_match_all( '/(#stars(:\d+.?\d+?)?(\/\d+)?)#/', $value, $star_matches ) )
+	{	// If at least one star template is found:
+		foreach( $star_matches[0] as $s => $star_match )
+		{
+			// Set number of stars, 5 stars by default:
+			$stars_num = ( isset( $star_matches[3][ $s ] ) && $star_matches[3][ $s ] !== '' ) ? intval( trim( $star_matches[3][ $s ], '/' ) ) : 5;
+			if( $params['stars_value'] === NULL || ! is_numeric( $params['stars_value'] ) )
+			{	// Make active all stars by default or get active stars e.g. '2.3' from stars mask like #stars:2.3/5#:
+				$stars_value = empty( $star_matches[2][ $s ] ) ? $stars_num : floatval( substr( $star_matches[2][ $s ], 1 ) );
+			}
+			else
+			{	// Use a number of active stars from params if it is a numeric really
+				$stars_value = floatval( $params['stars_value'] );
+			}
+			// Render stars:
+			$value = str_replace( $star_match, get_star_rating( $stars_value, $stars_num, $params ), $value );
+		}
+	}
+
+	return $value;
 }
 
 
@@ -4209,7 +4551,7 @@ function items_manual_results_block( $params = array() )
 
 		if( $order_action == 'update' )
 		{ // Update an order to new value
-			$new_value = (int)param( 'new_value', 'string', 0 );
+			$new_value = param( 'new_value', 'string', '' );
 			$order_data = param( 'order_data', 'string' );
 			$order_data = explode( '-', $order_data );
 			$order_obj_ID = (int)$order_data[2];
@@ -4224,7 +4566,7 @@ function items_manual_results_block( $params = array() )
 						{
 							if( $current_User->check_perm( 'blog_cats', '', false, $updated_Chapter->blog_ID ) )
 							{ // Check permission to edit this Chapter
-								$updated_Chapter->set( 'order', $new_value );
+								$updated_Chapter->set( 'order', intval( $new_value ) );
 								$updated_Chapter->dbupdate();
 								$ChapterCache->clear();
 							}
@@ -4238,8 +4580,7 @@ function items_manual_results_block( $params = array() )
 						{
 							if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $updated_Item ) )
 							{ // Check permission to edit this Item
-								$updated_Item->set( 'order', $new_value );
-								$updated_Item->dbupdate();
+								$updated_Item->update_order( $new_value, $cat_ID );
 							}
 						}
 						break;
@@ -5073,13 +5414,25 @@ function item_row_status( $Item, $index )
  */
 function item_row_order( $Item )
 {
-	global $current_User;
+	global $current_User, $ItemList;
 
-	$item_order = $Item->get( 'order' );
+	if( isset( $ItemList, $ItemList->filters['cat_array'] ) &&
+	    count ( $ItemList->filters['cat_array'] ) == 1 )
+	{	// Use order of single filtered category:
+		$order_cat_ID = $ItemList->filters['cat_array'][0];
+		$order_cat_attr = ' data-cat-id="'.$order_cat_ID.'"';
+	}
+	else
+	{	// Use order of main category:
+		$order_cat_ID = NULL;
+		$order_cat_attr = '';
+	}
+
+	$item_order = $Item->get_order( $order_cat_ID );
 
 	if( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{	// If current user can edit the Item then allow to edit an order by AJAX:
-		return '<a href="#" rel="'.$Item->ID.'">'.( $item_order === NULL ? '-' : $item_order ).'</a>';
+		return '<a href="#" rel="'.$Item->ID.'"'.$order_cat_attr.'>'.( $item_order === NULL ? '-' : $item_order ).'</a>';
 	}
 	else
 	{	// If current user cannot edit the Item then display a static text
@@ -5357,11 +5710,11 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	{
 		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 		{ // Add availability to edit an order if current user can edit this item
-			$order_attrs .= ' id="order-item-'.$Item->ID.'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
+			$order_attrs .= ' id="order-item-'.$Item->ID.'" data-cat="'.$params['chapter_ID'].'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
 		}
-		$order_value = $Item->dget('order');
+		$order_value = $Item->get_order( $params['chapter_ID'] );
 	}
-	$r .= '<td'.$order_attrs.'><span style="padding-left:'.$level.'em">'.$order_value.'</span></td>';
+	$r .= '<td'.$order_attrs.'><span style="padding-left:'.$level.'em">'.format_to_output( $order_value ).'</span></td>';
 
 	// Actions
 	$r .= '<td class="lastcol shrinkwrap">'.item_edit_actions( $Item ).'</td>';

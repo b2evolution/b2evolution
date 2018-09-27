@@ -23,7 +23,7 @@ class star_plugin extends Plugin
 	var $code = 'b2evStar';
 	var $name = 'Star renderer';
 	var $priority = 55;
-	var $version = '6.10.2';
+	var $version = '6.10.3';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -38,28 +38,6 @@ class star_plugin extends Plugin
 	{
 		$this->short_desc = T_('Star formatting e-g [stars:2.3/5]');
 		$this->long_desc = T_('This plugin allows to render star ratings inside blog posts and comments by using the syntax [stars:2.3/5] for example');
-	}
-
-
-	/**
-	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
-	 *
-	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
-	 *
-	 * @param array Associative array of parameters
-	 */
-	function SkinBeginHtmlHead( & $params )
-	{
-		global $Collection, $Blog;
-
-		if( ! isset( $Blog ) || (
-		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
-		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
-		{ // Don't load css/js files when plugin is not enabled
-			return;
-		}
-
-		$this->require_css( 'star.css' );
 	}
 
 
@@ -80,22 +58,7 @@ class star_plugin extends Plugin
 	 *
 	 * @see Plugin::RenderItemAsHtml()
 	 */
-	function RenderItemAsHtml( & $params )
-	{
-		$params['data'] = $this->render_stars( $params['data'] );
-
-		return true;
-	}
-
-
-	/**
-	 * Perform rendering of Message content
-	 *
-	 * NOTE: Use default coll settings of comments as messages settings
-	 *
-	 * @see Plugin::RenderMessageAsHtml()
-	 */
-	function RenderMessageAsHtml( & $params )
+	function DisplayItemAsHtml( & $params )
 	{
 		$params['data'] = $this->render_stars( $params['data'] );
 
@@ -108,40 +71,32 @@ class star_plugin extends Plugin
 	 *
 	 * @see RenderItemAsHtml()
 	 */
-	function RenderItemAsXml( & $params )
+	function DisplayItemAsXml( & $params )
 	{
-		$this->RenderItemAsHtml( $params );
+		return $this->DisplayItemAsHtml( $params );
 	}
 
 
 	/**
+	 * Perform rendering of email
 	 *
-	 * Render comments if required
-	 *
-	 * @see Plugin::FilterCommentContent()
+	 * @see Plugin::RenderEmailAsHtml()
 	 */
-	function FilterCommentContent( & $params )
+	function RenderEmailAsHtml( & $params )
 	{
-		$Comment = & $params['Comment'];
-		$comment_Item = & $Comment->get_Item();
-		$item_Blog = & $comment_Item->get_Blog();
-		if( in_array( $this->code, $Comment->get_renderers_validated() ) )
-		{	// If apply_comment_rendering is set to render:
-			$params['data'] = $this->render_stars( $params['data'] );
-		}
+		$this->force_img_stars = true;
+		return $this->DisplayItemAsHtml( $params );
 	}
 
 
 	/**
 	 * Render stars template from [[stars:3/7]
-	 *  to <span class="star_plugin" style="width:112px">
-	 *       <span>*</span>
-	 *       <span>*</span>
-	 *       <span>*</span>
-	 *       <span class="empty">-</span>
-	 *       <span class="empty">-</span>
-	 *       <span class="empty">-</span>
-	 *       <span class="empty">-</span>
+	 *  to <span class="evo_stars_img" style="width:112px">
+	 *       <i>*</i>
+	 *       <i>*</i>
+	 *       <i class="evo_stars_img_empty"><i style="width:50%">%</i></i>
+	 *       <i class="evo_stars_img_empty">-</i>
+	 *       <i class="evo_stars_img_empty">-</i>
 	 *     </span>
 	 *
 	 * @param string Source content
@@ -161,6 +116,8 @@ class star_plugin extends Plugin
 	 */
 	function get_stars_template( $matches )
 	{
+		global $b2evo_icons_type;
+
 		if( empty( $matches ) )
 		{ // No stars found
 			return;
@@ -177,30 +134,7 @@ class star_plugin extends Plugin
 			$number_stars = 5;
 		}
 
-		$active_stars_max = floor( $active_stars );
-		$percents = round( ( $active_stars - $active_stars_max ) * 100 );
-		$template = '<span class="star_plugin"'.( $number_stars != 5 ? ' style="width:'.( $number_stars * 16 ).'px"' : '' ).'>';
-		for( $s = 1; $s <= $number_stars; $s++ )
-		{
-			$attrs = '';
-			if( $s > $active_stars_max )
-			{ // Class for empty stars
-				$attrs .= ' class="empty"';
-			}
-			$template .= '<span'.$attrs.'>';
-			if( $s == $active_stars_max + 1 && $percents > 0 )
-			{ // Star with a percent fill
-				$template .= '<span style="width:'.$percents.'%">%</span>';
-			}
-			else
-			{
-				$template .= $s <= $active_stars_max ? '*' : '-';
-			}
-			$template .= '</span>';
-		}
-		$template .= '</span>';
-
-		return $template;
+		return get_star_rating( $active_stars, $number_stars );
 	}
 }
 

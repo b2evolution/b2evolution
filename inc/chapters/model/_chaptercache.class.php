@@ -666,7 +666,10 @@ class ChapterCache extends DataObjectCache
 			return strcmp( $Item->title, $Chapter->name );
 		}
 
-		if( $Item->order == NULL )
+		// Get item order depending on category:
+		$item_order = $Item->get_order( $Chapter->get( 'parent_ID' ) );
+
+		if( $item_order == NULL )
 		{
 			return $Chapter->order == NULL ? 0 : 1;
 		}
@@ -675,7 +678,7 @@ class ChapterCache extends DataObjectCache
 			return -1;
 		}
 
-		return ( $Item->order < $Chapter->order ) ? -1 : ( ( $Item->order > $Chapter->order ) ? 1 : 0 );
+		return ( $item_order < $Chapter->order ) ? -1 : ( ( $item_order > $Chapter->order ) ? 1 : 0 );
 	}
 
 
@@ -846,7 +849,8 @@ class ChapterCache extends DataObjectCache
 				'sorted'    => false,
 				'level'     => 0,
 				'max_level' => 0,
-				'subset_ID' => $Chapter->blog_ID
+				'subset_ID' => $Chapter->blog_ID,
+				'items_order_alpha_func' => 'compare_items_by_title',
 			), $params );
 
 		if( $params['sorted'] && $has_sub_cats )
@@ -856,7 +860,7 @@ class ChapterCache extends DataObjectCache
 		if( ! empty( $callbacks['posts'] ) )
 		{
 			$ItemCache = & get_ItemCache();
-			$cat_items = $ItemCache->get_by_cat_ID( $Chapter->ID, $params['sorted'] );
+			$cat_items = $ItemCache->get_by_cat_ID( $Chapter->ID, $params['items_order_alpha_func'] );
 		}
 
 		if( $has_sub_cats || !empty( $cat_items ) )

@@ -130,7 +130,7 @@ function get_target_ID( $Slug )
 			break;
 
 		default:
-			$r = 'n.a.';
+			$r = /* TRANS: "Not Available" */ T_('N/A');
 	}
 
 	if( is_null($r) )
@@ -200,7 +200,7 @@ function get_target_coll( $Slug )
 			return $coll;//'<a href="'.$target->get_single_url().'">'.$target->dget('title').'</a>';
 
 		default:
-			return 'n.a.';
+			return /* TRANS: "Not Available" */ T_('N/A');
 	}
 }
 $Results->cols[] = array(

@@ -118,7 +118,11 @@ class content_block_Widget extends ComponentWidget
 					'label' => T_('Item ID'),
 					'type' => 'integer',
 					'allow_empty' => true,
-					'size' => 5,
+					'size' => 13,
+					'valid_range' => array(
+						'min' => 1,
+						'max' => 4294967295,
+					),
 				),
 				'item_slug' => array(
 					'label' => T_('Item Slug'),
@@ -174,7 +178,7 @@ class content_block_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_start'];
 
-		$this->disp_title( $this->disp_params['title'] );
+		$this->disp_title();
 
 		echo $this->disp_params['block_body_start'];
 

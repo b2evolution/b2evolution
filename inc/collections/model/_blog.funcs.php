@@ -1550,16 +1550,20 @@ function & get_setting_Blog( $setting_name, $current_Blog = NULL, $halt_on_error
 		return $setting_Blog;
 	}
 
-	if( $setting_name == 'login_blog_ID' && $current_Blog !== NULL && $current_Blog->get( 'access_type' ) == 'absolute' )
-	{	// Don't allow to use main login collection if current collection has an external domain:
-		return $setting_Blog;
-	}
-
 	$blog_ID = intval( $Settings->get( $setting_name ) );
 	if( $blog_ID > 0 )
 	{ // Check if blog really exists in DB
 		$BlogCache = & get_BlogCache();
 		$setting_Blog = & $BlogCache->get_by_ID( $blog_ID, $halt_on_error, $halt_on_empty );
+	}
+
+	if( $setting_name == 'login_blog_ID' &&
+	    $current_Blog !== NULL &&
+	    $current_Blog->get( 'access_type' ) == 'absolute' &&
+	    ! empty( $setting_Blog ) &&
+	    ! url_check_same_domain( $current_Blog->gen_baseurl(), $setting_Blog->gen_baseurl() ) )
+	{	// Don't allow to use main login collection if current collection has a DIFFERENT external domain:
+		$setting_Blog = NULL;
 	}
 
 	return $setting_Blog;
@@ -1744,8 +1748,9 @@ function blogs_user_results_block( $params = array() )
 	param( 'user_ID', 'integer', 0, true );
 
 	$SQL = new SQL();
-	$SQL->SELECT( '*' );
+	$SQL->SELECT( '*, cset_value AS collection_logo_file_ID' );
 	$SQL->FROM( 'T_blogs' );
+	$SQL->FROM_add( 'LEFT JOIN T_coll_settings ON blog_ID = cset_coll_ID AND cset_name = "collection_logo_file_ID"' );
 	$SQL->WHERE( 'blog_owner_user_ID = '.$DB->quote( $edited_User->ID ) );
 
 	// Create result set:
@@ -1844,9 +1849,10 @@ function blogs_all_results_block( $params = array() )
 	}
 
 	$SQL = new SQL();
-	$SQL->SELECT( 'DISTINCT blog_ID, T_blogs.*, user_login, IF( cufv_user_id IS NULL, 0, 1 ) AS blog_favorite' );
+	$SQL->SELECT( 'DISTINCT blog_ID, T_blogs.*, user_login, IF( cufv_user_id IS NULL, 0, 1 ) AS blog_favorite, cset_value AS collection_logo_file_ID' );
 	$SQL->FROM( 'T_blogs INNER JOIN T_users ON blog_owner_user_ID = user_ID' );
 	$SQL->FROM_add( 'LEFT JOIN T_coll_user_favs ON ( cufv_blog_ID = blog_ID AND cufv_user_ID = '.$current_User->ID.' )' );
+	$SQL->FROM_add( 'LEFT JOIN T_coll_settings ON blog_ID = cset_coll_ID AND cset_name = "collection_logo_file_ID"' );
 
 	if( ! $current_User->check_perm( 'blogs', 'view' ) )
 	{ // We do not have perm to view all blogs... we need to restrict to those we're a member of:
@@ -1973,6 +1979,7 @@ function blogs_model_results_block( $params = array() )
 	// Initialize Results object
 	blogs_results( $blogs_Results, array(
 		'display_fav' => false,
+		'display_logo' => false,
 		'display_url' => $is_coll_admin,
 		'display_locale' => $is_coll_admin,
 		'display_plist' => false,
@@ -2019,6 +2026,7 @@ function blogs_results( & $blogs_Results, $params = array() )
 			'display_locale'   => true,
 			'display_plist'    => true,
 			'display_fav'      => true,
+			'display_logo'     => true,
 			'display_order'    => true,
 			'display_caching'  => true,
 			'display_actions'  => true,
@@ -2045,6 +2053,17 @@ function blogs_results( & $blogs_Results, $params = array() )
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
 				'td' => '%blog_row_setting( #blog_ID#, "fav", #blog_favorite# )%',
+			);
+	}
+
+	if( $params['display_logo'] )
+	{ // Display collection logo
+		$blogs_Results->cols[] = array(
+				'th' => T_('Image'),
+				'th_title' => T_('Image'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'td' => '%blog_row_setting( #blog_ID#, "logo", #collection_logo_file_ID# )%',
 			);
 	}
 
@@ -2461,8 +2480,16 @@ function blog_row_setting( $blog_ID, $setting_name, $setting_value )
 
 	switch( $setting_name )
 	{
-		case'fav':
+		case 'fav':
 			return get_coll_fav_icon( $blog_ID, array( 'class' => 'coll-fav' ) );
+
+		case 'logo':
+			$FileCache = & get_FileCache();
+			if( $image_File = & $FileCache->get_by_ID( $setting_value, false, false ) )
+			{
+				return $image_File->get_tag( '', '', '', '', 'crop-32x32', 'original', '', 'lightbox[c'.$image_File->ID.']' );
+			}
+			return;
 
 		default:
 			// Incorrect setting name

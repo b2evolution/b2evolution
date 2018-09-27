@@ -677,7 +677,7 @@ class Skin extends DataObject
 		}
 		else
 		{
-			echo '<div class="skinshot_noshot">'.T_('No skinshot available for').'</div>';
+			echo '<div class="skinshot_noshot">'.( empty( $disp_params['same_skin'] ) ? T_('No skinshot available for') : '' ).'</div>';
 			echo '<div class="skinshot_name">'.$select_a_begin.$skin_folder.$select_a_end.'</div>';
 		}
 		echo '</div>';
@@ -1020,7 +1020,7 @@ class Skin extends DataObject
 
 				case 'bootstrap_init_tooltips':
 					// JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions):
-					add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip() } )' );
+					add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip( {html: true} ) } )' );
 					break;
 
 				case 'bootstrap_messages':
@@ -1096,7 +1096,7 @@ class Skin extends DataObject
 					init_voting_comment_js( 'blog' );
 
 					// Used to display a tooltip to the right of plugin help icon:
-					init_plugins_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
+					init_popover_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
 					// Used to autocomplete usernames in textarea:
 					init_autocomplete_usernames_js( 'blog' );
@@ -1140,7 +1140,7 @@ class Skin extends DataObject
 					// Specific features for disp=messages:
 
 					// Used to display a tooltip to the right of plugin help icon:
-					init_plugins_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
+					init_popover_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
 					// Require results.css to display message query results in a table
 					if( ! in_array( 'bootstrap', $features ) )
@@ -1185,7 +1185,7 @@ class Skin extends DataObject
 					}
 
 					// Used to display a tooltip to the right of plugin help icon:
-					init_plugins_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
+					init_popover_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
 					// Require results.css to display thread query results in a table:
 					if( ! in_array( 'bootstrap', $features ) )
@@ -1201,8 +1201,14 @@ class Skin extends DataObject
 					require_once $inc_path.'_filters.inc.php';
 					break;
 
+				case 'disp_search':
+					// Used to suggest usernames for the field "Recipients":
+					init_tokeninput_js( 'blog' );
+					break;
+
 				case 'disp_login':
 				case 'disp_access_requires_login':
+				case 'disp_content_requires_login':
 					// Specific features for disp=login and disp=access_requires_login:
 
 					global $Settings, $Plugins;
@@ -1277,7 +1283,7 @@ class Skin extends DataObject
 					init_datepicker_js( 'blog' );
 
 					// Used to display a tooltip to the right of plugin help icon:
-					init_plugins_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
+					init_popover_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
 					// Used to switch to advanced editing:
 					require_js( 'backoffice.js', 'blog' );
@@ -1319,7 +1325,7 @@ class Skin extends DataObject
 					init_datepicker_js( 'blog' );
 
 					// Used to display a tooltip to the right of plugin help icon:
-					init_plugins_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
+					init_popover_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
 					// Used to autocomplete usernames in textarea:
 					init_autocomplete_usernames_js( 'blog' );

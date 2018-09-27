@@ -2389,7 +2389,13 @@ class File extends DataObject
 			$img_attribs['src'] = $this->get_url();
 			if( $tag_size != 'none' )
 			{	// Add attributes "width" & "height" only when they are not disabled:
-				if( ( $size_arr = $this->get_image_size( 'widthheight_assoc' ) ) )
+				if( $tag_size !== NULL )
+				{	// Use size values:
+					$tag_size = explode( 'x', $tag_size );
+					$img_attribs['width'] = $tag_size[0];
+					$img_attribs['height'] = empty( $tag_size[1] ) ? $tag_size[0] : $tag_size[1];
+				}
+				elseif( ( $size_arr = $this->get_image_size( 'widthheight_assoc' ) ) )
 				{
 					$img_attribs += $size_arr;
 				}

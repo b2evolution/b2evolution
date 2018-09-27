@@ -137,12 +137,13 @@ class org_members_Widget extends ComponentWidget
 					'note' => T_('Field used to determine the order in which the members are displayed'),
 					'type' => 'select',
 					'options' => array(
-							'user_id' => 'User ID', 
-							'user_level' => 'User Level',
-							'org_role' => 'Role in Organization',
-							'username' => 'Username',
-							'lastname' => 'Last Name, First Name',
-							'firstname' => 'First Name, Last Name'
+							'user_id'      => T_('User ID'),
+							'user_level'   => T_('User Level'),
+							'org_role'     => T_('Role in organization'),
+							'org_priority' => T_('Order in organization'),
+							'username'     => T_('Username'),
+							'lastname'     => T_('Last Name').', '.T_('First Name'),
+							'firstname'    => T_('First Name').', '.T_('Last Name'),
 					),
 					'defaultvalue' => 'user_id',
 				),
@@ -155,12 +156,6 @@ class org_members_Widget extends ComponentWidget
 				'display_role' => array(
 					'label' => T_('Role in organization'),
 					'note' => T_('Check this to display the role of the members in the organization'),
-					'type' => 'checkbox',
-					'defaultvalue' => 1,
-				),
-				'display_priority' => array(
-					'label' => T_('Priority in organization'),
-					'note' => T_('Check this to display the priority of the members in the organization'),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
@@ -292,13 +287,6 @@ class org_members_Widget extends ComponentWidget
 					{
 						$organizations_data = $org_User->get_organizations_data();
 						echo '<div class="evo_org_role text-muted">'.$organizations_data[$org_ID]['role'].'</div>';
-					}
-
-					// Organizational priority
-					if( $this->disp_params['display_priority'] == 1 )
-					{
-						$organizations_data = $org_User->get_organizations_data();
-						echo '<div class="evo_org_priority text-muted">'.$organizations_data[$org_ID]['priority'].'</div>';
 					}
 
 					if( $this->disp_params['display_icons'] )

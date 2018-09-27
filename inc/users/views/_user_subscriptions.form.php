@@ -249,7 +249,7 @@ if( $notifications_mode != 'off' )
 							LEFT JOIN T_users__secondary_user_groups ON (sug_grp_ID = bloggroup_group_ID AND sug_user_ID = '.$edited_User->ID.' AND opt.cset_value = "1" )
 							WHERE ( ( sub.cset_value = 1 OR sub.cset_value IS NULL ) OR ( subc.cset_value = 1 OR subc.cset_value IS NULL ) )
 								AND ( sug_user_ID = '.$edited_User->ID.' OR bloguser_user_ID = '.$edited_User->ID.' OR user_ID = '.$edited_User->ID.' OR sub_user_ID = '.$edited_User->ID.' )
-								AND ( sub_items <> 0 OR sub_comments <> 0 OR sub_coll_ID IS NULL )
+								AND ( sub_items <> 0 OR sub_items_mod <> 0 OR sub_comments <> 0 OR sub_coll_ID IS NULL )
 								AND ( CASE opt.cset_value WHEN 1 THEN blog_advanced_perms = 1 ELSE TRUE END )
 							GROUP BY blog_ID, blog_shortname';
 			$blog_subs = $DB->get_results( $sql );
@@ -264,7 +264,7 @@ if( $notifications_mode != 'off' )
 				}
 				if( ! ( $sub_Blog->get_setting( 'allow_subscriptions' ) && $blog_sub->sub_items ) &&
 						! ( $sub_Blog->get_setting( 'allow_comment_subscriptions' ) && $blog_sub->sub_comments ) &&
-						! ( $sub_Blog->get_setting( 'allow_item_mod_subscriptions' ) && $blog_sub->sub_items ) )
+						! ( $sub_Blog->get_setting( 'allow_item_mod_subscriptions' ) && $blog_sub->sub_items_mod ) )
 				{	// Skip because the collection doesn't allow any subscription:
 					continue;
 				}
@@ -401,7 +401,7 @@ if( $notifications_mode != 'off' )
 				}
 				if( is_admin_page() && $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $Item ) )
 				{ // Link title to back-office if user has a permission
-					$item_title = '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$row->blog_ID.'&amp;p='.$Item->ID.'">'.format_to_output( $Item->title ).'</a>';
+					$item_title = '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$row->blog_ID.'&amp;p='.$Item->ID.'">'.format_to_output( $Item->get( 'title' ) ).'</a>';
 				}
 				else
 				{ // Link title to front-office
@@ -428,6 +428,7 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 		$unread_message_reminder_delay = $Settings->get( 'unread_message_reminder_delay' );
 		$notify_options[ T_('Messaging') ][] = array( 'edited_user_notify_unread_messages', 1, sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $Settings->get( 'unread_message_reminder_threshold' ) ) ),  $UserSettings->get( 'notify_unread_messages', $edited_User->ID ), $disabled, sprintf( T_('This notification is sent only once every %s days.'), array_shift( $unread_message_reminder_delay ) ) );
 	}
+	$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_comment_mentioned', 1, T_( 'I have been mentioned on a comment.' ), $UserSettings->get( 'notify_comment_mentioned', $edited_User->ID ) );
 	if( $edited_User->check_role( 'post_owner' ) )
 	{ // user has at least one post or user has right to create new post
 		$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_publ_comments', 1, T_('a comment is published on one of <strong>my</strong> posts.'), $UserSettings->get( 'notify_published_comments', $edited_User->ID ), $disabled );
@@ -447,6 +448,7 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 	{ // edited user has a permission to back-office
 		$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_meta_comments', 1, T_('a meta comment is posted.'), $UserSettings->get( 'notify_meta_comments', $edited_User->ID ), $disabled );
 	}
+	$notify_options[ T_('Posts') ][] = array( 'edited_user_notify_post_mentioned', 1, T_( 'I have been mentioned on a post.' ), $UserSettings->get( 'notify_post_mentioned', $edited_User->ID ) );
 	if( $edited_User->check_role( 'post_moderator' ) )
 	{ // edited user is post moderator at least in one blog
 		$notify_options[ T_('Posts') ][] = array( 'edited_user_notify_post_moderation', 1, T_('a post is created and I have permissions to moderate it.'), $UserSettings->get( 'notify_post_moderation', $edited_User->ID ), $disabled );

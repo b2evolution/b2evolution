@@ -1206,7 +1206,7 @@ class Comment extends DataObject
 		global $Skin;
 
 		// Default params:
-		if( is_admin_page() || ( isset( $Skin ) && $Skin->get_api_version() >= 6 && strpos( $Skin->folder, 'bootstrap' ) !== FALSE ) )
+		if( is_admin_page() || ( isset( $Skin ) && $Skin->get_css_framework() == 'bootstrap' ) )
 		{	// for v6 bootstrap skins:
 			$default_params = array(
 					'member_before'  => '<span class="label label-info">',
@@ -1434,7 +1434,7 @@ class Comment extends DataObject
 	function author_url_with_actions( $redirect_to = NULL, $ajax_button = false, $check_perms = true, $save_context = true )
 	{
 		global $current_User;
-		if( $this->author_url( '', ' <span &bull; Url: id="commenturl_'.$this->ID.'" <span class="bUrl" >', '' ) )
+		if( $this->author_url( '', ' &bull; Url: <span id="commenturl_'.$this->ID.'" class="bUrl">', '' ) )
 		{ // There is an URL
 			if( ! $this->get_author_User() && $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
 			{ // Author is anonymous user and we have permission to edit this comment...
@@ -1468,7 +1468,7 @@ class Comment extends DataObject
 		{
 			if( ! isset($template_unknown) )
 			{
-				echo /* TRANS: "not available" */ T_('N/A');
+				echo /* TRANS: "Not Available" */ T_('N/A');
 			}
 			else
 			{
@@ -2783,7 +2783,7 @@ class Comment extends DataObject
 		}
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
-		$r = $Plugins->render( $r, $this->get_renderers_validated(), $format, array( 'Item' => $this->get_Item() ), 'Display' );
+		$r = $Plugins->render( $r, $this->get_renderers_validated(), $format, array( 'Comment' => $this, 'Item' => $this->get_Item() ), 'Display' );
 
 		return $r;
 	}
@@ -3849,6 +3849,13 @@ class Comment extends DataObject
 				$notify_users[$creator_User->ID] = 'creator';
 			}
 
+			// Get list of users who want to be notified when his login is mentioned in the comment content by @user's_login:
+			$mentioned_user_IDs = get_mentioned_user_IDs( 'comment', $this->get( 'content' ), $already_notified_user_IDs );
+			foreach( $mentioned_user_IDs as $mentioned_user_ID )
+			{
+				$notify_users[ $mentioned_user_ID ] = 'comment_mentioned';
+			}
+
 			// Get list of users who want to be notified about the this post comments:
 			if( $comment_item_Blog->get_setting( 'allow_item_subscriptions' ) )
 			{	// If item subscriptions is allowed:
@@ -4284,6 +4291,7 @@ class Comment extends DataObject
 					break;
 
 				case 'blog_subscription': // blog subscription
+				case 'comment_mentioned': // user was mentioned in the comment content
 				case 'item_subscription': // item subscription for registered user
 				case 'anon_subscription': // item subscription for anonymous user
 				case 'meta_comment': // meta comment notification

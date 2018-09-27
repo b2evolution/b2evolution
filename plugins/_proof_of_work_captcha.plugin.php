@@ -31,12 +31,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * Proof of Work Captcha Plugin.
  *
- * It displays an captcha question through {@link CaptchaValidated()} and validates
- * it in {@link CaptchaValidated()}.
+ * It displays an captcha question through {@link ValidateCaptcha()} and validates
+ * it in {@link ValidateCaptcha()}.
  */
 class proof_of_work_captcha_plugin extends Plugin
 {
-	var $version = '6.9.4';
+	var $version = '6.10.3';
 	var $group = 'antispam';
 	var $code = 'proof_of_work_captcha';
 
@@ -63,46 +63,120 @@ class proof_of_work_captcha_plugin extends Plugin
 	 */
 	function GetDefaultSettings( & $params )
 	{
-		global $Settings;
+		global $DB;
+
+		$GroupCache = & get_GroupCache();
+		$GroupCache->load_all();
+		$groups = array();
+		foreach( $GroupCache->cache as $Group )
+		{
+			if( $Group->get( 'usage' ) == 'primary' )
+			{
+				$is_default = preg_match( '#(spammer|suspect)#i', $Group->get( 'name' ) );
+				$groups[] = array( $Group->ID, $Group->get( 'name' ), $is_default );
+			}
+		}
 
 		return array(
-				'use_for_anonymous_comment' => array(
-					'label' => $this->T_('Use for anonymous comment forms'),
-					'defaultvalue' => 1,
-					'note' => $this->T_('Should this plugin be used for anonymous users on comment forms?'),
-					'type' => 'checkbox',
+				'apy_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('API settings')
 				),
-				'use_for_registration' => array(
-					'label' => $this->T_('Use for new registration forms'),
-					'defaultvalue' => 1,
-					'note' => $this->T_('Should this plugin be used on registration forms?'),
-					'type' => 'checkbox',
-				),
-				'use_for_anonymous_message' => array(
-					'label' => $this->T_('Use for anonymous messaging forms'),
-					'defaultvalue' => 1,
-					'note' => $this->T_('Should this plugin be used for anonymous users on messaging forms?'),
-					'type' => 'checkbox',
-				),
-				'api_site_key' => array(
-					'label' => $this->T_('API site key'),
-					'note'  => sprintf( $this->T_('Use "%s" which is generated for your site on <a %s>%s</a>'), $this->T_('Site Key (public)'), 'href="https://coinhive.com/settings/sites" target="_blank"', 'coinhive.com' ),
-					'type'  => 'text',
-					'size'  => 40,
-				),
-				'api_secret_key' => array(
-					'label' => $this->T_('API secret key'),
-					'note'  => sprintf( $this->T_('Use "%s" which is generated for your site on <a %s>%s</a>'), $this->T_('Secret Key (private)'), 'href="https://coinhive.com/settings/sites" target="_blank"', 'coinhive.com' ),
-					'type'  => 'text',
-					'size'  => 40,
-				),
-				'hash_num' => array(
-					'label'        => $this->T_('Number of hashes'),
-					'type'         => 'integer',
-					'defaultvalue' => 1024,
-					'valid_range'  => array(
-						'min' => 1,
+					'api_site_key' => array(
+						'label' => $this->T_('Coinhive site key'),
+						'note'  => sprintf( $this->T_('Use "%s" which is generated for your site on <a %s>%s</a>'), $this->T_('Site Key (public)'), 'href="https://coinhive.com/settings/sites" target="_blank"', 'coinhive.com' ),
+						'type'  => 'text',
+						'size'  => 40,
 					),
+					'api_secret_key' => array(
+						'label' => $this->T_('Coinhive secret key'),
+						'note'  => sprintf( $this->T_('Use "%s" which is generated for your site on <a %s>%s</a>'), $this->T_('Secret Key (private)'), 'href="https://coinhive.com/settings/sites" target="_blank"', 'coinhive.com' ),
+						'type'  => 'text',
+						'size'  => 40,
+					),
+				'api_layout_end' => array(
+					'layout' => 'end_fieldset',
+				),
+				'use_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Where to use')
+				),
+					'use_for_registration' => array(
+						'label' => $this->T_('Use in user registration forms'),
+						'defaultvalue' => 1,
+						'note' => $this->T_('Should this plugin be used on registration forms?'),
+						'type' => 'checkbox',
+					),
+					'use_for_anonymous_item' => array(
+						'label' => $this->T_('Use in anonymous item posting forms'),
+						'defaultvalue' => 1,
+						'note' => $this->T_('Should this plugin be used for anonymous users on item forms?'),
+						'type' => 'checkbox',
+					),
+					'use_for_anonymous_comment' => array(
+						'label' => $this->T_('Use in anonymous commenting forms'),
+						'defaultvalue' => 1,
+						'note' => $this->T_('Should this plugin be used for anonymous users on comment forms?'),
+						'type' => 'checkbox',
+					),
+					'use_for_anonymous_message' => array(
+						'label' => $this->T_('Use in anonymous messaging forms'),
+						'defaultvalue' => 1,
+						'note' => $this->T_('Should this plugin be used for anonymous users on messaging forms?'),
+						'type' => 'checkbox',
+					),
+					'use_for_suspect_users' => array(
+						'label' => $this->T_('Also use in the above forms for suspect users'),
+						'defaultvalue' => 1,
+						'note' => $this->T_('Should this plugin be used for suspect users in the above forms?'),
+						'type' => 'checkbox',
+					),
+				'use_layout_end' => array(
+					'layout' => 'end_fieldset',
+				),
+				'difficulty_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Difficulty settings')
+				),
+					'hash_num' => array(
+						'label'        => $this->T_('# of hashes by default'),
+						'type'         => 'integer',
+						'defaultvalue' => 1024,
+						'valid_range'  => array(
+							'min' => 256,
+						),
+					),
+					'hash_num_suspect' => array(
+						'label'        => $this->T_('# of hashes for anonymous users from suspect countries'),
+						'note'         => $this->T_('Plugin "GeoIP" must be enabled for using of this setting.'),
+						'type'         => 'integer',
+						'defaultvalue' => 10240,
+						'valid_range'  => array(
+							'min' => 256,
+						),
+					),
+					'hash_num_suspect_users' => array(
+						'label'        => $this->T_('# of hashes for suspect users'),
+						'type'         => 'integer',
+						'defaultvalue' => 10240,
+						'valid_range'  => array(
+							'min' => 256,
+						),
+					),
+				'difficulty_layout_end' => array(
+					'layout' => 'end_fieldset',
+				),
+				'suspect_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Suspect users')
+				),
+					'suspect_groups' => array(
+						'label' => T_('Suspect groups'),
+						'type' => 'checklist',
+						'options' => $groups,
+					),
+				'suspect_layout_end' => array(
+					'layout' => 'end_fieldset',
 				),
 			);
 	}
@@ -126,186 +200,97 @@ class proof_of_work_captcha_plugin extends Plugin
 
 
 	/**
-	 * Validate the given answer against our stored one.
+	 * Event handler: general event to validate a captcha which payload was added
+	 * through {@link RequestCaptcha()}.
 	 *
-	 * This event is provided for other plugins and gets used internally
-	 * for other events we're hooking into.
+	 * NOTE: if the action is verified/completed in total, you HAVE to cleanup its data
+	 *       and is not vulnerable against multiple usage of the same captcha!
 	 *
-	 * @param array Associative array of parameters.
-	 * @return boolean|NULL
+	 * @param array Associative array of parameters
+	 * @return boolean true if the catcha could be validated
 	 */
-	function CaptchaValidated( & $params )
+	function ValidateCaptcha( & $params )
 	{
 		global $Messages;
 
-		if( ! empty( $params['is_preview'] ) )
-		{	// Don't validate on preview action:
-			return false;
-		}
-
-		if( empty( $params['form_type'] ) )
-		{	// Form type must be defined:
-			return false;
-		}
-
-		if( ! $this->does_apply( $params['form_type'] ) )
+		if( ! empty( $params['is_preview'] ) || ! isset( $params['form_type'] ) || ! $this->does_apply( $params['form_type'] ) )
 		{	// We should not apply captcha to the requested form:
-			return false;
+			return true;
 		}
 
-		$post_data = array(
-			'secret' => $this->Settings->get( 'api_secret_key' ),
-			'token'  => param( 'coinhive-captcha-token', 'string' ),
-			'hashes' => 1024
+		$post_params = array(
+			'method'       => 'POST',
+			'content_type' => 'application/x-www-form-urlencoded',
+			'fields'       => array(
+				'secret' => $this->Settings->get( 'api_secret_key' ),
+				'token'  => param( 'coinhive-captcha-token', 'string' ),
+				'hashes' => $this->get_hash_num(),
+			),
 		);
 
-		$post_context = stream_context_create( array(
-			'http' => array(
-				'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-				'method'  => 'POST',
-				'content' => http_build_query( $post_data )
-			)
-		) );
+		$response = json_decode( fetch_remote_page( 'https://api.coinhive.com/token/verify', $info, NULL, NULL, $post_params ) );
 
-		$response = json_decode( file_get_contents( 'https://api.coinhive.com/token/verify', false, $post_context ) );
-
-		if( $response && $response->success )
+		if( $response && isset( $response->success ) && $response->success )
 		{	// Successful verifying:
 			return true;
 		}
 
 		// Display error message if captcha verifying has been failed:
-		$Messages->add( $this->T_('Captcha has not been verified successfully!'), 'error' );
+		$Messages->add_to_group( $this->T_('Antispam has not been verified successfully!'), 'error', T_('Validation errors:') );
 
 		return false;
 	}
 
 
 	/**
-	 * When a comment form gets displayed, we inject our captcha and an input field to
-	 * enter the answer.
+	 * Event handler: Return data to display captcha html code
 	 *
-	 * The question ID is saved into the user's Session and in the DB table "ip_question".
-	 *
-	 * @param array Associative array of parameters
-	 *   - 'Form': the form where payload should get added (by reference, OPTIONALLY!)
-	 *   - 'form_use_fieldset':
-	 *   - 'key': A key that is associated to the caller of the event (string, OPTIONALLY!)
-	 *   - 'form_type': Form type ( comment|register|message )
-	 * @return boolean|NULL true, if displayed; false, if error; NULL if it does not apply
+	 * @param array Associative array of parameters:
+	 *   - 'Form':          Form object
+	 *   - 'form_type':     Form type
+	 *   - 'form_position': Current form position where this event is called
+	 *   - 'captcha_info':  Default captcha info text(can be changed by this plugin)
+	 *   - 'captcha_template_question': Default HTML template for question text = '<span class="evo_captcha_question">$captcha_question$</span><br>'
+	 *   - 'captcha_template_answer':   Default HTML template for answer field = '<span class="evo_captcha_answer">$captcha_answer$</span><br>'
+	 * @return array Associative array of parameters:
+	 *   - 'captcha_position': Captcha position where current plugin must be displayed for the requested form type
+	 *   - 'captcha_html':     Captcha html code
+	 *   - 'captcha_info':     Captcha info text
 	 */
-	function CaptchaPayload( & $params )
+	function RequestCaptcha( & $params )
 	{
-		global $DB, $Session;
-
 		if( ! isset( $params['form_type'] ) || ! $this->does_apply( $params['form_type'] ) )
-		{	// We should not apply captcha to the requested form:
-			return;
+		{	// Exit here if the form type is not defined or this captcha plugin should not be applied for the requested form:
+			return false;
 		}
 
-		if( ! isset( $params['Form'] ) )
-		{	// there's no Form where we add to, but we create our own form:
-			$Form = new Form( regenerate_url() );
-			$Form->begin_form();
-		}
-		else
-		{
-			$Form = & $params['Form'];
-			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
-			{
-				$Form->begin_fieldset();
-			}
+		switch( $params['form_type'] )
+		{	// Set a position where we should display the captcha depending on form type:
+			case 'register':
+				$captcha_position = 'before_submit_button';
+				break;
+			case 'item':
+			case 'comment':
+			case 'message':
+				$captcha_position = 'before_textarea';
+				break;
+			default:
+				// The requested form type is not supported by this plugin
+				return false;
 		}
 
-		$Form->info( $this->T_('Antispam'), '<script src="https://authedmine.com/lib/captcha.min.js" async></script>
-			<div class="coinhive-captcha" data-hashes="'.format_to_output( $this->Settings->get( 'hash_num' ), 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="input[type=submit]">
+		$captcha_html = '<script src="https://authedmine.com/lib/captcha.min.js" async></script>'.
+			'<span class="coinhive-captcha" data-hashes="'.format_to_output( $this->get_hash_num(), 'htmlattr' ).'" data-key="'.format_to_output( $this->Settings->get( 'api_site_key' ), 'htmlattr' ).'" data-disable-elements="form[data-coinhive-captcha] input[type=submit]:not([name$=\'[preview]\'])">
 				<em>'.$this->T_('Loading Captcha...<br>If it doesn\'t load, please disable Adblock!').'</em>
-			</div>' );
+			</span>';
+		$captcha_html = str_replace( '$captcha_answer$', $captcha_html, $params['captcha_template_answer'] );
+		// Append a flag to the forms which contains the coinhive captcha in order to don't disable the submit buttons from other forms on the same page:
+		$captcha_html .= '<script type="text/javascript">jQuery( \'.coinhive-captcha[data-hashes]\' ).closest( \'form\' ).attr( \'data-coinhive-captcha\', 1 )</script>';
 
-		if( ! isset( $params['Form'] ) )
-		{	// there's no Form where we add to, but our own form:
-			$Form->end_form( array( array( 'submit', 'submit', $this->T_('Validate me'), 'ActionButton' ) ) );
-		}
-		else
-		{
-			if( ! isset($params['form_use_fieldset']) || $params['form_use_fieldset'] )
-			{
-				$Form->end_fieldset();
-			}
-		}
-
-		return true;
-	}
-
-
-	/**
-	 * We display our captcha with comment forms.
-	 */
-	function DisplayCommentFormFieldset( & $params )
-	{
-		$params['form_type'] = 'comment';
-		$this->CaptchaPayload( $params );
-	}
-
-
-	/**
-	 * Validate the answer against our stored one.
-	 *
-	 * In case of error we add a message of category 'error' which prevents the comment from
-	 * being posted.
-	 *
-	 * @param array Associative array of parameters.
-	 */
-	function BeforeCommentFormInsert( & $params )
-	{
-		$params['form_type'] = 'comment';
-		$this->CaptchaValidated( $params );
-	}
-
-
-	/**
-	 * We display our captcha with the register form.
-	 */
-	function DisplayRegisterFormFieldset( & $params )
-	{
-		$params['form_type'] = 'register';
-		$this->CaptchaPayload( $params );
-	}
-
-
-	/**
-	 * Validate the given private key against our stored one.
-	 *
-	 * In case of error we add a message of category 'error' which prevents the
-	 * user from being registered.
-	 */
-	function RegisterFormSent( & $params )
-	{
-		$params['form_type'] = 'register';
-		$this->CaptchaValidated( $params );
-	}
-
-
-	/**
-	 * We display our captcha with the message form.
-	 */
-	function DisplayMessageFormFieldset( & $params )
-	{
-		$params['form_type'] = 'message';
-		$this->CaptchaPayload( $params );
-	}
-
-
-	/**
-	 * Validate the given private key against our stored one.
-	 *
-	 * In case of error we add a message of category 'error' which prevents the
-	 * user from being registered.
-	 */
-	function MessageFormSent( & $params )
-	{
-		$params['form_type'] = 'message';
-		$this->CaptchaValidated( $params );
+		return array(
+				'captcha_position' => $captcha_position,
+				'captcha_html'     => $captcha_html,
+			);
 	}
 
 
@@ -319,13 +304,26 @@ class proof_of_work_captcha_plugin extends Plugin
 	 */
 	function does_apply( $form_type )
 	{
+		$check_suspect_user = false;
+
 		switch( $form_type )
 		{
+			case 'item':
+				if( !is_logged_in() )
+				{	// Use setting for anonymous user:
+					return $this->Settings->get( 'use_for_anonymous_item' );
+				}
+				// Check if it should be applied also for suspected users:
+				$check_suspect_user = ( $this->Settings->get( 'use_for_suspect_users' ) && $this->Settings->get( 'use_for_anonymous_item' ) );
+				break;
+
 			case 'comment':
 				if( !is_logged_in() )
-				{
+				{	// Use setting for anonymous user:
 					return $this->Settings->get( 'use_for_anonymous_comment' );
 				}
+				// Check if it should be applied also for suspected users:
+				$check_suspect_user = ( $this->Settings->get( 'use_for_suspect_users' ) && $this->Settings->get( 'use_for_anonymous_comment' ) );
 				break;
 
 			case 'register':
@@ -333,13 +331,61 @@ class proof_of_work_captcha_plugin extends Plugin
 
 			case 'message':
 				if( !is_logged_in() )
-				{
+				{	// Use setting for anonymous user:
 					return $this->Settings->get( 'use_for_anonymous_message' );
 				}
+				// Check if it should be applied also for suspected users:
+				$check_suspect_user = ( $this->Settings->get( 'use_for_suspect_users' ) && $this->Settings->get( 'use_for_anonymous_message' ) );
 				break;
 		}
 
+		if( $check_suspect_user && is_logged_in() )
+		{	// Try to check if current logged in user is suspected by this plugin:
+			global $current_User;
+			$suspect_groups = $this->Settings->get( 'suspect_groups' );
+			return ( is_array( $suspect_groups ) && isset( $suspect_groups[ $current_User->get( 'grp_ID' ) ] ) );
+		}
+
 		return false;
+	}
+
+
+	/**
+	 * Get number of hashes
+	 *
+	 * @return integer
+	 */
+	function get_hash_num()
+	{
+		if( is_logged_in() )
+		{	// Get hash number for logged in suspect user:
+			global $current_User;
+			$suspect_groups = $this->Settings->get( 'suspect_groups' );
+			if( ( is_array( $suspect_groups ) && isset( $suspect_groups[ $current_User->get( 'grp_ID' ) ] ) ) )
+			{	// Use special number of hashed for suspected logged in users:
+				$plugin_hash_num = $this->Settings->get( 'hash_num_suspect_users' );
+			}
+			else
+			{	// This should not occurs but set default number of hashes anyway to avoid errors:
+				$plugin_hash_num = $this->Settings->get( 'hash_num' );
+			}
+		}
+		else
+		{	// Get hash number for anonymous user:
+			$Plugins_admin = & get_Plugins_admin();
+			if( ( $geoip_Plugin = & $Plugins_admin->get_by_code( 'evo_GeoIP' ) ) &&
+					( $Country = $geoip_Plugin->get_country_by_IP( get_ip_list( true ) ) ) &&
+					( $Country->get( 'status' ) == 'suspect' ) )
+			{	// Use special setting when country can be detected by IP address and it is suspected:
+				$plugin_hash_num = $this->Settings->get( 'hash_num_suspect' );
+			}
+			else
+			{	// Use normal setting for number of hashes:
+				$plugin_hash_num = $this->Settings->get( 'hash_num' );
+			}
+		}
+
+		return intval( $plugin_hash_num );
 	}
 }
 ?>

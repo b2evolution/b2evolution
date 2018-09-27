@@ -381,6 +381,11 @@ div.results {
 	}
 }
 
+// Styles for edit-screen instructions
+.evo_instruction {
+	margin: 20px 10px 10px;
+}
+
 // Styles for in-skin editing
 form.inskin{
 	padding: 10px;
@@ -416,6 +421,15 @@ table.catselect {
 	> thead:first-child > tr:first-child > th {
 		border-top: 1px solid #bbb;
 	}
+	th, td {
+		border-right: 1px solid #bbb;
+		&:last-child {
+			border-right: none;
+		}
+	}
+	&.table > thead > tr > th {
+		border-color: #bbb;
+	}
 	td {
 		padding: .2ex 1ex;
 		background: none;
@@ -425,20 +439,16 @@ table.catselect {
 		border-bottom: 1px solid #bbb;
 		font-weight: bold;
 	}
-	tr.odd, tr.odd input {
+	tr.odd {
 		background-color: #eee;
 	}
 	tr.even, tr.even input {
 		background: none !important;
 	}
-	th.selector, td.selector {
+	td.selector {
 		width: 1%;
-		text-align:center;
-		border-right: 1px solid #bbb;
-	}
-	#new_category_name {
-		background-color: white;
-		width: 92% !important;
+		text-align: center;
+		vertical-align: middle;
 	}
 	tbody tr.group.catselect_blog__current td {
 		background: #31b0d5;
@@ -446,6 +456,14 @@ table.catselect {
 	}
 	.catsel_name label {
 		font-weight: normal;
+	}
+	.catsel_order input {
+		width: 40px;
+		padding-left: 3px;
+		padding-right: 3px;
+	}
+	input[type=text] {
+		height: 25px;
 	}
 }
 
@@ -857,31 +875,31 @@ form#comment_edit {
 }
 
 // Standard style for all tables of content:
-.evo_content_block table {
-	margin: 1em 0;
-	th {
-		border: 1px solid #ddd;
-		padding: 8px;
-		background-color: #eee;
-	}
-	td {
-		border: 1px solid #ddd;
-		padding: 8px;
-		vertical-align: top;
-	}
-}
-
-.evo_content_block table.evo_poll__table {
-	margin: 1em 0;
-	th {
-		border: 0;
-		padding: 2px 10px 2px 0;
-		background-color: #eee;
-	}
-	td {
-		border: 0;
-		padding: 2px 10px 2px 0;
-		vertical-align: top;
+.evo_content_block {
+	table {
+		margin: 1em 0;
+		th {
+			border: 1px solid #ddd;
+			padding: 8px;
+			background-color: #eee;
+		}
+		td {
+			border: 1px solid #ddd;
+			padding: 8px;
+			vertical-align: top;
+		}
+		&.evo_poll__table {
+			td {
+				border: 0;
+				padding: 2px 10px 2px 0;
+			}
+		}
+		&.item_custom_fields {
+			margin-bottom: 10px;
+			th, td {
+				vertical-align: middle;
+			}
+		}
 	}
 }
 

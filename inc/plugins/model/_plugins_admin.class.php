@@ -225,9 +225,8 @@ class Plugins_admin extends Plugins
 				'GetSpamKarmaForComment' => 'Asks plugin for the spam karma of a comment/trackback.',
 
 				// Other Plugins can use this:
-				'CaptchaValidated' => 'Validate the test from CaptchaPayload to detect humans.',
-				'CaptchaValidatedCleanup' => 'Cleanup data used for CaptchaValidated.',
-				'CaptchaPayload' => 'Provide a turing test to detect humans.',
+				'RequestCaptcha' => 'Return data to display captcha html code.',
+				'ValidateCaptcha' => 'Validate the test from RequestCaptcha to detect humans.',
 
 				'RegisterFormSent' => 'Called when the "Register" form has been submitted.',
 				'ValidateAccountFormSent' => 'Called when the "Validate account" form has been submitted.',
@@ -945,20 +944,9 @@ class Plugins_admin extends Plugins
 	{
 		global $DB;
 
-		if( strlen( $code ) < 8 )
+		if( ! preg_match( '#^[A-Za-z0-9\-_]{8,32}$#', $code ) )
 		{
-			return T_( 'The minimum length of a plugin code is 8 characters.' );
-		}
-
-		if( strlen( $code ) > 32 )
-		{
-			return T_( 'The maximum length of a plugin code is 32 characters.' );
-		}
-
-		// TODO: more strict check?! Just "[\w_-]+" as regexp pattern?
-		if( strpos( $code, '.' ) !== false )
-		{
-			return T_( 'The plugin code cannot include a dot!' );
+			return sprintf( T_('The field "%s" must be from %d to %d letters, digits or signs %s.'), T_('Code'), 8, 32, '<code>_</code>, <code>-</code>' );
 		}
 
 		if( ! empty($code) && isset( $this->index_code_ID[$code] ) )

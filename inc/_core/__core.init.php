@@ -1326,8 +1326,10 @@ class _core_Module extends Module
 				$entries['page'] = array(
 						'text' => T_('Page'),
 						'entries' => array(
-							// PLACE HOLDER FOR ENTRY "Edit contents":
-							'edit'       => NULL,
+							// PLACE HOLDER FOR ENTRIES "Edit in Front-Office", "Edit in Back-Office", "View in Back-Office":
+							'edit_front' => NULL,
+							'edit_back'  => NULL,
+							'view_back'  => NULL,
 							// PLACE HOLDERS FOR SESSIONS MODULE:
 							'stats_sep'  => NULL,
 							'stats_page' => NULL,
@@ -1359,50 +1361,41 @@ class _core_Module extends Module
 				    $edited_Item->ID > 0 &&
 				    $view_item_url = $edited_Item->get_permanent_url() )
 				{	// If curent user has a permission to edit a current viewing post:
-					$entries['post'] = array(
+					$entries['permalink'] = array(
 							'text'        => get_icon( 'permalink' ).' '.T_('Permalink'),
 							'href'        => $view_item_url,
 							'title'       => T_('Permanent link to full entry'),
 							'entry_class' => 'rwdhide',
 						);
 				}
-				elseif( ! is_admin_page() &&
-				  ( $disp == 'single' || $disp == 'page' ) &&
-				  ! empty( $Item ) &&
-				  $edit_item_url = $Item->get_edit_url() )
-				{	// If curent user has a permission to edit a current viewing post:
-					$entries['post'] = array(
-							'text'        => '<span class="fa fa-pencil-square"></span> '.( $perm_admin_restricted ? T_('Post') : T_('Edit') ),
-							'href'        => $edit_item_url,
-							'title'       => T_('Edit current post'),
-							'entry_class' => 'rwdhide',
-						);
-					if( $perm_admin_restricted )
-					{	// Menu entries to edit and view post in back-office:
-						$entries['post']['entries'] = array();
-						if( $Blog->get_setting( 'in_skin_editing' ) )
-						{	// If collection allows to edit posts in front-office:
-							$entries['post']['entries']['edit_front'] = array(
-									'text' => T_('Edit in Front-Office').'&hellip;',
-									'href' => $edit_item_url,
-								);
-						}
-						$entries['post']['entries']['edit_back'] = array(
-								'text' => T_('Edit in Back-Office').'&hellip;',
-								'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
-							);
-						$entries['post']['entries']['view_back'] = array(
-								'text' => T_('View in Back-Office').'&hellip;',
-								'href' => $admin_url.'?ctrl=items&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
+				if( ! is_admin_page() &&
+				    in_array( $disp, array( 'single', 'page', 'edit' ) ) &&
+				    $perm_admin_restricted )
+				{	// If curent user has a permission to edit a current editing/viewing post:
+					if( $disp != 'edit' &&
+					    $Blog->get_setting( 'in_skin_editing' ) &&
+					    ! empty( $Item ) &&
+					    $edit_item_url = $Item->get_edit_url() )
+					{	// Display menu entry to edit the post in front-office:
+						$entries['page']['entries']['edit_front'] = array(
+								'text' => sprintf( T_('Edit "%s" in Front-Office'), $Item->get_type_setting( 'name' ) ).'&hellip;',
+								'href' => $edit_item_url,
 							);
 					}
-					$entries['page']['entries']['edit'] = array(
-							'text'  => T_('Edit contents').'&hellip;',
-							'title' => T_('Edit current post'),
-							'href'  => $edit_item_url,
-						);
+					if( ! empty( $Item ) || ( ! empty( $edited_Item ) && $edited_Item->ID > 0 ) )
+					{	// Display menu entries to edit and view the post in back-office:
+						$menu_Item = empty( $Item ) ? $edited_Item : $Item;
+						$entries['page']['entries']['edit_back'] = array(
+								'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
+								'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+							);
+						$entries['page']['entries']['view_back'] = array(
+								'text' => sprintf( T_('View "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
+								'href' => $admin_url.'?ctrl=items&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+							);
+					}
 				}
-				elseif( $write_item_url = $Blog->get_write_item_url() )
+				if( $write_item_url = $Blog->get_write_item_url() )
 				{	// If write item URL is not empty, it's sure that user can create new post:
 					if( ! $perm_admin_normal )
 					{	// Initialize this menu item when user has no back-office access but can create new post:
@@ -1478,7 +1471,7 @@ class _core_Module extends Module
 					}
 
 					$entries['blog']['entries']['posts'] = array(
-							'text' => T_('Posts').'&hellip;',
+							'text' => T_('Contents').'&hellip;',
 							'href' => $items_url,
 						);
 					$display_separator = true;
@@ -1608,11 +1601,11 @@ class _core_Module extends Module
 					if( $current_User->check_perm( 'options', 'view', false, $Blog->ID ) )
 					{ // Post Types & Statuses
 						$entries['blog']['entries']['general']['entries']['item_types'] = array(
-								'text' => T_('Post Types').'&hellip;',
+								'text' => T_('Item Types').'&hellip;',
 								'href' => $admin_url.'?ctrl=itemtypes&amp;tab=settings&amp;tab3=types'.$blog_param,
 							);
 						$entries['blog']['entries']['general']['entries']['item_statuses'] = array(
-								'text' => T_('Post Statuses').'&hellip;',
+								'text' => T_('Item Statuses').'&hellip;',
 								'href' => $admin_url.'?ctrl=itemstatuses&amp;tab=settings&amp;tab3=statuses'.$blog_param,
 							);
 					}

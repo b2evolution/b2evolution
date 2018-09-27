@@ -111,6 +111,10 @@ $Form->begin_form( 'inskin', '', $form_params );
 	{ // DO NOT ADD HIDDEN FIELDS IF THEY ARE NOT SET
 		// These fields will be set only in case when switch tab from admin editing to in-skin editing
 		// Fields used in "advanced" form, but not here:
+		if( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' )
+		{
+			$Form->hidden( 'post_short_title', $edited_Item->get( 'short_title' ) );
+		}
 		$Form->hidden( 'post_comment_status', $edited_Item->get( 'comment_status' ) );
 		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
@@ -136,7 +140,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
 		$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
 		$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
-		$Form->hidden( 'item_order', $edited_Item->order );
 
 		$creator_User = $edited_Item->get_creator_User();
 		$Form->hidden( 'item_owner_login', $creator_User->login );
@@ -320,46 +323,26 @@ if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
 	$Form->hidden( 'google_map_type', $edited_Item->get_setting( 'map_type' ) );
 }
 
-// ################### PROPERTIES ###################
-if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
-{ // Custom fields are hidden by otem type
-	display_hidden_custom_fields( $Form, $edited_Item );
-}
-else
-{ // Custom fields should be displayed
-	$custom_fields = $edited_Item->get_type_custom_fields();
+// ################### CUSTOM FIELDS ###################
+$custom_fields = $edited_Item->get_type_custom_fields();
+if( count( $custom_fields ) > 0 )
+{
+	$Form->begin_fieldset( T_('Additional fields') );
 
-	if( count( $custom_fields ) > 0 )
-	{
-		$Form->begin_fieldset( T_('Properties') );
+	$Form->switch_layout( 'table' );
+	$Form->labelstart = '<td class="right"><strong>';
+	$Form->labelend = '</strong></td>';
 
-		$Form->switch_layout( 'table' );
-		$Form->labelstart = '<td class="right"><strong>';
-		$Form->labelend = '</strong></td>';
+	echo $Form->formstart;
 
-		echo $Form->formstart;
+	// Display inputs to edit custom fields:
+	display_editable_custom_fields( $Form, $edited_Item );
 
-		foreach( $custom_fields as $field )
-		{ // Display each custom field
-			if( $field['type'] == 'varchar' )
-			{
-				$field_note = '';
-				$field_params = array( 'maxlength' => 255, 'style' => 'width:100%' );
-			}
-			else
-			{	// type == double
-				$field_note = T_('can be decimal');
-				$field_params = array();
-			}
-			$Form->text_input( 'item_'.$field['type'].'_'.$field['ID'], $edited_Item->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] ), 10, $field['label'], $field_note, $field_params );
-		}
+	echo $Form->formend;
 
-		echo $Form->formend;
+	$Form->switch_layout( NULL );
 
-		$Form->switch_layout( NULL );
-
-		$Form->end_fieldset();
-	}
+	$Form->end_fieldset();
 }
 
 if( $edited_Item->get_type_setting( 'allow_attachments' ) && $edited_Item->ID > 0 )

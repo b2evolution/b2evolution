@@ -41,18 +41,78 @@ $AdminUI->set_path( 'options', 'misc', 'upgrade'.$tab );
 // Get action parameter from request:
 param_action();
 
+switch( $action )
+{
+	case 'delete':
+		// Delete already downloaded ZIP file or folder:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'upgrade_delete' );
+
+		$file = param( 'file', 'string' );
+
+		if( empty( $file ) )
+		{
+			debug_die( 'You don\'t select a file/folder for deleting!' );
+		}
+
+		// Decide file of folder depending on extension:
+		$is_dir = ! preg_match( '#\.zip$#i', $file );
+
+		$file_path = $upgrade_path.$file;
+
+		if( ! file_exists( $file_path ) )
+		{	// Display error when a requested file/folder doesn't exist:
+			// NOTE: Do NOT translate these messages because it must not occurs normally!
+			$Messages->add( sprintf( $is_dir
+				? 'The directory %s does not exist.'
+				: 'The file %s does not exist.', '<code>'.$file.'</code>' ), 'error' );
+			break;
+		}
+
+		// Check real type of the requested file or folder before deleting:
+		$is_dir = is_dir( $file_path );
+
+		if( $is_dir )
+		{	// Delete a folder:
+			$del_result = rmdir_r( $file_path );
+		}
+		else
+		{	// Delete a file:
+			$del_result = @unlink( $file_path );
+		}
+
+		if( $del_result )
+		{	// Successful deleting:
+			$Messages->add( sprintf( $is_dir
+				? T_('The directory &laquo;%s&raquo; has been deleted.')
+				: T_('The file &laquo;%s&raquo; has been deleted.'), $file ), 'success' );
+		}
+		else
+		{	// Failed deleting:
+			$Messages->add( sprintf( $is_dir
+				? T_('Cannot delete directory %s. Please check the permissions or delete it manually.')
+				: T_('File %s could not be deleted.'), '<code>'.$file.'</code>' ), 'error' );
+		}
+
+		// Redirect back to don't try delete the same file/folder twice:
+		header_redirect( $admin_url.'?ctrl=upgrade' );
+		// Exit here.
+		break;
+}
+
 // Display message if the upgrade config file doesn't exist
 check_upgrade_config( true );
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
 $AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
-if( $tab == 'svn' )
+if( $tab == 'git' )
 {
-	$AdminUI->breadcrumbpath_add( T_('Upgrade from SVN'), $admin_url.'?ctrl=upgrade&amp;tab='.$tab );
+	$AdminUI->breadcrumbpath_add( T_('Upgrade from Git'), $admin_url.'?ctrl=upgrade&amp;tab='.$tab );
 
 	// Set an url for manual page:
-	$AdminUI->set_page_manual_link( 'upgrade-from-svn' );
+	$AdminUI->set_page_manual_link( 'upgrade-from-git' );
 }
 else
 {
@@ -83,10 +143,11 @@ switch( $action )
 	case 'start':
 	default:
 		// STEP 1: Check for updates.
+
+		autoupgrade_display_steps( 1, $tab );
+
 		if( $tab == '' )
 		{
-			autoupgrade_display_steps( 1 );
-
 			$block_item_Widget = new Widget( 'block_item' );
 			$block_item_Widget->title = T_('Updates from b2evolution.net').get_manual_link( 'auto-upgrade' );
 			$block_item_Widget->disp_template_replaced( 'block_start' );
@@ -127,14 +188,54 @@ switch( $action )
 			$action = 'start';
 			$AdminUI->disp_view( 'maintenance/views/_upgrade.form.php' );
 		}
-		elseif( $tab == 'svn' )
+		elseif( $tab == 'git' )
 		{
-			svnupgrade_display_steps( 1 );
-
 			$action = 'start';
-			$AdminUI->disp_view( 'maintenance/views/_upgrade_svn.form.php' );
+			$AdminUI->disp_view( 'maintenance/views/_upgrade_git.form.php' );
 		}
 		break;
+
+	case 'export_git':
+		// GIT STEP 2: DOWNLOAD.
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'upgrade_started' );
+
+		if( $demo_mode )
+		{
+			$Messages->clear();
+			$Messages->add( T_( 'This feature is disabled on the demo server.' ), 'error' );
+			$Messages->display();
+			break;
+		}
+
+		$git_url = param( 'git_url', 'string', '', true );
+		$git_branch = param( 'git_branch', 'string', '', true );
+
+		$UserSettings->set( 'git_upgrade_url', $git_url );
+		$UserSettings->set( 'git_upgrade_branch', $git_branch );
+		$UserSettings->dbupdate();
+
+		$Messages->clear(); // Clear the messages to avoid a double displaying here
+
+		if( param_check_not_empty( 'git_url', T_('Please enter the URL of repository') ) &&
+		    param_check_url( 'git_url', 'download_src' ) &&
+		    preg_match( '#([^/]+)/([^/]+)/?$#', $git_url, $git_data ) )
+		{	// Generate an URL to download GIT branch as ZIP archive:
+			$git_owner = $git_data[1];
+			$git_repo = preg_replace( '#\.git$#', '', $git_data[2] );
+			set_param( 'upd_url', 'https://github.com/'.$git_owner.'/'.$git_repo.'/archive/'.$git_branch.'.zip' );
+			memorize_param( 'upd_url', 'url', NULL, get_param( 'upd_url' ) );
+			// No break here in order to go to the "download" form below
+		}
+		else
+		{	// Display the errors and the config form again to fix data:
+			$Messages->display();
+			autoupgrade_display_steps( 2, $tab );
+			$action = 'start';
+			$AdminUI->disp_view( 'maintenance/views/_upgrade_git.form.php' );
+			break;
+		}
 
 	case 'download':
 	case 'force_download':
@@ -154,7 +255,7 @@ switch( $action )
 		$action_success = true;
 		$download_success = true;
 
-		autoupgrade_display_steps( 2 );
+		autoupgrade_display_steps( 2, $tab );
 
 		$block_item_Widget = new Widget( 'block_item' );
 		$block_item_Widget->title = T_('Downloading package...');
@@ -183,8 +284,11 @@ switch( $action )
 		}
 
 		$upgrade_name = pathinfo( $download_url );
-		$upgrade_name = $upgrade_name['filename'];
-		$upgrade_file = $upgrade_path.$upgrade_name.'.zip';
+		$upgrade_name = $upgrade_name['filename'].'.zip';
+		$upgrade_file = $upgrade_path.$upgrade_name;
+
+		// Memorize ZIP file name for next step submitting:
+		memorize_param( 'upd_file', 'string', NULL, $upgrade_name );
 
 		if( file_exists( $upgrade_file ) )
 		{ // The downloading file already exists
@@ -199,7 +303,7 @@ switch( $action )
 			else
 			{
 				echo '<div class="action_messages"><div class="log_error" style="text-align:center;font-weight:bold">'
-					.sprintf( T_( 'The package %s is already downloaded.' ), $upgrade_name.'.zip' ).'</div></div>';
+					.sprintf( T_( 'The package %s is already downloaded.' ), $upgrade_name ).'</div></div>';
 				$action_success = false;
 			}
 			evo_flush();
@@ -264,19 +368,27 @@ switch( $action )
 		$action_success = true;
 		$unzip_success = true;
 
-		autoupgrade_display_steps( 3 );
+		autoupgrade_display_steps( 3, $tab );
 
 		$block_item_Widget = new Widget( 'block_item' );
 		$block_item_Widget->title = T_('Unzipping package...');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 		evo_flush();
 
-		$download_url = param( 'upd_url', 'string', '', true );
+		$upd_file = param( 'upd_file', 'string', '', true );
 
-		$upgrade_name = pathinfo( $download_url );
-		$upgrade_name = $upgrade_name['filename'];
-		$upgrade_dir = $upgrade_path.$upgrade_name;
-		$upgrade_file = $upgrade_dir.'.zip';
+		if( ! preg_match( '#\.zip$#i', $upd_file ) )
+		{	// Check the provided file is a .zip or .ZIP:
+			debug_die( 'The file "'.$upd_file.'" must be a ZIP archive!' );
+		}
+
+		$upgrade_dir_name = substr( $upd_file, 0, -4 );
+
+		$upgrade_dir = $upgrade_path.$upgrade_dir_name;
+		$upgrade_file = $upgrade_path.$upd_file;
+
+		// Memorize folder name for next step submitting:
+		memorize_param( 'upd_dir', 'string', NULL, $upgrade_dir_name );
 
 		if( file_exists( $upgrade_dir ) )
 		{ // The downloading file already exists
@@ -291,7 +403,7 @@ switch( $action )
 			else
 			{
 				echo '<div class="action_messages"><div class="log_error" style="text-align:center;font-weight:bold">'
-					.sprintf( T_( 'The package %s is already unzipped.' ), $upgrade_name.'.zip' ).'</div></div>';
+					.sprintf( T_( 'The package %s is already unzipped.' ), $upd_file ).'</div></div>';
 				$action_success = false;
 			}
 			evo_flush();
@@ -326,29 +438,13 @@ switch( $action )
 
 	case 'ready':
 		// STEP 4: READY TO UPGRADE.
-	case 'ready_svn':
-		// SVN STEP 3: READY TO UPGRADE.
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'upgrade_is_ready' );
 
-		if( $action == 'ready_svn' )
-		{ // SVN upgrade
-			svnupgrade_display_steps( 3 );
+		autoupgrade_display_steps( 4, $tab );
 
-			$upgrade_name = param( 'upd_name', 'string', NULL, true );
-		}
-		else
-		{ // Auto upgrade
-			autoupgrade_display_steps( 4 );
-
-			$download_url = param( 'upd_url', 'string', '', true );
-
-			$upgrade_name = pathinfo( $download_url );
-			$upgrade_name = $upgrade_name['filename'];
-			$upgrade_dir = $upgrade_path.$upgrade_name;
-			$upgrade_file = $upgrade_dir.'.zip';
-		}
+		$upgrade_name = param( 'upd_dir', 'string', '', true );
 
 		$block_item_Widget = new Widget( 'block_item' );
 		$block_item_Widget->title = T_('Ready to upgrade').'...';
@@ -356,7 +452,6 @@ switch( $action )
 		evo_flush();
 
 		$new_version_status = check_version( $upgrade_name );
-		$action_backup_value = ( $action == 'ready_svn' ) ? 'backup_and_overwrite_svn' : 'backup_and_overwrite';
 		if( empty( $new_version_status ) )
 		{ // New version
 			echo '<p><b>'.T_( 'The new files are ready to be installed.' ).'</b></p>';
@@ -385,8 +480,6 @@ switch( $action )
 
 	case 'backup_and_overwrite':
 		// STEP 5: BACKUP & UPGRADE.
-	case 'backup_and_overwrite_svn':
-		// SVN STEP 2: BACKUP AND OVERWRITE.
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'upgrade_is_launched' );
@@ -401,28 +494,17 @@ switch( $action )
 
 		if( !isset( $block_item_Widget ) )
 		{
-			if( $action == 'backup_and_overwrite_svn' )
-			{ // SVN upgrade
-				svnupgrade_display_steps( 4 );
-			}
-			else
-			{ // Auto upgrade
-				autoupgrade_display_steps( 5 );
-			}
+			autoupgrade_display_steps( 5, $tab );
 
 			$block_item_Widget = new Widget( 'block_item' );
-			$block_item_Widget->title = $action == 'backup_and_overwrite_svn'
-				? T_('Installing package from SVN...')
-				: T_('Installing package...');
+			$block_item_Widget->title = T_('Installing package...');
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
 			$upgrade_name = param( 'upd_name', 'string', NULL, true );
 			if( $upgrade_name === NULL )
-			{ // Get an upgrade name from url (Used for auto-upgrade, not svn)
+			{ // Get an upgrade name from url (Used for auto-upgrade, not git)
 				forget_param( 'upd_name' );
-				$download_url = param( 'upd_url', 'string', '', true );
-				$upgrade_name = pathinfo( $download_url );
-				$upgrade_name = $upgrade_name['filename'];
+				$upgrade_name = param( 'upd_dir', 'string', '', true );
 			}
 
 			$success = true;
@@ -508,7 +590,7 @@ switch( $action )
 			$Form->begin_form( 'fform' );
 			$Form->begin_fieldset( T_( 'Actions' ) );
 			echo '<p><b>'.T_('All new b2evolution files are in place. You will now be redirected to the installer to perform a DB upgrade.').'</b> '.T_('Note: the User Interface will look different.').'</p>';
-			$continue_onclick = 'location.href=\''.$baseurl.'install/index.php?action='.( ( $action == 'backup_and_overwrite_svn' ) ? 'svn_upgrade' : 'auto_upgrade' ).'&locale='.$current_locale.'\'';
+			$continue_onclick = 'location.href=\''.$baseurl.'install/index.php?action=auto_upgrade&locale='.$current_locale.'\'';
 			$Form->end_form( array( array( 'button', 'continue', T_('Continue to installer'), 'SaveButton', $continue_onclick ) ) );
 			unset( $block_item_Widget );
 		}
@@ -525,139 +607,6 @@ switch( $action )
 			$Form->begin_form( 'fform' );
 			$Form->begin_fieldset( T_( 'Actions' ) );
 			$Form->end_form( array( array( 'submit', 'actionArray['.$action.']', T_('Retry'), 'SaveButton' ) ) );
-			unset( $block_item_Widget );
-		}
-		break;
-
-	/****** UPGRADE FROM SVN *****/
-	case 'export_svn':
-	case 'force_export_svn':
-		// SVN STEP 2: EXPORT.
-
-		$Session->assert_received_crumb( 'upgrade_export' );
-
-		if( $demo_mode )
-		{
-			$Messages->clear();
-			$Messages->add( T_( 'This feature is disabled on the demo server.' ), 'error' );
-			$Messages->display();
-			break;
-		}
-
-		svnupgrade_display_steps( 2 );
-
-		$block_item_Widget = new Widget( 'block_item' );
-		$block_item_Widget->title = T_('Exporting package from SVN...');
-		$block_item_Widget->disp_template_replaced( 'block_start' );
-
-		$svn_url = param( 'svn_url', 'string', '', true );
-		$svn_folder = param( 'svn_folder', 'string', '/', true );
-		$svn_user = param( 'svn_user', 'string', false, true );
-		$svn_password = param( 'svn_password', 'string', false, true );
-		$svn_revision = param( 'svn_revision', 'integer', 0, true );
-
-		$UserSettings->set( 'svn_upgrade_url', $svn_url );
-		$UserSettings->set( 'svn_upgrade_folder', $svn_folder );
-		$UserSettings->set( 'svn_upgrade_user', $svn_user );
-		$UserSettings->set( 'svn_upgrade_revision', $svn_revision );
-		$UserSettings->dbupdate();
-
-		$Messages->clear(); // Clear the messages to avoid a double displaying here
-
-		$success = param_check_not_empty( 'svn_url', T_('Please enter the URL of repository') );
-		$success = $success && param_check_url( 'svn_url', 'download_src' );
-
-		// Display the errors and the download form again to fix data
-		$Messages->display();
-
-		if( ! $success )
-		{
-			$action = 'start';
-			$AdminUI->disp_view( 'maintenance/views/_upgrade_svn.form.php' );
-			break;
-		}
-
-		$success = prepare_maintenance_dir( $upgrade_path, true );
-
-		if( $success )
-		{
-			// Set maximum execution time
-			set_max_execution_time( 2400 ); // 60 minutes
-
-			load_class('_ext/phpsvnclient/phpsvnclient.php', 'phpsvnclient' );
-
-			$phpsvnclient = new phpsvnclient( $svn_url, $svn_user, $svn_password );
-
-			// Get an error if it was during connecting to svn server
-			$svn_error = $phpsvnclient->getError();
-
-			if( ! empty( $svn_error ) || $phpsvnclient->getVersion() < 1 )
-			{ // Some errors or Incorrect version
-				echo '<p class="red">'.T_( 'Unable to get a repository version, probably URL of repository is incorrect.' ).'</p>';
-				evo_flush();
-				$action = 'start';
-				break; // Stop an upgrade from SVN
-			}
-
-			if( $svn_revision > 0 )
-			{ // Set revision from request
-				if( $phpsvnclient->getVersion() < $svn_revision )
-				{ // Incorrect revision number
-					echo '<p class="red">'.sprintf( T_( 'Please select a correct revision number. The latest revision is %s.' ), $phpsvnclient->getVersion() ).'</p>';
-					evo_flush();
-					$action = 'start';
-					break; // Stop an upgrade from SVN
-				}
-				else
-				{ // Use only correct revision
-					$phpsvnclient->setVersion( $svn_revision );
-				}
-			}
-
-			$repository_version = $phpsvnclient->getVersion();
-
-			$upgrade_name = 'export_svn_'.$repository_version;
-			memorize_param( 'upd_name', 'string', '', $upgrade_name );
-			$upgrade_folder = $upgrade_path.$upgrade_name;
-
-			if( $action == 'force_export_svn' && file_exists( $upgrade_folder ) )
-			{ // The exported folder already exists
-				// Try to delete previous package
-				if( ! rmdir_r( $upgrade_folder ) )
-				{
-					echo '<p class="red">'.sprintf( T_('Unable to delete previous exported package %s before forcing the export.'), '<b>'.$upgrade_folder.'</b>' ).'</p>';
-				}
-				evo_flush();
-			}
-
-			if( file_exists( $upgrade_folder ) )
-			{ // Current version already is downloaded
-				echo '<p class="green">'.sprintf( T_('Revision %s has already been downloaded. Using: %s'), $repository_version, $upgrade_folder );
-				$revision_is_exported = true;
-			}
-			else
-			{ // Download files
-				echo '<p>'.sprintf( T_( 'Downloading package to &laquo;<strong>%s</strong>&raquo;...' ), $upgrade_folder );
-				evo_flush();
-
-				// Export all files in temp folder for following coping
-				$svn_result = $phpsvnclient->checkOut( $svn_folder, $upgrade_folder, false, true );
-
-				echo '</p>';
-
-				if( $svn_result === false )
-				{ // Checkout is failed
-					echo '<p style="color:red">'.sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $svn_url ).'</p>';
-					evo_flush();
-					$action = 'start';
-					break;
-				}
-			}
-		}
-
-		if( $success )
-		{ // Pause a process before upgrading
-			$AdminUI->disp_view( 'maintenance/views/_upgrade_export.form.php' );
 			unset( $block_item_Widget );
 		}
 		break;

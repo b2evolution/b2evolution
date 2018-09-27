@@ -29,6 +29,40 @@ $current_User->check_perm( 'maintenance', 'backup', true );
 // Load Backup class (PHP4):
 load_class( 'maintenance/model/_backup.class.php', 'Backup' );
 
+switch( $action )
+{
+	case 'delete':
+		// Delete backup folder:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'backup' );
+
+		$folder = param( 'folder', 'string' );
+
+		if( strpos( $folder, '/' ) !== false || strpos( $folder, '\\' ) !== false )
+		{	// Don't support slash chars in the folder name to avoid a hack:
+			debug_die( 'Wrong folder name "'.$folder.'"!' );
+		}
+
+		$deleting_folder_path = $backup_path.$folder;
+
+		if( ! file_exists( $deleting_folder_path ) || ! is_dir( $deleting_folder_path ) )
+		{	// Display error message if the requested folder doesn't exist:
+			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), '<code>'.$deleting_folder_path.'</code>' ), 'error' );
+		}
+		elseif( rmdir_r( $deleting_folder_path ) )
+		{	// Display a message after successful deleting:
+			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; has been deleted.'), '<code>'.$deleting_folder_path.'</code>' ), 'success' );
+		}
+		else
+		{	// Display error message if the requested folder could not be deleted:
+			$Messages->add( sprintf( T_('Could not delete directory: %s'), '<code>'.$deleting_folder_path.'</code>' ), 'error' );
+		}
+
+		header_redirect( $admin_url.'?ctrl=backup' );
+		break;
+}
+
 // Set options path:
 $AdminUI->set_path( 'options', 'misc', 'backup' );
 

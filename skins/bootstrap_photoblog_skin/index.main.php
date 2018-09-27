@@ -122,7 +122,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		<!-- ================================= START OF MAIN AREA ================================== -->
 
 		<?php
-		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login' ) ) )
+		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login', 'content_requires_login' ) ) )
 		{ // Don't display the messages here because they are displayed inside wrapper to have the same width as form
 			// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
 			messages( array(

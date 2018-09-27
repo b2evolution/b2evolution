@@ -559,8 +559,8 @@ class Table extends Widget
 			$func = $this->{$area_name}['callback'];
 			$filter_fields = $func( $this->Form );
 
-			if( is_admin_page() && ! empty( $filter_fields ) && is_array( $filter_fields ) )
-			{	// Display filters only in back-office because they require JavaScript plugin QueryBuilder:
+			if( ! empty( $filter_fields ) && is_array( $filter_fields ) )
+			{	// Display filters which use JavaScript plugin QueryBuilder:
 				$this->display_filter_fields( $this->Form, $filter_fields );
 			}
 
@@ -662,11 +662,23 @@ class Table extends Widget
 						}
 						break;
 
-					case 'input':
+					case 'values':
+						$param_values = array();
+						foreach( $param_value as $sub_param_name => $sub_param_value )
+						{
+							$param_values[] = '{\''.format_to_js( $sub_param_name ).'\':\''.format_to_js( $sub_param_value ).'\'}';
+						}
+						$param_value = '['.implode( ',', $param_values ).']';
+						break;
+
 					case 'valueGetter':
 					case 'valueSetter':
+						// Don't convert these params to string because they are functions:
+						break;
+
+					case 'input':
 						if( strpos( $param_value, 'function' ) === 0 )
-						{	// Don't convert these param to string if it is a function:
+						{	// Don't convert this param to string if it is a function:
 							break;
 						}
 
@@ -676,10 +688,6 @@ class Table extends Widget
 							$param_values = array();
 							foreach( $param_value as $sub_param_name => $sub_param_value )
 							{
-								if( $param_name == 'values' )
-								{	// All value indexes must be strings:
-									$sub_param_name = '\''.format_to_js( $sub_param_name ).'\'';
-								}
 								if( $sub_param_value == 'true' || $sub_param_value == 'false' ||
 								    strpos( $sub_param_value, '[' ) === 0 )
 								{	// This is a not string value:
@@ -705,8 +713,8 @@ class Table extends Widget
 		}
 
 		// Get filter values from request:
-		$filter_query = param_condition( 'filter_query' );
-		if( empty( $filter_query ) )
+		$filter_query = param_condition( 'filter_query', '', false, array_keys( $filter_fields ) );
+		if( empty( $filter_query ) || $filter_query === 'null' )
 		{	// Set filter values if no request yet:
 			$filter_query = array(
 				'rules'     => array(),
@@ -742,7 +750,9 @@ jQuery( document ).ready( function()
 		},
 		operators: [
 			'equal', 'not_equal', 'less', 'less_or_equal', 'greater', 'greater_or_equal', 'between', 'not_between', 'contains', 'not_contains',
-			{ type: 'blank', nb_inputs: 1, multiple: false, apply_to: ['string'] }
+			{ type: 'blank', nb_inputs: 1, multiple: false, apply_to: ['string'] },
+			{ type: 'user_tagged', nb_inputs: 1, multiple: false, apply_to: ['string'] },
+			{ type: 'user_not_tagged', nb_inputs: 1, multiple: false, apply_to: ['string'] }
 		],
 		lang: {
 			add_rule: '<?php echo TS_('Add filter'); ?>',
@@ -758,10 +768,12 @@ jQuery( document ).ready( function()
 				contains: '<?php echo TS_('contains'); ?>',
 				not_contains: '<?php echo TS_('doesn\'t contain'); ?>',
 				blank: ' ',
+				user_tagged: '<?php echo TS_('user is tagged with all of'); ?>',
+				user_not_tagged: '<?php echo TS_('user is not tagged with any of'); ?>',
 			}
 		},
 		filters: [<?php echo implode( ',', $js_filters ); ?>],
-		rules: <?php echo param_format_condition( $filter_query, 'js' ); ?>,
+		rules: <?php echo param_format_condition( $filter_query, 'js', array_keys( $filter_fields ) ); ?>,
 	} );
 
 	// Prepare form before submitting:

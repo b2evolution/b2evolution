@@ -179,7 +179,7 @@ class user_register_quick_Widget extends ComponentWidget
 				),
 				'subscribe_post_mod' => array(
 					'label' => '',
-					'note' => T_('check to auto subscribe new user to current collection when a post is modified and it has permissions to moderate it'),
+					'note' => T_('check to auto subscribe new user to current collection when a post is modified and user has permission to moderate it'),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
@@ -277,7 +277,7 @@ class user_register_quick_Widget extends ComponentWidget
 			echo '<p>'.$this->disp_params['intro'].'</p>';
 		}
 
-		$Form = new Form( get_htsrv_url( true ).'register.php', 'register_form', 'post' );
+		$Form = new Form( get_htsrv_url( 'login' ).'register.php', 'register_form', 'post' );
 
 		$Form->begin_form( NULL, '', array( 'class' => 'widget_register_form') );
 

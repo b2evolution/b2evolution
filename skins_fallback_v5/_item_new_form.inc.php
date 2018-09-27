@@ -55,6 +55,14 @@ if( $use_title != 'never' )
 	$Form->text_input( 'post_title', $new_Item->get( 'title' ), 20, T_('Title'), '', array( 'maxlength' => 255, 'style' => 'width: 100%;', 'required' => ( $use_title == 'required' ) ) );
 }
 
+// Display plugin captcha for item form before textarea:
+$Plugins->display_captcha( array(
+		'Form'              => & $Form,
+		'form_type'         => 'item',
+		'form_position'     => 'before_textarea',
+		'form_use_fieldset' => false,
+	) );
+
 $Form->end_fieldset();
 $Form->switch_layout( NULL );
 
@@ -113,6 +121,14 @@ if( $new_Item->get_type_setting( 'use_text' ) != 'never' )
 $Plugins->trigger_event( 'DisplayItemFormFieldset', array(
 		'Form'              => & $Form,
 		'Item'              => & $new_Item,
+		'form_use_fieldset' => false,
+	) );
+
+// Display plugin captcha for item form before submit button:
+$Plugins->display_captcha( array(
+		'Form'              => & $Form,
+		'form_type'         => 'item',
+		'form_position'     => 'before_submit_button',
 		'form_use_fieldset' => false,
 	) );
 

@@ -12,10 +12,6 @@
 // We want this only on Small devices and up(tablets, 768px and up)
 // We DON'T want this when labels are stacked
 @media (min-width: 768px) {
-	div.radio:last-of-type,
-	div.checkbox:last-of-type {
-		padding-bottom: 7px;
-	}
 	.text-left-sm {
 		text-align: left;
 	}
@@ -229,14 +225,7 @@ a.btn.action_icon {
 		}
 	}
 	// Properties block on edit post form
-	#itemform_edit_timestamp > input[type=text] {
-		display: inline-block;
-		width: auto;
-	}
-	#itemform_extra, #itemform_edit_timestamp {
-		#itemform_edit_timestamp {
-			padding: 10px 0;
-		}
+	#itemform_extra {
 		label {
 			padding-left: 20px;
 			margin-right: 5px;
@@ -434,6 +423,10 @@ form ul.token-input-list-facebook {
 					transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 	.border-radius;
 	padding: 4px 4px 0 4px;
+	&.token-input-list-process {
+		background: #fcf8e3;
+		border: 1px solid #f5e79e;
+	}
 	&.token-input-list-error {
 		background: #fbf2ee;
 		border: 1px solid #d99;
@@ -456,6 +449,23 @@ form ul.token-input-list-facebook {
 // Fix z-index to make it visible inside bootstrap modal window:
 body.modal-open div.token-input-dropdown-facebook {
 	z-index: 10002;
+}
+// Fix style for form of editing tags from widget:
+.evo_widget.widget_core_item_tags form {
+	display: inline-block;
+	vertical-align: middle;
+	ul.token-input-list-facebook {
+		width: 100%;
+		max-width: 100%;
+	}
+	#item_tags {
+		display: inline-block;
+		width: auto;
+		vertical-align: middle;
+	}
+	input[type=submit] {
+		margin: 0;
+	}
 }
 
 // Results table
@@ -612,7 +622,7 @@ a:hover .glyphicon {
 }
 
 // Make a label inline
-#itemform_renderers, #itemform_edit_timestamp, table.catselect {
+#itemform_renderers, table.catselect {
 	label {
 		display: inline-block;
 		margin-right: 5px;
@@ -1074,7 +1084,7 @@ div.edit_toolbars, div.message_toolbars {
 }
 
 // Widgets of container "Login Required" on disp=access_requires_login:
-.disp_access_requires_login {
+.disp_access_requires_login, .disp_content_requires_login {
 	.evo_widget {
 		&.widget_core_content_block.panel {
 			background: none;

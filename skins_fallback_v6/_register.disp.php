@@ -51,7 +51,7 @@ skin_container( NT_('Register'), array_merge( $params, array(
 if( $params['register_form_footer'] )
 {	// Display register form footer:
 	global $Hit;
-	echo '<div class="evo_login_dialog_standard_link"><a href="'.get_htsrv_url( true ).'register.php?source='.rawurlencode( get_param( 'source' ) ).'&amp;redirect_to='.rawurlencode( get_param( 'redirect_to' ) ).'&amp;return_to='.rawurlencode( get_param( 'return_to' ) ).'">'.T_( 'Use basic registration form instead').' &raquo;</a></div>';
+	echo '<div class="evo_login_dialog_standard_link"><a href="'.get_htsrv_url( 'login' ).'register.php?source='.rawurlencode( get_param( 'source' ) ).'&amp;redirect_to='.rawurlencode( get_param( 'redirect_to' ) ).'&amp;return_to='.rawurlencode( get_param( 'return_to' ) ).'">'.T_( 'Use basic registration form instead').' &raquo;</a></div>';
 	echo '<div class="evo_login_dialog_footer text-muted">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
 }
 

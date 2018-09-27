@@ -390,8 +390,9 @@ class ItemQuery extends SQL
 	 * Restrict to specific tags
 	 *
 	 * @param string List of tags to restrict to
+	 * @param string Condition to search by tags, 'OR' - if item has at least one tag, 'AND' - item must has all tags from the list
 	 */
-	function where_tags( $tags )
+	function where_tags( $tags, $tags_operator = 'OR' )
 	{
 		global $DB;
 
@@ -404,8 +405,20 @@ class ItemQuery extends SQL
 
 		$tags = explode( ',', $tags );
 
-		$this->FROM_add( 'INNER JOIN T_items__itemtag ON post_ID = itag_itm_ID
-								INNER JOIN T_items__tag ON (itag_tag_ID = tag_ID AND tag_name IN ('.$DB->quote($tags).') )' );
+		if( $tags_operator == 'AND' )
+		{	// Search items with ALL tags from the restriction list:
+			$this->WHERE_and( '( SELECT COUNT( itag_tag_ID )
+				 FROM T_items__tag
+				INNER JOIN T_items__itemtag ON tag_ID = itag_tag_ID
+				WHERE itag_itm_ID = post_ID
+				  AND tag_name IN ( '.$DB->quote( $tags ).' )
+				) = '.count( $tags ) );
+		}
+		else // 'OR'
+		{	// Search items with at least one tag from the restriction list:
+			$this->FROM_add( 'INNER JOIN T_items__itemtag ON post_ID = itag_itm_ID' );
+			$this->FROM_add( 'INNER JOIN T_items__tag ON itag_tag_ID = tag_ID AND tag_name IN ( '.$DB->quote( $tags ).' )' );
+		}
 	}
 
 
@@ -1079,6 +1092,20 @@ class ItemQuery extends SQL
 		$available_fields[] = 'status';
 		$available_fields[] = 'T_categories.cat_name';
 		$available_fields[] = 'T_categories.cat_order';
+
+		if( in_array( 'order', $orderby_array ) )
+		{	// If list is ordered by field 'order':
+			if( ( $order_i = array_search( 'order', $available_fields ) ) !== false )
+			{	// Use an order per category instead of old field 'post_order':
+				$available_fields[ $order_i ] = 'T_postcats.postcat_order';
+			}
+			if( ! preg_match( '#T_postcats#', $this->get_from( '' ) ) )
+			{	// Join table of categories for field 'postcat_order':
+				$this->FROM_add( 'INNER JOIN T_postcats ON postcat_post_ID = post_ID AND post_main_cat_ID = postcat_cat_ID' );
+			}
+			// Replace field to real name:
+			$order_by = str_replace( 'order', 'T_postcats.postcat_order', $order_by );
+		}
 
 		$order_clause = gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname, $available_fields );
 

@@ -2,7 +2,7 @@
 
 # b2evolution CMS
 
-This is b2evolution CMS version **6.10.2-stable**.
+This is b2evolution CMS version **6.10.3-stable**.
 
 ## A complete engine for your website !
 
@@ -14,7 +14,7 @@ More info: http://b2evolution.net
 
 ## Requirements
 
-Basically, all you need is a standard [web hosting plan](http://b2evolution.net/web-hosting/top-quality-best-webhosting.php).
+Basically, all you need is a standard [web hosting plan](https://b2evolution.net/web-hosting/cheap-plans/).
 
 More specifically, your web server should support PHP 5.4+, MySQL 5.1+ & Apache 2+ (which is very common). More info about these requirements [here](http://b2evolution.net/man/installation-upgrade/system_requirements).
 

@@ -177,33 +177,6 @@ function skin_init( $disp )
 				$Item->check_goal();
 			}
 
-			// Check if the post has 'redirected' status:
-			if( ! $preview && $Item->status == 'redirected' && $redir == 'yes' )
-			{	// $redir=no here allows to force a 'single post' URL for commenting
-				// Redirect to the URL specified in the post:
-				$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'].' );
-				header_redirect( $Item->url, true, true );
-			}
-
-			// Check if the post has 'deprecated' status:
-			if( isset( $Item->status ) && $Item->status == 'deprecated' )
-			{ // If the post is deprecated
-				global $disp;
-				$disp = '404';
-				$disp_detail = '404-deprecated-post' ;
-				break;
-			}
-
-			// Check if the post has allowed front office statuses
-			$allowed_statuses = get_inskin_statuses( $Blog->ID, 'post' );
-			if( ! $preview && ! in_array( $Item->status, $allowed_statuses ) )
-			{
-				global $disp;
-				$disp = '404';
-				$disp_detail = '404-disallowed-post-status';
-				break;
-			}
-
 			// Check if we want to redirect to a canonical URL for the post
 			// Please document encountered problems.
 			if( ! $preview
@@ -221,7 +194,7 @@ function skin_init( $disp )
 					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
 				}
 
-				if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+				if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 				{	// The requested URL does not look like the canonical URL for this post...
 					// url difference was resolved
 					$url_resolved = false;
@@ -239,7 +212,7 @@ function skin_init( $disp )
 								$MainList->nav_target = $cat_param[1];
 							}
 						}
-						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get( 'http_protocol' ) != 'always_redirect' );
+						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 					}
 					if( preg_match( '|[&?]tag=([^&A-Z]+)|', $ReqURI, $tag_param ) )
 					{ // A tag post navigation param is set
@@ -254,7 +227,7 @@ function skin_init( $disp )
 								$MainList->nav_target = $tag_param[1];
 							}
 						}
-						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get( 'http_protocol' ) != 'always_redirect' );
+						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 					}
 
 					if( !$url_resolved && $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' && ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) ) )
@@ -375,7 +348,7 @@ function skin_init( $disp )
 								}
 
 								$canonical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
-								if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+								if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 								{	// fp> TODO: we're going to lose the additional params, it would be better to keep them...
 									// fp> what additional params actually?
 									if( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
@@ -416,7 +389,7 @@ function skin_init( $disp )
 							|| $Blog->get_setting( 'relcanonical_tag_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
-						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{
 							if( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
 							{	// REDIRECT TO THE CANONICAL URL:
@@ -445,7 +418,7 @@ function skin_init( $disp )
 							|| $Blog->get_setting( 'relcanonical_archive_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w, '&', $MainList->get_active_filter('page') );
-						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{
 							if( $Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
 							{	// REDIRECT TO THE CANONICAL URL:
@@ -533,6 +506,7 @@ function skin_init( $disp )
 			$comment_id = param( 'comment_id', 'integer', 0, true );
 			$post_id = param( 'post_id', 'integer', 0, true );
 			$subject = param( 'subject', 'string', '' );
+			$redirect_to = param( 'redirect_to', 'url', regenerate_url(), true, true );
 
 			// try to init recipient_User
 			if( !empty( $recipient_id ) )
@@ -575,8 +549,6 @@ function skin_init( $disp )
 				if( $allow_msgform == 'login' )
 				{ // user must login first to be able to send a message to this User
 					$Messages->add( sprintf( T_( 'You must log in before you can contact "%s".' ), $recipient_User->get( 'login' ) ) );
-					// Override redirect to param:
-					$redirect_to = param( 'redirect_to', 'url', regenerate_url(), true, true );
 					// Redirect to special blog for login actions:
 					header_redirect( url_add_param( $Blog->get( 'loginurl', array( 'glue' => '&' ) ), 'redirect_to='.rawurlencode( $redirect_to ), '&' ) );
 					// Exit here.
@@ -622,9 +594,8 @@ function skin_init( $disp )
 					$Messages->add( T_( 'This commentator does not want to get contacted through the message form.' ), 'error' );
 				}
 
-				$blogurl = $Blog->gen_blogurl();
 				// If it was a front page request or the front page is set to 'msgform' then we must not redirect to the front page because it is forbidden for the current User
-				$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'msgform' ) ) ? url_add_param( $blogurl, 'disp=403', '&' ) : $blogurl;
+				$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'msgform' ) ) ? url_add_param( $Blog->gen_blogurl(), 'disp=403', '&' ) : $redirect_to;
 				header_redirect( $redirect_to, 302 );
 				// exited here
 			}
@@ -1051,7 +1022,11 @@ function skin_init( $disp )
 			break;
 
 		case 'access_requires_login':
+		case 'content_requires_login':
 			global $login_mode;
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
 
 			if( is_logged_in() )
 			{	// Don't display this page for already logged in user:
@@ -1070,10 +1045,19 @@ function skin_init( $disp )
 			{	// Display this error if user already tried to log in by HTTP basic authentication and it was failed:
 				$Messages->add( T_('Wrong Login/Password provided by browser (HTTP Auth).'), 'error' );
 			}
+
+			if( $disp == 'content_requires_login' )
+			{	// Set default details for this disp:
+				$disp_detail = '403-item-requires-login';
+			}
 			break;
 
 		case 'login':
+			// Log in form:
 			global $Plugins, $login_mode;
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
 
 			if( is_logged_in() )
 			{ // User is already logged in
@@ -1116,6 +1100,11 @@ function skin_init( $disp )
 			break;
 
 		case 'register':
+			// Register form:
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
 			if( is_logged_in() )
 			{ // If user is logged in the register form should not be displayed. In this case redirect to the blog home page.
 				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
@@ -1151,6 +1140,11 @@ function skin_init( $disp )
 			break;
 
 		case 'lostpassword':
+			// Lost password form:
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
 			if( is_logged_in() )
 			{ // If user is logged in the lost password form should not be displayed. In this case redirect to the blog home page.
 				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
@@ -1167,6 +1161,11 @@ function skin_init( $disp )
 			break;
 
 		case 'activateinfo':
+			// Activate info page:
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
 			if( !is_logged_in() )
 			{ // Redirect to the login page for anonymous users
 				$Messages->add( T_( 'You must log in before you can activate your account.' ) );
@@ -1215,7 +1214,6 @@ function skin_init( $disp )
 			break;
 
 		case 'profile':
-		case 'register_finish':
 		case 'avatar':
 			$action = param_action();
 			if( $action == 'crop' && is_logged_in() )
@@ -1227,9 +1225,15 @@ function skin_init( $disp )
 					set_param( 'action', '' );
 				}
 			}
+		case 'register_finish':
 		case 'pwdchange':
 		case 'userprefs':
 		case 'subs':
+			if( $disp == 'pwdchange' || $disp == 'register_finish' )
+			{	// Check and redirect if current URL must be used as https instead of http:
+				check_https_url( 'login' );
+			}
+
 			$seo_page_type = 'Special feature page';
 			if( $Blog->get_setting( 'special_noindex' ) )
 			{	// We prefer robots not to index these pages:
@@ -1548,6 +1552,21 @@ function skin_init( $disp )
 				$robots_index = false;
 			}
 			break;
+
+		case 'compare':
+			$items = trim( param( 'items', '/^[\d,]*$/' ), ',' );
+			if( ! empty( $items ) )
+			{	// Check if at least one item exist in DB:
+				$ItemCache = & get_ItemCache();
+				$items = $ItemCache->load_list( explode( ',', $items ) );
+			}
+			if( empty( $items ) )
+			{	// Display 404 page when no items to compare:
+				global $disp;
+				$disp = '404';
+				$Messages->add( T_('The requested items don\'t exist.'), 'error' );
+			}
+			break;
 	}
 
 	$Debuglog->add('skin_init: $disp='.$disp. ' / $disp_detail='.$disp_detail.' / $seo_page_type='.$seo_page_type, 'skins' );
@@ -1738,6 +1757,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_404'                   => '_404_not_found.disp.php',
 				'disp_access_denied'         => '_access_denied.disp.php',
 				'disp_access_requires_login' => '_access_requires_login.disp.php',
+				'disp_content_requires_login'=> '_content_requires_login.disp.php',
 				'disp_activateinfo'          => '_activateinfo.disp.php',
 				'disp_anonpost'              => '_anonpost.disp.php',
 				'disp_arcdir'                => '_arcdir.disp.php',
@@ -1779,6 +1799,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_useritems'             => '_useritems.disp.php',
 				'disp_usercomments'          => '_usercomments.disp.php',
 				'disp_users'                 => '_users.disp.php',
+				'disp_compare'               => '_compare.disp.php',
 			);
 
 		// Add plugin disp handlers:
@@ -2619,7 +2640,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 
 	if( !$skin_ID )
 	{ // The skin ID is empty use the same as normal skin ID
-		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as normal skin').'.</div>';
+		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as standard skin').'.</div>';
 	}
 	else
 	{
@@ -2645,7 +2666,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 		// Skin type
 		echo '<div class="skin_setting_row">';
 			echo '<label>'.T_('Skin type').':</label>';
-			echo '<span>'.$edited_Skin->type.'</span>';
+			echo '<span>'.get_skin_type_title( $edited_Skin->type ).'</span>';
 		echo '</div>';
 
 		// Containers
@@ -2841,5 +2862,36 @@ function get_skin_folder_base_version( $skin_folder )
 	}
 
 	return array( $base_skin, $skin_version );
+}
+
+
+/**
+ * Get skin types
+ *
+ * @return array
+ */
+function get_skin_types()
+{
+	return array(
+		'normal'  => array( T_('Standard'), T_('Standard skin for general browsing') ),
+		'mobile'  => array( T_('Phone'), T_('Mobile skin for mobile phones browsers') ),
+		'tablet'  => array( T_('Tablet'), T_('Tablet skin for tablet browsers') ),
+		'rwd'     => array( T_('RWD'), T_('Skin can be used for general, mobile phones and tablet browsers') ),
+		'feed'    => array( T_('XML Feed'), T_('Special system skin for XML feeds like RSS and Atom') ),
+		'sitemap' => array( T_('XML Sitemap'), T_('Special system skin for XML sitemaps') ),
+	);
+}
+
+
+/**
+ * Get title of skin type
+ *
+ * @param string Skin type
+ * @return string Skin title
+ */
+function get_skin_type_title( $skin_type )
+{
+	$skin_types = get_skin_types();
+	return ( isset( $skin_types[ $skin_type ] ) ? $skin_types[ $skin_type ][0] : $skin_type );
 }
 ?>

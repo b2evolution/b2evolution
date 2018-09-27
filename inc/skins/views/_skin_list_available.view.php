@@ -42,10 +42,10 @@ if( get_param( 'tab' ) == 'current_skin' )
 	switch( $sel_skin_type )
 	{
 		case 'normal':
-			$skin_type_title = /* TRANS: Skin type name */ T_('Normal');
+			$skin_type_title = /* TRANS: Skin type name */ T_('Standard');
 			break;
 		case 'mobile':
-			$skin_type_title = /* TRANS: Skin type name */ T_('Mobile');
+			$skin_type_title = /* TRANS: Skin type name */ T_('Phone');
 			break;
 		case 'tablet':
 			$skin_type_title = /* TRANS: Skin type name */ T_('Tablet');
@@ -65,7 +65,7 @@ $block_item_Widget->title = $block_title.get_manual_link( 'installing_skins' );
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
-	$block_item_Widget->global_icon( T_('Cancel install!'), 'close', $redirect_to );
+	$block_item_Widget->global_icon( T_('Cancel installation!'), 'close', $redirect_to );
 }
 
 $block_item_Widget->disp_template_replaced( 'block_start' );
@@ -81,8 +81,8 @@ $Form->hidden( 'tab', get_param( 'tab' ) );
 $Form->begin_form( 'skin_selector_filters' );
 $Form->select_input_array( 'sel_skin_type', $sel_skin_type, array(
 		''        => T_('All skins'),
-		'normal'  => T_('Normal skins'),
-		'mobile'  => T_('Mobile skins'),
+		'normal'  => T_('Standard skins'),
+		'mobile'  => T_('Phone skins'),
 		'tablet'  => T_('Tablet skins'),
 		'feed'    => T_('Feed skins'),
 		'sitemap' => T_('Sitemap skins'),

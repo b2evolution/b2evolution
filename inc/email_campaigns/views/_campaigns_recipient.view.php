@@ -53,7 +53,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => T_('Send count'),
-	'order' => 'send_count',
+	'order' => 'ecmp_send_count',
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
@@ -71,7 +71,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => /* TRANS: Image load count */ T_('Img loads'),
-	'order' => 'open_count',
+	'order' => 'ecmp_img_loads',
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
@@ -80,7 +80,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => T_('Link clicks'),
-	'order' => 'click_count',
+	'order' => 'ecmp_link_clicks',
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
@@ -89,6 +89,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => /* TRANS: Call To Action 1*/ T_('CTA1'),
+	'order' => 'ecmp_cta1_clicks',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
 	'td' =>'%campaign_td_recipient_action( {row}, "cta1" )%',
@@ -96,6 +97,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => /* TRANS: Call To Action 2*/ T_('CTA2'),
+	'order' => 'ecmp_cta2_clicks',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
 	'td' =>'%campaign_td_recipient_action( {row}, "cta2" )%',
@@ -103,6 +105,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => /* TRANS: Call To Action 3*/ T_('CTA3'),
+	'order' => 'ecmp_cta3_clicks',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
 	'td' =>'%campaign_td_recipient_action( {row}, "cta3" )%',
@@ -110,6 +113,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => T_('Likes'),
+	'order' => 'ecmp_like_count',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
 	'td' =>'%campaign_td_recipient_action( {row}, "liked" )%',
@@ -117,6 +121,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => T_('Dislikes'),
+	'order' => 'ecmp_dislike_count',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
 	'td' =>'%campaign_td_recipient_action( {row}, "disliked" )%',
@@ -124,7 +129,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => T_('Unsub clicks'),
-	'order' => 'unsubscribe_click_count',
+	'order' => 'ecmp_unsub_clicks',
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',

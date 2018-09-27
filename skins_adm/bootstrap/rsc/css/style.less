@@ -79,6 +79,9 @@ div.status_icon {
 	font-weight: bold;
 	margin: 2px;
 }
+span.action_icon {
+	cursor: pointer;
+}
 // Remove spaces between the spam voting buttons
 .btn-group .action_icon {
 	margin-left: 0;
@@ -192,6 +195,11 @@ div.avatartag {
 	}
 }
 
+.edit_actions_visibility {
+	white-space: nowrap;
+	margin-right: 5px;
+}
+
 div.log_container {
 	margin: 0;
 }
@@ -211,6 +219,14 @@ div.delete_messages ul {
 	li {
 		list-style: inherit;
 	}
+}
+
+.evo_panel {
+	margin-bottom: 20px;
+}
+
+.evo_panel__footer {
+	padding: 10px 15px;
 }
 
 /*
@@ -288,6 +304,16 @@ div.delete_messages ul {
 			text-align: center;
 			padding: 10px;
 			color: #5bc0de;
+		}
+	}
+}
+.evo_content_summary {
+	.evo_post {
+		.bTitle {
+			font-weight: bold;
+		}
+		.bText {
+			padding-left: 420px;
 		}
 	}
 }
@@ -624,9 +650,9 @@ fieldset ul {
 	font-weight: normal;
 }
 
-// Form elements on user edit page
-.user_admin_tags {
-	width: 500px;
+// Wrapper for form input element to enter autocomplete item or user tags:
+.evo_input__tags {
+	width: 100%;
 	max-width: 100%;
 	ul.token-input-list-facebook {
 		width: 100%;
@@ -710,6 +736,23 @@ fieldset ul {
 }
 #itemform_goals td {
 	padding-bottom: 2px;
+}
+
+// Form elements on item type edit page
+.custom_fields_edit_table {
+	.results {
+		overflow: initial;
+	}
+	.table_scroll {
+		margin-bottom: 20px;
+	}
+	.form-control {
+		width: auto;
+		&.custom_field_label {
+			width: 100%;
+			min-width: 200px;
+		}
+	}
 }
 
 // Attachments / links
@@ -999,14 +1042,39 @@ h2.user_title::first-line {
 }
 
 #itemform_extra {
-	#ffield_item_owner_login .help-inline {
-		display: inline-block;
-		vertical-align: middle;
-		margin-top: 10px;
+	td.flabel_item_owner_login {
+		vertical-align: top;
+		padding-top: 6px;
+	}
+	#ffield_item_owner_login {
+		.help-inline {
+			display: inline-block;
+			vertical-align: middle;
+			margin-top: 10px;
+		}
+		#item_owner_login {
+			vertical-align: middle !important;
+		}
 	}
 	label.ffield_item_create_user {
 		padding: 0;
 		font-weight: normal;
+	}
+	.itemform_extra_radio {
+		padding-top: 10px;
+		> label {
+			padding: 0;
+			margin: 0;
+		}
+		input[type=radio][name=item_dateset][value="1"] {
+			margin-top: 11px;
+		}
+		.form-group {
+			vertical-align: middle;
+			input {
+				margin-left: 0;
+			}
+		}
 	}
 }
 
@@ -1175,6 +1243,9 @@ div.coll-selector {
 	margin-bottom: -3px; // in this case we don't want level 2 to have it's 18 px top padding
 	.btn-group {
 		margin-right: 4px;
+		.dropdown-toggle .caret {
+			margin-left: 6px;
+		}
 	}
 }
 div.level2 {
@@ -1645,13 +1716,22 @@ table.diff {
 	background-color: @status_color_meta;
 }
 
-// Aggregate filter form:
-.evo_aggregate_filter {
+// Hits diagarm filter form:
+.evo_filter_diagram_hits {
 	white-space: nowrap;
+	float: left;
+	padding-left: 15px;
 	label {
-		padding-top: 5px;
-		padding-right: 5px;
+		float: none;
+		padding: 0 5px 0 0;
 		width: auto;
+		font-weight: normal;
+		&.control-label {
+			font-weight: bold;
+		}
+		input {
+			display: inline;
+		}
 	}
 	select {
 		display: inline;

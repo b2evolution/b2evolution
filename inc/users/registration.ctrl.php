@@ -44,11 +44,13 @@ switch ( $action )
 		param( 'enable_email', 'integer', 0 );
 		param( 'notify_messages', 'integer', 0 );
 		param( 'notify_unread_messages', 'integer', 0 );
+		param( 'notify_comment_mentioned', 'integer', 0 );
 		param( 'notify_published_comments', 'integer', 0 );
 		param( 'notify_comment_moderation', 'integer', 0 );
 		param( 'notify_edit_cmt_moderation', 'integer', 0 );
 		param( 'notify_spam_cmt_moderation', 'integer', 0 );
 		param( 'notify_meta_comments', 'integer', 0 );
+		param( 'notify_post_mentioned', 'integer', 0 );
 		param( 'notify_post_moderation', 'integer', 0 );
 		param( 'notify_edit_pst_moderation', 'integer', 0 );
 		param( 'notify_post_assignment', 'integer', 0 );
@@ -93,6 +95,7 @@ switch ( $action )
 		{	// Force to accept HTTP authentication headers when it is required:
 			$http_auth_accept = 1;
 		}
+		param( 'require_ssl', 'integer', 0 );
 		param( 'js_passwd_hashing', 'integer', 0 );
 		param( 'passwd_special', 'integer', 0 );
 		param( 'strict_logins', 'integer', 0 );
@@ -132,11 +135,13 @@ switch ( $action )
 					 array( 'def_enable_email', $enable_email ),
 					 array( 'def_notify_messages', $notify_messages ),
 					 array( 'def_notify_unread_messages', $notify_unread_messages ),
+					 array( 'def_notify_comment_mentioned', $notify_comment_mentioned ),
 					 array( 'def_notify_published_comments', $notify_published_comments ),
 					 array( 'def_notify_comment_moderation', $notify_comment_moderation ),
 					 array( 'def_notify_edit_cmt_moderation', $notify_edit_cmt_moderation ),
 					 array( 'def_notify_spam_cmt_moderation', $notify_spam_cmt_moderation ),
 					 array( 'def_notify_meta_comments', $notify_meta_comments ),
+					 array( 'def_notify_post_mentioned', $notify_post_mentioned ),
 					 array( 'def_notify_post_moderation', $notify_post_moderation ),
 					 array( 'def_notify_edit_pst_moderation', $notify_edit_pst_moderation ),
 					 array( 'def_notify_post_assignment', $notify_post_assignment ),
@@ -153,6 +158,7 @@ switch ( $action )
 					 array( 'after_registration', $after_registration ),
 					 array( 'after_registration_slug', $after_registration_slug ),
 					 array( 'user_minpwdlen', $user_minpwdlen ),
+					 array( 'require_ssl', $require_ssl ),
 					 array( 'js_passwd_hashing', $js_passwd_hashing ),
 					 array( 'http_auth_require', $http_auth_require ),
 					 array( 'http_auth_accept', $http_auth_accept ),

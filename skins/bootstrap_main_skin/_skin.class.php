@@ -21,7 +21,7 @@ class bootstrap_main_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.10.2';
+	var $version = '6.10.3';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -117,6 +117,13 @@ class bootstrap_main_Skin extends Skin
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
+						'allow_empty' => true,
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
 						'allow_empty' => true,
 					),
 				'section_layout_end' => array(
@@ -394,7 +401,7 @@ class bootstrap_main_Skin extends Skin
 		// Add custom CSS:
 		$custom_css = '';
 
-		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
+		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'content_requires_login' ) ) )
 		{
 			$FileCache = & get_FileCache();
 
@@ -444,7 +451,7 @@ class bootstrap_main_Skin extends Skin
 
 			if( $color = $this->get_setting( 'front_text_color' ) )
 			{ // Custom text color:
-				$custom_css .= 'body.pictured .front_main_content, body.pictured .front_main_content h1 small, .evo_container__header, .evo_container__page_top { color: '.$color." }\n";
+				$custom_css .= 'body.pictured .front_main_content, body.pictured .front_main_content h1 small, .evo_container__header, .evo_container__page_top, body.pictured:not(.disp_register) .evo_widget.widget_core_content_block { color: '.$color." }\n";
 			}
 
 			$link_color = $this->get_setting( 'front_link_color' );
@@ -521,6 +528,9 @@ class bootstrap_main_Skin extends Skin
 </style>';
 		add_headline( $custom_css );
 		}
+
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
 }
 ?>

@@ -81,7 +81,7 @@
 	function initialize( obj )
 	{
 		var options = obj.data('options'),
-			obj_orig_width = obj.width();
+			obj_orig_width = obj.outerWidth();
 
 		obj.css( {
 			width: obj_orig_width - options.width - options.margin,
@@ -99,10 +99,12 @@
 			if( $( this ).scrollLeft() == maxScrollLeft )
 			{	// Hide right scroll control if scrollbar is located in the right position
 				scroll_right.hide();
+				obj.css( 'marginRight', '0' );
 			}
 			else
 			{	// Show right scroll control
 				scroll_right.show();
+				obj.css( 'marginRight', options.width + options.margin );
 			}
 
 			if( $( this ).scrollLeft() == 0 )
@@ -115,17 +117,17 @@
 				scroll_left.show();
 				obj.css( { // Move main div to clear a space for the left scroll control
 					position: 'relative',
-					marginLeft: options.width + options.margin + 2
+					marginLeft: options.width + options.margin
 				} );
 			}
 
 			if( scroll_right.is(':visible') && scroll_left.is(':visible') )
 			{	// When left & right scroll controls are visible
-				obj.css( 'width', obj_orig_width - 2 * ( options.width + options.margin ) - 2 );
+				obj.css( 'width', obj_orig_width - 2 * ( options.width + options.margin ) );
 			}
 			else
 			{	// Only one control is visible
-				obj.css( 'width', obj_orig_width - options.width - options.margin - 1 );
+				obj.css( 'width', obj_orig_width - options.width - options.margin );
 			}
 		} );
 
@@ -158,6 +160,14 @@
 			var scroll_value = obj.scrollLeft() - Math.floor( obj.width() * options.scroll_step / 100 );
 			obj.animate( { scrollLeft: scroll_value + 'px' }, options.scroll_time );
 		} );
+
+		$( window ).bind( 'resize', function()
+		{	// Update box width and right control position:
+			obj.css( 'width', 'auto' );
+			obj_orig_width = obj.outerWidth( true );
+			obj.css( 'width', obj_orig_width - obj.css( 'marginLeft' ) - obj.css( 'marginRight' ) );
+			scroll_right.css( 'left', parseFloat( obj.parent().css( 'padding-left' ) ) + obj.outerWidth() + options.margin + ( scroll_left.is(':visible') && scroll_right.is(':visible') ? options.width : 0 ) );
+		} );
 	}
 
 	function create_control( obj, type )
@@ -176,7 +186,7 @@
 
 		var scroll_control_obj = $( '#' + control_id );
 
-		var control_css_left = 0;
+		var control_css_left = parseFloat( obj.parent().css( 'padding-left' ) );
 		if( type == 'right' )
 		{
 			control_css_left += obj.outerWidth() + options.margin;
@@ -227,5 +237,5 @@
 // Initialize for div.wide_scroll:
 jQuery( document ).ready( function()
 {
-	jQuery( 'div.wide_scroll' ).scrollWide( { scroll_time: 100 } );
+	jQuery( 'div.wide_scroll' ).scrollWide( { scroll_time: 100, margin: 0 } );
 } )

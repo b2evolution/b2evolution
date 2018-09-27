@@ -52,20 +52,11 @@ function hits_results( & $Results, $params = array() )
 		'presets' => $filter_presets
 		);
 
-	if( $sess_ID == NULL )
-	{
-		$session_link = '%stat_session_hits( #sess_ID#, #sess_ID# )%';
-	}
-	else
-	{
-		$session_link = '<a href="?ctrl=stats&amp;tab='.$tab.'&amp;blog='.$blog.'" title="'.T_( 'Show all sessions' ).'">$sess_ID$</a>';
-	}
-
 	$Results->cols[] = array(
 			'th' => T_('Session'),
 			'order' => 'hit_sess_ID',
 			'td_class' => 'right nowrap',
-			'td' => $session_link,
+			'td' => '%stat_session_hits( #sess_ID#, #sess_ID# )%',
 		);
 
 	$Results->cols[] = array(
@@ -290,6 +281,14 @@ function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp 
 		preg_match( '~[?&]s=([^&#]*)~', $int_search_uri, $res );
 		$hit_uri = sprintf( T_( 'Internal search: %s' ), $res[1] );
 	}
+	elseif( $hit_disp == 'redirect' )
+	{	// This is a redirect:
+		return '['.get_link_tag( $full_url, 'redirect' ).']';
+	}
+	elseif( strpos( $hit_uri, 'email_passthrough.php' ) !== false )
+	{	// This is a click from email message:
+		return '['.get_link_tag( $full_url, 'email_passthrough' ).']';
+	}
 	elseif( utf8_strlen( $hit_uri ) > $max_len )
 	{
 		$hit_uri = '...'.utf8_substr( $hit_uri, -$max_len );
@@ -301,6 +300,10 @@ function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp 
 		if( $hit_disp != NULL )
 		{
 			$hit_uri .= '[disp=<a href="'.$full_url.'">'.$hit_disp.'</a>]';
+			if( $hit_disp == 'single' || $hit_disp == 'page' )
+			{	// Display item slug:
+				$hit_uri .= ' <a href="'.$full_url.'">'.preg_replace( '#^.+/([^/]+)$#', '$1', $full_url ).'</a>';
+			}
 		}
 		if( $hit_ctrl != NULL )
 		{
@@ -342,7 +345,7 @@ function stat_session_login( $login )
  */
 function stat_session_hits( $sess_ID, $link_text )
 {
-	global $blog, $admin_url;
+	global $admin_url;
 
 	$tab = get_param( 'tab' );
 	if( empty( $tab ) )
@@ -350,7 +353,7 @@ function stat_session_hits( $sess_ID, $link_text )
 		$tab = 'hits';
 	}
 
-	return '<strong><a href="'.$admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;sess_ID='.$sess_ID.'&amp;blog='.$blog.'">'.$link_text.'</a></strong>';
+	return '<strong><a href="'.$admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;sess_ID='.$sess_ID.'&amp;blog=0">'.$link_text.'</a></strong>';
 }
 
 
@@ -361,7 +364,7 @@ function stat_session_hits( $sess_ID, $link_text )
  */
 function disp_clickable_log_IP( $hit_remote_addr )
 {
-	global $current_User, $blog;
+	global $current_User, $admin_url;
 	static $perm = NULL;
 
 	if( empty( $perm ) )
@@ -371,7 +374,9 @@ function disp_clickable_log_IP( $hit_remote_addr )
 
 	if( $perm == true )
 	{
-		return '<a href="?ctrl=stats&tab='.get_param( 'tab' ).'&colselect_submit=Filter+list&sess_ID=&remote_IP='.$hit_remote_addr.'&blog='.$blog.'">'.$hit_remote_addr.'</a>';
+		return '<a href="?ctrl=stats&tab='.get_param( 'tab' ).'&colselect_submit=Filter+list&sess_ID=&remote_IP='.$hit_remote_addr.'&blog=0">'.$hit_remote_addr.'</a>'
+				.' <a href="'.$admin_url.'?ctrl=antispam&amp;action=whois&amp;query='.$hit_remote_addr.'" onclick="return get_whois_info(\''.$hit_remote_addr.'\');">'
+				.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Check domain registration (WHOIS)...') ) ).'</a>';
 	}
 	else
 	{
@@ -426,28 +431,28 @@ function disp_color_agent( $hit_agent_type )
  */
 function hit_response_code_class( $hit_response_code )
 {
-	$class = '';
-
-	if( $hit_response_code >= 200 && $hit_response_code < 300 )
-	{
-		$class =  "code_2xx";
+	if( $hit_response_code >= 500 )
+	{	// Server errors:
+		return 'text-danger';
 	}
-	if( $hit_response_code >= 300 && $hit_response_code < 400 )
-	{
-		$class =  "code_3xx";
+	elseif( $hit_response_code >= 400 )
+	{	// Code errors:
+		return 'text-warning';
+	}
+	elseif( $hit_response_code == 304 )
+	{	// 304 means "Not Modified"; Display this as success 2xx codes:
+		return 'text-success';
+	}
+	elseif( $hit_response_code >= 300 )
+	{	// Redirects:
+		return 'text-info';
+	}
+	elseif( $hit_response_code >= 200 )
+	{	// Success pages:
+		return 'text-success';
 	}
 
-	if( $hit_response_code == 304 )
-	{
-		$class =  "code_304";
-	}
-
-	if( $hit_response_code >= 400 )
-	{
-		$class =  "code_4xx";
-	}
-
-	return $class;
+	return '';
 }
 
 

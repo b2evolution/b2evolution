@@ -262,6 +262,7 @@ function create_default_data()
 		);
 	$post_types[] = array(
 			'name'           => 'Manual Page',
+			'use_short_title'=> 'optional',
 			'allow_html'     => 0,
 		);
 	$post_types[] = array(
@@ -372,7 +373,6 @@ function create_default_data()
 			'use_comments'           => 0,
 			'allow_closing_comments' => 0,
 			'use_comment_expiration' => 'never',
-			'use_custom_fields'      => 0,
 		);
 	$post_types[] = array(
 			'name' => 'Bug Report',
@@ -385,6 +385,7 @@ function create_default_data()
 			'usage'                    => 'post',
 			'template_name'            => 'single',
 			'perm_level'               => 'standard',
+			'use_short_title'          => 'never',
 			'allow_html'               => 1,
 			'allow_breaks'             => 1,
 			'allow_featured'           => 1,
@@ -401,7 +402,6 @@ function create_default_data()
 			'allow_closing_comments'   => 1,
 			'allow_disabling_comments' => 0,
 			'use_comment_expiration'   => 'optional',
-			'use_custom_fields'        => 1,
 		);
 	$post_types_sql = 'INSERT INTO T_items__type ( ityp_'.implode( ', ityp_', array_keys( $post_type_default_settings ) ).' ) VALUES ';
 	foreach( $post_types as $p => $post_type )
@@ -416,14 +416,164 @@ function create_default_data()
 	// Insert item types:
 	$DB->query( $post_types_sql );
 
-	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note )
-			VALUES ( 3, '.$DB->quote( T_('First numeric field') ).', "first_numeric_field", "double", 1, '.$DB->quote( T_('Enter a number') ).' ),
-						 ( 3, '.$DB->quote( T_('Second numeric field') ).', "second_numeric_field", "double", 3, '.$DB->quote( T_('Enter a number') ).' ),
-						 ( 3, '.$DB->quote( T_('First string field') ).', "first_string_field", "varchar", 2, '.$DB->quote( T_('Enter a string') ).' ),
-						 ( 3, '.$DB->quote( T_('Define your own labels') ).', "define_your_own_labels", "varchar", 4, '.$DB->quote( T_('Define your own notes') ).' ),
-						 ( 3, '.$DB->quote( T_('Multiline plain text field') ).', "multiline_plain_text_field", "text", 6, '.$DB->quote( T_('Enter multiple lines') ).' ),
-						 ( 3, '.$DB->quote( T_('Multiline HTML field') ).', "multiline_html_field", "html", 5, '.$DB->quote( T_('Enter HTML code') ).' ),
-						 ( 3, '.$DB->quote( T_('URL field') ).', "url_field", "url", 7, '.$DB->quote( T_('Enter an URL (absolute or relative)') ).' )' );
+	// Item type custom fields:
+	$parent_ityp_ID = 3;
+	$child_ityp_ID = 4;
+	$custom_fields = array(
+		// for Item Type "Post with Custom Fields":
+		array(
+			'label'           => T_('Image 1'),
+			'name'            => 'image_1',
+			'type'            => 'image',
+			'order'           => 1,
+			'note'            => T_('Enter a link ID'),
+			'format'          => 'fit-192x192',
+			'link'            => 'linkpermzoom',
+			'line_highlight'  => 'never',
+			'green_highlight' => 'never',
+		),
+		array(
+			'label'           => T_('First numeric field'),
+			'name'            => 'first_numeric_field',
+			'type'            => 'double',
+			'order'           => 2,
+			'note'            => T_('Enter a number'),
+			'cell_class'      => 'right',
+		),
+		array(
+			'label'           => T_('Second numeric field'),
+			'name'            => 'second_numeric_field',
+			'type'            => 'double',
+			'order'           => 4,
+			'note'            => T_('Enter a number'),
+			'cell_class'      => 'right',
+		),
+		array(
+			'label'           => T_('USD Price'),
+			'name'            => 'usd_price',
+			'type'            => 'double',
+			'order'           => 8,
+			'note'            => T_('Enter a number'),
+			'format'          => '$ 0 0.00',
+			'cell_class'      => 'right',
+			'green_highlight' => 'lowest',
+		),
+		array(
+			'label'           => T_('EUR Price'),
+			'name'            => 'eur_price',
+			'type'            => 'double',
+			'order'           => 9,
+			'note'            => T_('Enter a number'),
+			'format'          => '0 0.00 €',
+			'cell_class'      => 'right',
+			'green_highlight' => 'lowest',
+		),
+		array(
+			'label'           => T_('First string field'),
+			'name'            => 'first_string_field',
+			'type'            => 'varchar',
+			'order'           => 3,
+			'note'            => T_('Enter a string'),
+		),
+		array(
+			'label'           => T_('Multiline plain text field'),
+			'name'            => 'multiline_plain_text_field',
+			'type'            => 'text',
+			'order'           => 6,
+			'note'            => T_('Enter multiple lines'),
+		),
+		array(
+			'label'           => T_('Multiline HTML field'),
+			'name'            => 'multiline_html_field',
+			'type'            => 'html',
+			'order'           => 5,
+			'note'            => T_('Enter HTML code'),
+		),
+		array(
+			'label'           => T_('URL field'),
+			'name'            => 'url_field',
+			'type'            => 'url',
+			'order'           => 7,
+			'note'            => T_('Enter an URL (absolute or relative)'),
+			'link'            => 'fieldurl',
+		),
+		array(
+			'label'           => T_('Checkmark field'),
+			'name'            => 'checkmark_field',
+			'type'            => 'double',
+			'order'           => 10,
+			'note'            => T_('1 = Yes; 0 = No'),
+			'format'          => '#yes#;;#no#;n/a',
+			'cell_class'      => 'right',
+		),
+		// for Item Type "Child Post":
+		array(
+			'ityp_ID'         => $child_ityp_ID,
+			'label'           => T_('Image 1'),
+			'name'            => 'image_1',
+			'type'            => 'image',
+			'order'           => 1,
+			'note'            => T_('Enter a link ID'),
+			'format'          => 'fit-192x192',
+			'link'            => 'linkpermzoom',
+			'line_highlight'  => 'never',
+			'green_highlight' => 'never',
+		),
+		array(
+			'ityp_ID'         => $child_ityp_ID,
+			'label'           => T_('First numeric field'),
+			'name'            => 'first_numeric_field',
+			'type'            => 'double',
+			'order'           => 2,
+			'note'            => T_('Enter a number'),
+			'cell_class'      => 'right',
+		),
+		array(
+			'ityp_ID'         => $child_ityp_ID,
+			'label'           => T_('First string field'),
+			'name'            => 'first_string_field',
+			'type'            => 'varchar',
+			'order'           => 3,
+			'note'            => T_('Enter a string'),
+		),
+		array(
+			'ityp_ID'         => $child_ityp_ID,
+			'label'           => T_('Checkmark field'),
+			'name'            => 'checkmark_field',
+			'type'            => 'double',
+			'order'           => 4,
+			'note'            => T_('1 = Yes; 0 = No'),
+			'format'          => '#yes#;;#no#;n/a',
+			'cell_class'      => 'right',
+		),
+	);
+	// Default settings for custom fields:
+	$custom_field_default_settings = array(
+			'ityp_ID'         => $parent_ityp_ID,
+			'label'           => '',
+			'name'            => '',
+			'type'            => 'double',
+			'order'           => '',
+			'note'            => NULL,
+			'format'          => NULL,
+			'header_class'    => 'right nowrap',
+			'cell_class'      => 'center',
+			'link'            => 'nolink',
+			'line_highlight'  => 'differences',
+			'green_highlight' => 'never',
+		);
+	// Insert item type custom fields:
+	$custom_fields_sql = 'INSERT INTO T_items__type_custom_field ( itcf_'.implode( ', itcf_', array_keys( $custom_field_default_settings ) ).' ) VALUES ';
+	foreach( $custom_fields as $c => $custom_field )
+	{
+		$custom_field = array_merge( $custom_field_default_settings, $custom_field );
+		$custom_fields_sql .= '( '.$DB->quote( $custom_field ).' )';
+		if( $c != count( $custom_fields ) - 1 )
+		{
+			$custom_fields_sql .= ',';
+		}
+	}
+	$DB->query( $custom_fields_sql );
 	task_end();
 
 
@@ -1878,9 +2028,9 @@ Shopping list:
 * oranges
 * pears
 
-The rain---not the reign---in Spain.
-
-Button examples:
+The rain---not the reign---in Spain.').
+"\n".
+T_('Button examples:
 [button]This is a button[/button]
 [like]I like this[/like] [dislike]I don\'t like this[/dislike]
 [cta:1:info]Call to action 1 info button[/cta] [cta:2:warning]Call to action 2 warning button[/cta] [cta:3:default]Call to action 3 default button[/cta]

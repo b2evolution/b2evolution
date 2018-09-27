@@ -153,7 +153,7 @@ class CollectionSettings extends AbstractSettings
 			'enable_sitemaps' => 1,
 
 		// General settings:
-			'ajax_form_enabled' => 0,					// Comment and contacts forms will be fetched by javascript
+			'ajax_form_enabled' => 1,					// Comment and contacts forms will be fetched by javascript
 			'ajax_form_loggedin_enabled' => 0,			// Also use JS forms for logged in users
 			'cache_enabled' => 0,
 			'cache_enabled_widgets' => 0,
@@ -188,6 +188,7 @@ class CollectionSettings extends AbstractSettings
 			'allow_html_comment' => 1, // Allow HTML in comments
 			'track_unread_content' => 0, // Should we track unread content on the specific blog. It can be modified on the Features/Other settings form.
 			'allow_access' => 'public', // Allow access to blog; Values: 'public' - Everyone (Public Blog), 'users' - Logged in users, 'members' - Members of the blog
+			'http_protocol' => 'always_http', // SSL; Values: 'always_http' - Always use http, 'always_https' - Always use https, 'allow_both' - Allow both http and https as valid URLs.
 			// Assets URLs:
 			'rsc_assets_url_type' => 'relative', // Load generic /rsc/ assets from: 'basic', 'relative', 'absolute'
 			'rsc_assets_absolute_url' => '', // Absolute URL for setting 'rsc_assets_url_type' with selected option 'absolute'
@@ -219,6 +220,11 @@ class CollectionSettings extends AbstractSettings
 			'msgform_require_message' => 1, // Require message
 
 		// User directory:
+			'userdir_filter_gender' => 1,
+			'userdir_filter_level' => 1,
+			'userdir_filter_org' => 1,
+			'userdir_filter_criteria' => 1,
+			'userdir_filter_lastseen' => 1,
 			'userdir_picture' => 1,
 			'image_size_user_list' => 'crop-top-48x48',
 			'userdir_login' => 1,
@@ -243,6 +249,7 @@ class CollectionSettings extends AbstractSettings
 			'search_include_posts' => 1, // Include posts to results on disp=search
 			'search_include_cmnts' => 1, // Include comments to results on disp=search
 			'search_include_tags'  => 1, // Include tags to results on disp=search
+			'search_include_files' => 1, // Include files to results on disp=search
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
 
 		// Time frame settings:

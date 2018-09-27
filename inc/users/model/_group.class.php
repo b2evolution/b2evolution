@@ -241,7 +241,7 @@ class Group extends DataObject
 			}
 		}
 
-		if( $GroupSettings->get( 'perm_admin', $this->ID ) != 'normal' && 
+		if( $GroupSettings->get( 'perm_admin', $this->ID ) != 'normal' &&
 				$GroupSettings->get( 'perm_users', $this->ID ) != 'none' )
 		{	// Display warning when users permissions are not allowed because of not full access to back-office:
 			$Messages->add( T_('Permission to view other users will not work because users of this group have restricted back-office access.'), 'warning' );
@@ -320,7 +320,7 @@ class Group extends DataObject
 			$permvalue = false; // This will result in $perm == false always. We go on for the $Debuglog..
 		}
 
-		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'skins_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs', 'centralantispam', 'maintenance' );
+		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'skins_root', 'plugins_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs', 'centralantispam', 'maintenance' );
 		if( in_array( $permname, $pluggable_perms ) )
 		{
 			$permname = 'perm_'.$permname;

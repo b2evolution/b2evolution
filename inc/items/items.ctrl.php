@@ -1043,6 +1043,9 @@ switch( $action )
 
 		$Plugins->trigger_event ( 'AdminBeforeItemEditCreate', array ('Item' => & $edited_Item ) );
 
+		// Validate first enabled captcha plugin:
+		$Plugins->trigger_event_first_return( 'ValidateCaptcha', array( 'form_type' => 'item' ) );
+
 		if( !empty( $mass_create ) )
 		{	// ------ MASS CREATE ------
 			$Items = & create_multiple_posts( $edited_Item, param( 'paragraphs_linebreak', 'boolean', 0 ) );
@@ -1761,7 +1764,7 @@ switch( $action )
 		}
 
 		if( $action == 'append' )
-		{	// If we should append
+		{	// If we should append item and comments at the end with new dates
 			$SQL = new SQL( 'Get the latest comment of Item #'.$dest_Item->ID.' to append Item #'.$edited_Item->ID );
 			$SQL->SELECT( 'MAX( comment_date )' );
 			$SQL->FROM( 'T_comments' );
@@ -1790,7 +1793,18 @@ switch( $action )
 			$Comment->set( 'date', $edited_Item->get( 'datestart' ) );
 		}
 		$Comment->set( 'notif_status', $edited_Item->get( 'notifications_status' ) );
-		$Comment->set( 'notif_flags', $edited_Item->get( 'notifications_flags' ) );
+		$notifications_flags = $edited_Item->get( 'notifications_flags' );
+		if( is_array( $notifications_flags ) )
+		{
+			foreach( $notifications_flags as $n => $notifications_flag )
+			{
+				if( ! in_array( $notifications_flag, array( 'moderators_notified', 'members_notified', 'community_notified' ) ) )
+				{	// Skip values which are not allowed for comment:
+					unset( $notifications_flags[ $n ] );
+				}
+			}
+		}
+		$Comment->set( 'notif_flags', $notifications_flags );
 		if( $Comment->dbinsert() )
 		{	// If comment has been created try to copy all attachments from source Item:
 			$DB->query( 'UPDATE T_links
@@ -1799,8 +1813,8 @@ switch( $action )
 			$DB->query( 'UPDATE T_links
 				  SET link_position = "aftermore"
 				WHERE link_cmt_ID = '.$Comment->ID.'
-					AND link_position != "teaser"
-					AND link_position != "aftermore"' );
+				  AND link_position != "teaser"
+				  AND link_position != "aftermore"' );
 		}
 		// Move all comments of the source Item to the target Item:
 		if( isset( $append_comment_timestamp ) )
@@ -1814,8 +1828,8 @@ switch( $action )
 			foreach( $source_comment_IDs as $source_comment_ID )
 			{
 				$DB->query( 'UPDATE T_comments
-						SET comment_item_ID = '.$dest_Item->ID.',
-						    comment_date = '.$DB->quote( date2mysql( $append_comment_timestamp ) ).'
+					  SET comment_item_ID = '.$dest_Item->ID.',
+					      comment_date = '.$DB->quote( date2mysql( $append_comment_timestamp ) ).'
 					WHERE comment_ID = '.$source_comment_ID );
 				// Increment 1 minute for each next appending comment:
 				$append_comment_timestamp += 60;
@@ -1824,9 +1838,13 @@ switch( $action )
 		else
 		{	// Merge comments with saving their dates:
 			$DB->query( 'UPDATE T_comments
-						SET comment_item_ID = '.$dest_Item->ID.'
-					WHERE comment_item_ID = '.$edited_Item->ID );
+				  SET comment_item_ID = '.$dest_Item->ID.'
+				WHERE comment_item_ID = '.$edited_Item->ID );
 		}
+		// Copy all slugs from source Item to destination Item:
+		$DB->query( 'UPDATE T_slug
+				  SET slug_itm_ID = '.$dest_Item->ID.'
+				WHERE slug_itm_ID = '.$edited_Item->ID );
 		// Delete the source Item completely:
 		$edited_Item_ID = $edited_Item->ID;
 		$edited_Item->dbdelete();
@@ -1887,6 +1905,8 @@ function init_list_mode()
 
 	// Set different filterset name for each different tab and tab_type
 	$filterset_name = ( $tab == 'type' ) ? $tab.'_'.utf8_strtolower( $tab_type ) : $tab;
+	// Append collection ID to filterset in order to keep filters separately per collection:
+	$filterset_name .= $Blog->ID;
 
 	// Create empty List:
 	$ItemList = new ItemList2( $Blog, NULL, NULL, $UserSettings->get('results_per_page'), 'ItemCache', $items_list_param_prefix, $filterset_name /* filterset name */ ); // COPY (func)
@@ -1914,6 +1934,17 @@ function init_list_mode()
 			require_js_helper( 'colorbox' );
 
 			$AdminUI->breadcrumbpath_add( T_('All'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
+			break;
+
+		case 'summary':
+			$ItemList->set_default_filters( array(
+					'itemtype_usage' => NULL // All types
+				) );
+
+			// require colorbox js
+			require_js_helper( 'colorbox' );
+
+			$AdminUI->breadcrumbpath_add( T_('Summary'), '?ctrl=items&amp;blog=$blog$&amp;tab=summary&amp;filter=restore' );
 			break;
 
 		case 'manual':
@@ -2017,6 +2048,17 @@ switch( $action )
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'filter' => 'restore' ) );
 
+		// Display item's title and ID in <title> tag instead of default breadcrumb path:
+		$AdminUI->htmltitle = $edited_Item->get_title( array(
+				'title_field' => 'short_title,title',
+				'link_type'   => 'none',
+			) );
+		if( empty( $AdminUI->htmltitle ) )
+		{	// Display collection short name when item has no yet e.g. on creating or when titles are disabled for current Item Type:
+			$AdminUI->htmltitle = $Blog->get( 'shortname' );
+		}
+		$AdminUI->htmltitle .= ' ('.( empty( $edited_Item->ID ) ? T_('New') : '#'.$edited_Item->ID ).')';
+
 		switch( $action )
 		{
 			case 'edit':
@@ -2111,10 +2153,17 @@ switch( $action )
 	break;
 
 	case 'view':
+	case 'history_compare':
+	case 'history_details':
 		// We're displaying a SINGLE specific post:
 		$item_ID = param( 'p', 'integer', true );
 
 		$AdminUI->title_titlearea = T_('View post & comments');
+
+		if( ! isset( $tab ) )
+		{
+			$tab = 'full';
+		}
 
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'tab' => $tab, 'filter' => 'restore' ) );
@@ -2163,7 +2212,7 @@ else
 	$AdminUI->append_path_level( empty( $tab ) ? 'full' : $tab );
 }
 
-if( ( isset( $tab ) && in_array( $tab, array( 'full', 'type', 'tracker' ) ) ) || strpos( $action, 'edit' ) === 0 )
+if( ( isset( $tab ) && in_array( $tab, array( 'full', 'summary', 'type', 'tracker' ) ) ) || strpos( $action, 'edit' ) === 0 )
 { // Init JS to autcomplete the user logins
 	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 	// Initialize date picker for _item_expert.form.php
@@ -2172,7 +2221,7 @@ if( ( isset( $tab ) && in_array( $tab, array( 'full', 'type', 'tracker' ) ) ) ||
 
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
-init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
+init_popover_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
 /* fp> I am disabling this. We haven't really used per-blof styles yet and at the moment it creates interference with boostrap Admin
 // Load the appropriate ITEM/POST styles depending on the blog's skin:
@@ -2193,7 +2242,7 @@ if( !empty( $Blog ) )
 }
 */
 
-if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action, 'new' ) !== false )
+if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action, 'new' ) !== false || $action == 'copy' )
 {	// Initialize js to autocomplete usernames in post/comment form
 	init_autocomplete_usernames_js();
 	// Require colorbox js:
@@ -2471,6 +2520,11 @@ switch( $action )
 					$AdminUI->disp_view( 'items/views/_item_list_full.view.php' );
 					break;
 
+				case 'summary':
+					// Display VIEW:
+					$AdminUI->disp_view( 'items/views/_item_list_summary.view.php' );
+					break;
+
 				case 'manual':
 					// Display VIEW:
 					$AdminUI->disp_view( 'items/views/_item_list_manual.view.php' );
@@ -2487,13 +2541,13 @@ switch( $action )
 			// would be used for moderation rules.
 			if( $Blog->get( 'notes' ) )
 			{
-				$block_item_Widget = new Widget( 'block_item' );
-				$block_item_Widget->title = T_('Notes');
-				// show a quicklink to edit if user has permission:
-/* fp> TODO: use an action icon (will appear on the right)
+				$edit_link = '';
 				if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
-					$block_item_Widget->title .=	' <a href="?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#ffield_blog_notes">'.get_icon( 'edit' ).'</a>';
-*/
+				{
+					$edit_link = action_icon( T_('Edit').'...', 'edit_button', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID, ' '.T_('Edit').'...', 3, 4, array( 'class' => 'btn btn-default btn-sm' ) );
+				}
+				$block_item_Widget = new Widget( 'block_item' );
+				$block_item_Widget->title = '<span class="pull-right panel_heading_action_icons">'.$edit_link.'</span>'.T_('Notes');
 				$block_item_Widget->disp_template_replaced( 'block_start' );
 				$Blog->disp( 'notes', 'htmlbody' );
 				$block_item_Widget->disp_template_replaced( 'block_end' );

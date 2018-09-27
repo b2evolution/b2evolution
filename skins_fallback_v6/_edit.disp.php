@@ -64,7 +64,7 @@ $Form->switch_template_parts( $params['edit_form_params'] );
 $ItemType = & $edited_Item->get_ItemType();
 if( $ItemType && ( $ItemType->get( 'front_instruction' ) == 1 ) && $ItemType->get( 'instruction' ) )
 {
-	echo '<div class="alert alert-info fade in">'.$ItemType->get( 'instruction' ).'</div>';
+	echo '<div class="alert alert-info fade in evo_instruction">'.$ItemType->get( 'instruction' ).'</div>';
 }
 
 // ================================ START OF EDIT FORM ================================
@@ -110,6 +110,10 @@ $Form->begin_form( 'inskin', '', $form_params );
 	{ // DO NOT ADD HIDDEN FIELDS IF THEY ARE NOT SET
 		// These fields will be set only in case when switch tab from admin editing to in-skin editing
 		// Fields used in "advanced" form, but not here:
+		if( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' )
+		{
+			$Form->hidden( 'post_short_title', $edited_Item->get( 'short_title' ) );
+		}
 		$Form->hidden( 'post_comment_status', $edited_Item->get( 'comment_status' ) );
 		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
@@ -135,7 +139,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
 		$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
 		$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
-		$Form->hidden( 'item_order', $edited_Item->order );
 
 		$creator_User = $edited_Item->get_creator_User();
 		$Form->hidden( 'item_owner_login', $creator_User->login );
@@ -338,40 +341,16 @@ if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
 	$Form->hidden( 'google_map_type', $edited_Item->get_setting( 'map_type' ) );
 }
 
-// ################### PROPERTIES ###################
-if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
-{ // Custom fields are hidden by otem type
-	display_hidden_custom_fields( $Form, $edited_Item );
-}
-else
-{ // Custom fields should be displayed
-	$custom_fields = $edited_Item->get_type_custom_fields();
+// ################### CUSTOM FIELDS ###################
+$custom_fields = $edited_Item->get_type_custom_fields();
+if( count( $custom_fields ) > 0 )
+{
+	$Form->begin_fieldset( T_('Additional fields'), array( 'id' => 'itemform_custom_fields' ) );
 
-	if( count( $custom_fields ) > 0 )
-	{
-		$Form->begin_fieldset( T_('Additional fields'), array( 'id' => 'itemform_custom_fields' ) );
+	// Display inputs to edit custom fields:
+	display_editable_custom_fields( $Form, $edited_Item );
 
-		foreach( $custom_fields as $custom_field )
-		{	// Display each custom field:
-			switch( $custom_field['type'] )
-			{
-				case 'double':
-					$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, $custom_field['label'], $custom_field['note'].' <code>'.$custom_field['name'].'</code>' );
-					break;
-				case 'varchar':
-					$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, $custom_field['label'], '<br />'.$custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
-					break;
-				case 'text':
-					$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
-					break;
-				case 'html':
-					$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
-					break;
-			}
-		}
-
-		$Form->end_fieldset();
-	}
+	$Form->end_fieldset();
 }
 
 // ####################### ATTACHMENTS/LINKS #########################

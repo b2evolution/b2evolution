@@ -49,17 +49,6 @@ $quiet = 0;
 if( $is_cli )
 { // called through Command Line Interface, handle args:
 
-	if( empty( $secure_htsrv_url ) )
-	{ // Initialize this url when it is empty:
-		global $ReqHost;
-		if( empty( $ReqHost ) )
-		{ // In CLI mode the HOST is unknown, so use $baseurl from the config:
-			global $baseurl;
-			$ReqHost = $baseurl;
-		}
-		$secure_htsrv_url = get_htsrv_url( true );
-	}
-
 	// Load required functions ( we need to load here, because in CLI mode it is not loaded )
 	load_funcs( '_core/_url.funcs.php' );
 

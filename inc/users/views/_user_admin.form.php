@@ -484,7 +484,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 	}
 	else
 	{
-		$account_close_date = 'n/a';
+		$account_close_date = /* TRANS: "Not Available" */ T_('N/A');
 		//$days_on_site = ( round( ( $servertimenow - $registration_ts ) / 86400/* 60*60*24 */) );
 	}
 
@@ -645,37 +645,4 @@ jQuery( '#edited_domain_status, #edited_initial_referer_status, #edited_email_do
 	}
 } );
 <?php } ?>
-
-function get_whois_info( ip_address )
-{
-	var window_height = jQuery( window ).height();
-	var margin_size_height = 20;
-	var modal_height = window_height - ( margin_size_height * 2 );
-
-	openModalWindow(
-			'<span id="spinner" class="loader_img loader_user_report absolute_center" title="<?php echo T_('Querying WHOIS server...');?>"></span>',
-			'90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true, true );
-
-	jQuery.ajax(
-	{
-		type: 'GET',
-		url: '<?php echo get_htsrv_url().'async.php';?>',
-		data: {
-			action: 'get_whois_info',
-			query: ip_address,
-			window_height: modal_height
-		},
-		success: function( result )
-		{
-			if( ajax_response_is_correct( result ) )
-			{
-				result = ajax_debug_clear( result );
-				openModalWindow( result, '90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true );
-			}
-		}
-	} );
-
-	return false;
-}
-
 </script>

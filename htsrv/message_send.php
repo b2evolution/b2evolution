@@ -404,6 +404,8 @@ $Plugins->trigger_event( 'MessageFormSent', array(
 	'sender_email' => & $sender_address,
 	) );
 
+// Validate first enabled captcha plugin:
+$Plugins->trigger_event_first_return( 'ValidateCaptcha', array( 'form_type' => 'message' ) );
 
 $success_message = ( !$Messages->has_errors() );
 if( $success_message )
@@ -477,7 +479,7 @@ if( $success_message )
 
 		if( ! empty( $send_contact_method ) )
 		{	// Append a preferred contact method to the message text:
-			$send_message[1] = T_('Preferred contact method').': '.$send_contact_method;
+			$send_message[1] = T_('Reply method').': '.$send_contact_method;
 		}
 
 		if( ! empty( $message ) )

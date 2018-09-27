@@ -488,7 +488,7 @@ if( !$Messages->has_errors() )
 
 			if( empty( $selected_user_ID ) )
 			{	// Inform to select a remaining account if it is not selected yet:
-				$Messages->add( sprintf( T_('Please select a remaining account to merge with %s:'), get_user_identity_link( '', $merging_user_ID ) ), 'warning' );
+				$Messages->add( sprintf( T_('User data from account %s will be merged to the account you select below. Check a radio button and click the orange button at the bottom.'), get_user_identity_link( '', $merging_user_ID ) ), 'warning' );
 			}
 			else
 			{	// Check edit permissions for remaining user as well:
@@ -496,6 +496,56 @@ if( !$Messages->has_errors() )
 			}
 
 			// The merging process is executed in the template below by function display_users_merging_process().
+			break;
+
+		case 'delete_spammers':
+			// Delete selected users as spammers:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'users', 'edit', true );
+
+			$users = explode( ',', param( 'users', 'string' ) );
+
+			// Set this param in order to delete the users as spammer:
+			set_param( 'deltype', 'spammer' );
+
+			$deleted_spam_logins = array();
+			$not_deleted_spam_logins = array();
+			$UserCache = & get_UserCache();
+			$delspam_Messages = new Messages();
+			foreach( $users as $u => $user_ID )
+			{
+				if( ! ( $deleted_spam_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
+				{	// Skip if user is not found in DB by requested ID:
+					continue;
+				}
+				$deleted_spam_login = $deleted_spam_User->get( 'login' );
+				// Delete user as spammer:
+				if( $deleted_spam_User->dbdelete( $delspam_Messages ) )
+				{	// If user has been deleted:
+					$deleted_spam_logins[] = $deleted_spam_login;
+				}
+				else
+				{	// If user cannot be deleted by some reason:
+					$not_deleted_spam_logins[] = $deleted_spam_User->get_identity_link();
+				}
+			}
+
+			if( count( $deleted_spam_logins ) > 0 )
+			{	// Display a message if at least one spammer have been deleted:
+				$Messages->add( sprintf( T_('Spammers %s have been deleted.'), implode( ', ', $deleted_spam_logins ) ), 'success' );
+			}
+			if( count( $not_deleted_spam_logins ) > 0 )
+			{	// Display a message if at least one spammer have NOT been deleted:
+				$Messages->add( sprintf( T_('Spammers %s could not been deleted.'), implode( ', ', $not_deleted_spam_logins ) ), 'error' );
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=users'.( count( $not_deleted_spam_logins ) > 0 ? '&action=spammers' : '' ), 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 			break;
 	}
 }
@@ -549,7 +599,7 @@ else
 
 			$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users' );
 			$AdminUI->top_block = get_user_quick_search_form();
-			if( $current_User->check_perm( 'users', 'moderate', false ) )
+			if( $current_User->check_perm( 'users', 'moderate' ) )
 			{	// Include to edit user level
 				require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 			}
@@ -634,8 +684,15 @@ switch( $action )
 
 		$edited_User->confirm_delete( $msg, 'user', $action, get_memorized( 'action' ), $confirm_messages, $delete_form_params );
 
-		// Display user identity form:
-		$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
+		if( $deltype == 'spammer' )
+		{	// Display user activity lists:
+			$user_tab = 'activity';
+			$AdminUI->disp_view( 'users/views/_user_activity.view.php' );
+		}
+		else
+		{	// Display user identity form:
+			$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
+		}
 		$AdminUI->disp_payload_end();
 
 		// Init JS for user reporting
@@ -668,6 +725,13 @@ switch( $action )
 
 		$AdminUI->disp_view( 'users/views/_user_list_tags.form.php' );
 
+		$AdminUI->disp_payload_end();
+		break;
+
+	case 'spammers':
+		memorize_param( 'action', 'string', '', $action );
+		$AdminUI->disp_payload_begin();
+		$AdminUI->disp_view( 'users/views/_user_list_spammers.view.php' );
 		$AdminUI->disp_payload_end();
 		break;
 

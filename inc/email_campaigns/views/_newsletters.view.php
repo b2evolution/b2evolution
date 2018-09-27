@@ -128,7 +128,6 @@ function newsletters_td_new_users( $enlt_ID )
 }
 $Results->cols[] = array(
 		'th' => T_('New users'),
-		'order' => 'enlt_ord',
 		'td' => '%newsletters_td_new_users( #enlt_ID# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center',

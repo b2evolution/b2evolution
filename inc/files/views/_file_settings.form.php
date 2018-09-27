@@ -155,6 +155,7 @@ $Form->begin_fieldset( T_('Accessible file roots').get_manual_link('accessible_f
 	$Form->checkbox( 'fm_enable_roots_user', $Settings->get('fm_enable_roots_user'), T_('Enable user directories'), T_('Check to enable root directories for users.' ) );
 	$Form->checkbox( 'fm_enable_roots_shared', $Settings->get('fm_enable_roots_shared'), T_('Enable shared directory'), T_('Check to enable shared root directory.' ) );
 	$Form->checkbox( 'fm_enable_roots_skins', $Settings->get('fm_enable_roots_skins'), T_('Enable skins directory'), T_('Check to enable root directory for skins.' ) );	// fp> note: meaning may change to 1 dir per (installed) skin
+	$Form->checkbox( 'fm_enable_roots_plugins', $Settings->get('fm_enable_roots_plugins'), T_('Enable plugins directory'), T_('Check to enable root directory for plugins.' ) );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('File creation options'), array( 'id' => 'ffset_filecreate', 'class' => 'additional_file_settings' ) );

@@ -146,7 +146,7 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	 * @var Hit
 	 */
 	global $Hit;
-	global $baseurl, $Collection, $Blog, $htsrv_url_sensitive, $ReqHost, $ReqURL, $dispatcher;
+	global $baseurl, $Collection, $Blog, $htsrv_url, $ReqHost, $ReqURL, $dispatcher;
 	global $Session, $Debuglog, $Messages;
 	global $http_response_code, $allow_redirects_to_different_domain;
 
@@ -169,19 +169,24 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	{ // $dispatcher is DEPRECATED and pages should use $admin_url URL instead, but at least we're staying on the same site:
 		$external_redirect = false;
 	}
-	elseif( strpos($redirect_to, $baseurl) === 0 )
+	elseif( strpos( $redirect_to, $baseurl ) === 0 )
 	{
 		$Debuglog->add('Redirecting within $baseurl, all is fine.', 'request' );
 		$external_redirect = false;
 	}
-	elseif( strpos($redirect_to, $htsrv_url_sensitive) === 0 )
-	{
-		$Debuglog->add('Redirecting within $htsrv_url_sensitive, all is fine.', 'request' );
+	elseif( strpos( $redirect_to, force_https_url( $baseurl ) ) === 0 )
+	{	// Protocol https may be forced for all login, registration and etc. pages:
+		$Debuglog->add('Redirecting within https of $baseurl, all is fine.', 'request' );
 		$external_redirect = false;
 	}
-	elseif( !empty($Blog) && strpos($redirect_to, $Blog->gen_baseurl()) === 0 )
+	elseif( ! empty( $Blog ) && strpos( $redirect_to, $Blog->gen_baseurl() ) === 0 )
 	{
 		$Debuglog->add('Redirecting within current collection URL, all is fine.', 'request' );
+		$external_redirect = false;
+	}
+	elseif( ! empty( $Blog ) && strpos( $redirect_to, force_https_url( $Blog->gen_baseurl() ) ) === 0 )
+	{	// Protocol https may be forced for all login, registration and etc. pages:
+		$Debuglog->add('Redirecting within https of current collection URL, all is fine.', 'request' );
 		$external_redirect = false;
 	}
 
@@ -457,7 +462,7 @@ function get_request_title( $params = array() )
 			'userprefs_text'      => T_('User preferences'),
 			'user_text'           => T_('User: %s'),
 			'users_text'          => T_('Users'),
-			'closeaccount_text'   => T_('Close account'),
+			'closeaccount_text'   => T_('Account closure'),
 			'subs_text'           => T_('Notifications & Subscriptions'),
 			'visits_text'         => T_('Who visited my profile?'),
 			'comments_text'       => T_('Latest Comments'),
@@ -475,6 +480,8 @@ function get_request_title( $params = array() )
 			'tags_text'           => T_('Tags'),
 			'flagged_text'        => T_('Flagged posts'),
 			'help_text'           => T_('In case of issues with this site...'),
+			'compare_text'           => /* TRANS: title for disp=compare */ T_('%s compared'),
+			'compare_text_separator' => /* TRANS: title separator for disp=compare */ ' '.T_('vs').' ',
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -831,6 +838,32 @@ function get_request_title( $params = array() )
 
 		case 'help':
 			$r[] = $params['help_text'];
+			break;
+
+		case 'compare':
+			// We are requesting the compare list:
+			$items = trim( param( 'items', '/^[\d,]*$/' ), ',' );
+
+			if( ! empty( $items ) )
+			{	// It at least one item is selected to compare
+				$items = explode( ',', $items );
+
+				// Load all requested posts into the cache:
+				$ItemCache = & get_ItemCache();
+				$ItemCache->load_list( $items );
+
+				$compare_item_titles = array();
+				foreach( $items as $item_ID )
+				{
+					if( $Item = & $ItemCache->get_by_ID( $item_ID, false, false ) )
+					{	// Use only existing Item:
+						$compare_item_titles[] = $Item->get( 'title' );
+					}
+				}
+
+				$r[] = sprintf( $params['compare_text'], implode( $params['compare_text_separator'], $compare_item_titles ) );
+			}
+
 			break;
 
 		case 'posts':
@@ -1542,10 +1575,24 @@ function init_userfields_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 /**
  * Registers headlines required to display a bubbletip to the right of plugin help icon.
  *
+ * @deprecated Use function init_popover_js()
+ *
  * @param string alias, url or filename (relative to rsc/css, rsc/js) for JS/CSS files
  * @param string Library: 'bubbletip', 'popover'
  */
 function init_plugins_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
+{
+	init_popover_js( $relative_to, $library );
+}
+
+
+/**
+ * Registers headlines required to display a bubbletip to the right of plugin, widget, custom fields help icon.
+ *
+ * @param string alias, url or filename (relative to rsc/css, rsc/js) for JS/CSS files
+ * @param string Library: 'bubbletip', 'popover'
+ */
+function init_popover_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 {
 	require_js( '#jquery#', $relative_to );
 
@@ -1604,6 +1651,67 @@ function init_results_js( $relative_to = 'rsc_url' )
 {
 	require_js( '#jquery#', $relative_to ); // dependency
 	require_js( 'results.js', $relative_to );
+}
+
+
+/**
+ * Registers headlines for initialization of functions to work with affixed Messages
+ */
+function init_affix_messages_js( $offset = 50 )
+{
+	global $display_mode;
+
+	if( isset( $display_mode ) && $display_mode == 'js' )
+	{	// Don't use affixed Messages in JS mode from modal windows:
+		return;
+	}
+
+	add_js_headline( '
+	jQuery( document ).ready( function()
+	{
+		var msg_obj = jQuery( ".affixed_messages" );
+		var msg_offset = '.format_to_js( $offset == '' ? 50 : $offset ).';
+
+		if( msg_obj.length == 0 )
+		{ // No Messages, exit
+			return;
+		}
+
+		msg_obj.wrap( "<div class=\"msg_wrapper\"></div>" );
+		var wrapper = msg_obj.parent();
+
+		msg_obj.affix( {
+				offset: {
+					top: function() {
+						return wrapper.offset().top - msg_offset - parseInt( msg_obj.css( "margin-top" ) );
+					}
+				}
+			} );
+
+		msg_obj.on( "affix.bs.affix", function()
+			{
+				wrapper.css( { "min-height": msg_obj.outerHeight( true ) } );
+
+				msg_obj.css( { "width": msg_obj.outerWidth(), "top": msg_offset, "z-index": 99999 } );
+
+				jQuery( window ).on( "resize", function()
+					{ // This will resize the Messages based on the wrapper width
+						msg_obj.css( { "width": wrapper.css( "width" ) } );
+					});
+			} );
+
+		msg_obj.on( "affixed-top.bs.affix", function()
+			{
+				wrapper.css( { "min-height": "" } );
+				msg_obj.css( { "width": "", "top": "", "z-index": "" } );
+			} );
+
+		jQuery( "div.alert", msg_obj ).on( "closed.bs.alert", function()
+			{
+				wrapper.css({ "min-height": msg_obj.outerHeight( true ) });
+			} );
+	} );
+	' );
 }
 
 
@@ -2119,26 +2227,6 @@ function credits( $params = array() )
 
 
 /**
- * Get rating as 5 stars
- *
- * @param integer Number of stars
- * @param string Class name
- * @return string Template for star rating
- */
-function get_star_rating( $stars, $class = 'not-used-any-more' )
-{
-	if( is_null( $stars ) )
-	{
-		return;
-	}
-
-	$average = ceil( ( $stars ) / 5 * 100 );
-
-	return '<div class="star_rating"><div style="width:'.$average.'%">'.$stars.' stars</div></div>';
-}
-
-
-/**
  * Display rating as 5 stars
  *
  * @param integer Number of stars
@@ -2146,7 +2234,7 @@ function get_star_rating( $stars, $class = 'not-used-any-more' )
  */
 function star_rating( $stars, $class = 'not-used-any-more' )
 {
-	echo get_star_rating( $stars, $class );
+	echo get_star_rating( $stars );
 }
 
 
@@ -2673,7 +2761,7 @@ function display_login_js_handler( $params )
 
 		jQuery.ajax({
 			type: 'POST',
-			url: '<?php echo get_htsrv_url(); ?>anon_async.php',
+			url: '<?php echo get_htsrv_url( 'login' ); ?>anon_async.php',
 			data: {
 				'<?php echo $dummy_fields[ 'login' ]; ?>': username,
 				'action': 'get_user_salt',
@@ -2759,7 +2847,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 	$params = array_merge( array(
 			'form_before'     => '',
 			'form_after'      => '',
-			'form_action'     => get_htsrv_url( true ).'login.php',
+			'form_action'     => get_htsrv_url( 'login' ).'login.php',
 			'form_name'       => 'lostpass_form',
 			'form_class'      => 'fform',
 			'form_template'   => NULL,
@@ -2869,7 +2957,7 @@ function display_activateinfo( $params )
 			'use_form_wrapper' => true,
 			'form_before'      => '',
 			'form_after'       => '',
-			'form_action'      => get_htsrv_url( true ).'login.php',
+			'form_action'      => get_htsrv_url( 'login' ).'login.php',
 			'form_name'        => 'form_validatemail',
 			'form_class'       => 'fform',
 			'form_layout'      => 'fieldset',
@@ -2998,7 +3086,7 @@ function display_activateinfo( $params )
 
 		echo $params['use_form_wrapper'] ? $params['form_before'] : '';
 
-		$Form = new Form( get_htsrv_url( true ).'login.php', 'form_validatemail', 'post', 'fieldset' );
+		$Form = new Form( get_htsrv_url( 'login' ).'login.php', 'form_validatemail', 'post', 'fieldset' );
 
 		if( ! empty( $params['form_template'] ) )
 		{ // Switch layout to template from array
@@ -3009,7 +3097,7 @@ function display_activateinfo( $params )
 
 		$Form->add_crumb( 'validateform' );
 		$Form->hidden( 'action', 'activateacc_sec' );
-		$Form->hidden( 'redirect_to', url_rel_to_same_host( $redirect_to, get_htsrv_url( true ) ) );
+		$Form->hidden( 'redirect_to', url_rel_to_same_host( $redirect_to, get_htsrv_url( 'login' ) ) );
 		$Form->hidden( 'reqID', 1 );
 		$Form->hidden( 'sessID', $Session->ID );
 
@@ -3052,7 +3140,7 @@ function display_password_indicator( $params = array() )
 
 	echo "<script type='text/javascript'>
 	// Load password strength estimation library
-	(function(){var a;a=function(){var a,b;b=document.createElement('script');b.src='".$rsc_url."js/zxcvbn.js';b.type='text/javascript';b.async=!0;a=document.getElementsByTagName('script')[0];return a.parentNode.insertBefore(b,a)};null!=window.attachEvent?window.attachEvent('onload',a):window.addEventListener('load',a,!1)}).call(this);
+	(function(){var a;a=function(){var a,b;b=document.createElement('script');b.src='".force_https_url( $rsc_url, 'login' )."js/zxcvbn.js';b.type='text/javascript';b.async=!0;a=document.getElementsByTagName('script')[0];return a.parentNode.insertBefore(b,a)};null!=window.attachEvent?window.attachEvent('onload',a):window.addEventListener('load',a,!1)}).call(this);
 
 	// Call 'passcheck' function when document is loaded
 	if( document.addEventListener )
@@ -3351,7 +3439,7 @@ function display_login_validator( $params = array() )
 			jQuery( "#login_status" ).html( login_icon_load );
 			jQuery.ajax( {
 				type: "POST",
-				url: "'.get_htsrv_url().'anon_async.php",
+				url: "'.get_htsrv_url( 'login' ).'anon_async.php",
 				data: "action=validate_login&login=" + jQuery( this ).val(),
 				success: function( result )
 				{
@@ -3591,4 +3679,86 @@ function init_fineuploader_js_lang_strings()
 		/* TRANS: Abbr. for Terabytes */.TS_('TB').'\'];' );
 }
 
+
+/**
+ * Get rating stars template
+ *
+ * @param float Rating value, e-g: 2 - display 2 active stars of default 5, 4.33 - display 4 active stars and 5 star is filled for 33%
+ * @param integer Total number of stars
+ * @param array Additional parameters
+ * @return string HTML of stars
+ */
+function get_star_rating( $value, $stars_num = 5, $params = array() )
+{
+	global $b2evo_icons_type;
+
+	if( isset( $b2evo_icons_type ) && strpos( $b2evo_icons_type, 'fontawesome' ) !== false )
+	{	// Use font-awesome stars if it is allowed for current skin:
+		$icon_type = 'fa';
+		$default_params = array(
+			'stars_before'       => '<span class="evo_stars">',
+			'stars_star_full'    => '<i class="fa fa-star"></i>',
+			'stars_star_percent' => '<i class="fa fa-star evo_star_percent"><i class="fa fa-star" style="width:$percent$"></i></i>', // $percent$ is replaced with values like 10%, 67%
+			'stars_star_empty'   => '<i class="fa fa-star evo_star_empty"></i>',
+			'stars_after'        => '</span>',
+		);
+	}
+	else
+	{	// Use image stars for v5 skins:
+		$icon_type = 'img';
+		$default_params = array(
+			'stars_before'       => '<span class="evo_stars_img" style="width:$stars_width$px">',
+			'stars_star_full'    => '<i>*</i>',
+			'stars_star_percent' => '<i class="evo_stars_img_empty"><i style="width:$percent$">%</i></i>', // $percent$ is replaced with values like 10%, 67%
+			'stars_star_empty'   => '<i class="evo_stars_img_empty">-</i>',
+			'stars_after'        => '</span>',
+		);
+	}
+
+	$params = array_merge( $default_params, $params );
+
+	if( ! is_numeric( $stars_num ) )
+	{	// Fix for old function where second param was a string:
+		$stars_num = 5;
+	}
+
+	$stars_num = intval( $stars_num );
+
+	if( $stars_num < 1 )
+	{	// Nothing to display:
+		return '';
+	}
+
+	if( $icon_type == 'fa' )
+	{
+		$stars_template = $params['stars_before'];
+	}
+	else
+	{	// Image icons must have a specific width depending on number of stars:
+		// (16px is width of one image star icon)
+		$stars_template = str_replace( '$stars_width$', $stars_num * 16, $params['stars_before'] );
+	}
+
+	$full_stars_max = floor( $value );
+	$percents = round( ( $value - $full_stars_max ) * 100 );
+	for( $s = 1; $s <= $stars_num; $s++ )
+	{
+		if( $s == $full_stars_max + 1 && $percents > 0 )
+		{	// Percent star:
+			$stars_template .= str_replace( '$percent$', $percents.'%', $params['stars_star_percent'] );
+		}
+		elseif( $s > $full_stars_max )
+		{	// Empty star:
+			$stars_template .= $params['stars_star_empty'];
+		}
+		else
+		{	// Full star:
+			$stars_template .= $params['stars_star_full'];
+		}
+	}
+
+	$stars_template .= $params['stars_after'];
+
+	return $stars_template;
+}
 ?>

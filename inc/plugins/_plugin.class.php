@@ -830,7 +830,7 @@ class Plugin
 	 *
 	 * Each <b>class</b> of dependency can have the following types:
 	 *  - 'events_by_one': A list of eventlists that have to be provided by a single plugin,
-	 *                     e.g., <code>array( array('CaptchaPayload', 'CaptchaValidated') )</code>
+	 *                     e.g., <code>array( array('RequestCaptcha', 'ValidateCaptcha') )</code>
 	 *                     to look for a plugin that provides both events.
 	 *  - 'plugins':
 	 *    A list of plugins, either just the plugin's classname or an array with
@@ -1596,6 +1596,10 @@ class Plugin
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}.
 	 *   - 'Item': The {@link Item} that gets displayed (by reference).
+	 *   - 'Comment': The {@link Comment} that gets displayed (by reference).
+	 *   - 'Message': The {@link Message} that gets displayed (by reference).
+	 *   - 'EmailCampaign': The {@link EmailCampaign} that gets displayed (by reference).
+	 *   - 'Widget': The {@link Widget} that gets displayed (by reference).
 	 *   - 'preview': Is this only a preview?
 	 *   - 'dispmore': Does this include the "more" text (if available), which means "full post"?
 	 *   - 'view_type': What part of a post are we displaying: 'teaser', 'extension' or 'full'
@@ -3012,59 +3016,36 @@ class Plugin
 	// General events: {{{
 
 	/**
-	 * Event handler: general event to inject payload for a captcha test.
+	 * Event handler: Return data to display captcha html code
 	 *
-	 * This does not get called by b2evolution itself, but provides an interface
-	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
-	 * uses this event optionally to whitelist a user.
-	 *
-	 * @param array Associative array of parameters
-	 *   - 'Form': the {@link form} where payload should get added (by reference, OPTIONALLY!)
-	 *     If it's not given as param, you have to create an own form, if you need one.
-	 *   - 'form_use_fieldset': if a "Form" param is given and we use it, should we add
-	 *                          an own fieldset? (boolean, default "true", OPTIONALLY!)
-	 *   - 'key': A key that is associated to the caller of the event (string, OPTIONALLY!)
-	 * @return boolean True, if you have provided payload for a captcha test
+	 * @param array Associative array of parameters:
+	 *   - 'Form':          Form object
+	 *   - 'form_type':     Form type
+	 *   - 'form_position': Current form position where this event is called
+	 *   - 'captcha_info':  Default captcha info text(can be changed by this plugin)
+	 *   - 'captcha_template_question': Default HTML template for question text = '<span class="evo_captcha_question">$captcha_question$</span><br>'
+	 *   - 'captcha_template_answer':   Default HTML template for answer field = '<span class="evo_captcha_answer">$captcha_answer$</span><br>'
+	 * @return array Associative array of parameters:
+	 *   - 'captcha_position': Captcha position where current plugin must be displayed for the requested form type
+	 *   - 'captcha_html':     Captcha html code
+	 *   - 'captcha_info':     Captcha info text
 	 */
-	function CaptchaPayload( & $params )
+	function RequestCaptcha( & $params )
 	{
 	}
 
 
 	/**
 	 * Event handler: general event to validate a captcha which payload was added
-	 * through {@link CaptchaPayload()}.
+	 * through {@link RequestCaptcha()}.
 	 *
-	 * This does not get called by b2evolution itself, but provides an interface
-	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
-	 * uses this event optionally to whitelist a user.
-	 *
-	 * NOTE: if the action is verified/completed in total, you HAVE to call
-	 *       {@link CaptchaValidatedCleanup()}, so that the plugin can cleanup its data
+	 * NOTE: if the action is verified/completed in total, you HAVE to cleanup its data
 	 *       and is not vulnerable against multiple usage of the same captcha!
 	 *
 	 * @param array Associative array of parameters
-	 *   - 'validate_error': you can optionally set this, if you want to give a reason
-	 *     of the failure. This is optionally and meant to be used by other plugins
-	 *     that trigger this event.
 	 * @return boolean true if the catcha could be validated
 	 */
-	function CaptchaValidated( & $params )
-	{
-	}
-
-
-	/**
-	 * Event handler: general event to be called after an action has been taken, which
-	 * involved {@link CaptchaPayload()} and {@link CaptchaValidated()}.
-	 *
-	 * This is meant to cleanup generated data for the Captcha test.
-	 *
-	 * This does not get called by b2evolution itself, but provides an interface
-	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
-	 * uses this event optionally to whitelist a user.
-	 */
-	function CaptchaValidatedCleanup( & $params )
+	function ValidateCaptcha( & $params )
 	{
 	}
 
@@ -3368,7 +3349,7 @@ class Plugin
 	 * Get the URL to call a plugin method through http. This links to the /htsrv/call_plugin.php
 	 * file.
 	 *
-	 * It uses either {@link $htsrv_url} or {@link $htsrv_url_sensitive} (if {@link $ReqHost} is on https).
+	 * It uses either {@link $htsrv_url} or {@link https version of $htsrv_url} (if {@link $ReqHost} is on https).
 	 *
 	 * NOTE: AJAX callbacks are required to be on the same domain/protocol, so if you're using absolute
 	 *       blog URLs on different domains you must set {@link $htsrv_url} dynamically, to use the same domain!
@@ -3452,7 +3433,7 @@ class Plugin
 	 *
 	 * @param array|string A single event or a list thereof
 	 * @param boolean Make sure there's at least one plugin that provides them all?
-	 *                This is useful for event pairs like "CaptchaPayload" and "CaptchaValidated", which
+	 *                This is useful for event pairs like "RequestCaptcha" and "ValidateCaptcha", which
 	 *                should be served by the same plugin.
 	 * @return boolean
 	 */
@@ -3661,20 +3642,15 @@ class Plugin
 			if( $use_tooltip )
 			{ // Add these data only for tooltip
 				$link_attribs['class'] = 'action_icon help_plugin_icon';
-				$link_attribs['rel'] = format_to_output( isset( $this->{$params['tooltip_field']} ) ? $this->{$params['tooltip_field']} : $this->long_desc, 'htmlspecialchars' );
+				$tooltip_text = isset( $this->{$params['tooltip_field']} ) ? $this->{$params['tooltip_field']} : $this->long_desc;
+				$tooltip_text .= $params['info_suffix_text'];
+				$link_attribs['data-popover'] = format_to_output( $tooltip_text, 'htmlspecialchars' );
+				$link_attribs['data-placement'] = $params['tooltip_placement'];
 				if( isset( $params['icon_color'] ) )
 				{
 					$link_attribs['style'] = 'color: '.$params['icon_color'].';';
 				}
-				if( ! empty( $params['info_suffix_text'] ) )
-				{
-					$link_attribs['data-info-suffix-text'] = format_to_output( $params['info_suffix_text'], 'htmlspecialchars' );
-				}
-				$link_attribs['data-tooltip-placement'] = $params['tooltip_placement'];
 			}
-
-			// Display additional info for help plugin icon only one time. It is used on plugins.js
-			//$info_suffix_text = $params['info_suffix_text'];
 		}
 		elseif( $target == '$readme' )
 		{ // README

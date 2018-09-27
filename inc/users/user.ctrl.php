@@ -72,6 +72,10 @@ if( ! is_null( $user_ID ) )
 		    && $edited_User->ID != $current_User->ID )
 		{ // user is only allowed to _view_ other user's profiles
 			$Messages->add( T_('You have no permission to edit other users!'), 'error' );
+			if( in_array( $user_tab, array( 'pwdchange', 'marketing', 'admin', 'sessions', 'activity' ) ) )
+			{	// Don't allow the restricted pages for view:
+				$user_tab = 'profile';
+			}
 			$action = 'view';
 		}
 		elseif( $demo_mode && ( $edited_User->ID <= 7 ) )
@@ -658,6 +662,28 @@ if( !$Messages->has_errors() )
 			}
 			break;
 
+		case 'delete_all_polls':
+			// Delete all polls posted by the user
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			// Check edit permissions:
+			$current_User->can_moderate_user( $edited_User->ID, true );
+
+			if( param( 'confirm', 'integer', 0 ) )
+			{	// confirmed
+				if( $edited_User->delete_polls() )
+				{	// The polls were deleted successfully
+					$Messages->add( T_('The polls owned by the user were deleted.'), 'success' );
+
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=user&user_tab=activity&user_ID='.$user_ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+				}
+			}
+			break;
+
 		case 'delete_all_userdata':
 			// Delete user and all his contributions
 
@@ -680,6 +706,7 @@ if( !$Messages->has_errors() )
 				$edited_User->delete_comments();
 				$edited_User->delete_posts( 'created|edited' );
 				$edited_User->delete_blogs();
+				$edited_User->delete_polls();
 				if( $edited_User->dbdelete( $Messages ) )
 				{	// User and all his contributions were deleted successfully
 					$Messages->add( sprintf( T_('The user &laquo;%s&raquo; and all his contributions were deleted.'), $user_login ), 'success' );
@@ -886,6 +913,9 @@ if( $display_mode != 'js')
 			require_css( '#jcrop_css#', 'rsc_url' );
 			break;
 		case 'pwdchange':
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
 			$AdminUI->breadcrumbpath_add( T_('Change password'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 
 			// Set an url for manual page:
@@ -1050,6 +1080,9 @@ switch( $action )
 				if( $display_mode != 'js' )
 				{ // Init JS for form to delete the posts, the comments and the messages of user
 					echo_user_deldata_js();
+
+					// Init JS for WHOIS query window
+					echo_whois_js_bootstrap();
 				}
 				break;
 			case 'sessions':
@@ -1058,9 +1091,10 @@ switch( $action )
 				break;
 			case 'activity':
 				// Display user activity lists:
+				load_funcs( 'polls/model/_poll.funcs.php' );
 				$AdminUI->disp_payload_begin();
 
-				if( in_array( $action, array( 'delete_all_blogs', 'delete_all_posts_created', 'delete_all_posts_edited', 'delete_all_comments', 'delete_all_messages', 'delete_all_userdata' ) ) )
+				if( in_array( $action, array( 'delete_all_blogs', 'delete_all_posts_created', 'delete_all_posts_edited', 'delete_all_comments', 'delete_all_messages', 'delete_all_polls', 'delete_all_userdata' ) ) )
 				{	// We need to ask for confirmation before delete:
 					param( 'user_ID', 'integer', 0 , true ); // Memorize user_ID
 					// Create Data Object to user only one method confirm_delete()
@@ -1103,6 +1137,14 @@ switch( $action )
 							if( $messages_count > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
 							{	// Display a confirm message if curent user can delete the messages sent by the edited user
 								$confirm_message = sprintf( T_('Delete %d private messages sent by the user?'), $messages_count );
+							}
+							break;
+
+						case 'delete_all_polls':
+							$polls_count = $edited_User->get_num_polls();
+							if( $polls_count > 0 )
+							{	// Display a confirm message if curent user can delete the polls owned by the edited user
+								$confirm_message = sprintf( T_('Delete %d polls owned by the user?'), $polls_count );
 							}
 							break;
 

@@ -330,7 +330,7 @@ class LinkItem extends LinkOwner
 	{
 		if( ! empty( $this->Item ) && ! $this->is_temp() )
 		{	// Update Item if it exists
-			$this->Item->update_last_touched_date();
+			$this->Item->update_last_touched_date( true, true, false, true );
 		}
 	}
 

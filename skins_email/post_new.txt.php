@@ -30,8 +30,13 @@ $recipient_User = $params['recipient_User'];
 $Item = $params['Item'];
 $Collection = $Blog = & $Item->get_Blog();
 
+// Add this info line if user was mentioned in the post content:
+$mentioned_user_message = ( $params['notify_type'] == 'post_mentioned' ? T_('You were mentioned in this post.')."\n\n" : '' );
+
 if( $params['notify_full'] )
 {	/* Full notification */
+	echo $mentioned_user_message;
+
 	// Calculate length for str_pad to align labels:
 	$pad_len = max( utf8_strlen( T_('Collection') ), utf8_strlen( T_('Author') ), utf8_strlen( T_('Title') ), utf8_strlen( T_('Url') ), utf8_strlen( T_('Content') ) );
 
@@ -81,6 +86,9 @@ else
 {	/* Short notification */
 	echo sprintf( T_( '%s created a new post on %s with title %s.' ), $Item->creator_User->get_username(), '"'.$Blog->get('shortname').'"', '"'.$Item->get('title').'"' );
 	echo "\n\n";
+
+	echo $mentioned_user_message;
+
 	echo T_( 'To read the full content of the post click here:' ).' ';
 	echo $Item->get_permanent_url( '', '', '&' );
 	echo "\n";
@@ -95,28 +103,40 @@ else
 }
 
 // Footer vars:
-if( $params['notify_type'] == 'moderator' )
-{ // moderation email
-	if( $params['is_new_item'] )
-	{	// about new item:
-		$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating new posts, click here' );
-		$unsubscribe_type = 'post_moderator';
-		$unsubscribe_params = '';
-	}
-	else
-	{	// about updated item:
-		$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating updated posts, click here' );
-		$unsubscribe_type = 'post_moderator_edit';
-		$unsubscribe_params = '&amp;coll_ID='.$Item->get_blog_ID();
-	}
-	$params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when a post may need moderation.' )."\n";
-	$params['unsubscribe_text'] .= $unsubscribe_text.': '
+switch( $params['notify_type'] )
+{
+	case 'moderator':
+		// moderation email
+		if( $params['is_new_item'] )
+		{	// about new item:
+			$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating new posts, click here' );
+			$unsubscribe_type = 'post_moderator';
+			$unsubscribe_params = '';
+		}
+		else
+		{	// about updated item:
+			$unsubscribe_text = T_( 'If you don\'t want to receive any more notifications about moderating updated posts, click here' );
+			$unsubscribe_type = 'post_moderator_edit';
+			$unsubscribe_params = '&amp;coll_ID='.$Item->get_blog_ID();
+		}
+		$params['unsubscribe_text'] = T_( 'You are a moderator in this blog, and you are receiving notifications when a post may need moderation.' )."\n";
+		$params['unsubscribe_text'] .= $unsubscribe_text.': '
 			.get_htsrv_url().'quick_unsubscribe.php?type='.$unsubscribe_type.$unsubscribe_params.'&user_ID=$user_ID$&key=$unsubscribe_key$';
-}
-else
-{ // subscription email
-	$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notifications about new posts on this blog, click here:' ).' '.
-			get_htsrv_url().'quick_unsubscribe.php?type=coll_post&user_ID=$user_ID$&coll_ID='.$Blog->ID.'&key=$unsubscribe_key$';
+		break;
+
+	case 'post_mentioned':
+		// user is mentioned in the post
+		$params['unsubscribe_text'] = T_( 'You were mentioned in this post, and you are receiving notifications when anyone mention your name in a post.' )."\n"
+			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in a post, click here' ).': '
+			.get_htsrv_url().'quick_unsubscribe.php?type=post_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$';
+		break;
+
+	case 'subscription':
+	default:
+		// subscription email
+		$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notifications about new posts on this blog, click here:' ).' '
+			.get_htsrv_url().'quick_unsubscribe.php?type=coll_post&user_ID=$user_ID$&coll_ID='.$Blog->ID.'&key=$unsubscribe_key$';
+		break;
 }
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

@@ -592,16 +592,13 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			break;
 
 		case 'usertag':
-			if( isset( $parmeta['size'] ) )
-			{
-				$size = (int) $parmeta['size'];
-			}
-			else
-			{
-				$size = 30;
-			}
-
+			$size = isset( $parmeta['size'] ) ? intval( $parmeta['size'] ) : 30;
 			$Form->usertag_input( $input_name, $set_value, $size, $set_label, '', $params );
+			break;
+
+		case 'itemtag':
+			$size = isset( $parmeta['size'] ) ? intval( $parmeta['size'] ) : 30;
+			$Form->tag_input( $input_name, $set_value, $size, $set_label, '', $params );
 			break;
 
 		case 'info':
@@ -986,6 +983,10 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 			case 'checklist':
 				$l_param_type = 'array';
 				$l_param_default = array();
+				break;
+
+			case 'textarea':
+				$l_param_type = 'text';
 				break;
 
 			case 'html_input':

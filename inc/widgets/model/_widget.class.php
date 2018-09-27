@@ -307,8 +307,8 @@ class ComponentWidget extends DataObject
 
 		if( $use_tooltip )
 		{ // Add these data only for tooltip
-			$link_attrs['class']  = 'action_icon help_plugin_icon';
-			$link_attrs['rel']    = format_to_output( $this->get_desc(), 'htmlattr' );
+			$link_attrs['class'] = 'action_icon help_plugin_icon';
+			$link_attrs['data-popover'] = format_to_output( $this->get_desc(), 'htmlattr' );
 		}
 
 		return action_icon( '', $icon, $widget_url, NULL, NULL, NULL, $link_attrs );
@@ -350,7 +350,7 @@ class ComponentWidget extends DataObject
 			$r['widget_css_class'] = array(
 					'label' => '<span class="dimmed">'.T_( 'CSS Class' ).'</span>',
 					'size' => 20,
-					'note' => T_( 'Replaces $wi_class$ in your skins containers.'),
+					'note' => sprintf( T_('Will be injected into %s in your skin containers (along with required system classes).'), '<code>$wi_class$</code>' ),
 				);
 		}
 
@@ -359,7 +359,7 @@ class ComponentWidget extends DataObject
 			$r['widget_ID'] = array(
 					'label' => '<span class="dimmed">'.T_( 'DOM ID' ).'</span>',
 					'size' => 20,
-					'note' => T_( 'Replaces $wi_ID$ in your skins containers.'),
+					'note' => sprintf( T_('Replaces %s in your skins containers.'), '<code>$wi_ID$</code>' ).' '.sprintf( T_('Leave empty to use default value: %s.'), '<code>widget_'.$this->type.'_'.$this->code.'_'.$this->ID.'</code>' ),
 				);
 		}
 
@@ -1293,8 +1293,8 @@ class ComponentWidget extends DataObject
 		$Plugins_admin->filter_contents( $fake_title /* by ref */, $content /* by ref */, $widget_renderers, $params /* by ref */ );
 
 		// Render block content with selected plugins:
-		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Render' );
-		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Display' );
+		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog, 'Widget' => $this ), 'Render' );
+		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog, 'Widget' => $this ), 'Display' );
 
 		return $content;
 	}

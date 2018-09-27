@@ -698,24 +698,11 @@ div.average_rating {
   padding-top: 5px;
 }
 div.average_rating span {
-  float: left;
   font-size: 11px;
   line-height: 12px;
+}
+div.average_rating span.average_rating_score {
   padding-left: 10px;
-}
-div.star_rating,
-div.star_rating div {
-  width: 60px;
-  height: 12px;
-  background: url(../icons/icons_sprite.png) repeat-x -64px -160px;
-  overflow: hidden;
-  text-indent: 100px;
-}
-div.star_rating div {
-  background-position: 0 -160px;
-}
-div.average_rating .star_rating {
-  float: left;
 }
 .rating_recap {
   clear: both;
@@ -724,6 +711,43 @@ div.average_rating .star_rating {
 .rating_recap div {
   float: left;
   padding-right: 10px;
+}
+.evo_stars_img {
+  white-space: nowrap;
+  display: inline-block;
+  position: relative;
+  top: 3px;
+}
+.evo_stars_img i {
+  width: 16px;
+  height: 16px;
+  float: left;
+  background: url('../icons/icons_sprite.png') no-repeat scroll 0 -208px transparent;
+  text-indent: 16px;
+  overflow: hidden;
+}
+.evo_stars_img i.evo_stars_img_empty {
+  background-position: -16px -208px;
+}
+.evo_stars_img i.evo_stars_img_empty i {
+  background-position: 0 -208px;
+}
+.evo_stars {
+  color: #ff9900;
+  white-space: nowrap;
+}
+.evo_stars .evo_star_empty,
+.evo_stars .evo_star_percent {
+  color: #999999;
+}
+.evo_stars .evo_star_percent {
+  position: relative;
+}
+.evo_stars .evo_star_percent .fa {
+  position: absolute;
+  left: 0;
+  overflow: hidden;
+  color: #ff9900;
 }
 *[class^="listnav_distance_"],
 *[class*=" listnav_distance_"] {
@@ -1097,6 +1121,9 @@ div.results {
   width: 100%;
   overflow: auto;
 }
+.evo_instruction {
+  margin: 20px 10px;
+}
 form.inskin {
   padding: 10px;
 }
@@ -1124,32 +1151,32 @@ table.catselect th {
 table.catselect td {
   padding: .2ex 1ex;
 }
+table.catselect th,
+table.catselect td {
+  border-right: 1px solid #bbb;
+}
+table.catselect th:last-child,
+table.catselect td:last-child {
+  border-right: none;
+}
 table.catselect tr.group td {
   border-top: 1px solid #bbb;
   border-bottom: 1px solid #bbb;
   background-color: #ccc;
   font-weight: bold;
 }
-table.catselect tr.odd,
-table.catselect tr.odd input {
+table.catselect tr.odd {
   background-color: #eee;
 }
-table.catselect tr.even,
-table.catselect tr.even input {
+table.catselect tr.even {
   background-color: #ddd;
 }
 table.catselect tr:hover,
 table.catselect tr:hover input {
   background-color: #ccc;
 }
-table.catselect th.selector,
-table.catselect td.selector {
-  width: 1%;
-  text-align: center;
-  border-right: 1px solid #bbb;
-}
-table.catselect #new_category_name {
-  background-color: white;
+table.catselect .catsel_order input {
+  width: 40px;
 }
 .raty_star_on,
 .raty_star_off,
@@ -1587,18 +1614,17 @@ input.btn-lg {
   padding: 8px;
   vertical-align: top;
 }
-.evo_content_block table.evo_poll__table {
-  border-spacing: 0;
-  border-collapse: collapse;
-  margin: 1em 0;
-}
-.evo_content_block table.evo_poll__table th {
-  padding: 2px 10px 2px 0;
-  background-color: #eee;
-}
 .evo_content_block table.evo_poll__table td {
   padding: 2px 10px 2px 0;
-  vertical-align: top;
+}
+.evo_content_block table.item_custom_fields {
+  border: none;
+  margin-bottom: 10px;
+}
+.evo_content_block table.item_custom_fields th,
+.evo_content_block table.item_custom_fields td {
+  vertical-align: middle;
+  padding: 0 10px 0 0;
 }
 .evo_post_gallery__image {
   display: inline-block;

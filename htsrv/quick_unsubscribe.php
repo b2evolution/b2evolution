@@ -325,6 +325,18 @@ elseif( $confirmed )
 					$UserSettings->dbupdate();
 					break;
 
+				case 'comment_mentioned':
+					// unsubscribe from new comment notifications when user is mentioned:
+					$UserSettings->set( 'notify_comment_mentioned', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'post_mentioned':
+					// unsubscribe from new post notifications when user is mentioned:
+					$UserSettings->set( 'notify_post_mentioned', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
 				default:
 					// DEFENSIVE programming:
 					$error_msg = 'Unhandled unsubscribe type.';
@@ -606,6 +618,18 @@ elseif( $confirmed )
 					$UserSettings->dbupdate();
 					break;
 
+				case 'comment_mentioned':
+					// resubscribe to new comment notifications when user is mentioned:
+					$UserSettings->set( 'notify_comment_mentioned', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'post_mentioned':
+					// resubscribe to new post notifications when user is mentioned:
+					$UserSettings->set( 'notify_post_mentioned', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
 				default:
 					// DEFENSIVE programming:
 					$error_msg = 'Unhandled resubscribe type.';
@@ -790,6 +814,16 @@ switch( $type )
 		$type_str = $notification_prefix.': '.T_('a meta comment is posted.');
 		break;
 
+	case 'comment_mentioned':
+		// unsubscribe from new comment notifications when user is mentioned:
+		$type_str = $notification_prefix.': '.T_('I have been mentioned on a comment.');
+		break;
+
+	case 'post_mentioned':
+		// unsubscribe from new comment notifications when user is mentioned:
+		$type_str = $notification_prefix.': '.T_('I have been mentioned on a post.');
+		break;
+
 	default:
 		// DEFENSIVE programming:
 		$type_str = T_('Unhandled unsubscribe type');
@@ -870,7 +904,7 @@ require $adminskins_path.'/login/_html_header.inc.php';
 $unsubscribe_form_params['formstart'] = str_replace( '$form_title$', $page_title, $unsubscribe_form_params['formstart'] );
 $params['unsubscribe_form_params'] = $unsubscribe_form_params;
 
-$Form = new Form( get_htsrv_url( true ).'quick_unsubscribe.php', 'unsubscribe_form', 'post' );
+$Form = new Form( get_htsrv_url().'quick_unsubscribe.php', 'unsubscribe_form', 'post' );
 
 if( ! is_null( $params['unsubscribe_form_params'] ) )
 { // Use another template param from skin
