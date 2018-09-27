@@ -5000,9 +5000,20 @@ class Item extends ItemLight
 	 *
 	 * @return string
 	 */
-	function get_feedback_url( $popup = false, $glue = '&amp;' )
+	function get_feedback_url( $popup = false, $glue = '&amp;', $blog_ID = NULL )
 	{
-		$url = $this->get_single_url( 'auto', '', $glue );
+		if( $blog_ID !== NULL &&
+				( $BlogCache = & get_BlogCache() ) &&
+				( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) ) )
+		{
+			$blog_url = $Blog->get( 'url' );
+		}
+		else
+		{
+			$blog_url = '';
+		}
+
+		$url = $this->get_single_url( 'auto', $blog_url, $glue, $blog_ID );
 		if( $popup )
 		{
 			$url = url_add_param( $url, 'disp=feedback-popup', $glue );
@@ -5030,7 +5041,7 @@ class Item extends ItemLight
 	 */
 	function get_feedback_link( $params )
 	{
-		global $ReqURL;
+		global $ReqURL, $Blog, $Settings;
 
 		if( ! $this->can_see_comments() )
 		{	// Comments disabled
@@ -5038,23 +5049,37 @@ class Item extends ItemLight
 		}
 
 		$params = array_merge( array(
-									'type' => 'feedbacks',		// Kind of feedbacks to count
-									'status' => '#',	// Statuses of feedbacks to count, can be a string for one status or array for several. '#' - active front-office comment statuses, '#moderation#' - "require moderation" statuses.
-									'link_before' => '',
-									'link_after' => '',
-									'link_text_zero' => '#',
-									'link_text_one' => '#',
-									'link_text_more' => '#',
-									'link_anchor_zero' => '#',
-									'link_anchor_one' => '#',
-									'link_anchor_more' => '#',
-									'link_title' => '#',
-									'link_class' => '',
-									'show_in_single_mode' => false,		// Do we want to show this link even if we are viewing the current post in single view mode
-									'url' => '#',
-								), $params );
+				'type' => 'feedbacks',		// Kind of feedbacks to count
+				'status' => '#',	// Statuses of feedbacks to count, can be a string for one status or array for several. '#' - active front-office comment statuses, '#moderation#' - "require moderation" statuses.
+				'link_before' => '',
+				'link_after' => '',
+				'link_text_zero' => '#',
+				'link_text_one' => '#',
+				'link_text_more' => '#',
+				'link_anchor_zero' => '#',
+				'link_anchor_one' => '#',
+				'link_anchor_more' => '#',
+				'link_title' => '#',
+				'link_class' => '',
+				'show_in_single_mode' => false,		// Do we want to show this link even if we are viewing the current post in single view mode
+				'url' => '#',
+				'stay_in_same_collection' => 'auto', // 'auto' - follow 'cross_post_nav_in_same_coll' if we are cross posted, true - always stay in same collection if we are cross posted, false - always go to permalink if we are cross posted
+			), $params );
 
-		if( $params['show_in_single_mode'] == false && is_same_url( $this->get_permanent_url('','','&'), $ReqURL ) )
+		if( isset( $Blog ) &&
+		    ( $params['stay_in_same_collection'] === true || // always stay in current collection
+		      ( $params['stay_in_same_collection'] == 'auto' && $Settings->get( 'cross_post_nav_in_same_coll' ) ) // follow 'cross_post_nav_in_same_coll' to stay in current collection
+		    ) )
+		{	// Use current collection if this Item is cross posted and has at least one category from current collection:
+			$current_blog_ID = $Blog->ID;
+			$current_blog_URL = $Blog->get( 'url' );
+		}
+		else
+		{	// Use main collection of this Item:
+			$current_blog_ID = NULL;
+			$current_blog_URL = '';
+		}
+		if( $params['show_in_single_mode'] == false && is_same_url( $this->get_permanent_url( '', $current_blog_URL, '&', array(), $current_blog_ID ), $ReqURL ) )
 		{	// We are viewing the single page for this pos, which (typically) )contains comments, so we dpn't want to display this link
 			return;
 		}
@@ -5125,7 +5150,7 @@ class Item extends ItemLight
 
 		if( $params['url'] == '#' )
 		{ // We want a link to single post:
-			$params['url'] = $this->get_feedback_url();
+			$params['url'] = $this->get_feedback_url( false, '&amp;', $current_blog_ID );
 		}
 
 		// Anchor position
@@ -5146,8 +5171,8 @@ class Item extends ItemLight
 
 		if( !empty( $params['url'] ) )
 		{
-			$r .= '<a href="'.$params['url'].$anchor.'" class="'.$params['link_class'].'" ';	// Position on feedback
-			$r .= 'title="'.$params['link_title'].'"';
+			$r .= '<a href="'.$params['url'].$anchor.'" class="'.format_to_output( $params['link_class'], 'htmlattr' ).'" ';	// Position on feedback
+			$r .= 'title="'.format_to_output( $params['link_title'], 'htmlattr' ).'"';
 			$r .= '>';
 			$r .= $link_text;
 			$r .= '</a>';
