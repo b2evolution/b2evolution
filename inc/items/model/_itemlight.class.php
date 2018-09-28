@@ -74,6 +74,13 @@ class ItemLight extends DataObject
 	var $single_view = 'normal';
 
 	/**
+	 * ID of current extra category
+	 * Used to set correct item URL in {@link ItemLight::get_single_url()}
+	 * @var integer
+	 */
+	var $current_extra_cat_ID = NULL;
+
+	/**
 	 * ID of the main category.
 	 * Use {@link ItemLight::set()} to set it, since other vars get lazily derived from it.
 	 * @var integer
@@ -167,6 +174,7 @@ class ItemLight extends DataObject
 			$this->ityp_ID = $db_row->post_ityp_ID;
 			$this->url = $db_row->post_url;
 			$this->single_view = isset( $db_row->post_single_view ) ? $db_row->post_single_view : $this->single_view;
+			$this->current_extra_cat_ID = isset( $db_row->postcat_cat_ID ) ? $db_row->postcat_cat_ID : $this->current_extra_cat_ID;
 		}
 	}
 
@@ -354,22 +362,31 @@ class ItemLight extends DataObject
 			case 'subchap':
 			case 'chapters':
 				if( $blog_ID === NULL )
-				{	// Try to get current collection only when it is allowed to stay in same collection when cross-posted:
+				{	// Try to get current collection:
 					global $blog, $Settings;
 					if( ! empty( $blog ) && $Settings->get( 'cross_post_nav_in_same_coll' ) )
-					{
+					{	// If it is allowed to stay in same collection when cross-posted:
 						$blog_ID = $blog;
 					}
 				}
-				if( $blog_ID !== NULL )
-				{	// Try to get first category of this Item from the requested collection:
-					$item_chapters = $this->get_Chapters();
-					foreach( $item_chapters as $item_Chapter )
-					{
-						if( $item_Chapter->get( 'blog_ID' ) == $blog_ID )
-						{	// Use first found category of this Item from the requested collection:
-							$url_Chapter = $item_Chapter;
-							break;
+				if( $blog_ID !== NULL && $blog_ID != $this->get_blog_ID() )
+				{	// If requested collection is not collection of main category:
+					if( ! empty( $this->current_extra_cat_ID ) )
+					{	// Use first detected extra category:
+						$ChapterCache = & get_ChapterCache();
+						$url_Chapter = & $ChapterCache->get_by_ID( $this->current_extra_cat_ID, false, false );
+					}
+					// Try to find first extra category of this Item from the requested collection:
+					if( empty( $url_Chapter ) )
+					{	// If we know what collection use to search category, but exclude main collection in order to use main category instead of extra:
+						$item_chapters = $this->get_Chapters();
+						foreach( $item_chapters as $item_Chapter )
+						{
+							if( $item_Chapter->get( 'blog_ID' ) == $blog_ID )
+							{	// Use first found category of this Item from the requested collection:
+								$url_Chapter = $item_Chapter;
+								break;
+							}
 						}
 					}
 				}
