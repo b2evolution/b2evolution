@@ -923,7 +923,8 @@ jQuery( '#itemtype_checkchanges' ).submit( function()
 	var custom_fields = {};
 	jQuery( '[name^=custom_field_]' ).each( function()
 	{
-		custom_fields[ jQuery( this ).attr( 'name' ) ] = jQuery( this ).val();
+		var option_val = jQuery( this ).attr( 'type' ) == 'checkbox' ? ( jQuery( this ).prop( 'checked' ) ? 1 : 0 ) : jQuery( this ).val();
+		custom_fields[ jQuery( this ).attr( 'name' ) ] = option_val;
 	} );
 	// Put all custom fields data in single input:
 	jQuery( this ).append( '<input type="hidden" name="custom_fields_data" />' );
