@@ -10796,7 +10796,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13260, 'Installing new shared widgets/containers...' ) )
+	if( upg_task_start( 15260, 'Installing new shared widgets/containers...' ) )
 	{	// part of 7.0.0-alpha
 		// Initialize environment variable $Settings in order to work with collection objects:
 		upg_init_environment();
@@ -10825,7 +10825,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13270, 'Upgrading widget containers table...' ) )
+	if( upg_task_start( 15270, 'Upgrading widget containers table...' ) )
 	{	// part of 7.0.0-alpha
 		// Add new column for Page Widget Containers:
 		db_add_col( 'T_widget__container', 'wico_item_ID', 'INT(11) UNSIGNED NULL DEFAULT NULL' );
@@ -10840,7 +10840,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13280, 'Installing new page widgets/containers...' ) )
+	if( upg_task_start( 15280, 'Installing new page widgets/containers...' ) )
 	{	// part of 7.0.0-alpha
 		install_new_default_widgets( 'widget_page_section_1' );
 		install_new_default_widgets( 'widget_page_section_2' );
