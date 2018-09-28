@@ -902,4 +902,20 @@ jQuery( document ).on( 'submit', 'form#itemtype_select_fields', function()
 	closeModalWindow();
 	return false;
 } );
+
+// Serialize all custom fields in single input before submit to avoid php error of max_input_vars:
+jQuery( '#itemtype_checkchanges' ).submit( function()
+{
+	var custom_fields = {};
+	jQuery( '[name^=custom_field_]' ).each( function()
+	{
+		var option_val = jQuery( this ).attr( 'type' ) == 'checkbox' ? ( jQuery( this ).prop( 'checked' ) ? 1 : 0 ) : jQuery( this ).val();
+		custom_fields[ jQuery( this ).attr( 'name' ) ] = option_val;
+	} );
+	// Put all custom fields data in single input:
+	jQuery( this ).append( '<input type="hidden" name="custom_fields_data" />' );
+	jQuery( '[name=custom_fields_data]' ).val( JSON.stringify( custom_fields ) );
+	// Remove name attribute of all custom fields inputs in order to don't post them all:
+	jQuery( '[name^=custom_field_]' ).removeAttr( 'name' );
+} );
 </script>
