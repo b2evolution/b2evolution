@@ -372,6 +372,7 @@ class ItemType extends DataObject
 
 		// Decode data of all custom fields which were posted as single JSON encoded hidden input by JavaScript:
 		$custom_fields_data = json_decode( param( 'custom_fields_data', 'string' ) );
+		set_param( 'custom_fields_data', $custom_fields_data );
 
 		$inputs = array(
 			'ID'              => '/^[a-z0-9\-_]+$/',
@@ -404,7 +405,7 @@ class ItemType extends DataObject
 				// Get input data:
 				$input_type = is_array( $input_data ) ? $input_data[0] : $input_data;
 				$input_default_value = is_array( $input_data )  ? $input_data[1] : NULL;
-				$input_value = isset( $custom_fields_data->{'custom_field_'.$input_name.$i} ) ? $custom_fields_data->{'custom_field_'.$input_name.$i} : $input_default_value;
+				$input_value = isset( $custom_fields_data->{$input_name.$i} ) ? $custom_fields_data->{$input_name.$i} : $input_default_value;
 
 				if( $input_value !== $input_default_value )
 				{	// Format input value to requested type only when it is not default value:
