@@ -2349,7 +2349,10 @@ function display_dragdrop_upload_button( $params = array() )
 			'display_support_msg'    => true, // Display info under button about that current supports drag&drop
 			'additional_dropzone'    => '', // jQuery selector of additional drop zone
 			'filename_before'        => '', // Append this text before file name on success uploading of new file,
-			                             // Used a mask $file_path$ to replace it with File->get_rdfp_rel_path()
+																	 // Used a mask $file_path$ to replace it with File->get_rdfp_rel_path()
+			'select_file_template'   => '', // Append this text before file name on success of uploading a new file,
+																			// Used a mask $file_path$ to replace it with File->get_rdfp_rel_path()
+			'select_file_type'       => NULL, // File type that can be selected
 			'LinkOwner'              => NULL, // Use it if you want to link a file to Item/Comment right after uploading
 			'display_status_success' => true, // Display status text about successful uploading
 			'status_conflict_place'  => 'default', // Where we should write a message about conflict:
@@ -2359,7 +2362,6 @@ function display_dragdrop_upload_button( $params = array() )
 			'resize_frame'           => false, // Resize frame on upload new image
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
 			'noresults'              => '',
-			'filename_select'        => '', // Append this text before file name on success uploading of new file
 		), $params );
 
 	$FileRootCache = & get_FileRootCache();
@@ -2585,6 +2587,16 @@ function display_dragdrop_upload_button( $params = array() )
 								filename_before = filename_before.replace( '$file_path$', responseJSON.data.path );
 							}
 
+							var select_file_template = '';
+							if( responseJSON.data.filetype == '<?php echo $params['select_file_type'];?>' )
+							{	// Add select file button:
+								var select_file_template = '<?php echo str_replace ( "'", "\'", $params['select_file_template'] ); ?>';
+								if( select_file_template != '' )
+								{
+									select_file_template = select_file_template.replace( '$file_path$', responseJSON.data.path );
+								}
+							}
+
 							var warning = '';
 							if( responseJSON.data.warning != '' )
 							{
@@ -2607,6 +2619,7 @@ function display_dragdrop_upload_button( $params = array() )
 								<?php } ?>
 								this_row.find( '.qq-upload-image' ).html( text );
 								this_row.find( '.qq-upload-file-selector' ).html( filename_before
+								  + select_file_template
 									+ '<input type="hidden" value="' + responseJSON.data.newpath + '" />'
 									+ '<span class="fname">' + file_name + '</span>' + warning );
 								this_row.find( '.qq-upload-size-selector' ).html( responseJSON.data.filesize );
@@ -2649,6 +2662,7 @@ function display_dragdrop_upload_button( $params = array() )
 								<?php } ?>
 								this_row.find( '.qq-upload-image-selector' ).append( htmlspecialchars_decode( responseJSON.data.file ) );
 								this_row.find( '.qq-upload-file-selector' ).html( filename_before
+									+ select_file_template
 									+ '<input type="hidden" value="' + responseJSON.data.newpath + '" />'
 									+ '<span class="fname">' + file_name + '</span>'
 									<?php echo ( $params['status_conflict_place'] == 'before_button' ) ? "+ ' - ".$status_conflict_message."'" : ''; ?>
