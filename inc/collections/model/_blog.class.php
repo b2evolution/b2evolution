@@ -4654,7 +4654,7 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get blog main containers
+	 * Get collection main containers
 	 *
 	 * @param boolean TRUE to initialize IDs of containers
 	 * @return array main container codes => array( name, order, id(optional) )
@@ -4664,7 +4664,7 @@ class Blog extends DataObject
 		if( ! isset( $this->widget_containers ) )
 		{
 			load_funcs( 'skins/_skin.funcs.php' );
-			// Get all skins of the blog and get the merge of main containers from each skin:
+			// Get all skins of the collection and get the merge of main containers from each skin:
 			$skin_ids = $this->get_skin_ids();
 
 			// Get containers of all collection skins:
