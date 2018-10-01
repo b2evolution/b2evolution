@@ -104,7 +104,8 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Item Single */
 	$default_widgets['item_single'] = array(
-		array(  5, 'item_title', 'coll_type' => 'manual' ),
+		array(  5, 'item_visibility_badge', 'coll_type' => 'manual' ),
+		array(  7, 'item_title', 'coll_type' => 'manual' ),
 		array( 10, 'item_content' ),
 		array( 15, 'item_attachments' ),
 		array( 17, 'item_link' ),
@@ -593,7 +594,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'type' => 'shared-sub',
 		'name' => NT_('Right Navigation'),
 		array( 10, 'basic_menu_link', 'params' => array(
-				'link_type'        => 'login', 
+				'link_type'        => 'login',
 			) ),
 		array( 20, 'basic_menu_link', 'params' => array(
 				'link_type' => 'register',

@@ -10732,7 +10732,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		install_new_default_widgets( 'item_list' );
 		install_new_default_widgets( 'item_in_list' );
 		install_new_default_widgets( 'item_single_header', 'item_visibility_badge,item_title,item_next_previous' );
-		install_new_default_widgets( 'item_single', 'item_title' );
+		install_new_default_widgets( 'item_single', 'item_visibility_badge,item_title' );
 		upg_task_end();
 	}
 
