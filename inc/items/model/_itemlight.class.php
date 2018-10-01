@@ -394,7 +394,7 @@ class ItemLight extends DataObject
 				{	// Use main category if another is not requested or cannot be detected above:
 					$url_Chapter = & $this->get_main_Chapter();
 				}
-				$chapter_url = ( $single_links == 'subchap' ? $url_Chapter->urlname : $url_Chapter->get_url_path() );
+				$chapter_url = ( $single_links == 'subchap' ? $url_Chapter->urlname.'/' : $url_Chapter->get_url_path() );
 				$permalink = url_add_tail( $blogurl, '/'.$chapter_url.$urltail );
 				break;
 
