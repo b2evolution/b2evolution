@@ -121,19 +121,23 @@ class coll_item_list_pages_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item, $disp;
+		global $disp;
 
-		$params = array_merge( array(
-				'block_start'           => '<div class="center"><ul class="pagination">',
-				'block_end'             => '</ul></div>',
-				'page_item_before'      => '<li>',
-				'page_item_after'       => '</li>',
-				'page_item_current_before' => '<li class="active">',
-				'page_item_current_after'  => '</li>',
-				'page_current_template' => '<span>$page_num$</span>',
-				'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
-				'next_text'             => '<i class="fa fa-angle-double-right"></i>',
-		), $params );
+		$page_link_params = array(
+			'block_start'              => '<div class="center"><ul class="pagination">',
+			'block_end'                => '</ul></div>',
+			'page_item_before'         => '<li>',
+			'page_item_after'          => '</li>',
+			'page_item_current_before' => '<li class="active">',
+			'page_item_current_after'  => '</li>',
+			'page_current_template'    => '<span>$page_num$</span>',
+			'prev_text'                => '<i class="fa fa-angle-double-left"></i>',
+			'next_text'                => '<i class="fa fa-angle-double-right"></i>',
+		);
+		if( isset( $params['widget_coll_item_list_pages_params'] ) && is_array( $params['widget_coll_item_list_pages_params'] ) )
+		{	// Override params from skin:
+			$page_link_params = array_merge( $page_link_params, $params['widget_coll_item_list_pages_params'] );
+		}
 
 		$this->init_display( $params );
 
@@ -143,7 +147,7 @@ class coll_item_list_pages_Widget extends ComponentWidget
 			$this->disp_title();
 			echo $this->disp_params['block_body_start'];
 
-			mainlist_page_links( $this->disp_params );
+			mainlist_page_links( $page_link_params );
 
 			echo $this->disp_params['block_body_end'];
 			echo $this->disp_params['block_end'];
