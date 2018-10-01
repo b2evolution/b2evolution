@@ -7838,7 +7838,7 @@ class Item extends ItemLight
 	 */
 	function insert_update_extracats( $mode )
 	{
-		global $DB, $Messages;
+		global $DB, $Messages, $Settings;
 
 		if( ! is_null( $this->extra_cat_IDs ) )
 		{ // Okay the extra cats are defined:
@@ -7854,17 +7854,25 @@ class Item extends ItemLight
 			if( $mode == 'update' )
 			{
 				// delete previous extracats:
-				$DB->query( 'DELETE FROM T_postcats WHERE postcat_post_ID = '.$this->ID, 'delete previous extracats' );
+				$DB->query( 'DELETE FROM T_postcats WHERE postcat_post_ID = '.$this->ID, 'Delete previous extracats of Item #'.$this->ID );
 			}
 
+			// Allow to use field "postcat_order" only since 12972 DB version:
+			$postcat_order_field = ( $Settings->get( 'db_version' ) >= 12972 ? ', postcat_order' : '' );
+
 			// insert new extracats:
-			$query = 'INSERT INTO T_postcats ( postcat_post_ID, postcat_cat_ID, postcat_order ) VALUES ';
+			$query = 'INSERT INTO T_postcats ( postcat_post_ID, postcat_cat_ID'.$postcat_order_field.' ) VALUES ';
 			foreach( $this->extra_cat_IDs as $extra_cat_ID )
 			{
-				$query .= '( '.$this->ID.', '.$extra_cat_ID.', '.$DB->quote( $this->get_order( $extra_cat_ID ) ).' ),';
+				$query .= '( '.$this->ID.', '.$extra_cat_ID;
+				if( ! empty( $postcat_order_field ) )
+				{	// Insert item order per category only when this field exists in DB:
+					$query .= ', '.$DB->quote( $this->get_order( $extra_cat_ID ) );
+				}
+				$query .= ' ),';
 			}
 			$query = substr( $query, 0, strlen( $query ) - 1 );
-			$DB->query( $query, 'insert new extracats fro Item #'.$this->ID );
+			$DB->query( $query, 'Insert new extracats for Item #'.$this->ID );
 
 			$DB->commit();
 		}
