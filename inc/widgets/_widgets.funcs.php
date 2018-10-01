@@ -1180,7 +1180,7 @@ function display_containers( $skin_type, $container_type, $params = array() )
 			$coll_containers = $Blog->get_main_containers();
 			foreach( $coll_containers as $container_code => $container_data )
 			{
-				$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code );
+				$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $Blog->ID, $skin_type, $container_code );
 				if( ! $WidgetContainer )
 				{	// If widget container doesn't exist in DB but it is detected in skin file:
 					$WidgetContainer = new WidgetContainer();
