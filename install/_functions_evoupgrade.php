@@ -596,6 +596,9 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 	// Get config of default widgets for the requested container:
 	$container_widgets = get_default_widgets_by_container( $new_container_code );
 
+	// Install new default widgets only for normal skin:
+	$skin_type = 'normal';
+
 	// Get container type:
 	$container_type = isset( $container_widgets['type'] ) ? $container_widgets['type'] : 'main';
 
@@ -617,7 +620,7 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 			foreach( $BlogCache->cache as $widget_Blog )
 			{
 				// Get all containers declared in the given blog's skins
-				$coll_containers = $widget_Blog->get_main_containers( true );
+				$coll_containers = $widget_Blog->get_main_containers( $skin_type, true );
 
 				// Get again config of default widgets for the requested container because several settings depend on collection type/kind:
 				$container_widgets = get_default_widgets_by_container( $new_container_code, $widget_Blog->get( 'type' ) );
@@ -653,11 +656,12 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 						}
 						// Insert new widget container into DB:
 						$new_container_fields = array(
-							'wico_code'    => $new_container_code,
-							'wico_name'    => $coll_container[0],
-							'wico_coll_ID' => $widget_Blog->ID,
-							'wico_order'   => $coll_container[1],
-							'wico_main'    => $container_type == 'sub' ? 0 : 1,
+							'wico_code'      => $new_container_code,
+							'wico_skin_type' => $skin_type,
+							'wico_name'      => $coll_container[0],
+							'wico_coll_ID'   => $widget_Blog->ID,
+							'wico_order'     => $coll_container[1],
+							'wico_main'      => $container_type == 'sub' ? 0 : 1,
 						);
 						if( $container_type == 'page' && isset( $container_widgets['item_ID'] ) )
 						{	// Page container has an additional field for Item:
@@ -668,7 +672,7 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 						// Update ID of new inserted widget container:
 						$coll_container['ID'] = $DB->insert_id;
 						// Also update ID in collection cache for next calls:
-						$widget_Blog->widget_containers[ $new_container_code ]['ID'] = $coll_container['ID'];
+						$widget_Blog->widget_containers[ $skin_type ][ $new_container_code ]['ID'] = $coll_container['ID'];
 					}
 					elseif( ! isset( $widget_orders_in_containers ) )
 					{	// For existing containers we should get all widget orders in order to avoid duplicate error on insert new widgets:
@@ -747,6 +751,7 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 				$shared_containers_SQL->SELECT( 'wico_code, wico_ID' );
 				$shared_containers_SQL->FROM( 'T_widget__container' );
 				$shared_containers_SQL->WHERE( 'wico_coll_ID IS NULL' );
+				$shared_containers_SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $skin_type ) );
 				$cache_installed_shared_containers = $DB->get_assoc( $shared_containers_SQL );
 				// Get max order of the shared widget containers:
 				$max_order_SQL = new SQL( 'Get max order of the shared widget containers' );
@@ -762,8 +767,8 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 			{	// Handle special array item with container data:
 				if( ! isset( $cache_installed_shared_containers[ $new_container_code ] ) )
 				{	// Insert new shared container:
-					$insert_result = $DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES '
-						.'( '.$DB->quote( $new_container_code ).', '.$DB->quote( $container_widgets['name'] ).', '.'NULL, '.( ++$cache_installed_shared_container_order ).', '.$DB->quote( $container_type == 'shared' ? 1 : 0 ).' )',
+					$insert_result = $DB->query( 'INSERT INTO T_widget__container( wico_code, wico_skin_type, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES '
+						.'( '.$DB->quote( $new_container_code ).', '.$DB->quote( $skin_type ).', '.$DB->quote( $container_widgets['name'] ).', '.'NULL, '.( ++$cache_installed_shared_container_order ).', '.$DB->quote( $container_type == 'shared' ? 1 : 0 ).' )',
 						'Insert default shared widget container' );
 					if( $insert_result && $DB->insert_id > 0 )
 					{
@@ -10837,14 +10842,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'INSERT INTO T_items__type_coll ( itc_ityp_ID, itc_coll_ID )
 				SELECT '.$DB->insert_id.', blog_ID FROM T_blogs' );
 		}
-		upg_task_end();
-	}
-
-	if( upg_task_start( 15280, 'Installing new page widgets/containers...' ) )
-	{	// part of 7.0.0-alpha
-		install_new_default_widgets( 'widget_page_section_1' );
-		install_new_default_widgets( 'widget_page_section_2' );
-		install_new_default_widgets( 'widget_page_section_3' );
 		upg_task_end();
 	}
 

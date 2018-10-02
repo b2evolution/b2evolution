@@ -3585,7 +3585,7 @@ class Blog extends DataObject
 
 		// ADD DEFAULT WIDGETS:
 		load_funcs( 'widgets/_widgets.funcs.php' );
-		insert_basic_widgets( $this->ID, $this->get_skin_ids(), false, $kind );
+		insert_basic_widgets( $this->ID, 'normal', false, $kind );
 
 		$Messages->add_to_group( T_('Default widgets have been set-up for this collection.'), 'success', T_('New collection created:') );
 
@@ -4594,7 +4594,7 @@ class Blog extends DataObject
 	 * @param string Skin type: 'auto', 'normal', 'mobile', 'tablet'
 	 * @return integer skin ID
 	 */
-	function get_skin_ID( $skin_type = 'auto' )
+	function get_skin_ID( $skin_type = 'auto', $real_value = false )
 	{
 		switch( $skin_type )
 		{
@@ -4605,11 +4605,11 @@ class Blog extends DataObject
 				{
 					if( $Session->is_mobile_session() )
 					{
-						return $this->get( 'mobile_skin_ID' );
+						return $this->get( 'mobile_skin_ID', array( 'real_value' => $real_value ) );
 					}
 					if( $Session->is_tablet_session() )
 					{
-						return $this->get( 'tablet_skin_ID' );
+						return $this->get( 'tablet_skin_ID', array( 'real_value' => $real_value ) );
 					}
 				}
 				return $this->get( 'normal_skin_ID' );
@@ -4620,11 +4620,11 @@ class Blog extends DataObject
 
 			case 'mobile':
 				// Mobile skin
-				return $this->get( 'mobile_skin_ID' );
+				return $this->get( 'mobile_skin_ID', array( 'real_value' => $real_value ) );
 
 			case 'tablet':
 				// Tablet skin
-				return $this->get( 'tablet_skin_ID' );
+				return $this->get( 'tablet_skin_ID', array( 'real_value' => $real_value ) );
 		}
 
 		// Deny to request invalid skin types
@@ -4654,27 +4654,43 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get collection skin containers which correspond to the current session device or which correspond to the selected skin type
+	 *
+	 * @param string Skin type: 'auto', 'normal', 'mobile', 'tablet'
+	 * @return array
+	 */
+	function get_skin_containers( $skin_type = 'auto' )
+	{
+		$SkinCache = & get_SkinCache();
+		$coll_Skin = & $SkinCache->get_by_ID( $this->get_skin_ID( $skin_type, true ), false, false );
+
+		return $coll_Skin ? $coll_Skin->get_containers() : array();
+	}
+
+
+	/**
 	 * Get collection main containers
 	 *
+	 * @param string Skin type: 'normal', 'mobile', 'tablet'
 	 * @param boolean TRUE to initialize IDs of containers
 	 * @return array main container codes => array( name, order, id(optional) )
 	 */
-	function get_main_containers( $load_container_ids = false )
+	function get_main_containers( $skin_type = 'normal', $load_container_ids = false )
 	{
 		if( ! isset( $this->widget_containers ) )
-		{
-			load_funcs( 'skins/_skin.funcs.php' );
-			// Get all skins of the collection and get the merge of main containers from each skin:
-			$skin_ids = $this->get_skin_ids();
+		{	// Initialize 
+			$this->widget_containers = array();
+		}
 
-			// Get containers of all collection skins:
-			$this->widget_containers = get_skin_containers( $skin_ids );
+		if( ! isset( $this->widget_containers[ $skin_type ] ) )
+		{	// Get widget containers of requested collection skin:
+			$this->widget_containers[ $skin_type ] = $this->get_skin_containers( $skin_type );
 		}
 
 		if( $load_container_ids &&
 		    $this->ID > 0 &&
-		    empty( $this->widget_containers_ids_loaded ) &&
-		    ! empty( $this->widget_containers ) )
+		    empty( $this->widget_containers_ids_loaded[ $skin_type ] ) &&
+		    ! empty( $this->widget_containers[ $skin_type ] ) )
 		{	// Initialize IDs of containers:
 			global $DB;
 
@@ -4682,21 +4698,25 @@ class Blog extends DataObject
 			$SQL->SELECT( 'wico_code, wico_ID' );
 			$SQL->FROM( 'T_widget__container' );
 			$SQL->WHERE( 'wico_coll_ID = '.$this->ID );
-			$SQL->WHERE_and( 'wico_skin_type = "normal"' );
-			$SQL->WHERE_and( 'wico_code IN ( '.$DB->quote( array_keys( $this->widget_containers ) ).' )' );
+			$SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $skin_type ) );
+			$SQL->WHERE_and( 'wico_code IN ( '.$DB->quote( array_keys( $this->widget_containers[ $skin_type ] ) ).' )' );
 			$containers_data = $DB->get_assoc( $SQL );
 			foreach( $containers_data as $container_code => $container_ID )
 			{
-				if( isset( $this->widget_containers[ $container_code ] ) )
+				if( isset( $this->widget_containers[ $skin_type ][ $container_code ] ) )
 				{
-					$this->widget_containers[ $container_code ]['ID'] = $container_ID;
+					$this->widget_containers[ $skin_type ][ $container_code ]['ID'] = $container_ID;
 				}
 			}
 			// Set flag to don't load these data twice:
-			$this->widget_containers_ids_loaded = true;
+			if( ! isset( $this->widget_containers_ids_loaded ) )
+			{
+				$this->widget_containers_ids_loaded = array();
+			}
+			$this->widget_containers_ids_loaded[ $skin_type ] = true;
 		}
 
-		return $this->widget_containers;
+		return $this->widget_containers[ $skin_type ];
 	}
 
 

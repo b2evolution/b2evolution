@@ -90,7 +90,7 @@ class subcontainer_row_Widget extends ComponentWidget
 		}
 
 		$WidgetContainerCache = & get_WidgetContainerCache();
-		$coll_widget_containers = $WidgetContainerCache->get_by_coll_ID( $coll_ID );
+		$coll_widget_containers = $WidgetContainerCache->get_by_coll_skintype( $coll_ID, $this->get_container_param( 'skin_type' ) );
 		$container_options = array(
 				''            => T_('None'),
 				'!create_new' => T_('Create New'),
@@ -273,7 +273,7 @@ class subcontainer_row_Widget extends ComponentWidget
 
 		// Get subcontainer name:
 		$WidgetContainerCache = & get_WidgetContainerCache();
-		$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $subcontainer_code );
+		$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $Blog->ID, $this->get_container_param( 'skin_type' ), $subcontainer_code );
 		$subcontainer_name = $WidgetContainer ? $WidgetContainer->get( 'name' ) : $subcontainer_code;
 
 		if( ! isset( $displayed_subcontainers ) )

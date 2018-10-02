@@ -93,7 +93,7 @@ class subcontainer_Widget extends ComponentWidget
 		}
 
 		$WidgetContainerCache = & get_WidgetContainerCache();
-		$coll_widget_containers = $WidgetContainerCache->get_by_coll_ID( $coll_ID );
+		$coll_widget_containers = $WidgetContainerCache->get_by_coll_skintype( $coll_ID, $this->get_container_param( 'skin_type' ) );
 		$container_options = array(
 				'' => T_('None'),
 				T_('Existing Sub-Containers') => array(),
@@ -151,7 +151,7 @@ class subcontainer_Widget extends ComponentWidget
 		elseif( in_array( $subcontainer_code, $displayed_subcontainers ) )
 		{	// Do not try do display the same subcontainer which were already displayed to avoid infinite display:
 			$WidgetContainerCache = & get_WidgetContainerCache();
-			if( $WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $this->get_coll_ID(), $subcontainer_code ) )
+			if( $WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $this->get_coll_ID(), $this->get_container_param( 'skin_type' ), $subcontainer_code ) )
 			{
 				$subcontainer_name = $WidgetContainer->get( 'name' );
 			}

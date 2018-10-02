@@ -885,7 +885,7 @@ function install_basic_widgets( $old_db_version = 0 )
 	load_funcs( 'widgets/_widgets.funcs.php' );
 
 	task_begin( 'Installing default shared widgets... ' );
-	insert_shared_widgets();
+	insert_shared_widgets( 'normal' );
 	task_end();
 
 	$blog_type = ( $old_db_version < 11010 ) ? '"std"' : 'blog_type';
@@ -898,16 +898,9 @@ function install_basic_widgets( $old_db_version = 0 )
 	foreach( $blogs_data as $blog_data )
 	{
 		task_begin( 'Installing default widgets for collection #'.$blog_data->blog_ID.'... ' );
-		$skin_IDs = array( $blog_data->blog_normal_skin_ID );
-		if( ! empty( $blog_data->blog_mobile_skin_ID ) )
-		{
-			$skin_IDs[] = $blog_data->blog_mobile_skin_ID;
-		}
-		if( ! empty( $blog_data->blog_tablet_skin_ID ) )
-		{
-			$skin_IDs[] = $blog_data->blog_tablet_skin_ID;
-		}
-		insert_basic_widgets( $blog_data->blog_ID, $skin_IDs, true, $blog_data->blog_type );
+		insert_basic_widgets( $blog_data->blog_ID, 'normal', true, $blog_data->blog_type );
+		insert_basic_widgets( $blog_data->blog_ID, 'mobile', true, $blog_data->blog_type );
+		insert_basic_widgets( $blog_data->blog_ID, 'tablet', true, $blog_data->blog_type );
 		task_end();
 	}
 }
