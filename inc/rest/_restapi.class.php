@@ -1324,6 +1324,10 @@ class RestApi
 		// Get param to limit number users per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
 
+		// Get param to select current page:
+		// (NOTE: if this param is not set then param 'paged' is used as filter of UserList)
+		$page = param( 'page', 'integer', NULL );
+
 		// Get user list params:
 		$api_list_params = param( 'list_params', 'array:string', array() );
 
@@ -1341,7 +1345,12 @@ class RestApi
 
 		if( ! empty( $user_filters ) )
 		{	// Filter list:
-			$UserList->set_filters( $user_filters, true, true );
+			$UserList->set_filters( $user_filters );
+		}
+
+		if( $page !== NULL )
+		{	// Set page from request:
+			$UserList->page = $page;
 		}
 
 		// Execute query:
