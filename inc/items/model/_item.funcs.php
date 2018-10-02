@@ -2444,7 +2444,7 @@ function evo_merge_load_coll_posts( coll_urlname, coll_name, page )
 
 	var current_post_exclude_param = '&pl=-' + jQuery( '#evo_merge_post_ID' ).val();
 
-	var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&paged=' + page;
+	var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&page=' + page;
 
 	evo_rest_api_start_loading( '#evo_merge_posts_list' );
 	evo_rest_api_request( 'collections/' + coll_urlname + '/items&orderby=datemodified&order=DESC' + current_post_exclude_param +page_param, function( data )
