@@ -60,13 +60,6 @@ $Form = new Form( $form_action, 'item_checkchanges', 'post' );
 
 $Form->switch_template_parts( $params['edit_form_params'] );
 
-// =================================== INSTRUCTION ====================================
-$ItemType = & $edited_Item->get_ItemType();
-if( $ItemType && ( $ItemType->get( 'front_instruction' ) == 1 ) && $ItemType->get( 'instruction' ) )
-{
-	echo '<div class="alert alert-info fade in">'.$ItemType->get( 'instruction' ).'</div>';
-}
-
 // ================================ START OF EDIT FORM ================================
 
 $form_params = array();
@@ -260,6 +253,12 @@ $Form->begin_form( 'inskin', '', $form_params );
 	else
 	{ // Hide text
 		$Form->hidden( 'content', $item_content );
+	}
+
+	// =================================== INSTRUCTION ====================================
+	if( $edited_Item->get_type_setting( 'front_instruction' ) && $edited_Item->get_type_setting( 'instruction' ) )
+	{
+		echo '<div class="action_messages evo_instruction"><div class="log_note">'.$edited_Item->get_type_setting( 'instruction' ).'</div></div>';
 	}
 
 	global $display_item_settings_is_defined;

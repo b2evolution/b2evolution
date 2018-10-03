@@ -3797,8 +3797,15 @@ div.results {
   width: 100%;
   overflow: auto;
 }
-.evo_instruction {
-  margin: 20px 10px;
+div.action_messages.evo_instruction {
+  margin: 10px 0 0;
+}
+div.action_messages.evo_instruction ul,
+div.action_messages.evo_instruction li {
+  list-style: initial;
+}
+div.action_messages.evo_instruction ul {
+  padding-left: 20px;
 }
 form.inskin {
   padding: 10px;
