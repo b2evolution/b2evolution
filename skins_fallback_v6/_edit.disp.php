@@ -60,13 +60,6 @@ $Form = new Form( $form_action, 'item_checkchanges', 'post' );
 
 $Form->switch_template_parts( $params['edit_form_params'] );
 
-// =================================== INSTRUCTION ====================================
-$ItemType = & $edited_Item->get_ItemType();
-if( $ItemType && ( $ItemType->get( 'front_instruction' ) == 1 ) && $ItemType->get( 'instruction' ) )
-{
-	echo '<div class="alert alert-info fade in evo_instruction">'.$ItemType->get( 'instruction' ).'</div>';
-}
-
 // ================================ START OF EDIT FORM ================================
 $form_params = array();
 $iframe_name = NULL;
@@ -275,6 +268,47 @@ $Form->begin_form( 'inskin', '', $form_params );
 
 	$Form->end_fieldset();
 
+	// =================================== INSTRUCTION ====================================
+	if( $edited_Item->get_type_setting( 'front_instruction' ) && $edited_Item->get_type_setting( 'instruction' ) )
+	{
+		echo '<div class="alert alert-info fade in evo_instruction">'.$edited_Item->get_type_setting( 'instruction' ).'</div>';
+	}
+
+	// ################### LOCATIONS ###################
+	echo_item_location_form( $Form, $edited_Item );
+
+	if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
+	{
+		$Form->hidden( 'item_latitude', $edited_Item->get_setting( 'latitude' ) );
+		$Form->hidden( 'item_longitude', $edited_Item->get_setting( 'longitude' ) );
+		$Form->hidden( 'google_map_zoom', $edited_Item->get_setting( 'map_zoom' ) );
+		$Form->hidden( 'google_map_type', $edited_Item->get_setting( 'map_type' ) );
+	}
+
+	// ################### CUSTOM FIELDS ###################
+	$custom_fields = $edited_Item->get_type_custom_fields();
+	if( count( $custom_fields ) > 0 )
+	{
+		$Form->begin_fieldset( T_('Additional fields'), array( 'id' => 'itemform_custom_fields' ) );
+
+		// Display inputs to edit custom fields:
+		display_editable_custom_fields( $Form, $edited_Item );
+
+		$Form->end_fieldset();
+	}
+
+	// ####################### ATTACHMENTS/LINKS #########################
+	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
+			$current_User->check_perm( 'files', 'view', false ) )
+	{	// If current user has a permission to view the files AND attachments are allowed for the item type:
+		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+		// Initialize this object as global because this is used in many link functions:
+		global $LinkOwner;
+		$LinkOwner = new LinkItem( $edited_Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
+		// Display attachments fieldset:
+		display_attachments_fieldset( $Form, $LinkOwner );
+	}
+
 	// ################### TEXT RENDERERS & CATEGORIES ###################
 	if( $Blog->get_setting( 'in_skin_editing_renderers' ) )
 	{	// If text renderers are allowed to update from front-office:
@@ -325,45 +359,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 
 	echo $two_columns_layout['after'];
-?>
-
-<div class="clear"></div>
-
-<?php
-// ################### LOCATIONS ###################
-echo_item_location_form( $Form, $edited_Item );
-
-if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
-{
-	$Form->hidden( 'item_latitude', $edited_Item->get_setting( 'latitude' ) );
-	$Form->hidden( 'item_longitude', $edited_Item->get_setting( 'longitude' ) );
-	$Form->hidden( 'google_map_zoom', $edited_Item->get_setting( 'map_zoom' ) );
-	$Form->hidden( 'google_map_type', $edited_Item->get_setting( 'map_type' ) );
-}
-
-// ################### CUSTOM FIELDS ###################
-$custom_fields = $edited_Item->get_type_custom_fields();
-if( count( $custom_fields ) > 0 )
-{
-	$Form->begin_fieldset( T_('Additional fields'), array( 'id' => 'itemform_custom_fields' ) );
-
-	// Display inputs to edit custom fields:
-	display_editable_custom_fields( $Form, $edited_Item );
-
-	$Form->end_fieldset();
-}
-
-// ####################### ATTACHMENTS/LINKS #########################
-if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
-    $current_User->check_perm( 'files', 'view', false ) )
-{	// If current user has a permission to view the files AND attachments are allowed for the item type:
-	load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
-	// Initialize this object as global because this is used in many link functions:
-	global $LinkOwner;
-	$LinkOwner = new LinkItem( $edited_Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
-	// Display attachments fieldset:
-	display_attachments_fieldset( $Form, $LinkOwner );
-}
 
 // ####################### PLUGIN FIELDSETS #########################
 $Plugins->trigger_event( 'DisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item) );

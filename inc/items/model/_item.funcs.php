@@ -4137,8 +4137,8 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 		{	// Display a not of the custon field if it is filled:
 			$custom_field_note .= $custom_field['note'];
 		}
-		if( $custom_field['type'] != 'separator' )
-		{	// Display a field name/code:
+		if( is_admin_page() && $custom_field['type'] != 'separator' )
+		{	// Display a field name/code only in back-office:
 			$custom_field_note .= empty( $custom_field_note ) ? '' : ' &middot; ';
 			$custom_field_note .= T_('Field name').': <code>'.$custom_field['name'].'</code>';
 		}
@@ -4173,6 +4173,14 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 
 		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
 		$custom_field_label = render_custom_field( $custom_field['label'] );
+		if( ! empty( $custom_field['description'] ) )
+		{	// Display a description in tooltip of the help icon:
+			$custom_field_label .= ' '.get_icon( 'help', 'imgtag', array(
+					'data-toggle' => 'tooltip',
+					'title'       => nl2br( $custom_field['description'] ),
+					//'class'       => $params['custom_fields_description_icon_class'],
+				) ).' ';
+		}
 
 		switch( $custom_field['type'] )
 		{
