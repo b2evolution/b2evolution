@@ -709,7 +709,7 @@ class Item extends ItemLight
 	 */
 	function load_from_Request( $editing = false, $creating = false )
 	{
-		global $default_locale, $current_User, $localtimenow;
+		global $default_locale, $current_User, $localtimenow, $Blog;
 		global $item_typ_ID;
 
 		// LOCALE:
@@ -904,10 +904,6 @@ class Item extends ItemLight
 				$this->set_setting( 'goal_ID', $goal_ID, true );
 			}
 		}
-
-		// ORDER:
-		param( 'item_order', 'double', NULL );
-		$this->set_from_Request( 'order', 'item_order', true );
 
 		// OWNER:
 		$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
@@ -1206,16 +1202,18 @@ class Item extends ItemLight
 			$this->set_from_Request( 'city_ID', 'item_city_ID', true );
 		}
 
-		// Item orders per category:
-		$post_cat_orders = param( 'post_cat_orders', 'array:string' );
-		$this->orders = array();
-		foreach( $post_cat_orders as $post_cat_ID => $post_cat_order )
-		{
-			if( isset( $this->extra_cat_IDs ) &&
-			    is_array( $this->extra_cat_IDs ) &&
-			    in_array( $post_cat_ID, $this->extra_cat_IDs ) )
-			{	// Set order only for selected category:
-				$this->orders[ $post_cat_ID ] = ( $post_cat_order === '' ? NULL : floatval( $post_cat_order ) );
+		if( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) )
+		{	// Item orders per category:
+			$post_cat_orders = param( 'post_cat_orders', 'array:string' );
+			$this->orders = array();
+			foreach( $post_cat_orders as $post_cat_ID => $post_cat_order )
+			{
+				if( isset( $this->extra_cat_IDs ) &&
+						is_array( $this->extra_cat_IDs ) &&
+						in_array( $post_cat_ID, $this->extra_cat_IDs ) )
+				{	// Set order only for selected category:
+					$this->orders[ $post_cat_ID ] = ( $post_cat_order === '' ? NULL : floatval( $post_cat_order ) );
+				}
 			}
 		}
 
@@ -7838,7 +7836,7 @@ class Item extends ItemLight
 	 */
 	function insert_update_extracats( $mode )
 	{
-		global $DB, $Messages, $Settings;
+		global $DB, $Messages, $Settings, $Blog;
 
 		if( ! is_null( $this->extra_cat_IDs ) )
 		{ // Okay the extra cats are defined:
@@ -7851,6 +7849,10 @@ class Item extends ItemLight
 				$Messages->add( T_('Could not set the selected categories!'), 'error' );
 				return false;
 			}
+
+			// Load item orders per categories before delete them from DB:
+			$this->load_orders();
+
 			if( $mode == 'update' )
 			{
 				// delete previous extracats:
@@ -9000,12 +9002,9 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get item order per category
-	 *
-	 * @param integer Category ID, NULL - for main category
-	 * @return double|NULL Order or NULL if an order is not defined for requested category
+	 * Load item orders per categories
 	 */
-	function get_order( $cat_ID = NULL )
+	function load_orders()
 	{
 		if( ! isset( $this->orders ) && $this->ID > 0 )
 		{	// Initialize item orders in all assigned categories:
@@ -9016,6 +9015,18 @@ class Item extends ItemLight
 			$SQL->WHERE( 'postcat_post_ID = '.$this->ID );
 			$this->orders = $DB->get_assoc( $SQL );
 		}
+	}
+
+
+	/**
+	 * Get item order per category
+	 *
+	 * @param integer Category ID, NULL - for main category
+	 * @return double|NULL Order or NULL if an order is not defined for requested category
+	 */
+	function get_order( $cat_ID = NULL )
+	{
+		$this->load_orders();
 
 		if( $cat_ID === NULL )
 		{	// Use main category:

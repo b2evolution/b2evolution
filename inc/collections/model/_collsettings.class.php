@@ -161,6 +161,7 @@ class CollectionSettings extends AbstractSettings
 			'in_skin_editing' => 0,
 			'in_skin_editing_renderers' => 1,
 			'in_skin_editing_category' => 1,
+			'in_skin_editing_category_order' => 1,
 			'default_cat_ID' => NULL,					// Default Cat for new posts
 			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet,evo_twitter', // ping plugin codes, separated by comma
 			'allow_subscriptions' => 1,         // Allow email subscriptions for new post by default
