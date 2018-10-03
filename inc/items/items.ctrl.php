@@ -2043,6 +2043,8 @@ switch( $action )
 	case 'update': // on error
 	case 'update_publish': // on error
 	case 'history':
+	case 'history_details':
+	case 'history_compare':
 	case 'extract_tags':
 
 		// Generate available blogs list:
@@ -2067,6 +2069,8 @@ switch( $action )
 			case 'update': // on error
 			case 'update_publish': // on error
 			case 'history':
+			case 'history_details':
+			case 'history_compare':
 			case 'extract_tags':
 				if( $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
 				{	// User has permissions to delete this post
@@ -2086,12 +2090,31 @@ switch( $action )
 							) );
 				}
 
+				if( $Blog->get_setting( 'allow_comments' ) != 'never' )
+				{
+					$comments_number = generic_ctp_number( $edited_Item->ID, 'comments', 'total', true );
+					$item_feedback_title = ( $comments_number == 0 ? T_('no comment') : ( $comments_number == 1 ? T_('1 comment') : sprintf( T_('%d comments'), $comments_number ) ) );
+					$AdminUI->global_icon( $item_feedback_title, ( $comments_number > 0 ? 'comments' : 'nocomment' ), $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID.'#comments',
+						' '.$item_feedback_title, 4, 3, array(
+								'style' => 'margin-right: 3ex;',
+						) );
+				}
+
 				$edited_item_url = $edited_Item->get_copy_url();
 				if( ! empty( $edited_item_url ) )
 				{	// If user has a permission to copy the edited Item:
 					$AdminUI->global_icon( T_('Duplicate this post...'), 'copy', $edited_item_url,
 						' '.T_('Duplicate...'), 4, 3, array(
 								'style' => 'margin-right: 3ex;',
+						) );
+				}
+
+				if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+				{	// If user has a permission to merge the edited Item:
+					$AdminUI->global_icon( T_('Merge with...'), 'merge', '#',
+						' '.T_('Merge with...'), 4, 3, array(
+								'style' => 'margin-right: 3ex;',
+								'onclick' => 'return evo_merge_load_window( '.$edited_Item->ID.' )',
 						) );
 				}
 				break;
