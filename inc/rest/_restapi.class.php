@@ -604,7 +604,10 @@ class RestApi
 
 		// Get param to limit number posts per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
-		$page = param( 'page', 'integer', 1 );
+
+		// Get param to select current page:
+		// (NOTE: if this param is not set then param 'paged' is used as filter of ItemList)
+		$page = param( 'page', 'integer', NULL );
 
 		// Get param to know what post fields should be sent in response:
 		$api_details = param( 'details', 'string', NULL );
@@ -632,7 +635,12 @@ class RestApi
 
 		if( $ItemList2->filters['types'] == $ItemList2->default_filters['types'] )
 		{	// Allow all post types by default for this request:
-			$ItemList2->set_filters( array( 'itemtype_usage' => NULL, 'page' => $page ), true, true );
+			$ItemList2->set_filters( array( 'itemtype_usage' => NULL ), true, true );
+		}
+
+		if( $page !== NULL )
+		{	// Set page from request:
+			$ItemList2->set_filters( array( 'page' => $page ), true, true );
 		}
 
 		if( ! empty( $force_filters ) )
@@ -1316,6 +1324,10 @@ class RestApi
 		// Get param to limit number users per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
 
+		// Get param to select current page:
+		// (NOTE: if this param is not set then param 'paged' is used as filter of UserList)
+		$page = param( 'page', 'integer', NULL );
+
 		// Get user list params:
 		$api_list_params = param( 'list_params', 'array:string', array() );
 
@@ -1333,7 +1345,12 @@ class RestApi
 
 		if( ! empty( $user_filters ) )
 		{	// Filter list:
-			$UserList->set_filters( $user_filters, true, true );
+			$UserList->set_filters( $user_filters );
+		}
+
+		if( $page !== NULL )
+		{	// Set page from request:
+			$UserList->page = $page;
 		}
 
 		// Execute query:
