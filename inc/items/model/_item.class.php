@@ -5847,8 +5847,6 @@ class Item extends ItemLight
 	function edit_link( $params = array() )
 	{
 		echo $this->get_edit_link( $params );
-
-		echo_item_merge_js();
 	}
 
 
@@ -5921,6 +5919,8 @@ class Item extends ItemLight
 	function merge_link( $params = array() )
 	{
 		echo $this->get_merge_link( $params );
+
+		echo_item_merge_js();
 	}
 
 
