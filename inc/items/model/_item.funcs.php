@@ -4619,6 +4619,10 @@ function items_manual_results_block( $params = array() )
 							'th' => T_('URL "slug"'),
 						);
 	$Table->cols[] = array(
+							'th' => T_('Status'),
+							'th_class' => 'shrinkwrap',
+						);
+	$Table->cols[] = array(
 							'th' => T_('Order'),
 							'th_class' => 'shrinkwrap',
 						);
@@ -5371,9 +5375,10 @@ function item_row_type( $Item )
  *
  * @param object Item
  * @param integer Index of the row on page
+ * @param integer|NULL Category ID
  * @return string
  */
-function item_row_status( $Item, $index )
+function item_row_status( $Item, $index, $cat_ID = NULL )
 {
 	global $current_User, $AdminUI, $Collection, $admin_url;
 
@@ -5398,7 +5403,7 @@ function item_row_status( $Item, $index )
 		foreach( $status_options as $status_key => $status_title )
 		{
 			$r .= '<li rel="'.$status_key.'" role="presentation"><a href="'
-					.$admin_url.'?ctrl=items'.$tab_param.'&amp;blog='.$blog_ID.'&amp;action=update_status&amp;post_ID='.$Item->ID.'&amp;status='.$status_key.'&amp;'.url_crumb( 'item' )
+					.$admin_url.'?ctrl=items'.$tab_param.'&amp;blog='.$blog_ID.'&amp;action=update_status&amp;post_ID='.$Item->ID.'&amp;status='.$status_key.( $cat_ID === NULL ? '' : '&amp;cat_ID='.$cat_ID ).'&amp;'.url_crumb( 'item' )
 					.'" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
 		}
 		$r .= '</ul>'
@@ -5589,6 +5594,9 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 	// URL "slug"
 	$r .= '<td><a href="'.htmlspecialchars($Chapter->get_permanent_url()).'">'.$Chapter->dget('urlname').'</a></td>';
 
+	// Status:
+	$r .= '<td>&nbsp;</td>';
+
 	// Order
 	$order_attrs = '';// ' style="padding-left:'.( ( $level * 10 ) + 5 ).'px"';
 	$order_value = T_('Alphabetic');
@@ -5651,6 +5659,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	global $Session;
 
 	$result_fadeout = $Session->get( 'fadeout_array' );
+	$highlight_id = $Session->get( 'highlight_id' );
 
 	$params = array_merge( array(
 			'title_before' => '',
@@ -5668,7 +5677,8 @@ function manual_display_post_row( $Item, $level, $params = array() )
 
 	// Check if current item's row should be highlighted:
 	$is_highlighted = ( param( 'highlight_id', 'integer', NULL ) == $Item->ID ) ||
-		( isset( $result_fadeout ) && in_array( 'item-'.$Item->ID, $result_fadeout ) );
+		( isset( $result_fadeout ) && in_array( 'item-'.$Item->ID, $result_fadeout ) ) ||
+		( $highlight_id == $Item->ID );
 
 	$r = '<tr id="item-'.$Item->ID.'" class="'.$line_class.( $is_highlighted ? ' evo_highlight' : '' ).'">';
 
@@ -5711,6 +5721,9 @@ function manual_display_post_row( $Item, $level, $params = array() )
 		$r .= ' '.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
 	}
 	$r .= '</td>';
+
+	// Status:
+	$r .= '<td>'.item_row_status( $Item, 0, $params['chapter_ID'] ).'</td>';
 
 	// Order
 	$order_attrs = '';// ' style="padding-left:'.( ( $level * 10 ) + 5 ).'px"';

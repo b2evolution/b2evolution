@@ -1458,6 +1458,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		param( 'status', 'string', true );
+		param( 'cat_ID', 'integer', NULL );
 
 		// Check edit permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
@@ -1491,7 +1492,8 @@ switch( $action )
 			$tab = param( 'tab', 'string', 'type' );
 			$tab_type = get_tab_by_item_type_usage( $edited_Item->get_type_setting( 'usage' ) );
 			$tab_type_param = ( $tab == 'type' ? '&tab_type='.( $tab_type ? $tab_type[0] : 'post' ) : '' );
-			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab='.$tab.$tab_type_param.'&filter=restore';
+			$cat_param = ( $cat_ID === NULL ? '' : '&cat_ID='.$cat_ID );
+			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab='.$tab.$tab_type_param.$cat_param.'&filter=restore';
 
 			// Highlight the updated item in list
 			$Session->set( 'highlight_id', $edited_Item->ID );
