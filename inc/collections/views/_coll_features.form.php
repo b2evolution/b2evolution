@@ -162,7 +162,7 @@ $Form->begin_fieldset( T_('Create/Edit options').get_manual_link('blog_features_
 		$coll_in_skin_editing_options[] = array( 'in_skin_editing_renderers', 1, T_('Allow Text Renderers selection in Front-Office edit screen').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing_renderers' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) );
 	}
 	$coll_in_skin_editing_options[] = array( 'in_skin_editing_category', 1, T_('Allow Category selection in Front-Office edit screen'), $edited_Blog->get_setting( 'in_skin_editing_category' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) );
-	$coll_in_skin_editing_options[] = array( 'in_skin_editing_category_order', 1, T_('Allow Order field in Category selection in Front-Office edit screen'), $edited_Blog->get_setting( 'in_skin_editing_category_order' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) );
+	$coll_in_skin_editing_options[] = array( 'in_skin_editing_category_order', 1, T_('Allow Order field in Category selection in Front-Office edit screen'), $edited_Blog->get_setting( 'in_skin_editing_category_order' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) || ! $edited_Blog->get_setting( 'in_skin_editing_category' ) );
 	$Form->checklist( $coll_in_skin_editing_options, 'front_office_posting', T_('Front-Office posting') );
 
 $Form->end_fieldset();
@@ -335,6 +335,10 @@ echo '</div>';
 jQuery( 'input[name=in_skin_editing]' ).click( function()
 {
 	jQuery( 'input[name^=in_skin_editing_]' ).prop( 'disabled', ! jQuery( this ).is( ':checked' ) );
+} );
+jQuery( 'input[name=in_skin_editing_category]' ).click( function()
+{
+	jQuery( 'input[name=in_skin_editing_category_order]' ).prop( 'disabled', ! jQuery( this ).is( ':checked' ) );
 } );
 
 jQuery( '#voting_positive' ).click( function()
