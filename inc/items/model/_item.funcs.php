@@ -2351,6 +2351,12 @@ function echo_item_merge_js()
 <script type="text/javascript">
 function evo_merge_load_window( item_ID )
 {
+	if( typeof( bozo ) && bozo.nb_changes > 0 )
+	{	// Don't allow to merge if item edit form is changed and not saved yet:
+		alert( '<?php echo TS_('You must save the Item before you can merge it.'); ?>' );
+		return false;
+	}
+
 	openModalWindow( '<div id="evo_merge_wrapper"></div>', 'auto', '', true,
 		'<?php echo TS_('Select destination Post...'); ?>', // Window title
 		[ '-', 'evo_merge_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back", "Merge with original dates",  "Append to this post with new dates"
