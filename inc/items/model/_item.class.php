@@ -905,10 +905,6 @@ class Item extends ItemLight
 			}
 		}
 
-		// ORDER:
-		param( 'item_order', 'double', NULL );
-		$this->set_from_Request( 'order', 'item_order', true );
-
 		// OWNER:
 		$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
 		if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && param( 'item_owner_login_displayed', 'string', NULL ) !== NULL )
@@ -5849,8 +5845,6 @@ class Item extends ItemLight
 	function edit_link( $params = array() )
 	{
 		echo $this->get_edit_link( $params );
-
-		echo_item_merge_js();
 	}
 
 
@@ -5923,6 +5917,8 @@ class Item extends ItemLight
 	function merge_link( $params = array() )
 	{
 		echo $this->get_merge_link( $params );
+
+		echo_item_merge_js();
 	}
 
 
