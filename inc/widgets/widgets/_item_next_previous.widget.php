@@ -121,23 +121,19 @@ class item_next_previous_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item, $disp;
-
-		if( isset( $params['ignored_widgets'] ) && in_array( $this->code, $params['ignored_widgets'] ) )
-		{
-			return false;
-		}
+		global $disp;
 
 		$this->init_display( $params );
 
 		$this->disp_params = array_merge( array(
+				'widget_item_next_previous_display' => true,
 				'widget_item_next_previous_params' => array(
 						'block_start' => '',
 						'block_end' => '',
-				),
+					),
 			), $this->disp_params );
 
-		if( $disp == 'single' )
+		if( $this->disp_params['widget_item_next_previous_display'] && $disp == 'single' )
 		{
 			echo $this->disp_params['block_start'];
 			$this->disp_title();
@@ -150,8 +146,10 @@ class item_next_previous_Widget extends ComponentWidget
 
 			return true;
 		}
-
-		return false;
+		else
+		{
+			return false;
+		}
 	}
 }
 

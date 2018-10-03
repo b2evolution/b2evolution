@@ -133,7 +133,6 @@ class item_title_Widget extends ComponentWidget
 
 		$this->disp_params = array_merge( array(
 				'widget_item_title_params' => array(),
-				'widget_item_title_link_params' => array(),
 			), $this->disp_params );
 
 		echo $this->disp_params['block_start'];
