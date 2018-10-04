@@ -302,11 +302,12 @@ class item_info_line_Widget extends ComponentWidget
 
 			$widget_params = $this->disp_params['widget_item_info_line_params'];
 
+			ob_start();
+
 			// Flag:
 			$flag = '';
 			if( $this->disp_params['flag_icon'] )
 			{
-				ob_start();
 				$Item->flag( array(
 						'before' => $widget_params['before_flag'],
 						'after'  => $widget_params['after_flag'],
@@ -319,7 +320,6 @@ class item_info_line_Widget extends ComponentWidget
 			$permalink = '';
 			if( $this->disp_params['permalink_icon'] )
 			{
-				ob_start();
 				$Item->permanent_link( array(
 						'text'   => '#icon#',
 						'before' => $widget_params['before_permalink'],
@@ -333,7 +333,6 @@ class item_info_line_Widget extends ComponentWidget
 			$author = '';
 			if( $this->disp_params['before_author'] != 'none' )
 			{
-				ob_start();
 				$Item->author( array(
 						'before'    => $widget_params['before_author'],
 						'after'     => $widget_params['after_author'],
@@ -347,7 +346,6 @@ class item_info_line_Widget extends ComponentWidget
 			$post_time = '';
 			if( $this->disp_params['date_format'] != 'none' || $this->disp_params['time_format'] != 'none' )
 			{
-				ob_start();
 				switch( $this->disp_params['display_date'] )
 				{
 					case 'issue_date':
@@ -372,7 +370,6 @@ class item_info_line_Widget extends ComponentWidget
 			$categories = '';
 			if( $this->disp_params['category'] )
 			{
-				ob_start();
 				$Item->categories( array(
 					'before'          => $widget_params['before_categories'],
 					'after'           => $widget_params['after_categories'],
@@ -389,7 +386,6 @@ class item_info_line_Widget extends ComponentWidget
 			$last_touched = '';
 			if( $this->disp_params['last_touched'] )
 			{
-				ob_start();
 				echo $widget_params['before_last_touched'];
 				echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) );
 				echo $widget_params['after_last_touched'];
@@ -401,7 +397,6 @@ class item_info_line_Widget extends ComponentWidget
 			$last_updated = '';
 			if( $this->disp_params['contents_updated'] )
 			{
-				ob_start();
 				echo $widget_params['before_last_updated'];
 				echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'contents_last_updated_ts' ) ).$Item->get_refresh_contents_last_updated_link();
 				echo $widget_params['after_last_updated'];
@@ -413,7 +408,6 @@ class item_info_line_Widget extends ComponentWidget
 			$edit_link = '';
 			if( $this->disp_params['edit_link'] )
 			{
-				ob_start();
 				$Item->edit_link( array(
 						'before' => $widget_params['before_edit_link'],
 						'after'  => $widget_params['after_edit_link'],
@@ -421,6 +415,8 @@ class item_info_line_Widget extends ComponentWidget
 				$edit_link = ob_get_contents();
 				ob_clean();
 			}
+
+			ob_end_clean();
 
 			// Item info line format:
 			$format = empty( $widget_params['format'] ) ? '$flag$$permalink$$author$$post_time$$categories$$last_touched$$last_updated$$edit_link$' : $widget_params['format'];
