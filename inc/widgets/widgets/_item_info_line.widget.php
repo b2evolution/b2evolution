@@ -269,26 +269,33 @@ class item_info_line_Widget extends ComponentWidget
 				'widget_item_info_line_display' => true,
 				'widget_item_info_line_before'  => '<span class="small text-muted">',
 				'widget_item_info_line_after'   => '</span>',
-				'widget_item_info_line_params'  => array(
-						'before_flag'         => '',
-						'after_flag'          => '',
-						'before_permalink'    => '',
-						'after_permalink'     => ' ',
-						'before_author'       => $before_author,
-						'after_author'        => ' ',
-						'before_post_time'    => $before_post_time,
-						'after_post_time'     => ' ',
-						'before_categories'   => T_('in').' ',
-						'after_categories'    => ' ',
-						'before_last_touched' => '<span class="text-muted"> &ndash; '.T_('Last touched').': ',
-						'after_last_touched'  => '</span>',
-						'before_last_updated' => '<span class="text-muted"> &ndash; '.T_('Contents updated').': ',
-						'after_last_updated'  => '</span>',
-						'before_edit_link'    => ' &bull; ',
-						'after_edit_link'     => '',
-						'format'              => '',
-					),
 			), $this->disp_params );
+
+		$widget_params = array(
+				'before_flag'         => '',
+				'after_flag'          => '',
+				'before_permalink'    => '',
+				'after_permalink'     => ' ',
+				'permalink_text'      => '#icon#',
+				'before_author'       => $before_author,
+				'after_author'        => ' ',
+				'before_post_time'    => $before_post_time,
+				'after_post_time'     => ' ',
+				'before_categories'   => T_('in').' ',
+				'after_categories'    => ' ',
+				'before_last_touched' => '<span class="text-muted"> &ndash; '.T_('Last touched').': ',
+				'after_last_touched'  => '</span>',
+				'before_last_updated' => '<span class="text-muted"> &ndash; '.T_('Contents updated').': ',
+				'after_last_updated'  => '</span>',
+				'before_edit_link'    => ' &bull; ',
+				'after_edit_link'     => '',
+				'edit_link_text'      => '#',
+				'format'              => '',
+			);
+
+
+		$this->disp_params['widget_item_info_line_params'] = array_merge( $widget_params, $this->disp_params['widget_item_info_line_params'] );
+		$widget_params = $this->disp_params['widget_item_info_line_params'];
 
 		if( $this->disp_params['widget_item_info_line_display'] )
 		{
@@ -299,8 +306,6 @@ class item_info_line_Widget extends ComponentWidget
 			echo $this->disp_params['block_body_start'];
 
 			echo $this->disp_params['widget_item_info_line_before'];
-
-			$widget_params = $this->disp_params['widget_item_info_line_params'];
 
 			ob_start();
 
@@ -321,7 +326,7 @@ class item_info_line_Widget extends ComponentWidget
 			if( $this->disp_params['permalink_icon'] )
 			{
 				$Item->permanent_link( array(
-						'text'   => '#icon#',
+						'text'   => $widget_params['permalink_text'],
 						'before' => $widget_params['before_permalink'],
 						'after'  => $widget_params['after_permalink'],
 					) );
@@ -411,6 +416,7 @@ class item_info_line_Widget extends ComponentWidget
 				$Item->edit_link( array(
 						'before' => $widget_params['before_edit_link'],
 						'after'  => $widget_params['after_edit_link'],
+						'text'   => $widget_params['edit_link_text'],
 					) );
 				$edit_link = ob_get_contents();
 				ob_clean();
