@@ -971,7 +971,7 @@ class Item extends ItemLight
 		$custom_fields = $this->get_type_custom_fields();
 		foreach( $custom_fields as $custom_field )
 		{ // update each custom field
-			$param_name = 'item_'.$custom_field['type'].'_'.$custom_field['ID'];
+			$param_name = 'item_cf_'.$custom_field['name'];
 			$param_error = false;
 			if( isset_param( $param_name ) )
 			{ // param is set
@@ -7342,11 +7342,15 @@ class Item extends ItemLight
 
 		if( ! empty( $dbchanges['post_ityp_ID'] ) )
 		{	// If item type has been changed to another,
-			// Clear all custom fields values of previous item type:
+			// Clear custom fields values ONLY of previous item type:
+			// But don't delete old custom field values if fields with same names exist in new selected item type:
+			$new_custom_fields = $this->get_type_custom_fields();
+			$sql_new_custom_fields = ( empty( $new_custom_fields ) ? '' : ' AND iset_name NOT IN ( "custom:'.implode( '", "custom:', array_keys( $new_custom_fields ) ).'" )' );
 			// NOTE: Call this before item settings updating in order to don't remove values of new selected item type:
 			$DB->query( 'DELETE FROM T_items__item_settings
 				WHERE iset_item_ID = '.$this->ID.'
-					AND iset_name LIKE "custom:%"' );
+					AND iset_name LIKE "custom:%"'
+					.$sql_new_custom_fields );
 		}
 
 		// save Item settings
