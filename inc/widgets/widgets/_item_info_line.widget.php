@@ -269,6 +269,7 @@ class item_info_line_Widget extends ComponentWidget
 				'widget_item_info_line_display' => true,
 				'widget_item_info_line_before'  => '<span class="small text-muted">',
 				'widget_item_info_line_after'   => '</span>',
+				'widget_item_info_line_params'  => array(),
 			), $this->disp_params );
 
 		$widget_params = array(
@@ -292,7 +293,6 @@ class item_info_line_Widget extends ComponentWidget
 				'edit_link_text'      => '#',
 				'format'              => '',
 			);
-
 
 		$this->disp_params['widget_item_info_line_params'] = array_merge( $widget_params, $this->disp_params['widget_item_info_line_params'] );
 		$widget_params = $this->disp_params['widget_item_info_line_params'];
