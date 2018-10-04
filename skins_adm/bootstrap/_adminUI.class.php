@@ -290,14 +290,13 @@ class AdminUI extends AdminUI_general
 			case 'menu3':
 				// level 3 submenu:
 				return array(
-						'before' => '<div class="container-fluid"><div class="row"><div class="col-lg-6 level3">'."\n"
+						'before' => '<div class="container-fluid level3">'."\n"
 										.'<nav>'."\n"
 									.'<ul class="nav nav-pills">'."\n",
 						'after' => '</ul>'."\n"
 									.'</nav>'."\n"
 								.'</div>'."\n"
-								.'<div class="col-lg-6"><div class="pull-right">$global_icons$</div></div>'."\n"
-								.'</div></div>'."\n",
+								.'<div class="container-fluid container-global-icons"><div class="pull-right">$global_icons$</div></div>'."\n",
 						'empty' => '<div class="container-fluid"><div class="pull-right">$global_icons$</div></div>'."\n",
 						'beforeEach' => '<li role="presentation">',
 						'afterEach'  => '</li>',

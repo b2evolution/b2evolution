@@ -4178,7 +4178,7 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 			$custom_field_label .= ' '.get_icon( 'help', 'imgtag', array(
 					'data-toggle' => 'tooltip',
 					'title'       => nl2br( $custom_field['description'] ),
-					//'class'       => $params['custom_fields_description_icon_class'],
+					'class'       => 'grey',
 				) ).' ';
 		}
 
