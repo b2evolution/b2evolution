@@ -7638,6 +7638,8 @@ class Item extends ItemLight
 	 */
 	function update_slugs( $urltitle = NULL )
 	{
+		$SlugCache = & get_SlugCache();
+
 		if( ! isset( $urltitle ) )
 		{
 			$urltitle = $this->urltitle;
@@ -7658,9 +7660,17 @@ class Item extends ItemLight
 			$new_Slug->set( 'type', 'item' );
 			$new_Slug->set( 'itm_ID', $this->ID );
 
+			if( ( $urltitle != $new_Slug->get( 'title' ) ) &&
+			    ( strtolower( $urltitle ) == $new_Slug->get( 'title' ) ) &&
+			    ( $prev_Slug = $SlugCache->get_by_name( $urltitle, false, false ) ) )
+			{	// Allow to use uppercase chars in slug title only if this is a single difference between requested slug title and result of urltitle_validate(),
+				// and only if such slug title alredy exists in DB:
+				// (such case possible after item merging when all sulgs were merged and also tiny slugs which have a format like aC8)
+				$new_Slug->set( 'title', $urltitle );
+			}
+
 			// Check if this slug was already used by this item or not.
 			// We need this check, because urltitle_validate() function will modify an existing urltitle only if it belongs to a different object
-			$SlugCache = & get_SlugCache();
 			$prev_Slug = $SlugCache->get_by_name( $new_Slug->get('title'), false, false );
 			if( $prev_Slug )
 			{ // A slug with this title already exists. It must belong to the same item!
