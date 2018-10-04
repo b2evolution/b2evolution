@@ -4185,25 +4185,25 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 		switch( $custom_field['type'] )
 		{
 			case 'double':
-				$Form->text_input( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
 				break;
 			case 'computed':
 				$Form->info( $custom_field_label, $edited_Item->get_custom_field_formatted( $custom_field['name'] ), $custom_field_note );
 				break;
 			case 'varchar':
-				$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
 				break;
 			case 'text':
-				$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
+				$Form->textarea_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
 				break;
 			case 'html':
-				$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
+				$Form->textarea_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
 				break;
 			case 'url':
-				$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
 				break;
 			case 'image':
-				$Form->text_input( 'item_image_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
 				break;
 			case 'separator':
 				if( is_admin_page() && $c > 0 )
@@ -4227,7 +4227,7 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 		    ! in_array( $custom_field['type'], array( 'computed', 'separator' ) ) ) // Theese fields don't have an editable value
 		{	// When input field is disabled and new item is creating
 			// we should create additional hidden input field because the disabled inputs are not submitted:
-			$Form->hidden( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ) );
+			$Form->hidden( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ) );
 		}
 
 		$c++;

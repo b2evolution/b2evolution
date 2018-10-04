@@ -101,7 +101,10 @@ class Slug extends DataObject
 		global $Messages;
 		// title
 		$slug_title = param( 'slug_title', 'string', true );
-		$slug_title = urltitle_validate( $slug_title, '', 0, true, 'slug_title', 'slug_ID', 'T_slug' );
+		if( empty( $this->ID ) || $slug_title != $this->get( 'title' ) )
+		{	// Check unique slug title only for new creating slug and if title was really changed:
+			$slug_title = urltitle_validate( $slug_title, $slug_title, 0, true, 'slug_title', 'slug_ID', 'T_slug' );
+		}
 		if( $this->dbexists( 'slug_title', $slug_title ) )
 		{
 			$Messages->add( sprintf( T_('The slug &laquo;%s&raquo; already exists.'), $slug_title ), 'error' );
