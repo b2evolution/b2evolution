@@ -882,6 +882,12 @@ class item_fields_compare_Widget extends ComponentWidget
 					}
 				}
 			}
+
+			// Remove duplicated items with same ID:
+			$items = array_unique( $items );
+
+			// Save original orders of the items when they are defined as specific list:
+			$orig_ordered_items = $items;
 		}
 
 		// Use ItemList in order to check what items can be displayed on front-office for current User
@@ -951,6 +957,20 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		// Get IDs of items filtered by $ItemList:
 		$items = $ItemList->get_page_ID_array();
+
+		if( isset( $orig_ordered_items ) && count( $items ) )
+		{	// Revert original orders of items:
+			$fix_ordered_items = array();
+			foreach( $orig_ordered_items as $orig_ordered_item_ID )
+			{
+				if( ( $item_ID_index = array_search( $orig_ordered_item_ID, $items ) ) !== false )
+				{
+					$fix_ordered_items[] = $items[ $item_ID_index ];
+				}
+			}
+			// Replace items ordered by $ItemList with original ordered array:
+			$items = $fix_ordered_items;
+		}
 
 		return $items;
 	}
