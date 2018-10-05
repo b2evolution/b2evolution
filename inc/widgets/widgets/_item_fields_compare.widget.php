@@ -226,6 +226,11 @@ class item_fields_compare_Widget extends ComponentWidget
 						'note' => T_('Enter one field name per line.'),
 						'rows' => 10,
 					),
+					'hide_empty_lines' => array(
+						'type' => 'checkbox',
+						'label' => T_('Hide empty lines'),
+						'defaultvalue' => 1,
+					),
 					'edit_links' => array(
 						'type' => 'checkbox',
 						'label' => T_('Edit Links'),
@@ -613,19 +618,21 @@ class item_fields_compare_Widget extends ComponentWidget
 				$all_custom_fields[ $c ]['is_different'] = true;
 			}
 
+			// Check for empty all values from this line only it is required by widget setting:
+			$this_line_values_are_empty = $this->disp_params['hide_empty_lines'];
+
 			// Compare values:
 			$prev_custom_field_value = NULL;
 			$i = 0;
-			$all_string_values_are_empty = ( $fields_source == 'all' || $fields_source == 'exclude' );
 			foreach( $custom_field['items'] as $item_ID )
 			{
 				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 				$custom_field_value = $widget_Item->get_custom_field_value( $custom_field['name'] );
 
-				if( $all_string_values_are_empty &&
+				if( $this_line_values_are_empty &&
 				    ( ! empty( $custom_field_value ) || $custom_field['type'] == 'separator' ) )
 				{	// At least one field is not empty:
-					$all_string_values_are_empty = false;
+					$this_line_values_are_empty = false;
 				}
 
 				// Check if the values are different from given line:
@@ -679,9 +686,8 @@ class item_fields_compare_Widget extends ComponentWidget
 				$i++;
 			}
 
-			if( $all_string_values_are_empty && $items_count > 1 )
-			{	// Don't display row of custom field if values from all compared items are empty,
-				// But display all empty fields when only single items is displayed, e.g. in child item_custom_fields_Widget:
+			if( $this_line_values_are_empty )
+			{	// Don't display row/line of custom field if values from all compared items are empty and if it is required by widget setting to hide empty lines:
 				unset( $all_custom_fields[ $c ] );
 			}
 		}
