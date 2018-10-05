@@ -385,6 +385,7 @@ echo_publishnowbutton_js();
 // New category input box:
 echo_onchange_newcat();
 echo_autocomplete_tags();
+echo_fieldset_folding_js();
 
 $edited_Item->load_Blog();
 // Location

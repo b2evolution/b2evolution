@@ -1029,6 +1029,9 @@ div.fieldset_wrapper.folded .panel-body {
 span[id^=title_folding_] {
   cursor: default;
 }
+tbody.fieldset_wrapper.folded + tbody[id^=cat_sel_] {
+  display: none;
+}
 .browse .evo_content_block {
   margin-right: 0;
 }

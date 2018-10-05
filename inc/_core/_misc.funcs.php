@@ -7767,29 +7767,34 @@ function evo_error_handler()
 function get_fieldset_folding_icon( $id, $params = array() )
 {
 	if( ! is_logged_in() )
-	{ // Only loggedin users can fold fieldset
+	{	// Only loggedin users can fold fieldset
 		return;
 	}
 
 	$params = array_merge( array(
-			'before'    => '',
-			'after'     => ' ',
-			'deny_fold' => false, // TRUE to don't allow fold the block and keep it opened always on page loading
+			'before'     => '',
+			'after'      => ' ',
+			'deny_fold'  => false, // TRUE to don't allow fold the block and keep it opened always on page loading
+			'fold_value' => NULL,
 		), $params );
 
 	if( $params['deny_fold'] )
-	{ // Deny folding for this case
+	{	// Deny folding for this case
 		$value = 0;
 	}
+	elseif( ! is_null( $params['fold_value'] ) )
+	{	// Fold value is specified, use this:
+		$value = intval( $params['fold_value'] );
+	}
 	else
-	{ // Get the fold value from user settings
+	{	// Get the fold value from user settings
 		global $UserSettings, $Collection, $Blog, $ctrl;
 		if( empty( $Blog ) || ( isset( $ctrl ) && in_array( $ctrl, array( 'plugins', 'user' ) ) ) )
-		{ // Get user setting value
+		{	// Get user setting value
 			$value = intval( $UserSettings->get( 'fold_'.$id ) );
 		}
 		else
-		{ // Get user-collection setting
+		{	// Get user-collection setting
 			$value = intval( $UserSettings->get_collection_setting( 'fold_'.$id, $Blog->ID ) );
 		}
 	}

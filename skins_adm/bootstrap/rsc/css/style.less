@@ -1106,6 +1106,11 @@ span[id^=title_folding_] {
 	cursor: default;
 }
 
+// Fieldset folding for Category selection
+tbody.fieldset_wrapper.folded+tbody[id^=cat_sel_] {
+	display: none;
+}
+
 // Dashboard
 .browse {
 	.evo_content_block {

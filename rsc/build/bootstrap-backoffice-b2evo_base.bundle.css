@@ -1019,6 +1019,9 @@ div#publish_buttons {
   box-shadow: 1px 10px 35px rgba(75, 75, 75, 0.75);
   z-index: 99999;
 }
+tbody.fieldset_wrapper.folded + tbody[id^=cat_sel_] {
+  display: none;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.

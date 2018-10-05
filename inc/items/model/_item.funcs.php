@@ -1187,21 +1187,38 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 			// Load all child categories:
 			$ChapterCache->reveal_children( $l_Blog->ID, true );
 
-			$r .= '<tbody data-toggle="collapse" style="cursor: pointer;" data-target="#cat_sel_'.$l_Blog->ID.'" data-parent="#cat_sel_group">';
-			$r .= '<tr class="group'.( $blog == $l_Blog->ID ? ' catselect_blog__current' : '' ).'" id="catselect_blog'.$l_Blog->ID.'">';
-			$r .= '<td colspan="'.( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) ? 4 : 3 ).'">'.$l_Blog->dget('name')."</td></tr>\n";
-			$r .= '</tbody>';
-			$r .= '<tbody class="accordion_panel '.( $blog == $l_Blog->ID ? 'collapse in' : 'collapse' ).'" id="cat_sel_'.$l_Blog->ID.'">';
-
+			$s = '';
 			$current_blog_ID = $l_Blog->ID;	// Global needed in callbacks
 			foreach( $ChapterCache->subset_root_cats[$current_blog_ID] as $root_Chapter )
 			{
-				$r .= cat_select_display( $root_Chapter, $callbacks, $cat_display_params );
+				$s .= cat_select_display( $root_Chapter, $callbacks, $cat_display_params );
 			}
 			if( $blog == $current_blog_ID )
 			{
-				$r .= cat_select_new( $cat_display_params );
+				$s .= cat_select_new( $cat_display_params );
 			}
+
+			// This is a REALLY SIMPLE test to see if a category under this collection is checked.
+			// This may need to be replaced with a more reliable solution.
+			if( strpos( $s, 'checked="checked"' ) === false )
+			{
+				$fold_value = 1;
+			}
+			else
+			{
+				$fold_value = 0;
+			}
+
+			$r .= '<tbody class="fieldset_wrapper" style="cursor: pointer;">';
+			$r .= '<tr class="group'.( $blog == $l_Blog->ID ? ' catselect_blog__current' : '' ).'" id="catselect_blog'.$l_Blog->ID.'">';
+			$r .= '<td colspan="'.( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) ? 4 : 3 ).'">';
+			$r .= get_fieldset_folding_icon( $l_Blog->get('urlname'), array( 'fold_value' => $fold_value ) );
+			$r .= '<span id="title_folding_'.$l_Blog->get('urlname').'">'.$l_Blog->dget('name').'</span>';
+			$r .= "</td></tr>\n";
+			$r .= '</tbody>';
+			$r .= '<tbody id="cat_sel_'.$l_Blog->ID.'">';
+
+			$r .= $s;
 
 			$r .= '</tbody>';
 		}
@@ -1225,16 +1242,15 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 
 	$Form->end_fieldset();
 
-	if( isset($blog) && get_allow_cross_posting() )
+	if( isset( $blog ) && get_allow_cross_posting() )
 	{
-		echo '<script type="text/javascript">jQuery.getScript("'.get_require_url( '#scrollto#' ).'", function () {
-			jQuery("[id$=itemform_categories]").scrollTo( "#catselect_blog'.$blog.'" );
-			var $catSelTable = jQuery("table#cat_sel_group");
-			var $accordionPanels = $catSelTable.find("tbody.accordion_panel");
-			$accordionPanels.on("show.bs.collapse", function() {
-				$catSelTable.find("tbody.collapse.in").collapse("hide");
-			});
-		});</script>';
+		?>
+		<script type="text/javascript">
+		jQuery.getScript( '<?php echo get_require_url( '#scrollto#' );?>', function() {
+				jQuery( "[id=itemform_categories]" ).scrollTo( "#catselect_blog<?php echo $blog;?>" );
+			} );
+		</script>';
+		<?php
 	}
 }
 
