@@ -347,6 +347,7 @@ class item_info_line_Widget extends ComponentWidget
 				ob_clean();
 			}
 
+
 			// We want to display the post time:
 			$post_time = '';
 			if( $this->disp_params['date_format'] != 'none' || $this->disp_params['time_format'] != 'none' )
@@ -357,13 +358,13 @@ class item_info_line_Widget extends ComponentWidget
 						$Item->issue_time( array(
 								'before'      => $widget_params['before_post_time'],
 								'after'       => $widget_params['after_post_time'],
-								'time_format' => $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format
+								'time_format' => $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format
 							) );
 						break;
 
 					case 'date_created':
 						echo $widget_params['before_post_time'];
-						echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->datecreated );
+						echo mysql2date( $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format, $Item->datecreated );
 						echo $widget_params['after_post_time'];
 						break;
 				}
