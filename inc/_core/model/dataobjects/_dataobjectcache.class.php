@@ -48,6 +48,11 @@ class DataObjectCache
 	var $cache = array();
 
 	/**
+	 * Object array by name
+	 */
+	var $cache_name = array();
+
+	/**
 	 * Copy of previous object array
 	 * @see DataObjectCache::clear()
 	 */
@@ -620,6 +625,12 @@ class DataObjectCache
 			return $r;
 		}
 
+		if( isset( $this->cache_name[ $req_name ] ) )
+		{	// Get object from cache by name:
+			$Debuglog->add( "Accessing <strong>$this->objtype($req_name)</strong> from cache by name", 'dataobjects' );
+			return $this->cache_name[ $req_name ];
+		}
+
 		// Load just the requested object:
 		$Debuglog->add( "Loading <strong>$this->objtype($req_name)</strong>", 'dataobjects' );
 		$SQL = $this->get_SQL_object();
@@ -638,18 +649,23 @@ class DataObjectCache
 					$Debuglog->add( 'Could not add() object to cache!', 'dataobjects' );
 				}
 			}
-			return $this->cache[$resolved_ID];
+			if( ! isset( $this->cache_name[ $req_name ] ) )
+			{	// Add object in cache by name:
+				$this->cache_name[ $req_name ] = $this->new_obj( $db_row );
+			}
 		}
-		else
-		{
+
+		if( empty( $this->cache_name[ $req_name ] ) )
+		{	// Object does not exist by requested name:
 			$Debuglog->add( 'Could not get DataObject by name.', 'dataobjects' );
 			if( $halt_on_error )
 			{
 				debug_die( "Requested $this->objtype does not exist!" );
 			}
-			$r = false;
-			return $r;
+			$this->cache_name[ $req_name ] = false;
 		}
+
+		return $this->cache_name[ $req_name ];
 	}
 
 

@@ -109,6 +109,9 @@ class item_custom_fields_Widget extends item_fields_compare_Widget
 		$generic_params['items']['note'] = T_('Leave empty for current Item.');
 		$generic_params['items']['size'] = 11;
 
+		// Don't hide empty lines by default for this widget:
+		$generic_params['hide_empty_lines']['defaultvalue'] = 0;
+
 		return $generic_params;
 	}
 

@@ -253,9 +253,10 @@ function init_inskin_editing()
  *                 "-": current blog only and exclude the aggregated blogs
  * @param boolean FALSE if FeaturedList cursor should move, TRUE otherwise
  * @param boolean Load featured post together with requested post types like intro but order the featured post below intro posts
+ * @param boolean Load intro items
  * @return Item
  */
-function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $preview = false, $load_featured = false )
+function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $preview = false, $load_featured = false, $load_intro = true )
 {
 	global $Collection, $Blog, $cat;
 	global $disp, $disp_detail, $MainList, $FeaturedList, $featured_list_type;
@@ -295,53 +296,56 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 
 		// FIRST: Try to find an Intro post:
 
-		if( ! $MainList->is_filtered() )
-		{	// This is not a filtered page, so we are on the home page.
-			if( $restrict_disp == 'front' )
-			{	// Special Front page:
-				// Use Intro-Front posts
-				$restrict_to_types_usage = 'intro-front';
+		if( $load_intro )
+		{
+			if( ! $MainList->is_filtered() )
+			{	// This is not a filtered page, so we are on the home page.
+				if( $restrict_disp == 'front' )
+				{	// Special Front page:
+					// Use Intro-Front posts
+					$restrict_to_types_usage = 'intro-front';
+				}
+				else
+				{	// Default front page displaying posts:
+					// The competing intro-* types are: 'main' and 'all':
+					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+					$restrict_to_types_usage = 'intro-main,intro-all';
+				}
 			}
 			else
-			{	// Default front page displaying posts:
-				// The competing intro-* types are: 'main' and 'all':
-				// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-				$restrict_to_types_usage = 'intro-main,intro-all';
+			{	// We are on a filtered... it means a category page or sth like this...
+				// echo $disp_detail;
+				switch( $disp_detail )
+				{
+					case 'posts-cat':
+					case 'posts-topcat':
+					case 'posts-subcat':
+						// The competing intro-* types are: 'cat' and 'all':
+						// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+						$restrict_to_types_usage = 'intro-cat,intro-all';
+						break;
+
+					case 'posts-tag':
+						// The competing intro-* types are: 'tag' and 'all':
+						// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+						$restrict_to_types_usage = 'intro-tag,intro-all';
+						break;
+
+					default:
+						// The competing intro-* types are: 'sub' and 'all':
+						// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+						$restrict_to_types_usage = 'intro-sub,intro-all';
+				}
 			}
+
+			$FeaturedList->set_filters( array(
+					'coll_IDs' => $coll_IDs,
+					'itemtype_usage' => $restrict_to_types_usage.( $load_featured ? ',*featured*' : '' ),
+				), false /* Do NOT memorize!! */ );
+			// pre_dump( $FeaturedList->filters );
+			// Run the query:
+			$FeaturedList->query();
 		}
-		else
-		{	// We are on a filtered... it means a category page or sth like this...
-			// echo $disp_detail;
-			switch( $disp_detail )
-			{
-				case 'posts-cat':
-				case 'posts-topcat':
-				case 'posts-subcat':
-					// The competing intro-* types are: 'cat' and 'all':
-					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-					$restrict_to_types_usage = 'intro-cat,intro-all';
-					break;
-
-				case 'posts-tag':
-					// The competing intro-* types are: 'tag' and 'all':
-					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-					$restrict_to_types_usage = 'intro-tag,intro-all';
-					break;
-
-				default:
-					// The competing intro-* types are: 'sub' and 'all':
-					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-					$restrict_to_types_usage = 'intro-sub,intro-all';
-			}
-		}
-
-		$FeaturedList->set_filters( array(
-				'coll_IDs' => $coll_IDs,
-				'itemtype_usage' => $restrict_to_types_usage.( $load_featured ? ',*featured*' : '' ),
-			), false /* Do NOT memorize!! */ );
-		// pre_dump( $FeaturedList->filters );
-		// Run the query:
-		$FeaturedList->query();
 
 
 		// SECOND: If no Intro, try to find an Featured post:
@@ -1189,21 +1193,38 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 			// Load all child categories:
 			$ChapterCache->reveal_children( $l_Blog->ID, true );
 
-			$r .= '<tbody data-toggle="collapse" style="cursor: pointer;" data-target="#cat_sel_'.$l_Blog->ID.'" data-parent="#cat_sel_group">';
-			$r .= '<tr class="group'.( $blog == $l_Blog->ID ? ' catselect_blog__current' : '' ).'" id="catselect_blog'.$l_Blog->ID.'">';
-			$r .= '<td colspan="'.( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) ? 4 : 3 ).'">'.$l_Blog->dget('name')."</td></tr>\n";
-			$r .= '</tbody>';
-			$r .= '<tbody class="accordion_panel '.( $blog == $l_Blog->ID ? 'collapse in' : 'collapse' ).'" id="cat_sel_'.$l_Blog->ID.'">';
-
+			$s = '';
 			$current_blog_ID = $l_Blog->ID;	// Global needed in callbacks
 			foreach( $ChapterCache->subset_root_cats[$current_blog_ID] as $root_Chapter )
 			{
-				$r .= cat_select_display( $root_Chapter, $callbacks, $cat_display_params );
+				$s .= cat_select_display( $root_Chapter, $callbacks, $cat_display_params );
 			}
 			if( $blog == $current_blog_ID )
 			{
-				$r .= cat_select_new( $cat_display_params );
+				$s .= cat_select_new( $cat_display_params );
 			}
+
+			// This is a REALLY SIMPLE test to see if a category under this collection is checked.
+			// This may need to be replaced with a more reliable solution.
+			if( strpos( $s, 'checked="checked"' ) === false )
+			{
+				$fold_value = 1;
+			}
+			else
+			{
+				$fold_value = 0;
+			}
+
+			$r .= '<tbody class="fieldset_wrapper" style="cursor: pointer;">';
+			$r .= '<tr class="group'.( $blog == $l_Blog->ID ? ' catselect_blog__current' : '' ).'" id="catselect_blog'.$l_Blog->ID.'">';
+			$r .= '<td colspan="'.( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) ? 4 : 3 ).'">';
+			$r .= get_fieldset_folding_icon( $l_Blog->get('urlname'), array( 'fold_value' => $fold_value ) );
+			$r .= '<span id="title_folding_'.$l_Blog->get('urlname').'">'.$l_Blog->dget('name').'</span>';
+			$r .= "</td></tr>\n";
+			$r .= '</tbody>';
+			$r .= '<tbody id="cat_sel_'.$l_Blog->ID.'">';
+
+			$r .= $s;
 
 			$r .= '</tbody>';
 		}
@@ -1227,16 +1248,15 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 
 	$Form->end_fieldset();
 
-	if( isset($blog) && get_allow_cross_posting() )
+	if( isset( $blog ) && get_allow_cross_posting() )
 	{
-		echo '<script type="text/javascript">jQuery.getScript("'.get_require_url( '#scrollto#' ).'", function () {
-			jQuery("[id$=itemform_categories]").scrollTo( "#catselect_blog'.$blog.'" );
-			var $catSelTable = jQuery("table#cat_sel_group");
-			var $accordionPanels = $catSelTable.find("tbody.accordion_panel");
-			$accordionPanels.on("show.bs.collapse", function() {
-				$catSelTable.find("tbody.collapse.in").collapse("hide");
-			});
-		});</script>';
+		?>
+		<script type="text/javascript">
+		jQuery.getScript( '<?php echo get_require_url( '#scrollto#' );?>', function() {
+				jQuery( "[id=itemform_categories]" ).scrollTo( "#catselect_blog<?php echo $blog;?>" );
+			} );
+		</script>';
+		<?php
 	}
 }
 
@@ -4189,32 +4209,32 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 			$custom_field_label .= ' '.get_icon( 'help', 'imgtag', array(
 					'data-toggle' => 'tooltip',
 					'title'       => nl2br( $custom_field['description'] ),
-					//'class'       => $params['custom_fields_description_icon_class'],
+					'class'       => 'grey',
 				) ).' ';
 		}
 
 		switch( $custom_field['type'] )
 		{
 			case 'double':
-				$Form->text_input( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
 				break;
 			case 'computed':
 				$Form->info( $custom_field_label, $edited_Item->get_custom_field_formatted( $custom_field['name'] ), $custom_field_note );
 				break;
 			case 'varchar':
-				$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
 				break;
 			case 'text':
-				$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
+				$Form->textarea_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
 				break;
 			case 'html':
-				$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
+				$Form->textarea_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
 				break;
 			case 'url':
-				$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
 				break;
 			case 'image':
-				$Form->text_input( 'item_image_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
 				break;
 			case 'separator':
 				if( is_admin_page() && $c > 0 )
@@ -4238,7 +4258,7 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 		    ! in_array( $custom_field['type'], array( 'computed', 'separator' ) ) ) // Theese fields don't have an editable value
 		{	// When input field is disabled and new item is creating
 			// we should create additional hidden input field because the disabled inputs are not submitted:
-			$Form->hidden( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ) );
+			$Form->hidden( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ) );
 		}
 
 		$c++;

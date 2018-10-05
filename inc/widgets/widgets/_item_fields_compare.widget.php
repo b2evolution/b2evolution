@@ -226,6 +226,11 @@ class item_fields_compare_Widget extends ComponentWidget
 						'note' => T_('Enter one field name per line.'),
 						'rows' => 10,
 					),
+					'hide_empty_lines' => array(
+						'type' => 'checkbox',
+						'label' => T_('Hide empty lines'),
+						'defaultvalue' => 1,
+					),
 					'edit_links' => array(
 						'type' => 'checkbox',
 						'label' => T_('Edit Links'),
@@ -613,19 +618,21 @@ class item_fields_compare_Widget extends ComponentWidget
 				$all_custom_fields[ $c ]['is_different'] = true;
 			}
 
+			// Check for empty all values from this line only it is required by widget setting:
+			$this_line_values_are_empty = $this->disp_params['hide_empty_lines'];
+
 			// Compare values:
 			$prev_custom_field_value = NULL;
 			$i = 0;
-			$all_string_values_are_empty = ( $fields_source == 'all' || $fields_source == 'exclude' );
 			foreach( $custom_field['items'] as $item_ID )
 			{
 				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 				$custom_field_value = $widget_Item->get_custom_field_value( $custom_field['name'] );
 
-				if( $all_string_values_are_empty &&
+				if( $this_line_values_are_empty &&
 				    ( ! empty( $custom_field_value ) || $custom_field['type'] == 'separator' ) )
 				{	// At least one field is not empty:
-					$all_string_values_are_empty = false;
+					$this_line_values_are_empty = false;
 				}
 
 				// Check if the values are different from given line:
@@ -679,9 +686,8 @@ class item_fields_compare_Widget extends ComponentWidget
 				$i++;
 			}
 
-			if( $all_string_values_are_empty && $items_count > 1 )
-			{	// Don't display row of custom field if values from all compared items are empty,
-				// But display all empty fields when only single items is displayed, e.g. in child item_custom_fields_Widget:
+			if( $this_line_values_are_empty )
+			{	// Don't display row/line of custom field if values from all compared items are empty and if it is required by widget setting to hide empty lines:
 				unset( $all_custom_fields[ $c ] );
 			}
 		}
@@ -877,79 +883,93 @@ class item_fields_compare_Widget extends ComponentWidget
 				}
 			}
 
-			if( $items_limit > 0 )
-			{	// Limit items by widget setting:
-				$items = array_slice( $items, 0, $items_limit );
+			// Remove duplicated items with same ID:
+			$items = array_unique( $items );
+
+			// Save original orders of the items when they are defined as specific list:
+			$orig_ordered_items = $items;
+		}
+
+		// Use ItemList in order to check what items can be displayed on front-office for current User
+		//           OR in order to filter items if it is required by widget setting:
+		$ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $items_limit );
+		// Set additional debug info prefix for SQL queries in order to know what code executes it:
+		$ItemList->query_title_prefix = get_class().' #'.$this->ID;
+
+		if( $this->disp_params['items_type'] == 'default' )
+		{	// Exclude items with types which are hidden by collection setting "Show post types":
+			$filter_item_type = $Blog->get_setting( 'show_post_types' ) != '' ? '-'.$Blog->get_setting( 'show_post_types' ) : NULL;
+		}
+		else
+		{	// Filter by selected Item Type:
+			$filter_item_type = intval( $this->disp_params['items_type'] );
+		}
+
+		// Set default orders:
+		$default_orders = array();
+		$default_dirs = array();
+		for( $order_index = 0; $order_index <= 2; $order_index++ )
+		{
+			$field_suffix = ( $order_index == 0 ? '' : '_'.$order_index );
+			$widget_orderby = $this->disp_params['orderby'.$field_suffix];
+			if( $widget_orderby == 'coll_default' )
+			{	// Use order from collection:
+				$coll_orderby = $Blog->get_setting( 'orderby'.$field_suffix );
+				if( ! empty( $coll_orderby ) )
+				{
+					$default_orders[] = $coll_orderby;
+					$default_dirs[] = $Blog->get_setting( 'orderdir'.$field_suffix );
+				}
+			}
+			elseif( ! empty( $widget_orderby ) )
+			{	// Use order from widget settings:
+				$default_orders[] = $widget_orderby;
+				$default_dirs[] = $this->disp_params['orderdir'.$field_suffix];
 			}
 		}
 
-		if( $this->disp_params['allow_filter'] || $items == 'all' )
-		{	// Use ItemList when we need a filter or when all items are requested from collection:
-			$ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $items_limit );
-			// Set additional debug info prefix for SQL queries in order to know what code executes it:
-			$ItemList->query_title_prefix = get_class().' #'.$this->ID;
+		// Set default filters:
+		$default_filters = array(
+			'types'        => $filter_item_type,
+			'post_ID_list' => is_array( $items ) ? implode( ',', $items ) : NULL,
+			'orderby'      => implode( ',', $default_orders ),
+			'order'        => implode( ',', $default_dirs ),
+			'featured'     => ( $this->disp_params['restrict_featured'] ? true : NULL ),
+		);
+		if( ! empty( $this->disp_params['restrict_cats'] ) )
+		{	// Restrict by categories:
+			$default_filters['cat_array'] = explode( ',', $this->disp_params['restrict_cats'] );
+		}
+		if( ! empty( $this->disp_params['restrict_tags'] ) )
+		{	// Restrict by tags:
+			$default_filters['tags'] = $this->disp_params['restrict_tags'];
+			$default_filters['tags_operator'] = 'AND';
+		}
+		$ItemList->set_default_filters( $default_filters );
 
-			if( $this->disp_params['items_type'] == 'default' )
-			{	// Exclude items with types which are hidden by collection setting "Show post types":
-				$filter_item_type = $Blog->get_setting( 'show_post_types' ) != '' ? '-'.$Blog->get_setting( 'show_post_types' ) : NULL;
-			}
-			else
-			{	// Filter by selected Item Type:
-				$filter_item_type = intval( $this->disp_params['items_type'] );
-			}
+		if( $this->disp_params['allow_filter'] )
+		{	// Filter items from request:
+			$ItemList->load_from_Request( false );
+		}
 
-			// Set default orders:
-			$default_orders = array();
-			$default_dirs = array();
-			for( $order_index = 0; $order_index <= 2; $order_index++ )
+		// Run query:
+		$ItemList->query();
+
+		// Get IDs of items filtered by $ItemList:
+		$items = $ItemList->get_page_ID_array();
+
+		if( isset( $orig_ordered_items ) && count( $items ) )
+		{	// Revert original orders of items:
+			$fix_ordered_items = array();
+			foreach( $orig_ordered_items as $orig_ordered_item_ID )
 			{
-				$field_suffix = ( $order_index == 0 ? '' : '_'.$order_index );
-				$widget_orderby = $this->disp_params['orderby'.$field_suffix];
-				if( $widget_orderby == 'coll_default' )
-				{	// Use order from collection:
-					$coll_orderby = $Blog->get_setting( 'orderby'.$field_suffix );
-					if( ! empty( $coll_orderby ) )
-					{
-						$default_orders[] = $coll_orderby;
-						$default_dirs[] = $Blog->get_setting( 'orderdir'.$field_suffix );
-					}
-				}
-				elseif( ! empty( $widget_orderby ) )
-				{	// Use order from widget settings:
-					$default_orders[] = $widget_orderby;
-					$default_dirs[] = $this->disp_params['orderdir'.$field_suffix];
+				if( ( $item_ID_index = array_search( $orig_ordered_item_ID, $items ) ) !== false )
+				{
+					$fix_ordered_items[] = $items[ $item_ID_index ];
 				}
 			}
-
-			// Set default filters:
-			$default_filters = array(
-				'types'        => $filter_item_type,
-				'post_ID_list' => is_array( $items ) ? implode( ',', $items ) : NULL,
-				'orderby'      => implode( ',', $default_orders ),
-				'order'        => implode( ',', $default_dirs ),
-				'featured'     => ( $this->disp_params['restrict_featured'] ? true : NULL ),
-			);
-			if( ! empty( $this->disp_params['restrict_cats'] ) )
-			{	// Restrict by categories:
-				$default_filters['cat_array'] = explode( ',', $this->disp_params['restrict_cats'] );
-			}
-			if( ! empty( $this->disp_params['restrict_tags'] ) )
-			{	// Restrict by tags:
-				$default_filters['tags'] = $this->disp_params['restrict_tags'];
-				$default_filters['tags_operator'] = 'AND';
-			}
-			$ItemList->set_default_filters( $default_filters );
-
-			if( $this->disp_params['allow_filter'] )
-			{	// Filter items from request:
-				$ItemList->load_from_Request( false );
-			}
-
-			// Run query:
-			$ItemList->query();
-
-			// Get IDs of items filtered by $ItemList:
-			$items = $ItemList->get_page_ID_array();
+			// Replace items ordered by $ItemList with original ordered array:
+			$items = $fix_ordered_items;
 		}
 
 		return $items;

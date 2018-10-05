@@ -971,7 +971,7 @@ class Item extends ItemLight
 		$custom_fields = $this->get_type_custom_fields();
 		foreach( $custom_fields as $custom_field )
 		{ // update each custom field
-			$param_name = 'item_'.$custom_field['type'].'_'.$custom_field['ID'];
+			$param_name = 'item_cf_'.$custom_field['name'];
 			$param_error = false;
 			if( isset_param( $param_name ) )
 			{ // param is set
@@ -7344,11 +7344,15 @@ class Item extends ItemLight
 
 		if( ! empty( $dbchanges['post_ityp_ID'] ) )
 		{	// If item type has been changed to another,
-			// Clear all custom fields values of previous item type:
+			// Clear custom fields values ONLY of previous item type:
+			// But don't delete old custom field values if fields with same names exist in new selected item type:
+			$new_custom_fields = $this->get_type_custom_fields();
+			$sql_new_custom_fields = ( empty( $new_custom_fields ) ? '' : ' AND iset_name NOT IN ( "custom:'.implode( '", "custom:', array_keys( $new_custom_fields ) ).'" )' );
 			// NOTE: Call this before item settings updating in order to don't remove values of new selected item type:
 			$DB->query( 'DELETE FROM T_items__item_settings
 				WHERE iset_item_ID = '.$this->ID.'
-					AND iset_name LIKE "custom:%"' );
+					AND iset_name LIKE "custom:%"'
+					.$sql_new_custom_fields );
 		}
 
 		// save Item settings
@@ -7636,6 +7640,8 @@ class Item extends ItemLight
 	 */
 	function update_slugs( $urltitle = NULL )
 	{
+		$SlugCache = & get_SlugCache();
+
 		if( ! isset( $urltitle ) )
 		{
 			$urltitle = $this->urltitle;
@@ -7656,9 +7662,17 @@ class Item extends ItemLight
 			$new_Slug->set( 'type', 'item' );
 			$new_Slug->set( 'itm_ID', $this->ID );
 
+			if( ( $urltitle != $new_Slug->get( 'title' ) ) &&
+			    ( strtolower( $urltitle ) == $new_Slug->get( 'title' ) ) &&
+			    ( $prev_Slug = $SlugCache->get_by_name( $urltitle, false, false ) ) )
+			{	// Allow to use uppercase chars in slug title only if this is a single difference between requested slug title and result of urltitle_validate(),
+				// and only if such slug title alredy exists in DB:
+				// (such case possible after item merging when all sulgs were merged and also tiny slugs which have a format like aC8)
+				$new_Slug->set( 'title', $urltitle );
+			}
+
 			// Check if this slug was already used by this item or not.
 			// We need this check, because urltitle_validate() function will modify an existing urltitle only if it belongs to a different object
-			$SlugCache = & get_SlugCache();
 			$prev_Slug = $SlugCache->get_by_name( $new_Slug->get('title'), false, false );
 			if( $prev_Slug )
 			{ // A slug with this title already exists. It must belong to the same item!

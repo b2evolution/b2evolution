@@ -286,7 +286,8 @@ div#skin_wrapper.skin_wrapper_loggedin .sitewide_header {
   font-size: inherit;
   margin-right: 5px;
 }
-.posts_list li > .btn-group {
+.posts_list li > .btn-group,
+.posts_list li > .evo_status {
   margin: 0 0 6px 30px;
 }
 ol.breadcrumb {

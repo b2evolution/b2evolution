@@ -55,7 +55,12 @@ foreach( $source_custom_fields as $source_custom_field )
 		( $source_custom_field['public'] ? T_('Public') : T_('Private') ) );
 }
 
-$Form->checklist( $custom_field_options, '', T_('Select fields') );
+$Form->checklist( $custom_field_options, '', T_('Select fields'), false, false, array(
+		'input_prefix' =>
+			'<input type="button" class="btn btn-default btn-xs" value="'.T_('Check all').'" onclick="jQuery( this ).closest( \'form\' ).find( \'input[type=checkbox]\' ).prop( \'checked\', true )" /> '.
+			'<input type="button" class="btn btn-default btn-xs" value="'.T_('Uncheck all').'" onclick="jQuery( this ).closest( \'form\' ).find( \'input[type=checkbox]\' ).prop( \'checked\', false )" /> '.
+			'<input type="button" class="btn btn-default btn-xs" value="'.T_('Reverse').'" onclick="jQuery( this ).closest( \'form\' ).find( \'input[type=checkbox]\' ).each( function() { jQuery( this ).prop( \'checked\', ! jQuery( this ).prop( \'checked\' ) ) } );"  />'
+) );
 
 $Form->end_form( array( array( 'submit', 'actionArray[select_custom_fields]', T_('Add fields now!'), 'SaveButton' ) ) );
 ?>
