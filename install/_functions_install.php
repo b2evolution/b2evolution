@@ -154,7 +154,7 @@ function display_base_config_recap()
  */
 function install_newdb()
 {
-	global $new_db_version, $admin_url, $baseurl, $install_login, $random_password;
+	global $new_db_version, $admin_url, $baseurl, $install_login, $random_password, $admin_user;
 	global $create_sample_contents, $create_sample_organization, $create_demo_users, $create_demo_messages;
 
 	/*
@@ -196,16 +196,24 @@ function install_newdb()
 	evo_flush();
 	create_default_data();
 
+	$user_org_IDs = NULL;
+	$demo_users = array();
 
 	if( $create_sample_organization || $create_demo_users )
 	{
 		echo get_install_format_text( '<h2>'.T_('Creating sample organization and users...').'</h2>', 'h2' );
 		evo_flush();
 
-		// Create sample organization if selected
+		// Create sample organization if selected:
 		if( $create_sample_organization )
 		{
-			create_sample_organization();
+			task_begin( 'Creating sample organization...' );
+			$user_org_IDs = array( create_demo_organization( 1 )->ID );
+			task_end();
+
+			task_begin( 'Adding admin user to sample organization...' );
+			$admin_user->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
+			task_end();
 		}
 
 		// Create demo users if selected
@@ -229,11 +237,13 @@ function install_newdb()
 			// (Assigning by reference does not work with "global" keyword (PHP 5.2.8))
 			$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
 
-			create_demo_users();
+			$demo_users = create_demo_users( $user_org_IDs );
 
 			if( $create_demo_messages )
 			{
+				task_begin('Creating sample private messages... ');
 				create_demo_messages();
+				task_end();
 			}
 		}
 	}
@@ -268,7 +278,7 @@ function install_newdb()
 		// (Assigning by reference does not work with "global" keyword (PHP 5.2.8))
 		$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
 
-		create_demo_contents();
+		create_demo_contents( $demo_users );
 	}
 
 	evo_flush();

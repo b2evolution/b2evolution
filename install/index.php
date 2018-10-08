@@ -803,98 +803,21 @@ switch( $action )
 		 * -----------------------------------------------------------------------------------
 		 */
 		track_step( 'installer-options' );
+		load_funcs( 'collections/_demo_content.funcs.php' );
 		?>
 
 		<form action="index.php" method="get" class="evo_form__install">
-			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
+			<h2><?php echo T_('b2evolution installation options') ?></h2>
+			<p><?php echo T_('You can start adding your own content whenever you\'re ready. Until then, it may be handy to have some demo contents to play around with. You can easily delete these demo contents once you\'re done testing.'); ?></p>
+
+			<input type="hidden" name="locale" value="'.$default_locale.'" />
 			<input type="hidden" name="confirmed" value="0" />
 			<input type="hidden" name="installer_version" value="10" />
 			<input type="hidden" name="action" value="newdb" />
 
-			<h2><?php echo T_('b2evolution installation options') ?></h2>
-
-			<p><?php echo T_('You can start adding your own content whenever you\'re ready. Until then, it may be handy to have some demo contents to play around with. You can easily delete these demo contents once you\'re done testing.'); ?></p>
-
-			<div class="checkbox">
-				<label>
-					<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />
-					<?php echo T_('Install sample collections &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.') ?>
-				</label>
-				<div id="create_sample_contents_options" style="margin:10px 0 0 20px">
-					<?php
-					echo T_('Which demo collections would you like to install?');
-					?>
-					<div class="radio" style="margin-left:1em">
-						<label>
-							<input type="radio" name="demo_content_type" id="minisite_demo" value="minisite" />
-							<?php echo T_('Mini-Site');?>
-						</label>
-					</div>
-					<div class="radio" style="margin-left:1em">
-						<label>
-							<input type="radio" name="demo_content_type" id="complex_site_demo" value="complex_site" checked="checked" />
-							<?php echo T_('Complex Site, including:');?>
-						</label>
-					</div>
-					<?php
-					// Display the collections to select which install
-					$collections = array(
-							'home'     => T_('Home'),
-							'a'        => T_('Blog A'),
-							'b'        => T_('Blog B'),
-							'photos'   => T_('Photos'),
-							'forums'   => T_('Forums'),
-							'manual'   => T_('Manual'),
-							'group'    => T_('Tracker'),
-						);
-
-					// Allow all modules to set what collections should be installed
-					$module_collections = modules_call_method( 'get_demo_collections' );
-					if( ! empty( $module_collections ) )
-					{
-						foreach( $module_collections as $module_key => $module_colls )
-						{
-							foreach( $module_colls as $module_coll_key => $module_coll_title )
-							{
-								$collections[ $module_key.'_'.$module_coll_key ] = $module_coll_title;
-							}
-						}
-					}
-
-					foreach( $collections as $coll_index => $coll_title )
-					{ // Display the checkboxes to select what demo collection to install
-					?>
-					<div class="checkbox" style="margin-left:2em">
-						<label>
-							<input type="checkbox" name="collections[]" id="collection_<?php echo $coll_index; ?>" value="<?php echo $coll_index; ?>" checked="checked" />
-							<?php echo $coll_title; ?>
-						</label>
-					</div>
-					<?php } ?>
-				</div>
-			</div>
-
-			<div class="checkbox" style="margin-top: 15px">
-				<label>
-					<input type="checkbox" name="create_sample_organization" id="create_sample_organization" value="1" checked="checked" />
-					<?php echo T_('Create a sample organization');?>
-				</label>
-			</div>
-
-			<div class="checkbox" style="margin-top: 15px">
-				<label>
-					<input type="checkbox" name="create_demo_users" id="create_demo_users" value="1" checked="checked" />
-					<?php echo T_('Create demo users (in addition to the admin account)');?>
-				</label>
-				<div id="create_demo_users_options" style="margin:10px 0 0 20px">
-					<div class="checkbox" style="margin-left: 1em">
-						<label>
-							<input type="checkbox" name="create_sample_private_messages" id="create_sameple_private_messages" value="1" checked="checked" />
-							<?php echo T_('Create sample private messages between users');?>
-						</label>
-					</div>
-				</div>
-			</div>
+			<?php
+			echo echo_installation_options();
+			?>
 
 			<?php
 			if( $allow_install_test_features )
@@ -938,28 +861,6 @@ switch( $action )
 			</p>
 		</form>
 
-		<script type="text/javascript">
-			jQuery( '#create_sample_contents' ).click( function()
-			{
-				jQuery( '#create_sample_contents_options' ).toggle();
-			} );
-
-			jQuery( '#create_demo_users' ).click( function()
-			{
-				jQuery( '#create_demo_users_options' ).toggle();
-			} );
-			jQuery( 'input[name="demo_content_type"]').click( function()
-			{
-				if( jQuery( this ).val() == 'minisite' )
-				{
-					jQuery( 'input[name="collections[]"]' ).attr( 'disabled', true );
-				}
-				else
-				{
-					jQuery( 'input[name="collections[]"]' ).removeAttr( 'disabled' );
-				}
-			} );
-		</script>
 		<?php
 		break;
 

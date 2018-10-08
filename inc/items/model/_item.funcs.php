@@ -1255,7 +1255,7 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 		jQuery.getScript( '<?php echo get_require_url( '#scrollto#' );?>', function() {
 				jQuery( "[id=itemform_categories]" ).scrollTo( "#catselect_blog<?php echo $blog;?>" );
 			} );
-		</script>';
+		</script>
 		<?php
 	}
 }

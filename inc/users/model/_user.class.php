@@ -7220,7 +7220,7 @@ class User extends DataObject
 	function get_organizations_data()
 	{
 		if( ! isset( $this->organizations ) )
-		{ // Get the organizations from DB
+		{	// Get the organizations from DB
 			global $DB;
 			$SQL = new SQL();
 			$SQL->SELECT( 'org_ID, org_name, uorg_accepted, uorg_role, uorg_priority' );

@@ -27,7 +27,7 @@ if( strpos( $action, 'new' ) !== false || $action == 'copy' )
 { // Simulate tab to value 'new' for actions to create new blog
 	$tab = 'new';
 }
-if( ! in_array( $action, array( 'list', 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site', 'new_section', 'edit_section', 'delete_section', 'update_site_skin' ) ) &&
+if( ! in_array( $action, array( 'list', 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site', 'new_section', 'edit_section', 'delete_section', 'update_site_skin', 'new_demo_content' ) ) &&
     ! in_array( $tab, array( 'site_settings', 'site_skin' ) ) )
 {
 	if( valid_blog_requested() )
@@ -678,6 +678,48 @@ switch( $action )
 			}
 		}
 		break;
+
+	case 'new_demo_content':
+		global $DB;
+		load_funcs( 'collections/_demo_content.funcs.php' );
+
+		$create_sample_contents = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
+		$create_sample_organization = param( 'create_sample_organization', 'boolean', false, true );
+		$create_demo_users = param( 'create_demo_users', 'boolean', false, true );
+		$create_demo_messages = param( 'create_sample_private_messages', 'boolean', false, true );
+
+		$user_org_IDs = NULL;
+		$demo_users = array();
+
+		$DB->begin();
+		if( $create_sample_organization )
+		{
+			$user_org_IDs = array( create_demo_organization( $current_User->ID )->ID );
+			$current_User->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
+			$Messages->add_to_group( T_('Created sample organization.'), 'success', T_('Demo contents').':' );
+		}
+
+		if( $create_demo_users )
+		{
+			$demo_users = get_demo_users( true );
+			$Messages->add_to_group( T_('Created demo users.'), 'success', T_('Demo contents').':' );
+		}
+
+		if( $create_demo_messages )
+		{
+			create_demo_messages();
+			$Messages->add_to_group( T_('Created sample private messages.'), 'success', T_('Demo contents').':' );
+		}
+
+		if( $create_sample_contents )
+		{
+			create_demo_collections( $demo_users, $create_demo_users );
+			$Messages->add_to_group( T_('Created sample contents.'), 'success', T_('Demo contents').':' );
+		}
+		$DB->commit();
+
+		header_redirect( $admin_url.'?ctrl=dashboard' ); // will save $Messages into Session
+		break;
 }
 
 switch( $tab )
@@ -776,7 +818,7 @@ switch( $tab )
 		// We should activate toolbar menu items for this controller and tab
 		$activate_collection_toolbar = true;
 		break;
-	
+
 	case 'section':
 		// Pages to create/edit/delete sections:
 		$AdminUI->set_path( 'site', 'dashboard' );

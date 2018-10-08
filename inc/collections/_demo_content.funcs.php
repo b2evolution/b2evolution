@@ -33,6 +33,7 @@ load_class( 'links/model/_linkuser.class.php', 'LinkUser' );
 load_class( 'users/model/_group.class.php', 'Group' );
 load_funcs( 'collections/model/_category.funcs.php' );
 load_class( 'users/model/_organization.class.php', 'Organization' );
+load_class( 'collections/model/_section.class.php', 'Section' );
 
 
 /**
@@ -121,6 +122,132 @@ function is_available_item_type( $blog_ID, $item_type_name = '#', $item_types = 
 	}
 
 	return in_array( $item_type_name, $available_item_types[$blog_ID] );
+}
+
+
+/**
+ * Display installation options
+ *
+ * @param array Display params
+ */
+function echo_installation_options( $params = array() )
+{
+	$params = array_merge( array(
+			'show_sample_organization' => true,
+			'show_sample_users'        => true,
+			'show_sample_messages'     => true,
+	), $params );
+
+	$r = '<div class="checkbox">
+				<label>
+					<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />'
+					.T_('Create a demo site').'
+				</label>
+				<div id="create_sample_contents_options" style="margin:10px 0 0 20px">
+					<div class="radio" style="margin-left:1em">
+						<label>
+							<input type="radio" name="demo_content_type" id="minisite_demo" value="minisite" />'
+							.T_('Mini-Site').'
+						</label>
+					</div>
+					<div class="radio" style="margin-left:1em">
+						<label>
+							<input type="radio" name="demo_content_type" id="complex_site_demo" value="complex_site" checked="checked" />'
+							.T_('Complex Site, including:').'
+						</label>
+					</div>';
+
+	// Display the collections to select which install
+	$collections = array(
+			'home'     => T_('Global home page'),
+			'a'        => T_('Sample Blog A (Public)'),
+			'b'        => T_('Sample Blog B (Private)'),
+			'photos'   => T_('Photo Albums'),
+			'forums'   => T_('Forums'),
+			'manual'   => T_('Online Manual'),
+			'group'    => T_('Tracker'),
+		);
+
+	// Allow all modules to set what collections should be installed
+	$module_collections = modules_call_method( 'get_demo_collections' );
+	if( ! empty( $module_collections ) )
+	{
+		foreach( $module_collections as $module_key => $module_colls )
+		{
+			foreach( $module_colls as $module_coll_key => $module_coll_title )
+			{
+				$collections[ $module_key.'_'.$module_coll_key ] = $module_coll_title;
+			}
+		}
+	}
+
+	foreach( $collections as $coll_index => $coll_title )
+	{	// Display the checkboxes to select what demo collection to install
+		$r .= '<div class="checkbox" style="margin-left:2em">
+						<label>
+							<input type="checkbox" name="collections[]" id="collection_'.$coll_index.'" value="'.$coll_index.'" checked="checked" />'
+							.$coll_title.'
+						</label>
+					</div>';
+	}
+
+	$r .= '</div></div>';
+
+	if( $params['show_sample_organization'] )
+	{
+		$r .= '<div class="checkbox" style="margin-top: 15px">
+						<label>
+							<input type="checkbox" name="create_sample_organization" id="create_sample_organization" value="1" checked="checked" />'
+							.T_('Create a sample organization')
+						.'</label>
+					</div>';
+	}
+
+	if( $params['show_sample_users'] )
+	{
+		$r .= '<div class="checkbox" style="margin-top: 15px">
+						<label>
+							<input type="checkbox" name="create_demo_users" id="create_demo_users" value="1" checked="checked" />'
+							.T_('Create demo users (in addition to the admin account)')
+						.'</label>
+					</div>';
+	}
+
+	if( $params['show_sample_messages'] )
+	{
+		$r .= '<div class="checkbox create_demo_users_options" style="margin-top: 15px">
+						<label>
+							<input type="checkbox" name="create_sample_private_messages" id="create_sameple_private_messages" value="1" checked="checked" />'
+							.T_('Create sample private messages between users')
+						.'</label>
+					</div>';
+	}
+
+	$r .= '<script type="text/javascript">
+					jQuery( "#create_sample_contents"	 ).click( function()
+					{
+						jQuery( "#create_sample_contents_options" ).toggle();
+					} );
+
+					jQuery( "#create_demo_users" ).click( function()
+					{
+						jQuery( ".create_demo_users_options" ).toggle();
+					} );
+
+					jQuery( "input[name=\"demo_content_type\"]" ).click( function()
+					{
+						if( jQuery( this ).val() == "minisite" )
+						{
+							jQuery( "input[name=\'collections[]\']" ).attr( "disabled", true );
+						}
+						else
+						{
+							jQuery( "input[name=\'collections[]\']" ).removeAttr( "disabled" );
+						}
+					} );
+				</script>';
+
+	return $r;
 }
 
 
@@ -235,13 +362,13 @@ function create_blog(
 	$Blog->init_by_kind( $kind, $blog_name, $blog_shortname, $blog_urlname );
 
 	if( ( $kind == 'forum' || $kind == 'manual' ) && ( $Plugin = & $Plugins->get_by_code( 'b2evMark' ) ) !== false )
-	{ // Initialize special Markdown plugin settings for Forums and Manual blogs
+	{	// Initialize special Markdown plugin settings for Forums and Manual blogs
 		$Blog->set_setting( 'plugin'.$Plugin->ID.'_coll_apply_comment_rendering', 'opt-out' );
 		$Blog->set_setting( 'plugin'.$Plugin->ID.'_links', '1' );
 		$Blog->set_setting( 'plugin'.$Plugin->ID.'_images', '1' );
 	}
 	if( $kind == 'photo' )
-	{ // Display category directory on front page for photo blogs
+	{	// Display category directory on front page for photo blogs
 		$Blog->set_setting( 'front_disp', 'catdir' );
 	}
 
@@ -253,7 +380,7 @@ function create_blog(
 	$Blog->set( 'normal_skin_ID', $blog_skin_ID );
 
 	if( $local_installation )
-	{ // Turn off all ping plugins if the installation is local/test/intranet
+	{	// Turn off all ping plugins if the installation is local/test/intranet
 		$Blog->set_setting( 'ping_plugins', '' );
 	}
 
@@ -409,7 +536,7 @@ function create_user( $params = array() )
 	$User->set( 'level', $params['level'] );
 	$User->set( 'locale', $params['locale'] );
 	if( !empty( $params['ctry_ID'] ) )
-	{ // Set country
+	{	// Set country
 		$User->set( 'ctry_ID', $params['ctry_ID'] );
 	}
 	$User->set( 'gender', $params['gender'] );
@@ -418,7 +545,7 @@ function create_user( $params = array() )
 	$User->set_datecreated( time() ); // Use current time temporarily, we'll update these later
 
 	if( ! $User->dbinsert( false ) )
-	{ // Don't continue if user creating has been failed
+	{	// Don't continue if user creating has been failed
 		return false;
 	}
 
@@ -431,7 +558,7 @@ function create_user( $params = array() )
 	}
 
 	if( ! empty( $params['fields'] ) )
-	{ // Additional user fields
+	{	// Additional user fields
 		global $DB;
 		$fields_SQL = new SQL();
 		$fields_SQL->SELECT( 'ufdf_ID, ufdf_name' );
@@ -442,7 +569,7 @@ function create_user( $params = array() )
 		foreach( $fields as $field_ID => $field_name )
 		{
 			if( ! isset( $params['fields'][ $field_name ] ) )
-			{ // Skip wrong field
+			{	// Skip wrong field
 				continue;
 			}
 
@@ -452,12 +579,12 @@ function create_user( $params = array() )
 			}
 
 			foreach( $params['fields'][ $field_name ] as $field_value )
-			{ // SQL record for each field value
+			{	// SQL record for each field value
 				$user_field_records[] = '( '.$User->ID.', '.$field_ID.', '.$DB->quote( $field_value ).' )';
 			}
 		}
 		if( count( $user_field_records ) )
-		{ // Insert all user fields by single SQL query
+		{	// Insert all user fields by single SQL query
 			$DB->query( 'INSERT INTO T_users__fields ( uf_user_ID, uf_ufdf_ID, uf_varchar ) VALUES '
 				.implode( ', ', $user_field_records ) );
 		}
@@ -539,7 +666,7 @@ function create_demo_organization( $owner_ID, $org_name = 'Company XYZ', $add_cu
 		$Organization = & $OrganizationCache->get_by_ID( $demo_org_ID );
 	}
 	else
-	{ // Sample organization does not exist, let's create one
+	{	// Sample organization does not exist, let's create one
 		$Organization = new Organization();
 		$Organization->set( 'owner_user_ID', $owner_ID );
 		$Organization->set( 'name', $org_name );
@@ -570,6 +697,135 @@ function create_demo_organization( $owner_ID, $org_name = 'Company XYZ', $add_cu
 }
 
 
+/**
+ * Returns defaults for demo users
+ *
+ * @return array Array of demo user defaults
+ */
+function get_demo_users_defaults()
+{
+	return array(
+		'admin' => array(
+				'login'     => 'admin',
+				'firstname' => 'Johnny',
+				'lastname'  => 'Admin',
+				'level'     => 10,
+				'gender'    => 'M',
+				'group'     => 'Administrators',
+				'org_IDs'   => '#',
+				'org_roles' => array( 'King of Spades' ),
+				'org_priorities' => array( 0 ),
+				'fields'    => array(
+						'Micro bio'   => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
+						'Website'     => 'http://b2evolution.net/',
+						'Twitter'     => 'https://twitter.com/b2evolution/',
+						'Facebook'    => 'https://www.facebook.com/b2evolution',
+						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
+						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
+						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+					)
+			),
+		'mary' => array(
+				'login'     => 'mary',
+				'firstname' => 'Mary',
+				'lastname'  => 'Wilson',
+				'level'     => 4, // NOTE: these levels define the order of display in the Organization memebers widget
+				'gender'    => 'F',
+				'group'     => 'Moderators',
+				'org_IDs'   => '#',
+				'org_roles' => array( 'Queen of Hearts' ),
+				'fields'    => array(
+						'Micro bio'   => 'I am a demo moderator for this site.'."\n".'I love it when things are neat!',
+						'Website'     => 'http://b2evolution.net/',
+						'Twitter'     => 'https://twitter.com/b2evolution/',
+						'Facebook'    => 'https://www.facebook.com/b2evolution',
+						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
+						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
+						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+					),
+			),
+		'jay' => array(
+				'login'     => 'jay',
+				'firstname' => 'Jay',
+				'lastname'  => 'Parker',
+				'level'     => 3, // NOTE: these levels define the order of display in the Organization memebers widget
+				'gender'    => 'M',
+				'group'     => 'Moderators',
+				'org_IDs'   => '#',
+				'org_roles' => array( 'The Artist' ),
+				'fields'    => array(
+						'Micro bio'   => 'I am a demo moderator for this site.'."\n".'I like to keep things clean!',
+						'Website'     => 'http://b2evolution.net/',
+						'Twitter'     => 'https://twitter.com/b2evolution/',
+						'Facebook'    => 'https://www.facebook.com/b2evolution',
+						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
+						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
+						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+					),
+			),
+		'dave' => array(
+				'login'     => 'dave',
+				'firstname' => 'David',
+				'lastname'  => 'Miller',
+				'level'     => 2,
+				'gender'    => 'M',
+				'group'     => 'Editors',
+				'org_IDs'   => '#',
+				'org_roles' => array( 'The Writer' ),
+				'fields'    => array(
+						'Micro bio'   => 'I\'m a demo author.'."\n".'I like to write!',
+						'Website'     => 'http://b2evolution.net/',
+						'Twitter'     => 'https://twitter.com/b2evolution/',
+						'Facebook'    => 'https://www.facebook.com/b2evolution',
+						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
+						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
+						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+					),
+			),
+		'paul' => array(
+				'login'     => 'paul',
+				'firstname' => 'Paul',
+				'lastname'  => 'Jones',
+				'level'     => 1,
+				'gender'    => 'M',
+				'group'     => 'Editors',
+				'org_IDs'   => '#',
+				'org_roles' => array( 'The Thinker' ),
+				'fields'    => array(
+						'Micro bio'   => 'I\'m a demo author.'."\n".'I like to think before I write ;)',
+						'Website'     => 'http://b2evolution.net/',
+						'Twitter'     => 'https://twitter.com/b2evolution/',
+						'Facebook'    => 'https://www.facebook.com/b2evolution',
+						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
+						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
+						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+					),
+			),
+		'larry' => array(
+				'login'     => 'larry',
+				'firstname' => 'Larry',
+				'lastname'  => 'Smith',
+				'level'     => 0,
+				'gender'    => 'M',
+				'group'     => 'Normal Users',
+				'fields'    => array(
+						'Micro bio' => 'Hi there!',
+					),
+			),
+		'kate' => array(
+				'login'     => 'kate',
+				'firstname' => 'Kate',
+				'lastname'  => 'Adams',
+				'level'     => 0,
+				'gender'    => 'F',
+				'group'     => 'Normal Users',
+				'fields'    => array(
+						'Micro bio' => 'Just me!',
+					),
+			),
+		);
+}
+
 
 /**
  * Get all available demo users
@@ -579,18 +835,18 @@ function create_demo_organization( $owner_ID, $org_name = 'Company XYZ', $add_cu
  * @param array List of organization where  the created demo users will be added
  * @return array List of available demo users
  */
-function get_demo_users( $create = false, $group = NULL, $user_org_IDs = NULL )
+function get_demo_users( $create = false, $group = NULL )
 {
-	global $user_org_IDs;
+	$demo_users = get_demo_users_defaults();
+	$demo_user_logins = array_keys( $demo_users );
 
-	$demo_user_logins = array( 'admin', 'jay', 'mary', 'paul', 'dave', 'larry', 'kate' );
 	$available_demo_users = array();
 	foreach( $demo_user_logins as $demo_user_login )
 	{
-		$demo_User = get_demo_user( $demo_user_login, $create, $group, $user_org_IDs );
+		$demo_User = get_demo_user( $demo_user_login, $create, $group );
 		if( $demo_User )
 		{
-			$available_demo_users[] = $demo_User;
+			$available_demo_users[$demo_user_login] = $demo_User;
 		}
 	}
 
@@ -607,43 +863,58 @@ function get_demo_users( $create = false, $group = NULL, $user_org_IDs = NULL )
  * @param array IDs of organization
  * @return mixed object Demo user if successful, false otherwise
  */
-function get_demo_user( $login, $create = false, $group_ID = NULL, $user_org_IDs = NULL )
+function get_demo_user( $login, $create = false, $group_ID = NULL )
 {
-	global $DB, $user_org_IDs;
-	global $current_User, $mary_moderator_ID, $jay_moderator_ID, $dave_blogger_ID, $paul_blogger_ID, $larry_user_ID, $kate_user_ID;
+	global $DB;
+	global $current_User;
 	global $user_timestamp;
 
-	$UserCache  = & get_UserCache();
+	$UserCache = & get_UserCache();
 	$demo_user = & $UserCache->get_by_login( $login );
+	$GroupCache = & get_GroupCache();
+
+	$demo_users = get_demo_users_defaults();
+
+	if( ! isset( $demo_users[$login] ) )
+	{	// Specified demo user does not exist:
+		return false;
+	}
+
+	if( is_null( $group_ID ) && $user_default_Group = $GroupCache->get_by_name( $demo_users[$login]['group'], false, false ) )
+	{	// Get default group ID:
+		$group_ID = $user_default_Group->ID;
+	}
+
+	$user_org_IDs = NULL;
+	if( isset( $demo_users[$login]['org_IDs'] )  )
+	{
+		if( $demo_users[$login]['org_IDs'] == '#' )
+		{ // Get first available organization:
+			if( $organization_ID = $DB->get_var( 'SELECT org_ID FROM T_users__organization ORDER BY org_ID ASC LIMIT 1' ) )
+			{
+				$user_org_IDs = array( $organization_ID );
+			}
+		}
+		elseif( is_array( $demo_users[$login]['org_IDs'] ) )
+		{
+			$user_org_IDs = $demo_users[$login]['org_IDs'];
+		}
+	}
 
 	if( ! $demo_user && $create )
 	{
 		adjust_timestamp( $user_timestamp, 360, 1440, false );
+
+		$user_defaults = array_merge( $demo_users[$login], array(
+			'group_ID'    => $group_ID,
+			'org_IDs'     => $user_org_IDs,
+			'datecreated' => $user_timestamp,
+		) );
+
 		switch( $login )
 		{
 			case 'mary':
-				$default_group_id = 2;
-				$mary_moderator = create_user( array(
-						'login'     => 'mary',
-						'firstname' => 'Mary',
-						'lastname'  => 'Wilson',
-						'level'     => 4,		// NOTE: these levels define the order of display in the Organization memebers widget
-						'gender'    => 'F',
-						'group_ID'  => $group_ID ? $group_ID : 2,
-						'org_IDs'   => $user_org_IDs,
-						'org_roles' => array( 'Queen of Hearts' ),
-						'fields'    => array(
-								'Micro bio'   => 'I am a demo moderator for this site.'."\n".'I love it when things are neat!',
-								'Website'     => 'http://b2evolution.net/',
-								'Twitter'     => 'https://twitter.com/b2evolution/',
-								'Facebook'    => 'https://www.facebook.com/b2evolution',
-								'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-								'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-								'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
-							),
-						'datecreated' => $user_timestamp
-					) );
-
+				$mary_moderator = create_user( $user_defaults );
 				if( $mary_moderator === false )
 				{
 					return false;
@@ -655,27 +926,7 @@ function get_demo_user( $login, $create = false, $group_ID = NULL, $user_org_IDs
 				break;
 
 			case 'jay':
-				$jay_moderator = create_user( array(
-						'login'     => 'jay',
-						'firstname' => 'Jay',
-						'lastname'  => 'Parker',
-						'level'     => 3,
-						'gender'    => 'M',
-						'group_ID'  => $group_ID ? $group_ID : 2,
-						'org_IDs'   => $user_org_IDs,
-						'org_roles' => array( 'The Artist' ),
-						'fields'    => array(
-								'Micro bio'   => 'I am a demo moderator for this site.'."\n".'I like to keep things clean!',
-								'Website'     => 'http://b2evolution.net/',
-								'Twitter'     => 'https://twitter.com/b2evolution/',
-								'Facebook'    => 'https://www.facebook.com/b2evolution',
-								'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-								'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-								'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
-							),
-						'datecreated' => $user_timestamp
-					) );
-
+				$jay_moderator = create_user( $user_defaults );
 				if( $jay_moderator === false )
 				{
 					return false;
@@ -687,27 +938,7 @@ function get_demo_user( $login, $create = false, $group_ID = NULL, $user_org_IDs
 				break;
 
 			case 'dave':
-				$dave_blogger = create_user( array(
-						'login'     => 'dave',
-						'firstname' => 'David',
-						'lastname'  => 'Miller',
-						'level'     => 2,
-						'gender'    => 'M',
-						'group_ID'  => $group_ID ? $group_ID : 3,
-						'org_IDs'   => $user_org_IDs,
-						'org_roles' => array( 'The Writer' ),
-						'fields'    => array(
-								'Micro bio'   => 'I\'m a demo author.'."\n".'I like to write!',
-								'Website'     => 'http://b2evolution.net/',
-								'Twitter'     => 'https://twitter.com/b2evolution/',
-								'Facebook'    => 'https://www.facebook.com/b2evolution',
-								'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-								'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-								'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
-							),
-						'datecreated' => $user_timestamp
-					) );
-
+				$dave_blogger = create_user( $user_defaults );
 				if( $dave_blogger === false )
 				{
 					return false;
@@ -719,27 +950,7 @@ function get_demo_user( $login, $create = false, $group_ID = NULL, $user_org_IDs
 				break;
 
 			case 'paul':
-				$paul_blogger = create_user( array(
-						'login'     => 'paul',
-						'firstname' => 'Paul',
-						'lastname'  => 'Jones',
-						'level'     => 1,
-						'gender'    => 'M',
-						'group_ID'  => $group_ID ? $group_ID : 3,
-						'org_IDs'   => $user_org_IDs,
-						'org_roles' => array( 'The Thinker' ),
-						'fields'    => array(
-								'Micro bio'   => 'I\'m a demo author.'."\n".'I like to think before I write ;)',
-								'Website'     => 'http://b2evolution.net/',
-								'Twitter'     => 'https://twitter.com/b2evolution/',
-								'Facebook'    => 'https://www.facebook.com/b2evolution',
-								'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-								'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-								'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
-							),
-						'datecreated' => $user_timestamp
-					) );
-
+				$paul_blogger = create_user( $user_defaults );
 				if( $paul_blogger === false )
 				{
 					return false;
@@ -751,19 +962,7 @@ function get_demo_user( $login, $create = false, $group_ID = NULL, $user_org_IDs
 				break;
 
 			case 'larry':
-				$larry_user = create_user( array(
-						'login'     => 'larry',
-						'firstname' => 'Larry',
-						'lastname'  => 'Smith',
-						'level'     => 0,
-						'gender'    => 'M',
-						'group_ID'  => $group_ID ? $group_ID : 4,
-						'fields'    => array(
-								'Micro bio' => 'Hi there!',
-							),
-						'datecreated' => $user_timestamp
-					) );
-
+				$larry_user = create_user( $user_defaults );
 				if( $larry_user === false )
 				{
 					return false;
@@ -775,19 +974,7 @@ function get_demo_user( $login, $create = false, $group_ID = NULL, $user_org_IDs
 				break;
 
 			case 'kate':
-				$kate_user = create_user( array(
-						'login'     => 'kate',
-						'firstname' => 'Kate',
-						'lastname'  => 'Adams',
-						'level'     => 0,
-						'gender'    => 'F',
-						'group_ID'  => $group_ID ? $group_ID : 4,
-						'fields'    => array(
-								'Micro bio' => 'Just me!',
-							),
-						'datecreated' => $user_timestamp
-					) );
-
+				$kate_user = create_user( $user_defaults );
 				if( $kate_user === false )
 				{
 					return false;
@@ -811,8 +998,348 @@ function get_demo_user( $login, $create = false, $group_ID = NULL, $user_org_IDs
 				       ( '.$demo_user->ID.', "user_domain", "localhost" )' );
 		}
 	}
+	elseif( $demo_user && ! $demo_user->get( 'avatar_file_ID' ) )
+	{
+		assign_profile_picture( $demo_user );
+		if( isset( $user_defaults['org_IDs'] ) && isset( $user_defaults['org_roles'] ) )
+		{
+			$org_priorities = isset( $user_defaults['org_priorities'] ) ? $user_defaults['org_priorities'] : array();
+			$demo_user->update_organizations( $user_org_IDs, $user_defaults['org_roles'], $org_priorities, true );
+		}
+	}
 
 	return $demo_user;
+}
+
+
+/**
+ * Create sample private messages
+ */
+function create_demo_messages()
+{
+	global $UserSettings, $DB, $now, $localtimenow;
+
+	load_class( 'messaging/model/_thread.class.php', 'Thread' );
+	load_class( 'messaging/model/_message.class.php', 'Message' );
+	load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+	$UserSettings = new UserSettings();
+	$UserCache = & get_UserCache();
+
+	$users_SQL = new SQL();
+	$users_SQL->SELECT( 'user_ID, user_login' );
+	$users_SQL->FROM( 'T_users' );
+	$users_SQL->WHERE( 'NOT user_ID  = 1' );
+	$users_SQL->ORDER_BY( 'user_ID' );
+	$users = $DB->get_results( $users_SQL->get() );
+
+	for( $i = 0; $i < count( $users ); $i++ )
+	{
+		if( $i % 2 == 0 )
+		{
+			$author_ID = 1;
+			$recipient_ID = $users[$i]->user_ID;
+		}
+		else
+		{
+			$author_ID = $users[$i]->user_ID;
+			$recipient_ID = 1;
+		}
+
+		$author_User = & $UserCache->get_by_ID( $author_ID );
+		$recipient_User = & $UserCache->get_by_ID( $recipient_ID );
+
+		$loop_Thread = new Thread();
+		$loop_Message = new Message();
+
+		// Initial message
+		$loop_Message->Thread = $loop_Thread;
+		$loop_Message->Thread->set_param( 'datemodified', 'string', date( 'Y-m-d H:i:s', $localtimenow - 60 ) );
+		$loop_Message->Thread->set( 'title', sprintf( T_('Demo private conversation #%s'), $i + 1 ) );
+		$loop_Message->Thread->recipients_list = array( $recipient_ID );
+		$loop_Message->set( 'author_user_ID', $author_ID );
+		$loop_Message->creator_user_ID = $author_ID;
+		$loop_Message->set( 'text', sprintf( T_('This is a demo private message to %s.'), $recipient_User->login ) );
+
+		$DB->begin();
+		$conversation_saved = false;
+		if( $loop_Message->Thread->dbinsert() )
+		{
+			$loop_Message->set_param( 'thread_ID', 'integer', $loop_Message->Thread->ID );
+			if( $loop_Message->dbinsert() )
+			{
+				if( $loop_Message->dbinsert_threadstatus( $loop_Message->Thread->recipients_list ) )
+				{
+					if( $loop_Message->dbinsert_contacts( $loop_Message->Thread->recipients_list ) )
+					{
+						if( $loop_Message->dbupdate_last_contact_datetime() )
+						{
+							$conversation_saved = true;
+						}
+					}
+				}
+			}
+		}
+
+		if( $conversation_saved )
+		{
+			$conversation_saved = false;
+
+			// Reply message
+			$loop_reply_Message = new Message();
+			$loop_reply_Message->Thread = $loop_Thread;
+			$loop_reply_Message->set( 'author_user_ID', $recipient_ID );
+			$loop_reply_Message->creator_user_ID = $author_ID;
+			$loop_reply_Message->set( 'text', sprintf( T_('This is a demo private reply to %s.'), $author_User->login ) );
+			$loop_reply_Message->set_param( 'thread_ID', 'integer', $loop_reply_Message->Thread->ID );
+
+			if( $loop_reply_Message->dbinsert() )
+			{
+				// Mark reply message as unread by initiator
+				$sql = 'UPDATE T_messaging__threadstatus
+						SET tsta_first_unread_msg_ID = '.$loop_reply_Message->ID.'
+						WHERE tsta_thread_ID = '.$loop_reply_Message->Thread->ID.'
+							AND tsta_user_ID = '.$author_ID.'
+							AND tsta_first_unread_msg_ID IS NULL';
+				$DB->query( $sql, 'Insert thread statuses' );
+
+				// Mark all messages as read by recipient
+				$sql = 'UPDATE T_messaging__threadstatus
+						SET tsta_first_unread_msg_ID = NULL
+						WHERE tsta_thread_ID = '.$loop_reply_Message->Thread->ID.'
+							AND tsta_user_ID = '.$recipient_ID;
+				$DB->query( $sql, 'Insert thread statuses' );
+
+				// check if contact pairs between sender and recipients exists
+				$recipient_list = $loop_reply_Message->Thread->load_recipients();
+				// remove author user from recipient list
+				$recipient_list = array_diff( $recipient_list, array( $loop_reply_Message->author_user_ID ) );
+				// insert missing contact pairs if required
+				if( $loop_reply_Message->dbinsert_contacts( $recipient_list ) )
+				{
+					if( $loop_reply_Message->dbupdate_last_contact_datetime() )
+					{
+						$DB->commit();
+						$conversation_saved = true;
+					}
+				}
+			}
+		}
+
+		if( ! $conversation_saved )
+		{
+			$DB->rollback();
+		}
+	}
+}
+
+/**
+ * This is called only for fresh installs and fills the tables with
+ * demo/tutorial things.
+ *
+ * @param array Array of user objects
+ * @param boolean True to create users for the demo content
+ */
+function create_demo_collections( $demo_users = array(), $create_demo_users = true )
+{
+	global $current_User, $DB;
+
+	$mary_moderator_ID = isset( $demo_users['mary'] ) ? $demo_users['mary']->ID : $current_User->ID;
+	$jay_moderator_ID  = isset( $demo_users['jay'] ) ? $demo_users['jay']->ID : $current_User->ID;
+	$dave_blogger_ID   = isset( $demo_users['dave'] ) ? $demo_users['dave']->ID : $current_User->ID;
+	$paul_blogger_ID   = isset( $demo_users['paul'] ) ? $demo_users['paul']->ID : $current_User->ID;
+	$larry_user_ID     = isset( $demo_users['larry'] ) ? $demo_users['larry']->ID : $current_User->ID;
+	$kate_user_ID      = isset( $demo_users['kate'] ) ? $demo_users['kate']->ID : $current_User->ID;
+
+	load_class( 'collections/model/_blog.class.php', 'Blog' );
+	load_class( 'files/model/_file.class.php', 'File' );
+	load_class( 'files/model/_filetype.class.php', 'FileType' );
+	load_class( 'links/model/_link.class.php', 'Link' );
+	load_funcs( 'widgets/_widgets.funcs.php' );
+
+	$create_sample_contents = param( 'create_sample_contents', 'string', '' );
+	if( $create_sample_contents == 'all' )
+	{	// Array contains which collections should be installed
+		$install_collection_minisite = 0;
+		$install_collection_home     = 1;
+		$install_collection_bloga    = 1;
+		$install_collection_blogb    = 1;
+		$install_collection_photos   = 1;
+		$install_collection_forums   = 1;
+		$install_collection_manual   = 1;
+		$install_collection_tracker  = 1;
+	}
+	else
+	{	// Array contains which collections should be installed
+		$demo_content_type = param( 'demo_content_type', 'string', NULL );
+		if( $demo_content_type == 'minisite' )
+		{
+			$install_collection_minisite = 1;
+			$install_collection_home     = 0;
+			$install_collection_bloga    = 0;
+			$install_collection_blogb    = 0;
+			$install_collection_photos   = 0;
+			$install_collection_forums   = 0;
+			$install_collection_manual   = 0;
+			$install_collection_tracker  = 0;
+		}
+		else
+		{
+			$collections = param( 'collections', 'array:string', array() );
+			$install_collection_minisite = 0;
+			$install_collection_home     = in_array( 'home', $collections );
+			$install_collection_bloga    = in_array( 'a', $collections );
+			$install_collection_blogb    = in_array( 'b', $collections );
+			$install_collection_photos   = in_array( 'photos', $collections );
+			$install_collection_forums   = in_array( 'forums', $collections );
+			$install_collection_manual   = in_array( 'manual', $collections );
+			$install_collection_tracker  = in_array( 'group', $collections );
+		}
+	}
+
+	if( $demo_content_type != 'minisite' )
+	{
+		$SectionCache = & get_SectionCache();
+
+		$sections = array(
+				'No Section' => array( 'owner_ID' => 1, 'order' => 1 ),
+				'Home'       => array( 'owner_ID' => 1, 'order' => 2 ),
+				'Blogs'      => array( 'owner_ID' => $jay_moderator_ID, 'order' => 3 ),
+				'Photos'     => array( 'owner_ID' => $dave_blogger_ID, 'order' => 4 ),
+				'Forums'     => array( 'owner_ID' => $paul_blogger_ID, 'order' => 5 ),
+				'Manual'     => array( 'owner_ID' => $dave_blogger_ID, 'order' => 6 ),
+			);
+
+		foreach( $sections as $section_name => $section_data )
+		{
+			if( $loop_Section = $SectionCache->get_by_name( $section_name, false, false ) )
+			{
+				$sections[$section_name]['ID'] = $loop_Section->ID;
+			}
+			else
+			{
+				$new_section = new Section();
+				$new_section->set( 'name', $section_name );
+				$new_section->set( 'order', $section_data['order'] );
+				$new_section->set( 'owner_user_ID', $section_data['owner_ID'] );
+				$new_section->dbsave();
+
+				$sections[$section_name]['ID'] = $new_section->ID;
+			}
+		}
+	}
+
+	// Store the item IDs in this array in order to create additional comments
+	$additional_comments_item_IDs = array();
+
+	// Use this var to shift the posts of the collections in time below:
+	$timeshift = 0;
+
+	insert_shared_widgets( 'normal' );
+
+	if( $install_collection_home )
+	{	// Install Home blog
+		$section_ID = isset( $sections['Home']['ID'] ) ? $sections['Home']['ID'] : 1;
+		$blog_ID = create_demo_collection( 'main', $jay_moderator_ID, $create_demo_users, $timeshift, $section_ID );
+		// Insert basic widgets:
+		insert_basic_widgets( $blog_ID, 'normal', false, 'main' );
+		insert_basic_widgets( $blog_ID, 'mobile', false, 'main' );
+		insert_basic_widgets( $blog_ID, 'tablet', false, 'main' );
+	}
+
+	if( $install_collection_bloga )
+	{	// Install Blog A
+		$timeshift += 86400;
+		$section_ID = isset( $sections['Blogs']['ID'] ) ? $sections['Blogs']['ID'] : 1;
+		$blog_ID = create_demo_collection( 'blog_a', $jay_moderator_ID, $create_demo_users, $timeshift, $section_ID );
+		// Insert basic widgets:
+		insert_basic_widgets( $blog_ID, 'normal', false, 'std' );
+		insert_basic_widgets( $blog_ID, 'mobile', false, 'std' );
+		insert_basic_widgets( $blog_ID, 'tablet', false, 'std' );
+	}
+
+	if( $install_collection_blogb )
+	{	// Install Blog B
+		$timeshift += 86400;
+		$section_ID = isset( $sections['Blogs']['ID'] ) ? $sections['Blogs']['ID'] : 1;
+		$blog_ID = create_demo_collection( 'blog_b', $paul_blogger_ID, $create_demo_users, $timeshift, $section_ID );
+		// Insert basic widgets:
+		insert_basic_widgets( $blog_ID, 'normal', false, 'std' );
+		insert_basic_widgets( $blog_ID, 'mobile', false, 'std' );
+		insert_basic_widgets( $blog_ID, 'tablet', false, 'std' );
+	}
+
+	if( $install_collection_photos )
+	{	// Install Photos blog
+		$timeshift += 86400;
+		$section_ID = isset( $sections['Photos']['ID'] ) ? $sections['Photos']['ID'] : 1;
+		$blog_ID = create_demo_collection( 'photo', $dave_blogger_ID, $create_demo_users, $timeshift, $section_ID );
+		// Insert basic widgets:
+		insert_basic_widgets( $blog_ID, 'normal', false, 'photo' );
+		insert_basic_widgets( $blog_ID, 'mobile', false, 'photo' );
+		insert_basic_widgets( $blog_ID, 'tablet', false, 'photo' );
+	}
+
+	if( $install_collection_forums )
+	{	// Install Forums blog
+		$timeshift += 86400;
+		$section_ID = isset( $sections['Forums']['ID'] ) ? $sections['Forums']['ID'] : 1;
+		$blog_ID = create_demo_collection( 'forum', $paul_blogger_ID, $create_demo_users, $timeshift, $section_ID );
+		// Insert basic widgets:
+		insert_basic_widgets( $blog_ID, 'normal', false, 'forum' );
+		insert_basic_widgets( $blog_ID, 'mobile', false, 'forum' );
+		insert_basic_widgets( $blog_ID, 'tablet', false, 'forum' );
+	}
+
+	if( $install_collection_manual )
+	{	// Install Manual blog
+		$timeshift += 86400;
+		$section_ID = isset( $sections['Manual']['ID'] ) ? $sections['Manual']['ID'] : 1;
+		$blog_ID = create_demo_collection( 'manual', $dave_blogger_ID, $create_demo_users, $timeshift, $section_ID );
+		// Insert basic widgets:
+		insert_basic_widgets( $blog_ID, 'normal', false, 'manual' );
+		insert_basic_widgets( $blog_ID, 'mobile', false, 'manual' );
+		insert_basic_widgets( $blog_ID, 'tablet', false, 'manual' );
+	}
+
+	if( $install_collection_tracker )
+	{	// Install Tracker blog
+		$timeshift += 86400;
+		$section_ID = isset( $sections['Forums']['ID'] ) ? $sections['Forums']['ID'] : 1;
+		$blog_ID = create_demo_collection( 'group', $jay_moderator_ID, $create_demo_users, $timeshift, $section_ID );
+		// Insert basic widgets:
+		insert_basic_widgets( $blog_ID, 'normal', false, 'group' );
+		insert_basic_widgets( $blog_ID, 'mobile', false, 'group' );
+		insert_basic_widgets( $blog_ID, 'tablet', false, 'group' );
+	}
+
+	if( $install_collection_minisite )
+	{	// Install Mini-site collection
+		$timeshift += 86400;
+		$blog_ID = create_demo_collection( 'minisite', $jay_moderator_ID, $create_demo_users, $timeshift, 1 );
+		// Insert basic widgets:
+		insert_basic_widgets( $blog_ID, 'normal', false, 'minisite' );
+		insert_basic_widgets( $blog_ID, 'mobile', false, 'minisite' );
+		insert_basic_widgets( $blog_ID, 'tablet', false, 'minisite' );
+	}
+
+	// Setting default login and default messaging collection:
+	$BlogCache = & get_BlogCache();
+	if( $demo_content_type == 'minisite' )
+	{
+		$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
+			VALUES ( '.$DB->quote( 'site_skins_enabled' ).', 0 ),
+						( '.$DB->quote( 'login_blog_ID' ).', 0 ),
+						( '.$DB->quote( 'msg_blog_ID' ).', 0 )' );
+	}
+	else
+	{
+		if( $first_Blog = & $BlogCache->get_by_ID( 1, false, false ) )
+		{	// Set first blog as default login and default messaging collection
+			$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
+				VALUES ( '.$DB->quote( 'login_blog_ID' ).', '.$DB->quote( $first_Blog->ID ).' ),
+							( '.$DB->quote( 'msg_blog_ID' ).', '.$DB->quote( $first_Blog->ID ).' )' );
+		}
+	}
 }
 
 
@@ -869,7 +1396,7 @@ This is a sample comment that has been approved by default!
 Admins and moderators can very quickly approve or reject comments from the collection dashboard.');
 	}
 	else
-	{ // draft
+	{	// draft
 		$content = T_('Hi!
 
 This is a sample comment that has **not** been approved by default!
@@ -986,7 +1513,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					$section_ID );
 
 			if( ! $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = '.$DB->quote( 'info_blog_ID' ) ) && ! empty( $blog_home_ID ) )
-			{ // Save ID of this blog in settings table, It is used on top menu, file "/skins_site/_site_body_header.inc.php"
+			{	// Save ID of this blog in settings table, It is used on top menu, file "/skins_site/_site_body_header.inc.php"
 				$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
 						VALUES ( '.$DB->quote( 'info_blog_ID' ).', '.$DB->quote( $blog_home_ID ).' )' );
 			}
@@ -1147,7 +1674,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			// do nothing
 	}
 
-	// Create sample contents for the collection
+	// Create sample contents for the collection:
 	create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo_user, $timeshift );
 
 	return $blog_ID;
@@ -1985,7 +2512,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				if( $install_test_features )
-				{ // Add examples for infodots plugin
+				{	// Add examples for infodots plugin
 					$edited_Item->set_tags_from_string( 'photo,demo' );
 					$edited_Item->set( 'content', $edited_Item->get( 'content' ).sprintf( '
 [infodot:%s:191:36:100px]School bus [b]here[/b]
@@ -2666,7 +3193,7 @@ Hello
 
 			// Check demo users if they can be assignee
 			$allowed_assignee = array();
-			foreach( $demo_users as $demo_user )
+			foreach( $demo_users as $key => $demo_user )
 			{
 				if( $demo_user->check_perm( 'blog_can_be_assignee', 'edit', false, $blog_ID ) )
 				{
@@ -2686,7 +3213,7 @@ Hello
 					$edited_Item->set( 'priority', $priorities[$j] );
 
 					if( $use_demo_user )
-					{ // Assign task to allowed assignee
+					{	// Assign task to allowed assignee
 						$edited_Item->set( 'assigned_user_ID', $allowed_assignee[$m] );
 					}
 
@@ -2742,7 +3269,7 @@ Hello
 	}
 
 	// Create demo comments
-	$comment_users = $use_demo_user ? $demo_users : NULL;
+	$comment_users = $use_demo_user ? array_values( $demo_users ) : NULL;
 	foreach( $item_IDs as $item_ID )
 	{
 		$comment_timestamp = strtotime( $item_ID[1] );
@@ -2753,7 +3280,7 @@ Hello
 	}
 
 	if( $install_test_features && count( $additional_comments_item_IDs ) && $use_demo_user )
-	{ // Create the additional comments when we install all features
+	{	// Create the additional comments when we install all features
 		foreach( $additional_comments_item_IDs as $additional_comments_item_ID )
 		{
 			// Restrict comment status by parent item:
@@ -2765,7 +3292,7 @@ Hello
 			$comment_status = $Comment->get( 'status' );
 
 			foreach( $demo_users as $demo_user )
-			{ // Insert the comments from each user
+			{	// Insert the comments from each user
 				$now = date( 'Y-m-d H:i:s' );
 				$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_status, comment_author_user_ID, comment_author_IP,
 						comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status, comment_notif_flags )
