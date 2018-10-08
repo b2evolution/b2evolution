@@ -5297,6 +5297,37 @@ function callback_filter_item_list_table( & $Form )
 
 
 /**
+ * Get item types options for <select> which are enabled for collection
+ *
+ * @param integer Collection ID
+ * @param integer ID of Item Type which should be loaded in additional to enabled collection Item Types
+ * @param string Prefix before each key, e.g. used in order to keep original order in jeditable selector
+ * @return array
+ */
+function collection_item_type_titles( $coll_ID, $item_type_ID = NULL, $key_prefix = '' )
+{
+	global $DB;
+
+	$SQL = new SQL( 'Get Item Type options for category' );
+	$SQL->SELECT( 'CONCAT( "'.$key_prefix.'", ityp_ID ), ityp_name' );
+	$SQL->FROM( 'T_items__type' );
+	$SQL->FROM_add( 'LEFT JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID' );
+	$SQL->WHERE( 'itc_coll_ID = '.$DB->quote( $coll_ID ) );
+	if( $item_type_ID > 0 )
+	{	// Load also current item type of this collection even if the Item Type already is not enabled for collection:
+		$SQL->WHERE_or( 'ityp_ID = '.$DB->quote( $item_type_ID ) );
+	}
+	$SQL->ORDER_BY( 'ityp_name' );
+
+	$item_type_options = array();
+	$item_type_options[$key_prefix.''] = T_('Same as collection default');
+	$item_type_options[$key_prefix.'0'] = T_('No default type');
+
+	return $item_type_options + $DB->get_assoc( $SQL );
+}
+
+
+/**
  * Helper functions to display Items results.
  * New ( not display helper ) functions must be created above item_results function
  */
@@ -5660,7 +5691,8 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 		if( $perm_create_item )
 		{ // Create new item
 			$redirect_to = '&amp;redirect_to='.urlencode( $admin_url.'?ctrl=items&tab=manual&cat_ID='.$Chapter->ID );
-			$r .= action_icon( T_('New manual page...'), 'new', $admin_url.'?ctrl=items&action=new&blog='.$Chapter->blog_ID.'&amp;cat='.$Chapter->ID.$redirect_to, NULL, NULL, NULL, array(), array( 'style' => 'width:12px' ) );
+			$default_item_type_param = ( $Chapter->get( 'ityp_ID' ) > 0 ? '&amp;item_typ_ID='.$Chapter->get( 'ityp_ID' ) : '' );
+			$r .= action_icon( T_('New manual page...'), 'new', $admin_url.'?ctrl=items&action=new&blog='.$Chapter->blog_ID.'&amp;cat='.$Chapter->ID.$default_item_type_param.$redirect_to, NULL, NULL, NULL, array(), array( 'style' => 'width:12px' ) );
 		}
 		if( $perm_edit )
 		{ // Delete chapter

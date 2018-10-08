@@ -10051,6 +10051,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12975, 'Upgrade categories table...' ) )
+	{	// part of 6.10.4-stable
+		db_add_col( 'T_categories', 'cat_ityp_ID', 'INT UNSIGNED NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

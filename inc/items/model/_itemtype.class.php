@@ -139,6 +139,7 @@ class ItemType extends DataObject
 	{
 		return array(
 				array( 'table'=>'T_items__item', 'fk'=>'post_ityp_ID', 'msg'=>T_('%d related items') ), // "Lignes de visit reports"
+				array( 'table'=>'T_categories', 'fk'=>'cat_ityp_ID', 'msg'=>T_('%d related categories') ),
 			);
 	}
 
@@ -801,6 +802,33 @@ class ItemType extends DataObject
 					WHERE its_ityp_ID = '.$this->ID.'
 					AND its_pst_ID IN ('.implode( ',', $remove_values ).')' );
 		}
+	}
+
+
+	/**
+	 * Check if this Item Type is enabled for requested collection
+	 *
+	 * @param integer Collection ID
+	 * @return boolean
+	 */
+	function is_enabled( $coll_ID )
+	{
+		if( empty( $this->ID ) )
+		{	// Item Type is not inserted in DB yet:
+			return false;
+		}
+
+		if( ! isset( $this->enabled_colls ) )
+		{	// Load into cache where this Item Type is enabled for all collections:
+			global $DB;
+			$SQL = new SQL( 'Load all colections IDs where Item Type #'.$this->ID.' is enabled' );
+			$SQL->SELECT( 'itc_coll_ID' );
+			$SQL->FROM( 'T_items__type_coll' );
+			$SQL->WHERE( 'itc_ityp_ID = '.$this->ID );
+			$this->enabled_colls = $DB->get_col( $SQL );
+		}
+
+		return in_array( $coll_ID, $this->enabled_colls );
 	}
 }
 

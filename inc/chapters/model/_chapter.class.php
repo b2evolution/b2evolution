@@ -59,6 +59,7 @@ class Chapter extends DataObject
 	var $order;
 	var $meta;
 	var $lock;
+	var $ityp_ID = NULL;
 
 	/**
 	 * Lazy filled
@@ -125,6 +126,7 @@ class Chapter extends DataObject
 			$this->meta = $db_row->cat_meta;
 			$this->lock = $db_row->cat_lock;
 			$this->last_touched_ts = $db_row->cat_last_touched_ts;		// When Chapter received last visible change (edit, item, comment, etc.)
+			$this->ityp_ID = $db_row->cat_ityp_ID;
 		}
 	}
 
@@ -352,6 +354,10 @@ class Chapter extends DataObject
 		// Locked category
 		param( 'cat_lock', 'integer', 0 );
 		$this->set_from_Request( 'lock' );
+
+		// Default Item Type:
+		param( 'cat_ityp_ID', 'integer', NULL );
+		$this->set_from_Request( 'ityp_ID' );
 
 		return ! param_errors_detected();
 	}

@@ -120,6 +120,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			cat_meta            tinyint(1) NOT NULL DEFAULT 0,
 			cat_lock            tinyint(1) NOT NULL DEFAULT 0,
 			cat_last_touched_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			cat_ityp_ID         INT UNSIGNED NULL,
 			PRIMARY KEY cat_ID (cat_ID),
 			UNIQUE cat_urlname( cat_urlname ),
 			KEY cat_blog_ID (cat_blog_ID),
