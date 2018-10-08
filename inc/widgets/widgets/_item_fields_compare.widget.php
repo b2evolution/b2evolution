@@ -110,7 +110,7 @@ class item_fields_compare_Widget extends ComponentWidget
 					'label' => T_('Specific Item IDs'),
 					'note' => sprintf( T_('Separate Item IDs or slugs or %s or %s with %s.'), '<code>$this$</code>', '<code>$parent$</code>', '<code>,</code>' ),
 					'valid_pattern' => array(
-						'pattern' => '/^(([\da-z\-_]+|\$this\$|\$parent\$)+(,([\da-z\-_]+|\$this\$|\$parent\$))*)?$/',
+						'pattern' => '/^(([\da-zA-Z\-_]+|\$this\$|\$parent\$)+(,([\da-zA-Z\-_]+|\$this\$|\$parent\$))*)?$/',
 						'error'   => sprintf( T_('Items to compare must be specified by ID, by slug or as %s or %s.'), '<code>$this$</code>', '<code>$parent$</code>' ),
 					),
 					'size' => 80,
@@ -870,7 +870,14 @@ class item_fields_compare_Widget extends ComponentWidget
 						unset( $items[ $i ] );
 					}
 				}
-				elseif( ! is_number( $item_ID ) )
+			}
+
+			// Load all requested Items by single SQL query into cache:
+			$ItemCache->load_by_IDs_or_slugs( $items );
+
+			foreach( $items as $i => $item_ID )
+			{
+				if( ! is_number( $item_ID ) )
 				{	// Try to get a post ID by slug:
 					if( $widget_Item = & $ItemCache->get_by_urltitle( $item_ID, false, false ) )
 					{	// Use ID of post detected by slug:
