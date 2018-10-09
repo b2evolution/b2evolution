@@ -716,7 +716,8 @@ function get_request_title( $params = array() )
 		case 'anonpost':
 			if( $params['anonpost_text'] == '#' )
 			{	// Initialize default auto title:
-				$r[] = sprintf( T_('New [%s]'), $Blog->get_default_item_type_name() );
+				$new_Item = get_session_Item( 0, true );
+				$r[] = sprintf( T_('New [%s]'), $new_Item->get_type_setting( 'name' ) );
 			}
 			else
 			{	// Use custom title from param:
@@ -726,7 +727,7 @@ function get_request_title( $params = array() )
 
 		case 'edit':
 			global $edited_Item;
-			$type_name = $edited_Item->get_ItemType()->get_name();
+			$type_name = $edited_Item->get_type_setting( 'name' );
 
 			$action = param_action(); // Edit post by switching into 'In skin' mode from Back-office
 			$p = param( 'p', 'integer', 0 ); // Edit post from Front-office

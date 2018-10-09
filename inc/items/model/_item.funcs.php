@@ -4406,6 +4406,12 @@ function get_session_Item( $item_ID = 0, $force_new = false )
 		// Prefill data from url:
 		$edited_Item->set( 'title', param( 'post_title', 'string' ) );
 		$edited_Item->set( 'urltitle', param( 'post_urltitle', 'string' ) );
+		// Try to get this from request if it has been not initialized by controller:
+		$item_typ_ID = param( 'item_typ_ID', 'integer', NULL );
+		if( ! empty( $item_typ_ID ) )
+		{	// Set new post type ID only if it is defined on request:
+			$edited_Item->set( 'ityp_ID', $item_typ_ID );
+		}
 
 		return $edited_Item;
 	}

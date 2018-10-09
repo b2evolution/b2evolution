@@ -1303,6 +1303,12 @@ function skin_init( $disp )
 			{	// Use default category instead of the wrong requested:
 				set_param( 'cat', $Blog->get_default_cat_ID() );
 			}
+
+			if( $Chapter && $Chapter->get_ItemType() === false )
+			{	// Don't allow to post in category without default Item Type:
+				$Messages->add( T_('You cannot post here'), 'error' );
+				header_redirect( $Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
+			}
 			break;
 
 		case 'edit':
@@ -1348,6 +1354,16 @@ function skin_init( $disp )
 				}
 				$Messages->add( $error_message, 'error' );
 				header_redirect( $Blog->gen_blogurl(), 302 );
+			}
+
+			$cat = param( 'cat', 'integer' );
+			if( $cat > 0 &&
+			    ( $ChapterCache = & get_ChapterCache() ) &&
+			    ( $selected_Chapter = & $ChapterCache->get_by_ID( $cat, false, false ) ) &&
+			    ( $selected_Chapter->get_ItemType() === false ) )
+			{	// Don't allow to post in category without default Item Type:
+				$Messages->add( T_('You cannot post here'), 'error' );
+				header_redirect( $selected_Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
 			}
 
 			// Prepare the 'In-skin editing':
