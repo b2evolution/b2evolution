@@ -5253,19 +5253,27 @@ class Blog extends DataObject
 
 			$ChapterCache = & get_ChapterCache();
 			$selected_Chapter = $ChapterCache->get_by_ID( $cat_ID, false, false );
-			if( $selected_Chapter && $selected_Chapter->lock )
-			{ // This category is locked, don't allow to create new post with this cat
+			if( $selected_Chapter &&
+			    ( $selected_Chapter->get( 'lock' ) ||
+			      ( $cat_ItemType = & $selected_Chapter->get_ItemType() ) === false ) )
+			{	// Don't allow to create new post with this category if it is locked or no default item type for the category:
 				return '';
 			}
+
 			if( ! is_logged_in() || $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->ID ) )
 			{	// We have permission to add a post with at least one status:
 				if( $this->get_setting( 'in_skin_editing' ) && ! is_admin_page() )
 				{	// We have a mode 'In-skin editing' for the current Blog
 					// User must have a permission to publish a post in this blog
 					$cat_url_param = '';
-					if( $cat_ID > 0 )
+					if( $selected_Chapter )
 					{	// Link to create a Item with predefined category
-						$cat_url_param = '&amp;cat='.$cat_ID;
+						$cat_url_param = '&amp;cat='.$selected_Chapter->ID;
+						if( empty( $post_type_usage ) &&
+						    ( $cat_ItemType = & $selected_Chapter->get_ItemType() ) )
+						{	// Use predefined Item Type from selected category:
+							$cat_url_param .= '&amp;item_typ_ID='.$cat_ItemType->ID;
+						}
 					}
 					$url = url_add_param( $this->get( 'url' ), ( is_logged_in() ? 'disp=edit' : 'disp=anonpost' ).$cat_url_param );
 				}

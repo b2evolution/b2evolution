@@ -79,6 +79,10 @@ $Form->begin_fieldset( T_('Properties').get_manual_link( 'categories-tab' ) );
 
 	$Form->checkbox_input( 'cat_meta', $edited_Chapter->meta, T_('Meta category'), array( 'note' => T_('If you check this box you will not be able to put any posts into this category.') ) );
 
+	echo '<div id="cat_ityp_ID_selector"'.( $edited_Chapter->get( 'meta' ) ? ' style="display:none"' : '' ).'>';
+	$Form->select_input_array( 'cat_ityp_ID', $edited_Chapter->ityp_ID, collection_item_type_titles( $edited_Chapter->get( 'blog_ID' ), $edited_Chapter->get( 'ityp_ID' ) ), T_('Default Item Type'), NULL, array( 'force_keys_as_values' => true ) );
+	echo '</div>';
+
 	$Form->checkbox_input( 'cat_lock', $edited_Chapter->lock, T_('Locked category'), array( 'note' => T_('Check this to lock all posts under this category. (Note: for posts with multiple categories, the post is only locked if *all* its categories are locked.)') ) );
 
 	$item_type_options = array( NULL => T_('Default of this collection'), 'disabled' => T_('Disabled') );
@@ -97,3 +101,16 @@ $Form->end_fieldset();
 $Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
 
 ?>
+<script type="text/javascript">
+jQuery( '#cat_meta' ).click( function()
+{	// Show/Hide selector of default Item Type depending on meta setting:
+	if( jQuery( this ).prop( 'checked' ) )
+	{
+		jQuery( '#cat_ityp_ID_selector' ).hide();
+	}
+	else
+	{
+		jQuery( '#cat_ityp_ID_selector' ).show();
+	}
+} );
+</script>

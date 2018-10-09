@@ -189,6 +189,72 @@ class ItemCache extends DataObjectCache
 
 
 	/**
+	 * Load a set of Item objects into the cache by IDs and slugs
+	 *
+	 * @param array List of IDs and names of Item objects to load
+	 * @return array List of Item objects
+	 */
+	function load_by_IDs_or_slugs( $IDs_slugs )
+	{
+		global $DB, $Debuglog;
+
+		if( empty( $IDs_slugs ) || ! is_array( $IDs_slugs ) )
+		{	// Wrong source data:
+			return array();
+		}
+
+		$IDs = array();
+		$slugs = array();
+		foreach( $IDs_slugs as $ID_slug )
+		{
+			if( is_number( $ID_slug ) )
+			{
+				$IDs[] = $ID_slug;
+			}
+			else
+			{
+				$slugs[] = $ID_slug;
+			}
+		}
+
+		$SQL = $this->get_SQL_object( 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()' );
+		$sql_where = array();
+		if( ! empty( $IDs ) )
+		{	// Load Items by IDs:
+			$sql_where[] = $this->dbIDname.' IN ( '.$DB->quote( $IDs ).' )';
+		}
+		if( ! empty( $slugs ) )
+		{	// Load Items by slugs:
+			$SlugCache = & get_SlugCache();
+			$sql_where[] = $SlugCache->name_field.' IN ( '.$DB->quote( $slugs ).' )';
+			$SQL->SELECT_add( ', slug_title' );
+			$SQL->FROM_add( 'INNER JOIN '.$SlugCache->dbtablename.' ON '.$this->dbIDname.' = slug_itm_ID' );
+			$SQL->WHERE_and( 'slug_type = "item"' );
+			$SQL->GROUP_BY( $this->dbIDname );
+		}
+		$SQL->WHERE_and( implode( ' OR ', $sql_where ) );
+
+		$item_rows = $DB->get_results( $SQL );
+
+		$items = array();
+		foreach( $item_rows as $Item )
+		{
+			$item_slug_title = isset( $Item->slug_title ) ? $Item->slug_title : false;
+			$Item = $this->instantiate( $Item );
+			$items[] = $Item;
+			if( $item_slug_title !== false &&
+			    ! isset( $this->urltitle_index[ $item_slug_title ] ) )
+			{	// Cache Item by slug:
+				$Debuglog->add( 'Cached <strong>'.$this->objtype.'('.$item_slug_title.')</strong>' );
+				$this->urltitle_index[ $item_slug_title ] = $Item;
+			}
+		}
+
+		return $items;
+	}
+
+
+	/**
 	 * Get an object from cache by its urltitle
 	 *
 	 * Load into cache if necessary

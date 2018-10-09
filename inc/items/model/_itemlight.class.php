@@ -63,6 +63,7 @@ class ItemLight extends DataObject
 	var $url;
 
 	var $ityp_ID;
+	var $ItemType = NULL;
 
 	/**
 	 * Single/page view
@@ -243,7 +244,7 @@ class ItemLight extends DataObject
 	 */
 	function & get_ItemType()
 	{
-		if( empty( $this->ItemType ) )
+		if( $this->ItemType === NULL )
 		{
 			$ItemTypeCache = & get_ItemTypeCache();
 			$this->ItemType = & $ItemTypeCache->get_by_ID( $this->ityp_ID, false, false );
@@ -1599,6 +1600,12 @@ class ItemLight extends DataObject
 				return $this->set_param( 'datestart', 'date', $parvalue_empty_seconds, false );
 
 			case 'ityp_ID':
+				if( $this->get( 'ityp_ID' ) !== $parname )
+				{	// Reset Item Type on changing ID to different value:
+					$this->ItemType = NULL;
+				}
+				return $this->set_param( $parname, 'number', $parvalue, true );
+
 			case 'canonical_slug_ID':
 			case 'tiny_slug_ID':
 			case 'dateset':

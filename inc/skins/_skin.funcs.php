@@ -323,6 +323,10 @@ function skin_init( $disp )
 					}
 
 					global $cat, $catsel;
+
+					$ChapterCache = & get_ChapterCache();
+					$Chapter = & $ChapterCache->get_by_ID( $cat, false, false );
+
 					if( empty( $catsel ) && preg_match( '~^[0-9]+$~', $cat ) )
 					{	// We are on a single cat page:
 						// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
@@ -335,16 +339,12 @@ function skin_init( $disp )
 						if( ( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
 							|| $Blog->get_setting( 'relcanonical_cat_urls' ) )
 						{ // Check if the URL was canonical:
-							if( !isset( $Chapter ) )
-							{
-								$ChapterCache = & get_ChapterCache();
-								/**
-								 * @var Chapter
-								 */
-								$Chapter = & $ChapterCache->get_by_ID( $MainList->filters['cat_array'][0], false );
+							if( empty( $Chapter ) && isset( $MainList->filters['cat_array'][0] ) )
+							{	// Try to get Chapter from filters:
+								$Chapter = & $ChapterCache->get_by_ID( $MainList->filters['cat_array'][0], false, false );
 							}
 
-							if( $Chapter )
+							if( ! empty( $Chapter ) )
 							{
 								if( $Chapter->parent_ID )
 								{	// This is a sub-category page (i-e: not a level 1 category)
@@ -365,19 +365,20 @@ function skin_init( $disp )
 									}
 								}
 							}
-							else
-							{ // If the requested chapter was not found display 404 page
-								$Messages->add( T_('The requested chapter was not found') );
-								global $disp;
-								$disp = '404';
-								break;
-							}
 						}
 
 						if( $post_navigation == 'same_category' )
 						{ // Category is set and post navigation should go through the same category, set navigation target param
 							$MainList->nav_target = $cat;
 						}
+					}
+
+					if( empty( $Chapter ) )
+					{	// If the requested chapter was not found display 404 page:
+						$Messages->add( T_('The requested chapter was not found') );
+						global $disp;
+						$disp = '404';
+						break;
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'tags', 'posts', 'page' ) ) == array() )
@@ -1306,6 +1307,12 @@ function skin_init( $disp )
 			{	// Use default category instead of the wrong requested:
 				set_param( 'cat', $Blog->get_default_cat_ID() );
 			}
+
+			if( $Chapter && $Chapter->get_ItemType() === false )
+			{	// Don't allow to post in category without default Item Type:
+				$Messages->add( T_('You cannot post here'), 'error' );
+				header_redirect( $Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
+			}
 			break;
 
 		case 'edit':
@@ -1351,6 +1358,16 @@ function skin_init( $disp )
 				}
 				$Messages->add( $error_message, 'error' );
 				header_redirect( $Blog->gen_blogurl(), 302 );
+			}
+
+			$cat = param( 'cat', 'integer' );
+			if( $cat > 0 &&
+			    ( $ChapterCache = & get_ChapterCache() ) &&
+			    ( $selected_Chapter = & $ChapterCache->get_by_ID( $cat, false, false ) ) &&
+			    ( $selected_Chapter->get_ItemType() === false ) )
+			{	// Don't allow to post in category without default Item Type:
+				$Messages->add( T_('You cannot post here'), 'error' );
+				header_redirect( $selected_Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
 			}
 
 			// Prepare the 'In-skin editing':

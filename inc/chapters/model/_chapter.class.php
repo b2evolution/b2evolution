@@ -59,6 +59,13 @@ class Chapter extends DataObject
 	var $order;
 	var $meta;
 	var $lock;
+	var $ityp_ID = NULL;
+
+	/**
+	 * Default Item Type
+	 * @var object|NULL|false
+	 */
+	var $ItemType = NULL;
 
 	/**
 	 * Lazy filled
@@ -125,6 +132,7 @@ class Chapter extends DataObject
 			$this->meta = $db_row->cat_meta;
 			$this->lock = $db_row->cat_lock;
 			$this->last_touched_ts = $db_row->cat_last_touched_ts;		// When Chapter received last visible change (edit, item, comment, etc.)
+			$this->ityp_ID = $db_row->cat_ityp_ID;
 		}
 	}
 
@@ -352,6 +360,10 @@ class Chapter extends DataObject
 		// Locked category
 		param( 'cat_lock', 'integer', 0 );
 		$this->set_from_Request( 'lock' );
+
+		// Default Item Type:
+		param( 'cat_ityp_ID', 'integer', NULL );
+		$this->set_from_Request( 'ityp_ID' );
 
 		if( $cat_Blog )
 		{
@@ -858,6 +870,13 @@ class Chapter extends DataObject
 			case 'image_file_ID':
 				return $this->set_param( $parname, 'integer', $parvalue, true );
 
+			case 'ityp_ID':
+				if( $this->get( 'meta' ) )
+				{	// Don't allow default Item Type for meta category because it cannot has items:
+					$parvalue = NULL;
+				}
+				return $this->set_param( $parname, 'integer', $parvalue, true );
+
 			case 'name':
 			case 'urlname':
 			case 'description':
@@ -938,6 +957,40 @@ class Chapter extends DataObject
 				'',
 				$params['size_x'],
 				$params['tag_size'] );
+	}
+
+
+	/**
+	 * Get default Item Type of this Chapter
+	 *
+	 * @return object|false|NULL Default Item Type,
+	 *                           NULL - Same as collection default,
+	 *                           FALSE - No default type or Item Type is not found in DB or Item Type is not enabled for chapter's collection
+	 */
+	function & get_ItemType()
+	{
+		if( $this->get( 'ityp_ID' ) === NULL )
+		{	// Item Type is same as collection default:
+			$r = NULL;
+			return $r;
+		}
+
+		if( $this->ItemType === NULL )
+		{	// Load Item Type into cache:
+			if( ( $this->get( 'ityp_ID' ) > 0 ) && 
+					( $ItemTypeCache = & get_ItemTypeCache() ) &&
+					( $cat_ItemType = & $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ), false, false ) ) &&
+					( $cat_ItemType->is_enabled( $this->get( 'blog_ID' ) ) ) )
+			{	// Default Item Type is found in DB and it is enabled for chapter's collection:
+				$this->ItemType = $cat_ItemType;
+			}
+			else
+			{	// No default type or Item Type is not found in DB or Item Type is not enabled for chapter's collection:
+				$this->ItemType = false;
+			}
+		}
+
+		return $this->ItemType;
 	}
 }
 

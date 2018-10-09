@@ -20,14 +20,14 @@ if( is_logged_in() || ! $Blog->get_setting( 'post_anonymous' ) )
 	return;
 }
 
+$new_Item = get_session_Item( 0, true );
+
 $params = array_merge( array(
 		'form_params'           => array(), // Use to change a structre of form, i.e. fieldstart, fieldend and etc.
-		'item_new_form_start'   => '<h3>'.sprintf( T_('New [%s]'), $Blog->get_default_item_type_name() ).'</h3>',
+		'item_new_form_start'   => '<h3>'.sprintf( T_('New [%s]'), $new_Item->get_type_setting( 'name' ) ).'</h3>',
 		'item_new_form_end'     => '',
 		'item_new_submit_text'  => T_('Create post'),
 	), $params );
-
-$new_Item = get_session_Item( 0, true );
 
 echo $params['item_new_form_start'];
 
@@ -39,7 +39,9 @@ $Form->begin_form();
 
 $Form->hidden( 'mname', 'collections' );
 $Form->add_crumb( 'collections_create_post' );
+$Form->hidden( 'blog', $Blog->ID );
 $Form->hidden( 'cat', get_param( 'cat' ) );
+$Form->hidden( 'item_typ_ID', $new_Item->ityp_ID );
 
 $Form->switch_layout( 'fields_table' );
 $Form->begin_fieldset();
@@ -108,6 +110,13 @@ if( $new_Item->get_type_setting( 'use_text' ) != 'never' )
 
 	// set b2evoCanvas for plugins
 	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
+
+
+	// =================================== INSTRUCTION ====================================
+	if( $new_Item->get_type_setting( 'front_instruction' ) && $new_Item->get_type_setting( 'instruction' ) )
+	{
+		echo '<br><div class="alert alert-info fade in evo_instruction">'.$new_Item->get_type_setting( 'instruction' ).'</div>';
+	}
 
 	// Display renderers:
 	$item_renderer_checkboxes = ( $Blog->get_setting( 'in_skin_editing_renderers' ) ? $new_Item->get_renderer_checkboxes() : false );

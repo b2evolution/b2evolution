@@ -66,9 +66,7 @@ function cat_line( $Chapter, $level )
 	$r = '<tr id="tr-'.$Chapter->ID.'"class="'.$line_class.
 					' chapter_parent_'.( $Chapter->parent_ID ? $Chapter->parent_ID : '0' ).
 					( $is_highlighted ? ' evo_highlight' : '' ).'">
-					<td class="firstcol shrinkwrap">'.
-						$Chapter->ID.'
-				</td>';
+					<td class="firstcol shrinkwrap">'.$Chapter->ID.'</td>';
 
 	// Default
 	if( $Chapter->get( 'meta' ) )
@@ -149,6 +147,37 @@ function cat_line( $Chapter, $level )
 		else
 		{
 			$r .= '<td></td>';
+		}
+
+		// Default Item Type:
+		if( $Chapter->get( 'meta' ) )
+		{	// Don't allow default Item Type for meta category because it cannot has items:
+			$r .= '<td>&nbsp;</td>';
+		}
+		else
+		{	// Normal category can has items, Allow to change its default Item Type:
+			if( $Chapter->get( 'ityp_ID' ) === NULL )
+			{	// Same as collection default:
+				$cat_item_type_name = T_('Same as collection default');
+			}
+			elseif( $Chapter->get( 'ityp_ID' ) == '0' )
+			{	// No default type:
+				$cat_item_type_name = '<b>'.T_('No default type').'</b>';
+			}
+			elseif( ( $ItemTypeCache = & get_ItemTypeCache() ) && 
+							( $cat_ItemType = & $ItemTypeCache->get_by_ID( $Chapter->get( 'ityp_ID' ), false, false ) ) )
+			{	// Custom Item Type:
+				$cat_item_type_name = $cat_ItemType->get( 'name' );
+				if( ! $cat_ItemType->is_enabled( $Chapter->get( 'blog_ID' ) ) )
+				{	// Mark not enabled Item Type with red color:
+					$cat_item_type_name = '<span class="red">'.$cat_item_type_name.'</span>';
+				}
+			}
+			else
+			{	// Not found Item Type in DB:
+				$cat_item_type_name = '<span class="red">'.T_('Not Found').' #'.$Chapter->get( 'ityp_ID' ).'</span>';
+			}
+			$r .= '<td class="jeditable_cell cat_ityp_ID_edit"><a href="#" rel="_'.$Chapter->get( 'ityp_ID' ).'">'.$cat_item_type_name.'</a></td>';
 		}
 
 		// Lock
@@ -280,6 +309,11 @@ if( $permission_to_edit )
 					);
 
 	$Table->cols[] = array(
+						'th' => T_('Default<br />Item Type'),
+						'th_class' => 'shrinkwrap',
+					);
+
+	$Table->cols[] = array(
 						'th' => T_('Lock'),
 						'th_class' => 'shrinkwrap',
 					);
@@ -373,4 +407,15 @@ echo_editable_column_js( array(
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',
 	'ID_name'         => 'cat_ID',
 	'field_type'      => 'text' ) );
+
+if( $permission_to_edit )
+{	// Print JS to edit default Item Type of category:
+	echo_editable_column_js( array(
+		'column_selector' => '.cat_ityp_ID_edit',
+		'ajax_url'        => get_htsrv_url().'async.php?action=cat_ityp_ID_edit&blogid='.$Blog->ID.'&'.url_crumb( 'catityp' ),
+		'options'         => collection_item_type_titles( $Blog->ID, NULL, '_' ),
+		'new_field_name'  => 'new_ityp_ID',
+		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',
+		'ID_name'         => 'cat_ID' ) );
+}
 ?>
