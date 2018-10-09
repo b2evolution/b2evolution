@@ -319,6 +319,10 @@ function skin_init( $disp )
 					}
 
 					global $cat, $catsel;
+
+					$ChapterCache = & get_ChapterCache();
+					$Chapter = & $ChapterCache->get_by_ID( $cat, false, false );
+
 					if( empty( $catsel ) && preg_match( '~^[0-9]+$~', $cat ) )
 					{	// We are on a single cat page:
 						// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
@@ -331,16 +335,12 @@ function skin_init( $disp )
 						if( ( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
 							|| $Blog->get_setting( 'relcanonical_cat_urls' ) )
 						{ // Check if the URL was canonical:
-							if( !isset( $Chapter ) )
-							{
-								$ChapterCache = & get_ChapterCache();
-								/**
-								 * @var Chapter
-								 */
-								$Chapter = & $ChapterCache->get_by_ID( $MainList->filters['cat_array'][0], false );
+							if( empty( $Chapter ) && isset( $MainList->filters['cat_array'][0] ) )
+							{	// Try to get Chapter from filters:
+								$Chapter = & $ChapterCache->get_by_ID( $MainList->filters['cat_array'][0], false, false );
 							}
 
-							if( $Chapter )
+							if( ! empty( $Chapter ) )
 							{
 								if( $Chapter->parent_ID )
 								{	// This is a sub-category page (i-e: not a level 1 category)
@@ -361,19 +361,20 @@ function skin_init( $disp )
 									}
 								}
 							}
-							else
-							{ // If the requested chapter was not found display 404 page
-								$Messages->add( T_('The requested chapter was not found') );
-								global $disp;
-								$disp = '404';
-								break;
-							}
 						}
 
 						if( $post_navigation == 'same_category' )
 						{ // Category is set and post navigation should go through the same category, set navigation target param
 							$MainList->nav_target = $cat;
 						}
+					}
+
+					if( empty( $Chapter ) )
+					{	// If the requested chapter was not found display 404 page:
+						$Messages->add( T_('The requested chapter was not found') );
+						global $disp;
+						$disp = '404';
+						break;
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'tags', 'posts', 'page' ) ) == array() )
