@@ -262,6 +262,12 @@ function echo_installation_options( $params = array() )
 						}
 					}
 
+					jQuery( document ).ready( function() {
+							toggle_create_demo_content_options();
+							toggle_demo_content_type_options();
+							toggle_create_demo_user_options();
+						} );
+
 					jQuery( "#create_sample_contents" ).click( toggle_create_demo_content_options );
 					jQuery( "input[name=\"demo_content_type\"]" ).click( toggle_demo_content_type_options );
 					jQuery( "#create_demo_users" ).click( toggle_create_demo_user_options );
