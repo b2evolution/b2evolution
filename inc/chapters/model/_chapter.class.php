@@ -863,6 +863,13 @@ class Chapter extends DataObject
 			case 'image_file_ID':
 				return $this->set_param( $parname, 'integer', $parvalue, true );
 
+			case 'ityp_ID':
+				if( $this->get( 'meta' ) )
+				{	// Don't allow default Item Type for meta category because it cannot has items:
+					$parvalue = NULL;
+				}
+				return $this->set_param( $parname, 'integer', $parvalue, true );
+
 			case 'name':
 			case 'urlname':
 			case 'description':
