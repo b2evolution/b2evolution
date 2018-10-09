@@ -259,7 +259,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				'custom_fields_table_start'                => '<div class="evo_content_block"><table class="item_custom_fields">',
 				'custom_fields_row_start'                  => '<tr>',
 				'custom_fields_topleft_cell'               => '<td style="border:none"></td>',
-				'custom_fields_col_header_item'            => '<th class="center">$item_link$$item_status$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
+				'custom_fields_col_header_item'            => '<th class="center" width="$col_width$">$item_link$$item_status$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
 				'custom_fields_row_header_field'           => '<th class="$header_cell_class$">$field_title$$field_description_icon$:</th>',
 				'custom_fields_item_status_template'       => '<div><div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div></div>',
 				'custom_fields_description_icon_class'     => 'grey',
@@ -305,6 +305,7 @@ class item_fields_compare_Widget extends ComponentWidget
 		{	// Display item column headers row if it is enabled by widget settings:
 			echo $this->get_field_template( 'row_start' );
 			echo $this->get_field_template( 'topleft_cell' );
+			$col_width = number_format( 100 / ( count( $items ) + 1 ), 2, '.', '' );
 			foreach( $items as $item_ID )
 			{
 				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
@@ -329,7 +330,7 @@ class item_fields_compare_Widget extends ComponentWidget
 					$item_status = '';
 				}
 
-				echo str_replace( array( '$item_link$', '$item_status$' ), array( $item_title, $item_status ), $this->get_field_template( 'col_header_item' ) );
+				echo str_replace( array( '$item_link$', '$item_status$', '$col_width$' ), array( $item_title, $item_status, $col_width.'%' ), $this->get_field_template( 'col_header_item' ) );
 			}
 			echo $this->get_field_template( 'row_end' );
 		}
