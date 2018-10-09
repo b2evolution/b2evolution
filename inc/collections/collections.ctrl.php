@@ -681,22 +681,25 @@ switch( $action )
 
 	case 'new_demo_content':
 		global $DB;
+		global $install_test_features;
+
 		load_funcs( 'collections/_demo_content.funcs.php' );
 
-		$create_sample_contents = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
-		$create_sample_organization = param( 'create_sample_organization', 'boolean', false, true );
-		$create_demo_users = param( 'create_demo_users', 'boolean', false, true );
-		$create_demo_messages = param( 'create_sample_private_messages', 'boolean', false, true );
+		$create_sample_contents   = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
+		$create_demo_organization = param( 'create_demo_organization', 'boolean', false, true );
+		$create_demo_users        = param( 'create_demo_users', 'boolean', false, true );
+		$create_demo_messages     = param( 'create_sample_private_messages', 'boolean', false, true );
+		$install_test_features    = param( 'install_test_features', 'boolean', false );
 
 		$user_org_IDs = NULL;
 		$demo_users = array();
 
 		$DB->begin();
-		if( $create_sample_organization )
+		if( $create_demo_organization )
 		{
 			$user_org_IDs = array( create_demo_organization( $current_User->ID )->ID );
 			$current_User->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
-			$Messages->add_to_group( T_('Created sample organization.'), 'success', T_('Demo contents').':' );
+			$Messages->add_to_group( sprintf( T_('Added user %s to demo organization.'), $current_User->login ), 'success', T_('Demo contents').':' );
 		}
 
 		if( $create_demo_users )

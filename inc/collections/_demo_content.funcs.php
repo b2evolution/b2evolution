@@ -133,31 +133,11 @@ function is_available_item_type( $blog_ID, $item_type_name = '#', $item_types = 
 function echo_installation_options( $params = array() )
 {
 	$params = array_merge( array(
-			'show_sample_organization' => true,
-			'show_sample_users'        => true,
-			'show_sample_messages'     => true,
+			'enable_create_demo_users' => true,
+			'show_create_organization' => true,
+			'show_create_messages'     => true,
 	), $params );
 
-	$r = '<div class="checkbox">
-				<label>
-					<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />'
-					.T_('Create a demo site').'
-				</label>
-				<div id="create_sample_contents_options" style="margin:10px 0 0 20px">
-					<div class="radio" style="margin-left:1em">
-						<label>
-							<input type="radio" name="demo_content_type" id="minisite_demo" value="minisite" />'
-							.T_('Mini-Site').'
-						</label>
-					</div>
-					<div class="radio" style="margin-left:1em">
-						<label>
-							<input type="radio" name="demo_content_type" id="complex_site_demo" value="complex_site" checked="checked" />'
-							.T_('Complex Site, including:').'
-						</label>
-					</div>';
-
-	// Display the collections to select which install
 	$collections = array(
 			'home'     => T_('Global home page'),
 			'a'        => T_('Sample Blog A (Public)'),
@@ -181,6 +161,26 @@ function echo_installation_options( $params = array() )
 		}
 	}
 
+	$r = '<div class="checkbox">
+				<label>
+					<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />'
+					.T_('Create a demo site').'
+				</label>
+				<div id="create_sample_contents_options" style="margin:10px 0 0 20px">
+					<div class="radio" style="margin-left:1em">
+						<label>
+							<input type="radio" name="demo_content_type" id="minisite_demo" value="minisite" />'
+							.T_('Mini-Site').'
+						</label>
+					</div>
+					<div class="radio" style="margin-left:1em">
+						<label>
+							<input type="radio" name="demo_content_type" id="complex_site_demo" value="complex_site" checked="checked" />'
+							.T_('Complex Site, including:').'
+						</label>
+					</div>';
+
+	// Display the collections to select which install
 	foreach( $collections as $coll_index => $coll_title )
 	{	// Display the checkboxes to select what demo collection to install
 		$r .= '<div class="checkbox" style="margin-left:2em">
@@ -193,50 +193,52 @@ function echo_installation_options( $params = array() )
 
 	$r .= '</div></div>';
 
-	if( $params['show_sample_organization'] )
+
+	$r .= '<div class="checkbox" style="margin-top: 15px">
+					<label>
+						<input type="checkbox" name="create_demo_users" id="create_demo_users" value="1" checked="checked" '.( $params['enable_create_demo_users'] ? '' : 'disabled="disabled"' ).' />'
+						.( $params['enable_create_demo_users'] ? T_('Create demo users') : T_('Your system already has several user accounts, so we won\'t create demo users.') ).
+					'</label>
+					<div id="create_demo_user_options" style="margin: 10px 0 0 20px">';
+
+	if( $params['show_create_organization'] )
 	{
-		$r .= '<div class="checkbox" style="margin-top: 15px">
+		$r .= '<div class="checkbox" style="margin-left: 1em">
 						<label>
-							<input type="checkbox" name="create_sample_organization" id="create_sample_organization" value="1" checked="checked" />'
-							.T_('Create a sample organization')
-						.'</label>
+							<input type="checkbox" name="create_demo_organization" id="create_demo_organization" value="1" checked="checked" />'
+							.T_('Create a demo organization / team').
+						'</label>
 					</div>';
 	}
 
-	if( $params['show_sample_users'] )
+	if( $params['show_create_messages'] )
 	{
-		$r .= '<div class="checkbox" style="margin-top: 15px">
-						<label>
-							<input type="checkbox" name="create_demo_users" id="create_demo_users" value="1" checked="checked" />'
-							.T_('Create demo users (in addition to the admin account)')
-						.'</label>
-					</div>';
-	}
-
-	if( $params['show_sample_messages'] )
-	{
-		$r .= '<div class="checkbox create_demo_users_options" style="margin-top: 15px">
+		$r .= '<div class="checkbox" style="margin-left: 1em">
 						<label>
 							<input type="checkbox" name="create_sample_private_messages" id="create_sameple_private_messages" value="1" checked="checked" />'
-							.T_('Create sample private messages between users')
-						.'</label>
+							.T_('Create demo private messages between users').
+						'</label>
 					</div>';
 	}
 
+	$r .= '</div></div>';
+
 	$r .= '<script type="text/javascript">
-					jQuery( "#create_sample_contents"	 ).click( function()
+					function toggle_create_demo_content_options()
 					{
-						jQuery( "#create_sample_contents_options" ).toggle();
-					} );
+						if( jQuery( "#create_sample_contents" ).is( ":checked" ) )
+						{
+							jQuery( "#create_sample_contents_options" ).show();
+						}
+						else
+						{
+							jQuery( "#create_sample_contents_options" ).hide();
+						}
+					}
 
-					jQuery( "#create_demo_users" ).click( function()
+					function toggle_demo_content_type_options()
 					{
-						jQuery( ".create_demo_users_options" ).toggle();
-					} );
-
-					jQuery( "input[name=\"demo_content_type\"]" ).click( function()
-					{
-						if( jQuery( this ).val() == "minisite" )
+						if( jQuery( "input[name=\"demo_content_type\"]:checked" ).val() == "minisite" )
 						{
 							jQuery( "input[name=\'collections[]\']" ).attr( "disabled", true );
 						}
@@ -244,7 +246,26 @@ function echo_installation_options( $params = array() )
 						{
 							jQuery( "input[name=\'collections[]\']" ).removeAttr( "disabled" );
 						}
-					} );
+					}
+
+					function toggle_create_demo_user_options()
+					{
+						if( jQuery( "#create_demo_users" ).is( ":checked" ) )
+						{
+							jQuery( "input[name=\'create_demo_organization\']" ).removeAttr( "disabled" );
+							jQuery( "input[name=\'create_sample_private_messages\']" ).removeAttr( "disabled" );
+						}
+						else
+						{
+							jQuery( "input[name=\'create_demo_organization\']" ).attr( "disabled", true );
+							jQuery( "input[name=\'create_sample_private_messages\']" ).attr( "disabled", true );
+						}
+					}
+
+					jQuery( "#create_sample_contents" ).click( toggle_create_demo_content_options );
+					jQuery( "input[name=\"demo_content_type\"]" ).click( toggle_demo_content_type_options );
+					jQuery( "#create_demo_users" ).click( toggle_create_demo_user_options );
+
 				</script>';
 
 	return $r;
@@ -698,9 +719,9 @@ function create_demo_organization( $owner_ID, $org_name = 'Company XYZ', $add_cu
 
 
 /**
- * Returns defaults for demo users
+ * Returns list  of valid demo users
  *
- * @return array Array of demo user defaults
+ * @return array Array of demo users with default settings
  */
 function get_demo_users_defaults()
 {
@@ -709,7 +730,7 @@ function get_demo_users_defaults()
 				'login'     => 'admin',
 				'firstname' => 'Johnny',
 				'lastname'  => 'Admin',
-				'level'     => 10,
+				'level'     => 10, // NOTE: these levels define the order of display in the Organization members widget
 				'gender'    => 'M',
 				'group'     => 'Administrators',
 				'org_IDs'   => '#',
@@ -729,7 +750,7 @@ function get_demo_users_defaults()
 				'login'     => 'mary',
 				'firstname' => 'Mary',
 				'lastname'  => 'Wilson',
-				'level'     => 4, // NOTE: these levels define the order of display in the Organization memebers widget
+				'level'     => 4, // NOTE: these levels define the order of display in the Organization members widget
 				'gender'    => 'F',
 				'group'     => 'Moderators',
 				'org_IDs'   => '#',
@@ -748,7 +769,7 @@ function get_demo_users_defaults()
 				'login'     => 'jay',
 				'firstname' => 'Jay',
 				'lastname'  => 'Parker',
-				'level'     => 3, // NOTE: these levels define the order of display in the Organization memebers widget
+				'level'     => 3, // NOTE: these levels define the order of display in the Organization members widget
 				'gender'    => 'M',
 				'group'     => 'Moderators',
 				'org_IDs'   => '#',
@@ -767,7 +788,7 @@ function get_demo_users_defaults()
 				'login'     => 'dave',
 				'firstname' => 'David',
 				'lastname'  => 'Miller',
-				'level'     => 2,
+				'level'     => 2, // NOTE: these levels define the order of display in the Organization members widget
 				'gender'    => 'M',
 				'group'     => 'Editors',
 				'org_IDs'   => '#',
@@ -786,7 +807,7 @@ function get_demo_users_defaults()
 				'login'     => 'paul',
 				'firstname' => 'Paul',
 				'lastname'  => 'Jones',
-				'level'     => 1,
+				'level'     => 1, // NOTE: these levels define the order of display in the Organization members widget
 				'gender'    => 'M',
 				'group'     => 'Editors',
 				'org_IDs'   => '#',
@@ -833,17 +854,17 @@ function get_demo_users_defaults()
  * @param boolean Create the demo users if they do not exist
  * @param object Group where the created demo users be assigned
  * @param array List of organization where  the created demo users will be added
- * @return array List of available demo users
+ * @return array Array of available demo users indexed by login
  */
-function get_demo_users( $create = false, $group = NULL )
+function get_demo_users( $create = false )
 {
 	$demo_users = get_demo_users_defaults();
-	$demo_user_logins = array_keys( $demo_users );
+	$demo_users_logins = array_keys( $demo_users );
 
 	$available_demo_users = array();
-	foreach( $demo_user_logins as $demo_user_login )
+	foreach( $demo_users_logins as $demo_user_login )
 	{
-		$demo_User = get_demo_user( $demo_user_login, $create, $group );
+		$demo_User = get_demo_user( $demo_user_login, $create );
 		if( $demo_User )
 		{
 			$available_demo_users[$demo_user_login] = $demo_User;
@@ -855,41 +876,46 @@ function get_demo_users( $create = false, $group = NULL )
 
 
 /**
- * Create a demo user
+ * Get demo user
  *
  * @param string User $login
  * @param boolean Create demo user if it does not exist
- * @param integer Group ID of user when created
- * @param array IDs of organization
  * @return mixed object Demo user if successful, false otherwise
  */
-function get_demo_user( $login, $create = false, $group_ID = NULL )
+function get_demo_user( $login, $create = false )
 {
 	global $DB;
 	global $current_User;
 	global $user_timestamp;
 
-	$UserCache = & get_UserCache();
-	$demo_user = & $UserCache->get_by_login( $login );
-	$GroupCache = & get_GroupCache();
-
+	// Get list of demo users:
 	$demo_users = get_demo_users_defaults();
 
 	if( ! isset( $demo_users[$login] ) )
-	{	// Specified demo user does not exist:
+	{	// Specified login not included in the list of demo users:
 		return false;
 	}
 
-	if( is_null( $group_ID ) && $user_default_Group = $GroupCache->get_by_name( $demo_users[$login]['group'], false, false ) )
+	$UserCache = & get_UserCache();
+	// Check if demo user is already created:
+	$demo_user = & $UserCache->get_by_login( $login );
+
+	$GroupCache = & get_GroupCache();
+	if( isset( $demo_users[$login]['group'] )
+			&& $user_default_Group = $GroupCache->get_by_name( $demo_users[$login]['group'], false, false ) )
 	{	// Get default group ID:
 		$group_ID = $user_default_Group->ID;
+	}
+	else
+	{
+		$group_ID = $GroupCache->get_by_name( 'Normal Users' );
 	}
 
 	$user_org_IDs = NULL;
 	if( isset( $demo_users[$login]['org_IDs'] )  )
 	{
 		if( $demo_users[$login]['org_IDs'] == '#' )
-		{ // Get first available organization:
+		{	// Get first available organization:
 			if( $organization_ID = $DB->get_var( 'SELECT org_ID FROM T_users__organization ORDER BY org_ID ASC LIMIT 1' ) )
 			{
 				$user_org_IDs = array( $organization_ID );
@@ -902,7 +928,7 @@ function get_demo_user( $login, $create = false, $group_ID = NULL )
 	}
 
 	if( ! $demo_user && $create )
-	{
+	{	// Demo user does not exist yet but we can create:
 		adjust_timestamp( $user_timestamp, 360, 1440, false );
 
 		$user_defaults = array_merge( $demo_users[$login], array(
@@ -911,85 +937,14 @@ function get_demo_user( $login, $create = false, $group_ID = NULL )
 			'datecreated' => $user_timestamp,
 		) );
 
-		switch( $login )
-		{
-			case 'mary':
-				$mary_moderator = create_user( $user_defaults );
-				if( $mary_moderator === false )
-				{
-					return false;
-				}
-
-				$mary_moderator_ID = $mary_moderator->ID;
-				assign_profile_picture( $mary_moderator );
-				$demo_user = & $mary_moderator;
-				break;
-
-			case 'jay':
-				$jay_moderator = create_user( $user_defaults );
-				if( $jay_moderator === false )
-				{
-					return false;
-				}
-
-				$jay_moderator_ID = $jay_moderator->ID;
-				assign_profile_picture( $jay_moderator );
-				$demo_user = & $jay_moderator;
-				break;
-
-			case 'dave':
-				$dave_blogger = create_user( $user_defaults );
-				if( $dave_blogger === false )
-				{
-					return false;
-				}
-
-				$dave_blogger_ID = $dave_blogger->ID;
-				assign_profile_picture( $dave_blogger );
-				$demo_user = & $dave_blogger;
-				break;
-
-			case 'paul':
-				$paul_blogger = create_user( $user_defaults );
-				if( $paul_blogger === false )
-				{
-					return false;
-				}
-
-				$paul_blogger_ID = $paul_blogger->ID;
-				assign_profile_picture( $paul_blogger );
-				$demo_user = & $paul_blogger;
-				break;
-
-			case 'larry':
-				$larry_user = create_user( $user_defaults );
-				if( $larry_user === false )
-				{
-					return false;
-				}
-
-				$larry_user_ID = $larry_user->ID;
-				assign_profile_picture( $larry_user );
-				$demo_user = & $larry_user;
-				break;
-
-			case 'kate':
-				$kate_user = create_user( $user_defaults );
-				if( $kate_user === false )
-				{
-					return false;
-				}
-
-				$kate_user_ID = $kate_user->ID;
-				assign_profile_picture( $kate_user );
-				$demo_user = & $kate_user;
-				break;
-
-			case 'admin':
-				// erhsatingin> Should we recreate 'admin' user here if the initial admin user has a different login?
-			default:
-				return false;
+		$demo_user = create_user( $user_defaults );
+		if( $demo_user === false )
+		{	// Cannot create demo user, exiting:
+			return false;
 		}
+
+		// Try to assign profile picture to demo user:
+		assign_profile_picture( $demo_user );
 
 		if( $demo_user )
 		{	// Insert default user settings:
@@ -998,9 +953,13 @@ function get_demo_user( $login, $create = false, $group_ID = NULL )
 				       ( '.$demo_user->ID.', "user_domain", "localhost" )' );
 		}
 	}
-	elseif( $demo_user && ! $demo_user->get( 'avatar_file_ID' ) )
+	elseif( $demo_user )
 	{
-		assign_profile_picture( $demo_user );
+		if( ! $demo_user->get( 'avatar_file_ID' ) )
+		{	// Demo user already exists but has avatar has not been set:
+			assign_profile_picture( $demo_user );
+		}
+
 		if( isset( $user_defaults['org_IDs'] ) && isset( $user_defaults['org_roles'] ) )
 		{
 			$org_priorities = isset( $user_defaults['org_priorities'] ) ? $user_defaults['org_priorities'] : array();
@@ -1013,7 +972,7 @@ function get_demo_user( $login, $create = false, $group_ID = NULL )
 
 
 /**
- * Create sample private messages
+ * Create demo private messages
  */
 function create_demo_messages()
 {
@@ -1234,7 +1193,8 @@ function create_demo_collections( $demo_users = array(), $create_demo_users = tr
 	// Use this var to shift the posts of the collections in time below:
 	$timeshift = 0;
 
-	insert_shared_widgets( 'normal' );
+	// Shared widgets should have already been installed:
+	// insert_shared_widgets( 'normal' );
 
 	if( $install_collection_home )
 	{	// Install Home blog

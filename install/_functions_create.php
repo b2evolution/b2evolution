@@ -1898,7 +1898,7 @@ function create_demo_contents( $demo_users = array() )
 	// Set default locations for each post in test mode installation
 	create_default_posts_location();
 
-	install_basic_widgets( $new_db_version );
+	//install_basic_widgets( $new_db_version );
 
 	load_funcs( 'tools/model/_system.funcs.php' );
 	system_init_caches( true, true ); // Outputs messages
