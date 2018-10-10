@@ -204,6 +204,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'type' => 'text',
 					'size' => 30,
 					'defaultvalue' => '',
+					'hide' => ( $current_link_type != 'url' ),
 				),
 				'highlight_current' => array(
 					'label' => T_('Highlight current'),
@@ -240,6 +241,10 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			( link_type_value == "item" )
 				? jQuery( "#ffield_'.$this->get_param_prefix().'item_ID" ).show()
 				: jQuery( "#ffield_'.$this->get_param_prefix().'item_ID" ).hide();
+			// Hide/Show URL:
+			( link_type_value == "url" )
+				? jQuery( "#ffield_'.$this->get_param_prefix().'link_href" ).show()
+				: jQuery( "#ffield_'.$this->get_param_prefix().'link_href" ).hide();
 		} );';
 	}
 
