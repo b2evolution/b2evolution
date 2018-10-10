@@ -365,13 +365,6 @@ class Chapter extends DataObject
 		param( 'cat_ityp_ID', 'integer', NULL );
 		$this->set_from_Request( 'ityp_ID' );
 
-		if( $cat_Blog )
-		{
-			$item_type = param( 'cat_default_item_type_ID', 'string', NULL );
-			$cat_Blog->set_setting( 'default_item_type_cat_'.$this->ID, $item_type );
-			$cat_Blog->dbsave();
-		}
-
 		return ! param_errors_detected();
 	}
 

@@ -6328,33 +6328,39 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get default new item type based on the collection's default category
+	 * Get default new item type based on the collection's default category or current working category
 	 *
-	 * @return mixed ItemType object, false if default item type is disabled
+	 * @return object|false ItemType object, false if default item type is disabled
 	 */
-	function get_default_new_ItemType()
+	function & get_default_new_ItemType()
 	{
 		global $cat;
 
+		// Get a working category:
 		$working_cat = $cat;
 		if( empty( $cat ) )
-		{
+		{	// Use default collection category when global category is not defined:
 			$working_cat = $this->get_setting( 'default_cat_ID' );
 		}
-		$default_new_ItemType = $this->get_setting( 'default_item_type_cat_'.$working_cat );
-		if( $default_new_ItemType == 'disabled' )
-		{
-			return false;
+
+		$ChapterCache = & get_ChapterCache();
+		$working_Chapter = & $ChapterCache->get_by_ID( $working_cat, false, false );
+
+		if( ! $working_Chapter ||
+		    ( ( $working_cat_ItemType = & $working_Chapter->get_ItemType() ) === false ) )
+		{	// The working category is not detected in DB or it has no default Item Type:
+			$r = false;
+			return $r;
 		}
-		elseif( empty( $default_new_ItemType ) )
-		{
-			return $this->get_default_ItemType();
+
+		if( $working_cat_ItemType === NULL )
+		{	// If the working category uses the same as collection default:
+			$coll_default_ItemType = $this->get_default_ItemType();
+			return $coll_default_ItemType;
 		}
-		else
-		{
-			$ItemTypeCache = & get_ItemTypeCache();
-			return $ItemTypeCache->get_by_ID( $default_new_ItemType, false, false );
-		}
+
+		// If the working category uses a custom Item Type:
+		return $working_cat_ItemType;
 	}
 
 

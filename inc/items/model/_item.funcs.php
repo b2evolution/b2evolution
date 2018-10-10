@@ -1415,7 +1415,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	if( get_post_cat_setting($blog) != 2 )
 	{ // if no "Multiple categories per post" option is set display radio
 		if( !$thisChapter->meta
-			&& ! ( ! is_admin_page() && ( $Blog->get_setting( 'default_item_type_cat_'.$thisChapter->ID ) == 'disabled' ) && $edited_Item->ID === 0 )
+			&& ! ( ! is_admin_page() && ( $thisChapter->get_ItemType() === false ) && $edited_Item->ID === 0 )
 			&& ( ( $current_blog_ID == $blog ) || ( get_allow_cross_posting( $blog ) >= 2 ) ) )
 		{ // This is current blog or we allow moving posts accross blogs
 			if( $cat_select_form_fields )
@@ -1444,7 +1444,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	if( get_post_cat_setting( $blog ) >= 2 )
 	{ // We allow multiple categories or main + extra cat,  display checkbox:
 		if( !$thisChapter->meta
-			&& ! ( ! is_admin_page() && ( $Blog->get_setting( 'default_item_type_cat_'.$thisChapter->ID ) == 'disabled' ) && $edited_Item->ID === 0 )
+			&& ! ( ! is_admin_page() && ( $thisChapter->get_ItemType() === false ) && $edited_Item->ID === 0 )
 			&& ( ($current_blog_ID == $blog) || ( get_allow_cross_posting( $blog ) % 2 == 1 )
 				|| ( ( get_allow_cross_posting( $blog ) == 2 ) && ( get_post_cat_setting( $blog ) == 2 ) ) ) )
 		{ // This is the current blog or we allow cross posting (select extra cat from another blog)
