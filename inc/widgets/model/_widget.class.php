@@ -1298,5 +1298,16 @@ class ComponentWidget extends DataObject
 
 		return $content;
 	}
+
+
+	/**
+	 * Get JavaScript code which helps to edit widget form
+	 *
+	 * @return string
+	 */
+	function get_edit_form_javascript()
+	{
+		return false;
+	}
 }
 ?>

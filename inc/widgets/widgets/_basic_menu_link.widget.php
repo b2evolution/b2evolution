@@ -135,9 +135,11 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 	{
 		global $admin_url;
 
+		$current_link_type = $this->get_param( 'link_type', true );
+
 		// Check if field "Collection ID" is disabled because of link type and site uses only one fixed collection for profile pages:
 		$coll_id_is_disabled = ( empty( $params['infinite_loop'] )
-			&& in_array( $this->get_param( 'link_type', true ), array( 'ownercontact', 'owneruserinfo', 'myprofile', 'profile', 'avatar' ) )
+			&& in_array( $current_link_type, array( 'ownercontact', 'owneruserinfo', 'myprofile', 'profile', 'avatar' ) )
 			&& $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) );
 
 		$r = array_merge( array(
@@ -174,6 +176,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
+					'hide' => ! in_array( $current_link_type, array( 'recentposts', 'postnew' ) ),
 				),
 				'visibility' => array(
 					'label' => T_( 'Visibility' ),
@@ -193,6 +196,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
+					'hide' => ( $current_link_type != 'item' ),
 				),
 				'link_href' => array(
 					'label' => T_('URL'),
@@ -215,6 +219,28 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
+	}
+
+
+	/**
+	 * Get JavaScript code which helps to edit widget form
+	 *
+	 * @return string
+	 */
+	function get_edit_form_javascript()
+	{
+		return 'jQuery( "#'.$this->get_param_prefix().'link_type" ).change( function()
+		{
+			var link_type_value = jQuery( this ).val();
+			// Hide/Show category ID:
+			( link_type_value == "recentposts" || link_type_value == "postnew" )
+				? jQuery( "#ffield_'.$this->get_param_prefix().'cat_ID" ).show()
+				: jQuery( "#ffield_'.$this->get_param_prefix().'cat_ID" ).hide();
+			// Hide/Show item ID:
+			( link_type_value == "item" )
+				? jQuery( "#ffield_'.$this->get_param_prefix().'item_ID" ).show()
+				: jQuery( "#ffield_'.$this->get_param_prefix().'item_ID" ).hide();
+		} );';
 	}
 
 
