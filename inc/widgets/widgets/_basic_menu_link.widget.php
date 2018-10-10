@@ -167,6 +167,14 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'defaultvalue' => '',
 					'disabled' => $coll_id_is_disabled ? 'disabled' : false,
 				),
+				'cat_ID' => array(
+					'label' => T_('Category ID'),
+					'note' => T_('Leave empty for default category.'),
+					'type' => 'integer',
+					'allow_empty' => true,
+					'size' => 5,
+					'defaultvalue' => '',
+				),
 				'visibility' => array(
 					'label' => T_( 'Visibility' ),
 					'note' => '',
@@ -238,7 +246,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		* @var Blog
 		*/
 		global $Collection, $Blog;
-		global $disp;
+		global $disp, $cat;
 
 		$this->init_display( $params );
 
@@ -271,7 +279,15 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		switch( $this->disp_params['link_type'] )
 		{
 			case 'recentposts':
+				$text = T_('Recently');
 				$url = $current_Blog->get( 'recentpostsurl' );
+				if( ! empty( $this->disp_params['cat_ID'] ) && 
+				    ( $ChapterCache = & get_ChapterCache() ) &&
+				    ( $Chapter = & $ChapterCache->get_by_ID( $this->disp_params['cat_ID'], false, false ) ) )
+				{	// Use category url and name instead of default if the defined category is found in DB:
+					$url = $Chapter->get_permanent_url();
+					$text = $Chapter->get( 'name' );
+				}
 				if( is_same_url( $url, $Blog->get( 'url' ) ) )
 				{ // This menu item has the same url as front page of blog
 					$EnabledWidgetCache = & get_EnabledWidgetCache();
@@ -289,9 +305,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					}
 				}
 
-				$text = T_('Recently');
 				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'posts' );
+				$highlight_current = ( $highlight_current && $disp == 'posts' && ( empty( $Chapter ) || $cat == $Chapter->ID ) );
 				break;
 
 			case 'search':
@@ -502,8 +517,25 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 				}
 				$url = url_add_param( $current_Blog->get( 'url' ), 'disp=edit' );
 				$text = T_('Write a new post');
+				if( ! empty( $this->disp_params['cat_ID'] ) && 
+				    ( $ChapterCache = & get_ChapterCache() ) &&
+				    ( $Chapter = & $ChapterCache->get_by_ID( $this->disp_params['cat_ID'], false, false ) ) )
+				{	// Append category ID to the URL:
+					$url = url_add_param( $url, 'cat='.$Chapter->ID );
+					$cat_ItemType = & $Chapter->get_ItemType();
+					if( $cat_ItemType === false )
+					{	// Don't allow to create a post in this category because this category has no default Item Type:
+						return false;
+					}
+					if( $cat_ItemType )
+					{	// Use button text depending on default category's Item Type:
+						$text = sprintf( T_('New [%s]'), $cat_ItemType->get( 'name' ) );
+						// Append item type ID to the URL:
+						$url = url_add_param( $url, 'item_typ_ID='.$cat_ItemType->ID );
+					}
+				}
 				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'edit' );
+				$highlight_current = ( $highlight_current && $disp == 'edit' && ( empty( $Chapter ) || $cat == $Chapter->ID ) );
 				break;
 
 			case 'myprofile':
