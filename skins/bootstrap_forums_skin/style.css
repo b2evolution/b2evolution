@@ -731,20 +731,14 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
   padding-bottom: 0;
 }
 .extended_search_form {
-  width: 100%;
-  display: inline-block;
-  vertical-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  display: block;
   text-align: center;
 }
 .extended_search_form input {
   text-align: left;
   display: inline-block;
-}
-.extended_search_form .SearchField {
-  width: 50%;
-}
-.extended_search_form .search_submit {
-  margin-top: -2px;
 }
 .evo_search_navigation {
   padding-bottom: 20px;
