@@ -8453,9 +8453,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$SQL = new SQL( 'Get all short date formats"' );
 		$SQL->SELECT( 'loc_locale, loc_datefmt, loc_timefmt' );
 		$SQL->FROM( 'T_locales' );
-		$locales = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+		$db_locale_rows = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 
-		foreach( $locales as $loc_data )
+		foreach( $db_locale_rows as $loc_data )
 		{
 			$loc_data_datefmt = $loc_data['loc_datefmt'];
 

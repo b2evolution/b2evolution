@@ -300,6 +300,12 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		$set_value = $value_from_request;
 	}
 
+	if( ! empty( $parmeta['hide'] ) )
+	{	// Hide this field on the editing form:
+		$original_form_fieldstart = $Form->fieldstart;
+		$Form->fieldstart = preg_replace( '/>$/', 'style="display:none">', $Form->fieldstart );
+	}
+
 	switch( $parmeta['type'] )
 	{
 		case 'begin_line':
@@ -671,6 +677,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 		default:
 			debug_die( 'Unsupported type ['.$parmeta['type'].'] from GetDefaultSettings()!' );
+	}
+
+	if( isset( $original_form_fieldstart ) )
+	{	// Revert original field start html code:
+		$Form->fieldstart = $original_form_fieldstart;
 	}
 
 	if( $outer_most && $has_array_type )

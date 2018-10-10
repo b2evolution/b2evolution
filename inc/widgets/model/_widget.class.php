@@ -1537,6 +1537,17 @@ class ComponentWidget extends DataObject
 
 
 	/**
+	 * Get JavaScript code which helps to edit widget form
+	 *
+	 * @return string
+	 */
+	function get_edit_form_javascript()
+	{
+		return false;
+	}
+
+
+	/**
 	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
 	 *
 	 * @param string Message
