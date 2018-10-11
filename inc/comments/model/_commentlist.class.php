@@ -56,9 +56,9 @@ class CommentList2 extends DataObjectList2
 	function __construct(
 			$Blog,
 			$limit = 1000,
-			$cache_name = 'CommentCache',	// name of cache to be used
+			$cache_name = 'CommentCache', // name of cache to be used
 			$param_prefix = '',
-			$filterset_name = '',			// Name to be used when saving the filterset (leave empty to use default for collection)
+			$filterset_name = '' // Name to be used when saving the filterset (leave empty to use default for collection)
 		)
 	{
 		global $Settings;
