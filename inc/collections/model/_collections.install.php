@@ -358,8 +358,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_allow_disabling_comments TINYINT DEFAULT 0,
 			ityp_use_comment_expiration   ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
 			ityp_perm_level               ENUM( 'standard', 'restricted', 'admin' ) COLLATE ascii_general_ci NOT NULL default 'standard',
-			ityp_evobar_link_text     VARCHAR(255) NULL DEFAULT NULL,
-			ityp_skin_btn_text        VARCHAR(255) NULL DEFAULT NULL,
+			ityp_evobar_link_text         VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+			ityp_skin_btn_text            VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			PRIMARY KEY ( ityp_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

@@ -10351,6 +10351,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12978, 'Upgrade table item types...' ) )
+	{	// part of 6.10.4-stable
+		db_upgrade_cols( 'T_items__type', array(
+			'ADD' => array(
+				'ityp_evobar_link_text'  => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_perm_level',
+				'ityp_skin_btn_text'     => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_evobar_link_text',
+			),
+		) );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '
@@ -10658,7 +10669,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			'T_items__item_settings'       => array( 'iset_value' ),
 			'T_items__prerendering'        => array( 'itpr_content_prerendered' ),
 			'T_items__status'              => array( 'pst_name' ),
-			'T_items__type'                => array( 'ityp_name', 'ityp_description', 'ityp_instruction', 'ityp_comment_form_msg' ),
+			'T_items__type'                => array( 'ityp_name', 'ityp_description', 'ityp_instruction', 'ityp_comment_form_msg', 'ityp_evobar_link_text', 'ityp_skin_btn_text' ),
 			'T_items__type_custom_field'   => array( 'itcf_label', 'itcf_note' ),
 			'T_items__version'             => array( 'iver_title', 'iver_content' ),
 			'T_locales'                    => array( 'loc_name', 'loc_messages', 'loc_transliteration_map' ),
@@ -10744,17 +10755,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		install_new_default_widgets( 'item_in_list' );
 		install_new_default_widgets( 'item_single_header', 'item_visibility_badge,item_title,item_next_previous' );
 		install_new_default_widgets( 'item_single', 'item_visibility_badge,item_title' );
-		upg_task_end();
-	}
-
-	if( upg_task_start( 13200, 'Upgrade table item types...' ) )
-	{	// part of 7.0.0-alpha
-		db_upgrade_cols( 'T_items__type', array(
-			'ADD' => array(
-				'ityp_evobar_link_text' => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_perm_level',
-				'ityp_skin_btn_text'    => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_evobar_link_text',
-			),
-		) );
 		upg_task_end();
 	}
 
