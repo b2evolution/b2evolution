@@ -10136,16 +10136,9 @@ class Item extends ItemLight
 		}
 
 		// Set titles by Blog type:
-		if( $this->Blog->get( 'type' ) == 'forum' )
-		{
-			$title_new = T_('New topic');
-			$title_updated = T_('Updated topic');
-		}
-		else
-		{
-			$title_new = T_('New post');
-			$title_updated = T_('Updated post');
-		}
+		$this->get_ItemType();
+		$title_new = $this->ItemType->get_item_denomination( 'title_new' );
+		$title_updated = $this->ItemType->get_item_denomination( 'title_updated' );
 
 		// Merge params
 		$params = array_merge( array(

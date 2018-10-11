@@ -1123,16 +1123,18 @@ class _core_Module extends Module
 		$working_blog = get_working_blog();
 		if( $working_blog )
 		{ // Set collection url only when current user has an access to the working blog
+			$BlogCache = & get_BlogCache();
+			$working_Blog = & $BlogCache->get_by_ID( $working_blog );
 			if( is_admin_page() )
 			{ // Front page of the working blog
-				$BlogCache = & get_BlogCache();
-				$working_Blog = & $BlogCache->get_by_ID( $working_blog );
 				$collection_url = $working_Blog->get( 'url' );
 			}
 			else
 			{ // Dashboard of the working blog
 				$collection_url = $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$working_blog;
 			}
+
+			$default_new_ItemType = $working_Blog->get_default_new_ItemType();
 		}
 
 		if( $perm_admin_normal || $perm_admin_restricted )
@@ -1340,12 +1342,18 @@ class _core_Module extends Module
 			// ---- "Post"/"Edit" MENU ----
 			if( $perm_admin_normal )
 			{	// Only for normal access display a menu item to create new:
-				$entries['post'] = array(
-						'text' => get_icon( 'new' ).' './* TRANS: noun */ T_('Post'),
-						'title' => T_('No blog is currently selected'),
-						'disabled' => true,
-						'entry_class' => 'rwdhide evobar-entry-new-post',
-					);
+				$menu_text = /* TRANS: noun */ T_('Post');
+				if( isset( $default_new_ItemType ) && $default_new_ItemType !== false )
+				{
+					$menu_text = $default_new_ItemType->get_item_denomination( 'evobar_new' );
+					$entries['post'] = array(
+							'text' => get_icon( 'new' ).' '.$menu_text,
+							//'text' => get_icon( 'new' ).' './* TRANS: noun */ T_('Post'),
+							'title' => T_('No blog is currently selected'),
+							'disabled' => true,
+							'entry_class' => 'rwdhide evobar-entry-new-post',
+						);
+				}
 			}
 		}
 
@@ -1395,12 +1403,25 @@ class _core_Module extends Module
 							);
 					}
 				}
-				if( $write_item_url = $Blog->get_write_item_url() )
+				if( ( $write_item_url = $Blog->get_write_item_url() ) && isset( $default_new_ItemType ) && $default_new_ItemType != false )
 				{	// If write item URL is not empty, it's sure that user can create new post:
+					$menu_text = /* TRANS: noun */ T_('Post');
+					if( ! empty( $default_new_ItemType ) )
+					{
+						$menu_text = $default_new_ItemType->get_item_denomination( 'evobar_new' );
+						// The get_write_url() function above does not allow specifying the item type ID we'll manually add it:
+						$write_item_url = url_add_param( $write_item_url, 'item_typ_ID='.$default_new_ItemType->ID );
+
+						$evobar_link_text = $default_new_ItemType->get( 'evobar_link_text' );
+						if( ! empty( $evobar_link_text ) )
+						{
+							$menu_text = $evobar_link_text;
+						}
+					}
 					if( ! $perm_admin_normal )
 					{	// Initialize this menu item when user has no back-office access but can create new post:
 						$entries['post'] = array(
-							'text'        => get_icon( 'new' ).' './* TRANS: noun */ T_('Post'),
+							'text'        => get_icon( 'new' ).' '.$menu_text,
 							'entry_class' => 'rwdhide evobar-entry-new-post',
 						);
 					}

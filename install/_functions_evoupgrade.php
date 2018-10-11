@@ -10057,6 +10057,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12978, 'Upgrade table item types...' ) )
+	{	// part of 6.10.4-stable
+		db_upgrade_cols( 'T_items__type', array(
+			'ADD' => array(
+				'ityp_evobar_link_text'  => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_perm_level',
+				'ityp_skin_btn_text'     => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_evobar_link_text',
+			),
+		) );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

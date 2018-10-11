@@ -57,6 +57,8 @@ class ItemType extends DataObject
 	var $allow_disabling_comments = 0;
 	var $use_comment_expiration = 'optional';
 	var $perm_level = 'standard';
+	var $evobar_link_text = NULL;
+	var $skin_btn_text = NULL;
 
 	/**
 	 * Custom fields
@@ -126,6 +128,8 @@ class ItemType extends DataObject
 			$this->allow_disabling_comments = $db_row->ityp_allow_disabling_comments;
 			$this->use_comment_expiration = $db_row->ityp_use_comment_expiration;
 			$this->perm_level = $db_row->ityp_perm_level;
+			$this->evobar_link_text = isset( $db_row->ityp_evobar_link_text ) ? $db_row->ityp_evobar_link_text : $this->evobar_link_text;
+			$this->skin_btn_text = isset( $db_row->ityp_skin_btn_text ) ? $db_row->ityp_skin_btn_text : $this->skin_btn_text;
 		}
 	}
 
@@ -187,6 +191,14 @@ class ItemType extends DataObject
 		// Template name
 		param( 'ityp_template_name', 'string' );
 		$this->set_from_Request( 'template_name', NULL, true );
+
+		// New item link in evobar text
+		param( 'ityp_evobar_link_text', 'string' );
+		$this->set_from_Request( 'evobar_link_text' );
+
+		// New item button in skin text
+		param( 'ityp_skin_btn_text', 'string' );
+		$this->set_from_Request( 'skin_btn_text' );
 
 		// Show instruction in front-office
 		param( 'ityp_front_instruction', 'integer' );
@@ -829,6 +841,42 @@ class ItemType extends DataObject
 		}
 
 		return in_array( $coll_ID, $this->enabled_colls );
+	}
+
+
+	/**
+	 * Get item denomination
+	 *
+	 * @param string Position where denomination will be used, can be one of the following: 'evobar_new', 'inskin_new_btn', 'title_new', 'title_update'
+	 * @return string Item denomination
+	 */
+	function get_item_denomination( $position = 'evobar_new' )
+	{
+		switch( $position )
+		{
+			case 'evobar_new':
+				if( ! empty( $this->evobar_link_text ) )
+				{
+					return $this->evobar_link_text;
+				}
+				break;
+
+			case 'inskin_new_btn':
+				if( ! empty( $this->skin_btn_text ) )
+				{
+					return $this->skin_btn_text;
+				}
+				break;
+		}
+
+		global $Collection, $Blog;
+
+		if( ! empty( $Blog  ) )
+		{
+			return $Blog->get_item_denomination( $position );
+		}
+
+		return NULL;
 	}
 }
 
