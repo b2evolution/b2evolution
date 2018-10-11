@@ -1600,7 +1600,7 @@ class ItemLight extends DataObject
 				return $this->set_param( 'datestart', 'date', $parvalue_empty_seconds, false );
 
 			case 'ityp_ID':
-				if( $this->get( 'ityp_ID' ) !== $parname )
+				if( $this->get( 'ityp_ID' ) != $parvalue )
 				{	// Reset Item Type on changing ID to different value:
 					$this->ItemType = NULL;
 				}
