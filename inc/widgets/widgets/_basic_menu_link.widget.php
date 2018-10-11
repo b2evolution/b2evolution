@@ -501,7 +501,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			case 'visits':
 				global $Settings, $current_User;
 				if( ! is_logged_in() || ! $Settings->get( 'enable_visit_tracking' ) )
-				{
+				{	// Current user must be logged in and visit tracking must be enabled:
+					$this->display_debug_message();
 					return false;
 				}
 
@@ -576,6 +577,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					$cat_ItemType = & $Chapter->get_ItemType();
 					if( $cat_ItemType === false )
 					{	// Don't allow to create a post in this category because this category has no default Item Type:
+						$this->display_debug_message();
 						return false;
 					}
 					if( $cat_ItemType )
