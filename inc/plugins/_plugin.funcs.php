@@ -231,7 +231,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				break;
 
 			case 'Widget':
-				$set_value = $Obj->get_param( $parname, false, $group );
+				$set_value = $Obj->get_param( $parname, NULL, $group );
 				$error_value = NULL;
 				break;
 

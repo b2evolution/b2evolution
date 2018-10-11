@@ -52,17 +52,13 @@ class CommentList2 extends DataObjectList2
 	 * @param string name of cache to be used
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 * @param string Name to be used when saving the filterset (leave empty to use default for collection)
-	 * @param integer Comments created before this timestamp are excluded
-	 * @param integer Comments created after this timestamp are excluded
 	 */
 	function __construct(
-		$Blog,
-		$limit = 1000,
-		$cache_name = 'CommentCache',	// name of cache to be used
-		$param_prefix = '',
-		$filterset_name = '',			// Name to be used when saving the filterset (leave empty to use default for collection)
-		$comment_ts_min = NULL, // do not show comments before this timestamp
-		$comment_ts_max = NULL // do not show comments after this timestamp
+			$Blog,
+			$limit = 1000,
+			$cache_name = 'CommentCache', // name of cache to be used
+			$param_prefix = '',
+			$filterset_name = '' // Name to be used when saving the filterset (leave empty to use default for collection)
 		)
 	{
 		global $Settings;
@@ -355,12 +351,6 @@ class CommentList2 extends DataObjectList2
 		$this->filters['rating_toshow'] = param( $this->param_prefix.'rating_toshow', 'array:string', $this->default_filters['rating_toshow'], true );      // Rating to restrict to
 		$this->filters['rating_turn'] = param( $this->param_prefix.'rating_turn', 'string', $this->default_filters['rating_turn'], true );      // Rating to restrict to
 		$this->filters['rating_limit'] = param( $this->param_prefix.'rating_limit', 'integer', $this->default_filters['rating_limit'], true ); 	// Rating to restrict to
-
-		/*
-		 * Restrict to selected comment date:
-		 */
-		$this->filters['comment_ts_min'] = param( $this->param_prefix.'comment_ts_min', 'integer', $this->default_filters['comment_ts_min'], true );
-		$this->filters['comment_ts_max'] = param( $this->param_prefix.'comment_ts_max', 'integer', $this->default_filters['comment_ts_max'], true );
 
 		// 'limit'
 		$this->filters['comments'] = param( $this->param_prefix.'comments', 'integer', $this->default_filters['comments'], true ); 			// # of units to display on the page

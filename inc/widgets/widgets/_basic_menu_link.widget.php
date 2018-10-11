@@ -135,11 +135,11 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 	{
 		global $admin_url;
 
-		$current_link_type = $this->get_param( 'link_type', true );
+		$default_link_type = 'home';
+		$current_link_type = $this->get_param( 'link_type', $default_link_type );
 
 		// Check if field "Collection ID" is disabled because of link type and site uses only one fixed collection for profile pages:
-		$coll_id_is_disabled = ( empty( $params['infinite_loop'] )
-			&& in_array( $current_link_type, array( 'ownercontact', 'owneruserinfo', 'myprofile', 'profile', 'avatar' ) )
+		$coll_id_is_disabled = ( in_array( $current_link_type, array( 'ownercontact', 'owneruserinfo', 'myprofile', 'profile', 'avatar' ) )
 			&& $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) );
 
 		$r = array_merge( array(
@@ -148,7 +148,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'note' => T_('What do you want to link to?'),
 					'type' => 'select',
 					'options' => $this->link_types,
-					'defaultvalue' => 'home',
+					'defaultvalue' => $default_link_type,
 				),
 				'link_text' => array(
 					'label' => T_('Link text'),
