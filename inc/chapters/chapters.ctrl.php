@@ -373,8 +373,24 @@ switch( $action )
 			break;
 		}
 
+		if( $edited_Chapter->get( 'ityp_ID' ) === '0' )
+		{	// Force "No default type" of default category to "Same as collection default":
+			$edited_Chapter->set( 'ityp_ID', NULL, true );
+			if( $edited_Chapter->dbupdate() )
+			{	// Inform user about this modification:
+				$Messages->add( sprintf( T_('Default Item Type of the category "%s" has been changed to "%s" because it must be specified for default catefory.'), $edited_Chapter->get( 'name' ), T_('Same as collection default') ), 'note' );
+			}
+		}
+
 		$edited_Blog->set_setting( 'default_cat_ID', $edited_Chapter->ID );
 		$edited_Blog->dbsave();
+
+		$Messages->add( sprintf( T_('Default category of this collection has been updated to "%s".'), $edited_Chapter->get( 'name' ) ), 'success' );
+
+		// We want to highlight the edited object on next list display:
+		$Session->set( 'fadeout_array', array( $edited_Chapter->ID ) );
+
+		header_redirect( $admin_url.'?ctrl=chapters&blog='.$blog );
 		break;
 
 	case 'set_meta':
