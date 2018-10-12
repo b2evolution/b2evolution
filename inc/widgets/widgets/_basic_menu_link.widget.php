@@ -553,14 +553,14 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 				    ( $Chapter = & $ChapterCache->get_by_ID( $this->disp_params['cat_ID'], false, false ) ) )
 				{	// Append category ID to the URL:
 					$url = url_add_param( $url, 'cat='.$Chapter->ID );
-					$cat_ItemType = & $Chapter->get_ItemType();
+					$cat_ItemType = & $Chapter->get_ItemType( true );
 					if( $cat_ItemType === false )
 					{	// Don't allow to create a post in this category because this category has no default Item Type:
 						return false;
 					}
 					if( $cat_ItemType )
 					{	// Use button text depending on default category's Item Type:
-						$text = sprintf( T_('New [%s]'), $cat_ItemType->get( 'name' ) );
+						$text = $cat_ItemType->get_item_denomination( 'inskin_new_btn' );
 						// Append item type ID to the URL:
 						$url = url_add_param( $url, 'item_typ_ID='.$cat_ItemType->ID );
 					}

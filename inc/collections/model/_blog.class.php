@@ -5811,7 +5811,7 @@ class Blog extends DataObject
 					);
 		}
 
-		return $denominations[$position];
+		return isset( $denominations[ $position ] ) ? $denominations[ $position ] : '';
 	}
 }
 

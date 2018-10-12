@@ -427,10 +427,7 @@ class bootstrap_forums_Skin extends Skin
 			}
 			else
 			{	// Use button text from Item Type:
-				$skin_btn_text = $default_new_ItemType->get( 'skin_btn_text' );
-				$button_text = empty( $skin_btn_text )
-					? $default_new_ItemType->get_item_denomination( 'inskin_new_btn' )
-					: $default_new_ItemType->get( 'skin_btn_text' );
+				$button_text = $default_new_ItemType->get_item_denomination( 'inskin_new_btn' );
 			}
 
 			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post a new topic').'"><i class="fa fa-pencil"></i> '.$button_text.'</a>';

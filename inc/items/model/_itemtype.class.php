@@ -848,9 +848,10 @@ class ItemType extends DataObject
 	 * Get item denomination
 	 *
 	 * @param string Position where denomination will be used, can be one of the following: 'evobar_new', 'inskin_new_btn', 'title_new', 'title_update'
+	 * @param string Default denomination, e.g. when no current collection
 	 * @return string Item denomination
 	 */
-	function get_item_denomination( $position = 'evobar_new' )
+	function get_item_denomination( $position = 'evobar_new', $default_denomination = NULL )
 	{
 		switch( $position )
 		{
@@ -876,7 +877,7 @@ class ItemType extends DataObject
 			return $Blog->get_item_denomination( $position );
 		}
 
-		return NULL;
+		return $default_denomination;
 	}
 }
 

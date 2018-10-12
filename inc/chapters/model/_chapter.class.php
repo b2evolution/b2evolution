@@ -963,24 +963,38 @@ class Chapter extends DataObject
 	/**
 	 * Get default Item Type of this Chapter
 	 *
+	 * @param boolean TRUE to return default Item Type object of collection when this category uses same it as collection default
 	 * @return object|false|NULL Default Item Type,
-	 *                           NULL - Same as collection default,
+	 *                           NULL - Same as collection default (only when $use_collection_item_type == false, otherwise real Item Type object what is used as default for collection),
 	 *                           FALSE - No default type or Item Type is not found in DB or Item Type is not enabled for chapter's collection
 	 */
-	function & get_ItemType()
+	function & get_ItemType( $load_coll_default_item_type = false )
 	{
-		if( $this->get( 'ityp_ID' ) === NULL )
-		{	// Item Type is same as collection default:
+		if( $this->get( 'ityp_ID' ) === NULL && ! $load_coll_default_item_type )
+		{	// Item Type is same as collection default,
+			// Return NULL because no request to get real Item Type object:
 			$r = NULL;
 			return $r;
 		}
 
 		if( $this->ItemType === NULL )
 		{	// Load Item Type into cache:
-			if( ( $this->get( 'ityp_ID' ) > 0 ) && 
-					( $ItemTypeCache = & get_ItemTypeCache() ) &&
-					( $cat_ItemType = & $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ), false, false ) ) &&
-					( $cat_ItemType->is_enabled( $this->get( 'blog_ID' ) ) ) )
+			if( $this->get( 'ityp_ID' ) === NULL && $load_coll_default_item_type )
+			{	// Try to get real Item Type object of this category's collection:
+				if( ( $cat_Blog = & $this->get_Blog() ) && 
+				    ( $coll_ItemType = & $cat_Blog->get_default_ItemType() ) )
+				{	// Use real Item Type object:
+					$this->ItemType = $coll_ItemType;
+				}
+				else
+				{	// Impossible to get default Item Type by some unknown reason:
+					$this->ItemType = false;
+				}
+			}
+			elseif( ( $this->get( 'ityp_ID' ) > 0 ) && 
+			        ( $ItemTypeCache = & get_ItemTypeCache() ) &&
+			        ( $cat_ItemType = & $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ), false, false ) ) &&
+			        ( $cat_ItemType->is_enabled( $this->get( 'blog_ID' ) ) ) )
 			{	// Default Item Type is found in DB and it is enabled for chapter's collection:
 				$this->ItemType = $cat_ItemType;
 			}
