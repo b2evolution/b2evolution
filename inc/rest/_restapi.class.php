@@ -240,11 +240,11 @@ class RestApi
 
 		$halt_messages = array();
 		$Messages->close_group(); // Make sure any open message group are closed
-		foreach( $Messages->messages_text as $m => $message_text )
+		foreach( $Messages->messages as $message )
 		{
-			if( in_array( $Messages->messages_type[ $m ], $message_types ) )
+			if( in_array( $message['type'], $message_types ) )
 			{	// Get this message for halt because of message type:
-				$halt_messages[] = $message_text;
+				$halt_messages[] = $message['text'];
 			}
 		}
 

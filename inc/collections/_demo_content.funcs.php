@@ -1658,7 +1658,8 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
  */
 function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo_user = true, $timeshift = 86400 )
 {
-	global $DB, $install_test_features, $timestamp, $Settings, $admin_url, $installed_collection_info_pages;
+	global $DB, $Messages;
+	global $install_test_features, $timestamp, $Settings, $admin_url, $installed_collection_info_pages;
 
 	if( ! isset( $installed_collection_info_pages ) )
 	{	// Array for item IDs which should be used in default shared widget containers "Main Navigation" and "Navigation Hamburger":
@@ -1671,6 +1672,8 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 	$demo_users = get_demo_users( $use_demo_user );
 
 	$BlogCache = & get_BlogCache();
+
+	$Messages->suppressed = true;
 
 	switch( $collection_type )
 	{
@@ -3271,4 +3274,6 @@ Admins and moderators can very quickly approve or reject comments from the colle
 		}
 		echo_install_log( 'TEST FEATURE: Creating additional comments on items ('.implode( ', ', $additional_comments_item_IDs ).')' );
 	}
+
+	$Messages->suppressed = false;
 }
