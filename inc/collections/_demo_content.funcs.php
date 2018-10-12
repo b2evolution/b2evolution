@@ -1673,8 +1673,6 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 	$BlogCache = & get_BlogCache();
 
-	$Messages->suppressed = true;
-
 	switch( $collection_type )
 	{
 		// =======================================================================================================
@@ -2253,6 +2251,9 @@ T_("<p>To get you started, the installer has automatically created several sampl
 
 		// =======================================================================================================
 		case 'blog_b':
+			// Suppress messages to prevent excessive messages:
+			$Messages->suppressed = true;
+
 			$post_count = 11;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
@@ -2418,6 +2419,9 @@ T_("<p>To get you started, the installer has automatically created several sampl
 				// $edited_Item->insert_update_tags( 'update' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
+
+			// Remove message suppression:
+			$Messages->suppressed = false;
 			break;
 
 		// =======================================================================================================
@@ -3274,6 +3278,4 @@ Admins and moderators can very quickly approve or reject comments from the colle
 		}
 		echo_install_log( 'TEST FEATURE: Creating additional comments on items ('.implode( ', ', $additional_comments_item_IDs ).')' );
 	}
-
-	$Messages->suppressed = false;
 }
