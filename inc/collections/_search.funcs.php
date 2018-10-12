@@ -291,6 +291,7 @@ function get_search_date_by_content_age( $content_age )
 			// Last year:
 			$date = date( 'YmdHis', $localtimenow - 31190400 ); // 86400 * 361
 			break;
+		case 'anytime':
 		default:
 			// Unknown age value:
 			$date = NULL;
@@ -711,14 +712,17 @@ function search_and_score_files( $search_term, $keywords, $quoted_parts, $author
  * This searches matching objects and gives a match-quality-score to each found object
  *
  * @param string the search keywords
- * @param string What types search: 'all', 'item', 'comment', 'category', 'tag'
- *               Use ','(comma) as separator to use several kinds, e.g: 'item,comment' or 'tag,comment,category'
+ * @param string What types to search: 'all', 'item', 'comment', 'category', 'tag'
+ *               Use ','(comma) as separator to use several kinds, e.g: 'item,comment' or 'tag,comment,category'.
+ *               An empty value is equivalent to 'all'.
  * @param string Post IDs to exclude from result, Separated with ','(comma)
  * @param string Author IDs to filter, separated with ',' (comma)
- * @param string Content age to consider
+ * @param string Content age to consider: 'anytime', 'hour', 'day', 'week', '30d', '90d', 'year'
+ *               An empty value is equivalent to 'anytime'.
+ *               See @get_search_date_by_content_age().
  * @return array scored search result, each element is an array( type, ID, score )
  */
-function perform_scored_search( $search_keywords, $searched_content_types = '', $exclude_posts = '', $search_authors = '', $content_age = '' )
+function perform_scored_search( $search_keywords, $searched_content_types = 'all', $exclude_posts = '', $search_authors = '', $content_age = 'anytime' )
 {
 	$keywords = trim( $search_keywords );
 	if( empty( $keywords ) )
@@ -767,7 +771,7 @@ function perform_scored_search( $search_keywords, $searched_content_types = '', 
 		// TODO: return NULL and display a specific error message like "Please enter some keywords to search."
 	}
 
-	if( empty( $searched_content_types ) )
+	if( $searched_content_types == 'all' || empty( $searched_content_types ) )
 	{	// Search all result types:
 		$search_type_item     = true;
 		$search_type_comment  = true;
@@ -785,7 +789,7 @@ function perform_scored_search( $search_keywords, $searched_content_types = '', 
 		$search_type_file       = in_array( 'file', $searched_content_types );
 	}
 
-	if( ! empty( $search_authors ) || ! empty( $content_age ) )
+	if( ! empty( $search_authors ) || ( ! empty( $content_age ) && ( $content_age != 'anytime' ) ) )
 	{	// If search by author or age is enabled then don't search results in categories and tags because they don't have such data:
 		$search_type_category = false;
 		$search_type_tag      = false;
