@@ -704,23 +704,23 @@ switch( $action )
 			}
 			$Chapter->set( 'ityp_ID', $cat_ityp_ID, true );
 			$Chapter->dbupdate();
-			if( $cat_ityp_ID === NULL )
+			if( $Chapter->get( 'ityp_ID' ) === NULL )
 			{
 				$cat_ityp_title = T_('Same as collection default');
 			}
-			elseif( $cat_ityp_ID == '0' )
+			elseif( $Chapter->get( 'ityp_ID' ) == '0' )
 			{
 				$cat_ityp_title = '<b>'.T_('No default type').'</b>';
 			}
-			elseif( isset( $ItemType ) )
+			elseif( $ItemType = & $ItemTypeCache->get_by_ID( $Chapter->get( 'ityp_ID' ), false, false ) )
 			{
 				$cat_ityp_title = $ItemType->get_name();
 			}
 			else
 			{
-				$cat_ityp_title = '<span class="red">'.T_('Not Found').' #'.$cat_ityp_ID.'</span>';
+				$cat_ityp_title = '<span class="red">'.T_('Not Found').' #'.$Chapter->get( 'ityp_ID' ).'</span>';
 			}
-			echo '<a href="#" rel="_'.$cat_ityp_ID.'">'.$cat_ityp_title.'</a>';
+			echo '<a href="#" rel="_'.$Chapter->get( 'ityp_ID' ).'">'.$cat_ityp_title.'</a>';
 		}
 		break;
 

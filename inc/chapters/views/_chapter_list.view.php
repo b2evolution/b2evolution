@@ -177,7 +177,16 @@ function cat_line( $Chapter, $level )
 			{	// Not found Item Type in DB:
 				$cat_item_type_name = '<span class="red">'.T_('Not Found').' #'.$Chapter->get( 'ityp_ID' ).'</span>';
 			}
-			$r .= '<td class="jeditable_cell cat_ityp_ID_edit"><a href="#" rel="_'.$Chapter->get( 'ityp_ID' ).'">'.$cat_item_type_name.'</a></td>';
+			if( ( $cat_Blog = & $Chapter->get_Blog() ) &&
+			    $cat_Blog->get_default_cat_ID() == $Chapter->ID )
+			{	// For default category use a separate options without "No default type":
+				$cat_cell_edit_class = 'default_cat_ityp_ID_edit';
+			}
+			else
+			{	// For not default categories use full options list:
+				$cat_cell_edit_class = 'cat_ityp_ID_edit';
+			}
+			$r .= '<td class="jeditable_cell '.$cat_cell_edit_class.'"><a href="#" rel="_'.$Chapter->get( 'ityp_ID' ).'">'.$cat_item_type_name.'</a></td>';
 		}
 
 		// Lock
@@ -410,12 +419,16 @@ echo_editable_column_js( array(
 
 if( $permission_to_edit )
 {	// Print JS to edit default Item Type of category:
-	echo_editable_column_js( array(
+	echo_editable_column_js( $cat_ityp_ID_edit_params = array(
 		'column_selector' => '.cat_ityp_ID_edit',
 		'ajax_url'        => get_htsrv_url().'async.php?action=cat_ityp_ID_edit&blogid='.$Blog->ID.'&'.url_crumb( 'catityp' ),
 		'options'         => collection_item_type_titles( $Blog->ID, NULL, '_' ),
 		'new_field_name'  => 'new_ityp_ID',
 		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',
 		'ID_name'         => 'cat_ID' ) );
+	// Separate options without "No default type" for default category of the collection:
+	$cat_ityp_ID_edit_params['column_selector'] = '.default_cat_ityp_ID_edit';
+	$cat_ityp_ID_edit_params['options'] = collection_item_type_titles( $Blog->ID, NULL, '_', false );
+	echo_editable_column_js( $cat_ityp_ID_edit_params );
 }
 ?>

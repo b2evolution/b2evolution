@@ -5312,9 +5312,10 @@ function callback_filter_item_list_table( & $Form )
  * @param integer Collection ID
  * @param integer ID of Item Type which should be loaded in additional to enabled collection Item Types
  * @param string Prefix before each key, e.g. used in order to keep original order in jeditable selector
+ * @param boolean TRUE to include option "No default type", Note: default category of the collection cannot use this option.
  * @return array
  */
-function collection_item_type_titles( $coll_ID, $item_type_ID = NULL, $key_prefix = '' )
+function collection_item_type_titles( $coll_ID, $item_type_ID = NULL, $key_prefix = '', $include_no_default_type = true )
 {
 	global $DB;
 
@@ -5331,7 +5332,10 @@ function collection_item_type_titles( $coll_ID, $item_type_ID = NULL, $key_prefi
 
 	$item_type_options = array();
 	$item_type_options[$key_prefix.''] = T_('Same as collection default');
-	$item_type_options[$key_prefix.'0'] = T_('No default type');
+	if( $include_no_default_type )
+	{	// Include this option only when it is requested:
+		$item_type_options[$key_prefix.'0'] = T_('No default type');
+	}
 
 	return $item_type_options + $DB->get_assoc( $SQL );
 }

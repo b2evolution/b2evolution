@@ -868,6 +868,13 @@ class Chapter extends DataObject
 				{	// Don't allow default Item Type for meta category because it cannot has items:
 					$parvalue = NULL;
 				}
+				elseif( ( $parvalue === 0 || $parvalue === '0' )&&
+				        $this->ID > 0 &&
+				        ( $cat_Blog = & $this->get_Blog() ) &&
+				        $cat_Blog->get_default_cat_ID() == $this->ID )
+				{	// Force "No default type" of default category to "Same as collection default":
+					$parvalue = NULL;
+				}
 				return $this->set_param( $parname, 'integer', $parvalue, true );
 
 			case 'name':
