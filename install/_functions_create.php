@@ -1872,23 +1872,7 @@ function create_demo_contents( $demo_users = array() )
 
 
 	task_begin( 'Creating default polls... ' );
-	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text, pqst_max_answers )
-		VALUES ( 1, "What are your favorite b2evolution features?", 3 )' );
-	$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
-		VALUES ( 1, "Multiple blogs",          1 ),
-		       ( 1, "Photo Galleries",         2 ),
-		       ( 1, "Forums",                  3 ),
-		       ( 1, "Online Manuals",          4 ),
-		       ( 1, "Lists / E-mailing", 5 ),
-		       ( 1, "Easy Maintenance",        6 )' );
-	$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
-		VALUES ( 1, 5, 1 ), ( 1, 5, 5 ), ( 1, 5, 6 ),
-		       ( 1, 6, 2 ), ( 1, 6, 5 ), ( 1, 6, 1 ),
-		       ( 1, 7, 2 ), ( 1, 7, 5 ), ( 1, 6, 3 ),
-		       ( 1, 2, 2 ), ( 1, 2, 5 ), ( 1, 2, 4 ),
-		       ( 1, 3, 3 ), ( 1, 3, 5 ), ( 1, 3, 1 ),
-		       ( 1, 4, 3 ), ( 1, 4, 6 ), ( 1, 4, 2 ),
-		       ( 1, 1, 6 ), ( 1, 1, 5 ), ( 1, 1, 3 )' );
+	create_demo_poll();
 	task_end();
 
 

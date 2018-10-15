@@ -6982,7 +6982,8 @@ class Item extends ItemLight
 		$post_renderers = array('default'),
 		$item_type_name_or_ID = '#', // Use 'Page', 'Post' and etc. OR '#' to use default post type OR integer to use post type by ID
 		$item_st_ID = NULL,
-		$postcat_order = NULL )
+		$postcat_order = NULL,
+		$display_restrict_status_messages = true )
 	{
 		global $DB, $query, $UserCache;
 		global $default_locale;
@@ -7067,7 +7068,7 @@ class Item extends ItemLight
 		$this->set( 'order', $postcat_order );
 
 		// INSERT INTO DB:
-		$this->dbinsert();
+		$this->dbinsert( $display_restrict_status_messages );
 
 		// Update post_datestart using FROM_UNIXTIME to prevent invalid datetime values during DST spring forward - fall back
 		$DB->query( 'UPDATE T_items__item SET post_datestart = FROM_UNIXTIME('.strtotime( $post_timestamp ).') WHERE post_ID = '.$DB->quote( $this->ID ) );
@@ -7079,9 +7080,10 @@ class Item extends ItemLight
 	/**
 	 * Insert object into DB based on previously recorded changes
 	 *
+	 * @param boolean Display restrict status messages
 	 * @return boolean true on success
 	 */
-	function dbinsert()
+	function dbinsert( $display_restrict_status_messages = true )
 	{
 		global $DB, $current_User, $Plugins;
 
@@ -7090,7 +7092,7 @@ class Item extends ItemLight
 		if( isset( $this->previous_status ) )
 		{	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
 			// (ONLY if current request is updating item status)
-			$this->restrict_status( true );
+			$this->restrict_status( true, $display_restrict_status_messages );
 		}
 
 		if( $this->status != 'draft' )
@@ -9056,7 +9058,7 @@ class Item extends ItemLight
 	 *
 	 * @param double New order value
 	 * @param integer Category ID, NULL - for main category
-	 * @return boolean 
+	 * @return boolean
 	 */
 	function update_order( $order, $cat_ID = NULL )
 	{
@@ -10479,8 +10481,9 @@ class Item extends ItemLight
 	 * Restrict Item status by Collection access restriction AND by CURRENT USER write perm
 	 *
 	 * @param boolean TRUE to update status
+	 * @param boolean TRUE to display messages
 	 */
-	function restrict_status( $update_status = false )
+	function restrict_status( $update_status = false, $display_messages = true )
 	{
 		$item_Blog = & $this->get_Blog();
 
@@ -10499,7 +10502,7 @@ class Item extends ItemLight
 			$this->status = $restricted_status;
 		}
 
-		if( $current_status != $this->get( 'status' ) )
+		if( $current_status != $this->get( 'status' ) && $display_messages )
 		{	// If current item status cannot be used for item collection
 			global $Messages;
 

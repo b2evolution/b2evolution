@@ -2272,12 +2272,12 @@ T_("<p>To get you started, the installer has automatically created several sampl
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
-				$edited_Item->insert( $owner_ID, 'Skin Faktory', '', $now, $cat_additional_skins, array(), 'published', 'en-US', '', 'http://www.skinfaktory.com/', 'open', array('default'), 'Sidebar link' );
+				$edited_Item->insert( $owner_ID, 'Skin Faktory', '', $now, $cat_additional_skins, array(), 'published', 'en-US', '', 'http://www.skinfaktory.com/', 'open', array('default'), 'Sidebar link', NULL, NULL, false );
 
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
-				$edited_Item->insert( $owner_ID, T_('b2evo skins repository'), '', $now, $cat_additional_skins, array(), 'published', 'en-US', '', 'http://skins.b2evolution.net/', 'open', array('default'), 'Sidebar link' );
+				$edited_Item->insert( $owner_ID, T_('b2evo skins repository'), '', $now, $cat_additional_skins, array(), 'published', 'en-US', '', 'http://skins.b2evolution.net/', 'open', array('default'), 'Sidebar link', NULL, NULL, false );
 			}
 
 			if( is_available_item_type( $blog_ID, 'Standalone Page' ) )
@@ -2287,7 +2287,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->insert( $owner_ID, T_('About Blog B'), sprintf( get_filler_text( 'info_page'), T_('Blog B') ), $now, $cat_ann_b,
-					array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
+					array(), 'published', '#', '', '', 'open', array('default'), 'Standalone Page', NULL, NULL, false );
 			}
 
 			if( is_available_item_type( $blog_ID, 'Intro-Front' ) )
@@ -2305,7 +2305,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 <li>To view the blog\'s posts, click on "News" in the menu above.</li>
 <li>If you don\'t want to have such a front page, you can disable it in the Blog\'s settings > Features > <a %s>Front Page</a>. You can also see an example of a blog without a Front Page in Blog A</li>
 </ul>'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=home&amp;blog='.$blog_ID.'"' ),
-						$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Front' );
+						$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Front', NULL, NULL, false );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
 
@@ -2317,7 +2317,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'intro' );
 				$edited_Item->insert( $owner_ID, T_('b2evolution tips category &ndash; Sub Intro post'), T_('This uses post type "Intro-Cat" and is attached to the desired Category(ies).'),
-						$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Cat' );
+						$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Cat', NULL, NULL, false );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
 
@@ -2329,7 +2329,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'widgets,intro' );
 				$edited_Item->insert( $owner_ID, T_('Widgets tag &ndash; Sub Intro post'), T_('This uses post type "Intro-Tag" and is tagged with the desired Tag(s).'),
-						$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Tag' );
+						$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Tag', NULL, NULL, false );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
 
@@ -2345,7 +2345,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 <p>It will be featured whenever we have no specific "Intro" post to display for the current request. To see it in action, try displaying the "Announcements" category.</p>
 
 <p>Also note that when the post is featured, it does not appear in the regular post flow.</p>').get_filler_text( 'lorem_1paragraph' ),
-						$now, $cat_b2evo, array( $cat_ann_b ) );
+						$now, $cat_b2evo, array( $cat_ann_b ), 'published', '#', '', '', 'open', array('default'), '#', NULL, NULL, false );
 				$edited_Item->set( 'featured', 1 );
 				$edited_Item->dbsave();
 				$item_IDs[] = array( $edited_Item->ID, $now );
@@ -2360,7 +2360,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 'href="'.get_manual_url( 'tricky-stuff' ).'"',
 'href="'.get_manual_url( 'performance-optimization' ).'"',
 'href="http://b2evolution.net/web-hosting/"' ),
-						$now, $cat_b2evo, array( $cat_ann_b ) );
+						$now, $cat_b2evo, array( $cat_ann_b ), 'published', '#', '', '', 'open', array('default'), '#', NULL, NULL, false );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				// Insert a post:
@@ -2380,7 +2380,8 @@ T_("<p>To get you started, the installer has automatically created several sampl
 
 <p>You will find more information in the stub/template files themselves. Open them in a text editor and read the comments in there.</p>
 
-<p>Either way, make sure you go to the blogs admin and set the correct access method/URL for your blog. Otherwise, the permalinks will not function properly.</p>"), $now, $cat_b2evo );
+<p>Either way, make sure you go to the blogs admin and set the correct access method/URL for your blog. Otherwise, the permalinks will not function properly.</p>"),
+						$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), '#', NULL, NULL, false );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				// Insert a post:
@@ -2392,7 +2393,8 @@ T_("<p>To get you started, the installer has automatically created several sampl
 
 <p>You can add, remove and reorder widgets from the Blog Settings tab in the admin interface.</p>
 
-<p>Note: in order to be displayed, widgets are placed in containers. Each container appears in a specific place in an evoskin. If you change your blog skin, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.</p>'), $now, $cat_b2evo );
+<p>Note: in order to be displayed, widgets are placed in containers. Each container appears in a specific place in an evoskin. If you change your blog skin, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.</p>'),
+						$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), '#', NULL, NULL, false );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
 				// Insert a post:
@@ -2410,7 +2412,8 @@ T_("<p>To get you started, the installer has automatically created several sampl
 
 <p>To start customizing a skin, open its "<code>index.main.php</code>" file in an editor and read the comments in there. Note: you can also edit skins in the "Files" tab of the admin interface.</p>
 
-<p>And, of course, read the <a href="%s" target="_blank">manual on skins</a>!</p>'), get_manual_url( 'skin-structure' ) ), $now, $cat_b2evo );
+<p>And, of course, read the <a href="%s" target="_blank">manual on skins</a>!</p>'), get_manual_url( 'skin-structure' ) ),
+						$now, $cat_b2evo, array(), 'published', '#', '', '', 'open', array('default'), '#', NULL, NULL, false );
 				$edited_Item->dbsave();
 				// $edited_Item->insert_update_tags( 'update' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
@@ -3271,4 +3274,35 @@ Admins and moderators can very quickly approve or reject comments from the colle
 		}
 		echo_install_log( 'TEST FEATURE: Creating additional comments on items ('.implode( ', ', $additional_comments_item_IDs ).')' );
 	}
+}
+
+
+/**
+ * Create a demo poll
+ *
+ * @return integer ID of of created poll
+ */
+function create_demo_poll()
+{
+	global $DB;
+
+	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text, pqst_max_answers )
+		VALUES ( 1, "What are your favorite b2evolution features?", 3 )' );
+	$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
+		VALUES ( 1, "Multiple blogs",          1 ),
+					( 1, "Photo Galleries",         2 ),
+					( 1, "Forums",                  3 ),
+					( 1, "Online Manuals",          4 ),
+					( 1, "Lists / E-mailing", 5 ),
+					( 1, "Easy Maintenance",        6 )' );
+	$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
+		VALUES ( 1, 5, 1 ), ( 1, 5, 5 ), ( 1, 5, 6 ),
+					( 1, 6, 2 ), ( 1, 6, 5 ), ( 1, 6, 1 ),
+					( 1, 7, 2 ), ( 1, 7, 5 ), ( 1, 6, 3 ),
+					( 1, 2, 2 ), ( 1, 2, 5 ), ( 1, 2, 4 ),
+					( 1, 3, 3 ), ( 1, 3, 5 ), ( 1, 3, 1 ),
+					( 1, 4, 3 ), ( 1, 4, 6 ), ( 1, 4, 2 ),
+					( 1, 1, 6 ), ( 1, 1, 5 ), ( 1, 1, 3 )' );
+
+	return $DB->insert_id;
 }
