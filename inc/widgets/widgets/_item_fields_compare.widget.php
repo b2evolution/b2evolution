@@ -269,10 +269,10 @@ class item_fields_compare_Widget extends ComponentWidget
 				'custom_fields_row_header_field'           => '<th class="$header_cell_class$">$field_title$$field_description_icon$:</th>',
 				'custom_fields_item_status_template'       => '<div><div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div></div>',
 				'custom_fields_description_icon_class'     => 'grey',
-				'custom_fields_value_default'              => '<td class="$data_cell_class$">$field_value$</td>',
-				'custom_fields_value_difference_highlight' => '<td class="$data_cell_class$ bg-warning">$field_value$</td>',
-				'custom_fields_value_green'                => '<td class="$data_cell_class$ bg-success">$field_value$</td>',
-				'custom_fields_value_red'                  => '<td class="$data_cell_class$ bg-danger">$field_value$</td>',
+				'custom_fields_value_default'              => '<td class="$data_cell_class$"$data_cell_attrs$>$field_value$</td>',
+				'custom_fields_value_difference_highlight' => '<td class="$data_cell_class$ bg-warning"$data_cell_attrs$>$field_value$</td>',
+				'custom_fields_value_green'                => '<td class="$data_cell_class$ bg-success"$data_cell_attrs$>$field_value$</td>',
+				'custom_fields_value_red'                  => '<td class="$data_cell_class$ bg-danger"$data_cell_attrs$>$field_value$</td>',
 				'custom_fields_edit_link_cell'             => '<td class="center">$edit_link$</td>',
 				'custom_fields_edit_link_class'            => 'btn btn-xs btn-default',
 				'custom_fields_row_end'                    => '</tr>',
@@ -358,7 +358,7 @@ class item_fields_compare_Widget extends ComponentWidget
 						$table_header_cells[ count( $table_header_cells ) - 1 ]['cols']++;
 					}
 					else
-					{	// Don't skin different column header cell:
+					{	// Don't skip different column header cell:
 						$skip_duplicate_header_cell = false;
 					}
 					// Store current title values in order to comapre then next time:
@@ -788,6 +788,7 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		if( $custom_field['type'] != 'separator' )
 		{	// Separator fields have no values:
+			$table_row_cells = array();
 			foreach( $items as $item_ID )
 			{
 				// Custom field value per each post:
@@ -842,7 +843,34 @@ class item_fields_compare_Widget extends ComponentWidget
 					}
 				}
 
-				echo str_replace( array( '$data_cell_class$', '$field_value$' ), array( $custom_field['cell_class'], $custom_field_value ), $field_value_template );
+				if( $custom_field['merge'] )
+				{	// Check if previous field value same as currect:
+					if( isset( $prev_field_value ) && $prev_field_value == $custom_field_orig_value )
+					{	// This is a duplicated field value cell as before:
+						$skip_duplicate_field_value = true;
+						// Increase a count of duplicated field value cell:
+						$table_row_cells[ count( $table_row_cells ) - 1 ]['cols']++;
+					}
+					else
+					{	// Don't skip different field value cell:
+						$skip_duplicate_field_value = false;
+					}
+					// Store current field value in order to comapre then next time:
+					$prev_field_value = $custom_field_orig_value;
+				}
+
+				if( empty( $skip_duplicate_field_value ) )
+				{	// Display field value cell only if it not hidden on merging same values:
+					$table_row_cells[] = array(
+						'template' => str_replace( array( '$data_cell_class$', '$field_value$' ), array( $custom_field['cell_class'], $custom_field_value ), $field_value_template ),
+						'cols'     => 1,
+					);
+				}
+			}
+
+			foreach( $table_row_cells as $table_row_cell )
+			{	// Print out table field value cells:
+				echo str_replace( '$data_cell_attrs$', ( $table_row_cell['cols'] > 1 ? ' colspan="'.$table_row_cell['cols'].'"' : '' ), $table_row_cell['template'] );
 			}
 		}
 

@@ -209,6 +209,7 @@ custom_field_edit_form_template( '<input type="hidden" name="cf_link$cf_num$" va
 	.'<input type="hidden" name="cf_link_nofollow$cf_num$" value="$cf_link_nofollow$" />'
 	.'<input type="hidden" name="cf_link_class$cf_num$" value="$cf_link_class$" />', '-text,-html,-separator', $custom_field_templates );
 echo '<input type="hidden" name="cf_description$cf_num$" value="$cf_description$" />';
+echo '<input type="hidden" name="cf_merge$cf_num$" value="$cf_merge$" />';
 // Create this <hidden> to know this custom field is new created field:
 echo '<input type="hidden" name="cf_new$cf_num$" value="$cf_new$" />';
 $Table->display_col_end();
@@ -373,6 +374,7 @@ foreach( $custom_fields as $custom_field )
 		'$cf_link_class$'    => format_to_output( $custom_field['link_class'], 'htmlattr' ),
 		'$cf_note$'          => format_to_output( $custom_field['note'], 'htmlattr' ),
 		'$cf_description$'   => format_to_output( $custom_field['description'], 'htmlspecialchars' ),
+		'$cf_merge$'         => format_to_output( $custom_field['merge'], 'htmlattr' ),
 	);
 	$cf_select_replacements = array( 'format', 'line_highlight', 'green_highlight', 'red_highlight' );
 	$custom_field_type_template = str_replace( array_keys( $cf_input_replacements ), $cf_input_replacements, $custom_field_type_template );
@@ -564,6 +566,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 	var field_value_red_highlight = '';
 	var field_value_public = '';
 	var field_value_description = '';
+	var field_value_merge = '';
 	if( typeof( duplicated_field_obj ) != 'undefined' && duplicated_field_obj !== false && duplicated_field_obj.length > 0 )
 	{	// Get data from duplicated field of the current editing Item Type:
 		new_field_mode = 'duplicate_empty';
@@ -588,6 +591,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		field_value_red_highlight = duplicated_field_obj.find( 'select[name^="cf_red_highlight"]' ).val();
 		field_value_public = duplicated_field_obj.find( 'input[name^="cf_public"]' ).is( ':checked' );
 		field_value_description = duplicated_field_obj.find( 'input[name^="cf_description"]' ).val();
+		field_value_merge = duplicated_field_obj.find( 'input[name^="cf_merge"]' ).val();
 	}
 	else if( typeof( duplicated_field_data ) != 'undefined' && duplicated_field_data.length > 0 )
 	{	// Get data from duplicated field from another selected Item Type:
@@ -608,6 +612,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		field_value_red_highlight = duplicated_field_data.data( 'red_highlight' );
 		field_value_public = duplicated_field_data.data( 'public' );
 		field_value_description = duplicated_field_data.data( 'description' );
+		field_value_merge = duplicated_field_data.data( 'merge' );
 	}
 
 	var count_custom = jQuery( 'input[name=count_custom_fields]' ).val();
@@ -655,7 +660,8 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		.replace( '$cf_link_nofollow$', field_value_link_nofollow ? 1 : 0 )
 		.replace( '$cf_link_class$', field_value_link_class )
 		.replace( '$cf_note$', field_value_note )
-		.replace( '$cf_description$', field_value_description );
+		.replace( '$cf_description$', field_value_description )
+		.replace( '$cf_merge$', field_value_merge );
 
 	if( new_field_mode == 'new' )
 	{	// Set values of the select and hidden inputs for new creating field:
@@ -896,6 +902,7 @@ jQuery( document ).on( 'submit', 'form#itemtype_select_fields', function()
 			field_row.find( 'select[name^="cf_red_highlight"]' ).val( field_data_obj.data( 'red_highlight' ) );
 			field_row.find( 'input[name^="cf_public"]' ).prop( 'checked', field_data_obj.data( 'public' ) );
 			field_row.find( 'input[name^="cf_description"]' ).val( field_data_obj.data( 'description' ) );
+			field_row.find( 'input[name^="cf_merge"]' ).val( field_data_obj.data( 'merge' ) );
 		}
 		else
 		{	// If the selected custom field doens't exist then duplicate it to current editing Item Type:
