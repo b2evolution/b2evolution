@@ -10362,6 +10362,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12981, 'Upgrading post type custom fields table...' ) )
+	{	// part of 6.10.4-stable
+		db_add_col( 'T_items__type_custom_field', 'itcf_merge', 'TINYINT DEFAULT 0' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '

@@ -6401,6 +6401,15 @@ class Blog extends DataObject
 					);
 				break;
 
+			case 'manual':
+				$denominations = array(
+						'evobar_new'     => T_('Page'),
+						'inskin_new_btn' => T_('New page'),
+						'title_new'      => T_('New page'),
+						'title_updated'  => T_('Updated page'),
+					);
+				break;
+
 			default:
 				$denominations = array(
 						'evobar_new'     => T_('Post'),

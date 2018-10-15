@@ -199,6 +199,12 @@ class item_fields_compare_Widget extends ComponentWidget
 						'label' => T_('Show column headers'),
 						'defaultvalue' => 1,
 					),
+					'merge_headers' => array(
+						'type' => 'checkbox',
+						'label' => T_('Auto merge'),
+						'note' => T_('Merge the column headers when they are identical.'),
+						'defaultvalue' => 0,
+					),
 					'show_status' => array(
 						'type' => 'radio',
 						'label' => T_('Show item visibility status'),
@@ -259,14 +265,14 @@ class item_fields_compare_Widget extends ComponentWidget
 				'custom_fields_table_start'                => '<div class="evo_content_block"><table class="item_custom_fields">',
 				'custom_fields_row_start'                  => '<tr>',
 				'custom_fields_topleft_cell'               => '<td style="border:none"></td>',
-				'custom_fields_col_header_item'            => '<th class="center" width="$col_width$">$item_link$$item_status$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
+				'custom_fields_col_header_item'            => '<th class="center" width="$col_width$"$col_attrs$>$item_link$$item_status$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
 				'custom_fields_row_header_field'           => '<th class="$header_cell_class$">$field_title$$field_description_icon$:</th>',
 				'custom_fields_item_status_template'       => '<div><div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div></div>',
 				'custom_fields_description_icon_class'     => 'grey',
-				'custom_fields_value_default'              => '<td class="$data_cell_class$">$field_value$</td>',
-				'custom_fields_value_difference_highlight' => '<td class="$data_cell_class$ bg-warning">$field_value$</td>',
-				'custom_fields_value_green'                => '<td class="$data_cell_class$ bg-success">$field_value$</td>',
-				'custom_fields_value_red'                  => '<td class="$data_cell_class$ bg-danger">$field_value$</td>',
+				'custom_fields_value_default'              => '<td class="$data_cell_class$"$data_cell_attrs$>$field_value$</td>',
+				'custom_fields_value_difference_highlight' => '<td class="$data_cell_class$ bg-warning"$data_cell_attrs$>$field_value$</td>',
+				'custom_fields_value_green'                => '<td class="$data_cell_class$ bg-success"$data_cell_attrs$>$field_value$</td>',
+				'custom_fields_value_red'                  => '<td class="$data_cell_class$ bg-danger"$data_cell_attrs$>$field_value$</td>',
 				'custom_fields_edit_link_cell'             => '<td class="center">$edit_link$</td>',
 				'custom_fields_edit_link_class'            => 'btn btn-xs btn-default',
 				'custom_fields_row_end'                    => '</tr>',
@@ -306,32 +312,81 @@ class item_fields_compare_Widget extends ComponentWidget
 			echo $this->get_field_template( 'row_start' );
 			echo $this->get_field_template( 'topleft_cell' );
 			$col_width = number_format( 100 / ( count( $items ) + 1 ), 2, '.', '' );
-			foreach( $items as $item_ID )
+			$table_header_cells = array();
+			foreach( $items as $i => $item_ID )
 			{
 				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 
 				if( $this->disp_params['show_headers'] )
 				{	// Get permanent item link:
-					$item_title = $widget_Item->get_title( array( 'title_field' => 'short_title,title' ) );
+					$item_title_link = $widget_Item->get_title( array( 'title_field' => 'short_title,title' ) );
+					if( $this->disp_params['merge_headers'] )
+					{	// Get title text in order to compare on merging:
+						$item_title_text = $widget_Item->get_title( array( 'title_field' => 'short_title,title', 'link_type' => 'none' ) );
+					}
 				}
 				else
 				{	// Item title should not be displayed:
-					$item_title = '';
+					$item_title_link = '';
+					$item_title_text = '';
 				}
 
 				if( $show_status == 'always' ||
 				    $show_status == 'differences' ||
 				    ( $show_status == 'not_public' && $widget_Item->get( 'status' ) != 'published' ) )
 				{	// Get item status:
-					$item_status = $widget_Item->get_format_status( array( 'template' => $this->disp_params['custom_fields_item_status_template'] ) );
+					$item_status_badge = $widget_Item->get_format_status( array( 'template' => $this->disp_params['custom_fields_item_status_template'] ) );
+					if( $this->disp_params['merge_headers'] )
+					{	// Get status text in order to compare on merging:
+						$item_status_text = $widget_Item->get( 'status' );
+					}
 				}
 				else
 				{	// Don't display item status:
-					$item_status = '';
+					$item_status_badge = '';
+					$item_status_text = '';
 				}
 
-				echo str_replace( array( '$item_link$', '$item_status$', '$col_width$' ), array( $item_title, $item_status, $col_width.'%' ), $this->get_field_template( 'col_header_item' ) );
+				if( $this->disp_params['merge_headers'] )
+				{	// Check if previous header same as currect:
+					if( isset( $prev_item_title_text, $prev_item_status_text ) &&
+					    $prev_item_title_text == $item_title_text &&
+					    $prev_item_status_text == $item_status_text )
+					{	// This is a duplicated header cell as before:
+						$skip_duplicate_header_cell = true;
+						// Increase a count of duplicated hedaer cell:
+						$table_header_cells[ count( $table_header_cells ) - 1 ]['cols']++;
+					}
+					else
+					{	// Don't skip different column header cell:
+						$skip_duplicate_header_cell = false;
+					}
+					// Store current title values in order to comapre then next time:
+					$prev_item_title_text = $item_title_text;
+					$prev_item_status_text = $item_status_text;
+				}
+
+				if( empty( $skip_duplicate_header_cell ) )
+				{	// Display header cell only if it not hidden on merging same headers:
+					$table_header_cells[] = array(
+						'title'  => $item_title_link,
+						'status' => $item_status_badge,
+						'cols'   => 1,
+					);
+				}
 			}
+
+			foreach( $table_header_cells as $table_header_cell )
+			{	// Print out table header cells:
+				$cell_params = array(
+					'$item_link$'   => $table_header_cell['title'],
+					'$item_status$' => $table_header_cell['status'],
+					'$col_width$'   => ( $col_width * $table_header_cell['cols'] ).'%',
+					'$col_attrs$'   => ( $table_header_cell['cols'] > 1 ? ' colspan="'.$table_header_cell['cols'].'"' : '' ),
+				);
+				echo str_replace( array_keys( $cell_params ), $cell_params, $this->get_field_template( 'col_header_item' ) );
+			}
+
 			echo $this->get_field_template( 'row_end' );
 		}
 
@@ -733,6 +788,7 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		if( $custom_field['type'] != 'separator' )
 		{	// Separator fields have no values:
+			$table_row_cells = array();
 			foreach( $items as $item_ID )
 			{
 				// Custom field value per each post:
@@ -787,7 +843,34 @@ class item_fields_compare_Widget extends ComponentWidget
 					}
 				}
 
-				echo str_replace( array( '$data_cell_class$', '$field_value$' ), array( $custom_field['cell_class'], $custom_field_value ), $field_value_template );
+				if( $custom_field['merge'] )
+				{	// Check if previous field value same as currect:
+					if( isset( $prev_field_value ) && $prev_field_value == $custom_field_orig_value )
+					{	// This is a duplicated field value cell as before:
+						$skip_duplicate_field_value = true;
+						// Increase a count of duplicated field value cell:
+						$table_row_cells[ count( $table_row_cells ) - 1 ]['cols']++;
+					}
+					else
+					{	// Don't skip different field value cell:
+						$skip_duplicate_field_value = false;
+					}
+					// Store current field value in order to comapre then next time:
+					$prev_field_value = $custom_field_orig_value;
+				}
+
+				if( empty( $skip_duplicate_field_value ) )
+				{	// Display field value cell only if it not hidden on merging same values:
+					$table_row_cells[] = array(
+						'template' => str_replace( array( '$data_cell_class$', '$field_value$' ), array( $custom_field['cell_class'], $custom_field_value ), $field_value_template ),
+						'cols'     => 1,
+					);
+				}
+			}
+
+			foreach( $table_row_cells as $table_row_cell )
+			{	// Print out table field value cells:
+				echo str_replace( '$data_cell_attrs$', ( $table_row_cell['cols'] > 1 ? ' colspan="'.$table_row_cell['cols'].'"' : '' ), $table_row_cell['template'] );
 			}
 		}
 

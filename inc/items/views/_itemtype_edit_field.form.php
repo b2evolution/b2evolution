@@ -96,5 +96,8 @@ if( get_param( 'itcf_type' ) != 'separator' )
 // Description:
 $Form->textarea( 'itcf_description', get_param( 'itcf_description' ), 3, T_('Description') );
 
+// Public:
+$Form->checkbox( 'itcf_merge', get_param( 'itcf_merge' ), T_('Auto merge'), T_('Merge the column cells if the value is identical to the next') );
+
 $Form->end_form( array( array( 'submit', 'actionArray[select_custom_fields]', T_('Update'), 'SaveButton' ) ) );
 ?>
