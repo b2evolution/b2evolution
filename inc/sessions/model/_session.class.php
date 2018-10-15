@@ -195,9 +195,9 @@ class Session
 							// Load a Messages object from session data, if available:
 							if( ( $sess_Messages = $this->get('Messages') ) && $sess_Messages instanceof Messages )
 							{
-								$Messages->prepend_messages( $sess_Messages );
+								// dh> TODO: "old" messages should rather get prepended to any existing ones from the current request, rather than appended
+								$Messages->add_messages( $sess_Messages );
 								$Messages->affixed = $sess_Messages->affixed;
-								$Messages->suppressed = $sess_Messages->suppressed;
 								$Debuglog->add( 'Session: Added Messages from session data.', 'request' );
 								$this->delete( 'Messages' );
 							}

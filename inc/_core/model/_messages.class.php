@@ -37,14 +37,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class Messages
 {
 	/**
-	 * The stored messages
-	 * array of Array
-	 *
-	 * @var array
-	 */
-	var $messages = array();
-
-	/**
 	 * The stored messages text.
 	 * array of Strings
 	 *
@@ -57,16 +49,8 @@ class Messages
 	 * array of Strings
 	 *
 	 * @var array
-	 * @deprecated
 	 */
 	var $messages_type = array();
-
-	/**
-	 * Message counters
-	 *
-	 * @var array
-	 */
-	var $counters = array();
 
 	/**
 	 * The number of messages
@@ -107,7 +91,6 @@ class Messages
 	 * The stored message group text.
 	 *
 	 * @var array of Strings
-	 * @deprecated
 	 */
 	var $message_group_text = array();
 
@@ -143,14 +126,6 @@ class Messages
 	var $affixed = false;
 
 	/**
-	 * Marks added messages as suppressed
-	 *
-	 * @var boolean
-	 */
-	var $suppressed = false;
-
-
-	/**
 	 * Constructor.
 	 *
 	 * @param array Params
@@ -184,11 +159,9 @@ class Messages
 	 */
 	function clear()
 	{
-		$this->messages = array();
 		$this->messages_text = array();
 		$this->messages_type = array();
 		$this->count = 0;
-		$this->counters = array();
 		$this->has_errors = false;
 
 		$this->message_group_open = false;
@@ -198,31 +171,6 @@ class Messages
 		$this->group_count = 0;
 	}
 
-	function increment_counter( $type )
-	{
-		if( isset( $this->counters[$type] ) )
-		{
-			$this->counters[$type]++;
-		}
-		else
-		{
-			$this->counters[$type] = 1;
-		}
-
-		return $this->counters[$type];
-	}
-
-	function get_count( $type )
-	{
-		if( isset( $this->counters[$type] ) )
-		{
-			return $this->counters[$type];
-		}
-		else
-		{
-			return 0;
-		}
-	}
 
 	/**
 	 * Add a message.
@@ -234,24 +182,9 @@ class Messages
 	{
 		$this->close_group();
 
-		$this->messages_text[$this->get_count( 'msg' )] = $text;
-		$this->messages_type[$this->get_count( 'msg' )] = $type;
+		$this->messages_text[$this->count] = $text;
+		$this->messages_type[$this->count] = $type;
 		$this->count++;
-		$this->increment_counter( 'msg' );
-		$this->increment_counter( $type );
-		if( $this->suppressed )
-		{
-			$this->increment_counter( 'suppressed' );
-		}
-		$this->messages[] = array(
-				'entry' => 'message',
-				'type' => $type,
-				'text' => $text,
-				'count' => $this->get_count( 'msg' ),
-				'suppressed' => $this->suppressed,
-				//'header' => $this->message_group_header,
-			);
-
 		if( !$this->has_errors )
 		{
 			$this->has_errors = ( $type == 'error' );
@@ -260,62 +193,48 @@ class Messages
 
 
 	/**
-	 * Prepend Messages object to this.
+	 * Add a Messages object to this.
 	 *
 	 * @param Messages object
 	 */
-	function prepend_messages( $p_Messages )
+	function add_messages( $p_Messages )
 	{
-		// Cleanup $p_Messages last message entry and/or $this first message entry:
-		if( count( $this->messages ) )
+		$this->count = $this->count + $p_Messages->count;
+		for( $i = 0; $i < $p_Messages->count; $i++ )
 		{
-			$p_last_entry = $p_Messages->messages[count( $p_Messages->messages ) - 1];
-			if( $p_Messages->has_open_group() || $p_last_entry['entry'] == 'end_group' )
+			$this->messages_text[] = $p_Messages->messages_text[$i];
+			$this->messages_type[] = $p_Messages->messages_type[$i];
+			if( !$this->has_errors )
 			{
-				$p_header = $p_Messages->has_open_group() ? $p_Messages->message_group_header : $p_last_entry['header'];
-				$p_type   = $p_Messages->has_open_group() ? $p_Messages->message_group_type : $p_last_entry['type'];
+				$this->has_errors = ( $p_Messages->messages_type[$i] == 'error' );
+			}
+		}
 
-				if( $this->messages[0]['entry'] == 'start_group' )
+		if( $this->has_open_group() )
+		{	// Check if this is still the same group by comparing the first text of message group, message group type and display empty group values
+			$same_group = ( $this->message_group_header === $p_Messages->message_group_header )	&& ( $this->message_group_type == $p_Messages->message_group_type );
+
+			if( ! $same_group )
+			{ // No longer the same message group, close the previous group and append to current message queue
+				$r = $p_Messages->close_group( true );
+				$this->add( $r[0], $r[1] );
+			}
+			else
+			{ // Append group messages
+				$this->group_count += $p_Messages->group_count;
+				for( $i = 0; $i < $p_Messages->group_count; $i++ )
 				{
-					if( ( $this->messages[0]['header'] === $p_header ) && ( $this->messages[0]['type'] === $p_type_) )
-					{	// Same group, remove $this start group entry:
-						unset( $this->messages[0] );
-
-						if( $p_last_entry['entry'] == 'end_group' )
-						{	// Remove $p_Messages end group entry
-							unset( $p_Messages->messages[count($p_Messages->messages) - 1] );
-						}
-					}
-					else
-					{	// Close previous group:
-						$p_Messages->messages[] = array( 'entry' => 'end_group', 'header' => $p_header, 'type' => $p_type );
-					}
-				}
-				elseif( $p_Messages->has_open_group() )
-				{	// Close previous group:
-					$p_Messages->messages[] = array( 'entry' => 'end_group', 'header' => $p_header, 'type' => $p_type );
+					$this->message_group_text[] = $p_Messages->message_group_text[$i];
 				}
 			}
 		}
 		else
-		{
-			$this->message_group_open   = $p_Messages->message_group_open;
+		{ // No open group, just copy the other object's group values
+			$this->message_group_open = $p_Messages->message_group_open;
 			$this->message_group_header = $p_Messages->message_group_header;
-		}
-
-		$this->messages    = $p_Messages->messages + $this->messages;
-		$this->count       = $this->count + $p_Messages->count;
-		$sums = array();
-		foreach( array_keys( $this->counters + $p_Messages->counters ) as $key )
-		{
-			$sums[$key] = ( isset( $this->counters[$key] ) ? $this->counters[$key] : 0 ) + ( isset( $p_Messages->counters[$key] ) ? $p_Messages->counters[$key] : 0 );
-		}
-		$this->counters = $sums;
-		$this->group_count = $this->group_count + $p_Messages->group_count;
-
-		if( ! $this->has_errors )
-		{
-			$this->has_errors = $p_Messages->has_errors;
+			$this->message_group_text = $p_Messages->message_group_text;
+			$this->message_group_type = $p_Messages->message_group_type;
+			$this->group_count = $p_Messages->group_count;
 		}
 	}
 
@@ -326,19 +245,13 @@ class Messages
 	 * @param string the group header/title
 	 * @param string the message type, it can have this values: 'success', 'warning', 'error', 'note'
 	 */
-	function start_group( $header = NULL, $type = 'error', $close_previous = true )
+	function start_group( $header = NULL, $type = 'error' )
 	{
-		if( $close_previous )
-		{
-			$this->close_group();
-		}
+		$this->close_group();
 
-		$this->messages[] = array( 'entry' => 'start_group', 'header' => $header, 'type' => $type );
-
-		$this->group_count++;
 		$this->message_group_header = $header;
-		$this->message_group_type   = $type;
-		$this->message_group_open   = true;
+		$this->message_group_type = $type;
+		$this->message_group_open = true;
 	}
 
 
@@ -357,33 +270,11 @@ class Messages
 			$this->close_group();
 		}
 
-		if( ! $this->message_group_open )
-		{
-			$this->start_group( $header, $type );
-		}
-
-		$this->messages_text[$this->count] = $text;
-
-		$this->count++;
-		$count = $this->increment_counter( 'msg' );
-		$this->increment_counter( $type );
-		if( $this->suppressed )
-		{
-			$this->increment_counter( 'suppressed' );
-		}
-		$this->messages[] = array(
-				'entry' => 'message',
-				'type' => $type,
-				'text' => $text,
-				'count' => $count,
-				'suppressed' => $this->suppressed,
-				//'header' => $this->message_group_header,
-			);
-
-		if( !$this->has_errors )
-		{
-			$this->has_errors = ( $type == 'error' );
-		}
+		$this->message_group_header = $header;
+		$this->message_group_type = $type;
+		$this->message_group_text[$this->group_count] = $text;
+		$this->group_count++;
+		$this->message_group_open = true;
 	}
 
 
@@ -391,22 +282,38 @@ class Messages
 	 * Closes the current message group and add to message queue.
 	 *
 	 * @param boolean True to only output message group but not add it to the message queue
+	 * @return mixed NULL if there is no open group messag otherwise an array of group message and message type of current group
 	 */
 	function close_group( $output = false )
 	{
 		if( $this->has_open_group() )
 		{
-			$this->messages[] = array(
-					'entry' => 'end_group',
-					'header' => $this->message_group_header,
-					'type' => $this->message_group_type
-				);
+			if( $this->group_count === 1 && empty( $this->message_group_header ) )
+			{ // There is only a single group item and no header text to display, display as single line message
+				$message = $this->message_group_text[0];
+			}
+			else
+			{
+				$message = $this->params['before_group'].$this->message_group_header;
+				for( $i = 0; $i < $this->group_count; $i++ )
+				{
+					$message .= $this->params['before_group_item'].$this->message_group_text[$i].$this->params['after_group_item'];
+				}
+				$message .= $this->params['after_group'];
+			}
 
 			// Clear message group
 			$this->message_group_open = false;
 			$this->message_group_header = NULL;
 			$this->message_group_text = array();
+			$this->group_count = 0;
+
+			$this->add( $message, $this->message_group_type );
+
+			return array( $message, $this->message_group_type );
 		}
+
+		return NULL;
 	}
 
 
@@ -450,7 +357,7 @@ class Messages
 			}
 		}
 
-		if( $this->get_count( 'msg' ) )
+		if( $this->count )
 		{
 			$disp = $this->display( NULL, NULL, false, NULL );
 
@@ -478,20 +385,18 @@ class Messages
 	 * @param string|NULL Footer
 	 * @param boolean to display or return (default: display)
 	 * @param mixed the outer div, may be false
-	 * @param boolean display suppressed messages
 	 * @return boolean false, if no messages; else true (and outputs if $display)
 	 */
-	function display( $head = NULL, $foot = NULL, $display = true, $outerdivclass = 'log_container', $display_suppressed = false )
+	function display( $head = NULL, $foot = NULL, $display = true, $outerdivclass = 'log_container' )
 	{
 		if( $this->has_open_group() )
 		{
 			$this->close_group();
 		}
 
-		if( $this->get_count( 'msg' ) == 0 ) {
+		if( $this->count == 0 ) {
 			return false;
 		}
-
 
 		$disp = '';
 
@@ -511,79 +416,17 @@ class Messages
 		}
 
 		$disp .= '<ul>';
-		$in_group = false;
-		$group_data = NULL;
-		$group_messages = array();
-		$group_msg_counter = 0;
-		foreach( $this->messages as $message )
+		for( $i = 0; $i < $this->count; $i++ )
 		{
-			switch( $message['entry'] )
-			{
-				case 'start_group':
-					$in_group = true;
-					$group_data = $message;
-					break;
-
-				case 'end_group':
-					if( $in_group )
-					{
-						if( ! empty( $group_messages ) && ! empty( $group_data ) )
-						{
-							$class = isset( $this->params['class_'.$group_data['type']] ) ? $this->params['class_'.$group_data['type']] : $this->params['class_note'];
-							if( $group_msg_counter === 1 && empty( $group_data['header'] ) )
-							{
-								$disp .= '<li><div class="'.$class.'">'
-										.$this->params['before_'.$message['type']]
-										.$this->params['before_message']
-										.$group_messages[0]
-										.$this->params['after_'.$message['type']]
-										.'</div></li>';
-							}
-							else
-							{
-								$disp .= '<li><div class="'.$class.'">'
-										.$this->params['before_'.$group_data['type']]
-										.$this->params['before_message']
-										.$this->params['before_group'].$group_data['header'];
-
-								foreach( $group_messages as $msg )
-								{
-									$disp .= $this->params['before_group_item'].$msg.$this->params['after_group_item'];
-								}
-
-								$disp .= $this->params['after_group']
-										.$this->params['after_'.$group_data['type']]
-										.'</div></li>';
-							}
-						}
-					}
-					$in_group          = false;
-					$group_data        = NULL;
-					$group_messages    = array();
-					$group_msg_counter = 0;
-					break;
-
-				case 'message':
-					if( ! $message['suppressed'] || $display_suppressed )
-					{
-						if( $in_group )
-						{
-							$group_messages[] = $message['text'];
-							$group_msg_counter++;
-						}
-						else
-						{
-							$class = isset( $this->params['class_'.$message['type']] ) ? $this->params['class_'.$message['type']] : $this->params['class_note'];
-							$disp .= '<li><div class="'.$class.'">'
-									.$this->params['before_'.$message['type']]
-									.$this->params['before_message']
-									.$message['text']
-									.$this->params['after_'.$message['type']]
-									.'</div></li>';
-						}
-					}
-					break;
-			}
+			$class = isset( $this->params['class_'.$this->messages_type[$i]] ) ?
+					$this->params['class_'.$this->messages_type[$i]] :
+					$this->params['class_note'];
+			$disp .= "<li>\t<div class=\"{$class}\"".'>'
+					.$this->params['before_'.$this->messages_type[$i]]
+					.$this->params['before_message']
+					.$this->messages_text[$i]
+					.$this->params['after_'.$this->messages_type[$i]]
+				."</div></li>\n";
 		}
 		$disp .= '</ul>';
 
@@ -597,15 +440,6 @@ class Messages
 			$disp .= "</div>\n";
 		}
 
-		/*
-		pre_dump( array(
-			'messages' => $this->messages,
-			'string' => $this->get_string(),
-			'msg_count' => $this->count,
-			'grp_count' => $this->group_count,
-		) );
-		*/
-
 		if( $display )
 		{
 			echo $disp;
@@ -614,11 +448,12 @@ class Messages
 		return $disp;
 	}
 
+
 	/**
 	 * Concatenates messages of a given category to a string
 	 *
 	 * @param string prefix of the string
-	 * @param string suffix of the string
+	 * @param string suffic of the string
 	 * @param string the glue
 	 * @param string result format
 	 * @return string the messages, imploded. Tags stripped.
@@ -630,7 +465,7 @@ class Messages
 			$this->close_group();
 		}
 
-		if( !$this->get_count( 'msg' ) )
+		if( !$this->count )
 		{
 			return false;
 		}
@@ -640,17 +475,7 @@ class Messages
 		{
 			$r .= $head.' ';
 		}
-
-		$messages = array();
-		foreach( $this->messages as $msg )
-		{
-			if( $msg['entry'] == 'message' && ! $msg['suppressed'] )
-			{
-				$messages[] = $msg['text'];
-			}
-		}
-		$r .= implode( $implodeBy, $messages );
-
+		$r .= implode( $implodeBy, $this->messages_text );
 		if( '' != $foot )
 		{
 			$r .= ' '.$foot;
@@ -679,25 +504,16 @@ class Messages
 	 *
 	 * @return number of messages
 	 */
-	function count( $type = NULL, $include_suppressed = false )
+	function count()
 	{
-		$count = 0;
-		if( is_null( $type ) )
+		if( $this->has_open_group() )
 		{
-			$count = isset( $this->counters['msg'] ) ? $this->counters['msg'] : 0;
+			return $this->count + 1;
 		}
 		else
 		{
-			$count = isset( $this->counters[$type] ) ? $this->counters[$type] : 0;
+			return $this->count;
 		}
-
-		if( ! $include_suppressed )
-		{
-			$suppressed_count = isset( $this->counters['suppressed'] ) ? $this->counters['suppressed'] : 0;
-			$count = $count - $suppressed_count;
-		}
-
-		return $count;
 	}
 
 
