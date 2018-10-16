@@ -813,7 +813,7 @@ class ComponentWidget extends DataObject
 				{	// Plugin failed (happens when a plugin has been disabled for example):
 					if( $this->mode == 'designer' )
 					{	// Display red text in customizer widget designer mode in order to make this plugin visible for editing:
-						echo $this->disp_params['block_start'].'<span class="red">'.T_('Inactive / Uninstalled plugin').'</span>'.$this->disp_params['block_end'];
+						echo $this->disp_params['block_start'].'<span class="evo_param_error">'.T_('Inactive / Uninstalled plugin').'</span>'.$this->disp_params['block_end'];
 					}
 					return false;
 				}

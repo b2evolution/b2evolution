@@ -2931,7 +2931,7 @@ class Item extends ItemLight
 		if( ! isset( $custom_fields[ $field_index ] ) )
 		{ // Custom field with this index doesn't exist
 			echo $params['before']
-				.'<span class="red">'.sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_index.'</b>' ).'</span>'
+				.'<span class="evo_param_error">'.sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_index.'</b>' ).'</span>'
 				.$params['after'];
 			return;
 		}
@@ -3789,12 +3789,12 @@ class Item extends ItemLight
 					$wrong_item_info = '<code>'.$item_ID_slug.'</code>';
 				}
 				// Replace inline content block tag with error message about wrong referenced item:
-				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>', $content );
+				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>', $content );
 				continue;
 			}
 			elseif( get_status_permvalue( $this->get( 'status' ) ) > get_status_permvalue( $content_Item->get( 'status' ) ) )
 			{	// Deny to display content block Item with lower status than parent Item:
-				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The visibility level of the content block "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('The visibility level of the content block "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
 				continue;
 			}
 			elseif( $content_Item->get( 'creator_user_ID' ) != $this->get( 'creator_user_ID' ) &&
@@ -3807,7 +3807,7 @@ class Item extends ItemLight
 				//  - Content block Item has same owner as owner of parent Item's collection,
 				//  - Content block Item is in same collection as parent Item,
 				//  - Content block Item from collection for shared content blocks:
-				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
 				continue;
 			}
 
@@ -3818,7 +3818,7 @@ class Item extends ItemLight
 
 			if( in_array( $content_Item->ID, $content_block_items ) )
 			{	// Replace inline content block tag with error message about recursion:
-				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('Content inclusion loop detected. Not including "%s".'), '#'.$content_Item->ID.' '.$content_Item->get( 'title' ) ).'</p>', $content );
+				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('Content inclusion loop detected. Not including "%s".'), '#'.$content_Item->ID.' '.$content_Item->get( 'title' ) ).'</p>', $content );
 				continue;
 			}
 

@@ -245,7 +245,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 		{	// Display an error when newsletter is not found or not active:
 			$this->disp_title();
 			echo $this->disp_params['block_body_start'];
-			echo '<div class="red">'.T_('List subscription widget references an inactive list.').'</div>';
+			echo '<div class="evo_param_error">'.T_('List subscription widget references an inactive list.').'</div>';
 			echo $this->disp_params['block_body_end'];
 		}
 		else
