@@ -209,7 +209,7 @@ custom_field_edit_form_template( '<input type="hidden" name="cf_link$cf_num$" va
 	.'<input type="hidden" name="cf_link_nofollow$cf_num$" value="$cf_link_nofollow$" />'
 	.'<input type="hidden" name="cf_link_class$cf_num$" value="$cf_link_class$" />', '-text,-html,-separator', $custom_field_templates );
 echo '<input type="hidden" name="cf_description$cf_num$" value="$cf_description$" />';
-echo '<input type="hidden" name="cf_merge$cf_num$" value="$cf_merge$" />';
+custom_field_edit_form_template( '<input type="hidden" name="cf_merge$cf_num$" value="$cf_merge$" />', '-separator', $custom_field_templates );
 // Create this <hidden> to know this custom field is new created field:
 echo '<input type="hidden" name="cf_new$cf_num$" value="$cf_new$" />';
 $Table->display_col_end();

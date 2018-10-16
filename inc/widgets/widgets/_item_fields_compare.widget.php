@@ -845,7 +845,7 @@ class item_fields_compare_Widget extends ComponentWidget
 
 				if( $custom_field['merge'] )
 				{	// Check if previous field value same as currect:
-					if( isset( $prev_field_value ) && $prev_field_value == $custom_field_orig_value )
+					if( isset( $prev_field_value ) && $prev_field_value == $custom_field_value )
 					{	// This is a duplicated field value cell as before:
 						$skip_duplicate_field_value = true;
 						// Increase a count of duplicated field value cell:
@@ -856,7 +856,7 @@ class item_fields_compare_Widget extends ComponentWidget
 						$skip_duplicate_field_value = false;
 					}
 					// Store current field value in order to comapre then next time:
-					$prev_field_value = $custom_field_orig_value;
+					$prev_field_value = $custom_field_value;
 				}
 
 				if( empty( $skip_duplicate_field_value ) )
