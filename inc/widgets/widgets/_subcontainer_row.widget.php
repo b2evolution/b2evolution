@@ -77,10 +77,20 @@ class subcontainer_row_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $Blog;
+		$container_type = $this->get_container_param( 'type' );
+
+		if( $container_type == 'shared' || $container_type == 'shared-sub' )
+		{	// For shared containers allow only shared sub-containers:
+			$coll_ID = '';
+		}
+		else
+		{	// For collection containers allow only collection sub-containers:
+			global $Blog;
+			$coll_ID = $Blog->ID;
+		}
 
 		$WidgetContainerCache = & get_WidgetContainerCache();
-		$coll_widget_containers = $WidgetContainerCache->get_by_coll_ID( $Blog->ID );
+		$coll_widget_containers = $WidgetContainerCache->get_by_coll_skintype( $coll_ID, $this->get_container_param( 'skin_type' ) );
 		$container_options = array(
 				''            => T_('None'),
 				'!create_new' => T_('Create New'),
@@ -263,7 +273,7 @@ class subcontainer_row_Widget extends ComponentWidget
 
 		// Get subcontainer name:
 		$WidgetContainerCache = & get_WidgetContainerCache();
-		$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $subcontainer_code );
+		$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $Blog->ID, $this->get_container_param( 'skin_type' ), $subcontainer_code );
 		$subcontainer_name = $WidgetContainer ? $WidgetContainer->get( 'name' ) : $subcontainer_code;
 
 		if( ! isset( $displayed_subcontainers ) )

@@ -4352,7 +4352,7 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 		{
 			$tracking_params = array(
 					'content_type' => $format,
-					'image_load' => isset( $$track_email_image_load ) ? $$track_email_image_load : true,
+					'image_load' => isset( $track_email_image_load ) ? $track_email_image_load : true,
 					'link_click_html' => isset( $track_email_click_html ) ? $track_email_click_html : true ,
 					'link_click_text' => isset( $track_email_click_plain_text ) ? $track_email_click_plain_text : true,
 					'template_parts' => $params['template_parts'],
@@ -7772,29 +7772,34 @@ function evo_error_handler()
 function get_fieldset_folding_icon( $id, $params = array() )
 {
 	if( ! is_logged_in() )
-	{ // Only loggedin users can fold fieldset
+	{	// Only loggedin users can fold fieldset
 		return;
 	}
 
 	$params = array_merge( array(
-			'before'    => '',
-			'after'     => ' ',
-			'deny_fold' => false, // TRUE to don't allow fold the block and keep it opened always on page loading
+			'before'     => '',
+			'after'      => ' ',
+			'deny_fold'  => false, // TRUE to don't allow fold the block and keep it opened always on page loading
+			'fold_value' => NULL,
 		), $params );
 
 	if( $params['deny_fold'] )
-	{ // Deny folding for this case
+	{	// Deny folding for this case
 		$value = 0;
 	}
+	elseif( ! is_null( $params['fold_value'] ) )
+	{	// Fold value is specified, use this:
+		$value = intval( $params['fold_value'] );
+	}
 	else
-	{ // Get the fold value from user settings
+	{	// Get the fold value from user settings
 		global $UserSettings, $Collection, $Blog, $ctrl;
 		if( empty( $Blog ) || ( isset( $ctrl ) && in_array( $ctrl, array( 'plugins', 'user' ) ) ) )
-		{ // Get user setting value
+		{	// Get user setting value
 			$value = intval( $UserSettings->get( 'fold_'.$id ) );
 		}
 		else
-		{ // Get user-collection setting
+		{	// Get user-collection setting
 			$value = intval( $UserSettings->get_collection_setting( 'fold_'.$id, $Blog->ID ) );
 		}
 	}
@@ -8049,9 +8054,13 @@ function get_script_baseurl()
 		if( isset( $_SERVER['SERVER_PORT'] ) )
 		{
 			if( $_SERVER['SERVER_PORT'] == '443' )
-			{	// Rewrite that as hhtps:
+			{	// Rewrite that as https:
 				$temp_baseurl = 'https://'.$_SERVER['SERVER_NAME'];
-			}	// Add port name
+			}	
+			elseif( $_SERVER['SERVER_PORT'] == '8890' )
+			{	// Used for testing
+				$temp_baseurl = 'https://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'];
+			}	
 			elseif( $_SERVER['SERVER_PORT'] != '80' )
 			{ // Get also a port number
 				$temp_baseurl .= ':'.$_SERVER['SERVER_PORT'];
@@ -9056,30 +9065,30 @@ function get_social_media_image( $Item = NULL, $params = array() )
 	$social_media_image = NULL;
 
 	if( ! empty( $Item ) )
-	{ // Try to get attached images
+	{	// Try to get attached images
 		$LinkOwner = new LinkItem( $Item );
 		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink', 'image', array(
 				'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
 				'sql_order_by'   => 'link_priority ASC, link_order ASC' ) ) )
-		{ // Item has linked files:
+		{	// Item has linked files:
 			while( $Link = & $LinkList->get_next() )
 			{
 				if( ! ( $File = & $Link->get_File() ) )
-				{ // No File object:
+				{	// No File object:
 					global $Debuglog;
 					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $Item->ID ), array( 'error', 'files' ) );
 					continue;
 				}
 
 				if( ! $File->exists() )
-				{ // File doesn't exist:
+				{	// File doesn't exist:
 					global $Debuglog;
-					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $Item->ID, $File->get_full_path() ), array( 'error', 'files' ) );
 					continue;
 				}
 
 				if( $File->is_image() )
-				{ // Use only image files for og:image tag:
+				{	// Use only image files for og:image tag:
 					if( $params['return_as_link'] )
 					{
 						return $Link;
@@ -9094,10 +9103,10 @@ function get_social_media_image( $Item = NULL, $params = array() )
 		}
 
 		if( $params['use_item_cat_fallback'] )
-		{ // No attached image from Item, let's try getting one from the Item's default chapter
+		{	// No attached image from Item, let's try getting one from the Item's default chapter
 			$FileCache = & get_FileCache();
 			if( $default_Chapter = & $Item->get_main_Chapter() )
-			{ // Try social media boilerplate image first:
+			{	// Try social media boilerplate image first:
 				$social_media_image_file_ID = $default_Chapter->get( 'social_media_image_file_ID', false );
 				if( $social_media_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) ) && $File->is_image() )
 				{
@@ -9110,17 +9119,16 @@ function get_social_media_image( $Item = NULL, $params = array() )
 	global $Blog;
 
 	if( $params['use_coll_fallback'] && $Blog )
-	{ // Try to get collection social media boiler plate and collection image/logo:
+	{	// Try to get collection social media boiler plate and collection image/logo:
 		$social_media_image_file_ID = $Blog->get_setting( 'social_media_image_file_ID', false );
 		if( $social_media_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) ) && $File->is_image() )
-		{ // Try social media boiler plate first:
-
+		{	// Try social media boiler plate first:
 			return $File;
 		}
 	}
 
 	if( $params['use_site_fallback'] )
-	{ // Use social media boilerplate logo if configured
+	{	// Use social media boilerplate logo if configured
 		global $Settings;
 
 		$FileCache = & get_FileCache();

@@ -68,7 +68,7 @@ $Plugins->trigger_event( 'WidgetBeginSettingsForm', array(
 $Form->begin_fieldset( T_('Widget info'), array( 'id' => 'widget_info' ) );
 	if( $mode == 'customizer' )
 	{
-		$Form->info( '', $edited_ComponentWidget->get_icon().' '.$edited_ComponentWidget->get_name(), '<br>'.$edited_ComponentWidget->get_desc() );
+		$Form->info( '', $edited_ComponentWidget->get_icon().' '.$edited_ComponentWidget->get_name().' '.$edited_ComponentWidget->get_help_link( 'manual', false ), '<br>'.$edited_ComponentWidget->get_desc() );
 	}
 	else
 	{
@@ -194,6 +194,12 @@ if( $mode == 'customizer' )
 
 // Enable JS for fieldset folding:
 echo_fieldset_folding_js();
+
+// Print out JavaScript code which helps to edit widget form:
+if( $widget_javascript = $edited_ComponentWidget->get_edit_form_javascript() )
+{
+	echo "\n".'<script type="text/javascript">'.$widget_javascript.'</script>'."\n";
+}
 
 if( $display_mode == 'js' )
 {	// Reset previous and Initialize new bozo validator for each new opened widget edit form in popup window,

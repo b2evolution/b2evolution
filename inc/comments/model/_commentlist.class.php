@@ -52,17 +52,13 @@ class CommentList2 extends DataObjectList2
 	 * @param string name of cache to be used
 	 * @param string prefix to differentiate page/order params when multiple Results appear one same page
 	 * @param string Name to be used when saving the filterset (leave empty to use default for collection)
-	 * @param integer Comments created before this timestamp are excluded
-	 * @param integer Comments created after this timestamp are excluded
 	 */
 	function __construct(
-		$Blog,
-		$limit = 1000,
-		$cache_name = 'CommentCache',	// name of cache to be used
-		$param_prefix = '',
-		$filterset_name = '',			// Name to be used when saving the filterset (leave empty to use default for collection)
-		$comment_ts_min = NULL, // do not show comments before this timestamp
-		$comment_ts_max = NULL // do not show comments after this timestamp
+			$Blog,
+			$limit = 1000,
+			$cache_name = 'CommentCache', // name of cache to be used
+			$param_prefix = '',
+			$filterset_name = '' // Name to be used when saving the filterset (leave empty to use default for collection)
 		)
 	{
 		global $Settings;
@@ -98,6 +94,7 @@ class CommentList2 extends DataObjectList2
 				'filter_preset' => NULL,
 				'author_IDs' => NULL,
 				'author' => NULL,
+				'authors_login' => NULL,
 				'author_email' => NULL,
 				'author_url' => NULL,
 				'url_match' => '=',
@@ -125,8 +122,8 @@ class CommentList2 extends DataObjectList2
 				'timestamp_max' => NULL, // Do not show comments from posts after this timestamp
 				'threaded_comments' => false, // Mode to display the comment replies
 				'user_perm' => NULL,
-				'comment_ts_min' => $comment_ts_min,
-				'comment_ts_max' => $comment_ts_max,
+				'ymdhms_min' => NULL,
+				'ymdhms_max' => NULL,
 		) );
 	}
 
@@ -199,6 +196,12 @@ class CommentList2 extends DataObjectList2
 			memorize_param( $this->param_prefix.'author_IP', 'string', $this->default_filters['author_IP'], $this->filters['author_IP'] );  // List of authors ip to restrict to
 
 			/*
+			 * Restrict by dates
+			 */
+			memorize_param( $this->param_prefix.'dstart', 'integer', $this->default_filters['ymdhms_min'], $this->filters['ymdhms_min'] ); // YearMonth(DayHourMinuteSecond) to start at
+			memorize_param( $this->param_prefix.'dstop', 'integer', $this->default_filters['ymdhms_max'], $this->filters['ymdhms_max'] ); // YearMonth(DayHourMinuteSecond) to stop at
+
+			/*
 			 * Restrict to selected rating:
 			 */
 			memorize_param( $this->param_prefix.'rating_toshow', 'array', $this->default_filters['rating_toshow'], $this->filters['rating_toshow'] );  // Rating to restrict to
@@ -221,12 +224,6 @@ class CommentList2 extends DataObjectList2
 			 * Restrict to not active/expired comments:
 			 */
 			memorize_param( $this->param_prefix.'expiry_statuses', 'array', $this->default_filters['expiry_statuses'], $this->filters['expiry_statuses'] );  // List of expiry statuses to restrict to
-
-			/*
-			 * Restrict to comment date:
-			 */
-			memorize_param( $this->param_prefix.'comment_ts_min', 'integer', $this->default_filters['comment_ts_min'], $this->filters['comment_ts_min'] );
-			memorize_param( $this->param_prefix.'comment_ts_max', 'integer', $this->default_filters['comment_ts_max'], $this->filters['comment_ts_max'] );
 
 			/*
 			 * Restrict to selected comment type:
@@ -316,6 +313,12 @@ class CommentList2 extends DataObjectList2
 		$this->filters['author_IP'] = param( $this->param_prefix.'author_IP', 'string', $this->default_filters['author_IP'], true );
 
 		/*
+		 * Restrict to selected min and max dates:
+		 */
+		$this->filters['ymdhms_min'] = param_compact_date( $this->param_prefix.'dstart', $this->default_filters['ymdhms_min'], true, T_( 'Invalid date' ) ); // YearMonth(DayHourMinuteSecond) to start at
+		$this->filters['ymdhms_max'] = param_compact_date( $this->param_prefix.'dstop', $this->default_filters['ymdhms_max'], true, T_( 'Invalid date' ) ); // YearMonth(DayHourMinuteSecond) to stop at
+
+		/*
 		 * Restrict to selected statuses:
 		 */
 		$this->filters['statuses'] = param( $this->param_prefix.'show_statuses', 'array:string', $this->default_filters['statuses'], true );      // List of statuses to restrict to
@@ -348,12 +351,6 @@ class CommentList2 extends DataObjectList2
 		$this->filters['rating_toshow'] = param( $this->param_prefix.'rating_toshow', 'array:string', $this->default_filters['rating_toshow'], true );      // Rating to restrict to
 		$this->filters['rating_turn'] = param( $this->param_prefix.'rating_turn', 'string', $this->default_filters['rating_turn'], true );      // Rating to restrict to
 		$this->filters['rating_limit'] = param( $this->param_prefix.'rating_limit', 'integer', $this->default_filters['rating_limit'], true ); 	// Rating to restrict to
-
-		/*
-		 * Restrict to selected comment date:
-		 */
-		$this->filters['comment_ts_min'] = param( $this->param_prefix.'comment_ts_min', 'integer', $this->default_filters['comment_ts_min'], true );
-		$this->filters['comment_ts_max'] = param( $this->param_prefix.'comment_ts_max', 'integer', $this->default_filters['comment_ts_max'], true );
 
 		// 'limit'
 		$this->filters['comments'] = param( $this->param_prefix.'comments', 'integer', $this->default_filters['comments'], true ); 			// # of units to display on the page
@@ -424,6 +421,7 @@ class CommentList2 extends DataObjectList2
 		 * filtering stuff:
 		 */
 		$this->CommentQuery->where_author( $this->filters['author_IDs'] );
+		$this->CommentQuery->where_author_logins( $this->filters['authors_login'] );
 		$this->CommentQuery->where_author_email( $this->filters['author_email'] );
 		$this->CommentQuery->where_author_url( $this->filters['author_url'], $this->filters['url_match'], $this->filters['include_emptyurl'] );
 		$this->CommentQuery->where_author_IP( $this->filters['author_IP'] );
@@ -434,8 +432,8 @@ class CommentList2 extends DataObjectList2
 		$this->CommentQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 		$this->CommentQuery->where_statuses( $this->filters['statuses'] );
 		$this->CommentQuery->where_types( $this->filters['types'] );
+		$this->CommentQuery->where_dates( $this->filters['ymdhms_min'], $this->filters['ymdhms_max'] );
 		$this->ItemQuery->where_datestart( '', '', '', '', $this->filters['timestamp_min'], $this->filters['timestamp_max'] );
-		$this->CommentQuery->where_comment_date( $this->filters['comment_ts_min'], $this->filters['comment_ts_max'] );
 
 		if( !is_null( $this->Blog ) && isset( $this->filters['user_perm'] ) )
 		{ // If Blog and required user permission is set, add the corresponding restriction

@@ -47,6 +47,12 @@ function init_MainList( $items_nb_limit )
 						) );
 					break;
 
+				case 'widget_page':
+					$MainList->set_default_filters( array(
+							'itemtype_usage' => 'widget-page' // Only widget pages
+						) );
+					break;
+
 				case 'terms':
 					$MainList->set_default_filters( array(
 							'itemtype_usage' => 'page,special' // Allow all post types
@@ -247,9 +253,10 @@ function init_inskin_editing()
  *                 "-": current blog only and exclude the aggregated blogs
  * @param boolean FALSE if FeaturedList cursor should move, TRUE otherwise
  * @param boolean Load featured post together with requested post types like intro but order the featured post below intro posts
+ * @param boolean Load intro items
  * @return Item
  */
-function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $preview = false, $load_featured = false )
+function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $preview = false, $load_featured = false, $load_intro = true )
 {
 	global $Collection, $Blog, $cat;
 	global $disp, $disp_detail, $MainList, $FeaturedList, $featured_list_type;
@@ -289,53 +296,56 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 
 		// FIRST: Try to find an Intro post:
 
-		if( ! $MainList->is_filtered() )
-		{	// This is not a filtered page, so we are on the home page.
-			if( $restrict_disp == 'front' )
-			{	// Special Front page:
-				// Use Intro-Front posts
-				$restrict_to_types_usage = 'intro-front';
+		if( $load_intro )
+		{
+			if( ! $MainList->is_filtered() )
+			{	// This is not a filtered page, so we are on the home page.
+				if( $restrict_disp == 'front' )
+				{	// Special Front page:
+					// Use Intro-Front posts
+					$restrict_to_types_usage = 'intro-front';
+				}
+				else
+				{	// Default front page displaying posts:
+					// The competing intro-* types are: 'main' and 'all':
+					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+					$restrict_to_types_usage = 'intro-main,intro-all';
+				}
 			}
 			else
-			{	// Default front page displaying posts:
-				// The competing intro-* types are: 'main' and 'all':
-				// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-				$restrict_to_types_usage = 'intro-main,intro-all';
+			{	// We are on a filtered... it means a category page or sth like this...
+				// echo $disp_detail;
+				switch( $disp_detail )
+				{
+					case 'posts-cat':
+					case 'posts-topcat':
+					case 'posts-subcat':
+						// The competing intro-* types are: 'cat' and 'all':
+						// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+						$restrict_to_types_usage = 'intro-cat,intro-all';
+						break;
+
+					case 'posts-tag':
+						// The competing intro-* types are: 'tag' and 'all':
+						// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+						$restrict_to_types_usage = 'intro-tag,intro-all';
+						break;
+
+					default:
+						// The competing intro-* types are: 'sub' and 'all':
+						// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+						$restrict_to_types_usage = 'intro-sub,intro-all';
+				}
 			}
+
+			$FeaturedList->set_filters( array(
+					'coll_IDs' => $coll_IDs,
+					'itemtype_usage' => $restrict_to_types_usage.( $load_featured ? ',*featured*' : '' ),
+				), false /* Do NOT memorize!! */ );
+			// pre_dump( $FeaturedList->filters );
+			// Run the query:
+			$FeaturedList->query();
 		}
-		else
-		{	// We are on a filtered... it means a category page or sth like this...
-			// echo $disp_detail;
-			switch( $disp_detail )
-			{
-				case 'posts-cat':
-				case 'posts-topcat':
-				case 'posts-subcat':
-					// The competing intro-* types are: 'cat' and 'all':
-					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-					$restrict_to_types_usage = 'intro-cat,intro-all';
-					break;
-
-				case 'posts-tag':
-					// The competing intro-* types are: 'tag' and 'all':
-					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-					$restrict_to_types_usage = 'intro-tag,intro-all';
-					break;
-
-				default:
-					// The competing intro-* types are: 'sub' and 'all':
-					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-					$restrict_to_types_usage = 'intro-sub,intro-all';
-			}
-		}
-
-		$FeaturedList->set_filters( array(
-				'coll_IDs' => $coll_IDs,
-				'itemtype_usage' => $restrict_to_types_usage.( $load_featured ? ',*featured*' : '' ),
-			), false /* Do NOT memorize!! */ );
-		// pre_dump( $FeaturedList->filters );
-		// Run the query:
-		$FeaturedList->query();
 
 
 		// SECOND: If no Intro, try to find an Featured post:
@@ -1096,7 +1106,7 @@ function recreate_autogenerated_excerpts( $continue_url, $remove_all = true, $de
  */
 function cat_select( $Form, $form_fields = true, $show_title_links = true, $params = array() )
 {
-	global $blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
+	global $blog, $Blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
 	global $admin_url, $rsc_url;
 
 	if( get_post_cat_setting( $blog ) < 1 )
@@ -1152,39 +1162,69 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 	if( $current_User->check_perm( 'blog_admin', '', false, $blog ) &&
 		( get_allow_cross_posting() >= 2 ||
 	  ( isset( $blog) && get_post_cat_setting( $blog ) > 1 && get_allow_cross_posting() == 1 ) ) )
-	{ // If BLOG cross posting enabled, go through all blogs with cats:
-		/**
-		 * @var BlogCache
-		 */
+	{	// If collection cross posting is enabled, go through collections where current Item Type is enabled or current Item already uses categories of those collections:
 		$BlogCache = & get_BlogCache();
-		$ChapterCache->reveal_children( NULL, true );
+		$BlogCache->clear();
+		$cats_coll_SQL = $BlogCache->get_SQL_object( 'Load collections which categories are used by Item #'.$edited_Item->ID );
+		// Load collections only where current Item Type is enabled:
+		$item_type_coll_SQL = $BlogCache->get_SQL_object( 'Load collections where Item Type #'.$edited_Item->get( 'ityp_ID' ).' is enabled' );
+		$item_type_coll_SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_coll_ID = blog_ID' );
+		$item_type_coll_SQL->WHERE_and( 'itc_ityp_ID = '.$edited_Item->get( 'ityp_ID' ) );
+		$BlogCache->load_by_sql( $item_type_coll_SQL );
+		// Load collections which categories are used by current Item:
+		$cats_coll_SQL->FROM_add( 'INNER JOIN T_categories ON cat_blog_ID = blog_ID' );
+		$cats_coll_SQL->FROM_add( 'INNER JOIN T_postcats ON postcat_cat_ID = cat_ID' );
+		$cats_coll_SQL->WHERE_and( 'postcat_post_ID = '.$edited_Item->ID );
+		$BlogCache->load_by_sql( $cats_coll_SQL );
 
-		/**
-		 * @var Blog
-		 */
-		for( $l_Blog = & $BlogCache->get_first(); !is_null($l_Blog); $l_Blog = & $BlogCache->get_next() )
-		{ // run recursively through the cats
+		foreach( $BlogCache->cache as $l_Blog )
+		{	// Run recursively through the categories of the detected collections:
+			if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) ||
+			    ! $current_User->check_perm( 'blog_admin', '', false, $l_Blog->ID ) )
+			{	// Skip collection if current user has no appropriate permissions:
+				continue;
+			}
+
 			if( ! blog_has_cats( $l_Blog->ID ) )
+			{	// Skip collection without categories:
 				continue;
+			}
 
-			// Skip collection if current user do not have the appropriate permissions
-			if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) || ! $current_User->check_perm( 'blog_admin', '', false, $l_Blog->ID ) )
-				continue;
-			$r .= '<tbody data-toggle="collapse" style="cursor: pointer;" data-target="#cat_sel_'.$l_Blog->ID.'" data-parent="#cat_sel_group">';
-			$r .= '<tr class="group'.( $blog == $l_Blog->ID ? ' catselect_blog__current' : '' ).'" id="catselect_blog'.$l_Blog->ID.'">';
-			$r .= '<td colspan="3">'.$l_Blog->dget('name')."</td></tr>\n";
-			$r .= '</tbody>';
-			$r .= '<tbody class="accordion_panel '.( $blog == $l_Blog->ID ? 'collapse in' : 'collapse' ).'" id="cat_sel_'.$l_Blog->ID.'">';
+			// Load all child categories:
+			$ChapterCache->reveal_children( $l_Blog->ID, true );
 
+			$s = '';
 			$current_blog_ID = $l_Blog->ID;	// Global needed in callbacks
 			foreach( $ChapterCache->subset_root_cats[$current_blog_ID] as $root_Chapter )
 			{
-				$r .= cat_select_display( $root_Chapter, $callbacks, $cat_display_params );
+				$s .= cat_select_display( $root_Chapter, $callbacks, $cat_display_params );
 			}
 			if( $blog == $current_blog_ID )
 			{
-				$r .= cat_select_new( $cat_display_params );
+				$s .= cat_select_new( $cat_display_params );
 			}
+
+			// This is a REALLY SIMPLE test to see if a category under this collection is checked.
+			// This may need to be replaced with a more reliable solution.
+			if( strpos( $s, 'checked="checked"' ) === false )
+			{
+				$fold_value = 1;
+			}
+			else
+			{
+				$fold_value = 0;
+			}
+
+			$r .= '<tbody class="fieldset_wrapper" style="cursor: pointer;">';
+			$r .= '<tr class="group'.( $blog == $l_Blog->ID ? ' catselect_blog__current' : '' ).'" id="catselect_blog'.$l_Blog->ID.'">';
+			$r .= '<td colspan="'.( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) ? 4 : 3 ).'">';
+			$r .= get_fieldset_folding_icon( $l_Blog->get('urlname'), array( 'fold_value' => $fold_value ) );
+			$r .= '<span id="title_folding_'.$l_Blog->get('urlname').'">'.$l_Blog->dget('name').'</span>';
+			$r .= "</td></tr>\n";
+			$r .= '</tbody>';
+			$r .= '<tbody id="cat_sel_'.$l_Blog->ID.'">';
+
+			$r .= $s;
 
 			$r .= '</tbody>';
 		}
@@ -1208,16 +1248,15 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 
 	$Form->end_fieldset();
 
-	if( isset($blog) && get_allow_cross_posting() )
+	if( isset( $blog ) && get_allow_cross_posting() )
 	{
-		echo '<script type="text/javascript">jQuery.getScript("'.get_require_url( '#scrollto#' ).'", function () {
-			jQuery("[id$=itemform_categories]").scrollTo( "#catselect_blog'.$blog.'" );
-			var $catSelTable = jQuery("table#cat_sel_group");
-			var $accordionPanels = $catSelTable.find("tbody.accordion_panel");
-			$accordionPanels.on("show.bs.collapse", function() {
-				$catSelTable.find("tbody.collapse.in").collapse("hide");
-			});
-		});</script>';
+		?>
+		<script type="text/javascript">
+		jQuery.getScript( '<?php echo get_require_url( '#scrollto#' );?>', function() {
+				jQuery( "[id=itemform_categories]" ).scrollTo( "#catselect_blog<?php echo $blog;?>" );
+			} );
+		</script>
+		<?php
 	}
 }
 
@@ -1228,21 +1267,32 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
  */
 function cat_select_header( $params = array() )
 {
+	global $Blog;
+
 	$params = array_merge( array(
 			'category_name'        => T_('Category'),
+			'category_main_text'   => T_('Main'),
 			'category_main_title'  => T_('Main category'),
+			'category_extra_text'  => T_('Ext'),
 			'category_extra_title' => T_('Additional category'),
+			'category_order_text'  => T_('Ord'),
+			'category_order_title' => T_('Order'),
 		), $params );
 
-	// main cat header
-	$r = '<thead><tr><th class="selector catsel_main" title="'.$params['category_main_title'].'">'.T_('Main').'</th>';
+	// Radio option for main category:
+	$r = '<thead><tr><th class="catsel_main col-narrow" title="'.format_to_output( $params['category_main_title'], 'htmlattr' ).'">'.format_to_output( $params['category_main_text'] ).'</th>';
 
-	// extra cat header
-	$r .= '<th class="selector catsel_extra" title="'.$params['category_extra_title'].'">'.T_('Extra').'</th>';
+	// Checkbox for extra category:
+	$r .= '<th class="catsel_extra col-narrow" title="'.format_to_output( $params['category_extra_title'], 'htmlattr' ).'">'.format_to_output( $params['category_extra_text'] ).'</th>';
 
-	// category header
-	$r .= '<th class="catsel_name">'.$params['category_name'].'</th>'
-		.'</tr></thead>';
+	// Category name:
+	$r .= '<th class="catsel_name">'.$params['category_name'].'</th>';
+
+	if( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) )
+	{	// Item order per category:
+		$r .= '<th class="catsel_order col-narrow" title="'.format_to_output( $params['category_order_title'], 'htmlattr' ).'">'.format_to_output( $params['category_order_text'] ).'</th>'
+			.'</tr></thead>';
+	}
 
 	return $r;
 }
@@ -1346,7 +1396,7 @@ function cat_select_before_first( $parent_cat_ID, $level )
  */
 function cat_select_before_each( $cat_ID, $level, $total_count )
 { // callback to display sublist element
-	global $current_blog_ID, $blog, $post_extracats, $edited_Item, $current_User;
+	global $current_blog_ID, $blog, $Blog, $post_extracats, $edited_Item, $current_User;
 	global $creating, $cat_select_level, $cat_select_form_fields;
 
 	$ChapterCache = & get_ChapterCache();
@@ -1365,7 +1415,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	if( get_post_cat_setting($blog) != 2 )
 	{ // if no "Multiple categories per post" option is set display radio
 		if( !$thisChapter->meta
-			&& ! ( ! is_admin_page() && ( $Blog->get_setting( 'default_item_type_cat_'.$thisChapter->ID ) == 'disabled' ) && $edited_Item->ID === 0 )
+			&& ! ( ! is_admin_page() && ( $thisChapter->get_ItemType() === false ) && $edited_Item->ID === 0 )
 			&& ( ( $current_blog_ID == $blog ) || ( get_allow_cross_posting( $blog ) >= 2 ) ) )
 		{ // This is current blog or we allow moving posts accross blogs
 			if( $cat_select_form_fields )
@@ -1394,7 +1444,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	if( get_post_cat_setting( $blog ) >= 2 )
 	{ // We allow multiple categories or main + extra cat,  display checkbox:
 		if( !$thisChapter->meta
-			&& ! ( ! is_admin_page() && ( $Blog->get_setting( 'default_item_type_cat_'.$thisChapter->ID ) == 'disabled' ) && $edited_Item->ID === 0 )
+			&& ! ( ! is_admin_page() && ( $thisChapter->get_ItemType() === false ) && $edited_Item->ID === 0 )
 			&& ( ($current_blog_ID == $blog) || ( get_allow_cross_posting( $blog ) % 2 == 1 )
 				|| ( ( get_allow_cross_posting( $blog ) == 2 ) && ( get_post_cat_setting( $blog ) == 2 ) ) ) )
 		{ // This is the current blog or we allow cross posting (select extra cat from another blog)
@@ -1444,8 +1494,14 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 				.$chapter_lock_status
 				.' <a href="'.htmlspecialchars($thisChapter->get_permanent_url()).'" title="'.htmlspecialchars(T_('View category in blog.')).'">'
 				.'&nbsp;&raquo;&nbsp;' // TODO: dh> provide an icon instead? // fp> maybe the A(dmin)/B(log) icon from the toolbar? And also use it for permalinks to posts?
-				.'</a></td>'
-			.'</tr>'."\n";
+				.'</a></td>';
+
+	if( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) )
+	{	// Display item order per category only on back-office or when it is enabled for front-office:
+		$r .= '<td class="catsel_order"><input type="text" name="post_cat_orders['.$cat_ID.']" class="form_text_input form-control" value="'.$edited_Item->get_order( $cat_ID ).'" title="'.format_to_output( T_('can be decimal'), 'htmlattr' ).'" /></td>';
+	}
+
+	$r .= '</tr>'."\n";
 
 	return $r;
 }
@@ -1474,7 +1530,7 @@ function cat_select_after_last( $parent_cat_ID, $level )
  */
 function cat_select_new( & $cat_display_params )
 {
-	global $blog, $current_User;
+	global $blog, $Blog, $current_User;
 
 	if( ! $current_User->check_perm( 'blog_cats', '', false, $blog ) )
 	{	// Current user cannot add/edit a categories for this blog
@@ -1486,10 +1542,12 @@ function cat_select_new( & $cat_display_params )
 	if( $new_maincat || $new_extracat )
 	{
 		$category_name = param( 'category_name', 'string', '' );
+		$category_order = param( 'category_order', 'integer', '' );
 	}
 	else
 	{
 		$category_name = '';
+		$category_order = '';
 	}
 
 	$cat_display_params['total_count'] = $cat_display_params['total_count']  + 1;
@@ -1499,7 +1557,7 @@ function cat_select_new( & $cat_display_params )
 	{
 		// RADIO for new main cat:
 		$r .= '<td class="selector catsel_main"><input type="radio" name="post_category" class="checkbox" title="'
-							.T_('Select as MAIN category').'" value="0"';
+							.format_to_output( T_('Select as MAIN category'), 'htmlattr' ).'" value="0"';
 		if( $new_maincat )
 		{
 			$r.= ' checked="checked"';
@@ -1513,7 +1571,7 @@ function cat_select_new( & $cat_display_params )
 	{
 		// CHECKBOX
 		$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
-							.T_('Select as an additional category').'" value="0"';
+							.format_to_output( T_('Select as an additional category'), 'htmlattr' ).'" value="0"';
 		if( $new_extracat )
 		{
 			$r.= ' checked="checked"';
@@ -1523,9 +1581,17 @@ function cat_select_new( & $cat_display_params )
 
 	// INPUT TEXT for new category name
 	$r .= '<td class="catsel_name">'
-				.'<input maxlength="255" style="width: 100%;" value="'.$category_name.'" size="20" type="text" name="category_name" id="new_category_name" />'
-				.'</td>'
-			.'</tr>';
+				.'<input maxlength="255" style="width:100%" value="'.format_to_output( $category_name, 'htmlattr' ).'" size="20" type="text" name="category_name" id="new_category_name" class="form_text_input form-control" />'
+				.'</td>';
+
+	if( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) )
+	{	// INPUT TEXT for item order in new category:
+		$r .= '<td class="catsel_order">'
+				.'<input type="text" name="post_cat_orders[0]" value="'.format_to_output( $category_order, 'htmlattr' ).'" name="category_order" class="form_text_input form-control" title="'.format_to_output( T_('can be decimal'), 'htmlattr' ).'" />'
+				.'</td>';
+	}
+
+	$r .= '</tr>';
 
 	return $r;
 }
@@ -1684,6 +1750,7 @@ function get_tab_by_item_type_usage( $type_usage )
 			$type_tab = array( 'post', NT_('Posts') );
 			break;
 		case 'page':
+		case 'widget-page':
 			$type_tab = array( 'page', NT_('Pages') );
 			break;
 		case 'special':
@@ -1720,7 +1787,7 @@ function get_item_type_usage_by_tab( $tab_name )
 	switch( $tab_name )
 	{
 		case 'page':
-			$type_usages = array( 'page' );
+			$type_usages = array( 'page', 'widget-page' );
 			break;
 		case 'special':
 			$type_usages = array( 'special' );
@@ -2315,6 +2382,12 @@ function echo_item_merge_js()
 <script type="text/javascript">
 function evo_merge_load_window( item_ID )
 {
+	if( typeof( bozo ) && bozo.nb_changes > 0 )
+	{	// Don't allow to merge if item edit form is changed and not saved yet:
+		alert( '<?php echo TS_('You must save the Item before you can merge it.'); ?>' );
+		return false;
+	}
+
 	openModalWindow( '<div id="evo_merge_wrapper"></div>', 'auto', '', true,
 		'<?php echo TS_('Select destination Post...'); ?>', // Window title
 		[ '-', 'evo_merge_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back", "Merge with original dates",  "Append to this post with new dates"
@@ -2323,7 +2396,7 @@ function evo_merge_load_window( item_ID )
 	// Load collections:
 	var current_coll_urlname = '<?php echo empty( $Blog ) ? '' : format_to_js( $Blog->get( 'urlname' ) ); ?>';
 	evo_rest_api_start_loading( '#evo_merge_wrapper' );
-	evo_rest_api_request( 'collections', function( data )
+	evo_rest_api_request( 'collections', { per_page: 0, list_in_frontoffice: 'all' }, function( data )
 	{	// Display the colllections on success request:
 		var coll_urlname = '';
 		var coll_name = '';
@@ -2417,7 +2490,7 @@ function evo_merge_load_coll_posts( coll_urlname, coll_name, page )
 
 	var current_post_exclude_param = '&pl=-' + jQuery( '#evo_merge_post_ID' ).val();
 
-	var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&paged=' + page;
+	var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&page=' + page;
 
 	evo_rest_api_start_loading( '#evo_merge_posts_list' );
 	evo_rest_api_request( 'collections/' + coll_urlname + '/items&orderby=datemodified&order=DESC' + current_post_exclude_param +page_param, function( data )
@@ -3105,6 +3178,15 @@ function check_categories( & $post_category, & $post_extracats, $Item = NULL, $f
 					unset($post_extracats[0]);
 				}
 				$post_extracats[] = $new_Chapter->ID;
+			}
+
+			// Set order for new created category:
+			$post_cat_orders = param( 'post_cat_orders', 'array:string' );
+			if( isset( $post_cat_orders[0] ) )
+			{
+				$post_cat_orders[ $new_Chapter->ID ] = $post_cat_orders[0];
+				unset( $post_cat_orders[0] );
+				set_param( 'post_cat_orders', $post_cat_orders );
 			}
 
 			$ChapterCache->add( $new_Chapter );
@@ -4086,8 +4168,8 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 		{	// Display a not of the custon field if it is filled:
 			$custom_field_note .= $custom_field['note'];
 		}
-		if( $custom_field['type'] != 'separator' )
-		{	// Display a field name/code:
+		if( is_admin_page() && $custom_field['type'] != 'separator' )
+		{	// Display a field name/code only in back-office:
 			$custom_field_note .= empty( $custom_field_note ) ? '' : ' &middot; ';
 			$custom_field_note .= T_('Field name').': <code>'.$custom_field['name'].'</code>';
 		}
@@ -4122,29 +4204,37 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 
 		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
 		$custom_field_label = render_custom_field( $custom_field['label'] );
+		if( ! empty( $custom_field['description'] ) )
+		{	// Display a description in tooltip of the help icon:
+			$custom_field_label .= ' '.get_icon( 'help', 'imgtag', array(
+					'data-toggle' => 'tooltip',
+					'title'       => nl2br( $custom_field['description'] ),
+					'class'       => 'grey',
+				) ).' ';
+		}
 
 		switch( $custom_field['type'] )
 		{
 			case 'double':
-				$Form->text_input( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
 				break;
 			case 'computed':
 				$Form->info( $custom_field_label, $edited_Item->get_custom_field_formatted( $custom_field['name'] ), $custom_field_note );
 				break;
 			case 'varchar':
-				$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
 				break;
 			case 'text':
-				$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
+				$Form->textarea_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
 				break;
 			case 'html':
-				$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
+				$Form->textarea_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
 				break;
 			case 'url':
-				$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
 				break;
 			case 'image':
-				$Form->text_input( 'item_image_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
 				break;
 			case 'separator':
 				if( is_admin_page() && $c > 0 )
@@ -4168,7 +4258,7 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 		    ! in_array( $custom_field['type'], array( 'computed', 'separator' ) ) ) // Theese fields don't have an editable value
 		{	// When input field is disabled and new item is creating
 			// we should create additional hidden input field because the disabled inputs are not submitted:
-			$Form->hidden( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ) );
+			$Form->hidden( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ) );
 		}
 
 		$c++;
@@ -4327,6 +4417,12 @@ function get_session_Item( $item_ID = 0, $force_new = false )
 		// Prefill data from url:
 		$edited_Item->set( 'title', param( 'post_title', 'string' ) );
 		$edited_Item->set( 'urltitle', param( 'post_urltitle', 'string' ) );
+		// Try to get this from request if it has been not initialized by controller:
+		$item_typ_ID = param( 'item_typ_ID', 'integer', NULL );
+		if( ! empty( $item_typ_ID ) )
+		{	// Set new post type ID only if it is defined on request:
+			$edited_Item->set( 'ityp_ID', $item_typ_ID );
+		}
 
 		return $edited_Item;
 	}
@@ -4515,7 +4611,7 @@ function items_manual_results_block( $params = array() )
 
 		if( $order_action == 'update' )
 		{ // Update an order to new value
-			$new_value = (int)param( 'new_value', 'string', 0 );
+			$new_value = param( 'new_value', 'string', '' );
 			$order_data = param( 'order_data', 'string' );
 			$order_data = explode( '-', $order_data );
 			$order_obj_ID = (int)$order_data[2];
@@ -4530,7 +4626,7 @@ function items_manual_results_block( $params = array() )
 						{
 							if( $current_User->check_perm( 'blog_cats', '', false, $updated_Chapter->blog_ID ) )
 							{ // Check permission to edit this Chapter
-								$updated_Chapter->set( 'order', $new_value );
+								$updated_Chapter->set( 'order', intval( $new_value ) );
 								$updated_Chapter->dbupdate();
 								$ChapterCache->clear();
 							}
@@ -4544,8 +4640,7 @@ function items_manual_results_block( $params = array() )
 						{
 							if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $updated_Item ) )
 							{ // Check permission to edit this Item
-								$updated_Item->set( 'order', $new_value );
-								$updated_Item->dbupdate();
+								$updated_Item->update_order( $new_value, $cat_ID );
 							}
 						}
 						break;
@@ -4573,6 +4668,10 @@ function items_manual_results_block( $params = array() )
 						);
 	$Table->cols[] = array(
 							'th' => T_('URL "slug"'),
+						);
+	$Table->cols[] = array(
+							'th' => T_('Status'),
+							'th_class' => 'shrinkwrap',
 						);
 	$Table->cols[] = array(
 							'th' => T_('Order'),
@@ -5271,6 +5370,41 @@ function ityp_schema_title( $schema )
 
 
 /**
+ * Get item types options for <select> which are enabled for collection
+ *
+ * @param integer Collection ID
+ * @param integer ID of Item Type which should be loaded in additional to enabled collection Item Types
+ * @param string Prefix before each key, e.g. used in order to keep original order in jeditable selector
+ * @param boolean TRUE to include option "No default type", Note: default category of the collection cannot use this option.
+ * @return array
+ */
+function collection_item_type_titles( $coll_ID, $item_type_ID = NULL, $key_prefix = '', $include_no_default_type = true )
+{
+	global $DB;
+
+	$SQL = new SQL( 'Get Item Type options for category' );
+	$SQL->SELECT( 'CONCAT( "'.$key_prefix.'", ityp_ID ), ityp_name' );
+	$SQL->FROM( 'T_items__type' );
+	$SQL->FROM_add( 'LEFT JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID' );
+	$SQL->WHERE( 'itc_coll_ID = '.$DB->quote( $coll_ID ) );
+	if( $item_type_ID > 0 )
+	{	// Load also current item type of this collection even if the Item Type already is not enabled for collection:
+		$SQL->WHERE_or( 'ityp_ID = '.$DB->quote( $item_type_ID ) );
+	}
+	$SQL->ORDER_BY( 'ityp_name' );
+
+	$item_type_options = array();
+	$item_type_options[$key_prefix.''] = T_('Same as collection default');
+	if( $include_no_default_type )
+	{	// Include this option only when it is requested:
+		$item_type_options[$key_prefix.'0'] = T_('No default type');
+	}
+
+	return $item_type_options + $DB->get_assoc( $SQL );
+}
+
+
+/**
  * Helper functions to display Items results.
  * New ( not display helper ) functions must be created above item_results function
  */
@@ -5383,9 +5517,10 @@ function item_row_type( $Item )
  *
  * @param object Item
  * @param integer Index of the row on page
+ * @param integer|NULL Category ID
  * @return string
  */
-function item_row_status( $Item, $index )
+function item_row_status( $Item, $index, $cat_ID = NULL )
 {
 	global $current_User, $AdminUI, $Collection, $admin_url;
 
@@ -5410,7 +5545,7 @@ function item_row_status( $Item, $index )
 		foreach( $status_options as $status_key => $status_title )
 		{
 			$r .= '<li rel="'.$status_key.'" role="presentation"><a href="'
-					.$admin_url.'?ctrl=items'.$tab_param.'&amp;blog='.$blog_ID.'&amp;action=update_status&amp;post_ID='.$Item->ID.'&amp;status='.$status_key.'&amp;'.url_crumb( 'item' )
+					.$admin_url.'?ctrl=items'.$tab_param.'&amp;blog='.$blog_ID.'&amp;action=update_status&amp;post_ID='.$Item->ID.'&amp;status='.$status_key.( $cat_ID === NULL ? '' : '&amp;cat_ID='.$cat_ID ).'&amp;'.url_crumb( 'item' )
 					.'" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
 		}
 		$r .= '</ul>'
@@ -5435,13 +5570,25 @@ function item_row_status( $Item, $index )
  */
 function item_row_order( $Item )
 {
-	global $current_User;
+	global $current_User, $ItemList;
 
-	$item_order = $Item->get( 'order' );
+	if( isset( $ItemList, $ItemList->filters['cat_array'] ) &&
+	    count ( $ItemList->filters['cat_array'] ) == 1 )
+	{	// Use order of single filtered category:
+		$order_cat_ID = $ItemList->filters['cat_array'][0];
+		$order_cat_attr = ' data-cat-id="'.$order_cat_ID.'"';
+	}
+	else
+	{	// Use order of main category:
+		$order_cat_ID = NULL;
+		$order_cat_attr = '';
+	}
+
+	$item_order = $Item->get_order( $order_cat_ID );
 
 	if( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{	// If current user can edit the Item then allow to edit an order by AJAX:
-		return '<a href="#" rel="'.$Item->ID.'">'.( $item_order === NULL ? '-' : $item_order ).'</a>';
+		return '<a href="#" rel="'.$Item->ID.'"'.$order_cat_attr.'>'.( $item_order === NULL ? '-' : $item_order ).'</a>';
 	}
 	else
 	{	// If current user cannot edit the Item then display a static text
@@ -5589,6 +5736,9 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 	// URL "slug"
 	$r .= '<td><a href="'.htmlspecialchars($Chapter->get_permanent_url()).'">'.$Chapter->dget('urlname').'</a></td>';
 
+	// Status:
+	$r .= '<td>&nbsp;</td>';
+
 	// Order
 	$order_attrs = '';// ' style="padding-left:'.( ( $level * 10 ) + 5 ).'px"';
 	$order_value = T_('Alphabetic');
@@ -5618,7 +5768,8 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 		if( $perm_create_item )
 		{ // Create new item
 			$redirect_to = '&amp;redirect_to='.urlencode( $admin_url.'?ctrl=items&tab=manual&cat_ID='.$Chapter->ID );
-			$r .= action_icon( T_('New manual page...'), 'new', $admin_url.'?ctrl=items&action=new&blog='.$Chapter->blog_ID.'&amp;cat='.$Chapter->ID.$redirect_to, NULL, NULL, NULL, array(), array( 'style' => 'width:12px' ) );
+			$default_item_type_param = ( $Chapter->get( 'ityp_ID' ) > 0 ? '&amp;item_typ_ID='.$Chapter->get( 'ityp_ID' ) : '' );
+			$r .= action_icon( T_('New manual page...'), 'new', $admin_url.'?ctrl=items&action=new&blog='.$Chapter->blog_ID.'&amp;cat='.$Chapter->ID.$default_item_type_param.$redirect_to, NULL, NULL, NULL, array(), array( 'style' => 'width:12px' ) );
 		}
 		if( $perm_edit )
 		{ // Delete chapter
@@ -5651,6 +5802,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	global $Session;
 
 	$result_fadeout = $Session->get( 'fadeout_array' );
+	$highlight_id = $Session->get( 'highlight_id' );
 
 	$params = array_merge( array(
 			'title_before' => '',
@@ -5668,7 +5820,8 @@ function manual_display_post_row( $Item, $level, $params = array() )
 
 	// Check if current item's row should be highlighted:
 	$is_highlighted = ( param( 'highlight_id', 'integer', NULL ) == $Item->ID ) ||
-		( isset( $result_fadeout ) && in_array( 'item-'.$Item->ID, $result_fadeout ) );
+		( isset( $result_fadeout ) && in_array( 'item-'.$Item->ID, $result_fadeout ) ) ||
+		( $highlight_id == $Item->ID );
 
 	$r = '<tr id="item-'.$Item->ID.'" class="'.$line_class.( $is_highlighted ? ' evo_highlight' : '' ).'">';
 
@@ -5712,6 +5865,9 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	}
 	$r .= '</td>';
 
+	// Status:
+	$r .= '<td>'.item_row_status( $Item, 0, $params['chapter_ID'] ).'</td>';
+
 	// Order
 	$order_attrs = '';// ' style="padding-left:'.( ( $level * 10 ) + 5 ).'px"';
 	$order_value = T_('Alphabetic');
@@ -5719,11 +5875,11 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	{
 		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 		{ // Add availability to edit an order if current user can edit this item
-			$order_attrs .= ' id="order-item-'.$Item->ID.'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
+			$order_attrs .= ' id="order-item-'.$Item->ID.'" data-cat="'.$params['chapter_ID'].'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
 		}
-		$order_value = $Item->dget('order');
+		$order_value = $Item->get_order( $params['chapter_ID'] );
 	}
-	$r .= '<td'.$order_attrs.'><span style="padding-left:'.$level.'em">'.$order_value.'</span></td>';
+	$r .= '<td'.$order_attrs.'><span style="padding-left:'.$level.'em">'.format_to_output( $order_value ).'</span></td>';
 
 	// Actions
 	$r .= '<td class="lastcol shrinkwrap">'.item_edit_actions( $Item ).'</td>';

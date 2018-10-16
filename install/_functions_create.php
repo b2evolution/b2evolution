@@ -281,6 +281,15 @@ function create_default_data()
 			'use_comments'   => 0,
 		);
 	$post_types[] = array(
+			'name'           => 'Widget Page',
+			'usage'          => 'widget-page',
+			'template_name'  => 'widget_page',
+			'perm_level'     => 'admin',
+			'use_text'       => 'never',
+			'use_comments'   => 0,
+			'use_coordinates'=> 'optional',
+		);
+	$post_types[] = array(
 			'name'           => 'Intro-Front',
 			'usage'          => 'intro-front',
 			'template_name'  => NULL,
@@ -412,6 +421,7 @@ function create_default_data()
 			'allow_disabling_comments' => 0,
 			'use_comment_expiration'   => 'optional',
 			'schema'                   => NULL,
+			'use_coordinates'          => 'never',
 		);
 	$post_types_sql = 'INSERT INTO T_items__type ( ityp_'.implode( ', ityp_', array_keys( $post_type_default_settings ) ).' ) VALUES ';
 	foreach( $post_types as $p => $post_type )
@@ -1514,7 +1524,7 @@ function create_default_jobs( $is_upgrade = false )
 			$cleanup_email_logs_key   => "( ".$DB->quote( form_date( $tomorrow, '08:30:00' ) ).", 86400, ".$DB->quote( $cleanup_email_logs_key ).", ".$ctsk_params." )",
 		);
 	if( $is_upgrade )
-	{ // Check if these jobs already exist, and don't create another
+	{	// Check if these jobs already exist, and don't create another
 		$SQL = new SQL();
 		$SQL->SELECT( 'COUNT( ctsk_ID ) AS job_number, ctsk_key' );
 		$SQL->FROM( 'T_cron__task' );
@@ -1524,14 +1534,14 @@ function create_default_jobs( $is_upgrade = false )
 		$SQL->GROUP_BY( 'ctsk_key' );
 		$result = $DB->get_results( $SQL->get() );
 		foreach( $result as $row )
-		{ // clear existing jobs insert values
+		{	// clear existing jobs insert values
 			unset( $insert_values[ $row->ctsk_key ] );
 		}
 	}
 
 	$values = implode( ', ', $insert_values );
 	if( empty( $values ) )
-	{ // nothing to create
+	{	// nothing to create
 		return;
 	}
 
@@ -1543,39 +1553,34 @@ function create_default_jobs( $is_upgrade = false )
 }
 
 
-function create_sample_organization()
-{
-	global $user_org_IDs, $admin_user;
 
-	task_begin( 'Creating sample organization...' );
-	$user_org_IDs = array( create_demo_organization( 1 )->ID );
-	task_end();
-
-	task_begin( 'Adding admin user to sample organization...' );
-	$admin_user->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
-	task_end();
-}
-
-
+/**
+ * Create demo users
+ *
+ * @param array Array of organization IDs
+ * @return  array Array of demo user objects
+ */
 function create_demo_users()
 {
 	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group, $blogb_Group;
-	global $mary_moderator_ID, $jay_moderator_ID, $dave_blogger_ID, $paul_blogger_ID, $larry_user_ID, $kate_user_ID;
-	global $user_org_IDs;
+
+	$demo_Users = array();
 
 	task_begin('Assigning avatar to Admin... ');
 	$UserCache = & get_UserCache();
+	$GroupCache = & get_GroupCache();
+	$normal_Group = & $GroupCache->get_by_name( 'Normal Users' );
 	$User_Admin = & $UserCache->get_by_ID( 1 );
 
 	global $media_path;
 	$src_admin_dir = $media_path.'users/admin';
 	$dest_admin_dir = $media_path.'users/'.$User_Admin->login;
 	if( $User_Admin->login != 'admin' )
-	{ // If admin login is not "admin" we should try to rename folder of the admin avatars
+	{	// If admin login is not "admin" we should try to rename folder of the admin avatars
 		if( ! file_exists( $src_admin_dir ) ||
 		    ! is_dir( $src_admin_dir ) ||
 		    ! @rename( $src_admin_dir, $dest_admin_dir ) )
-		{ // Impossible to rename the admin folder to another name
+		{	// Impossible to rename the admin folder to another name
 
 			// Display the errors:
 			echo get_install_format_text( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to rename <code>%s</code> to <code>%s</code>.', $src_admin_dir, $dest_admin_dir ).'</evo:error></span> ' );
@@ -1584,7 +1589,7 @@ function create_demo_users()
 			// Change admin login to "admin":
 			$User_Admin->set( 'login', 'admin' );
 			if( $User_Admin->dbupdate() )
-			{ // Change global var of admin login for report:
+			{	// Change global var of admin login for report:
 				global $install_login;
 				$install_login = 'admin';
 			}
@@ -1592,7 +1597,7 @@ function create_demo_users()
 	}
 
 	if( file_exists( $media_path.'users/'.$User_Admin->login ) )
-	{ // Do assign avatars to admin only if it the admin folder exists on the disk
+	{	// Do assign avatars to admin only if it the admin folder exists on the disk
 		assign_profile_picture( $User_Admin, 'admin' );
 
 		// Associate secondary picture:
@@ -1613,202 +1618,35 @@ function create_demo_users()
 	}
 	task_end();
 
-	task_begin('Creating demo user mary... ');
-	$mary_moderator = get_demo_user( 'mary', true, $moderators_Group->ID, $user_org_IDs );
-	if( $mary_moderator )
-	{
-		$mary_moderator_ID = $mary_moderator->ID;
-		task_end();
-	}
-	else
-	{
-		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
-	}
+	$demo_users = get_demo_users_defaults();
 
+	foreach( $demo_users as $demo_user )
+	{
+		task_begin( sprintf( 'Creating demo user %s...', $demo_user['login'] ) );
 
-	task_begin('Creating demo user jay... ');
-	$jay_moderator = get_demo_user( 'jay', true, $moderators_Group->ID, $user_org_IDs );
-	if( $jay_moderator )
-	{
-		$jay_moderator_ID = $jay_moderator->ID;
-		task_end();
-	}
-	else
-	{
-		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
-	}
-
-	task_begin('Creating demo user dave... ');
-	$dave_blogger = get_demo_user( 'dave', true, $editors_Group->ID, $user_org_IDs );
-	if( $dave_blogger )
-	{
-		$dave_blogger_ID = $dave_blogger->ID;
-		task_end();
-	}
-	else
-	{
-		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
-	}
-
-	task_begin('Creating demo user paul... ');
-	$paul_blogger = get_demo_user( 'paul', true, $editors_Group->ID, $user_org_IDs );
-	if( $paul_blogger )
-	{
-		$paul_blogger_ID = $paul_blogger->ID;
-		task_end();
-	}
-	else
-	{
-		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
-	}
-
-	task_begin('Creating demo user larry... ');
-	$larry_user = get_demo_user( 'larry', true, $users_Group->ID, NULL );
-	if( $larry_user )
-	{
-		$larry_user_ID = $larry_user->ID;
-		task_end();
-	}
-	else
-	{
-		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
-	}
-
-	task_begin('Creating demo user kate... ');
-	$kate_user = get_demo_user( 'kate', true, $users_Group->ID, NULL );
-	if( $kate_user )
-	{
-		$kate_user_ID = $kate_user->ID;
-		task_end();
-	}
-	else
-	{
-		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
-	}
-}
-
-
-/**
- * Creates sample private messages between admin and existing users
- *
- */
-function create_demo_messages()
-{
-	task_begin('Creating sample private messages... ');
-	global $UserSettings, $DB, $now, $localtimenow;
-
-	load_class( 'messaging/model/_thread.class.php', 'Thread' );
-	load_class( 'messaging/model/_message.class.php', 'Message' );
-	load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
-	$UserSettings = new UserSettings();
-	$UserCache = & get_UserCache();
-
-	$users_SQL = new SQL();
-	$users_SQL->SELECT( 'user_ID, user_login' );
-	$users_SQL->FROM( 'T_users' );
-	$users_SQL->WHERE( 'NOT user_ID  = 1' );
-	$users_SQL->ORDER_BY( 'user_ID' );
-	$users = $DB->get_results( $users_SQL->get() );
-
-	for( $i = 0; $i < count( $users ); $i++ )
-	{
-		if( $i % 2 == 0 )
+		$user_Group = & $GroupCache->get_by_name( $demo_user['group'], false, false );
+		if( $user_Group )
 		{
-			$author_ID = 1;
-			$recipient_ID = $users[$i]->user_ID;
+			$group_ID = $user_Group->ID;
 		}
 		else
 		{
-			$author_ID = $users[$i]->user_ID;
-			$recipient_ID = 1;
+			$group_ID = $normal_Group->ID;
 		}
 
-		$author_User = & $UserCache->get_by_ID( $author_ID );
-		$recipient_User = & $UserCache->get_by_ID( $recipient_ID );
-
-		$loop_Thread = new Thread();
-		$loop_Message = new Message();
-
-		// Initial message
-		$loop_Message->Thread = $loop_Thread;
-		$loop_Message->Thread->set_param( 'datemodified', 'string', date( 'Y-m-d H:i:s', $localtimenow - 60 ) );
-		$loop_Message->Thread->set( 'title', sprintf( T_('Demo private conversation #%s'), $i + 1 ) );
-		$loop_Message->Thread->recipients_list = array( $recipient_ID );
-		$loop_Message->set( 'author_user_ID', $author_ID );
-		$loop_Message->creator_user_ID = $author_ID;
-		$loop_Message->set( 'text', sprintf( T_('This is a demo private message to %s.'), $recipient_User->login ) );
-
-		$DB->begin();
-		$conversation_saved = false;
-		if( $loop_Message->Thread->dbinsert() )
+		$demo_User = get_demo_user( $demo_user['login'], true, $group_ID, '#' );
+		if( $demo_User )
 		{
-			$loop_Message->set_param( 'thread_ID', 'integer', $loop_Message->Thread->ID );
-			if( $loop_Message->dbinsert() )
-			{
-				if( $loop_Message->dbinsert_threadstatus( $loop_Message->Thread->recipients_list ) )
-				{
-					if( $loop_Message->dbinsert_contacts( $loop_Message->Thread->recipients_list ) )
-					{
-						if( $loop_Message->dbupdate_last_contact_datetime() )
-						{
-							$conversation_saved = true;
-						}
-					}
-				}
-			}
+			$demo_Users[ $demo_user['login'] ] = $demo_User;
+			task_end();
 		}
-
-		if( $conversation_saved )
+		else
 		{
-			$conversation_saved = false;
-
-			// Reply message
-			$loop_reply_Message = new Message();
-			$loop_reply_Message->Thread = $loop_Thread;
-			$loop_reply_Message->set( 'author_user_ID', $recipient_ID );
-			$loop_reply_Message->creator_user_ID = $author_ID;
-			$loop_reply_Message->set( 'text', sprintf( T_('This is a demo private reply to %s.'), $author_User->login ) );
-			$loop_reply_Message->set_param( 'thread_ID', 'integer', $loop_reply_Message->Thread->ID );
-
-			if( $loop_reply_Message->dbinsert() )
-			{
-				// Mark reply message as unread by initiator
-				$sql = 'UPDATE T_messaging__threadstatus
-						SET tsta_first_unread_msg_ID = '.$loop_reply_Message->ID.'
-						WHERE tsta_thread_ID = '.$loop_reply_Message->Thread->ID.'
-							AND tsta_user_ID = '.$author_ID.'
-							AND tsta_first_unread_msg_ID IS NULL';
-				$DB->query( $sql, 'Insert thread statuses' );
-
-				// Mark all messages as read by recipient
-				$sql = 'UPDATE T_messaging__threadstatus
-						SET tsta_first_unread_msg_ID = NULL
-						WHERE tsta_thread_ID = '.$loop_reply_Message->Thread->ID.'
-							AND tsta_user_ID = '.$recipient_ID;
-				$DB->query( $sql, 'Insert thread statuses' );
-
-				// check if contact pairs between sender and recipients exists
-				$recipient_list = $loop_reply_Message->Thread->load_recipients();
-				// remove author user from recipient list
-				$recipient_list = array_diff( $recipient_list, array( $loop_reply_Message->author_user_ID ) );
-				// insert missing contact pairs if required
-				if( $loop_reply_Message->dbinsert_contacts( $recipient_list ) )
-				{
-					if( $loop_reply_Message->dbupdate_last_contact_datetime() )
-					{
-						$DB->commit();
-						$conversation_saved = true;
-					}
-				}
-			}
-		}
-
-		if( ! $conversation_saved )
-		{
-			$DB->rollback();
+			task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
 		}
 	}
-	task_end();
+
+	return $demo_Users;
 }
 
 
@@ -1816,25 +1654,22 @@ function create_demo_messages()
  * This is called only for fresh installs and fills the tables with
  * demo/tutorial things.
  */
-function create_demo_contents()
+function create_demo_contents( $demo_users = array() )
 {
 	global $baseurl, $admin_url;
 	global $random_password, $query;
 	global $timestamp, $admin_email;
-	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $blogb_Group;
 	global $DB;
 	global $default_locale, $default_country;
 	global $Plugins;
 	global $install_test_features;
-	global $user_org_IDs;
-	global $mary_moderator_ID, $jay_moderator_ID, $dave_blogger_ID, $paul_blogger_ID, $larry_user_ID, $kate_user_ID;
 	global $admin_user;
 	global $create_demo_users;
 	global $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $blog_tracker_ID;
 
 	// Global exception handler function
 	function demo_content_error_handler( $errno, $errstr, $errfile, $errline )
-	{ // handle only E_USER_NOTICE
+	{	// handle only E_USER_NOTICE
 		if( $errno == E_USER_NOTICE )
 		{
 			echo get_install_format_text( '<span class="text-warning"><evo:warning>'.$errstr.'</evo:warning></span> ' );
@@ -1844,36 +1679,12 @@ function create_demo_contents()
 	// Set global exception handler
 	set_error_handler( "demo_content_error_handler" );
 
-	if( ! isset( $mary_moderator_ID ) )
-	{
-		$mary_moderator_ID = $admin_user->ID;
-	}
-
-	if( ! isset( $jay_moderator_ID ) )
-	{
-		$jay_moderator_ID = $admin_user->ID;
-	}
-
-	if( ! isset( $dave_blogger_ID ) )
-	{
-		$dave_blogger_ID = $admin_user->ID;
-	}
-
-	if( ! isset( $paul_blogger_ID ) )
-	{
-		$paul_blogger_ID = $admin_user->ID;
-	}
-
-	if( ! isset( $larry_user_ID ) )
-	{
-		$larry_user_ID = $admin_user->ID;
-	}
-
-	if( ! isset( $kate_user_ID ) )
-	{
-		$kate_user_ID = $admin_user->ID;
-	}
-
+	$mary_moderator_ID = isset( $demo_users['mary'] ) ? $demo_users['mary']->ID : $admin_user->ID;
+	$jay_moderator_ID  = isset( $demo_users['jay'] ) ? $demo_users['jay']->ID : $admin_user->ID;
+	$dave_blogger_ID   = isset( $demo_users['dave'] ) ? $demo_users['dave']->ID : $admin_user->ID;
+	$paul_blogger_ID   = isset( $demo_users['paul'] ) ? $demo_users['paul']->ID : $admin_user->ID;
+	$larry_user_ID     = isset( $demo_users['larry'] ) ? $demo_users['larry']->ID : $admin_user->ID;
+	$kate_user_ID      = isset( $demo_users['kate'] ) ? $demo_users['kate']->ID : $admin_user->ID;
 
 	/**
 	 * @var FileRootCache
@@ -1944,7 +1755,7 @@ function create_demo_contents()
 	$timeshift = 0;
 
 	if( $install_collection_home )
-	{ // Install Home blog
+	{	// Install Home blog
 		task_begin( 'Creating Home collection...' );
 		$blog_home_ID = create_demo_collection( 'main', $jay_moderator_ID, $create_demo_users, $timeshift, 2 );
 		update_install_progress_bar();
@@ -1952,7 +1763,7 @@ function create_demo_contents()
 	}
 
 	if( $install_collection_bloga )
-	{ // Install Blog A
+	{	// Install Blog A
 		$timeshift += 86400;
 		task_begin( 'Creating Blog A collection...' );
 		$blog_a_ID = create_demo_collection( 'blog_a', $jay_moderator_ID, $create_demo_users, $timeshift, 3 );
@@ -1961,7 +1772,7 @@ function create_demo_contents()
 	}
 
 	if( $install_collection_blogb )
-	{ // Install Blog B
+	{	// Install Blog B
 		$timeshift += 86400;
 		task_begin( 'Creating Blog B collection...' );
 		$blog_b_ID = create_demo_collection( 'blog_b', $paul_blogger_ID, $create_demo_users, $timeshift, 3 );
@@ -1970,7 +1781,7 @@ function create_demo_contents()
 	}
 
 	if( $install_collection_photos )
-	{ // Install Photos blog
+	{	// Install Photos blog
 		$timeshift += 86400;
 		task_begin( 'Creating Photos collection...' );
 		$blog_photoblog_ID = create_demo_collection( 'photo', $dave_blogger_ID, $create_demo_users, $timeshift, 4 );
@@ -1979,7 +1790,7 @@ function create_demo_contents()
 	}
 
 	if( $install_collection_forums )
-	{ // Install Forums blog
+	{	// Install Forums blog
 		$timeshift += 86400;
 		task_begin( 'Creating Forums collection...' );
 		$blog_forums_ID = create_demo_collection( 'forum', $paul_blogger_ID, $create_demo_users, $timeshift, 5 );
@@ -1988,7 +1799,7 @@ function create_demo_contents()
 	}
 
 	if( $install_collection_manual )
-	{ // Install Manual blog
+	{	// Install Manual blog
 		$timeshift += 86400;
 		task_begin( 'Creating Manual collection...' );
 		$blog_manual_ID = create_demo_collection( 'manual', $dave_blogger_ID, $create_demo_users, $timeshift, 6 );
@@ -1997,7 +1808,7 @@ function create_demo_contents()
 	}
 
 	if( $install_collection_tracker )
-	{ // Install Tracker blog
+	{	// Install Tracker blog
 		$timeshift += 86400;
 		task_begin( 'Creating Tracker collection...' );
 		$blog_tracker_ID = create_demo_collection( 'group', $jay_moderator_ID, $create_demo_users, $timeshift, 5 );
@@ -2006,7 +1817,7 @@ function create_demo_contents()
 	}
 
 	if( $install_collection_minisite )
-	{ // Install Mini-site collection
+	{	// Install Mini-site collection
 		task_begin( 'Creating Mini-Site collection...' );
 		$blog_minisite_ID = create_demo_collection( 'minisite', $jay_moderator_ID, $create_demo_users, $timeshift, 1 );
 		update_install_progress_bar();
@@ -2025,7 +1836,7 @@ function create_demo_contents()
 	else
 	{
 		if( $first_Blog = & $BlogCache->get_by_ID( 1, false, false ) )
-		{ // Set first blog as default login and default messaging collection
+		{	// Set first blog as default login and default messaging collection
 			$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
 				VALUES ( '.$DB->quote( 'login_blog_ID' ).', '.$DB->quote( $first_Blog->ID ).' ),
 							( '.$DB->quote( 'msg_blog_ID' ).', '.$DB->quote( $first_Blog->ID ).' )' );
@@ -2062,23 +1873,7 @@ function create_demo_contents()
 
 
 	task_begin( 'Creating default polls... ' );
-	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text, pqst_max_answers )
-		VALUES ( 1, "What are your favorite b2evolution features?", 3 )' );
-	$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
-		VALUES ( 1, "Multiple blogs",          1 ),
-		       ( 1, "Photo Galleries",         2 ),
-		       ( 1, "Forums",                  3 ),
-		       ( 1, "Online Manuals",          4 ),
-		       ( 1, "Lists / E-mailing", 5 ),
-		       ( 1, "Easy Maintenance",        6 )' );
-	$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
-		VALUES ( 1, 5, 1 ), ( 1, 5, 5 ), ( 1, 5, 6 ),
-		       ( 1, 6, 2 ), ( 1, 6, 5 ), ( 1, 6, 1 ),
-		       ( 1, 7, 2 ), ( 1, 7, 5 ), ( 1, 6, 3 ),
-		       ( 1, 2, 2 ), ( 1, 2, 5 ), ( 1, 2, 4 ),
-		       ( 1, 3, 3 ), ( 1, 3, 5 ), ( 1, 3, 1 ),
-		       ( 1, 4, 3 ), ( 1, 4, 6 ), ( 1, 4, 2 ),
-		       ( 1, 1, 6 ), ( 1, 1, 5 ), ( 1, 1, 3 )' );
+	create_demo_poll();
 	task_end();
 
 
@@ -2089,7 +1884,7 @@ function create_demo_contents()
 	create_default_posts_location();
 
 	// Installing default widgets for all collections:
-	install_basic_widgets();
+	//install_basic_widgets();
 
 	load_funcs( 'tools/model/_system.funcs.php' );
 	system_init_caches( true, true ); // Outputs messages

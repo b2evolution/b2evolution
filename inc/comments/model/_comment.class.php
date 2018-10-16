@@ -1434,7 +1434,7 @@ class Comment extends DataObject
 	function author_url_with_actions( $redirect_to = NULL, $ajax_button = false, $check_perms = true, $save_context = true )
 	{
 		global $current_User;
-		if( $this->author_url( '', ' <span &bull; Url: id="commenturl_'.$this->ID.'" <span class="bUrl" >', '' ) )
+		if( $this->author_url( '', ' &bull; Url: <span id="commenturl_'.$this->ID.'" class="bUrl">', '' ) )
 		{ // There is an URL
 			if( ! $this->get_author_User() && $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
 			{ // Author is anonymous user and we have permission to edit this comment...

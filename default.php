@@ -116,10 +116,10 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 
 			if( count( $BlogCache->cache ) == 0 )
 			{ // There is no blog on this system!
-				echo '<p><strong>'.T_('b2evolution is installed and ready but you haven\'t created any content collection on this system yet.').'</strong></p>';
+				echo '<p><strong>'.T_('Your b2evolution installation is installed and working but there is no content yet.').'</strong></p>';
 
 				// Display this link to create blog
-				echo '<ul class="pager"><li class="next"><a href="'.$admin_url.'?ctrl=collections&amp;action=new&amp;redirect_to='.rawurlencode( regenerate_url() ).'">'.T_( 'Create a first collection' ).' <span aria-hidden="true">&rarr;</span></a></li></ul>';
+				echo '<ul class="pager"><li class="next"><a href="'.$admin_url.'?ctrl=dashboard">'.T_( 'Go to the dashboard & start creating' ).' <span aria-hidden="true">&rarr;</span></a></li></ul>';
 			}
 			else
 			{
@@ -170,7 +170,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 			<footer class="footer">
 				<p class="pull-right"><a href="https://github.com/b2evolution/b2evolution" class="text-nowrap"><?php echo T_('GitHub page'); ?></a></p>
 				<p><a href="http://b2evolution.net/" class="text-nowrap">b2evolution.net</a>
-				&bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" class="text-nowrap"><?php echo T_('Find a host'); ?></a>
+				&bull; <a href="https://b2evolution.net/web-hosting/cheap-plans/" class="text-nowrap"><?php echo T_('Find a host'); ?></a>
 				&bull; <a href="http://b2evolution.net/man/" class="text-nowrap"><?php echo T_('Online manual'); ?></a>
 				&bull; <a href="http://forums.b2evolution.net" class="text-nowrap"><?php echo T_('Help forums'); ?></a>
 				</p>

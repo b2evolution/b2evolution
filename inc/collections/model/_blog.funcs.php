@@ -2553,10 +2553,6 @@ function blog_row_type( $coll_type, $coll_ID )
 	{ // This blog is default
 		$r .= action_icon( T_('Default collection to display'), 'coll_default', $admin_url.'?ctrl=collections&amp;tab=site_settings' );
 	}
-	if( $coll_ID == $Settings->get( 'info_blog_ID' ) )
-	{ // This blog is used for info
-		$r .= action_icon( T_('Collection for info pages'), 'coll_info', $admin_url.'?ctrl=collections&amp;tab=site_settings' );
-	}
 	if( $coll_ID == $Settings->get( 'login_blog_ID' ) )
 	{ // This blog is used for login actions
 		$r .= action_icon( T_('Collection for login/registration'), 'coll_login', $admin_url.'?ctrl=collections&amp;tab=site_settings' );
@@ -2564,6 +2560,10 @@ function blog_row_type( $coll_type, $coll_ID )
 	if( $coll_ID == $Settings->get( 'msg_blog_ID' ) )
 	{ // This blog is used for messaging
 		$r .= action_icon( T_('Collection for profiles/messaging'), 'coll_message', $admin_url.'?ctrl=collections&amp;tab=site_settings' );
+	}
+	if( $coll_ID == $Settings->get( 'info_blog_ID' ) )
+	{ // This blog is used for info
+		$r .= action_icon( T_('Collection for shared content blocks'), 'coll_info', $admin_url.'?ctrl=collections&amp;tab=site_settings' );
 	}
 
 	return $r;

@@ -121,70 +121,35 @@ class item_next_previous_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item, $disp;
-
-		if( isset( $params['ignored_widgets'] ) && in_array( $this->code, $params['ignored_widgets'] ) )
-		{
-			return false;
-		}
-
-		$params = array_merge( array(
-				'widget_item_next_previous_block_start'    => '',
-				'widget_item_next_previous_block_end'      => '',
-				'widget_item_next_previous_template'       => '$prev$$separator$$next$',
-				'widget_item_next_previous_prev_start'     => '',
-				'widget_item_next_previous_prev_text'      => '&laquo; $title$',
-				'widget_item_next_previous_prev_end'       => '',
-				'widget_item_next_previous_prev_no_item'   => '',
-				'widget_item_next_previous_prev_class'     => '',
-				'widget_item_next_previous_separator'      => '',
-				'widget_item_next_previous_next_start'     => '',
-				'widget_item_next_previous_next_text'      => '$title$ &raquo;',
-				'widget_item_next_previous_next_end'       => '',
-				'widget_item_next_previous_next_no_item'   => '',
-				'widget_item_next_previous_next_class'     => '',
-				'widget_item_next_previous_target_blog'    => '',
-				'widget_item_next_previous_post_navigation'=> NULL,
-				'widget_item_next_previous_itemtype_usage' => 'post', // Include only post with type usage "post"
-				'widget_item_next_previous_featured'       => NULL,
-			), $params );
+		global $disp;
 
 		$this->init_display( $params );
 
-		if( $disp == 'single' )
+		$this->disp_params = array_merge( array(
+				'widget_item_next_previous_display' => true,
+				'widget_item_next_previous_params' => array(
+						'block_start' => '',
+						'block_end' => '',
+					),
+			), $this->disp_params );
+
+		if( $this->disp_params['widget_item_next_previous_display'] && $disp == 'single' )
 		{
 			echo $this->disp_params['block_start'];
 			$this->disp_title();
 			echo $this->disp_params['block_body_start'];
 
-			item_prevnext_links( array(
-				'block_start'    => $params['widget_item_next_previous_block_start'],
-				'block_end'      => $params['widget_item_next_previous_block_end'],
-				'template'       => $params['widget_item_next_previous_template'],
-				'prev_start'     => $params['widget_item_next_previous_prev_start'],
-				'prev_text'      => $params['widget_item_next_previous_prev_text'],
-				'prev_end'       => $params['widget_item_next_previous_prev_end'],
-				'prev_no_item'   => $params['widget_item_next_previous_prev_no_item'],
-				'prev_class'     => $params['widget_item_next_previous_prev_class'],
-				'separator'      => $params['widget_item_next_previous_separator'],
-				'next_start'     => $params['widget_item_next_previous_next_start'],
-				'next_text'      => $params['widget_item_next_previous_next_text'],
-				'next_end'       => $params['widget_item_next_previous_next_end'],
-				'next_no_item'   => $params['widget_item_next_previous_next_no_item'],
-				'next_class'     => $params['widget_item_next_previous_next_class'],
-				'target_blog'    => $params['widget_item_next_previous_target_blog'],
-				'post_navigation'=> $params['widget_item_next_previous_post_navigation'],
-				'itemtype_usage' => $params['widget_item_next_previous_itemtype_usage'],
-				'featured'       => $params['widget_item_next_previous_featured'],
-			) );
+			item_prevnext_links( $this->disp_params['widget_item_next_previous_params'] );
 
 			echo $this->disp_params['block_body_end'];
 			echo $this->disp_params['block_end'];
 
 			return true;
 		}
-
-		return false;
+		else
+		{
+			return false;
+		}
 	}
 }
 

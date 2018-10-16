@@ -88,12 +88,6 @@ class user_register_quick_Widget extends ComponentWidget
 		// Load all active newsletters:
 		$NewsletterCache = & get_NewsletterCache();
 		$load_where = 'enlt_active = 1';
-		/*$selected_newsletters = $this->get_param( 'newsletters', true );
-		if( empty( $params['infinite_loop'] ) && ! empty( $selected_newsletters ) )
-		{	// Load additional newsletters which are currently used by this widget:
-			global $DB;
-			$load_where .= ' OR enlt_ID IN ( '.$DB->quote( array_keys( $selected_newsletters ) ).' )';
-		}*/
 		$NewsletterCache->load_where( $load_where );
 		// Initialize checkbox options for param "Newsletter":
 		$def_newsletters = explode( ',', $Settings->get( 'def_newsletters' ) );
@@ -179,7 +173,7 @@ class user_register_quick_Widget extends ComponentWidget
 				),
 				'subscribe_post_mod' => array(
 					'label' => '',
-					'note' => T_('check to auto subscribe new user to current collection when a post is modified and it has permissions to moderate it'),
+					'note' => T_('check to auto subscribe new user to current collection when a post is modified and user has permission to moderate it'),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),

@@ -151,10 +151,10 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 	?>
 	<div class="evo_customizer__wrapper">
 		<div class="evo_customizer__left">
-			<iframe id="evo_customizer__backoffice" src="<?php echo $admin_url.'?ctrl=customize&amp;view='.$view.'&amp;blog='.$blog; ?>" data-instance="<?php echo $instance_name; ?>" data-coll-id="<?php echo $Blog->ID; ?>"></iframe>
+			<iframe id="evo_customizer__backoffice" name="evo_customizer__backoffice" src="<?php echo $admin_url.'?ctrl=customize&amp;view='.$view.'&amp;blog='.$blog; ?>" data-instance="<?php echo $instance_name; ?>" data-coll-id="<?php echo $Blog->ID; ?>"></iframe>
 		</div>
 		<div class="evo_customizer__right">
-			<iframe id="evo_customizer__frontoffice" src="<?php echo url_add_param( $customizing_url, 'customizer_mode=enable&amp;show_toolbar=hidden&amp;redir=no' ); ?>" data-coll-url="<?php echo format_to_output( $Blog->get( 'url' ), 'htmlattr' ); ?>"></iframe>
+			<iframe id="evo_customizer__frontoffice" name="evo_customizer__frontoffice" src="<?php echo url_add_param( $customizing_url, 'customizer_mode=enable&amp;show_toolbar=hidden&amp;redir=no' ); ?>" data-coll-url="<?php echo format_to_output( $Blog->get( 'url' ), 'htmlattr' ); ?>"></iframe>
 			<div id="evo_customizer__frontoffice_loader"></div>
 		</div>
 		<iframe id="evo_customizer__updater" name="evo_customizer__updater" style="display:none"></iframe>

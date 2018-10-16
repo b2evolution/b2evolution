@@ -1491,7 +1491,7 @@ class User extends DataObject
 					$subscribe_blog_ID = param( 'subscribe_blog', 'integer', 0 );
 
 					$sub_items    = 1;
-					$sub_items_mod = 1;
+					$sub_items_mod = 0;
 					$sub_comments = 0; // We normally subscribe to new posts only
 
 					// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
@@ -1658,7 +1658,7 @@ class User extends DataObject
 							$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
 							$sub_items_mod = param( 'sub_items_mod_'.$loop_blog_ID, 'integer', 0 );
 
-							if( $sub_items || $sub_comments )
+							if( $sub_items || $sub_comments || $sub_items_mod )
 							{	// We have a subscription for this blog
 								$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_items_mod, $sub_comments )";
 							}
@@ -7220,7 +7220,7 @@ class User extends DataObject
 	function get_organizations_data()
 	{
 		if( ! isset( $this->organizations ) )
-		{ // Get the organizations from DB
+		{	// Get the organizations from DB
 			global $DB;
 			$SQL = new SQL();
 			$SQL->SELECT( 'org_ID, org_name, uorg_accepted, uorg_role, uorg_priority' );

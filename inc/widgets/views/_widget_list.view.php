@@ -24,7 +24,6 @@ if( empty( $skin_ID ) && get_param( 'skin_type' ) != 'normal' )
 }
 else
 {	// Allow to control widgets if different skin is used for mobile/tablet:
-	global $container_Widget_array;
 
 	// Load widgets for current collection:
 	$WidgetCache = & get_WidgetCache();
@@ -41,22 +40,50 @@ else
 
 	echo '<div class="row">';
 
-	echo '<div class="col-md-6 col-sm-12">';
+	// Skin Containers:
+	echo '<div class="col-md-4 col-sm-12">';
 		echo '<h4 class="pull-left">'.T_('Skin Containers').'</h4>';
 		// Display a button to scan skin for widgets:
 		echo action_icon( T_('Reload container definitions'), 'reload',
 			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;skin_type='.get_param( 'skin_type' ).'&amp;'.url_crumb('widget'), T_('Reload container definitions'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info pull-right' ) );
 		echo '<div class="clearfix"></div>';
-		display_containers( get_param( 'skin_type' ), true );
+		display_containers( get_param( 'skin_type' ), 'main' );
 	echo '</div>';
 
-	echo '<div class="col-md-6 col-sm-12">';
+	// Sub-Containers & Page Containers:
+	echo '<div class="col-md-4 col-sm-12">';
+		// Sub-Containers:
 		echo '<h4 class="pull-left">'.T_('Sub-Containers').'</h4>';
 		// Display a button to add new sub-container:
 		echo action_icon( T_('Add Sub-Container'), 'add',
-				$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;skin_type='.get_param( 'skin_type' ), T_('Add Sub-Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=sub&amp;skin_type='.get_param( 'skin_type' ), T_('Add Sub-Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
 		echo '<div class="clearfix"></div>';
-		display_containers( get_param( 'skin_type' ), false );
+		display_containers( get_param( 'skin_type' ), 'sub' );
+
+		// Page Containers:
+		echo '<h4 class="pull-left">'.T_('Page Containers').'</h4>';
+		// Display a button to add new page container:
+		echo action_icon( T_('Add Page container'), 'add',
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=page&amp;skin_type='.get_param( 'skin_type' ), T_('Add Page Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
+		echo '<div class="clearfix"></div>';
+		display_containers( get_param( 'skin_type' ), 'page' );
+	echo '</div>';
+
+	// Shared Main and Sub Containers:
+	echo '<div class="col-md-4 col-sm-12">';
+		echo '<h4 class="pull-left">'.T_('Shared Containers').'</h4>';
+		// Display a button to add new shared container:
+		echo action_icon( T_('Add Shared Container'), 'add',
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=shared&amp;skin_type='.get_param( 'skin_type' ), T_('Add Shared Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
+		echo '<div class="clearfix"></div>';
+		display_containers( get_param( 'skin_type' ), 'shared' );
+
+		echo '<h4 class="pull-left">'.T_('Shared Sub-Containers').'</h4>';
+		// Display a button to add new shared container:
+		echo action_icon( T_('Add Shared Sub-Container'), 'add',
+			$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=new_container&amp;container_type=shared-sub&amp;skin_type='.get_param( 'skin_type' ), T_('Add Shared Sub-Container').' &raquo;', 3, 4, array( 'class' => 'action_icon hoverlink btn btn-default pull-right' ) );
+		echo '<div class="clearfix"></div>';
+		display_containers( get_param( 'skin_type' ), 'shared-sub' );
 	echo '</div>';
 
 	echo '</div>';

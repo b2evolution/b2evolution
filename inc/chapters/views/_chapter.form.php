@@ -79,21 +79,30 @@ $Form->begin_fieldset( T_('Properties').get_manual_link( 'categories-tab' ) );
 
 	$Form->checkbox_input( 'cat_meta', $edited_Chapter->meta, T_('Meta category'), array( 'note' => T_('If you check this box you will not be able to put any posts into this category.') ) );
 
-	$Form->checkbox_input( 'cat_lock', $edited_Chapter->lock, T_('Locked category'), array( 'note' => T_('Check this to lock all posts under this category. (Note: for posts with multiple categories, the post is only locked if *all* its categories are locked.)') ) );
+	echo '<div id="cat_ityp_ID_selector"'.( $edited_Chapter->get( 'meta' ) ? ' style="display:none"' : '' ).'>';
+	// Include "No default type" option only for not default category of the collection:
+	$include_no_default_option = ( $edited_Chapter->ID == 0 || ( ( $cat_Blog = & $edited_Chapter->get_Blog() ) && $cat_Blog->get_default_cat_ID() != $edited_Chapter->ID ) );
+	$item_type_options = collection_item_type_titles( $edited_Chapter->get( 'blog_ID' ), $edited_Chapter->get( 'ityp_ID' ), '', $include_no_default_option );
+	$Form->select_input_array( 'cat_ityp_ID', $edited_Chapter->ityp_ID, $item_type_options, T_('Default Item Type'), NULL, array( 'force_keys_as_values' => true ) );
+	echo '</div>';
 
-	$item_type_options = array( NULL => T_('Default of this collection'), 'disabled' => T_('Disabled') );
-	$item_types_SQL = new SQL();
-	$item_types_SQL->SELECT( 'ityp_ID, ityp_name' );
-	$item_types_SQL->FROM( 'T_items__type' );
-	$item_types_SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID AND itc_coll_ID = '.$edited_Blog->ID );
-	$item_types_SQL->ORDER_BY( 'ityp_ID' );
-	$item_types = $DB->get_assoc( $item_types_SQL->get() );
-	$item_type_options = $item_type_options + $item_types;
-	$Form->select_input_array( 'cat_default_item_type_ID', $edited_Blog->get_setting( 'default_item_type_cat_'.$edited_Chapter->ID ),
-			$item_type_options, T_('Default Item type for new items'), NULL, array( 'force_keys_as_values' => true ) );
+	$Form->checkbox_input( 'cat_lock', $edited_Chapter->lock, T_('Locked category'), array( 'note' => T_('Check this to lock all posts under this category. (Note: for posts with multiple categories, the post is only locked if *all* its categories are locked.)') ) );
 
 $Form->end_fieldset();
 
 $Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
 
 ?>
+<script type="text/javascript">
+jQuery( '#cat_meta' ).click( function()
+{	// Show/Hide selector of default Item Type depending on meta setting:
+	if( jQuery( this ).prop( 'checked' ) )
+	{
+		jQuery( '#cat_ityp_ID_selector' ).hide();
+	}
+	else
+	{
+		jQuery( '#cat_ityp_ID_selector' ).show();
+	}
+} );
+</script>

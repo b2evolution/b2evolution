@@ -338,7 +338,20 @@ class Skin extends DataObject
 				'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
 				'container_start' => '',
 				'container_end'   => '',
+				// Restriction for Page Containers:
+				'container_item_ID' => NULL,
 			), $params );
+
+		$WidgetContainer = isset( $params['WidgetContainer'] ) ? $params['WidgetContainer'] : NULL;
+
+		if( ! empty( $WidgetContainer ) && $WidgetContainer->get( 'coll_ID' ) == 0 )
+		{	// Shared container:
+			$widgets_coll_ID = '';
+		}
+		else
+		{	// Collection/skin container:
+			$widgets_coll_ID = $Blog->ID;
+		}
 
 		if( $container_code === NULL )
 		{	// Try to detect container in DB by name:
@@ -378,13 +391,22 @@ class Skin extends DataObject
 			$container_params['container_display_if_empty'] = true;
 		}
 
-		/**
-		 * @var EnabledWidgetCache
-		 */
-		$EnabledWidgetCache = & get_EnabledWidgetCache();
-		$Widget_array = & $EnabledWidgetCache->get_by_coll_container( $Blog->ID,
-			( $container_code === NULL ? $sco_name : $container_code ),// Use container code if it is defined, otherwise use container name
-			( $container_code !== NULL ) );// Get by container code if it is defined
+		if( $params['container_item_ID'] !== NULL )
+		{	// Check restriction for page containers:
+			if( empty( $WidgetContainer ) ||
+			    ( $WidgetContainer->get_type() == 'page' && $WidgetContainer->get( 'item_ID' ) != $params['container_item_ID'] ) )
+			{	// We should not try to get widgets from this container, because it is a not proper page container:
+				$Widget_array = array();
+			}
+		}
+
+		if( ! isset( $Widget_array ) )
+		{	// Get enabled widget for the container:
+			$EnabledWidgetCache = & get_EnabledWidgetCache();
+			$Widget_array = & $EnabledWidgetCache->get_by_coll_container( $widgets_coll_ID,
+				( $container_code === NULL ? $sco_name : $container_code ),// Use container code if it is defined, otherwise use container name
+				( $container_code !== NULL ) );// Get by container code if it is defined
+		}
 
 		if( ! empty( $Widget_array ) )
 		{
@@ -1299,6 +1321,8 @@ class Skin extends DataObject
 				case 'disp_search':
 					// Used to suggest usernames for the field "Recipients":
 					init_tokeninput_js( 'blog' );
+					// Initialize JS to autcomplete user logins and date picker to edit workflow properties:
+					init_autocomplete_login_js( 'blog', $this->get_template( 'autocomplete_plugin' ) );
 					break;
 
 				case 'disp_login':
@@ -1400,8 +1424,8 @@ class Skin extends DataObject
 					require_js( 'multiupload/fine-uploader.js', 'blog' );
 					require_css( 'fine-uploader.css', 'blog' );
 					// Load JS files to make the links table sortable:
-					require_js( '#jquery#' );
-					require_js( 'jquery/jquery.sortable.min.js' );
+					require_js( '#jquery#', 'blog' );
+					require_js( 'jquery/jquery.sortable.min.js', 'blog' );
 					break;
 
 				case 'disp_edit_comment':

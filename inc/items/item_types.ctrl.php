@@ -374,6 +374,7 @@ switch( $action )
 		param( 'itcf_green_highlight', 'string' );
 		param( 'itcf_red_highlight', 'string' );
 		param( 'itcf_description', 'html' );
+		param( 'itcf_merge', 'integer' );
 		$AdminUI->disp_view( 'items/views/_itemtype_edit_field.form.php' );
 		break;
 

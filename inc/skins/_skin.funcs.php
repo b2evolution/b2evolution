@@ -97,6 +97,7 @@ function skin_init( $disp )
 		case 'posts':
 		case 'single':
 		case 'page':
+		case 'widget_page':
 		case 'terms':
 		case 'download':
 		case 'feedback-popup':
@@ -322,6 +323,10 @@ function skin_init( $disp )
 					}
 
 					global $cat, $catsel;
+
+					$ChapterCache = & get_ChapterCache();
+					$Chapter = & $ChapterCache->get_by_ID( $cat, false, false );
+
 					if( empty( $catsel ) && preg_match( '~^[0-9]+$~', $cat ) )
 					{	// We are on a single cat page:
 						// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
@@ -334,16 +339,12 @@ function skin_init( $disp )
 						if( ( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
 							|| $Blog->get_setting( 'relcanonical_cat_urls' ) )
 						{ // Check if the URL was canonical:
-							if( !isset( $Chapter ) )
-							{
-								$ChapterCache = & get_ChapterCache();
-								/**
-								 * @var Chapter
-								 */
-								$Chapter = & $ChapterCache->get_by_ID( $MainList->filters['cat_array'][0], false );
+							if( empty( $Chapter ) && isset( $MainList->filters['cat_array'][0] ) )
+							{	// Try to get Chapter from filters:
+								$Chapter = & $ChapterCache->get_by_ID( $MainList->filters['cat_array'][0], false, false );
 							}
 
-							if( $Chapter )
+							if( ! empty( $Chapter ) )
 							{
 								if( $Chapter->parent_ID )
 								{	// This is a sub-category page (i-e: not a level 1 category)
@@ -364,19 +365,20 @@ function skin_init( $disp )
 									}
 								}
 							}
-							else
-							{ // If the requested chapter was not found display 404 page
-								$Messages->add( T_('The requested chapter was not found') );
-								global $disp;
-								$disp = '404';
-								break;
-							}
 						}
 
 						if( $post_navigation == 'same_category' )
 						{ // Category is set and post navigation should go through the same category, set navigation target param
 							$MainList->nav_target = $cat;
 						}
+					}
+
+					if( empty( $Chapter ) )
+					{	// If the requested chapter was not found display 404 page:
+						$Messages->add( T_('The requested chapter was not found') );
+						global $disp;
+						$disp = '404';
+						break;
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'tags', 'posts', 'page' ) ) == array() )
@@ -1305,6 +1307,12 @@ function skin_init( $disp )
 			{	// Use default category instead of the wrong requested:
 				set_param( 'cat', $Blog->get_default_cat_ID() );
 			}
+
+			if( $Chapter && $Chapter->get_ItemType() === false )
+			{	// Don't allow to post in category without default Item Type:
+				$Messages->add( T_('You cannot post here'), 'error' );
+				header_redirect( $Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
+			}
 			break;
 
 		case 'edit':
@@ -1350,6 +1358,16 @@ function skin_init( $disp )
 				}
 				$Messages->add( $error_message, 'error' );
 				header_redirect( $Blog->gen_blogurl(), 302 );
+			}
+
+			$cat = param( 'cat', 'integer' );
+			if( $cat > 0 &&
+			    ( $ChapterCache = & get_ChapterCache() ) &&
+			    ( $selected_Chapter = & $ChapterCache->get_by_ID( $cat, false, false ) ) &&
+			    ( $selected_Chapter->get_ItemType() === false ) )
+			{	// Don't allow to post in category without default Item Type:
+				$Messages->add( T_('You cannot post here'), 'error' );
+				header_redirect( $selected_Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
 			}
 
 			// Prepare the 'In-skin editing':
@@ -1825,6 +1843,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_module_form'           => '_module_form.disp.php',
 				'disp_msgform'               => '_msgform.disp.php',
 				'disp_page'                  => '_page.disp.php',
+				'disp_widget_page'           => '_widget_page.disp.php',
 				'disp_postidx'               => '_postidx.disp.php',
 				'disp_posts'                 => '_posts.disp.php',
 				'disp_profile'               => '_profile.disp.php',
@@ -2711,6 +2730,8 @@ function widget_container( $container_code, $params = array() )
 			'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
 			'container_start' => '<div class="evo_container $wico_class$">',
 			'container_end'   => '</div>',
+			// Restriction for Page Containers:
+			'container_item_ID' => NULL,
 		), $params );
 
 	// Try to find widget container by code for current collection and skin type:
@@ -2726,6 +2747,9 @@ function widget_container( $container_code, $params = array() )
 		// Exit because we cannot display widgets without container:
 		return;
 	}
+
+	// Pass WidgetContainer object:
+	$params['WidgetContainer'] = $WidgetContainer;
 
 	$Skin->container( $WidgetContainer->get( 'name' ), $params, $container_code );
 }
@@ -2809,35 +2833,6 @@ function skin_container( $sco_name, $params = array(), $container_code = NULL )
 	global $Skin;
 
 	$Skin->container( $sco_name, $params, $container_code );
-}
-
-
-/**
- * Get the set of main containers of multiple skins
- * Note: Used to get blog main containers when multiple skins are set for different devices
- *
- * @param array skin ids
- * @return array skin container codes => skin container names
- */
-function get_skin_containers( $skin_ids )
-{
-	if( empty( $skin_ids ) )
-	{ // Return empty list if skins are not set
-		return array();
-	}
-
-	$SkinCache = & get_SkinCache();
-	$SkinCache->load_list( $skin_ids );
-	$blog_containers = array();
-	foreach( $skin_ids as $skin_ID )
-	{ // Collect containers from the given skins and merge them
-		if( $Skin = & $SkinCache->get_by_ID( $skin_ID, false, false ) )
-		{
-			$blog_containers = array_merge( $blog_containers, $Skin->get_containers() );
-		}
-	}
-
-	return $blog_containers;
 }
 
 

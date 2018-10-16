@@ -123,10 +123,6 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-p
 		}
 
 		$set_as_options = array();
-		if( ! $Settings->get( 'info_blog_ID' ) )
-		{
-			$set_as_options[] = array( 'set_as_info_blog', 1, T_('Collection for info pages'), param( 'set_as_info_blog', 'boolean', $set_as_checked ) );
-		}
 		if( ! $Settings->get( 'login_blog_ID' ) )
 		{
 			$set_as_options[] = array( 'set_as_login_blog', 1, T_('Collection for login/registration'), param( 'set_as_login_blog', 'boolean', $set_as_checked ) );
@@ -134,6 +130,10 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-p
 		if( ! $Settings->get( 'msg_blog_ID' ) )
 		{
 			$set_as_options[] = array( 'set_as_msg_blog', 1, T_('Collection for profiles/messaging'), param( 'set_as_msg_blog', 'boolean', $set_as_checked ) );
+		}
+		if( ! $Settings->get( 'info_blog_ID' ) )
+		{
+			$set_as_options[] = array( 'set_as_info_blog', 1, T_('Collection for shared content blocks'), param( 'set_as_info_blog', 'boolean', $set_as_checked ) );
 		}
 
 		if( $set_as_options )

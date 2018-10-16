@@ -231,7 +231,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				break;
 
 			case 'Widget':
-				$set_value = $Obj->get_param( $parname, false, $group );
+				$set_value = $Obj->get_param( $parname, NULL, $group );
 				$error_value = NULL;
 				break;
 
@@ -270,6 +270,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$error_value = $Obj->PluginSettingsValidateSet( $tmp_params );
 				break;
 
+			case 'SharedSettings':
+				$set_value = $Obj->get_shared_setting( $parname, $group );
+				$error_value = NULL;
+				break;
+
 			default:
 				debug_die( "unhandled set_type $set_type" );
 				break;
@@ -293,6 +298,12 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	if( $value_from_request !== NULL )
 	{
 		$set_value = $value_from_request;
+	}
+
+	if( ! empty( $parmeta['hide'] ) )
+	{	// Hide this field on the editing form:
+		$original_form_fieldstart = $Form->fieldstart;
+		$Form->fieldstart = preg_replace( '/>$/', 'style="display:none">', $Form->fieldstart );
 	}
 
 	switch( $parmeta['type'] )
@@ -617,16 +628,13 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			break;
 
 		case 'usertag':
-			if( isset( $parmeta['size'] ) )
-			{
-				$size = (int) $parmeta['size'];
-			}
-			else
-			{
-				$size = 30;
-			}
-
+			$size = isset( $parmeta['size'] ) ? intval( $parmeta['size'] ) : 30;
 			$Form->usertag_input( $input_name, $set_value, $size, $set_label, '', $params );
+			break;
+
+		case 'itemtag':
+			$size = isset( $parmeta['size'] ) ? intval( $parmeta['size'] ) : 30;
+			$Form->tag_input( $input_name, $set_value, $size, $set_label, '', $params );
 			break;
 
 		case 'info':
@@ -669,6 +677,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 		default:
 			debug_die( 'Unsupported type ['.$parmeta['type'].'] from GetDefaultSettings()!' );
+	}
+
+	if( isset( $original_form_fieldstart ) )
+	{	// Revert original field start html code:
+		$Form->fieldstart = $original_form_fieldstart;
 	}
 
 	if( $outer_most && $has_array_type )
@@ -779,6 +792,11 @@ function _set_setting_by_path( & $Plugin, $set_type, $path, $init_value = array(
 			$Skin->set_setting( $set_name, $setting );
 			break;
 
+		case 'SharedSettings':
+			$set_name = ( $set_name == 'shared_apply_rendering' ? '' : 'shared_' ).$set_name;
+			$Plugin->Settings->set( $set_name, $setting );
+			break;
+
 		default:
 			debug_die( 'Invalid plugin type param!' );
 	}
@@ -863,6 +881,12 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
 			$Skin = & $Plugin;
 			$setting = $Skin->get_setting( $set_name );
 			$defaults = $Skin->get_param_definitions( $tmp_params );
+			break;
+
+		case 'SharedSettings':
+			$param_name = ( $set_name == 'shared_apply_rendering' ? '' : 'shared_' ).$set_name;
+			$setting = $Plugin->Settings->get( $param_name );
+			$defaults = $Plugin->get_shared_setting_definitions( $tmp_params );
 			break;
 
 		default:
@@ -1120,7 +1144,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 				$widget_Blog = & $Obj->get_Blog();
 				$l_value = $Plugins->validate_renderer_list( array_keys( $l_value ), array(
 						'Blog'         => & $widget_Blog,
-						'setting_name' => 'coll_apply_rendering',
+						'setting_name' => 'shared_apply_rendering',
 					) );
 				$l_value = array_fill_keys( $l_value, 1 );
 			}
@@ -1169,6 +1193,8 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 			// Plugin messages settings:
 		case 'EmailSettings':
 			// Plugin emails settings:
+		case 'SharedSettings':
+			// Plugin shared settings:
 			$dummy = array(
 				'name'   => $parname,
 				'value'  => & $l_value,
@@ -1185,8 +1211,12 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 					$Obj->Settings->set( 'msg_'.$parname, $l_value );
 				}
 				elseif( $set_type == 'EmailSettings' && $parname != 'email_apply_rendering' )
-				{	// Use prefix 'email_' for all message settings except of "email_apply_rendering":
+				{	// Use prefix 'email_' for all email settings except of "email_apply_rendering":
 					$Obj->Settings->set( 'email_'.$parname, $l_value );
+				}
+				elseif( $set_type == 'SharedSettings' && $parname != 'shared_apply_rendering' )
+				{	// Use prefix 'shared_' for all shared settings except of "shared_apply_rendering":
+					$Obj->Settings->set( 'shared_'.$parname, $l_value );
 				}
 				else
 				{	// Global settings:

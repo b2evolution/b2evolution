@@ -49,10 +49,10 @@ if( $notifications_mode != 'off' )
 		$subscription_checkboxes[] = array( 'opt_out_subscription', 1, T_('Consider collection members to be subscribed for each new post unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_subscription' ), $allow_subscriptions == 0 || $advanced_perms == 0 );
 		$subscription_checkboxes[] = array( 'allow_comment_subscriptions', 1, T_('Allow users to subscribe and receive email notifications for each new comment.'), $allow_comment_subscriptions );
 		$subscription_checkboxes[] = array( 'opt_out_comment_subscription', 1, T_('Consider collection members to be subscribed for each new comment unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_comment_subscription' ), $allow_comment_subscriptions == 0 || $advanced_perms == 0 );
+		$subscription_checkboxes[] = array( 'allow_item_mod_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications when post is modified and user has permission to moderate it.' ), $allow_item_mod_subscriptions );
+		$subscription_checkboxes[] = array( 'opt_out_item_mod_subscription', 1, T_('Consider collection members to be subscribed to all post modifications unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_item_mod_subscription' ), $allow_item_mod_subscriptions == 0 || $advanced_perms == 0 );
 		$subscription_checkboxes[] = array( 'allow_item_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ), $allow_item_subscriptions );
 		$subscription_checkboxes[] = array( 'opt_out_item_subscription', 1, T_('Consider collection members to be subscribed for comments on a post unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_item_subscription' ), $allow_item_subscriptions == 0 || $advanced_perms == 0 );
-		$subscription_checkboxes[] = array( 'allow_item_mod_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications when post is modified and user has a permissions to moderate it.' ), $allow_item_mod_subscriptions );
-		$subscription_checkboxes[] = array( 'opt_out_item_mod_subscription', 1, T_('Consider collection members to be subscribed for each modified post unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_item_mod_subscription' ), $allow_item_mod_subscriptions == 0 || $advanced_perms == 0 );
 		$Form->checklist( $subscription_checkboxes, 'subscriptions', T_('Email subscriptions') );
 		// TODO: checkbox 'Enable RSS/Atom feeds'
 		// TODO2: which feeds (skins)?

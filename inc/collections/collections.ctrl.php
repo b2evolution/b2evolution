@@ -27,7 +27,7 @@ if( strpos( $action, 'new' ) !== false || $action == 'copy' )
 { // Simulate tab to value 'new' for actions to create new blog
 	$tab = 'new';
 }
-if( ! in_array( $action, array( 'list', 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site', 'new_section', 'edit_section', 'delete_section', 'update_site_skin' ) ) &&
+if( ! in_array( $action, array( 'list', 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site', 'new_section', 'edit_section', 'delete_section', 'update_site_skin', 'new_demo_content' ) ) &&
     ! in_array( $tab, array( 'site_settings', 'site_skin' ) ) )
 {
 	if( valid_blog_requested() )
@@ -376,6 +376,9 @@ switch( $action )
 		// Redirect moved posts:
 		$Settings->set( 'redirect_moved_posts', param( 'redirect_moved_posts', 'integer', 0 ) );
 
+		// Allow item URLs in other collections:
+		$Settings->set( 'cross_post_nav_in_same_coll', param( 'cross_post_nav_in_same_coll', 'integer', 0 ) );
+
 		// Subscribing to new blogs:
 		$Settings->set( 'subscribe_new_blogs', param( 'subscribe_new_blogs', 'string', 'public' ) );
 
@@ -444,9 +447,6 @@ switch( $action )
 		// Social media boilerplate logo
 		param( 'social_media_image_file_ID', 'integer', NULL );
 		$Settings->set( 'social_media_image_file_ID', get_param( 'social_media_image_file_ID' ) );
-
-		// Site footer text
-		$Settings->set( 'site_footer_text', param( 'site_footer_text', 'string', '' ) );
 
 		// Enable site skins
 		$old_site_skins_enabled = $Settings->get( 'site_skins_enabled' );
@@ -678,6 +678,52 @@ switch( $action )
 			}
 		}
 		break;
+
+	case 'new_demo_content':
+		global $DB;
+		global $install_test_features;
+
+		load_funcs( 'collections/_demo_content.funcs.php' );
+
+		$create_sample_contents   = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
+		$create_demo_organization = param( 'create_demo_organization', 'boolean', false, true );
+		$create_demo_users        = param( 'create_demo_users', 'boolean', false, true );
+		$create_demo_messages     = param( 'create_sample_private_messages', 'boolean', false, true );
+		$install_test_features    = param( 'install_test_features', 'boolean', false );
+
+		$user_org_IDs = NULL;
+		$demo_users = array();
+
+		$DB->begin();
+		if( $create_demo_organization )
+		{
+			$user_org_IDs = array( create_demo_organization( $current_User->ID )->ID );
+			$current_User->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
+			$Messages->add_to_group( sprintf( T_('Added user %s to demo organization.'), $current_User->login ), 'success', T_('Demo contents').':' );
+		}
+
+		if( $create_demo_users )
+		{
+			$demo_users = get_demo_users( true );
+			$Messages->add_to_group( T_('Created demo users.'), 'success', T_('Demo contents').':' );
+		}
+
+		if( $create_demo_messages )
+		{
+			create_demo_messages();
+			$Messages->add_to_group( T_('Created sample private messages.'), 'success', T_('Demo contents').':' );
+		}
+
+		if( $create_sample_contents )
+		{
+			$poll_ID = create_demo_poll();
+			create_demo_collections( $demo_users, $create_demo_users );
+			$Messages->add_to_group( T_('Created sample contents.'), 'success', T_('Demo contents').':' );
+		}
+		$DB->commit();
+
+		header_redirect( $admin_url.'?ctrl=dashboard' ); // will save $Messages into Session
+		break;
 }
 
 switch( $tab )
@@ -776,7 +822,7 @@ switch( $tab )
 		// We should activate toolbar menu items for this controller and tab
 		$activate_collection_toolbar = true;
 		break;
-	
+
 	case 'section':
 		// Pages to create/edit/delete sections:
 		$AdminUI->set_path( 'site', 'dashboard' );

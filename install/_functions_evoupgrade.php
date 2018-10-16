@@ -596,6 +596,9 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 	// Get config of default widgets for the requested container:
 	$container_widgets = get_default_widgets_by_container( $new_container_code );
 
+	// Install new default widgets only for normal skin:
+	$skin_type = 'normal';
+
 	// Get container type:
 	$container_type = isset( $container_widgets['type'] ) ? $container_widgets['type'] : 'main';
 
@@ -604,6 +607,7 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 	{
 		case 'main':
 		case 'sub':
+		case 'page':
 			// Install widgets for collection/skin container:
 			$BlogCache = & get_BlogCache();
 			$BlogCache->load_all();
@@ -616,7 +620,7 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 			foreach( $BlogCache->cache as $widget_Blog )
 			{
 				// Get all containers declared in the given blog's skins
-				$coll_containers = $widget_Blog->get_main_containers( true );
+				$coll_containers = $widget_Blog->get_main_containers( $skin_type, true );
 
 				// Get again config of default widgets for the requested container because several settings depend on collection type/kind:
 				$container_widgets = get_default_widgets_by_container( $new_container_code, $widget_Blog->get( 'type' ) );
@@ -627,8 +631,8 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 					continue;
 				}
 
-				if( $container_type == 'sub' )
-				{	// Initialize sub-container data in order to install it below:
+				if( $container_type == 'sub' || $container_type == 'page' )
+				{	// Initialize sub-container and page containers data in order to install it below:
 					$coll_containers[ $new_container_code ] = array(
 							isset( $container_widgets['name'] ) ? $container_widgets['name'] : $new_container_code,
 							isset( $container_widgets['order'] ) ? $container_widgets['order'] : 1,
@@ -652,18 +656,23 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 						}
 						// Insert new widget container into DB:
 						$new_container_fields = array(
-							'wico_code'    => $new_container_code,
-							'wico_name'    => $coll_container[0],
-							'wico_coll_ID' => $widget_Blog->ID,
-							'wico_order'   => $coll_container[1],
-							'wico_main'    => $container_type == 'sub' ? 0 : 1,
+							'wico_code'      => $new_container_code,
+							'wico_skin_type' => $skin_type,
+							'wico_name'      => $coll_container[0],
+							'wico_coll_ID'   => $widget_Blog->ID,
+							'wico_order'     => $coll_container[1],
+							'wico_main'      => $container_type == 'sub' ? 0 : 1,
 						);
+						if( $container_type == 'page' && isset( $container_widgets['item_ID'] ) )
+						{	// Page container has an additional field for Item:
+							$new_container_fields['wico_item_ID'] = $container_widgets['item_ID'];
+						}
 						$DB->query( 'INSERT INTO T_widget__container ( '.implode( ', ', array_keys( $new_container_fields ) ).' )
 								VALUES ( '.$DB->quote( $new_container_fields ).' )' );
 						// Update ID of new inserted widget container:
 						$coll_container['ID'] = $DB->insert_id;
 						// Also update ID in collection cache for next calls:
-						$widget_Blog->widget_containers[ $new_container_code ]['ID'] = $coll_container['ID'];
+						$widget_Blog->widget_containers[ $skin_type ][ $new_container_code ]['ID'] = $coll_container['ID'];
 					}
 					elseif( ! isset( $widget_orders_in_containers ) )
 					{	// For existing containers we should get all widget orders in order to avoid duplicate error on insert new widgets:
@@ -729,6 +738,67 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 						$new_widgets_insert_sql_rows[] = '( '.$coll_container['ID'].', '.$widget_order.', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[1] ).', '.$DB->quote( $widget_params ).' )';
 					}
 				}
+			}
+			break;
+
+		case 'shared':
+		case 'shared-sub':
+			// Install widgets for shared container:
+			global $cache_installed_shared_containers, $cache_installed_shared_container_order;
+			if( ! isset( $cache_installed_shared_containers ) )
+			{	// Load all shared containers in cache global array once:
+				$shared_containers_SQL = new SQL( 'Get all shared widget containers' );
+				$shared_containers_SQL->SELECT( 'wico_code, wico_ID' );
+				$shared_containers_SQL->FROM( 'T_widget__container' );
+				$shared_containers_SQL->WHERE( 'wico_coll_ID IS NULL' );
+				$shared_containers_SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $skin_type ) );
+				$cache_installed_shared_containers = $DB->get_assoc( $shared_containers_SQL );
+				// Get max order of the shared widget containers:
+				$max_order_SQL = new SQL( 'Get max order of the shared widget containers' );
+				$max_order_SQL->SELECT( 'wico_order' );
+				$max_order_SQL->FROM( 'T_widget__container' );
+				$max_order_SQL->WHERE( 'wico_coll_ID IS NULL' );
+				$max_order_SQL->ORDER_BY( 'wico_order DESC' );
+				$max_order_SQL->LIMIT( '1' );
+				$cache_installed_shared_container_order = intval( $DB->get_var( $max_order_SQL ) );
+			}
+
+			if( isset( $container_widgets['name'] ) )
+			{	// Handle special array item with container data:
+				if( ! isset( $cache_installed_shared_containers[ $new_container_code ] ) )
+				{	// Insert new shared container:
+					$insert_result = $DB->query( 'INSERT INTO T_widget__container( wico_code, wico_skin_type, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES '
+						.'( '.$DB->quote( $new_container_code ).', '.$DB->quote( $skin_type ).', '.$DB->quote( $container_widgets['name'] ).', '.'NULL, '.( ++$cache_installed_shared_container_order ).', '.$DB->quote( $container_type == 'shared' ? 1 : 0 ).' )',
+						'Insert default shared widget container' );
+					if( $insert_result && $DB->insert_id > 0 )
+					{
+						$cache_installed_shared_containers[ $new_container_code ] = $DB->insert_id;
+					}
+				}
+			}
+
+			if( ! isset( $cache_installed_shared_containers[ $new_container_code ] ) )
+			{	// Skip container which is not installed as shared:
+				break;
+			}
+
+			foreach( $container_widgets as $key => $widget )
+			{
+				if( ! is_number( $key ) )
+				{	// Skip the config data which is used as additional info for container like 'type', 'name', 'order', 'item_ID', 'coll_type':
+					continue;
+				}
+
+				if( isset( $widget['install'] ) && ! $widget['install'] )
+				{	// Skip widget because it should not be installed by condition from config:
+					continue;
+				}
+
+				// Initialize a widget row to insert into DB below by single query:
+				$widget_type = isset( $widget['type'] ) ? $widget['type'] : 'core';
+				$widget_params = isset( $widget['params'] ) ? ( is_array( $widget['params'] ) ? serialize( $widget['params'] ) : $widget['params'] ) : NULL;
+				$widget_enabled = isset( $widget['enabled'] ) ? intval( $widget['enabled'] ) : 1;
+				$new_widgets_insert_sql_rows[] = '( '.$cache_installed_shared_containers[ $new_container_code ].', '.$widget[0].', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[1] ).', '.$DB->quote( $widget_params ).' )';
 			}
 			break;
 	}
@@ -8381,9 +8451,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$SQL = new SQL( 'Get all short date formats"' );
 		$SQL->SELECT( 'loc_locale, loc_datefmt, loc_timefmt' );
 		$SQL->FROM( 'T_locales' );
-		$locales = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+		$db_locale_rows = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 
-		foreach( $locales as $loc_data )
+		foreach( $db_locale_rows as $loc_data )
 		{
 			$loc_data_datefmt = $loc_data['loc_datefmt'];
 
@@ -9608,7 +9678,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			load_class( 'items/model/_item.class.php', 'Item' );
 			upg_init_environment( 'Settings,Plugins' );
 
-			// Get collection for info pages in order to create a help and a register content block items below:
+			// Get collection for info pages(shared content blocks) in order to create a help and a register content block items below:
 			$info_Blog = & get_setting_Blog( 'info_blog_ID' );
 
 			foreach( $collections as $coll_ID => $cat_ID )
@@ -9923,7 +9993,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			load_class( 'items/model/_item.class.php', 'Item' );
 			upg_init_environment( 'Settings,Plugins' );
 
-			// Get collection for info pages in order to create a help and a register content block items below:
+			// Get collection for info pages(shared content blocks) in order to create a help and a register content block items below:
 			$info_Blog = & get_setting_Blog( 'info_blog_ID' );
 
 			foreach( $collections as $coll_ID => $cat_ID )
@@ -10263,6 +10333,39 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12972, 'Move Order from Posts table to Categories-to-Posts relationships table...' ) )
+	{	// part of 6.10.3-stable
+		db_add_col( 'T_postcats', 'postcat_order', 'DOUBLE NULL' );
+		$DB->query( 'UPDATE T_postcats
+			INNER JOIN T_items__item ON post_ID = postcat_post_ID
+			  SET postcat_order = post_order' );
+		db_drop_col( 'T_items__item', 'post_order' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12975, 'Upgrade categories table...' ) )
+	{	// part of 6.10.4-stable
+		db_add_col( 'T_categories', 'cat_ityp_ID', 'INT UNSIGNED NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12978, 'Upgrade table item types...' ) )
+	{	// part of 6.10.4-stable
+		db_upgrade_cols( 'T_items__type', array(
+			'ADD' => array(
+				'ityp_evobar_link_text'  => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_perm_level',
+				'ityp_skin_btn_text'     => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_evobar_link_text',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12981, 'Upgrading post type custom fields table...' ) )
+	{	// part of 6.10.4-stable
+		db_add_col( 'T_items__type_custom_field', 'itcf_merge', 'TINYINT DEFAULT 0' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '
@@ -10570,7 +10673,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			'T_items__item_settings'       => array( 'iset_value' ),
 			'T_items__prerendering'        => array( 'itpr_content_prerendered' ),
 			'T_items__status'              => array( 'pst_name' ),
-			'T_items__type'                => array( 'ityp_name', 'ityp_description', 'ityp_instruction', 'ityp_comment_form_msg' ),
+			'T_items__type'                => array( 'ityp_name', 'ityp_description', 'ityp_instruction', 'ityp_comment_form_msg', 'ityp_evobar_link_text', 'ityp_skin_btn_text' ),
 			'T_items__type_custom_field'   => array( 'itcf_label', 'itcf_note' ),
 			'T_items__version'             => array( 'iver_title', 'iver_content' ),
 			'T_locales'                    => array( 'loc_name', 'loc_messages', 'loc_transliteration_map' ),
@@ -10655,18 +10758,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		install_new_default_widgets( 'item_list' );
 		install_new_default_widgets( 'item_in_list' );
 		install_new_default_widgets( 'item_single_header', 'item_visibility_badge,item_title,item_next_previous' );
-		install_new_default_widgets( 'item_single', 'item_title' );
-		upg_task_end();
-	}
-
-	if( upg_task_start( 13200, 'Upgrade table item types...' ) )
-	{	// part of 7.0.0-alpha
-		db_upgrade_cols( 'T_items__type', array(
-			'ADD' => array(
-				'ityp_evobar_link_text' => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_perm_level',
-				'ityp_skin_btn_text'    => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_evobar_link_text',
-			),
-		) );
+		install_new_default_widgets( 'item_single', 'item_visibility_badge,item_title' );
 		upg_task_end();
 	}
 
@@ -10719,7 +10811,51 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13260, 'Upgrade widget "Social links"...' ) )
+	if( upg_task_start( 15260, 'Installing new shared widgets/containers...' ) )
+	{	// part of 7.0.0-alpha
+		// Initialize environment variable $Settings in order to work with collection objects:
+		upg_init_environment();
+		if( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) )
+		{	// If site uses collection for info pages(shared content blocks):
+			global $installed_collection_info_pages;
+			$SQL = new SQL( 'Get all pages from Collection for info pages(shared content blocks)' );
+			$SQL->SELECT( 'post_ID' );
+			$SQL->FROM( 'T_items__item' );
+			$SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
+			$SQL->FROM_add( 'INNER JOIN T_items__type ON post_ityp_ID = ityp_ID' );
+			$SQL->WHERE( 'cat_blog_ID = '.$info_Blog->ID );
+			$SQL->WHERE_and( 'ityp_usage = "page"' );
+			// Get only pages which are allowed to be displayed on front-office:
+			$SQL->WHERE_and( 'post_status IN ( '.$DB->quote( get_inskin_statuses( $info_Blog->ID, 'post' ) ).' )' );
+			// Set pages from info/shared collection in order to create menu items in shared widget containers "Main Navigation" and "Navigation Hamburger":
+			$installed_collection_info_pages = $DB->get_col( $SQL );
+		}
+
+		// Install new shared widgets/containers:
+		install_new_default_widgets( 'site_header' );
+		install_new_default_widgets( 'site_footer' );
+		install_new_default_widgets( 'navigation_hamburger' );
+		install_new_default_widgets( 'main_navigation' );
+		install_new_default_widgets( 'right_navigation' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15270, 'Upgrading widget containers table...' ) )
+	{	// part of 7.0.0-alpha
+		// Add new column for Page Widget Containers:
+		db_add_col( 'T_widget__container', 'wico_item_ID', 'INT(11) UNSIGNED NULL DEFAULT NULL' );
+		// Insert default Item Type which items should be used for Page Containers:
+		$widget_page_result = $DB->query( 'INSERT INTO T_items__type ( ityp_name, ityp_usage, ityp_template_name, ityp_use_text, ityp_use_coordinates, ityp_use_comments, ityp_perm_level )
+			VALUES ( "Widget Page", "widget-page", "widget_page", "never", "optional", 0, "admin")' );
+		if( $widget_page_result && $DB->insert_id > 0 )
+		{	// Enable new inserted Item Type "Widget Page" for all collections:
+			$DB->query( 'INSERT INTO T_items__type_coll ( itc_ityp_ID, itc_coll_ID )
+				SELECT '.$DB->insert_id.', blog_ID FROM T_blogs' );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15280, 'Upgrade widget "Social links"...' ) )
 	{	// part of 7.0.0-alpha
 		// Old version of widget "Social links" had the user field definition IDs in the params "link1",
 		// but new version must has the user field definition codes instead:

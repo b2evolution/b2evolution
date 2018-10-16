@@ -135,9 +135,11 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 	{
 		global $admin_url;
 
+		$default_link_type = 'home';
+		$current_link_type = $this->get_param( 'link_type', $default_link_type );
+
 		// Check if field "Collection ID" is disabled because of link type and site uses only one fixed collection for profile pages:
-		$coll_id_is_disabled = ( empty( $params['infinite_loop'] )
-			&& in_array( $this->get_param( 'link_type', true ), array( 'ownercontact', 'owneruserinfo', 'myprofile', 'profile', 'avatar' ) )
+		$coll_id_is_disabled = ( in_array( $current_link_type, array( 'ownercontact', 'owneruserinfo', 'myprofile', 'profile', 'avatar' ) )
 			&& $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) );
 
 		$r = array_merge( array(
@@ -146,7 +148,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'note' => T_('What do you want to link to?'),
 					'type' => 'select',
 					'options' => $this->link_types,
-					'defaultvalue' => 'home',
+					'defaultvalue' => $default_link_type,
 				),
 				'link_text' => array(
 					'label' => T_('Link text'),
@@ -167,6 +169,15 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'defaultvalue' => '',
 					'disabled' => $coll_id_is_disabled ? 'disabled' : false,
 				),
+				'cat_ID' => array(
+					'label' => T_('Category ID'),
+					'note' => T_('Leave empty for default category.'),
+					'type' => 'integer',
+					'allow_empty' => true,
+					'size' => 5,
+					'defaultvalue' => '',
+					'hide' => ! in_array( $current_link_type, array( 'recentposts', 'postnew' ) ),
+				),
 				'visibility' => array(
 					'label' => T_( 'Visibility' ),
 					'note' => '',
@@ -185,6 +196,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
+					'hide' => ( $current_link_type != 'item' ),
 				),
 				'link_href' => array(
 					'label' => T_('URL'),
@@ -192,6 +204,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'type' => 'text',
 					'size' => 30,
 					'defaultvalue' => '',
+					'hide' => ( $current_link_type != 'url' ),
 				),
 				'highlight_current' => array(
 					'label' => T_('Highlight current'),
@@ -207,6 +220,32 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
+	}
+
+
+	/**
+	 * Get JavaScript code which helps to edit widget form
+	 *
+	 * @return string
+	 */
+	function get_edit_form_javascript()
+	{
+		return 'jQuery( "#'.$this->get_param_prefix().'link_type" ).change( function()
+		{
+			var link_type_value = jQuery( this ).val();
+			// Hide/Show category ID:
+			( link_type_value == "recentposts" || link_type_value == "postnew" )
+				? jQuery( "#ffield_'.$this->get_param_prefix().'cat_ID" ).show()
+				: jQuery( "#ffield_'.$this->get_param_prefix().'cat_ID" ).hide();
+			// Hide/Show item ID:
+			( link_type_value == "item" )
+				? jQuery( "#ffield_'.$this->get_param_prefix().'item_ID" ).show()
+				: jQuery( "#ffield_'.$this->get_param_prefix().'item_ID" ).hide();
+			// Hide/Show URL:
+			( link_type_value == "url" )
+				? jQuery( "#ffield_'.$this->get_param_prefix().'link_href" ).show()
+				: jQuery( "#ffield_'.$this->get_param_prefix().'link_href" ).hide();
+		} );';
 	}
 
 
@@ -238,7 +277,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		* @var Blog
 		*/
 		global $Collection, $Blog;
-		global $disp;
+		global $disp, $cat;
 
 		$this->init_display( $params );
 
@@ -273,7 +312,15 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		switch( $this->disp_params['link_type'] )
 		{
 			case 'recentposts':
+				$text = T_('Recently');
 				$url = $current_Blog->get( 'recentpostsurl' );
+				if( ! empty( $this->disp_params['cat_ID'] ) && 
+				    ( $ChapterCache = & get_ChapterCache() ) &&
+				    ( $Chapter = & $ChapterCache->get_by_ID( $this->disp_params['cat_ID'], false, false ) ) )
+				{	// Use category url and name instead of default if the defined category is found in DB:
+					$url = $Chapter->get_permanent_url();
+					$text = $Chapter->get( 'name' );
+				}
 				if( is_same_url( $url, $Blog->get( 'url' ) ) )
 				{ // This menu item has the same url as front page of blog
 					$EnabledWidgetCache = & get_EnabledWidgetCache();
@@ -292,9 +339,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					}
 				}
 
-				$text = T_('Recently');
 				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'posts' );
+				$highlight_current = ( $highlight_current && $disp == 'posts' && ( empty( $Chapter ) || $cat == $Chapter->ID ) );
 				break;
 
 			case 'search':
@@ -455,7 +501,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			case 'visits':
 				global $Settings, $current_User;
 				if( ! is_logged_in() || ! $Settings->get( 'enable_visit_tracking' ) )
-				{
+				{	// Current user must be logged in and visit tracking must be enabled:
+					$this->display_debug_message();
 					return false;
 				}
 
@@ -522,8 +569,26 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 				}
 				$url = url_add_param( $current_Blog->get( 'url' ), 'disp=edit' );
 				$text = T_('Write a new post');
+				if( ! empty( $this->disp_params['cat_ID'] ) && 
+				    ( $ChapterCache = & get_ChapterCache() ) &&
+				    ( $Chapter = & $ChapterCache->get_by_ID( $this->disp_params['cat_ID'], false, false ) ) )
+				{	// Append category ID to the URL:
+					$url = url_add_param( $url, 'cat='.$Chapter->ID );
+					$cat_ItemType = & $Chapter->get_ItemType( true );
+					if( $cat_ItemType === false )
+					{	// Don't allow to create a post in this category because this category has no default Item Type:
+						$this->display_debug_message();
+						return false;
+					}
+					if( $cat_ItemType )
+					{	// Use button text depending on default category's Item Type:
+						$text = $cat_ItemType->get_item_denomination( 'inskin_new_btn' );
+						// Append item type ID to the URL:
+						$url = url_add_param( $url, 'item_typ_ID='.$cat_ItemType->ID );
+					}
+				}
 				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'edit' );
+				$highlight_current = ( $highlight_current && $disp == 'edit' && ( empty( $Chapter ) || $cat == $Chapter->ID ) );
 				break;
 
 			case 'myprofile':

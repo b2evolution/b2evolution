@@ -27,8 +27,6 @@ global $admin_Plugins;
 global $edited_plugin_name, $edited_plugin_shortdesc, $edited_plugin_priority, $edited_plugin_code;
 global $admin_url;
 
-load_funcs('plugins/_plugin.funcs.php');
-
 
 $Form = new Form( NULL, 'pluginsettings_checkchanges' );
 
@@ -71,8 +69,6 @@ $Form->end_fieldset();
 // --------------------------- SETTINGS ---------------------------
 if( $edit_Plugin->Settings ) // NOTE: this triggers PHP5 autoloading through Plugin::__get() and therefor the 'isset($this->Settings)' hack in Plugin::GetDefaultSettings() still works, which is good.
 {
-	load_funcs('plugins/_plugin.funcs.php');
-
 	// We use output buffers here to only display the fieldset if there's content in there
 	// (either from PluginSettings or PluginSettingsEditDisplayAfter).
 	ob_start();

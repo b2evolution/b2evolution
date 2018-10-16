@@ -1125,8 +1125,15 @@ div.results {
   width: 100%;
   overflow: auto;
 }
-.evo_instruction {
-  margin: 20px 10px;
+div.action_messages.evo_instruction {
+  margin: 10px 0 0;
+}
+div.action_messages.evo_instruction ul,
+div.action_messages.evo_instruction li {
+  list-style: initial;
+}
+div.action_messages.evo_instruction ul {
+  padding-left: 20px;
 }
 form.inskin {
   padding: 10px;
@@ -1155,32 +1162,32 @@ table.catselect th {
 table.catselect td {
   padding: .2ex 1ex;
 }
+table.catselect th,
+table.catselect td {
+  border-right: 1px solid #bbb;
+}
+table.catselect th:last-child,
+table.catselect td:last-child {
+  border-right: none;
+}
 table.catselect tr.group td {
   border-top: 1px solid #bbb;
   border-bottom: 1px solid #bbb;
   background-color: #ccc;
   font-weight: bold;
 }
-table.catselect tr.odd,
-table.catselect tr.odd input {
+table.catselect tr.odd {
   background-color: #eee;
 }
-table.catselect tr.even,
-table.catselect tr.even input {
+table.catselect tr.even {
   background-color: #ddd;
 }
 table.catselect tr:hover,
 table.catselect tr:hover input {
   background-color: #ccc;
 }
-table.catselect th.selector,
-table.catselect td.selector {
-  width: 1%;
-  text-align: center;
-  border-right: 1px solid #bbb;
-}
-table.catselect #new_category_name {
-  background-color: white;
+table.catselect .catsel_order input {
+  width: 40px;
 }
 .raty_star_on,
 .raty_star_off,

@@ -41,12 +41,23 @@ echo '<p class="text-center">'.T_('Hover widgets in the right panel and click to
 $Form->begin_group( array( 'id' => $container_params['group_id'] ) );
 
 // Display main containers:
-display_containers( get_param( 'skin_type' ), true, $container_params );
-
-echo '<h4>'.T_('Sub-Containers').'</h4>';
+display_containers( get_param( 'skin_type' ), 'main', $container_params );
 
 // Display sub-containers:
-display_containers( get_param( 'skin_type' ), false, $container_params );
+echo '<h4>'.T_('Sub-Containers').'</h4>';
+display_containers( get_param( 'skin_type' ), 'sub', $container_params );
+
+// Display page containers:
+echo '<h4>'.T_('Page Containers').'</h4>';
+display_containers( get_param( 'skin_type' ), 'page', $container_params );
+
+// Display shared main containers:
+echo '<h4>'.T_('Shared Containers').'</h4>';
+display_containers( get_param( 'skin_type' ), 'shared', $container_params );
+
+// Display shared sub-containers:
+echo '<h4>'.T_('Shared Sub-Containers').'</h4>';
+display_containers( get_param( 'skin_type' ), 'shared-sub', $container_params );
 
 $Form->end_group();
 

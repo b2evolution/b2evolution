@@ -621,11 +621,11 @@ fieldset ul {
   color: #000;
   font-weight: normal;
 }
-.user_admin_tags {
-  width: 500px;
+.evo_input__tags {
+  width: 100%;
   max-width: 100%;
 }
-.user_admin_tags ul.token-input-list-facebook {
+.evo_input__tags ul.token-input-list-facebook {
   width: 100%;
   max-width: 100%;
 }
@@ -1035,6 +1035,9 @@ div.fieldset_wrapper.folded .panel-body {
 span[id^=title_folding_] {
   cursor: default;
 }
+tbody.fieldset_wrapper.folded + tbody[id^=cat_sel_] {
+  display: none;
+}
 .browse .evo_content_block {
   margin-right: 0;
 }
@@ -1240,6 +1243,10 @@ div.level3 nav .nav > li.active a:focus {
 }
 div.level3 nav .nav > li + li {
   margin-left: 0px;
+}
+.container-global-icons {
+  margin-top: 9px;
+  margin-bottom: -3px;
 }
 .footer {
   background-color: #f5f5f5;

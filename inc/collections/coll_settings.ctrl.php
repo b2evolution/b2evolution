@@ -364,7 +364,7 @@ switch( $action )
 			$DB->query( 'DELETE FROM T_coll_settings
 				WHERE cset_coll_ID = '.$DB->quote( $edited_Blog->ID ).'
 				AND ( cset_name LIKE "skin%" OR cset_name LIKE "plugin%" )' );
-			// Reset previous widgets with new from normal skin default widget declarations:
+			// Reset previous widgets with new from all skins default widget declarations:
 			$edited_Blog->reset_widgets();
 		}
 

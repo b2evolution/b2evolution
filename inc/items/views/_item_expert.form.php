@@ -238,8 +238,8 @@ $Form->begin_form( '', '', $params );
 			'edit_layout'   => 'expert',
 		) );
 	$plugin_button = ob_get_flush();
-	if( empty( $plugin_button ) )
-	{	// If button is not displayed by any plugin
+	if( empty( $plugin_button ) && $edited_Item->get_type_setting( 'use_text' ) != 'never')
+	{	// If button is not displayed by any plugin and text is allowed for current item type:
 		// Display a current status of HTML allowing for the edited item:
 		echo '<span class="html_status">';
 		if( $edited_Item->get_type_setting( 'allow_html' ) )
@@ -253,6 +253,11 @@ $Form->begin_form( '', '', $params );
 		// Display manual link for more info:
 		echo get_manual_link( 'post-allow-html' );
 		echo '</span>';
+	}
+	if( $edited_Item->get_type_setting( 'usage' ) == 'widget-page' &&
+	    $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+	{	// Display a button to edit widgets only if item type is used for page containers and current user has permission to edit widgets:
+		echo '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'" class="btn btn-primary">'.T_('Edit widgets now').'</a>';
 	}
 	echo '</div>';
 
@@ -650,10 +655,6 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'post_parent_ID', $edited_Item->get( 'parent_ID' ) );
 	}
 
-	echo '<tr><td><strong>'.T_('Order').':</strong></td><td>';
-	$Form->text( 'item_order', $edited_Item->order, 10, '', T_('can be decimal') );
-	echo '</td></tr>';
-
 	if( $current_User->check_perm( 'users', 'edit' ) )
 	{	// If current User has full access to edit other users,
 		// Display item's owner:
@@ -1022,6 +1023,8 @@ echo_onchange_goal_cat();
 echo_fieldset_folding_js();
 // Save and restore item content field height and scroll position:
 echo_item_content_position_js( get_param( 'content_height' ), get_param( 'content_scroll' ) );
+// JS code for merge button:
+echo_item_merge_js();
 
 // JS to post excerpt mode switching:
 ?>

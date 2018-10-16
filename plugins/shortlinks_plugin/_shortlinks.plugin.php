@@ -114,6 +114,20 @@ class shortlinks_plugin extends Plugin
 
 
 	/**
+	 * Define here default shared settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_shared_setting_definitions( & $params )
+	{
+		// set params to allow rendering for shared container widgets by default:
+		$default_params = array_merge( $params, array( 'default_shared_rendering' => 'opt-out' ) );
+		return parent::get_shared_setting_definitions( $default_params );
+	}
+
+
+	/**
 	 * Event handler: Called when displaying an item/post's content as HTML.
 	 *
 	 * This is different from {@link RenderItemAsHtml()}, because it gets called
@@ -1114,7 +1128,7 @@ class shortlinks_plugin extends Plugin
 				shortlinks_display_search_form( coll_urlname, coll_name );
 			}
 
-			var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&paged=' + page;
+			var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&page=' + page;
 
 			shortlinks_api_request( 'collections/' + coll_urlname + '/items&orderby=datemodified&order=DESC' + page_param, '#shortlinks_posts_list', function( data )
 			{	// Display the posts on success request:

@@ -441,17 +441,17 @@ class ComponentWidget extends DataObject
 			$advanced_layout_is_started = true;
 		}
 
-		if( get_parent_class( $this ) == 'generic_menu_link_Widget' )
-		{	// Widget link/button CSS classes for menu link widgets:
+		if( ! empty( $this->allow_link_css_params ) )
+		{	// Enable link/button CSS classes only for specific widgets like menu widgets:
 			$r['widget_link_class'] = array(
 					'label' => '<span class="dimmed">'.T_('Link/Button Class').'</span>',
 					'size' => 20,
-					'note' => T_('Replaces $link_class$ in class attribute of link/button.'),
+					'note' => sprintf( T_('Replaces %s in class attribute of link/button.'), '<code>$link_class$</code>' ).' '.T_('Leave empty to use default values from skin or from widget.'),
 				);
 			$r['widget_active_link_class'] = array(
 					'label' => '<span class="dimmed">'.T_('Active Link/Button Class').'</span>',
 					'size' => 20,
-					'note' => T_('Replaces $link_class$ in class attribute of active link/button.'),
+					'note' => sprintf( T_('Replaces %s in class attribute of active link/button.'), '<code>$link_class$</code>' ).' '.T_('Leave empty to use default values from skin or from widget.'),
 				);
 		}
 
@@ -460,7 +460,7 @@ class ComponentWidget extends DataObject
 			$r['widget_css_class'] = array(
 					'label' => '<span class="dimmed">'.T_( 'CSS Class' ).'</span>',
 					'size' => 20,
-					'note' => T_( 'Replaces $wi_class$ in your skins containers.'),
+					'note' => sprintf( T_('Will be injected into %s in your skin containers (along with required system classes).'), '<code>$wi_class$</code>' ),
 				);
 		}
 
@@ -469,7 +469,7 @@ class ComponentWidget extends DataObject
 			$r['widget_ID'] = array(
 					'label' => '<span class="dimmed">'.T_( 'DOM ID' ).'</span>',
 					'size' => 20,
-					'note' => T_( 'Replaces $wi_ID$ in your skins containers.'),
+					'note' => sprintf( T_('Replaces %s in your skins containers.'), '<code>$wi_ID$</code>' ).' '.sprintf( T_('Leave empty to use default value: %s.'), '<code>widget_'.$this->type.'_'.$this->code.'_'.$this->ID.'</code>' ),
 				);
 		}
 
@@ -516,13 +516,14 @@ class ComponentWidget extends DataObject
 
 
 	/**
- 	 * Get param value.
- 	 *
- 	 * @param string
- 	 * @param boolean default false, set to true only if it is called from a widget::get_param_definition() function to avoid infinite loop
- 	 * @return mixed
+	 * Get param value.
+	 *
+	 * @param string Parameter name
+	 * @param mixed Default value, Set to different than NULL only if it is called from a widget::get_param_definition() function to avoid infinite loop
+	 * @param string|NULL Group name
+	 * @return mixed
 	 */
-	function get_param( $parname, $check_infinite_loop = false, $group = NULL )
+	function get_param( $parname, $default_value = NULL, $group = NULL )
 	{
 		$this->load_param_array();
 
@@ -554,9 +555,14 @@ class ComponentWidget extends DataObject
 			return $this->param_array[ $parname ];
 		}
 
-		// Try default values:
-		// Note we set 'infinite_loop' param to avoid calling the get_param() from the get_param_definitions() function recursively
-		$params = $this->get_param_definitions( $check_infinite_loop ? array( 'infinite_loop' => true ) : NULL );
+		if( $default_value !== NULL )
+		{	// Use defined default value when it is not saved in DB yet:
+			// (This call is used to get a value from function widget::get_param_definition() to avoid infinite loop)
+			return $default_value;
+		}
+
+		// Try default values from widget config:
+		$params = $this->get_param_definitions( NULL );
 
 		if( $group === NULL )
 		{	// Get param from simple field:
@@ -803,8 +809,14 @@ class ComponentWidget extends DataObject
 				{
 					return true;
 				}
-				// Plugin failed (happens when a plugin has been disabled for example):
-				return false;
+				else
+				{	// Plugin failed (happens when a plugin has been disabled for example):
+					if( $this->mode == 'designer' )
+					{	// Display red text in customizer widget designer mode in order to make this plugin visible for editing:
+						echo $this->disp_params['block_start'].'<span class="red">'.T_('Inactive / Uninstalled plugin').'</span>'.$this->disp_params['block_end'];
+					}
+					return false;
+				}
 		}
 
 		echo "Widget $this->type : $this->code did not provide a display() method! ";
@@ -1111,13 +1123,13 @@ class ComponentWidget extends DataObject
 
 				if( $Blog && $l_blog_ID == $Blog->ID )
 				{ // This is the blog being displayed on this page:
-				echo $this->disp_params['item_selected_start'];
-					$link_class = $this->disp_params['link_selected_class'];
+					echo $this->disp_params['item_selected_start'];
+					$link_class = empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['link_selected_class'] : $this->disp_params['widget_active_link_class'];
 				}
 				else
 				{
 					echo $this->disp_params['item_start'];
-					$link_class = $this->disp_params['link_default_class'];;
+					$link_class = empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['link_default_class'] : $this->disp_params['widget_link_class'];
 				}
 
 				echo '<a href="'.$l_Blog->gen_blogurl().'" class="'.$link_class.'" title="'
@@ -1478,7 +1490,7 @@ class ComponentWidget extends DataObject
 
 			$this->renderers_validated = $Plugins->validate_renderer_list( $widget_renderers, array(
 					'Blog'         => & $widget_Blog,
-					'setting_name' => 'coll_apply_rendering'
+					'setting_name' => 'shared_apply_rendering'
 				) );
 		}
 
@@ -1502,6 +1514,11 @@ class ComponentWidget extends DataObject
 		global $Plugins;
 
 		$widget_Blog = & $this->get_Blog();
+		if( empty( $widget_Blog ) )
+		{	// Use current collection if it is not defined, e.g. for shared widget containers:
+			global $Blog;
+			$widget_Blog = $Blog;
+		}
 		$widget_renderers = $this->get_renderers_validated();
 
 		// Do some optional filtering on the content
@@ -1522,6 +1539,17 @@ class ComponentWidget extends DataObject
 		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog, 'Widget' => $this ), 'Display' );
 
 		return $content;
+	}
+
+
+	/**
+	 * Get JavaScript code which helps to edit widget form
+	 *
+	 * @return string
+	 */
+	function get_edit_form_javascript()
+	{
+		return false;
 	}
 
 

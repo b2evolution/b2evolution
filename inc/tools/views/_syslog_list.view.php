@@ -202,7 +202,7 @@ function syslog_object_link( $object_type, $object_ID )
 				if( $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $Comment ) )
 				{ // Current user has permission to edit this comment
 					$Item = & $Comment->get_Item();
-					$link = '<a href="'.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID.'">'.$Item->title.' #'.$Comment->ID.'</a>';
+					$link = '<a href="'.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID.'">'.$Item->get( 'title' ).' #'.$Comment->ID.'</a>';
 				}
 			}
 			else
@@ -218,7 +218,7 @@ function syslog_object_link( $object_type, $object_ID )
 			{
 				if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 				{ // Current user has permission to edit this item
-					$link = '<a href="'.$Item->get_edit_url().'">'.$Item->title.'</a>';
+					$link = '<a href="'.$Item->get_edit_url().'">'.$Item->get( 'title' ).'</a>';
 				}
 			}
 			else

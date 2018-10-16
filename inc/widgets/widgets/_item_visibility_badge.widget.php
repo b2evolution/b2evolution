@@ -125,7 +125,7 @@ class item_visibility_badge_Widget extends ComponentWidget
 		// '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 		$params = array_merge( array(
 				'widget_item_visibility_badge_display'  => true,
-				'widget_item_visibility_badge_template' => '<div class="evo_status evo_status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+				'widget_item_visibility_badge_template' => '<div class="evo_status evo_status__$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 				'widget_item_visibility_badge_format'   => 'htmlbody'
 			), $params );
 

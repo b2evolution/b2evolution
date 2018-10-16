@@ -274,6 +274,11 @@ class tinymce_plugin extends Plugin
 			return false;
 		}
 
+		if( empty( $params['target_object'] ) )
+		{	// Target object must be defined:
+			return false;
+		}
+
 		switch( $params['target_type'] )
 		{
 			case 'Item':
@@ -282,8 +287,13 @@ class tinymce_plugin extends Plugin
 
 				$edited_Item = & $params['target_object'];
 
-				if( ! empty( $edited_Item ) && ! $edited_Item->get_type_setting( 'allow_html' ) )
+				if( ! $edited_Item->get_type_setting( 'allow_html' ) )
 				{	// Only when HTML is allowed in post:
+					return false;
+				}
+
+				if( $edited_Item->get_type_setting( 'use_text' ) == 'never' )
+				{	// Only when text is allowed for current item type:
 					return false;
 				}
 

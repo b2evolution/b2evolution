@@ -1017,6 +1017,9 @@ div#publish_buttons {
   box-shadow: 1px 10px 35px rgba(75, 75, 75, 0.75);
   z-index: 99999;
 }
+tbody.fieldset_wrapper.folded + tbody[id^=cat_sel_] {
+  display: none;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.
@@ -1523,10 +1526,6 @@ div.dev-blocks--belowtoolbar {
   font-size: 18px;
   line-height: 1.42857143;
 }
-.evo_designer.evo_designer__widget.evo_widget__outside .evo_designer__title,
-.evo_designer.evo_designer__widget.evo_widget__outside .evo_designer__actions {
-  left: -3px;
-}
 .evo_designer.evo_designer__container,
 .evo_designer.evo_designer__subcontainer_active,
 .evo_designer.evo_designer__subcontainer_inactive {
@@ -1809,6 +1808,13 @@ img.avatar_above_login {
 }
 .shrinkwrap.left {
   text-align: left;
+}
+.col-narrow {
+  width: 1px;
+  white-space: nowrap;
+  text-align: center;
+  padding-left: 1px !important;
+  padding-right: 1px !important;
 }
 .block {
   margin: 1ex;
@@ -2750,6 +2756,11 @@ body.modal-open div.token-input-dropdown-facebook {
 }
 .evo_widget.widget_core_item_tags form input[type=submit] {
   margin: 0;
+}
+.extended_search_form ul.token-input-list-facebook {
+  max-width: 100%;
+  padding-top: 5px;
+  padding-left: 12px;
 }
 div.results {
   margin-top: 0;

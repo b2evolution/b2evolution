@@ -43,7 +43,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  */
 function get_default_widgets( $coll_type = '', $context = array() )
 {
-	global $DB;
+	global $DB, $installed_collection_info_pages;
 
 	$context = array_merge( array(
 			'current_coll_ID'       => NULL,
@@ -121,7 +121,8 @@ function get_default_widgets( $coll_type = '', $context = array() )
 
 	/* Item Single */
 	$default_widgets['item_single'] = array(
-		array(  5, 'item_title', 'coll_type' => 'manual' ),
+		array(  5, 'item_visibility_badge', 'coll_type' => 'manual' ),
+		array(  7, 'item_title', 'coll_type' => 'manual' ),
 		array( 10, 'item_content' ),
 		array( 15, 'item_attachments' ),
 		array( 17, 'item_link' ),
@@ -533,6 +534,168 @@ function get_default_widgets( $coll_type = '', $context = array() )
 			) ),
 	);
 
+	// **** SHARED CONTAINERS ***** //
+
+	/* Site Header */
+	$default_widgets['site_header'] = array(
+		'type' => 'shared',
+		'name' => NT_('Site Header'),
+		array( 10, 'site_logo' ),
+		array( 20, 'subcontainer', 'params' => array(
+				'title'     => T_('Main Navigation'),
+				'container' => 'main_navigation',
+			) ),
+		array( 30, 'subcontainer', 'params' => array(
+				'title'            => T_('Right Navigation'),
+				'container'        => 'right_navigation',
+				'widget_css_class' => 'floatright',
+			) ),
+	);
+
+	/* Site Footer */
+	$default_widgets['site_footer'] = array(
+		'type' => 'shared',
+		'name' => NT_('Site Footer'),
+		array( 10, 'free_text', 'params' => array(
+				'content' => T_('Cookies are required to enable core site functionality.'),
+			) ),
+	);
+
+	/* Navigation Hamburger */
+	$default_widgets['navigation_hamburger'] = array(
+		'type' => 'shared',
+		'name' => NT_('Navigation Hamburger'),
+		array( 10, 'colls_list_public', 'params' => array(
+				'widget_css_class' => 'visible-xs',
+			) ),
+	);
+	$tmp_widget_order = 20;
+	if( ! empty( $installed_collection_info_pages ) && is_array( $installed_collection_info_pages ) )
+	{	// Install additional menu items for each page from info/shared collection:
+		foreach( $installed_collection_info_pages as $installed_collection_info_page_item_ID )
+		{
+			$default_widgets['navigation_hamburger'][] = array( $tmp_widget_order++, 'basic_menu_link', 'params' => array(
+				'link_type'        => 'item',
+				'item_ID'          => $installed_collection_info_page_item_ID,
+				'widget_css_class' => 'visible-sm visible-xs',
+			) );
+		}
+	}
+	$tmp_widget_order = intval( $tmp_widget_order / 10 ) * 10;
+	$default_widgets['navigation_hamburger'] = array_merge( $default_widgets['navigation_hamburger'], array(
+		array( $tmp_widget_order + 10, 'basic_menu_link', 'params' => array(
+				'link_type'        => 'ownercontact',
+				'widget_css_class' => 'visible-sm visible-xs',
+			) ),
+		array( $tmp_widget_order + 20, 'free_html', 'params' => array(
+				'content' => '<hr class="visible-xs" />',
+			) ),
+		array( $tmp_widget_order + 30, 'basic_menu_link', 'params' => array(
+				'link_type' => 'register',
+				'widget_css_class' => 'visible-xs',
+				'widget_link_class'=> 'bg-white',
+			) ),
+		array( $tmp_widget_order + 40, 'msg_menu_link', 'params' => array(
+				'widget_css_class' => 'visible-xs',
+			) ),
+		array( $tmp_widget_order + 50, 'basic_menu_link', 'params' => array(
+				'link_type'        => 'logout',
+				'widget_css_class' => 'visible-xs',
+			) ),
+	) );
+
+	/* Main Navigation */
+	$default_widgets['main_navigation'] = array(
+		'type' => 'shared-sub',
+		'name' => NT_('Main Navigation'),
+		array( 10, 'colls_list_public', 'params' => array(
+				'widget_css_class' => 'hidden-xs',
+			) )
+	);
+	$tmp_widget_order = 20;
+	if( ! empty( $installed_collection_info_pages ) && is_array( $installed_collection_info_pages ) )
+	{	// Install additional menu items for each page from info/shared collection:
+		foreach( $installed_collection_info_pages as $installed_collection_info_page_item_ID )
+		{
+			$default_widgets['main_navigation'][] = array( $tmp_widget_order++, 'basic_menu_link', 'params' => array(
+				'link_type'        => 'item',
+				'item_ID'          => $installed_collection_info_page_item_ID,
+				'widget_link_class'=> 'hidden-sm hidden-xs',
+			) );
+		}
+	}
+	$tmp_widget_order = intval( $tmp_widget_order / 10 ) * 10;
+	$default_widgets['main_navigation'] = array_merge( $default_widgets['main_navigation'], array(
+		array( $tmp_widget_order + 10, 'basic_menu_link', 'params' => array(
+				'link_type'        => 'ownercontact',
+				'widget_link_class'=> 'hidden-sm hidden-xs',
+			) ),
+	) );
+
+	/* Right Navigation */
+	$default_widgets['right_navigation'] = array(
+		'type' => 'shared-sub',
+		'name' => NT_('Right Navigation'),
+		array( 10, 'basic_menu_link', 'params' => array(
+				'link_type'        => 'login',
+			) ),
+		array( 20, 'basic_menu_link', 'params' => array(
+				'link_type' => 'register',
+				'widget_link_class' => 'hidden-xs bg-white',
+			) ),
+		array( 30, 'profile_menu_link', 'params' => array(
+				'profile_picture_size' => 'crop-top-32x32',
+			) ),
+		array( 40, 'msg_menu_link', 'params' => array(
+				'widget_link_class' => 'hidden-xs',
+			) ),
+		array( 50, 'basic_menu_link', 'params' => array(
+				'link_type'        => 'logout',
+				'widget_css_class' => 'hidden-xs',
+			) ),
+		array( 60, 'free_html', 'params' => array(
+				'content' => '<label for="nav-trigger"></label>',
+				'widget_css_class' => 'visible-sm-inline-block visible-xs-inline-block',
+			) ),
+	);
+
+	// **** PAGE CONTAINERS ***** //
+
+	if( isset( $installed_collection_info_pages['widget_page'] ) )
+	{	// Install page containers only with defined item ID:
+
+	/* Widget Page Section 1 */
+	$default_widgets['widget_page_section_1'] = array(
+		'type'    => 'page',
+		'name'    => NT_('Widget Page Section 1'),
+		'order'   => 10,
+		'item_ID' => $installed_collection_info_pages['widget_page'],
+		array( 10, 'coll_featured_posts' ),
+	);
+
+	/* Widget Page Section 2 */
+	$default_widgets['widget_page_section_2'] = array(
+		'type'    => 'page',
+		'name'    => NT_('Widget Page Section 2'),
+		'order'   => 20,
+		'item_ID' => $installed_collection_info_pages['widget_page'],
+		array( 10, 'org_members' ),
+	);
+
+	/* Widget Page Section 3 */
+	$default_widgets['widget_page_section_3'] = array(
+		'type'    => 'page',
+		'name'    => NT_('Widget Page Section 3'),
+		'order'   => 30,
+		'item_ID' => $installed_collection_info_pages['widget_page'],
+		array( 10, 'evo_Gmaps', 'type' => 'plugin', 'params' => array(
+				'latitude'  => '48.8566573582',
+				'longitude' => '2.35195398331',
+			) ),
+	);
+
+	}
+
 	return $default_widgets;
 }
 
@@ -557,28 +720,33 @@ function get_default_widgets_by_container( $container_code, $coll_type = '', $co
  * Get WidgetContainer object from the widget list view widget container fieldset id
  * Note: It is used during creating and reordering widgets
  *
- * @return WidgetContainer
+ * @param integer Collection ID
+ * @param string Skin type: 'normal', 'mobile', 'tablet'
+ * @param string Container fieldset ID like 'wico_code_containercode' or 'wico_ID_123'
+ * @return object WidgetContainer
  */
-function & get_widget_container( $coll_ID, $container_fieldset_id )
+function & get_WidgetContainer_by_coll_skintype_fieldset( $coll_ID, $skin_type, $container_fieldset_id )
 {
 	$WidgetContainerCache = & get_WidgetContainerCache();
 
 	if( substr( $container_fieldset_id, 0, 10 ) == 'wico_code_' )
 	{ // The widget contianer fieldset id was given by the container code because probably it was not created in the database yet
 		$container_code = substr( $container_fieldset_id, 10 );
-		$WidgetContainer = $WidgetContainerCache->get_by_coll_and_code( $coll_ID, $container_code );
+		$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $coll_ID, $skin_type, $container_code );
 		if( ! $WidgetContainer )
 		{ // The skin container didn't contain any widget before, and it was not saved in the database
 			$WidgetContainer = new WidgetContainer();
 			$WidgetContainer->set( 'code', $container_code );
 			$WidgetContainer->set( 'name', $container_code );
 			$WidgetContainer->set( 'coll_ID', $coll_ID );
+			$WidgetContainer->set( 'main', 1 );
+			$WidgetContainer->set( 'skin_type', $skin_type );
 		}
 	}
 	elseif( substr( $container_fieldset_id, 0, 8 ) == 'wico_ID_' )
 	{ // The widget contianer fieldset id contains the container database ID
 		$container_ID = substr( $container_fieldset_id, 8 );
-		$WidgetContainer = $WidgetContainerCache->get_by_ID( $container_ID );
+		$WidgetContainer = & $WidgetContainerCache->get_by_ID( $container_ID );
 	}
 	else
 	{ // The received fieldset id is not valid
@@ -590,11 +758,93 @@ function & get_widget_container( $coll_ID, $container_fieldset_id )
 
 
 /**
- * @param string Title of the container. This gets passed to T_()!
- * @param boolean Is included in collection skin
+ * Insert shared widget containers
+ *
+ * @param string Skin type: 'normal', 'mobile', 'tablet'
+ */
+function insert_shared_widgets( $skin_type )
+{
+	global $DB;
+
+	// Get config of default shared widgets:
+	$default_widgets = get_default_widgets();
+
+	$shared_widgets_insert_sql_rows = array();
+	$shared_containers = array();
+	$shared_container_order = 1;
+	foreach( $default_widgets as $wico_code => $container_widgets )
+	{
+		if( ! isset( $container_widgets['type'] ) ||
+		    ! in_array( $container_widgets['type'], array( 'shared', 'shared-sub' ) ) )
+		{	// Skip not shared container:
+			continue;
+		}
+
+		if( isset( $container_widgets['skin_type'] ) &&
+				! is_allowed_option( $skin_type, $container_widgets['skin_type'] ) )
+		{	// Skip container because it should not be installed for the given skin type:
+			continue;
+		}
+
+		if( isset( $container_widgets['name'] ) )
+		{	// Handle special array item with container data:
+			if( ! isset( $shared_containers[ $wico_code ] ) )
+			{	// Insert new shared container:
+				$insert_result = $DB->query( 'INSERT INTO T_widget__container ( wico_code, wico_skin_type, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES '
+					.'( '.$DB->quote( $wico_code ).', '.$DB->quote( $skin_type ).', '.$DB->quote( $container_widgets['name'] ).', '.'NULL, '.$shared_container_order++.', '.$DB->quote( $container_widgets['type'] == 'shared' ? 1 : 0 ).' )',
+					'Insert default shared widget container' );
+				if( $insert_result && $DB->insert_id > 0 )
+				{
+					$shared_containers[ $wico_code ] = $DB->insert_id;
+				}
+			}
+		}
+
+		if( ! isset( $shared_containers[ $wico_code ] ) )
+		{	// Skip container which is not installed as shared:
+			continue;
+		}
+
+		$wico_id = $shared_containers[ $wico_code ];
+
+		foreach( $container_widgets as $key => $widget )
+		{
+			if( ! is_number( $key ) )
+			{	// Skip the config data which is used as additional info for container like 'type', 'name', 'order', 'item_ID', 'coll_type':
+				continue;
+			}
+
+			if( isset( $widget['install'] ) && ! $widget['install'] )
+			{	// Skip widget because it should not be installed by condition from config:
+				continue;
+			}
+
+			if( isset( $widget['skin_type'] ) && ! is_allowed_option( $skin_type, $widget['skin_type'] ) )
+			{	// Skip widget because it should not be installed for the given skin type:
+				continue;
+			}
+
+			// Initialize a widget row to insert into DB below by single query:
+			$widget_type = isset( $widget['type'] ) ? $widget['type'] : 'core';
+			$widget_params = isset( $widget['params'] ) ? ( is_array( $widget['params'] ) ? serialize( $widget['params'] ) : $widget['params'] ) : NULL;
+			$widget_enabled = isset( $widget['enabled'] ) ? intval( $widget['enabled'] ) : 1;
+			$shared_widgets_insert_sql_rows[] = '( '.$wico_id.', '.$widget[0].', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[1] ).', '.$DB->quote( $widget_params ).' )';
+		}
+	}
+
+	// Check if there are widgets to create:
+	if( ! empty( $shared_widgets_insert_sql_rows ) )
+	{	// Insert the widget records by single SQL query:
+		$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+		           .'VALUES '.implode( ', ', $shared_widgets_insert_sql_rows ) );
+	}
+}
+
+/*
+ * @param object Widget Container
  * @param array Params
  */
-function display_container( $WidgetContainer, $is_included = true, $params = array() )
+function display_container( $WidgetContainer, $params = array() )
 {
 	global $Collection, $Blog, $admin_url, $embedded_containers, $mode;
 	global $Session;
@@ -627,7 +877,7 @@ function display_container( $WidgetContainer, $is_included = true, $params = arr
 		$destroy_container_url .= '&amp;mode='.$mode;
 	}
 
-	if( ! $is_included )
+	if( $WidgetContainer->get_type() != 'main' )
 	{	// Allow to destroy sub-container when it is not included into the selected skin:
 		$destroy_btn_title = ( $WidgetContainer->main ? T_('Destroy container') : T_('Destroy sub-container') );
 		$Table->global_icon( $destroy_btn_title, 'delete', $destroy_container_url, $destroy_btn_title, $mode == 'customizer' ? 0 : 3, $mode == 'customizer' ? 0 : 4, array( 'onclick' => 'return confirm( \''.TS_('Are you sure you want to destroy this container?').'\' )') );
@@ -647,6 +897,10 @@ function display_container( $WidgetContainer, $is_included = true, $params = arr
 		if( ! empty( $WidgetContainer->ID ) )
 		{
 			$widget_container_name = '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.( $mode == 'customizer' ? '&amp;mode='.$mode : '' ).'">'.$widget_container_name.'</a>';
+			if( $WidgetContainer->get_type() == 'page' )
+			{	// Display additional info for Page Container:
+				$widget_container_name .= ' '.sprintf( T_('on Page #%s'), $WidgetContainer->get( 'item_ID' ) );
+			}
 		}
 		$Table->title = '<span class="dimmed">'.$WidgetContainer->get( 'order' ).'</span> '
 			.'<span class="container_name" data-wico_id="'.$widget_container_id.'">'.$widget_container_name.'</span> '
@@ -843,95 +1097,74 @@ function display_container( $WidgetContainer, $is_included = true, $params = arr
  * Display containers
  *
  * @param string Skin type: 'normal', 'mobile', 'tablet'
- * @param boolean TRUE to display main containers, FALSE - sub containers
+ * @param string Container type: 'main', 'sub', 'page', 'shared', 'shared-sub'
  * @param array Params
  */
-function display_containers( $skin_type, $main = true, $params = array() )
+function display_containers( $skin_type, $container_type, $params = array() )
 {
-	global $Blog, $blog_container_list, $skins_container_list, $embedded_containers;
+	global $Blog, $DB;
 
-	// Display containers for current skin:
-	$displayed_containers = array();
-	$ordered_containers = array();
-	$embedded_containers = array();
 	$WidgetContainerCache = & get_WidgetContainerCache();
-	foreach( $skins_container_list as $container_code => $container_data )
+	$WidgetContainerCache->clear();
+
+	$containers = array();
+
+	switch( $container_type )
 	{
-		$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code );
-		if( ! $WidgetContainer )
-		{
-			$WidgetContainer = new WidgetContainer();
-			$WidgetContainer->set( 'code', $container_code );
-			$WidgetContainer->set( 'name', $container_data[0] );
-			$WidgetContainer->set( 'coll_ID', $Blog->ID );
-			$WidgetContainer->set( 'order', 0 );
-		}
-		if( $WidgetContainer->get( 'skin_type' ) != $skin_type ||
-		    ( $main && ! $WidgetContainer->get( 'main' ) ) ||
-		    ( ! $main && $WidgetContainer->get( 'main' ) ) )
-		{	// Skip this container because another type is requested:
-			continue;
-		}
-
-		$ordered_containers[] = array( $WidgetContainer, true );
-		if( $WidgetContainer->ID > 0 )
-		{ // Container exists in the database
-			$displayed_containers[$container_code] = $WidgetContainer->ID;
-		}
-	}
-
-	// Display embedded containers
-	reset( $embedded_containers );
-	while( count( $embedded_containers ) > 0 )
-	{
-		// Get the first item key, and remove the first item from the array
-		$container_code = key( $embedded_containers );
-		array_shift( $embedded_containers );
-		if( isset( $displayed_containers[$container_code] ) )
-		{ // This container was already displayed
-			continue;
-		}
-
-		if( $WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code ) )
-		{ // Confirmed that it is part of the blog's containers in the database
-			if( ( $main && ! $WidgetContainer->get( 'main' ) ) ||
-			    ( ! $main && $WidgetContainer->get( 'main' ) ) )
-			{	// Skip this container because another type is requested:
-				continue;
+		case 'main':
+			// Get main/skin containers:
+			$coll_containers = $Blog->get_main_containers( $skin_type );
+			foreach( $coll_containers as $container_code => $container_data )
+			{
+				$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $Blog->ID, $skin_type, $container_code );
+				if( ! $WidgetContainer )
+				{	// If widget container doesn't exist in DB but it is detected in skin file:
+					$WidgetContainer = new WidgetContainer();
+					$WidgetContainer->set( 'code', $container_code );
+					$WidgetContainer->set( 'name', $container_data[0] );
+					$WidgetContainer->set( 'coll_ID', $Blog->ID );
+					$WidgetContainer->set( 'skin_type', $skin_type );
+				}
+				$containers[] = $WidgetContainer;
 			}
-			$ordered_containers[] = array( $WidgetContainer, true );
-			$displayed_containers[$container_code] = $WidgetContainer->ID;
-		}
+			break;
+
+		case 'sub':
+			// Get sub-containers:
+			$containers = $WidgetContainerCache->load_where( 'wico_coll_ID = '.$Blog->ID.'
+				AND wico_skin_type = '.$DB->quote( $skin_type ).'
+				AND wico_main = 0
+				AND wico_item_ID IS NULL' );
+			break;
+
+		case 'page':
+			// Get page containers:
+			$containers = $WidgetContainerCache->load_where( 'wico_coll_ID = '.$Blog->ID.'
+				AND wico_skin_type = '.$DB->quote( $skin_type ).'
+				AND wico_main = 1
+				AND wico_item_ID IS NOT NULL' );
+			break;
+
+		case 'shared':
+			// Get shared main containers:
+			$containers = $WidgetContainerCache->load_where( 'wico_coll_ID IS NULL
+				AND wico_skin_type = '.$DB->quote( $skin_type ).'
+				AND wico_main = 1
+				AND wico_item_ID IS NULL' );
+			break;
+
+		case 'shared-sub':
+			// Get shared sub-containers:
+			$containers = $WidgetContainerCache->load_where( 'wico_coll_ID IS NULL
+				AND wico_skin_type = '.$DB->quote( $skin_type ).'
+				AND wico_main = 0
+				AND wico_item_ID IS NULL' );
+			break;
 	}
 
-	// Display other blog containers which are not in the current skin
-	foreach( $blog_container_list as $container_ID )
-	{
-		if( in_array( $container_ID, $displayed_containers ) )
-		{
-			continue;
-		}
-
-		$WidgetContainer = & $WidgetContainerCache->get_by_ID( $container_ID );
-		if( ( $main && ! $WidgetContainer->get( 'main' ) ) ||
-		    ( ! $main && $WidgetContainer->get( 'main' ) ) )
-		{	// Skip this container because another type is requested:
-			continue;
-		}
-		$ordered_containers[] = array( $WidgetContainer, false );
-	}
-
-	// Sort widget containers by order and name:
-	usort( $ordered_containers, 'callback_sort_widget_containers' );
-
-	// Display the ordered containers:
-	foreach( $ordered_containers as $container_data )
-	{
-		$WidgetContainer = & $container_data[0];
-		// Is included in collection skin?
-		$is_included = $container_data[1];
-		// Display a container with widgets:
-		display_container( $WidgetContainer, $is_included, $params  );
+	foreach( $containers as $WidgetContainer )
+	{	// Display each found container:
+		display_container( $WidgetContainer, $params );
 	}
 }
 
