@@ -8054,9 +8054,13 @@ function get_script_baseurl()
 		if( isset( $_SERVER['SERVER_PORT'] ) )
 		{
 			if( $_SERVER['SERVER_PORT'] == '443' )
-			{	// Rewrite that as hhtps:
+			{	// Rewrite that as https:
 				$temp_baseurl = 'https://'.$_SERVER['SERVER_NAME'];
-			}	// Add port name
+			}	
+			elseif( $_SERVER['SERVER_PORT'] == '8890' )
+			{	// Used for testing
+				$temp_baseurl = 'https://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'];
+			}	
 			elseif( $_SERVER['SERVER_PORT'] != '80' )
 			{ // Get also a port number
 				$temp_baseurl .= ':'.$_SERVER['SERVER_PORT'];
