@@ -21,13 +21,13 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Get config array of default widgets for install, upgrade and new collections
  *
- * @param string Collection kind
- * @param integer Collection ID
+ * @param string Collection type: 'std', 'main', 'photo', 'group', 'forum', 'manual'
  * @param array Context
  * @return array Array of default widgets:
  *          - Key - Container code,
  *          - Value - array of widget arrays OR SPECIAL VALUES:
- *             - 'coll_type': Include this container only for collection kinds separated by comma, first char "-" means to exclude,
+ *             - 'coll_type': Include this container only for collection types separated by comma, first char "-" means to exclude,
+ *             - 'skin_type': Include this container only for skin types separated by comma, first char "-" means to exclude,
  *             - 'type': Container type, empty - main container, other values: 'sub', 'page', 'shared', 'shared-sub',
  *             - 'name': Container name,
  *             - 'order': Container order,
@@ -37,14 +37,16 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  *                - 'params' - Widget params(array or serialized string),
  *                - 'type' - Widget type(default = 'core', another value - 'plugin'),
  *                - 'enabled' - Boolean value; default is TRUE; FALSE to install the widget as disabled,
- *                - 'coll_type': Include this widget only for collection kinds separated by comma, first char "-" means to exclude,
+ *                - 'coll_type': Include this widget only for collection types separated by comma, first char "-" means to exclude,
+ *                - 'skin_type': Include this widget only for skin types separated by comma, first char "-" means to exclude,
  *                - 'install' - Boolean value; default is TRUE; FALSE to skip this widget on install.
  */
-function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
+function get_default_widgets( $coll_type = '', $context = array() )
 {
 	global $DB;
 
 	$context = array_merge( array(
+			'current_coll_ID'       => NULL,
 			'coll_home_ID'          => NULL,
 			'coll_blog_a_ID'        => NULL,
 			'coll_photoblog_ID'     => NULL,
@@ -84,7 +86,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
 		array( 35, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'arcdir' ) ),
 		array( 37, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'latestcomments' ) ),
 		array( 50, 'msg_menu_link', 'params' => array( 'link_type' => 'messages' ), 'enabled' => 0 ),
-		array( 60, 'basic_menu_link', 'params' => array( 'link_type' => 'ownercontact', 'show_badge' => 0 ), 'enabled' => ( $kind == 'minisite' ) ),
+		array( 60, 'basic_menu_link', 'params' => array( 'link_type' => 'ownercontact', 'show_badge' => 0 ), 'enabled' => ( $coll_type == 'minisite' ) ),
 		array( 70, 'basic_menu_link', 'params' => array( 'link_type' => 'login' ), 'enabled' => 0 ),
 		array( 80, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'register' ) ),
 	);
@@ -162,7 +164,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
 	);
 
 	/* Sidebar */
-	if( $kind == 'manual' )
+	if( $coll_type == 'manual' )
 	{
 		$default_widgets['sidebar'] = array(
 			'coll_type' => 'manual',
@@ -173,7 +175,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
 	else
 	{
 		// Special checking to don't install several Sidebar widgets below for collection 'Forums':
-		$install_not_forum = ( ! $context['init_as_forums'] && $kind != 'forum' );
+		$install_not_forum = ( ! $context['init_as_forums'] && $coll_type != 'forum' );
 		if( $context['init_as_home'] )
 		{	// Advertisements, Install only for collection #1 home collection:
 			$advertisement_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_name = "Advertisement"' );
@@ -187,14 +189,14 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
 			array( 10, 'user_login', 'install' => $context['install_test_features'] ),
 			array( 15, 'user_greetings', 'install' => $context['install_test_features'] ),
 			array( 20, 'user_profile_pics', 'install' => $install_not_forum ),
-			array( 30, 'evo_Calr', 'type' => 'plugin', 'install' => ( $install_not_forum && $blog_id > $context['coll_blog_a_ID'] ) ),
+			array( 30, 'evo_Calr', 'type' => 'plugin', 'install' => ( $install_not_forum && $context['current_coll_ID'] > $context['coll_blog_a_ID'] ) ),
 			array( 40, 'coll_longdesc', 'install' => $install_not_forum, 'params' => array( 'title' => '$title$' ) ),
 			array( 50, 'coll_search_form', 'install' => $install_not_forum ),
 			array( 60, 'coll_category_list', 'install' => $install_not_forum ),
 			array( 70, 'coll_item_list', 'install' => $install_not_forum && $context['init_as_home'], 'params' => array(
 					'title' => 'Advertisement (Demo)',
 					'item_type' => empty( $advertisement_type_ID ) ? '#' : $advertisement_type_ID,
-					'blog_ID' => $blog_id,
+					'blog_ID' => $context['current_coll_ID'],
 					'order_by' => 'RAND',
 					'limit' => 1,
 					'disp_title' => false,
@@ -265,12 +267,12 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
 	$default_widgets['front_page_main_area'] = array(
 		array(  1, 'coll_title', 'coll_type' => 'main,minisite' ),
 		array(  2, 'coll_tagline', 'coll_type' => 'main,minisite' ),
-		array( 10, 'coll_featured_intro', 'coll_type' => '-minisite', 'params' => ( $kind == 'main' ? array(
+		array( 10, 'coll_featured_intro', 'coll_type' => '-minisite', 'params' => ( $coll_type == 'main' ? array(
 			// Hide a title of the front intro post:
 				'disp_title' => 0,
 			) : NULL ) ),
 		array( 15, 'user_links', 'coll_type' => 'main' ),
-		array( 20, 'coll_featured_posts', 'coll_type' => '-minisite', 'params' => ( $kind == 'main' ? array(
+		array( 20, 'coll_featured_posts', 'coll_type' => '-minisite', 'params' => ( $coll_type == 'main' ? array(
 			// Display the posts from all other blogs if it is allowed by blogs setting "Collections to aggregate":
 				'blog_ID'    => '',
 				'limit'      => 5,
@@ -281,7 +283,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
 		array( 40, 'poll', 'install' => $context['init_as_blog_b'], 'params' => array( 'poll_ID' => 1 ) ),
 		array( 50, 'subcontainer_row', 'params' => array(
 				'column1_container' => 'front_page_column_a',
-				'column1_class'     => ( $kind == 'main' ? 'col-xs-12' : 'col-sm-6 col-xs-12' ),
+				'column1_class'     => ( $coll_type == 'main' ? 'col-xs-12' : 'col-sm-6 col-xs-12' ),
 				'column2_container' => 'front_page_column_b',
 				'column2_class'     => 'col-sm-6 col-xs-12',
 			) ),
@@ -367,12 +369,14 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
 
 	/* Mobile Footer */
 	$default_widgets['mobile_footer'] = array(
+		'skin_type' => 'mobile',
 		array( 10, 'coll_longdesc' ),
 		array( 20, 'mobile_skin_switcher' ),
 	);
 
 	/* Mobile Navigation Menu */
 	$default_widgets['mobile_navigation_menu'] = array(
+		'skin_type' => 'mobile',
 		array( 10, 'coll_page_list' ),
 		array( 20, 'basic_menu_link', 'params' => array( 'link_type' => 'ownercontact' ) ),
 		array( 30, 'basic_menu_link', 'params' => array( 'link_type' => 'home' ) ),
@@ -381,6 +385,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
 
 	/* Mobile Tools Menu */
 	$default_widgets['mobile_tools_menu'] = array(
+		'skin_type' => 'mobile',
 		array( 10, 'basic_menu_link', 'params' => array( 'link_type' => 'login' ) ),
 		array( 20, 'msg_menu_link', 'params' => array( 'link_type' => 'messages' ) ),
 		array( 30, 'msg_menu_link', 'params' => array( 'link_type' => 'contacts', 'show_badge' => 0 ) ),
@@ -537,13 +542,12 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $context = array() )
  *
  * @param string Container code
  * @param string Collection kind
- * @param integer Collection ID
  * @param array Context
  * @return array|boolean FALSE if no widgets for a requested container
  */
-function get_default_widgets_by_container( $container_code, $kind = '', $blog_id = NULL, $context = array() )
+function get_default_widgets_by_container( $container_code, $coll_type = '', $context = array() )
 {
-	$default_widgets = get_default_widgets( $kind, $blog_id, $context );
+	$default_widgets = get_default_widgets( $coll_type, $context );
 
 	return isset( $default_widgets[ $container_code ] ) ? $default_widgets[ $container_code ] : false;
 }

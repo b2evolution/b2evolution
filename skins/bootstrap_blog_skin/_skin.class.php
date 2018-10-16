@@ -122,7 +122,8 @@ class bootstrap_blog_Skin extends Skin
 	/**
 	 * Get the declarations of the widgets that the skin wants to use.
 	 *
-	 * @param string Collection kind: 'std', 'main', 'photo', 'group', 'forum', 'manual'
+	 * @param string Collection type: 'std', 'main', 'photo', 'group', 'forum', 'manual'
+	 * @param string Skin type: 'normal' - Standard, 'mobile' - Phone, 'tablet' - Tablet
 	 * @param array Additional params. Example value 'init_as_blog_b' => true
 	 * @return array Array of default widgets:
 	 *          - Key - Container code,
@@ -137,10 +138,11 @@ class bootstrap_blog_Skin extends Skin
 	 *                - 'params' - Widget params(array or serialized string),
 	 *                - 'type' - Widget type(default = 'core', another value - 'plugin'),
 	 *                - 'enabled' - Boolean value; default is TRUE; FALSE to install the widget as disabled,
-	 *                - 'coll_type': Include this widget only for collection kinds separated by comma, first char "-" means to exclude,
+	 *                - 'coll_type': Include this widget only for collection types separated by comma, first char "-" means to exclude,
+	 *                - 'skin_type': Include this widget only for skin types separated by comma, first char "-" means to exclude,
 	 *                - 'install' - Boolean value; default is TRUE; FALSE to skip this widget on install.
 	 */
-	function get_default_widgets( $kind = '', $context = array() )
+	function get_default_widgets( $coll_type = '', $skin_type = 'normal', $context = array() )
 	{
 		global $DB;
 
@@ -175,7 +177,7 @@ class bootstrap_blog_Skin extends Skin
 			array( 35, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'arcdir' ) ),
 			array( 37, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'latestcomments' ) ),
 			array( 50, 'msg_menu_link', 'params' => array( 'link_type' => 'messages' ), 'enabled' => 0 ),
-			array( 60, 'msg_menu_link', 'params' => array( 'link_type' => 'contacts', 'show_badge' => 0 ), 'enabled' => ( $kind == 'minisite' ) ),
+			array( 60, 'msg_menu_link', 'params' => array( 'link_type' => 'contacts', 'show_badge' => 0 ), 'enabled' => ( $coll_type == 'minisite' ) ),
 			array( 70, 'basic_menu_link', 'params' => array( 'link_type' => 'login' ), 'enabled' => 0 ),
 		);
 
@@ -318,12 +320,12 @@ class bootstrap_blog_Skin extends Skin
 		$default_widgets['front_page_main_area'] = array(
 			array(  1, 'coll_title', 'coll_type' => 'main,minisite' ),
 			array(  2, 'coll_tagline', 'coll_type' => 'main,minisite' ),
-			array( 10, 'coll_featured_intro', 'params' => ( $kind == 'main' ? array(
+			array( 10, 'coll_featured_intro', 'params' => ( $coll_type == 'main' ? array(
 				// Hide a title of the front intro post:
 					'disp_title' => 0,
 				) : NULL ) ),
 			array( 15, 'user_links', 'coll_type' => 'main' ),
-			array( 20, 'coll_featured_posts', 'params' => ( $kind == 'main' ? array(
+			array( 20, 'coll_featured_posts', 'params' => ( $coll_type == 'main' ? array(
 				// Display the posts from all other blogs if it is allowed by blogs setting "Collections to aggregate":
 					'blog_ID'    => '',
 					'limit'      => 5,
@@ -334,7 +336,7 @@ class bootstrap_blog_Skin extends Skin
 			array( 40, 'poll', 'install' => $context['init_as_blog_b'], 'params' => array( 'poll_ID' => 1 ) ),
 			array( 50, 'subcontainer_row', 'params' => array(
 					'column1_container' => 'front_page_column_a',
-					'column1_class'     => ( $kind == 'main' ? 'col-xs-12' : 'col-sm-6 col-xs-12' ),
+					'column1_class'     => ( $coll_type == 'main' ? 'col-xs-12' : 'col-sm-6 col-xs-12' ),
 					'column2_container' => 'front_page_column_b',
 					'column2_class'     => 'col-sm-6 col-xs-12',
 				) ),
@@ -414,12 +416,14 @@ class bootstrap_blog_Skin extends Skin
 
 		/* Mobile Footer */
 		$default_widgets['mobile_footer'] = array(
+			'skin_type' => 'mobile',
 			array( 10, 'coll_longdesc' ),
 			array( 20, 'mobile_skin_switcher' ),
 		);
 
 		/* Mobile Navigation Menu */
 		$default_widgets['mobile_navigation_menu'] = array(
+			'skin_type' => 'mobile',
 			array( 10, 'coll_page_list' ),
 			array( 20, 'basic_menu_link', 'params' => array( 'link_type' => 'ownercontact' ) ),
 			array( 30, 'basic_menu_link', 'params' => array( 'link_type' => 'home' ) ),
@@ -427,6 +431,7 @@ class bootstrap_blog_Skin extends Skin
 
 		/* Mobile Tools Menu */
 		$default_widgets['mobile_tools_menu'] = array(
+			'skin_type' => 'mobile',
 			array( 10, 'basic_menu_link', 'params' => array( 'link_type' => 'login' ) ),
 			array( 20, 'msg_menu_link', 'params' => array( 'link_type' => 'messages' ) ),
 			array( 30, 'msg_menu_link', 'params' => array( 'link_type' => 'contacts', 'show_badge' => 0 ) ),

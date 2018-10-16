@@ -6272,7 +6272,7 @@ class Blog extends DataObject
 
 		// Get the declarations of the widgets that the skin wants to use:
 		$context['current_coll_ID'] = $this->ID;
-		$skin_widgets = $coll_Skin->get_default_widgets( $this->get( 'type' ), $context );
+		$skin_widgets = $coll_Skin->get_default_widgets( $this->get( 'type' ), $skin_type, $context );
 
 		// Check if the skin wants to use all b2evolution default widgets:
 		if( isset( $skin_widgets['*'] ) )
@@ -6288,7 +6288,7 @@ class Blog extends DataObject
 		load_funcs( 'widgets/_widgets.funcs.php' );
 
 		// Get the declarations of the widgets that b2evolution recommends by default:
-		$b2evo_default_widgets = get_default_widgets( $this->get( 'type' ), $this->ID, $context );
+		$b2evo_default_widgets = get_default_widgets( $this->get( 'type' ), $context );
 
 		// Merge the skin widget declarations with b2evolution default widgets:
 		foreach( $b2evo_default_widgets as $container_code => $widgets )
@@ -6306,13 +6306,27 @@ class Blog extends DataObject
 		}
 
 		// Check all skin widget containers to be sure they all are proper arrays and not other values like true, false and etc.:
-		foreach( $skin_widgets as $container_code => $widgets )
+		foreach( $skin_widgets as $container_code => $container_widgets )
 		{
-			if( $widgets === true )
-			{	// Set empty container if it has not been detected in b2evolution default widget declrations above:
+			if( isset( $container_widgets['coll_type'] ) &&
+			    ! is_allowed_option( $this->get( 'type' ), $container_widgets['coll_type'] ) )
+			{	// Skip container because it should not be installed for the given collection kind:
+				unset( $skin_widgets[ $container_code ] );
+				continue;
+			}
+
+			if( isset( $container_widgets['skin_type'] ) &&
+			    ! is_allowed_option( $skin_type, $container_widgets['skin_type'] ) )
+			{	// Skip container because it should not be installed for the given skin type:
+				unset( $skin_widgets[ $container_code ] );
+				continue;
+			}
+
+			if( $container_widgets === true )
+			{	// Set empty container if it has not been detected in b2evolution default widget declarations above:
 				$skin_widgets[ $container_code ] = array();
 			}
-			elseif( ! is_array( $widgets ) )
+			elseif( ! is_array( $container_widgets ) )
 			{	// Ignore all other not array, probably it is a boolean false or some other string value which should be ignored indeed:
 				unset( $skin_widgets[ $container_code ] );
 			}
@@ -6347,31 +6361,36 @@ class Blog extends DataObject
 		$widget_containers_sql_rows = array();
 		foreach( $blog_containers as $container_code => $wico_data )
 		{
-			$widget_containers_sql_rows[] = '( '.$DB->quote( $container_code ).', '.$DB->quote( $skin_type ).', '.$DB->quote( $wico_data[0] ).', '.$this->ID.', '.$DB->quote( $wico_data[1] ).', '.( isset( $wico_data[2] ) ? intval( $wico_data[2] ) : '1' ).' )';
+			if( isset( $skin_widgets[ $container_code ] ) )
+			{
+				$widget_containers_sql_rows[] = '( '.$DB->quote( $container_code ).', '.$DB->quote( $skin_type ).', '.$DB->quote( $wico_data[0] ).', '.$this->ID.', '.$DB->quote( $wico_data[1] ).', '.( isset( $wico_data[2] ) ? intval( $wico_data[2] ) : '1' ).' )';
+			}
 		}
 
-		// Insert widget containers records by one SQL query
+		if( empty( $widget_containers_sql_rows ) )
+		{	// No collection containers to install:
+			return;
+		}
+
+		// Insert widget containers records by one SQL query:
 		$DB->query( 'INSERT INTO T_widget__container ( wico_code, wico_skin_type, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES'
 			.implode( ', ', $widget_containers_sql_rows ) );
 
 		$insert_id = $DB->insert_id;
 		foreach( $blog_containers as $container_code => $wico_data )
 		{
-			$blog_containers[ $container_code ]['wico_ID'] = $insert_id;
-			$insert_id++;
+			if( isset( $skin_widgets[ $container_code ] ) )
+			{
+				$blog_containers[ $container_code ]['wico_ID'] = $insert_id;
+				$insert_id++;
+			}
 		}
 
 		$basic_widgets_insert_sql_rows = array();
 		foreach( $skin_widgets as $container_code => $container_widgets )
 		{
 			if( ! isset( $blog_containers[ $container_code ] ) )
-			{	// Skip container which is not supported by current colelction's skin:
-				continue;
-			}
-
-			if( isset( $container_widgets['coll_type'] ) &&
-			    ! is_allowed_option( $this->get( 'type' ), $container_widgets['coll_type'] ) )
-			{	// Skip container because it should not be installed for the given collection kind:
+			{	// Skip container which is not supported by current collection's skin:
 				continue;
 			}
 
@@ -6396,6 +6415,11 @@ class Blog extends DataObject
 
 				if( isset( $widget['coll_ID'] ) && ! is_allowed_option( $this->ID, $widget['coll_ID'] ) )
 				{	// Skip widget because it should not be installed for the given collection ID:
+					continue;
+				}
+
+				if( isset( $widget['skin_type'] ) && ! is_allowed_option( $skin_type, $widget['skin_type'] ) )
+				{	// Skip widget because it should not be installed for the given skin type:
 					continue;
 				}
 
