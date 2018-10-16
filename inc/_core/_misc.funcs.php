@@ -4352,7 +4352,7 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 		{
 			$tracking_params = array(
 					'content_type' => $format,
-					'image_load' => isset( $$track_email_image_load ) ? $$track_email_image_load : true,
+					'image_load' => isset( $track_email_image_load ) ? $track_email_image_load : true,
 					'link_click_html' => isset( $track_email_click_html ) ? $track_email_click_html : true ,
 					'link_click_text' => isset( $track_email_click_plain_text ) ? $track_email_click_plain_text : true,
 					'template_parts' => $params['template_parts'],
