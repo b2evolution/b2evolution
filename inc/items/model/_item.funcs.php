@@ -4187,7 +4187,7 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 					$custom_field_note .= ' &middot; '.T_('Parent Item Field value').': '
 						.$parent_Item->get_edit_link( array( 'text' => format_to_output( $preview_parent_custom_field_value, ( $custom_field['type'] == 'double' ? 'raw' : 'htmlspecialchars' ) ) ) )
 						.action_icon( '', 'refresh', '#', NULL, NULL, NULL, array(
-						'data-child-input-id' => 'item_'.$custom_field['type'].'_'.$custom_field['ID'],
+						'data-child-input-id' => 'item_cf_'.$custom_field['name'],
 						'data-parent-value'   => $parent_custom_field_value,
 					) );
 					$custom_field_input_params['disabled'] = 'disabled';
