@@ -701,7 +701,7 @@ function create_demo_organization( $owner_ID, $org_name = 'Company XYZ', $add_cu
 		if( $Organization->dbinsert() )
 		{
 			$demo_org_ID = $Organization->ID;
-			$Messages->add( sprintf( T_('The sample organization %s has been created.'), $org_name ), 'success' );
+			$Messages->add_to_group( sprintf( T_('The sample organization %s has been created.'), $org_name ), 'success', T_('Demo contents').':' );
 		}
 	}
 
