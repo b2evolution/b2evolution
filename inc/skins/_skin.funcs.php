@@ -187,18 +187,34 @@ function skin_init( $disp )
 					&& (( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
 								|| $Blog->get_setting( 'relcanonical_item_urls' ) ) )
 			{	// We want to redirect to the Item's canonical URL:
-
-				$canonical_url = $Item->get_permanent_url( '', '', '&' );
-				if( preg_match( '|[&?](page=\d+)|', $ReqURI, $page_param ) )
-				{	// A certain post page has been requested, keep only this param and discard all others:
-					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
+				$canonical_is_same_url = true;
+				// Use item URL from first detected category of the current collection:
+				$canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID );
+				$canonical_url_params_regexp = '#[&?](page=\d+|mode=quote&[qcp]+=\d+)+#';
+				if( preg_match_all( $canonical_url_params_regexp, $ReqURI, $page_param ) )
+				{	// A certain post page or a quote of comment/post have been requested, keep only this param and discard all others:
+					$canonical_url = url_add_param( $canonical_url, implode( '&', $page_param[1] ), '&' );
 				}
-				if( preg_match( '|[&?](mode=quote&[qcp]+=\d+)|', $ReqURI, $page_param ) )
-				{	// A quote of comment/post, keep only these params and discard all others:
-					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
+				$canonical_is_same_url = is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
+
+				if( ! $canonical_is_same_url && in_array( $Blog->get_setting( 'single_links' ), array( 'subchap', 'chapters' ) ) )
+				{	// If current URL is not same as first detected category then try to check all other categories from the current collection:
+					$item_chapters = $Item->get_Chapters();
+					foreach( $item_chapters as $item_Chapter )
+					{	// Try to find in what category the Item may has the same canonical url as current requested URL:
+						$cat_canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID, $item_Chapter->ID );
+						if( preg_match_all( $canonical_url_params_regexp, $ReqURI, $page_param ) )
+						{	// A certain post page or a quote of comment/post have been requested, keep only this param and discard all others:
+							$cat_canonical_url = url_add_param( $cat_canonical_url, implode( '&', $page_param[1] ), '&' );
+						}
+						if( $canonical_is_same_url = is_same_url( $ReqURL, $cat_canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
+						{	// We have found the same URL, stop find another and stay on the current page without redirect:
+							break;
+						}
+					}
 				}
 
-				if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
+				if( ! $canonical_is_same_url )
 				{	// The requested URL does not look like the canonical URL for this post...
 					// url difference was resolved
 					$url_resolved = false;
@@ -234,16 +250,21 @@ function skin_init( $disp )
 						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 					}
 
-					if( !$url_resolved && $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' && ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) ) )
+					if( ! $url_resolved &&
+					    $Blog->get_setting( 'canonical_item_urls' ) &&
+					    $redir == 'yes' &&
+					    ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) || // If Item has main category in the current collection
+					      $Item->is_part_of_blog( $Blog->ID ) // If Item has extra category from not main collection
+					    ) )
 					{	// REDIRECT TO THE CANONICAL URL:
 						$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].' );
 						header_redirect( $canonical_url, true );
+						// EXITED.
 					}
 					else
 					{	// Use rel="canoncial":
 						add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 					}
-					// EXITED.
 				}
 			}
 
