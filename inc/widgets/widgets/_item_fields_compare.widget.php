@@ -82,8 +82,6 @@ class item_fields_compare_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $Blog;
-
 		$ItemTypeCache = & get_ItemTypeCache();
 		$item_type_options = array(
 				'default' => T_('Default types shown for this collection')
@@ -161,7 +159,7 @@ class item_fields_compare_Widget extends ComponentWidget
 		for( $order_index = 0; $order_index <= 2; $order_index++ )
 		{	// Default order settings:
 			$field_suffix = ( $order_index == 0 ? '' : '_'.$order_index );
-			$coll_item_sort_options = get_available_sort_options( $Blog->ID, $order_index > 0, true );
+			$coll_item_sort_options = get_available_sort_options( $this->get( 'coll_ID' ), $order_index > 0, true );
 			$r = array_merge( $r, array(
 				'order_begin_line'.$field_suffix => array(
 					'type' => 'begin_line',
@@ -876,6 +874,11 @@ class item_fields_compare_Widget extends ComponentWidget
 					}
 				}
 			}
+		}
+
+		if( empty( $Blog ) )
+		{	// Cannot use filter by ItemList below because current collection is not defined:
+			return $items;
 		}
 
 		// Use ItemList in order to check what items can be displayed on front-office for current User
