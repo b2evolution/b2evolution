@@ -317,9 +317,10 @@ class ItemLight extends DataObject
 	 * @param string base url to use
 	 * @param string glue between url params
 	 * @param integer Collection ID, to use URL of first category of this Item from the collection, NULL - use current collection when it is allowed to stay in same collection when cross-posted
+	 * @param integer Category ID, to use URL of this Item from the requested category
 	 * @return string
 	 */
-	function get_single_url( $allow_redir = true, $blogurl = '', $glue = '&amp;', $blog_ID = NULL )
+	function get_single_url( $allow_redir = true, $blogurl = '', $glue = '&amp;', $blog_ID = NULL, $cat_ID = NULL )
 	{
 		$this->get_Blog();
 
@@ -377,14 +378,15 @@ class ItemLight extends DataObject
 						$ChapterCache = & get_ChapterCache();
 						$url_Chapter = & $ChapterCache->get_by_ID( $this->current_extra_cat_ID, false, false );
 					}
-					// Try to find first extra category of this Item from the requested collection:
+					// Try to find first extra or requested category of this Item from the requested collection:
 					if( empty( $url_Chapter ) )
 					{	// If we know what collection use to search category, but exclude main collection in order to use main category instead of extra:
 						$item_chapters = $this->get_Chapters();
 						foreach( $item_chapters as $item_Chapter )
 						{
-							if( $item_Chapter->get( 'blog_ID' ) == $blog_ID )
-							{	// Use first found category of this Item from the requested collection:
+							if( $item_Chapter->get( 'blog_ID' ) == $blog_ID &&
+							  ( $cat_ID === NULL || $item_Chapter->ID == $cat_ID ) )
+							{	// Use first found or requested category of this Item from the requested collection:
 								$url_Chapter = $item_Chapter;
 								break;
 							}
@@ -477,9 +479,10 @@ class ItemLight extends DataObject
 	 * @param string Glue between url params
 	 * @param array What permanent types should be ignored to don't return a permanent URL
 	 * @param integer Collection ID, to use URL of first category of this Item from the collection
+	 * @param integer Category ID, to use URL of this Item from the requested category
 	 * @return string|boolean Permalink URL | FALSE when some permanent type must be ignored
 	 */
-	function get_permanent_url( $permalink_type = '', $blogurl = '', $glue = '&amp;', $ignore_types = array(), $blog_ID = NULL )
+	function get_permanent_url( $permalink_type = '', $blogurl = '', $glue = '&amp;', $ignore_types = array(), $blog_ID = NULL, $cat_ID = NULL )
 	{
 		// Get permalink type depending on this item settings:
 		$permalink_type = $this->get_permalink_type( $permalink_type );
@@ -528,7 +531,7 @@ class ItemLight extends DataObject
 
 			case 'single':
 			default:
-				return $this->get_single_url( true, $blogurl, $glue, $blog_ID );
+				return $this->get_single_url( true, $blogurl, $glue, $blog_ID, $cat_ID );
 		}
 	}
 
