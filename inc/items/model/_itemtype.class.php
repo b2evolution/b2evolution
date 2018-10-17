@@ -626,9 +626,12 @@ class ItemType extends DataObject
 					WHERE itcf_ityp_ID = '.$DB->quote( $this->ID ).'
 						AND itcf_ID = '.$DB->quote( $itcf_ID ).'
 						AND itcf_type = '.$DB->quote( $custom_field['type'] ) );
-				if( isset( $old_custom_fields[ $itcf_ID ] ) )
+				if( isset( $old_custom_fields[ $itcf_ID ] ) &&
+				    $this->ID > 0 &&
+				    $custom_field['name'] != $old_custom_fields[ $itcf_ID ]['name'] )
 				{	// Update item setting names of custom field to use new field name:
 					$DB->query( 'UPDATE T_items__item_settings
+						INNER JOIN T_items__item ON post_ID = iset_item_ID AND post_ityp_ID = '.$DB->quote( $this->ID ).'
 						  SET iset_name = '.$DB->quote( 'custom:'.$custom_field['name'] ).'
 						WHERE iset_name = '.$DB->quote( 'custom:'.$old_custom_fields[ $itcf_ID ]['name'] ) );
 				}
