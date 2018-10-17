@@ -184,7 +184,7 @@ function skin_init( $disp )
 								|| $Blog->get_setting( 'relcanonical_item_urls' ) ) )
 			{	// We want to redirect to the Item's canonical URL:
 
-				$canonical_url = $Item->get_permanent_url( '', '', '&' );
+				$canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID );
 				if( preg_match( '|[&?](page=\d+)|', $ReqURI, $page_param ) )
 				{	// A certain post page has been requested, keep only this param and discard all others:
 					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
@@ -230,16 +230,25 @@ function skin_init( $disp )
 						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 					}
 
-					if( !$url_resolved && $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' && ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) ) )
+					if( ! $url_resolved && $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
 					{	// REDIRECT TO THE CANONICAL URL:
-						$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].' );
-						header_redirect( $canonical_url, true );
+						if( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) )
+						{	// Redirect to URL where Item has main category:
+							$Debuglog->add( 'Redirecting to main canonical URL ['.$canonical_url.'].' );
+							header_redirect( $canonical_url, true );
+							// EXITED.
+						}
+						elseif( $Item->is_part_of_blog( $Blog->ID ) )
+						{	// Redirect to URL where Item has extra category from not main collection:
+							$canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID );
+							$Debuglog->add( 'Redirecting to extra canonical URL ['.$canonical_url.'].' );
+							header_redirect( $canonical_url, true );
+							// EXITED.
+						}
 					}
-					else
-					{	// Use rel="canoncial":
-						add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
-					}
-					// EXITED.
+
+					// Use rel="canoncial":
+					add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 				}
 			}
 
