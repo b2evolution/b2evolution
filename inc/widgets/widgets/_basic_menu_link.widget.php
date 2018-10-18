@@ -42,31 +42,34 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 
 		$this->link_types = array(
 			'home' => T_('Front Page'),
-			'recentposts' => T_('Recent posts'),
-			'search' => T_('Search page'),
-			'arcdir' => T_('Archive directory'),
-			'catdir' => T_('Category directory'),
-			'tags' => T_('Tags'),
-			'postidx' => T_('Post index'),
-			'mediaidx' => T_('Photo index'),
-			'sitemap' => T_('Site Map'),
-			'latestcomments' => T_('Latest comments'),
+			'recentposts' => T_('Recent posts').' (disp=posts)',
+			'search' => T_('Search page').' (disp=search)',
+			'arcdir' => T_('Archive directory').' (disp=arcdir)',
+			'catdir' => T_('Category directory').' (disp=catdir)',
+			'tags' => T_('Tags').' (disp=tags)',
+			'postidx' => T_('Post index').' (disp=postidx)',
+			'mediaidx' => T_('Photo index').' (disp=mediaidx)',
+			'sitemap' => T_('Site Map').' (disp=sitemap)',
+			'latestcomments' => T_('Latest comments').' (disp=comments)',
 
-			'ownercontact' => T_('Blog owner contact form'),
-			'owneruserinfo' => T_('Blog owner profile'),
+			'ownercontact' => T_('Blog owner contact form').' (disp=msgform)',
+			'owneruserinfo' => T_('Blog owner profile').' (disp=user)',
 
-			'users' => T_('User directory'),
+			'users' => T_('User directory').' (disp=users)',
 
-			'login' => T_('Log in form'),
+			'login' => T_('Log in form').' (disp=login)',
 			'logout' => T_('Logout link'),
-			'register' => T_('Registration form'),
-			'myprofile' => T_('My profile'),
-			'profile' => T_('Edit profile'),
-			'avatar' => T_('Edit profile picture'),
-			'visits' => T_('My visits'),
+			'register' => T_('Registration form').' (disp=register)',
+			'myprofile' => T_('My profile').' (disp=user)',
+			'profile' => T_('Edit profile').' (disp=profile)',
+			'avatar' => T_('Edit profile picture').' (disp=avatar)',
+			'visits' => T_('My visits').' (disp=visits)',
 
-			'item' => T_('Any item (post, page, etc...)'),
-			'postnew' => T_('New Item'),
+			'useritems' => T_('User\'s posts/items').' (disp=useritems)',
+			'usercomments' => T_('User\'s comments').' (disp=usercomments)',
+
+			'item' => T_('Any item (post, page, etc...)').' (disp=single|page) ',
+			'postnew' => T_('New Item').' (disp=edit)',
 
 			'admin' => T_('Admin / Back-Office link'),
 			'url' => T_('Any URL'),
@@ -497,6 +500,26 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					$text .= ' <span class="badge badge-info">'.$visit_count.'</span>';
 				}
 				$highlight_current = ( $highlight_current && $disp == 'visits' );
+				break;
+
+			case 'useritems':
+				if( ! is_logged_in() )
+				{
+					return false;
+				}
+				$url = url_add_param( $Blog->gen_blogurl(), 'disp=useritems' );
+				$text = T_('User\'s posts/items');
+				$highlight_current = ( $highlight_current && $disp == 'useritems' );
+				break;
+
+			case 'usercomments':
+				if( ! is_logged_in() )
+				{
+					return false;
+				}
+				$url = url_add_param( $Blog->gen_blogurl(), 'disp=usercomments' );
+				$text = T_('User\'s usercomments');
+				$highlight_current = ( $highlight_current && $disp == 'usercomments' );
 				break;
 
 			case 'users':

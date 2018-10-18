@@ -1461,7 +1461,13 @@ function skin_init( $disp )
 			global $display_params, $viewed_User;
 
 			// get user_ID because we want it in redirect_to in case we need to ask for login.
-			$user_ID = param( 'user_ID', 'integer', true, true );
+			$user_ID = param( 'user_ID', 'integer', NULL, true );
+
+			if( $user_ID === NULL && is_logged_in() )
+			{	// Use current logged in User if it is not specified in param:
+				$user_ID = $current_User->ID;
+			}
+
 			if( empty( $user_ID ) )
 			{
 				bad_request_die( sprintf( T_('Parameter &laquo;%s&raquo; is required!'), 'user_ID' ) );
