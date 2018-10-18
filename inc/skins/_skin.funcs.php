@@ -2836,6 +2836,9 @@ function skin_body_attrs( $params = array() )
 	// Logged in/Anonymous class:
 	$classes[] = is_logged_in() ? 'loggedin' : 'anonymous';
 
+	// Toolbar visibility class:
+	$classes[] = show_toolbar() ? 'evo_toolbar_visible' : 'evo_toolbar_hidden';
+
 	// User Group class:
 	$classes[] = 'usergroup_'.( ! is_logged_in() && empty( $current_User->grp_ID ) ? 'none' : $current_User->grp_ID );
 
