@@ -522,6 +522,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			case 'useritems':
 				if( ! is_logged_in() )
 				{
+					$this->display_debug_message();
 					return false;
 				}
 				$url = url_add_param( $Blog->gen_blogurl(), 'disp=useritems' );
@@ -532,6 +533,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			case 'usercomments':
 				if( ! is_logged_in() )
 				{
+					$this->display_debug_message();
 					return false;
 				}
 				$url = url_add_param( $Blog->gen_blogurl(), 'disp=usercomments' );
