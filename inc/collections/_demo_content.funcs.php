@@ -3286,23 +3286,42 @@ function create_demo_poll()
 {
 	global $DB;
 
-	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text, pqst_max_answers )
-		VALUES ( 1, "What are your favorite b2evolution features?", 3 )' );
-	$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
-		VALUES ( 1, "Multiple blogs",          1 ),
-					( 1, "Photo Galleries",         2 ),
-					( 1, "Forums",                  3 ),
-					( 1, "Online Manuals",          4 ),
-					( 1, "Lists / E-mailing", 5 ),
-					( 1, "Easy Maintenance",        6 )' );
-	$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
-		VALUES ( 1, 5, 1 ), ( 1, 5, 5 ), ( 1, 5, 6 ),
-					( 1, 6, 2 ), ( 1, 6, 5 ), ( 1, 6, 1 ),
-					( 1, 7, 2 ), ( 1, 7, 5 ), ( 1, 6, 3 ),
-					( 1, 2, 2 ), ( 1, 2, 5 ), ( 1, 2, 4 ),
-					( 1, 3, 3 ), ( 1, 3, 5 ), ( 1, 3, 1 ),
-					( 1, 4, 3 ), ( 1, 4, 6 ), ( 1, 4, 2 ),
-					( 1, 1, 6 ), ( 1, 1, 5 ), ( 1, 1, 3 )' );
+	$UserCache = & get_UserCache();
+	$user_IDs = $UserCache->get_ID_array();
+	$max_answers = 3;
 
-	return $DB->insert_id;
+	// Add poll question:
+	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text, pqst_max_answers )
+		VALUES ( 1, "What are your favorite b2evolution features?", '.$max_answers.' )' );
+
+	$demo_poll_ID = $DB->insert_id;
+
+	// Add poll answers:
+	$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
+               VALUES ( '.$demo_poll_ID.', "Multiple blogs",   1 ),
+                      ( '.$demo_poll_ID.', "Photo Galleries",   2 ),
+                      ( '.$demo_poll_ID.', "Forums",            3 ),
+                      ( '.$demo_poll_ID.', "Online Manuals",    4 ),
+                      ( '.$demo_poll_ID.', "Lists / E-mailing", 5 ),
+                      ( '.$demo_poll_ID.', "Easy Maintenance",  6 )' );
+
+	// Generate answers:
+	$insert_values = array();
+	foreach( $user_IDs as $user_ID )
+	{
+		$answers = array( 1, 2, 3, 4, 5, 6 );
+		for( $i = 0; $i < $max_answers; $i++ )
+		{
+			$rand_key = array_rand( $answers );
+			$insert_values[] = '( '.$demo_poll_ID.', '.$user_ID.', '.$answers[$rand_key].' )';
+			unset( $answers[$rand_key] );
+		}
+	}
+	if( $insert_values )
+	{
+		$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
+			VALUES '.implode( ', ', $insert_values ) );
+	}
+
+	return $demo_poll_ID;
 }
