@@ -2079,16 +2079,16 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'demo' );
-				$edited_Item->set_setting( 'custom:first_numeric_field', '123' );
-				$edited_Item->set_setting( 'custom:second_numeric_field', '456' );
-				$edited_Item->set_setting( 'custom:usd_price', '29.99' );
-				$edited_Item->set_setting( 'custom:eur_price', '24.79' );
-				$edited_Item->set_setting( 'custom:first_string_field', 'abc' );
-				$edited_Item->set_setting( 'custom:multiline_plain_text_field', 'This is a sample text field.
+				$edited_Item->set_custom_field( 'first_numeric_field', '123' );
+				$edited_Item->set_custom_field( 'second_numeric_field', '456' );
+				$edited_Item->set_custom_field( 'usd_price', '29.99' );
+				$edited_Item->set_custom_field( 'eur_price', '24.79' );
+				$edited_Item->set_custom_field( 'first_string_field', 'abc' );
+				$edited_Item->set_custom_field( 'multiline_plain_text_field', 'This is a sample text field.
 It can have multiple lines.' );
-				$edited_Item->set_setting( 'custom:multiline_html_field', 'This is an <b>HTML</b> <i>field</i>.' );
-				$edited_Item->set_setting( 'custom:url_field', 'http://b2evolution.net/' );
-				$edited_Item->set_setting( 'custom:checkmark_field', '1' );
+				$edited_Item->set_custom_field( 'multiline_html_field', 'This is an <b>HTML</b> <i>field</i>.' );
+				$edited_Item->set_custom_field( 'url_field', 'http://b2evolution.net/' );
+				$edited_Item->set_custom_field( 'checkmark_field', '1' );
 				$post_custom_fields_ID = $edited_Item->insert( $owner_ID, T_('Custom Fields Example'),
 '<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>'.
 
@@ -2109,7 +2109,7 @@ It can have multiple lines.' );
 				$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				$custom_item_link_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'attachment' );
-				$edited_Item->set_setting( 'custom:image_1', $custom_item_link_ID );
+				$edited_Item->set_custom_field( 'image_1', $custom_item_link_ID );
 				$edited_Item->dbupdate();
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
@@ -2118,17 +2118,17 @@ It can have multiple lines.' );
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'demo' );
-				$edited_Item->set_setting( 'custom:first_numeric_field', '123.45' );
-				$edited_Item->set_setting( 'custom:second_numeric_field', '456' );
-				$edited_Item->set_setting( 'custom:usd_price', '17.50' );
-				$edited_Item->set_setting( 'custom:eur_price', '14.95' );
-				$edited_Item->set_setting( 'custom:first_string_field', 'abcdef' );
-				$edited_Item->set_setting( 'custom:multiline_plain_text_field', 'This is a sample text field.
+				$edited_Item->set_custom_field( 'first_numeric_field', '123.45' );
+				$edited_Item->set_custom_field( 'second_numeric_field', '456' );
+				$edited_Item->set_custom_field( 'usd_price', '17.50' );
+				$edited_Item->set_custom_field( 'eur_price', '14.95' );
+				$edited_Item->set_custom_field( 'first_string_field', 'abcdef' );
+				$edited_Item->set_custom_field( 'multiline_plain_text_field', 'This is a sample text field.
 It can have multiple lines.
 This is an extra line.' );
-				$edited_Item->set_setting( 'custom:multiline_html_field', 'This is an <b>HTML</b> <i>field</i>.' );
-				$edited_Item->set_setting( 'custom:url_field', 'http://b2evolution.net/' );
-				$edited_Item->set_setting( 'custom:checkmark_field', '0' );
+				$edited_Item->set_custom_field( 'multiline_html_field', 'This is an <b>HTML</b> <i>field</i>.' );
+				$edited_Item->set_custom_field( 'url_field', 'http://b2evolution.net/' );
+				$edited_Item->set_custom_field( 'checkmark_field', '0' );
 				$another_custom_fields_example_ID = $edited_Item->insert( $owner_ID, T_('Another Custom Fields Example'),
 '<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>'.
 
@@ -2149,7 +2149,7 @@ This is an extra line.' );
 				$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley-road.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				$another_item_link_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'attachment' );
-				$edited_Item->set_setting( 'custom:image_1', $another_item_link_ID );
+				$edited_Item->set_custom_field( 'image_1', $another_item_link_ID );
 				$edited_Item->dbupdate();
 				$item_IDs[] = array( $edited_Item->ID, $now );
 
@@ -2160,10 +2160,10 @@ This is an extra line.' );
 					$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 					$edited_Item = new Item();
 					$edited_Item->set_tags_from_string( 'demo' );
-					$edited_Item->set_setting( 'custom:first_numeric_field', '123' );
-					$edited_Item->set_setting( 'custom:first_string_field', 'abc' );
-					$edited_Item->set_setting( 'custom:image_1', $custom_item_link_ID );
-					$edited_Item->set_setting( 'custom:checkmark_field', '1' );
+					$edited_Item->set_custom_field( 'first_numeric_field', '123' );
+					$edited_Item->set_custom_field( 'first_string_field', 'abc' );
+					$edited_Item->set_custom_field( 'image_1', $custom_item_link_ID );
+					$edited_Item->set_custom_field( 'checkmark_field', '1' );
 					$edited_Item->set( 'parent_ID', $post_custom_fields_ID ); // Set parent post ID
 					/*$edited_Item->insert( $owner_ID, T_('Child Post Example'), T_('<p>This post has a special post type called "Child Post".</p>'),*/
 					$edited_Item->insert( $owner_ID, T_('Child Post Example'),

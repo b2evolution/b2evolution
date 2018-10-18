@@ -668,6 +668,9 @@ fieldset ul {
   font-weight: normal;
   display: block;
 }
+#itemform_custom_fields .help-inline label {
+  display: inline-block;
+}
 #itemform_adv_props ul.token-input-list-facebook {
   width: 100%;
   max-width: 100%;

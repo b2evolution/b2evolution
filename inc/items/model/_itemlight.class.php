@@ -1604,8 +1604,9 @@ class ItemLight extends DataObject
 
 			case 'ityp_ID':
 				if( $this->get( 'ityp_ID' ) != $parvalue )
-				{	// Reset Item Type on changing ID to different value:
+				{	// Reset Item Type and parent Item on changing ID to different value:
 					$this->ItemType = NULL;
+					$this->parent_Item = NULL;
 				}
 				return $this->set_param( $parname, 'number', $parvalue, true );
 

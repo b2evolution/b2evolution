@@ -48,6 +48,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_comments__prerendering'   => $tableprefix.'comments__prerendering',
 		'T_items__item'              => $tableprefix.'items__item',
 		'T_items__item_settings'     => $tableprefix.'items__item_settings',
+		'T_items__item_custom_field' => $tableprefix.'items__item_custom_field',
 		'T_items__itemtag'           => $tableprefix.'items__itemtag',
 		'T_items__prerendering'      => $tableprefix.'items__prerendering',
 		'T_items__status'            => $tableprefix.'items__status',

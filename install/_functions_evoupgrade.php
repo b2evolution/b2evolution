@@ -10857,6 +10857,24 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15280, 'Creating item custom field values table...' ) )
+	{	// part of 7.0.0-alpha
+		db_create_table( 'T_items__item_custom_field', '
+			icfv_item_ID     INT UNSIGNED NOT NULL,
+			icfv_itcf_name   VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
+			icfv_value       VARCHAR( 10000 ) COLLATE utf8mb4_unicode_ci NULL,
+			icfv_parent_sync TINYINT(1) NOT NULL DEFAULT 1,
+			PRIMARY KEY      ( icfv_item_ID, icfv_itcf_name )' );
+		// Move custom field values from settings table to new created above:
+		$DB->query( 'INSERT INTO T_items__item_custom_field ( icfv_item_ID, icfv_itcf_name, icfv_value )
+			SELECT iset_item_ID, SUBSTRING( iset_name, 8 ), iset_value
+			  FROM T_items__item_settings
+			 WHERE iset_name LIKE "custom:%"' );
+		$DB->query( 'DELETE FROM T_items__item_settings
+			WHERE iset_name LIKE "custom:%"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

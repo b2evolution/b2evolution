@@ -444,6 +444,16 @@ $schema_queries = array_merge( $schema_queries, array(
 			PRIMARY KEY ( iset_item_ID, iset_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	'T_items__item_custom_field' => array(
+		'Creating item custom field values table',
+		"CREATE TABLE T_items__item_custom_field (
+			icfv_item_ID     INT UNSIGNED NOT NULL,
+			icfv_itcf_name   VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
+			icfv_value       VARCHAR( 10000 ) COLLATE utf8mb4_unicode_ci NULL,
+			icfv_parent_sync TINYINT(1) NOT NULL DEFAULT 1,
+			PRIMARY KEY      ( icfv_item_ID, icfv_itcf_name )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
 	'T_items__user_data' => array(
 		'Creating table for user post data',
 		"CREATE TABLE T_items__user_data (

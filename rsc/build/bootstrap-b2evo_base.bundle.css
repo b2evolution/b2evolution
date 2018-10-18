@@ -4297,6 +4297,9 @@ a.btn.action_icon.hoverlink {
 .form-horizontal #itemform_custom_fields .panel-body .form-group:last-child {
   margin-bottom: 0;
 }
+.form-horizontal #itemform_custom_fields .help-inline label {
+  font-weight: normal;
+}
 .form-horizontal #itemform_categories .panel-body.extracats {
   padding: 0;
 }

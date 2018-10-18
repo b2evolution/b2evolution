@@ -1019,18 +1019,18 @@ class Item extends ItemLight
 					param( $param_name, $param_type, NULL ); // get par value
 				}
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
-				$this->set_setting( 'custom:'.$custom_field['name'], get_param( $param_name ), $custom_field_make_null );
+				$this->set_custom_field( $custom_field['name'], get_param( $param_name ), 'value', $custom_field_make_null );
 			}
+			// Update checkbox "Auto-sync from Parent":
+			$this->set_custom_field( $custom_field['name'], param( 'item_pscf_'.$custom_field['name'], 'integer', 0 ), 'parent_sync' );
 		}
 		foreach( $custom_fields as $custom_field )
 		{	// Update computed custom fields after when all fields we updated above:
 			if( $custom_field['type'] == 'computed' )
 			{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
-				$this->set_setting( 'custom:'.$custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ), true );
+				$this->set_custom_field( $custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ) );
 			}
 		}
-		// Clear the cached values to use new after updating:
-		unset( $this->custom_fields );
 
 		// COMMENTS:
 		if( $this->allow_comment_statuses() )
@@ -2478,17 +2478,20 @@ class Item extends ItemLight
 	 */
 	function get_custom_fields_defs()
 	{
-		if( ! isset( $this->custom_fields ) )
-		{	// Load item custom fields only once:
+		if( ! isset( $this->custom_fields ) ||
+		    ! isset( $this->custom_fields_loaded_ityp_ID ) ||
+		    $this->custom_fields_loaded_ityp_ID != $this->get( 'ityp_ID' ) )
+		{	// Load item custom fields only once if Item Type was not changed:
 			global $DB;
 
 			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
-			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_schema_prop AS schema_prop, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, iset_value AS value, ' );
+			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_schema_prop AS schema_prop, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
 			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
 			$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
-			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge' );
+			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge, ' );
+			$SQL->SELECT_add( 'icfv_value AS value, IFNULL( icfv_parent_sync, 1 )AS parent_sync' );
 			$SQL->FROM( 'T_items__type_custom_field' );
-			$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON iset_name = CONCAT( "custom:", itcf_name ) AND iset_item_ID = '.$this->ID );
+			$SQL->FROM_add( 'LEFT JOIN T_items__item_custom_field ON itcf_name = icfv_itcf_name AND icfv_item_ID = '.$this->ID );
 			$SQL->WHERE_and( 'itcf_ityp_ID = '.$DB->quote( $this->get( 'ityp_ID' ) ) );
 			$SQL->ORDER_BY( 'itcf_order, itcf_ID' );
 			$custom_fields = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
@@ -2498,9 +2501,88 @@ class Item extends ItemLight
 			{	// Use field name/code as key/index of array:
 				$this->custom_fields[ $custom_field['name'] ] = $custom_field;
 			}
+			// Store current Item Type in order to reload the custom fields when Item Type was changed:
+			$this->custom_fields_loaded_ityp_ID = $this->get( 'ityp_ID' );
 		}
 
 		return $this->custom_fields;
+	}
+
+
+	/**
+	 * Set item custom field value or parent_sync
+	 *
+	 * @param string Field name
+	 * @param string New value
+	 * @param string Value key: 'value', 'parent_sync'
+	 * @param boolean TRUE to set to NULL if empty value
+	 */
+	function set_custom_field( $field_index, $new_value, $value_key = 'value', $make_null = true )
+	{
+		if( $value_key != 'value' && $value_key != 'parent_sync' )
+		{	// Skip unknown column in the table T_items__type_custom_field:
+			return;
+		}
+
+		// Load all custom fields for this item:
+		$this->get_custom_fields_defs();
+
+		if( ! isset( $this->custom_fields[ $field_index ] ) )
+		{	// Set new array for custom field data, Used for new creating Item:
+			$this->custom_fields[ $field_index ] = array();
+		}
+
+		if( $value_key == 'value' && $make_null && empty( $new_value ) )
+		{	// Set NULL for empty value:
+			$new_value = NULL;
+		}
+
+		// Set new value for the field:
+		$this->custom_fields[ $field_index ][ $value_key ] = $new_value;
+	}
+
+
+	/**
+	 * Update custom fields
+	 *
+	 * @return boolean TRUE if custom fields were updated
+	 */
+	function update_custom_fields()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// Item must be stored in DB
+			return false;
+		}
+
+		// Get all custom fields:
+		$custom_fields = $this->get_custom_fields_defs();
+
+		// Remove old values from DB:
+		$deleted_cf_num = $DB->query( 'DELETE FROM T_items__item_custom_field
+			WHERE icfv_item_ID = '.$this->ID,
+			'Delete old custom field values before insert new values for Item #'.$this->ID );
+
+		if( empty( $custom_fields ) )
+		{	// No new custom fields to update:
+			return ( $deleted_cf_num > 0 );
+		}
+
+		// Insert new values:
+		$cf_insert_data = array();
+		foreach( $custom_fields as $custom_field_name => $custom_field )
+		{
+			$cf_insert_data[] = '( '.$this->ID.', '
+				.$DB->quote( $custom_field_name ).', '
+				.$DB->quote( $custom_field['value'] ).', '
+				.$DB->quote( isset( $custom_field['parent_sync'] ) && $custom_field['parent_sync'] !== NULL ? $custom_field['parent_sync'] : 1 ).' )';
+		}
+		$inserted_cf_num = $DB->query( 'INSERT INTO T_items__item_custom_field ( icfv_item_ID, icfv_itcf_name, icfv_value, icfv_parent_sync )
+			VALUES '.implode( ', ', $cf_insert_data ),
+			'Insert new custom field values for Item #'.$this->ID );
+
+		return ( $deleted_cf_num > 0 || $inserted_cf_num > 0 );
 	}
 
 
@@ -2827,9 +2909,7 @@ class Item extends ItemLight
 
 		if( $custom_fields[ $field_index ]['type'] == 'double' )
 		{	// This case may be called by computing of the formula:
-			// NOTE: Get a value directly from setting and not from the cached array
-			//       in order to get new updated double value after edit form updating:
-			return $this->get_setting( 'custom:'.$field_index );
+			return $this->get_custom_field_value( $field_index );
 		}
 
 		if( $custom_fields[ $field_index ]['type'] != 'computed' )
@@ -7171,6 +7251,9 @@ class Item extends ItemLight
 				$this->ItemSettings->dbupdate();
 			}
 
+			// Update custom fields:
+			$this->update_custom_fields();
+
 			if( $result )
 			{
 				modules_call_method( 'update_item_after_insert', array( 'edited_Item' => $this ) );
@@ -7344,19 +7427,6 @@ class Item extends ItemLight
 		// Check whether any db change has been executed
 		$db_changed = false;
 
-		if( ! empty( $dbchanges['post_ityp_ID'] ) )
-		{	// If item type has been changed to another,
-			// Clear custom fields values ONLY of previous item type:
-			// But don't delete old custom field values if fields with same names exist in new selected item type:
-			$new_custom_fields = $this->get_type_custom_fields();
-			$sql_new_custom_fields = ( empty( $new_custom_fields ) ? '' : ' AND iset_name NOT IN ( "custom:'.implode( '", "custom:', array_keys( $new_custom_fields ) ).'" )' );
-			// NOTE: Call this before item settings updating in order to don't remove values of new selected item type:
-			$DB->query( 'DELETE FROM T_items__item_settings
-				WHERE iset_item_ID = '.$this->ID.'
-					AND iset_name LIKE "custom:%"'
-					.$sql_new_custom_fields );
-		}
-
 		// save Item settings
 		if( isset( $this->ItemSettings ) )
 		{
@@ -7369,6 +7439,9 @@ class Item extends ItemLight
 				$this->set_param( $this->datemodified_field, 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
 			}
 		}
+
+		// Update custom fields:
+		$db_changed = $this->update_custom_fields() || $db_changed;
 
 		if( $update_child_custom_fields )
 		{	// Update custom fields of all child posts of this post:
@@ -7404,7 +7477,7 @@ class Item extends ItemLight
 						// Stop here to avoid infinite loop:
 						continue;
 					}
-					$child_custom_fields = $child_Item->get_type_custom_fields();
+					$child_custom_fields = $child_Item->get_custom_fields_defs();
 					if( ! empty( $child_custom_fields ) )
 					{	// If child post has at least one custom field:
 						$update_child_custom_field = false;
@@ -7412,9 +7485,11 @@ class Item extends ItemLight
 						{
 							if( isset( $child_custom_fields[ $custom_field_code ] ) &&
 							    $child_custom_fields[ $custom_field_code ]['type'] == $custom_field['type'] &&
+							    $child_custom_fields[ $custom_field_code ]['parent_sync'] &&
 							    $custom_field['type'] != 'computed' ) // NOTE: we must NOT copy the computed values from parent because child custom field may has a different formula!
 							{	// If child post has a custom field with same code and type:
-								$child_Item->set_setting( 'custom:'.$custom_field['name'], $this->get_custom_field_value( $custom_field_code, $custom_field['type'] ) );
+								$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
+								$child_Item->set_custom_field( $custom_field['name'], $this->get_custom_field_value( $custom_field_code, $custom_field['type'] ), 'value', $custom_field_make_null );
 								// Mark to know custom fields of the child post must be updated from parent:
 								$update_child_custom_field = true;
 							}
@@ -7424,7 +7499,7 @@ class Item extends ItemLight
 						{	// Update computed custom fields after when all fields we updated above:
 							if( $child_custom_field['type'] == 'computed' )
 							{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
-								$child_Item->set_setting( 'custom:'.$child_custom_field['name'], $child_Item->get_custom_field_computed( $child_custom_field['name'] ), true );
+								$child_Item->set_custom_field( $child_custom_field['name'], $child_Item->get_custom_field_computed( $child_custom_field['name'] ) );
 								// Mark to know custom fields of the child post must be updated from parent:
 								$update_child_custom_field = true;
 							}
