@@ -3286,8 +3286,7 @@ function create_demo_poll()
 {
 	global $DB;
 
-	$UserCache = & get_UserCache();
-	$user_IDs = $UserCache->get_ID_array();
+	$demo_users = get_demo_users( false );
 	$max_answers = 3;
 
 	// Add poll question:
@@ -3307,13 +3306,13 @@ function create_demo_poll()
 
 	// Generate answers:
 	$insert_values = array();
-	foreach( $user_IDs as $user_ID )
+	foreach( $demo_users as $demo_user )
 	{
 		$answers = array( 1, 2, 3, 4, 5, 6 );
 		for( $i = 0; $i < $max_answers; $i++ )
 		{
 			$rand_key = array_rand( $answers );
-			$insert_values[] = '( '.$demo_poll_ID.', '.$user_ID.', '.$answers[$rand_key].' )';
+			$insert_values[] = '( '.$demo_poll_ID.', '.$demo_user->ID.', '.$answers[$rand_key].' )';
 			unset( $answers[$rand_key] );
 		}
 	}
