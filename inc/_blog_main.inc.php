@@ -634,13 +634,13 @@ elseif( $disp == '-' )
 
 if( $disp == 'page' || $disp == 'single' )
 {	// Check if the requested Item can be correctly displayed for disp 'page' and 'single':
-	if( empty( $Item ) )
+	if( ! $preview && empty( $Item ) )
 	{	// If Item is not defined/not found in DB
 		// Note: The 'preview' action is the only one exception, but that is handled above in this if statement
 		$disp = '404';
 		$disp_detail = '404-item-not-found';
 	}
-	elseif( $Item->status == 'deprecated' )
+	elseif( ! $preview && $Item->status == 'deprecated' )
 	{	// If the requested Item is deprecated
 		$disp = '404';
 		$disp_detail = '404-item-deprecated';
