@@ -8125,9 +8125,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$SQL = new SQL( 'Get all short date formats"' );
 		$SQL->SELECT( 'loc_locale, loc_datefmt, loc_timefmt' );
 		$SQL->FROM( 'T_locales' );
-		$locales = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+		$db_locale_rows = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 
-		foreach( $locales as $loc_data )
+		foreach( $db_locale_rows as $loc_data )
 		{
 			$loc_data_datefmt = $loc_data['loc_datefmt'];
 
@@ -10048,6 +10048,29 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			INNER JOIN T_items__item ON post_ID = postcat_post_ID
 			  SET postcat_order = post_order' );
 		db_drop_col( 'T_items__item', 'post_order' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12975, 'Upgrade categories table...' ) )
+	{	// part of 6.10.4-stable
+		db_add_col( 'T_categories', 'cat_ityp_ID', 'INT UNSIGNED NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12978, 'Upgrade table item types...' ) )
+	{	// part of 6.10.4-stable
+		db_upgrade_cols( 'T_items__type', array(
+			'ADD' => array(
+				'ityp_evobar_link_text'  => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_perm_level',
+				'ityp_skin_btn_text'     => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_evobar_link_text',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12981, 'Upgrading post type custom fields table...' ) )
+	{	// part of 6.10.4-stable
+		db_add_col( 'T_items__type_custom_field', 'itcf_merge', 'TINYINT DEFAULT 0' );
 		upg_task_end();
 	}
 

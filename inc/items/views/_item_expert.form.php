@@ -1018,6 +1018,8 @@ echo_onchange_goal_cat();
 echo_fieldset_folding_js();
 // Save and restore item content field height and scroll position:
 echo_item_content_position_js( get_param( 'content_height' ), get_param( 'content_scroll' ) );
+// JS code for merge button:
+echo_item_merge_js();
 
 // JS to post excerpt mode switching:
 ?>

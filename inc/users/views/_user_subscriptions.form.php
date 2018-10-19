@@ -401,7 +401,7 @@ if( $notifications_mode != 'off' )
 				}
 				if( is_admin_page() && $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $Item ) )
 				{ // Link title to back-office if user has a permission
-					$item_title = '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$row->blog_ID.'&amp;p='.$Item->ID.'">'.format_to_output( $Item->title ).'</a>';
+					$item_title = '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$row->blog_ID.'&amp;p='.$Item->ID.'">'.format_to_output( $Item->get( 'title' ) ).'</a>';
 				}
 				else
 				{ // Link title to front-office

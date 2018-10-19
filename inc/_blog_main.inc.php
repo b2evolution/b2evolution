@@ -373,7 +373,13 @@ if( !empty($p) || !empty($title) )
 		// Search item by title:
 		$Item = & $ItemCache->get_by_urltitle( $title, false, false );
 
-		if( ( !empty( $Item ) ) && ( $Item !== false ) && (! $Item->is_part_of_blog( $blog ) ) )
+		if( empty( $Item ) && substr( $title, -1 ) == '-' )
+		{ // Try lookup by removing last invalid chars, which might have been e.g. > | "> | , | ,. | ">?!
+			$title = preg_replace( '/\-+$/', '', $title );
+			$Item = & $ItemCache->get_by_urltitle( $title, false, false );
+		}
+
+		if( ! empty( $Item ) && ! $Item->is_part_of_blog( $blog ) )
 		{ // We have found an Item object, but it doesn't belong to the current blog!
 			// Check if we want to redirect moved posts:
 			if( $Settings->get( 'redirect_moved_posts' ) )
@@ -386,9 +392,14 @@ if( !empty($p) || !empty($title) )
 			unset($Item);
 		}
 
-		if( empty($Item) && substr($title, -1) == '-' )
-		{ // Try lookup by removing last invalid chars, which might have been e.g. > | "> | , | ,. | ">?!
-			$Item = $ItemCache->get_by_urltitle( preg_replace( '/\-+$/', '', $title ), false, false );
+		if( ! empty( $Item ) &&
+		    ( $SlugCache = & get_SlugCache() ) && 
+		    ( $item_Slug = & $SlugCache->get_by_ID( $Item->get( 'canonical_slug_ID' ), false, false ) ) &&
+		    ( $item_Slug->get( 'title' ) != $title ) && // If current slug is NOT canonical slug of the Item
+		    $Item->is_part_of_blog( $blog ) ) // If the Item has a category from current collection
+		{	// Redirect permanently to the item main/canonical permanent url in the current collection:
+			header_redirect( $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $blog ), 301 );
+			// Exit here.
 		}
 	}
 	if( empty( $Item ) )
@@ -623,13 +634,13 @@ elseif( $disp == '-' )
 
 if( $disp == 'page' || $disp == 'single' )
 {	// Check if the requested Item can be correctly displayed for disp 'page' and 'single':
-	if( empty( $Item ) )
+	if( ! $preview && empty( $Item ) )
 	{	// If Item is not defined/not found in DB
 		// Note: The 'preview' action is the only one exception, but that is handled above in this if statement
 		$disp = '404';
 		$disp_detail = '404-item-not-found';
 	}
-	elseif( $Item->status == 'deprecated' )
+	elseif( ! $preview && $Item->status == 'deprecated' )
 	{	// If the requested Item is deprecated
 		$disp = '404';
 		$disp_detail = '404-item-deprecated';

@@ -1123,16 +1123,18 @@ class _core_Module extends Module
 		$working_blog = get_working_blog();
 		if( $working_blog )
 		{ // Set collection url only when current user has an access to the working blog
+			$BlogCache = & get_BlogCache();
+			$working_Blog = & $BlogCache->get_by_ID( $working_blog );
 			if( is_admin_page() )
 			{ // Front page of the working blog
-				$BlogCache = & get_BlogCache();
-				$working_Blog = & $BlogCache->get_by_ID( $working_blog );
 				$collection_url = $working_Blog->get( 'url' );
 			}
 			else
 			{ // Dashboard of the working blog
 				$collection_url = $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$working_blog;
 			}
+
+			$default_new_ItemType = $working_Blog->get_default_new_ItemType();
 		}
 
 		if( $perm_admin_normal || $perm_admin_restricted )
@@ -1338,10 +1340,11 @@ class _core_Module extends Module
 			}
 
 			// ---- "Post"/"Edit" MENU ----
-			if( $perm_admin_normal )
-			{	// Only for normal access display a menu item to create new:
+			if( ! empty( $default_new_ItemType ) )
+			{	// If it is allowed to create here (may be depended on default Item Type of the current category):
 				$entries['post'] = array(
-						'text' => get_icon( 'new' ).' './* TRANS: noun */ T_('Post'),
+						'text' => get_icon( 'new' ).' '.$default_new_ItemType->get_item_denomination( 'evobar_new', /* TRANS: noun */ T_('Post') ),
+						//'text' => get_icon( 'new' ).' './* TRANS: noun */ T_('Post'),
 						'title' => T_('No blog is currently selected'),
 						'disabled' => true,
 						'entry_class' => 'rwdhide evobar-entry-new-post',
@@ -1395,14 +1398,11 @@ class _core_Module extends Module
 							);
 					}
 				}
-				if( $write_item_url = $Blog->get_write_item_url() )
-				{	// If write item URL is not empty, it's sure that user can create new post:
-					if( ! $perm_admin_normal )
-					{	// Initialize this menu item when user has no back-office access but can create new post:
-						$entries['post'] = array(
-							'text'        => get_icon( 'new' ).' './* TRANS: noun */ T_('Post'),
-							'entry_class' => 'rwdhide evobar-entry-new-post',
-						);
+				if( isset( $entries['post'] ) && $write_item_url = $Blog->get_write_item_url() )
+				{	// Enable menu to create new item if current User has a permission in current collection:
+					if( ! empty( $default_new_ItemType ) )
+					{	// The get_write_url() function above does not allow specifying the item type ID we'll manually add it:
+						$write_item_url = url_add_param( $write_item_url, 'item_typ_ID='.$default_new_ItemType->ID );
 					}
 					$entries['post']['href'] = $write_item_url;
 					$entries['post']['disabled'] = false;

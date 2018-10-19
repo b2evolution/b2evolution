@@ -181,7 +181,7 @@ class coll_current_filters_Widget extends ComponentWidget
 				'display_flagged'    => ! empty( $this->disp_params['show_filters']['flagged'] ),
 			) ) );
 
-		if( empty( $filters ) && ! $this->disp_params['display_empty_filter'] )
+		if( empty( $filters ) && ! $params['display_empty_filter'] )
 		{ // No filters
 			return;
 		}
@@ -196,7 +196,7 @@ class coll_current_filters_Widget extends ComponentWidget
 
 		if( empty( $filters ) )
 		{ // No filters
-			if( $this->disp_params['display_empty_filter'] )
+			if( $params['display_empty_filter'] )
 			{
 				if( is_admin_page() && get_param( 'tab' ) == 'type' )
 				{ // Try to get a title for current selected post type on back-office pages:

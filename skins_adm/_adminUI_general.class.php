@@ -738,7 +738,6 @@ class AdminUI_general extends Menu
 			$path0 = $this->get_path(0);
 			$r = $this->get_html_menu( $path0, 'sub', 0, ! $params['display_menu2'] );
 
-			echo $this->replace_vars( $r );
 			//echo ' disp_submenu-END ';
 
 			// Show breadcrumbs
@@ -749,8 +748,9 @@ class AdminUI_general extends Menu
 
 			// Show 3rd level menu for settings tab
 			$path1 = $this->get_path(1);
-			echo $this->get_html_menu( array($path0, $path1), 'menu3', 0, ! $params['display_menu3'] );
+			$r .= $this->get_html_menu( array($path0, $path1), 'menu3', 0, ! $params['display_menu3'] );
 
+			echo $this->replace_vars( $r );
 
 			$this->displayed_sub_begin = 1;
 		}

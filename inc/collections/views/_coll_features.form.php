@@ -117,7 +117,19 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_settings'), array( 'id' => 'post_options' ) );
+$Form->begin_fieldset( T_('Single Item view').get_manual_link('blog_features_settings'), array( 'id' => 'post_options' ) );
+
+	$Form->radio( 'post_navigation', $edited_Blog->get_setting('post_navigation'),
+		array( array( 'same_blog', T_('same blog') ),
+			array( 'same_category', T_('same category') ),
+			array( 'same_author', T_('same author') ),
+			array( 'same_tag', T_('same tag') ) ),
+			T_('Default post by post navigation should stay in'), true, T_( 'Skins may override this setting!') );
+
+$Form->end_fieldset();
+
+
+$Form->begin_fieldset( T_('Create/Edit options').get_manual_link('blog_features_settings'), array( 'id' => 'post_options' ) );
 
 	$Form->radio( 'enable_goto_blog', $edited_Blog->get_setting( 'enable_goto_blog' ),
 		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
@@ -143,21 +155,15 @@ $Form->begin_fieldset( T_('Post options').get_manual_link('blog_features_setting
 			array( 'no_cat_post', T_('Don\'t allow category selections'), T_('(Main cat will be assigned automatically)') ) ),
 			T_('Post category options'), true );
 
+	$coll_in_skin_editing_options = array();
 	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// Permission to edit advanced admin settings:
-		$Form->checklist( array(
-				array( 'in_skin_editing', 1, T_('Allow posting/editing from the Front-Office').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing' ) ),
-				array( 'in_skin_editing_renderers', 1, T_('Allow Text Renderers selection in Front-Office edit screen').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing_renderers' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) ),
-				array( 'in_skin_editing_category', 1, T_('Allow Category selection in Front-Office edit screen').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing_category' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) ),
-			), 'front_office_posting', T_('Front-Office posting') );
+		$coll_in_skin_editing_options[] = array( 'in_skin_editing', 1, T_('Allow posting/editing from the Front-Office').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing' ) );
+		$coll_in_skin_editing_options[] = array( 'in_skin_editing_renderers', 1, T_('Allow Text Renderers selection in Front-Office edit screen').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing_renderers' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) );
 	}
-
-	$Form->radio( 'post_navigation', $edited_Blog->get_setting('post_navigation'),
-		array( array( 'same_blog', T_('same blog') ),
-			array( 'same_category', T_('same category') ),
-			array( 'same_author', T_('same author') ),
-			array( 'same_tag', T_('same tag') ) ),
-			T_('Default post by post navigation should stay in'), true, T_( 'Skins may override this setting!') );
+	$coll_in_skin_editing_options[] = array( 'in_skin_editing_category', 1, T_('Allow Category selection in Front-Office edit screen'), $edited_Blog->get_setting( 'in_skin_editing_category' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) );
+	$coll_in_skin_editing_options[] = array( 'in_skin_editing_category_order', 1, T_('Allow Order field in Category selection in Front-Office edit screen'), $edited_Blog->get_setting( 'in_skin_editing_category_order' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) || ! $edited_Blog->get_setting( 'in_skin_editing_category' ) );
+	$Form->checklist( $coll_in_skin_editing_options, 'front_office_posting', T_('Front-Office posting') );
 
 $Form->end_fieldset();
 
@@ -328,16 +334,11 @@ echo '</div>';
 <script type="text/javascript">
 jQuery( 'input[name=in_skin_editing]' ).click( function()
 {
-	if( jQuery( this ).is( ':checked' ) )
-	{
-		jQuery( 'input[name=in_skin_editing_renderers]' ).removeAttr( 'disabled' );
-		jQuery( 'input[name=in_skin_editing_category]' ).removeAttr( 'disabled' );
-	}
-	else
-	{
-		jQuery( 'input[name=in_skin_editing_renderers]' ).attr( 'disabled', 'disabled' );
-		jQuery( 'input[name=in_skin_editing_category]' ).attr( 'disabled', 'disabled' );
-	}
+	jQuery( 'input[name^=in_skin_editing_]' ).prop( 'disabled', ! jQuery( this ).is( ':checked' ) );
+} );
+jQuery( 'input[name=in_skin_editing_category]' ).click( function()
+{
+	jQuery( 'input[name=in_skin_editing_category_order]' ).prop( 'disabled', ! jQuery( this ).is( ':checked' ) );
 } );
 
 jQuery( '#voting_positive' ).click( function()

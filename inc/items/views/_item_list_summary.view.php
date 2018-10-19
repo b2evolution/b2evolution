@@ -51,7 +51,7 @@ $block_item_Widget = new Widget( 'block_item' );
 echo '<div class="evo_content_block evo_content_summary">';
 
 if( $action == 'view' )
-{ // We are displaying a single post:
+{	// We are displaying a single post:
 	echo '<div class="global_actions">'
 			.action_icon( T_('Close post'), 'close', regenerate_url( 'p,action', 'filter=restore&amp;highlight='.$p ),
 				NULL, NULL, NULL, array( 'class' => 'action_icon btn btn-default' ) )
@@ -69,7 +69,7 @@ if( $action == 'view' )
 				);
 }
 else
-{ // We are displaying multiple posts ( Not a single post! )
+{	// We are displaying multiple posts ( Not a single post! )
 	$block_item_Widget->title = T_('Posts Browser').get_manual_link( 'browse-edit-tab' );
 	if( $ItemList->is_filtered() )
 	{ // List is filtered, offer option to reset filters:
@@ -145,19 +145,19 @@ while( $Item = & $ItemList->get_item() )
 							'image_size'     => 'fit-400x320',
 							'image_link_to'  => 'original',
 							'image_link_rel' => 'lightbox[p'.$post_image->ID.']',
+							'image_desc'     => '',
 						) );
 				}
 				else
 				{
 					echo $post_image->get_tag( '<div class="evo_image_block pull-left">', '', '', '</div>', 'fit-400x320', 'original', '', 'lightbox[p'.$post_image->ID.']' );
-					//echo $post_image->get_tag( '<div class="pull-left">', '', '', '</div>', 'crop-80x80' );
 				}
 			}
 			?>
 			<div class="bText">
 					<span class="bTitle">
 					<?php
-					$title_length = mb_strlen( $Item->title );
+					$title_length = mb_strlen( html_entity_decode( $Item->title ) );
 					$label = 'default';
 					if( $title_length <= 55 )
 					{
@@ -176,7 +176,7 @@ while( $Item = & $ItemList->get_item() )
 					<p>
 					<?php
 					$excerpt = format_to_output( $Item->get_excerpt2(), 'htmlbody' );
-					$excerpt_length = mb_strlen( $excerpt );
+					$excerpt_length = mb_strlen( html_entity_decode( $excerpt ) );
 					$label = 'default';
 					if( $excerpt_length <= 55 )
 					{
@@ -318,15 +318,15 @@ while( $Item = & $ItemList->get_item() )
 		// _____________________________________ Displayed in SINGLE VIEW mode only _____________________________________
 
 		if( $action == 'view' )
-		{ // We are looking at a single post, include files and comments:
+		{	// We are looking at a single post, include files and comments:
 
 			if( $comment_type == 'meta' && ! $Item->can_see_meta_comments() )
-			{ // Current user cannot views meta comments
+			{	// Current user cannot views meta comments
 				$comment_type = 'feedback';
 			}
 
 			if( isset($GLOBALS['files_Module']) )
-			{ // Files:
+			{	// Files:
 				echo '<div class="evo_post__attachments">';	// TODO
 
 				/**
@@ -350,7 +350,7 @@ while( $Item = & $ItemList->get_item() )
 						'class'   => 'btn btn-default'
 					) );
 			if( $comment_type != 'meta' )
-			{ // Don't display "Recycle bin" link for meta comments, because they are deleted directly without recycle bin
+			{	// Don't display "Recycle bin" link for meta comments, because they are deleted directly without recycle bin
 				echo get_opentrash_link( true, false, array(
 						'before' => ' <span id="recycle_bin">',
 						'after' => '</span>',
@@ -360,7 +360,7 @@ while( $Item = & $ItemList->get_item() )
 			echo '</div>';
 
 			if( $Item->can_see_meta_comments() )
-			{ // Display tabs to switch between user and meta comments Only if current user can views meta comments
+			{	// Display tabs to switch between user and meta comments Only if current user can views meta comments
 				$switch_comment_type_url = $admin_url.'?ctrl=items&amp;blog='.$blog.'&amp;p='.$Item->ID;
 				$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total', true );
 				$switch_comment_type_tabs = array(
@@ -408,7 +408,7 @@ while( $Item = & $ItemList->get_item() )
 			$show_comments_expiry = param( 'show_comments_expiry', 'string', 'active', false, true );
 			$expiry_statuses = array( 'active' );
 			if( $show_comments_expiry == 'all' )
-			{ // Display also the expired comments
+			{	// Display also the expired comments
 				$expiry_statuses[] = 'expired';
 			}
 
@@ -425,12 +425,12 @@ while( $Item = & $ItemList->get_item() )
 			<a id="comments"></a>
 			<?php
 			if( $display_params['disp_rating_summary'] )
-			{ // Display a ratings summary
+			{	// Display a ratings summary
 				echo $Item->get_rating_summary();
 			}
 
 			if( $comment_type != 'meta' )
-			{ // Display this filter only for not meta comments
+			{	// Display this filter only for not meta comments
 				?>
 				<div class="tile"><label><?php echo T_('Show').':' ?></label></div>
 				<div class="tile">
@@ -756,7 +756,7 @@ while( $Item = & $ItemList->get_item() )
 }
 
 if( $action == 'view' )
-{ // Load JS functions to work with comments
+{	// Load JS functions to work with comments
 	load_funcs( 'comments/model/_comment_js.funcs.php' );
 
 	// Handle show_comments radioboxes

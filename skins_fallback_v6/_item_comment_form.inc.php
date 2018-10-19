@@ -269,8 +269,10 @@ if( $params['disp_comment_form'] && ( $params['comment_type'] == 'meta' && $Item
 	echo $params['form_title_text'];
 	echo $params['form_title_end'];
 
-	// Display a message before comment form:
-	$Item->display_comment_form_msg();
+	if( $params['comment_type'] != 'meta' )
+	{	// Display a message before comment form:
+		$Item->display_comment_form_msg();
+	}
 
 /*
 	echo '<script type="text/javascript">
