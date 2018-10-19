@@ -1174,7 +1174,6 @@ class item_fields_compare_Widget extends ComponentWidget
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'item_ID'      => isset( $Item ) ? $Item->ID : NULL, // Has the Item page changed? (this is important for disp=single|page because $this$ and $parent$ resolve differently depending on item ID)
 				'items'        => implode( ',', $items ), // Have the compared items changed? (Check firstly widget setting and then param from request) (this is important in case the same items are compared in different order)
-				'meta_settings'=> 1, // Have meta settings(any item type) changed?
 			);
 
 		if( $this->disp_params['edit_links'] )
@@ -1184,11 +1183,18 @@ class item_fields_compare_Widget extends ComponentWidget
 			$cache_keys['user_ID'] = ( is_logged_in() ? $current_User->ID : 0 ); // Has the current User changed?
 		}
 
+		$ItemCache = & get_ItemCache();
+
 		// Add 1 cache key for each item that is being compared, in order to detect changes on each one:
+		// Also add 1 cache key for item type which is used for compared items, in order to detect changes on each one:
 		foreach( $items as $item_ID )
 		{
 			// 1 is a dummy value, only the key name is really important
 			$cache_keys['item_'.$item_ID] = 1;
+			if( $Item = & $ItemCache->get_by_ID( $item_ID, false, false ) )
+			{	// Add cache key for item type of the compared item:
+				$cache_keys['item_type_'.$Item->get( 'ityp_ID' )] = 1;
+			}
 		}
 
 		return $cache_keys;
