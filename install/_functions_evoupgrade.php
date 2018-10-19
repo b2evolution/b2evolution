@@ -10074,6 +10074,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12984, 'Upgrading post type custom fields table...' ) )
+	{	// part of 6.10.4-stable
+		db_modify_col( 'T_items__type_custom_field', 'itcf_link', 'ENUM( "nolink", "linkto", "permalink", "zoom", "linkpermzoom", "permzoom", "linkperm", "fieldurl", "fieldurlblank" ) COLLATE ascii_general_ci NOT NULL default "nolink"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
