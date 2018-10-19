@@ -1335,6 +1335,7 @@ class tinymce_plugin extends Plugin
 	}
 	*/
 
+
 	/**
 	 * Return the list of Htsrv (HTTP-Services) provided by the plugin.
 	 *
@@ -1384,7 +1385,7 @@ class tinymce_plugin extends Plugin
 	{
 		global $disp;
 
-		if( $disp == 'edit' )
+		if( $disp == 'edit' || $disp == 'single' )
 		{
 			$this->require_css( 'toolbar.css' );
 		}
@@ -1401,7 +1402,7 @@ class tinymce_plugin extends Plugin
 	{
 		global $ctrl;
 
-		if( $ctrl == 'items' || $ctrl == 'campaigns' )
+		if( $ctrl == 'items' || $ctrl == 'comments' || $ctrl == 'campaigns' )
 		{
 			$this->require_css( 'toolbar.css' );
 		}
