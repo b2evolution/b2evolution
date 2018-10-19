@@ -230,6 +230,15 @@ class item_fields_compare_Widget extends ComponentWidget
 						'note' => T_('Enter one field name per line.'),
 						'rows' => 10,
 					),
+					'cell_colors' => array(
+						'type' => 'checklist',
+						'label' => T_('Automatic cell colors'),
+						'options' => array(
+							array( 'diff',  T_('Yellow highlights'), 1 ),
+							array( 'green', T_('Green highlights'), 1 ),
+							array( 'red',   T_('Red highlights'), 1 ),
+						),
+					),
 					'hide_empty_lines' => array(
 						'type' => 'checkbox',
 						'label' => T_('Hide empty lines'),
@@ -667,7 +676,8 @@ class item_fields_compare_Widget extends ComponentWidget
 				$all_custom_fields[ $c ]['highest_value'] = NULL;
 				$all_custom_fields[ $c ]['lowest_value'] = NULL;
 			}
-			if( $items_count != count( $custom_field['items'] ) )
+			if( isset( $this->disp_params['cell_colors']['diff'] ) &&
+			    $items_count != count( $custom_field['items'] ) )
 			{	// If some post has no field then it is a different:
 				$all_custom_fields[ $c ]['is_different'] = true;
 			}
@@ -690,7 +700,9 @@ class item_fields_compare_Widget extends ComponentWidget
 				}
 
 				// Check if the values are different from given line:
-				if( ! $all_custom_fields[ $c ]['is_different'] && $i > 0 )
+				if( isset( $this->disp_params['cell_colors']['diff'] ) &&
+				    ! $all_custom_fields[ $c ]['is_different'] &&
+				    $i > 0 )
 				{	// Don't search differences in all fields if at least two fields are different:
 					switch( $custom_field['type'] )
 					{
@@ -805,36 +817,41 @@ class item_fields_compare_Widget extends ComponentWidget
 				// Default template for field value:
 				$field_value_template = $this->get_field_template( 'value_default', $custom_field['type'] );
 
-				if( ( $custom_field['is_different'] && $custom_field['line_highlight'] == 'differences' ) ||
-				    ( $custom_field['line_highlight'] == 'always' && count( $items ) > 1 ) )
+				if( isset( $this->disp_params['cell_colors']['diff'] ) &&
+				    ( ( $custom_field['is_different'] && $custom_field['line_highlight'] == 'differences' ) ||
+				      ( $custom_field['line_highlight'] == 'always' && count( $items ) > 1 ) ) )
 				{	// Mark the field value as different only when it is defined in the settings of the custom field:
 					$field_value_template = $this->get_field_template( 'value_difference_highlight', $custom_field['type'] );
 				}
 
 				if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) &&
-						is_numeric( $custom_field_orig_value ) )
+				    is_numeric( $custom_field_orig_value ) )
 				{	// Compare only numeric values:
 					if( $custom_field_orig_value === $custom_field['highest_value'] &&
-							$custom_field_orig_value !== $custom_field['lowest_value'] )
+					    $custom_field_orig_value !== $custom_field['lowest_value'] )
 					{	// Check if we should mark the highest field:
-						if( $custom_field['green_highlight'] == 'highest' )
+						if( isset( $this->disp_params['cell_colors']['green'] ) &&
+						    $custom_field['green_highlight'] == 'highest' )
 						{	// The highest value must be marked as green:
 							$field_value_template = $this->get_field_template( 'value_green', $custom_field['type'] );
 						}
-						elseif( $custom_field['red_highlight'] == 'highest' )
+						elseif( isset( $this->disp_params['cell_colors']['red'] ) &&
+						        $custom_field['red_highlight'] == 'highest' )
 						{	// The highest value must be marked as red:
 							$field_value_template = $this->get_field_template( 'value_red', $custom_field['type'] );
 						}
 					}
 
 					if( $custom_field_orig_value === $custom_field['lowest_value'] &&
-							$custom_field_orig_value !== $custom_field['highest_value'] )
+					    $custom_field_orig_value !== $custom_field['highest_value'] )
 					{	// Check if we should mark the lowest field:
-						if( $custom_field['green_highlight'] == 'lowest' )
+						if( isset( $this->disp_params['cell_colors']['green'] ) &&
+						    $custom_field['green_highlight'] == 'lowest' )
 						{	// The lowest value must be marked as green:
 							$field_value_template = $this->get_field_template( 'value_green', $custom_field['type'] );
 						}
-						elseif( $custom_field['red_highlight'] == 'lowest' )
+						elseif( isset( $this->disp_params['cell_colors']['red'] ) &&
+						        $custom_field['red_highlight'] == 'lowest' )
 						{	// The lowest value must be marked as red:
 							$field_value_template = $this->get_field_template( 'value_red', $custom_field['type'] );
 						}
