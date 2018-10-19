@@ -860,7 +860,7 @@ class tinymce_plugin extends Plugin
 
 		/* ----------- button row 1 : paragraph related styles ------------ */
 		$tmce_theme_advanced_buttons1_array = array(
-			'formatselect styleselect',
+			'formatselect',
 			'alignleft aligncenter alignright alignjustify',
 			'bullist numlist',
 			'outdent indent'
@@ -931,35 +931,6 @@ class tinymce_plugin extends Plugin
 		$tmce_theme_advanced_buttons2 = implode( ' | ' , $tmce_theme_advanced_buttons2_array );
 		$tmce_theme_advanced_buttons3 = implode( ' | ' , $tmce_theme_advanced_buttons3_array );
 		$tmce_theme_advanced_buttons4 = implode( ' | ' , $tmce_theme_advanced_buttons4_array );
-
-		// Style formats:
-		$tmce_style_formats = array(
-			array(
-					'title' => 'Download Link',
-					'selector' => 'a',
-					'classes' => 'download'
-					),
-			array(
-					'title' => 'My Test',
-					'selector' => 'p',
-					'classes' => 'mytest',
-			),
-			array(
-					'title' => 'AlertBox',
-					'block' => 'div',
-					'classes' => 'alert_box',
-					'wrapper' => true
-			),
-			array(
-					'title' => 'Red Uppercase Text',
-					'inline' => 'span',
-					'styles' => array(
-							'color'         => 'red', // or hex value #ff0000
-							'fontWeight'    => 'bold',
-							'textTransform' => 'uppercase'
-					)
-			)
-		);
 
 		// PLUGIN EXTENSIONS:
 		$tmce_plugins_array =
@@ -1088,16 +1059,7 @@ class tinymce_plugin extends Plugin
 			$content_css = implode( ',', array_merge( $content_css, $tinymce_content_css ) );
 		}
 
-		/*
-		$init_options[] = 'content_css : "'.$this->get_plugin_url().'editor.css?v='.( $debug ? $localtimenow : $this->version.'+'.$app_version_long )
-									.$content_css.'"';
-		*/
-
 		$init_options[] = 'content_css : "'.$content_css.'"';
-
-		// Style formats:
-		$init_options[] = 'style_formats : '.json_encode( $tmce_style_formats );
-		$init_options[] = 'style_formats_merge : false';
 
 		// Generated HTML code options:
 		// Do not make the path relative to "document_base_url":
