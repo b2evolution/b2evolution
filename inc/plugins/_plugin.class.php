@@ -4292,6 +4292,15 @@ class Plugin
 			$Plugins->instantiate_Settings( $this, 'Settings' );
 		}
 
+		// Try default values:
+		$tmp_params = array( 'for_editing' => true );
+		$params = $this->get_email_setting_definitions( $tmp_params );
+
+		if( $parname == 'email_apply_rendering' && empty( $params ) )
+		{	// Empty params mean this plugin cannot be used for Email Campaign at all:
+			return 'never';
+		}
+
 		// Use prefix 'email_' for all message settings except of "email_apply_rendering":
 		$value = $this->Settings->get( $parname == 'email_apply_rendering' ? $parname : 'email_'.$parname );
 
@@ -4299,10 +4308,6 @@ class Plugin
 		{	// We have a value for this param:
 			return $value;
 		}
-
-		// Try default values:
-		$tmp_params = array( 'for_editing' => true );
-		$params = $this->get_email_setting_definitions( $tmp_params );
 
 		return $this->get_default_setting( $parname, $params, $group );
 	}

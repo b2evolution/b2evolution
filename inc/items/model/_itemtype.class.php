@@ -538,7 +538,7 @@ class ItemType extends DataObject
 		$DB->commit();
 
 		// BLOCK CACHE INVALIDATION:
-		BlockCache::invalidate_key( 'meta_settings', 1 ); // Meta settings(any item type) have changed
+		BlockCache::invalidate_key( 'item_type_'.$this->ID, 1 ); // Item Type has changed (useful for compare widget which needs to check several item_IDs, including from different collections)
 	}
 
 

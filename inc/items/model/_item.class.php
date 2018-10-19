@@ -2829,6 +2829,7 @@ class Item extends ItemLight
 				'permalink'    => array( 'perm' ),
 				'zoom'         => array( 'zoom' ),
 				'fieldurl'     => array( 'url' ),
+				'fieldurlblank'=> array( 'urlblank' ),
 			);
 
 			if( isset( $link_fallbacks[ $custom_field['link'] ] ) )
@@ -2876,10 +2877,11 @@ class Item extends ItemLight
 							break;
 
 						case 'url':
+						case 'urlblank':
 							// Use value of url fields as URL to the link:
 							if( ! empty( $orig_custom_field_value ) )
 							{	// Format URL to link only with not empty URL otherwise display URL as simple text if special text is defined in format for empty URL:
-								$custom_field_value = '<a href="'.$orig_custom_field_value.'"'.$nofollow_attr.$link_class_attr.'>'.$custom_field_value.'</a>';
+								$custom_field_value = '<a href="'.$orig_custom_field_value.'"'.$nofollow_attr.$link_class_attr.( $link_fallback == 'urlblank' ? ' target="_blank"' : '' ).'>'.$custom_field_value.'</a>';
 							}
 							break 2;
 					}

@@ -42,6 +42,19 @@ class star_plugin extends Plugin
 
 
 	/**
+	 * Define here default email settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_email_setting_definitions( & $params )
+	{
+		// Set empty array to disable this plugin for Email Campaign:
+		return array();
+	}
+
+
+	/**
 	 * Event handler: Called when ending the admin html head section.
 	 *
 	 * @param array Associative array of parameters
@@ -73,18 +86,6 @@ class star_plugin extends Plugin
 	 */
 	function DisplayItemAsXml( & $params )
 	{
-		return $this->DisplayItemAsHtml( $params );
-	}
-
-
-	/**
-	 * Perform rendering of email
-	 *
-	 * @see Plugin::RenderEmailAsHtml()
-	 */
-	function RenderEmailAsHtml( & $params )
-	{
-		$this->force_img_stars = true;
 		return $this->DisplayItemAsHtml( $params );
 	}
 

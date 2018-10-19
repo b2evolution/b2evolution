@@ -2208,7 +2208,7 @@ class Plugins
 				break;
 
 			case 'email_apply_rendering':
-				// Get Message renderer plugins
+				// Get Email Campaign renderer plugins
 				$RendererPlugins = $this->get_list_by_events( array('FilterEmailContent') );
 				break;
 
