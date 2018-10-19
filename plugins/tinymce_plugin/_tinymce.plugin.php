@@ -343,6 +343,9 @@ class tinymce_plugin extends Plugin
 	{
 		global $wysiwyg_toggle_switch_js_initialized;
 
+		// Initialize JavaScript to build and open window, used in insert inline modals:
+		echo_modalwindow_js();
+
 		if( empty( $params['content_id'] ) )
 		{	// Value of html attribute "id" of textarea where tinymce is applied
 			// Don't allow empty id:
