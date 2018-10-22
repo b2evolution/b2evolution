@@ -5063,12 +5063,12 @@ class Item extends ItemLight
 				'link_class' => '',
 				'show_in_single_mode' => false,		// Do we want to show this link even if we are viewing the current post in single view mode
 				'url' => '#',
-				'stay_in_same_collection' => 'auto', // 'auto' - follow 'cross_post_nav_in_same_coll' if we are cross posted, true - always stay in same collection if we are cross posted, false - always go to permalink if we are cross posted
+				'stay_in_same_collection' => 'auto', // 'auto' - follow 'allow_crosspost_urls' if we are cross posted, true - always stay in same collection if we are cross posted, false - always go to permalink if we are cross posted
 			), $params );
 
 		if( isset( $Blog ) &&
 		    ( $params['stay_in_same_collection'] === true || // always stay in current collection
-		      ( $params['stay_in_same_collection'] == 'auto' && $Settings->get( 'cross_post_nav_in_same_coll' ) ) // follow 'cross_post_nav_in_same_coll' to stay in current collection
+		      ( $params['stay_in_same_collection'] == 'auto' && ( $item_Blog = & $this->get_Blog() ) && $item_Blog->get_setting( 'allow_crosspost_urls' ) ) // follow 'allow_crosspost_urls' to stay in current collection
 		    ) )
 		{	// Use current collection if this Item is cross posted and has at least one category from current collection:
 			$current_blog_ID = $Blog->ID;

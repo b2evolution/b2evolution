@@ -183,7 +183,6 @@ class GeneralSettings extends AbstractSettings
 		'cross_posting' => 0,						// Allow additional categories from other blogs
 		'cross_posting_blog' => 0,					// Allow to choose main category from another blog
 		'redirect_moved_posts' => 0,				// Allow to redirect moved posts link to the correct blog
-		'cross_post_nav_in_same_coll' => 1,		// Stay in current coll if requested Item Slug is only cross posted in current coll (do not redirect to Canonial)
 
 		'subscribe_new_blogs' => 'public', // Subscribing to new blogs: 'page', 'public', 'all'
 

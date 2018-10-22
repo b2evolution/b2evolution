@@ -184,8 +184,9 @@ function skin_init( $disp )
 								|| $Blog->get_setting( 'relcanonical_item_urls' ) ) )
 			{	// We want to redirect to the Item's canonical URL:
 				$canonical_is_same_url = true;
+				$item_Blog = & $Item->get_Blog();
 				// Use item URL from first detected category of the current collection:
-				if( $Settings->get( 'cross_post_nav_in_same_coll' ) )
+				if( $item_Blog->get_setting( 'allow_crosspost_urls' ) )
 				{	// If non-canonical URL is allowed for cross-posted items,
 					// try to get a canonical URL in thecurrent collection even it is not main/canonical collection of the Item:
 					$canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID );
@@ -206,8 +207,8 @@ function skin_init( $disp )
 					$item_chapters = $Item->get_Chapters();
 					foreach( $item_chapters as $item_Chapter )
 					{	// Try to find in what category the Item may has the same canonical url as current requested URL:
-						if( ! $Settings->get( 'cross_post_nav_in_same_coll' ) &&
-						    $Item->get_blog_ID() != $item_Chapter->get( 'blog_ID' ) )
+						if( ! $item_Blog->get_setting( 'allow_crosspost_urls' ) &&
+						    $item_Blog->ID != $item_Chapter->get( 'blog_ID' ) )
 						{	// Don't allow to use URL of categories from cross-posted collection if it is restricted:
 							continue;
 						}

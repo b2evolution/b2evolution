@@ -10080,6 +10080,20 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12987, 'Update collection setting...' ) )
+	{	// part of 6.10.4-stable
+		$setting_SQL = new SQL();
+		$setting_SQL->SELECT( 'set_value' );
+		$setting_SQL->FROM( 'T_settings' );
+		$setting_SQL->WHERE( 'set_name = "cross_post_nav_in_same_coll"' );
+		if( $DB->get_var( $setting_SQL ) === '0' )
+		{	// Move only not default value to the collection settings table:
+			$DB->query( 'INSERT INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+				SELECT blog_ID, "allow_crosspost_urls", 0 FROM T_blogs' );
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
