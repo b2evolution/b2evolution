@@ -128,6 +128,18 @@ class coll_search_form_Widget extends ComponentWidget
 
 
 	/**
+	 * Request all required css and js files for this widget
+	 */
+	function request_required_files()
+	{
+		if( is_logged_in() )
+		{	// Load JS to edit tags if it is enabled by widget setting and current User has a permission to edit them:
+			init_tokeninput_js( 'blog' );
+		}
+	}
+
+
+	/**
 	 * Prepare display params
 	 *
 	 * @param array MUST contain at least the basic display params
