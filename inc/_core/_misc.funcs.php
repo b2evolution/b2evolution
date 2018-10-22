@@ -6855,7 +6855,7 @@ function get_htsrv_url( $force_https = false )
  */
 function get_samedomain_htsrv_url( $force_https = false )
 {
-	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_subdir, $Collection, $Blog;
+	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_subdir, $Collection, $Blog, $is_cli;
 
 	// Force URL if it is reauired and enabled by settings:
 	$req_htsrv_url = force_https_url( $htsrv_url, $force_https );
@@ -6863,8 +6863,9 @@ function get_samedomain_htsrv_url( $force_https = false )
 	// Cut htsrv folder from end of the URL:
 	$req_htsrv_url = substr( $req_htsrv_url, 0, strlen( $req_htsrv_url ) - strlen( $htsrv_subdir ) );
 
-	if( strpos( $ReqHost.$ReqPath, $req_htsrv_url ) !== false )
-	{	// If current request path contains the required htsrv URL:
+	if( $is_cli || strpos( $ReqHost.$ReqPath, $req_htsrv_url ) !== false )
+	{	// If current request path contains the required htsrv URL
+		// or this is CLI mode where $ReqHost is not defined:
 		return $req_htsrv_url.$htsrv_subdir;
 	}
 

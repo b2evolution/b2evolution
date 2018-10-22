@@ -366,7 +366,7 @@ class ItemLight extends DataObject
 				if( $blog_ID === NULL )
 				{	// Try to get current collection:
 					global $blog, $Settings;
-					if( ! empty( $blog ) && $Settings->get( 'cross_post_nav_in_same_coll' ) )
+					if( ! empty( $blog ) && ( $item_Blog = & $this->get_Blog() ) && $item_Blog->get_setting( 'allow_crosspost_urls' ) )
 					{	// If it is allowed to stay in same collection when cross-posted:
 						$blog_ID = $blog;
 					}
@@ -1198,7 +1198,7 @@ class ItemLight extends DataObject
 			return false;
 		}
 
-		if( ! $Settings->get( 'cross_post_nav_in_same_coll' ) )
+		if( ! $this->Blog->get_setting( 'allow_crosspost_urls' ) )
 		{ // we have to navigate to the item's main cat's blog.
 			return false;
 		}
