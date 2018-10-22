@@ -1454,6 +1454,14 @@ function skin_init( $disp )
 
 			// Restrict comment status by parent item:
 			$edited_Comment->restrict_status();
+
+			// require Fine Uploader js and css:
+			init_fineuploader_js_lang_strings();
+			require_js( 'multiupload/fine-uploader.js' );
+			require_css( 'fine-uploader.css' );
+			// Load JS files to make the links table sortable:
+			require_js( '#jquery#' );
+			require_js( 'jquery/jquery.sortable.min.js' );
 			break;
 
 		case 'useritems':

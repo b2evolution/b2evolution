@@ -1357,38 +1357,53 @@ switch( $action )
 		break;
 
 	case 'render_inlines':
-		if( $item_ID)
+		$target_ID = param( 'id', 'integer' );
+		$target_type = param( 'type', 'string' );
+		$tags = param( 'tags', 'array:string', array() );
+
+		// Default params from skins/skins_fallback_v6/_item_content.inc.php
+		$params = array(
+			'before_image'             => '<figure class="evo_image_block">',
+			'before_image_legend'      => '<figcaption class="evo_image_legend">',
+			'after_image_legend'       => '</figcaption>',
+			'after_image'              => '</figure>',
+			'after_images'             => '</div>',
+			'image_class'              => 'img-responsive',
+			'image_size'               => param( 'image_size', 'string', 'fit-256x256' ),
+			'image_limit'              => 1000,
+			'image_link_to'            => 'original', // Can be 'original', 'single' or empty
+		);
+
+		switch( $target_type )
 		{
-			$ItemCache = & get_ItemCache();
-			$Item = $ItemCache->get_by_ID( $item_ID );
-			$tags = param( 'tags', 'array:string', array() );
+			case 'Item':
+				$ItemCache = & get_ItemCache();
+				$edited_Item = $ItemCache->get_by_ID( $target_ID );
+				$rendered_tags = render_inline_tags( $edited_Item, $tags, $params );
+				break;
 
-			// Default params from skins/skins_fallback_v6/_item_content.inc.php
-			$params = array(
-				'before_image'             => '<figure class="evo_image_block">',
-				'before_image_legend'      => '<figcaption class="evo_image_legend">',
-				'after_image_legend'       => '</figcaption>',
-				'after_image'              => '</figure>',
-				'after_images'             => '</div>',
-				'image_class'              => 'img-responsive',
-				'image_size'               => param( 'image_size', 'string', 'fit-256x256' ),
-				'image_limit'              => 1000,
-				'image_link_to'            => 'original', // Can be 'original', 'single' or empty
-			);
+			case 'Comment':
+				$CommentCache = & get_CommentCache();
+				$edited_Comment = $CommentCache->get_by_ID( $target_ID );
+				$rendered_tags = render_inline_tags( $edited_Comment, $tags, $params );
+				break;
 
-			$rendered_tags = render_inline_tags( $Item, $tags, $params );
+			case 'EmailCampaign':
+				$EmailCampaignCache = & get_EmailCampaignCache();
+				$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $target_ID );
+				$rendered_tags = render_inline_tags( $edited_EmailCampaign, $tags, $params );
+				break;
+		}
+
+		if( $rendered_tags )
+		{
 			echo json_encode( $rendered_tags );
 		}
+
 		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
 
 	case 'get_insert_image_form':
 	case 'get_edit_image_form':
-		// TODO: Make Collection/Blog optional? Why do we even need the Skin here?
-		$BlogCache = & get_BlogCache();
-		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
-		$skin_ID = $Blog->get_skin_ID();
-		$SkinCache = & get_SkinCache();
-		$Skin = & $SkinCache->get_by_ID( $skin_ID );
 		$restrict_tag = false;
 
 		if( $action == 'get_insert_image_form' )
@@ -1432,7 +1447,7 @@ switch( $action )
 		}
 
 		$LinkCache = & get_LinkCache();
-		if( ( $Link = & $LinkCache->get_by_ID( $link_ID ) ) === false )
+		if( ( $Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) === false )
 		{ // Bad request with incorrect link ID
 			echo '';
 			exit(0);

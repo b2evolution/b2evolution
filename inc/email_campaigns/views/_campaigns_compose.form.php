@@ -17,6 +17,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $admin_url, $tab;
 global $edited_EmailCampaign, $Plugins, $UserSettings;
 
+echo_image_insert_modal();
+
 $Form = new Form( NULL, 'campaign_form' );
 $Form->begin_form( 'fform' );
 

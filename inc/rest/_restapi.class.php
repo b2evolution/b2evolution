@@ -2239,8 +2239,9 @@ class RestApi
 		// Check permission:
 		$LinkOwner->check_perm( 'edit', true );
 
-		if( $edited_Link->set( 'position', $link_position ) && $edited_Link->dbupdate() )
-		{ // update was successful
+		$edited_Link->set( 'position', $link_position ); // This returns false if no change was made
+		if( $edited_Link->dbupdate() !== false ) // This returns NULL if no change was made
+		{ // update was successful or no change was made
 
 			// Update last touched date of Owners
 			$LinkOwner->update_last_touched_date();

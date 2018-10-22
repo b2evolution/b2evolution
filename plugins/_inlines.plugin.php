@@ -33,20 +33,6 @@ class inlines_plugin extends Plugin
 
 
 	/**
-	 * Define here default collection/blog settings that are to be made available in the backoffice.
-	 *
-	 * @param array Associative array of parameters.
-	 * @return array See {@link Plugin::GetDefaultSettings()}.
-	 */
-	function get_coll_setting_definitions( & $params )
-	{
-		$default_params = array_merge( $params, array( 'default_comment_using' => 'disabled' ) );
-
-		return parent::get_coll_setting_definitions( $default_params );
-	}
-
-
-	/**
 	 * Event handler: Called when displaying editor toolbars on post/item form.
 	 *
 	 * This is for post/item edit forms only. Comments, PMs and emails use different events.
@@ -56,14 +42,12 @@ class inlines_plugin extends Plugin
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		global $Hit;
+		$Item = & $params['Item'];
 
-		if( $Hit->is_lynx() )
-		{	// let's deactivate quicktags on Lynx, because they don't work there.
+		if( empty( $Item ) )
+		{
 			return false;
 		}
-
-		$Item = & $params['Item'];
 
 		$item_Blog = & $Item->get_Blog();
 
@@ -72,12 +56,90 @@ class inlines_plugin extends Plugin
 			return false;
 		}
 
+		return $this->DisplayCodeToolbar( $params );
+	}
+
+
+	/**
+	 * Event handler: Called when displaying editor toolbars on comment form.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCommentToolbar( & $params )
+	{
+		$Comment = & $params['Comment'];
+		if( $Comment )
+		{	// Get a post of the comment:
+			$comment_Item = & $Comment->get_Item();
+		}
+
+		if( empty( $comment_Item ) )
+		{
+			return false;
+		}
+
+		$item_Blog = & $comment_Item->get_Blog();
+
+		if( ! $this->get_coll_setting( 'coll_use_for_comments', $item_Blog ) )
+		{	// This plugin is disabled to use for comments:
+			return false;
+		}
+
+		return $this->DisplayCodeToolbar( $params );
+	}
+
+
+	/**
+	 * Display a code toolbar
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCodeToolbar( & $params )
+	{
+		global $Hit;
+
+		if( $Hit->is_lynx() )
+		{	// let's deactivate quicktags on Lynx, because they don't work there.
+			return false;
+		}
+
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
+		switch( $params['target_type'] )
+		{
+			case 'Item':
+				$Item = & $params['Item'];
+				$target_ID = $Item->ID;
+				break;
+
+			case 'Comment':
+				$Comment = & $params['Comment'];
+				$target_ID = $Comment->ID;
+
+				if( empty( $target_ID ) )
+				{
+					return false;
+				}
+				break;
+
+			case 'EmailCampaign':
+				$EmailCampaign = & $params['EmailCampaign'];
+				$target_ID = $EmailCampaign->ID;
+
+				if( empty( $target_ID ) )
+				{
+					return false;
+				}
+				break;
+		}
+
 		?><script type="text/javascript">
 		//<![CDATA[
-		var post_ID = <?php echo $Item->ID;?>;
+		var target_ID = <?php echo format_to_js( $target_ID );?>;
+		var target_type = '<?php echo format_to_js( $params['target_type'] );?>';
 		var inline_buttons = new Array();
 
 		function inline_button( id, text, type, title, style )
@@ -110,10 +172,22 @@ class inlines_plugin extends Plugin
 
 		function insert_inline( inlineType )
 		{
-			if( post_ID == 0 )
+			if( target_ID == 0 )
 			{
-				alert( evo_js_lang_alert_before_insert );
-				return;
+				switch( target_type )
+				{
+					case 'Item':
+						alert( evo_js_lang_alert_before_insert_item  );
+						break;
+
+					case 'Comment':
+						alert( evo_js_lang_alert_before_insert_comment );
+						break;
+
+					case 'EmailCampaign':
+						alert( evo_js_lang_alert_before_insert_emailcampaign );
+						break;
+				}
 			}
 
 			if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
@@ -128,8 +202,8 @@ class inlines_plugin extends Plugin
 
 				jQuery.ajax( {
 					type: 'POST',
-					url: '<?php echo $this->get_htsrv_url( 'insert_inline', array( 'post_ID' => $Item->ID ), '&' ); ?>',
-					success: function(result)
+					url: '<?php echo $this->get_htsrv_url( 'insert_inline', array( 'target_ID' => $target_ID, 'target_type' => $params['target_type'] ), '&' ); ?>',
+					success: function( result )
 					{
 						openModalWindow( result, '90%', '80%', true, 'Select image', '' );
 					}
@@ -163,33 +237,67 @@ class inlines_plugin extends Plugin
 		$AdminUI = new AdminUI();
 		load_funcs( 'links/model/_link.funcs.php' );
 
-		if( ! isset( $params['post_ID'] ) )
+		if( ! isset( $params['target_ID'] ) || ! isset( $params['target_type'] ) )
 		{
 			return;
 		}
 
-		$ItemCache = & get_ItemCache();
-		$edited_Item = & $ItemCache->get_by_ID( $params['post_ID'] );
-
-		if( empty( $blog ) )
+		switch( $params['target_type'] )
 		{
-			$blog = $edited_Item->get_Blog()->ID;
+			case 'Item':
+				$ItemCache = & get_ItemCache();
+				$edited_Item = & $ItemCache->get_by_ID( $params['target_ID'] );
+
+				if( empty( $blog ) )
+				{
+					$blog = $edited_Item->get_Blog()->ID;
+				}
+
+				if( isset( $GLOBALS['files_Module'] )
+					&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
+					&& $current_User->check_perm( 'files', 'view', false ) )
+				{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
+					load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+					global $LinkOwner; // Initialize this object as global because this is used in many link functions
+					$LinkOwner = new LinkItem( $edited_Item );
+				}
+				break;
+
+			case 'Comment':
+				$CommentCache = & get_CommentCache();
+				$edited_Comment = & $CommentCache->get_by_ID( $params['target_ID'] );
+
+				if( isset( $GLOBALS['files_Module'] )
+					&& $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment )
+					&& $current_User->check_perm( 'files', 'view', false ) )
+				{	// Files module is enabled, but in case of creating new comments we should show file attachments block only if user has all required permissions to attach files
+					load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+					global $LinkOwner; // Initialize this object as global because this is used in many link functions
+					$LinkOwner = new LinkComment( $edited_Comment );
+				}
+				break;
+
+			case 'EmailCampaign':
+				$EmailCampaign = & get_EmailCampaignCache();
+				$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $params['target_ID'] );
+
+				if( isset( $GLOBALS['files_Module'] )
+					&& $current_User->check_perm( 'emails', 'edit', true )
+					&& $current_User->check_perm( 'files', 'view', false ) )
+				{	// Files module is enabled, but in case of creating new comments we should show file attachments block only if user has all required permissions to attach files
+					load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
+					global $LinkOwner; // Initialize this object as global because this is used in many link functions
+					$LinkOwner = new LinkEmailCampaign( $edited_EmailCampaign );
+				}
+			default:
+				return;
 		}
 
-		if( isset( $GLOBALS['files_Module'] )
-				&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
-				&& $current_User->check_perm( 'files', 'view', false ) )
-		{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
-			load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
-			global $LinkOwner; // Initialize this object as global because this is used in many link functions
-			$LinkOwner = new LinkItem( $edited_Item );
-
-			// Set a different dragand drop button ID
-			global $dragdropbutton_ID, $fm_mode;
-			$fm_mode = 'file_select';
-			$dragdropbutton_ID = 'file-uploader-modal';
-			$AdminUI->disp_view( 'links/views/_link_list.view.php' );
-		}
+		// Set a different dragand drop button ID
+		global $dragdropbutton_ID, $fm_mode;
+		$fm_mode = 'file_select';
+		$dragdropbutton_ID = 'file-uploader-modal';
+		$AdminUI->disp_view( 'links/views/_link_list.view.php' );
 	}
 }
 ?>

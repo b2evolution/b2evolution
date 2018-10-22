@@ -321,4 +321,6 @@ $Form->end_form();
 echo_status_dropdown_button_js( 'comment' );
 // JS code for fieldset folding:
 echo_fieldset_folding_js();
+// JS code for inserting preview image
+echo_image_insert_modal();
 ?>

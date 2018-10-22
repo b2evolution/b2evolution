@@ -7721,7 +7721,9 @@ function echo_modalwindow_js_bootstrap()
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_edit_image = \''.TS_('Insert or edit inline image').'\';
 		var evo_js_lang_select_image_insert = \''.TS_('Select image to insert').'\';
-		var evo_js_lang_alert_before_insert = \''.TS_('Save post to start uploading files').'\';
+		var evo_js_lang_alert_before_insert_item = \''.TS_('Save post to start uploading files').'\';
+		var evo_js_lang_alert_before_insert_comment = \''.TS_('Save comment to start uploading files').'\';
+		var evo_js_lang_alert_before_insert_emailcampaign = \''.TS_('Save email campaign to start uploading files').'\';
 	</script>';
 }
 
@@ -8054,11 +8056,11 @@ function get_script_baseurl()
 			if( $_SERVER['SERVER_PORT'] == '443' )
 			{	// Rewrite that as https:
 				$temp_baseurl = 'https://'.$_SERVER['SERVER_NAME'];
-			}	
+			}
 			elseif( $_SERVER['SERVER_PORT'] == '8890' )
 			{	// Used for testing
 				$temp_baseurl = 'https://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'];
-			}	
+			}
 			elseif( $_SERVER['SERVER_PORT'] != '80' )
 			{ // Get also a port number
 				$temp_baseurl .= ':'.$_SERVER['SERVER_PORT'];
@@ -8380,6 +8382,12 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		{
 			case 'Item':
 				$LinkOwner = new LinkItem( $Object, $temp_link_owner_ID );
+				$prepare_plugin_event_name = 'PrepareForRenderItemAttachment';
+				$render_plugin_event_name = 'RenderItemAttachment';
+				break;
+
+			case 'Comment':
+				$LinkOwner = new LinkComment( $Object, $temp_link_owner_ID );
 				$prepare_plugin_event_name = 'PrepareForRenderItemAttachment';
 				$render_plugin_event_name = 'RenderItemAttachment';
 				break;

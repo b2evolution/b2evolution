@@ -2965,7 +2965,7 @@ class Comment extends DataObject
 				{ // Image should be displayed above content
 					$images_above_content .= $r;
 				}
-				else
+				elseif( $link_position != 'inline' )
 				{ // Image should be displayed below content
 					$images_below_content .= $r;
 				}
@@ -2989,13 +2989,15 @@ class Comment extends DataObject
 			$ban_urls = $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this );
 		}
 
+		$output = $this->render_inline_tags( $this->get_content( $format ), $params );
+
 		if( $ban_urls )
 		{ // ban urls and user has permission
-			echo add_ban_icons( $this->get_content( $format ) );
+			echo add_ban_icons( $output );
 		}
 		else
 		{ // don't ban urls
-			echo $this->get_content( $format );
+			echo $output;
 		}
 
 		if( ! empty( $images_below_content ) )
@@ -5216,6 +5218,29 @@ class Comment extends DataObject
 		$inlist_order = intval( $CommentList->inlist_orders[ $this->ID ] );
 
 		return $inlist_order < 0 ? 0 : $inlist_order;
+	}
+
+
+	/**
+	 * Convert all inline tags to HTML code
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_inline_tags( $content, $params = array() )
+	{
+		$params = array_merge( array(
+				'check_code_block'      => true, // TRUE to find inline tags only outside of codeblocks
+				'render_inline_files'   => true,
+			), $params );
+
+		if( $params['render_inline_files'] )
+		{	// Render inline file tags like [image:123:caption] or [file:123:caption]:
+			$content = render_inline_files( $content, $this, $params );
+		}
+
+		return $content;
 	}
 }
 

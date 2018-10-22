@@ -778,7 +778,21 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 		tooltip: evo_js_lang_edit_image,
 		onclick: function() {
 			if( ! editor.getParam( 'target_ID' ) )	{
-				alert( evo_js_lang_alert_before_insert );
+				switch( editor.getParam( 'target_type' ) )
+				{
+					case 'Item':
+						alert( evo_js_lang_alert_before_insert_item  );
+						break;
+
+					case 'Comment':
+						alert( evo_js_lang_alert_before_insert_comment );
+						break;
+
+					case 'EmailCampaign':
+						alert( evo_js_lang_alert_before_insert_emailcampaign );
+						break;
+				}
+
 				return false;
 			}
 

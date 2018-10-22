@@ -876,7 +876,7 @@ class tinymce_plugin extends Plugin
 			'removeformat',
 		);
 		/* ----------- button row 3 : tools + insert buttons ------------ */
-		$image_media_buttons = ( $target_type == 'Item' ? 'evo_image image media' : 'image media' );
+		$image_media_buttons = ( ( $target_type == 'Comment' ) && empty( $this->target_ID ) ? 'image media' : 'evo_image image media' );
 		$tmce_theme_advanced_buttons3_array = array(
 			'undo redo',
 			'searchreplace',
@@ -888,7 +888,6 @@ class tinymce_plugin extends Plugin
 			'table',
 		);
 
-// fp>erwin: add code to use the followign only for posts (not comments):
 		if( $target_type == 'Item' )
 		{
 			$tmce_theme_advanced_buttons3_array[] = 'morebreak pagebreak';
@@ -897,8 +896,6 @@ class tinymce_plugin extends Plugin
 		if( $edit_layout != 'inskin' )
 		{ // Additional toolbar for BACK-OFFICE only:
 			/* ----------- button row 4 ------------ */
-
-// fp>erwin: please test visualchars.
 			$tmce_plugins_array[] = 'visualchars';
 			$tmce_theme_advanced_buttons4_array = array(
 				'visualchars',
@@ -965,7 +962,6 @@ class tinymce_plugin extends Plugin
 
 		// B2evo plugin options
 		$init_options[] = 'collection: "'.$this->collection.'"';
-		//$init_options[] = 'postID: '.( empty( $this->post_ID ) ? 'undefined' : $this->post_ID );
 		$init_options[] = 'target_ID: '.( empty( $this->target_ID ) ? 'undefined' : $this->target_ID );
 		$init_options[] = 'target_type: "'.( empty( $this->target_type ) ? 'undefined' : format_to_js( $this->target_type ) ).'"';
 
@@ -1175,6 +1171,11 @@ class tinymce_plugin extends Plugin
 	}
 
 
+	/**
+	 * Opens modal to insert inline image tags
+	 *
+	 * @param array Params
+	 */
 	function htsrv_insert_inline( $params )
 	{
 		global $UserSettings, $current_User, $adminskins_path, $AdminUI, $is_admin_page, $blog;
@@ -1208,20 +1209,46 @@ class tinymce_plugin extends Plugin
 					load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
 					global $LinkOwner; // Initialize this object as global because this is used in many link functions
 					$LinkOwner = new LinkItem( $edited_Item );
+				}
+				break;
 
-					// Set a different dragand drop button ID
-					global $dragdropbutton_ID, $fm_mode;
-					$fm_mode = 'file_select';
-					$dragdropbutton_ID = 'file-uploader-modal';
-					$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+			case 'Comment':
+				$CommentCache = & get_CommentCache();
+				$edited_Comment = & $CommentCache->get_by_ID( $params['target_ID'] );
+
+				if( isset( $GLOBALS['files_Module'] )
+					&& $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment )
+					&& $current_User->check_perm( 'files', 'view', false ) )
+				{	// Files module is enabled, but in case of creating new comments we should show file attachments block only if user has all required permissions to attach files
+					load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+					global $LinkOwner; // Initialize this object as global because this is used in many link functions
+					$LinkOwner = new LinkComment( $edited_Comment );
 				}
 				break;
 
 			case 'EmailCampaign':
-			case 'Comment':
+				$EmailCampaignCache = & get_EmailCampaignCache();
+				$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $params['target_ID'] );
+
+				if( isset( $GLOBALS['files_Module'] )
+					&& $current_User->check_perm( 'emails', 'edit', true )
+					&& $current_User->check_perm( 'files', 'view', false ) )
+				{	// Files module is enabled, but in case of creating new comments we should show file attachments block only if user has all required permissions to attach files
+					load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
+					global $LinkOwner; // Initialize this object as global because this is used in many link functions
+					$LinkOwner = new LinkEmailCampaign( $edited_EmailCampaign );
+				}
+				break;
+
 			default:
 				return;
 		}
+
+		// Set a different dragand drop button ID
+		global $dragdropbutton_ID, $fm_mode;
+		$fm_mode = 'file_select';
+		$dragdropbutton_ID = 'file-uploader-modal';
+		$AdminUI->disp_view( 'links/views/_link_list.view.php' );
 	}
 
 
