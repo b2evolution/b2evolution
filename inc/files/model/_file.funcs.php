@@ -2468,12 +2468,12 @@ function display_dragdrop_upload_button( $params = array() )
 				text: {
 					formatProgress: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('Uploading {total_size}...');?>',
 					sizeSymbols: [
-						/* TRANS: Abbr. for "Kilobytes" */'<?php echo TS_('KB') ?>',
-						/* TRANS: Abbr. for Megabytes */'<?php echo TS_('MB') ?>',
-						/* TRANS: Abbr. for Gigabytes */'<?php echo TS_('GB') ?>',
-						/* TRANS: Abbr. for Terabytes */'<?php echo TS_('TB') ?>',
-						/* TRANS: Abbr. for Petabytes */'<?php echo TS_('PB') ?>',
-						/* TRANS: Abbr. for Exabytes */'<?php echo TS_('EB') ?>'
+						'<?php echo /* TRANS: Abbr. for Kilobytes */ TS_('KB') ?>',
+						'<?php echo /* TRANS: Abbr. for Megabytes */ TS_('MB') ?>',
+						'<?php echo /* TRANS: Abbr. for Gigabytes */ TS_('GB') ?>',
+						'<?php echo /* TRANS: Abbr. for Terabytes */ TS_('TB') ?>',
+						'<?php echo /* TRANS: Abbr. for Petabytes */ TS_('PB') ?>',
+						'<?php echo /* TRANS: Abbr. for Exabytes  */ TS_('EB') ?>'
 					],
 				},
 				validation: {
