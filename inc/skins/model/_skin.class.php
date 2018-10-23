@@ -1301,7 +1301,6 @@ class Skin extends DataObject
 					}
 
 					// Require Fine Uploader js and css:
-					init_fineuploader_js_lang_strings();
 					require_js( 'multiupload/fine-uploader.js', 'blog' );
 					require_css( 'fine-uploader.css', 'blog' );
 					// Load JS files to make the links table sortable:
