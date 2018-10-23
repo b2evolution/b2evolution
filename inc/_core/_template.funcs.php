@@ -3721,21 +3721,6 @@ function init_fontawesome_icons( $icons_type = 'fontawesome', $relative_to = 'rs
 
 
 /**
- * Initialize JavaScript variables for fileuploader.js
- */
-function init_fineuploader_js_lang_strings()
-{
-	// Initialize variables for the file "fileuploader.js":
-	add_js_headline( 'var evo_js_lang_file_sizes = [\''
-		/* TRANS: Abbr. for "Bytes" */.TS_('B.').'\', \''
-		/* TRANS: Abbr. for "Kilobytes" */.TS_('KB').'\', \''
-		/* TRANS: Abbr. for Megabytes */.TS_('MB').'\', \''
-		/* TRANS: Abbr. for Gigabytes */.TS_('GB').'\', \''
-		/* TRANS: Abbr. for Terabytes */.TS_('TB').'\'];' );
-}
-
-
-/**
  * Get rating stars template
  *
  * @param float Rating value, e-g: 2 - display 2 active stars of default 5, 4.33 - display 4 active stars and 5 star is filled for 33%

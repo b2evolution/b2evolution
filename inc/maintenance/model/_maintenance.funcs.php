@@ -296,15 +296,20 @@ function prepare_maintenance_dir( $dir_name, $deny_access = true )
  */
 function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_name = '' )
 {
-	if( !file_exists( $dest_dir ) )
-	{ // We can create directory
-		if ( ! mkdir_r( $dest_dir ) )
-		{
-			echo '<p class="text-danger">'.sprintf( T_( 'Unable to create &laquo;%s&raquo; directory to extract files from ZIP archive.' ), $dest_dir ).'</p>';
-			evo_flush();
+	global $Settings, $current_User;
 
-			return false;
-		}
+	if( ! is_logged_in() || ! $current_User->check_perm( 'files', 'all' ) )
+	{	// No permission to unzip files:
+		echo '<p class="text-danger">'.T_('You don\'t have permission to UNZIP files automatically on the server.').'</p>';
+		evo_flush();
+		return false;
+	}
+
+	if( ! file_exists( $dest_dir ) && ! mkdir_r( $dest_dir ) )
+	{	// Destination directory doesn't exist and it couldn't be created:
+		echo '<p class="text-danger">'.sprintf( T_( 'Unable to create &laquo;%s&raquo; directory to extract files from ZIP archive.' ), $dest_dir ).'</p>';
+		evo_flush();
+		return false;
 	}
 
 	if( function_exists( 'gzopen' ) )
@@ -314,7 +319,7 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 		load_class( '_ext/pclzip/pclzip.lib.php', 'PclZip' );
 
 		$PclZip = new PclZip( $src_file );
-		if( $PclZip->extract( PCLZIP_OPT_PATH, $dest_dir ) == 0 )
+		if( $PclZip->extract( PCLZIP_OPT_PATH, $dest_dir, PCLZIP_OPT_SET_CHMOD, octdec( $Settings->get( 'fm_default_chmod_file' ) ) ) == 0 )
 		{
 			if( empty( $src_file_name ) )
 			{ // Set zip file name
