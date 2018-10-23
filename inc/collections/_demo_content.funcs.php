@@ -1227,6 +1227,9 @@ function create_demo_collections( $demo_users = array(), $create_demo_users = tr
 	{	// Install Blog B
 		$timeshift += 86400;
 		$section_ID = isset( $sections['Blogs']['ID'] ) ? $sections['Blogs']['ID'] : 1;
+		// Create demo poll:
+		global $demo_poll_ID;
+		$demo_poll_ID = create_demo_poll();
 		$blog_ID = create_demo_collection( 'blog_b', $paul_blogger_ID, $create_demo_users, $timeshift, $section_ID );
 		// Insert basic widgets:
 		insert_basic_widgets( $blog_ID, 'normal', false, 'std' );
@@ -3289,37 +3292,54 @@ function create_demo_poll()
 	$demo_users = get_demo_users( false );
 	$max_answers = 3;
 
-	// Add poll question:
-	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text, pqst_max_answers )
-		VALUES ( 1, "What are your favorite b2evolution features?", '.$max_answers.' )' );
+	$demo_question = T_('What are your favorite b2evolution feature?');
 
-	$demo_poll_ID = $DB->insert_id;
+	// Check if there is already a demo poll:
+	$demo_poll_ID = $DB->get_var( 'SELECT pqst_ID FROM T_polls__question WHERE pqst_question_text = '.$DB->quote( $demo_question ) );
 
-	// Add poll answers:
-	$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
-               VALUES ( '.$demo_poll_ID.', "Multiple blogs",   1 ),
-                      ( '.$demo_poll_ID.', "Photo Galleries",   2 ),
-                      ( '.$demo_poll_ID.', "Forums",            3 ),
-                      ( '.$demo_poll_ID.', "Online Manuals",    4 ),
-                      ( '.$demo_poll_ID.', "Lists / E-mailing", 5 ),
-                      ( '.$demo_poll_ID.', "Easy Maintenance",  6 )' );
-
-	// Generate answers:
-	$insert_values = array();
-	foreach( $demo_users as $demo_user )
+	if( empty( $demo_poll_ID ) )
 	{
-		$answers = array( 1, 2, 3, 4, 5, 6 );
-		for( $i = 0; $i < $max_answers; $i++ )
+		// Add poll question:
+		$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text, pqst_max_answers )
+			VALUES ( 1, '.$DB->quote( $demo_question ).', '.$max_answers.' )' );
+
+		$demo_poll_ID = $DB->insert_id;
+
+		// Add poll answers:
+		$answer_texts = array(
+				array( T_('Multiple blogs'), 1 ),
+				array( T_('Photo Galleries'), 2 ),
+				array( T_('Forums'), 3 ),
+				array( T_('Online Manuals'), 4 ),
+				array( T_('Lists / E-mailing'), 5 ),
+				array( T_('Easy Maintenance'), 6 )
+			);
+
+		$answer_IDs = array();
+		foreach( $answer_texts as $answer_text )
 		{
-			$rand_key = array_rand( $answers );
-			$insert_values[] = '( '.$demo_poll_ID.', '.$demo_user->ID.', '.$answers[$rand_key].' )';
-			unset( $answers[$rand_key] );
+			$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
+					VALUES ( '.$demo_poll_ID.', '.$DB->quote( $answer_text[0] ).', '.$DB->quote( $answer_text[1] ).' )' );
+			$answer_IDs[] = $DB->insert_id;
 		}
-	}
-	if( $insert_values )
-	{
-		$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
-			VALUES '.implode( ', ', $insert_values ) );
+
+		// Generate answers:
+		$insert_values = array();
+		foreach( $demo_users as $demo_user )
+		{
+			$answers = $answer_IDs;
+			for( $i = 0; $i < $max_answers; $i++ )
+			{
+				$rand_key = array_rand( $answers );
+				$insert_values[] = '( '.$demo_poll_ID.', '.$demo_user->ID.', '.$answers[$rand_key].' )';
+				unset( $answers[$rand_key] );
+			}
+		}
+		if( $insert_values )
+		{
+			$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
+				VALUES '.implode( ', ', $insert_values ) );
+		}
 	}
 
 	return $demo_poll_ID;

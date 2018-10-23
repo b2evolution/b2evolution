@@ -1747,6 +1747,14 @@ function create_demo_contents( $demo_users = array() )
 	}
 	task_end();
 
+	if( $install_collection_blogb )
+	{
+		global $demo_poll_ID;
+		task_begin( 'Creating default polls... ' );
+		$demo_poll_ID = create_demo_poll();
+		task_end();
+	}
+
 	// Store the item IDs in this array in order to create additional comments
 	$additional_comments_item_IDs = array();
 
@@ -1869,12 +1877,6 @@ function create_demo_contents( $demo_users = array() )
 	$DB->query( $query );
 	echo "OK.<br />\n";
 	*/
-
-
-	task_begin( 'Creating default polls... ' );
-	create_demo_poll();
-	task_end();
-
 
 	// Allow all modules to create their own demo contents:
 	modules_call_method( 'create_demo_contents' );

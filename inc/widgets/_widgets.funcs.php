@@ -31,6 +31,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	global $DB, $install_test_features, $installed_collection_info_pages;
 	// Handle all blog IDs which can go from function create_demo_contents()
 	global $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
+	global $demo_poll_ID;
 	$blog_home_ID = intval( $blog_home_ID );
 	$blog_a_ID = intval( $blog_a_ID );
 	$blog_b_ID = intval( $blog_b_ID );
@@ -38,6 +39,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$blog_forums_ID = intval( $blog_forums_ID );
 	$blog_manual_ID = intval( $blog_manual_ID );
 	$events_blog_ID = intval( $events_blog_ID );
+	$demo_poll_ID = intval( $demo_poll_ID );
 
 	// Init insert widget query and default params
 	$default_blog_param = 's:7:"blog_ID";s:0:"";';
@@ -241,7 +243,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 				'thumb_size' => 'crop-80x80',
 			) : NULL ) ),
 		// Install widget "Poll" only for Blog B on install:
-		array( 40, 'poll', 'coll_ID' => $blog_b_ID, 'params' => array( 'poll_ID' => 1 ) ),
+		array( 40, 'poll', 'coll_ID' => $blog_b_ID, 'params' => array( 'poll_ID' => $demo_poll_ID ) ),
 		array( 50, 'subcontainer_row', 'params' => array(
 				'column1_container' => 'front_page_column_a',
 				'column1_class'     => ( $kind == 'main' ? 'col-xs-12' : 'col-sm-6 col-xs-12' ),
