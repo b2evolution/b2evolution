@@ -1661,13 +1661,6 @@ fieldset#ffield_g textarea {
 	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(SizingMethod='auto expand', M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476)"; /* IE8 */
 }
 
-@media \0screen {/* IE8 */
-	.evo_content_block span[class*=status_] span {
-		top: -15px;
-		left: -2px;
-	}
-}
-
 div.section_requires_javascript p.ajax-loader {
 	text-align: center;
 }
