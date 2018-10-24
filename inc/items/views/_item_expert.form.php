@@ -170,7 +170,7 @@ $Form->begin_form( '', '', $params );
 	$Form->begin_fieldset( '', array( 'class' => 'evo_fields_table__single_row' ) );
 	if( $edited_Item->get_type_setting( 'use_title' ) != 'never' )
 	{	// Display a post title field:
-		$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array( 'maxlength' => 255, 'required' => ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ) );
+		$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array( 'maxlength' => 255, 'data-maxlength' => 255, 'required' => ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ) );
 	}
 	else
 	{	// Hide a post title field:
@@ -401,6 +401,7 @@ $Form->begin_form( '', '', $params );
 	{	// Display url:
 		$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, T_('Link to url'), '', array(
 				'maxlength' => 255,
+				'data-maxlength' => 255,
 				'required'  => ( $edited_Item->get_type_setting( 'use_url' ) == 'required' )
 			) );
 	}
@@ -415,6 +416,7 @@ $Form->begin_form( '', '', $params );
 		{	// Display <title> tag:
 			$Form->text_input( 'titletag', $edited_Item->get( 'titletag' ), 40, T_('&lt;title&gt; tag'), '', array(
 					'maxlength' => 255,
+					'data-maxlength' => 255,
 					'required'  => ( $edited_Item->get_type_setting( 'use_title_tag' ) == 'required' )
 				) );
 		}
@@ -427,6 +429,7 @@ $Form->begin_form( '', '', $params );
 		{	// Display <meta> description:
 			$Form->text_input( 'metadesc', $edited_Item->get_setting( 'metadesc' ), 40, T_('&lt;meta&gt; desc'), '', array(
 					'maxlength' => 255,
+					'data-maxlength' => 255,
 					'required'  => ( $edited_Item->get_type_setting( 'use_meta_desc' ) == 'required' )
 				) );
 		}
@@ -439,6 +442,7 @@ $Form->begin_form( '', '', $params );
 		{	// Display <meta> keywords:
 			$Form->text_input( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ), 40, T_('&lt;meta&gt; keywds'), '', array(
 					'maxlength' => 255,
+					'data-maxlength' => 255,
 					'required'  => ( $edited_Item->get_type_setting( 'use_meta_keywds' ) == 'required' )
 				) );
 		}

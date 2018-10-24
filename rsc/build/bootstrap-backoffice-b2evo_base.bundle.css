@@ -2267,6 +2267,11 @@ tr.evo_highlight td {
     background-color: auto;
   }
 }
+.evo_input_maxlength_counter {
+  position: absolute;
+  color: #999;
+  font-size: 80%;
+}
 
 /**
  * item_base.css 
