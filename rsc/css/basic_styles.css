@@ -219,14 +219,6 @@ span.icon.voted {
 }
 a.rollover_sprite:hover span.icon {
   visibility: hidden;
-  visibility: visible\0/;
-  /* IE8 */
-}
-@media screen and (min-width: 0\0) {
-  /* IE9-10 */
-  a.rollover_sprite:hover span.icon {
-    visibility: visible;
-  }
 }
 a.rollover_sprite:hover span.icon:before {
   visibility: visible !important;
