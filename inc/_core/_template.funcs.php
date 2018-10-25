@@ -2416,6 +2416,12 @@ function display_ajax_form( $params )
 
 	echo '<div id="ajax_form_number_'.$ajax_form_number.'" class="section_requires_javascript">';
 
+	if( isset( $params['action'], $params['p'] ) && $params['action'] == 'get_comment_form' )
+	{	// Display anchor here even form is not loaded yet because it is used e.g. for reply links:
+		$comment_form_anchor = empty( $params['params']['comment_form_anchor'] ) ? 'form_p' : $params['params']['comment_form_anchor'];
+		echo '<a id="'.format_to_output( $comment_form_anchor.$params['p'], 'htmlattr' ).'"></a>';
+	}
+
 	// Needs json_encode function to create json type params
 	$json_params = evo_json_encode( $params );
 
