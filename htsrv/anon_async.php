@@ -1405,6 +1405,33 @@ switch( $action )
 	case 'get_insert_image_form':
 	case 'get_edit_image_form':
 		$restrict_tag = false;
+		$request_from = param( 'request_from', 'string', NULL );
+
+		global $is_admin_page;
+
+		init_fontawesome_icons();
+
+		$is_admin_page = is_logged_in() && $request_from == 'back';
+
+		if( is_admin_page() )
+		{
+			global $UserSettings, $adminskins_path, $AdminUI;
+
+			$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+			$AdminUI = new AdminUI();
+		}
+		else
+		{
+			$BlogCache = & get_BlogCache();
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID );
+			$blog_skin_ID = $Blog->get_skin_ID();
+			if( ! empty( $blog_skin_ID ) )
+			{
+				$SkinCache = & get_SkinCache();
+				$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+			}
+		}
 
 		if( $action == 'get_insert_image_form' )
 		{

@@ -24,7 +24,12 @@ global $Collection, $Blog;
  */
 global $LinkOwner;
 
-global $AdminUI, $Skin, $current_User;
+global $AdminUI, $current_User;
+
+if( ! isset( $Skin ) )
+{
+	global $Skin;
+}
 
 // Override $dragdropbutton_ID to enable multiple drag and buton
 global $dragdropbutton_ID, $fm_mode;

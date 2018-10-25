@@ -967,7 +967,12 @@ class tinymce_plugin extends Plugin
 
 		$init_options[] = 'rest_url: "'.get_htsrv_url().'rest.php"';
 		$init_options[] = 'anon_async_url: "'.get_htsrv_url().'anon_async.php"';
-		$init_options[] = 'modal_url: "'.$this->get_htsrv_url( 'insert_inline', array( 'target_type' => $this->target_type, 'target_ID' => $this->target_ID ), '&' ).'"';
+		$insert_inline_modal_params = array(
+				'target_type'  => $this->target_type,
+				'target_ID'    => $this->target_ID,
+				'request_from' => is_admin_page() ? 'back' : 'front',
+			);
+		$init_options[] = 'modal_url: "'.$this->get_htsrv_url( 'insert_inline', $insert_inline_modal_params, '&' ).'"';
 
 		$init_options[] = 'fontsize_formats: "8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt"';
 
@@ -1178,18 +1183,17 @@ class tinymce_plugin extends Plugin
 	 */
 	function htsrv_insert_inline( $params )
 	{
-		global $UserSettings, $current_User, $adminskins_path, $AdminUI, $is_admin_page, $blog;
+		global $current_User, $inc_path, $Blog, $blog, $LinkOwner;
+		global $is_admin_page;
 
-		$is_admin_page = true;
-		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
-		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
-		$AdminUI = new AdminUI();
 		load_funcs( 'links/model/_link.funcs.php' );
 
 		if( ! isset( $params['target_ID'] ) || ! isset( $params['target_type'] ) )
 		{
 			return;
 		}
+
+		$is_admin_page = is_logged_in() && isset( $params['request_from'] ) && $params['request_from'] == 'back';
 
 		switch( $params['target_type'] )
 		{
@@ -1199,7 +1203,8 @@ class tinymce_plugin extends Plugin
 
 				if( empty( $blog ) )
 				{
-					$blog = $edited_Item->get_Blog()->ID;
+					$Blog = $edited_Item->get_Blog();
+					$blog = $Blog->ID;
 				}
 
 				if( isset( $GLOBALS['files_Module'] )
@@ -1215,6 +1220,13 @@ class tinymce_plugin extends Plugin
 			case 'Comment':
 				$CommentCache = & get_CommentCache();
 				$edited_Comment = & $CommentCache->get_by_ID( $params['target_ID'] );
+				$comment_Item = & $edited_Comment->get_Item();
+
+				if( empty( $blog ) )
+				{
+					$Blog = $comment_Item->get_Blog();
+					$blog = $Blog->ID;
+				}
 
 				if( isset( $GLOBALS['files_Module'] )
 					&& $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment )
@@ -1248,7 +1260,29 @@ class tinymce_plugin extends Plugin
 		global $dragdropbutton_ID, $fm_mode;
 		$fm_mode = 'file_select';
 		$dragdropbutton_ID = 'file-uploader-modal';
-		$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+
+		if( is_admin_page() )
+		{
+			global $UserSettings, $adminskins_path, $AdminUI;
+
+			$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+			$AdminUI = new AdminUI();
+
+			$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+		}
+		else
+		{
+			global $Skin, $inc_path;
+
+			init_fontawesome_icons();
+
+			$blog_skin_ID = $Blog->get_skin_ID();
+			$SkinCache = & get_SkinCache();
+			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+
+			require $inc_path.'links/views/_link_list.view.php';
+		}
 	}
 
 

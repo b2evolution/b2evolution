@@ -4579,6 +4579,7 @@ function echo_image_insert_modal()
 				'tag_type': tagType,
 				'link_ID': linkID,
 				'blog': blog,
+				'request_from': '<?php echo format_to_js( is_admin_page() ? 'back' : 'front' );?>',
 			},
 			success: function(result)
 			{
