@@ -158,7 +158,7 @@ $Form->begin_form( '', '', $params );
 		$Form->begin_fieldset( '', array( 'class' => 'evo_fields_table__single_row' ) );
 		if( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' )
 		{	// Display a post short title field:
-			$Form->text_input( 'post_short_title', $edited_Item->get( 'short_title' ), 50, T_('Short title'), '', array( 'maxlength' => 50 ) );
+			$Form->text_input( 'post_short_title', $edited_Item->get( 'short_title' ), 50, T_('Short title'), '', array( 'maxlength' => 50, 'data-recommended-length' => '20;30' ) );
 		}
 		else
 		{	// Hide a post short title field:
@@ -170,7 +170,7 @@ $Form->begin_form( '', '', $params );
 	$Form->begin_fieldset( '', array( 'class' => 'evo_fields_table__single_row' ) );
 	if( $edited_Item->get_type_setting( 'use_title' ) != 'never' )
 	{	// Display a post title field:
-		$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array( 'maxlength' => 255, 'data-maxlength' => 255, 'required' => ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ) );
+		$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array( 'maxlength' => 255, 'data-recommended-length' => '60;65', 'required' => ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ) );
 	}
 	else
 	{	// Hide a post title field:
@@ -389,6 +389,7 @@ $Form->begin_form( '', '', $params );
 					'required' => ( $edited_Item->get_type_setting( 'use_excerpt' ) == 'required' ),
 					'style'    => 'width:100%',
 					'note'     => $excerpt_checkbox,
+					'data-recommended-length' => '80;120',
 				) );
 		}
 		else
@@ -415,8 +416,8 @@ $Form->begin_form( '', '', $params );
 		if( $edited_Item->get_type_setting( 'use_title_tag' ) != 'never' )
 		{	// Display <title> tag:
 			$Form->text_input( 'titletag', $edited_Item->get( 'titletag' ), 40, T_('&lt;title&gt; tag'), '', array(
-					'maxlength' => 255,
-					'data-maxlength' => 255,
+					'maxlength' => 500,
+					'data-recommended-length' => '60;65',
 					'required'  => ( $edited_Item->get_type_setting( 'use_title_tag' ) == 'required' )
 				) );
 		}
@@ -428,8 +429,8 @@ $Form->begin_form( '', '', $params );
 		if( $edited_Item->get_type_setting( 'use_meta_desc' ) != 'never' )
 		{	// Display <meta> description:
 			$Form->text_input( 'metadesc', $edited_Item->get_setting( 'metadesc' ), 40, T_('&lt;meta&gt; desc'), '', array(
-					'maxlength' => 255,
-					'data-maxlength' => 255,
+					'maxlength' => 500,
+					'data-recommended-length' => '80;120',
 					'required'  => ( $edited_Item->get_type_setting( 'use_meta_desc' ) == 'required' )
 				) );
 		}
@@ -441,8 +442,8 @@ $Form->begin_form( '', '', $params );
 		if( $edited_Item->get_type_setting( 'use_meta_keywds' ) != 'never' )
 		{	// Display <meta> keywords:
 			$Form->text_input( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ), 40, T_('&lt;meta&gt; keywds'), '', array(
-					'maxlength' => 255,
-					'data-maxlength' => 255,
+					'maxlength' => 500,
+					'data-recommended-length' => '200;250',
 					'required'  => ( $edited_Item->get_type_setting( 'use_meta_keywds' ) == 'required' )
 				) );
 		}
