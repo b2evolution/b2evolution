@@ -3519,6 +3519,9 @@ class Blog extends DataObject
 
 			$DB->commit();
 
+			// Create collection media directory:
+			$this->get_media_dir();
+
 			return true;
 		}
 
