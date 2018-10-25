@@ -1257,9 +1257,10 @@ class tinymce_plugin extends Plugin
 		}
 
 		// Set a different dragand drop button ID
-		global $dragdropbutton_ID, $fm_mode;
+		global $dragdropbutton_ID, $fm_mode, $link_list_tbody_ID;
 		$fm_mode = 'file_select';
 		$dragdropbutton_ID = 'file-uploader-modal';
+		$link_list_tbody_ID = 'linklist_tbody_modal';
 
 		if( is_admin_page() )
 		{

@@ -316,7 +316,7 @@ function evo_link_refresh_list( type, object_ID, action )
 		evo_rest_api_request( 'links',
 		{
 			'action':    typeof( action ) == 'undefined' ? 'refresh' : 'sort',
-			'type':      type,
+			'type':      type.toLowerCase(),
 			'object_ID': object_ID,
 		},
 		function( data )

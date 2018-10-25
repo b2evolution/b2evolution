@@ -2351,9 +2351,6 @@ function display_dragdrop_upload_button( $params = array() )
 			'additional_dropzone'    => '', // jQuery selector of additional drop zone
 			'filename_before'        => '', // Append this text before file name on success uploading of new file,
 																	 // Used a mask $file_path$ to replace it with File->get_rdfp_rel_path()
-			'select_file_template'   => '', // Append this text before file name on success of uploading a new file,
-																			// Used a mask $file_path$ to replace it with File->get_rdfp_rel_path()
-			'select_file_type'       => NULL, // File type that can be selected
 			'LinkOwner'              => NULL, // Use it if you want to link a file to Item/Comment right after uploading
 			'display_status_success' => true, // Display status text about successful uploading
 			'status_conflict_place'  => 'default', // Where we should write a message about conflict:
@@ -2593,13 +2590,9 @@ function display_dragdrop_upload_button( $params = array() )
 							}
 
 							var select_file_template = '';
-							if( responseJSON.data.filetype == '<?php echo $params['select_file_type'];?>' )
+							if( responseJSON.data.select_link_button )
 							{	// Add select file button:
-								var select_file_template = '<?php echo str_replace ( "'", "\'", $params['select_file_template'] ); ?>';
-								if( select_file_template != '' )
-								{
-									select_file_template = select_file_template.replace( '$file_path$', responseJSON.data.path );
-								}
+								select_file_template = responseJSON.data.select_link_button;
 							}
 
 							var warning = '';

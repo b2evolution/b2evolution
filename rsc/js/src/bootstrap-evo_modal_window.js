@@ -19,7 +19,7 @@ var modal_window_js_initialized = false;
  * @param string ID of iframe where all contents
  * @param function Event handler when dialog is shown
  */
-function openModalWindow( body_html, width, height, transparent, title, buttons, is_new_window, keep_panels, iframe_id, on_shown_handler )
+function openModalWindow( body_html, width, height, transparent, title, buttons, is_new_window, keep_panels, iframe_id, on_shown_handler, on_hide_handler )
 {
 	var style_width = ( typeof( width ) == 'undefined' || width == 'auto' ) ? '' : 'width:' + width + ';';
 	var style_height = ( typeof( height ) == 'undefined' || height == 0 || height == '' ) ? '': 'height:' + height;
@@ -128,6 +128,10 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 	jQuery( '#modal_window').on( 'hidden.bs.modal', function ()
 	{ // Remove modal window on hide event to draw new window in next time with new title and button
 		jQuery( this ).remove();
+		if( typeof( on_hide_handler ) == 'function' )
+		{
+			on_hide_handler();
+		}
 	} );
 
 	modal_window_js_initialized = true;

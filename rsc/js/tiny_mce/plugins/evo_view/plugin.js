@@ -82,7 +82,11 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 						url: editor.getParam( 'modal_url' ),
 						success: function(result)
 						{
-							openModalWindow( result, '90%', '80%', true, 'Select image', '' );
+							//openModalWindow( result, '90%', '80%', true, 'Select image', '' );
+							openModalWindow( result, '90%', '80%', true, 'Select image', '', '', '', '', '', function() {
+									evo_link_refresh_list( editor.getParam( 'target_type' ), editor.getParam( 'target_ID') );
+									evo_link_fix_wrapper_height();
+								} );
 						}
 					} );
 

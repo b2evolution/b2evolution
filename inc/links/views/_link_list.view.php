@@ -30,6 +30,12 @@ if( ! isset( $Skin ) )
 {
 	global $Skin;
 }
+global $link_list_tbody_ID;
+
+if( ! isset( $link_list_tbody_ID ) )
+{
+	$link_list_tbody_ID = 'linklist_tbody';
+}
 
 // Override $dragdropbutton_ID to enable multiple drag and buton
 global $dragdropbutton_ID, $fm_mode;
@@ -132,7 +138,7 @@ $Results->cols[] = array(
 				);
 
 // Add attr "id" to handle quick uploader
-$tbody_start = '<tbody class="filelist_tbody"'.( $fm_mode == 'file_select' ? ' data-file-select="true"' : '' ).'"';
+$tbody_start = '<tbody id="'.$link_list_tbody_ID.'"'.( $fm_mode == 'file_select' ? ' data-file-select="true"' : '' ).' class="filelist_tbody"';
 $compact_results_params = is_admin_page() ? $AdminUI->get_template( 'compact_results' ) : $Skin->get_template( 'compact_results' );
 $compact_results_params['body_start'] = str_replace( '<tbody', $tbody_start, $compact_results_params['body_start'] );
 $compact_results_params['no_results_start'] = str_replace( '<tbody', $tbody_start, $compact_results_params['no_results_start'] );
@@ -190,7 +196,7 @@ display_dragdrop_upload_button( array(
 		'after'  => '</div>',
 		'fileroot_ID'      => $upload_fileroot,
 		'path'             => $upload_path,
-		'listElement'      => 'jQuery( ".filelist_tbody" ).get(0)',
+		'listElement'      => 'jQuery( "#'.$link_list_tbody_ID.'" ).get(0)',
 		'list_style'       => 'table',
 		'template'         => '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
 				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'
@@ -223,7 +229,7 @@ display_dragdrop_upload_button( array(
 							.( count( $LinkOwner->get_positions() ) > 1 ? '<td class="qq-upload-link-position lastcol shrinkwrap"><a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a></td>' : '' )
 						.'</tr>',
 		'display_support_msg'    => false,
-		'additional_dropzone'    => 'jQuery( ".filelist_tbody" )',
+		'additional_dropzone'    => 'jQuery( "#'.$link_list_tbody_ID.'" )',
 		'filename_before'        => '',
 		'LinkOwner'              => $LinkOwner,
 		'display_status_success' => false,

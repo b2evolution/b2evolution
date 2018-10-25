@@ -205,7 +205,10 @@ class inlines_plugin extends Plugin
 					url: '<?php echo $this->get_htsrv_url( 'insert_inline', array( 'target_ID' => $target_ID, 'target_type' => $params['target_type'] ), '&' ); ?>',
 					success: function( result )
 					{
-						openModalWindow( result, '90%', '80%', true, 'Select image', '' );
+						openModalWindow( result, '90%', '80%', true, 'Select image', '', '', '', '', '', function() {
+									evo_link_refresh_list( editor.getParam( 'target_type' ), editor.getParam( 'target_ID') );
+									evo_link_fix_wrapper_height();
+								} );
 					}
 				} );
 			}
