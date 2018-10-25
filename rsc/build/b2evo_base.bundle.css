@@ -220,14 +220,6 @@ span.icon.voted {
 }
 a.rollover_sprite:hover span.icon {
   visibility: hidden;
-  visibility: visible\0/;
-  /* IE8 */
-}
-@media screen and (min-width: 0\0) {
-  /* IE9-10 */
-  a.rollover_sprite:hover span.icon {
-    visibility: visible;
-  }
 }
 a.rollover_sprite:hover span.icon:before {
   visibility: visible !important;
@@ -2666,7 +2658,7 @@ tr.evo_highlight td {
     background-color: #FF6600;
   }
   to {
-    background-color: auto;
+    background-color: transparent;
   }
 }
 .evo_input_maxlength_counter {
@@ -4078,14 +4070,6 @@ div.results span[class*=status_] span {
   border-radius: 12px 12px 12px 12px;
   float: left;
   width: 80px;
-}
-@media \0screen {
-  /* IE8 */
-  #styled_content_block span[class*=status_] span,
-  .evo_content_block span[class*=status_] span {
-    top: -15px;
-    left: -2px;
-  }
 }
 .search_title {
   font-size: 125%;

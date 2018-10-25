@@ -1275,21 +1275,6 @@ div.results .status_meta span {
   float: left;
   width: 80px;
 }
-@media \0screen {
-  /* IE8 */
-  .evo_content_block span.status_published span,
-  .evo_content_block span.status_community span,
-  .evo_content_block span.status_protected span,
-  .evo_content_block span.status_review span,
-  .evo_content_block span.status_private span,
-  .evo_content_block span.status_draft span,
-  .evo_content_block span.status_deprecated span,
-  .evo_content_block span.status_redirected span,
-  .evo_content_block span.status_trash span {
-    top: -15px;
-    left: -2px;
-  }
-}
 .search_title {
   font-size: 125%;
   color: #666;

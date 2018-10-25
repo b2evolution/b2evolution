@@ -1391,7 +1391,7 @@ tr.evo_highlight td {
     background-color: #FF6600;
   }
   to {
-    background-color: auto;
+    background-color: transparent;
   }
 }
 .evo_input_maxlength_counter {
