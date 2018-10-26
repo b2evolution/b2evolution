@@ -1394,8 +1394,11 @@ tr.evo_highlight td {
     background-color: transparent;
   }
 }
-.evo_input_maxlength_counter {
+.evo_input_counter {
   position: absolute;
   color: #999;
   font-size: 80%;
+}
+.evo_input_counter.label {
+  color: #FFF;
 }

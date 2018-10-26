@@ -2264,6 +2264,9 @@ tr.evo_highlight td {
   color: #999;
   font-size: 80%;
 }
+.evo_input_counter.label {
+  color: #FFF;
+}
 
 /**
  * These are the generic styles that are common to "all" skins.
@@ -4843,10 +4846,6 @@ div.message_toolbars {
 }
 .edit_plugin_actions {
   padding-top: 7px;
-}
-.badge-success {
-  background-color: #28a745 !important;
-  color: #FFF !important;
 }
 .badge-important {
   background-color: #F00 !important;

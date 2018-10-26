@@ -3,7 +3,7 @@
  *
  * To initialize the counter helper use html attributes for input/textarea fields:
  *  - 'data-maxlength="255"' for down counter,
- *  - 'data-recommended-length="60;65"' for up counter with color badge; in this example <=60 - green/success badge, >60 and <=65 - orange/warning badge, >65 - red/error badge.
+ *  - 'data-recommended-length="60;65"' for up counter with color label; in this example <=60 - green/success label, >60 and <=65 - orange/warning label, >65 - red/danger label.
  */
 
 jQuery( document ).ready( function()
@@ -75,16 +75,16 @@ jQuery( document ).ready( function()
 
 		var curr_counter_val = counter_obj.html();
 		if( curr_counter_val <= input_obj.data( 'recommended-min' ) )
-		{	// Use green badge for recommended length:
-			counter_obj.removeClass( 'badge-warning badge-important' ).addClass( 'badge badge-success' );
+		{	// Use green label for recommended length:
+			counter_obj.removeClass( 'label-warning label-danger' ).addClass( 'label label-success' );
 		}
 		else if( curr_counter_val > input_obj.data( 'recommended-min' ) && curr_counter_val <= input_obj.data( 'recommended-max' ) )
-		{	// Use orange badge for normal length:
-			counter_obj.removeClass( 'badge-success badge-important' ).addClass( 'badge badge-warning' );
+		{	// Use orange label for normal length:
+			counter_obj.removeClass( 'label-success label-danger' ).addClass( 'label label-warning' );
 		}
 		else
-		{	// Use red badge for very long length:
-			counter_obj.removeClass( 'badge-success badge-warning' ).addClass( 'badge badge-important' );
+		{	// Use red label for very long length:
+			counter_obj.removeClass( 'label-success label-warning' ).addClass( 'label label-danger' );
 		}
 	}
 
