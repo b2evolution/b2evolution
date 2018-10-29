@@ -4609,6 +4609,7 @@ function echo_image_insert_modal()
 				'action': 'get_edit_image_form',
 				'short_tag': shortTag,
 				'blog': blog,
+				'request_from': '<?php echo format_to_js( is_admin_page() ? 'back' : 'front' );?>',
 			},
 			success: function(result)
 			{

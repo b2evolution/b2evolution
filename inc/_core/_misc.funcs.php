@@ -8546,9 +8546,11 @@ function render_inline_tags( $Object, $tags, $params = array() )
 							case 'EmailCampaign':
 								// Get the IMG tag without link for email content:
 								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
-										'image_link_to' => false,
-										'image_style' => 'border: none; max-width: 100%; height: auto;',
-										'add_loadimg' => false,
+										'image_link_to'       => false,
+										'image_style'         => 'border: none; max-width: 100%; height: auto;',
+										'add_loadimg'         => false,
+										'before_image'        => '<div'.emailskin_style( '.image_block' ).'>',
+										'before_image_legend' => '<div'.emailskin_style( '.image_legend' ).'>',
 									) ) );
 								break;
 
@@ -8563,9 +8565,23 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						switch( $object_class )
 						{
 							case 'EmailCampaign':
+								if( ! empty( $current_file_params['class'] ) )
+								{
+									$classes = explode( ' ', $current_file_params['class'] );
+									$image_style = '';
+									$custom_classes = array();
+									foreach( $classes as $class )
+									{
+										$class_style = emailskin_style( '.'.trim( $class ), false );
+										$image_style .= $class_style;
+										if( empty( $class_style ) )
+										{	// Doesn't have appropriate email skin style:
+											$custom_classes[] = $class;
+										}
+									}
+								}
 								$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
-										( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', '', '', '', 1, NULL,
-										'border: none; max-width: 100%; height: auto;', false );
+										implode( ' ', $custom_classes ), '', '', '', '', 1, NULL, 'border: none; max-width: 100%; height: auto;'.$image_style, false );
 								break;
 
 							default:
@@ -8656,10 +8672,26 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 						case 'EmailCampaign':
 							// Get the IMG tag without link for email content:
+							if( ! empty( $current_image_params['image_class'] ) )
+							{
+								$classes = explode( ' ', $current_image_params['image_class'] );
+								$image_style = '';
+								$custom_classes = array();
+								foreach( $classes as $class )
+								{
+									$class_style = emailskin_style( '.'.trim( $class ), false );
+									$image_style .= $class_style;
+									if( empty( $class_style ) )
+									{	// Doesn't have appropriate email skin style:
+										$custom_classes[] = $class;
+									}
+								}
+								$current_image_params['image_class'] = implode( ' ', $custom_classes );
+							}
 							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
 									'image_link_to' => false,
-									'image_style' => 'border: none; max-width: 100%; height: auto;',
-									'add_loadimg' => false
+									'image_style'   => 'border: none; max-width: 100%; height: auto;'.$image_style,
+									'add_loadimg'   => false,
 								) ) );
 							break;
 

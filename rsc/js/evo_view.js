@@ -831,7 +831,6 @@
 					}
 
 					this.getEditors( function( editor ) {
-							console.info( 'Requesting for preview data...' + self.text );
 							tinymce.util.XHR.send( {
 									url: editor.getParam( 'anon_async_url' ) + '?action=render_inlines&type=' + editor.getParam( 'target_type' ) + '&id=' + editor.getParam( 'target_ID' ),
 									content_type : 'application/x-www-form-urlencoded',

@@ -1424,12 +1424,15 @@ switch( $action )
 		else
 		{
 			$BlogCache = & get_BlogCache();
-			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID );
-			$blog_skin_ID = $Blog->get_skin_ID();
-			if( ! empty( $blog_skin_ID ) )
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+			if( $Blog )
 			{
-				$SkinCache = & get_SkinCache();
-				$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+				$blog_skin_ID = $Blog->get_skin_ID();
+				if( ! empty( $blog_skin_ID ) )
+				{
+					$SkinCache = & get_SkinCache();
+					$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+				}
 			}
 		}
 
