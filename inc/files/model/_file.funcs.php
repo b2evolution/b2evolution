@@ -2468,7 +2468,15 @@ function display_dragdrop_upload_button( $params = array() )
 					onLeave: '<?php echo TS_('Files are currently being uploaded. If you leave this page now, the upload will be cancelled.'); ?>'
 				},
 				text: {
-					formatProgress: '<?php echo /* TRANS: strings in {] must NOT be translated */ TS_('Uploading {total_size}...');?>',
+					formatProgress: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('Uploading {total_size}...');?>',
+					sizeSymbols: [
+						'<?php echo /* TRANS: Abbr. for Kilobytes */ TS_('KB') ?>',
+						'<?php echo /* TRANS: Abbr. for Megabytes */ TS_('MB') ?>',
+						'<?php echo /* TRANS: Abbr. for Gigabytes */ TS_('GB') ?>',
+						'<?php echo /* TRANS: Abbr. for Terabytes */ TS_('TB') ?>',
+						'<?php echo /* TRANS: Abbr. for Petabytes */ TS_('PB') ?>',
+						'<?php echo /* TRANS: Abbr. for Exabytes  */ TS_('EB') ?>'
+					],
 				},
 				validation: {
 					sizeLimit: <?php echo min( array( return_bytes( ini_get('post_max_size') ), return_bytes( ini_get('upload_max_filesize') ), $Settings->get( 'upload_maxkb') * 1024 ) );?>,

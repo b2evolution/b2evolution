@@ -1398,14 +1398,6 @@ div.results span[class*=status_] span {
   float: left;
   width: 80px;
 }
-@media \0screen {
-  /* IE8 */
-  #styled_content_block span[class*=status_] span,
-  .evo_content_block span[class*=status_] span {
-    top: -15px;
-    left: -2px;
-  }
-}
 .search_title {
   font-size: 125%;
   color: #666;

@@ -350,7 +350,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			itcf_formula         VARCHAR(2000) COLLATE ascii_general_ci NULL,
 			itcf_header_class    VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			itcf_cell_class      VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL,
-			itcf_link            ENUM( 'nolink', 'linkto', 'permalink', 'zoom', 'linkpermzoom', 'permzoom', 'linkperm', 'fieldurl' ) COLLATE ascii_general_ci NOT NULL default 'nolink',
+			itcf_link            ENUM( 'nolink', 'linkto', 'permalink', 'zoom', 'linkpermzoom', 'permzoom', 'linkperm', 'fieldurl', 'fieldurlblank' ) COLLATE ascii_general_ci NOT NULL default 'nolink',
 			itcf_link_nofollow   TINYINT NULL DEFAULT 0,
 			itcf_link_class      VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			itcf_line_highlight  ENUM( 'never', 'differences', 'always' ) COLLATE ascii_general_ci NULL DEFAULT NULL,

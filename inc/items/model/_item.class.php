@@ -1104,12 +1104,17 @@ class Item extends ItemLight
 			$this->set_setting( 'editor_code', $editor_code );
 		}
 
+		// Never allow html content on post titles:  (fp> probably so as to not mess up backoffice and all sorts of tools)
+		param( 'post_title', 'htmlspecialchars', '' );
+		// Title checking:
+		if( ( ! $editing || $creating ) && $this->get_type_setting( 'use_title' ) == 'required' ) // creating is important, when the action is create_edit
+		{
+			param_check_not_empty( 'post_title', T_('Please provide a title.'), '' );
+		}
+
 		$content = param( 'content', $text_format, NULL );
 		if( $content !== NULL )
 		{
-			// Never allow html content on post titles:  (fp> probably so as to not mess up backoffice and all sorts of tools)
-			param( 'post_title', 'htmlspecialchars', NULL );
-
 			// Do some optional filtering on the content
 			// Typically stuff that will help the content to validate
 			// Useful for code display.
@@ -1122,26 +1127,19 @@ class Item extends ItemLight
 				);
 			$Plugins_admin->filter_contents( $GLOBALS['post_title'] /* by ref */, $GLOBALS['content'] /* by ref */, $renderers, $params /* by ref */ );
 
-			// Title checking:
-			$use_title = $this->get_type_setting( 'use_title' );
-
-			if( ( ! $editing || $creating ) && $use_title == 'required' ) // creating is important, when the action is create_edit
-			{
-				param_check_not_empty( 'post_title', T_('Please provide a title.'), '' );
-			}
-
 			// Format raw HTML input to cleaned up and validated HTML:
 			param_check_html( 'content', T_('Invalid content.') );
 			$content = prepare_item_content( get_param( 'content' ) );
 
 			$this->set( 'content', $content );
-
-			$this->set( 'title', get_param( 'post_title' ) );
 		}
 		if( empty( $content ) && $this->get_type_setting( 'use_text' ) == 'required' )
 		{ // Content must be entered
 			param_check_not_empty( 'content', T_('Please enter some text.'), '' );
 		}
+
+		// Set title only here because it may be filtered by plugins above:
+		$this->set( 'title', get_param( 'post_title' ) );
 
 		if( $is_not_content_block )
 		{	// Save excerpt for item with type usage except of content block:
@@ -1597,7 +1595,7 @@ class Item extends ItemLight
 		if( $display )
 		{ // display a comment form section even if comment form won't be displayed, "add new comment" links should point to this section
 			$comment_form_anchor = empty( $params['comment_form_anchor'] ) ? 'form_p' : $params['comment_form_anchor'];
-			echo '<a id="'.$comment_form_anchor.$this->ID.'"></a>';
+			echo '<a id="'.format_to_output( $comment_form_anchor.$this->ID, 'htmlattr' ).'"></a>';
 		}
 
 		if( ! $this->get_type_setting( 'use_comments' ) )
@@ -2747,6 +2745,7 @@ class Item extends ItemLight
 				'permalink'    => array( 'perm' ),
 				'zoom'         => array( 'zoom' ),
 				'fieldurl'     => array( 'url' ),
+				'fieldurlblank'=> array( 'urlblank' ),
 			);
 
 			if( isset( $link_fallbacks[ $custom_field['link'] ] ) )
@@ -2794,10 +2793,11 @@ class Item extends ItemLight
 							break;
 
 						case 'url':
+						case 'urlblank':
 							// Use value of url fields as URL to the link:
 							if( ! empty( $orig_custom_field_value ) )
 							{	// Format URL to link only with not empty URL otherwise display URL as simple text if special text is defined in format for empty URL:
-								$custom_field_value = '<a href="'.$orig_custom_field_value.'"'.$nofollow_attr.$link_class_attr.'>'.$custom_field_value.'</a>';
+								$custom_field_value = '<a href="'.$orig_custom_field_value.'"'.$nofollow_attr.$link_class_attr.( $link_fallback == 'urlblank' ? ' target="_blank"' : '' ).'>'.$custom_field_value.'</a>';
 							}
 							break 2;
 					}
@@ -2963,191 +2963,26 @@ class Item extends ItemLight
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'before'       => '<table class="item_custom_fields">',
-				'field_format' => '<tr><th class="$header_cell_class$">$title$$description_icon$:</th><td class="$data_cell_class$">$value$</td></tr>', // $title$ $description_icon$ $class$ $value$
-				'after'        => '</table>',
-				'field_description_icon_class' => 'grey',
-				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
-				// Separate template for separator fields:
-				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
-				'field_separator_format' => '<tr><th colspan="2" class="$header_cell_class$">$title$$description_icon$</th></tr>', // $title$ $description_icon$
+				'fields'        => '', // Empty string to display ALL fields, OR fields names separated by comma to show/hide only the requested fields in order what you want
+				'fields_source' => 'include', // 'all' - All item's fields, 'exclude' - All except fields listed in the param 'fields', 'include' - Only fields listed in the param 'fields'
+				// See default template params in the widget function item_fields_compare_Widget->display():
 			), $params );
 
-		// Get all custom fields by item ID:
-		$custom_fields = $this->get_custom_fields_defs();
+		// Convert fields separator to widget format:
+		$custom_fields = str_replace( ',', "\n", trim( $params['fields'], ', ' ) );
 
-		if( empty( $params['fields'] ) )
-		{	// Display all fields:
-			$display_fields = array_keys( $custom_fields );
-		}
-		else
-		{	// Display only the requested fields:
-			$display_fields = explode( ',', $params['fields'] );
-		}
+		// Call widget with params only when content is not generated yet above:
+		ob_start();
+		skin_widget( array_merge( $params, array(
+				'widget'        => 'item_custom_fields',
+				'fields_source' => empty( $custom_fields ) ? 'all' : $params['fields_source'],
+				'fields'        => $custom_fields,
+				'items'         => $this->ID,
+			) ) );
+		$widget_html = ob_get_contents();
+		ob_end_clean();
 
-		if( count( $display_fields ) == 0 )
-		{	// No custom fields:
-			return '';
-		}
-
-		$html = '';
-
-		foreach( $display_fields as $field_key )
-		{
-			$field_name = $field_key;
-			$field_options = '';
-			if( ! empty( $params['fields'] ) && strpos( $field_key, '+' ) !== false )
-			{	// Parse additional field options, e.g. separators may have names as 'separator+repeat', 'separator+fields', 'separator+repeat+fields':
-				$field_options_arr = explode( '+', $field_key, 2 );
-				if( isset( $field_options_arr[1] ) )
-				{	// The field has additional options:
-					$field_options = $field_options_arr[1];
-				}
-				// Set real name of separator field from key like 'separator+repeat+fields':
-				$field_name = $field_options_arr[0];
-			}
-
-			// Get HTML code of the custom field:
-			$html .= $this->get_custom_field_template( $field_name, $params );
-
-			if( ! isset( $custom_fields[ $field_name ] ) )
-			{	// Skip unknown field:
-				continue;
-			}
-
-			$field = $custom_fields[ $field_name ];
-
-			if( $field['type'] == 'separator' )
-			{	// Repeat fields and fields under separator field until next separtor:
-				if( ! empty( $field['format'] )  &&
-				    ( strpos( $field_options, 'repeat' ) !== false || // if field is requested with name like 'separator+repeat' or 'separator+repeat+fields'
-				      empty( $params['fields'] ) // also get all repeat fields when fields list is full
-				    )
-				  )
-				{	// Try to find the repeat fields:
-					$separator_format = explode( ':', $field['format'] );
-					if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
-					{	// Skip wrong separator format:
-						continue;
-					}
-					$repeat_fields = explode( ',', $separator_format[1] );
-				}
-				else
-				{	// The separator has no repeat fields:
-					$repeat_fields = array();
-				}
-
-				if( ! empty( $params['fields'] ) &&
-				    strpos( $field_options, 'fields' ) !== false ) // if field is requested with name like 'separator+fields' or 'separator+repeat+fields')
-				{	// Try to find fields under separator only when we request a specific fields list,
-					// in full list the fields under separator are displayed automatically, se we should not get them to avoid duplicated view:
-					$is_under_separator_field = false;
-					foreach( $custom_fields as $ic_field_name => $ic_field )
-					{
-						if( $ic_field_name == $field_name )
-						{	// We found the current separtor, set flag to use next fields:
-							$is_under_separator_field = true;
-							continue;
-						}
-						if( $is_under_separator_field )
-						{	// This is a field under current separator:
-							if( $ic_field['type'] == 'separator' )
-							{	// Stop here because it is another separator:
-								break;
-							}
-							$repeat_fields[] = $ic_field_name;
-						}
-					}
-				}
-
-				foreach( $repeat_fields as $repeat_field_name )
-				{
-					$repeat_field_name = trim( $repeat_field_name );
-					if( ! isset( $custom_fields[ $repeat_field_name ] ) ||
-					    ! $custom_fields[ $repeat_field_name ]['public'] )
-					{	// Skip unknown or not public field:
-						continue;
-					}
-					// Get HTML code of the repeated custom field:
-					$html .= $this->get_custom_field_template( $repeat_field_name, $params );
-				}
-			}
-		}
-
-		if( $html == '' )
-		{	// No fields to display:
-			return '';
-		}
-
-		// Print out if at least one field is filled for this item:
-		return $params['before'].$html.$params['after'];
-	}
-
-
-	/**
-	 * Get HTML code of the requested field
-	 *
-	 * @param string Custom field name
-	 * @param array Additional parameters
-	 */
-	function get_custom_field_template( $field_name, $params = array() )
-	{
-		$custom_fields = $this->get_custom_fields_defs();
-
-		$mask_vars = array( '$title$', '$description_icon$', '$header_cell_class$', '$data_cell_class$', '$value$' );
-
-		$field_name = trim( $field_name );
-		if( ! isset( $custom_fields[ $field_name ] ) )
-		{	// Wrong field:
-			$mask_values = array( $field_name, '', '', '', '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>' );
-			return str_replace( $mask_vars, $mask_values, $params['field_format'] );
-		}
-
-		$field = $custom_fields[ $field_name ];
-
-		// Use field format depending on type:
-		$field_type = ( $field['type'] == 'double' ? 'numeric' : ( $field['type'] == 'varchar' ? 'string' : $field['type'] ) );
-		$field_format = isset( $params['field_'.$field_type.'_format'] ) ? $params['field_'.$field_type.'_format'] : $params['field_format'];
-
-		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
-		$mask_values = array( render_custom_field( $field['label'], $params ) );
-
-		if( empty( $field['description'] ) )
-		{	// The custom field has no description:
-			$mask_values[] = '';
-		}
-		else
-		{	// Display a description in tooltip of the help icon:
-			$mask_values[] = ' '.get_icon( 'help', 'imgtag', array(
-					'data-toggle' => 'tooltip',
-					'title'       => nl2br( $field['description'] ),
-					'class'       => $params['field_description_icon_class'],
-				) ).' ';
-		}
-
-		// Alignment classes for header and data cells:
-		$mask_values[] = $field['header_class'];
-		$mask_values[] = $field['cell_class'];
-
-		if( ! $field['public'] )
-		{	// Not public field:
-			if( ! empty( $params['fields'] ) )
-			{	// Display an error message only when fields are called by names:
-				$mask_values[] = '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field['name'] ).'</span>';
-				return str_replace( $mask_vars, $mask_values, $field_format );
-				$fields_exist = true;
-			}
-			return '';
-		}
-
-		$custom_field_value = $this->get_custom_field_formatted( $field['name'], $params );
-		if( ! empty( $custom_field_value ) ||
-				$field['type'] == 'separator' ||
-				( ( $field['type'] == 'double' || $field['type'] == 'computed' ) && $custom_field_value == '0' ) )
-		{	// Display only the filled field AND also numeric field with '0' value:
-			$mask_values[] = $custom_field_value;
-			return str_replace( $mask_vars, $mask_values, $field_format );
-		}
+		return $widget_html;
 	}
 
 
@@ -3187,7 +3022,7 @@ class Item extends ItemLight
 		}
 
 		if( $params['render_custom_fields'] )
-		{	// Render Custom Fields [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field]:
+		{	// Render single value of Custom Fields [field:first_string_field]:
 			$content = $this->render_custom_fields( $content, $params );
 		}
 
@@ -5061,12 +4896,12 @@ class Item extends ItemLight
 				'link_class' => '',
 				'show_in_single_mode' => false,		// Do we want to show this link even if we are viewing the current post in single view mode
 				'url' => '#',
-				'stay_in_same_collection' => 'auto', // 'auto' - follow 'cross_post_nav_in_same_coll' if we are cross posted, true - always stay in same collection if we are cross posted, false - always go to permalink if we are cross posted
+				'stay_in_same_collection' => 'auto', // 'auto' - follow 'allow_crosspost_urls' if we are cross posted, true - always stay in same collection if we are cross posted, false - always go to permalink if we are cross posted
 			), $params );
 
 		if( isset( $Blog ) &&
 		    ( $params['stay_in_same_collection'] === true || // always stay in current collection
-		      ( $params['stay_in_same_collection'] == 'auto' && $Settings->get( 'cross_post_nav_in_same_coll' ) ) // follow 'cross_post_nav_in_same_coll' to stay in current collection
+		      ( $params['stay_in_same_collection'] == 'auto' && ( $item_Blog = & $this->get_Blog() ) && $item_Blog->get_setting( 'allow_crosspost_urls' ) ) // follow 'allow_crosspost_urls' to stay in current collection
 		    ) )
 		{	// Use current collection if this Item is cross posted and has at least one category from current collection:
 			$current_blog_ID = $Blog->ID;

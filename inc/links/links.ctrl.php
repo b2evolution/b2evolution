@@ -282,7 +282,6 @@ switch( $action )
 // require colorbox js
 require_js_helper( 'colorbox' );
 // require Fine Uploader js and css:
-init_fineuploader_js_lang_strings();
 require_js( 'multiupload/fine-uploader.js' );
 require_css( 'fine-uploader.css' );
 if( $action == 'edit_links' )

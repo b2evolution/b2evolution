@@ -16,6 +16,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $Collection, $Blog, $download_Item, $download_Link;
 
+// Temporarily switch to post locale (useful for multilingual blogs)
+$download_Item->locale_temp_switch();
+
 // Default params:
 $params = array_merge( array(
 		'download_item_links_before'    => '<p>',
@@ -56,16 +59,13 @@ $params = array_merge( array(
  */
 $download_File = & $download_Link->get_File();
 ?>
+<div id="<?php $download_Item->anchor_id() ?>" class="<?php $download_Item->div_classes( $params ) ?>" lang="<?php $download_Item->lang() ?>">
 <header>
-	<div class="evo_post_title"</div>
-		<h1>Download: <?php echo $download_File->get_name(); ?></h1>
+	<div class="evo_post_title">
+		<h1><?php echo T_('Download').': '.$download_File->get_name(); ?></h1>
 	</div>
 </header>
-<div id="<?php $download_Item->anchor_id() ?>" class="<?php $download_Item->div_classes( $params ) ?>" lang="<?php $download_Item->lang() ?>">
 <?php
-
-// Temporarily switch to post locale (useful for multilingual blogs)
-$download_Item->locale_temp_switch();
 
 // File name
 echo $params['download_file_name_before'];

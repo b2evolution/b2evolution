@@ -1883,8 +1883,9 @@ function get_item_type_field_linkto_options( $field_type )
 			break;
 		case 'url':
 			$options = array(
-				'fieldurl' => T_('This field URL'),
-				'nolink'   => T_('No Link'),
+				'fieldurl'      => T_('This field URL'),
+				'fieldurlblank' => T_('This field URL with target=_blank'),
+				'nolink'        => T_('No Link'),
 			);
 			break;
 		case 'double':
