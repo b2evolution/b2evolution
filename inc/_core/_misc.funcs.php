@@ -8354,10 +8354,12 @@ function render_inline_tags( $Object, $tags, $params = array() )
 	global $Plugins;
 	$inlines = array();
 
+	$object_class = get_class( $Object );
+
 	$params = array_merge( array(
 				'before'                   => '<div>',
-				'before_image'             => '<div class="image_block">',
-				'before_image_legend'      => '<div class="image_legend">',
+				'before_image'             => '<div'.( $object_class == 'EmailCampaign' ? emailskin_style( '.image_block' ) : ' class="image_block"' ).'>',
+				'before_image_legend'      => '<div'.( $object_class == 'EmailCampaign' ? emailskin_style( '.image_legend' ) : ' class="image_legend"' ).'>',
 				'after_image_legend'       => '</div>',
 				'after_image'              => '</div>',
 				'after'                    => '</div>',
@@ -8366,8 +8368,6 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				'limit'                    => 1000, // Max # of images displayed
 				'get_rendered_attachments' => true,
 			), $params );
-
-	$object_class = get_class( $Object );
 
 	if( !isset( $LinkList ) )
 	{	// Get list of attached Links only first time:
@@ -8413,7 +8413,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 	}
 
 	if( empty( $LinkList ) )
-	{ // This Item has no attached files for 'inline' position, Exit here
+	{	// This Item has no attached files for 'inline' position, Exit here
 		return false;
 	}
 
@@ -8431,19 +8431,19 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		$current_link_ID = (int) $inline[2];
 
 		if( empty( $current_link_ID ) )
-		{ // Invalid link ID, Go to next match
+		{	// Invalid link ID, Go to next match
 			$inlines[$current_inline] = $current_inline;
 			continue;
 		}
 
 		if( ! ( $Link = & $LinkList->get_by_field( 'link_ID', $current_link_ID ) ) )
-		{ // Link ID is not part of the linked files for position "inline"
+		{	// Link ID is not part of the linked files for position "inline"
 			$inlines[$current_inline] = $current_inline;
 			continue;
 		}
 
 		if( ! ( $File = & $Link->get_File() ) )
-		{ // No File object:
+		{	// No File object:
 			global $Debuglog;
 			$Debuglog->add( sprintf( 'Link ID#%d of '.$object_class.' #%d does not have a file object!', $Link->ID, $Object->ID ), array( 'error', 'files' ) );
 			$inlines[$current_inline] = $current_inline;
@@ -8451,7 +8451,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		}
 
 		if( ! $File->exists() )
-		{ // File doesn't exist:
+		{	// File doesn't exist:
 			global $Debuglog;
 			$Debuglog->add( sprintf( 'File linked to '.$object_class.' #%d does not exist (%s)!', $Object->ID, $File->get_full_path() ), array( 'error', 'files' ) );
 			$inlines[$current_inline] = $current_inline;
@@ -8478,14 +8478,14 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						$inline_params = explode( ':.', $inline[4] );
 
 						if( ! empty( $inline_params[0] ) )
-						{ // Caption is set, so overwrite the image link title
+						{	// Caption is set, so overwrite the image link title
 							if( $inline_params[0] == '-' )
-							{ // Caption display is disabled
+							{	// Caption display is disabled
 								$current_image_params['image_link_title'] = '';
 								$current_image_params['hide_image_link_title'] = true;
 							}
 							else
-							{ // New image caption was set
+							{	// New image caption was set
 								$current_image_params['image_link_title'] = strip_tags( $inline_params[0] );
 							}
 
@@ -8495,13 +8495,38 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 						$class_index = ( $inline_type == 'inline' ) ? 0 : 1; // [inline] tag doesn't have a caption, so 0 index is for class param
 						if( ! empty( $inline_params[ $class_index ] ) )
-						{ // A class name is set for the inline tags
+						{	// A class name is set for the inline tags
 							$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
 
 							if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
 							{
 								// Overwrite 'before_image' setting to add an extra class name:
-								$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
+								if( $object_class == 'EmailCampaign' )
+								{
+									$el_style = '';
+									$custom_classes = array();
+									if( isset( $image_extraclass ) )
+									{
+										$classes = explode( ' ', $image_extraclass );
+										foreach( $classes as $class )
+										{
+											$class_style = emailskin_style( '.'.trim( $class ), false );
+											$el_style .= $class_style;
+											if( empty( $class_style ) )
+											{	// Doesn't have appropriate email skin style:
+												$custom_classes[] = $class;
+											}
+										}
+									}
+									$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array(
+											'class' => implode( ' ', $custom_classes ),
+											'style' => $el_style
+										) );
+								}
+								else
+								{
+									$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
+								}
 
 								// Append extra class to file inline img tags:
 								$current_file_params['class'] = $image_extraclass;
@@ -8510,13 +8535,13 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					}
 
 					if( ! $current_image_params['get_rendered_attachments'] )
-					{ // Save $r to temp var in order to don't get the rendered data from plugins
+					{	// Save $r to temp var in order to don't get the rendered data from plugins
 						$temp_r = $r;
 					}
 
 					$temp_params = $current_image_params;
 					foreach( $current_image_params as $param_key => $param_value )
-					{ 	// Pass all params by reference, in order to give possibility to modify them by plugin
+					{	// Pass all params by reference, in order to give possibility to modify them by plugin
 						// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
 						$current_image_params[ $param_key ] = & $current_image_params[ $param_key ];
 					}
@@ -8545,13 +8570,29 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 							case 'EmailCampaign':
 								// Get the IMG tag without link for email content:
-								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
-										'image_link_to'       => false,
-										'image_style'         => 'border: none; max-width: 100%; height: auto;',
-										'add_loadimg'         => false,
-										'before_image'        => '<div'.emailskin_style( '.image_block' ).'>',
-										'before_image_legend' => '<div'.emailskin_style( '.image_legend' ).'>',
-									) ) );
+								$image_style = '';
+								if( isset( $current_image_params['image_class'] ) )
+								{
+									$classes = explode( ' ', $current_image_params['image_class'] );
+									$custom_classes = array();
+									foreach( $classes as $class )
+									{
+										$class_style = emailskin_style( '.'.trim( $class ), false );
+										$image_style .= $class_style;
+										if( empty( $class_style ) )
+										{	// Doesn't have appropriate email skin style:
+											$custom_classes[] = $class;
+										}
+									}
+									$current_image_params['image_class'] = implode( ' ', $custom_classes );
+									$current_image_params['image_style'] = $image_style;
+								}
+
+								$inlines[ $current_inline ] = $Link->get_tag( array_merge( array(
+										'image_link_to' => false,
+										'image_style'   => 'border: none; max-width: 100%; height: auto;',
+										'add_loadimg'   => false,
+								), $current_image_params ) );
 								break;
 
 							default:
@@ -8565,11 +8606,11 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						switch( $object_class )
 						{
 							case 'EmailCampaign':
+								$image_style = '';
+								$custom_classes = array();
 								if( ! empty( $current_file_params['class'] ) )
 								{
 									$classes = explode( ' ', $current_file_params['class'] );
-									$image_style = '';
-									$custom_classes = array();
 									foreach( $classes as $class )
 									{
 										$class_style = emailskin_style( '.'.trim( $class ), false );
@@ -8672,10 +8713,10 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 						case 'EmailCampaign':
 							// Get the IMG tag without link for email content:
+							$image_style = '';
 							if( ! empty( $current_image_params['image_class'] ) )
 							{
 								$classes = explode( ' ', $current_image_params['image_class'] );
-								$image_style = '';
 								$custom_classes = array();
 								foreach( $classes as $class )
 								{

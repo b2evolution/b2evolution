@@ -91,6 +91,18 @@ class inlines_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called when displaying editor toolbars for email.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayEmailToolbar( & $params )
+	{
+		return $this->DisplayCodeToolbar( $params );
+	}
+
+
+	/**
 	 * Display a code toolbar
 	 *
 	 * @param array Associative array of parameters
@@ -202,7 +214,11 @@ class inlines_plugin extends Plugin
 
 				jQuery.ajax( {
 					type: 'POST',
-					url: '<?php echo $this->get_htsrv_url( 'insert_inline', array( 'target_ID' => $target_ID, 'target_type' => $params['target_type'] ), '&' ); ?>',
+					url: '<?php echo $this->get_htsrv_url( 'insert_inline', array(
+							'target_ID' => $target_ID,
+							'target_type' => $params['target_type'],
+							'request_from' => is_admin_page() ? 'back' : 'front',
+						), '&' ); ?>',
 					success: function( result )
 					{
 						openModalWindow( result, '90%', '80%', true, 'Select image', '', '', '', '', '', function() {
@@ -281,7 +297,7 @@ class inlines_plugin extends Plugin
 				break;
 
 			case 'EmailCampaign':
-				$EmailCampaign = & get_EmailCampaignCache();
+				$EmailCampaignCache = & get_EmailCampaignCache();
 				$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $params['target_ID'] );
 
 				if( isset( $GLOBALS['files_Module'] )
@@ -292,6 +308,8 @@ class inlines_plugin extends Plugin
 					global $LinkOwner; // Initialize this object as global because this is used in many link functions
 					$LinkOwner = new LinkEmailCampaign( $edited_EmailCampaign );
 				}
+				break;
+
 			default:
 				return;
 		}

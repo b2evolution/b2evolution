@@ -1363,8 +1363,8 @@ switch( $action )
 
 		// Default params from skins/skins_fallback_v6/_item_content.inc.php
 		$params = array(
-			'before_image'             => '<figure class="evo_image_block">',
-			'before_image_legend'      => '<figcaption class="evo_image_legend">',
+			'before_image'             => '<figure'.( $target_type == 'EmailCampaign' ? emailskin_style( '.evo_image_block' ) : ' class="evo_image_block"' ).'>',
+			'before_image_legend'      => '<figcaption'.( $target_type == 'EmailCampaign' ? emailskin_style( '.evo_image_legend' ) : ' class="evo_image_legend"' ).'>',
 			'after_image_legend'       => '</figcaption>',
 			'after_image'              => '</figure>',
 			'after_images'             => '</div>',
