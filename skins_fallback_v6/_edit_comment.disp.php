@@ -98,20 +98,6 @@ $Form->begin_form( 'evo_comment' );
 	echo '</div>';
 	$comment_toolbar = ob_get_clean();
 
-	// Message field:
-	$form_inputstart = $Form->inputstart;
-	$Form->inputstart .= $comment_toolbar;
-	$Form->textarea_input( 'content', $comment_content, $display_params['textarea_lines'], $display_params['form_comment_text'], array(
-			'cols' => 38,
-			'rows' => 11,
-			'class' => 'evo_comment_field autocomplete_usernames',
-			'id' => $dummy_fields[ 'content' ]
-		) );
-	$Form->inputstart = $form_inputstart;
-
-	// set b2evoCanvas for plugins
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
-
 	// CALL PLUGINS NOW:
 	ob_start();
 	$Plugins->trigger_event( 'DisplayEditorButton', array(
@@ -120,7 +106,25 @@ $Form->begin_form( 'evo_comment' );
 		'content_id'    => $dummy_fields[ 'content' ],
 		'edit_layout'   => 'inskin'
 	) );
-	$quick_setting_switch = ob_get_flush();
+	$quick_setting_switch = ob_get_clean();
+
+	// Message field:
+	$form_inputstart = $Form->inputstart;
+	$form_inputend = $Form->inputend;
+	$Form->inputstart .= $comment_toolbar;
+	$Form->inputend = $quick_setting_switch.$Form->inputend;
+	$Form->textarea_input( 'content', $comment_content, $display_params['textarea_lines'], $display_params['form_comment_text'], array(
+			'cols' => 38,
+			'rows' => 11,
+			'class' => 'evo_comment_field autocomplete_usernames',
+			'id' => $dummy_fields[ 'content' ]
+		) );
+	$Form->inputstart = $form_inputstart;
+	$Form->inputend = $form_inputend;
+
+	// set b2evoCanvas for plugins
+	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
+
 
 	// Display renderers checkboxes ( Note: This contains inputs )
 	$comment_renderer_checkboxes = $edited_Comment->renderer_checkboxes( NULL, false );
@@ -167,11 +171,6 @@ $Form->end_form();
 		}
 		return false;
 	}
-
-	jQuery( document ).ready( function() {
-		// Align TinyMCE toggle buttons:
-		jQuery( '.evo_tinymce_toggle_buttons' ).addClass( 'col-sm-offset-3' );
-	} );
 </script>
 <?php
 

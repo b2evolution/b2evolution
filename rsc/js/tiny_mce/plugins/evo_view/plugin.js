@@ -84,7 +84,19 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 						{
 							//openModalWindow( result, '90%', '80%', true, 'Select image', '' );
 							openModalWindow( result, '90%', '80%', true, 'Select image', '', '', '', '', '', function() {
-									evo_link_refresh_list( editor.getParam( 'target_type' ), editor.getParam( 'target_ID') );
+									var target_type, target_ID;
+									if( editor.getParam( 'temp_ID' ) == undefined )
+									{
+										target_type = editor.getParam( 'target_type' );
+										target_ID = editor.getParam( 'target_ID' );
+									}
+									else
+									{
+										target_type = 'temporary';
+										target_ID = editor.getParam( 'temp_ID' );
+									}
+
+									evo_link_refresh_list( target_type, target_ID );
 									evo_link_fix_wrapper_height();
 								} );
 						}
@@ -1017,24 +1029,39 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 				icon: false,
 				tooltip: evo_js_lang_edit_image,
 				onclick: function() {
-						if( ! editor.getParam( 'target_ID' ) )
+						switch( editor.getParam( 'target_type' ) )
 						{
-							switch( editor.getParam( 'target_type' ) )
-							{
-								case 'Item':
+							case 'Item':
+								if( ! editor.getParam( 'target_ID' ) && ! editor.getParam( 'temp_ID' ) )
+								{
 									alert( evo_js_lang_alert_before_insert_item  );
-									break;
+									return false;
+								}
+								break;
 
-								case 'Comment':
+							case 'Comment':
+								if( ! editor.getParam( 'target_ID' ) )
+								{
 									alert( evo_js_lang_alert_before_insert_comment );
-									break;
+									return false;
+								}
+								break;
 
-								case 'EmailCampaign':
+							case 'EmailCampaign':
+								if( ! editor.getParam( 'target_ID' ) )
+								{
 									alert( evo_js_lang_alert_before_insert_emailcampaign );
-									break;
-							}
+									return false;
+								}
+								break;
 
-							return false;
+							case 'Message':
+								if( ! editor.getParam( 'target_ID' ) && ! editor.getParam( 'temp_ID' ) )
+								{
+									alert( evo_js_lang_alert_before_insert_message );
+									return false;
+								}
+								break;
 						}
 
 						editView();

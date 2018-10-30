@@ -1357,9 +1357,10 @@ switch( $action )
 		break;
 
 	case 'render_inlines':
-		$target_ID = param( 'id', 'integer' );
+		$target_ID = param( 'id', 'integer', 0 );
 		$target_type = param( 'type', 'string' );
 		$tags = param( 'tags', 'array:string', array() );
+		// 'temp_link_owner_ID' param will be passed for objects with temporary ID
 
 		// Default params from skins/skins_fallback_v6/_item_content.inc.php
 		$params = array(
@@ -1378,7 +1379,11 @@ switch( $action )
 		{
 			case 'Item':
 				$ItemCache = & get_ItemCache();
-				$edited_Item = $ItemCache->get_by_ID( $target_ID );
+				$edited_Item = $ItemCache->get_by_ID( $target_ID, false, false );
+				if( ! $edited_Item )
+				{	// We need to pass object_class as a param because render_inline_tags() will not be able to determine $edited_Item's class:
+					$params['object_class'] = 'Item';
+				}
 				$rendered_tags = render_inline_tags( $edited_Item, $tags, $params );
 				break;
 
@@ -1392,6 +1397,17 @@ switch( $action )
 				$EmailCampaignCache = & get_EmailCampaignCache();
 				$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $target_ID );
 				$rendered_tags = render_inline_tags( $edited_EmailCampaign, $tags, $params );
+				break;
+
+			case 'Message':
+				$MessageCache = & get_MessageCache();
+				$edited_Message = $MessageCache->get_by_ID( $target_ID, false, false );
+				if( ! $edited_Message )
+				{	// We need to pass object_class as a param because render_inline_tags() will not be able to determine $edited_Message's class:
+					$params['object_class'] = 'Message';
+				}
+
+				$rendered_tags = render_inline_tags( $edited_Message, $tags, $params );
 				break;
 		}
 

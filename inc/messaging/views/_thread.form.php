@@ -111,13 +111,35 @@ $Plugins->trigger_event( 'DisplayMessageToolbar', array() );
 echo '</div>';
 $message_toolbar = ob_get_clean();
 
+if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
+{	// If current user has a permission to view the files AND it is back-office:
+	load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+	// Initialize this object as global because this is used in many link functions:
+	global $LinkOwner;
+	$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+}
+
+// CALL PLUGINS NOW:
+ob_start();
+$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+	'target_type'   => 'Message',
+	'target_object' => $edited_Message,
+	'temp_ID'       => isset( $LinkOwner ) && $LinkOwner->is_temp() ? $LinkOwner->get_ID() : NULL,
+	'content_id'    => 'msg_text',
+	'edit_layout'   => NULL,
+) );
+$quick_setting_switch = ob_get_clean();
+
 $form_inputstart = $Form->inputstart;
+$form_inputend = $Form->inputend;
 $Form->inputstart .= $message_toolbar;
+$Form->inputend = $quick_setting_switch.$Form->inputend;
 $Form->textarea_input( 'msg_text', $edited_Message->original_text, 10, T_('Message'), array(
 		'cols' => $params['cols'],
 		'required' => true
 	) );
 $Form->inputstart = $form_inputstart;
+$Form->inputend = $form_inputend;
 
 // set b2evoCanvas for plugins
 echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "msg_text" );</script>';
@@ -133,10 +155,12 @@ if( !empty( $message_renderer_checkboxes ) )
 // ####################### ATTACHMENTS/LINKS #########################
 if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
 {	// If current user has a permission to view the files AND it is back-office:
+	/*
 	load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
 	// Initialize this object as global because this is used in many link functions:
 	global $LinkOwner;
 	$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+	*/
 	// Display attachments fieldset:
 	display_attachments_fieldset( $Form, $LinkOwner );
 }
@@ -263,7 +287,7 @@ function check_form_thread()
 }
 </script>
 <?php }
-
+echo_image_insert_modal();
 if( $action == 'preview' )
 { // ------------------ PREVIEW MESSAGE START ------------------ //
 	if( isset( $edited_Thread->recipients_list ) )

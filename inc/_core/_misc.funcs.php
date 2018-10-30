@@ -7725,6 +7725,7 @@ function echo_modalwindow_js_bootstrap()
 		var evo_js_lang_alert_before_insert_item = \''.TS_('Save post to start uploading files').'\';
 		var evo_js_lang_alert_before_insert_comment = \''.TS_('Save comment to start uploading files').'\';
 		var evo_js_lang_alert_before_insert_emailcampaign = \''.TS_('Save email campaign to start uploading files').'\';
+		var evo_js_lang_alert_before_insert_message = \''.TS_('Save message to start uploading files').'\';
 	</script>';
 }
 
@@ -8354,7 +8355,19 @@ function render_inline_tags( $Object, $tags, $params = array() )
 	global $Plugins;
 	$inlines = array();
 
-	$object_class = get_class( $Object );
+	if( $Object )
+	{
+		$object_class = get_class( $Object );
+	}
+	elseif( isset( $params['object_class'] ) )
+	{
+		$object_class = $params['object_class'];
+		unset( $params['object_class'] );
+	}
+	else
+	{
+		$object_class = NULL;
+	}
 
 	$params = array_merge( array(
 				'before'                   => '<div>',
@@ -8371,7 +8384,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 	if( !isset( $LinkList ) )
 	{	// Get list of attached Links only first time:
-		if( $Object->ID == 0 )
+		if( empty( $Object ) || $Object->ID == 0 )
 		{	// Get temporary object ID on preview new creating object:
 			$temp_link_owner_ID = param( 'temp_link_owner_ID', 'integer', NULL );
 		}
@@ -8388,7 +8401,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				break;
 
 			case 'Comment':
-				$LinkOwner = new LinkComment( $Object, $temp_link_owner_ID );
+				$LinkOwner = new LinkComment( $Object );
 				$prepare_plugin_event_name = 'PrepareForRenderItemAttachment';
 				$render_plugin_event_name = 'RenderItemAttachment';
 				break;

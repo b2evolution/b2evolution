@@ -46,6 +46,7 @@ class tinymce_plugin extends Plugin
 
 	var $target_type = NULL;
 	var $target_ID = NULL;
+	var $temp_ID = NULL;
 
 	function PluginInit( & $params )
 	{
@@ -457,6 +458,29 @@ class tinymce_plugin extends Plugin
 					);
 				break;
 
+			case 'Message':
+				// Initialize settings for email campaign:
+				global $Settings;
+
+				$edited_Message = & $params['target_object'];
+				$this->target_type = 'Message';
+				$this->target_ID = $edited_Message->ID;
+				$this->temp_ID = $params['temp_ID'];
+
+				if( ! $Settings->get( 'allow_html_message' ) )
+				{	// Only when HTML is allowed for messages:
+					return false;
+				}
+
+				$show_wysiwyg_warning = $this->UserSettings->get( 'show_wysiwyg_warning_message' );
+				$wysiwyg_checkbox_label = TS_("Don't show this again when composing private messages");
+
+				$state_params = array(
+						'type'    => $params['target_type'],
+						'message' => $edited_Message->ID,
+					);
+				break;
+
 			default:
 				// Don't allow this plugin for another things:
 				return false;
@@ -513,7 +537,6 @@ class tinymce_plugin extends Plugin
 			default:
 				// Get init params, depending on edit mode: simple|expert
 				$tmce_init = $this->get_tmce_init( $params['edit_layout'], $params['content_id'], $params['target_type'] );
-
 				?>
 
 				<div class="btn-group evo_tinymce_toggle_buttons">
@@ -795,7 +818,7 @@ class tinymce_plugin extends Plugin
 	 */
 	function DisplayEditorButton( & $params )
 	{
-		return $this->AdminDisplayEditorButton($params);
+		return $this->AdminDisplayEditorButton( $params );
 	}
 
 
@@ -963,6 +986,7 @@ class tinymce_plugin extends Plugin
 		// B2evo plugin options
 		$init_options[] = 'collection: "'.$this->collection.'"';
 		$init_options[] = 'target_ID: '.( empty( $this->target_ID ) ? 'undefined' : $this->target_ID );
+		$init_options[] = 'temp_ID: '.( empty( $this->temp_ID ) ? 'undefined' : $this->temp_ID );
 		$init_options[] = 'target_type: "'.( empty( $this->target_type ) ? 'undefined' : format_to_js( $this->target_type ) ).'"';
 
 		$init_options[] = 'rest_url: "'.get_htsrv_url().'rest.php"';
@@ -972,6 +996,10 @@ class tinymce_plugin extends Plugin
 				'target_ID'    => $this->target_ID,
 				'request_from' => is_admin_page() ? 'back' : 'front',
 			);
+		if( isset( $this->temp_ID ) )
+		{
+			$insert_inline_modal_params['temp_ID'] = $this->temp_ID;
+		}
 		$init_options[] = 'modal_url: "'.$this->get_htsrv_url( 'insert_inline', $insert_inline_modal_params, '&' ).'"';
 
 		$init_options[] = 'fontsize_formats: "8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt"';
@@ -1188,16 +1216,21 @@ class tinymce_plugin extends Plugin
 
 		load_funcs( 'links/model/_link.funcs.php' );
 
-		if( ! isset( $params['target_ID'] ) || ! isset( $params['target_type'] ) )
-		{
-			return;
-		}
+		$params = array_merge( array(
+				'temp_ID' => NULL,
+			), $params );
+
 
 		$is_admin_page = is_logged_in() && isset( $params['request_from'] ) && $params['request_from'] == 'back';
 
 		switch( $params['target_type'] )
 		{
 			case 'Item':
+				if( ( ! isset( $params['target_ID'] ) && ! isset( $params['temp_ID'] ) ) || ! isset( $params['target_type'] ) )
+				{
+					return;
+				}
+
 				$ItemCache = & get_ItemCache();
 				$edited_Item = & $ItemCache->get_by_ID( $params['target_ID'] );
 
@@ -1213,11 +1246,16 @@ class tinymce_plugin extends Plugin
 				{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
 					load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
 					global $LinkOwner; // Initialize this object as global because this is used in many link functions
-					$LinkOwner = new LinkItem( $edited_Item );
+					$LinkOwner = new LinkItem( $edited_Item, $params['temp_ID'] );
 				}
 				break;
 
 			case 'Comment':
+				if( ! isset( $params['target_ID'] ) || ! isset( $params['target_type'] ) )
+				{
+					return;
+				}
+
 				$CommentCache = & get_CommentCache();
 				$edited_Comment = & $CommentCache->get_by_ID( $params['target_ID'] );
 				$comment_Item = & $edited_Comment->get_Item();
@@ -1239,16 +1277,40 @@ class tinymce_plugin extends Plugin
 				break;
 
 			case 'EmailCampaign':
+				if( ! isset( $params['target_ID'] ) || ! isset( $params['target_type'] ) )
+				{
+					return;
+				}
+
 				$EmailCampaignCache = & get_EmailCampaignCache();
 				$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $params['target_ID'] );
 
 				if( isset( $GLOBALS['files_Module'] )
 					&& $current_User->check_perm( 'emails', 'edit', true )
 					&& $current_User->check_perm( 'files', 'view', false ) )
-				{	// Files module is enabled, but in case of creating new comments we should show file attachments block only if user has all required permissions to attach files
+				{	// Files module is enabled, but in case of creating new email campaign  we should show file attachments block only if user has all required permissions to attach files
 					load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
 					global $LinkOwner; // Initialize this object as global because this is used in many link functions
 					$LinkOwner = new LinkEmailCampaign( $edited_EmailCampaign );
+				}
+				break;
+
+			case 'Message':
+				if( ( ! isset( $params['target_ID'] ) && ! isset( $params['temp_target_ID'] ) ) || ! isset( $params['target_type'] ) )
+				{
+					return;
+				}
+
+				$MessageCache = & get_MessageCache();
+				$edited_Message = $MessageCache->get_by_ID( $params['target_ID'], false, false );
+
+				if( isset( $GLOBALS['files_Module'] )
+					&& $current_User->check_perm( 'perm_messaging', 'reply' )
+					&& $current_User->check_perm( 'files', 'view', false ) )
+				{	// Files module is enabled, but in case of creating new messages we should show file attachments block only if user has all required permissions to attach files
+					load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+					global $LinkOwner; // Initialize this object as global because this is used in many link functions
+					$LinkOwner = new LinkMessage( $edited_Message, $params['temp_ID'] );
 				}
 				break;
 
@@ -1309,6 +1371,10 @@ class tinymce_plugin extends Plugin
 			case 'EmailCampaign':
 				$this->UserSettings->set( 'show_wysiwyg_warning_emailcampaign', intval( $params['on'] ) );
 				break;
+
+			case 'Message':
+				$this->UserSettings->set( 'show_wysiwyg_warning_message', intval( $params['on'] ) );
+				break;
 		}
 
 		$this->UserSettings->dbupdate();
@@ -1360,6 +1426,11 @@ class tinymce_plugin extends Plugin
 				{
 					return $EmailCampaign->get( 'use_wysiwyg' );
 				}
+				break;
+
+			case 'Message':
+				// Check if MCE was used last time anything was edited:
+				return $this->UserSettings->get( 'use_tinymce' );
 				break;
 		}
 

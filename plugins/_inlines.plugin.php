@@ -120,11 +120,18 @@ class inlines_plugin extends Plugin
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
+		$temp_ID = isset( $params['temp_ID'] ) ? $params['temp_ID'] : NULL;
+
 		switch( $params['target_type'] )
 		{
 			case 'Item':
 				$Item = & $params['Item'];
 				$target_ID = $Item->ID;
+
+				if( empty( $target_ID ) && empty( $temp_ID ) )
+				{
+					return false;
+				}
 				break;
 
 			case 'Comment':
@@ -146,11 +153,22 @@ class inlines_plugin extends Plugin
 					return false;
 				}
 				break;
+
+			case 'Message':
+				$Message = & $params['Message'];
+				$target_ID = $Message->ID;
+
+				if( empty( $target_ID ) && empty( $temp_ID ) )
+				{
+					return false;
+				}
+				break;
 		}
 
 		?><script type="text/javascript">
 		//<![CDATA[
 		var target_ID = <?php echo format_to_js( $target_ID );?>;
+		var temp_ID = <?php echo format_to_js( $temp_ID );?>;
 		var target_type = '<?php echo format_to_js( $params['target_type'] );?>';
 		var inline_buttons = new Array();
 
@@ -209,16 +227,24 @@ class inlines_plugin extends Plugin
 			}
 			else
 			{
+				<?php
+				$insert_inline_params = array(
+						'target_ID' => $target_ID,
+						'target_type' => $params['target_type'],
+						'request_from' => is_admin_page() ? 'back' : 'front',
+					);
+
+				if( isset( $temp_ID ) )
+				{
+					$insert_inline_params['temp_ID'] = $temp_ID;
+				}
+				?>
 				openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '..."></span>',
 						'80%', '', true, evo_js_lang_select_image_insert, '', true );
 
 				jQuery.ajax( {
 					type: 'POST',
-					url: '<?php echo $this->get_htsrv_url( 'insert_inline', array(
-							'target_ID' => $target_ID,
-							'target_type' => $params['target_type'],
-							'request_from' => is_admin_page() ? 'back' : 'front',
-						), '&' ); ?>',
+					url: '<?php echo $this->get_htsrv_url( 'insert_inline', $insert_inline_parms, '&' ); ?>',
 					success: function( result )
 					{
 						openModalWindow( result, '90%', '80%', true, 'Select image', '', '', '', '', '', function() {
