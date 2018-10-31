@@ -1381,8 +1381,8 @@ switch( $action )
 				$ItemCache = & get_ItemCache();
 				$edited_Item = $ItemCache->get_by_ID( $target_ID, false, false );
 				if( ! $edited_Item )
-				{	// We need to pass object_class as a param because render_inline_tags() will not be able to determine $edited_Item's class:
-					$params['object_class'] = 'Item';
+				{
+					$edited_Item = new Item();
 				}
 				$rendered_tags = render_inline_tags( $edited_Item, $tags, $params );
 				break;
@@ -1403,8 +1403,8 @@ switch( $action )
 				$MessageCache = & get_MessageCache();
 				$edited_Message = $MessageCache->get_by_ID( $target_ID, false, false );
 				if( ! $edited_Message )
-				{	// We need to pass object_class as a param because render_inline_tags() will not be able to determine $edited_Message's class:
-					$params['object_class'] = 'Message';
+				{
+					$edited_Message = new Message();
 				}
 
 				$rendered_tags = render_inline_tags( $edited_Message, $tags, $params );

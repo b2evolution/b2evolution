@@ -353,6 +353,10 @@ class tinymce_plugin extends Plugin
 			return false;
 		}
 
+		$params = array_merge( array(
+				'temp_ID' => NULL,
+			), $params );
+
 		switch( $params['target_type'] )
 		{
 			case 'Item':
@@ -363,6 +367,7 @@ class tinymce_plugin extends Plugin
 				$edited_Item = & $params['target_object'];
 				$this->target_type = 'Item';
 				$this->target_ID = $edited_Item->ID;
+				$this->temp_ID = $params['temp_ID'];
 
 				if( ! empty( $edited_Item ) && ! $edited_Item->get_type_setting( 'allow_html' ) )
 				{	// Only when HTML is allowed in post:
@@ -996,6 +1001,10 @@ class tinymce_plugin extends Plugin
 				'target_ID'    => $this->target_ID,
 				'request_from' => is_admin_page() ? 'back' : 'front',
 			);
+		if( $Blog )
+		{
+			$insert_inline_modal_params['blog'] = $Blog->ID;
+		}
 		if( isset( $this->temp_ID ) )
 		{
 			$insert_inline_modal_params['temp_ID'] = $this->temp_ID;
@@ -1211,141 +1220,7 @@ class tinymce_plugin extends Plugin
 	 */
 	function htsrv_insert_inline( $params )
 	{
-		global $current_User, $inc_path, $Blog, $blog, $LinkOwner;
-		global $is_admin_page;
-
-		load_funcs( 'links/model/_link.funcs.php' );
-
-		$params = array_merge( array(
-				'temp_ID' => NULL,
-			), $params );
-
-
-		$is_admin_page = is_logged_in() && isset( $params['request_from'] ) && $params['request_from'] == 'back';
-
-		switch( $params['target_type'] )
-		{
-			case 'Item':
-				if( ( ! isset( $params['target_ID'] ) && ! isset( $params['temp_ID'] ) ) || ! isset( $params['target_type'] ) )
-				{
-					return;
-				}
-
-				$ItemCache = & get_ItemCache();
-				$edited_Item = & $ItemCache->get_by_ID( $params['target_ID'] );
-
-				if( empty( $blog ) )
-				{
-					$Blog = $edited_Item->get_Blog();
-					$blog = $Blog->ID;
-				}
-
-				if( isset( $GLOBALS['files_Module'] )
-					&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
-					&& $current_User->check_perm( 'files', 'view', false ) )
-				{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
-					load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
-					global $LinkOwner; // Initialize this object as global because this is used in many link functions
-					$LinkOwner = new LinkItem( $edited_Item, $params['temp_ID'] );
-				}
-				break;
-
-			case 'Comment':
-				if( ! isset( $params['target_ID'] ) || ! isset( $params['target_type'] ) )
-				{
-					return;
-				}
-
-				$CommentCache = & get_CommentCache();
-				$edited_Comment = & $CommentCache->get_by_ID( $params['target_ID'] );
-				$comment_Item = & $edited_Comment->get_Item();
-
-				if( empty( $blog ) )
-				{
-					$Blog = $comment_Item->get_Blog();
-					$blog = $Blog->ID;
-				}
-
-				if( isset( $GLOBALS['files_Module'] )
-					&& $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment )
-					&& $current_User->check_perm( 'files', 'view', false ) )
-				{	// Files module is enabled, but in case of creating new comments we should show file attachments block only if user has all required permissions to attach files
-					load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
-					global $LinkOwner; // Initialize this object as global because this is used in many link functions
-					$LinkOwner = new LinkComment( $edited_Comment );
-				}
-				break;
-
-			case 'EmailCampaign':
-				if( ! isset( $params['target_ID'] ) || ! isset( $params['target_type'] ) )
-				{
-					return;
-				}
-
-				$EmailCampaignCache = & get_EmailCampaignCache();
-				$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $params['target_ID'] );
-
-				if( isset( $GLOBALS['files_Module'] )
-					&& $current_User->check_perm( 'emails', 'edit', true )
-					&& $current_User->check_perm( 'files', 'view', false ) )
-				{	// Files module is enabled, but in case of creating new email campaign  we should show file attachments block only if user has all required permissions to attach files
-					load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
-					global $LinkOwner; // Initialize this object as global because this is used in many link functions
-					$LinkOwner = new LinkEmailCampaign( $edited_EmailCampaign );
-				}
-				break;
-
-			case 'Message':
-				if( ( ! isset( $params['target_ID'] ) && ! isset( $params['temp_target_ID'] ) ) || ! isset( $params['target_type'] ) )
-				{
-					return;
-				}
-
-				$MessageCache = & get_MessageCache();
-				$edited_Message = $MessageCache->get_by_ID( $params['target_ID'], false, false );
-
-				if( isset( $GLOBALS['files_Module'] )
-					&& $current_User->check_perm( 'perm_messaging', 'reply' )
-					&& $current_User->check_perm( 'files', 'view', false ) )
-				{	// Files module is enabled, but in case of creating new messages we should show file attachments block only if user has all required permissions to attach files
-					load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
-					global $LinkOwner; // Initialize this object as global because this is used in many link functions
-					$LinkOwner = new LinkMessage( $edited_Message, $params['temp_ID'] );
-				}
-				break;
-
-			default:
-				return;
-		}
-
-		// Set a different dragand drop button ID
-		global $dragdropbutton_ID, $fm_mode, $link_list_tbody_ID;
-		$fm_mode = 'file_select';
-		$dragdropbutton_ID = 'file-uploader-modal';
-		$link_list_tbody_ID = 'linklist_tbody_modal';
-
-		if( is_admin_page() )
-		{
-			global $UserSettings, $adminskins_path, $AdminUI;
-
-			$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
-			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
-			$AdminUI = new AdminUI();
-
-			$AdminUI->disp_view( 'links/views/_link_list.view.php' );
-		}
-		else
-		{
-			global $Skin, $inc_path;
-
-			init_fontawesome_icons();
-
-			$blog_skin_ID = $Blog->get_skin_ID();
-			$SkinCache = & get_SkinCache();
-			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
-
-			require $inc_path.'links/views/_link_list.view.php';
-		}
+		insert_image_links_block( $params );
 	}
 
 
