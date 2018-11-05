@@ -50,7 +50,7 @@ $Form = new Form( $form_action, 'user_checkchanges' );
 
 $form_title = '';
 $form_class = 'fform';
-$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
+$Form->title_fmt = '$title$';
 
 if( $display_mode != 'js' )
 {

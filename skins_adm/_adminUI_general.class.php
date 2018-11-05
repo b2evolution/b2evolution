@@ -358,7 +358,7 @@ class AdminUI_general extends Menu
 	function display_breadcrumbpath_get_html( $params = array() )
 	{
 		$params = array_merge( array(
-				'before'     => '<div class="col-md-12"><nav aria-label="breadcrumb"><ol class="breadcrumb" style="margin-left: 0">',
+				'before'     => '<div class="col-md-12"><nav aria-label="breadcrumb"><ol class="breadcrumb">',
 				'after'      => '</ol></nav></div>',
 				'beforeText' => '',
 				'beforeEach' => '<li class="breadcrumb-item">',

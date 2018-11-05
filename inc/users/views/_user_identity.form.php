@@ -102,7 +102,7 @@ if( $is_admin )
 	{
 		$form_text_title = '<span class="nowrap">'.T_( 'Edit profile' ).'</span>'.get_manual_link( 'user-profile-tab' ); // used for js confirmation message on leave the changed form
 		$form_title = get_usertab_header( $edited_User, 'profile', $form_text_title );
-		$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
+		$Form->title_fmt = '$title$';
 	}
 	$form_class = 'fform';
 }

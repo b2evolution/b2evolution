@@ -76,7 +76,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 
 	<?php
-	$Form->begin_fieldset( T_('Comment contents').get_manual_link( 'editing-comments' ) );
+	$Form->begin_fieldset( sprintf( T_('Comment #%s'), $edited_Comment->ID ).get_manual_link( 'editing-comments' ) );
 
 	echo '<div class="row">';
 		echo '<div class="col-sm-12">';

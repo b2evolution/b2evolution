@@ -2758,9 +2758,14 @@ function get_usertab_header( $edited_User, $user_tab, $user_tab_title )
 	$AdminUI->add_menu_entries( array( 'users', 'users' ), get_user_sub_entries( true, $edited_User->ID ) );
 	$AdminUI->set_path( 'users', 'users', $user_tab );
 	$user_menu3 = $AdminUI->get_html_menu( array( 'users', 'users' ), 'menu3' );
+	// Remove global icons mask from template to avoid the duplicate icons on the $Form template which is used the same mask:
+	$user_menu3 = str_replace( '$global_icons$', '', $user_menu3 );
 
-	$result = $avatar_tag.'<div class="user_header_content">'.$form_title.'</div></div></div></div><div class="row"><div class="col-xs-12"><div class="user_header"><div class="user_header_content">'.$user_menu3.'</div>';
-	return '<div class="user_header">'.$result.'</div>'.'<div class="clear"></div>';
+	return '<div class="row">'
+			.'<div class="col-lg-6 col-xs-12 user_header_content">'.$avatar_tag.$form_title.'</div>'
+			.'<div class="col-lg-6 col-xs-12 text-right">$global_icons$</div>'
+		.'</div>'
+		.'<div class="user_header_content">'.$user_menu3.'</div>';
 }
 
 
