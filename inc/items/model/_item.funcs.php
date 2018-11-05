@@ -246,7 +246,7 @@ function init_inskin_editing()
  *                 "1,2,3":blog IDs separated by comma
  *                 "-": current blog only and exclude the aggregated blogs
  * @param boolean FALSE if FeaturedList cursor should move, TRUE otherwise
- * @param boolean Load featured post together with requested post types like intro but order the featured post below intro posts
+ * @param boolean Load featured post together with requested post types like intro but order the featured post below intro posts, NULL - to don't load featured post even when no intro post
  * @param boolean Load intro items
  * @return Item
  */
@@ -262,7 +262,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 		return $Item;
 	}
 
-	if( $featured_list_type != $load_featured )
+	if( $featured_list_type !== $load_featured )
 	{	// Reset a featured list if previous request was to load another type:
 		$FeaturedList = NULL;
 	}
@@ -344,7 +344,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 
 		// SECOND: If no Intro, try to find an Featured post:
 
-		if( ! $load_featured && // Don't try to load featured posts twice,
+		if( $load_featured === false && // Don't try to load featured posts twice,
 		    $FeaturedList->result_num_rows == 0 && // If no intro post has been load above,
 		    $restrict_disp != 'front' && // Exclude front page,
 		    $Blog->get_setting( 'disp_featured_above_list' ) ) // If the collection setting "Featured post above list" is enabled.

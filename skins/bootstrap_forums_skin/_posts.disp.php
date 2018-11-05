@@ -50,7 +50,7 @@ skin_widget( array(
 
 
 // Go Grab the featured post:
-if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = & get_featured_Item() )
+if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = & get_featured_Item( 'posts', NULL, false, NULL ) )
 {	// We have a intro post to display:
 	$intro_item_style = '';
 	$LinkOwner = new LinkItem( $Item );
