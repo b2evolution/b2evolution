@@ -223,10 +223,10 @@ display_dragdrop_upload_button( array(
 							.'<td class="qq-upload-link-actions shrinkwrap">'
 								.'<div class="qq-upload-status-text-selector qq-upload-status-text">'
 									.'<span class="qq-upload-size-selector"></span>'
-									.( count( $LinkOwner->get_positions() ) > 1 ? '' : ' <a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a>' )
+									.' <a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
 								.'</div>'
 							.'</td>'
-							.( count( $LinkOwner->get_positions() ) > 1 ? '<td class="qq-upload-link-position lastcol shrinkwrap"><a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a></td>' : '' )
+							.'<td class="qq-upload-link-position lastcol shrinkwrap"></td>'
 						.'</tr>',
 		'display_support_msg'    => false,
 		'additional_dropzone'    => 'jQuery( "#'.$link_list_tbody_ID.'" )',
