@@ -356,9 +356,7 @@ if( $is_recipient )
 			$Form->inputend = $quick_setting_switch.$Form->inputend;
 			$Form->textarea_input( 'msg_text', !empty( $edited_Message ) ? $edited_Message->original_text : '', 10, T_('Message'), array(
 					'cols' => $params['cols'],
-					// The contents of the editor is not transferred to this textarea on submit and will fail validation before submission.
-					// The following is disabled as it can cause an error when the textarea is hidden by the TinyMCE editor and unfocusable by the browser:
-					//'required' => true
+					'required' => true
 				) );
 			$Form->inputstart = $form_inputstart;
 			$Form->inputend = $form_inputend;

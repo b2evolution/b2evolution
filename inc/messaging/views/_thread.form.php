@@ -78,8 +78,7 @@ if( $params['allow_select_recipients'] )
 		'<noscript>'.T_('Enter usernames. Separate with comma (,)').'</noscript>',
 		array(
 			'maxlength'=> 255,
-			// The following is disabled as it can cause an error when the input is hidden by jQuery.tokenInput and unfocusable by the browser:
-			//'required'=>true,
+			'required'=>true,
 			'class'=>'wide_input'
 		) );
 
@@ -151,9 +150,7 @@ $Form->inputstart .= $message_toolbar;
 $Form->inputend = $quick_setting_switch.$Form->inputend;
 $Form->textarea_input( 'msg_text', $edited_Message->original_text, 10, T_('Message'), array(
 		'cols' => $params['cols'],
-		// The contents of the editor is not transferred to this textarea on submit and will fail validation before submission.
-		// The following is disabled as it can cause an error when the textarea is hidden by the TinyMCE editor and unfocusable by the browser:
-		//'required' => true
+		'required' => true
 	) );
 $Form->inputstart = $form_inputstart;
 $Form->inputend = $form_inputend;

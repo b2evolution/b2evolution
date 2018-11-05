@@ -561,12 +561,12 @@ class tinymce_plugin extends Plugin
 					function confirm_switch()
 					{
 						if( jQuery( 'input[name=hideWarning]' ).is(':checked') )
-						{ // Do not show warning again
+						{	// Do not show warning again
 							toggle_switch_warning( false );
 						}
 
 						// switch to WYSIWYG
-						tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
+						tinymce_plugin_toggleEditor( '<?php echo $params['content_id']; ?>' );
 
 						// close the modal window
 						closeModalWindow();
@@ -605,15 +605,17 @@ class tinymce_plugin extends Plugin
 					* Toggle TinyMCE editor on/off.
 					* This updates the corresponding PluginUserSetting, too.
 					*/
-					function tinymce_plugin_toggleEditor(id)
+					function tinymce_plugin_toggleEditor( id )
 					{
+						var textarea = jQuery( '#<?php echo $params['content_id'];?>' );
+
 						jQuery( '[id^=tinymce_plugin_toggle_button_]' ).removeClass( 'active' ).attr( 'disabled', 'disabled' );
 
 						if( ! tinymce_plugin_init_done )
 						{
 							tinymce_plugin_init_done = true;
 							// call this method on init again, with "null" id, so that mceAddControl gets called.
-							tinymce_plugin_init_tinymce( function() {tinymce_plugin_toggleEditor(null)} );
+							tinymce_plugin_init_tinymce( function() { tinymce_plugin_toggleEditor( null ) } );
 							return;
 						}
 
@@ -635,6 +637,12 @@ class tinymce_plugin extends Plugin
 								}
 								jQuery( this ).attr( 'disabled', 'disabled' ).removeAttr( 'checked' );
 							} );
+
+							if( id && textarea.prop( 'required' ) )
+							{
+								textarea.attr( 'data-required', true );
+								textarea.removeAttr( 'required' );
+							}
 						}
 						else
 						{ // Hide the editor, Display only source HTML
@@ -654,6 +662,12 @@ class tinymce_plugin extends Plugin
 								}
 								jQuery( this ).removeAttr( 'disabled' );
 							} );
+
+							if( id && textarea.attr( 'data-required' ) )
+							{
+								textarea.removeAttr( 'data-required' );
+								textarea.attr( 'required', true );
+							}
 						}
 					}
 
@@ -691,7 +705,7 @@ class tinymce_plugin extends Plugin
 					?>
 
 					<script type="text/javascript">
-					function tinymce_plugin_init_tinymce(oninit)
+					function tinymce_plugin_init_tinymce( oninit )
 					{
 						// Init tinymce:
 						if( typeof tinymce == "undefined" )
@@ -769,6 +783,13 @@ class tinymce_plugin extends Plugin
 											tinymce.execInstanceCommand( "<?php echo $params['content_id']; ?>", "mceInsertRawHTML", false, value );
 											return true;
 									}, true );
+								}
+
+								var textarea = jQuery( '#<?php echo $params['content_id'];?>' );
+								if( textarea.prop( 'required' ) )
+								{
+									textarea.attr( 'data-required', true );
+									textarea.removeAttr( 'required' );
 								}
 							}
 
