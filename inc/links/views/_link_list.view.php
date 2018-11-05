@@ -189,6 +189,8 @@ switch( $link_owner_type )
 		break;
 }
 
+$link_owner_positions = $LinkOwner->get_positions();
+
 // Display a button to quick upload the files by drag&drop method
 display_dragdrop_upload_button( array(
 		'button_ID' => isset( $dragdropbutton_ID ) ? $dragdropbutton_ID : 'file-uploader',
@@ -223,10 +225,10 @@ display_dragdrop_upload_button( array(
 							.'<td class="qq-upload-link-actions shrinkwrap">'
 								.'<div class="qq-upload-status-text-selector qq-upload-status-text">'
 									.'<span class="qq-upload-size-selector"></span>'
-									.( count( $LinkOwner->get_positions() ) > 1 ? '' : ' <a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a>' )
+									.( count( $link_owner_positions ) > 1 ? '' : ' <a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a>' )
 								.'</div>'
 							.'</td>'
-							.( count( $LinkOwner->get_positions() ) > 1 ? '<td class="qq-upload-link-position lastcol shrinkwrap"><a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a></td>' : '' )
+							.( count( $link_owner_positions ) > 1 || isset( $link_owner_positions['inline'] )? '<td class="qq-upload-link-position lastcol shrinkwrap"><a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a></td>' : '' )
 						.'</tr>',
 		'display_support_msg'    => false,
 		'additional_dropzone'    => 'jQuery( "#'.$link_list_tbody_ID.'" )',
