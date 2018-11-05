@@ -25,6 +25,8 @@ global $DB, $action, $Plugins, $Settings;
 
 global $Collection, $Blog;
 
+global $thrd_recipients_array, $recipients_selected;
+
 $creating = is_create_action( $action );
 
 if( !isset( $display_params ) )
@@ -92,10 +94,13 @@ if( $params['allow_select_recipients'] )
 else
 {	// No available to select recipients, Used in /contact.php
 	$Form->info( T_('Recipients'), $edited_Thread->recipients );
-	foreach( $recipients_selected as $recipient )
+	if( $recipients_selected )
 	{
-		$Form->hidden( 'thrd_recipients_array[id][]', $recipient['id'] );
-		$Form->hidden( 'thrd_recipients_array[login][]', $recipient['login'] );
+		foreach( $recipients_selected as $recipient )
+		{
+			$Form->hidden( 'thrd_recipients_array[id][]', $recipient['id'] );
+			$Form->hidden( 'thrd_recipients_array[login][]', $recipient['login'] );
+		}
 	}
 }
 
@@ -179,7 +184,6 @@ if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
 	display_attachments_fieldset( $Form, $LinkOwner );
 }
 
-global $thrd_recipients_array, $recipients_selected;
 if( !empty( $thrd_recipients_array ) )
 {	// Initialize the preselected users (from post request or when user send a message to own contacts)
 	foreach( $thrd_recipients_array['id'] as $rnum => $recipient_ID )
@@ -256,15 +260,19 @@ jQuery( '#thrd_recipients' ).tokenInput(
 		{
 			check_multiple_recipients();
 		},
-		<?php
-		if( param_has_error( 'thrd_recipients' ) )
-		{ // Mark this field as error
-		?>
 		onReady: function()
 		{
-			jQuery( '.token-input-list-facebook' ).addClass( 'token-input-list-error' );
+			<?php
+			if( param_has_error( 'thrd_recipients' ) )
+			{ // Mark this field as error
+			?>
+				jQuery( '.token-input-list-facebook' ).addClass( 'token-input-list-error' );
+			<?php
+			}
+			?>
+			// Remove required attribute to prevent unfocusable field error during validation checking when the field is hidden:
+			jQuery( '#thrd_recipients' ).removeAttr( 'required' );
 		}
-		<?php } ?>
 	}
 );
 
