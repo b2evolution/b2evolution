@@ -168,9 +168,9 @@ function evo_link_delete( event_object, type, link_ID, action )
 	},
 	function( data )
 	{
-		if( type == 'item' )
+		if( type == 'item' || type == 'comment' || type == 'emailcampaign' || type == 'message' )
 		{	// Replace the inline image placeholders when file is unlinked from Item:
-			var b2evoCanvas = window.document.getElementById( 'itemform_post_content' );
+			var b2evoCanvas = window.b2evoCanvas;
 			if( b2evoCanvas != null )
 			{ // Canvas exists
 				var regexp = new RegExp( '\\\[(image|file|inline|video|audio|thumbnail):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
