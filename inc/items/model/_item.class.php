@@ -3178,7 +3178,6 @@ class Item extends ItemLight
 							'usertags' => isset( $user_tags ) ? $user_tags : NULL,
 							'subscribe_post' => 0,
 							'subscribe_comment' => 0,
-							'subscribe_post_mod' => 0,
 							'button_class' => 'btn-primary',
 							'inline' => 1
 						);

@@ -171,12 +171,6 @@ class user_register_quick_Widget extends ComponentWidget
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
-				'subscribe_post_mod' => array(
-					'label' => '',
-					'note' => T_('check to auto subscribe new user to current collection when a post is modified and user has permission to moderate it'),
-					'type' => 'checkbox',
-					'defaultvalue' => 1,
-				),
 				'button' => array(
 					'label' => T_('Button title'),
 					'note' => T_('Text that appears on the form submit button.'),
@@ -290,7 +284,6 @@ class user_register_quick_Widget extends ComponentWidget
 			$Form->hidden( 'ask_lastname', $this->disp_params['ask_lastname'] );
 			$Form->hidden( 'usertags', $this->disp_params['usertags'] );
 			$Form->hidden( 'subscribe_post', $this->disp_params['subscribe_post'] );
-			$Form->hidden( 'subscribe_post_mod', $this->disp_params['subscribe_post_mod'] );
 			$Form->hidden( 'subscribe_comment', $this->disp_params['subscribe_comment'] );
 
 			$newsletters = array();
