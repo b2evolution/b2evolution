@@ -265,14 +265,14 @@ class item_info_line_Widget extends ComponentWidget
 		}
 		$before_post_time = $this->disp_params['before_author'] == 'none' ? '' : T_('on').' ';
 
-		$this->disp_params = array_merge( array(
+		$params = array_merge( array(
 				'widget_item_info_line_display' => true,
 				'widget_item_info_line_before'  => '<span class="small text-muted">',
 				'widget_item_info_line_after'   => '</span>',
 				'widget_item_info_line_params'  => array(),
-			), $this->disp_params );
+			), $params );
 
-		$widget_params = array(
+		$widget_params = array_merge( array(
 				'before_flag'         => '',
 				'after_flag'          => '',
 				'before_permalink'    => '',
@@ -292,12 +292,9 @@ class item_info_line_Widget extends ComponentWidget
 				'after_edit_link'     => '',
 				'edit_link_text'      => '#',
 				'format'              => '',
-			);
+			), $params['widget_item_info_line_params'] );
 
-		$this->disp_params['widget_item_info_line_params'] = array_merge( $widget_params, $this->disp_params['widget_item_info_line_params'] );
-		$widget_params = $this->disp_params['widget_item_info_line_params'];
-
-		if( $this->disp_params['widget_item_info_line_display'] )
+		if( $params['widget_item_info_line_display'] )
 		{
 			echo $this->disp_params['block_start'];
 
@@ -305,7 +302,7 @@ class item_info_line_Widget extends ComponentWidget
 
 			echo $this->disp_params['block_body_start'];
 
-			echo $this->disp_params['widget_item_info_line_before'];
+			echo $params['widget_item_info_line_before'];
 
 			ob_start();
 
@@ -435,7 +432,7 @@ class item_info_line_Widget extends ComponentWidget
 
 			echo $info_line;
 
-			echo $this->disp_params['widget_item_info_line_after'];
+			echo $params['widget_item_info_line_after'];
 			echo $this->disp_params['block_body_end'];
 			echo $this->disp_params['block_end'];
 

@@ -119,8 +119,10 @@ $params = array_merge( array(
 					'link_type' => $params['item_link_type'],
 				),
 			// Template params for "Item Visibility Badge" widget:
-			'widget_item_visibility_badge_display'  => ( ! $Item->is_intro() && $Item->status != 'published' ),
-			'widget_item_visibility_badge_template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+			'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
+			'widget_item_visibility_badge_params'  => array(
+					'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+				),
 			// Template params for "Item Link" widget:
 			'widget_item_link_before'    => '<p class="evo_post_link">',
 			'widget_item_link_after'     => '</p>',

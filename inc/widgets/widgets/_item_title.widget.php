@@ -131,12 +131,12 @@ class item_title_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		$this->disp_params = array_merge( array(
-			  'widget_item_title_display' => true,
+		$params = array_merge( array(
+				'widget_item_title_display' => true,
 				'widget_item_title_params'  => array(),
-			), $this->disp_params );
+			), $params );
 
-		$widget_params = array(
+		$widget_params = array_merge( array(
 				// Parameters for item title:
 				'before'    => '',
 				'after'     => '',
@@ -147,12 +147,9 @@ class item_title_Widget extends ComponentWidget
 				'after_edit_link'   => '</div>',
 				'edit_link_text'    => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
 				'edit_link_class'   => button_class( 'text' ),
-			);
+			), $params['widget_item_title_params'] );
 
-		$this->disp_params['widget_item_title_params'] = array_merge( $widget_params, $this->disp_params['widget_item_title_params'] );
-		$widget_params = $this->disp_params['widget_item_title_params'];
-
-		if( $this->disp_params['widget_item_title_display'] )
+		if( $params['widget_item_title_display'] )
 		{
 			echo $this->disp_params['block_start'];
 			$this->disp_title();

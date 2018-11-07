@@ -125,21 +125,23 @@ class item_next_previous_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		$this->disp_params = array_merge( array(
+		$params = array_merge( array(
 				'widget_item_next_previous_display' => true,
-				'widget_item_next_previous_params' => array(
-						'block_start' => '',
-						'block_end' => '',
-					),
-			), $this->disp_params );
+				'widget_item_next_previous_params' => array(),
+			), $params );
 
-		if( $this->disp_params['widget_item_next_previous_display'] && $disp == 'single' )
+		$widget_params = array_merge( array(
+				'block_start' => '',
+				'block_end' => '',
+			), $params['widget_item_next_previous_params'] );
+
+		if( $params['widget_item_next_previous_display'] && $disp == 'single' )
 		{
 			echo $this->disp_params['block_start'];
 			$this->disp_title();
 			echo $this->disp_params['block_body_start'];
 
-			item_prevnext_links( $this->disp_params['widget_item_next_previous_params'] );
+			item_prevnext_links( $widget_params );
 
 			echo $this->disp_params['block_body_end'];
 			echo $this->disp_params['block_end'];
