@@ -314,6 +314,22 @@ ol.breadcrumb {
 .cat_title .btn-group .btn {
   float: none;
 }
+@media (max-width: 767px) {
+  .evo_post_title,
+  .cat_title {
+    display: block;
+  }
+  .evo_post_title h1,
+  .cat_title h1 {
+    display: block;
+  }
+  .evo_post_title .btn-group,
+  .cat_title .btn-group {
+    display: block;
+    text-align: right;
+    padding: 0 0 10px 0;
+  }
+}
 .evo_content_block .evo_comment .evo_comment_footer .action_btn_group {
   float: right;
 }
