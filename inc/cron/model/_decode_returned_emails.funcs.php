@@ -213,7 +213,9 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		// Instanciate mime_parser.php library:
 		$mimeParser = new mime_parser_class();
 		$mimeParser->mbox = 0;						// Set to 0 for parsing a *single* RFC 2822 message
-		$mimeParser->decode_headers = 1;			// Set to 1 if it is	necessary to decode message headers that may have non-ASCII	characters and use other character set encodings
+		// NOTE: Use function mb_decode_mimeheader() instead of decoder from mime_parser_class,
+		// because the class cannot properly decode KOI8-R headers:
+		$mimeParser->decode_headers = ! function_exists( 'mb_decode_mimeheader' );			// Set to 1 if it is	necessary to decode message headers that may have non-ASCII	characters and use other character set encodings
 		$mimeParser->ignore_syntax_errors = 1;	// ignore syntax errors in	malformed messages.
 		$mimeParser->extract_addresses = 0;
 
@@ -476,6 +478,10 @@ function dre_process_header( $header, & $subject, & $post_date, $cron = false )
 	global $Settings;
 
 	$subject = $header['Subject'];
+	if( function_exists( 'mb_decode_mimeheader' ) )
+	{	// Decode email subject:
+		$subject = mb_decode_mimeheader( $subject );
+	}
 	$ddate = $header['Date'];
 
 	dre_msg( ('Subject').': '.$subject, $cron );
