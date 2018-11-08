@@ -17,6 +17,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $admin_url, $tab;
 global $edited_EmailCampaign, $Plugins, $UserSettings;
 
+echo_image_insert_modal();
+
 $Form = new Form( NULL, 'campaign_form' );
 $Form->begin_form( 'fform' );
 
@@ -33,7 +35,7 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 	ob_start();
 	echo '<div class="email_toolbars">';
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'DisplayEmailToolbar' );
+	$Plugins->trigger_event( 'DisplayEmailToolbar', array( 'target_type' => 'EmailCampaign', 'EmailCampaign' => & $edited_EmailCampaign ) );
 	echo '</div>';
 	$email_toolbar = ob_get_clean();
 

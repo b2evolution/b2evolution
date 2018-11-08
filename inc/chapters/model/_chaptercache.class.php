@@ -796,8 +796,8 @@ class ChapterCache extends DataObjectCache
 				$r .= $callbacks['line']( $cat, $level, $params ); // <li> Category  - or - <tr><td>Category</td></tr> ...
 			}
 
-			if( ( empty( $max_level ) || $max_level > $level + 1 ) && $params['is_opened'] )
-			{ // Iterate through sub categories recursively
+			if( $params['is_opened'] || ( $max_level > $level + 1 ) )
+			{	// Iterate through sub categories recursively:
 				$params['level'] = $level;
 				$r .= $this->iterate_through_category_children( $cat, $callbacks, true, $params );
 			}

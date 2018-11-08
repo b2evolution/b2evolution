@@ -292,6 +292,53 @@ $emailskins_styles = array(
 'li.evo_poll_option' => '
 	margin-top: 1ex;
 	margin-bottom: 1ex;
-'
+',
+/* Images */
+'.image_block' => '
+	text-align: center;
+',
+'.image_block img' => '
+	margin: 1ex;
+',
+'.image_legend' => '
+	font-size: 84%;
+	color: #aaa;
+	margin: 1ex;
+',
+'.evo_image_block' => '
+	text-align: center;
+',
+'.evo_image_legend' => '
+	font-size: 84%;
+	color: #aaa;
+	padding: 9px 6px 6px 6px;
+	text-align: center;
+',
+'.img-responsive' => '
+	display: inline-block;
+',
+'.evo_thumbnail' => '
+	max-width: 100%;
+',
+'.evo_thumbnail__left' => '
+  float: left;
+	margin: 0 4px 4px 0;
+',
+'.evo_thumbnail__right' => '
+	float: right;
+	margin: 0 0 4px 4px;
+',
+'.border' => '
+	border: 1px solid #666;
+',
+'.noborder' => '
+	border: none;
+',
+'.rounded' => '
+	border-radius: 4px;
+',
+'.squared' => '
+	border-radius: 0;
+',
 );
 ?>

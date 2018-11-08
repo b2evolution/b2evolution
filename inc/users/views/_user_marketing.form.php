@@ -41,7 +41,7 @@ $user_status_icons = get_user_status_icons();
 
 $Form = new Form( NULL, 'user_checkchanges' );
 
-$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
+$Form->title_fmt = '$title$';
 
 echo_user_actions( $Form, $edited_User, $action );
 

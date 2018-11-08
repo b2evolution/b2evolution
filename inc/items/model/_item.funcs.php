@@ -252,7 +252,7 @@ function init_inskin_editing()
  *                 "1,2,3":blog IDs separated by comma
  *                 "-": current blog only and exclude the aggregated blogs
  * @param boolean FALSE if FeaturedList cursor should move, TRUE otherwise
- * @param boolean Load featured post together with requested post types like intro but order the featured post below intro posts
+ * @param boolean Load featured post together with requested post types like intro but order the featured post below intro posts, NULL - to don't load featured post even when no intro post
  * @param boolean Load intro items
  * @return Item
  */
@@ -268,7 +268,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 		return $Item;
 	}
 
-	if( $featured_list_type != $load_featured )
+	if( $featured_list_type !== $load_featured )
 	{	// Reset a featured list if previous request was to load another type:
 		$FeaturedList = NULL;
 	}
@@ -350,7 +350,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 
 		// SECOND: If no Intro, try to find an Featured post:
 
-		if( ! $load_featured && // Don't try to load featured posts twice,
+		if( $load_featured === false && // Don't try to load featured posts twice,
 		    $FeaturedList->result_num_rows == 0 && // If no intro post has been load above,
 		    $restrict_disp != 'front' && // Exclude front page,
 		    $Blog->get_setting( 'disp_featured_above_list' ) ) // If the collection setting "Featured post above list" is enabled.
@@ -4565,6 +4565,78 @@ function item_priority_color( $priority )
 	$colors = item_priority_colors();
 
 	return isset( $colors[ $priority ] ) ? '#'.$colors[ $priority ] : 'none';
+}
+
+
+/**
+ * Prints out Javascript to open image insert modal
+ */
+function echo_image_insert_modal()
+{
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+?>
+<script type="text/javascript">
+	function evo_item_image_insert( blog, tagType, linkID )
+	{
+		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
+		var evo_js_lang_insert_image = '<?php echo T_('Insert image into post');?>';
+		var evo_js_lang_modal_action = '<?php echo TS_('Insert');?>';
+		evo_js_lang_close = '<?php echo TS_('Cancel');?>';
+
+		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '"></span>',
+			'800px', '480px', true, evo_js_lang_insert_image, evo_js_lang_modal_action, true );
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url(); ?>anon_async.php',
+			data:
+			{
+				'action': 'get_insert_image_form',
+				'tag_type': tagType,
+				'link_ID': linkID,
+				'blog': blog,
+				'request_from': '<?php echo format_to_js( is_admin_page() ? 'back' : 'front' );?>',
+			},
+			success: function(result)
+			{
+				result = ajax_debug_clear( result );
+				openModalWindow( result, '90%', '80%', true, evo_js_lang_insert_image, evo_js_lang_modal_action );
+			}
+		} );
+		return false;
+	}
+
+	function evo_item_image_edit( blog, shortTag )
+	{
+		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
+		var evo_js_lang_edit_image = '<?php echo T_('Edit image');?>';
+		var evo_js_lang_modal_action = '<?php echo TS_('Update');?>';
+		evo_js_lang_close = '<?php echo TS_('Cancel');?>';
+
+		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '"></span>',
+			'800px', '480px', true, evo_js_lang_edit_image, evo_js_lang_modal_action, true );
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url(); ?>anon_async.php',
+			data:
+			{
+				'action': 'get_edit_image_form',
+				'short_tag': shortTag,
+				'blog': blog,
+				'request_from': '<?php echo format_to_js( is_admin_page() ? 'back' : 'front' );?>',
+			},
+			success: function(result)
+			{
+				result = ajax_debug_clear( result );
+				openModalWindow( result, '90%', '80%', true, evo_js_lang_edit_image, evo_js_lang_modal_action );
+			}
+		} );
+		return false;
+	}
+</script>
+<?php
 }
 
 

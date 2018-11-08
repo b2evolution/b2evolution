@@ -1356,6 +1356,158 @@ switch( $action )
 		require $inc_path.'users/views/_user_groups.form.php';
 		break;
 
+	case 'render_inlines':
+		$target_ID = param( 'id', 'integer', 0 );
+		$target_type = param( 'type', 'string' );
+		$tags = param( 'tags', 'array:string', array() );
+		// 'temp_link_owner_ID' param will be passed for objects with temporary ID
+
+		// Default params from skins/skins_fallback_v6/_item_content.inc.php
+		$params = array(
+			'before_image'             => '<figure'.( $target_type == 'EmailCampaign' ? emailskin_style( '.evo_image_block' ) : ' class="evo_image_block"' ).'>',
+			'before_image_legend'      => '<figcaption'.( $target_type == 'EmailCampaign' ? emailskin_style( '.evo_image_legend' ) : ' class="evo_image_legend"' ).'>',
+			'after_image_legend'       => '</figcaption>',
+			'after_image'              => '</figure>',
+			'after_images'             => '</div>',
+			'image_class'              => 'img-responsive',
+			'image_size'               => param( 'image_size', 'string', 'fit-256x256' ),
+			'image_limit'              => 1000,
+			'image_link_to'            => 'original', // Can be 'original', 'single' or empty
+		);
+
+		switch( $target_type )
+		{
+			case 'Item':
+				$ItemCache = & get_ItemCache();
+				$edited_Item = $ItemCache->get_by_ID( $target_ID, false, false );
+				if( ! $edited_Item )
+				{
+					$edited_Item = new Item();
+				}
+				$rendered_tags = render_inline_tags( $edited_Item, $tags, $params );
+				break;
+
+			case 'Comment':
+				$CommentCache = & get_CommentCache();
+				$edited_Comment = $CommentCache->get_by_ID( $target_ID );
+				$rendered_tags = render_inline_tags( $edited_Comment, $tags, $params );
+				break;
+
+			case 'EmailCampaign':
+				$EmailCampaignCache = & get_EmailCampaignCache();
+				$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $target_ID );
+				$rendered_tags = render_inline_tags( $edited_EmailCampaign, $tags, $params );
+				break;
+
+			case 'Message':
+				$MessageCache = & get_MessageCache();
+				$edited_Message = $MessageCache->get_by_ID( $target_ID, false, false );
+				if( ! $edited_Message )
+				{
+					$edited_Message = new Message();
+				}
+
+				$rendered_tags = render_inline_tags( $edited_Message, $tags, $params );
+				break;
+		}
+
+		if( $rendered_tags )
+		{
+			echo json_encode( $rendered_tags );
+		}
+
+		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
+
+	case 'get_insert_image_form':
+	case 'get_edit_image_form':
+		$restrict_tag = false;
+		$request_from = param( 'request_from', 'string', NULL );
+
+		global $is_admin_page;
+
+		init_fontawesome_icons();
+
+		$is_admin_page = is_logged_in() && $request_from == 'back';
+
+		if( is_admin_page() )
+		{
+			global $UserSettings, $adminskins_path, $AdminUI;
+
+			$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+			$AdminUI = new AdminUI();
+		}
+		else
+		{
+			$BlogCache = & get_BlogCache();
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+			if( $Blog )
+			{
+				$blog_skin_ID = $Blog->get_skin_ID();
+				if( ! empty( $blog_skin_ID ) )
+				{
+					$SkinCache = & get_SkinCache();
+					$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+				}
+			}
+		}
+
+		if( $action == 'get_insert_image_form' )
+		{
+			$tag_type = param( 'tag_type', 'string', 'image' );
+			$link_ID = param( 'link_ID', 'integer', true );
+			$replace = 0;
+
+			$image_caption = NULL;
+			$image_class = NULL;
+			$image_disable_caption = false;
+			$thumbnail_size = 'medium';
+			$thumbnail_alignment = 'left';
+			$thumbnail_class = NULL;
+			$inline_class = NULL;
+		}
+		else
+		{
+			// Uncomment line below to hide inline type tabs
+			//$restrict_tag = true;
+			$short_tag = param( 'short_tag', 'string', true );
+			$short_tag = rawurldecode( $short_tag );
+			$replace = 1;
+
+			$parts = trim( $short_tag, '[]' );
+			$parts = explode( ':', $parts );
+
+			$tag_type = $parts[0];
+			$link_ID = $parts[1];
+
+			$image_caption = ( $tag_type == 'image' && isset( $parts[2] ) ? $parts[2] : NULL );
+			$image_class = ( $tag_type == 'image' && isset( $parts[3] ) ? $parts[3] : NULL );
+			$image_disable_caption = ( $tag_type == 'image' && ( isset( $image_caption ) && $image_caption == '-' ) );
+			$image_caption = ( $tag_type == 'image' && $image_caption == '-' ? NULL : $image_caption ); // disable caption, reset caption to empty string
+
+			$thumbnail_size = ( $tag_type == 'thumbnail' && isset( $parts[2] ) ? $parts[2] : 'medium' );
+			$thumbnail_alignment = ( $tag_type == 'thumbnail' && isset( $parts[3] ) ? $parts[3] : 'left' );
+			$thumbnail_class = ( $tag_type == 'thumbnail' && isset( $parts[4] ) ? $parts[4] : NULL );
+
+			$inline_class = ( $tag_type == 'inline' && isset( $parts[2] ) ? $parts[2] : NULL );
+		}
+
+		$LinkCache = & get_LinkCache();
+		if( ( $Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) === false )
+		{ // Bad request with incorrect link ID
+			echo '';
+			exit(0);
+		}
+
+		if( ( $File = & $Link->get_File() ) && empty( $File ) )
+		{ // File no longer available
+			echo '';
+			exit(0);
+		}
+
+		require $inc_path.'items/views/_item_image.form.php';
+		break;
+
 	case 'set_object_link_position':
 		// Change a position of a link on the edit item screen (fieldset "Images & Attachments")
 

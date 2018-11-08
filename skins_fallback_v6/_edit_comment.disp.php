@@ -18,6 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $Collection, $Blog, $edited_Comment, $comment_Item, $comment_content;
 global $display_params, $admin_url, $dummy_fields;
 
+
 if( empty( $comment_Item ) )
 {
 	$comment_Item = & $edited_Comment->get_Item();
@@ -96,9 +97,21 @@ $Form->begin_form( 'evo_comment' );
 	echo '</div>';
 	$comment_toolbar = ob_get_clean();
 
+	// CALL PLUGINS NOW:
+	ob_start();
+	$Plugins->trigger_event( 'DisplayEditorButton', array(
+		'target_type'   => 'Comment',
+		'target_object' => $edited_Comment,
+		'content_id'    => $dummy_fields[ 'content' ],
+		'edit_layout'   => 'inskin'
+	) );
+	$quick_setting_switch = ob_get_clean();
+
 	// Message field:
 	$form_inputstart = $Form->inputstart;
+	$form_inputend = $Form->inputend;
 	$Form->inputstart .= $comment_toolbar;
+	$Form->inputend = $quick_setting_switch.$Form->inputend;
 	$Form->textarea_input( 'content', $comment_content, $display_params['textarea_lines'], $display_params['form_comment_text'], array(
 			'cols' => 38,
 			'rows' => 11,
@@ -106,9 +119,11 @@ $Form->begin_form( 'evo_comment' );
 			'id' => $dummy_fields[ 'content' ]
 		) );
 	$Form->inputstart = $form_inputstart;
+	$Form->inputend = $form_inputend;
 
 	// set b2evoCanvas for plugins
 	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
+
 
 	// Display renderers checkboxes ( Note: This contains inputs )
 	$comment_renderer_checkboxes = $edited_Comment->renderer_checkboxes( NULL, false );
@@ -120,22 +135,15 @@ $Form->begin_form( 'evo_comment' );
 	$Form->end_fieldset();
 
 	// Display comment attachments
+	global $LinkOwner;
 	$LinkOwner = new LinkComment( $edited_Comment );
-	if( $LinkOwner->count_links() )
-	{ // there are attachments to display
-		if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
-		{
-			$Form->begin_fieldset( T_('Attachments'), array( 'id' => 'comment_attachments' ) );
-			display_attachments( $LinkOwner, array(
-						'block_start' => '<div class="attachment_list results">',
-						'table_start' => '<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0" cellpadding="0">',
-					)  );
-			$Form->end_fieldset();
-		}
-		else
-		{
-			$Form->info( T_('Attachments'), T_('You do not have permission to edit file attachments for this comment') );
-		}
+	if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
+	{
+		display_attachments_fieldset( $Form, $LinkOwner );
+	}
+	else
+	{
+		$Form->info( T_('Attachments'), T_('You do not have permission to edit file attachments for this comment') );
 	}
 
 	echo '<div class="edit_actions form-group text-center">';
@@ -160,4 +168,7 @@ $Form->end_form();
 
 // JS code for status dropdown submit button
 echo_status_dropdown_button_js( 'comment' );
+
+// Insert image modal window:
+echo_image_insert_modal();
 ?>

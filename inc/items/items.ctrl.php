@@ -2070,9 +2070,6 @@ switch( $action )
 			case 'update_edit':
 			case 'update': // on error
 			case 'update_publish': // on error
-			case 'history':
-			case 'history_details':
-			case 'history_compare':
 			case 'extract_tags':
 				if( $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
 				{	// User has permissions to delete this post
@@ -2122,7 +2119,7 @@ switch( $action )
 				break;
 		}
 
-		if( ! in_array( $action, array( 'new_type', 'edit_type' ) ) )
+		if( ! in_array( $action, array( 'new_type', 'edit_type', 'history', 'history_details', 'history_compare' ) ) )
 		{
 			if( $edited_Item->ID > 0 )
 			{ // Display a link to history if Item exists in DB
@@ -2153,6 +2150,15 @@ switch( $action )
 			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', $redirect_to, T_('Cancel'), 4, 2 );
 
 			init_tokeninput_js();
+		}
+
+		if( in_array( $action, array( 'history', 'history_details', 'history_compare' ) ) )
+		{	// History tabs:
+			if( $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
+			{	// User has permissions to edit this Item:
+				$AdminUI->global_icon( T_('Edit current version'), 'edit',  $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$edited_Item->ID, T_('Edit current version'), 4, 3, array( 'style' => 'margin-right:3ex' ) );
+			}
+			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', $redirect_to, T_('Cancel'), 4, 2 );
 		}
 
 		break;

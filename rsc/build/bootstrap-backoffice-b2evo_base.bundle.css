@@ -2269,7 +2269,7 @@ tr.evo_highlight td {
 }
 
 /**
- * item_base.css 
+ * item_base.css
  * These are the default styles that are used INSIDE of a blog post.
  * Override this with an item.css file in your skin folder.
  */
@@ -2351,6 +2351,13 @@ div.podplayer {
 	font-weight: bold;
 }
 */
+span.NonExistentWikiWord {
+  border-bottom: 1px dotted #ccc;
+}
+/* Styles used by TinyMCE b2evo_shorttags plugin */
+.evo_selected {
+  background-color: #eee;
+}
 .evo_shortlink_broken {
   border-bottom: 1px dotted #F00;
 }

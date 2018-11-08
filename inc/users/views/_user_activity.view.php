@@ -42,17 +42,16 @@ user_prevnext_links( array(
 	) );
 // ------------- END OF PREV/NEXT USER LINKS -------------------
 
-echo '<div class="row">';
+$usertab_header = get_usertab_header( $edited_User, $user_tab, '<span class="nowrap">'.( $current_User->ID == $edited_User->ID ? T_('My Activity') : T_('User Activity') ).'</span>'.get_manual_link( 'user-activity-tab' ) );
 
 if( !$user_profile_only )
 { // echo user edit action icons
 	$Widget = new Widget();
 	echo_user_actions( $Widget, $edited_User, $action );
-	echo '<span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">'.$Widget->gen_global_icons().'</span>';
+	$usertab_header = str_replace( '$global_icons$', $Widget->gen_global_icons(), $usertab_header );
 }
 
-echo '<div class="col-xs-12 col-lg-6'.( $user_profile_only ? '' : ' col-lg-pull-6').'">'.get_usertab_header( $edited_User, $user_tab, '<span class="nowrap">'.( $current_User->ID == $edited_User->ID ? T_('My Activity') : T_('User Activity') ).'</span>'.get_manual_link( 'user-activity-tab' ) ).'</div>';
-echo '</div>';
+echo $usertab_header;
 
 // Display IP address from where this user was created
 echo '<div style="margin-top:25px;font-weight:bold;"><span>'.T_( 'User created from IP' ).': '.int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ).'</span></div>';

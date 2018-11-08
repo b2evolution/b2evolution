@@ -75,8 +75,7 @@ if( $plugin_ID )
 			bad_request_die( 'Call to non-htsrv Plugin method!' );
 		}
 	}
-	else
-	if( ! in_array( $method, $Plugin->GetHtsrvMethods() ) )
+	elseif( ! in_array( $method, $Plugin->GetHtsrvMethods() ) )
 	{
 		bad_request_die( 'Call to non-htsrv Plugin method!' );
 	}
