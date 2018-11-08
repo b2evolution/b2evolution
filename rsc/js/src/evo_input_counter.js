@@ -12,13 +12,12 @@ jQuery( document ).ready( function()
 
 	jQuery( evo_input_counter_selector ).each( function()
 	{	// Initialize counter element for each input where it is required:
-		var counter_type = evo_input_counter_get_type( jQuery( this ) );
-		jQuery( this ).after( '<span class="evo_input_counter">' + ( counter_type == 'countdown' ? ( jQuery( this ).data( 'maxlength' ) - jQuery( this ).val().length ) : jQuery( this ).val().length ) + '</span>' );
+		jQuery( this ).after( '<span class="evo_input_counter">' + evo_input_counter_get_count( jQuery( this ) ) + '</span>' );
 		// Set relative position of the parent element for proper position of the counter elements:
 		jQuery( this ).parent().css( 'position', 'relative' );
 		// Store original right padding because it may be changed depending on counter width:
 		jQuery( this ).data( 'padding-right', parseInt( jQuery( this ).css( 'padding-right' ) ) );
-		if( counter_type == 'recommended' )
+		if( evo_input_counter_get_type( jQuery( this ) ) == 'recommended' )
 		{	// Parse recommended data only on initialization time:
 			var recommended_length = jQuery( this ).data( 'recommended-length' ).toString().split( ';', 2 );
 			jQuery( this ).data( 'recommended-min', parseInt( recommended_length[0] ) );
@@ -38,7 +37,7 @@ jQuery( document ).ready( function()
 			return;
 		}
 		var prev_counter_length = counter_obj.html().length;
-		counter_obj.html( ( evo_input_counter_get_type( jQuery( this ) ) == 'countdown' ? ( jQuery( this ).data( 'maxlength' ) - jQuery( this ).val().length ) : jQuery( this ).val().length ) );
+		counter_obj.html( evo_input_counter_get_count( jQuery( this ) ) );
 		// Update counter status when its value was changed:
 		evo_input_counter_update_status( jQuery( this ) );
 		if( prev_counter_length != counter_obj.html().length )
@@ -54,6 +53,19 @@ jQuery( document ).ready( function()
 			evo_input_counter_update_position( jQuery( this ) );
 		} );
 	} );
+
+	function evo_input_counter_get_count( input_obj )
+	{
+		if( evo_input_counter_get_type( input_obj ) == 'countdown' )
+		{	// Down counter:
+			return input_obj.data( 'maxlength' ) - input_obj.val().length;
+		}
+		else
+		{	// Up counter:
+			// Decode html entities in order to count strings like &hellip; &eacute; &bull; &nbsp; as single char:
+			return jQuery( '<textarea/>' ).html( input_obj.val() ).text().length;
+		}
+	}
 
 	function evo_input_counter_get_type( input_obj )
 	{
