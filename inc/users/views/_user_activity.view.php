@@ -56,13 +56,13 @@ echo $usertab_header;
 // Display IP address from where this user was created
 echo '<div style="margin-top:25px;font-weight:bold;"><span>'.T_( 'User created from IP' ).': '.int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ).'</span></div>';
 
-/**** Reports from edited user  ****/
+/**** Reports of the User by other Users  ****/
 user_reports_results_block( array(
 		'edited_User' => $edited_User,
 	) );
 evo_flush();
 
-/**** Blogs owned by the user ****/
+/**** Collections owned by the User ****/
 blogs_user_results_block( array(
 		'edited_User' => $edited_User,
 		'action'      => $action,
