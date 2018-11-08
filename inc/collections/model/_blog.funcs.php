@@ -1751,7 +1751,7 @@ function blogs_user_results_block( $params = array() )
 	$params = array_merge( array(
 			'edited_User'          => NULL,
 			'results_param_prefix' => 'actv_blog_',
-			'results_title'        => T_('Blogs owned by the user'),
+			'results_title'        => T_('Collections owned by the User'),
 			'results_no_text'      => T_('User does not own any blogs'),
 			'action'               => '',
 		), $params );

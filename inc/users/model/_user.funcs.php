@@ -5631,7 +5631,7 @@ function user_reports_results_block( $params = array() )
 	$params = array_merge( array(
 			'edited_User'          => NULL,
 			'results_param_prefix' => 'actv_reports_',
-			'results_title'        => T_('This user profile has been reported by other users!'),
+			'results_title'        => T_('Reports of the User by other Users'),
 			'results_no_text'      => T_('User was not reported yet.'),
 		), $params );
 
