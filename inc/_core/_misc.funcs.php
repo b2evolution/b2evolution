@@ -9411,6 +9411,7 @@ function insert_image_links_block( $params )
 
 		require $inc_path.'links/views/_link_list.view.php';
 	}
+}
 
 
 /**
