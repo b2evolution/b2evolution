@@ -10896,7 +10896,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 
-	if( upg_task_start( 13290 ) )
+	if( upg_task_start( 15290 ) )
 	{	// part of 7.0.0-alpha
 
 		/* ---- Install basic widgets for containers "Shopping Cart": ---- START */
@@ -10972,11 +10972,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end( false );
 	}
 
-	if( upg_task_start( 13300, 'Creating table for item pricing...' ) )
+	if( upg_task_start( 15300, 'Creating table for item pricing...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_items__pricing', "
-			iprc_ID         INT UNSIGNED NOT NULL,
-			iprc_itm_ID    INT UNSIGNED NOT NULL,
+			iprc_ID         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			iprc_itm_ID     INT UNSIGNED NOT NULL,
 			iprc_price      DOUBLE NOT NULL,
 			iprc_curr_ID    INT UNSIGNED NOT NULL,
 			iprc_min_qty    INT UNSIGNED,
@@ -10988,7 +10988,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13310, 'Upgrade table currencies...' ) )
+	if( upg_task_start( 15310, 'Upgrade table currencies...' ) )
 	{	// part of 7.0.0-alpha
 		db_add_col( 'T_regional__currency', 'curr_default', 'tinyint(1) NOT NULL DEFAULT 0' );
 		$DB->query( 'UPDATE T_regional__currency
@@ -10997,7 +10997,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13320 ) )
+	if( upg_task_start( 15320 ) )
 	{	// part of 7.0.0-alpha
 		global $basic_widgets_insert_sql_rows;
 		$basic_widgets_insert_sql_rows = array();
@@ -11012,7 +11012,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		 * @param array|string|NULL Widget params
 		 * @param integer 1 - enabled, 0 - disabled
 		 */
-		function add_basic_widget_13290( $container_ID, $code, $type, $order, $params = NULL, $enabled = 1 )
+		function add_basic_widget_15320( $container_ID, $code, $type, $order, $params = NULL, $enabled = 1 )
 		{
 			global $basic_widgets_insert_sql_rows, $DB;
 
@@ -11059,7 +11059,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				$wi_order = intval( $container['wi_order'] ) + $orders['_'.$container['wico_ID']];
 				$DB->query( 'UPDATE T_widget__widget SET wi_order = '.( $container['wi_order'] + 10 )
 						.' WHERE wi_wico_ID = '.$container['wico_ID'].' AND wi_order >= '.$wi_order );
-				add_basic_widget_13290( $container['wico_ID'], 'currency_selector', 'core', $wi_order );
+				add_basic_widget_15320( $container['wico_ID'], 'currency_selector', 'core', $wi_order );
 				$orders['_'.$container['wico_ID']] += 10;
 				task_end();
 			}
@@ -11070,6 +11070,30 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$DB->query( 'INSERT INTO T_widget__widget ( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
 								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
 		}
+
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15330 ) )
+	{	// part of 7.0.0-alpha
+
+		task_begin( 'Updating table items... ' );
+		db_upgrade_cols( 'T_items__item', array(
+			'ADD' => array(
+				'post_qty_in_stock'  => 'INT(10) NOT NULL DEFAULT 0 AFTER post_countvotes',
+				'post_low_stock'     => 'INT(10) NOT NULL DEFAULT 5 AFTER post_qty_in_stock',
+				'post_can_be_ordered_if_no_stock' => 'TINYINT DEFAULT 1 AFTER post_low_stock',
+			),
+		) );
+		task_end();
+
+		task_begin( 'Updating table item types... ' );
+		db_upgrade_cols( 'T_items__type', array(
+			'ADD' => array(
+				'ityp_can_be_purchased_instore' => 'TINYINT DEFAULT 0 AFTER ityp_skin_btn_text',
+				'ityp_can_be_purchased_online'  => 'TINYINT DEFAULT 0 AFTER ityp_can_be_purchased_instore',
+			),
+		) );
 
 		upg_task_end();
 	}

@@ -199,6 +199,9 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_city_ID                INT(10) UNSIGNED NULL,
 			post_addvotes               INT NOT NULL DEFAULT 0,
 			post_countvotes             INT UNSIGNED NOT NULL DEFAULT 0,
+			post_qty_in_stock           INT(10) NOT NULL DEFAULT 0,
+			post_low_stock              INT(10) NOT NULL DEFAULT 5,
+			post_can_be_ordered_if_no_stock TINYINT DEFAULT 1,
 			PRIMARY KEY post_ID( post_ID ),
 			UNIQUE post_urltitle( post_urltitle ),
 			INDEX post_datestart( post_datestart ),
@@ -360,6 +363,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_perm_level               ENUM( 'standard', 'restricted', 'admin' ) COLLATE ascii_general_ci NOT NULL default 'standard',
 			ityp_evobar_link_text         VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			ityp_skin_btn_text            VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+			ityp_can_be_purchased_instore TINYINT DEFAULT 0,
+			ityp_can_be_purchased_online  TINYINT DEFAULT 0,
 			PRIMARY KEY ( ityp_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -482,7 +487,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating item pricing table',
 		"CREATE TABLE T_items__pricing (
 			iprc_ID         INT UNSIGNED NOT NULL AUTO_INCREMENT,
-			iprc_itm_ID    INT UNSIGNED NOT NULL,
+			iprc_itm_ID     INT UNSIGNED NOT NULL,
 			iprc_price      DOUBLE NOT NULL,
 			iprc_curr_ID    INT UNSIGNED NOT NULL,
 			iprc_min_qty    INT UNSIGNED NULL,
