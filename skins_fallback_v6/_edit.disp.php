@@ -43,7 +43,6 @@ global $edited_Item, $item_tags, $item_title, $item_content;
 global $post_category, $post_extracats;
 global $admin_url, $redirect_to, $form_action;
 
-echo_image_insert_modal();
 
 // Default params:
 $params = array_merge( array(
@@ -400,6 +399,9 @@ echo_status_dropdown_button_js( 'post' );
 echo_onchange_newcat();
 echo_autocomplete_tags();
 echo_fieldset_folding_js();
+
+// Insert image modal window:
+echo_image_insert_modal();
 
 $edited_Item->load_Blog();
 // Location

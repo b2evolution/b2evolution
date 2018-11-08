@@ -1330,6 +1330,9 @@ class Skin extends DataObject
 
 					// Used to autocomplete usernames in textarea:
 					init_autocomplete_usernames_js( 'blog' );
+
+					// Used to switch to advanced editing:
+					require_js( 'backoffice.js', 'blog' );
 					break;
 
 				case 'disp_useritems':

@@ -1624,7 +1624,8 @@ form#comment_edit {
 .evo_container__sidebar .evo_poll__title {
   white-space: normal;
 }
-#itemform_links .panel-body {
+#itemform_links .panel-body,
+#cmntform_links .panel-body {
   padding: 0;
 }
 div.qq-upload-button,

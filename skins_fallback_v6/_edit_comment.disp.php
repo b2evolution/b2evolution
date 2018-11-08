@@ -18,7 +18,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $Collection, $Blog, $edited_Comment, $comment_Item, $comment_content;
 global $display_params, $admin_url, $dummy_fields;
 
-echo_image_insert_modal();
 
 if( empty( $comment_Item ) )
 {
@@ -136,22 +135,15 @@ $Form->begin_form( 'evo_comment' );
 	$Form->end_fieldset();
 
 	// Display comment attachments
+	global $LinkOwner;
 	$LinkOwner = new LinkComment( $edited_Comment );
-	if( $LinkOwner->count_links() )
-	{ // there are attachments to display
-		if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
-		{
-			$Form->begin_fieldset( T_('Attachments'), array( 'id' => 'comment_attachments' ) );
-			display_attachments( $LinkOwner, array(
-						'block_start' => '<div class="attachment_list results">',
-						'table_start' => '<table class="table table-striped table-bordered table-hover table-condensed" cellspacing="0" cellpadding="0">',
-					)  );
-			$Form->end_fieldset();
-		}
-		else
-		{
-			$Form->info( T_('Attachments'), T_('You do not have permission to edit file attachments for this comment') );
-		}
+	if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
+	{
+		display_attachments_fieldset( $Form, $LinkOwner );
+	}
+	else
+	{
+		$Form->info( T_('Attachments'), T_('You do not have permission to edit file attachments for this comment') );
 	}
 
 	echo '<div class="edit_actions form-group text-center">';
@@ -176,4 +168,7 @@ $Form->end_form();
 
 // JS code for status dropdown submit button
 echo_status_dropdown_button_js( 'comment' );
+
+// Insert image modal window:
+echo_image_insert_modal();
 ?>
