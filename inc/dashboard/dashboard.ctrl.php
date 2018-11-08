@@ -76,6 +76,15 @@ $AdminUI->disp_body_top();
 
 // We're on the GLOBAL tab...
 $AdminUI->disp_payload_begin();
+
+$collection_count = get_table_count( 'T_blogs' );
+if( $current_User->check_perm( 'blogs', 'create' ) && $collection_count  === 0 )
+{
+	// Display welcome panel:
+	$AdminUI->disp_view( 'collections/views/_welcome_demo_content.view.php' );
+	$AdminUI->disp_payload_end();
+}
+
 // Display blog list VIEW:
 $AdminUI->disp_view( 'collections/views/_coll_list.view.php' );
 load_funcs( 'collections/model/_blog_js.funcs.php' );
@@ -121,7 +130,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	// Blogs
 	$chart_data[] = array(
 			'title' => T_('Blogs'),
-			'value' => get_table_count( 'T_blogs' ),
+			'value' => $collection_count,
 			'type'  => 'number',
 		);
 	$post_all_counter = get_table_count( 'T_items__item' );

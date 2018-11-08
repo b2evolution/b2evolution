@@ -229,6 +229,9 @@ if( $revisions_count > 1 )
 }
 $Form->end_form( $buttons );
 
+// JS code for merge button:
+echo_item_merge_js();
+
 if( $revisions_count > 2 )
 {	// Print JS code for selectors to compare the revisions
 ?>

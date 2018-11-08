@@ -217,14 +217,6 @@ span.icon.voted {
 }
 a.rollover_sprite:hover span.icon {
   visibility: hidden;
-  visibility: visible\0/;
-  /* IE8 */
-}
-@media screen and (min-width: 0\0) {
-  /* IE9-10 */
-  a.rollover_sprite:hover span.icon {
-    visibility: visible;
-  }
 }
 a.rollover_sprite:hover span.icon:before {
   visibility: visible !important;
@@ -1017,6 +1009,9 @@ div#publish_buttons {
   box-shadow: 1px 10px 35px rgba(75, 75, 75, 0.75);
   z-index: 99999;
 }
+tbody.fieldset_wrapper.folded + tbody[id^=cat_sel_] {
+  display: none;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.
@@ -1806,6 +1801,13 @@ img.avatar_above_login {
 .shrinkwrap.left {
   text-align: left;
 }
+.col-narrow {
+  width: 1px;
+  white-space: nowrap;
+  text-align: center;
+  padding-left: 1px !important;
+  padding-right: 1px !important;
+}
 .block {
   margin: 1ex;
   white-space: nowrap;
@@ -2254,8 +2256,16 @@ tr.evo_highlight td {
     background-color: #FF6600;
   }
   to {
-    background-color: auto;
+    background-color: transparent;
   }
+}
+.evo_input_counter {
+  position: absolute;
+  color: #999;
+  font-size: 80%;
+}
+.evo_input_counter.label {
+  color: #FFF;
 }
 
 /**
@@ -2518,6 +2528,9 @@ a.btn.action_icon.hoverlink {
 .form-horizontal #itemform_custom_fields .panel-body .form-group:last-child {
   margin-bottom: 0;
 }
+.form-horizontal #itemform_custom_fields .help-inline label {
+  font-weight: normal;
+}
 .form-horizontal #itemform_categories .panel-body.extracats {
   padding: 0;
 }
@@ -2741,6 +2754,11 @@ body.modal-open div.token-input-dropdown-facebook {
 }
 .evo_widget.widget_core_item_tags form input[type=submit] {
   margin: 0;
+}
+.extended_search_form ul.token-input-list-facebook {
+  max-width: 100%;
+  padding-top: 5px;
+  padding-left: 12px;
 }
 div.results {
   margin-top: 0;

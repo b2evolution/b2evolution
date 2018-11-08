@@ -87,9 +87,6 @@ div.extended_search_form .search_options .search_option {
   display: inline-block;
   margin-right: 10px;
 }
-table.catselect input#new_category_name {
-  width: 98% !important;
-}
 label.control-label[for=post_title] {
   width: auto;
 }
@@ -289,7 +286,8 @@ div#skin_wrapper.skin_wrapper_loggedin .sitewide_header {
   font-size: inherit;
   margin-right: 5px;
 }
-.posts_list li > .btn-group {
+.posts_list li > .btn-group,
+.posts_list li > .evo_status {
   margin: 0 0 6px 30px;
 }
 ol.breadcrumb {

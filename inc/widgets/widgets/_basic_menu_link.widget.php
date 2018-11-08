@@ -42,32 +42,35 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 
 		$this->link_types = array(
 			'home' => T_('Front Page'),
-			'recentposts' => T_('Recent posts'),
-			'search' => T_('Search page'),
-			'arcdir' => T_('Archive directory'),
-			'catdir' => T_('Category directory'),
-			'tags' => T_('Tags'),
-			'postidx' => T_('Post index'),
-			'mediaidx' => T_('Photo index'),
-			'sitemap' => T_('Site Map'),
-			'latestcomments' => T_('Latest comments'),
-			'cart' => T_('Shopping cart'),
+			'recentposts' => T_('Recent posts').' (disp=posts)',
+			'search' => T_('Search page').' (disp=search)',
+			'arcdir' => T_('Archive directory').' (disp=arcdir)',
+			'catdir' => T_('Category directory').' (disp=catdir)',
+			'tags' => T_('Tags').' (disp=tags)',
+			'postidx' => T_('Post index').' (disp=postidx)',
+			'mediaidx' => T_('Photo index').' (disp=mediaidx)',
+			'sitemap' => T_('Site Map').' (disp=sitemap)',
+			'latestcomments' => T_('Latest comments').' (disp=comments)',
+			'cart' => T_('Shopping cart').' (disp=cart)',
 
-			'ownercontact' => T_('Blog owner contact form'),
-			'owneruserinfo' => T_('Blog owner profile'),
+			'ownercontact' => T_('Blog owner contact form').' (disp=msgform)',
+			'owneruserinfo' => T_('Blog owner profile').' (disp=user)',
 
-			'users' => T_('User directory'),
+			'users' => T_('User directory').' (disp=users)',
 
-			'login' => T_('Log in form'),
+			'login' => T_('Log in form').' (disp=login)',
 			'logout' => T_('Logout link'),
-			'register' => T_('Registration form'),
-			'myprofile' => T_('My profile'),
-			'profile' => T_('Edit profile'),
-			'avatar' => T_('Edit profile picture'),
-			'visits' => T_('My visits'),
+			'register' => T_('Registration form').' (disp=register)',
+			'myprofile' => T_('My profile').' (disp=user)',
+			'profile' => T_('Edit profile').' (disp=profile)',
+			'avatar' => T_('Edit profile picture').' (disp=avatar)',
+			'visits' => T_('My visits').' (disp=visits)',
 
-			'item' => T_('Any item (post, page, etc...)'),
-			'postnew' => T_('New Item'),
+			'useritems' => T_('User\'s posts/items').' (disp=useritems)',
+			'usercomments' => T_('User\'s comments').' (disp=usercomments)',
+
+			'item' => T_('Any item (post, page, etc...)').' (disp=single|page) ',
+			'postnew' => T_('New Item').' (disp=edit)',
 
 			'admin' => T_('Admin / Back-Office link'),
 			'url' => T_('Any URL'),
@@ -136,9 +139,11 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 	{
 		global $admin_url;
 
+		$default_link_type = 'home';
+		$current_link_type = $this->get_param( 'link_type', $default_link_type );
+
 		// Check if field "Collection ID" is disabled because of link type and site uses only one fixed collection for profile pages:
-		$coll_id_is_disabled = ( empty( $params['infinite_loop'] )
-			&& in_array( $this->get_param( 'link_type', true ), array( 'ownercontact', 'owneruserinfo', 'myprofile', 'profile', 'avatar' ) )
+		$coll_id_is_disabled = ( in_array( $current_link_type, array( 'ownercontact', 'owneruserinfo', 'myprofile', 'profile', 'avatar' ) )
 			&& $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) );
 
 		$r = array_merge( array(
@@ -147,7 +152,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'note' => T_('What do you want to link to?'),
 					'type' => 'select',
 					'options' => $this->link_types,
-					'defaultvalue' => 'home',
+					'defaultvalue' => $default_link_type,
 				),
 				'link_text' => array(
 					'label' => T_('Link text'),
@@ -168,6 +173,15 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'defaultvalue' => '',
 					'disabled' => $coll_id_is_disabled ? 'disabled' : false,
 				),
+				'cat_ID' => array(
+					'label' => T_('Category ID'),
+					'note' => T_('Leave empty for default category.'),
+					'type' => 'integer',
+					'allow_empty' => true,
+					'size' => 5,
+					'defaultvalue' => '',
+					'hide' => ! in_array( $current_link_type, array( 'recentposts', 'postnew' ) ),
+				),
 				'visibility' => array(
 					'label' => T_( 'Visibility' ),
 					'note' => '',
@@ -186,6 +200,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
+					'hide' => ( $current_link_type != 'item' ),
 				),
 				'link_href' => array(
 					'label' => T_('URL'),
@@ -193,6 +208,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'type' => 'text',
 					'size' => 30,
 					'defaultvalue' => '',
+					'hide' => ( $current_link_type != 'url' ),
 				),
 				'highlight_current' => array(
 					'label' => T_('Highlight current'),
@@ -208,6 +224,32 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
+	}
+
+
+	/**
+	 * Get JavaScript code which helps to edit widget form
+	 *
+	 * @return string
+	 */
+	function get_edit_form_javascript()
+	{
+		return 'jQuery( "#'.$this->get_param_prefix().'link_type" ).change( function()
+		{
+			var link_type_value = jQuery( this ).val();
+			// Hide/Show category ID:
+			( link_type_value == "recentposts" || link_type_value == "postnew" )
+				? jQuery( "#ffield_'.$this->get_param_prefix().'cat_ID" ).show()
+				: jQuery( "#ffield_'.$this->get_param_prefix().'cat_ID" ).hide();
+			// Hide/Show item ID:
+			( link_type_value == "item" )
+				? jQuery( "#ffield_'.$this->get_param_prefix().'item_ID" ).show()
+				: jQuery( "#ffield_'.$this->get_param_prefix().'item_ID" ).hide();
+			// Hide/Show URL:
+			( link_type_value == "url" )
+				? jQuery( "#ffield_'.$this->get_param_prefix().'link_href" ).show()
+				: jQuery( "#ffield_'.$this->get_param_prefix().'link_href" ).hide();
+		} );';
 	}
 
 
@@ -239,7 +281,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		* @var Blog
 		*/
 		global $Collection, $Blog;
-		global $disp;
+		global $disp, $cat;
 
 		$this->init_display( $params );
 
@@ -274,7 +316,15 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		switch( $this->disp_params['link_type'] )
 		{
 			case 'recentposts':
+				$text = T_('Recently');
 				$url = $current_Blog->get( 'recentpostsurl' );
+				if( ! empty( $this->disp_params['cat_ID'] ) && 
+				    ( $ChapterCache = & get_ChapterCache() ) &&
+				    ( $Chapter = & $ChapterCache->get_by_ID( $this->disp_params['cat_ID'], false, false ) ) )
+				{	// Use category url and name instead of default if the defined category is found in DB:
+					$url = $Chapter->get_permanent_url();
+					$text = $Chapter->get( 'name' );
+				}
 				if( is_same_url( $url, $Blog->get( 'url' ) ) )
 				{ // This menu item has the same url as front page of blog
 					$EnabledWidgetCache = & get_EnabledWidgetCache();
@@ -293,9 +343,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					}
 				}
 
-				$text = T_('Recently');
 				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'posts' );
+				$highlight_current = ( $highlight_current && $disp == 'posts' && ( empty( $Chapter ) || $cat == $Chapter->ID ) );
 				break;
 
 			case 'search':
@@ -463,7 +512,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			case 'visits':
 				global $Settings, $current_User;
 				if( ! is_logged_in() || ! $Settings->get( 'enable_visit_tracking' ) )
-				{
+				{	// Current user must be logged in and visit tracking must be enabled:
+					$this->display_debug_message();
 					return false;
 				}
 
@@ -475,6 +525,28 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					$text .= ' <span class="badge badge-info">'.$visit_count.'</span>';
 				}
 				$highlight_current = ( $highlight_current && $disp == 'visits' );
+				break;
+
+			case 'useritems':
+				if( ! is_logged_in() )
+				{
+					$this->display_debug_message();
+					return false;
+				}
+				$url = url_add_param( $Blog->gen_blogurl(), 'disp=useritems' );
+				$text = T_('User\'s posts/items');
+				$highlight_current = ( $highlight_current && $disp == 'useritems' );
+				break;
+
+			case 'usercomments':
+				if( ! is_logged_in() )
+				{
+					$this->display_debug_message();
+					return false;
+				}
+				$url = url_add_param( $Blog->gen_blogurl(), 'disp=usercomments' );
+				$text = T_('User\'s usercomments');
+				$highlight_current = ( $highlight_current && $disp == 'usercomments' );
 				break;
 
 			case 'users':
@@ -530,8 +602,26 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 				}
 				$url = url_add_param( $current_Blog->get( 'url' ), 'disp=edit' );
 				$text = T_('Write a new post');
+				if( ! empty( $this->disp_params['cat_ID'] ) && 
+				    ( $ChapterCache = & get_ChapterCache() ) &&
+				    ( $Chapter = & $ChapterCache->get_by_ID( $this->disp_params['cat_ID'], false, false ) ) )
+				{	// Append category ID to the URL:
+					$url = url_add_param( $url, 'cat='.$Chapter->ID );
+					$cat_ItemType = & $Chapter->get_ItemType( true );
+					if( $cat_ItemType === false )
+					{	// Don't allow to create a post in this category because this category has no default Item Type:
+						$this->display_debug_message();
+						return false;
+					}
+					if( $cat_ItemType )
+					{	// Use button text depending on default category's Item Type:
+						$text = $cat_ItemType->get_item_denomination( 'inskin_new_btn' );
+						// Append item type ID to the URL:
+						$url = url_add_param( $url, 'item_typ_ID='.$cat_ItemType->ID );
+					}
+				}
 				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'edit' );
+				$highlight_current = ( $highlight_current && $disp == 'edit' && ( empty( $Chapter ) || $cat == $Chapter->ID ) );
 				break;
 
 			case 'myprofile':

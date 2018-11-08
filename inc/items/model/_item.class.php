@@ -190,9 +190,9 @@ class Item extends ItemLight
 	var $priority;
 
 	/**
-	 * @var float
+	 * @var array Item orders per category
 	 */
-	var $order;
+	var $orders;
 	/**
 	 * @var boolean
 	 */
@@ -431,7 +431,6 @@ class Item extends ItemLight
 			$this->notifications_ctsk_ID = $db_row->post_notifications_ctsk_ID;
 			$this->notifications_flags = $db_row->post_notifications_flags;
 			$this->comment_status = $db_row->post_comment_status;			// Comments status
-			$this->order = $db_row->post_order;
 			$this->featured = $db_row->post_featured;
 			$this->parent_ID = $db_row->post_parent_ID === NULL ? NULL : intval( $db_row->post_parent_ID );
 
@@ -540,16 +539,20 @@ class Item extends ItemLight
 			debug_die('Invalid item objects received to compare.');
 		}
 
-		if( $a_Item->order == NULL )
+		// Get item orders depending on current category:
+		$a_item_order = isset( $a_Item->sort_current_cat_ID ) ? $a_Item->sort_current_cat_ID : NULL;
+		$b_item_order = isset( $b_Item->sort_current_cat_ID ) ? $b_Item->sort_current_cat_ID : NULL;
+
+		if( $a_Item->get_order( $a_item_order ) == NULL )
 		{
-			return $b_Item->order == NULL ? 0 : 1;
+			return $b_Item->get_order( $b_item_order ) == NULL ? 0 : 1;
 		}
-		elseif( $b_Item->order == NULL )
+		elseif( $b_Item->get_order( $b_item_order ) == NULL )
 		{
 			return -1;
 		}
 
-		return ( $a_Item->order < $b_Item->order ) ? -1 : ( ( $a_Item->order > $b_Item->order ) ? 1 : 0 );
+		return ( $a_Item->get_order( $a_item_order ) < $b_Item->get_order( $b_item_order ) ) ? -1 : ( ( $a_Item->get_order( $a_item_order ) > $b_Item->get_order( $b_item_order ) ) ? 1 : 0 );
 	}
 
 
@@ -720,7 +723,7 @@ class Item extends ItemLight
 	 */
 	function load_from_Request( $editing = false, $creating = false )
 	{
-		global $default_locale, $current_User, $localtimenow;
+		global $default_locale, $current_User, $localtimenow, $Blog;
 		global $item_typ_ID;
 
 		// LOCALE:
@@ -919,10 +922,6 @@ class Item extends ItemLight
 			}
 		}
 
-		// ORDER:
-		param( 'item_order', 'double', NULL );
-		$this->set_from_Request( 'order', 'item_order', true );
-
 		// OWNER:
 		$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
 		if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && param( 'item_owner_login_displayed', 'string', NULL ) !== NULL )
@@ -992,7 +991,7 @@ class Item extends ItemLight
 		$custom_fields = $this->get_type_custom_fields();
 		foreach( $custom_fields as $custom_field )
 		{ // update each custom field
-			$param_name = 'item_'.$custom_field['type'].'_'.$custom_field['ID'];
+			$param_name = 'item_cf_'.$custom_field['name'];
 			$param_error = false;
 			if( isset_param( $param_name ) )
 			{ // param is set
@@ -1040,18 +1039,18 @@ class Item extends ItemLight
 					param( $param_name, $param_type, NULL ); // get par value
 				}
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
-				$this->set_setting( 'custom:'.$custom_field['name'], get_param( $param_name ), $custom_field_make_null );
+				$this->set_custom_field( $custom_field['name'], get_param( $param_name ), 'value', $custom_field_make_null );
 			}
+			// Update checkbox "Auto-sync from Parent":
+			$this->set_custom_field( $custom_field['name'], param( 'item_pscf_'.$custom_field['name'], 'integer', 0 ), 'parent_sync' );
 		}
 		foreach( $custom_fields as $custom_field )
 		{	// Update computed custom fields after when all fields we updated above:
 			if( $custom_field['type'] == 'computed' )
 			{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
-				$this->set_setting( 'custom:'.$custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ), true );
+				$this->set_custom_field( $custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ) );
 			}
 		}
-		// Clear the cached values to use new after updating:
-		unset( $this->custom_fields );
 
 		// COMMENTS:
 		if( $this->allow_comment_statuses() )
@@ -1125,12 +1124,17 @@ class Item extends ItemLight
 			$this->set_setting( 'editor_code', $editor_code );
 		}
 
+		// Never allow html content on post titles:  (fp> probably so as to not mess up backoffice and all sorts of tools)
+		param( 'post_title', 'htmlspecialchars', '' );
+		// Title checking:
+		if( ( ! $editing || $creating ) && $this->get_type_setting( 'use_title' ) == 'required' ) // creating is important, when the action is create_edit
+		{
+			param_check_not_empty( 'post_title', T_('Please provide a title.'), '' );
+		}
+
 		$content = param( 'content', $text_format, NULL );
 		if( $content !== NULL )
 		{
-			// Never allow html content on post titles:  (fp> probably so as to not mess up backoffice and all sorts of tools)
-			param( 'post_title', 'htmlspecialchars', NULL );
-
 			// Do some optional filtering on the content
 			// Typically stuff that will help the content to validate
 			// Useful for code display.
@@ -1143,26 +1147,19 @@ class Item extends ItemLight
 				);
 			$Plugins_admin->filter_contents( $GLOBALS['post_title'] /* by ref */, $GLOBALS['content'] /* by ref */, $renderers, $params /* by ref */ );
 
-			// Title checking:
-			$use_title = $this->get_type_setting( 'use_title' );
-
-			if( ( ! $editing || $creating ) && $use_title == 'required' ) // creating is important, when the action is create_edit
-			{
-				param_check_not_empty( 'post_title', T_('Please provide a title.'), '' );
-			}
-
 			// Format raw HTML input to cleaned up and validated HTML:
 			param_check_html( 'content', T_('Invalid content.') );
 			$content = prepare_item_content( get_param( 'content' ) );
 
 			$this->set( 'content', $content );
-
-			$this->set( 'title', get_param( 'post_title' ) );
 		}
 		if( empty( $content ) && $this->get_type_setting( 'use_text' ) == 'required' )
 		{ // Content must be entered
 			param_check_not_empty( 'content', T_('Please enter some text.'), '' );
 		}
+
+		// Set title only here because it may be filtered by plugins above:
+		$this->set( 'title', get_param( 'post_title' ) );
 
 		if( $is_not_content_block )
 		{	// Save excerpt for item with type usage except of content block:
@@ -1221,6 +1218,21 @@ class Item extends ItemLight
 					&& cities_exist( $country_ID, $region_ID, $subregion_ID );
 			param_check_number( 'item_city_ID', T_('Please select a city'), $city_is_required );
 			$this->set_from_Request( 'city_ID', 'item_city_ID', true );
+		}
+
+		if( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) )
+		{	// Item orders per category:
+			$post_cat_orders = param( 'post_cat_orders', 'array:string' );
+			$this->orders = array();
+			foreach( $post_cat_orders as $post_cat_ID => $post_cat_order )
+			{
+				if( isset( $this->extra_cat_IDs ) &&
+						is_array( $this->extra_cat_IDs ) &&
+						in_array( $post_cat_ID, $this->extra_cat_IDs ) )
+				{	// Set order only for selected category:
+					$this->orders[ $post_cat_ID ] = ( $post_cat_order === '' ? NULL : floatval( $post_cat_order ) );
+				}
+			}
 		}
 
 		return ! param_errors_detected();
@@ -1711,7 +1723,7 @@ class Item extends ItemLight
 		if( $display )
 		{ // display a comment form section even if comment form won't be displayed, "add new comment" links should point to this section
 			$comment_form_anchor = empty( $params['comment_form_anchor'] ) ? 'form_p' : $params['comment_form_anchor'];
-			echo '<a id="'.$comment_form_anchor.$this->ID.'"></a>';
+			echo '<a id="'.format_to_output( $comment_form_anchor.$this->ID, 'htmlattr' ).'"></a>';
 		}
 
 		if( ! $this->get_type_setting( 'use_comments' ) )
@@ -2623,17 +2635,20 @@ class Item extends ItemLight
 	 */
 	function get_custom_fields_defs()
 	{
-		if( ! isset( $this->custom_fields ) )
-		{	// Load item custom fields only once:
+		if( ! isset( $this->custom_fields ) ||
+		    ! isset( $this->custom_fields_loaded_ityp_ID ) ||
+		    $this->custom_fields_loaded_ityp_ID != $this->get( 'ityp_ID' ) )
+		{	// Load item custom fields only once if Item Type was not changed:
 			global $DB;
 
 			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
-			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_schema_prop AS schema_prop, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, iset_value AS value, ' );
+			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_schema_prop AS schema_prop, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
 			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
 			$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
-			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description' );
+			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge, ' );
+			$SQL->SELECT_add( 'icfv_value AS value, IFNULL( icfv_parent_sync, 1 )AS parent_sync' );
 			$SQL->FROM( 'T_items__type_custom_field' );
-			$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON itcf_name = SUBSTRING( iset_name, 8 ) AND iset_item_ID = '.$this->ID );
+			$SQL->FROM_add( 'LEFT JOIN T_items__item_custom_field ON itcf_name = icfv_itcf_name AND icfv_item_ID = '.$this->ID );
 			$SQL->WHERE_and( 'itcf_ityp_ID = '.$DB->quote( $this->get( 'ityp_ID' ) ) );
 			$SQL->ORDER_BY( 'itcf_order, itcf_ID' );
 			$custom_fields = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
@@ -2643,9 +2658,88 @@ class Item extends ItemLight
 			{	// Use field name/code as key/index of array:
 				$this->custom_fields[ $custom_field['name'] ] = $custom_field;
 			}
+			// Store current Item Type in order to reload the custom fields when Item Type was changed:
+			$this->custom_fields_loaded_ityp_ID = $this->get( 'ityp_ID' );
 		}
 
 		return $this->custom_fields;
+	}
+
+
+	/**
+	 * Set item custom field value or parent_sync
+	 *
+	 * @param string Field name
+	 * @param string New value
+	 * @param string Value key: 'value', 'parent_sync'
+	 * @param boolean TRUE to set to NULL if empty value
+	 */
+	function set_custom_field( $field_index, $new_value, $value_key = 'value', $make_null = true )
+	{
+		if( $value_key != 'value' && $value_key != 'parent_sync' )
+		{	// Skip unknown column in the table T_items__type_custom_field:
+			return;
+		}
+
+		// Load all custom fields for this item:
+		$this->get_custom_fields_defs();
+
+		if( ! isset( $this->custom_fields[ $field_index ] ) )
+		{	// Set new array for custom field data, Used for new creating Item:
+			$this->custom_fields[ $field_index ] = array();
+		}
+
+		if( $value_key == 'value' && $make_null && empty( $new_value ) )
+		{	// Set NULL for empty value:
+			$new_value = NULL;
+		}
+
+		// Set new value for the field:
+		$this->custom_fields[ $field_index ][ $value_key ] = $new_value;
+	}
+
+
+	/**
+	 * Update custom fields
+	 *
+	 * @return boolean TRUE if custom fields were updated
+	 */
+	function update_custom_fields()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// Item must be stored in DB
+			return false;
+		}
+
+		// Get all custom fields:
+		$custom_fields = $this->get_custom_fields_defs();
+
+		// Remove old values from DB:
+		$deleted_cf_num = $DB->query( 'DELETE FROM T_items__item_custom_field
+			WHERE icfv_item_ID = '.$this->ID,
+			'Delete old custom field values before insert new values for Item #'.$this->ID );
+
+		if( empty( $custom_fields ) )
+		{	// No new custom fields to update:
+			return ( $deleted_cf_num > 0 );
+		}
+
+		// Insert new values:
+		$cf_insert_data = array();
+		foreach( $custom_fields as $custom_field_name => $custom_field )
+		{
+			$cf_insert_data[] = '( '.$this->ID.', '
+				.$DB->quote( $custom_field_name ).', '
+				.$DB->quote( $custom_field['value'] ).', '
+				.$DB->quote( isset( $custom_field['parent_sync'] ) && $custom_field['parent_sync'] !== NULL ? $custom_field['parent_sync'] : 1 ).' )';
+		}
+		$inserted_cf_num = $DB->query( 'INSERT INTO T_items__item_custom_field ( icfv_item_ID, icfv_itcf_name, icfv_value, icfv_parent_sync )
+			VALUES '.implode( ', ', $cf_insert_data ),
+			'Insert new custom field values for Item #'.$this->ID );
+
+		return ( $deleted_cf_num > 0 || $inserted_cf_num > 0 );
 	}
 
 
@@ -2654,7 +2748,7 @@ class Item extends ItemLight
 	 *
 	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
 	 * @param string Restrict field by type(double, varchar, html, text, url, image, computed, separator), FALSE - to don't restrict
-	 * @return string|boolean FALSE if the field doesn't exist
+	 * @return string|boolean FALSE if the field doesn't exist; NULL if the field exists but no value has been entered yet, '' (empty string) if field has been left blank
 	 */
 	function get_custom_field_value( $field_index, $restrict_type = false )
 	{
@@ -2706,7 +2800,7 @@ class Item extends ItemLight
 		$custom_field = $custom_fields[ $field_index ];
 
 		if( ( $custom_field_value === '' || $custom_field_value === NULL ) && // don't format empty value
-		    ! in_array( $custom_field['type'], array( 'double', 'computed' ) ) ) // double and computed fields may have a special format even for empty value
+		    ! in_array( $custom_field['type'], array( 'double', 'computed', 'url' ) ) ) // double, computed and url fields may have a special format even for empty value
 		{	// Don't format value in such cases:
 			return $custom_field_value;
 		}
@@ -2844,6 +2938,37 @@ class Item extends ItemLight
 					$custom_field_value = '<span class="text-danger">'.T_('Invalid link ID:').' '.$custom_field_value.'</span>';
 				}
 				break;
+
+			case 'url':
+				// Format URL field value:
+				if( $format === NULL || $format === '' )
+				{	// No format:
+					break;
+				}
+
+				$formats = explode( ';', $format );
+
+				if( $custom_field_value === '' || $custom_field_value === NULL )
+				{	// Use second format option for empty url:
+					if( ! isset( $formats[1] ) || $formats[1] === '' )
+					{	// No format for empty URL:
+						return $custom_field_value;
+					}
+					else
+					{	// Set a format for empty URL:
+						$format_value = $formats[1];
+					}
+				}
+				else
+				{	// Use first format option for not empty url:
+					$format_value = $formats[0];
+				}
+
+				if( $format_value != '#url#' )
+				{	// Use specific text for link from format if it is not requested to use original url as link text:
+					$custom_field_value = $format_value;
+				}
+				break;
 		}
 
 		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
@@ -2861,6 +2986,7 @@ class Item extends ItemLight
 				'permalink'    => array( 'perm' ),
 				'zoom'         => array( 'zoom' ),
 				'fieldurl'     => array( 'url' ),
+				'fieldurlblank'=> array( 'urlblank' ),
 			);
 
 			if( isset( $link_fallbacks[ $custom_field['link'] ] ) )
@@ -2908,8 +3034,12 @@ class Item extends ItemLight
 							break;
 
 						case 'url':
+						case 'urlblank':
 							// Use value of url fields as URL to the link:
-							$custom_field_value = '<a href="'.$custom_field_value.'"'.$nofollow_attr.$link_class_attr.'>'.$custom_field_value.'</a>';
+							if( ! empty( $orig_custom_field_value ) )
+							{	// Format URL to link only with not empty URL otherwise display URL as simple text if special text is defined in format for empty URL:
+								$custom_field_value = '<a href="'.$orig_custom_field_value.'"'.$nofollow_attr.$link_class_attr.( $link_fallback == 'urlblank' ? ' target="_blank"' : '' ).'>'.$custom_field_value.'</a>';
+							}
 							break 2;
 					}
 				}
@@ -2938,9 +3068,7 @@ class Item extends ItemLight
 
 		if( $custom_fields[ $field_index ]['type'] == 'double' )
 		{	// This case may be called by computing of the formula:
-			// NOTE: Get a value directly from setting and not from the cached array
-			//       in order to get new updated double value after edit form updating:
-			return $this->get_setting( 'custom:'.$field_index );
+			return $this->get_custom_field_value( $field_index );
 		}
 
 		if( $custom_fields[ $field_index ]['type'] != 'computed' )
@@ -3042,7 +3170,7 @@ class Item extends ItemLight
 		if( ! isset( $custom_fields[ $field_index ] ) )
 		{ // Custom field with this index doesn't exist
 			echo $params['before']
-				.'<span class="red">'.sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_index.'</b>' ).'</span>'
+				.'<span class="evo_param_error">'.sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_index.'</b>' ).'</span>'
 				.$params['after'];
 			return;
 		}
@@ -3074,191 +3202,26 @@ class Item extends ItemLight
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'before'       => '<table class="item_custom_fields">',
-				'field_format' => '<tr><th class="$header_cell_class$">$title$$description_icon$:</th><td class="$data_cell_class$">$value$</td></tr>', // $title$ $description_icon$ $class$ $value$
-				'after'        => '</table>',
-				'field_description_icon_class' => 'grey',
-				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
-				// Separate template for separator fields:
-				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
-				'field_separator_format' => '<tr><th colspan="2" class="$header_cell_class$">$title$$description_icon$</th></tr>', // $title$ $description_icon$
+				'fields'        => '', // Empty string to display ALL fields, OR fields names separated by comma to show/hide only the requested fields in order what you want
+				'fields_source' => 'include', // 'all' - All item's fields, 'exclude' - All except fields listed in the param 'fields', 'include' - Only fields listed in the param 'fields'
+				// See default template params in the widget function item_fields_compare_Widget->display():
 			), $params );
 
-		// Get all custom fields by item ID:
-		$custom_fields = $this->get_custom_fields_defs();
+		// Convert fields separator to widget format:
+		$custom_fields = str_replace( ',', "\n", trim( $params['fields'], ', ' ) );
 
-		if( empty( $params['fields'] ) )
-		{	// Display all fields:
-			$display_fields = array_keys( $custom_fields );
-		}
-		else
-		{	// Display only the requested fields:
-			$display_fields = explode( ',', $params['fields'] );
-		}
+		// Call widget with params only when content is not generated yet above:
+		ob_start();
+		skin_widget( array_merge( $params, array(
+				'widget'        => 'item_custom_fields',
+				'fields_source' => empty( $custom_fields ) ? 'all' : $params['fields_source'],
+				'fields'        => $custom_fields,
+				'items'         => $this->ID,
+			) ) );
+		$widget_html = ob_get_contents();
+		ob_end_clean();
 
-		if( count( $display_fields ) == 0 )
-		{	// No custom fields:
-			return '';
-		}
-
-		$html = '';
-
-		foreach( $display_fields as $field_key )
-		{
-			$field_name = $field_key;
-			$field_options = '';
-			if( ! empty( $params['fields'] ) && strpos( $field_key, '+' ) !== false )
-			{	// Parse additional field options, e.g. separators may have names as 'separator+repeat', 'separator+fields', 'separator+repeat+fields':
-				$field_options_arr = explode( '+', $field_key, 2 );
-				if( isset( $field_options_arr[1] ) )
-				{	// The field has additional options:
-					$field_options = $field_options_arr[1];
-				}
-				// Set real name of separator field from key like 'separator+repeat+fields':
-				$field_name = $field_options_arr[0];
-			}
-
-			// Get HTML code of the custom field:
-			$html .= $this->get_custom_field_template( $field_name, $params );
-
-			if( ! isset( $custom_fields[ $field_name ] ) )
-			{	// Skip unknown field:
-				continue;
-			}
-
-			$field = $custom_fields[ $field_name ];
-
-			if( $field['type'] == 'separator' )
-			{	// Repeat fields and fields under separator field until next separtor:
-				if( ! empty( $field['format'] )  &&
-				    ( strpos( $field_options, 'repeat' ) !== false || // if field is requested with name like 'separator+repeat' or 'separator+repeat+fields'
-				      empty( $params['fields'] ) // also get all repeat fields when fields list is full
-				    )
-				  )
-				{	// Try to find the repeat fields:
-					$separator_format = explode( ':', $field['format'] );
-					if( $separator_format[0] != 'repeat' || empty( $separator_format[1] ) )
-					{	// Skip wrong separator format:
-						continue;
-					}
-					$repeat_fields = explode( ',', $separator_format[1] );
-				}
-				else
-				{	// The separator has no repeat fields:
-					$repeat_fields = array();
-				}
-
-				if( ! empty( $params['fields'] ) &&
-				    strpos( $field_options, 'fields' ) !== false ) // if field is requested with name like 'separator+fields' or 'separator+repeat+fields')
-				{	// Try to find fields under separator only when we request a specific fields list,
-					// in full list the fields under separator are displayed automatically, se we should not get them to avoid duplicated view:
-					$is_under_separator_field = false;
-					foreach( $custom_fields as $ic_field_name => $ic_field )
-					{
-						if( $ic_field_name == $field_name )
-						{	// We found the current separtor, set flag to use next fields:
-							$is_under_separator_field = true;
-							continue;
-						}
-						if( $is_under_separator_field )
-						{	// This is a field under current separator:
-							if( $ic_field['type'] == 'separator' )
-							{	// Stop here because it is another separator:
-								break;
-							}
-							$repeat_fields[] = $ic_field_name;
-						}
-					}
-				}
-
-				foreach( $repeat_fields as $repeat_field_name )
-				{
-					$repeat_field_name = trim( $repeat_field_name );
-					if( ! isset( $custom_fields[ $repeat_field_name ] ) ||
-					    ! $custom_fields[ $repeat_field_name ]['public'] )
-					{	// Skip unknown or not public field:
-						continue;
-					}
-					// Get HTML code of the repeated custom field:
-					$html .= $this->get_custom_field_template( $repeat_field_name, $params );
-				}
-			}
-		}
-
-		if( $html == '' )
-		{	// No fields to display:
-			return '';
-		}
-
-		// Print out if at least one field is filled for this item:
-		return $params['before'].$html.$params['after'];
-	}
-
-
-	/**
-	 * Get HTML code of the requested field
-	 *
-	 * @param string Custom field name
-	 * @param array Additional parameters
-	 */
-	function get_custom_field_template( $field_name, $params = array() )
-	{
-		$custom_fields = $this->get_custom_fields_defs();
-
-		$mask_vars = array( '$title$', '$description_icon$', '$header_cell_class$', '$data_cell_class$', '$value$' );
-
-		$field_name = trim( $field_name );
-		if( ! isset( $custom_fields[ $field_name ] ) )
-		{	// Wrong field:
-			$mask_values = array( $field_name, '', '', '', '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>' );
-			return str_replace( $mask_vars, $mask_values, $params['field_format'] );
-		}
-
-		$field = $custom_fields[ $field_name ];
-
-		// Use field format depending on type:
-		$field_type = ( $field['type'] == 'double' ? 'numeric' : ( $field['type'] == 'varchar' ? 'string' : $field['type'] ) );
-		$field_format = isset( $params['field_'.$field_type.'_format'] ) ? $params['field_'.$field_type.'_format'] : $params['field_format'];
-
-		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
-		$mask_values = array( render_custom_field( $field['label'], $params ) );
-
-		if( empty( $field['description'] ) )
-		{	// The custom field has no description:
-			$mask_values[] = '';
-		}
-		else
-		{	// Display a description in tooltip of the help icon:
-			$mask_values[] = ' '.get_icon( 'help', 'imgtag', array(
-					'data-toggle' => 'tooltip',
-					'title'       => nl2br( $field['description'] ),
-					'class'       => $params['field_description_icon_class'],
-				) ).' ';
-		}
-
-		// Alignment classes for header and data cells:
-		$mask_values[] = $field['header_class'];
-		$mask_values[] = $field['cell_class'];
-
-		if( ! $field['public'] )
-		{	// Not public field:
-			if( ! empty( $params['fields'] ) )
-			{	// Display an error message only when fields are called by names:
-				$mask_values[] = '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field['name'] ).'</span>';
-				return str_replace( $mask_vars, $mask_values, $field_format );
-				$fields_exist = true;
-			}
-			return '';
-		}
-
-		$custom_field_value = $this->get_custom_field_formatted( $field['name'], $params );
-		if( ! empty( $custom_field_value ) ||
-				$field['type'] == 'separator' ||
-				( ( $field['type'] == 'double' || $field['type'] == 'computed' ) && $custom_field_value == '0' ) )
-		{	// Display only the filled field AND also numeric field with '0' value:
-			$mask_values[] = $custom_field_value;
-			return str_replace( $mask_vars, $mask_values, $field_format );
-		}
+		return $widget_html;
 	}
 
 
@@ -3298,7 +3261,7 @@ class Item extends ItemLight
 		}
 
 		if( $params['render_custom_fields'] )
-		{	// Render Custom Fields [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field]:
+		{	// Render single value of Custom Fields [field:first_string_field]:
 			$content = $this->render_custom_fields( $content, $params );
 		}
 
@@ -3900,12 +3863,12 @@ class Item extends ItemLight
 					$wrong_item_info = '<code>'.$item_ID_slug.'</code>';
 				}
 				// Replace inline content block tag with error message about wrong referenced item:
-				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>', $content );
+				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>', $content );
 				continue;
 			}
 			elseif( get_status_permvalue( $this->get( 'status' ) ) > get_status_permvalue( $content_Item->get( 'status' ) ) )
 			{	// Deny to display content block Item with lower status than parent Item:
-				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The visibility level of the content block "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('The visibility level of the content block "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
 				continue;
 			}
 			elseif( $content_Item->get( 'creator_user_ID' ) != $this->get( 'creator_user_ID' ) &&
@@ -3918,7 +3881,7 @@ class Item extends ItemLight
 				//  - Content block Item has same owner as owner of parent Item's collection,
 				//  - Content block Item is in same collection as parent Item,
 				//  - Content block Item from collection for shared content blocks:
-				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
 				continue;
 			}
 
@@ -3929,7 +3892,7 @@ class Item extends ItemLight
 
 			if( in_array( $content_Item->ID, $content_block_items ) )
 			{	// Replace inline content block tag with error message about recursion:
-				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('Content inclusion loop detected. Not including "%s".'), '#'.$content_Item->ID.' '.$content_Item->get( 'title' ) ).'</p>', $content );
+				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('Content inclusion loop detected. Not including "%s".'), '#'.$content_Item->ID.' '.$content_Item->get( 'title' ) ).'</p>', $content );
 				continue;
 			}
 
@@ -4152,9 +4115,9 @@ class Item extends ItemLight
 	 */
 	function get_titletag()
 	{
-		if( empty($this->titletag) )
+		if( empty( $this->titletag ) )
 		{
-			return $this->title;
+			return $this->get( 'title' );
 		}
 
 		return $this->titletag;
@@ -4512,7 +4475,7 @@ class Item extends ItemLight
 					'image_link_to'    => $link_to,
 					'image_link_title' => $link_title,
 					'image_link_rel'   => $link_rel,
-					'image_alt'        => $this->title,
+					'image_alt'        => $this->get( 'title' ),
 				) ) );
 	}
 
@@ -5109,9 +5072,20 @@ class Item extends ItemLight
 	 *
 	 * @return string
 	 */
-	function get_feedback_url( $popup = false, $glue = '&amp;' )
+	function get_feedback_url( $popup = false, $glue = '&amp;', $blog_ID = NULL )
 	{
-		$url = $this->get_single_url( 'auto', '', $glue );
+		if( $blog_ID !== NULL &&
+				( $BlogCache = & get_BlogCache() ) &&
+				( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) ) )
+		{
+			$blog_url = $Blog->get( 'url' );
+		}
+		else
+		{
+			$blog_url = '';
+		}
+
+		$url = $this->get_single_url( 'auto', $blog_url, $glue, $blog_ID );
 		if( $popup )
 		{
 			$url = url_add_param( $url, 'disp=feedback-popup', $glue );
@@ -5139,7 +5113,7 @@ class Item extends ItemLight
 	 */
 	function get_feedback_link( $params )
 	{
-		global $ReqURL;
+		global $ReqURL, $Blog, $Settings;
 
 		if( ! $this->can_see_comments() )
 		{	// Comments disabled
@@ -5147,23 +5121,37 @@ class Item extends ItemLight
 		}
 
 		$params = array_merge( array(
-									'type' => 'feedbacks',		// Kind of feedbacks to count
-									'status' => '#',	// Statuses of feedbacks to count, can be a string for one status or array for several. '#' - active front-office comment statuses, '#moderation#' - "require moderation" statuses.
-									'link_before' => '',
-									'link_after' => '',
-									'link_text_zero' => '#',
-									'link_text_one' => '#',
-									'link_text_more' => '#',
-									'link_anchor_zero' => '#',
-									'link_anchor_one' => '#',
-									'link_anchor_more' => '#',
-									'link_title' => '#',
-									'link_class' => '',
-									'show_in_single_mode' => false,		// Do we want to show this link even if we are viewing the current post in single view mode
-									'url' => '#',
-								), $params );
+				'type' => 'feedbacks',		// Kind of feedbacks to count
+				'status' => '#',	// Statuses of feedbacks to count, can be a string for one status or array for several. '#' - active front-office comment statuses, '#moderation#' - "require moderation" statuses.
+				'link_before' => '',
+				'link_after' => '',
+				'link_text_zero' => '#',
+				'link_text_one' => '#',
+				'link_text_more' => '#',
+				'link_anchor_zero' => '#',
+				'link_anchor_one' => '#',
+				'link_anchor_more' => '#',
+				'link_title' => '#',
+				'link_class' => '',
+				'show_in_single_mode' => false,		// Do we want to show this link even if we are viewing the current post in single view mode
+				'url' => '#',
+				'stay_in_same_collection' => 'auto', // 'auto' - follow 'allow_crosspost_urls' if we are cross posted, true - always stay in same collection if we are cross posted, false - always go to permalink if we are cross posted
+			), $params );
 
-		if( $params['show_in_single_mode'] == false && is_same_url( $this->get_permanent_url('','','&'), $ReqURL ) )
+		if( isset( $Blog ) &&
+		    ( $params['stay_in_same_collection'] === true || // always stay in current collection
+		      ( $params['stay_in_same_collection'] == 'auto' && ( $item_Blog = & $this->get_Blog() ) && $item_Blog->get_setting( 'allow_crosspost_urls' ) ) // follow 'allow_crosspost_urls' to stay in current collection
+		    ) )
+		{	// Use current collection if this Item is cross posted and has at least one category from current collection:
+			$current_blog_ID = $Blog->ID;
+			$current_blog_URL = $Blog->get( 'url' );
+		}
+		else
+		{	// Use main collection of this Item:
+			$current_blog_ID = NULL;
+			$current_blog_URL = '';
+		}
+		if( $params['show_in_single_mode'] == false && is_same_url( $this->get_permanent_url( '', $current_blog_URL, '&', array(), $current_blog_ID ), $ReqURL ) )
 		{	// We are viewing the single page for this pos, which (typically) )contains comments, so we dpn't want to display this link
 			return;
 		}
@@ -5234,7 +5222,7 @@ class Item extends ItemLight
 
 		if( $params['url'] == '#' )
 		{ // We want a link to single post:
-			$params['url'] = $this->get_feedback_url();
+			$params['url'] = $this->get_feedback_url( false, '&amp;', $current_blog_ID );
 		}
 
 		// Anchor position
@@ -5255,8 +5243,8 @@ class Item extends ItemLight
 
 		if( !empty( $params['url'] ) )
 		{
-			$r .= '<a href="'.$params['url'].$anchor.'" class="'.$params['link_class'].'" ';	// Position on feedback
-			$r .= 'title="'.$params['link_title'].'"';
+			$r .= '<a href="'.$params['url'].$anchor.'" class="'.format_to_output( $params['link_class'], 'htmlattr' ).'" ';	// Position on feedback
+			$r .= 'title="'.format_to_output( $params['link_title'], 'htmlattr' ).'"';
 			$r .= '>';
 			$r .= $link_text;
 			$r .= '</a>';
@@ -5933,8 +5921,6 @@ class Item extends ItemLight
 	function edit_link( $params = array() )
 	{
 		echo $this->get_edit_link( $params );
-
-		echo_item_merge_js();
 	}
 
 
@@ -6007,6 +5993,8 @@ class Item extends ItemLight
 	function merge_link( $params = array() )
 	{
 		echo $this->get_merge_link( $params );
+
+		echo_item_merge_js();
 	}
 
 
@@ -6938,7 +6926,17 @@ class Item extends ItemLight
 				return $this->set_param( 'datedeadline', 'date', $parvalue, true );
 
 			case 'order':
-				return $this->set_param( 'order', 'number', $parvalue, true );
+				// Field 'post_order' is deprecated,
+				// but we can set it per each category:
+				if( is_array( $this->extra_cat_IDs ) )
+				{	// Update order per each item category:
+					$this->orders = array();
+					foreach( $this->extra_cat_IDs as $extra_cat_ID )
+					{
+						$this->orders[ $extra_cat_ID ] = $parvalue;
+					}
+				}
+				return false;
 
 			case 'renderers': // deprecated
 				return $this->set_renderers( $parvalue );
@@ -7058,7 +7056,8 @@ class Item extends ItemLight
 		$post_renderers = array('default'),
 		$item_type_name_or_ID = '#', // Use 'Page', 'Post' and etc. OR '#' to use default post type OR integer to use post type by ID
 		$item_st_ID = NULL,
-		$post_order = NULL )
+		$postcat_order = NULL,
+		$display_restrict_status_messages = true )
 	{
 		global $DB, $query, $UserCache;
 		global $default_locale;
@@ -7140,10 +7139,10 @@ class Item extends ItemLight
 		$this->set_renderers( $post_renderers );
 		$this->set( 'ityp_ID', $item_typ_ID );
 		$this->set( 'pst_ID', $item_st_ID );
-		$this->set( 'order', $post_order );
+		$this->set( 'order', $postcat_order );
 
 		// INSERT INTO DB:
-		$this->dbinsert();
+		$this->dbinsert( $display_restrict_status_messages );
 
 		// Update post_datestart using FROM_UNIXTIME to prevent invalid datetime values during DST spring forward - fall back
 		$DB->query( 'UPDATE T_items__item SET post_datestart = FROM_UNIXTIME('.strtotime( $post_timestamp ).') WHERE post_ID = '.$DB->quote( $this->ID ) );
@@ -7155,9 +7154,10 @@ class Item extends ItemLight
 	/**
 	 * Insert object into DB based on previously recorded changes
 	 *
+	 * @param boolean Display restrict status messages
 	 * @return boolean true on success
 	 */
-	function dbinsert()
+	function dbinsert( $display_restrict_status_messages = true )
 	{
 		global $DB, $current_User, $Plugins;
 
@@ -7166,7 +7166,7 @@ class Item extends ItemLight
 		if( isset( $this->previous_status ) )
 		{	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
 			// (ONLY if current request is updating item status)
-			$this->restrict_status( true );
+			$this->restrict_status( true, $display_restrict_status_messages );
 		}
 
 		if( $this->status != 'draft' )
@@ -7244,6 +7244,9 @@ class Item extends ItemLight
 
 				$this->ItemSettings->dbupdate();
 			}
+
+			// Update custom fields:
+			$this->update_custom_fields();
 
 			if( $result )
 			{
@@ -7421,15 +7424,6 @@ class Item extends ItemLight
 		// Check whether any db change has been executed
 		$db_changed = false;
 
-		if( ! empty( $dbchanges['post_ityp_ID'] ) )
-		{	// If item type has been changed to another,
-			// Clear all custom fields values of previous item type:
-			// NOTE: Call this before item settings updating in order to don't remove values of new selected item type:
-			$DB->query( 'DELETE FROM T_items__item_settings
-				WHERE iset_item_ID = '.$this->ID.'
-					AND iset_name LIKE "custom:%"' );
-		}
-
 		// save Item settings
 		if( isset( $this->ItemSettings ) )
 		{
@@ -7442,6 +7436,9 @@ class Item extends ItemLight
 				$this->set_param( $this->datemodified_field, 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
 			}
 		}
+
+		// Update custom fields:
+		$db_changed = $this->update_custom_fields() || $db_changed;
 
 		if( $update_child_custom_fields )
 		{	// Update custom fields of all child posts of this post:
@@ -7477,7 +7474,7 @@ class Item extends ItemLight
 						// Stop here to avoid infinite loop:
 						continue;
 					}
-					$child_custom_fields = $child_Item->get_type_custom_fields();
+					$child_custom_fields = $child_Item->get_custom_fields_defs();
 					if( ! empty( $child_custom_fields ) )
 					{	// If child post has at least one custom field:
 						$update_child_custom_field = false;
@@ -7485,9 +7482,11 @@ class Item extends ItemLight
 						{
 							if( isset( $child_custom_fields[ $custom_field_code ] ) &&
 							    $child_custom_fields[ $custom_field_code ]['type'] == $custom_field['type'] &&
+							    $child_custom_fields[ $custom_field_code ]['parent_sync'] &&
 							    $custom_field['type'] != 'computed' ) // NOTE: we must NOT copy the computed values from parent because child custom field may has a different formula!
 							{	// If child post has a custom field with same code and type:
-								$child_Item->set_setting( 'custom:'.$custom_field['name'], $this->get_custom_field_value( $custom_field_code, $custom_field['type'] ) );
+								$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
+								$child_Item->set_custom_field( $custom_field['name'], $this->get_custom_field_value( $custom_field_code, $custom_field['type'] ), 'value', $custom_field_make_null );
 								// Mark to know custom fields of the child post must be updated from parent:
 								$update_child_custom_field = true;
 							}
@@ -7497,7 +7496,7 @@ class Item extends ItemLight
 						{	// Update computed custom fields after when all fields we updated above:
 							if( $child_custom_field['type'] == 'computed' )
 							{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
-								$child_Item->set_setting( 'custom:'.$child_custom_field['name'], $child_Item->get_custom_field_computed( $child_custom_field['name'] ), true );
+								$child_Item->set_custom_field( $child_custom_field['name'], $child_Item->get_custom_field_computed( $child_custom_field['name'] ) );
 								// Mark to know custom fields of the child post must be updated from parent:
 								$update_child_custom_field = true;
 							}
@@ -7718,6 +7717,8 @@ class Item extends ItemLight
 	 */
 	function update_slugs( $urltitle = NULL )
 	{
+		$SlugCache = & get_SlugCache();
+
 		if( ! isset( $urltitle ) )
 		{
 			$urltitle = $this->urltitle;
@@ -7738,9 +7739,17 @@ class Item extends ItemLight
 			$new_Slug->set( 'type', 'item' );
 			$new_Slug->set( 'itm_ID', $this->ID );
 
+			if( ( $urltitle != $new_Slug->get( 'title' ) ) &&
+			    ( strtolower( $urltitle ) == $new_Slug->get( 'title' ) ) &&
+			    ( $prev_Slug = $SlugCache->get_by_name( $urltitle, false, false ) ) )
+			{	// Allow to use uppercase chars in slug title only if this is a single difference between requested slug title and result of urltitle_validate(),
+				// and only if such slug title alredy exists in DB:
+				// (such case possible after item merging when all sulgs were merged and also tiny slugs which have a format like aC8)
+				$new_Slug->set( 'title', $urltitle );
+			}
+
 			// Check if this slug was already used by this item or not.
 			// We need this check, because urltitle_validate() function will modify an existing urltitle only if it belongs to a different object
-			$SlugCache = & get_SlugCache();
 			$prev_Slug = $SlugCache->get_by_name( $new_Slug->get('title'), false, false );
 			if( $prev_Slug )
 			{ // A slug with this title already exists. It must belong to the same item!
@@ -7982,7 +7991,7 @@ class Item extends ItemLight
 	 */
 	function insert_update_extracats( $mode )
 	{
-		global $DB, $Messages;
+		global $DB, $Messages, $Settings, $Blog;
 
 		if( ! is_null( $this->extra_cat_IDs ) )
 		{ // Okay the extra cats are defined:
@@ -7995,21 +8004,32 @@ class Item extends ItemLight
 				$Messages->add( T_('Could not set the selected categories!'), 'error' );
 				return false;
 			}
+
+			// Load item orders per categories before delete them from DB:
+			$this->load_orders();
+
 			if( $mode == 'update' )
 			{
 				// delete previous extracats:
-				$DB->query( 'DELETE FROM T_postcats WHERE postcat_post_ID = '.$this->ID, 'delete previous extracats' );
+				$DB->query( 'DELETE FROM T_postcats WHERE postcat_post_ID = '.$this->ID, 'Delete previous extracats of Item #'.$this->ID );
 			}
 
+			// Allow to use field "postcat_order" only since 12972 DB version:
+			$postcat_order_field = ( $Settings->get( 'db_version' ) >= 12972 ? ', postcat_order' : '' );
+
 			// insert new extracats:
-			$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
+			$query = 'INSERT INTO T_postcats ( postcat_post_ID, postcat_cat_ID'.$postcat_order_field.' ) VALUES ';
 			foreach( $this->extra_cat_IDs as $extra_cat_ID )
 			{
-				//echo "extracat: $extracat_ID <br />";
-				$query .= "( $this->ID, $extra_cat_ID ),";
+				$query .= '( '.$this->ID.', '.$extra_cat_ID;
+				if( ! empty( $postcat_order_field ) )
+				{	// Insert item order per category only when this field exists in DB:
+					$query .= ', '.$DB->quote( $this->get_order( $extra_cat_ID ) );
+				}
+				$query .= ' ),';
 			}
 			$query = substr( $query, 0, strlen( $query ) - 1 );
-			$DB->query( $query, 'insert new extracats' );
+			$DB->query( $query, 'Insert new extracats for Item #'.$this->ID );
 
 			$DB->commit();
 		}
@@ -9050,7 +9070,7 @@ class Item extends ItemLight
 
 			case 'title':
 			case 'item_title':
-				return $this->title;
+				return $this->get( 'title' );
 
 			case 'excerpt':
 				return $this->get_excerpt();
@@ -9126,9 +9146,86 @@ class Item extends ItemLight
 
 			case 'notifications_flags':
 				return empty( $this->notifications_flags ) ? array() : explode( ',', $this->notifications_flags );
+
+			case 'order':
+				// Get item order in main category:
+				return $this->get_order();
 		}
 
 		return parent::get( $parname );
+	}
+
+
+	/**
+	 * Load item orders per categories
+	 */
+	function load_orders()
+	{
+		if( ! isset( $this->orders ) && $this->ID > 0 )
+		{	// Initialize item orders in all assigned categories:
+			global $DB;
+			$SQL = new SQL( 'Get all orders per categories of Item #'.$this->ID );
+			$SQL->SELECT( 'postcat_cat_ID, postcat_order' );
+			$SQL->FROM( 'T_postcats' );
+			$SQL->WHERE( 'postcat_post_ID = '.$this->ID );
+			$this->orders = $DB->get_assoc( $SQL );
+		}
+	}
+
+
+	/**
+	 * Get item order per category
+	 *
+	 * @param integer Category ID, NULL - for main category
+	 * @return double|NULL Order or NULL if an order is not defined for requested category
+	 */
+	function get_order( $cat_ID = NULL )
+	{
+		$this->load_orders();
+
+		if( $cat_ID === NULL )
+		{	// Use main category:
+			$cat_ID = $this->get( 'main_cat_ID' );
+		}
+
+		return isset( $this->orders[ $cat_ID ] ) ? $this->orders[ $cat_ID ] : NULL;
+	}
+
+
+	/**
+	 * Update item order per category
+	 *
+	 * @param double New order value
+	 * @param integer Category ID, NULL - for main category
+	 * @return boolean
+	 */
+	function update_order( $order, $cat_ID = NULL )
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// Item must be created:
+			return false;
+		}
+
+		if( $cat_ID === NULL )
+		{	// Use main category:
+			$cat_ID = $this->get( 'main_cat_ID' );
+		}
+
+		// Change order to correct value:
+		$order = ( $order === '' ? NULL : floatval( $order ) );
+
+		// Insert/Update order per category:
+		$r = $DB->query( 'REPLACE INTO T_postcats ( postcat_post_ID, postcat_cat_ID, postcat_order )
+			VALUES ( '.$this->ID.', '.intval( $cat_ID ).', '.$DB->quote( $order ).' ) ' );
+
+		if( $r )
+		{	// Update last touched date:
+			$this->update_last_touched_date();
+		}
+
+		return $r;
 	}
 
 
@@ -10523,8 +10620,9 @@ class Item extends ItemLight
 	 * Restrict Item status by Collection access restriction AND by CURRENT USER write perm
 	 *
 	 * @param boolean TRUE to update status
+	 * @param boolean TRUE to display messages
 	 */
-	function restrict_status( $update_status = false )
+	function restrict_status( $update_status = false, $display_messages = true )
 	{
 		$item_Blog = & $this->get_Blog();
 
@@ -10543,7 +10641,7 @@ class Item extends ItemLight
 			$this->status = $restricted_status;
 		}
 
-		if( $current_status != $this->get( 'status' ) )
+		if( $current_status != $this->get( 'status' ) && $display_messages )
 		{	// If current item status cannot be used for item collection
 			global $Messages;
 

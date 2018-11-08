@@ -116,8 +116,10 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 					'after' => ( in_array( $disp, array( 'single', 'page' ) ) ? '</h1>' : '</h2>' ).'</div>',
 				),
 				// Item Visibility Badge widge template
-				'widget_item_visibility_badge_display'  => ( ! $Item->is_intro() && $Item->status != 'published' ),
-				'widget_item_visibility_badge_template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+				'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
+				'widget_item_visibility_badge_params'  => array(
+						'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+					),
 			) );
 			// ----------------------------- END OF "Item in List" CONTAINER -----------------------------
 		}
@@ -144,15 +146,19 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 						'after' => ( in_array( $disp, array( 'single', 'page' ) ) ? '</h1>' : '</h2>' ).'</div>',
 					),
 				// Item Previous Next widget
-				'widget_item_next_previous_block_start' => '<nav><ul class="pager">',
-					'widget_item_next_previous_prev_start'  => '<li class="previous">',
-					'widget_item_next_previous_prev_end'    => '</li>',
-					'widget_item_next_previous_next_start'  => '<li class="next">',
-					'widget_item_next_previous_next_end'    => '</li>',
-				'widget_item_next_previous_block_end'   => '</ul></nav>',
+				'widget_item_next_previous_params' => array(
+						'block_start' => '<nav><ul class="pager">',
+						'block_end' => '</ul></nav>',
+						'prev_start' => '<li class="previous">',
+						'prev_end' => '</li>',
+						'next_start' => '<li class="next">',
+						'next_end' => '</li>',
+					),
 				// Item Visibility Badge widge template
-				'widget_item_visibility_badge_display'  => ( ! $Item->is_intro() && $Item->status != 'published' ),
-				'widget_item_visibility_badge_template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+				'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
+				'widget_item_visibility_badge_params'  => array(
+						'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+					),
 			) );
 			// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
 		}

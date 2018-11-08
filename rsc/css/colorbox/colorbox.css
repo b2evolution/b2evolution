@@ -46,7 +46,6 @@
 		#cboxClose{position:absolute; bottom:0; right:0; background:url(../../icons/icons_sprite.png) no-repeat -24px -272px; width:23px; height:23px; text-indent:-9999px;}
 		#cboxClose.hover{background-position:-24px -296px;}
 		#cboxVoting{position:relative; bottom:25px; min-height:15px; width:100%; padding:5px 0 10px; text-align:center; white-space:normal; -khtml-border-radius:6px; border-radius:6px;}
-		#cboxVoting{bottom:22px \0;}/* IE9 */
 		#cboxVoting a{margin:0 10px 0 0; vertical-align:middle; display: inline-block;}
 		#cboxVoting a span{margin:0; vertical-align:middle;}
 		#cboxVoting span.icon{vertical-align:middle;}

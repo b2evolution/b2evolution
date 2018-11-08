@@ -458,8 +458,14 @@ div.results {
 }
 
 // Styles for edit-screen instructions
-.evo_instruction {
-	margin: 20px 10px;
+div.action_messages.evo_instruction {
+	margin: 10px 0 0;
+	ul, li {
+		list-style: initial;
+	}
+	ul {
+		padding-left: 20px;
+	}
 }
 
 // Styles for in-skin editing
@@ -484,41 +490,39 @@ table.catselect {
 	border-spacing:0;
 	width:100%;
 	border: 1px solid #bbb;
-}
-table.catselect th {
-	padding: .3ex 1ex;
-	background-color: #ddd;
-	border-bottom: 1px solid #bbb;
-}
-table.catselect td {
-	padding: .2ex 1ex;
-}
-table.catselect tr.group td {
-	border-top: 1px solid #bbb;
-	border-bottom: 1px solid #bbb;
-	background-color: #ccc;
-	font-weight: bold;
-}
-table.catselect tr.odd,
-table.catselect tr.odd input {
-	background-color: #eee;
-}
-table.catselect tr.even,
-table.catselect tr.even input {
-	background-color:#ddd;
-}
-table.catselect tr:hover,
-table.catselect tr:hover input {
-	background-color:#ccc;
-}
-table.catselect th.selector,
-table.catselect td.selector {
-	width: 1%;
-	text-align:center;
-	border-right: 1px solid #bbb;
-}
-table.catselect #new_category_name {
-	background-color:white;
+	th {
+		padding: .3ex 1ex;
+		background-color: #ddd;
+		border-bottom: 1px solid #bbb;
+	}
+	td {
+		padding: .2ex 1ex;
+	}
+	th, td {
+		border-right: 1px solid #bbb;
+		&:last-child {
+			border-right: none;
+		}
+	}
+	tr.group td {
+		border-top: 1px solid #bbb;
+		border-bottom: 1px solid #bbb;
+		background-color: #ccc;
+		font-weight: bold;
+	}
+	tr.odd {
+		background-color: #eee;
+	}
+	tr.even {
+		background-color:#ddd;
+	}
+	tr:hover,
+	tr:hover input {
+		background-color:#ccc;
+	}
+	.catsel_order input {
+		width: 40px;
+	}
 }
 
 // Raty icons (stars)
@@ -747,15 +751,6 @@ div.results span[class*=status_] span {
 	border-radius: 12px 12px 12px 12px;
 	float: left;
 	width: 80px;
-}
-
-@fix-IE8-media-screen: ~"\0screen";
-@media @fix-IE8-media-screen {/* IE8 */
-	#styled_content_block span[class*=status_] span,
-	.evo_content_block span[class*=status_] span {
-		top: -15px;
-		left: -2px;
-	}
 }
 
 .search_title {

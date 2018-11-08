@@ -217,14 +217,6 @@ span.icon.voted {
 }
 a.rollover_sprite:hover span.icon {
   visibility: hidden;
-  visibility: visible\0/;
-  /* IE8 */
-}
-@media screen and (min-width: 0\0) {
-  /* IE9-10 */
-  a.rollover_sprite:hover span.icon {
-    visibility: visible;
-  }
 }
 a.rollover_sprite:hover span.icon:before {
   visibility: visible !important;
@@ -1017,6 +1009,9 @@ div#publish_buttons {
   box-shadow: 1px 10px 35px rgba(75, 75, 75, 0.75);
   z-index: 99999;
 }
+tbody.fieldset_wrapper.folded + tbody[id^=cat_sel_] {
+  display: none;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.
@@ -1806,6 +1801,13 @@ img.avatar_above_login {
 .shrinkwrap.left {
   text-align: left;
 }
+.col-narrow {
+  width: 1px;
+  white-space: nowrap;
+  text-align: center;
+  padding-left: 1px !important;
+  padding-right: 1px !important;
+}
 .block {
   margin: 1ex;
   white-space: nowrap;
@@ -2254,8 +2256,16 @@ tr.evo_highlight td {
     background-color: #FF6600;
   }
   to {
-    background-color: auto;
+    background-color: transparent;
   }
+}
+.evo_input_counter {
+  position: absolute;
+  color: #999;
+  font-size: 80%;
+}
+.evo_input_counter.label {
+  color: #FFF;
 }
 
 /**
@@ -3198,6 +3208,10 @@ div.container_menu_top div.widget_core_coll_search_form {
 div.container_menu_top input.search_field {
   width: 160px;
 }
+div.extended_search_form div[class^='col-'] {
+  padding-left: 3px;
+  padding-right: 3px;
+}
 .widget_core_user_register_quick #register_form {
   margin-top: 5px;
 }
@@ -3279,7 +3293,7 @@ div.results {
   margin-bottom: 4px;
 }
 .evo_instruction {
-  margin: 20px 10px 10px;
+  margin: 0 0 20px;
 }
 form.inskin {
   padding: 10px;
@@ -3313,6 +3327,17 @@ table.catselect thead tr th {
 table.catselect > thead:first-child > tr:first-child > th {
   border-top: 1px solid #bbb;
 }
+table.catselect th,
+table.catselect td {
+  border-right: 1px solid #bbb;
+}
+table.catselect th:last-child,
+table.catselect td:last-child {
+  border-right: none;
+}
+table.catselect.table > thead > tr > th {
+  border-color: #bbb;
+}
 table.catselect td {
   padding: .2ex 1ex;
   background: none;
@@ -3322,23 +3347,17 @@ table.catselect tr.group td {
   border-bottom: 1px solid #bbb;
   font-weight: bold;
 }
-table.catselect tr.odd,
-table.catselect tr.odd input {
+table.catselect tr.odd {
   background-color: #eee;
 }
 table.catselect tr.even,
 table.catselect tr.even input {
   background: none !important;
 }
-table.catselect th.selector,
 table.catselect td.selector {
   width: 1%;
   text-align: center;
-  border-right: 1px solid #bbb;
-}
-table.catselect #new_category_name {
-  background-color: white;
-  width: 92% !important;
+  vertical-align: middle;
 }
 table.catselect tbody tr.group.catselect_blog__current td {
   background: #31b0d5;
@@ -3346,6 +3365,14 @@ table.catselect tbody tr.group.catselect_blog__current td {
 }
 table.catselect .catsel_name label {
   font-weight: normal;
+}
+table.catselect .catsel_order input {
+  width: 40px;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+table.catselect input[type=text] {
+  height: 25px;
 }
 .raty_star_on,
 .raty_star_off,
@@ -3536,21 +3563,6 @@ div.results .status_meta span {
   border-radius: 12px 12px 12px 12px;
   float: left;
   width: 80px;
-}
-@media \0screen {
-  /* IE8 */
-  .evo_content_block span.status_published span,
-  .evo_content_block span.status_community span,
-  .evo_content_block span.status_protected span,
-  .evo_content_block span.status_review span,
-  .evo_content_block span.status_private span,
-  .evo_content_block span.status_draft span,
-  .evo_content_block span.status_deprecated span,
-  .evo_content_block span.status_redirected span,
-  .evo_content_block span.status_trash span {
-    top: -15px;
-    left: -2px;
-  }
 }
 .search_title {
   font-size: 125%;
@@ -4278,6 +4290,9 @@ a.btn.action_icon.hoverlink {
 .form-horizontal #itemform_custom_fields .panel-body .form-group:last-child {
   margin-bottom: 0;
 }
+.form-horizontal #itemform_custom_fields .help-inline label {
+  font-weight: normal;
+}
 .form-horizontal #itemform_categories .panel-body.extracats {
   padding: 0;
 }
@@ -4501,6 +4516,11 @@ body.modal-open div.token-input-dropdown-facebook {
 }
 .evo_widget.widget_core_item_tags form input[type=submit] {
   margin: 0;
+}
+.extended_search_form ul.token-input-list-facebook {
+  max-width: 100%;
+  padding-top: 5px;
+  padding-left: 12px;
 }
 div.results {
   margin-top: 0;

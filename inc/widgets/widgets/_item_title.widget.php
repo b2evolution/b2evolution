@@ -131,21 +131,53 @@ class item_title_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		$this->disp_params = array_merge( array(
-				'widget_item_title_params' => array(),
-				'widget_item_title_link_params' => array(),
-			), $this->disp_params );
+		$params = array_merge( array(
+				'widget_item_title_display' => true,
+				'widget_item_title_params'  => array(),
+			), $params );
 
-		echo $this->disp_params['block_start'];
-		$this->disp_title();
-		echo $this->disp_params['block_body_start'];
+		$widget_params = array_merge( array(
+				// Parameters for item title:
+				'before'    => '',
+				'after'     => '',
+				'link_type' => '#',
+				// Parameters for edit link:
+				'edit_link_display' => false,
+				'before_edit_link'  => '<div class="'.button_class( 'group' ).'">',
+				'after_edit_link'   => '</div>',
+				'edit_link_text'    => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
+				'edit_link_class'   => button_class( 'text' ),
+			), $params['widget_item_title_params'] );
 
-		$Item->title( $this->disp_params['widget_item_title_params'] );
+		if( $params['widget_item_title_display'] )
+		{
+			echo $this->disp_params['block_start'];
+			$this->disp_title();
+			echo $this->disp_params['block_body_start'];
 
-		echo $this->disp_params['block_body_end'];
-		echo $this->disp_params['block_end'];
+			$Item->title( array(
+				'before' => $widget_params['before'],
+				'after'  => $widget_params['after'],
+				'link_type' => $widget_params['link_type'],
+			) );
 
-		return true;
+			if( $widget_params['edit_link_display'] )
+			{
+				$Item->edit_link( array(
+					'before' => $widget_params['before_edit_link'],
+					'after'  => $widget_params['after_edit_link'],
+					'text'   => $widget_params['edit_link_text'],
+					'class'  => $widget_params['edit_link_class'],
+				) );
+			}
+
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
+
+			return true;
+		}
+
+		return false;
 	}
 }
 

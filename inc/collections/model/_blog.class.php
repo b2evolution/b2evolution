@@ -975,10 +975,14 @@ class Blog extends DataObject
 			{	// We have permission to edit advanced admin settings:
 				$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
 				if( $this->get_setting( 'in_skin_editing' ) )
-				{
+				{	// Only when in-skin editing in enabled
 					$this->set_setting( 'in_skin_editing_renderers', param( 'in_skin_editing_renderers', 'integer', 0 ) );
-					$this->set_setting( 'in_skin_editing_category', param( 'in_skin_editing_category', 'integer', 0 ) );
 				}
+			}
+			if( $this->get_setting( 'in_skin_editing' ) )
+			{	// Only when in-skin editing in enabled
+				$this->set_setting( 'in_skin_editing_category', param( 'in_skin_editing_category', 'integer', 0 ) );
+				$this->set_setting( 'in_skin_editing_category_order', param( 'in_skin_editing_category_order', 'integer', 0 ) );
 			}
 
 			$this->set_setting( 'post_navigation', param( 'post_navigation', 'string', NULL ) );
@@ -1241,6 +1245,7 @@ class Blog extends DataObject
 			$this->set_setting( 'canonical_homepage', param( 'canonical_homepage', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_homepage', param( 'relcanonical_homepage', 'integer', 0 ) );
 			$this->set_setting( 'canonical_item_urls', param( 'canonical_item_urls', 'integer', 0 ) );
+			$this->set_setting( 'allow_crosspost_urls', param( 'allow_crosspost_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_item_urls', param( 'relcanonical_item_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_archive_urls', param( 'canonical_archive_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_archive_urls', param( 'relcanonical_archive_urls', 'integer', 0 ) );
@@ -3536,6 +3541,9 @@ class Blog extends DataObject
 
 			$DB->commit();
 
+			// Create collection media directory:
+			$this->get_media_dir();
+
 			return true;
 		}
 
@@ -3607,7 +3615,7 @@ class Blog extends DataObject
 
 		// ADD DEFAULT WIDGETS:
 		load_funcs( 'widgets/_widgets.funcs.php' );
-		insert_basic_widgets( $this->ID, $this->get_skin_ids(), false, $kind );
+		insert_basic_widgets( $this->ID, 'normal', false, $kind );
 
 		$Messages->add_to_group( T_('Default widgets have been set-up for this collection.'), 'success', T_('New collection created:') );
 
@@ -4616,7 +4624,7 @@ class Blog extends DataObject
 	 * @param string Skin type: 'auto', 'normal', 'mobile', 'tablet'
 	 * @return integer skin ID
 	 */
-	function get_skin_ID( $skin_type = 'auto' )
+	function get_skin_ID( $skin_type = 'auto', $real_value = false )
 	{
 		switch( $skin_type )
 		{
@@ -4627,11 +4635,11 @@ class Blog extends DataObject
 				{
 					if( $Session->is_mobile_session() )
 					{
-						return $this->get( 'mobile_skin_ID' );
+						return $this->get( 'mobile_skin_ID', array( 'real_value' => $real_value ) );
 					}
 					if( $Session->is_tablet_session() )
 					{
-						return $this->get( 'tablet_skin_ID' );
+						return $this->get( 'tablet_skin_ID', array( 'real_value' => $real_value ) );
 					}
 				}
 				return $this->get( 'normal_skin_ID' );
@@ -4642,11 +4650,11 @@ class Blog extends DataObject
 
 			case 'mobile':
 				// Mobile skin
-				return $this->get( 'mobile_skin_ID' );
+				return $this->get( 'mobile_skin_ID', array( 'real_value' => $real_value ) );
 
 			case 'tablet':
 				// Tablet skin
-				return $this->get( 'tablet_skin_ID' );
+				return $this->get( 'tablet_skin_ID', array( 'real_value' => $real_value ) );
 		}
 
 		// Deny to request invalid skin types
@@ -4676,27 +4684,43 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get blog main containers
+	 * Get collection skin containers which correspond to the current session device or which correspond to the selected skin type
 	 *
+	 * @param string Skin type: 'auto', 'normal', 'mobile', 'tablet'
+	 * @return array
+	 */
+	function get_skin_containers( $skin_type = 'auto' )
+	{
+		$SkinCache = & get_SkinCache();
+		$coll_Skin = & $SkinCache->get_by_ID( $this->get_skin_ID( $skin_type, true ), false, false );
+
+		return $coll_Skin ? $coll_Skin->get_containers() : array();
+	}
+
+
+	/**
+	 * Get collection main containers
+	 *
+	 * @param string Skin type: 'normal', 'mobile', 'tablet'
 	 * @param boolean TRUE to initialize IDs of containers
 	 * @return array main container codes => array( name, order, id(optional) )
 	 */
-	function get_main_containers( $load_container_ids = false )
+	function get_main_containers( $skin_type = 'normal', $load_container_ids = false )
 	{
 		if( ! isset( $this->widget_containers ) )
-		{
-			load_funcs( 'skins/_skin.funcs.php' );
-			// Get all skins of the blog and get the merge of main containers from each skin:
-			$skin_ids = $this->get_skin_ids();
+		{	// Initialize 
+			$this->widget_containers = array();
+		}
 
-			// Get containers of all collection skins:
-			$this->widget_containers = get_skin_containers( $skin_ids );
+		if( ! isset( $this->widget_containers[ $skin_type ] ) )
+		{	// Get widget containers of requested collection skin:
+			$this->widget_containers[ $skin_type ] = $this->get_skin_containers( $skin_type );
 		}
 
 		if( $load_container_ids &&
 		    $this->ID > 0 &&
-		    empty( $this->widget_containers_ids_loaded ) &&
-		    ! empty( $this->widget_containers ) )
+		    empty( $this->widget_containers_ids_loaded[ $skin_type ] ) &&
+		    ! empty( $this->widget_containers[ $skin_type ] ) )
 		{	// Initialize IDs of containers:
 			global $DB;
 
@@ -4704,21 +4728,25 @@ class Blog extends DataObject
 			$SQL->SELECT( 'wico_code, wico_ID' );
 			$SQL->FROM( 'T_widget__container' );
 			$SQL->WHERE( 'wico_coll_ID = '.$this->ID );
-			$SQL->WHERE_and( 'wico_skin_type = "normal"' );
-			$SQL->WHERE_and( 'wico_code IN ( '.$DB->quote( array_keys( $this->widget_containers ) ).' )' );
+			$SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $skin_type ) );
+			$SQL->WHERE_and( 'wico_code IN ( '.$DB->quote( array_keys( $this->widget_containers[ $skin_type ] ) ).' )' );
 			$containers_data = $DB->get_assoc( $SQL );
 			foreach( $containers_data as $container_code => $container_ID )
 			{
-				if( isset( $this->widget_containers[ $container_code ] ) )
+				if( isset( $this->widget_containers[ $skin_type ][ $container_code ] ) )
 				{
-					$this->widget_containers[ $container_code ]['ID'] = $container_ID;
+					$this->widget_containers[ $skin_type ][ $container_code ]['ID'] = $container_ID;
 				}
 			}
 			// Set flag to don't load these data twice:
-			$this->widget_containers_ids_loaded = true;
+			if( ! isset( $this->widget_containers_ids_loaded ) )
+			{
+				$this->widget_containers_ids_loaded = array();
+			}
+			$this->widget_containers_ids_loaded[ $skin_type ] = true;
 		}
 
-		return $this->widget_containers;
+		return $this->widget_containers[ $skin_type ];
 	}
 
 
@@ -5251,19 +5279,27 @@ class Blog extends DataObject
 
 			$ChapterCache = & get_ChapterCache();
 			$selected_Chapter = $ChapterCache->get_by_ID( $cat_ID, false, false );
-			if( $selected_Chapter && $selected_Chapter->lock )
-			{ // This category is locked, don't allow to create new post with this cat
+			if( $selected_Chapter &&
+			    ( $selected_Chapter->get( 'lock' ) ||
+			      ( $cat_ItemType = & $selected_Chapter->get_ItemType() ) === false ) )
+			{	// Don't allow to create new post with this category if it is locked or no default item type for the category:
 				return '';
 			}
+
 			if( ! is_logged_in() || $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->ID ) )
 			{	// We have permission to add a post with at least one status:
 				if( $this->get_setting( 'in_skin_editing' ) && ! is_admin_page() )
 				{	// We have a mode 'In-skin editing' for the current Blog
 					// User must have a permission to publish a post in this blog
 					$cat_url_param = '';
-					if( $cat_ID > 0 )
+					if( $selected_Chapter )
 					{	// Link to create a Item with predefined category
-						$cat_url_param = '&amp;cat='.$cat_ID;
+						$cat_url_param = '&amp;cat='.$selected_Chapter->ID;
+						if( empty( $post_type_usage ) &&
+						    ( $cat_ItemType = & $selected_Chapter->get_ItemType() ) )
+						{	// Use predefined Item Type from selected category:
+							$cat_url_param .= '&amp;item_typ_ID='.$cat_ItemType->ID;
+						}
 					}
 					$url = url_add_param( $this->get( 'url' ), ( is_logged_in() ? 'disp=edit' : 'disp=anonpost' ).$cat_url_param );
 				}
@@ -6322,33 +6358,39 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get default new item type based on the collection's default category
+	 * Get default new item type based on the collection's default category or current working category
 	 *
-	 * @return mixed ItemType object, false if default item type is disabled
+	 * @return object|false ItemType object, false if default item type is disabled
 	 */
-	function get_default_new_ItemType()
+	function & get_default_new_ItemType()
 	{
 		global $cat;
 
+		// Get a working category:
 		$working_cat = $cat;
 		if( empty( $cat ) )
-		{
+		{	// Use default collection category when global category is not defined:
 			$working_cat = $this->get_setting( 'default_cat_ID' );
 		}
-		$default_new_ItemType = $this->get_setting( 'default_item_type_cat_'.$working_cat );
-		if( $default_new_ItemType == 'disabled' )
-		{
-			return false;
+
+		$ChapterCache = & get_ChapterCache();
+		$working_Chapter = & $ChapterCache->get_by_ID( $working_cat, false, false );
+
+		if( ! $working_Chapter ||
+		    ( ( $working_cat_ItemType = & $working_Chapter->get_ItemType() ) === false ) )
+		{	// The working category is not detected in DB or it has no default Item Type:
+			$r = false;
+			return $r;
 		}
-		elseif( empty( $default_new_ItemType ) )
-		{
-			return $this->get_default_ItemType();
+
+		if( $working_cat_ItemType === NULL )
+		{	// If the working category uses the same as collection default:
+			$coll_default_ItemType = $this->get_default_ItemType();
+			return $coll_default_ItemType;
 		}
-		else
-		{
-			$ItemTypeCache = & get_ItemTypeCache();
-			return $ItemTypeCache->get_by_ID( $default_new_ItemType, false, false );
-		}
+
+		// If the working category uses a custom Item Type:
+		return $working_cat_ItemType;
 	}
 
 
@@ -6389,6 +6431,15 @@ class Blog extends DataObject
 					);
 				break;
 
+			case 'manual':
+				$denominations = array(
+						'evobar_new'     => T_('Page'),
+						'inskin_new_btn' => T_('New page'),
+						'title_new'      => T_('New page'),
+						'title_updated'  => T_('Updated page'),
+					);
+				break;
+
 			default:
 				$denominations = array(
 						'evobar_new'     => T_('Post'),
@@ -6398,7 +6449,7 @@ class Blog extends DataObject
 					);
 		}
 
-		return $denominations[$position];
+		return isset( $denominations[ $position ] ) ? $denominations[ $position ] : '';
 	}
 }
 

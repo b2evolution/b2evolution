@@ -122,12 +122,16 @@ class item_visibility_badge_Widget extends ComponentWidget
 	function display( $params )
 	{
 		global $Item, $disp;
-		// '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+
 		$params = array_merge( array(
-				'widget_item_visibility_badge_display'  => true,
-				'widget_item_visibility_badge_template' => '<div class="evo_status evo_status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
-				'widget_item_visibility_badge_format'   => 'htmlbody'
+				'widget_item_visibility_badge_display' => true,
+				'widget_item_visibility_badge_params'  => array(),
 			), $params );
+
+		$widget_params = array_merge( array(
+				'template' => '<div class="evo_status evo_status__$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+				'format'   => 'htmlbody'
+			), $params['widget_item_visibility_badge_params'] );
 
 		$this->init_display( $params );
 
@@ -138,8 +142,8 @@ class item_visibility_badge_Widget extends ComponentWidget
 			echo $this->disp_params['block_body_start'];
 
 			$Item->format_status( array(
-					'template' => $params['widget_item_visibility_badge_template'],
-					'format'   => $params['widget_item_visibility_badge_format'],
+					'template' => $widget_params['template'],
+					'format'   => $widget_params['format'],
 				) );
 
 			echo $this->disp_params['block_body_end'];

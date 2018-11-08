@@ -116,6 +116,13 @@ img.avatar_above_login {
 .shrinkwrap.left {
 	text-align: left;
 }
+.col-narrow {
+	width: 1px;
+	white-space: nowrap;
+	text-align: center;
+	padding-left: 1px !important;
+	padding-right: 1px !important;
+}
 
 .block {
 	margin: 1ex;
@@ -638,6 +645,16 @@ div.evo_highlight, li.evo_highlight, tr.evo_highlight td {
 		background-color: #FF6600;
 	}
 	to {
-		background-color: auto;
+		background-color: transparent;
+	}
+}
+
+// Counter for max and recommended length of input/textarea elements:
+.evo_input_counter {
+	position: absolute;
+	color: #999;
+	font-size: 80%;
+	&.label {
+		color: #FFF;
 	}
 }

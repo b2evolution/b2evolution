@@ -596,6 +596,9 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 	// Get config of default widgets for the requested container:
 	$container_widgets = get_default_widgets_by_container( $new_container_code );
 
+	// Install new default widgets only for normal skin:
+	$skin_type = 'normal';
+
 	// Get container type:
 	$container_type = isset( $container_widgets['type'] ) ? $container_widgets['type'] : 'main';
 
@@ -617,7 +620,7 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 			foreach( $BlogCache->cache as $widget_Blog )
 			{
 				// Get all containers declared in the given blog's skins
-				$coll_containers = $widget_Blog->get_main_containers( true );
+				$coll_containers = $widget_Blog->get_main_containers( $skin_type, true );
 
 				// Get again config of default widgets for the requested container because several settings depend on collection type/kind:
 				$container_widgets = get_default_widgets_by_container( $new_container_code, $widget_Blog->get( 'type' ) );
@@ -653,11 +656,12 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 						}
 						// Insert new widget container into DB:
 						$new_container_fields = array(
-							'wico_code'    => $new_container_code,
-							'wico_name'    => $coll_container[0],
-							'wico_coll_ID' => $widget_Blog->ID,
-							'wico_order'   => $coll_container[1],
-							'wico_main'    => $container_type == 'sub' ? 0 : 1,
+							'wico_code'      => $new_container_code,
+							'wico_skin_type' => $skin_type,
+							'wico_name'      => $coll_container[0],
+							'wico_coll_ID'   => $widget_Blog->ID,
+							'wico_order'     => $coll_container[1],
+							'wico_main'      => $container_type == 'sub' ? 0 : 1,
 						);
 						if( $container_type == 'page' && isset( $container_widgets['item_ID'] ) )
 						{	// Page container has an additional field for Item:
@@ -668,7 +672,7 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 						// Update ID of new inserted widget container:
 						$coll_container['ID'] = $DB->insert_id;
 						// Also update ID in collection cache for next calls:
-						$widget_Blog->widget_containers[ $new_container_code ]['ID'] = $coll_container['ID'];
+						$widget_Blog->widget_containers[ $skin_type ][ $new_container_code ]['ID'] = $coll_container['ID'];
 					}
 					elseif( ! isset( $widget_orders_in_containers ) )
 					{	// For existing containers we should get all widget orders in order to avoid duplicate error on insert new widgets:
@@ -747,6 +751,7 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 				$shared_containers_SQL->SELECT( 'wico_code, wico_ID' );
 				$shared_containers_SQL->FROM( 'T_widget__container' );
 				$shared_containers_SQL->WHERE( 'wico_coll_ID IS NULL' );
+				$shared_containers_SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $skin_type ) );
 				$cache_installed_shared_containers = $DB->get_assoc( $shared_containers_SQL );
 				// Get max order of the shared widget containers:
 				$max_order_SQL = new SQL( 'Get max order of the shared widget containers' );
@@ -762,8 +767,8 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 			{	// Handle special array item with container data:
 				if( ! isset( $cache_installed_shared_containers[ $new_container_code ] ) )
 				{	// Insert new shared container:
-					$insert_result = $DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES '
-						.'( '.$DB->quote( $new_container_code ).', '.$DB->quote( $container_widgets['name'] ).', '.'NULL, '.( ++$cache_installed_shared_container_order ).', '.$DB->quote( $container_type == 'shared' ? 1 : 0 ).' )',
+					$insert_result = $DB->query( 'INSERT INTO T_widget__container( wico_code, wico_skin_type, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES '
+						.'( '.$DB->quote( $new_container_code ).', '.$DB->quote( $skin_type ).', '.$DB->quote( $container_widgets['name'] ).', '.'NULL, '.( ++$cache_installed_shared_container_order ).', '.$DB->quote( $container_type == 'shared' ? 1 : 0 ).' )',
 						'Insert default shared widget container' );
 					if( $insert_result && $DB->insert_id > 0 )
 					{
@@ -8448,9 +8453,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$SQL = new SQL( 'Get all short date formats"' );
 		$SQL->SELECT( 'loc_locale, loc_datefmt, loc_timefmt' );
 		$SQL->FROM( 'T_locales' );
-		$locales = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+		$db_locale_rows = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
 
-		foreach( $locales as $loc_data )
+		foreach( $db_locale_rows as $loc_data )
 		{
 			$loc_data_datefmt = $loc_data['loc_datefmt'];
 
@@ -10330,6 +10335,59 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12972, 'Move Order from Posts table to Categories-to-Posts relationships table...' ) )
+	{	// part of 6.10.3-stable
+		db_add_col( 'T_postcats', 'postcat_order', 'DOUBLE NULL' );
+		$DB->query( 'UPDATE T_postcats
+			INNER JOIN T_items__item ON post_ID = postcat_post_ID
+			  SET postcat_order = post_order' );
+		db_drop_col( 'T_items__item', 'post_order' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12975, 'Upgrade categories table...' ) )
+	{	// part of 6.10.4-stable
+		db_add_col( 'T_categories', 'cat_ityp_ID', 'INT UNSIGNED NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12978, 'Upgrade table item types...' ) )
+	{	// part of 6.10.4-stable
+		db_upgrade_cols( 'T_items__type', array(
+			'ADD' => array(
+				'ityp_evobar_link_text'  => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_perm_level',
+				'ityp_skin_btn_text'     => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_evobar_link_text',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12981, 'Upgrading post type custom fields table...' ) )
+	{	// part of 6.10.4-stable
+		db_add_col( 'T_items__type_custom_field', 'itcf_merge', 'TINYINT DEFAULT 0' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12984, 'Upgrading post type custom fields table...' ) )
+	{	// part of 6.10.4-stable
+		db_modify_col( 'T_items__type_custom_field', 'itcf_link', 'ENUM( "nolink", "linkto", "permalink", "zoom", "linkpermzoom", "permzoom", "linkperm", "fieldurl", "fieldurlblank" ) COLLATE ascii_general_ci NOT NULL default "nolink"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12987, 'Update collection setting...' ) )
+	{	// part of 6.10.4-stable
+		$setting_SQL = new SQL();
+		$setting_SQL->SELECT( 'set_value' );
+		$setting_SQL->FROM( 'T_settings' );
+		$setting_SQL->WHERE( 'set_name = "cross_post_nav_in_same_coll"' );
+		if( $DB->get_var( $setting_SQL ) === '0' )
+		{	// Move only not default value to the collection settings table:
+			$DB->query( 'INSERT INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+				SELECT blog_ID, "allow_crosspost_urls", 0 FROM T_blogs' );
+		}
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '
@@ -10637,7 +10695,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			'T_items__item_settings'       => array( 'iset_value' ),
 			'T_items__prerendering'        => array( 'itpr_content_prerendered' ),
 			'T_items__status'              => array( 'pst_name' ),
-			'T_items__type'                => array( 'ityp_name', 'ityp_description', 'ityp_instruction', 'ityp_comment_form_msg' ),
+			'T_items__type'                => array( 'ityp_name', 'ityp_description', 'ityp_instruction', 'ityp_comment_form_msg', 'ityp_evobar_link_text', 'ityp_skin_btn_text' ),
 			'T_items__type_custom_field'   => array( 'itcf_label', 'itcf_note' ),
 			'T_items__version'             => array( 'iver_title', 'iver_content' ),
 			'T_locales'                    => array( 'loc_name', 'loc_messages', 'loc_transliteration_map' ),
@@ -10722,18 +10780,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		install_new_default_widgets( 'item_list' );
 		install_new_default_widgets( 'item_in_list' );
 		install_new_default_widgets( 'item_single_header', 'item_visibility_badge,item_title,item_next_previous' );
-		install_new_default_widgets( 'item_single', 'item_title' );
-		upg_task_end();
-	}
-
-	if( upg_task_start( 13200, 'Upgrade table item types...' ) )
-	{	// part of 7.0.0-alpha
-		db_upgrade_cols( 'T_items__type', array(
-			'ADD' => array(
-				'ityp_evobar_link_text' => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_perm_level',
-				'ityp_skin_btn_text'    => 'VARCHAR(255) NULL DEFAULT NULL AFTER ityp_evobar_link_text',
-			),
-		) );
+		install_new_default_widgets( 'item_single', 'item_visibility_badge,item_title' );
 		upg_task_end();
 	}
 
@@ -10786,7 +10833,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13260, 'Installing new shared widgets/containers...' ) )
+	if( upg_task_start( 15260, 'Installing new shared widgets/containers...' ) )
 	{	// part of 7.0.0-alpha
 		// Initialize environment variable $Settings in order to work with collection objects:
 		upg_init_environment();
@@ -10815,7 +10862,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13270, 'Upgrading widget containers table...' ) )
+	if( upg_task_start( 15270, 'Upgrading widget containers table...' ) )
 	{	// part of 7.0.0-alpha
 		// Add new column for Page Widget Containers:
 		db_add_col( 'T_widget__container', 'wico_item_ID', 'INT(11) UNSIGNED NULL DEFAULT NULL' );
@@ -10830,11 +10877,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13280, 'Installing new page widgets/containers...' ) )
+	if( upg_task_start( 15280, 'Creating item custom field values table...' ) )
 	{	// part of 7.0.0-alpha
-		install_new_default_widgets( 'widget_page_section_1' );
-		install_new_default_widgets( 'widget_page_section_2' );
-		install_new_default_widgets( 'widget_page_section_3' );
+		db_create_table( 'T_items__item_custom_field', '
+			icfv_item_ID     INT UNSIGNED NOT NULL,
+			icfv_itcf_name   VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
+			icfv_value       VARCHAR( 10000 ) COLLATE utf8mb4_unicode_ci NULL,
+			icfv_parent_sync TINYINT(1) NOT NULL DEFAULT 1,
+			PRIMARY KEY      ( icfv_item_ID, icfv_itcf_name )' );
+		// Move custom field values from settings table to new created above:
+		$DB->query( 'INSERT INTO T_items__item_custom_field ( icfv_item_ID, icfv_itcf_name, icfv_value )
+			SELECT iset_item_ID, SUBSTRING( iset_name, 8 ), iset_value
+			  FROM T_items__item_settings
+			 WHERE iset_name LIKE "custom:%"' );
+		$DB->query( 'DELETE FROM T_items__item_settings
+			WHERE iset_name LIKE "custom:%"' );
 		upg_task_end();
 	}
 

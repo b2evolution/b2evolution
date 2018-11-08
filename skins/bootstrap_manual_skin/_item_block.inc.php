@@ -86,13 +86,6 @@ $params = array_merge( array(
 		$action_links = '<div class="'.button_class( 'group' ).'">'.$action_links.'</div>';
 	}
 
-	if( $Item->status != 'published' )
-	{
-		$Item->format_status( array(
-				'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
-			) );
-	}
-
 	if( ! in_array( $disp, array( 'single', 'page' ) ) )
 	{
 		$Item->title( array(
@@ -125,18 +118,23 @@ $params = array_merge( array(
 					'after' => '</h1>'.$action_links.'</div>',
 					'link_type' => $params['item_link_type'],
 				),
-			// Template params for "Item Link" widget
+			// Template params for "Item Visibility Badge" widget:
+			'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
+			'widget_item_visibility_badge_params'  => array(
+					'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+				),
+			// Template params for "Item Link" widget:
 			'widget_item_link_before'    => '<p class="evo_post_link">',
 			'widget_item_link_after'     => '</p>',
-			// Template params for "Item Tags" widget
+			// Template params for "Item Tags" widget:
 			'widget_item_tags_before'    => '<nav class="small post_tags text-muted">',
 			'widget_item_tags_after'     => '</nav>',
 			'widget_item_tags_separator' => ', ',
-			// Template params for "Small Print" widget
+			// Template params for "Small Print" widget:
 			'widget_item_small_print_before'         => '<p class="small text-muted">',
 			'widget_item_small_print_after'          => '</p>',
 			'widget_item_small_print_display_author' => false,
-			// Params for skin file "_item_content.inc.php"
+			// Params for skin file "_item_content.inc.php":
 			'widget_item_content_params' => $params,
 			// Template params for "Item Attachments" widget:
 			'widget_item_attachments_params' => array(

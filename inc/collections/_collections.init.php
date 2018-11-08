@@ -48,6 +48,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_comments__prerendering'   => $tableprefix.'comments__prerendering',
 		'T_items__item'              => $tableprefix.'items__item',
 		'T_items__item_settings'     => $tableprefix.'items__item_settings',
+		'T_items__item_custom_field' => $tableprefix.'items__item_custom_field',
 		'T_items__itemtag'           => $tableprefix.'items__itemtag',
 		'T_items__prerendering'      => $tableprefix.'items__prerendering',
 		'T_items__status'            => $tableprefix.'items__status',
@@ -1463,10 +1464,6 @@ class collections_Module extends Module
 				// Set item properties from submitted form:
 				$new_Item->load_from_Request( false, true );
 
-				// Use default item/post type of the collection:
-				$default_item_type_ID = $item_Blog->get_setting( 'default_post_type' );
-				$new_Item->set( 'ityp_ID', ( empty( $default_item_type_ID ) ? 1 /* Post */ : $default_item_type_ID ) );
-
 				// Call plugin event for additional checking, e-g captcha:
 				$Plugins->trigger_event( 'AdminBeforeItemEditCreate', array( 'Item' => & $new_Item ) );
 
@@ -1598,7 +1595,7 @@ class collections_Module extends Module
 
 				if( $Settings->get( 'newusers_mustvalidate' ) )
 				{	// We want that the user validates his email address:
-					if( $new_User->send_validate_email( $redirect_to, $item_Blog->ID ) )
+					if( $new_User->send_validate_email( NULL, $item_Blog->ID ) )
 					{
 						$activateinfo_link = 'href="'.get_activate_info_url( NULL, '&amp;' ).'"';
 						$Messages->add( sprintf( T_('An email has been sent to your email address. Please click on the link therein to activate your account. <a %s>More info &raquo;</a>'), $activateinfo_link ), 'success' );

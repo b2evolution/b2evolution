@@ -38,4 +38,6 @@ $Form->info( T_('Content'), $Revision->iver_content );
 
 $Form->end_form();
 
+// JS code for merge button:
+echo_item_merge_js();
 ?>

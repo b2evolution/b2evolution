@@ -124,6 +124,7 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 
 	$Form->checklist( array(
 		array( 'canonical_item_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_item_urls' ) ),
+		array( 'allow_crosspost_urls', 1, T_('For cross-posted Items, allow non-canonical URL'), $edited_Blog->get_setting( 'allow_crosspost_urls' ), ! $edited_Blog->get_setting( 'canonical_item_urls' ) ),
 		array( 'relcanonical_item_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_item_urls' ) ),
 		), 'canonical_item_urls_options', T_('Make canonical') );
 
@@ -344,3 +345,14 @@ $Form->end_fieldset();
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>
+<script type="text/javascript">
+jQuery( 'input[name=canonical_item_urls]' ).click( function()
+{
+	var canonical_item_urls_is_unchecked = ! jQuery( this ).prop( 'checked' );
+	jQuery( 'input[name=allow_crosspost_urls]' ).prop( 'disabled', canonical_item_urls_is_unchecked );
+	if( canonical_item_urls_is_unchecked )
+	{
+		jQuery( 'input[name=allow_crosspost_urls]' ).prop( 'checked', false );
+	}
+} );
+</script>

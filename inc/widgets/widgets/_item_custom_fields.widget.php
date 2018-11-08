@@ -88,8 +88,15 @@ class item_custom_fields_Widget extends item_fields_compare_Widget
 		// We only change the defaults and hide some params:
 		$generic_params['items_source']['no_edit'] = true;
 		$generic_params['items_type']['no_edit'] = true;
+		$generic_params['restrict_featured']['no_edit'] = true;
+		$generic_params['restrict_cats']['no_edit'] = true;
+		$generic_params['restrict_tags']['no_edit'] = true;
 		$generic_params['items_limit']['no_edit'] = true;
 		$generic_params['allow_filter']['no_edit'] = true;
+		$generic_params['show_headers']['no_edit'] = true;
+		$generic_params['merge_headers']['no_edit'] = true;
+		$generic_params['show_status']['no_edit'] = true;
+		$generic_params['cell_colors']['no_edit'] = true;
 		for( $order_index = 0; $order_index <= 2; $order_index++ )
 		{
 			$field_suffix = ( $order_index == 0 ? '' : '_'.$order_index );
@@ -103,6 +110,9 @@ class item_custom_fields_Widget extends item_fields_compare_Widget
 		$generic_params['items']['label'] = T_('Item ID to show');
 		$generic_params['items']['note'] = T_('Leave empty for current Item.');
 		$generic_params['items']['size'] = 11;
+
+		// Don't hide empty lines by default for this widget:
+		$generic_params['hide_empty_lines']['defaultvalue'] = 0;
 
 		return $generic_params;
 	}
@@ -125,9 +135,9 @@ class item_custom_fields_Widget extends item_fields_compare_Widget
 		{	// Use current Item by default:
 			$this->disp_params['items'] = '$this$';
 		}
-
-		// We should not display a header with item title for this widget:
-		$this->display_item_headers = false;
+		// We should not display a header with item title and status for this widget:
+		$this->disp_params['show_headers'] = 0;
+		$this->disp_params['show_status'] = 'never';
 	}
 }
 

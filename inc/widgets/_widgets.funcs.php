@@ -31,6 +31,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	global $DB, $install_test_features, $installed_collection_info_pages;
 	// Handle all blog IDs which can go from function create_demo_contents()
 	global $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
+	global $demo_poll_ID;
 	$blog_home_ID = intval( $blog_home_ID );
 	$blog_a_ID = intval( $blog_a_ID );
 	$blog_b_ID = intval( $blog_b_ID );
@@ -38,6 +39,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$blog_forums_ID = intval( $blog_forums_ID );
 	$blog_manual_ID = intval( $blog_manual_ID );
 	$events_blog_ID = intval( $events_blog_ID );
+	$demo_poll_ID = intval( $demo_poll_ID );
 
 	// Init insert widget query and default params
 	$default_blog_param = 's:7:"blog_ID";s:0:"";';
@@ -104,6 +106,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Item Single */
 	$default_widgets['item_single'] = array(
+		array(  4, 'item_visibility_badge', 'coll_type' => 'manual' ),
 		array(  5, 'item_title', 'coll_type' => 'manual,catalog' ),
 		array(  8, 'subcontainer_row', 'coll_type' => 'catalog', 'params' => array(
 				'column1_container' => 'product_page_column_a',
@@ -272,7 +275,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 				'thumb_size' => 'crop-80x80',
 			) : NULL ) ),
 		// Install widget "Poll" only for Blog B on install:
-		array( 40, 'poll', 'coll_ID' => $blog_b_ID, 'params' => array( 'poll_ID' => 1 ) ),
+		array( 40, 'poll', 'coll_ID' => $blog_b_ID, 'params' => array( 'poll_ID' => $demo_poll_ID ) ),
 		array( 50, 'subcontainer_row', 'params' => array(
 				'column1_container' => 'front_page_column_a',
 				'column1_class'     => ( $kind == 'main' ? 'col-xs-12' : 'col-sm-6 col-xs-12' ),
@@ -630,7 +633,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'type' => 'shared-sub',
 		'name' => NT_('Right Navigation'),
 		array( 10, 'basic_menu_link', 'params' => array(
-				'link_type'        => 'login', 
+				'link_type'        => 'login',
 			) ),
 		array( 20, 'basic_menu_link', 'params' => array(
 				'link_type' => 'register',
@@ -654,12 +657,15 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	// **** PAGE CONTAINERS ***** //
 
+	if( isset( $installed_collection_info_pages['widget_page'] ) )
+	{	// Install page containers only with defined item ID:
+
 	/* Widget Page Section 1 */
 	$default_widgets['widget_page_section_1'] = array(
 		'type'    => 'page',
 		'name'    => NT_('Widget Page Section 1'),
 		'order'   => 10,
-		'item_ID' => isset( $installed_collection_info_pages['widget_page'] ) ? $installed_collection_info_pages['widget_page'] : '',
+		'item_ID' => $installed_collection_info_pages['widget_page'],
 		array( 10, 'coll_featured_posts' ),
 	);
 
@@ -668,7 +674,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'type'    => 'page',
 		'name'    => NT_('Widget Page Section 2'),
 		'order'   => 20,
-		'item_ID' => isset( $installed_collection_info_pages['widget_page'] ) ? $installed_collection_info_pages['widget_page'] : '',
+		'item_ID' => $installed_collection_info_pages['widget_page'],
 		array( 10, 'org_members' ),
 	);
 
@@ -677,12 +683,14 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'type'    => 'page',
 		'name'    => NT_('Widget Page Section 3'),
 		'order'   => 30,
-		'item_ID' => isset( $installed_collection_info_pages['widget_page'] ) ? $installed_collection_info_pages['widget_page'] : '',
+		'item_ID' => $installed_collection_info_pages['widget_page'],
 		array( 10, 'evo_Gmaps', 'type' => 'plugin', 'params' => array(
 				'latitude'  => '48.8566573582',
 				'longitude' => '2.35195398331',
 			) ),
 	);
+
+	}
 
 	return $default_widgets;
 }
@@ -709,19 +717,16 @@ function get_default_widgets_by_container( $container_code, $kind = '', $blog_id
  * Insert the basic widgets for a collection
  *
  * @param integer should never be 0
- * @param array the list of skin ids which are set for the given blog ( normal, mobile and tablet skin ids )
+ * @param string Skin type: 'normal', 'mobile', 'tablet'
  * @param boolean should be true only when it's called after initial install
  * fp> TODO: $initial_install is used to know if we want to trust globals like $blog_photoblog_ID and $blog_forums_ID. We don't want that.
  *           We should pass a $context array with values like 'photo_source_coll_ID' => 4.
  *           Also, checking $blog_forums_ID is unnecessary complexity. We can check the colleciton kind == forum
  * @param string Kind of blog ( 'std', 'photo', 'group', 'forum' )
  */
-function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $kind = '' )
+function insert_basic_widgets( $blog_id, $skin_type, $initial_install = false, $kind = '' )
 {
 	global $DB, $install_test_features;
-
-	// Load skin functions needed to get the skin containers
-	load_funcs( 'skins/_skin.funcs.php' );
 
 	// Handle all blog IDs which can go from function create_demo_contents()
 	global $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
@@ -733,11 +738,22 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	$blog_manual_ID = intval( $blog_manual_ID );
 	$events_blog_ID = intval( $events_blog_ID );
 
+	$BlogCache = & get_BlogCache();
+	if( ! ( $Blog = & $BlogCache->get_by_ID( $blog_id, false, false ) ) )
+	{	// Wrong requested collection:
+		return;
+	}
+
+	// Get all containers declared in the given collection skin type:
+	$blog_containers = $Blog->get_skin_containers( $skin_type );
+
+	if( empty( $blog_containers ) )
+	{	// No containers for given skin:
+		return;
+	}
+
 	// Get config of default widgets:
 	$default_widgets = get_default_widgets( $kind, $blog_id, $initial_install );
-
-	// Get all containers declared in the given blog's skins
-	$blog_containers = get_skin_containers( $skin_ids );
 
 	// Install additional sub-containers and page containers from default config,
 	// which are not declared as main containers but should be installed too:
@@ -759,11 +775,17 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
 	$widget_containers_sql_rows = array();
 	foreach( $blog_containers as $wico_code => $wico_data )
 	{
-		$widget_containers_sql_rows[] = '( "'.$wico_code.'", "'.$wico_data[0].'", '.$blog_id.', '.$wico_data[1].', '.( isset( $wico_data[2] ) ? intval( $wico_data[2] ) : '1' ).', '.( isset( $wico_data[3] ) ? intval( $wico_data[3] ) : 'NULL' ).' )';
+		$widget_containers_sql_rows[] = '( '.$DB->quote( $wico_code ).', '
+			.$DB->quote( $skin_type ).', '
+			.$DB->quote( $wico_data[0] ).', '
+			.$blog_id.', '
+			.$DB->quote( $wico_data[1] ).', '
+			.( isset( $wico_data[2] ) ? intval( $wico_data[2] ) : '1' ).', '
+			.( isset( $wico_data[3] ) ? intval( $wico_data[3] ) : 'NULL' ).' )';
 	}
 
 	// Insert widget containers records by one SQL query
-	$DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main, wico_item_ID ) VALUES'
+	$DB->query( 'INSERT INTO T_widget__container ( wico_code, wico_skin_type, wico_name, wico_coll_ID, wico_order, wico_main, wico_item_ID ) VALUES'
 		.implode( ', ', $widget_containers_sql_rows ) );
 
 	$insert_id = $DB->insert_id;
@@ -838,28 +860,33 @@ function insert_basic_widgets( $blog_id, $skin_ids, $initial_install = false, $k
  * Get WidgetContainer object from the widget list view widget container fieldset id
  * Note: It is used during creating and reordering widgets
  *
- * @return WidgetContainer
+ * @param integer Collection ID
+ * @param string Skin type: 'normal', 'mobile', 'tablet'
+ * @param string Container fieldset ID like 'wico_code_containercode' or 'wico_ID_123'
+ * @return object WidgetContainer
  */
-function & get_widget_container( $coll_ID, $container_fieldset_id )
+function & get_WidgetContainer_by_coll_skintype_fieldset( $coll_ID, $skin_type, $container_fieldset_id )
 {
 	$WidgetContainerCache = & get_WidgetContainerCache();
 
 	if( substr( $container_fieldset_id, 0, 10 ) == 'wico_code_' )
 	{ // The widget contianer fieldset id was given by the container code because probably it was not created in the database yet
 		$container_code = substr( $container_fieldset_id, 10 );
-		$WidgetContainer = $WidgetContainerCache->get_by_coll_and_code( $coll_ID, $container_code );
+		$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $coll_ID, $skin_type, $container_code );
 		if( ! $WidgetContainer )
 		{ // The skin container didn't contain any widget before, and it was not saved in the database
 			$WidgetContainer = new WidgetContainer();
 			$WidgetContainer->set( 'code', $container_code );
 			$WidgetContainer->set( 'name', $container_code );
 			$WidgetContainer->set( 'coll_ID', $coll_ID );
+			$WidgetContainer->set( 'main', 1 );
+			$WidgetContainer->set( 'skin_type', $skin_type );
 		}
 	}
 	elseif( substr( $container_fieldset_id, 0, 8 ) == 'wico_ID_' )
 	{ // The widget contianer fieldset id contains the container database ID
 		$container_ID = substr( $container_fieldset_id, 8 );
-		$WidgetContainer = $WidgetContainerCache->get_by_ID( $container_ID );
+		$WidgetContainer = & $WidgetContainerCache->get_by_ID( $container_ID );
 	}
 	else
 	{ // The received fieldset id is not valid
@@ -872,8 +899,10 @@ function & get_widget_container( $coll_ID, $container_fieldset_id )
 
 /**
  * Insert shared widget containers
+ *
+ * @param string Skin type: 'normal', 'mobile', 'tablet'
  */
-function insert_shared_widgets()
+function insert_shared_widgets( $skin_type )
 {
 	global $DB;
 
@@ -895,8 +924,8 @@ function insert_shared_widgets()
 		{	// Handle special array item with container data:
 			if( ! isset( $shared_containers[ $wico_code ] ) )
 			{	// Insert new shared container:
-				$insert_result = $DB->query( 'INSERT INTO T_widget__container( wico_code, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES '
-					.'( '.$DB->quote( $wico_code ).', '.$DB->quote( $container_widgets['name'] ).', '.'NULL, '.$shared_container_order++.', '.$DB->quote( $container_widgets['type'] == 'shared' ? 1 : 0 ).' )',
+				$insert_result = $DB->query( 'INSERT INTO T_widget__container ( wico_code, wico_skin_type, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES '
+					.'( '.$DB->quote( $wico_code ).', '.$DB->quote( $skin_type ).', '.$DB->quote( $container_widgets['name'] ).', '.'NULL, '.$shared_container_order++.', '.$DB->quote( $container_widgets['type'] == 'shared' ? 1 : 0 ).' )',
 					'Insert default shared widget container' );
 				if( $insert_result && $DB->insert_id > 0 )
 				{
@@ -1213,10 +1242,10 @@ function display_containers( $skin_type, $container_type, $params = array() )
 	{
 		case 'main':
 			// Get main/skin containers:
-			$coll_containers = $Blog->get_main_containers();
+			$coll_containers = $Blog->get_main_containers( $skin_type );
 			foreach( $coll_containers as $container_code => $container_data )
 			{
-				$WidgetContainer = & $WidgetContainerCache->get_by_coll_and_code( $Blog->ID, $container_code );
+				$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $Blog->ID, $skin_type, $container_code );
 				if( ! $WidgetContainer )
 				{	// If widget container doesn't exist in DB but it is detected in skin file:
 					$WidgetContainer = new WidgetContainer();
@@ -1224,10 +1253,6 @@ function display_containers( $skin_type, $container_type, $params = array() )
 					$WidgetContainer->set( 'name', $container_data[0] );
 					$WidgetContainer->set( 'coll_ID', $Blog->ID );
 					$WidgetContainer->set( 'skin_type', $skin_type );
-				}
-				if( $WidgetContainer->get( 'skin_type' ) != $skin_type )
-				{	// Skip this container because another type is requested:
-					continue;
 				}
 				$containers[] = $WidgetContainer;
 			}

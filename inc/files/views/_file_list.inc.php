@@ -331,19 +331,18 @@ $Form->begin_form();
 					echo ' ';
 				}
 
-				if( $fm_mode == 'file_select' && !empty( $field_name )  && !$lFile->is_dir() && $lFile->get( 'type' ) == $file_type )
+				if( $fm_mode == 'file_select' && !empty( $field_name ) && !$lFile->is_dir() && $lFile->get( 'type' ) == $file_type )
 				{
 					$sfile_root = FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() );
 					$sfile_path = $lFile->get_rdfp_rel_path();
 					$link_attribs = array();
 					$link_action = 'set_field';
-					$link_attribs['target'] = get_param( 'iframe_name' ) == '' ? '_parent' : 'evo_customizer__backoffice';
-					$link_attribs['class'] = 'action_icon select_file btn btn-primary btn-xs';
+
+					$link_attribs['class'] = 'evo_select_file btn btn-primary btn-xs';
 					$link_attribs['onclick'] = 'return '.( get_param( 'iframe_name' ) == '' ? 'window.parent' : 'parent.frames[\''.format_to_js( get_param( 'iframe_name' ) ).'\']' ).'.file_select_add( \''.$field_name.'\', \''.$sfile_root.'\', \''.$sfile_path.'\' );';
-					echo action_icon( T_('Select file'), 'link',
-							regenerate_url( 'fm_selected', 'action=file_select&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
-							' './* TRANS: verb */ T_('Select'), NULL, 5, $link_attribs );
-					echo ' ';
+					$link_attribs['type'] = 'button';
+					$link_attribs['title'] = T_('Select file');
+					echo '<button'.get_field_attribs_as_string( $link_attribs, false ).'>'.get_icon( 'link' ).' './* TRANS: verb */ T_('Select').'</button> ';
 				}
 			}
 
@@ -550,17 +549,17 @@ $Form->begin_form();
 	// Quick upload with drag&drop button:
 	// --------------
 	if( $Settings->get( 'upload_enabled' ) && $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
-	{ // Upload is enabled and we have permission to use it...
+	{	// Upload is enabled and we have permission to use it...
 	?>
 		<tr id="fileuploader_form" class="listfooter firstcol lastcol">
 			<td colspan="<?php echo $filetable_cols ?>">
 			<?php
 			if( isset( $LinkOwner ) && $LinkOwner->check_perm( 'edit' ) )
-			{ // Offer option to link the file to an Item (or anything else):
+			{	// Offer option to link the file to an Item (or anything else):
 				$link_attribs = array();
 				$link_action = 'link';
 				if( $mode == 'upload' )
-				{ // We want the action to happen in the post attachments iframe:
+				{	// We want the action to happen in the post attachments iframe:
 					$link_attribs['target'] = $iframe_name;
 					$link_attribs['onclick'] = 'return evo_link_attach( \''.$LinkOwner->type.'\', '.$LinkOwner->get_ID()
 							.', \''.FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() )
@@ -575,6 +574,21 @@ $Form->begin_form();
 			else
 			{ // No icon to link files
 				$icon_to_link_files = '';
+			}
+
+			if( $fm_mode == 'file_select' && !empty( $field_name ) )
+			{
+				$sfile_root = FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() );
+				$link_attribs = array();
+				$link_attribs['class'] = 'evo_select_file btn btn-primary btn-xs';
+				$link_attribs['onclick'] = 'return window.parent.file_select_add( \''.$field_name.'\', \''.$sfile_root.'\', \'$file_path$\' );';
+				$link_attribs['type'] = 'button';
+				$link_attribs['title'] = T_('Select file');
+				$icon_to_select_files = '<button'.get_field_attribs_as_string( $link_attribs, false ).'>'.get_icon( 'link' ).' '.T_('Select').'</button> ';
+			}
+			else
+			{	// No icon to select file
+				$icon_to_select_files = '';
 			}
 
 			$template = '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
@@ -594,23 +608,6 @@ $Form->begin_form();
 
 			$template .= '<td class="checkbox firstcol qq-upload-checkbox">&nbsp;</td>';
 			$template .= '<td class="icon_type qq-upload-image shrinkwrap"><span class="qq-upload-spinner-selector qq-upload-spinner">&nbsp;</span></td>';
-
-			if( $fm_mode == 'file_select' && !empty( $field_name ) )
-			{
-				$sfile_root = FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() );
-				$link_attribs = array();
-				$link_action = 'set_field';
-				$link_attribs['target'] = '_parent';
-				$link_attribs['class'] = 'action_icon select_file btn btn-primary btn-xs';
-				$link_attribs['onclick'] = 'return window.parent.file_select_add( \''.$field_name.'\', \''.$sfile_root.'\', \''.'$file_path$'.'\' );';
-				$icon_to_select_files = action_icon( T_('Select file'), 'link',
-						regenerate_url( 'fm_selected', 'action=file_select&amp;fm_selected[]='.'$file_path$'.'&amp;'.url_crumb('file') ),
-						' './* TRANS: verb */ T_('Select'), NULL, 5, $link_attribs ).' ';
-			}
-			else
-			{
-				$icon_to_select_files = '';
-			}
 
 			if( $fm_flatmode )
 			{
@@ -663,16 +660,17 @@ $Form->begin_form();
 
 			// Display a button to quick upload the files by drag&drop method
 			display_dragdrop_upload_button( array(
-					'fileroot_ID'         => $fm_FileRoot->ID,
-					'path'                => $path,
-					'listElement'         => 'jQuery( "#filelist_tbody" ).get(0)',
-					'list_style'          => 'table',
-					'template'            => $template,
-					'display_support_msg' => false,
-					'additional_dropzone' => '[ document.getElementById( "filelist_tbody" ) ]',
-					'filename_before'     => $icon_to_link_files,
-					'noresults'           => $noresults,
-					'filename_select'     => $icon_to_select_files,
+					'fileroot_ID'          => $fm_FileRoot->ID,
+					'path'                 => $path,
+					'listElement'          => 'jQuery( "#filelist_tbody" ).get(0)',
+					'list_style'           => 'table',
+					'template'             => $template,
+					'display_support_msg'  => false,
+					'additional_dropzone'  => '[ document.getElementById( "filelist_tbody" ) ]',
+					'filename_before'      => $icon_to_link_files,
+					'select_file_template' => $icon_to_select_files,
+					'select_file_type'     => $file_type,
+					'noresults'            => $noresults,
 				) );
 			?>
 			</td>
@@ -925,7 +923,7 @@ $Form->begin_form();
 			// Display a message to inform user after the file was selected
 			jQuery( document ).ready( function()
 			{
-				jQuery( document ).on( 'click', 'a.select_file', function()
+				jQuery( document ).on( 'click', '.evo_select_file', function()
 				{
 					jQuery( '.selected_msg' ).remove();
 					jQuery( this ).parent().append( '<div class="green selected_msg"><?php echo TS_('The file has been selected.'); ?></div>' );

@@ -216,8 +216,8 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
-		$WidgetContainer = & get_widget_container( $Blog->ID, $container );
-		if( ! in_array( $WidgetContainer->get( 'code' ), array_keys( $Blog->get_main_containers() ) ) )
+		$WidgetContainer = & get_WidgetContainer_by_coll_skintype_fieldset( $Blog->ID, $skin_type, $container );
+		if( ! in_array( $WidgetContainer->get( 'code' ), array_keys( $Blog->get_main_containers( $skin_type ) ) ) )
 		{ // The container is not part of the current skin
 			$Messages->add( T_('WARNING: you are adding to a container that does not seem to be part of the current skin.'), 'error' );
 		}
@@ -618,7 +618,7 @@ switch( $action )
 
 			foreach( $containers as $container_fieldset_id => $widgets )
 			{ // loop through each container and set new order
-				$WidgetContainer = & get_widget_container( $Blog->ID, $container_fieldset_id );
+				$WidgetContainer = & get_WidgetContainer_by_coll_skintype_fieldset( $Blog->ID, $skin_type, $container_fieldset_id );
 				if( ( $WidgetContainer->ID == 0 ) && ( count( $widgets ) > 0 ) )
 				{ // Widget was moved to an empty main widget container, it needs to be created
 					$WidgetContainer->dbinsert();
@@ -869,7 +869,7 @@ switch( $action )
 				$WidgetContainerCache = & get_WidgetContainerCache();
 				$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $blog, $skin_type, $container_code );
 
-				// Change this param to proper work of func get_widget_container():
+				// Change this param to proper work of func get_WidgetContainer_by_coll_skintype_fieldset():
 				set_param( 'container', 'wico_ID_'.$WidgetContainer->ID );
 
 				$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );

@@ -620,6 +620,7 @@ switch( $action )
 
 		$item_order = param( 'new_item_order', 'string' );
 		$post_ID = param( 'post_ID', 'integer' );
+		$cat_ID = param( 'cat_ID', 'integer', NULL );
 
 		$ItemCache = & get_ItemCache();
 		$Item = & $ItemCache->get_by_ID( $post_ID );
@@ -632,12 +633,11 @@ switch( $action )
 			$item_order = NULL;
 		}
 		else
-		{	// Make an order to integer:
-			$item_order = intval( $item_order );
+		{	// Make an order to double:
+			$item_order = floatval( $item_order );
 		}
 
-		$Item->set( 'order', $item_order, true );
-		$Item->dbupdate();
+		$Item->update_order( $item_order, $cat_ID );
 
 		// Return a link to make the cell editable on next time:
 		echo '<a href="#" rel="'.$Item->ID.'">'.( $item_order === NULL ? '-' : $item_order ).'</a>';
@@ -667,6 +667,60 @@ switch( $action )
 			$Chapter->set( 'order', ( $cat_order === '' ? NULL : $cat_order ), true );
 			$Chapter->dbupdate();
 			echo '<a href="#">'.( $cat_order === NULL ? '-' : $cat_order ).'</a>';
+		}
+		break;
+
+	case 'cat_ityp_ID_edit':
+		// Update default Item Type of a chapter from list screen by clicking on the order column:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'catityp' );
+
+		$blog = param( 'blogid', 'integer' );
+		$cat_ityp_ID = param( 'new_ityp_ID', 'string', NULL );
+		$cat_ID = param( 'cat_ID', 'integer' );
+
+		// Check permission:
+		$current_User->check_perm( 'blog_cats', '', true, $blog );
+
+		if( ! empty( $cat_ityp_ID ) )
+		{	// Remove prefix "_" which is used only for correct order in jeditable selector:
+			$cat_ityp_ID = substr( $cat_ityp_ID, 1 );
+		}
+		if( $cat_ityp_ID === false || $cat_ityp_ID === '' )
+		{	// Convert empty value to NULL to update DB:
+			$cat_ityp_ID = NULL;
+		}
+
+		$ChapterCache = & get_ChapterCache();
+		if( $Chapter = & $ChapterCache->get_by_ID( $cat_ID, false ) )
+		{	// Update cat Item Type if it exists in DB:
+			$ItemTypeCache = & get_ItemTypeCache();
+			if( ! empty( $cat_ityp_ID ) &&
+			    ( ! ( $ItemType = & $ItemTypeCache->get_by_ID( $cat_ityp_ID, false, false ) ) ||
+			      ! $ItemType->is_enabled( $blog ) ) )
+			{	// Revert back to use previous Item Type if new is wrong for current category:
+				$cat_ityp_ID = $Chapter->get( 'ityp_ID' );
+			}
+			$Chapter->set( 'ityp_ID', $cat_ityp_ID, true );
+			$Chapter->dbupdate();
+			if( $Chapter->get( 'ityp_ID' ) === NULL )
+			{
+				$cat_ityp_title = T_('Same as collection default');
+			}
+			elseif( $Chapter->get( 'ityp_ID' ) == '0' )
+			{
+				$cat_ityp_title = '<b>'.T_('No default type').'</b>';
+			}
+			elseif( $ItemType = & $ItemTypeCache->get_by_ID( $Chapter->get( 'ityp_ID' ), false, false ) )
+			{
+				$cat_ityp_title = $ItemType->get_name();
+			}
+			else
+			{
+				$cat_ityp_title = '<span class="red">'.T_('Not Found').' #'.$Chapter->get( 'ityp_ID' ).'</span>';
+			}
+			echo '<a href="#" rel="_'.$Chapter->get( 'ityp_ID' ).'">'.$cat_ityp_title.'</a>';
 		}
 		break;
 

@@ -220,14 +220,6 @@ span.icon.voted {
 }
 a.rollover_sprite:hover span.icon {
   visibility: hidden;
-  visibility: visible\0/;
-  /* IE8 */
-}
-@media screen and (min-width: 0\0) {
-  /* IE9-10 */
-  a.rollover_sprite:hover span.icon {
-    visibility: visible;
-  }
 }
 a.rollover_sprite:hover span.icon:before {
   visibility: visible !important;
@@ -2042,6 +2034,13 @@ img.avatar_above_login {
   white-space: nowrap;
   text-align: center;
 }
+.col-narrow {
+  width: 1px;
+  white-space: nowrap;
+  text-align: center;
+  padding-left: 1px !important;
+  padding-right: 1px !important;
+}
 .filename {
   font-family: monospace;
   font-size: larger;
@@ -2659,8 +2658,16 @@ tr.evo_highlight td {
     background-color: #FF6600;
   }
   to {
-    background-color: auto;
+    background-color: transparent;
   }
+}
+.evo_input_counter {
+  position: absolute;
+  color: #999;
+  font-size: 80%;
+}
+.evo_input_counter.label {
+  color: #FFF;
 }
 
 /**
@@ -3790,8 +3797,15 @@ div.results {
   width: 100%;
   overflow: auto;
 }
-.evo_instruction {
-  margin: 20px 10px;
+div.action_messages.evo_instruction {
+  margin: 10px 0 0;
+}
+div.action_messages.evo_instruction ul,
+div.action_messages.evo_instruction li {
+  list-style: initial;
+}
+div.action_messages.evo_instruction ul {
+  padding-left: 20px;
 }
 form.inskin {
   padding: 10px;
@@ -3820,32 +3834,32 @@ table.catselect th {
 table.catselect td {
   padding: .2ex 1ex;
 }
+table.catselect th,
+table.catselect td {
+  border-right: 1px solid #bbb;
+}
+table.catselect th:last-child,
+table.catselect td:last-child {
+  border-right: none;
+}
 table.catselect tr.group td {
   border-top: 1px solid #bbb;
   border-bottom: 1px solid #bbb;
   background-color: #ccc;
   font-weight: bold;
 }
-table.catselect tr.odd,
-table.catselect tr.odd input {
+table.catselect tr.odd {
   background-color: #eee;
 }
-table.catselect tr.even,
-table.catselect tr.even input {
+table.catselect tr.even {
   background-color: #ddd;
 }
 table.catselect tr:hover,
 table.catselect tr:hover input {
   background-color: #ccc;
 }
-table.catselect th.selector,
-table.catselect td.selector {
-  width: 1%;
-  text-align: center;
-  border-right: 1px solid #bbb;
-}
-table.catselect #new_category_name {
-  background-color: white;
+table.catselect .catsel_order input {
+  width: 40px;
 }
 .raty_star_on,
 .raty_star_off,
@@ -4059,14 +4073,6 @@ div.results span[class*=status_] span {
   border-radius: 12px 12px 12px 12px;
   float: left;
   width: 80px;
-}
-@media \0screen {
-  /* IE8 */
-  #styled_content_block span[class*=status_] span,
-  .evo_content_block span[class*=status_] span {
-    top: -15px;
-    left: -2px;
-  }
 }
 .search_title {
   font-size: 125%;

@@ -352,7 +352,9 @@ switch( $action )
 				AND ( cset_name LIKE "skin%" OR cset_name LIKE "plugin%" )' );
 			// ADD DEFAULT WIDGETS:
 			load_funcs( 'widgets/_widgets.funcs.php' );
-			insert_basic_widgets( $edited_Blog->ID, $edited_Blog->get_skin_ids(), false, $type );
+			insert_basic_widgets( $edited_Blog->ID, 'normal', false, $type );
+			insert_basic_widgets( $edited_Blog->ID, 'mobile', false, $type );
+			insert_basic_widgets( $edited_Blog->ID, 'tablet', false, $type );
 		}
 
 		$edited_Blog->init_by_kind( $type, $edited_Blog->get( 'name' ), $edited_Blog->get( 'shortname' ), $edited_Blog->get( 'urlname' ) );

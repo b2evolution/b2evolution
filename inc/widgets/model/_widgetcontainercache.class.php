@@ -38,13 +38,6 @@ load_class( 'widgets/model/_widgetcontainer.class.php', 'WidgetContainer' );
 class WidgetContainerCache extends DataObjectCache
 {
 	/**
-	 * Cache by collection ID and widget container code
-	 *
-	 * @var cache_by_coll_and_code array
-	 */
-	var $cache_by_coll_and_code;
-
-	/**
 	 * Cache by collection ID, container code and skin type
 	 *
 	 * @var cache_by_coll_skintype_code array
@@ -70,23 +63,14 @@ class WidgetContainerCache extends DataObjectCache
 	function add( $WidgetContainer )
 	{
 		$container_code = $WidgetContainer->get( 'code' );
-		if( ( !empty( $container_code ) ) )
-		{ // This container is not shared and it is a main container ( has code )
-			if( ! isset( $this->cache_by_coll_and_code[$WidgetContainer->coll_ID] ) )
-			{
-				$this->cache_by_coll_and_code[$WidgetContainer->coll_ID] = array();
-			}
-			$this->cache_by_coll_and_code[$WidgetContainer->coll_ID][$container_code] = & $WidgetContainer;
-
+		if( ! empty( $container_code ) )
+		{	// This container is not shared and it is a main container ( has code )
 			$skin_type = $WidgetContainer->get( 'skin_type' );
-			if( ! empty( $skin_type ) )
-			{	// Cache by additional field "skin type":
-				if( ! isset( $this->cache_by_coll_skintype_code[ $WidgetContainer->coll_ID ][ $skin_type ] ) )
-				{
-					$this->cache_by_coll_skintype_code[ $WidgetContainer->coll_ID ][ $skin_type ] = array();
-				}
-				$this->cache_by_coll_skintype_code[ $WidgetContainer->coll_ID ][ $skin_type ][ $container_code ] = & $WidgetContainer;
+			if( ! isset( $this->cache_by_coll_skintype_code[ $WidgetContainer->coll_ID ][ $skin_type ] ) )
+			{
+				$this->cache_by_coll_skintype_code[ $WidgetContainer->coll_ID ][ $skin_type ] = array();
 			}
+			$this->cache_by_coll_skintype_code[ $WidgetContainer->coll_ID ][ $skin_type ][ $container_code ] = & $WidgetContainer;
 		}
 
 		return parent::add( $WidgetContainer );
@@ -102,7 +86,7 @@ class WidgetContainerCache extends DataObjectCache
 	{
 		global $DB;
 
-		if( isset( $this->cache_by_coll_and_code[ $coll_ID ] ) )
+		if( isset( $this->cache_by_coll_skintype_code[ $coll_ID ] ) )
 		{	// Don't load widget containers twice:
 			return;
 		}
@@ -120,55 +104,22 @@ class WidgetContainerCache extends DataObjectCache
 
 
 	/**
-	 * Get widget container from the given collection with the given container code
-	 *
-	 * @param integer collection ID
-	 * @param string container code
-	 * @param boolean halt on error
-	 * @return WidgetContainer
-	 */
-	function & get_by_coll_and_code( $coll_ID, $wico_code, $halt_on_error = false )
-	{
-		$this->load_by_coll_ID( $coll_ID );
-
-		if( empty( $this->cache_by_coll_and_code[ $coll_ID ][ $wico_code ] ) && // collection/skin container
-		    empty( $this->cache_by_coll_and_code[ '' ][ $wico_code ] ) ) // shared container
-		{
-			if( $halt_on_error )
-			{
-				debug_die( 'Requested widget container does not exist!' );
-			}
-			$r = false;
-			return $r;
-		}
-
-		if( isset( $this->cache_by_coll_and_code[ $coll_ID ][ $wico_code ] ) )
-		{	// Collection/skin container:
-			return $this->cache_by_coll_and_code[ $coll_ID ][ $wico_code ];
-		}
-		else
-		{	// Shared container:
-			return $this->cache_by_coll_and_code[''][ $wico_code ];
-		}
-	}
-
-
-	/**
-	 * Get widget containers from the given collection
+	 * Get widget containers from the given collection for the given skin type
 	 *
 	 * @param integer Collection ID
+	 * @param string Skin type: 'normal', 'mobile', 'tablet'
 	 * @return array of WidgetContainer
 	 */
-	function & get_by_coll_ID( $coll_ID )
+	function get_by_coll_skintype( $coll_ID, $skin_type )
 	{
 		$this->load_by_coll_ID( $coll_ID );
-		if( isset( $this->cache_by_coll_and_code[$coll_ID] ) )
+
+		if( isset( $this->cache_by_coll_skintype_code[ $coll_ID ][ $skin_type ] ) )
 		{
-			return $this->cache_by_coll_and_code[$coll_ID];
+			return $this->cache_by_coll_skintype_code[ $coll_ID ][ $skin_type ];
 		}
 
-		$r = array();
-		return $r;
+		return array();
 	}
 
 

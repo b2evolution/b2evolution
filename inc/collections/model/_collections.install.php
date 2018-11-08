@@ -146,6 +146,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			cat_meta            tinyint(1) NOT NULL DEFAULT 0,
 			cat_lock            tinyint(1) NOT NULL DEFAULT 0,
 			cat_last_touched_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			cat_ityp_ID         INT UNSIGNED NULL,
 			PRIMARY KEY cat_ID (cat_ID),
 			UNIQUE cat_urlname( cat_urlname ),
 			KEY cat_blog_ID (cat_blog_ID),
@@ -192,7 +193,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_renderers              VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			post_priority               int(11) unsigned null COMMENT 'Task priority in workflow',
 			post_featured               tinyint(1) NOT NULL DEFAULT 0,
-			post_order                  DOUBLE NULL,
 			post_ctry_ID                INT(10) UNSIGNED NULL,
 			post_rgn_ID                 INT(10) UNSIGNED NULL,
 			post_subrg_ID               INT(10) UNSIGNED NULL,
@@ -208,8 +208,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			INDEX post_parent_ID( post_parent_ID ),
 			INDEX post_assigned_user_ID( post_assigned_user_ID ),
 			INDEX post_ityp_ID( post_ityp_ID ),
-			INDEX post_pst_ID( post_pst_ID ),
-			INDEX post_order( post_order )
+			INDEX post_pst_ID( post_pst_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_postcats' => array(
@@ -217,6 +216,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_postcats (
 			postcat_post_ID int(11) unsigned NOT NULL,
 			postcat_cat_ID int(11) unsigned NOT NULL,
+			postcat_order DOUBLE NULL,
 			PRIMARY KEY postcat_pk (postcat_post_ID,postcat_cat_ID),
 			UNIQUE catpost ( postcat_cat_ID, postcat_post_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -358,8 +358,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_allow_disabling_comments TINYINT DEFAULT 0,
 			ityp_use_comment_expiration   ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
 			ityp_perm_level               ENUM( 'standard', 'restricted', 'admin' ) COLLATE ascii_general_ci NOT NULL default 'standard',
-			ityp_evobar_link_text     VARCHAR(255) NULL DEFAULT NULL,
-			ityp_skin_btn_text        VARCHAR(255) NULL DEFAULT NULL,
+			ityp_evobar_link_text         VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+			ityp_skin_btn_text            VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			PRIMARY KEY ( ityp_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -379,13 +379,14 @@ $schema_queries = array_merge( $schema_queries, array(
 			itcf_formula         VARCHAR(2000) COLLATE ascii_general_ci NULL,
 			itcf_header_class    VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			itcf_cell_class      VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL,
-			itcf_link            ENUM( 'nolink', 'linkto', 'permalink', 'zoom', 'linkpermzoom', 'permzoom', 'linkperm', 'fieldurl' ) COLLATE ascii_general_ci NOT NULL default 'nolink',
+			itcf_link            ENUM( 'nolink', 'linkto', 'permalink', 'zoom', 'linkpermzoom', 'permzoom', 'linkperm', 'fieldurl', 'fieldurlblank' ) COLLATE ascii_general_ci NOT NULL default 'nolink',
 			itcf_link_nofollow   TINYINT NULL DEFAULT 0,
 			itcf_link_class      VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			itcf_line_highlight  ENUM( 'never', 'differences', 'always' ) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			itcf_green_highlight ENUM( 'never', 'lowest', 'highest' ) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			itcf_red_highlight   ENUM( 'never', 'lowest', 'highest' ) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			itcf_description     TEXT NULL,
+			itcf_merge           TINYINT DEFAULT 0,
 			PRIMARY KEY ( itcf_ID ),
 			UNIQUE itcf_ityp_ID_name( itcf_ityp_ID, itcf_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -441,6 +442,16 @@ $schema_queries = array_merge( $schema_queries, array(
 			iset_name     varchar( 50 ) COLLATE ascii_general_ci NOT NULL,
 			iset_value    varchar( 10000 ) COLLATE utf8mb4_unicode_ci NULL,
 			PRIMARY KEY ( iset_item_ID, iset_name )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_items__item_custom_field' => array(
+		'Creating item custom field values table',
+		"CREATE TABLE T_items__item_custom_field (
+			icfv_item_ID     INT UNSIGNED NOT NULL,
+			icfv_itcf_name   VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
+			icfv_value       VARCHAR( 10000 ) COLLATE utf8mb4_unicode_ci NULL,
+			icfv_parent_sync TINYINT(1) NOT NULL DEFAULT 1,
+			PRIMARY KEY      ( icfv_item_ID, icfv_itcf_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__user_data' => array(

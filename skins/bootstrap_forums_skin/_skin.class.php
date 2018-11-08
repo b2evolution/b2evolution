@@ -448,17 +448,13 @@ class bootstrap_forums_Skin extends Skin
 		$write_new_post_url = $Blog->get_write_item_url( $chapter_ID );
 		if( $write_new_post_url != '' )
 		{ // Display button to write a new post
-			$button_text = T_('New topic');
-			if( ! empty( $default_new_ItemType ) )
-			{
+			if( empty( $default_new_ItemType ) )
+			{	// Use default button text:
+				$button_text = T_('New topic');
+			}
+			else
+			{	// Use button text from Item Type:
 				$button_text = $default_new_ItemType->get_item_denomination( 'inskin_new_btn' );
-				// The get_write_url() function above does not allow specifying the item type ID we'll manually add it:
-				$write_new_post_url = url_add_param( $write_new_post_url, 'item_typ_ID='.$default_new_ItemType->ID );
-
-				if( ! empty( $default_new_ItemType->get( 'skin_btn_text' ) ) )
-				{
-					$button_text = $default_new_ItemType->get( 'skin_btn_text' );
-				}
 			}
 
 			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post a new topic').'"><i class="fa fa-pencil"></i> '.$button_text.'</a>';

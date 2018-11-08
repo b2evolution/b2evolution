@@ -154,8 +154,8 @@ function display_base_config_recap()
  */
 function install_newdb()
 {
-	global $new_db_version, $admin_url, $baseurl, $install_login, $random_password;
-	global $create_sample_contents, $create_sample_organization, $create_demo_users, $create_demo_messages;
+	global $new_db_version, $admin_url, $baseurl, $install_login, $random_password, $admin_user;
+	global $create_sample_contents, $create_demo_organization, $create_demo_users, $create_demo_messages;
 
 	/*
 	 * -----------------------------------------------------------------------------------
@@ -196,16 +196,24 @@ function install_newdb()
 	evo_flush();
 	create_default_data();
 
+	$user_org_IDs = NULL;
+	$demo_users = array();
 
-	if( $create_sample_organization || $create_demo_users )
+	if( $create_demo_organization || $create_demo_users )
 	{
 		echo get_install_format_text( '<h2>'.T_('Creating sample organization and users...').'</h2>', 'h2' );
 		evo_flush();
 
-		// Create sample organization if selected
-		if( $create_sample_organization )
+		// Create demo organization if selected:
+		if( $create_demo_organization )
 		{
-			create_sample_organization();
+			task_begin( 'Creating demo organization...' );
+			$user_org_IDs = array( create_demo_organization( 1 )->ID );
+			task_end();
+
+			task_begin( 'Adding admin user to demo organization...' );
+			$admin_user->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
+			task_end();
 		}
 
 		// Create demo users if selected
@@ -229,11 +237,13 @@ function install_newdb()
 			// (Assigning by reference does not work with "global" keyword (PHP 5.2.8))
 			$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
 
-			create_demo_users();
+			$demo_users = create_demo_users();
 
 			if( $create_demo_messages )
 			{
+				task_begin( 'Creating demo private messages...' );
 				create_demo_messages();
+				task_end();
 			}
 		}
 	}
@@ -268,8 +278,12 @@ function install_newdb()
 		// (Assigning by reference does not work with "global" keyword (PHP 5.2.8))
 		$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
 
-		create_demo_contents();
+		create_demo_contents( $demo_users );
 	}
+
+	// Call the following function even if no demo content will be installed.
+	// We still need to install the shared widgets
+	install_basic_widgets( $new_db_version );
 
 	evo_flush();
 	create_default_newsletters();
@@ -481,7 +495,7 @@ function create_default_settings( $override = array() )
 	global $DB, $new_db_version, $default_locale;
 	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group;
 	global $install_test_features, $create_sample_contents, $install_site_color, $local_installation;
-	global $create_sample_organization, $create_demo_users;
+	global $create_demo_organization, $create_demo_users;
 
 	$defaults = array(
 		'db_version' => $new_db_version,
@@ -888,7 +902,7 @@ function install_basic_widgets( $old_db_version = 0 )
 	load_funcs( 'widgets/_widgets.funcs.php' );
 
 	task_begin( 'Installing default shared widgets... ' );
-	insert_shared_widgets();
+	insert_shared_widgets( 'normal' );
 	task_end();
 
 	$blog_type = ( $old_db_version < 11010 ) ? '"std"' : 'blog_type';
@@ -901,16 +915,9 @@ function install_basic_widgets( $old_db_version = 0 )
 	foreach( $blogs_data as $blog_data )
 	{
 		task_begin( 'Installing default widgets for collection #'.$blog_data->blog_ID.'... ' );
-		$skin_IDs = array( $blog_data->blog_normal_skin_ID );
-		if( ! empty( $blog_data->blog_mobile_skin_ID ) )
-		{
-			$skin_IDs[] = $blog_data->blog_mobile_skin_ID;
-		}
-		if( ! empty( $blog_data->blog_tablet_skin_ID ) )
-		{
-			$skin_IDs[] = $blog_data->blog_tablet_skin_ID;
-		}
-		insert_basic_widgets( $blog_data->blog_ID, $skin_IDs, true, $blog_data->blog_type );
+		insert_basic_widgets( $blog_data->blog_ID, 'normal', true, $blog_data->blog_type );
+		insert_basic_widgets( $blog_data->blog_ID, 'mobile', true, $blog_data->blog_type );
+		insert_basic_widgets( $blog_data->blog_ID, 'tablet', true, $blog_data->blog_type );
 		task_end();
 	}
 }
@@ -1386,7 +1393,7 @@ function update_install_progress_bar()
 function get_install_steps_count()
 {
 	global $allow_install_test_features, $allow_evodb_reset;
-	global $create_sample_organization;
+	global $create_demo_organization;
 
 	$steps = 0;
 
@@ -1413,8 +1420,8 @@ function get_install_steps_count()
 	// Before install default skins:
 	$steps++;
 
-	// Creating sample organization:
-	if( $create_sample_organization )
+	// Creating demo organization:
+	if( $create_demo_organization )
 	{
 		$steps++;
 	}
