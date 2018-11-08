@@ -315,13 +315,6 @@ if( $is_recipient )
 					'form_use_fieldset' => false,
 				) );
 
-			ob_start();
-			echo '<div class="message_toolbars">';
-			// CALL PLUGINS NOW:
-			$Plugins->trigger_event( 'DisplayMessageToolbar', array() );
-			echo '</div>';
-			$message_toolbar = ob_get_clean();
-
 			if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
 			{	// If current user has a permission to view the files AND it is back-office:
 				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
@@ -330,15 +323,31 @@ if( $is_recipient )
 				$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
 			}
 
+			ob_start();
+			echo '<div class="message_toolbars">';
+			// CALL PLUGINS NOW:
+			$message_toolbar_params = array( 'Message' => & $edited_Message );
+			if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+			{
+				$message_toolbar_params['temp_ID'] = $LinkOwner->get_ID();
+			}
+			$Plugins->trigger_event( 'DisplayMessageToolbar', $message_toolbar_params );
+			echo '</div>';
+			$message_toolbar = ob_get_clean();
+
 			// CALL PLUGINS NOW:
 			ob_start();
-			$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
-				'target_type'   => 'Message',
-				'target_object' => $edited_Message,
-				'temp_ID'       => isset( $LinkOwner ) && $LinkOwner->is_temp() ? $LinkOwner->get_ID() : NULL,
-				'content_id'    => 'msg_text',
-				'edit_layout'   => NULL,
-			) );
+			$admin_editor_params = array(
+					'target_type'   => 'Message',
+					'target_object' => $edited_Message,
+					'content_id'    => 'msg_text',
+					'edit_layout'   => NULL,
+				);
+			if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+			{
+				$admin_editor_params['temp_ID'] = $LinkOwner->get_ID();
+			}
+			$Plugins->trigger_event( 'AdminDisplayEditorButton', $admin_editor_params );
 			$quick_setting_switch = ob_get_clean();
 
 			$form_inputstart = $Form->inputstart;

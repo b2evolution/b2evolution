@@ -103,6 +103,18 @@ class inlines_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called when displaying editor toolbars for message.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayMessageToolbar( & $params )
+	{
+		return $this->DisplayCodeToolbar( $params );
+	}
+
+
+	/**
 	 * Display a code toolbar
 	 *
 	 * @param array Associative array of parameters
@@ -110,24 +122,23 @@ class inlines_plugin extends Plugin
 	 */
 	function DisplayCodeToolbar( & $params )
 	{
-		global $Hit;
+		global $Hit, $blog;
 
 		if( $Hit->is_lynx() )
 		{	// let's deactivate quicktags on Lynx, because they don't work there.
 			return false;
 		}
 
+		$temp_ID = empty( $params['temp_ID'] ) ? NULL : $params['temp_ID'];
+
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
-
-		$temp_ID = isset( $params['temp_ID'] ) ? $params['temp_ID'] : NULL;
 
 		switch( $params['target_type'] )
 		{
 			case 'Item':
 				$Item = & $params['Item'];
 				$target_ID = $Item->ID;
-
 				if( empty( $target_ID ) && empty( $temp_ID ) )
 				{
 					return false;
@@ -137,7 +148,6 @@ class inlines_plugin extends Plugin
 			case 'Comment':
 				$Comment = & $params['Comment'];
 				$target_ID = $Comment->ID;
-
 				if( empty( $target_ID ) )
 				{
 					return false;
@@ -147,7 +157,6 @@ class inlines_plugin extends Plugin
 			case 'EmailCampaign':
 				$EmailCampaign = & $params['EmailCampaign'];
 				$target_ID = $EmailCampaign->ID;
-
 				if( empty( $target_ID ) )
 				{
 					return false;
@@ -157,18 +166,20 @@ class inlines_plugin extends Plugin
 			case 'Message':
 				$Message = & $params['Message'];
 				$target_ID = $Message->ID;
-
 				if( empty( $target_ID ) && empty( $temp_ID ) )
 				{
 					return false;
 				}
 				break;
+
+			default:
+				return false;
 		}
 
 		?><script type="text/javascript">
 		//<![CDATA[
 		var target_ID = <?php echo format_to_js( $target_ID );?>;
-		var temp_ID = <?php echo format_to_js( $temp_ID );?>;
+		var temp_ID = <?php echo empty( $params['temp_ID'] ) ? 'undefined' : format_to_js( $temp_ID );?>;
 		var target_type = '<?php echo format_to_js( $params['target_type'] );?>';
 		var inline_buttons = new Array();
 
@@ -202,22 +213,40 @@ class inlines_plugin extends Plugin
 
 		function insert_inline( inlineType )
 		{
-			if( target_ID == 0 )
+
+			switch( target_type )
 			{
-				switch( target_type )
-				{
-					case 'Item':
+				case 'Item':
+					if( ! target_ID && ! temp_ID )
+					{
 						alert( evo_js_lang_alert_before_insert_item  );
-						break;
+						return false;
+					}
+					break;
 
-					case 'Comment':
+				case 'Comment':
+					if( ! target_ID )
+					{
 						alert( evo_js_lang_alert_before_insert_comment );
-						break;
+						return false;
+					}
+					break;
 
-					case 'EmailCampaign':
+				case 'EmailCampaign':
+					if( ! target_ID )
+					{
 						alert( evo_js_lang_alert_before_insert_emailcampaign );
-						break;
-				}
+						return false;
+					}
+					break;
+
+				case 'Message':
+					if( ! target_ID && ! temp_ID )
+					{
+						alert( evo_js_lang_alert_before_insert_message );
+						return false;
+					}
+					break;
 			}
 
 			if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
@@ -234,6 +263,10 @@ class inlines_plugin extends Plugin
 						'request_from' => is_admin_page() ? 'back' : 'front',
 					);
 
+				if( isset( $blog ) )
+				{
+					$insert_inline_params['blog'] = $blog;
+				}
 				if( isset( $temp_ID ) )
 				{
 					$insert_inline_params['temp_ID'] = $temp_ID;
@@ -244,11 +277,22 @@ class inlines_plugin extends Plugin
 
 				jQuery.ajax( {
 					type: 'POST',
-					url: '<?php echo $this->get_htsrv_url( 'insert_inline', $insert_inline_parms, '&' ); ?>',
+					url: '<?php echo $this->get_htsrv_url( 'insert_inline', $insert_inline_params, '&' ); ?>',
 					success: function( result )
 					{
+						var param_target_type, param_target_ID;
+						if( temp_ID == undefined )
+						{
+							param_target_type = target_type;
+							param_target_ID = target_ID
+						}
+						else
+						{
+							param_target_type = 'temporary';
+							param_target_ID = temp_ID;
+						}
 						openModalWindow( result, '90%', '80%', true, 'Select image', '', '', '', '', '', function() {
-									evo_link_refresh_list( editor.getParam( 'target_type' ), editor.getParam( 'target_ID') );
+									evo_link_refresh_list( param_target_type, param_target_ID );
 									evo_link_fix_wrapper_height();
 								} );
 					}
@@ -260,7 +304,9 @@ class inlines_plugin extends Plugin
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript">inline_toolbar( '<?php echo TS_('Inlines').':'; ?>' );</script><?php
+		?>
+		<script type="text/javascript">inline_toolbar( '<?php echo TS_('Inlines').':'; ?>' );</script>
+		<?php
 
 		return true;
 	}
@@ -272,79 +318,14 @@ class inlines_plugin extends Plugin
 	}
 
 
+	/**
+	 * Load insert image links
+	 *
+	 * @param array Params
+	 */
 	function htsrv_insert_inline( $params )
 	{
-		global $UserSettings, $current_User, $adminskins_path, $AdminUI, $is_admin_page, $blog;
-
-		$is_admin_page = true;
-		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
-		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
-		$AdminUI = new AdminUI();
-		load_funcs( 'links/model/_link.funcs.php' );
-
-		if( ! isset( $params['target_ID'] ) || ! isset( $params['target_type'] ) )
-		{
-			return;
-		}
-
-		switch( $params['target_type'] )
-		{
-			case 'Item':
-				$ItemCache = & get_ItemCache();
-				$edited_Item = & $ItemCache->get_by_ID( $params['target_ID'] );
-
-				if( empty( $blog ) )
-				{
-					$blog = $edited_Item->get_Blog()->ID;
-				}
-
-				if( isset( $GLOBALS['files_Module'] )
-					&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
-					&& $current_User->check_perm( 'files', 'view', false ) )
-				{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
-					load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
-					global $LinkOwner; // Initialize this object as global because this is used in many link functions
-					$LinkOwner = new LinkItem( $edited_Item );
-				}
-				break;
-
-			case 'Comment':
-				$CommentCache = & get_CommentCache();
-				$edited_Comment = & $CommentCache->get_by_ID( $params['target_ID'] );
-
-				if( isset( $GLOBALS['files_Module'] )
-					&& $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment )
-					&& $current_User->check_perm( 'files', 'view', false ) )
-				{	// Files module is enabled, but in case of creating new comments we should show file attachments block only if user has all required permissions to attach files
-					load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
-					global $LinkOwner; // Initialize this object as global because this is used in many link functions
-					$LinkOwner = new LinkComment( $edited_Comment );
-				}
-				break;
-
-			case 'EmailCampaign':
-				$EmailCampaignCache = & get_EmailCampaignCache();
-				$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $params['target_ID'] );
-
-				if( isset( $GLOBALS['files_Module'] )
-					&& $current_User->check_perm( 'emails', 'edit', true )
-					&& $current_User->check_perm( 'files', 'view', false ) )
-				{	// Files module is enabled, but in case of creating new comments we should show file attachments block only if user has all required permissions to attach files
-					load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
-					global $LinkOwner; // Initialize this object as global because this is used in many link functions
-					$LinkOwner = new LinkEmailCampaign( $edited_EmailCampaign );
-				}
-				break;
-
-			default:
-				return;
-		}
-
-		// Set a different dragand drop button ID
-		global $dragdropbutton_ID, $fm_mode;
-		$fm_mode = 'file_select';
-		$dragdropbutton_ID = 'file-uploader-modal';
-		$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+		insert_image_links_block( $params );
 	}
 }
 ?>

@@ -8345,7 +8345,7 @@ function render_inline_files( $content, $Object, $params = array() )
 /**
  * Convert inline tags like [image:|file:|inline:|video:|audio:|thumbnail:|folder:] into HTML tags
  *
- * @param object Source object: Item, EmailCampaign
+ * @param object Source object: Item, EmailCampaign, Comment, Message
  * @param array Inline tags
  * @param array Params
  * @return array Associative array of rendered HTML tags with inline tags as key
@@ -8355,19 +8355,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 	global $Plugins;
 	$inlines = array();
 
-	if( $Object )
-	{
-		$object_class = get_class( $Object );
-	}
-	elseif( isset( $params['object_class'] ) )
-	{
-		$object_class = $params['object_class'];
-		unset( $params['object_class'] );
-	}
-	else
-	{
-		$object_class = NULL;
-	}
+	$object_class = get_class( $Object );
 
 	$params = array_merge( array(
 				'before'                   => '<div>',
@@ -8384,7 +8372,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 	if( !isset( $LinkList ) )
 	{	// Get list of attached Links only first time:
-		if( empty( $Object ) || $Object->ID == 0 )
+		if( $Object->ID == 0 )
 		{	// Get temporary object ID on preview new creating object:
 			$temp_link_owner_ID = param( 'temp_link_owner_ID', 'integer', NULL );
 		}
@@ -8392,6 +8380,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		{	// Don't use temporary object for existing object:
 			$temp_link_owner_ID = NULL;
 		}
+
 		switch( $object_class )
 		{
 			case 'Item':
@@ -9235,5 +9224,160 @@ function get_social_media_image( $Item = NULL, $params = array() )
 	}
 
 	return NULL;
+}
+
+
+/**
+ * Opens modal to insert inline image tags.
+ * Used by the following plugins:
+ * - evo_TinyMCE
+ * - evo_inlines
+ *
+ * @param array Params
+ */
+function insert_image_links_block( $params )
+{
+	global $current_User, $inc_path, $Blog, $blog, $LinkOwner;
+	global $is_admin_page;
+
+	load_funcs( 'links/model/_link.funcs.php' );
+
+	$params = array_merge( array(
+			'target_type' => NULL,
+		), $params );
+
+	if( ! empty( $params['blog'] ) )
+	{
+		$BlogCache = & get_BlogCache();
+		$blog = $params['blog'];
+		$Blog = $BlogCache->get_by_ID( $blog );
+	}
+
+	$temp_ID = empty( $params['temp_ID'] ) ? NULL : $params['temp_ID'];
+	$is_admin_page = is_logged_in() && isset( $params['request_from'] ) && ( $params['request_from'] == 'back' );
+
+	switch( $params['target_type'] )
+	{
+		case 'Item':
+			if( ! isset( $params['target_ID'] ) && ! isset( $params['temp_ID'] ) )
+			{
+				return;
+			}
+
+			$ItemCache = & get_ItemCache();
+			$edited_Item = & $ItemCache->get_by_ID( $params['target_ID'], false, false );
+
+			if( empty( $blog ) && $edited_Item )
+			{
+				$Blog = $edited_Item->get_Blog();
+				$blog = $Blog->ID;
+			}
+
+			if( isset( $GLOBALS['files_Module'] )
+				&& ( ( $edited_Item && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) ) || ( empty( $edited_Item ) && $params['temp_ID'] ) )
+				&& $current_User->check_perm( 'files', 'view', false ) )
+			{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
+				load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+				global $LinkOwner; // Initialize this object as global because this is used in many link functions
+				$LinkOwner = new LinkItem( $edited_Item, $temp_ID );
+			}
+			break;
+
+		case 'Comment':
+			if( ! isset( $params['target_ID'] ) )
+			{
+				return;
+			}
+
+			$CommentCache = & get_CommentCache();
+			$edited_Comment = & $CommentCache->get_by_ID( $params['target_ID'] );
+			$comment_Item = & $edited_Comment->get_Item();
+
+			if( empty( $blog ) && $comment_Item )
+			{
+				$Blog = $comment_Item->get_Blog();
+				$blog = $Blog->ID;
+			}
+
+			if( isset( $GLOBALS['files_Module'] )
+				&& $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment )
+				&& $current_User->check_perm( 'files', 'view', false ) )
+			{	// Files module is enabled, but in case of creating new comments we should show file attachments block only if user has all required permissions to attach files
+				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+				global $LinkOwner; // Initialize this object as global because this is used in many link functions
+				$LinkOwner = new LinkComment( $edited_Comment );
+			}
+			break;
+
+		case 'EmailCampaign':
+			if( ! isset( $params['target_ID'] ) )
+			{
+				return;
+			}
+
+			$EmailCampaignCache = & get_EmailCampaignCache();
+			$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $params['target_ID'] );
+
+			if( isset( $GLOBALS['files_Module'] )
+				&& $current_User->check_perm( 'emails', 'edit', true )
+				&& $current_User->check_perm( 'files', 'view', false ) )
+			{	// Files module is enabled, but in case of creating new email campaign  we should show file attachments block only if user has all required permissions to attach files
+				load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
+				global $LinkOwner; // Initialize this object as global because this is used in many link functions
+				$LinkOwner = new LinkEmailCampaign( $edited_EmailCampaign );
+			}
+			break;
+
+		case 'Message':
+			if( ! isset( $params['target_ID'] ) && ! isset( $params['temp_ID'] ) )
+			{
+				return;
+			}
+
+			$MessageCache = & get_MessageCache();
+			$edited_Message = $MessageCache->get_by_ID( $params['target_ID'], false, false );
+
+			if( isset( $GLOBALS['files_Module'] )
+				&& $current_User->check_perm( 'perm_messaging', 'reply' )
+				&& $current_User->check_perm( 'files', 'view', false ) )
+			{	// Files module is enabled, but in case of creating new messages we should show file attachments block only if user has all required permissions to attach files
+				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+				global $LinkOwner; // Initialize this object as global because this is used in many link functions
+				$LinkOwner = new LinkMessage( $edited_Message, $temp_ID );
+			}
+			break;
+
+		default:
+			return;
+	}
+
+	// Set a different dragand drop button ID
+	global $dragdropbutton_ID, $fm_mode, $link_list_tbody_ID;
+	$fm_mode = 'file_select';
+	$dragdropbutton_ID = 'file-uploader-modal';
+	$link_list_tbody_ID = 'linklist_tbody_modal';
+
+	if( is_admin_page() )
+	{
+		global $UserSettings, $adminskins_path, $AdminUI;
+
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
+		$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+	}
+	else
+	{
+		global $Skin, $inc_path;
+
+		init_fontawesome_icons();
+
+		$blog_skin_ID = $Blog->get_skin_ID();
+		$SkinCache = & get_SkinCache();
+		$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+
+		require $inc_path.'links/views/_link_list.view.php';
+	}
 }
 ?>

@@ -564,7 +564,7 @@ function display_link_position( & $row, $show_actions = true )
 			{
 				$r .= ' '.get_icon( 'add', 'imgtag', array(
 						'title'   => sprintf( T_('Insert %s tag into the post'), '['.$type.':]' ),
-						'onclick' => 'evo_item_image_insert( '.intval( $blog ).', \'image\', '.$row->link_ID.' );',
+						'onclick' => 'return evo_item_image_insert( '.( empty( $blog ) ? 'null' : $blog ).', \'image\', '.$row->link_ID.' );',
 						'style'   => 'cursor:pointer;'
 					) );
 
