@@ -1219,6 +1219,7 @@ function move_short_tags( $content, $pattern = NULL, $callback = NULL )
 function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickable_callback', $additional_attrs = '', $exclude_headers = false )
 {
 	$r = '';
+	$inside_bracket_short_tag = false;
 	$inside_tag = false;
 	$in_a_tag = false;
 	$in_code_tag = false;
@@ -1233,7 +1234,16 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 	// faster and less memory intensive (tested for some example content)
 	while( $i < $n )
 	{	// Go through each char in string... (we will fast forward from tag to tag)
-		if( $inside_tag )
+		if( $inside_bracket_short_tag )
+		{	// State: We're currently inside bracket short tag like [image:], [emailcapture:], [fields:], [compare:] and etc.:
+			if( $text[ $i ] == ']' )
+			{	// End of bracket short tag:
+				$inside_bracket_short_tag = false;
+				$r .= substr( $text, $from_pos, $i - $from_pos + 1 );
+				$from_pos = $i + 1;
+			}
+		}
+		elseif( $inside_tag )
 		{	// State: We're currently inside some tag:
 			switch( $text[$i] )
 			{
@@ -1323,29 +1333,46 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 		else
 		{ // State: we're not currently in any tag:
 			// Find next tag opening:
-			$i = strpos($text, '<', $i);
-			if( $i === false )
-			{ // No more opening tags:
-				break;
+			if( ( $b = strpos( $text, '[', $i ) ) !== false )
+			{	// Check if a bracket '[]' short tag is really opening:
+				// (we are finding here short tags like [image:], [emailcapture:], [fields:], [compare:] and etc., see full list in the Item->render_inline_tags())
+				$b++;
+				$short_tag_name = '';
+				while( isset( $text[ $b ] ) && $text[ $b ] != ':' && $text[ $b ] != ']' )
+				{	// Get short tag name between chars '[' and ( ':' or ']' ):
+					$short_tag_name .= $text[ $b ];
+					$b++;
+				}
+				// We are inside bracket short tag if its name contains only letters:
+				$inside_bracket_short_tag = preg_match( '/^[a-z]+$/', $short_tag_name );
 			}
 
-			$inside_tag = true;
-			$in_tag_quote = false;
-			// s$r .= '{'.$text[$i+1];
+			if( ! $inside_bracket_short_tag )
+			{	// Try to find opening HTML tag only if bracket short tag is not opened currently:
+				$i = strpos($text, '<', $i);
+				if( $i === false )
+				{ // No more opening tags:
+					break;
+				}
 
-			if( ($text[$i+1] == 'a' || $text[$i+1] == 'A') && ctype_space($text[$i+2]) )
-			{ // opening "A" tag
-				$in_a_tag = true;
-			}
+				$inside_tag = true;
+				$in_tag_quote = false;
+				// s$r .= '{'.$text[$i+1];
 
-			if( ( substr( $text, $i+1, 4 ) == 'code') )
-			{ // opening "code" tag
-				$in_code_tag = true;
-			}
+				if( ($text[$i+1] == 'a' || $text[$i+1] == 'A') && ctype_space($text[$i+2]) )
+				{ // opening "A" tag
+					$in_a_tag = true;
+				}
 
-			if( $exclude_headers && preg_match( '/^h[1-6]$/', substr( $text, $i+1, 2 ), $h_match ) )
-			{	// opening "h1" - "h6" tags:
-				$in_header_tag = $h_match[0];
+				if( ( substr( $text, $i+1, 4 ) == 'code') )
+				{ // opening "code" tag
+					$in_code_tag = true;
+				}
+
+				if( $exclude_headers && preg_match( '/^h[1-6]$/', substr( $text, $i+1, 2 ), $h_match ) )
+				{	// opening "h1" - "h6" tags:
+					$in_header_tag = $h_match[0];
+				}
 			}
 
 			// Make the text before the opening < clickable:
