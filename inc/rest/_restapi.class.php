@@ -258,7 +258,7 @@ class RestApi
 	/**
 	 * Add new element in response array
 	 *
-	 * @param string Key or Value ( if second param is NULL )
+	 * @param string Key or Value ( if second param is NULL ), Use NULL to merge the array from second param with existing response array
 	 * @param mixed Value
 	 * @param string Type of new added item: 'raw', 'integer', 'array'
 	 */
@@ -267,6 +267,10 @@ class RestApi
 		if( $value === NULL )
 		{	// Use auto key:
 			$this->response[] = $key;
+		}
+		elseif( $key === NULL && is_array( $value ) )
+		{	// Merge new data array to response array:
+			$this->response = array_merge( $this->response, $value );
 		}
 		else
 		{	// Use defined key:
@@ -589,7 +593,7 @@ class RestApi
 			'tagline'   => $Blog->get( 'tagline' ),
 			'desc'      => $Blog->get( 'longdesc' ) );
 
-		$this->response = $collection_data;
+		$this->add_response( NULL, $collection_data );
 	}
 
 
@@ -761,7 +765,7 @@ class RestApi
 
 			if( $post_ID )
 			{	// If only one post is requested then response should as one level array with post fields:
-				$this->response = $item_data;
+				$this->add_response( NULL, $item_data );
 			}
 			else
 			{	// Add data of each post in separate array of response:
@@ -769,7 +773,7 @@ class RestApi
 			}
 		}
 
-		if( empty( $this->response ) )
+		if( empty( $item_data ) )
 		{	// No posts detected:
 			if( $post_ID )
 			{	// Wrong post request:
@@ -1387,7 +1391,7 @@ class RestApi
 			$this->add_response( 'users', $user_data, 'array' );
 		}
 
-		if( empty( $this->response ) )
+		if( empty( $user_data ) )
 		{	// No users found:
 			$this->halt( 'No users found', 'no_users', 404 );
 			// Exit here.
@@ -1496,7 +1500,7 @@ class RestApi
 		}
 
 		// Add user data in the response:
-		$this->response = $user_data;
+		$this->add_response( NULL, $user_data );
 	}
 
 
@@ -2484,8 +2488,8 @@ class RestApi
 
 		if( ! $source_LinkOwner || ! ( $source_LinkList = $source_LinkOwner->get_attachment_LinkList( 1000, $source_position, $source_file_type, $link_list_params ) ) )
 		{	// No requested links, Exit here:
-			$this->response = array();
-			return;
+			$this->halt( 'No requested links!', 'no_links', 404 );
+			// Exit here.
 		}
 
 		$dest_position = param( 'dest_position', 'string' );
