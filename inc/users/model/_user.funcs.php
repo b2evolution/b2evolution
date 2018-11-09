@@ -5609,6 +5609,97 @@ function check_access_user_profile( $user_ID, $mode = 'normal' )
 
 
 /**
+ * Display emails sent to the User results table
+ *
+ * @param array Params
+ */
+function user_sent_emails_results_block( $params = array() )
+{
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'edited_User'          => NULL,
+			'results_param_prefix' => 'user_email_',
+			'results_title'        => T_('Emails sent to the User'),
+			'results_no_text'      => T_('User does not receive any emails'),
+			'action'               => '',
+		), $params );
+
+	if( ! is_logged_in() )
+	{	// Only logged in users can access to this function
+		return;
+	}
+
+	global $current_User;
+	if( ! $current_User->check_perm( 'users', 'moderate' ) || ! $current_User->check_perm( 'emails', 'view' ) )
+	{	// Check minimum permission:
+		return;
+	}
+
+	$edited_User = $params['edited_User'];
+	if( ! $edited_User )
+	{	// No defined User, probably the function is calling from AJAX request
+		$user_ID = param( 'user_ID', 'integer', 0 );
+		if( empty( $user_ID ) )
+		{	// Bad request, Exit here
+			return;
+		}
+		$UserCache = & get_UserCache();
+		if( ( $edited_User = & $UserCache->get_by_ID( $user_ID, false ) ) === false )
+		{	// Bad request, Exit here
+			return;
+		}
+	}
+
+	global $DB, $AdminUI;
+
+	param( 'user_tab', 'string', '', true );
+	param( 'user_ID', 'integer', 0, true );
+
+	$SQL = new SQL();
+	$SQL->SELECT( 'SQL_NO_CACHE emlog_ID, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_last_open_ts, emlog_last_click_ts, emlog_camp_ID, ecmp_name' );
+	$SQL->FROM( 'T_email__log' );
+	$SQL->FROM_add( 'LEFT JOIN T_email__campaign ON ecmp_ID = emlog_camp_ID' );
+	$SQL->WHERE( 'emlog_user_ID = '.$DB->quote( $edited_User->ID ) );
+
+	// Create result set:
+	$emails_Results = new Results( $SQL->get(), $params['results_param_prefix'] );
+	$emails_Results->title = $params['results_title'];
+	$emails_Results->no_results_text = $params['results_no_text'];
+
+	// Get a count of the blogs which current user can delete
+	if( $params['action'] != 'view' && $emails_Results->get_total_rows() > 0 && $current_User->check_perm( 'emails', 'edit' ) )
+	{	// Display action icon to delete all records if at least one record exists & user has a permission:
+		$emails_Results->global_icon( sprintf( T_('Delete all emails sent to the User %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_sent_emails&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
+	}
+
+	// Initialize Results object:
+	emails_sent_log_results( $emails_Results, array(
+			'display_receiver' => false,
+		) );
+
+	if( is_ajax_content() )
+	{	// init results param by template name
+		if( !isset( $params[ 'skin_type' ] ) || ! isset( $params[ 'skin_name' ] ) )
+		{
+			debug_die( 'Invalid ajax results request!' );
+		}
+		$emails_Results->init_params_by_skin( $params[ 'skin_type' ], $params[ 'skin_name' ] );
+	}
+
+	$results_params = $AdminUI->get_template( 'Results' );
+	$display_params = array(
+		'before' => str_replace( '>', ' style="margin-top:25px" id="user_sent_emails_result">', $results_params['before'] ),
+	);
+	$emails_Results->display( $display_params );
+
+	if( ! is_ajax_content() )
+	{	// Create this hidden div to get a function name for AJAX request
+		echo '<div id="'.$params['results_param_prefix'].'ajax_callback" style="display:none">'.__FUNCTION__.'</div>';
+	}
+}
+
+
+/**
  * Display user's reposts results table
  *
  * @param array Params

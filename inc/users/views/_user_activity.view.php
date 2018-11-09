@@ -71,8 +71,14 @@ foreach( $user_tags as $user_tag )
 }
 echo '</div>';
 
+/**** Emails sent to the User ****/
+user_sent_emails_results_block( array(
+		'edited_User' => $edited_User,
+		'action'      => $action,
+	) );
+evo_flush();
 
-/**** Reports of the User by other Users  ****/
+/**** Reports of the User by other Users ****/
 user_reports_results_block( array(
 		'edited_User' => $edited_User,
 	) );
@@ -85,7 +91,7 @@ blogs_user_results_block( array(
 	) );
 evo_flush();
 
-/**** Posts created by the user  ****/
+/**** Posts created by the user ****/
 items_created_results_block( array(
 		'edited_User' => $edited_User,
 		'action'      => $action,
