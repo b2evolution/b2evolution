@@ -969,6 +969,7 @@ switch( $action )
 			case 'items_list_block_by_page':
 			case 'items_manual_results_block':
 			case 'user_sent_emails_results_block':
+			case 'user_email_returns_results_block':
 				break;
 
 			default:

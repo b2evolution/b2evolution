@@ -1594,4 +1594,103 @@ function emails_sent_log_results( & $emails_Results, $params = array() )
 			);
 	}
 }
+
+
+/**
+ * Helper to display email address in cell of email returns table
+ *
+ * @param string Email address
+ * @return string
+ */
+function emret_td_address( $emret_address )
+{
+	return '<a href="'.regenerate_url( 'email,action,emret_ID', 'email='.$emret_address ).'">'.$emret_address.'</a>';
+}
+
+
+/**
+ * Initialize Results object for email returns list
+ *
+ * @param object Results
+ * @param array Params
+ */
+function email_returns_results( & $email_returns_Results, $params = array() )
+{
+	global $admin_url;
+
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'display_id'         => true,
+			'display_datetime'   => true,
+			'display_address'    => true,
+			'display_error_type' => true,
+			'display_error_msg'  => true,
+			'display_actions'    => true,
+		), $params );
+
+	if( $params['display_id'] )
+	{	// Display ID column:
+		$email_returns_Results->cols[] = array(
+			'th' => T_('ID'),
+			'order' => 'emret_ID',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'right',
+			'td' => '$emret_ID$',
+		);
+	}
+
+	if( $params['display_id'] )
+	{	// Display Date Time column:
+		$email_returns_Results->cols[] = array(
+			'th' => T_('Date Time'),
+			'order' => 'emret_timestamp',
+			'default_dir' => 'D',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'timestamp',
+			'td' => '%mysql2localedatetime_spans( #emret_timestamp# )%',
+		);
+	}
+
+	if( $params['display_address'] )
+	{	// Display Address column:
+		$email_returns_Results->cols[] = array(
+			'th' => T_('Address'),
+			'order' => 'emret_address',
+			'td' => '%emret_td_address( #emret_address# )%',
+			'th_class' => 'shrinkwrap',
+		);
+	}
+
+	if( $params['display_error_type'] )
+	{	// Display Err Type column:
+		load_funcs( 'cron/model/_decode_returned_emails.funcs.php' );
+		$email_returns_Results->cols[] = array(
+			'th' => T_('Err Type'),
+			'order' => 'emret_errtype',
+			'td' => '%dre_decode_error_type( #emret_errtype# )%',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'shrinkwrap',
+		);
+	}
+
+	if( $params['display_error_msg'] )
+	{	// Display Error column:
+		$email_returns_Results->cols[] = array(
+			'th' => T_('Error'),
+			'order' => 'emret_errormsg',
+			'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=return&amp;emret_ID=$emret_ID$">%htmlspecialchars( #emret_errormsg# )%</a>',
+		);
+	}
+
+	if( $params['display_actions'] )
+	{	// Display Actions column:
+		$email_returns_Results->cols[] = array(
+			'th' => T_('Actions'),
+			'th_class' => 'shrinkwrap small',
+			'td_class' => 'shrinkwrap',
+			'td' => action_icon( T_('View this email...'), 'magnifier', $admin_url.'?ctrl=email&amp;tab=return&amp;emret_ID=$emret_ID$' )
+				.action_icon( T_('Go to users list with this email address'), 'play', $admin_url.'?ctrl=users&amp;filter=new&amp;keywords=$emret_address$' )
+		);
+	}
+}
 ?>

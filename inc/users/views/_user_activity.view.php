@@ -78,6 +78,13 @@ user_sent_emails_results_block( array(
 	) );
 evo_flush();
 
+/**** Email returns from the User's email address ****/
+user_email_returns_results_block( array(
+		'edited_User' => $edited_User,
+		'action'      => $action,
+	) );
+evo_flush();
+
 /**** Reports of the User by other Users ****/
 user_reports_results_block( array(
 		'edited_User' => $edited_User,

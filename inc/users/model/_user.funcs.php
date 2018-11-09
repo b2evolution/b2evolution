@@ -5693,7 +5693,91 @@ function user_sent_emails_results_block( $params = array() )
 	$emails_Results->display( $display_params );
 
 	if( ! is_ajax_content() )
-	{	// Create this hidden div to get a function name for AJAX request
+	{	// Create this hidden div to get a function name for AJAX request:
+		echo '<div id="'.$params['results_param_prefix'].'ajax_callback" style="display:none">'.__FUNCTION__.'</div>';
+	}
+}
+
+
+/**
+ * Display email returns from the User's email address results table
+ *
+ * @param array Params
+ */
+function user_email_returns_results_block( $params = array() )
+{
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'edited_User'          => NULL,
+			'results_param_prefix' => 'user_returns_',
+			'results_title'        => T_('Email returns from the User\'s email address'),
+			'results_no_text'      => T_('No email returns from the User\'s email address'),
+			'action'               => '',
+		), $params );
+
+	if( ! is_logged_in() )
+	{	// Only logged in users can access to this function
+		return;
+	}
+
+	global $current_User;
+	if( ! $current_User->check_perm( 'users', 'moderate' ) || ! $current_User->check_perm( 'emails', 'view' ) )
+	{	// Check minimum permission:
+		return;
+	}
+
+	$edited_User = $params['edited_User'];
+	if( ! $edited_User )
+	{	// No defined User, probably the function is calling from AJAX request
+		$user_ID = param( 'user_ID', 'integer', 0 );
+		if( empty( $user_ID ) )
+		{	// Bad request, Exit here
+			return;
+		}
+		$UserCache = & get_UserCache();
+		if( ( $edited_User = & $UserCache->get_by_ID( $user_ID, false ) ) === false )
+		{	// Bad request, Exit here
+			return;
+		}
+	}
+
+	global $DB, $AdminUI;
+
+	param( 'user_tab', 'string', '', true );
+	param( 'user_ID', 'integer', 0, true );
+
+	$SQL = new SQL();
+	$SQL->SELECT( 'SQL_NO_CACHE emret_ID, emret_timestamp, emret_address, emret_errormsg, emret_errtype' );
+	$SQL->FROM( 'T_email__returns' );
+	$SQL->WHERE( 'emret_address = '.$DB->quote( $edited_User->get( 'email' ) ) );
+
+	// Create result set:
+	$email_returns_Results = new Results( $SQL->get(), $params['results_param_prefix'] );
+	$email_returns_Results->title = $params['results_title'];
+	$email_returns_Results->no_results_text = $params['results_no_text'];
+
+	// Initialize Results object:
+	email_returns_results( $email_returns_Results, array(
+			'display_address' => false,
+		) );
+
+	if( is_ajax_content() )
+	{	// init results param by template name
+		if( !isset( $params[ 'skin_type' ] ) || ! isset( $params[ 'skin_name' ] ) )
+		{
+			debug_die( 'Invalid ajax results request!' );
+		}
+		$email_returns_Results->init_params_by_skin( $params[ 'skin_type' ], $params[ 'skin_name' ] );
+	}
+
+	$results_params = $AdminUI->get_template( 'Results' );
+	$display_params = array(
+		'before' => str_replace( '>', ' style="margin-top:25px" id="user_email_returns_result">', $results_params['before'] ),
+	);
+	$email_returns_Results->display( $display_params );
+
+	if( ! is_ajax_content() )
+	{	// Create this hidden div to get a function name for AJAX request:
 		echo '<div id="'.$params['results_param_prefix'].'ajax_callback" style="display:none">'.__FUNCTION__.'</div>';
 	}
 }
