@@ -54,7 +54,23 @@ if( !$user_profile_only )
 echo $usertab_header;
 
 // Display IP address from where this user was created
-echo '<div style="margin-top:25px;font-weight:bold;"><span>'.T_( 'User created from IP' ).': '.int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ).'</span></div>';
+echo '<div style="margin-top:25px"><b>'.T_('User created from IP').': '.int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) ).'</b></div>';
+
+// Display user tags:
+$user_tags_SQL = new SQL( 'Get tags for the User #'.$edited_User->ID );
+$user_tags_SQL->SELECT( 'utag_name' );
+$user_tags_SQL->FROM( 'T_users__tag' );
+$user_tags_SQL->FROM_add( 'INNER JOIN T_users__usertag ON uutg_emtag_ID = utag_ID' );
+$user_tags_SQL->WHERE( 'uutg_user_ID = '.$edited_User->ID );
+$user_tags_SQL->ORDER_BY( 'utag_name' );
+$user_tags = $DB->get_col( $user_tags_SQL );
+echo '<div style="margin-top:25px"><b>'.T_('User Tags').':</b> ';
+foreach( $user_tags as $user_tag )
+{
+	echo '<span class="label label-info">'.$user_tag.'</span> ';
+}
+echo '</div>';
+
 
 /**** Reports of the User by other Users  ****/
 user_reports_results_block( array(
