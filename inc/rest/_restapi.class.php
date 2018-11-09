@@ -166,8 +166,12 @@ class RestApi
 	 */
 	private function user_authentication()
 	{
-		if( isset( $_SERVER, $_SERVER['PHP_AUTH_USER'] ) )
-		{	// Do basic HTTP authentication:
+		global $current_User;
+
+		if( isset( $_SERVER, $_SERVER['PHP_AUTH_USER'] ) &&
+		    ( ! is_logged_in() || $current_User->get( 'login' ) != $_SERVER['PHP_AUTH_USER'] ) )
+		{	// Do basic HTTP authentication when user login is provided AND
+			// user is not logged in yet OR the provided login is defferent than login of the current User:
 			$this->user_log_in( $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'] );
 		}
 	}
