@@ -4708,7 +4708,7 @@ class Blog extends DataObject
 	function get_main_containers( $skin_type = 'normal', $load_container_ids = false )
 	{
 		if( ! isset( $this->widget_containers ) )
-		{	// Initialize 
+		{	// Initialize
 			$this->widget_containers = array();
 		}
 
@@ -5736,7 +5736,7 @@ class Blog extends DataObject
 				break;
 
 			case 'catalog':
-				$default_post_types = array( 'Product' );
+				$default_post_types = array( 'Product', 'Digital Product' );
 				break;
 
 			default: // 'std'

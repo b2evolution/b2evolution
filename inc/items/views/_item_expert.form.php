@@ -286,8 +286,8 @@ $Form->begin_form( '', '', $params );
 	}
 
 	// ############################ ITEM PRICING #############################
-	// Custom fields:
 	global $thumbnail_sizes;
+
 	$Table = new Table( 'Results' );
 	$Table->title = T_('Pricing').get_manual_link( 'item-pricing' );
 	if( $current_User->check_perm( 'options', 'edit' ) )
@@ -296,6 +296,21 @@ $Form->begin_form( '', '', $params );
 				.'<button type="button" class="btn btn-primary btn-sm" id="add_item_pricing" title="'.T_('Add new price rule').'">'.get_icon( 'new' ).' '.T_('Add new price rule').'</button>'
 			.'</span>';
 	}
+
+	// ############################ ITEM AVAILABILITY #############################
+	$Form->begin_fieldset( T_('Item Availability').get_manual_link( 'item-availability-panel' ), array( 'id' => 'itemform_item_availability', 'fold' => true ) );
+
+	$Form->switch_layout( 'fields_table' );
+	$Form->begin_fieldset();
+
+	$Form->end_fieldset();
+	$Form->switch_layout( NULL );
+
+	$Form->text_input( 'qty_in_stock', $edited_Item->get( 'qty_in_stock' ), 40, T_('Quantity in stock'), '', array( 'type' => 'number', 'maxlength' => 9 ) );
+	$Form->text_input( 'low_stock', $edited_Item->get( 'low_stock' ), 40, T_('Low stock threshold'), '', array( 'type' => 'number', 'maxlength' => 9 ) );
+	$Form->checkbox_input( 'can_be_ordered_if_no_stock', $edited_Item->get( 'can_be_ordered_if_no_stock' ), T_('Can still be ordered if no stock') );
+
+	$Form->end_fieldset();
 
 	$Table->cols = array(
 		array( 'th' => T_('Price') ),

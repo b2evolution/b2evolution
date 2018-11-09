@@ -5380,6 +5380,77 @@ function ityp_schema_title( $schema )
 
 
 /**
+ * Get item availability properties
+ *
+ * @return array Item availability properties
+ */
+function item_availability_properties()
+{
+	$availability_properties = array(
+		'discontinued' => array(
+			'schema' => 'Discontinued',
+			'title'  => T_('Discontinued'),
+			'label'  => 'danger',
+		),
+		'in_stock' => array(
+			'schema' => 'InStock',
+			'title'  => T_('In Stock'),
+			'label'  => 'success',
+		),
+		'in_store_only' => array(
+			'schema' => 'InStoreOnly',
+			'title'  => T_('Available only in store'),
+			'label'  => 'info',
+		),
+		'limited_availability' => array(
+			'schema' => 'LimitedAvailability',
+			'title'  => T_('Only %d left!'),
+			'label'  => 'warning',
+		),
+		'online_only' => array(
+			'schema' => 'OnlineOnly',
+			'title'  => T_('Available now'),
+			'label'  => 'success',
+		),
+		'out_of_stock' => array(
+			'schema' => 'OutOfStock',
+			'title'  => T_('Temporarily out of stock, order now and get it as soon as it\'s available'),
+			'label'  => 'info',
+		),
+		'sold_out' => array(
+			'schema' => 'SoldOut',
+			'title'  => T_('Sold out. May be available later.'),
+			'label'  => 'danger',
+		)
+	);
+
+	return $availability_properties;
+}
+
+
+/**
+ * Get item availability property availability name
+ *
+ * @param string Availability name
+ * @param string Property
+ * @return array
+ */
+function item_availability_property( $name, $property = '' )
+{
+	$item_availabilities = item_availability_properties();
+
+	if( empty( $property ) )
+	{
+		return isset( $item_availabilities[$name] ) ? $item_availabilities[$name] : NULL;
+	}
+	else
+	{
+		return isset( $item_availabilities[$name][$property] ) ? $item_availabilities[$name][$property] : NULL;
+	}
+}
+
+
+/**
  * Get item types options for <select> which are enabled for collection
  *
  * @param integer Collection ID

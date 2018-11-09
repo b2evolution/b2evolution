@@ -324,6 +324,13 @@ class Item extends ItemLight
 	var $update_item_pricing = NULL;
 	var $insert_item_pricing = NULL;
 	var $delete_item_pricing = NULL;
+	/**
+	 * Item availability fields
+	 */
+	var $qty_in_stock = 0;
+	var $low_stock = 5;
+	var $can_be_ordered_if_no_stock = 0;
+
 
 	/**
 	 * Constructor
@@ -465,6 +472,11 @@ class Item extends ItemLight
 			// Voting fields:
 			$this->addvotes = $db_row->post_addvotes;
 			$this->countvotes = $db_row->post_countvotes;
+
+			// Item availability fields:
+			$this->qty_in_stock = isset( $db_row->post_qty_in_stock ) ? $db_row->post_qty_in_stock : $this->qty_in_stock;
+			$this->low_stock = isset( $db_row->post_low_stock ) ? $db_row->post_low_stock : $this->low_stock;
+			$this->can_be_ordered_if_no_stock = isset( $db_row->post_can_be_ordered_if_no_stock ) ? $db_row->post_can_be_ordered_if_no_stock : $this->can_be_ordered_if_no_stock;
 		}
 
 		modules_call_method( 'constructor_item', array( 'Item' => & $this ) );
@@ -880,6 +892,23 @@ class Item extends ItemLight
 			{ // Meta keywords must be entered
 				param_check_not_empty( 'metakeywords', T_('Please provide the meta keywords.'), '' );
 			}
+		}
+
+		// Item availability stuff:
+		$qty_in_stock = param( 'qty_in_stock', 'integer', NULL );
+		if( $qty_in_stock !== NULL )
+		{
+			$this->set_from_Request( 'qty_in_stock', 'qty_in_stock' );
+		}
+		$low_stock = param( 'low_stock', 'integer', NULL );
+		if( $low_stock !== NULL )
+		{
+			$this->set_from_Request( 'low_stock', 'low_stock' );
+		}
+		$can_be_ordered_if_no_stock = param( 'can_be_ordered_if_no_stock', 'integer', NULL );
+		if( $can_be_ordered_if_no_stock !== NULL )
+		{
+			$this->set_from_Request( 'can_be_ordered_if_no_stock', 'can_be_ordered_if_no_stock' );
 		}
 
 		// TAGS:
@@ -11609,6 +11638,53 @@ class Item extends ItemLight
 		$SQL->LIMIT( 1 );
 
 		return $DB->get_row( $SQL, ARRAY_A );
+	}
+
+
+	/**
+	 * Get item availability
+	 *
+	 * @return string Item availability
+	 */
+	function get_availability()
+	{
+		$this->get_ItemType();
+
+		if( $this->qty_in_stock > $this->low_stock )
+		{
+			if( $this->ItemType->can_be_purchased_online && $this->ItemType->can_be_purchased_instore )
+			{
+				return 'in_stock';
+			}
+			elseif( $this->ItemType->can_be_purchased_online )
+			{
+				return 'online_only';
+			}
+			elseif( $this->ItemType->can_be_purchased_instore )
+			{
+				return 'in_store_only';
+			}
+			else
+			{
+				//debug_die( 'Item not available in store or online!' );
+				return 'discontinued';
+			}
+		}
+		elseif( $this->qty_in_stock > 0 && $this->qty_in_stock < $this->low_stock )
+		{
+			return 'limited_availability';
+		}
+		else
+		{
+			if( ! $this->ItemType->can_be_purchased_online && ! $this->ItemType->can_be_purchased_instore && ! $this->can_be_ordered_if_no_stock )
+			{
+				return 'discontinued';
+			}
+			elseif( $this->ItemType->can_be_purchased_online || $this->ItemType->can_be_purchased_instore )
+			{
+				return $this->can_be_ordered_if_no_stock ? 'out_of_stock' : 'sold_out';
+			}
+		}
 	}
 }
 ?>

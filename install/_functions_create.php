@@ -391,13 +391,17 @@ function create_default_data()
 	$post_types[] = array(
 			'name'   => 'Product',
 			'schema' => 'Product',
+			'can_be_purchased_instore' => 1,
+			'can_be_purchased_online' => 1,
+		);
+	$post_types[] = array(
+			'name'   => 'Digital Product',
+			'schema' => 'Product',
+			'can_be_purchased_online' => 1,
 		);
 	$post_types[] = array(
 			'name'   => 'Review',
 			'schema' => 'Review',
-		);
-	$post_types[] = array(
-			'name' => 'Product',
 		);
 	// Default settings:
 	$post_type_default_settings = array(
@@ -425,6 +429,8 @@ function create_default_data()
 			'use_comment_expiration'   => 'optional',
 			'schema'                   => NULL,
 			'use_coordinates'          => 'never',
+			'can_be_purchased_instore' => 0,
+			'can_be_purchased_online'  => 0,
 		);
 	$post_types_sql = 'INSERT INTO T_items__type ( ityp_'.implode( ', ityp_', array_keys( $post_type_default_settings ) ).' ) VALUES ';
 	foreach( $post_types as $p => $post_type )
@@ -440,10 +446,11 @@ function create_default_data()
 	$DB->query( $post_types_sql );
 
 	// Item type custom fields:
-	$parent_ityp_ID = 3;
-	$child_ityp_ID = 4;
-	$product_ityp_ID = 20;
-	$review_ityp_ID = 21;
+	$parent_ityp_ID          = 3;
+	$child_ityp_ID           = 4;
+	$product_ityp_ID         = 21;
+	$digital_product_ityp_ID = 22;
+	$review_ityp_ID          = 23;
 	$custom_fields = array(
 		// for Item Type "Post with Custom Fields":
 		array(
@@ -639,6 +646,31 @@ function create_default_data()
 			'order'           => 10,
 			'note'            => T_('cm'),
 			'cell_class'      => 'right',
+		),
+		// for Item Type "Digital Product":
+		array(
+			'ityp_ID'         => $digital_product_ityp_ID,
+			'label'           => T_('Brand'),
+			'name'            => 'brand',
+			'schema_prop'     => 'brand',
+			'type'            => 'varchar',
+			'order'           => 1,
+		),
+		array(
+			'ityp_ID'         => $digital_product_ityp_ID,
+			'label'           => T_('SKU'),
+			'name'            => 'sku',
+			'schema_prop'     => 'sku',
+			'type'            => 'varchar',
+			'order'           => 2,
+		),
+		array(
+			'ityp_ID'         => $digital_product_ityp_ID,
+			'label'           => T_('Availability'),
+			'name'            => 'availability',
+			'schema_prop'     => 'offers.availability',
+			'type'            => 'varchar',
+			'order'           => 5,
 		),
 		// for Item Type "Review":
 		array(

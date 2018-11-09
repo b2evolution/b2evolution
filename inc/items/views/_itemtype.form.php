@@ -125,6 +125,11 @@ $Form->begin_fieldset( T_('Use of Comments').get_manual_link( 'item-type-comment
 	$Form->radio( 'ityp_use_comment_expiration', $edited_Itemtype->use_comment_expiration, $options, T_('Use comment expiration') );
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Item Availability').get_manual_link( 'item-type-availability' ), array( 'id' => 'itemtype_availability' ) );
+	$Form->checkbox_input( 'ityp_can_be_purchased_instore', $edited_Itemtype->get( 'can_be_purchased_instore' ), T_('Can be purchased in store') );
+	$Form->checkbox_input( 'ityp_can_be_purchased_online', $edited_Itemtype->get( 'can_be_purchased_online' ), T_('Can be purchased online') );
+$Form->end_fieldset();
+
 // Custom fields:
 $Table = new Table( 'Results' );
 $Table->title = T_('Custom Fields').get_manual_link( 'item-type-custom-fields' );

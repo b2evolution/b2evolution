@@ -61,6 +61,8 @@ class ItemType extends DataObject
 	var $perm_level = 'standard';
 	var $evobar_link_text = NULL;
 	var $skin_btn_text = NULL;
+	var $can_be_purchased_instore = 0;
+	var $can_be_purchased_online = 0;
 
 	/**
 	 * Custom fields
@@ -134,6 +136,8 @@ class ItemType extends DataObject
 			$this->perm_level = $db_row->ityp_perm_level;
 			$this->evobar_link_text = isset( $db_row->ityp_evobar_link_text ) ? $db_row->ityp_evobar_link_text : $this->evobar_link_text;
 			$this->skin_btn_text = isset( $db_row->ityp_skin_btn_text ) ? $db_row->ityp_skin_btn_text : $this->skin_btn_text;
+			$this->can_be_purchased_instore = isset( $db_row->ityp_can_be_purchased_instore ) ? $db_row->ityp_can_be_purchased_instore : $this->can_be_purchased_instore;
+			$this->can_be_purchased_online = isset( $db_row->ityp_can_be_purchased_online ) ? $db_row->ityp_can_be_purchased_online : $this->can_be_purchased_online;
 		}
 	}
 
@@ -336,6 +340,12 @@ class ItemType extends DataObject
 		// Use comment expiration
 		param( 'ityp_use_comment_expiration', 'string' );
 		$this->set_from_Request( 'use_comment_expiration' );
+
+		// Availability
+		param( 'ityp_can_be_purchased_instore', 'integer', 0 );
+		$this->set_from_Request( 'can_be_purchased_instore' );
+		param( 'ityp_can_be_purchased_online', 'integer', 0 );
+		$this->set_from_Request( 'can_be_purchased_online' );
 
 		// Load custom fields from request
 		$this->load_custom_fields_from_Request();
