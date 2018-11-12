@@ -156,13 +156,13 @@ switch( $action )
 		load_funcs('plugins/_plugin.funcs.php');
 
 		// Init the new setting set:
-		_set_setting_by_path( $Plugin, $set_type, $set_path, array() );
+		$set_node = _set_setting_by_path( $Plugin, $set_type, $set_path, array() );
 
 		// Get the new plugin setting set and display it with a fake Form
 		$r = get_plugin_settings_node_by_path( $Plugin, $set_type, $set_path, /* create: */ false );
 
 		$Form = new Form(); // fake Form to display plugin setting
-		autoform_display_field( $set_path, $r['set_meta'], $Form, $set_type, $plugin_Object, $target_Object, $r['set_node'] );
+		autoform_display_field( $set_path, $r['set_meta'], $Form, $set_type, $plugin_Object, $target_Object, $set_node );
 		break;
 
 	case 'edit_comment':
