@@ -84,6 +84,8 @@ class Cart
 	 *                     NULL - to use quantity from request param 'qty' with default value '1'.
 	 * @param integer|NULL Item/Product ID,
 	 *                     NULL - to use item ID from request param 'item_ID'.
+	 * @param integer|NULL Currency ID,
+	 *                     NULL - to use currency ID from session.
 	 * @return boolean TRUE on successful updating,
 	 *                 FALSE on failed e.g. if a requested item doesn't exist
 	 */
@@ -125,6 +127,12 @@ class Cart
 		}
 		elseif( $qty > 0 )
 		{	// Add/Update quantity of items in cart:
+
+			if( ! $cart_Item->can_be_ordered_if_no_stock && $qty > $cart_Item->qty_in_stock )
+			{	// Quantity exceeds stock and item cannot be ordered if no stock:
+				$Messages->add( sprintf( T_('Product "%s" is out of stock and additional orders cannot be made.'), $cart_Item->get( 'title' ) ) , 'error' );
+				return false;
+			}
 
 			// Get best pricing for item:
 			$best_pricing = $cart_Item->get_current_best_pricing( $curr_ID, NULL, $qty );

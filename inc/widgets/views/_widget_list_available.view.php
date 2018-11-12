@@ -137,6 +137,7 @@ $core_componentwidget_defs = array(
 			'item_vote',
 			'item_next_previous',
 			'item_price',
+			'item_availability',
 			'add_to_cart_btn',
 			'item_custom_fields',
 		),

@@ -905,7 +905,7 @@ class Item extends ItemLight
 		{
 			$this->set_from_Request( 'low_stock', 'low_stock' );
 		}
-		$can_be_ordered_if_no_stock = param( 'can_be_ordered_if_no_stock', 'integer', NULL );
+		$can_be_ordered_if_no_stock = param( 'can_be_ordered_if_no_stock', 'integer', 0 );
 		if( $can_be_ordered_if_no_stock !== NULL )
 		{
 			$this->set_from_Request( 'can_be_ordered_if_no_stock', 'can_be_ordered_if_no_stock' );

@@ -149,7 +149,8 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 15, 'item_vote' ),
 		//array( 20, 'item_custom_fields', 'params' => array( 'fields_source' => 'include', 'fields' => 'price', 'widget_css_class' => 'product_price' ) ),
 		array( 20, 'item_price' ),
-		array( 25, 'add_to_cart_btn' ),
+		array( 25, 'item_availability' ),
+		array( 30, 'add_to_cart_btn' ),
 	);
 
 	/* Item Page */

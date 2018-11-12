@@ -291,7 +291,10 @@ class display_shopping_cart_Widget extends ComponentWidget
 				$qty_cell = '<span class="nowrap">';
 				$qty_cell .= action_icon( '', 'minus', $cart_action_url.( $item_qty - 1 ), NULL, NULL, NULL, array( 'class' => '' ) ).' ';
 				$qty_cell .= $item_qty.' ';
-				$qty_cell .= action_icon( '', 'add', $cart_action_url.( $item_qty + 1 ), NULL, NULL, NULL, array( 'class' => '' ) );
+				if( $item_qty < $cart_Item->qty_in_stock || $cart_Item->can_be_ordered_if_no_stock )
+				{
+					$qty_cell .= action_icon( '', 'add', $cart_action_url.( $item_qty + 1 ), NULL, NULL, NULL, array( 'class' => '' ) );
+				}
 				$qty_cell .= '</span>';
 				echo str_replace( $product_cell_masks, array( $qty_cell, $this->disp_params['class_quantity_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
