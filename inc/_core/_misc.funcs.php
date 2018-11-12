@@ -8057,11 +8057,11 @@ function get_script_baseurl()
 			if( $_SERVER['SERVER_PORT'] == '443' )
 			{	// Rewrite that as https:
 				$temp_baseurl = 'https://'.$_SERVER['SERVER_NAME'];
-			}	
+			}
 			elseif( $_SERVER['SERVER_PORT'] == '8890' )
 			{	// Used for testing
 				$temp_baseurl = 'https://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'];
-			}	
+			}
 			elseif( $_SERVER['SERVER_PORT'] != '80' )
 			{ // Get also a port number
 				$temp_baseurl .= ':'.$_SERVER['SERVER_PORT'];
@@ -9236,5 +9236,27 @@ function set_currency( $curr_ID )
 {
 	global $Session;
 	$Session->set( 'currency_ID', $curr_ID );
+}
+
+
+/**
+ * Get current active country
+ *
+ * @return object Country object
+ */
+function get_country()
+{
+	global $Session;
+	$CountryCache = & get_CountryCache();
+
+	$country_ID = $Session->get( 'country_ID' );
+	if( empty( $country_ID ) )
+	{	// No country defined in session, use default country:
+		load_funcs( 'regional/model/_regional.funcs.php' );
+		$country_ID = get_preferred_country_ID();
+		$Session->set( 'country_ID', $country_ID );
+	}
+
+	return $CountryCache->get_by_ID( $country_ID, false, false );
 }
 ?>

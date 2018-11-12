@@ -1657,6 +1657,19 @@ switch( $action )
 			}
 			break;
 
+	case 'set_country':
+			global $Session;
+			$country_ID = param( 'country', 'integer', true );
+			$redirect_to = param( 'redirect_to', 'url', '' );
+			$Session->set( 'country_ID', $country_ID );
+
+			if( !empty( $redirect_to ) )
+			{ // Redirect to back page, It is used by browsers without JavaScript
+				header_redirect( $redirect_to, 303 ); // Will EXIT
+				// We have EXITed already at this point!!
+			}
+			break;
+
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
 		break;

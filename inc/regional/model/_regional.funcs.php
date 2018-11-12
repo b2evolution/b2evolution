@@ -832,4 +832,23 @@ function get_default_currency_ID()
 	return $default_curr_ID;
 }
 
+
+
+/**
+ * Get preferred country ID
+ *
+ * @return integer Country ID
+ */
+function get_preferred_country_ID()
+{
+	global $DB, $preferred_country_ID;
+
+	if( empty( $preferred_country_ID ) )
+	{
+		$preferred_country_ID = $DB->get_var( 'SELECT ctry_ID FROM T_regional__country WHERE ctry_preferred = 1 LIMIT 1' );
+	}
+
+	return $preferred_country_ID;
+}
+
 ?>
