@@ -21,6 +21,9 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
+// Stop a request from the blocked IP addresses or Domains:
+antispam_block_request();
+
 if( $Settings->get('system_lock') )
 { // System is locked for maintenance, trackbacks are not allowed
 	$Messages->add( T_('You cannot leave a comment at this time because the system is under maintenance. Please try again in a few moments.'), 'error' );
