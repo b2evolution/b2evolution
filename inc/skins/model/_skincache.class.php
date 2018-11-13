@@ -173,8 +173,12 @@ class SkinCache extends DataObjectCache
 
 	/**
 	 * Instanciate a new object within this cache
+	 *
+	 * @param object Skin row
+	 * @param string Skin folder name
+	 * @param boolean TRUE if function should die on error
 	 */
-	function & new_obj( $row = NULL, $skin_folder = NULL )
+	function & new_obj( $row = NULL, $skin_folder = NULL, $halt_on_error = false )
 	{
 		if( is_null( $skin_folder ) )
 		{	// This happens when using the default skin
@@ -192,8 +196,12 @@ class SkinCache extends DataObjectCache
 			$objtype = $short_skin_folder.'_Skin';
 			if( ! class_exists( $objtype ) )
 			{
-				debug_die( 'There seems to be a _skin.class.php file in the skin directory ['.$skin_folder.'], but it does not contain a properly named class. Expected class name is: '.$objtype );
+				debug_die( 'There seems to be a <code>_skin.class.php</code> file in the skin directory <code>'.$skin_folder.'</code>, but it does not contain a properly named class. Expected class name is: <code>'.$objtype.'</code>' );
 			}
+		}
+		elseif( $halt_on_error )
+		{	// Don't allow to install skin if its class file doesn't exist:
+			debug_die( 'There is no file <code>_skin.class.php</code> in the skin directory <code>'.$skin_folder.'</code>.' );
 		}
 		else
 		{

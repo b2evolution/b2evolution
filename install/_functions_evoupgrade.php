@@ -10425,7 +10425,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$SkinCache = & get_SkinCache();
 		if( ! ( $default_site_Skin = & $SkinCache->get_by_folder( 'default_site_skin', false ) ) )
 		{	// If the skin doesn't exist try to install it:
-			$default_site_Skin = skin_install( 'default_site_skin' );
+			$default_site_Skin = skin_install( 'default_site_skin', true );
 		}
 		if( $default_site_Skin && $default_site_Skin->ID > 0 )
 		{	// Use the installed skin as default for site:
