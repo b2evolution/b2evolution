@@ -271,8 +271,8 @@ class coll_media_index_Widget extends ComponentWidget
 		// Maybe it would be good to get only the requested amount of files, because after a very short period the file types will be set for all images.
 		$ItemQuery->LIMIT( intval( $this->disp_params['limit'] ) * 2 );
 
-		$ItemQuery->ORDER_BY(	gen_order_clause( $this->disp_params['order_by'], $this->disp_params['order_dir'],
-											'post_', 'post_ID '.$this->disp_params['order_dir'].', link_ID' ) );
+		$ItemQuery->ORDER_BY( $ItemQuery->gen_order_clause( $this->disp_params['order_by'], $this->disp_params['order_dir'],
+											'post_', 'post_ID' ).', link_ID '.$this->disp_params['order_dir'] );
 
 		// Init FileList with the above defined query
 		$FileList = new DataObjectList2( $FileCache );

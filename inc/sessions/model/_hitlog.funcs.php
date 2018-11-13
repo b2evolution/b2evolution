@@ -899,19 +899,32 @@ function & get_Domain_by_subdomain( $subdomain_name )
 
 	$subdomain_name = explode( '.', $subdomain_name );
 
+	// Store in this var top existing domain even with unknown status,
+	// This domain will be returned when all other subdomains have unknown status:
+	$first_existing_Domain = NULL;
+
 	for( $i = 0; $i < count( $subdomain_name ); $i++ )
 	{
 		$domain_name = implode( '.', array_slice( $subdomain_name, $i ) );
-
-		if( $Domain = & $DomainCache->get_by_name( $domain_name, false, false ) ||
-		    $Domain = & $DomainCache->get_by_name( '.'.$domain_name, false, false ) )
-		{	// Domain exists with name, Get it:
-			return $Domain;
+		$domain_names = array( $domain_name, '.'.$domain_name );
+		foreach( $domain_names as $domain_name )
+		{
+			if( $Domain = & $DomainCache->get_by_name( $domain_name, false, false ) )
+			{	// If domain exists in DB:
+				if( $first_existing_Domain === NULL )
+				{	// Store first top existing domain with any status:
+					$first_existing_Domain = $Domain;
+				}
+				if( $Domain->get( 'status' ) != 'unknown' )
+				{	// Use this domain because it exists with not unknown status:
+					return $Domain;
+				}
+			}
 		}
 	}
 
-	$Domain = NULL;
-	return $Domain;
+	// Return either NULL or first top existing domain with unknown status:
+	return $first_existing_Domain;
 }
 
 
