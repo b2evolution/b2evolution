@@ -9259,4 +9259,31 @@ function get_country()
 
 	return $CountryCache->get_by_ID( $country_ID, false, false );
 }
+
+
+/**
+ * Get current shipment plugin
+ *
+ * @return object Shipment plugin object
+ */
+function get_shipment_plugin()
+{
+	global $Session, $Plugins;
+
+	$shipment_plugin_ID = $Session->get( 'shipment_plugin_ID' );
+	if( empty( $shipment_plugin_ID ) )
+	{	// No shipment_plugin_ID defined in session, use first plugin available:
+		global $Plugins;
+		$shipment_plugins = $Plugins->trigger_event_first_return( 'GetShipmentOption' );
+		if( $shipment_plugins )
+		{
+			$shipment_plugin_ID = $shipment_plugins['plugin_ID'];
+			$Session->set( 'shipment_plugin_ID', $shipment_plugin_ID );
+		}
+	}
+
+	return $Plugins->get_by_ID( $shipment_plugin_ID, false, false );
+}
+
+
 ?>

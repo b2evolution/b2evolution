@@ -3301,6 +3301,26 @@ class Plugin
 	}
 
 
+	/**
+	 * Event handler: Called when building possible shipment options
+	 *
+	 * @return string Shipment option title
+	 */
+	function GetShipmentOption()
+	{
+		return NULL;
+	}
+
+
+	/**
+	 * Event handler: Called when shipping cost
+	 */
+	function GetShippingCost( & $params )
+	{
+		return 0;
+	}
+
+
 	/*
 	 * Event handlers }}}
 	 */

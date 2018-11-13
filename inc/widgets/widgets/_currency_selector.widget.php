@@ -136,7 +136,7 @@ class currency_selector_Widget extends ComponentWidget
 		$CurrencyCache = & get_CurrencyCache();
 		$update_button = '<button type="submit" id="button_update_currency" name="actionArray[set_currency]" class="btn btn-primary" style="margin: 0;">'.T_('Update').'</button>';
 
-		$Form = new Form( get_htsrv_url().'anon_async.php?action=set_currency', 'currency_selector' );
+		$Form = new Form( get_htsrv_url().'anon_async.php?action=set_currency', 'currency_selector', 'post', 'blockspan' );
 		$Form->begin_form();
 		$Form->select_input_object( 'currency', $currency->ID, $CurrencyCache, T_('Currency'), array( 'field_suffix' => $update_button ) );
 		$Form->hidden( 'redirect_to', regenerate_url() );

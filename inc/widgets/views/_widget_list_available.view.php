@@ -119,6 +119,7 @@ $core_componentwidget_defs = array(
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
 			'display_shopping_cart',  // Shopping cart
+			'display_shipping_method' // Shipment options
 		),
 	'infoitem' => array(
 			'item_title',

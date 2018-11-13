@@ -256,6 +256,9 @@ class Plugins_admin extends Plugins
 				'GetCronJobs' => 'Gets a list of implemented cron jobs.',
 				'GetProvidedSkins' => 'Get a list of "skins" handled by the plugin.',
 
+				'GetShipmentOption' => 'Called when building possible shipment options',
+				'GetShippingCost' => 'Get shipping cost',
+
 				// sam2kb> This hook is not used anywhere
 				// TODO: remove it
 				'PluginUserSettingsEditAction' => 'Called as action before editing a user\'s settings.',

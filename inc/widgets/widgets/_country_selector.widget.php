@@ -141,7 +141,7 @@ class country_selector_Widget extends ComponentWidget
 		$CountryCache = & get_CountryCache();
 		$update_button = '<button type="submit" id="button_update_country" name="actionArray[set_country]" class="btn btn-primary" style="margin: 0;">'.T_('Update').'</button>';
 
-		$Form = new Form( get_htsrv_url().'anon_async.php?action=set_country', 'country_selector' );
+		$Form = new Form( get_htsrv_url().'anon_async.php?action=set_country', 'country_selector', 'post', 'blockspan' );
 		$Form->begin_form();
 		$Form->select_input_object( 'country', $country->ID, $CountryCache, $this->disp_params['selector_label'], array( 'field_suffix' => $update_button ) );
 		$Form->hidden( 'redirect_to', regenerate_url() );

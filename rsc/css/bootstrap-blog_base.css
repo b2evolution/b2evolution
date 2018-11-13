@@ -1724,13 +1724,15 @@ div#fileuploader_form {
 #filelist_tbody tr:last-child .action_icon_link_move_down {
   visibility: hidden;
 }
-.widget_core_currency_selector label,
-.widget_core_country_selector label {
-  width: auto;
-  padding: 0 15px 0 0;
+.widget_core_display_shopping_cart .evo_shopping_cart {
+  margin: 10px 0;
 }
-.widget_core_currency_selector select,
-.widget_core_country_selector select {
-  width: auto;
-  display: inline-block;
+.widget_core_display_shipping_method .evo_shipping_options .radio {
+  display: block;
+}
+.widget_core_display_shipping_method .evo_shipping_cost {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: baseline;
+      align-items: baseline;
 }

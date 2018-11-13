@@ -826,6 +826,12 @@ function install_basic_plugins( $old_db_version = 0 )
 	{
 		install_plugin( 'email_elements_plugin' );
 	}
+
+	if( $old_db_version < 15330 )
+	{
+		install_plugin( 'instore_pickup_plugin' );
+		install_plugin( 'courier_example_plugin' );
+	}
 }
 
 

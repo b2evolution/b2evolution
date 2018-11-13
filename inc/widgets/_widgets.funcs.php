@@ -366,6 +366,8 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['shopping_cart'] = array(
 		array( 10, 'currency_selector' ),
 		array( 20, 'display_shopping_cart' ),
+		array( 30, 'country_selector' ),
+		array( 40, 'display_shipping_method' ),
 	);
 
 	/* Mobile Footer */

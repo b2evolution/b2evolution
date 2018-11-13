@@ -1650,7 +1650,7 @@ switch( $action )
 			$redirect_to = param( 'redirect_to', 'url', '' );
 			$Session->set( 'currency_ID', $curr_ID );
 
-			if( !empty( $redirect_to ) )
+			if( ! empty( $redirect_to ) )
 			{ // Redirect to back page, It is used by browsers without JavaScript
 				header_redirect( $redirect_to, 303 ); // Will EXIT
 				// We have EXITed already at this point!!
@@ -1663,7 +1663,20 @@ switch( $action )
 			$redirect_to = param( 'redirect_to', 'url', '' );
 			$Session->set( 'country_ID', $country_ID );
 
-			if( !empty( $redirect_to ) )
+			if( ! empty( $redirect_to ) )
+			{ // Redirect to back page, It is used by browsers without JavaScript
+				header_redirect( $redirect_to, 303 ); // Will EXIT
+				// We have EXITed already at this point!!
+			}
+			break;
+
+	case 'set_shipment_method':
+			global $Session;
+			$shipment_plugin_ID = param( 'shipment_plugin_ID', 'integer', true );
+			$redirect_to = param( 'redirect_to', 'url', '' );
+			$Session->set( 'shipment_plugin_ID', $shipment_plugin_ID );
+
+			if( ! empty( $redirect_to ) )
 			{ // Redirect to back page, It is used by browsers without JavaScript
 				header_redirect( $redirect_to, 303 ); // Will EXIT
 				// We have EXITed already at this point!!
