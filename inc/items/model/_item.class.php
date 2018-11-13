@@ -3147,26 +3147,11 @@ class Item extends ItemLight
 
 					case 'emailcapture':
 						// Widget "Email capture / Quick registration":
-						$fields_to_display = array();
-						$button_text = '';
-
 						preg_match( '/(\d+)?(?:\/(.*))?/', $tag_params[0], $newsletter_ID_tags );
-						if( isset( $newsletter_ID_tags[1] ) )
-						{
-							$newsletter_ID = intval( $newsletter_ID_tags[1] );
-						}
-						if( isset( $newsletter_ID_tags[2] ) )
-						{
-							$user_tags = $newsletter_ID_tags[2];
-						}
-						if( isset( $tag_params[1] ) )
-						{
-							$fields_to_display = explode( '+', $tag_params[1] );
-						}
-						if( isset( $tag_params[2] ) )
-						{
-							$button_text = $tag_params[2];
-						}
+						$newsletter_ID = isset( $newsletter_ID_tags[1] ) ? intval( $newsletter_ID_tags[1] ) : NULL;
+						$user_tags = isset( $newsletter_ID_tags[2] ) ? $newsletter_ID_tags[2] : NULL;
+						$fields_to_display = isset( $tag_params[1] ) ? explode( '+', $tag_params[1] ) : array();
+						$button_text = isset( $tag_params[2] ) ? $tag_params[2] : '';
 
 						$widget_params = array(
 							'widget' => 'user_register_quick',
@@ -3175,7 +3160,7 @@ class Item extends ItemLight
 							'ask_firstname' => in_array( 'firstname', $fields_to_display ) ? 'required' : 'no',
 							'ask_lastname' => in_array( 'lastname', $fields_to_display ) ? 'required' : 'no',
 							'source' => 'Page: '.$this->get( 'urltitle' ),
-							'usertags' => isset( $user_tags ) ? $user_tags : NULL,
+							'usertags' => $user_tags,
 							'subscribe_post' => 0,
 							'subscribe_comment' => 0,
 							'button_class' => 'btn-primary',
