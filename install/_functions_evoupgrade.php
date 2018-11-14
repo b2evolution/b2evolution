@@ -10895,6 +10895,31 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15290, 'Updating item types table...' ) )
+	{	// part of 7.0.0-alpha
+		db_add_col( 'T_items__type', 'ityp_short_title_maxlen', 'SMALLINT UNSIGNED DEFAULT 30' );
+		db_add_col( 'T_items__type', 'ityp_title_maxlen', 'SMALLINT UNSIGNED DEFAULT 100' );
+
+		// Set comment max length for forum collections to NULL:
+		$SQL = new SQL( 'Get all pages from Collection for info pages(shared content blocks)' );
+		$SQL->SELECT( 'blog_ID' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->WHERE( 'blog_type = "forum"' );
+
+		$forum_collections = $DB->get_col( $SQL );
+		if( $forum_collections )
+		{
+			$insert_values = array();
+			foreach( $forum_collections as $coll_ID )
+			{
+				$insert_values[] = '( '.$DB->quote( $coll_ID ).', "comment_maxlen", "" )';
+			}
+			$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value ) VALUES '.implode( ', ', $insert_values ) );
+		}
+
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

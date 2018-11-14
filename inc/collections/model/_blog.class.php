@@ -412,6 +412,7 @@ class Blog extends DataObject
 				$this->set_setting( 'in_skin_editing', '1' );
 				$this->set_setting( 'posts_per_page', 30 );
 				$this->set_setting( 'allow_html_comment', 0 );
+				$this->set_setting( 'comment_maxlen', '' );
 				$this->set_setting( 'orderby', 'contents_last_updated_ts' );
 				$this->set_setting( 'orderdir', 'DESC' );
 				$this->set_setting( 'enable_goto_blog', 'post' );
@@ -1191,6 +1192,7 @@ class Blog extends DataObject
 			$this->set_setting( 'require_anon_name', param( 'require_anon_name', 'string', '0' ) );
 			$this->set_setting( 'require_anon_email', param( 'require_anon_email', 'string', '0' ) );
 			$this->set_setting( 'allow_anon_url', param( 'allow_anon_url', 'string', '0' ) );
+			$this->set_setting( 'comment_maxlen', param( 'comment_maxlen', 'integer', '' ) );
 			$this->set_setting( 'allow_html_comment', param( 'allow_html_comment', 'string', '0' ) );
 			$this->set_setting( 'allow_attachments', param( 'allow_attachments', 'string', 'registered' ) );
 			$this->set_setting( 'max_attachments', param( 'max_attachments', 'integer', '' ) );
@@ -4686,7 +4688,7 @@ class Blog extends DataObject
 	function get_main_containers( $skin_type = 'normal', $load_container_ids = false )
 	{
 		if( ! isset( $this->widget_containers ) )
-		{	// Initialize 
+		{	// Initialize
 			$this->widget_containers = array();
 		}
 

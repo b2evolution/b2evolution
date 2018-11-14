@@ -2048,6 +2048,7 @@ textarea.form_textarea_input {
 }
 label.radiooption {
   margin-right: 1em;
+  cursor: pointer;
 }
 .file_select_wrapper {
   display: flex;
@@ -2521,7 +2522,8 @@ a.btn.action_icon.hoverlink {
 .form-horizontal .control-buttons {
   padding-left: 0;
 }
-.form-horizontal label.radio-inline {
+.form-horizontal label.radio-inline,
+.form-horizontal label.radiooption {
   font-weight: normal;
 }
 .form-horizontal div.radio label,

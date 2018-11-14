@@ -112,6 +112,7 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 			array( 'allow_anon_url', 1, T_('Allow to submit an URL'), $edited_Blog->get_setting( 'allow_anon_url' ) )
 		), 'allow_anon_url', T_('Anonymous comments') );
 
+	$Form->text_input( 'comment_maxlen', $edited_Blog->get_setting( 'comment_maxlen' ), 4, T_('Max. comment length'), T_('Leave empty for unrestricted.') );
 	$Form->checkbox( 'allow_html_comment', $edited_Blog->get_setting( 'allow_html_comment' ),
 						T_( 'Allow HTML' ), T_( 'Check to allow HTML in comments.' ).' ('.T_('HTML code will pass several sanitization filters.').')' );
 

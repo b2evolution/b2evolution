@@ -146,7 +146,12 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$content = $comment_content;
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
-	$Form->textarea_input( 'content', $content, 16, '', array( 'cols' => 40 , 'id' => 'commentform_post_content', 'class' => 'autocomplete_usernames' ) );
+	$Form->textarea_input( 'content', $content, 16, '', array(
+			'cols' => 40 ,
+			'id' => 'commentform_post_content',
+			'class' => 'autocomplete_usernames',
+			'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
+		) );
 	$Form->fieldstart = '<div class="tile">';
 	$Form->fieldend = '</div>';
 	?>

@@ -211,7 +211,7 @@ if( $params['disp_comment_form'] && ( $params['comment_type'] == 'meta' && $Item
 			$comment_content = param( $dummy_fields[ 'content' ], 'html' );
 			$quoted_comment_ID = param( 'qc', 'integer', 0 );
 			$quoted_post_ID = param( 'qp', 'integer', 0 );
-			if( ! empty( $quoted_comment_ID ) && 
+			if( ! empty( $quoted_comment_ID ) &&
 			    ( $CommentCache = & get_CommentCache() ) &&
 			    ( $quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false ) ) &&
 			    $params['comment_type'] == $quoted_Comment->get( 'type' ) )
@@ -433,6 +433,7 @@ function validateCommentForm(form)
 			'cols'  => 38,
 			'class' => 'autocomplete_usernames',
 			'id'    => $content_id,
+			'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
 		) );
 	$Form->inputstart = $form_inputstart;
 

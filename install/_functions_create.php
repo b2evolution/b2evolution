@@ -404,6 +404,8 @@ function create_default_data()
 			'template_name'            => 'single',
 			'perm_level'               => 'standard',
 			'use_short_title'          => 'never',
+			'short_title_maxlen'       => 30,
+			'title_maxlen'             => 100,
 			'allow_html'               => 1,
 			'allow_breaks'             => 1,
 			'allow_featured'           => 1,

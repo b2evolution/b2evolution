@@ -61,6 +61,8 @@ class ItemType extends DataObject
 	var $perm_level = 'standard';
 	var $evobar_link_text = NULL;
 	var $skin_btn_text = NULL;
+	var $short_title_maxlen = 30;
+	var $title_maxlen = 100;
 
 	/**
 	 * Custom fields
@@ -134,6 +136,8 @@ class ItemType extends DataObject
 			$this->perm_level = $db_row->ityp_perm_level;
 			$this->evobar_link_text = isset( $db_row->ityp_evobar_link_text ) ? $db_row->ityp_evobar_link_text : $this->evobar_link_text;
 			$this->skin_btn_text = isset( $db_row->ityp_skin_btn_text ) ? $db_row->ityp_skin_btn_text : $this->skin_btn_text;
+			$this->short_title_maxlen = isset( $db_row->ityp_short_title_maxlen ) ? $db_row->ityp_short_title_maxlen : $this->short_title_maxlen;
+			$this->title_maxlen = isset( $db_row->ityp_title_maxlen ) ? $db_row->ityp_title_maxlen : $this->title_maxlen;
 		}
 	}
 

@@ -55,7 +55,7 @@ $params = array_merge( array(
 		'comment_text_after'    => '</div>',
 		'comment_info_before'   => '<div class="bCommentSmallPrint">',
 		'comment_info_after'    => '</div>',
-		
+
 	), $params );
 
 $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
@@ -194,7 +194,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			$comment_content = param( $dummy_fields[ 'content' ], 'html' );
 			$quoted_comment_ID = param( 'qc', 'integer', 0 );
 			$quoted_post_ID = param( 'qp', 'integer', 0 );
-			if( ! empty( $quoted_comment_ID ) && 
+			if( ! empty( $quoted_comment_ID ) &&
 			    ( $CommentCache = & get_CommentCache() ) &&
 			    ( $quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false ) ) &&
 			    $params['comment_type'] == $quoted_Comment->get( 'type' ) )
@@ -368,6 +368,7 @@ function validateCommentForm(form)
 			'cols' => 38,
 			'class' => 'bComment autocomplete_usernames',
 			'display_fix_pixel' => false,
+			'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
 		) );
 	$Form->inputstart = $form_inputstart;
 

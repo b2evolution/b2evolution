@@ -158,7 +158,10 @@ $Form->begin_form( '', '', $params );
 		$Form->begin_fieldset( '', array( 'class' => 'evo_fields_table__single_row' ) );
 		if( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' )
 		{	// Display a post short title field:
-			$Form->text_input( 'post_short_title', $edited_Item->get( 'short_title' ), 50, T_('Short title'), '', array( 'maxlength' => 50, 'data-recommended-length' => '20;30' ) );
+			$short_title_maxlen = intval( $edited_Item->get_type_setting( 'short_title_maxlen' ) );
+			$Form->text_input( 'post_short_title', $edited_Item->get( 'short_title' ), 50, T_('Short title'), '', array(
+					'maxlength' => $short_title_maxlen,
+					'data-recommended-length' => ( $short_title_maxlen <= 30 ) ? number_format( $short_title_maxlen*.75 ).';'.number_format( $short_title_maxlen*.85 ) : '20;30' ) );
 		}
 		else
 		{	// Hide a post short title field:
@@ -170,7 +173,11 @@ $Form->begin_form( '', '', $params );
 	$Form->begin_fieldset( '', array( 'class' => 'evo_fields_table__single_row' ) );
 	if( $edited_Item->get_type_setting( 'use_title' ) != 'never' )
 	{	// Display a post title field:
-		$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array( 'maxlength' => 255, 'data-recommended-length' => '60;65', 'required' => ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ) );
+		$title_maxlen = intval( $edited_Item->get_type_setting( 'title_maxlen' ) );
+		$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array(
+				'maxlength' => $title_maxlen,
+				'data-recommended-length' => ( $title_maxlen <= 65 ) ? number_format( $title_maxlen*.75 ).';'.number_format( $title_maxlen*.85 ) : '60;65',
+				'required' => ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ) );
 	}
 	else
 	{	// Hide a post title field:
