@@ -235,9 +235,17 @@ class ItemType extends DataObject
 		param( 'ityp_use_short_title', 'string' );
 		$this->set_from_Request( 'use_short_title' );
 
+		// Short title max length
+		param( 'ityp_short_title_maxlen', 'integer' );
+		$this->set_from_Request( 'short_title_maxlen' );
+
 		// Use title
 		param( 'ityp_use_title', 'string' );
 		$this->set_from_Request( 'use_title' );
+
+		// Title max length
+		param( 'ityp_title_maxlen', 'integer' );
+		$this->set_from_Request( 'title_maxlen' );
 
 		// Use URL
 		param( 'ityp_use_url', 'string' );
