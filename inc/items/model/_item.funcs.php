@@ -2133,31 +2133,61 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
  *
  * @param object Form
  * @param object edited Item
+ * @param string Action: NULL - to get action from global var
  */
-function echo_item_status_buttons( $Form, $edited_Item )
+function echo_item_status_buttons( $Form, $edited_Item, $button_action = NULL )
 {
 	global $next_action, $action, $Collection, $Blog;
 
+	if( $edited_Item !== NULL )
+	{	// If the edited Item is defined, e-g on edit form:
+		$item_status = $edited_Item->status;
+	}
+	else
+	{	// If item is not defined, e-g on action for several items from list:
+		$item_status = get_highest_publish_status( 'post', $Blog->ID, false );
+	}
+
+	$next_action = ( $button_action === NULL ? ( is_create_action( $action ) ? 'create' : 'update' ) : $button_action );
+
 	// Get those statuses which are not allowed for the current User to create posts in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status, '', $edited_Item ), array( 'trash' ) );
-	// Get allowed visibility statuses
-	$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
+	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $item_status, '', $edited_Item ), array( 'trash' ) );
+	// Get allowed visibility statuses:
+	if( $next_action == 'items_visibility' )
+	{
+		$status_options = get_visibility_statuses( '', $exclude_statuses );
+		foreach( $status_options as $status_key => $status_title )
+		{
+			$status_options[ $status_key ] = sprintf( T_('Set visibility to %s'), $status_title );
+		}
+		$tooltip_placement = 'bottom';
+	}
+	else // 'create' or 'update'
+	{
+		$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
+		$status_options = array_map( 'T_', $status_options );
+		$tooltip_placement = 'left';
+	}
+
+	if( empty( $status_options ) )
+	{	// If current User has no permission to edit to any status:
+		return;
+	}
+
 	$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 
-	$next_action = ( is_create_action( $action ) ? 'create' : 'update' );
-
-	$Form->hidden( 'post_status', $edited_Item->status );
-	echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
-	echo '<button type="submit" class="btn btn-status-'.$edited_Item->status.'" name="actionArray['.$next_action.']">'
-				.'<span>'.T_( $status_options[ $edited_Item->status ] ).'</span>'
+	$Form->hidden( 'post_status', $item_status );
+	echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="'.$tooltip_placement.'" data-container="body" title="'.get_status_tooltip_title( $item_status ).'">';
+	echo '<button type="submit" class="btn btn-status-'.$item_status.'" name="actionArray['.$next_action.']">'
+				.'<span>'.$status_options[ $item_status ].'</span>'
 			.'</button>'
-			.'<button type="button" class="btn btn-status-'.$edited_Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
+			.'<button type="button" class="btn btn-status-'.$item_status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
 				.'<span class="caret"></span>'
 			.'</button>';
 	echo '<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
 	foreach( $status_options as $status_key => $status_title )
 	{
-		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.T_( $status_title ).'</span></a></li>';
+		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
 	}
 	echo '</ul>';
 	echo '</div>';

@@ -31,7 +31,7 @@ global $CommentList;
 $pp = $CommentList->param_prefix;
 
 global ${$pp.'show_statuses'}, ${$pp.'expiry_statuses'}, ${$pp.'s'}, ${$pp.'sentence'}, ${$pp.'exact'};
-global ${$pp.'rating_toshow'}, ${$pp.'rating_turn'}, ${$pp.'rating_limit'}, ${$pp.'url_match'}, ${$pp.'author_url'}, ${$pp.'include_emptyurl'}, ${$pp.'author_IP'};
+global ${$pp.'rating_toshow'}, ${$pp.'rating_turn'}, ${$pp.'rating_limit'}, ${$pp.'url_match'}, ${$pp.'author_IDs'}, ${$pp.'authors_login'}, ${$pp.'author_url'}, ${$pp.'include_emptyurl'}, ${$pp.'author_IP'};
 global $tab3;
 
 $show_statuses = ${$pp.'show_statuses'};
@@ -43,6 +43,8 @@ $rating_toshow = ${$pp.'rating_toshow'};
 $rating_turn = ${$pp.'rating_turn'};
 $rating_limit = ${$pp.'rating_limit'};
 $url_match = ${$pp.'url_match'};
+$author_IDs = ${$pp.'author_IDs'};
+$authors_login = ${$pp.'authors_login'};
 $author_url = ${$pp.'author_url'};
 $include_emptyurl = ${$pp.'include_emptyurl'};
 $author_IP = ${$pp.'author_IP'};
@@ -162,6 +164,50 @@ $Form->begin_form( '' );
 		</div>
 
 		<?php
+		echo '</fieldset>';
+
+		// Load only first 21 users to know when we should display an input box instead of full users list:
+		$first_users_SQL = new SQL( 'Get users count for filter comments list' );
+		$first_users_SQL->SELECT( 'user_ID' );
+		$first_users_SQL->FROM( 'T_users' );
+		$first_users_SQL->ORDER_BY( 'user_login' );
+		$first_users_SQL->LIMIT( '21' );
+		$first_users = $DB->get_col( $first_users_SQL );
+		$user_count = count( $first_users );
+		/*
+		 * Authors:
+		 * TODO: allow multiple selection
+		 */
+		echo '<fieldset>';
+		echo '<legend>'.T_('Authors').'</legend>';
+		if( $user_count )
+		{
+			if( $user_count > 20 )
+			{	// Display an input box to enter user login:
+				echo '<label for="'.$pp.'authors_login">'.T_('User').':</label> <input type="text" class="form-control middle autocomplete_login" value="'.format_to_output( $authors_login, 'formvalue' ).'" name="'.$pp.'authors_login" id="'.$pp.'authors_login" />';
+			}
+			else
+			{	// Display a list of users:
+				echo '<ul>'
+					.'<li>'
+						.'<input type="radio" name="'.$pp.'author_IDs" value="0" class="radio"'.( empty( $author_IDs ) ? ' checked="checked"' : '' ).' /> '
+						.'<a href="'.regenerate_url( $pp.'author_IDs', $pp.'author_IDs=0' ).'">'.T_('Any').'</a>'
+					.'</li>';
+				$UserCache = & get_UserCache();
+				$UserCache->load_list( $first_users );
+				foreach( $first_users as $user_ID )
+				{
+					$loop_User = & $UserCache->get_by_ID( $user_ID );
+					echo '<li>'
+						.'<input type="radio" name="'.$pp.'author_IDs" value="'.$loop_User->ID.'" class="radio"'.( $loop_User->ID == $author_IDs ? ' checked="checked"' : '' ).' /> '
+						.'<a href="'.regenerate_url( $pp.'author_IDs', $pp.'author_IDs='.$loop_User->ID ).'" rel="bubbletip_user_'.$loop_User->ID.'">'
+							.$loop_User->get_colored_login( array( 'login_text' => 'name' ) )
+						.'</a>'
+					.'</li>';
+				}
+				echo '</ul>';
+			}
+		}
 		echo '</fieldset>';
 
 		echo '<fieldset>';

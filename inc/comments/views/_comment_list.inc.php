@@ -51,6 +51,7 @@ if( ! $is_meta_comments_list && $CommentList->total_rows > 0 )
 	$Form->hidden( 'ctrl', 'items' );
 	$Form->hidden( 'blog', $blog );
 	$Form->hidden( 'p', $item_id );
+	$Form->hidden( 'page', $CommentList->page );
 	$Form->add_crumb( 'comments' );
 }
 
@@ -145,7 +146,7 @@ if( ! $is_meta_comments_list && $CommentList->total_rows > 0 )
 	$Item = & $ItemCache->get_by_ID( $item_id, false, false );
 	$item_status = $Item ? $Item->get( 'status' ) : '';
 	$Form->hidden( 'comment_status', $item_status );
-	echo_comment_status_buttons( $Form, NULL, $item_status, 'set_visibility' );
+	echo_comment_status_buttons( $Form, NULL, $item_status, 'comments_visibility' );
 	echo_status_dropdown_button_js( 'comment' );
 
 	if( $item_id > 0 && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $blog ) )
