@@ -5666,7 +5666,6 @@ function user_sent_emails_results_block( $params = array() )
 	$emails_Results->title = $params['results_title'];
 	$emails_Results->no_results_text = $params['results_no_text'];
 
-	// Get a count of the blogs which current user can delete
 	if( $params['action'] != 'view' && $emails_Results->get_total_rows() > 0 && $current_User->check_perm( 'emails', 'edit' ) )
 	{	// Display action icon to delete all records if at least one record exists & user has a permission:
 		$emails_Results->global_icon( sprintf( T_('Delete all emails sent to the User %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_sent_emails&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
@@ -5755,6 +5754,11 @@ function user_email_returns_results_block( $params = array() )
 	$email_returns_Results = new Results( $SQL->get(), $params['results_param_prefix'] );
 	$email_returns_Results->title = $params['results_title'];
 	$email_returns_Results->no_results_text = $params['results_no_text'];
+
+	if( $params['action'] != 'view' && $email_returns_Results->get_total_rows() > 0 && $current_User->check_perm( 'emails', 'edit' ) )
+	{	// Display action icon to delete all records if at least one record exists & user has a permission:
+		$email_returns_Results->global_icon( sprintf( T_('Delete all email returns from the User\'s email address %s'), $edited_User->get( 'email' ) ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_email_returns&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb( 'user' ), ' '.T_('Delete all'), 3, 4 );
+	}
 
 	// Initialize Results object:
 	email_returns_results( $email_returns_Results, array(
