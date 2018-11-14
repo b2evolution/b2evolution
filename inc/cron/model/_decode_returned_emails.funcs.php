@@ -372,7 +372,7 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		$email_headers = dre_get_headers( $decodedMIME );
 
 		// Get data of the returned email:
-		$email_data = dre_get_email_data( $content, $message_text, $email_headers );
+		$email_data = dre_get_email_data( $subject.' '.$content, $message_text, $email_headers, $subject );
 
 		dre_msg( ('Email Address').': '.$email_data['address'], $cron );
 		dre_msg( ('Error Type').': '.dre_decode_error_type( $email_data['errtype'] ), $cron );
