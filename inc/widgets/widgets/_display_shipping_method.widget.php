@@ -108,11 +108,11 @@ class display_shipping_method_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		$this->disp_params = array_merge( $this->disp_params, array(
-				'shipping_empty'        => '<p>'.T_('No shipment plugins found.').'</p>',
-				'shipping_list_start'   => '<div class="evo_shipping_options">',
-				'shipping_list_end'     => '</div>',
-				'shipping_cost_start'   => '',
-				'shipping_cost_end'     => '',
+				'shipping_method_empty'            => '<p>'.T_('No shipment plugins found.').'</p>',
+				'shipping_method_list_start'       => '<div class="evo_shipping_options">',
+				'shipping_method_list_end'         => '</div>',
+				'shipping_method_total_cost_start' => '',
+				'shipping_method_total_cost_end'   => '',
 			), $params );
 
 		// Get shipment plugins:
@@ -126,7 +126,7 @@ class display_shipping_method_Widget extends ComponentWidget
 
 		if( empty( $shipment_options ) )
 		{
-			echo $this->disp_params['shipping_empty'];
+			echo $this->disp_params['shipping_method_empty'];
 		}
 		else
 		{
@@ -137,7 +137,7 @@ class display_shipping_method_Widget extends ComponentWidget
 				{
 					$shipment_plugin_ID = $plugin_ID;
 				}
-				$options[] = array( 'value' => $plugin_ID, 'label' => $title );
+				$options[] = array( 'value' => $plugin_ID, 'label' => '<span class="evo_shipment_option">'.$title.'</span>' );
 			}
 
 			// Display list of shipment plugin options:
@@ -145,9 +145,9 @@ class display_shipping_method_Widget extends ComponentWidget
 			$Form->begin_form();
 
 			$Form->switch_layout( 'linespan' );
-			echo $this->disp_params['shipping_list_start'];
+			echo $this->disp_params['shipping_method_list_start'];
 			$Form->radio_input( 'shipment_plugin_ID', $shipment_plugin_ID, $options, '', array( 'class' => 'evo_shipping_option', 'lines' => true ) );
-			echo $this->disp_params['shipping_list_end'];
+			echo $this->disp_params['shipping_method_list_end'];
 			$Form->switch_layout( NULL );
 
 			// Determine current shipping cost:
@@ -175,7 +175,7 @@ class display_shipping_method_Widget extends ComponentWidget
 				$shipping_cost = $shipment_Plugin->GetShippingCost( $params );
 				if( $shipping_cost !== false )
 				{
-					$shipping_cost = $currency->shortcut.'&nbsp;'.number_format( $shipping_cost, 2 );
+					$shipping_cost = '<span class="evo_total_shipping_cost">'.$currency->shortcut.'&nbsp;'.number_format( $shipping_cost, 2 ).'</span>';
 				}
 				else
 				{
@@ -185,10 +185,10 @@ class display_shipping_method_Widget extends ComponentWidget
 			}
 
 			$update_button = '<button type="submit" id="button_update_shipment" name="actionArray[get_shipment_cost]" class="btn btn-primary" style="margin: 0;">'.T_('Update').'</button>';
-			echo $this->disp_params['shipping_cost_start'];
+			echo $this->disp_params['shipping_method_total_cost_start'];
 			$Form->info_field( T_('Shipping cost'), $shipping_cost, array( 'class' => 'evo_shipping_cost', 'field_suffix' => '&nbsp;'.$update_button ) );
 			$Form->hidden( 'redirect_to', regenerate_url() );
-			echo $this->disp_params['shipping_cost_end'];
+			echo $this->disp_params['shipping_method_total_cost_end'];
 
 			$Form->end_form();
 		}
