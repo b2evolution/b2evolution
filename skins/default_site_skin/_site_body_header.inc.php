@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	widget_container( 'site_header', array(
 			// The following params will be used as defaults for widgets included in this container:
 			'container_display_if_empty' => false, // If no widget, don't display container at all
-			'container_start'     => '<nav class="sitewide_header evo_container $wico_class$">',
+			'container_start'     => '<nav class="evo_container $wico_class$">',
 			'container_end'       => '<div class="clear"></div></nav>',
 			'block_start'         => '<span class="evo_widget $wi_class$">',
 			'block_end'           => '</span>',
@@ -34,8 +34,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			// The following params will be used as defaults for widgets included in this container:
 			'container_display_if_empty' => false, // If no widget, don't display container at all
 			'container_start'     => '<input type="checkbox" id="nav-trigger" class="nav-trigger">'
-					.'<div class="sitewide_header_menu_wrapper evo_container $wico_class$">'
-					.'<ul class="sitewide_header_menu">',
+					.'<div class="evo_container $wico_class$">'
+					.'<ul class="evo_navigation_hamburger_list">',
 			'container_end'       => '</ul></div>',
 			'block_start'         => '',
 			'block_end'           => '',

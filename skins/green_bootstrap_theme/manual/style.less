@@ -261,15 +261,19 @@ div.action_messages, div.log_container {
 }
 
 // Make sitewide header fixed on top
-div#skin_wrapper .sitewide_header {
-	position: fixed;
-	top: 0;
-	width: 100%;
-	z-index: 10000;
-	-webkit-font-smoothing: subpixel-antialiased;
+div#skin_wrapper {
+	.sitewide_header, .evo_container__site_header {
+		position: fixed;
+		top: 0;
+		width: 100%;
+		z-index: 10000;
+		-webkit-font-smoothing: subpixel-antialiased;
+	}
 }
-div#skin_wrapper.skin_wrapper_loggedin .sitewide_header {
-	top: 27px;
+body.evo_toolbar_visible div#skin_wrapper {
+	.sitewide_header, .evo_container__site_header {
+		top: 27px;
+	}
 }
 
 // Chapters list on sidebar and on front page & Posts list on view chapter page with subchapters

@@ -239,14 +239,16 @@ div.action_messages,
 div.log_container {
   margin: 0;
 }
-div#skin_wrapper .sitewide_header {
+div#skin_wrapper .sitewide_header,
+div#skin_wrapper .evo_container__site_header {
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 10000;
   -webkit-font-smoothing: subpixel-antialiased;
 }
-div#skin_wrapper.skin_wrapper_loggedin .sitewide_header {
+body.evo_toolbar_visible div#skin_wrapper .sitewide_header,
+body.evo_toolbar_visible div#skin_wrapper .evo_container__site_header {
   top: 27px;
 }
 .chapters_list ul {
