@@ -116,7 +116,7 @@ class default_site_Skin extends Skin
 	function siteskin_init()
 	{
 		// Include the default skin style.css relative current SITE skin folder:
-		require_css( 'style.css', 'siteskin' );
+		require_css( 'style.min.css', 'siteskin' );
 
 		// Add custom styles:
 		$menu_bar_logo_padding = $this->get_setting( 'menu_bar_logo_padding' );
