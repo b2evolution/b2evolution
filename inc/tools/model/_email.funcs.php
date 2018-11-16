@@ -1609,6 +1609,29 @@ function emret_td_address( $emret_address )
 
 
 /**
+ * Helper to display action icons in cell of email returns table
+ *
+ * @param string ID of the returned email record
+ * @param string Email address
+ * @return string
+ */
+function emret_td_actions( $emret_ID, $emret_address )
+{
+	global $admin_url, $current_User;
+
+	$r = action_icon( T_('View this email...'), 'magnifier', $admin_url.'?ctrl=email&amp;tab=return&amp;emret_ID='.$emret_ID )
+		.action_icon( T_('Go to users list with this email address'), 'play', $admin_url.'?ctrl=users&amp;filter=new&amp;keywords='.$emret_address );
+
+	if( $current_User->check_perm( 'emails', 'edit' ) )
+	{
+		$r .= action_icon( T_('Delete this record!'), 'delete', $admin_url.'?ctrl=email&amp;tab=return&amp;action=returned_delete&amp;emret_ID='.$emret_ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'blog', '', '', '&' ) ).'&amp;'.url_crumb( 'email' ), '', 1, 0, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this record?').'\');' ) );
+	}
+
+	return $r;
+}
+
+
+/**
  * Initialize Results object for email returns list
  *
  * @param object Results
@@ -1688,8 +1711,7 @@ function email_returns_results( & $email_returns_Results, $params = array() )
 			'th' => T_('Actions'),
 			'th_class' => 'shrinkwrap small',
 			'td_class' => 'shrinkwrap',
-			'td' => action_icon( T_('View this email...'), 'magnifier', $admin_url.'?ctrl=email&amp;tab=return&amp;emret_ID=$emret_ID$' )
-				.action_icon( T_('Go to users list with this email address'), 'play', $admin_url.'?ctrl=users&amp;filter=new&amp;keywords=$emret_address$' )
+			'td' => '%emret_td_actions( #emret_ID#, #emret_address# )%'
 		);
 	}
 }

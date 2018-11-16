@@ -182,6 +182,10 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 			if( isset( $msg_statuses[ $index - 1 ] ) && $msg_statuses[ $index - 1 ]->seen == 1 )
 			{	// Skip this message because it has already been read:
 				dre_msg( ('Ignoring this message because it has aleady been read.'), $cron );
+				if( $cron )
+				{	// Mark the end of action for cron log:
+					cron_log_action_end( '' );
+				}
 				continue;
 			}
 			else
@@ -199,6 +203,10 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		if( ! ($tmpMIME = tempnam( sys_get_temp_dir(), 'b2evoMail' )) )
 		{
 			dre_msg( ('Could not create temporary file.'), $cron );
+			if( $cron )
+			{	// Mark the end of action for cron log:
+				cron_log_action_end( '' );
+			}
 			continue;
 		}
 		// Save the whole body of a specific message from the mailbox:
@@ -232,6 +240,10 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 			dre_msg( sprintf( ('MIME message decoding error: %s at position %d.'), $mimeParser->error, $mimeParser->error_position ), $cron, 'error' );
 			rmdir_r( $tmpDirMIME );
 			unlink( $tmpMIME );
+			if( $cron )
+			{	// Mark the end of action for cron log:
+				cron_log_action_end( '' );
+			}
 			continue;
 		}
 		else
@@ -244,6 +256,10 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 				dre_msg( sprintf( ('MIME message analyze error: %s'), $mimeParser->error ), $cron, 'error' );
 				rmdir_r( $tmpDirMIME );
 				unlink( $tmpMIME );
+				if( $cron )
+				{	// Mark the end of action for cron log:
+					cron_log_action_end( '' );
+				}
 				continue;
 			}
 
@@ -252,6 +268,10 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 			{	// Couldn't process message headers:
 				rmdir_r( $tmpDirMIME );
 				unlink( $tmpMIME );
+				if( $cron )
+				{	// Mark the end of action for cron log:
+					cron_log_action_end( '' );
+				}
 				continue;
 			}
 
@@ -357,10 +377,14 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		{
 			// Make it easier for user to find and correct the errors
 			dre_msg( "\n".sprintf( ('Processing message: %s'), $post_title ), $cron );
-			dre_msg( $Messages->get_string( ('Cannot post, please correct these errors:'), 'error' ), $cron, 'error' );
+			dre_msg( $Messages->get_string( ('Cannot process the returned email, please correct these errors:'), 'error' ), $cron, 'error' );
 
 			$Messages->clear();
 			rmdir_r( $tmpDirMIME );
+			if( $cron )
+			{	// Mark the end of action for cron log:
+				cron_log_action_end( '' );
+			}
 			continue;
 		}
 
@@ -372,11 +396,28 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		$email_headers = dre_get_headers( $decodedMIME );
 
 		// Get data of the returned email:
-		$email_data = dre_get_email_data( $content, $message_text, $email_headers );
+		$email_data = dre_get_email_data( $subject.' '.$content, $message_text, $email_headers, $subject );
 
 		dre_msg( ('Email Address').': '.$email_data['address'], $cron );
 		dre_msg( ('Error Type').': '.dre_decode_error_type( $email_data['errtype'] ), $cron );
-		dre_msg( ('Error Message').': '.$email_data['errormsg'], $cron );
+		dre_msg( ('Error Message').': '.balance_tags( $email_data['errormsg'] ), $cron );
+
+		if( empty( $email_data['address'] ) )
+		{	// Don't process a returned message without email address:
+			$info_error_msg = 'Cannot find email address in the returned email message "'.$subject.'". ';
+			if( $Settings->get('repath_delete_emails') )
+			{
+				$info_error_msg .= 'This email message cannot be deleted automatically from inbox. ';
+			}
+			$info_error_msg .= 'Please analyse this manually.';
+			dre_msg( $info_error_msg, $cron, 'error' );
+			rmdir_r( $tmpDirMIME );
+			if( $cron )
+			{	// Mark the end of action for cron log:
+				cron_log_action_end( '' );
+			}
+			continue;
+		}
 
 		// Insert a returned email's data into DB
 		if( dre_insert_returned_email( $email_data ) )
@@ -712,8 +753,13 @@ function dre_get_error_message( $message )
 		$error_text = $message;
 	}
 
-	// Return error text limited by DB field length
-	return utf8_substr( $error_text, 0, 255 );
+	// Set error text limited by DB field length:
+	$error_text = utf8_substr( $error_text, 0, 255 );
+
+	// Cut a not finished html tag at the end in order to don't break a content:
+	$error_text = preg_replace( '/<[^>]+$/', '', $error_text );
+
+	return $error_text;
 }
 
 

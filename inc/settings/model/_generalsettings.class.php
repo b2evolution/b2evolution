@@ -230,7 +230,9 @@ delayed 24 hours
 delayed 48 hours
 delayed 72 hours
 failure notice
-Undeliverable:',
+Undeliverable:
+Quarantine
+Карантин',
 		'repath_body_terminator' => '---------- Forwarded message ----------
 ------ This is a copy of the message, including all the headers. ------
 ----- Transcript of session follows -----
@@ -278,6 +280,8 @@ T account has been disabled
 T timeout exceeded
 T quota exceeded
 T Delivery attempts will continue
+T quarantine
+T карантин
 P is unavailable
 P not available
 P user doesn\'t have a .+ account
