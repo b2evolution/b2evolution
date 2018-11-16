@@ -128,6 +128,13 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 60, 'item_vote' ),
 	);
 
+	/* Comment Area */
+	$default_widgets['comment_area'] = array(
+		array( 10, 'item_comment_form' ),
+		array( 20, 'item_comment_notification' ),
+		array( 30, 'item_comment_feed_link' ),
+	);
+
 	/* Sidebar Single */
 	$default_widgets['sidebar_single'] = array(
 		array(  1, 'coll_related_post_list', 'coll_type' => 'forum' ),

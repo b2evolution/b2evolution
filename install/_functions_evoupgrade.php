@@ -10920,6 +10920,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15300, 'Installing new shared widgets/containers...' ) )
+	{	// part of 7.0.0-alpha
+
+		// Install new widgets/containers:
+		install_new_default_widgets( 'comment_area' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
