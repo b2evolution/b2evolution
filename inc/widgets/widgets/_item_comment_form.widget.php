@@ -205,6 +205,8 @@ class item_comment_form_Widget extends ComponentWidget
 				'comment_info_after'    => '</small></footer></div>',
 			), $params['widget_item_comment_form_params'] );
 
+		$email_is_detected = false; // Used when comment contains an email strings
+
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
