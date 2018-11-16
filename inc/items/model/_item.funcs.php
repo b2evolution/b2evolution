@@ -4171,8 +4171,9 @@ function display_hidden_custom_fields( & $Form, & $edited_Item )
  *
  * @param object Form
  * @param object edited Item
+ * @param string Field name to display a form input only for it
  */
-function display_editable_custom_fields( & $Form, & $edited_Item )
+function display_editable_custom_fields( & $Form, & $edited_Item, $restrict_field = NULL )
 {
 	$custom_fields = $edited_Item->get_type_custom_fields();
 
@@ -4186,6 +4187,10 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 	$c = 0;
 	foreach( $custom_fields as $custom_field )
 	{	// Loop through custom fields:
+		if( $restrict_field !== NULL && $restrict_field != $custom_field['name'] )
+		{	// Skip not requested field:
+			continue;
+		}
 		$custom_field_input_params = array();
 		$custom_field_note = '';
 		if( ! empty( $custom_field['note'] ) )
@@ -4215,8 +4220,10 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 				if( $custom_field['type'] != 'computed' )
 				{	// The computed fields cannot be updated from parent here because we update them by formula on updating automatically,
 					// Also parent field may has a different formula so we should not display a value of the parent field:
+					$parent_field_value_text = format_to_output( $preview_parent_custom_field_value, ( $custom_field['type'] == 'double' ? 'raw' : 'htmlspecialchars' ) );
+					$parent_field_value_edit_link = $parent_Item->get_edit_link( array( 'text' => $parent_field_value_text ) );
 					$custom_field_note .= ' &middot; '.T_('Parent Item Field value').': '
-						.$parent_Item->get_edit_link( array( 'text' => format_to_output( $preview_parent_custom_field_value, ( $custom_field['type'] == 'double' ? 'raw' : 'htmlspecialchars' ) ) ) )
+						.( $parent_field_value_edit_link === false ? ' '.$parent_field_value_text.' ' : $parent_field_value_edit_link )
 						.action_icon( '', 'refresh', '#', NULL, NULL, NULL, array(
 						'data-child-input-id' => 'item_cf_'.$custom_field['name'],
 						'data-parent-value'   => $parent_custom_field_value,

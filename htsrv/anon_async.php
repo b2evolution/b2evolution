@@ -1658,6 +1658,83 @@ switch( $action )
 			) );
 		break;
 
+
+	case 'get_custom_field_form':
+		// Get a form to edit custom field value:
+	case 'update_custom_field':
+		// Update item custom field:
+
+		if( $action == 'update_custom_field' )
+		{	// Only for update action
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'item' );
+		}
+
+		if( ! is_logged_in() )
+		{	// User must be logged in
+			break;
+		}
+
+		param( 'item_ID', 'integer', true );
+		param( 'field', 'string', true );
+
+		$ItemCache = & get_ItemCache();
+		$Item = & $ItemCache->get_by_ID( $item_ID );
+
+		// Check permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item );
+
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
+		$BlogCache = & get_BlogCache();
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
+
+		locale_activate( $Blog->get('locale') );
+
+		$blog_skin_ID = $Blog->get_skin_ID();
+		if( ! empty( $blog_skin_ID ) )
+		{	// check if Blog skin has specific comment form:
+			$SkinCache = & get_SkinCache();
+			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+			$ads_current_skin_path = $skins_path.$Skin->folder.'/';
+		}
+
+		switch( $action )
+		{
+			case 'get_custom_field_form':
+				// Get a form to edit custom field value:
+				$Form = new Form( NULL, 'item_custom_field_ajax_form' );
+				$Form->begin_form();
+				$Form->add_crumb( 'item' );
+				$Form->hidden( 'item_ID', $Item->ID );
+				$Form->hidden( 'field', $field );
+
+				// Display inputs to edit the requested custom field:
+				display_editable_custom_fields( $Form, $Item, $field );
+
+				$Form->end_form( array( array( 'submit', 'submit', T_('Save'), 'SaveButton' ) ) );
+				break;
+
+			case 'update_custom_field':
+				// Update item custom field:
+				if( $Item->load_custom_fields_from_Request() )
+				{	// If custom field is loaded:
+					$Item->dbupdate();
+				}
+				else
+				{	// Return errors:
+					$Messages->set_params( array( 'before_group_item' => ' ' ) );
+					echo utf8_strip_tags( $Messages->display( NULL, NULL, false ) );
+					header_http_response( '400 Bad Request' );
+					break;
+				}
+				// Return new value:
+				echo $Item->get_custom_field_formatted( $field );
+				break;
+		}
+		break;
+
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
 		break;

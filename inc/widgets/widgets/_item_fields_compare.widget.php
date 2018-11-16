@@ -26,6 +26,9 @@ class item_fields_compare_Widget extends ComponentWidget
 {
 	var $icon = 'balance-scale';
 
+	// Store items IDs for this widget in this cache array:
+	var $items_IDs;
+
 	/**
 	 * Constructor
 	 */
@@ -458,6 +461,9 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		echo $this->get_field_template( 'table_end' );
 
+		// Load JavaScript to edit cell by AJAX:
+		$this->load_edit_cell_js();
+
 		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
@@ -771,6 +777,8 @@ class item_fields_compare_Widget extends ComponentWidget
 	 */
 	function display_field_row_template( $custom_field, $items, $params = array() )
 	{
+		global $current_User;
+
 		$ItemCache = & get_ItemCache();
 
 		echo $this->get_field_template( 'row_start', $custom_field['type'] );
@@ -810,6 +818,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				}
 				else
 				{	// This post has no this custom field:
+					$widget_Item = NULL;
 					$custom_field_value = '';
 					$custom_field_orig_value = false;
 				}
@@ -879,13 +888,17 @@ class item_fields_compare_Widget extends ComponentWidget
 					$table_row_cells[] = array(
 						'template' => str_replace( array( '$data_cell_class$', '$field_value$' ), array( $custom_field['cell_class'], $custom_field_value ), $field_value_template ),
 						'cols'     => 1,
+						'edit_item'=> ( is_logged_in() && $widget_Item && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $widget_Item ) ? $widget_Item->ID : 0 ),
 					);
 				}
 			}
 
 			foreach( $table_row_cells as $table_row_cell )
 			{	// Print out table field value cells:
-				echo str_replace( '$data_cell_attrs$', ( $table_row_cell['cols'] > 1 ? ' colspan="'.$table_row_cell['cols'].'"' : '' ), $table_row_cell['template'] );
+				$data_cell_attrs = ( $table_row_cell['cols'] > 1 ? ' colspan="'.$table_row_cell['cols'].'"' : '' );
+				// Add attrinute data what used for AJAX editing the field value:
+				$data_cell_attrs .= ( $table_row_cell['edit_item'] > 0 ? ' data-item="'.$table_row_cell['edit_item'].'" data-field="'.$custom_field['name'].'"' : '' );
+				echo str_replace( '$data_cell_attrs$', $data_cell_attrs, $table_row_cell['template'] );
 			}
 		}
 
@@ -901,6 +914,11 @@ class item_fields_compare_Widget extends ComponentWidget
 	function get_items_IDs()
 	{
 		global $Collection, $Blog, $Item;
+
+		if( $this->items_IDs !== NULL )
+		{	// Get item IDs from cache:
+			return $this->items_IDs;
+		}
 
 		switch( $this->disp_params['items_source'] )
 		{
@@ -925,12 +943,14 @@ class item_fields_compare_Widget extends ComponentWidget
 
 			default:
 				// Stop here, because unknown items source.
-				return array();
+				$this->items_IDs = array();
+				return $this->items_IDs;
 		}
 
 		if( empty( $items ) && $items != 'all' )
 		{	// No items to compare:
-			return array();
+			$this->items_IDs = array();
+			return $this->items_IDs;
 		}
 
 		$ItemCache = & get_ItemCache();
@@ -998,7 +1018,8 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		if( empty( $Blog ) )
 		{	// Cannot use filter by ItemList below because current collection is not defined:
-			return $items;
+			$this->items_IDs = $items;
+			return $this->items_IDs;
 		}
 
 		// Use ItemList in order to check what items can be displayed on front-office for current User
@@ -1083,7 +1104,8 @@ class item_fields_compare_Widget extends ComponentWidget
 			$items = $fix_ordered_items;
 		}
 
-		return $items;
+		$this->items_IDs = $items;
+		return $this->items_IDs;
 	}
 
 
@@ -1215,6 +1237,124 @@ class item_fields_compare_Widget extends ComponentWidget
 		}
 
 		return $cache_keys;
+	}
+
+	/**
+	 * Load JavaScript to edit cell by AJAX
+	 */
+	function load_edit_cell_js()
+	{
+		global $current_User, $blog, $b2evo_icons_type;
+
+		if( ! is_logged_in() )
+		{	// Current user must be logged in:
+			return;
+		}
+
+		// Check if user has a permission to edit at least one Item:
+		$user_has_perm_edit_item = false;
+		$items_IDs = $this->get_items_IDs();
+		$ItemCache = & get_ItemCache();
+		foreach( $items_IDs as $item_ID )
+		{
+			$Item = & $ItemCache->get_by_ID( $item_ID, false, false );
+			if( $Item && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+			{	// Curent user has a permission to edit at least one item for this widget:
+				$user_has_perm_edit_item = true;
+				// Don't check other items:
+				break;
+			}
+		}
+		if( ! $user_has_perm_edit_item )
+		{	// Curent user must has a permission to edit at least one item for this widget:
+			return;
+		}
+
+		// Initialize JavaScript:
+		echo_modalwindow_js_bootstrap();
+		?>
+<script type="text/javascript">
+jQuery( document ).ready( function()
+{
+	if( typeof( evo_item_custom_fields_widget_js_loaded ) != 'undefined' )
+	{	// Don't initialize the below JS code twice on each widget calling:
+		return;
+	}
+
+	jQuery( '.evo_widget.widget_core_item_fields_compare td[data-item], .evo_widget.widget_core_item_custom_fields td[data-item]' ).on( 'click', function()
+	{	// Open modal window to edit custom field:
+		openModalWindow(
+			'<span id="spinner" class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '"></span>',
+			'auto', 'auto', true,
+			'<?php echo TS_('Edit custom field'); ?>', [ '<?php echo TS_('Save'); ?>', 'btn-primary' ], true );
+
+		// Execute ajax request to load a form to edit the custom field value:
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url().'anon_async.php'; ?>',
+			data:
+			{
+				action: 'get_custom_field_form',
+				blog: <?php echo $blog; ?>,
+				item_ID: jQuery( this ).data( 'item' ),
+				field: jQuery( this ).data( 'field' ),
+				b2evo_icons_type: '<?php echo $b2evo_icons_type; ?>'
+			},
+			success: function( result )
+			{	// Display form:
+				openModalWindow( ajax_debug_clear( result ),
+					'auto', 'auto', true,
+					'<?php echo TS_('Edit custom field'); ?>', [ '<?php echo TS_('Save'); ?>', 'btn-primary' ] );
+			}
+		} );
+
+		// Set flag to know what field is editing, in order update it on form submitting:
+		jQuery( 'td[data-item]' ).removeAttr( 'data-editing-field' );
+		jQuery( this ).attr( 'data-editing-field', 1 );
+	} )
+	.on( 'click', 'a', function( e )
+	{	// Use default action for children links in order to don't open the modal window before redirect to url from href:
+		e.stopPropagation();
+	} );
+
+	jQuery( document ).on( 'submit', 'form#item_custom_field_ajax_form', function()
+	{	// Execute ajax request to submit a form to update the custom field value:
+		var field = jQuery( this ).find( 'input[name=field]' ).val();
+		var data = {
+			action: 'update_custom_field',
+			blog: <?php echo $blog; ?>,
+			item_ID: jQuery( this ).find( 'input[name=item_ID]' ).val(),
+			field: field,
+			crumb_item: jQuery( this ).find( 'input[name=crumb_item]' ).val(),
+			b2evo_icons_type: '<?php echo $b2evo_icons_type; ?>'
+		};
+		data[ 'item_cf_' + field ] = jQuery( this ).find( '[name=item_cf_' + field + ']' ).val();
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url().'anon_async.php'; ?>',
+			data: data,
+			success: function( result )
+			{	// Update the cell with new value:
+				jQuery( 'td[data-item][data-editing-field=1]' ).html( ajax_debug_clear( result ) );
+				closeModalWindow();
+			},
+			error: function( result )
+			{	// Display error:
+				alert( ajax_debug_clear( result.responseText ) );
+			}
+		} );
+
+		// Don't use default submit event:
+		return false;
+	} );
+
+	// Set this flag to don't initialize the same events twice:
+	evo_item_custom_fields_widget_js_loaded = true;
+} );
+</script>
+		<?php
 	}
 }
 

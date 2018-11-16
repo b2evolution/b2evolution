@@ -968,69 +968,7 @@ class Item extends ItemLight
 		}
 
 		// CUSTOM FIELDS:
-		$custom_fields = $this->get_type_custom_fields();
-		foreach( $custom_fields as $custom_field )
-		{ // update each custom field
-			$param_name = 'item_cf_'.$custom_field['name'];
-			$param_error = false;
-			if( isset_param( $param_name ) )
-			{ // param is set
-				switch( $custom_field['type'] )
-				{
-					case 'double':
-						$param_type = 'double';
-						$field_value = param( $param_name, 'string', NULL );
-						if( ! empty( $field_value ) && ! preg_match( '/^(\+|-)?[0-9]+(\.[0-9]+)?$/', $field_value ) ) // we could have used is_numeric here but this is how "double" type is checked in the param.funcs.php
-						{
-							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
-							$param_error = true;
-						}
-						break;
-					case 'html':
-					case 'text': // Keep html tags for text fields, they will be escaped at display
-						$param_type = 'html';
-						break;
-					case 'url':
-						$param_type = 'url';
-						$field_value = param( $param_name, 'string', NULL );
-						$url_error = validate_url( $field_value, 'http-https' );
-						if( $url_error !== false )
-						{
-							param_error( $param_name, $url_error );
-							$param_error = true;
-						}
-						break;
-					case 'image':
-						$param_type = 'integer';
-						$field_value = param( $param_name, 'string', NULL );
-						if( ! empty( $field_value ) && ! is_number( $field_value ) )
-						{
-							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
-							$param_error = true;
-						}
-						break;
-					case 'varchar':
-					default:
-						$param_type = 'string';
-						break;
-				}
-				if( ! $param_error )
-				{
-					param( $param_name, $param_type, NULL ); // get par value
-				}
-				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
-				$this->set_setting( 'custom:'.$custom_field['name'], get_param( $param_name ), $custom_field_make_null );
-			}
-		}
-		foreach( $custom_fields as $custom_field )
-		{	// Update computed custom fields after when all fields we updated above:
-			if( $custom_field['type'] == 'computed' )
-			{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
-				$this->set_setting( 'custom:'.$custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ), true );
-			}
-		}
-		// Clear the cached values to use new after updating:
-		unset( $this->custom_fields );
+		$this->load_custom_fields_from_Request();
 
 		// COMMENTS:
 		if( $this->allow_comment_statuses() )
@@ -1272,7 +1210,7 @@ class Item extends ItemLight
 				$this->set( 'datedeadline', $item_deadline_datetime, true );
 			}
 
-			// Return TRUE when no errors and ata least one workflow property has been changed:
+			// Return TRUE when no errors and at least one workflow property has been changed:
 			return ! param_errors_detected() && (
 				isset( $this->dbchanges['post_assigned_user_ID'] ) ||
 				isset( $this->dbchanges['post_priority'] ) ||
@@ -1282,6 +1220,84 @@ class Item extends ItemLight
 
 		// If workflow properties are not allowed to be stored for this Item by current User:
 		return false;
+	}
+
+
+	/**
+	 * Load custom fields from Request form
+	 *
+	 * @return boolean TRUE if loaded data seems valid, FALSE if some errors or no any field has been changed
+	 */
+	function load_custom_fields_from_Request()
+	{
+		$custom_fields = $this->get_type_custom_fields();
+		foreach( $custom_fields as $custom_field )
+		{ // update each custom field
+			$param_name = 'item_cf_'.$custom_field['name'];
+			$param_error = false;
+			if( isset_param( $param_name ) )
+			{ // param is set
+				switch( $custom_field['type'] )
+				{
+					case 'double':
+						$param_type = 'double';
+						$field_value = param( $param_name, 'string', NULL );
+						if( ! empty( $field_value ) && ! preg_match( '/^(\+|-)?[0-9]+(\.[0-9]+)?$/', $field_value ) ) // we could have used is_numeric here but this is how "double" type is checked in the param.funcs.php
+						{
+							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
+							$param_error = true;
+						}
+						break;
+					case 'html':
+					case 'text': // Keep html tags for text fields, they will be escaped at display
+						$param_type = 'html';
+						break;
+					case 'url':
+						$param_type = 'url';
+						$field_value = param( $param_name, 'string', NULL );
+						$url_error = validate_url( $field_value, 'http-https' );
+						if( $url_error !== false )
+						{
+							param_error( $param_name, $url_error );
+							$param_error = true;
+						}
+						break;
+					case 'image':
+						$param_type = 'integer';
+						$field_value = param( $param_name, 'string', NULL );
+						if( ! empty( $field_value ) && ! is_number( $field_value ) )
+						{
+							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
+							$param_error = true;
+						}
+						break;
+					case 'varchar':
+					default:
+						$param_type = 'string';
+						break;
+				}
+				if( ! $param_error )
+				{
+					param( $param_name, $param_type, NULL ); // get par value
+				}
+				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
+				$this->set_setting( 'custom:'.$custom_field['name'], get_param( $param_name ), $custom_field_make_null );
+			}
+		}
+
+		foreach( $custom_fields as $custom_field )
+		{	// Update computed custom fields after when all fields we updated above:
+			if( $custom_field['type'] == 'computed' )
+			{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
+				$this->set_setting( 'custom:'.$custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ), true );
+			}
+		}
+
+		// Clear the cached values to use new after updating:
+		unset( $this->custom_fields );
+
+		// Return TRUE when no errors:
+		return ! param_errors_detected();
 	}
 
 
