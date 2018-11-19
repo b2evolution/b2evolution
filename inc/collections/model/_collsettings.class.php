@@ -188,7 +188,7 @@ class CollectionSettings extends AbstractSettings
 			'allow_html_comment' => 1, // Allow HTML in comments
 			'track_unread_content' => 0, // Should we track unread content on the specific blog. It can be modified on the Features/Other settings form.
 			'allow_access' => 'public', // Allow access to blog; Values: 'public' - Everyone (Public Blog), 'users' - Logged in users, 'members' - Members of the blog
-			'http_protocol' => 'always_http', // SSL; Values: 'always_http' - Always use http, 'always_https' - Always use https, 'allow_both' - Allow both http and https as valid URLs.
+			'http_protocol' => 'allow_both', // SSL; Values: 'always_http' - Always use http, 'always_https' - Always use https, 'allow_both' - Allow both http and https as valid URLs.
 			// Assets URLs:
 			'rsc_assets_url_type' => 'relative', // Load generic /rsc/ assets from: 'basic', 'relative', 'absolute'
 			'rsc_assets_absolute_url' => '', // Absolute URL for setting 'rsc_assets_url_type' with selected option 'absolute'
