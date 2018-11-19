@@ -6850,9 +6850,9 @@ function get_htsrv_url( $force_https = false )
  */
 function get_samedomain_htsrv_url( $force_https = false )
 {
-	global $ReqHost, $ReqPath, $htsrv_url, $htsrv_subdir, $Collection, $Blog, $is_cli;
+	global $ReqHost, $ReqPath, $baseurl, $htsrv_url, $htsrv_subdir, $Collection, $Blog, $is_cli;
 
-	// Force URL if it is reauired and enabled by settings:
+	// Force URL if it is required and enabled by settings:
 	$req_htsrv_url = force_https_url( $htsrv_url, $force_https );
 
 	// Cut htsrv folder from end of the URL:
@@ -6864,15 +6864,25 @@ function get_samedomain_htsrv_url( $force_https = false )
 		return $req_htsrv_url.$htsrv_subdir;
 	}
 
+	$baseurl_parts = @parse_url( $baseurl );
 	$req_url_parts = @parse_url( $ReqHost );
-	$hsrv_url_parts = @parse_url( $req_htsrv_url );
-	if( ( !isset( $req_url_parts['host'] ) ) || ( !isset( $hsrv_url_parts['host'] ) ) )
+	$htsrv_url_parts = @parse_url( $req_htsrv_url );
+	if( ( ! isset( $baseurl_parts['host'] ) ) ||
+	    ( ! isset( $req_url_parts['host'] ) ) ||
+	    ( ! isset( $htsrv_url_parts['host'] ) ) )
 	{
 		debug_die( 'Invalid hosts!' );
 	}
 
+	if( $req_url_parts['host'] == $baseurl_parts['host'] &&
+	    ! isset( $req_url_parts['path'] ) && 
+	    isset( $baseurl_parts['path'] ) )
+	{	// Don't miss folder of base url from url like http://site.com/folder/:
+		$req_url_parts['path'] = $baseurl_parts['path'];
+	}
+
 	$req_domain = rtrim( $req_url_parts['host'].( isset( $req_url_parts['path'] ) ? $req_url_parts['path'] : '' ), '/' );
-	$htsrv_domain = rtrim( $hsrv_url_parts['host'].( isset( $hsrv_url_parts['path'] ) ? $hsrv_url_parts['path'] : '' ), '/' );
+	$htsrv_domain = rtrim( $htsrv_url_parts['host'].( isset( $htsrv_url_parts['path'] ) ? $htsrv_url_parts['path'] : '' ), '/' );
 
 	// Replace domain + path of htsrv URL with current request:
 	$samedomain_htsrv_url = substr_replace( $req_htsrv_url, $req_domain, strpos( $req_htsrv_url, $htsrv_domain ), strlen( $htsrv_domain ) );
