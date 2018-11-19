@@ -141,6 +141,54 @@ switch( $action )
 		break;
 
 
+	case 'get_widget_form':
+		// Display widget form:
+
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
+		if( param( 'wi_ID', 'integer', 0 ) )
+		{	// Try to get a Widget by ID if it called from DB:
+			$WidgetCache = & get_WidgetCache();
+			$Widget = & $WidgetCache->get_by_ID( $wi_ID );
+			if( ! $Widget || $Widget->get( 'coll_ID' ) != $blog_ID )
+			{
+				debug_die( 'Wrong widget request!' );
+			}
+		}
+		else
+		{	// Try to get a Widget by code if it called from content with inline short tag like [emailcapture]:
+			param( 'wi_code', 'string', true );
+			if( ! file_exists( $inc_path.'widgets/widgets/_'.$wi_code.'.widget.php' ) )
+			{	// For some reason, that widget doesn't seem to exist... (any more?)
+				debug_die( 'Wrong widget request!' );
+			}
+			require_once $inc_path.'widgets/widgets/_'.$wi_code.'.widget.php';
+			// Create new widget by provided code:
+			$widget_classname = $wi_code.'_Widget';
+			$Widget = new $widget_classname();
+		}
+
+		param( 'params', 'array', array() );
+
+		$BlogCache = & get_BlogCache();
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
+
+		locale_activate( $Blog->get('locale') );
+
+		$blog_skin_ID = $Blog->get_skin_ID();
+		if( ! empty( $blog_skin_ID ) )
+		{ // check if Blog skin has specific comment form
+			$SkinCache = & get_SkinCache();
+			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+			$ads_current_skin_path = $skins_path.$Skin->folder.'/';
+		}
+
+		// Display widget form:
+		$Widget->display_form( $params );
+		break;
+
+
 	case 'get_user_bubbletip':
 		// Get contents of a user bubbletip
 		// Displays avatar & name
