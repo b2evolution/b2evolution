@@ -1281,12 +1281,22 @@ jQuery( document ).ready( function()
 		return;
 	}
 
+	var evo_item_custom_fields_widget_cell_selector = 'td[data-item][data-editing-field=1]';
+
 	jQuery( '.evo_widget.widget_core_item_fields_compare td[data-item], .evo_widget.widget_core_item_custom_fields td[data-item]' ).on( 'click', function()
 	{	// Open modal window to edit custom field:
 		openModalWindow(
 			'<span id="spinner" class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '"></span>',
 			'auto', 'auto', true,
-			'<?php echo TS_('Edit custom field'); ?>', [ '<?php echo TS_('Save'); ?>', 'btn-primary' ], true );
+			'<?php echo TS_('Edit custom field'); ?>', [ '<?php echo TS_('Save'); ?>', 'btn-primary' ], true, false, false, false, function()
+				{	// Revert background color of the editing cell to original:
+					if( jQuery( evo_item_custom_fields_widget_cell_selector ).length )
+					{
+						evoFadeBg( jQuery( evo_item_custom_fields_widget_cell_selector ).get( 0 ) );
+					}
+				} );
+
+		var this_cell = this;
 
 		// Execute ajax request to load a form to edit the custom field value:
 		jQuery.ajax(
@@ -1306,6 +1316,8 @@ jQuery( document ).ready( function()
 				openModalWindow( ajax_debug_clear( result ),
 					'auto', 'auto', true,
 					'<?php echo TS_('Edit custom field'); ?>', [ '<?php echo TS_('Save'); ?>', 'btn-primary' ] );
+				// Highlight the editing cell with orange color:
+				evoFadeBg( this_cell, ['#ffbf00'], { finish_orig_bg: false } );
 			}
 		} );
 
@@ -1320,6 +1332,10 @@ jQuery( document ).ready( function()
 
 	jQuery( document ).on( 'submit', 'form#item_custom_field_ajax_form', function()
 	{	// Execute ajax request to submit a form to update the custom field value:
+
+		// Highlight the updating cell with red color:
+		evoFadeBg( jQuery( evo_item_custom_fields_widget_cell_selector ).get( 0 ), ['#ff0000'], { finish_orig_bg: false } );
+
 		var field = jQuery( this ).find( 'input[name=field]' ).val();
 		var data = {
 			action: 'update_custom_field',
@@ -1337,12 +1353,18 @@ jQuery( document ).ready( function()
 			data: data,
 			success: function( result )
 			{	// Update the cell with new value:
-				jQuery( 'td[data-item][data-editing-field=1]' ).html( ajax_debug_clear( result ) );
+				jQuery( evo_item_custom_fields_widget_cell_selector ).html( ajax_debug_clear( result ) );
 				closeModalWindow();
+				// Highlight the updated cell with green color and back to original:
+				evoFadeBg( jQuery( evo_item_custom_fields_widget_cell_selector ).get( 0 ), ['#ddff00'] );
 			},
 			error: function( result )
 			{	// Display error:
 				alert( ajax_debug_clear( result.responseText ) );
+				// Highlight the editing cell with orange color:
+				evoFadeBg( evo_item_custom_fields_widget_cell_selector, ['#ffbf00'], { finish_orig_bg: false } );
+				// Fix to don't use default disabling for the submit button:
+				jQuery( '#modal_window .modal-footer button[type=submit]' ).data( 'click_init', 0 );
 			}
 		} );
 
