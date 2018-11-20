@@ -217,14 +217,6 @@ span.icon.voted {
 }
 a.rollover_sprite:hover span.icon {
   visibility: hidden;
-  visibility: visible\0/;
-  /* IE8 */
-}
-@media screen and (min-width: 0\0) {
-  /* IE9-10 */
-  a.rollover_sprite:hover span.icon {
-    visibility: visible;
-  }
 }
 a.rollover_sprite:hover span.icon:before {
   visibility: visible !important;
@@ -1018,6 +1010,9 @@ div#publish_buttons {
   background-color: #ffffff;
   box-shadow: 1px 10px 35px rgba(75, 75, 75, 0.75);
   z-index: 99999;
+}
+tbody.fieldset_wrapper.folded + tbody[id^=cat_sel_] {
+  display: none;
 }
 
 /*
@@ -2022,7 +2017,7 @@ tr.evo_highlight td {
     background-color: #FF6600;
   }
   to {
-    background-color: auto;
+    background-color: transparent;
   }
 }
 
@@ -2966,6 +2961,10 @@ div.container_menu_top div.widget_core_coll_search_form {
 div.container_menu_top input.search_field {
   width: 160px;
 }
+div.extended_search_form div[class^='col-'] {
+  padding-left: 3px;
+  padding-right: 3px;
+}
 .widget_core_user_register_quick #register_form {
   margin-top: 5px;
 }
@@ -3043,7 +3042,7 @@ div.results {
   margin-bottom: 4px;
 }
 .evo_instruction {
-  margin: 20px 10px 10px;
+  margin: 0 0 20px;
 }
 form.inskin {
   padding: 10px;
@@ -3313,21 +3312,6 @@ div.results .status_meta span {
   border-radius: 12px 12px 12px 12px;
   float: left;
   width: 80px;
-}
-@media \0screen {
-  /* IE8 */
-  .evo_content_block span.status_published span,
-  .evo_content_block span.status_community span,
-  .evo_content_block span.status_protected span,
-  .evo_content_block span.status_review span,
-  .evo_content_block span.status_private span,
-  .evo_content_block span.status_draft span,
-  .evo_content_block span.status_deprecated span,
-  .evo_content_block span.status_redirected span,
-  .evo_content_block span.status_trash span {
-    top: -15px;
-    left: -2px;
-  }
 }
 .search_title {
   font-size: 125%;
@@ -3690,7 +3674,8 @@ form#comment_edit {
 .evo_container__sidebar .evo_poll__title {
   white-space: normal;
 }
-#itemform_links .panel-body {
+#itemform_links .panel-body,
+#cmntform_links .panel-body {
   padding: 0;
 }
 div.qq-upload-button,
@@ -3762,7 +3747,7 @@ div#fileuploader_form {
 }
 
 /**
- * item_base.css 
+ * item_base.css
  * These are the default styles that are used INSIDE of a blog post.
  * Override this with an item.css file in your skin folder.
  */
@@ -3844,6 +3829,13 @@ div.podplayer {
 	font-weight: bold;
 }
 */
+span.NonExistentWikiWord {
+  border-bottom: 1px dotted #ccc;
+}
+/* Styles used by TinyMCE b2evo_shorttags plugin */
+.evo_selected {
+  background-color: #eee;
+}
 .evo_shortlink_broken {
   border-bottom: 1px dotted #F00;
 }
@@ -4244,6 +4236,11 @@ body.modal-open div.token-input-dropdown-facebook {
 }
 .evo_widget.widget_core_item_tags form input[type=submit] {
   margin: 0;
+}
+.extended_search_form ul.token-input-list-facebook {
+  max-width: 100%;
+  padding-top: 5px;
+  padding-left: 12px;
 }
 div.results {
   margin-top: 0;

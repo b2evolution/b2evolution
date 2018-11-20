@@ -76,7 +76,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 
 	<?php
-	$Form->begin_fieldset( T_('Comment contents').get_manual_link( 'editing-comments' ) );
+	$Form->begin_fieldset( sprintf( T_('Comment #%s'), $edited_Comment->ID ).get_manual_link( 'editing-comments' ) );
 
 	echo '<div class="row">';
 		echo '<div class="col-sm-12">';
@@ -168,7 +168,14 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	}
 
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Comment', 'edit_layout' => NULL ) );
+	ob_start();
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+			'target_type'   => 'Comment',
+			'target_object' => $edited_Comment,
+			'content_id'    => 'commentform_post_content',
+			'edit_layout'   => NULL
+		) );
+	$quick_setting_switch = ob_get_flush();
 
 	echo '<div class="pull-right">';
 	echo_comment_buttons( $Form, $edited_Comment );
@@ -314,4 +321,6 @@ $Form->end_form();
 echo_status_dropdown_button_js( 'comment' );
 // JS code for fieldset folding:
 echo_fieldset_folding_js();
+// JS code for inserting preview image
+echo_image_insert_modal();
 ?>

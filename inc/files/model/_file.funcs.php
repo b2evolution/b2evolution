@@ -2284,6 +2284,7 @@ function display_dragdrop_upload_button( $params = array() )
 	global $blog, $Settings, $current_User, $b2evo_icons_type, $DB;
 
 	$params = array_merge( array(
+			'button_ID'        => 'file-uploader',
 			'before'           => '',
 			'after'            => '',
 			'fileroot_ID'      => 0, // Root type and ID, e.g. collection_1
@@ -2350,9 +2351,6 @@ function display_dragdrop_upload_button( $params = array() )
 			'additional_dropzone'    => '', // jQuery selector of additional drop zone
 			'filename_before'        => '', // Append this text before file name on success uploading of new file,
 																	 // Used a mask $file_path$ to replace it with File->get_rdfp_rel_path()
-			'select_file_template'   => '', // Append this text before file name on success of uploading a new file,
-																			// Used a mask $file_path$ to replace it with File->get_rdfp_rel_path()
-			'select_file_type'       => NULL, // File type that can be selected
 			'LinkOwner'              => NULL, // Use it if you want to link a file to Item/Comment right after uploading
 			'display_status_success' => true, // Display status text about successful uploading
 			'status_conflict_place'  => 'default', // Where we should write a message about conflict:
@@ -2404,7 +2402,7 @@ function display_dragdrop_upload_button( $params = array() )
 	sort( $allowed_extensions );
 
 	?>
-	<div id="file-uploader" style="width:100%">
+	<div id="<?php echo $params['button_ID'];?>" style="width:100%">
 		<noscript>
 			<p><?php echo T_('Please enable JavaScript to use file uploader.'); ?></p>
 		</noscript>
@@ -2435,7 +2433,11 @@ function display_dragdrop_upload_button( $params = array() )
 		<?php
 		if( $params['LinkOwner'] !== NULL )
 		{	// Add params to link a file right after uploading:
-			echo 'url += "&link_owner='.$params['LinkOwner']->type.'_'.$params['LinkOwner']->get_ID().'_'.intval( $params['LinkOwner']->is_temp() ).'"';
+			echo 'url += "&link_owner='.$params['LinkOwner']->type.'_'.$params['LinkOwner']->get_ID().'_'.intval( $params['LinkOwner']->is_temp() ).'";';
+		}
+		if( ! empty( $params['fm_mode'] ) && $params['fm_mode'] == 'file_select' )
+		{
+			echo 'url += "&fm_mode='.$params['fm_mode'].'";';
 		}
 		?>
 
@@ -2448,7 +2450,7 @@ function display_dragdrop_upload_button( $params = array() )
 					params: { root_and_path: root_and_path }
 				},
 				template: document.getElementById( 'qq-template'),
-				element: document.getElementById( 'file-uploader' ),
+				element: document.getElementById( '<?php echo $params['button_ID'];?>' ),
 				listElement: <?php echo $params['listElement']; ?>,
 				dragAndDrop: {
 					extraDropzones: <?php echo $params['additional_dropzone'];?>
@@ -2466,7 +2468,15 @@ function display_dragdrop_upload_button( $params = array() )
 					onLeave: '<?php echo TS_('Files are currently being uploaded. If you leave this page now, the upload will be cancelled.'); ?>'
 				},
 				text: {
-					formatProgress: '<?php echo /* TRANS: strings in {] must NOT be translated */ TS_('Uploading {total_size}...');?>',
+					formatProgress: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('Uploading {total_size}...');?>',
+					sizeSymbols: [
+						'<?php echo /* TRANS: Abbr. for Kilobytes */ TS_('KB') ?>',
+						'<?php echo /* TRANS: Abbr. for Megabytes */ TS_('MB') ?>',
+						'<?php echo /* TRANS: Abbr. for Gigabytes */ TS_('GB') ?>',
+						'<?php echo /* TRANS: Abbr. for Terabytes */ TS_('TB') ?>',
+						'<?php echo /* TRANS: Abbr. for Petabytes */ TS_('PB') ?>',
+						'<?php echo /* TRANS: Abbr. for Exabytes  */ TS_('EB') ?>'
+					],
 				},
 				validation: {
 					sizeLimit: <?php echo min( array( return_bytes( ini_get('post_max_size') ), return_bytes( ini_get('upload_max_filesize') ), $Settings->get( 'upload_maxkb') * 1024 ) );?>,
@@ -2588,13 +2598,9 @@ function display_dragdrop_upload_button( $params = array() )
 							}
 
 							var select_file_template = '';
-							if( responseJSON.data.filetype == '<?php echo $params['select_file_type'];?>' )
+							if( responseJSON.data.select_link_button )
 							{	// Add select file button:
-								var select_file_template = '<?php echo str_replace ( "'", "\'", $params['select_file_template'] ); ?>';
-								if( select_file_template != '' )
-								{
-									select_file_template = select_file_template.replace( '$file_path$', responseJSON.data.path );
-								}
+								select_file_template = responseJSON.data.select_link_button;
 							}
 
 							var warning = '';

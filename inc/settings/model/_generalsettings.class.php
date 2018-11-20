@@ -183,7 +183,6 @@ class GeneralSettings extends AbstractSettings
 		'cross_posting' => 0,						// Allow additional categories from other blogs
 		'cross_posting_blog' => 0,					// Allow to choose main category from another blog
 		'redirect_moved_posts' => 0,				// Allow to redirect moved posts link to the correct blog
-		'cross_post_nav_in_same_coll' => 1,		// Stay in current coll if requested Item Slug is only cross posted in current coll (do not redirect to Canonial)
 
 		'subscribe_new_blogs' => 'public', // Subscribing to new blogs: 'page', 'public', 'all'
 
@@ -231,7 +230,9 @@ delayed 24 hours
 delayed 48 hours
 delayed 72 hours
 failure notice
-Undeliverable:',
+Undeliverable:
+Quarantine
+Карантин',
 		'repath_body_terminator' => '---------- Forwarded message ----------
 ------ This is a copy of the message, including all the headers. ------
 ----- Transcript of session follows -----
@@ -279,6 +280,8 @@ T account has been disabled
 T timeout exceeded
 T quota exceeded
 T Delivery attempts will continue
+T quarantine
+T карантин
 P is unavailable
 P not available
 P user doesn\'t have a .+ account

@@ -85,8 +85,6 @@ $Form->begin_fieldset( T_('Cross posting').get_manual_link('collections-cross-po
 		'allow_cross_posting', T_('Cross posting') );
 
 	$Form->checkbox_input( 'redirect_moved_posts', $Settings->get('redirect_moved_posts'), T_('Redirect if post has moved'), array( 'note'=>T_('check to allow redirects to the correct Collection if the requested Item Slug was found in a different collection.') ) );
-
-	$Form->checkbox_input( 'cross_post_nav_in_same_coll', $Settings->get( 'cross_post_nav_in_same_coll' ), T_('Stay in same collection when cross-posted'), array( 'note' => T_('check to stay in the current Collection if the requested Item Slug is only cross-posted in the current Collection. (No redirect to Canoncial)') ) );
 $Form->end_fieldset();
 
 // --------------------------------------------

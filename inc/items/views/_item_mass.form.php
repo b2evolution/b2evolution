@@ -224,5 +224,6 @@ $Form->end_form();
 // ####################### JS BEHAVIORS #########################
 // New category input box:
 echo_onchange_newcat();
+echo_fieldset_folding_js();
 
 ?>

@@ -238,30 +238,28 @@ echo $Widget->replace_vars( $template['block_start'] );
 		echo '<legend>'.T_('Authors').'</legend>';
 		if( $user_count )
 		{
-			echo '<ul>';
-
 			if( $user_count > 20 )
-			{ // Display an input box to enter user login	
-				echo '<li>';
-				echo T_('User').': <input type="text" class="form_text_input autocomplete_login" value="'.$author_login.'" name="'.$pp.'author_login" id="'.$pp.'author_login" />';
-				echo '</li>';
+			{	// Display an input box to enter user login:
+				echo '<label for="'.$pp.'author_login">'.T_('User').':</label> <input type="text" class="form-control middle autocomplete_login" value="'.format_to_output( $author_login, 'formvalue' ).'" name="'.$pp.'author_login" id="'.$pp.'author_login" />';
 			}
 			else
-			{ // Display a list of users
-				echo '<li><input type="radio" name="'.$pp.'author" value="0" class="radio"';
-				if( empty( $author ) ) echo ' checked="checked"';
-				echo ' /> <a href="'.regenerate_url( $pp.'author', $pp.'author=0' ).'">'.T_('Any').'</a></li>';
-
+			{	// Display a list of users:
+				echo '<ul>'
+					.'<li>'
+						.'<input type="radio" name="'.$pp.'author" value="0" class="radio"'.( empty( $author ) ? ' checked="checked"' : '' ).' /> '
+						.'<a href="'.regenerate_url( $pp.'author', $pp.'author=0' ).'">'.T_('Any').'</a>'
+					.'</li>';
 				foreach( $UserCache->cache as $loop_User )
 				{
-					echo '<li><input type="radio" name="'.$pp.'author" value="'.$loop_User->ID.'" class="radio"';
-					if( $loop_User->ID == $author ) echo ' checked="checked"';
-					echo ' /> <a href="'.regenerate_url( $pp.'author', $pp.'author='.$loop_User->ID ).'" rel="bubbletip_user_'.$loop_User->ID.'">';
-					echo $loop_User->get_colored_login( array( 'login_text' => 'name' ) );
-					echo '</a></li>';
+					echo '<li>'
+						.'<input type="radio" name="'.$pp.'author" value="'.$loop_User->ID.'" class="radio"'.( $loop_User->ID == $author ? ' checked="checked"' : '' ).' /> '
+						.'<a href="'.regenerate_url( $pp.'author', $pp.'author='.$loop_User->ID ).'" rel="bubbletip_user_'.$loop_User->ID.'">'
+							.$loop_User->get_colored_login( array( 'login_text' => 'name' ) )
+						.'</a>'
+					.'</li>';
 				}
+				echo '</ul>';
 			}
-			echo '</ul>';
 		}
 		echo '</fieldset>';
 

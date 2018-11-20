@@ -2468,6 +2468,82 @@ class User extends DataObject
 
 
 	/**
+	 * Get a number of emails sent to this User
+	 *
+	 * @return integer
+	 */
+	function get_num_sent_emails()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{
+			return 0;
+		}
+
+		$SQL = new SQL( 'Get a number of emails sent to the User #'.$this->ID );
+		$SQL->SELECT( 'COUNT( emlog_ID )' );
+		$SQL->FROM( 'T_email__log' );
+		$SQL->WHERE( 'emlog_user_ID = '.$this->ID );
+
+		return intval( $DB->get_var( $SQL ) );
+	}
+
+
+	/**
+	 * Delete all emails sent to the user
+	 *
+	 * @return boolean True on success
+	 */
+	function delete_sent_emails()
+	{
+		global $DB;
+
+		return $DB->query( 'DELETE
+			 FROM T_email__log
+			WHERE emlog_user_ID = '.$this->ID );
+	}
+
+
+	/**
+	 * Get a number of email returns from this User's email address
+	 *
+	 * @return integer
+	 */
+	function get_num_email_returns()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{
+			return 0;
+		}
+
+		$SQL = new SQL( 'Get a number of email returns from email address of the User #'.$this->ID );
+		$SQL->SELECT( 'COUNT( emret_ID )' );
+		$SQL->FROM( 'T_email__returns' );
+		$SQL->WHERE( 'emret_address = '.$DB->quote( $this->get( 'email' ) ) );
+
+		return intval( $DB->get_var( $SQL ) );
+	}
+
+
+	/**
+	 * Delete all email returns from the user's email address
+	 *
+	 * @return boolean True on success
+	 */
+	function delete_email_returns()
+	{
+		global $DB;
+
+		return $DB->query( 'DELETE
+			 FROM T_email__returns
+			WHERE emret_address = '.$DB->quote( $this->get( 'email' ) ) );
+	}
+
+
+	/**
 	 * Get the path to the media directory. If it does not exist, it will be created.
 	 *
 	 * If we're {@link is_admin_page() on an admin page}, it adds status messages.
@@ -7264,14 +7340,12 @@ class User extends DataObject
 		$insert_orgs = array();
 		foreach( $organization_IDs as $o => $organization_ID )
 		{
-			$organization_ID = intval( $organization_ID );
-			if( empty( $organization_ID ) )
-			{ // Organization is not selected, Skip it
+			if( ! ( $user_Organization = & $OrganizationCache->get_by_ID( $organization_ID, false, false ) ) )
+			{ // Organization is not selected or doesn't exist in DB, Skip it
 				continue;
 			}
 
-			// Get organization ang perm if current user can edit it:
-			$user_Organization = & $OrganizationCache->get_by_ID( $organization_ID );
+			// Check permission if current user can edit the organization:
 			$perm_edit_orgs = ( is_logged_in() && $current_User->check_perm( 'orgs', 'edit', false, $user_Organization ) );
 			if( ! $perm_edit_orgs && $user_Organization->get( 'accept' ) == 'no' )
 			{	// Skip this if current user cannot edit the organization and it has a setting to deny a member joining:
@@ -7285,7 +7359,7 @@ class User extends DataObject
 			elseif( in_array( $organization_ID, $curr_org_IDs ) )
 			{ // User is already in this organization
 				if( $user_Organization->perm_role == 'owner and member' ||
-				    $user_Organization->owner_user_ID == $current_User->ID ||
+				    ( is_logged_in() && $user_Organization->owner_user_ID == $current_User->ID ) ||
 				    ! $curr_orgs[ $organization_ID ]['accepted'] )
 				{	// Update role if current user has permission or it is not accepted yet by admin
 					$insert_orgs[ $organization_ID ]['role'] = ( empty( $organization_roles[ $o ] ) ? NULL : $organization_roles[ $o ] );
@@ -7296,7 +7370,7 @@ class User extends DataObject
 				}
 
 				if( $perm_edit_orgs ||
-				    $user_Organization->owner_user_ID == $current_User->ID ||
+				    ( is_logged_in() && $user_Organization->owner_user_ID == $current_User->ID ) ||
 				    ! $curr_orgs[ $organization_ID ]['accepted'] )
 				{	// Update priority if current user has permission or it is not accepted yet by admin
 					$insert_orgs[ $organization_ID ]['priority'] = ( empty( $organization_priorities[ $o ] ) ? NULL : $organization_priorities[ $o ] );

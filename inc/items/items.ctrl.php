@@ -538,7 +538,78 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=items&blog='.$blog.'&p='.( $new_post_creation_result ? $new_Item->ID : $item_ID.'&comment_type=feedback#comments' ) );
 		break;
 
-	case 'set_visibility':
+	case 'items_visibility':
+		// Change visibility of selected items:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'items' );
+
+		$selected_items = param( 'selected_items', 'array:integer' );
+		$page = param( 'page', 'integer', 1 );
+
+		// Set an URL to redirect to items list after this action:
+		$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.( $page > 1 ? '&items_full_paged='.$page : '' );
+
+		if( empty( $selected_items ) )
+		{	// If no items selected:
+			$Messages->add( T_('Please select at least one item.'), 'error' );
+			// REDIRECT / EXIT:
+			header_redirect( $redirect_to );
+		}
+
+		$item_status = param( 'post_status', 'string' );
+		$status_options = get_visibility_statuses();
+		$item_status_title = isset( $status_options[ $item_status ] ) ? $status_options[ $item_status ] : $item_status;
+
+		$ItemCache = & get_ItemCache();
+		$items_success = 0;
+		$items_restricted = array();
+		$items_failed = 0;
+		foreach( $selected_items as $selected_item_ID )
+		{
+			if( ( $selected_Item = & $ItemCache->get_by_ID( $selected_item_ID, false, false ) ) &&
+			    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $selected_Item ) )
+			{	// If current User has a permission to edit the selected Item:
+				$selected_Item->set( 'status', $item_status );
+				if( $selected_Item->dbupdate() )
+				{
+					if( $item_status == $selected_Item->get( 'status' ) )
+					{	// If the item has been updated to the requested status:
+						$items_success++;
+					}
+					else
+					{	// If the item could not be updated to the requested status because of restriction e.g. by post status:
+						if( ! isset( $items_restricted[ $selected_Item->get( 'status' ) ] ) )
+						{
+							$items_restricted[ $selected_Item->get( 'status' ) ] = 0;
+						}
+						$items_restricted[ $selected_Item->get( 'status' ) ]++;
+					}
+					continue;
+				}
+			}
+			// Wrong item or current User has no perm to edit the selected item:
+			$items_failed++;
+		}
+
+		if( $items_success )
+		{	// Inform about success updates:
+			$Messages->add( sprintf( T_('Visibility of %d items have been updated to %s.'), $items_success, $item_status_title ), 'success' );
+		}
+		foreach( $items_restricted as $restricted_status => $restricted_status_num )
+		{	// Inform about restricted updates:
+			$Messages->add( sprintf( T_('Visibility of %d items have been restricted to %s.'), $restricted_status_num, isset( $status_options[ $restricted_status ] ) ? $status_options[ $restricted_status ] : $restricted_status ), 'note' );
+		}
+		if( $items_failed )
+		{	// Inform about failed updates:
+			$Messages->add( sprintf( T_('Visibility of %d items could not be updated to %s.'), $items_failed, $item_status_title ), 'error' );
+		}
+
+		// REDIRECT / EXIT:
+		header_redirect( $redirect_to );
+		break;
+
+	case 'comments_visibility':
 		// Set visibility of selected comments:
 
 		// Check that this action request is not a CSRF hacked request:
@@ -546,6 +617,7 @@ switch( $action )
 
 		$item_ID = param( 'p', 'integer', 0 );
 		$selected_comments = param( 'selected_comments', 'array:integer' );
+		$page = param( 'page', 'integer', 1 );
 
 		if( $item_ID > 0 )
 		{	// Set an URL to redirect to item view details page after this action:
@@ -553,7 +625,7 @@ switch( $action )
 		}
 		else
 		{	// Set an URL to redirect to comments list after this action:
-			$redirect_to = $admin_url.'?ctrl=comments&blog='.$blog;
+			$redirect_to = $admin_url.'?ctrl=comments&blog='.$blog.( $page > 1 ? '&cmnt_fullview_paged='.$page : '' );
 		}
 
 		if( empty( $selected_comments ) )
@@ -569,6 +641,7 @@ switch( $action )
 
 		$CommentCache = & get_CommentCache();
 		$comments_success = 0;
+		$comments_restricted = array();
 		$comments_failed = 0;
 		foreach( $selected_comments as $selected_comment_ID )
 		{
@@ -579,7 +652,18 @@ switch( $action )
 				$selected_Comment->set( 'status', $comment_status );
 				if( $selected_Comment->dbupdate() )
 				{
-					$comments_success++;
+					if( $comment_status == $selected_Comment->get( 'status' ) )
+					{	// If the comment has been updated to the requested status:
+						$comments_success++;
+					}
+					else
+					{	// If the comment could not be updated to the requested status because of restriction e.g. by post status:
+						if( ! isset( $comments_restricted[ $selected_Comment->get( 'status' ) ] ) )
+						{
+							$comments_restricted[ $selected_Comment->get( 'status' ) ] = 0;
+						}
+						$comments_restricted[ $selected_Comment->get( 'status' ) ]++;
+					}
 					continue;
 				}
 			}
@@ -590,6 +674,10 @@ switch( $action )
 		if( $comments_success )
 		{	// Inform about success updates:
 			$Messages->add( sprintf( T_('Visibility of %d comments have been updated to %s.'), $comments_success, $comment_status_title ), 'success' );
+		}
+		foreach( $comments_restricted as $restricted_status => $restricted_status_num )
+		{	// Inform about restricted updates:
+			$Messages->add( sprintf( T_('Visibility of %d comments have been restricted to %s.'), $restricted_status_num, isset( $status_options[ $restricted_status ] ) ? $status_options[ $restricted_status ] : $restricted_status ), 'note' );
 		}
 		if( $comments_failed )
 		{	// Inform about failed updates:
@@ -1458,6 +1546,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		param( 'status', 'string', true );
+		param( 'cat_ID', 'integer', NULL );
 
 		// Check edit permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
@@ -1491,7 +1580,8 @@ switch( $action )
 			$tab = param( 'tab', 'string', 'type' );
 			$tab_type = get_tab_by_item_type_usage( $edited_Item->get_type_setting( 'usage' ) );
 			$tab_type_param = ( $tab == 'type' ? '&tab_type='.( $tab_type ? $tab_type[0] : 'post' ) : '' );
-			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab='.$tab.$tab_type_param.'&filter=restore';
+			$cat_param = ( $cat_ID === NULL ? '' : '&cat_ID='.$cat_ID );
+			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab='.$tab.$tab_type_param.$cat_param.'&filter=restore';
 
 			// Highlight the updated item in list
 			$Session->set( 'highlight_id', $edited_Item->ID );
@@ -2043,6 +2133,8 @@ switch( $action )
 	case 'update': // on error
 	case 'update_publish': // on error
 	case 'history':
+	case 'history_details':
+	case 'history_compare':
 	case 'extract_tags':
 
 		// Generate available blogs list:
@@ -2066,7 +2158,6 @@ switch( $action )
 			case 'update_edit':
 			case 'update': // on error
 			case 'update_publish': // on error
-			case 'history':
 			case 'extract_tags':
 				if( $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
 				{	// User has permissions to delete this post
@@ -2086,6 +2177,16 @@ switch( $action )
 							) );
 				}
 
+				if( $Blog->get_setting( 'allow_comments' ) != 'never' )
+				{
+					$comments_number = generic_ctp_number( $edited_Item->ID, 'comments', 'total', true );
+					$item_feedback_title = ( $comments_number == 0 ? T_('no comment') : ( $comments_number == 1 ? T_('1 comment') : sprintf( T_('%d comments'), $comments_number ) ) );
+					$AdminUI->global_icon( $item_feedback_title, ( $comments_number > 0 ? 'comments' : 'nocomment' ), $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID.'#comments',
+						' '.$item_feedback_title, 4, 3, array(
+								'style' => 'margin-right: 3ex;',
+						) );
+				}
+
 				$edited_item_url = $edited_Item->get_copy_url();
 				if( ! empty( $edited_item_url ) )
 				{	// If user has a permission to copy the edited Item:
@@ -2094,10 +2195,19 @@ switch( $action )
 								'style' => 'margin-right: 3ex;',
 						) );
 				}
+
+				if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+				{	// If user has a permission to merge the edited Item:
+					$AdminUI->global_icon( T_('Merge with...'), 'merge', '#',
+						' '.T_('Merge with...'), 4, 3, array(
+								'style' => 'margin-right: 3ex;',
+								'onclick' => 'return evo_merge_load_window( '.$edited_Item->ID.' )',
+						) );
+				}
 				break;
 		}
 
-		if( ! in_array( $action, array( 'new_type', 'edit_type' ) ) )
+		if( ! in_array( $action, array( 'new_type', 'edit_type', 'history', 'history_details', 'history_compare' ) ) )
 		{
 			if( $edited_Item->ID > 0 )
 			{ // Display a link to history if Item exists in DB
@@ -2128,6 +2238,15 @@ switch( $action )
 			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', $redirect_to, T_('Cancel'), 4, 2 );
 
 			init_tokeninput_js();
+		}
+
+		if( in_array( $action, array( 'history', 'history_details', 'history_compare' ) ) )
+		{	// History tabs:
+			if( $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
+			{	// User has permissions to edit this Item:
+				$AdminUI->global_icon( T_('Edit current version'), 'edit',  $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$edited_Item->ID, T_('Edit current version'), 4, 3, array( 'style' => 'margin-right:3ex' ) );
+			}
+			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', $redirect_to, T_('Cancel'), 4, 2 );
 		}
 
 		break;
@@ -2248,7 +2367,6 @@ if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action,
 	// Require colorbox js:
 	require_js_helper( 'colorbox' );
 	// Require Fine Uploader js and css:
-	init_fineuploader_js_lang_strings();
 	require_js( 'multiupload/fine-uploader.js' );
 	require_css( 'fine-uploader.css' );
 	// Load JS files to make the links table sortable:

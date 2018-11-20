@@ -183,18 +183,48 @@ function skin_init( $disp )
 					&& (( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
 								|| $Blog->get_setting( 'relcanonical_item_urls' ) ) )
 			{	// We want to redirect to the Item's canonical URL:
-
-				$canonical_url = $Item->get_permanent_url( '', '', '&' );
-				if( preg_match( '|[&?](page=\d+)|', $ReqURI, $page_param ) )
-				{	// A certain post page has been requested, keep only this param and discard all others:
-					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
+				$canonical_is_same_url = true;
+				$item_Blog = & $Item->get_Blog();
+				// Use item URL from first detected category of the current collection:
+				if( $item_Blog->get_setting( 'allow_crosspost_urls' ) )
+				{	// If non-canonical URL is allowed for cross-posted items,
+					// try to get a canonical URL in thecurrent collection even it is not main/canonical collection of the Item:
+					$canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID );
 				}
-				if( preg_match( '|[&?](mode=quote&[qcp]+=\d+)|', $ReqURI, $page_param ) )
-				{	// A quote of comment/post, keep only these params and discard all others:
-					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
+				else
+				{	// If non-canonical URL is allowed for cross-posted items, then only get canonical URL in the main collection:
+					$canonical_url = $Item->get_permanent_url( '', '', '&' );
+				}
+				$canonical_url_params_regexp = '#[&?](page=\d+|mode=quote&[qcp]+=\d+)+#';
+				if( preg_match_all( $canonical_url_params_regexp, $ReqURI, $page_param ) )
+				{	// A certain post page or a quote of comment/post have been requested, keep only this param and discard all others:
+					$canonical_url = url_add_param( $canonical_url, implode( '&', $page_param[1] ), '&' );
+				}
+				$canonical_is_same_url = is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
+
+				if( ! $canonical_is_same_url && in_array( $Blog->get_setting( 'single_links' ), array( 'subchap', 'chapters' ) ) )
+				{	// If current URL is not same as first detected category then try to check all other categories from the current collection:
+					$item_chapters = $Item->get_Chapters();
+					foreach( $item_chapters as $item_Chapter )
+					{	// Try to find in what category the Item may has the same canonical url as current requested URL:
+						if( ! $item_Blog->get_setting( 'allow_crosspost_urls' ) &&
+						    $item_Blog->ID != $item_Chapter->get( 'blog_ID' ) )
+						{	// Don't allow to use URL of categories from cross-posted collection if it is restricted:
+							continue;
+						}
+						$cat_canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID, $item_Chapter->ID );
+						if( preg_match_all( $canonical_url_params_regexp, $ReqURI, $page_param ) )
+						{	// A certain post page or a quote of comment/post have been requested, keep only this param and discard all others:
+							$cat_canonical_url = url_add_param( $cat_canonical_url, implode( '&', $page_param[1] ), '&' );
+						}
+						if( $canonical_is_same_url = is_same_url( $ReqURL, $cat_canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
+						{	// We have found the same URL, stop find another and stay on the current page without redirect:
+							break;
+						}
+					}
 				}
 
-				if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
+				if( ! $canonical_is_same_url )
 				{	// The requested URL does not look like the canonical URL for this post...
 					// url difference was resolved
 					$url_resolved = false;
@@ -230,16 +260,21 @@ function skin_init( $disp )
 						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 					}
 
-					if( !$url_resolved && $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' && ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) ) )
+					if( ! $url_resolved &&
+					    $Blog->get_setting( 'canonical_item_urls' ) &&
+					    $redir == 'yes' &&
+					    ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) || // If Item has main category in the current collection
+					      $Item->is_part_of_blog( $Blog->ID ) // If Item has extra category from not main collection
+					    ) )
 					{	// REDIRECT TO THE CANONICAL URL:
 						$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].' );
 						header_redirect( $canonical_url, true );
+						// EXITED.
 					}
 					else
 					{	// Use rel="canoncial":
 						add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 					}
-					// EXITED.
 				}
 			}
 
@@ -319,6 +354,10 @@ function skin_init( $disp )
 					}
 
 					global $cat, $catsel;
+
+					$ChapterCache = & get_ChapterCache();
+					$Chapter = & $ChapterCache->get_by_ID( $cat, false, false );
+
 					if( empty( $catsel ) && preg_match( '~^[0-9]+$~', $cat ) )
 					{	// We are on a single cat page:
 						// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
@@ -331,16 +370,12 @@ function skin_init( $disp )
 						if( ( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
 							|| $Blog->get_setting( 'relcanonical_cat_urls' ) )
 						{ // Check if the URL was canonical:
-							if( !isset( $Chapter ) )
-							{
-								$ChapterCache = & get_ChapterCache();
-								/**
-								 * @var Chapter
-								 */
-								$Chapter = & $ChapterCache->get_by_ID( $MainList->filters['cat_array'][0], false );
+							if( empty( $Chapter ) && isset( $MainList->filters['cat_array'][0] ) )
+							{	// Try to get Chapter from filters:
+								$Chapter = & $ChapterCache->get_by_ID( $MainList->filters['cat_array'][0], false, false );
 							}
 
-							if( $Chapter )
+							if( ! empty( $Chapter ) )
 							{
 								if( $Chapter->parent_ID )
 								{	// This is a sub-category page (i-e: not a level 1 category)
@@ -361,19 +396,20 @@ function skin_init( $disp )
 									}
 								}
 							}
-							else
-							{ // If the requested chapter was not found display 404 page
-								$Messages->add( T_('The requested chapter was not found') );
-								global $disp;
-								$disp = '404';
-								break;
-							}
 						}
 
 						if( $post_navigation == 'same_category' )
 						{ // Category is set and post navigation should go through the same category, set navigation target param
 							$MainList->nav_target = $cat;
 						}
+					}
+
+					if( empty( $Chapter ) )
+					{	// If the requested chapter was not found display 404 page:
+						$Messages->add( T_('The requested chapter was not found') );
+						global $disp;
+						$disp = '404';
+						break;
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'tags', 'posts', 'page' ) ) == array() )
@@ -1303,6 +1339,12 @@ function skin_init( $disp )
 			{	// Use default category instead of the wrong requested:
 				set_param( 'cat', $Blog->get_default_cat_ID() );
 			}
+
+			if( $Chapter && $Chapter->get_ItemType() === false )
+			{	// Don't allow to post in category without default Item Type:
+				$Messages->add( T_('You cannot post here'), 'error' );
+				header_redirect( $Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
+			}
 			break;
 
 		case 'edit':
@@ -1348,6 +1390,16 @@ function skin_init( $disp )
 				}
 				$Messages->add( $error_message, 'error' );
 				header_redirect( $Blog->gen_blogurl(), 302 );
+			}
+
+			$cat = param( 'cat', 'integer' );
+			if( $cat > 0 &&
+			    ( $ChapterCache = & get_ChapterCache() ) &&
+			    ( $selected_Chapter = & $ChapterCache->get_by_ID( $cat, false, false ) ) &&
+			    ( $selected_Chapter->get_ItemType() === false ) )
+			{	// Don't allow to post in category without default Item Type:
+				$Messages->add( T_('You cannot post here'), 'error' );
+				header_redirect( $selected_Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
 			}
 
 			// Prepare the 'In-skin editing':
@@ -1416,6 +1468,13 @@ function skin_init( $disp )
 
 			// Restrict comment status by parent item:
 			$edited_Comment->restrict_status();
+
+			// require Fine Uploader js and css:
+			require_js( 'multiupload/fine-uploader.js' );
+			require_css( 'fine-uploader.css' );
+			// Load JS files to make the links table sortable:
+			require_js( '#jquery#' );
+			require_js( 'jquery/jquery.sortable.min.js' );
 			break;
 
 		case 'useritems':
@@ -1423,7 +1482,13 @@ function skin_init( $disp )
 			global $display_params, $viewed_User;
 
 			// get user_ID because we want it in redirect_to in case we need to ask for login.
-			$user_ID = param( 'user_ID', 'integer', true, true );
+			$user_ID = param( 'user_ID', 'integer', NULL, true );
+
+			if( $user_ID === NULL && is_logged_in() )
+			{	// Use current logged in User if it is not specified in param:
+				$user_ID = $current_User->ID;
+			}
+
 			if( empty( $user_ID ) )
 			{
 				bad_request_die( sprintf( T_('Parameter &laquo;%s&raquo; is required!'), 'user_ID' ) );
@@ -2797,6 +2862,9 @@ function skin_body_attrs( $params = array() )
 
 	// Logged in/Anonymous class:
 	$classes[] = is_logged_in() ? 'loggedin' : 'anonymous';
+
+	// Toolbar visibility class:
+	$classes[] = show_toolbar() ? 'evo_toolbar_visible' : 'evo_toolbar_hidden';
 
 	// User Group class:
 	$classes[] = 'usergroup_'.( ! is_logged_in() && empty( $current_User->grp_ID ) ? 'none' : $current_User->grp_ID );

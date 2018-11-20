@@ -28,7 +28,7 @@ class LinkEmailCampaign extends LinkOwner
 	/**
 	 * Constructor
 	 */
-	function __construct( $EmailCampaign )
+	function __construct( $EmailCampaign  )
 	{
 		// call parent contsructor
 		parent::__construct( $EmailCampaign, 'emailcampaign', 'ecmp_ID' );

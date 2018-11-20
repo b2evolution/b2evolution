@@ -1707,8 +1707,8 @@ class Form extends Widget
 		{
 			$precision_mn = $matches[1];
 			$precision_s = 0;
-			// convert the precision in sec
-			$precision *= 60;
+			// convert the precision in sec:
+			$precision = $precision_mn * 60;
 		}
 		else
 		{

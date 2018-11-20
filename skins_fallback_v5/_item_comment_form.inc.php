@@ -194,10 +194,11 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			$comment_content = param( $dummy_fields[ 'content' ], 'html' );
 			$quoted_comment_ID = param( 'qc', 'integer', 0 );
 			$quoted_post_ID = param( 'qp', 'integer', 0 );
-			if( !empty( $quoted_comment_ID ) )
-			{
-				$CommentCache = & get_CommentCache();
-				$quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false );
+			if( ! empty( $quoted_comment_ID ) && 
+			    ( $CommentCache = & get_CommentCache() ) &&
+			    ( $quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false ) ) &&
+			    $params['comment_type'] == $quoted_Comment->get( 'type' ) )
+			{	// Allow comment quoting only for the same comment type form:
 				$quoted_Item = $quoted_Comment->get_Item();
 				if( $quoted_User = $quoted_Comment->get_author_User() )
 				{ // User is registered
@@ -210,8 +211,8 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 				$quoted_content = $quoted_Comment->get( 'content' );
 				$quoted_ID = 'c'.$quoted_Comment->ID;
 			}
-			else if( !empty( $quoted_post_ID ) )
-			{
+			elseif( ! empty( $quoted_post_ID ) && $params['comment_type'] != 'meta' )
+			{	// Allow item quoting only for normal(not meta) comment type form:
 				$ItemCache = & get_ItemCache();
 				$quoted_Item = & $ItemCache->get_by_ID( $quoted_post_ID, false );
 				$quoted_login = $quoted_Item->get_creator_login();
@@ -272,11 +273,13 @@ function validateCommentForm(form)
 
 	$Form->begin_form( 'bComment', '', array( 'target' => '_self'/*, 'onsubmit' => 'return validateCommentForm(this);'*/ ) );
 
-	// Display a message before comment form:
-	$Item->display_comment_form_msg( array(
-			'before' => '<br /><div class="warning"><div class="action_messages">',
-			'after'  => '</div></div>',
-		) );
+	if( $params['comment_type'] != 'meta' )
+	{	// Display a message before comment form:
+		$Item->display_comment_form_msg( array(
+				'before' => '<br /><div class="warning"><div class="action_messages">',
+				'after'  => '</div></div>',
+			) );
+	}
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
 	//           Actually, the best would be, if the $Form object could be changed by a plugin

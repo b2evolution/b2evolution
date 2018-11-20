@@ -88,12 +88,6 @@ class user_register_quick_Widget extends ComponentWidget
 		// Load all active newsletters:
 		$NewsletterCache = & get_NewsletterCache();
 		$load_where = 'enlt_active = 1';
-		/*$selected_newsletters = $this->get_param( 'newsletters', true );
-		if( empty( $params['infinite_loop'] ) && ! empty( $selected_newsletters ) )
-		{	// Load additional newsletters which are currently used by this widget:
-			global $DB;
-			$load_where .= ' OR enlt_ID IN ( '.$DB->quote( array_keys( $selected_newsletters ) ).' )';
-		}*/
 		$NewsletterCache->load_where( $load_where );
 		// Initialize checkbox options for param "Newsletter":
 		$def_newsletters = explode( ',', $Settings->get( 'def_newsletters' ) );
@@ -177,12 +171,6 @@ class user_register_quick_Widget extends ComponentWidget
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
-				'subscribe_post_mod' => array(
-					'label' => '',
-					'note' => T_('check to auto subscribe new user to current collection when a post is modified and user has permission to moderate it'),
-					'type' => 'checkbox',
-					'defaultvalue' => 1,
-				),
 				'button' => array(
 					'label' => T_('Button title'),
 					'note' => T_('Text that appears on the form submit button.'),
@@ -228,12 +216,47 @@ class user_register_quick_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Collection, $Blog, $Settings, $Session, $redirect_to, $dummy_fields;
+		global $Collection, $Blog;
 
 		if( is_logged_in() )
 		{	// No display when user is already registered
 			return false;
 		}
+
+		$params['redirect_to'] = param( 'redirect_to', 'url', regenerate_url( '', '', '', '&' ) );
+
+		if( $Blog->get_ajax_form_enabled() )
+		{	// Load widget form through AJAX:
+			$widget_params = array(
+				'action' => 'get_widget_form',
+				'blog'   => $Blog->ID,
+				'params' => $params,
+			);
+			if( empty( $this->ID ) )
+			{	// Use code for calling widget from content with inline short tag like [emailcapture]:
+				$widget_params['wi_code'] = $this->get( 'code' );
+			}
+			else
+			{	// Use ID for calling widget from DB:
+				$widget_params['wi_ID'] = $this->ID;
+			}
+			display_ajax_form( $widget_params );
+		}
+		else
+		{	// Display widget form:
+			$this->display_form( $params );
+		}
+	}
+
+
+	/**
+	 * Display widget form
+	 *
+	 * @param array Params
+	 */
+	function display_form( $params )
+	{
+		global $Collection, $Blog, $Settings, $Session, $redirect_to, $dummy_fields;
 
 		if( $Settings->get( 'newusers_canregister' ) != 'yes' || ! $Settings->get( 'quick_registration' ) )
 		{ // Display error message when quick registration is disabled
@@ -266,8 +289,6 @@ class user_register_quick_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_start'];
 
-		$redirect_to = param( 'redirect_to', 'url', regenerate_url( '', '', '', '&' ) );
-
 		$this->disp_title();
 
 		echo $this->disp_params['block_body_start'];
@@ -286,7 +307,7 @@ class user_register_quick_Widget extends ComponentWidget
 		$Form->hidden( 'inskin', true );
 		$Form->hidden( 'blog', $Blog->ID );
 		$Form->hidden( 'widget', $this->ID );
-		$Form->hidden( 'redirect_to', $redirect_to );
+		$Form->hidden( 'redirect_to', $params['redirect_to'] );
 
 		if( $this->disp_params['inline'] == 1 )
 		{
@@ -296,7 +317,6 @@ class user_register_quick_Widget extends ComponentWidget
 			$Form->hidden( 'ask_lastname', $this->disp_params['ask_lastname'] );
 			$Form->hidden( 'usertags', $this->disp_params['usertags'] );
 			$Form->hidden( 'subscribe_post', $this->disp_params['subscribe_post'] );
-			$Form->hidden( 'subscribe_post_mod', $this->disp_params['subscribe_post_mod'] );
 			$Form->hidden( 'subscribe_comment', $this->disp_params['subscribe_comment'] );
 
 			$newsletters = array();

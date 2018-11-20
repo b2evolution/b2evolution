@@ -34,7 +34,7 @@ if( $edited_Itemtype->ID > 0 )
 }
 $Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,ityp_ID' ) );
 
-$Form->begin_form( 'fform', ( $edited_Itemtype->ID > 0 ? T_('Edit item type') : T_('New item type') ) );
+$Form->begin_form( 'fform', ( $edited_Itemtype->ID > 0 ? T_('Edit Item Type') : T_('New Item Type') ) );
 
 $Form->add_crumb( 'itemtype' );
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',ityp_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
@@ -60,6 +60,8 @@ $Form->begin_fieldset( T_('General').get_manual_link('item-type-general') );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Use of Instructions').get_manual_link( 'item-type-instructions' ), array( 'id' => 'itemtype_instructions' ) );
+	$Form->text_input( 'ityp_evobar_link_text', $edited_Itemtype->evobar_link_text, 25, T_('New Item link in evobar'), T_('Leave empty for default') );
+	$Form->text_input( 'ityp_skin_btn_text', $edited_Itemtype->skin_btn_text, 25, T_('New Item button in skin'), T_('Leave empty for default') );
 	$Form->checklist( array(
 		array( 'ityp_front_instruction', 1, T_('In front-office edit screen'),$edited_Itemtype->front_instruction ),
 		array( 'ityp_back_instruction', 1, T_('In back-office edit screen'), $edited_Itemtype->back_instruction )
@@ -195,30 +197,31 @@ $Table->display_line_start();
 
 // Order
 $Table->display_col_start();
-echo '<input type="text" name="custom_field_order$cf_num$" value="$cf_order$" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />';
+echo '<input type="text" name="cf_order$cf_num$" value="$cf_order$" class="form_text_input form-control custom_field_order" maxlength="11" size="3" />';
 // Hidden options which are stored in DB or used as additional data:
-echo '<input type="hidden" name="custom_field_ID$cf_num$" value="$cf_ID$" />';
-echo '<input type="hidden" name="custom_field_type$cf_num$" value="$cf_type$" />';
-echo '<input type="hidden" name="custom_field_note$cf_num$" value="$cf_note$" />';
-custom_field_edit_form_template( '<input type="hidden" name="custom_field_formula$cf_num$" value="$cf_formula$" />', 'computed', $custom_field_templates );
-echo '<input type="hidden" name="custom_field_header_class$cf_num$" value="$cf_header_class$" />';
-custom_field_edit_form_template( '<input type="hidden" name="custom_field_cell_class$cf_num$" value="$cf_cell_class$" />', '-separator', $custom_field_templates );
-custom_field_edit_form_template( '<input type="hidden" name="custom_field_link$cf_num$" value="$cf_link$" />'
-	.'<input type="hidden" name="custom_field_link_nofollow$cf_num$" value="$cf_link_nofollow$" />'
-	.'<input type="hidden" name="custom_field_link_class$cf_num$" value="$cf_link_class$" />', '-text,-html,-separator', $custom_field_templates );
-echo '<input type="hidden" name="custom_field_description$cf_num$" value="$cf_description$" />';
+echo '<input type="hidden" name="cf_ID$cf_num$" value="$cf_ID$" />';
+echo '<input type="hidden" name="cf_type$cf_num$" value="$cf_type$" />';
+echo '<input type="hidden" name="cf_note$cf_num$" value="$cf_note$" />';
+custom_field_edit_form_template( '<input type="hidden" name="cf_formula$cf_num$" value="$cf_formula$" />', 'computed', $custom_field_templates );
+echo '<input type="hidden" name="cf_header_class$cf_num$" value="$cf_header_class$" />';
+custom_field_edit_form_template( '<input type="hidden" name="cf_cell_class$cf_num$" value="$cf_cell_class$" />', '-separator', $custom_field_templates );
+custom_field_edit_form_template( '<input type="hidden" name="cf_link$cf_num$" value="$cf_link$" />'
+	.'<input type="hidden" name="cf_link_nofollow$cf_num$" value="$cf_link_nofollow$" />'
+	.'<input type="hidden" name="cf_link_class$cf_num$" value="$cf_link_class$" />', '-text,-html,-separator', $custom_field_templates );
+echo '<input type="hidden" name="cf_description$cf_num$" value="$cf_description$" />';
+custom_field_edit_form_template( '<input type="hidden" name="cf_merge$cf_num$" value="$cf_merge$" />', '-separator', $custom_field_templates );
 // Create this <hidden> to know this custom field is new created field:
-echo '<input type="hidden" name="custom_field_new$cf_num$" value="$cf_new$" />';
+echo '<input type="hidden" name="cf_new$cf_num$" value="$cf_new$" />';
 $Table->display_col_end();
 
 // Title
 $Table->display_col_start();
-echo '<input type="text" name="custom_field_label$cf_num$" value="$cf_label$" class="form_text_input form-control custom_field_label $cf_label_class$" maxlength="255" />';
+echo '<input type="text" name="cf_label$cf_num$" value="$cf_label$" class="form_text_input form-control custom_field_label $cf_label_class$" maxlength="255" />';
 $Table->display_col_end();
 
 // Name
 $Table->display_col_start();
-echo '<input type="text" name="custom_field_name$cf_num$" value="$cf_name$" class="form_text_input form-control custom_field_name $cf_name_class$" maxlength="255" />';
+echo '<input type="text" name="cf_name$cf_num$" value="$cf_name$" class="form_text_input form-control custom_field_name $cf_name_class$" maxlength="255" />';
 $Table->display_col_end();
 
 // Type
@@ -229,33 +232,33 @@ $Table->display_col_end();
 // Format
 $Table->display_col_start();
 custom_field_edit_form_template( array(
-		'<input type="text" name="custom_field_format$cf_num$" value="$cf_format$" class="form_text_input form-control custom_field_format" size="20" maxlength="2000" />',
-		'<select name="custom_field_format$cf_num$" class="form-control custom_field_format">'.Form::get_select_options_string( array_keys( $thumbnail_sizes ) ).'</select>'
+		'<input type="text" name="cf_format$cf_num$" value="$cf_format$" class="form_text_input form-control custom_field_format" size="20" maxlength="2000" />',
+		'<select name="cf_format$cf_num$" class="form-control custom_field_format">'.Form::get_select_options_string( array_keys( $thumbnail_sizes ) ).'</select>'
 	), array( 'double,computed,separator,url', 'image' ), $custom_field_templates );
 $Table->display_col_end();
 
 // Public
 $Table->display_col_start();
-echo '<input type="checkbox" name="custom_field_public$cf_num$" value="1" />';
+echo '<input type="checkbox" name="cf_public$cf_num$" value="1" />';
 $Table->display_col_end();
 
 // Line highlight
 $Table->display_col_start();
-custom_field_edit_form_template( '<select name="custom_field_line_highlight$cf_num$" class="form-control custom_field_line_highlight">'
+custom_field_edit_form_template( '<select name="cf_line_highlight$cf_num$" class="form-control custom_field_line_highlight">'
 		.Form::get_select_options_string( get_item_type_field_highlight_options( 'line' ), NULL, true )
 	.'</select>', '-separator', $custom_field_templates );
 $Table->display_col_end();
 
 // Green highlight
 $Table->display_col_start();
-custom_field_edit_form_template( '<select name="custom_field_green_highlight$cf_num$" class="form-control custom_field_green_highlight">'
+custom_field_edit_form_template( '<select name="cf_green_highlight$cf_num$" class="form-control custom_field_green_highlight">'
 		.Form::get_select_options_string( get_item_type_field_highlight_options( 'green' ), NULL, true )
 	.'</select>', '-separator', $custom_field_templates );
 $Table->display_col_end();
 
 // Red highlight
 $Table->display_col_start();
-custom_field_edit_form_template( '<select name="custom_field_red_highlight$cf_num$" class="form-control custom_field_red_highlight">'
+custom_field_edit_form_template( '<select name="cf_red_highlight$cf_num$" class="form-control custom_field_red_highlight">'
 		.Form::get_select_options_string( get_item_type_field_highlight_options( 'red' ), NULL, true )
 	.'</select>', '-separator', $custom_field_templates );
 $Table->display_col_end();
@@ -314,14 +317,15 @@ foreach( $custom_fields as $custom_field )
 	$custom_field_label = $custom_field['label'];
 	$custom_field_label_class = '';
 	$custom_field_name_class = '';
+	$custom_fields_data = get_param( 'custom_fields_data' );
 	if( empty( $custom_field_label ) )
 	{ // When user saves new field without title
-		$custom_field_label = get_param( 'custom_field_'.$i );
+		$custom_field_label = ( isset( $custom_fields_data->{'label'.$i} ) ? $custom_fields_data->{'label'.$i} : NULL );
 		$custom_field_label_class = 'field_error new_custom_field_title';
 	}
 	if( empty( $custom_field_name ) )
 	{ // When user saves new field without name
-		$custom_field_name = get_param( 'custom_field_name'.$i );
+		$custom_field_name = ( isset( $custom_fields_data->{'name'.$i} ) ? $custom_fields_data->{'name'.$i} : NULL );
 		$custom_field_name_class = 'field_error';
 		if( empty( $custom_field_label_class ) )
 		{ // The field "Title" mast have this class to auto-fill the field "Name"
@@ -353,7 +357,7 @@ foreach( $custom_fields as $custom_field )
 	// Replace masks with values of the custom field:
 	$cf_input_replacements = array(
 		'$cf_ID$'            => $custom_ID,
-		'$cf_new$'           => param( 'custom_field_new'.$i, 'integer', 0 ),
+		'$cf_new$'           => ( isset( $custom_fields_data->{'new'.$i} ) ? $custom_fields_data->{'new'.$i} : 0 ),
 		'$cf_num$'           => $i,
 		'$cf_type$'          => format_to_output( $custom_field['type'], 'htmlattr' ),
 		'$cf_order$'         => format_to_output( $custom_field['order'], 'htmlattr' ),
@@ -370,16 +374,17 @@ foreach( $custom_fields as $custom_field )
 		'$cf_link_class$'    => format_to_output( $custom_field['link_class'], 'htmlattr' ),
 		'$cf_note$'          => format_to_output( $custom_field['note'], 'htmlattr' ),
 		'$cf_description$'   => format_to_output( $custom_field['description'], 'htmlspecialchars' ),
+		'$cf_merge$'         => format_to_output( $custom_field['merge'], 'htmlattr' ),
 	);
 	$cf_select_replacements = array( 'format', 'line_highlight', 'green_highlight', 'red_highlight' );
 	$custom_field_type_template = str_replace( array_keys( $cf_input_replacements ), $cf_input_replacements, $custom_field_type_template );
 	foreach( $cf_select_replacements as $cf_select_field )
 	{	// Set a selected option:
-		$custom_field_type_template = preg_replace( '/(<select[^>]+name="custom_field_'.$cf_select_field.'.+<option value="'.preg_quote( $custom_field[ $cf_select_field ], '/' ).'")/', '$1 selected="selected"', $custom_field_type_template );
+		$custom_field_type_template = preg_replace( '/(<select[^>]+name="cf_'.$cf_select_field.'.+<option value="'.preg_quote( $custom_field[ $cf_select_field ], '/' ).'")/', '$1 selected="selected"', $custom_field_type_template );
 	}
 	if( $custom_field[ 'public' ] )
 	{	// Enabled public option:
-		$custom_field_type_template = preg_replace( '/(<input type="checkbox"[^>]+name="custom_field_public[^"]+")/', '$1 checked="checked"', $custom_field_type_template );
+		$custom_field_type_template = preg_replace( '/(<input type="checkbox"[^>]+name="cf_public[^"]+")/', '$1 checked="checked"', $custom_field_type_template );
 	}
 	echo $custom_field_type_template;
 
@@ -561,6 +566,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 	var field_value_red_highlight = '';
 	var field_value_public = '';
 	var field_value_description = '';
+	var field_value_merge = '';
 	if( typeof( duplicated_field_obj ) != 'undefined' && duplicated_field_obj !== false && duplicated_field_obj.length > 0 )
 	{	// Get data from duplicated field of the current editing Item Type:
 		new_field_mode = 'duplicate_empty';
@@ -569,22 +575,23 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 			duplicated_count_custom_field = 0;
 		}
 		duplicated_count_custom_field++;
-		field_value_label = duplicated_field_obj.find( 'input[name^="custom_field_label"]' ).val();
-		field_value_name = duplicated_field_obj.find( 'input[name^="custom_field_name"]' ).val() + '_' + duplicated_count_custom_field;
-		field_value_order = duplicated_field_obj.find( 'input[name^="custom_field_order"]' ).val();
-		field_value_note = duplicated_field_obj.find( 'input[name^="custom_field_note"]' ).val();
-		field_value_format = duplicated_field_obj.find( '[name^="custom_field_format"]' ).val();
-		field_value_formula = duplicated_field_obj.find( 'input[name^="custom_field_formula"]' ).val();
-		field_value_header_class = duplicated_field_obj.find( 'input[name^="custom_field_header_class"]' ).val();
-		field_value_cell_class = duplicated_field_obj.find( 'input[name^="custom_field_cell_class"]' ).val();
-		field_value_link = duplicated_field_obj.find( 'input[name^="custom_field_link"]' ).val();
-		field_value_link_nofollow = duplicated_field_obj.find( 'input[name^="custom_field_link_nofollow"]' ).is( ':checked' );
-		field_value_link_class = duplicated_field_obj.find( 'input[name^="custom_field_link_class"]' ).val();
-		field_value_line_highlight = duplicated_field_obj.find( 'select[name^="custom_field_line_highlight"]' ).val();
-		field_value_green_highlight = duplicated_field_obj.find( 'select[name^="custom_field_green_highlight"]' ).val();
-		field_value_red_highlight = duplicated_field_obj.find( 'select[name^="custom_field_red_highlight"]' ).val();
-		field_value_public = duplicated_field_obj.find( 'input[name^="custom_field_public"]' ).is( ':checked' );
-		field_value_description = duplicated_field_obj.find( 'input[name^="custom_field_description"]' ).val();
+		field_value_label = duplicated_field_obj.find( 'input[name^="cf_label"]' ).val();
+		field_value_name = duplicated_field_obj.find( 'input[name^="cf_name"]' ).val() + '_' + duplicated_count_custom_field;
+		field_value_order = duplicated_field_obj.find( 'input[name^="cf_order"]' ).val();
+		field_value_note = duplicated_field_obj.find( 'input[name^="cf_note"]' ).val();
+		field_value_format = duplicated_field_obj.find( '[name^="cf_format"]' ).val();
+		field_value_formula = duplicated_field_obj.find( 'input[name^="cf_formula"]' ).val();
+		field_value_header_class = duplicated_field_obj.find( 'input[name^="cf_header_class"]' ).val();
+		field_value_cell_class = duplicated_field_obj.find( 'input[name^="cf_cell_class"]' ).val();
+		field_value_link = duplicated_field_obj.find( 'input[name^="cf_link"]' ).val();
+		field_value_link_nofollow = duplicated_field_obj.find( 'input[name^="cf_link_nofollow"]' ).is( ':checked' );
+		field_value_link_class = duplicated_field_obj.find( 'input[name^="cf_link_class"]' ).val();
+		field_value_line_highlight = duplicated_field_obj.find( 'select[name^="cf_line_highlight"]' ).val();
+		field_value_green_highlight = duplicated_field_obj.find( 'select[name^="cf_green_highlight"]' ).val();
+		field_value_red_highlight = duplicated_field_obj.find( 'select[name^="cf_red_highlight"]' ).val();
+		field_value_public = duplicated_field_obj.find( 'input[name^="cf_public"]' ).is( ':checked' );
+		field_value_description = duplicated_field_obj.find( 'input[name^="cf_description"]' ).val();
+		field_value_merge = duplicated_field_obj.find( 'input[name^="cf_merge"]' ).val();
 	}
 	else if( typeof( duplicated_field_data ) != 'undefined' && duplicated_field_data.length > 0 )
 	{	// Get data from duplicated field from another selected Item Type:
@@ -605,12 +612,13 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		field_value_red_highlight = duplicated_field_data.data( 'red_highlight' );
 		field_value_public = duplicated_field_data.data( 'public' );
 		field_value_description = duplicated_field_data.data( 'description' );
+		field_value_merge = duplicated_field_data.data( 'merge' );
 	}
 
 	var count_custom = jQuery( 'input[name=count_custom_fields]' ).val();
 	count_custom++;
 
-	var custom_field_inputs = {};
+	var cf_inputs = {};
 	<?php
 	// Initialize JS var for each custom field type:
 	foreach( $custom_field_types as $custom_field_type => $custom_field_type_title )
@@ -630,11 +638,11 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 				$custom_field_type_template .= $custom_field_template;
 			}
 		}
-		echo 'custom_field_inputs["'.$custom_field_type.'"] = \''.format_to_js( $custom_field_type_template )."';\r\n";
+		echo 'cf_inputs["'.$custom_field_type.'"] = \''.format_to_js( $custom_field_type_template )."';\r\n";
 	}
 	?>
 	// Replace masks with values:
-	var custom_field_type_inputs = custom_field_inputs[ type ]
+	var custom_field_type_inputs = cf_inputs[ type ]
 		.replace( '$cf_ID$', guidGenerator() )
 		.replace( '$cf_new$', 1 )
 		.replace( /\$cf_num\$/g, count_custom )
@@ -652,7 +660,8 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		.replace( '$cf_link_nofollow$', field_value_link_nofollow ? 1 : 0 )
 		.replace( '$cf_link_class$', field_value_link_class )
 		.replace( '$cf_note$', field_value_note )
-		.replace( '$cf_description$', field_value_description );
+		.replace( '$cf_description$', field_value_description )
+		.replace( '$cf_merge$', field_value_merge );
 
 	if( new_field_mode == 'new' )
 	{	// Set values of the select and hidden inputs for new creating field:
@@ -670,11 +679,11 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		{
 			for( var cf_select_field in cf_select_defaults[ type ] )
 			{	// Set default value for select options:
-				var cf_field_regexp = new RegExp( '(<select[^>]+name="custom_field_' + cf_select_field + '.+<option value="' + cf_select_defaults[ type ][ cf_select_field ] + '")' );
+				var cf_field_regexp = new RegExp( '(<select[^>]+name="cf_' + cf_select_field + '.+<option value="' + cf_select_defaults[ type ][ cf_select_field ] + '")' );
 				custom_field_type_inputs = custom_field_type_inputs.replace( cf_field_regexp, '$1 selected="selected"' );
 			}
 		}
-		custom_field_type_inputs = custom_field_type_inputs.replace( /(<input type="checkbox"[^>]+name="custom_field_public[^"]+")/, '$1 checked="checked"' );
+		custom_field_type_inputs = custom_field_type_inputs.replace( /(<input type="checkbox"[^>]+name="cf_public[^"]+")/, '$1 checked="checked"' );
 	}
 
 	// Insert a row of new adding field:
@@ -692,11 +701,11 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		var new_field_obj = ( new_field_mode == 'duplicate_empty' ?
 			duplicated_field_obj.next() :
 			jQuery( '.custom_fields_edit_table table tbody tr:last' ) );
-		new_field_obj.find( 'select[name^="custom_field_format"]' ).val( field_value_format );
-		new_field_obj.find( 'select[name^="custom_field_line_highlight"]' ).val( field_value_line_highlight );
-		new_field_obj.find( 'select[name^="custom_field_green_highlight"]' ).val( field_value_green_highlight );
-		new_field_obj.find( 'select[name^="custom_field_red_highlight"]' ).val( field_value_red_highlight );
-		new_field_obj.find( 'input[name^="custom_field_public"]' ).prop( 'checked', field_value_public );
+		new_field_obj.find( 'select[name^="cf_format"]' ).val( field_value_format );
+		new_field_obj.find( 'select[name^="cf_line_highlight"]' ).val( field_value_line_highlight );
+		new_field_obj.find( 'select[name^="cf_green_highlight"]' ).val( field_value_green_highlight );
+		new_field_obj.find( 'select[name^="cf_red_highlight"]' ).val( field_value_red_highlight );
+		new_field_obj.find( 'input[name^="cf_public"]' ).prop( 'checked', field_value_public );
 	}
 
 	// Update a count of custom fields:
@@ -718,7 +727,7 @@ jQuery( '#add_custom_field [data-type]' ).click( function()
 jQuery( document ).on( 'click', '.duplicate_custom_field', function()
 {
 	var field_row_obj = jQuery( this ).closest( 'tr' );
-	var field_type = field_row_obj.find( '[name^=custom_field_type]' ).val();
+	var field_type = field_row_obj.find( '[name^=cf_type]' ).val();
 	add_new_custom_field( field_type, field_row_obj );
 } );
 
@@ -728,14 +737,14 @@ jQuery( document ).on( 'click', '.delete_custom_field', function()
 	if( confirm( '<?php echo TS_('Are you sure want to delete this custom field?\nThe update will be performed when you will click on the \'Save Changes!\' button.'); ?>' ) )
 	{ // Delete custom field only from html form, This field will be removed after saving of changes
 		var field_row_obj = jQuery( this ).closest( 'tr' );
-		if( field_row_obj.find( 'input[name^=custom_field_new][value=0]' ).length )
+		if( field_row_obj.find( 'input[name^=cf_new][value=0]' ).length )
 		{
 			var deleted_fields_value = jQuery( '[name=deleted_custom_fields]' ).val();
 			if( deleted_fields_value )
 			{
 				deleted_fields_value = deleted_fields_value + ',';
 			}
-			jQuery( '[name=deleted_custom_fields]' ).val( deleted_fields_value + field_row_obj.find( '[name^=custom_field_ID]' ).val() );
+			jQuery( '[name=deleted_custom_fields]' ).val( deleted_fields_value + field_row_obj.find( '[name^=cf_ID]' ).val() );
 		}
 		field_row_obj.remove();
 		if( jQuery( '.custom_fields_edit_table table tbody tr' ).length == 0 )
@@ -751,13 +760,13 @@ jQuery( document ).on( 'click', '.edit_custom_field', function()
 	var field_row_obj = jQuery( this ).closest( 'tr' );
 	openModalWindow( '<span class="loader_img absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
 		'80%', '', true,
-		'<?php echo TS_('Edit custom field'); ?>: ' + field_row_obj.find( '[name^=custom_field_label]' ).val(),
+		'<?php echo TS_('Edit custom field'); ?>: ' + field_row_obj.find( '[name^=cf_label]' ).val(),
 		'<?php echo TS_('Update'); ?>', true, true );
 	var field_options = {};
-	field_row_obj.find( '[name^=custom_field_]' ).each( function()
+	field_row_obj.find( '[name^=cf_]' ).each( function()
 	{
 		var option_val = jQuery( this ).attr( 'type' ) == 'checkbox' ? ( jQuery( this ).prop( 'checked' ) ? 1 : 0 ) : jQuery( this ).val();
-		field_options[ 'itcf_' + jQuery( this ).attr( 'name' ).replace( /^custom_field_([^\d]+)\d+$/, '$1' ) ] = option_val;
+		field_options[ 'itcf_' + jQuery( this ).attr( 'name' ).replace( /^cf_([^\d]+)\d+$/, '$1' ) ] = option_val;
 	} );
 	jQuery.ajax(
 	{
@@ -772,7 +781,7 @@ jQuery( document ).on( 'click', '.edit_custom_field', function()
 		success: function( result )
 		{
 			openModalWindow( result, '80%', '', true,
-				'<?php echo TS_('Edit custom field'); ?>: ' + field_row_obj.find( '[name^=custom_field_label]' ).val(),
+				'<?php echo TS_('Edit custom field'); ?>: ' + field_row_obj.find( '[name^=cf_label]' ).val(),
 				'<?php echo TS_('Update'); ?>', false, true );
 		}
 	} );
@@ -782,7 +791,7 @@ jQuery( document ).on( 'click', '.edit_custom_field', function()
 jQuery( document ).on( 'submit', 'form#itemtype_edit_field', function()
 {
 	var field_ID = jQuery( '[name=itcf_ID]', this ).val();
-	var field_row_obj = jQuery( '[name^=custom_field_ID][value=' + field_ID + ']' ).closest( 'tr' );
+	var field_row_obj = jQuery( '[name^=cf_ID][value=' + field_ID + ']' ).closest( 'tr' );
 	if( field_row_obj.length > 0 )
 	{	// Update field options:
 		jQuery( '[name^=itcf_]', this ).each( function()
@@ -790,18 +799,18 @@ jQuery( document ).on( 'submit', 'form#itemtype_edit_field', function()
 			var option_name = jQuery( this ).attr( 'name' ).replace( 'itcf_', '' );
 			if( jQuery( this ).attr( 'type' ) == 'checkbox' )
 			{	// Checkbox:
-				if( field_row_obj.find( '[name^=custom_field_' + option_name + ']' ).attr( 'type' ) == 'checkbox' )
+				if( field_row_obj.find( '[name^=cf_' + option_name + ']' ).attr( 'type' ) == 'checkbox' )
 				{
-					field_row_obj.find( '[name^=custom_field_' + option_name + ']' ).prop( 'checked', jQuery( this ).prop( 'checked' ) );
+					field_row_obj.find( '[name^=cf_' + option_name + ']' ).prop( 'checked', jQuery( this ).prop( 'checked' ) );
 				}
 				else
 				{
-					field_row_obj.find( '[name^=custom_field_' + option_name + ']' ).val( jQuery( this ).prop( 'checked' ) ? 1 : 0 );
+					field_row_obj.find( '[name^=cf_' + option_name + ']' ).val( jQuery( this ).prop( 'checked' ) ? 1 : 0 );
 				}
 			}
 			else
 			{	// Input, select, textarea:
-				field_row_obj.find( '[name^=custom_field_' + option_name + ']' ).val( jQuery( this ).val() );
+				field_row_obj.find( '[name^=cf_' + option_name + ']' ).val( jQuery( this ).val() );
 			}
 		} );
 		field_row_obj.addClass( 'evo_highlight' );
@@ -862,13 +871,13 @@ jQuery( document ).on( 'submit', 'form#itemtype_select_fields', function()
 {
 	jQuery( 'input[type=checkbox]:checked', this ).each( function()
 	{
-		var field_data_obj = jQuery( 'input[name=custom_field_data][data-name=' + jQuery( this ).val() + ']' );
+		var field_data_obj = jQuery( 'input[name=cf_data][data-name=' + jQuery( this ).val() + ']' );
 		if( ! field_data_obj.length )
 		{
 			return;
 		}
 		var existing_field = null;
-		jQuery( 'input.custom_field_name[name^="custom_field_name"]' ).each( function()
+		jQuery( 'input.custom_field_name[name^="cf_name"]' ).each( function()
 		{
 			if( jQuery( this ).val() == field_data_obj.data( 'name' ) )
 			{
@@ -878,21 +887,22 @@ jQuery( document ).on( 'submit', 'form#itemtype_select_fields', function()
 		if( existing_field !== null )
 		{	// If the selected custom field already exists then update it:
 			var field_row = existing_field.closest( 'tr' );
-			field_row.find( 'input[name^="custom_field_label"]' ).val( field_data_obj.data( 'label' ) );
-			field_row.find( 'input[name^="custom_field_order"]' ).val( field_data_obj.data( 'order' ) );
-			field_row.find( 'input[name^="custom_field_note"]' ).val( field_data_obj.data( 'note' ) );
-			field_row.find( '[name^="custom_field_format"]' ).val( field_data_obj.data( 'format' ) );
-			field_row.find( 'input[name^="custom_field_formula"]' ).val( field_data_obj.data( 'formula' ) );
-			field_row.find( 'input[name^="custom_field_header_class"]' ).val( field_data_obj.data( 'header_class' ) );
-			field_row.find( 'input[name^="custom_field_cell_class"]' ).val( field_data_obj.data( 'cell_class' ) );
-			field_row.find( 'input[name^="custom_field_link"]' ).val( field_data_obj.data( 'link' ) );
-			field_row.find( 'input[name^="custom_field_link_nofollow"]' ).val( field_data_obj.data( 'link_nofollow' ) );
-			field_row.find( 'input[name^="custom_field_link_class"]' ).val( field_data_obj.data( 'link_class' ) );
-			field_row.find( 'select[name^="custom_field_line_highlight"]' ).val( field_data_obj.data( 'line_highlight' ) );
-			field_row.find( 'select[name^="custom_field_green_highlight"]' ).val( field_data_obj.data( 'green_highlight' ) );
-			field_row.find( 'select[name^="custom_field_red_highlight"]' ).val( field_data_obj.data( 'red_highlight' ) );
-			field_row.find( 'input[name^="custom_field_public"]' ).prop( 'checked', field_data_obj.data( 'public' ) );
-			field_row.find( 'input[name^="custom_field_description"]' ).val( field_data_obj.data( 'description' ) );
+			field_row.find( 'input[name^="cf_label"]' ).val( field_data_obj.data( 'label' ) );
+			field_row.find( 'input[name^="cf_order"]' ).val( field_data_obj.data( 'order' ) );
+			field_row.find( 'input[name^="cf_note"]' ).val( field_data_obj.data( 'note' ) );
+			field_row.find( '[name^="cf_format"]' ).val( field_data_obj.data( 'format' ) );
+			field_row.find( 'input[name^="cf_formula"]' ).val( field_data_obj.data( 'formula' ) );
+			field_row.find( 'input[name^="cf_header_class"]' ).val( field_data_obj.data( 'header_class' ) );
+			field_row.find( 'input[name^="cf_cell_class"]' ).val( field_data_obj.data( 'cell_class' ) );
+			field_row.find( 'input[name^="cf_link"]' ).val( field_data_obj.data( 'link' ) );
+			field_row.find( 'input[name^="cf_link_nofollow"]' ).val( field_data_obj.data( 'link_nofollow' ) );
+			field_row.find( 'input[name^="cf_link_class"]' ).val( field_data_obj.data( 'link_class' ) );
+			field_row.find( 'select[name^="cf_line_highlight"]' ).val( field_data_obj.data( 'line_highlight' ) );
+			field_row.find( 'select[name^="cf_green_highlight"]' ).val( field_data_obj.data( 'green_highlight' ) );
+			field_row.find( 'select[name^="cf_red_highlight"]' ).val( field_data_obj.data( 'red_highlight' ) );
+			field_row.find( 'input[name^="cf_public"]' ).prop( 'checked', field_data_obj.data( 'public' ) );
+			field_row.find( 'input[name^="cf_description"]' ).val( field_data_obj.data( 'description' ) );
+			field_row.find( 'input[name^="cf_merge"]' ).val( field_data_obj.data( 'merge' ) );
 		}
 		else
 		{	// If the selected custom field doens't exist then duplicate it to current editing Item Type:
@@ -901,5 +911,35 @@ jQuery( document ).on( 'submit', 'form#itemtype_select_fields', function()
 	} );
 	closeModalWindow();
 	return false;
+} );
+
+// Serialize all custom fields in single input before submit to avoid php error of max_input_vars:
+jQuery( '#itemtype_checkchanges' ).submit( function()
+{
+	//console.time( 'Timer TOTAL' );
+
+	//console.time( 'Timer 1' );
+	var custom_fields = {};
+	jQuery( '[name^=cf_]' ).each( function()
+	{
+		custom_fields[ jQuery( this ).attr( 'name' ).substr( 3 ) ] =
+			jQuery( this ).attr( 'type' ) == 'checkbox'
+				? ( jQuery( this ).prop( 'checked' ) ? 1 : 0 )
+				: jQuery( this ).val();
+	} );
+	//console.timeEnd( 'Timer 1' );
+
+	//console.time( 'Timer 2' );
+	// Put all custom fields data in single input:
+	jQuery( this ).append( '<input type="hidden" name="custom_fields_data" />' );
+	jQuery( '[name=custom_fields_data]' ).val( JSON.stringify( custom_fields ) );
+	//console.timeEnd( 'Timer 2' );
+
+	//console.time( 'Timer 3' );
+	// Remove name attribute of all custom fields inputs in order to don't post them all:
+	jQuery( '[name^=cf_]' ).removeAttr( 'name' );
+	//console.timeEnd( 'Timer 3' );
+
+	//console.timeEnd( 'Timer TOTAL' );
 } );
 </script>

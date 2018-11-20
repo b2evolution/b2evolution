@@ -23,7 +23,7 @@ class star_plugin extends Plugin
 	var $code = 'b2evStar';
 	var $name = 'Star renderer';
 	var $priority = 55;
-	var $version = '6.10.3';
+	var $version = '6.10.4';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -38,6 +38,19 @@ class star_plugin extends Plugin
 	{
 		$this->short_desc = T_('Star formatting e-g [stars:2.3/5]');
 		$this->long_desc = T_('This plugin allows to render star ratings inside blog posts and comments by using the syntax [stars:2.3/5] for example');
+	}
+
+
+	/**
+	 * Define here default email settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_email_setting_definitions( & $params )
+	{
+		// Set empty array to disable this plugin for Email Campaign:
+		return array();
 	}
 
 
@@ -73,18 +86,6 @@ class star_plugin extends Plugin
 	 */
 	function DisplayItemAsXml( & $params )
 	{
-		return $this->DisplayItemAsHtml( $params );
-	}
-
-
-	/**
-	 * Perform rendering of email
-	 *
-	 * @see Plugin::RenderEmailAsHtml()
-	 */
-	function RenderEmailAsHtml( & $params )
-	{
-		$this->force_img_stars = true;
 		return $this->DisplayItemAsHtml( $params );
 	}
 

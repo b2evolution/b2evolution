@@ -324,8 +324,10 @@ div#skin_wrapper.skin_wrapper_loggedin .sitewide_header {
 			}
 		}
 	}
-	li > .btn-group {
-		margin: 0 0 6px 30px;
+	li {
+		> .btn-group, > .evo_status {
+			margin: 0 0 6px 30px;
+		}
 	}
 }
 
@@ -349,6 +351,19 @@ ol.breadcrumb {
 		white-space: nowrap;
 		.btn {
 			float: none;
+		}
+	}
+}
+@media (max-width: 767px) {
+	.evo_post_title, .cat_title {
+		display: block;
+		h1 {
+			display: block;
+		}
+		.btn-group {
+			display: block;
+			text-align: right;
+			padding: 0 0 10px 0;
 		}
 	}
 }

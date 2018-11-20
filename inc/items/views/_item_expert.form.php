@@ -60,7 +60,7 @@ $Form->labelend = "</strong>\n";
 
 
 // ================================ START OF EDIT FORM ================================
-
+echo_image_insert_modal();
 $iframe_name = NULL;
 $params = array();
 if( !empty( $bozo_start_modified ) )
@@ -193,15 +193,29 @@ $Form->begin_form( '', '', $params );
 	$Form->end_fieldset();
 	$Form->switch_layout( NULL );
 
+	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
+	    $current_User->check_perm( 'files', 'view', false ) )
+	{	// If current user has a permission to view the files AND attachments are allowed for the item type:
+		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+		// Initialize this object as global because this is used in many link functions:
+		global $LinkOwner;
+		$LinkOwner = new LinkItem( $edited_Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
+	}
+
 	if( $edited_Item->get_type_setting( 'use_text' ) != 'never' )
 	{ // Display text
 		// --------------------------- TOOLBARS ------------------------------------
 		echo '<div class="edit_toolbars">';
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'AdminDisplayToolbar', array(
+		$admin_toolbar_params = array(
 				'edit_layout' => 'expert',
 				'Item' => $edited_Item,
-			) );
+			);
+		if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+		{
+			$admin_editor_params['temp_ID'] = $LinkOwner->get_ID();
+		}
+		$Plugins->trigger_event( 'AdminDisplayToolbar', $admin_toolbar_params );
 		echo '</div>';
 
 		// ---------------------------- TEXTAREA -------------------------------------
@@ -231,12 +245,17 @@ $Form->begin_form( '', '', $params );
 	echo '<div class="pull-left">';
 	// CALL PLUGINS NOW:
 	ob_start();
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+	$admin_editor_params = array(
 			'target_type'   => 'Item',
 			'target_object' => $edited_Item,
 			'content_id'    => 'itemform_post_content',
 			'edit_layout'   => 'expert',
-		) );
+		);
+	if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+	{
+		$admin_editor_params['temp_ID'] = $LinkOwner->get_ID();
+	}
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', $admin_editor_params );
 	$plugin_button = ob_get_flush();
 	if( empty( $plugin_button ) )
 	{	// If button is not displayed by any plugin
@@ -270,12 +289,7 @@ $Form->begin_form( '', '', $params );
 	// ####################### ATTACHMENTS/LINKS #########################
 	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
 	    $current_User->check_perm( 'files', 'view', false ) )
-	{	// If current user has a permission to view the files AND attachments are allowed for the item type:
-		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
-		// Initialize this object as global because this is used in many link functions:
-		global $LinkOwner;
-		$LinkOwner = new LinkItem( $edited_Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
-		// Display attachments fieldset:
+	{	// Display attachments fieldset:
 		$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
 		display_attachments_fieldset( $Form, $LinkOwner, false, $fold_images_attachments_block );
 	}
@@ -921,14 +935,19 @@ $Form->begin_form( '', '', $params );
 
 		// CALL PLUGINS NOW:
 		ob_start();
-		$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
-				'target_type'   => 'Item',
-				'target_object' => $edited_Item,
-				'content_id'    => 'itemform_post_content',
-				'edit_layout'   => 'expert_quicksettings',
+		$admin_editor_params = array(
+				'target_type'             => 'Item',
+				'target_object'           => $edited_Item,
+				'content_id'              => 'itemform_post_content',
+				'edit_layout'             => 'expert_quicksettings',
 				'quicksetting_item_start' => '<p id="quicksetting_wysiwyg_switch">',
-				'quicksetting_item_end' => '</p>'
-			) );
+				'quicksetting_item_end'   => '</p>'
+			);
+		if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+		{
+			$admin_editor_params['temp_ID'] = $LinkOwner->get_ID();
+		}
+		$Plugins->trigger_event( 'AdminDisplayEditorButton', $admin_editor_params );
 		$quick_setting_switch = ob_get_flush();
 	}
 
@@ -1018,6 +1037,8 @@ echo_onchange_goal_cat();
 echo_fieldset_folding_js();
 // Save and restore item content field height and scroll position:
 echo_item_content_position_js( get_param( 'content_height' ), get_param( 'content_scroll' ) );
+// JS code for merge button:
+echo_item_merge_js();
 
 // JS to post excerpt mode switching:
 ?>

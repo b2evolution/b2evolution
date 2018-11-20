@@ -92,4 +92,6 @@ else
 
 $Form->end_form();
 
+// JS code for merge button:
+echo_item_merge_js();
 ?>

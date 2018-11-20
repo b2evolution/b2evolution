@@ -82,8 +82,6 @@ class item_fields_compare_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $Blog;
-
 		$ItemTypeCache = & get_ItemTypeCache();
 		$item_type_options = array(
 				'default' => T_('Default types shown for this collection')
@@ -110,7 +108,7 @@ class item_fields_compare_Widget extends ComponentWidget
 					'label' => T_('Specific Item IDs'),
 					'note' => sprintf( T_('Separate Item IDs or slugs or %s or %s with %s.'), '<code>$this$</code>', '<code>$parent$</code>', '<code>,</code>' ),
 					'valid_pattern' => array(
-						'pattern' => '/^(([\da-z\-_]+|\$this\$|\$parent\$)+(,([\da-z\-_]+|\$this\$|\$parent\$))*)?$/',
+						'pattern' => '/^(([\da-zA-Z\-_]+|\$this\$|\$parent\$)+(,([\da-zA-Z\-_]+|\$this\$|\$parent\$))*)?$/',
 						'error'   => sprintf( T_('Items to compare must be specified by ID, by slug or as %s or %s.'), '<code>$this$</code>', '<code>$parent$</code>' ),
 					),
 					'size' => 80,
@@ -161,7 +159,7 @@ class item_fields_compare_Widget extends ComponentWidget
 		for( $order_index = 0; $order_index <= 2; $order_index++ )
 		{	// Default order settings:
 			$field_suffix = ( $order_index == 0 ? '' : '_'.$order_index );
-			$coll_item_sort_options = get_available_sort_options( $Blog->ID, $order_index > 0, true );
+			$coll_item_sort_options = get_available_sort_options( $this->get( 'coll_ID' ), $order_index > 0, true );
 			$r = array_merge( $r, array(
 				'order_begin_line'.$field_suffix => array(
 					'type' => 'begin_line',
@@ -199,6 +197,12 @@ class item_fields_compare_Widget extends ComponentWidget
 						'label' => T_('Show column headers'),
 						'defaultvalue' => 1,
 					),
+					'merge_headers' => array(
+						'type' => 'checkbox',
+						'label' => T_('Auto merge'),
+						'note' => T_('Merge the column headers when they are identical.'),
+						'defaultvalue' => 0,
+					),
 					'show_status' => array(
 						'type' => 'radio',
 						'label' => T_('Show item visibility status'),
@@ -225,6 +229,20 @@ class item_fields_compare_Widget extends ComponentWidget
 						'label' => '',
 						'note' => T_('Enter one field name per line.'),
 						'rows' => 10,
+					),
+					'cell_colors' => array(
+						'type' => 'checklist',
+						'label' => T_('Automatic cell colors'),
+						'options' => array(
+							array( 'diff',  T_('Yellow highlights'), 1 ),
+							array( 'green', T_('Green highlights'), 1 ),
+							array( 'red',   T_('Red highlights'), 1 ),
+						),
+					),
+					'hide_empty_lines' => array(
+						'type' => 'checkbox',
+						'label' => T_('Hide empty lines'),
+						'defaultvalue' => 1,
 					),
 					'edit_links' => array(
 						'type' => 'checkbox',
@@ -254,14 +272,14 @@ class item_fields_compare_Widget extends ComponentWidget
 				'custom_fields_table_start'                => '<div class="evo_content_block"><table class="item_custom_fields">',
 				'custom_fields_row_start'                  => '<tr>',
 				'custom_fields_topleft_cell'               => '<td style="border:none"></td>',
-				'custom_fields_col_header_item'            => '<th class="center">$item_link$$item_status$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
+				'custom_fields_col_header_item'            => '<th class="center" width="$col_width$"$col_attrs$>$item_link$$item_status$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
 				'custom_fields_row_header_field'           => '<th class="$header_cell_class$">$field_title$$field_description_icon$:</th>',
 				'custom_fields_item_status_template'       => '<div><div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div></div>',
 				'custom_fields_description_icon_class'     => 'grey',
-				'custom_fields_value_default'              => '<td class="$data_cell_class$">$field_value$</td>',
-				'custom_fields_value_difference_highlight' => '<td class="$data_cell_class$ bg-warning">$field_value$</td>',
-				'custom_fields_value_green'                => '<td class="$data_cell_class$ bg-success">$field_value$</td>',
-				'custom_fields_value_red'                  => '<td class="$data_cell_class$ bg-danger">$field_value$</td>',
+				'custom_fields_value_default'              => '<td class="$data_cell_class$"$data_cell_attrs$>$field_value$</td>',
+				'custom_fields_value_difference_highlight' => '<td class="$data_cell_class$ bg-warning"$data_cell_attrs$>$field_value$</td>',
+				'custom_fields_value_green'                => '<td class="$data_cell_class$ bg-success"$data_cell_attrs$>$field_value$</td>',
+				'custom_fields_value_red'                  => '<td class="$data_cell_class$ bg-danger"$data_cell_attrs$>$field_value$</td>',
 				'custom_fields_edit_link_cell'             => '<td class="center">$edit_link$</td>',
 				'custom_fields_edit_link_class'            => 'btn btn-xs btn-default',
 				'custom_fields_row_end'                    => '</tr>',
@@ -300,32 +318,82 @@ class item_fields_compare_Widget extends ComponentWidget
 		{	// Display item column headers row if it is enabled by widget settings:
 			echo $this->get_field_template( 'row_start' );
 			echo $this->get_field_template( 'topleft_cell' );
-			foreach( $items as $item_ID )
+			$col_width = number_format( 100 / ( count( $items ) + 1 ), 2, '.', '' );
+			$table_header_cells = array();
+			foreach( $items as $i => $item_ID )
 			{
 				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 
 				if( $this->disp_params['show_headers'] )
 				{	// Get permanent item link:
-					$item_title = $widget_Item->get_title( array( 'title_field' => 'short_title,title' ) );
+					$item_title_link = $widget_Item->get_title( array( 'title_field' => 'short_title,title' ) );
+					if( $this->disp_params['merge_headers'] )
+					{	// Get title text in order to compare on merging:
+						$item_title_text = $widget_Item->get_title( array( 'title_field' => 'short_title,title', 'link_type' => 'none' ) );
+					}
 				}
 				else
 				{	// Item title should not be displayed:
-					$item_title = '';
+					$item_title_link = '';
+					$item_title_text = '';
 				}
 
 				if( $show_status == 'always' ||
 				    $show_status == 'differences' ||
 				    ( $show_status == 'not_public' && $widget_Item->get( 'status' ) != 'published' ) )
 				{	// Get item status:
-					$item_status = $widget_Item->get_format_status( array( 'template' => $this->disp_params['custom_fields_item_status_template'] ) );
+					$item_status_badge = $widget_Item->get_format_status( array( 'template' => $this->disp_params['custom_fields_item_status_template'] ) );
+					if( $this->disp_params['merge_headers'] )
+					{	// Get status text in order to compare on merging:
+						$item_status_text = $widget_Item->get( 'status' );
+					}
 				}
 				else
 				{	// Don't display item status:
-					$item_status = '';
+					$item_status_badge = '';
+					$item_status_text = '';
 				}
 
-				echo str_replace( array( '$item_link$', '$item_status$' ), array( $item_title, $item_status ), $this->get_field_template( 'col_header_item' ) );
+				if( $this->disp_params['merge_headers'] )
+				{	// Check if previous header same as currect:
+					if( isset( $prev_item_title_text, $prev_item_status_text ) &&
+					    $prev_item_title_text == $item_title_text &&
+					    $prev_item_status_text == $item_status_text )
+					{	// This is a duplicated header cell as before:
+						$skip_duplicate_header_cell = true;
+						// Increase a count of duplicated hedaer cell:
+						$table_header_cells[ count( $table_header_cells ) - 1 ]['cols']++;
+					}
+					else
+					{	// Don't skip different column header cell:
+						$skip_duplicate_header_cell = false;
+					}
+					// Store current title values in order to comapre then next time:
+					$prev_item_title_text = $item_title_text;
+					$prev_item_status_text = $item_status_text;
+				}
+
+				if( empty( $skip_duplicate_header_cell ) )
+				{	// Display header cell only if it not hidden on merging same headers:
+					$table_header_cells[] = array(
+						'title'  => $item_title_link,
+						'status' => $item_status_badge,
+						'cols'   => 1,
+					);
+				}
 			}
+
+			foreach( $table_header_cells as $table_header_cell )
+			{	// Print out table header cells:
+				$cell_params = array(
+					'$item_link$'   => $table_header_cell['title'],
+					'$item_status$' => $table_header_cell['status'],
+					'$col_width$'   => ( $col_width * $table_header_cell['cols'] ).'%',
+					'$col_attrs$'   => ( $table_header_cell['cols'] > 1 ? ' colspan="'.$table_header_cell['cols'].'"' : '' ),
+				);
+				echo str_replace( array_keys( $cell_params ), $cell_params, $this->get_field_template( 'col_header_item' ) );
+			}
+
 			echo $this->get_field_template( 'row_end' );
 		}
 
@@ -608,28 +676,33 @@ class item_fields_compare_Widget extends ComponentWidget
 				$all_custom_fields[ $c ]['highest_value'] = NULL;
 				$all_custom_fields[ $c ]['lowest_value'] = NULL;
 			}
-			if( $items_count != count( $custom_field['items'] ) )
+			if( isset( $this->disp_params['cell_colors']['diff'] ) &&
+			    $items_count != count( $custom_field['items'] ) )
 			{	// If some post has no field then it is a different:
 				$all_custom_fields[ $c ]['is_different'] = true;
 			}
 
+			// Check for empty all values from this line only it is required by widget setting:
+			$this_line_values_are_empty = $this->disp_params['hide_empty_lines'];
+
 			// Compare values:
 			$prev_custom_field_value = NULL;
 			$i = 0;
-			$all_string_values_are_empty = ( $fields_source == 'all' || $fields_source == 'exclude' );
 			foreach( $custom_field['items'] as $item_ID )
 			{
 				$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 				$custom_field_value = $widget_Item->get_custom_field_value( $custom_field['name'] );
 
-				if( $all_string_values_are_empty &&
+				if( $this_line_values_are_empty &&
 				    ( ! empty( $custom_field_value ) || $custom_field['type'] == 'separator' ) )
 				{	// At least one field is not empty:
-					$all_string_values_are_empty = false;
+					$this_line_values_are_empty = false;
 				}
 
 				// Check if the values are different from given line:
-				if( ! $all_custom_fields[ $c ]['is_different'] && $i > 0 )
+				if( isset( $this->disp_params['cell_colors']['diff'] ) &&
+				    ! $all_custom_fields[ $c ]['is_different'] &&
+				    $i > 0 )
 				{	// Don't search differences in all fields if at least two fields are different:
 					switch( $custom_field['type'] )
 					{
@@ -679,9 +752,8 @@ class item_fields_compare_Widget extends ComponentWidget
 				$i++;
 			}
 
-			if( $all_string_values_are_empty && $items_count > 1 )
-			{	// Don't display row of custom field if values from all compared items are empty,
-				// But display all empty fields when only single items is displayed, e.g. in child item_custom_fields_Widget:
+			if( $this_line_values_are_empty )
+			{	// Don't display row/line of custom field if values from all compared items are empty and if it is required by widget setting to hide empty lines:
 				unset( $all_custom_fields[ $c ] );
 			}
 		}
@@ -726,6 +798,7 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		if( $custom_field['type'] != 'separator' )
 		{	// Separator fields have no values:
+			$table_row_cells = array();
 			foreach( $items as $item_ID )
 			{
 				// Custom field value per each post:
@@ -744,43 +817,75 @@ class item_fields_compare_Widget extends ComponentWidget
 				// Default template for field value:
 				$field_value_template = $this->get_field_template( 'value_default', $custom_field['type'] );
 
-				if( ( $custom_field['is_different'] && $custom_field['line_highlight'] == 'differences' ) ||
-				    ( $custom_field['line_highlight'] == 'always' && count( $items ) > 1 ) )
+				if( isset( $this->disp_params['cell_colors']['diff'] ) &&
+				    ( ( $custom_field['is_different'] && $custom_field['line_highlight'] == 'differences' ) ||
+				      ( $custom_field['line_highlight'] == 'always' && count( $items ) > 1 ) ) )
 				{	// Mark the field value as different only when it is defined in the settings of the custom field:
 					$field_value_template = $this->get_field_template( 'value_difference_highlight', $custom_field['type'] );
 				}
 
 				if( in_array( $custom_field['type'], array( 'double', 'computed' ) ) &&
-						is_numeric( $custom_field_orig_value ) )
+				    is_numeric( $custom_field_orig_value ) )
 				{	// Compare only numeric values:
 					if( $custom_field_orig_value === $custom_field['highest_value'] &&
-							$custom_field_orig_value !== $custom_field['lowest_value'] )
+					    $custom_field_orig_value !== $custom_field['lowest_value'] )
 					{	// Check if we should mark the highest field:
-						if( $custom_field['green_highlight'] == 'highest' )
+						if( isset( $this->disp_params['cell_colors']['green'] ) &&
+						    $custom_field['green_highlight'] == 'highest' )
 						{	// The highest value must be marked as green:
 							$field_value_template = $this->get_field_template( 'value_green', $custom_field['type'] );
 						}
-						elseif( $custom_field['red_highlight'] == 'highest' )
+						elseif( isset( $this->disp_params['cell_colors']['red'] ) &&
+						        $custom_field['red_highlight'] == 'highest' )
 						{	// The highest value must be marked as red:
 							$field_value_template = $this->get_field_template( 'value_red', $custom_field['type'] );
 						}
 					}
 
 					if( $custom_field_orig_value === $custom_field['lowest_value'] &&
-							$custom_field_orig_value !== $custom_field['highest_value'] )
+					    $custom_field_orig_value !== $custom_field['highest_value'] )
 					{	// Check if we should mark the lowest field:
-						if( $custom_field['green_highlight'] == 'lowest' )
+						if( isset( $this->disp_params['cell_colors']['green'] ) &&
+						    $custom_field['green_highlight'] == 'lowest' )
 						{	// The lowest value must be marked as green:
 							$field_value_template = $this->get_field_template( 'value_green', $custom_field['type'] );
 						}
-						elseif( $custom_field['red_highlight'] == 'lowest' )
+						elseif( isset( $this->disp_params['cell_colors']['red'] ) &&
+						        $custom_field['red_highlight'] == 'lowest' )
 						{	// The lowest value must be marked as red:
 							$field_value_template = $this->get_field_template( 'value_red', $custom_field['type'] );
 						}
 					}
 				}
 
-				echo str_replace( array( '$data_cell_class$', '$field_value$' ), array( $custom_field['cell_class'], $custom_field_value ), $field_value_template );
+				if( $custom_field['merge'] )
+				{	// Check if previous field value same as currect:
+					if( isset( $prev_field_value ) && $prev_field_value == $custom_field_value )
+					{	// This is a duplicated field value cell as before:
+						$skip_duplicate_field_value = true;
+						// Increase a count of duplicated field value cell:
+						$table_row_cells[ count( $table_row_cells ) - 1 ]['cols']++;
+					}
+					else
+					{	// Don't skip different field value cell:
+						$skip_duplicate_field_value = false;
+					}
+					// Store current field value in order to comapre then next time:
+					$prev_field_value = $custom_field_value;
+				}
+
+				if( empty( $skip_duplicate_field_value ) )
+				{	// Display field value cell only if it not hidden on merging same values:
+					$table_row_cells[] = array(
+						'template' => str_replace( array( '$data_cell_class$', '$field_value$' ), array( $custom_field['cell_class'], $custom_field_value ), $field_value_template ),
+						'cols'     => 1,
+					);
+				}
+			}
+
+			foreach( $table_row_cells as $table_row_cell )
+			{	// Print out table field value cells:
+				echo str_replace( '$data_cell_attrs$', ( $table_row_cell['cols'] > 1 ? ' colspan="'.$table_row_cell['cols'].'"' : '' ), $table_row_cell['template'] );
 			}
 		}
 
@@ -864,7 +969,14 @@ class item_fields_compare_Widget extends ComponentWidget
 						unset( $items[ $i ] );
 					}
 				}
-				elseif( ! is_number( $item_ID ) )
+			}
+
+			// Load all requested Items by single SQL query into cache:
+			$ItemCache->load_by_IDs_or_slugs( $items );
+
+			foreach( $items as $i => $item_ID )
+			{
+				if( ! is_number( $item_ID ) )
 				{	// Try to get a post ID by slug:
 					if( $widget_Item = & $ItemCache->get_by_urltitle( $item_ID, false, false ) )
 					{	// Use ID of post detected by slug:
@@ -877,79 +989,98 @@ class item_fields_compare_Widget extends ComponentWidget
 				}
 			}
 
-			if( $items_limit > 0 )
-			{	// Limit items by widget setting:
-				$items = array_slice( $items, 0, $items_limit );
+			// Remove duplicated items with same ID:
+			$items = array_unique( $items );
+
+			// Save original orders of the items when they are defined as specific list:
+			$orig_ordered_items = $items;
+		}
+
+		if( empty( $Blog ) )
+		{	// Cannot use filter by ItemList below because current collection is not defined:
+			return $items;
+		}
+
+		// Use ItemList in order to check what items can be displayed on front-office for current User
+		//           OR in order to filter items if it is required by widget setting:
+		$ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $items_limit );
+		// Set additional debug info prefix for SQL queries in order to know what code executes it:
+		$ItemList->query_title_prefix = get_class().' #'.$this->ID;
+
+		if( $this->disp_params['items_type'] == 'default' )
+		{	// Exclude items with types which are hidden by collection setting "Show post types":
+			$filter_item_type = $Blog->get_setting( 'show_post_types' ) != '' ? '-'.$Blog->get_setting( 'show_post_types' ) : NULL;
+		}
+		else
+		{	// Filter by selected Item Type:
+			$filter_item_type = intval( $this->disp_params['items_type'] );
+		}
+
+		// Set default orders:
+		$default_orders = array();
+		$default_dirs = array();
+		for( $order_index = 0; $order_index <= 2; $order_index++ )
+		{
+			$field_suffix = ( $order_index == 0 ? '' : '_'.$order_index );
+			$widget_orderby = $this->disp_params['orderby'.$field_suffix];
+			if( $widget_orderby == 'coll_default' )
+			{	// Use order from collection:
+				$coll_orderby = $Blog->get_setting( 'orderby'.$field_suffix );
+				if( ! empty( $coll_orderby ) )
+				{
+					$default_orders[] = $coll_orderby;
+					$default_dirs[] = $Blog->get_setting( 'orderdir'.$field_suffix );
+				}
+			}
+			elseif( ! empty( $widget_orderby ) )
+			{	// Use order from widget settings:
+				$default_orders[] = $widget_orderby;
+				$default_dirs[] = $this->disp_params['orderdir'.$field_suffix];
 			}
 		}
 
-		if( $this->disp_params['allow_filter'] || $items == 'all' )
-		{	// Use ItemList when we need a filter or when all items are requested from collection:
-			$ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $items_limit );
-			// Set additional debug info prefix for SQL queries in order to know what code executes it:
-			$ItemList->query_title_prefix = get_class().' #'.$this->ID;
+		// Set default filters:
+		$default_filters = array(
+			'types'        => $filter_item_type,
+			'post_ID_list' => is_array( $items ) ? implode( ',', $items ) : NULL,
+			'orderby'      => implode( ',', $default_orders ),
+			'order'        => implode( ',', $default_dirs ),
+			'featured'     => ( $this->disp_params['restrict_featured'] ? true : NULL ),
+		);
+		if( ! empty( $this->disp_params['restrict_cats'] ) )
+		{	// Restrict by categories:
+			$default_filters['cat_array'] = explode( ',', $this->disp_params['restrict_cats'] );
+		}
+		if( ! empty( $this->disp_params['restrict_tags'] ) )
+		{	// Restrict by tags:
+			$default_filters['tags'] = $this->disp_params['restrict_tags'];
+			$default_filters['tags_operator'] = 'AND';
+		}
+		$ItemList->set_default_filters( $default_filters );
 
-			if( $this->disp_params['items_type'] == 'default' )
-			{	// Exclude items with types which are hidden by collection setting "Show post types":
-				$filter_item_type = $Blog->get_setting( 'show_post_types' ) != '' ? '-'.$Blog->get_setting( 'show_post_types' ) : NULL;
-			}
-			else
-			{	// Filter by selected Item Type:
-				$filter_item_type = intval( $this->disp_params['items_type'] );
-			}
+		if( $this->disp_params['allow_filter'] )
+		{	// Filter items from request:
+			$ItemList->load_from_Request( false );
+		}
 
-			// Set default orders:
-			$default_orders = array();
-			$default_dirs = array();
-			for( $order_index = 0; $order_index <= 2; $order_index++ )
+		// Run query:
+		$ItemList->query();
+
+		// Get IDs of items filtered by $ItemList:
+		$items = $ItemList->get_page_ID_array();
+
+		if( isset( $orig_ordered_items ) && count( $items ) )
+		{	// Revert original orders of items:
+			$fix_ordered_items = array();
+			foreach( $orig_ordered_items as $orig_ordered_item_ID )
 			{
-				$field_suffix = ( $order_index == 0 ? '' : '_'.$order_index );
-				$widget_orderby = $this->disp_params['orderby'.$field_suffix];
-				if( $widget_orderby == 'coll_default' )
-				{	// Use order from collection:
-					$coll_orderby = $Blog->get_setting( 'orderby'.$field_suffix );
-					if( ! empty( $coll_orderby ) )
-					{
-						$default_orders[] = $coll_orderby;
-						$default_dirs[] = $Blog->get_setting( 'orderdir'.$field_suffix );
-					}
-				}
-				elseif( ! empty( $widget_orderby ) )
-				{	// Use order from widget settings:
-					$default_orders[] = $widget_orderby;
-					$default_dirs[] = $this->disp_params['orderdir'.$field_suffix];
+				if( ( $item_ID_index = array_search( $orig_ordered_item_ID, $items ) ) !== false )
+				{
+					$fix_ordered_items[] = $items[ $item_ID_index ];
 				}
 			}
-
-			// Set default filters:
-			$default_filters = array(
-				'types'        => $filter_item_type,
-				'post_ID_list' => is_array( $items ) ? implode( ',', $items ) : NULL,
-				'orderby'      => implode( ',', $default_orders ),
-				'order'        => implode( ',', $default_dirs ),
-				'featured'     => ( $this->disp_params['restrict_featured'] ? true : NULL ),
-			);
-			if( ! empty( $this->disp_params['restrict_cats'] ) )
-			{	// Restrict by categories:
-				$default_filters['cat_array'] = explode( ',', $this->disp_params['restrict_cats'] );
-			}
-			if( ! empty( $this->disp_params['restrict_tags'] ) )
-			{	// Restrict by tags:
-				$default_filters['tags'] = $this->disp_params['restrict_tags'];
-				$default_filters['tags_operator'] = 'AND';
-			}
-			$ItemList->set_default_filters( $default_filters );
-
-			if( $this->disp_params['allow_filter'] )
-			{	// Filter items from request:
-				$ItemList->load_from_Request( false );
-			}
-
-			// Run query:
-			$ItemList->query();
-
-			// Get IDs of items filtered by $ItemList:
-			$items = $ItemList->get_page_ID_array();
+			// Replace items ordered by $ItemList with original ordered array:
+			$items = $fix_ordered_items;
 		}
 
 		return $items;
@@ -1060,7 +1191,6 @@ class item_fields_compare_Widget extends ComponentWidget
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'item_ID'      => isset( $Item ) ? $Item->ID : NULL, // Has the Item page changed? (this is important for disp=single|page because $this$ and $parent$ resolve differently depending on item ID)
 				'items'        => implode( ',', $items ), // Have the compared items changed? (Check firstly widget setting and then param from request) (this is important in case the same items are compared in different order)
-				'meta_settings'=> 1, // Have meta settings(any item type) changed?
 			);
 
 		if( $this->disp_params['edit_links'] )
@@ -1070,11 +1200,18 @@ class item_fields_compare_Widget extends ComponentWidget
 			$cache_keys['user_ID'] = ( is_logged_in() ? $current_User->ID : 0 ); // Has the current User changed?
 		}
 
+		$ItemCache = & get_ItemCache();
+
 		// Add 1 cache key for each item that is being compared, in order to detect changes on each one:
+		// Also add 1 cache key for item type which is used for compared items, in order to detect changes on each one:
 		foreach( $items as $item_ID )
 		{
 			// 1 is a dummy value, only the key name is really important
 			$cache_keys['item_'.$item_ID] = 1;
+			if( $Item = & $ItemCache->get_by_ID( $item_ID, false, false ) )
+			{	// Add cache key for item type of the compared item:
+				$cache_keys['item_type_'.$Item->get( 'ityp_ID' )] = 1;
+			}
 		}
 
 		return $cache_keys;

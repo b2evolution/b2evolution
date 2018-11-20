@@ -1204,6 +1204,8 @@ class Skin extends DataObject
 				case 'disp_search':
 					// Used to suggest usernames for the field "Recipients":
 					init_tokeninput_js( 'blog' );
+					// Initialize JS to autcomplete user logins and date picker to edit workflow properties:
+					init_autocomplete_login_js( 'blog', $this->get_template( 'autocomplete_plugin' ) );
 					break;
 
 				case 'disp_login':
@@ -1301,12 +1303,11 @@ class Skin extends DataObject
 					}
 
 					// Require Fine Uploader js and css:
-					init_fineuploader_js_lang_strings();
 					require_js( 'multiupload/fine-uploader.js', 'blog' );
 					require_css( 'fine-uploader.css', 'blog' );
 					// Load JS files to make the links table sortable:
-					require_js( '#jquery#' );
-					require_js( 'jquery/jquery.sortable.min.js' );
+					require_js( '#jquery#', 'blog' );
+					require_js( 'jquery/jquery.sortable.min.js', 'blog' );
 					break;
 
 				case 'disp_edit_comment':
@@ -1329,6 +1330,9 @@ class Skin extends DataObject
 
 					// Used to autocomplete usernames in textarea:
 					init_autocomplete_usernames_js( 'blog' );
+
+					// Used to switch to advanced editing:
+					require_js( 'backoffice.js', 'blog' );
 					break;
 
 				case 'disp_useritems':

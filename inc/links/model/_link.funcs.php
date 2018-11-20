@@ -322,7 +322,7 @@ function display_attachments( & $LinkOwner, $params = array() )
 }
 
 
-/*
+/**
  * Get a link destination
  *
  * @return string
@@ -371,6 +371,50 @@ function link_destination()
 
 
 /**
+ * Get select button for link in link list view
+ *
+ * @param integer Link ID
+ * @return string
+ */
+function select_link_button( $link_ID, $file_type = 'image' )
+{
+	global $Blog, $LinkOwner, $current_File;
+
+	$LinkCache = & get_LinkCache();
+	$current_Link = & $LinkCache->get_by_ID( $link_ID );
+	$linked_File = & $current_Link->get_File();
+
+
+	if( empty( $Blog ) )
+	{
+		$Blog = & $LinkOwner->get_Blog();
+	}
+
+	$link_attribs = array();
+	$link_attribs['class'] = 'evo_select_file btn btn-primary btn-xs';
+
+	// Call evo_item_image_insert only after closing the current modal window to prevent
+	// modal overlay not getting removed after closing the second modal window
+	$link_attribs['onclick'] = 'closeModalWindow( window.document, function() {
+		evo_item_image_insert( '.( empty( $Blog ) ? 'undefined' : $Blog->ID ).', \'image\', '.$link_ID.' );
+	} );';
+
+	$link_attribs['type'] = 'button';
+	$link_attribs['title'] = T_('Select file');
+
+	$r = '';
+
+	if( $linked_File->get_file_type() == $file_type )
+	{
+		$r .= '<button'.get_field_attribs_as_string( $link_attribs, false ).'>'.T_('Select').'</button>';
+		$r .= ' ';
+	}
+
+	return $r;
+}
+
+
+/**
  * Display link actions
  *
  * @param integer Link ID
@@ -403,13 +447,15 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		$r .= action_icon( T_('Move upwards'), 'move_up',
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=link_move_up'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
 						array( 'class' => 'action_icon_link_move_up',
-									 'onclick' => 'return evo_link_change_order( this, '.$link_ID.', \'move_up\' )' ) );
+									 'onclick' => 'return evo_link_change_order( this, '.$link_ID.', \'move_up\' )',
+									 'data-link-id' => $link_ID ) );
 
 		// Allow to move down all rows except of last, This action icon is hidden by CSS for last row
 		$r .= ' '.action_icon( T_('Move down'), 'move_down',
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=link_move_down'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
 						array( 'class' => 'action_icon_link_move_down',
-									 'onclick' => 'return evo_link_change_order( this, '.$link_ID.', \'move_down\' )' ) );
+									 'onclick' => 'return evo_link_change_order( this, '.$link_ID.', \'move_down\' )',
+									 'data-link-id' => $link_ID ) );
 	}
 
 	if( $current_File && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
@@ -445,7 +491,8 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 						$admin_url.'?ctrl=links&amp;link_ID='.$link_ID.'&amp;action=delete'.$blog_param.'&amp;'.url_crumb( 'link' ), NULL, NULL, NULL,
 						array( 'onclick' => 'return confirm( \''
 								.sprintf( TS_('Are you sure want to DELETE the file &laquo;%s&raquo;?\nThis CANNOT be reversed!'), utf8_strip_tags( link_destination() ) )
-								.'\' ) && evo_link_delete( this, \''.$LinkOwner->type.'\', '.$link_ID.', \'delete\' )' ) );
+								.'\' ) && evo_link_delete( this, \''.$LinkOwner->type.'\', '.$link_ID.', \'delete\' )',
+								'data-link-id' => $link_ID ) );
 		}
 		else
 		{	// If current user can only unlink the attachment (probably it is linked to several objects)
@@ -461,13 +508,21 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
  * Display link position edit actions
  *
  * @param object Row of SQL query from T_links and T_files
+ * @param boolean Show additional link actions
  * @return string
  */
-function display_link_position( & $row )
+function display_link_position( & $row, $show_actions = true )
 {
-	global $LinkOwner, $current_File;
+	global $LinkOwner, $blog, $Blog;
+	global $current_File;
 
 	$r = '';
+
+	if( empty( $blog ) )
+	{
+		$Blog = $LinkOwner->get_Blog();
+		$blog = empty( $Blog ) ? NULL : $Blog->ID;
+	}
 
 	// Get available link position for current link owner and file:
 	$available_positions = $LinkOwner->get_positions( $row->file_ID );
@@ -480,51 +535,50 @@ function display_link_position( & $row )
 			.'</select>';
 	}
 
-	if( isset( $available_positions['inline'] ) )
-	{	// If link owner support inline position,
-		// Display icon to insert image, audio, video or file inline tag into content:
-		$type = isset( $row->file_type ) ? $row->file_type : 'file';
+	if( $show_actions && $current_File )
+	{
+		if( isset( $available_positions['inline'] ) )
+		{	// If link owner support inline position,
+			// Display icon to insert image, audio, video or file inline tag into content:
+			$type = $current_File->get_file_type();
+			// $type = isset( $row->file_type ) ? $row->file_type : 'file';
 
-		// valid file types: audio, video, image, other. See @link File::set_file_type()
-		switch( $type )
-		{
-			case 'audio':
-				break;
+			// valid file types: audio, video, image, other. See @link File::set_file_type()
+			switch( $type )
+			{
+				case 'audio':
+					break;
 
-			case 'video':
-				break;
+				case 'video':
+					break;
 
-			case 'image':
-				break;
+				case 'image':
+					break;
 
-			case 'other':
-				$type = 'file';
-				break;
-		}
+				case 'other':
+					$type = 'file';
+					break;
+			}
 
-		if( $type == 'image' )
-		{
-			$r .= ' '.get_icon( 'add', 'imgtag', array(
+			if( $type == 'image' )
+			{
+				$r .= ' '.get_icon( 'add', 'imgtag', array(
 						'title'   => sprintf( T_('Insert %s tag into the post'), '['.$type.':]' ),
-						'onclick' => 'evo_link_insert_inline( \'image\', '.$row->link_ID.', \'\' )',
-						'style'   => 'cursor:default;'
+						'onclick' => 'return evo_item_image_insert( '.( empty( $blog ) ? 'null' : $blog ).', \'image\', '.$row->link_ID.' );',
+						'style'   => 'cursor:pointer;'
 					) );
 
-			$r .= ' '.get_icon( 'add__yellow', 'imgtag', array(
-						'title'   => T_('Insert [thumbnail:] tag into the post'),
-						'onclick' => 'evo_link_insert_inline( \'thumbnail\', '.$row->link_ID.', \'medium:left\' )',
-						'style'   => 'cursor:default;'
-					) );
-		}
-		elseif( $type == 'audio' || $type == 'video' || $type == 'file' )
-		{
-			$r .= ' '.get_icon( 'add__blue', 'imgtag', array(
-						'title'   => sprintf( T_('Insert %s tag into the post'), '['.$type.':]' ),
-						'onclick' => 'evo_link_insert_inline( \''.$type.'\', '.$row->link_ID.', \'\' )',
-						'style'   => 'cursor:default;'
-					) );
+			}
+			elseif( $type == 'audio' || $type == 'video' || $type == 'file' )
+			{
+				$r .= ' '.get_icon( 'add__blue', 'imgtag', array(
+							'title'   => sprintf( T_('Insert %s tag into the post'), '['.$type.':]' ),
+							'onclick' => 'evo_link_insert_inline( \''.$type.'\', '.$row->link_ID.', \'\' )',
+							'style'   => 'cursor:pointer;'
+						) );
 
-			if( $current_File->is_dir() )
+			}
+			elseif( $current_File->is_dir() )
 			{
 				$r .= ' '.get_icon( 'add__cyan', 'imgtag', array(
 							'title'   => sprintf( T_('Insert %s tag into the post'), '[folder:]' ),

@@ -772,6 +772,11 @@ if( $tab3 == 'fullview' || $tab3 == 'meta' )
 	require_js( '#jqueryUI#' );
 }
 
+if( $tab3 == 'fullview' || $tab3 == 'listview' )
+{	// Init JS to autcomplete the user logins:
+	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+}
+
 if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit', 'elevate', 'switch_view' ) ) )
 { // Initialize date picker for _comment.form.php
 	init_datepicker_js();
@@ -780,7 +785,6 @@ if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit',
 	// Require colorbox js:
 	require_js_helper( 'colorbox' );
 	// Require Fine Uploader js and css:
-	init_fineuploader_js_lang_strings();
 	require_js( 'multiupload/fine-uploader.js' );
 	require_css( 'fine-uploader.css' );
 	// Load JS files to make the links table sortable:

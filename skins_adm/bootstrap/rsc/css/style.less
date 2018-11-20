@@ -797,7 +797,7 @@ fieldset ul {
 		}
 	}
 }
-#filelist_tbody {
+.filelist_tbody {
 	tr:first-child .action_icon_link_move_up,
 	tr:last-child .action_icon_link_move_down {
 		visibility: hidden;
@@ -1098,12 +1098,23 @@ div#upload_wrapper, div#import_wrapper {
 div.fieldset_wrapper {
 	margin-top: 0;
 }
+
+// Adjacent fieldsets
+div.fieldset_wrapper+div.fieldset_wrapper {
+	margin-top: 10px;
+}
+
 // Fieldset folding
 div.fieldset_wrapper.folded .panel-body {
 	display: none;
 }
 span[id^=title_folding_] {
 	cursor: default;
+}
+
+// Fieldset folding for Category selection
+tbody.fieldset_wrapper.folded+tbody[id^=cat_sel_] {
+	display: none;
 }
 
 // Dashboard
@@ -1323,6 +1334,16 @@ div.level3 nav .nav > li {
 
 div.level3 nav .nav > li + li {
 	margin-left: 0px;
+}
+
+ol.breadcrumb {
+	margin: 20px 0;
+}
+
+// Global icons container:
+.container-global-icons {
+	margin-top: 9px;
+	margin-bottom: -3px;
 }
 
 // Footer

@@ -120,6 +120,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			cat_meta            tinyint(1) NOT NULL DEFAULT 0,
 			cat_lock            tinyint(1) NOT NULL DEFAULT 0,
 			cat_last_touched_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			cat_ityp_ID         INT UNSIGNED NULL,
 			PRIMARY KEY cat_ID (cat_ID),
 			UNIQUE cat_urlname( cat_urlname ),
 			KEY cat_blog_ID (cat_blog_ID),
@@ -329,6 +330,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_allow_disabling_comments TINYINT DEFAULT 0,
 			ityp_use_comment_expiration   ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
 			ityp_perm_level               ENUM( 'standard', 'restricted', 'admin' ) COLLATE ascii_general_ci NOT NULL default 'standard',
+			ityp_evobar_link_text         VARCHAR(255) NULL DEFAULT NULL,
+			ityp_skin_btn_text            VARCHAR(255) NULL DEFAULT NULL,
 			PRIMARY KEY ( ityp_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -347,13 +350,14 @@ $schema_queries = array_merge( $schema_queries, array(
 			itcf_formula         VARCHAR(2000) COLLATE ascii_general_ci NULL,
 			itcf_header_class    VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			itcf_cell_class      VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL,
-			itcf_link            ENUM( 'nolink', 'linkto', 'permalink', 'zoom', 'linkpermzoom', 'permzoom', 'linkperm', 'fieldurl' ) COLLATE ascii_general_ci NOT NULL default 'nolink',
+			itcf_link            ENUM( 'nolink', 'linkto', 'permalink', 'zoom', 'linkpermzoom', 'permzoom', 'linkperm', 'fieldurl', 'fieldurlblank' ) COLLATE ascii_general_ci NOT NULL default 'nolink',
 			itcf_link_nofollow   TINYINT NULL DEFAULT 0,
 			itcf_link_class      VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			itcf_line_highlight  ENUM( 'never', 'differences', 'always' ) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			itcf_green_highlight ENUM( 'never', 'lowest', 'highest' ) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			itcf_red_highlight   ENUM( 'never', 'lowest', 'highest' ) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			itcf_description     TEXT NULL,
+			itcf_merge           TINYINT DEFAULT 0,
 			PRIMARY KEY ( itcf_ID ),
 			UNIQUE itcf_ityp_ID_name( itcf_ityp_ID, itcf_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

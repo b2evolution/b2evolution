@@ -166,8 +166,12 @@ class RestApi
 	 */
 	private function user_authentication()
 	{
-		if( isset( $_SERVER, $_SERVER['PHP_AUTH_USER'] ) )
-		{	// Do basic HTTP authentication:
+		global $current_User;
+
+		if( isset( $_SERVER, $_SERVER['PHP_AUTH_USER'] ) &&
+		    ( ! is_logged_in() || $current_User->get( 'login' ) != $_SERVER['PHP_AUTH_USER'] ) )
+		{	// Do basic HTTP authentication when user login is provided AND
+			// user is not logged in yet OR the provided login is defferent than login of the current User:
 			$this->user_log_in( $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'] );
 		}
 	}
@@ -258,7 +262,7 @@ class RestApi
 	/**
 	 * Add new element in response array
 	 *
-	 * @param string Key or Value ( if second param is NULL )
+	 * @param string Key or Value ( if second param is NULL ), Use NULL to merge the array from second param with existing response array
 	 * @param mixed Value
 	 * @param string Type of new added item: 'raw', 'integer', 'array'
 	 */
@@ -267,6 +271,10 @@ class RestApi
 		if( $value === NULL )
 		{	// Use auto key:
 			$this->response[] = $key;
+		}
+		elseif( $key === NULL && is_array( $value ) )
+		{	// Merge new data array to response array:
+			$this->response = array_merge( $this->response, $value );
 		}
 		else
 		{	// Use defined key:
@@ -589,7 +597,7 @@ class RestApi
 			'tagline'   => $Blog->get( 'tagline' ),
 			'desc'      => $Blog->get( 'longdesc' ) );
 
-		$this->response = $collection_data;
+		$this->add_response( NULL, $collection_data );
 	}
 
 
@@ -604,7 +612,10 @@ class RestApi
 
 		// Get param to limit number posts per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
-		$page = param( 'page', 'integer', 1 );
+
+		// Get param to select current page:
+		// (NOTE: if this param is not set then param 'paged' is used as filter of ItemList)
+		$page = param( 'page', 'integer', NULL );
 
 		// Get param to know what post fields should be sent in response:
 		$api_details = param( 'details', 'string', NULL );
@@ -632,7 +643,12 @@ class RestApi
 
 		if( $ItemList2->filters['types'] == $ItemList2->default_filters['types'] )
 		{	// Allow all post types by default for this request:
-			$ItemList2->set_filters( array( 'itemtype_usage' => NULL, 'page' => $page ), true, true );
+			$ItemList2->set_filters( array( 'itemtype_usage' => NULL ), true, true );
+		}
+
+		if( $page !== NULL )
+		{	// Set page from request:
+			$ItemList2->set_filters( array( 'page' => $page ), true, true );
 		}
 
 		if( ! empty( $force_filters ) )
@@ -753,7 +769,7 @@ class RestApi
 
 			if( $post_ID )
 			{	// If only one post is requested then response should as one level array with post fields:
-				$this->response = $item_data;
+				$this->add_response( NULL, $item_data );
 			}
 			else
 			{	// Add data of each post in separate array of response:
@@ -761,7 +777,7 @@ class RestApi
 			}
 		}
 
-		if( empty( $this->response ) )
+		if( empty( $item_data ) )
 		{	// No posts detected:
 			if( $post_ID )
 			{	// Wrong post request:
@@ -1316,6 +1332,10 @@ class RestApi
 		// Get param to limit number users per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
 
+		// Get param to select current page:
+		// (NOTE: if this param is not set then param 'paged' is used as filter of UserList)
+		$page = param( 'page', 'integer', NULL );
+
 		// Get user list params:
 		$api_list_params = param( 'list_params', 'array:string', array() );
 
@@ -1333,7 +1353,12 @@ class RestApi
 
 		if( ! empty( $user_filters ) )
 		{	// Filter list:
-			$UserList->set_filters( $user_filters, true, true );
+			$UserList->set_filters( $user_filters );
+		}
+
+		if( $page !== NULL )
+		{	// Set page from request:
+			$UserList->page = $page;
 		}
 
 		// Execute query:
@@ -1370,7 +1395,7 @@ class RestApi
 			$this->add_response( 'users', $user_data, 'array' );
 		}
 
-		if( empty( $this->response ) )
+		if( empty( $user_data ) )
 		{	// No users found:
 			$this->halt( 'No users found', 'no_users', 404 );
 			// Exit here.
@@ -1479,7 +1504,7 @@ class RestApi
 		}
 
 		// Add user data in the response:
-		$this->response = $user_data;
+		$this->add_response( NULL, $user_data );
 	}
 
 
@@ -2080,6 +2105,10 @@ class RestApi
 				// Actions to update the links:
 				switch( $link_action )
 				{
+					case 'position':
+						$link_controller = 'change_position';
+						break;
+
 					case 'move_up':
 					case 'move_down':
 						$link_controller = 'change_order';
@@ -2191,6 +2220,58 @@ class RestApi
 		// The requested link has been deleted successfully:
 		$this->halt( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'delete_success', 200 );
 		// Exit here.
+	}
+
+
+	/**
+	 * Call link controller to change the position of the requested link
+	 */
+	private function controller_link_change_position()
+	{
+		global $DB, $Session;
+
+		// Check permission if current user can update the requested link:
+		$this->link_check_perm();
+
+		$link_position = $this->args[3];
+
+		$edited_Link = & $this->get_Link();
+		$LinkOwner = & $edited_Link->get_LinkOwner();
+
+		// Don't display the inline position reminder again until the user logs out or loses the session cookie
+		if( $link_position == 'inline' )
+		{
+			$Session->set( 'display_inline_reminder', 'false' );
+		}
+
+		// Check permission:
+		$LinkOwner->check_perm( 'edit', true );
+
+		$edited_Link->set( 'position', $link_position ); // This returns false if no change was made
+		if( $edited_Link->dbupdate() !== false ) // This returns NULL if no change was made
+		{ // update was successful or no change was made
+
+			// Update last touched date of Owners
+			$LinkOwner->update_last_touched_date();
+
+			if( $link_position == 'cover' && $LinkOwner->type == 'item' )
+			{ // Position "Cover" can be used only by one link
+			  // Replace previous position with "Inline"
+				$DB->query( 'UPDATE T_links
+						SET link_position = "aftermore"
+					WHERE link_ID != '.$DB->quote( $link_ID ).'
+						AND link_itm_ID = '.$DB->quote( $LinkOwner->Item->ID ).'
+						AND link_position = "cover"' );
+			}
+
+			$this->halt( 'Link position has been updated.', 'change_position_success', 200 );
+			// Exit here
+		}
+		else
+		{ // return the current value on failure
+			$this->halt( 'Failed to change link position.', 'change_position_failed', 403 );
+			// Exit here
+		}
 	}
 
 
@@ -2467,8 +2548,8 @@ class RestApi
 
 		if( ! $source_LinkOwner || ! ( $source_LinkList = $source_LinkOwner->get_attachment_LinkList( 1000, $source_position, $source_file_type, $link_list_params ) ) )
 		{	// No requested links, Exit here:
-			$this->response = array();
-			return;
+			$this->halt( 'No requested links!', 'no_links', 404 );
+			// Exit here.
 		}
 
 		$dest_position = param( 'dest_position', 'string' );

@@ -60,13 +60,6 @@ $Form = new Form( $form_action, 'item_checkchanges', 'post' );
 
 $Form->switch_template_parts( $params['edit_form_params'] );
 
-// =================================== INSTRUCTION ====================================
-$ItemType = & $edited_Item->get_ItemType();
-if( $ItemType && ( $ItemType->get( 'front_instruction' ) == 1 ) && $ItemType->get( 'instruction' ) )
-{
-	echo '<div class="alert alert-info fade in">'.$ItemType->get( 'instruction' ).'</div>';
-}
-
 // ================================ START OF EDIT FORM ================================
 
 $form_params = array();
@@ -217,15 +210,26 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->switch_layout( NULL );
 	}
 
+
+	if( $edited_Item->get_type_setting( 'allow_attachments' ) && $edited_Item->ID > 0 )
+	{ // ####################### ATTACHMENTS FIELDSETS #########################
+		$LinkOwner = new LinkItem( $edited_Item );
+	}
+
 	if( $edited_Item->get_type_setting( 'use_text' ) != 'never' )
 	{ // Display text
 		// --------------------------- TOOLBARS ------------------------------------
 		echo '<div class="edit_toolbars">';
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'AdminDisplayToolbar', array(
+		$admin_toolbar_params = array(
 				'edit_layout' => 'expert',
 				'Item' => $edited_Item,
-			) );
+			);
+		if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+		{
+			$admin_editor_params['temp_ID'] = $LinkOwner->get_ID();
+		}
+		$Plugins->trigger_event( 'AdminDisplayToolbar', $admin_editor_params );
 		echo '</div>';
 
 		// ---------------------------- TEXTAREA -------------------------------------
@@ -249,17 +253,28 @@ $Form->begin_form( 'inskin', '', $form_params );
 		<?php
 		echo '<div class="edit_plugin_actions">';
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'DisplayEditorButton', array(
+		$display_editor_params = array(
 				'target_type'   => 'Item',
 				'target_object' => $edited_Item,
 				'content_id'    => 'itemform_post_content',
-				'edit_layout'   => 'inskin'
-			) );
+				'edit_layout'   => 'inskin',
+			);
+		if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+		{
+			$display_editor_params['temp_ID'] = $LinkOwner->get_ID();
+		}
+		$Plugins->trigger_event( 'DisplayEditorButton', $display_editor_params );
 		echo '</div>';
 	}
 	else
 	{ // Hide text
 		$Form->hidden( 'content', $item_content );
+	}
+
+	// =================================== INSTRUCTION ====================================
+	if( $edited_Item->get_type_setting( 'front_instruction' ) && $edited_Item->get_type_setting( 'instruction' ) )
+	{
+		echo '<div class="action_messages evo_instruction"><div class="log_note">'.$edited_Item->get_type_setting( 'instruction' ).'</div></div>';
 	}
 
 	global $display_item_settings_is_defined;
@@ -347,7 +362,6 @@ if( count( $custom_fields ) > 0 )
 
 if( $edited_Item->get_type_setting( 'allow_attachments' ) && $edited_Item->ID > 0 )
 { // ####################### ATTACHMENTS FIELDSETS #########################
-	$LinkOwner = new LinkItem( $edited_Item );
 	if( $LinkOwner->count_links() )
 	{
 		$Form->begin_fieldset( T_('Attachments') );
@@ -386,6 +400,7 @@ echo_publishnowbutton_js();
 // New category input box:
 echo_onchange_newcat();
 echo_autocomplete_tags();
+echo_fieldset_folding_js();
 
 $edited_Item->load_Blog();
 // Location

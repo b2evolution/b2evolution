@@ -452,8 +452,14 @@ div.results {
 }
 
 // Styles for edit-screen instructions
-.evo_instruction {
-	margin: 20px 10px;
+div.action_messages.evo_instruction {
+	margin: 10px 0 0;
+	ul, li {
+		list-style: initial;
+	}
+	ul {
+		padding-left: 20px;
+	}
 }
 
 // Styles for in-skin editing
@@ -739,15 +745,6 @@ div.results span[class*=status_] span {
 	border-radius: 12px 12px 12px 12px;
 	float: left;
 	width: 80px;
-}
-
-@fix-IE8-media-screen: ~"\0screen";
-@media @fix-IE8-media-screen {/* IE8 */
-	#styled_content_block span[class*=status_] span,
-	.evo_content_block span[class*=status_] span {
-		top: -15px;
-		left: -2px;
-	}
 }
 
 .search_title {
