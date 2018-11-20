@@ -225,9 +225,12 @@ $buttons = array();
 if( $revisions_count > 1 )
 {	// Button to compare the revisions
 	$buttons = array( array( 'submit', '', T_('Compare selected revisions'), 'SaveButton' ) );
-	echo get_icon( 'multi_action', 'imgtag', array( 'style' => 'margin-left:18px;position:relative;top:-5px;') );
+	echo get_icon( 'multi_action', 'imgtag', array( 'style' => 'margin:0 10px 0 18px') );
 }
 $Form->end_form( $buttons );
+
+// JS code for merge button:
+echo_item_merge_js();
 
 if( $revisions_count > 2 )
 {	// Print JS code for selectors to compare the revisions

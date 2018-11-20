@@ -353,7 +353,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
  * @param object Form
  * @param object edited Comment
  * @param string Max allowed status
- * @param string Action: 'update' - for button titles like 'Save as Public!', 'set_visibility' - for button titles like 'Set visibility to Public'
+ * @param string Action: 'update' - for button titles like 'Save as Public!', 'comments_visibility' - for button titles like 'Set visibility to Public'
  */
 function echo_comment_status_buttons( $Form, $edited_Comment = NULL, $max_allowed_status = '', $action = 'update' )
 {
@@ -382,7 +382,7 @@ function echo_comment_status_buttons( $Form, $edited_Comment = NULL, $max_allowe
 	// Get those statuses which are not allowed for the current User to create posts in this blog
 	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit', $comment_status, $restrict_max_allowed_status ), array( 'redirected', 'trash' ) );
 	// Get allowed visibility statuses:
-	if( $action == 'set_visibility' )
+	if( $action == 'comments_visibility' )
 	{
 		$status_options = get_visibility_statuses( '', $exclude_statuses );
 		foreach( $status_options as $status_key => $status_title )

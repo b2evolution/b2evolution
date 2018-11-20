@@ -1439,4 +1439,280 @@ function add_email_tracking( $message, $email_ID, $email_key, $params = array() 
 	return $message;
 
 }
+
+
+/**
+ * Helper to display email receiver in cell of sent emails table
+ *
+ * @param integer Email log ID
+ * @param string Email receiver name when no user ID
+ * @param integer Receiver User ID
+ * @return string
+ */
+function emlog_td_receiver( $emlog_ID, $emlog_to, $emlog_user_ID )
+{
+	$deleted_user_note = '';
+	if( !empty( $emlog_user_ID ) )
+	{	// Get user
+		$UserCache = & get_UserCache();
+		if( $User = $UserCache->get_by_ID( $emlog_user_ID, false ) )
+		{
+			$to = $User->get_identity_link();
+		}
+		else
+		{ // could not find user, probably it was deleted
+			$deleted_user_note = '( '.T_( 'Deleted user' ).' )';
+		}
+	}
+
+	if( empty( $to ) )
+	{	// User is not defined
+		global $admin_url;
+		$to = '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;emlog_ID='.$emlog_ID.'">'.htmlspecialchars( $emlog_to ).$deleted_user_note.'</a>';
+	}
+
+	return $to;
+}
+
+
+/**
+ * Initialize Results object for sent emails log list
+ *
+ * @param object Results
+ * @param array Params
+ */
+function emails_sent_log_results( & $emails_Results, $params = array() )
+{
+	global $admin_url;
+
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'display_id'             => true,
+			'display_datetime'       => true,
+			'display_status'         => true,
+			'display_receiver'       => true,
+			'display_subject'        => true,
+			'display_email_campaign' => true,
+			'display_last_opened'    => true,
+			'display_last_clicked'   => true,
+			'display_actions'        => true,
+		), $params );
+
+	if( $params['display_id'] )
+	{	// Display ID column:
+		$emails_Results->cols[] = array(
+				'th' => T_('ID'),
+				'order' => 'emlog_ID',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'right',
+				'td' => '$emlog_ID$',
+			);
+	}
+
+	if( $params['display_datetime'] )
+	{	// Display Date Time column:
+		$emails_Results->cols[] = array(
+				'th' => T_('Date Time'),
+				'order' => 'emlog_timestamp',
+				'default_dir' => 'D',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'timestamp',
+				'td' => '%mysql2localedatetime_spans( #emlog_timestamp# )%',
+			);
+	}
+
+	if( $params['display_status'] )
+	{	// Display Status column:
+		$emails_Results->cols[] = array(
+				'th' => T_('Status'),
+				'order' => 'emlog_result',
+				'td' => '%emlog_result_info( #emlog_result#, array( \'link_blocked\' => true, \'email\' => #emlog_to# ), #emlog_last_open_ts#, #emlog_last_click_ts# )%',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'nowrap'
+			);
+	}
+
+	if( $params['display_receiver'] )
+	{	// Display "To"/receiver column:
+		$emails_Results->cols[] = array(
+				'th' => T_('To'),
+				'order' => 'emlog_to',
+				'td' => '%emlog_td_receiver( #emlog_ID#, #emlog_to#, #emlog_user_ID# )%',
+			);
+	}
+
+	if( $params['display_subject'] )
+	{	// Display Subject column:
+		$emails_Results->cols[] = array(
+				'th' => T_('Subject'),
+				'order' => 'emlog_subject',
+				'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;emlog_ID=$emlog_ID$">%htmlspecialchars(#emlog_subject#)%</a>',
+			);
+	}
+
+	if( $params['display_email_campaign'] )
+	{	// Display Email campaign column:
+		$emails_Results->cols[] = array(
+				'th' => T_('Email campaign'),
+				'order' => 'ecmp_name',
+				'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$emlog_camp_ID$">$ecmp_name$</a>',
+			);
+	}
+
+	if( $params['display_last_opened'] )
+	{	// Display Last opened column:
+		$emails_Results->cols[] = array(
+				'order' => 'emlog_last_open_ts',
+				'default_dir' => 'D',
+				'th' => T_('Last opened'),
+				'th_class' => 'shrinkwrap',
+				'td' => '%mysql2localedatetime_spans( #emlog_last_open_ts# )%',
+				'td_class' => 'timestamp'
+			);
+	}
+
+	if( $params['display_last_clicked'] )
+	{	// Display Last clicked column:
+		$emails_Results->cols[] = array(
+				'order' => 'emlog_last_click_ts',
+				'default_dir' => 'D',
+				'th' => T_('Last clicked'),
+				'th_class' => 'shrinkwrap',
+				'td' => '%mysql2localedatetime_spans( #emlog_last_click_ts# )%',
+				'td_class' => 'timestamp'
+			);
+	}
+
+	if( $params['display_actions'] )
+	{	// Display Actions column:
+		global $current_User;
+		$emails_Results->cols[] = array(
+				'th' => T_('Actions'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'td' => ( $current_User->check_perm( 'emails', 'edit' ) ? action_icon( T_('Delete this record!'), 'delete', $admin_url.'?ctrl=email&amp;tab=sent&amp;action=delete&amp;emlog_ID=$emlog_ID$&amp;'.url_crumb( 'email' ) ) : '' )
+			);
+	}
+}
+
+
+/**
+ * Helper to display email address in cell of email returns table
+ *
+ * @param string Email address
+ * @return string
+ */
+function emret_td_address( $emret_address )
+{
+	return '<a href="'.regenerate_url( 'email,action,emret_ID', 'email='.$emret_address ).'">'.$emret_address.'</a>';
+}
+
+
+/**
+ * Helper to display action icons in cell of email returns table
+ *
+ * @param string ID of the returned email record
+ * @param string Email address
+ * @return string
+ */
+function emret_td_actions( $emret_ID, $emret_address )
+{
+	global $admin_url, $current_User;
+
+	$r = action_icon( T_('View this email...'), 'magnifier', $admin_url.'?ctrl=email&amp;tab=return&amp;emret_ID='.$emret_ID )
+		.action_icon( T_('Go to users list with this email address'), 'play', $admin_url.'?ctrl=users&amp;filter=new&amp;keywords='.$emret_address );
+
+	if( $current_User->check_perm( 'emails', 'edit' ) )
+	{
+		$r .= action_icon( T_('Delete this record!'), 'delete', $admin_url.'?ctrl=email&amp;tab=return&amp;action=returned_delete&amp;emret_ID='.$emret_ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'blog', '', '', '&' ) ).'&amp;'.url_crumb( 'email' ), '', 1, 0, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this record?').'\');' ) );
+	}
+
+	return $r;
+}
+
+
+/**
+ * Initialize Results object for email returns list
+ *
+ * @param object Results
+ * @param array Params
+ */
+function email_returns_results( & $email_returns_Results, $params = array() )
+{
+	global $admin_url;
+
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'display_id'         => true,
+			'display_datetime'   => true,
+			'display_address'    => true,
+			'display_error_type' => true,
+			'display_error_msg'  => true,
+			'display_actions'    => true,
+		), $params );
+
+	if( $params['display_id'] )
+	{	// Display ID column:
+		$email_returns_Results->cols[] = array(
+			'th' => T_('ID'),
+			'order' => 'emret_ID',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'right',
+			'td' => '$emret_ID$',
+		);
+	}
+
+	if( $params['display_id'] )
+	{	// Display Date Time column:
+		$email_returns_Results->cols[] = array(
+			'th' => T_('Date Time'),
+			'order' => 'emret_timestamp',
+			'default_dir' => 'D',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'timestamp',
+			'td' => '%mysql2localedatetime_spans( #emret_timestamp# )%',
+		);
+	}
+
+	if( $params['display_address'] )
+	{	// Display Address column:
+		$email_returns_Results->cols[] = array(
+			'th' => T_('Address'),
+			'order' => 'emret_address',
+			'td' => '%emret_td_address( #emret_address# )%',
+			'th_class' => 'shrinkwrap',
+		);
+	}
+
+	if( $params['display_error_type'] )
+	{	// Display Err Type column:
+		load_funcs( 'cron/model/_decode_returned_emails.funcs.php' );
+		$email_returns_Results->cols[] = array(
+			'th' => T_('Err Type'),
+			'order' => 'emret_errtype',
+			'td' => '%dre_decode_error_type( #emret_errtype# )%',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'shrinkwrap',
+		);
+	}
+
+	if( $params['display_error_msg'] )
+	{	// Display Error column:
+		$email_returns_Results->cols[] = array(
+			'th' => T_('Error'),
+			'order' => 'emret_errormsg',
+			'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=return&amp;emret_ID=$emret_ID$">%htmlspecialchars( #emret_errormsg# )%</a>',
+		);
+	}
+
+	if( $params['display_actions'] )
+	{	// Display Actions column:
+		$email_returns_Results->cols[] = array(
+			'th' => T_('Actions'),
+			'th_class' => 'shrinkwrap small',
+			'td_class' => 'shrinkwrap',
+			'td' => '%emret_td_actions( #emret_ID#, #emret_address# )%'
+		);
+	}
+}
 ?>

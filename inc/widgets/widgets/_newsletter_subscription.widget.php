@@ -83,10 +83,13 @@ class newsletter_subscription_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		$default_enlt_ID = '';
+
 		// Load all active newsletters or if newsletter is currently used by this widget:
 		$NewsletterCache = & get_NewsletterCache();
+		$current_enlt_ID = intval( $this->get_param( 'enlt_ID', $default_enlt_ID ) );
 		$NewsletterCache->load_where( 'enlt_active = 1'.
-			( empty( $params['infinite_loop'] ) ? ' OR enlt_ID = '.intval( $this->get_param( 'enlt_ID', true ) ) : '' ) );
+			( $current_enlt_ID > 0 ? ' OR enlt_ID = '.$current_enlt_ID : '' ) );
 
 		$r = array_merge( array(
 				'general_layout_start' => array(
@@ -98,7 +101,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 						'note' => '',
 						'type' => 'select',
 						'options' => array( ''  => T_('None') ) + $NewsletterCache->get_option_array(),
-						'defaultvalue' => '',
+						'defaultvalue' => $default_enlt_ID,
 					),
 					'usertags' => array(
 						'label' => T_('On subscription, tag user with'),
@@ -242,7 +245,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 		{	// Display an error when newsletter is not found or not active:
 			$this->disp_title();
 			echo $this->disp_params['block_body_start'];
-			echo '<div class="red">'.T_('List subscription widget references an inactive list.').'</div>';
+			echo '<div class="evo_param_error">'.T_('List subscription widget references an inactive list.').'</div>';
 			echo $this->disp_params['block_body_end'];
 		}
 		else

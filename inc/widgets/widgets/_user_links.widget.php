@@ -142,7 +142,7 @@ class user_links_Widget extends ComponentWidget
 		$widget_User = & $this->get_widget_User();
 		if( empty( $widget_User ) )
 		{ // No user detected
-			$r .= '<p class="red">'.sprintf( T_('User %s not found.'), '<b>'.format_to_output( $this->disp_params['login'], 'text' ).'</b>' ).'</p>';
+			$r .= '<p class="evo_param_error">'.sprintf( T_('User %s not found.'), '<b>'.format_to_output( $this->disp_params['login'], 'text' ).'</b>' ).'</p>';
 		}
 
 		if( ! empty( $widget_User ) )

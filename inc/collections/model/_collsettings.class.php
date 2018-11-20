@@ -52,6 +52,7 @@ class CollectionSettings extends AbstractSettings
 
 		// Single post settings:
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
+			'allow_crosspost_urls' => 1,					// For cross-posted Items, allow non-canonical URL
 			'relcanonical_item_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'single_links'   => 'short',
 			'single_item_footer_text' => '',
@@ -153,7 +154,7 @@ class CollectionSettings extends AbstractSettings
 			'enable_sitemaps' => 1,
 
 		// General settings:
-			'ajax_form_enabled' => 1,					// Comment and contacts forms will be fetched by javascript
+			'ajax_form_enabled' => 1,					// Comment, Contact & Quick registration forms will be fetched by javascript
 			'ajax_form_loggedin_enabled' => 0,			// Also use JS forms for logged in users
 			'cache_enabled' => 0,
 			'cache_enabled_widgets' => 0,
@@ -161,6 +162,7 @@ class CollectionSettings extends AbstractSettings
 			'in_skin_editing' => 0,
 			'in_skin_editing_renderers' => 1,
 			'in_skin_editing_category' => 1,
+			'in_skin_editing_category_order' => 1,
 			'default_cat_ID' => NULL,					// Default Cat for new posts
 			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet,evo_twitter', // ping plugin codes, separated by comma
 			'allow_subscriptions' => 1,         // Allow email subscriptions for new post by default

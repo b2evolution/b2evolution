@@ -178,6 +178,8 @@ class content_hierarchy_Widget extends ComponentWidget
 				'display_blog_title'   => true,
 				'open_children_levels' => 0,
 				'list_posts'           => true,
+				// Don't expand all categories by default for this widget, because it has a separate parameter 'open_children_levels':
+				'expand_all'           => false,
 			), $params );
 
 		global $blog, $cat, $Item;
@@ -233,7 +235,7 @@ class content_hierarchy_Widget extends ComponentWidget
 			$params['items_order_alpha_func'] = 'compare_items_by_short_title';
 		}
 
-		echo $ChapterCache->recurse( $callbacks, $this->Blog->ID, NULL, 0, 0, $params );
+		echo $ChapterCache->recurse( $callbacks, $this->Blog->ID, NULL, 0, $params['open_children_levels'] + 1, $params );
 
 		echo $params['list_end'];
 

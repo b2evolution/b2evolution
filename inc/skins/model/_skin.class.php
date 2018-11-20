@@ -1204,6 +1204,8 @@ class Skin extends DataObject
 				case 'disp_search':
 					// Used to suggest usernames for the field "Recipients":
 					init_tokeninput_js( 'blog' );
+					// Initialize JS to autcomplete user logins and date picker to edit workflow properties:
+					init_autocomplete_login_js( 'blog', $this->get_template( 'autocomplete_plugin' ) );
 					break;
 
 				case 'disp_login':
@@ -1328,6 +1330,9 @@ class Skin extends DataObject
 
 					// Used to autocomplete usernames in textarea:
 					init_autocomplete_usernames_js( 'blog' );
+
+					// Used to switch to advanced editing:
+					require_js( 'backoffice.js', 'blog' );
 					break;
 
 				case 'disp_useritems':

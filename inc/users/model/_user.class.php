@@ -2468,6 +2468,82 @@ class User extends DataObject
 
 
 	/**
+	 * Get a number of emails sent to this User
+	 *
+	 * @return integer
+	 */
+	function get_num_sent_emails()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{
+			return 0;
+		}
+
+		$SQL = new SQL( 'Get a number of emails sent to the User #'.$this->ID );
+		$SQL->SELECT( 'COUNT( emlog_ID )' );
+		$SQL->FROM( 'T_email__log' );
+		$SQL->WHERE( 'emlog_user_ID = '.$this->ID );
+
+		return intval( $DB->get_var( $SQL ) );
+	}
+
+
+	/**
+	 * Delete all emails sent to the user
+	 *
+	 * @return boolean True on success
+	 */
+	function delete_sent_emails()
+	{
+		global $DB;
+
+		return $DB->query( 'DELETE
+			 FROM T_email__log
+			WHERE emlog_user_ID = '.$this->ID );
+	}
+
+
+	/**
+	 * Get a number of email returns from this User's email address
+	 *
+	 * @return integer
+	 */
+	function get_num_email_returns()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{
+			return 0;
+		}
+
+		$SQL = new SQL( 'Get a number of email returns from email address of the User #'.$this->ID );
+		$SQL->SELECT( 'COUNT( emret_ID )' );
+		$SQL->FROM( 'T_email__returns' );
+		$SQL->WHERE( 'emret_address = '.$DB->quote( $this->get( 'email' ) ) );
+
+		return intval( $DB->get_var( $SQL ) );
+	}
+
+
+	/**
+	 * Delete all email returns from the user's email address
+	 *
+	 * @return boolean True on success
+	 */
+	function delete_email_returns()
+	{
+		global $DB;
+
+		return $DB->query( 'DELETE
+			 FROM T_email__returns
+			WHERE emret_address = '.$DB->quote( $this->get( 'email' ) ) );
+	}
+
+
+	/**
 	 * Get the path to the media directory. If it does not exist, it will be created.
 	 *
 	 * If we're {@link is_admin_page() on an admin page}, it adds status messages.

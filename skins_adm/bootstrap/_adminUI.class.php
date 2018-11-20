@@ -274,9 +274,8 @@ class AdminUI extends AdminUI_general
 								.'<ul class="nav nav-tabs">'."\n",
 						'after' => '</ul>'."\n"
 										.'</nav>'."\n"
-									.'</div>'."\n"
-									.'<div class="container-fluid pull-right">$global_icons$</div>',
-						'empty' => '<div class="container-fluid pull-right">$global_icons$</div>',
+									.'</div>'."\n",
+						'empty' => '',
 						'beforeEach'    => '<li role="presentation">',
 						'afterEach'     => '</li>',
 						'beforeEachSel' => '<li role="presentation" class="active">',
@@ -296,8 +295,9 @@ class AdminUI extends AdminUI_general
 									.'<ul class="nav nav-pills">'."\n",
 						'after' => '</ul>'."\n"
 									.'</nav>'."\n"
-								.'</div>'."\n",
-						'empty' => '',
+								.'</div>'."\n"
+								.'<div class="container-fluid container-global-icons"><div class="pull-right">$global_icons$</div></div>'."\n",
+						'empty' => '<div class="container-fluid"><div class="pull-right">$global_icons$</div></div>'."\n",
 						'beforeEach' => '<li role="presentation">',
 						'afterEach'  => '</li>',
 						'beforeEachSel' => '<li role="presentation" class="active">',

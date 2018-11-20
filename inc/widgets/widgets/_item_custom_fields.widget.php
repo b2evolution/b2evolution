@@ -94,7 +94,9 @@ class item_custom_fields_Widget extends item_fields_compare_Widget
 		$generic_params['items_limit']['no_edit'] = true;
 		$generic_params['allow_filter']['no_edit'] = true;
 		$generic_params['show_headers']['no_edit'] = true;
+		$generic_params['merge_headers']['no_edit'] = true;
 		$generic_params['show_status']['no_edit'] = true;
+		$generic_params['cell_colors']['no_edit'] = true;
 		for( $order_index = 0; $order_index <= 2; $order_index++ )
 		{
 			$field_suffix = ( $order_index == 0 ? '' : '_'.$order_index );
@@ -108,6 +110,9 @@ class item_custom_fields_Widget extends item_fields_compare_Widget
 		$generic_params['items']['label'] = T_('Item ID to show');
 		$generic_params['items']['note'] = T_('Leave empty for current Item.');
 		$generic_params['items']['size'] = 11;
+
+		// Don't hide empty lines by default for this widget:
+		$generic_params['hide_empty_lines']['defaultvalue'] = 0;
 
 		return $generic_params;
 	}

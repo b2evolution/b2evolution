@@ -817,13 +817,17 @@ class ItemListLight extends DataObjectList2
 		}
 
 		// QUERY:
-		$this->sql = 'SELECT DISTINCT '.$this->Cache->dbIDname.', post_datestart, post_datemodified, post_title, post_short_title, post_url,
-									post_excerpt, post_urltitle, post_canonical_slug_ID, post_tiny_slug_ID, post_main_cat_ID, post_ityp_ID, post_single_view '
-									.$this->ItemQuery->get_from()
-									.$this->ItemQuery->get_where()
-									.$this->ItemQuery->get_group_by()
-									.$this->ItemQuery->get_order_by()
-									.$this->ItemQuery->get_limit();
+		$this->ItemQuery->SELECT( 'DISTINCT '.$this->Cache->dbIDname.', post_datestart, post_datemodified, post_title, post_short_title, post_url,' );
+		$this->ItemQuery->SELECT_add( 'post_excerpt, post_urltitle, post_canonical_slug_ID, post_tiny_slug_ID, post_main_cat_ID, post_ityp_ID, post_single_view, postcat_cat_ID' );
+		if( strpos( $this->ItemQuery->get_from(), 'T_postcats' ) === false )
+		{	// If categories table is not joined yet we should use it for column postcat_cat_ID
+			$this->ItemQuery->FROM_add( 'INNER JOIN T_postcats ON '.$this->Cache->dbIDname.' = postcat_post_ID' );
+		}
+		if( $this->ItemQuery->get_group_by() == '' )
+		{	// Group by item ID only if another grouping is not used currently:
+			$this->ItemQuery->GROUP_BY( $this->Cache->dbIDname );
+		}
+		$this->sql = $this->ItemQuery->get();
 
 		// echo DB::format_query( $this->sql );
 

@@ -670,6 +670,60 @@ switch( $action )
 		}
 		break;
 
+	case 'cat_ityp_ID_edit':
+		// Update default Item Type of a chapter from list screen by clicking on the order column:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'catityp' );
+
+		$blog = param( 'blogid', 'integer' );
+		$cat_ityp_ID = param( 'new_ityp_ID', 'string', NULL );
+		$cat_ID = param( 'cat_ID', 'integer' );
+
+		// Check permission:
+		$current_User->check_perm( 'blog_cats', '', true, $blog );
+
+		if( ! empty( $cat_ityp_ID ) )
+		{	// Remove prefix "_" which is used only for correct order in jeditable selector:
+			$cat_ityp_ID = substr( $cat_ityp_ID, 1 );
+		}
+		if( $cat_ityp_ID === false || $cat_ityp_ID === '' )
+		{	// Convert empty value to NULL to update DB:
+			$cat_ityp_ID = NULL;
+		}
+
+		$ChapterCache = & get_ChapterCache();
+		if( $Chapter = & $ChapterCache->get_by_ID( $cat_ID, false ) )
+		{	// Update cat Item Type if it exists in DB:
+			$ItemTypeCache = & get_ItemTypeCache();
+			if( ! empty( $cat_ityp_ID ) &&
+			    ( ! ( $ItemType = & $ItemTypeCache->get_by_ID( $cat_ityp_ID, false, false ) ) ||
+			      ! $ItemType->is_enabled( $blog ) ) )
+			{	// Revert back to use previous Item Type if new is wrong for current category:
+				$cat_ityp_ID = $Chapter->get( 'ityp_ID' );
+			}
+			$Chapter->set( 'ityp_ID', $cat_ityp_ID, true );
+			$Chapter->dbupdate();
+			if( $Chapter->get( 'ityp_ID' ) === NULL )
+			{
+				$cat_ityp_title = T_('Same as collection default');
+			}
+			elseif( $Chapter->get( 'ityp_ID' ) == '0' )
+			{
+				$cat_ityp_title = '<b>'.T_('No default type').'</b>';
+			}
+			elseif( $ItemType = & $ItemTypeCache->get_by_ID( $Chapter->get( 'ityp_ID' ), false, false ) )
+			{
+				$cat_ityp_title = $ItemType->get_name();
+			}
+			else
+			{
+				$cat_ityp_title = '<span class="red">'.T_('Not Found').' #'.$Chapter->get( 'ityp_ID' ).'</span>';
+			}
+			echo '<a href="#" rel="_'.$Chapter->get( 'ityp_ID' ).'">'.$cat_ityp_title.'</a>';
+		}
+		break;
+
 	case 'get_goals':
 		// Get option list with goals by selected category
 		$blog = param( 'blogid', 'integer' );

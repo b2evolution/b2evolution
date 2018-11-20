@@ -921,6 +921,10 @@ div.container_menu_top div.widget_core_coll_search_form {
 div.container_menu_top input.search_field {
   width: 160px;
 }
+div.extended_search_form div[class^='col-'] {
+  padding-left: 3px;
+  padding-right: 3px;
+}
 .widget_core_user_register_quick #register_form {
   margin-top: 5px;
 }
@@ -998,7 +1002,7 @@ div.results {
   margin-bottom: 4px;
 }
 .evo_instruction {
-  margin: 20px 10px 10px;
+  margin: 0 0 20px;
 }
 form.inskin {
   padding: 10px;
@@ -1620,7 +1624,8 @@ form#comment_edit {
 .evo_container__sidebar .evo_poll__title {
   white-space: normal;
 }
-#itemform_links .panel-body {
+#itemform_links .panel-body,
+#cmntform_links .panel-body {
   padding: 0;
 }
 div.qq-upload-button,

@@ -1219,6 +1219,7 @@ function move_short_tags( $content, $pattern = NULL, $callback = NULL )
 function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickable_callback', $additional_attrs = '', $exclude_headers = false )
 {
 	$r = '';
+	$inside_bracket_short_tag = false;
 	$inside_tag = false;
 	$in_a_tag = false;
 	$in_code_tag = false;
@@ -1233,7 +1234,16 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 	// faster and less memory intensive (tested for some example content)
 	while( $i < $n )
 	{	// Go through each char in string... (we will fast forward from tag to tag)
-		if( $inside_tag )
+		if( $inside_bracket_short_tag )
+		{	// State: We're currently inside bracket short tag like [image:], [emailcapture:], [fields:], [compare:] and etc.:
+			if( $text[ $i ] == ']' )
+			{	// End of bracket short tag:
+				$inside_bracket_short_tag = false;
+				$r .= substr( $text, $from_pos, $i - $from_pos + 1 );
+				$from_pos = $i + 1;
+			}
+		}
+		elseif( $inside_tag )
 		{	// State: We're currently inside some tag:
 			switch( $text[$i] )
 			{
@@ -1323,29 +1333,46 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 		else
 		{ // State: we're not currently in any tag:
 			// Find next tag opening:
-			$i = strpos($text, '<', $i);
-			if( $i === false )
-			{ // No more opening tags:
-				break;
+			if( ( $b = strpos( $text, '[', $i ) ) !== false )
+			{	// Check if a bracket '[]' short tag is really opening:
+				// (we are finding here short tags like [image:], [emailcapture:], [fields:], [compare:] and etc., see full list in the Item->render_inline_tags())
+				$b++;
+				$short_tag_name = '';
+				while( isset( $text[ $b ] ) && $text[ $b ] != ':' && $text[ $b ] != ']' )
+				{	// Get short tag name between chars '[' and ( ':' or ']' ):
+					$short_tag_name .= $text[ $b ];
+					$b++;
+				}
+				// We are inside bracket short tag if its name contains only letters:
+				$inside_bracket_short_tag = preg_match( '/^[a-z]+$/', $short_tag_name );
 			}
 
-			$inside_tag = true;
-			$in_tag_quote = false;
-			// s$r .= '{'.$text[$i+1];
+			if( ! $inside_bracket_short_tag )
+			{	// Try to find opening HTML tag only if bracket short tag is not opened currently:
+				$i = strpos($text, '<', $i);
+				if( $i === false )
+				{ // No more opening tags:
+					break;
+				}
 
-			if( ($text[$i+1] == 'a' || $text[$i+1] == 'A') && ctype_space($text[$i+2]) )
-			{ // opening "A" tag
-				$in_a_tag = true;
-			}
+				$inside_tag = true;
+				$in_tag_quote = false;
+				// s$r .= '{'.$text[$i+1];
 
-			if( ( substr( $text, $i+1, 4 ) == 'code') )
-			{ // opening "code" tag
-				$in_code_tag = true;
-			}
+				if( ($text[$i+1] == 'a' || $text[$i+1] == 'A') && ctype_space($text[$i+2]) )
+				{ // opening "A" tag
+					$in_a_tag = true;
+				}
 
-			if( $exclude_headers && preg_match( '/^h[1-6]$/', substr( $text, $i+1, 2 ), $h_match ) )
-			{	// opening "h1" - "h6" tags:
-				$in_header_tag = $h_match[0];
+				if( ( substr( $text, $i+1, 4 ) == 'code') )
+				{ // opening "code" tag
+					$in_code_tag = true;
+				}
+
+				if( $exclude_headers && preg_match( '/^h[1-6]$/', substr( $text, $i+1, 2 ), $h_match ) )
+				{	// opening "h1" - "h6" tags:
+					$in_header_tag = $h_match[0];
+				}
 			}
 
 			// Make the text before the opening < clickable:
@@ -7730,6 +7757,12 @@ function echo_modalwindow_js_bootstrap()
 	echo '<script type="text/javascript">
 		var evo_js_lang_close = \''.TS_('Close').'\'
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_edit_image = \''.TS_('Insert or edit inline image').'\';
+		var evo_js_lang_select_image_insert = \''.TS_('Select image to insert').'\';
+		var evo_js_lang_alert_before_insert_item = \''.TS_('Save post to start uploading files').'\';
+		var evo_js_lang_alert_before_insert_comment = \''.TS_('Save comment to start uploading files').'\';
+		var evo_js_lang_alert_before_insert_emailcampaign = \''.TS_('Save email campaign to start uploading files').'\';
+		var evo_js_lang_alert_before_insert_message = \''.TS_('Save message to start uploading files').'\';
 	</script>';
 }
 
@@ -7778,29 +7811,34 @@ function evo_error_handler()
 function get_fieldset_folding_icon( $id, $params = array() )
 {
 	if( ! is_logged_in() )
-	{ // Only loggedin users can fold fieldset
+	{	// Only loggedin users can fold fieldset
 		return;
 	}
 
 	$params = array_merge( array(
-			'before'    => '',
-			'after'     => ' ',
-			'deny_fold' => false, // TRUE to don't allow fold the block and keep it opened always on page loading
+			'before'     => '',
+			'after'      => ' ',
+			'deny_fold'  => false, // TRUE to don't allow fold the block and keep it opened always on page loading
+			'fold_value' => NULL,
 		), $params );
 
 	if( $params['deny_fold'] )
-	{ // Deny folding for this case
+	{	// Deny folding for this case
 		$value = 0;
 	}
+	elseif( ! is_null( $params['fold_value'] ) )
+	{	// Fold value is specified, use this:
+		$value = intval( $params['fold_value'] );
+	}
 	else
-	{ // Get the fold value from user settings
+	{	// Get the fold value from user settings
 		global $UserSettings, $Collection, $Blog, $ctrl;
 		if( empty( $Blog ) || ( isset( $ctrl ) && in_array( $ctrl, array( 'plugins', 'user' ) ) ) )
-		{ // Get user setting value
+		{	// Get user setting value
 			$value = intval( $UserSettings->get( 'fold_'.$id ) );
 		}
 		else
-		{ // Get user-collection setting
+		{	// Get user-collection setting
 			$value = intval( $UserSettings->get_collection_setting( 'fold_'.$id, $Blog->ID ) );
 		}
 	}
@@ -8055,9 +8093,13 @@ function get_script_baseurl()
 		if( isset( $_SERVER['SERVER_PORT'] ) )
 		{
 			if( $_SERVER['SERVER_PORT'] == '443' )
-			{	// Rewrite that as hhtps:
+			{	// Rewrite that as https:
 				$temp_baseurl = 'https://'.$_SERVER['SERVER_NAME'];
-			}	// Add port name
+			}
+			elseif( $_SERVER['SERVER_PORT'] == '8890' )
+			{	// Used for testing
+				$temp_baseurl = 'https://'.$_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'];
+			}
 			elseif( $_SERVER['SERVER_PORT'] != '80' )
 			{ // Get also a port number
 				$temp_baseurl .= ':'.$_SERVER['SERVER_PORT'];
@@ -8340,7 +8382,7 @@ function render_inline_files( $content, $Object, $params = array() )
 /**
  * Convert inline tags like [image:|file:|inline:|video:|audio:|thumbnail:|folder:] into HTML tags
  *
- * @param object Source object: Item, EmailCampaign
+ * @param object Source object: Item, EmailCampaign, Comment, Message
  * @param array Inline tags
  * @param array Params
  * @return array Associative array of rendered HTML tags with inline tags as key
@@ -8350,10 +8392,12 @@ function render_inline_tags( $Object, $tags, $params = array() )
 	global $Plugins;
 	$inlines = array();
 
+	$object_class = get_class( $Object );
+
 	$params = array_merge( array(
 				'before'                   => '<div>',
-				'before_image'             => '<div class="image_block">',
-				'before_image_legend'      => '<div class="image_legend">',
+				'before_image'             => '<div'.( $object_class == 'EmailCampaign' ? emailskin_style( '.image_block' ) : ' class="image_block"' ).'>',
+				'before_image_legend'      => '<div'.( $object_class == 'EmailCampaign' ? emailskin_style( '.image_legend' ) : ' class="image_legend"' ).'>',
 				'after_image_legend'       => '</div>',
 				'after_image'              => '</div>',
 				'after'                    => '</div>',
@@ -8362,8 +8406,6 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				'limit'                    => 1000, // Max # of images displayed
 				'get_rendered_attachments' => true,
 			), $params );
-
-	$object_class = get_class( $Object );
 
 	if( !isset( $LinkList ) )
 	{	// Get list of attached Links only first time:
@@ -8375,10 +8417,17 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		{	// Don't use temporary object for existing object:
 			$temp_link_owner_ID = NULL;
 		}
+
 		switch( $object_class )
 		{
 			case 'Item':
 				$LinkOwner = new LinkItem( $Object, $temp_link_owner_ID );
+				$prepare_plugin_event_name = 'PrepareForRenderItemAttachment';
+				$render_plugin_event_name = 'RenderItemAttachment';
+				break;
+
+			case 'Comment':
+				$LinkOwner = new LinkComment( $Object );
 				$prepare_plugin_event_name = 'PrepareForRenderItemAttachment';
 				$render_plugin_event_name = 'RenderItemAttachment';
 				break;
@@ -8403,7 +8452,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 	}
 
 	if( empty( $LinkList ) )
-	{ // This Item has no attached files for 'inline' position, Exit here
+	{	// This Item has no attached files for 'inline' position, Exit here
 		return false;
 	}
 
@@ -8421,19 +8470,19 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		$current_link_ID = (int) $inline[2];
 
 		if( empty( $current_link_ID ) )
-		{ // Invalid link ID, Go to next match
+		{	// Invalid link ID, Go to next match
 			$inlines[$current_inline] = $current_inline;
 			continue;
 		}
 
 		if( ! ( $Link = & $LinkList->get_by_field( 'link_ID', $current_link_ID ) ) )
-		{ // Link ID is not part of the linked files for position "inline"
+		{	// Link ID is not part of the linked files for position "inline"
 			$inlines[$current_inline] = $current_inline;
 			continue;
 		}
 
 		if( ! ( $File = & $Link->get_File() ) )
-		{ // No File object:
+		{	// No File object:
 			global $Debuglog;
 			$Debuglog->add( sprintf( 'Link ID#%d of '.$object_class.' #%d does not have a file object!', $Link->ID, $Object->ID ), array( 'error', 'files' ) );
 			$inlines[$current_inline] = $current_inline;
@@ -8441,7 +8490,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		}
 
 		if( ! $File->exists() )
-		{ // File doesn't exist:
+		{	// File doesn't exist:
 			global $Debuglog;
 			$Debuglog->add( sprintf( 'File linked to '.$object_class.' #%d does not exist (%s)!', $Object->ID, $File->get_full_path() ), array( 'error', 'files' ) );
 			$inlines[$current_inline] = $current_inline;
@@ -8468,14 +8517,14 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						$inline_params = explode( ':.', $inline[4] );
 
 						if( ! empty( $inline_params[0] ) )
-						{ // Caption is set, so overwrite the image link title
+						{	// Caption is set, so overwrite the image link title
 							if( $inline_params[0] == '-' )
-							{ // Caption display is disabled
+							{	// Caption display is disabled
 								$current_image_params['image_link_title'] = '';
 								$current_image_params['hide_image_link_title'] = true;
 							}
 							else
-							{ // New image caption was set
+							{	// New image caption was set
 								$current_image_params['image_link_title'] = strip_tags( $inline_params[0] );
 							}
 
@@ -8485,11 +8534,38 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 						$class_index = ( $inline_type == 'inline' ) ? 0 : 1; // [inline] tag doesn't have a caption, so 0 index is for class param
 						if( ! empty( $inline_params[ $class_index ] ) )
-						{ // A class name is set for the inline tags
+						{	// A class name is set for the inline tags
 							$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
+
 							if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
-							{	// Overwrite 'before_image' setting to add an extra class name:
-								$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
+							{
+								// Overwrite 'before_image' setting to add an extra class name:
+								if( $object_class == 'EmailCampaign' )
+								{
+									$el_style = '';
+									$custom_classes = array();
+									if( isset( $image_extraclass ) )
+									{
+										$classes = explode( ' ', $image_extraclass );
+										foreach( $classes as $class )
+										{
+											$class_style = emailskin_style( '.'.trim( $class ), false );
+											$el_style .= $class_style;
+											if( empty( $class_style ) )
+											{	// Doesn't have appropriate email skin style:
+												$custom_classes[] = $class;
+											}
+										}
+									}
+									$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array(
+											'class' => implode( ' ', $custom_classes ),
+											'style' => $el_style
+										) );
+								}
+								else
+								{
+									$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
+								}
 
 								// Append extra class to file inline img tags:
 								$current_file_params['class'] = $image_extraclass;
@@ -8498,13 +8574,13 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					}
 
 					if( ! $current_image_params['get_rendered_attachments'] )
-					{ // Save $r to temp var in order to don't get the rendered data from plugins
+					{	// Save $r to temp var in order to don't get the rendered data from plugins
 						$temp_r = $r;
 					}
 
 					$temp_params = $current_image_params;
 					foreach( $current_image_params as $param_key => $param_value )
-					{ 	// Pass all params by reference, in order to give possibility to modify them by plugin
+					{	// Pass all params by reference, in order to give possibility to modify them by plugin
 						// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
 						$current_image_params[ $param_key ] = & $current_image_params[ $param_key ];
 					}
@@ -8533,11 +8609,29 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 							case 'EmailCampaign':
 								// Get the IMG tag without link for email content:
-								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
+								$image_style = '';
+								if( isset( $current_image_params['image_class'] ) )
+								{
+									$classes = explode( ' ', $current_image_params['image_class'] );
+									$custom_classes = array();
+									foreach( $classes as $class )
+									{
+										$class_style = emailskin_style( '.'.trim( $class ), false );
+										$image_style .= $class_style;
+										if( empty( $class_style ) )
+										{	// Doesn't have appropriate email skin style:
+											$custom_classes[] = $class;
+										}
+									}
+									$current_image_params['image_class'] = implode( ' ', $custom_classes );
+									$current_image_params['image_style'] = $image_style;
+								}
+
+								$inlines[ $current_inline ] = $Link->get_tag( array_merge( array(
 										'image_link_to' => false,
-										'image_style' => 'border: none; max-width: 100%; height: auto;',
-										'add_loadimg' => false,
-									) ) );
+										'image_style'   => 'border: none; max-width: 100%; height: auto;',
+										'add_loadimg'   => false,
+								), $current_image_params ) );
 								break;
 
 							default:
@@ -8551,9 +8645,23 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						switch( $object_class )
 						{
 							case 'EmailCampaign':
+								$image_style = '';
+								$custom_classes = array();
+								if( ! empty( $current_file_params['class'] ) )
+								{
+									$classes = explode( ' ', $current_file_params['class'] );
+									foreach( $classes as $class )
+									{
+										$class_style = emailskin_style( '.'.trim( $class ), false );
+										$image_style .= $class_style;
+										if( empty( $class_style ) )
+										{	// Doesn't have appropriate email skin style:
+											$custom_classes[] = $class;
+										}
+									}
+								}
 								$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
-										( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', '', '', '', 1, NULL,
-										'border: none; max-width: 100%; height: auto;', false );
+										implode( ' ', $custom_classes ), '', '', '', '', 1, NULL, 'border: none; max-width: 100%; height: auto;'.$image_style, false );
 								break;
 
 							default:
@@ -8644,10 +8752,26 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 						case 'EmailCampaign':
 							// Get the IMG tag without link for email content:
+							$image_style = '';
+							if( ! empty( $current_image_params['image_class'] ) )
+							{
+								$classes = explode( ' ', $current_image_params['image_class'] );
+								$custom_classes = array();
+								foreach( $classes as $class )
+								{
+									$class_style = emailskin_style( '.'.trim( $class ), false );
+									$image_style .= $class_style;
+									if( empty( $class_style ) )
+									{	// Doesn't have appropriate email skin style:
+										$custom_classes[] = $class;
+									}
+								}
+								$current_image_params['image_class'] = implode( ' ', $custom_classes );
+							}
 							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
 									'image_link_to' => false,
-									'image_style' => 'border: none; max-width: 100%; height: auto;',
-									'add_loadimg' => false
+									'image_style'   => 'border: none; max-width: 100%; height: auto;'.$image_style,
+									'add_loadimg'   => false,
 								) ) );
 							break;
 
@@ -9137,5 +9261,160 @@ function get_social_media_image( $Item = NULL, $params = array() )
 	}
 
 	return NULL;
+}
+
+
+/**
+ * Opens modal to insert inline image tags.
+ * Used by the following plugins:
+ * - evo_TinyMCE
+ * - evo_inlines
+ *
+ * @param array Params
+ */
+function insert_image_links_block( $params )
+{
+	global $current_User, $inc_path, $Blog, $blog, $LinkOwner;
+	global $is_admin_page;
+
+	load_funcs( 'links/model/_link.funcs.php' );
+
+	$params = array_merge( array(
+			'target_type' => NULL,
+		), $params );
+
+	if( ! empty( $params['blog'] ) )
+	{
+		$BlogCache = & get_BlogCache();
+		$blog = $params['blog'];
+		$Blog = $BlogCache->get_by_ID( $blog );
+	}
+
+	$temp_ID = empty( $params['temp_ID'] ) ? NULL : $params['temp_ID'];
+	$is_admin_page = is_logged_in() && isset( $params['request_from'] ) && ( $params['request_from'] == 'back' );
+
+	switch( $params['target_type'] )
+	{
+		case 'Item':
+			if( ! isset( $params['target_ID'] ) && ! isset( $params['temp_ID'] ) )
+			{
+				return;
+			}
+
+			$ItemCache = & get_ItemCache();
+			$edited_Item = & $ItemCache->get_by_ID( $params['target_ID'], false, false );
+
+			if( empty( $blog ) && $edited_Item )
+			{
+				$Blog = $edited_Item->get_Blog();
+				$blog = $Blog->ID;
+			}
+
+			if( isset( $GLOBALS['files_Module'] )
+				&& ( ( $edited_Item && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) ) || ( empty( $edited_Item ) && $params['temp_ID'] ) )
+				&& $current_User->check_perm( 'files', 'view', false ) )
+			{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
+				load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+				global $LinkOwner; // Initialize this object as global because this is used in many link functions
+				$LinkOwner = new LinkItem( $edited_Item, $temp_ID );
+			}
+			break;
+
+		case 'Comment':
+			if( ! isset( $params['target_ID'] ) )
+			{
+				return;
+			}
+
+			$CommentCache = & get_CommentCache();
+			$edited_Comment = & $CommentCache->get_by_ID( $params['target_ID'] );
+			$comment_Item = & $edited_Comment->get_Item();
+
+			if( empty( $blog ) && $comment_Item )
+			{
+				$Blog = $comment_Item->get_Blog();
+				$blog = $Blog->ID;
+			}
+
+			if( isset( $GLOBALS['files_Module'] )
+				&& $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment )
+				&& $current_User->check_perm( 'files', 'view', false ) )
+			{	// Files module is enabled, but in case of creating new comments we should show file attachments block only if user has all required permissions to attach files
+				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+				global $LinkOwner; // Initialize this object as global because this is used in many link functions
+				$LinkOwner = new LinkComment( $edited_Comment );
+			}
+			break;
+
+		case 'EmailCampaign':
+			if( ! isset( $params['target_ID'] ) )
+			{
+				return;
+			}
+
+			$EmailCampaignCache = & get_EmailCampaignCache();
+			$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $params['target_ID'] );
+
+			if( isset( $GLOBALS['files_Module'] )
+				&& $current_User->check_perm( 'emails', 'edit', true )
+				&& $current_User->check_perm( 'files', 'view', false ) )
+			{	// Files module is enabled, but in case of creating new email campaign  we should show file attachments block only if user has all required permissions to attach files
+				load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
+				global $LinkOwner; // Initialize this object as global because this is used in many link functions
+				$LinkOwner = new LinkEmailCampaign( $edited_EmailCampaign );
+			}
+			break;
+
+		case 'Message':
+			if( ! isset( $params['target_ID'] ) && ! isset( $params['temp_ID'] ) )
+			{
+				return;
+			}
+
+			$MessageCache = & get_MessageCache();
+			$edited_Message = $MessageCache->get_by_ID( $params['target_ID'], false, false );
+
+			if( isset( $GLOBALS['files_Module'] )
+				&& $current_User->check_perm( 'perm_messaging', 'reply' )
+				&& $current_User->check_perm( 'files', 'view', false ) )
+			{	// Files module is enabled, but in case of creating new messages we should show file attachments block only if user has all required permissions to attach files
+				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+				global $LinkOwner; // Initialize this object as global because this is used in many link functions
+				$LinkOwner = new LinkMessage( $edited_Message, $temp_ID );
+			}
+			break;
+
+		default:
+			return;
+	}
+
+	// Set a different dragand drop button ID
+	global $dragdropbutton_ID, $fm_mode, $link_list_tbody_ID;
+	$fm_mode = 'file_select';
+	$dragdropbutton_ID = 'file-uploader-modal';
+	$link_list_tbody_ID = 'linklist_tbody_modal';
+
+	if( is_admin_page() )
+	{
+		global $UserSettings, $adminskins_path, $AdminUI;
+
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
+		$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+	}
+	else
+	{
+		global $Skin, $inc_path;
+
+		init_fontawesome_icons();
+
+		$blog_skin_ID = $Blog->get_skin_ID();
+		$SkinCache = & get_SkinCache();
+		$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+
+		require $inc_path.'links/views/_link_list.view.php';
+	}
 }
 ?>

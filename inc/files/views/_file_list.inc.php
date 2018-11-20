@@ -668,8 +668,6 @@ $Form->begin_form();
 					'display_support_msg'  => false,
 					'additional_dropzone'  => '[ document.getElementById( "filelist_tbody" ) ]',
 					'filename_before'      => $icon_to_link_files,
-					'select_file_template' => $icon_to_select_files,
-					'select_file_type'     => $file_type,
 					'noresults'            => $noresults,
 				) );
 			?>

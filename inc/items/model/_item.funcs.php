@@ -246,10 +246,11 @@ function init_inskin_editing()
  *                 "1,2,3":blog IDs separated by comma
  *                 "-": current blog only and exclude the aggregated blogs
  * @param boolean FALSE if FeaturedList cursor should move, TRUE otherwise
- * @param boolean Load featured post together with requested post types like intro but order the featured post below intro posts
+ * @param boolean Load featured post together with requested post types like intro but order the featured post below intro posts, NULL - to don't load featured post even when no intro post
+ * @param boolean Load intro items
  * @return Item
  */
-function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $preview = false, $load_featured = false )
+function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $preview = false, $load_featured = false, $load_intro = true )
 {
 	global $Collection, $Blog, $cat;
 	global $disp, $disp_detail, $MainList, $FeaturedList, $featured_list_type;
@@ -261,7 +262,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 		return $Item;
 	}
 
-	if( $featured_list_type != $load_featured )
+	if( $featured_list_type !== $load_featured )
 	{	// Reset a featured list if previous request was to load another type:
 		$FeaturedList = NULL;
 	}
@@ -289,58 +290,61 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 
 		// FIRST: Try to find an Intro post:
 
-		if( ! $MainList->is_filtered() )
-		{	// This is not a filtered page, so we are on the home page.
-			if( $restrict_disp == 'front' )
-			{	// Special Front page:
-				// Use Intro-Front posts
-				$restrict_to_types_usage = 'intro-front';
+		if( $load_intro )
+		{
+			if( ! $MainList->is_filtered() )
+			{	// This is not a filtered page, so we are on the home page.
+				if( $restrict_disp == 'front' )
+				{	// Special Front page:
+					// Use Intro-Front posts
+					$restrict_to_types_usage = 'intro-front';
+				}
+				else
+				{	// Default front page displaying posts:
+					// The competing intro-* types are: 'main' and 'all':
+					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+					$restrict_to_types_usage = 'intro-main,intro-all';
+				}
 			}
 			else
-			{	// Default front page displaying posts:
-				// The competing intro-* types are: 'main' and 'all':
-				// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-				$restrict_to_types_usage = 'intro-main,intro-all';
+			{	// We are on a filtered... it means a category page or sth like this...
+				// echo $disp_detail;
+				switch( $disp_detail )
+				{
+					case 'posts-cat':
+					case 'posts-topcat':
+					case 'posts-subcat':
+						// The competing intro-* types are: 'cat' and 'all':
+						// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+						$restrict_to_types_usage = 'intro-cat,intro-all';
+						break;
+
+					case 'posts-tag':
+						// The competing intro-* types are: 'tag' and 'all':
+						// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+						$restrict_to_types_usage = 'intro-tag,intro-all';
+						break;
+
+					default:
+						// The competing intro-* types are: 'sub' and 'all':
+						// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
+						$restrict_to_types_usage = 'intro-sub,intro-all';
+				}
 			}
+
+			$FeaturedList->set_filters( array(
+					'coll_IDs' => $coll_IDs,
+					'itemtype_usage' => $restrict_to_types_usage.( $load_featured ? ',*featured*' : '' ),
+				), false /* Do NOT memorize!! */ );
+			// pre_dump( $FeaturedList->filters );
+			// Run the query:
+			$FeaturedList->query();
 		}
-		else
-		{	// We are on a filtered... it means a category page or sth like this...
-			// echo $disp_detail;
-			switch( $disp_detail )
-			{
-				case 'posts-cat':
-				case 'posts-topcat':
-				case 'posts-subcat':
-					// The competing intro-* types are: 'cat' and 'all':
-					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-					$restrict_to_types_usage = 'intro-cat,intro-all';
-					break;
-
-				case 'posts-tag':
-					// The competing intro-* types are: 'tag' and 'all':
-					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-					$restrict_to_types_usage = 'intro-tag,intro-all';
-					break;
-
-				default:
-					// The competing intro-* types are: 'sub' and 'all':
-					// fplanque> IMPORTANT> nobody changes this without consulting the manual and talking to me first!
-					$restrict_to_types_usage = 'intro-sub,intro-all';
-			}
-		}
-
-		$FeaturedList->set_filters( array(
-				'coll_IDs' => $coll_IDs,
-				'itemtype_usage' => $restrict_to_types_usage.( $load_featured ? ',*featured*' : '' ),
-			), false /* Do NOT memorize!! */ );
-		// pre_dump( $FeaturedList->filters );
-		// Run the query:
-		$FeaturedList->query();
 
 
 		// SECOND: If no Intro, try to find an Featured post:
 
-		if( ! $load_featured && // Don't try to load featured posts twice,
+		if( $load_featured === false && // Don't try to load featured posts twice,
 		    $FeaturedList->result_num_rows == 0 && // If no intro post has been load above,
 		    $restrict_disp != 'front' && // Exclude front page,
 		    $Blog->get_setting( 'disp_featured_above_list' ) ) // If the collection setting "Featured post above list" is enabled.
@@ -1096,7 +1100,7 @@ function recreate_autogenerated_excerpts( $continue_url, $remove_all = true, $de
  */
 function cat_select( $Form, $form_fields = true, $show_title_links = true, $params = array() )
 {
-	global $blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
+	global $blog, $Blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
 	global $admin_url, $rsc_url;
 
 	if( get_post_cat_setting( $blog ) < 1 )
@@ -1183,21 +1187,38 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 			// Load all child categories:
 			$ChapterCache->reveal_children( $l_Blog->ID, true );
 
-			$r .= '<tbody data-toggle="collapse" style="cursor: pointer;" data-target="#cat_sel_'.$l_Blog->ID.'" data-parent="#cat_sel_group">';
-			$r .= '<tr class="group'.( $blog == $l_Blog->ID ? ' catselect_blog__current' : '' ).'" id="catselect_blog'.$l_Blog->ID.'">';
-			$r .= '<td colspan="4">'.$l_Blog->dget('name')."</td></tr>\n";
-			$r .= '</tbody>';
-			$r .= '<tbody class="accordion_panel '.( $blog == $l_Blog->ID ? 'collapse in' : 'collapse' ).'" id="cat_sel_'.$l_Blog->ID.'">';
-
+			$s = '';
 			$current_blog_ID = $l_Blog->ID;	// Global needed in callbacks
 			foreach( $ChapterCache->subset_root_cats[$current_blog_ID] as $root_Chapter )
 			{
-				$r .= cat_select_display( $root_Chapter, $callbacks, $cat_display_params );
+				$s .= cat_select_display( $root_Chapter, $callbacks, $cat_display_params );
 			}
 			if( $blog == $current_blog_ID )
 			{
-				$r .= cat_select_new( $cat_display_params );
+				$s .= cat_select_new( $cat_display_params );
 			}
+
+			// This is a REALLY SIMPLE test to see if a category under this collection is checked.
+			// This may need to be replaced with a more reliable solution.
+			if( strpos( $s, 'checked="checked"' ) === false )
+			{
+				$fold_value = 1;
+			}
+			else
+			{
+				$fold_value = 0;
+			}
+
+			$r .= '<tbody class="fieldset_wrapper" style="cursor: pointer;">';
+			$r .= '<tr class="group'.( $blog == $l_Blog->ID ? ' catselect_blog__current' : '' ).'" id="catselect_blog'.$l_Blog->ID.'">';
+			$r .= '<td colspan="'.( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) ? 4 : 3 ).'">';
+			$r .= get_fieldset_folding_icon( $l_Blog->get('urlname'), array( 'fold_value' => $fold_value ) );
+			$r .= '<span id="title_folding_'.$l_Blog->get('urlname').'">'.$l_Blog->dget('name').'</span>';
+			$r .= "</td></tr>\n";
+			$r .= '</tbody>';
+			$r .= '<tbody id="cat_sel_'.$l_Blog->ID.'">';
+
+			$r .= $s;
 
 			$r .= '</tbody>';
 		}
@@ -1221,16 +1242,15 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 
 	$Form->end_fieldset();
 
-	if( isset($blog) && get_allow_cross_posting() )
+	if( isset( $blog ) && get_allow_cross_posting() )
 	{
-		echo '<script type="text/javascript">jQuery.getScript("'.get_require_url( '#scrollto#' ).'", function () {
-			jQuery("[id$=itemform_categories]").scrollTo( "#catselect_blog'.$blog.'" );
-			var $catSelTable = jQuery("table#cat_sel_group");
-			var $accordionPanels = $catSelTable.find("tbody.accordion_panel");
-			$accordionPanels.on("show.bs.collapse", function() {
-				$catSelTable.find("tbody.collapse.in").collapse("hide");
-			});
-		});</script>';
+		?>
+		<script type="text/javascript">
+		jQuery.getScript( '<?php echo get_require_url( '#scrollto#' );?>', function() {
+				jQuery( "[id=itemform_categories]" ).scrollTo( "#catselect_blog<?php echo $blog;?>" );
+			} );
+		</script>
+		<?php
 	}
 }
 
@@ -1241,6 +1261,8 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
  */
 function cat_select_header( $params = array() )
 {
+	global $Blog;
+
 	$params = array_merge( array(
 			'category_name'        => T_('Category'),
 			'category_main_text'   => T_('Main'),
@@ -1260,9 +1282,11 @@ function cat_select_header( $params = array() )
 	// Category name:
 	$r .= '<th class="catsel_name">'.$params['category_name'].'</th>';
 
-	// Item order per category:
-	$r .= '<th class="catsel_order col-narrow" title="'.format_to_output( $params['category_order_title'], 'htmlattr' ).'">'.format_to_output( $params['category_order_text'] ).'</th>'
-		.'</tr></thead>';
+	if( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) )
+	{	// Item order per category:
+		$r .= '<th class="catsel_order col-narrow" title="'.format_to_output( $params['category_order_title'], 'htmlattr' ).'">'.format_to_output( $params['category_order_text'] ).'</th>'
+			.'</tr></thead>';
+	}
 
 	return $r;
 }
@@ -1366,11 +1390,13 @@ function cat_select_before_first( $parent_cat_ID, $level )
  */
 function cat_select_before_each( $cat_ID, $level, $total_count )
 { // callback to display sublist element
-	global $current_blog_ID, $blog, $post_extracats, $edited_Item, $current_User;
+	global $current_blog_ID, $blog, $Blog, $post_extracats, $edited_Item, $current_User;
 	global $creating, $cat_select_level, $cat_select_form_fields;
 
 	$ChapterCache = & get_ChapterCache();
 	$thisChapter = $ChapterCache->get_by_ID($cat_ID);
+
+	$Blog = $thisChapter->get_blog();
 
 	if( $thisChapter->lock && !$current_User->check_perm( 'blog_cats', '', false, $current_blog_ID ) )
 	{	// This chapter is locked and current user has no permission to edit the categories of this blog
@@ -1383,6 +1409,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	if( get_post_cat_setting($blog) != 2 )
 	{ // if no "Multiple categories per post" option is set display radio
 		if( !$thisChapter->meta
+			&& ! ( ! is_admin_page() && ( $thisChapter->get_ItemType() === false ) && $edited_Item->ID === 0 )
 			&& ( ( $current_blog_ID == $blog ) || ( get_allow_cross_posting( $blog ) >= 2 ) ) )
 		{ // This is current blog or we allow moving posts accross blogs
 			if( $cat_select_form_fields )
@@ -1411,6 +1438,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	if( get_post_cat_setting( $blog ) >= 2 )
 	{ // We allow multiple categories or main + extra cat,  display checkbox:
 		if( !$thisChapter->meta
+			&& ! ( ! is_admin_page() && ( $thisChapter->get_ItemType() === false ) && $edited_Item->ID === 0 )
 			&& ( ($current_blog_ID == $blog) || ( get_allow_cross_posting( $blog ) % 2 == 1 )
 				|| ( ( get_allow_cross_posting( $blog ) == 2 ) && ( get_post_cat_setting( $blog ) == 2 ) ) ) )
 		{ // This is the current blog or we allow cross posting (select extra cat from another blog)
@@ -1462,7 +1490,10 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 				.'&nbsp;&raquo;&nbsp;' // TODO: dh> provide an icon instead? // fp> maybe the A(dmin)/B(log) icon from the toolbar? And also use it for permalinks to posts?
 				.'</a></td>';
 
-	$r .= '<td class="catsel_order"><input type="text" name="post_cat_orders['.$cat_ID.']" class="form_text_input form-control" value="'.$edited_Item->get_order( $cat_ID ).'" title="'.format_to_output( T_('can be decimal'), 'htmlattr' ).'" /></td>';
+	if( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) )
+	{	// Display item order per category only on back-office or when it is enabled for front-office:
+		$r .= '<td class="catsel_order"><input type="text" name="post_cat_orders['.$cat_ID.']" class="form_text_input form-control" value="'.$edited_Item->get_order( $cat_ID ).'" title="'.format_to_output( T_('can be decimal'), 'htmlattr' ).'" /></td>';
+	}
 
 	$r .= '</tr>'."\n";
 
@@ -1493,7 +1524,7 @@ function cat_select_after_last( $parent_cat_ID, $level )
  */
 function cat_select_new( & $cat_display_params )
 {
-	global $blog, $current_User;
+	global $blog, $Blog, $current_User;
 
 	if( ! $current_User->check_perm( 'blog_cats', '', false, $blog ) )
 	{	// Current user cannot add/edit a categories for this blog
@@ -1547,10 +1578,12 @@ function cat_select_new( & $cat_display_params )
 				.'<input maxlength="255" style="width:100%" value="'.format_to_output( $category_name, 'htmlattr' ).'" size="20" type="text" name="category_name" id="new_category_name" class="form_text_input form-control" />'
 				.'</td>';
 
-	// INPUT TEXT for otem order in new category:
-	$r .= '<td class="catsel_order">'
+	if( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) )
+	{	// INPUT TEXT for item order in new category:
+		$r .= '<td class="catsel_order">'
 				.'<input type="text" name="post_cat_orders[0]" value="'.format_to_output( $category_order, 'htmlattr' ).'" name="category_order" class="form_text_input form-control" title="'.format_to_output( T_('can be decimal'), 'htmlattr' ).'" />'
 				.'</td>';
+	}
 
 	$r .= '</tr>';
 
@@ -1850,8 +1883,9 @@ function get_item_type_field_linkto_options( $field_type )
 			break;
 		case 'url':
 			$options = array(
-				'fieldurl' => T_('This field URL'),
-				'nolink'   => T_('No Link'),
+				'fieldurl'      => T_('This field URL'),
+				'fieldurlblank' => T_('This field URL with target=_blank'),
+				'nolink'        => T_('No Link'),
 			);
 			break;
 		case 'double':
@@ -2092,31 +2126,61 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
  *
  * @param object Form
  * @param object edited Item
+ * @param string Action: NULL - to get action from global var
  */
-function echo_item_status_buttons( $Form, $edited_Item )
+function echo_item_status_buttons( $Form, $edited_Item, $button_action = NULL )
 {
 	global $next_action, $action, $Collection, $Blog;
 
+	if( $edited_Item !== NULL )
+	{	// If the edited Item is defined, e-g on edit form:
+		$item_status = $edited_Item->status;
+	}
+	else
+	{	// If item is not defined, e-g on action for several items from list:
+		$item_status = get_highest_publish_status( 'post', $Blog->ID, false );
+	}
+
+	$next_action = ( $button_action === NULL ? ( is_create_action( $action ) ? 'create' : 'update' ) : $button_action );
+
 	// Get those statuses which are not allowed for the current User to create posts in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status, '', $edited_Item ), array( 'trash' ) );
-	// Get allowed visibility statuses
-	$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
+	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $item_status, '', $edited_Item ), array( 'trash' ) );
+	// Get allowed visibility statuses:
+	if( $next_action == 'items_visibility' )
+	{
+		$status_options = get_visibility_statuses( '', $exclude_statuses );
+		foreach( $status_options as $status_key => $status_title )
+		{
+			$status_options[ $status_key ] = sprintf( T_('Set visibility to %s'), $status_title );
+		}
+		$tooltip_placement = 'bottom';
+	}
+	else // 'create' or 'update'
+	{
+		$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
+		$status_options = array_map( 'T_', $status_options );
+		$tooltip_placement = 'left';
+	}
+
+	if( empty( $status_options ) )
+	{	// If current User has no permission to edit to any status:
+		return;
+	}
+
 	$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 
-	$next_action = ( is_create_action( $action ) ? 'create' : 'update' );
-
-	$Form->hidden( 'post_status', $edited_Item->status );
-	echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
-	echo '<button type="submit" class="btn btn-status-'.$edited_Item->status.'" name="actionArray['.$next_action.']">'
-				.'<span>'.T_( $status_options[ $edited_Item->status ] ).'</span>'
+	$Form->hidden( 'post_status', $item_status );
+	echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="'.$tooltip_placement.'" data-container="body" title="'.get_status_tooltip_title( $item_status ).'">';
+	echo '<button type="submit" class="btn btn-status-'.$item_status.'" name="actionArray['.$next_action.']">'
+				.'<span>'.$status_options[ $item_status ].'</span>'
 			.'</button>'
-			.'<button type="button" class="btn btn-status-'.$edited_Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
+			.'<button type="button" class="btn btn-status-'.$item_status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
 				.'<span class="caret"></span>'
 			.'</button>';
 	echo '<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
 	foreach( $status_options as $status_key => $status_title )
 	{
-		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.T_( $status_title ).'</span></a></li>';
+		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
 	}
 	echo '</ul>';
 	echo '</div>';
@@ -2342,6 +2406,12 @@ function echo_item_merge_js()
 <script type="text/javascript">
 function evo_merge_load_window( item_ID )
 {
+	if( typeof( bozo ) && bozo.nb_changes > 0 )
+	{	// Don't allow to merge if item edit form is changed and not saved yet:
+		alert( '<?php echo TS_('You must save the Item before you can merge it.'); ?>' );
+		return false;
+	}
+
 	openModalWindow( '<div id="evo_merge_wrapper"></div>', 'auto', '', true,
 		'<?php echo TS_('Select destination Post...'); ?>', // Window title
 		[ '-', 'evo_merge_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back", "Merge with original dates",  "Append to this post with new dates"
@@ -4122,8 +4192,8 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 		{	// Display a not of the custon field if it is filled:
 			$custom_field_note .= $custom_field['note'];
 		}
-		if( $custom_field['type'] != 'separator' )
-		{	// Display a field name/code:
+		if( is_admin_page() && $custom_field['type'] != 'separator' )
+		{	// Display a field name/code only in back-office:
 			$custom_field_note .= empty( $custom_field_note ) ? '' : ' &middot; ';
 			$custom_field_note .= T_('Field name').': <code>'.$custom_field['name'].'</code>';
 		}
@@ -4158,6 +4228,14 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 
 		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
 		$custom_field_label = render_custom_field( $custom_field['label'] );
+		if( ! empty( $custom_field['description'] ) )
+		{	// Display a description in tooltip of the help icon:
+			$custom_field_label .= ' '.get_icon( 'help', 'imgtag', array(
+					'data-toggle' => 'tooltip',
+					'title'       => nl2br( $custom_field['description'] ),
+					'class'       => 'grey',
+				) ).' ';
+		}
 
 		switch( $custom_field['type'] )
 		{
@@ -4363,6 +4441,12 @@ function get_session_Item( $item_ID = 0, $force_new = false )
 		// Prefill data from url:
 		$edited_Item->set( 'title', param( 'post_title', 'string' ) );
 		$edited_Item->set( 'urltitle', param( 'post_urltitle', 'string' ) );
+		// Try to get this from request if it has been not initialized by controller:
+		$item_typ_ID = param( 'item_typ_ID', 'integer', NULL );
+		if( ! empty( $item_typ_ID ) )
+		{	// Set new post type ID only if it is defined on request:
+			$edited_Item->set( 'ityp_ID', $item_typ_ID );
+		}
 
 		return $edited_Item;
 	}
@@ -4499,6 +4583,78 @@ function item_priority_color( $priority )
 
 
 /**
+ * Prints out Javascript to open image insert modal
+ */
+function echo_image_insert_modal()
+{
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+?>
+<script type="text/javascript">
+	function evo_item_image_insert( blog, tagType, linkID )
+	{
+		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
+		var evo_js_lang_insert_image = '<?php echo T_('Insert image into post');?>';
+		var evo_js_lang_modal_action = '<?php echo TS_('Insert');?>';
+		evo_js_lang_close = '<?php echo TS_('Cancel');?>';
+
+		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '"></span>',
+			'800px', '480px', true, evo_js_lang_insert_image, evo_js_lang_modal_action, true );
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url(); ?>anon_async.php',
+			data:
+			{
+				'action': 'get_insert_image_form',
+				'tag_type': tagType,
+				'link_ID': linkID,
+				'blog': blog,
+				'request_from': '<?php echo format_to_js( is_admin_page() ? 'back' : 'front' );?>',
+			},
+			success: function(result)
+			{
+				result = ajax_debug_clear( result );
+				openModalWindow( result, '90%', '80%', true, evo_js_lang_insert_image, evo_js_lang_modal_action );
+			}
+		} );
+		return false;
+	}
+
+	function evo_item_image_edit( blog, shortTag )
+	{
+		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
+		var evo_js_lang_edit_image = '<?php echo T_('Edit image');?>';
+		var evo_js_lang_modal_action = '<?php echo TS_('Update');?>';
+		evo_js_lang_close = '<?php echo TS_('Cancel');?>';
+
+		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '"></span>',
+			'800px', '480px', true, evo_js_lang_edit_image, evo_js_lang_modal_action, true );
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url(); ?>anon_async.php',
+			data:
+			{
+				'action': 'get_edit_image_form',
+				'short_tag': shortTag,
+				'blog': blog,
+				'request_from': '<?php echo format_to_js( is_admin_page() ? 'back' : 'front' );?>',
+			},
+			success: function(result)
+			{
+				result = ajax_debug_clear( result );
+				openModalWindow( result, '90%', '80%', true, evo_js_lang_edit_image, evo_js_lang_modal_action );
+			}
+		} );
+		return false;
+	}
+</script>
+<?php
+}
+
+
+/**
  * Display the manual pages results table
  *
  * @param array Params
@@ -4608,6 +4764,10 @@ function items_manual_results_block( $params = array() )
 						);
 	$Table->cols[] = array(
 							'th' => T_('URL "slug"'),
+						);
+	$Table->cols[] = array(
+							'th' => T_('Status'),
+							'th_class' => 'shrinkwrap',
 						);
 	$Table->cols[] = array(
 							'th' => T_('Order'),
@@ -5250,6 +5410,41 @@ function callback_filter_item_list_table( & $Form )
 
 
 /**
+ * Get item types options for <select> which are enabled for collection
+ *
+ * @param integer Collection ID
+ * @param integer ID of Item Type which should be loaded in additional to enabled collection Item Types
+ * @param string Prefix before each key, e.g. used in order to keep original order in jeditable selector
+ * @param boolean TRUE to include option "No default type", Note: default category of the collection cannot use this option.
+ * @return array
+ */
+function collection_item_type_titles( $coll_ID, $item_type_ID = NULL, $key_prefix = '', $include_no_default_type = true )
+{
+	global $DB;
+
+	$SQL = new SQL( 'Get Item Type options for category' );
+	$SQL->SELECT( 'CONCAT( "'.$key_prefix.'", ityp_ID ), ityp_name' );
+	$SQL->FROM( 'T_items__type' );
+	$SQL->FROM_add( 'LEFT JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID' );
+	$SQL->WHERE( 'itc_coll_ID = '.$DB->quote( $coll_ID ) );
+	if( $item_type_ID > 0 )
+	{	// Load also current item type of this collection even if the Item Type already is not enabled for collection:
+		$SQL->WHERE_or( 'ityp_ID = '.$DB->quote( $item_type_ID ) );
+	}
+	$SQL->ORDER_BY( 'ityp_name' );
+
+	$item_type_options = array();
+	$item_type_options[$key_prefix.''] = T_('Same as collection default');
+	if( $include_no_default_type )
+	{	// Include this option only when it is requested:
+		$item_type_options[$key_prefix.'0'] = T_('No default type');
+	}
+
+	return $item_type_options + $DB->get_assoc( $SQL );
+}
+
+
+/**
  * Helper functions to display Items results.
  * New ( not display helper ) functions must be created above item_results function
  */
@@ -5362,9 +5557,10 @@ function item_row_type( $Item )
  *
  * @param object Item
  * @param integer Index of the row on page
+ * @param integer|NULL Category ID
  * @return string
  */
-function item_row_status( $Item, $index )
+function item_row_status( $Item, $index, $cat_ID = NULL )
 {
 	global $current_User, $AdminUI, $Collection, $admin_url;
 
@@ -5389,7 +5585,7 @@ function item_row_status( $Item, $index )
 		foreach( $status_options as $status_key => $status_title )
 		{
 			$r .= '<li rel="'.$status_key.'" role="presentation"><a href="'
-					.$admin_url.'?ctrl=items'.$tab_param.'&amp;blog='.$blog_ID.'&amp;action=update_status&amp;post_ID='.$Item->ID.'&amp;status='.$status_key.'&amp;'.url_crumb( 'item' )
+					.$admin_url.'?ctrl=items'.$tab_param.'&amp;blog='.$blog_ID.'&amp;action=update_status&amp;post_ID='.$Item->ID.'&amp;status='.$status_key.( $cat_ID === NULL ? '' : '&amp;cat_ID='.$cat_ID ).'&amp;'.url_crumb( 'item' )
 					.'" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
 		}
 		$r .= '</ul>'
@@ -5580,6 +5776,9 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 	// URL "slug"
 	$r .= '<td><a href="'.htmlspecialchars($Chapter->get_permanent_url()).'">'.$Chapter->dget('urlname').'</a></td>';
 
+	// Status:
+	$r .= '<td>&nbsp;</td>';
+
 	// Order
 	$order_attrs = '';// ' style="padding-left:'.( ( $level * 10 ) + 5 ).'px"';
 	$order_value = T_('Alphabetic');
@@ -5609,7 +5808,8 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 		if( $perm_create_item )
 		{ // Create new item
 			$redirect_to = '&amp;redirect_to='.urlencode( $admin_url.'?ctrl=items&tab=manual&cat_ID='.$Chapter->ID );
-			$r .= action_icon( T_('New manual page...'), 'new', $admin_url.'?ctrl=items&action=new&blog='.$Chapter->blog_ID.'&amp;cat='.$Chapter->ID.$redirect_to, NULL, NULL, NULL, array(), array( 'style' => 'width:12px' ) );
+			$default_item_type_param = ( $Chapter->get( 'ityp_ID' ) > 0 ? '&amp;item_typ_ID='.$Chapter->get( 'ityp_ID' ) : '' );
+			$r .= action_icon( T_('New manual page...'), 'new', $admin_url.'?ctrl=items&action=new&blog='.$Chapter->blog_ID.'&amp;cat='.$Chapter->ID.$default_item_type_param.$redirect_to, NULL, NULL, NULL, array(), array( 'style' => 'width:12px' ) );
 		}
 		if( $perm_edit )
 		{ // Delete chapter
@@ -5642,6 +5842,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	global $Session;
 
 	$result_fadeout = $Session->get( 'fadeout_array' );
+	$highlight_id = $Session->get( 'highlight_id' );
 
 	$params = array_merge( array(
 			'title_before' => '',
@@ -5659,7 +5860,8 @@ function manual_display_post_row( $Item, $level, $params = array() )
 
 	// Check if current item's row should be highlighted:
 	$is_highlighted = ( param( 'highlight_id', 'integer', NULL ) == $Item->ID ) ||
-		( isset( $result_fadeout ) && in_array( 'item-'.$Item->ID, $result_fadeout ) );
+		( isset( $result_fadeout ) && in_array( 'item-'.$Item->ID, $result_fadeout ) ) ||
+		( $highlight_id == $Item->ID );
 
 	$r = '<tr id="item-'.$Item->ID.'" class="'.$line_class.( $is_highlighted ? ' evo_highlight' : '' ).'">';
 
@@ -5702,6 +5904,9 @@ function manual_display_post_row( $Item, $level, $params = array() )
 		$r .= ' '.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
 	}
 	$r .= '</td>';
+
+	// Status:
+	$r .= '<td>'.item_row_status( $Item, 0, $params['chapter_ID'] ).'</td>';
 
 	// Order
 	$order_attrs = '';// ' style="padding-left:'.( ( $level * 10 ) + 5 ).'px"';

@@ -48,6 +48,32 @@ skin_widget( array(
 		'suffix_text'      => empty( $single_cat_ID ) ? T_('Latest topics') : '',
 	) );
 
+
+// Go Grab the featured post:
+if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = & get_featured_Item( 'posts', NULL, false, NULL ) )
+{	// We have a intro post to display:
+	$intro_item_style = '';
+	$LinkOwner = new LinkItem( $Item );
+	$LinkList = $LinkOwner->get_attachment_LinkList( 1, 'cover' );
+	if( ! empty( $LinkList ) &&
+			$Link = & $LinkList->get_next() &&
+			$File = & $Link->get_File() &&
+			$File->exists() &&
+			$File->is_image() )
+	{	// Use cover image of intro-post as background:
+		$intro_item_style = 'background-image: url("'.$File->get_url().'")';
+	}
+	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
+	skin_include( '_item_block_intro.inc.php', array(
+			'content_mode'  => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
+			'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+			'item_class'    => 'well evo_intro_post'.( empty( $intro_item_style ) ? '' : ' evo_hasbgimg' ),
+			'item_style'    => $intro_item_style,
+			'Item'          => $Item,
+		) );
+	// ----------------------------END ITEM BLOCK  ----------------------------
+}
+
 if( $single_cat_ID )
 {	// Display sub-chapters:
 
@@ -198,7 +224,7 @@ if( isset( $MainList ) &&
 
 if( $single_cat_ID )
 {	// Go to grab the intro/featured posts only on pages with defined category:
-	while( $Item = & get_featured_Item( 'posts', NULL, false, true ) )
+	while( $Item = & get_featured_Item( 'posts', NULL, false, true, false ) )
 	{	// We have the intro or featured posts to display:
 		// ---------------------- ITEM LIST INCLUDED HERE ------------------------
 		skin_include( '_item_list.inc.php', array(

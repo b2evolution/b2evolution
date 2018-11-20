@@ -22,7 +22,7 @@ function autm_display_breadcrumb()
 {
 	global $admin_url, $edited_Automation, $edited_AutomationStep;
 
-	echo '<nav aria-label="breadcrumb"><ol class="breadcrumb" style="margin-left:0">';
+	echo '<nav aria-label="breadcrumb"><ol class="breadcrumb">';
 	echo '<li class="breadcrumb-item'.( isset( $edited_Automation ) || isset( $edited_AutomationStep ) ? '' : ' active' ).'">'
 			.( isset( $edited_Automation ) || isset( $edited_AutomationStep ) ? '<a href="'.$admin_url.'?ctrl=automations">'.T_('All').'</a>' : T_('All') )
 		.'</li>';

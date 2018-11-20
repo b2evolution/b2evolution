@@ -407,13 +407,14 @@ class ComponentWidget extends DataObject
 
 
 	/**
- 	 * Get param value.
- 	 *
- 	 * @param string
- 	 * @param boolean default false, set to true only if it is called from a widget::get_param_definition() function to avoid infinite loop
- 	 * @return mixed
+	 * Get param value.
+	 *
+	 * @param string Parameter name
+	 * @param mixed Default value, Set to different than NULL only if it is called from a widget::get_param_definition() function to avoid infinite loop
+	 * @param string|NULL Group name
+	 * @return mixed
 	 */
-	function get_param( $parname, $check_infinite_loop = false, $group = NULL )
+	function get_param( $parname, $default_value = NULL, $group = NULL )
 	{
 		$this->load_param_array();
 
@@ -445,9 +446,14 @@ class ComponentWidget extends DataObject
 			return $this->param_array[ $parname ];
 		}
 
-		// Try default values:
-		// Note we set 'infinite_loop' param to avoid calling the get_param() from the get_param_definitions() function recursively
-		$params = $this->get_param_definitions( $check_infinite_loop ? array( 'infinite_loop' => true ) : NULL );
+		if( $default_value !== NULL )
+		{	// Use defined default value when it is not saved in DB yet:
+			// (This call is used to get a value from function widget::get_param_definition() to avoid infinite loop)
+			return $default_value;
+		}
+
+		// Try default values from widget config:
+		$params = $this->get_param_definitions( NULL );
 
 		if( $group === NULL )
 		{	// Get param from simple field:
@@ -1297,6 +1303,17 @@ class ComponentWidget extends DataObject
 		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog, 'Widget' => $this ), 'Display' );
 
 		return $content;
+	}
+
+
+	/**
+	 * Get JavaScript code which helps to edit widget form
+	 *
+	 * @return string
+	 */
+	function get_edit_form_javascript()
+	{
+		return false;
 	}
 }
 ?>

@@ -351,7 +351,7 @@ class Filelist
 				}
 				else
 				{ // Filter is NOT a regexp:
-					if( ! fnmatch( $this->_filter, $name ) )
+					if( ! fnmatch( '*'.trim( $this->_filter, '*' ).'*', $name ) )
 					{
 						continue;
 					}

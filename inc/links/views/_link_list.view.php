@@ -24,7 +24,21 @@ global $Collection, $Blog;
  */
 global $LinkOwner;
 
-global $AdminUI, $Skin, $current_User;
+global $AdminUI, $current_User;
+
+if( ! isset( $Skin ) )
+{
+	global $Skin;
+}
+global $link_list_tbody_ID;
+
+if( ! isset( $link_list_tbody_ID ) )
+{
+	$link_list_tbody_ID = 'linklist_tbody';
+}
+
+// Override $dragdropbutton_ID to enable multiple drag and buton
+global $dragdropbutton_ID, $fm_mode;
 
 if( empty( $Blog ) )
 {
@@ -40,7 +54,6 @@ $SQL = $LinkOwner->get_SQL();
 $Results = new Results( $SQL->get(), '', '', 1000 );
 
 $Results->title = T_('Attachments');
-
 
 function link_add_iframe( $link_destination )
 {
@@ -73,17 +86,29 @@ function display_subtype( $link_ID )
 
 	return $Link->get_preview_thumb();
 }
+
 $Results->cols[] = array(
 						'th' => T_('Icon/Type'),
 						'td_class' => 'shrinkwrap',
 						'td' => '%link_add_iframe( display_subtype( #link_ID# ) )%',
 					);
 
-$Results->cols[] = array(
-						'th' => T_('Destination'),
-						'td' => '%link_add_iframe( link_destination() )%',
-						'td_class' => 'fm_filename',
-					);
+if( $fm_mode == 'file_select' )
+{
+	$Results->cols[] = array(
+							'th' => T_('Destination'),
+							'td' => '%select_link_button( #link_ID# ).\' \'.link_add_iframe( link_destination() )%',
+							'td_class' => 'fm_filename',
+						);
+}
+else
+{
+	$Results->cols[] = array(
+							'th' => T_('Destination'),
+							'td' => '%link_add_iframe( link_destination() )%',
+							'td_class' => 'fm_filename',
+						);
+}
 
 function display_link_info( $link )
 {
@@ -109,13 +134,14 @@ $Results->cols[] = array(
 					'th' => T_('Position'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'nowrap '.( count( $LinkOwner->get_positions() ) > 1 ? 'left' : 'center' ),
-					'td' => '%display_link_position( {row} )%',
+					'td' => '%display_link_position( {row}, '.( $fm_mode == 'file_select' ? 'false' : 'true' ).' )%',
 				);
 
 // Add attr "id" to handle quick uploader
+$tbody_start = '<tbody id="'.$link_list_tbody_ID.'"'.( $fm_mode == 'file_select' ? ' data-file-select="true"' : '' ).' class="filelist_tbody"';
 $compact_results_params = is_admin_page() ? $AdminUI->get_template( 'compact_results' ) : $Skin->get_template( 'compact_results' );
-$compact_results_params['body_start'] = str_replace( '<tbody', '<tbody id="filelist_tbody"', $compact_results_params['body_start'] );
-$compact_results_params['no_results_start'] = str_replace( '<tbody', '<tbody id="filelist_tbody"', $compact_results_params['no_results_start'] );
+$compact_results_params['body_start'] = str_replace( '<tbody', $tbody_start, $compact_results_params['body_start'] );
+$compact_results_params['no_results_start'] = str_replace( '<tbody', $tbody_start, $compact_results_params['no_results_start'] );
 
 $Results->display( $compact_results_params );
 
@@ -163,13 +189,16 @@ switch( $link_owner_type )
 		break;
 }
 
+$link_owner_positions = $LinkOwner->get_positions();
+
 // Display a button to quick upload the files by drag&drop method
 display_dragdrop_upload_button( array(
+		'button_ID' => isset( $dragdropbutton_ID ) ? $dragdropbutton_ID : 'file-uploader',
 		'before' => '<div id="fileuploader_form">',
 		'after'  => '</div>',
 		'fileroot_ID'      => $upload_fileroot,
 		'path'             => $upload_path,
-		'listElement'      => 'jQuery( "#filelist_tbody" ).get(0)',
+		'listElement'      => 'jQuery( "#'.$link_list_tbody_ID.'" ).get(0)',
 		'list_style'       => 'table',
 		'template'         => '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
 				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'
@@ -196,13 +225,13 @@ display_dragdrop_upload_button( array(
 							.'<td class="qq-upload-link-actions shrinkwrap">'
 								.'<div class="qq-upload-status-text-selector qq-upload-status-text">'
 									.'<span class="qq-upload-size-selector"></span>'
-									.( count( $LinkOwner->get_positions() ) > 1 ? '' : ' <a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a>' )
+									.' <a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a>'
 								.'</div>'
 							.'</td>'
-							.( count( $LinkOwner->get_positions() ) > 1 ? '<td class="qq-upload-link-position lastcol shrinkwrap"><a class="qq-upload-cancel-selector qq-upload-cancel" href="#">'.TS_('Cancel').'</a></td>' : '' )
+							.'<td class="qq-upload-link-position lastcol shrinkwrap"></td>'
 						.'</tr>',
 		'display_support_msg'    => false,
-		'additional_dropzone'    => '[ document.getElementById( "filelist_tbody" ) ]',
+		'additional_dropzone'    => 'jQuery( "#'.$link_list_tbody_ID.'" )',
 		'filename_before'        => '',
 		'LinkOwner'              => $LinkOwner,
 		'display_status_success' => false,
@@ -210,5 +239,6 @@ display_dragdrop_upload_button( array(
 		'conflict_file_format'   => 'full_path_link',
 		'resize_frame'           => true,
 		'table_headers'          => $table_headers,
+		'fm_mode'                => $fm_mode,
 	) );
 ?>

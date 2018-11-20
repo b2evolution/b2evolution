@@ -184,8 +184,9 @@ function skin_init( $disp )
 								|| $Blog->get_setting( 'relcanonical_item_urls' ) ) )
 			{	// We want to redirect to the Item's canonical URL:
 				$canonical_is_same_url = true;
+				$item_Blog = & $Item->get_Blog();
 				// Use item URL from first detected category of the current collection:
-				if( $Settings->get( 'cross_post_nav_in_same_coll' ) )
+				if( $item_Blog->get_setting( 'allow_crosspost_urls' ) )
 				{	// If non-canonical URL is allowed for cross-posted items,
 					// try to get a canonical URL in thecurrent collection even it is not main/canonical collection of the Item:
 					$canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID );
@@ -206,8 +207,8 @@ function skin_init( $disp )
 					$item_chapters = $Item->get_Chapters();
 					foreach( $item_chapters as $item_Chapter )
 					{	// Try to find in what category the Item may has the same canonical url as current requested URL:
-						if( ! $Settings->get( 'cross_post_nav_in_same_coll' ) &&
-						    $Item->get_blog_ID() != $item_Chapter->get( 'blog_ID' ) )
+						if( ! $item_Blog->get_setting( 'allow_crosspost_urls' ) &&
+						    $item_Blog->ID != $item_Chapter->get( 'blog_ID' ) )
 						{	// Don't allow to use URL of categories from cross-posted collection if it is restricted:
 							continue;
 						}
@@ -1338,6 +1339,12 @@ function skin_init( $disp )
 			{	// Use default category instead of the wrong requested:
 				set_param( 'cat', $Blog->get_default_cat_ID() );
 			}
+
+			if( $Chapter && $Chapter->get_ItemType() === false )
+			{	// Don't allow to post in category without default Item Type:
+				$Messages->add( T_('You cannot post here'), 'error' );
+				header_redirect( $Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
+			}
 			break;
 
 		case 'edit':
@@ -1383,6 +1390,16 @@ function skin_init( $disp )
 				}
 				$Messages->add( $error_message, 'error' );
 				header_redirect( $Blog->gen_blogurl(), 302 );
+			}
+
+			$cat = param( 'cat', 'integer' );
+			if( $cat > 0 &&
+			    ( $ChapterCache = & get_ChapterCache() ) &&
+			    ( $selected_Chapter = & $ChapterCache->get_by_ID( $cat, false, false ) ) &&
+			    ( $selected_Chapter->get_ItemType() === false ) )
+			{	// Don't allow to post in category without default Item Type:
+				$Messages->add( T_('You cannot post here'), 'error' );
+				header_redirect( $selected_Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
 			}
 
 			// Prepare the 'In-skin editing':
@@ -1451,6 +1468,13 @@ function skin_init( $disp )
 
 			// Restrict comment status by parent item:
 			$edited_Comment->restrict_status();
+
+			// require Fine Uploader js and css:
+			require_js( 'multiupload/fine-uploader.js' );
+			require_css( 'fine-uploader.css' );
+			// Load JS files to make the links table sortable:
+			require_js( '#jquery#' );
+			require_js( 'jquery/jquery.sortable.min.js' );
 			break;
 
 		case 'useritems':
@@ -1458,7 +1482,13 @@ function skin_init( $disp )
 			global $display_params, $viewed_User;
 
 			// get user_ID because we want it in redirect_to in case we need to ask for login.
-			$user_ID = param( 'user_ID', 'integer', true, true );
+			$user_ID = param( 'user_ID', 'integer', NULL, true );
+
+			if( $user_ID === NULL && is_logged_in() )
+			{	// Use current logged in User if it is not specified in param:
+				$user_ID = $current_User->ID;
+			}
+
 			if( empty( $user_ID ) )
 			{
 				bad_request_die( sprintf( T_('Parameter &laquo;%s&raquo; is required!'), 'user_ID' ) );
@@ -2832,6 +2862,9 @@ function skin_body_attrs( $params = array() )
 
 	// Logged in/Anonymous class:
 	$classes[] = is_logged_in() ? 'loggedin' : 'anonymous';
+
+	// Toolbar visibility class:
+	$classes[] = show_toolbar() ? 'evo_toolbar_visible' : 'evo_toolbar_hidden';
 
 	// User Group class:
 	$classes[] = 'usergroup_'.( ! is_logged_in() && empty( $current_User->grp_ID ) ? 'none' : $current_User->grp_ID );

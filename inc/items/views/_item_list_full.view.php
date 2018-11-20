@@ -114,6 +114,20 @@ $ItemList->display_init( $display_params );
 // Display navigation:
 $ItemList->display_nav( 'header' );
 
+$allow_items_list_form = ( $action != 'view' && $ItemList->total_rows > 0 && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $blog ) );
+if( $allow_items_list_form )
+{	// Allow to select item for action only on items list if current user can edit at least one item status:
+	global $admin_url;
+
+	$Form = new Form( $admin_url );
+
+	$Form->begin_form();
+	$Form->hidden( 'ctrl', 'items' );
+	$Form->hidden( 'blog', $blog );
+	$Form->hidden( 'page', $ItemList->page );
+	$Form->add_crumb( 'items' );
+}
+
 /*
  * Display posts:
  */
@@ -173,6 +187,11 @@ while( $Item = & $ItemList->get_item() )
 				echo $Item->get( 'locale' ).' ';
 				$Item->locale_flag( array(' class' => 'flagtop' ) );
 				echo '</div>';
+
+				if( $action != 'view' && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+				{	// Display checkbox to select item for action only on items list:
+					echo '<input type="checkbox" name="selected_items[]" value="'.$Item->ID.'" /> ';
+				}
 
 				$Item->issue_date( array(
 						'before'      => '<span class="bDate">',
@@ -853,6 +872,16 @@ if( $action == 'view' )
 
 	// Handle show_comments radioboxes
 	echo_show_comments_changed( $comment_type );
+}
+elseif( $allow_items_list_form )
+{	// Allow to select item for action only on items list if current user can edit at least one item status:
+	echo T_('With checked posts').': ';
+
+	// Display a button to change visibility of selected comments:
+	echo_item_status_buttons( $Form, NULL, 'items_visibility' );
+	echo_status_dropdown_button_js( 'post' );
+
+	$Form->end_form();
 }
 
 // Display navigation:

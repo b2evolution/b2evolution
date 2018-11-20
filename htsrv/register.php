@@ -144,7 +144,6 @@ switch( $action )
 				$user_tags = param( 'usertags', 'string', NULL );
 				$auto_subscribe_posts = param( 'subscribe_post', 'integer', true );
 				$auto_subscribe_comments = param( 'subscribe_comment', 'integer', true );
-				$auto_subscribe_posts_mod = param( 'subscribe_post_mod', 'integer', true );
 				$newsletters = param( 'newsletters', 'string', true );
 				$newsletters = explode( ',', $newsletters );
 				$widget_newsletters = array();
@@ -183,7 +182,6 @@ switch( $action )
 			$registration_require_lastname = ( $user_register_quick_Widget->disp_params['ask_lastname'] == 'required' );
 			$auto_subscribe_posts = $user_register_quick_Widget->disp_params['subscribe_post'];
 			$auto_subscribe_comments = $user_register_quick_Widget->disp_params['subscribe_comment'];
-			$auto_subscribe_posts_mod = $user_register_quick_Widget->disp_params['subscribe_post_mod'];
 			$widget_newsletters = $user_register_quick_Widget->disp_params['newsletters'];
 			$user_tags = $user_register_quick_Widget->disp_params['usertags'];
 			$widget_redirect_to = trim( $user_register_quick_Widget->disp_params['redirect_to'] );
@@ -487,10 +485,10 @@ switch( $action )
 		$UserSettings->dbupdate();
 
 		// Auto subscribe new user to current collection posts/comments:
-		if( ! empty( $subscribe_coll_ID ) && ( ! empty( $auto_subscribe_posts ) || ! empty( $auto_subscribe_comments ) || ! empty( $auto_subscribe_posts_mod ) ) )
+		if( ! empty( $subscribe_coll_ID ) && ( ! empty( $auto_subscribe_posts ) || ! empty( $auto_subscribe_comments ) ) )
 		{ // If at least one option is enabled
 			$DB->query( 'REPLACE INTO T_subscriptions ( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
-					VALUES ( '.$DB->quote( $subscribe_coll_ID ).', '.$DB->quote( $new_User->ID ).', '.$DB->quote( intval( $auto_subscribe_posts ) ).', '.$DB->quote( intval( $auto_subscribe_posts_mod ) ).', '.$DB->quote( intval( $auto_subscribe_comments ) ).' )' );
+					VALUES ( '.$DB->quote( $subscribe_coll_ID ).', '.$DB->quote( $new_User->ID ).', '.$DB->quote( intval( $auto_subscribe_posts ) ).', 0, '.$DB->quote( intval( $auto_subscribe_comments ) ).' )' );
 		}
 
 		// Get user domain status:

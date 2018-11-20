@@ -49,7 +49,7 @@ foreach( $source_custom_fields as $source_custom_field )
 		'<b>'.$source_custom_field['label'].'</b> '.
 		'<code>'.$source_custom_field['name'].'</code> '.
 		'('.$custom_field_type_titles[ $source_custom_field['type'] ].')'.
-		'<input type="hidden" name="custom_field_data"'.get_field_attribs_as_string( $source_custom_field_data ).' />',
+		'<input type="hidden" name="cf_data"'.get_field_attribs_as_string( $source_custom_field_data ).' />',
 		! in_array( $source_custom_field['name'], $custom_fields ), // check automatically only fields which is not added on the requested form yet
 		false,
 		( $source_custom_field['public'] ? T_('Public') : T_('Private') ) );
@@ -58,7 +58,8 @@ foreach( $source_custom_fields as $source_custom_field )
 $Form->checklist( $custom_field_options, '', T_('Select fields'), false, false, array(
 		'input_prefix' =>
 			'<input type="button" class="btn btn-default btn-xs" value="'.T_('Check all').'" onclick="jQuery( this ).closest( \'form\' ).find( \'input[type=checkbox]\' ).prop( \'checked\', true )" /> '.
-			'<input type="button" class="btn btn-default btn-xs" value="'.T_('Uncheck all').'" onclick="jQuery( this ).closest( \'form\' ).find( \'input[type=checkbox]\' ).prop( \'checked\', false )" />'
+			'<input type="button" class="btn btn-default btn-xs" value="'.T_('Uncheck all').'" onclick="jQuery( this ).closest( \'form\' ).find( \'input[type=checkbox]\' ).prop( \'checked\', false )" /> '.
+			'<input type="button" class="btn btn-default btn-xs" value="'.T_('Reverse').'" onclick="jQuery( this ).closest( \'form\' ).find( \'input[type=checkbox]\' ).each( function() { jQuery( this ).prop( \'checked\', ! jQuery( this ).prop( \'checked\' ) ) } );"  />'
 ) );
 
 $Form->end_form( array( array( 'submit', 'actionArray[select_custom_fields]', T_('Add fields now!'), 'SaveButton' ) ) );
