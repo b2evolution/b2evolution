@@ -1,6 +1,5 @@
 /**
  * This file is used to open modal window to edit contact groups of the user
- * (Used only in front-office)
  */
 
 

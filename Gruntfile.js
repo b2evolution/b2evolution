@@ -242,38 +242,54 @@ module.exports = function(grunt) {
 			// JS files that are used on front-office standard skins:
 			evo_frontoffice: {
 				options: {
-					banner: '/* This includes 10 files: src/evo_modal_window.js, src/evo_highlight.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, src/evo_links.js, ajax.js */\n'
+					banner: '/* This includes 3 files: src/evo_images.js, src/evo_rest_api.js, ajax.js */\n'
+				},
+				nonull: true, // Display missing files
+				src: ['rsc/js/src/evo_images.js',
+							'rsc/js/src/evo_rest_api.js',
+							'rsc/js/ajax.js'],
+				dest: 'rsc/js/build/evo_frontoffice.bmin.js'
+			},
+			// JS files that are used on front-office standard skins only for loggen in users:
+			evo_frontoffice_loggedin: {
+				options: {
+					banner: '/* This includes 7 files: src/evo_modal_window.js, src/evo_highlight.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_item_flag.js, src/evo_links.js */\n'
 				},
 				nonull: true, // Display missing files
 				src: ['rsc/js/src/evo_modal_window.js',
 							'rsc/js/src/evo_highlight.js',
-							'rsc/js/src/evo_images.js',
 							'rsc/js/src/evo_user_crop.js',
 							'rsc/js/src/evo_user_report.js',
 							'rsc/js/src/evo_user_contact_groups.js',
-							'rsc/js/src/evo_rest_api.js',
 							'rsc/js/src/evo_item_flag.js',
-							'rsc/js/src/evo_links.js',
-							'rsc/js/ajax.js'],
-				dest: 'rsc/js/build/evo_frontoffice.bmin.js'
+							'rsc/js/src/evo_links.js'],
+				dest: 'rsc/js/build/evo_frontoffice_loggedin.bmin.js'
 			},
 			// JS files that are used on front-office bootstrap skins:
 			evo_frontoffice_bootstrap: {
 				options: {
-					banner: '/* This includes 10 files: src/bootstrap-evo_modal_window.js, src/evo_highlight.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, src/evo_links.js, ajax.js */\n'
+					banner: '/* This includes 3 files: src/evo_images.js, src/evo_rest_api.js, ajax.js */\n'
+				},
+				nonull: true, // Display missing files
+				src: ['rsc/js/src/evo_images.js',
+							'rsc/js/src/evo_rest_api.js',
+							'rsc/js/ajax.js'],
+				dest: 'rsc/js/build/bootstrap-evo_frontoffice.bmin.js'
+			},
+			// JS files that are used on front-office bootstrap skins only for loggen in users:
+			evo_frontoffice_bootstrap_loggedin: {
+				options: {
+					banner: '/* This includes 7 files: src/bootstrap-evo_modal_window.js, src/evo_highlight.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_item_flag.js, src/evo_links.js */\n'
 				},
 				nonull: true, // Display missing files
 				src: ['rsc/js/src/bootstrap-evo_modal_window.js',
 							'rsc/js/src/evo_highlight.js',
-							'rsc/js/src/evo_images.js',
 							'rsc/js/src/evo_user_crop.js',
 							'rsc/js/src/evo_user_report.js',
 							'rsc/js/src/evo_user_contact_groups.js',
-							'rsc/js/src/evo_rest_api.js',
 							'rsc/js/src/evo_item_flag.js',
-							'rsc/js/src/evo_links.js',
-							'rsc/js/ajax.js'],
-				dest: 'rsc/js/build/bootstrap-evo_frontoffice.bmin.js'
+							'rsc/js/src/evo_links.js'],
+				dest: 'rsc/js/build/bootstrap-evo_frontoffice_loggedin.bmin.js'
 			},
 			// JS files that are used on back-office standard skins:
 			evo_backoffice: {

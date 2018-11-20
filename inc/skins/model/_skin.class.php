@@ -1390,10 +1390,18 @@ var downloadInterval = setInterval( function()
 		if( $this->get_api_version() == 6 )
 		{ // Bootstrap skin
 			require_js( 'build/bootstrap-evo_frontoffice.bmin.js', 'blog' );
+			if( is_logged_in() )
+			{
+				require_js( 'build/bootstrap-evo_frontoffice_loggedin.bmin.js', 'blog' );
+			}
 		}
 		else
 		{ // Standard skin
 			require_js( 'build/evo_frontoffice.bmin.js', 'blog' );
+			if( is_logged_in() )
+			{
+				require_js( 'build/evo_frontoffice_loggedin.bmin.js', 'blog' );
+			}
 		}
 	}
 
