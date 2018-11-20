@@ -34,7 +34,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = '6.10.3';
+	var $version = '6.10.4';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
