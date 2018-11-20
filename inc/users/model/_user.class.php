@@ -346,7 +346,6 @@ class User extends DataObject
 				array( 'table'=>'T_links', 'fk'=>'link_usr_ID', 'msg'=>T_('%d links to this user'),
 						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "user"', 'msg'=>T_('%d files from this user file root'), 'style' => 'bold' ),
-				array( 'table' => 'T_files', 'fk'=>'file_creator_user_ID', 'and_condition'=>'file_root_type != "user"', 'msg'=>T_('%d files will lose their creator ID.') ),
 				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_user_ID', 'msg'=>T_('%d list emails for this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_target_user_ID', 'msg'=>T_('%d reports about this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_reporter_ID', 'msg'=>T_('%d reports created by this user') ),
@@ -368,24 +367,37 @@ class User extends DataObject
 	 *
 	 * @param boolean Is this user spammer
 	 */
-	function init_relations( $is_spammer = false )
+	function init_relations( $params = array() )
 	{
 		if( ! is_null( $this->delete_cascades ) || ! is_null( $this->delete_restrictions ) )
 		{ // Initialize the relations only once
 			return;
 		}
 
+		$params = array_merge( array(
+				'delete_messages' => false,
+				'delete_comments' => false,
+				'delete_files'    => false,
+			), $params );
+
 		parent::init_relations();
 
-		if( $is_spammer )
-		{
+		if( $params['delete_messages'] )
+		{	// Delete messages:
 			$this->delete_cascades[] = array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('%d messages from this user'),
 					'class'=>'Message', 'class_path'=>'messaging/model/_message.class.php', 'style' => 'bold' );
 			$this->delete_cascades[] = array( 'table'=>'T_messaging__threadstatus', 'fk'=>'tsta_user_ID', 'msg'=>T_('%d message read statuses from this user') );
+		}
+		if( $params['delete_comments'] )
+		{	// Delete comments:
 			$this->delete_cascades[] = array( 'table'=>'T_comments', 'fk'=>'comment_author_user_ID', 'msg'=>T_('%d comments by this user'),
 					'class'=>'Comment', 'class_path'=>'comments/model/_comment.class.php', 'style' => 'bold' );
+		}
+		if( $params['delete_files'] )
+		{	// Delete files and links:
 			$this->delete_cascades[] = array( 'table'=>'T_links', 'fk'=>'link_creator_user_ID', 'msg'=>T_('%d links created by this user'),
 					'class'=>'Link', 'class_path'=>'links/model/_link.class.php' );
+			$this->delete_cascades[] = array( 'table'=>'T_files', 'fk'=>'file_creator_user_ID', 'and_condition'=>'file_root_type != "user"', 'msg'=>T_('%d files will lose their creator ID.') );
 		}
 	}
 
@@ -4343,14 +4355,21 @@ class User extends DataObject
 
 		$deltype = param( 'deltype', 'string', '' ); // spammer
 
+		// Check to delete additional data if we are deleting user as spammer or it is checked on the submitted form:
+		$delete_messages = ( $deltype == 'spammer' || param( 'force_delete_messages', 'integer', 0 ) );
+		$delete_comments = ( $deltype == 'spammer' || param( 'force_delete_comments', 'integer', 0 ) );
+		$delete_files    = ( $deltype == 'spammer' || param( 'force_delete_files', 'integer', 0 ) );
+
 		$DB->begin();
 
-		if( $deltype == 'spammer' )
-		{ // If we delete user as spammer we should delete private messaged of this user
-			$this->init_relations( true );
-		}
-		else
-		{ // If we delete user as not spammer we keep his comments as from anonymous user
+		$this->init_relations( array(
+				'delete_messages' => $delete_messages,
+				'delete_comments' => $delete_comments,
+				'delete_files'    => $delete_files,
+			) );
+
+		if( ! $delete_comments )
+		{	// Keep user's comments as from anonymous user,
 			// Transform registered user comments to unregistered:
 			$ret = $DB->query( 'UPDATE T_comments
 													SET comment_author_user_ID = NULL,
@@ -4364,11 +4383,14 @@ class User extends DataObject
 			}
 		}
 
-		if( $deltype != 'spammer' )
-		{
+		if( ! $delete_files )
+		{	// Keep user's files as from anonymous user:
 			$ret = $DB->query( 'UPDATE T_files
-			                    SET file_creator_user_ID = NULL
-								WHERE file_creator_user_ID = '.$this->ID. ' AND file_root_type != "user"' );
+				  SET file_creator_user_ID = NULL
+				WHERE file_creator_user_ID = '.$this->ID. ' AND file_root_type != "user"' );
+			$ret = $DB->query( 'UPDATE T_links
+				  SET link_creator_user_ID = NULL
+				WHERE link_creator_user_ID = '.$this->ID );
 			if( $Log instanceof log )
 			{
 				$Log->add( 'Setting user\'s uploaded files creator ID to NULL...'.sprintf( '(%d rows)', $ret ), 'note' );
