@@ -111,7 +111,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 					),
 					'unsubscribed_if_not_tagged' => array(
 						'type' => 'checkbox',
-						'note' => T_('Treat user has not subscribed if he is not tagged yet'),
+						'note' => T_('Treat user as not subscribed if he is not tagged yet'),
 						'defaultvalue' => false,
 					),
 					// Hidden, used by subscribe shorttag
