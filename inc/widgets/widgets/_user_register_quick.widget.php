@@ -110,7 +110,7 @@ class user_register_quick_Widget extends ComponentWidget
 					'label' => T_('Block title'),
 					'note' => T_('Title to display in your skin.'),
 					'size' => 40,
-					'defaultvalue' => T_('Get our list!'),
+					'defaultvalue' => T_('Get our newsletter!'),
 				),
 				'intro' => array(
 					'label' => T_('Intro text'),
@@ -154,13 +154,13 @@ class user_register_quick_Widget extends ComponentWidget
 					'maxlength' => 255,
 				),
 				'newsletters' => array(
-					'label' => T_('Lists'),
+					'label' => T_('Subscribe to lists'),
 					'type' => 'checklist',
 					'options' => $newsletters_options,
 					'note' => ''
 				),
 				'subscribe_post' => array(
-					'label' => T_('Auto subscribe'),
+					'label' => T_('Subscribe to collection'),
 					'note' => T_('check to auto subscribe new user to current collection posts'),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,

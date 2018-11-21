@@ -131,7 +131,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 						'label' => T_('Block title'),
 						'note' => T_('Title to display in your skin.'),
 						'size' => 40,
-						'defaultvalue' => T_('Get our list!'),
+						'defaultvalue' => T_('Get our newsletter!'),
 					),
 					'intro' => array(
 						'label' => T_('Intro text'),
@@ -168,7 +168,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 						'label' => T_('Block title'),
 						'note' => T_('Title to display in your skin.'),
 						'size' => 40,
-						'defaultvalue' => T_('Get our list!'),
+						'defaultvalue' => T_('Get our newsletter!'),
 					),
 					'intro_subscribed' => array(
 						'label' => T_('Intro text'),
