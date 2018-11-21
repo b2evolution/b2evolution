@@ -109,7 +109,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		{
 			$ajax_loggedin_params[ 'disabled' ] = 'disabled';
 		}
-		$Form->checkbox_input( 'ajax_form_enabled', $ajax_enabled, T_('Enable AJAX forms'), array( 'note'=>T_('Comment and contacts forms will be fetched by javascript') ) );
+		$Form->checkbox_input( 'ajax_form_enabled', $ajax_enabled, T_('Enable AJAX forms'), array( 'note'=>T_('Comment, Contact & Quick registration forms will be fetched by javascript') ) );
 		$Form->checkbox_input( 'ajax_form_loggedin_enabled', $edited_Blog->get_setting('ajax_form_loggedin_enabled'), '', $ajax_loggedin_params );
 		$Form->checkbox_input( 'cache_enabled', $edited_Blog->get_setting('cache_enabled'), get_icon( 'page_cache_on' ).' '.T_('Enable page cache'), array( 'note'=>T_('Cache rendered blog pages') ) );
 		$Form->checkbox_input( 'cache_enabled_widgets', $edited_Blog->get_setting('cache_enabled_widgets'), get_icon( 'block_cache_on' ).' '.T_('Enable widget/block cache'), array( 'note'=>T_('Cache rendered widgets') ) );

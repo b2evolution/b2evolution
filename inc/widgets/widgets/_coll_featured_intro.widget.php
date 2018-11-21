@@ -183,7 +183,7 @@ class coll_featured_intro_Widget extends ComponentWidget
 
 		// Go Grab the featured post:
 		if( $Item = & get_featured_Item( 'front', $this->disp_params['blog_ID'] ) )
-		{ // We have a featured/intro post to display:
+		{	// We have a featured/intro post to display:
 			$item_style = '';
 			$LinkOwner = new LinkItem( $Item );
 			$LinkList = $LinkOwner->get_attachment_LinkList( 1, 'cover' );

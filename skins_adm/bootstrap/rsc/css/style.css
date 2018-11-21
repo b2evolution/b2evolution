@@ -193,6 +193,10 @@ div.delete_messages ul {
 div.delete_messages ul li {
   list-style: inherit;
 }
+div.delete_messages ul label {
+  font-weight: normal;
+  margin: 0;
+}
 .evo_panel {
   margin-bottom: 20px;
 }

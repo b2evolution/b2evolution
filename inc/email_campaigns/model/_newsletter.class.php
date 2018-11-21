@@ -33,6 +33,10 @@ class Newsletter extends DataObject
 
 	var $order;
 
+	var $perm_subscribe = 'anyone';
+
+	var $perm_groups = '';
+
 	/**
 	 * @var array IDs of subscribed users
 	 */
@@ -55,6 +59,8 @@ class Newsletter extends DataObject
 			$this->label = $db_row->enlt_label;
 			$this->active = $db_row->enlt_active;
 			$this->order = $db_row->enlt_order;
+			$this->perm_subscribe = $db_row->enlt_perm_subscribe;
+			$this->perm_groups = $db_row->enlt_perm_groups;
 		}
 	}
 
@@ -111,6 +117,16 @@ class Newsletter extends DataObject
 		// Order:
 		param( 'enlt_order', 'integer', NULL );
 		$this->set_from_Request( 'order', 'enlt_order', true );
+
+		// Self-subscribing:
+		param( 'enlt_perm_subscribe', 'string', true );
+		$this->set_from_Request( 'perm_subscribe' );
+
+		if( $this->get( 'perm_subscribe' ) == 'group' )
+		{	// Allowed User Groups:
+			$perm_groups = param( 'enlt_perm_groups', 'array:integer' );
+			$this->set( 'perm_groups', implode( ',', $perm_groups ) );
+		}
 
 		return ! param_errors_detected();
 	}

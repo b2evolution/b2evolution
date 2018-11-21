@@ -10388,6 +10388,118 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12990 ) )
+	{	// part of 6.10.4-stable
+
+		/* ---- Install basic widgets for containers "Front Page Main Area": ---- START */
+		global $basic_widgets_insert_sql_rows;
+		$basic_widgets_insert_sql_rows = array();
+
+		/**
+		 * Add a widget to global array in order to insert it in DB by single SQL query later
+		 *
+		 * @param integer Blog ID
+		 * @param string Container name
+		 * @param string Type
+		 * @param string Code
+		 * @param integer Order
+		 * @param array|string|NULL Widget params
+		 * @param integer 1 - enabled, 0 - disabled
+		 */
+		function add_basic_widget_12990( $blog_ID, $container_name, $code, $type, $order, $params = NULL, $enabled = 1 )
+		{
+			global $basic_widgets_insert_sql_rows, $DB;
+
+			if( is_null( $params ) )
+			{ // NULL
+				$params = 'NULL';
+			}
+			elseif( is_array( $params ) )
+			{ // array
+				$params = $DB->quote( serialize( $params ) );
+			}
+			else
+			{ // string
+				$params = $DB->quote( $params );
+			}
+
+			$basic_widgets_insert_sql_rows[] = '( '
+				.$blog_ID.', '
+				.$DB->quote( $container_name ).', '
+				.$order.', '
+				.$enabled.', '
+				.$DB->quote( $type ).', '
+				.$DB->quote( $code ).', '
+				.$params.' )';
+		}
+
+		// Update coll_featured_intro widget:
+		task_begin( 'Updating coll_feature_intro widget settings...' );
+		$setting_SQL = new SQL();
+		$setting_SQL->SELECT( 'wi_ID, wi_coll_ID, wi_sco_name, wi_code, wi_params' );
+		$setting_SQL->FROM( 'T_widget' );
+		$setting_SQL->FROM_add( 'INNER JOIN T_blogs ON blog_ID = wi_coll_ID' );
+		$setting_SQL->WHERE( 'blog_type = "manual"' );
+		$setting_SQL->WHERE_and( 'wi_sco_name = "Front Page Main Area"' );
+		$setting_SQL->WHERE_and( 'wi_code = "coll_featured_intro"' );
+		foreach( $DB->get_results( $setting_SQL ) as $row )
+		{
+			$widget_params = empty( $row->wi_params ) ? array() : unserialize( $row->wi_params );
+			if( ! isset( $widget_params['item_class'] ) || ( isset( $widget_params['item_class'] ) && $widget_params['item_class'] == 'featurepost' ) )
+			{	// Replace the item_class property if it wasn't customized:
+				$widget_params['item_class'] = 'jumbotron evo_content_block';
+
+				$DB->query( 'UPDATE T_widget
+						SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+					WHERE wi_ID = '.$row->wi_ID );
+			}
+		}
+		task_end();
+
+		// Insert content_hierarchy widget:
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_coll_ID, MAX(wi_order)' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->FROM_add( 'INNER JOIN T_blogs ON blog_ID = wi_coll_ID' );
+		$SQL->WHERE( 'blog_type = "manual"' );
+		$SQL->WHERE_and( 'wi_sco_name = "Front Page Main Area"' );
+		$SQL->ORDER_BY( 'wi_coll_ID' );
+		$SQL->GROUP_BY( 'wi_coll_ID');
+
+		$collections = $DB->get_assoc( $SQL );
+		if( count( $collections ) > 0 )
+		{	// If at least one collection exists:
+			foreach( $collections as $coll_ID => $max_order )
+			{
+				task_begin( 'Installing default "Content Hierarchy" widget for collection #'.$coll_ID.'... ' );
+				add_basic_widget_12990( $coll_ID, 'Front Page Main Area', 'content_hierarchy', 'core', intval( $max_order ) + 10 );
+				task_end();
+			}
+		}
+
+		if( ! empty( $basic_widgets_insert_sql_rows ) )
+		{	// Insert the widget records by single SQL query:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
+		}
+		/* ---- Install basic widgets for containers "Front Page Main Area": ---- END */
+		upg_task_end( false );
+	}
+
+	if( upg_task_start( 12993, 'Upgrading email newsletters table...' ) )
+	{	// part of 6.10.4-stable
+		db_upgrade_cols( 'T_email__newsletter', array(
+			'ADD' => array(
+				'enlt_perm_subscribe' => 'ENUM( "admin", "anyone", "group" ) COLLATE ascii_general_ci NOT NULL DEFAULT "anyone"',
+				'enlt_perm_groups'    => 'VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL',
+			),
+		) );
+		$DB->query( 'UPDATE T_email__newsletter
+			  SET enlt_perm_subscribe = "admin"
+			WHERE enlt_active = 0' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 13000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '

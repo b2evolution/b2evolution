@@ -216,13 +216,48 @@ class user_register_quick_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Collection, $Blog, $Settings, $Session, $redirect_to, $dummy_fields;
+		global $Collection, $Blog;
 
 		if( is_logged_in() )
 		{	// No display when user is already registered
 			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because you are already registered.' );
 			return false;
 		}
+
+		$params['redirect_to'] = param( 'redirect_to', 'url', regenerate_url( '', '', '', '&' ) );
+
+		if( $Blog->get_ajax_form_enabled() )
+		{	// Load widget form through AJAX:
+			$widget_params = array(
+				'action' => 'get_widget_form',
+				'blog'   => $Blog->ID,
+				'params' => $params,
+			);
+			if( empty( $this->ID ) )
+			{	// Use code for calling widget from content with inline short tag like [emailcapture]:
+				$widget_params['wi_code'] = $this->get( 'code' );
+			}
+			else
+			{	// Use ID for calling widget from DB:
+				$widget_params['wi_ID'] = $this->ID;
+			}
+			display_ajax_form( $widget_params );
+		}
+		else
+		{	// Display widget form:
+			$this->display_form( $params );
+		}
+	}
+
+
+	/**
+	 * Display widget form
+	 *
+	 * @param array Params
+	 */
+	function display_form( $params )
+	{
+		global $Collection, $Blog, $Settings, $Session, $redirect_to, $dummy_fields;
 
 		if( $Settings->get( 'newusers_canregister' ) != 'yes' || ! $Settings->get( 'quick_registration' ) )
 		{ // Display error message when quick registration is disabled
@@ -255,8 +290,6 @@ class user_register_quick_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_start'];
 
-		$redirect_to = param( 'redirect_to', 'url', regenerate_url( '', '', '', '&' ) );
-
 		$this->disp_title();
 
 		echo $this->disp_params['block_body_start'];
@@ -275,7 +308,7 @@ class user_register_quick_Widget extends ComponentWidget
 		$Form->hidden( 'inskin', true );
 		$Form->hidden( 'blog', $Blog->ID );
 		$Form->hidden( 'widget', $this->ID );
-		$Form->hidden( 'redirect_to', $redirect_to );
+		$Form->hidden( 'redirect_to', $params['redirect_to'] );
 
 		if( $this->disp_params['inline'] == 1 )
 		{

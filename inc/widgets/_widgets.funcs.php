@@ -251,6 +251,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 			) : NULL ) ),
 		// Install widget "Poll" only for Blog B on install:
 		array( 40, 'poll', 'coll_ID' => $blog_b_ID, 'params' => array( 'poll_ID' => $demo_poll_ID ) ),
+		array( 45, 'content_hierarchy', 'coll_type' => 'manual' ),
 		array( 50, 'subcontainer_row', 'params' => array(
 				'column1_container' => 'front_page_column_a',
 				'column1_class'     => ( $kind == 'main' ? 'col-xs-12' : 'col-sm-6 col-xs-12' ),

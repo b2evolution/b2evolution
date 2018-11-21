@@ -61,7 +61,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			),
 			T_('Tools') => array(
 				'login'        => T_('Log in form').' (disp=login)',
-				'logout'       => T_('Logout link'),
+				'logout'       => T_('Logout'),
 				'register'     => T_('Registration form').' (disp=register)',
 				'myprofile'    => T_('View my profile').' (disp=user)',
 				'visits'       => T_('View my visits').' (disp=visits)',
@@ -72,7 +72,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			),
 			T_('Other') => array(
 				'postnew' => T_('Create new Item').' (disp=edit)',
-				'admin'   => T_('Go to Back-Office link'),
+				'admin'   => T_('Go to Back-Office'),
 				'url'     => T_('Go to any URL'),
 			),
 		);
@@ -118,7 +118,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			{
 				if( isset( $link_types[ $this->param_array['link_type'] ] ) )
 				{
-					return sprintf( T_( '%s link' ), $link_types[ $this->param_array['link_type'] ] );
+					return sprintf( T_('Link to: %s'), $link_types[ $this->param_array['link_type'] ] );
 				}
 			}
 		}

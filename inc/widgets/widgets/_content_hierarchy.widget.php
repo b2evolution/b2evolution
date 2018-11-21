@@ -130,6 +130,21 @@ class content_hierarchy_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
+		$params = array_merge( array(
+				'widget_content_hierarchy_params' => array(),
+			), $params );
+
+		$widget_params = array_merge( array(
+				'display_blog_title'   => isset( $this->disp_params['display_blog_title'] ) ? $this->disp_params['display_blog_title'] : true,
+				'open_children_levels' => isset( $this->disp_params['open_children_levels'] ) ? $this->disp_params['open_children_levels'] : 20,
+				'item_title_fields'    => isset( $this->disp_params['item_title_fields'] ) ? $this->disp_params['item_title_fields'] : 'title',
+				'custom_title'         => isset( $this->disp_params['custom_title'] ) ? $this->disp_params['custom_title'] : '',
+				'item_before_opened'   => isset( $this->disp_params['item_before_opened'] ) ? $this->disp_params['item_before_opened'] : '',
+				'item_before_closed'   => isset( $this->disp_params['item_before_closed'] ) ? $this->disp_params['item_before_closed'] : '',
+				'item_before_post'     => isset( $this->disp_params['item_before_post'] ) ? $this->disp_params['item_before_post'] : '',
+				'sorted'               => true,
+			), $params['widget_content_hierarchy_params'] );
+
 		echo $this->disp_params['block_start'];
 
 		if( ( $disp == 'single' || $disp == 'page' ) && ! empty( $Item ) )
@@ -137,12 +152,7 @@ class content_hierarchy_Widget extends ComponentWidget
 			$params['selected_item_ID'] = $Item->ID;
 		}
 
-		$this->display_hierarchy( array_merge( array(
-				'display_blog_title'   => $this->disp_params['display_blog_title'],
-				'open_children_levels' => $this->disp_params['open_children_levels'],
-				'item_title_fields'    => isset( $this->disp_params['item_title_fields'] ) ? $this->disp_params['item_title_fields'] : 'title',
-				'sorted' => true
-			), $params ) );
+		$this->display_hierarchy( $widget_params );
 
 		echo $this->disp_params['block_end'];
 
@@ -176,6 +186,7 @@ class content_hierarchy_Widget extends ComponentWidget
 				'class_selected'       => 'selected',
 				'class_post'           => 'post',
 				'display_blog_title'   => true,
+				'custom_title'         => '',
 				'open_children_levels' => 0,
 				'list_posts'           => true,
 				// Don't expand all categories by default for this widget, because it has a separate parameter 'open_children_levels':
@@ -217,10 +228,17 @@ class content_hierarchy_Widget extends ComponentWidget
 		echo $params['list_start'];
 
 		if( $params['display_blog_title'] )
-		{ // Display blog title
-			echo str_replace( '>', ' class="title '.$params['class_selected'].'">', $params['item_start'] );
-			echo '<a href="'.$this->Blog->get( 'url' ).'" class="link">'.$this->Blog->get( 'name' ).'</a>';
-			echo $params['item_end'];
+		{	// Display blog title
+			if( empty( $params['custom_title'] ) )
+			{
+				echo str_replace( '>', ' class="title '.$params['class_selected'].'">', $params['item_start'] );
+				echo '<a href="'.$this->Blog->get( 'url' ).'" class="link">'.$this->Blog->get( 'name' ).'</a>';
+				echo $params['item_end'];
+			}
+			else
+			{
+				echo $params['custom_title'];
+			}
 		}
 
 		$callbacks = array(
