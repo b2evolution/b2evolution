@@ -56,6 +56,30 @@ if( empty( $Blog ) )
 	// EXIT.
 }
 
+if( isset( $ReqURL ) )
+{	// Check protocol of the current URL:
+	if( $Blog->get_setting( 'http_protocol' ) == 'always_http' )
+	{	// Check current URL is really using HTTP protocol as it is specified with collection setting "SSL" = "Always use http":
+		if( strpos( $ReqURL, 'https://' ) === 0 )
+		{	// Redirect to URL with allowed protocol because current URL has a protocol HTTPS instead of expected HTTP:
+			$fixed_req_url = 'http'.substr( $ReqURL, 5 );
+			$Debuglog->add( 'Redirecting to HTTP URL ['.$fixed_req_url.'] because of collection setting "SSL".' );
+			header_redirect( $fixed_req_url, true ); // Redirect with permanent status 301
+			// EXITED.
+		}
+	}
+	elseif( $Blog->get_setting( 'http_protocol' ) == 'always_https' )
+	{	// Check current URL is really using HTTPS protocol as it is specified with collection setting "SSL" = "Always use https":
+		if( strpos( $ReqURL, 'http://' ) === 0 )
+		{	// Redirect to URL with allowed protocol because current URL has a protocol HTTP instead of expected HTTPS:
+			$fixed_req_url = 'https'.substr( $ReqURL, 4 );
+			$Debuglog->add( 'Redirecting to HTTPS URL ['.$fixed_req_url.'] because of collection setting "SSL".' );
+			header_redirect( $fixed_req_url, true ); // Redirect with permanent status 301
+			// EXITED.
+		}
+	}
+}
+
 // Set a selected collection in user settings in order to use a correct last viewed collection URL in back-office:
 set_working_blog( $blog );
 

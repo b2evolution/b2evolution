@@ -200,14 +200,12 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('List subscriptions').( is_admin_page() ? get_manual_link( 'user-lists-panel' ) : '' ) );
 
-	$NewsletterCache = & get_NewsletterCache();
-	$NewsletterCache->load_where( 'enlt_active = 1' );
-
-	if( count( $NewsletterCache->cache ) )
+	$allowed_newsletters = $edited_User->get_allowed_newsletters();
+	if( count( $allowed_newsletters ) )
 	{	// If at least one newsletter is active:
 		$user_newsletter_subscriptions = $edited_User->get_newsletter_subscriptions();
 		$newsletter_options = array();
-		foreach( $NewsletterCache->cache as $Newsletter )
+		foreach( $allowed_newsletters as $Newsletter )
 		{
 			$newsletter_options[] = array( 'edited_user_newsletters[]', $Newsletter->ID, $Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ), in_array( $Newsletter->ID, $user_newsletter_subscriptions ), $disabled );
 		}

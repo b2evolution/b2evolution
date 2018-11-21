@@ -347,13 +347,17 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_post_list', 'core', 25, array( 'title' => T_('More Posts'), 'featured' => 'other' ) );
 
 	if( $kind != 'main' )
-	{ // Don't install the "Recent Commnets" widget for Main blogs
+	{ // Don't install the "Recent Comments" widget for Main blogs
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_comment_list', 'core', 30 );
 	}
 
 	if( $blog_id == $blog_b_ID )
 	{	// Install widget "Poll" only for Blog B on install:
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'poll', 'core', 40, array( 'poll_ID' => 1 ) );
+	}
+	if( $kind == 'manual' )
+	{
+		add_basic_widget( $blog_id, 'Front Page Main Area', 'content_hierarchy', 'core', 45 );
 	}
 
 
@@ -374,7 +378,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	{
 		add_basic_widget( $blog_id, 'Forum Front Secondary Area', 'coll_activity_stats', 'core', 10 );
 	}
-	
+
 	/* Compare Main Area */
 	add_basic_widget( $blog_id, 'Compare Main Area', 'item_fields_compare', 'core', 10, array( 'items_source' => 'all' ) );
 

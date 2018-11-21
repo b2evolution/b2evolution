@@ -178,9 +178,8 @@ if( !$Messages->has_errors() )
 				break;
 			}
 
-			// Init cascade relations: If we delete user as spammer we also should remove the comments and the messages
+			// Check if the user is deleted as spammer:
 			$is_spammer = ( param( 'deltype', 'string', '', true ) == 'spammer' );
-			$edited_User->init_relations( $is_spammer );
 
 			$fullname = $edited_User->dget( 'fullname' );
 			if( param( 'confirm', 'integer', 0 ) )
@@ -247,6 +246,13 @@ if( !$Messages->has_errors() )
 				{
 					$msg = sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $edited_User->dget( 'login' ) );
 				}
+
+				// Init cascade relations: If we delete user as spammer we also should remove the comments, messages and files:
+				$edited_User->init_relations( array(
+					'delete_messages' => $is_spammer,
+					'delete_comments' => $is_spammer,
+					'delete_files'    => $is_spammer,
+				) );
 
 				if( ! $edited_User->check_delete( $msg, array(), true ) )
 				{ // There are restrictions:
@@ -649,12 +655,16 @@ switch( $action )
 			$confirm_messages[] = array( T_('Note: this will also delete private messages sent/received by this user.'), 'note' );
 			$confirm_messages[] = array( T_('Note: this will also delete comments made by this user.'), 'note' );
 			$confirm_messages[] = array( T_('Note: this will also delete files uploaded by this user.'), 'note' );
+			$confirm_messages[] = array( '<strong>'.sprintf( T_('Note: the email address %s will be banned from registering again.'), '<code>'.$edited_User->get( 'email' ).'</code>' ).'</strong>', 'note' );
 		}
 		else
 		{	// Display the notes for standard deleting:
-			$confirm_messages[] = array( T_('Note: this will <b>not</b> automatically delete private messages sent/received by this user. However, this will delete any new orphan private messages (which no longer have any existing sender or recipient).'), 'note' );
-			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete comments made by this user. Instead it will transform them from member to visitor comments.'), 'note' );
-			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete files uploaded by this user outside of the user root. Instead the creator ID of these files will be set to NULL.'), 'note' );
+			$confirm_messages[] = array( T_('Note: this will <b>not</b> automatically delete private messages sent/received by this user. However, this will delete any new orphan private messages (which no longer have any existing sender or recipient).')
+				.'<br /><label><input type="checkbox" name="force_delete_messages" value="1" /> '.T_('Force deleting all private messages sent/received by this user.').'</label>', 'note' );
+			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete comments made by this user. Instead it will transform them from member to visitor comments.')
+				.'<br /><label><input type="checkbox" name="force_delete_comments" value="1" /> '.T_('Force deleting all comments made by this user.').'</label>', 'note' );
+			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete files uploaded by this user outside of the user root. Instead the creator ID of these files will be set to NULL.')
+				.'<br /><label><input type="checkbox" name="force_delete_files" value="1" /> '.T_('Force deleting all files uploaded by this user.').'</label>', 'note' );
 		}
 
 		// Find other users with the same email address
