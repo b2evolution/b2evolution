@@ -17,26 +17,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Home page, display full categories list
 
-// Go Grab the featured post:
-$intro_Item = & get_featured_Item( 'front' ); // $intro_Item is used below for comments form
-$Item = $intro_Item;
-if( !empty( $Item ) )
-{ // We have a featured/intro post to display:
-	echo '<div class="evo_content_block">'; // Beginning of posts display
-	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-	skin_include( '_item_block.inc.php', array(
-			'feature_block'     => true,
-			'content_mode'      => 'auto',		// 'auto' will auto select depending on $disp-detail
-			'intro_mode'        => 'normal',	// Intro posts will be displayed in normal mode
-			'item_class'        => 'jumbotron evo_content_block evo_post',
-			'disp_comment_form' => false,
-			'item_link_type'    => 'none',
-			'Item'              => $Item,
-		) );
-	// ----------------------------END ITEM BLOCK  ----------------------------
-	echo '</div>'; // End of posts display
-}
-
 // ------------------------- "Front Page Main Area" CONTAINER EMBEDDED HERE --------------------------
 	// Display container and contents:
 	skin_container( NT_('Front Page Main Area'), array(
@@ -45,23 +25,18 @@ if( !empty( $Item ) )
 		'block_end'         => '</div>',
 		'block_title_start' => '<h2 class="page-header">',
 		'block_title_end'   => '</h2>',
+
+		// Template params for "Content Hierarchy" widget:
+		'widget_content_hierarchy_params' => array(
+				'open_children_levels' => 20,
+				'class_selected'       => '',
+				'custom_title'         => '<h2 class="table_contents">'.T_('Table of contents').'</h2>',
+				'item_before_opened'   => get_icon( 'collapse' ),
+				'item_before_closed'   => get_icon( 'expand' ),
+				'item_before_post'     => get_icon( 'file_message' ),
+			),
 	) );
 // ----------------------------- END OF "Front Page Main Area" CONTAINER -----------------------------
-
-// --------------------------------- START OF CONTENT HIERARCHY --------------------------------
-echo '<h2 class="table_contents">'.T_('Table of contents').'</h2>';
-skin_widget( array(
-		// CODE for the widget:
-		'widget' => 'content_hierarchy',
-		// Optional display params
-		'display_blog_title'   => false,
-		'open_children_levels' => 20,
-		'class_selected'       => '',
-		'item_before_opened'   => get_icon( 'collapse' ),
-		'item_before_closed'   => get_icon( 'expand' ),
-		'item_before_post'     => get_icon( 'file_message' ),
-	) );
-// ---------------------------------- END OF CONTENT HIERARCHY ---------------------------------
 
 if( ! empty( $intro_Item ) )
 {
