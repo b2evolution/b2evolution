@@ -10192,6 +10192,20 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end( false );
 	}
 
+	if( upg_task_start( 12993, 'Upgrading email newsletters table...' ) )
+	{	// part of 6.10.4-stable
+		db_upgrade_cols( 'T_email__newsletter', array(
+			'ADD' => array(
+				'enlt_perm_subscribe' => 'ENUM( "admin", "anyone", "group" ) COLLATE ascii_general_ci NOT NULL DEFAULT "anyone"',
+				'enlt_perm_groups'    => 'VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL',
+			),
+		) );
+		$DB->query( 'UPDATE T_email__newsletter
+			  SET enlt_perm_subscribe = "admin"
+			WHERE enlt_active = 0' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

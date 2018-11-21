@@ -522,11 +522,13 @@ $schema_queries = array(
 	'T_email__newsletter' => array(
 		'Creating email newsletters table',
 		"CREATE TABLE T_email__newsletter (
-			enlt_ID     INT UNSIGNED NOT NULL AUTO_INCREMENT,
-			enlt_name   VARCHAR(255) NOT NULL,
-			enlt_label  VARCHAR(255) NULL,
-			enlt_active TINYINT(1) UNSIGNED DEFAULT 1,
-			enlt_order  INT NULL DEFAULT NULL,
+			enlt_ID             INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			enlt_name           VARCHAR(255) NOT NULL,
+			enlt_label          VARCHAR(255) NULL,
+			enlt_active         TINYINT(1) UNSIGNED DEFAULT 1,
+			enlt_order          INT NULL DEFAULT NULL,
+			enlt_perm_subscribe ENUM( 'admin', 'anyone', 'group' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'anyone',
+			enlt_perm_groups    VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
 			PRIMARY KEY (enlt_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
