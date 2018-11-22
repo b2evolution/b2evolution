@@ -6257,9 +6257,13 @@ class User extends DataObject
 			return false;
 		}
 
-		if( $Settings->get( 'welcomepm_notag' ) && !empty( $this->get_usertags() ) )
-		{	// Don't send welcome PM if user account already has an user tag
-			return false;
+		if( $Settings->get( 'welcomepm_notag' ) )
+		{	// Don't send welcome PM if user account already has an user tag:
+			$user_tags = $this->get_usertags();
+			if( ! empty( $user_tags ) )
+			{
+				return false;
+			}
 		}
 
 		if( $UserSettings->get( 'welcome_message_sent', $this->ID ) )
