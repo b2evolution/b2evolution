@@ -6253,17 +6253,22 @@ class User extends DataObject
 		global $Settings, $UserSettings;
 
 		if( !$Settings->get( 'welcomepm_enabled' ) )
-		{ // Sending of welcome PM is disabled
+		{	// Sending of welcome PM is disabled
+			return false;
+		}
+
+		if( $Settings->get( 'welcomepm_notag' ) && !empty( $this->get_usertags() ) )
+		{	// Don't send welcome PM if user account already has an user tag
 			return false;
 		}
 
 		if( $UserSettings->get( 'welcome_message_sent', $this->ID ) )
-		{ // User already received the welcome message
+		{	// User already received the welcome message
 			return false;
 		}
 
 		if( !$this->accepts_pm() )
-		{ // user can't read private messages, or doesn't want to receive private messages
+		{	// user can't read private messages, or doesn't want to receive private messages
 			return false;
 		}
 
@@ -6271,7 +6276,7 @@ class User extends DataObject
 		$UserCache = & get_UserCache();
 		$User = $UserCache->get_by_login( $Settings->get( 'welcomepm_from' ) );
 		if( !$User )
-		{ // Don't send an welcome email if sender login is incorrect
+		{	// Don't send an welcome email if sender login is incorrect
 			return false;
 		}
 
@@ -6288,7 +6293,7 @@ class User extends DataObject
 		$edited_Message->creator_user_ID = $User->ID;
 		$edited_Message->set( 'text', $Settings->get( 'welcomepm_message' ) );
 		if( $edited_Message->dbinsert_individual( $User ) )
-		{ // The welcome message was sent/created successfully
+		{	// The welcome message was sent/created successfully
 			// Change user setting to TRUE in order to don't send it twice
 			$UserSettings->set( 'welcome_message_sent', 1, $this->ID );
 			$UserSettings->dbupdate();

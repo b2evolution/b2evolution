@@ -151,6 +151,7 @@ class GeneralSettings extends AbstractSettings
 
 		// Welcome private message
 		'welcomepm_enabled' => 0,
+		'welcomepm_notag'   => 0,
 		'welcomepm_from'    => 'admin',	// User login
 		'welcomepm_title'   => 'Welcome to our community!',
 		'welcomepm_message' => '',

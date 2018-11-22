@@ -327,7 +327,7 @@ if( $is_recipient )
 			echo '<div class="message_toolbars">';
 			// CALL PLUGINS NOW:
 			$message_toolbar_params = array( 'Message' => & $edited_Message );
-			if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+			if( isset( $LinkOwner ) && $LinkOwner->is_temp() )
 			{
 				$message_toolbar_params['temp_ID'] = $LinkOwner->get_ID();
 			}

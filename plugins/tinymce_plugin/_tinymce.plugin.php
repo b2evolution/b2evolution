@@ -469,7 +469,7 @@ class tinymce_plugin extends Plugin
 
 				$edited_Message = & $params['target_object'];
 				$this->target_type = 'Message';
-				$this->target_ID = empty( $edited_Message) ? NULL : $edited_Message->ID;
+				$this->target_ID = empty( $edited_Message ) ? NULL : $edited_Message->ID;
 				$this->temp_ID = $params['temp_ID'];
 
 				if( ! $Settings->get( 'allow_html_message' ) )
@@ -482,7 +482,7 @@ class tinymce_plugin extends Plugin
 
 				$state_params = array(
 						'type'    => $params['target_type'],
-						'message' => empty( $edited_Message) ? NULL : $edited_Message->ID,
+						'message' => empty( $edited_Message ) ? NULL : $edited_Message->ID,
 					);
 				break;
 
