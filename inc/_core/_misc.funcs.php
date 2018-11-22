@@ -4226,6 +4226,8 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
 
 	if( $User )
 	{	// Get data of registered User:
+		global $UserSettings;
+
 		if( $format == 'html' )
 		{
 			$username = $User->get_colored_login( array(
@@ -4254,6 +4256,8 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
 		$user_email = $User->email;
 		$user_ID = $User->ID;
 		$unsubscribe_key = '$secret_content_start$'.md5( $User->ID.$User->unsubscribe_key ).'$secret_content_end$';
+		$reminder_key = $UserSettings->get( 'last_activation_reminder_key', $user_ID );
+		$notifications_url = get_notifications_url( '&amp;', $user_ID );
 	}
 	else
 	{	// Get data of anonymous user:
@@ -4266,10 +4270,12 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
 		$user_email = $user_email;
 		$user_ID = '';
 		$unsubscribe_key = '';
+		$reminder_key = '';
+		$notifications_url = get_notifications_url();
 	}
 
-	$rpls_from = array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$', '$email$', '$user_ID$', '$unsubscribe_key$' );
-	$rpls_to = array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login, $user_email, $user_ID, $unsubscribe_key );
+	$rpls_from = array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$', '$email$', '$user_ID$', '$unsubscribe_key$', '$reminder_key$', '$notifications_url$' );
+	$rpls_to = array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login, $user_email, $user_ID, $unsubscribe_key, $reminder_key, $notifications_url );
 
 	return str_replace( $rpls_from, $rpls_to, $text );
 }
@@ -6902,7 +6908,7 @@ function get_samedomain_htsrv_url( $force_https = false )
 	}
 
 	if( $req_url_parts['host'] == $baseurl_parts['host'] &&
-	    ! isset( $req_url_parts['path'] ) && 
+	    ! isset( $req_url_parts['path'] ) &&
 	    isset( $baseurl_parts['path'] ) )
 	{	// Don't miss folder of base url from url like http://site.com/folder/:
 		$req_url_parts['path'] = $baseurl_parts['path'];

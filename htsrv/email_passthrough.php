@@ -151,6 +151,15 @@ switch( $type )
 									$email_User->dbupdate();
 								}
 								break;
+
+							case 8: // Activate account
+								// Does nothing yet
+								break;
+
+							case 9: // Unsubscribe
+								// Do not track click
+								$skip_click_tracking = true;
+								break;
 						}
 
 						// We are not using header_redirect below so we need to transfer Messages to the next page:

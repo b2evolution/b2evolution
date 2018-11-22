@@ -148,6 +148,14 @@ class EmailTrackingHelper
 						case 'cta3':
 							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 7 ) );
 							break;
+
+						case 'activate':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 8 ) );
+							break;
+
+						case 'unsubscribe':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 9 ) );
+							break;
 					}
 
 					// Remove email function marker in the URL
@@ -211,6 +219,14 @@ class EmailTrackingHelper
 
 						case 'cta3':
 							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 7 ) );
+							break;
+
+						case 'activate':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 8 ) );
+							break;
+
+						case 'unsubscribe':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 9 ) );
 							break;
 					}
 
