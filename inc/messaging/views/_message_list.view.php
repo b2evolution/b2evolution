@@ -315,8 +315,8 @@ if( $is_recipient )
 					'form_use_fieldset' => false,
 				) );
 
-			if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
-			{	// If current user has a permission to view the files AND it is back-office:
+			if( $current_User->check_perm( 'files', 'view' ) )
+			{	// If current user has a permission to view the files:
 				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
 				// Initialize this object as global because this is used in many link functions:
 				global $LinkOwner;
