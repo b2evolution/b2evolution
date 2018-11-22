@@ -140,6 +140,17 @@ class user_register_quick_Widget extends ComponentWidget
 						),
 					'defaultvalue' => 'no',
 				),
+				'ask_country' => array(
+					'label' => T_('Ask for country'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'no', T_('No') ),
+							array( 'optional', T_('Optional') ),
+							array( 'required', T_('Required') )
+						),
+					'defaultvalue' => 'no',
+				),
 				'source' => array(
 					'label' => T_('Source code'),
 					'note' => '',
@@ -315,6 +326,7 @@ class user_register_quick_Widget extends ComponentWidget
 			$Form->hidden( 'source', $this->disp_params['source'] );
 			$Form->hidden( 'ask_firstname', $this->disp_params['ask_firstname'] );
 			$Form->hidden( 'ask_lastname', $this->disp_params['ask_lastname'] );
+			$Form->hidden( 'ask_country', $this->disp_params['ask_country'] );
 			$Form->hidden( 'usertags', $this->disp_params['usertags'] );
 			$Form->hidden( 'subscribe_post', $this->disp_params['subscribe_post'] );
 			$Form->hidden( 'subscribe_comment', $this->disp_params['subscribe_comment'] );
@@ -367,6 +379,13 @@ class user_register_quick_Widget extends ComponentWidget
 		// E-mail
 		$email_value = isset( $widget_param_input_values[ $dummy_fields['email'] ] ) ? $widget_param_input_values[ $dummy_fields['email'] ] : '';
 		$Form->email_input( $dummy_fields['email'], $email_value, 50, T_('Your email'), array( 'maxlength' => 255, 'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' ), 'required' => true, 'input_required' => 'required' ) );
+
+		if( $this->disp_params['ask_country'] != 'no' )
+		{	// Country
+			$CountryCache = & get_CountryCache();
+			$country_value = isset( $widget_param_input_values['country'] ) ? $widget_param_input_values['country'] : '';
+			$Form->select_country( 'country', $country_value, $CountryCache, T_('Country'), array( 'allow_none' => true, 'required' => $this->disp_params['ask_country'] == 'required' ) );
+		}
 
 		// Submit button
 		$Form->button_input( array(

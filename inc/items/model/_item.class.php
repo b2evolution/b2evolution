@@ -3159,6 +3159,7 @@ class Item extends ItemLight
 							'intro' => '',
 							'ask_firstname' => in_array( 'firstname', $fields_to_display ) ? 'required' : 'no',
 							'ask_lastname' => in_array( 'lastname', $fields_to_display ) ? 'required' : 'no',
+							'ask_country' => in_array( 'country', $fields_to_display ) ? 'required' : 'no',
 							'source' => 'Page: '.$this->get( 'urltitle' ),
 							'usertags' => $user_tags,
 							'subscribe_post' => 0,
