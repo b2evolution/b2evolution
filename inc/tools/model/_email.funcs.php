@@ -1229,8 +1229,9 @@ function smtp_email_sending_test()
 	}
 	else
 	{	// Error:
-		$test_mail_messages[] = $smtp_mail_sending_log_html.'<b class="red">'.T_('Failed').'</b>';
-		syslog_insert( $smtp_message.$smtp_mail_sending_log.' '.T_('Failed'), 'warning', NULL );
+		global $mail_log_message;
+		$test_mail_messages[] = $smtp_mail_sending_log_html.'<b class="red">'.T_('Failed').': '.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'</b>';
+		syslog_insert( $smtp_message.$smtp_mail_sending_log.' '.T_('Failed').': '.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ), 'warning', NULL );
 		$smtp_connection_result = false;
 	}
 
@@ -1274,8 +1275,9 @@ function php_email_sending_test()
 	}
 	else
 	{	// Error:
-		$test_mail_messages[] = $php_mail_sending_log_html.'<b class="red">'.T_('Failed').'</b>';
-		syslog_insert( $mail_message.$php_mail_sending_log.' '.T_('Failed'), 'warning', NULL );
+		global $mail_log_message;
+		$test_mail_messages[] = $php_mail_sending_log_html.'<b class="red">'.T_('Failed').': '.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'</b>';
+		syslog_insert( $mail_message.$php_mail_sending_log.' '.T_('Failed').': '.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ), 'warning', NULL );
 		$smtp_connection_result = false;
 	}
 
