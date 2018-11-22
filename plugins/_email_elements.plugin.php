@@ -428,7 +428,7 @@ class email_elements_plugin extends Plugin
 						}
 
 						// Only EASY activation will work for this case:
-						$activation_url = get_htsrv_url().'login.php?action=activateacc_ez'.'&userID=$user_ID$&reminderKey=$reminder_key$';
+						$activation_url = get_htsrv_url().'login.php?action=activateacc_ez&userID=$user_ID$&reminderKey=$reminder_key$';
 
 						if( isset( $url ) )
 						{
@@ -452,7 +452,8 @@ class email_elements_plugin extends Plugin
 							$button_type = 'link';
 						}
 
-						$link_tag = get_link_tag( '$notifications_url$', $button_text, $button_type == 'link' ? '' : 'div.btn a+a.btn-'.$button_type );
+						$notifications_url = get_htsrv_url().'quick_unsubscribe.php?type=newsletter&newsletter=$newsletter_ID$&user_ID=$user_ID$&key=$unsubscribe_key$';
+						$link_tag = get_link_tag( $notifications_url, $button_text, $button_type == 'link' ? '' : 'div.btn a+a.btn-'.$button_type );
 						break;
 				}
 

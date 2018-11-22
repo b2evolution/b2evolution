@@ -4215,9 +4215,10 @@ function send_mail_to_anonymous_user( $user_email, $user_name, $subject, $templa
  * @param string Format: 'html', 'text'
  * @param string Email of anonymous user
  * @param string Name of anonymous user
+ * @param array Email template params
  * @return string Text
 */
-function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user_email = NULL, $user_name = NULL )
+function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user_email = NULL, $user_name = NULL, $params = array() )
 {
 	if( ! $User && ! ( $user_email || $user_email ) )
 	{	// No user data:
@@ -4257,7 +4258,13 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
 		$user_ID = $User->ID;
 		$unsubscribe_key = '$secret_content_start$'.md5( $User->ID.$User->unsubscribe_key ).'$secret_content_end$';
 		$reminder_key = $UserSettings->get( 'last_activation_reminder_key', $user_ID );
-		$notifications_url = get_notifications_url( '&amp;', $user_ID );
+		if( empty( $reminder_key ) && strpos( $text, '$reminder_key$' ) !== false )
+		{	// If reminder key was not generated yet we need create it in order user can active account even if did request the activation email yet:
+			$reminder_key = generate_random_key( 32 );
+			$UserSettings->set( 'last_activation_reminder_key', $reminder_key, $user_ID );
+			$UserSettings->dbupdate();
+		}
+		$newsletter_ID = isset( $params['newsletter'] ) ? $params['newsletter'] : '';
 	}
 	else
 	{	// Get data of anonymous user:
@@ -4271,11 +4278,11 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
 		$user_ID = '';
 		$unsubscribe_key = '';
 		$reminder_key = '';
-		$notifications_url = get_notifications_url();
+		$newsletter_ID = '';
 	}
 
-	$rpls_from = array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$', '$email$', '$user_ID$', '$unsubscribe_key$', '$reminder_key$', '$notifications_url$' );
-	$rpls_to = array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login, $user_email, $user_ID, $unsubscribe_key, $reminder_key, $notifications_url );
+	$rpls_from = array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$', '$email$', '$user_ID$', '$unsubscribe_key$', '$reminder_key$', '$newsletter_ID$' );
+	$rpls_to = array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login, $user_email, $user_ID, $unsubscribe_key, $reminder_key, $newsletter_ID );
 
 	return str_replace( $rpls_from, $rpls_to, $text );
 }
@@ -4370,7 +4377,7 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 
 		if( ! empty( $User ) )
 		{ // Replace $login$ with gender colored link + icon in HTML format, and with simple login text in PLAIN TEXT format
-			$formated_message = mail_autoinsert_user_data( $formated_message, $User, $format );
+			$formated_message = mail_autoinsert_user_data( $formated_message, $User, $format, NULL, NULL, $params );
 		}
 		elseif( ! empty( $params['anonymous_recipient_name'] ) )
 		{	// Replace anonymous name:
