@@ -369,12 +369,10 @@ class user_register_quick_Widget extends ComponentWidget
 		$Form->email_input( $dummy_fields['email'], $email_value, 50, T_('Your email'), array( 'maxlength' => 255, 'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' ), 'required' => true, 'input_required' => 'required' ) );
 
 		// Submit button
-		$Form->begin_fieldset( '', array( 'class' => 'fieldset field_register_btn' ) );
 		$Form->button_input( array(
 				'value' => $this->disp_params['button'],
 				'class' => $this->disp_params['button_class'].' submit' )
 			);
-		$Form->end_fieldset();
 
 		$Form->end_form();
 
