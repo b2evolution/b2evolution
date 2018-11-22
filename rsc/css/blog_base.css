@@ -1034,7 +1034,7 @@ div.container_menu_top input.search_field {
   padding: 0;
   margin: 0;
 }
-.widget_core_user_register_quick .field_register_btn {
+.widget_core_user_register_quick input[type=submit] {
   margin: 5px 0;
 }
 .widget_core_user_register_quick .input_text {

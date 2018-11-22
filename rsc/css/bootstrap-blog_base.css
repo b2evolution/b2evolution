@@ -925,20 +925,6 @@ div.extended_search_form div[class^='col-'] {
   padding-left: 3px;
   padding-right: 3px;
 }
-.widget_core_user_register_quick #register_form {
-  margin-top: 5px;
-}
-.widget_core_user_register_quick fieldset {
-  border: none;
-  padding: 0;
-  margin: 0;
-}
-.widget_core_user_register_quick .field_register_btn {
-  margin: 5px 0;
-}
-.widget_core_user_register_quick .input_text {
-  width: 96%;
-}
 .widget_core_user_login .control-buttons {
   width: 100%;
   padding: 0;

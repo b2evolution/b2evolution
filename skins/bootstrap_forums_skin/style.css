@@ -704,31 +704,16 @@ main .widget_core_coll_search_form div.compact_search_form input.search_field {
 aside .widget_core_coll_search_form div.compact_search_form input.search_field {
   width: 100%;
 }
-.widget_core_user_register_quick #register_form .form-group {
-  margin: 0;
-}
 .widget_core_user_register_quick #register_form label {
   text-align: left;
-  width: 160px;
+  width: auto;
   padding-left: 0;
 }
 .widget_core_user_register_quick #register_form .controls {
-  padding: 0;
   width: 100%;
 }
 .widget_core_user_register_quick #register_form .form_text_input.form-control {
   width: 100%;
-}
-.widget_core_user_register_quick .field_register_btn .panel {
-  margin: 0;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-}
-.widget_core_user_register_quick .field_register_btn .panel .panel-body {
-  padding-left: 0;
-  padding-right: 0;
-  padding-bottom: 0;
 }
 .extended_search_form {
   max-width: 600px;

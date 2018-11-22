@@ -42,12 +42,13 @@ global $inline_class;
 				echo '<div id="image" class="tab-pane'.($tag_type == 'image' ? ' active' : '' ).'">';
 				$Form->text( 'image_caption', $image_caption, 40, T_('Caption'), '<br>
 						<span style="display: flex; flex-flow: row; align-items: center; margin-top: 8px;">
-							<input type="checkbox" name="image_disable_caption" id="image_disable_caption" value="1" style="margin: 0 8px 0 0;"><span>'.T_('Disable caption').'</span></span>' );
+							<input type="checkbox" name="image_disable_caption" id="image_disable_caption" value="1" style="margin: 0 8px 0 0;">
+							<span>'.T_('Disable caption').'</span></span>', '' );
 				$Form->text( 'image_class', $image_class, 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
 						<button class="btn btn-default btn-xs">border</button>
 						<button class="btn btn-default btn-xs">noborder</button>
 						<button class="btn btn-default btn-xs">rounded</button>
-						<button class="btn btn-default btn-xs">squared</button></div>' );
+						<button class="btn btn-default btn-xs">squared</button></div>', '' );
 				echo '</div>';
 
 				echo '<div id="thumbnail" class="tab-pane'.($tag_type == 'thumbnail' ? ' active' : '' ).'">';
@@ -64,7 +65,7 @@ global $inline_class;
 						<button class="btn btn-default btn-xs">border</button>
 						<button class="btn btn-default btn-xs">noborder</button>
 						<button class="btn btn-default btn-xs">rounded</button>
-						<button class="btn btn-default btn-xs">squared</button></div>' );
+						<button class="btn btn-default btn-xs">squared</button></div>', '' );
 				echo '</div>';
 
 				echo '<div id="inline" class="tab-pane'.($tag_type == 'inline' ? ' active' : '' ).'">';
@@ -72,7 +73,7 @@ global $inline_class;
 						<button class="btn btn-default btn-xs">border</button>
 						<button class="btn btn-default btn-xs">noborder</button>
 						<button class="btn btn-default btn-xs">rounded</button>
-						<button class="btn btn-default btn-xs">squared</button></div>' );
+						<button class="btn btn-default btn-xs">squared</button></div>', '' );
 				echo '</div>';
 			echo '</div>';
 

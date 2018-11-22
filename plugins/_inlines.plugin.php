@@ -165,7 +165,7 @@ class inlines_plugin extends Plugin
 
 			case 'Message':
 				$Message = & $params['Message'];
-				$target_ID = $Message->ID;
+				$target_ID = empty( $Message ) ? NULL : $Message->ID;
 				if( empty( $target_ID ) && empty( $temp_ID ) )
 				{
 					return false;
@@ -178,8 +178,8 @@ class inlines_plugin extends Plugin
 
 		?><script type="text/javascript">
 		//<![CDATA[
-		var target_ID = <?php echo format_to_js( $target_ID );?>;
-		var temp_ID = <?php echo empty( $params['temp_ID'] ) ? 'undefined' : format_to_js( $temp_ID );?>;
+		var target_ID = <?php echo empty( $target_ID ) ? 'undefined' : format_to_js( $target_ID );?>;
+		var temp_ID = <?php echo empty( $temp_ID ) ? 'undefined' : format_to_js( $temp_ID );?>;
 		var target_type = '<?php echo format_to_js( $params['target_type'] );?>';
 		var inline_buttons = new Array();
 

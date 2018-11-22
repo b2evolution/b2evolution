@@ -110,7 +110,7 @@ class user_register_quick_Widget extends ComponentWidget
 					'label' => T_('Block title'),
 					'note' => T_('Title to display in your skin.'),
 					'size' => 40,
-					'defaultvalue' => T_('Get our list!'),
+					'defaultvalue' => T_('Get our newsletter!'),
 				),
 				'intro' => array(
 					'label' => T_('Intro text'),
@@ -140,6 +140,17 @@ class user_register_quick_Widget extends ComponentWidget
 						),
 					'defaultvalue' => 'no',
 				),
+				'ask_country' => array(
+					'label' => T_('Ask for country'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'no', T_('No') ),
+							array( 'optional', T_('Optional') ),
+							array( 'required', T_('Required') )
+						),
+					'defaultvalue' => 'no',
+				),
 				'source' => array(
 					'label' => T_('Source code'),
 					'note' => '',
@@ -154,13 +165,13 @@ class user_register_quick_Widget extends ComponentWidget
 					'maxlength' => 255,
 				),
 				'newsletters' => array(
-					'label' => T_('Lists'),
+					'label' => T_('Subscribe to lists'),
 					'type' => 'checklist',
 					'options' => $newsletters_options,
 					'note' => ''
 				),
 				'subscribe_post' => array(
-					'label' => T_('Auto subscribe'),
+					'label' => T_('Subscribe to collection'),
 					'note' => T_('check to auto subscribe new user to current collection posts'),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
@@ -316,6 +327,7 @@ class user_register_quick_Widget extends ComponentWidget
 			$Form->hidden( 'source', $this->disp_params['source'] );
 			$Form->hidden( 'ask_firstname', $this->disp_params['ask_firstname'] );
 			$Form->hidden( 'ask_lastname', $this->disp_params['ask_lastname'] );
+			$Form->hidden( 'ask_country', $this->disp_params['ask_country'] );
 			$Form->hidden( 'usertags', $this->disp_params['usertags'] );
 			$Form->hidden( 'subscribe_post', $this->disp_params['subscribe_post'] );
 			$Form->hidden( 'subscribe_comment', $this->disp_params['subscribe_comment'] );
@@ -369,13 +381,18 @@ class user_register_quick_Widget extends ComponentWidget
 		$email_value = isset( $widget_param_input_values[ $dummy_fields['email'] ] ) ? $widget_param_input_values[ $dummy_fields['email'] ] : '';
 		$Form->email_input( $dummy_fields['email'], $email_value, 50, T_('Your email'), array( 'maxlength' => 255, 'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' ), 'required' => true, 'input_required' => 'required' ) );
 
+		if( $this->disp_params['ask_country'] != 'no' )
+		{	// Country
+			$CountryCache = & get_CountryCache();
+			$country_value = isset( $widget_param_input_values['country'] ) ? $widget_param_input_values['country'] : '';
+			$Form->select_country( 'country', $country_value, $CountryCache, T_('Country'), array( 'allow_none' => true, 'required' => $this->disp_params['ask_country'] == 'required' ) );
+		}
+
 		// Submit button
-		$Form->begin_fieldset( '', array( 'class' => 'fieldset field_register_btn' ) );
 		$Form->button_input( array(
 				'value' => $this->disp_params['button'],
 				'class' => $this->disp_params['button_class'].' submit' )
 			);
-		$Form->end_fieldset();
 
 		$Form->end_form();
 

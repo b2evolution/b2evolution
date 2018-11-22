@@ -315,8 +315,8 @@ if( $is_recipient )
 					'form_use_fieldset' => false,
 				) );
 
-			if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
-			{	// If current user has a permission to view the files AND it is back-office:
+			if( $current_User->check_perm( 'files', 'view' ) )
+			{	// If current user has a permission to view the files:
 				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
 				// Initialize this object as global because this is used in many link functions:
 				global $LinkOwner;
@@ -327,7 +327,7 @@ if( $is_recipient )
 			echo '<div class="message_toolbars">';
 			// CALL PLUGINS NOW:
 			$message_toolbar_params = array( 'Message' => & $edited_Message );
-			if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+			if( isset( $LinkOwner ) && $LinkOwner->is_temp() )
 			{
 				$message_toolbar_params['temp_ID'] = $LinkOwner->get_ID();
 			}

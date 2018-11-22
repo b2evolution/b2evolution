@@ -25,7 +25,7 @@ class email_elements_plugin extends Plugin
 	var $number_of_installs = 1;
 
 	var $cta_numbers = array( 1, 2, 3 );
-	var $cta_button_types = array( 'primary', 'success', 'warning', 'danger', 'info', 'default', 'link' );
+	var $button_types = array( 'primary', 'success', 'warning', 'danger', 'info', 'default', 'link' );
 
 	/**
 	 * Init
@@ -117,6 +117,16 @@ class email_elements_plugin extends Plugin
 				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
 				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|cta" value="<?php echo TS_('Call to Action') ?>" />'
 
+				// Activate
+				+ '<input type="button" title="<?php echo TS_('Activate') ?>"'
+				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
+				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|activate" value="<?php echo TS_('Activate') ?>" />'
+
+				// Unsubscribe
+				+ '<input type="button" title="<?php echo TS_('Unsubscribe') ?>"'
+				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
+				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|unsubscribe" value="<?php echo TS_('Unsubscribe') ?>" />'
+
 				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
 
 				jQuery( '.' + prefix + '<?php echo $this->code ?>_toolbar' ).html( r );
@@ -140,10 +150,14 @@ class email_elements_plugin extends Plugin
 						+ '</select>'
 						+ '</div></div>';
 
+			}
+
+			if( type == 'cta' || type == 'activate' || type == 'unsubscribe' )
+			{
 				r += '<div class="form-group"><label class="control-label"><?php echo T_('Button type');?></label><div class="controls">'
 						+ '<select class="form-control" name="button_type" style="width: auto;">'
 						<?php
-						foreach( $this->cta_button_types as $button_type )
+						foreach( $this->button_types as $button_type )
 						{
 							echo '+ \'<option value="'.$button_type.'">'.$button_type.'</option>\'';
 						}
@@ -173,6 +187,14 @@ class email_elements_plugin extends Plugin
 				case 'cta':
 					modal_window_title = '<?php echo TS_('Add a call to action button');?>';
 					break;
+
+				case 'activate':
+					modal_window_title = '<?php echo TS_('Add an activate button');?>';
+					break;
+
+				case 'unsubscribe':
+					modal_window_title = '<?php echo TS_('Add an unsubscribe button');?>';
+					break;
 			}
 
 			openModalWindow( r, '550px', '', true,
@@ -195,11 +217,15 @@ class email_elements_plugin extends Plugin
 				'max-height': modal_height
 			} );
 
-			// Add insert button
+			// Add insert button:
 			var buttons_side_obj = jQuery( '.email_element_button_buttons' ).length ?
 						jQuery( '.email_element_button_buttons' ) :
 						jQuery( '#email_element_button_buttons' );
 			buttons_side_obj.after( '<button id="email_element_button_insert" class="btn btn-primary" data-function="' + type + '"><?php echo T_('Insert');?></button>' );
+
+			// Set button type dropdown default:
+			var button_defaults = { 'cta': 'primary', 'activate': 'success', 'unsubscribe': 'link' };
+			var button_type = jQuery( 'select[name=button_type]', '#email_element_button_wrapper' ).val( button_defaults[type] );
 
 			// To prevent link default event:
 			return false;
@@ -211,6 +237,7 @@ class email_elements_plugin extends Plugin
 			var type = jQuery( this ).data( 'function' );
 			var url = jQuery( 'input[name=button_url]', '#email_element_button_wrapper' ).val();
 			var text = jQuery( 'input[name=button_text]', '#email_element_button_wrapper' ).val();
+			var button_type = jQuery( 'select[name=button_type]', '#email_element_button_wrapper' ).val();
 			var myField = <?php echo $params['js_prefix']; ?>b2evoCanvas;
 			var shortTag;
 
@@ -231,8 +258,15 @@ class email_elements_plugin extends Plugin
 
 				case 'cta':
 					var cta_num = jQuery( 'select[name=cta_num]', '#email_element_button_wrapper' ).val();
-					var button_type = jQuery( 'select[name=button_type]', '#email_element_button_wrapper' ).val();
 					shortTag = '[cta:' + cta_num + ':' + button_type + ( url == '' ? '' : ':' + url ) + ']'+text+'[/cta]'
+					break;
+
+				case 'activate':
+					shortTag = '[activate' + ':' + button_type + ( url == '' ? '' : ':' + url ) + ']'+text+'[/activate]';
+					break;
+
+				case 'unsubscribe':
+					shortTag = '[unsubscribe' + ':' + button_type + ( url == '' ? '' : ':' + url ) + ']'+text+'[/unsubscribe]';
 					break;
 			}
 			textarea_wrap_selection( myField, shortTag, '', 0 );
@@ -294,7 +328,7 @@ class email_elements_plugin extends Plugin
 		$content = & $params['data'];
 		$default_destination = isset( $params['EmailCampaign'] ) && !empty( $params['EmailCampaign']->email_defaultdest ) ? $params['EmailCampaign']->email_defaultdest : '';
 
-		$search_pattern = '#\[(button|like|dislike|cta):?([^\[\]]*?)](.*?)\[\/\1]#';
+		$search_pattern = '#\[(button|like|dislike|cta|activate|unsubscribe):?([^\[\]]*?)](.*?)\[\/\1]#';
 		preg_match_all( $search_pattern, $content, $matches );
 
 		if( ! empty( $matches[0] ) )
@@ -361,7 +395,7 @@ class email_elements_plugin extends Plugin
 							break;
 						}
 
-						if( ! in_array( $button_type, $this->cta_button_types ) )
+						if( ! in_array( $button_type, $this->button_types ) )
 						{
 							$link_tag = $current_element;
 							break;
@@ -377,6 +411,49 @@ class email_elements_plugin extends Plugin
 							$link_tag = get_link_tag( $url, $text, $button_type == 'link' ? '' : 'div.btn a+a.btn-'.$button_type );
 						}
 
+						break;
+
+					case 'activate':
+						$button_text = trim( $matches[3][$i] );
+
+						if( isset( $matches[2][$i] ) )
+						{
+							$options = explode( ':', $matches[2][$i], 2 );
+							$button_type = trim( $options[0] );
+							$url = isset( $options[1] ) ? trim( $options[1] ) : NULL;
+						}
+						else
+						{
+							$button_type = 'primary';
+						}
+
+						// Only EASY activation will work for this case:
+						$activation_url = get_htsrv_url().'login.php?action=activateacc_ez&userID=$user_ID$&reminderKey=$reminder_key$';
+
+						if( isset( $url ) )
+						{
+							$activation_url = url_add_param( $activation_url, array( 'redirect_to' => $url ) );
+						}
+
+						$link_tag = get_link_tag( $activation_url, $button_text, $button_type == 'link' ? '' : 'div.btn a+a.btn-'.$button_type );
+						break;
+
+					case 'unsubscribe':
+						$button_text = trim( $matches[3][$i] );
+
+						if( isset( $matches[2][$i] ) )
+						{
+							$options = explode( ':', $matches[2][$i], 2 );
+							$button_type = trim( $options[0] );
+							$url = isset( $options[1] ) ? trim( $options[1] ) : NULL;
+						}
+						else
+						{
+							$button_type = 'link';
+						}
+
+						$notifications_url = get_htsrv_url().'quick_unsubscribe.php?type=newsletter&newsletter=$newsletter_ID$&user_ID=$user_ID$&key=$unsubscribe_key$';
+						$link_tag = get_link_tag( $notifications_url, $button_text, $button_type == 'link' ? '' : 'div.btn a+a.btn-'.$button_type );
 						break;
 				}
 

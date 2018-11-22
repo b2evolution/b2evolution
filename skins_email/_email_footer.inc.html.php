@@ -19,6 +19,11 @@ $params = array_merge( array(
 	), $params );
 
 $recipient_user_ID  = empty( $params['recipient_User'] ) ? NULL : $params['recipient_User']->ID;
+
+if( ! in_array( $params['template_name'], array( 'account_activate', 'account_activated' ) ) )
+{
+	// Add custom messages here
+}
 ?>
 </div>
 </div>
