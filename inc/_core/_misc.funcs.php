@@ -4311,6 +4311,9 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 			'default_template_tag' => NULL
 		), $params );
 
+	// Set this param to know current template name inside code of email templates like header and footer:
+	$params['template_name'] = $template_name;
+
 	if( !empty( $params['locale'] ) )
 	{ // Switch to locale for current email template
 		locale_temp_switch( $params['locale'] );
