@@ -1677,3 +1677,25 @@ div#fileuploader_form {
 #filelist_tbody tr:last-child .action_icon_link_move_down {
   visibility: hidden;
 }
+.evo_widget_form__compact {
+  margin-bottom: -15px;
+}
+.evo_widget_form__compact label.control-label {
+  text-align: left;
+  width: auto;
+  padding: 0;
+}
+.evo_widget_form__compact .controls {
+  width: 100%;
+}
+.evo_widget_form__compact .form_text_input.form-control {
+  width: 100%;
+}
+.evo_widget_form__compact .form_text_input.form-control.inline_widget {
+  width: 100%;
+  max-width: 250px;
+}
+.evo_widget_form__compact .control-buttons {
+  margin: 0;
+  padding: 0;
+}

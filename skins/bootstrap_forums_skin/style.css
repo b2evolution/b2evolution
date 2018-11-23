@@ -704,17 +704,6 @@ main .widget_core_coll_search_form div.compact_search_form input.search_field {
 aside .widget_core_coll_search_form div.compact_search_form input.search_field {
   width: 100%;
 }
-.widget_core_user_register_quick #register_form label {
-  text-align: left;
-  width: 160px;
-  padding-left: 0;
-}
-.widget_core_user_register_quick #register_form .controls {
-  width: 100%;
-}
-.widget_core_user_register_quick #register_form .form_text_input.form-control {
-  width: 100%;
-}
 .extended_search_form {
   max-width: 600px;
   margin: 0 auto;

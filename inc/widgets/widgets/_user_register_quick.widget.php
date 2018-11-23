@@ -311,7 +311,7 @@ class user_register_quick_Widget extends ComponentWidget
 
 		$Form = new Form( get_htsrv_url( 'login' ).'register.php', 'register_form', 'post' );
 
-		$Form->begin_form( NULL, '', array( 'class' => 'widget_register_form') );
+		$Form->begin_form( NULL, '', array( 'class' => 'widget_register_form '.$this->get_form_display_class( 'compact' ) ) );
 
 		$Form->add_crumb( 'regform' );
 		$Form->hidden( 'action', 'quick_register' );
@@ -387,13 +387,11 @@ class user_register_quick_Widget extends ComponentWidget
 			$Form->select_country( 'country', $country_value, $CountryCache, T_('Country'), array( 'allow_none' => true, 'required' => $this->disp_params['ask_country'] == 'required' ) );
 		}
 
-		// Submit button
-		$Form->button_input( array(
+		// Submit button:
+		$Form->end_form( array( array(
 				'value' => $this->disp_params['button'],
 				'class' => $this->disp_params['button_class'].' submit' )
-			);
-
-		$Form->end_form();
+			) );
 
 		if( ! is_logged_in() )
 		{	// JS code to get crumb from AJAX request when page caching is enabled:

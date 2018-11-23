@@ -10,24 +10,6 @@
 .nav.nav-tabs {
   margin-top: 0;
 }
-.widget_core_user_register_quick #register_form label {
-  text-align: left;
-  width: 160px;
-  padding-left: 0;
-}
-.widget_core_user_register_quick #register_form .controls {
-  width: 100%;
-}
-.widget_core_user_register_quick #register_form .form_text_input.form-control {
-  width: 100%;
-}
-.widget_core_user_register_quick #register_form .form_text_input.form-control .inline_widget {
-  width: 250px;
-}
-.widget_core_user_register_quick #register_form .form_text_input.form-control.inline_widget {
-  width: 100%;
-  max-width: 250px;
-}
 ul.profile_tabs {
   margin: 0 2ex 2ex;
   position: relative;
