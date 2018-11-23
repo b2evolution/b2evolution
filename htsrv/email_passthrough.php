@@ -64,6 +64,7 @@ switch( $type )
 								break;
 
 							case 2: // Update clicked_unsubscribe
+							case 9: // Unsubscribe button
 								$result = $DB->query( 'UPDATE T_email__campaign_send
 										SET csnd_clicked_unsubscribe = 1
 										WHERE csnd_camp_ID = '.$DB->quote( $ecmp_ID ).' AND csnd_user_ID = '.$DB->quote( $email_User->ID ) );
@@ -152,13 +153,8 @@ switch( $type )
 								}
 								break;
 
-							case 8: // Activate account
+							case 8: // Activate account button
 								// Does nothing yet
-								break;
-
-							case 9: // Unsubscribe
-								// Do not track click
-								$skip_click_tracking = true;
 								break;
 						}
 
