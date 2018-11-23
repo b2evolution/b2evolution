@@ -5614,7 +5614,7 @@ class User extends DataObject
 			}
 			else
 			{ // validation process is easy, send email with permanent activation link
-				if( $this->send_validate_email( NULL, $blog, ( $user_old_email != $this->email ) ) )
+				if( $this->send_validate_email( NULL, $blog, !$is_new_user && ( $user_old_email != $this->email ) ) ) // $is_new_user check added to prevent regeneration of $reminder_key when creating new user accounts with welcome campaign email
 				{
 					if( $current_User->ID == $this->ID )
 					{
