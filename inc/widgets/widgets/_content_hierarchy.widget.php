@@ -130,20 +130,10 @@ class content_hierarchy_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		$params = array_merge( array(
-				'widget_content_hierarchy_params' => array(),
-			), $params );
-
-		$widget_params = array_merge( array(
-				'display_blog_title'   => isset( $this->disp_params['display_blog_title'] ) ? $this->disp_params['display_blog_title'] : true,
-				'open_children_levels' => isset( $this->disp_params['open_children_levels'] ) ? $this->disp_params['open_children_levels'] : 20,
-				'item_title_fields'    => isset( $this->disp_params['item_title_fields'] ) ? $this->disp_params['item_title_fields'] : 'title',
-				'custom_title'         => isset( $this->disp_params['custom_title'] ) ? $this->disp_params['custom_title'] : '',
-				'item_before_opened'   => isset( $this->disp_params['item_before_opened'] ) ? $this->disp_params['item_before_opened'] : '',
-				'item_before_closed'   => isset( $this->disp_params['item_before_closed'] ) ? $this->disp_params['item_before_closed'] : '',
-				'item_before_post'     => isset( $this->disp_params['item_before_post'] ) ? $this->disp_params['item_before_post'] : '',
-				'sorted'               => true,
-			), $params['widget_content_hierarchy_params'] );
+		if( !isset( $params['widget_content_hierarchy_params'] ) )
+		{
+			$params['widget_content_hierarchy_params'] = array();
+		}
 
 		echo $this->disp_params['block_start'];
 
@@ -152,7 +142,12 @@ class content_hierarchy_Widget extends ComponentWidget
 			$params['selected_item_ID'] = $Item->ID;
 		}
 
-		$this->display_hierarchy( $widget_params );
+		$this->display_hierarchy( array_merge( array(
+				'display_blog_title'   => $this->disp_params['display_blog_title'],
+				'open_children_levels' => $this->disp_params['open_children_levels'],
+				'item_title_fields'    => isset( $this->disp_params['item_title_fields'] ) ? $this->disp_params['item_title_fields'] : 'title',
+				'sorted' => true
+			), $params, $params['widget_content_hierarchy_params'] ) );
 
 		echo $this->disp_params['block_end'];
 
