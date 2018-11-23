@@ -26,6 +26,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		'block_end'         => '</div>',
 		'block_title_start' => '<h2 class="page-header">',
 		'block_title_end'   => '</h2>',
+		'featured_intro_before' => '<div class="jumbotron">',
+		'featured_intro_after'  => '</div>',
 
 		// Template params for "Content Hierarchy" widget:
 		'widget_content_hierarchy_params' => array(

@@ -159,20 +159,6 @@ body.pictured.dev_designer_mode .secondary_area {
     top: 35px;
   }
 }
-.widget_core_user_register_quick #register_form label {
-  text-align: left;
-  width: auto;
-  padding-left: 0;
-}
-.widget_core_user_register_quick #register_form .controls {
-  width: 100%;
-}
-.widget_core_user_register_quick #register_form .form_text_input.form-control {
-  width: 100%;
-}
-.widget_core_user_register_quick .submit {
-  font-size: 12px;
-}
 ul.profile_tabs {
   margin: 0 2ex 2ex;
   position: relative;

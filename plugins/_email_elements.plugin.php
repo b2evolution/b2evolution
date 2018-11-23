@@ -149,7 +149,6 @@ class email_elements_plugin extends Plugin
 						?>
 						+ '</select>'
 						+ '</div></div>';
-
 			}
 
 			if( type == 'cta' || type == 'activate' || type == 'unsubscribe' )
@@ -166,9 +165,13 @@ class email_elements_plugin extends Plugin
 						+ '</div></div>';
 			}
 
-			r += '<div class="form-group"><label class="control-label"><?php echo T_('URL');?></label><div class="controls"><input class="form_text_input form-control" type="text" name="button_url" /></div></div>'
-					+ '<div class="form-group"><label class="control-label"><?php echo T_('Text');?></label><div class="controls"><input class="form_text_input form-control" type="text" name="button_text" /></div></div>'
-					+ '</form>';
+			if( type != 'unsubscribe' )
+			{
+				r += '<div class="form-group"><label class="control-label"><?php echo T_('URL');?></label><div class="controls"><input class="form_text_input form-control" type="text" name="button_url" /></div></div>';
+			}
+
+			r += '<div class="form-group"><label class="control-label"><?php echo T_('Text');?></label><div class="controls"><input class="form_text_input form-control" type="text" name="button_text" /></div></div>';
+			r += '</form>';
 
 			switch( type )
 			{
@@ -266,7 +269,7 @@ class email_elements_plugin extends Plugin
 					break;
 
 				case 'unsubscribe':
-					shortTag = '[unsubscribe' + ':' + button_type + ( url == '' ? '' : ':' + url ) + ']'+text+'[/unsubscribe]';
+					shortTag = '[unsubscribe' + ':' + button_type + ']'+text+'[/unsubscribe]';
 					break;
 			}
 			textarea_wrap_selection( myField, shortTag, '', 0 );

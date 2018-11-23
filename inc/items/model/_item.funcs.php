@@ -201,8 +201,14 @@ function init_inskin_editing()
 		$edited_Item->set_creator_location( 'subregion' );
 		$edited_Item->set_creator_location( 'city' );
 
-		// Set object params:
+		// Set prefilled params from _GET request like 'cat', 'item_typ_ID' and etc.:
 		$edited_Item->load_from_Request( /* editing? */ false, /* creating? */ true );
+
+		// Clear all errors which were generated in the Item->load_from_Request() above,
+		// because we should not display them on first opening the item form:
+		global $Messages, $param_input_err_messages;
+		$Messages->clear();
+		$param_input_err_messages = NULL;
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}

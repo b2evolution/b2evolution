@@ -4257,12 +4257,19 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
 		$user_email = $User->email;
 		$user_ID = $User->ID;
 		$unsubscribe_key = '$secret_content_start$'.md5( $User->ID.$User->unsubscribe_key ).'$secret_content_end$';
-		$reminder_key = $UserSettings->get( 'last_activation_reminder_key', $user_ID );
-		if( empty( $reminder_key ) && strpos( $text, '$reminder_key$' ) !== false )
-		{	// If reminder key was not generated yet we need create it in order user can active account even if did request the activation email yet:
-			$reminder_key = generate_random_key( 32 );
-			$UserSettings->set( 'last_activation_reminder_key', $reminder_key, $user_ID );
-			$UserSettings->dbupdate();
+		if( isset( $params['template_mode'] ) && $params['template_mode'] == 'preview' )
+		{	// Don't use real value of reminder key on preview email template, e.g. on review message of email campaign:
+			$reminder_key = '$reminder_key$';
+		}
+		else
+		{	// Use real value of reminder key:
+			$reminder_key = $UserSettings->get( 'last_activation_reminder_key', $user_ID );
+			if( empty( $reminder_key ) && strpos( $text, '$reminder_key$' ) !== false )
+			{	// If reminder key was not generated yet we need create it in order user can active account even if did request the activation email yet:
+				$reminder_key = generate_random_key( 32 );
+				$UserSettings->set( 'last_activation_reminder_key', $reminder_key, $user_ID );
+				$UserSettings->dbupdate();
+			}
 		}
 		$newsletter_ID = isset( $params['newsletter'] ) ? $params['newsletter'] : '';
 	}

@@ -10433,29 +10433,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				.$params.' )';
 		}
 
-		// Update coll_featured_intro widget:
-		task_begin( 'Updating coll_feature_intro widget settings...' );
-		$setting_SQL = new SQL();
-		$setting_SQL->SELECT( 'wi_ID, wi_coll_ID, wi_sco_name, wi_code, wi_params' );
-		$setting_SQL->FROM( 'T_widget' );
-		$setting_SQL->FROM_add( 'INNER JOIN T_blogs ON blog_ID = wi_coll_ID' );
-		$setting_SQL->WHERE( 'blog_type = "manual"' );
-		$setting_SQL->WHERE_and( 'wi_sco_name = "Front Page Main Area"' );
-		$setting_SQL->WHERE_and( 'wi_code = "coll_featured_intro"' );
-		foreach( $DB->get_results( $setting_SQL ) as $row )
-		{
-			$widget_params = empty( $row->wi_params ) ? array() : unserialize( $row->wi_params );
-			if( ! isset( $widget_params['item_class'] ) || ( isset( $widget_params['item_class'] ) && $widget_params['item_class'] == 'featurepost' ) )
-			{	// Replace the item_class property if it wasn't customized:
-				$widget_params['item_class'] = 'jumbotron evo_content_block';
-
-				$DB->query( 'UPDATE T_widget
-						SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
-					WHERE wi_ID = '.$row->wi_ID );
-			}
-		}
-		task_end();
-
 		// Insert content_hierarchy widget:
 		$SQL = new SQL();
 		$SQL->SELECT( 'wi_coll_ID, MAX(wi_order)' );

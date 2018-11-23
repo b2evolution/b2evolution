@@ -1554,6 +1554,25 @@ class ComponentWidget extends DataObject
 
 
 	/**
+	 * Get style class for widget form depending on current requested mode from skin by param 'form_display'
+	 *
+	 * @param string Default value for form display: 'standard', 'compact'
+	 */
+	function get_form_display_class( $default_form_display = 'standard' )
+	{
+		$form_display = isset( $this->disp_params['form_display'] ) ? $this->disp_params['form_display'] : $default_form_display;
+		if( $form_display == 'standard' ||
+		    $form_display == 'compact' )
+		{
+			return 'evo_widget_form__'.$form_display;
+		}
+
+		// Unknown widget form display mode:
+		return '';
+	}
+
+
+	/**
 	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
 	 *
 	 * @param string Message

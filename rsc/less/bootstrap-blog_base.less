@@ -1142,3 +1142,27 @@ div#fileuploader_form {
 		visibility: hidden;
 	}
 }
+
+// Widget forms:
+.evo_widget_form__compact {
+	margin-bottom: -15px; // to remove bottom margin from the last form-group of submit button
+	label.control-label {
+		text-align: left;
+		width: auto;
+		padding: 0;
+	}
+	.controls {
+		width: 100%;
+	}
+	.form_text_input.form-control {
+		width: 100%;
+		&.inline_widget {
+			width: 100%;
+			max-width: 250px;
+		}
+	}
+	.control-buttons {
+		margin: 0;
+		padding: 0;
+	}
+}
