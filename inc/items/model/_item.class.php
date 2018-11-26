@@ -1688,6 +1688,15 @@ class Item extends ItemLight
 			return false;
 		}
 
+		if( ! is_admin_page() )
+		{	// Check visibility of meta comments on front-office:
+			$item_Blog = & $this->get_Blog();
+			if( ! $item_Blog || ! $item_Blog->get_setting( 'meta_comments_frontoffice' ) )
+			{	// Meta comments are disabled to be displayed on front-office for this Item's collection:
+				return false;
+			}
+		}
+
 		global $current_User;
 
 		return $current_User->check_perm( 'meta_comment', 'view', false, $this->get_blog_ID() );
