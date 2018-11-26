@@ -1340,14 +1340,16 @@ class _core_Module extends Module
 			}
 		}
 
-		// ---- "+ Post"/ MENU ----
-		$default_item_denomination = /* TRANS: noun */ T_('Post');
-		$entries['post'] = array(
-				'text' => get_icon( 'new' ).' '.( empty( $default_new_ItemType ) ? $default_item_denomination : $default_new_ItemType->get_item_denomination( 'evobar_new', $default_item_denomination ) ),
-				//'title' => T_('No blog is currently selected'),
-				'disabled' => true,
-				'entry_class' => 'rwdhide evobar-entry-new-post',
-			);
+		if( ! empty( $default_new_ItemType ) )
+		{	// ---- "+ Post" MENU ----
+			$default_item_denomination = /* TRANS: noun */ T_('Post');
+			$entries['post'] = array(
+					'text' => get_icon( 'new' ).' '.$default_new_ItemType->get_item_denomination( 'evobar_new', /* TRANS: noun */ T_('Post') ),
+					//'title' => T_('No blog is currently selected'),
+					'disabled' => true,
+					'entry_class' => 'rwdhide evobar-entry-new-post',
+				);
+		}
 
 		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) )
 		{ // A collection is currently selected AND we can activate toolbar items for selected collection:
@@ -1394,7 +1396,7 @@ class _core_Module extends Module
 							);
 					}
 				}
-				if( $write_item_url = $Blog->get_write_item_url() )
+				if( isset( $entries['post'] ) && $write_item_url = $Blog->get_write_item_url() )
 				{	// Enable menu to create new item if current User has a permission in current collection:
 					if( ! empty( $default_new_ItemType ) )
 					{	// The get_write_url() function above does not allow specifying the item type ID we'll manually add it:
