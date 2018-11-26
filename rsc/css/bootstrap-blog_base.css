@@ -1677,25 +1677,38 @@ div#fileuploader_form {
 #filelist_tbody tr:last-child .action_icon_link_move_down {
   visibility: hidden;
 }
-.evo_widget_form__compact {
+.evo_widget_form__compact,
+.evo_widget_form__nolabels {
   margin-bottom: -15px;
 }
-.evo_widget_form__compact label.control-label {
+.evo_widget_form__compact label.control-label,
+.evo_widget_form__nolabels label.control-label {
   text-align: left;
   width: auto;
   padding: 0;
 }
-.evo_widget_form__compact .controls {
+.evo_widget_form__compact .controls,
+.evo_widget_form__nolabels .controls {
   width: 100%;
 }
-.evo_widget_form__compact .form_text_input.form-control {
+.evo_widget_form__compact .form_text_input.form-control,
+.evo_widget_form__nolabels .form_text_input.form-control {
   width: 100%;
 }
-.evo_widget_form__compact .form_text_input.form-control.inline_widget {
+.evo_widget_form__compact .form_text_input.form-control.inline_widget,
+.evo_widget_form__nolabels .form_text_input.form-control.inline_widget {
   width: 100%;
   max-width: 250px;
 }
-.evo_widget_form__compact .control-buttons {
+.evo_widget_form__compact .control-buttons,
+.evo_widget_form__nolabels .control-buttons {
   margin: 0;
   padding: 0;
+}
+.evo_widget_form__compact .control-buttons .btn,
+.evo_widget_form__nolabels .control-buttons .btn {
+  margin: 0;
+}
+.evo_widget_form__nolabels label.control-label {
+  display: none;
 }

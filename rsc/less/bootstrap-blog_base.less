@@ -1103,7 +1103,7 @@ div#fileuploader_form {
 }
 
 // Widget forms:
-.evo_widget_form__compact {
+.evo_widget_form__compact, .evo_widget_form__nolabels {
 	margin-bottom: -15px; // to remove bottom margin from the last form-group of submit button
 	label.control-label {
 		text-align: left;
@@ -1123,5 +1123,13 @@ div#fileuploader_form {
 	.control-buttons {
 		margin: 0;
 		padding: 0;
+		.btn {
+			margin: 0;
+		}
+	}
+}
+.evo_widget_form__nolabels {
+	label.control-label {
+		display: none;
 	}
 }

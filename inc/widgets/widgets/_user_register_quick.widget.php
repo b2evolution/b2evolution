@@ -309,9 +309,12 @@ class user_register_quick_Widget extends ComponentWidget
 			echo '<p>'.$this->disp_params['intro'].'</p>';
 		}
 
+		// Get current form display mode:
+		$form_display_mode = $this->get_form_display( 'compact' );
+
 		$Form = new Form( get_htsrv_url( 'login' ).'register.php', 'register_form', 'post' );
 
-		$Form->begin_form( NULL, '', array( 'class' => 'widget_register_form '.$this->get_form_display_class( 'compact' ) ) );
+		$Form->begin_form( NULL, '', array( 'class' => 'widget_register_form evo_widget_form__'.$form_display_mode ) );
 
 		$Form->add_crumb( 'regform' );
 		$Form->hidden( 'action', 'quick_register' );
@@ -356,7 +359,11 @@ class user_register_quick_Widget extends ComponentWidget
 				// Set HTML5 attribute required="required" to display JS error before submit form:
 				$firstname_params['input_required'] = 'required';
 			}
-			$Form->text_input( 'firstname', $firstname_value, 18, T_('Your first name'), '', $firstname_params );
+			if( $form_display_mode == 'nolabels' )
+			{	// Display placeholder only in mode when labels are hidden:
+				$firstname_params['placeholder'] = T_('Your first name');
+			}
+			$Form->text_input( 'firstname', $firstname_value, 18, ( $form_display_mode == 'nolabels' ? '' : T_('Your first name') ), '', $firstname_params );
 		}
 
 		if( $this->disp_params['ask_lastname'] != 'no' )
@@ -373,18 +380,32 @@ class user_register_quick_Widget extends ComponentWidget
 				// Set HTML5 attribute required="required" to display JS error before submit form:
 				$lastname_params['input_required'] = 'required';
 			}
-			$Form->text_input( 'lastname', $lastname_value, 18, T_('Your last name'), '', $lastname_params );
+			if( $form_display_mode == 'nolabels' )
+			{	// Display placeholder only in mode when labels are hidden:
+				$lastname_params['placeholder'] = T_('Your last name');
+			}
+			$Form->text_input( 'lastname', $lastname_value, 18, ( $form_display_mode == 'nolabels' ? '' : T_('Your last name') ), '', $lastname_params );
 		}
 
 		// E-mail
+		$email_params = array(
+			'maxlength'      => 255,
+			'class'          => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' ),
+			'required'       => true,
+			'input_required' => 'required'
+		);
+		if( $form_display_mode == 'nolabels' )
+		{	// Display placeholder only in mode when labels are hidden:
+			$email_params['placeholder'] = T_('Your email');
+		}
 		$email_value = isset( $widget_param_input_values[ $dummy_fields['email'] ] ) ? $widget_param_input_values[ $dummy_fields['email'] ] : '';
-		$Form->email_input( $dummy_fields['email'], $email_value, 50, T_('Your email'), array( 'maxlength' => 255, 'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' ), 'required' => true, 'input_required' => 'required' ) );
+		$Form->email_input( $dummy_fields['email'], $email_value, 50, ( $form_display_mode == 'nolabels' ? '' : T_('Your email') ), $email_params );
 
 		if( $this->disp_params['ask_country'] != 'no' )
 		{	// Country
-			$CountryCache = & get_CountryCache();
+			$CountryCache = & get_CountryCache( NT_('Select your country') );
 			$country_value = isset( $widget_param_input_values['country'] ) ? $widget_param_input_values['country'] : '';
-			$Form->select_country( 'country', $country_value, $CountryCache, T_('Country'), array( 'allow_none' => true, 'required' => $this->disp_params['ask_country'] == 'required' ) );
+			$Form->select_country( 'country', $country_value, $CountryCache, ( $form_display_mode == 'nolabels' ? '' : T_('Country') ), array( 'allow_none' => true, 'required' => $this->disp_params['ask_country'] == 'required' ) );
 		}
 
 		// Submit button:

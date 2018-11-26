@@ -989,7 +989,7 @@ input.btn-lg {
 }
 
 // Widget forms:
-.evo_widget_form__compact {
+.evo_widget_form__compact, .evo_widget_form__nolabels {
 	fieldset {
 		border: none;
 		padding: 0;
@@ -1000,5 +1000,10 @@ input.btn-lg {
 	}
 	.input_text {
 		width: 96%;
+	}
+}
+.evo_widget_form__nolabels {
+	.label label {
+		display: none;
 	}
 }
