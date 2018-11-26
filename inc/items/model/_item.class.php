@@ -826,7 +826,10 @@ class Item extends ItemLight
 		// SLUG:
 		if( param( 'post_urltitle', 'string', NULL ) !== NULL )
 		{
-			$this->set_from_Request( 'urltitle' );
+			// Replace special chars/umlauts:
+			load_funcs( 'locales/_charset.funcs.php' );
+			$post_urltitle = replace_special_chars( get_param( 'post_urltitle' ), $this->get( 'locale' ) );
+			$this->set( 'urltitle', $post_urltitle );
 			// Added in May 2017; but old slugs are not converted yet.
 			if( preg_match( '#(^|,+)[^a-z\d_]*\d+[^a-z\d_]*($|,+)#i', get_param( 'post_urltitle' ) ) )
 			{	// Display error if item slugs contain only digits:
