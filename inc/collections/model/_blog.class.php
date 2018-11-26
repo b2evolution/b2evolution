@@ -5745,7 +5745,7 @@ class Blog extends DataObject
 		$working_cat = $cat;
 		if( empty( $cat ) )
 		{	// Use default collection category when global category is not defined:
-			$working_cat = $this->get_setting( 'default_cat_ID' );
+			$working_cat = $this->get_default_cat_ID();
 		}
 
 		$ChapterCache = & get_ChapterCache();

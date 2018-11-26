@@ -207,6 +207,11 @@ class item_info_line_Widget extends ComponentWidget
 	{
 		global $Item;
 
+		if( empty( $Item ) )
+		{	// Don't display this widget when no Item object
+			return false;
+		}
+
 		$params = array_merge( array(
 			'author_link_text' => 'preferredname'
 		), $params );
