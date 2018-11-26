@@ -612,14 +612,14 @@ function get_icon_info( $name )
 			'legend' => T_('Activate'),
 			'size' => array( 16, 16 ),
 			'xy' => array( 64, 96 ),
-			'fa' => 'toggle-on'
+			'fa' => 'toggle-off'
 		);
 		case 'deactivate': return array(
 			'alt'  => /* TRANS: Short for "Deactivate(d)" */ T_('Deact.'),
 			'legend' => T_('Deactivate'),
 			'size' => array( 16, 16 ),
 			'xy' => array( 80, 96 ),
-			'fa' => 'toggle-off'
+			'fa' => 'toggle-on'
 		);
 		case 'enabled': return array(
 			'alt'  => /* TRANS: Short for "Activate(d)" */ T_('Act.'),
