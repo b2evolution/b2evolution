@@ -448,13 +448,13 @@ function update_mail_log_time( $type, $emlog_ID, $emlog_key )
 			  SET '.$campaign_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
 			WHERE csnd_emlog_ID = '.$DB->quote( $emlog_ID ) );
 
-		// Update last time for user subscriptions of all automation newsletters:
+		// Update last time for user subscriptions of newsletters:
 		$DB->query( 'UPDATE T_email__newsletter_subscription
-			INNER JOIN T_automation__newsletter ON aunl_enlt_ID = enls_enlt_ID AND enls_subscribed = 1
-			INNER JOIN T_email__log ON aunl_autm_ID = emlog_autm_ID AND enls_user_ID = emlog_user_ID
-			  SET '.$newsletter_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
-			WHERE emlog_ID = '.$DB->quote( $emlog_ID ).'
-			  AND enls_last_sent_manual_ts IS NOT NULL' );// When user really received an email from the Newsletter(to avoid subscriptions after email was sent)
+			INNER JOIN T_email__campaign ON ecmp_enlt_ID = enls_enlt_ID AND enls_subscribed = 1
+			INNER JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_user_ID = enls_user_ID
+				SET '.$newsletter_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
+			WHERE csnd_emlog_ID = '.$DB->quote( $emlog_ID ).'
+				AND enls_last_sent_manual_ts IS NOT NULL' );// When user really received an email from the Newsletter(to avoid subscriptions after email was sent)
 	}
 }
 
