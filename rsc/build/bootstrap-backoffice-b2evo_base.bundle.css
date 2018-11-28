@@ -1006,6 +1006,9 @@ div#publish_buttons {
   padding: 5px;
   text-align: center;
 }
+div#publish_buttons .quick-publish {
+  margin-left: 5px;
+}
 .publish_buttons_wrapper div#publish_buttons.affix {
   background-color: #ffffff;
   box-shadow: 1px 10px 35px rgba(75, 75, 75, 0.75);
