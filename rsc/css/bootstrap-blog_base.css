@@ -1712,3 +1712,15 @@ div#fileuploader_form {
 .evo_widget_form__nolabels label.control-label {
   display: none;
 }
+.evo_widget_form__inline label.control-label {
+  display: none;
+}
+.evo_widget_form__inline div {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  width: auto;
+}
+.evo_widget_form__inline input.btn {
+  margin: 0;
+}
