@@ -311,7 +311,7 @@ class user_register_quick_Widget extends ComponentWidget
 
 		// Get current form display mode:
 		$form_display_mode = $this->get_form_display( 'compact' );
-		$is_nolabels_mode = ( $form_display_mode == 'nolabels' || $form_display_mode == 'inline' );
+		$is_nolabels_mode = in_array( $form_display_mode, array( 'nolabels', 'inline', 'grouped' ) );
 
 		$Form = new Form( get_htsrv_url( 'login' ).'register.php', 'register_form', 'post' );
 
@@ -346,12 +346,20 @@ class user_register_quick_Widget extends ComponentWidget
 			$Form->hidden( 'newsletters', implode( ',', $newsletters ) );
 		}
 
+		if( $form_display_mode == 'grouped' )
+		{	// Start a group of all inputs and submit button in single line:
+			$Form->begin_line();
+			$Form->inputend = '';
+			$Form->fieldend = '';
+		}
+
 		if( $this->disp_params['ask_firstname'] != 'no' )
 		{ // First name
 			$firstname_value = isset( $widget_param_input_values['firstname'] ) ? $widget_param_input_values['firstname'] : '';
 			$firstname_params = array(
 					'maxlength' => 50,
-					'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' )
+					'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' ),
+					'input_suffix' => '',
 				);
 			if( $this->disp_params['ask_firstname'] == 'required' )
 			{	// Params if first name is required:
@@ -372,7 +380,8 @@ class user_register_quick_Widget extends ComponentWidget
 			$lastname_value = isset( $widget_param_input_values['lastname'] ) ? $widget_param_input_values['lastname'] : '';
 			$lastname_params = array(
 					'maxlength' => 50,
-					'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' )
+					'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' ),
+					'input_suffix' => '', // Remove default "\n" in order to avoid a space on grouped mode
 				);
 			if( $this->disp_params['ask_lastname'] == 'required' )
 			{	// Params if first name is required:
@@ -393,7 +402,8 @@ class user_register_quick_Widget extends ComponentWidget
 			'maxlength'      => 255,
 			'class'          => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' ),
 			'required'       => true,
-			'input_required' => 'required'
+			'input_required' => 'required',
+			'input_suffix' => '', // Remove default "\n" in order to avoid a space on grouped mode
 		);
 		if( $is_nolabels_mode )
 		{	// Display placeholder only in mode when labels are hidden:
@@ -406,14 +416,25 @@ class user_register_quick_Widget extends ComponentWidget
 		{	// Country
 			$CountryCache = & get_CountryCache( NT_('Select your country') );
 			$country_value = isset( $widget_param_input_values['country'] ) ? $widget_param_input_values['country'] : '';
-			$Form->select_country( 'country', $country_value, $CountryCache, ( $is_nolabels_mode ? '' : T_('Country') ), array( 'allow_none' => true, 'required' => $this->disp_params['ask_country'] == 'required' ) );
+			$Form->select_country( 'country', $country_value, $CountryCache, ( $is_nolabels_mode ? '' : T_('Country') ), array(
+				'allow_none' => true,
+				'required' => $this->disp_params['ask_country'] == 'required',
+				'input_suffix' => '', // Remove default "\n" in order to avoid a space on grouped mode
+			) );
 		}
 
-		// Submit button:
-		$Form->end_form( array( array(
+		$Form->buttons( array( array(
 				'value' => $this->disp_params['button'],
 				'class' => $this->disp_params['button_class'].' submit' )
 			) );
+
+		if( $form_display_mode == 'grouped' )
+		{	// End of the group of all inputs and submit button in single line:
+			$Form->end_line();
+		}
+
+		// Submit button:
+		$Form->end_form();
 
 		if( ! is_logged_in() )
 		{	// JS code to get crumb from AJAX request when page caching is enabled:

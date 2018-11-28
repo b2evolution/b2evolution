@@ -3769,17 +3769,40 @@ div#fileuploader_form {
 .evo_widget_form__nolabels label.control-label {
   display: none;
 }
-.evo_widget_form__inline label.control-label {
+.evo_widget_form__inline label.control-label,
+.evo_widget_form__grouped label.control-label {
   display: none;
 }
-.evo_widget_form__inline div {
+.evo_widget_form__inline div,
+.evo_widget_form__grouped div {
   display: inline-block;
   margin: 0;
   padding: 0;
   width: auto;
 }
-.evo_widget_form__inline input.btn {
+.evo_widget_form__inline input.btn,
+.evo_widget_form__grouped input.btn {
   margin: 0;
+}
+.evo_widget_form__grouped .controls input {
+  border-radius: 0;
+  vertical-align: top;
+}
+.evo_widget_form__grouped .controls input:not(:last-child) {
+  border-right: none;
+}
+.evo_widget_form__grouped .controls input:first-child {
+  border-radius: 4px 0 0 4px;
+}
+.evo_widget_form__grouped .controls input:last-child {
+  border-radius: 0 4px 4px 0;
+}
+.evo_widget_form__grouped .controls select {
+  -webkit-border-radius: 0;
+  border: 0;
+  outline: 1px solid #ccc;
+  outline-offset: -1px;
+  vertical-align: top;
 }
 
 /**

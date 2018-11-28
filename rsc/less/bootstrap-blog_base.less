@@ -1133,7 +1133,7 @@ div#fileuploader_form {
 		display: none;
 	}
 }
-.evo_widget_form__inline {
+.evo_widget_form__inline, .evo_widget_form__grouped {
 	label.control-label {
 		display: none;
 	}
@@ -1145,5 +1145,29 @@ div#fileuploader_form {
 	}
 	input.btn {
 		margin: 0;
+	}
+}
+.evo_widget_form__grouped {
+	.controls {
+		input {
+			border-radius: 0;
+			vertical-align: top;
+		}
+		input:not(:last-child) {
+			border-right: none;
+		}
+		input:first-child {
+			border-radius: 4px 0 0 4px;
+		}
+		input:last-child {
+			border-radius: 0 4px 4px 0;
+		}
+		select {
+			-webkit-border-radius: 0;
+			border: 0;
+			outline: 1px solid #ccc;
+			outline-offset: -1px;
+			vertical-align: top;
+		}
 	}
 }
