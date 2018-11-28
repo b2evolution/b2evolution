@@ -27,6 +27,11 @@ class coll_featured_intro_Widget extends ComponentWidget
 	var $icon = 'asterisk';
 
 	/**
+	 * Featured/Intro Item:
+	 */
+	var $Item;
+
+	/**
 	 * Constructor
 	 */
 	function __construct( $db_row = NULL )
@@ -52,9 +57,13 @@ class coll_featured_intro_Widget extends ComponentWidget
 					'note' => '.inc.php',
 					'defaultvalue' => '_item_block',
 				),
-				'item_class' => array(
-					'label' => T_('Item class'),
+				'featured_class' => array(
+					'label' => T_('Featured Item class'),
 					'defaultvalue' => 'featurepost',
+				),
+				'intro_class' => array(
+					'label' => T_('Intro Item class'),
+					'defaultvalue' => 'jumbotron',
 				),
 				'disp_title' => array(
 					'label' => T_( 'Title' ),
@@ -155,18 +164,74 @@ class coll_featured_intro_Widget extends ComponentWidget
 
 
 	/**
+	 * Get featured/intro Item
+	 *
+	 * @return mixed Item Object if a featured/intro item is available, false otherwise
+	 */
+	function & get_featured_Item()
+	{
+		if( empty( $this->Item ) )
+		{
+			$this->Item = & get_featured_Item( 'front', $this->disp_params['blog_ID'] );
+		}
+
+		return $this->Item;
+	}
+
+
+	/**
 	 * Prepare display params
 	 *
 	 * @param array MUST contain at least the basic display params
 	 */
 	function init_display( $params )
 	{
+		$this->load_param_array();
+		$original_widget_css_class = $this->param_array['widget_css_class'];
+
+		if( $Item = & $this->get_featured_Item() )
+		{
+			$extra_classes = array();
+
+			if( $Item->is_intro() )
+			{
+				$intro_classes = array();
+				if( !empty( $params['intro_class'] ) )
+				{
+					$intro_classes = preg_split( '/[\s,]+/', $params['intro_class'] );
+				}
+				$extra_classes = array_merge( $intro_classes, preg_split( '/[\s,]+/', $this->param_array['intro_class'] ) );
+			}
+
+			if( $Item->is_featured() )
+			{
+				$featured_classes = array();
+				if( !empty( $params['featured_class'] ) )
+				{
+					$featured_classes = preg_split( '/[\s,]+/', $params['featured_class'] );
+				}
+				$extra_classes = array_merge( $featured_classes, preg_split( '/[\s,]+/', $this->param_array['featured_class'] ) );
+			}
+
+			if( !empty( $extra_classes ) )
+			{
+				$extra_classes = array_unique( $extra_classes );
+				$extra_classes = implode( ' ', $extra_classes );
+
+				// Append extra classes to widget_css_class before it is injected into $wi_class$:
+				$this->param_array['widget_css_class'] .= ' '.$extra_classes;
+			}
+		}
+
 		$params = array_merge( array(
 				'featured_intro_before' => '',
 				'featured_intro_after'  => '',
 			), $params );
 
 		parent::init_display( $params );
+
+		// Restore widget_css_class:
+		$this->param_array['widget_css_class'] = $original_widget_css_class;
 	}
 
 
@@ -182,7 +247,7 @@ class coll_featured_intro_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		// Go Grab the featured post:
-		if( $Item = & get_featured_Item( 'front', $this->disp_params['blog_ID'] ) )
+		if( $Item = & $this->get_featured_Item() )
 		{	// We have a featured/intro post to display:
 			$item_style = '';
 			$LinkOwner = new LinkItem( $Item );
@@ -210,7 +275,7 @@ class coll_featured_intro_Widget extends ComponentWidget
 					'feature_block'        => true,
 					'content_mode'         => 'auto',   // 'auto' will auto select depending on $disp-detail
 					'intro_mode'           => 'normal', // Intro posts will be displayed in normal mode
-					'item_class'           => $this->disp_params['item_class'],
+					'item_class'           => $Item->is_featured() ? $this->disp_params['featured_class'] : ( $Item->is_intro() ? $this->disp_params['intro_class'] : '' ),
 					'image_size'           => $this->disp_params['image_size'],
 					'disp_title'           => $this->disp_params['disp_title'],
 					'item_title_link_type' => $this->disp_params['item_title_link_type'],
