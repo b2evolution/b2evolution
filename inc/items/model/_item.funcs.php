@@ -2295,17 +2295,18 @@ function echo_status_dropdown_button_js( $type = 'post' )
 			var item = jQuery( this ).parent();
 			var status = item.attr( 'rel' );
 			var btn_group = item.parent().parent();
-			var dropdown_buttons = item.parent().parent().find( 'button' );
+			var btn_wrapper = btn_group.parent().parent();
+			var dropdown_buttons = btn_group.find( 'button' );
 			var first_button = dropdown_buttons.parent().find( 'button:first' );
-			var save_buttons = jQuery( '.edit_actions input[type="submit"]:not(.quick-publish)' ).add( dropdown_buttons );
+			var save_buttons = btn_wrapper.find( 'input[type="submit"]:not(.quick-publish)' ).add( dropdown_buttons );
 
 			if( status == 'published' )
 			{ // Hide button "Publish!" if current status is already the "published":
-				jQuery( '.edit_actions .quick-publish' ).hide();
+				btn_wrapper.find( '.quick-publish' ).hide();
 			}
 			else
 			{ // Show button "Publish!" only when another status is selected:
-				jQuery( '.edit_actions .quick-publish' ).show();
+				btn_wrapper.find( '.quick-publish' ).show();
 			}
 
 			save_buttons.each( function()
@@ -2314,7 +2315,7 @@ function echo_status_dropdown_button_js( $type = 'post' )
 			} );
 			first_button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
 			jQuery( 'input[type=hidden][name=<?php echo $type; ?>_status]' ).val( status ); // update hidden field to new status value
-			item.parent().parent().removeClass( 'open' ); // hide dropdown menu
+			btn_group.removeClass( 'open' ); // hide dropdown menu
 
 			if( first_button.attr( 'type' ) == 'submit' )
 			{ // Submit form if current dropdown button is used to submit form
