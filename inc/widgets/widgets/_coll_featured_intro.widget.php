@@ -187,7 +187,7 @@ class coll_featured_intro_Widget extends ComponentWidget
 	function init_display( $params )
 	{
 		$this->load_param_array();
-		$original_widget_css_class = $this->param_array['widget_css_class'];
+		$original_widget_css_class = isset( $this->param_array['widget_css_class'] ) ? $this->param_array['widget_css_class'] : NULL;
 
 		if( $Item = & $this->get_featured_Item() )
 		{
@@ -195,22 +195,26 @@ class coll_featured_intro_Widget extends ComponentWidget
 
 			if( $Item->is_intro() )
 			{
-				$intro_classes = array();
 				if( !empty( $params['intro_class'] ) )
 				{
-					$intro_classes = preg_split( '/[\s,]+/', $params['intro_class'] );
+					$extra_classes = array_merge( $extra_classes, preg_split( '/[\s,]+/', $params['intro_class'] ) );
 				}
-				$extra_classes = array_merge( $intro_classes, preg_split( '/[\s,]+/', $this->param_array['intro_class'] ) );
+				if( !empty( $this->param_array['intro_class'] ) )
+				{
+					$extra_classes = array_merge( $extra_classes, preg_split( '/[\s,]+/', $this->get_param( 'intro_class' ) ) );
+				}
 			}
 
 			if( $Item->is_featured() )
 			{
-				$featured_classes = array();
 				if( !empty( $params['featured_class'] ) )
 				{
-					$featured_classes = preg_split( '/[\s,]+/', $params['featured_class'] );
+					$extra_classes = array_merge( $extra_classes, preg_split( '/[\s,]+/', $params['featured_class'] ) );
 				}
-				$extra_classes = array_merge( $featured_classes, preg_split( '/[\s,]+/', $this->param_array['featured_class'] ) );
+				if( !empty( $this->param_array['featured_class'] ) )
+				{
+					$extra_classes = array_merge( $extra_classes, preg_split( '/[\s,]+/', $this->get_param( 'featured_class' ) ) );
+				}
 			}
 
 			if( !empty( $extra_classes ) )
@@ -219,6 +223,10 @@ class coll_featured_intro_Widget extends ComponentWidget
 				$extra_classes = implode( ' ', $extra_classes );
 
 				// Append extra classes to widget_css_class before it is injected into $wi_class$:
+				if( empty( $this->param_array['widget_css_class'] ) )
+				{
+					$this->param_array['widget_css_class'] = '';
+				}
 				$this->param_array['widget_css_class'] .= ' '.$extra_classes;
 			}
 		}
@@ -275,7 +283,6 @@ class coll_featured_intro_Widget extends ComponentWidget
 					'feature_block'        => true,
 					'content_mode'         => 'auto',   // 'auto' will auto select depending on $disp-detail
 					'intro_mode'           => 'normal', // Intro posts will be displayed in normal mode
-					'item_class'           => $Item->is_featured() ? $this->disp_params['featured_class'] : ( $Item->is_intro() ? $this->disp_params['intro_class'] : '' ),
 					'image_size'           => $this->disp_params['image_size'],
 					'disp_title'           => $this->disp_params['disp_title'],
 					'item_title_link_type' => $this->disp_params['item_title_link_type'],
