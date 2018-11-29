@@ -8895,7 +8895,7 @@ class Item extends ItemLight
 		}
 
 		// Change order to correct value:
-		$order = ( $order === '' ? NULL : floatval( $order ) );
+		$order = ( $order === '' || $order === NULL ? NULL : floatval( $order ) );
 
 		// Insert/Update order per category:
 		$r = $DB->query( 'REPLACE INTO T_postcats ( postcat_post_ID, postcat_cat_ID, postcat_order )
