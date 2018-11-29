@@ -996,7 +996,7 @@ div.other_profile_pictures {
 }
 
 // Widget forms:
-.evo_widget_form__compact {
+.evo_widget_form__compact, .evo_widget_form__nolabels {
 	fieldset {
 		border: none;
 		padding: 0;
@@ -1007,5 +1007,10 @@ div.other_profile_pictures {
 	}
 	.input_text {
 		width: 96%;
+	}
+}
+.evo_widget_form__nolabels {
+	.label label {
+		display: none;
 	}
 }

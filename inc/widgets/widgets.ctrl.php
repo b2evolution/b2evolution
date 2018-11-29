@@ -759,8 +759,8 @@ if( $display_mode == 'normal' )
 	var enabled_icon_tag = \''.get_icon( 'bullet_green', 'imgtag', array( 'title' => T_( 'The widget is enabled.' ) ) ).'\';
 	var disabled_icon_tag = \''.get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_( 'The widget is disabled.' ) ) ).'\';
 	var disabled_plugin_tag = \''.get_icon( 'warning', 'imgtag', array( 'title' => T_('Inactive / Uninstalled plugin') ) ).'\';
-	var activate_icon_tag = \''.get_icon( 'deactivate', 'imgtag', array( 'title' => T_( 'Enable this widget!' ) ) ).'\';
-	var deactivate_icon_tag = \''.get_icon( 'activate', 'imgtag', array( 'title' => T_( 'Disable this widget!' ) ) ).'\';
+	var activate_icon_tag = \''.get_icon( 'activate', 'imgtag', array( 'title' => T_( 'Enable this widget!' ) ) ).'\';
+	var deactivate_icon_tag = \''.get_icon( 'deactivate', 'imgtag', array( 'title' => T_( 'Disable this widget!' ) ) ).'\';
 	var cache_enabled_icon_tag = \''.get_icon( 'block_cache_on', 'imgtag', array( 'title' => T_( 'Caching is enabled. Click to disable.' ) ) ).'\';
 	var cache_disabled_icon_tag = \''.get_icon( 'block_cache_off', 'imgtag', array( 'title' => T_( 'Caching is disabled. Click to enable.' ) ) ).'\';
 	var cache_disallowed_icon_tag = \''.get_icon( 'block_cache_disabled', 'imgtag', array( 'title' => T_( 'This widget cannot be cached.' ) ) ).'\';

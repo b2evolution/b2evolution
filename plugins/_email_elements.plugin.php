@@ -90,6 +90,13 @@ class email_elements_plugin extends Plugin
 		// Initialize JavaScript to build and open window:
 		echo_modalwindow_js();
 
+		$Form = new Form();
+		$Form->output = false;
+		$cta_select = $Form->select_input_array( 'cta_num', NULL, $this->cta_numbers, T_('CTA number') );
+		$style_select = $Form->select_input_array( 'button_type', NULL, $this->button_types, T_('Link/Button style') );
+		$button_text_input = $Form->text_input( 'button_text', '', NULL, T_('Text'), '', array( 'style' => 'width:100%;' ) );
+		$button_url_input = $Form->text_input( 'button_url', '', NULL, T_('URL'), '', array( 'style' => 'width:100%;' ) );
+
 		?><script type="text/javascript">
 		//<![CDATA[
 		function email_elements_toolbar( title, prefix )
@@ -102,6 +109,11 @@ class email_elements_plugin extends Plugin
 				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
 				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|button" value="<?php echo TS_('Button') ?>" />'
 
+				// Call to Action Button element
+				+ '<input type="button" title="<?php echo TS_('Call to Action') ?>"'
+				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
+				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|cta" value="<?php echo TS_('Call to Action') ?>" />'
+
 				// Like Button element
 				+ '<input type="button" title="<?php echo TS_('Like') ?>"'
 				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
@@ -111,11 +123,6 @@ class email_elements_plugin extends Plugin
 				+ '<input type="button" title="<?php echo TS_('Dislike') ?>"'
 				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
 				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|dislike" value="<?php echo TS_('Dislike') ?>" />'
-
-				// Call to Action Button element
-				+ '<input type="button" title="<?php echo TS_('Call to Action') ?>"'
-				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
-				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|cta" value="<?php echo TS_('Call to Action') ?>" />'
 
 				// Activate
 				+ '<input type="button" title="<?php echo TS_('Activate') ?>"'
@@ -135,42 +142,25 @@ class email_elements_plugin extends Plugin
 		<?php echo $js_code_prefix;?>_insert_button = function( type )
 		{
 			var modal_window_title;
-			var r = '<form id="email_element_button_wrapper" class="form">';
+			var r = '<form id="email_element_button_wrapper" class="form-horizontal">';
 
 			if( type == 'cta' )
 			{
-				r += '<div class="form-group"><label class="control-label"><?php echo T_('CTA number');?></label><div class="controls">'
-						+ '<select class="form-control" name="cta_num" style="width: auto;">'
-						<?php
-						foreach( $this->cta_numbers as $cta_num )
-						{
-							echo '+ \'<option value="'.$cta_num.'">'.$cta_num.'</option>\'';
-						}
-						?>
-						+ '</select>'
-						+ '</div></div>';
+				r += '<?php echo format_to_js( $cta_select );?>';
 			}
 
-			if( type == 'cta' || type == 'activate' || type == 'unsubscribe' )
+			if( type == 'button' || type == 'cta' || type == 'activate' || type == 'unsubscribe' )
 			{
-				r += '<div class="form-group"><label class="control-label"><?php echo T_('Button type');?></label><div class="controls">'
-						+ '<select class="form-control" name="button_type" style="width: auto;">'
-						<?php
-						foreach( $this->button_types as $button_type )
-						{
-							echo '+ \'<option value="'.$button_type.'">'.$button_type.'</option>\'';
-						}
-						?>
-						+ '</select>'
-						+ '</div></div>';
+				r += '<?php echo format_to_js( $style_select );?>';
 			}
 
 			if( type != 'unsubscribe' )
 			{
-				r += '<div class="form-group"><label class="control-label"><?php echo T_('URL');?></label><div class="controls"><input class="form_text_input form-control" type="text" name="button_url" /></div></div>';
+				r += '<?php echo format_to_js( $button_url_input );?>';
 			}
 
-			r += '<div class="form-group"><label class="control-label"><?php echo T_('Text');?></label><div class="controls"><input class="form_text_input form-control" type="text" name="button_text" /></div></div>';
+			r += '<?php echo format_to_js( $button_text_input );?>';
+
 			r += '</form>';
 
 			switch( type )
@@ -200,7 +190,7 @@ class email_elements_plugin extends Plugin
 					break;
 			}
 
-			openModalWindow( r, '550px', '', true,
+			openModalWindow( r, '600px', '', true,
 					modal_window_title, // Window title
 					[ '-', 'email_element_button_buttons' ],
 					true );
@@ -227,7 +217,7 @@ class email_elements_plugin extends Plugin
 			buttons_side_obj.after( '<button id="email_element_button_insert" class="btn btn-primary" data-function="' + type + '"><?php echo T_('Insert');?></button>' );
 
 			// Set button type dropdown default:
-			var button_defaults = { 'cta': 'primary', 'activate': 'success', 'unsubscribe': 'link' };
+			var button_defaults = { 'button': 'primary', 'cta': 'primary', 'activate': 'success', 'unsubscribe': 'link' };
 			var button_type = jQuery( 'select[name=button_type]', '#email_element_button_wrapper' ).val( button_defaults[type] );
 
 			// To prevent link default event:
@@ -248,7 +238,7 @@ class email_elements_plugin extends Plugin
 			switch( type )
 			{
 				case 'button':
-					shortTag = '[button' + ( url == '' ? '' : ':' + url ) + ']'+text+'[/button]';
+					shortTag = '[button' + ':' + button_type + ( url == '' ? '' : ':' + url ) + ']'+text+'[/button]';
 					break;
 
 				case 'like':
@@ -341,8 +331,19 @@ class email_elements_plugin extends Plugin
 				switch( $matches[1][$i] )
 				{
 					case 'button':
-						$url = trim( $matches[2][$i] );
 						$button_text = trim( $matches[3][$i] );
+
+						$options = explode( ':', $matches[2][$i], 2 );
+						$button_type = trim( $options[0] );
+						if( in_array( $button_type, $this->button_types ) )
+						{
+							$url = isset( $options[1] ) ? trim( $options[1] ) : NULL;
+						}
+						else
+						{
+							$button_type = 'primary';
+							$url = trim( $matches[2][$i] );
+						}
 
 						if( empty( $url ) )
 						{
@@ -355,7 +356,7 @@ class email_elements_plugin extends Plugin
 						}
 						else
 						{
-							$link_tag = get_link_tag( $url, $button_text, 'div.btn a+a.btn-primary' );
+							$link_tag = get_link_tag( $url, $button_text, $button_type == 'link' ? '' : 'div.btn a+a.btn-'.$button_type );
 						}
 						break;
 
@@ -384,7 +385,15 @@ class email_elements_plugin extends Plugin
 						$options = explode( ':', $matches[2][$i], 3 );
 						$cta_num = trim( $options[0] );
 						$button_type = trim( $options[1] );
-						$url = isset( $options[2] ) ? trim( $options[2] ) : '';
+						if( in_array( $button_type, $this->button_types ) )
+						{
+							$url = isset( $options[2] ) ? trim( $options[2] ) : '';
+						}
+						else
+						{
+							$button_type = 'primary';
+							$url = implode( ':', array_slice( $options, 1 ) ); // ignore cta number option
+						}
 						$text = trim( $matches[3][$i] );
 
 						if( empty( $url ) )
@@ -393,12 +402,6 @@ class email_elements_plugin extends Plugin
 						}
 
 						if( ! in_array( $cta_num, $this->cta_numbers ) )
-						{
-							$link_tag = $current_element;
-							break;
-						}
-
-						if( ! in_array( $button_type, $this->button_types ) )
 						{
 							$link_tag = $current_element;
 							break;

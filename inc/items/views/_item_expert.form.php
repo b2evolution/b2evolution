@@ -942,11 +942,11 @@ $Form->begin_form( '', '', $params );
 		echo '<p>';
 		if( $UserSettings->get_collection_setting( 'show_quick_publish', $Blog->ID ) )
 		{ // The quick button is displayed
-			echo action_icon( '', 'activate', $quick_setting_url.'hide_quick_button', T_('Show the quick "Publish!" button when relevant.'), 3, 4 );
+			echo action_icon( '', 'deactivate', $quick_setting_url.'hide_quick_button', T_('Show the quick "Publish!" button when relevant.'), 3, 4 );
 		}
 		else
 		{ // The quick button is hidden
-			echo action_icon( '', 'deactivate', $quick_setting_url.'show_quick_button', T_('Never show the quick "Publish!" button.'), 3, 4 );
+			echo action_icon( '', 'activate', $quick_setting_url.'show_quick_button', T_('Never show the quick "Publish!" button.'), 3, 4 );
 		}
 		echo '</p>';
 

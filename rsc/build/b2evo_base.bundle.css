@@ -4340,16 +4340,22 @@ div.other_profile_pictures img {
 .evo_container__sidebar .evo_poll__title {
   white-space: normal;
 }
-.evo_widget_form__compact fieldset {
+.evo_widget_form__compact fieldset,
+.evo_widget_form__nolabels fieldset {
   border: none;
   padding: 0;
   margin: 0;
 }
-.evo_widget_form__compact input[type=submit] {
+.evo_widget_form__compact input[type=submit],
+.evo_widget_form__nolabels input[type=submit] {
   margin: 5px 0;
 }
-.evo_widget_form__compact .input_text {
+.evo_widget_form__compact .input_text,
+.evo_widget_form__nolabels .input_text {
   width: 96%;
+}
+.evo_widget_form__nolabels .label label {
+  display: none;
 }
 
 /**

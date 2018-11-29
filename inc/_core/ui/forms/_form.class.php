@@ -2730,9 +2730,29 @@ class Form extends Widget
 
 		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form-control';
 
-		$r .="\n<select".get_field_attribs_as_string($field_params).'>'
+		if( isset($field_params['input_prefix']) )
+		{
+			$input_prefix = $field_params['input_prefix'];
+			unset($field_params['input_prefix']); // no HTML attribute
+		}
+		else
+		{
+			$input_prefix = '';
+		}
+
+		if( isset($field_params['input_suffix']) )
+		{
+			$input_suffix = $field_params['input_suffix'];
+			unset($field_params['input_suffix']); // no HTML attribute
+		}
+		else
+		{
+			$input_suffix = "\n";
+		}
+
+		$r .= $input_prefix.'<select'.get_field_attribs_as_string( $field_params ).'>'
 			 .$field_options
-			 ."</select>\n";
+			 .'</select>'.$input_suffix;
 
 		$r .= $this->end_field();
 

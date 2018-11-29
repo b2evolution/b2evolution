@@ -826,7 +826,10 @@ class Item extends ItemLight
 		// SLUG:
 		if( param( 'post_urltitle', 'string', NULL ) !== NULL )
 		{
-			$this->set_from_Request( 'urltitle' );
+			// Replace special chars/umlauts:
+			load_funcs( 'locales/_charset.funcs.php' );
+			$post_urltitle = replace_special_chars( get_param( 'post_urltitle' ), $this->get( 'locale' ) );
+			$this->set( 'urltitle', $post_urltitle );
 			// Added in May 2017; but old slugs are not converted yet.
 			if( preg_match( '#(^|,+)[^a-z\d_]*\d+[^a-z\d_]*($|,+)#i', get_param( 'post_urltitle' ) ) )
 			{	// Display error if item slugs contain only digits:
@@ -1683,6 +1686,15 @@ class Item extends ItemLight
 		if( ! is_logged_in() )
 		{	// User must be logged in
 			return false;
+		}
+
+		if( ! is_admin_page() )
+		{	// Check visibility of meta comments on front-office:
+			$item_Blog = & $this->get_Blog();
+			if( ! $item_Blog || ! $item_Blog->get_setting( 'meta_comments_frontoffice' ) )
+			{	// Meta comments are disabled to be displayed on front-office for this Item's collection:
+				return false;
+			}
 		}
 
 		global $current_User;

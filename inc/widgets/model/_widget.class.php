@@ -1554,21 +1554,15 @@ class ComponentWidget extends DataObject
 
 
 	/**
-	 * Get style class for widget form depending on current requested mode from skin by param 'form_display'
+	 * Get a form display mode depending on requested skin param 'form_display'
 	 *
-	 * @param string Default value for form display: 'standard', 'compact'
+	 * @param string Default value for form display: 'standard', 'compact', 'nolabels', 'inline', 'grouped'
+	 * @return string Current form display: 'standard', 'compact', 'nolabels', 'inline', 'grouped' or another default of the widget
 	 */
-	function get_form_display_class( $default_form_display = 'standard' )
+	function get_form_display( $default_form_display = 'standard' )
 	{
 		$form_display = isset( $this->disp_params['form_display'] ) ? $this->disp_params['form_display'] : $default_form_display;
-		if( $form_display == 'standard' ||
-		    $form_display == 'compact' )
-		{
-			return 'evo_widget_form__'.$form_display;
-		}
-
-		// Unknown widget form display mode:
-		return '';
+		return in_array( $form_display, array( 'standard', 'compact', 'nolabels', 'inline', 'grouped' ) ) ? $form_display : $default_form_display;
 	}
 
 

@@ -316,6 +316,13 @@ $Form->begin_fieldset( T_('Comment recycle bin').get_manual_link('recycle-bin-se
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset( T_('Meta Comments').get_manual_link( 'meta-comments-settings' ) );
+
+	$Form->checkbox( 'meta_comments_frontoffice', $edited_Blog->get_setting( 'meta_comments_frontoffice' ), T_('Display in Front-Office'), T_('Display meta comments in Front-Office.') );
+
+$Form->end_fieldset();
+
+
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 echo '<div class="well">';

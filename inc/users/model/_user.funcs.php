@@ -5674,7 +5674,7 @@ function user_sent_emails_results_block( $params = array() )
 	$SQL->WHERE( 'emlog_user_ID = '.$DB->quote( $edited_User->ID ) );
 
 	// Create result set:
-	$emails_Results = new Results( $SQL->get(), $params['results_param_prefix'] );
+	$emails_Results = new Results( $SQL->get(), $params['results_param_prefix'], '-D' );
 	$emails_Results->title = $params['results_title'];
 	$emails_Results->no_results_text = $params['results_no_text'];
 
@@ -5763,7 +5763,7 @@ function user_email_returns_results_block( $params = array() )
 	$SQL->WHERE( 'emret_address = '.$DB->quote( $edited_User->get( 'email' ) ) );
 
 	// Create result set:
-	$email_returns_Results = new Results( $SQL->get(), $params['results_param_prefix'] );
+	$email_returns_Results = new Results( $SQL->get(), $params['results_param_prefix'], '-D' );
 	$email_returns_Results->title = $params['results_title'];
 	$email_returns_Results->no_results_text = $params['results_no_text'];
 
