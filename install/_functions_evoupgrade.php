@@ -10477,7 +10477,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13000, 'Creating sections table...' ) )
+	if( upg_task_start( 15000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '
 				sec_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -10488,13 +10488,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13005, 'Upgrading collections table...' ) )
+	if( upg_task_start( 15005, 'Upgrading collections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_add_col( 'T_blogs', 'blog_sec_ID', 'INT(11) UNSIGNED NOT NULL DEFAULT 1' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13010, 'Create default section...' ) )
+	if( upg_task_start( 15010, 'Create default section...' ) )
 	{	// part of 7.0.0-alpha
 		$DB->query( 'INSERT INTO T_section ( sec_ID, sec_name, sec_order, sec_owner_user_ID )
 			VALUES ( 1, "No Section", 1, 1 )' );
@@ -10508,7 +10508,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13020, 'Install default site skin...' ) )
+	if( upg_task_start( 15020, 'Install default site skin...' ) )
 	{	// part of 7.0.0-alpha
 		load_funcs( 'skins/_skin.funcs.php' );
 		$SkinCache = & get_SkinCache();
@@ -10524,7 +10524,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13030, 'Creating plugin group settings table...' ) )
+	if( upg_task_start( 15030, 'Creating plugin group settings table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_plugingroupsettings', '
 			pgset_plug_ID INT(11) UNSIGNED NOT NULL,
@@ -10536,7 +10536,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 
-	if( upg_task_start( 13040, 'Creating table for widget container...' ) )
+	if( upg_task_start( 15040, 'Creating table for widget container...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_widget__container', '
 			wico_ID       INT(10) UNSIGNED auto_increment,
@@ -10548,7 +10548,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13050, 'Inserting widget containers...' ) )
+	if( upg_task_start( 15050, 'Inserting widget containers...' ) )
 	{	// part of 7.0.0-alpha
 		$DB->query( 'INSERT INTO T_widget__container ( wico_name, wico_coll_ID, wico_order )
 			SELECT wi_sco_name, wi_coll_ID, @order := @order + 1 AS wico_order
@@ -10591,7 +10591,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13060, 'Upgrading widgets table...' ) )
+	if( upg_task_start( 15060, 'Upgrading widgets table...' ) )
 	{	// part of 7.0.0-alpha
 		$DB->query( 'RENAME TABLE '.$tableprefix.'widget TO T_widget__widget' );
 		db_add_col( 'T_widget__widget', 'wi_wico_ID', 'INT(10) UNSIGNED NULL DEFAULT NULL AFTER wi_ID' );
@@ -10611,7 +10611,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13070, 'Updating widget containers content...' ) )
+	if( upg_task_start( 15070, 'Updating widget containers content...' ) )
 	{	// part of 7.0.0-alpha
 		// Create Item Single containers and a content widget to make sure item contents will be displayed in every collection:
 		$widget_containers_sql_rows = array();
@@ -10647,13 +10647,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13080, 'Droping skin containers table...' ) )
+	if( upg_task_start( 15080, 'Droping skin containers table...' ) )
 	{	// part of 7.0.0-alpha
 		$DB->query( 'DROP TABLE IF EXISTS '.$tableprefix.'skins__container' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13090, 'Upgrading widget containers table...' ) )
+	if( upg_task_start( 15090, 'Upgrading widget containers table...' ) )
 	{	// part of 7.0.0-alpha
 		db_add_col( 'T_widget__container', 'wico_main', 'TINYINT(1) NOT NULL DEFAULT 0' );
 		// Update new flag to 1 for all main containers of existing collections:
@@ -10696,7 +10696,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13100, 'Rename widget "coll_avatar" to "user_profile_pics"...' ) )
+	if( upg_task_start( 15100, 'Rename widget "coll_avatar" to "user_profile_pics"...' ) )
 	{	// part of 7.0.0-alpha
 		$DB->query( 'UPDATE T_widget__widget
 			  SET wi_code = "user_profile_pics"
@@ -10704,7 +10704,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13110, 'Upgrading widget containers table...' ) )
+	if( upg_task_start( 15110, 'Upgrading widget containers table...' ) )
 	{	// part of 7.0.0-alpha
 		db_add_col( 'T_widget__container', 'wico_skin_type', 'ENUM( "normal", "mobile", "tablet" ) COLLATE ascii_general_ci NOT NULL DEFAULT "normal" AFTER wico_code' );
 		db_drop_index( 'T_widget__container', 'wico_coll_ID_code' );
@@ -10712,7 +10712,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13120, 'Converting columns to ASCII...' ) )
+	if( upg_task_start( 15120, 'Converting columns to ASCII...' ) )
 	{	// part of 7.0.0-alpha
 		db_modify_col( 'T_automation__automation', 'autm_status', 'ENUM("paused", "active") COLLATE ascii_general_ci DEFAULT "paused"' );
 		db_upgrade_cols( 'T_blogs', array(
@@ -10748,7 +10748,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13130, 'Converting columns to utf8mb4...' ) )
+	if( upg_task_start( 15130, 'Converting columns to utf8mb4...' ) )
 	{	// part of 7.0.0-alpha
 		// Modify indexes with max 767 chars(191 * 4 bytes):
 		db_add_index( 'T_users__organization', 'org_name', 'org_name(191)', 'UNIQUE' );
@@ -10826,7 +10826,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13140, 'Converting columns to utf8mb4...' ) )
+	if( upg_task_start( 15140, 'Converting columns to utf8mb4...' ) )
 	{	// part of 7.0.0-alpha
 		db_convert_cols_to_utf8mb4( array(
 			'T_email__campaign' => array( 'ecmp_name', 'ecmp_user_tag_sendskip', 'ecmp_user_tag_sendsuccess' ),
@@ -10834,7 +10834,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13150, 'Converting columns to utf8mb4...' ) )
+	if( upg_task_start( 15150, 'Converting columns to utf8mb4...' ) )
 	{	// part of 7.0.0-alpha
 		db_convert_cols_to_utf8mb4( array(
 			'T_items__type_custom_field' => array( 'itcf_format' ),
@@ -10842,7 +10842,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13160, 'Creating table for URL aliases...' ) )
+	if( upg_task_start( 15160, 'Creating table for URL aliases...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_coll_url_aliases', "
 			cua_coll_ID   INT(11) UNSIGNED NOT NULL,
@@ -10852,19 +10852,19 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13170, 'Updating Antispam IP Ranges table... ' ) )
+	if( upg_task_start( 15170, 'Updating Antispam IP Ranges table... ' ) )
 	{ // part of 7.0.0-alpha
 		db_modify_col( 'T_antispam__iprange', 'aipr_status', 'enum( "trusted", "probably_ok", "suspect", "very_suspect", "blocked" ) COLLATE ascii_general_ci NULL DEFAULT NULL' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13180, 'Upgrade table item types... ') )
+	if( upg_task_start( 15180, 'Upgrade table item types... ') )
 	{ // part of 7.0.0-alpha
 		db_add_col( 'T_items__type', 'ityp_schema', 'ENUM( "Article", "WebPage", "BlogPosting", "ImageGallery", "DiscussionForumPosting", "TechArticle" ) COLLATE ascii_general_ci NULL DEFAULT NULL AFTER ityp_template_name' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13190, 'Installing new widgets/containers...' ) )
+	if( upg_task_start( 15190, 'Installing new widgets/containers...' ) )
 	{	// part of 7.0.0-alpha
 		install_new_default_widgets( 'item_list' );
 		install_new_default_widgets( 'item_in_list' );
@@ -10873,7 +10873,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13210, 'Update free html widgets...' ) )
+	if( upg_task_start( 15210, 'Update free html widgets...' ) )
 	{	// part of 7.0.0-alpha
 		$SQL = new SQL( 'Get free html widget to update new option "renderers"' );
 		$SQL->SELECT( 'wi_ID, wi_params' );
@@ -10892,14 +10892,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13220, 'Updating table item types... ' ) )
+	if( upg_task_start( 15220, 'Updating table item types... ' ) )
 	{ // part of 7.0.0-alpha
 		db_add_col( 'T_items__type', 'ityp_add_aggregate_rating', 'TINYINT DEFAULT 1 AFTER ityp_schema' );
 		db_modify_col( 'T_items__type', 'ityp_schema', 'ENUM( "Article", "WebPage", "BlogPosting", "ImageGallery", "DiscussionForumPosting", "TechArticle", "Product" ) COLLATE ascii_general_ci NULL DEFAULT NULL' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13230, 'Installing new widgets/containers...' ) )
+	if( upg_task_start( 15230, 'Installing new widgets/containers...' ) )
 	{	// part of 7.0.0-alpha
 		install_new_default_widgets( 'front_page_column_a' );
 		install_new_default_widgets( 'front_page_column_b' );
@@ -10910,13 +10910,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13240, 'Updating table item types...' ) )
+	if( upg_task_start( 15240, 'Updating table item types...' ) )
 	{ // part of 7.0.0-alpha
 		db_modify_col( 'T_items__type', 'ityp_schema', 'ENUM( "Article", "WebPage", "BlogPosting", "ImageGallery", "DiscussionForumPosting", "TechArticle", "Product", "Review" ) COLLATE ascii_general_ci NULL DEFAULT NULL' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13250, 'Updating table item custom fields...' ) )
+	if( upg_task_start( 15250, 'Updating table item custom fields...' ) )
 	{ // part of 7.0.0-alpha
 		db_add_col( 'T_items__type_custom_field', 'itcf_schema_prop', 'VARCHAR(255) COLLATE ascii_general_ci NULL AFTER itcf_name' );
 		upg_task_end();
