@@ -68,6 +68,9 @@ class GeneralSettings extends AbstractSettings
 				  180 to 365 days ->  60 days spacing
 				  365 to 730 days -> 120 days spacing
 				more => "The user has not logged in for x days, so we will not send him notifications any more"*/
+		// Manage email address statuses:
+		'manage_email_statuses_min_delay' => 259200, // seconds, Minimum 3 days delay since last error
+		'manage_email_statuses_min_sends' => 3, // Number of minimum sends since last error
 
 		'email_service' => 'mail', // Preferred email service: 'mail', 'smtp'
 		'force_email_sending' => '0', // Force email sending

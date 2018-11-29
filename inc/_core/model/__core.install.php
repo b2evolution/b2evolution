@@ -493,7 +493,7 @@ $schema_queries = array(
 			emlog_message       MEDIUMTEXT COLLATE utf8mb4_unicode_ci DEFAULT NULL,
 			emlog_last_open_ts  TIMESTAMP NULL,
 			emlog_last_click_ts TIMESTAMP NULL,
-			emlog_camp_ID       INT UNSIGNED NULL DEFAULT NULL,
+			emlog_camp_ID       INT UNSIGNED NULL DEFAULT NULL COMMENT 'Used to reference campaign when there is no associated campaign_send or the previously associated campaign_send updated its csnd_emlog_ID',
 			emlog_autm_ID       INT UNSIGNED DEFAULT NULL,
 			PRIMARY KEY         (emlog_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),

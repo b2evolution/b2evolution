@@ -2333,6 +2333,12 @@ class _core_Module extends Module
 				'ctrl'   => 'cron/jobs/_decode_returned_emails.job.php',
 				'params' => NULL,
 			),
+			'manage-email-statuses' => array(
+				'name'   => T_('Manage email address statuses'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_manage_email_statuses.job.php',
+				'params' => NULL,
+			),
 			'send-non-activated-account-reminders' => array(
 				'name'   => T_('Send reminders about non-activated accounts'),
 				'help'   => '#',

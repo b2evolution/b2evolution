@@ -45,7 +45,7 @@ class EmailLog extends DataObject
 
 	var $last_click_ts;
 
-	var $camp_ID;
+	var $camp_ID; // Used to reference the campaign when there is no associated campaign_send or the previously associated campaign updated its csnd_emlog_ID
 
 	var $autm_ID;
 

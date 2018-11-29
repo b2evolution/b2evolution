@@ -101,42 +101,42 @@ class email_elements_plugin extends Plugin
 		//<![CDATA[
 		function email_elements_toolbar( title, prefix )
 		{
-			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
+			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) );?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) );?>'
 				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>'
 
 				// Button element
-				+ '<input type="button" title="<?php echo TS_('Button') ?>"'
-				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
-				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|button" value="<?php echo TS_('Button') ?>" />'
+				+ '<input type="button" title="<?php echo format_to_js( T_('Button (or link) for any use') );?>"'
+				+ ' class="<?php echo format_to_js( $this->get_template( 'toolbar_button_class' ) );?>"'
+				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|button" value="<?php echo format_to_js( T_('Button') );?>" />'
 
 				// Call to Action Button element
-				+ '<input type="button" title="<?php echo TS_('Call to Action') ?>"'
-				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
-				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|cta" value="<?php echo TS_('Call to Action') ?>" />'
+				+ '<input type="button" title="<?php echo format_to_js( T_('Button (or link) which additionally records CTA stats') );?>"'
+				+ ' class="<?php echo format_to_js( $this->get_template( 'toolbar_button_class' ) );?>"'
+				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|cta" value="<?php echo format_to_js( T_('Call to Action') );?>" />'
 
 				// Like Button element
-				+ '<input type="button" title="<?php echo TS_('Like') ?>"'
-				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
-				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|like" value="<?php echo TS_('Like') ?>" />'
+				+ '<input type="button" title="<?php echo format_to_js( T_('Button which records a like') );?>"'
+				+ ' class="<?php echo format_to_js( $this->get_template( 'toolbar_button_class' ) );?>"'
+				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|like" value="<?php echo format_to_js( T_('Like') );?>" />'
 
 				// Dislike Button element
-				+ '<input type="button" title="<?php echo TS_('Dislike') ?>"'
-				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
-				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|dislike" value="<?php echo TS_('Dislike') ?>" />'
+				+ '<input type="button" title="<?php echo format_to_js( T_('Button which record a dislike') );?>"'
+				+ ' class="<?php echo format_to_js( $this->get_template( 'toolbar_button_class' ) );?>"'
+				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|dislike" value="<?php echo format_to_js( T_('Dislike') );?>" />'
 
 				// Activate
-				+ '<input type="button" title="<?php echo TS_('Activate') ?>"'
-				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
-				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|activate" value="<?php echo TS_('Activate') ?>" />'
+				+ '<input type="button" title="<?php echo format_to_js( T_('Button which activates the User\'s account') );?>"'
+				+ ' class="<?php echo format_to_js( $this->get_template( 'toolbar_button_class' ) );?>"'
+				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|activate" value="<?php echo format_to_js( T_('Activate') );?>" />'
 
 				// Unsubscribe
-				+ '<input type="button" title="<?php echo TS_('Unsubscribe') ?>"'
-				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
-				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|unsubscribe" value="<?php echo TS_('Unsubscribe') ?>" />'
+				+ '<input type="button" title="<?php echo format_to_js( T_('Button which Unsubscribes the User from the current List') );?>"'
+				+ ' class="<?php echo format_to_js( $this->get_template( 'toolbar_button_class' ) );?>"'
+				+ ' data-func="<?php echo $js_code_prefix;?>_insert_button|unsubscribe" value="<?php echo format_to_js( T_('Unsubscribe') );?>" />'
 
-				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
+				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) );?>';
 
-				jQuery( '.' + prefix + '<?php echo $this->code ?>_toolbar' ).html( r );
+				jQuery( '.' + prefix + '<?php echo $this->code;?>_toolbar' ).html( r );
 		}
 
 		<?php echo $js_code_prefix;?>_insert_button = function( type )
@@ -166,27 +166,27 @@ class email_elements_plugin extends Plugin
 			switch( type )
 			{
 				case 'button':
-					modal_window_title = '<?php echo TS_('Add a link button');?>';
+					modal_window_title = '<?php echo format_to_js( T_('Add a link button') );?>';
 					break;
 
 				case 'like':
-					modal_window_title = '<?php echo TS_('Add a like button');?>';
+					modal_window_title = '<?php echo format_to_js( T_('Add a like button') );?>';
 					break;
 
 				case 'dislike':
-					modal_window_title = '<?php echo TS_('Add a dislike button');?>';
+					modal_window_title = '<?php echo format_to_js( T_('Add a dislike button') );?>';
 					break;
 
 				case 'cta':
-					modal_window_title = '<?php echo TS_('Add a call to action button');?>';
+					modal_window_title = '<?php echo format_to_js( T_('Add a call to action button') );?>';
 					break;
 
 				case 'activate':
-					modal_window_title = '<?php echo TS_('Add an activate button');?>';
+					modal_window_title = '<?php echo format_to_js( T_('Add an activate button') );?>';
 					break;
 
 				case 'unsubscribe':
-					modal_window_title = '<?php echo TS_('Add an unsubscribe button');?>';
+					modal_window_title = '<?php echo format_to_js( T_('Add an unsubscribe button') );?>';
 					break;
 			}
 

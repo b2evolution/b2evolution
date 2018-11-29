@@ -186,60 +186,12 @@ class coll_featured_intro_Widget extends ComponentWidget
 	 */
 	function init_display( $params )
 	{
-		$this->load_param_array();
-		$original_widget_css_class = isset( $this->param_array['widget_css_class'] ) ? $this->param_array['widget_css_class'] : NULL;
-
-		if( $Item = & $this->get_featured_Item() )
-		{
-			$extra_classes = array();
-
-			if( $Item->is_intro() )
-			{
-				if( !empty( $params['intro_class'] ) )
-				{
-					$extra_classes = array_merge( $extra_classes, preg_split( '/[\s,]+/', $params['intro_class'] ) );
-				}
-				if( !empty( $this->param_array['intro_class'] ) )
-				{
-					$extra_classes = array_merge( $extra_classes, preg_split( '/[\s,]+/', $this->get_param( 'intro_class' ) ) );
-				}
-			}
-
-			if( $Item->is_featured() )
-			{
-				if( !empty( $params['featured_class'] ) )
-				{
-					$extra_classes = array_merge( $extra_classes, preg_split( '/[\s,]+/', $params['featured_class'] ) );
-				}
-				if( !empty( $this->param_array['featured_class'] ) )
-				{
-					$extra_classes = array_merge( $extra_classes, preg_split( '/[\s,]+/', $this->get_param( 'featured_class' ) ) );
-				}
-			}
-
-			if( !empty( $extra_classes ) )
-			{
-				$extra_classes = array_unique( $extra_classes );
-				$extra_classes = implode( ' ', $extra_classes );
-
-				// Append extra classes to widget_css_class before it is injected into $wi_class$:
-				if( empty( $this->param_array['widget_css_class'] ) )
-				{
-					$this->param_array['widget_css_class'] = '';
-				}
-				$this->param_array['widget_css_class'] .= ' '.$extra_classes;
-			}
-		}
-
 		$params = array_merge( array(
 				'featured_intro_before' => '',
 				'featured_intro_after'  => '',
 			), $params );
 
 		parent::init_display( $params );
-
-		// Restore widget_css_class:
-		$this->param_array['widget_css_class'] = $original_widget_css_class;
 	}
 
 
@@ -279,7 +231,8 @@ class coll_featured_intro_Widget extends ComponentWidget
 			{	// Append item style to use cover as background:
 				echo update_html_tag_attribs( $this->disp_params['featured_intro_before'], array( 'style' => $item_style, 'class' => 'evo_hasbgimg' ) );
 			}
-			skin_include( $this->disp_params['skin_template'].'.inc.php', array(
+
+			$template_params = array(
 					'feature_block'        => true,
 					'content_mode'         => 'auto',   // 'auto' will auto select depending on $disp-detail
 					'intro_mode'           => 'normal', // Intro posts will be displayed in normal mode
@@ -289,7 +242,25 @@ class coll_featured_intro_Widget extends ComponentWidget
 					'attached_pics'        => $this->disp_params['attached_pics'],
 					'item_pic_link_type'   => $this->disp_params['item_pic_link_type'],
 					'Item'                 => $Item,
-				) );
+			);
+
+			// Add item_class:
+			$item_class = array();
+			if( $Item->is_intro() )
+			{
+				$item_class = preg_split( '/[\s,]+/', $this->disp_params['intro_class'] );
+			}
+			elseif( $Item->is_featured() )
+			{
+				$item_class = preg_split( '/[\s,]+/', $this->disp_params['featured_class'] );
+			}
+
+			if( !empty( $item_class ) )
+			{
+				$template_params['item_class'] = implode( ' ', $item_class );
+			}
+
+			skin_include( $this->disp_params['skin_template'].'.inc.php', $template_params );
 			echo $this->disp_params['featured_intro_after'];
 			echo $this->disp_params['block_body_end'];
 			echo $this->disp_params['block_end'];

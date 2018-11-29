@@ -137,6 +137,12 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 					}
 				}
 				break;
+
+			case 'manage-email-statuses':
+				// Manage email address statuses:
+				$Form->duration_input( 'manage_email_statuses_min_delay', $Settings->get( 'manage_email_statuses_min_delay' ), T_('Minimum delay since last error'), 'days', 'minutes', array( 'note' => T_('<code>Warning</code> or <code>Suspicious</code> addresses may return to <code>Unknown</code> after this delay.') ) );
+				$Form->text_input( 'manage_email_statuses_min_sends', $Settings->get( 'manage_email_statuses_min_sends' ), 5, T_('Minimum sends since last error'), T_('<code>Warning</code> or <code>Suspicious</code> addresses may return to <code>Unknown</code> after this number of new (presumed successful) email sends.'), array( 'type' => 'number', 'min' => 1, 'max' => 999999999 ) );
+				break;
 		}
 
 		$Form->duration_input( 'cjob_timeout_'.$cron_job_key, $Settings->get( 'cjob_timeout_'.$cron_job_key ), T_('Max execution time'), 'days', 'minutes', array( 'note' => T_( 'Leave empty for no limit' ) ) );
