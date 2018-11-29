@@ -631,7 +631,8 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 					continue;
 				}
 
-				if( $container_type == 'sub' || $container_type == 'page' )
+				if( ! isset( $coll_containers[ $new_container_code ] ) &&
+				    ( $container_type == 'sub' || $container_type == 'page' ) )
 				{	// Initialize sub-container and page containers data in order to install it below:
 					$coll_containers[ $new_container_code ] = array(
 							isset( $container_widgets['name'] ) ? $container_widgets['name'] : $new_container_code,
