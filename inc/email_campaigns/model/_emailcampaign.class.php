@@ -891,12 +891,24 @@ class EmailCampaign extends DataObject
 			}
 
 			if( $result )
-			{	// Update last sending data for newsletter per user:
-				$DB->query( 'UPDATE T_email__newsletter_subscription
-					SET enls_last_sent_manual_ts = '.$DB->quote( date2mysql( $localtimenow ) ).',
-					    enls_send_count = enls_send_count + 1
-					WHERE enls_user_ID = '.$DB->quote( $user_ID ).'
-					  AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+			{
+				if( empty( $automation_ID ) )
+				{	// Update last sending data for newsletter per user:
+					$DB->query( 'UPDATE T_email__newsletter_subscription
+						SET enls_last_sent_manual_ts = '.$DB->quote( date2mysql( $localtimenow ) ).',
+								enls_send_count = enls_send_count + 1
+						WHERE enls_user_ID = '.$DB->quote( $user_ID ).'
+							AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+				}
+				else
+				{
+					$DB->query( 'UPDATE T_email__newsletter_subscription
+						INNER JOIN T_automation__newsletter ON aunl_enlt_ID = enls_enlt_ID AND enls_subscribed = 1
+							SET enls_last_sent_manual_ts = '.$DB->quote( date2mysql( $localtimenow ) ).',
+									enls_send_count = enls_send_count + 1
+						WHERE enls_user_ID = '.$DB->quote( $user_ID ) );
+				}
+
 				// Add tags to user after successful email sending:
 				$user_tag_sendsuccess = trim( $this->get( 'user_tag_sendsuccess' ) );
 				if( ! empty( $user_tag_sendsuccess ) )
