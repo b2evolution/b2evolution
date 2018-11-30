@@ -151,7 +151,7 @@ switch( $action )
 		{	// Try to get a Widget by ID if it called from DB:
 			$WidgetCache = & get_WidgetCache();
 			$Widget = & $WidgetCache->get_by_ID( $wi_ID );
-			if( ! $Widget || $Widget->get( 'coll_ID' ) != $blog_ID )
+			if( ! $Widget || ( $Widget->get( 'coll_ID' ) !== NULL && $Widget->get( 'coll_ID' ) != $blog_ID ) )
 			{
 				debug_die( 'Wrong widget request!' );
 			}
