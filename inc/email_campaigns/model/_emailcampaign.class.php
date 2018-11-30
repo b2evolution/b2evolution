@@ -901,7 +901,7 @@ class EmailCampaign extends DataObject
 							AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
 				}
 				else
-				{
+				{	// Update last sending data for all newsletters tied to the automation and where the user is subscribed to:
 					$DB->query( 'UPDATE T_email__newsletter_subscription
 						INNER JOIN T_automation__newsletter ON aunl_enlt_ID = enls_enlt_ID AND enls_subscribed = 1
 							SET enls_last_sent_manual_ts = '.$DB->quote( date2mysql( $localtimenow ) ).',
