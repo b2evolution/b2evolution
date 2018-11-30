@@ -10183,6 +10183,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12996, 'Upgrading email newsletter subscriptions table...' ) )
+	{	// part of 6.10.4-stable
+		db_add_col( 'T_email__newsletter_subscription', 'enls_last_sent_auto_ts', 'TIMESTAMP NULL AFTER enls_last_sent_manual_ts' );
+		$DB->query( 'UPDATE T_email__newsletter_subscription
+			SET enls_last_sent_auto_ts = enls_last_sent_manual_ts' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

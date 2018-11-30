@@ -6118,6 +6118,7 @@ function users_results_block( $params = array() )
 			'display_enls_subscribed_ts'   => false,
 			'display_enls_unsubscribed_ts' => false,
 			'display_enls_sent_manual'     => false,
+			'display_enls_sent_auto'       => false,
 			'display_enls_last_open'       => false,
 			'display_enls_last_click'      => false,
 			'display_enls_send_count'      => false,
@@ -6432,6 +6433,7 @@ function users_results( & $UserList, $params = array() )
 			'display_enls_subscribed_ts'   => false,
 			'display_enls_unsubscribed_ts' => false,
 			'display_enls_sent_manual'     => false,
+			'display_enls_sent_auto'       => false,
 			'display_enls_last_open'       => false,
 			'display_enls_last_click'      => false,
 			'display_enls_send_count'      => false,
@@ -6974,14 +6976,26 @@ function users_results( & $UserList, $params = array() )
 	}
 
 	if( $params['display_enls_sent_manual'] )
-	{ // Display email campaign send date:
+	{	// Display newsletter last sent date manually:
 		$UserList->cols[] = array(
-				'th' => T_('Last sent'),
+				'th' => T_('Sent manually'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'timestamp',
 				'order' => 'enls_last_sent_manual_ts',
 				'default_dir' => 'D',
 				'td' => '%mysql2localedatetime_spans( #enls_last_sent_manual_ts# )%',
+			);
+	}
+
+	if( $params['display_enls_sent_auto'] )
+	{	// Display newsletter last sent date automatically:
+		$UserList->cols[] = array(
+				'th' => T_('Sent automatically'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'timestamp',
+				'order' => 'enls_last_sent_auto_ts',
+				'default_dir' => 'D',
+				'td' => '%mysql2localedatetime_spans( #enls_last_sent_auto_ts# )%',
 			);
 	}
 

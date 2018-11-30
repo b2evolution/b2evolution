@@ -538,6 +538,7 @@ $schema_queries = array(
 			enls_user_ID             INT UNSIGNED NOT NULL,
 			enls_enlt_ID             INT UNSIGNED NOT NULL,
 			enls_last_sent_manual_ts TIMESTAMP NULL,
+			enls_last_sent_auto_ts   TIMESTAMP NULL,
 			enls_last_open_ts        TIMESTAMP NULL,
 			enls_last_click_ts       TIMESTAMP NULL,
 			enls_send_count          INT UNSIGNED NOT NULL DEFAULT 0,
