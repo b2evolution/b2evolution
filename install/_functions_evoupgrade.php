@@ -10198,6 +10198,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13010, 'Upgrading email addresses table...' ) )
+	{	// part of 6.10.4-stable
+		db_modify_col( 'T_email__address', 'emadr_status', 'ENUM( "unknown", "working", "unattended", "redemption", "warning", "suspicious1", "suspicious2", "suspicious3", "prmerror", "spammer" ) COLLATE ascii_general_ci NOT NULL DEFAULT "unknown"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
@@ -10211,7 +10217,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	 * ALL DB CHANGES MUST BE EXPLICITLY CARRIED OUT. DO NOT RELY ON SCHEMA UPDATES!
 	 * Schema updates do not survive after several incremental changes.
 	 *
-	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 3).
+	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 10).
 	 */
 
 	// Execute general upgrade tasks.

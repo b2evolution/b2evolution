@@ -506,7 +506,7 @@ $schema_queries = array(
 		"CREATE TABLE T_email__address (
 			emadr_ID                    INT(10) UNSIGNED NOT NULL auto_increment,
 			emadr_address               VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
-			emadr_status                ENUM( 'unknown', 'redemption', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
+			emadr_status                ENUM( 'unknown', 'working', 'unattended', 'redemption', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
 			emadr_sent_count            INT(10) UNSIGNED NOT NULL DEFAULT 0,
 			emadr_sent_last_returnerror INT(10) UNSIGNED NOT NULL DEFAULT 0,
 			emadr_prmerror_count        INT(10) UNSIGNED NOT NULL DEFAULT 0,

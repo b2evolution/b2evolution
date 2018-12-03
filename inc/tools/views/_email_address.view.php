@@ -16,10 +16,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $blog, $admin_url, $UserSettings, $email, $statuses, $all_statuses;
 
 param( 'email', 'string', '', true );
-param( 'statuses', 'array:string', array( 'redemption', 'warning', 'suspicious3' ), true );
-if( param( 'all_statuses', 'integer', 0, true ) )
+param( 'statuses', 'array:string', NULL, true );
+if( $statuses === NULL && param( 'all_statuses', 'integer', 0, true ) )
 {	// Filter to get email addresses with all statuses:
 	$statuses = array_keys( emadr_get_status_titles() );
+}
+if( $statuses === NULL )
+{	// Default filter:
+	$statuses = array( 'redemption', 'warning', 'suspicious3' );
 }
 
 // Create result set:
@@ -70,7 +74,7 @@ function filter_email_blocked( & $Form )
 	$statuses = emadr_get_status_titles();
 	foreach( $statuses as $status_value => $status_title )
 	{	// Display the checkboxes to filter by status
-		$Form->checkbox( 'statuses[]', in_array( $status_value, get_param( 'statuses' ) ), $status_title, '', '', $status_value );
+		$Form->checkbox( 'statuses[]', in_array( $status_value, get_param( 'statuses' ) ), '<span class="label" style="background-color:'.emadr_get_status_color( $status_value ).( in_array( $status_value, array( 'redemption', 'warning', 'suspicious1' ) ) ? ';color:#333' : '' ).'">'.$status_title.'</span>', '', '', $status_value );
 	}
 }
 $Results->filter_area = array(

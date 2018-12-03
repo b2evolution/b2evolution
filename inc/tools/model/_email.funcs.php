@@ -23,6 +23,8 @@ function emadr_get_status_titles()
 {
 	return array(
 			'unknown'     => TS_('Unknown'),
+			'working'     => TS_('Working'),
+			'unattended'  => TS_('Unattended?'),
 			'redemption'  => TS_('Redemption'),
 			'warning'     => TS_('Warning'),
 			'suspicious1' => TS_('Suspicious 1'),
@@ -44,7 +46,9 @@ function emadr_get_status_colors()
 	return array(
 			''            => '808080',
 			'unknown'     => '808080',
-			'redemption'  => 'FF00FF',
+			'working'     => '00CC00',
+			'unattended'  => 'FF00FF',
+			'redemption'  => 'D9EDF7',
 			'warning'     => 'FFFF00',
 			'suspicious1' => 'FFC800',
 			'suspicious2' => 'FFA500',
@@ -64,7 +68,9 @@ function emadr_get_status_icons()
 {
 	return array(
 			'unknown'     => get_icon( 'bullet_white', 'imgtag', array( 'title' => emadr_get_status_title( 'unknown' ) ) ),
-			'redemption'  => get_icon( 'bullet_magenta', 'imgtag', array( 'title' => emadr_get_status_title( 'redemption' ) ) ),
+			'working'     => get_icon( 'bullet_green', 'imgtag', array( 'title' => emadr_get_status_title( 'working' ) ) ),
+			'unattended'  => get_icon( 'bullet_magenta', 'imgtag', array( 'title' => emadr_get_status_title( 'unattended' ) ) ),
+			'redemption'  => get_icon( 'bullet_light_blue', 'imgtag', array( 'title' => emadr_get_status_title( 'redemption' ) ) ),
 			'warning'     => get_icon( 'bullet_yellow', 'imgtag', array( 'title' => emadr_get_status_title( 'warning' ) ) ),
 			'suspicious1' => get_icon( 'bullet_orange', 'imgtag', array( 'title' => emadr_get_status_title( 'suspicious1' ) ) ),
 			'suspicious2' => get_icon( 'bullet_orange', 'imgtag', array( 'title' => emadr_get_status_title( 'suspicious2' ) ) ),
@@ -84,13 +90,15 @@ function emadr_get_status_levels()
 {
 	$levels = array(
 			'unknown'     => 1,
-			'redemption'  => 2,
-			'warning'     => 3,
-			'suspicious1' => 4,
-			'suspicious2' => 5,
-			'suspicious3' => 6,
-			'prmerror'    => 7,
-			'spammer'     => 8,
+			'working'     => 2,
+			'unattended'  => 3,
+			'redemption'  => 4,
+			'warning'     => 5,
+			'suspicious1' => 6,
+			'suspicious2' => 7,
+			'suspicious3' => 8,
+			'prmerror'    => 9,
+			'spammer'     => 10,
 		);
 
 	return $levels;
@@ -482,6 +490,9 @@ function update_mail_log_time( $type, $emlog_ID, $emlog_key )
  * @param array User IDs
  * @param array Blocked statuses to know what emails are blocked to send
  *     'unknown'     - Unknown
+ *     'working'     - Working
+ *     'unattended'  - Unattended?
+ *     'redemption'  - Redemption
  *     'warning'     - Warning
  *     'suspicious1' - Suspicious 1
  *     'suspicious2' - Suspicious 2
@@ -531,6 +542,9 @@ function load_blocked_emails( $user_IDs, $blocked_statuses = array() )
  * @param string Email address
  * @param array Blocked statuses to know what emails are blocked to send
  *     'unknown'     - Unknown
+ *     'working'     - Working
+ *     'unattended'  - Unattended?
+ *     'redemption'  - Redemption
  *     'warning'     - Warning
  *     'suspicious1' - Suspicious 1
  *     'suspicious2' - Suspicious 2
@@ -576,6 +590,9 @@ function mail_is_blocked( $email, $blocked_statuses = array() )
  * @param boolean set true for blocked emails and false for not blocked emails
  * @param array Blocked statuses to know what emails are blocked to send
  *     'unknown'     - Unknown
+ *     'working'     - Working
+ *     'unattended'  - Unattended?
+ *     'redemption'  - Redemption
  *     'warning'     - Warning
  *     'suspicious1' - Suspicious 1
  *     'suspicious2' - Suspicious 2
