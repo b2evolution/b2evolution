@@ -448,9 +448,13 @@ function update_mail_log_time( $type, $emlog_ID, $emlog_key )
 			  SET '.$campaign_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
 			WHERE csnd_emlog_ID = '.$DB->quote( $emlog_ID ) );
 
-		$email_log = $DB->get_row( 'SELECT * FROM T_email__log WHERE emlog_ID = '.$DB->quote( $emlog_ID ) );
+		$SQL = new SQL();
+		$SQL->SELECT( 'emlog_autm_ID' );
+		$SQL->FROM( 'T_email__log' );
+		$SQL->WHERE( 'emlog_ID = '.$DB->quote( $emlog_ID ) );
+		$emlog_autm_ID = $DB->get_var( $SQL );
 
-		if( empty( $email_log->emlog_autm_ID ) )
+		if( empty( $emlog_autm_ID ) )
 		{	// Update last time for user subscriptions of newsletters:
 			$DB->query( 'UPDATE T_email__newsletter_subscription
 				INNER JOIN T_email__campaign ON ecmp_enlt_ID = enls_enlt_ID AND enls_subscribed = 1
