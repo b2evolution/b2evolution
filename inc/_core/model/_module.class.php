@@ -82,6 +82,18 @@ class Module
 
 
 	/**
+	 * Gets called at the top of the skin's HTML BODY section
+	 *
+	 * could be used e.g. for additional content of javascript plugins
+	 */
+	function SkinBeginHtmlBody()
+	{
+	}
+
+
+	/**
+	 * Gets called at the end of the skin's HTML BODY section
+	 *
 	 * could be used e.g. by a google_analytics plugin to add the javascript snippet
 	 */
 	function SkinEndHtmlBody()

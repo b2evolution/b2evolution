@@ -1556,6 +1556,10 @@ class _core_Module extends Module
 											'text' => T_('Other displays').'&hellip;',
 											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other'.$blog_param,
 										),
+									'popup' => array(
+											'text' => T_('Popups').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=popup'.$blog_param,
+										),
 									'more' => array(
 											'text' => T_('More').'&hellip;',
 											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=more'.$blog_param,

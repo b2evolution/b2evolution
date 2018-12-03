@@ -11010,11 +11010,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15300, 'Installing new shared widgets/containers...' ) )
+	if( upg_task_start( 15300, 'Installing new widget container "Comment Area"...' ) )
 	{	// part of 7.0.0-alpha
-
-		// Install new widgets/containers:
 		install_new_default_widgets( 'comment_area' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15310, 'Installing new shared widget container "Marketing Popup"...' ) )
+	{	// part of 7.0.0-alpha
+		install_new_default_widgets( 'marketing_popup' );
 		upg_task_end();
 	}
 

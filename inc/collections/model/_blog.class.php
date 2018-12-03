@@ -1155,6 +1155,20 @@ class Blog extends DataObject
 			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
 		}
 
+		if( in_array( 'popup', $groups ) )
+		{ // we want to load the popups settings:
+
+			// Marketing Popup:
+			$this->set_setting( 'marketing_popup_using', param( 'marketing_popup_using', 'string' ) );
+			$this->set_setting( 'marketing_popup_animation', param( 'marketing_popup_animation', 'string' ) );
+			$container_disps = array( 'front', 'posts', 'single', 'page', 'catdir' );
+			foreach( $container_disps as $container_disp )
+			{
+				$this->set_setting( 'marketing_popup_container_'.$container_disp, param( 'marketing_popup_container_'.$container_disp, 'string' ) );
+			}
+			$this->set_setting( 'marketing_popup_container_other_disps', param( 'marketing_popup_container_other_disps', 'string' ) );
+		}
+
 		if( in_array( 'more', $groups ) )
 		{ // we want to load more settings:
 
@@ -6427,6 +6441,46 @@ class Blog extends DataObject
 		}
 
 		return isset( $denominations[ $position ] ) ? $denominations[ $position ] : '';
+	}
+
+
+	/**
+	 * Get a marketing popup container code if it is enabled for current requested page
+	 *
+	 * @return string|boolean Container code, FALSE if marketing popup is not enabled
+	 */
+	function get_marketing_popup_container()
+	{
+		if( is_admin_page() )
+		{	// Don't display on back-office:
+			return false;
+		}
+
+		if( $this->get_setting( 'marketing_popup_using' ) == 'never' )
+		{	// Marketing popup is disabled for all users:
+			return false;
+		}
+
+		if( is_logged_in() && $this->get_setting( 'marketing_popup_using' ) == 'anonymous' )
+		{	// Marketing popup is enabled only for anonymous users:
+			return false;
+		}
+
+		// Get widget container code depending on current disp:
+		global $disp;
+		$container_disp = in_array( $disp, array( 'front', 'posts', 'single', 'page', 'catdir' ) ) ? $disp : 'other_disps';
+		$container_code = $this->get_setting( 'marketing_popup_container_'.$container_disp );
+
+		if( empty( $container_code ) )
+		{	// Don't try to find a widget container without code:
+			return false;
+		}
+
+		// Check if widget container realy exists in DB for current collection or it is a shared container:
+		$WidgetContainerCache = & get_WidgetContainerCache();
+		$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $this->ID, $this->get_skin_type(), $container_code );
+
+		return $WidgetContainer ? $container_code : false;
 	}
 }
 

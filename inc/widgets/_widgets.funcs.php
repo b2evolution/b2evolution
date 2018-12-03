@@ -626,6 +626,13 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 			) ),
 	);
 
+	/* Marketing Popup */
+	$default_widgets['marketing_popup'] = array(
+		'type' => 'shared',
+		'name' => NT_('Marketing Popup'),
+		array( 10, 'user_register_quick' ),
+	);
+
 	// **** PAGE CONTAINERS ***** //
 
 	if( isset( $installed_collection_info_pages['widget_page'] ) )

@@ -895,6 +895,9 @@ class collections_Module extends Module
 							'other' => array(
 								'text' => T_('Other displays'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other&amp;blog='.$blog ),
+							'popup' => array(
+								'text' => T_('Popups'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=popup&amp;blog='.$blog ),
 							'more' => array(
 								'text' => T_('More'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=more&amp;blog='.$blog ),
@@ -1656,6 +1659,25 @@ class collections_Module extends Module
 				{	// Exit here when AJAX request, so we don't need a redirect after this function:
 					exit(0);
 				}
+		}
+	}
+
+
+	/**
+	 * Gets called at the begin of the skin's HTML BODY section
+	 */
+	function SkinBeginHtmlBody()
+	{
+		global $Blog;
+
+		if( isset( $Blog ) && $marketing_popup_container_code = $Blog->get_marketing_popup_container() )
+		{	// Display marketing popup container:
+			widget_container( $marketing_popup_container_code, array(
+				// The following params will be used as defaults for widgets included in this container:
+				'container_display_if_empty' => false, // If no widget, don't display container at all
+				'container_start' => '<div id="evo_container__'.$marketing_popup_container_code.'" class="evo_container $wico_class$ ddexitpop">',
+				'container_end'   => '</div>',
+			) );
 		}
 	}
 }

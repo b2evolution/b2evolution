@@ -1,0 +1,104 @@
+#ddexitpopwrapper { /* dynamically generated wrapper DIV that surrounds exit pop content DIV */
+    display: flex;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+		pointer-events: none;
+    align-items: center;
+    justify-content: center;
+}
+
+#ddexitpopwrapper .veil{ /* dynamically generated "overlay" DIV that covers entire window when pop up is shown */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background-color: rgba(0,0,0,.7);
+    content: "";
+    z-index: 1;
+    display: none;
+    cursor: default;
+}
+
+
+.ddexitpop { /* user defined exit popup DIV style */
+    display: none;
+    width: 90%;
+    max-width: 700px;
+    border: 2px solid black;
+    padding: 10px;
+    z-index: 2;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    border: 20px solid black;
+    background: white;
+    left: 0;
+    top: -100px; /* shift popup DIV upwards by 100px from middle of screen */
+		-webkit-animation-duration: .5s; /* customize animation duration */
+		animation-duration: .5s; /* customize animation duration */
+    visibility: hidden;
+}
+
+
+
+.ddexitpop .calltoaction{ /* demo button style */
+	display: inline-block;
+    text-decoration: none;
+    border-radius: 5px;
+    padding: 15px;
+    background: #15C5FF;
+    display: block;
+    width: 80%;
+    font: bold 24px Arial;
+    box-shadow: 0 0 15px gray, 0 0 10px gray inset;
+    margin: 10px auto;
+    text-align: center;
+    color: white !important;
+}
+
+
+div.closeexitpop{ /* Large x close button  */
+	width: 70px;
+	height: 70px;
+	overflow: hidden;
+	display: none;
+	position: fixed;
+	cursor: pointer;
+	text-indent: -1000px;
+	z-index: 3;
+	top: 10px;
+	right: 10px;
+}
+
+
+#ddexitpopwrapper.open{
+	pointer-events: auto;
+}
+
+#ddexitpopwrapper.open .veil{ /* style of veil when exit pop is open */
+    display: block;
+}
+
+#ddexitpopwrapper.open div.closeexitpop{
+    display: block;
+}
+
+#ddexitpopwrapper.open .ddexitpop{ /* style of exit pop content DIV when exit pop is open */
+    visibility: visible;
+    display: block;
+}
+
+
+/* #### CSS that's applied when the viewing area's height is 765px or less #### */
+
+@media screen and (max-height: 765px){
+	.ddexitpop{
+		top: 0; /* don't shift exit pop up upwards 100px on screens that aren't very tall */
+	}
+}

@@ -47,6 +47,7 @@ $Blog->disp_setting( 'body_includes', 'raw' );
 
 $Plugins->trigger_event( 'SkinBeginHtmlBody' );
 
+modules_call_method( 'SkinBeginHtmlBody' );
 
 // ---------------------------- SITE HEADER INCLUDED HERE ----------------------------
 // If site headers are enabled, they will be included here:

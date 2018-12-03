@@ -268,6 +268,16 @@ class CollectionSettings extends AbstractSettings
 			'download_delay' => 5,
 			'download_noindex' => 1,
 			'download_nofollowto' => 1,
+
+		// Popups settings:
+			'marketing_popup_using' => 'anonymous',
+			'marketing_popup_animation' => 'random',
+			'marketing_popup_container_front' => 'marketing_popup',
+			'marketing_popup_container_posts' => 'marketing_popup',
+			'marketing_popup_container_single' => 'marketing_popup',
+			'marketing_popup_container_page' => 'marketing_popup',
+			'marketing_popup_container_catdir' => 'marketing_popup',
+			'marketing_popup_container_other_disps' => 'marketing_popup',
 		);
 
 	/**

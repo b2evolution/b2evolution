@@ -1476,14 +1476,31 @@ var downloadInterval = setInterval( function()
 			}
 		}
 
+		// Check if current page has a marketing popup container:
+		$marketing_popup_container_code = $Blog->get_marketing_popup_container();
+
 		// Load general JS file:
 		if( $this->get_api_version() == 6 )
 		{ // Bootstrap skin
-			require_js( 'build/bootstrap-evo_frontoffice.bmin.js', 'blog' );
+			require_js( $marketing_popup_container_code ? 'build/bootstrap-evo_frontoffice-with-ddexitpop.bmin.js' : 'build/bootstrap-evo_frontoffice.bmin.js', 'blog' );
 		}
 		else
 		{ // Standard skin
-			require_js( 'build/evo_frontoffice.bmin.js', 'blog' );
+			require_js( $marketing_popup_container_code ? 'build/evo_frontoffice-with-ddexitpop.bmin.js' : 'build/evo_frontoffice.bmin.js', 'blog' );
+		}
+
+		if( $marketing_popup_container_code )
+		{	// Initialize JS code to display a marketing popup:
+			require_css( 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css', 'blog' );
+			require_css( 'ddexitpop/ddexitpop.css', 'blog' );
+			add_js_headline( 'jQuery( function()
+			{
+				ddexitpop.init(
+				{
+					contentsource: ["id", "evo_container__'.$marketing_popup_container_code.'"],
+					fxclass: "'.$Blog->get_setting( 'marketing_popup_animation' ).'",
+				} )
+			} )' );
 		}
 
 		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
