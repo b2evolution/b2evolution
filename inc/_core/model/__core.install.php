@@ -515,6 +515,7 @@ $schema_queries = array(
 			emadr_othererror_count      INT(10) UNSIGNED NOT NULL DEFAULT 0,
 			emadr_last_sent_ts          TIMESTAMP NULL,
 			emadr_last_error_ts         TIMESTAMP NULL,
+			emadr_last_open_ts          TIMESTAMP NULL,
 			PRIMARY KEY                 (emadr_ID),
 			UNIQUE                      emadr_address (emadr_address)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),

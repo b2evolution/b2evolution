@@ -456,13 +456,13 @@ function update_mail_log_time( $type, $emlog_ID, $emlog_key )
 			  SET '.$campaign_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
 			WHERE csnd_emlog_ID = '.$DB->quote( $emlog_ID ) );
 
-		$SQL = new SQL();
-		$SQL->SELECT( 'emlog_autm_ID' );
+		$SQL = new SQL( 'Get email log data' );
+		$SQL->SELECT( 'emlog_autm_ID, emlog_to, emlog_timestamp' );
 		$SQL->FROM( 'T_email__log' );
 		$SQL->WHERE( 'emlog_ID = '.$DB->quote( $emlog_ID ) );
-		$emlog_autm_ID = $DB->get_var( $SQL );
+		$emlog = $DB->get_row( $SQL );
 
-		if( empty( $emlog_autm_ID ) )
+		if( empty( $emlog->emlog_autm_ID ) )
 		{	// Update last time for user subscriptions of newsletters:
 			$DB->query( 'UPDATE T_email__newsletter_subscription
 				INNER JOIN T_email__campaign ON ecmp_enlt_ID = enls_enlt_ID AND enls_subscribed = 1
@@ -479,6 +479,21 @@ function update_mail_log_time( $type, $emlog_ID, $emlog_key )
 					SET '.$newsletter_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
 				WHERE emlog_ID = '.$DB->quote( $emlog_ID ).'
 					AND ( enls_last_sent_manual_ts IS NOT NULL OR enls_last_sent_auto_ts IS NOT NULL )' );// When user really received an email from the Newsletter(to avoid subscriptions after email was sent)
+		}
+
+		$EmailAddressCache = & get_EmailAddressCache();
+		if( $EmailAddress = & $EmailAddressCache->get_by_name( $emlog->emlog_to, false, false ) )
+		{	// If email address exists in DB
+			// Update the last opened date of the email address:
+			$EmailAddress->set( 'last_open_ts', $emlog->emlog_timestamp );
+			if( $EmailAddress->get( 'status' ) != 'spammer' &&
+			    ( $EmailAddress->get( 'last_error_ts' ) === NULL ||
+			      $emlog->emlog_timestamp > $EmailAddress->get( 'last_error_ts' )
+			    ) )
+			{	// Switch status to "Working":
+				$EmailAddress->set( 'status', 'working' );
+			}
+			$EmailAddress->dbupdate();
 		}
 	}
 }

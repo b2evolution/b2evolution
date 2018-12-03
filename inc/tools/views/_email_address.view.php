@@ -29,7 +29,7 @@ if( $statuses === NULL )
 // Create result set:
 
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE emadr_ID, emadr_address, emadr_status, emadr_last_sent_ts, emadr_sent_count, emadr_sent_last_returnerror, emadr_last_error_ts,
+$SQL->SELECT( 'SQL_NO_CACHE emadr_ID, emadr_address, emadr_status, emadr_last_sent_ts, emadr_sent_count, emadr_sent_last_returnerror, emadr_last_error_ts, emadr_last_open_ts,
 ( emadr_prmerror_count + emadr_tmperror_count + emadr_spamerror_count + emadr_othererror_count ) AS emadr_all_count,
 emadr_prmerror_count, emadr_tmperror_count, emadr_spamerror_count, emadr_othererror_count,
 COUNT( user_ID ) AS users_count' );
@@ -129,7 +129,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th_group' => T_('Send messages'),
+		'th_group' => T_('Sent messages'),
 		'th' => T_('Last sent date'),
 		'order' => 'emadr_last_sent_ts',
 		'default_dir' => 'D',
@@ -138,7 +138,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th_group' => T_('Send messages'),
+		'th_group' => T_('Sent messages'),
 		'th' => T_('Sent count'),
 		'order' => 'emadr_sent_count',
 		'default_dir' => 'D',
@@ -147,12 +147,20 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th_group' => T_('Send messages'),
+		'th_group' => T_('Sent messages'),
 		'th' => T_('Since last error'),
 		'order' => 'emadr_sent_last_returnerror',
 		'default_dir' => 'D',
 		'td' => '$emadr_sent_last_returnerror$',
 		'td_class' => 'right'
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Last opened email date'),
+		'order' => 'emadr_last_open_ts',
+		'default_dir' => 'D',
+		'td_class' => 'timestamp',
+		'td' => '%mysql2localedatetime_spans( #emadr_last_open_ts# )%',
 	);
 
 $Results->cols[] = array(

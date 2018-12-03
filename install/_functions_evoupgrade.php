@@ -10200,7 +10200,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 13010, 'Upgrading email addresses table...' ) )
 	{	// part of 6.10.4-stable
-		db_modify_col( 'T_email__address', 'emadr_status', 'ENUM( "unknown", "working", "unattended", "redemption", "warning", "suspicious1", "suspicious2", "suspicious3", "prmerror", "spammer" ) COLLATE ascii_general_ci NOT NULL DEFAULT "unknown"' );
+		db_upgrade_cols( 'T_email__address', array(
+			'MODIFY' => array( 'emadr_status' => 'ENUM( "unknown", "working", "unattended", "redemption", "warning", "suspicious1", "suspicious2", "suspicious3", "prmerror", "spammer" ) COLLATE ascii_general_ci NOT NULL DEFAULT "unknown"' ),
+			'ADD' => array( 'emadr_last_open_ts' => 'TIMESTAMP NULL' ),
+		) );
 		upg_task_end();
 	}
 
