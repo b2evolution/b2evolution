@@ -44,6 +44,8 @@ $Form->text_input( 'enlt_label', $edited_Newsletter->get( 'label' ), 150, T_('La
 
 $Form->text_input( 'enlt_order', $edited_Newsletter->get( 'order' ), 10, T_('Order'), '', array( 'maxlength' => 11 ) );
 
+$Form->username( 'enlt_owner_login', $edited_Newsletter->get_owner_User(), T_('Owner'), '', '', array( 'required' => true ) );
+
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Permissions').get_manual_link( 'email-list-permissions' ) );

@@ -527,6 +527,7 @@ $schema_queries = array(
 			enlt_label          VARCHAR(255) NULL,
 			enlt_active         TINYINT(1) UNSIGNED DEFAULT 1,
 			enlt_order          INT NULL DEFAULT NULL,
+			enlt_owner_user_ID  INT UNSIGNED NOT NULL,
 			enlt_perm_subscribe ENUM( 'admin', 'anyone', 'group' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'anyone',
 			enlt_perm_groups    VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
 			PRIMARY KEY (enlt_ID)
