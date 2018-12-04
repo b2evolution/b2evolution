@@ -59,11 +59,13 @@ class coll_featured_intro_Widget extends ComponentWidget
 				),
 				'featured_class' => array(
 					'label' => T_('Featured Item class'),
-					'defaultvalue' => 'featurepost',
+					'note' => T_('Leave empty for default'),
+					'defaultvalue' => '',
 				),
 				'intro_class' => array(
 					'label' => T_('Intro Item class'),
-					'defaultvalue' => 'jumbotron',
+					'note' => T_('Leave empty for default'),
+					'defaultvalue' => '',
 				),
 				'disp_title' => array(
 					'label' => T_( 'Title' ),
