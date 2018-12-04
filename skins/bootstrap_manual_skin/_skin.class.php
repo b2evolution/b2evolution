@@ -373,8 +373,9 @@ class bootstrap_manual_Skin extends Skin
 					'search_cell_author_end'   => '</p>',
 					'search_date_format'       => 'F jS, Y',
 					// Front page
-					'featured_intro_before' => '<div class="jumbotron">',
-					'featured_intro_after'  => '</div>',
+					'featured_intro_before' => '',
+					'featured_intro_after'  => '',
+					'intro_class'           => 'jumbotron',
 					// Form "Sending a message"
 					'msgform_form_title' => T_('Contact'),
 				);
