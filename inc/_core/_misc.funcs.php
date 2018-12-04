@@ -9440,4 +9440,28 @@ function insert_image_links_block( $params )
 		require $inc_path.'links/views/_link_list.view.php';
 	}
 }
+
+
+/**
+ * Get line for CSV file from provided array
+ *
+ * @param array Row data
+ * @param string Delimiter
+ * @param string Enclosure
+ * @param string End of line
+ * @return string
+ */
+function get_csv_line( $row, $delimiter = ';', $enclosure = '"', $eol = "\n" )
+{
+	foreach( $row as $r => $cell )
+	{
+		$row[ $r ] = str_replace( $enclosure, $enclosure.$enclosure, $cell );
+		if( strpos( $cell, $delimiter ) !== false )
+		{
+			$row[ $r ] = $enclosure.$row[ $r ].$enclosure;
+		}
+	}
+
+	return implode( $delimiter, $row ).$eol;
+}
 ?>

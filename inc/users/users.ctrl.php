@@ -553,6 +553,46 @@ if( !$Messages->has_errors() )
 			header_redirect( '?ctrl=users'.( count( $not_deleted_spam_logins ) > 0 ? '&action=spammers' : '' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 			break;
+
+		case 'export':
+			// Export user group data into CSV file:
+			load_class( 'users/model/_userlist.class.php', 'UserList' );
+			$UserList = new UserList( 'admin' );
+			$UserList->memorize = false;
+			$UserList->load_from_Request();
+			if( empty( $UserList->filters['users'] ) )
+			{	// No users to export:
+				header_redirect( $admin_url.'?ctrl=users' );
+				break;
+			}
+
+			$SQL_main_group = new SQL();
+			$SQL_main_group->SELECT( 'user_ID, user_login, grp_name, "primary" AS type' );
+			$SQL_main_group->FROM( 'T_users' );
+			$SQL_main_group->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
+			$SQL_main_group->WHERE( 'user_ID IN ('.implode( ',', $UserList->filters['users'] ).') ' );
+			$SQL_sub_groups = new SQL();
+			$SQL_sub_groups->SELECT( 'user_ID, user_login, grp_name, "secondary" AS type' );
+			$SQL_sub_groups->FROM( 'T_users' );
+			$SQL_sub_groups->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON sug_user_ID = user_ID' );
+			$SQL_sub_groups->FROM_add( 'INNER JOIN T_groups ON sug_grp_ID = grp_ID' );
+			$SQL_sub_groups->WHERE( 'sug_user_ID IN ('.implode( ',', $UserList->filters['users'] ).') ' );
+			$user_groups_sql = 'SELECT * FROM ( '.$SQL_main_group->get().' UNION '.$SQL_sub_groups->get().' ) AS users
+				ORDER BY FIND_IN_SET( user_ID, "'.implode( ',', $UserList->filters['users'] ).'" ), type';
+			$users = $DB->get_results( $user_groups_sql, ARRAY_A, 'Get users data for export group data into CSV file' );
+
+			header_nocache();
+			header_content_type( 'text/csv' );
+			header( 'Content-Disposition: attachment; filename=users.csv' );
+
+			echo get_csv_line( array( 'username', 'groupname', 'type' ) );
+
+			foreach( $users as $user )
+			{
+				unset( $user['user_ID'] );
+				echo get_csv_line( $user );
+			}
+			exit;
 	}
 }
 
