@@ -27,11 +27,6 @@ class coll_featured_intro_Widget extends ComponentWidget
 	var $icon = 'asterisk';
 
 	/**
-	 * Featured/Intro Item:
-	 */
-	var $Item;
-
-	/**
 	 * Constructor
 	 */
 	function __construct( $db_row = NULL )
@@ -56,11 +51,6 @@ class coll_featured_intro_Widget extends ComponentWidget
 					'label' => T_('Template'),
 					'note' => '.inc.php',
 					'defaultvalue' => '_item_block',
-				),
-				'featured_class' => array(
-					'label' => T_('Featured Item class'),
-					'note' => T_('Leave empty for default'),
-					'defaultvalue' => '',
 				),
 				'intro_class' => array(
 					'label' => T_('Intro Item class'),
@@ -166,22 +156,6 @@ class coll_featured_intro_Widget extends ComponentWidget
 
 
 	/**
-	 * Get featured/intro Item
-	 *
-	 * @return mixed Item Object if a featured/intro item is available, false otherwise
-	 */
-	function & get_featured_Item()
-	{
-		if( empty( $this->Item ) )
-		{
-			$this->Item = & get_featured_Item( 'front', $this->disp_params['blog_ID'] );
-		}
-
-		return $this->Item;
-	}
-
-
-	/**
 	 * Prepare display params
 	 *
 	 * @param array MUST contain at least the basic display params
@@ -194,6 +168,12 @@ class coll_featured_intro_Widget extends ComponentWidget
 			), $params );
 
 		parent::init_display( $params );
+
+		// Use container params if DB params are empty:
+		if( empty( $this->disp_params['intro_class'] ) && ! empty( $params['intro_class'] ) )
+		{
+			$this->disp_params['intro_class'] = $params['intro_class'];
+		}
 	}
 
 
@@ -209,7 +189,7 @@ class coll_featured_intro_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		// Go Grab the featured post:
-		if( $Item = & $this->get_featured_Item() )
+		if( $Item = & get_featured_Item( 'front', $this->disp_params['blog_ID'] ) )
 		{	// We have a featured/intro post to display:
 			$item_style = '';
 			$LinkOwner = new LinkItem( $Item );
@@ -248,14 +228,7 @@ class coll_featured_intro_Widget extends ComponentWidget
 
 			// Add item_class:
 			$item_class = array();
-			if( $Item->is_intro() )
-			{
-				$item_class = preg_split( '/[\s,]+/', $this->disp_params['intro_class'] );
-			}
-			elseif( $Item->is_featured() )
-			{
-				$item_class = preg_split( '/[\s,]+/', $this->disp_params['featured_class'] );
-			}
+			$item_class = preg_split( '/[\s,]+/', $this->disp_params['intro_class'] );
 
 			if( !empty( $item_class ) )
 			{
