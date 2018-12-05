@@ -207,22 +207,22 @@ class item_info_line_Widget extends ComponentWidget
 	{
 		global $Item;
 
+		$params = array_merge( array(
+			'author_link_text' => 'preferredname'
+		), $params );
+
+		$this->init_display( $params );
+
+		echo $this->disp_params['block_start'];
+		$this->disp_title();
+		echo $this->disp_params['block_body_start'];
+
 		if( empty( $Item ) )
-		{	// Don't display this widget when no Item object
-			echo '<p class="evo_param_error">'.sprintf( T_('No $Item object found. Cannot display widget %s.'), '&laquo;'.$this->get_name().'&raquo;' ).'</p>';
+		{	// Display error message when no Item object:
+			echo '<span class="evo_param_error">'.sprintf( T_('No $Item object found. Cannot display widget %s.'), '&laquo;'.$this->get_name().'&raquo;' ).'</span>';
 		}
 		else
 		{
-			$params = array_merge( array(
-				'author_link_text' => 'preferredname'
-			), $params );
-
-			$this->init_display( $params );
-
-			echo $this->disp_params['block_start'];
-			$this->disp_title();
-			echo $this->disp_params['block_body_start'];
-
 			// Flag:
 			if( $this->disp_params['flag_icon'] )
 			{
@@ -356,10 +356,10 @@ class item_info_line_Widget extends ComponentWidget
 					'after'     => '',
 				) );
 			}
-
-			echo $this->disp_params['block_body_end'];
-			echo $this->disp_params['block_end'];
 		}
+
+		echo $this->disp_params['block_body_end'];
+		echo $this->disp_params['block_end'];
 
 		return true;
 	}
