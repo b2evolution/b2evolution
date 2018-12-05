@@ -52,6 +52,11 @@ class coll_featured_intro_Widget extends ComponentWidget
 					'note' => '.inc.php',
 					'defaultvalue' => '_item_block',
 				),
+				'featured_class' => array(
+					'label' => T_('Featured Item class'),
+					'note' => T_('Leave empty for default'),
+					'defaultvalue' => '',
+				),
 				'intro_class' => array(
 					'label' => T_('Intro Item class'),
 					'note' => T_('Leave empty for default'),
@@ -174,6 +179,11 @@ class coll_featured_intro_Widget extends ComponentWidget
 		{
 			$this->disp_params['intro_class'] = $params['intro_class'];
 		}
+
+		if( empty( $this->disp_params['featured_class'] ) && ! empty( $params['featured_class'] ) )
+		{
+			$this->disp_params['featured_class'] = $params['featured_class'];
+		}
 	}
 
 
@@ -228,7 +238,14 @@ class coll_featured_intro_Widget extends ComponentWidget
 
 			// Add item_class:
 			$item_class = array();
-			$item_class = preg_split( '/[\s,]+/', $this->disp_params['intro_class'] );
+			if( $Item->is_intro() )
+			{
+				$item_class = preg_split( '/[\s,]+/', $this->disp_params['intro_class'] );
+			}
+			elseif( $Item->is_featured() )
+			{
+				$item_class = preg_split( '/[\s,]+/', $this->disp_params['featured_class'] );
+			}
 
 			if( !empty( $item_class ) )
 			{

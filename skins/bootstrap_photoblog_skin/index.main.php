@@ -242,6 +242,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'featured_intro_before' => '',
 					'featured_intro_after'  => '',
 					'intro_class'           => 'jumbotron',
+					'featured_class'        => 'featurepost',
 					// Form "Sending a message"
 					'msgform_form_title' => T_('Contact'),
 				) );
