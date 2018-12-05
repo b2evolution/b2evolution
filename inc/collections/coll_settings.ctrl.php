@@ -424,6 +424,44 @@ switch( $action )
 		header_redirect( $update_redirect_url, 303 ); // Will EXIT
 
 		break;
+
+	case 'export_userperms':
+		// Export user permissions into CSV file:
+
+		load_funcs( 'collections/views/_coll_perm_view.funcs.php' );
+
+		$keywords = param( 'keywords', 'string', '' );
+
+		// Get SQL for collection user permissions:
+		$SQL = get_coll_user_perms_SQL( $edited_Blog, $keywords, false );
+
+		$user_perms = $DB->get_results( $SQL );
+
+		header_nocache();
+		header_content_type( 'text/csv' );
+		header( 'Content-Disposition: attachment; filename=colls_userperms.csv' );
+
+		echo get_csv_coll_perms( 'bloguser_', $user_perms, $edited_Blog );
+		exit;
+
+	case 'export_groupperms':
+		// Export group permissions into CSV file:
+
+		load_funcs( 'collections/views/_coll_perm_view.funcs.php' );
+
+		$keywords = param( 'keywords', 'string', '' );
+
+		// Get SQL for collection user permissions:
+		$SQL = get_coll_group_perms_SQL( $edited_Blog, $keywords, false );
+
+		$group_perms = $DB->get_results( $SQL );
+
+		header_nocache();
+		header_content_type( 'text/csv' );
+		header( 'Content-Disposition: attachment; filename=colls_groupperms.csv' );
+
+		echo get_csv_coll_perms( 'bloggroup_', $group_perms, $edited_Blog );
+		exit;
 }
 
 if( $action == 'dashboard' )

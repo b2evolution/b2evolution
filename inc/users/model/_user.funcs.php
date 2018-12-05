@@ -6138,6 +6138,7 @@ function users_results_block( $params = array() )
 			'display_org_actions'  => false,
 			'display_dupl_actions' => false,
 			'display_newsletter'   => true,
+			'display_btn_export'   => false,
 			'display_automation'   => false,
 			'display_btn_tags'     => false,
 			'force_check_user'     => false,
@@ -6351,11 +6352,18 @@ function users_results_block( $params = array() )
 			.'</a>';
 	}
 
+	if( $params['display_btn_export'] && is_logged_in() && $UserList->result_num_rows > 0 )
+	{	// Button to export user group data as CSV file:
+		$user_list_buttons[] = '<br><a href="'.$admin_url.'?ctrl=users&amp;action=export" class="btn btn-primary">'
+				.format_to_output( T_('Export groups as CSV') )
+			.'</a>';
+	}
+
 	if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Buttons and info to delete spammers:
 		if( $params['display_btn_delspam'] )
 		{	// Button to go to list with confirmation before spammers deleting:
-			$user_list_buttons[] = '<br><a href="'.$admin_url.'?ctrl=users&amp;action=spammers" class="btn btn-danger">'
+			$user_list_buttons[] = ( $params['display_btn_export'] ? '' : '<br>' ).'<a href="'.$admin_url.'?ctrl=users&amp;action=spammers" class="btn btn-danger">'
 					.format_to_output( T_('Delete spammers...') )
 				.'</a>';
 		}
