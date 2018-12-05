@@ -482,8 +482,9 @@ function update_mail_log_time( $type, $emlog_ID, $emlog_key )
 		}
 
 		$EmailAddressCache = & get_EmailAddressCache();
-		if( $EmailAddress = & $EmailAddressCache->get_by_name( $emlog->emlog_to, false, false ) )
-		{	// If email address exists in DB
+		if( ( $EmailAddress = & $EmailAddressCache->get_by_name( $emlog->emlog_to, false, false ) ) &&
+		    ( $emlog->emlog_timestamp > $EmailAddress->get( 'last_open_ts' ) ) )
+		{	// If email address exists in DB and sent date > previous last opened email date:
 			// Update the last opened date of the email address:
 			$EmailAddress->set( 'last_open_ts', $emlog->emlog_timestamp );
 			if( $EmailAddress->get( 'status' ) != 'spammer' &&

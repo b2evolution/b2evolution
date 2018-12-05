@@ -16,7 +16,7 @@ $email_addresses_num = $DB->query( 'UPDATE T_email__address
 
 if( $email_addresses_num == 0 )
 {	// No updated email addresses:
-	cron_log_append( sprintf( T_('No email addresses found which may be updated to %s status.'), '<code>'.T_('Unknown').'</code>' ) );
+	cron_log_append( T_('No email addresses match the criteria for a status update at this point.') );
 }
 else
 {	// If at least one email address is updated:

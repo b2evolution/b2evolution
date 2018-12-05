@@ -329,7 +329,7 @@ switch( $action )
 					$manage_email_statuses_min_delay = param_duration( 'manage_email_statuses_min_delay' );
 					param_check_not_empty( 'manage_email_statuses_min_delay', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Minimum delay since last error') ) );
 					$Settings->set( 'manage_email_statuses_min_delay', $manage_email_statuses_min_delay );
-					param_integer_range( 'manage_email_statuses_min_sends', 1, 999999999, sprintf( T_('The minimum sends since last error is %d.'), 1 ) );
+					param_integer_range( 'manage_email_statuses_min_sends', 1, 999999999, sprintf( T_('The minimum value of the field "%s" is %d.'), T_('Minimum sends since last error'), 1 ) );
 					$Settings->set( 'manage_email_statuses_min_sends', $manage_email_statuses_min_sends );
 					break;
 			}
