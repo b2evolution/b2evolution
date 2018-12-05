@@ -116,6 +116,7 @@ class bootstrap_manual_Skin extends Skin
 				'front_page_secondary_area' => NULL,
 				'item_in_list'              => NULL,
 				'item_single_header'        => NULL,
+				'chapter_main_area'         => array( NT_('Chapter Main Area'), 46 ),
 			);
 	}
 

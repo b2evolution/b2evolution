@@ -194,12 +194,12 @@ class coll_featured_intro_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item;
+		global $Item, $disp;
 
 		$this->init_display( $params );
 
 		// Go Grab the featured post:
-		if( $Item = & get_featured_Item( 'front', $this->disp_params['blog_ID'] ) )
+		if( $Item = & get_featured_Item( $disp, $this->disp_params['blog_ID'] ) )
 		{	// We have a featured/intro post to display:
 			$item_style = '';
 			$LinkOwner = new LinkItem( $Item );

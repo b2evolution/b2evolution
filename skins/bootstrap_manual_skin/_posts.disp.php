@@ -57,6 +57,20 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 	$ChapterCache->reveal_children( $Blog->ID );
 	$curr_Chapter = & $ChapterCache->get_by_ID( $cat, false );
 
+	// ------------------------- "Chapter Main Area" CONTAINER EMBEDDED HERE --------------------------
+	// Display container and contents:
+	widget_container( 'chapter_main_area', array(
+		// The following params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
+			'block_start'       => '<div class="evo_widget $wi_class$">',
+			'block_end'         => '</div>',
+			'block_title_start' => '<h2 class="page-header">',
+			'block_title_end'   => '</h2>',
+			'intro_class'       => 'well evo_post evo_content_block',
+			'featured_class'    => 'featurepost',
+		) );
+	// ----------------------------- END OF "Chapter Main Area" CONTAINER -----------------------------
+
 	// Go Grab the featured post:
 	$intro_Item = & get_featured_Item(); // $intro_Item is used below for comments form
 
@@ -84,26 +98,6 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 		echo '</div>';
 
 			echo '</div>';
-	}
-
-	if( ! empty( $intro_Item ) )
-	{ // We have a featured/intro post to display:
-		$Item = $intro_Item;
-		echo '<div class="evo_content_block">'; // Beginning of posts display
-		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-		skin_include( '_item_block.inc.php', array_merge( array(
-				'feature_block'     => true,
-				'content_mode'      => 'auto',		// 'auto' will auto select depending on $disp-detail
-				'intro_mode'        => 'normal',	// Intro posts will be displayed in normal mode
-				'item_class'        => 'well evo_post evo_content_block',
-				'disp_comments'     => false,
-				'disp_comment_form' => false,
-				'disp_notification' => false,
-				'item_link_type'    => 'none',
-				'Item'              => $Item,
-			), $Skin->get_template( 'disp_params' ) ) );
-		// ----------------------------END ITEM BLOCK  ----------------------------
-		echo '</div>'; // End of posts display
 	}
 
 	$callbacks = array(

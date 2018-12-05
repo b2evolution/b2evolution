@@ -301,6 +301,12 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 10, 'item_fields_compare', 'params' => array( 'items_source' => 'all' ) ),
 	);
 
+	/* Chapter Main Area */
+	$default_widgets['chapter_main_area'] = array(
+		'coll_type' => 'manual',
+		array( 10, 'coll_featured_intro' ),
+	);
+
 	/* 404 Page */
 	$default_widgets['404_page'] = array(
 		array( 10, 'page_404_not_found' ),
