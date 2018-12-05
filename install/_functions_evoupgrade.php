@@ -10478,6 +10478,30 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12996, 'Upgrading email newsletter subscriptions table...' ) )
+	{	// part of 6.10.4-stable
+		db_add_col( 'T_email__newsletter_subscription', 'enls_last_sent_auto_ts', 'TIMESTAMP NULL AFTER enls_last_sent_manual_ts' );
+		$DB->query( 'UPDATE T_email__newsletter_subscription
+			SET enls_last_sent_auto_ts = enls_last_sent_manual_ts' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12999, 'Upgrading email newsletters table...' ) )
+	{	// part of 6.10.4-stable
+		db_add_col( 'T_email__newsletter', 'enlt_owner_user_ID', 'INT UNSIGNED NOT NULL AFTER enlt_order' );
+		$DB->query( 'UPDATE T_email__newsletter SET enlt_owner_user_ID = 1' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13010, 'Upgrading email addresses table...' ) )
+	{	// part of 6.10.4-stable
+		db_upgrade_cols( 'T_email__address', array(
+			'MODIFY' => array( 'emadr_status' => 'ENUM( "unknown", "working", "unattended", "redemption", "warning", "suspicious1", "suspicious2", "suspicious3", "prmerror", "spammer" ) COLLATE ascii_general_ci NOT NULL DEFAULT "unknown"' ),
+			'ADD' => array( 'emadr_last_open_ts' => 'TIMESTAMP NULL' ),
+		) );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 15000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '

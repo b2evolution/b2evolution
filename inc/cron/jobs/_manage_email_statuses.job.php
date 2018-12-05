@@ -20,7 +20,7 @@ if( $email_addresses_num == 0 )
 }
 else
 {	// If at least one email address is updated:
-	cron_log_action_end( sprintf( T_('%d email addresses have been updated to %s status.'), $email_addresses_num, '<code>'.T_('Unknown').'</code>' ) );
+	cron_log_action_end( sprintf( T_('%d email addresses have been updated to the status: %s.'), $email_addresses_num, '<code>'.T_('Unknown').'</code>' ) );
 }
 
 return 1; // success

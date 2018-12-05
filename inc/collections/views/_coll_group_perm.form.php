@@ -101,14 +101,20 @@ echo '</div>';
 // fp> TODO: link
 echo '<p class="note center">'.T_('Note: General group permissions may further restrict or extend any media folder permissions defined here.').'</p>';
 
+$form_buttons = array();
+
 // Make a hidden list of all displayed users:
 $grp_IDs = array();
-foreach( $Results->rows as $row )
+if( ! empty( $Results->rows ) )
 {
-	$grp_IDs[] = $row->grp_ID;
+	foreach( $Results->rows as $row )
+	{
+		$grp_IDs[] = $row->grp_ID;
+	}
+	$form_buttons[] = array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' );
 }
 $Form->hidden( 'group_IDs', implode( ',', $grp_IDs) );
 
-$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
+$Form->end_form( $form_buttons );
 
 ?>

@@ -516,7 +516,7 @@ $schema_queries = array(
 		"CREATE TABLE T_email__address (
 			emadr_ID                    INT(10) UNSIGNED NOT NULL auto_increment,
 			emadr_address               VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
-			emadr_status                ENUM( 'unknown', 'redemption', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
+			emadr_status                ENUM( 'unknown', 'working', 'unattended', 'redemption', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
 			emadr_sent_count            INT(10) UNSIGNED NOT NULL DEFAULT 0,
 			emadr_sent_last_returnerror INT(10) UNSIGNED NOT NULL DEFAULT 0,
 			emadr_prmerror_count        INT(10) UNSIGNED NOT NULL DEFAULT 0,
@@ -525,6 +525,7 @@ $schema_queries = array(
 			emadr_othererror_count      INT(10) UNSIGNED NOT NULL DEFAULT 0,
 			emadr_last_sent_ts          TIMESTAMP NULL,
 			emadr_last_error_ts         TIMESTAMP NULL,
+			emadr_last_open_ts          TIMESTAMP NULL,
 			PRIMARY KEY                 (emadr_ID),
 			UNIQUE                      emadr_address (emadr_address)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
@@ -537,6 +538,7 @@ $schema_queries = array(
 			enlt_label          VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
 			enlt_active         TINYINT(1) UNSIGNED DEFAULT 1,
 			enlt_order          INT NULL DEFAULT NULL,
+			enlt_owner_user_ID  INT UNSIGNED NOT NULL,
 			enlt_perm_subscribe ENUM( 'admin', 'anyone', 'group' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'anyone',
 			enlt_perm_groups    VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
 			PRIMARY KEY (enlt_ID)
@@ -548,6 +550,7 @@ $schema_queries = array(
 			enls_user_ID             INT UNSIGNED NOT NULL,
 			enls_enlt_ID             INT UNSIGNED NOT NULL,
 			enls_last_sent_manual_ts TIMESTAMP NULL,
+			enls_last_sent_auto_ts   TIMESTAMP NULL,
 			enls_last_open_ts        TIMESTAMP NULL,
 			enls_last_click_ts       TIMESTAMP NULL,
 			enls_send_count          INT UNSIGNED NOT NULL DEFAULT 0,

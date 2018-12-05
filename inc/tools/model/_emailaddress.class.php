@@ -46,6 +46,8 @@ class EmailAddress extends DataObject
 
 	var $last_error_ts;
 
+	var $last_open_ts;
+
 	/**
 	 * Constructor
 	 *
@@ -69,6 +71,7 @@ class EmailAddress extends DataObject
 			$this->othererror_count = $db_row->emadr_othererror_count;
 			$this->last_sent_ts = $db_row->emadr_last_sent_ts;
 			$this->last_error_ts = $db_row->emadr_last_error_ts;
+			$this->last_open_ts = $db_row->emadr_last_open_ts;
 		}
 	}
 

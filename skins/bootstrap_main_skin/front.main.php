@@ -181,6 +181,8 @@ if( ! empty( $bg_File ) && $bg_File->exists() )
 					'front_block_first_title_end'   => '</h1>',
 					'front_block_title_start'       => '<h2>',
 					'front_block_title_end'         => '</h2>',
+					'intro_class'                   => '',
+					'featured_class'                => 'featurepost',
 					// Form "Sending a message"
 					'msgform_form_title' => T_('Contact'),
 				) );

@@ -1503,6 +1503,7 @@ function create_default_jobs( $is_upgrade = false )
 	$post_reminder_key        = 'send-unmoderated-posts-reminders';
 	$alert_old_contents_key   = 'monthly-alert-old-contents';
 	$execute_automations_key  = 'execute-automations';
+	$manage_email_status_key  = 'manage-email-statuses';
 
 	// init insert values
 	$insert_values = array(
@@ -1524,6 +1525,7 @@ function create_default_jobs( $is_upgrade = false )
 			$execute_automations_key  => "( ".$DB->quote( form_date( $today, '00:00:00' ) ).", 300, ".$DB->quote( $execute_automations_key ).", ".$ctsk_params." )",
 			$inactive_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '08:00:00' ) ).", 86400, ".$DB->quote( $inactive_reminder_key ).", ".$ctsk_params." )",
 			$cleanup_email_logs_key   => "( ".$DB->quote( form_date( $tomorrow, '08:30:00' ) ).", 86400, ".$DB->quote( $cleanup_email_logs_key ).", ".$ctsk_params." )",
+			$manage_email_status_key  => "( ".$DB->quote( form_date( $tomorrow, '09:00:00' ) ).", 86400, ".$DB->quote( $manage_email_status_key ).", ".$ctsk_params." )",
 		);
 	if( $is_upgrade )
 	{	// Check if these jobs already exist, and don't create another
@@ -1928,9 +1930,9 @@ function create_default_newsletters()
 	if( $create_sample_contents )
 	{
 		// Insert default newsletters:
-		$DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label, enlt_order )
-			VALUES ( "News", "Send me news about this site.", 1 ),
-			       ( "Promotions", "I want to receive ADs that may be relevant to my interests.", 2 )' );
+		$DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label, enlt_order, enlt_owner_user_ID )
+			VALUES ( "News", "Send me news about this site.", 1, 1 ),
+			       ( "Promotions", "I want to receive ADs that may be relevant to my interests.", 2, 1 )' );
 
 		// Insert default subscriptions for each user on first newsletter:
 		$DB->query( 'REPLACE INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )

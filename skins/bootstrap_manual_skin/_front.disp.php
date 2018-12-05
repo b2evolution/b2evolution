@@ -19,8 +19,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // ------------------------- "Front Page Main Area" CONTAINER EMBEDDED HERE --------------------------
 	// Display container and contents:
-	widget_container( 'front_page_main_area', array(
-	// The following params will be used as defaults for widgets included in this container:
+	widget_container( 'front_page_main_area', array_merge( array(
+		// The following params will be used as defaults for widgets included in this container:
 		'container_display_if_empty' => false, // If no widget, don't display container at all
 		'block_start'       => '<div class="evo_widget $wi_class$">',
 		'block_end'         => '</div>',
@@ -38,7 +38,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				'item_before_closed'   => get_icon( 'expand' ),
 				'item_before_post'     => get_icon( 'file_message' ),
 			),
-	) );
+	), $Skin->get_template( 'disp_params' ) ) );
 // ----------------------------- END OF "Front Page Main Area" CONTAINER -----------------------------
 
 if( ! empty( $intro_Item ) )

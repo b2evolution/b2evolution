@@ -207,97 +207,17 @@ class item_info_line_Widget extends ComponentWidget
 	{
 		global $Item;
 
-		if( empty( $Item ) )
-		{	// Don't display this widget when no Item object
-			return false;
-		}
-
 		$params = array_merge( array(
 			'author_link_text' => 'preferredname',
 			'block_body_start' => '<div class="small text-muted">',
 			'block_body_end'   => '</div>',
+			'widget_item_info_line_display' => true,
+			'widget_item_info_line_before'  => '<span class="small text-muted">',
+			'widget_item_info_line_after'   => '</span>',
+			'widget_item_info_line_params'  => array(),
 		), $params );
 
 		$this->init_display( $params );
-
-		// Get default before author:
-		switch( $this->disp_params['before_author'] )
-		{
-			case 'posted_by':
-				$before_author = T_('Posted by').' ';
-				break;
-
-			case 'started_by':
-				$before_author = T_('Started by').' ';
-				break;
-
-			default:
-				$before_author = '';
-		}
-
-		// Get datetime format:
-		$date_format = '';
-		if( $this->disp_params['date_format'] != 'none' )
-		{
-			switch( $this->disp_params['date_format'] )
-			{
-				case 'extended':
-					$date_format = locale_extdatefmt();
-					break;
-
-				case 'long':
-					$date_format = locale_longdatefmt();
-					break;
-
-				case 'short':
-					$date_format = locale_datefmt();
-					break;
-			}
-		}
-		$time_format = '';
-		if( $this->disp_params['time_format'] != 'none' )
-		{
-			switch( $this->disp_params['time_format'] )
-			{
-				case 'long':
-					$time_format = locale_timefmt();
-					break;
-
-				case 'short':
-					$time_format = locale_shorttimefmt();
-					break;
-			}
-		}
-		$before_post_time = $this->disp_params['before_author'] == 'none' ? '' : T_('on').' ';
-
-		$params = array_merge( array(
-				'widget_item_info_line_display' => true,
-				'widget_item_info_line_before'  => '<span class="small text-muted">',
-				'widget_item_info_line_after'   => '</span>',
-				'widget_item_info_line_params'  => array(),
-			), $params );
-
-		$widget_params = array_merge( array(
-				'before_flag'         => '',
-				'after_flag'          => '',
-				'before_permalink'    => '',
-				'after_permalink'     => ' ',
-				'permalink_text'      => '#icon#',
-				'before_author'       => $before_author,
-				'after_author'        => ' ',
-				'before_post_time'    => $before_post_time,
-				'after_post_time'     => ' ',
-				'before_categories'   => T_('in').' ',
-				'after_categories'    => ' ',
-				'before_last_touched' => '<span class="text-muted"> &ndash; '.T_('Last touched').': ',
-				'after_last_touched'  => '</span>',
-				'before_last_updated' => '<span class="text-muted"> &ndash; '.T_('Contents updated').': ',
-				'after_last_updated'  => '</span>',
-				'before_edit_link'    => ' &bull; ',
-				'after_edit_link'     => '',
-				'edit_link_text'      => '#',
-				'format'              => '',
-			), $params['widget_item_info_line_params'] );
 
 		if( $params['widget_item_info_line_display'] )
 		{
@@ -307,143 +227,224 @@ class item_info_line_Widget extends ComponentWidget
 
 			echo $this->disp_params['block_body_start'];
 
-			echo $params['widget_item_info_line_before'];
-
-			ob_start();
-
-			// Flag:
-			$flag = '';
-			if( $this->disp_params['flag_icon'] )
-			{
-				$Item->flag( array(
-						'before' => $widget_params['before_flag'],
-						'after'  => $widget_params['after_flag'],
-					)	);
-				$flag = ob_get_contents();
-				ob_clean();
+			if( empty( $Item ) )
+			{	// Display error message when no Item object:
+				echo '<span class="evo_param_error">'.sprintf( T_('No $Item object found. Cannot display widget %s.'), '&laquo;'.$this->get_name().'&raquo;' ).'</span>';
 			}
-
-			// Permalink:
-			$permalink = '';
-			if( $this->disp_params['permalink_icon'] )
+			else
 			{
-				$Item->permanent_link( array(
-						'text'   => $widget_params['permalink_text'],
-						'before' => $widget_params['before_permalink'],
-						'after'  => $widget_params['after_permalink'],
-					) );
-				$permalink = ob_get_contents();
-				ob_clean();
-			}
-
-			// Author:
-			$author = '';
-			if( $this->disp_params['before_author'] != 'none' )
-			{
-				$Item->author( array(
-						'before'    => $widget_params['before_author'],
-						'after'     => $widget_params['after_author'],
-						'link_text' => $params['author_link_text'],
-					) );
-				$author = ob_get_contents();
-				ob_clean();
-			}
-
-
-			// We want to display the post time:
-			$post_time = '';
-			if( $this->disp_params['date_format'] != 'none' || $this->disp_params['time_format'] != 'none' )
-			{
-				switch( $this->disp_params['display_date'] )
+				// Get default before author:
+				switch( $this->disp_params['before_author'] )
 				{
-					case 'issue_date':
-						$Item->issue_time( array(
-								'before'      => $widget_params['before_post_time'],
-								'after'       => $widget_params['after_post_time'],
-								'time_format' => $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format
-							) );
+					case 'posted_by':
+						$before_author = T_('Posted by').' ';
 						break;
 
-					case 'date_created':
-						echo $widget_params['before_post_time'];
-						echo mysql2date( $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format, $Item->datecreated );
-						echo $widget_params['after_post_time'];
+					case 'started_by':
+						$before_author = T_('Started by').' ';
 						break;
+
+					default:
+						$before_author = '';
 				}
-				$post_time = ob_get_contents();
-				ob_clean();
-			}
 
-			// Categories:
-			$categories = '';
-			if( $this->disp_params['category'] )
-			{
-				$Item->categories( array(
-					'before'          => $widget_params['before_categories'],
-					'after'           => $widget_params['after_categories'],
-					'include_main'    => true,
-					'include_other'   => true,
-					'include_external'=> true,
-					'link_categories' => true,
-				) );
-				$categories = ob_get_contents();
-				ob_clean();
-			}
+				// Get datetime format:
+				$date_format = '';
+				if( $this->disp_params['date_format'] != 'none' )
+				{
+					switch( $this->disp_params['date_format'] )
+					{
+						case 'extended':
+							$date_format = locale_extdatefmt();
+							break;
 
-			// Last touched:
-			$last_touched = '';
-			if( $this->disp_params['last_touched'] )
-			{
-				echo $widget_params['before_last_touched'];
-				echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) );
-				echo $widget_params['after_last_touched'];
-				$last_touched = ob_get_contents();
-				ob_clean();
-			}
+						case 'long':
+							$date_format = locale_longdatefmt();
+							break;
 
-			// Contents last updated:
-			$last_updated = '';
-			if( $this->disp_params['contents_updated'] )
-			{
-				echo $widget_params['before_last_updated'];
-				echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'contents_last_updated_ts' ) ).$Item->get_refresh_contents_last_updated_link();
-				echo $widget_params['after_last_updated'];
-				$last_updated = ob_get_contents();
-				ob_clean();
-			}
+						case 'short':
+							$date_format = locale_datefmt();
+							break;
+					}
+				}
+				$time_format = '';
+				if( $this->disp_params['time_format'] != 'none' )
+				{
+					switch( $this->disp_params['time_format'] )
+					{
+						case 'long':
+							$time_format = locale_timefmt();
+							break;
 
-			// Link for editing:
-			$edit_link = '';
-			if( $this->disp_params['edit_link'] )
-			{
-				$Item->edit_link( array(
-						'before' => $widget_params['before_edit_link'],
-						'after'  => $widget_params['after_edit_link'],
-						'text'   => $widget_params['edit_link_text'],
+						case 'short':
+							$time_format = locale_shorttimefmt();
+							break;
+					}
+				}
+				$before_post_time = $this->disp_params['before_author'] == 'none' ? '' : T_('on').' ';
+
+				$widget_params = array_merge( array(
+						'before_flag'         => '',
+						'after_flag'          => '',
+						'before_permalink'    => '',
+						'after_permalink'     => ' ',
+						'permalink_text'      => '#icon#',
+						'before_author'       => $before_author,
+						'after_author'        => ' ',
+						'before_post_time'    => $before_post_time,
+						'after_post_time'     => ' ',
+						'before_categories'   => T_('in').' ',
+						'after_categories'    => ' ',
+						'before_last_touched' => '<span class="text-muted"> &ndash; '.T_('Last touched').': ',
+						'after_last_touched'  => '</span>',
+						'before_last_updated' => '<span class="text-muted"> &ndash; '.T_('Contents updated').': ',
+						'after_last_updated'  => '</span>',
+						'before_edit_link'    => ' &bull; ',
+						'after_edit_link'     => '',
+						'edit_link_text'      => '#',
+						'format'              => '',
+					), $params['widget_item_info_line_params'] );
+
+				echo $params['widget_item_info_line_before'];
+
+				ob_start();
+
+				// Flag:
+				$flag = '';
+				if( $this->disp_params['flag_icon'] )
+				{
+					$Item->flag( array(
+							'before' => $widget_params['before_flag'],
+							'after'  => $widget_params['after_flag'],
+						)	);
+					$flag = ob_get_contents();
+					ob_clean();
+				}
+
+				// Permalink:
+				$permalink = '';
+				if( $this->disp_params['permalink_icon'] )
+				{
+					$Item->permanent_link( array(
+							'text'   => $widget_params['permalink_text'],
+							'before' => $widget_params['before_permalink'],
+							'after'  => $widget_params['after_permalink'],
+						) );
+					$permalink = ob_get_contents();
+					ob_clean();
+				}
+
+				// Author:
+				$author = '';
+				if( $this->disp_params['before_author'] != 'none' )
+				{
+					$Item->author( array(
+							'before'    => $widget_params['before_author'],
+							'after'     => $widget_params['after_author'],
+							'link_text' => $params['author_link_text'],
+						) );
+					$author = ob_get_contents();
+					ob_clean();
+				}
+
+
+				// We want to display the post time:
+				$post_time = '';
+				if( $this->disp_params['date_format'] != 'none' || $this->disp_params['time_format'] != 'none' )
+				{
+					switch( $this->disp_params['display_date'] )
+					{
+						case 'issue_date':
+							$Item->issue_time( array(
+									'before'      => $widget_params['before_post_time'],
+									'after'       => $widget_params['after_post_time'],
+									'time_format' => $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format
+								) );
+							break;
+
+						case 'date_created':
+							echo $widget_params['before_post_time'];
+							echo mysql2date( $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format, $Item->datecreated );
+							echo $widget_params['after_post_time'];
+							break;
+					}
+					$post_time = ob_get_contents();
+					ob_clean();
+				}
+
+				// Categories:
+				$categories = '';
+				if( $this->disp_params['category'] )
+				{
+					$Item->categories( array(
+						'before'          => $widget_params['before_categories'],
+						'after'           => $widget_params['after_categories'],
+						'include_main'    => true,
+						'include_other'   => true,
+						'include_external'=> true,
+						'link_categories' => true,
 					) );
-				$edit_link = ob_get_contents();
-				ob_clean();
+					$categories = ob_get_contents();
+					ob_clean();
+				}
+
+				// Last touched:
+				$last_touched = '';
+				if( $this->disp_params['last_touched'] )
+				{
+					echo $widget_params['before_last_touched'];
+					echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) );
+					echo $widget_params['after_last_touched'];
+					$last_touched = ob_get_contents();
+					ob_clean();
+				}
+
+				// Contents last updated:
+				$last_updated = '';
+				if( $this->disp_params['contents_updated'] )
+				{
+					echo $widget_params['before_last_updated'];
+					echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'contents_last_updated_ts' ) ).$Item->get_refresh_contents_last_updated_link();
+					echo $widget_params['after_last_updated'];
+					$last_updated = ob_get_contents();
+					ob_clean();
+				}
+
+				// Link for editing:
+				$edit_link = '';
+				if( $this->disp_params['edit_link'] )
+				{
+					$Item->edit_link( array(
+							'before' => $widget_params['before_edit_link'],
+							'after'  => $widget_params['after_edit_link'],
+							'text'   => $widget_params['edit_link_text'],
+						) );
+					$edit_link = ob_get_contents();
+					ob_clean();
+				}
+
+				ob_end_clean();
+
+				// Item info line format:
+				$format = empty( $widget_params['format'] ) ? '$flag$$permalink$$author$$post_time$$categories$$last_touched$$last_updated$$edit_link$' : $widget_params['format'];
+
+				$info_line = str_replace(
+						array( '$flag$', '$permalink$', '$author$', '$post_time$', '$last_touched$', '$last_updated$', '$categories$', '$edit_link$' ),
+						array( $flag, $permalink, $author, $post_time, $last_touched, $last_updated, $categories, $edit_link ), $format
+					);
+
+				echo $info_line;
+
+				echo $params['widget_item_info_line_after'];
 			}
 
-			ob_end_clean();
-
-			// Item info line format:
-			$format = empty( $widget_params['format'] ) ? '$flag$$permalink$$author$$post_time$$categories$$last_touched$$last_updated$$edit_link$' : $widget_params['format'];
-
-			$info_line = str_replace(
-					array( '$flag$', '$permalink$', '$author$', '$post_time$', '$last_touched$', '$last_updated$', '$categories$', '$edit_link$' ),
-					array( $flag, $permalink, $author, $post_time, $last_touched, $last_updated, $categories, $edit_link ), $format
-				);
-
-			echo $info_line;
-
-			echo $params['widget_item_info_line_after'];
 			echo $this->disp_params['block_body_end'];
 			echo $this->disp_params['block_end'];
 
 			return true;
 		}
 
+		$this->display_debug_message();
 		return false;
 	}
 }

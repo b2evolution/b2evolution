@@ -7173,7 +7173,7 @@ class User extends DataObject
 	/**
 	 * Get status of user email
 	 *
-	 * @return string Status: 'unknown', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer', 'redemption'
+	 * @return string Status: 'unknown', 'working', 'unattended', 'redemption', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer'
 	 */
 	function get_email_status()
 	{

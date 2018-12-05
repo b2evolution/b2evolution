@@ -23,6 +23,8 @@ function emadr_get_status_titles()
 {
 	return array(
 			'unknown'     => TS_('Unknown'),
+			'working'     => TS_('Working'),
+			'unattended'  => TS_('Unattended?'),
 			'redemption'  => TS_('Redemption'),
 			'warning'     => TS_('Warning'),
 			'suspicious1' => TS_('Suspicious 1'),
@@ -44,7 +46,9 @@ function emadr_get_status_colors()
 	return array(
 			''            => '808080',
 			'unknown'     => '808080',
-			'redemption'  => 'FF00FF',
+			'working'     => '00CC00',
+			'unattended'  => 'FF00FF',
+			'redemption'  => 'D9EDF7',
 			'warning'     => 'FFFF00',
 			'suspicious1' => 'FFC800',
 			'suspicious2' => 'FFA500',
@@ -64,7 +68,9 @@ function emadr_get_status_icons()
 {
 	return array(
 			'unknown'     => get_icon( 'bullet_white', 'imgtag', array( 'title' => emadr_get_status_title( 'unknown' ) ) ),
-			'redemption'  => get_icon( 'bullet_magenta', 'imgtag', array( 'title' => emadr_get_status_title( 'redemption' ) ) ),
+			'working'     => get_icon( 'bullet_green', 'imgtag', array( 'title' => emadr_get_status_title( 'working' ) ) ),
+			'unattended'  => get_icon( 'bullet_magenta', 'imgtag', array( 'title' => emadr_get_status_title( 'unattended' ) ) ),
+			'redemption'  => get_icon( 'bullet_light_blue', 'imgtag', array( 'title' => emadr_get_status_title( 'redemption' ) ) ),
 			'warning'     => get_icon( 'bullet_yellow', 'imgtag', array( 'title' => emadr_get_status_title( 'warning' ) ) ),
 			'suspicious1' => get_icon( 'bullet_orange', 'imgtag', array( 'title' => emadr_get_status_title( 'suspicious1' ) ) ),
 			'suspicious2' => get_icon( 'bullet_orange', 'imgtag', array( 'title' => emadr_get_status_title( 'suspicious2' ) ) ),
@@ -84,13 +90,15 @@ function emadr_get_status_levels()
 {
 	$levels = array(
 			'unknown'     => 1,
-			'redemption'  => 2,
-			'warning'     => 3,
-			'suspicious1' => 4,
-			'suspicious2' => 5,
-			'suspicious3' => 6,
-			'prmerror'    => 7,
-			'spammer'     => 8,
+			'working'     => 2,
+			'unattended'  => 3,
+			'redemption'  => 4,
+			'warning'     => 5,
+			'suspicious1' => 6,
+			'suspicious2' => 7,
+			'suspicious3' => 8,
+			'prmerror'    => 9,
+			'spammer'     => 10,
 		);
 
 	return $levels;
@@ -448,16 +456,20 @@ function update_mail_log_time( $type, $emlog_ID, $emlog_key )
 			  SET '.$campaign_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
 			WHERE csnd_emlog_ID = '.$DB->quote( $emlog_ID ) );
 
-		$email_log = $DB->get_row( 'SELECT * FROM T_email__log WHERE emlog_ID = '.$DB->quote( $emlog_ID ) );
+		$SQL = new SQL( 'Get email log data' );
+		$SQL->SELECT( 'emlog_autm_ID, emlog_to, emlog_timestamp' );
+		$SQL->FROM( 'T_email__log' );
+		$SQL->WHERE( 'emlog_ID = '.$DB->quote( $emlog_ID ) );
+		$emlog = $DB->get_row( $SQL );
 
-		if( empty( $email_log->emlog_autm_ID ) )
+		if( empty( $emlog->emlog_autm_ID ) )
 		{	// Update last time for user subscriptions of newsletters:
 			$DB->query( 'UPDATE T_email__newsletter_subscription
 				INNER JOIN T_email__campaign ON ecmp_enlt_ID = enls_enlt_ID AND enls_subscribed = 1
 				INNER JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_user_ID = enls_user_ID
 					SET '.$newsletter_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
 				WHERE csnd_emlog_ID = '.$DB->quote( $emlog_ID ).'
-					AND enls_last_sent_manual_ts IS NOT NULL' );// When user really received an email from the Newsletter(to avoid subscriptions after email was sent)
+					AND ( enls_last_sent_manual_ts IS NOT NULL OR enls_last_sent_auto_ts IS NOT NULL )' );// When user really received an email from the Newsletter(to avoid subscriptions after email was sent)
 		}
 		else
 		{	// Update last time for user subscriptions of all automation newsletters:
@@ -466,7 +478,22 @@ function update_mail_log_time( $type, $emlog_ID, $emlog_key )
 				INNER JOIN T_email__log ON aunl_autm_ID = emlog_autm_ID AND enls_user_ID = emlog_user_ID
 					SET '.$newsletter_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
 				WHERE emlog_ID = '.$DB->quote( $emlog_ID ).'
-					AND enls_last_sent_manual_ts IS NOT NULL' );// When user really received an email from the Newsletter(to avoid subscriptions after email was sent)
+					AND ( enls_last_sent_manual_ts IS NOT NULL OR enls_last_sent_auto_ts IS NOT NULL )' );// When user really received an email from the Newsletter(to avoid subscriptions after email was sent)
+		}
+
+		$EmailAddressCache = & get_EmailAddressCache();
+		if( $EmailAddress = & $EmailAddressCache->get_by_name( $emlog->emlog_to, false, false ) )
+		{	// If email address exists in DB
+			// Update the last opened date of the email address:
+			$EmailAddress->set( 'last_open_ts', $emlog->emlog_timestamp );
+			if( $EmailAddress->get( 'status' ) != 'spammer' &&
+			    ( $EmailAddress->get( 'last_error_ts' ) === NULL ||
+			      $emlog->emlog_timestamp > $EmailAddress->get( 'last_error_ts' )
+			    ) )
+			{	// Switch status to "Working":
+				$EmailAddress->set( 'status', 'working' );
+			}
+			$EmailAddress->dbupdate();
 		}
 	}
 }
@@ -478,6 +505,9 @@ function update_mail_log_time( $type, $emlog_ID, $emlog_key )
  * @param array User IDs
  * @param array Blocked statuses to know what emails are blocked to send
  *     'unknown'     - Unknown
+ *     'working'     - Working
+ *     'unattended'  - Unattended?
+ *     'redemption'  - Redemption
  *     'warning'     - Warning
  *     'suspicious1' - Suspicious 1
  *     'suspicious2' - Suspicious 2
@@ -527,6 +557,9 @@ function load_blocked_emails( $user_IDs, $blocked_statuses = array() )
  * @param string Email address
  * @param array Blocked statuses to know what emails are blocked to send
  *     'unknown'     - Unknown
+ *     'working'     - Working
+ *     'unattended'  - Unattended?
+ *     'redemption'  - Redemption
  *     'warning'     - Warning
  *     'suspicious1' - Suspicious 1
  *     'suspicious2' - Suspicious 2
@@ -572,6 +605,9 @@ function mail_is_blocked( $email, $blocked_statuses = array() )
  * @param boolean set true for blocked emails and false for not blocked emails
  * @param array Blocked statuses to know what emails are blocked to send
  *     'unknown'     - Unknown
+ *     'working'     - Working
+ *     'unattended'  - Unattended?
+ *     'redemption'  - Redemption
  *     'warning'     - Warning
  *     'suspicious1' - Suspicious 1
  *     'suspicious2' - Suspicious 2

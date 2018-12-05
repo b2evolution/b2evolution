@@ -892,22 +892,23 @@ class EmailCampaign extends DataObject
 
 			if( $result )
 			{
+				$last_sent_ts_field = ( $update_sent_ts == 'auto' ? 'enls_last_sent_auto_ts' : 'enls_last_sent_manual_ts' );
 				if( empty( $automation_ID ) )
 				{	// Update last sending data for newsletter per user:
-					$DB->query( 'UPDATE T_email__newsletter_subscription
-						SET enls_last_sent_manual_ts = '.$DB->quote( date2mysql( $localtimenow ) ).',
-								enls_send_count = enls_send_count + 1
-						WHERE enls_user_ID = '.$DB->quote( $user_ID ).'
-							AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+					$last_sent_ts_sql_join = '';
+					$last_sent_ts_sql_where = ' AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) );
 				}
 				else
 				{	// Update last sending data for all newsletters tied to the automation and where the user is subscribed to:
-					$DB->query( 'UPDATE T_email__newsletter_subscription
-						INNER JOIN T_automation__newsletter ON aunl_enlt_ID = enls_enlt_ID AND enls_subscribed = 1
-							SET enls_last_sent_manual_ts = '.$DB->quote( date2mysql( $localtimenow ) ).',
-									enls_send_count = enls_send_count + 1
-						WHERE enls_user_ID = '.$DB->quote( $user_ID ) );
+					$last_sent_ts_sql_join = ' INNER JOIN T_automation__newsletter ON aunl_enlt_ID = enls_enlt_ID AND enls_subscribed = 1';
+					$last_sent_ts_sql_where = '';
 				}
+				$DB->query( 'UPDATE T_email__newsletter_subscription'
+					.$last_sent_ts_sql_join.'
+					SET '.$last_sent_ts_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).',
+					    enls_send_count = enls_send_count + 1
+					WHERE enls_user_ID = '.$DB->quote( $user_ID )
+						.$last_sent_ts_sql_where );
 
 				// Add tags to user after successful email sending:
 				$user_tag_sendsuccess = trim( $this->get( 'user_tag_sendsuccess' ) );
