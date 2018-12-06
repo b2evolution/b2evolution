@@ -1167,6 +1167,10 @@ class Blog extends DataObject
 				$this->set_setting( 'marketing_popup_container_'.$container_disp, param( 'marketing_popup_container_'.$container_disp, 'string' ) );
 			}
 			$this->set_setting( 'marketing_popup_container_other_disps', param( 'marketing_popup_container_other_disps', 'string' ) );
+			$this->set_setting( 'marketing_popup_show_repeat', param( 'marketing_popup_show_repeat', 'integer', 0 ) );
+			$this->set_setting( 'marketing_popup_show_frequency', param( 'marketing_popup_show_frequency', 'string' ) );
+			$this->set_setting( 'marketing_popup_show_period_val', param( 'marketing_popup_show_period_val', 'integer', NULL ), true );
+			$this->set_setting( 'marketing_popup_show_period_unit', param( 'marketing_popup_show_period_unit', 'string' ) );
 		}
 
 		if( in_array( 'more', $groups ) )
@@ -6495,6 +6499,12 @@ class Blog extends DataObject
 			// Load CSS right in the current calling place:
 			require_css( 'ddexitpop.bmin.css', 'blog', NULL, NULL, '#', true );
 			// Initialize JS code to display a marketing popup:
+			$marketing_popup_show_frequency = $this->get_setting( 'marketing_popup_show_frequency' );
+			if( $marketing_popup_show_frequency == 'period' )
+			{	// Use period frequency like X hours or X days:
+				$marketing_popup_show_frequency = $this->get_setting( 'marketing_popup_show_period_val' )
+					.$this->get_setting( 'marketing_popup_show_period_unit' );
+			}
 			echo '<script type="text/javascript">
 			// <![CDATA[
 			jQuery( function()
@@ -6503,6 +6513,8 @@ class Blog extends DataObject
 				{
 					contentsource: ["id", "evo_container__'.$marketing_popup_container_code.'"],
 					fxclass: "'.$this->get_setting( 'marketing_popup_animation' ).'",
+					hideaftershow: '.( $this->get_setting( 'marketing_popup_show_repeat' ) ? 'false' : 'true' ).',
+					displayfreq: "'.$marketing_popup_show_frequency.'",
 				} )
 			} )
 			// ]]>

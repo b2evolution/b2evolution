@@ -1670,10 +1670,13 @@ table.diff {
 	}
 }
 
-// Fix alignment of radio buttons on post features form:
-.radio input[type="radio"][name^="timestamp_"][value="duration"] {
-	position: relative;
-	margin-right: 4px;
+// Fix alignment of radio buttons with additional input/select elements:
+.radio input[type="radio"] {
+	&[name^="timestamp_"][value="duration"],
+	&[name^="marketing_popup_show_frequency"][value="period"] {
+		position: relative;
+		margin-right: 4px;
+	}
 }
 
 // Attachments table:

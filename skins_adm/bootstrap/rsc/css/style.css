@@ -1517,7 +1517,8 @@ table.diff td.diff-title-addedline {
   font-size: 120%;
   font-weight: bold;
 }
-.radio input[type="radio"][name^="timestamp_"][value="duration"] {
+.radio input[type="radio"][name^="timestamp_"][value="duration"],
+.radio input[type="radio"][name^="marketing_popup_show_frequency"][value="period"] {
   position: relative;
   margin-right: 4px;
 }

@@ -278,6 +278,8 @@ class CollectionSettings extends AbstractSettings
 			'marketing_popup_container_page' => 'marketing_popup',
 			'marketing_popup_container_catdir' => 'marketing_popup',
 			'marketing_popup_container_other_disps' => 'marketing_popup',
+			'marketing_popup_show_repeat' => 0,
+			'marketing_popup_show_frequency' => 'always',
 		);
 
 	/**
