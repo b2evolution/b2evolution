@@ -4063,6 +4063,10 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 				// 'notify_changed_account' - "an account was changed."
 			case 'scheduled_task_error_report':
 				// 'notify_cronjob_error' - "a scheduled task ends with an error or timeout."
+			case 'list_new_subscriber':
+				// 'notify_list_new_subscriber' - "one of my Lists gets a new subscriber."
+			case 'list_lost_subscriber':
+				// 'notify_list_lost_subscriber' - "one of my Lists loses a subscriber."
 			case 'automation_owner_notification':
 				// 'notify_automation_owner' - "one of my automations wants to notify me."
 				$email_limit_setting = 'notification_email_limit';

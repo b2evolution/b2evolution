@@ -1634,6 +1634,8 @@ class User extends DataObject
 				// Newsletters:
 				$newsletter_subscriptions = param( 'edited_user_newsletters', 'array:integer', NULL );
 				$this->set_newsletter_subscriptions( $newsletter_subscriptions );
+				$UserSettings->set( 'notify_list_new_subscriber', param( 'edited_user_notify_list_new_subscriber', 'integer', 0 ), $this->ID );
+				$UserSettings->set( 'notify_list_lost_subscriber', param( 'edited_user_notify_list_lost_subscriber', 'integer', 0 ), $this->ID );
 
 				// Emails limit per day
 				param_integer_range( 'edited_user_notification_email_limit', 0, 999, T_('Notificaiton email limit must be between %d and %d.'), ! $is_api_request );
@@ -7912,11 +7914,14 @@ class User extends DataObject
 	 * Subscribe to newsletter
 	 *
 	 * @param array|integer Newsletter IDs
+	 * @param array Optional subscription params
+	 *              - 'subscribed_User': User that subscribed
+	 *              - 'usertags': Comma-delimited user tags applied as part of subscription
 	 * @return integer|boolean # of rows affected or false if error
 	 */
-	function subscribe( $newsletter_IDs )
+	function subscribe( $newsletter_IDs, $params = array() )
 	{
-		global $DB, $localtimenow, $servertimenow;
+		global $DB, $localtimenow, $servertimenow, $current_User;
 
 		if( empty( $this->ID ) )
 		{	// Only created user can has the newsletter subscriptions:
@@ -7955,6 +7960,17 @@ class User extends DataObject
 
 			// Send emails of campaigns which must be sent at subscription:
 			$this->send_auto_subscriptions( $insert_newsletter_IDs );
+		}
+
+		if( count( $insert_newsletter_IDs ) )
+		{	// Notify list owner of new subscriber:
+			$email_template_params = array_merge( array(
+				'subscribed_User' => $this,
+				'subscribed_by_admin' => $current_User->login == $this->login ? '' : $current_User->login,
+			), $params );
+
+			// Note: list owners are only notified of NEW subscribers. Resubscriptions are currently ignored.
+			send_list_owner_notification( $insert_newsletter_IDs, 'list_new_subscriber', $email_template_params );
 		}
 
 		if( count( $update_newsletter_IDs ) )
@@ -8002,11 +8018,14 @@ class User extends DataObject
 	 * Unsubscribe from newsletter
 	 *
 	 * @param array|integer Newsletter IDs
+	 * @param array Optional subscription params
+	 *              - 'subscribed_User': User that unsubscribed
+	 *              - 'usertags': Comma-delimited user tags applied as part of unsubscription
 	 * @return integer|boolean # of rows affected or false if error
 	 */
-	function unsubscribe( $newsletter_IDs )
+	function unsubscribe( $newsletter_IDs, $params = array() )
 	{
-		global $DB, $localtimenow;
+		global $DB, $localtimenow, $current_User;
 
 		if( empty( $this->ID ) )
 		{	// Only created user can has the newsletter subscriptions:
@@ -8023,6 +8042,10 @@ class User extends DataObject
 			$newsletter_IDs = array( $newsletter_IDs );
 		}
 
+		// Get list of newsletter IDs that will be updated:
+		$newsletter_subscriptions = $this->get_newsletter_subscriptions( 'subscribed' );
+		$update_newsletter_IDs = array_intersect( $newsletter_IDs, $newsletter_subscriptions );
+
 		$r = $DB->query( 'UPDATE T_email__newsletter_subscription
 			SET enls_subscribed = 0,
 			    enls_unsubscribed_ts = '.$DB->quote( date2mysql( $localtimenow ) ).'
@@ -8030,6 +8053,10 @@ class User extends DataObject
 			  AND enls_enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )
 			  AND enls_subscribed = 1',
 			'Unsubscribe user #'.$this->ID.' from lists #'.implode( ',', $newsletter_IDs ) );
+
+		// Update newsletter subscriptions:
+		$this->newsletter_subscriptions['subscribed'] = array_diff( $this->newsletter_subscriptions['subscribed'], $update_newsletter_IDs );
+		$this->newsletter_subscriptions['unsubscribed'] = array_unique( array_merge( $this->newsletter_subscriptions['unsubscribed'], $update_newsletter_IDs ) );
 
 		if( $r )
 		{	// If user has been unsubscribed from at least one newsletter,
@@ -8040,6 +8067,16 @@ class User extends DataObject
 				  AND aunl_enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )
 				  AND aunl_autoexit = 1',
 				'Exit user automatically from all automations tied to lists #'.implode( ',', $newsletter_IDs ) );
+		}
+
+		if( count( $update_newsletter_IDs ) )
+		{	// Notify list owner of lost subscriber:
+			$email_template_params = array_merge( array(
+				'subscribed_User' => $this,
+				'unsubscribed_by_admin' => $current_User->login == $this->login ? '' : $current_User->login,
+			), $params );
+
+			send_list_owner_notification( $update_newsletter_IDs, 'list_lost_subscriber', $email_template_params );
 		}
 
 		return $r;
@@ -8055,7 +8092,7 @@ class User extends DataObject
 	{
 		global $DB;
 
-		// Additional check to know what newsletter is really new, in order to exclude the updating subscritptions:
+		// Additional check to know what newsletter is really new, in order to exclude the updating subscriptions:
 		$newsletter_subscriptions = $this->get_newsletter_subscriptions( 'all' );
 		$new_subscriptions = array_diff( $newsletter_IDs, $newsletter_subscriptions );
 

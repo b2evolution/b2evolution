@@ -572,6 +572,76 @@ function send_admin_notification( $subject, $template_name, $template_params )
 
 
 /**
+ * Send notification to list owner
+ *
+ * @param array Newsletter IDs
+ * @param string notificaiton email template name
+ * @param array notification email template params
+ */
+function send_list_owner_notification( $newsletter_IDs, $template_name, $template_params = array() )
+{
+	global $DB, $current_User, $UserSettings;
+
+	// Set default subject suffix:
+	$subject_suffix = empty( $template_params['subscribed_User'] ) ? '' : ': '.$template_params['subscribed_User']->get_username();
+
+	switch( $template_name )
+	{
+		case 'list_new_subscriber':
+			$check_setting = 'notify_list_new_subscriber';
+			$subject = NT_('New subscriber to your list');
+			break;
+
+		case 'list_lost_subscriber':
+			$check_setting = 'notify_list_lost_subscriber';
+			$subject = NT_('A user has unsubscribed from your list');
+			break;
+
+		default:
+			debug_die( 'Unhandled newsletter notification template!' );
+	}
+
+	$NewsletterCache = & get_NewsletterCache();
+	$NewsletterCache->clear();
+	$NewsletterCache->load_where( 'enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )' );
+
+	$owner_newsletters = array();
+	foreach( $NewsletterCache->cache as $Newsletter )
+	{
+		$owner_User = $Newsletter->get_owner_User();
+		$owner_ID = $owner_User->ID;
+		if( ! isset( $owner_newsletters[$owner_ID] ) )
+		{
+			$owner_newsletters[$owner_ID] = array();
+		}
+
+		$owner_newsletters[$owner_ID][] = $Newsletter;
+	}
+
+	$UserCache = & get_UserCache();
+
+	foreach( $owner_newsletters as $owner_ID => $newsletters )
+	{
+		$owner_User = & $UserCache->get_by_ID( $owner_ID );
+
+		if( is_logged_in() && $current_User->ID == $owner_ID )
+		{	// Don't send a notification to current user, because user already knows about this event
+			return;
+		}
+		if( $UserSettings->get( $check_setting, $owner_ID ) )
+		{	// this owner must be notifed
+			$template_params['newsletters'] = $newsletters;
+			locale_temp_switch( $owner_User->get( 'locale' ) );
+			// send mail to user (using his local)
+			$localized_subject = T_( $subject ).$subject_suffix;
+			send_mail_to_User( $owner_User->ID, $localized_subject, $template_name, $template_params ); // ok, if this may fail
+			locale_restore_previous();
+		}
+	}
+}
+
+
+/**
  * Use in-skin login
  */
 function use_in_skin_login()
