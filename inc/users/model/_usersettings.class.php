@@ -96,6 +96,8 @@ class UserSettings extends AbstractSettings
 		'notify_reported_account' => 1, // Notify admin user when an account has been reported by another user
 		'notify_changed_account' => 1, // Notify admin user when an account has been changed
 		'notify_cronjob_error' => 1, // Notify admin user when a scheduled task ends with an error or timeout
+		'notify_list_new_subscriber' => 1, // Notify list owner user when there is a new subscriber
+		'notify_list_lost_subscriber' => 1, // Notify list owner user when list loses a subscriber
 		'notify_automation_owner' => 1, // Notify automation owner user when step is executed
 
 		'account_close_ts' => NULL, // It will be the date when the account was closed. Until the account is not closed this will be NULL.
