@@ -1079,7 +1079,7 @@ class collections_Module extends Module
 	{
 		return array(
 			'create-post-by-email' => array(
-				'name'   => T_('Create posts by email'),
+				'name'   => T_('Create posts by email').' ('.T_('Deprecated').')',
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_post_by_email.job.php',
 				'params' => NULL,
