@@ -190,6 +190,10 @@ module.exports = function(grunt) {
 					'rsc/build/colorbox-bootstrap.min.css': 'rsc/css/colorbox/colorbox-bootstrap.css',
 				}
 			},
+			ddexitpop: {
+				src: [ 'rsc/css/ddexitpop/ddexitpop.css', 'rsc/css/ddexitpop/animate.min.css' ],
+				dest: 'rsc/build/ddexitpop.bmin.css',
+			},
 		},
 
 		// Configuration for the uglify minifying tasks:

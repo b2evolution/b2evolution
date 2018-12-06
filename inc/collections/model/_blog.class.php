@@ -6482,6 +6482,33 @@ class Blog extends DataObject
 
 		return $WidgetContainer ? $container_code : false;
 	}
+
+
+	/**
+	 * Initialize JS & CSS for marketing popup container
+	 */
+	function init_marketing_popup_container()
+	{
+		$marketing_popup_container_code = $this->get_marketing_popup_container();
+		if( $marketing_popup_container_code )
+		{	// If marketing popup is enabled for current page and user:
+			// Load CSS right in the current calling place:
+			require_css( 'ddexitpop.bmin.css', 'blog', NULL, NULL, '#', true );
+			// Initialize JS code to display a marketing popup:
+			echo '<script type="text/javascript">
+			// <![CDATA[
+			jQuery( function()
+			{
+				ddexitpop.init(
+				{
+					contentsource: ["id", "evo_container__'.$marketing_popup_container_code.'"],
+					fxclass: "'.$this->get_setting( 'marketing_popup_animation' ).'",
+				} )
+			} )
+			// ]]>
+			</script>';
+		}
+	}
 }
 
 ?>

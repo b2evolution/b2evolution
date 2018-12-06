@@ -1489,20 +1489,6 @@ var downloadInterval = setInterval( function()
 			require_js( $marketing_popup_container_code ? 'build/evo_frontoffice-with-ddexitpop.bmin.js' : 'build/evo_frontoffice.bmin.js', 'blog' );
 		}
 
-		if( $marketing_popup_container_code )
-		{	// Initialize JS code to display a marketing popup:
-			require_css( 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css', 'blog' );
-			require_css( 'ddexitpop/ddexitpop.css', 'blog' );
-			add_js_headline( 'jQuery( function()
-			{
-				ddexitpop.init(
-				{
-					contentsource: ["id", "evo_container__'.$marketing_popup_container_code.'"],
-					fxclass: "'.$Blog->get_setting( 'marketing_popup_animation' ).'",
-				} )
-			} )' );
-		}
-
 		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
 		{	// If desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode":
 			global $current_User;
