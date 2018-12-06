@@ -2514,19 +2514,21 @@ function display_ajax_form( $params )
 			});
 		}
 
-		function check_and_show_<?php echo $ajax_form_number; ?>()
+		function check_and_show_<?php echo $ajax_form_number; ?>( force_load )
 		{
-			var window_scrollTop = jQuery(window).scrollTop();
-			var window_height = jQuery(window).height();
-			// check if the ajax form is visible, or if it will be visible soon ( 20 pixel )
-			if( window_scrollTop >= ajax_form_offset_<?php echo $ajax_form_number; ?> - window_height - 20 )
-			{
-				if( !request_sent_<?php echo $ajax_form_number; ?> )
-				{
-					request_sent_<?php echo $ajax_form_number; ?> = true;
-					// get the form
-					get_form_<?php echo $ajax_form_number; ?>();
-				}
+			if( request_sent_<?php echo $ajax_form_number; ?> )
+			{	// Don't load the form twice:
+				return;
+			}
+			var load_form = ( typeof force_load == undefined ) ? false : force_load;
+			if( ! load_form )
+			{	// Check if the ajax form is visible, or if it will be visible soon ( 20 pixel ):
+				load_form = jQuery(window).scrollTop() >= ajax_form_offset_<?php echo $ajax_form_number; ?> - jQuery(window).height() - 20;
+			}
+			if( load_form )
+			{	// Load the form only if it is forced or allowed because page is scrolled down to the form position:
+				request_sent_<?php echo $ajax_form_number; ?> = true;
+				get_form_<?php echo $ajax_form_number; ?>();
 			}
 		}
 
@@ -2535,7 +2537,7 @@ function display_ajax_form( $params )
 		});
 
 		jQuery(document).ready( function() {
-			check_and_show_<?php echo $ajax_form_number; ?>();
+			check_and_show_<?php echo $ajax_form_number; ?>( <?php echo empty( $params['params']['load_ajax_form_on_page_load'] ) ? 'false' : 'true'; ?> );
 		});
 
 		jQuery(window).resize( function() {

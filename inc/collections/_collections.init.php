@@ -1661,25 +1661,6 @@ class collections_Module extends Module
 				}
 		}
 	}
-
-
-	/**
-	 * Gets called at the begin of the skin's HTML BODY section
-	 */
-	function SkinBeginHtmlBody()
-	{
-		global $Blog;
-
-		if( isset( $Blog ) && $marketing_popup_container_code = $Blog->get_marketing_popup_container() )
-		{	// Display marketing popup container:
-			widget_container( $marketing_popup_container_code, array(
-				// The following params will be used as defaults for widgets included in this container:
-				'container_display_if_empty' => false, // If no widget, don't display container at all
-				'container_start' => '<div id="evo_container__'.$marketing_popup_container_code.'" class="evo_container $wico_class$ ddexitpop">',
-				'container_end'   => '</div>',
-			) );
-		}
-	}
 }
 
 $collections_Module = new collections_Module();
