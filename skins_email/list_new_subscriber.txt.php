@@ -149,8 +149,8 @@ if( $params['usertags'] )
 }
 
 // Footer vars:
-$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notification when a user subscribes to your list, click here:' ).' '.
-		get_htsrv_url().'quick_unsubscribe.php?type=account_activated&user_ID=$user_ID$&key=$unsubscribe_key$';
+$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notification when a user subscribes to one of your lists, click here:' ).' '.
+		get_htsrv_url().'quick_unsubscribe.php?type=list_new_subscriber&user_ID=$user_ID$&key=$unsubscribe_key$';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

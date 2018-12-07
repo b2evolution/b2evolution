@@ -337,6 +337,18 @@ elseif( $confirmed )
 					$UserSettings->dbupdate();
 					break;
 
+				case 'list_new_subscriber':
+					// unsubscribe from notifications when someone subscribes to one of the user's lists:
+					$UserSettings->set( 'notify_list_new_subscriber', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'list_lost_subscriber':
+					// unsubscribe from notifications when a user unsubscribes to one of the user's lists:
+					$UserSettings->set( 'notify_list_lost_subscriber', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
 				default:
 					// DEFENSIVE programming:
 					$error_msg = 'Unhandled unsubscribe type.';
@@ -630,6 +642,18 @@ elseif( $confirmed )
 					$UserSettings->dbupdate();
 					break;
 
+				case 'list_new_subscriber':
+					// resubscribe from notifications when someone subscribes to one of the user's lists:
+					$UserSettings->set( 'notify_list_new_subscriber', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'list_lost_subscriber':
+					// resubscribe from notifications when a user unsubscribes to one of the user's lists:
+					$UserSettings->set( 'notify_list_lost_subscriber', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
 				default:
 					// DEFENSIVE programming:
 					$error_msg = 'Unhandled resubscribe type.';
@@ -822,6 +846,16 @@ switch( $type )
 	case 'post_mentioned':
 		// unsubscribe from new comment notifications when user is mentioned:
 		$type_str = $notification_prefix.': '.T_('I have been mentioned on a post.');
+		break;
+
+	case 'list_new_subscriber':
+		// unsubscribe from notifications when someone subscribes to one of the user's lists:
+		$type_str = $notification_prefix.': '.T_('one of my Lists gets a new subscriber.');
+		break;
+
+	case 'list_lost_subscriber':
+		// unsubscribe from notifications when a user unsubscribes to one of the user's lists:
+		$type_str = $notification_prefix.': '.T_('one of my Lists loses a subscriber.');
 		break;
 
 	default:
