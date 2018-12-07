@@ -22,6 +22,7 @@ $params = array_merge( array(
 		'newsletters'     => array(),
 		'usertags'        => '', // new user tags being set as part of the new subscription
 		'unsubscribed_by_admin' => '', // Login of admin which unsubscribed the user
+		'user_account_closed' => false, // unsubscribed because account was closed
 	), $params );
 
 
@@ -69,9 +70,15 @@ if( $params['usertags'] )
 	echo implode( ', ', $tags )."\n\n";
 }
 
+// Account closure notice:
+if( $params['user_account_closed'] )
+{
+	echo T_('The user was automatically unsubscribed due to account closure.')."\n\n";
+}
+
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notification when a user unsubscribes from one of your lists, click here:' ).' '.
-		get_htsrv_url().'quick_unsubscribe.php?type=account_activated&user_ID=$user_ID$&key=$unsubscribe_key$';
+		get_htsrv_url().'quick_unsubscribe.php?type=list_lost_subscriber&user_ID=$user_ID$&key=$unsubscribe_key$';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );
