@@ -5707,6 +5707,10 @@ class User extends DataObject
 				$clear_sessions_query = 'UPDATE T_sessions
 									SET sess_key = NULL
 									WHERE sess_user_ID = '.$DB->quote( $this->ID );
+				// unsubscribe user from all lists:
+				$subscribed_newletter_IDs = $this->get_newsletter_subscriptions( 'subscribed' );
+				$this->unsubscribe( $subscribed_newletter_IDs, array( 'user_account_closed' => true ) );
+
 				if( $dbsave && $this->dbupdate() && $UserSettings->dbupdate() && ( $DB->query( $clear_sessions_query ) !== false ) )
 				{ // all db modification was successful
 					$DB->commit();
@@ -7944,6 +7948,8 @@ class User extends DataObject
 		$newsletter_subscriptions = $this->get_newsletter_subscriptions( 'all' );
 		$insert_newsletter_IDs = array_diff( $newsletter_IDs, $newsletter_subscriptions );
 		$update_newsletter_IDs = array_intersect( $newsletter_IDs, $newsletter_subscriptions );
+
+		// Make sure we get a list newletters IDs for resubscriptions:
 		$resubscribe_newsletter_IDs = array_intersect( $newsletter_IDs, $this->get_newsletter_subscriptions( 'unsubscribed' ) );
 
 		$r = 0;

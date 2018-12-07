@@ -22,6 +22,7 @@ $params = array_merge( array(
 		'newsletters'     => array(),
 		'usertags'        => '', // new user tags being set as part of the new subscription
 		'unsubscribed_by_admin' => '', // Login of admin which unsubscribed the user
+		'user_account_closed' => false, // unsubscribed because account was closed
 	), $params );
 
 
@@ -67,6 +68,12 @@ if( $params['usertags'] )
 	$tags = explode( ',', $params['usertags'] );
 	echo T_('User tags set as part of the unsubscription').':'."\n";
 	echo implode( ', ', $tags )."\n\n";
+}
+
+// Account closure notice:
+if( $params['user_account_closed'] )
+{
+	echo T_('The user was automatically unsubscribed due to account closure.')."\n\n";
 }
 
 // Footer vars:

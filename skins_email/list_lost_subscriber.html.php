@@ -22,6 +22,7 @@ $params = array_merge( array(
 		'newsletters'     => array(),
 		'usertags'        => '', // new user tags being set as part of the new subscription
 		'unsubscribed_by_admin' => '', // Login of admin which unsubscribed the user
+		'user_account_closed' => false, // unsubscribed because account was closed
 	), $params );
 
 
@@ -68,7 +69,7 @@ echo empty( $user_pictures ) ? '<p'.emailskin_style( '.p' ).'><b>'.T_('No pictur
 if( $params['newsletters'] )
 {
 	echo '<p'.emailskin_style( '.p' ).'>';
-	echo T_('The user is now unsubscribed from the following list/s').':'."\n";
+	echo T_('The user is now unsubscribed from the following list/s').':';
 	echo '</p>'."\n";
 	echo '<ol>'."\n";
 	foreach( $params['newsletters'] as $newsletter )
@@ -88,6 +89,14 @@ if( $params['usertags'] )
 	{
 		echo '<span'.emailskin_style( '.label+.label-default' ).'>'.$tag.'</span>'."\n";
 	}
+	echo '</p>'."\n";
+}
+
+// Account closure notice:
+if( $params['user_account_closed'] )
+{
+	echo '<p'.emailskin_style( '.p' ).'>';
+	echo T_('The user was automatically unsubscribed due to account closure.');
 	echo '</p>'."\n";
 }
 
