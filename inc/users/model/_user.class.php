@@ -7944,6 +7944,7 @@ class User extends DataObject
 		$newsletter_subscriptions = $this->get_newsletter_subscriptions( 'all' );
 		$insert_newsletter_IDs = array_diff( $newsletter_IDs, $newsletter_subscriptions );
 		$update_newsletter_IDs = array_intersect( $newsletter_IDs, $newsletter_subscriptions );
+		$resubscribe_newsletter_IDs = array_intersect( $newsletter_IDs, $this->get_newsletter_subscriptions( 'unsubscribed' ) );
 
 		$r = 0;
 
@@ -7962,17 +7963,6 @@ class User extends DataObject
 			$this->send_auto_subscriptions( $insert_newsletter_IDs );
 		}
 
-		if( count( $insert_newsletter_IDs ) )
-		{	// Notify list owner of new subscriber:
-			$email_template_params = array_merge( array(
-				'subscribed_User' => $this,
-				'subscribed_by_admin' => $current_User->login == $this->login ? '' : $current_User->login,
-			), $params );
-
-			// Note: list owners are only notified of NEW subscribers. Resubscriptions are currently ignored.
-			send_list_owner_notification( $insert_newsletter_IDs, 'list_new_subscriber', $email_template_params );
-		}
-
 		if( count( $update_newsletter_IDs ) )
 		{	// If previous unsubscriptions should be subscribed again:
 			$r += $DB->query( 'UPDATE T_email__newsletter_subscription
@@ -7982,6 +7972,16 @@ class User extends DataObject
 			  AND enls_enlt_ID IN ( '.$DB->quote( $update_newsletter_IDs ).' )
 			  AND enls_subscribed = 0',
 			'Subscribe(update unsubscriptions) user #'.$this->ID.' to lists #'.implode( ',', $update_newsletter_IDs ) );
+		}
+
+		if( count( $insert_newsletter_IDs ) || count( $resubscribe_newsletter_IDs ) )
+		{	// Notify list owner of new subscriber:
+			$email_template_params = array_merge( array(
+				'subscribed_User' => $this,
+				'subscribed_by_admin' => $current_User->login == $this->login ? '' : $current_User->login,
+			), $params );
+
+			send_list_owner_notification( array_unique( array_merge( $insert_newsletter_IDs, $resubscribe_newsletter_IDs ) ), 'list_new_subscriber', $email_template_params );
 		}
 
 		// Insert user states for newsletters with automations:
@@ -8009,6 +8009,7 @@ class User extends DataObject
 
 		// Update the CACHE array where we store who are subscribed already in order to avoid a duplicate entry error on second calling of this function:
 		$this->newsletter_subscriptions['subscribed'] = array_merge( $this->newsletter_subscriptions['subscribed'], $newsletter_IDs );
+		$this->newsletter_subscriptions['unsubscribed'] = array_diff( $this->newsletter_subscriptions['unsubscribed'], $newsletter_IDs );
 
 		return $r;
 	}
@@ -8054,10 +8055,6 @@ class User extends DataObject
 			  AND enls_subscribed = 1',
 			'Unsubscribe user #'.$this->ID.' from lists #'.implode( ',', $newsletter_IDs ) );
 
-		// Update newsletter subscriptions:
-		$this->newsletter_subscriptions['subscribed'] = array_diff( $this->newsletter_subscriptions['subscribed'], $update_newsletter_IDs );
-		$this->newsletter_subscriptions['unsubscribed'] = array_unique( array_merge( $this->newsletter_subscriptions['unsubscribed'], $update_newsletter_IDs ) );
-
 		if( $r )
 		{	// If user has been unsubscribed from at least one newsletter,
 			// Then this user must automatically exit all automations tied to those newsletters:
@@ -8078,6 +8075,10 @@ class User extends DataObject
 
 			send_list_owner_notification( $update_newsletter_IDs, 'list_lost_subscriber', $email_template_params );
 		}
+
+		// Update the CACHE array where we store who are subscribed already in order to avoid a duplicate entry error on second calling of this function:
+		$this->newsletter_subscriptions['subscribed'] = array_diff( $this->newsletter_subscriptions['subscribed'], $update_newsletter_IDs );
+		$this->newsletter_subscriptions['unsubscribed'] = array_unique( array_merge( $this->newsletter_subscriptions['unsubscribed'], $update_newsletter_IDs ) );
 
 		return $r;
 	}
