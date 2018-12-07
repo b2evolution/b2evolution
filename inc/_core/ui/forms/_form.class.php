@@ -326,7 +326,6 @@ class Form extends Widget
 							'checkbox_newline_end'   => "<br />\n",
 							'checkbox_basic_start'   => '<label>',
 							'checkbox_basic_end'     => '</label>',
-							'checkbox_note_format'   => $this->note_format,
 							// - radio
 							'fieldstart_radio'       => $this->fieldstart,
 							'fieldend_radio'         => $this->fieldend,
@@ -349,7 +348,6 @@ class Form extends Widget
 					$this->checkbox_newline_end   = $template['checkbox_newline_end'];
 					$this->checkbox_basic_start   = $template['checkbox_basic_start'];
 					$this->checkbox_basic_end     = $template['checkbox_basic_end'];
-					$this->checkbox_note_format   = $template['checkbox_note_format'];
 					// - radio
 					$this->fieldstart_radio       = $template['fieldstart_radio'];
 					$this->fieldend_radio         = $template['fieldend_radio'];
@@ -439,7 +437,6 @@ class Form extends Widget
 					$this->checkbox_newline_end   = "<br />\n";
 					$this->checkbox_basic_start   = '<label>';
 					$this->checkbox_basic_end     = '</label>';
-					$this->checkbox_note_format   = $this->note_format;
 					// - radio
 					$this->fieldstart_radio       = $this->fieldstart;
 					$this->fieldend_radio         = $this->fieldend;
@@ -488,7 +485,6 @@ class Form extends Widget
 					$this->checkbox_newline_end   = "<br />\n";
 					$this->checkbox_basic_start   = '<label>';
 					$this->checkbox_basic_end     = '</label>';
-					$this->checkbox_note_format   = $this->note_format;
 					// - radio
 					$this->fieldstart_radio       = $this->fieldstart;
 					$this->fieldend_radio         = $this->fieldend;
@@ -538,7 +534,6 @@ class Form extends Widget
 					$this->checkbox_newline_end   = "<br />\n";
 					$this->checkbox_basic_start   = '<label>';
 					$this->checkbox_basic_end     = '</label>';
-					$this->checkbox_note_format   = $this->note_format;
 					// - radio
 					$this->fieldstart_radio       = $this->fieldstart;
 					$this->fieldend_radio         = $this->fieldend;
@@ -588,7 +583,6 @@ class Form extends Widget
 					$this->checkbox_newline_end   = "<br />\n";
 					$this->checkbox_basic_start   = '<label>';
 					$this->checkbox_basic_end     = '</label>';
-					$this->checkbox_note_format   = $this->note_format;
 					// - radio
 					$this->fieldstart_radio       = $this->fieldstart;
 					$this->fieldend_radio         = $this->fieldend;
@@ -639,7 +633,6 @@ class Form extends Widget
 					$this->checkbox_newline_end   = "<br />\n";
 					$this->checkbox_basic_start   = '<label>';
 					$this->checkbox_basic_end     = '</label>';
-					$this->checkbox_note_format   = $this->note_format;
 					// - radio
 					$this->fieldstart_radio       = $this->fieldstart;
 					$this->fieldend_radio         = $this->fieldend;
@@ -751,15 +744,6 @@ class Form extends Widget
 			$field_classes[] = 'field_required';
 		}
 
-		if( empty( $this->_common_params['label'] ) )
-		{	// Add class to know this field is used without label, e.g. useful for checkbox which is going after checkbox with label:
-			$field_classes[] = 'field_nolabel';
-			if( ! empty( $type ) )
-			{	// Also class for type in order to use a different style per type:
-				$field_classes[] = 'field_type_'.$type;
-			}
-		}
-
 		if( isset( $this->{'fieldstart_'.$type} ) )
 		{ // Use special field start for element with type
 			$r = $this->{'fieldstart_'.$type};
@@ -826,12 +810,11 @@ class Form extends Widget
 
 		if( !empty($this->_common_params['note']) )
 		{ // We have a note
-			$note_format = isset( $this->_common_params[$type.'_note_format'] ) ? $this->_common_params[$type.'_note_format'] : $this->_common_params['note_format'];
 			if( ! empty( $this->is_lined_fields ) )
-			{	// Fix note format for fields that are used in one line:
-				$note_format = str_replace( 'class="', 'class="oneline ', $note_format );
+			{ // Fix note format for fields that are used in one line
+				$this->_common_params['note_format'] = str_replace( 'class="', 'class="oneline ', $this->_common_params['note_format'] );
 			}
-			$r .= sprintf( $note_format, $this->_common_params['note'] );
+			$r .= sprintf( $this->_common_params['note_format'], $this->_common_params['note'] );
 		}
 
 		if( !empty($this->_common_params['bottom_note'] ) )
@@ -4695,11 +4678,6 @@ class Form extends Widget
 		else
 		{
 			$this->_common_params['note_format'] = $this->note_format;
-		}
-
-		if( isset( $field_params['type'], $this->{$field_params['type'].'_note_format'} ) )
-		{	// Use specific note format per type, e.g. checkbox_note_format:
-			$this->_common_params[$field_params['type'].'_note_format'] = $this->{$field_params['type'].'_note_format'};
 		}
 
 		if( isset($field_params['bottom_note_format']) )
