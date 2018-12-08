@@ -481,8 +481,6 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 				evo_flush();
 				continue;
 			}
-			// Change rights for new folder:
-			@chmod( $dest_dir, octdec( $Settings->get( 'fm_default_chmod_dir' ) ) );
 		}
 
 		if( $dir_success )
