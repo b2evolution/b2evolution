@@ -7248,7 +7248,7 @@ function save_to_file( $data, $filename, $mode = 'a' )
 		// Doesn't work during installation
 		if( !empty($Settings) )
 		{
-			$chmod = $Settings->get('fm_default_chmod_dir');
+			$chmod = $Settings->get('fm_default_chmod_file');
 			@chmod( $filename, octdec($chmod) );
 		}
 	}

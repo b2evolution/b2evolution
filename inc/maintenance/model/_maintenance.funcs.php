@@ -354,7 +354,7 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
  */
 function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read_only_list )
 {
-	global $basepath;
+	global $basepath, $Settings;
 
 	/**
 	 * Result of this function is FALSE when some error was detected
@@ -481,6 +481,8 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 				evo_flush();
 				continue;
 			}
+			// Change rights for new folder:
+			@chmod( $dest_dir, octdec( $Settings->get( 'fm_default_chmod_dir' ) ) );
 		}
 
 		if( $dir_success )
@@ -548,6 +550,10 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 			echo '<div class="red">'.sprintf( T_('Unavailable copying to %s, probably no permissions.'), '&laquo;<b>'.$dest_file_name.'</b>&raquo;' ).'</div>';
 			$result = false;
 			evo_flush();
+		}
+		else
+		{	// Change rights for new file:
+			@chmod( $dest_file, octdec( $Settings->get( 'fm_default_chmod_file' ) ) );
 		}
 	}
 
