@@ -1790,7 +1790,6 @@ var downloadInterval = setInterval( function()
 							'inputend_checkbox'      => "</label></div></div>\n",
 							'checkbox_newline_start' => '<div class="checkbox">',
 							'checkbox_newline_end'   => "</div>\n",
-							'checkbox_note_format'   => '%s',
 							// - radio
 							'fieldstart_radio'       => '<div class="form-group radio-group" $ID$>'."\n",
 							'fieldend_radio'         => "</div>\n\n",

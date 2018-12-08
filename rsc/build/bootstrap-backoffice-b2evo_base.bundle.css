@@ -2453,9 +2453,6 @@ a.btn.action_icon.hoverlink {
   margin-left: 0;
   margin-right: 0;
 }
-.form-horizontal .form-group.field_nolabel.field_type_checkbox {
-  margin-top: -15px;
-}
 .form-horizontal .control-label {
   padding-left: 0;
 }

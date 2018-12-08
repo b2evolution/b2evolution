@@ -565,7 +565,6 @@ class AdminUI extends AdminUI_general
 					'checkbox_newline_end'   => "</div>\n",
 					'checkbox_basic_start'   => '<div class="checkbox"><label>',
 					'checkbox_basic_end'     => "</label></div>\n",
-					'checkbox_note_format'   => '%s',
 					// - radio
 					'fieldstart_radio'       => '<div class="form-group radio-group" $ID$>'."\n",
 					'fieldend_radio'         => "</div>\n\n",
