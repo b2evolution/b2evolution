@@ -37,6 +37,17 @@ else
 	printf( T_('A user was subscribed to one of your list/s by %s').':', $params['subscribed_by_admin'] );
 }
 echo "\n\n";
+
+// List of newsletters the user subscribed to:
+if( $params['newsletters'] )
+{
+	foreach( $params['newsletters'] as $newsletter )
+	{
+		echo "\t".'- '.$newsletter->get( 'name' )."\n";
+	}
+	echo "\n\n";
+}
+
 echo /* TRANS: noun */ T_('Login').": ".$subscribed_User->login."\n";
 echo T_('Email').": ".$subscribed_User->email."\n";
 
@@ -128,17 +139,6 @@ if( $user_Group = & $subscribed_User->get_Group() )
 // A count of user's pictures:
 $user_pictures_count = count( $subscribed_User->get_avatar_Links( false ) );
 echo "\n".sprintf( T_('The user has %s profile pictures.'), $user_pictures_count )."\n\n";
-
-// List of newsletters the user subscribed to:
-if( $params['newsletters'] )
-{
-	echo T_('User subscribed to the following list/s').':'."\n";
-	foreach( $params['newsletters'] as $newsletter )
-	{
-		echo "\t".'- '.$newsletter->get( 'name' )."\n";
-	}
-	echo "\n\n";
-}
 
 // List of user tags applied:
 if( $params['usertags'] )
