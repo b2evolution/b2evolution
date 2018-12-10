@@ -8006,7 +8006,7 @@ class User extends DataObject
 		{	// Notify list owner of new subscriber:
 			$email_template_params = array_merge( array(
 				'subscribed_User' => $this,
-				'subscribed_by_admin' => $current_User->login == $this->login ? '' : $current_User->login,
+				'subscribed_by_admin' => ( is_logged_in() && $current_User->login != $this->login ? $current_User->login : '' ),
 			), $params );
 
 			send_list_owner_notification( array_unique( array_merge( $insert_newsletter_IDs, $resubscribe_newsletter_IDs ) ), 'list_new_subscriber', $email_template_params );
@@ -8098,7 +8098,7 @@ class User extends DataObject
 		{	// Notify list owner of lost subscriber:
 			$email_template_params = array_merge( array(
 				'subscribed_User' => $this,
-				'unsubscribed_by_admin' => $current_User->login == $this->login ? '' : $current_User->login,
+				'unsubscribed_by_admin' => ( is_logged_in() && $current_User->login != $this->login ? $current_User->login : '' ),
 			), $params );
 
 			send_list_owner_notification( $update_newsletter_IDs, 'list_lost_subscriber', $email_template_params );

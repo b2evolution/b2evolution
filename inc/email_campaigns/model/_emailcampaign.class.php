@@ -63,6 +63,8 @@ class EmailCampaign extends DataObject
 
 	var $user_tag_dislike;
 
+	var $user_tag_unsubscribe;
+
 	var $send_count;
 
 	var $open_count;
@@ -147,6 +149,7 @@ class EmailCampaign extends DataObject
 			$this->user_tag_cta3 = $db_row->ecmp_user_tag_cta3;
 			$this->user_tag_like = $db_row->ecmp_user_tag_like;
 			$this->user_tag_dislike = $db_row->ecmp_user_tag_dislike;
+			$this->user_tag_unsubscribe = $db_row->ecmp_user_tag_unsubscribe;
 			$this->send_count = $db_row->ecmp_send_count;
 			$this->open_count = $db_row->ecmp_open_count;
 			$this->img_loads = $db_row->ecmp_img_loads;
@@ -678,7 +681,7 @@ class EmailCampaign extends DataObject
 		}
 
 		if( param( 'ecmp_name', 'string', NULL ) !== NULL )
-		{ // Campaign name:
+		{	// Campaign name:
 			param_string_not_empty( 'ecmp_name', T_('Please enter a name.') );
 			$this->set_from_Request( 'name' );
 		}
@@ -744,33 +747,38 @@ class EmailCampaign extends DataObject
 		}
 
 		if( param( 'ecmp_user_tag', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag' );
 		}
 
 		if( param( 'ecmp_user_tag_cta1', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_cta1' );
 		}
 
 		if( param( 'ecmp_user_tag_cta2', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_cta2' );
 		}
 
 		if( param( 'ecmp_user_tag_cta3', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_cta3' );
 		}
 
 		if( param( 'ecmp_user_tag_like', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_like' );
 		}
 
 		if( param( 'ecmp_user_tag_dislike', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_dislike' );
+		}
+
+		if( param( 'ecmp_user_tag_unsubscribe', 'string', NULL ) !== NULL )
+		{	// User tag:
+			$this->set_from_Request( 'user_tag_unsubscribe' );
 		}
 
 		return ! param_errors_detected();

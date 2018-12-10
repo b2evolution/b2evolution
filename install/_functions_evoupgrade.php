@@ -10502,6 +10502,26 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13020 ) )
+	{	// part of 6.10.4-stable
+		task_begin( 'Updating email log table...' );
+		db_modify_col( 'T_email__log', 'emlog_camp_ID', 'INT UNSIGNED NULL DEFAULT NULL COMMENT "Used to reference campaign when there is no associated campaign_send or the previously associated campaign_send updated its csnd_emlog_ID"' );
+		task_end();
+
+		task_begin( 'Updating email newsletter subscriptions table...' );
+		$localtimenow = date2mysql( $GLOBALS['localtimenow'] );
+		$DB->query( 'UPDATE T_email__newsletter_subscription
+			INNER JOIN T_users ON user_ID = enls_user_ID AND user_status = "closed" AND enls_subscribed = 1
+			SET enls_subscribed = 0, enls_unsubscribed_ts = '.$DB->quote( $localtimenow ) );
+		task_end();
+
+		task_begin( 'Upgrading email campaigns table...' );
+		db_add_col( 'T_email__campaign', 'ecmp_user_tag_unsubscribe', 'VARCHAR(255) NULL AFTER ecmp_user_tag_like' );
+		task_end();
+
+		upg_task_end( false );
+	}
+
 	if( upg_task_start( 15000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '
@@ -10795,7 +10815,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			'T_comments__prerendering'     => array( 'cmpr_content_prerendered' ),
 			'T_cron__log'                  => array( 'clog_messages' ),
 			'T_cron__task'                 => array( 'ctsk_name', 'ctsk_params' ),
-			'T_email__campaign'            => array( 'ecmp_email_title', 'ecmp_email_html', 'ecmp_email_text', 'ecmp_email_plaintext', 'ecmp_user_tag', 'ecmp_user_tag_cta1', 'ecmp_user_tag_cta2', 'ecmp_user_tag_cta3', 'ecmp_user_tag_like', 'ecmp_user_tag_dislike' ),
+			'T_email__campaign'            => array( 'ecmp_email_title', 'ecmp_email_html', 'ecmp_email_text', 'ecmp_email_plaintext', 'ecmp_user_tag', 'ecmp_user_tag_cta1', 'ecmp_user_tag_cta2', 'ecmp_user_tag_cta3', 'ecmp_user_tag_like', 'ecmp_user_tag_dislike, ecmp_user_tag_unsubscribe' ),
 			'T_email__log'                 => array( 'emlog_subject', 'emlog_headers', 'emlog_message' ),
 			'T_email__newsletter'          => array( 'enlt_name', 'enlt_label' ),
 			'T_email__returns'             => array( 'emret_errormsg', 'emret_headers', 'emret_message' ),

@@ -38,6 +38,17 @@ else
 }
 echo '</p>'."\n";
 
+// List of newsletters the user subscribed to:
+if( $params['newsletters'] )
+{
+	echo '<ol>'."\n";
+	foreach( $params['newsletters'] as $newsletter )
+	{
+		echo '<li>'.$newsletter->get( 'name' ).'</li>'."\n";
+	}
+	echo '</ol>'."\n";
+}
+
 echo '<table'.emailskin_style( 'table.email_table' ).'>'."\n";
 echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'./* TRANS: noun */ T_('Login').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$subscribed_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:' ) ).'</td></tr>'."\n";
 echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Email').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$subscribed_User->email.'</td></tr>'."\n";
@@ -147,20 +158,6 @@ foreach( $user_avatars as $user_Link )
 		) );
 }
 echo empty( $user_pictures ) ? '<p'.emailskin_style( '.p' ).'><b>'.T_('No pictures.').'</b></p>' : $user_pictures;
-
-// List of newsletters the user subscribed to:
-if( $params['newsletters'] )
-{
-	echo '<p'.emailskin_style( '.p' ).'>';
-	echo T_('User subscribed to the following list/s').':'."\n";
-	echo '</p>'."\n";
-	echo '<ol>'."\n";
-	foreach( $params['newsletters'] as $newsletter )
-	{
-		echo '<li>'.$newsletter->get( 'name' ).'</li>'."\n";
-	}
-	echo '</ol>'."\n";
-}
 
 // List of user tags applied:
 if( $params['usertags'] )

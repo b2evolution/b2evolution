@@ -81,6 +81,9 @@ $Form->begin_fieldset( T_('Click tagging').get_manual_link( 'campaign-tagging-pa
 	$Form->usertag_input( 'ecmp_user_tag_dislike', param( 'ecmp_user_tag_dislike', 'string', $edited_EmailCampaign->get( 'user_tag_dislike' ) ), 60, T_('Tag users who disliked the email with'), '', array(
 		'maxlength' => 255,
 	) );
+	$Form->usertag_input( 'ecmp_user_tag_unsubscribe', param( 'ecmp_user_tag_unsubscribe', 'string', $edited_EmailCampaign->get( 'user_tag_unsubscribe' ) ), 60, T_('Tag users who (really) unsubscribe with'), '', array(
+		'maxlength' => 255,
+	) );
 
 	?>
 	<script type="text/javascript">

@@ -1177,6 +1177,7 @@ div#fileuploader_form {
 .evo_widget_form__inline, .evo_widget_form__grouped {
 	label.control-label {
 		display: none;
+		float: none;
 	}
 	div {
 		display: inline-block;
@@ -1186,6 +1187,15 @@ div#fileuploader_form {
 	}
 	input.btn {
 		margin: 0;
+	}
+}
+.evo_widget_form__inline {
+	div.controls, div.control-buttons {
+		float: none;
+		margin-bottom: 4px;
+		.form-control {
+			width: 100%;
+		}
 	}
 }
 .evo_widget_form__grouped {
