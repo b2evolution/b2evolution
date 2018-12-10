@@ -15,6 +15,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $blog, $admin_url, $UserSettings;
 
+$org_name = param( 'org_name', 'string', '', true );
+
 // Create result set:
 $SQL = new SQL();
 $SQL->SELECT( 'SQL_NO_CACHE org_ID, org_owner_user_ID, org_name, org_url, org_accept, org_perm_role, user_login, COUNT( uorg_user_ID ) AS members_count' );
@@ -28,6 +30,13 @@ $count_SQL->SELECT( 'SQL_NO_CACHE COUNT( org_ID )' );
 $count_SQL->FROM( 'T_users__organization' );
 $count_SQL->FROM_add( 'INNER JOIN T_users ON org_owner_user_ID = user_ID' );
 
+if( ! empty( $org_name ) )
+{	// Filter with organization name:
+	$filter_sql = 'org_name LIKE ( '.$DB->quote( '%'.$org_name.'%' ).' )';
+	$SQL->WHERE( $filter_sql );
+	$count_SQL->WHERE( $filter_sql );
+}
+
 $Results = new Results( $SQL->get(), 'org_', '-D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 $Results->Cache = get_OrganizationCache();
 
@@ -40,6 +49,23 @@ if( $current_User->check_perm( 'orgs', 'create', false ) )
 { // create new group link
 	$Results->global_icon( T_('Create a new organization...'), 'new', '?ctrl=organizations&amp;action=new', T_('Add organization').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
+
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_organizations( & $Form )
+{
+	$Form->text_input( 'org_name', get_param( 'org_name' ), 50, T_('Name'), '', array( 'maxlength' => 255 ) );
+}
+$Results->filter_area = array(
+	'callback' => 'filter_organizations',
+	'url_ignore' => 'org_name,results_org_page',
+	'presets' => array(
+		'all' => array( T_('All'), '?ctrl=organizations' ),
+		)
+	);
 
 $Results->cols[] = array(
 		'th' => T_('ID'),
