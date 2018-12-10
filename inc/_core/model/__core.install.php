@@ -483,7 +483,7 @@ $schema_queries = array(
 			emlog_message       MEDIUMTEXT DEFAULT NULL,
 			emlog_last_open_ts  TIMESTAMP NULL,
 			emlog_last_click_ts TIMESTAMP NULL,
-			emlog_camp_ID       INT UNSIGNED NULL DEFAULT NULL,
+			emlog_camp_ID       INT UNSIGNED NULL DEFAULT NULL COMMENT 'Used to reference campaign when there is no associated campaign_send or the previously associated campaign_send updated its csnd_emlog_ID',
 			emlog_autm_ID       INT UNSIGNED DEFAULT NULL,
 			PRIMARY KEY         (emlog_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
@@ -578,6 +578,7 @@ $schema_queries = array(
 			ecmp_user_tag_cta3        VARCHAR(255) NULL,
 			ecmp_user_tag_like        VARCHAR(255) NULL,
 			ecmp_user_tag_dislike     VARCHAR(255) NULL,
+			ecmp_user_tag_unsubscribe VARCHAR(255) NULL,
 			ecmp_send_count           INT UNSIGNED NOT NULL DEFAULT 0,
 			ecmp_open_count           INT UNSIGNED NOT NULL DEFAULT 0,
 			ecmp_img_loads            INT UNSIGNED NOT NULL DEFAULT 0,

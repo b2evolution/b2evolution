@@ -20,6 +20,7 @@ param( 'coll_ID', 'integer', 0 );
 param( 'post_ID', 'integer', 0 );
 param( 'confirmed', 'integer', 0 );
 param( 'action', 'string', NULL );
+param( 'ecmp_ID', 'integer', 0 );
 
 $unsub_Comment = false;
 if( $comment_ID !== NULL )
@@ -265,10 +266,32 @@ elseif( $confirmed )
 					//    which was upgraded to Newsletter with ID = 1
 					$newsletter_ID = param( 'newsletter', 'integer', 1 );
 
-					if( ! $edited_User->unsubscribe( $newsletter_ID ) )
+					$assigned_user_tag = NULL;
+					$email_campaign_ID = param( 'ecmp_ID', 'integer', 0 );
+					$EmailCampaignCache = & get_EmailCampaignCache();
+					if( $email_campaign_ID )
+					{
+						if( $EmailCampaign = & $EmailCampaignCache->get_by_ID( $email_campaign_ID, false, false ) )
+						{
+							$assigned_user_tag = $EmailCampaign->get( 'user_tag_unsubscribe' );
+						}
+						else
+						{
+							$error_msg = T_('Invalid unsubscribe link!');
+							break;
+						}
+					}
+
+					if( ! $edited_User->unsubscribe( $newsletter_ID, array( 'usertags' => $assigned_user_tag ) ) )
 					{	// Display a message is the user is not subscribed on the requested newsletter:
 						$error_msg = T_('You are not subscribed to this list.');
 					}
+					elseif( ! empty( $assigned_user_tag ) )
+					{
+						$edited_User->add_usertags( $assigned_user_tag );
+						$edited_User->dbupdate();
+					}
+
 					break;
 
 				case 'user_registration':
@@ -967,6 +990,10 @@ else
 	$Form->hidden( 'coll_ID', $coll_ID );
 	$Form->hidden( 'post_ID', $post_ID );
 	$Form->hidden( 'confirmed', 1 );
+	if( $ecmp_ID )
+	{
+		$Form->hidden( 'ecmp_ID', $ecmp_ID );
+	}
 	if( ! empty( $hidden_form_params ) && is_array( $hidden_form_params ) )
 	{	// Set additional hidden params from the array:
 		foreach( $hidden_form_params as $hidden_form_param_key => $hidden_form_param_value )

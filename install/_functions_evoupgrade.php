@@ -10207,6 +10207,26 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13020 ) )
+	{	// part of 6.10.4-stable
+		task_begin( 'Updating email log table...' );
+		db_modify_col( 'T_email__log', 'emlog_camp_ID', 'INT UNSIGNED NULL DEFAULT NULL COMMENT "Used to reference campaign when there is no associated campaign_send or the previously associated campaign_send updated its csnd_emlog_ID"' );
+		task_end();
+
+		task_begin( 'Updating email newsletter subscriptions table...' );
+		$localtimenow = date2mysql( $GLOBALS['localtimenow'] );
+		$DB->query( 'UPDATE T_email__newsletter_subscription
+			INNER JOIN T_users ON user_ID = enls_user_ID AND user_status = "closed" AND enls_subscribed = 1
+			SET enls_subscribed = 0, enls_unsubscribed_ts = '.$DB->quote( $localtimenow ) );
+		task_end();
+
+		task_begin( 'Upgrading email campaigns table...' );
+		db_add_col( 'T_email__campaign', 'ecmp_user_tag_unsubscribe', 'VARCHAR(255) NULL AFTER ecmp_user_tag_like' );
+		task_end();
+
+		upg_task_end( false );
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
