@@ -267,7 +267,7 @@ class user_register_quick_Widget extends ComponentWidget
 	 */
 	function display_form( $params )
 	{
-		global $Collection, $Blog, $Settings, $Session, $redirect_to, $dummy_fields;
+		global $Collection, $Blog, $Settings, $Session, $Plugins, $redirect_to, $dummy_fields;
 
 		if( $Settings->get( 'newusers_canregister' ) != 'yes' || ! $Settings->get( 'quick_registration' ) )
 		{ // Display error message when quick registration is disabled
@@ -316,6 +316,8 @@ class user_register_quick_Widget extends ComponentWidget
 		$Form = new Form( get_htsrv_url( 'login' ).'register.php', 'register_form', 'post' );
 
 		$Form->begin_form( NULL, '', array( 'class' => 'widget_register_form evo_widget_form__'.$form_display_mode ) );
+
+		$Plugins->trigger_event( 'DisplayRegisterFormBefore', array( 'Form' => & $Form, 'inskin' => true, 'Widget' => & $this ) );
 
 		$Form->add_crumb( 'regform' );
 		$Form->hidden( 'action', 'quick_register' );
@@ -412,10 +414,11 @@ class user_register_quick_Widget extends ComponentWidget
 		$email_value = isset( $widget_param_input_values[ $dummy_fields['email'] ] ) ? $widget_param_input_values[ $dummy_fields['email'] ] : '';
 		$Form->email_input( $dummy_fields['email'], $email_value, 50, ( $is_nolabels_mode ? '' : T_('Your email') ), $email_params );
 
-		if( $this->disp_params['ask_country'] != 'no' )
+		if( $this->disp_params['ask_country'] != 'no' && empty( $this->disp_params['hide_country_by_plugin'] ) )
 		{	// Country
-			$CountryCache = & get_CountryCache( NT_('Select your country') );
-			$country_value = isset( $widget_param_input_values['country'] ) ? $widget_param_input_values['country'] : '';
+			$CountryCache = & get_CountryCache();
+			$CountryCache->none_option_text = NT_('Select your country');
+			$country_value = isset( $widget_param_input_values['country'] ) ? $widget_param_input_values['country'] : get_param( 'country' );
 			$Form->select_country( 'country', $country_value, $CountryCache, ( $is_nolabels_mode ? '' : T_('Country') ), array(
 				'allow_none' => true,
 				'required' => $this->disp_params['ask_country'] == 'required',
