@@ -86,7 +86,7 @@ $params = array_merge( array(
 		$action_links = '<div class="'.button_class( 'group' ).'">'.$action_links.'</div>';
 	}
 
-	if( ! in_array( $disp, array( 'single', 'page' ) ) )
+	if( $disp != 'single' )
 	{
 		$Item->title( array(
 				'link_type'  => $params['item_link_type'],
