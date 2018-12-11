@@ -279,11 +279,6 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 		$FeaturedList = NULL;
 	}
 
-	if( isset( $FeaturedList ) && ( $FeaturedList->filters['coll_IDs'] !== $coll_IDs ) )
-	{ // Reset a featured list if previous request had a different $coll_IDs:
-		$FeaturedList = NULL;
-	}
-
 	// Save current list type in global var:
 	$featured_list_type = $load_featured;
 

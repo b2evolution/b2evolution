@@ -57,6 +57,9 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 	$ChapterCache->reveal_children( $Blog->ID );
 	$curr_Chapter = & $ChapterCache->get_by_ID( $cat, false );
 
+	// This will initialize $FeaturedList that will be used by widgets below and without moving the cursor:
+	$intro_Item = & get_featured_Item( 'posts', NULL, true ); // $intro_Item is used below for comments form
+
 	// ------------------------- "Chapter Main Area" CONTAINER EMBEDDED HERE --------------------------
 	// Display container and contents:
 	widget_container( 'chapter_main_area', array(
@@ -70,35 +73,6 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 			'featured_class'    => 'featurepost',
 		) );
 	// ----------------------------- END OF "Chapter Main Area" CONTAINER -----------------------------
-
-	// Go Grab the featured post:
-	$intro_Item = & get_featured_Item(); // $intro_Item is used below for comments form
-
-	if( empty( $intro_Item ) || $intro_Item->get( 'title' ) == '' )
-	{ // Display chapter title only if intro post has no title
-		echo '<div class="cat_title">';
-
-		echo '<h1>'.$curr_Chapter->get( 'name' ).'</h1>';
-		echo '<div class="'.button_class( 'group' ).'">';
-		echo $curr_Chapter->get_edit_link( array(
-				'text'          => get_icon( 'edit' ).' '.T_('Edit Cat'),
-				'class'         => button_class( 'text' ),
-				'redirect_page' => 'front',
-			) );
-
-		// Button to create a new page
-		$write_new_intro_url = $Blog->get_write_item_url( $cat, '', '', 'intro-cat' );
-		if( !empty( $write_new_intro_url ) )
-		{ // Display button to write a new intro
-			echo '<a href="'.$write_new_intro_url.'" class="'.button_class( 'text' ).'">'
-					.get_icon( 'add' ).' '
-					.T_('Add Intro')
-				.'</a>';
-		}
-		echo '</div>';
-
-			echo '</div>';
-	}
 
 	$callbacks = array(
 		'line'  => 'cat_inskin_display',

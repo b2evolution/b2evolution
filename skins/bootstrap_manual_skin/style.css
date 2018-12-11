@@ -297,19 +297,21 @@ ol.breadcrumb {
 }
 .evo_post_title,
 .cat_title {
-  display: table;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
 }
 .evo_post_title h1,
 .cat_title h1 {
-  display: table-cell;
   margin: 0;
   padding: 20px 0 10px;
 }
 .evo_post_title .btn-group,
 .cat_title .btn-group {
-  display: table-cell;
   padding: 20px 0 10px 30px;
-  vertical-align: middle;
   white-space: nowrap;
 }
 .evo_post_title .btn-group .btn,

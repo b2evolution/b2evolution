@@ -305,6 +305,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['chapter_main_area'] = array(
 		'coll_type' => 'manual',
 		array( 10, 'coll_featured_intro' ),
+		array( 20, 'cat_title', 'params' => array( 'blog_ID' => '-', 'display_when' => 'no_intro' ) ),
 	);
 
 	/* 404 Page */

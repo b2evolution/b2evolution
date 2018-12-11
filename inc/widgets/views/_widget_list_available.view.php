@@ -147,6 +147,7 @@ $core_componentwidget_defs = array(
 			'coll_xml_feeds',
 			'coll_subscription',
 			'coll_activity_stats',
+			'cat_title',
 		),
 	'user' => array(
 			'user_avatars',
