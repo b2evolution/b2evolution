@@ -118,6 +118,7 @@ class UserSettings extends AbstractSettings
 		'suggest_item_tags' => 1, // Suggest to autocomplete item tags on edit form
 
 		'agg_period' => 'last_30_days', // Date period to filter the aggregated hits data
+		'aggcmp_period' => 'prev_30_days', // Date period to compare the aggregated hits data
 
 		'git_upgrade_url' => 'https://github.com/b2evolution/b2evolution.git', // URL of Git repository
 		'git_upgrade_branch' => 'master', // Git branch
