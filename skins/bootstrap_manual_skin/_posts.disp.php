@@ -71,6 +71,13 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 			'block_title_end'   => '</h2>',
 			'intro_class'       => 'well evo_post evo_content_block',
 			'featured_class'    => 'featurepost',
+			'item_mask'         => '<li><a href="$url$">$title$</a></li>',
+			'item_active_mask'  => '<li class="active">$title$</li>',
+
+			// Template params for "Breadcrumb Path" widget:
+			'widget_breadcrumb_path_before' => '<nav><ol class="breadcrumb">',
+			'widget_breadcrumb_path_after' => '</ol></nav>',
+
 		) );
 	// ----------------------------- END OF "Chapter Main Area" CONTAINER -----------------------------
 

@@ -119,6 +119,11 @@ class breadcrumb_path_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
+		$this->disp_params = array_merge( array(
+			'widget_breadcrumb_path_before'      => '',
+			'widget_breadcrumb_path_after'       => '',
+		), $this->disp_params );
+
 		$breadcrumbs = array();
 
 		if( ! empty( $this->disp_params['suffix_text'] ) )
@@ -182,6 +187,7 @@ class breadcrumb_path_Widget extends ComponentWidget
 
 		// Print out the breadcrumbs
 		$breadcrumbs = array_reverse( $breadcrumbs );
+		echo $this->disp_params['widget_breadcrumb_path_before'];
 		foreach( $breadcrumbs as $b => $breadcrumb )
 		{
 			if( $b == count( $breadcrumbs ) - 1 )
@@ -197,6 +203,7 @@ class breadcrumb_path_Widget extends ComponentWidget
 				echo $this->disp_params['separator'];
 			}
 		}
+		echo $this->disp_params['widget_breadcrumb_path_after'];
 
 		echo $this->disp_params['block_end'];
 
