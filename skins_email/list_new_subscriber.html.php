@@ -49,6 +49,19 @@ if( $params['newsletters'] )
 	echo '</ol>'."\n";
 }
 
+// List of user tags applied:
+if( $params['usertags'] )
+{
+	$tags = explode( ',', $params['usertags'] );
+	echo '<p'.emailskin_style( '.p' ).'>';
+	echo T_('User tags set as part of new subscription').':'."\n";
+	foreach( $tags as $tag )
+	{
+		echo '<span'.emailskin_style( '.label+.label-default' ).'>'.$tag.'</span>'."\n";
+	}
+	echo '</p>'."\n";
+}
+
 echo '<table'.emailskin_style( 'table.email_table' ).'>'."\n";
 echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'./* TRANS: noun */ T_('Login').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$subscribed_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:' ) ).'</td></tr>'."\n";
 echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Email').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$subscribed_User->email.'</td></tr>'."\n";
@@ -159,18 +172,10 @@ foreach( $user_avatars as $user_Link )
 }
 echo empty( $user_pictures ) ? '<p'.emailskin_style( '.p' ).'><b>'.T_('No pictures.').'</b></p>' : $user_pictures;
 
-// List of user tags applied:
-if( $params['usertags'] )
-{
-	$tags = explode( ',', $params['usertags'] );
-	echo '<p'.emailskin_style( '.p' ).'>';
-	echo T_('User tags set as part of new subscription').':'."\n";
-	foreach( $tags as $tag )
-	{
-		echo '<span'.emailskin_style( '.label+.label-default' ).'>'.$tag.'</span>'."\n";
-	}
-	echo '</p>'."\n";
-}
+// Buttons:
+echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
+echo get_link_tag( $admin_url.'?ctrl=user&user_tab=profile&user_ID='.$subscribed_User->ID, T_('Edit User'), 'div.buttons a+a.btn-primary' )."\n";
+echo "</div>\n";
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notification when a user subscribes to one of your lists, click here:' )

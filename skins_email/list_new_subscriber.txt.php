@@ -48,6 +48,14 @@ if( $params['newsletters'] )
 	echo "\n\n";
 }
 
+// List of user tags applied:
+if( $params['usertags'] )
+{
+	$tags = explode( ',', $params['usertags'] );
+	echo T_('User tags set as part of new subscription').':'."\n";
+	echo implode( ', ', $tags )."\n\n";
+}
+
 echo /* TRANS: noun */ T_('Login').": ".$subscribed_User->login."\n";
 echo T_('Email').": ".$subscribed_User->email."\n";
 
@@ -140,13 +148,8 @@ if( $user_Group = & $subscribed_User->get_Group() )
 $user_pictures_count = count( $subscribed_User->get_avatar_Links( false ) );
 echo "\n".sprintf( T_('The user has %s profile pictures.'), $user_pictures_count )."\n\n";
 
-// List of user tags applied:
-if( $params['usertags'] )
-{
-	$tags = explode( ',', $params['usertags'] );
-	echo T_('User tags set as part of new subscription').':'."\n";
-	echo implode( ', ', $tags )."\n\n";
-}
+// Edit user link:
+echo T_('Edit user').': '.$admin_url.'?ctrl=user&user_tab=profile&user_ID='.$subscribed_User->ID."\n";
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notification when a user subscribes to one of your lists, click here:' ).' '.
