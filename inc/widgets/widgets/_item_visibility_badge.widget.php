@@ -152,6 +152,7 @@ class item_visibility_badge_Widget extends ComponentWidget
 			return true;
 		}
 
+		$this->display_debug_message();
 		return false;
 	}
 }

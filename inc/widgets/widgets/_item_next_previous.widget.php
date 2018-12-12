@@ -135,13 +135,17 @@ class item_next_previous_Widget extends ComponentWidget
 				'block_end' => '',
 			), $params['widget_item_next_previous_params'] );
 
-		if( $params['widget_item_next_previous_display'] && $disp == 'single' )
+		ob_start();
+		item_prevnext_links( $widget_params );
+		$item_prevnext_links = ob_get_clean();
+
+		if( $params['widget_item_next_previous_display'] && $disp == 'single' && ! empty( $item_prevnext_links ) )
 		{
 			echo $this->disp_params['block_start'];
 			$this->disp_title();
 			echo $this->disp_params['block_body_start'];
 
-			item_prevnext_links( $widget_params );
+			echo $item_prevnext_links;
 
 			echo $this->disp_params['block_body_end'];
 			echo $this->disp_params['block_end'];
@@ -150,6 +154,7 @@ class item_next_previous_Widget extends ComponentWidget
 		}
 		else
 		{
+			$this->display_debug_message();
 			return false;
 		}
 	}
