@@ -3254,8 +3254,7 @@ class Item extends ItemLight
 							'ask_country' => in_array( 'country', $fields_to_display ) ? 'required' : 'no',
 							'source' => 'Page: '.$this->get( 'urltitle' ),
 							'usertags' => $user_tags,
-							'subscribe_post' => 0,
-							'subscribe_comment' => 0,
+							'subscribe' => array( 'post' => 0, 'comment' => 0 ),
 							'button_class' => 'btn-primary',
 							'inline' => 1
 						);

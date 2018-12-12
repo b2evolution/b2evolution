@@ -11072,6 +11072,42 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15330, 'Updating widget "Email capture / Quick registration"...' ) )
+	{	// part of 7.0.0-alpha
+		$SQL = new SQL( 'Get email capture widgets to update params from checkbox to checklist' );
+		$SQL->SELECT( 'wi_ID, wi_params' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->WHERE( 'wi_code = "user_register_quick"' );
+		$SQL->WHERE_and( 'wi_params IS NOT NULL' );
+		$widgets = $DB->get_assoc( $SQL );
+		foreach( $widgets as $widget_ID => $widget_params )
+		{
+			$widget_params = @unserialize( $widget_params );
+			if( ! $widget_params )
+			{	// Skip wrong widget params:
+				continue;
+			}
+			// Set the param values in new format:
+			$widget_params['subscribe'] = array(
+					'post'    => empty( $widget_params['subscribe_post'] ) ? 0 : 1,
+					'comment' => empty( $widget_params['subscribe_comment'] ) ? 0 : 1,
+				);
+			if( isset( $widget_params['subscribe_post'] ) )
+			{	// Remove old param:
+				unset( $widget_params['subscribe_post'] );
+			}
+			if( isset( $widget_params['subscribe_comment'] ) )
+			{	// Remove old param:
+				unset( $widget_params['subscribe_comment'] );
+			}
+			// Update widget params:
+			$DB->query( 'UPDATE T_widget__widget
+				  SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+				WHERE wi_ID = '.$widget_ID );
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

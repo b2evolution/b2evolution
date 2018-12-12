@@ -182,8 +182,8 @@ switch( $action )
 			$registration_require_firstname = ( $user_register_quick_Widget->disp_params['ask_firstname'] == 'required' );
 			$registration_require_lastname = ( $user_register_quick_Widget->disp_params['ask_lastname'] == 'required' );
 			$registration_require_country = ( $user_register_quick_Widget->disp_params['ask_country'] == 'required' );
-			$auto_subscribe_posts = $user_register_quick_Widget->disp_params['subscribe_post'];
-			$auto_subscribe_comments = $user_register_quick_Widget->disp_params['subscribe_comment'];
+			$auto_subscribe_posts = $user_register_quick_Widget->disp_params['subscribe']['post'];
+			$auto_subscribe_comments = $user_register_quick_Widget->disp_params['subscribe']['comment'];
 			$widget_newsletters = $user_register_quick_Widget->disp_params['newsletters'];
 			$user_tags = $user_register_quick_Widget->disp_params['usertags'];
 			$widget_redirect_to = trim( $user_register_quick_Widget->disp_params['redirect_to'] );

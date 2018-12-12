@@ -170,17 +170,13 @@ class user_register_quick_Widget extends ComponentWidget
 					'options' => $newsletters_options,
 					'note' => ''
 				),
-				'subscribe_post' => array(
+				'subscribe' => array(
 					'label' => T_('Subscribe to collection'),
-					'note' => T_('check to auto subscribe new user to current collection posts'),
-					'type' => 'checkbox',
-					'defaultvalue' => 1,
-				),
-				'subscribe_comment' => array(
-					'label' => '',
-					'note' => T_('check to auto subscribe new user to current collection comments'),
-					'type' => 'checkbox',
-					'defaultvalue' => 1,
+					'type' => 'checklist',
+					'options' => array(
+						array( 'post', T_('check to auto subscribe new user to current collection posts'), 1 ),
+						array( 'comment', T_('check to auto subscribe new user to current collection comments'), 1 ),
+					),
 				),
 				'button' => array(
 					'label' => T_('Button title'),
@@ -335,8 +331,8 @@ class user_register_quick_Widget extends ComponentWidget
 			$Form->hidden( 'ask_lastname', $this->disp_params['ask_lastname'] );
 			$Form->hidden( 'ask_country', $this->disp_params['ask_country'] );
 			$Form->hidden( 'usertags', $this->disp_params['usertags'] );
-			$Form->hidden( 'subscribe_post', $this->disp_params['subscribe_post'] );
-			$Form->hidden( 'subscribe_comment', $this->disp_params['subscribe_comment'] );
+			$Form->hidden( 'subscribe_post', $this->disp_params['subscribe']['post'] );
+			$Form->hidden( 'subscribe_comment', $this->disp_params['subscribe']['comment'] );
 
 			$newsletters = array();
 			foreach( $this->disp_params['newsletters'] as $loop_newsletter )
