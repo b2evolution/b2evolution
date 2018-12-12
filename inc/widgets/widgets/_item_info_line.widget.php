@@ -217,9 +217,19 @@ class item_info_line_Widget extends ComponentWidget
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
+		$display_widget = $this->disp_params['flag_icon'] || $this->disp_params['permalink_icon'] || $this->disp_params['before_author'] != 'none'
+				|| $this->disp_params['date_format'] != 'none' || $this->disp_params['time_format'] != 'none' || $this->disp_params['category']
+				|| $this->disp_params['last_touched'] || $this->disp_params['contents_updated'] || $this->disp_params['edit_link'];
+
 		if( empty( $Item ) )
 		{	// Display error message when no Item object:
-			echo '<span class="evo_param_error">'.sprintf( T_('No $Item object found. Cannot display widget %s.'), '&laquo;'.$this->get_name().'&raquo;' ).'</span>';
+			echo '<span class="evo_param_error">'.sprintf( T_('No %s object found. Cannot display widget "%s".'), '<code>Item</code>', $this->get_name() ).'</span>';
+		}
+		elseif( ! $display_widget )
+		{
+			global $admin_url;
+			echo '<span class="evo_param_error">'.sprintf( T_('Nothing to display! Check "%s" <a %s>widget settings</a>.'),
+					$this->get_name(), 'href="'.url_add_param( $admin_url, array( 'ctrl' => 'widgets', 'action' => 'edit', 'wi_ID' => $this->ID ) ).'"' ).'</span>';
 		}
 		else
 		{
