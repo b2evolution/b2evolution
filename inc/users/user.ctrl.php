@@ -43,6 +43,11 @@ if( $user_profile_only )
 	}
 }
 
+if( $action == 'new' )
+{	// Check permission, only admins can create new user:
+	$current_User->check_perm( 'users', 'edit', true );
+}
+
 /*
  * Load editable objects and set $action (while checking permissions)
  */

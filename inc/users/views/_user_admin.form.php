@@ -62,72 +62,22 @@ $Form->hidden( 'edited_user_login', $edited_User->login );
 
 $Form->begin_fieldset( T_('User permissions').get_manual_link('user-admin-permissions'), array( 'class'=>'fieldset clear' ) );
 
-$edited_User->get_Group();
-$level_fieldnote = '[0 - 10]';
+// Status:
 $status_icon = '<div id="user_status_icon" class="status_icon">'.$user_status_icons[ $edited_User->get( 'status' ) ].'</div>';
-
-$GroupCache = & get_GroupCache();
-$group_where_sql = '';
-if( ! $current_User->check_perm( 'users', 'edit' ) )
-{	// Show the limited list for moderators:
-	$group_where_sql = 'grp_level < '.$current_User->get_Group()->get( 'level' );
-}
-
 if( $edited_User->ID == 1 )
-{	// This is Admin user, Don't allow to change status, primary group:
-	echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->grp_ID.'" />';
+{	// This is Admin user, Don't allow to change status:
 	$Form->info( T_('Account status'), $status_icon.' '.T_( 'Autoactivated' ) );
-	$Form->info( sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ), $edited_User->Group->dget('name') );
 }
 else
-{	// Allow to change status and primary group for non-admin users:
-	$GroupCache->clear();
-	$GroupCache->load_where( ( empty( $group_where_sql ) ? '' : $group_where_sql.' AND ' )
-		.' ( grp_usage = "primary" OR grp_ID = '.$edited_User->grp_ID.' )' );
-	$GroupCache->all_loaded = true;
+{	// Allow to change status for non-admin users:
 	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), T_( 'Account status' ), '', array( 'input_prefix' => $status_icon ) );
-	$Form->select_object( 'edited_user_grp_ID', $edited_User->grp_ID, $GroupCache, sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ) );
 }
 
-// Reload secondary group cache for the selects below to exclude groups that are not available for current user:
-$GroupCache->clear();
-// Secondary user groups:
-$user_secondary_groups = $edited_User->get_secondary_groups();
-if( empty( $user_secondary_groups ) )
-{	// If user has no secondary groups yet, Add one empty element to display a select box to select first secondary group:
-	$user_secondary_groups[] = 0;
-}
-$GroupCache->load_where( ( empty( $group_where_sql ) ? '' : $group_where_sql.' AND ' ).' grp_usage = "secondary"' );
-$GroupCache->all_loaded = true;
-foreach( $user_secondary_groups as $s => $user_secondary_Group )
-{
-	$field_title = ( $s == 0 ? sprintf( T_('<span %s>Secondary</span> user groups'), 'class="label label-info"' ) : '' );
-	$field_add_icon = get_icon( 'add', 'imgtag', array( 'class' => 'add_secondary_group', 'style' => 'cursor:pointer' ) );
+// Primary and secondary groups:
+display_user_groups_selectors( $edited_User, $Form );
 
-	if( empty( $user_secondary_Group ) || $user_secondary_Group->can_be_assigned() )
-	{	// Current user has a permission to assign this group:
-		$user_secondary_group_ID = empty( $user_secondary_Group ) ? 0 : $user_secondary_Group->ID;
-		$Form->select_input_object( 'edited_user_secondary_grp_ID[]', $user_secondary_group_ID, $GroupCache, $field_title, array(
-				'allow_none' => true,
-				'field_suffix' => $field_add_icon
-			) );
-	}
-	else
-	{	// Current user has no permission to assign this group:
-		$Form->info_field( $field_title, $user_secondary_Group->get_name().' '.$field_add_icon, array(
-				// Use this param to add html attribute "id" for the fieldset in order to add new group by JS:
-				'name' => 'edited_user_secondary_grp_ID_'.$user_secondary_Group->ID
-			) );
-	}
-}
-// Use this hidden select element as template for JS code to add new secondary groups:
-echo '<div id="template_secondary_group_block" style="display:none">';
-$Form->select_input_object( 'template_secondary_group_select', 0, $GroupCache, '', array(
-		'allow_none' => true,
-		'field_suffix' => $field_add_icon
-	) );
-echo '</div>';
-
+// User level:
+$level_fieldnote = '[0 - 10]';
 if( $edited_User->ID == 1 )
 {	// This is Admin user, Don't allow to change level:
 	$Form->info_field( T_('User level'), $edited_User->get('level'), array( 'note' => $level_fieldnote ) );
@@ -528,20 +478,6 @@ jQuery( '#edited_user_status' ).change( function()
 	{
 		jQuery( '#user_status_icon' ).html( '' );
 	}
-} );
-
-jQuery( document ).on( 'click', '.add_secondary_group', function()
-{	// Add new select element for new secondary group:
-	var current_fieldset = jQuery( this ).closest( '[id^=ffield_]' );
-
-	// Clone template fieldset to add one new:
-	var new_fieldset = jQuery( '#ffield_template_secondary_group_select' ).clone();
-
-	// Set correct field name that is used on form submit:
-	new_fieldset.find( 'select' ).attr( 'name', 'edited_user_secondary_grp_ID[]' );
-
-	// Add new fieldset after current:
-	current_fieldset.after( new_fieldset );
 } );
 
 <?php
