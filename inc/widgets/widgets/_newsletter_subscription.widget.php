@@ -234,13 +234,22 @@ class newsletter_subscription_Widget extends ComponentWidget
 			$this->BlockCache->abort_collect();
 		}
 
+		$NewsletterCache = & get_NewsletterCache();
+		$widget_Newsletter = & $NewsletterCache->get_by_ID( $this->disp_params['enlt_ID'], false, false );
+
+		if( $widget_Newsletter &&
+		    ! $current_User->is_subscribed( $widget_Newsletter->ID ) &&
+		    ! $current_User->is_allowed_newsletter( $widget_Newsletter->ID ) )
+		{	// Don't display the widget block completely when user is not subscribed
+			// and current user has no permission to be subscribed to:
+			return;
+		}
+
 		echo $this->disp_params['block_start'];
 
 		$redirect_to = param( 'redirect_to', 'url', regenerate_url( '', '', '', '&' ) );
 
-
-		$NewsletterCache = & get_NewsletterCache();
-		if( ! ( $widget_Newsletter = & $NewsletterCache->get_by_ID( $this->disp_params['enlt_ID'], false, false ) ) ||
+		if( ! $widget_Newsletter ||
 		    ! $widget_Newsletter->get( 'active' ) )
 		{	// Display an error when newsletter is not found or not active:
 			$this->disp_title();
