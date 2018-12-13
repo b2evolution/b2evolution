@@ -63,6 +63,9 @@ $Form->begin_fieldset( T_('Default user permissions').get_manual_link('default-u
 	$Form->checkbox_input( 'quick_registration', $Settings->get( 'quick_registration' ), T_('Quick registration'), array_merge( array( 'note' => T_('Check to allow registering with email only (no username, no password) using the quick registration widget.' ) ), $disabled_param_grouplevel ) );
 
 	$GroupCache = & get_GroupCache();
+	$GroupCache->clear();
+	$GroupCache->load_where( 'grp_usage = "primary"' );
+	$GroupCache->all_loaded = true;
 	$Form->select_input_object( 'newusers_grp_ID', $Settings->get( 'newusers_grp_ID' ), $GroupCache, T_('Group for new users'), array_merge( array( 'note' => T_('Groups determine user roles and permissions.') ), $disabled_param_grouplevel ) );
 
 	$Form->text_input( 'newusers_level', $Settings->get( 'newusers_level' ), 1, T_('Level for new users'), T_('Levels determine hierarchy of users in blogs.' ), array_merge( array( 'maxlength' => 1, 'required' => true ), $disabled_param_grouplevel ) );
