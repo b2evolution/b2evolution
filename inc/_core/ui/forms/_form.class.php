@@ -3071,23 +3071,6 @@ class Form extends Widget
 		// Give it a class, so it can be selected for CSS in IE6
 		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form_textarea_input form-control';
 
-		if( isset($field_params['maxlength']) )
-		{ // attach event to the textarea to accomplish max length:
-			$this->append_javascript['textarea_maxlength'.$field_name] = '
-				if( typeof jQuery == "function" )
-				{
-				jQuery("#'.$field_params['id'].'").bind( "keyup", function(event)
-					{
-						if( this.value.length > '.$field_params['maxlength'].' )
-						{
-							this.value = this.value.substr(0,'.$field_params['maxlength'].');
-							event.preventDefault();
-						}
-					} );
-				}';
-			unset($field_params['maxlength']); // not a HTML attribute for textarea
-		}
-
 		$r = $this->begin_field();
 		$r .= $input_prefix;
 		$r .= '<textarea'
