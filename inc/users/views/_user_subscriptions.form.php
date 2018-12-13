@@ -201,14 +201,20 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('List subscriptions').( is_admin_page() ? get_manual_link( 'user-lists-panel' ) : '' ) );
 
 	$allowed_newsletters = $edited_User->get_allowed_newsletters();
-	if( count( $allowed_newsletters ) )
-	{	// If at least one newsletter is active:
-		$user_newsletter_subscriptions = $edited_User->get_newsletter_subscriptions();
-		$newsletter_options = array();
-		foreach( $allowed_newsletters as $Newsletter )
-		{
+	$user_newsletter_subscriptions = $edited_User->get_newsletter_subscriptions();
+	$NewsletterCache = & get_NewsletterCache();
+	$NewsletterCache->load_all();
+	$newsletter_options = array();
+	foreach( $NewsletterCache->cache as $Newsletter )
+	{
+		if( isset( $allowed_newsletters[ $Newsletter->ID ] ) ||
+		    in_array( $Newsletter->ID, $user_newsletter_subscriptions ) )
+		{	// Display only allowed newsletter and what user is subscribed to:
 			$newsletter_options[] = array( 'edited_user_newsletters[]', $Newsletter->ID, $Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ), in_array( $Newsletter->ID, $user_newsletter_subscriptions ), $disabled );
 		}
+	}
+	if( count( $newsletter_options ) )
+	{
 		$Form->checklist( $newsletter_options, 'edited_user_newsletter', T_( 'Lists' ), false, false, $checklist_params );
 	}
 

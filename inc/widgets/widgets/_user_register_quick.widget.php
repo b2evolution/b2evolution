@@ -87,8 +87,7 @@ class user_register_quick_Widget extends ComponentWidget
 
 		// Load all active newsletters:
 		$NewsletterCache = & get_NewsletterCache();
-		$load_where = 'enlt_active = 1';
-		$NewsletterCache->load_where( $load_where );
+		$NewsletterCache->load_where( 'enlt_active = 1 AND enlt_perm_subscribe = "anyone"' );
 		// Initialize checkbox options for param "Newsletter":
 		$def_newsletters = explode( ',', $Settings->get( 'def_newsletters' ) );
 		foreach( $NewsletterCache->cache as $Newsletter )

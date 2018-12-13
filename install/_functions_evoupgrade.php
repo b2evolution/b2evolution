@@ -10177,9 +10177,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				'enlt_perm_groups'    => 'VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL',
 			),
 		) );
-		$DB->query( 'UPDATE T_email__newsletter
-			  SET enlt_perm_subscribe = "admin"
-			WHERE enlt_active = 0' );
 		upg_task_end();
 	}
 

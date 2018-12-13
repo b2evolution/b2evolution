@@ -7769,8 +7769,8 @@ class User extends DataObject
 			$SQL->WHERE( 'enlt_active = 1' );
 			$perm_conditions = array( 'enlt_perm_subscribe = "anyone"' );
 			$check_groups = array();
-			if( is_logged_in() && $current_User->can_moderate_user( $this->ID ) )
-			{	// Allow to subscribe to forbidden newsletters by user moderator:
+			if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
+			{	// Allow to subscribe to forbidden newsletters by user admins:
 				$perm_conditions[] = 'enlt_perm_subscribe = "admin"';
 				$check_groups[] = $current_User->get( 'grp_ID' );
 			}
@@ -7804,13 +7804,25 @@ class User extends DataObject
 				{
 					if( $Newsletter = & $NewsletterCache->get_by_ID( $newsletter_ID, false, false ) )
 					{
-						$this->allowed_newsletters[] = $Newsletter;
+						$this->allowed_newsletters[ $Newsletter->ID ] = $Newsletter;
 					}
 				}
 			}
 		}
 
 		return $this->allowed_newsletters;
+	}
+
+
+	/**
+	 * Check if the newsletter is allowed for this User
+	 *
+	 * @param integer Newsletter ID
+	 * @return boolean
+	 */
+	function is_allowed_newsletter( $newsletter_ID )
+	{
+		return in_array( $newsletter_ID, $this->get_allowed_newsletter_IDs() );
 	}
 
 
@@ -7893,13 +7905,16 @@ class User extends DataObject
 
 		if( count( $new_subscriptions ) > 0 )
 		{
-			$allowed_newsletter_IDs = $this->get_allowed_newsletter_IDs();
 			foreach( $new_subscriptions as $n => $new_subscription_ID )
 			{
 				// Format each value to integer:
 				$new_subscription_ID = intval( $new_subscription_ID );
-				if( empty( $new_subscription_ID ) || ! in_array( $new_subscription_ID, $allowed_newsletter_IDs ) )
-				{	// Unset wrong value or if current User cannot subscribe this User to the new newsletter:
+				if( empty( $new_subscription_ID ) ||
+				    ( ! $this->is_allowed_newsletter( $new_subscription_ID ) &&
+				      ! in_array( $new_subscription_ID, $prev_subscriptions ) ) )
+				{	// Unset wrong value or
+					//   if current User cannot subscribe this User to the new newsletter
+					//   but keep if it was subscribed before:
 					unset( $new_subscriptions[ $n ] );
 				}
 				else
