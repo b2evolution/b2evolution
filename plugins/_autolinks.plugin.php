@@ -103,25 +103,15 @@ class autolinks_plugin extends Plugin
 	 */
 	function GetDefaultSettings( & $params )
 	{
-		global $rsc_subdir;
 		return array(
-				'autolink_urls' => array(
-						'label' => T_( 'Autolink URLs' ),
-						'defaultvalue' => 1,
-						'type' => 'checkbox',
-						'note' => T_('Autolink URLs starting with http: https: mailto: aim: icq: as well as adresses of the form www.*.* or *@*.*'),
-					),
-				'autolink_defs_default' => array(
-						'label' => T_( 'Autolink definitions' ),
-						'defaultvalue' => 1,
-						'type' => 'checkbox',
-						'note' => T_('As defined in definitions.default.txt'),
-					),
-				'autolink_defs_local' => array(
-						'label' => '',
-						'defaultvalue' => 0,
-						'type' => 'checkbox',
-						'note' => T_('As defined in definitions.local.txt'),
+				'autolink' => array(
+						'label' => T_('Create auto-links for'),
+						'type' => 'checklist',
+						'options' => array(
+							array( 'urls', sprintf( T_('Urls starting with %s as well as adresses of the form %s or %s'), '<code>http:</code> <code>https:</code> <code>mailto:</code> <code>aim:</code> <code>icq:</code>', '<code>www.*.*</code>', '<code>*@*.*</code>' ), 1 ),
+							array( 'defs_default', sprintf( T_('Definitions as defined in %s'), '<code>definitions.default.txt</code>' ), 1 ),
+							array( 'defs_local', sprintf( T_('Definitions as defined in %s'), '<code>definitions.local.txt</code>' ), 0 ),
+						)
 					),
 				'autolink_defs_db' => array(
 						'label' => T_('Custom definitions'),
@@ -203,42 +193,24 @@ class autolinks_plugin extends Plugin
 						'defaultvalue' => $default_values['autolink_tag'],
 					),
 				// No follow in posts
-				'autolink_post_nofollow_exist' => array(
-						'label' => T_( 'No follow in posts' ),
-						'type' => 'checkbox',
-						'note' => $this->T_( 'Add rel="nofollow" to pre-existings links' ),
-						'defaultvalue' => $default_values['autolink_post_nofollow_exist'],
-					),
-				'autolink_post_nofollow_explicit' => array(
-						'label' => '',
-						'type' => 'checkbox',
-						'note' => $this->T_( 'Add rel="nofollow" to explicit links' ),
-						'defaultvalue' => $default_values['autolink_post_nofollow_explicit'],
-					),
-				'autolink_post_nofollow_auto' => array(
-						'label' => '',
-						'type' => 'checkbox',
-						'note' => $this->T_( 'Add rel="nofollow" to auto-links' ),
-						'defaultvalue' => $default_values['autolink_post_nofollow_auto'],
+				'autolink_post_nofollow' => array(
+						'label' => T_('No follow in posts'),
+						'type' => 'checklist',
+						'options' => array(
+							array( 'exist', $this->T_('Add rel="nofollow" to pre-existings links'), $default_values['autolink_post_nofollow_exist'] ),
+							array( 'explicit', $this->T_('Add rel="nofollow" to explicit links'), $default_values['autolink_post_nofollow_explicit'] ),
+							array( 'auto', $this->T_('Add rel="nofollow" to auto-links'), $default_values['autolink_post_nofollow_auto'] ),
+						)
 					),
 				// No follow in comments
-				'autolink_comment_nofollow_exist' => array(
-						'label' => T_( 'No follow in comments' ),
-						'type' => 'checkbox',
-						'note' => $this->T_( 'Add rel="nofollow" to pre-existings links' ),
-						'defaultvalue' => $default_values['autolink_comment_nofollow_exist'],
-					),
-				'autolink_comment_nofollow_explicit' => array(
-						'label' => '',
-						'type' => 'checkbox',
-						'note' => $this->T_( 'Add rel="nofollow" to explicit links' ),
-						'defaultvalue' => $default_values['autolink_comment_nofollow_explicit'],
-					),
-				'autolink_comment_nofollow_auto' => array(
-						'label' => '',
-						'type' => 'checkbox',
-						'note' => $this->T_( 'Add rel="nofollow" to auto-links' ),
-						'defaultvalue' => $default_values['autolink_comment_nofollow_auto'],
+				'autolink_comment_nofollow' => array(
+						'label' => T_('No follow in comments'),
+						'type' => 'checklist',
+						'options' => array(
+							array( 'exist', $this->T_('Add rel="nofollow" to pre-existings links'), $default_values['autolink_comment_nofollow_exist'] ),
+							array( 'explicit', $this->T_('Add rel="nofollow" to explicit links'), $default_values['autolink_comment_nofollow_explicit'] ),
+							array( 'auto', $this->T_('Add rel="nofollow" to auto-links'), $default_values['autolink_comment_nofollow_auto'] ),
+						)
 					),
 			)
 		);
@@ -258,23 +230,14 @@ class autolinks_plugin extends Plugin
 		return array_merge( parent::get_msg_setting_definitions( $default_params ),
 			array(
 				// No follow settings in messages:
-				'autolink_nofollow_exist' => array(
-						'label' => T_( 'No follow in messages' ),
-						'type' => 'checkbox',
-						'note' => $this->T_( 'Add rel="nofollow" to pre-existings links' ),
-						'defaultvalue' => 0,
-					),
-				'autolink_nofollow_explicit' => array(
-						'label' => '',
-						'type' => 'checkbox',
-						'note' => $this->T_( 'Add rel="nofollow" to explicit links' ),
-						'defaultvalue' => 0,
-					),
-				'autolink_nofollow_auto' => array(
-						'label' => '',
-						'type' => 'checkbox',
-						'note' => $this->T_( 'Add rel="nofollow" to auto-links' ),
-						'defaultvalue' => 0,
+				'autolink_nofollow' => array(
+						'label' => T_('No follow in messages'),
+						'type' => 'checklist',
+						'options' => array(
+							array( 'exist', $this->T_('Add rel="nofollow" to pre-existings links'), 0 ),
+							array( 'explicit', $this->T_('Add rel="nofollow" to explicit links'), 0 ),
+							array( 'auto', $this->T_('Add rel="nofollow" to auto-links'), 0 ),
+						)
 					),
 			)
 		);
@@ -293,24 +256,15 @@ class autolinks_plugin extends Plugin
 		$default_params = array_merge( $params, array( 'default_email_rendering' => 'stealth' ) );
 		return array_merge( parent::get_email_setting_definitions( $default_params ),
 			array(
-				// No follow settings in messages:
-				'autolink_nofollow_exist' => array(
-						'label' => T_( 'No follow in messages' ),
-						'type' => 'checkbox',
-						'note' => $this->T_( 'Add rel="nofollow" to pre-existings links' ),
-						'defaultvalue' => 0,
-					),
-				'autolink_nofollow_explicit' => array(
-						'label' => '',
-						'type' => 'checkbox',
-						'note' => $this->T_( 'Add rel="nofollow" to explicit links' ),
-						'defaultvalue' => 0,
-					),
-				'autolink_nofollow_auto' => array(
-						'label' => '',
-						'type' => 'checkbox',
-						'note' => $this->T_( 'Add rel="nofollow" to auto-links' ),
-						'defaultvalue' => 0,
+				// No follow settings in email campaigns:
+				'autolink_nofollow' => array(
+						'label' => T_('No follow in messages'),
+						'type' => 'checklist',
+						'options' => array(
+							array( 'exist', $this->T_('Add rel="nofollow" to pre-existings links'), 0 ),
+							array( 'explicit', $this->T_('Add rel="nofollow" to explicit links'), 0 ),
+							array( 'auto', $this->T_('Add rel="nofollow" to auto-links'), 0 ),
+						)
 					),
 			)
 		);
@@ -330,23 +284,14 @@ class autolinks_plugin extends Plugin
 		return array_merge( parent::get_shared_setting_definitions( $default_params ),
 			array(
 				// No follow settings in messages:
-				'autolink_nofollow_exist' => array(
-						'label' => T_( 'No follow in messages' ),
-						'type' => 'checkbox',
-						'note' => $this->T_( 'Add rel="nofollow" to pre-existings links' ),
-						'defaultvalue' => 0,
-					),
-				'autolink_nofollow_explicit' => array(
-						'label' => '',
-						'type' => 'checkbox',
-						'note' => $this->T_( 'Add rel="nofollow" to explicit links' ),
-						'defaultvalue' => 0,
-					),
-				'autolink_nofollow_auto' => array(
-						'label' => '',
-						'type' => 'checkbox',
-						'note' => $this->T_( 'Add rel="nofollow" to auto-links' ),
-						'defaultvalue' => 0,
+				'autolink_nofollow' => array(
+						'label' => T_('No follow in messages'),
+						'type' => 'checklist',
+						'options' => array(
+							array( 'exist', $this->T_('Add rel="nofollow" to pre-existings links'), 0 ),
+							array( 'explicit', $this->T_('Add rel="nofollow" to explicit links'), 0 ),
+							array( 'auto', $this->T_('Add rel="nofollow" to auto-links'), 0 ),
+						)
 					),
 			)
 		);
@@ -366,11 +311,11 @@ class autolinks_plugin extends Plugin
 		{	// global defs NOT already loaded
 			$this->link_array[0] = array();
 
-			if( $this->Settings->get( 'autolink_defs_default' ) )
+			if( $this->get_checklist_setting( 'autolink', 'defs_default' ) )
 			{	// Load defaults:
 				$this->read_csv_file( $plugins_path.'autolinks_plugin/definitions.default.txt', 0 );
 			}
-			if( $this->Settings->get( 'autolink_defs_local' ) )
+			if( $this->get_checklist_setting( 'autolink', 'defs_local' ) )
 			{	// Load local user defintions:
 				$this->read_csv_file( $plugins_path.'autolinks_plugin/definitions.local.txt', 0 );
 			}
@@ -488,15 +433,15 @@ class autolinks_plugin extends Plugin
 		// Define the setting names depending on what is rendering now
 		if( !empty( $params['Comment'] ) )
 		{	// Comment is rendering
-			$this->setting_nofollow_exist = $this->get_coll_setting( 'autolink_comment_nofollow_exist', $this->current_Blog );
-			$this->setting_nofollow_explicit = $this->get_coll_setting( 'autolink_comment_nofollow_explicit', $this->current_Blog );
-			$this->setting_nofollow_auto = $this->get_coll_setting( 'autolink_comment_nofollow_auto', $this->current_Blog );
+			$this->setting_nofollow_exist = $this->get_checklist_setting( 'autolink_comment_nofollow', 'exist', 'coll', $this->current_Blog );
+			$this->setting_nofollow_explicit = $this->get_checklist_setting( 'autolink_comment_nofollow', 'explicit', 'coll', $this->current_Blog );
+			$this->setting_nofollow_auto = $this->get_checklist_setting( 'autolink_comment_nofollow', 'auto', 'coll', $this->current_Blog );
 		}
 		else
 		{	// Item is rendering
-			$this->setting_nofollow_exist = $this->get_coll_setting( 'autolink_post_nofollow_exist', $this->current_Blog );
-			$this->setting_nofollow_explicit = $this->get_coll_setting( 'autolink_post_nofollow_explicit', $this->current_Blog );
-			$this->setting_nofollow_auto = $this->get_coll_setting( 'autolink_post_nofollow_auto', $this->current_Blog );
+			$this->setting_nofollow_exist = $this->get_checklist_setting( 'autolink_post_nofollow', 'exist', 'coll', $this->current_Blog );
+			$this->setting_nofollow_explicit = $this->get_checklist_setting( 'autolink_post_nofollow', 'explicit', 'coll', $this->current_Blog );
+			$this->setting_nofollow_auto = $this->get_checklist_setting( 'autolink_post_nofollow', 'auto', 'coll', $this->current_Blog );
 		}
 
 		$this->setting_autolink_defs_coll_db = $this->get_coll_setting( 'autolink_defs_coll_db', $this->current_Blog );
@@ -519,9 +464,9 @@ class autolinks_plugin extends Plugin
 		$content = & $params['data'];
 
 		// Message is rendering
-		$this->setting_nofollow_exist = $this->get_msg_setting( 'autolink_nofollow_exist' );
-		$this->setting_nofollow_explicit = $this->get_msg_setting( 'autolink_nofollow_explicit' );
-		$this->setting_nofollow_auto = $this->get_msg_setting( 'autolink_nofollow_auto' );
+		$this->setting_nofollow_exist = $this->get_checklist_setting( 'autolink_nofollow', 'exist', 'msg' );
+		$this->setting_nofollow_explicit = $this->get_checklist_setting( 'autolink_nofollow', 'explicit', 'msg' );
+		$this->setting_nofollow_auto = $this->get_checklist_setting( 'autolink_nofollow', 'auto', 'msg' );
 		$this->setting_autolink_defs_coll_db = $this->get_msg_setting( 'autolink_defs_coll_db' );
 		$this->setting_autolink_username = $this->get_msg_setting( 'autolink_username' );
 		$this->setting_autolink_tag = false;
@@ -542,9 +487,9 @@ class autolinks_plugin extends Plugin
 		$content = & $params['data'];
 
 		// Email is rendering
-		$this->setting_nofollow_exist = $this->get_email_setting( 'autolink_nofollow_exist' );
-		$this->setting_nofollow_explicit = $this->get_email_setting( 'autolink_nofollow_explicit' );
-		$this->setting_nofollow_auto = $this->get_email_setting( 'autolink_nofollow_auto' );
+		$this->setting_nofollow_exist = $this->get_checklist_setting( 'autolink_nofollow', 'exist', 'email' );
+		$this->setting_nofollow_explicit = $this->get_checklist_setting( 'autolink_nofollow', 'explicit', 'email' );
+		$this->setting_nofollow_auto = $this->get_checklist_setting( 'autolink_nofollow', 'auto', 'email' );
 		$this->setting_autolink_defs_coll_db = $this->get_email_setting( 'autolink_defs_coll_db' );
 		$this->setting_autolink_username = $this->get_email_setting( 'autolink_username' );
 		$this->setting_autolink_tag = false;
@@ -589,7 +534,7 @@ class autolinks_plugin extends Plugin
 			$link_attrs .= ' rel="nofollow"';
 		}
 
-		if( $this->Settings->get( 'autolink_urls' ) )
+		if( $this->get_checklist_setting( 'autolink', 'urls' ) )
 		{	// First, make the URLs clickable:
 			$content = make_clickable( $content, '&amp;', 'make_clickable_callback', $link_attrs, true );
 		}
