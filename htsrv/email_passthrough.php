@@ -106,6 +106,9 @@ switch( $type )
 									$email_User->dbupdate();
 								}
 
+								// Add user to automation if it is defined in email campaign:
+								$edited_EmailCampaign->add_user_to_automation( 'like', $email_User->ID );
+
 								$Messages->add( T_('Your vote has been recorded, thank you!'), 'success' );
 								break;
 
@@ -133,6 +136,9 @@ switch( $type )
 								// Do not track click
 								$skip_click_tracking = true;
 
+								// Add user to automation if it is defined in email campaign:
+								$edited_EmailCampaign->add_user_to_automation( 'dislike', $email_User->ID );
+
 								$Messages->add( T_('Your vote has been recorded, thank you!'), 'success' );
 								break;
 
@@ -157,6 +163,9 @@ switch( $type )
 									$email_User->add_usertags( $assigned_user_tag );
 									$email_User->dbupdate();
 								}
+
+								// Add user to automation if it is defined in email campaign:
+								$edited_EmailCampaign->add_user_to_automation( 'cta'.$cta_num, $email_User->ID );
 								break;
 
 							case 8: // Activate account button

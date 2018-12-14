@@ -120,6 +120,18 @@ $Form->begin_fieldset( T_('Click tagging').get_manual_link( 'campaign-tagging-pa
 	<?php
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Automations').get_manual_link( 'campaign-automations-panel' ) );
+	$AutomationCache = & get_AutomationCache();
+	$AutomationCache->load_all();
+	$AutomationCache->none_option_text = T_('Select automation');
+	$AutomationCache->none_option_value = 0;
+	$Form->select_input_object( 'ecmp_cta1_autm_ID', $edited_EmailCampaign->get( 'cta1_autm_ID' ), $AutomationCache, T_('Add users who click CTA 1 to'), array( 'allow_none' => true ) );
+	$Form->select_input_object( 'ecmp_cta2_autm_ID', $edited_EmailCampaign->get( 'cta2_autm_ID' ), $AutomationCache, T_('Add users who click CTA 2 to'), array( 'allow_none' => true ) );
+	$Form->select_input_object( 'ecmp_cta3_autm_ID', $edited_EmailCampaign->get( 'cta3_autm_ID' ), $AutomationCache, T_('Add users who click CTA 3 to'), array( 'allow_none' => true ) );
+	$Form->select_input_object( 'ecmp_like_autm_ID', $edited_EmailCampaign->get( 'like_autm_ID' ), $AutomationCache, T_('Add users who like the email to'), array( 'allow_none' => true ) );
+	$Form->select_input_object( 'ecmp_dislike_autm_ID', $edited_EmailCampaign->get( 'dislike_autm_ID' ), $AutomationCache, T_('Add users who dislike the email to'), array( 'allow_none' => true ) );
+$Form->end_fieldset();
+
 $buttons = array();
 if( $current_User->check_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails

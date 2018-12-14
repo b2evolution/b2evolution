@@ -85,6 +85,16 @@ class EmailCampaign extends DataObject
 
 	var $unsub_clicks;
 
+	var $cta1_autm_ID;
+
+	var $cta2_autm_ID;
+
+	var $cta3_autm_ID;
+
+	var $like_autm_ID;
+
+	var $dislike_autm_ID;
+
 	var $use_wysiwyg = 0;
 
 	var $send_ctsk_ID;
@@ -160,6 +170,11 @@ class EmailCampaign extends DataObject
 			$this->like_count = $db_row->ecmp_like_count;
 			$this->dislike_count = $db_row->ecmp_dislike_count;
 			$this->unsub_clicks = $db_row->ecmp_unsub_clicks;
+			$this->cta1_autm_ID = $db_row->ecmp_cta1_autm_ID;
+			$this->cta2_autm_ID = $db_row->ecmp_cta2_autm_ID;
+			$this->cta3_autm_ID = $db_row->ecmp_cta3_autm_ID;
+			$this->like_autm_ID = $db_row->ecmp_like_autm_ID;
+			$this->dislike_autm_ID = $db_row->ecmp_dislike_autm_ID;
 		}
 	}
 
@@ -779,6 +794,36 @@ class EmailCampaign extends DataObject
 		if( param( 'ecmp_user_tag_unsubscribe', 'string', NULL ) !== NULL )
 		{	// User tag:
 			$this->set_from_Request( 'user_tag_unsubscribe' );
+		}
+
+		$cta1_autm_ID = param( 'ecmp_cta1_autm_ID', 'integer', NULL );
+		if( $cta1_autm_ID !== NULL )
+		{	// Automation CTA 1:
+			$this->set( 'cta1_autm_ID', ( $cta1_autm_ID === 0 ? NULL : $cta1_autm_ID ), true );
+		}
+
+		$cta2_autm_ID = param( 'ecmp_cta2_autm_ID', 'integer', NULL );
+		if( $cta2_autm_ID !== NULL )
+		{	// Automation CTA 2:
+			$this->set( 'cta2_autm_ID', ( $cta2_autm_ID === 0 ? NULL : $cta2_autm_ID ), true );
+		}
+
+		$cta3_autm_ID = param( 'ecmp_cta3_autm_ID', 'integer', NULL );
+		if( $cta3_autm_ID !== NULL )
+		{	// Automation CTA 3:
+			$this->set( 'cta3_autm_ID', ( $cta3_autm_ID === 0 ? NULL : $cta3_autm_ID ), true );
+		}
+
+		$like_autm_ID = param( 'ecmp_like_autm_ID', 'integer', NULL );
+		if( $like_autm_ID !== NULL )
+		{	// Automation LIKE:
+			$this->set( 'like_autm_ID', ( $like_autm_ID === 0 ? NULL : $like_autm_ID ), true );
+		}
+
+		$dislike_autm_ID = param( 'ecmp_dislike_autm_ID', 'integer', NULL );
+		if( $dislike_autm_ID !== NULL )
+		{	// Automation DISLIKE:
+			$this->set( 'dislike_autm_ID', ( $dislike_autm_ID === 0 ? NULL : $dislike_autm_ID ), true );
 		}
 
 		return ! param_errors_detected();
@@ -1477,6 +1522,35 @@ class EmailCampaign extends DataObject
 		$EmailCampaignCache->add( $this );
 
 		return true;
+	}
+
+
+	/**
+	 * Add user to automation if it is defined in this email campaign for requested click type
+	 *
+	 * @param string Click type: 'cta1', 'cta2', 'cta3', 'like', 'dislike'
+	 * @param integer User ID
+	 * @return boolean|integer FALSE on fail, Number of added users on success
+	 */
+	function add_user_to_automation( $click_type, $user_ID )
+	{
+		$autm_ID = $this->get( $click_type.'_autm_ID' );
+
+		if( empty( $autm_ID ) )
+		{	// Automation is not defined for this email campaign:
+			return false;
+		}
+
+		$AutomationCache = & get_AutomationCache();
+		if( ! $click_Automation = & $AutomationCache->get_by_ID( $autm_ID, false, false ) )
+		{	// Wrong automation:
+			return false;
+		}
+
+		// Add user to automation:
+		$added_users_num = $click_Automation->add_users( array( $user_ID ) );
+
+		return empty( $added_users_num ) ? false : $added_users_num;
 	}
 }
 

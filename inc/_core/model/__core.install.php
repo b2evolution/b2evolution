@@ -599,6 +599,11 @@ $schema_queries = array(
 			ecmp_like_count           INT UNSIGNED NOT NULL DEFAULT 0,
 			ecmp_dislike_count        INT UNSIGNED NOT NULL DEFAULT 0,
 			ecmp_unsub_clicks         INT UNSIGNED NOT NULL DEFAULT 0,
+			ecmp_cta1_autm_ID         INT UNSIGNED NULL,
+			ecmp_cta2_autm_ID         INT UNSIGNED NULL,
+			ecmp_cta3_autm_ID         INT UNSIGNED NULL,
+			ecmp_like_autm_ID         INT UNSIGNED NULL,
+			ecmp_dislike_autm_ID      INT UNSIGNED NULL,
 			PRIMARY KEY               (ecmp_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 

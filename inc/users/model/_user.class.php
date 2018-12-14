@@ -1385,7 +1385,13 @@ class User extends DataObject
 				//   - password change requested by email
 				//   - password has not been set yet(email capture/quick registration)
 
-				if( $request_password_confirmation )
+				if( $is_new_user && empty( $edited_user_pass1 ) && empty( $edited_user_pass2 ) )
+				{	// Allow to create new user without password from back-office by admin:
+					$this->set( 'pass_driver', 'nopass' );
+					$this->set( 'pass', '' );
+					$this->set( 'salt', '' );
+				}
+				elseif( $request_password_confirmation )
 				{	// Request a password confirmation:
 					if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
 					{ // We can set password
