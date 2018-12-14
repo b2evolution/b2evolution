@@ -133,17 +133,12 @@ else
 
 if( $new_user_creating )
 {
-	$current_User->check_perm( 'users', 'edit', true );
-	$edited_User->get_Group();
-
 	$Form->begin_fieldset( T_( 'New user' ).get_manual_link( 'user-edit' ), array( 'class' => 'fieldset clear' ) );
 
-	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get( 'newusers_grp_ID' ) : $edited_User->grp_ID;
-	$GroupCache = & get_GroupCache();
-	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ) );
+	// Primary and secondary groups:
+	display_user_groups_selectors( $edited_User, $Form );
 
-	$field_note = '[0 - 10]';
-	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), $field_note, array( 'required' => true ) );
+	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), '[0 - 10]', array( 'required' => true ) );
 
 	$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
 	$Form->email_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), array( 'maxlength' => 255, 'required' => true, 'note' => $email_fieldnote ) );

@@ -761,10 +761,15 @@ class User extends DataObject
 				}
 			}
 
-			if( $is_admin_form )
+			$edited_user_secondary_grp_IDs = param( 'edited_user_secondary_grp_ID', 'array:integer', NULL );
+			if( $edited_user_secondary_grp_IDs !== NULL )
 			{	// Save secondary groups for this user:
-				$edited_user_secondary_grp_IDs = param( 'edited_user_secondary_grp_ID', 'array:integer', array() );
-				$this->update_secondary_groups( $edited_user_secondary_grp_IDs );
+				// Store old groups in order to delete them before insert new selected groups:
+				$this->old_secondary_groups = $this->get_secondary_groups();
+				$GroupCache = & get_GroupCache();
+				$GroupCache->clear();
+				// Set new groups which should be stored in DB:
+				$this->secondary_groups = $GroupCache->load_list( $edited_user_secondary_grp_IDs );
 			}
 
 			$edited_user_source = param( 'edited_user_source', 'string', ! $is_api_request ? true : NULL );
@@ -4137,6 +4142,9 @@ class User extends DataObject
 		if( $result = parent::dbinsert() )
 		{ // We could insert the user object..
 
+			// Save secondary groups:
+			$this->update_secondary_groups();
+
 			// Add new fields:
 			if( !empty($this->new_fields) )
 			{
@@ -4222,6 +4230,9 @@ class User extends DataObject
 		$DB->begin();
 
 		$result = parent::dbupdate();
+
+		// Save secondary groups:
+		$this->update_secondary_groups();
 
 		// Update existing fields:
 		if( !empty($this->updated_fields) )
@@ -7497,7 +7508,7 @@ class User extends DataObject
 	 *
 	 * @param array Secondary group IDs
 	 */
-	function update_secondary_groups( $secondary_group_IDs )
+	function update_secondary_groups()
 	{
 		global $DB, $current_User;
 
@@ -7511,43 +7522,40 @@ class User extends DataObject
 			return;
 		}
 
-		$old_secondary_groups = $this->get_secondary_groups();
-		if( ! empty( $old_secondary_groups ) )
-		{	// Check each old secondary group if it can be deleted by current user:
-			$delete_old_secondary_groups = array();
-			foreach( $old_secondary_groups as $o => $old_secondary_Group )
-			{
-				if( $old_secondary_Group->can_be_assigned() )
-				{	// Current user can delete only this group:
-					$delete_old_secondary_group_IDs[] = $old_secondary_Group->ID;
-				}
-			}
-			if( ! empty( $delete_old_secondary_group_IDs ) )
-			{	// Clear secondary groups only which can be touched by currrent user:
-				$DB->query( 'DELETE FROM T_users__secondary_user_groups
-					WHERE sug_user_ID = '.$this->ID.'
-					  AND sug_grp_ID IN ( '.$DB->quote( $delete_old_secondary_group_IDs ).' )' );
-			}
+		if( ! isset( $this->old_secondary_groups ) || $this->old_secondary_groups === false )
+		{	// Skip a request without updating secondary groups:
+			return;
 		}
 
-		$GroupCache = & get_GroupCache();
+		// Check each old secondary group if it can be deleted by current user:
+		$delete_old_secondary_groups = array();
+		foreach( $this->old_secondary_groups as $old_secondary_Group )
+		{
+			if( $old_secondary_Group->can_be_assigned() )
+			{	// Current user can delete only this group:
+				$delete_old_secondary_group_IDs[] = $old_secondary_Group->ID;
+			}
+		}
+		if( ! empty( $delete_old_secondary_group_IDs ) )
+		{	// Clear secondary groups only which can be touched by currrent user:
+			$DB->query( 'DELETE FROM T_users__secondary_user_groups
+				WHERE sug_user_ID = '.$this->ID.'
+					AND sug_grp_ID IN ( '.$DB->quote( $delete_old_secondary_group_IDs ).' )' );
+		}
+		// Set this var in order to don't update secondary group twice:
+		$this->old_secondary_groups = false;
 
-		if( count( $secondary_group_IDs ) )
+		if( ! empty( $this->secondary_groups ) )
 		{	// Update new secondary groups:
 			$new_secondary_grp_IDs = array();
-
-			foreach( $secondary_group_IDs as $secondary_group_ID )
+			foreach( $this->secondary_groups as $secondary_Group )
 			{
-				if( ! empty( $secondary_group_ID ) )
-				{
-					if( $edited_user_secondary_Group = & $GroupCache->get_by_ID( $secondary_group_ID, false, false ) &&
-					    $edited_user_secondary_Group->can_be_assigned() )
-					{	// We can add this secondary group because current user has a permission:
-						if( $secondary_group_ID != $this->get( 'grp_ID' ) &&
-						    ! in_array( $secondary_group_ID, $new_secondary_grp_IDs ) )
-						{	// Add except of primary user group and the duplicates:
-							$new_secondary_grp_IDs[] = $secondary_group_ID;
-						}
+				if( $secondary_Group->can_be_assigned() )
+				{	// We can add this secondary group because current user has a permission:
+					if( $secondary_Group->ID != $this->get( 'grp_ID' ) &&
+							! in_array( $secondary_Group->ID, $new_secondary_grp_IDs ) )
+					{	// Add except of primary user group and the duplicates:
+						$new_secondary_grp_IDs[] = $secondary_Group->ID;
 					}
 				}
 			}
@@ -7570,19 +7578,26 @@ class User extends DataObject
 	{
 		if( ! is_array( $this->secondary_groups ) )
 		{	// Initialize the secondary groups:
-			global $DB;
+			if( $this->ID > 0 )
+			{	// For existing user:
+				global $DB;
 
-			// Initialize SQL for secondary groups of this user:
-			$secondary_groups_SQL = new SQL();
-			$secondary_groups_SQL->SELECT( '*' );
-			$secondary_groups_SQL->FROM( 'T_groups' );
-			$secondary_groups_SQL->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON grp_ID = sug_grp_ID' );
-			$secondary_groups_SQL->WHERE( 'sug_user_ID = '.$this->ID );
+				// Initialize SQL for secondary groups of this user:
+				$secondary_groups_SQL = new SQL( 'Get secondary groups of the User #'.$this->ID );
+				$secondary_groups_SQL->SELECT( '*' );
+				$secondary_groups_SQL->FROM( 'T_groups' );
+				$secondary_groups_SQL->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON grp_ID = sug_grp_ID' );
+				$secondary_groups_SQL->WHERE( 'sug_user_ID = '.$this->ID );
 
-			// Load all secondary group objects of this user in cache:
-			$GroupCache = & get_GroupCache();
-			$GroupCache->clear();
-			$this->secondary_groups = $GroupCache->load_by_sql( $secondary_groups_SQL );
+				// Load all secondary group objects of this user in cache:
+				$GroupCache = & get_GroupCache();
+				$GroupCache->clear();
+				$this->secondary_groups = $GroupCache->load_by_sql( $secondary_groups_SQL );
+			}
+			else
+			{	// For new creating user:
+				$this->secondary_groups = array();
+			}
 		}
 
 		return $this->secondary_groups;
@@ -7776,8 +7791,8 @@ class User extends DataObject
 			$SQL->WHERE( 'enlt_active = 1' );
 			$perm_conditions = array( 'enlt_perm_subscribe = "anyone"' );
 			$check_groups = array();
-			if( is_logged_in() && $current_User->can_moderate_user( $this->ID ) )
-			{	// Allow to subscribe to forbidden newsletters by user moderator:
+			if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
+			{	// Allow to subscribe to forbidden newsletters by user admins:
 				$perm_conditions[] = 'enlt_perm_subscribe = "admin"';
 				$check_groups[] = $current_User->get( 'grp_ID' );
 			}
@@ -7811,13 +7826,25 @@ class User extends DataObject
 				{
 					if( $Newsletter = & $NewsletterCache->get_by_ID( $newsletter_ID, false, false ) )
 					{
-						$this->allowed_newsletters[] = $Newsletter;
+						$this->allowed_newsletters[ $Newsletter->ID ] = $Newsletter;
 					}
 				}
 			}
 		}
 
 		return $this->allowed_newsletters;
+	}
+
+
+	/**
+	 * Check if the newsletter is allowed for this User
+	 *
+	 * @param integer Newsletter ID
+	 * @return boolean
+	 */
+	function is_allowed_newsletter( $newsletter_ID )
+	{
+		return in_array( $newsletter_ID, $this->get_allowed_newsletter_IDs() );
 	}
 
 
@@ -7900,13 +7927,16 @@ class User extends DataObject
 
 		if( count( $new_subscriptions ) > 0 )
 		{
-			$allowed_newsletter_IDs = $this->get_allowed_newsletter_IDs();
 			foreach( $new_subscriptions as $n => $new_subscription_ID )
 			{
 				// Format each value to integer:
 				$new_subscription_ID = intval( $new_subscription_ID );
-				if( empty( $new_subscription_ID ) || ! in_array( $new_subscription_ID, $allowed_newsletter_IDs ) )
-				{	// Unset wrong value or if current User cannot subscribe this User to the new newsletter:
+				if( empty( $new_subscription_ID ) ||
+				    ( ! $this->is_allowed_newsletter( $new_subscription_ID ) &&
+				      ! in_array( $new_subscription_ID, $prev_subscriptions ) ) )
+				{	// Unset wrong value or
+					//   if current User cannot subscribe this User to the new newsletter
+					//   but keep if it was subscribed before:
 					unset( $new_subscriptions[ $n ] );
 				}
 				else
