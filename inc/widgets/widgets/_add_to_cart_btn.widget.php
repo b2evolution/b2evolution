@@ -103,6 +103,11 @@ class add_to_cart_btn_Widget extends ComponentWidget
 					'size' => 40,
 					'defaultvalue' => 'fa fa-cart-plus'
 				),
+				'display_out_of_stock' => array(
+					'label' => T_('Display "Out of stock"'),
+					'type' => 'checkbox',
+					'defaultvalue' => 0
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -138,14 +143,32 @@ class add_to_cart_btn_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		// Initialize URL to add a product to cart:
-		$add_cart_url = $Blog->get( 'carturl', array( 'url_suffix' => 'action=add&amp;item_ID='.$Item->ID.'&amp;qty=1' ) );
+		if( $Item->can_be_ordered_if_no_stock == 0 && $Item->qty_in_stock <= 0 )
+		{
+			if( $this->disp_params['display_out_of_stock'] )
+			{
+				echo '<span class="evo_out_of_stock">'.T_('Out of stock').'</span>';
+			}
+			else
+			{
+				$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because the Item is currently out of stock.' );
+				echo $this->disp_params['block_body_end'];
+				echo $this->disp_params['block_end'];
 
-		// Display a buttton to add a product to cart:
-		echo '<a href="'.$add_cart_url.'" class="'.format_to_output( $this->disp_params['btn_class'], 'htmlattr' ).'">'
-				.'<i class="'.format_to_output( $this->disp_params['icon_class'], 'htmlattr' ).'"></i> '
-				.format_to_output( $this->disp_params['btn_title'], 'htmlbody' )
-			.'</a>';
+				return false;
+			}
+		}
+		else
+		{
+			// Initialize URL to add a product to cart:
+			$add_cart_url = $Blog->get( 'carturl', array( 'url_suffix' => 'action=add&amp;item_ID='.$Item->ID.'&amp;qty=1' ) );
+
+			// Display a buttton to add a product to cart:
+			echo '<a href="'.$add_cart_url.'" class="'.format_to_output( $this->disp_params['btn_class'], 'htmlattr' ).'">'
+					.'<i class="'.format_to_output( $this->disp_params['icon_class'], 'htmlattr' ).'"></i> '
+					.format_to_output( $this->disp_params['btn_title'], 'htmlbody' )
+				.'</a>';
+		}
 
 		echo $this->disp_params['block_body_end'];
 
