@@ -451,28 +451,6 @@ switch( $action )
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 		evo_flush();
 
-		$new_version_status = check_version( $upgrade_name );
-		if( empty( $new_version_status ) )
-		{ // New version
-			echo '<p><b>'.T_( 'The new files are ready to be installed.' ).'</b></p>';
-		}
-		else
-		{ // Old/Same version
-			echo '<div class="alert '.( $new_version_status['error'] == 'old' ? 'alert-danger' : 'alert-warning' ).'">'.$new_version_status['message'].'</div>';
-		}
-
-		echo '<p>'
-			.sprintf( T_( 'If you continue, the following sequence will be carried out automatically (trying to minimize "<a %s>maintenance time</a>" for the site):' ),
-				'href="http://b2evolution.net/man/installation-upgrade/configuration-files/maintenance-html" target="_blank"' )
-			.'<ul><li>'.sprintf( T_( 'The site will switch to <a %s>maintenance mode</a>' ),
-						'href="http://b2evolution.net/man/installation-upgrade/configuration-files/maintenance-html" target="_blank"' ).'</li>'
-				.'<li>'.T_( 'A backup will be performed' ).'</li>'
-				.'<li>'.T_( 'The upgrade will be applied' ).'</li>'
-				.'<li>'.T_( 'The install script of the new version will be called' ).'</li>'
-				.'<li>'.sprintf( T_( 'The cleanup rules from %s will be applied' ), '<code>'.get_upgrade_config_file_name().'</code>' ).'</li>'
-				.'<li>'.T_( 'The site will switch to normal mode again at the end of the install script.' ).'</li>'
-			.'</ul></p>';
-
 		// Pause the process before next step
 		$AdminUI->disp_view( 'maintenance/views/_upgrade_ready.form.php' );
 		unset( $block_item_Widget );
@@ -484,6 +462,8 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'upgrade_is_launched' );
 
+		autoupgrade_display_steps( 5, $tab );
+
 		if( $demo_mode )
 		{
 			$Messages->clear();
@@ -492,10 +472,41 @@ switch( $action )
 			break;
 		}
 
+		// Load Backup class (PHP4) and backup all of the folders and files
+		load_class( 'maintenance/model/_backup.class.php', 'Backup' );
+		$Backup = new Backup();
+		// Memorize all form params in order t oresubmit form if some errors exist
+		$Backup->load_from_Request( true );
+
+		// File options:
+		param( 'fm_default_chmod_dir', 'string' );
+		param_check_regexp( 'fm_default_chmod_dir', '~^[0-7]{3}$~', T_('Invalid CHMOD value. Use 3 digits.') );
+		$Settings->set( 'fm_default_chmod_dir', $fm_default_chmod_dir );
+		param( 'fm_default_chmod_file', 'string' );
+		param_check_regexp( 'fm_default_chmod_file', '~^[0-7]{3}$~', T_('Invalid CHMOD value. Use 3 digits.') );
+		$Settings->set( 'fm_default_chmod_file', $fm_default_chmod_file );
+
+		if( param_errors_detected() )
+		{	// Display the previous step form in order to fix the detected errors:
+			$upgrade_name = param( 'upd_dir', 'string', '', true );
+
+			$Messages->display();
+
+			$block_item_Widget = new Widget( 'block_item' );
+			$block_item_Widget->title = T_('Ready to upgrade').'...';
+			$block_item_Widget->disp_template_replaced( 'block_start' );
+			evo_flush();
+
+			$AdminUI->disp_view( 'maintenance/views/_upgrade_ready.form.php' );
+			unset( $block_item_Widget );
+			break;
+		}
+
+		// Update file options:
+		$Settings->dbupdate();
+
 		if( !isset( $block_item_Widget ) )
 		{
-			autoupgrade_display_steps( 5, $tab );
-
 			$block_item_Widget = new Widget( 'block_item' );
 			$block_item_Widget->title = T_('Installing package...');
 			$block_item_Widget->disp_template_replaced( 'block_start' );
@@ -510,13 +521,7 @@ switch( $action )
 			$success = true;
 		}
 
-		// Load Backup class (PHP4) and backup all of the folders and files
-		load_class( 'maintenance/model/_backup.class.php', 'Backup' );
-		$Backup = new Backup();
-		// Memorize all form params in order t oresubmit form if some errors exist
-		$Backup->load_from_Request( true );
-
-		// Enable maintenance mode
+		// Enable maintenance mode:
 		$success = ( $success && switch_maintenance_mode( true, 'upgrade', T_( 'System upgrade is in progress. Please reload this page in a few minutes.' ) ) );
 
 		if( $success )

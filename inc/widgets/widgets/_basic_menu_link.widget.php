@@ -41,39 +41,41 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		parent::__construct( $db_row, 'core', 'basic_menu_link' );
 
 		$this->link_types = array(
-			'home' => T_('Front Page'),
-			'recentposts' => T_('Recent posts').' (disp=posts)',
-			'search' => T_('Search page').' (disp=search)',
-			'arcdir' => T_('Archive directory').' (disp=arcdir)',
-			'catdir' => T_('Category directory').' (disp=catdir)',
-			'tags' => T_('Tags').' (disp=tags)',
-			'postidx' => T_('Post index').' (disp=postidx)',
-			'mediaidx' => T_('Photo index').' (disp=mediaidx)',
-			'sitemap' => T_('Site Map').' (disp=sitemap)',
-			'latestcomments' => T_('Latest comments').' (disp=comments)',
-			'cart' => T_('Shopping cart').' (disp=cart)',
-
-			'ownercontact' => T_('Blog owner contact form').' (disp=msgform)',
-			'owneruserinfo' => T_('Blog owner profile').' (disp=user)',
-
-			'users' => T_('User directory').' (disp=users)',
-
-			'login' => T_('Log in form').' (disp=login)',
-			'logout' => T_('Logout link'),
-			'register' => T_('Registration form').' (disp=register)',
-			'myprofile' => T_('My profile').' (disp=user)',
-			'profile' => T_('Edit profile').' (disp=profile)',
-			'avatar' => T_('Edit profile picture').' (disp=avatar)',
-			'visits' => T_('My visits').' (disp=visits)',
-
-			'useritems' => T_('User\'s posts/items').' (disp=useritems)',
-			'usercomments' => T_('User\'s comments').' (disp=usercomments)',
-
-			'item' => T_('Any item (post, page, etc...)').' (disp=single|page) ',
-			'postnew' => T_('New Item').' (disp=edit)',
-
-			'admin' => T_('Admin / Back-Office link'),
-			'url' => T_('Any URL'),
+			T_('Contents') => array(
+				'home'           => T_('Front Page'),
+				'recentposts'    => T_('Latest posts').' (disp=posts)',
+				'latestcomments' => T_('Latest comments').' (disp=comments)',
+				'search'         => T_('Search page').' (disp=search)',
+				'item'           => T_('Any item (post, page, etc...)').' (disp=single|page) ',
+				'arcdir'         => T_('Archives').' (disp=arcdir)',
+				'catdir'         => T_('Categories').' (disp=catdir)',
+				'tags'           => T_('Tags').' (disp=tags)',
+				'postidx'        => T_('Post index').' (disp=postidx)',
+				'mediaidx'       => T_('Photo index').' (disp=mediaidx)',
+				'sitemap'        => T_('Site Map').' (disp=sitemap)',
+			),
+			T_('Communication') => array(
+				'ownercontact'  => T_('Collection owner contact form').' (disp=msgform)',
+				'owneruserinfo' => T_('Collection owner profile').' (disp=user)',
+				'users'         => T_('User directory').' (disp=users)',
+			),
+			T_('Tools') => array(
+				'login'        => T_('Log in form').' (disp=login)',
+				'logout'       => T_('Logout'),
+				'register'     => T_('Registration form').' (disp=register)',
+				'myprofile'    => T_('View my profile').' (disp=user)',
+				'visits'       => T_('View my visits').' (disp=visits)',
+				'profile'      => T_('Edit my profile').' (disp=profile)',
+				'avatar'       => T_('Edit my profile picture').' (disp=avatar)',
+				'useritems'    => T_('View my posts/items').' (disp=useritems)',
+				'usercomments' => T_('View my comments').' (disp=usercomments)',
+			),
+			T_('Other') => array(
+				'postnew' => T_('Create new Item').' (disp=edit)',
+				'admin'   => T_('Go to Back-Office'),
+				'url'     => T_('Go to any URL'),
+				'cart'    => T_('Shopping cart').' (disp=cart)',
+			),
 		);
 	}
 
@@ -113,7 +115,13 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 
 		if( !empty($this->param_array['link_type']) )
 		{	// TRANS: %s is the link type, e. g. "Blog home" or "Log in form"
-			return sprintf( T_( '%s link' ), $this->link_types[ $this->param_array['link_type'] ] );
+			foreach( $this->link_types as $link_types )
+			{
+				if( isset( $link_types[ $this->param_array['link_type'] ] ) )
+				{
+					return sprintf( T_('Link to: %s'), $link_types[ $this->param_array['link_type'] ] );
+				}
+			}
 		}
 
 		return $this->get_name();

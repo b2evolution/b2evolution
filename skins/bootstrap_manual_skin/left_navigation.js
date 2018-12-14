@@ -47,7 +47,7 @@ jQuery( document ).ready( function()
 		}
 	}
 
-	var sidebar_shift = jQuery( '.sitewide_header' ).length > 0 ? 54 : 0;
+	var sidebar_shift = jQuery( '.sitewide_header, .evo_container__site_header' ).length > 0 ? 54 : 0;
 	var $sidebar = jQuery( '#evo_container__sidebar' );
 	if( $sidebar.outerHeight( true ) + 70/* footer height */ < jQuery( window ).height() )
 	{

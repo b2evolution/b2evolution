@@ -63,6 +63,8 @@ class ItemType extends DataObject
 	var $skin_btn_text = NULL;
 	var $can_be_purchased_instore = 0;
 	var $can_be_purchased_online = 0;
+	var $short_title_maxlen = 30;
+	var $title_maxlen = 100;
 
 	/**
 	 * Custom fields
@@ -138,6 +140,8 @@ class ItemType extends DataObject
 			$this->skin_btn_text = isset( $db_row->ityp_skin_btn_text ) ? $db_row->ityp_skin_btn_text : $this->skin_btn_text;
 			$this->can_be_purchased_instore = isset( $db_row->ityp_can_be_purchased_instore ) ? $db_row->ityp_can_be_purchased_instore : $this->can_be_purchased_instore;
 			$this->can_be_purchased_online = isset( $db_row->ityp_can_be_purchased_online ) ? $db_row->ityp_can_be_purchased_online : $this->can_be_purchased_online;
+			$this->short_title_maxlen = isset( $db_row->ityp_short_title_maxlen ) ? $db_row->ityp_short_title_maxlen : $this->short_title_maxlen;
+			$this->title_maxlen = isset( $db_row->ityp_title_maxlen ) ? $db_row->ityp_title_maxlen : $this->title_maxlen;
 		}
 	}
 
@@ -235,9 +239,17 @@ class ItemType extends DataObject
 		param( 'ityp_use_short_title', 'string' );
 		$this->set_from_Request( 'use_short_title' );
 
+		// Short title max length
+		param( 'ityp_short_title_maxlen', 'integer' );
+		$this->set_from_Request( 'short_title_maxlen' );
+
 		// Use title
 		param( 'ityp_use_title', 'string' );
 		$this->set_from_Request( 'use_title' );
+
+		// Title max length
+		param( 'ityp_title_maxlen', 'integer' );
+		$this->set_from_Request( 'title_maxlen' );
 
 		// Use URL
 		param( 'ityp_use_url', 'string' );

@@ -178,9 +178,8 @@ if( !$Messages->has_errors() )
 				break;
 			}
 
-			// Init cascade relations: If we delete user as spammer we also should remove the comments and the messages
+			// Check if the user is deleted as spammer:
 			$is_spammer = ( param( 'deltype', 'string', '', true ) == 'spammer' );
-			$edited_User->init_relations( $is_spammer );
 
 			$fullname = $edited_User->dget( 'fullname' );
 			if( param( 'confirm', 'integer', 0 ) )
@@ -247,6 +246,13 @@ if( !$Messages->has_errors() )
 				{
 					$msg = sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $edited_User->dget( 'login' ) );
 				}
+
+				// Init cascade relations: If we delete user as spammer we also should remove the comments, messages and files:
+				$edited_User->init_relations( array(
+					'delete_messages' => $is_spammer,
+					'delete_comments' => $is_spammer,
+					'delete_files'    => $is_spammer,
+				) );
 
 				if( ! $edited_User->check_delete( $msg, array(), true ) )
 				{ // There are restrictions:
@@ -547,6 +553,46 @@ if( !$Messages->has_errors() )
 			header_redirect( '?ctrl=users'.( count( $not_deleted_spam_logins ) > 0 ? '&action=spammers' : '' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 			break;
+
+		case 'export':
+			// Export user group data into CSV file:
+			load_class( 'users/model/_userlist.class.php', 'UserList' );
+			$UserList = new UserList( 'admin' );
+			$UserList->memorize = false;
+			$UserList->load_from_Request();
+			if( empty( $UserList->filters['users'] ) )
+			{	// No users to export:
+				header_redirect( $admin_url.'?ctrl=users' );
+				break;
+			}
+
+			$SQL_main_group = new SQL();
+			$SQL_main_group->SELECT( 'user_ID, user_login, grp_name, "primary" AS type' );
+			$SQL_main_group->FROM( 'T_users' );
+			$SQL_main_group->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
+			$SQL_main_group->WHERE( 'user_ID IN ('.implode( ',', $UserList->filters['users'] ).') ' );
+			$SQL_sub_groups = new SQL();
+			$SQL_sub_groups->SELECT( 'user_ID, user_login, grp_name, "secondary" AS type' );
+			$SQL_sub_groups->FROM( 'T_users' );
+			$SQL_sub_groups->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON sug_user_ID = user_ID' );
+			$SQL_sub_groups->FROM_add( 'INNER JOIN T_groups ON sug_grp_ID = grp_ID' );
+			$SQL_sub_groups->WHERE( 'sug_user_ID IN ('.implode( ',', $UserList->filters['users'] ).') ' );
+			$user_groups_sql = 'SELECT * FROM ( '.$SQL_main_group->get().' UNION '.$SQL_sub_groups->get().' ) AS users
+				ORDER BY FIND_IN_SET( user_ID, "'.implode( ',', $UserList->filters['users'] ).'" ), type';
+			$users = $DB->get_results( $user_groups_sql, ARRAY_A, 'Get users data for export group data into CSV file' );
+
+			header_nocache();
+			header_content_type( 'text/csv' );
+			header( 'Content-Disposition: attachment; filename=users.csv' );
+
+			echo get_csv_line( array( 'username', 'groupname', 'type' ) );
+
+			foreach( $users as $user )
+			{
+				unset( $user['user_ID'] );
+				echo get_csv_line( $user );
+			}
+			exit;
 	}
 }
 
@@ -649,12 +695,16 @@ switch( $action )
 			$confirm_messages[] = array( T_('Note: this will also delete private messages sent/received by this user.'), 'note' );
 			$confirm_messages[] = array( T_('Note: this will also delete comments made by this user.'), 'note' );
 			$confirm_messages[] = array( T_('Note: this will also delete files uploaded by this user.'), 'note' );
+			$confirm_messages[] = array( '<strong>'.sprintf( T_('Note: the email address %s will be banned from registering again.'), '<code>'.$edited_User->get( 'email' ).'</code>' ).'</strong>', 'note' );
 		}
 		else
 		{	// Display the notes for standard deleting:
-			$confirm_messages[] = array( T_('Note: this will <b>not</b> automatically delete private messages sent/received by this user. However, this will delete any new orphan private messages (which no longer have any existing sender or recipient).'), 'note' );
-			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete comments made by this user. Instead it will transform them from member to visitor comments.'), 'note' );
-			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete files uploaded by this user outside of the user root. Instead the creator ID of these files will be set to NULL.'), 'note' );
+			$confirm_messages[] = array( T_('Note: this will <b>not</b> automatically delete private messages sent/received by this user. However, this will delete any new orphan private messages (which no longer have any existing sender or recipient).')
+				.'<br /><label><input type="checkbox" name="force_delete_messages" value="1" /> '.T_('Force deleting all private messages sent/received by this user.').'</label>', 'note' );
+			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete comments made by this user. Instead it will transform them from member to visitor comments.')
+				.'<br /><label><input type="checkbox" name="force_delete_comments" value="1" /> '.T_('Force deleting all comments made by this user.').'</label>', 'note' );
+			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete files uploaded by this user outside of the user root. Instead the creator ID of these files will be set to NULL.')
+				.'<br /><label><input type="checkbox" name="force_delete_files" value="1" /> '.T_('Force deleting all files uploaded by this user.').'</label>', 'note' );
 		}
 
 		// Find other users with the same email address

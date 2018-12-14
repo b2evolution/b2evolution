@@ -63,6 +63,8 @@ class EmailCampaign extends DataObject
 
 	var $user_tag_dislike;
 
+	var $user_tag_unsubscribe;
+
 	var $send_count;
 
 	var $open_count;
@@ -147,6 +149,7 @@ class EmailCampaign extends DataObject
 			$this->user_tag_cta3 = $db_row->ecmp_user_tag_cta3;
 			$this->user_tag_like = $db_row->ecmp_user_tag_like;
 			$this->user_tag_dislike = $db_row->ecmp_user_tag_dislike;
+			$this->user_tag_unsubscribe = $db_row->ecmp_user_tag_unsubscribe;
 			$this->send_count = $db_row->ecmp_send_count;
 			$this->open_count = $db_row->ecmp_open_count;
 			$this->img_loads = $db_row->ecmp_img_loads;
@@ -281,7 +284,7 @@ class EmailCampaign extends DataObject
 		{
 			case 'plaintext_template_preview':
 				global $current_User;
-				$text_mail_template = mail_template( 'newsletter', 'text', array( 'message_text' => $this->get( 'email_plaintext' ), 'include_greeting' => false, 'add_email_tracking' => false ), $current_User );
+				$text_mail_template = mail_template( 'newsletter', 'text', array( 'message_text' => $this->get( 'email_plaintext' ), 'include_greeting' => false, 'add_email_tracking' => false, 'template_mode' => 'preview' ), $current_User );
 				$text_mail_template = str_replace( array( '$email_key$', '$mail_log_ID$', '$email_key_start$', '$email_key_end$' ), array( '***email-key***', '', '', '' ), $text_mail_template );
 				$text_mail_template = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $text_mail_template );
 				return nl2br( $text_mail_template );
@@ -678,7 +681,7 @@ class EmailCampaign extends DataObject
 		}
 
 		if( param( 'ecmp_name', 'string', NULL ) !== NULL )
-		{ // Campaign name:
+		{	// Campaign name:
 			param_string_not_empty( 'ecmp_name', T_('Please enter a name.') );
 			$this->set_from_Request( 'name' );
 		}
@@ -744,33 +747,38 @@ class EmailCampaign extends DataObject
 		}
 
 		if( param( 'ecmp_user_tag', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag' );
 		}
 
 		if( param( 'ecmp_user_tag_cta1', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_cta1' );
 		}
 
 		if( param( 'ecmp_user_tag_cta2', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_cta2' );
 		}
 
 		if( param( 'ecmp_user_tag_cta3', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_cta3' );
 		}
 
 		if( param( 'ecmp_user_tag_like', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_like' );
 		}
 
 		if( param( 'ecmp_user_tag_dislike', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_dislike' );
+		}
+
+		if( param( 'ecmp_user_tag_unsubscribe', 'string', NULL ) !== NULL )
+		{	// User tag:
+			$this->set_from_Request( 'user_tag_unsubscribe' );
 		}
 
 		return ! param_errors_detected();
@@ -891,12 +899,25 @@ class EmailCampaign extends DataObject
 			}
 
 			if( $result )
-			{	// Update last sending data for newsletter per user:
-				$DB->query( 'UPDATE T_email__newsletter_subscription
-					SET enls_last_sent_manual_ts = '.$DB->quote( date2mysql( $localtimenow ) ).',
+			{
+				$last_sent_ts_field = ( $update_sent_ts == 'auto' ? 'enls_last_sent_auto_ts' : 'enls_last_sent_manual_ts' );
+				if( empty( $automation_ID ) )
+				{	// Update last sending data for newsletter per user:
+					$last_sent_ts_sql_join = '';
+					$last_sent_ts_sql_where = ' AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) );
+				}
+				else
+				{	// Update last sending data for all newsletters tied to the automation and where the user is subscribed to:
+					$last_sent_ts_sql_join = ' INNER JOIN T_automation__newsletter ON aunl_enlt_ID = enls_enlt_ID AND enls_subscribed = 1';
+					$last_sent_ts_sql_where = '';
+				}
+				$DB->query( 'UPDATE T_email__newsletter_subscription'
+					.$last_sent_ts_sql_join.'
+					SET '.$last_sent_ts_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).',
 					    enls_send_count = enls_send_count + 1
-					WHERE enls_user_ID = '.$DB->quote( $user_ID ).'
-					  AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+					WHERE enls_user_ID = '.$DB->quote( $user_ID )
+						.$last_sent_ts_sql_where );
+
 				// Add tags to user after successful email sending:
 				$user_tag_sendsuccess = trim( $this->get( 'user_tag_sendsuccess' ) );
 				if( ! empty( $user_tag_sendsuccess ) )

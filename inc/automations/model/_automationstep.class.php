@@ -1073,7 +1073,8 @@ class AutomationStep extends DataObject
 
 			case 'listsend_last_sent_to_user':
 				// Check last sent list to user:
-				return $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'enls_last_sent_manual_ts' );
+				return $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'enls_last_sent_manual_ts' ) ||
+							 $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'enls_last_sent_auto_ts' );
 
 			case 'listsend_last_opened_by_user':
 				// Check last opened list by user:

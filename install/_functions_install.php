@@ -589,41 +589,36 @@ function install_basic_skins( $install_mobile_skins = true )
 
 	// Note: Skin #1 will be used by Blog A and Blog B
 	// Install this skin firstly in order to use it by default for all collections with wrong skin ID on upgrade process:
-	skin_install( 'bootstrap_blog_skin' );
+	skin_install( 'bootstrap_blog_skin', true );
 
 	// Note: Skin #2 will be used by Home:
-	skin_install( 'bootstrap_main_skin' );
+	skin_install( 'bootstrap_main_skin', true );
 
 	// Note: Skin #3 will be used by Photos:
-	skin_install( 'bootstrap_gallery_skin' );
+	skin_install( 'bootstrap_gallery_skin', true );
 
 	// Note: Skin #4 will be used by Forums:
-	skin_install( 'bootstrap_forums_skin' );
+	skin_install( 'bootstrap_forums_skin', true );
 
 	// Note: Skin #5 will be used by Manual:
-	skin_install( 'bootstrap_manual_skin' );
+	skin_install( 'bootstrap_manual_skin', true );
 
 	// Note: Skin #6 will be used by Mini-Site
-	skin_install( 'jared_skin' );
+	skin_install( 'jared_skin', true );
 
 	// Note: Skin #7 will be used by Catalog:
-	skin_install( 'bootstrap_catalog_skin' );
+	skin_install( 'bootstrap_catalog_skin', true );
 
-	// skin_install( 'asevo' );
-	// skin_install( 'dating_mood' );
-	// skin_install( 'evopress' );
-	// skin_install( 'photoalbums' );
-	// skin_install( 'photoblog' );
-	// skin_install( 'pureforums' );
+
 	if( $install_mobile_skins )
 	{
-		skin_install( 'touch' );
+		skin_install( 'touch', true );
 	}
-	skin_install( '_atom' );
-	skin_install( '_rss2' );
+	skin_install( '_atom', true );
+	skin_install( '_rss2', true );
 
 	// Install default site skin:
-	$default_site_Skin = skin_install( 'default_site_skin' );
+	$default_site_Skin = skin_install( 'default_site_skin', true );
 	if( $default_site_Skin && $default_site_Skin->ID > 0 )
 	{	// Use the installed skin as default for site:
 		global $Settings;
@@ -636,9 +631,9 @@ function install_basic_skins( $install_mobile_skins = true )
 		$Settings->dbupdate();
 	}
 
-	skin_install( 'bootstrap_site_navbar_skin' );
-	skin_install( 'bootstrap_site_tabs_skin' );
-	skin_install( 'bootstrap_site_dropdown_skin' );
+	skin_install( 'bootstrap_site_navbar_skin', true );
+	skin_install( 'bootstrap_site_tabs_skin', true );
+	skin_install( 'bootstrap_site_dropdown_skin', true );
 
 	task_end();
 }
@@ -820,6 +815,11 @@ function install_basic_plugins( $old_db_version = 0 )
 	if( $old_db_version < 11760 )
 	{
 		install_plugin( 'polls_plugin' );
+	}
+
+	if( $old_db_version < 12330 )
+	{
+		install_plugin( 'inlines_plugin' );
 	}
 
 	if( $old_db_version < 12580 )

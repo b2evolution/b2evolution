@@ -631,7 +631,8 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 					continue;
 				}
 
-				if( $container_type == 'sub' || $container_type == 'page' )
+				if( ! isset( $coll_containers[ $new_container_code ] ) &&
+				    ( $container_type == 'sub' || $container_type == 'page' ) )
 				{	// Initialize sub-container and page containers data in order to install it below:
 					$coll_containers[ $new_container_code ] = array(
 							isset( $container_widgets['name'] ) ? $container_widgets['name'] : $new_container_code,
@@ -10388,7 +10389,140 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13000, 'Creating sections table...' ) )
+	if( upg_task_start( 12990 ) )
+	{	// part of 6.10.4-stable
+
+		/* ---- Install basic widgets for containers "Front Page Main Area": ---- START */
+		global $basic_widgets_insert_sql_rows;
+		$basic_widgets_insert_sql_rows = array();
+
+		/**
+		 * Add a widget to global array in order to insert it in DB by single SQL query later
+		 *
+		 * @param integer Blog ID
+		 * @param string Container name
+		 * @param string Type
+		 * @param string Code
+		 * @param integer Order
+		 * @param array|string|NULL Widget params
+		 * @param integer 1 - enabled, 0 - disabled
+		 */
+		function add_basic_widget_12990( $blog_ID, $container_name, $code, $type, $order, $params = NULL, $enabled = 1 )
+		{
+			global $basic_widgets_insert_sql_rows, $DB;
+
+			if( is_null( $params ) )
+			{ // NULL
+				$params = 'NULL';
+			}
+			elseif( is_array( $params ) )
+			{ // array
+				$params = $DB->quote( serialize( $params ) );
+			}
+			else
+			{ // string
+				$params = $DB->quote( $params );
+			}
+
+			$basic_widgets_insert_sql_rows[] = '( '
+				.$blog_ID.', '
+				.$DB->quote( $container_name ).', '
+				.$order.', '
+				.$enabled.', '
+				.$DB->quote( $type ).', '
+				.$DB->quote( $code ).', '
+				.$params.' )';
+		}
+
+		// Insert content_hierarchy widget:
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_coll_ID, MAX(wi_order)' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->FROM_add( 'INNER JOIN T_blogs ON blog_ID = wi_coll_ID' );
+		$SQL->WHERE( 'blog_type = "manual"' );
+		$SQL->WHERE_and( 'wi_sco_name = "Front Page Main Area"' );
+		$SQL->ORDER_BY( 'wi_coll_ID' );
+		$SQL->GROUP_BY( 'wi_coll_ID');
+
+		$collections = $DB->get_assoc( $SQL );
+		if( count( $collections ) > 0 )
+		{	// If at least one collection exists:
+			foreach( $collections as $coll_ID => $max_order )
+			{
+				task_begin( 'Installing default "Content Hierarchy" widget for collection #'.$coll_ID.'... ' );
+				add_basic_widget_12990( $coll_ID, 'Front Page Main Area', 'content_hierarchy', 'core', intval( $max_order ) + 10 );
+				task_end();
+			}
+		}
+
+		if( ! empty( $basic_widgets_insert_sql_rows ) )
+		{	// Insert the widget records by single SQL query:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
+		}
+		/* ---- Install basic widgets for containers "Front Page Main Area": ---- END */
+		upg_task_end( false );
+	}
+
+	if( upg_task_start( 12993, 'Upgrading email newsletters table...' ) )
+	{	// part of 6.10.4-stable
+		db_upgrade_cols( 'T_email__newsletter', array(
+			'ADD' => array(
+				'enlt_perm_subscribe' => 'ENUM( "admin", "anyone", "group" ) COLLATE ascii_general_ci NOT NULL DEFAULT "anyone"',
+				'enlt_perm_groups'    => 'VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL',
+			),
+		) );
+		$DB->query( 'UPDATE T_email__newsletter
+			  SET enlt_perm_subscribe = "admin"
+			WHERE enlt_active = 0' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12996, 'Upgrading email newsletter subscriptions table...' ) )
+	{	// part of 6.10.4-stable
+		db_add_col( 'T_email__newsletter_subscription', 'enls_last_sent_auto_ts', 'TIMESTAMP NULL AFTER enls_last_sent_manual_ts' );
+		$DB->query( 'UPDATE T_email__newsletter_subscription
+			SET enls_last_sent_auto_ts = enls_last_sent_manual_ts' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12999, 'Upgrading email newsletters table...' ) )
+	{	// part of 6.10.4-stable
+		db_add_col( 'T_email__newsletter', 'enlt_owner_user_ID', 'INT UNSIGNED NOT NULL AFTER enlt_order' );
+		$DB->query( 'UPDATE T_email__newsletter SET enlt_owner_user_ID = 1' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13010, 'Upgrading email addresses table...' ) )
+	{	// part of 6.10.4-stable
+		db_upgrade_cols( 'T_email__address', array(
+			'MODIFY' => array( 'emadr_status' => 'ENUM( "unknown", "working", "unattended", "redemption", "warning", "suspicious1", "suspicious2", "suspicious3", "prmerror", "spammer" ) COLLATE ascii_general_ci NOT NULL DEFAULT "unknown"' ),
+			'ADD' => array( 'emadr_last_open_ts' => 'TIMESTAMP NULL' ),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13020 ) )
+	{	// part of 6.10.4-stable
+		task_begin( 'Updating email log table...' );
+		db_modify_col( 'T_email__log', 'emlog_camp_ID', 'INT UNSIGNED NULL DEFAULT NULL COMMENT "Used to reference campaign when there is no associated campaign_send or the previously associated campaign_send updated its csnd_emlog_ID"' );
+		task_end();
+
+		task_begin( 'Updating email newsletter subscriptions table...' );
+		$localtimenow = date2mysql( $GLOBALS['localtimenow'] );
+		$DB->query( 'UPDATE T_email__newsletter_subscription
+			INNER JOIN T_users ON user_ID = enls_user_ID AND user_status = "closed" AND enls_subscribed = 1
+			SET enls_subscribed = 0, enls_unsubscribed_ts = '.$DB->quote( $localtimenow ) );
+		task_end();
+
+		task_begin( 'Upgrading email campaigns table...' );
+		db_add_col( 'T_email__campaign', 'ecmp_user_tag_unsubscribe', 'VARCHAR(255) NULL AFTER ecmp_user_tag_like' );
+		task_end();
+
+		upg_task_end( false );
+	}
+
+	if( upg_task_start( 15000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '
 				sec_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -10399,13 +10533,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13005, 'Upgrading collections table...' ) )
+	if( upg_task_start( 15005, 'Upgrading collections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_add_col( 'T_blogs', 'blog_sec_ID', 'INT(11) UNSIGNED NOT NULL DEFAULT 1' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13010, 'Create default section...' ) )
+	if( upg_task_start( 15010, 'Create default section...' ) )
 	{	// part of 7.0.0-alpha
 		$DB->query( 'INSERT INTO T_section ( sec_ID, sec_name, sec_order, sec_owner_user_ID )
 			VALUES ( 1, "No Section", 1, 1 )' );
@@ -10419,13 +10553,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13020, 'Install default site skin...' ) )
+	if( upg_task_start( 15020, 'Install default site skin...' ) )
 	{	// part of 7.0.0-alpha
 		load_funcs( 'skins/_skin.funcs.php' );
 		$SkinCache = & get_SkinCache();
 		if( ! ( $default_site_Skin = & $SkinCache->get_by_folder( 'default_site_skin', false ) ) )
 		{	// If the skin doesn't exist try to install it:
-			$default_site_Skin = skin_install( 'default_site_skin' );
+			$default_site_Skin = skin_install( 'default_site_skin', true );
 		}
 		if( $default_site_Skin && $default_site_Skin->ID > 0 )
 		{	// Use the installed skin as default for site:
@@ -10435,7 +10569,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13030, 'Creating plugin group settings table...' ) )
+	if( upg_task_start( 15030, 'Creating plugin group settings table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_plugingroupsettings', '
 			pgset_plug_ID INT(11) UNSIGNED NOT NULL,
@@ -10447,7 +10581,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 
-	if( upg_task_start( 13040, 'Creating table for widget container...' ) )
+	if( upg_task_start( 15040, 'Creating table for widget container...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_widget__container', '
 			wico_ID       INT(10) UNSIGNED auto_increment,
@@ -10459,7 +10593,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13050, 'Inserting widget containers...' ) )
+	if( upg_task_start( 15050, 'Inserting widget containers...' ) )
 	{	// part of 7.0.0-alpha
 		$DB->query( 'INSERT INTO T_widget__container ( wico_name, wico_coll_ID, wico_order )
 			SELECT wi_sco_name, wi_coll_ID, @order := @order + 1 AS wico_order
@@ -10502,7 +10636,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13060, 'Upgrading widgets table...' ) )
+	if( upg_task_start( 15060, 'Upgrading widgets table...' ) )
 	{	// part of 7.0.0-alpha
 		$DB->query( 'RENAME TABLE '.$tableprefix.'widget TO T_widget__widget' );
 		db_add_col( 'T_widget__widget', 'wi_wico_ID', 'INT(10) UNSIGNED NULL DEFAULT NULL AFTER wi_ID' );
@@ -10522,7 +10656,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13070, 'Updating widget containers content...' ) )
+	if( upg_task_start( 15070, 'Updating widget containers content...' ) )
 	{	// part of 7.0.0-alpha
 		// Create Item Single containers and a content widget to make sure item contents will be displayed in every collection:
 		$widget_containers_sql_rows = array();
@@ -10558,13 +10692,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13080, 'Droping skin containers table...' ) )
+	if( upg_task_start( 15080, 'Droping skin containers table...' ) )
 	{	// part of 7.0.0-alpha
 		$DB->query( 'DROP TABLE IF EXISTS '.$tableprefix.'skins__container' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13090, 'Upgrading widget containers table...' ) )
+	if( upg_task_start( 15090, 'Upgrading widget containers table...' ) )
 	{	// part of 7.0.0-alpha
 		db_add_col( 'T_widget__container', 'wico_main', 'TINYINT(1) NOT NULL DEFAULT 0' );
 		// Update new flag to 1 for all main containers of existing collections:
@@ -10607,7 +10741,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13100, 'Rename widget "coll_avatar" to "user_profile_pics"...' ) )
+	if( upg_task_start( 15100, 'Rename widget "coll_avatar" to "user_profile_pics"...' ) )
 	{	// part of 7.0.0-alpha
 		$DB->query( 'UPDATE T_widget__widget
 			  SET wi_code = "user_profile_pics"
@@ -10615,7 +10749,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13110, 'Upgrading widget containers table...' ) )
+	if( upg_task_start( 15110, 'Upgrading widget containers table...' ) )
 	{	// part of 7.0.0-alpha
 		db_add_col( 'T_widget__container', 'wico_skin_type', 'ENUM( "normal", "mobile", "tablet" ) COLLATE ascii_general_ci NOT NULL DEFAULT "normal" AFTER wico_code' );
 		db_drop_index( 'T_widget__container', 'wico_coll_ID_code' );
@@ -10623,7 +10757,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13120, 'Converting columns to ASCII...' ) )
+	if( upg_task_start( 15120, 'Converting columns to ASCII...' ) )
 	{	// part of 7.0.0-alpha
 		db_modify_col( 'T_automation__automation', 'autm_status', 'ENUM("paused", "active") COLLATE ascii_general_ci DEFAULT "paused"' );
 		db_upgrade_cols( 'T_blogs', array(
@@ -10659,7 +10793,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13130, 'Converting columns to utf8mb4...' ) )
+	if( upg_task_start( 15130, 'Converting columns to utf8mb4...' ) )
 	{	// part of 7.0.0-alpha
 		// Modify indexes with max 767 chars(191 * 4 bytes):
 		db_add_index( 'T_users__organization', 'org_name', 'org_name(191)', 'UNIQUE' );
@@ -10681,7 +10815,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			'T_comments__prerendering'     => array( 'cmpr_content_prerendered' ),
 			'T_cron__log'                  => array( 'clog_messages' ),
 			'T_cron__task'                 => array( 'ctsk_name', 'ctsk_params' ),
-			'T_email__campaign'            => array( 'ecmp_email_title', 'ecmp_email_html', 'ecmp_email_text', 'ecmp_email_plaintext', 'ecmp_user_tag', 'ecmp_user_tag_cta1', 'ecmp_user_tag_cta2', 'ecmp_user_tag_cta3', 'ecmp_user_tag_like', 'ecmp_user_tag_dislike' ),
+			'T_email__campaign'            => array( 'ecmp_email_title', 'ecmp_email_html', 'ecmp_email_text', 'ecmp_email_plaintext', 'ecmp_user_tag', 'ecmp_user_tag_cta1', 'ecmp_user_tag_cta2', 'ecmp_user_tag_cta3', 'ecmp_user_tag_like', 'ecmp_user_tag_dislike, ecmp_user_tag_unsubscribe' ),
 			'T_email__log'                 => array( 'emlog_subject', 'emlog_headers', 'emlog_message' ),
 			'T_email__newsletter'          => array( 'enlt_name', 'enlt_label' ),
 			'T_email__returns'             => array( 'emret_errormsg', 'emret_headers', 'emret_message' ),
@@ -10737,7 +10871,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13140, 'Converting columns to utf8mb4...' ) )
+	if( upg_task_start( 15140, 'Converting columns to utf8mb4...' ) )
 	{	// part of 7.0.0-alpha
 		db_convert_cols_to_utf8mb4( array(
 			'T_email__campaign' => array( 'ecmp_name', 'ecmp_user_tag_sendskip', 'ecmp_user_tag_sendsuccess' ),
@@ -10745,7 +10879,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13150, 'Converting columns to utf8mb4...' ) )
+	if( upg_task_start( 15150, 'Converting columns to utf8mb4...' ) )
 	{	// part of 7.0.0-alpha
 		db_convert_cols_to_utf8mb4( array(
 			'T_items__type_custom_field' => array( 'itcf_format' ),
@@ -10753,7 +10887,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13160, 'Creating table for URL aliases...' ) )
+	if( upg_task_start( 15160, 'Creating table for URL aliases...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_coll_url_aliases', "
 			cua_coll_ID   INT(11) UNSIGNED NOT NULL,
@@ -10763,19 +10897,19 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13170, 'Updating Antispam IP Ranges table... ' ) )
+	if( upg_task_start( 15170, 'Updating Antispam IP Ranges table... ' ) )
 	{ // part of 7.0.0-alpha
 		db_modify_col( 'T_antispam__iprange', 'aipr_status', 'enum( "trusted", "probably_ok", "suspect", "very_suspect", "blocked" ) COLLATE ascii_general_ci NULL DEFAULT NULL' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13180, 'Upgrade table item types... ') )
+	if( upg_task_start( 15180, 'Upgrade table item types... ') )
 	{ // part of 7.0.0-alpha
 		db_add_col( 'T_items__type', 'ityp_schema', 'ENUM( "Article", "WebPage", "BlogPosting", "ImageGallery", "DiscussionForumPosting", "TechArticle" ) COLLATE ascii_general_ci NULL DEFAULT NULL AFTER ityp_template_name' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13190, 'Installing new widgets/containers...' ) )
+	if( upg_task_start( 15190, 'Installing new widgets/containers...' ) )
 	{	// part of 7.0.0-alpha
 		install_new_default_widgets( 'item_list' );
 		install_new_default_widgets( 'item_in_list' );
@@ -10784,7 +10918,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13210, 'Update free html widgets...' ) )
+	if( upg_task_start( 15210, 'Update free html widgets...' ) )
 	{	// part of 7.0.0-alpha
 		$SQL = new SQL( 'Get free html widget to update new option "renderers"' );
 		$SQL->SELECT( 'wi_ID, wi_params' );
@@ -10803,14 +10937,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13220, 'Updating table item types... ' ) )
+	if( upg_task_start( 15220, 'Updating table item types... ' ) )
 	{ // part of 7.0.0-alpha
 		db_add_col( 'T_items__type', 'ityp_add_aggregate_rating', 'TINYINT DEFAULT 1 AFTER ityp_schema' );
 		db_modify_col( 'T_items__type', 'ityp_schema', 'ENUM( "Article", "WebPage", "BlogPosting", "ImageGallery", "DiscussionForumPosting", "TechArticle", "Product" ) COLLATE ascii_general_ci NULL DEFAULT NULL' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13230, 'Installing new widgets/containers...' ) )
+	if( upg_task_start( 15230, 'Installing new widgets/containers...' ) )
 	{	// part of 7.0.0-alpha
 		install_new_default_widgets( 'front_page_column_a' );
 		install_new_default_widgets( 'front_page_column_b' );
@@ -10821,13 +10955,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13240, 'Updating table item types...' ) )
+	if( upg_task_start( 15240, 'Updating table item types...' ) )
 	{ // part of 7.0.0-alpha
 		db_modify_col( 'T_items__type', 'ityp_schema', 'ENUM( "Article", "WebPage", "BlogPosting", "ImageGallery", "DiscussionForumPosting", "TechArticle", "Product", "Review" ) COLLATE ascii_general_ci NULL DEFAULT NULL' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13250, 'Updating table item custom fields...' ) )
+	if( upg_task_start( 15250, 'Updating table item custom fields...' ) )
 	{ // part of 7.0.0-alpha
 		db_add_col( 'T_items__type_custom_field', 'itcf_schema_prop', 'VARCHAR(255) COLLATE ascii_general_ci NULL AFTER itcf_name' );
 		upg_task_end();
@@ -10895,8 +11029,86 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15290, 'Updating item types table...' ) )
+	{	// part of 7.0.0-alpha
+		db_add_col( 'T_items__type', 'ityp_short_title_maxlen', 'SMALLINT UNSIGNED DEFAULT 30' );
+		db_add_col( 'T_items__type', 'ityp_title_maxlen', 'SMALLINT UNSIGNED DEFAULT 100' );
 
-	if( upg_task_start( 15290 ) )
+		// Set comment max length for forum collections to NULL:
+		$SQL = new SQL( 'Get all pages from Collection for info pages(shared content blocks)' );
+		$SQL->SELECT( 'blog_ID' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->WHERE( 'blog_type = "forum"' );
+
+		$forum_collections = $DB->get_col( $SQL );
+		if( $forum_collections )
+		{
+			$insert_values = array();
+			foreach( $forum_collections as $coll_ID )
+			{
+				$insert_values[] = '( '.$DB->quote( $coll_ID ).', "comment_maxlen", "" )';
+			}
+			$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value ) VALUES '.implode( ', ', $insert_values ) );
+		}
+
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15300, 'Installing new widget container "Comment Area"...' ) )
+	{	// part of 7.0.0-alpha
+		install_new_default_widgets( 'comment_area' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15310, 'Installing new shared widget container "Marketing Popup"...' ) )
+	{	// part of 7.0.0-alpha
+		install_new_default_widgets( 'marketing_popup' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15320, 'Installing new widget container "Chapter Main Area"...' ) )
+	{	// part of 7.0.0-alpha
+		install_new_default_widgets( 'chapter_main_area' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15330, 'Updating widget "Email capture / Quick registration"...' ) )
+	{	// part of 7.0.0-alpha
+		$SQL = new SQL( 'Get email capture widgets to update params from checkbox to checklist' );
+		$SQL->SELECT( 'wi_ID, wi_params' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->WHERE( 'wi_code = "user_register_quick"' );
+		$SQL->WHERE_and( 'wi_params IS NOT NULL' );
+		$widgets = $DB->get_assoc( $SQL );
+		foreach( $widgets as $widget_ID => $widget_params )
+		{
+			$widget_params = @unserialize( $widget_params );
+			if( ! $widget_params )
+			{	// Skip wrong widget params:
+				continue;
+			}
+			// Set the param values in new format:
+			$widget_params['subscribe'] = array(
+					'post'    => empty( $widget_params['subscribe_post'] ) ? 0 : 1,
+					'comment' => empty( $widget_params['subscribe_comment'] ) ? 0 : 1,
+				);
+			if( isset( $widget_params['subscribe_post'] ) )
+			{	// Remove old param:
+				unset( $widget_params['subscribe_post'] );
+			}
+			if( isset( $widget_params['subscribe_comment'] ) )
+			{	// Remove old param:
+				unset( $widget_params['subscribe_comment'] );
+			}
+			// Update widget params:
+			$DB->query( 'UPDATE T_widget__widget
+				  SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+				WHERE wi_ID = '.$widget_ID );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15340 ) )
 	{	// part of 7.0.0-alpha
 
 		/* ---- Install basic widgets for containers "Shopping Cart": ---- START */
@@ -10972,7 +11184,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end( false );
 	}
 
-	if( upg_task_start( 15300, 'Creating table for item pricing...' ) )
+	if( upg_task_start( 15350, 'Creating table for item pricing...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_items__pricing', "
 			iprc_ID         INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -10988,7 +11200,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15310, 'Upgrade table currencies...' ) )
+	if( upg_task_start( 15360, 'Upgrade table currencies...' ) )
 	{	// part of 7.0.0-alpha
 		db_add_col( 'T_regional__currency', 'curr_default', 'tinyint(1) NOT NULL DEFAULT 0' );
 		$DB->query( 'UPDATE T_regional__currency
@@ -10997,7 +11209,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15320 ) )
+	if( upg_task_start( 15370 ) )
 	{	// part of 7.0.0-alpha
 		global $basic_widgets_insert_sql_rows;
 		$basic_widgets_insert_sql_rows = array();
@@ -11074,7 +11286,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15330 ) )
+	if( upg_task_start( 15380 ) )
 	{	// part of 7.0.0-alpha
 
 		task_begin( 'Updating table items... ' );
@@ -11094,7 +11306,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				'ityp_can_be_purchased_online'  => 'TINYINT DEFAULT 0 AFTER ityp_can_be_purchased_instore',
 			),
 		) );
-
 		upg_task_end();
 	}
 

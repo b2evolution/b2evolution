@@ -78,6 +78,7 @@ class CollectionSettings extends AbstractSettings
 			'require_anon_name' => 1,
 			'require_anon_email' => 1,
 			'allow_anon_url' => 0,
+			'comment_maxlen' => 1500,
 			'allow_attachments' => 'registered',
 			'max_attachments' => '',
 			'display_rating_summary' => '1', // Display a summary of star ratings above the comments
@@ -93,6 +94,7 @@ class CollectionSettings extends AbstractSettings
 			'comments_register' => 1,
 			'comment_quick_moderation' => 'expire',		// Comment quick moderation can be 'never', 'expire' - Links expire on first edit action, and 'always'
 			'autocomplete_usernames' => 1,
+			'meta_comments_frontoffice' => 1, // Display meta comments in front-office
 
 		// Archive settings:
 			'arcdir_noindex' => '1',					// META NOINDEX on Archive directory
@@ -155,7 +157,7 @@ class CollectionSettings extends AbstractSettings
 			'enable_sitemaps' => 1,
 
 		// General settings:
-			'ajax_form_enabled' => 1,					// Comment and contacts forms will be fetched by javascript
+			'ajax_form_enabled' => 1,					// Comment, Contact & Quick registration forms will be fetched by javascript
 			'ajax_form_loggedin_enabled' => 0,			// Also use JS forms for logged in users
 			'cache_enabled' => 0,
 			'cache_enabled_widgets' => 0,
@@ -191,7 +193,7 @@ class CollectionSettings extends AbstractSettings
 			'allow_html_comment' => 1, // Allow HTML in comments
 			'track_unread_content' => 0, // Should we track unread content on the specific blog. It can be modified on the Features/Other settings form.
 			'allow_access' => 'public', // Allow access to blog; Values: 'public' - Everyone (Public Blog), 'users' - Logged in users, 'members' - Members of the blog
-			'http_protocol' => 'always_http', // SSL; Values: 'always_http' - Always use http, 'always_https' - Always use https, 'allow_both' - Allow both http and https as valid URLs.
+			'http_protocol' => 'allow_both', // SSL; Values: 'always_http' - Always use http, 'always_https' - Always use https, 'allow_both' - Allow both http and https as valid URLs.
 			// Assets URLs:
 			'rsc_assets_url_type' => 'relative', // Load generic /rsc/ assets from: 'basic', 'relative', 'absolute'
 			'rsc_assets_absolute_url' => '', // Absolute URL for setting 'rsc_assets_url_type' with selected option 'absolute'
@@ -266,6 +268,18 @@ class CollectionSettings extends AbstractSettings
 			'download_delay' => 5,
 			'download_noindex' => 1,
 			'download_nofollowto' => 1,
+
+		// Popups settings:
+			'marketing_popup_using' => 'anonymous',
+			'marketing_popup_animation' => 'random',
+			'marketing_popup_container_front' => 'marketing_popup',
+			'marketing_popup_container_posts' => 'marketing_popup',
+			'marketing_popup_container_single' => 'marketing_popup',
+			'marketing_popup_container_page' => 'marketing_popup',
+			'marketing_popup_container_catdir' => 'marketing_popup',
+			'marketing_popup_container_other_disps' => 'marketing_popup',
+			'marketing_popup_show_repeat' => 0,
+			'marketing_popup_show_frequency' => 'always',
 		);
 
 	/**

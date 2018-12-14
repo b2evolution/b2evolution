@@ -161,6 +161,13 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 60, 'item_vote' ),
 	);
 
+	/* Comment Area */
+	$default_widgets['comment_area'] = array(
+		array( 10, 'item_comment_form' ),
+		array( 20, 'item_comment_notification' ),
+		array( 30, 'item_comment_feed_link' ),
+	);
+
 	/* Sidebar Single */
 	$default_widgets['sidebar_single'] = array(
 		array(  1, 'coll_related_post_list', 'coll_type' => 'forum' ),
@@ -277,6 +284,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 			) : NULL ) ),
 		// Install widget "Poll" only for Blog B on install:
 		array( 40, 'poll', 'coll_ID' => $blog_b_ID, 'params' => array( 'poll_ID' => $demo_poll_ID ) ),
+		array( 45, 'content_hierarchy', 'coll_type' => 'manual' ),
 		array( 50, 'subcontainer_row', 'params' => array(
 				'column1_container' => 'front_page_column_a',
 				'column1_class'     => ( $kind == 'main' ? 'col-xs-12' : 'col-sm-6 col-xs-12' ),
@@ -324,6 +332,14 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	/* Compare Main Area */
 	$default_widgets['compare_main_area'] = array(
 		array( 10, 'item_fields_compare', 'params' => array( 'items_source' => 'all' ) ),
+	);
+
+	/* Chapter Main Area */
+	$default_widgets['chapter_main_area'] = array(
+		'coll_type' => 'manual',
+		array( 10, 'breadcrumb_path', 'params' => array( 'separator' => '' ) ),
+		array( 20, 'coll_featured_intro' ),
+		array( 30, 'cat_title', 'params' => array( 'blog_ID' => '-', 'display_when' => 'no_intro' ) ),
 	);
 
 	/* 404 Page */
@@ -656,6 +672,13 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 				'content' => '<label for="nav-trigger"></label>',
 				'widget_css_class' => 'visible-sm-inline-block visible-xs-inline-block',
 			) ),
+	);
+
+	/* Marketing Popup */
+	$default_widgets['marketing_popup'] = array(
+		'type' => 'shared',
+		'name' => NT_('Marketing Popup'),
+		array( 10, 'user_register_quick' ),
 	);
 
 	// **** PAGE CONTAINERS ***** //

@@ -141,13 +141,17 @@ class coll_item_list_pages_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		if( $disp == 'posts' )
+		ob_start();
+		mainlist_page_links( $page_link_params );
+		$mainlist_page_links = ob_get_clean();
+
+		if( $disp == 'posts' && ! empty( $mainlist_page_links ) )
 		{
 			echo $this->disp_params['block_start'];
 			$this->disp_title();
 			echo $this->disp_params['block_body_start'];
 
-			mainlist_page_links( $page_link_params );
+			echo $mainlist_page_links;
 
 			echo $this->disp_params['block_body_end'];
 			echo $this->disp_params['block_end'];
@@ -155,6 +159,7 @@ class coll_item_list_pages_Widget extends ComponentWidget
 			return true;
 		}
 
+		$this->display_debug_message();
 		return false;
 	}
 }

@@ -28,6 +28,20 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 	$Blog->disp_setting( 'footer_includes', 'raw' );
 
+	if( $marketing_popup_container_code = $Blog->get_marketing_popup_container() )
+	{	// Display marketing popup container:
+		widget_container( $marketing_popup_container_code, array(
+			// The following params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
+			'container_start' => '<div id="evo_container__'.$marketing_popup_container_code.'" class="evo_container $wico_class$ ddexitpop">',
+			'container_end'   => '</div>',
+			// Force loading of all ajax forms from widgets of this container right after page loading in order to don't wait scroll down event:
+			'load_ajax_form_on_page_load' => true,
+		) );
+		// Initialize JS & CSS for marketing popup container:
+		$Blog->init_marketing_popup_container();
+	}
+
 	// Add structured data at the end
 	skin_structured_data();
 ?>

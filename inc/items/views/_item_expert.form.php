@@ -60,7 +60,7 @@ $Form->labelend = "</strong>\n";
 
 
 // ================================ START OF EDIT FORM ================================
-
+echo_image_insert_modal();
 $iframe_name = NULL;
 $params = array();
 if( !empty( $bozo_start_modified ) )
@@ -158,7 +158,10 @@ $Form->begin_form( '', '', $params );
 		$Form->begin_fieldset( '', array( 'class' => 'evo_fields_table__single_row' ) );
 		if( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' )
 		{	// Display a post short title field:
-			$Form->text_input( 'post_short_title', $edited_Item->get( 'short_title' ), 50, T_('Short title'), '', array( 'maxlength' => 50, 'data-recommended-length' => '20;30' ) );
+			$short_title_maxlen = intval( $edited_Item->get_type_setting( 'short_title_maxlen' ) );
+			$Form->text_input( 'post_short_title', $edited_Item->get( 'short_title' ), 50, T_('Short title'), '', array(
+					'maxlength' => $short_title_maxlen,
+					'data-recommended-length' => '20;30' ) );
 		}
 		else
 		{	// Hide a post short title field:
@@ -170,7 +173,11 @@ $Form->begin_form( '', '', $params );
 	$Form->begin_fieldset( '', array( 'class' => 'evo_fields_table__single_row' ) );
 	if( $edited_Item->get_type_setting( 'use_title' ) != 'never' )
 	{	// Display a post title field:
-		$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array( 'maxlength' => 255, 'data-recommended-length' => '60;65', 'required' => ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ) );
+		$title_maxlen = intval( $edited_Item->get_type_setting( 'title_maxlen' ) );
+		$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array(
+				'maxlength' => $title_maxlen,
+				'data-recommended-length' => '60;65',
+				'required' => ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ) );
 	}
 	else
 	{	// Hide a post title field:
@@ -193,15 +200,29 @@ $Form->begin_form( '', '', $params );
 	$Form->end_fieldset();
 	$Form->switch_layout( NULL );
 
+	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
+	    $current_User->check_perm( 'files', 'view', false ) )
+	{	// If current user has a permission to view the files AND attachments are allowed for the item type:
+		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+		// Initialize this object as global because this is used in many link functions:
+		global $LinkOwner;
+		$LinkOwner = new LinkItem( $edited_Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
+	}
+
 	if( $edited_Item->get_type_setting( 'use_text' ) != 'never' )
 	{ // Display text
 		// --------------------------- TOOLBARS ------------------------------------
 		echo '<div class="edit_toolbars">';
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'AdminDisplayToolbar', array(
+		$admin_toolbar_params = array(
 				'edit_layout' => 'expert',
 				'Item' => $edited_Item,
-			) );
+			);
+		if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+		{
+			$admin_editor_params['temp_ID'] = $LinkOwner->get_ID();
+		}
+		$Plugins->trigger_event( 'AdminDisplayToolbar', $admin_toolbar_params );
 		echo '</div>';
 
 		// ---------------------------- TEXTAREA -------------------------------------
@@ -231,12 +252,17 @@ $Form->begin_form( '', '', $params );
 	echo '<div class="pull-left">';
 	// CALL PLUGINS NOW:
 	ob_start();
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+	$admin_editor_params = array(
 			'target_type'   => 'Item',
 			'target_object' => $edited_Item,
 			'content_id'    => 'itemform_post_content',
 			'edit_layout'   => 'expert',
-		) );
+		);
+	if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+	{
+		$admin_editor_params['temp_ID'] = $LinkOwner->get_ID();
+	}
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', $admin_editor_params );
 	$plugin_button = ob_get_flush();
 	if( empty( $plugin_button ) && $edited_Item->get_type_setting( 'use_text' ) != 'never')
 	{	// If button is not displayed by any plugin and text is allowed for current item type:
@@ -275,12 +301,7 @@ $Form->begin_form( '', '', $params );
 	// ####################### ATTACHMENTS/LINKS #########################
 	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
 	    $current_User->check_perm( 'files', 'view', false ) )
-	{	// If current user has a permission to view the files AND attachments are allowed for the item type:
-		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
-		// Initialize this object as global because this is used in many link functions:
-		global $LinkOwner;
-		$LinkOwner = new LinkItem( $edited_Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
-		// Display attachments fieldset:
+	{	// Display attachments fieldset:
 		$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
 		display_attachments_fieldset( $Form, $LinkOwner, false, $fold_images_attachments_block );
 	}
@@ -1103,24 +1124,29 @@ $Form->begin_form( '', '', $params );
 		echo '<p>';
 		if( $UserSettings->get_collection_setting( 'show_quick_publish', $Blog->ID ) )
 		{ // The quick button is displayed
-			echo action_icon( '', 'activate', $quick_setting_url.'hide_quick_button', T_('Show the quick "Publish!" button when relevant.'), 3, 4 );
+			echo action_icon( '', 'deactivate', $quick_setting_url.'hide_quick_button', T_('Show the quick "Publish!" button when relevant.'), 3, 4 );
 		}
 		else
 		{ // The quick button is hidden
-			echo action_icon( '', 'deactivate', $quick_setting_url.'show_quick_button', T_('Never show the quick "Publish!" button.'), 3, 4 );
+			echo action_icon( '', 'activate', $quick_setting_url.'show_quick_button', T_('Never show the quick "Publish!" button.'), 3, 4 );
 		}
 		echo '</p>';
 
 		// CALL PLUGINS NOW:
 		ob_start();
-		$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
-				'target_type'   => 'Item',
-				'target_object' => $edited_Item,
-				'content_id'    => 'itemform_post_content',
-				'edit_layout'   => 'expert_quicksettings',
+		$admin_editor_params = array(
+				'target_type'             => 'Item',
+				'target_object'           => $edited_Item,
+				'content_id'              => 'itemform_post_content',
+				'edit_layout'             => 'expert_quicksettings',
 				'quicksetting_item_start' => '<p id="quicksetting_wysiwyg_switch">',
-				'quicksetting_item_end' => '</p>'
-			) );
+				'quicksetting_item_end'   => '</p>'
+			);
+		if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+		{
+			$admin_editor_params['temp_ID'] = $LinkOwner->get_ID();
+		}
+		$Plugins->trigger_event( 'AdminDisplayEditorButton', $admin_editor_params );
 		$quick_setting_switch = ob_get_flush();
 	}
 

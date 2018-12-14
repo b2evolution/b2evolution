@@ -104,7 +104,7 @@ function cron_log_append( $message, $type = NULL, $nl = "\n" )
 			$cron_log_buffer_size = 0;
 		}
 
-		// We nust update cron log in DB in order to don't lost it on unexpected crash:
+		// We must update cron log in DB in order to don't lose it on unexpected crash:
 		global $DB, $ctsk_ID, $time_difference;
 		if( ! empty( $ctsk_ID ) )
 		{	// We can update only cron job which is executing right now:
@@ -112,8 +112,7 @@ function cron_log_append( $message, $type = NULL, $nl = "\n" )
 				  SET clog_messages = '.$DB->quote( $result_message ).',
 				      clog_actions_num = '.$DB->quote( $cron_log_actions_num ).',
 				      clog_realstop_datetime = '.$DB->quote( date2mysql( time() + $time_difference ) ).'
-				WHERE clog_ctsk_ID = '.$ctsk_ID.'
-				  AND clog_status = "started"',
+				WHERE clog_ctsk_ID = '.$ctsk_ID,
 				'Update a log message of the executing cron job #'.$ctsk_ID );
 		}
 	}

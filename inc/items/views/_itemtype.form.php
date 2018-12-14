@@ -85,11 +85,27 @@ $intro_type_disabled = $edited_Itemtype->is_intro();
 $intro_type_note = $intro_type_disabled ? T_('This feature is not compatible with Intro posts.') : '';
 
 $Form->begin_fieldset( T_('Features').get_manual_link( 'item-type-features' ), array( 'id' => 'itemtype_features' ) );
-	$Form->radio( 'ityp_use_short_title', $edited_Itemtype->use_short_title, array(
-			array( 'optional', T_('Optional') ),
-			array( 'never', T_('Never') ),
-		), T_('Use short title') );
-	$Form->radio( 'ityp_use_title', $edited_Itemtype->use_title, $options, T_('Use title') );
+	$Form->begin_line( T_('Use short title') );
+		$Form->radio( 'ityp_use_short_title', $edited_Itemtype->use_short_title, array(
+				array( 'optional', T_('Optional') ),
+				array( 'never', T_('Never') ),
+		), '' );
+		$Form->text_input( 'ityp_short_title_maxlen', $edited_Itemtype->short_title_maxlen, 3, '', '', array(
+				'type' => 'number',
+				'min' => 1,
+				'max' => 50,
+				'field_prefix' => '&nbsp;<strong>'.T_('Max. length').':</strong> ',
+			) );
+	$Form->end_line();
+	$Form->begin_line( T_('Use title') );
+		$Form->radio( 'ityp_use_title', $edited_Itemtype->use_title, $options, '' );
+		$Form->text_input( 'ityp_title_maxlen', $edited_Itemtype->title_maxlen, 3, '', '', array(
+				'type' => 'number',
+				'min' => 1,
+				'max' => 255,
+				'field_prefix' => '&nbsp;<strong>'.T_('Max. length').':</strong> ',
+			) );
+	$Form->end_line();
 	$Form->radio( 'ityp_use_text', $edited_Itemtype->use_text, $options, T_('Use text') );
 	$Form->checkbox( 'ityp_allow_html', $edited_Itemtype->allow_html, T_('Allow HTML'), T_( 'Check to allow HTML in posts.' ).' ('.T_('HTML code will pass several sanitization filters.').')' );
 	$Form->checkbox( 'ityp_allow_breaks', $edited_Itemtype->allow_breaks, T_('Allow Teaser and Page breaks'), $intro_type_note, '', 1, $intro_type_disabled );

@@ -149,27 +149,31 @@ class item_title_Widget extends ComponentWidget
 				'edit_link_class'   => button_class( 'text' ),
 			), $params['widget_item_title_params'] );
 
-		if( $params['widget_item_title_display'] )
+		ob_start();
+		$Item->title( array(
+			'before' => $widget_params['before'],
+			'after'  => $widget_params['after'],
+			'link_type' => $widget_params['link_type'],
+		) );
+
+		if( $widget_params['edit_link_display'] )
+		{
+			$Item->edit_link( array(
+				'before' => $widget_params['before_edit_link'],
+				'after'  => $widget_params['after_edit_link'],
+				'text'   => $widget_params['edit_link_text'],
+				'class'  => $widget_params['edit_link_class'],
+			) );
+		}
+		$item_title = ob_get_clean();
+
+		if( $params['widget_item_title_display'] && ! empty( $item_title ) )
 		{
 			echo $this->disp_params['block_start'];
 			$this->disp_title();
 			echo $this->disp_params['block_body_start'];
 
-			$Item->title( array(
-				'before' => $widget_params['before'],
-				'after'  => $widget_params['after'],
-				'link_type' => $widget_params['link_type'],
-			) );
-
-			if( $widget_params['edit_link_display'] )
-			{
-				$Item->edit_link( array(
-					'before' => $widget_params['before_edit_link'],
-					'after'  => $widget_params['after_edit_link'],
-					'text'   => $widget_params['edit_link_text'],
-					'class'  => $widget_params['edit_link_class'],
-				) );
-			}
+			echo $item_title;
 
 			echo $this->disp_params['block_body_end'];
 			echo $this->disp_params['block_end'];
@@ -177,6 +181,7 @@ class item_title_Widget extends ComponentWidget
 			return true;
 		}
 
+		$this->display_debug_message();
 		return false;
 	}
 }

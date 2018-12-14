@@ -1234,6 +1234,14 @@ class Skin extends DataObject
 					// Require functions.js to show/hide a panel with filters:
 					require_js( 'functions.js', 'blog' );
 
+					// Require Fine Uploader js and css:
+					require_js( 'multiupload/fine-uploader.js', 'blog' );
+					require_css( 'fine-uploader.css', 'blog' );
+
+					// Load JS files to make the links table sortable:
+					require_js( '#jquery#', 'blog' );
+					require_js( 'jquery/jquery.sortable.min.js', 'blog' );
+
 					// Include this file to expand/collapse the filters panel when JavaScript is disabled
 					global $inc_path;
 					require_once $inc_path.'_filters.inc.php';
@@ -1413,6 +1421,9 @@ class Skin extends DataObject
 
 					// Used to autocomplete usernames in textarea:
 					init_autocomplete_usernames_js( 'blog' );
+
+					// Used to switch to advanced editing:
+					require_js( 'backoffice.js', 'blog' );
 					break;
 
 				case 'disp_useritems':
@@ -1466,14 +1477,17 @@ var downloadInterval = setInterval( function()
 			}
 		}
 
+		// Check if current page has a marketing popup container:
+		$marketing_popup_container_code = $Blog->get_marketing_popup_container();
+
 		// Load general JS file:
 		if( $this->get_api_version() == 6 )
 		{ // Bootstrap skin
-			require_js( 'build/bootstrap-evo_frontoffice.bmin.js', 'blog' );
+			require_js( $marketing_popup_container_code ? 'build/bootstrap-evo_frontoffice-with-ddexitpop.bmin.js' : 'build/bootstrap-evo_frontoffice.bmin.js', 'blog' );
 		}
 		else
 		{ // Standard skin
-			require_js( 'build/evo_frontoffice.bmin.js', 'blog' );
+			require_js( $marketing_popup_container_code ? 'build/evo_frontoffice-with-ddexitpop.bmin.js' : 'build/evo_frontoffice.bmin.js', 'blog' );
 		}
 
 		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )

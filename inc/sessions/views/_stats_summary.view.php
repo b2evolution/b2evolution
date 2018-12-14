@@ -40,153 +40,27 @@ display_hits_summary_panel( $diagram_columns );
 $diagram_columns = get_filtered_hits_diagram_columns( 'global', $diagram_columns );
 
 // Check if it is a mode to display a live data:
-$is_live_mode = ( get_hits_summary_mode() == 'live' );
+$hits_summary_mode = get_hits_summary_mode();
+$is_live_mode = ( $hits_summary_mode == 'live' );
 
-// fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
-// Bug report: http://lists.mysql.com/bugs/36
-// Solution : CAST to string
-// TODO: I've also limited this to hit_agent_type "browser" here, according to the change for "referers" (Rev 1.6)
-//       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
-$SQL = new SQL( 'Get global hits summary ('.( $is_live_mode ? 'Live data' : 'Aggregate data' ).')' );
-if( $is_live_mode )
-{	// Get the live data:
-	$SQL->SELECT( 'SQL_NO_CACHE COUNT( * ) AS hits, hit_agent_type, hit_type,
-		EXTRACT( YEAR FROM hit_datetime ) AS year,
-		EXTRACT( MONTH FROM hit_datetime ) AS month,
-		EXTRACT( DAY FROM hit_datetime ) AS day' );
-	$SQL->FROM( 'T_hitlog' );
-	if( ! empty( $sec_ID ) )
-	{	// Filter by section:
-		$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
-		$SQL->WHERE( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
-	}
-	if( $blog > 0 )
-	{	// Filter by collection:
-		$SQL->WHERE( 'hit_coll_ID = '.$DB->quote( $blog ) );
-	}
+// Get hits data for chart and table:
+$res_hits = get_hits_results_global( $hits_summary_mode );
 
-	$hits_start_date = NULL;
-	$hits_end_date = date( 'Y-m-d' );
-}
-else
-{	// Get the aggregated data:
-	$SQL->SELECT( 'SUM( hagg_count ) AS hits, hagg_agent_type AS hit_agent_type, hagg_type AS hit_type,
-		EXTRACT( YEAR FROM hagg_date ) AS year,
-		EXTRACT( MONTH FROM hagg_date ) AS month,
-		EXTRACT( DAY FROM hagg_date ) AS day' );
-	$SQL->FROM( 'T_hits__aggregate' );
-	if( ! empty( $sec_ID ) )
-	{	// Filter by section:
-		$SQL->FROM_add( 'LEFT JOIN T_blogs ON hagg_coll_ID = blog_ID' );
-		$SQL->WHERE( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
-	}
-	if( $blog > 0 )
-	{	// Filter by collection:
-		$SQL->WHERE( 'hagg_coll_ID = '.$DB->quote( $blog ) );
-	}
-	// Filter by date:
-	list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates();
-	$SQL->WHERE_and( 'hagg_date >= '.$DB->quote( $hits_start_date ) );
-	$SQL->WHERE_and( 'hagg_date <= '.$DB->quote( $hits_end_date ) );
-}
-$SQL->GROUP_BY( 'year, month, day, hit_agent_type, hit_type' );
-$SQL->ORDER_BY( 'year DESC, month DESC, day DESC, hit_agent_type, hit_type' );
-$res_hits = $DB->get_results( $SQL, ARRAY_A );
-
-
-/*
- * Chart
- */
 if( count( $res_hits ) )
 {
 	// Initialize params to filter by selected collection and/or group:
 	$section_params = empty( $blog ) ? '' : '&blog='.$blog;
 	$section_params .= empty( $sec_ID ) ? '' : '&sec_ID='.$sec_ID;
 
-	// Find the dates without hits and fill them with 0 to display on graph and table:
-	$res_hits = fill_empty_hit_days( $res_hits, $hits_start_date, $hits_end_date );
+	// Display diagram for live or aggregated data:
+	display_hits_diagram( 'global', $diagram_columns, $res_hits );
 
-	$last_date = 0;
-
-	// Initialize the data to open an url by click on bar item:
-	$chart['link_data'] = array();
-	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&hit_type=$param1$&agent_type=$param2$';
-	$chart['link_data']['params'] = array();
-
-	// This defines what hits will go where
-	// This maps a 'hit_type' (from any agent type that is 'browser' or 'robot') to a column
-	// OR it can also map 'hit_type'_'hit_agent_type' (concatenated with _ ) to a column
-	// OR the 'unknown' column will get ANY hits from an unknown user agent (this will go to the "other" column)
-	$col_mapping = array();
-	$col_num = 1;
-	$chart[ 'chart_data' ][ 0 ] = array();
-	foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
-	{
-		$chart[ 'chart_data' ][ $col_num ] = array();
-		$chart['link_data']['params'][] = $diagram_column_data['link_data'];
-		$col_mapping[ $diagram_column_key ] = $col_num++;
+	if( ! $is_live_mode )
+	{	// Display diagram to compare hits:
+		display_hits_filter_form( 'compare', $diagram_columns );
+		$prev_res_hits = get_hits_results_global( 'compare' );
+		display_hits_diagram( 'global', $diagram_columns, $prev_res_hits, 'cmpcanvasbarschart' );
 	}
-
-	$chart['dates'] = array();
-
-	$count = 0;
-	foreach( $res_hits as $row_stats )
-	{
-		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
-		if( $last_date != $this_date )
-		{ // We just hit a new day, let's display the previous one:
-			$last_date = $this_date;	// that'll be the next one
-			$count ++;
-			array_unshift( $chart[ 'chart_data' ][ 0 ], date( 'D '.locale_datefmt(), $last_date ) );
-			$col_num = 1;
-			foreach( $diagram_columns as $diagram_column_data )
-			{
-				array_unshift( $chart[ 'chart_data' ][ $col_num++ ], 0 );
-			}
-
-			array_unshift( $chart['dates'], $last_date );
-		}
-
-		if( $row_stats['hit_agent_type'] == 'unknown' )
-		{	// only those hits are calculated which hit_agent_type = unknown
-			$hit_key = $row_stats['hit_agent_type'];
-		}
-		elseif( ! empty ( $col_mapping[$row_stats['hit_type'].'_'.$row_stats['hit_agent_type']] ) )
-		{	// those hits are calculated here if hit_type = standard and hit_agent_type = browser, robot
-			$hit_key = $row_stats['hit_type'].'_'.$row_stats['hit_agent_type'];
-		}
-		elseif( ! empty ( $col_mapping[$row_stats['hit_type']] ) )
-		{	// those hits are calculated here which did not match either of the above rules
-			$hit_key = $row_stats['hit_type'];
-		}
-		else
-		{
-			$hit_key = NULL;
-		}
-
-		if( isset( $col_mapping[ $hit_key ] ) )
-		{
-			$chart['chart_data'][ $col_mapping[ $hit_key ] ][0] += $row_stats['hits'];
-		}
-	}
-
-	// Initialize titles and colors for diagram columns:
-	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
-	$col_num = 1;
-	$chart['series_color'] = array();
-	foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
-	{
-		$chart['series_color'][ $col_num ] = $diagram_column_data['color'];
-		array_unshift( $chart[ 'chart_data' ][ $col_num++ ], $diagram_column_data['title'] );
-	}
-
-	$chart[ 'canvas_bg' ] = array( 'width'  => '100%', 'height' => 355 );
-
-	echo '<div class="center">';
-	load_funcs('_ext/_canvascharts.php');
-	CanvasBarsChart( $chart );
-	echo '</div>';
-
 
 	/*
 	 * Table:

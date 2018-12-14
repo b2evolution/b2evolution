@@ -1471,6 +1471,13 @@ function skin_init( $disp )
 
 			// Restrict comment status by parent item:
 			$edited_Comment->restrict_status();
+
+			// require Fine Uploader js and css:
+			require_js( 'multiupload/fine-uploader.js' );
+			require_css( 'fine-uploader.css' );
+			// Load JS files to make the links table sortable:
+			require_js( '#jquery#' );
+			require_js( 'jquery/jquery.sortable.min.js' );
 			break;
 
 		case 'useritems':
@@ -2936,6 +2943,7 @@ function get_skin_default_containers()
 			'item_single_header'        => array( NT_('Item Single Header'), 50 ),
 			'item_single'               => array( NT_('Item Single'), 51 ),
 			'item_page'                 => array( NT_('Item Page'), 55 ),
+			'comment_area'              => array( NT_('Comment Area'), 60 ),
 			'sidebar'                   => array( NT_('Sidebar'), 80 ),
 			'sidebar_2'                 => array( NT_('Sidebar 2'), 90 ),
 			'footer'                    => array( NT_('Footer'), 100 ),
@@ -2957,12 +2965,13 @@ function get_skin_default_containers()
  * @todo do not install if skin doesn't exist. Important for upgrade. Need to NOT fail if ZERO skins installed though :/
  *
  * @param string Skin folder
- * @return Skin
+ * @param boolean TRUE if function should die on error
+ * @return object Skin
  */
-function & skin_install( $skin_folder )
+function & skin_install( $skin_folder, $halt_on_error = false )
 {
 	$SkinCache = & get_SkinCache();
-	$Skin = & $SkinCache->new_obj( NULL, $skin_folder );
+	$Skin = & $SkinCache->new_obj( NULL, $skin_folder, $halt_on_error );
 
 	$Skin->install();
 

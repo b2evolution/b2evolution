@@ -142,10 +142,10 @@ switch( $action )
 				$source = param( 'source', 'string', true );
 				$registration_require_firstname = ( param( 'ask_firstname', 'string', true ) == 'required' );
 				$registration_require_lastname = ( param( 'ask_lastname', 'string', true ) == 'required' );
+				$registration_require_country = ( param( 'ask_country', 'string', true ) == 'required' );
 				$user_tags = param( 'usertags', 'string', NULL );
 				$auto_subscribe_posts = param( 'subscribe_post', 'integer', true );
 				$auto_subscribe_comments = param( 'subscribe_comment', 'integer', true );
-				$auto_subscribe_posts_mod = param( 'subscribe_post_mod', 'integer', true );
 				$newsletters = param( 'newsletters', 'string', true );
 				$newsletters = explode( ',', $newsletters );
 				$widget_newsletters = array();
@@ -159,7 +159,6 @@ switch( $action )
 			}
 
 			// Check what fields should be required by current widget:
-			$registration_require_country = false;
 			$registration_require_gender = false;
 		}
 
@@ -169,7 +168,7 @@ switch( $action )
 			$user_register_quick_Widget = & $WidgetCache->get_by_ID( $widget, false, false );
 			if( ! $user_register_quick_Widget ||
 					$user_register_quick_Widget->code != 'user_register_quick' ||
-					( $is_quick && $user_register_quick_Widget->get( 'coll_ID' ) != $Blog->ID ) )
+					( $is_quick && $user_register_quick_Widget->get( 'coll_ID' ) !== NULL && $user_register_quick_Widget->get( 'coll_ID' ) != $Blog->ID ) )
 			{ // Wrong or hacked request!
 				debug_die( 'Quick registration is currently disabled on this system.' );
 				break;
@@ -182,9 +181,9 @@ switch( $action )
 			$source = $user_register_quick_Widget->disp_params['source'];
 			$registration_require_firstname = ( $user_register_quick_Widget->disp_params['ask_firstname'] == 'required' );
 			$registration_require_lastname = ( $user_register_quick_Widget->disp_params['ask_lastname'] == 'required' );
-			$auto_subscribe_posts = $user_register_quick_Widget->disp_params['subscribe_post'];
-			$auto_subscribe_comments = $user_register_quick_Widget->disp_params['subscribe_comment'];
-			$auto_subscribe_posts_mod = $user_register_quick_Widget->disp_params['subscribe_post_mod'];
+			$registration_require_country = ( $user_register_quick_Widget->disp_params['ask_country'] == 'required' );
+			$auto_subscribe_posts = $user_register_quick_Widget->disp_params['subscribe']['post'];
+			$auto_subscribe_comments = $user_register_quick_Widget->disp_params['subscribe']['comment'];
 			$widget_newsletters = $user_register_quick_Widget->disp_params['newsletters'];
 			$user_tags = $user_register_quick_Widget->disp_params['usertags'];
 			$widget_redirect_to = trim( $user_register_quick_Widget->disp_params['redirect_to'] );
@@ -488,10 +487,10 @@ switch( $action )
 		$UserSettings->dbupdate();
 
 		// Auto subscribe new user to current collection posts/comments:
-		if( ! empty( $subscribe_coll_ID ) && ( ! empty( $auto_subscribe_posts ) || ! empty( $auto_subscribe_comments ) || ! empty( $auto_subscribe_posts_mod ) ) )
+		if( ! empty( $subscribe_coll_ID ) && ( ! empty( $auto_subscribe_posts ) || ! empty( $auto_subscribe_comments ) ) )
 		{ // If at least one option is enabled
 			$DB->query( 'REPLACE INTO T_subscriptions ( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
-					VALUES ( '.$DB->quote( $subscribe_coll_ID ).', '.$DB->quote( $new_User->ID ).', '.$DB->quote( intval( $auto_subscribe_posts ) ).', '.$DB->quote( intval( $auto_subscribe_posts_mod ) ).', '.$DB->quote( intval( $auto_subscribe_comments ) ).' )' );
+					VALUES ( '.$DB->quote( $subscribe_coll_ID ).', '.$DB->quote( $new_User->ID ).', '.$DB->quote( intval( $auto_subscribe_posts ) ).', 0, '.$DB->quote( intval( $auto_subscribe_comments ) ).' )' );
 		}
 
 		// Get user domain status:

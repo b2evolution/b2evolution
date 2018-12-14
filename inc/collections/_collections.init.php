@@ -915,6 +915,9 @@ class collections_Module extends Module
 							'other' => array(
 								'text' => T_('Other displays'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other&amp;blog='.$blog ),
+							'popup' => array(
+								'text' => T_('Popups'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=popup&amp;blog='.$blog ),
 							'more' => array(
 								'text' => T_('More'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=more&amp;blog='.$blog ),
@@ -1096,7 +1099,7 @@ class collections_Module extends Module
 	{
 		return array(
 			'create-post-by-email' => array(
-				'name'   => T_('Create posts by email'),
+				'name'   => T_('Create posts by email').' ('.T_('Deprecated').')',
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_post_by_email.job.php',
 				'params' => NULL,
@@ -1388,7 +1391,7 @@ class collections_Module extends Module
 				}
 				else
 				{	// Subscribe to newsletter:
-					if( $current_User->is_subscribed( $Newsletter->ID ) || $current_User->subscribe( $Newsletter->ID ) )
+					if( $current_User->is_subscribed( $Newsletter->ID ) || $current_User->subscribe( $Newsletter->ID, array( 'usertags' => $insert_user_tags ) ) )
 					{
 						if( ! empty( $insert_user_tags ) )
 						{

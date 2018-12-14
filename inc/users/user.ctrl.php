@@ -552,6 +552,50 @@ if( !$Messages->has_errors() )
 			$edited_User->subrg_ID = param( 'edited_user_subrg_ID', 'integer', 0 );
 			break;
 
+		case 'delete_all_sent_emails':
+			// Delete all emails sent to the edited user:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			// Check edit permissions:
+			$current_User->check_perm( 'emails', 'edit', true );
+
+			if( param( 'confirm', 'integer', 0 ) )
+			{	// confirmed
+				if( $edited_User->delete_sent_emails() )
+				{	// The blogs were deleted successfully
+					$Messages->add( T_('All emails sent to the user were deleted.'), 'success' );
+
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=user&user_tab=activity&user_ID='.$user_ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+				}
+			}
+			break;
+
+		case 'delete_all_email_returns':
+			// Delete all email returns from the edited user's email address:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			// Check edit permissions:
+			$current_User->check_perm( 'emails', 'edit', true );
+
+			if( param( 'confirm', 'integer', 0 ) )
+			{	// confirmed
+				if( $edited_User->delete_email_returns() )
+				{	// The blogs were deleted successfully
+					$Messages->add( T_('All email returns from the user\'s email address were deleted.'), 'success' );
+
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=user&user_tab=activity&user_ID='.$user_ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+				}
+			}
+			break;
+
 		case 'delete_all_blogs':
 			// Delete all blogs of edited user recursively
 
@@ -702,6 +746,8 @@ if( !$Messages->has_errors() )
 			{	// confirmed
 				$user_login = $edited_User->dget( 'login' );
 
+				$edited_User->delete_sent_emails();
+				$edited_User->delete_email_returns();
 				$edited_User->delete_messages();
 				$edited_User->delete_comments();
 				$edited_User->delete_posts( 'created|edited' );
@@ -1129,13 +1175,29 @@ switch( $action )
 				load_funcs( 'polls/model/_poll.funcs.php' );
 				$AdminUI->disp_payload_begin();
 
-				if( in_array( $action, array( 'delete_all_blogs', 'delete_all_posts_created', 'delete_all_posts_edited', 'delete_all_comments', 'delete_all_messages', 'delete_all_polls', 'delete_all_userdata' ) ) )
+				if( in_array( $action, array( 'delete_all_sent_emails', 'delete_all_email_returns', 'delete_all_blogs', 'delete_all_posts_created', 'delete_all_posts_edited', 'delete_all_comments', 'delete_all_messages', 'delete_all_polls', 'delete_all_userdata' ) ) )
 				{	// We need to ask for confirmation before delete:
 					param( 'user_ID', 'integer', 0 , true ); // Memorize user_ID
 					// Create Data Object to user only one method confirm_delete()
 					$DataObject = new DataObject( '' );
 					switch( $action )
 					{
+						case 'delete_all_sent_emails':
+							$sent_emails_count = $edited_User->get_num_sent_emails();
+							if( $sent_emails_count > 0 )
+							{	// Display a confirm message if curent user can delete at least one email log of the edited user:
+								$confirm_message = sprintf( T_('Delete %d emails sent to the user?'), $sent_emails_count );
+							}
+							break;
+
+						case 'delete_all_email_returns':
+							$email_returns_count = $edited_User->get_num_email_returns();
+							if( $email_returns_count > 0 )
+							{	// Display a confirm message if curent user can delete at least one email returns of the edited user:
+								$confirm_message = sprintf( T_('Delete %d email returns from the user\'s email address?'), $email_returns_count );
+							}
+							break;
+
 						case 'delete_all_blogs':
 							$deleted_blogs_count = count( $edited_User->get_deleted_blogs() );
 							if( $deleted_blogs_count > 0 )
@@ -1187,6 +1249,16 @@ switch( $action )
 							if(  $current_User->ID != $edited_User->ID && $edited_User->ID != 1 )
 							{	// User can NOT delete admin and own account:
 								$confirm_messages = array();
+								$sent_emails_count = $edited_User->get_num_sent_emails();
+								if( $sent_emails_count > 0 && $current_User->check_perm( 'emails', 'edit' ) )
+								{	// Display a confirm message if curent user can delete at least one email sent log of the edited user:
+									$confirm_messages[] = array( sprintf( T_('%d emails sent to the user'), $sent_emails_count ), 'warning' );
+								}
+								$email_returns_count = $edited_User->get_num_email_returns();
+								if( $email_returns_count > 0 && $current_User->check_perm( 'emails', 'edit' ) )
+								{	// Display a confirm message if curent user can delete at least one email return of the edited user:
+									$confirm_messages[] = array( sprintf( T_('%d email returns from the user\'s email address'), $email_returns_count ), 'warning' );
+								}
 								$deleted_blogs_count = count( $edited_User->get_deleted_blogs() );
 								if( $deleted_blogs_count > 0 )
 								{	// Display a confirm message if curent user can delete at least one blog of the edited user:

@@ -412,6 +412,7 @@ class Blog extends DataObject
 				$this->set_setting( 'in_skin_editing', '1' );
 				$this->set_setting( 'posts_per_page', 30 );
 				$this->set_setting( 'allow_html_comment', 0 );
+				$this->set_setting( 'comment_maxlen', '' );
 				$this->set_setting( 'orderby', 'contents_last_updated_ts' );
 				$this->set_setting( 'orderdir', 'DESC' );
 				$this->set_setting( 'enable_goto_blog', 'post' );
@@ -1092,6 +1093,7 @@ class Blog extends DataObject
 
 			$this->set_setting( 'comments_detect_email', param( 'comments_detect_email', 'integer', 0 ) );
 			$this->set_setting( 'comments_register', param( 'comments_register', 'integer', 0 ) );
+			$this->set_setting( 'meta_comments_frontoffice', param( 'meta_comments_frontoffice', 'integer', 0 ) );
 		}
 
 		if( in_array( 'contact', $groups ) )
@@ -1171,6 +1173,24 @@ class Blog extends DataObject
 			$this->set_setting( 'archive_mode', param( 'archive_mode', 'string', true ) );
 		}
 
+		if( in_array( 'popup', $groups ) )
+		{ // we want to load the popups settings:
+
+			// Marketing Popup:
+			$this->set_setting( 'marketing_popup_using', param( 'marketing_popup_using', 'string' ) );
+			$this->set_setting( 'marketing_popup_animation', param( 'marketing_popup_animation', 'string' ) );
+			$container_disps = array( 'front', 'posts', 'single', 'page', 'catdir' );
+			foreach( $container_disps as $container_disp )
+			{
+				$this->set_setting( 'marketing_popup_container_'.$container_disp, param( 'marketing_popup_container_'.$container_disp, 'string' ) );
+			}
+			$this->set_setting( 'marketing_popup_container_other_disps', param( 'marketing_popup_container_other_disps', 'string' ) );
+			$this->set_setting( 'marketing_popup_show_repeat', param( 'marketing_popup_show_repeat', 'integer', 0 ) );
+			$this->set_setting( 'marketing_popup_show_frequency', param( 'marketing_popup_show_frequency', 'string' ) );
+			$this->set_setting( 'marketing_popup_show_period_val', param( 'marketing_popup_show_period_val', 'integer', NULL ), true );
+			$this->set_setting( 'marketing_popup_show_period_unit', param( 'marketing_popup_show_period_unit', 'string' ) );
+		}
+
 		if( in_array( 'more', $groups ) )
 		{ // we want to load more settings:
 
@@ -1209,6 +1229,7 @@ class Blog extends DataObject
 			$this->set_setting( 'require_anon_name', param( 'require_anon_name', 'string', '0' ) );
 			$this->set_setting( 'require_anon_email', param( 'require_anon_email', 'string', '0' ) );
 			$this->set_setting( 'allow_anon_url', param( 'allow_anon_url', 'string', '0' ) );
+			$this->set_setting( 'comment_maxlen', param( 'comment_maxlen', 'integer', '' ) );
 			$this->set_setting( 'allow_html_comment', param( 'allow_html_comment', 'string', '0' ) );
 			$this->set_setting( 'allow_attachments', param( 'allow_attachments', 'string', 'registered' ) );
 			$this->set_setting( 'max_attachments', param( 'max_attachments', 'integer', '' ) );
@@ -6370,7 +6391,7 @@ class Blog extends DataObject
 		$working_cat = $cat;
 		if( empty( $cat ) )
 		{	// Use default collection category when global category is not defined:
-			$working_cat = $this->get_setting( 'default_cat_ID' );
+			$working_cat = $this->get_default_cat_ID();
 		}
 
 		$ChapterCache = & get_ChapterCache();
@@ -6450,6 +6471,81 @@ class Blog extends DataObject
 		}
 
 		return isset( $denominations[ $position ] ) ? $denominations[ $position ] : '';
+	}
+
+
+	/**
+	 * Get a marketing popup container code if it is enabled for current requested page
+	 *
+	 * @return string|boolean Container code, FALSE if marketing popup is not enabled
+	 */
+	function get_marketing_popup_container()
+	{
+		if( is_admin_page() )
+		{	// Don't display on back-office:
+			return false;
+		}
+
+		if( $this->get_setting( 'marketing_popup_using' ) == 'never' )
+		{	// Marketing popup is disabled for all users:
+			return false;
+		}
+
+		if( is_logged_in() && $this->get_setting( 'marketing_popup_using' ) == 'anonymous' )
+		{	// Marketing popup is enabled only for anonymous users:
+			return false;
+		}
+
+		// Get widget container code depending on current disp:
+		global $disp;
+		$container_disp = in_array( $disp, array( 'front', 'posts', 'single', 'page', 'catdir' ) ) ? $disp : 'other_disps';
+		$container_code = $this->get_setting( 'marketing_popup_container_'.$container_disp );
+
+		if( empty( $container_code ) )
+		{	// Don't try to find a widget container without code:
+			return false;
+		}
+
+		// Check if widget container realy exists in DB for current collection or it is a shared container:
+		$WidgetContainerCache = & get_WidgetContainerCache();
+		$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $this->ID, $this->get_skin_type(), $container_code );
+
+		return $WidgetContainer ? $container_code : false;
+	}
+
+
+	/**
+	 * Initialize JS & CSS for marketing popup container
+	 */
+	function init_marketing_popup_container()
+	{
+		$marketing_popup_container_code = $this->get_marketing_popup_container();
+		if( $marketing_popup_container_code )
+		{	// If marketing popup is enabled for current page and user:
+			// Load CSS right in the current calling place:
+			require_css( 'ddexitpop.bmin.css', 'blog', NULL, NULL, '#', true );
+			// Initialize JS code to display a marketing popup:
+			$marketing_popup_show_frequency = $this->get_setting( 'marketing_popup_show_frequency' );
+			if( $marketing_popup_show_frequency == 'period' )
+			{	// Use period frequency like X hours or X days:
+				$marketing_popup_show_frequency = $this->get_setting( 'marketing_popup_show_period_val' )
+					.$this->get_setting( 'marketing_popup_show_period_unit' );
+			}
+			echo '<script type="text/javascript">
+			// <![CDATA[
+			jQuery( function()
+			{
+				ddexitpop.init(
+				{
+					contentsource: ["id", "evo_container__'.$marketing_popup_container_code.'"],
+					fxclass: "'.$this->get_setting( 'marketing_popup_animation' ).'",
+					hideaftershow: '.( $this->get_setting( 'marketing_popup_show_repeat' ) ? 'false' : 'true' ).',
+					displayfreq: "'.$marketing_popup_show_frequency.'",
+				} )
+			} )
+			// ]]>
+			</script>';
+		}
 	}
 }
 

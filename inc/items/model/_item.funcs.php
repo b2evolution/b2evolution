@@ -201,8 +201,14 @@ function init_inskin_editing()
 		$edited_Item->set_creator_location( 'subregion' );
 		$edited_Item->set_creator_location( 'city' );
 
-		// Set object params:
+		// Set prefilled params from _GET request like 'cat', 'item_typ_ID' and etc.:
 		$edited_Item->load_from_Request( /* editing? */ false, /* creating? */ true );
+
+		// Clear all errors which were generated in the Item->load_from_Request() above,
+		// because we should not display them on first opening the item form:
+		global $Messages, $param_input_err_messages;
+		$Messages->clear();
+		$param_input_err_messages = NULL;
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
@@ -252,7 +258,7 @@ function init_inskin_editing()
  *                 "1,2,3":blog IDs separated by comma
  *                 "-": current blog only and exclude the aggregated blogs
  * @param boolean FALSE if FeaturedList cursor should move, TRUE otherwise
- * @param boolean Load featured post together with requested post types like intro but order the featured post below intro posts
+ * @param boolean Load featured post together with requested post types like intro but order the featured post below intro posts, NULL - to don't load featured post even when no intro post
  * @param boolean Load intro items
  * @return Item
  */
@@ -268,7 +274,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 		return $Item;
 	}
 
-	if( $featured_list_type != $load_featured )
+	if( $featured_list_type !== $load_featured )
 	{	// Reset a featured list if previous request was to load another type:
 		$FeaturedList = NULL;
 	}
@@ -350,7 +356,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 
 		// SECOND: If no Intro, try to find an Featured post:
 
-		if( ! $load_featured && // Don't try to load featured posts twice,
+		if( $load_featured === false && // Don't try to load featured posts twice,
 		    $FeaturedList->result_num_rows == 0 && // If no intro post has been load above,
 		    $restrict_disp != 'front' && // Exclude front page,
 		    $Blog->get_setting( 'disp_featured_above_list' ) ) // If the collection setting "Featured post above list" is enabled.
@@ -2133,31 +2139,61 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
  *
  * @param object Form
  * @param object edited Item
+ * @param string Action: NULL - to get action from global var
  */
-function echo_item_status_buttons( $Form, $edited_Item )
+function echo_item_status_buttons( $Form, $edited_Item, $button_action = NULL )
 {
 	global $next_action, $action, $Collection, $Blog;
 
+	if( $edited_Item !== NULL )
+	{	// If the edited Item is defined, e-g on edit form:
+		$item_status = $edited_Item->status;
+	}
+	else
+	{	// If item is not defined, e-g on action for several items from list:
+		$item_status = get_highest_publish_status( 'post', $Blog->ID, false );
+	}
+
+	$next_action = ( $button_action === NULL ? ( is_create_action( $action ) ? 'create' : 'update' ) : $button_action );
+
 	// Get those statuses which are not allowed for the current User to create posts in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status, '', $edited_Item ), array( 'trash' ) );
-	// Get allowed visibility statuses
-	$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
+	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $item_status, '', $edited_Item ), array( 'trash' ) );
+	// Get allowed visibility statuses:
+	if( $next_action == 'items_visibility' )
+	{
+		$status_options = get_visibility_statuses( '', $exclude_statuses );
+		foreach( $status_options as $status_key => $status_title )
+		{
+			$status_options[ $status_key ] = sprintf( T_('Set visibility to %s'), $status_title );
+		}
+		$tooltip_placement = 'bottom';
+	}
+	else // 'create' or 'update'
+	{
+		$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
+		$status_options = array_map( 'T_', $status_options );
+		$tooltip_placement = 'left';
+	}
+
+	if( empty( $status_options ) )
+	{	// If current User has no permission to edit to any status:
+		return;
+	}
+
 	$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 
-	$next_action = ( is_create_action( $action ) ? 'create' : 'update' );
-
-	$Form->hidden( 'post_status', $edited_Item->status );
-	echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
-	echo '<button type="submit" class="btn btn-status-'.$edited_Item->status.'" name="actionArray['.$next_action.']">'
-				.'<span>'.T_( $status_options[ $edited_Item->status ] ).'</span>'
+	$Form->hidden( 'post_status', $item_status );
+	echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="'.$tooltip_placement.'" data-container="body" title="'.get_status_tooltip_title( $item_status ).'">';
+	echo '<button type="submit" class="btn btn-status-'.$item_status.'" name="actionArray['.$next_action.']">'
+				.'<span>'.$status_options[ $item_status ].'</span>'
 			.'</button>'
-			.'<button type="button" class="btn btn-status-'.$edited_Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
+			.'<button type="button" class="btn btn-status-'.$item_status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
 				.'<span class="caret"></span>'
 			.'</button>';
 	echo '<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
 	foreach( $status_options as $status_key => $status_title )
 	{
-		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.T_( $status_title ).'</span></a></li>';
+		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
 	}
 	echo '</ul>';
 	echo '</div>';
@@ -2261,17 +2297,18 @@ function echo_status_dropdown_button_js( $type = 'post' )
 			var item = jQuery( this ).parent();
 			var status = item.attr( 'rel' );
 			var btn_group = item.parent().parent();
-			var dropdown_buttons = item.parent().parent().find( 'button' );
+			var btn_wrapper = btn_group.parent().parent();
+			var dropdown_buttons = btn_group.find( 'button' );
 			var first_button = dropdown_buttons.parent().find( 'button:first' );
-			var save_buttons = jQuery( '.edit_actions input[type="submit"]:not(.quick-publish)' ).add( dropdown_buttons );
+			var save_buttons = btn_wrapper.find( 'input[type="submit"]:not(.quick-publish)' ).add( dropdown_buttons );
 
 			if( status == 'published' )
 			{ // Hide button "Publish!" if current status is already the "published":
-				jQuery( '.edit_actions .quick-publish' ).hide();
+				btn_wrapper.find( '.quick-publish' ).hide();
 			}
 			else
 			{ // Show button "Publish!" only when another status is selected:
-				jQuery( '.edit_actions .quick-publish' ).show();
+				btn_wrapper.find( '.quick-publish' ).show();
 			}
 
 			save_buttons.each( function()
@@ -2280,7 +2317,7 @@ function echo_status_dropdown_button_js( $type = 'post' )
 			} );
 			first_button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
 			jQuery( 'input[type=hidden][name=<?php echo $type; ?>_status]' ).val( status ); // update hidden field to new status value
-			item.parent().parent().removeClass( 'open' ); // hide dropdown menu
+			btn_group.removeClass( 'open' ); // hide dropdown menu
 
 			if( first_button.attr( 'type' ) == 'submit' )
 			{ // Submit form if current dropdown button is used to submit form
@@ -4565,6 +4602,78 @@ function item_priority_color( $priority )
 	$colors = item_priority_colors();
 
 	return isset( $colors[ $priority ] ) ? '#'.$colors[ $priority ] : 'none';
+}
+
+
+/**
+ * Prints out Javascript to open image insert modal
+ */
+function echo_image_insert_modal()
+{
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+?>
+<script type="text/javascript">
+	function evo_item_image_insert( blog, tagType, linkID )
+	{
+		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
+		var evo_js_lang_insert_image = '<?php echo T_('Insert image into post');?>';
+		var evo_js_lang_modal_action = '<?php echo TS_('Insert');?>';
+		evo_js_lang_close = '<?php echo TS_('Cancel');?>';
+
+		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '"></span>',
+			'800px', '480px', true, evo_js_lang_insert_image, evo_js_lang_modal_action, true );
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url(); ?>anon_async.php',
+			data:
+			{
+				'action': 'get_insert_image_form',
+				'tag_type': tagType,
+				'link_ID': linkID,
+				'blog': blog,
+				'request_from': '<?php echo format_to_js( is_admin_page() ? 'back' : 'front' );?>',
+			},
+			success: function(result)
+			{
+				result = ajax_debug_clear( result );
+				openModalWindow( result, '90%', '80%', true, evo_js_lang_insert_image, evo_js_lang_modal_action );
+			}
+		} );
+		return false;
+	}
+
+	function evo_item_image_edit( blog, shortTag )
+	{
+		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
+		var evo_js_lang_edit_image = '<?php echo T_('Edit image');?>';
+		var evo_js_lang_modal_action = '<?php echo TS_('Update');?>';
+		evo_js_lang_close = '<?php echo TS_('Cancel');?>';
+
+		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '"></span>',
+			'800px', '480px', true, evo_js_lang_edit_image, evo_js_lang_modal_action, true );
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url(); ?>anon_async.php',
+			data:
+			{
+				'action': 'get_edit_image_form',
+				'short_tag': shortTag,
+				'blog': blog,
+				'request_from': '<?php echo format_to_js( is_admin_page() ? 'back' : 'front' );?>',
+			},
+			success: function(result)
+			{
+				result = ajax_debug_clear( result );
+				openModalWindow( result, '90%', '80%', true, evo_js_lang_edit_image, evo_js_lang_modal_action );
+			}
+		} );
+		return false;
+	}
+</script>
+<?php
 }
 
 

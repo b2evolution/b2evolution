@@ -365,6 +365,8 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_skin_btn_text            VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			ityp_can_be_purchased_instore TINYINT DEFAULT 0,
 			ityp_can_be_purchased_online  TINYINT DEFAULT 0,
+			ityp_short_title_maxlen       SMALLINT UNSIGNED DEFAULT 30,
+			ityp_title_maxlen             SMALLINT UNSIGNED DEFAULT 100,
 			PRIMARY KEY ( ityp_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

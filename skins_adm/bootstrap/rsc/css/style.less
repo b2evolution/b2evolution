@@ -229,6 +229,10 @@ div.delete_messages ul {
 	li {
 		list-style: inherit;
 	}
+	label {
+		font-weight: normal;
+		margin: 0;
+	}
 }
 
 .evo_panel {
@@ -812,7 +816,7 @@ fieldset ul {
 		}
 	}
 }
-#filelist_tbody {
+.filelist_tbody {
 	tr:first-child .action_icon_link_move_up,
 	tr:last-child .action_icon_link_move_down {
 		visibility: hidden;
@@ -1113,6 +1117,12 @@ div#upload_wrapper, div#import_wrapper {
 div.fieldset_wrapper {
 	margin-top: 0;
 }
+
+// Adjacent fieldsets
+div.fieldset_wrapper+div.fieldset_wrapper {
+	margin-top: 10px;
+}
+
 // Fieldset folding
 div.fieldset_wrapper.folded .panel-body {
 	display: none;
@@ -1357,6 +1367,10 @@ div.level3 nav .nav > li {
 
 div.level3 nav .nav > li + li {
 	margin-left: 0px;
+}
+
+ol.breadcrumb {
+	margin: 20px 0;
 }
 
 // Global icons container:
@@ -1656,10 +1670,13 @@ table.diff {
 	}
 }
 
-// Fix alignment of radio buttons on post features form:
-.radio input[type="radio"][name^="timestamp_"][value="duration"] {
-	position: relative;
-	margin-right: 4px;
+// Fix alignment of radio buttons with additional input/select elements:
+.radio input[type="radio"] {
+	&[name^="timestamp_"][value="duration"],
+	&[name^="marketing_popup_show_frequency"][value="period"] {
+		position: relative;
+		margin-right: 4px;
+	}
 }
 
 // Attachments table:

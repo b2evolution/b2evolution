@@ -299,10 +299,20 @@ switch( $action )
 		if( param( 'agg_period', 'string', NULL ) !== NULL )
 		{	// Filter the aggregated data by date:
 			$UserSettings->set( 'agg_period', $agg_period );
+			// Update also the filter to compare hits with same values:
+			$aggcmp_periods = array(
+				'last_30_days'   => 'prev_30_days',
+				'last_60_days'   => 'prev_60_days',
+				'current_month'  => 'prev_month',
+			);
+			$UserSettings->set( 'aggcmp_period', isset( $aggcmp_periods[ $agg_period ] ) ? $aggcmp_periods[ $agg_period ] : $agg_period );
 			if( $agg_period == 'specific_month' )
 			{
 				$UserSettings->set( 'agg_month', param( 'agg_month', 'integer' ) );
 				$UserSettings->set( 'agg_year', param( 'agg_year', 'integer' ) );
+				// Update also the filter to compare hits with same values:
+				$UserSettings->set( 'aggcmp_month', get_param( 'agg_month' ) );
+				$UserSettings->set( 'aggcmp_year', get_param( 'agg_year' ) - 1 );
 			}
 		}
 
@@ -324,6 +334,30 @@ switch( $action )
 
 		// Redirect to referer page:
 		header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog.( empty( $sec_ID ) ? '' : '&sec_ID='.$sec_ID ), 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
+	case 'compare_hits_diagram':
+		// Filter hits diagram to compare:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'filterhitsdiagram' );
+
+		if( param( 'aggcmp_period', 'string', NULL ) !== NULL )
+		{	// Filter the compared data by date:
+			$UserSettings->set( 'aggcmp_period', $aggcmp_period );
+			if( $aggcmp_period == 'specific_month' )
+			{
+				$UserSettings->set( 'aggcmp_month', param( 'aggcmp_month', 'integer' ) );
+				$UserSettings->set( 'aggcmp_year', param( 'aggcmp_year', 'integer' ) );
+			}
+		}
+
+		// Save the filter data in settings of current user:
+		$UserSettings->dbupdate();
+
+		// Redirect to referer page:
+		header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 }
@@ -568,6 +602,7 @@ switch( $AdminUI->get_path( 1 ) )
 {
 	case 'summary':
 		// Display VIEW:
+		load_funcs( 'sessions/views/_stats_view.funcs.php' );
 		switch( $tab3 )
 		{
 			case 'browser':

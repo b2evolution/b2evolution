@@ -2035,21 +2035,33 @@ class Results extends Table
 	function display_first( $page_url = '' )
 	{
 		$r = '';
-		if( $this->page == 1 )
+		if( $this->page == 1 && isset( $this->params['page_item_current_before'] ) )
 		{
-			if( isset( $this->params['page_item_current_before'] ) )
-			{
-				$r .= add_tag_class( $this->params['page_item_current_before'], 'listnav_first' );
-			}
+			$r .= add_tag_class( $this->params['page_item_current_before'], 'listnav_first' );
 		}
 		elseif( isset( $this->params['page_item_before'] ) )
 		{
 			$r .= add_tag_class( $this->params['page_item_before'], 'listnav_first' );
 		}
 
-		$r .= '<a href="'.regenerate_url( $this->page_param, '', $page_url ).'">1</a>';
+		if( $this->page == 1 )
+		{	// no link for the current page
+			if( ! isset( $this->params['page_current_template'] ) )
+			{
+				$this->params['page_current_template'] = '<strong class="current_page">$page_num$</strong>';
+			}
+			$r .= str_replace( '$page_num$', 1, $this->params['page_current_template'] );
+		}
+		else
+		{	// a link for non-current pages
+			$r .= '<a href="'.regenerate_url( $this->page_param, '', $page_url ).'">1</a>';
+		}
 
-		if( isset( $this->params['page_item_after'] ) )
+		if( $this->page == 1 && isset( $this->params['page_item_current_after'] ) )
+		{
+			$r .= $this->params['page_item_current_after'];
+		}
+		elseif( isset( $this->params['page_item_after'] ) )
 		{
 			$r .= $this->params['page_item_after'];
 		}
@@ -2064,21 +2076,33 @@ class Results extends Table
 	function display_last( $page_url = '' )
 	{
 		$r = '';
-		if( $this->page == $this->total_pages )
+		if( $this->page == $this->total_pages && isset( $this->params['page_item_current_before'] ) )
 		{
-			if( isset( $this->params['page_item_current_before'] ) )
-			{
-				$r .= add_tag_class( $this->params['page_item_current_before'], 'listnav_last' );
-			}
+			$r .= add_tag_class( $this->params['page_item_current_before'], 'listnav_last' );
 		}
 		elseif( isset( $this->params['page_item_before'] ) )
 		{
 			$r .= add_tag_class( $this->params['page_item_before'], 'listnav_last' );
 		}
 
-		$r .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$this->total_pages, $page_url ).'">'.$this->total_pages.'</a>';
+		if( $this->page == $this->total_pages )
+		{	// no link for the current page
+			if( ! isset( $this->params['page_current_template'] ) )
+			{
+				$this->params['page_current_template'] = '<strong class="current_page">$page_num$</strong>';
+			}
+			$r .= str_replace( '$page_num$', $this->total_pages, $this->params['page_current_template'] );
+		}
+		else
+		{	// a link for non-current pages
+			$r .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$this->total_pages, $page_url ).'">'.$this->total_pages.'</a>';
+		}
 
-		if( isset( $this->params['page_item_after'] ) )
+		if( $this->page == $this->total_pages && isset( $this->params['page_item_current_after'] ) )
+		{
+			$r .= $this->params['page_item_current_after'];
+		}
+		elseif( isset( $this->params['page_item_after'] ) )
 		{
 			$r .= $this->params['page_item_after'];
 		}

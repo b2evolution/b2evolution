@@ -346,7 +346,6 @@ class User extends DataObject
 				array( 'table'=>'T_links', 'fk'=>'link_usr_ID', 'msg'=>T_('%d links to this user'),
 						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
 				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "user"', 'msg'=>T_('%d files from this user file root'), 'style' => 'bold' ),
-				array( 'table' => 'T_files', 'fk'=>'file_creator_user_ID', 'and_condition'=>'file_root_type != "user"', 'msg'=>T_('%d files will lose their creator ID.') ),
 				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_user_ID', 'msg'=>T_('%d list emails for this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_target_user_ID', 'msg'=>T_('%d reports about this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_reporter_ID', 'msg'=>T_('%d reports created by this user') ),
@@ -368,24 +367,37 @@ class User extends DataObject
 	 *
 	 * @param boolean Is this user spammer
 	 */
-	function init_relations( $is_spammer = false )
+	function init_relations( $params = array() )
 	{
 		if( ! is_null( $this->delete_cascades ) || ! is_null( $this->delete_restrictions ) )
 		{ // Initialize the relations only once
 			return;
 		}
 
+		$params = array_merge( array(
+				'delete_messages' => false,
+				'delete_comments' => false,
+				'delete_files'    => false,
+			), $params );
+
 		parent::init_relations();
 
-		if( $is_spammer )
-		{
+		if( $params['delete_messages'] )
+		{	// Delete messages:
 			$this->delete_cascades[] = array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('%d messages from this user'),
 					'class'=>'Message', 'class_path'=>'messaging/model/_message.class.php', 'style' => 'bold' );
 			$this->delete_cascades[] = array( 'table'=>'T_messaging__threadstatus', 'fk'=>'tsta_user_ID', 'msg'=>T_('%d message read statuses from this user') );
+		}
+		if( $params['delete_comments'] )
+		{	// Delete comments:
 			$this->delete_cascades[] = array( 'table'=>'T_comments', 'fk'=>'comment_author_user_ID', 'msg'=>T_('%d comments by this user'),
 					'class'=>'Comment', 'class_path'=>'comments/model/_comment.class.php', 'style' => 'bold' );
+		}
+		if( $params['delete_files'] )
+		{	// Delete files and links:
 			$this->delete_cascades[] = array( 'table'=>'T_links', 'fk'=>'link_creator_user_ID', 'msg'=>T_('%d links created by this user'),
 					'class'=>'Link', 'class_path'=>'links/model/_link.class.php' );
+			$this->delete_cascades[] = array( 'table'=>'T_files', 'fk'=>'file_creator_user_ID', 'and_condition'=>'file_root_type != "user"', 'msg'=>T_('%d files will lose their creator ID.') );
 		}
 	}
 
@@ -1622,6 +1634,8 @@ class User extends DataObject
 				// Newsletters:
 				$newsletter_subscriptions = param( 'edited_user_newsletters', 'array:integer', NULL );
 				$this->set_newsletter_subscriptions( $newsletter_subscriptions );
+				$UserSettings->set( 'notify_list_new_subscriber', param( 'edited_user_notify_list_new_subscriber', 'integer', 0 ), $this->ID );
+				$UserSettings->set( 'notify_list_lost_subscriber', param( 'edited_user_notify_list_lost_subscriber', 'integer', 0 ), $this->ID );
 
 				// Emails limit per day
 				param_integer_range( 'edited_user_notification_email_limit', 0, 999, T_('Notificaiton email limit must be between %d and %d.'), ! $is_api_request );
@@ -2467,6 +2481,82 @@ class User extends DataObject
 		$SQL->WHERE( 'pqst_owner_user_ID = '.$this->ID );
 
 		return $DB->get_var( $SQL );
+	}
+
+
+	/**
+	 * Get a number of emails sent to this User
+	 *
+	 * @return integer
+	 */
+	function get_num_sent_emails()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{
+			return 0;
+		}
+
+		$SQL = new SQL( 'Get a number of emails sent to the User #'.$this->ID );
+		$SQL->SELECT( 'COUNT( emlog_ID )' );
+		$SQL->FROM( 'T_email__log' );
+		$SQL->WHERE( 'emlog_user_ID = '.$this->ID );
+
+		return intval( $DB->get_var( $SQL ) );
+	}
+
+
+	/**
+	 * Delete all emails sent to the user
+	 *
+	 * @return boolean True on success
+	 */
+	function delete_sent_emails()
+	{
+		global $DB;
+
+		return $DB->query( 'DELETE
+			 FROM T_email__log
+			WHERE emlog_user_ID = '.$this->ID );
+	}
+
+
+	/**
+	 * Get a number of email returns from this User's email address
+	 *
+	 * @return integer
+	 */
+	function get_num_email_returns()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{
+			return 0;
+		}
+
+		$SQL = new SQL( 'Get a number of email returns from email address of the User #'.$this->ID );
+		$SQL->SELECT( 'COUNT( emret_ID )' );
+		$SQL->FROM( 'T_email__returns' );
+		$SQL->WHERE( 'emret_address = '.$DB->quote( $this->get( 'email' ) ) );
+
+		return intval( $DB->get_var( $SQL ) );
+	}
+
+
+	/**
+	 * Delete all email returns from the user's email address
+	 *
+	 * @return boolean True on success
+	 */
+	function delete_email_returns()
+	{
+		global $DB;
+
+		return $DB->query( 'DELETE
+			 FROM T_email__returns
+			WHERE emret_address = '.$DB->quote( $this->get( 'email' ) ) );
 	}
 
 
@@ -4289,14 +4379,21 @@ class User extends DataObject
 
 		$deltype = param( 'deltype', 'string', '' ); // spammer
 
+		// Check to delete additional data if we are deleting user as spammer or it is checked on the submitted form:
+		$delete_messages = ( $deltype == 'spammer' || param( 'force_delete_messages', 'integer', 0 ) );
+		$delete_comments = ( $deltype == 'spammer' || param( 'force_delete_comments', 'integer', 0 ) );
+		$delete_files    = ( $deltype == 'spammer' || param( 'force_delete_files', 'integer', 0 ) );
+
 		$DB->begin();
 
-		if( $deltype == 'spammer' )
-		{ // If we delete user as spammer we should delete private messaged of this user
-			$this->init_relations( true );
-		}
-		else
-		{ // If we delete user as not spammer we keep his comments as from anonymous user
+		$this->init_relations( array(
+				'delete_messages' => $delete_messages,
+				'delete_comments' => $delete_comments,
+				'delete_files'    => $delete_files,
+			) );
+
+		if( ! $delete_comments )
+		{	// Keep user's comments as from anonymous user,
 			// Transform registered user comments to unregistered:
 			$ret = $DB->query( 'UPDATE T_comments
 													SET comment_author_user_ID = NULL,
@@ -4310,11 +4407,14 @@ class User extends DataObject
 			}
 		}
 
-		if( $deltype != 'spammer' )
-		{
+		if( ! $delete_files )
+		{	// Keep user's files as from anonymous user:
 			$ret = $DB->query( 'UPDATE T_files
-			                    SET file_creator_user_ID = NULL
-								WHERE file_creator_user_ID = '.$this->ID. ' AND file_root_type != "user"' );
+				  SET file_creator_user_ID = NULL
+				WHERE file_creator_user_ID = '.$this->ID. ' AND file_root_type != "user"' );
+			$ret = $DB->query( 'UPDATE T_links
+				  SET link_creator_user_ID = NULL
+				WHERE link_creator_user_ID = '.$this->ID );
 			if( $Log instanceof log )
 			{
 				$Log->add( 'Setting user\'s uploaded files creator ID to NULL...'.sprintf( '(%d rows)', $ret ), 'note' );
@@ -5538,7 +5638,7 @@ class User extends DataObject
 			}
 			else
 			{ // validation process is easy, send email with permanent activation link
-				if( $this->send_validate_email( NULL, $blog, ( $user_old_email != $this->email ) ) )
+				if( $this->send_validate_email( NULL, $blog, !$is_new_user && ( $user_old_email != $this->email ) ) ) // $is_new_user check added to prevent regeneration of $reminder_key when creating new user accounts with welcome campaign email
 				{
 					if( $current_User->ID == $this->ID )
 					{
@@ -5629,6 +5729,10 @@ class User extends DataObject
 				$clear_sessions_query = 'UPDATE T_sessions
 									SET sess_key = NULL
 									WHERE sess_user_ID = '.$DB->quote( $this->ID );
+				// unsubscribe user from all lists:
+				$subscribed_newletter_IDs = $this->get_newsletter_subscriptions( 'subscribed' );
+				$this->unsubscribe( $subscribed_newletter_IDs, array( 'user_account_closed' => true ) );
+
 				if( $dbsave && $this->dbupdate() && $UserSettings->dbupdate() && ( $DB->query( $clear_sessions_query ) !== false ) )
 				{ // all db modification was successful
 					$DB->commit();
@@ -6177,17 +6281,26 @@ class User extends DataObject
 		global $Settings, $UserSettings;
 
 		if( !$Settings->get( 'welcomepm_enabled' ) )
-		{ // Sending of welcome PM is disabled
+		{	// Sending of welcome PM is disabled
 			return false;
 		}
 
+		if( $Settings->get( 'welcomepm_notag' ) )
+		{	// Don't send welcome PM if user account already has an user tag:
+			$user_tags = $this->get_usertags();
+			if( ! empty( $user_tags ) )
+			{
+				return false;
+			}
+		}
+
 		if( $UserSettings->get( 'welcome_message_sent', $this->ID ) )
-		{ // User already received the welcome message
+		{	// User already received the welcome message
 			return false;
 		}
 
 		if( !$this->accepts_pm() )
-		{ // user can't read private messages, or doesn't want to receive private messages
+		{	// user can't read private messages, or doesn't want to receive private messages
 			return false;
 		}
 
@@ -6195,7 +6308,7 @@ class User extends DataObject
 		$UserCache = & get_UserCache();
 		$User = $UserCache->get_by_login( $Settings->get( 'welcomepm_from' ) );
 		if( !$User )
-		{ // Don't send an welcome email if sender login is incorrect
+		{	// Don't send an welcome email if sender login is incorrect
 			return false;
 		}
 
@@ -6212,7 +6325,7 @@ class User extends DataObject
 		$edited_Message->creator_user_ID = $User->ID;
 		$edited_Message->set( 'text', $Settings->get( 'welcomepm_message' ) );
 		if( $edited_Message->dbinsert_individual( $User ) )
-		{ // The welcome message was sent/created successfully
+		{	// The welcome message was sent/created successfully
 			// Change user setting to TRUE in order to don't send it twice
 			$UserSettings->set( 'welcome_message_sent', 1, $this->ID );
 			$UserSettings->dbupdate();
@@ -7066,7 +7179,7 @@ class User extends DataObject
 	/**
 	 * Get status of user email
 	 *
-	 * @return string Status: 'unknown', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer', 'redemption'
+	 * @return string Status: 'unknown', 'working', 'unattended', 'redemption', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer'
 	 */
 	function get_email_status()
 	{
@@ -7648,6 +7761,67 @@ class User extends DataObject
 
 
 	/**
+	 * Get IDs List/Newsletters which are allowed for this User
+	 *
+	 * @return array Newsletter IDs
+	 */
+	function get_allowed_newsletter_IDs()
+	{
+		if( ! isset( $this->allowed_newsletter_IDs ) )
+		{	// Load allowed newsletters from cache:
+			global $DB, $current_User;
+			$SQL = new SQL( 'Get allowed newsletters for User #'.$this->ID );
+			$SQL->SELECT( 'enlt_ID' );
+			$SQL->FROM( 'T_email__newsletter' );
+			$SQL->WHERE( 'enlt_active = 1' );
+			$perm_conditions = array( 'enlt_perm_subscribe = "anyone"' );
+			$check_groups = array();
+			if( is_logged_in() && $current_User->can_moderate_user( $this->ID ) )
+			{	// Allow to subscribe to forbidden newsletters by user moderator:
+				$perm_conditions[] = 'enlt_perm_subscribe = "admin"';
+				$check_groups[] = $current_User->get( 'grp_ID' );
+			}
+			$check_groups[] = $this->get( 'grp_ID' );
+			$check_groups = count( $check_groups ) > 1 ? '('.implode( '|', $check_groups ).')' : $check_groups[0];
+			$perm_conditions[] = 'enlt_perm_subscribe = "group" AND enlt_perm_groups REGEXP( "(^|,)'.$check_groups.'(,|$)" )';
+			$SQL->WHERE_and( implode( ' OR ', $perm_conditions ) );
+			$this->allowed_newsletter_IDs = $DB->get_col( $SQL );
+		}
+
+		return $this->allowed_newsletter_IDs;
+	}
+
+
+	/**
+	 * Get List/Newsletters which are allowed for this User
+	 *
+	 * @return array Newsletter objects
+	 */
+	function get_allowed_newsletters()
+	{
+		if( ! isset( $this->allowed_newsletters ) )
+		{	// Load allowed newsletters from cache:
+			$newsletter_IDs = $this->get_allowed_newsletter_IDs();
+			$this->allowed_newsletters = array();
+			if( count( $newsletter_IDs ) > 0 )
+			{
+				$NewsletterCache = & get_NewsletterCache();
+				$NewsletterCache->load_list( $newsletter_IDs );
+				foreach( $newsletter_IDs as $newsletter_ID )
+				{
+					if( $Newsletter = & $NewsletterCache->get_by_ID( $newsletter_ID, false, false ) )
+					{
+						$this->allowed_newsletters[] = $Newsletter;
+					}
+				}
+			}
+		}
+
+		return $this->allowed_newsletters;
+	}
+
+
+	/**
 	 * Get IDs of newsletters which this user is subscribed on
 	 *
 	 * @param string Type: 'subscribed', 'unsubscribed', 'all'
@@ -7724,17 +7898,21 @@ class User extends DataObject
 			$new_subscriptions = array();
 		}
 
-		foreach( $new_subscriptions as $n => $new_subscription_ID )
+		if( count( $new_subscriptions ) > 0 )
 		{
-			// Format each value to integer:
-			$new_subscription_ID = intval( $new_subscription_ID );
-			if( empty( $new_subscription_ID ) )
-			{	// Unset wrong value:
-				unset( $new_subscriptions[ $n ] );
-			}
-			else
-			{	// Keep integer values only:
-				$new_subscriptions[ $n ] = $new_subscription_ID;
+			$allowed_newsletter_IDs = $this->get_allowed_newsletter_IDs();
+			foreach( $new_subscriptions as $n => $new_subscription_ID )
+			{
+				// Format each value to integer:
+				$new_subscription_ID = intval( $new_subscription_ID );
+				if( empty( $new_subscription_ID ) || ! in_array( $new_subscription_ID, $allowed_newsletter_IDs ) )
+				{	// Unset wrong value or if current User cannot subscribe this User to the new newsletter:
+					unset( $new_subscriptions[ $n ] );
+				}
+				else
+				{	// Keep integer values only:
+					$new_subscriptions[ $n ] = $new_subscription_ID;
+				}
 			}
 		}
 
@@ -7762,11 +7940,14 @@ class User extends DataObject
 	 * Subscribe to newsletter
 	 *
 	 * @param array|integer Newsletter IDs
+	 * @param array Optional subscription params
+	 *              - 'subscribed_User': User that subscribed
+	 *              - 'usertags': Comma-delimited user tags applied as part of subscription
 	 * @return integer|boolean # of rows affected or false if error
 	 */
-	function subscribe( $newsletter_IDs )
+	function subscribe( $newsletter_IDs, $params = array() )
 	{
-		global $DB, $localtimenow, $servertimenow;
+		global $DB, $localtimenow, $servertimenow, $current_User;
 
 		if( empty( $this->ID ) )
 		{	// Only created user can has the newsletter subscriptions:
@@ -7789,6 +7970,9 @@ class User extends DataObject
 		$newsletter_subscriptions = $this->get_newsletter_subscriptions( 'all' );
 		$insert_newsletter_IDs = array_diff( $newsletter_IDs, $newsletter_subscriptions );
 		$update_newsletter_IDs = array_intersect( $newsletter_IDs, $newsletter_subscriptions );
+
+		// Make sure we get a list newletters IDs for resubscriptions:
+		$resubscribe_newsletter_IDs = array_intersect( $newsletter_IDs, $this->get_newsletter_subscriptions( 'unsubscribed' ) );
 
 		$r = 0;
 
@@ -7818,6 +8002,16 @@ class User extends DataObject
 			'Subscribe(update unsubscriptions) user #'.$this->ID.' to lists #'.implode( ',', $update_newsletter_IDs ) );
 		}
 
+		if( count( $insert_newsletter_IDs ) || count( $resubscribe_newsletter_IDs ) )
+		{	// Notify list owner of new subscriber:
+			$email_template_params = array_merge( array(
+				'subscribed_User' => $this,
+				'subscribed_by_admin' => ( is_logged_in() && $current_User->login != $this->login ? $current_User->login : '' ),
+			), $params );
+
+			send_list_owner_notification( array_unique( array_merge( $insert_newsletter_IDs, $resubscribe_newsletter_IDs ) ), 'list_new_subscriber', $email_template_params );
+		}
+
 		// Insert user states for newsletters with automations:
 		$first_step_SQL = new SQL( 'Get first step of automation' );
 		$first_step_SQL->SELECT( 'step_ID' );
@@ -7843,6 +8037,7 @@ class User extends DataObject
 
 		// Update the CACHE array where we store who are subscribed already in order to avoid a duplicate entry error on second calling of this function:
 		$this->newsletter_subscriptions['subscribed'] = array_merge( $this->newsletter_subscriptions['subscribed'], $newsletter_IDs );
+		$this->newsletter_subscriptions['unsubscribed'] = array_diff( $this->newsletter_subscriptions['unsubscribed'], $newsletter_IDs );
 
 		return $r;
 	}
@@ -7852,11 +8047,14 @@ class User extends DataObject
 	 * Unsubscribe from newsletter
 	 *
 	 * @param array|integer Newsletter IDs
+	 * @param array Optional subscription params
+	 *              - 'subscribed_User': User that unsubscribed
+	 *              - 'usertags': Comma-delimited user tags applied as part of unsubscription
 	 * @return integer|boolean # of rows affected or false if error
 	 */
-	function unsubscribe( $newsletter_IDs )
+	function unsubscribe( $newsletter_IDs, $params = array() )
 	{
-		global $DB, $localtimenow;
+		global $DB, $localtimenow, $current_User;
 
 		if( empty( $this->ID ) )
 		{	// Only created user can has the newsletter subscriptions:
@@ -7872,6 +8070,10 @@ class User extends DataObject
 		{	// Convert single newsletter ID to array:
 			$newsletter_IDs = array( $newsletter_IDs );
 		}
+
+		// Get list of newsletter IDs that will be updated:
+		$newsletter_subscriptions = $this->get_newsletter_subscriptions( 'subscribed' );
+		$update_newsletter_IDs = array_intersect( $newsletter_IDs, $newsletter_subscriptions );
 
 		$r = $DB->query( 'UPDATE T_email__newsletter_subscription
 			SET enls_subscribed = 0,
@@ -7892,6 +8094,20 @@ class User extends DataObject
 				'Exit user automatically from all automations tied to lists #'.implode( ',', $newsletter_IDs ) );
 		}
 
+		if( count( $update_newsletter_IDs ) )
+		{	// Notify list owner of lost subscriber:
+			$email_template_params = array_merge( array(
+				'subscribed_User' => $this,
+				'unsubscribed_by_admin' => ( is_logged_in() && $current_User->login != $this->login ? $current_User->login : '' ),
+			), $params );
+
+			send_list_owner_notification( $update_newsletter_IDs, 'list_lost_subscriber', $email_template_params );
+		}
+
+		// Update the CACHE array where we store who are subscribed already in order to avoid a duplicate entry error on second calling of this function:
+		$this->newsletter_subscriptions['subscribed'] = array_diff( $this->newsletter_subscriptions['subscribed'], $update_newsletter_IDs );
+		$this->newsletter_subscriptions['unsubscribed'] = array_unique( array_merge( $this->newsletter_subscriptions['unsubscribed'], $update_newsletter_IDs ) );
+
 		return $r;
 	}
 
@@ -7905,7 +8121,7 @@ class User extends DataObject
 	{
 		global $DB;
 
-		// Additional check to know what newsletter is really new, in order to exclude the updating subscritptions:
+		// Additional check to know what newsletter is really new, in order to exclude the updating subscriptions:
 		$newsletter_subscriptions = $this->get_newsletter_subscriptions( 'all' );
 		$new_subscriptions = array_diff( $newsletter_IDs, $newsletter_subscriptions );
 

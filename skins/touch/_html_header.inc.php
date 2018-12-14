@@ -77,6 +77,8 @@ $Blog->disp_setting( 'body_includes', 'raw' );
 
 $Plugins->trigger_event( 'SkinBeginHtmlBody' );
 
+modules_call_method( 'SkinBeginHtmlBody' );
+
 // Call BeforeSkinWrapper to display additional info:
 $Plugins->trigger_event( 'BeforeSkinWrapper' );
 

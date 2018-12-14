@@ -1707,8 +1707,8 @@ class Form extends Widget
 		{
 			$precision_mn = $matches[1];
 			$precision_s = 0;
-			// convert the precision in sec
-			$precision *= 60;
+			// convert the precision in sec:
+			$precision = $precision_mn * 60;
 		}
 		else
 		{
@@ -2730,9 +2730,29 @@ class Form extends Widget
 
 		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form-control';
 
-		$r .="\n<select".get_field_attribs_as_string($field_params).'>'
+		if( isset($field_params['input_prefix']) )
+		{
+			$input_prefix = $field_params['input_prefix'];
+			unset($field_params['input_prefix']); // no HTML attribute
+		}
+		else
+		{
+			$input_prefix = '';
+		}
+
+		if( isset($field_params['input_suffix']) )
+		{
+			$input_suffix = $field_params['input_suffix'];
+			unset($field_params['input_suffix']); // no HTML attribute
+		}
+		else
+		{
+			$input_suffix = "\n";
+		}
+
+		$r .= $input_prefix.'<select'.get_field_attribs_as_string( $field_params ).'>'
 			 .$field_options
-			 ."</select>\n";
+			 .'</select>'.$input_suffix;
 
 		$r .= $this->end_field();
 
@@ -3050,23 +3070,6 @@ class Form extends Widget
 
 		// Give it a class, so it can be selected for CSS in IE6
 		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form_textarea_input form-control';
-
-		if( isset($field_params['maxlength']) )
-		{ // attach event to the textarea to accomplish max length:
-			$this->append_javascript['textarea_maxlength'.$field_name] = '
-				if( typeof jQuery == "function" )
-				{
-				jQuery("#'.$field_params['id'].'").bind( "keyup", function(event)
-					{
-						if( this.value.length > '.$field_params['maxlength'].' )
-						{
-							this.value = this.value.substr(0,'.$field_params['maxlength'].');
-							event.preventDefault();
-						}
-					} );
-				}';
-			unset($field_params['maxlength']); // not a HTML attribute for textarea
-		}
 
 		$r = $this->begin_field();
 		$r .= $input_prefix;

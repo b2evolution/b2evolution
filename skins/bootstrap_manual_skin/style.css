@@ -239,14 +239,16 @@ div.action_messages,
 div.log_container {
   margin: 0;
 }
-div#skin_wrapper .sitewide_header {
+div#skin_wrapper .sitewide_header,
+div#skin_wrapper .evo_container__site_header {
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 10000;
   -webkit-font-smoothing: subpixel-antialiased;
 }
-div#skin_wrapper.skin_wrapper_loggedin .sitewide_header {
+body.evo_toolbar_visible div#skin_wrapper .sitewide_header,
+body.evo_toolbar_visible div#skin_wrapper .evo_container__site_header {
   top: 27px;
 }
 .chapters_list ul {
@@ -295,24 +297,42 @@ ol.breadcrumb {
 }
 .evo_post_title,
 .cat_title {
-  display: table;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
 }
 .evo_post_title h1,
 .cat_title h1 {
-  display: table-cell;
   margin: 0;
   padding: 20px 0 10px;
 }
 .evo_post_title .btn-group,
 .cat_title .btn-group {
-  display: table-cell;
   padding: 20px 0 10px 30px;
-  vertical-align: middle;
   white-space: nowrap;
 }
 .evo_post_title .btn-group .btn,
 .cat_title .btn-group .btn {
   float: none;
+}
+@media (max-width: 767px) {
+  .evo_post_title,
+  .cat_title {
+    display: block;
+  }
+  .evo_post_title h1,
+  .cat_title h1 {
+    display: block;
+  }
+  .evo_post_title .btn-group,
+  .cat_title .btn-group {
+    display: block;
+    text-align: right;
+    padding: 0 0 10px 0;
+  }
 }
 .evo_content_block .evo_comment .evo_comment_footer .action_btn_group {
   float: right;
@@ -323,4 +343,12 @@ ol.breadcrumb {
 .evo_content_block .evo_comment .btn-group > .btn.first-child {
   border-top-left-radius: 3px !important;
   border-bottom-left-radius: 3px !important;
+}
+.widget_core_coll_featured_intro .featurepost {
+  background-color: #d9edf7;
+  padding: 15px 15px 25px;
+  margin-bottom: 20px;
+  border: 1px solid #e3e3e3;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
 }

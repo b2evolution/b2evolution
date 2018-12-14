@@ -82,7 +82,7 @@ if( $imap_obj->Nmsgs == 0 )
 // Create posts
 pbm_process_messages( $mbox, $imap_obj->Nmsgs, true );
 
-if( ! $Settings->get('eblog_test_mode') && count( $del_cntr ) > 0 )
+if( ! $Settings->get('eblog_test_mode') && $del_cntr > 0 )
 {	// We want to delete processed emails from server
 	imap_expunge( $mbox );
 	pbm_msg( sprintf( T_('Deleted %d processed message(s) from inbox.'), $del_cntr ), true );

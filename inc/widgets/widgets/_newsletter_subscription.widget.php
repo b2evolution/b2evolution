@@ -111,7 +111,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 					),
 					'unsubscribed_if_not_tagged' => array(
 						'type' => 'checkbox',
-						'note' => T_('Treat user has not subscribed if he is not tagged yet'),
+						'note' => T_('Treat user as not subscribed if he is not tagged yet'),
 						'defaultvalue' => false,
 					),
 					// Hidden, used by subscribe shorttag
@@ -131,7 +131,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 						'label' => T_('Block title'),
 						'note' => T_('Title to display in your skin.'),
 						'size' => 40,
-						'defaultvalue' => T_('Get our list!'),
+						'defaultvalue' => T_('Get our newsletter!'),
 					),
 					'intro' => array(
 						'label' => T_('Intro text'),
@@ -168,7 +168,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 						'label' => T_('Block title'),
 						'note' => T_('Title to display in your skin.'),
 						'size' => 40,
-						'defaultvalue' => T_('Get our list!'),
+						'defaultvalue' => T_('Get our newsletter!'),
 					),
 					'intro_subscribed' => array(
 						'label' => T_('Intro text'),

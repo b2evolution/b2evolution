@@ -58,12 +58,13 @@ switch( $type )
 								$assigned_user_tag = $edited_EmailCampaign->get( 'user_tag' );
 								if( ! empty( $assigned_user_tag ) )
 								{
-									$email_User->add_usertags( $edited_EmailCampaign->get( 'user_tag' ) );
+									$email_User->add_usertags( $assigned_user_tag );
 									$email_User->dbupdate();
 								}
 								break;
 
 							case 2: // Update clicked_unsubscribe
+							case 9: // Unsubscribe button
 								$result = $DB->query( 'UPDATE T_email__campaign_send
 										SET csnd_clicked_unsubscribe = 1
 										WHERE csnd_camp_ID = '.$DB->quote( $ecmp_ID ).' AND csnd_user_ID = '.$DB->quote( $email_User->ID ) );
@@ -71,6 +72,12 @@ switch( $type )
 								if( $result )
 								{
 									$update_values[] = 'ecmp_unsub_clicks = ecmp_unsub_clicks + 1';
+								}
+
+								// Add campaign ID as param to unsubscribe link:
+								if( $redirect_to && !empty( $email_log['emlog_camp_ID'] ) )
+								{
+									$redirect_to = url_add_param( $redirect_to, array( 'ecmp_ID' => $email_log['emlog_camp_ID'] ), '&' );
 								}
 
 								// Do not track click
@@ -150,6 +157,10 @@ switch( $type )
 									$email_User->add_usertags( $assigned_user_tag );
 									$email_User->dbupdate();
 								}
+								break;
+
+							case 8: // Activate account button
+								// Does nothing yet
 								break;
 						}
 

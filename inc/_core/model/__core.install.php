@@ -494,7 +494,7 @@ $schema_queries = array(
 			emlog_message       MEDIUMTEXT COLLATE utf8mb4_unicode_ci DEFAULT NULL,
 			emlog_last_open_ts  TIMESTAMP NULL,
 			emlog_last_click_ts TIMESTAMP NULL,
-			emlog_camp_ID       INT UNSIGNED NULL DEFAULT NULL,
+			emlog_camp_ID       INT UNSIGNED NULL DEFAULT NULL COMMENT 'Used to reference campaign when there is no associated campaign_send or the previously associated campaign_send updated its csnd_emlog_ID',
 			emlog_autm_ID       INT UNSIGNED DEFAULT NULL,
 			PRIMARY KEY         (emlog_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
@@ -517,7 +517,7 @@ $schema_queries = array(
 		"CREATE TABLE T_email__address (
 			emadr_ID                    INT(10) UNSIGNED NOT NULL auto_increment,
 			emadr_address               VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
-			emadr_status                ENUM( 'unknown', 'redemption', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
+			emadr_status                ENUM( 'unknown', 'working', 'unattended', 'redemption', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
 			emadr_sent_count            INT(10) UNSIGNED NOT NULL DEFAULT 0,
 			emadr_sent_last_returnerror INT(10) UNSIGNED NOT NULL DEFAULT 0,
 			emadr_prmerror_count        INT(10) UNSIGNED NOT NULL DEFAULT 0,
@@ -526,6 +526,7 @@ $schema_queries = array(
 			emadr_othererror_count      INT(10) UNSIGNED NOT NULL DEFAULT 0,
 			emadr_last_sent_ts          TIMESTAMP NULL,
 			emadr_last_error_ts         TIMESTAMP NULL,
+			emadr_last_open_ts          TIMESTAMP NULL,
 			PRIMARY KEY                 (emadr_ID),
 			UNIQUE                      emadr_address (emadr_address)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
@@ -533,11 +534,14 @@ $schema_queries = array(
 	'T_email__newsletter' => array(
 		'Creating email newsletters table',
 		"CREATE TABLE T_email__newsletter (
-			enlt_ID     INT UNSIGNED NOT NULL AUTO_INCREMENT,
-			enlt_name   VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-			enlt_label  VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
-			enlt_active TINYINT(1) UNSIGNED DEFAULT 1,
-			enlt_order  INT NULL DEFAULT NULL,
+			enlt_ID             INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			enlt_name           VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+			enlt_label          VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
+			enlt_active         TINYINT(1) UNSIGNED DEFAULT 1,
+			enlt_order          INT NULL DEFAULT NULL,
+			enlt_owner_user_ID  INT UNSIGNED NOT NULL,
+			enlt_perm_subscribe ENUM( 'admin', 'anyone', 'group' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'anyone',
+			enlt_perm_groups    VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL,
 			PRIMARY KEY (enlt_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" ),
 
@@ -547,6 +551,7 @@ $schema_queries = array(
 			enls_user_ID             INT UNSIGNED NOT NULL,
 			enls_enlt_ID             INT UNSIGNED NOT NULL,
 			enls_last_sent_manual_ts TIMESTAMP NULL,
+			enls_last_sent_auto_ts   TIMESTAMP NULL,
 			enls_last_open_ts        TIMESTAMP NULL,
 			enls_last_click_ts       TIMESTAMP NULL,
 			enls_send_count          INT UNSIGNED NOT NULL DEFAULT 0,
@@ -584,6 +589,7 @@ $schema_queries = array(
 			ecmp_user_tag_cta3        VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
 			ecmp_user_tag_like        VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
 			ecmp_user_tag_dislike     VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
+			ecmp_user_tag_unsubscribe VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
 			ecmp_send_count           INT UNSIGNED NOT NULL DEFAULT 0,
 			ecmp_open_count           INT UNSIGNED NOT NULL DEFAULT 0,
 			ecmp_img_loads            INT UNSIGNED NOT NULL DEFAULT 0,

@@ -112,6 +112,7 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 			array( 'allow_anon_url', 1, T_('Allow to submit an URL'), $edited_Blog->get_setting( 'allow_anon_url' ) )
 		), 'allow_anon_url', T_('Anonymous comments') );
 
+	$Form->text_input( 'comment_maxlen', $edited_Blog->get_setting( 'comment_maxlen' ), 4, T_('Max. comment length'), T_('Leave empty for unrestricted.') );
 	$Form->checkbox( 'allow_html_comment', $edited_Blog->get_setting( 'allow_html_comment' ),
 						T_( 'Allow HTML' ), T_( 'Check to allow HTML in comments.' ).' ('.T_('HTML code will pass several sanitization filters.').')' );
 
@@ -311,6 +312,13 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Comment recycle bin').get_manual_link('recycle-bin-settings') );
 
 	$Form->text_input( 'auto_empty_trash', $Settings->get('auto_empty_trash'), 5, T_('Prune recycled comments after'), T_('days').'. '.T_('Warning: This affects ALL collections on the system.') );
+
+$Form->end_fieldset();
+
+
+$Form->begin_fieldset( T_('Meta Comments').get_manual_link( 'meta-comments-settings' ) );
+
+	$Form->checkbox( 'meta_comments_frontoffice', $edited_Blog->get_setting( 'meta_comments_frontoffice' ), T_('Display in Front-Office'), T_('Display meta comments in Front-Office.') );
 
 $Form->end_fieldset();
 

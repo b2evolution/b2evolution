@@ -29,6 +29,7 @@ users_results_block( array(
 		'display_automation' => true,
 		'display_btn_tags'   => true,
 		'display_btn_delspam'=> true,
+		'display_btn_export' => true,
 	) );
 
 if( is_admin_page() )

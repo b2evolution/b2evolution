@@ -30,6 +30,8 @@ $Form->begin_fieldset( T_( 'Welcome message after account activation' ).get_manu
 
 	$Form->checkbox_input( 'welcomepm_enabled', $Settings->get( 'welcomepm_enabled' ), T_('Send Welcome PM'), array( 'note' => T_('Check to automatically send a welcome message to users when they activate their account.' ) ) );
 
+	$Form->checkbox_input( 'welcomepm_notag', $Settings->get( 'welcomepm_notag' ), T_('Only if no User Tag'), array( 'note' => T_('Don\'t send the welcome message if the User Account already has any User Tag.' ) ) );
+
 	$UserCache = & get_UserCache();
 	$User = $UserCache->get_by_login( $Settings->get( 'welcomepm_from' ) );
 	if( !$User )

@@ -37,8 +37,8 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 		parent::__construct( $db_row, 'core', 'msg_menu_link' );
 
 		$this->link_types = array(
-			'messages' => T_('Messages'),
-			'contacts' => T_('Contacts'),
+			'messages' => T_('Private messages'),
+			'contacts' => T_('Messaging contacts'),
 		);
 	}
 
@@ -72,7 +72,7 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 
 		if( !empty($this->param_array['link_type']) )
 		{	// Messaging or Contacts
-			return sprintf( T_( '%s link' ), $this->link_types[ $this->param_array['link_type'] ] );
+			return sprintf( T_('Link to: %s'), $this->link_types[ $this->param_array['link_type'] ] );
 		}
 
 		return $this->get_name();

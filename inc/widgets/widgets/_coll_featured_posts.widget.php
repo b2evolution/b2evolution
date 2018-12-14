@@ -64,6 +64,7 @@ class coll_featured_posts_Widget extends coll_item_list_Widget
 		$r['layout']['defaultvalue'] = 'rwd';
 		$r['item_type_usage']['no_edit'] = true;
 		$r['featured']['no_edit'] = true;
+		$r['flagged']['no_edit'] = true;
 		$r['featured']['defaultvalue'] = 'featured';
 		$r['follow_mainlist']['no_edit'] = true;
 		$r['blog_ID']['no_edit'] = true;

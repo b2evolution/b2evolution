@@ -117,6 +117,7 @@ class bootstrap_manual_Skin extends Skin
 				'front_page_secondary_area' => NULL,
 				'item_in_list'              => NULL,
 				'item_single_header'        => NULL,
+				'chapter_main_area'         => array( NT_('Chapter Main Area'), 46 ),
 			);
 	}
 
@@ -397,8 +398,10 @@ class bootstrap_manual_Skin extends Skin
 					'search_cell_author_end'   => '</p>',
 					'search_date_format'       => 'F jS, Y',
 					// Front page
-					'featured_intro_before' => '<div class="jumbotron">',
-					'featured_intro_after'  => '</div>',
+					'featured_intro_before' => '',
+					'featured_intro_after'  => '',
+					'intro_class'           => 'jumbotron',
+					'featured_class'        => 'featurepost',
 					// Form "Sending a message"
 					'msgform_form_title' => T_('Contact'),
 				);

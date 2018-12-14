@@ -193,6 +193,10 @@ div.delete_messages ul {
 div.delete_messages ul li {
   list-style: inherit;
 }
+div.delete_messages ul label {
+  font-weight: normal;
+  margin: 0;
+}
 .evo_panel {
   margin-bottom: 20px;
 }
@@ -757,8 +761,8 @@ fieldset ul {
 #attachments_fieldset_wrapper table tbody td {
   cursor: move;
 }
-#filelist_tbody tr:first-child .action_icon_link_move_up,
-#filelist_tbody tr:last-child .action_icon_link_move_down {
+.filelist_tbody tr:first-child .action_icon_link_move_up,
+.filelist_tbody tr:last-child .action_icon_link_move_down {
   visibility: hidden;
 }
 table.filelist {
@@ -1032,6 +1036,9 @@ div#import_wrapper {
 div.fieldset_wrapper {
   margin-top: 0;
 }
+div.fieldset_wrapper + div.fieldset_wrapper {
+  margin-top: 10px;
+}
 div.fieldset_wrapper.folded .panel-body {
   display: none;
 }
@@ -1246,6 +1253,9 @@ div.level3 nav .nav > li.active a:focus {
 }
 div.level3 nav .nav > li + li {
   margin-left: 0px;
+}
+ol.breadcrumb {
+  margin: 20px 0;
 }
 .container-global-icons {
   margin-top: 9px;
@@ -1507,7 +1517,8 @@ table.diff td.diff-title-addedline {
   font-size: 120%;
   font-weight: bold;
 }
-.radio input[type="radio"][name^="timestamp_"][value="duration"] {
+.radio input[type="radio"][name^="timestamp_"][value="duration"],
+.radio input[type="radio"][name^="marketing_popup_show_frequency"][value="period"] {
   position: relative;
   margin-right: 4px;
 }

@@ -67,7 +67,9 @@ function evo_link_change_position( selectInput, url, crumb )
 {
 	var oThis = selectInput;
 	var new_position = selectInput.value;
-	jQuery.get( url + 'anon_async.php?action=set_object_link_position&link_ID=' + selectInput.id.substr(17) + '&link_position=' + new_position + '&crumb_link=' + crumb, {
+	var link_ID = selectInput.id.substr(17);
+
+	jQuery.get( url + 'anon_async.php?action=set_object_link_position&link_ID=' + link_ID + '&link_position=' + new_position + '&crumb_link=' + crumb, {
 	}, function(r, status) {
 		r = ajax_debug_clear( r );
 		if( r == "OK" ) {
@@ -98,10 +100,15 @@ function evo_link_change_position( selectInput, url, crumb )
  * @param integer File ID
  * @param string Caption text
  */
-function evo_link_insert_inline( type, link_ID, option )
+function evo_link_insert_inline( type, link_ID, option, replace )
 {
+	if( replace == undefined )
+	{
+		replace = 0;
+	}
+
 	if( typeof( b2evoCanvas ) != 'undefined' )
-	{ // Canvas exists
+	{	// Canvas exists
 		var insert_tag = '[' + type + ':' + link_ID;
 
 		if( option.length )
@@ -111,18 +118,34 @@ function evo_link_insert_inline( type, link_ID, option )
 
 		insert_tag += ']';
 
-		// Insert an image tag
-		textarea_wrap_selection( b2evoCanvas, insert_tag, '', 0, window.document );
-
 		var $position_selector = jQuery( '#display_position_' + link_ID );
 		if( $position_selector.length != 0 )
-		{ // Change the position to 'Inline'
+		{
 			if( $position_selector.val() != 'inline' )
-			{
+			{	// Not yet inline, change the position to 'Inline'
 				deferInlineReminder = true;
-				$position_selector.val( 'inline' ).change();
+				// We have to change the link position in the DB before we insert the image tag
+				// otherwise the inline tag will not render because it is not yet in the 'inline' position
+				evo_rest_api_request( 'links/' + link_ID + '/position/inline',
+					function( data )
+					{
+						$position_selector.val( 'inline' );
+						evoFadeSuccess( $position_selector.closest( 'tr' ) );
+						$position_selector.closest( 'td' ).removeClass( 'error' );
+
+						// Insert an image tag
+						textarea_wrap_selection( b2evoCanvas, insert_tag, '', replace, window.document );
+					}, 'POST' );
 				deferInlineReminder = false;
 			}
+			else
+			{	// Already an inline, insert image tag
+				textarea_wrap_selection( b2evoCanvas, insert_tag, '', replace, window.document );
+			}
+		}
+		else
+		{
+			textarea_wrap_selection( b2evoCanvas, insert_tag, '', replace, window.document );
 		}
 	}
 }
@@ -145,9 +168,9 @@ function evo_link_delete( event_object, type, link_ID, action )
 	},
 	function( data )
 	{
-		if( type == 'item' )
+		if( type == 'item' || type == 'comment' || type == 'emailcampaign' || type == 'message' )
 		{	// Replace the inline image placeholders when file is unlinked from Item:
-			var b2evoCanvas = window.document.getElementById( 'itemform_post_content' );
+			var b2evoCanvas = window.b2evoCanvas;
 			if( b2evoCanvas != null )
 			{ // Canvas exists
 				var regexp = new RegExp( '\\\[(image|file|inline|video|audio|thumbnail):' + link_ID + ':?[^\\\]]*\\\]', 'ig' );
@@ -293,7 +316,7 @@ function evo_link_refresh_list( type, object_ID, action )
 		evo_rest_api_request( 'links',
 		{
 			'action':    typeof( action ) == 'undefined' ? 'refresh' : 'sort',
-			'type':      type,
+			'type':      type.toLowerCase(),
 			'object_ID': object_ID,
 		},
 		function( data )

@@ -852,7 +852,10 @@ class Item extends ItemLight
 		// SLUG:
 		if( param( 'post_urltitle', 'string', NULL ) !== NULL )
 		{
-			$this->set_from_Request( 'urltitle' );
+			// Replace special chars/umlauts:
+			load_funcs( 'locales/_charset.funcs.php' );
+			$post_urltitle = replace_special_chars( get_param( 'post_urltitle' ), $this->get( 'locale' ) );
+			$this->set( 'urltitle', $post_urltitle );
 			// Added in May 2017; but old slugs are not converted yet.
 			if( preg_match( '#(^|,+)[^a-z\d_]*\d+[^a-z\d_]*($|,+)#i', get_param( 'post_urltitle' ) ) )
 			{	// Display error if item slugs contain only digits:
@@ -1840,6 +1843,15 @@ class Item extends ItemLight
 		if( ! is_logged_in() )
 		{	// User must be logged in
 			return false;
+		}
+
+		if( ! is_admin_page() )
+		{	// Check visibility of meta comments on front-office:
+			$item_Blog = & $this->get_Blog();
+			if( ! $item_Blog || ! $item_Blog->get_setting( 'meta_comments_frontoffice' ) )
+			{	// Meta comments are disabled to be displayed on front-office for this Item's collection:
+				return false;
+			}
 		}
 
 		global $current_User;
@@ -3415,26 +3427,11 @@ class Item extends ItemLight
 
 					case 'emailcapture':
 						// Widget "Email capture / Quick registration":
-						$fields_to_display = array();
-						$button_text = '';
-
 						preg_match( '/(\d+)?(?:\/(.*))?/', $tag_params[0], $newsletter_ID_tags );
-						if( isset( $newsletter_ID_tags[1] ) )
-						{
-							$newsletter_ID = intval( $newsletter_ID_tags[1] );
-						}
-						if( isset( $newsletter_ID_tags[2] ) )
-						{
-							$user_tags = $newsletter_ID_tags[2];
-						}
-						if( isset( $tag_params[1] ) )
-						{
-							$fields_to_display = explode( '+', $tag_params[1] );
-						}
-						if( isset( $tag_params[2] ) )
-						{
-							$button_text = $tag_params[2];
-						}
+						$newsletter_ID = isset( $newsletter_ID_tags[1] ) ? intval( $newsletter_ID_tags[1] ) : NULL;
+						$user_tags = isset( $newsletter_ID_tags[2] ) ? $newsletter_ID_tags[2] : NULL;
+						$fields_to_display = isset( $tag_params[1] ) ? explode( '+', $tag_params[1] ) : array();
+						$button_text = isset( $tag_params[2] ) ? $tag_params[2] : '';
 
 						$widget_params = array(
 							'widget' => 'user_register_quick',
@@ -3442,11 +3439,10 @@ class Item extends ItemLight
 							'intro' => '',
 							'ask_firstname' => in_array( 'firstname', $fields_to_display ) ? 'required' : 'no',
 							'ask_lastname' => in_array( 'lastname', $fields_to_display ) ? 'required' : 'no',
+							'ask_country' => in_array( 'country', $fields_to_display ) ? 'required' : 'no',
 							'source' => 'Page: '.$this->get( 'urltitle' ),
-							'usertags' => isset( $user_tags ) ? $user_tags : NULL,
-							'subscribe_post' => 0,
-							'subscribe_comment' => 0,
-							'subscribe_post_mod' => 0,
+							'usertags' => $user_tags,
+							'subscribe' => array( 'post' => 0, 'comment' => 0 ),
 							'button_class' => 'btn-primary',
 							'inline' => 1
 						);
@@ -9243,7 +9239,7 @@ class Item extends ItemLight
 		}
 
 		// Change order to correct value:
-		$order = ( $order === '' ? NULL : floatval( $order ) );
+		$order = ( $order === '' || $order === NULL ? NULL : floatval( $order ) );
 
 		// Insert/Update order per category:
 		$r = $DB->query( 'REPLACE INTO T_postcats ( postcat_post_ID, postcat_cat_ID, postcat_order )

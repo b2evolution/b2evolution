@@ -480,7 +480,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'emails', 'edit', true );
 
-		// Make sure we got an enlt_ID:
+		// Make sure we got an emlog_ID:
 		param( 'emlog_ID', 'integer', 0, true );
 
 		$EmailLogCache = & get_EmailLogCache();
@@ -507,6 +507,31 @@ switch( $action )
 			header_redirect( $admin_url.'?ctrl=email&tab=sent', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
+		break;
+
+	case 'returned_delete':
+		// Delete a log of returned email:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'email' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		param( 'emret_ID', 'integer', 0 );
+		param( 'redirect_to', 'url', $admin_url.'?ctrl=email&tab=return' );
+
+		$result = $DB->query( 'DELETE
+			FROM T_email__returns
+			WHERE emret_ID = '.$emret_ID );
+		if( $result )
+		{
+			$Messages->add( sprintf( T_('Returned email log #%d has been deleted.'), $emret_ID ), 'success' );
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $redirect_to, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 }
 

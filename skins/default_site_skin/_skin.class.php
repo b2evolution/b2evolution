@@ -116,13 +116,13 @@ class default_site_Skin extends Skin
 	function siteskin_init()
 	{
 		// Include the default skin style.css relative current SITE skin folder:
-		require_css( 'style.css', 'siteskin' );
+		require_css( 'style.min.css', 'siteskin' );
 
 		// Add custom styles:
 		$menu_bar_logo_padding = $this->get_setting( 'menu_bar_logo_padding' );
 
 		add_css_headline( '
-.sitewide_header a.evo_widget__site_logo_image img {
+.evo_container__site_header a.evo_widget__site_logo_image img {
 	padding: '.$menu_bar_logo_padding.'px;
 }
 ' );
