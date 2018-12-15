@@ -22,7 +22,7 @@ class shortcodes_plugin extends Plugin
 	var $code = 'evo_shortcodes';
 	var $name = 'Short Codes';
 	var $priority = 40;
-	var $version = '6.10.4';
+	var $version = '6.10.5';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 

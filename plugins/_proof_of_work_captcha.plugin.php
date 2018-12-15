@@ -36,7 +36,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class proof_of_work_captcha_plugin extends Plugin
 {
-	var $version = '6.10.4';
+	var $version = '6.10.5';
 	var $group = 'antispam';
 	var $code = 'proof_of_work_captcha';
 

@@ -22,7 +22,7 @@ class shortlinks_plugin extends Plugin
 	var $code = 'b2evWiLi';
 	var $name = 'Short Links';
 	var $priority = 35;
-	var $version = '6.10.4';
+	var $version = '6.10.5';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;

@@ -21,7 +21,7 @@ class bootstrap_gallery_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.10.4';
+	var $version = '6.10.5';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
