@@ -125,11 +125,20 @@ $Form->begin_fieldset( T_('Automations').get_manual_link( 'campaign-automations-
 	$AutomationCache->load_all();
 	$AutomationCache->none_option_text = T_('Select automation');
 	$AutomationCache->none_option_value = 0;
-	$Form->select_input_object( 'ecmp_cta1_autm_ID', $edited_EmailCampaign->get( 'cta1_autm_ID' ), $AutomationCache, T_('Add users who click CTA 1 to'), array( 'allow_none' => true ) );
-	$Form->select_input_object( 'ecmp_cta2_autm_ID', $edited_EmailCampaign->get( 'cta2_autm_ID' ), $AutomationCache, T_('Add users who click CTA 2 to'), array( 'allow_none' => true ) );
-	$Form->select_input_object( 'ecmp_cta3_autm_ID', $edited_EmailCampaign->get( 'cta3_autm_ID' ), $AutomationCache, T_('Add users who click CTA 3 to'), array( 'allow_none' => true ) );
-	$Form->select_input_object( 'ecmp_like_autm_ID', $edited_EmailCampaign->get( 'like_autm_ID' ), $AutomationCache, T_('Add users who like the email to'), array( 'allow_none' => true ) );
-	$Form->select_input_object( 'ecmp_dislike_autm_ID', $edited_EmailCampaign->get( 'dislike_autm_ID' ), $AutomationCache, T_('Add users who dislike the email to'), array( 'allow_none' => true ) );
+	$automation_options = array(
+			array( T_('Add users who click CTA 1 to'),       'cta1_autm_ID',    'cta1_autm_execute' ),
+			array( T_('Add users who click CTA 2 to'),       'cta2_autm_ID',    'cta2_autm_execute' ),
+			array( T_('Add users who click CTA 3 to'),       'cta3_autm_ID',    'cta3_autm_execute' ),
+			array( T_('Add users who like the email to'),    'like_autm_ID',    'like_autm_execute' ),
+			array( T_('Add users who dislike the email to'), 'dislike_autm_ID', 'dislike_autm_execute' ),
+		);
+	foreach( $automation_options as $automation_option )
+	{
+		$Form->begin_line( $automation_option[0] );
+			$Form->select_input_object( 'ecmp_'.$automation_option[1], $edited_EmailCampaign->get( $automation_option[1] ), $AutomationCache, '', array( 'allow_none' => true ) );
+			$Form->checkbox_input( 'ecmp_'.$automation_option[2], $edited_EmailCampaign->get( $automation_option[2] ), '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.T_('Execute first step(s) immediately').'</label> &nbsp; ' ) );
+		$Form->end_line();
+	}
 $Form->end_fieldset();
 
 $buttons = array();

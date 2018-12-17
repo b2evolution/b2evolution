@@ -367,7 +367,7 @@ class Automation extends DataObject
 	/**
 	 * Add users to this automation
 	 *
-	 * @param array IDs of users
+	 * @param array|integer IDs of users
 	 * @param array Params
 	 * @return integer Number of added users
 	 */
@@ -392,6 +392,11 @@ class Automation extends DataObject
 		if( empty( $user_IDs ) )
 		{	// No users to add:
 			return $added_users_num;
+		}
+
+		if( ! is_array( $user_IDs ) )
+		{
+			$user_IDs = array( $user_IDs );
 		}
 
 		if( $params['users_no_subs'] == 'ignore' )
@@ -819,6 +824,54 @@ class Automation extends DataObject
 
 		// Fill cells array to know current cell is busy with current step:
 		$this->diagram_cells[ $col.':'.$row ] = $step_ID;
+	}
+
+
+	/**
+	 * Get first automation step
+	 *
+	 * @return object First automation step
+	 */
+	function & get_first_AutomationStep()
+	{
+		if( ! isset( $this->first_AutomationStep ) )
+		{	// Load 
+			global $DB;
+			$first_step_SQL = new SQL( 'Get first step of automation #'.$this->ID );
+			$first_step_SQL->SELECT( 'step_ID' );
+			$first_step_SQL->FROM( 'T_automation__step' );
+			$first_step_SQL->WHERE( 'step_autm_ID = '.$this->ID );
+			$first_step_SQL->ORDER_BY( 'step_order ASC' );
+			$first_step_SQL->LIMIT( 1 );
+			$first_step_ID = $DB->get_var( $first_step_SQL );
+			$AutomationStepCache = & get_AutomationStepCache();
+			$this->first_AutomationStep = & $AutomationStepCache->get_by_ID( $first_step_ID, false, false );
+		}
+
+		return $this->first_AutomationStep;
+	}
+
+
+	/**
+	 * Execute action for first step(s)
+	 *
+	 * @param integer User ID
+	 * @return string|boolean A process log, FALSE - if no first step
+	 */
+	function execute_first_step( $user_ID )
+	{
+		if( ! ( $first_AutomationStep = & $this->get_first_AutomationStep() ) )
+		{	// No step:
+			return false;
+		}
+
+		if( $this->get( 'status' ) != 'active' )
+		{	// Don't execute a paused automation:
+			return false;
+		}
+
+		// Execute first step(s) of this automation:
+		return $first_AutomationStep->execute_action( $user_ID );
 	}
 }
 
