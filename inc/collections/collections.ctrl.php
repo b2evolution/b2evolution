@@ -675,51 +675,6 @@ switch( $action )
 			}
 		}
 		break;
-
-	case 'new_demo_content':
-		global $DB;
-		global $install_test_features;
-
-		load_funcs( 'collections/_demo_content.funcs.php' );
-
-		$create_sample_contents   = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
-		$create_demo_organization = param( 'create_demo_organization', 'boolean', false, true );
-		$create_demo_users        = param( 'create_demo_users', 'boolean', false, true );
-		$create_demo_messages     = param( 'create_sample_private_messages', 'boolean', false, true );
-		$install_test_features    = param( 'install_test_features', 'boolean', false );
-
-		$user_org_IDs = NULL;
-		$demo_users = array();
-
-		$DB->begin();
-		if( $create_demo_organization )
-		{
-			$user_org_IDs = array( create_demo_organization( $current_User->ID )->ID );
-			$current_User->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
-			$Messages->add_to_group( sprintf( T_('Added user %s to demo organization.'), $current_User->login ), 'success', T_('Demo contents').':' );
-		}
-
-		if( $create_demo_users )
-		{
-			$demo_users = get_demo_users( true );
-			$Messages->add_to_group( T_('Created demo users.'), 'success', T_('Demo contents').':' );
-		}
-
-		if( $create_demo_messages )
-		{
-			create_demo_messages();
-			$Messages->add_to_group( T_('Created sample private messages.'), 'success', T_('Demo contents').':' );
-		}
-
-		if( $create_sample_contents )
-		{
-			create_demo_collections( $demo_users, $create_demo_users );
-			$Messages->add_to_group( T_('Created sample contents.'), 'success', T_('Demo contents').':' );
-		}
-		$DB->commit();
-
-		header_redirect( $admin_url.'?ctrl=dashboard' ); // will save $Messages into Session
-		break;
 }
 
 switch( $tab )

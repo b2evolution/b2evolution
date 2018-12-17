@@ -10,6 +10,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_funcs( 'collections/_demo_content.funcs.php' );
+
 /**
  * Open a block
  *
@@ -278,7 +280,7 @@ function install_newdb()
 		// (Assigning by reference does not work with "global" keyword (PHP 5.2.8))
 		$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
 
-		create_demo_contents( $demo_users );
+		create_demo_contents( $demo_users, $create_demo_users, true );
 	}
 
 	// Call the following function even if no demo content will be installed.
@@ -322,25 +324,7 @@ function install_newdb()
 }
 
 
-/**
- * Begin install task.
- * This will offer other display methods in the future
- */
-function task_begin( $title )
-{
-	echo get_install_format_text( $title."\n" );
-	evo_flush();
-}
 
-
-/**
- * End install task.
- * This will offer other display methods in the future
- */
-function task_end( $message = 'OK.' )
-{
-	echo get_install_format_text( $message."<br />\n", 'br' );
-}
 
 
 function get_db_version()

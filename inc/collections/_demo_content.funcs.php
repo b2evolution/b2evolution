@@ -37,6 +37,27 @@ load_class( 'collections/model/_section.class.php', 'Section' );
 
 
 /**
+ * Begin install task.
+ * This will offer other display methods in the future
+ */
+function task_begin( $title )
+{
+	echo get_install_format_text( $title."\n" );
+	evo_flush();
+}
+
+
+/**
+ * End install task.
+ * This will offer other display methods in the future
+ */
+function task_end( $message = 'OK.' )
+{
+	echo get_install_format_text( $message."<br />\n", 'br' );
+}
+
+
+/**
  * Adjust timestamp value, adjusts it to the current time if not yet set
  *
  * @param timestamp Base timestamp
@@ -935,6 +956,7 @@ function get_demo_user( $login, $create = false )
 
 	if( ! $demo_user && $create )
 	{	// Demo user does not exist yet but we can create:
+		task_begin( sprintf( 'Creating demo user %s...', $login ) );
 		adjust_timestamp( $user_timestamp, 360, 1440, false );
 
 		$user_defaults = array_merge( $demo_users[$login], array(
@@ -958,6 +980,7 @@ function get_demo_user( $login, $create = false )
 				VALUES ( '.$demo_user->ID.', "created_fromIPv4", '.$DB->quote( ip2int( '127.0.0.1' ) ).' ),
 				       ( '.$demo_user->ID.', "user_domain", "localhost" )' );
 		}
+		task_end();
 	}
 	elseif( $demo_user )
 	{
@@ -1104,9 +1127,21 @@ function create_demo_messages()
  * @param array Array of user objects
  * @param boolean True to create users for the demo content
  */
-function create_demo_collections( $demo_users = array(), $create_demo_users = true )
+function create_demo_contents( $demo_users = array(), $create_demo_users = true, $initial_install = true )
 {
-	global $current_User, $DB;
+	global $current_User, $DB, $Settings;
+
+	// Global exception handler function
+	function demo_content_error_handler( $errno, $errstr, $errfile, $errline )
+	{	// handle only E_USER_NOTICE
+		if( $errno == E_USER_NOTICE )
+		{
+			echo get_install_format_text( '<span class="text-warning"><evo:warning>'.$errstr.'</evo:warning></span> ' );
+		}
+	}
+
+	// Set global exception handler
+	set_error_handler( "demo_content_error_handler" );
 
 	$mary_moderator_ID = isset( $demo_users['mary'] ) ? $demo_users['mary']->ID : $current_User->ID;
 	$jay_moderator_ID  = isset( $demo_users['jay'] ) ? $demo_users['jay']->ID : $current_User->ID;
@@ -1132,6 +1167,7 @@ function create_demo_collections( $demo_users = array(), $create_demo_users = tr
 		$install_collection_forums   = 1;
 		$install_collection_manual   = 1;
 		$install_collection_tracker  = 1;
+		$site_skins_setting          = 1;
 	}
 	else
 	{	// Array contains which collections should be installed
@@ -1146,6 +1182,7 @@ function create_demo_collections( $demo_users = array(), $create_demo_users = tr
 			$install_collection_forums   = 0;
 			$install_collection_manual   = 0;
 			$install_collection_tracker  = 0;
+			$site_skins_setting          = 0;
 		}
 		else
 		{
@@ -1158,9 +1195,11 @@ function create_demo_collections( $demo_users = array(), $create_demo_users = tr
 			$install_collection_forums   = in_array( 'forums', $collections );
 			$install_collection_manual   = in_array( 'manual', $collections );
 			$install_collection_tracker  = in_array( 'group', $collections );
+			$site_skins_setting          = 1;
 		}
 	}
 
+	task_begin( 'Creating default sections... ' );
 	if( $demo_content_type != 'minisite' )
 	{
 		$SectionCache = & get_SectionCache();
@@ -1182,19 +1221,25 @@ function create_demo_collections( $demo_users = array(), $create_demo_users = tr
 			}
 			else
 			{
-				$new_section = new Section();
-				$new_section->set( 'name', $section_name );
-				$new_section->set( 'order', $section_data['order'] );
-				$new_section->set( 'owner_user_ID', $section_data['owner_ID'] );
-				$new_section->dbsave();
+				$new_Section = new Section();
+				$new_Section->set( 'name', $section_name );
+				$new_Section->set( 'order', $section_data['order'] );
+				$new_Section->set( 'owner_user_ID', $section_data['owner_ID'] );
+				$new_Section->dbsave();
 
-				$sections[$section_name]['ID'] = $new_section->ID;
+				$sections[$section_name]['ID'] = $new_Section->ID;
 			}
 		}
 	}
+	task_end();
 
-	// Store the item IDs in this array in order to create additional comments
-	$additional_comments_item_IDs = array();
+	if( $install_collection_blogb )
+	{
+		global $demo_poll_ID;
+		task_begin( 'Creating default polls... ' );
+		$demo_poll_ID = create_demo_poll();
+		task_end();
+	}
 
 	// Use this var to shift the posts of the collections in time below:
 	$timeshift = 0;
@@ -1204,111 +1249,258 @@ function create_demo_collections( $demo_users = array(), $create_demo_users = tr
 
 	if( $install_collection_home )
 	{	// Install Home blog
+		task_begin( 'Creating Home collection...' );
 		$section_ID = isset( $sections['Home']['ID'] ) ? $sections['Home']['ID'] : 1;
 		$blog_ID = create_demo_collection( 'main', $jay_moderator_ID, $create_demo_users, $timeshift, $section_ID );
-		// Insert basic widgets:
-		insert_basic_widgets( $blog_ID, 'normal', false, 'main' );
-		insert_basic_widgets( $blog_ID, 'mobile', false, 'main' );
-		insert_basic_widgets( $blog_ID, 'tablet', false, 'main' );
+
+		if( $initial_install )
+		{
+			if( is_callable( 'update_install_progress_bar' ) )
+			{
+				update_install_progress_bar();
+			}
+		}
+		else
+		{	// Insert basic widgets:
+			insert_basic_widgets( $blog_ID, 'normal', false, 'main' );
+			insert_basic_widgets( $blog_ID, 'mobile', false, 'main' );
+			insert_basic_widgets( $blog_ID, 'tablet', false, 'main' );
+		}
+		task_end();
 	}
 
 	if( $install_collection_bloga )
 	{	// Install Blog A
 		$timeshift += 86400;
+		task_begin( 'Creating Blog A collection...' );
 		$section_ID = isset( $sections['Blogs']['ID'] ) ? $sections['Blogs']['ID'] : 1;
 		$blog_ID = create_demo_collection( 'blog_a', $jay_moderator_ID, $create_demo_users, $timeshift, $section_ID );
-		// Insert basic widgets:
-		insert_basic_widgets( $blog_ID, 'normal', false, 'std' );
-		insert_basic_widgets( $blog_ID, 'mobile', false, 'std' );
-		insert_basic_widgets( $blog_ID, 'tablet', false, 'std' );
+		if( $initial_install )
+		{
+			if( is_callable( 'update_install_progress_bar' ) )
+			{
+				update_install_progress_bar();
+			}
+		}
+		else
+		{	// Insert basic widgets:
+			insert_basic_widgets( $blog_ID, 'normal', false, 'std' );
+			insert_basic_widgets( $blog_ID, 'mobile', false, 'std' );
+			insert_basic_widgets( $blog_ID, 'tablet', false, 'std' );
+		}
+		task_end();
 	}
 
 	if( $install_collection_blogb )
 	{	// Install Blog B
 		$timeshift += 86400;
+		task_begin( 'Creating Blog B collection...' );
 		$section_ID = isset( $sections['Blogs']['ID'] ) ? $sections['Blogs']['ID'] : 1;
-		// Create demo poll:
-		global $demo_poll_ID;
-		$demo_poll_ID = create_demo_poll();
 		$blog_ID = create_demo_collection( 'blog_b', $paul_blogger_ID, $create_demo_users, $timeshift, $section_ID );
-		// Insert basic widgets:
-		insert_basic_widgets( $blog_ID, 'normal', false, 'std' );
-		insert_basic_widgets( $blog_ID, 'mobile', false, 'std' );
-		insert_basic_widgets( $blog_ID, 'tablet', false, 'std' );
+		if( $initial_install )
+		{
+			if( is_callable( 'update_install_progress_bar' ) )
+			{
+				update_install_progress_bar();
+			}
+		}
+		else
+		{	// Insert basic widgets:
+			insert_basic_widgets( $blog_ID, 'normal', false, 'std' );
+			insert_basic_widgets( $blog_ID, 'mobile', false, 'std' );
+			insert_basic_widgets( $blog_ID, 'tablet', false, 'std' );
+		}
+		task_end();
 	}
 
 	if( $install_collection_photos )
 	{	// Install Photos blog
 		$timeshift += 86400;
+		task_begin( 'Creating Photos collection...' );
 		$section_ID = isset( $sections['Photos']['ID'] ) ? $sections['Photos']['ID'] : 1;
 		$blog_ID = create_demo_collection( 'photo', $dave_blogger_ID, $create_demo_users, $timeshift, $section_ID );
-		// Insert basic widgets:
-		insert_basic_widgets( $blog_ID, 'normal', false, 'photo' );
-		insert_basic_widgets( $blog_ID, 'mobile', false, 'photo' );
-		insert_basic_widgets( $blog_ID, 'tablet', false, 'photo' );
+
+		if( $initial_install )
+		{
+			if( is_callable( 'update_install_progress_bar' ) )
+			{
+				update_install_progress_bar();
+			}
+		}
+		else
+		{	// Insert basic widgets:
+			insert_basic_widgets( $blog_ID, 'normal', false, 'photo' );
+			insert_basic_widgets( $blog_ID, 'mobile', false, 'photo' );
+			insert_basic_widgets( $blog_ID, 'tablet', false, 'photo' );
+		}
+		task_end();
 	}
 
 	if( $install_collection_forums )
 	{	// Install Forums blog
 		$timeshift += 86400;
+		task_begin( 'Creating Forums collection...' );
 		$section_ID = isset( $sections['Forums']['ID'] ) ? $sections['Forums']['ID'] : 1;
 		$blog_ID = create_demo_collection( 'forum', $paul_blogger_ID, $create_demo_users, $timeshift, $section_ID );
-		// Insert basic widgets:
-		insert_basic_widgets( $blog_ID, 'normal', false, 'forum' );
-		insert_basic_widgets( $blog_ID, 'mobile', false, 'forum' );
-		insert_basic_widgets( $blog_ID, 'tablet', false, 'forum' );
+
+		if( $initial_install )
+		{
+			if( is_callable( 'update_install_progress_bar' ) )
+			{
+				update_install_progress_bar();
+			}
+		}
+		else
+		{	// Insert basic widgets:
+			insert_basic_widgets( $blog_ID, 'normal', false, 'forum' );
+			insert_basic_widgets( $blog_ID, 'mobile', false, 'forum' );
+			insert_basic_widgets( $blog_ID, 'tablet', false, 'forum' );
+		}
+		task_end();
 	}
 
 	if( $install_collection_manual )
 	{	// Install Manual blog
 		$timeshift += 86400;
+		task_begin( 'Creating Manual collection...' );
 		$section_ID = isset( $sections['Manual']['ID'] ) ? $sections['Manual']['ID'] : 1;
 		$blog_ID = create_demo_collection( 'manual', $dave_blogger_ID, $create_demo_users, $timeshift, $section_ID );
-		// Insert basic widgets:
-		insert_basic_widgets( $blog_ID, 'normal', false, 'manual' );
-		insert_basic_widgets( $blog_ID, 'mobile', false, 'manual' );
-		insert_basic_widgets( $blog_ID, 'tablet', false, 'manual' );
+
+		if( $initial_install )
+		{
+			if( is_callable( 'update_install_progress_bar' ) )
+			{
+				update_install_progress_bar();
+			}
+		}
+		else
+		{	// Insert basic widgets:
+			insert_basic_widgets( $blog_ID, 'normal', false, 'manual' );
+			insert_basic_widgets( $blog_ID, 'mobile', false, 'manual' );
+			insert_basic_widgets( $blog_ID, 'tablet', false, 'manual' );
+		}
+		task_end();
 	}
 
 	if( $install_collection_tracker )
 	{	// Install Tracker blog
 		$timeshift += 86400;
+		task_begin( 'Creating Tracker collection...' );
 		$section_ID = isset( $sections['Forums']['ID'] ) ? $sections['Forums']['ID'] : 1;
 		$blog_ID = create_demo_collection( 'group', $jay_moderator_ID, $create_demo_users, $timeshift, $section_ID );
-		// Insert basic widgets:
-		insert_basic_widgets( $blog_ID, 'normal', false, 'group' );
-		insert_basic_widgets( $blog_ID, 'mobile', false, 'group' );
-		insert_basic_widgets( $blog_ID, 'tablet', false, 'group' );
+
+		if( $initial_install )
+		{
+			if( is_callable( 'update_install_progress_bar' ) )
+			{
+				update_install_progress_bar();
+			}
+		}
+		else
+		{	// Insert basic widgets:
+			insert_basic_widgets( $blog_ID, 'normal', false, 'group' );
+			insert_basic_widgets( $blog_ID, 'mobile', false, 'group' );
+			insert_basic_widgets( $blog_ID, 'tablet', false, 'group' );
+		}
+		task_end();
 	}
 
 	if( $install_collection_minisite )
 	{	// Install Mini-site collection
 		$timeshift += 86400;
+		task_begin( 'Creating Mini-Site collection...' );
 		$blog_ID = create_demo_collection( 'minisite', $jay_moderator_ID, $create_demo_users, $timeshift, 1 );
-		// Insert basic widgets:
-		insert_basic_widgets( $blog_ID, 'normal', false, 'minisite' );
-		insert_basic_widgets( $blog_ID, 'mobile', false, 'minisite' );
-		insert_basic_widgets( $blog_ID, 'tablet', false, 'minisite' );
+
+		if( $initial_install )
+		{
+			if( is_callable( 'update_install_progress_bar' ) )
+			{
+				update_install_progress_bar();
+			}
+		}
+		else
+		{
+			// Insert basic widgets:
+			insert_basic_widgets( $blog_ID, 'normal', false, 'minisite' );
+			insert_basic_widgets( $blog_ID, 'mobile', false, 'minisite' );
+			insert_basic_widgets( $blog_ID, 'tablet', false, 'minisite' );
+		}
+		task_end();
 	}
 
 	// Setting default login and default messaging collection:
+	task_begin( 'Setting default login and default messaging collection...' );
 	$BlogCache = & get_BlogCache();
 	if( $demo_content_type == 'minisite' )
 	{
-		$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
-			VALUES ( '.$DB->quote( 'site_skins_enabled' ).', 0 ),
-						( '.$DB->quote( 'login_blog_ID' ).', 0 ),
+		$DB->query( 'REPLACE INTO T_settings ( set_name, set_value )
+			VALUES ( '.$DB->quote( 'login_blog_ID' ).', 0 ),
 						( '.$DB->quote( 'msg_blog_ID' ).', 0 )' );
 	}
 	else
 	{
 		if( $first_Blog = & $BlogCache->get_by_ID( 1, false, false ) )
 		{	// Set first blog as default login and default messaging collection
-			$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
+			$DB->query( 'REPLACE INTO T_settings ( set_name, set_value )
 				VALUES ( '.$DB->quote( 'login_blog_ID' ).', '.$DB->quote( $first_Blog->ID ).' ),
 							( '.$DB->quote( 'msg_blog_ID' ).', '.$DB->quote( $first_Blog->ID ).' )' );
 		}
 	}
+	if( $initial_install )
+	{
+		if( is_callable( 'update_install_progress_bar' ) )
+		{
+			update_install_progress_bar();
+		}
+	}
+	task_end();
+
+	task_begin( 'Set setting for site skins...' );
+	$Settings->set( 'site_skins_enabled', $site_skins_setting );
+	$Settings->dbupdate();
+	task_end();
+
+	if( $initial_install )
+	{
+		if( $install_test_features )
+		{
+			echo_install_log( 'TEST FEATURE: Creating fake hit statistics' );
+			task_begin( 'Creating fake hit statistics... ' );
+			load_funcs('sessions/model/_hitlog.funcs.php');
+			load_funcs('_core/_url.funcs.php');
+			$insert_data_count = generate_hit_stat(10, 0, 5000);
+			echo sprintf( '%d test hits are added.', $insert_data_count );
+			task_end();
+		}
+
+		/*
+		// Note: we don't really need this any longer, but we might use it for a better default setup later...
+		echo 'Creating default user/blog permissions... ';
+		// Admin for blog A:
+		$query = "INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+								bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
+								bloguser_perm_meta_comment, bloguser_perm_cats, bloguser_perm_properties,
+								bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
+							VALUES
+								( $blog_a_ID, ".$User_Demo->ID.", 1,
+								'published,deprecated,protected,private,draft', 1, 1, 1, 0, 0, 1, 1, 1 )";
+		$DB->query( $query );
+		echo "OK.<br />\n";
+		*/
+
+		// Allow all modules to create their own demo contents:
+		modules_call_method( 'create_demo_contents' );
+
+		// Set default locations for each post in test mode installation
+		create_default_posts_location();
+
+		//install_basic_widgets( $new_db_version );
+
+		load_funcs( 'tools/model/_system.funcs.php' );
+		system_init_caches( true, true ); // Outputs messages
+	}
+
+	restore_error_handler();
 }
 
 
@@ -1483,7 +1675,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 
 			if( ! $DB->get_var( 'SELECT set_value FROM T_settings WHERE set_name = '.$DB->quote( 'info_blog_ID' ) ) && ! empty( $blog_home_ID ) )
 			{	// Save ID of this blog in settings table, It is used on top menu, file "/skins_site/_site_body_header.inc.php"
-				$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
+				$DB->query( 'REPLACE INTO T_settings ( set_name, set_value )
 						VALUES ( '.$DB->quote( 'info_blog_ID' ).', '.$DB->quote( $blog_home_ID ).' )' );
 			}
 			$blog_ID = $blog_home_ID;
@@ -3343,4 +3535,66 @@ function create_demo_poll()
 	}
 
 	return $demo_poll_ID;
+}
+
+
+/**
+ * This is called installs in the backoffice and fills the tables with
+ * demo/tutorial things.
+ */
+function install_demo_content()
+{
+	global $DB, $current_User;
+	global $install_test_features;
+
+	$create_sample_contents   = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
+	$create_demo_organization = param( 'create_demo_organization', 'boolean', false, true );
+	$create_demo_users        = param( 'create_demo_users', 'boolean', false, true );
+	$create_demo_messages     = param( 'create_sample_private_messages', 'boolean', false, true );
+	$install_test_features    = param( 'install_test_features', 'boolean', false );
+
+	$user_org_IDs = NULL;
+	$demo_users = array();
+
+	$DB->begin();
+	if( $create_demo_organization || $create_demo_users )
+	{
+		echo get_install_format_text( '<h2>'.T_('Creating sample organization and users...').'</h2>', 'h2' );
+		evo_flush();
+
+		if( $create_demo_organization )
+		{
+			task_begin( 'Creating demo organization...' );
+			$user_org_IDs = array( create_demo_organization( $current_User->ID )->ID );
+			task_end();
+
+			task_begin( 'Adding admin user to demo organization...' );
+			$current_User->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
+			task_end();
+		}
+
+		if( $create_demo_users )
+		{
+			$demo_users = get_demo_users( true );
+		}
+	}
+
+	if( $create_demo_messages )
+	{
+		task_begin( 'Creating demo private messages...' );
+		create_demo_messages();
+		task_end();
+	}
+
+	if( $create_sample_contents )
+	{
+		echo get_install_format_text( '<h2>'.T_('Installing sample contents...').'</h2>', 'h2' );
+		evo_flush();
+		create_demo_contents( $demo_users, $create_demo_users, false );
+	}
+
+	echo '<br/><br/>';
+	echo get_install_format_text( '<span class="text-success">'.T_('Created sample contents.').'</span>' );
+	evo_flush();
+	$DB->commit();
 }

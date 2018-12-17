@@ -33,6 +33,17 @@ if( empty( $_GET['blog'] ) )
 	unset( $Blog, $Collection );
 }
 
+param_action();
+
+if( $action == 'new_demo_content' )
+{	// Update site skins setting ahead of rendering so that the menu will display correctly:
+	global $Settings;
+
+	$demo_content_type = param( 'demo_content_type', 'string', NULL );
+	$Settings->set( 'site_skins_enabled', $demo_content_type != 'minisite' );
+	$Settings->dbupdate();
+}
+
 // Site dashboard
 $AdminUI->set_path( 'site', 'dashboard' );
 
@@ -78,7 +89,19 @@ $AdminUI->disp_body_top();
 $AdminUI->disp_payload_begin();
 
 $collection_count = get_table_count( 'T_blogs' );
-if( $current_User->check_perm( 'blogs', 'create' ) && $collection_count  === 0 )
+if( $action == 'new_demo_content' )
+{	// Execute action inside template to display a process in real time
+	$block_item_Widget = new Widget( 'block_item' );
+
+	$block_item_Widget->title = T_('Demo content').':';
+	$block_item_Widget->disp_template_replaced( 'block_start' );
+
+	load_funcs( 'collections/_demo_content.funcs.php' );
+	install_demo_content();
+
+	$block_item_Widget->disp_template_raw( 'block_end' );
+}
+elseif( $current_User->check_perm( 'blogs', 'create' ) && $collection_count === 0 )
 {
 	// Display welcome panel:
 	$AdminUI->disp_view( 'collections/views/_welcome_demo_content.view.php' );
