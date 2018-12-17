@@ -815,8 +815,6 @@ body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
   margin-bottom: 0;
 }
 .evo_widget div {
-  margin-top: 0;
-  margin-bottom: 0;
   padding: 0;
 }
 .evo_widget div > p,
@@ -1085,13 +1083,16 @@ div[class*="_list"],
 }
 @media (min-width: 768px) {
   .flex-parent {
+    display: -ms-flexbox;
     display: flex;
-    align-items: center;
+    -ms-flex-align: center;
+        align-items: center;
     padding: 10px;
     margin: 30px 0;
   }
   .long-and-truncated {
-    flex: 1;
+    -ms-flex: 1;
+        flex: 1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1107,7 +1108,8 @@ div[class*="_list"],
     display: inline-block;
   }
   .long-and-truncated-with-child {
-    flex: 1;
+    -ms-flex: 1;
+        flex: 1;
   }
   .long-and-truncated-with-child h2 {
     white-space: nowrap;
@@ -1115,7 +1117,8 @@ div[class*="_list"],
     text-overflow: ellipsis;
   }
   .long-and-truncated-with-child-corrected {
-    flex: 1;
+    -ms-flex: 1;
+        flex: 1;
     min-width: 0;
     /* or some value */
   }
