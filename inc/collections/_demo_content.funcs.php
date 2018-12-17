@@ -1430,20 +1430,23 @@ function create_demo_contents( $demo_users = array(), $create_demo_users = true,
 
 	// Setting default login and default messaging collection:
 	task_begin( 'Setting default login and default messaging collection...' );
-	$BlogCache = & get_BlogCache();
 	if( $demo_content_type == 'minisite' )
 	{
-		$DB->query( 'REPLACE INTO T_settings ( set_name, set_value )
-			VALUES ( '.$DB->quote( 'login_blog_ID' ).', 0 ),
-						( '.$DB->quote( 'msg_blog_ID' ).', 0 )' );
+		$Settings->set( 'login_blog_ID', 0 );
+		$Settings->set( 'msg_blog_ID', 0 );
+		$Settings->set( 'info_blog_ID', 0 );
+		$Settings->dbupdate();
 	}
 	else
 	{
-		if( $first_Blog = & $BlogCache->get_by_ID( 1, false, false ) )
+		$BlogCache = & get_BlogCache();
+		//$BlogCache->load_where( 'blog_type = "main" )' );
+		if( $first_Blog = & $BlogCache->get_first() )
 		{	// Set first blog as default login and default messaging collection
-			$DB->query( 'REPLACE INTO T_settings ( set_name, set_value )
-				VALUES ( '.$DB->quote( 'login_blog_ID' ).', '.$DB->quote( $first_Blog->ID ).' ),
-							( '.$DB->quote( 'msg_blog_ID' ).', '.$DB->quote( $first_Blog->ID ).' )' );
+			$Settings->set( 'login_blog_ID', $first_Blog->ID );
+			$Settings->set( 'msg_blog_ID', $first_Blog->ID );
+			$Settings->set( 'info_blog_ID', $first_Blog->ID );
+			$Settings->dbupdate();
 		}
 	}
 	if( $initial_install )
