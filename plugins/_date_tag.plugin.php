@@ -21,7 +21,7 @@ class date_tag_plugin extends Plugin
 	var $code = 'evo_datetag';
 	var $name = 'Date tag';
 	var $priority = 57;
-	var $version = '6.10.4';
+	var $version = '7.0.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;

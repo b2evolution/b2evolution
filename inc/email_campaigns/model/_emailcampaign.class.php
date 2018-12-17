@@ -86,14 +86,19 @@ class EmailCampaign extends DataObject
 	var $unsub_clicks;
 
 	var $cta1_autm_ID;
+	var $cta1_autm_execute = 1;
 
 	var $cta2_autm_ID;
+	var $cta2_autm_execute = 1;
 
 	var $cta3_autm_ID;
+	var $cta3_autm_execute = 1;
 
 	var $like_autm_ID;
+	var $like_autm_execute = 1;
 
 	var $dislike_autm_ID;
+	var $dislike_autm_execute = 1;
 
 	var $use_wysiwyg = 0;
 
@@ -171,10 +176,15 @@ class EmailCampaign extends DataObject
 			$this->dislike_count = $db_row->ecmp_dislike_count;
 			$this->unsub_clicks = $db_row->ecmp_unsub_clicks;
 			$this->cta1_autm_ID = $db_row->ecmp_cta1_autm_ID;
+			$this->cta1_autm_execute = $db_row->ecmp_cta1_autm_execute;
 			$this->cta2_autm_ID = $db_row->ecmp_cta2_autm_ID;
+			$this->cta2_autm_execute = $db_row->ecmp_cta2_autm_execute;
 			$this->cta3_autm_ID = $db_row->ecmp_cta3_autm_ID;
+			$this->cta3_autm_execute = $db_row->ecmp_cta3_autm_execute;
 			$this->like_autm_ID = $db_row->ecmp_like_autm_ID;
+			$this->like_autm_execute = $db_row->ecmp_like_autm_execute;
 			$this->dislike_autm_ID = $db_row->ecmp_dislike_autm_ID;
+			$this->dislike_autm_execute = $db_row->ecmp_dislike_autm_execute;
 		}
 	}
 
@@ -800,30 +810,40 @@ class EmailCampaign extends DataObject
 		if( $cta1_autm_ID !== NULL )
 		{	// Automation CTA 1:
 			$this->set( 'cta1_autm_ID', ( $cta1_autm_ID === 0 ? NULL : $cta1_autm_ID ), true );
+			param( 'ecmp_cta1_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'cta1_autm_execute' );
 		}
 
 		$cta2_autm_ID = param( 'ecmp_cta2_autm_ID', 'integer', NULL );
 		if( $cta2_autm_ID !== NULL )
 		{	// Automation CTA 2:
 			$this->set( 'cta2_autm_ID', ( $cta2_autm_ID === 0 ? NULL : $cta2_autm_ID ), true );
+			param( 'ecmp_cta2_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'cta2_autm_execute' );
 		}
 
 		$cta3_autm_ID = param( 'ecmp_cta3_autm_ID', 'integer', NULL );
 		if( $cta3_autm_ID !== NULL )
 		{	// Automation CTA 3:
 			$this->set( 'cta3_autm_ID', ( $cta3_autm_ID === 0 ? NULL : $cta3_autm_ID ), true );
+			param( 'ecmp_cta3_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'cta3_autm_execute' );
 		}
 
 		$like_autm_ID = param( 'ecmp_like_autm_ID', 'integer', NULL );
 		if( $like_autm_ID !== NULL )
 		{	// Automation LIKE:
 			$this->set( 'like_autm_ID', ( $like_autm_ID === 0 ? NULL : $like_autm_ID ), true );
+			param( 'ecmp_like_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'like_autm_execute' );
 		}
 
 		$dislike_autm_ID = param( 'ecmp_dislike_autm_ID', 'integer', NULL );
 		if( $dislike_autm_ID !== NULL )
 		{	// Automation DISLIKE:
 			$this->set( 'dislike_autm_ID', ( $dislike_autm_ID === 0 ? NULL : $dislike_autm_ID ), true );
+			param( 'ecmp_dislike_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'dislike_autm_execute' );
 		}
 
 		return ! param_errors_detected();
@@ -1548,7 +1568,14 @@ class EmailCampaign extends DataObject
 		}
 
 		// Add user to automation:
-		$added_users_num = $click_Automation->add_users( array( $user_ID ) );
+		$added_users_num = $click_Automation->add_users( $user_ID, array(
+				'users_no_subs' => 'add', // Add anyway users who are not subscribed to Newsletter of the Automation
+			) );
+
+		if( $added_users_num && $this->get( $click_type.'_autm_execute' ) )
+		{	// Execute first step(s) immediately:
+			$click_Automation->execute_first_step( $user_ID );
+		}
 
 		return empty( $added_users_num ) ? false : $added_users_num;
 	}

@@ -10523,11 +10523,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	{	// part of 6.10.4-stable
 		db_upgrade_cols( 'T_email__campaign', array(
 			'ADD' => array(
-				'ecmp_cta1_autm_ID' => 'INT UNSIGNED NULL',
-				'ecmp_cta2_autm_ID' => 'INT UNSIGNED NULL',
-				'ecmp_cta3_autm_ID' => 'INT UNSIGNED NULL',
-				'ecmp_like_autm_ID' => 'INT UNSIGNED NULL',
-				'ecmp_dislike_autm_ID' => 'INT UNSIGNED NULL',
+				'ecmp_cta1_autm_ID'         => 'INT UNSIGNED NULL',
+				'ecmp_cta1_autm_execute'    => 'TINYINT(1) NOT NULL DEFAULT 1',
+				'ecmp_cta2_autm_ID'         => 'INT UNSIGNED NULL',
+				'ecmp_cta2_autm_execute'    => 'TINYINT(1) NOT NULL DEFAULT 1',
+				'ecmp_cta3_autm_ID'         => 'INT UNSIGNED NULL',
+				'ecmp_cta3_autm_execute'    => 'TINYINT(1) NOT NULL DEFAULT 1',
+				'ecmp_like_autm_ID'         => 'INT UNSIGNED NULL',
+				'ecmp_like_autm_execute'    => 'TINYINT(1) NOT NULL DEFAULT 1',
+				'ecmp_dislike_autm_ID'      => 'INT UNSIGNED NULL',
+				'ecmp_dislike_autm_execute' => 'TINYINT(1) NOT NULL DEFAULT 1',
 			),
 		) );
 		upg_task_end();
