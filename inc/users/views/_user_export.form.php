@@ -91,9 +91,10 @@ $Form->begin_form( 'fform', get_usertab_header( $edited_User, 'export', '<span c
 
 $Form->begin_fieldset( T_('Export to XML/ZIP file').get_manual_link( 'export-xml-zip' ), array( 'class'=>'fieldset clear' ) );
 
-$Form->checkbox_input( 'options[pass]', isset( $options['pass'] ) ? 1 : 0, T_('Select what to export'), array( 'input_suffix' => '<label for="options_pass_">'.T_('Include (md5-hashed) user passwords in export').'</label>' ) );
-
-$Form->checkbox_input( 'options[avatar]', isset( $options['avatar'] ) ? 1 : 0, '', array( 'input_suffix' => '<label for="options_avatar_">'.T_('Include profile pictures').'</label>', 'note' => T_('will be included in ZIP file') ) );
+$Form->checklist( array(
+		array( 'options[pass]', 1, T_('Include (md5-hashed) user passwords in export'), isset( $options['pass'] ) ? 1 : 0 ),
+		array( 'options[avatar]', 1, T_('Include profile pictures'), isset( $options['avatar'] ) ? 1 : 0, 0, T_('will be included in ZIP file') ),
+	), 'export_options', T_('Select what to export') );
 
 $Form->end_fieldset();
 

@@ -72,8 +72,10 @@ $Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(di
 		array( 'relcanonical_homepage', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_homepage' ) ),
 		), 'canonical_homepage_options', T_('Make canonical') );
 
-	$Form->checkbox( 'paged_noindex', $edited_Blog->get_setting( 'paged_noindex' ), T_('"Next" blog pages'), T_('META NOINDEX').' - '.T_('Page 2,3,4...') );
-	$Form->checkbox( 'paged_nofollowto', $edited_Blog->get_setting( 'paged_nofollowto' ), '', T_('NOFOLLOW on links to').' '.T_('Page 2,3,4...') );
+	$Form->checklist( array(
+			array( 'paged_noindex', 1, T_('META NOINDEX').' - '.T_('Page 2,3,4...'), $edited_Blog->get_setting( 'paged_noindex' ) ),
+			array( 'paged_nofollowto', 1, T_('NOFOLLOW on links to').' '.T_('Page 2,3,4...'), $edited_Blog->get_setting( 'paged_nofollowto' ) ),
+		), 'paged', T_('"Next" blog pages') );
 
 	$Form->radio( 'title_link_type', $edited_Blog->get_setting( 'title_link_type' ), array(
 			  array( 'permalink', T_('Link to the permanent url of the post') ),
