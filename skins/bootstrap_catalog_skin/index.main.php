@@ -114,10 +114,12 @@ siteskin_include( '_site_body_header.inc.php' );
 		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login' ) ) )
 		{ // Don't display the messages here because they are displayed inside wrapper to have the same width as form
 			// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
+			echo '<div class="action_messages">';
 			messages( array(
-					'block_start' => '<div class="action_messages">',
-					'block_end'   => '</div>',
+					'block_start' => '',
+					'block_end'   => '',
 				) );
+			echo '</div>';
 			// --------------------------------- END OF MESSAGES ---------------------------------
 		}
 		?>

@@ -209,7 +209,23 @@ class display_shopping_cart_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Collection, $Blog;
+		global $Collection, $Blog, $Session, $servertimenow;
+
+		// Get current cart:
+		$Cart = & get_Cart();
+		$cart_last_updated = $Session->get( 'cart_last_updated' );
+
+		if( empty( $cart_last_updated ) || ( $servertimenow > ( $cart_last_updated + 600 ) ) )
+		{	// Update availability and pricing of cart items
+			$update_Messages = $Cart->update_cart();
+		}
+
+		// Get items from the current cart:
+		$cart_items = $Cart->get_items();
+
+		$params = array_merge( array(
+				'message_container_selector' => '.action_messages',
+			), $params );
 
 		$this->init_display( $params );
 
@@ -224,10 +240,6 @@ class display_shopping_cart_Widget extends ComponentWidget
 				'shopping_cart_total_row_end'   => '</div>',
 				'shopping_cart_table_end'       => '</div>',
 			), $params );
-
-		// Get items form the current cart:
-		$Cart = & get_Cart();
-		$cart_items = $Cart->get_items();
 
 		echo $this->disp_params['block_start'];
 
@@ -291,7 +303,7 @@ class display_shopping_cart_Widget extends ComponentWidget
 				$qty_cell = '<span class="nowrap">';
 				$qty_cell .= action_icon( '', 'minus', $cart_action_url.( $item_qty - 1 ), NULL, NULL, NULL, array( 'class' => '' ) ).' ';
 				$qty_cell .= $item_qty.' ';
-				if( $item_qty < $cart_Item->qty_in_stock || $cart_Item->can_be_ordered_if_no_stock )
+				if( ( $item_qty < $cart_Item->qty_in_stock ) || $cart_Item->can_be_ordered_if_no_stock )
 				{
 					$qty_cell .= action_icon( '', 'add', $cart_action_url.( $item_qty + 1 ), NULL, NULL, NULL, array( 'class' => '' ) );
 				}
@@ -323,6 +335,18 @@ class display_shopping_cart_Widget extends ComponentWidget
 		}
 
 		echo $this->disp_params['block_body_end'];
+
+		if( ! empty( $update_Messages ) )
+		{
+		?>
+		<script type="text/javascript" id="widget_display_shopping_cart_<?php echo $this->ID; ?>">
+		jQuery( document ).ready( function() {
+			var message_container = jQuery( '<?php echo format_to_js( $this->disp_params['message_container_selector'] );?>' );
+			message_container.append( '<?php echo format_to_js( $update_Messages ); ?>' );
+		} );
+		</script>
+		<?php
+		}
 
 		echo $this->disp_params['block_end'];
 
