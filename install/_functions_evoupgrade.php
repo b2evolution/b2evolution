@@ -10538,6 +10538,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13040, 'Upgrading items table...' ) )
+	{	// part of 6.10.5-stable
+		db_modify_col( 'T_items__item', 'post_title', 'VARCHAR(255) NULL' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 15000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '
