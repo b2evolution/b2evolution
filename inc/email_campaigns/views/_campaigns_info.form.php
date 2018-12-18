@@ -123,7 +123,6 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Automations').get_manual_link( 'campaign-automations-panel' ) );
 	$AutomationCache = & get_AutomationCache();
 	$AutomationCache->load_all();
-	$AutomationCache->none_option_text = T_('Select automation');
 	$AutomationCache->none_option_value = 0;
 	$automation_options = array(
 			array( T_('Add users who click CTA 1 to'),       'cta1_autm_ID',    'cta1_autm_execute' ),
