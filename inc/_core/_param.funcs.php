@@ -884,7 +884,7 @@ function param_check_new_user_email( $var, $value = NULL, $link_Blog = NULL )
 			global $Blog;
 			$link_Blog = $Blog;
 		}
-		param_error( $var, sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know or have forgotten it, you can <a %s>set your password here</a>.'),
+		param_error( $var, sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know it or have forgotten it, you can <a %s>reset your password here</a>.'),
 			'href="'.( $link_Blog === NULL ? get_login_url( '' ) : $link_Blog->get( 'loginurl' ) ).'"',
 			'href="'.( $link_Blog === NULL ? get_lostpassword_url() : $link_Blog->get( 'lostpasswordurl' ) ).'"' ) );
 		return false;

@@ -169,7 +169,16 @@ switch( $type )
 								break;
 
 							case 8: // Activate account button
-								// Does nothing yet
+								// Add tag for activate only
+								$assigned_user_tag = $edited_EmailCampaign->get( 'user_tag_activate' );
+								if( ! empty( $assigned_user_tag ) )
+								{
+									$email_User->add_usertags( $assigned_user_tag );
+									$email_User->dbupdate();
+								}
+
+								// Add user to automation if it is defined in email campaign:
+								$edited_EmailCampaign->add_user_to_automation( 'activate', $email_User->ID );
 								break;
 						}
 

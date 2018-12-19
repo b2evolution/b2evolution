@@ -10544,6 +10544,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13050, 'Upgrading email campaigns table...' ) )
+	{	// part of 6.10.4-stable
+		db_upgrade_cols( 'T_email__campaign', array(
+			'ADD' => array(
+				'ecmp_user_tag_activate'     => 'VARCHAR(255) NULL AFTER ecmp_user_tag_dislike',
+				'ecmp_activate_autm_ID'      => 'INT UNSIGNED NULL',
+				'ecmp_activate_autm_execute' => 'TINYINT(1) NOT NULL DEFAULT 1',
+			),
+		) );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 15000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '
@@ -10837,7 +10849,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			'T_comments__prerendering'     => array( 'cmpr_content_prerendered' ),
 			'T_cron__log'                  => array( 'clog_messages' ),
 			'T_cron__task'                 => array( 'ctsk_name', 'ctsk_params' ),
-			'T_email__campaign'            => array( 'ecmp_email_title', 'ecmp_email_html', 'ecmp_email_text', 'ecmp_email_plaintext', 'ecmp_user_tag', 'ecmp_user_tag_cta1', 'ecmp_user_tag_cta2', 'ecmp_user_tag_cta3', 'ecmp_user_tag_like', 'ecmp_user_tag_dislike, ecmp_user_tag_unsubscribe' ),
+			'T_email__campaign'            => array( 'ecmp_email_title', 'ecmp_email_html', 'ecmp_email_text', 'ecmp_email_plaintext', 'ecmp_user_tag', 'ecmp_user_tag_cta1', 'ecmp_user_tag_cta2', 'ecmp_user_tag_cta3', 'ecmp_user_tag_like', 'ecmp_user_tag_dislike', 'ecmp_user_tag_activate', 'ecmp_user_tag_unsubscribe' ),
 			'T_email__log'                 => array( 'emlog_subject', 'emlog_headers', 'emlog_message' ),
 			'T_email__newsletter'          => array( 'enlt_name', 'enlt_label' ),
 			'T_email__returns'             => array( 'emret_errormsg', 'emret_headers', 'emret_message' ),

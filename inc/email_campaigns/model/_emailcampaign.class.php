@@ -63,6 +63,8 @@ class EmailCampaign extends DataObject
 
 	var $user_tag_dislike;
 
+	var $user_tag_activate;
+
 	var $user_tag_unsubscribe;
 
 	var $send_count;
@@ -99,6 +101,9 @@ class EmailCampaign extends DataObject
 
 	var $dislike_autm_ID;
 	var $dislike_autm_execute = 1;
+
+	var $activate_autm_ID;
+	var $activate_autm_execute = 1;
 
 	var $use_wysiwyg = 0;
 
@@ -164,6 +169,7 @@ class EmailCampaign extends DataObject
 			$this->user_tag_cta3 = $db_row->ecmp_user_tag_cta3;
 			$this->user_tag_like = $db_row->ecmp_user_tag_like;
 			$this->user_tag_dislike = $db_row->ecmp_user_tag_dislike;
+			$this->user_tag_activate = $db_row->ecmp_user_tag_activate;
 			$this->user_tag_unsubscribe = $db_row->ecmp_user_tag_unsubscribe;
 			$this->send_count = $db_row->ecmp_send_count;
 			$this->open_count = $db_row->ecmp_open_count;
@@ -185,6 +191,8 @@ class EmailCampaign extends DataObject
 			$this->like_autm_execute = $db_row->ecmp_like_autm_execute;
 			$this->dislike_autm_ID = $db_row->ecmp_dislike_autm_ID;
 			$this->dislike_autm_execute = $db_row->ecmp_dislike_autm_execute;
+			$this->activate_autm_ID = $db_row->ecmp_activate_autm_ID;
+			$this->activate_autm_execute = $db_row->ecmp_activate_autm_execute;
 		}
 	}
 
@@ -641,15 +649,49 @@ class EmailCampaign extends DataObject
 	{
 		if( $force_update || $this->get( 'sync_plaintext' ) )
 		{	// Update plain-text message only when it is enabled for this email campaign:
-			$email_plaintext = preg_replace( '#<a[^>]+href="([^"]+)"[^>]*>[^<]*</a>#i', ' [ $1 ] ', $this->get( 'email_html' ) );
+			$email_plaintext = preg_replace_callback( '#<a[^>]+href="([^"]+)"[^>]*>([^<]*)</a>#i', array( $this, 'update_plaintext_callback_a' ), $this->get( 'email_html' ) );
 			$email_plaintext = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', ' [ $1 ] ', $email_plaintext );
 			$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
-			$email_plaintext = preg_replace( '#<(p|/h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
-			$email_plaintext = preg_replace( '#<(br|h[1-6]|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
+			$email_plaintext = preg_replace_callback( '#<h([1-4])[^>]*>([^<]*)</h\1>#i', array( $this, 'update_plaintext_callback_h' ), $email_plaintext );
+			$email_plaintext = preg_replace( '#<(p|/?h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
+			$email_plaintext = preg_replace( '#<(br|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
 			$email_plaintext = preg_replace( '#<li[^>]*>#i', "- ", $email_plaintext );
 			$email_plaintext = preg_replace( '#<hr ?/?>#i', "\n\n----------------\n\n", $email_plaintext );
-			$this->set( 'email_plaintext', strip_tags( $email_plaintext ) );
+			$email_plaintext = preg_replace( '#[\n\s]{2,}#i', "\n\n", $email_plaintext );
+			$this->set( 'email_plaintext', trim( strip_tags( $email_plaintext ), " \r\n" ) );
 		}
+	}
+
+
+	/**
+	 * Callback for <h1-4> of the function update_plaintext()
+	 *
+	 * @param array Matches
+	 * @return string
+	 */
+	function update_plaintext_callback_h( $m )
+	{
+		return "\n\n"
+			// Header text:
+			.$m[2]."\n"
+			// Put ======= under H1 and H2, ------- under H3 and H4:
+			.str_repeat( ( $m[1] > 2 ? '-' : '=' ), utf8_strlen( $m[2] ) )."\n\n";
+	}
+
+
+	/**
+	 * Callback for <a> of the function update_plaintext()
+	 *
+	 * @param array Matches
+	 * @return string
+	 */
+	function update_plaintext_callback_a( $m )
+	{
+		return ' [ '
+			// Display a text of the link if it is not same as url:
+			.( $m[1] == $m[2] ? '' : $m[2].' --> ' )
+			// Url of the link:
+			.$m[1].' ] ';
 	}
 
 
@@ -801,6 +843,11 @@ class EmailCampaign extends DataObject
 			$this->set_from_Request( 'user_tag_dislike' );
 		}
 
+		if( param( 'ecmp_user_tag_activate', 'string', NULL ) !== NULL )
+		{	// User tag:
+			$this->set_from_Request( 'user_tag_activate' );
+		}
+
 		if( param( 'ecmp_user_tag_unsubscribe', 'string', NULL ) !== NULL )
 		{	// User tag:
 			$this->set_from_Request( 'user_tag_unsubscribe' );
@@ -844,6 +891,14 @@ class EmailCampaign extends DataObject
 			$this->set( 'dislike_autm_ID', ( $dislike_autm_ID === 0 ? NULL : $dislike_autm_ID ), true );
 			param( 'ecmp_dislike_autm_execute', 'integer', 0 );
 			$this->set_from_Request( 'dislike_autm_execute' );
+		}
+
+		$activate_autm_ID = param( 'ecmp_activate_autm_ID', 'integer', NULL );
+		if( $activate_autm_ID !== NULL )
+		{	// Automation ACTIVATE:
+			$this->set( 'activate_autm_ID', ( $activate_autm_ID === 0 ? NULL : $activate_autm_ID ), true );
+			param( 'ecmp_activate_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'activate_autm_execute' );
 		}
 
 		return ! param_errors_detected();
@@ -903,7 +958,7 @@ class EmailCampaign extends DataObject
 	 * @param integer User ID
 	 * @param string Email address
 	 * @param string Mode: 'test' - to send test email newsletter
-	 * @param string|boolean Update time of last sending: 'auto', 'manual', FALSE - to don't update
+	 * @param string|boolean Update time of last sending: 'auto', 'manual'. FALSE and 'welcome' - to don't update
 	 * @param integer Newsletter ID, used for unsubscribe link in email footer, NULL - to use Newsletter ID of this Email Campaign
 	 * @param integer Automation ID, used to store in mail log
 	 * @return boolean TRUE on success
@@ -923,7 +978,8 @@ class EmailCampaign extends DataObject
 						'header' => 0,
 						'footer' => 0
 					),
-				'default_template_tag' => 1
+				'default_template_tag' => 1,
+				'is_welcome_email'     => ( $update_sent_ts == 'welcome' ),
 			);
 
 		$UserCache = & get_UserCache();
@@ -1032,7 +1088,7 @@ class EmailCampaign extends DataObject
 	 *
 	 * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
 	 * @param array Force users instead of users which are ready to receive this email campaign
-	 * @param string|boolean Update time of last sending: 'auto', 'manual', FALSE - to don't update
+	 * @param string|boolean Update time of last sending: 'auto', 'manual', 'welcome'. FALSE - to don't update
 	 */
 	function send_all_emails( $display_messages = true, $user_IDs = NULL, $update_sent_ts = 'manual' )
 	{
@@ -1080,7 +1136,7 @@ class EmailCampaign extends DataObject
 			}
 
 			// Send email to user:
-			$result = $this->send_email( $user_ID );
+			$result = $this->send_email( $user_ID, '', '', ( $update_sent_ts == 'welcome' ? $update_sent_ts : false ) );
 
 			if( $result )
 			{	// Email newsletter was sent for user successfully:
@@ -1153,7 +1209,7 @@ class EmailCampaign extends DataObject
 			}
 		}
 
-		if( $update_sent_ts == 'auto' )
+		if( $update_sent_ts == 'auto' || $update_sent_ts == 'welcome' )
 		{	// Update auto date of sending:
 			$this->set( 'auto_sent_ts', date( 'Y-m-d H:i:s', $localtimenow ) );
 			$this->dbupdate();
@@ -1548,7 +1604,7 @@ class EmailCampaign extends DataObject
 	/**
 	 * Add user to automation if it is defined in this email campaign for requested click type
 	 *
-	 * @param string Click type: 'cta1', 'cta2', 'cta3', 'like', 'dislike'
+	 * @param string Click type: 'cta1', 'cta2', 'cta3', 'like', 'dislike', 'activate'
 	 * @param integer User ID
 	 * @return boolean|integer FALSE on fail, Number of added users on success
 	 */

@@ -207,7 +207,7 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 	$return_url = param( 'return_to', 'url', '' );
 	if( empty( $return_url ) )
 	{
-		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), get_htsrv_url( 'login' ) );
+		$return_url = regenerate_url( '', '', '', '&' );
 	}
 
 	if( ! $force_normal_login && use_in_skin_login() )
@@ -219,28 +219,20 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 		}
 		$BlogCache = & get_BlogCache();
 		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
-		if( ! empty( $redirect_url ) )
-		{
-			$redirect_url = url_rel_to_same_host( $redirect_url, $Blog->get( $blog_page, array( 'glue' => '&' ) ) );
-		}
-		if( ! empty( $redirect_url ) )
-		{
-			$return_url = url_rel_to_same_host( $return_url, $Blog->get( $blog_page, array( 'glue' => '&' ) ) );
-		}
 		$url = $Blog->get( $blog_page, array( 'glue' => '&' ) );
-		//$url = force_https_url( $url, 'login' );
 	}
 	else
 	{ // Use normal/basic login form (without blog skin)
-		if( ! empty( $redirect_url ) )
-		{
-			$redirect_url = url_rel_to_same_host( $redirect_url, get_htsrv_url( 'login' ) );
-		}
-		if( ! empty( $redirect_url ) )
-		{
-			$return_url = url_rel_to_same_host( $return_url, get_htsrv_url( 'login' ) );
-		}
 		$url = get_htsrv_url( 'login' ).'login.php';
+	}
+
+	if( ! empty( $redirect_url ) )
+	{
+		$redirect_url = url_rel_to_same_host( $redirect_url, $url );
+	}
+	if( ! empty( $redirect_url ) )
+	{
+		$return_url = url_rel_to_same_host( $return_url, $url );
 	}
 
 	return url_add_param( $url, 'redirect_to='.rawurlencode( $redirect_url )
@@ -263,13 +255,13 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to 
 
 	if( empty( $redirect_to ) && $redirect_to !== false )
 	{ // Redirect back to current URL
-		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( 'login' ) );
+		$redirect_to = regenerate_url( '', '', '', $glue );
 	}
 
 	// This URL is used to redirect after ABORT login action:
 	if( empty( $return_to ) && $return_to !== false  )
 	{
-		$return_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( 'login' ) );
+		$return_to = regenerate_url( '', '', '', $glue );
 	}
 
 	if( use_in_skin_login() )
@@ -283,12 +275,12 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to 
 
 	if( $redirect_to !== false )
 	{ // Append redirect URL only when it is not restricted:
-		$lostpassword_url = url_add_param( $lostpassword_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue );
+		$lostpassword_url = url_add_param( $lostpassword_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, $lostpassword_url ) ), $glue );
 	}
 
 	if( $return_to !== false )
 	{ // Append return URL only when it is not restricted:
-		$lostpassword_url = url_add_param( $lostpassword_url, 'return_to='.rawurlencode( $return_to ), $glue );
+		$lostpassword_url = url_add_param( $lostpassword_url, 'return_to='.rawurlencode( url_rel_to_same_host( $return_to, $lostpassword_url ) ), $glue );
 	}
 
 	return $lostpassword_url;
@@ -308,7 +300,7 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 
 	if( empty( $redirect_to ) )
 	{ // Redirect back to current URL
-		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( 'login' ) );
+		$redirect_to = regenerate_url( '', '', '', $glue );
 	}
 
 	if( use_in_skin_login() )
@@ -320,7 +312,7 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 		$activateinfo_url = get_htsrv_url( 'login' ).'login.php?action=req_activate_email';
 	}
 
-	return url_add_param( $activateinfo_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue ) ;
+	return url_add_param( $activateinfo_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, $activateinfo_url ) ), $glue );
 }
 
 
@@ -857,14 +849,14 @@ function get_user_register_url( $redirect_to = NULL, $default_source_string = ''
 
 	if( ! empty( $redirect_to ) )
 	{
-		$register_url = url_add_param( $register_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, get_htsrv_url( 'login' ) ) ), $glue );
+		$register_url = url_add_param( $register_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, $register_url ) ), $glue );
 	}
 
 	// This URL is used to redirect after ABORT login action
 	$return_url = param( 'return_to', 'url', '' );
 	if( empty( $return_url ) )
 	{
-		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), get_htsrv_url( 'login' ) );
+		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), $register_url );
 	}
 
 	$register_url = url_add_param( $register_url, 'return_to='.rawurlencode( $return_url ), $glue );

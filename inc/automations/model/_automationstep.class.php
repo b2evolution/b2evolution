@@ -177,7 +177,9 @@ class AutomationStep extends DataObject
 		if( ! $this->can_be_modified() && ! param( 'confirm_pause', 'integer' ) )
 		{	// Don't allow to edit step of active automation without confirmation:
 			global $Messages;
-			$Messages->add( T_('You must pause the automation before creating it.'), 'error' );
+			$Messages->add( empty( $this->ID )
+				? T_('You must pause the automation before creating new step.')
+				: T_('You must pause the automation before changing step.'), 'error' );
 		}
 
 		// Order:
