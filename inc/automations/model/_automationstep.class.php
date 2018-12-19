@@ -660,10 +660,16 @@ class AutomationStep extends DataObject
 						if( $this->get( 'type' ) == 'subscribe' )
 						{	// Subscribe:
 							$affected_subscriprions_num = $step_User->subscribe( $Newsletter->ID );
+
+							// Send notification to owners of lists where user was subscribed:
+							$step_User->send_list_owner_notifications( 'subscribe' );
 						}
 						else
 						{	// Unsubscribe:
 							$affected_subscriprions_num = $step_User->unsubscribe( $Newsletter->ID );
+
+							// Send notification to owners of lists where user was unsubscribed:
+							$step_User->send_list_owner_notifications( 'unsubscribe' );
 						}
 						$step_result = ( $affected_subscriprions_num ? 'YES' : 'NO' );
 						// Display newsletter name in log:

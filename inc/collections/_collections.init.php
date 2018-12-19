@@ -1245,6 +1245,9 @@ class collections_Module extends Module
 					if( $current_User->unsubscribe( $Newsletter->ID ) )
 					{
 						$Messages->add( sprintf( T_('You have unsubscribed and you will no longer receive emails from %s.'), '"'.$Newsletter->get( 'name' ).'"' ), 'success' );
+
+						// Send notification to owners of lists where user subscribed:
+						$current_User->send_list_owner_notifications( 'unsubscribe' );
 					}
 				}
 				else
@@ -1257,6 +1260,9 @@ class collections_Module extends Module
 							$current_User->dbupdate();
 						}
 						$Messages->add( sprintf( T_('You have successfully subscribed to: %s.'), '"'.$Newsletter->get( 'name' ).'"' ), 'success' );
+
+						// Send notification to owners of lists where user subscribed:
+						$current_User->send_list_owner_notifications( 'subscribe' );
 					}
 				}
 

@@ -182,6 +182,15 @@ class User extends DataObject
 	var $newsletter_subscriptions_updated = false;
 
 	/**
+	 * Array of newsletter subscription changes with the following elements:
+	 *   - string, 'subscribe' | 'unsubscribe'
+	 *   - array of newsletter IDs
+	 *   - array of email template params
+	 * @var array
+	 */
+	var $newsletter_subscription_changed_values = array();
+
+	/**
 	 * Constructor
 	 *
 	 * @param object DB row
@@ -4257,6 +4266,9 @@ class User extends DataObject
 			$this->subscribe( $this->new_newsletter_subscriptions );
 			// Unsubscribe from unchecked newsletters:
 			$this->unsubscribe( array_diff( $this->get_newsletter_subscriptions( 'all' ), $this->new_newsletter_subscriptions ) );
+
+			// Send notifications to owners of lists where user subscribed/unsubscribed:
+			$this->send_list_owner_notifications();
 		}
 
 		// Update user tags:
@@ -5604,6 +5616,9 @@ class User extends DataObject
 			{ // Send notification email about the changes of user account
 				$this->send_account_changed_notification();
 			}
+
+			// Send notification to owners of lists where user is automatically subscribed:
+			$this->send_list_owner_notifications();
 		}
 		elseif( $is_new_user )
 		{	// Some error on inserting new user in DB:
@@ -5744,6 +5759,10 @@ class User extends DataObject
 							);
 						send_admin_notification( NT_('User account closed'), 'account_closed', $email_template_params );
 					}
+
+					// Send notification to owners of list where user was automatically unsubscribed:
+					$this->send_list_owner_notifications( 'unsubscribe' );
+
 					return true;
 				}
 			}
@@ -8028,7 +8047,7 @@ class User extends DataObject
 				'subscribed_by_admin' => ( is_logged_in() && $current_User->login != $this->login ? $current_User->login : '' ),
 			), empty( $this->newsletter_subscription_params ) ? array() : $this->newsletter_subscription_params, $params );
 
-			send_list_owner_notification( array_unique( array_merge( $insert_newsletter_IDs, $resubscribe_newsletter_IDs ) ), 'list_new_subscriber', $email_template_params );
+			$this->newsletter_subscription_changed_values[] = array( 'subscribe', array_unique( array_merge( $insert_newsletter_IDs, $resubscribe_newsletter_IDs ) ), $email_template_params );
 		}
 
 		// Insert user states for newsletters with automations:
@@ -8122,7 +8141,7 @@ class User extends DataObject
 				'unsubscribed_by_admin' => ( is_logged_in() && $current_User->login != $this->login ? $current_User->login : '' ),
 			), empty( $this->newsletter_unsubscription_params ) ? array() : $this->newsletter_unsubscription_params, $params );
 
-			send_list_owner_notification( $update_newsletter_IDs, 'list_lost_subscriber', $email_template_params );
+			$this->newsletter_subscription_changed_values[] = array( 'unsubscribe', $update_newsletter_IDs, $email_template_params );
 		}
 
 		// Unset newsletter unsubscription params for subsequent calls to this function:
@@ -8158,6 +8177,44 @@ class User extends DataObject
 			foreach( $EmailCampaignCache->cache as $EmailCampaign )
 			{	// Send an email of the campaign at subscription:
 				$EmailCampaign->send_all_emails( false, array( $this->ID ), 'welcome' );
+			}
+		}
+	}
+
+
+	/**
+	 * Send email notification to owners of lists where user subscribed/unsubscribed
+	 *
+	 * @param string subscribed | unsubscribed | all
+	 */
+	function send_list_owner_notifications( $type = 'all' )
+	{
+		if( ! empty( $this->newsletter_subscription_changed_values ) )
+		{
+			foreach( $this->newsletter_subscription_changed_values as $key => $value )
+			{
+				if( $type == 'all' || $type == $value[0] )
+				{
+					switch( $value[0] )
+					{
+						case 'subscribe':
+							$template_name = 'list_new_subscriber';
+							break;
+
+						case 'unsubscribe':
+							$template_name = 'list_lost_subscriber';
+							break;
+
+						default:
+							debug_die( 'Invalid type of subscription action' );
+					}
+
+					// Send an email to the list owner:
+					send_list_owner_notification( $value[1], $template_name, $value[2] );
+
+					// Remove subscription change:
+					unset( $this->newsletter_subscription_changed_values[$key] );
+				}
 			}
 		}
 	}
