@@ -248,7 +248,7 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
-						'th'          => T_('# actions'),
+						'th'          => T_('# of actions'),
 						'order'       => 'clog_actions_num',
 						'td'          => '$clog_actions_num$',
 						'default_dir' => 'D',

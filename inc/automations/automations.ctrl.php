@@ -77,7 +77,7 @@ switch( $action )
 
 		if( ( $action == 'edit_step' || $action == 'copy_step' ) && ! $edited_AutomationStep->can_be_modified() )
 		{	// If step cannot be modified currently
-			$Messages->add( T_('You must pause the automation before creating it.'), 'warning' );
+			$Messages->add( T_('You must pause the automation before changing step.'), 'warning' );
 		}
 		break;
 
@@ -93,7 +93,7 @@ switch( $action )
 
 		if( ! $edited_AutomationStep->can_be_modified() )
 		{	// If step cannot be modified currently
-			$Messages->add( T_('You must pause the automation before creating it.'), 'warning' );
+			$Messages->add( T_('You must pause the automation before creating new step.'), 'warning' );
 		}
 		break;
 
@@ -296,7 +296,7 @@ switch( $action )
 
 		if( ! $edited_AutomationStep->can_be_modified() )
 		{	// If step cannot be modified currently
-			$Messages->add( T_('You must pause the automation before creating it.'), 'error' );
+			$Messages->add( T_('You must pause the automation before changing step.'), 'error' );
 			$action = 'edit'; // To keep same opened page
 			// We want to highlight the Step:
 			$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
@@ -592,7 +592,7 @@ switch( $action )
 
 		if( ! $edited_AutomationStep->can_be_modified() )
 		{	// If step cannot be modified currently
-			$Messages->add( T_('You must pause the automation before creating it.'), 'error' );
+			$Messages->add( T_('You must pause the automation before deleting step.'), 'error' );
 		}
 		elseif( $edited_AutomationStep->dbdelete() )
 		{

@@ -378,7 +378,7 @@ switch( $action )
 			$edited_Chapter->set( 'ityp_ID', NULL, true );
 			if( $edited_Chapter->dbupdate() )
 			{	// Inform user about this modification:
-				$Messages->add( sprintf( T_('Default Item Type of the category "%s" has been changed to "%s" because it must be specified for default catefory.'), $edited_Chapter->get( 'name' ), T_('Same as collection default') ), 'note' );
+				$Messages->add( sprintf( T_('Default Item Type of the category "%s" has been changed to "%s" because Default Item Type must be specific for default category.'), $edited_Chapter->get( 'name' ), T_('Same as collection default') ), 'note' );
 			}
 		}
 
