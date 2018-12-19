@@ -224,7 +224,7 @@ class display_shopping_cart_Widget extends ComponentWidget
 		$cart_items = $Cart->get_items();
 
 		$params = array_merge( array(
-				'message_container_selector' => '.action_messages',
+				'message_container_selector' => 'jQuery( ".action_messages" )',
 			), $params );
 
 		$this->init_display( $params );
@@ -337,14 +337,14 @@ class display_shopping_cart_Widget extends ComponentWidget
 		echo $this->disp_params['block_body_end'];
 
 		if( ! empty( $update_Messages ) )
-		{
+		{	// Inject messages from cart update if any into the message container:
 		?>
-		<script type="text/javascript" id="widget_display_shopping_cart_<?php echo $this->ID; ?>">
-		jQuery( document ).ready( function() {
-			var message_container = jQuery( '<?php echo format_to_js( $this->disp_params['message_container_selector'] );?>' );
-			message_container.append( '<?php echo format_to_js( $update_Messages ); ?>' );
-		} );
-		</script>
+			<script type="text/javascript" id="widget_display_shopping_cart_<?php echo $this->ID; ?>">
+			jQuery( document ).ready( function() {
+				var message_container = <?php echo format_to_js( $this->disp_params['message_container_selector'] );?>;
+				message_container.append( '<?php echo format_to_js( $update_Messages ); ?>' );
+			} );
+			</script>
 		<?php
 		}
 

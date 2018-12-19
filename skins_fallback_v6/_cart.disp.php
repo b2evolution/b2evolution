@@ -16,6 +16,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // ------------------ "Shopping Cart" CONTAINER EMBEDDED HERE -------------------
 // Display container and contents:
-widget_container( 'shopping_cart' );
+widget_container( 'shopping_cart', array(
+		// Template params for "Display Shopping Cart" widget:
+		'message_container_selector' => 'jQuery( ".action_messages" )',
+	) );
 // --------------------- END OF "Shopping Cart" CONTAINER -----------------------
 ?>

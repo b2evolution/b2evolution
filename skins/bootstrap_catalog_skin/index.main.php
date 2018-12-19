@@ -114,6 +114,8 @@ siteskin_include( '_site_body_header.inc.php' );
 		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login' ) ) )
 		{ // Don't display the messages here because they are displayed inside wrapper to have the same width as form
 			// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
+			// <div class="action_messages"> must ALWAYS be there so that widgets (like the Cart widget) can inject Messages
+			// by Javascript if needed (e-g: Availability change detected on cart display/update)
 			echo '<div class="action_messages">';
 			messages( array(
 					'block_start' => '',
