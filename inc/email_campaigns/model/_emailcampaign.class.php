@@ -641,15 +641,49 @@ class EmailCampaign extends DataObject
 	{
 		if( $force_update || $this->get( 'sync_plaintext' ) )
 		{	// Update plain-text message only when it is enabled for this email campaign:
-			$email_plaintext = preg_replace( '#<a[^>]+href="([^"]+)"[^>]*>[^<]*</a>#i', ' [ $1 ] ', $this->get( 'email_html' ) );
+			$email_plaintext = preg_replace_callback( '#<a[^>]+href="([^"]+)"[^>]*>([^<]*)</a>#i', array( $this, 'update_plaintext_callback_a' ), $this->get( 'email_html' ) );
 			$email_plaintext = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', ' [ $1 ] ', $email_plaintext );
 			$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
-			$email_plaintext = preg_replace( '#<(p|/h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
-			$email_plaintext = preg_replace( '#<(br|h[1-6]|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
+			$email_plaintext = preg_replace_callback( '#<h([1-4])[^>]*>([^<]*)</h\1>#i', array( $this, 'update_plaintext_callback_h' ), $email_plaintext );
+			$email_plaintext = preg_replace( '#<(p|/?h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
+			$email_plaintext = preg_replace( '#<(br|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
 			$email_plaintext = preg_replace( '#<li[^>]*>#i', "- ", $email_plaintext );
 			$email_plaintext = preg_replace( '#<hr ?/?>#i', "\n\n----------------\n\n", $email_plaintext );
-			$this->set( 'email_plaintext', strip_tags( $email_plaintext ) );
+			$email_plaintext = preg_replace( '#[\n\s]{2,}#i', "\n\n", $email_plaintext );
+			$this->set( 'email_plaintext', trim( strip_tags( $email_plaintext ), " \r\n" ) );
 		}
+	}
+
+
+	/**
+	 * Callback for <h1-4> of the function update_plaintext()
+	 *
+	 * @param array Matches
+	 * @return string
+	 */
+	function update_plaintext_callback_h( $m )
+	{
+		return "\n\n"
+			// Header text:
+			.$m[2]."\n"
+			// Put ======= under H1 and H2, ------- under H3 and H4:
+			.str_repeat( ( $m[1] > 2 ? '-' : '=' ), utf8_strlen( $m[2] ) )."\n\n";
+	}
+
+
+	/**
+	 * Callback for <a> of the function update_plaintext()
+	 *
+	 * @param array Matches
+	 * @return string
+	 */
+	function update_plaintext_callback_a( $m )
+	{
+		return ' [ '
+			// Display a text of the link if it is not same as url:
+			.( $m[1] == $m[2] ? '' : $m[2].' --> ' )
+			// Url of the link:
+			.$m[1].' ] ';
 	}
 
 
