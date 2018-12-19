@@ -7899,8 +7899,11 @@ class User extends DataObject
 	 * Set newsletter subscriptions for this user
 	 *
 	 * @param array
+	 * @param array Optional subscription params. This will be applied to the next call to User::subscribe() and cleared thereafter.
+	 *              This will also be overridden by params passed to User::subscribe().
+	 *              - 'usertags': Comma-delimited user tags applied as part of subscription
 	 */
-	function set_newsletter_subscriptions( $new_subscriptions )
+	function set_newsletter_subscriptions( $new_subscriptions, $params = array() )
 	{
 		$prev_subscriptions = $this->get_newsletter_subscriptions();
 
@@ -7947,6 +7950,9 @@ class User extends DataObject
 
 		// Set new subscriptions:
 		$this->new_newsletter_subscriptions = $new_subscriptions;
+
+		// Set newsletter subscription params:
+		$this->newsletter_subscription_params = $params;
 	}
 
 
@@ -7955,7 +7961,6 @@ class User extends DataObject
 	 *
 	 * @param array|integer Newsletter IDs
 	 * @param array Optional subscription params
-	 *              - 'subscribed_User': User that subscribed
 	 *              - 'usertags': Comma-delimited user tags applied as part of subscription
 	 * @return integer|boolean # of rows affected or false if error
 	 */
@@ -8019,9 +8024,9 @@ class User extends DataObject
 		if( count( $insert_newsletter_IDs ) || count( $resubscribe_newsletter_IDs ) )
 		{	// Notify list owner of new subscriber:
 			$email_template_params = array_merge( array(
-				'subscribed_User' => $this,
+				'subscribed_User'     => $this,
 				'subscribed_by_admin' => ( is_logged_in() && $current_User->login != $this->login ? $current_User->login : '' ),
-			), $params );
+			), empty( $this->newsletter_subscription_params ) ? array() : $this->newsletter_subscription_params, $params );
 
 			send_list_owner_notification( array_unique( array_merge( $insert_newsletter_IDs, $resubscribe_newsletter_IDs ) ), 'list_new_subscriber', $email_template_params );
 		}
@@ -8049,6 +8054,9 @@ class User extends DataObject
 		// Unset flag in order not to run this twice:
 		$this->newsletter_subscriptions_updated = false;
 
+		// Unset newsletter subscription params for subsequent calls to this function:
+		unset( $this->newsletter_subscription_params );
+
 		// Update the CACHE array where we store who are subscribed already in order to avoid a duplicate entry error on second calling of this function:
 		$this->newsletter_subscriptions['subscribed'] = array_merge( $this->newsletter_subscriptions['subscribed'], $newsletter_IDs );
 		$this->newsletter_subscriptions['unsubscribed'] = array_diff( $this->newsletter_subscriptions['unsubscribed'], $newsletter_IDs );
@@ -8062,7 +8070,6 @@ class User extends DataObject
 	 *
 	 * @param array|integer Newsletter IDs
 	 * @param array Optional subscription params
-	 *              - 'subscribed_User': User that unsubscribed
 	 *              - 'usertags': Comma-delimited user tags applied as part of unsubscription
 	 * @return integer|boolean # of rows affected or false if error
 	 */
@@ -8111,12 +8118,15 @@ class User extends DataObject
 		if( count( $update_newsletter_IDs ) )
 		{	// Notify list owner of lost subscriber:
 			$email_template_params = array_merge( array(
-				'subscribed_User' => $this,
+				'subscribed_User'       => $this,
 				'unsubscribed_by_admin' => ( is_logged_in() && $current_User->login != $this->login ? $current_User->login : '' ),
-			), $params );
+			), empty( $this->newsletter_unsubscription_params ) ? array() : $this->newsletter_unsubscription_params, $params );
 
 			send_list_owner_notification( $update_newsletter_IDs, 'list_lost_subscriber', $email_template_params );
 		}
+
+		// Unset newsletter unsubscription params for subsequent calls to this function:
+		unset( $this->newsletter_unsubscription_params );
 
 		// Update the CACHE array where we store who are subscribed already in order to avoid a duplicate entry error on second calling of this function:
 		$this->newsletter_subscriptions['subscribed'] = array_diff( $this->newsletter_subscriptions['subscribed'], $update_newsletter_IDs );

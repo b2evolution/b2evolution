@@ -383,7 +383,12 @@ switch( $action )
 			}
 			if( count( $widget_newsletters ) )
 			{	// If at least one newsletter is selected in widget params:
-				$new_User->set_newsletter_subscriptions( array_keys( $widget_newsletters ) );
+				$newsletter_subscription_params = array();
+				if( ! empty( $user_tags ) )
+				{
+					$newsletter_subscription_params['usertags'] = $user_tags;
+				}
+				$new_User->set_newsletter_subscriptions( array_keys( $widget_newsletters ), $newsletter_subscription_params );
 			}
 		}
 
