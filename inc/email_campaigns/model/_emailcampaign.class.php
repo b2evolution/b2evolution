@@ -903,7 +903,7 @@ class EmailCampaign extends DataObject
 	 * @param integer User ID
 	 * @param string Email address
 	 * @param string Mode: 'test' - to send test email newsletter
-	 * @param string|boolean Update time of last sending: 'auto', 'manual', FALSE - to don't update
+	 * @param string|boolean Update time of last sending: 'auto', 'manual'. FALSE and 'welcome' - to don't update
 	 * @param integer Newsletter ID, used for unsubscribe link in email footer, NULL - to use Newsletter ID of this Email Campaign
 	 * @param integer Automation ID, used to store in mail log
 	 * @return boolean TRUE on success
@@ -923,7 +923,8 @@ class EmailCampaign extends DataObject
 						'header' => 0,
 						'footer' => 0
 					),
-				'default_template_tag' => 1
+				'default_template_tag' => 1,
+				'is_welcome_email'     => ( $update_sent_ts == 'welcome' ),
 			);
 
 		$UserCache = & get_UserCache();
@@ -1032,7 +1033,7 @@ class EmailCampaign extends DataObject
 	 *
 	 * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
 	 * @param array Force users instead of users which are ready to receive this email campaign
-	 * @param string|boolean Update time of last sending: 'auto', 'manual', FALSE - to don't update
+	 * @param string|boolean Update time of last sending: 'auto', 'manual', 'welcome'. FALSE - to don't update
 	 */
 	function send_all_emails( $display_messages = true, $user_IDs = NULL, $update_sent_ts = 'manual' )
 	{
@@ -1080,7 +1081,7 @@ class EmailCampaign extends DataObject
 			}
 
 			// Send email to user:
-			$result = $this->send_email( $user_ID );
+			$result = $this->send_email( $user_ID, '', '', ( $update_sent_ts == 'welcome' ? $update_sent_ts : false ) );
 
 			if( $result )
 			{	// Email newsletter was sent for user successfully:
@@ -1153,7 +1154,7 @@ class EmailCampaign extends DataObject
 			}
 		}
 
-		if( $update_sent_ts == 'auto' )
+		if( $update_sent_ts == 'auto' || $update_sent_ts == 'welcome' )
 		{	// Update auto date of sending:
 			$this->set( 'auto_sent_ts', date( 'Y-m-d H:i:s', $localtimenow ) );
 			$this->dbupdate();
