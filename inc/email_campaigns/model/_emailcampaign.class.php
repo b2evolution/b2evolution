@@ -63,6 +63,8 @@ class EmailCampaign extends DataObject
 
 	var $user_tag_dislike;
 
+	var $user_tag_activate;
+
 	var $user_tag_unsubscribe;
 
 	var $send_count;
@@ -99,6 +101,9 @@ class EmailCampaign extends DataObject
 
 	var $dislike_autm_ID;
 	var $dislike_autm_execute = 1;
+
+	var $activate_autm_ID;
+	var $activate_autm_execute = 1;
 
 	var $use_wysiwyg = 0;
 
@@ -164,6 +169,7 @@ class EmailCampaign extends DataObject
 			$this->user_tag_cta3 = $db_row->ecmp_user_tag_cta3;
 			$this->user_tag_like = $db_row->ecmp_user_tag_like;
 			$this->user_tag_dislike = $db_row->ecmp_user_tag_dislike;
+			$this->user_tag_activate = $db_row->ecmp_user_tag_activate;
 			$this->user_tag_unsubscribe = $db_row->ecmp_user_tag_unsubscribe;
 			$this->send_count = $db_row->ecmp_send_count;
 			$this->open_count = $db_row->ecmp_open_count;
@@ -185,6 +191,8 @@ class EmailCampaign extends DataObject
 			$this->like_autm_execute = $db_row->ecmp_like_autm_execute;
 			$this->dislike_autm_ID = $db_row->ecmp_dislike_autm_ID;
 			$this->dislike_autm_execute = $db_row->ecmp_dislike_autm_execute;
+			$this->activate_autm_ID = $db_row->ecmp_activate_autm_ID;
+			$this->activate_autm_execute = $db_row->ecmp_activate_autm_execute;
 		}
 	}
 
@@ -835,6 +843,11 @@ class EmailCampaign extends DataObject
 			$this->set_from_Request( 'user_tag_dislike' );
 		}
 
+		if( param( 'ecmp_user_tag_activate', 'string', NULL ) !== NULL )
+		{	// User tag:
+			$this->set_from_Request( 'user_tag_activate' );
+		}
+
 		if( param( 'ecmp_user_tag_unsubscribe', 'string', NULL ) !== NULL )
 		{	// User tag:
 			$this->set_from_Request( 'user_tag_unsubscribe' );
@@ -878,6 +891,14 @@ class EmailCampaign extends DataObject
 			$this->set( 'dislike_autm_ID', ( $dislike_autm_ID === 0 ? NULL : $dislike_autm_ID ), true );
 			param( 'ecmp_dislike_autm_execute', 'integer', 0 );
 			$this->set_from_Request( 'dislike_autm_execute' );
+		}
+
+		$activate_autm_ID = param( 'ecmp_activate_autm_ID', 'integer', NULL );
+		if( $activate_autm_ID !== NULL )
+		{	// Automation ACTIVATE:
+			$this->set( 'activate_autm_ID', ( $activate_autm_ID === 0 ? NULL : $activate_autm_ID ), true );
+			param( 'ecmp_activate_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'activate_autm_execute' );
 		}
 
 		return ! param_errors_detected();
@@ -1583,7 +1604,7 @@ class EmailCampaign extends DataObject
 	/**
 	 * Add user to automation if it is defined in this email campaign for requested click type
 	 *
-	 * @param string Click type: 'cta1', 'cta2', 'cta3', 'like', 'dislike'
+	 * @param string Click type: 'cta1', 'cta2', 'cta3', 'like', 'dislike', 'activate'
 	 * @param integer User ID
 	 * @return boolean|integer FALSE on fail, Number of added users on success
 	 */

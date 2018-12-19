@@ -10249,6 +10249,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13050, 'Upgrading email campaigns table...' ) )
+	{	// part of 6.10.4-stable
+		db_upgrade_cols( 'T_email__campaign', array(
+			'ADD' => array(
+				'ecmp_user_tag_activate'     => 'VARCHAR(255) NULL AFTER ecmp_user_tag_dislike',
+				'ecmp_activate_autm_ID'      => 'INT UNSIGNED NULL',
+				'ecmp_activate_autm_execute' => 'TINYINT(1) NOT NULL DEFAULT 1',
+			),
+		) );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

@@ -63,27 +63,20 @@ $Form->begin_fieldset( T_('List recipients').get_manual_link( 'campaign-recipien
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Click tagging').get_manual_link( 'campaign-tagging-panel' ) );
-	$Form->usertag_input( 'ecmp_user_tag', param( 'ecmp_user_tag', 'string', $edited_EmailCampaign->get( 'user_tag' ) ), 60, T_('Tag users who click on content links with'), '', array(
-		'maxlength' => 255,
-	) );
-	$Form->usertag_input( 'ecmp_user_tag_cta1', param( 'ecmp_user_tag_cta1', 'string', $edited_EmailCampaign->get( 'user_tag_cta1' ) ), 60, /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 1 with'), '', array(
-		'maxlength' => 255,
-	) );
-	$Form->usertag_input( 'ecmp_user_tag_cta2', param( 'ecmp_user_tag_cta2', 'string', $edited_EmailCampaign->get( 'user_tag_cta2' ) ), 60, /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 2 with'), '', array(
-		'maxlength' => 255,
-	) );
-	$Form->usertag_input( 'ecmp_user_tag_cta3', param( 'ecmp_user_tag_cta3', 'string', $edited_EmailCampaign->get( 'user_tag_cta3' ) ), 60, /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 3 with'), '', array(
-		'maxlength' => 255,
-	) );
-	$Form->usertag_input( 'ecmp_user_tag_like', param( 'ecmp_user_tag_like', 'string', $edited_EmailCampaign->get( 'user_tag_like' ) ), 60, T_('Tag users who liked the email with'), '', array(
-		'maxlength' => 255,
-	) );
-	$Form->usertag_input( 'ecmp_user_tag_dislike', param( 'ecmp_user_tag_dislike', 'string', $edited_EmailCampaign->get( 'user_tag_dislike' ) ), 60, T_('Tag users who disliked the email with'), '', array(
-		'maxlength' => 255,
-	) );
-	$Form->usertag_input( 'ecmp_user_tag_unsubscribe', param( 'ecmp_user_tag_unsubscribe', 'string', $edited_EmailCampaign->get( 'user_tag_unsubscribe' ) ), 60, T_('Tag users who (really) unsubscribe with'), '', array(
-		'maxlength' => 255,
-	) );
+	$tag_options = array(
+			array( T_('Tag users who click on content links with'), 'user_tag' ),
+			array( /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 1 with'), 'user_tag_cta1' ),
+			array( /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 2 with'), 'user_tag_cta2' ),
+			array( /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 3 with'), 'user_tag_cta3' ),
+			array( T_('Tag users who liked the email with'), 'user_tag_like' ),
+			array( T_('Tag users who disliked the email with'), 'user_tag_dislike' ),
+			array( T_('Tag users who click Activate with'), 'user_tag_activate' ),
+			array( T_('Tag users who (really) unsubscribe with'), 'user_tag_unsubscribe' ),
+		);
+	foreach( $tag_options as $tag_option )
+	{
+		$Form->usertag_input( 'ecmp_'.$tag_option[1], $edited_EmailCampaign->get( $tag_option[1] ), 60, $tag_option[0], '', array( 'maxlength' => 255 ) );
+	}
 
 	?>
 	<script type="text/javascript">
@@ -130,6 +123,7 @@ $Form->begin_fieldset( T_('Automations').get_manual_link( 'campaign-automations-
 			array( T_('Add users who click CTA 3 to'),       'cta3_autm_ID',    'cta3_autm_execute' ),
 			array( T_('Add users who like the email to'),    'like_autm_ID',    'like_autm_execute' ),
 			array( T_('Add users who dislike the email to'), 'dislike_autm_ID', 'dislike_autm_execute' ),
+			array( T_('Add users who click Activate to'),    'activate_autm_ID','activate_autm_execute' ),
 		);
 	foreach( $automation_options as $automation_option )
 	{
