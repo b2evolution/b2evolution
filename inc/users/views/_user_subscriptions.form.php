@@ -210,7 +210,7 @@ $Form->begin_fieldset( T_('List subscriptions').( is_admin_page() ? get_manual_l
 		if( isset( $allowed_newsletters[ $Newsletter->ID ] ) ||
 		    in_array( $Newsletter->ID, $user_newsletter_subscriptions ) )
 		{	// Display only allowed newsletter and what user is subscribed to:
-			$newsletter_options[] = array( 'edited_user_newsletters[]', $Newsletter->ID, $Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ), in_array( $Newsletter->ID, $user_newsletter_subscriptions ), $disabled );
+			$newsletter_options[] = array( 'edited_user_newsletters[]', $Newsletter->ID, '<b>'.$Newsletter->get( 'name' ).':</b> '.$Newsletter->get( 'label' ), in_array( $Newsletter->ID, $user_newsletter_subscriptions ), $disabled );
 		}
 	}
 	if( count( $newsletter_options ) )
