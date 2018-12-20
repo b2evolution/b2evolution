@@ -2159,7 +2159,8 @@ class User extends DataObject
 	{
 		if( $this->check_status( 'is_closed' ) && ( !is_admin_page() ) )
 		{ // don't return closed accounts regional information to front office
-			return false;
+			$r = false;
+			return $r;
 		}
 
 		if( is_null($this->$Object) && !empty($this->$ID ) )
@@ -4266,9 +4267,6 @@ class User extends DataObject
 			$this->subscribe( $this->new_newsletter_subscriptions );
 			// Unsubscribe from unchecked newsletters:
 			$this->unsubscribe( array_diff( $this->get_newsletter_subscriptions( 'all' ), $this->new_newsletter_subscriptions ) );
-
-			// Send notifications to owners of lists where user subscribed/unsubscribed:
-			$this->send_list_owner_notifications();
 		}
 
 		// Update user tags:
@@ -5617,7 +5615,7 @@ class User extends DataObject
 				$this->send_account_changed_notification();
 			}
 
-			// Send notification to owners of lists where user is automatically subscribed:
+			// Send notification to owners of lists where user is subscribed/unsubscribed:
 			$this->send_list_owner_notifications();
 		}
 		elseif( $is_new_user )
@@ -8047,6 +8045,7 @@ class User extends DataObject
 				'subscribed_by_admin' => ( is_logged_in() && $current_User->login != $this->login ? $current_User->login : '' ),
 			), empty( $this->newsletter_subscription_params ) ? array() : $this->newsletter_subscription_params, $params );
 
+			// Add to changes in subscription values:
 			$this->newsletter_subscription_changed_values[] = array( 'subscribe', array_unique( array_merge( $insert_newsletter_IDs, $resubscribe_newsletter_IDs ) ), $email_template_params );
 		}
 
@@ -8141,6 +8140,7 @@ class User extends DataObject
 				'unsubscribed_by_admin' => ( is_logged_in() && $current_User->login != $this->login ? $current_User->login : '' ),
 			), empty( $this->newsletter_unsubscription_params ) ? array() : $this->newsletter_unsubscription_params, $params );
 
+			// Add to changes in subscription values:
 			$this->newsletter_subscription_changed_values[] = array( 'unsubscribe', $update_newsletter_IDs, $email_template_params );
 		}
 
@@ -8187,15 +8187,16 @@ class User extends DataObject
 	 *
 	 * @param string subscribed | unsubscribed | all
 	 */
-	function send_list_owner_notifications( $type = 'all' )
+	function send_list_owner_notifications( $filter = 'all' )
 	{
 		if( ! empty( $this->newsletter_subscription_changed_values ) )
 		{
 			foreach( $this->newsletter_subscription_changed_values as $key => $value )
 			{
-				if( $type == 'all' || $type == $value[0] )
+				list( $action, $newsletter_IDs, $email_template_params ) = $value;
+				if( $filter == 'all' || $filter == $action )
 				{
-					switch( $value[0] )
+					switch( $action )
 					{
 						case 'subscribe':
 							$template_name = 'list_new_subscriber';
@@ -8210,9 +8211,9 @@ class User extends DataObject
 					}
 
 					// Send an email to the list owner:
-					send_list_owner_notification( $value[1], $template_name, $value[2] );
+					send_list_owner_notification( $newsletter_IDs, $template_name, $email_template_params );
 
-					// Remove subscription change:
+					// Unset subscription change:
 					unset( $this->newsletter_subscription_changed_values[$key] );
 				}
 			}
