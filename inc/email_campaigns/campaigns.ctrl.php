@@ -359,8 +359,8 @@ switch( $action )
 		}
 
 		$Messages->add( ( $action == 'enable_activate' ?
-			T_('The email campaign has been set as "Activate" to its list.') :
-			T_('The email campaign has been unset as "Activate" from its list.') ), 'success' );
+			T_('The email campaign will double as an Activation email and no separate activation email will be sent.') :
+			T_('The email campaign does not act as an activation email. If necessary, a separate activation email will be sent.') ), 'success' );
 
 		// We want to highlight the reduced Step on list display:
 		$Session->set( 'fadeout_array', array( 'ecmp_ID' => array( $ecmp_ID ) ) );

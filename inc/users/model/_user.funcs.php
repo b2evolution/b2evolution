@@ -3103,7 +3103,7 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 		{ // No subject for this locale generated yet:
 			locale_temp_switch( $notify_locale );
 
-			$cache_by_locale[$notify_locale]['subject'] = T_( 'Activate your account: $login$' );
+			$cache_by_locale[$notify_locale]['subject'] = sprintf( T_( 'Activate your account: %s' ), '$login$' );
 
 			locale_restore_previous();
 		}

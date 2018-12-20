@@ -566,7 +566,7 @@ function campaign_td_welcome( $ecmp_ID, $ecmp_welcome, $ecmp_activate )
 		$welcome_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => T_('The email campaign is used as "Welcome" for its list.') ) );
 		if( $ecmp_activate )
 		{	// If email campaign is used as activate message:
-			$activate_icon = get_icon( 'bullet_blue', 'imgtag', array( 'title' => T_('This welcome email doubles as an activation message. No separate activation email will be sent.') ) );
+			$activate_icon = get_icon( 'bullet_dark_blue', 'imgtag', array( 'title' => T_('This welcome email doubles as an activation message. No separate activation email will be sent.') ) );
 		}
 		else
 		{	// If email campaign is NOT used as activate message:
