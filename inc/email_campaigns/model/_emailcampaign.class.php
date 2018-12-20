@@ -971,7 +971,7 @@ class EmailCampaign extends DataObject
 				'include_greeting' => false,
 				'message_html'     => $this->get( 'email_html' ),
 				'message_text'     => $this->get( 'email_plaintext' ),
-				'newsletter'       => ( $newsletter_ID === NULL ? $this->get( 'enlt_ID' ) : $newsletter_ID ),
+				'enlt_ID'          => ( $newsletter_ID === NULL ? $this->get( 'enlt_ID' ) : $newsletter_ID ),
 				'ecmp_ID'          => $this->ID,
 				'autm_ID'          => $automation_ID,
 				'template_parts'   => array(
