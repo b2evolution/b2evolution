@@ -8393,7 +8393,7 @@ class Item extends ItemLight
 					LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
 					LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
 					LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
-					LEFT JOIN T_users ON ( user_ID = sub_user_ID )
+					LEFT JOIN T_users ON ( user_ID = sug_user_ID )
 					WHERE opt.cset_coll_ID = '.$this->get_blog_ID().'
 						AND opt.cset_name = "opt_out_subscription"
 						AND opt.cset_value = 1

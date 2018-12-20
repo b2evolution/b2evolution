@@ -3983,7 +3983,7 @@ class Comment extends DataObject
 									LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
 									LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
 									LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
-									INNER JOIN T_users ON ( user_ID = sub_user_ID '.$active_users_condition.' )
+									INNER JOIN T_users ON ( user_ID = sug_user_ID '.$active_users_condition.' )
 									WHERE opt.cset_coll_ID = '.$comment_item_Blog->ID.'
 										AND opt.cset_name = "opt_out_comment_subscription"
 										AND opt.cset_value = 1
