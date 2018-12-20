@@ -4490,6 +4490,15 @@ class User extends DataObject
 		global $app_name, $Session, $baseurl, $servertimenow;
 		global $Settings, $UserSettings;
 
+		if( ! empty( $this->welcome_activate_email_campaign_sent ) )
+		{	// This flag means we don't need to send a separate activation email
+			// because at least one special(Welcome-Activate) email campaign was sent
+			// on auto newsletter subscribing before calling this function.
+			// Return TRUE in order to display the same info messages what user sees on normal activation,
+			// because Welcome-Activate email campaign may contains button/link to activate user account:
+			return true;
+		}
+
 		// Display messages depending on user email status
 		display_user_email_status_message( $this->ID );
 
@@ -8175,8 +8184,12 @@ class User extends DataObject
 			$EmailCampaignCache->load_where( 'ecmp_enlt_ID IN ( '.$DB->quote( $new_subscriptions ).' ) AND ecmp_welcome = 1' );
 
 			foreach( $EmailCampaignCache->cache as $EmailCampaign )
-			{	// Send an email of the campaign at subscription:
-				$EmailCampaign->send_all_emails( false, array( $this->ID ), 'welcome' );
+			{	// Send a "Welcome" email of the campaign at subscription:
+				$r = $EmailCampaign->send_all_emails( false, array( $this->ID ), 'welcome' );
+				if( $r && $EmailCampaign->get( 'activate' ) )
+				{	// Set a flag to know email campaign which is used as "Activate" message has been sent now for this User:
+					$this->welcome_activate_email_campaign_sent = true;
+				}
 			}
 		}
 	}

@@ -47,6 +47,16 @@ class EmailCampaign extends DataObject
 
 	var $auto_sent_ts;
 
+	var $renderers;
+
+	var $use_wysiwyg = 0;
+
+	var $send_ctsk_ID;
+
+	var $welcome = 0;
+
+	var $activate = 0;
+
 	var $user_tag_sendskip;
 
 	var $user_tag_sendsuccess;
@@ -105,12 +115,6 @@ class EmailCampaign extends DataObject
 	var $activate_autm_ID;
 	var $activate_autm_execute = 1;
 
-	var $use_wysiwyg = 0;
-
-	var $send_ctsk_ID;
-
-	var $welcome = 0;
-
 	var $sequence;
 
 	var $Newsletter = NULL;
@@ -123,11 +127,6 @@ class EmailCampaign extends DataObject
 	 *   'wait'    - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
 	 */
 	var $users = NULL;
-
-	/**
-	 * @var string
-	 */
-	var $renderers;
 
 	/**
 	 * Constructor
@@ -161,6 +160,7 @@ class EmailCampaign extends DataObject
 			$this->use_wysiwyg = $db_row->ecmp_use_wysiwyg;
 			$this->send_ctsk_ID = $db_row->ecmp_send_ctsk_ID;
 			$this->welcome = $db_row->ecmp_welcome;
+			$this->activate = $db_row->ecmp_activate;
 			$this->user_tag_sendskip = $db_row->ecmp_user_tag_sendskip;
 			$this->user_tag_sendsuccess = $db_row->ecmp_user_tag_sendsuccess;
 			$this->user_tag = $db_row->ecmp_user_tag;
@@ -1089,6 +1089,7 @@ class EmailCampaign extends DataObject
 	 * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
 	 * @param array Force users instead of users which are ready to receive this email campaign
 	 * @param string|boolean Update time of last sending: 'auto', 'manual', 'welcome'. FALSE - to don't update
+	 * @return boolean TRUE if at least one email is sent
 	 */
 	function send_all_emails( $display_messages = true, $user_IDs = NULL, $update_sent_ts = 'manual' )
 	{
@@ -1107,7 +1108,7 @@ class EmailCampaign extends DataObject
 
 		if( empty( $user_IDs ) )
 		{	// No users, Exit here:
-			return;
+			return false;
 		}
 
 		// It it important to randomize order so that it is not always the same users who get the news first and the same users who the get news last:
@@ -1123,6 +1124,7 @@ class EmailCampaign extends DataObject
 		$email_success_count = 0;
 		$email_skip_count = 0;
 		$email_error_count = 0;
+		$return = false;
 		foreach( $user_IDs as $user_ID )
 		{
 			if( $email_campaign_chunk_size > 0 && $email_success_count >= $email_campaign_chunk_size )
@@ -1137,6 +1139,7 @@ class EmailCampaign extends DataObject
 
 			// Send email to user:
 			$result = $this->send_email( $user_ID, '', '', ( $update_sent_ts == 'welcome' ? $update_sent_ts : false ) );
+			$return = $return || $result;
 
 			if( $result )
 			{	// Email newsletter was sent for user successfully:
@@ -1250,6 +1253,8 @@ class EmailCampaign extends DataObject
 				$Messages->display();
 			}
 		}
+
+		return $return;
 	}
 
 

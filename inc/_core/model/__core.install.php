@@ -570,6 +570,7 @@ $schema_queries = array(
 			ecmp_use_wysiwyg          TINYINT(1) NOT NULL DEFAULT 0,
 			ecmp_send_ctsk_ID         INT(10) UNSIGNED NULL DEFAULT NULL,
 			ecmp_welcome              TINYINT(1) NOT NULL DEFAULT 0,
+			ecmp_activate             TINYINT(1) NOT NULL DEFAULT 0,
 			ecmp_user_tag_sendskip    VARCHAR(255) NULL,
 			ecmp_user_tag_sendsuccess VARCHAR(255) NULL,
 			ecmp_user_tag             VARCHAR(255) NULL,
