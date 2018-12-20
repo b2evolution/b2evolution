@@ -35,7 +35,7 @@ if( isset( $params['ecmp_ID'] ) && $params['ecmp_ID'] == 1 )
 	// Add custom messages here
 }
 
-if( isset( $params['newsletter'] ) && $params['newsletter'] == 1 )
+if( isset( $params['enlt_ID'] ) && $params['enlt_ID'] == 1 )
 {	// Newsletter/List #1 is sending now:
 	// Add custom messages here
 }

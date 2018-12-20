@@ -285,6 +285,9 @@ elseif( $confirmed )
 					if( ! $edited_User->unsubscribe( $newsletter_ID, array( 'usertags' => $assigned_user_tag ) ) )
 					{	// Display a message is the user is not subscribed on the requested newsletter:
 						$error_msg = T_('You are not subscribed to this list.');
+
+						// Send notification to owners of lists where user unsubscribed:
+						$edited_User->send_list_owner_notifications( 'unsubscribe' );
 					}
 					elseif( ! empty( $assigned_user_tag ) )
 					{
@@ -593,7 +596,12 @@ elseif( $confirmed )
 					//    which was upgraded to Newsletter with ID = 1
 					$newsletter_ID = param( 'newsletter', 'integer', 1 );
 
-					if( ! $edited_User->subscribe( $newsletter_ID ) )
+					if( $edited_User->subscribe( $newsletter_ID ) )
+					{
+						// Send notification to owners of lists where user subscribed:
+						$edited_User->send_list_owner_notifications( 'subscribe' );
+					}
+					else
 					{	// Display a message is the user is not subscribed on the requested newsletter:
 						$error_msg = T_('You are already subscribed to this list.');
 					}

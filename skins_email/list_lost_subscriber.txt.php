@@ -89,7 +89,22 @@ if( ! empty( $user_domain ) )
 if( $subscribed_User->ctry_ID > 0 )
 {	// Country field is defined
 	load_class( 'regional/model/_country.class.php', 'Country' );
-	echo T_('Profile Country').": ".$subscribed_User->get_country_name()."\n";
+
+	if( $params['user_account_closed'] )
+	{	// Set TRUE to use country settings from back office.
+		global $is_admin_page;
+		$old_is_admin_page = $is_admin_page;
+		$is_admin_page = true;
+
+		echo T_('Profile Country').": ".$subscribed_User->get_country_name()."\n";
+
+		// Restore $is_admin_page:
+		$is_admin_page = $old_is_admin_page;
+	}
+	else
+	{
+		echo T_('Profile Country').": ".$subscribed_User->get_country_name()."\n";
+	}
 }
 
 echo "\n";

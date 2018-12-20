@@ -527,6 +527,9 @@ switch( $action )
 			);
 		send_admin_notification( NT_('New user registration'), 'account_new', $email_template_params );
 
+		// Send notification to owners of lists where new user is automatically subscribed:
+		$new_User->send_list_owner_notifications( 'subscribe' );
+
 		$Plugins->trigger_event( 'AfterUserRegistration', array( 'User' => & $new_User ) );
 		// Move user to suspect group by IP address and reverse DNS domain and email address domain:
 		// Make this move even if during the registration it was added to a trusted group:

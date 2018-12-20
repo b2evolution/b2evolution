@@ -1685,7 +1685,7 @@ function create_default_newsletters()
  */
 function create_default_email_campaigns()
 {
-	global $DB, $create_sample_contents, $baseurl;
+	global $DB, $Settings, $create_sample_contents, $baseurl;
 
 	task_begin( 'Creating default email campaigns... ' );
 
@@ -1744,6 +1744,16 @@ T_('Button examples:
 				'name' => T_('Another example'),
 				'text' => sprintf( T_('Hello %s!'), '$firstname_and_login$' )."\r\n\r\n".T_('Here are some news...'),
 			),
+			array(
+				'name'  => T_('Welcome & Activate'),
+				'title' => sprintf( T_( 'Activate your account: %s' ), '$login$' ),
+				'text'  => sprintf( T_('Hello %s!'), '$username$' )."\r\n\r\n"
+					.sprintf( T_('You have recently registered a new account on %s .'), '<a href="'.$baseurl.'">'.$Settings->get( 'notification_short_name' ).'</a>' )."\r\n\r\n"
+					.'<b style="color:#d00">'.T_('You must activate this account by clicking below in order to be able to use all the site features.').'</b>'."\r\n\r\n"
+					.T_('Your login is: $login$')."\r\n\r\n"
+					.T_('Your email is: $email$')."\r\n\r\n"
+					.'[activate:primary]'.T_( 'Activate NOW' ).'[/activate]'
+			),
 		);
 
 		$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
@@ -1752,7 +1762,7 @@ T_('Button examples:
 			$EmailCampaign = new EmailCampaign();
 			$EmailCampaign->set( 'enlt_ID', 1 );
 			$EmailCampaign->set( 'name', $email_campaign['name'] );
-			$EmailCampaign->set( 'email_title', $email_campaign['name'] );
+			$EmailCampaign->set( 'email_title', isset( $email_campaign['title'] ) ? $email_campaign['title'] : $email_campaign['name'] );
 			$EmailCampaign->set( 'email_defaultdest', $baseurl );
 			$EmailCampaign->set( 'email_text', $email_campaign['text'] );
 

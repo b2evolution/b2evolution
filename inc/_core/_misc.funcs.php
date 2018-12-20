@@ -4275,7 +4275,7 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
 				$UserSettings->dbupdate();
 			}
 		}
-		$newsletter_ID = isset( $params['newsletter'] ) ? $params['newsletter'] : '';
+		$newsletter_ID = isset( $params['enlt_ID'] ) ? $params['enlt_ID'] : '';
 	}
 	else
 	{	// Get data of anonymous user:

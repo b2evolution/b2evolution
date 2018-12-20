@@ -100,7 +100,22 @@ if( ! empty( $user_domain ) )
 if( $subscribed_User->ctry_ID > 0 )
 { // Country field is defined
 	load_class( 'regional/model/_country.class.php', 'Country' );
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Profile Country').': </th><td'.emailskin_style( 'table.email_table td' ).'>'.$subscribed_User->get_country_name().'</td></tr>'."\n";
+
+	if( $params['user_account_closed'] )
+	{	// Set TRUE to use country settings from back office.
+		global $is_admin_page;
+		$old_is_admin_page = $is_admin_page;
+		$is_admin_page = true;
+
+		echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Profile Country').': </th><td'.emailskin_style( 'table.email_table td' ).'>'.$subscribed_User->get_country_name().'</td></tr>'."\n";
+
+		// Restore $is_admin_page:
+		$is_admin_page = $old_is_admin_page;
+	}
+	else
+	{
+		echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Profile Country').': </th><td'.emailskin_style( 'table.email_table td' ).'>'.$subscribed_User->get_country_name().'</td></tr>'."\n";
+	}
 }
 
 echo '<tr><td'.emailskin_style( 'table.email_table td' ).' colspan=2>&nbsp;</td></tr>'."\n";

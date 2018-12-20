@@ -621,10 +621,10 @@ function send_list_owner_notification( $newsletter_IDs, $template_name, $templat
 			return;
 		}
 		if( $UserSettings->get( $check_setting, $owner_ID ) )
-		{	// this owner must be notifed
+		{	// this owner must be notified
 			$template_params['newsletters'] = $newsletters;
 			locale_temp_switch( $owner_User->get( 'locale' ) );
-			// send mail to user (using his local)
+			// send mail to owner User (using his local)
 			$localized_subject = T_( $subject ).$subject_suffix;
 			send_mail_to_User( $owner_User->ID, $localized_subject, $template_name, $template_params ); // ok, if this may fail
 			locale_restore_previous();
@@ -3115,7 +3115,7 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 		{ // No subject for this locale generated yet:
 			locale_temp_switch( $notify_locale );
 
-			$cache_by_locale[$notify_locale]['subject'] = T_( 'Activate your account: $login$' );
+			$cache_by_locale[$notify_locale]['subject'] = sprintf( T_( 'Activate your account: %s' ), '$login$' );
 
 			locale_restore_previous();
 		}

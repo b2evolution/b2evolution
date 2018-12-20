@@ -425,7 +425,7 @@ function campaign_results_block( $params = array() )
 			'order' => 'ecmp_welcome',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' => '%campaign_td_welcome( #ecmp_ID#, #ecmp_welcome# )%',
+			'td' => '%campaign_td_welcome( #ecmp_ID#, #ecmp_welcome#, #ecmp_activate# )%',
 		);
 
 	$Results->cols[] = array(
@@ -554,29 +554,46 @@ function campaign_results_block( $params = array() )
  *
  * @param integer Email Campaign ID
  * @param integer TRUE/1 if this is a welcome Email Campaign
+ * @param integer TRUE/1 if this is an activate Email Campaign
  * @return string
  */
-function campaign_td_welcome( $ecmp_ID, $ecmp_welcome )
+function campaign_td_welcome( $ecmp_ID, $ecmp_welcome, $ecmp_activate )
 {
 	global $current_User;
 
 	if( $ecmp_welcome )
-	{	// If newsletter is active:
+	{	// If email campaign is used as welcome message:
 		$welcome_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => T_('The email campaign is used as "Welcome" for its list.') ) );
+		if( $ecmp_activate )
+		{	// If email campaign is used as activate message:
+			$activate_icon = get_icon( 'bullet_dark_blue', 'imgtag', array( 'title' => T_('This welcome email doubles as an activation message. No separate activation email will be sent.') ) );
+		}
+		else
+		{	// If email campaign is NOT used as activate message:
+			$activate_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_('This welcome email does not act as an activation message.') ) );
+		}
 	}
 	else
-	{	// If newsletter is NOT active:
+	{	// If email campaign is NOT used as welcome message:
 		$welcome_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_('The email campaign is not used as "Welcome" for its list.') ) );
+		// Don't use email campaign as activate message when it is not used as welcome message:
+		$activate_icon = '';
 	}
 
 	if( $current_User->check_perm( 'emails', 'edit' ) )
-	{	// Make icon toggle welcome status if current User has a perm to edit this:
+	{	// Make icon(s) toggle welcome/activate statuses if current User has a perm to edit this:
 		global $admin_url, $ctrl;
-		$url_param = $ctrl == 'newsletters' ? '&amp;from='.$ctrl : '';
-		$welcome_icon = '<a href="'.$admin_url.'?ctrl=campaigns&amp;action='.( $ecmp_welcome ? 'disable_welcome' : 'enable_welcome' )
-			.'&amp;ecmp_ID='.$ecmp_ID.$url_param.'&amp;'.url_crumb( 'campaign' ).'">'.$welcome_icon.'</a>';
+		$icon_url = $admin_url.'?ctrl=campaigns'
+			.'&amp;ecmp_ID='.$ecmp_ID
+			.( $ctrl == 'newsletters' ? '&amp;from='.$ctrl : '' )
+			.'&amp;'.url_crumb( 'campaign' );
+		$welcome_icon = '<a href="'.$icon_url.'&amp;action='.( $ecmp_welcome ? 'disable_welcome' : 'enable_welcome' ).'">'.$welcome_icon.'</a>';
+		if( ! empty( $activate_icon ) )
+		{	// Make activate icon clickable:
+			$activate_icon = '<a href="'.$icon_url.'&amp;action='.( $ecmp_activate ? 'disable_activate' : 'enable_activate' ).'">'.$activate_icon.'</a>';
+		}
 	}
 
-	return $welcome_icon;
+	return $welcome_icon.( empty( $activate_icon ) ? '' : ' '.$activate_icon );
 }
 ?>
