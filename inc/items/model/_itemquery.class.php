@@ -240,13 +240,13 @@ class ItemQuery extends SQL
 			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID' );
 			$this->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID'.$sql_join_categories );
 			// fp> we try to restrict as close as possible to the posts but I don't know if it matters
-			$cat_ID_field = 'postcat_cat_ID';
+			$cat_ID_field = 'T_postcats.postcat_cat_ID';
 		}
 		elseif( get_allow_cross_posting() >= 1 )
 		{	// Select extra categories if cross posting is enabled:
 			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID' );
 			$this->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
-			$cat_ID_field = 'postcat_cat_ID';
+			$cat_ID_field = 'T_postcats.postcat_cat_ID';
 		}
 		else
 		{	// Select only main categories:
