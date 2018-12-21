@@ -204,9 +204,10 @@ class ItemList2 extends ItemListLight
 
 		// asimo> This must be removed if the option to 'always move the null values in the end of the result' will be implemented
 		$select_temp_order = '';
-		if( !empty( $this->ItemQuery->order_by ) && strpos( $this->ItemQuery->order_by, 'postcatsorders.postcat_order' ) !== false )
+		if( !empty( $this->ItemQuery->order_by ) && preg_match( '/'.preg_quote( 'postcatsorders.postcat_order' ).' (DESC|ASC)/i', $this->ItemQuery->order_by, $order_dir_match ) )
 		{	// Move the items with NULL order to the end of the list
-			$select_temp_order = ', IF( postcatsorders.postcat_order IS NULL, 999999999, postcatsorders.postcat_order ) AS temp_order';
+			$null_orders = ( $order_dir_match[1] == 'DESC' ? '-' : '' ).'999999999'; // Always keep the not ordered posts at the end
+			$select_temp_order = ', IF( postcatsorders.postcat_order IS NULL, '.$null_orders.', postcatsorders.postcat_order ) AS temp_order';
 			$this->ItemQuery->ORDER_BY( str_replace( 'postcatsorders.postcat_order', 'temp_order', $this->ItemQuery->get_order_by( '' ) ) );
 		}
 
@@ -787,7 +788,9 @@ class ItemList2 extends ItemListLight
 					}
 
 					// Decide the items with NULL order in the end of the list:
-					$select_temp_order = ', IF( postcatsorders.postcat_order IS NULL, 999999999, postcatsorders.postcat_order ) AS temp_order';
+					preg_match( '/'.preg_quote( 'postcatsorders.postcat_order' ).' (DESC|ASC)/i', $next_Query->order_by, $order_dir_match );
+					$null_orders = ( isset( $order_dir_match[1] ) && $order_dir_match[1] == 'DESC' ? '-' : '' ).'999999999'; // Always keep the not ordered posts at the end
+					$select_temp_order = ', IF( postcatsorders.postcat_order IS NULL, '.$null_orders.', postcatsorders.postcat_order ) AS temp_order';
 					$next_Query->order_by = str_replace( 'postcatsorders.postcat_order', 'temp_order', $next_Query->order_by );
 
 					// asimo> If we would like to order the null values into the end of the result, then we must check the current direction
