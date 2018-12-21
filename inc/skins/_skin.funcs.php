@@ -359,14 +359,14 @@ function skin_init( $disp )
 
 					global $cat, $catsel;
 
-					$ChapterCache = & get_ChapterCache();
-					$Chapter = & $ChapterCache->get_by_ID( $cat, false, false );
-
 					if( empty( $catsel ) && preg_match( '~^[0-9]+$~', $cat ) )
 					{	// We are on a single cat page:
 						// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
 						// BUT: - this can resolve to including children
 						//      - selecting exactly one cat through catsel[] is NOT OK since not equivalent (will exclude children)
+
+						$ChapterCache = & get_ChapterCache();
+						$Chapter = & $ChapterCache->get_by_ID( $cat, false, false );
 
 						// echo 'SINGLE CAT PAGE';
 						$disp_detail = 'posts-topcat';  // may become 'posts-subcat' below.
@@ -406,14 +406,14 @@ function skin_init( $disp )
 						{ // Category is set and post navigation should go through the same category, set navigation target param
 							$MainList->nav_target = $cat;
 						}
-					}
 
-					if( empty( $Chapter ) )
-					{	// If the requested chapter was not found display 404 page:
-						$Messages->add( T_('The requested chapter was not found') );
-						global $disp;
-						$disp = '404';
-						break;
+						if( empty( $Chapter ) )
+						{	// If the requested chapter was not found display 404 page:
+							$Messages->add( T_('The requested chapter was not found') );
+							global $disp;
+							$disp = '404';
+							break;
+						}
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'tags', 'posts', 'page' ) ) == array() )

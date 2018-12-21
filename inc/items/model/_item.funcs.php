@@ -5691,10 +5691,10 @@ function item_row_order( $Item )
 {
 	global $current_User, $ItemList;
 
-	if( isset( $ItemList, $ItemList->filters['cat_array'] ) &&
-	    count ( $ItemList->filters['cat_array'] ) == 1 )
+	if( isset( $ItemList, $ItemList->filters['cat_single'] ) &&
+	    ! empty( $ItemList->filters['cat_single'] ) )
 	{	// Use order of single filtered category:
-		$order_cat_ID = $ItemList->filters['cat_array'][0];
+		$order_cat_ID = $ItemList->filters['cat_single'];
 		$order_cat_attr = ' data-cat-id="'.$order_cat_ID.'"';
 	}
 	else
