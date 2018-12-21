@@ -17,6 +17,7 @@ $welcome_content_Widget = new Widget( 'block_item' );
 	echo '<form action="'.$admin_url.'?ctrl=dashboard&amp;action=new_demo_content" method="post" class="evo_form__install">';
 	echo '<input type="hidden" name="action" value="new_demo_content" />';
 	echo '<input type="hidden" name="install_test_features" value="0" />';
+	echo '<input type="hidden" name="crumb_demo_content" value="'.get_crumb( 'demo_content' ).'" />';
 
 	$welcome_content_Widget->title = T_('Welcome to b2evolution');
 	$welcome_content_Widget->no_results_text = 'Hello World';

@@ -91,6 +91,10 @@ $AdminUI->disp_payload_begin();
 $collection_count = get_table_count( 'T_blogs' );
 if( $action == 'new_demo_content' )
 {	// Execute action inside template to display a process in real time
+
+	// Check that this action request is not a CSRF hacked request:
+	$Session->assert_received_crumb( 'demo_content' );
+
 	$block_item_Widget = new Widget( 'block_item' );
 
 	$block_item_Widget->title = T_('Demo content').':';
