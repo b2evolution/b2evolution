@@ -1108,7 +1108,7 @@ class Item extends ItemLight
 		}
 
 		// Never allow html content on post titles:  (fp> probably so as to not mess up backoffice and all sorts of tools)
-		param( 'post_title', 'htmlspecialchars', '' );
+		param( 'post_title', 'htmlspecialchars', NULL );
 		// Title checking:
 		if( ( ! $editing || $creating ) && $this->get_type_setting( 'use_title' ) == 'required' ) // creating is important, when the action is create_edit
 		{
@@ -1142,7 +1142,7 @@ class Item extends ItemLight
 		}
 
 		// Set title only here because it may be filtered by plugins above:
-		$this->set( 'title', get_param( 'post_title' ) );
+		$this->set( 'title', get_param( 'post_title' ), true );
 
 		if( $is_not_content_block )
 		{	// Save excerpt for item with type usage except of content block:
@@ -1686,6 +1686,15 @@ class Item extends ItemLight
 		if( ! is_logged_in() )
 		{	// User must be logged in
 			return false;
+		}
+
+		if( ! is_admin_page() )
+		{	// Check visibility of meta comments on front-office:
+			$item_Blog = & $this->get_Blog();
+			if( ! $item_Blog || ! $item_Blog->get_setting( 'meta_comments_frontoffice' ) )
+			{	// Meta comments are disabled to be displayed on front-office for this Item's collection:
+				return false;
+			}
 		}
 
 		global $current_User;
@@ -3162,6 +3171,7 @@ class Item extends ItemLight
 							'intro' => '',
 							'ask_firstname' => in_array( 'firstname', $fields_to_display ) ? 'required' : 'no',
 							'ask_lastname' => in_array( 'lastname', $fields_to_display ) ? 'required' : 'no',
+							'ask_country' => in_array( 'country', $fields_to_display ) ? 'required' : 'no',
 							'source' => 'Page: '.$this->get( 'urltitle' ),
 							'usertags' => $user_tags,
 							'subscribe_post' => 0,
@@ -8383,7 +8393,7 @@ class Item extends ItemLight
 					LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
 					LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
 					LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
-					LEFT JOIN T_users ON ( user_ID = sub_user_ID )
+					LEFT JOIN T_users ON ( user_ID = sug_user_ID )
 					WHERE opt.cset_coll_ID = '.$this->get_blog_ID().'
 						AND opt.cset_name = "opt_out_subscription"
 						AND opt.cset_value = 1

@@ -319,7 +319,7 @@ $Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
 				array( '301', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '301' ) ),
 				array( '302', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '302' ) ),
 				array( '303', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '303' ) ),
-				array( '404', T_('404 "Not found" response') ),
+				array( '404', T_('404 "Not Found" response') ),
 				array( '410', T_('410 "Gone" response') ),
 			), T_('404 "Not Found" response'), true );
 

@@ -207,7 +207,7 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 	$return_url = param( 'return_to', 'url', '' );
 	if( empty( $return_url ) )
 	{
-		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), get_htsrv_url( 'login' ) );
+		$return_url = regenerate_url( '', '', '', '&' );
 	}
 
 	if( ! $force_normal_login && use_in_skin_login() )
@@ -219,28 +219,20 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 		}
 		$BlogCache = & get_BlogCache();
 		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
-		if( ! empty( $redirect_url ) )
-		{
-			$redirect_url = url_rel_to_same_host( $redirect_url, $Blog->get( $blog_page, array( 'glue' => '&' ) ) );
-		}
-		if( ! empty( $redirect_url ) )
-		{
-			$return_url = url_rel_to_same_host( $return_url, $Blog->get( $blog_page, array( 'glue' => '&' ) ) );
-		}
 		$url = $Blog->get( $blog_page, array( 'glue' => '&' ) );
-		//$url = force_https_url( $url, 'login' );
 	}
 	else
 	{ // Use normal/basic login form (without blog skin)
-		if( ! empty( $redirect_url ) )
-		{
-			$redirect_url = url_rel_to_same_host( $redirect_url, get_htsrv_url( 'login' ) );
-		}
-		if( ! empty( $redirect_url ) )
-		{
-			$return_url = url_rel_to_same_host( $return_url, get_htsrv_url( 'login' ) );
-		}
 		$url = get_htsrv_url( 'login' ).'login.php';
+	}
+
+	if( ! empty( $redirect_url ) )
+	{
+		$redirect_url = url_rel_to_same_host( $redirect_url, $url );
+	}
+	if( ! empty( $redirect_url ) )
+	{
+		$return_url = url_rel_to_same_host( $return_url, $url );
 	}
 
 	return url_add_param( $url, 'redirect_to='.rawurlencode( $redirect_url )
@@ -263,13 +255,13 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to 
 
 	if( empty( $redirect_to ) && $redirect_to !== false )
 	{ // Redirect back to current URL
-		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( 'login' ) );
+		$redirect_to = regenerate_url( '', '', '', $glue );
 	}
 
 	// This URL is used to redirect after ABORT login action:
 	if( empty( $return_to ) && $return_to !== false  )
 	{
-		$return_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( 'login' ) );
+		$return_to = regenerate_url( '', '', '', $glue );
 	}
 
 	if( use_in_skin_login() )
@@ -283,12 +275,12 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to 
 
 	if( $redirect_to !== false )
 	{ // Append redirect URL only when it is not restricted:
-		$lostpassword_url = url_add_param( $lostpassword_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue );
+		$lostpassword_url = url_add_param( $lostpassword_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, $lostpassword_url ) ), $glue );
 	}
 
 	if( $return_to !== false )
 	{ // Append return URL only when it is not restricted:
-		$lostpassword_url = url_add_param( $lostpassword_url, 'return_to='.rawurlencode( $return_to ), $glue );
+		$lostpassword_url = url_add_param( $lostpassword_url, 'return_to='.rawurlencode( url_rel_to_same_host( $return_to, $lostpassword_url ) ), $glue );
 	}
 
 	return $lostpassword_url;
@@ -308,7 +300,7 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 
 	if( empty( $redirect_to ) )
 	{ // Redirect back to current URL
-		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( 'login' ) );
+		$redirect_to = regenerate_url( '', '', '', $glue );
 	}
 
 	if( use_in_skin_login() )
@@ -320,7 +312,7 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 		$activateinfo_url = get_htsrv_url( 'login' ).'login.php?action=req_activate_email';
 	}
 
-	return url_add_param( $activateinfo_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue ) ;
+	return url_add_param( $activateinfo_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, $activateinfo_url ) ), $glue );
 }
 
 
@@ -572,6 +564,76 @@ function send_admin_notification( $subject, $template_name, $template_params )
 
 
 /**
+ * Send notification to list owner
+ *
+ * @param array Newsletter IDs
+ * @param string notificaiton email template name
+ * @param array notification email template params
+ */
+function send_list_owner_notification( $newsletter_IDs, $template_name, $template_params = array() )
+{
+	global $DB, $current_User, $UserSettings;
+
+	// Set default subject suffix:
+	$subject_suffix = empty( $template_params['subscribed_User'] ) ? '' : ': '.$template_params['subscribed_User']->get_username();
+
+	switch( $template_name )
+	{
+		case 'list_new_subscriber':
+			$check_setting = 'notify_list_new_subscriber';
+			$subject = NT_('New subscriber to your list');
+			break;
+
+		case 'list_lost_subscriber':
+			$check_setting = 'notify_list_lost_subscriber';
+			$subject = NT_('A user has unsubscribed from your list');
+			break;
+
+		default:
+			debug_die( 'Unhandled newsletter notification template!' );
+	}
+
+	$NewsletterCache = & get_NewsletterCache();
+	$NewsletterCache->clear();
+	$NewsletterCache->load_where( 'enlt_ID IN ( '.$DB->quote( $newsletter_IDs ).' )' );
+
+	$owner_newsletters = array();
+	foreach( $NewsletterCache->cache as $Newsletter )
+	{
+		$owner_User = $Newsletter->get_owner_User();
+		$owner_ID = $owner_User->ID;
+		if( ! isset( $owner_newsletters[$owner_ID] ) )
+		{
+			$owner_newsletters[$owner_ID] = array();
+		}
+
+		$owner_newsletters[$owner_ID][] = $Newsletter;
+	}
+
+	$UserCache = & get_UserCache();
+
+	foreach( $owner_newsletters as $owner_ID => $newsletters )
+	{
+		$owner_User = & $UserCache->get_by_ID( $owner_ID );
+
+		if( is_logged_in() && $current_User->ID == $owner_ID )
+		{	// Don't send a notification to current user, because user already knows about this event
+			return;
+		}
+		if( $UserSettings->get( $check_setting, $owner_ID ) )
+		{	// this owner must be notified
+			$template_params['newsletters'] = $newsletters;
+			locale_temp_switch( $owner_User->get( 'locale' ) );
+			// send mail to owner User (using his local)
+			$localized_subject = T_( $subject ).$subject_suffix;
+			send_mail_to_User( $owner_User->ID, $localized_subject, $template_name, $template_params ); // ok, if this may fail
+			locale_restore_previous();
+		}
+	}
+}
+
+
+/**
  * Use in-skin login
  */
 function use_in_skin_login()
@@ -782,14 +844,14 @@ function get_user_register_url( $redirect_to = NULL, $default_source_string = ''
 
 	if( ! empty( $redirect_to ) )
 	{
-		$register_url = url_add_param( $register_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, get_htsrv_url( 'login' ) ) ), $glue );
+		$register_url = url_add_param( $register_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, $register_url ) ), $glue );
 	}
 
 	// This URL is used to redirect after ABORT login action
 	$return_url = param( 'return_to', 'url', '' );
 	if( empty( $return_url ) )
 	{
-		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), get_htsrv_url( 'login' ) );
+		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), $register_url );
 	}
 
 	$register_url = url_add_param( $register_url, 'return_to='.rawurlencode( $return_url ), $glue );
@@ -3041,7 +3103,7 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 		{ // No subject for this locale generated yet:
 			locale_temp_switch( $notify_locale );
 
-			$cache_by_locale[$notify_locale]['subject'] = T_( 'Activate your account: $login$' );
+			$cache_by_locale[$notify_locale]['subject'] = sprintf( T_( 'Activate your account: %s' ), '$login$' );
 
 			locale_restore_previous();
 		}
@@ -5662,7 +5724,7 @@ function user_sent_emails_results_block( $params = array() )
 	$SQL->WHERE( 'emlog_user_ID = '.$DB->quote( $edited_User->ID ) );
 
 	// Create result set:
-	$emails_Results = new Results( $SQL->get(), $params['results_param_prefix'] );
+	$emails_Results = new Results( $SQL->get(), $params['results_param_prefix'], '-D' );
 	$emails_Results->title = $params['results_title'];
 	$emails_Results->no_results_text = $params['results_no_text'];
 
@@ -5751,7 +5813,7 @@ function user_email_returns_results_block( $params = array() )
 	$SQL->WHERE( 'emret_address = '.$DB->quote( $edited_User->get( 'email' ) ) );
 
 	// Create result set:
-	$email_returns_Results = new Results( $SQL->get(), $params['results_param_prefix'] );
+	$email_returns_Results = new Results( $SQL->get(), $params['results_param_prefix'], '-D' );
 	$email_returns_Results->title = $params['results_title'];
 	$email_returns_Results->no_results_text = $params['results_no_text'];
 
@@ -6118,6 +6180,7 @@ function users_results_block( $params = array() )
 			'display_enls_subscribed_ts'   => false,
 			'display_enls_unsubscribed_ts' => false,
 			'display_enls_sent_manual'     => false,
+			'display_enls_sent_auto'       => false,
 			'display_enls_last_open'       => false,
 			'display_enls_last_click'      => false,
 			'display_enls_send_count'      => false,
@@ -6125,6 +6188,7 @@ function users_results_block( $params = array() )
 			'display_org_actions'  => false,
 			'display_dupl_actions' => false,
 			'display_newsletter'   => true,
+			'display_btn_export'   => false,
 			'display_automation'   => false,
 			'display_btn_tags'     => false,
 			'force_check_user'     => false,
@@ -6338,11 +6402,18 @@ function users_results_block( $params = array() )
 			.'</a>';
 	}
 
+	if( $params['display_btn_export'] && is_logged_in() && $UserList->result_num_rows > 0 )
+	{	// Button to export user group data as CSV file:
+		$user_list_buttons[] = '<br><a href="'.$admin_url.'?ctrl=users&amp;action=export" class="btn btn-primary">'
+				.format_to_output( T_('Export groups as CSV') )
+			.'</a>';
+	}
+
 	if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Buttons and info to delete spammers:
 		if( $params['display_btn_delspam'] )
 		{	// Button to go to list with confirmation before spammers deleting:
-			$user_list_buttons[] = '<br><a href="'.$admin_url.'?ctrl=users&amp;action=spammers" class="btn btn-danger">'
+			$user_list_buttons[] = ( $params['display_btn_export'] ? '' : '<br>' ).'<a href="'.$admin_url.'?ctrl=users&amp;action=spammers" class="btn btn-danger">'
 					.format_to_output( T_('Delete spammers...') )
 				.'</a>';
 		}
@@ -6432,6 +6503,7 @@ function users_results( & $UserList, $params = array() )
 			'display_enls_subscribed_ts'   => false,
 			'display_enls_unsubscribed_ts' => false,
 			'display_enls_sent_manual'     => false,
+			'display_enls_sent_auto'       => false,
 			'display_enls_last_open'       => false,
 			'display_enls_last_click'      => false,
 			'display_enls_send_count'      => false,
@@ -6974,14 +7046,26 @@ function users_results( & $UserList, $params = array() )
 	}
 
 	if( $params['display_enls_sent_manual'] )
-	{ // Display email campaign send date:
+	{	// Display newsletter last sent date manually:
 		$UserList->cols[] = array(
-				'th' => T_('Last sent'),
+				'th' => T_('Sent manually'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'timestamp',
 				'order' => 'enls_last_sent_manual_ts',
 				'default_dir' => 'D',
 				'td' => '%mysql2localedatetime_spans( #enls_last_sent_manual_ts# )%',
+			);
+	}
+
+	if( $params['display_enls_sent_auto'] )
+	{	// Display newsletter last sent date automatically:
+		$UserList->cols[] = array(
+				'th' => T_('Sent automatically'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'timestamp',
+				'order' => 'enls_last_sent_auto_ts',
+				'default_dir' => 'D',
+				'td' => '%mysql2localedatetime_spans( #enls_last_sent_auto_ts# )%',
 			);
 	}
 

@@ -23,7 +23,7 @@ class polls_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.10.4';
+	var $version = '6.10.5';
 	var $number_of_installs = 1;
 
 
@@ -354,7 +354,7 @@ class polls_plugin extends Plugin
 		//<![CDATA[
 		function polls_toolbar( title, prefix )
 		{
-			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>'	+ title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
+			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
 					+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>'
 					+ '<input type="button" title="<?php echo TS_('Insert a Poll');?>"'
 					+ ' class="<?php echo $this->get_template( 'toolbar_button_class' );?>"'

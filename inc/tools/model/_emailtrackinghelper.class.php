@@ -103,6 +103,7 @@ class EmailTrackingHelper
 
 		$unsubscribe_link_re = '/quick_unsubscribe\.php(?:[^\<\>])+type=(newsletter)/';
 		$email_func_re = '/(?:\?|&)evo_mail_function=(like|dislike|cta(?:1|2|3))&?/';
+		$activate_link_re = '/login\.php\?action=activateacc_ez/';
 
 		switch( $this->content_type )
 		{
@@ -148,10 +149,18 @@ class EmailTrackingHelper
 						case 'cta3':
 							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 7 ) );
 							break;
+
+						case 'unsubscribe':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 9 ) );
+							break;
 					}
 
 					// Remove email function marker in the URL
 					$redirect_url = $this->_cleanup_email_param_marker( $match, $redirect_url );
+				}
+				elseif( preg_match( $activate_link_re, $redirect_url, $match ) )
+				{	// Activate button/link:
+					$passthrough_url = $this->get_passthrough_url( array( 'tag' => 8 ) );
 				}
 
 				if( preg_match_all( '~(\$secret_content_start\$)(.*?)(\$secret_content_end\$)~', $redirect_url, $secret_contents ) )
@@ -212,10 +221,18 @@ class EmailTrackingHelper
 						case 'cta3':
 							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 7 ) );
 							break;
+
+						case 'unsubscribe':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 9 ) );
+							break;
 					}
 
 					// Remove email function marker in the URL
 					$redirect_url = $this->_cleanup_email_param_marker( $match, $redirect_url );
+				}
+				elseif( preg_match( $activate_link_re, $redirect_url, $match ) )
+				{
+					$passthrough_url = $this->get_passthrough_url( array( 'tag' => 8 ) );
 				}
 
 				if( preg_match_all( '~(\$secret_content_start\$)(.*?)(\$secret_content_end\$)~', $redirect_url, $secret_contents ) )

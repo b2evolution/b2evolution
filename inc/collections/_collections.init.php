@@ -957,7 +957,7 @@ class collections_Module extends Module
 	{
 		return array(
 			'create-post-by-email' => array(
-				'name'   => T_('Create posts by email'),
+				'name'   => T_('Create posts by email').' ('.T_('Deprecated').')',
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_post_by_email.job.php',
 				'params' => NULL,
@@ -1245,11 +1245,14 @@ class collections_Module extends Module
 					if( $current_User->unsubscribe( $Newsletter->ID ) )
 					{
 						$Messages->add( sprintf( T_('You have unsubscribed and you will no longer receive emails from %s.'), '"'.$Newsletter->get( 'name' ).'"' ), 'success' );
+
+						// Send notification to owners of lists where user subscribed:
+						$current_User->send_list_owner_notifications( 'unsubscribe' );
 					}
 				}
 				else
 				{	// Subscribe to newsletter:
-					if( $current_User->is_subscribed( $Newsletter->ID ) || $current_User->subscribe( $Newsletter->ID ) )
+					if( $current_User->is_subscribed( $Newsletter->ID ) || $current_User->subscribe( $Newsletter->ID, array( 'usertags' => $insert_user_tags ) ) )
 					{
 						if( ! empty( $insert_user_tags ) )
 						{
@@ -1257,6 +1260,9 @@ class collections_Module extends Module
 							$current_User->dbupdate();
 						}
 						$Messages->add( sprintf( T_('You have successfully subscribed to: %s.'), '"'.$Newsletter->get( 'name' ).'"' ), 'success' );
+
+						// Send notification to owners of lists where user subscribed:
+						$current_User->send_list_owner_notifications( 'subscribe' );
 					}
 				}
 

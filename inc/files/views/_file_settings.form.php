@@ -158,7 +158,7 @@ $Form->begin_fieldset( T_('Accessible file roots').get_manual_link('accessible_f
 	$Form->checkbox( 'fm_enable_roots_plugins', $Settings->get('fm_enable_roots_plugins'), T_('Enable plugins directory'), T_('Check to enable root directory for plugins.' ) );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('File creation options'), array( 'id' => 'ffset_filecreate', 'class' => 'additional_file_settings' ) );
+$Form->begin_fieldset( T_('File creation options').get_manual_link('file-creation-options'), array( 'id' => 'ffset_filecreate', 'class' => 'additional_file_settings' ) );
 	$Form->checkbox( 'fm_enable_create_dir', $Settings->get('fm_enable_create_dir'), T_('Enable creation of folders'), T_('Check to enable creation of directories.' ) );
 	$Form->checkbox( 'fm_enable_create_file', $Settings->get('fm_enable_create_file'), T_('Enable creation of files'), T_('Check to enable creation of files.' ) );
 	$Form->checkbox_input( 'upload_enabled', $Settings->get( 'upload_enabled', true ), T_('Enable upload of files'), array(
@@ -180,12 +180,13 @@ $Form->begin_fieldset( T_('File creation options'), array( 'id' => 'ffset_filecr
 	echo JS_showhide_ffield_on_checkbox( 'upload_maxkb', 'upload_enabled' );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Advanced options'), array( 'id' => 'ffset_fileadvanced', 'class' => 'additional_file_settings' ) );
+$Form->begin_fieldset( T_('Advanced options').get_manual_link('advanced-file-options'), array( 'id' => 'ffset_fileadvanced', 'class' => 'additional_file_settings' ) );
 
-	$Form->text_input( 'fm_default_chmod_dir', $Settings->get('fm_default_chmod_dir'), 4, T_('Default folder permissions'), T_('Default CHMOD (UNIX permissions) for new directories created by the file manager.' ) );
+	$Form->text_input( 'fm_default_chmod_dir', $Settings->get('fm_default_chmod_dir'), 4, T_('Permissions for new folders'), T_('Default CHMOD (UNIX permissions) for new directories created by b2evolution.') );
 
-	// fp> Does the following also applu to *uploaded* files? (It should)
- 	$Form->text_input( 'fm_default_chmod_file', $Settings->get('fm_default_chmod_file'), 4, T_('Default file permissions'), T_('Default CHMOD (UNIX permissions) for new files created by the file manager.' ) );
+	// fp> Does the following also apply to *uploaded* files? (It should)
+	// yb> Yes, I tested on December 8, 2018, ver. 6.10.4-stable, branch "develop".
+	$Form->text_input( 'fm_default_chmod_file', $Settings->get('fm_default_chmod_file'), 4, T_('Permissions for new files'), T_('Default CHMOD (UNIX permissions) for new files created by b2evolution.') );
 
 	if( empty( $force_regexp_filename ) || empty( $force_regexp_dirname ) )
 	{ // At least one of these strings can be configured in the UI:

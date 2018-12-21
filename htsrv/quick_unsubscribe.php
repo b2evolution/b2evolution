@@ -20,6 +20,7 @@ param( 'coll_ID', 'integer', 0 );
 param( 'post_ID', 'integer', 0 );
 param( 'confirmed', 'integer', 0 );
 param( 'action', 'string', NULL );
+param( 'ecmp_ID', 'integer', 0 );
 
 $unsub_Comment = false;
 if( $comment_ID !== NULL )
@@ -265,10 +266,35 @@ elseif( $confirmed )
 					//    which was upgraded to Newsletter with ID = 1
 					$newsletter_ID = param( 'newsletter', 'integer', 1 );
 
-					if( ! $edited_User->unsubscribe( $newsletter_ID ) )
+					$assigned_user_tag = NULL;
+					$email_campaign_ID = param( 'ecmp_ID', 'integer', 0 );
+					$EmailCampaignCache = & get_EmailCampaignCache();
+					if( $email_campaign_ID )
+					{
+						if( $EmailCampaign = & $EmailCampaignCache->get_by_ID( $email_campaign_ID, false, false ) )
+						{
+							$assigned_user_tag = $EmailCampaign->get( 'user_tag_unsubscribe' );
+						}
+						else
+						{
+							$error_msg = T_('Invalid unsubscribe link!');
+							break;
+						}
+					}
+
+					if( ! $edited_User->unsubscribe( $newsletter_ID, array( 'usertags' => $assigned_user_tag ) ) )
 					{	// Display a message is the user is not subscribed on the requested newsletter:
 						$error_msg = T_('You are not subscribed to this list.');
+
+						// Send notification to owners of lists where user unsubscribed:
+						$edited_User->send_list_owner_notifications( 'unsubscribe' );
 					}
+					elseif( ! empty( $assigned_user_tag ) )
+					{
+						$edited_User->add_usertags( $assigned_user_tag );
+						$edited_User->dbupdate();
+					}
+
 					break;
 
 				case 'user_registration':
@@ -334,6 +360,18 @@ elseif( $confirmed )
 				case 'post_mentioned':
 					// unsubscribe from new post notifications when user is mentioned:
 					$UserSettings->set( 'notify_post_mentioned', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'list_new_subscriber':
+					// unsubscribe from notifications when someone subscribes to one of the user's lists:
+					$UserSettings->set( 'notify_list_new_subscriber', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'list_lost_subscriber':
+					// unsubscribe from notifications when a user unsubscribes to one of the user's lists:
+					$UserSettings->set( 'notify_list_lost_subscriber', '0', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
@@ -558,7 +596,12 @@ elseif( $confirmed )
 					//    which was upgraded to Newsletter with ID = 1
 					$newsletter_ID = param( 'newsletter', 'integer', 1 );
 
-					if( ! $edited_User->subscribe( $newsletter_ID ) )
+					if( $edited_User->subscribe( $newsletter_ID ) )
+					{
+						// Send notification to owners of lists where user subscribed:
+						$edited_User->send_list_owner_notifications( 'subscribe' );
+					}
+					else
 					{	// Display a message is the user is not subscribed on the requested newsletter:
 						$error_msg = T_('You are already subscribed to this list.');
 					}
@@ -627,6 +670,18 @@ elseif( $confirmed )
 				case 'post_mentioned':
 					// resubscribe to new post notifications when user is mentioned:
 					$UserSettings->set( 'notify_post_mentioned', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'list_new_subscriber':
+					// resubscribe from notifications when someone subscribes to one of the user's lists:
+					$UserSettings->set( 'notify_list_new_subscriber', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'list_lost_subscriber':
+					// resubscribe from notifications when a user unsubscribes to one of the user's lists:
+					$UserSettings->set( 'notify_list_lost_subscriber', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
@@ -824,6 +879,16 @@ switch( $type )
 		$type_str = $notification_prefix.': '.T_('I have been mentioned on a post.');
 		break;
 
+	case 'list_new_subscriber':
+		// unsubscribe from notifications when someone subscribes to one of the user's lists:
+		$type_str = $notification_prefix.': '.T_('one of my Lists gets a new subscriber.');
+		break;
+
+	case 'list_lost_subscriber':
+		// unsubscribe from notifications when a user unsubscribes to one of the user's lists:
+		$type_str = $notification_prefix.': '.T_('one of my Lists loses a subscriber.');
+		break;
+
 	default:
 		// DEFENSIVE programming:
 		$type_str = T_('Unhandled unsubscribe type');
@@ -933,6 +998,10 @@ else
 	$Form->hidden( 'coll_ID', $coll_ID );
 	$Form->hidden( 'post_ID', $post_ID );
 	$Form->hidden( 'confirmed', 1 );
+	if( $ecmp_ID )
+	{
+		$Form->hidden( 'ecmp_ID', $ecmp_ID );
+	}
 	if( ! empty( $hidden_form_params ) && is_array( $hidden_form_params ) )
 	{	// Set additional hidden params from the array:
 		foreach( $hidden_form_params as $hidden_form_param_key => $hidden_form_param_value )

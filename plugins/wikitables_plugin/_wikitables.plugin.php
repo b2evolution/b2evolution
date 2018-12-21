@@ -22,7 +22,7 @@ class wikitables_plugin extends Plugin
 	var $code = 'b2evWiTa';
 	var $name = 'Wiki Tables';
 	var $priority = 15;
-	var $version = '6.10.4';
+	var $version = '6.10.5';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;

@@ -87,8 +87,7 @@ class user_register_quick_Widget extends ComponentWidget
 
 		// Load all active newsletters:
 		$NewsletterCache = & get_NewsletterCache();
-		$load_where = 'enlt_active = 1';
-		$NewsletterCache->load_where( $load_where );
+		$NewsletterCache->load_where( 'enlt_active = 1 AND enlt_perm_subscribe = "anyone"' );
 		// Initialize checkbox options for param "Newsletter":
 		$def_newsletters = explode( ',', $Settings->get( 'def_newsletters' ) );
 		foreach( $NewsletterCache->cache as $Newsletter )
@@ -110,7 +109,7 @@ class user_register_quick_Widget extends ComponentWidget
 					'label' => T_('Block title'),
 					'note' => T_('Title to display in your skin.'),
 					'size' => 40,
-					'defaultvalue' => T_('Get our list!'),
+					'defaultvalue' => T_('Get our newsletter!'),
 				),
 				'intro' => array(
 					'label' => T_('Intro text'),
@@ -140,6 +139,17 @@ class user_register_quick_Widget extends ComponentWidget
 						),
 					'defaultvalue' => 'no',
 				),
+				'ask_country' => array(
+					'label' => T_('Ask for country'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'no', T_('No') ),
+							array( 'optional', T_('Optional') ),
+							array( 'required', T_('Required') )
+						),
+					'defaultvalue' => 'no',
+				),
 				'source' => array(
 					'label' => T_('Source code'),
 					'note' => '',
@@ -154,13 +164,13 @@ class user_register_quick_Widget extends ComponentWidget
 					'maxlength' => 255,
 				),
 				'newsletters' => array(
-					'label' => T_('Lists'),
+					'label' => T_('Subscribe to lists'),
 					'type' => 'checklist',
 					'options' => $newsletters_options,
 					'note' => ''
 				),
 				'subscribe_post' => array(
-					'label' => T_('Auto subscribe'),
+					'label' => T_('Subscribe to collection'),
 					'note' => T_('check to auto subscribe new user to current collection posts'),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
@@ -256,7 +266,7 @@ class user_register_quick_Widget extends ComponentWidget
 	 */
 	function display_form( $params )
 	{
-		global $Collection, $Blog, $Settings, $Session, $redirect_to, $dummy_fields;
+		global $Collection, $Blog, $Settings, $Session, $Plugins, $redirect_to, $dummy_fields;
 
 		if( $Settings->get( 'newusers_canregister' ) != 'yes' || ! $Settings->get( 'quick_registration' ) )
 		{ // Display error message when quick registration is disabled
@@ -298,9 +308,15 @@ class user_register_quick_Widget extends ComponentWidget
 			echo '<p>'.$this->disp_params['intro'].'</p>';
 		}
 
+		// Get current form display mode:
+		$form_display_mode = $this->get_form_display( 'compact' );
+		$is_nolabels_mode = in_array( $form_display_mode, array( 'nolabels', 'inline', 'grouped' ) );
+
 		$Form = new Form( get_htsrv_url( 'login' ).'register.php', 'register_form', 'post' );
 
-		$Form->begin_form( NULL, '', array( 'class' => 'widget_register_form') );
+		$Form->begin_form( NULL, '', array( 'class' => 'widget_register_form evo_widget_form__'.$form_display_mode ) );
+
+		$Plugins->trigger_event( 'DisplayRegisterFormBefore', array( 'Form' => & $Form, 'inskin' => true, 'Widget' => & $this ) );
 
 		$Form->add_crumb( 'regform' );
 		$Form->hidden( 'action', 'quick_register' );
@@ -315,6 +331,7 @@ class user_register_quick_Widget extends ComponentWidget
 			$Form->hidden( 'source', $this->disp_params['source'] );
 			$Form->hidden( 'ask_firstname', $this->disp_params['ask_firstname'] );
 			$Form->hidden( 'ask_lastname', $this->disp_params['ask_lastname'] );
+			$Form->hidden( 'ask_country', $this->disp_params['ask_country'] );
 			$Form->hidden( 'usertags', $this->disp_params['usertags'] );
 			$Form->hidden( 'subscribe_post', $this->disp_params['subscribe_post'] );
 			$Form->hidden( 'subscribe_comment', $this->disp_params['subscribe_comment'] );
@@ -330,12 +347,20 @@ class user_register_quick_Widget extends ComponentWidget
 			$Form->hidden( 'newsletters', implode( ',', $newsletters ) );
 		}
 
+		if( $form_display_mode == 'grouped' )
+		{	// Start a group of all inputs and submit button in single line:
+			$Form->begin_line();
+			$Form->inputend = '';
+			$Form->fieldend = '';
+		}
+
 		if( $this->disp_params['ask_firstname'] != 'no' )
 		{ // First name
 			$firstname_value = isset( $widget_param_input_values['firstname'] ) ? $widget_param_input_values['firstname'] : '';
 			$firstname_params = array(
 					'maxlength' => 50,
-					'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' )
+					'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' ),
+					'input_suffix' => '',
 				);
 			if( $this->disp_params['ask_firstname'] == 'required' )
 			{	// Params if first name is required:
@@ -344,7 +369,11 @@ class user_register_quick_Widget extends ComponentWidget
 				// Set HTML5 attribute required="required" to display JS error before submit form:
 				$firstname_params['input_required'] = 'required';
 			}
-			$Form->text_input( 'firstname', $firstname_value, 18, T_('Your first name'), '', $firstname_params );
+			if( $is_nolabels_mode )
+			{	// Display placeholder only in mode when labels are hidden:
+				$firstname_params['placeholder'] = T_('Your first name');
+			}
+			$Form->text_input( 'firstname', $firstname_value, 18, ( $is_nolabels_mode ? '' : T_('Your first name') ), '', $firstname_params );
 		}
 
 		if( $this->disp_params['ask_lastname'] != 'no' )
@@ -352,7 +381,8 @@ class user_register_quick_Widget extends ComponentWidget
 			$lastname_value = isset( $widget_param_input_values['lastname'] ) ? $widget_param_input_values['lastname'] : '';
 			$lastname_params = array(
 					'maxlength' => 50,
-					'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' )
+					'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' ),
+					'input_suffix' => '', // Remove default "\n" in order to avoid a space on grouped mode
 				);
 			if( $this->disp_params['ask_lastname'] == 'required' )
 			{	// Params if first name is required:
@@ -361,21 +391,51 @@ class user_register_quick_Widget extends ComponentWidget
 				// Set HTML5 attribute required="required" to display JS error before submit form:
 				$lastname_params['input_required'] = 'required';
 			}
-			$Form->text_input( 'lastname', $lastname_value, 18, T_('Your last name'), '', $lastname_params );
+			if( $is_nolabels_mode )
+			{	// Display placeholder only in mode when labels are hidden:
+				$lastname_params['placeholder'] = T_('Your last name');
+			}
+			$Form->text_input( 'lastname', $lastname_value, 18, ( $is_nolabels_mode ? '' : T_('Your last name') ), '', $lastname_params );
 		}
 
 		// E-mail
+		$email_params = array(
+			'maxlength'      => 255,
+			'class'          => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' ),
+			'required'       => true,
+			'input_required' => 'required',
+			'input_suffix' => '', // Remove default "\n" in order to avoid a space on grouped mode
+		);
+		if( $is_nolabels_mode )
+		{	// Display placeholder only in mode when labels are hidden:
+			$email_params['placeholder'] = T_('Your email');
+		}
 		$email_value = isset( $widget_param_input_values[ $dummy_fields['email'] ] ) ? $widget_param_input_values[ $dummy_fields['email'] ] : '';
-		$Form->email_input( $dummy_fields['email'], $email_value, 50, T_('Your email'), array( 'maxlength' => 255, 'class' => 'input_text'.( $this->disp_params['inline'] == 1 ? ' inline_widget' : '' ), 'required' => true, 'input_required' => 'required' ) );
+		$Form->email_input( $dummy_fields['email'], $email_value, 50, ( $is_nolabels_mode ? '' : T_('Your email') ), $email_params );
 
-		// Submit button
-		$Form->begin_fieldset( '', array( 'class' => 'fieldset field_register_btn' ) );
-		$Form->button_input( array(
+		if( $this->disp_params['ask_country'] != 'no' && empty( $this->disp_params['hide_country_by_plugin'] ) )
+		{	// Country
+			$CountryCache = & get_CountryCache();
+			$CountryCache->none_option_text = NT_('Select your country');
+			$country_value = isset( $widget_param_input_values['country'] ) ? $widget_param_input_values['country'] : get_param( 'country' );
+			$Form->select_country( 'country', $country_value, $CountryCache, ( $is_nolabels_mode ? '' : T_('Country') ), array(
+				'allow_none' => true,
+				'required' => $this->disp_params['ask_country'] == 'required',
+				'input_suffix' => '', // Remove default "\n" in order to avoid a space on grouped mode
+			) );
+		}
+
+		$Form->buttons( array( array(
 				'value' => $this->disp_params['button'],
 				'class' => $this->disp_params['button_class'].' submit' )
-			);
-		$Form->end_fieldset();
+			) );
 
+		if( $form_display_mode == 'grouped' )
+		{	// End of the group of all inputs and submit button in single line:
+			$Form->end_line();
+		}
+
+		// Submit button:
 		$Form->end_form();
 
 		if( ! is_logged_in() )

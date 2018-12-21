@@ -925,20 +925,6 @@ div.extended_search_form div[class^='col-'] {
   padding-left: 3px;
   padding-right: 3px;
 }
-.widget_core_user_register_quick #register_form {
-  margin-top: 5px;
-}
-.widget_core_user_register_quick fieldset {
-  border: none;
-  padding: 0;
-  margin: 0;
-}
-.widget_core_user_register_quick .field_register_btn {
-  margin: 5px 0;
-}
-.widget_core_user_register_quick .input_text {
-  width: 96%;
-}
 .widget_core_user_login .control-buttons {
   width: 100%;
   padding: 0;
@@ -1690,4 +1676,84 @@ div#fileuploader_form {
 #filelist_tbody tr:first-child .action_icon_link_move_up,
 #filelist_tbody tr:last-child .action_icon_link_move_down {
   visibility: hidden;
+}
+.evo_widget_form__compact,
+.evo_widget_form__nolabels {
+  margin-bottom: -15px;
+}
+.evo_widget_form__compact label.control-label,
+.evo_widget_form__nolabels label.control-label {
+  text-align: left;
+  width: auto;
+  padding: 0;
+}
+.evo_widget_form__compact .controls,
+.evo_widget_form__nolabels .controls {
+  width: 100%;
+}
+.evo_widget_form__compact .form_text_input.form-control,
+.evo_widget_form__nolabels .form_text_input.form-control {
+  width: 100%;
+}
+.evo_widget_form__compact .form_text_input.form-control.inline_widget,
+.evo_widget_form__nolabels .form_text_input.form-control.inline_widget {
+  width: 100%;
+  max-width: 250px;
+}
+.evo_widget_form__compact .control-buttons,
+.evo_widget_form__nolabels .control-buttons {
+  margin: 0;
+  padding: 0;
+}
+.evo_widget_form__compact .control-buttons .btn,
+.evo_widget_form__nolabels .control-buttons .btn {
+  margin: 0;
+}
+.evo_widget_form__nolabels label.control-label {
+  display: none;
+}
+.evo_widget_form__inline label.control-label,
+.evo_widget_form__grouped label.control-label {
+  display: none;
+  float: none;
+}
+.evo_widget_form__inline div,
+.evo_widget_form__grouped div {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  width: auto;
+}
+.evo_widget_form__inline input.btn,
+.evo_widget_form__grouped input.btn {
+  margin: 0;
+}
+.evo_widget_form__inline div.controls,
+.evo_widget_form__inline div.control-buttons {
+  float: none;
+  margin-bottom: 4px;
+}
+.evo_widget_form__inline div.controls .form-control,
+.evo_widget_form__inline div.control-buttons .form-control {
+  width: 100%;
+}
+.evo_widget_form__grouped .controls input {
+  border-radius: 0;
+  vertical-align: top;
+}
+.evo_widget_form__grouped .controls input:not(:last-child) {
+  border-right: none;
+}
+.evo_widget_form__grouped .controls input:first-child {
+  border-radius: 4px 0 0 4px;
+}
+.evo_widget_form__grouped .controls input:last-child {
+  border-radius: 0 4px 4px 0;
+}
+.evo_widget_form__grouped .controls select {
+  -webkit-border-radius: 0;
+  border: 0;
+  outline: 1px solid #ccc;
+  outline-offset: -1px;
+  vertical-align: top;
 }

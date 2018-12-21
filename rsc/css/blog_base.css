@@ -1026,20 +1026,6 @@ div.container_menu_top div.widget_core_coll_search_form {
 div.container_menu_top input.search_field {
   width: 160px;
 }
-.widget_core_user_register_quick #register_form {
-  margin-top: 5px;
-}
-.widget_core_user_register_quick fieldset {
-  border: none;
-  padding: 0;
-  margin: 0;
-}
-.widget_core_user_register_quick .field_register_btn {
-  margin: 5px 0;
-}
-.widget_core_user_register_quick .input_text {
-  width: 96%;
-}
 .widget_core_user_greetings .greeting,
 .widget_core_user_greetings .avatar {
   vertical-align: middle;
@@ -1676,4 +1662,21 @@ input.btn-lg {
 }
 .evo_container__sidebar .evo_poll__title {
   white-space: normal;
+}
+.evo_widget_form__compact fieldset,
+.evo_widget_form__nolabels fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+.evo_widget_form__compact input[type=submit],
+.evo_widget_form__nolabels input[type=submit] {
+  margin: 5px 0;
+}
+.evo_widget_form__compact .input_text,
+.evo_widget_form__nolabels .input_text {
+  width: 96%;
+}
+.evo_widget_form__nolabels .label label {
+  display: none;
 }

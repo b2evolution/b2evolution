@@ -843,6 +843,10 @@ class DataObject
 			}
 		}
 
+		$Form = new Form( '', 'form_confirm', 'get', '' );
+
+		$Form->begin_form( 'inline' );
+
 		if( $restriction_Messages->count() )
 		{	// The will be cascading deletes, issue WARNING:
 			echo '<h3 class="evo_confirm_delete__title">'.T_('WARNING: Deleting this object will also delete:').'</h3>';
@@ -854,9 +858,6 @@ class DataObject
 
 		$redirect_to = param( 'redirect_to', 'url', '' );
 
-		$Form = new Form( '', 'form_confirm', 'get', '' );
-
-		$Form->begin_form( 'inline' );
 			$Form->add_crumb( $crumb_name );
 			$Form->hiddens_by_key( $hiddens );
 			$Form->hidden( 'action', $delete_action );

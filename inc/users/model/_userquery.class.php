@@ -1003,7 +1003,7 @@ class UserQuery extends FilterSQL
 			}
 
 			global $DB;
-			$this->SELECT_add( ', enls_last_sent_manual_ts, enls_last_open_ts, enls_last_click_ts, enls_send_count, enls_subscribed, enls_subscribed_ts, enls_unsubscribed_ts, enls_enlt_ID' );
+			$this->SELECT_add( ', enls_last_sent_manual_ts, enls_last_sent_auto_ts, enls_last_open_ts, enls_last_click_ts, enls_send_count, enls_subscribed, enls_subscribed_ts, enls_unsubscribed_ts, enls_enlt_ID' );
 			$this->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID'.( $is_subscribed === NULL ? ' AND enls_enlt_ID = '.$DB->quote( $value ) : '' ) );
 
 			return '( SELECT enls_enlt_ID FROM T_email__newsletter_subscription WHERE enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $value ).$restrict_is_subscribed.' ) '.( $operator == 'equal' ? 'IS NOT NULL' : 'IS NULL' );

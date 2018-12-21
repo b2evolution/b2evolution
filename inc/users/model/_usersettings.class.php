@@ -56,6 +56,7 @@ class UserSettings extends AbstractSettings
 		'fold_cmntform_info' => 1,
 		'fold_cmntform_notifications' => 1,
 		'fold_upgrade_backup_options' => 1,
+		'fold_upgrade_file_options' => 1,
 		'fold_plugin_vars' => 1,
 		'fold_plugin_events' => 1,
 
@@ -96,6 +97,8 @@ class UserSettings extends AbstractSettings
 		'notify_reported_account' => 1, // Notify admin user when an account has been reported by another user
 		'notify_changed_account' => 1, // Notify admin user when an account has been changed
 		'notify_cronjob_error' => 1, // Notify admin user when a scheduled task ends with an error or timeout
+		'notify_list_new_subscriber' => 1, // Notify list owner user when there is a new subscriber
+		'notify_list_lost_subscriber' => 1, // Notify list owner user when list loses a subscriber
 		'notify_automation_owner' => 1, // Notify automation owner user when step is executed
 
 		'account_close_ts' => NULL, // It will be the date when the account was closed. Until the account is not closed this will be NULL.
@@ -115,6 +118,7 @@ class UserSettings extends AbstractSettings
 		'suggest_item_tags' => 1, // Suggest to autocomplete item tags on edit form
 
 		'agg_period' => 'last_30_days', // Date period to filter the aggregated hits data
+		'aggcmp_period' => 'prev_30_days', // Date period to compare the aggregated hits data
 
 		'git_upgrade_url' => 'https://github.com/b2evolution/b2evolution.git', // URL of Git repository
 		'git_upgrade_branch' => 'master', // Git branch

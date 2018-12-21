@@ -13,13 +13,16 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-/**
- * View funcs
- */
-require_once dirname(__FILE__).'/_stats_view.funcs.php';
-
-
 global $blog, $admin_url, $rsc_url, $AdminUI, $agent_type_color, $Settings, $localtimenow;
+
+// All diagarm and table columns for current page:
+$diagram_columns = array(
+	'robot'  => array( 'title' => T_('Robot hits'), 'link_data' => array( 'robot' ) ),
+);
+foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
+{
+	$diagram_columns[ $diagram_column_key ]['color'] = $agent_type_color[ $diagram_column_key ];
+}
 
 echo '<h2 class="page-title">'.T_('Hits from indexing robots / spiders / crawlers - Summary').get_manual_link( 'robots-hits-summary' ).'</h2>';
 
@@ -29,98 +32,23 @@ echo '<p class="notes">'.T_('In order to be detected, robots must be listed in /
 display_hits_summary_panel();
 
 // Check if it is a mode to display a live data:
-$is_live_mode = ( get_hits_summary_mode() == 'live' );
+$hits_summary_mode = get_hits_summary_mode();
+$is_live_mode = ( $hits_summary_mode == 'live' );
 
-$SQL = new SQL( 'Get robot hits summary ('.( $is_live_mode ? 'Live data' : 'Aggregate data' ).')' );
-if( $is_live_mode )
-{	// Get the live data:
-	$SQL->SELECT( 'SQL_NO_CACHE COUNT( * ) AS hits,
-		EXTRACT( YEAR FROM hit_datetime ) AS year,
-		EXTRACT( MONTH FROM hit_datetime ) AS month,
-		EXTRACT( DAY FROM hit_datetime ) AS day' );
-	$SQL->FROM( 'T_hitlog' );
-	$SQL->WHERE( 'hit_agent_type = "robot"' );
-	if( $blog > 0 )
-	{	// Filter by collection:
-		$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
-	}
+// Get hits data for chart and table:
+$res_hits = get_hits_results_robot( $hits_summary_mode );
 
-	$hits_start_date = NULL;
-	$hits_end_date = date( 'Y-m-d' );
-}
-else
-{	// Get the aggregated data:
-	$SQL->SELECT( 'SUM( hagg_count ) AS hits,
-		EXTRACT( YEAR FROM hagg_date ) AS year,
-		EXTRACT( MONTH FROM hagg_date ) AS month,
-		EXTRACT( DAY FROM hagg_date ) AS day' );
-	$SQL->FROM( 'T_hits__aggregate' );
-	$SQL->WHERE( 'hagg_agent_type = "robot"' );
-	if( $blog > 0 )
-	{	// Filter by collection:
-		$SQL->WHERE_and( 'hagg_coll_ID = '.$DB->quote( $blog ) );
-	}
-	// Filter by date:
-	list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates();
-	$SQL->WHERE_and( 'hagg_date >= '.$DB->quote( $hits_start_date ) );
-	$SQL->WHERE_and( 'hagg_date <= '.$DB->quote( $hits_end_date ) );
-}
-$SQL->GROUP_BY( 'year, month, day' );
-$SQL->ORDER_BY( 'year DESC, month DESC, day DESC' );
-$res_hits = $DB->get_results( $SQL, ARRAY_A );
-
-/*
- * Chart
- */
 if( count( $res_hits ) )
 {
-	// Find the dates without hits and fill them with 0 to display on graph and table:
-	$res_hits = fill_empty_hit_days( $res_hits, $hits_start_date, $hits_end_date );
+	// Display diagram for live or aggregated data:
+	display_hits_diagram( 'robot', $diagram_columns, $res_hits );
 
-	$last_date = 0;
-
-	$chart[ 'chart_data' ][ 0 ] = array();
-	$chart[ 'chart_data' ][ 1 ] = array();
-
-	$chart['dates'] = array();
-
-	// Initialize the data to open an url by click on bar item
-	$chart['link_data'] = array();
-	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&agent_type=$param1$';
-	$chart['link_data']['params'] = array(
-			array( 'robot' )
-		);
-
-	$count = 0;
-	foreach( $res_hits as $row_stats )
-	{
-		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
-		if( $last_date != $this_date )
-		{ // We just hit a new day, let's display the previous one:
-			$last_date = $this_date;	// that'll be the next one
-			$count ++;
-			array_unshift( $chart[ 'chart_data' ][ 0 ], date( 'D '.locale_datefmt(), $last_date ) );
-			array_unshift( $chart[ 'chart_data' ][ 1 ], 0 );
-
-			array_unshift( $chart['dates'], $last_date );
-		}
-		$chart [ 'chart_data' ][1][0] = $row_stats['hits'];
+	if( ! $is_live_mode )
+	{	// Display diagram to compare hits:
+		display_hits_filter_form( 'compare', $diagram_columns );
+		$prev_res_hits = get_hits_results_robot( 'compare' );
+		display_hits_diagram( 'robot', $diagram_columns, $prev_res_hits, 'cmpcanvasbarschart' );
 	}
-
-	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
-	array_unshift( $chart[ 'chart_data' ][ 1 ], T_('Robot hits') );	// Translations need to be UTF-8
-
-	$chart[ 'series_color' ] = array (
-			$agent_type_color['robot'],
-		);
-
-	$chart[ 'canvas_bg' ] = array( 'width'  => '100%', 'height' => 355 );
-
-	echo '<div class="center">';
-	load_funcs('_ext/_canvascharts.php');
-	CanvasBarsChart( $chart );
-	echo '</div>';
-
 
 	/*
 	 * Table:
@@ -128,7 +56,10 @@ if( count( $res_hits ) )
 	echo '<table class="grouped table table-striped table-bordered table-hover table-condensed" cellspacing="0">';
 	echo '	<tr>';
 	echo '		<th class="firstcol shrinkwrap">'.T_('Date').'</th>';
-	echo '		<th class="lastcol" style="background-color: #'.$agent_type_color['robot'].'"><a href="'.$admin_url.'?ctrl=stats&amp;tab=hits&amp;agent_type=robot&amp;blog='.$blog.'">'.T_('Robot hits').'</a></th>';
+	foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
+	{
+		echo '		<th class="lastcol" style="background-color: #'.$diagram_column_data['color'].'"><a href="'.$admin_url.'?ctrl=stats&amp;tab=hits&amp;agent_type='.$diagram_column_key.'&amp;blog='.$blog.'">'.$diagram_column_data['title'].'</a></th>';
+	}
 	echo '	</tr>';
 
 	$hits_total = 0;

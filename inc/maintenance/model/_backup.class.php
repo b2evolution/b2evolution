@@ -303,7 +303,7 @@ class Backup
 	 */
 	function backup_files( $backup_dirpath )
 	{
-		global $basepath, $backup_paths, $backup_exclude_folders, $backup_current_exclude_folders, $inc_path;
+		global $basepath, $backup_paths, $backup_exclude_folders, $backup_current_exclude_folders, $inc_path, $Settings;
 
 		echo '<h4>'.T_('Creating folders/files backup...').'</h4>';
 		evo_flush();
@@ -420,6 +420,9 @@ class Backup
 				}
 				else
 				{
+					// Set rights for new created ZIP file:
+					@chmod( $zip_filepath, octdec( $Settings->get( 'fm_default_chmod_file' ) ) );
+
 					echo ' OK.<br />';
 					evo_flush();
 				}
@@ -446,7 +449,7 @@ class Backup
 	 */
 	function backup_database( $backup_dirpath )
 	{
-		global $DB, $db_config, $backup_tables, $inc_path;
+		global $DB, $db_config, $backup_tables, $inc_path, $Settings;
 
 		echo '<h4>'.T_('Creating database backup...').'</h4>';
 		evo_flush();
@@ -631,6 +634,9 @@ class Backup
 			}
 
 			unlink( $backup_sql_filepath );
+
+			// Set rights for new created ZIP file:
+			@chmod( $zip_filepath, octdec( $Settings->get( 'fm_default_chmod_file' ) ) );
 		}
 
 		return true;

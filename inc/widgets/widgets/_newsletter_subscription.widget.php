@@ -111,7 +111,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 					),
 					'unsubscribed_if_not_tagged' => array(
 						'type' => 'checkbox',
-						'note' => T_('Treat user has not subscribed if he is not tagged yet'),
+						'note' => T_('Treat user as not subscribed if he is not tagged yet'),
 						'defaultvalue' => false,
 					),
 					// Hidden, used by subscribe shorttag
@@ -131,7 +131,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 						'label' => T_('Block title'),
 						'note' => T_('Title to display in your skin.'),
 						'size' => 40,
-						'defaultvalue' => T_('Get our list!'),
+						'defaultvalue' => T_('Get our newsletter!'),
 					),
 					'intro' => array(
 						'label' => T_('Intro text'),
@@ -168,7 +168,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 						'label' => T_('Block title'),
 						'note' => T_('Title to display in your skin.'),
 						'size' => 40,
-						'defaultvalue' => T_('Get our list!'),
+						'defaultvalue' => T_('Get our newsletter!'),
 					),
 					'intro_subscribed' => array(
 						'label' => T_('Intro text'),
@@ -234,13 +234,22 @@ class newsletter_subscription_Widget extends ComponentWidget
 			$this->BlockCache->abort_collect();
 		}
 
+		$NewsletterCache = & get_NewsletterCache();
+		$widget_Newsletter = & $NewsletterCache->get_by_ID( $this->disp_params['enlt_ID'], false, false );
+
+		if( $widget_Newsletter &&
+		    ! $current_User->is_subscribed( $widget_Newsletter->ID ) &&
+		    ! $current_User->is_allowed_newsletter( $widget_Newsletter->ID ) )
+		{	// Don't display the widget block completely when user is not subscribed
+			// and current user has no permission to be subscribed to:
+			return;
+		}
+
 		echo $this->disp_params['block_start'];
 
 		$redirect_to = param( 'redirect_to', 'url', regenerate_url( '', '', '', '&' ) );
 
-
-		$NewsletterCache = & get_NewsletterCache();
-		if( ! ( $widget_Newsletter = & $NewsletterCache->get_by_ID( $this->disp_params['enlt_ID'], false, false ) ) ||
+		if( ! $widget_Newsletter ||
 		    ! $widget_Newsletter->get( 'active' ) )
 		{	// Display an error when newsletter is not found or not active:
 			$this->disp_title();
