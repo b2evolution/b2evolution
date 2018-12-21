@@ -30,8 +30,9 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 {
 	global $DB, $install_test_features, $installed_collection_info_pages;
 	// Handle all blog IDs which can go from function create_demo_contents()
-	global $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
+	global $blog_minisite_ID, $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
 	global $demo_poll_ID;
+	$blog_minisite_ID = intval( $blog_minisite_ID );
 	$blog_home_ID = intval( $blog_home_ID );
 	$blog_a_ID = intval( $blog_a_ID );
 	$blog_b_ID = intval( $blog_b_ID );
@@ -715,7 +716,8 @@ function insert_basic_widgets( $blog_id, $skin_type, $initial_install = false, $
 	global $DB, $install_test_features;
 
 	// Handle all blog IDs which can go from function create_demo_contents()
-	global $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
+	global $blog_minisite_ID, $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
+	$blog_minisite_ID = intval( $blog_minisite_ID );
 	$blog_home_ID = intval( $blog_home_ID );
 	$blog_a_ID = intval( $blog_a_ID );
 	$blog_b_ID = intval( $blog_b_ID );

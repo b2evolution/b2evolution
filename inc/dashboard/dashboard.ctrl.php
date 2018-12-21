@@ -97,15 +97,14 @@ if( $action == 'new_demo_content' )
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 
 	load_funcs( 'collections/_demo_content.funcs.php' );
-	install_demo_content();
+	$collection_count = install_demo_content();
 
 	$block_item_Widget->disp_template_raw( 'block_end' );
 }
-elseif( $current_User->check_perm( 'blogs', 'create' ) && $collection_count === 0 )
+if( $current_User->check_perm( 'blogs', 'create' ) && $collection_count === 0 )
 {
 	// Display welcome panel:
 	$AdminUI->disp_view( 'collections/views/_welcome_demo_content.view.php' );
-	$AdminUI->disp_payload_end();
 }
 
 // Display blog list VIEW:
