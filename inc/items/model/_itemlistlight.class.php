@@ -818,7 +818,7 @@ class ItemListLight extends DataObjectList2
 
 		// QUERY:
 		$this->ItemQuery->SELECT( 'DISTINCT '.$this->Cache->dbIDname.', post_datestart, post_datemodified, post_title, post_short_title, post_url,' );
-		$this->ItemQuery->SELECT_add( 'post_excerpt, post_urltitle, post_canonical_slug_ID, post_tiny_slug_ID, post_main_cat_ID, post_ityp_ID, post_single_view, postcat_cat_ID' );
+		$this->ItemQuery->SELECT_add( 'post_excerpt, post_urltitle, post_canonical_slug_ID, post_tiny_slug_ID, post_main_cat_ID, post_ityp_ID, post_single_view, T_postcats.postcat_cat_ID' );
 		if( strpos( $this->ItemQuery->get_from(), 'T_postcats' ) === false )
 		{	// If categories table is not joined yet we should use it for column postcat_cat_ID
 			$this->ItemQuery->FROM_add( 'INNER JOIN T_postcats ON '.$this->Cache->dbIDname.' = postcat_post_ID' );
