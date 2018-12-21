@@ -251,7 +251,13 @@ switch( $action )
 
 				// Switch locale to translate content
 				locale_temp_switch( param( 'blog_locale', 'string' ) );
-				create_sample_content( $kind, $edited_Blog->ID, $edited_Blog->owner_user_ID, $create_demo_users );
+
+				if( $create_demo_users )
+				{
+					get_demo_users( true, false );
+				}
+
+				create_sample_content( $kind, $edited_Blog->ID, $edited_Blog->owner_user_ID );
 				locale_restore_previous();
 			}
 

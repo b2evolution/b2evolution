@@ -280,6 +280,7 @@ function install_newdb()
 		// (Assigning by reference does not work with "global" keyword (PHP 5.2.8))
 		$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
 
+		// Create the demo/sample contents:
 		create_demo_contents( $demo_users, $create_demo_users, true );
 	}
 

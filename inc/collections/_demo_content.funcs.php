@@ -887,11 +887,10 @@ function get_demo_users_defaults()
  * Get all available demo users
  *
  * @param boolean Create the demo users if they do not exist
- * @param object Group where the created demo users be assigned
- * @param array List of organization where  the created demo users will be added
+ * @param boolean Display ouput
  * @return array Array of available demo users indexed by login
  */
-function get_demo_users( $create = false )
+function get_demo_users( $create = false, $output = true )
 {
 	$demo_users = get_demo_users_defaults();
 	$demo_users_logins = array_keys( $demo_users );
@@ -899,7 +898,7 @@ function get_demo_users( $create = false )
 	$available_demo_users = array();
 	foreach( $demo_users_logins as $demo_user_login )
 	{
-		$demo_User = get_demo_user( $demo_user_login, $create );
+		$demo_User = get_demo_user( $demo_user_login, $create, $output );
 		if( $demo_User )
 		{
 			$available_demo_users[$demo_user_login] = $demo_User;
@@ -915,9 +914,10 @@ function get_demo_users( $create = false )
  *
  * @param string User $login
  * @param boolean Create demo user if it does not exist
+ * @param boolean Display output
  * @return mixed object Demo user if successful, false otherwise
  */
-function get_demo_user( $login, $create = false )
+function get_demo_user( $login, $create = false, $output = true )
 {
 	global $DB;
 	global $current_User;
@@ -964,7 +964,15 @@ function get_demo_user( $login, $create = false )
 
 	if( ! $demo_user && $create )
 	{	// Demo user does not exist yet but we can create:
-		task_begin( sprintf( 'Creating demo user %s...', $login ) );
+		if( $login == 'admin' && $admin_user = $UserCache->get_by_ID( 1, false, false ) )
+		{	// Admin user must have been renamed, skip:
+			return false;
+		}
+
+		if( $output )
+		{
+			task_begin( sprintf( 'Creating demo user %s...', $login ) );
+		}
 		adjust_timestamp( $user_timestamp, 360, 1440, false );
 
 		$user_defaults = array_merge( $demo_users[$login], array(
@@ -988,7 +996,10 @@ function get_demo_user( $login, $create = false )
 				VALUES ( '.$demo_user->ID.', "created_fromIPv4", '.$DB->quote( ip2int( '127.0.0.1' ) ).' ),
 				       ( '.$demo_user->ID.', "user_domain", "localhost" )' );
 		}
-		task_end();
+		if( $output )
+		{
+			task_end();
+		}
 	}
 	elseif( $demo_user )
 	{
@@ -1136,7 +1147,7 @@ function create_demo_messages()
  * @param boolean True to create users for the demo content
  * @return integer Number of collections created
  */
-function create_demo_contents( $demo_users = array(), $create_demo_users = true, $initial_install = true )
+function create_demo_contents( $demo_users = array(), $use_demo_users = true, $initial_install = true )
 {
 	global $current_User, $DB, $Settings;
 
@@ -1263,7 +1274,7 @@ function create_demo_contents( $demo_users = array(), $create_demo_users = true,
 	{	// Install Home blog
 		task_begin( 'Creating Home collection...' );
 		$section_ID = isset( $sections['Home']['ID'] ) ? $sections['Home']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'main', $jay_moderator_ID, $create_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'main', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID ) )
 		{
 			if( $initial_install )
 			{
@@ -1293,7 +1304,7 @@ function create_demo_contents( $demo_users = array(), $create_demo_users = true,
 		$timeshift += 86400;
 		task_begin( 'Creating Blog A collection...' );
 		$section_ID = isset( $sections['Blogs']['ID'] ) ? $sections['Blogs']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'blog_a', $jay_moderator_ID, $create_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'blog_a', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID ) )
 		{
 			if( $initial_install )
 			{
@@ -1322,7 +1333,7 @@ function create_demo_contents( $demo_users = array(), $create_demo_users = true,
 		$timeshift += 86400;
 		task_begin( 'Creating Blog B collection...' );
 		$section_ID = isset( $sections['Blogs']['ID'] ) ? $sections['Blogs']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'blog_b', $paul_blogger_ID, $create_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'blog_b', $paul_blogger_ID, $use_demo_users, $timeshift, $section_ID ) )
 		{
 			if( $initial_install )
 			{
@@ -1351,7 +1362,7 @@ function create_demo_contents( $demo_users = array(), $create_demo_users = true,
 		$timeshift += 86400;
 		task_begin( 'Creating Photos collection...' );
 		$section_ID = isset( $sections['Photos']['ID'] ) ? $sections['Photos']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'photo', $dave_blogger_ID, $create_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'photo', $dave_blogger_ID, $use_demo_users, $timeshift, $section_ID ) )
 		{
 			if( $initial_install )
 			{
@@ -1380,7 +1391,7 @@ function create_demo_contents( $demo_users = array(), $create_demo_users = true,
 		$timeshift += 86400;
 		task_begin( 'Creating Forums collection...' );
 		$section_ID = isset( $sections['Forums']['ID'] ) ? $sections['Forums']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'forum', $paul_blogger_ID, $create_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'forum', $paul_blogger_ID, $use_demo_users, $timeshift, $section_ID ) )
 		{
 			if( $initial_install )
 			{
@@ -1409,7 +1420,7 @@ function create_demo_contents( $demo_users = array(), $create_demo_users = true,
 		$timeshift += 86400;
 		task_begin( 'Creating Manual collection...' );
 		$section_ID = isset( $sections['Manual']['ID'] ) ? $sections['Manual']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'manual', $dave_blogger_ID, $create_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'manual', $dave_blogger_ID, $use_demo_users, $timeshift, $section_ID ) )
 		{
 			if( $initial_install )
 			{
@@ -1438,7 +1449,7 @@ function create_demo_contents( $demo_users = array(), $create_demo_users = true,
 		$timeshift += 86400;
 		task_begin( 'Creating Tracker collection...' );
 		$section_ID = isset( $sections['Forums']['ID'] ) ? $sections['Forums']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'group', $jay_moderator_ID, $create_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'group', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID ) )
 		{
 			if( $initial_install )
 			{
@@ -1466,7 +1477,7 @@ function create_demo_contents( $demo_users = array(), $create_demo_users = true,
 	{	// Install Mini-site collection
 		$timeshift += 86400;
 		task_begin( 'Creating Mini-Site collection...' );
-		if( $blog_ID = create_demo_collection( 'minisite', $jay_moderator_ID, $create_demo_users, $timeshift, 1 ) )
+		if( $blog_ID = create_demo_collection( 'minisite', $jay_moderator_ID, $use_demo_users, $timeshift, 1 ) )
 		{
 			if( $initial_install )
 			{
@@ -1960,7 +1971,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 	$timestamp = time();
 	$item_IDs = array();
 	$additional_comments_item_IDs = array();
-	$demo_users = get_demo_users( $use_demo_user );
+	$demo_users = get_demo_users( false );
 
 	$BlogCache = & get_BlogCache();
 
@@ -3530,7 +3541,11 @@ Hello
 	}
 
 	// Create demo comments
-	$comment_users = $use_demo_user ? array_values( $demo_users ) : NULL;
+	$comment_users = array_values( $demo_users );
+	if( count( $comment_users ) === 1 )
+	{	// Only 1 demo user, use anonymous users:
+		$comment_users = NULL;
+	}
 	foreach( $item_IDs as $item_ID )
 	{
 		$comment_timestamp = strtotime( $item_ID[1] );
@@ -3653,10 +3668,9 @@ function install_demo_content()
 	$install_test_features    = param( 'install_test_features', 'boolean', false );
 
 	$user_org_IDs = NULL;
-	$demo_users = array();
 
 	$DB->begin();
-	if( $create_demo_organization || $create_demo_users )
+	if( $create_demo_organization )
 	{
 		echo get_install_format_text( '<h2>'.T_('Creating sample organization and users...').'</h2>', 'h2' );
 		evo_flush();
@@ -3671,14 +3685,11 @@ function install_demo_content()
 			$current_User->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
 			task_end();
 		}
-
-		if( $create_demo_users )
-		{
-			$demo_users = get_demo_users( true );
-		}
 	}
 
-	if( $create_demo_messages )
+	$demo_users = get_demo_users( $create_demo_users );
+
+	if( $create_demo_users && $create_demo_messages )
 	{
 		task_begin( 'Creating demo private messages...' );
 		create_demo_messages();
@@ -3690,7 +3701,7 @@ function install_demo_content()
 	{
 		echo get_install_format_text( '<h2>'.T_('Installing sample contents...').'</h2>', 'h2' );
 		evo_flush();
-		$collections_installed = create_demo_contents( $demo_users, $create_demo_users, false );
+		$collections_installed = create_demo_contents( $demo_users, true, false );
 	}
 
 	if( $collections_installed )

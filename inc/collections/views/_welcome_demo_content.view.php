@@ -25,10 +25,11 @@ $welcome_content_Widget = new Widget( 'block_item' );
 
 	echo '<p>'.T_('Your b2evolution installation is installed and working but there is no content yet.').'</p>';
 	echo '<p>'.T_('Would you like to create some demo contents to get a better understanding of how things work? You can easily delete these demo contents when you no longer need them.').'</p>';
+	$enable_create_demo_users = get_table_count( 'T_users', 'user_ID != 1' ) === 0;
 	echo echo_installation_options( array(
-			'enable_create_demo_users' => get_table_count( 'T_users', 'user_ID != 1' ) === 0,
-			'show_create_organization' => get_table_count( 'T_users__organization') === 0,
-			'show_create_messages'     => get_table_count( 'T_messaging__message' ) === 0,
+			'enable_create_demo_users' => $enable_create_demo_users,
+			'show_create_organization' => $enable_create_demo_users && ( get_table_count( 'T_users__organization') === 0 ),
+			'show_create_messages'     => $enable_create_demo_users && ( get_table_count( 'T_messaging__message' ) === 0 ),
 		) );
 
 	?>
