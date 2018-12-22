@@ -11325,6 +11325,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15350, 'Installing minisite collection default skin...' ) )
+	{	// part of 7.0.0-alpha
+		load_funcs( 'skins/_skin.funcs.php' );
+		skin_install( 'jared_skin', true );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

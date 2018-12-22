@@ -385,7 +385,7 @@ function create_blog(
 		$blog_urlname,
 		$blog_tagline = '',
 		$blog_longdesc = '',
-		$blog_skin_class = 'bootstrap_blog_Skin',
+		$blog_skin_name = 'Bootstrap Blog',
 		$kind = 'std', // standard blog; notorious variations: "photo", "group", "forum"
 		$allow_rating_items = '',
 		$use_inskin_login = 0,
@@ -399,10 +399,17 @@ function create_blog(
 	global $default_locale, $install_test_features, $local_installation, $Plugins, $Blog;
 
 	$SkinCache = & get_SkinCache();
-	$blog_Skin = & $SkinCache->get_by_class( $blog_skin_class, false, false );
+	$blog_Skin = & $SkinCache->get_by_name( $blog_skin_name, false, false );
+	if( ! $blog_Skin )
+	{	// Try looking for skin using class name:
+		$blog_skin_class = strtolower( $blog_skin_name );
+		$blog_skin_class = trim( preg_replace( array( '/\h+/', '/_[s|S]kin$/' ), array( '_', '' ), $blog_skin_class ) ).'_Skin';
+		$blog_Skin = & $SkinCache->get_by_class( $blog_skin_name, false, false );
+	}
+
 	if( ! $blog_Skin )
 	{
-		trigger_error( 'Unable to find the default skin of the collection.', E_USER_NOTICE );
+		trigger_error( sprintf( 'Unable to find the default skin of the collection (%s).', $blog_skin_name ), E_USER_NOTICE );
 		return false;
 	}
 
@@ -1694,7 +1701,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					'minisite',
 					T_('Change this as you like'),
 					sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-					'jared_Skin',
+					'Jared Skin',
 					'minisite',
 					'any',
 					1,
@@ -1743,7 +1750,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					'home',
 					T_('Change this as you like'),
 					sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-					'bootstrap_main_Skin',
+					'Bootstrap Main',
 					'main',
 					'any',
 					1,
@@ -1783,7 +1790,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					$blog_stub,
 					T_('This blog is completely public...'),
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-					'bootstrap_blog_Skin',
+					'Bootstrap Blog',
 					'std',
 					'any',
 					1,
@@ -1822,7 +1829,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					$blog_stub,
 					T_('This blog has restricted access...'),
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-					'bootstrap_blog_Skin',
+					'Bootstrap Blog',
 					'std',
 					'',
 					0,
@@ -1859,7 +1866,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					$blog_stub,
 					T_('This blog shows photos...'),
 					sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
-					'bootstrap_gallery_Skin',
+					'Bootstrap Gallery Skin',
 					'photo', '', 0, '#', true, 'public',
 					$owner_ID,
 					'public',
@@ -1880,7 +1887,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					$blog_stub,
 					T_('Tagline for Forums'),
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-					'bootstrap_forums_Skin',
+					'Bootstrap Forums',
 					'forum', 'any', 1, '#', false, 'public',
 					$owner_ID,
 					'public',
@@ -1901,7 +1908,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					$blog_stub,
 					T_('Tagline for this online manual'),
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-					'bootstrap_manual_Skin',
+					'Bootstrap Manual',
 					'manual', 'any', 1, '#', false, 'public',
 					$owner_ID,
 					'public',
@@ -1922,7 +1929,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					$blog_stub,
 					T_('Tagline for Tracker'),
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-					'bootstrap_forums_Skin',
+					'Bootstrap Forums',
 					'group', 'any', 1, '#', false, 'public',
 					$owner_ID,
 					'public',
