@@ -10094,6 +10094,174 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 12990 ) )
+	{	// part of 6.10.4-stable
+
+		/* ---- Install basic widgets for containers "Front Page Main Area": ---- START */
+		global $basic_widgets_insert_sql_rows;
+		$basic_widgets_insert_sql_rows = array();
+
+		/**
+		 * Add a widget to global array in order to insert it in DB by single SQL query later
+		 *
+		 * @param integer Blog ID
+		 * @param string Container name
+		 * @param string Type
+		 * @param string Code
+		 * @param integer Order
+		 * @param array|string|NULL Widget params
+		 * @param integer 1 - enabled, 0 - disabled
+		 */
+		function add_basic_widget_12990( $blog_ID, $container_name, $code, $type, $order, $params = NULL, $enabled = 1 )
+		{
+			global $basic_widgets_insert_sql_rows, $DB;
+
+			if( is_null( $params ) )
+			{ // NULL
+				$params = 'NULL';
+			}
+			elseif( is_array( $params ) )
+			{ // array
+				$params = $DB->quote( serialize( $params ) );
+			}
+			else
+			{ // string
+				$params = $DB->quote( $params );
+			}
+
+			$basic_widgets_insert_sql_rows[] = '( '
+				.$blog_ID.', '
+				.$DB->quote( $container_name ).', '
+				.$order.', '
+				.$enabled.', '
+				.$DB->quote( $type ).', '
+				.$DB->quote( $code ).', '
+				.$params.' )';
+		}
+
+		// Insert content_hierarchy widget:
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_coll_ID, MAX(wi_order)' );
+		$SQL->FROM( 'T_widget' );
+		$SQL->FROM_add( 'INNER JOIN T_blogs ON blog_ID = wi_coll_ID' );
+		$SQL->WHERE( 'blog_type = "manual"' );
+		$SQL->WHERE_and( 'wi_sco_name = "Front Page Main Area"' );
+		$SQL->ORDER_BY( 'wi_coll_ID' );
+		$SQL->GROUP_BY( 'wi_coll_ID');
+
+		$collections = $DB->get_assoc( $SQL );
+		if( count( $collections ) > 0 )
+		{	// If at least one collection exists:
+			foreach( $collections as $coll_ID => $max_order )
+			{
+				task_begin( 'Installing default "Content Hierarchy" widget for collection #'.$coll_ID.'... ' );
+				add_basic_widget_12990( $coll_ID, 'Front Page Main Area', 'content_hierarchy', 'core', intval( $max_order ) + 10 );
+				task_end();
+			}
+		}
+
+		if( ! empty( $basic_widgets_insert_sql_rows ) )
+		{	// Insert the widget records by single SQL query:
+			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
+		}
+		/* ---- Install basic widgets for containers "Front Page Main Area": ---- END */
+		upg_task_end( false );
+	}
+
+	if( upg_task_start( 12993, 'Upgrading email newsletters table...' ) )
+	{	// part of 6.10.4-stable
+		db_upgrade_cols( 'T_email__newsletter', array(
+			'ADD' => array(
+				'enlt_perm_subscribe' => 'ENUM( "admin", "anyone", "group" ) COLLATE ascii_general_ci NOT NULL DEFAULT "anyone"',
+				'enlt_perm_groups'    => 'VARCHAR(255) COLLATE ascii_general_ci DEFAULT NULL',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12996, 'Upgrading email newsletter subscriptions table...' ) )
+	{	// part of 6.10.4-stable
+		db_add_col( 'T_email__newsletter_subscription', 'enls_last_sent_auto_ts', 'TIMESTAMP NULL AFTER enls_last_sent_manual_ts' );
+		$DB->query( 'UPDATE T_email__newsletter_subscription
+			SET enls_last_sent_auto_ts = enls_last_sent_manual_ts' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 12999, 'Upgrading email newsletters table...' ) )
+	{	// part of 6.10.4-stable
+		db_add_col( 'T_email__newsletter', 'enlt_owner_user_ID', 'INT UNSIGNED NOT NULL AFTER enlt_order' );
+		$DB->query( 'UPDATE T_email__newsletter SET enlt_owner_user_ID = 1' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13010, 'Upgrading email addresses table...' ) )
+	{	// part of 6.10.4-stable
+		db_upgrade_cols( 'T_email__address', array(
+			'MODIFY' => array( 'emadr_status' => 'ENUM( "unknown", "working", "unattended", "redemption", "warning", "suspicious1", "suspicious2", "suspicious3", "prmerror", "spammer" ) COLLATE ascii_general_ci NOT NULL DEFAULT "unknown"' ),
+			'ADD' => array( 'emadr_last_open_ts' => 'TIMESTAMP NULL' ),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13020 ) )
+	{	// part of 6.10.4-stable
+		task_begin( 'Updating email log table...' );
+		db_modify_col( 'T_email__log', 'emlog_camp_ID', 'INT UNSIGNED NULL DEFAULT NULL COMMENT "Used to reference campaign when there is no associated campaign_send or the previously associated campaign_send updated its csnd_emlog_ID"' );
+		task_end();
+
+		task_begin( 'Updating email newsletter subscriptions table...' );
+		$localtimenow = date2mysql( $GLOBALS['localtimenow'] );
+		$DB->query( 'UPDATE T_email__newsletter_subscription
+			INNER JOIN T_users ON user_ID = enls_user_ID AND user_status = "closed" AND enls_subscribed = 1
+			SET enls_subscribed = 0, enls_unsubscribed_ts = '.$DB->quote( $localtimenow ) );
+		task_end();
+
+		task_begin( 'Upgrading email campaigns table...' );
+		db_add_col( 'T_email__campaign', 'ecmp_user_tag_unsubscribe', 'VARCHAR(255) NULL AFTER ecmp_user_tag_like' );
+		task_end();
+
+		upg_task_end( false );
+	}
+
+	if( upg_task_start( 13030, 'Upgrading email campaigns table...' ) )
+	{	// part of 6.10.4-stable
+		db_upgrade_cols( 'T_email__campaign', array(
+			'ADD' => array(
+				'ecmp_cta1_autm_ID'         => 'INT UNSIGNED NULL',
+				'ecmp_cta1_autm_execute'    => 'TINYINT(1) NOT NULL DEFAULT 1',
+				'ecmp_cta2_autm_ID'         => 'INT UNSIGNED NULL',
+				'ecmp_cta2_autm_execute'    => 'TINYINT(1) NOT NULL DEFAULT 1',
+				'ecmp_cta3_autm_ID'         => 'INT UNSIGNED NULL',
+				'ecmp_cta3_autm_execute'    => 'TINYINT(1) NOT NULL DEFAULT 1',
+				'ecmp_like_autm_ID'         => 'INT UNSIGNED NULL',
+				'ecmp_like_autm_execute'    => 'TINYINT(1) NOT NULL DEFAULT 1',
+				'ecmp_dislike_autm_ID'      => 'INT UNSIGNED NULL',
+				'ecmp_dislike_autm_execute' => 'TINYINT(1) NOT NULL DEFAULT 1',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13040, 'Upgrading items table...' ) )
+	{	// part of 6.10.5-stable
+		db_modify_col( 'T_items__item', 'post_title', 'VARCHAR(255) NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13050, 'Upgrading email campaigns table...' ) )
+	{	// part of 6.10.5-stable
+		db_upgrade_cols( 'T_email__campaign', array(
+			'ADD' => array(
+				'ecmp_activate'              => 'TINYINT(1) NOT NULL DEFAULT 0 AFTER ecmp_welcome',
+				'ecmp_user_tag_activate'     => 'VARCHAR(255) NULL AFTER ecmp_user_tag_dislike',
+				'ecmp_activate_autm_ID'      => 'INT UNSIGNED NULL',
+				'ecmp_activate_autm_execute' => 'TINYINT(1) NOT NULL DEFAULT 1',
+			),
+		) );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
@@ -10107,7 +10275,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	 * ALL DB CHANGES MUST BE EXPLICITLY CARRIED OUT. DO NOT RELY ON SCHEMA UPDATES!
 	 * Schema updates do not survive after several incremental changes.
 	 *
-	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 3).
+	 * NOTE: every change that gets done here, should bump {@link $new_db_version} (by 10).
 	 */
 
 	// Execute general upgrade tasks.

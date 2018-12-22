@@ -52,9 +52,15 @@ class coll_featured_intro_Widget extends ComponentWidget
 					'note' => '.inc.php',
 					'defaultvalue' => '_item_block',
 				),
-				'item_class' => array(
-					'label' => T_('Item class'),
-					'defaultvalue' => 'featurepost',
+				'featured_class' => array(
+					'label' => T_('Featured Item class'),
+					'note' => T_('Leave empty for default'),
+					'defaultvalue' => '',
+				),
+				'intro_class' => array(
+					'label' => T_('Intro Item class'),
+					'note' => T_('Leave empty for default'),
+					'defaultvalue' => '',
 				),
 				'disp_title' => array(
 					'label' => T_( 'Title' ),
@@ -167,6 +173,17 @@ class coll_featured_intro_Widget extends ComponentWidget
 			), $params );
 
 		parent::init_display( $params );
+
+		// Use container params if DB params are empty:
+		if( empty( $this->disp_params['intro_class'] ) && ! empty( $params['intro_class'] ) )
+		{
+			$this->disp_params['intro_class'] = $params['intro_class'];
+		}
+
+		if( empty( $this->disp_params['featured_class'] ) && ! empty( $params['featured_class'] ) )
+		{
+			$this->disp_params['featured_class'] = $params['featured_class'];
+		}
 	}
 
 
@@ -183,7 +200,7 @@ class coll_featured_intro_Widget extends ComponentWidget
 
 		// Go Grab the featured post:
 		if( $Item = & get_featured_Item( 'front', $this->disp_params['blog_ID'] ) )
-		{ // We have a featured/intro post to display:
+		{	// We have a featured/intro post to display:
 			$item_style = '';
 			$LinkOwner = new LinkItem( $Item );
 			$LinkList = $LinkOwner->get_attachment_LinkList( 1, 'cover' );
@@ -206,18 +223,36 @@ class coll_featured_intro_Widget extends ComponentWidget
 			{	// Append item style to use cover as background:
 				echo update_html_tag_attribs( $this->disp_params['featured_intro_before'], array( 'style' => $item_style, 'class' => 'evo_hasbgimg' ) );
 			}
-			skin_include( $this->disp_params['skin_template'].'.inc.php', array(
+
+			$template_params = array(
 					'feature_block'        => true,
 					'content_mode'         => 'auto',   // 'auto' will auto select depending on $disp-detail
 					'intro_mode'           => 'normal', // Intro posts will be displayed in normal mode
-					'item_class'           => $this->disp_params['item_class'],
 					'image_size'           => $this->disp_params['image_size'],
 					'disp_title'           => $this->disp_params['disp_title'],
 					'item_title_link_type' => $this->disp_params['item_title_link_type'],
 					'attached_pics'        => $this->disp_params['attached_pics'],
 					'item_pic_link_type'   => $this->disp_params['item_pic_link_type'],
 					'Item'                 => $Item,
-				) );
+			);
+
+			// Add item_class:
+			$item_class = array();
+			if( $Item->is_intro() )
+			{
+				$item_class = preg_split( '/[\s,]+/', $this->disp_params['intro_class'] );
+			}
+			elseif( $Item->is_featured() )
+			{
+				$item_class = preg_split( '/[\s,]+/', $this->disp_params['featured_class'] );
+			}
+
+			if( !empty( $item_class ) )
+			{
+				$template_params['item_class'] = implode( ' ', $item_class );
+			}
+
+			skin_include( $this->disp_params['skin_template'].'.inc.php', $template_params );
 			echo $this->disp_params['featured_intro_after'];
 			echo $this->disp_params['block_body_end'];
 			echo $this->disp_params['block_end'];

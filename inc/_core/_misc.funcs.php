@@ -1433,7 +1433,7 @@ function make_clickable_callback( $text, $moredelim = '&amp;', $additional_attrs
 			'#(^|[\s>\(]|\[url=)aim:([^",<\s\]\)]+)#i',
 			'#(^|[\s>\(]|\[url=)icq:(\d+)#i',
 			'#(^|[\s>\(]|\[url=)www\.'.$pattern_domain.'([^"<>{}\s]*[^".,:;!\?\s\]\)])#i',
-			'#(^|[\s>\(]|\[url=)([a-z0-9\-_.]+?)@'.$pattern_domain.'([^".,:;!\?<\s\]\)]+)#i', ),
+			'#(^|[\s>\(]|\[url=)([a-z0-9\-_.]+?)@'.$pattern_domain.'([^".,:;!\?&<\s\]\)]+)#i', ),
 		array( '$1<a href="$2://$3"'.$additional_attrs.'>$2://$3</a>',
 			'$1<a href="aim:goim?screenname=$2$3'.$moredelim.'message='.rawurlencode(T_('Hello')).'"'.$additional_attrs.'>$2$3</a>',
 			'$1<a href="http://wwp.icq.com/scripts/search.dll?to=$2"'.$additional_attrs.'>$2</a>',
@@ -4063,6 +4063,10 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 				// 'notify_changed_account' - "an account was changed."
 			case 'scheduled_task_error_report':
 				// 'notify_cronjob_error' - "a scheduled task ends with an error or timeout."
+			case 'list_new_subscriber':
+				// 'notify_list_new_subscriber' - "one of my Lists gets a new subscriber."
+			case 'list_lost_subscriber':
+				// 'notify_list_lost_subscriber' - "one of my Lists loses a subscriber."
 			case 'automation_owner_notification':
 				// 'notify_automation_owner' - "one of my automations wants to notify me."
 				$email_limit_setting = 'notification_email_limit';
@@ -4215,9 +4219,10 @@ function send_mail_to_anonymous_user( $user_email, $user_name, $subject, $templa
  * @param string Format: 'html', 'text'
  * @param string Email of anonymous user
  * @param string Name of anonymous user
+ * @param array Email template params
  * @return string Text
 */
-function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user_email = NULL, $user_name = NULL )
+function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user_email = NULL, $user_name = NULL, $params = array() )
 {
 	if( ! $User && ! ( $user_email || $user_email ) )
 	{	// No user data:
@@ -4226,6 +4231,8 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
 
 	if( $User )
 	{	// Get data of registered User:
+		global $UserSettings;
+
 		if( $format == 'html' )
 		{
 			$username = $User->get_colored_login( array(
@@ -4254,6 +4261,21 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
 		$user_email = $User->email;
 		$user_ID = $User->ID;
 		$unsubscribe_key = '$secret_content_start$'.md5( $User->ID.$User->unsubscribe_key ).'$secret_content_end$';
+		if( isset( $params['template_mode'] ) && $params['template_mode'] == 'preview' )
+		{	// Don't use real value of reminder key on preview email template, e.g. on review message of email campaign:
+			$reminder_key = '$reminder_key$';
+		}
+		else
+		{	// Use real value of reminder key:
+			$reminder_key = $UserSettings->get( 'last_activation_reminder_key', $user_ID );
+			if( empty( $reminder_key ) && strpos( $text, '$reminder_key$' ) !== false )
+			{	// If reminder key was not generated yet we need create it in order user can active account even if did request the activation email yet:
+				$reminder_key = generate_random_key( 32 );
+				$UserSettings->set( 'last_activation_reminder_key', $reminder_key, $user_ID );
+				$UserSettings->dbupdate();
+			}
+		}
+		$newsletter_ID = isset( $params['enlt_ID'] ) ? $params['enlt_ID'] : '';
 	}
 	else
 	{	// Get data of anonymous user:
@@ -4266,10 +4288,12 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
 		$user_email = $user_email;
 		$user_ID = '';
 		$unsubscribe_key = '';
+		$reminder_key = '';
+		$newsletter_ID = '';
 	}
 
-	$rpls_from = array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$', '$email$', '$user_ID$', '$unsubscribe_key$' );
-	$rpls_to = array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login, $user_email, $user_ID, $unsubscribe_key );
+	$rpls_from = array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$', '$email$', '$user_ID$', '$unsubscribe_key$', '$reminder_key$', '$newsletter_ID$' );
+	$rpls_to = array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login, $user_email, $user_ID, $unsubscribe_key, $reminder_key, $newsletter_ID );
 
 	return str_replace( $rpls_from, $rpls_to, $text );
 }
@@ -4297,6 +4321,9 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 				),
 			'default_template_tag' => NULL
 		), $params );
+
+	// Set this param to know current template name inside code of email templates like header and footer:
+	$params['template_name'] = $template_name;
 
 	if( !empty( $params['locale'] ) )
 	{ // Switch to locale for current email template
@@ -4364,7 +4391,7 @@ function mail_template( $template_name, $format = 'auto', $params = array(), $Us
 
 		if( ! empty( $User ) )
 		{ // Replace $login$ with gender colored link + icon in HTML format, and with simple login text in PLAIN TEXT format
-			$formated_message = mail_autoinsert_user_data( $formated_message, $User, $format );
+			$formated_message = mail_autoinsert_user_data( $formated_message, $User, $format, NULL, NULL, $params );
 		}
 		elseif( ! empty( $params['anonymous_recipient_name'] ) )
 		{	// Replace anonymous name:
@@ -6902,7 +6929,7 @@ function get_samedomain_htsrv_url( $force_https = false )
 	}
 
 	if( $req_url_parts['host'] == $baseurl_parts['host'] &&
-	    ! isset( $req_url_parts['path'] ) && 
+	    ! isset( $req_url_parts['path'] ) &&
 	    isset( $baseurl_parts['path'] ) )
 	{	// Don't miss folder of base url from url like http://site.com/folder/:
 		$req_url_parts['path'] = $baseurl_parts['path'];
@@ -7221,7 +7248,7 @@ function save_to_file( $data, $filename, $mode = 'a' )
 		// Doesn't work during installation
 		if( !empty($Settings) )
 		{
-			$chmod = $Settings->get('fm_default_chmod_dir');
+			$chmod = $Settings->get('fm_default_chmod_file');
 			@chmod( $filename, octdec($chmod) );
 		}
 	}
@@ -9416,5 +9443,29 @@ function insert_image_links_block( $params )
 
 		require $inc_path.'links/views/_link_list.view.php';
 	}
+}
+
+
+/**
+ * Get line for CSV file from provided array
+ *
+ * @param array Row data
+ * @param string Delimiter
+ * @param string Enclosure
+ * @param string End of line
+ * @return string
+ */
+function get_csv_line( $row, $delimiter = ';', $enclosure = '"', $eol = "\n" )
+{
+	foreach( $row as $r => $cell )
+	{
+		$row[ $r ] = str_replace( $enclosure, $enclosure.$enclosure, $cell );
+		if( strpos( $cell, $delimiter ) !== false )
+		{
+			$row[ $r ] = $enclosure.$row[ $r ].$enclosure;
+		}
+	}
+
+	return implode( $delimiter, $row ).$eol;
 }
 ?>

@@ -47,6 +47,16 @@ class EmailCampaign extends DataObject
 
 	var $auto_sent_ts;
 
+	var $renderers;
+
+	var $use_wysiwyg = 0;
+
+	var $send_ctsk_ID;
+
+	var $welcome = 0;
+
+	var $activate = 0;
+
 	var $user_tag_sendskip;
 
 	var $user_tag_sendsuccess;
@@ -62,6 +72,10 @@ class EmailCampaign extends DataObject
 	var $user_tag_like;
 
 	var $user_tag_dislike;
+
+	var $user_tag_activate;
+
+	var $user_tag_unsubscribe;
 
 	var $send_count;
 
@@ -83,11 +97,23 @@ class EmailCampaign extends DataObject
 
 	var $unsub_clicks;
 
-	var $use_wysiwyg = 0;
+	var $cta1_autm_ID;
+	var $cta1_autm_execute = 1;
 
-	var $send_ctsk_ID;
+	var $cta2_autm_ID;
+	var $cta2_autm_execute = 1;
 
-	var $welcome = 0;
+	var $cta3_autm_ID;
+	var $cta3_autm_execute = 1;
+
+	var $like_autm_ID;
+	var $like_autm_execute = 1;
+
+	var $dislike_autm_ID;
+	var $dislike_autm_execute = 1;
+
+	var $activate_autm_ID;
+	var $activate_autm_execute = 1;
 
 	var $sequence;
 
@@ -101,11 +127,6 @@ class EmailCampaign extends DataObject
 	 *   'wait'    - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
 	 */
 	var $users = NULL;
-
-	/**
-	 * @var string
-	 */
-	var $renderers;
 
 	/**
 	 * Constructor
@@ -139,6 +160,7 @@ class EmailCampaign extends DataObject
 			$this->use_wysiwyg = $db_row->ecmp_use_wysiwyg;
 			$this->send_ctsk_ID = $db_row->ecmp_send_ctsk_ID;
 			$this->welcome = $db_row->ecmp_welcome;
+			$this->activate = $db_row->ecmp_activate;
 			$this->user_tag_sendskip = $db_row->ecmp_user_tag_sendskip;
 			$this->user_tag_sendsuccess = $db_row->ecmp_user_tag_sendsuccess;
 			$this->user_tag = $db_row->ecmp_user_tag;
@@ -147,6 +169,8 @@ class EmailCampaign extends DataObject
 			$this->user_tag_cta3 = $db_row->ecmp_user_tag_cta3;
 			$this->user_tag_like = $db_row->ecmp_user_tag_like;
 			$this->user_tag_dislike = $db_row->ecmp_user_tag_dislike;
+			$this->user_tag_activate = $db_row->ecmp_user_tag_activate;
+			$this->user_tag_unsubscribe = $db_row->ecmp_user_tag_unsubscribe;
 			$this->send_count = $db_row->ecmp_send_count;
 			$this->open_count = $db_row->ecmp_open_count;
 			$this->img_loads = $db_row->ecmp_img_loads;
@@ -157,6 +181,18 @@ class EmailCampaign extends DataObject
 			$this->like_count = $db_row->ecmp_like_count;
 			$this->dislike_count = $db_row->ecmp_dislike_count;
 			$this->unsub_clicks = $db_row->ecmp_unsub_clicks;
+			$this->cta1_autm_ID = $db_row->ecmp_cta1_autm_ID;
+			$this->cta1_autm_execute = $db_row->ecmp_cta1_autm_execute;
+			$this->cta2_autm_ID = $db_row->ecmp_cta2_autm_ID;
+			$this->cta2_autm_execute = $db_row->ecmp_cta2_autm_execute;
+			$this->cta3_autm_ID = $db_row->ecmp_cta3_autm_ID;
+			$this->cta3_autm_execute = $db_row->ecmp_cta3_autm_execute;
+			$this->like_autm_ID = $db_row->ecmp_like_autm_ID;
+			$this->like_autm_execute = $db_row->ecmp_like_autm_execute;
+			$this->dislike_autm_ID = $db_row->ecmp_dislike_autm_ID;
+			$this->dislike_autm_execute = $db_row->ecmp_dislike_autm_execute;
+			$this->activate_autm_ID = $db_row->ecmp_activate_autm_ID;
+			$this->activate_autm_execute = $db_row->ecmp_activate_autm_execute;
 		}
 	}
 
@@ -281,7 +317,7 @@ class EmailCampaign extends DataObject
 		{
 			case 'plaintext_template_preview':
 				global $current_User;
-				$text_mail_template = mail_template( 'newsletter', 'text', array( 'message_text' => $this->get( 'email_plaintext' ), 'include_greeting' => false, 'add_email_tracking' => false ), $current_User );
+				$text_mail_template = mail_template( 'newsletter', 'text', array( 'message_text' => $this->get( 'email_plaintext' ), 'include_greeting' => false, 'add_email_tracking' => false, 'template_mode' => 'preview' ), $current_User );
 				$text_mail_template = str_replace( array( '$email_key$', '$mail_log_ID$', '$email_key_start$', '$email_key_end$' ), array( '***email-key***', '', '', '' ), $text_mail_template );
 				$text_mail_template = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $text_mail_template );
 				return nl2br( $text_mail_template );
@@ -613,15 +649,50 @@ class EmailCampaign extends DataObject
 	{
 		if( $force_update || $this->get( 'sync_plaintext' ) )
 		{	// Update plain-text message only when it is enabled for this email campaign:
-			$email_plaintext = preg_replace( '#<a[^>]+href="([^"]+)"[^>]*>[^<]*</a>#i', ' [ $1 ] ', $this->get( 'email_html' ) );
+			$email_plaintext = preg_replace_callback( '#<a[^>]+href="([^"]+)"[^>]*>([^<]*)</a>#i', array( $this, 'update_plaintext_callback_a' ), $this->get( 'email_html' ) );
 			$email_plaintext = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', ' [ $1 ] ', $email_plaintext );
 			$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
-			$email_plaintext = preg_replace( '#<(p|/h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
-			$email_plaintext = preg_replace( '#<(br|h[1-6]|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
+			$email_plaintext = preg_replace( '#</li>[\s\t]*</ul>#i', '</li></ul>', $email_plaintext );
+			$email_plaintext = preg_replace_callback( '#<h([1-4])[^>]*>([^<]*)</h\1>#i', array( $this, 'update_plaintext_callback_h' ), $email_plaintext );
+			$email_plaintext = preg_replace( '#<(p|/?h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
+			$email_plaintext = preg_replace( '#<(br|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
 			$email_plaintext = preg_replace( '#<li[^>]*>#i', "- ", $email_plaintext );
 			$email_plaintext = preg_replace( '#<hr ?/?>#i', "\n\n----------------\n\n", $email_plaintext );
-			$this->set( 'email_plaintext', strip_tags( $email_plaintext ) );
+			$email_plaintext = preg_replace( '#[\n\s]{2,}#i', "\n\n", $email_plaintext );
+			$this->set( 'email_plaintext', trim( strip_tags( $email_plaintext ), " \r\n" ) );
 		}
+	}
+
+
+	/**
+	 * Callback for <h1-4> of the function update_plaintext()
+	 *
+	 * @param array Matches
+	 * @return string
+	 */
+	function update_plaintext_callback_h( $m )
+	{
+		return "\n\n"
+			// Header text:
+			.$m[2]."\n"
+			// Put ======= under H1 and H2, ------- under H3 and H4:
+			.str_repeat( ( $m[1] > 2 ? '-' : '=' ), utf8_strlen( $m[2] ) )."\n\n";
+	}
+
+
+	/**
+	 * Callback for <a> of the function update_plaintext()
+	 *
+	 * @param array Matches
+	 * @return string
+	 */
+	function update_plaintext_callback_a( $m )
+	{
+		return ' [ '
+			// Display a text of the link if it is not same as url:
+			.( $m[1] == $m[2] ? '' : $m[2].' --> ' )
+			// Url of the link:
+			.$m[1].' ] ';
 	}
 
 
@@ -678,7 +749,7 @@ class EmailCampaign extends DataObject
 		}
 
 		if( param( 'ecmp_name', 'string', NULL ) !== NULL )
-		{ // Campaign name:
+		{	// Campaign name:
 			param_string_not_empty( 'ecmp_name', T_('Please enter a name.') );
 			$this->set_from_Request( 'name' );
 		}
@@ -744,33 +815,91 @@ class EmailCampaign extends DataObject
 		}
 
 		if( param( 'ecmp_user_tag', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag' );
 		}
 
 		if( param( 'ecmp_user_tag_cta1', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_cta1' );
 		}
 
 		if( param( 'ecmp_user_tag_cta2', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_cta2' );
 		}
 
 		if( param( 'ecmp_user_tag_cta3', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_cta3' );
 		}
 
 		if( param( 'ecmp_user_tag_like', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_like' );
 		}
 
 		if( param( 'ecmp_user_tag_dislike', 'string', NULL ) !== NULL )
-		{ // User tag:
+		{	// User tag:
 			$this->set_from_Request( 'user_tag_dislike' );
+		}
+
+		if( param( 'ecmp_user_tag_activate', 'string', NULL ) !== NULL )
+		{	// User tag:
+			$this->set_from_Request( 'user_tag_activate' );
+		}
+
+		if( param( 'ecmp_user_tag_unsubscribe', 'string', NULL ) !== NULL )
+		{	// User tag:
+			$this->set_from_Request( 'user_tag_unsubscribe' );
+		}
+
+		$cta1_autm_ID = param( 'ecmp_cta1_autm_ID', 'integer', NULL );
+		if( $cta1_autm_ID !== NULL )
+		{	// Automation CTA 1:
+			$this->set( 'cta1_autm_ID', ( $cta1_autm_ID === 0 ? NULL : $cta1_autm_ID ), true );
+			param( 'ecmp_cta1_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'cta1_autm_execute' );
+		}
+
+		$cta2_autm_ID = param( 'ecmp_cta2_autm_ID', 'integer', NULL );
+		if( $cta2_autm_ID !== NULL )
+		{	// Automation CTA 2:
+			$this->set( 'cta2_autm_ID', ( $cta2_autm_ID === 0 ? NULL : $cta2_autm_ID ), true );
+			param( 'ecmp_cta2_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'cta2_autm_execute' );
+		}
+
+		$cta3_autm_ID = param( 'ecmp_cta3_autm_ID', 'integer', NULL );
+		if( $cta3_autm_ID !== NULL )
+		{	// Automation CTA 3:
+			$this->set( 'cta3_autm_ID', ( $cta3_autm_ID === 0 ? NULL : $cta3_autm_ID ), true );
+			param( 'ecmp_cta3_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'cta3_autm_execute' );
+		}
+
+		$like_autm_ID = param( 'ecmp_like_autm_ID', 'integer', NULL );
+		if( $like_autm_ID !== NULL )
+		{	// Automation LIKE:
+			$this->set( 'like_autm_ID', ( $like_autm_ID === 0 ? NULL : $like_autm_ID ), true );
+			param( 'ecmp_like_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'like_autm_execute' );
+		}
+
+		$dislike_autm_ID = param( 'ecmp_dislike_autm_ID', 'integer', NULL );
+		if( $dislike_autm_ID !== NULL )
+		{	// Automation DISLIKE:
+			$this->set( 'dislike_autm_ID', ( $dislike_autm_ID === 0 ? NULL : $dislike_autm_ID ), true );
+			param( 'ecmp_dislike_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'dislike_autm_execute' );
+		}
+
+		$activate_autm_ID = param( 'ecmp_activate_autm_ID', 'integer', NULL );
+		if( $activate_autm_ID !== NULL )
+		{	// Automation ACTIVATE:
+			$this->set( 'activate_autm_ID', ( $activate_autm_ID === 0 ? NULL : $activate_autm_ID ), true );
+			param( 'ecmp_activate_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'activate_autm_execute' );
 		}
 
 		return ! param_errors_detected();
@@ -830,7 +959,7 @@ class EmailCampaign extends DataObject
 	 * @param integer User ID
 	 * @param string Email address
 	 * @param string Mode: 'test' - to send test email newsletter
-	 * @param string|boolean Update time of last sending: 'auto', 'manual', FALSE - to don't update
+	 * @param string|boolean Update time of last sending: 'auto', 'manual'. FALSE and 'welcome' - to don't update
 	 * @param integer Newsletter ID, used for unsubscribe link in email footer, NULL - to use Newsletter ID of this Email Campaign
 	 * @param integer Automation ID, used to store in mail log
 	 * @return boolean TRUE on success
@@ -843,14 +972,15 @@ class EmailCampaign extends DataObject
 				'include_greeting' => false,
 				'message_html'     => $this->get( 'email_html' ),
 				'message_text'     => $this->get( 'email_plaintext' ),
-				'newsletter'       => ( $newsletter_ID === NULL ? $this->get( 'enlt_ID' ) : $newsletter_ID ),
+				'enlt_ID'          => ( $newsletter_ID === NULL ? $this->get( 'enlt_ID' ) : $newsletter_ID ),
 				'ecmp_ID'          => $this->ID,
 				'autm_ID'          => $automation_ID,
 				'template_parts'   => array(
 						'header' => 0,
 						'footer' => 0
 					),
-				'default_template_tag' => 1
+				'default_template_tag' => 1,
+				'is_welcome_email'     => ( $update_sent_ts == 'welcome' ),
 			);
 
 		$UserCache = & get_UserCache();
@@ -891,12 +1021,25 @@ class EmailCampaign extends DataObject
 			}
 
 			if( $result )
-			{	// Update last sending data for newsletter per user:
-				$DB->query( 'UPDATE T_email__newsletter_subscription
-					SET enls_last_sent_manual_ts = '.$DB->quote( date2mysql( $localtimenow ) ).',
+			{
+				$last_sent_ts_field = ( $update_sent_ts == 'auto' ? 'enls_last_sent_auto_ts' : 'enls_last_sent_manual_ts' );
+				if( empty( $automation_ID ) )
+				{	// Update last sending data for newsletter per user:
+					$last_sent_ts_sql_join = '';
+					$last_sent_ts_sql_where = ' AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) );
+				}
+				else
+				{	// Update last sending data for all newsletters tied to the automation and where the user is subscribed to:
+					$last_sent_ts_sql_join = ' INNER JOIN T_automation__newsletter ON aunl_enlt_ID = enls_enlt_ID AND enls_subscribed = 1';
+					$last_sent_ts_sql_where = '';
+				}
+				$DB->query( 'UPDATE T_email__newsletter_subscription'
+					.$last_sent_ts_sql_join.'
+					SET '.$last_sent_ts_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).',
 					    enls_send_count = enls_send_count + 1
-					WHERE enls_user_ID = '.$DB->quote( $user_ID ).'
-					  AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+					WHERE enls_user_ID = '.$DB->quote( $user_ID )
+						.$last_sent_ts_sql_where );
+
 				// Add tags to user after successful email sending:
 				$user_tag_sendsuccess = trim( $this->get( 'user_tag_sendsuccess' ) );
 				if( ! empty( $user_tag_sendsuccess ) )
@@ -946,7 +1089,8 @@ class EmailCampaign extends DataObject
 	 *
 	 * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
 	 * @param array Force users instead of users which are ready to receive this email campaign
-	 * @param string|boolean Update time of last sending: 'auto', 'manual', FALSE - to don't update
+	 * @param string|boolean Update time of last sending: 'auto', 'manual', 'welcome'. FALSE - to don't update
+	 * @return boolean TRUE if at least one email is sent
 	 */
 	function send_all_emails( $display_messages = true, $user_IDs = NULL, $update_sent_ts = 'manual' )
 	{
@@ -965,7 +1109,7 @@ class EmailCampaign extends DataObject
 
 		if( empty( $user_IDs ) )
 		{	// No users, Exit here:
-			return;
+			return false;
 		}
 
 		// It it important to randomize order so that it is not always the same users who get the news first and the same users who the get news last:
@@ -981,6 +1125,7 @@ class EmailCampaign extends DataObject
 		$email_success_count = 0;
 		$email_skip_count = 0;
 		$email_error_count = 0;
+		$return = false;
 		foreach( $user_IDs as $user_ID )
 		{
 			if( $email_campaign_chunk_size > 0 && $email_success_count >= $email_campaign_chunk_size )
@@ -994,7 +1139,8 @@ class EmailCampaign extends DataObject
 			}
 
 			// Send email to user:
-			$result = $this->send_email( $user_ID );
+			$result = $this->send_email( $user_ID, '', '', ( $update_sent_ts == 'welcome' ? $update_sent_ts : false ) );
+			$return = $return || $result;
 
 			if( $result )
 			{	// Email newsletter was sent for user successfully:
@@ -1067,7 +1213,7 @@ class EmailCampaign extends DataObject
 			}
 		}
 
-		if( $update_sent_ts == 'auto' )
+		if( $update_sent_ts == 'auto' || $update_sent_ts == 'welcome' )
 		{	// Update auto date of sending:
 			$this->set( 'auto_sent_ts', date( 'Y-m-d H:i:s', $localtimenow ) );
 			$this->dbupdate();
@@ -1108,6 +1254,8 @@ class EmailCampaign extends DataObject
 				$Messages->display();
 			}
 		}
+
+		return $return;
 	}
 
 
@@ -1456,6 +1604,42 @@ class EmailCampaign extends DataObject
 		$EmailCampaignCache->add( $this );
 
 		return true;
+	}
+
+
+	/**
+	 * Add user to automation if it is defined in this email campaign for requested click type
+	 *
+	 * @param string Click type: 'cta1', 'cta2', 'cta3', 'like', 'dislike', 'activate'
+	 * @param integer User ID
+	 * @return boolean|integer FALSE on fail, Number of added users on success
+	 */
+	function add_user_to_automation( $click_type, $user_ID )
+	{
+		$autm_ID = $this->get( $click_type.'_autm_ID' );
+
+		if( empty( $autm_ID ) )
+		{	// Automation is not defined for this email campaign:
+			return false;
+		}
+
+		$AutomationCache = & get_AutomationCache();
+		if( ! $click_Automation = & $AutomationCache->get_by_ID( $autm_ID, false, false ) )
+		{	// Wrong automation:
+			return false;
+		}
+
+		// Add user to automation:
+		$added_users_num = $click_Automation->add_users( $user_ID, array(
+				'users_no_subs' => 'add', // Add anyway users who are not subscribed to Newsletter of the Automation
+			) );
+
+		if( $added_users_num && $this->get( $click_type.'_autm_execute' ) )
+		{	// Execute first step(s) immediately:
+			$click_Automation->execute_first_step( $user_ID );
+		}
+
+		return empty( $added_users_num ) ? false : $added_users_num;
 	}
 }
 

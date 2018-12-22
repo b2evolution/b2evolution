@@ -1338,20 +1338,18 @@ class _core_Module extends Module
 						)
 					);
 			}
-
-			// ---- "Post"/"Edit" MENU ----
-			if( ! empty( $default_new_ItemType ) )
-			{	// If it is allowed to create here (may be depended on default Item Type of the current category):
-				$entries['post'] = array(
-						'text' => get_icon( 'new' ).' '.$default_new_ItemType->get_item_denomination( 'evobar_new', /* TRANS: noun */ T_('Post') ),
-						//'text' => get_icon( 'new' ).' './* TRANS: noun */ T_('Post'),
-						'title' => T_('No blog is currently selected'),
-						'disabled' => true,
-						'entry_class' => 'rwdhide evobar-entry-new-post',
-					);
-			}
 		}
 
+		if( ! empty( $default_new_ItemType ) )
+		{	// ---- "+ Post" MENU ----
+			$default_item_denomination = /* TRANS: noun */ T_('Post');
+			$entries['post'] = array(
+					'text' => get_icon( 'new' ).' '.$default_new_ItemType->get_item_denomination( 'evobar_new', /* TRANS: noun */ T_('Post') ),
+					//'title' => T_('No blog is currently selected'),
+					'disabled' => true,
+					'entry_class' => 'rwdhide evobar-entry-new-post',
+				);
+		}
 
 		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) )
 		{ // A collection is currently selected AND we can activate toolbar items for selected collection:
@@ -2309,6 +2307,12 @@ class _core_Module extends Module
 				'name'   => T_('Process the return path inbox'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_decode_returned_emails.job.php',
+				'params' => NULL,
+			),
+			'manage-email-statuses' => array(
+				'name'   => T_('Manage email address statuses'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_manage_email_statuses.job.php',
 				'params' => NULL,
 			),
 			'send-non-activated-account-reminders' => array(

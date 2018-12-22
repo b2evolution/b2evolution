@@ -1070,7 +1070,7 @@ function stats_goal_hit_extra_params( $ghit_params )
  */
 function display_hits_summary_panel( $diagram_columns = array() )
 {
-	global $ReqURL, $current_User, $tab3;
+	global $ReqURL, $current_User;
 
 	$hits_summary_mode = get_hits_summary_mode();
 
@@ -1094,78 +1094,7 @@ function display_hits_summary_panel( $diagram_columns = array() )
 
 	if( $hits_summary_mode == 'aggregate' || ! empty( $diagram_columns ) )
 	{
-		global $UserSettings;
-
-		echo '<div class="evo_filter_diagram_hits">';
-		$Form = new Form();
-		$Form->hidden_ctrl();
-		$Form->hidden( 'tab', get_param( 'tab' ) );
-		$Form->hidden( 'tab3', get_param( 'tab3' ) );
-		$Form->hidden( 'blog', get_param( 'blog' ) );
-		$Form->hidden( 'action', 'filter_hits_diagram' );
-		$Form->add_crumb( 'filterhitsdiagram' );
-
-		$Form->switch_layout( 'none' );
-
-		$Form->begin_form();
-
-		if( $hits_summary_mode == 'aggregate' )
-		{	// Filter the aggregated data by date period:
-			$Form->select_input_array( 'agg_period', $UserSettings->get( 'agg_period' ), array(
-					'last_30_days'   => sprintf( T_('Last %d days'), 30 ),
-					'last_60_days'   => sprintf( T_('Last %d days'), 60 ),
-					'current_month'  => T_( 'Current Month to date' ),
-					'specific_month' => T_( 'Specific Month:' ),
-				), T_('Show') );
-
-			$months_years_params = array( 'force_keys_as_values' => true );
-			if( $UserSettings->get( 'agg_period' ) != 'specific_month' )
-			{
-				$months_years_params['style'] = 'display:none';
-			}
-			$months = array();
-			for( $m = 1; $m <= 12; $m++ )
-			{
-				$months[ $m ] = T_( date( 'F', mktime( 0, 0, 0, $m ) ) );
-			}
-			$agg_month = $UserSettings->get( 'agg_month' );
-			$Form->select_input_array( 'agg_month', ( empty( $agg_month ) ? date( 'n' ) : $agg_month ), $months, '', NULL, $months_years_params );
-
-			$years = array();
-			for( $y = date( 'Y' ) - 20; $y <= date( 'Y' ); $y++ )
-			{
-				$years[ $y ] = $y;
-			}
-			$agg_year = $UserSettings->get( 'agg_year' );
-			$Form->select_input_array( 'agg_year', ( empty( $agg_year ) ? date( 'Y' ) : $agg_year ), $years, '', NULL, $months_years_params );
-
-			echo '<script type="text/javascript">
-				jQuery( "#agg_period" ).change( function()
-				{
-					if( jQuery( this ).val() == "specific_month" )
-					{
-						jQuery( "#agg_month, #agg_year" ).show();
-					}
-					else
-					{
-						jQuery( "#agg_month, #agg_year" ).hide();
-					}
-				} );
-				</script>';
-		}
-
-		$filter_hits_diagram_cols = $UserSettings->get( 'filter_hits_diagram_cols' );
-		foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
-		{	// Filter hits by type:
-			$Form->checkbox_basic_input( 'filter_types[]',
-				( ! isset( $filter_hits_diagram_cols[ $tab3 ] ) || empty( $filter_hits_diagram_cols[ $tab3 ] ) || in_array( $diagram_column_key, $filter_hits_diagram_cols[ $tab3 ] ) ), // Is checked?
-				'<span style="color:#'.$diagram_column_data['color'].'">'.$diagram_column_data['title'].'</span>', // Colored title
-				array( 'value' => $diagram_column_key ) ); // Value
-		}
-
-		$Form->end_form( array( array( 'submit', 'submit', T_('Filter'), 'btn-info' ) ) );
-
-		echo '</div>';
+		display_hits_filter_form( 'filter', $diagram_columns, $hits_summary_mode == 'aggregate' );
 	}
 
 	if( $current_User->check_perm( 'stats', 'edit' ) )
@@ -1180,50 +1109,194 @@ function display_hits_summary_panel( $diagram_columns = array() )
 }
 
 
-/**
- * Get dates for filter the aggregated hits
- *
- * @return array Array with two items: 0 - start date, 1 - end date
- */
-function get_filter_aggregated_hits_dates()
+function display_hits_filter_form( $mode, $diagram_columns, $display_filter_period = true )
 {
-	global $DB, $UserSettings;
+	global $UserSettings, $tab3;
 
-	switch( $UserSettings->get( 'agg_period' ) )
+	switch( $mode )
 	{
-		case 'last_60_days':
-			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 59 ) ); // Date of 60 days ago
-			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1 ) ); // Yesterday
+		case 'filter':
+			$period_selector_title = T_('Show');
+			$submit_button_text = T_('Filter');
+			$prefix = 'agg_';
+			$action = 'filter_hits_diagram';
+			$display_filter_diagram_cols = true;
+			$block_style = '';
+			$period_options = array(
+				'last_30_days'   => sprintf( T_('Last %d days'), 30 ),
+				'last_60_days'   => sprintf( T_('Last %d days'), 60 ),
+				'current_month'  => T_( 'Current Month to date' ),
+				'specific_month' => T_( 'Specific Month:' ),
+			);
+			$years_length = 20;
 			break;
 
-		case 'current_month':
-			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), 1 ) ); // First day of current month
-			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1 ) ); // Yesterday
-			break;
-
-		case 'specific_month':
-			$agg_month = $UserSettings->get( 'agg_month' );
-			$agg_year = $UserSettings->get( 'agg_year' );
-			if( empty( $agg_month ) )
-			{
-				$agg_month = date( 'm' );
-			}
-			if( empty( $agg_year ) )
-			{
-				$agg_year = date( 'Y' );
-			}
-			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, $agg_month, 1, $agg_year ) ); // First day of the selected month
-			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, $agg_month + 1, 0, $agg_year ) ); // Last day of the selected month
-			break;
-
-		case 'last_30_days':
-		default:
-			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 29 ) ); // Date of 30 days ago
-			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1 ) ); // Yesterday
+		case 'compare':
+			$period_selector_title = T_('Compare to');
+			$submit_button_text = T_('Compare');
+			$prefix = 'aggcmp_';
+			$action = 'compare_hits_diagram';
+			$display_filter_diagram_cols = false;
+			$block_style = ' style="padding-left:0"';
+			$period_options = array(
+				'prev_30_days'   => sprintf( T_('Previous %d days'), 30 ),
+				'prev_60_days'   => sprintf( T_('Previous %d days'), 60 ),
+				'prev_month'  => T_( 'Previous Month' ),
+				'specific_month' => T_( 'Specific Month:' ),
+			);
+			$years_length = 21;
 			break;
 	}
 
-	return array( $start_date, $end_date );
+	echo '<div class="evo_filter_diagram_hits"'.$block_style.'>';
+	$Form = new Form();
+	$Form->hidden_ctrl();
+	$Form->hidden( 'tab', get_param( 'tab' ) );
+	$Form->hidden( 'tab3', get_param( 'tab3' ) );
+	$Form->hidden( 'blog', get_param( 'blog' ) );
+	$Form->hidden( 'action', $action );
+	$Form->add_crumb( 'filterhitsdiagram' );
+
+	$Form->switch_layout( 'none' );
+
+	$Form->begin_form();
+
+	if( $display_filter_period )
+	{	// Filter the aggregated data by date period:
+		$Form->select_input_array( $prefix.'period', $UserSettings->get( $prefix.'period' ), $period_options, $period_selector_title );
+
+		$months_years_params = array( 'force_keys_as_values' => true );
+		if( $UserSettings->get( $prefix.'period' ) != 'specific_month' )
+		{
+			$months_years_params['style'] = 'display:none';
+		}
+		$months = array();
+		for( $m = 1; $m <= 12; $m++ )
+		{
+			$months[ $m ] = T_( date( 'F', mktime( 0, 0, 0, $m ) ) );
+		}
+		$month = $UserSettings->get( $prefix.'month' );
+		$Form->select_input_array( $prefix.'month', ( empty( $month ) ? date( 'n' ) : $month ), $months, '', NULL, $months_years_params );
+
+		$years = array();
+		for( $y = date( 'Y' ) - $years_length; $y <= date( 'Y' ); $y++ )
+		{
+			$years[ $y ] = $y;
+		}
+		$year = $UserSettings->get( $prefix.'year' );
+		$Form->select_input_array( $prefix.'year', ( empty( $year ) ? date( 'Y' ) : $year ), $years, '', NULL, $months_years_params );
+
+		echo '<script type="text/javascript">
+			jQuery( "#'.$prefix.'period" ).change( function()
+			{
+				if( jQuery( this ).val() == "specific_month" )
+				{
+					jQuery( "#'.$prefix.'month, #'.$prefix.'year" ).show();
+				}
+				else
+				{
+					jQuery( "#'.$prefix.'month, #'.$prefix.'year" ).hide();
+				}
+			} );
+			</script>';
+	}
+
+	if( $display_filter_diagram_cols )
+	{
+		$filter_hits_diagram_cols = $UserSettings->get( 'filter_hits_diagram_cols' );
+		foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
+		{	// Filter hits by type:
+			$Form->checkbox_basic_input( 'filter_types[]',
+				( ! isset( $filter_hits_diagram_cols[ $tab3 ] ) || empty( $filter_hits_diagram_cols[ $tab3 ] ) || in_array( $diagram_column_key, $filter_hits_diagram_cols[ $tab3 ] ) ), // Is checked?
+				'<span style="color:#'.$diagram_column_data['color'].'">'.$diagram_column_data['title'].'</span>', // Colored title
+				array( 'value' => $diagram_column_key ) ); // Value
+		}
+	}
+
+	$Form->end_form( array( array( 'submit', 'submit', $submit_button_text, 'btn-info' ) ) );
+
+	echo '</div>';
+
+	if( $mode == 'compare' )
+	{
+		echo '<div class="clear"></div>';
+	}
+}
+
+
+/**
+ * Get dates for filter the aggregated hits
+ *
+ * @param string Data mode: 'aggregate', 'compare'
+ * @return array Array with two items: 0 - start date, 1 - end date
+ */
+function get_filter_aggregated_hits_dates( $mode = 'aggregate' )
+{
+	global $DB, $UserSettings;
+
+	if( $mode == 'compare' )
+	{	// Use a filter for comparing data:
+		$period = $UserSettings->get( 'aggcmp_period' );
+	}
+	else
+	{	// Use a filter for aggregate data:
+		$period = $UserSettings->get( 'agg_period' );
+	}
+
+	$start_date = $end_date = array(
+		'm' => date( 'm' ),
+		'd' => date( 'd' ),
+		'Y' => date( 'Y' ),
+	);
+
+	switch( $period )
+	{
+		case 'prev_60_days':
+			$start_date['d'] -= 60; // Date of 120 days ago
+			$end_date['d'] -= 59; // Date of 61 days ago
+		case 'last_60_days':
+			$start_date['d'] -= 59; // Date of 60 days ago
+			$end_date['d'] -= 1; // Yesterday
+			break;
+
+		case 'prev_month':
+			$start_date['m'] -= 1; // First day of previous month
+			$end_date['d'] = 1; // Last day of previous month
+		case 'current_month':
+			$start_date['d'] = 1; // First day of current month
+			$end_date['d'] -= 1; // Yesterday
+			break;
+
+		case 'specific_month':
+			$agg_month = ( $mode == 'compare' ? $UserSettings->get( 'aggcmp_month' ) : $UserSettings->get( 'agg_month' ) );
+			$agg_year = ( $mode == 'compare' ? $UserSettings->get( 'aggcmp_year' ) : $UserSettings->get( 'agg_year' ) );
+			if( ! empty( $agg_month ) )
+			{	// Use month from setting:
+				$start_date['m'] = $agg_month;
+				$end_date['m'] = $agg_month + 1;
+			}
+			if( ! empty( $agg_year ) )
+			{	// Use year from setting:
+				$start_date['Y'] = $end_date['Y'] = $agg_year;
+			}
+			$start_date['d'] = 1; // First day of the selected month
+			$end_date['d'] = 0; // Last day of the selected month
+			break;
+
+		case 'prev_30_days':
+			$start_date['d'] -= 30; // Date of 60 days ago
+			$end_date['d'] -= 29; // Date of 31 days ago
+		case 'last_30_days':
+		default:
+			$start_date['d'] -= 29; // Date of 30 days ago
+			$end_date['d'] -= 1; // Yesterday
+			break;
+	}
+
+	return array(
+			date( 'Y-m-d', mktime( 0, 0, 0, $start_date['m'], $start_date['d'], $start_date['Y'] ) ),
+			date( 'Y-m-d', mktime( 0, 0, 0, $end_date['m'], $end_date['d'], $end_date['Y'] ) )
+		);
 }
 
 

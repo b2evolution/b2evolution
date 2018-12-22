@@ -48,7 +48,7 @@ $Form->begin_fieldset( sprintf( T_('Review message for: %s'), $edited_EmailCampa
 echo '<div style="display:table;width:100%;table-layout:fixed;">';
 	echo '<div class="floatleft" style="width:50%">';
 	echo '<p><b>'.T_('HTML message').':</b></p>';
-	$html_mail_template = mail_template( 'newsletter', 'html', array( 'message_html' => $edited_EmailCampaign->get( 'email_html' ), 'include_greeting' => false, 'add_email_tracking' => false ), $current_User );
+	$html_mail_template = mail_template( 'newsletter', 'html', array( 'message_html' => $edited_EmailCampaign->get( 'email_html' ), 'include_greeting' => false, 'add_email_tracking' => false, 'template_mode' => 'preview' ), $current_User );
 	$html_mail_template = str_replace( array( '$email_key$', '$mail_log_ID$', '$email_key_start$', '$email_key_end$' ), array( '***email-key***', '', '', '' ), $html_mail_template );
 	$html_mail_template = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $html_mail_template );
 	// Clear all html tags that may break styles of main html page:

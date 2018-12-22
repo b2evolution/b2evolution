@@ -195,8 +195,14 @@ function init_inskin_editing()
 		$edited_Item->set_creator_location( 'subregion' );
 		$edited_Item->set_creator_location( 'city' );
 
-		// Set object params:
+		// Set prefilled params from _GET request like 'cat', 'item_typ_ID' and etc.:
 		$edited_Item->load_from_Request( /* editing? */ false, /* creating? */ true );
+
+		// Clear all errors which were generated in the Item->load_from_Request() above,
+		// because we should not display them on first opening the item form:
+		global $Messages, $param_input_err_messages;
+		$Messages->clear();
+		$param_input_err_messages = NULL;
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
@@ -264,6 +270,11 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 
 	if( $featured_list_type !== $load_featured )
 	{	// Reset a featured list if previous request was to load another type:
+		$FeaturedList = NULL;
+	}
+
+	if( isset( $FeaturedList ) && ( $FeaturedList->filters['coll_IDs'] !== $coll_IDs ) )
+	{ // Reset a featured list if previous request had a different $coll_IDs:
 		$FeaturedList = NULL;
 	}
 
@@ -2284,17 +2295,18 @@ function echo_status_dropdown_button_js( $type = 'post' )
 			var item = jQuery( this ).parent();
 			var status = item.attr( 'rel' );
 			var btn_group = item.parent().parent();
-			var dropdown_buttons = item.parent().parent().find( 'button' );
+			var btn_wrapper = btn_group.parent().parent();
+			var dropdown_buttons = btn_group.find( 'button' );
 			var first_button = dropdown_buttons.parent().find( 'button:first' );
-			var save_buttons = jQuery( '.edit_actions input[type="submit"]:not(.quick-publish)' ).add( dropdown_buttons );
+			var save_buttons = btn_wrapper.find( 'input[type="submit"]:not(.quick-publish)' ).add( dropdown_buttons );
 
 			if( status == 'published' )
 			{ // Hide button "Publish!" if current status is already the "published":
-				jQuery( '.edit_actions .quick-publish' ).hide();
+				btn_wrapper.find( '.quick-publish' ).hide();
 			}
 			else
 			{ // Show button "Publish!" only when another status is selected:
-				jQuery( '.edit_actions .quick-publish' ).show();
+				btn_wrapper.find( '.quick-publish' ).show();
 			}
 
 			save_buttons.each( function()
@@ -2303,7 +2315,7 @@ function echo_status_dropdown_button_js( $type = 'post' )
 			} );
 			first_button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
 			jQuery( 'input[type=hidden][name=<?php echo $type; ?>_status]' ).val( status ); // update hidden field to new status value
-			item.parent().parent().removeClass( 'open' ); // hide dropdown menu
+			btn_group.removeClass( 'open' ); // hide dropdown menu
 
 			if( first_button.attr( 'type' ) == 'submit' )
 			{ // Submit form if current dropdown button is used to submit form
@@ -5612,10 +5624,10 @@ function item_row_order( $Item )
 {
 	global $current_User, $ItemList;
 
-	if( isset( $ItemList, $ItemList->filters['cat_array'] ) &&
-	    count ( $ItemList->filters['cat_array'] ) == 1 )
+	if( isset( $ItemList, $ItemList->filters['cat_single'] ) &&
+	    ! empty( $ItemList->filters['cat_single'] ) )
 	{	// Use order of single filtered category:
-		$order_cat_ID = $ItemList->filters['cat_array'][0];
+		$order_cat_ID = $ItemList->filters['cat_single'];
 		$order_cat_attr = ' data-cat-id="'.$order_cat_ID.'"';
 	}
 	else

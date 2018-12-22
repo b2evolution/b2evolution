@@ -50,6 +50,7 @@ switch ( $action )
 					$User = $current_User;
 				}
 				$Settings->set( 'welcomepm_enabled', param( 'welcomepm_enabled', 'integer', 0 ) );
+				$Settings->set( 'welcomepm_notag', param( 'welcomepm_notag', 'integer', 0 ) );
 				$Settings->set( 'welcomepm_from', $User->login );
 				$Settings->set( 'welcomepm_title', param( 'welcomepm_title', 'string', true ) );
 				$Settings->set( 'welcomepm_message', param( 'welcomepm_message', 'text', true ) );

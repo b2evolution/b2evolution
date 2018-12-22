@@ -141,6 +141,7 @@ switch( $action )
 				$source = param( 'source', 'string', true );
 				$registration_require_firstname = ( param( 'ask_firstname', 'string', true ) == 'required' );
 				$registration_require_lastname = ( param( 'ask_lastname', 'string', true ) == 'required' );
+				$registration_require_country = ( param( 'ask_country', 'string', true ) == 'required' );
 				$user_tags = param( 'usertags', 'string', NULL );
 				$auto_subscribe_posts = param( 'subscribe_post', 'integer', true );
 				$auto_subscribe_comments = param( 'subscribe_comment', 'integer', true );
@@ -157,7 +158,6 @@ switch( $action )
 			}
 
 			// Check what fields should be required by current widget:
-			$registration_require_country = false;
 			$registration_require_gender = false;
 		}
 
@@ -180,6 +180,7 @@ switch( $action )
 			$source = $user_register_quick_Widget->disp_params['source'];
 			$registration_require_firstname = ( $user_register_quick_Widget->disp_params['ask_firstname'] == 'required' );
 			$registration_require_lastname = ( $user_register_quick_Widget->disp_params['ask_lastname'] == 'required' );
+			$registration_require_country = ( $user_register_quick_Widget->disp_params['ask_country'] == 'required' );
 			$auto_subscribe_posts = $user_register_quick_Widget->disp_params['subscribe_post'];
 			$auto_subscribe_comments = $user_register_quick_Widget->disp_params['subscribe_comment'];
 			$widget_newsletters = $user_register_quick_Widget->disp_params['newsletters'];
@@ -382,7 +383,12 @@ switch( $action )
 			}
 			if( count( $widget_newsletters ) )
 			{	// If at least one newsletter is selected in widget params:
-				$new_User->set_newsletter_subscriptions( array_keys( $widget_newsletters ) );
+				$newsletter_subscription_params = array();
+				if( ! empty( $user_tags ) )
+				{
+					$newsletter_subscription_params['usertags'] = $user_tags;
+				}
+				$new_User->set_newsletter_subscriptions( array_keys( $widget_newsletters ), $newsletter_subscription_params );
 			}
 		}
 
@@ -519,6 +525,9 @@ switch( $action )
 				'new_user_ID' => $new_User->ID,
 			);
 		send_admin_notification( NT_('New user registration'), 'account_new', $email_template_params );
+
+		// Send notification to owners of lists where new user is automatically subscribed:
+		$new_User->send_list_owner_notifications( 'subscribe' );
 
 		$Plugins->trigger_event( 'AfterUserRegistration', array( 'User' => & $new_User ) );
 		// Move user to suspect group by IP address and reverse DNS domain and email address domain:

@@ -39,152 +39,23 @@ display_hits_summary_panel( $diagram_columns );
 $diagram_columns = get_filtered_hits_diagram_columns( 'api', $diagram_columns );
 
 // Check if it is a mode to display a live data:
-$is_live_mode = ( get_hits_summary_mode() == 'live' );
+$hits_summary_mode = get_hits_summary_mode();
+$is_live_mode = ( $hits_summary_mode == 'live' );
 
-$SQL = new SQL( 'Get API hits summary ('.( $is_live_mode ? 'Live data' : 'Aggregate data' ).')' );
-$sessions_SQL = new SQL( 'Get API sessions summary ('.( $is_live_mode ? 'Live data' : 'Aggregate data' ).')' );
-if( $is_live_mode )
-{	// Get the live data:
-	$SQL->SELECT( 'SQL_NO_CACHE COUNT( * ) AS hits, hit_referer_type AS referer_type,
-		GROUP_CONCAT( DISTINCT hit_sess_ID SEPARATOR "," ) AS sessions,
-		EXTRACT( YEAR FROM hit_datetime ) AS year,
-		EXTRACT( MONTH FROM hit_datetime ) AS month,
-		EXTRACT( DAY FROM hit_datetime ) AS day' );
-	$SQL->FROM( 'T_hitlog' );
-	$SQL->WHERE( 'hit_type = "api"' );
+// Get hits and session data for chart and table:
+list( $res_hits, $sessions ) = get_hits_results_api( $hits_summary_mode );
 
-	$sessions_SQL->SELECT( 'SQL_NO_CACHE DATE( hit_datetime ) AS hit_date, COUNT( DISTINCT hit_sess_ID )' );
-	$sessions_SQL->FROM( 'T_hitlog' );
-	$sessions_SQL->WHERE( 'hit_type = "api"' );
-
-	if( $blog > 0 )
-	{	// Filter by collection:
-		$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
-		$sessions_SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
-	}
-
-	$hits_start_date = NULL;
-	$hits_end_date = date( 'Y-m-d' );
-}
-else
-{	// Get the aggregated data:
-	$SQL->SELECT( 'SUM( hagg_count ) AS hits, hagg_referer_type AS referer_type,
-		"" AS sessions,
-		EXTRACT( YEAR FROM hagg_date ) AS year,
-		EXTRACT( MONTH FROM hagg_date ) AS month,
-		EXTRACT( DAY FROM hagg_date ) AS day' );
-	$SQL->FROM( 'T_hits__aggregate' );
-	$SQL->WHERE( 'hagg_type = "api"' );
-	// Filter by date:
-	list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates();
-	$SQL->WHERE_and( 'hagg_date >= '.$DB->quote( $hits_start_date ) );
-	$SQL->WHERE_and( 'hagg_date <= '.$DB->quote( $hits_end_date ) );
-
-	$sessions_SQL->SELECT( 'hags_date AS hit_date, hags_count_api' );
-	$sessions_SQL->FROM( 'T_hits__aggregate_sessions' );
-
-	if( $blog > 0 )
-	{	// Filter by collection:
-		$SQL->WHERE_and( 'hagg_coll_ID = '.$DB->quote( $blog ) );
-		$sessions_SQL->WHERE( 'hags_coll_ID = '.$DB->quote( $blog ) );
-	}
-	else
-	{	// Get ALL aggregated sessions:
-		$sessions_SQL->WHERE( 'hags_coll_ID = 0' );
-	}
-	// Filter by date:
-	$sessions_SQL->WHERE_and( 'hags_date >= '.$DB->quote( $hits_start_date ) );
-	$sessions_SQL->WHERE_and( 'hags_date <= '.$DB->quote( $hits_end_date ) );
-}
-$SQL->GROUP_BY( 'year, month, day, referer_type' );
-$SQL->ORDER_BY( 'year DESC, month DESC, day DESC, referer_type' );
-$sessions_SQL->GROUP_BY( 'hit_date' );
-$sessions_SQL->ORDER_BY( 'hit_date DESC' );
-
-$res_hits = $DB->get_results( $SQL, ARRAY_A );
-$sessions = $DB->get_assoc( $sessions_SQL );
-
-/*
- * Chart
- */
 if( count( $res_hits ) )
 {
-	// Find the dates without hits and fill them with 0 to display on graph and table:
-	$res_hits = fill_empty_hit_days( $res_hits, $hits_start_date, $hits_end_date );
+	// Display diagram for live or aggregated data:
+	display_hits_diagram( 'api', $diagram_columns, array( $res_hits, $sessions ) );
 
-	$last_date = 0;
-
-	// Initialize the data to open an url by click on bar item:
-	$chart['link_data'] = array();
-	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&referer_type=$param1$&hit_type=api';
-	$chart['link_data']['params'] = array();
-
-	$col_mapping = array();
-	$col_num = 1;
-	$chart[ 'chart_data' ][ 0 ] = array();
-	foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
-	{
-		$chart[ 'chart_data' ][ $col_num ] = array();
-		if( $diagram_column_data['link_data'] !== false )
-		{
-			$chart['link_data']['params'][] = $diagram_column_data['link_data'];
-		}
-		$col_mapping[ $diagram_column_key ] = $col_num++;
+	if( ! $is_live_mode )
+	{	// Display diagram to compare hits:
+		display_hits_filter_form( 'compare', $diagram_columns );
+		list( $prev_res_hits, $prev_sessions ) = get_hits_results_api( 'compare' );
+		display_hits_diagram( 'api', $diagram_columns, array( $prev_res_hits, $prev_sessions ), 'cmpcanvasbarschart' );
 	}
-
-	$chart['dates'] = array();
-
-	if( isset( $diagram_columns['session'] ) )
-	{	// Draw last data as line only for Sessions:
-		$chart['draw_last_line'] = true;
-	}
-
-	$count = 0;
-	foreach( $res_hits as $row_stats )
-	{
-		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
-		if( $last_date != $this_date )
-		{	// We just hit a new day, let's display the previous one:
-			$last_date = $this_date;	// that'll be the next one
-			$count ++;
-			array_unshift( $chart[ 'chart_data' ][ 0 ], date( 'D '.locale_datefmt(), $last_date ) );
-			$col_num = 1;
-			foreach( $diagram_columns as $diagram_column_data )
-			{
-				array_unshift( $chart[ 'chart_data' ][ $col_num++ ], 0 );
-			}
-
-			array_unshift( $chart['dates'], $last_date );
-		}
-
-		if( isset( $col_mapping[ $row_stats['referer_type'] ] ) )
-		{
-			$chart['chart_data'][ $col_mapping[ $row_stats['referer_type'] ] ][0] += $row_stats['hits'];
-		}
-
-		if( isset( $col_mapping['session'] ) )
-		{	// Store a count of sessions:
-			$chart['chart_data'][ $col_mapping['session'] ][0] = ( isset( $sessions[ date( 'Y-m-d', $this_date ) ] ) ? $sessions[ date( 'Y-m-d', $this_date ) ] : 0 );
-		}
-	}
-
-	// Initialize titles and colors for diagram columns:
-	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
-	$col_num = 1;
-	$chart['series_color'] = array();
-	foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
-	{
-		$chart['series_color'][ $col_num ] = $diagram_column_data['color'];
-		array_unshift( $chart[ 'chart_data' ][ $col_num++ ], $diagram_column_data['title'] );
-	}
-
-	$chart[ 'canvas_bg' ] = array( 'width'  => '100%', 'height' => 355 );
-
-	echo '<div class="center">';
-	load_funcs('_ext/_canvascharts.php');
-	CanvasBarsChart( $chart );
-	echo '</div>';
-
 
 	/*
 	 * Table:

@@ -58,12 +58,13 @@ switch( $type )
 								$assigned_user_tag = $edited_EmailCampaign->get( 'user_tag' );
 								if( ! empty( $assigned_user_tag ) )
 								{
-									$email_User->add_usertags( $edited_EmailCampaign->get( 'user_tag' ) );
+									$email_User->add_usertags( $assigned_user_tag );
 									$email_User->dbupdate();
 								}
 								break;
 
 							case 2: // Update clicked_unsubscribe
+							case 9: // Unsubscribe button
 								$result = $DB->query( 'UPDATE T_email__campaign_send
 										SET csnd_clicked_unsubscribe = 1
 										WHERE csnd_camp_ID = '.$DB->quote( $ecmp_ID ).' AND csnd_user_ID = '.$DB->quote( $email_User->ID ) );
@@ -71,6 +72,12 @@ switch( $type )
 								if( $result )
 								{
 									$update_values[] = 'ecmp_unsub_clicks = ecmp_unsub_clicks + 1';
+								}
+
+								// Add campaign ID as param to unsubscribe link:
+								if( $redirect_to && !empty( $email_log['emlog_camp_ID'] ) )
+								{
+									$redirect_to = url_add_param( $redirect_to, array( 'ecmp_ID' => $email_log['emlog_camp_ID'] ), '&' );
 								}
 
 								// Do not track click
@@ -99,6 +106,9 @@ switch( $type )
 									$email_User->dbupdate();
 								}
 
+								// Add user to automation if it is defined in email campaign:
+								$edited_EmailCampaign->add_user_to_automation( 'like', $email_User->ID );
+
 								$Messages->add( T_('Your vote has been recorded, thank you!'), 'success' );
 								break;
 
@@ -126,6 +136,9 @@ switch( $type )
 								// Do not track click
 								$skip_click_tracking = true;
 
+								// Add user to automation if it is defined in email campaign:
+								$edited_EmailCampaign->add_user_to_automation( 'dislike', $email_User->ID );
+
 								$Messages->add( T_('Your vote has been recorded, thank you!'), 'success' );
 								break;
 
@@ -150,6 +163,22 @@ switch( $type )
 									$email_User->add_usertags( $assigned_user_tag );
 									$email_User->dbupdate();
 								}
+
+								// Add user to automation if it is defined in email campaign:
+								$edited_EmailCampaign->add_user_to_automation( 'cta'.$cta_num, $email_User->ID );
+								break;
+
+							case 8: // Activate account button
+								// Add tag for activate only
+								$assigned_user_tag = $edited_EmailCampaign->get( 'user_tag_activate' );
+								if( ! empty( $assigned_user_tag ) )
+								{
+									$email_User->add_usertags( $assigned_user_tag );
+									$email_User->dbupdate();
+								}
+
+								// Add user to automation if it is defined in email campaign:
+								$edited_EmailCampaign->add_user_to_automation( 'activate', $email_User->ID );
 								break;
 						}
 

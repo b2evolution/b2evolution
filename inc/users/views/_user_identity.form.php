@@ -96,7 +96,7 @@ if( $is_admin )
 {
 	if( $new_user_creating )
 	{
-		$form_title = '<span class="nowrap">'.T_('Edit user profile').'</span>';
+		$form_title = '<span class="nowrap">'.T_('New user profile').'</span>';
 	}
 	else
 	{
@@ -133,17 +133,12 @@ else
 
 if( $new_user_creating )
 {
-	$current_User->check_perm( 'users', 'edit', true );
-	$edited_User->get_Group();
-
 	$Form->begin_fieldset( T_( 'New user' ).get_manual_link( 'user-edit' ), array( 'class' => 'fieldset clear' ) );
 
-	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get( 'newusers_grp_ID' ) : $edited_User->grp_ID;
-	$GroupCache = & get_GroupCache();
-	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ) );
+	// Primary and secondary groups:
+	display_user_groups_selectors( $edited_User, $Form );
 
-	$field_note = '[0 - 10]';
-	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), $field_note, array( 'required' => true ) );
+	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), '[0 - 10]', array( 'required' => true ) );
 
 	$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
 	$Form->email_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), array( 'maxlength' => 255, 'required' => true, 'note' => $email_fieldnote ) );
@@ -552,11 +547,10 @@ $Form->end_fieldset();
 	/***************  Password  **************/
 
 if( empty( $edited_User->ID ) && $action != 'view' )
-{ // We can edit the values:
-
+{	// Display password fields for new creating user:
 	$Form->begin_fieldset( T_('Password') );
-		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'maxlength' => 50, 'required' => true, 'autocomplete'=>'off' ) );
-		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'note'=>sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => true, 'autocomplete'=>'off' ) );
+		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'maxlength' => 50, 'autocomplete'=>'off' ) );
+		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'note'=>sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'autocomplete'=>'off' ) );
 	$Form->end_fieldset();
 }
 

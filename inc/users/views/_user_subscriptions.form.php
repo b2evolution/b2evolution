@@ -200,17 +200,21 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('List subscriptions').( is_admin_page() ? get_manual_link( 'user-lists-panel' ) : '' ) );
 
+	$allowed_newsletters = $edited_User->get_allowed_newsletters();
+	$user_newsletter_subscriptions = $edited_User->get_newsletter_subscriptions();
 	$NewsletterCache = & get_NewsletterCache();
-	$NewsletterCache->load_where( 'enlt_active = 1' );
-
-	if( count( $NewsletterCache->cache ) )
-	{	// If at least one newsletter is active:
-		$user_newsletter_subscriptions = $edited_User->get_newsletter_subscriptions();
-		$newsletter_options = array();
-		foreach( $NewsletterCache->cache as $Newsletter )
-		{
-			$newsletter_options[] = array( 'edited_user_newsletters[]', $Newsletter->ID, $Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ), in_array( $Newsletter->ID, $user_newsletter_subscriptions ), $disabled );
+	$NewsletterCache->load_all();
+	$newsletter_options = array();
+	foreach( $NewsletterCache->cache as $Newsletter )
+	{
+		if( isset( $allowed_newsletters[ $Newsletter->ID ] ) ||
+		    in_array( $Newsletter->ID, $user_newsletter_subscriptions ) )
+		{	// Display only allowed newsletter and what user is subscribed to:
+			$newsletter_options[] = array( 'edited_user_newsletters[]', $Newsletter->ID, '<b>'.$Newsletter->get( 'name' ).':</b> '.$Newsletter->get( 'label' ), in_array( $Newsletter->ID, $user_newsletter_subscriptions ), $disabled );
 		}
+	}
+	if( count( $newsletter_options ) )
+	{
 		$Form->checklist( $newsletter_options, 'edited_user_newsletter', T_( 'Lists' ), false, false, $checklist_params );
 	}
 
@@ -480,6 +484,9 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 	{ // edited user has permission to edit options, save notification preferences
 		$notify_options[ T_('System maintenance') ][] = array( 'edited_user_notify_cronjob_error', 1, T_( 'a scheduled task ends with an error or timeout.' ), $UserSettings->get( 'notify_cronjob_error',  $edited_User->ID ), $disabled );
 	}
+
+	$notify_options[ T_('System maintenance') ][] = array( 'edited_user_notify_list_new_subscriber', 1, T_('one of my Lists gets a new subscriber.'), $UserSettings->get( 'notify_list_new_subscriber', $edited_User->ID ), $disabled );
+	$notify_options[ T_('System maintenance') ][] = array( 'edited_user_notify_list_lost_subscriber', 1, T_('one of my Lists loses a subscriber.'), $UserSettings->get( 'notify_list_lost_subscriber', $edited_User->ID ), $disabled );
 	if( $current_User->check_perm( 'users', 'edit' ) && $edited_User->check_perm( 'options', 'view' ) )
 	{	// current User is an administrator and the edited user has a permission to automations:
 		$notify_options[ T_('System maintenance') ][] = array( 'edited_user_notify_automation_owner', 1, T_('one of my automations wants to notify me.'), $UserSettings->get( 'notify_automation_owner', $edited_User->ID ), $disabled );

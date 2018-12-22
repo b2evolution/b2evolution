@@ -985,6 +985,7 @@ class Blog extends DataObject
 
 			$this->set_setting( 'comments_detect_email', param( 'comments_detect_email', 'integer', 0 ) );
 			$this->set_setting( 'comments_register', param( 'comments_register', 'integer', 0 ) );
+			$this->set_setting( 'meta_comments_frontoffice', param( 'meta_comments_frontoffice', 'integer', 0 ) );
 		}
 
 		if( in_array( 'contact', $groups ) )
@@ -5745,7 +5746,7 @@ class Blog extends DataObject
 		$working_cat = $cat;
 		if( empty( $cat ) )
 		{	// Use default collection category when global category is not defined:
-			$working_cat = $this->get_setting( 'default_cat_ID' );
+			$working_cat = $this->get_default_cat_ID();
 		}
 
 		$ChapterCache = & get_ChapterCache();

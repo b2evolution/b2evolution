@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '6.10.4';
+	var $version = '6.10.5';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -469,7 +469,7 @@ class tinymce_plugin extends Plugin
 
 				$edited_Message = & $params['target_object'];
 				$this->target_type = 'Message';
-				$this->target_ID = $edited_Message->ID;
+				$this->target_ID = empty( $edited_Message ) ? NULL : $edited_Message->ID;
 				$this->temp_ID = $params['temp_ID'];
 
 				if( ! $Settings->get( 'allow_html_message' ) )
@@ -482,7 +482,7 @@ class tinymce_plugin extends Plugin
 
 				$state_params = array(
 						'type'    => $params['target_type'],
-						'message' => $edited_Message->ID,
+						'message' => empty( $edited_Message ) ? NULL : $edited_Message->ID,
 					);
 				break;
 
@@ -497,7 +497,6 @@ class tinymce_plugin extends Plugin
 			<script type="text/javascript">
 			function toggle_switch_warning( state )
 			{
-				var params = <?php echo json_encode( $state_params );?>;
 				var activate_link = '<?php echo $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' );?>';
 				var deactivate_link = '<?php echo $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 0 ) ), '&' );?>';
 				jQuery.get( ( state ? activate_link : deactivate_link ),
@@ -505,6 +504,7 @@ class tinymce_plugin extends Plugin
 						{	// Fire wysiwyg warning state change event
 							jQuery( document ).trigger( 'wysiwyg_warning_changed', [ state ] );
 						} );
+				return false;
 			}
 			</script>
 		<?php
@@ -522,17 +522,17 @@ class tinymce_plugin extends Plugin
 
 				$params['quicksetting_item_start'] = str_replace( '%quicksetting_id%', $params['quicksetting_item_id'], $params['quicksetting_item_start'] );
 
-				$activate_warning_link = action_icon( '', 'activate', '', T_('Show an alert when switching from markup to WYSIWYG'), 3, 4, array( 'onclick' => 'toggle_switch_warning( false ); return false;' ) );
-				$deactivate_warning_link = action_icon( '', 'deactivate', '', T_('Never show alert when switching from markup to WYSIWYG'), 3, 4, array( 'onclick' => 'toggle_switch_warning( true ); return false;' ) );
+				$deactivate_warning_link = action_icon( '', 'deactivate', '', T_('Show an alert when switching from markup to WYSIWYG'), 3, 4, array( 'onclick' => 'return toggle_switch_warning( false )' ) );
+				$activate_warning_link = action_icon( '', 'activate', '', T_('Never show alert when switching from markup to WYSIWYG'), 3, 4, array( 'onclick' => 'return toggle_switch_warning( true )' ) );
 
 				echo $params['quicksetting_item_start'];
-				echo ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ) ? $activate_warning_link : $deactivate_warning_link;
+				echo ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ) ? $deactivate_warning_link : $activate_warning_link;
 				echo $params['quicksetting_item_end'];
 				?>
 				<script type="text/javascript">
 					var quicksetting_switch = jQuery( '#<?php echo $params['quicksetting_item_id'];?>' );
 					jQuery( document ).on( 'wysiwyg_warning_changed', function( event, state ) {
-							quicksetting_switch.html( state ? '<?php echo format_to_js( $activate_warning_link );?>' : '<?php echo format_to_js( $deactivate_warning_link ); ?>' );
+							quicksetting_switch.html( state ? '<?php echo format_to_js( $deactivate_warning_link );?>' : '<?php echo format_to_js( $activate_warning_link ); ?>' );
 						} );
 				</script>
 				<?php

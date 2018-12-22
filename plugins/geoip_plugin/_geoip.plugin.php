@@ -34,7 +34,7 @@ class geoip_plugin extends Plugin
 	var $name = 'GeoIP';
 	var $code = 'evo_GeoIP';
 	var $priority = 45;
-	var $version = '6.10.4';
+	var $version = '6.10.5';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 	var $plugin_actions = array( 'geoip_download', 'geoip_find_country', 'geoip_fix_country' );
@@ -441,7 +441,14 @@ jQuery( document ).ready( function()
 	{
 		global $Settings;
 
-		$registration_require_country = (bool)$Settings->get('registration_require_country');
+		if( isset( $params['Widget'] ) )
+		{	// Get a setting for quick registration widget:
+			$registration_require_country = ( $params['Widget']->disp_params['ask_country'] != 'no' );
+		}
+		else
+		{	// Get a setting for normal registration form:
+			$registration_require_country = (bool)$Settings->get('registration_require_country');
+		}
 		if( !$registration_require_country )
 		{	// Country is not required on registration form. Exit here.
 			return;
@@ -485,6 +492,11 @@ jQuery( document ).ready( function()
 
 				// Disable this setting temporary to hide a select list with countries
 				$Settings->set( 'registration_require_country', 0 );
+
+				if( isset( $params['Widget'] ) )
+				{	// Hide country selector on widget:
+					$params['Widget']->disp_params['hide_country_by_plugin'] = true;
+				}
 
 				// Append a hidden input element with autodetected country ID
 				$Form->hidden( 'country', $Country->ID );

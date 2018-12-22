@@ -21,7 +21,7 @@ class bootstrap_manual_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.10.4';
+	var $version = '6.10.5';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -373,8 +373,10 @@ class bootstrap_manual_Skin extends Skin
 					'search_cell_author_end'   => '</p>',
 					'search_date_format'       => 'F jS, Y',
 					// Front page
-					'featured_intro_before' => '<div class="jumbotron">',
-					'featured_intro_after'  => '</div>',
+					'featured_intro_before' => '',
+					'featured_intro_after'  => '',
+					'intro_class'           => 'jumbotron',
+					'featured_class'        => 'featurepost',
 					// Form "Sending a message"
 					'msgform_form_title' => T_('Contact'),
 				);
