@@ -1408,8 +1408,6 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	$ChapterCache = & get_ChapterCache();
 	$thisChapter = $ChapterCache->get_by_ID($cat_ID);
 
-	$Blog = $thisChapter->get_blog();
-
 	if( $thisChapter->lock && !$current_User->check_perm( 'blog_cats', '', false, $current_blog_ID ) )
 	{	// This chapter is locked and current user has no permission to edit the categories of this blog
 		return;
