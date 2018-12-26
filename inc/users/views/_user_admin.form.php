@@ -173,7 +173,7 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 		// Separator between the last notification email timestamp and counter
 		$counter_separator = strpos( $last_notification_email, '_' );
 		$last_notificaiton_timestamp = substr( $last_notification_email, 0, $counter_separator );
-		$last_notificaiton_date = format_to_output( date2mysql( $last_notificaiton_timestamp ) );
+		$last_notificaiton_date = mysql2localedatetime( date2mysql( $last_notificaiton_timestamp ) );
 		$Form->info_field( T_('Latest notification email'), $last_notificaiton_date, array( 'note' => T_('The latest between all kind of notification emails.') ) );
 		$notification_counter = ( date( 'Ymd', $servertimenow ) == date( 'Ymd', $last_notificaiton_timestamp ) ) ? substr( $last_notification_email, $counter_separator + 1 ) : 0;
 		$notification_limit = $UserSettings->get( 'notification_email_limit',  $edited_User->ID );
@@ -191,12 +191,16 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 		// Separator between the last newsletter timestamp and counter
 		$counter_separator = strpos( $last_newsletter, '_' );
 		$last_newsletter_timestamp = substr( $last_newsletter, 0, $counter_separator );
-		$last_newsletter_date = format_to_output( date2mysql( $last_newsletter_timestamp ) );
+		$last_newsletter_date = mysql2localedatetime( date2mysql( $last_newsletter_timestamp ) );
 		$Form->info_field( T_('Latest list'), $last_newsletter_date );
 		$newsletter_counter = ( date( 'Ymd', $servertimenow ) == date( 'Ymd', $last_newsletter_timestamp ) ) ? substr( $last_newsletter, $counter_separator + 1 ) : 0;
 		$newsletter_limit = $UserSettings->get( 'newsletter_limit',  $edited_User->ID );
 		$Form->info_field( T_('Lists already sent today'), sprintf( T_('%d out of a maximum allowed of %d'), $newsletter_counter, $newsletter_limit ) );
 	}
+
+	// Display date/time of the latest inactive account email reminder:
+	$last_inactive_status_email = $UserSettings->get( 'last_inactive_status_email', $edited_User->ID );
+	$Form->info_field( T_('Latest inactive account email'), empty( $last_inactive_status_email ) ? T_('None yet') : mysql2localedatetime( $last_inactive_status_email ) );
 $Form->end_fieldset(); // Email info
 
 $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
