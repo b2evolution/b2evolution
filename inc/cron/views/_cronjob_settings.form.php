@@ -74,28 +74,39 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 				// Get array of account activation reminder settings:
 				$activate_account_reminder_config = $Settings->get( 'activate_account_reminder_config' );
 				$config_count = count( $activate_account_reminder_config );
+				$reminder_config_label = T_('Reminder #%d');
+				$reminder_config_params = array(
+						'note'             => T_('After last notification'),
+						'none_title_label' => T_('Don\'t send'),
+					);
 				foreach( $activate_account_reminder_config as $c => $config_value )
 				{
-					$reminder_config_label = sprintf( T_('Reminder #%d'), $c + 1 );
-					$reminder_config_params = array(
-							'note'             => T_('After last notification'),
-							'none_title_label' => T_('Don\'t send'),
-						);
-					if( $c == $config_count - 1 )
-					{	// Last option is used for failed activation threshold:
-						$Form->duration_input( 'activate_account_reminder_config_'.$c, 0, $reminder_config_label, '', '', $reminder_config_params );
+					if( $c == $config_count - 3 )
+					{	// This option is used for failed activation threshold:
+						$Form->duration_input( 'activate_account_reminder_config_'.$c, 0, sprintf( $reminder_config_label, $c + 1 ), '', '', $reminder_config_params );
 						$Form->duration_input( 'activate_account_reminder_config_'.( $c + 1 ), $config_value, T_('Mark as failed'), '', '', $reminder_config_params );
+					}
+					elseif( $c == $config_count - 2 )
+					{	// This option is used for delete warning threshold:
+						$Form->duration_input( 'activate_account_reminder_config_'.( $c + 1 ), $config_value, T_('Delete warning'), '', '', $reminder_config_params );
+					}
+					elseif( $c == $config_count - 1 )
+					{	// Last option is used for delete account threshold:
+						$Form->duration_input( 'activate_account_reminder_config_'.( $c + 1 ), $config_value, T_('Delete account'), '', '', array(
+								'note'             => T_('After last notification/warning'),
+								'none_title_label' => T_('Don\'t delete'),
+							) );
 					}
 					else
 					{	// Not last options for reminders:
-						$Form->duration_input( 'activate_account_reminder_config_'.$c, $config_value, $reminder_config_label, '', '', $reminder_config_params );
+						$Form->duration_input( 'activate_account_reminder_config_'.$c, $config_value, sprintf( $reminder_config_label, $c + 1 ), '', '', $reminder_config_params );
 					}
 				}
 				$Form->hidden( 'activate_account_reminder_config_num', $config_count );
 				break;
 
 			case 'send-inactive-account-reminders':
-				$Form->duration_input( 'inactive_account_reminder_threshold', $Settings->get( 'inactive_account_reminder_threshold' ), T_('Trigger after'), 'days', 'minutes', array( 'note' => T_('An inactive account is an account that had been activated but the user hasn\'t connected for an extended period.') ) );
+				$Form->duration_input( 'inactive_account_reminder_threshold', $Settings->get( 'inactive_account_reminder_threshold' ), T_('Trigger after'), 'days', 'minutes', array( 'note' => T_('An inactive account is an account that has been activated but the user hasn\'t connected for an extended period.') ) );
 				break;
 
 			case 'send-unmoderated-comments-reminders':

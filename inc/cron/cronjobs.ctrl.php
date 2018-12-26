@@ -246,18 +246,18 @@ switch( $action )
 					for( $c = 0; $c <= $reminder_config_num; $c++ )
 					{
 						$reminder_config_value = param_duration( 'activate_account_reminder_config_'.$c );
-						if( $reminder_config_value > 0 )
-						{	// Store only a selected reminder:
+						if( $reminder_config_value > 0 || $c >= $reminder_config_num - 2 )
+						{	// Store only a selected reminder and 3 last options("Mark as failed", "Delete warning", "Delete account"):
 							$reminder_config[ $c ] = $reminder_config_value;
 						}
 					}
-					if( count( $reminder_config ) < 2 )
+					if( count( $reminder_config ) < 4 )
 					{	// If no reminder has been selected:
 						param_error( 'activate_account_reminder_config_0', T_('Please select at least one reminder for account activation reminder after subscription.') );
 					}
-					if( ! isset( $reminder_config[ $reminder_config_num ] ) )
+					if( empty( $reminder_config[ $reminder_config_num - 2 ] ) )
 					{	// If "Mark as failed" is not selected:
-						param_error( 'activate_account_reminder_config_'.$reminder_config_num, T_('Please select account activation reminder threshold to mark as failed after subscription.') );
+						param_error( 'activate_account_reminder_config_'.( $reminder_config_num - 2 ), T_('Please select account activation reminder threshold to mark as failed after subscription.') );
 					}
 					$Settings->set( 'activate_account_reminder_config', implode( ',', $reminder_config ) );
 					break;
