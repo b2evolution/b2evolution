@@ -4138,7 +4138,7 @@ div.codeblock pre {
 }
 p.codeblock_title,
 .evo_comment p.codeblock_title {
-  font-family: Verdana, sans-serif;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
   letter-spacing: 0.1em;
   line-height: 95%;
   font-weight: bold;

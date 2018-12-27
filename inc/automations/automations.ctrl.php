@@ -394,7 +394,7 @@ switch( $action )
 			$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab='.$tab.'&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'new_step';
@@ -733,7 +733,6 @@ switch( $action )
 			if( empty( $edited_Automation ) )
 			{	// Get Automation of the edited Step:
 				$edited_Automation = & $edited_AutomationStep->get_Automation();
-				set_param( 'tab', $display_mode == 'js' ? 'diagram' : 'steps' );
 			}
 			$AdminUI->add_menu_entries( array( 'email', 'automations' ), array(
 					'settings' => array(
