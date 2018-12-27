@@ -546,14 +546,22 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 
 
 /**
- * Get percent by function log10()
+ * Get percent by logarithm functions
  *
  * @param integer Value
+ * @param integer Max value, NULL - 100000
  * @return integer Percent
  */
-function log10_percent( $value )
+function log10_percent( $value, $max = NULL )
 {
-	$percent = log10( intval( $value ) ) * 2 * 10;
+	if( $max === NULL )
+	{	// Use log10 by default where max value is 100000:
+		$percent = log10( $value ) * 2 * 10;
+	}
+	else
+	{	// Use log with custom max value:
+		$percent = log( $value, $max ) * 100;
+	}
 	return intval( $percent > 100 ? 100 : $percent );
 }
 
@@ -578,9 +586,9 @@ function display_charts( $chart_data )
 	foreach( $chart_data as $chart_item )
 	{
 		if( $chart_item['type'] == 'number' )
-		{ // Calculate a percent with log10 where max value is 100000
-			$chart_percent = empty( $chart_item['value'] ) ? 0 : log10_percent( $chart_item['value'] );
-			// Set a color for value, from green(0%) to red(100%)
+		{ // Calculate a percent with logarithm functions:
+			$chart_percent = empty( $chart_item['value'] ) ? 0 : log10_percent( $chart_item['value'], ( isset( $chart_item['max'] ) ? $chart_item['max'] : NULL ) );
+			// Set a color for value, from green(0%) to orange(100%)
 			$chart_color = get_color_by_percent( '#61bd4f', '#f2d600', '#ffab4a', $chart_percent );
 		}
 		else
