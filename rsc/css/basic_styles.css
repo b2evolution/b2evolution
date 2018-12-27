@@ -147,14 +147,14 @@ img.round,
 .leftmargin {
   float: left;
   margin-right: 1ex;
-  margin-top: .2ex;
-  margin-bottom: .2ex;
+  margin-top: 0.2ex;
+  margin-bottom: 0.2ex;
 }
 .rightmargin {
   float: right;
   margin-left: 1ex;
-  margin-top: .2ex;
-  margin-bottom: .2ex;
+  margin-top: 0.2ex;
+  margin-bottom: 0.2ex;
 }
 .clear {
   clear: both;
@@ -352,43 +352,43 @@ input.loader_img {
 }
 @keyframes evo_rest_api_loader {
   0% {
-    box-shadow: #ff8866 -14px -14px 0 7px, #ffcc66 14px -14px 0 7px, #66dd77 14px 14px 0 7px, #44aaee -14px 14px 0 7px;
+    box-shadow: #f86 -14px -14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px;
   }
   8.33% {
-    box-shadow: #ff8866 14px -14px 0 7px, #ffcc66 14px -14px 0 7px, #66dd77 14px 14px 0 7px, #44aaee -14px 14px 0 7px;
+    box-shadow: #f86 14px -14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px;
   }
   16.67% {
-    box-shadow: #ff8866 14px 14px 0 7px, #ffcc66 14px 14px 0 7px, #66dd77 14px 14px 0 7px, #44aaee -14px 14px 0 7px;
+    box-shadow: #f86 14px 14px 0 7px, #fc6 14px 14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px;
   }
   25% {
-    box-shadow: #ff8866 -14px 14px 0 7px, #ffcc66 -14px 14px 0 7px, #66dd77 -14px 14px 0 7px, #44aaee -14px 14px 0 7px;
+    box-shadow: #f86 -14px 14px 0 7px, #fc6 -14px 14px 0 7px, #6d7 -14px 14px 0 7px, #4ae -14px 14px 0 7px;
   }
   33.33% {
-    box-shadow: #ff8866 -14px -14px 0 7px, #ffcc66 -14px 14px 0 7px, #66dd77 -14px -14px 0 7px, #44aaee -14px -14px 0 7px;
+    box-shadow: #f86 -14px -14px 0 7px, #fc6 -14px 14px 0 7px, #6d7 -14px -14px 0 7px, #4ae -14px -14px 0 7px;
   }
   41.67% {
-    box-shadow: #ff8866 14px -14px 0 7px, #ffcc66 -14px 14px 0 7px, #66dd77 -14px -14px 0 7px, #44aaee 14px -14px 0 7px;
+    box-shadow: #f86 14px -14px 0 7px, #fc6 -14px 14px 0 7px, #6d7 -14px -14px 0 7px, #4ae 14px -14px 0 7px;
   }
   50% {
-    box-shadow: #ff8866 14px 14px 0 7px, #ffcc66 -14px 14px 0 7px, #66dd77 -14px -14px 0 7px, #44aaee 14px -14px 0 7px;
+    box-shadow: #f86 14px 14px 0 7px, #fc6 -14px 14px 0 7px, #6d7 -14px -14px 0 7px, #4ae 14px -14px 0 7px;
   }
   58.33% {
-    box-shadow: #ff8866 -14px 14px 0 7px, #ffcc66 -14px 14px 0 7px, #66dd77 -14px -14px 0 7px, #44aaee 14px -14px 0 7px;
+    box-shadow: #f86 -14px 14px 0 7px, #fc6 -14px 14px 0 7px, #6d7 -14px -14px 0 7px, #4ae 14px -14px 0 7px;
   }
   66.67% {
-    box-shadow: #ff8866 -14px -14px 0 7px, #ffcc66 -14px -14px 0 7px, #66dd77 -14px -14px 0 7px, #44aaee 14px -14px 0 7px;
+    box-shadow: #f86 -14px -14px 0 7px, #fc6 -14px -14px 0 7px, #6d7 -14px -14px 0 7px, #4ae 14px -14px 0 7px;
   }
   75% {
-    box-shadow: #ff8866 14px -14px 0 7px, #ffcc66 14px -14px 0 7px, #66dd77 14px -14px 0 7px, #44aaee 14px -14px 0 7px;
+    box-shadow: #f86 14px -14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px -14px 0 7px, #4ae 14px -14px 0 7px;
   }
   83.33% {
-    box-shadow: #ff8866 14px 14px 0 7px, #ffcc66 14px -14px 0 7px, #66dd77 14px 14px 0 7px, #44aaee 14px 14px 0 7px;
+    box-shadow: #f86 14px 14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae 14px 14px 0 7px;
   }
   91.67% {
-    box-shadow: #ff8866 -14px 14px 0 7px, #ffcc66 14px -14px 0 7px, #66dd77 14px 14px 0 7px, #44aaee -14px 14px 0 7px;
+    box-shadow: #f86 -14px 14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px;
   }
   100% {
-    box-shadow: #ff8866 -14px -14px 0 7px, #ffcc66 14px -14px 0 7px, #66dd77 14px 14px 0 7px, #44aaee -14px 14px 0 7px;
+    box-shadow: #f86 -14px -14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px;
   }
 }
 /* :not(:required) hides this rule from IE9 and below */
@@ -401,37 +401,37 @@ input.loader_img {
   height: 7px;
   background: transparent;
   border-radius: 100%;
-  box-shadow: #ff8866 -14px -14px 0 7px, #ffcc66 14px -14px 0 7px, #66dd77 14px 14px 0 7px, #44aaee -14px 14px 0 7px;
+  box-shadow: #f86 -14px -14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px;
   animation: evo_rest_api_loader 5s infinite ease-in-out;
   -ms-transform-origin: 50% 50%;
   transform-origin: 50% 50%;
 }
 .status_color_draft {
-  color: #ffff99;
+  color: #ff9;
 }
 .status_color_review {
-  color: #cc0099;
+  color: #CC0099;
 }
 .status_color_community {
-  color: #2e8bb9;
+  color: #2E8BB9;
 }
 .status_color_protected {
-  color: #ff9c2a;
+  color: #FF9C2A;
 }
 .status_color_private {
-  color: #dc143c;
+  color: #DC143C;
 }
 .status_color_published {
-  color: #99ee44;
+  color: #99EE44;
 }
 .status_color_deprecated {
-  color: #000000;
+  color: #000;
 }
 .status_color_redirected {
   color: #663399;
 }
 .status_color_trash {
-  color: #ff6666;
+  color: #f66;
 }
 .status_color_meta {
   color: #5bc0de;
@@ -441,7 +441,7 @@ input.loader_img {
 }
 .btn-status-draft {
   color: #000;
-  background-color: #ffff99;
+  background-color: #ff9;
   border-color: #dfdfdf;
 }
 .btn-status-draft:hover {
@@ -450,7 +450,7 @@ input.loader_img {
 }
 .btn-status-review {
   color: #fff;
-  background-color: #cc0099;
+  background-color: #CC0099;
 }
 .btn-status-review:hover {
   color: #fff;
@@ -458,7 +458,7 @@ input.loader_img {
 }
 .btn-status-community {
   color: #fff;
-  background-color: #2e8bb9;
+  background-color: #2E8BB9;
 }
 .btn-status-community:hover {
   color: #fff;
@@ -466,7 +466,7 @@ input.loader_img {
 }
 .btn-status-protected {
   color: #fff;
-  background-color: #ff9c2a;
+  background-color: #FF9C2A;
 }
 .btn-status-protected:hover {
   color: #fff;
@@ -474,7 +474,7 @@ input.loader_img {
 }
 .btn-status-private {
   color: #fff;
-  background-color: #dc143c;
+  background-color: #DC143C;
 }
 .btn-status-private:hover {
   color: #fff;
@@ -482,7 +482,7 @@ input.loader_img {
 }
 .btn-status-published {
   color: #000;
-  background-color: #99ee44;
+  background-color: #99EE44;
 }
 .btn-status-published .glyphicon {
   color: inherit !important;
@@ -493,11 +493,11 @@ input.loader_img {
 }
 .btn-status-deprecated {
   color: #fff;
-  background-color: #000000;
+  background-color: #000;
 }
 .btn-status-deprecated:hover {
   color: #fff;
-  background-color: #333333;
+  background-color: #333;
 }
 .btn-status-redirected {
   color: #fff;
@@ -509,11 +509,11 @@ input.loader_img {
 }
 .btn-status-trash {
   color: #fff;
-  background-color: #ff6666;
+  background-color: #f66;
 }
 .btn-status-trash:hover {
   color: #fff;
-  background-color: #ff4444;
+  background-color: #f44;
 }
 .ufld_yahooim.ufld__textcolor,
 .ufld_yahooim.ufld__hovertextcolor:hover {
