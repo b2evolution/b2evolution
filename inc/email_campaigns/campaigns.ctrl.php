@@ -630,7 +630,7 @@ switch( $action )
 		break;
 	default:
 	$AdminUI->display_breadcrumbpath_add( T_('Campaigns') );
-		$AdminUI->set_page_manual_link( 'email-campaigns' );
+		$AdminUI->set_page_manual_link( 'email-campaign-list' );
 		break;
 }
 
