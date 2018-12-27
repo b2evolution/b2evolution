@@ -42,10 +42,17 @@ else
 if( count( $steps ) > 0 )
 {	// Display a button to reset a diagram layout to default positions:
 	echo '<a href="'.$admin_url.'?ctrl=automations&amp;action=reset_diagram&amp;autm_ID='.$edited_Automation->ID.'&amp;'.url_crumb( 'automationstep' ).'"'
-				.' class="btn btn-danger pull-right" onclick="return confirm( \''.TS_('Are you sure you want to reset step positions to the default layout?').'\' )">'
+				.' class="btn btn-default pull-right" style="margin-left:5px"'
+				.' onclick="return confirm( \''.TS_('Are you sure you want to reset step positions to the default layout?').'\' )">'
 			.T_('Reset layout')
 		.'</a>';
 }
+
+echo '<a href="'.$admin_url.'?ctrl=automations&amp;action=reset_diagram&amp;autm_ID='.$edited_Automation->ID.'&amp;'.url_crumb( 'automationstep' ).'"'
+			.' class="btn btn-primary pull-right"'
+			.' onclick="return evo_add_new_automation_step()">'
+		.get_icon( 'new' ).' '.T_('New step')
+	.'</a>';
 
 // Print out HTML boxes for steps and Initialise steps data to build connectors between steps by JS code below:
 echo '<div>';
@@ -73,6 +80,35 @@ echo '</div>';
 echo_modalwindow_js();
 ?>
 <script type="text/javascript">
+function evo_add_new_automation_step()
+{
+	openModalWindow( '<span class="loader_img loader_file_edit absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
+		'80%', '', true,
+		'<?php echo TS_('New step').get_manual_link( 'automation-step-form' ); ?>',
+		'<?php echo TS_('Record'); ?>', true, true );
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: '<?php echo $admin_url; ?>',
+		data:
+		{
+			'ctrl': 'automations',
+			'action': 'new_step',
+			'tab': 'diagram',
+			'autm_ID': <?php echo $edited_Automation->ID; ?>,
+			'display_mode': 'js',
+		},
+		success: function( result )
+		{
+			openModalWindow( result, '80%', '',true,
+				'<?php echo TS_('New step').get_manual_link( 'automation-step-form' ); ?>',
+				'<?php echo TS_('Record'); ?>', false, true );
+		}
+	} );
+
+	return false;
+}
+	
 jQuery( document ).ready( function()
 {	// CSS fix to make diagram canvas full height:
 	var min_step_bottom_position = 0;
@@ -107,6 +143,7 @@ jQuery( document ).ready( function()
 			{
 				'ctrl': 'automations',
 				'action': 'edit_step',
+				'tab': 'diagram',
 				'step_ID': jQuery( this ).attr( 'id' ).replace( 'step_', '' ),
 				'display_mode': 'js',
 			},
@@ -171,7 +208,7 @@ jsPlumb.ready( function ()
 	point_source_no.connectorOverlays[0][1].width = 15;
 	point_source_no.connectorOverlays[0][1].length = 15;
 	point_source_no.connectorOverlays[1][1].cssClass = 'jtk-label jtk-label-no';
-	point_source_no.connectorOverlays[1][1].location = 0.7;
+	point_source_no.connectorOverlays[1][1].location = 0.55;
 	// "ERROR" red connector and source point:
 	var point_source_error = jQuery.extend( true, {}, point_source );
 	point_source_error.connectionType = 'error';
