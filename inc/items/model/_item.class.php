@@ -828,8 +828,14 @@ class Item extends ItemLight
 		{
 			// Replace special chars/umlauts:
 			load_funcs( 'locales/_charset.funcs.php' );
-			$post_urltitle = replace_special_chars( get_param( 'post_urltitle' ), $this->get( 'locale' ) );
-			$this->set( 'urltitle', $post_urltitle );
+			// Split slug url titles with comma because the function replace_special_chars()
+			// converts `,` to `-`, so separate slugs are concatenated in single, that's wrong:
+			$post_urltitle = explode( ',', get_param( 'post_urltitle' ) );
+			foreach( $post_urltitle as $u => $slug_urltitle )
+			{
+				$post_urltitle[ $u ] = replace_special_chars( $slug_urltitle, $this->get( 'locale' ) );
+			}
+			$this->set( 'urltitle', implode( ', ', $post_urltitle ) );
 			// Added in May 2017; but old slugs are not converted yet.
 			if( preg_match( '#(^|,+)[^a-z\d_]*\d+[^a-z\d_]*($|,+)#i', get_param( 'post_urltitle' ) ) )
 			{	// Display error if item slugs contain only digits:
