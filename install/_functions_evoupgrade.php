@@ -10218,7 +10218,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Upgrading email campaigns table...' );
-		db_add_col( 'T_email__campaign', 'ecmp_user_tag_unsubscribe', 'VARCHAR(255) NULL AFTER ecmp_user_tag_like' );
+		db_add_col( 'T_email__campaign', 'ecmp_user_tag_unsubscribe', 'VARCHAR(255) NULL AFTER ecmp_user_tag_dislike' );
 		task_end();
 
 		upg_task_end( false );
