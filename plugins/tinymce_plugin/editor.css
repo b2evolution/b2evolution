@@ -1,7 +1,6 @@
 /* Styles for TinyMCE's iframe/editable area */
-
+/*
 body.mce-content-body {
-	/*
 	font-family: Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
 	font-size: 16px;
 	line-height: 1.5;
@@ -9,7 +8,6 @@ body.mce-content-body {
 	-webkit-font-smoothing: antialiased !important;
 	padding: 0.6em;
 	margin: 0;
-	*/
 	font-size: 16px;
 	line-height: 1.75;
 	-webkit-font-smoothing: antialiased !important;
@@ -28,7 +26,7 @@ h6 {font-size: .75em}
 td {
 	font: 13px/19px Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
 }
-
+*/
 pre {
 	font: 12px/18px "Courier New", monospace;
 }
