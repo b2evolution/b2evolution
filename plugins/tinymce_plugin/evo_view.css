@@ -1,3 +1,7 @@
+.evo-view-wrap[data-evo-view-type="image"] {
+	display: block;
+}
+
 /* delegate the handling of the selection to the wpview tinymce plugin */
 .evo-view-wrap,
 .evo-view-wrap * {
