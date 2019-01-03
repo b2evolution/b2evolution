@@ -283,7 +283,7 @@ if( $params['comment_type'] == 'meta' )
 		}
 
 		/*
-			echo '<script type="text/javascript">
+			echo '<script>
 		/* <![CDATA[ *
 		function validateCommentForm(form)
 		{
@@ -446,7 +446,7 @@ if( $params['comment_type'] == 'meta' )
 		$Form->inputstart = $form_inputstart;
 
 		// Set canvas object for plugins:
-		echo '<script type="text/javascript">var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
+		echo '<script>var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
 
 		// CALL PLUGINS NOW:
 		ob_start();
@@ -544,7 +544,7 @@ if( $params['comment_type'] == 'meta' )
 			echo $Form->buttonsend;
 		$Form->end_fieldset();
 		?>
-		<script type="text/javascript">
+		<script>
 		jQuery( document ).ready( function() {
 			// Align TinyMCE toggle buttons:
 			jQuery( '.evo_tinymce_toggle_buttons' ).addClass( 'col-sm-offset-3' );

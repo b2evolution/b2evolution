@@ -1308,7 +1308,7 @@ function start_install_progress_bar( $title, $steps = NULL )
 				.'<style type="text/css">.progress-bar{width:100% !important}</style>'
 			.'</noscript>';
 		// Don't use the striped animation when we have a real progress indication
-		echo '<script type="text/javascript">'
+		echo '<script>'
 			.'jQuery( ".progress-bar.active.progress-bar-striped" ).removeClass( "active progress-bar-striped" );'
 		.'</script>';
 	}
@@ -1327,7 +1327,7 @@ function stop_install_progress_bar()
 		return;
 	}
 
-	echo '<script type="text/javascript">'
+	echo '<script>'
 		.'jQuery( ".progress-bar" ).css( "width", "100%" ).removeClass( "active progress-bar-striped" );'
 		.'setTimeout( function() { jQuery( ".progress-bar" ).addClass( "progress-bar-'.$install_progress_bar_status.'" ); }, 600 );'
 	.'</script>';
@@ -1360,7 +1360,7 @@ function update_install_progress_bar()
 		$bar_width = 100;
 	}
 
-	echo '<script type="text/javascript">'
+	echo '<script>'
 		.'jQuery( ".progress-bar" ).css( "width", "'.$bar_width.'%" );'
 	.'</script>';
 }
@@ -1593,7 +1593,7 @@ function echo_install_button_js()
 {
 	global $app_name;
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '#install_button' ).click( function()
@@ -1717,7 +1717,7 @@ function display_install_result_window( $title, $body )
 	</div>';
 
 	// JavaScript to open modal window with info:
-	echo '<script type="text/javascript">'
+	echo '<script>'
 		.'setTimeout( function() { jQuery( "#evo_modal__install" ).modal(); }, 1000 );'
 	.'</script>';
 }

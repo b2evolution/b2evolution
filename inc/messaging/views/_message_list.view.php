@@ -362,7 +362,7 @@ if( $is_recipient )
 			$Form->inputend = $form_inputend;
 
 			// set b2evoCanvas for plugins
-			echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "msg_text" );</script>';
+			echo '<script>var b2evoCanvas = document.getElementById( "msg_text" );</script>';
 
 			// Display renderers
 			$current_renderers = !empty( $edited_Message ) ? $edited_Message->get_renderers_validated() : array( 'default' );

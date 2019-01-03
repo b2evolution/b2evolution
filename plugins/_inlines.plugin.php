@@ -176,7 +176,7 @@ class inlines_plugin extends Plugin
 				return false;
 		}
 
-		?><script type="text/javascript">
+		?><script>
 		//<![CDATA[
 		var target_ID = <?php echo empty( $target_ID ) ? 'undefined' : format_to_js( $target_ID );?>;
 		var temp_ID = <?php echo empty( $temp_ID ) ? 'undefined' : format_to_js( $temp_ID );?>;
@@ -305,7 +305,7 @@ class inlines_plugin extends Plugin
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
 		?>
-		<script type="text/javascript">inline_toolbar( '<?php echo TS_('Inlines').':'; ?>' );</script>
+		<script>inline_toolbar( '<?php echo TS_('Inlines').':'; ?>' );</script>
 		<?php
 
 		return true;

@@ -741,7 +741,7 @@ class Table extends Widget
 			$filter_query = json_encode( $filter_query );
 		}
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '#evo_results_filters' ).queryBuilder(

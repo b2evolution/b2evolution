@@ -235,7 +235,7 @@ echo_item_merge_js();
 if( $revisions_count > 2 )
 {	// Print JS code for selectors to compare the revisions
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( 'input[name=r1]:eq(1)' ).attr( 'checked', 'checked' );

@@ -40,7 +40,7 @@ if( $this->get_path(0) == 'files'
 	|| $this->get_path_range(0,1) == array( 'blogs', 'permgroup' ) )
 { // init checkall JS functions
 	?>
-	<script type="text/javascript">
+	<script>
 		initcheckall();
 		<?php
 		if( $this->get_path(0) == 'files' )

@@ -87,7 +87,7 @@ class shortcodes_plugin extends Plugin
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		?><script type="text/javascript">
+		?><script>
 		//<![CDATA[
 		var shortcodes_buttons = new Array();
 
@@ -138,7 +138,7 @@ class shortcodes_plugin extends Plugin
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript">shortcodes_toolbar( '<?php echo TS_('Shortcodes:'); ?>' );</script><?php
+		?><script>shortcodes_toolbar( '<?php echo TS_('Shortcodes:'); ?>' );</script><?php
 
 		return true;
 	}

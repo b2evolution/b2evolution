@@ -157,7 +157,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 }
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( 'input[name="eblog_method"], input[name="eblog_encrypt"]' ).click( function()

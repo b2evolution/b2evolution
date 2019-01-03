@@ -144,7 +144,7 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 				$Form->text_input( $dummy_fields['subject'].'_other', $subject_other, 50, '', '', array( 'maxlength' => 255, 'style' => 'margin-left: 5px; display: none;' ) );
 			$Form->end_line();
 			?>
-			<script type="text/javascript">
+			<script>
 			jQuery( document ).ready( function() {
 				var select_field = jQuery( '#<?php echo $dummy_fields['subject'];?>' );
 				var other_field = jQuery( '#<?php echo $dummy_fields['subject'];?>_other' );

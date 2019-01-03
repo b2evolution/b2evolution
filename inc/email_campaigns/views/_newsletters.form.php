@@ -82,7 +82,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 }
 $Form->end_form( $buttons );
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '[name=enlt_perm_subscribe]' ).click( function()
 {
 	jQuery( '[name="enlt_perm_groups[]"]' ).prop( 'disabled', jQuery( this ).val() != 'group' );

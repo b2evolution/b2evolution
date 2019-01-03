@@ -127,7 +127,7 @@ class quicktags_plugin extends Plugin
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		?><script type="text/javascript">
+		?><script>
 		//<![CDATA[
 		var <?php echo $params['js_prefix']; ?>b2evoButtons = new Array();
 		var <?php echo $params['js_prefix']; ?>b2evoLinks = new Array();
@@ -475,7 +475,7 @@ class quicktags_plugin extends Plugin
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript"><?php echo $params['js_prefix']; ?>b2evoToolbar( 'HTML: ' );</script><?php
+		?><script><?php echo $params['js_prefix']; ?>b2evoToolbar( 'HTML: ' );</script><?php
 
 		return true;
 	}

@@ -284,7 +284,7 @@ body {
   font-family: 'Josefin Sans', sans-serif;
   font-weight: 300;
   font-size: 18px;
-  letter-spacing: 0.15em;
+  letter-spacing: .15em;
   line-height: 20px;
   text-transform: uppercase;
   padding-top: 17px;
@@ -304,7 +304,7 @@ body {
 .navbar.main-header-navigation .navbar-collapse .nav li a {
   padding-top: 17px;
   padding-bottom: 17px;
-  transition: 0.1s opacity linear;
+  transition: .1s opacity linear;
 }
 .navbar.main-header-navigation .navbar-collapse .nav li.menu-button a {
   border: 2px solid;
@@ -314,7 +314,7 @@ body {
   letter-spacing: 1px;
   font-weight: 400;
   margin-top: 5px;
-  transition: 0.1s opacity linear;
+  transition: .1s opacity linear;
 }
 .navbar.main-header-navigation .navbar-collapse .nav:hover li a {
   opacity: 0.8;
@@ -334,7 +334,7 @@ body {
   font-weight: 400;
   font-family: 'Josefin Sans', sans-serif;
   font-size: 13px;
-  letter-spacing: 0.18em;
+  letter-spacing: .18em;
 }
 .navbar.main-header-navigation.affix {
   position: fixed;
@@ -385,7 +385,7 @@ div.front_main_area .evo_container__front_page_main_area .widget_core_coll_title
   font-size: 80px;
   line-height: 1.2em;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: .02em;
   font-weight: 100;
 }
 body.pictured #skin_wrapper {
@@ -844,7 +844,7 @@ body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: 100;
-  transition: 0.1s opacity linear;
+  transition: .1s opacity linear;
 }
 .evo_widget > .btn.btn-default:hover {
   opacity: 0.8;

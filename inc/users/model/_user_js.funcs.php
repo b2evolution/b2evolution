@@ -4,7 +4,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 ?>
 
-<script type="text/javascript">
+<script>
 /**
  * Init autocomplete event for Specific criteria input
  */

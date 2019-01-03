@@ -230,7 +230,7 @@ $Form->begin_form( '', '', $params );
 		$Form->fieldend = "</div>\n";
 		$Form->textarea_input( 'content', $item_content, 16, '', array( 'cols' => 40 , 'id' => 'itemform_post_content', 'class' => 'autocomplete_usernames' ) );
 		?>
-		<script type="text/javascript" language="JavaScript">
+		<script>
 			<!--
 			// This is for toolbar plugins
 			var b2evoCanvas = document.getElementById('itemform_post_content');
@@ -978,7 +978,7 @@ $Form->begin_form( '', '', $params );
 	echo_publish_buttons( $Form, $creating, $edited_Item );
 	echo '</div>';
 	?>
-	<script type="text/javascript">
+	<script>
 	jQuery( document ).ready( function()
 	{
 		var affix_obj = jQuery( "#publish_buttons" );
@@ -1059,7 +1059,7 @@ echo_item_merge_js();
 
 // JS to post excerpt mode switching:
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#post_excerpt' ).on( 'keyup', function()
 {
 	// Disable excerpt auto-generation on any changing and enable if excerpt field is empty:

@@ -52,7 +52,7 @@ global $AdminUI;
 // Admin skin dropdown list handler
 // Display settings corresponding only for the current (loaded) admin skin
 ?>
-<script type="text/javascript">
+<script>
 	function admin_skin_changed()
 	{
 		// admin skin dropdown list selected value

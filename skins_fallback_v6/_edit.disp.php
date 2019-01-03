@@ -257,7 +257,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 			) );
 		$Form->switch_layout( NULL );
 		?>
-		<script type="text/javascript" language="JavaScript">
+		<script>
 			<!--
 			// This is for toolbar plugins
 			var b2evoCanvas = document.getElementById('itemform_post_content');

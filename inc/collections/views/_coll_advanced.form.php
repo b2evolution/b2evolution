@@ -209,7 +209,7 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveBut
 
 ?>
 
-<script type="text/javascript">
+<script>
 	jQuery( 'input[name=ajax_form_enabled]' ).click( function()
 	{
 		var checked = jQuery( this ).prop( 'checked' );

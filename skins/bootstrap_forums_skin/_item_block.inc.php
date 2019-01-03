@@ -446,7 +446,7 @@ skin_widget( array(
 	<?php
 		locale_restore_previous();	// Restore previous locale (Blog locale)
 	?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '.quote_button' ).click( function()

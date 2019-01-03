@@ -463,7 +463,7 @@ $Form->end_form();
 // End payload block:
 $this->disp_payload_end();
 ?>
-<script type="text/javascript">
+<script>
 var user_status_icons = new Array;
 <?php
 foreach( $user_status_icons as $status => $icon )

@@ -167,7 +167,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 ?>
 
-<script type="text/javascript">
+<script>
 	jQuery( '#untranslated_only' ).on( 'change', function()
 		{
 			var translated_string_input = jQuery( '#translated' );

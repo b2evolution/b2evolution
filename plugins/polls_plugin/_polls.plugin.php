@@ -364,7 +364,7 @@ class polls_plugin extends Plugin
 		echo_modalwindow_js();
 
 		?>
-		<script type="text/javascript">
+		<script>
 		//<![CDATA[
 		function polls_toolbar( title, prefix )
 		{
@@ -478,7 +478,7 @@ class polls_plugin extends Plugin
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
 		?>
-		<script type="text/javascript">polls_toolbar( '<?php echo TS_('Polls').':';?>', '<?php echo $params['js_prefix']; ?>' );</script>
+		<script>polls_toolbar( '<?php echo TS_('Polls').':';?>', '<?php echo $params['js_prefix']; ?>' );</script>
 		<?php
 
 		return true;

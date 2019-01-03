@@ -244,7 +244,7 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 }
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'input[name=newusers_canregister]' ).click( function()
 {
 	if( jQuery( this ).val() == 'yes' )

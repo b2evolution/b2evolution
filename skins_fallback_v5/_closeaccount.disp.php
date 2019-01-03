@@ -51,7 +51,7 @@ else
 	$Form->textarea_input( 'account_close_reason', $account_close_reason, 3, T_('Details'), array( 'cols' => 40, 'maxlength' => 255 ) );
 	$Form->info_field( NULL, '%s characters left', array( 'class' => 'section_requires_javascript dimmed', 'name' => 'character_counter' ) );
 ?>
-	<script type="text/javascript">
+	<script>
 		<?php echo 'var counter_text = "'.T_( '%s characters left' ).'";';?>
 		var characterCounter = jQuery("#ffield_character_counter > div");
 		var otherReason = jQuery("#account_close_reason");

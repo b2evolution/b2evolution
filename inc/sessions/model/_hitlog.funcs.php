@@ -1195,7 +1195,7 @@ function display_hits_filter_form( $mode, $diagram_columns, $display_filter_peri
 		$year = $UserSettings->get( $prefix.'year' );
 		$Form->select_input_array( $prefix.'year', ( empty( $year ) ? date( 'Y' ) : $year ), $years, '', NULL, $months_years_params );
 
-		echo '<script type="text/javascript">
+		echo '<script>
 			jQuery( "#'.$prefix.'period" ).change( function()
 			{
 				if( jQuery( this ).val() == "specific_month" )

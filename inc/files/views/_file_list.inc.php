@@ -819,7 +819,7 @@ $Form->begin_form();
 	{{{ // include JS
 		// TODO: remove these javascript functions to an external .js file and include them through add_headline()
 		?>
-		<script type="text/javascript">
+		<script>
 			<!--
 			function js_act_on_selected()
 			{
@@ -935,7 +935,7 @@ $Form->begin_form();
 		{ // we want to highlight a file (e.g. via "Locate this file!"), scroll there and do the success fade
 			?>
 
-			<script type="text/javascript">
+			<script>
 			jQuery( function() {
 				var fm_hl = jQuery("#fm_highlighted");
 				if( fm_hl.length ) {

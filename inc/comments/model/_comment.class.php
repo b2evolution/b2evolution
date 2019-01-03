@@ -3303,7 +3303,7 @@ class Comment extends DataObject
 
 		echo '</div>';
 
-		echo '<script type="text/javascript">
+		echo '<script>
 		/* <![CDATA[ */
 		jQuery("#comment_rating").html("").raty({
 			scoreName: "comment_rating",

@@ -926,7 +926,7 @@ function echo_comment_reply_js( $Item )
 	}
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'a.comment_reply' ).click( function()
 {	// The click action for the links "Reply to this comment"
 	var comment_ID = jQuery( this ).attr( 'rel' );

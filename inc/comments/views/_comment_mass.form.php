@@ -49,7 +49,7 @@ $Form->hidden( 'ctrl', 'comments' );
 
 $Form->end_form();
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'input[name=mass_type]' ).click( function()
 {
 	if( jQuery( this ).val() == 'delete' )

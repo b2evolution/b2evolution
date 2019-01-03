@@ -213,7 +213,7 @@ echo $Widget->replace_vars( $template['block_start'] );
 			}
 			echo '</fieldset>';
 			?>
-			<script type="text/javascript">
+			<script>
 			jQuery( '#<?php echo $pp; ?>assgn_login' ).focus( function()
 			{
 				jQuery( 'input[name=<?php echo $pp; ?>assgn]' ).removeAttr( 'checked' );
