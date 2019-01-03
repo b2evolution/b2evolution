@@ -113,7 +113,7 @@ $params = array_merge( array(
 	?>
 
 </div>
-<script type="text/javascript">
+<script>
 var has_touch_event;
 window.addEventListener( 'touchstart', function set_has_touch_event ()
 {

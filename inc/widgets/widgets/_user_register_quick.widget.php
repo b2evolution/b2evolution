@@ -440,7 +440,7 @@ class user_register_quick_Widget extends ComponentWidget
 
 		if( ! is_logged_in() )
 		{	// JS code to get crumb from AJAX request when page caching is enabled:
-			echo '<script type="text/javascript">
+			echo '<script>
 var user_reg_widget_request_sent = false;
 jQuery( ".widget_register_form" ).submit( function()
 {

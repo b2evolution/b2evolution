@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 /**
  * Get regional option list from given array
- * 
+ *
  * @param array rows
  * @param integer ID of selected row
  * @param array field params
@@ -100,7 +100,7 @@ function get_regional_option_list( $rows, $selected = 0, $params = array() )
 
 /**
  * Get option list with regions by country ID
- * 
+ *
  * @param integer country ID
  * @param integer selected region ID
  * @param array field params
@@ -127,7 +127,7 @@ function get_regions_option_list( $country_ID, $region_ID = 0, $params = array()
 
 /**
  * Get option list with sub-regions by region ID
- * 
+ *
  * @param integer region ID
  * @param integer selected sub-region ID
  * @param array field params
@@ -154,7 +154,7 @@ function get_subregions_option_list( $region_ID, $subregion_ID = 0, $params = ar
 
 /**
  * Get option list with cities by country, region or subregion
- * 
+ *
  * @param integer country ID
  * @param integer region ID
  * @param integer subregion ID
@@ -242,9 +242,9 @@ function get_cities_option_list( $country_ID, $region_ID = 0, $subregion_ID = 0,
 
 /**
  * Import cities from CSV file
- * 
+ *
  * @param integer country ID
- * @param string 
+ * @param string
  * @return array (
  *   'inserted' => Count of inserted cities,
  *   'updated'  => Count of updated cities );
@@ -399,7 +399,7 @@ function echo_regional_js( $prefix, $region_visible )
 		return;
 	}
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	check_regional_required_fields();
@@ -538,7 +538,7 @@ function load_cities( country_ID, region_ID, subregion_ID )
 function echo_regional_required_js( $prefix )
 {
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'input[name=<?php echo $prefix; ?>city][value=required]' ).click( function ()
 {	// when city is required make subregion is required
 	set_subregion_required();

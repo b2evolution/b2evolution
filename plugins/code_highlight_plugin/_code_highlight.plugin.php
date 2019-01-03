@@ -328,7 +328,7 @@ class code_highlight_plugin extends Plugin
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		?><script type="text/javascript">
+		?><script>
 			//<![CDATA[
 			function <?php echo $params['js_prefix']; ?>code_tag( tag_name )
 			{

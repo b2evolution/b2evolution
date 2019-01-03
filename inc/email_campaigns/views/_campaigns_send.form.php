@@ -141,7 +141,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 
 $Form->end_form();
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '[name=ecmp_sync_plaintext]' ).click( function()
 {
 	if( jQuery( this ).val() == 1 )

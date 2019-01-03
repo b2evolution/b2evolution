@@ -151,7 +151,7 @@ class cookie_consent_plugin extends Plugin
 				.'<div class="eu_cookie_consent__button"><button class="btn btn-info">'.format_to_js( $accept_button ).'</button></div>'
 			.'</div>';
 
-		echo '<script type="text/javascript">
+		echo '<script>
 var eu_cookie_consent = jQuery.cookie( "eu_cookie_consent" )
 if( eu_cookie_consent != "accepted" )
 { // Print a block only if this was not accepted yet:

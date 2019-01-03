@@ -3382,7 +3382,7 @@ function debug_info( $force = false, $force_clean = false )
 			$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
 			require_js( 'jquery/jquery.tablesorter.min.js', $relative_to, true, true );
 			echo '
-			<script type="text/javascript">
+			<script>
 			(function($){
 				var clicked_once;
 				jQuery("table.debug_timer th").click( function(event) {
@@ -6244,7 +6244,7 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 		{	// Send headers only when they are not send yet to avoid an error:
 			headers_content_mightcache( 'text/html', 0 );		// Do NOT cache interactive communications.
 		}
-		echo '<html><head></head><body><script type="text/javascript">'."\n";
+		echo '<html><head></head><body><script>'."\n";
 		echo $output;
 		echo '</script></body></html>';
 	}
@@ -7585,7 +7585,7 @@ function echo_editable_column_js( $params = array() )
 	if( $params['print_init_tags'] )
 	{
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 <?php
@@ -7783,7 +7783,7 @@ function echo_modalwindow_js()
 function echo_modalwindow_js_bootstrap()
 {
 	// Initialize variables for the file "bootstrap-evo_modal_window.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_close = \''.TS_('Close').'\'
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_edit_image = \''.TS_('Insert or edit inline image').'\';
@@ -7800,7 +7800,7 @@ function echo_modalwindow_js_bootstrap()
  */
 function echo_whois_js_bootstrap()
 {
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_close = \''.TS_('Close').'\';
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_whois_title = \''.TS_('Querying WHOIS server...').'\';
@@ -7909,7 +7909,7 @@ function echo_fieldset_folding_js()
 	}
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).on( 'click', 'span[id^=icon_folding_], span[id^=title_folding_]', function()
 {
 	var is_icon = jQuery( this ).attr( 'id' ).match( /^icon_folding_/ );
@@ -8078,7 +8078,7 @@ function echo_form_dropdown_js()
 	}
 	$tooltip_titles_js_array = implode( ', ', $tooltip_titles_js_array );
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '.btn-group.dropdown.autoselected li a' ).click( function()
 {
 	var item_status_tooltips = {<?php echo $tooltip_titles_js_array ?>};

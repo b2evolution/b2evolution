@@ -79,7 +79,7 @@ $Form->begin_fieldset( T_('Click tagging').get_manual_link( 'campaign-tagging-pa
 	}
 
 	?>
-	<script type="text/javascript">
+	<script>
 	function update_campaign_recipients_count( ecmp_ID )
 	{
 		jQuery.ajax(

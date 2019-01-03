@@ -219,7 +219,7 @@ foreach( $post_status_types as $post_status_type )
 }
 
 ?>
-<script type="text/javascript">
+<script>
 	var itemStatuses = <?php echo json_encode( $post_statuses );?>;
 
 	function getApplicableStatus( el, selected ) {

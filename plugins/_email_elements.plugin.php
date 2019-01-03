@@ -97,7 +97,7 @@ class email_elements_plugin extends Plugin
 		$button_text_input = $Form->text_input( 'button_text', '', NULL, T_('Text'), '', array( 'style' => 'width:100%;' ) );
 		$button_url_input = $Form->text_input( 'button_url', '', NULL, T_('URL'), '', array( 'style' => 'width:100%;' ) );
 
-		?><script type="text/javascript">
+		?><script>
 		//<![CDATA[
 		function email_elements_toolbar( title, prefix )
 		{
@@ -276,7 +276,7 @@ class email_elements_plugin extends Plugin
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
 		?>
-		<script type="text/javascript">email_elements_toolbar( '<?php echo TS_('Email Elements:'); ?>', '<?php echo $params['js_prefix']; ?>' );</script>
+		<script>email_elements_toolbar( '<?php echo TS_('Email Elements:'); ?>', '<?php echo $params['js_prefix']; ?>' );</script>
 		<?php
 
 		return true;

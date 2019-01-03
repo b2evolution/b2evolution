@@ -72,7 +72,7 @@ $Form->begin_fieldset( T_('Hit & session logging').get_manual_link('hit_logging'
 
 	if( $Settings->get('auto_prune_stats_mode') == 'off' )
 	{ // hide the "days" input field, if mode set to off:
-		echo '<script type="text/javascript">jQuery("#auto_prune_stats_container").hide();</script>';
+		echo '<script>jQuery("#auto_prune_stats_container").hide();</script>';
 	}
 
 $Form->end_fieldset();

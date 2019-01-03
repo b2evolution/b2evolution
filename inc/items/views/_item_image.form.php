@@ -85,7 +85,7 @@ global $inline_class;
 			$Form->end_form();
 			?>
 
-			<script type="text/javascript">
+			<script>
 			jQuery( document ).ready( function() {
 				var img = jQuery( "#image_preview img" );
 				var tagType = jQuery( '.tab-content .tab-pane.active' ).attr( 'id' );

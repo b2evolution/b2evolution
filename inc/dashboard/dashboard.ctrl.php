@@ -261,7 +261,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 if( ! empty( $chart_data ) )
 { // JavaScript to initialize charts
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'document' ).ready( function()
 {
 	var chart_params = {

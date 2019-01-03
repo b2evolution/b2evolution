@@ -314,7 +314,7 @@ var _b2evoCommunications = function()
 				{ // we have some data
 					params.url += '&'+params.data;
 				}
-				var script = jQuery( '<script type="text/javascript"></script>' );
+				var script = jQuery( '<script></script>' );
 				script.attr( 'src', params.url );
 				script.load( params.ok() );
 				script.error( params.error() );

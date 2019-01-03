@@ -125,7 +125,7 @@ class facebook_plugin extends Plugin
 	function WidgetBeginSettingsForm( & $params )
 	{
 		?>
-		<script type="text/javascript">
+		<script>
 		jQuery( document ).ready( function() {
 			var showButtons = jQuery( 'input[name$=show_buttons]' ),
 					layoutSelect = jQuery( 'select[name$=layout]' ),

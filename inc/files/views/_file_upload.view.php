@@ -27,7 +27,7 @@ global $fm_FileRoot;
 /* TODO: dh> move JS to external file. */
 ?>
 
-<script type="text/javascript">
+<script>
 	<!--
 	/**
 	 * Mighty cool function to append an input or textarea element onto another element.
@@ -301,7 +301,7 @@ global $fm_FileRoot;
 				?>
 			</ul>
 
-			<script type="text/javascript">
+			<script>
 				(function()
 				{
 					var handler = function()

@@ -547,7 +547,7 @@ function echo_requeue_automation_js()
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_deldata.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_requeue_automation_for_finished_steps = \''.TS_('Requeue automation for finished steps').get_manual_link( 'requeue-automation-for-finished-steps' ).'\';
 		var evo_js_lang_requeue_automation_for_step_users = \''.TS_('Requeue automation for users of step #%s').get_manual_link( 'requeue-automation-for-step' ).'\';

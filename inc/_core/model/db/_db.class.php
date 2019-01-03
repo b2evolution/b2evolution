@@ -1467,7 +1467,7 @@ class DB
 
 					echo '<code id="'.$div_id.'" style="display:none">'.$sql_short.'</code>';
 					echo '<code id="'.$div_id.'_full">'.$sql.'</code>';
-					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.','.$div_id.'_full", "Show less", "Show more", false);</script>';
+					echo '<script>debug_onclick_toggle_div("'.$div_id.','.$div_id.'_full", "Show less", "Show more", false);</script>';
 				}
 				else
 				{
@@ -1566,7 +1566,7 @@ class DB
 						echo '<div id="'.$div_id.'">';
 						echo $this->debug_get_rows_table( 100, true );
 						echo '</div>';
-						echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show EXPLAIN", "Hide EXPLAIN");</script>';
+						echo '<script>debug_onclick_toggle_div("'.$div_id.'", "Show EXPLAIN", "Hide EXPLAIN");</script>';
 					}
 					else
 					{ // TODO: dh> contains html.
@@ -1585,7 +1585,7 @@ class DB
 					echo '<div id="'.$div_id.'">';
 					echo $query['profile'];
 					echo '</div>';
-					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show PROFILE", "Hide PROFILE");</script>';
+					echo '<script>debug_onclick_toggle_div("'.$div_id.'", "Show PROFILE", "Hide PROFILE");</script>';
 				}
 				else
 				{ // TODO: dh> contains html.
@@ -1602,7 +1602,7 @@ class DB
 					echo '<div id="'.$div_id.'">';
 					echo $query['results'];
 					echo '</div>';
-					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show results", "Hide results");</script>';
+					echo '<script>debug_onclick_toggle_div("'.$div_id.'", "Show results", "Hide results");</script>';
 				}
 				else
 				{ // TODO: dh> contains html.
@@ -1619,7 +1619,7 @@ class DB
 					echo '<div id="'.$div_id.'">';
 					echo $query['function_trace'];
 					echo '</div>';
-					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show function trace", "Hide function trace");</script>';
+					echo '<script>debug_onclick_toggle_div("'.$div_id.'", "Show function trace", "Hide function trace");</script>';
 				}
 				else
 				{ // TODO: dh> contains html.

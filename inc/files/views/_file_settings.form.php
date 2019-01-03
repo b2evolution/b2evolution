@@ -33,7 +33,7 @@ global $Settings;
  */
 function JS_showhide_class_on_checkbox( $class, $checkbox_id )
 {
-	return '<script type="text/javascript">
+	return '<script>
     if( document.getElementById("'.$checkbox_id.'").checked )
 		{
  			jQuery(".'.$class.'").show();
@@ -60,7 +60,7 @@ function JS_showhide_ids_on_checkbox( $div_ids, $checkbox_id )
 	{
 		$div_ids = array( $div_ids );
 	}
-	$r = '<script type="text/javascript">
+	$r = '<script>
 		var display = document.getElementById("'.$checkbox_id.'").checked ? "" : "none";'."\n";
 	foreach( $div_ids as $div_id )
 	{
@@ -81,7 +81,7 @@ function JS_showhide_ids_on_checkbox( $div_ids, $checkbox_id )
  */
 function JS_showhide_ffield_on_checkbox( $field_id, $checkbox_id )
 {
-	return '<script type="text/javascript">
+	return '<script>
 		document.getElementById("ffield_'.$field_id.'").style.display = (document.getElementById("'.$checkbox_id.'").checked ? "" : "none")
 	</script>';
 }

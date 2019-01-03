@@ -112,7 +112,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 }
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( 'input[name="repath_method"], input[name="repath_encrypt"]' ).click( function()

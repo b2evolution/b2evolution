@@ -70,7 +70,7 @@ foreach( $steps as $step )
 		.'<b>#'.$step['order'].' '.step_get_type_title( $step['type'] ).':</b><br>'
 			.$step['label']
 		.'</div>'."\n";
-	
+
 }
 echo '</div>';
 echo '</div>';
@@ -79,7 +79,7 @@ echo '</div>';
 // Initialize JavaScript to build and open window:
 echo_modalwindow_js();
 ?>
-<script type="text/javascript">
+<script>
 function evo_add_new_automation_step()
 {
 	openModalWindow( '<span class="loader_img loader_file_edit absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
@@ -108,7 +108,7 @@ function evo_add_new_automation_step()
 
 	return false;
 }
-	
+
 jQuery( document ).ready( function()
 {	// CSS fix to make diagram canvas full height:
 	var min_step_bottom_position = 0;

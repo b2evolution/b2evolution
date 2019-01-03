@@ -1060,7 +1060,7 @@ class test_plugin extends Plugin
 	 */
 	function SkinEndHtmlHead( & $params )
 	{
-		echo '<script type="text/javascript">
+		echo '<script>
 			jQuery( document ).ready( function()
 			{
 				jQuery( "#plugin_test_htsrv_action_'.$this->ID.'" ).click( function()

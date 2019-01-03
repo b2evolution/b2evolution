@@ -195,7 +195,7 @@ class poll_Widget extends ComponentWidget
 				if( empty( $evo_poll_answer_JS_is_initialized ) || $Poll->get( 'max_answers' ) > 1 )
 				{	// Initialize JS code to restrict max answers per user and Fix answer long text width:
 				?>
-				<script type="text/javascript">
+				<script>
 				jQuery( document ).ready( function()
 				{
 					jQuery( '.evo_poll__selector input[type="checkbox"]' ).on( 'click', function()

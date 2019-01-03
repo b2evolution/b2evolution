@@ -192,7 +192,7 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveBut
 
 ?>
 
-<script type="text/javascript">
+<script>
 	jQuery( '#ajax_form_enabled' ).click( function()
 	{
 		if( jQuery( '#ajax_form_enabled' ).attr( "checked" ) )

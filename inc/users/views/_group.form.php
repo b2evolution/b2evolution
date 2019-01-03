@@ -233,7 +233,7 @@ $Form->end_form();
 
 // set shared root permission availability, when form was loaded and when file perms was changed
 ?>
-<script type="text/javascript">
+<script>
 <?php
 global $Settings;
 if( $Settings->get('fm_enable_roots_shared') )

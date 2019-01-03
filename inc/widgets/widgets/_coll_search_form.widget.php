@@ -310,7 +310,7 @@ class coll_search_form_Widget extends ComponentWidget
 				}
 			}
 			?>
-			<script type="text/javascript">
+			<script>
 			jQuery( document ).ready( function()
 			{
 				jQuery( '[data-search-id="<?php echo format_to_js( $this->widget_instance_ID );?>"] #search_author' ).tokenInput(
