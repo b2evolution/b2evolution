@@ -56,7 +56,7 @@ class UserSettings extends AbstractSettings
 		'fold_cmntform_info' => 1,
 		'fold_cmntform_notifications' => 1,
 		'fold_upgrade_backup_options' => 1,
-		'fold_upgrade_file_options' => 1,
+		'fold_upgrade_file_options' => 0,
 		'fold_plugin_vars' => 1,
 		'fold_plugin_events' => 1,
 
