@@ -2802,7 +2802,7 @@ function get_skin_folder_base_version( $skin_folder )
 function download_skin_update( $download_url, $upgrade_file )
 {
 	global $skins_path;
-	list( $base_skin, $skin_version ) = get_skin_folder_base_version( preg_replace( '/(.*)\.zip$/', '$1', $upgrade_file ) );
+	list( $base_skin, $skin_version ) = get_skin_folder_base_version( preg_replace( '/(.+)\.zip$/', '$1', $upgrade_file ) );
 	$upgrade_file = $skins_path.$upgrade_file;
 	$target_dir = $skins_path.$base_skin.'-'.$skin_version.'/';
 
@@ -2871,16 +2871,17 @@ function download_skin_update( $download_url, $upgrade_file )
 		// Set maximum execution time
 		set_max_execution_time( 1800 ); // 30 minutes
 
-		echo '<p>'.sprintf( T_( 'Unpacking package to &laquo;<strong>%s</strong>&raquo;...' ), $target_dir );
+		echo '<p>'.sprintf( T_( 'Unpacking package to %s...' ), '<code>'.$target_dir.'</code>' );
 		evo_flush();
 
 		// Unpack package
 		if( $unzip_success = unpack_archive( $upgrade_file, $temp_dir, true ) )
 		{
 			echo ' OK.</p>';
-			if( file_exists( $temp_dir.$base_skin ) )
+			$temp_skin_dir = $temp_dir.$base_skin.'-'.$skin_version;
+			if( file_exists( $temp_skin_dir ) )
 			{
-				rename( $temp_dir.$base_skin, $target_dir );
+				rename( $temp_skin_dir, $target_dir );
 			}
 			else
 			{

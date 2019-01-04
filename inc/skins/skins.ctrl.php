@@ -331,7 +331,7 @@ switch( $action )
 				$skin_updates = array();
 				foreach( $skin_data->attachments as $attachment )
 				{
-					if( preg_match( '/(.*)?\.zip$/', $attachment->name, $match ) )
+					if( preg_match( '/(.+)\.zip$/', $attachment->name, $match ) )
 					{ // Process only *.zip files
 						list( $base_skin, $skin_version ) = get_skin_folder_base_version( $match[1] );
 						if( $loop_Skin = $SkinCache->get_by_class( $base_skin, false ) )

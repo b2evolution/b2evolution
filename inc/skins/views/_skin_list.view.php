@@ -149,7 +149,7 @@ function skin_td_actions( $row )
 	}
 
 	$url_title = str_replace( '_', '-', strtolower( $row->skin_class ) );
-	$r .= action_icon( TS_('Check for updates'), 'refresh', regenerate_url( '', 'skin_ID='.$row->skin_ID.'&amp;action=check_update&amp;'.url_crumb( 'skin' ) ) );
+	$r .= action_icon( TS_('Check for updates'), 'refresh', regenerate_url( 'skin_ID', 'skin_ID='.$row->skin_ID.'&amp;action=check_update&amp;'.url_crumb( 'skin' ) ) );
 
 	return $r;
 }
