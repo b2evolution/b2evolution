@@ -22,7 +22,7 @@ class markdown_plugin extends Plugin
 	var $code = 'b2evMark';
 	var $name = 'Markdown';
 	var $priority = 20;
-	var $version = '6.10.5';
+	var $version = '6.10.6';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -374,7 +374,7 @@ class markdown_plugin extends Plugin
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		?><script type="text/javascript">
+		?><script>
 		//<![CDATA[
 		var <?php echo $params['js_prefix']; ?>markdown_btns = new Array();
 		var <?php echo $params['js_prefix']; ?>markdown_open_tags = new Array();
@@ -670,7 +670,7 @@ class markdown_plugin extends Plugin
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript"><?php echo $params['js_prefix']; ?>markdown_toolbar( '<?php echo TS_('Markdown').': '; ?>' );</script><?php
+		?><script><?php echo $params['js_prefix']; ?>markdown_toolbar( '<?php echo TS_('Markdown').': '; ?>' );</script><?php
 
 		return true;
 	}

@@ -671,7 +671,7 @@ if( $action != 'view' )
 $Form->end_form();
 
 ?>
-<script type="text/javascript">
+<script>
 	function replace_form_params( result, field_id )
 	{
 		field_id = ( typeof( field_id ) == 'undefined' ? '' : ' id="' + field_id + '"' );
@@ -923,7 +923,7 @@ $Form->end_form();
 	} );
 </script>
 
-<script type="text/javascript">
+<script>
 function bind_autocomplete( field_objs )
 {	// Bind autocomplete plugin event
 	if( field_objs.length > 0 )

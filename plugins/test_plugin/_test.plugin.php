@@ -34,7 +34,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = '6.10.5';
+	var $version = '6.10.6';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -1060,7 +1060,7 @@ class test_plugin extends Plugin
 	 */
 	function SkinEndHtmlHead( & $params )
 	{
-		echo '<script type="text/javascript">
+		echo '<script>
 			jQuery( document ).ready( function()
 			{
 				jQuery( "#plugin_test_htsrv_action_'.$this->ID.'" ).click( function()

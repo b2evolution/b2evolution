@@ -331,7 +331,7 @@ echo '</ul>';
 echo '</div>';
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'input[name=in_skin_editing]' ).click( function()
 {
 	jQuery( 'input[name^=in_skin_editing_]' ).prop( 'disabled', ! jQuery( this ).is( ':checked' ) );

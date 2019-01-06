@@ -211,7 +211,7 @@ if( $params['disp_comment_form'] && ( $params['comment_type'] == 'meta' && $Item
 			$comment_content = param( $dummy_fields[ 'content' ], 'html' );
 			$quoted_comment_ID = param( 'qc', 'integer', 0 );
 			$quoted_post_ID = param( 'qp', 'integer', 0 );
-			if( ! empty( $quoted_comment_ID ) && 
+			if( ! empty( $quoted_comment_ID ) &&
 			    ( $CommentCache = & get_CommentCache() ) &&
 			    ( $quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false ) ) &&
 			    $params['comment_type'] == $quoted_Comment->get( 'type' ) )
@@ -276,7 +276,7 @@ if( $params['disp_comment_form'] && ( $params['comment_type'] == 'meta' && $Item
 	}
 
 /*
-	echo '<script type="text/javascript">
+	echo '<script>
 /* <![CDATA[ *
 function validateCommentForm(form)
 {
@@ -437,7 +437,7 @@ function validateCommentForm(form)
 	$Form->inputstart = $form_inputstart;
 
 	// Set canvas object for plugins:
-	echo '<script type="text/javascript">var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
+	echo '<script>var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
 
 	// CALL PLUGINS NOW:
 	ob_start();
@@ -533,7 +533,7 @@ function validateCommentForm(form)
 		echo $Form->buttonsend;
 	$Form->end_fieldset();
 	?>
-	<script type="text/javascript">
+	<script>
 	jQuery( document ).ready( function() {
 		// Align TinyMCE toggle buttons:
 		jQuery( '.evo_tinymce_toggle_buttons' ).addClass( 'col-sm-offset-3' );

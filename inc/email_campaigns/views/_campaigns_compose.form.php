@@ -77,7 +77,7 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 
 
 	// set b2evoCanvas for plugins:
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "ecmp_email_text" );</script>';
+	echo '<script>var b2evoCanvas = document.getElementById( "ecmp_email_text" );</script>';
 
 	// Display renderers
 	$current_renderers = !empty( $edited_EmailCampaign ) ? $edited_EmailCampaign->get_renderers_validated() : array( 'default' );
@@ -109,7 +109,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 $Form->end_form( $buttons );
 
 ?>
-<script type="text/javascript">
+<script>
 function toggleWYSIWYGSwitch( val )
 {
 	if( val )

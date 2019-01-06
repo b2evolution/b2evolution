@@ -19,7 +19,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for maintenance module to function properly
  */
-$required_php_version[ 'maintenance' ] = '5.4';
+$required_php_version[ 'maintenance' ] = '5.6';
 
 /**
  * Minimum MYSQL version required for maintenance module to function properly

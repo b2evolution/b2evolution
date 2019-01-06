@@ -22,7 +22,7 @@ class shortcodes_plugin extends Plugin
 	var $code = 'evo_shortcodes';
 	var $name = 'Short Codes';
 	var $priority = 40;
-	var $version = '6.10.5';
+	var $version = '6.10.6';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -87,7 +87,7 @@ class shortcodes_plugin extends Plugin
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		?><script type="text/javascript">
+		?><script>
 		//<![CDATA[
 		var shortcodes_buttons = new Array();
 
@@ -138,7 +138,7 @@ class shortcodes_plugin extends Plugin
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript">shortcodes_toolbar( '<?php echo TS_('Shortcodes:'); ?>' );</script><?php
+		?><script>shortcodes_toolbar( '<?php echo TS_('Shortcodes:'); ?>' );</script><?php
 
 		return true;
 	}

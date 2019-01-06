@@ -652,13 +652,14 @@ class EmailCampaign extends DataObject
 			$email_plaintext = preg_replace_callback( '#<a[^>]+href="([^"]+)"[^>]*>([^<]*)</a>#i', array( $this, 'update_plaintext_callback_a' ), $this->get( 'email_html' ) );
 			$email_plaintext = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', ' [ $1 ] ', $email_plaintext );
 			$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
-			$email_plaintext = preg_replace( '#</li>[\s\t]*</ul>#i', '</li></ul>', $email_plaintext );
+			$email_plaintext = preg_replace( '#</li>[\s\t]*</ul>#i', '</li>', $email_plaintext );
 			$email_plaintext = preg_replace_callback( '#<h([1-4])[^>]*>([^<]*)</h\1>#i', array( $this, 'update_plaintext_callback_h' ), $email_plaintext );
 			$email_plaintext = preg_replace( '#<(p|/?h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
 			$email_plaintext = preg_replace( '#<(br|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
-			$email_plaintext = preg_replace( '#<li[^>]*>#i', "- ", $email_plaintext );
+			$email_plaintext = preg_replace( '#<li[^>]*>#i', '- ', $email_plaintext );
 			$email_plaintext = preg_replace( '#<hr ?/?>#i', "\n\n----------------\n\n", $email_plaintext );
-			$email_plaintext = preg_replace( '#[\n\s]{2,}#i', "\n\n", $email_plaintext );
+			$email_plaintext = preg_replace( '#[\n\s]{3,}#i', "\n\n", $email_plaintext );
+			$email_plaintext = str_replace( array( '&ndash;', '&mdash;', '&#8211;', '&#8212;' ), '--', $email_plaintext );
 			$this->set( 'email_plaintext', trim( strip_tags( $email_plaintext ), " \r\n" ) );
 		}
 	}

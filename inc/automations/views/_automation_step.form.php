@@ -192,7 +192,7 @@ if( ! $creating && $display_mode != 'js' )
 	echo_requeue_automation_js();
 }
 ?>
-<script type="text/javascript">
+<script>
 // Suggest default values only for new creating Step:
 <?php if( $edited_AutomationStep->ID > 0 ) { ?>
 set_default_next_step_data = false;

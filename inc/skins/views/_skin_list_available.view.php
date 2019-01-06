@@ -450,7 +450,7 @@ $Form->end_form( $form_buttons );
 $block_item_Widget->disp_template_replaced( 'block_end' );
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#check_all_skins' ).click( function() {
 	jQuery( 'input[name="skin_folders[]"]' ).attr( 'checked', 'checked' );
 } );

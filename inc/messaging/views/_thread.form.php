@@ -161,7 +161,7 @@ $Form->inputstart = $form_inputstart;
 $Form->inputend = $form_inputend;
 
 // set b2evoCanvas for plugins
-echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "msg_text" );</script>';
+echo '<script>var b2evoCanvas = document.getElementById( "msg_text" );</script>';
 
 // Display renderers
 $current_renderers = !empty( $edited_Message ) ? $edited_Message->get_renderers_validated() : array( 'default' );
@@ -212,7 +212,7 @@ $Form->end_form( array(
 if( $params['allow_select_recipients'] )
 {	// User can select recipients
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	check_multiple_recipients();

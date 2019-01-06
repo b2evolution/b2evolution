@@ -536,7 +536,7 @@ echo_regional_required_js( 'ityp_use_' );
 // Initialize JavaScript to build and open window:
 echo_modalwindow_js();
 ?>
-<script type="text/javascript">
+<script>
 function guidGenerator()
 {
 	var S4 = function()

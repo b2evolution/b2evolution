@@ -113,7 +113,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	// Blogs
 	$chart_data[] = array(
-			'title' => T_('Blogs'),
+			'title' => T_('Collections'),
 			'value' => get_table_count( 'T_blogs' ),
 			'type'  => 'number',
 		);
@@ -158,6 +158,30 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 			'title' => T_('Messages'),
 			'value' => get_table_count( 'T_messaging__message' ),
 			'type'  => 'number',
+		);
+
+	// Email Lists
+	$chart_data[] = array(
+			'title' => T_('Email Lists'),
+			'value' => get_table_count( 'T_email__newsletter' ),
+			'type'  => 'number',
+			'max'   => 20,
+		);
+
+	// Campaigns
+	$chart_data[] = array(
+			'title' => T_('Campaigns'),
+			'value' => get_table_count( 'T_email__campaign' ),
+			'type'  => 'number',
+			'max'   => 10000,
+		);
+
+	// Automations
+	$chart_data[] = array(
+			'title' => T_('Automations'),
+			'value' => get_table_count( 'T_automation__automation' ),
+			'type'  => 'number',
+			'max'   => 20,
 		);
 
 	$stat_item_Widget = new Widget( 'block_item' );
@@ -237,7 +261,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 if( ! empty( $chart_data ) )
 { // JavaScript to initialize charts
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'document' ).ready( function()
 {
 	var chart_params = {

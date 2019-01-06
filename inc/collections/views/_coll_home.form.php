@@ -74,7 +74,7 @@ $Form->end_fieldset();
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'input[name=front_disp]' ).click( function()
 {
 	if( jQuery( this ).val() == 'page' )

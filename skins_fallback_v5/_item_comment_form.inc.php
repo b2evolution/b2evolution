@@ -55,7 +55,7 @@ $params = array_merge( array(
 		'comment_text_after'    => '</div>',
 		'comment_info_before'   => '<div class="bCommentSmallPrint">',
 		'comment_info_after'    => '</div>',
-		
+
 	), $params );
 
 $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
@@ -194,7 +194,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			$comment_content = param( $dummy_fields[ 'content' ], 'html' );
 			$quoted_comment_ID = param( 'qc', 'integer', 0 );
 			$quoted_post_ID = param( 'qp', 'integer', 0 );
-			if( ! empty( $quoted_comment_ID ) && 
+			if( ! empty( $quoted_comment_ID ) &&
 			    ( $CommentCache = & get_CommentCache() ) &&
 			    ( $quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false ) ) &&
 			    $params['comment_type'] == $quoted_Comment->get( 'type' ) )
@@ -254,7 +254,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	echo $params['form_title_end'];
 
 /*
-	echo '<script type="text/javascript">
+	echo '<script>
 /* <![CDATA[ *
 function validateCommentForm(form)
 {
@@ -372,7 +372,7 @@ function validateCommentForm(form)
 	$Form->inputstart = $form_inputstart;
 
 	// set b2evoCanvas for plugins
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
+	echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
 
 	// Attach files:
 	if( !empty( $comment_attachments ) )

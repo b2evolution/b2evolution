@@ -90,7 +90,7 @@ if( $new_Item->get_type_setting( 'use_text' ) != 'never' )
 		) );
 	$Form->switch_layout( NULL );
 	?>
-	<script type="text/javascript" language="JavaScript">
+	<script>
 		<!--
 		// This is for toolbar plugins
 		var b2evoCanvas = document.getElementById('itemform_post_content');
@@ -109,7 +109,7 @@ if( $new_Item->get_type_setting( 'use_text' ) != 'never' )
 	echo '</div>';
 
 	// set b2evoCanvas for plugins
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
+	echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
 
 
 	// =================================== INSTRUCTION ====================================

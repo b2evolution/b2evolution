@@ -397,9 +397,9 @@ if( $display != 'cli' )
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="robots" content="noindex, follow" />
 		<title><?php echo format_to_output( T_('b2evo installer').( $title ? ': '.$title : '' ), 'htmlhead' ); ?></title>
-		<script type="text/javascript" src="../rsc/js/jquery.min.js"></script>
+		<script src="../rsc/js/jquery.min.js"></script>
 		<!-- Bootstrap -->
-		<script type="text/javascript" src="../rsc/js/bootstrap/bootstrap.min.js"></script>
+		<script src="../rsc/js/bootstrap/bootstrap.min.js"></script>
 		<link href="../rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
 		<link href="../rsc/build/b2evo_helper_screens.css" rel="stylesheet">
 	</head>
@@ -925,7 +925,7 @@ switch( $action )
 			</p>
 		</form>
 
-		<script type="text/javascript">
+		<script>
 			jQuery( '#create_sample_contents' ).click( function()
 			{
 				jQuery( '#create_sample_contents_options' ).toggle();

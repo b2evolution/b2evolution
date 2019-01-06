@@ -2205,7 +2205,7 @@ class Form extends Widget
 		if( $this->form_type == 'form' )	// DO not do this for div's
 		{	// Initialization of javascript vars used to create parent_child select lists
 			// fp>yura: TODO: does this make sense to add it to every form??
-			$r .= '<script type="text/javascript">
+			$r .= '<script>
 								var nb_dynamicSelects = 0;
 								var tab_dynamicSelects = Array();
 						</script>';
@@ -2217,7 +2217,7 @@ class Form extends Widget
 			&& preg_match( '#^(.*)_checkchanges#', $this->form_name ) )
 		{ // This form will trigger the bozo validator, preset a localized bozo confirm message:
 
-			$r .= '<script type="text/javascript">
+			$r .= '<script>
 					if( typeof bozo == "object" )
 					{ // If Bozo validator is active:
 						bozo.confirm_mess = \'';
@@ -2309,7 +2309,7 @@ class Form extends Widget
 
 			// When the page loads, Initialize all the parent child select lists + other javascripts
 			$r .= '
-				<script type="text/javascript">
+				<script>
 					//<![CDATA[
 					if( typeof init_dynamicSelect == "function" )
 					{
@@ -2758,7 +2758,7 @@ class Form extends Widget
 
 		if( !empty( $field_params['parent'] ) )
 		{ // Set up the dynamic preselection array from the parent to this select list options
-			$r .= "<script type='text/javascript'>
+			$r .= "<script>
 								tab_dynamicSelects[nb_dynamicSelects] = Array();
 								tab_dynamicSelects[nb_dynamicSelects]['parent'] = '".$field_params['parent']."';
 								tab_dynamicSelects[nb_dynamicSelects]['child'] = '$field_name';
@@ -4051,7 +4051,7 @@ class Form extends Widget
 			if( empty( $file_select_js_initialized ) )
 			{
 				$r .= '
-						<script type="text/javascript">
+						<script>
 						var fsel_size, fsel_name, fsel_type, fsel_obj, fsel_replace = false, fsel_title;
 
 						function file_select_attachment_window( event_object, replace_item, fm_highlight )
@@ -4306,7 +4306,7 @@ class Form extends Widget
 
 		if( ! isset( $tag_input_js_initialized[ $field_params['tag_type'] ] ) )
 		{
-			$field_params['input_suffix'] .= '<script type="text/javascript">
+			$field_params['input_suffix'] .= '<script>
 						function init_autocomplete_tags_'.$field_params['tag_type'].'( selector )
 						{
 							var tags = jQuery( selector ).val();
@@ -4338,7 +4338,7 @@ class Form extends Widget
 			$tag_input_js_initialized[ $field_params['tag_type'] ] = true;
 		}
 
-		$field_params['input_suffix'] .= '<script type="text/javascript">
+		$field_params['input_suffix'] .= '<script>
 					jQuery( document ).ready( function()
 					{
 						jQuery( "#'.format_to_js( $field_name ).'" ).hide();

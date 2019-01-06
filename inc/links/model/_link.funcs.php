@@ -230,7 +230,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	// Initialize JavaScript to build and open window:
 	echo_modalwindow_js();
 ?>
-<script type="text/javascript">
+<script>
 function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_highlight )
 {
 	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
@@ -600,7 +600,7 @@ function echo_link_position_js()
 {
 	global $Session;
 ?>
-<script type="text/javascript">
+<script>
 var displayInlineReminder = <?php echo $Session->get( 'display_inline_reminder', 'true' );?>;
 var deferInlineReminder = false;
 
@@ -627,7 +627,7 @@ jQuery( document ).on( 'change', 'select[id^=display_position_]', {
 function echo_link_sortable_js()
 {
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '#attachments_fieldset_table table' ).sortable(

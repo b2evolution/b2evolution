@@ -29,7 +29,7 @@ global $rsc_subdir, $pagenow, $servertimenow, $localtimenow, $date_default_timez
 
 // JavaScript function to calculate time difference: {{{
 ?>
-<script type="text/javascript">
+<script>
 
 var server_Date = new Date();
 server_Date.setTime( <?php echo $servertimenow.'000' ?> ); // milliseconds

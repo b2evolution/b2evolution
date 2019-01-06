@@ -66,7 +66,7 @@ $Form->end_form( array(
 	) );
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#evo_add_tied_list' ).click( function()
 {
 	var list_num = jQuery( '[name="aunl_enlt_ID[]"]' ).length + 1;

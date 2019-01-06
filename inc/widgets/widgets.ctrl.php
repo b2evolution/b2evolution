@@ -711,7 +711,7 @@ switch( $action )
 		$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );
 		echo '</div></div>'."\n";
 		echo '
-		<script type="text/javascript">
+		<script>
 			<!--
 			var blog = '.$Blog->ID.';
 			// -->

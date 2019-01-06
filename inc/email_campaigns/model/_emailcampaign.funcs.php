@@ -332,7 +332,7 @@ function campaign_results_block( $params = array() )
 
 	$params = array_merge( array(
 		'enlt_ID'               => NULL,
-		'results_title'         => T_('Email campaigns').get_manual_link( 'email-campaigns' ),
+		'results_title'         => T_('Email campaigns').get_manual_link( 'email-campaign-list' ),
 		'display_create_button' => true
 	), $params );
 

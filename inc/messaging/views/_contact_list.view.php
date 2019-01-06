@@ -494,7 +494,7 @@ if( count( $Results->rows ) > 0 )
 	$Form->switch_layout( NULL );
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#send_selected_recipients' ).click( function()
 { // Add selected users to this link
 	var recipients_param = '';

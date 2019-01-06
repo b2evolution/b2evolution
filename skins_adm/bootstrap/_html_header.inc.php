@@ -79,7 +79,7 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 		// gets initialized in _footer.php
 
 		$begin_script = <<<JS
-		<script type="text/javascript">
+		<script>
 		<!--
 		  var allchecked = Array();
 		  var idprefix;

@@ -58,12 +58,13 @@
 .jtk-label {
 	padding: 3px 3px 23px 3px;
 	font: 12px sans-serif;
-		font-weight: bold;
+	font-weight: bold;
 	color: #333;
 	z-index: 21;
 	opacity: 0.8;
 	cursor: pointer;
-		color: #61bd4f;
+	color: #61bd4f;
+	text-shadow: 1px 1px #fff, -1px -1px #fff, -1px 1px #fff, 1px -1px #fff;
 }
 .jtk-label.jtk-label-no {
 	padding-top: 23px;
@@ -79,6 +80,8 @@
 	border: 1px solid white;
 	border-radius: 5px;
 	padding: 3px;
+	text-shadow: none;
+	z-index: 100000;
 }
 .jtk-label.jtk-hover.jtk-label-no {
 	background-color: #0079bf;

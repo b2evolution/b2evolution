@@ -3054,15 +3054,21 @@ function update_anon_user_email_counter( $comment_ID )
  * @param boolean TRUE if user email is changed
  * @param string URL, where to redirect the user after he clicked the validation link (gets saved in Session).
  * @param boolean|string 'cron_job' - to log messages for cron job, FALSE - to don't log
+ * @param string Email template name: 'account_activate', 'account_delete_warning'
  * @return integer the number of successfully sent emails
  */
-function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_changed = false, $redirect_to_after = NULL, $log_messages = false )
+function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_changed = false, $redirect_to_after = NULL, $log_messages = false, $email_template_name = 'account_activate' )
 {
 	global $UserSettings, $Session, $servertimenow;
 
+	if( empty( $user_ids ) )
+	{	// No users to send:
+		return 0;
+	}
+
 	$UserCache = & get_UserCache();
 
-	if( isset( $GLOBALS['messaging_Module'] ) )
+	if( isset( $GLOBALS['messaging_Module'] ) && $email_template_name == 'account_activate' )
 	{ // Get already received messages for each recepient user:
 		$already_received_messages = get_users_unread_threads( $user_ids, NULL, 'string', 'text', 'http:' );
 	}
@@ -3123,7 +3129,7 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 		// Update notification sender's info from General settings
 		$User->update_sender( true );
 
-		if( send_mail_to_User( $User->ID, $cache_by_locale[$notify_locale]['subject'], 'account_activate', $email_template_params, true ) )
+		if( send_mail_to_User( $User->ID, $cache_by_locale[$notify_locale]['subject'], $email_template_name, $email_template_params, true ) )
 		{ // save corresponding user settings right after the email was sent, to prevent not saving if an eroor occurs
 			$email_sent++;
 			// Set last remind activation email date and increase sent reminder emails number in UserSettings
@@ -3819,7 +3825,7 @@ function callback_filter_userlist( & $Form )
 	if( user_region_visible() )
 	{	// JS functions for AJAX loading of regions, subregions & cities
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#country' ).change( function()
 {
 	var this_obj = jQuery( this );
@@ -4008,7 +4014,7 @@ function load_cities( country_ID, region_ID, subregion_ID )
 					'operators'   => 'user_tagged,user_not_tagged',
 				);
 ?>
-<script type="text/javascript">
+<script>
 function evo_get_filter_user_tags( rule )
 {
 	var input_name = rule.$el.find( ".rule-value-container input" ).attr( "name" );
@@ -4978,7 +4984,7 @@ function echo_user_report_window()
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_report.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_report_user = \''.TS_('Report User').'\';
 		var evo_js_lang_report_this_user_now = \''.TS_('Report this user now!').'\';
@@ -5001,7 +5007,7 @@ function echo_user_contact_groups_window()
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_contact_groups.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_contact_groups = \''.TS_('Contact Groups').'\';
 		var evo_js_lang_save = \''.TS_('Save').'\';
@@ -5023,7 +5029,7 @@ function echo_user_crop_avatar_window()
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_crop.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_crop_profile_pic = \''.TS_('Crop profile picture').'\';
 		var evo_js_lang_crop = \''.TS_('Apply').'\';
@@ -5049,7 +5055,7 @@ function echo_user_deldata_js( $params = array() )
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_deldata.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_delete_user_data = \''.TS_('Delete user data').get_manual_link( 'delete-user-data' ).'\';
 		var evo_js_lang_delete_selected_data = \''.TS_('Delete selected data').'\';
@@ -5071,7 +5077,7 @@ function echo_user_automation_js()
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_deldata.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_add_user_to_automation = \''.TS_('Add user to an automation...').get_manual_link( 'add-user-to-automation' ).'\';
 		var evo_js_lang_add = \''.TS_('Add').'\';
@@ -5093,7 +5099,7 @@ function echo_userlist_automation_js()
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_deldata.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_add_current_selection_to_automation = \''.TS_('Add users to Automation...').get_manual_link( 'add-users-list-to-automation' ).'\';
 		var evo_js_lang_add_selected_users_to_automation = \''.TS_('Add selected users to "%s"').'\';
@@ -5115,7 +5121,7 @@ function echo_userlist_tags_js()
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_deldata.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_add_remove_tags_to_users = \''.TS_('Add/Remove tags...').get_manual_link( 'add-remove-user-tags' ).'\';
 		var evo_js_lang_make_changes_now = \''.TS_('Make changes now!').'\';
@@ -5175,7 +5181,7 @@ function user_report_form( $params = array() )
 		if( $use_js )
 		{
 			$report_content = str_replace( '$report_info_content$', '', $report_content );
-			$report_content .= '<script type="text/javascript">
+			$report_content .= '<script>
 				var info_content = \''.$info_content.'\';
 				jQuery("#report_user_status").change( function() {
 					var report_info = jQuery("#report_info");
@@ -5222,7 +5228,7 @@ function echo_user_organization_js()
 		return;
 	}
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).on( 'click', 'span[rel^=org_status_]', function()
 { // Change an accept status of organization
 	var this_obj = jQuery( this );
@@ -5265,7 +5271,7 @@ function echo_user_add_organization_js( $edited_Organization )
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_deldata.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_add_user_to_organization = \''.TS_('Add user to organization').get_manual_link( 'add-user-organization' ).'\';
 		var evo_js_lang_add = \''.TS_('Add').'\';
@@ -5292,7 +5298,7 @@ function echo_user_edit_membership_js( $edited_Organization )
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_deldata.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_edit_membership = \''.TS_('Edit membership').get_manual_link( 'edit-user-membership' ).'\';
 		var evo_js_lang_edit = \''.TS_('Edit').'\';
@@ -5320,7 +5326,7 @@ function echo_user_remove_membership_js( $edited_Organization )
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_deldata.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_remove_user_membership = \''.TS_('WARNING').'\';
 		var evo_js_lang_remove = \''.TS_('Continue').'\';
@@ -8168,7 +8174,7 @@ function display_user_groups_selectors( & $User, & $Form )
 		) );
 	echo '</div>';
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).on( 'click', '.add_secondary_group', function()
 {	// Add new select element for new secondary group:
 	var current_fieldset = jQuery( this ).closest( '[id^=ffield_]' );

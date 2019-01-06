@@ -1001,7 +1001,7 @@ function echo_progress_log_update( $progress_log_id, $done, $all )
 {
 	echo '<span class="function_echo_progress_log_update">';
 	?>
-	<script type="text/javascript">
+	<script>
 		jQuery('.function_echo_progress_log_update').remove();
 		jQuery( '#' + '<?php echo $progress_log_id; ?>' ).html("<?php echo ' '.$done.' / '.$all ?>");
 	</script>

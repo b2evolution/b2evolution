@@ -209,7 +209,7 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 	{
 		$blog_urlname = $action == 'copy' ? NULL : $edited_Blog->get( 'urlname' );
 		?>
-		<script type="text/javascript">
+		<script>
 		var shortNameInput = jQuery( '#blog_shortname');
 		var timeoutId = 0;
 
@@ -447,7 +447,7 @@ $Form->buttons( array( array( 'submit', 'submit', ( $action == 'copy' ? T_('Dupl
 $Form->end_form();
 
 ?>
-<script type="text/javascript">
+<script>
 
 function updateDemoContentInputs()
 {
