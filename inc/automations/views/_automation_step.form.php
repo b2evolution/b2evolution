@@ -32,7 +32,7 @@ if( $display_mode != 'js' )
 	$Form->global_icon( T_('Cancel editing').'!', 'close', $edit_automation_url );
 }
 
-$Form->begin_form( 'fform', $display_mode == 'js' ? '' : sprintf( $creating ? ( $edited_AutomationStep->ID > 0 ? T_('Duplicate step') : T_('New step') ) : T_('Step') ).get_manual_link( 'automation-step-form' ) );
+$Form->begin_form( 'fform', $display_mode == 'js' ? '' : sprintf( $creating ? ( $edited_AutomationStep->ID > 0 ? T_('Duplicate step') : T_('New step') ) : T_('Step') ).get_manual_link( 'automation-step-details' ) );
 
 $Form->add_crumb( 'automationstep' );
 $Form->hidden( 'action', $creating ? ( $edited_AutomationStep->ID > 0 ? 'duplicate_step' : 'create_step' ) : 'update_step' );
