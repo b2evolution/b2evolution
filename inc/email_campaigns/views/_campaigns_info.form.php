@@ -128,7 +128,9 @@ $Form->begin_fieldset( T_('Automations').get_manual_link( 'campaign-automations-
 	foreach( $automation_options as $automation_option )
 	{
 		$Form->begin_line( $automation_option[0] );
-			$Form->select_input_object( 'ecmp_'.$automation_option[1], $edited_EmailCampaign->get( $automation_option[1] ), $AutomationCache, '', array( 'allow_none' => true ) );
+			$action_autm_ID = $edited_EmailCampaign->get( $automation_option[1] );
+			$Form->select_input_object( 'ecmp_'.$automation_option[1], $action_autm_ID, $AutomationCache, '', array( 'allow_none' => true ) );
+			echo action_icon( T_('Steps'), 'edit', $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=steps&amp;autm_ID='.$action_autm_ID, NULL, NULL, NULL, empty( $action_autm_ID ) ? array( 'style' => 'display:none' ) : array() );
 			$Form->checkbox_input( 'ecmp_'.$automation_option[2], $edited_EmailCampaign->get( $automation_option[2] ), '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.T_('Execute first step(s) immediately').'</label> &nbsp; ' ) );
 		$Form->end_line();
 	}
@@ -142,3 +144,17 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 $Form->end_form( $buttons );
 
 ?>
+<script>
+jQuery( 'select[name$=_autm_ID]' ).change( function()
+{	// Show/Hide icon to view automation steps:
+	var edit_icon = jQuery( this ).next( 'a' );
+	if( jQuery( this ).val() > 0 )
+	{
+		edit_icon.show().attr( 'href', '<?php echo $admin_url; ?>?ctrl=automations&action=edit&tab=steps&autm_ID=' + jQuery( this ).val() );
+	}
+	else
+	{
+		edit_icon.hide();
+	}
+} );
+</script>
