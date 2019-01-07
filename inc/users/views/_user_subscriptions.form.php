@@ -417,7 +417,7 @@ if( $notifications_mode != 'off' )
 			$Form->checklist( $post_subs, 'item_subscriptions', $blog_name );
 		}
 		$Form->hidden( 'subs_item_IDs', implode( ',', $subs_item_IDs ) );
-		$Form->info_field( '', T_( 'To subscribe to notifications on a specifc post, go to that post and click "Notify me when someone comments" at the end of the comment list.' ), array( 'class' => 'info_full' ) );
+		$Form->info_field( '', T_( 'To subscribe to notifications on a specifc post, go to that post and click "Notify me by email when someone comments here." at the end of the comment list.' ), array( 'class' => 'info_full' ) );
 
 	$Form->end_fieldset();
 }

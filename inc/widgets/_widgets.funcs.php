@@ -133,7 +133,9 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['comment_area'] = array(
 		array( 10, 'item_comment_form' ),
 		array( 20, 'item_comment_notification' ),
-		array( 30, 'item_comment_feed_link' ),
+		array( 30, 'coll_item_notification' ),
+		array( 40, 'coll_comment_notification' ),
+		array( 50, 'item_comment_feed_link' ),
 	);
 
 	/* Sidebar Single */

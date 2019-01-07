@@ -148,6 +148,8 @@ $core_componentwidget_defs = array(
 			'coll_subscription',
 			'coll_activity_stats',
 			'cat_title',
+			'coll_item_notification',
+			'coll_comment_notification',
 		),
 	'user' => array(
 			'user_avatars',

@@ -1,11 +1,11 @@
 <?php
 /**
- * This file implements the item_comment_notification Widget class.
+ * This file implements the coll_item_notification Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2013 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -32,7 +32,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class item_comment_notification_Widget extends ComponentWidget
+class coll_item_notification_Widget extends ComponentWidget
 {
 	var $icon = 'file-text';
 
@@ -42,7 +42,7 @@ class item_comment_notification_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'item_comment_notification' );
+		parent::__construct( $db_row, 'core', 'coll_item_notification' );
 	}
 
 
@@ -53,7 +53,7 @@ class item_comment_notification_Widget extends ComponentWidget
 	 */
 	function get_help_url()
 	{
-		return get_manual_url( 'item-comment-notification-widget' );
+		return get_manual_url( 'coll-item-notification-widget' );
 	}
 
 
@@ -62,7 +62,7 @@ class item_comment_notification_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Comment Notification');
+		return T_('Collection Item Notification');
 	}
 
 
@@ -71,7 +71,7 @@ class item_comment_notification_Widget extends ComponentWidget
 	 */
 	function get_short_desc()
 	{
-		return format_to_output( T_('Item Comment Notification') );
+		return format_to_output( T_('Collection Item Notification') );
 	}
 
 
@@ -80,7 +80,7 @@ class item_comment_notification_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display item comment notification.');
+		return T_('Display collection item notification.');
 	}
 
 
@@ -149,115 +149,117 @@ class item_comment_notification_Widget extends ComponentWidget
 			return false;
 		}
 
+		if( empty( $Blog ) )
+		{
+			$Blog = $Item->get_Blog();
+		}
+
 		// Default renderers:
 		$comment_renderers = array( 'default' );
 
 		$this->init_display( $params );
 
 		$params = array_merge( array(
-			'widget_item_comment_notification_display' => true,
-			'widget_item_comment_notification_params'  => array(),
+			'widget_coll_item_notification_display' => true,
+			'widget_coll_item_notification_params'  => array(),
 		), $params );
 
 		$widget_params = array_merge( array(
-				'notification_before' => '<nav class="evo_post_comment_notification">',
-				'notification_text'   => T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' ),
-				'notification_text2'  => T_( 'You will be notified by email when someone comments here.' ),
-				'notification_text3'  => T_( 'Notify me by email when someone comments here.' ),
+				'notification_before' => '<nav class="evo_post_notification">',
+				'notification_subscribe_text' => T_('Notify me about all new posts (in this collection).'),
+				'notification_unsubscribe_text' => T_('Unsubscribe from notifications about new posts.'),
 				'notification_after'  => '</nav>',
-			), $params['widget_item_comment_notification_params'] );
+			), $params['widget_coll_item_notification_params'] );
 
-		if( $params['widget_item_comment_notification_display'] && is_logged_in() && $Item->can_comment( NULL ) )
+		if( $params['widget_coll_item_notification_display'] && is_logged_in() && $Item->can_comment( NULL ) )
 		{
 			global $DB;
 			global $UserSettings;
 
-			echo $this->disp_params['block_start'];
-			$this->disp_title();
-			echo $this->disp_params['block_body_start'];
-			echo $widget_params['notification_before'];
-
 			$notification_icon = get_icon( 'notification' );
+
 			$not_subscribed = true;
 			$creator_User = $Item->get_creator_User();
 
-			if( $Blog->get_setting( 'allow_item_subscriptions' ) )
+			if( $Blog->get_setting( 'allow_subscriptions' ) )
 			{
-				$sql = 'SELECT count( isub_user_ID )
+				$sql = 'SELECT count( sub_user_ID )
 								FROM (
-									SELECT DISTINCT isub_user_ID
-									FROM T_items__subscriptions
-									WHERE isub_user_ID = '.$current_User->ID.' AND isub_item_ID = '.$Item->ID.' AND isub_comments <> 0
+									SELECT DISTINCT sub_user_ID
+									FROM T_subscriptions
+									WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_items <> 0
 
 									UNION
 
 									SELECT user_ID
 									FROM T_coll_settings AS opt
 									INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
-									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
+									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
 									LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
 									LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
-									LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$Item->ID.' AND isub_user_ID = user_ID )
+									LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = user_ID )
 									WHERE opt.cset_coll_ID = '.$Blog->ID.'
-										AND opt.cset_name = "opt_out_item_subscription"
+										AND opt.cset_name = "opt_out_subscription"
 										AND opt.cset_value = 1
 										AND user_ID = '.$current_User->ID.'
-										AND ( isub_comments IS NULL OR isub_comments <> 0 )
+										AND ( sub_items IS NULL OR sub_items <> 0 )
 
 									UNION
 
 									SELECT sug_user_ID
 									FROM T_coll_settings AS opt
 									INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
-									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
+									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
 									LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
 									LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
-									LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$Item->ID.' AND isub_user_ID = sug_user_ID )
+									LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
 									WHERE opt.cset_coll_ID = '.$Blog->ID.'
-										AND opt.cset_name = "opt_out_item_subscription"
+										AND opt.cset_name = "opt_out_subscription"
 										AND opt.cset_value = 1
 										AND sug_user_ID = '.$current_User->ID.'
-										AND ( isub_comments IS NULL OR isub_comments <> 0 )
+										AND ( sub_items IS NULL OR sub_items <> 0 )
+
 									UNION
 
 									SELECT bloguser_user_ID
 									FROM T_coll_settings AS opt
 									INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
-									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_item_subscriptions" AND sub.cset_value = 1 )
+									INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
 									LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
-									LEFT JOIN T_items__subscriptions ON ( isub_item_ID = '.$Item->ID.' AND isub_user_ID = bloguser_user_ID )
+									LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = bloguser_user_ID )
 									WHERE opt.cset_coll_ID = '.$Blog->ID.'
-										AND opt.cset_name = "opt_out_item_subscription"
+										AND opt.cset_name = "opt_out_subscription"
 										AND opt.cset_value = 1
 										AND bloguser_user_ID = '.$current_User->ID.'
-										AND ( isub_comments IS NULL OR isub_comments <> 0 )
+										AND ( sub_items IS NULL OR sub_items <> 0 )
 								) AS users';
+
+				echo $this->disp_params['block_start'];
+				$this->disp_title();
+				echo $this->disp_params['block_body_start'];
+
+				echo $widget_params['notification_before'];
 
 				if( $DB->get_var( $sql ) > 0 )
 				{
-					echo '<p class="text-center">'.$notification_icon.' <span>'.T_( 'You are receiving notifications when anyone comments on this post.' );
-					echo ' <a href="'.get_htsrv_url().'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></span></p>';
-					$not_subscribed = false;
+					echo '<p class="text-center"><a href="'.get_htsrv_url().'action.php?mname=collections&action=subs_update&subscribe_blog='.$Blog->ID.'&amp;sub_items=0&amp;'.url_crumb( 'collections_subs_update' ).'" class="btn btn-default">'.$notification_icon.' '.$widget_params['notification_unsubscribe_text'].'</a></p>';
 				}
-			}
+				else
+				{
+					echo '<p class="text-center"><a href="'.get_htsrv_url().'action.php?mname=collections&action=subs_update&subscribe_blog='.$Blog->ID.'&amp;sub_items=1&amp;'.url_crumb( 'collections_subs_update' ).'" class="btn btn-default">'.$notification_icon.' '.$widget_params['notification_subscribe_text'].'</a></p>';
+				}
 
-			if( $not_subscribed && ( $creator_User->ID == $current_User->ID ) && ( $UserSettings->get( 'notify_published_comments', $current_User->ID ) != 0 ) )
+				echo $widget_params['notification_after'];
+				echo $this->disp_params['block_body_end'];
+				echo $this->disp_params['block_end'];
+
+				return true;
+			}
+			else
 			{
-				echo '<p class="text-center">'.$notification_icon.' <span>'.$widget_params['notification_text'];
-				echo ' <a href="'.$Blog->get('subsurl').'">'.T_( 'Click here to manage your subscriptions.' ).'</a></span></p>';
-				$not_subscribed = false;
+				$this->display_debug_message();
+				return false;
 			}
-
-			if( $not_subscribed && $Blog->get_setting( 'allow_item_subscriptions' ) )
-			{
-				echo '<p class="text-center"><a href="'.get_htsrv_url().'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'" class="btn btn-default">'.$notification_icon.' '.$widget_params['notification_text3'].'</a></p>';
-			}
-
-			echo $widget_params['notification_after'];
-			echo $this->disp_params['block_body_end'];
-			echo $this->disp_params['block_end'];
-
-			return true;
 		}
 		else
 		{
