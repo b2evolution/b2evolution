@@ -261,13 +261,10 @@ class EmailCampaign extends DataObject
 			$new_users_SQL->WHERE( 'user_ID IN ( '.$DB->quote( $filtered_users_IDs ).' )' );
 			$new_users_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 			$new_users_SQL->WHERE_and( 'enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
-			$new_users = $DB->get_col( $new_users_SQL->get(), 0, $new_users_SQL->title );
+			$new_users = $DB->get_col( $new_users_SQL );
 
-			// Remove the filtered recipients which didn't receive email newsletter yet:
-			$this->remove_recipients();
-
-			// Get users which already received email newsletter:
-			$old_users = $this->get_recipients( 'receive' );
+			// Get all send statuses per users of this email campaign in order to don't insert the data twice:
+			$old_users = $this->get_recipients( 'full_all' );
 
 			// Exclude old users from new users (To store value of csnd_emlog_ID):
 			$new_users = array_diff( $new_users, $old_users );
@@ -279,7 +276,7 @@ class EmailCampaign extends DataObject
 				{
 					$insert_SQL .= "\n".'( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', "ready_to_send" ),';
 				}
-				$DB->query( substr( $insert_SQL, 0, -1 ) );
+				$DB->query( substr( $insert_SQL, 0, -1 ).' ON DUPLICATE KEY UPDATE csnd_camp_ID = csnd_camp_ID, csnd_user_ID = csnd_user_ID' );
 			}
 		}
 	}
