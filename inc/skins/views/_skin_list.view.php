@@ -27,18 +27,22 @@ if( ! empty( $template_action ) )
 		case 'show_skin_updates':
 			global $skin_updates;
 
-			$block_item_Widget->title = T_('Updates are available');
-			$block_item_Widget->disp_template_replaced( 'block_start' );
-			evo_flush();
-			echo T_('Select which update you want to download:');
-			echo '<ul>';
-			foreach( $skin_updates as $update )
+			if( $skin_updates )
 			{
-				$target_file = $update['class'].'-'.$update['version'].'.zip';
-				$download_url = regenerate_url( 'skin_ID', 'action=download_use_skin&amp;file='.rawurlencode( $update['url'] ).'&amp;target='.rawurlencode( $target_file ).'&amp;'.url_crumb( 'skin' ) );
-				echo '<li>'.action_icon( TS_('Download file'), 'download', $download_url ).'<a href="'.$download_url.'">'.$update['name'].'</a></li>';
+				$block_item_Widget->title = T_('Updates are available');
+				$block_item_Widget->disp_template_replaced( 'block_start' );
+				evo_flush();
+				echo T_('Select which update you want to download:');
+				echo '<ul>';
+				foreach( $skin_updates as $update )
+				{
+					$target_file = $update['class'].'-'.$update['version'].'.zip';
+					$download_url = regenerate_url( 'skin_ID', 'action=download_use_skin&amp;file='.rawurlencode( $update['url'] ).'&amp;target='.rawurlencode( $target_file ).'&amp;'.url_crumb( 'skin' ) );
+					echo '<li>'.action_icon( TS_('Download file'), 'download', $download_url ).'<a href="'.$download_url.'">'.$update['name'].'</a></li>';
+				}
+				echo '</ul>';
+				$block_item_Widget->disp_template_raw( 'block_end' );
 			}
-			echo '</ul>';
 			break;
 
 		case 'download_skin_update':
@@ -48,10 +52,9 @@ if( ! empty( $template_action ) )
 			$download_url = param( 'file', 'url', true );
 			$target = param( 'target', 'string', true );
 			download_skin_update( $download_url, $target );
+			$block_item_Widget->disp_template_raw( 'block_end' );
 			break;
 	}
-
-	$block_item_Widget->disp_template_raw( 'block_end' );
 }
 
 // Create result set:

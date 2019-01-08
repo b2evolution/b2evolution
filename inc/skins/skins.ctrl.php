@@ -339,9 +339,9 @@ switch( $action )
 							if( evo_version_compare( $skin_version, $edited_Skin->version, '>' ) )
 							{ // Add only updates with skin version > current skin's version
 								$skin_updates[] = array(
-										'name' => $attachment->name,
-										'class' => $base_skin,
-										'url' => $attachment->url,
+										'name'    => $attachment->name,
+										'class'   => $base_skin,
+										'url'     => $attachment->url,
 										'version' => $skin_version
 									);
 							}
@@ -350,7 +350,7 @@ switch( $action )
 				}
 
 				if( ! empty( $skin_updates ) )
-				{ // There are skin updates available
+				{	// There are skin updates available
 					$template_action = 'show_skin_updates';
 				}
 				else

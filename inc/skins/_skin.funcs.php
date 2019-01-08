@@ -2799,9 +2799,17 @@ function get_skin_folder_base_version( $skin_folder )
 	return array( $base_skin, $skin_version );
 }
 
+
+/**
+ * Download skin update
+ *
+ * @param string Download URL
+ * @param string Filename of upgrade file
+ */
 function download_skin_update( $download_url, $upgrade_file )
 {
 	global $skins_path;
+
 	list( $base_skin, $skin_version ) = get_skin_folder_base_version( preg_replace( '/(.+)\.zip$/', '$1', $upgrade_file ) );
 	$upgrade_file = $skins_path.$upgrade_file;
 	$target_dir = $skins_path.$base_skin.'-'.$skin_version.'/';
@@ -2809,21 +2817,27 @@ function download_skin_update( $download_url, $upgrade_file )
 	$skip_download = false;
 	$skip_unzip = false;
 	$skip_change_skin = false;
-	$download_success = true;
+	$download_success = false;
 	$unzip_success = true;
 
 	if( file_exists( $upgrade_file ) )
-	{ // The downloading file already exists
-		echo '<p>'.sprintf( T_( 'The package %s is already downloaded.' ), $upgrade_file ).'</p>';
+	{	// Package file has already been downloaded:
+		echo '<p>'.sprintf( T_('The package %s has already been downloaded.'), $upgrade_file ).'</p>';
 		$skip_download = true;
+		$download_success = true;
 		evo_flush();
 	}
 
 	if( file_exists( $target_dir ) )
 	{
-		echo '<p>'.sprintf( T_( 'The skin folder %s already exists.' ), $target_dir ).'</p>';
-		$skip_download = true;
-		$skip_unzip = true;
+		echo '<p>'.sprintf( T_('Skin folder %s already exists.'), $target_dir ).'</p>';
+		if( ! is_empty_directory( $target_dir ) )
+		{	// Only skip download and unzip if the target dir is not empty:
+			$skip_download = true;
+			$download_success = true;
+			$skip_unzip = true;
+			$unzip_success = true;
+		}
 		evo_flush();
 	}
 
@@ -2833,7 +2847,7 @@ function download_skin_update( $download_url, $upgrade_file )
 		// Set maximum execution time
 		set_max_execution_time( 1800 ); // 30 minutes
 
-		echo '<p>'.sprintf( T_( 'Downloading package to &laquo;<strong>%s</strong>&raquo;...' ), $skins_path );
+		echo '<p>'.sprintf( T_('Downloading update package from %s...'), '<code>'.$download_url.'</code>' );
 		evo_flush();
 
 		// Download
@@ -2842,23 +2856,24 @@ function download_skin_update( $download_url, $upgrade_file )
 		if( $info['status'] != 200 || empty( $file_contents ) )
 		{
 			$download_success = false;
-			echo '</p><p style="color:red">'.sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $download_url ).'</p>';
+			echo '</p><p style="color:red">'.sprintf( T_('Unable to download package from %s'), '<code>'.$download_url.'</code>' ).'</p>';
 		}
 		elseif( ! save_to_file( $file_contents, $upgrade_file, 'w' ) )
 		{
 			$download_success = false;
-			echo '</p><p style="color:red">'.sprintf( T_( 'Unable to create file: &laquo;%s&raquo;' ), $upgrade_file ).'</p>';
+			echo '</p><p style="color:red">'.sprintf( T_('Unable to create file: %s'), '<code>'.$upgrade_file.'</code>' ).'</p>';
 
 			if( file_exists( $upgrade_file ) )
-			{ // Remove file from disk
+			{	// Remove file from disk
 				if( ! @unlink( $upgrade_file ) )
 				{
-					echo '<p style="color:red">'.sprintf( T_( 'Unable to remove file: &laquo;%s&raquo;' ), $upgrade_file ).'</p>';
+					echo '<p style="color:red">'.sprintf( T_('Unable to remove file: %s'), '<code>'.$upgrade_file.'</code>' ).'</p>';
 				}
 			}
 		}
 		else
-		{ // The package is downloaded successfully
+		{	// The package was successfully downloaded
+			$download_success = true;
 			echo ' OK '.bytesreadable( filesize( $upgrade_file ), false, false ).'.</p>';
 		}
 		evo_flush();
@@ -2871,7 +2886,7 @@ function download_skin_update( $download_url, $upgrade_file )
 		// Set maximum execution time
 		set_max_execution_time( 1800 ); // 30 minutes
 
-		echo '<p>'.sprintf( T_( 'Unpacking package to %s...' ), '<code>'.$target_dir.'</code>' );
+		echo '<p>'.sprintf( T_('Unpacking package to %s...'), '<code>'.$target_dir.'</code>' );
 		evo_flush();
 
 		// Unpack package
@@ -2886,16 +2901,16 @@ function download_skin_update( $download_url, $upgrade_file )
 			else
 			{
 				echo '</p>';
-				echo '<p style="color:red">'.sprintf( T_('Package does not contain skin folder &laquo;%s&raquo;'), $base_skin ).'</p>';
+				echo '<p style="color:red">'.sprintf( T_('Package does not contain skin folder %s'), '<code>'.$base_skin.'</code>' ).'</p>';
 			}
 			if( ! rmdir_r( $temp_dir ) )
 			{
-				echo '<p style="color:red">'.sprintf( T_( 'Unable to remove file: &laquo;%s&raquo;' ), $temp_dir ).'</p>';
+				echo '<p style="color:red">'.sprintf( T_('Unable to remove temporary skin folder: %s'), '<code>'.$temp_dir.'</code>' ).'</p>';
 			}
 		}
 		else
 		{
-			echo '</p>';
+			echo ' Failed.</p>';
 		}
 		evo_flush();
 	}
