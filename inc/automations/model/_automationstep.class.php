@@ -719,9 +719,12 @@ class AutomationStep extends DataObject
 						$step_result = 'ERROR';
 						$additional_result_message = 'Status of admin user account cannot be changed';
 					}
-					elseif( $current_status == 'closed' )
-					{	// If step User's account is already closed:
+					elseif( $current_status == $new_status )
+					{	// If step User's account is already in the desired status:
 						$step_result = 'NO';
+						// Display status title in log:
+						$user_statuses = get_user_statuses();
+						$additional_result_message = ( isset( $user_statuses[ $new_status ] ) ? $user_statuses[ $new_status ] : $new_status );
 					}
 					else
 					{	// Change user account to another status:

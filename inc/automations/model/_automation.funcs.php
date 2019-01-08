@@ -281,7 +281,7 @@ function step_get_result_titles()
 		),
 		'user_status' => array(
 			'YES'   => 'User account status was changed to %s',
-			'NO'    => 'User account is already closed',
+			'NO'    => 'User account is already in the desired status %s',
 			'ERROR' => 'ERROR: %s',
 		),
 	);
@@ -338,7 +338,7 @@ function step_get_result_labels()
 		),
 		'user_status' => array(
 			'YES'   => NT_('Next step if User account status was changed successfully'),
-			'NO'    => NT_('Next step if User account is already closed'),
+			'NO'    => NT_('Next step if User account is already in the desired status'),
 			'ERROR' => NT_('Next step if User account status cannot be changed'),
 		),
 	);

@@ -88,7 +88,7 @@ $Form->select_input_object( 'step_automation', $automation_ID, $AutomationCache,
 $step_user_status = ( $edited_AutomationStep->get( 'type' ) == 'user_status' ? $edited_AutomationStep->get( 'info' ) : '' );
 $user_statuses = get_user_statuses();
 unset( $user_statuses['new'] );
-$Form->select_input_array( 'user_status', $step_user_status, $user_statuses, T_('Account status'), T_('If the user account is already closed when the step is executed, the status will <b>NOT</b> be changed.'), array( 'required' => true, 'allow_none' => true ) );
+$Form->select_input_array( 'user_status', $step_user_status, $user_statuses, T_('Account status'), T_('If the user account is already in the desired status when the step is executed, the status will <b>NOT</b> be changed.'), array( 'required' => true, 'allow_none' => true ) );
 
 // Load all steps of the edited step's automation excluding current step:
 $AutomationStepCache = & get_AutomationStepCache();
@@ -314,6 +314,7 @@ function step_type_update_info( step_type )
 			jQuery( '#user_status' ).attr( 'required', 'required' );
 			jQuery( '#step_result_label_yes' ).html( '<?php echo TS_( step_get_result_label( 'user_status', 'YES' ) ); ?>' );
 			jQuery( '#step_result_label_no' ).html( '<?php echo TS_( step_get_result_label( 'user_status', 'NO' ) ); ?>' );
+			jQuery( '#step_result_label_error' ).html( '<?php echo TS_( step_get_result_label( 'user_status', 'ERROR' ) ); ?>' );
 			if( set_default_next_step_data )
 			{	// Suggest default values:
 				jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID, #step_error_next_step_ID' ).val( '' );
