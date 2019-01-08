@@ -221,12 +221,7 @@ class item_info_line_Widget extends ComponentWidget
 
 		if( empty( $Item ) )
 		{ // Don't display this widget when there is no Item object:
-			echo $this->disp_params['block_start'];
-			$this->disp_title();
-			echo $this->disp_params['block_body_start'];
-			echo '<span class="evo_param_error">'.sprintf( T_('No %s object found. Cannot display widget "%s".'), '<code>Item</code>', $this->get_name() ).'</span>';
-			echo $this->disp_params['block_body_end'];
-			echo $this->disp_params['block_end'];
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
 			return false;
 		}
 

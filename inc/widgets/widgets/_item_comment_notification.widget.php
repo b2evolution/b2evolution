@@ -138,14 +138,12 @@ class item_comment_notification_Widget extends ComponentWidget
 	function display( $params )
 	{
 		global $Item;
-		//global $cookie_name, $cookie_email, $cookie_url;
-		//global $comment_cookies, $comment_allow_msgform, $comment_anon_notify;
-		//global $Plugins;
 		global $current_User;
 		global $Collection, $Blog;
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
 			return false;
 		}
 
