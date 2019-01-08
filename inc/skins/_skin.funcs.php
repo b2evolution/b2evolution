@@ -2928,12 +2928,12 @@ function download_skin_update( $download_url, $upgrade_file )
 			$edited_Skin->set( 'folder', $new_Skin->folder );
 			$edited_Skin->dbupdate();
 			$SkinCache->remove_by_ID( $edited_Skin->ID );
-			echo '<p>'.T_('Skin has been upgraded to a later version.').'</p>';
+			echo '<p class="text-success">'.sprintf( T_('%s has been upgraded to version %s.'), $edited_Skin->name, $skin_version ).'</p>';
 		}
 		else
 		{
 			$edited_Skin = & skin_install( $skin_folder );
-			echo '<p>'.T_('The selected skins have been installed.').'</p>';
+			echo '<p class="text-success">'.T_('The selected skins have been installed.').'</p>';
 		}
 		evo_flush();
 	}
