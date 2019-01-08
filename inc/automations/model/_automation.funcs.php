@@ -333,7 +333,7 @@ function step_get_result_labels()
 		),
 		'start_automation' => array(
 			'YES'   => NT_('Next step if User started new automation successfully'),
-			'NO'    => NT_('Next step if Users was already in the other automation'),
+			'NO'    => NT_('Next step if User was already in the other automation'),
 			'ERROR' => NT_('Next step if Automation does not exist'),
 		),
 		'user_status' => array(
