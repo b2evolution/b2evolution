@@ -1453,4 +1453,28 @@ function fill_empty_hit_days( $hits_data, $start_date, $end_date )
 
 	return $fixed_hits_data;
 }
+
+
+/**
+ * Get full URL from hit URI and collection ID
+ *
+ * @param string Hit URI
+ * @param integer Hit collection ID
+ * @return string Full hit URL
+ */
+function get_hit_full_url( $hit_uri, $hit_coll_ID )
+{
+	$hit_host = '';
+
+	if( ! empty( $hit_coll_ID ) )
+	{	// Try to get a collection if it was a hit from collection page:
+		$BlogCache = & get_BlogCache();
+		if( $Blog = & $BlogCache->get_by_ID( $hit_coll_ID, false, false ) )
+		{	// Get collection host:
+			$hit_host = $Blog->get_baseurl_root();
+		}
+	}
+
+	return $hit_host.$hit_uri;
+}
 ?>
