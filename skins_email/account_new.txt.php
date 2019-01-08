@@ -76,7 +76,7 @@ if( !empty ( $params['initial_hit'] ) )
 { // Hit info
 	echo T_('Session ID').': '.$params['initial_hit']->hit_sess_ID.' - '.$admin_url.'?ctrl=stats&tab=hits&blog=0&sess_ID='.$params['initial_hit']->hit_sess_ID."\n";
 	echo T_('Initial referer').": ".$params['initial_hit']->hit_referer."\n";
-	echo T_('Initial page').": ".T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri."\n";
+	echo T_('Initial page').": ".T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".get_hit_full_url( $params['initial_hit']->hit_uri, $params['initial_hit']->hit_coll_ID )."\n";
 }
 
 if( $params['gender'] == 'M' )

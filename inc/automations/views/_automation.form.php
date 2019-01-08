@@ -57,7 +57,7 @@ $newsletter_fields = $Form->begin_line( T_('Tied to List').' <span class="evo_ti
 	.$Form->end_line();
 $Form->output = true;
 // Display a button to add more newsletter:
-$Form->info( '', '<button class="btn btn-default" type="button" id="evo_add_tied_list">'.get_icon( 'add' ).' '.T_('Tie to an additional list...').'</button>' );
+$Form->info_field( '', '<button class="btn btn-default" type="button" id="evo_add_tied_list">'.get_icon( 'add' ).' '.T_('Tie to an additional list...').'</button>', array( 'class' => 'info_full_height' ) );
 
 $Form->username( 'autm_owner_login', $edited_Automation->get_owner_User(), T_('Owner'), '', '', array( 'required' => true ) );
 

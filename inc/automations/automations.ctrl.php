@@ -733,6 +733,7 @@ switch( $action )
 			if( empty( $edited_Automation ) )
 			{	// Get Automation of the edited Step:
 				$edited_Automation = & $edited_AutomationStep->get_Automation();
+				set_param( 'tab', $display_mode == 'js' ? 'diagram' : 'steps' );
 			}
 			$AdminUI->add_menu_entries( array( 'email', 'automations' ), array(
 					'settings' => array(
@@ -762,7 +763,7 @@ switch( $action )
 		switch( $tab )
 		{
 			case 'steps':
-				$AdminUI->set_page_manual_link( 'automation-steps' );
+				$AdminUI->set_page_manual_link( in_array( $action, array( 'new_step', 'edit_step', 'copy_step' ) ) ? 'automation-step-details' : 'automation-steps' );
 				$AdminUI->set_path( 'email', 'automations', 'steps' );
 				break;
 

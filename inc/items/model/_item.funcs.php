@@ -4777,7 +4777,7 @@ function items_manual_results_block( $params = array() )
 	$Table->global_icon( T_('Add new chapter...'), 'add', $admin_url.'?ctrl=chapters&amp;action=new&amp;blog='.$blog.$redirect_page, ' '.T_('Add top level chapter').' &raquo;', 3, 4 );
 
 	$Table->cols[] = array(
-							'th' => T_('Name'),
+							'th' => T_('Title'),
 						);
 	$Table->cols[] = array(
 							'th' => T_('Image'),
@@ -5957,7 +5957,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	}
 	$r .= $params['title_before']
 			.$item_icon.' '
-			.$Item->dget('title')
+			.$Item->get_title( array( 'title_field' => 'short_title,title', 'link_type' => 'none' ) )
 			.$params['title_after'];
 	$r .= !empty( $item_edit_url ) ? '</a>' : '';
 	$r .= '</strong></td>';

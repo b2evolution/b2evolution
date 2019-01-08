@@ -271,6 +271,13 @@ class AutomationStep extends DataObject
 				$this->set( 'info', get_param( 'step_automation' ) );
 				break;
 
+			case 'user_status':
+				// Change user account status:
+				param( 'user_status', 'string', true );
+				param_check_not_empty( 'user_status', /* Do NOT translate because this error is impossible for normal form */'Please select an account status.' );
+				$this->set( 'info', get_param( 'user_status' ) );
+				break;
+
 			default:
 				$this->set( 'info', NULL, true );
 		}
@@ -700,6 +707,39 @@ class AutomationStep extends DataObject
 					{	// If List/Newsletter does not exist:
 						$step_result = 'ERROR';
 						$additional_result_message = 'Automation #'.$this->get( 'info' ).' is not found in DB.';
+					}
+					break;
+
+				case 'user_status':
+					// Change user account status:
+					$current_status = $step_User->get( 'status' );
+					$new_status = $this->get( 'info' );
+					if( $step_User->ID == 1 )
+					{	// Don't allow to change status of the Admin user:
+						$step_result = 'ERROR';
+						$additional_result_message = 'Status of admin user account cannot be changed';
+					}
+					elseif( $current_status == $new_status )
+					{	// If step User's account is already in the desired status:
+						$step_result = 'NO';
+						// Display status title in log:
+						$user_statuses = get_user_statuses();
+						$additional_result_message = ( isset( $user_statuses[ $new_status ] ) ? $user_statuses[ $new_status ] : $new_status );
+					}
+					else
+					{	// Change user account to another status:
+						$step_User->set( 'status', $new_status );
+						if( $step_User->dbupdate() )
+						{	// Successful user updating:
+							$step_result = 'YES';
+							// Display status title in log:
+							$user_statuses = get_user_statuses();
+							$additional_result_message = ( isset( $user_statuses[ $new_status ] ) ? $user_statuses[ $new_status ] : $new_status );
+						}
+						else
+						{	// Unknown error on user updating:
+							$step_result = 'ERROR';
+						}
 					}
 					break;
 
@@ -1272,6 +1312,14 @@ class AutomationStep extends DataObject
 				if( $Automation = & $AutomationCache->get_by_ID( $this->get( 'info' ), false, false ) )
 				{	// Use name of Automation:
 					$label = $Automation->get( 'name' );
+				}
+				break;
+
+			case 'user_status':
+				$user_statuses = get_user_statuses();
+				if( isset( $user_statuses[ $this->get( 'info' ) ] ) )
+				{	// Get status title from status key:
+					$label = $user_statuses[ $this->get( 'info' ) ];
 				}
 				break;
 
