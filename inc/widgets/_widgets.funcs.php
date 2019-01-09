@@ -90,8 +90,9 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	/* Item in List */
 	$default_widgets['item_in_list'] = array(
 		array( 10, 'item_title' ),
-		array( 20, 'item_visibility_badge' ),
-		array( 30, 'item_info_line' ),
+		array( 20, 'coll_type' => '-manual', 'item_visibility_badge' ),
+		array( 30, 'coll_type' => '-manual', 'item_info_line' ),
+		array( 40, 'coll_type' => 'manual', 'item_content' ),
 	);
 
 	/* Item Single Header */

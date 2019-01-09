@@ -57,20 +57,34 @@ if( ! empty( $params['Item'] ) )
 				'template' => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 			) );
 
-		// Title:
-		$Item->title( array(
+
+		// ------------------------- "Item in List" CONTAINER EMBEDDED HERE --------------------------
+		// Display container contents:
+		widget_container( 'item_in_list', array(
+			'widget_context' => 'item',	// Signal that we are displaying within an Item
+			// The following (optional) params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
+			// This will enclose each widget in a block:
+			'block_start' => '<div class="evo_widget $wi_class$">',
+			'block_end' => '</div>',
+			// This will enclose the title of each widget:
+			'block_title_start' => '<h3>',
+			'block_title_end' => '</h3>',
+
+			// Controlling the title:
+			'widget_item_title_params'  => array(
 				'before'          => $params['before_title'],
 				'after'           => $item_flag.$params['after_title'].$item_status.$item_action_links.'<div class="clear"></div>',
 				'before_title'    => get_icon( 'file_message' ),
-				//'after'      => ' <span class="red">'.( $Item->get('order') > 0 ? $Item->get('order') : 'NULL').'</span>'.$params['after_title'].$item_edit_link.'<div class="clear"></div>',
 				'post_navigation' => $params['post_navigation'],
 				'link_class'      => 'link',
-			) );
-		// this will create a <section>
-			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-			skin_include( '_item_content.inc.php', $params );
-			// Note: You can customize the default item content by copying the generic
-			// /skins/_item_content.inc.php file into the current skin folder.
-			// -------------------------- END OF POST CONTENT -------------------------
-		// this will end a </section>
+			),
+			// Item Visibility Badge widget template
+			'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
+			'widget_item_visibility_badge_params'  => array(
+					'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+				),
+		) );
+		// ----------------------------- END OF "Item in List" CONTAINER -----------------------------
+
 ?></li>

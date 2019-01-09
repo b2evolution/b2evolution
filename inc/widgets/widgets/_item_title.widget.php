@@ -129,42 +129,39 @@ class item_title_Widget extends ComponentWidget
 			return false;
 		}
 
+		$params = array_merge( array(
+			'widget_item_title_display' => true,
+			'widget_item_title_params'  => array(),
+			'widget_item_title__edit_link_params' => array(),
+		), $params );
+
 		$this->init_display( $params );
 
-		$params = array_merge( array(
-				'widget_item_title_display' => true,
-				'widget_item_title_params'  => array(),
-			), $params );
-
-		$widget_params = array_merge( array(
-				// Parameters for item title:
+		// Parameters for item title:
+		$title_params = array_merge( array(
 				'before'    => '',
 				'after'     => '',
 				'link_type' => '#',
-				// Parameters for edit link:
-				'edit_link_display' => false,
-				'before_edit_link'  => '<div class="'.button_class( 'group' ).'">',
-				'after_edit_link'   => '</div>',
-				'edit_link_text'    => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
-				'edit_link_class'   => button_class( 'text' ),
 			), $params['widget_item_title_params'] );
 
-		ob_start();
-		$Item->title( array(
-			'before' => $widget_params['before'],
-			'after'  => $widget_params['after'],
-			'link_type' => $widget_params['link_type'],
-		) );
+		// Parameters for edit link:
+		$link_params = array_merge( array(
+				'edit_link_display' => false,
+				'before'  => '<div class="'.button_class( 'group' ).'">',
+				'after'   => '</div>',
+				'text'    => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
+				'class'   => button_class( 'text' ),
+			), $params['widget_item_title__edit_link_params'] );
 
-		if( $widget_params['edit_link_display'] )
+		ob_start();
+
+		$Item->title( $title_params );
+
+		if( $link_params['edit_link_display'] )
 		{
-			$Item->edit_link( array(
-				'before' => $widget_params['before_edit_link'],
-				'after'  => $widget_params['after_edit_link'],
-				'text'   => $widget_params['edit_link_text'],
-				'class'  => $widget_params['edit_link_class'],
-			) );
+			$Item->edit_link( $link_params );
 		}
+
 		$item_title = ob_get_clean();
 
 		if( $params['widget_item_title_display'] && ! empty( $item_title ) )
