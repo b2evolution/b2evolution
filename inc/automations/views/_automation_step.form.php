@@ -65,7 +65,7 @@ $Form->select_input_object( 'step_email_campaign',
 $Form->textarea_input( 'step_notification_message', (
 		$edited_AutomationStep->get( 'type' ) == 'notify_owner'
 		? $edited_AutomationStep->get( 'info' )
-		: 'The User $login$ has reached step $step_number$ (ID: $step_ID$) in automation $automation_name$ (ID: $automation_ID$)'
+		: '$login$ has reached step $step_number$ (ID: $step_ID$)'."\n".'in automation $automation_name$ (ID: $automation_ID$)'
 	), 10, T_('Notification message') );
 
 // Usertag:

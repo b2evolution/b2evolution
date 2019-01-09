@@ -93,11 +93,12 @@ class AutomationStep extends DataObject
 	/**
 	 * Insert object into DB based on previously recorded changes.
 	 *
+	 * @param boolean TRUE to check if step can be inserted e.g. when automation is not paused
 	 * @return boolean true on success
 	 */
-	function dbinsert()
+	function dbinsert( $check_restriction = true )
 	{
-		if( ! $this->can_be_modified() )
+		if( $check_restriction && ! $this->can_be_modified() )
 		{	// If this step cannnot be modified
 			return false;
 		}
@@ -604,8 +605,8 @@ class AutomationStep extends DataObject
 						) );
 
 					$email_template_params = array(
-						'message_html' => str_replace( '$login$', $step_user_login_html, $notification_message ),
-						'message_text' => nl2br( str_replace( '$login$', $step_User->get( 'login' ), $notification_message ) ),
+						'message_html' => nl2br( str_replace( '$login$', $step_user_login_html, $notification_message ) ),
+						'message_text' => str_replace( '$login$', $step_User->get( 'login' ), $notification_message ),
 					);
 
 					if( send_mail_to_User( $owner_User->ID, sprintf( T_('Notification of automation %s'), '"'.$Automation->get( 'name' ).'"' ), 'automation_owner_notification', $email_template_params ) )
