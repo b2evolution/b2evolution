@@ -12,7 +12,7 @@ global $servertimenow, $baseurl;
 
 if( $Settings->get( 'validation_process' ) != 'easy' )
 {
-	cron_log_append( T_( 'With secure activation process sending reminder emails is not permitted!' ), 'error' );
+	cron_log_append( 'With secure activation process sending reminder emails is not permitted!', 'error' );
 	return 2; /* error */
 }
 
@@ -33,19 +33,21 @@ $activate_account_reminder_config = $Settings->get( 'activate_account_reminder_c
 $number_of_max_reminders = ( count( $activate_account_reminder_config ) - 1 );
 if( $number_of_max_reminders < 3 )
 { // The config array is wrong, it must have at least 4 elements (Reminder #1, Mark as failed, Delete warning, Delete account)
-	cron_log_append( T_('The job advanced configuration is wrong, can\'t send reminders!'), 'error' );
+	cron_log_append( 'The job advanced configuration is wrong, can\'t send reminders!', 'error' );
 	return 3; /* error */
 }
-$reminder_date = date2mysql( $servertimenow - $activate_account_reminder_config[0] );
-$reminder_delay_conditions = array( '( ( last_sent.uset_value IS NULL OR last_sent.uset_value < '.$DB->quote( $reminder_date ).' ) AND ( reminder_sent.uset_value IS NULL OR reminder_sent.uset_value = "0" ) )' );
-for( $i = 1; $i <= $number_of_max_reminders; $i++ )
+
+$reminder_delay_conditions = array();
+for( $i = 0; $i <= $number_of_max_reminders; $i++ )
 {
 	$reminder_date = date2mysql( $servertimenow - $activate_account_reminder_config[$i] );
-	$reminder_delay_conditions[] = '( last_sent.uset_value < '.$DB->quote( $reminder_date ).' AND reminder_sent.uset_value = '.$DB->quote( $i ).' )';
+	$reminder_delay_conditions[] = ( $i == 0
+		? '( ( last_sent.uset_value IS NULL OR last_sent.uset_value < '.$DB->quote( $reminder_date ).' ) AND ( reminder_sent.uset_value IS NULL OR reminder_sent.uset_value = "'.$i.'" ) )'
+		: '( last_sent.uset_value < '.$DB->quote( $reminder_date ).' AND reminder_sent.uset_value = "'.$i.'" )' );
 }
 
 $SQL = new SQL( 'Get users which should be reminded or deleted because of they are not activated' );
-$SQL->SELECT( 'T_users.user_ID, reminder_sent.uset_value' );
+$SQL->SELECT( 'T_users.user_ID, T_users.user_status, reminder_sent.uset_value' );
 $SQL->FROM( 'T_users' );
 // join UserSettings
 $SQL->FROM_add( 'LEFT JOIN T_users__usersettings last_sent ON last_sent.uset_user_ID = user_ID AND last_sent.uset_name = "last_activation_email"' );
@@ -64,36 +66,46 @@ $SQL->WHERE_and( 'user_created_datetime < '.$DB->quote( $threshold_date ) );
 $SQL->WHERE_and( implode( ' OR ', $reminder_delay_conditions ) );
 // check if user wants to recevice activation reminder or not
 $SQL->WHERE_and( 'notif_setting.uset_value IS NULL OR notif_setting.uset_value <> '.$DB->quote( '0' ) );
-$reminder_users = $DB->get_assoc( $SQL );
+$reminder_users = $DB->get_results( $SQL );
 
+$all_reminder_users = array();
 $send_activation_users = array(); // Users for cron settings "Reminder #X" and "Mark as failed"
 $mark_failed_users = array(); // Users for cron setting "Mark as failed"
 $send_delete_warning_users = array(); // Users for cron setting "Delete warning"
 $delete_account_users = array(); // Users for cron setting "Delete account"
-foreach( $reminder_users as $user_ID => $activation_reminder_count )
+foreach( $reminder_users as $reminder_user )
 {
-	if( $activation_reminder_count == $number_of_max_reminders )
-	{	// This user must be deleted completely:
-		$delete_account_users[] = $user_ID;
+	$all_reminder_users[] = $reminder_user->user_ID;
+	$activation_reminder_count = $reminder_user->uset_value;
+	if( $reminder_user->user_status == 'failedactivation' &&
+	    ( // If this is the last reminder number and the option "Delete account" is enabled
+	      ( $activation_reminder_count == $number_of_max_reminders && ! empty( $activate_account_reminder_config[ $activation_reminder_count ] ) ) ||
+	      // Case when "Delete warning" is not enabled(=="Don't send") but "Delete account" is enabled, so we should use penultimate reminder number as last("Delete account") in order to skip the reminder of "Delete warning":
+	      ( $activation_reminder_count == $number_of_max_reminders - 1 && empty( $activate_account_reminder_config[ $number_of_max_reminders - 1 ] ) && ! empty( $activate_account_reminder_config[ $number_of_max_reminders ] ) )
+	    ) )
+	{	// This user must be deleted completely ONLY if it is in "Failed activation" status:
+		$delete_account_users[] = $reminder_user->user_ID;
 	}
-	elseif( $activation_reminder_count == $number_of_max_reminders - 1 )
-	{	// This user must receive a delete warning email:
-		$send_delete_warning_users[] = $user_ID;
+	elseif( $reminder_user->user_status == 'failedactivation' &&
+	        $activation_reminder_count == $number_of_max_reminders - 1 && // If this is the penultimate reminder number
+	        ! empty( $activate_account_reminder_config[ $activation_reminder_count ] ) ) // If the option "Delete warning" is enabled
+	{	// This user must receive a delete warning email ONLY if it is in "Failed activation" status:
+		$send_delete_warning_users[] = $reminder_user->user_ID;
 	}
 	elseif( $activation_reminder_count == $number_of_max_reminders - 2 )
-	{	// This user must be marked as failed:
-		$mark_failed_users[] = $user_ID;
+	{	// This user must be marked with status "Failed activation":
+		$mark_failed_users[] = $reminder_user->user_ID;
 	}
-	else
+	elseif( $activation_reminder_count <= $number_of_max_reminders - 3 )
 	{	// This user must receive an activation email:
-		$send_activation_users[] = $user_ID;
+		$send_activation_users[] = $reminder_user->user_ID;
 	}
 }
 
 $UserCache = & get_UserCache();
 $UserCache->clear();
 // load all users to reminded into the UserCache:
-$UserCache->load_list( array_keys( $reminder_users ) );
+$UserCache->load_list( $all_reminder_users );
 
 // ---- #1 Send activation reminder:
 $send_activation_users_num = count( $send_activation_users );
