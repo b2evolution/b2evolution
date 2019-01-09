@@ -84,11 +84,16 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 					if( $c == $config_count - 3 )
 					{	// This option is used for failed activation threshold:
 						$Form->duration_input( 'activate_account_reminder_config_'.$c, 0, sprintf( $reminder_config_label, $c + 1 ), '', '', $reminder_config_params );
-						$Form->duration_input( 'activate_account_reminder_config_'.( $c + 1 ), $config_value, T_('Mark as failed'), '', '', $reminder_config_params );
+						$Form->duration_input( 'activate_account_reminder_config_'.( $c + 1 ), $config_value, T_('Mark as failed'), '', '', array_merge( $reminder_config_params, array(
+								'allow_none_value' => false,
+								'allow_none_title' => false,
+							) ) );
 					}
 					elseif( $c == $config_count - 2 )
 					{	// This option is used for delete warning threshold:
-						$Form->duration_input( 'activate_account_reminder_config_'.( $c + 1 ), $config_value, T_('Delete warning'), '', '', $reminder_config_params );
+						$Form->duration_input( 'activate_account_reminder_config_'.( $c + 1 ), $config_value, T_('Delete warning'), '', '', array_merge( $reminder_config_params, array(
+								'note' => T_('After marking as failed'),
+							) ) );
 					}
 					elseif( $c == $config_count - 1 )
 					{	// Last option is used for delete account threshold:

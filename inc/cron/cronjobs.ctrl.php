@@ -257,7 +257,7 @@ switch( $action )
 					}
 					if( empty( $reminder_config[ $reminder_config_num - 2 ] ) )
 					{	// If "Mark as failed" is not selected:
-						param_error( 'activate_account_reminder_config_'.( $reminder_config_num - 2 ), T_('Please select account activation reminder threshold to mark as failed after subscription.') );
+						param_error( 'activate_account_reminder_config_'.( $reminder_config_num - 2 ), /* Do NOT translate because it is impossible for normal form */'Please select account activation reminder threshold to mark as failed after subscription.' );
 					}
 					$Settings->set( 'activate_account_reminder_config', implode( ',', $reminder_config ) );
 					break;
