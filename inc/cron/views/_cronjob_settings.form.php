@@ -163,6 +163,11 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 
 		$Form->duration_input( 'cjob_timeout_'.$cron_job_key, $Settings->get( 'cjob_timeout_'.$cron_job_key ), T_('Max execution time'), 'days', 'minutes', array( 'note' => T_( 'Leave empty for no limit' ) ) );
 
+		if( $Settings->get( 'cjob_maxemail_'.$cron_job_key ) !== NULL )
+		{	// Setting only for cron jobs that use email sending:
+			$Form->text_input( 'cjob_maxemail_'.$cron_job_key, $Settings->get( 'cjob_maxemail_'.$cron_job_key ), 10, T_('Max emails to send'), T_('Leave empty for no limit'), array( 'type' => 'number', 'min' => 0 ) );
+		}
+
 	$Form->end_fieldset();
 }
 

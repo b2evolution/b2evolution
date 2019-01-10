@@ -3792,7 +3792,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	global $servertimenow, $email_send_simulate_only;
 
 	/**
-	 * @var string|NULL This global var stores ID of the last mail log message
+	 * @var string|NULL This global var stores a last mail log message
 	 */
 	global $mail_log_message;
 	$mail_log_message = NULL;
@@ -3800,7 +3800,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	// Stop a request from the blocked IP addresses or Domains
 	antispam_block_request();
 
-	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode, $mail_log_insert_ID;
+	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode, $mail_log_insert_ID, $executing_cron_task_key;
 
 	$message_data = $message;
 	if( is_array( $message_data ) && isset( $message_data['full'] ) )
@@ -3948,7 +3948,25 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		$send_mail_result = true;
 	}
 	else
-	{	// Send email message on real mode:
+	{	// If real mode
+		if( isset( $executing_cron_task_key ) )
+		{	// Check max number of emails that can be sent on executing cron job:
+			$max_cron_emails = intval( $Settings->get( 'cjob_maxemail_'.$executing_cron_task_key ) );
+			if( $max_cron_emails > 0 )
+			{	// Check if email sending in not unlimitted:
+				global $executing_cron_task_emails_count;
+				if( $executing_cron_task_emails_count >= $max_cron_emails )
+				{	// Stop email sending because of limit from cron job:
+					$mail_log_message = 'Stopping execution because max number of emails ('.$max_cron_emails.') has been sent.';
+					$Debuglog->add( htmlspecialchars( $mail_log_message ) );
+					return false;
+				}
+				// Increase a number of sent emails even if the sending is failed:
+				$executing_cron_task_emails_count++;
+			}
+		}
+
+		// Send email message:
 		$send_mail_result = evo_mail( $to, $subject, $message_data, $headers, $additional_parameters );
 	}
 
@@ -3994,7 +4012,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 	global $UserSettings, $Settings, $current_charset;
 
 	/**
-	 * @var string|NULL This global var stores ID of the last mail log message
+	 * @var string|NULL This global var stores a last mail log message
 	 */
 	global $mail_log_message;
 	$mail_log_message = NULL;
@@ -4163,7 +4181,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 function send_mail_to_anonymous_user( $user_email, $user_name, $subject, $template_name, $template_params = array(), $force_on_non_activated = false, $headers = array(), $force_email_address = '' )
 {
 	/**
-	 * @var string|NULL This global var stores ID of the last mail log message
+	 * @var string|NULL This global var stores a last mail log message
 	 */
 	global $mail_log_message;
 	$mail_log_message = NULL;
