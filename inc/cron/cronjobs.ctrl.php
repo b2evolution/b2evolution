@@ -198,6 +198,13 @@ switch( $action )
 			// Max execution time:
 			$Settings->set( 'cjob_timeout_'.$cron_job_key, param_duration( 'cjob_timeout_'.$cron_job_key ) );
 
+			$cjob_maxemail = param( 'cjob_maxemail_'.$cron_job_key, 'string', NULL );
+			if( $cjob_maxemail !== NULL )
+			{	// Setting only for cron jobs that use email sending:
+				$cjob_maxemail = intval( $cjob_maxemail );
+				$Settings->set( 'cjob_maxemail_'.$cron_job_key, ( $cjob_maxemail > 0 ? $cjob_maxemail : '' ) );
+			}
+
 			// Additional settings per cron job:
 			switch( $cron_job_key )
 			{

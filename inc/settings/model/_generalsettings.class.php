@@ -345,6 +345,18 @@ C message size exceeds',
 
 	// Back-end settings, these can't be modified by the users:
 		'last_invalidation_timestamp' => 0,
+
+	// Cron job settings:
+		'cjob_maxemail_send-non-activated-account-reminders' => 50,
+		'cjob_maxemail_send-unmoderated-comments-reminders' => 50,
+		'cjob_maxemail_send-comment-notifications' => 50,
+		'cjob_maxemail_execute-automations' => 50,
+		'cjob_maxemail_send-inactive-account-reminders' => 50,
+		'cjob_maxemail_monthly-alert-old-contents' => 50,
+		'cjob_maxemail_create-post-by-email' => 50,
+		'cjob_maxemail_send-unmoderated-posts-reminders' => 50,
+		'cjob_maxemail_send-post-notifications' => 50,
+		'cjob_maxemail_send-unread-messages-reminders' => 50,
 	);
 
 

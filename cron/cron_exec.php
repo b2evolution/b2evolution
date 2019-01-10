@@ -153,6 +153,9 @@ else
 	// Initialize a var to count a number of cron job actions:
 	$cron_log_actions_num = NULL;
 
+	// Store key of currently executing cron job:
+	$executing_cron_task_key = $task->ctsk_key;
+
 	cron_log( 'Requesting lock on task #'.$ctsk_ID.' ['.$ctsk_name.']', 0 );
 
 	$DB->halt_on_error = false;
@@ -260,8 +263,9 @@ else
 		$DB->query( $sql, 'Record task as finished.' );
 	}
 
-	// Unset ID of the executed cron job to 
+	// Unset data of the executed cron job:
 	unset( $ctsk_ID );
+	unset( $executing_cron_task_key );
 }
 
 
