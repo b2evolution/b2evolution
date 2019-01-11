@@ -3089,6 +3089,12 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 	$email_sent = 0;
 	foreach( $user_ids as $user_ID )
 	{ // Iterate through user ids and send account activation reminder to all user
+
+		if( $log_messages == 'cron_job' && ! check_cron_job_emails_limit() )
+		{	// Stop execution for cron job because max number of emails has been already sent:
+			break;
+		}
+
 		$User = $UserCache->get_by_ID( $user_ID, false );
 		if( !$User )
 		{ // user not exists
@@ -3195,6 +3201,12 @@ function send_inactive_user_emails( $user_ids, $redirect_to_after = NULL, $log_m
 	$email_sent = 0;
 	foreach( $user_ids as $user_ID )
 	{ // Iterate through user ids and send account activation reminder to all user
+
+		if( $log_messages == 'cron_job' && ! check_cron_job_emails_limit() )
+		{	// Stop execution for cron job because max number of emails has been already sent:
+			break;
+		}
+
 		$User = $UserCache->get_by_ID( $user_ID, false );
 		if( !$User )
 		{ // user not exists

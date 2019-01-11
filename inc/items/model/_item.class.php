@@ -8307,9 +8307,10 @@ class Item extends ItemLight
 	 *                       'skip' - Skip notifications
 	 *                       'force' - Force notifications
 	 * @param boolean|string Force sending notifications for community (use same values of third param)
+	 * @param boolean|string 'cron_job' - to log messages for cron job, FALSE - to don't log
 	 * @return array Notified flags: 'members_notified', 'community_notified'
 	 */
-	function send_email_notifications( $executed_by_userid = NULL, $is_new_item = false, $already_notified_user_IDs = NULL, $force_members = false, $force_community = false )
+	function send_email_notifications( $executed_by_userid = NULL, $is_new_item = false, $already_notified_user_IDs = NULL, $force_members = false, $force_community = false, $log_messages = false )
 	{
 		global $DB, $debug, $Messages, $Debuglog;
 
@@ -8323,14 +8324,30 @@ class Item extends ItemLight
 
 		if( ! $edited_Blog->get_setting( 'allow_subscriptions' ) )
 		{	// Subscriptions not enabled!
-			$Messages->add_to_group( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return array();
 		}
 
 		if( ! $this->notifications_allowed() )
 		{	// Don't send notifications about some post/usages like "special":
 			// Note: this is a safety but this case should never happen, so don't make translators work on this:
-			$Messages->add_to_group( 'This post type/usage cannot support notifications: skipping notifications...', 'note', T_('Sending notifications:') );
+			$message = 'This post type/usage cannot support notifications: skipping notifications...';
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return array();
 		}
 
@@ -8338,27 +8355,67 @@ class Item extends ItemLight
 		{	// Don't send notifications about items with not allowed status:
 			$status_titles = get_visibility_statuses( '', array() );
 			$status_title = isset( $status_titles[ $this->get( 'status' ) ] ) ? $status_titles[ $this->get( 'status' ) ] : $this->get( 'status' );
-			$Messages->add_to_group( sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title ), 'note', T_('Sending notifications:') );
+			$message = sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title );
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return array();
 		}
 
 		if( $force_members == 'skip' && $force_community == 'skip' )
 		{	// Skip subscriber notifications because of it is forced by param:
-			$Messages->add_to_group( T_('Skipping email notifications to subscribers.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping email notifications to subscribers.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return array();
 		}
 
 		if( $force_members == 'force' && $force_community == 'force' )
 		{	// Force to members and community:
-			$Messages->add_to_group( T_('Force sending email notifications to subscribers...'), 'note', T_('Sending notifications:') );
+			$message = T_('Force sending email notifications to subscribers...');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 		elseif( $force_members == 'force' )
 		{	// Force to members only:
-			$Messages->add_to_group( T_('Force sending email notifications to subscribed members...'), 'note', T_('Sending notifications:') );
+			$message = T_('Force sending email notifications to subscribed members...');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 		elseif( $force_community == 'force' )
 		{	// Force to community only:
-			$Messages->add_to_group( T_('Force sending email notifications to other subscribers...'), 'note', T_('Sending notifications:') );
+			$message = T_('Force sending email notifications to other subscribers...');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 		else
 		{	// Check if email notifications can be sent for this item currently:
@@ -8367,7 +8424,15 @@ class Item extends ItemLight
 			// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
 			if( $this->get_type_setting( 'usage' ) != 'post' )
 			{	// Don't send outbound pings for items that are not regular posts:
-				$Messages->add_to_group( T_('This post type/usage doesn\'t need notifications by default: skipping notifications...'), 'note', T_('Sending notifications:') );
+				$message = T_('This post type/usage doesn\'t need notifications by default: skipping notifications...');
+				if( $log_messages == 'cron_job' )
+				{
+					cron_log_append( $message."\n" );
+				}
+				else
+				{
+					$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+				}
 				return array();
 			}
 		}
@@ -8396,18 +8461,42 @@ class Item extends ItemLight
 
 		if( ! $notify_members && ! $notify_community )
 		{	// Everyone has already been notified, nothing to do:
-			$Messages->add_to_group( T_('Skipping email notifications to subscribers because they were already notified.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping email notifications to subscribers because they were already notified.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return array();
 		}
 
 		if( $notify_members && $force_members == 'skip' )
 		{	// Skip email notifications to members because it is forced by param:
-			$Messages->add_to_group( T_('Skipping email notifications to subscribed members.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping email notifications to subscribed members.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			$notify_members = false;
 		}
 		if( $notify_community && $force_community == 'skip' )
 		{	// Skip email notifications to community because it is forced by param:
-			$Messages->add_to_group( T_('Skipping email notifications to other subscribers.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping email notifications to other subscribers.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			$notify_community = false;
 		}
 
@@ -8587,11 +8676,27 @@ class Item extends ItemLight
 
 		if( $notify_members )
 		{	// Display a message to know how many members are notified:
-			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note', T_('Sending notifications:') );
+			$message = sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count );
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 		if( $notify_community )
 		{	// Display a message to know how many community users are notified:
-			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note', T_('Sending notifications:') );
+			$message = sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count );
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 
 		if( empty( $notify_users ) )
@@ -8608,9 +8713,15 @@ class Item extends ItemLight
 		load_blocked_emails( $notify_user_IDs );
 
 		// Send emails:
+		$notified_users_num = 0;
 		$cache_by_locale = array();
 		foreach( $notify_users as $user_ID => $notify_type )
 		{
+			if( ! check_cron_job_emails_limit() )
+			{	// Stop execution for cron job because max number of emails has been already sent:
+				break;
+			}
+
 			$notify_User = & $UserCache->get_by_ID( $user_ID, false, false );
 			if( empty( $notify_User ) )
 			{	// skip invalid users:
@@ -8651,12 +8762,30 @@ class Item extends ItemLight
 				echo "<p>Sending notification to $notify_email:<pre>$message_content</pre>";
 			}
 
-			send_mail_to_User( $user_ID, $cache_by_locale[$notify_locale]['subject'], 'post_new', $email_template_params );
+			if( send_mail_to_User( $user_ID, $cache_by_locale[$notify_locale]['subject'], 'post_new', $email_template_params ) )
+			{
+				$notified_users_num++;
+				if( $log_messages == 'cron_job' )
+				{	// Log success mail sending for cron job:
+					cron_log_action_end( 'User '.$notify_User->get_identity_link().' has been notified' );
+				}
+			}
+			elseif( $log_messages == 'cron_job' )
+			{	// Log failed mail sending for cron job:
+				global $mail_log_message;
+				cron_log_action_end( 'User '.$notify_User->get_identity_link().' could not be notified because of error: '
+					.'"'.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'"', 'warning' );
+			}
 
 			blocked_emails_memorize( $notify_User->email );
 		}
 
-		blocked_emails_display();
+		blocked_emails_display( $log_messages );
+
+		if( $log_messages == 'cron_job' )
+		{	// Log how much users were really notified:
+			cron_log_append( sprintf( '%d of %d users have been notified!', $notified_users_num, count( $notify_users ) ) );
+		}
 
 		return $notified_flags;
 	}
@@ -8669,41 +8798,82 @@ class Item extends ItemLight
 	 *                       false - Auto mode depending on current item statuses
 	 *                       'skip' - Skip notifications
 	 *                       'force' - Force notifications
+	 * @param boolean|string 'cron_job' - to log messages for cron job, FALSE - to don't log
 	 * @return boolean TRUE on success
 	 */
-	function send_outbound_pings( $force_pings = false )
+	function send_outbound_pings( $force_pings = false, $log_messages = false )
 	{
 		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $allow_post_pings_on_localhost;
 
 		if( ! $this->notifications_allowed() )
 		{	// Don't send pings about some post/usages like "special":
 			// Note: this is a safety but this case should never happen, so don't make translators work on this:
-			$Messages->add_to_group( 'This post type/usage cannot support pings: skipping pings...', 'note', T_('Sending notifications:') );
+			$message = 'This post type/usage cannot support pings: skipping pings...';
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return false;
 		}
 
 		if( $this->get( 'status' ) != 'published' )
 		{	// Don't send pings if item is not 'public':
-			$Messages->add_to_group( T_('Skipping outbound pings because item is not published yet.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping outbound pings because item is not published yet.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return false;
 		}
 
 		if( $force_pings == 'skip' )
 		{	// Skip pings because it is forced by param:
-			$Messages->add_to_group( T_('Skipping outbound pings.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping outbound pings.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return false;
 		}
 
 		if( $force_pings == 'force' )
 		{	// Force pings:
-			$Messages->add_to_group( T_('Force sending outbound pings...'), 'note', T_('Sending notifications:') );
+			$message = T_('Force sending outbound pings...');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 		else
 		{	// Check if pings can be sent for this item currently:
 
 			if( $this->check_notifications_flags( 'pings_sent' ) )
 			{	// Don't send pings if they have already been sent:
-				$Messages->add_to_group( T_('Skipping outbound pings because they were already sent.'), 'note', T_('Sending notifications:') );
+				$message = T_('Skipping outbound pings because they were already sent.');
+				if( $log_messages == 'cron_job' )
+				{
+					cron_log_append( $message."\n" );
+				}
+				else
+				{
+					$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+				}
 				return false;
 			}
 
@@ -8711,7 +8881,15 @@ class Item extends ItemLight
 			// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
 			if( $this->get_type_setting( 'usage' ) != 'post' )
 			{	// Don't send outbound pings for items that are not regular posts:
-				$Messages->add_to_group( T_('This post type/usage doesn\'t need pings by default: skipping pings...'), 'note', T_('Sending notifications:') );
+				$message = T_('This post type/usage doesn\'t need pings by default: skipping pings...');
+				if( $log_messages == 'cron_job' )
+				{
+					cron_log_append( $message."\n" );
+				}
+				else
+				{
+					$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+				}
 				return false;
 			}
 		}
@@ -8724,12 +8902,28 @@ class Item extends ItemLight
 		    ( preg_match( '#^http://localhost[/:]#', $baseurl ) ||
 		      preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) ) /* domain ending in ".local" */
 		{	// Don't send pings from localhost:
-			$Messages->add_to_group( T_('Skipping pings (Running on localhost).'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping pings (Running on localhost).');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return false;
 		}
 		else
 		{	// Send pings:
-			$Messages->add_to_group( T_('Trying to find plugins for sending outbound pings...'), 'note', T_('Sending notifications:') );
+			$message = T_('Trying to find plugins for sending outbound pings...');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 
 			load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 
@@ -8808,7 +9002,14 @@ class Item extends ItemLight
 						}
 						else
 						{
-							$Messages->add_to_group( $current_message, $current_type, $current_title );
+							if( $log_messages == 'cron_job' )
+							{
+								cron_log_append( $current_message."\n", $current_type );
+							}
+							else
+							{
+								$Messages->add_to_group( $current_message, $current_type, $current_title );
+							}
 							$current_message = $loop_message;
 							$current_type = $loop_type;
 							$current_title = $loop_title;
@@ -8817,7 +9018,14 @@ class Item extends ItemLight
 
 					if( !empty( $current_message ) )
 					{ // Display last message
-						$Messages->add_to_group( $current_message, $current_type, $current_title );
+						if( $log_messages == 'cron_job' )
+						{
+							cron_log_append( $current_message."\n", $current_type );
+						}
+						else
+						{
+							$Messages->add_to_group( $current_message, $current_type, $current_title );
+						}
 					}
 				}
 			}

@@ -6,7 +6,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Settings, $Messages, $UserSettings;
+global $Settings, $UserSettings;
 
 // Get the ID of the comment we are supposed notify:
 if( empty( $job_params['comment_ID'] ) )
@@ -59,7 +59,7 @@ $previous_comment_visibility_status = '';
 while( $edited_Comment->get( 'status' ) != $previous_comment_visibility_status )
 {
 	// Send email notifications to users who want to receive them for the collection of this comment: (will be different recipients depending on visibility)
-	$notified_flags = $edited_Comment->send_email_notifications( $job_params['executed_by_userid'], $job_params['is_new_comment'], $job_params['already_notified_user_IDs'], $job_params['force_members'], $job_params['force_community'] );
+	$notified_flags = $edited_Comment->send_email_notifications( $job_params['executed_by_userid'], $job_params['is_new_comment'], $job_params['already_notified_user_IDs'], $job_params['force_members'], $job_params['force_community'], 'cron_job' );
 
 	// Record that we have just notified the members and/or community:
 	$edited_Comment->set( 'notif_flags', $notified_flags );
@@ -75,10 +75,6 @@ while( $edited_Comment->get( 'status' ) != $previous_comment_visibility_status )
 	// Destroy current Comment to get most recent comment from DB:
 	unset( $CommentCache->cache[ $edited_Comment->ID ] );
 	$edited_Comment = & $CommentCache->get_by_ID( $comment_ID );
-
-	// Store messages of the comment sending email notifications:
-	cron_log_action_end( $Messages->get_string( '', '', "\n", '' ) );
-	$Messages->clear();
 }
 
 if( empty( $result_message ) )
