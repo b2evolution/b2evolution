@@ -3725,9 +3725,10 @@ class Comment extends DataObject
 	 *                       'skip' - Skip notifications
 	 *                       'force' - Force notifications
 	 * @param boolean|string Force sending notifications for community (use same values of fourth param)
+	 * @param boolean|string 'cron_job' - to log messages for cron job, FALSE - to don't log
 	 * @return array Notified flags: 'members_notified', 'community_notified'
 	 */
-	function send_email_notifications( $executed_by_userid = NULL, $is_new_comment = false, $already_notified_user_IDs = array(), $force_members = false, $force_community = false )
+	function send_email_notifications( $executed_by_userid = NULL, $is_new_comment = false, $already_notified_user_IDs = array(), $force_members = false, $force_community = false, $log_messages = false )
 	{
 		global $DB, $Settings, $UserSettings, $Messages;
 
@@ -3742,7 +3743,15 @@ class Comment extends DataObject
 
 		if( ! $comment_item_Blog->get_setting( 'allow_item_subscriptions' ) )
 		{	// Subscriptions not enabled!
-			$Messages->add_to_group( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return array();
 		}
 
@@ -3750,27 +3759,67 @@ class Comment extends DataObject
 		{	// Don't send notifications about comments with not allowed status:
 			$status_titles = get_visibility_statuses( '', array() );
 			$status_title = isset( $status_titles[ $this->get( 'status' ) ] ) ? $status_titles[ $this->get( 'status' ) ] : $this->get( 'status' );
-			$Messages->add_to_group( sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title ), 'note', T_('Sending notifications:') );
+			$message = sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title );
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n"  );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return array();
 		}
 
 		if( $force_members == 'skip' && $force_community == 'skip' )
 		{	// Skip subscriber notifications because of it is forced by param:
-			$Messages->add_to_group( T_('Skipping email notifications to subscribers.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping email notifications to subscribers.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n"  );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return array();
 		}
 
 		if( $force_members == 'force' && $force_community == 'force' )
 		{	// Force to members and community:
-			$Messages->add_to_group( T_('Force sending email notifications to subscribers...'), 'note', T_('Sending notifications:') );
+			$message = T_('Force sending email notifications to subscribers...');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n"  );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 		elseif( $force_members == 'force' )
 		{	// Force to members only:
-			$Messages->add_to_group( T_('Force sending email notifications to subscribed members...'), 'note', T_('Sending notifications:') );
+			$message = T_('Force sending email notifications to subscribed members...');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n"  );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 		elseif( $force_community == 'force' )
 		{	// Force to community only:
-			$Messages->add_to_group( T_('Force sending email notifications to other subscribers...'), 'note', T_('Sending notifications:') );
+			$message = T_('Force sending email notifications to other subscribers...');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n"  );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 
 		$notify_members = false;
@@ -3797,18 +3846,42 @@ class Comment extends DataObject
 
 		if( ! $notify_members && ! $notify_community )
 		{	// Everyone has already been notified, nothing to do:
-			$Messages->add_to_group( T_('Skipping email notifications to subscribers because they were already notified.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping email notifications to subscribers because they were already notified.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n"  );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return array();
 		}
 
 		if( $notify_members && $force_members == 'skip' )
 		{	// Skip email notifications to members because it is forced by param:
-			$Messages->add_to_group( T_('Skipping email notifications to subscribed members.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping email notifications to subscribed members.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n"  );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			$notify_members = false;
 		}
 		if( $notify_community && $force_community == 'skip' )
 		{	// Skip email notifications to community because it is forced by param:
-			$Messages->add_to_group( T_('Skipping email notifications to other subscribers.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping email notifications to other subscribers.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n"  );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			$notify_community = false;
 		}
 
@@ -4124,11 +4197,27 @@ class Comment extends DataObject
 
 		if( $notify_members )
 		{	// Display a message to know how many members are notified:
-			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note', T_('Sending notifications:') );
+			$message = sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count );
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n"  );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 		if( $notify_community )
 		{	// Display a message to know how many community users are notified:
-			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note', T_('Sending notifications:') );
+			$message = sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count );
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n"  );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 
 		if( empty( $notify_users ) && empty( $notify_anon_users ) )
@@ -4136,7 +4225,13 @@ class Comment extends DataObject
 			return $notified_flags;
 		}
 
-		$this->send_email_messages( $notify_users + $notify_anon_users, $is_new_comment );
+		$all_notify_users = $notify_users + $notify_anon_users;
+		$notified_users_num = $this->send_email_messages( $all_notify_users, $is_new_comment, $log_messages );
+
+		if( $log_messages == 'cron_job' )
+		{	// Log how much users were really notified:
+			cron_log_append( sprintf( '%d of %d users have been notified!', $notified_users_num, count( $all_notify_users ) ) );
+		}
 
 		return $notified_flags;
 	}
@@ -4153,8 +4248,10 @@ class Comment extends DataObject
 	 *              - 'anon_subscription'
 	 *              - 'meta_comment'
 	 * @param boolean TRUE if it is notification about new comment, FALSE - for edited comment
+	 * @param boolean|string 'cron_job' - to log messages for cron job, FALSE - to don't log
+	 * @return integer Number of notified users
 	 */
-	function send_email_messages( $notify_users, $is_new_comment = false )
+	function send_email_messages( $notify_users, $is_new_comment = false, $log_messages = false )
 	{
 		global $debug, $Debuglog, $default_locale;
 
@@ -4165,7 +4262,7 @@ class Comment extends DataObject
 
 		if( ! count( $notify_users ) )
 		{	// No-one to notify:
-			return;
+			return 0;
 		}
 
 		/*
@@ -4211,8 +4308,14 @@ class Comment extends DataObject
 		load_blocked_emails( $load_users_IDs );
 
 		// Send emails:
+		$notified_users_num = 0;
 		foreach( $notify_users as $notify_user_ID => $notify_type )
 		{
+			if( ! check_cron_job_emails_limit() )
+			{	// Stop execution for cron job because max number of emails has been already sent:
+				break;
+			}
+
 			if( $notify_type == 'anon_subscription' )
 			{	// Get data of anonymous user:
 				$notify_comment_ID = intval( substr( $notify_user_ID, 5 ) );
@@ -4332,13 +4435,33 @@ class Comment extends DataObject
 			if( $notify_User )
 			{	// Send the email to registered User:
 				// Note: Note activated users won't get notification email
-				send_mail_to_User( $notify_user_ID, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+				$send_mail_result = send_mail_to_User( $notify_user_ID, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
 			}
 			else
 			{	// Send the email to anonymous user:
 				$email_template_params['comment_ID'] = $anon_Comment->ID;
 				$email_template_params['anonymous_unsubscribe_key'] = md5( $anon_Comment->ID.$anon_Comment->get( 'secret' ) );
-				send_mail_to_anonymous_user( $notify_email, $notify_user_name, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+				$send_mail_result = send_mail_to_anonymous_user( $notify_email, $notify_user_name, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+			}
+
+			if( $send_mail_result )
+			{	// Count of successful notified users:
+				$notified_users_num++;
+			}
+
+			if( $log_messages == 'cron_job' )
+			{	// Log mail sending for cron job:
+				$user_name = ( $notify_User ? $notify_User->get_identity_link() : $notify_user_name.' <'.$notify_email.'>' );
+				if( $send_mail_result )
+				{	// Log success mail sending:
+					cron_log_action_end( 'User '.$user_name.' has been notified' );
+				}
+				else
+				{	// Log failed mail sending:
+					global $mail_log_message;
+					cron_log_action_end( 'User '.$user_name.' could not be notified because of error: '
+						.'"'.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'"', 'warning' );
+				}
 			}
 
 			blocked_emails_memorize( $notify_email );
@@ -4346,7 +4469,9 @@ class Comment extends DataObject
 			locale_restore_previous();
 		}
 
-		blocked_emails_display();
+		blocked_emails_display( $log_messages );
+
+		return $notified_users_num;
 	}
 
 

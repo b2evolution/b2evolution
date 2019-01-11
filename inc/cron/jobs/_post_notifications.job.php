@@ -9,8 +9,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Messages;
-
 // Get the ID of the post we are supposed to post-process:
 if( empty( $job_params['item_ID'] ) )
 {
@@ -56,10 +54,10 @@ $previous_item_visibility_status = '';
 while( $edited_Item->get( 'status' ) != $previous_item_visibility_status )
 {
 	// Send outbound pings: (will only do something if visibility is 'public')
-	$edited_Item->send_outbound_pings( $job_params['force_pings'] );
+	$edited_Item->send_outbound_pings( $job_params['force_pings'], 'cron_job' );
 
 	// Send email notifications to users who want to receive them for the collection of this item: (will be different recipients depending on visibility)
-	$notified_flags = $edited_Item->send_email_notifications( $job_params['executed_by_userid'], $job_params['is_new_item'], $job_params['already_notified_user_IDs'], $job_params['force_members'], $job_params['force_community'] );
+	$notified_flags = $edited_Item->send_email_notifications( $job_params['executed_by_userid'], $job_params['is_new_item'], $job_params['already_notified_user_IDs'], $job_params['force_members'], $job_params['force_community'], 'cron_job' );
 
 	// Record that we have just notified the members and/or community:
 	$edited_Item->set( 'notifications_flags', $notified_flags );
@@ -75,10 +73,6 @@ while( $edited_Item->get( 'status' ) != $previous_item_visibility_status )
 	// Destroy current Item to get most recent item from DB:
 	unset( $ItemCache->cache[ $edited_Item->ID ] );
 	$edited_Item = & $ItemCache->get_by_ID( $item_ID );
-
-	// Store messages of the post sending email notifications:
-	cron_log_action_end( $Messages->get_string( '', '', "\n", '' ) );
-	$Messages->clear();
 }
 
 if( empty( $result_message ) )

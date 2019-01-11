@@ -110,7 +110,7 @@ $UserCache->load_list( $all_reminder_users );
 // ---- #1 Send activation reminder:
 $send_activation_users_num = count( $send_activation_users );
 $success_sent_activation_users_num = send_easy_validate_emails( $send_activation_users, true, false, NULL, 'cron_job' );
-cron_log_append( sprintf( T_('%d account activation reminder emails were sent!'), $success_sent_activation_users_num ),
+cron_log_append( sprintf( T_('%d of %d account activation reminder emails were sent!'), $success_sent_activation_users_num, $send_activation_users_num ),
 	( $send_activation_users_num ? ( $send_activation_users_num == $success_sent_activation_users_num ? 'success' : 'warning' ) : NULL ) );
 
 // ---- #2 Mark users as failed:
@@ -143,8 +143,10 @@ else
 
 // ---- #3 Send a delete warning reminder:
 $send_delete_warning_users_num = count( $send_delete_warning_users );
-$succes_sent_delete_warning_users_num = send_easy_validate_emails( $send_delete_warning_users, true, false, NULL, 'cron_job', 'account_delete_warning' );
-cron_log_append( sprintf( '%d delete warning reminder emails were sent!', $succes_sent_delete_warning_users_num )."\n",
+$succes_sent_delete_warning_users_num = check_cron_job_emails_limit() // Run email sending only when max emails number was not reached in the same function above
+	? send_easy_validate_emails( $send_delete_warning_users, true, false, NULL, 'cron_job', 'account_delete_warning' )
+	: 0;
+cron_log_append( sprintf( '%d of %d delete warning reminder emails were sent!', $succes_sent_delete_warning_users_num, $send_delete_warning_users_num )."\n",
 	( $send_delete_warning_users_num ? ( $send_delete_warning_users_num == $succes_sent_delete_warning_users_num ? 'success' : 'warning' ) : NULL ) );
 
 // ---- #4 Delete users:

@@ -3764,6 +3764,52 @@ function user_get_notification_sender( $user_ID, $setting )
 
 
 /**
+ * Check if current executing cron job should be stopped because of email sending limit
+ *
+ * @param boolean TRUE to increase a counter, e.g. from the function send_mail()
+ * @return boolean TRUE if cron job execution can continue, FALSE - when max emails was reached
+ */
+function check_cron_job_emails_limit( $increase_counter = false )
+{
+	global $Settings, $executing_cron_task_key;
+
+	if( ! isset( $executing_cron_task_key ) )
+	{	// Don't stop because it is a not cron job execution:
+		return true;
+	}
+
+	// Get max number of emails for current cron job:
+	$current_cron_job_emails_limit = intval( $Settings->get( 'cjob_maxemail_'.$executing_cron_task_key ) );
+
+	if( $current_cron_job_emails_limit > 0 )
+	{	// If current cron job has a limit for sending of emails:
+		global $executing_cron_task_emails_count;
+		if( $executing_cron_task_emails_count >= $current_cron_job_emails_limit )
+		{	// The limit was reached:
+			global $executing_cron_task_emails_reached, $mail_log_message;
+			$mail_log_message = 'Stopping execution because max number of emails ('.$current_cron_job_emails_limit.') has been sent.';
+			if( empty( $executing_cron_task_emails_reached ) )
+			{	// Append warning to cron log only if max emails is not reached yet:
+				cron_log_append( $mail_log_message."\n", 'warning' );
+				// Set flag to don't show the above warning twice:
+				$executing_cron_task_emails_reached = true;
+			}
+			// Stop current job execution:
+			return false;
+		}
+
+		if( $increase_counter )
+		{	// Increase a counter only if it is requested:
+			$executing_cron_task_emails_count++;
+		}
+	}
+
+	// Allow to continue current cron job execution:
+	return true;
+}
+
+
+/**
  * Sends an email, wrapping PHP's mail() function.
  * ALL emails sent by b2evolution must be sent through this function (for consistency and for logging)
  *
@@ -3800,7 +3846,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	// Stop a request from the blocked IP addresses or Domains
 	antispam_block_request();
 
-	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode, $mail_log_insert_ID, $executing_cron_task_key;
+	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode, $mail_log_insert_ID;
 
 	$message_data = $message;
 	if( is_array( $message_data ) && isset( $message_data['full'] ) )
@@ -3949,21 +3995,11 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	}
 	else
 	{	// If real mode
-		if( isset( $executing_cron_task_key ) )
-		{	// Check max number of emails that can be sent on executing cron job:
-			$max_cron_emails = intval( $Settings->get( 'cjob_maxemail_'.$executing_cron_task_key ) );
-			if( $max_cron_emails > 0 )
-			{	// Check if email sending in not unlimitted:
-				global $executing_cron_task_emails_count;
-				if( $executing_cron_task_emails_count >= $max_cron_emails )
-				{	// Stop email sending because of limit from cron job:
-					$mail_log_message = 'Stopping execution because max number of emails ('.$max_cron_emails.') has been sent.';
-					$Debuglog->add( htmlspecialchars( $mail_log_message ) );
-					return false;
-				}
-				// Increase a number of sent emails even if the sending is failed:
-				$executing_cron_task_emails_count++;
-			}
+
+		// Check if it is called from cron job and should be restricted by setting "Max emails to send":
+		if( ! check_cron_job_emails_limit( true/* Increase email sending counter */ ) )
+		{	// Stop email sending because of limit by current executing cron job:
+			return false;
 		}
 
 		// Send email message:

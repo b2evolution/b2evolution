@@ -665,8 +665,10 @@ function blocked_emails_memorize( $email )
 
 /**
  * Display the blocked emails from cache array
+ * 
+ * @param boolean|string 'cron_job' - to log messages for cron job, FALSE - to don't log
  */
-function blocked_emails_display()
+function blocked_emails_display( $log_messages = false )
 {
 	global $Messages, $cache_blocked_emails;
 
@@ -674,7 +676,15 @@ function blocked_emails_display()
 	{ // Display the messages about the blocked emails (grouped by email)
 		foreach( $cache_blocked_emails as $blocked_email => $blocked_emails_count )
 		{
-			$Messages->add( sprintf( T_('We could not send %d email to %s because this address is blocked.'), $blocked_emails_count, $blocked_email ) );
+			$message = sprintf( T_('We could not send %d email to %s because this address is blocked.'), $blocked_emails_count, $blocked_email );
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n", 'error' );
+			}
+			else
+			{
+				$Messages->add( $message );
+			}
 		}
 	}
 }
