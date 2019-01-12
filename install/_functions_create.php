@@ -2112,19 +2112,18 @@ function create_default_automations()
 			$AutomationStep = new AutomationStep();
 			$AutomationStep->set( 'autm_ID', $Automation->ID );
 			$AutomationStep->set( 'order', 1 );
-			$AutomationStep->set( 'label', 'admin' );
 			$AutomationStep->set( 'type', 'notify_owner' );
-			$AutomationStep->set( 'info', 'The User $login$ has reached step $step_number$ (ID: $step_ID$) in automation $automation_name$ (ID: $automation_ID$)' );
+			$AutomationStep->set( 'info', '$login$ has reached step $step_number$ (ID: $step_ID$)'."\n".'in automation $automation_name$ (ID: $automation_ID$)' );
 			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
 			$AutomationStep->set( 'yes_next_step_delay', 86400 ); // 1 day
 			$AutomationStep->set( 'error_next_step_ID', 1 ); // Loop
 			$AutomationStep->set( 'error_next_step_delay', 14400 ); // 4 hours
+			$AutomationStep->set_label();
 			$AutomationStep->dbinsert();
 
 			$AutomationStep = new AutomationStep();
 			$AutomationStep->set( 'autm_ID', $Automation->ID );
 			$AutomationStep->set( 'order', 2 );
-			$AutomationStep->set( 'label', 'Markdown Example' );
 			$AutomationStep->set( 'type', 'send_campaign' );
 			$AutomationStep->set( 'info', '1' ); // Email Campaign ID
 			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
@@ -2133,12 +2132,12 @@ function create_default_automations()
 			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
 			$AutomationStep->set( 'error_next_step_ID', 2 ); // Loop
 			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
+			$AutomationStep->set_label();
 			$AutomationStep->dbinsert();
 
 			$AutomationStep = new AutomationStep();
 			$AutomationStep->set( 'autm_ID', $Automation->ID );
 			$AutomationStep->set( 'order', 3 );
-			$AutomationStep->set( 'label', 'Another example' );
 			$AutomationStep->set( 'type', 'send_campaign' );
 			$AutomationStep->set( 'info', '2' ); // Email Campaign ID
 			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
@@ -2147,6 +2146,7 @@ function create_default_automations()
 			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
 			$AutomationStep->set( 'error_next_step_ID', 3 ); // Loop
 			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
+			$AutomationStep->set_label();
 			$AutomationStep->dbinsert();
 
 			// Add users to this automation:

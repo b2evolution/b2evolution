@@ -10271,6 +10271,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13070, 'Upgrading automation step table...' ) )
+	{	// part of 6.10.6-stable
+		db_modify_col( 'T_automation__step', 'step_type', 'ENUM("if_condition", "send_campaign", "notify_owner", "add_usertag", "remove_usertag", "subscribe", "unsubscribe", "start_automation", "user_status") COLLATE ascii_general_ci NOT NULL DEFAULT "if_condition"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

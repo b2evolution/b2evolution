@@ -32,7 +32,7 @@ if( $display_mode != 'js' )
 	$Form->global_icon( T_('Cancel editing').'!', 'close', $edit_automation_url );
 }
 
-$Form->begin_form( 'fform', $display_mode == 'js' ? '' : sprintf( $creating ? ( $edited_AutomationStep->ID > 0 ? T_('Duplicate step') : T_('New step') ) : T_('Step') ).get_manual_link( 'automation-step-form' ) );
+$Form->begin_form( 'fform', $display_mode == 'js' ? '' : sprintf( $creating ? ( $edited_AutomationStep->ID > 0 ? T_('Duplicate step') : T_('New step') ) : T_('Step') ).get_manual_link( 'automation-step-details' ) );
 
 $Form->add_crumb( 'automationstep' );
 $Form->hidden( 'action', $creating ? ( $edited_AutomationStep->ID > 0 ? 'duplicate_step' : 'create_step' ) : 'update_step' );
@@ -65,7 +65,7 @@ $Form->select_input_object( 'step_email_campaign',
 $Form->textarea_input( 'step_notification_message', (
 		$edited_AutomationStep->get( 'type' ) == 'notify_owner'
 		? $edited_AutomationStep->get( 'info' )
-		: 'The User $login$ has reached step $step_number$ (ID: $step_ID$) in automation $automation_name$ (ID: $automation_ID$)'
+		: '$login$ has reached step $step_number$ (ID: $step_ID$)'."\n".'in automation $automation_name$ (ID: $automation_ID$)'
 	), 10, T_('Notification message') );
 
 // Usertag:
@@ -83,6 +83,12 @@ $AutomationCache = & get_AutomationCache();
 $AutomationCache->load_all();
 $automation_ID = ( $edited_AutomationStep->get( 'type' ) == 'start_automation' ? intval( $edited_AutomationStep->get( 'info' ) ) : 0 );
 $Form->select_input_object( 'step_automation', $automation_ID, $AutomationCache, T_('Automation'), array( 'required' => true, 'allow_none' => true ) );
+
+// Account status:
+$step_user_status = ( $edited_AutomationStep->get( 'type' ) == 'user_status' ? $edited_AutomationStep->get( 'info' ) : '' );
+$user_statuses = get_user_statuses();
+unset( $user_statuses['new'] );
+$Form->select_input_array( 'user_status', $step_user_status, $user_statuses, T_('Account status'), T_('If the user account is already in the desired status when the step is executed, the status will <b>NOT</b> be changed.'), array( 'required' => true, 'allow_none' => true ) );
 
 // Load all steps of the edited step's automation excluding current step:
 $AutomationStepCache = & get_AutomationStepCache();
@@ -212,8 +218,8 @@ jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID, #step_error_next_step_ID
  */
 function step_type_update_info( step_type )
 {
-	jQuery( '#ffield_step_email_campaign, .ffield_step_if_condition, #ffield_step_notification_message, #ffield_step_usertag, #ffield_step_newsletter, #ffield_step_automation' ).hide();
-	jQuery( '#step_email_campaign, #step_newsletter, #step_automation' ).removeAttr( 'required' );
+	jQuery( '#ffield_step_email_campaign, .ffield_step_if_condition, #ffield_step_notification_message, #ffield_step_usertag, #ffield_step_newsletter, #ffield_step_automation, #ffield_user_status' ).hide();
+	jQuery( '#step_email_campaign, #step_newsletter, #step_automation, #user_status' ).removeAttr( 'required' );
 	jQuery( '#ffield_step_no_next' ).show();
 	jQuery( '#ffield_step_error_next' ).show();
 
@@ -300,6 +306,20 @@ function step_type_update_info( step_type )
 				jQuery( '#step_error_next_step_ID' ).val( 'loop' );
 				jQuery( '#step_error_next_step_delay_value' ).val( '7' );
 				jQuery( '#step_error_next_step_delay_name' ).val( 'day' );
+			}
+			break;
+
+		case 'user_status':
+			jQuery( '#ffield_user_status' ).show();
+			jQuery( '#user_status' ).attr( 'required', 'required' );
+			jQuery( '#step_result_label_yes' ).html( '<?php echo TS_( step_get_result_label( 'user_status', 'YES' ) ); ?>' );
+			jQuery( '#step_result_label_no' ).html( '<?php echo TS_( step_get_result_label( 'user_status', 'NO' ) ); ?>' );
+			jQuery( '#step_result_label_error' ).html( '<?php echo TS_( step_get_result_label( 'user_status', 'ERROR' ) ); ?>' );
+			if( set_default_next_step_data )
+			{	// Suggest default values:
+				jQuery( '#step_yes_next_step_ID, #step_no_next_step_ID, #step_error_next_step_ID' ).val( '' );
+				jQuery( '#step_yes_next_step_delay_value, #step_no_next_step_delay_value, #step_error_next_step_delay_value' ).val( '0' );
+				jQuery( '#step_yes_next_step_delay_name, #step_no_next_step_delay_name, #step_error_next_step_delay_name' ).val( 'second' );
 			}
 			break;
 
