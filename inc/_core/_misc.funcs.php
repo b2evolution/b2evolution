@@ -3766,10 +3766,15 @@ function user_get_notification_sender( $user_ID, $setting )
 /**
  * Check if current executing cron job should be stopped because of email sending limit
  *
- * @param boolean TRUE to increase a counter, e.g. from the function send_mail()
+ * 1. THIS MUST BE CALLED ONLY FROM INSIDE THE MAIN LOOP of the cronjob (*.job.php), not from within a generic function.
+ * 2. THE GOAL is to NOT overload the sending  mail server by creating a PAUSE afer (approximately) the pax number of email to send in a chunk
+ * 2B. The goal is that the next execution of the cron job will continue sending emails where the current job has left off.
+ * 2C. The goal is NOT to miss sending notifications by generating send errors!
+ * 3. Counter increase must be done SEPARATELY when an email is sent.
+ *
  * @return boolean TRUE if cron job execution can continue, FALSE - when max emails was reached
  */
-function check_cron_job_emails_limit( $increase_counter = false )
+function check_cron_job_emails_limit()
 {
 	global $Settings, $executing_cron_task_key;
 
@@ -3798,10 +3803,6 @@ function check_cron_job_emails_limit( $increase_counter = false )
 			return false;
 		}
 
-		if( $increase_counter )
-		{	// Increase a counter only if it is requested:
-			$executing_cron_task_emails_count++;
-		}
 	}
 
 	// Allow to continue current cron job execution:
@@ -3995,16 +3996,12 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	}
 	else
 	{	// If real mode
-
-		// Check if it is called from cron job and should be restricted by setting "Max emails to send":
-		if( ! check_cron_job_emails_limit( true/* Increase email sending counter */ ) )
-		{	// Stop email sending because of limit by current executing cron job:
-			return false;
-		}
-
 		// Send email message:
 		$send_mail_result = evo_mail( $to, $subject, $message_data, $headers, $additional_parameters );
 	}
+
+// HERE: increase_mail_send_counter();  THIS MUST NOT STOP execution here!
+
 
 	if( ! $send_mail_result )
 	{	// The message has not been sent successfully

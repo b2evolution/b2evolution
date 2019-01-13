@@ -263,6 +263,9 @@ class EmailCampaign extends DataObject
 			$new_users_SQL->WHERE_and( 'enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
 			$new_users = $DB->get_col( $new_users_SQL );
 
+			// Remove the filtered recipients which didn't receive email newsletter yet:
+			$this->remove_recipients();
+
 			// Get all send statuses per users of this email campaign in order to don't insert the data twice:
 			$old_users = $this->get_recipients( 'full_all' );
 
