@@ -56,6 +56,7 @@ $Form->begin_fieldset( T_('List recipients').get_manual_link( 'campaign-recipien
 			'input_prefix' => '<div class="evo_input__tags">',
 			'input_suffix' => '</div><span id="skipped_tag_count">'.$edited_EmailCampaign->get_recipients_count( 'skipped_tag' ).'</span>',
 		) );
+	$Form->info( T_('Send error'), $edited_EmailCampaign->get_recipients_count( 'error', true ), '('.T_('Accounts which had errors on receiving this campaign').')' );
 	$Form->info( T_('Ready to send'), '<span id="ready_to_send_count">'.$edited_EmailCampaign->get_recipients_count( 'wait', true ).'</span>', '('.T_('Accounts which meet all criteria to receive this campaign').')' );
 	$Form->usertag_input( 'ecmp_user_tag_sendsuccess', param( 'ecmp_user_tag_sendsuccess', 'string', $edited_EmailCampaign->get( 'user_tag_sendsuccess' ) ), 60, T_('On successful send, tag users with'), '', array(
 		'maxlength' => 255,

@@ -541,6 +541,9 @@ class EmailCampaign extends DataObject
 					case 'wait':
 						$recipient_type = 'ready_to_send';
 						break;
+					case 'error':
+						$recipient_type = 'send_error';
+						break;
 					case 'filter':
 					default:
 						$recipient_type = 'filtered';
