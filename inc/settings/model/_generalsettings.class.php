@@ -54,7 +54,7 @@ class GeneralSettings extends AbstractSettings
 		'cleanup_jobs_threshold' => 45, // days (Cleanup scheduled jobs threshold)
 		'cleanup_email_logs_threshold' => 59616000, // seconds (Cleanup email logs threshold)
 		'activate_account_reminder_threshold' => 86400, // seconds (Account activation reminder threshold)
-		'activate_account_reminder_config' => '86400,129600,345600,604800', // seconds (Account activation reminder settings), Defaults: one day, 1.5 days, 4 days, 7 days
+		'activate_account_reminder_config' => '86400,129600,345600,604800,0,0', // seconds (Account activation reminder settings), Defaults: one day, 1.5 days, 4 days, 7 days, "Don't send", "Don't delete"
 		'inactive_account_reminder_threshold' => 31536000, // seconds (Inactive account reminder threshold)
 		'comment_moderation_reminder_threshold' => 86400, // seconds (Comment moderation reminder threshold)
 		'post_moderation_reminder_threshold' => 86400, // seconds (Post moderation reminder threshold)

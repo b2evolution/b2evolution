@@ -656,7 +656,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 	if( $outer_most && $has_array_type )
 	{ // Note for Non-Javascript users:
-		echo '<script type="text/javascript"></script><noscript>';
+		echo '<script></script><noscript>';
 		echo '<p class="note">'.T_('Note: before adding a new set you have to save any changes.').'</p>';
 		echo '</noscript>';
 	}

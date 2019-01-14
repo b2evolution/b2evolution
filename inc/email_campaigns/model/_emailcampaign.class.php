@@ -261,13 +261,13 @@ class EmailCampaign extends DataObject
 			$new_users_SQL->WHERE( 'user_ID IN ( '.$DB->quote( $filtered_users_IDs ).' )' );
 			$new_users_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 			$new_users_SQL->WHERE_and( 'enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
-			$new_users = $DB->get_col( $new_users_SQL->get(), 0, $new_users_SQL->title );
+			$new_users = $DB->get_col( $new_users_SQL );
 
 			// Remove the filtered recipients which didn't receive email newsletter yet:
 			$this->remove_recipients();
 
-			// Get users which already received email newsletter:
-			$old_users = $this->get_recipients( 'receive' );
+			// Get all send statuses per users of this email campaign in order to don't insert the data twice:
+			$old_users = $this->get_recipients( 'full_all' );
 
 			// Exclude old users from new users (To store value of csnd_emlog_ID):
 			$new_users = array_diff( $new_users, $old_users );
@@ -279,7 +279,7 @@ class EmailCampaign extends DataObject
 				{
 					$insert_SQL .= "\n".'( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', "ready_to_send" ),';
 				}
-				$DB->query( substr( $insert_SQL, 0, -1 ) );
+				$DB->query( substr( $insert_SQL, 0, -1 ).' ON DUPLICATE KEY UPDATE csnd_camp_ID = csnd_camp_ID, csnd_user_ID = csnd_user_ID' );
 			}
 		}
 	}
@@ -652,13 +652,14 @@ class EmailCampaign extends DataObject
 			$email_plaintext = preg_replace_callback( '#<a[^>]+href="([^"]+)"[^>]*>([^<]*)</a>#i', array( $this, 'update_plaintext_callback_a' ), $this->get( 'email_html' ) );
 			$email_plaintext = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', ' [ $1 ] ', $email_plaintext );
 			$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
-			$email_plaintext = preg_replace( '#</li>[\s\t]*</ul>#i', '</li></ul>', $email_plaintext );
+			$email_plaintext = preg_replace( '#</li>[\s\t]*</ul>#i', '</li>', $email_plaintext );
 			$email_plaintext = preg_replace_callback( '#<h([1-4])[^>]*>([^<]*)</h\1>#i', array( $this, 'update_plaintext_callback_h' ), $email_plaintext );
 			$email_plaintext = preg_replace( '#<(p|/?h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
 			$email_plaintext = preg_replace( '#<(br|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
-			$email_plaintext = preg_replace( '#<li[^>]*>#i', "- ", $email_plaintext );
+			$email_plaintext = preg_replace( '#<li[^>]*>#i', '- ', $email_plaintext );
 			$email_plaintext = preg_replace( '#<hr ?/?>#i', "\n\n----------------\n\n", $email_plaintext );
-			$email_plaintext = preg_replace( '#[\n\s]{2,}#i', "\n\n", $email_plaintext );
+			$email_plaintext = preg_replace( '#[\n\s]{3,}#i', "\n\n", $email_plaintext );
+			$email_plaintext = str_replace( array( '&ndash;', '&mdash;', '&#8211;', '&#8212;' ), '--', $email_plaintext );
 			$this->set( 'email_plaintext', trim( strip_tags( $email_plaintext ), " \r\n" ) );
 		}
 	}

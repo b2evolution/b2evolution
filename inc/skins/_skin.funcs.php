@@ -335,7 +335,16 @@ function skin_init( $disp )
 			if( !empty($active_filters) )
 			{	// The current page is being filtered...
 
-				if( array_diff( $active_filters, array( 'page' ) ) == array() )
+				if( array_diff( $active_filters, array( 'posts' ) ) == array() )
+				{	// This is the default blog page only if the 'front_disp' is set to 'posts'
+					$disp_detail = 'posts-default';
+					$seo_page_type = 'Default page';
+					if( $Blog->get_setting( 'default_noindex' ) )
+					{	// We prefer robots not to index archive pages:
+						$robots_index = false;
+					}
+				}
+				elseif( array_diff( $active_filters, array( 'posts', 'page' ) ) == array() )
 				{ // This is just a follow "paged" page
 					$disp_detail = 'posts-next';
 					$seo_page_type = 'Next page';

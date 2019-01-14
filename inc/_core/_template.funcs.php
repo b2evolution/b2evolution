@@ -1133,7 +1133,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 	{
 		$required_js[] = strtolower( $js_url );
 
-		$script_tag = '<script type="text/javascript"';
+		$script_tag = '<script';
 		$script_tag .= $async ? ' async' : '';
 		$script_tag .= ' src="'.$js_url.'">';
 		$script_tag .= '</script>';
@@ -1449,7 +1449,7 @@ function add_headline( $headline, $file_name = NULL )
  */
 function add_js_headline($headline)
 {
-	add_headline("<script type=\"text/javascript\">\n\t/* <![CDATA[ */\n\t\t"
+	add_headline("<script>\n\t/* <![CDATA[ */\n\t\t"
 		.$headline."\n\t/* ]]> */\n\t</script>");
 }
 
@@ -2428,7 +2428,7 @@ function display_ajax_form( $params )
 	// Display loader gif until the ajax call returns:
 	echo '<p class="ajax-loader"><span class="loader_img loader_ajax_form" title="'.T_('Loading...').'"></span><br />'.T_( 'Form is loading...' ).'</p>';
 	?>
-	<script type="text/javascript">
+	<script>
 		var ajax_form_offset_<?php echo $ajax_form_number; ?> = jQuery('#ajax_form_number_<?php echo $ajax_form_number; ?>').offset().top;
 		var request_sent_<?php echo $ajax_form_number; ?> = false;
 		var ajax_form_loading_number_<?php echo $ajax_form_number; ?> = 0;
@@ -2737,7 +2737,7 @@ function display_login_js_handler( $params )
 	$params = array_merge( array( 'get_widget_login_hidden_fields' => false ), $params );
 
 ?>
-	<script type="text/javascript">
+	<script>
 	var requestSent = false;
 	var login = document.getElementById("<?php echo $dummy_fields[ 'login' ]; ?>");
 	if( login.value.length > 0 )
@@ -3145,7 +3145,7 @@ function display_password_indicator( $params = array() )
 			'blacklist'   => "'b2evo','b2evolution'", // Identify the password as "weak" if it includes any of these words
 		), $params );
 
-	echo "<script type='text/javascript'>
+	echo "<script>
 	// Load password strength estimation library
 	(function(){var a;a=function(){var a,b;b=document.createElement('script');b.src='".force_https_url( $rsc_url, 'login' )."js/zxcvbn.js';b.type='text/javascript';b.async=!0;a=document.getElementsByTagName('script')[0];return a.parentNode.insertBefore(b,a)};null!=window.attachEvent?window.attachEvent('onload',a):window.addEventListener('load',a,!1)}).call(this);
 
@@ -3302,7 +3302,7 @@ function display_password_js_edit()
 {
 	global $Settings;
 
-	echo '<script type="text/javascript">
+	echo '<script>
 jQuery( "#current_user_pass" ).keyup( function()
 {
 	var error_obj = jQuery( this ).parent().find( "span.field_error" );
@@ -3422,7 +3422,7 @@ function display_login_validator( $params = array() )
 			'login-id' => $dummy_fields[ 'login' ],
 		), $params );
 
-	echo '<script type="text/javascript">
+	echo '<script>
 	var login_icon_load = \'<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.TS_('Loading...').'" title="'.TS_('Loading...').'" style="margin:2px 0 0 5px" align="top" />\';
 	var login_icon_available = \''.get_icon( 'allowback', 'imgtag', array( 'title' => TS_('This username is available.') ) ).'\';
 	var login_icon_exists = \''.get_icon( 'xross', 'imgtag', array( 'title' => TS_('This username is already in use. Please choose another one.') ) ).'\';

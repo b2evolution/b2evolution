@@ -990,7 +990,7 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 
 		if( ! empty($js_closeClickIDs) )
 		{ // there are IDs of checkboxes that we want to close
-			$ret .= "\n".'<script type="text/javascript">toggle_clickopen( \''
+			$ret .= "\n".'<script>toggle_clickopen( \''
 						.implode( "' );\ntoggle_clickopen( '", $js_closeClickIDs )
 						."' );\n</script>";
 		}
@@ -2408,7 +2408,7 @@ function display_dragdrop_upload_button( $params = array() )
 		</noscript>
 	</div>
 	<input id="saveBtn" type="submit" style="display:none" name="saveBtn" value="<?php echo T_('Save modified files'); ?>" class="ActionButton" />
-	<script type="text/javascript">
+	<script>
 		if( 'draggable' in document.createElement('span') )
 		{
 			var button_text = '<?php echo TS_('Drag & Drop files to upload here <br /><span>or click to manually select files...</span>') ?>';
@@ -3060,7 +3060,7 @@ function echo_file_properties()
 	// Initialize JavaScript to build and open window:
 	echo_modalwindow_js();
 ?>
-<script type="text/javascript">
+<script>
 	//<![CDATA[
 	// Window to edit file
 	function file_properties( root, path, file )

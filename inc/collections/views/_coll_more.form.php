@@ -58,7 +58,7 @@ if( $notifications_mode != 'off' )
 		// TODO2: which feeds (skins)?
 	$Form->end_fieldset();
 	?>
-	<script type="text/javascript">
+	<script>
 		jQuery( 'input[name=allow_subscriptions], input[name=allow_comment_subscriptions], input[name=allow_item_subscriptions], input[name=allow_item_mod_subscriptions]' ).on( 'click', function()
 		{
 			var opt_out_object = jQuery( 'input[name=opt_out_' + jQuery( this ).attr( 'name' ).replace( /^allow_/, '' ).replace( /subscriptions$/, 'subscription' ) + ']' );

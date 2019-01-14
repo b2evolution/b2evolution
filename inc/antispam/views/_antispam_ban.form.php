@@ -292,7 +292,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : T_('Confirm ban & delet
 $Form->end_form();
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function() {
 	jQuery( document ).on( 'keypress', function( e ) {
 		if( e.key == "Enter" )

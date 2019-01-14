@@ -273,7 +273,7 @@ $Results->cols[] = array(
 $Results->display();
 
 ?>
-<script type="text/javascript">
+<script>
 function syslog_origin_ID()
 {
 	if( jQuery( '#origin' ).val() == 'plugin' )

@@ -74,7 +74,7 @@ else
 	$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
 }
 ?>
-<script type="text/javascript">
+<script>
 	jQuery( '#ufdf_type' ).change( function()
 	{	// Show textarea input only for field type with "Option list"
 		if( jQuery( this ).val() == 'list' )

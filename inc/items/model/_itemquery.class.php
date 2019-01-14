@@ -102,18 +102,17 @@ class ItemQuery extends SQL
 		// if a post urltitle is specified, load that post
 		if( !empty( $title ) )
 		{
+			global $DB;
 			if( substr( $this->title, 0, 1 ) == '-' )
 			{	// Starts with MINUS sign:
-				$eq_title = ' <> ';
-				$this->title = substr( $this->title, 1 );
+				$title = substr( $this->title, 1 );
+				$this->WHERE_and( 'post_ID NOT IN ( SELECT slug_itm_ID FROM T_slug WHERE slug_title = '.$DB->quote( $title ).' )' );
 			}
 			else
 			{
-				$eq_title = ' = ';
+				$this->FROM_add( 'LEFT JOIN T_slug ON slug_itm_ID = post_ID AND slug_type = "item" AND slug_title = '.$DB->quote( $title ) );
+				$this->WHERE_and( 'slug_title IS NOT NULL' );
 			}
-
-			global $DB;
-			$this->WHERE_and( $this->dbprefix.'urltitle'.$eq_title.$DB->quote($this->title) );
 			$r = true;
 		}
 

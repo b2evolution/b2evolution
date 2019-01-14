@@ -36,7 +36,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class proof_of_work_captcha_plugin extends Plugin
 {
-	var $version = '6.10.5';
+	var $version = '6.10.6';
 	var $group = 'antispam';
 	var $code = 'proof_of_work_captcha';
 
@@ -285,7 +285,7 @@ class proof_of_work_captcha_plugin extends Plugin
 			</span>';
 		$captcha_html = str_replace( '$captcha_answer$', $captcha_html, $params['captcha_template_answer'] );
 		// Append a flag to the forms which contains the coinhive captcha in order to don't disable the submit buttons from other forms on the same page:
-		$captcha_html .= '<script type="text/javascript">jQuery( \'.coinhive-captcha[data-hashes]\' ).closest( \'form\' ).attr( \'data-coinhive-captcha\', 1 )</script>';
+		$captcha_html .= '<script>jQuery( \'.coinhive-captcha[data-hashes]\' ).closest( \'form\' ).attr( \'data-coinhive-captcha\', 1 )</script>';
 
 		return array(
 				'captcha_position' => $captcha_position,

@@ -305,7 +305,7 @@ else
 }
 ?>
 	</div>
-<script type="text/javascript">
+<script>
 if( typeof file_uploader_note_text != 'undefined' )
 {
 	document.write( '<div class="note pull-right">' + file_uploader_note_text + '</div>' );
@@ -331,7 +331,7 @@ if( typeof file_uploader_note_text != 'undefined' )
 	$new_root_selector_html = preg_replace( '/<script.*?<\/script>/is', '', $new_root_selector_html );
 	$new_root_selector_html = format_to_js( $new_root_selector_html );
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '#new_root_selector a[data-type]' ).click( function()

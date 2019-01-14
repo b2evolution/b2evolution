@@ -51,7 +51,7 @@ $Form->hiddens_by_key( get_memorized( 'action' ) );
 $Form->begin_form( 'fform' );
 
 // Display the backup options to select what should be backuped:
-$Form->begin_fieldset( T_( 'Advanced backup options' ), array( 'id' => 'upgrade_backup_options', 'fold' => true ) );
+$Form->begin_fieldset( T_( 'Advanced backup options' ).get_manual_link( 'upgrade-advanced-backup-options' ), array( 'id' => 'upgrade_backup_options', 'fold' => true ) );
 
 // Create Backup object:
 load_class( 'maintenance/model/_backup.class.php', 'Backup' );
@@ -124,7 +124,7 @@ if( function_exists( 'gzopen' ) )
 $Form->end_fieldset();
 
 // Display file options:
-$Form->begin_fieldset( T_('File options'), array( 'id' => 'upgrade_file_options', 'fold' => true ) );
+$Form->begin_fieldset( T_('File options').get_manual_link( 'upgrade-file-options' ), array( 'id' => 'upgrade_file_options', 'fold' => true ) );
 	$Form->text_input( 'fm_default_chmod_dir', $Settings->get('fm_default_chmod_dir'), 4, T_('Permissions for new folders'), T_('Default CHMOD (UNIX permissions) for new directories created by b2evolution.') );
 	$Form->text_input( 'fm_default_chmod_file', $Settings->get('fm_default_chmod_file'), 4, T_('Permissions for new files'), T_('Default CHMOD (UNIX permissions) for new files created by b2evolution.') );
 $Form->end_fieldset();

@@ -628,11 +628,11 @@ class RestApi
 		if( $post_ID )
 		{	// Get only one requested post:
 			if( ctype_digit( ( string ) $post_ID ) )
-			{ // Get by post ID
+			{	// Get by post ID:
 				$ItemList2->set_filters( array( 'post_ID' => $post_ID ), true, true );
 			}
 			else
-			{ // Get by url slug
+			{	// Get by url slug:
 				$ItemList2->set_filters( array( 'post_title' => $post_ID ), true, true );
 			}
 		}

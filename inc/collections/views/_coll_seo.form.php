@@ -25,7 +25,7 @@ global $preset;
 global $rsc_url;
 
 ?>
-<script type="text/javascript">
+<script>
 	function show_hide_chapter_prefix(ob)
 	{
 		var fldset = document.getElementById( 'category_prefix_container' );
@@ -182,7 +182,7 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo'
 		echo '</div>';
 		if( $edited_Blog->get_setting( 'chapter_links' ) == 'param_num' )
 		{ ?>
-		<script type="text/javascript">
+		<script>
 			<!--
 			var fldset = document.getElementById( 'category_prefix_container' );
 			fldset.style.display = 'none';
@@ -260,7 +260,7 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo'), array('
 
 // Javascript juice for the tag fields.
 ?>
-<script type="text/javascript">
+<script>
 jQuery("#tag_links_fieldset input[name=tag_links][type=radio]").click( function()
 {
 	// Disable tag_prefix, if "param" is used. fp> TODO: visual feedback that this is disabled
@@ -341,7 +341,7 @@ $Form->end_fieldset();
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'input[name=canonical_item_urls]' ).click( function()
 {
 	var canonical_item_urls_is_unchecked = ! jQuery( this ).prop( 'checked' );

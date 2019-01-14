@@ -25,7 +25,7 @@ function CanvasBarsChart( $chart, $init_js_callback = NULL, $canvas_id = 'canvas
 {
 ?>
 <div id="<?php echo $canvas_id; ?>" style="height:<?php echo $chart['canvas_bg']['height']; ?>px;width:<?php echo $chart['canvas_bg']['width']; ?>px;margin:auto auto 35px;"></div>
-<script type="text/javascript">
+<script>
 jQuery( window ).load( function()
 {
 	<?php
@@ -239,7 +239,7 @@ function CanvasDonutChart( $chart )
 {
 ?>
 <div id="canvasdonutchart" style="height:<?php echo $chart['height']; ?>px;width:<?php echo $chart['width']; ?>px;"></div>
-<script type="text/javascript">
+<script>
 jQuery( window ).load( function()
 {
 <?php

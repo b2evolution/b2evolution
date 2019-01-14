@@ -77,7 +77,7 @@ $Form->begin_form( 'bComment' );
 	$Form->inputstart = $form_inputstart;
 
 	// set b2evoCanvas for plugins
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
+	echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
 
 	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
@@ -144,7 +144,7 @@ $Form->begin_form( 'bComment' );
 $Form->end_form();
 
 ?>
-<script type="text/javascript">
+<script>
 	function switch_edit_view()
 	{
 		var form = document.getElementById('comment_edit');

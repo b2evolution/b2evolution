@@ -10218,7 +10218,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Upgrading email campaigns table...' );
-		db_add_col( 'T_email__campaign', 'ecmp_user_tag_unsubscribe', 'VARCHAR(255) NULL AFTER ecmp_user_tag_like' );
+		db_add_col( 'T_email__campaign', 'ecmp_user_tag_unsubscribe', 'VARCHAR(255) NULL AFTER ecmp_user_tag_dislike' );
 		task_end();
 
 		upg_task_end( false );
@@ -10259,6 +10259,22 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				'ecmp_activate_autm_execute' => 'TINYINT(1) NOT NULL DEFAULT 1',
 			),
 		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13060, 'Updating settings for scheduled job "Send reminders about non-activated accounts"...' ) )
+	{	// part of 6.10.5-stable
+		// Add default value "Don't send" for new setting "Delete warning"
+		// and default value "Don't delete" for new setting "Delete account":
+		$DB->query( 'UPDATE T_settings
+			  SET set_value = CONCAT( set_value, ",0,0" )
+			WHERE set_name = "activate_account_reminder_config"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13070, 'Upgrading automation step table...' ) )
+	{	// part of 6.10.6-stable
+		db_modify_col( 'T_automation__step', 'step_type', 'ENUM("if_condition", "send_campaign", "notify_owner", "add_usertag", "remove_usertag", "subscribe", "unsubscribe", "start_automation", "user_status") COLLATE ascii_general_ci NOT NULL DEFAULT "if_condition"' );
 		upg_task_end();
 	}
 

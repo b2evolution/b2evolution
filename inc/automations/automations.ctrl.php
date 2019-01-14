@@ -111,8 +111,23 @@ switch( $action )
 		if( $edited_Automation->load_from_Request() )
 		{	// We could load data from form without errors:
 			// Insert in DB:
-			$edited_Automation->dbinsert();
-			$Messages->add( T_('New automation has been created.'), 'success' );
+			if( $edited_Automation->dbinsert() )
+			{
+				$Messages->add( T_('New automation has been created.'), 'success' );
+
+				// Create default step automatically:
+				$default_AutomationStep = new AutomationStep();
+				$default_AutomationStep->set( 'autm_ID', $edited_Automation->ID );
+				$default_AutomationStep->set( 'order', '1' );
+				$default_AutomationStep->set( 'type', 'notify_owner' );
+				$default_AutomationStep->set( 'info', '$login$ has ENTERED automation $automation_name$ (ID: $automation_ID$)'."\n\n".'Step $step_number$ (ID: $step_ID$)' );
+				$default_AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+				$default_AutomationStep->set( 'yes_next_step_delay', 86400 ); // 1 day
+				$default_AutomationStep->set( 'error_next_step_ID', 1 ); // Loop
+				$default_AutomationStep->set( 'error_next_step_delay', 14400 ); // 4 hours
+				$default_AutomationStep->set_label();
+				$default_AutomationStep->dbinsert( false/* Insert step even when automation is not paused */ );
+			}
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=automations', 303 ); // Will EXIT
@@ -394,7 +409,7 @@ switch( $action )
 			$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab='.$tab.'&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'new_step';
@@ -763,7 +778,7 @@ switch( $action )
 		switch( $tab )
 		{
 			case 'steps':
-				$AdminUI->set_page_manual_link( 'automation-steps' );
+				$AdminUI->set_page_manual_link( in_array( $action, array( 'new_step', 'edit_step', 'copy_step' ) ) ? 'automation-step-details' : 'automation-steps' );
 				$AdminUI->set_path( 'email', 'automations', 'steps' );
 				break;
 

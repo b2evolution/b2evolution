@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '6.10.5';
+	var $version = '6.10.6';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -494,7 +494,7 @@ class tinymce_plugin extends Plugin
 		if( empty( $wysiwyg_toggle_switch_js_initialized ) )
 		{
 		?>
-			<script type="text/javascript">
+			<script>
 			function toggle_switch_warning( state )
 			{
 				var activate_link = '<?php echo $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' );?>';
@@ -529,7 +529,7 @@ class tinymce_plugin extends Plugin
 				echo ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ) ? $deactivate_warning_link : $activate_warning_link;
 				echo $params['quicksetting_item_end'];
 				?>
-				<script type="text/javascript">
+				<script>
 					var quicksetting_switch = jQuery( '#<?php echo $params['quicksetting_item_id'];?>' );
 					jQuery( document ).on( 'wysiwyg_warning_changed', function( event, state ) {
 							quicksetting_switch.html( state ? '<?php echo format_to_js( $deactivate_warning_link );?>' : '<?php echo format_to_js( $activate_warning_link ); ?>' );
@@ -551,7 +551,7 @@ class tinymce_plugin extends Plugin
 						title="<?php echo format_to_output( $this->T_('Toggle to the WYSIWYG editor.'), 'htmlattr' ); ?>" />
 				</div>
 
-				<script type="text/javascript">
+				<script>
 					var displayWarning = <?php echo ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ) ? 'true' : 'false';?>;
 
 					jQuery( document ).on( 'wysiwyg_warning_changed', function( event, state ) {
@@ -704,7 +704,7 @@ class tinymce_plugin extends Plugin
 					require_js( '#evo_view#', 'blog', false, true );
 					?>
 
-					<script type="text/javascript">
+					<script>
 					function tinymce_plugin_init_tinymce( oninit )
 					{
 						// Init tinymce:
@@ -811,12 +811,12 @@ class tinymce_plugin extends Plugin
 				if( $use_tinymce )
 				{ // User used MCE last time, load MCE on document.ready:
 					$editor_code = $this->code;
-					echo '<script type="text/javascript">jQuery( tinymce_plugin_toggleEditor("'.$params['content_id'].'") );</script>';
+					echo '<script>jQuery( tinymce_plugin_toggleEditor("'.$params['content_id'].'") );</script>';
 				}
 				// By default set the editor code to an empty string
 				echo '<input type="hidden" name="editor_code" value="">';
 				// If the js is enabled set the editor code to the currently used value
-				echo '<script type="text/javascript">jQuery(\'[name="editor_code"]\').attr(\'value\', \''.$editor_code.'\');</script>';
+				echo '<script>jQuery(\'[name="editor_code"]\').attr(\'value\', \''.$editor_code.'\');</script>';
 
 				// We also want to save the 'last used/not-used' state: (if no NULLs, this won't change anything)
 				$this->htsrv_save_editor_state( array_merge( $state_params, array( 'on' => $use_tinymce ) ) );
@@ -1115,6 +1115,7 @@ class tinymce_plugin extends Plugin
 		global $tinymce_content_css, $app_version_long;
 
 		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'evo_view.css', true, 'css', $this->version.'+'.$app_version_long );
+		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'editor.css', true, 'css', $this->version.'+'.$app_version_long );
 
 		if( is_array( $tinymce_content_css ) && count( $tinymce_content_css ) )
 		{

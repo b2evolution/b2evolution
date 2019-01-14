@@ -575,7 +575,7 @@ while( $Item = & $ItemList->get_item() )
 			$Form->inputstart = $form_inputstart;
 
 			// Set b2evoCanvas for plugins:
-			echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
+			echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
 
 			// Attach files:
 			if( !empty( $comment_attachments ) )
