@@ -10264,9 +10264,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 13060, 'Updating settings for scheduled job "Send reminders about non-activated accounts"...' ) )
 	{	// part of 6.10.5-stable
-		// Add default values(15 days) for new settings "Delete warning" and "Delete account":
+		// Add default value "Don't send" for new setting "Delete warning"
+		// and default value "Don't delete" for new setting "Delete account":
 		$DB->query( 'UPDATE T_settings
-			  SET set_value = CONCAT( set_value, ",1296000,1296000" )
+			  SET set_value = CONCAT( set_value, ",0,0" )
 			WHERE set_name = "activate_account_reminder_config"' );
 		upg_task_end();
 	}
