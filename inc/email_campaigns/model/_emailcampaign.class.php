@@ -397,12 +397,11 @@ class EmailCampaign extends DataObject
 
 		// Get users from DB:
 		$users_SQL = new SQL( 'Get recipients of campaign #'.$this->ID );
-		$users_SQL->SELECT( 'user_ID, csnd_emlog_ID, csnd_user_ID, csnd_status, enls_subscribed' );
+		$users_SQL->SELECT( 'user_ID, csnd_emlog_ID, csnd_user_ID, csnd_status, enls_user_ID' );
 		$users_SQL->FROM( 'T_users' );
-		$users_SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = '.$DB->quote( $this->ID ).' AND csnd_user_ID = user_ID' );
-		$users_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+		$users_SQL->FROM_add( 'INNER JOIN T_email__campaign_send ON ( csnd_camp_ID = '.$DB->quote( $this->ID ).' AND ( csnd_user_ID = user_ID OR csnd_user_ID IS NULL ) )' );
+		$users_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_subscribed = 1 AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
 		$users_SQL->WHERE( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
-		$users_SQL->WHERE_and( 'csnd_user_ID IS NOT NULL OR enls_user_ID IS NOT NULL' );
 		$users = $DB->get_results( $users_SQL->get(), OBJECT, $users_SQL->title );
 
 		$this->users = array(
@@ -428,7 +427,7 @@ class EmailCampaign extends DataObject
 
 		foreach( $users as $user_data )
 		{
-			if( ! $user_data->enls_subscribed )
+			if( $user_data->enls_user_ID === NULL )
 			{	// This user is unsubscribed from newsletter of this email campaign:
 				$this->users['unsub_all'][] = $user_data->user_ID;
 			}
@@ -439,7 +438,7 @@ class EmailCampaign extends DataObject
 
 			if( $user_data->csnd_status == 'sent' )
 			{	// This user already received newsletter email:
-				if( ! $user_data->enls_subscribed )
+				if( $user_data->enls_user_ID === NULL )
 				{	// This user is unsubscribed from newsletter of this email campaign:
 					$this->users['unsub_receive'][] = $user_data->user_ID;
 					$this->users['unsub_filter'][] = $user_data->user_ID;
@@ -452,7 +451,7 @@ class EmailCampaign extends DataObject
 			}
 			elseif( $user_data->csnd_status == 'skipped' )
 			{ // This user will be skipped from receiving newsletter email:
-				if( ! $user_data->enls_subscribed )
+				if( $user_data->enls_user_ID === NULL )
 				{	// This user is unsubscribed from newsletter of this email campaign:
 					$this->users['unsub_skipped'][] = $user_data->user_ID;
 					$this->users['unsub_filter'][] = $user_data->user_ID;
@@ -465,7 +464,7 @@ class EmailCampaign extends DataObject
 			}
 			elseif( check_usertags( $user_data->user_ID, explode( ',', $this->get( 'user_tag_sendskip' ) ), 'has_any' ) )
 			{	// This user will be skipped from receiving newsletter email because of skip tags:
-				if( ! $user_data->enls_subscribed )
+				if( $user_data->enls_user_ID === NULL )
 				{	// This user is unsubscribed from newsletter of this email campaign:
 					$this->users['unsub_skipped_tag'][] = $user_data->user_ID;
 					$this->users['unsub_filter'][] = $user_data->user_ID;
@@ -478,7 +477,7 @@ class EmailCampaign extends DataObject
 			}
 			elseif( $user_data->csnd_status == 'send_error' )
 			{ // We encountered a send error the last time we attempted to send email,:
-				if( ! $user_data->enls_subscribed )
+				if( $user_data->enls_user_ID === NULL )
 				{	// This user is unsubscribed from newsletter of this email campaign:
 					$this->users['unsub_error'][] = $user_data->user_ID;
 					$this->users['unsub_filter'][] = $user_data->user_ID;
@@ -491,7 +490,7 @@ class EmailCampaign extends DataObject
 			}
 			elseif( $user_data->csnd_user_ID > 0 ) // Includes failed email attempts
 			{	// This user didn't receive email yet:
-				if( ! $user_data->enls_subscribed )
+				if( $user_data->enls_user_ID === NULL )
 				{	// This user is unsubscribed from newsletter of this email campaign:
 					$this->users['unsub_wait'][] = $user_data->user_ID;
 					$this->users['unsub_filter'][] = $user_data->user_ID;
@@ -523,31 +522,22 @@ class EmailCampaign extends DataObject
 
 		if( $link )
 		{	// Initialize URL to page with reciepients of this Email Campaign:
-			if( $type == 'all' )
-			{	// Get URL to display ALL subscribers:
-				global $admin_url;
-				$url = $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=subscribers&amp;enlt_ID='.$this->get( 'enlt_ID' );
-			}
-			else
-			{	// Get URL to display filtered and other users which are linked to this email campaign:
-				switch( $type )
-				{
-					case 'receive':
-						$recipient_type = 'sent';
-						break;
-					case 'skipped':
-						$recipient_type = 'skipped';
-						break;
-					case 'wait':
-						$recipient_type = 'ready_to_send';
-						break;
-					case 'filter':
-					default:
-						$recipient_type = 'filtered';
-						break;
-				}
-				$campaign_edit_modes = get_campaign_edit_modes( $this->ID );
-				$url = $campaign_edit_modes['recipient']['href'].( empty( $type ) ? '' : '&amp;recipient_type='.$recipient_type );
+			$campaign_edit_modes = get_campaign_edit_modes( $this->ID );
+			switch( $type )
+			{
+				case 'receive':
+					$recipient_type = 'sent';
+					break;
+				case 'skipped':
+					$recipient_type = 'skipped';
+					break;
+				case 'wait':
+					$recipient_type = 'ready_to_send';
+					break;
+				case 'filter':
+				default:
+					$recipient_type = 'filtered';
+					break;
 			}
 
 			$unsub_recipients_count = count( $this->get_recipients( 'unsub_'.$type ) );
@@ -555,7 +545,7 @@ class EmailCampaign extends DataObject
 			{	// If unsubscribed users exist:
 				$recipients_count = $recipients_count.' ('.T_('still subscribed').') + '.$unsub_recipients_count.' ('.T_('unsubscribed').')';
 			}
-			$recipients_count = '<a href="'.$url.'">'.$recipients_count.'</a>';
+			$recipients_count = '<a href="'.$campaign_edit_modes['recipient']['href'].( empty( $type ) ? '' : '&amp;recipient_type='.$recipient_type ).'">'.$recipients_count.'</a>';
 		}
 
 		return $recipients_count;
