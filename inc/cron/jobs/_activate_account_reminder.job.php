@@ -22,9 +22,9 @@ if( empty( $UserSettings ) )
 	$UserSettings = new UserSettings();
 }
 
-// Only users with "new", "emailchanged", "deactivated" OR "failedactivation" statuses may receive activation reminders
+// Only users with "New", "Email changed", "Deactivated", "Failed activation" or "Pending delete" statuses may receive activation reminders
 // This will be a precondition to get less users from db, but this will be checked again with check_status() in the send_easy_validate_emails() function
-$status_condition = 'user_status IN ( "new", "emailchanged", "deactivated", "failedactivation" )';
+$status_condition = 'user_status IN ( "new", "emailchanged", "deactivated", "failedactivation", "pendingdelete" )';
 
 // Get array of account activation reminder settings:
 $activate_account_reminder_config = $Settings->get( 'activate_account_reminder_config' );
@@ -69,31 +69,31 @@ $SQL->WHERE_and( 'notif_setting.uset_value IS NULL OR notif_setting.uset_value <
 $reminder_users = $DB->get_results( $SQL );
 
 $all_reminder_users = array();
-$send_activation_users = array(); // Users for cron settings "Reminder #X" and "Mark as failed"
-$mark_failed_users = array(); // Users for cron setting "Mark as failed"
+$send_activation_users = array(); // Users for cron settings "Reminder #X"
+$mark_failed_users = array(); // Users for cron setting "Mark as Failed / Pending delete"
 $send_delete_warning_users = array(); // Users for cron setting "Delete warning"
 $delete_account_users = array(); // Users for cron setting "Delete account"
 foreach( $reminder_users as $reminder_user )
 {
 	$all_reminder_users[] = $reminder_user->user_ID;
 	$activation_reminder_count = $reminder_user->uset_value;
-	if( $reminder_user->user_status == 'failedactivation' &&
+	if( $reminder_user->user_status == 'pendingdelete' &&
 	    ( // If this is the last reminder number and the option "Delete account" is enabled
 	      ( $activation_reminder_count == $number_of_max_reminders && ! empty( $activate_account_reminder_config[ $activation_reminder_count ] ) ) ||
 	      // Case when "Delete warning" is not enabled(=="Don't send") but "Delete account" is enabled, so we should use penultimate reminder number as last("Delete account") in order to skip the reminder of "Delete warning":
 	      ( $activation_reminder_count == $number_of_max_reminders - 1 && empty( $activate_account_reminder_config[ $number_of_max_reminders - 1 ] ) && ! empty( $activate_account_reminder_config[ $number_of_max_reminders ] ) )
 	    ) )
-	{	// This user must be deleted completely ONLY if it is in "Failed activation" status:
+	{	// This user must be deleted completely ONLY if it is in "Pending delete" status:
 		$delete_account_users[] = $reminder_user->user_ID;
 	}
-	elseif( $reminder_user->user_status == 'failedactivation' &&
+	elseif( $reminder_user->user_status == 'pendingdelete' &&
 	        $activation_reminder_count == $number_of_max_reminders - 1 && // If this is the penultimate reminder number
 	        ! empty( $activate_account_reminder_config[ $activation_reminder_count ] ) ) // If the option "Delete warning" is enabled
-	{	// This user must receive a delete warning email ONLY if it is in "Failed activation" status:
+	{	// This user must receive a delete warning email ONLY if it is in "Pending delete" status:
 		$send_delete_warning_users[] = $reminder_user->user_ID;
 	}
 	elseif( $activation_reminder_count == $number_of_max_reminders - 2 )
-	{	// This user must be marked with status "Failed activation":
+	{	// This user must be marked with status "Failed activation" or "Pending delete":
 		$mark_failed_users[] = $reminder_user->user_ID;
 	}
 	elseif( $activation_reminder_count <= $number_of_max_reminders - 3 )
@@ -116,11 +116,16 @@ cron_log_append( sprintf( T_('%d of %d account activation reminder emails were s
 // ---- #2 Mark users as failed:
 $mark_failed_users_num = count( $mark_failed_users );
 if( $mark_failed_users_num )
-{	// Set failed activation status for all users who didn't receive activation reminder or account validation email in the last days of the setting "Mark as failed":
+{	// Change account status for all users who didn't receive activation reminder or account validation email in the last days of the setting "Mark as Failed / Pending delete",
+	// If status was "New" - change status to "Pending delete" otherwise "Failed activation":
 	$success_mark_failed_users_num = $DB->query( 'UPDATE T_users
-		  SET user_status = "failedactivation"
+		  SET user_status = CASE
+		    WHEN user_status = "new" THEN "pendingdelete"
+		    ELSE "failedactivation"
+		  END
 		WHERE user_ID IN ( '.$DB->quote( $mark_failed_users ).' )
 		  AND '.$status_condition );
+	// Increase counter and date in order to run next reminder:
 	$DB->query( 'UPDATE T_users__usersettings
 		INNER JOIN T_users ON uset_user_ID = user_ID
 		  SET uset_value = CASE
@@ -129,16 +134,16 @@ if( $mark_failed_users_num )
 		    ELSE uset_value
 		  END
 		WHERE user_ID IN ( '.$DB->quote( $mark_failed_users ).' )
-		  AND user_status = "failedactivation"
+		  AND user_status IN ( "failedactivation", "pendingdelete" )
 		  AND uset_name IN ( "activation_reminder_count", "last_activation_email" ) ' );
 	// Display this as action because here some users may be updated:
-	cron_log_action_end( "\n".sprintf( '%d of %d users(with IDs: %s) were marked with status "Failed activation"!',
+	cron_log_action_end( "\n".sprintf( '%d of %d users(with IDs: %s) were marked with status "Failed activation" or "Pending delete"!',
 			$success_mark_failed_users_num, $mark_failed_users_num, implode( ', ', $mark_failed_users ) )."\n",
 		( $mark_failed_users_num ? ( $mark_failed_users_num == $success_mark_failed_users_num ? 'success' : 'warning' ) : NULL ) );
 }
 else
 {	// Don't display this as action because no users to update a status:
-	cron_log_append( "\n".sprintf( '%d users were marked with status "Failed activation"!', 0 )."\n" );
+	cron_log_append( "\n".sprintf( '%d users were marked with status "Failed activation" or "Pending delete"!', 0 )."\n" );
 }
 
 // ---- #3 Send a delete warning reminder:

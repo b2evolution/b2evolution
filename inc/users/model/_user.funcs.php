@@ -4212,6 +4212,7 @@ function get_user_statuses( $null_option_name = '' )
 			'emailchanged'     => T_( 'Email changed' ),
 			'deactivated'      => T_( 'Deactivated email' ),
 			'failedactivation' => T_( 'Failed activation' ),
+			'pendingdelete'    => T_( 'Pending delete' ),
 			'closed'           => T_( 'Closed account' )
 		);
 
@@ -4243,7 +4244,8 @@ function get_user_status_icons( $display_text = false )
 			'deactivated'      => get_icon( 'bullet_blue', 'imgtag', array( 'title' => T_( 'Deactivated account' ) ) ),
 			'emailchanged'     => get_icon( 'bullet_yellow', 'imgtag', array( 'title' => T_( 'Email address was changed' ) ) ),
 			'closed'           => get_icon( 'bullet_black', 'imgtag', array( 'title' => T_( 'Closed account' ) ) ),
-			'failedactivation' => get_icon( 'bullet_red', 'imgtag', array( 'title' => T_( 'Account was not activated or the activation failed' ) ) )
+			'failedactivation' => get_icon( 'bullet_red', 'imgtag', array( 'title' => T_( 'Account was not activated or the activation failed' ) ) ),
+			'pendingdelete'    => get_icon( 'bullet_red', 'imgtag', array( 'title' => T_( 'Account is pending delete' ) ) ),
 		);
 
 	if( $display_text )
@@ -4256,6 +4258,7 @@ function get_user_status_icons( $display_text = false )
 		$user_status_icons['emailchanged']     .= ' '.T_( 'Email changed' );
 		$user_status_icons['closed']           .= ' '.T_( 'Closed' );
 		$user_status_icons['failedactivation'] .= ' '.T_( 'Failed activation' );
+		$user_status_icons['pendingdelete']    .= ' '.T_( 'Pending delete' );
 	}
 
 	return $user_status_icons;
