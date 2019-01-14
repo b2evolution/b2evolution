@@ -42,7 +42,7 @@ $Form->begin_fieldset( T_('List recipients').get_manual_link( 'campaign-recipien
 	$Form->select_input_object( 'ecmp_enlt_ID', $edited_EmailCampaign->get( 'enlt_ID' ), $NewsletterCache, T_('Send to subscribers of'), array(
 			'required'     => true,
 			'field_suffix' => '<input type="submit" name="actionArray[update_newsletter]" class="btn btn-default" value="'.format_to_output( T_('Update'), 'htmlattr' ).'" />' ) );
-	$Form->info( T_('Currently selected recipients'), $edited_EmailCampaign->get_recipients_count(), '('.T_('Accounts which currently accept this list').')' );
+	$Form->info( T_('Subscribers'), $edited_EmailCampaign->get_recipients_count( 'all', true ), '('.T_('Accounts which currently accept this list').')' );
 	$Form->info_field( T_('After additional filter'), $edited_EmailCampaign->get_recipients_count( 'filter', true ), array(
 			'class' => 'info_full_height',
 			'note'  => '('.T_('Accounts that match your additional filter').') '
@@ -56,6 +56,7 @@ $Form->begin_fieldset( T_('List recipients').get_manual_link( 'campaign-recipien
 			'input_prefix' => '<div class="evo_input__tags">',
 			'input_suffix' => '</div><span id="skipped_tag_count">'.$edited_EmailCampaign->get_recipients_count( 'skipped_tag' ).'</span>',
 		) );
+	$Form->info( T_('Send error'), $edited_EmailCampaign->get_recipients_count( 'error', true ), '('.T_('Accounts which had errors on receiving this campaign').')' );
 	$Form->info( T_('Ready to send'), '<span id="ready_to_send_count">'.$edited_EmailCampaign->get_recipients_count( 'wait', true ).'</span>', '('.T_('Accounts which meet all criteria to receive this campaign').')' );
 	$Form->usertag_input( 'ecmp_user_tag_sendsuccess', param( 'ecmp_user_tag_sendsuccess', 'string', $edited_EmailCampaign->get( 'user_tag_sendsuccess' ) ), 60, T_('On successful send, tag users with'), '', array(
 		'maxlength' => 255,

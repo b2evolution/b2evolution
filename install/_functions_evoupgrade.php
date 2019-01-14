@@ -10559,9 +10559,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 13060, 'Updating settings for scheduled job "Send reminders about non-activated accounts"...' ) )
 	{	// part of 6.10.5-stable
-		// Add default values(15 days) for new settings "Delete warning" and "Delete account":
+		// Add default value "Don't send" for new setting "Delete warning"
+		// and default value "Don't delete" for new setting "Delete account":
 		$DB->query( 'UPDATE T_settings
-			  SET set_value = CONCAT( set_value, ",1296000,1296000" )
+			  SET set_value = CONCAT( set_value, ",0,0" )
 			WHERE set_name = "activate_account_reminder_config"' );
 		upg_task_end();
 	}
@@ -10569,6 +10570,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 13070, 'Upgrading automation step table...' ) )
 	{	// part of 6.10.6-stable
 		db_modify_col( 'T_automation__step', 'step_type', 'ENUM("if_condition", "send_campaign", "notify_owner", "add_usertag", "remove_usertag", "subscribe", "unsubscribe", "start_automation", "user_status") COLLATE ascii_general_ci NOT NULL DEFAULT "if_condition"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13080, 'Upgrading users table...' ) )
+	{	// part of 6.10.6-stable
+		db_modify_col( 'T_users', 'user_status', "enum( 'activated', 'manualactivated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'pendingdelete', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new'" );
 		upg_task_end();
 	}
 

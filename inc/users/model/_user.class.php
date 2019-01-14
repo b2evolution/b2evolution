@@ -59,7 +59,7 @@ class User extends DataObject
 	/**
 	 * User account status
 	 *
-	 * 'new', 'activated', 'manualactivated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
+	 * 'new', 'activated', 'manualactivated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'pendingdelete', 'closed'
 	 *
 	 * @var string
 	 */
@@ -3863,7 +3863,7 @@ class User extends DataObject
 				}
 				return false;
 			case 'can_be_validated':
-				return ( ( $this->status == 'new' ) || ( $this->status == 'emailchanged' ) || ( $this->status == 'deactivated' ) || ( $this->status == 'failedactivation' ) );
+				return in_array( $this->status, array( 'new', 'emailchanged', 'deactivated', 'failedactivation', 'pendingdelete' ) );
 			case 'can_view_msgform':
 			case 'can_receive_any_message': // can this user receive emails or private messages
 			case 'can_receive_pm':
