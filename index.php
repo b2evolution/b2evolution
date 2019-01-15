@@ -29,7 +29,7 @@ $Timer->resume('index.php');
 
 if( ! isset($collections_Module) )
 {	// The evocore framework is not used as a blog app here / we don't know how to display a public interface...
-	header_redirect( 'admin.php', 302 );
+	header_redirect( $admin_url, 302 );
 	exit(0);
 }
 

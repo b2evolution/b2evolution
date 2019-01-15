@@ -500,7 +500,7 @@ $emailskins_url = $assets_baseurl.$emailskins_subdir;     // You should not need
 /**
  * Location of the admin interface dispatcher
  */
-$dispatcher = 'admin.php'; // DEPRECATED
+$dispatcher = 'admin.php';
 $admin_url = $baseurl.$dispatcher;
 
 /**
