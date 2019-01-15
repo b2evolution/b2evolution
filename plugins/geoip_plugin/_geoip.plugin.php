@@ -249,7 +249,6 @@ class geoip_plugin extends Plugin
 
 		if( empty( $this->reader ) )
 		{
-			//require_once( __DIR__.'/src/MaxMind/Db/Reader.php' );
 			$this->reader = new Reader( __DIR__.'/'.$this->geoip_file_name );
 		}
 
@@ -886,7 +885,7 @@ jQuery( document ).ready( function()
 		{
 			if( preg_match( $re, $file, $matches ) )
 			{
-				$phar->extractTo( sys_get_temp_dir(), $matches[1] );
+				$phar->extractTo( sys_get_temp_dir(), $matches[1], true );
 				@copy( sys_get_temp_dir().'/'.$matches[1], $plugin_dir.'/'.$this->geoip_file_name );
 				if( @unlink( sys_get_temp_dir().'/'.$matches[1] ) )
 				{
@@ -902,7 +901,7 @@ jQuery( document ).ready( function()
 
 		$this->print_tool_log( sprintf( T_('Remove gzip file %s...'), '<b>'.$gzip_tar_file_path.'</b>' ) );
 		if( ! @unlink( $tar_file_path ) )
-		{	// Failed on removing
+		{	// Failed to remove tar file:
 			$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), $tar_file_path ), 'warning' );
 		}
 		if( @unlink( $gzip_tar_file_path ) )
@@ -910,18 +909,18 @@ jQuery( document ).ready( function()
 			$this->print_tool_log( ' OK.<br />' );
 		}
 		else
-		{	// Failed on removing
+		{	// Failed to remove gzip file:
 			$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), $gzip_tar_file_path ), 'warning' );
 		}
 
-		// Success message
+		// Success message:
 		$this->print_tool_log( sprintf( T_('%s file was downloaded successfully.'), $this->geoip_file_name ), 'success' );
 
 		// Try to enable plugin automatically:
 		global $Plugins;
 		$enable_return = $this->BeforeEnable();
 		if( $enable_return === true )
-		{	// Success enabling
+		{	// Successfully enabled the plugin:
 			$this->print_tool_log( T_('The plugin has been enabled.'), 'success' );
 
 			if( $this->status != 'enabled' )
@@ -930,7 +929,7 @@ jQuery( document ).ready( function()
 			}
 		}
 		else
-		{	// Some restriction for enabling
+		{	// Some restriction for enabling:
 			$this->print_tool_log( T_('The plugin could not be automatically enabled.'), 'warning' );
 
 			if( $this->status != 'needs_config' )
