@@ -7039,7 +7039,7 @@ function users_results( & $UserList, $params = array() )
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'center nowrap',
 				'order' => 'csnd_status',
-				'td' => '%user_td_campaign_status( #csnd_status#, #csnd_emlog_ID# )%'
+				'td' => '%user_td_campaign_status( #csnd_status#, #csnd_emlog_ID#, #emadr_status# )%'
 			);
 	}
 
@@ -7868,9 +7868,14 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 /**
  * Get user campaign status
  */
-function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL )
+function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL, $email_status = NULL )
 {
 	global $current_User, $admin_url;
+
+	if( $email_status == 'prmerror' && $csnd_status != 'send_error' )
+	{	// Force users with email status "Permanent error" to "Send error" status:
+		$csnd_status = 'send_error_prmerror';
+	}
 
 	switch( $csnd_status )
 	{
@@ -7884,14 +7889,17 @@ function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL )
 			return T_('Sent');
 
 		case 'send_error':
+		case 'send_error_prmerror':
+			$link_text = T_('Send error');
+			if( $csnd_status == 'send_error_prmerror' )
+			{
+				$link_text .= ' ('.T_('Permanent error').')';
+			}
 			if( $current_User->check_perm( 'emails', 'view', true ) && ! empty( $csnd_emlog_ID ) )
 			{
-				return '<a href="'.get_dispctrl_url( 'email', 'tab=sent&amp;emlog_ID='.$csnd_emlog_ID ).'">'.T_('Send error').'</a>';
+				$link_text = '<a href="'.get_dispctrl_url( 'email', 'tab=sent&amp;emlog_ID='.$csnd_emlog_ID ).'">'.$link_text.'</a>';
 			}
-			else
-			{
-				return T_('Send error');
-			}
+			return $link_text;
 
 		case 'skipped':
 			return T_('Skipped');
