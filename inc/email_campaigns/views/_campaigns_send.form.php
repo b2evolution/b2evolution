@@ -41,7 +41,7 @@ if( !empty( $template_action ) && $template_action == 'send_campaign' )
 }
 
 $Form->begin_fieldset( sprintf( T_('Review message for: %s'), $edited_EmailCampaign->dget( 'name' ) ).get_manual_link( 'campaign-review-panel' ) );
-	$Form->info( T_('Email title'), mail_autoinsert_user_data( $edited_EmailCampaign->get( 'email_title' ), $current_User ) );
+	$Form->info( T_('Email title'), mail_autoinsert_user_data( $edited_EmailCampaign->get( 'email_title' ), $current_User, 'text', NULL, NULL, array( 'enlt_ID' => $edited_EmailCampaign->get( 'enlt_ID' ) ) ) );
 	$Form->info( T_('Campaign created'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ) ) );
 	$Form->info( T_('Last sent'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ) ) : T_('Not sent yet') );
 
