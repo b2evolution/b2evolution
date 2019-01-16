@@ -176,6 +176,7 @@ users_results_block( array(
 		'display_campaign_actions' => true,
 		'display_newsletter'   => false,
 		'display_enlt_status'  => true,
+		'display_camp_user_status' => true,
 		'display_camp_status'  => true,
 		'display_emlog_date'   => true,
 		'display_email_tracking' => true,

@@ -90,9 +90,9 @@ $Form->begin_fieldset( T_('Campaign recipients').get_manual_link( 'campaign-reci
 			           .'<a href="'.$admin_url.'?ctrl=users&amp;action=campaign&amp;ecmp_ID='.$edited_EmailCampaign->ID.'" class="btn btn-default">'.T_('Change filter').'</a>',
 		) );
 	$Form->info( T_('Already received'), $edited_EmailCampaign->get_recipients_count( 'receive', true ), '('.T_('Accounts which have already been sent this campaign').')' );
-	$Form->info( T_('Manually skipped'), $edited_EmailCampaign->get_recipients_count( 'skipped', true ), '('.T_('Accounts which will be skipped from receiving this campaign').')' );
 	$Form->info( T_('Send error'), $edited_EmailCampaign->get_recipients_count( 'error', true ), '('.T_('Accounts which had errors on receiving this campaign').')' );
-	$Form->info( T_('Ready to send'), $edited_EmailCampaign->get_recipients_count( 'wait', true ), '('.T_('Accounts which meet all criteria to receive this campaign').')' );
+	$Form->info( T_('Manually skipped'), $edited_EmailCampaign->get_recipients_count( 'skipped', true ), '('.T_('Accounts which will be skipped from receiving this campaign').')' );
+	$Form->info( T_('Ready to send'), $edited_EmailCampaign->get_recipients_count( 'wait', 'only_subscribed' ), '('.T_('Accounts which meet all criteria to receive this campaign').')' );
 
 	if( $edited_EmailCampaign->get_recipients_count( 'wait' ) > 0 )
 	{	// Display message to send emails only when users exist for this campaign:
