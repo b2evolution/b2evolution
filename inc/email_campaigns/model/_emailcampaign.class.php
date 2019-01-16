@@ -397,10 +397,11 @@ class EmailCampaign extends DataObject
 
 		// Get users from DB:
 		$users_SQL = new SQL( 'Get recipients of campaign #'.$this->ID );
-		$users_SQL->SELECT( 'user_ID, csnd_emlog_ID, csnd_user_ID, csnd_status, enls_subscribed' );
+		$users_SQL->SELECT( 'user_ID, csnd_emlog_ID, csnd_user_ID, csnd_status, enls_subscribed, emadr_status' );
 		$users_SQL->FROM( 'T_users' );
 		$users_SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = '.$DB->quote( $this->ID ).' AND csnd_user_ID = user_ID' );
 		$users_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+		$users_SQL->FROM_add( 'LEFT JOIN T_email__address ON user_email = emadr_address' );
 		$users_SQL->WHERE( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 		$users_SQL->WHERE_and( 'csnd_user_ID IS NOT NULL OR enls_user_ID IS NOT NULL' );
 		$users = $DB->get_results( $users_SQL->get(), OBJECT, $users_SQL->title );
@@ -476,8 +477,8 @@ class EmailCampaign extends DataObject
 					$this->users['filter'][] = $user_data->user_ID;
 				}
 			}
-			elseif( $user_data->csnd_status == 'send_error' )
-			{ // We encountered a send error the last time we attempted to send email,:
+			elseif( $user_data->csnd_status == 'send_error' || $user_data->emadr_status == 'prmerror' )
+			{	// We encountered a send error the last time we attempted to send email, or if current status of email address is "Permanent error":
 				if( ! $user_data->enls_subscribed )
 				{	// This user is unsubscribed from newsletter of this email campaign:
 					$this->users['unsub_error'][] = $user_data->user_ID;
@@ -514,7 +515,7 @@ class EmailCampaign extends DataObject
 	 *   'filter'  - Filtered active users which accept newsletter of this campaign
 	 *   'receive' - Users which already received email newsletter
 	 *   'wait'    - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
-	 * @param boolean TRUE to return as link to page with recipients list
+	 * @param boolean|string TRUE to return as link to page with recipients list, 'only_subscribed' - display only subscribed
 	 * @return integer Number of users
 	 */
 	function get_recipients_count( $type = 'all', $link = false )
@@ -553,10 +554,9 @@ class EmailCampaign extends DataObject
 				$url = $campaign_edit_modes['recipient']['href'].( empty( $type ) ? '' : '&amp;recipient_type='.$recipient_type );
 			}
 
-			$unsub_recipients_count = count( $this->get_recipients( 'unsub_'.$type ) );
-			if( $unsub_recipients_count > 0 )
-			{	// If unsubscribed users exist:
-				$recipients_count = $recipients_count.' ('.T_('still subscribed').') + '.$unsub_recipients_count.' ('.T_('unsubscribed').')';
+			if( $link === true && ( $unsub_recipients_count = count( $this->get_recipients( 'unsub_'.$type ) ) ) > 0 )
+			{	// Display a counter of unsubscribed users if they exist and it is requested:
+				$recipients_count .= ' ('.T_('still subscribed').') + '.$unsub_recipients_count.' ('.T_('unsubscribed').')';
 			}
 			$recipients_count = '<a href="'.$url.'">'.$recipients_count.'</a>';
 		}

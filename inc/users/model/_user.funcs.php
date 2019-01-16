@@ -6223,6 +6223,7 @@ function users_results_block( $params = array() )
 			'display_level'        => true,
 			'display_status'       => true,
 			'display_enlt_status'  => false,
+			'display_camp_user_status' => false,
 			'display_camp_status'  => false,
 			'display_emlog_date'   => false,
 			'display_email_tracking' => false,
@@ -6566,6 +6567,7 @@ function users_results( & $UserList, $params = array() )
 			'display_sec_groups' => false,
 			'display_level'      => true,
 			'display_status'     => true,
+			'display_camp_user_status' => false,
 			'display_camp_status' => false,
 			'display_emlog_date' => false,
 			'display_email_tracking' => false,
@@ -7000,6 +7002,18 @@ function users_results( & $UserList, $params = array() )
 				'td_class' => 'nowrap',
 				'order' => 'enls_subscribed',
 				'td' => '~conditional( #enls_subscribed# > 0, \''.format_to_output( T_('Still subscribed'), 'htmlattr' ).'\', \''.format_to_output( T_('Unsubscribed'), 'htmlattr' ).'\' )~',
+			);
+	}
+
+	if( $params['display_camp_user_status'] )
+	{	// Display account status before campaign status:
+		$UserList->cols[] = array(
+				'th' => T_('Account status'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'order' => 'user_status',
+				'default_dir' => 'D',
+				'td' => '%user_td_status( #user_status#, #user_ID# )%'
 			);
 	}
 
