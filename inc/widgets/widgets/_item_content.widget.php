@@ -143,7 +143,7 @@ class item_content_Widget extends ComponentWidget
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
-			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
 			return false;
 		}
 

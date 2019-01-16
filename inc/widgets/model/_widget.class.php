@@ -1604,5 +1604,26 @@ class ComponentWidget extends DataObject
 			}
 		}
 	}
+
+
+	/**
+	 * Display an error message
+	 *
+	 * @param string Message
+	 */
+	function display_error_message( $message = NULL )
+	{
+		if( $message === NULL )
+		{
+			$message = 'Unable to display widget '.$this->get_name();
+		}
+
+		echo $this->disp_params['block_start'];
+		$this->disp_title();
+		echo $this->disp_params['block_body_start'];
+		echo '<span class="evo_param_error">'.$message.'</span>';
+		echo $this->disp_params['block_body_end'];
+		echo $this->disp_params['block_end'];
+	}
 }
 ?>
