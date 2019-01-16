@@ -950,7 +950,7 @@ function dre_get_email_data( $content, $message_text, $headers )
 			'address'   => $emails,
 			'errormsg'  => $error_info['text'],
 			'timestamp' => date2mysql( $servertimenow ),
-			'message'   => htmlspecialchars( utf8_clean( $message_text ) ),
+			'message'   => utf8_substr( htmlspecialchars( utf8_clean( $message_text ) ), 0, 65535 ),
 			'headers'   => $headers,
 			'errtype'   => $error_info['type']
 		);
