@@ -404,7 +404,7 @@ $conf_path = str_replace( '\\', '/', dirname(__FILE__) ).'/';
  * @global string Path of the base.
  *                fp> made [i]nsensitive to case because of Windows URL oddities)
  */
-$basepath = preg_replace( '#/'.$conf_subdir.'$#i', '', $conf_path ).'/';
+$basepath = preg_replace( '#/'.preg_quote( $conf_subdir, '#' ).'$#i', '', $conf_path ).'/';
 // echo '<br/>basepath='.$basepath;
 
 /**

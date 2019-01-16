@@ -6476,7 +6476,7 @@ function users_results_block( $params = array() )
  */
 function users_results( & $UserList, $params = array() )
 {
-	global $Settings, $current_User, $collections_Module;
+	global $Settings, $current_User, $collections_Module, $admin_url;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -6798,7 +6798,7 @@ function users_results( & $UserList, $params = array() )
 				'default_dir' => 'D',
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'center small',
-				'td' => '~conditional( (#nb_blogs# > 0), \'<a href="admin.php?ctrl=user&amp;user_tab=activity&amp;user_ID=$user_ID$" title="'.format_to_output( T_('View personal blogs'), 'htmlattr' ).'">$nb_blogs$</a>\', \'&nbsp;\' )~',
+				'td' => '~conditional( (#nb_blogs# > 0), \'<a href="'.$admin_url.'?ctrl=user&amp;user_tab=activity&amp;user_ID=$user_ID$" title="'.format_to_output( T_('View personal blogs'), 'htmlattr' ).'">$nb_blogs$</a>\', \'&nbsp;\' )~',
 			);
 	}
 

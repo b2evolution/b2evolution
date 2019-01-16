@@ -4,7 +4,7 @@
  * or display the default collection. If there is none, it will call default.php.
  *
  * ---------------------------------------------------------------------------------------------------------------
- * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER. 
+ * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER.
  * TO GET STARTED, GO TO THIS PAGE: http://b2evolution.net/man/getting-started
  * ---------------------------------------------------------------------------------------------------------------
  *
@@ -38,13 +38,15 @@ if( !init_requested_blog( false ) )
 {	// No specific blog to be displayed:
 	if( $Settings->get( 'default_blog_ID' ) == -1 )
 	{	// we are going to display the admin page:
+		global $dispatcher;
+
 		if( ! is_logged_in() )
 		{	// user must be logged in and his/her account must be validated before access to admin:
 			$login_required = true;
 			$validate_required = true;
 			require $inc_path.'_init_login.inc.php';
 		}
-		require dirname(__FILE__).'/admin.php';
+		require dirname(__FILE__).'/'.$dispatcher;
 	}
 	else
 	{	// we are going to display the default page:

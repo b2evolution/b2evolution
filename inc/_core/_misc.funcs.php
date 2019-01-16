@@ -5910,8 +5910,8 @@ function is_front_page()
  */
 function require_login( $url, $check_login_screen )
 {
-	global $Settings;
-	if( preg_match( '#/admin.php([&?].*)?$#', $url ) )
+	global $Settings, $dispatcher;
+	if( preg_match( '#/'.preg_quote( $dispatcher, '#' ).'([&?].*)?$#', $url ) )
 	{ // admin always require logged in user
 		return true;
 	}
