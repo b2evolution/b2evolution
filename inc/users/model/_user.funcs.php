@@ -6224,6 +6224,7 @@ function users_results_block( $params = array() )
 			'display_status'       => true,
 			'display_enlt_status'  => false,
 			'display_camp_user_status' => false,
+			'display_email_status' => false,
 			'display_camp_status'  => false,
 			'display_emlog_date'   => false,
 			'display_email_tracking' => false,
@@ -6568,6 +6569,7 @@ function users_results( & $UserList, $params = array() )
 			'display_level'      => true,
 			'display_status'     => true,
 			'display_camp_user_status' => false,
+			'display_email_status' => false,
 			'display_camp_status' => false,
 			'display_emlog_date' => false,
 			'display_email_tracking' => false,
@@ -7014,6 +7016,18 @@ function users_results( & $UserList, $params = array() )
 				'order' => 'user_status',
 				'default_dir' => 'D',
 				'td' => '%user_td_status( #user_status#, #user_ID# )%'
+			);
+	}
+
+	if( $params['display_email_status'] )
+	{	// Display account status before campaign status:
+		$UserList->cols[] = array(
+				'th' => T_('Email status'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'order' => 'emadr_status',
+				'default_dir' => 'D',
+				'td' => '%user_td_email_status( #emadr_status#, #emadr_ID# )%'
 			);
 	}
 
@@ -7849,6 +7863,32 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 	}
 }
 
+/**
+ * Helper function to display email status in table cell
+ *
+ * @param string Email address status
+ * @param integer Email address ID
+ * @return string
+ */
+function user_td_email_status( $emadr_status, $emadr_ID )
+{
+	global $current_User, $admin_url;
+
+	if( empty( $emadr_status ) )
+	{	// If email address does not exist in DB:
+		$emadr_status = 'unknown';
+	}
+
+	$status_content = emadr_get_status_icon( $emadr_status ).' '.emadr_get_status_title( $emadr_status );
+
+	if( is_admin_page() && $emadr_ID > 0 && $current_User->check_perm( 'emails', 'view' ) )
+	{	// Return a link to view email address details if current User has a permission:
+		return '<a href="'.$admin_url.'?ctrl=email&amp;emadr_ID='.$emadr_ID.'">'.$status_content.'</a>';
+	}
+
+	return $status_content;
+}
+
 
 /**
  * Get user campaign status
@@ -7858,8 +7898,8 @@ function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL, $email_st
 	global $current_User, $admin_url;
 
 	if( $email_status == 'prmerror' && $csnd_status != 'send_error' )
-	{	// Force users with email status "Permanent error" to "Send error" status:
-		$csnd_status = 'send_error_prmerror';
+	{	// Force users with email status "Permanent error" to "Cannot send" status:
+		$csnd_status = 'cannot_send';
 	}
 
 	switch( $csnd_status )
@@ -7874,17 +7914,13 @@ function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL, $email_st
 			return T_('Sent');
 
 		case 'send_error':
-		case 'send_error_prmerror':
-			$link_text = T_('Send error');
-			if( $csnd_status == 'send_error_prmerror' )
-			{
-				$link_text .= ' ('.T_('Permanent error').')';
+		case 'cannot_send':
+			$status_text = ( $csnd_status == 'cannot_send' ? T_('Cannot send') : T_('Send error') );
+			if( ! empty( $csnd_emlog_ID ) && $current_User->check_perm( 'emails', 'view' ) )
+			{	// Make a link to view details of error sending:
+				$status_text = '<a href="'.get_dispctrl_url( 'email', 'tab=sent&amp;emlog_ID='.$csnd_emlog_ID ).'">'.$status_text.'</a>';
 			}
-			if( $current_User->check_perm( 'emails', 'view', true ) && ! empty( $csnd_emlog_ID ) )
-			{
-				$link_text = '<a href="'.get_dispctrl_url( 'email', 'tab=sent&amp;emlog_ID='.$csnd_emlog_ID ).'">'.$link_text.'</a>';
-			}
-			return $link_text;
+			return $status_text;
 
 		case 'skipped':
 			return T_('Skipped');

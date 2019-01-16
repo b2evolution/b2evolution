@@ -579,7 +579,7 @@ class UserQuery extends FilterSQL
 		$this->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_enlt_ID = ecmp_enlt_ID AND enls_user_ID = user_ID AND enls_subscribed = 1' );
 
 		// Get email address status:
-		$this->SELECT_add( ', emadr_status' );
+		$this->SELECT_add( ', emadr_status, emadr_ID' );
 		$this->FROM_add( 'LEFT JOIN T_email__address ON user_email = emadr_address' );
 
 		switch( $recipient_type )
