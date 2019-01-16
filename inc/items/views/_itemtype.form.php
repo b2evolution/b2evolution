@@ -523,7 +523,7 @@ $Results->cols[] = array(
 	);
 
 $display_params = array(
-		'page_url' => 'admin.php?ctrl=itemtypes&ityp_ID='.$edited_Itemtype->ID.'&action=edit'
+		'page_url' => $admin_url.'?ctrl=itemtypes&ityp_ID='.$edited_Itemtype->ID.'&action=edit'
 	);
 
 $Results->checkbox_toggle_selectors = 'input[name^=status_]:checkbox';

@@ -578,18 +578,27 @@ class UserQuery extends FilterSQL
 		$this->FROM_add( 'LEFT JOIN T_email__campaign ON ecmp_ID = csnd_camp_ID' );
 		$this->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_enlt_ID = ecmp_enlt_ID AND enls_user_ID = user_ID AND enls_subscribed = 1' );
 
+		// Get email address status:
+		$this->SELECT_add( ', emadr_status, emadr_ID' );
+		$this->FROM_add( 'LEFT JOIN T_email__address ON user_email = emadr_address' );
+
 		switch( $recipient_type )
 		{
 			case 'ready_to_send':
-				// Get recipients which have already received this newsletter:
+				// Get recipients which are ready to receive the email campaign:
 				$this->WHERE_and( 'csnd_status IN ( "ready_to_send", "ready_to_resend" )' );
 				break;
 
-			case 'sent':
 			case 'send_error':
+				// Get recipients which had error on receiving the email campaign
+				// or if their email address has a status "Permanent error":
+				$this->WHERE_and( 'csnd_status = "send_error" OR emadr_status = "prmerror"' );
+				break;
+
+			case 'sent':
 			case 'skipped':
-				// Get recipients which have already received this newsletter:
-				$this->WHERE_and( 'csnd_status = "'.$recipient_type.'"' );
+				// Get recipients which are skipped or have already received this newsletter:
+				$this->WHERE_and( 'csnd_status = '.$DB->quote( $recipient_type ) );
 				break;
 		}
 

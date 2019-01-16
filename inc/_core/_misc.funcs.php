@@ -4172,7 +4172,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 		$message = mail_template( $template_name, $UserSettings->get( 'email_format', $User->ID ), $template_params, $User );
 
 		// Autoinsert user's data
-		$subject = mail_autoinsert_user_data( $subject, $User );
+		$subject = mail_autoinsert_user_data( $subject, $User, 'text', NULL, NULL, $template_params );
 
 		// erhsatingin > moved to mail_template()
 		//$message = mail_autoinsert_user_data( $message, $User );
@@ -4244,7 +4244,7 @@ function send_mail_to_anonymous_user( $user_email, $user_name, $subject, $templa
 	$message = mail_template( $template_name, 'auto', $template_params );
 
 	// Autoinsert user's data:
-	$subject = mail_autoinsert_user_data( $subject, NULL, 'text', $user_email, $user_name );
+	$subject = mail_autoinsert_user_data( $subject, NULL, 'text', $user_email, $user_name, $template_params );
 
 	// Params for email log:
 	$email_campaign_ID = empty( $template_params['ecmp_ID'] ) ? NULL : $template_params['ecmp_ID'];
@@ -5915,8 +5915,8 @@ function is_front_page()
  */
 function require_login( $url, $check_login_screen )
 {
-	global $Settings;
-	if( preg_match( '#/admin.php([&?].*)?$#', $url ) )
+	global $Settings, $dispatcher;
+	if( preg_match( '#/'.preg_quote( $dispatcher, '#' ).'([&?].*)?$#', $url ) )
 	{ // admin always require logged in user
 		return true;
 	}
