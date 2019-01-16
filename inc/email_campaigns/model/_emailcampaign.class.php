@@ -1007,9 +1007,10 @@ class EmailCampaign extends DataObject
 			$headers = array( 'Content-Type' => 'multipart/mixed; boundary="'.$newsletter_params['boundary'].'"' );
 
 			if( $test_User = & $UserCache->get_by_ID( $user_ID, false, false ) )
-			{ // Send a test email only when test user exists
+			{	// Send a test email only when test user exists:
+				$email_title = mail_autoinsert_user_data( $this->get( 'email_title' ), $test_User, 'text', NULL, NULL, $newsletter_params );
 				$message = mail_template( 'newsletter', 'auto', $newsletter_params, $test_User );
-				$result = send_mail( $email_address, NULL, $this->get( 'email_title' ), $message, NULL, NULL, $headers );
+				$result = send_mail( $email_address, NULL, $email_title, $message, NULL, NULL, $headers );
 			}
 			else
 			{ // No test user found
