@@ -267,7 +267,7 @@ class EmailCampaign extends DataObject
 			$this->remove_recipients();
 
 			// Get all send statuses per users of this email campaign in order to don't insert the data twice:
-			$old_users = $this->get_recipients( 'full_all' );
+			$old_users = $this->get_recipients( 'full_filter' );
 
 			// Exclude old users from new users (To store value of csnd_emlog_ID):
 			$new_users = array_diff( $new_users, $old_users );

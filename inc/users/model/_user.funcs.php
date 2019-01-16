@@ -5137,12 +5137,54 @@ function echo_userlist_tags_js()
 	// Initialize JavaScript to build and open window:
 	echo_modalwindow_js();
 
-	// Initialize variables for the file "evo_user_deldata.js":
+	// Initialize variables for the file "evo_user_tags.js":
 	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_add_remove_tags_to_users = \''.TS_('Add/Remove tags...').get_manual_link( 'add-remove-user-tags' ).'\';
 		var evo_js_lang_make_changes_now = \''.TS_('Make changes now!').'\';
 		var evo_js_userlist_tags_ajax_url = \''.$admin_url.'\';
+	</script>';
+}
+
+
+/**
+ * Initialize JavaScript for AJAX loading of popup window to set account status of users from users list
+ * @param array Params
+ */
+function echo_userlist_set_account_status_js()
+{
+	global $admin_url;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_status.js":
+		echo '<script>
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_set_user_account_status = \''.TS_('Set account status...').get_manual_link( 'set-account-status' ).'\';
+		var evo_js_lang_make_changes_now = \''.TS_('Make changes now!').'\';
+		var evo_js_userlist_set_account_status_ajax_url = \''.$admin_url.'\';
+	</script>';
+}
+
+
+/**
+ * Initialize JavaScript for AJAX loading of popup window to change group membership of users from users list
+ * @param array Params
+ */
+function echo_userlist_change_groups_js()
+{
+	global $admin_url;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_status.js":
+		echo '<script>
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_change_groups = \''.TS_('Change groups...').get_manual_link( 'change-user-groups' ).'\';
+		var evo_js_lang_make_changes_now = \''.TS_('Make changes now!').'\';
+		var evo_js_userlist_change_groups_ajax_url = \''.$admin_url.'\';
 	</script>';
 }
 
@@ -6214,6 +6256,8 @@ function users_results_block( $params = array() )
 			'display_btn_export'   => false,
 			'display_automation'   => false,
 			'display_btn_tags'     => false,
+			'display_btn_account_status' => false,
+			'display_btn_change_groups'  => false,
 			'force_check_user'     => false,
 			'where_duplicate_email' => false,
 			'display_btn_delspam'  => false,
@@ -6387,6 +6431,24 @@ function users_results_block( $params = array() )
 			.'</a>';
 		// Init JS for form to add/remove tags to/from users:
 		echo_userlist_tags_js();
+	}
+
+	if( $params['display_btn_account_status'] && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
+	{	// Button to set user account status:
+		$user_list_buttons[] = '<a href="#" class="btn btn-default" onclick="return set_account_status()">'
+				.format_to_output( T_('Set account status...') )
+			.'</a>';
+		// Init JS for form to set account status:
+		echo_userlist_set_account_status_js();
+	}
+
+	if( $params['display_btn_change_groups'] && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
+	{	// Button to change user groups:
+		$user_list_buttons[] = '<a href="#" class="btn btn-default" onclick="return change_groups()">'
+				.format_to_output( T_('Change groups...') )
+			.'</a>';
+		// Init JS for form to set account status:
+		echo_userlist_change_groups_js();
 	}
 
 	if( $params['display_automation'] && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) && $UserList->result_num_rows > 0 )
