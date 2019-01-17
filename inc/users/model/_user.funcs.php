@@ -3270,8 +3270,12 @@ function send_inactive_user_emails( $user_ids, $redirect_to_after = NULL, $log_m
 function check_usertags( $user_ID, $test_tags = array(), $type = 'has_any' )
 {
 	$UserCache = & get_UserCache();
-	$edited_User = $UserCache->get_by_ID( $user_ID );
-	$user_tags = $edited_User->get_usertags();
+	if( ! ( $tag_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
+	{	// Don't halt on wrong user, and consider this like user has no tags:
+		return ( $type == 'has_none' );
+	}
+
+	$user_tags = $tag_User->get_usertags();
 
 	switch( $type )
 	{
