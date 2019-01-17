@@ -6588,6 +6588,8 @@ function users_results( & $UserList, $params = array() )
 			'th_class_avatar'    => 'shrinkwrap small',
 			'td_class_avatar'    => 'shrinkwrap center small',
 			'avatar_size'        => 'crop-top-48x48',
+			'th_class_id'        => 'shrinkwrap small',
+			'td_class_id'        => 'shrinkwrap small',
 			'th_class_login'     => 'shrinkwrap small',
 			'td_class_login'     => 'small',
 			'th_class_nickname'  => 'shrinkwrap small',
@@ -6652,8 +6654,8 @@ function users_results( & $UserList, $params = array() )
 	{ // Display ID
 		$UserList->cols[] = array(
 				'th' => T_('ID'),
-				'th_class' => 'shrinkwrap small',
-				'td_class' => 'shrinkwrap small',
+				'th_class' => $params['th_class_id'],
+				'td_class' => $params['td_class_id'],
 				'order' => 'user_ID',
 				'td' => '$user_ID$',
 			);
@@ -7278,8 +7280,8 @@ function users_results( & $UserList, $params = array() )
 		{	// Display actions for email campaign's users:
 			$UserList->cols[] = array(
 					'th' => T_('Actions'),
-					'th_class' => 'small',
-					'td_class' => 'shrinkwrap small',
+					'th_class' => '',
+					'td_class' => 'shrinkwrap',
 					'td' => '%user_td_campaign_actions( '.intval( $params['ecmp_ID'] ).', #user_ID#, #csnd_status# )%'
 				);
 		}
