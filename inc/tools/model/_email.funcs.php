@@ -601,7 +601,30 @@ function mail_is_blocked( $email, $blocked_statuses = array() )
 
 
 /**
- * Get where conditino to check if a mail is blocked or not
+ * Get email address statuses which are considered as blocked
+ *
+ * @return array
+ */
+function get_blocked_email_statuses()
+{
+	return array( 'prmerror', 'spammer' );
+}
+
+
+/**
+ * Check if the email address status is blocked
+ *
+ * @param string Email address status
+ * @return boolean
+ */
+function is_blocked_email_status( $email_status )
+{
+	return in_array( $email_status, get_blocked_email_statuses() );
+}
+
+
+/**
+ * Get SQL condition to check if a mail is blocked or not
  *
  * @param boolean set true for blocked emails and false for not blocked emails
  * @param array Blocked statuses to know what emails are blocked to send
@@ -623,7 +646,7 @@ function get_mail_blocked_condition( $is_blocked = true, $blocked_statuses = arr
 
 	if( empty( $blocked_statuses ) )
 	{	// Default the blocked statuses
-		$blocked_statuses = array( 'prmerror', 'spammer' );
+		$blocked_statuses = get_blocked_email_statuses();
 	}
 
 	$operator = $is_blocked ? 'IN' : 'NOT IN';

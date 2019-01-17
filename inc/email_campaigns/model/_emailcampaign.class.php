@@ -477,8 +477,8 @@ class EmailCampaign extends DataObject
 					$this->users['filter'][] = $user_data->user_ID;
 				}
 			}
-			elseif( $user_data->csnd_status == 'send_error' || $user_data->emadr_status == 'prmerror' )
-			{	// We encountered a send error the last time we attempted to send email, or if current status of email address is "Permanent error":
+			elseif( $user_data->csnd_status == 'send_error' || is_blocked_email_status( $user_data->emadr_status ) )
+			{	// We encountered a send error the last time we attempted to send email, or if current status of email address is "Permanent error" or "Spammer":
 				if( ! $user_data->enls_subscribed )
 				{	// This user is unsubscribed from newsletter of this email campaign:
 					$this->users['unsub_error'][] = $user_data->user_ID;
@@ -1078,8 +1078,8 @@ class EmailCampaign extends DataObject
 				$this->update_user_send_status( $user_ID, 'sent' );
 			}
 			elseif( ( $User = & $UserCache->get_by_ID( $user_ID, false, false ) ) &&
-			        $User->get_email_status() == 'prmerror' )
-			{	// Unable to send email due to permanent error:
+			        is_blocked_email_status( $User->get_email_status() ) )
+			{	// Unable to send email due to blocked email addresses:
 				$this->update_user_send_status( $user_ID, 'send_error' );
 			}
 		}
@@ -1164,7 +1164,7 @@ class EmailCampaign extends DataObject
 			else
 			{	// This email sending was skipped:
 				$email_skip_count++;
-				if( $User->get_email_status() == 'prmerror' )
+				if( is_blocked_email_status( $User->get_email_status() ) )
 				{	// Unable to send email due to permanent error:
 					$email_error_count++;
 				}
@@ -1198,9 +1198,9 @@ class EmailCampaign extends DataObject
 							echo '<span class="orange">'.$error_msg.'</span><br />';
 						}
 					}
-					elseif( $User->get_email_status() == 'prmerror' )
+					elseif( is_blocked_email_status( $User->get_email_status() ) )
 					{ // Email has permanent error
-						$error_msg = sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).' ('.T_('Reason').': '.T_('Permanent error').')';
+						$error_msg = sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).' ('.T_('Reason').': '.emadr_get_status_title( $User->get_email_status() ).')';
 						if( $display_messages === 'cron_job' )
 						{
 							cron_log_action_end( $error_msg, 'error' );
@@ -1211,8 +1211,9 @@ class EmailCampaign extends DataObject
 						}
 					}
 					else
-					{ // Another error
-						$error_msg = sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() );
+					{	// Another error from function send_mail():
+						global $mail_log_message;
+						$error_msg = sprintf( T_('Email was not sent to user: %s'), $User->get_identity_link() ).' ('.T_('Reason').': '.( empty( $mail_log_message ) ? T_('Unknown Error') : $mail_log_message ).')';
 						if( $display_messages === 'cron_job' )
 						{
 							cron_log_action_end( $error_msg, 'error' );

@@ -3764,6 +3764,26 @@ function user_get_notification_sender( $user_ID, $setting )
 
 
 /**
+ * Get limit for email sending for currently executing cron job
+ *
+ * @return integer 0 means either unlimited email sending or no cron job is executing at the moment
+ */
+function get_cron_job_emails_limit()
+{
+	global $executing_cron_task_key;
+
+	if( isset( $executing_cron_task_key ) )
+	{	// If any cron job is really executing now:
+		global $Settings;
+		return intval( $Settings->get( 'cjob_maxemail_'.$executing_cron_task_key ) );
+	}
+
+	// No currently executing cron job:
+	return 0;
+}
+
+
+/**
  * Check if current executing cron job should be stopped because of email sending limit
  *
  * 1. THIS MUST BE CALLED ONLY FROM INSIDE THE MAIN LOOP of the cronjob (*.job.php), not from within a generic function.
@@ -3776,15 +3796,8 @@ function user_get_notification_sender( $user_ID, $setting )
  */
 function check_cron_job_emails_limit()
 {
-	global $Settings, $executing_cron_task_key;
-
-	if( ! isset( $executing_cron_task_key ) )
-	{	// Don't stop because it is a not cron job execution:
-		return true;
-	}
-
 	// Get max number of emails for current cron job:
-	$current_cron_job_emails_limit = intval( $Settings->get( 'cjob_maxemail_'.$executing_cron_task_key ) );
+	$current_cron_job_emails_limit = get_cron_job_emails_limit();
 
 	if( $current_cron_job_emails_limit > 0 )
 	{	// If current cron job has a limit for sending of emails:
@@ -3802,7 +3815,6 @@ function check_cron_job_emails_limit()
 			// Stop current job execution:
 			return false;
 		}
-
 	}
 
 	// Allow to continue current cron job execution:
@@ -4000,7 +4012,11 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		$send_mail_result = evo_mail( $to, $subject, $message_data, $headers, $additional_parameters );
 	}
 
-// HERE: increase_mail_send_counter();  THIS MUST NOT STOP execution here!
+	if( get_cron_job_emails_limit() > 0 )
+	{	// Increase global counter if currently executing cron jobs has a limit for mail sending:
+		global $executing_cron_task_emails_count;
+		$executing_cron_task_emails_count++;
+	}
 
 
 	if( ! $send_mail_result )

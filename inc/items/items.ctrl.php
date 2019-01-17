@@ -40,7 +40,7 @@ global $current_User;
  */
 global $Collection, $Blog;
 
-global $dispatcher;
+global $admin_url;
 
 global $basehost;
 
@@ -373,7 +373,7 @@ switch( $action )
 
 		// Note: we redirect without restoring filter. This should allow to see the new files.
 		// &filter=restore
-		header_redirect( $dispatcher.'?ctrl=items&blog='.$blog );	// Will save $Messages
+		header_redirect( $admin_url.'?ctrl=items&blog='.$blog );	// Will save $Messages
 
 		// Note: we should have EXITED here. In case we don't (error, or sth...)
 

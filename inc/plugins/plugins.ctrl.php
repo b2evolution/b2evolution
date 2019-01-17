@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher;
+global $admin_url;
 
 
 // Check permission to display:
@@ -871,7 +871,7 @@ switch( $action )
 			exit(0);
 		}
 
-		$title = sprintf( T_('Help for plugin &laquo;%s&raquo;'), '<a href="'.$dispatcher.'?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$edit_Plugin->ID.'">'.$edit_Plugin->name.'</a>' );
+		$title = sprintf( T_('Help for plugin &laquo;%s&raquo;'), '<a href="'.$admin_url.'?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$edit_Plugin->ID.'">'.$edit_Plugin->name.'</a>' );
 		if( ! empty($edit_Plugin->help_url) )
 		{
 			$title .= ' '.action_icon( T_('External help page'), 'help', $edit_Plugin->help_url );

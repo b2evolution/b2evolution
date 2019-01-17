@@ -26,8 +26,6 @@ global $AdminUI;
  */
 global $current_User;
 
-global $dispatcher;
-
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
 

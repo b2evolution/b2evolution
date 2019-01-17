@@ -14,7 +14,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher;
 global $current_User, $Settings;
 global $DB;
 

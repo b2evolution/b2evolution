@@ -28,7 +28,7 @@ load_class( 'files/model/_filelist.class.php', 'FileList' );
 
 global $current_User, $Plugins;
 
-global $dispatcher;
+global $admin_url;
 
 global $blog;
 
@@ -367,7 +367,7 @@ if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 
 	if( empty($failedFiles) && empty($renamedFiles) )
 	{ // quick mode or no failed files, Go back to Browsing
-		// header_redirect( $dispatcher.'?ctrl=files&root='.$fm_FileRoot->ID.'&path='.rawurlencode($path) );
+		// header_redirect( $admin_url.'?ctrl=files&root='.$fm_FileRoot->ID.'&path='.rawurlencode($path) );
 		header_redirect( regenerate_url( 'ctrl', 'ctrl=files', '', '&' ) );
 	}
 }

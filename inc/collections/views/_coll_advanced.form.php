@@ -22,7 +22,7 @@ global $edited_Blog;
 
 global $Plugins, $Settings;
 
-global $basepath, $rsc_url, $dispatcher, $admin_url;
+global $basepath, $rsc_url, $admin_url;
 
 $Form = new Form( NULL, 'blogadvanced_checkchanges' );
 

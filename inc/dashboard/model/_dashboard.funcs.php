@@ -256,7 +256,7 @@ function get_comments_awaiting_moderation_number( $blog_ID )
  */
 function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limit = 5, $comment_IDs = array(), $script = true )
 {
-	global $current_User, $dispatcher;
+	global $current_User;
 
 	if( is_null( $CommentList ) )
 	{ // Inititalize CommentList

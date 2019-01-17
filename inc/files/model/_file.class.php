@@ -2130,11 +2130,11 @@ class File extends DataObject
 	function get_linkedit_link( $link_type = NULL, $link_obj_ID = NULL, $text = NULL, $title = NULL, $no_access_text = NULL,
 											$actionurl = '#', $target = '' )
 	{
-		global $dispatcher;
+		global $admin_url;
 
 		if( $actionurl == '#' )
 		{
-			$actionurl = $dispatcher.'?ctrl=files';
+			$actionurl = $admin_url.'?ctrl=files';
 		}
 
 		if( is_null( $text ) )
@@ -2173,11 +2173,11 @@ class File extends DataObject
 	 */
 	function get_linkedit_url( $link_type = NULL, $link_obj_ID = NULL, $actionurl = '#' )
 	{
-		global $dispatcher;
+		global $admin_url;
 
 		if( $actionurl == '#' )
 		{
-			$actionurl = $dispatcher.'?ctrl=files';
+			$actionurl = $admin_url.'?ctrl=files';
 		}
 
 		if( $this->is_dir() )

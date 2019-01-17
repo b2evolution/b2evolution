@@ -20,7 +20,7 @@ items_manual_results_block();
 echo '<p class="note">'.T_('<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same collection (smallest category number).').'</p>';
 */
 
-global $Settings, $dispatcher, $ReqURI, $Collection, $Blog, $blog;
+global $Settings, $admin_url, $ReqURI, $Collection, $Blog, $blog;
 
 if( empty( $Blog ) )
 { // Set Blog
@@ -49,7 +49,7 @@ echo '</div>'; // form wrapper end
 
 if( ! $Settings->get('allow_moving_chapters') )
 { // TODO: check perm
-	echo '<p class="alert alert-info">'.sprintf( T_('<strong>Note:</strong> Moving categories across blogs is currently disabled in the %sblogs settings%s.'), '<a href="'.$dispatcher.'?ctrl=collections&tab=blog_settings#categories">', '</a>' ).'</p> ';
+	echo '<p class="alert alert-info">'.sprintf( T_('<strong>Note:</strong> Moving categories across blogs is currently disabled in the %sblogs settings%s.'), '<a href="'.$admin_url.'?ctrl=collections&tab=blog_settings#categories">', '</a>' ).'</p> ';
 }
 
 ?>

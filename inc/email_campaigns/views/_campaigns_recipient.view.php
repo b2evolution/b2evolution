@@ -152,7 +152,7 @@ users_results_block( array(
 		'page_url'             => get_dispctrl_url( 'campaigns', 'action=edit&amp;tab=recipient&amp;ecmp_ID='.$edited_EmailCampaign->ID.
 				( empty( $recipient_type ) ? '' : '&amp;recipient_type='.$recipient_type ).
 				( empty( $recipient_action ) ? '' : '&amp;recipient_action='.$recipient_action ) ),
-		'display_ID'           => false,
+		'display_ID'           => true,
 		'display_btn_adduser'  => false,
 		'display_btn_addgroup' => false,
 		'display_avatar'       => false,
@@ -180,6 +180,8 @@ users_results_block( array(
 		'display_camp_status'  => true,
 		'display_emlog_date'   => true,
 		'display_email_tracking' => true,
+		'th_class_id'          => 'shrinkwrap',
+		'td_class_id'          => 'shrinkwrap',
 		'th_class_login'       => '',
 		'td_class_login'       => '',
 	) );
