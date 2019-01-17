@@ -699,7 +699,7 @@ class ItemList2 extends ItemListLight
 				$compare_field = substr( $orderby, 0, -4 );
 			}
 			$compare_field = trim( $compare_field );
-			if( strpos( $compare_field, 'T_postcats.postcat_order' ) !== false )
+			if( strpos( $compare_field, 'postcatsorders.postcat_order' ) !== false )
 			{	// This is an order field per category:
 				$post_field_name = 'postcat_order';
 			}
