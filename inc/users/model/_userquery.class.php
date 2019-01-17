@@ -884,7 +884,7 @@ class UserQuery extends FilterSQL
 	{
 		if( ! empty( $value ) )
 		{
-			return $this->get_where_condition( 'DATE( user_lastseen_ts )', $value, $operator );
+			return $this->get_where_condition( 'DATE( IFNULL( user_lastseen_ts, "1970-01-01" ) )', $value, $operator );
 		}
 	}
 

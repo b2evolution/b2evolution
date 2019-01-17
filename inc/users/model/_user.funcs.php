@@ -3652,7 +3652,24 @@ function callback_filter_userlist( & $Form )
 			'gender'   => '',
 			'criteria' => '0:contains:',
 			'lastseen' => '',
-		)
+		),
+		// Set order of the filters here, but filters are initalized below:
+		// (some filters may be hidden depending on current User permissions and front-office calling)
+		'gender'              => NULL, // Gender
+		'criteria'            => NULL, // Specific criteria
+		'tags'                => NULL, // User tags
+		'org'                 => NULL, // Organization
+		'group'               => NULL, // Primary Group
+		'group2'              => NULL, // Secondary Group
+		'lastseen'            => NULL, // User last seen
+		'regdate'             => NULL, // Registration date
+		'source'              => NULL, // Registration source
+		'status'              => NULL, // Account status
+		'newsletter'          => NULL, // Subscribed to
+		'report_count'        => NULL, // Reported count
+		'level'               => NULL, // User level
+		'custom_sender_email' => NULL, // Uses custom sender address
+		'custom_sender_name'  => NULL, // Uses custom sender name
 	);
 
 	$Form->hidden( 'filter', 'new' );
@@ -4066,6 +4083,15 @@ function evo_set_filter_user_tags( rule, value )
 }
 </script>
 <?php
+		}
+	}
+
+	// Find and remove filters which are not used for current case:
+	foreach( $filters as $filter_key => $filter_data )
+	{
+		if( $filter_data === NULL )
+		{
+			unset( $filters[ $filter_key ] );
 		}
 	}
 
