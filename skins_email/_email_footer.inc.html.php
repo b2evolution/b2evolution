@@ -40,6 +40,14 @@ if( isset( $params['enlt_ID'] ) && $params['enlt_ID'] == 1 )
 	// Add custom messages here
 }
 
+if( check_usertags( $recipient_user_ID, array( 'user_tag_1', 'user_tag_2' ), 'has_any' ) )
+{	// Check user tags of the recipient, 3rd param has 3 values:
+	//   'has_any' - has at least one tag from the array,
+	//   'has_all' - has all tags from the array,
+	//   'has_none' - has no all tags from the array.
+	// Add custom messages here
+}
+
 ?>
 </div>
 </div>
