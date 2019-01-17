@@ -1672,7 +1672,7 @@ function attach_browse_tabs( $display_tabs3 = true )
 					array(
 						'custom' => array(
 							'text' => T_('Custom Types'),
-							'href' => $dispatcher.'?ctrl=items&amp;tab=custom&amp;filter=restore&amp;blog='.$Blog->ID,
+							'href' => $admin_url.'?ctrl=items&amp;tab=custom&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 					)
 			);

@@ -28,7 +28,7 @@ global $ItemList;
  */
 global $Item;
 
-global $action, $dispatcher, $blog, $posts, $poststart, $postend, $ReqURI;
+global $action, $blog, $posts, $poststart, $postend, $ReqURI;
 global $edit_item_url, $delete_item_url, $p, $dummy_fields;
 global $comment_allowed_tags, $comment_type;
 global $Plugins, $DB, $UserSettings, $Session, $Messages;

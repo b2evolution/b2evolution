@@ -34,7 +34,7 @@ load_class( 'files/model/_filelist.class.php', 'FileList' );
  */
 global $current_User;
 
-global $dispatcher;
+global $admin_url;
 
 global $blog;
 
@@ -1176,7 +1176,7 @@ switch( $action )
 					$DB->rollback();
 				}
 
-				header_redirect( $dispatcher.'?ctrl=items&action=edit&p='.$edited_Item->ID );	// Will save $Messages
+				header_redirect( $admin_url.'?ctrl=items&action=edit&p='.$edited_Item->ID );	// Will save $Messages
 				break;
 		}
 

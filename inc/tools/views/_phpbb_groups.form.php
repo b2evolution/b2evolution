@@ -15,7 +15,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $phpbb_db_config, $dispatcher, $phpbb_tool_title, $phpbb_version;
+global $phpbb_db_config, $admin_url, $phpbb_tool_title, $phpbb_version;
 
 phpbb_display_steps( 2 );
 
@@ -108,7 +108,7 @@ $Form->begin_fieldset( T_('Select the forums which will be imported') );
 $Form->end_fieldset();
 
 $Form->buttons( array( array( 'submit', 'submit', T_('Continue').'!', 'SaveButton' ),
-											 array( 'button', 'button', T_('Back'), 'SaveButton', 'location.href=\''.$dispatcher.'?ctrl=phpbbimport\'' ) ) );
+											 array( 'button', 'button', T_('Back'), 'SaveButton', 'location.href=\''.$admin_url.'?ctrl=phpbbimport\'' ) ) );
 
 $Form->end_form();
 

@@ -21,8 +21,6 @@ load_funcs('sessions/model/_hitlog.funcs.php');
  */
 global $current_User;
 
-global $dispatcher;
-
 global $collections_Module, $DB;
 param_action();
 

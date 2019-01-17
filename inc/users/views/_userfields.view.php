@@ -16,8 +16,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'users/model/_userfield.class.php', 'Userfield' );
 
-global $dispatcher;
-
 // query which groups have user field definitions (in order to prevent deletion of groups which have user field definitions)
 global $usedgroups;	// We need this in a callback below
 $usedgroups = $DB->get_col( 'SELECT ufgp_ID

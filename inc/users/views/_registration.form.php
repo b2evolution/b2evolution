@@ -21,8 +21,6 @@ global $current_User;
  */
 global $Settings;
 
-global $dispatcher;
-
 global $collections_Module, $Plugins;
 
 global $baseurl;
