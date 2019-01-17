@@ -7892,7 +7892,7 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 }
 
 /**
- * Helper function to display email status in table cell
+ * Helper function to get email status in table cell
  *
  * @param string Email address status
  * @param integer Email address ID
@@ -7919,14 +7919,17 @@ function user_td_email_status( $emadr_status, $emadr_ID )
 
 
 /**
- * Get user campaign status
+ * Helper function to get email campaign status for the user
+ *
+ * @param string Key of user campaign status
+ * @param integer Email log ID
+ * @param string Email address status
+ * @return string Title of user campaign status
  */
 function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL, $email_status = NULL )
 {
-	global $current_User, $admin_url;
-
-	if( $email_status == 'prmerror' && $csnd_status != 'send_error' )
-	{	// Force users with email status "Permanent error" to "Cannot send" status:
+	if( $csnd_status != 'send_error' && is_blocked_email_status( $email_status ) )
+	{	// Force users with blocked email status("Permanent error" or "Spammer") to fake status "Cannot send":
 		$csnd_status = 'cannot_send';
 	}
 
@@ -7942,7 +7945,8 @@ function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL, $email_st
 			return T_('Sent');
 
 		case 'send_error':
-		case 'cannot_send':
+		case 'cannot_send': // This status doesn't exist in DB!
+			global $current_User;
 			$status_text = ( $csnd_status == 'cannot_send' ? T_('Cannot send') : T_('Send error') );
 			if( ! empty( $csnd_emlog_ID ) && $current_User->check_perm( 'emails', 'view' ) )
 			{	// Make a link to view details of error sending:

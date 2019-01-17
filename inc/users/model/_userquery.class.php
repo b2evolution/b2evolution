@@ -591,8 +591,8 @@ class UserQuery extends FilterSQL
 
 			case 'send_error':
 				// Get recipients which had error on receiving the email campaign
-				// or if their email address has a status "Permanent error":
-				$this->WHERE_and( 'csnd_status = "send_error" OR emadr_status = "prmerror"' );
+				// or if their email address has a blocked status("Permanent error" or "Spammer"):
+				$this->WHERE_and( 'csnd_status = "send_error" OR '.get_mail_blocked_condition() );
 				break;
 
 			case 'sent':
