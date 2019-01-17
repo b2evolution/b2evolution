@@ -3664,7 +3664,24 @@ function callback_filter_userlist( & $Form )
 			'gender'   => '',
 			'criteria' => '0:contains:',
 			'lastseen' => '',
-		)
+		),
+		// Set order of the filters here, but filters are initalized below:
+		// (some filters may be hidden depending on current User permissions and front-office calling)
+		'gender'              => NULL, // Gender
+		'criteria'            => NULL, // Specific criteria
+		'tags'                => NULL, // User tags
+		'org'                 => NULL, // Organization
+		'group'               => NULL, // Primary Group
+		'group2'              => NULL, // Secondary Group
+		'lastseen'            => NULL, // User last seen
+		'regdate'             => NULL, // Registration date
+		'source'              => NULL, // Registration source
+		'status'              => NULL, // Account status
+		'newsletter'          => NULL, // Subscribed to
+		'report_count'        => NULL, // Reported count
+		'level'               => NULL, // User level
+		'custom_sender_email' => NULL, // Uses custom sender address
+		'custom_sender_name'  => NULL, // Uses custom sender name
 	);
 
 	$Form->hidden( 'filter', 'new' );
@@ -4078,6 +4095,15 @@ function evo_set_filter_user_tags( rule, value )
 }
 </script>
 <?php
+		}
+	}
+
+	// Find and remove filters which are not used for current case:
+	foreach( $filters as $filter_key => $filter_data )
+	{
+		if( $filter_data === NULL )
+		{
+			unset( $filters[ $filter_key ] );
 		}
 	}
 
@@ -6603,6 +6629,8 @@ function users_results( & $UserList, $params = array() )
 			'th_class_avatar'    => 'shrinkwrap small',
 			'td_class_avatar'    => 'shrinkwrap center small',
 			'avatar_size'        => 'crop-top-48x48',
+			'th_class_id'        => 'shrinkwrap small',
+			'td_class_id'        => 'shrinkwrap small',
 			'th_class_login'     => 'shrinkwrap small',
 			'td_class_login'     => 'small',
 			'th_class_nickname'  => 'shrinkwrap small',
@@ -6667,8 +6695,8 @@ function users_results( & $UserList, $params = array() )
 	{ // Display ID
 		$UserList->cols[] = array(
 				'th' => T_('ID'),
-				'th_class' => 'shrinkwrap small',
-				'td_class' => 'shrinkwrap small',
+				'th_class' => $params['th_class_id'],
+				'td_class' => $params['td_class_id'],
 				'order' => 'user_ID',
 				'td' => '$user_ID$',
 			);
@@ -7293,8 +7321,8 @@ function users_results( & $UserList, $params = array() )
 		{	// Display actions for email campaign's users:
 			$UserList->cols[] = array(
 					'th' => T_('Actions'),
-					'th_class' => 'small',
-					'td_class' => 'shrinkwrap small',
+					'th_class' => '',
+					'td_class' => 'shrinkwrap',
 					'td' => '%user_td_campaign_actions( '.intval( $params['ecmp_ID'] ).', #user_ID#, #csnd_status# )%'
 				);
 		}
@@ -7879,7 +7907,7 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 }
 
 /**
- * Helper function to display email status in table cell
+ * Helper function to get email status in table cell
  *
  * @param string Email address status
  * @param integer Email address ID
@@ -7906,14 +7934,17 @@ function user_td_email_status( $emadr_status, $emadr_ID )
 
 
 /**
- * Get user campaign status
+ * Helper function to get email campaign status for the user
+ *
+ * @param string Key of user campaign status
+ * @param integer Email log ID
+ * @param string Email address status
+ * @return string Title of user campaign status
  */
 function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL, $email_status = NULL )
 {
-	global $current_User, $admin_url;
-
-	if( $email_status == 'prmerror' && $csnd_status != 'send_error' )
-	{	// Force users with email status "Permanent error" to "Cannot send" status:
+	if( $csnd_status != 'send_error' && is_blocked_email_status( $email_status ) )
+	{	// Force users with blocked email status("Permanent error" or "Spammer") to fake status "Cannot send":
 		$csnd_status = 'cannot_send';
 	}
 
@@ -7929,7 +7960,8 @@ function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL, $email_st
 			return T_('Sent');
 
 		case 'send_error':
-		case 'cannot_send':
+		case 'cannot_send': // This status doesn't exist in DB!
+			global $current_User;
 			$status_text = ( $csnd_status == 'cannot_send' ? T_('Cannot send') : T_('Send error') );
 			if( ! empty( $csnd_emlog_ID ) && $current_User->check_perm( 'emails', 'view' ) )
 			{	// Make a link to view details of error sending:
