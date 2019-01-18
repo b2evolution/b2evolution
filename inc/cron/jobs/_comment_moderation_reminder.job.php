@@ -240,12 +240,6 @@ foreach( $moderation_blogs as $blog_ID )
 
 foreach( $loaded_ids as $moderator_ID )
 { // Loop trhough each moderators and send comment moderation emails if it is required
-
-	if( ! check_cron_job_emails_limit() )
-	{	// Stop execution for cron job because max number of emails has been already sent:
-		break;
-	}
-
 	$moderator_User = $UserCache->get_by_ID( $moderator_ID );
 	$blog_comments = array();
 	if( in_array( $moderator_ID, $global_moderators ) )
@@ -350,6 +344,6 @@ foreach( $loaded_ids as $moderator_ID )
 	locale_restore_previous();
 }
 
-cron_log_append( ( ( $mail_sent + $mail_failed ) ? "\n" : '' ).sprintf( '%d of %d moderators have been notified!', $mail_sent, count( $loaded_ids ) ) );
+cron_log_append( ( ( $mail_sent + $mail_failed ) ? "\n" : '' ).sprintf( '%d of %d moderators have been notified!', $mail_sent, ( $mail_sent + $mail_failed ) ) );
 return 1; /*OK*/
 ?>

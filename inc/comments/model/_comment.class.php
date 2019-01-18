@@ -4311,11 +4311,6 @@ class Comment extends DataObject
 		$notified_users_num = 0;
 		foreach( $notify_users as $notify_user_ID => $notify_type )
 		{
-			if( ! check_cron_job_emails_limit() )
-			{	// Stop execution for cron job because max number of emails has been already sent:
-				break;
-			}
-
 			if( $notify_type == 'anon_subscription' )
 			{	// Get data of anonymous user:
 				$notify_comment_ID = intval( substr( $notify_user_ID, 5 ) );

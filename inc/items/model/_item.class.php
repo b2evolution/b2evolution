@@ -8641,11 +8641,6 @@ class Item extends ItemLight
 		$cache_by_locale = array();
 		foreach( $notify_users as $user_ID => $notify_type )
 		{
-			if( ! check_cron_job_emails_limit() )
-			{	// Stop execution for cron job because max number of emails has been already sent:
-				break;
-			}
-
 			$notify_User = & $UserCache->get_by_ID( $user_ID, false, false );
 			if( empty( $notify_User ) )
 			{	// skip invalid users:
