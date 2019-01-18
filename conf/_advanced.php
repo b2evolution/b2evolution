@@ -728,9 +728,13 @@ $use_hacks = false;
 
 
 /**
- * If user tries to login 10 times during X seconds we refuse login (even if password is correct)
- * If set to 0, then there is never a lockout
+ * If user tries to log in {$failed_logins_before_lockout} times
+ * during the last {$failed_logins_lockout} seconds,
+ * we refuse login (even if password is correct) and display that
+ * the account is locked out until the above condition is no longer true.
+ * If {$failed_logins_lockout} is set to 0, there will never be a lockout.
  */
+$failed_logins_before_lockout = 10; // 10 times, Max is 197
 $failed_logins_lockout = 600; // 10 minutes
 
 
