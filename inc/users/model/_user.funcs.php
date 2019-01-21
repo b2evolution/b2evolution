@@ -1715,7 +1715,7 @@ function profile_check_params( $params, $User = NULL )
 			}
 			elseif( $Settings->get('passwd_special') && ! preg_match( '~[\x20-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]~', $params['pass1'][0] ) )
 			{
-				param_error( $dummy_fields[ $params['pass1'][1] ], T_('Your password should contain at least one special character (like & ! $ * - _ + etc.)') );
+				param_error( $dummy_fields[ $params['pass1'][1] ], T_('Your password should contain at least one special character (like ! $ * - _ + etc.)') );
 			}
 			elseif( utf8_strlen( $params['pass1'][0] ) < $Settings->get( 'user_minpwdlen' ) )
 			{

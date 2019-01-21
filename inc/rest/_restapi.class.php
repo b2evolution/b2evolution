@@ -67,7 +67,7 @@ class RestApi
 	 */
 	private function user_log_in( $entered_login, $entered_password )
 	{
-		global $current_User, $failed_logins_lockout, $UserSettings, $Settings, $Session, $localtimenow;
+		global $current_User, $failed_logins_lockout, $failed_logins_before_lockout, $UserSettings, $Settings, $Session, $localtimenow;
 
 		$UserCache = & get_UserCache();
 
@@ -111,11 +111,11 @@ class RestApi
 		// Check user login attempts:
 		$login_attempts = $UserSettings->get( 'login_attempts', $User->ID );
 		$login_attempts = empty( $login_attempts ) ? array() : explode( ';', $login_attempts );
-		if( $failed_logins_lockout > 0 && count( $login_attempts ) == 9 )
+		if( $failed_logins_lockout > 0 && count( $login_attempts ) >= $failed_logins_before_lockout - 1 )
 		{	// User already has a maximum value of the attempts:
 			$first_attempt = explode( '|', $login_attempts[0] );
 			if( $localtimenow - $first_attempt[0] < $failed_logins_lockout )
-			{	// User has used 9 attempts during X minutes, Display error and Refuse login
+			{	// User has used N attempts during X minutes, Display error and Refuse login
 				$this->halt( sprintf( T_('There have been too many failed login attempts. This account is temporarily locked. Try again in %s minutes.'), ceil( $failed_logins_lockout / 60 ) ), 'login_attempt_failed', 403 );
 				// Exit here.
 			}
@@ -124,7 +124,7 @@ class RestApi
 		if( ! $User->check_password( $entered_password ) )
 		{	// The entered password is not right for requested user
 			// Save new login attempt into DB:
-			if( count( $login_attempts ) == 9 )
+			if( count( $login_attempts ) >= $failed_logins_before_lockout - 1 )
 			{ // Unset first attempt to clear a space for new attempt
 				unset( $login_attempts[0] );
 			}

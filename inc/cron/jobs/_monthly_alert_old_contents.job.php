@@ -180,11 +180,6 @@ $mail_moderator_num = 0;
 $mail_coll_sent = 0;
 foreach( $BlogCache->cache as $alert_Blog )
 {
-	if( ! check_cron_job_emails_limit() )
-	{	// Stop execution for cron job because max number of emails has been already sent:
-		break;
-	}
-
 	// Get all old posts of the collection to alert for moderators:
 	$SQL = new SQL( 'Get all old posts of the collection '.$alert_Blog->ID.' to alert for moderators' );
 	$SQL->SELECT( 'post_ID, post_status, user_level as author_level, post_creator_user_ID' );
@@ -204,11 +199,6 @@ foreach( $BlogCache->cache as $alert_Blog )
 
 	foreach( $UserCache->cache as $alert_User )
 	{
-		if( ! check_cron_job_emails_limit() )
-		{	// Stop execution for cron job because max number of emails has been already sent:
-			break;
-		}
-
 		$moderator_old_posts = array();
 		if( in_array( $alert_User->ID, $global_moderator_IDs ) ||
 		    ( isset( $coll_owners[ $alert_User->ID ] ) && in_array( $alert_Blog->ID, $coll_owners[ $alert_User->ID ] ) ) )
