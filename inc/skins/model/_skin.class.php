@@ -956,7 +956,12 @@ class Skin extends DataObject
 	 */
 	function display_init( /*optional: $features = array() */ )
 	{
-		global $debug, $Messages, $disp, $UserSettings;
+		global $debug, $Messages, $disp, $UserSettings, $Collection, $Blog;
+
+		if( $Blog->get_setting( 'webmentions' ) )
+		{	// If current collection allows webmentions
+			add_headline( '<link rel="webmention" href="'.$Blog->get_htsrv_url().'webmention.php" />' );
+		}
 
 		// We get the optional arg this way for PHP7 comaptibility:
 		@list( $features ) = func_get_args();

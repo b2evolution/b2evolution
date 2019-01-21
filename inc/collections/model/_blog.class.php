@@ -1116,6 +1116,11 @@ class Blog extends DataObject
 			{ // Only admin can turn ON this setting
 				$this->set( 'allowtrackbacks', $blog_allowtrackbacks );
 			}
+			$blog_webmentions = param( 'blog_webmentions', 'integer', 0 );
+			if( $blog_webmentions != $this->get_setting( 'webmentions' ) && ( $blog_webmentions == 0 || $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
+			{	// Only admin can turn ON this setting
+				$this->set_setting( 'webmentions', $blog_webmentions );
+			}
 			$this->set_setting( 'comments_orderdir', param( 'comments_orderdir', '/^(?:ASC|DESC)$/', 'ASC' ) );
 
 			// call modules update_collection_comments on this blog

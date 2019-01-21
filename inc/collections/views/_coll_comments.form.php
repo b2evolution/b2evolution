@@ -138,6 +138,14 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 		$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Trackbacks').$trackbacks_title, $trackbacks_warning.T_('Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.') );
 	}
 
+	if( $perm_blog_admin || $edited_Blog->get_setting( 'webmentions' ) )
+	{	// Only admin can turn ON this setting
+		$Form->checkbox( 'blog_webmentions', $edited_Blog->get_setting( 'webmentions' ),
+			T_('Webmentions').( ! $edited_Blog->get_setting( 'webmentions' ) ? get_admin_badge() : '' ),
+			str_replace( '$attrs$', ' id="webmentions_warning" style="display:'.( $edited_Blog->get_setting( 'webmentions' ) ? 'inline' : 'none' ).'"', $spammers_warning )
+				.T_('Allow other bloggers to send webmentions to this collection, letting you know when they refer to it.') );
+	}
+
 	$Form->checkbox( 'autocomplete_usernames', $edited_Blog->get_setting( 'autocomplete_usernames' ),
 		T_( 'Autocomplete usernames in back-office' ), T_( 'Check to enable auto-completion of usernames entered after a "@" sign in the comment forms' ) );
 
@@ -390,6 +398,18 @@ echo '</div>';
 		else
 		{
 			jQuery( '#trackbacks_warning' ).hide();
+		}
+	} );
+
+	jQuery( '#blog_webmentions' ).click( function()
+	{ // Show/Hide warning for 'Webmentions'
+		if( jQuery( this ).is( ':checked' ) )
+		{
+			jQuery( '#webmentions_warning' ).css( 'display', 'inline' );
+		}
+		else
+		{
+			jQuery( '#webmentions_warning' ).hide();
 		}
 	} );
 
