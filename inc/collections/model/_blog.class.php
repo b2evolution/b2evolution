@@ -2413,6 +2413,11 @@ class Blog extends DataObject
 			}
 		}
 
+		if( $allowed_status === NULL )
+		{	// Use max allowed status if it could not be found above:
+			$allowed_status = $max_allowed_status;
+		}
+
 		return $allowed_status;
 	}
 
