@@ -37,6 +37,10 @@ $close_icon = action_icon( T_('Close this window'), 'close', '', '', 0, 0, array
 
 $Form->begin_fieldset( T_('Set account status...').get_manual_link( 'userlist-set-account-status' ).$close_icon );
 
+	echo '<div class="alert alert-info">';
+	echo T_('Changing the account status for users may trigger additional actions: Welcome messages, Subscriptions, Unsubscriptions, etc.');
+	echo '</div>';
+
 	// Status:
 	$user_status_icons = get_user_status_icons();
 	reset( $user_status_icons );

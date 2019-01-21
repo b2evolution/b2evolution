@@ -495,6 +495,9 @@ if( !$Messages->has_errors() )
 			$UserCache->clear();
 			$UserCache->load_list( get_filterset_user_IDs() );
 
+			// Try to obtain some serious time to do some serious processing (30 minutes)
+			set_max_execution_time( 1800 );
+
 			$updated_users_num = 0;
 			foreach( $UserCache->cache as $filtered_User )
 			{	// Update account status of each filtered User:
