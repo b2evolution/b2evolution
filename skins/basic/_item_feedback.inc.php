@@ -3,13 +3,10 @@
  * This is the template that displays the feedback for a post
  * (comments, trackback, pingback...)
  *
- * You may want to call this file multiple time in a row with different $c $tb $pb params.
- * This allow to seprate different kinds of feedbacks instead of displaying them mixed together
- *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the main.page.php template.
  * To display a feedback, you should call a stub AND pass the right parameters
- * For example: /blogs/index.php?p=1&more=1&c=1&tb=1&pb=1
+ * For example: /blogs/index.php?p=1&more=1
  * Note: don't code this URL by hand, use the template functions to generate it!
  *
  * b2evolution - {@link http://b2evolution.net/}
@@ -21,53 +18,36 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Default params:
 $params = array_merge( array(
+		'disp_comments'        => is_single_page(),
+		'disp_comment_form'    => is_single_page(),
+		'disp_trackbacks'      => is_single_page(),
+		'disp_trackback_url'   => is_single_page(),
+		'disp_pingbacks'       => is_single_page(),
 		'comment_start'        => '<div>',
 		'comment_end'          => '</div>',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
 	), $params );
 
 
-global $c, $cookie_name, $cookie_email, $cookie_url, $comment_allowed_tags;
+global $cookie_name, $cookie_email, $cookie_url, $comment_allowed_tags;
 
-// Display filters:
-// You can change these and call this template multiple time if you want to separate comments from trackbacks
-$disp_comments = 1;					// Display the comments if requested
-$disp_comment_form = 1;			// Display the comments form if comments requested
-$disp_trackbacks = 1;				// Display the trackbacks if requested
-$disp_trackback_url = 1;		// Display the trackbal URL if trackbacks requested
-$disp_pingbacks = 1;        // pingbacks (deprecated)
-
-
-
-if( empty($c) )
-{	// Comments not requested
-	$disp_comments = 0;					// DO NOT Display the comments if not requested
-	$disp_comment_form = 0;			// DO NOT Display the comments form if not requested
+if( ! $Item->can_receive_pings() )
+{	// Trackbacks are not allowed
+	$params['disp_trackbacks'] = false;				// DO NOT Display the trackbacks if not allowed
+	$params['disp_trackback_url'] = false;		// DO NOT Display the trackback URL if not allowed
 }
-
-if( empty($tb) || !$Item->can_receive_pings() )
-{	// Trackback not requested or not allowed
-	$disp_trackbacks = 0;				// DO NOT Display the trackbacks if not requested
-	$disp_trackback_url = 0;		// DO NOT Display the trackback URL if not requested
-}
-
-if( empty($pb) )
-{	// Pingback not requested
-	$disp_pingbacks = 0;				// DO NOT Display the pingbacks if not requested
-}
-
 ?>
 <a id="feedbacks"></a>
 <?php
 
-if( ! ($disp_comments || $disp_comment_form || $disp_trackbacks || $disp_trackback_url || $disp_pingbacks ) )
+if( ! ( $params['disp_comments'] || $params['disp_comment_form'] || $params['disp_trackbacks'] || $params['disp_trackback_url'] || $params['disp_pingbacks'] ) )
 {	// Nothing more to do....
 	return false;
 }
 
 $type_list = array();
 $disp_title = array();
-if(  $disp_comments )
+if(  $params['disp_comments'] )
 {	// We requested to display comments
 	if( $Item->can_see_comments( true ) )
 	{ // User can see a comments
@@ -76,24 +56,24 @@ if(  $disp_comments )
 	}
 	else
 	{ // Use cannot see comments
-		$disp_comments = false;
+		$params['disp_comments'] = false;
 	}
 	?>
 	<a id="comments"></a>
 <?php }
-if( $disp_trackbacks ) {
+if( $params['disp_trackbacks'] ) {
 	$type_list[] = 'trackback';
 	$disp_title[] = T_("Trackbacks"); ?>
 	<a id="trackbacks"></a>
 <?php }
-if( $disp_pingbacks ) {
+if( $params['disp_pingbacks'] ) {
 	$type_list[] = 'pingback';
 	$disp_title[] = T_("Pingbacks"); ?>
 	<a id="pingbacks"></a>
 <?php } ?>
 
 <?php
-if( $disp_trackback_url )
+if( $params['disp_trackback_url'] )
 {	// We want to display the trackback URL:
 	?>
 	<h4><?php echo T_('Trackback address for this post:') ?></h4>
@@ -112,9 +92,8 @@ if( $disp_trackback_url )
 ?>
 
 <?php
-if( $disp_comments || $disp_trackbacks || $disp_pingbacks )
+if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] )
 {
-	if( $disp_comments )
 ?>
 
 <!-- Title for comments, tbs, pbs... -->
@@ -181,7 +160,7 @@ while( $Comment = & $CommentList->get_next() )
 }
 
 // ------------------ COMMENT FORM INCLUDED HERE ------------------
-if( $disp_comment_form && // if enabled by skin param
+if( $params['disp_comment_form'] && // if enabled by skin param
     $Blog->get_setting( 'allow_comments' ) != 'never' && // if enabled by collection setting
     $Item->get_type_setting( 'use_comments' ) ) // if enabled by item type setting
 {	// Display a comment form only if it is enabled:

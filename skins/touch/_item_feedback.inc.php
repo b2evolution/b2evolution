@@ -3,13 +3,10 @@
  * This is the template that displays the feedback for a post
  * (comments, trackback, pingback...)
  *
- * You may want to call this file multiple time in a row with different $c $tb $pb params.
- * This allow to seprate different kinds of feedbacks instead of displaying them mixed together
- *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the main.page.php template.
  * To display a feedback, you should call a stub AND pass the right parameters
- * For example: /blogs/index.php?p=1&more=1&c=1&tb=1&pb=1
+ * For example: /blogs/index.php?p=1&more=1
  * Note: don't code this URL by hand, use the template functions to generate it!
  *
  * b2evolution - {@link http://b2evolution.net/}
@@ -27,11 +24,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Default params:
 $params = array_merge( array(
-		'disp_comments'        => true,
-		'disp_comment_form'    => true,
-		'disp_trackbacks'      => true,
-		'disp_trackback_url'   => true,
-		'disp_pingbacks'       => true,
+		'disp_comments'        => is_single_page(),
+		'disp_comment_form'    => is_single_page(),
+		'disp_trackbacks'      => is_single_page(),
+		'disp_trackback_url'   => is_single_page(),
+		'disp_pingbacks'       => is_single_page(),
 		'disp_section_title'   => true,
 		'disp_rating_summary'  => true,
 		'before_section_title' => '<h3 id="com-head" onclick="bnc_showhide_coms_toggle();"><img alt="arrow" src="'.$Skin->get_url().'img/com_arrow.png" id="com-arrow">',
@@ -52,7 +49,7 @@ $params = array_merge( array(
 		'notification_text'    => T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' ),
 	), $params );
 
-global $c, $tb, $pb, $redir;
+global $redir;
 
 echo '<div id="comment_wrapper">';
 
@@ -63,24 +60,13 @@ modules_call_method( 'before_comments', $params );
 // Check if user is allowed to see comments, display corresponding message if not allowed
 if( $Item->can_see_comments( true ) )
 { // user is allowed to see comments
-	if( empty($c) )
-	{	// Comments not requested
-		$params['disp_comments'] = false;					// DO NOT Display the comments if not requested
-		$params['disp_comment_form'] = false;			// DO NOT Display the comments form if not requested
+	if( ! $Item->can_receive_pings() )
+	{	// Trackbacks are not allowed
+		$params['disp_trackbacks'] = false;				// DO NOT Display the trackbacks if not allowed
+		$params['disp_trackback_url'] = false;		// DO NOT Display the trackback URL if not allowed
 	}
 
-	if( empty($tb) || !$Item->can_receive_pings() )
-	{	// Trackback not requested or not allowed
-		$params['disp_trackbacks'] = false;				// DO NOT Display the trackbacks if not requested
-		$params['disp_trackback_url'] = false;		// DO NOT Display the trackback URL if not requested
-	}
-
-	if( empty($pb) )
-	{	// Pingback not requested
-		$params['disp_pingbacks'] = false;				// DO NOT Display the pingbacks if not requested
-	}
-
-	if( ! ($params['disp_comments'] || $params['disp_comment_form'] || $params['disp_trackbacks'] || $params['disp_trackback_url'] || $params['disp_pingbacks'] ) )
+	if( ! ( $params['disp_comments'] || $params['disp_comment_form'] || $params['disp_trackbacks'] || $params['disp_trackback_url'] || $params['disp_pingbacks'] ) )
 	{	// Nothing more to do....
 		return false;
 	}

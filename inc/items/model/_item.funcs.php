@@ -111,9 +111,6 @@ function init_MainList( $items_nb_limit )
 
 	param( 'more', 'integer', 0, true );
 	param( 'page', 'integer', 1, true ); // Post page to show
-	param( 'c',    'integer', 0, true ); // Display comments?
-	param( 'tb',   'integer', 0, true ); // Display trackbacks?
-	param( 'pb',   'integer', 0, true ); // Display pingbacks?
 }
 
 

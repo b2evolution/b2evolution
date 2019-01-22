@@ -2187,6 +2187,19 @@ function display_if_empty( $params = array() )
 
 
 /**
+ * Check if current page is a single Item's page
+ *
+ * @return boolean
+ */
+function is_single_page()
+{
+	global $disp, $MainList;
+
+	return ( $disp == 'single' || $disp == 'page' ) && isset( $MainList ) && $MainList->single_post;
+}
+
+
+/**
  * Template tag for credits
  *
  * Note: You can limit (and even disable) the number of links being displayed here though the Admin interface:

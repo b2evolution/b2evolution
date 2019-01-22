@@ -95,8 +95,6 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 				'content_mode'      => 'auto',		// 'auto' will auto select depending on $disp-detail
 				'intro_mode'        => 'normal',	// Intro posts will be displayed in normal mode
 				'item_class'        => 'well evo_post evo_content_block',
-				'disp_comments'     => false,
-				'disp_comment_form' => false,
 				'disp_notification' => false,
 				'item_link_type'    => 'none',
 				'Item'              => $Item,
