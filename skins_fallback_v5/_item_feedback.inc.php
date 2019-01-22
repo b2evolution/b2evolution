@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the template that displays the feedback for a post (comments, trackback, pingback...)
+ * This is the template that displays the feedback for a post (comments, trackback, pingback, webmention...)
  *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the main.page.php template.
@@ -28,6 +28,7 @@ $params = array_merge( array(
 		'disp_trackbacks'      => is_single_page(),
 		'disp_trackback_url'   => is_single_page(),
 		'disp_pingbacks'       => is_single_page(),
+		'disp_webmentions'     => is_single_page(),
 		'disp_section_title'   => true,
 		'disp_rating_summary'  => true,
 		'before_section_title' => '<h3>',
@@ -99,7 +100,7 @@ if( $Item->can_see_comments( true ) )
 		$params['disp_trackback_url'] = false;		// DO NOT Display the trackback URL if not allowed
 	}
 
-	if( ! ( $params['disp_comments'] || $params['disp_comment_form'] || $params['disp_trackbacks'] || $params['disp_trackback_url'] || $params['disp_pingbacks'] ) )
+	if( ! ( $params['disp_comments'] || $params['disp_comment_form'] || $params['disp_trackbacks'] || $params['disp_trackback_url'] || $params['disp_pingbacks'] || $params['disp_webmentions'] ) )
 	{	// Nothing more to do....
 		return false;
 	}
@@ -159,6 +160,16 @@ if( $Item->can_see_comments( true ) )
 		echo '<a id="pingbacks"></a>';
 	}
 
+	if( $params['disp_webmentions'] )
+	{
+		$type_list[] = 'webmention';
+		if( $title = $Item->get_feedback_title( 'webmentions' ) )
+		{
+			$disp_title[] = $title;
+		}
+		echo '<a id="webmentions"></a>';
+	}
+
 	if( $params['disp_trackback_url'] )
 	{ // We want to display the trackback URL:
 
@@ -176,7 +187,7 @@ if( $Item->can_see_comments( true ) )
 	}
 
 
-	if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks']  )
+	if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] || $params['disp_webmentions'] )
 	{
 		if( empty($disp_title) )
 		{	// No title yet
@@ -466,7 +477,7 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 }
 
 
-if( $Item->can_see_comments( false ) && ( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] ) )
+if( $Item->can_see_comments( false ) && ( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] || $params['disp_webmentions'] ) )
 {	// user is allowed to see comments
 	// Display link for comments feed:
 	$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>', $params['feed_title'] );

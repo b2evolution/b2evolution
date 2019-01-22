@@ -46,6 +46,7 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
 			'disp_comment_form'     => false,
 			'disp_trackbacks'       => false,
 			'disp_pingbacks'        => false,
+			'disp_webmentions'      => false,
 			'disp_meta_comments'    => true,
 			'disp_section_title'    => false,
 			'disp_rating_summary'   => false,

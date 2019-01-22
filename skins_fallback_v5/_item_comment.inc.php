@@ -129,6 +129,17 @@ $Comment->get_Item();
 				) );
 			$Comment->author( '', '#', '', '#', 'htmlbody', true, $params['author_link_text'] );
 			break;
+
+		case 'webmention': // Display a webmention:
+			$Comment->permanent_link( array(
+					'before'   => '',
+					'after'    => ' '.T_('from:').' ',
+					'text'     => T_('Webmention'),
+					'class'    => 'bComment-type',
+					'nofollow' => true,
+				) );
+			$Comment->author( '', '#', '', '#', 'htmlbody', true, $params['author_link_text'] );
+			break;
 	}
 	echo $params['comment_title_after'];
 

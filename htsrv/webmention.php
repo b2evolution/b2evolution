@@ -39,8 +39,53 @@ $debug_jslog = false;
 // in order to don't break the response data:
 $allow_evo_stats = false;
 
+
+/**
+ * Send a webmention response and exits
+ *
+ * @param integer Error code
+ * @param string Error message
+ */
+function webmention_response( $error_code = 0, $error_message = '' )
+{
+	header_http_response( $error_code.' '.$error_message );
+	die( $error_message );
+}
+
 // Mandatory URls to post webmention comment:
 param( 'source', 'url', true );
 param( 'target', 'url', true );
 
-// Insert "webmention" comment to the Item with permanent URL == $target
+if( ! preg_match( '#/([a-z0-9\-_]+)[^/]*$#', $target, $item_url ) ||
+    ! ( $ItemCache = & get_ItemCache() ) ||
+    ! ( $target_Item = & $ItemCache->get_by_urltitle( $item_url[1], false, false ) ) )
+{	// If item cannot be found by the requested absolute url:
+	webmention_response( 500, 'Wrong target url' );
+}
+
+if( ! $target_Item->can_receive_webmentions() )
+{	// If collection of the target Item doesn't support accepting webmentions:
+	webmention_response( 500, 'No webmentions support' );
+}
+
+// Initialize new Comment for webmention:
+$webmention_Comment = new Comment();
+$webmention_Comment->set( 'type', 'webmention' );
+$webmention_Comment->set_Item( $target_Item );
+$source_data = parse_url( $source );
+$webmention_Comment->set( 'author', ( isset( $source_data['host'] ) ? $source_data['host'] : '' ) );
+$webmention_Comment->set( 'author_IP', $Hit->IP );
+$webmention_Comment->set( 'date', date('Y-m-d H:i:s', $localtimenow ) );
+$webmention_Comment->set( 'content', $source );
+$target_Blog = & $target_Item->get_Blog();
+$webmention_Comment->set( 'status', $target_Blog->get_setting( 'new_feedback_status' ) );
+
+if( ! $webmention_Comment->dbinsert() )
+{	// Insert new "webmention" comment:
+	webmention_response( 500, 'Error webmention creating' );
+}
+
+// Execute or schedule various notifications:
+$webmention_Comment->handle_notifications( NULL, true );
+
+webmention_response( 202, 'Webmention has been accepted' );

@@ -49,6 +49,11 @@ $Comment = & $params['Comment'];
 			echo T_('Pingback from:') ?>
 			<?php $Comment->author( '', '#', '', '#', 'htmlbody', true, 'auto' ) ?>
 			<?php break;
+		
+		case 'webmention': // Display a webmention:
+			echo T_('Webmention from:') ?>
+			<?php $Comment->author( '', '#', '', '#', 'htmlbody', true, 'auto' ) ?>
+			<?php break;
 	}
 
 	$Comment->edit_link( ' &middot; ', ' ', '#', '#', '', '&amp;', true, $Comment->get_permanent_url() ); // Link to backoffice for editing

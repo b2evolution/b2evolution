@@ -1,7 +1,7 @@
 <?php
 /**
  * This is the template that displays the feedback for a post
- * (comments, trackback, pingback...)
+ * (comments, trackback, pingback, webmention...)
  *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the main.page.php template.
@@ -23,6 +23,7 @@ $params = array_merge( array(
 		'disp_trackbacks'      => is_single_page(),
 		'disp_trackback_url'   => is_single_page(),
 		'disp_pingbacks'       => is_single_page(),
+		'disp_webmentions'     => is_single_page(),
 		'comment_start'        => '<div>',
 		'comment_end'          => '</div>',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
@@ -40,7 +41,7 @@ if( ! $Item->can_receive_pings() )
 <a id="feedbacks"></a>
 <?php
 
-if( ! ( $params['disp_comments'] || $params['disp_comment_form'] || $params['disp_trackbacks'] || $params['disp_trackback_url'] || $params['disp_pingbacks'] ) )
+if( ! ( $params['disp_comments'] || $params['disp_comment_form'] || $params['disp_trackbacks'] || $params['disp_trackback_url'] || $params['disp_pingbacks'] || $params['disp_webmentions'] ) )
 {	// Nothing more to do....
 	return false;
 }
@@ -70,6 +71,11 @@ if( $params['disp_pingbacks'] ) {
 	$type_list[] = 'pingback';
 	$disp_title[] = T_("Pingbacks"); ?>
 	<a id="pingbacks"></a>
+<?php }
+if( $params['disp_webmentions'] ) {
+	$type_list[] = 'webmention';
+	$disp_title[] = T_('Webmentions'); ?>
+	<a id="webmentions"></a>
 <?php } ?>
 
 <?php
@@ -92,7 +98,7 @@ if( $params['disp_trackback_url'] )
 ?>
 
 <?php
-if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] )
+if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] || $params['disp_webmentions'] )
 {
 ?>
 
@@ -118,7 +124,7 @@ $CommentList->set_filters( array(
 $CommentList->display_init();
 
 $CommentList->display_if_empty( array(
-		'msg_empty' => sprintf( /* TRANS: NO comments/trackbacks/pingbacks/ FOR THIS POST... */
+		'msg_empty' => sprintf( /* TRANS: NO comments/trackbacks/pingbacks/webmentions FOR THIS POST... */
 				T_('No %s for this post yet...'), implode( "/", $disp_title) ),
 	 ) );
 

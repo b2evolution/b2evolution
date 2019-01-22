@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'comments/model/_comment.class.php', 'Comment' );
 
 /**
- * Generic comments/trackbacks/pingbacks counting
+ * Generic comments/trackbacks/pingbacks/webmentions counting
  *
  * @todo check this in a multiblog page...
  * @todo This should support visibility: at least in the default front office (_feedback.php), there should only the number of visible comments/trackbacks get used ({@link Item::feedback_link()}).
@@ -79,7 +79,8 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 						'trackbacks' => $statuses_array,
 						'pingbacks'  => $statuses_array,
 						'feedbacks'  => $statuses_array,
-						'metas'      => $statuses_array
+						'metas'      => $statuses_array,
+						'webmentions'=> $statuses_array,
 					);
 			}
 
@@ -121,7 +122,8 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 				'trackbacks' => $statuses_array,
 				'pingbacks'  => $statuses_array,
 				'feedbacks'  => $statuses_array,
-				'metas'      => $statuses_array
+				'metas'      => $statuses_array,
+				'webmentions'=> $statuses_array,
 			);
 
 		$count_SQL->WHERE_and( 'comment_item_ID = '.intval($post_id) );
@@ -145,7 +147,7 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 		}
 	}
 
-	if( ! in_array( $mode, array( 'comments', 'trackbacks', 'pingbacks', 'metas' ) ) )
+	if( ! in_array( $mode, array( 'comments', 'trackbacks', 'pingbacks', 'metas', 'webmentions' ) ) )
 	{
 		$mode = 'feedbacks';
 	}

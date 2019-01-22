@@ -55,7 +55,7 @@ class Comment extends DataObject
 	 */
 	var $author_user_ID;
 	/**
-	 * Comment type: 'comment', 'linkback', 'trackback' or 'pingback'
+	 * Comment type: 'comment', 'linkback', 'trackback', 'pingback', 'meta' or 'webmention'
 	 * @var string
 	 */
 	var $type;
@@ -3125,6 +3125,10 @@ class Comment extends DataObject
 
 			case 'pingback': // Display a pingback:
 				$s = T_('Pingback from %s');
+				break;
+
+			case 'webmention': // Display a webmention:
+				$s = T_('Webmention from %s');
 				break;
 
 			case 'meta': // Display a meta comment:

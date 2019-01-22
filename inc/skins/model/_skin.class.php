@@ -959,8 +959,11 @@ class Skin extends DataObject
 		global $debug, $Messages, $disp, $UserSettings, $Collection, $Blog;
 
 		if( $Blog->get_setting( 'webmentions' ) )
-		{	// If current collection allows webmentions
-			add_headline( '<link rel="webmention" href="'.$Blog->get_htsrv_url().'webmention.php" />' );
+		{	// Send header or initialize <link> tag in order to mark current collection allows webmentions:
+			$webmention_url = $Blog->get_htsrv_url().'webmention.php';
+			header( 'Link: <'.$webmention_url.'>; rel="webmention"' );
+			add_headline( '<link rel="webmention" href="'.$webmention_url.'" />' );
+			add_headline( '<link rel="http://webmention.org/" href="'.$webmention_url.'" />' );// used for older version of the protocol specification
 		}
 
 		// We get the optional arg this way for PHP7 comaptibility:

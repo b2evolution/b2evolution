@@ -130,6 +130,17 @@ switch( $Comment->get( 'type' ) )
 			) );
 		$Comment->author( '', '#', '', '#', 'htmlbody', true, $params['author_link_text'] );
 		break;
+
+	case 'webmention': // Display a webmention:
+		$Comment->permanent_link( array(
+				'before'   => '',
+				'after'    => ' '.T_('from:').' ',
+				'text'     => T_('Webmention'),
+				'class'    => 'evo_comment_type',
+				'nofollow' => true,
+			) );
+		$Comment->author( '', '#', '', '#', 'htmlbody', true, $params['author_link_text'] );
+		break;
 }
 
 // Status

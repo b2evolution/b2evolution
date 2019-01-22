@@ -53,7 +53,7 @@ class webmention_plugin extends Plugin
 
 
 	/**
-	 * Ping the pingomatic RPC service.
+	 * Ping the detected url to send webmentions
 	 */
 	function ItemSendPing( & $params )
 	{
@@ -76,20 +76,54 @@ class webmention_plugin extends Plugin
 			return true;
 		}
 
+		$check_urls = array_unique( $check_urls );
+
 		// Initialize client to send webmentions:
 		require_once( __DIR__.'/MentionClient.php' );
 		$MentionClient = new IndieWeb\MentionClient();
 
 		$source_url = $Item->get_permanent_url( '', '', '&' );
 
+		$nosupport_urls = array();
+		$success_urls = array();
+		$failed_urls = array();
 		foreach( $check_urls as $target_url )
 		{
-			if( $endpoint = $MentionClient->discoverWebmentionEndpoint( $target_url ) )
-			{	// Send webmention if site of the posted url can receive webmention:
-				$response = $MentionClient->sendWebmention( $source_url, $target_url );
-				//$params['xmlrpcresp'] = $response;
+			if( ! $MentionClient->discoverWebmentionEndpoint( $target_url ) )
+			{	// The URL doesn't accept webmention:
+				$nosupport_urls[] = get_link_tag( $target_url, '', '', 255 );
+				continue;
 			}
+
+			if( ! ( $response = $MentionClient->sendWebmention( $source_url, $target_url ) ) ||
+			    $response['code'] != 202 )
+			{	// Webmention couldn't be accepted by some reason:
+				$failed_urls[] = get_link_tag( $target_url, '', '', 255 ).( empty( $response['body'] ) ? '' : ' ('.T_('Error').': <code>'.$response['body'].'</code>)' );
+				continue;
+			}
+
+			// Webmention has been accepted successfully:
+			$success_urls[] = get_link_tag( $target_url, '', '', 255 );
 		}
+
+		$messages = array();
+
+		if( count( $success_urls ) )
+		{	// Success URLs:
+			$messages[] = sprintf( T_('Webmentions have been accepted in the URLs: %s.'), implode( ', ', $success_urls ) );
+		}
+
+		if( count( $nosupport_urls ) )
+		{	// No support URLs:
+			$messages[] = sprintf( T_('Webmentions are not supported for the URLs: %s.'), implode( ', ', $nosupport_urls ) );
+		}
+
+		if( count( $failed_urls ) )
+		{	// Failed URLs:
+			$messages[] = sprintf( T_('Webmentions couldn\'t be accepted for the URLs: %s.'), implode( ', ', $failed_urls ) );
+		}
+
+		$params['xmlrpcresp'] = array( 'message' => implode( '<br />', $messages ) );
 
 		return true;
 	}
