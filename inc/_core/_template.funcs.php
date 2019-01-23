@@ -263,19 +263,20 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	if( ! empty($Session) )
 	{	// Session is required here
 
-		// Transfer of Debuglog to next page:
-		if( $Debuglog->count('all') )
-		{	// Save Debuglog into Session, so that it's available after redirect (gets loaded by Session constructor):
-			$sess_Debuglogs = $Session->get('Debuglogs');
-			if( empty($sess_Debuglogs) )
+		// Transfer full debug info to next page:
+		ob_start();
+		debug_info( true );
+		$current_debug_info = ob_get_clean();
+		if( ! empty( $current_debug_info ) )
+		{	// Save full debug info into Session, so that it's available after redirect (gets loaded by Session constructor):
+			$sess_debug_infos = $Session->get( 'debug_infos' );
+			if( empty( $sess_debug_infos ) )
 			{
-				$sess_Debuglogs = array();
+				$sess_debug_infos = array();
 			}
-
-			$sess_Debuglogs[] = $Debuglog;
-			$Session->set( 'Debuglogs', $sess_Debuglogs, 60 /* expire in 60 seconds */ );
-			// echo 'Passing Debuglog(s) to next page';
-			// pre_dump( $sess_Debuglogs );
+			// NOTE: We must encode data in order to avoid error "Session data corrupted" because of special chars on unserialize the data:
+			$sess_debug_infos[] = base64_encode( $current_debug_info );
+			$Session->set( 'debug_infos', $sess_debug_infos, 60 /* expire in 60 seconds */ );
 		}
 
 		// Transfer of Messages to next page:
