@@ -256,7 +256,8 @@ class Slug extends DataObject
 				return $ItemCache->get_by_ID( $this->itm_ID, false, false );
 
 			case 'help':
-				return false;
+				$r = false;
+				return $r;
 
 			default:
 				// not defined restriction
