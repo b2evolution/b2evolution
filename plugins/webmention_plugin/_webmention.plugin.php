@@ -117,7 +117,7 @@ class webmention_plugin extends Plugin
 
 		if( count( $nosupport_urls ) )
 		{	// No support URLs:
-			$messages[] = sprintf( T_('Webmentions are not supported for the URLs: %s.'), implode( ', ', $nosupport_urls ) );
+			$messages[] = sprintf( T_('The following URLs do not support webmentions: %s.'), implode( ', ', $nosupport_urls ) );
 		}
 
 		if( count( $failed_urls ) )

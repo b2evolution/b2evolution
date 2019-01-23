@@ -60,12 +60,12 @@ if( ! preg_match( '#/([a-z0-9\-_]+)[^/]*$#', $target, $item_url ) ||
     ! ( $ItemCache = & get_ItemCache() ) ||
     ! ( $target_Item = & $ItemCache->get_by_urltitle( $item_url[1], false, false ) ) )
 {	// If item cannot be found by the requested absolute url:
-	webmention_response( 500, 'Wrong target url' );
+	webmention_response( 400, 'You are sending a webmention to an invalid target URL' );
 }
 
 if( ! $target_Item->can_receive_webmentions() )
 {	// If collection of the target Item doesn't support accepting webmentions:
-	webmention_response( 500, 'No webmentions support' );
+	webmention_response( 400, 'Webmentions are disabled' );
 }
 
 // Initialize new Comment for webmention:
@@ -82,7 +82,7 @@ $webmention_Comment->set( 'status', $target_Blog->get_setting( 'new_feedback_sta
 
 if( ! $webmention_Comment->dbinsert() )
 {	// Insert new "webmention" comment:
-	webmention_response( 500, 'Error webmention creating' );
+	webmention_response( 500, 'Error while registering the webmention' );
 }
 
 // Execute or schedule various notifications:
