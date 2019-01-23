@@ -47,6 +47,7 @@ class webmention_plugin extends Plugin
 		$this->name = T_('Webmention plugin');
 		$this->short_desc = T_('Send webmentions to all URLs detected in a posted Item.');
 
+		$this->ping_service_type = 'send'; // To use word "Send" instead of "Ping" for UI
 		$this->ping_service_name = 'Webmention';
 		$this->ping_service_note = T_('Send webmentions to all URLs detected in a posted Item.');
 	}

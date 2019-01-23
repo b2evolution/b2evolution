@@ -59,7 +59,12 @@ $Form->begin_fieldset( T_('After each new post...').get_manual_link('after_each_
 			$displayed_ping_plugin = true;
 
 			$checked = in_array( $loop_Plugin->code, $ping_plugins );
-			$Form->checkbox_input( 'blog_ping_plugins[]', $checked, /* TRANS: %s is a ping service name */ sprintf( T_('Ping %s'), $loop_Plugin->ping_service_name ), array('value'=>$loop_Plugin->code, 'note'=>$loop_Plugin->ping_service_note) );
+			$Form->checkbox_input( 'blog_ping_plugins[]', $checked, sprintf(
+				( isset( $loop_Plugin->ping_service_type ) && $loop_Plugin->ping_service_type == 'send' )
+					? /* TRANS: %s is a ping service name */ T_('Send %s')
+					: /* TRANS: %s is a ping service name */ T_('Ping %s'),
+				$loop_Plugin->ping_service_name ),
+				array('value' => $loop_Plugin->code, 'note' => $loop_Plugin->ping_service_note) );
 
 			while( ($key = array_search($loop_Plugin->code, $ping_plugins)) !== false )
 			{

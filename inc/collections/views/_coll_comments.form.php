@@ -142,8 +142,7 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 	{	// Only admin can turn ON this setting
 		$Form->checkbox( 'blog_webmentions', $edited_Blog->get_setting( 'webmentions' ),
 			T_('Webmentions').( ! $edited_Blog->get_setting( 'webmentions' ) ? get_admin_badge() : '' ),
-			str_replace( '$attrs$', ' id="webmentions_warning" style="display:'.( $edited_Blog->get_setting( 'webmentions' ) ? 'inline' : 'none' ).'"', $spammers_warning )
-				.T_('Allow other bloggers to send webmentions to this collection, letting you know when they refer to it.') );
+			T_('Allow other bloggers to send webmentions to this collection, letting you know when they refer to it.') );
 	}
 
 	$Form->checkbox( 'autocomplete_usernames', $edited_Blog->get_setting( 'autocomplete_usernames' ),
@@ -398,18 +397,6 @@ echo '</div>';
 		else
 		{
 			jQuery( '#trackbacks_warning' ).hide();
-		}
-	} );
-
-	jQuery( '#blog_webmentions' ).click( function()
-	{ // Show/Hide warning for 'Webmentions'
-		if( jQuery( this ).is( ':checked' ) )
-		{
-			jQuery( '#webmentions_warning' ).css( 'display', 'inline' );
-		}
-		else
-		{
-			jQuery( '#webmentions_warning' ).hide();
 		}
 	} );
 
