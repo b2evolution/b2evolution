@@ -8889,11 +8889,7 @@ class Item extends ItemLight
 				{
 					$ping_messages = array();
 					$ping_messages[] = array(
-						'message' => sprintf(
-							( isset( $Plugin->ping_service_type ) && $Plugin->ping_service_type == 'send' )
-								? /* TRANS: %s is a ping service name */ T_('Sending %s...')
-								: /* TRANS: %s is a ping service name */ T_('Pinging %s...'),
-							$Plugin->ping_service_name ),
+						'message' => isset( $Plugin->ping_service_process_message ) ? $Plugin->ping_service_process_message : sprintf( /* TRANS: %s is a ping service name */ T_('Pinging %s...'), $Plugin->ping_service_name ),
 						'type' => 'note' );
 					$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
 
