@@ -3244,8 +3244,6 @@ function debug_info( $force = false, $force_clean = false )
 												$printf_format ) ) - 2;
 	*/
 
-	$ReqHostPathQuery = $ReqHost.$ReqPath.( empty( $_SERVER['QUERY_STRING'] ) ? '' : '?'.$_SERVER['QUERY_STRING'] );
-
 	echo "\n\n\n";
 	echo ( $clean ? '*** Debug info ***'."\n\n" : '<div class="debug" id="debug_info"><h2>Debug info</h2>' );
 
@@ -3272,6 +3270,77 @@ function debug_info( $force = false, $force_clean = false )
 		echo $clean ? "\n" : '<br />';
 
 		echo '</div></div>';
+	}
+
+	// FULL DEBUG INFO(s) FROM PREVIOUS SESSION(s), after REDIRECT(s):
+	if( isset( $Session ) && ( $sess_debug_infos = $Session->get( 'debug_infos' ) ) && ! empty( $sess_debug_infos ) )
+	{
+		$count_sess_debug_infos = count( $sess_debug_infos );
+		if( $count_sess_debug_infos > 1 )
+		{	// Links to those Debuglogs:
+			if( $clean )
+			{	// kind of useless, but anyway...
+				echo "\n".'There are '.$count_sess_debug_infos.' debug infos from redirected pages.'."\n";
+			}
+			else
+			{
+				echo '<p>There are '.$count_sess_debug_infos.' debug infos from redirected pages: ';
+				for( $i = 1; $i <= $count_sess_debug_infos; $i++ )
+				{
+					echo '<a href="#debug_sess_debug_info_'.$i.'">#'.$i.'</a> ';
+				}
+				echo '</p>';
+			}
+		}
+
+		foreach( $sess_debug_infos as $k => $sess_debug_info )
+		{
+			if( $clean )
+			{
+				echo "\n".'== Debug messages from redirected page (#'.( $k + 1 ).') =='."\n"
+					.'See below for the Debuglog from the current request.'."\n";
+				echo base64_decode( $sess_debug_info );
+			}
+			else
+			{
+				echo '<div class="debug_session">';
+				echo '<h3 id="debug_sess_debug_info_'.( $k + 1 ).'" style="color:#f00">Debug messages from redirected page (#'.( $k + 1 ).')</h3>'
+					// link to real Debuglog:
+					.'<p><a href="#debug_current">See below for the debug from the current request.</a></p>';
+				$sess_debug_info = base64_decode( $sess_debug_info );
+				// Fix all anchors to proper work with SESSION debug info and do NOT mix with current debug info where same achors are used but without number suffix ($k + 1):
+				echo preg_replace( '/(id="|href="#)(evo_debug_queries|debug_info_cat_[^"]+)"/', '$1$2_'.( $k + 1 ).'"', $sess_debug_info );
+				echo '</div>';
+			}
+		}
+
+		if( ! $clean )
+		{	// Anchor to scrolldown to current debug:
+			echo '<a id="debug_current"></a>';
+		}
+
+		// link to first sess_debug_infos:
+		if( $clean )
+		{
+			echo 'See above for the debug info(s) from before the redirect.'."\n";
+		}
+		else
+		{
+			echo '<p><a href="#debug_sess_debug_info_1">See above for the debug info(s) from before the redirect.</a></p>';
+		}
+
+		// Delete logs since they have been displayed...
+		// EXCEPT if we are redirecting, because in this case we won't see these logs in a browser (only in request debug tools)
+		// So in that case we want them to move over to the next page...
+		if( $http_response_code < 300 || $http_response_code >= 400 )
+		{	// This is NOT a 3xx redirect, assume debuglogs have been seen & delete them:
+			$Session->delete( 'debug_infos' );
+		}
+	}
+	// END OF DEBUG FROM PREVIOUS SESSIONS, after REDIRECT(s).
+
+	if( !$obhandler_debug )
+	{ // don't display changing items when we want to test obhandler
 
 		// ================================== DB Summary ================================
 		if( isset($DB) )
@@ -3280,7 +3349,7 @@ function debug_info( $force = false, $force_clean = false )
 			echo $DB->num_queries.' SQL queries executed in '.$Timer->get_duration( 'SQL QUERIES' )." seconds\n";
 			if( ! $clean )
 			{
-				echo ' &nbsp; <a href="'.$ReqHostPathQuery.'#evo_debug_queries">scroll down to details</a><p>';
+				echo ' &nbsp; <a href="#evo_debug_queries">scroll down to details</a><p>';
 			}
 			echo '</div></div>';
 		}
@@ -3444,91 +3513,9 @@ function debug_info( $force = false, $force_clean = false )
 	}
 
 
-	// DEBUGLOG(s) FROM PREVIOUS SESSIONS, after REDIRECT(s) (with list of categories at top):
-	if( isset($Session) && ($sess_Debuglogs = $Session->get('Debuglogs')) && ! empty($sess_Debuglogs) )
-	{
-		$count_sess_Debuglogs = count($sess_Debuglogs);
-		if( $count_sess_Debuglogs > 1 )
-		{ // Links to those Debuglogs:
-			if ( $clean )
-			{	// kind of useless, but anyway...
-				echo "\n".'There are '.$count_sess_Debuglogs.' Debuglogs from redirected pages.'."\n";
-			}
-			else
-			{
-				echo '<p>There are '.$count_sess_Debuglogs.' Debuglogs from redirected pages: ';
-				for( $i = 1; $i <= $count_sess_Debuglogs; $i++ )
-				{
-					echo '<a href="'.$ReqHostPathQuery.'#debug_sess_debuglog_'.$i.'">#'.$i.'</a> ';
-				}
-				echo '</p>';
-			}
-		}
-
-		foreach( $sess_Debuglogs as $k => $sess_Debuglog )
-		{
-			$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
-
-			if( $clean )
-			{
-				$log_container_head = "\n".'== Debug messages from redirected page (#'.($k+1).') =='."\n"
-									 .'See below for the Debuglog from the current request.'."\n";
-				echo format_to_output(
-					$sess_Debuglog->display( array(
-							'container' => array( 'string' => $log_container_head, 'template' => false ),
-							'all' => array( 'string' => '= %s ='."\n\n", 'template' => false ) ),
-						'', false, $log_categories, '', 'raw', false ),
-					'raw' );
-			}
-			else
-			{
-				$log_container_head = '<h3 id="debug_sess_debuglog_'.($k+1).'" style="color:#f00;">Debug messages from redirected page (#'.($k+1).')</h3>'
-					// link to real Debuglog:
-					.'<p><a href="'.$ReqHostPathQuery.'#debug_debuglog">See below for the Debuglog from the current request.</a></p>';
-				$log_cats = array_keys($sess_Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
-				$log_head_links = array();
-
-				foreach( $log_cats as $l_cat )
-				{
-					$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_redir_'.($k+1).'_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
-				}
-				$log_container_head .= implode( ' | ', $log_head_links );
-
-				echo '<div style="border:1px solid #F00;background:#aaa">'.
-					format_to_output(
-						$sess_Debuglog->display( array(
-								'container' => array( 'string' => $log_container_head, 'template' => false ),
-								'all' => array( 'string' => '<h4 id="debug_redir_'.($k+1).'_info_cat_%s">%s:</h4>', 'template' => false ) ),
-							'', false, $log_categories ),
-						'htmlbody' ).
-					'</div>';
-			}
-		}
-
-		// Delete logs since they have been displayed...
-		// EXCEPT if we are redirecting, because in this case we won't see these logs in a browser (only in request debug tools)
-		// So in that case we want them to move over to the next page...
-		if( $http_response_code < 300 || $http_response_code >= 400 )
-		{	// This is NOT a 3xx redirect, assume debuglogs have been seen & delete them:
-			$Session->delete( 'Debuglogs' );
-		}
-	}
-
-
 	// CURRENT DEBUGLOG (with list of categories at top):
 	$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
 	$log_container_head = $clean ? ( "\n".'== Debug messages =='."\n" ) : '<h3 id="debug_debuglog">Debug messages</h3>';
-	if( ! empty($sess_Debuglogs) )
-	{ // link to first sess_Debuglog:
-		if ( $clean )
-		{
-			$log_container_head .= 'See above for the Debuglog(s) from before the redirect.'."\n";
-		}
-		else
-		{
-			$log_container_head .= '<p><a href="'.$ReqHostPathQuery.'#debug_sess_debuglog_1">See above for the Debuglog(s) from before the redirect.</a></p>';
-		}
-	}
 
 	if ( ! $clean )
 	{
@@ -3536,7 +3523,7 @@ function debug_info( $force = false, $force_clean = false )
 		$log_head_links = array();
 		foreach( $log_cats as $l_cat )
 		{
-			$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
+			$log_head_links[] .= '<a href="#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
 		}
 		$log_container_head .= implode( ' | ', $log_head_links );
 

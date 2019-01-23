@@ -1576,7 +1576,7 @@ class DB
 						echo $this->debug_get_rows_table( 100, true );
 					}
 				}
-				$this->result->free();
+				$this->flush();
 			}
 
 			// Profile:
