@@ -953,9 +953,13 @@ switch( $action )
 		// but we need to make sure the requested/default one is ok:
 		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status, $edited_Item );
 
-		// We use the request variables to fill the edit form, because we need to be able to pass those values
-		// from tab to tab via javascript when the editor wants to switch views...
-		$edited_Item->load_from_Request( true ); // needs Blog set
+		param( 'load_from_request', 'integer', 1 );
+		if( $load_from_request )
+		{
+			// We use the request variables to fill the edit form, because we need to be able to pass those values
+			// from tab to tab via javascript when the editor wants to switch views...
+			$edited_Item->load_from_Request( true ); // needs Blog set
+		}
 
 		// Check if new category was started to create. If yes then set up parameters for next page:
 		check_categories_nosave( $post_category, $post_extracats,$edited_Item, ( $action == 'edit_switchtab' ? 'frontoffice' : 'backoffice' ) );
@@ -1112,7 +1116,7 @@ switch( $action )
 		// Get requested Post Type:
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
 		// Check permission on post type: (also verifies that post type is enabled and NOT reserved)
-		check_perm_posttype( $item_typ_ID, $post_extracats );
+		$valid_item_type = check_perm_posttype( $item_typ_ID, $post_extracats, false );
 
 		// Update the folding positions for current user
 		save_fieldset_folding_values( $Blog->ID );
@@ -1235,7 +1239,14 @@ switch( $action )
 		// We want to highlight the edited object on next list display:
 		$Session->set( 'fadeout_array', array( 'item-'.$edited_Item->ID ) );
 
-		if( $edited_Item->status != 'redirected' &&
+		if( ! $valid_item_type )
+		{	// Item Type is not enabled for this collection, we will redirect to item type selection to allow user to change it t a valid one:
+			$Messages->add( sprintf( T_('You just edited an Item of Type "%s" which is not valid for this collection. Please select a new Item type below...'), $edited_Item->get( 't_type' ) ), 'warning' );
+
+			// load_from_request param set to 0 will prevent loading of Item data from request because we are not passing any item data from request!
+			$redirect_to = url_add_param( $admin_url, 'ctrl=items&action=edit_type&post_ID='.$edited_Item->ID.'&load_from_request=0' );
+		}
+		elseif( $edited_Item->status != 'redirected' &&
 		    ! strpos( $redirect_to, 'tab=tracker' ) &&
 		    ! strpos( $redirect_to, 'tab=manual' ) )
 		{	// Where to go after creating the post?
@@ -1313,7 +1324,7 @@ switch( $action )
 		// Get requested Post Type:
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
 		// Check permission on post type: (also verifies that post type is enabled and NOT reserved)
-		check_perm_posttype( $item_typ_ID, $post_extracats );
+		$valid_item_type = check_perm_posttype( $item_typ_ID, $post_extracats, false );
 
 		// UPDATE POST:
 		// Set the params we already got:
@@ -1410,7 +1421,12 @@ switch( $action )
 		}
 
 		// Where to go after editing the post?
-		if( $edited_Item->status == 'redirected' ||
+		if( ! $valid_item_type )
+		{	// Item Type is not enabled for this collection, we will redirect to item type selection to allow user to change it t a valid one:
+			$Messages->add( sprintf( T_('You just edited an Item of Type "%s" which is not valid for this collection. Please select a new Item type below...'), $edited_Item->get( 't_type' ) ), 'warning' );
+			$blog_redirect_setting = 'post_type';
+		}
+		elseif( $edited_Item->status == 'redirected' ||
 		    strpos( $redirect_to, 'tab=tracker' ) )
 		{ // We should show the posts list if:
 			//    a post is in "Redirected" status
@@ -1441,6 +1457,10 @@ switch( $action )
 			$Session->set( 'highlight_id', $edited_Item->ID );
 			$Session->set( 'fadeout_array', array( 'item-'.$edited_Item->ID ) );
 			$redirect_to = url_add_param( $redirect_to, 'highlight_id='.$edited_Item->ID, '&' );
+		}
+		elseif( $blog_redirect_setting == 'post_type' )
+		{	// load_from_request param set to 0 will prevent loading of Item data from request because we are not passing any item data from request!
+			$redirect_to = url_add_param( $admin_url, 'ctrl=items&action=edit_type&post_ID='.$edited_Item->ID.'&load_from_request=0' );
 		}
 		else
 		{ // $blog_redirect_setting == 'no', set redirect_to = NULL which will redirect to posts list

@@ -2955,8 +2955,11 @@ function echo_autocomplete_tags( $params = array() )
  *
  * @param integer Item type ID
  * @param array The extra cats of the post.
+ * @param boolean Assert valid post type
+ * @param boolean Assert valid permission
+ * @return boolean
  */
-function check_perm_posttype( $item_typ_ID, $post_extracats )
+function check_perm_posttype( $item_typ_ID, $post_extracats, $assert_post_type = true, $assert_permission = true )
 {
 	global $Collection, $Blog, $current_User;
 
@@ -2965,11 +2968,15 @@ function check_perm_posttype( $item_typ_ID, $post_extracats )
 
 	if( ! $Blog->is_item_type_enabled( $ItemType->ID ) )
 	{ // Don't allow to use a not enabled post type:
-		debug_die( 'This post type is not enabled. Please choose another one.' );
+		if( $assert_post_type )
+		{
+			debug_die( 'This post type is not enabled. Please choose another one.' );
+		}
+		return false;
 	}
 
 	// Check permission:
-	$current_User->check_perm( 'cats_item_type_'.$ItemType->perm_level, 'edit', true /* assert */, $post_extracats );
+	return $current_User->check_perm( 'cats_item_type_'.$ItemType->perm_level, 'edit', $assert_permission, $post_extracats );
 }
 
 
