@@ -8865,8 +8865,8 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					}
 				}
 				else
-				{
-					continue;
+				{	// not an image file, do not process
+					$inlines[$current_inline] = $current_inline;
 				}
 				break;
 

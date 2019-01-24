@@ -1452,7 +1452,7 @@ class Plugins_admin extends Plugins
 
 					case 'api_min':
 						// obsolete since 1.9:
-						continue;
+						break;
 
 
 					default:

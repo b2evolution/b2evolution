@@ -1501,32 +1501,29 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 				case UPLOAD_ERR_INI_SIZE:
 					// File is larger than allowed in php.ini:
 					$failedFiles[$lKey] = 'The file exceeds the upload_max_filesize directive in php.ini.'; // Configuration error, no translation
-					// Abort upload for this file:
-					continue;
+					break;
 
 				case UPLOAD_ERR_PARTIAL:
 					$failedFiles[$lKey] = T_('The file was only partially uploaded.');
-					// Abort upload for this file:
-					continue;
+					break;
 
 				case UPLOAD_ERR_NO_FILE:
 					// Is probably the same as empty($lName) before.
 					$failedFiles[$lKey] = T_('No file was uploaded.');
-					// Abort upload for this file:
-					continue;
+					break;
 
 				case 6: // numerical value of UPLOAD_ERR_NO_TMP_DIR
 				# (min_php: 4.3.10, 5.0.3) case UPLOAD_ERR_NO_TMP_DIR:
 					// Missing a temporary folder.
 					$failedFiles[$lKey] = 'Temporary upload dir is missing! (upload_tmp_dir in php.ini)'; // Configuration error, no translation
-					// Abort upload for this file:
-					continue;
+					break;
 
 				default:
 					$failedFiles[$lKey] = T_('An unknown error has occurred!').' Error code #'.$_FILES['uploadfile']['error'][$lKey];
-					// Abort upload for this file:
-					continue;
+					break;
 			}
+			// Abort upload for this file:
+			continue;
 		}
 
 		if( ! isset($_FILES['uploadfile']['_evo_fetched_url'][$lKey]) // skip check for fetched URLs
