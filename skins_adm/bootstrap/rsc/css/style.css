@@ -640,6 +640,9 @@ fieldset ul {
 #item_locations select {
   width: 160px;
 }
+#item_locations td.input {
+  width: 100%;
+}
 #itemform_content .panel-title > a.post_type_link {
   color: #337ab7;
 }

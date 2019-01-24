@@ -817,6 +817,35 @@ $Form->begin_form( '', '', $params );
 
 	if( $is_not_content_block )
 	{	// Display goal tracking and notifications for item with type usage except of content block:
+
+		// ################### USER TAGGING ###################
+		$Form->begin_fieldset( T_('User Tagging').get_manual_link( 'post-user-tagging-panel' )
+						.( $current_User->check_perm( 'options', 'view' ) ? action_icon( T_('User Tags'), 'edit', $admin_url.'?ctrl=usertags', T_('User Tags'), 3, 4, array( 'class' => 'action_icon pull-right' ) ) : '' ),
+					array( 'id' => 'itemform_usertags', 'fold' => true ) );
+
+		$Form->switch_layout( 'table' );
+		$Form->formstart = '<table id="item_locations" cellspacing="0" class="fform">'."\n";
+		$Form->labelstart = '<td class="right"><strong>';
+		$Form->labelend = '</strong></td>';
+
+		echo '<p class="note">'.T_('You can tag the (registered) Users who view this page.').'</p>';
+
+		echo $Form->formstart;
+
+		$Form->usertag_input( 'user_tags', $edited_Item->get_setting( 'user_tags' ), 40, T_('Tags'), '', array(
+				'maxlength'    => 255,
+				'style'        => 'width:100%',
+				'input_prefix' => '<span class="evo_input__tags">',
+				'input_suffix' => '</span>',
+			) );
+
+		echo $Form->formend;
+
+		$Form->switch_layout( NULL );
+
+		$Form->end_fieldset();
+
+
 		// ################### GOAL TRACKING ###################
 
 		$Form->begin_fieldset( T_('Goal tracking').get_manual_link( 'post-goal-tracking-panel' )

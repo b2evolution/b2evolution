@@ -906,6 +906,12 @@ class Item extends ItemLight
 			// HIDE TEASER checkbox:
 			$this->set_setting( 'hide_teaser', param( 'item_hideteaser', 'integer', 0 ) );
 
+			// User Tagging:
+			if( param( 'user_tags', 'string', NULL ) !== NULL )
+			{
+				$this->set_setting( 'user_tags', trim( get_param( 'user_tags' ), ' ,' ) );
+			}
+
 			// Goal ID:
 			$goal_ID = param( 'goal_ID', 'integer', NULL );
 			if( $goal_ID !== NULL )
@@ -11487,6 +11493,35 @@ class Item extends ItemLight
 		}
 
 		return $this->social_media_image_File;
+	}
+
+
+	/**
+	 * Add tags to current User
+	 */
+	function tag_user()
+	{
+		if( empty( $this->ID ) )
+		{	// Item is not saved in DB
+			return;
+		}
+
+		if( ! is_logged_in() )
+		{	// User is not logged in
+			return;
+		}
+
+		$item_user_tags = trim( $this->get_setting( 'user_tags' ), ' ,' );
+		if( empty( $item_user_tags ) )
+		{	// This Item has no tags for users:
+			return;
+		}
+
+		global $current_User;
+
+		// Add tags to current User:
+		$current_User->add_usertags( $item_user_tags );
+		$current_User->dbupdate();
 	}
 }
 ?>

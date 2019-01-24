@@ -49,6 +49,7 @@ class UserSettings extends AbstractSettings
 		'fold_itemform_meta_cmnt' => 1,
 		'fold_itemform_extra' => 1,
 		'fold_itemform_comments' => 1,
+		'fold_itemform_usertags' => 1,
 		'fold_itemform_goals' => 1,
 		'fold_itemform_notifications' => 1,
 		'fold_cmntform_datetime' => 1,
