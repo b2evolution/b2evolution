@@ -2193,9 +2193,11 @@ function display_if_empty( $params = array() )
  */
 function is_single_page()
 {
-	global $disp, $MainList;
+	global $disp, $MainList, $Item;
 
-	return ( $disp == 'single' || $disp == 'page' ) && isset( $MainList ) && $MainList->single_post;
+	return ( $disp == 'single' || $disp == 'page' ) &&
+		( isset( $MainList ) && $MainList->single_post ) &&
+		( isset( $Item ) && $Item->ID > 0 );
 }
 
 

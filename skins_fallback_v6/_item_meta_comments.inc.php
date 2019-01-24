@@ -16,8 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $disp, $Session;
 
-if( ( $disp == 'single' || $disp == 'page' ) &&
-    isset( $Item ) && $Item->ID > 0 &&
+if( is_single_page() &&
     $Item->can_see_meta_comments() )
 {	// Display the meta comments if current user has a permission:
 
