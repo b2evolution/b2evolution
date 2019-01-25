@@ -25,11 +25,11 @@ global $db_storage_charset;
 $schema_queries['T_files'] = array(
 		'Creating table for File Meta Data',
 		"CREATE TABLE T_files (
-			file_ID                  int(11) unsigned  not null AUTO_INCREMENT,
+			file_ID                  int(10) unsigned  not null AUTO_INCREMENT,
 			file_creator_user_ID     INT(10) UNSIGNED NULL DEFAULT NULL,
 			file_type                enum('image', 'audio', 'video', 'other') COLLATE ascii_general_ci NULL DEFAULT NULL,
 			file_root_type           enum('absolute','user','collection','shared','skins','siteskins','plugins','import','emailcampaign') COLLATE ascii_general_ci NOT NULL DEFAULT 'absolute',
-			file_root_ID             int(11) unsigned not null default 0,
+			file_root_ID             int(10) unsigned not null default 0,
 			file_path                varchar(767) not null default '',
 			file_title               varchar(255) COLLATE utf8mb4_unicode_ci,
 			file_alt                 varchar(255) COLLATE utf8mb4_unicode_ci,
@@ -45,7 +45,7 @@ $schema_queries['T_files'] = array(
 $schema_queries['T_filetypes'] = array(
 		'Creating table for file types',
 		"CREATE TABLE T_filetypes (
-			ftyp_ID         int(11) unsigned NOT NULL auto_increment,
+			ftyp_ID         int(10) unsigned NOT NULL auto_increment,
 			ftyp_extensions varchar(30) COLLATE ascii_general_ci NOT NULL,
 			ftyp_name       varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
 			ftyp_mimetype   varchar(50) COLLATE ascii_general_ci NOT NULL,

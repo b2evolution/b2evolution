@@ -11354,6 +11354,39 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15360, 'Fix integer unsigned ID columns...' ) )
+	{	// part of 7.0.0-alpha
+		$tables_num = 0;
+		$columns_num = 0;
+		foreach( $db_config['aliases'] as $table_alias => $table_name )
+		{
+			$modify_columns = array();
+			// ID field must be unsigned 10 digit size instead of wrong 11:
+			$columns = $DB->get_results( 'SHOW FULL COLUMNS FROM '.$table_name
+				.' WHERE Field LIKE "%_ID"'
+				.' AND Type LIKE "int(11)%"' );
+			foreach( $columns as $column )
+			{
+				$modify_columns[ $column->Field ] = 'MODIFY COLUMN `'.$column->Field.'` '
+					.'INT(10) UNSIGNED ' // Change from INT(11) to INT(10)
+					.( $column->Null == 'YES' ? 'NULL' : 'NOT NULL' )
+					.( $column->Default === NULL ? '' : ' DEFAULT '.$DB->quote( $column->Default ) )
+					.( empty( $column->Extra ) ? '' : ' '.$column->Extra )
+					.( empty( $column->Comment ) ? '' : ' COMMENT '.$DB->quote( $column->Comment ) );
+				$columns_num++;
+			}
+			if( ! empty( $modify_columns ) )
+			{	// Upgrade wrong integer unsigned ID columns:
+				$DB->query( 'ALTER TABLE '.$table_name.' '.implode( ', ', $modify_columns ) );
+				echo '<br />- table <code>'.$table_name.'</code>, columns: <code>'.implode( '</code>, <code>', array_keys( $modify_columns ) ).'</code>';
+				$tables_num++;
+				evo_flush();
+			}
+		}
+		echo '<br />'.$columns_num.' columns have been modified in '.$tables_num.' tables - ';
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

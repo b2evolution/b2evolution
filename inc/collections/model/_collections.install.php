@@ -40,11 +40,11 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_blogs' => array(
 		'Creating table for Blogs',
 		"CREATE TABLE T_blogs (
-			blog_ID              int(11) unsigned NOT NULL auto_increment,
-			blog_sec_ID          INT(11) UNSIGNED NOT NULL DEFAULT 1,
+			blog_ID              INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			blog_sec_ID          INT(10) UNSIGNED NOT NULL DEFAULT 1,
 			blog_shortname       varchar(255) COLLATE utf8mb4_unicode_ci NULL default '',
 			blog_name            varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL default '',
-			blog_owner_user_ID   int(11) unsigned NOT NULL default 1,
+			blog_owner_user_ID   int(10) unsigned NOT NULL default 1,
 			blog_advanced_perms  TINYINT(1) NOT NULL default 0,
 			blog_tagline         varchar(250) COLLATE utf8mb4_unicode_ci NULL default '',
 			blog_shortdesc       varchar(250) COLLATE utf8mb4_unicode_ci NULL default '',
@@ -59,7 +59,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			blog_allowblogcss    TINYINT(1) NOT NULL default 1,
 			blog_allowusercss    TINYINT(1) NOT NULL default 1,
 			blog_in_bloglist     ENUM( 'public', 'logged', 'member', 'never' ) COLLATE ascii_general_ci DEFAULT 'public' NOT NULL,
-			blog_links_blog_ID   INT(11) NULL DEFAULT NULL,
+			blog_links_blog_ID   INT(10) UNSIGNED NULL DEFAULT NULL,
 			blog_media_location  ENUM( 'default', 'subdir', 'custom', 'none' ) COLLATE ascii_general_ci DEFAULT 'default' NOT NULL,
 			blog_media_subdir    VARCHAR( 255 ) NULL,
 			blog_media_fullpath  VARCHAR( 255 ) NULL,
@@ -76,17 +76,17 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_section' => array(
 		'Creating sections table',
 		"CREATE TABLE T_section (
-			sec_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			sec_ID            INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			sec_name          VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
 			sec_order         INT(11) NOT NULL,
-			sec_owner_user_ID INT(11) UNSIGNED NOT NULL default 1,
+			sec_owner_user_ID INT(10) UNSIGNED NOT NULL default 1,
 			PRIMARY KEY ( sec_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_coll_url_aliases' => array(
 		'Creating collection URL aliases table',
 		"CREATE TABLE T_coll_url_aliases (
-			cua_coll_ID   INT(11) UNSIGNED NOT NULL,
+			cua_coll_ID   INT(10) UNSIGNED NOT NULL,
 			cua_url_alias VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
 			PRIMARY KEY ( cua_url_alias ),
 			INDEX cua_coll_ID ( cua_coll_ID )
@@ -95,7 +95,7 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_coll_settings' => array(
 		'Creating collection settings table',
 		"CREATE TABLE T_coll_settings (
-			cset_coll_ID INT(11) UNSIGNED NOT NULL,
+			cset_coll_ID INT(10) UNSIGNED NOT NULL,
 			cset_name    VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL,
 			cset_value   VARCHAR( 10000 ) COLLATE utf8mb4_unicode_ci NULL COMMENT 'The AdSense plugin wants to store very long snippets of HTML',
 			PRIMARY KEY ( cset_coll_ID, cset_name )
@@ -111,7 +111,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			wico_coll_ID   INT(10) NULL DEFAULT NULL,
 			wico_order     INT(10) NOT NULL,
 			wico_main      TINYINT(1) NOT NULL DEFAULT 0,
-			wico_item_ID   INT(11) UNSIGNED NULL DEFAULT NULL,
+			wico_item_ID   INT(10) UNSIGNED NULL DEFAULT NULL,
 			PRIMARY KEY    ( wico_ID ),
 			UNIQUE wico_coll_ID_code_skin_type ( wico_coll_ID, wico_code, wico_skin_type )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -157,11 +157,11 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_items__item' => array(
 		'Creating table for Posts',
 		"CREATE TABLE T_items__item (
-			post_ID                     int(11) unsigned NOT NULL auto_increment,
-			post_parent_ID              int(11) unsigned NULL,
-			post_creator_user_ID        int(11) unsigned NOT NULL,
-			post_lastedit_user_ID       int(11) unsigned NULL,
-			post_assigned_user_ID       int(11) unsigned NULL,
+			post_ID                     int(10) unsigned NOT NULL auto_increment,
+			post_parent_ID              int(10) unsigned NULL,
+			post_creator_user_ID        int(10) unsigned NOT NULL,
+			post_lastedit_user_ID       int(10) unsigned NULL,
+			post_assigned_user_ID       int(10) unsigned NULL,
 			post_dateset                tinyint(1) NOT NULL DEFAULT 1,
 			post_datestart              TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			post_datedeadline           TIMESTAMP NULL,
@@ -171,7 +171,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_contents_last_updated_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			post_status                 ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NOT NULL DEFAULT 'draft',
 			post_single_view            ENUM('normal','404','redirected') COLLATE ascii_general_ci NOT NULL DEFAULT 'normal',
-			post_pst_ID                 int(11) unsigned NULL,
+			post_pst_ID                 int(10) unsigned NULL,
 			post_ityp_ID                int(10) unsigned NOT NULL DEFAULT 1,
 			post_locale                 VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT 'en-EU',
 			post_content                MEDIUMTEXT COLLATE utf8mb4_unicode_ci NULL,
@@ -184,7 +184,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_tiny_slug_ID           int(10) unsigned NULL DEFAULT NULL,
 			post_titletag               VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			post_url                    VARCHAR(255) NULL DEFAULT NULL,
-			post_main_cat_ID            int(11) unsigned NOT NULL,
+			post_main_cat_ID            int(10) unsigned NOT NULL,
 			post_notifications_status   ENUM('noreq','todo','started','finished') COLLATE ascii_general_ci NOT NULL DEFAULT 'noreq',
 			post_notifications_ctsk_ID  INT(10) unsigned NULL DEFAULT NULL,
 			post_notifications_flags    SET('moderators_notified','members_notified','community_notified','pings_sent') COLLATE ascii_general_ci NOT NULL DEFAULT '',
@@ -214,8 +214,8 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_postcats' => array(
 		'Creating table for Categories-to-Posts relationships',
 		"CREATE TABLE T_postcats (
-			postcat_post_ID int(11) unsigned NOT NULL,
-			postcat_cat_ID int(11) unsigned NOT NULL,
+			postcat_post_ID int(10) unsigned NOT NULL,
+			postcat_cat_ID int(10) unsigned NOT NULL,
 			postcat_order DOUBLE NULL,
 			PRIMARY KEY postcat_pk (postcat_post_ID,postcat_cat_ID),
 			UNIQUE catpost ( postcat_cat_ID, postcat_post_ID )
@@ -224,8 +224,8 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_comments' => array(	// Note: pingbacks no longer supported, but previous pingbacks are to be preserved in the DB
 		'Creating table for Comments',
 		"CREATE TABLE T_comments (
-			comment_ID                 int(11) unsigned NOT NULL auto_increment,
-			comment_item_ID            int(11) unsigned NOT NULL default 0,
+			comment_ID                 int(10) unsigned NOT NULL auto_increment,
+			comment_item_ID            int(10) unsigned NOT NULL default 0,
 			comment_type               enum('comment','linkback','trackback','pingback','meta') COLLATE ascii_general_ci NOT NULL default 'comment',
 			comment_status             ENUM('published','community','deprecated','protected','private','review','draft','trash') COLLATE ascii_general_ci DEFAULT 'draft' NOT NULL,
 			comment_in_reply_to_cmt_ID INT(10) unsigned NULL,
@@ -277,7 +277,7 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_items__prerendering' => array(
 		'Creating item prerendering cache table',
 		"CREATE TABLE T_items__prerendering(
-			itpr_itm_ID                   INT(11) UNSIGNED NOT NULL,
+			itpr_itm_ID                   INT(10) UNSIGNED NOT NULL,
 			itpr_format                   ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
 			itpr_renderers                VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			itpr_content_prerendered      MEDIUMTEXT COLLATE utf8mb4_unicode_ci NULL,
@@ -288,7 +288,7 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_comments__prerendering' => array(
 		'Creating comment prerendering cache table',
 		"CREATE TABLE T_comments__prerendering(
-			cmpr_cmt_ID                   INT(11) UNSIGNED NOT NULL,
+			cmpr_cmt_ID                   INT(10) UNSIGNED NOT NULL,
 			cmpr_format                   ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
 			cmpr_renderers                VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			cmpr_content_prerendered      MEDIUMTEXT COLLATE utf8mb4_unicode_ci NULL,
@@ -313,7 +313,7 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_items__status' => array(
 		'Creating table for Post Statuses',
 		"CREATE TABLE T_items__status (
-			pst_ID   int(11) unsigned not null AUTO_INCREMENT,
+			pst_ID   int(10) unsigned not null AUTO_INCREMENT,
 			pst_name varchar(30) COLLATE utf8mb4_unicode_ci not null,
 			primary key ( pst_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -321,7 +321,7 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_items__type' => array(
 		'Creating table for Post Types',
 		"CREATE TABLE T_items__type (
-			ityp_ID                INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			ityp_ID                INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			ityp_name              VARCHAR(30) COLLATE utf8mb4_unicode_ci NOT NULL,
 			ityp_description       TEXT COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			ityp_usage             VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT 'post',
@@ -368,8 +368,8 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_items__type_custom_field' => array(
 		'Creating table for custom fields of Post Types',
 		"CREATE TABLE T_items__type_custom_field (
-			itcf_ID              INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			itcf_ityp_ID         INT(11) UNSIGNED NOT NULL,
+			itcf_ID              INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			itcf_ityp_ID         INT(10) UNSIGNED NOT NULL,
 			itcf_label           VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
 			itcf_name            VARCHAR(255) COLLATE ascii_general_ci NOT NULL,
 			itcf_schema_prop     VARCHAR(255) COLLATE ascii_general_ci NULL,
@@ -396,8 +396,8 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_items__type_coll' => array(
 		'Creating table for PostType-to-Collection relationships',
 		"CREATE TABLE T_items__type_coll (
-			itc_ityp_ID int(11) unsigned NOT NULL,
-			itc_coll_ID int(11) unsigned NOT NULL,
+			itc_ityp_ID int(10) unsigned NOT NULL,
+			itc_coll_ID int(10) unsigned NOT NULL,
 			PRIMARY KEY (itc_ityp_ID, itc_coll_ID),
 			UNIQUE itemtypecoll ( itc_ityp_ID, itc_coll_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -405,15 +405,15 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_items__status_type' => array(
 		'Creating table for PostType-to-Status relationships',
 		"CREATE TABLE T_items__status_type (
-			its_pst_ID INT(11) UNSIGNED NOT NULL,
-			its_ityp_ID INT(11) UNSIGNED NOT NULL,
+			its_pst_ID INT(10) UNSIGNED NOT NULL,
+			its_ityp_ID INT(10) UNSIGNED NOT NULL,
 			PRIMARY KEY ( its_ityp_ID, its_pst_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__tag' => array(
 		'Creating table for Tags',
 		"CREATE TABLE T_items__tag (
-			tag_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			tag_ID   INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			tag_name VARCHAR(50) COLLATE utf8_bin NOT NULL,
 			PRIMARY KEY (tag_ID),
 			UNIQUE tag_name( tag_name )
@@ -422,8 +422,8 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_items__itemtag' => array(
 		'Creating table for Post-to-Tag relationships',
 		"CREATE TABLE T_items__itemtag (
-			itag_itm_ID int(11) unsigned NOT NULL,
-			itag_tag_ID int(11) unsigned NOT NULL,
+			itag_itm_ID int(10) unsigned NOT NULL,
+			itag_tag_ID int(10) unsigned NOT NULL,
 			PRIMARY KEY (itag_itm_ID, itag_tag_ID),
 			UNIQUE tagitem ( itag_tag_ID, itag_itm_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -431,8 +431,8 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_items__subscriptions' => array(
 		'Creating table for subscriptions to individual blog posts',
 		"CREATE TABLE T_items__subscriptions (
-			isub_item_ID    int(11) unsigned NOT NULL,
-			isub_user_ID    int(11) unsigned NOT NULL,
+			isub_item_ID    int(10) unsigned NOT NULL,
+			isub_user_ID    int(10) unsigned NOT NULL,
 			isub_comments   tinyint(1) NOT NULL DEFAULT 0 COMMENT 'The user wants to receive notifications for new comments on this post',
 			PRIMARY KEY (isub_item_ID, isub_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -459,8 +459,8 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_items__user_data' => array(
 		'Creating table for user post data',
 		"CREATE TABLE T_items__user_data (
-			itud_user_ID          INT(11) UNSIGNED NOT NULL,
-			itud_item_ID          INT(11) UNSIGNED NOT NULL,
+			itud_user_ID          INT(10) UNSIGNED NOT NULL,
+			itud_item_ID          INT(10) UNSIGNED NOT NULL,
 			itud_read_item_ts     TIMESTAMP NULL DEFAULT NULL,
 			itud_read_comments_ts TIMESTAMP NULL DEFAULT NULL,
 			itud_flagged_item     TINYINT(1) NOT NULL DEFAULT 0,
@@ -483,8 +483,8 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_subscriptions' => array(
 		'Creating table for subscriptions',
 		"CREATE TABLE T_subscriptions (
-			sub_coll_ID     int(11) unsigned    not null,
-			sub_user_ID     int(11) unsigned    not null,
+			sub_coll_ID     int(10) unsigned    not null,
+			sub_user_ID     int(10) unsigned    not null,
 			sub_items       tinyint(1)          not null,
 			sub_items_mod   TINYINT(1)          NOT NULL,
 			sub_comments    tinyint(1)          not null,
@@ -495,8 +495,8 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_coll_user_perms' => array(
 		'Creating table for Blog-User permissions',
 		"CREATE TABLE T_coll_user_perms (
-			bloguser_blog_ID              int(11) unsigned NOT NULL default 0,
-			bloguser_user_ID              int(11) unsigned NOT NULL default 0,
+			bloguser_blog_ID              int(10) unsigned NOT NULL default 0,
+			bloguser_user_ID              int(10) unsigned NOT NULL default 0,
 			bloguser_ismember             tinyint NOT NULL default 0,
 			bloguser_can_be_assignee      tinyint NOT NULL default 0,
 			bloguser_perm_poststatuses    set('review','draft','private','protected','deprecated','community','published','redirected') COLLATE ascii_general_ci NOT NULL default '',
@@ -524,8 +524,8 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_coll_group_perms' => array(
 		'Creating table for blog-group permissions',
 		"CREATE TABLE T_coll_group_perms (
-			bloggroup_blog_ID              int(11) unsigned NOT NULL default 0,
-			bloggroup_group_ID             int(11) unsigned NOT NULL default 0,
+			bloggroup_blog_ID              int(10) unsigned NOT NULL default 0,
+			bloggroup_group_ID             int(10) unsigned NOT NULL default 0,
 			bloggroup_ismember             tinyint NOT NULL default 0,
 			bloggroup_can_be_assignee      tinyint NOT NULL default 0,
 			bloggroup_perm_poststatuses    set('review','draft','private','protected','deprecated','community','published','redirected') COLLATE ascii_general_ci NOT NULL default '',
@@ -560,19 +560,19 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_links' => array(
 		'Creating table for Links',
 		"CREATE TABLE T_links (
-			link_ID               int(11) unsigned  not null AUTO_INCREMENT,
+			link_ID               int(10) unsigned  not null AUTO_INCREMENT,
 			link_datecreated      TIMESTAMP         NOT NULL DEFAULT '2000-01-01 00:00:00',
 			link_datemodified     TIMESTAMP         NOT NULL DEFAULT '2000-01-01 00:00:00',
-			link_creator_user_ID  int(11) unsigned  NULL,
-			link_lastedit_user_ID int(11) unsigned  NULL,
-			link_itm_ID           int(11) unsigned  NULL,
-			link_cmt_ID           int(11) unsigned  NULL COMMENT 'Used for linking files to comments (comment attachments)',
-			link_usr_ID           int(11) unsigned  NULL COMMENT 'Used for linking files to users (user profile picture)',
-			link_ecmp_ID          int(11) unsigned  NULL COMMENT 'Used for linking files to email campaign',
-			link_msg_ID           int(11) unsigned  NULL COMMENT 'Used for linking files to private message',
-			link_tmp_ID           int(11) unsigned  NULL COMMENT 'Used for linking files to new creating object',
-			link_file_ID          int(11) unsigned  NULL,
-			link_ltype_ID         int(11) unsigned  NOT NULL default 1,
+			link_creator_user_ID  int(10) unsigned  NULL,
+			link_lastedit_user_ID int(10) unsigned  NULL,
+			link_itm_ID           int(10) unsigned  NULL,
+			link_cmt_ID           int(10) unsigned  NULL COMMENT 'Used for linking files to comments (comment attachments)',
+			link_usr_ID           int(10) unsigned  NULL COMMENT 'Used for linking files to users (user profile picture)',
+			link_ecmp_ID          int(10) unsigned  NULL COMMENT 'Used for linking files to email campaign',
+			link_msg_ID           int(10) unsigned  NULL COMMENT 'Used for linking files to private message',
+			link_tmp_ID           int(10) unsigned  NULL COMMENT 'Used for linking files to new creating object',
+			link_file_ID          int(10) unsigned  NULL,
+			link_ltype_ID         int(10) unsigned  NOT NULL default 1,
 			link_position         varchar(10) COLLATE ascii_general_ci NOT NULL,
 			link_order            int(11) unsigned  NOT NULL,
 			PRIMARY KEY (link_ID),
@@ -586,17 +586,17 @@ $schema_queries = array_merge( $schema_queries, array(
 	'T_temporary_ID' => array(
 		'Creating table for temporary IDs (used for uploads on new posts or messages)',
 		"CREATE TABLE T_temporary_ID (
-			tmp_ID      INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			tmp_ID      INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			tmp_type    VARCHAR(32) COLLATE ascii_general_ci NOT NULL,
-			tmp_coll_ID INT(11) UNSIGNED NULL,
+			tmp_coll_ID INT(10) UNSIGNED NULL,
 			PRIMARY KEY (tmp_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_links__vote' => array(
 		'Creating table for File Links Votes',
 		"CREATE TABLE T_links__vote (
-			lvot_link_ID       int(11) UNSIGNED NOT NULL,
-			lvot_user_ID       int(11) UNSIGNED NOT NULL,
+			lvot_link_ID       int(10) UNSIGNED NOT NULL,
+			lvot_user_ID       int(10) UNSIGNED NOT NULL,
 			lvot_like          tinyint(1),
 			lvot_inappropriate tinyint(1),
 			lvot_spam          tinyint(1),
