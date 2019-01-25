@@ -10579,6 +10579,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13090, 'Upgrading messages table...' ) )
+	{	// part of 6.10.6-stable
+		db_add_index( 'T_messaging__message', 'msg_author_user_ID', 'msg_author_user_ID' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 15000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '
