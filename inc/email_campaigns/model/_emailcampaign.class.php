@@ -662,7 +662,7 @@ class EmailCampaign extends DataObject
 	{
 		if( $force_update || $this->get( 'sync_plaintext' ) )
 		{	// Update plain-text message only when it is enabled for this email campaign:
-			$email_plaintext = preg_replace_callback( '#<a[^>]+href="([^"]+)"[^>]*>([^<]*)</a>#i', array( $this, 'update_plaintext_callback_a' ), $this->get( 'email_html' ) );
+			$email_plaintext = preg_replace_callback( '#<a[^>]+href="([^"]+)"[^>]*>(.*?)</a>#i', array( $this, 'update_plaintext_callback_a' ), $this->get( 'email_html' ) );
 			$email_plaintext = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', ' [ $1 ] ', $email_plaintext );
 			$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
 			$email_plaintext = preg_replace( '#</li>[\s\t]*</ul>#i', '</li>', $email_plaintext );
@@ -702,9 +702,11 @@ class EmailCampaign extends DataObject
 	 */
 	function update_plaintext_callback_a( $m )
 	{
+		$link_text = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', '$1', $m[2] );
+
 		return ' [ '
 			// Display a text of the link if it is not same as url:
-			.( $m[1] == $m[2] ? '' : $m[2].' --> ' )
+			.( $m[1] == $link_text ? '' : $link_text.' --> ' )
 			// Url of the link:
 			.$m[1].' ] ';
 	}

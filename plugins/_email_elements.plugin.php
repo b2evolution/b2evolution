@@ -399,7 +399,14 @@ class email_elements_plugin extends Plugin
 						continue;
 					}
 					// If image file is correct we should display it instead of text:
-					$text = $image_File->get_tag( '', '', '', '', 'original', false, '', '', '', '', $text, '' );
+					$text = $image_Link->get_tag( array(
+						'before_image'        => '',
+						'before_image_legend' => NULL,
+						'after_image'         => '',
+						'image_link_to'       => false,
+						'image_alt'           => $text,
+						'add_loadimg'         => false,
+					) );
 				}
 
 				if( empty( $url ) && in_array( $type, array( 'button', 'like', 'dislike', 'cta' ) ) )
