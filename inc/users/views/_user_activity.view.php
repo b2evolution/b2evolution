@@ -126,6 +126,13 @@ threads_results_block( array(
 	) );
 evo_flush();
 
+/**** Private messages received by the user ****/
+received_threads_results_block( array(
+		'edited_User' => $edited_User,
+		'action'      => $action,
+	) );
+evo_flush();
+
 /**** Polls owned by the user ****/
 polls_results_block( array(
 		'edited_User'          => $edited_User,

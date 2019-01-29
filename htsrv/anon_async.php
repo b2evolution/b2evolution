@@ -1011,6 +1011,7 @@ switch( $action )
 			case 'items_edited_results_block':
 			case 'comments_results_block':
 			case 'threads_results_block':
+			case 'received_threads_results_block':
 			case 'user_reports_results_block':
 			case 'blogs_user_results_block':
 			case 'blogs_all_results_block':
