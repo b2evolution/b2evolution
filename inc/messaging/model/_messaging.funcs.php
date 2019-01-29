@@ -2047,27 +2047,9 @@ function threads_results_block( $params = array() )
 	}
 	else
 	{ // No permission for abuse management
-		$Table = new Table();
-
-		$Table->title = T_('Messaging');
-		$Table->no_results_text = sprintf( T_('User has sent %s private messages'), $edited_User->get_num_messages( 'sent' ) );
-
-		$Table->display_init();
-		$Table->total_pages = 0;
-
-		echo $display_params['before'];
-
-		$Table->display_head();
-
-		echo $Table->params['content_start'];
-
-		$Table->display_list_start();
-
-		$Table->display_list_end();
-
-		echo $Table->params['content_end'];
-
-		echo $display_params['after'];
+		echo '<p>'.sprintf( T_('User has sent %s private messages'), $edited_User->get_num_messages( 'sent' ) ).'</p>';
+		echo '<p>'.sprintf( T_('User has received %s private messages'), $edited_User->get_num_messages( 'received' ) ).'</p>';
+		echo '<p class="note" style="margin-bottom:20px">'.T_('You need Abuse management permission to see details.').'</p>';
 	}
 }
 
