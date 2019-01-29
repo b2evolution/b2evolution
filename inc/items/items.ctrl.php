@@ -2266,6 +2266,16 @@ switch( $action )
 			{	// User has permissions to edit this Item:
 				$AdminUI->global_icon( T_('Edit current version'), 'edit',  $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$edited_Item->ID, T_('Edit current version'), 4, 3, array( 'style' => 'margin-right:3ex' ) );
 			}
+
+			$item_permanent_url = $edited_Item->get_permanent_url( '', '', '&amp;', array( 'none' ) );
+			if( $item_permanent_url !== false )
+			{	// Display item permanent URL only if permanent type is not 'none':
+				$AdminUI->global_icon( T_('Permanent link to full entry'), 'permalink', $item_permanent_url,
+						' '.T_('Permalink'), 4, 3, array(
+								'style' => 'margin-right: 3ex',
+						) );
+			}
+
 			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', $redirect_to, T_('Cancel'), 4, 2 );
 		}
 

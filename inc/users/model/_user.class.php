@@ -6775,9 +6775,10 @@ class User extends DataObject
 	/**
 	 * Delete private messaged of the user
 	 *
+	 * @param string Type ( sent | received )
 	 * @return boolean True on success
 	 */
-	function delete_messages()
+	function delete_messages( $type = 'sent' )
 	{
 		global $DB, $Plugins, $current_User;
 
@@ -6792,21 +6793,35 @@ class User extends DataObject
 
 		$MessageCache = & get_MessageCache();
 		$MessageCache->clear();
-		$MessageCache->load_where( 'msg_author_user_ID = '.$this->ID );
-		$message_was_deleted = false;
+		if( $type == 'received' )
+		{	// Received messages:
+			$SQL = $MessageCache->get_SQL_object();
+			$SQL->FROM_add( 'INNER JOIN T_messaging__threadstatus ON tsta_thread_ID = msg_thread_ID' );
+			$SQL->WHERE( 'tsta_user_ID = '.$DB->quote( $this->ID ) );
+			$SQL->WHERE_and( 'msg_author_user_ID != '.$DB->quote( $this->ID ) );
+			$MessageCache->load_by_sql( $SQL );
+		}
+		else
+		{	// Sent messages:
+			$MessageCache->load_where( 'msg_author_user_ID = '.$this->ID );
+		}
 
+		$thread_IDs = array();
 		while( ( $iterator_Message = & $MessageCache->get_next() ) != NULL )
 		{ // Iterate through MessageCache
 			// Delete a message from DB:
-			$iterator_Message->dbdelete();
-			$message_was_deleted = true;
+			$msg_thread_ID = $iterator_Message->get( 'thread_ID' );
+			if( $iterator_Message->dbdelete() )
+			{
+				$thread_IDs[ $msg_thread_ID ] = NULL;
+			}
 		}
 
-		if( $message_was_deleted )
-		{ // at least one message was deleted
-			// Delete statuses
+		if( ! empty( $thread_IDs ) )
+		{	// Delete read statuses of the threads where message was deleted:
 			$DB->query( 'DELETE FROM T_messaging__threadstatus
-							WHERE tsta_user_ID = '.$DB->quote( $this->ID ) );
+				WHERE tsta_user_ID = '.$DB->quote( $this->ID ).'
+				  AND tsta_thread_ID IN ( '.$DB->quote( array_keys( $thread_IDs ) ).' )' );
 		}
 
 		$DB->commit();

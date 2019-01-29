@@ -41,6 +41,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	), $Skin->get_template( 'disp_params' ) ) );
 // ----------------------------- END OF "Front Page Main Area" CONTAINER -----------------------------
 
+$intro_Item = & get_featured_Item( 'front' );
 if( ! empty( $intro_Item ) )
 {
 	global $c, $ReqURI;

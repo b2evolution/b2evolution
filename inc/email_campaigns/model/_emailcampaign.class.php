@@ -662,7 +662,7 @@ class EmailCampaign extends DataObject
 	{
 		if( $force_update || $this->get( 'sync_plaintext' ) )
 		{	// Update plain-text message only when it is enabled for this email campaign:
-			$email_plaintext = preg_replace_callback( '#<a[^>]+href="([^"]+)"[^>]*>([^<]*)</a>#i', array( $this, 'update_plaintext_callback_a' ), $this->get( 'email_html' ) );
+			$email_plaintext = preg_replace_callback( '#<a[^>]+href="([^"]+)"[^>]*>(.*?)</a>#i', array( $this, 'update_plaintext_callback_a' ), $this->get( 'email_html' ) );
 			$email_plaintext = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', ' [ $1 ] ', $email_plaintext );
 			$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
 			$email_plaintext = preg_replace( '#</li>[\s\t]*</ul>#i', '</li>', $email_plaintext );
@@ -702,9 +702,11 @@ class EmailCampaign extends DataObject
 	 */
 	function update_plaintext_callback_a( $m )
 	{
+		$link_text = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', '$1', $m[2] );
+
 		return ' [ '
 			// Display a text of the link if it is not same as url:
-			.( $m[1] == $m[2] ? '' : $m[2].' --> ' )
+			.( $m[1] == $link_text ? '' : $link_text.' --> ' )
 			// Url of the link:
 			.$m[1].' ] ';
 	}
@@ -1415,13 +1417,20 @@ class EmailCampaign extends DataObject
 	/**
 	 * Get current Cronjob of this email campaign
 	 *
+	 * @param boolean TRUE to exclude error cron job
 	 * @return object Cronjob
 	 */
-	function & get_Cronjob()
+	function & get_Cronjob( $exclude_error = true )
 	{
 		$CronjobCache = & get_CronjobCache();
 
 		$Cronjob = & $CronjobCache->get_by_ID( $this->get( 'send_ctsk_ID' ), false, false );
+
+		if( $exclude_error && $Cronjob &&
+		    ! in_array( $Cronjob->get_status(), array( 'pending', 'started', 'finished' ) ) )
+		{	// Exclude cron job if it was stopped with an error:
+			$Cronjob = NULL;
+		}
 
 		return $Cronjob;
 	}

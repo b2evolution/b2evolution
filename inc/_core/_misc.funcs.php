@@ -8715,11 +8715,11 @@ function render_inline_tags( $Object, $tags, $params = array() )
 									$current_image_params['image_style'] = $image_style;
 								}
 
-								$inlines[ $current_inline ] = $Link->get_tag( array_merge( array(
+								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
 										'image_link_to' => false,
 										'image_style'   => 'border: none; max-width: 100%; height: auto;',
 										'add_loadimg'   => false,
-								), $current_image_params ) );
+								) ) );
 								break;
 
 							default:
