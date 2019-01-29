@@ -1415,13 +1415,20 @@ class EmailCampaign extends DataObject
 	/**
 	 * Get current Cronjob of this email campaign
 	 *
+	 * @param boolean TRUE to exclude error cron job
 	 * @return object Cronjob
 	 */
-	function & get_Cronjob()
+	function & get_Cronjob( $exclude_error = true )
 	{
 		$CronjobCache = & get_CronjobCache();
 
 		$Cronjob = & $CronjobCache->get_by_ID( $this->get( 'send_ctsk_ID' ), false, false );
+
+		if( $exclude_error && $Cronjob &&
+		    ! in_array( $Cronjob->get_status(), array( 'pending', 'started', 'finished' ) ) )
+		{	// Exclude cron job if it was stopped with an error:
+			$Cronjob = NULL;
+		}
 
 		return $Cronjob;
 	}
