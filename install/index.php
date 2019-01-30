@@ -606,10 +606,10 @@ switch( $action )
 					<p class="text-muted small"><?php echo T_('b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installing b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.') ?></p>
 					<?php
 					$Form->checkbox( 'conf_create_db', param( 'conf_create_db', 'integer' ), '', T_('Try to create this DB if it doesn\'t exist yet (useful for developers)') );
-					$Form->text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ), 120 );
-					$Form->text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ), 100);
-					$Form->text( 'conf_db_user', $conf_db_user, 16, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 );
-					$Form->text( 'conf_db_password', $conf_db_password, 16, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 ); // no need to hyde this. nobody installs b2evolution from a public place
+					$Form->text( 'conf_db_host', $conf_db_host, NULL, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ) );
+					$Form->text( 'conf_db_name', $conf_db_name, NULL, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ) );
+					$Form->text( 'conf_db_user', $conf_db_user, NULL, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ) );
+					$Form->text( 'conf_db_password', $conf_db_password, NULL, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ) ); // no need to hyde this. nobody installs b2evolution from a public place
 					// Too confusing for (most) newbies.	form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
 				block_close();
 
