@@ -116,6 +116,15 @@ class FileRootCache
 			$r[ $import_FileRoot->ID ] = & $import_FileRoot;
 		}
 
+		// Email campaigns root:
+		$emailcampaign_ID = get_param( 'link_type' ) == 'emailcampaign' ? intval( get_param( 'link_object_ID' ) ) : 0;
+		if( ( $emailcampaign_FileRoot = & $FileRootCache->get_by_type_and_ID( 'emailcampaign', $emailcampaign_ID, true ) ) &&
+				$current_User->check_perm( 'files', 'view', false, $emailcampaign_FileRoot ) &&
+				$current_User->check_perm( 'emails', 'view' ) )
+		{ // Try to add Email campaign file root if current user has an access:
+			$r[ $emailcampaign_FileRoot->ID ] = & $emailcampaign_FileRoot;
+		}
+
 		return $r;
 	}
 

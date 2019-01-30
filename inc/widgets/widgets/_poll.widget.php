@@ -125,6 +125,13 @@ class poll_Widget extends ComponentWidget
 			}
 
 			$poll_options = $Poll->get_poll_options();
+
+			if( $Poll->get( 'max_answers' ) < count( $poll_options ) )
+			{
+				echo '<p class="note">'.sprintf( T_('Select up to %d answers below.'), $Poll->get( 'max_answers' ) ).'</p>';
+			}
+
+
 			if( count( $poll_options ) )
 			{	// Display a form only if at least one poll option exists:
 				if( is_logged_in() )
