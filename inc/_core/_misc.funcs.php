@@ -3962,6 +3962,10 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 			load_funcs( 'cron/model/_decode_returned_emails.funcs.php' );
 			$content = dre_limit_by_terminators( $mail_log_message );
 			$email_data = dre_get_email_data( $content, $mail_log_message, 'Empty headers' );
+			if( empty( $email_data['address'] ) )
+			{	// Use current email address if no email address is detected in the error message:
+				$email_data['address'] = $to_email_address;
+			}
 			dre_insert_returned_email( $email_data );
 		}
 	}
