@@ -10549,7 +10549,7 @@ class Item extends ItemLight
 		$this->set_user_data( 'item_flag', $new_flag_value );
 
 		// Invalidate key for the Item data per current User:
-		BlockCache::invalidate_key( 'item_user_data_'.$this->ID, $current_User->ID );
+		BlockCache::invalidate_key( 'item_user_flag_'.$this->ID, $current_User->ID );
 
 		$DB->commit();
 	}
