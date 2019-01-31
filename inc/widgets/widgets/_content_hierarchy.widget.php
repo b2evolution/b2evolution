@@ -357,6 +357,7 @@ class content_hierarchy_Widget extends ComponentWidget
 		$r .= $Item->get_flag( array(
 				'before'       => ' ',
 				'only_flagged' => true,
+				'allow_toggle' => false,
 			) );
 
 		$r .= $params['item_end'];
