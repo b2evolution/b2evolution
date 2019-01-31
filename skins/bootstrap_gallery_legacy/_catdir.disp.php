@@ -143,7 +143,9 @@ if( ! empty( $chapters ) )
 				}
 				// Flag:
 				$item_flag = $Item->get_flag( array(
-						'only_flagged' => true
+						'after'        => ' ',
+						'only_flagged' => true,
+						'allow_toggle' => false,
 					) );
 				// Display a title
 				echo $Item->get_title( array(

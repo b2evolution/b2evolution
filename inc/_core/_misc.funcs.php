@@ -3994,9 +3994,26 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		$send_mail_result = true;
 	}
 	else
-	{	// If real mode
-		// Send email message:
-		$send_mail_result = evo_mail( $to, $subject, $message_data, $headers, $additional_parameters );
+	{	// Send email message on real mode:
+		try
+		{	// Try to send:
+			$send_mail_result = evo_mail( $to, $subject, $message_data, $headers, $additional_parameters );
+		}
+		catch( Exception $ex )
+		{	// Unexpected error:
+			$send_mail_result = false;
+			// Log the caught error:
+			$mail_log_message = $ex->getMessage();
+			// Insert a returned email's data into DB:
+			load_funcs( 'cron/model/_decode_returned_emails.funcs.php' );
+			$content = dre_limit_by_terminators( $mail_log_message );
+			$email_data = dre_get_email_data( $content, $mail_log_message, 'Empty headers' );
+			if( empty( $email_data['address'] ) )
+			{	// Use current email address if no email address is detected in the error message:
+				$email_data['address'] = $to_email_address;
+			}
+			dre_insert_returned_email( $email_data );
+		}
 	}
 
 	if( get_cron_job_emails_limit() > 0 )
@@ -4008,7 +4025,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 
 	if( ! $send_mail_result )
 	{	// The message has not been sent successfully
-		$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED.';
+		$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED'.( $mail_log_message === NULL ? '' : ', Error: '.$mail_log_message ).'.';
 		update_mail_log( $mail_log_insert_ID, 'error', $message );
 		if( $debug > 1 )
 		{ // We agree to die for debugging...
