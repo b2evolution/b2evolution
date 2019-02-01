@@ -815,8 +815,8 @@ $Form->begin_form( '', '', $params );
 	}
 
 
-	if( $is_not_content_block )
-	{	// Display goal tracking and notifications for item with type usage except of content block:
+	if( in_array( $edited_Item->get_type_setting( 'usage' ), array( 'post', 'page', 'widget-page' ) ) )
+	{	// Display user tagging for items which can be displayed only on disp=single, disp=page or disp=widget_page:
 
 		// ################### USER TAGGING ###################
 		$Form->begin_fieldset( T_('User Tagging').get_manual_link( 'post-user-tagging-panel' )
@@ -844,7 +844,10 @@ $Form->begin_form( '', '', $params );
 		$Form->switch_layout( NULL );
 
 		$Form->end_fieldset();
+	}
 
+	if( $is_not_content_block )
+	{	// Display goal tracking and notifications for item with type usage except of content block:
 
 		// ################### GOAL TRACKING ###################
 
