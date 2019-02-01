@@ -2667,6 +2667,10 @@ function display_login_form( $params )
 
 	$Form->add_crumb( 'loginform' );
 	$source = param( 'source', 'string', $params['source'].' login form' );
+	if( ! empty( $blog ) )
+	{
+		$Form->hidden( 'blog', $blog );
+	}
 	$Form->hidden( 'source', $source );
 	$Form->hidden( 'redirect_to', $redirect_to );
 	$Form->hidden( 'return_to', $return_to );

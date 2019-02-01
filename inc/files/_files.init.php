@@ -225,7 +225,7 @@ class files_Module extends Module
 						array( 'add', T_('Add/Upload files to allowed roots'), sprintf( T_('Only %sunlocked file types can be uploaded.'), $filetypes_allowed_icon ) ),
 						array( 'edit_allowed', T_('Edit files in allowed roots'), sprintf( T_('Only %sunlocked file types can be edited.'), $filetypes_allowed_icon ) ),
 						array( 'edit', sprintf( T_('Edit %sunlocked files in all roots'), $filetypes_allowed_icon ) ),
-						array( 'all', sprintf( T_('Edit all files, including %slocked ones, in all roots'), $filetypes_not_allowed_icon ), T_('Needed for editing PHP files in skins.') ),
+						array( 'all', sprintf( T_('Edit / Unzip all files, including %slocked ones, in all roots'), $filetypes_not_allowed_icon ), T_('Needed for editing PHP files in skins.') ),
 					),
 				'perm_type' => 'radiobox',
 				'field_lines' => true,

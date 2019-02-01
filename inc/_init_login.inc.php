@@ -457,7 +457,14 @@ if( ! empty( $login_action_value ) && empty( $login_error ) && ( $action != 'log
 				preg_match( '#/register.php([&?].*)?$#', $redirect_to ) ||
 				preg_match( '#disp=(login|register|lostpassword)#', $redirect_to ) )
 			{ // avoid redirect back to login/register screen. This shouldn't occur.
-				$redirect_to = $baseurl;
+				$redirect_to = $Settings->get( 'redirect_to_after_login' );
+				if( empty( $redirect_to ) )
+				{
+					$blog = param( 'blog', 'integer' );
+					$BlogCache = & get_BlogCache();
+					$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+					$redirect_to = $Blog ? $Blog->get( 'url' ) : $baseurl;
+				}
 			}
 
 			if( $email_login )
