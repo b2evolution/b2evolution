@@ -300,7 +300,13 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 
 	if( ! is_logged_in() || ! $current_User->check_perm( 'files', 'all' ) )
 	{	// No permission to unzip files:
-		echo '<p class="text-danger">'.T_('You don\'t have permission to UNZIP files automatically on the server.').'</p>';
+		$error = '<span class="text-danger">'.T_('You don\'t have permission to UNZIP files automatically on the server.').'</span>';
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{	// Link to edit permissions:
+			global $admin_url;
+			$error = '<a href="'.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->get( 'grp_ID' ).'#fieldset_wrapper_file">'.$error.'</a>';
+		}
+		echo '<p>'.$error.'</p>';
 		evo_flush();
 		return false;
 	}
