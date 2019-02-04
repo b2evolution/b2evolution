@@ -1084,6 +1084,10 @@ class tinymce_plugin extends Plugin
 
 		$init_options[] = 'extended_valid_elements : "figure[class],figcaption[class]"';
 
+		// Options below will prevent insertion of <p> for every newline:
+		// $init_options[] = 'force_p_newlines : false';
+		// $init_options[] = 'forced_root_block : ""';
+
 		// Content CSS:
 		$content_css = array();
 		if( ! empty( $Blog ) )

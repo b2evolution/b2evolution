@@ -1,5 +1,15 @@
 .evo-view-wrap[data-evo-view-type="image"] {
 	display: block;
+	clear: both;
+}
+
+.evo-view-wrap[data-evo-view-type="image"].evo-view-selected {
+	background-color: #eee;
+}
+
+.evo-view-wrap[data-evo-view-type="thumbnail"] {
+	height: 0px;
+	width: 0px;
 }
 
 /* delegate the handling of the selection to the wpview tinymce plugin */
@@ -65,10 +75,6 @@
 
 .has-focus .evo-view-wrap.evo-view-cursor-hide:before {
 	opacity: 0;
-}
-
-.evo-view-selected {
-	background-color: #eee;
 }
 
 .evo-view-selected img {
