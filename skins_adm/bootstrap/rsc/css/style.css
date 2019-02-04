@@ -285,19 +285,19 @@ div.delete_messages ul label {
 .evo_content_summary .evo_post .bText {
   padding-left: 420px;
 }
-#comment_filter_form fieldset {
+.evo_sidebar_filters fieldset {
   margin-bottom: 20px;
 }
-#comment_filter_form .controls.col-sm-10 {
-  width: 100%;
+.evo_sidebar_filters fieldset legend {
+  margin-bottom: 10px;
 }
-#comment_filter_form .controls.col-sm-10 input[type=text] {
-  width: 100%;
+.evo_sidebar_filters .pull-right[type=submit] {
+  margin: -3px 0 0 0;
 }
-#comment_filter_form .rating input[name=cmnt_fullview_rating_limit] {
+.evo_sidebar_filters .rating input[name$=_rating_limit] {
   margin-right: 10px;
 }
-#comment_filter_form .rating input[name=cmnt_fullview_rating_limit]:first-child {
+.evo_sidebar_filters .rating input[name$=_rating_limit]:first-child {
   margin-left: 10px;
 }
 .evo_comments_container .evo_comment {
