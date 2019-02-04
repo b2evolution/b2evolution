@@ -884,9 +884,12 @@ function param_check_new_user_email( $var, $value = NULL, $link_Blog = NULL )
 			global $Blog;
 			$link_Blog = $Blog;
 		}
+		global $dummy_fields;
+		$lostpassword_url = ( $link_Blog === NULL ? get_lostpassword_url() : $link_Blog->get( 'lostpasswordurl' ) );
+		$lostpassword_url = url_add_param( $lostpassword_url, $dummy_fields['login'].'='.urlencode( $value ) );
 		param_error( $var, sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know it or have forgotten it, you can <a %s>reset your password here</a>.'),
 			'href="'.( $link_Blog === NULL ? get_login_url( '' ) : $link_Blog->get( 'loginurl' ) ).'"',
-			'href="'.( $link_Blog === NULL ? get_lostpassword_url() : $link_Blog->get( 'lostpasswordurl' ) ).'"' ) );
+			'href="'.$lostpassword_url.'"' ) );
 		return false;
 	}
 

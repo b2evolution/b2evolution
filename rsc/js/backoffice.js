@@ -212,8 +212,9 @@ function b2edit_reload( form_selector, new_action_url, blog, params, reset )
 {
 	var form = jQuery( form_selector );
 
-	if( form.length == 0 )
-	{	// Form is not detected on the current page by requested selector:
+	if( form.length == 0 || form.find( 'input[type=hidden][name^=crumb_]' ).length == 0 )
+	{	// Form is not detected on the current page by requested selector
+		// or form is not loaded completely because of slow code:
 		// Redirect to new URL without form submitting:
 		location.href = new_action_url;
 		return false;
