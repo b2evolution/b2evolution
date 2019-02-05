@@ -837,10 +837,8 @@ class Item extends ItemLight
 			}
 			$this->set( 'urltitle', implode( ', ', $post_urltitle ) );
 			// Added in May 2017; but old slugs are not converted yet.
-			if( preg_match( '#(^|,+)[^a-z\d_]*\d+[^a-z\d_]*($|,+)#i', get_param( 'post_urltitle' ) ) )
-			{	// Display error if item slugs contain only digits:
-				param_error( 'post_urltitle', T_('All slugs must contain at least one letter.') );
-			}
+			// Display error if item slugs don't contain at least one letter:
+			param_check_regexp( 'post_urltitle', '#^([^,]*[a-z][^,]*,?)+$#i', T_('All slugs must contain at least one letter.') );
 		}
 
 		if( $is_not_content_block )
