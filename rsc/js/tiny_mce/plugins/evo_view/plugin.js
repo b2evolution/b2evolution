@@ -121,16 +121,15 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 		/**
 		 * Set view cursor location
 		 *
-		 * @param boolean Set cursor before the view
+		 * @param boolean True to set cursor before the view, False to set cursor after the view
 		 * @param object View
 		 */
 		function setViewCursor( before, view )
 		{
-			var location = before ? 'before' : 'after',
-					offset = before ? 0 : 1;
+			var location = before ? 'before' : 'after';
 
 			deselect();
-			editor.selection.setCursorLocation( editor.dom.select( '.evo-view-selection-' + location, view )[0], offset );
+			editor.selection.setCursorLocation( editor.dom.select( '.evo-view-selection-' + location, view )[0] );
 			editor.nodeChanged();
 		}
 
@@ -186,7 +185,6 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 					// erhsatingin: The following line was commented out as it adds an extra paragraph upon removal of view
 					//handleEnter( view );
 					evo.views.remove( editor, view );
-					deselect();
 				} );
 		}
 
@@ -340,6 +338,7 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 					if( selected )
 					{
 						removeView( selected );
+						deselect();
 					}
 
 					node = editor.selection.getNode();
@@ -620,9 +619,9 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 				if( selected )
 				{	// Ignore key presses that involve the command or control key, but continue when in combination with backspace or v.
 					// Also ignore the F# keys.
-					if( ( ( event.metaKey || event.ctrlKey ) && key !== VK.BACKSPACE && key !== 86 ) || ( key >= 112 && key <= 123 ) )
+					if( ( /* Ctrl+v */ ( event.metaKey || event.ctrlKey ) && key !== VK.BACKSPACE && key !== 86 ) || ( /*F# keys*/ key >= 112 && key <= 123 ) )
 					{	// Remove the view when pressing cmd/ctrl+x on keyup, otherwise the browser can't copy the content.
-						if( ( event.metaKey || event.ctrlKey ) && key === 88 )
+						if( /* Ctrl+x */ ( event.metaKey || event.ctrlKey ) && key === 88 )
 						{
 							toRemove = selected;
 						}
@@ -694,11 +693,35 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 					}
 					else if( ! isSpecialKey( key ) )
 					{
-						removeView( selected );
-
-						if( key === VK.ENTER || key === VK.DELETE || key === VK.BACKSPACE )
+						if( key === VK.ENTER )
 						{
+							handleEnter( view, false, key );
 							event.preventDefault();
+						}
+						else if( key === VK.DELETE /*|| key === VK.BACKSPACE*/ )
+						{
+							removeView( selected );
+							deselect();
+							event.preventDefault();
+						}
+						else if( key === VK.BACKSPACE )
+						{
+							previousView = getView( view.previousElementSibling );
+
+							if( previousView )
+							{
+								removeView( previousView );
+							}
+							else if( view.previousSibling )
+							{
+								selection.setCursorLocation( view.previousSibling );
+								deselect();
+							}
+							else if( view.parentNode.previousSibling )
+							{
+								selection.setCursorLocation( view.parentNode.previousSibling, 1 );
+								deselect();
+							}
 						}
 					}
 				}
@@ -737,9 +760,8 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 					}
 
 					if( ! view )
-					{
-						// Make sure we don't eat any content.
-						if( event.keyCode === VK.BACKSPACE )
+					{	// Make sure we don't eat any content.
+						if( key === VK.BACKSPACE )
 						{
 							if( editor.dom.isEmpty( node ) )
 							{
@@ -763,15 +785,16 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 						return;
 					}
 
-					if( ! ( ( cursorBefore = dom.hasClass( view, 'evo-view-selection-before' ) )
-							|| ( cursorAfter = dom.hasClass( view, 'evo-view-selection-after' ) ) ) )
-					{
+					var cursorBefore = dom.hasClass( view, 'evo-view-selection-before' );
+					var cursorAfter  = dom.hasClass( view, 'evo-view-selection-after' );
+
+					if( ! cursorBefore && ! cursorAfter )
+					{	// Cursor not before or after a View, exit:
 						return;
 					}
 
 					if( isSpecialKey( key ) )
-					{
-						// ignore
+					{	// ignore
 						return;
 					}
 
@@ -810,9 +833,24 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 							{
 								setViewCursor( key === VK.RIGHT, view.nextSibling );
 							}
+							else if( view.nextSibling.nodeType == Node.TEXT_NODE )
+							{
+								selection.select( view.nextSibling );
+							}
 							else
 							{
-								selection.setCursorLocation( view.nextSibling, 0 );
+								selection.setCursorLocation( view.nextSibling );
+							}
+						}
+						else if( view.parentNode.nextSibling )
+						{
+							if( getView( view.parentNode.nextSibling ) )
+							{
+								setViewCursor( key === VK.RIGHT, view.parentNode.nextSibling );
+							}
+							else
+							{
+								selection.setCursorLocation( view.parentNode.nextSibling );
 							}
 						}
 						event.preventDefault();
@@ -829,6 +867,17 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 							{
 								selection.select( view.previousSibling, true );
 								selection.collapse();
+							}
+						}
+						else if( view.parentNode.previousSibling )
+						{
+							if( getView( view.parentNode.previousSibling ) )
+							{
+								setViewCursor( key === VK.RIGHT, view.parentNode.previousSibling );
+							}
+							else
+							{
+								selection.setCursorLocation( view.parentNode.previousSibling );
 							}
 						}
 						event.preventDefault();
@@ -862,6 +911,30 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 						removeView( view );
 						event.preventDefault();
 					}
+					else if( cursorBefore && key === VK.DELETE )
+					{
+						var nextView = getView( view.nextSibling );
+
+						removeView( view );
+
+						if( nextView )
+						{
+							setViewCursor( true, nextView );
+						}
+
+						event.preventDefault();
+					}
+					else if( cursorAfter && key === VK.DELETE )
+					{
+						var nextView = getView( view.nextSibling );
+
+						if( nextView )
+						{
+							setViewCursor( true, nextView );
+						}
+
+						event.preventDefault();
+					}
 					else if( cursorAfter )
 					{
 						handleEnter( view );
@@ -882,8 +955,11 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 				if( toRemove )
 				{
 					removeView( toRemove );
+					deselect();
 					toRemove = false;
 				}
+
+				return;
 			} );
 
 		editor.on( 'focus', function() {

@@ -441,13 +441,13 @@
 				/**
 				 * Marker text
 				 */
-				markerText: '<span class="evo-view-wrap" data-evo-view-text="%encodedText%" data-evo-view-type="%viewType%">' +
-											'<span class="evo-view-selection-before">\u00a0</span>' +
-											'<span class="evo-view-body" contenteditable="false">' +
-												'<span class="evo-view-content evo-view-type-%viewType%"></span>' +
-											'</span>' +
-											'<span class="evo-view-selection-after">\u00a0</span>' +
-										'</span>',
+				markerText: '<div class="evo-view-wrap" data-evo-view-text="%encodedText%" data-evo-view-type="%viewType%">' +
+											'<div class="evo-view-selection-before"></div>' +
+											'<div class="evo-view-body" contenteditable="false">' +
+												'<div class="evo-view-content evo-view-type-%viewType%"></div>' +
+											'</div>' +
+											'<div class="evo-view-selection-after"></div>' +
+										'</div>',
 
 				/**
 				 * Replaces all marker nodes tied to this view instance.
@@ -851,16 +851,25 @@
 
 		views.register( 'image', image );
 
-		thumbnail = $.extend( {}, image );
+		thumbnail = $.extend( {}, image, {
+			markerText: '<span class="evo-view-wrap" data-evo-view-text="%encodedText%" data-evo-view-type="%viewType%">' +
+					'<span class="evo-view-selection-before"> </span>' +
+					'<span class="evo-view-body" contenteditable="false">' +
+						'<span class="evo-view-content evo-view-type-%viewType%"></span>' +
+					'</span>' +
+					'<span class="evo-view-selection-after"> </span>' +
+				'</span>',
+			} );
+
 		views.register( 'thumbnail', thumbnail );
 
 		inline = $.extend( {}, image, {
 				markerText: '<span class="evo-view-wrap" data-evo-view-text="%encodedText%" data-evo-view-type="%viewType%">' +
-						'<span class="evo-view-selection-before">\u00a0</span>' +
+						'<span class="evo-view-selection-before"> </span>' +
 						'<span class="evo-view-body" contenteditable="false">' +
 							'<span class="evo-view-content evo-view-type-%viewType%"></span>' +
 						'</span>' +
-						'<span class="evo-view-selection-after">\u00a0</span>' +
+						'<span class="evo-view-selection-after"> </span>' +
 					'</span>',
 			} );
 

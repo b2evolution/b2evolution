@@ -3431,10 +3431,10 @@ function debug_info( $force = false, $force_clean = false )
 		// Collapse ignored rows, allowing to expand them with Javascript:
 		if( $count_collapse > 5 )
 		{
-			echo '<tr><td colspan="4" class="center" id="evo-debuglog-timer-long-header">';
-			echo '<a href="" onclick="var e = document.getElementById(\'evo-debuglog-timer-long\'); e.style.display = (e.style.display == \'none\' ? \'\' : \'none\'); return false;">+ '.$count_collapse.' queries &lt; 1%</a> </td></tr>';
+			echo '<tr><td colspan="4" class="center">';
+			echo '<a href="" onclick="jQuery(this).closest(\'tbody\').next().toggle(); return false;">+ '.$count_collapse.' queries &lt; 1%</a> </td></tr>';
 			echo '</tbody>';
-			echo '<tbody id="evo-debuglog-timer-long" style="display:none;">';
+			echo '<tbody style="display:none">';
 		}
 		echo implode( "\n", $table_rows_collapse )."\n";
 
@@ -3454,12 +3454,13 @@ function debug_info( $force = false, $force_clean = false )
 			<script>
 			(function($){
 				var clicked_once;
-				jQuery("table.debug_timer th").click( function(event) {
+				jQuery( "table.debug_timer th" ).click( function(event) {
 					if( clicked_once ) return; else clicked_once = true;
-					jQuery("#evo-debuglog-timer-long tr").appendTo(jQuery("table.debug_timer tbody")[0]);
-					jQuery("#evo-debuglog-timer-long-header").remove();
+					var table = jQuery(this).closest( "table.debug_timer" );
+					jQuery( "tbody:eq(0) tr:last", table ).remove();
+					jQuery( "tbody:eq(1) tr", table ).appendTo( jQuery( "tbody:eq(0)", table ) );
 					// click for tablesorter:
-					jQuery("table.debug_timer").tablesorter();
+					table.tablesorter();
 					jQuery(event.currentTarget).click();
 				});
 			})(jQuery);

@@ -328,6 +328,7 @@ class Chapter extends DataObject
 
 		// Check url name
 		param( 'cat_urlname', 'string' );
+		param_check_regexp( 'cat_urlname', '#[a-z]#i', T_('All slugs must contain at least one letter.') );
 		$this->set_from_Request( 'urlname' );
 
 		// Check description

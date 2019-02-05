@@ -110,9 +110,9 @@ class Slug extends DataObject
 			$Messages->add( sprintf( T_('The slug &laquo;%s&raquo; already exists.'), $slug_title ), 'error' );
 		}
 		// Added in May 2017; but old slugs are not converted yet.
-		elseif( preg_match( '#^\d+$#i', $slug_title ) )
-		{	// Display error if slug title contains only digits:
-			param_error( 'slug_title', T_('All slugs must contain at least one letter.') );
+		else
+		{	// Display error if slug title doesn't contain at least one letter:
+			param_check_regexp( 'slug_title', '#[a-z]#i', T_('All slugs must contain at least one letter.') );
 		}
 		$this->set( 'title', $slug_title );
 

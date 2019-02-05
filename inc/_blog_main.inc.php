@@ -324,7 +324,7 @@ if( $resolve_extra_path )
 						// echo $path_elements[$i];
 						if( isset( $path_elements[$i] ) )
 						{
-							if( is_numeric( $path_elements[$i] ) )
+							if( preg_match( '#^\d{4}$#', $path_elements[$i] ) )
 							{ // We'll consider this to be the year
 								$m = $path_elements[$i++];
 								$Debuglog->add( 'Setting year from extra path info. $m=' . $m , 'params' );
@@ -335,18 +335,18 @@ if( $resolve_extra_path )
 									$posts = $Blog->get_setting( 'posts_per_page' );
 								}
 
-								if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
+								if( isset( $path_elements[$i] ) && preg_match( '#^(0[1-9]|1[0-2])$#', $path_elements[$i] ) )
 								{ // We'll consider this to be the month
 									$m .= $path_elements[$i++];
 									$Debuglog->add( 'Setting month from extra path info. $m=' . $m , 'params' );
 
-									if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
+									if( isset( $path_elements[$i] ) && preg_match( '#^(0[1-9]|[12][0-9]|3[01])$#', $path_elements[$i] ) )
 									{ // We'll consider this to be the day
 										$m .= $path_elements[$i++];
 										$Debuglog->add( 'Setting day from extra path info. $m=' . $m , 'params' );
 									}
 								}
-								elseif( isset( $path_elements[$i] ) && substr( $path_elements[$i], 0, 1 ) == 'w' )
+								elseif( isset( $path_elements[$i] ) && preg_match( '#^w(0?[0-9]|[1-4][0-9]|5[0-3])$#', $path_elements[$i] ) )
 								{ // We consider this a week number
 									$w = substr( $path_elements[$i], 1, 2 );
 								}
