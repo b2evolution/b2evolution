@@ -121,16 +121,15 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 		/**
 		 * Set view cursor location
 		 *
-		 * @param boolean Set cursor before the view
+		 * @param boolean True to set cursor before the view, False to set cursor after the view
 		 * @param object View
 		 */
 		function setViewCursor( before, view )
 		{
-			var location = before ? 'before' : 'after',
-					offset = before ? 0 : 1;
+			var location = before ? 'before' : 'after';
 
 			deselect();
-			editor.selection.setCursorLocation( editor.dom.select( '.evo-view-selection-' + location, view )[0], offset );
+			editor.selection.setCursorLocation( editor.dom.select( '.evo-view-selection-' + location, view )[0] );
 			editor.nodeChanged();
 		}
 
@@ -761,8 +760,7 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 					}
 
 					if( ! view )
-					{
-						// Make sure we don't eat any content.
+					{	// Make sure we don't eat any content.
 						if( key === VK.BACKSPACE )
 						{
 							if( editor.dom.isEmpty( node ) )
@@ -787,10 +785,163 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 						return;
 					}
 
-					if( isSpecialKey( key ) )
-					{
-						// ignore
+					var cursorBefore = dom.hasClass( view, 'evo-view-selection-before' );
+					var cursorAfter  = dom.hasClass( view, 'evo-view-selection-after' );
+
+					if( ! cursorBefore && ! cursorAfter )
+					{	// Cursor not before or after a View, exit:
 						return;
+					}
+
+					if( isSpecialKey( key ) )
+					{	// ignore
+						return;
+					}
+
+					if( ( cursorAfter && key === VK.UP ) || ( cursorBefore && key === VK.BACKSPACE ) )
+					{
+						if( view.previousSibling )
+						{
+							if( getView( view.previousSibling ) )
+							{
+								setViewCursor( false, view.previousSibling );
+							}
+							else
+							{
+								if( dom.isEmpty( view.previousSibling ) && key === VK.BACKSPACE )
+								{
+									dom.remove( view.previousSibling );
+								}
+								else
+								{
+									selection.select( view.previousSibling, true );
+									selection.collapse();
+								}
+							}
+						}
+						else
+						{
+							setViewCursor( true, view );
+						}
+						event.preventDefault();
+					}
+					else if( cursorAfter && ( key === VK.DOWN || key === VK.RIGHT ) )
+					{
+						if( view.nextSibling )
+						{
+							if( getView( view.nextSibling ) )
+							{
+								setViewCursor( key === VK.RIGHT, view.nextSibling );
+							}
+							else if( view.nextSibling.nodeType == Node.TEXT_NODE )
+							{
+								selection.select( view.nextSibling );
+							}
+							else
+							{
+								selection.setCursorLocation( view.nextSibling );
+							}
+						}
+						else if( view.parentNode.nextSibling )
+						{
+							if( getView( view.parentNode.nextSibling ) )
+							{
+								setViewCursor( key === VK.RIGHT, view.parentNode.nextSibling );
+							}
+							else
+							{
+								selection.setCursorLocation( view.parentNode.nextSibling );
+							}
+						}
+						event.preventDefault();
+					}
+					else if( cursorBefore && ( key === VK.UP || key ===  VK.LEFT ) )
+					{
+						if( view.previousSibling )
+						{
+							if( getView( view.previousSibling ) )
+							{
+								setViewCursor( key === VK.UP, view.previousSibling );
+							}
+							else
+							{
+								selection.select( view.previousSibling, true );
+								selection.collapse();
+							}
+						}
+						else if( view.parentNode.previousSibling )
+						{
+							if( getView( view.parentNode.previousSibling ) )
+							{
+								setViewCursor( key === VK.RIGHT, view.parentNode.previousSibling );
+							}
+							else
+							{
+								selection.setCursorLocation( view.parentNode.previousSibling );
+							}
+						}
+						event.preventDefault();
+					}
+					else if( cursorBefore && key === VK.DOWN )
+					{
+						if( view.nextSibling )
+						{
+							if( getView( view.nextSibling ) )
+							{
+								setViewCursor( true, view.nextSibling );
+							}
+							else
+							{
+								selection.setCursorLocation( view.nextSibling, 0 );
+							}
+						}
+						else
+						{
+							setViewCursor( false, view );
+						}
+						event.preventDefault();
+					}
+					else if( ( cursorAfter && key === VK.LEFT ) || ( cursorBefore && key === VK.RIGHT ) )
+					{
+						select( view );
+						event.preventDefault();
+					}
+					else if( cursorAfter && key === VK.BACKSPACE )
+					{
+						removeView( view );
+						event.preventDefault();
+					}
+					else if( cursorBefore && key === VK.DELETE )
+					{
+						var nextView = getView( view.nextSibling );
+
+						removeView( view );
+
+						if( nextView )
+						{
+							setViewCursor( true, nextView );
+						}
+
+						event.preventDefault();
+					}
+					else if( cursorAfter && key === VK.DELETE )
+					{
+						var nextView = getView( view.nextSibling );
+
+						if( nextView )
+						{
+							setViewCursor( true, nextView );
+						}
+
+						event.preventDefault();
+					}
+					else if( cursorAfter )
+					{
+						handleEnter( view );
+					}
+					else if( cursorBefore )
+					{
+						handleEnter( view , true, key );
 					}
 
 					if( key === VK.ENTER )
@@ -801,69 +952,6 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 			} );
 
 		editor.on( 'keyup', function() {
-				var key = event.keyCode,
-						dom = editor.dom,
-						selection = editor.selection,
-						currentNode = selection.getNode();
-
-				view = getView( currentNode );
-
-				if( view )
-				{
-					beforeView = dom.hasClass( currentNode, 'evo-view-selection-before' );
-					afterView = dom.hasClass( currentNode, 'evo-view-selection-after' );
-					console.log( beforeView, afterView );
-
-					if( key === VK.RIGHT || key === VK.DOWN )
-					{
-						if( beforeView )
-						{
-							select( view );
-						}
-						else if( afterView )
-						{
-							viewWrapper = getParent( currentNode, 'evo-view-wrap' );
-							nextView = getView( viewWrapper.nextElementSibling );
-							if( nextView )
-							{
-								select( nextView );
-							}
-							else if( viewWrapper.nextSibling )
-							{
-								selection.setCursorLocation( viewWrapper.nextSibling );
-							}
-							else if( viewWrapper.parentNode.nextSibling )
-							{
-								selection.setCursorLocation( viewWrapper.parentNode.nextSibling );
-							}
-						}
-					}
-					else if( key === VK.LEFT || key === VK.UP )
-					{
-						if( beforeView )
-						{
-							viewWrapper = getParent( currentNode, 'evo-view-wrap' );
-							previousView = getView( viewWrapper.previousElementSibling );
-							if( previousView )
-							{
-								select( previousView );
-							}
-							else if( viewWrapper.previousSibling )
-							{
-								selection.setCursorLocation( viewWrapper.previousSibling );
-							}
-							else if( viewWrapper.parentNode.previousSibling )
-							{
-								selection.setCursorLocation( viewWrapper.parentNode.previousSibling, 1 );
-							}
-						}
-						else if( afterView )
-						{
-							select( view );
-						}
-					}
-				}
-
 				if( toRemove )
 				{
 					removeView( toRemove );

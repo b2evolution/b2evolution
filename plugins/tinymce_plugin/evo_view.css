@@ -7,11 +7,6 @@
 	background-color: #eee;
 }
 
-.evo-view-wrap[data-evo-view-type="thumbnail"] {
-	height: 0px;
-	width: 0px;
-}
-
 /* delegate the handling of the selection to the wpview tinymce plugin */
 .evo-view-wrap,
 .evo-view-wrap * {
