@@ -49,6 +49,7 @@ class webmention_plugin extends Plugin
 
 		$this->ping_service_name = 'Webmention';
 		$this->ping_service_note = T_('Send webmentions to all URLs detected in a posted Item.');
+		$this->ping_service_note_not_public_coll = T_('This collection cannot receive webmentions because it is not public.');
 		$this->ping_service_process_message = T_('Sending webmention pings to URLs mentioned in the post').'...';
 		$this->ping_service_setting_title = T_('Send Webmention');
 	}
@@ -97,7 +98,7 @@ class webmention_plugin extends Plugin
 				continue;
 			}
 
-			if( ! ( $response = $MentionClient->sendWebmention( $source_url, $target_url ) ) ||
+			if( ! ( $response = $MentionClient->sendWebmention( $source_url, $target_url, array( 'excerpt' => $Item->get( 'excerpt' ) ) ) ) ||
 			    $response['code'] != 202 )
 			{	// Webmention couldn't be accepted by some reason:
 				$failed_urls[] = get_link_tag( $target_url, '', '', 255 ).( empty( $response['body'] ) ? '' : ' ('.T_('Error').': <code>'.$response['body'].'</code>)' );

@@ -61,7 +61,12 @@ $Form->begin_fieldset( T_('After each new post...').get_manual_link('after_each_
 			$checked = in_array( $loop_Plugin->code, $ping_plugins );
 			$Form->checkbox_input( 'blog_ping_plugins[]', $checked,
 				isset( $loop_Plugin->ping_service_setting_title ) ? $loop_Plugin->ping_service_setting_title : sprintf( /* TRANS: %s is a ping service name */ T_('Ping %s'), $loop_Plugin->ping_service_name ),
-				array('value' => $loop_Plugin->code, 'note' => $loop_Plugin->ping_service_note ) );
+				array(
+					'value' => $loop_Plugin->code,
+					'note'  => $loop_Plugin->ping_service_note
+						// Display additional note for not public collection:
+						.( $edited_Blog->get_setting( 'allow_access' ) != 'public' && isset( $loop_Plugin->ping_service_note_not_public_coll ) ? ' <span class="red">'.$loop_Plugin->ping_service_note_not_public_coll.'</span>' : '' )
+				) );
 
 			while( ($key = array_search($loop_Plugin->code, $ping_plugins)) !== false )
 			{

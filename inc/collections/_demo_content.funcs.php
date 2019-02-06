@@ -244,11 +244,6 @@ function create_blog(
 	$Blog->set( 'owner_user_ID', $owner_user_ID );
 	$Blog->set( 'normal_skin_ID', $blog_skin_ID );
 
-	if( $local_installation )
-	{ // Turn off all ping plugins if the installation is local/test/intranet
-		$Blog->set_setting( 'ping_plugins', '' );
-	}
-
 	$Blog->dbinsert();
 
 	if( $install_test_features )
@@ -340,6 +335,11 @@ function create_blog(
 		$Blog->set_setting( 'post_moderation_statuses', implode( ',', $post_moderation_statuses ) );
 		// Force enabled statuses regardless of previous settings
 		$Blog->set_setting( 'moderation_statuses', implode( ',', $enable_comment_moderation_statuses ) );
+	}
+
+	if( $local_installation || $Blog->get_setting( 'allow_access' ) == 'users' || $Blog->get_setting( 'allow_access' ) == 'members' )
+	{	// Turn off all ping plugins if the installation is local/test/intranet or this is a not public collection:
+		$Blog->set_setting( 'ping_plugins', '' );
 	}
 
 	$Blog->dbupdate();

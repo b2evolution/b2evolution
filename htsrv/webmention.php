@@ -55,6 +55,7 @@ function webmention_response( $error_code = 0, $error_message = '' )
 // Mandatory URls to post webmention comment:
 param( 'source', 'url', true );
 param( 'target', 'url', true );
+param( 'excerpt', 'string' );
 
 if( ! preg_match( '#/([a-z0-9\-_]+)[^/]*$#', $target, $item_url ) ||
     ! ( $ItemCache = & get_ItemCache() ) ||
@@ -76,7 +77,7 @@ $source_data = parse_url( $source );
 $webmention_Comment->set( 'author', ( isset( $source_data['host'] ) ? $source_data['host'] : '' ) );
 $webmention_Comment->set( 'author_IP', $Hit->IP );
 $webmention_Comment->set( 'date', date('Y-m-d H:i:s', $localtimenow ) );
-$webmention_Comment->set( 'content', $source );
+$webmention_Comment->set( 'content', $source.( empty( $excerpt ) ? '' : "\n".$excerpt ) );
 $target_Blog = & $target_Item->get_Blog();
 $webmention_Comment->set( 'status', $target_Blog->get_setting( 'new_feedback_status' ) );
 
