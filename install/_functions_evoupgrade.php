@@ -10277,6 +10277,35 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13080, 'Upgrading GeoIP plugin data file...' ) )
+	{	// part of 6.10.6-stable
+		if( $Plugins_admin = & get_Plugins_admin() &&
+		    $geoip_Plugin = & $Plugins_admin->get_by_code( 'evo_GeoIP' ) &&
+		    $geoip_Plugin->status == 'enabled' )
+		{	// Try to donwload only when plugin is enabled:
+			try
+			{	// Download GeoIP data file:
+				$geoip_Plugin->download_geoip_data();
+			}
+			catch( Exception $ex )
+			{	// Unexpected error:
+				if( ! is_object( $Plugins ) )
+				{	// Initiliaze Plugins object because it is required in the function Plugin->set_status():
+					load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+					$Plugins = new Plugins();
+				}
+				// Disable plugin if new data file cannot be downloaded as expected:
+				$status_result = $geoip_Plugin->set_status( 'needs_config' );
+				// Display error message:
+				echo get_install_format_text( '<span class="text-danger"><evo:error>'
+						.'<b>UNEXPECTED ERROR</b>: '.nl2br( $ex->getMessage() )
+						.( $status_result ? ' <b>WARNING:</b> The plugin #'.$geoip_Plugin->ID.'('.$geoip_Plugin->name.') has been disabled!' : '' )
+					.'</evo:error></span> ' );
+			}
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

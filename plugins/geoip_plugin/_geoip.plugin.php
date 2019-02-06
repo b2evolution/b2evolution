@@ -562,7 +562,6 @@ jQuery( document ).ready( function()
 		if( $action == 'geoip_download' && ! ( isset( $template_action ) && $template_action == 'deferred_admin_tool_action' ) )
 		{
 			$this->download_geoip_data();
-			$this->print_tool_log( '<br /><br />' );
 		}
 		else
 		{
@@ -811,7 +810,8 @@ jQuery( document ).ready( function()
 		// Display a process of downloading of GeoLite2-Country.mmdb
 		global $admin_url;
 
-		$this->print_tool_log( sprintf( T_('Downloading GeoLite2-Country.mmdb file from the url: %s ...'),
+		$this->print_tool_log( sprintf( T_('Downloading %s file from the url: %s ...'),
+			'<code>'.$this->geoip_file_name.'</code>',
 			'<a href="'.$this->geoip_download_url.'" target="_blank">'.$this->geoip_download_url.'</a>' ) );
 
 		// DOWNLOAD:
@@ -820,7 +820,7 @@ jQuery( document ).ready( function()
 		{	// Download failed
 			if( empty( $info['error'] ) )
 			{	// Some unknown error
-				$this->print_tool_log( T_( 'The URL is not available. It may correspond to an old version of the GeoLite2-Country.mmdb file.' ), 'error' );
+				$this->print_tool_log( sprintf( T_('The URL is not available. It may correspond to an old version of the %s file.'), '<code>'.$this->geoip_file_name.'</code>' ), 'error' );
 			}
 			else
 			{	// Display an error of request
@@ -837,40 +837,40 @@ jQuery( document ).ready( function()
 		{
 			if( ! is_writable( $geoip_dat_file ) )
 			{
-				$this->print_tool_log( sprintf( T_('File %s must be writable to update it. Please fix the write permissions and try again.'), '<b>'.$geoip_dat_file.'</b>' ), 'error' );
+				$this->print_tool_log( sprintf( T_('File %s must be writable to update it. Please fix the write permissions and try again.'), '<code>'.$geoip_dat_file.'</code>' ), 'error' );
 				return;
 			}
 		}
 		elseif( ! is_writable( $plugin_dir ) )
 		{	// Check the write rights
-			$this->print_tool_log( sprintf( T_('Plugin folder %s must be writable to receive %s. Please fix the write permissions and try again.'), '<b>'.$plugin_dir.'</b>', $this->geoip_file_name ), 'error' );
+			$this->print_tool_log( sprintf( T_('Plugin folder %s must be writable to receive %s. Please fix the write permissions and try again.'), '<code>'.$plugin_dir.'</code>', '<code>'.$this->geoip_file_name.'</code>' ), 'error' );
 			return;
 		}
 
 		$gzip_tar_file_name = explode( '/', $this->geoip_download_url );
 		$gzip_tar_file_name = $gzip_tar_file_name[ count( $gzip_tar_file_name ) - 1 ];
-		$gzip_tar_file_path = sys_get_temp_dir().'/'.$gzip_tar_file_name;
+		$gzip_tar_file_path = rtrim( sys_get_temp_dir(), '/' ).'/'.$gzip_tar_file_name;
 
 		if( ! save_to_file( $gzip_contents, $gzip_tar_file_path, 'w' ) )
 		{	// Impossible to save file...
-			$this->print_tool_log( sprintf( T_( 'Unable to create file: %s' ), '<b>'.$gzip_tar_file_path.'</b>' ), 'error' );
+			$this->print_tool_log( sprintf( T_( 'Unable to create file: %s' ), '<code>'.$gzip_tar_file_path.'</code>' ), 'error' );
 
 			if( file_exists( $gzip_tar_file_path ) )
 			{	// Remove file from disk
 				if( ! @unlink( $gzip_tar_file_path ) )
 				{	// File exists without the write rights
-					$this->print_tool_log( sprintf( T_( 'Unable to remove file: %s' ), '<b>'.$gzip_tar_file_path.'</b>' ), 'error' );
+					$this->print_tool_log( sprintf( T_('Unable to remove file: %s'), '<code>'.$gzip_tar_file_path.'</code>' ), 'error' );
 				}
 			}
 			return;
 		}
 
 		// UNPACK:
-		$this->print_tool_log( sprintf( T_('Extracting of the file %s...'), '<b>'.$gzip_tar_file_path.'</b>' ) );
+		$this->print_tool_log( sprintf( T_('Extracting of the file %s...'), '<code>'.$gzip_tar_file_path.'</code>' ) );
 
 		if( ! defined( 'Phar::TAR' ) )
 		{	// No extension
-			$this->print_tool_log( T_( 'There is no \'phar\' extension installed!' ), 'error' );
+			$this->print_tool_log( sprintf( T_('There is no %s extension installed!'), '<code>phar</code>' ), 'error' );
 			return;
 		}
 
@@ -893,39 +893,38 @@ jQuery( document ).ready( function()
 				}
 				else
 				{	// Failed removing
-					$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), $gzip_file_path ), 'warning' );
+					$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), '<code>'.$gzip_file_path.'</code>' ), 'warning' );
 				}
 				break;
 			}
 		}
 
-		$this->print_tool_log( sprintf( T_('Remove gzip file %s...'), '<b>'.$gzip_tar_file_path.'</b>' ) );
+		$this->print_tool_log( sprintf( T_('Remove gzip file %s...'), '<code>'.$gzip_tar_file_path.'</code>' ) );
 		if( ! @unlink( $tar_file_path ) )
 		{	// Failed to remove tar file:
-			$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), $tar_file_path ), 'warning' );
+			$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), '<code>'.$tar_file_path.'</code>' ), 'warning' );
 		}
 		if( @unlink( $gzip_tar_file_path ) )
 		{
-			$this->print_tool_log( ' OK.<br />' );
+			$this->print_tool_log( ' OK.' );
 		}
 		else
 		{	// Failed to remove gzip file:
-			$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), $gzip_tar_file_path ), 'warning' );
+			$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), '<code>'.$gzip_tar_file_path.'</code>' ), 'warning' );
 		}
 
 		// Success message:
-		$this->print_tool_log( sprintf( T_('%s file was downloaded successfully.'), $this->geoip_file_name ), 'success' );
+		$this->print_tool_log( sprintf( T_('%s file was downloaded successfully.'), '<code>'.$this->geoip_file_name.'</code>' ), 'success' );
 
 		// Try to enable plugin automatically:
 		global $Plugins;
 		$enable_return = $this->BeforeEnable();
 		if( $enable_return === true )
 		{	// Successfully enabled the plugin:
-			$this->print_tool_log( T_('The plugin has been enabled.'), 'success' );
-
 			if( $this->status != 'enabled' )
 			{	// Enable this plugin automatically:
 				$Plugins->set_Plugin_status( $this, 'enabled' );
+				$this->print_tool_log( T_('The plugin has been enabled.'), 'success' );
 			}
 		}
 		else
