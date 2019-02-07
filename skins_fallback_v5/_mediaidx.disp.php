@@ -15,46 +15,20 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $thumbnail_sizes;
 
-if( empty( $params ) )
-{ // Initialize array with params
-	$params = array();
-}
-
-// Merge the params from current skin
-$params = array_merge( array(
-		'mediaidx_thumb_size' => 'fit-80x80'
-	), $params );
-
-$photocell_styles = '';
-if( isset( $thumbnail_sizes[ $params['mediaidx_thumb_size'] ] ) )
-{
-	$photocell_styles = ' style="width:'.$thumbnail_sizes[ $params['mediaidx_thumb_size'] ][1].'px;'
-		.'height:'.$thumbnail_sizes[ $params['mediaidx_thumb_size'] ][2].'px"';
-}
-
-// --------------------------------- START OF MEDIA INDEX --------------------------------
-skin_widget( array(
-		// CODE for the widget:
-		'widget' => 'coll_media_index',
-		// Optional display params
-		'block_start' => '',
-		'block_end' => '',
-		'block_display_title' => false,
-		'thumb_size' => $params['mediaidx_thumb_size'],
-		'thumb_layout' => 'grid',
-		'grid_start' => '<div class="image_index">',
-		'grid_end' => '</div>',
-		'grid_nb_cols' => 8,
-		'grid_colstart' => '',
-		'grid_colend' => '',
-		'grid_cellstart' => '<div><span'.$photocell_styles.'>',
-		'grid_cellend' => '</span></div>',
-		'order_by' => get_blog_order( $Blog, 'field' ),
-		'order_dir' => get_blog_order( $Blog, 'dir' ),
-		'limit' => 1000,
-	) );
-// ---------------------------------- END OF MEDIA INDEX ---------------------------------
+// ------------------------- "Photo Index" CONTAINER EMBEDDED HERE --------------------------
+skin_container( NT_('Photo Index'), array(
+	// The following params will be used as defaults for widgets included in this container:
+	// This will enclose each widget in a block:
+	'block_start'    => '<div class="evo_widget $wi_class$">',
+	'block_end'      => '</div>',
+	'grid_start'     => '<div class="image_index">',
+	'grid_end'       => '</div>',
+	'grid_colstart'  => '',
+	'grid_colend'    => '',
+	'grid_cellstart' => '<div><span>',
+	'grid_cellend'   => '</span></div>',
+) );
+// ----------------------------- END OF "Photo Index" CONTAINER -----------------------------
 
 ?>

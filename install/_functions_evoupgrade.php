@@ -11393,6 +11393,35 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15370, 'Installing new widget container "Photo Index"...' ) )
+	{	// part of 7.0.0-alpha
+		install_new_default_widgets( 'photo_index' );
+		// Move skin setting "Thumbnail size in Media index" to widget "Photo Index" of new created container "Photo Index":
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_ID, wi_params, cset_value' );
+		$SQL->FROM( 'T_widget__container' );
+		$SQL->FROM_add( 'INNER JOIN T_coll_settings ON cset_coll_ID = wico_coll_ID' );
+		$SQL->FROM_add( 'INNER JOIN T_widget__widget ON wi_wico_ID = wico_ID' );
+		$SQL->WHERE( 'wico_code = "photo_index"' );
+		$SQL->WHERE_and( 'wi_code = "coll_media_index"' );
+		$SQL->WHERE_and( 'cset_name LIKE "skin%mediaidx\_thumb\_size"' );
+		$skin_settings = $DB->get_results( $SQL );
+		foreach( $skin_settings as $skin_setting )
+		{
+			$wi_params = empty( $skin_setting->wi_params ) ? array() : @unserialize( $skin_setting->wi_params );
+			if( ! is_array( $wi_params ) )
+			{
+				$wi_params = array();
+			}
+			// Update widget thumb size setting with value what was stored in skin settings:
+			$wi_params['thumb_size'] = $skin_setting->cset_value;
+			$DB->query( 'UPDATE T_widget__widget
+				  SET wi_params = '.$DB->quote( serialize( $wi_params ) ).'
+				WHERE wi_ID = '.$DB->quote( $skin_setting->wi_ID ) );
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

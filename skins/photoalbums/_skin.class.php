@@ -225,13 +225,6 @@ class photoalbums_Skin extends Skin
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
 				),
-				'mediaidx_thumb_size' => array(
-					'label' => T_('Thumbnail size for media index'),
-					'note' => '',
-					'defaultvalue' => 'fit-128x128',
-					'options' => get_available_thumb_sizes(),
-					'type' => 'select',
-				),
 				'posts_thumb_size' => array(
 					'label' => T_('Thumbnail size in post list'),
 					'note' => '',

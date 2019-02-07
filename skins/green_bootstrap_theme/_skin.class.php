@@ -581,13 +581,6 @@ class green_bootstrap_theme_Skin extends Skin
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
 					),
-					'mediaidx_thumb_size' => array(
-						'label' => T_('Thumbnail size in Media index'),
-						'note' => T_('Select thumbnail size for Media index images') . ' (disp=mediaidx).',
-						'defaultvalue' => 'fit-256x256',
-						'options' => get_available_thumb_sizes(),
-						'type' => 'select',
-					),
 					'banner_public' => array(
 						'label' => T_('Display "Public" banner'),
 						'note' => T_('Display banner for "Public" albums (albums & comments)'),

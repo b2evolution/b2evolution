@@ -119,9 +119,6 @@ class photoblog_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
-		// Load to use function get_available_thumb_sizes()
-		load_funcs( 'files/model/_image.funcs.php' );
-
 		$r = array_merge( array(
 				'menu_bg_color' => array(
 					'label' => T_('Menu background color'),
@@ -218,13 +215,6 @@ class photoblog_Skin extends Skin
 					'note' => T_('Check to enable auto-completion of usernames entered after a "@" sign in the comment forms'),
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
-				),
-				'mediaidx_thumb_size' => array(
-					'label' => T_('Thumbnail size for media index'),
-					'note' => '',
-					'defaultvalue' => 'fit-80x80',
-					'options' => get_available_thumb_sizes(),
-					'type' => 'select',
 				),
 			), parent::get_param_definitions( $params ) );
 

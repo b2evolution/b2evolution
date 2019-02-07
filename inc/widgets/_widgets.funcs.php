@@ -349,6 +349,16 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 20, 'content_block', 'params' => array( 'item_slug' => 'register-content' ) ),
 	);
 
+	/* Photo Index */
+	$default_widgets['photo_index'] = array(
+		array( 10, 'coll_media_index', 'params' => array(
+				'title'        => '',
+				'thumb_size'   => 'fit-256x256',
+				'thumb_layout' => 'grid',
+				'grid_nb_cols' => 8,
+				'limit'        => 1000,
+			) ),
+	);
 
 	/* Mobile Footer */
 	$default_widgets['mobile_footer'] = array(
