@@ -38,11 +38,11 @@ $Form->hidden( 'blog', $edited_Blog->ID );
 $Form->begin_fieldset( T_('After each new post...').get_manual_link('after_each_new_post') );
 	if( $edited_Blog->get_setting( 'allow_access' ) == 'users' )
 	{
-		echo '<p class="center orange">'.T_('This collection is for logged in users only.').' '.T_('The ping plugins can be enabled only for public collection.').'</p>';
+		echo '<p class="center orange">'.T_('This collection is for logged in users only.').' '.T_('The ping plugins can be enabled only for public collections.').'</p>';
 	}
 	elseif( $edited_Blog->get_setting( 'allow_access' ) == 'members' )
 	{
-		echo '<p class="center orange">'.T_('This collection is for members only.').' '.T_('The ping plugins can be enabled only for public collection.').'</p>';
+		echo '<p class="center orange">'.T_('This collection is for members only.').' '.T_('The ping plugins can be enabled only for public collections.').'</p>';
 	}
 	$ping_plugins = preg_split( '~\s*,\s*~', $edited_Blog->get_setting( 'ping_plugins' ), -1, PREG_SPLIT_NO_EMPTY );
 
