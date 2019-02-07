@@ -98,7 +98,7 @@ class webmention_plugin extends Plugin
 			}
 
 			if( ! ( $response = $MentionClient->sendWebmention( $source_url, $target_url, array( 'excerpt' => $Item->get( 'excerpt' ) ) ) ) ||
-			    $response['code'] != 202 )
+			    $response['code'] < 200 || $response['code'] > 299 ) // Any 2xx response code must be considered a success
 			{	// Webmention couldn't be accepted by some reason:
 				$failed_urls[] = get_link_tag( $target_url, '', '', 255 ).( empty( $response['body'] ) ? '' : ' ('.T_('Error').': <code>'.$response['body'].'</code>)' );
 				continue;
