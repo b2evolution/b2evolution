@@ -3077,9 +3077,15 @@ class Blog extends DataObject
 				}
 				break;
 
+			case 'webmentions':
+				if( $this->get_setting( 'allow_access' ) != 'public' )
+				{	// Disable receiving of webmentions for not public collections:
+					$result = 0;
+				}
+
 			case 'ping_plugins':
 				if( $this->get_setting( 'allow_access' ) != 'public' )
-				{	// Disable ping plugins for not public collection:
+				{	// Disable ping plugins for not public collections:
 					$result = '';
 				}
 		}
