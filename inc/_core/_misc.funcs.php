@@ -3299,7 +3299,7 @@ function debug_info( $force = false, $force_clean = false )
 			{
 				echo "\n".'== Debug messages from redirected page (#'.( $k + 1 ).') =='."\n"
 					.'See below for the Debuglog from the current request.'."\n";
-				echo base64_decode( $sess_debug_info );
+				echo gzdecode( $sess_debug_info );
 			}
 			else
 			{
@@ -3307,7 +3307,7 @@ function debug_info( $force = false, $force_clean = false )
 				echo '<h3 id="debug_sess_debug_info_'.( $k + 1 ).'" style="color:#f00">Debug messages from redirected page (#'.( $k + 1 ).')</h3>'
 					// link to real Debuglog:
 					.'<p><a href="#debug_current">See below for the debug from the current request.</a></p>';
-				$sess_debug_info = base64_decode( $sess_debug_info );
+				$sess_debug_info = gzdecode( $sess_debug_info );
 				// Fix all anchors to proper work with SESSION debug info and do NOT mix with current debug info where same achors are used but without number suffix ($k + 1):
 				echo preg_replace( '/(id="|href="#)(evo_debug_queries|debug_info_cat_[^"]+)"/', '$1$2_'.( $k + 1 ).'"', $sess_debug_info );
 				echo '</div>';

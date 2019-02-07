@@ -833,10 +833,6 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 							{
 								setViewCursor( key === VK.RIGHT, view.nextSibling );
 							}
-							else if( view.nextSibling.nodeType == Node.TEXT_NODE )
-							{
-								selection.select( view.nextSibling );
-							}
 							else
 							{
 								selection.setCursorLocation( view.nextSibling );
@@ -877,7 +873,8 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 							}
 							else
 							{
-								selection.setCursorLocation( view.parentNode.previousSibling );
+								selection.select( view.parentNode.previousSibling, true );
+								selection.collapse( false );
 							}
 						}
 						event.preventDefault();

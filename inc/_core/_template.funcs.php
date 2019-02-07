@@ -275,7 +275,7 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 				$sess_debug_infos = array();
 			}
 			// NOTE: We must encode data in order to avoid error "Session data corrupted" because of special chars on unserialize the data:
-			$sess_debug_infos[] = base64_encode( $current_debug_info );
+			$sess_debug_infos[] = gzencode( $current_debug_info );
 			$Session->set( 'debug_infos', $sess_debug_infos, 60 /* expire in 60 seconds */ );
 		}
 
