@@ -49,7 +49,6 @@ class webmention_plugin extends Plugin
 
 		$this->ping_service_name = 'Webmention';
 		$this->ping_service_note = T_('Send webmentions to all URLs detected in a posted Item.');
-		$this->ping_service_note_not_public_coll = T_('This collection cannot receive webmentions because it is not public.');
 		$this->ping_service_process_message = T_('Sending webmention pings to URLs mentioned in the post').'...';
 		$this->ping_service_setting_title = T_('Send Webmention');
 	}

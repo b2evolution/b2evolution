@@ -142,7 +142,9 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 	{	// Only admin can turn ON this setting
 		$Form->checkbox( 'blog_webmentions', $edited_Blog->get_setting( 'webmentions' ),
 			T_('Webmentions').( ! $edited_Blog->get_setting( 'webmentions' ) ? get_admin_badge() : '' ),
-			T_('Allow other bloggers to send webmentions to this collection, letting you know when they refer to it.') );
+			T_('Allow other bloggers to send webmentions to this collection, letting you know when they refer to it.')
+			// Display additional note for not public collection:
+			.( $edited_Blog->get_setting( 'allow_access' ) != 'public' ? ' <span class="red">'.T_('This collection cannot receive webmentions because it is not public.').'</span>' : '' ) );
 	}
 
 	$Form->checkbox( 'autocomplete_usernames', $edited_Blog->get_setting( 'autocomplete_usernames' ),

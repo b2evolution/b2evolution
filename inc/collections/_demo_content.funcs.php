@@ -337,7 +337,7 @@ function create_blog(
 		$Blog->set_setting( 'moderation_statuses', implode( ',', $enable_comment_moderation_statuses ) );
 	}
 
-	if( $local_installation || $Blog->get_setting( 'allow_access' ) == 'users' || $Blog->get_setting( 'allow_access' ) == 'members' )
+	if( $local_installation || $Blog->get_setting( 'allow_access' ) != 'public' )
 	{	// Turn off all ping plugins if the installation is local/test/intranet or this is a not public collection:
 		$Blog->set_setting( 'ping_plugins', '' );
 	}
