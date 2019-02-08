@@ -48,7 +48,7 @@ $CommentList = new CommentList2( $Blog );
 
 // Filter list:
 $CommentList->set_filters( array(
-		'types'    => array( 'comment', 'trackback', 'pingback' ),
+		'types'    => array( 'comment', 'trackback', 'pingback', 'webmention' ),
 		'statuses' => get_inskin_statuses( $Blog->ID, 'comment' ),
 		'order'    => 'DESC',
 		'comments' => $Blog->get_setting( 'latest_comments_num' ),

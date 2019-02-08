@@ -111,7 +111,7 @@ class CommentList2 extends DataObjectList2
 				'exact' => 0,
 				'statuses' => NULL,
 				'expiry_statuses' => array( 'active' ), // Show active/expired comments
-				'types' => array( 'comment','trackback','pingback' ),
+				'types' => array( 'comment','trackback','pingback','webmention' ),
 				'orderby' => 'date',
 				'order' => !is_null( $this->Blog ) ? $this->Blog->get_setting('comments_orderdir') : 'DESC',
 				//'order' => 'DESC',

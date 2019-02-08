@@ -287,6 +287,25 @@ function & get_Plugins_admin()
 
 
 /**
+ * Get the Plugins
+ *
+ * @return object Plugins
+ */
+function & get_Plugins()
+{
+	global $Plugins;
+
+	if( ! is_object( $Plugins ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+		$Plugins = new Plugins();
+	}
+
+	return $Plugins;
+}
+
+
+/**
  * Get the UserCache
  *
  * @return UserCache

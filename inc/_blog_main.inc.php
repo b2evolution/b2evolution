@@ -298,9 +298,6 @@ if( $resolve_extra_path )
 					// Set a lot of defaults as if we had received a complex URL:
 					$m = '';
 					$more = 1; // Display the extended entries' text
-					$c = 1;    // Display comments
-					$tb = 1;   // Display trackbacks
-					$pb = 1;   // Display pingbacks
 
 					if( preg_match( '#^p([0-9]+)$#', $last_part, $req_post ) )
 					{ // The last param is of the form p000

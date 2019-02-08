@@ -639,8 +639,8 @@ class Blog extends DataObject
 				// Force enabled statuses regardless of previous settings
 				$this->set_setting( 'moderation_statuses', implode( ',', $enable_comment_moderation_statuses ) );
 			}
-			if( $this->get_setting( 'allow_access' ) == 'users' || $this->get_setting( 'allow_access' ) == 'members' )
-			{ // Disable site maps, feeds and ping plugins when access is restricted on this blog
+			if( $this->get_setting( 'allow_access' ) != 'public' )
+			{	// Disable site maps, feeds and ping plugins for not public collection:
 				$this->set_setting( 'enable_sitemaps', 0 );
 				$this->set_setting( 'feed_content', 'none' );
 				$this->set_setting( 'ping_plugins', '' );
@@ -914,8 +914,7 @@ class Blog extends DataObject
 		if( in_array( 'pings', $groups ) )
 		{ // we want to load the ping checkboxes:
 			$blog_ping_plugins = param( 'blog_ping_plugins', 'array:string', array() );
-			$blog_ping_plugins = array_unique($blog_ping_plugins);
-			$this->set_setting('ping_plugins', implode(',', $blog_ping_plugins));
+			$this->set_setting( 'ping_plugins', implode( ',', array_unique( $blog_ping_plugins ) ) );
 		}
 
 		if( in_array( 'home', $groups ) )
@@ -1224,6 +1223,11 @@ class Blog extends DataObject
 			if( $blog_allowtrackbacks != $this->get( 'allowtrackbacks' ) && ( $blog_allowtrackbacks == 0 || $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
 			{ // Only admin can turn ON this setting
 				$this->set( 'allowtrackbacks', $blog_allowtrackbacks );
+			}
+			$blog_webmentions = param( 'blog_webmentions', 'integer', 0 );
+			if( $blog_webmentions != $this->get_setting( 'webmentions' ) && ( $blog_webmentions == 0 || $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
+			{	// Only admin can turn ON this setting
+				$this->set_setting( 'webmentions', $blog_webmentions );
 			}
 			$this->set_setting( 'comments_orderdir', param( 'comments_orderdir', '/^(?:ASC|DESC)$/', 'ASC' ) );
 
@@ -3345,6 +3349,20 @@ class Blog extends DataObject
 							$result[ $subject_option ] = $subject_option;
 						}
 					}
+				}
+				break;
+
+			case 'webmentions':
+				if( $this->get_setting( 'allow_access' ) != 'public' )
+				{	// Disable receiving of webmentions for not public collections:
+					$result = 0;
+				}
+				break;
+
+			case 'ping_plugins':
+				if( $this->get_setting( 'allow_access' ) != 'public' )
+				{	// Disable ping plugins for not public collections:
+					$result = '';
 				}
 				break;
 

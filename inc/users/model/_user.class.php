@@ -2334,7 +2334,7 @@ class User extends DataObject
 			$SQL->SELECT( 'comment_status, COUNT(*)' );
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_author_user_ID = '.$this->ID );
-			$SQL->WHERE_and( 'comment_type IN ( "comment", "trackback", "pingback" )' );
+			$SQL->WHERE_and( 'comment_type IN ( "comment", "trackback", "pingback", "webmentions" )' );
 			$SQL->GROUP_BY( 'comment_status' );
 			$this->_num_comments = $DB->get_assoc( $SQL );
 

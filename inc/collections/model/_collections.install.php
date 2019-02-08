@@ -226,7 +226,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_comments (
 			comment_ID                 int(10) unsigned NOT NULL auto_increment,
 			comment_item_ID            int(10) unsigned NOT NULL default 0,
-			comment_type               enum('comment','linkback','trackback','pingback','meta') COLLATE ascii_general_ci NOT NULL default 'comment',
+			comment_type               enum('comment','linkback','trackback','pingback','meta','webmention') COLLATE ascii_general_ci NOT NULL default 'comment',
 			comment_status             ENUM('published','community','deprecated','protected','private','review','draft','trash') COLLATE ascii_general_ci DEFAULT 'draft' NOT NULL,
 			comment_in_reply_to_cmt_ID INT(10) unsigned NULL,
 			comment_author_user_ID     int unsigned NULL default NULL,

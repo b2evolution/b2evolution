@@ -545,7 +545,7 @@ if( $action == 'dashboard' )
 
 			// Filter list:
 			$CommentList->set_filters( array(
-					'types' => array( 'comment','trackback','pingback' ),
+					'types' => array( 'comment','trackback','pingback','webmention' ),
 					'statuses' => $user_modeartion_statuses,
 					'user_perm' => 'moderate',
 					'post_statuses' => array( 'published', 'community', 'protected' ),
