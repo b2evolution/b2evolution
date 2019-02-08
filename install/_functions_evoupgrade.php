@@ -10290,6 +10290,19 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13100, 'Updating collection ping plugin settings...' ) )
+	{	// part of 6.10.6-stable
+		load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
+		$CollectionSettings = new CollectionSettings();
+		// Remove webmention from default setting in order to don't enable webmentions plugin for collections on upgrade:
+		$default_ping_plugins = trim( preg_replace( '/(^|,)webmention(,|$)/', '$2', $CollectionSettings->get_default( 'ping_plugins' ) ), ',' );
+		$DB->query( 'INSERT INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+			SELECT blog_ID, "ping_plugins", '.$DB->quote( $default_ping_plugins ).'
+			  FROM T_blogs
+			 WHERE blog_ID NOT IN ( SELECT cset_coll_ID FROM T_coll_settings WHERE cset_name = "ping_plugins" )' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
