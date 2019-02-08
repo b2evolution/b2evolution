@@ -10282,10 +10282,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		if( $Plugins_admin = & get_Plugins_admin() &&
 		    $geoip_Plugin = & $Plugins_admin->get_by_code( 'evo_GeoIP' ) &&
 		    $geoip_Plugin->status == 'enabled' )
-		{	// Try to donwload only when plugin is enabled:
+		{	// Try to download only when plugin is installed and enabled:
 			try
 			{	// Download GeoIP data file:
 				$geoip_Plugin->download_geoip_data();
+				task_end( 'OK.' );
 			}
 			catch( Exception $ex )
 			{	// Unexpected error:
@@ -10300,10 +10301,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				echo get_install_format_text( '<span class="text-danger"><evo:error>'
 						.'<b>UNEXPECTED ERROR</b>: '.nl2br( $ex->getMessage() )
 						.( $status_result ? ' <b>WARNING:</b> The plugin #'.$geoip_Plugin->ID.'('.$geoip_Plugin->name.') has been disabled!' : '' )
+						.'<br />Please check the GeoIP plugin settings right after this upgrade has finished.'
 					.'</evo:error></span> ' );
+				task_end( '' );
 			}
 		}
-		upg_task_end();
+		else
+		{
+			task_end( 'Not needed - Plugin is not active.' );
+		}
+		upg_task_end( false );
 	}
 
 	/*
