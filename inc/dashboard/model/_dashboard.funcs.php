@@ -235,7 +235,7 @@ function get_comments_awaiting_moderation_number( $blog_ID )
 				INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID ';
 
 	$sql .= 'WHERE '.$Blog->get_sql_where_aggregate_coll_IDs('othercats.cat_blog_ID');
-	$sql .= ' AND comment_type IN (\'comment\',\'trackback\',\'pingback\') ';
+	$sql .= ' AND comment_type IN (\'comment\',\'trackback\',\'pingback\',\'webmention\') ';
 	$sql .= ' AND comment_status IN ( '.$moderation_statuses_condition.' )';
 	$sql .= ' AND '.statuses_where_clause();
 
@@ -274,7 +274,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 
 		// Filter list:
 		$CommentList->set_filters( array(
-				'types' => array( 'comment', 'trackback', 'pingback' ),
+				'types' => array( 'comment', 'trackback', 'pingback', 'webmention' ),
 				'statuses' => $moderation_statuses,
 				'comment_ID_list' => $exlude_ID_list,
 				'post_statuses' => array( 'published', 'community', 'protected' ),

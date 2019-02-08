@@ -95,8 +95,6 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 				'content_mode'      => 'auto',		// 'auto' will auto select depending on $disp-detail
 				'intro_mode'        => 'normal',	// Intro posts will be displayed in normal mode
 				'item_class'        => 'well evo_post evo_content_block',
-				'disp_comments'     => false,
-				'disp_comment_form' => false,
 				'disp_notification' => false,
 				'item_link_type'    => 'none',
 				'Item'              => $Item,
@@ -143,6 +141,13 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 		echo '<div class="evo_content_block">'; // Beginning of posts display
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( array(
+				'disp_comments'        => true,
+				'disp_comment_form'    => true,
+				'disp_trackbacks'      => false,
+				'disp_trackback_url'   => false,
+				'disp_pingbacks'       => false,
+				'disp_webmentions'     => false,
+				'disp_meta_comments'   => false,
 				'before_section_title' => '<h3 class="evo_comment__list_title">',
 				'after_section_title'  => '</h3>',
 				'Item'                 => $intro_Item,

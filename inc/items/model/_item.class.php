@@ -4971,6 +4971,18 @@ class Item extends ItemLight
 				if( $params['link_text_more'] == '#' ) $params['link_text_more'] = T_('%d pingbacks').' &raquo;';
 				break;
 
+			case 'webmentions':
+				if( ! $this->can_receive_webmentions() )
+				{ // Webmentions not allowed on this collection:
+					// We'll consider webmentions to follow the same restriction
+					return;
+				}
+				if( $params['link_title'] == '#' ) $params['link_title'] = T_('Display webmentions');
+				if( $params['link_text_zero'] == '#' ) $params['link_text_zero'] = T_('No webmention yet').' &raquo;';
+				if( $params['link_text_one'] == '#' ) $params['link_text_one'] = T_('1 webmention').' &raquo;';
+				if( $params['link_text_more'] == '#' ) $params['link_text_more'] = T_('%d webmentions').' &raquo;';
+				break;
+
 			default:
 				debug_die( "Unknown feedback type [{$params['type']}]" );
 		}
@@ -5042,6 +5054,7 @@ class Item extends ItemLight
 			case 'comments':
 			case 'trackbacks':
 			case 'pingbacks':
+			case 'webmentions':
 				break;
 			default:
 				debug_die( "Unknown feedback type [{$params['type']}]" );
@@ -5066,9 +5079,21 @@ class Item extends ItemLight
 
 
 	/**
+	 * Return true if webmentions are allowed
+	 *
+	 * @return boolean
+	 */
+	function can_receive_webmentions()
+	{
+		$this->load_Blog();
+		return $this->Blog->get_setting( 'webmentions' ) && $this->can_comment( NULL );
+	}
+
+
+	/**
 	 * Get text depending on number of comments
 	 *
-	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks)
+	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks/webmentions)
 	 * @param string Link text to display when there are 0 comments
 	 * @param string Link text to display when there is 1 comment
 	 * @param string Link text to display when there are >1 comments (include %d for # of comments)
@@ -5115,6 +5140,12 @@ class Item extends ItemLight
 				if( $zero == '#' ) $zero = '';
 				if( $one == '#' ) $one = T_('1 meta comment');
 				if( $more == '#' ) $more = T_('%d meta comments');
+				break;
+
+			case 'webmentions':
+				if( $zero == '#' ) $zero = '';
+				if( $one == '#' ) $one = T_('1 webmention');
+				if( $more == '#' ) $more = T_('%d webmentions');
 				break;
 
 			default:
@@ -5256,7 +5287,7 @@ class Item extends ItemLight
 	/**
 	 * Template function: Displays feeback moderation info
 	 *
-	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks)
+	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks/webmentions)
 	 * @param string String to display before the link (if comments are to be displayed)
 	 * @param string String to display after the link (if comments are to be displayed)
 	 * @param string Link text to display when there are 0 comments
@@ -8850,13 +8881,13 @@ class Item extends ItemLight
 
 			foreach( $ping_plugins as $plugin_code )
 			{
-				$Plugin = & $Plugins->get_by_code($plugin_code);
+				$Plugin = & $Plugins->get_by_code( $plugin_code );
 
 				if( $Plugin )
 				{
 					$ping_messages = array();
 					$ping_messages[] = array(
-						'message' => sprintf( T_('Pinging %s...'), $Plugin->ping_service_name ),
+						'message' => isset( $Plugin->ping_service_process_message ) ? $Plugin->ping_service_process_message : sprintf( /* TRANS: %s is a ping service name */ T_('Pinging %s...'), $Plugin->ping_service_name ),
 						'type' => 'note' );
 					$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
 

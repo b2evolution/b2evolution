@@ -138,6 +138,18 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 		$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Trackbacks').$trackbacks_title, $trackbacks_warning.T_('Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.') );
 	}
 
+	if( $perm_blog_admin || $edited_Blog->get_setting( 'webmentions' ) )
+	{	// Only admin can turn ON this setting
+		$Form->checkbox( 'blog_webmentions', $edited_Blog->get_setting( 'webmentions' ),
+			T_('Webmentions').( ! $edited_Blog->get_setting( 'webmentions' ) ? get_admin_badge() : '' ),
+			T_('Allow other bloggers to send webmentions to this collection, letting you know when they refer to it.')
+			// Display additional note for not public collection:
+			.( $edited_Blog->get_setting( 'allow_access' ) != 'public' ? ' <span class="red">'.T_('This collection cannot receive webmentions because it is not public.').'</span>' : '' ),
+			'', 1,
+			// Disable receiving of webmentions for not public collections:
+			$edited_Blog->get_setting( 'allow_access' ) != 'public' );
+	}
+
 	$Form->checkbox( 'autocomplete_usernames', $edited_Blog->get_setting( 'autocomplete_usernames' ),
 		T_( 'Autocomplete usernames in back-office' ), T_( 'Check to enable auto-completion of usernames entered after a "@" sign in the comment forms' ) );
 

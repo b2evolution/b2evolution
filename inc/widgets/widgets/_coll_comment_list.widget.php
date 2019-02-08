@@ -178,7 +178,7 @@ class coll_comment_list_Widget extends ComponentWidget
 		$CommentList = new CommentList2( $listBlog, $limit, 'CommentCache', $this->code.'_' );
 
 		$filters = array(
-				'types' => array( 'comment','trackback','pingback' ),
+				'types' => array( 'comment','trackback','pingback','webmentions' ),
 				'statuses' => explode( ',', $listBlog->get_setting( 'comment_inskin_statuses' ) ),
 				'order' => $order,
 				'comments' => $limit,
