@@ -6539,6 +6539,10 @@ class Blog extends DataObject
 					hideaftershow: '.( $this->get_setting( 'marketing_popup_show_repeat' ) ? 'false' : 'true' ).',
 					displayfreq: "'.$marketing_popup_show_frequency.'",
 				} )
+				jQuery( ".ddexitpop button.close" ).click( function()
+				{	// Hide popup on click top-right close icon button:
+					ddexitpop.hidepopup();
+				} )
 			} )
 			// ]]>
 			</script>';
