@@ -2519,6 +2519,26 @@ class Item extends ItemLight
 
 
 	/**
+	 * Get item custom field title by field index
+	 *
+	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
+	 * @return string|boolean FALSE if the field doesn't exist
+	 */
+	function get_custom_field_title( $field_index )
+	{
+		// Get all custom fields by item ID:
+		$custom_fields = $this->get_custom_fields_defs();
+
+		if( ! isset( $custom_fields[ $field_index ] ) )
+		{	// The requested field is not detected:
+			return false;
+		}
+
+		return $custom_fields[ $field_index ]['label'];
+	}
+
+
+	/**
 	 * Get item custom field value by field index
 	 *
 	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}

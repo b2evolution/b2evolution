@@ -5161,7 +5161,7 @@ class Blog extends DataObject
 				break;
 
 			default: // 'std'
-				$default_post_types = array( 'Post', 'Podcast Episode', 'Post with Custom Fields', 'Child Post' );
+				$default_post_types = array( 'Post', 'Podcast Episode', 'Post with Custom Fields', 'Child Post', 'Recipe' );
 				break;
 		}
 

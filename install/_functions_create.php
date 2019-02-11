@@ -375,8 +375,12 @@ function create_default_data()
 			'use_comment_expiration' => 'never',
 		);
 	$post_types[] = array(
-			'name' => 'Bug Report',
-			'allow_html'     => 0,
+			'name'       => 'Bug Report',
+			'allow_html' => 0,
+		);
+	$post_types[] = array(
+			'name'          => 'Recipe',
+			'template_name' => 'recipe',
 		);
 	// Default settings:
 	$post_type_default_settings = array(
@@ -419,6 +423,7 @@ function create_default_data()
 	// Item type custom fields:
 	$parent_ityp_ID = 3;
 	$child_ityp_ID = 4;
+	$recipe_ityp_ID = 20;
 	$custom_fields = array(
 		// for Item Type "Post with Custom Fields":
 		array(
@@ -546,6 +551,87 @@ function create_default_data()
 			'format'          => '#yes#;;#no#;n/a',
 			'cell_class'      => 'right',
 		),
+		// for Item Type "Recipe":
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => T_('Course'),
+			'name'            => 'course',
+			'type'            => 'varchar',
+			'order'           => 1,
+			'note'            => T_('E-g: ').'"'.T_('Dessert').'"',
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => T_('Cuisine'),
+			'name'            => 'cuisine',
+			'type'            => 'varchar',
+			'order'           => 2,
+			'note'            => T_('E-g: ').'"'.T_('Italian').'"',
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => T_('Servings'),
+			'name'            => 'servings',
+			'order'           => 3,
+			'note'            => T_('E-g: ').'"'.sprintf( T_('%d people'), 4 ).'"',
+			'format'          => sprintf( T_('%d people'), 0 ),
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => T_('Prep Time'),
+			'name'            => 'prep_time',
+			'order'           => 4,
+			'note'            => T_('E-g: ').'"'.sprintf( T_('%s minutes'), 2 ).'"',
+			'format'          => sprintf( T_('%s minutes'), 0 ),
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => T_('Cook Time'),
+			'name'            => 'cook_time',
+			'order'           => 5,
+			'note'            => T_('E-g: ').'"'.sprintf( T_('%s minutes'), 35 ).'"',
+			'format'          => sprintf( T_('%s minutes'), 0 ),
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => T_('Passive Time'),
+			'name'            => 'passive_time',
+			'order'           => 6,
+			'note'            => T_('E-g: ').'"'.sprintf( T_('%s minutes'), 5 ).'"',
+			'format'          => sprintf( T_('%s minutes'), 0 ),
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => T_('Total time'),
+			'name'            => 'total_time',
+			'type'            => 'computed',
+			'order'           => 7,
+			'format'          => sprintf( T_('%s minutes'), 0 ),
+			'formula'         => '$prep_time$ + $cook_time$ + $passive_time$',
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => T_('Ingredients'),
+			'name'            => 'ingredients',
+			'type'            => 'text',
+			'order'           => 8,
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
 	);
 	// Default settings for custom fields:
 	$custom_field_default_settings = array(
@@ -556,6 +642,7 @@ function create_default_data()
 			'order'           => '',
 			'note'            => NULL,
 			'format'          => NULL,
+			'formula'         => NULL,
 			'header_class'    => 'right nowrap',
 			'cell_class'      => 'center',
 			'link'            => 'nolink',

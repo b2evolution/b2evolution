@@ -1323,7 +1323,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 		// =======================================================================================================
 		case 'std':
 		case 'blog_a':
-			$post_count = 12;
+			$post_count = 13;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -1530,21 +1530,63 @@ This is an extra line.' );
 				$edited_Item->set_setting( 'custom:image_1', $another_item_link_ID );
 				$edited_Item->dbupdate();
 				$item_IDs[] = array( $edited_Item->ID, $now );
+			}
 
-				if( is_available_item_type( $blog_ID, 'Child Post' ) )
-				{
-					// Insert a post:
-					$post_count--;
-					$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
-					$edited_Item = new Item();
-					$edited_Item->set_tags_from_string( 'demo' );
-					$edited_Item->set_setting( 'custom:first_numeric_field', '123' );
-					$edited_Item->set_setting( 'custom:first_string_field', 'abc' );
-					$edited_Item->set_setting( 'custom:image_1', $custom_item_link_ID );
-					$edited_Item->set_setting( 'custom:checkmark_field', '1' );
-					$edited_Item->set( 'parent_ID', $post_custom_fields_ID ); // Set parent post ID
-					/*$edited_Item->insert( $owner_ID, T_('Child Post Example'), T_('<p>This post has a special post type called "Child Post".</p>'),*/
-					$edited_Item->insert( $owner_ID, T_('Child Post Example'),
+			if( is_available_item_type( $blog_ID, 'Recipe' ) )
+			{
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo,photo' );
+				$edited_Item->set_setting( 'custom:course', 'Main Course' );
+				$edited_Item->set_setting( 'custom:cuisine', 'Mongolian' );
+				$edited_Item->set_setting( 'custom:servings', '4' );
+				$edited_Item->set_setting( 'custom:prep_time', '2' );
+				$edited_Item->set_setting( 'custom:cook_time', '35' );
+				$edited_Item->set_setting( 'custom:passive_time', '5' );
+				$edited_Item->set_setting( 'custom:total_time', '42' );
+				$edited_Item->set_setting( 'custom:ingredients', 'vegetable oil
+1⁄2 teaspoon ginger
+1 tablespoon garlic
+1⁄2 cup soy sauce
+1⁄2 cup water
+3⁄4 cup dark brown sugar
+1 lb flank steak
+1 yellow onion
+2 large green onions' );
+				$mongolian_beef_ID = $edited_Item->insert( $owner_ID, T_('Mongolian Beef'),
+'<p>A quick go-to dinner. Can be made with almost any meat. I often used ground. Works perfect for lettuce wraps. Try replacing the onion with thinly sliced fennel.</p>'.
+'<p>Optional: spice this thing up, with a dose of your favorite chili paste/sauce.</p>'.
+'[teaserbreak]'.
+'<p>Slice the beef thin and cook with a bit of oil (your choice) and the yellow onion (cut into petals) in a medium saucepan. Set aside when done.</p>'.
+'<p>Make the sauce by heating 2 tsp of vegetable oil over med/low heat in the same pan. Don’t get the oil too hot.</p>'.
+'<p>Add ginger and garlic to the pan and quickly add the soy sauce and water before the garlic scorches.</p>'.
+'<p>Dissolve the brown sugar in the sauce, then raise the heat to medium and boil the sauce for 2-3 minutes or until the sauce thickens.</p>'.
+'<p>Remove from the heat, add beef back in. Toss</p>'.
+'<p>Serve with rice, top with green onions</p>',
+						$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Recipe' );
+				$edit_File = new File( 'shared', 0, 'recipe/mongolian-beef.jpg' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File->link_to_Object( $LinkOwner, 1, 'teaser' );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+			}
+
+			if( is_available_item_type( $blog_ID, 'Post with Custom Fields' ) &&
+			    is_available_item_type( $blog_ID, 'Child Post' ) )
+			{
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->set_setting( 'custom:first_numeric_field', '123' );
+				$edited_Item->set_setting( 'custom:first_string_field', 'abc' );
+				$edited_Item->set_setting( 'custom:image_1', $custom_item_link_ID );
+				$edited_Item->set_setting( 'custom:checkmark_field', '1' );
+				$edited_Item->set( 'parent_ID', $post_custom_fields_ID ); // Set parent post ID
+				/*$edited_Item->insert( $owner_ID, T_('Child Post Example'), T_('<p>This post has a special post type called "Child Post".</p>'),*/
+				$edited_Item->insert( $owner_ID, T_('Child Post Example'),
 '<p>'.sprintf( T_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' ).'</p>'.
 
 '<p>'.T_('This also allows us to access the custom fields of the parent post:').'</p>'.
@@ -1574,9 +1616,8 @@ This is an extra line.' );
 '<p>'.sprintf( T_('Another way to show this, is to use b2evolution\'s %s short tag:'), '`[compare:...]`' ).'</p>'.
 
 '<p>[compare:$this$,$parent$]</p>',
-							$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Child Post' );
-					$item_IDs[] = array( $edited_Item->ID, $now );
-				}
+						$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Child Post' );
+				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
 
 			if( is_available_item_type( $blog_ID, '#' ) )
