@@ -313,28 +313,23 @@ if( mainlist_get_item() )
 		$ingredients = $Item->get_custom_field_value( 'ingredients' );
 		if( $ingredients !== false )
 		{	// Display "Ingredients" only if this custom field exists for the current Item:
-			$ingredients = utf8_trim( utf8_strip_tags( $ingredients ), "\n " );
-			if( ! empty( $ingredients ) )
-			{	// Display ingredients as numeric list:
-				$ingredients = '<ol><li>'.str_replace( "\n", '</li><li>', $ingredients ).'</li></ol>';
-			}
 		?>
 		<div class="col-lg-3 col-sm-4">
 			<h4><?php echo $Item->get_custom_field_title( 'ingredients' ); ?></h4>
-			<?php echo $ingredients; ?>
+			<p><?php echo $ingredients; ?></p>
 		</div>
 		<?php
-			$instructions_col_size = 'col-lg-9 col-sm-8';
+			$directions_col_size = 'col-lg-9 col-sm-8';
 		}
 		else
 		{	// Use full width if ingredients field is not detected:
-			$instructions_col_size = 'col-sm-12';
+			$directions_col_size = 'col-sm-12';
 		}
 
-		// Instructions:
+		// Directions:
 		?>
-		<div class="<?php echo $instructions_col_size; ?>">
-			<h4><?php echo T_('Instructions'); ?></h4>
+		<div class="<?php echo $directions_col_size; ?>">
+			<h4><?php echo T_('Directions'); ?></h4>
 			<?php
 			// Display the "after more" part of the text: (part after "[teaserbreak]")
 			$Item->content_extension( array(

@@ -1539,26 +1539,28 @@ This is an extra line.' );
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'demo,photo' );
-				$edited_Item->set_setting( 'custom:course', 'Main Course' );
-				$edited_Item->set_setting( 'custom:cuisine', 'South African' );
+				$edited_Item->set_setting( 'custom:course', TD_('Main Course') );
+				$edited_Item->set_setting( 'custom:cuisine', TD_('South African') );
 				$edited_Item->set_setting( 'custom:servings', '2' );
 				$edited_Item->set_setting( 'custom:prep_time', '1' );
 				$edited_Item->set_setting( 'custom:cook_time', '20' );
 				$edited_Item->set_setting( 'custom:passive_time', '3' );
-				$edited_Item->set_setting( 'custom:ingredients', '1 jar Peppedew Peppers (or piquante pepper)
+				$edited_Item->set_setting( 'custom:ingredients', TD_('1 jar Peppedew Peppers (or piquante pepper)
 4oz goat cheese (any flavor)
 1 tbsp mayonnaise
 1 tbsp sour cream
 1 bunch of chives, chopped
 hearty shot of hot sauce (Franks, Yellowbird)
-hearty crack of pepper' );
-				$mongolian_beef_ID = $edited_Item->insert( $owner_ID, T_('Stuffed Peppers'),
-'<p>We found these during Happy Hour at Chiso’s Grill in Bee Cave, Tx. We’ve since tweaked the recipe a bit. This recipe is just a starting point, add/remove anything you want (like more hot sauce if you’re into that).</p>'.
+hearty crack of pepper') );
+				$mongolian_beef_ID = $edited_Item->insert( $owner_ID, TD_('Stuffed Peppers'),
+'<p>'.TD_('We found these during Happy Hour at Chiso’s Grill in Bee Cave, Tx. We’ve since tweaked the recipe a bit. This recipe is just a starting point, add/remove anything you want (like more hot sauce if you’re into that).').'</p>'.
 '[teaserbreak]'.
-'<p>combine goat cheese, mayo, sour cream, 2/3rds of your chives, hot sauce, black pepper</p>'.
-'<p>if you are feeling spry, beat the mixture to make it fluffy</p>'.
-'<p>put filling in a plastic bag, snip of the tip with scissors to make a piping bag</p>'.
-'<p>fill peppers, place in bowl, top with chives and hot sauce</p>',
+'<ol>'.
+	'<li>'.TD_('combine goat cheese, mayo, sour cream, 2/3rds of your chives, hot sauce, black pepper').'</li>'.
+	'<li>'.TD_('if you are feeling spry, beat the mixture to make it fluffy').'</li>'.
+	'<li>'.TD_('put filling in a plastic bag, snip of the tip with scissors to make a piping bag').'</li>'.
+	'<li>'.TD_('fill peppers, place in bowl, top with chives and hot sauce').'</li>'.
+'</ol>',
 						$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Recipe' );
 				$edit_File = new File( 'shared', 0, 'recipes/stuffed-peppers.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -1570,13 +1572,13 @@ hearty crack of pepper' );
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'demo,photo' );
-				$edited_Item->set_setting( 'custom:course', 'Main Course' );
-				$edited_Item->set_setting( 'custom:cuisine', 'Mongolian' );
+				$edited_Item->set_setting( 'custom:course', TD_('Main Course') );
+				$edited_Item->set_setting( 'custom:cuisine', TD_('Mongolian') );
 				$edited_Item->set_setting( 'custom:servings', '4' );
 				$edited_Item->set_setting( 'custom:prep_time', '2' );
 				$edited_Item->set_setting( 'custom:cook_time', '35' );
 				$edited_Item->set_setting( 'custom:passive_time', '5' );
-				$edited_Item->set_setting( 'custom:ingredients', 'vegetable oil
+				$edited_Item->set_setting( 'custom:ingredients', TD_('vegetable oil
 1⁄2 teaspoon ginger
 1 tablespoon garlic
 1⁄2 cup soy sauce
@@ -1584,17 +1586,19 @@ hearty crack of pepper' );
 3⁄4 cup dark brown sugar
 1 lb flank steak
 1 yellow onion
-2 large green onions' );
-				$mongolian_beef_ID = $edited_Item->insert( $owner_ID, T_('Mongolian Beef'),
-'<p>A quick go-to dinner. Can be made with almost any meat. I often used ground. Works perfect for lettuce wraps. Try replacing the onion with thinly sliced fennel.</p>'.
-'<p>Optional: spice this thing up, with a dose of your favorite chili paste/sauce.</p>'.
+2 large green onions') );
+				$mongolian_beef_ID = $edited_Item->insert( $owner_ID, TD_('Mongolian Beef'),
+'<p>'.TD_('A quick go-to dinner. Can be made with almost any meat. I often used ground. Works perfect for lettuce wraps. Try replacing the onion with thinly sliced fennel.').'</p>'.
+'<p>'.TD_('Optional: spice this thing up, with a dose of your favorite chili paste/sauce.').'</p>'.
 '[teaserbreak]'.
-'<p>Slice the beef thin and cook with a bit of oil (your choice) and the yellow onion (cut into petals) in a medium saucepan. Set aside when done.</p>'.
-'<p>Make the sauce by heating 2 tsp of vegetable oil over med/low heat in the same pan. Don’t get the oil too hot.</p>'.
-'<p>Add ginger and garlic to the pan and quickly add the soy sauce and water before the garlic scorches.</p>'.
-'<p>Dissolve the brown sugar in the sauce, then raise the heat to medium and boil the sauce for 2-3 minutes or until the sauce thickens.</p>'.
-'<p>Remove from the heat, add beef back in. Toss</p>'.
-'<p>Serve with rice, top with green onions</p>',
+'<ol>'.
+	'<li>'.TD_('Slice the beef thin and cook with a bit of oil (your choice) and the yellow onion (cut into petals) in a medium saucepan. Set aside when done.').'</li>'.
+	'<li>'.TD_('Make the sauce by heating 2 tsp of vegetable oil over med/low heat in the same pan. Don’t get the oil too hot.').'</li>'.
+	'<li>'.TD_('Add ginger and garlic to the pan and quickly add the soy sauce and water before the garlic scorches.').'</li>'.
+	'<li>'.TD_('Dissolve the brown sugar in the sauce, then raise the heat to medium and boil the sauce for 2-3 minutes or until the sauce thickens.').'</li>'.
+	'<li>'.TD_('Remove from the heat, add beef back in. Toss').'</li>'.
+	'<li>'.TD_('Serve with rice, top with green onions').'</li>'.
+'</ol>',
 						$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Recipe' );
 				$edit_File = new File( 'shared', 0, 'recipes/mongolian-beef.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );

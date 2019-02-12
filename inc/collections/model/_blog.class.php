@@ -5153,7 +5153,7 @@ class Blog extends DataObject
 				break;
 
 			case 'manual':
-				$default_post_types = array( 'Manual Page' );
+				$default_post_types = array( 'Manual Page', 'Recipe' );
 				break;
 
 			case 'group':
