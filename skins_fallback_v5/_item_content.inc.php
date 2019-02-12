@@ -119,11 +119,6 @@ if( $content_mode == 'auto' )
 			$content_mode = $Blog->get_setting('archive_content');
 			break;
 
-		case 'posts-filtered':
-		case 'search':
-			$content_mode = $Blog->get_setting('filtered_content');
-			break;
-
 		case 'single':
 		case 'page':
 			$content_mode = 'full';
@@ -131,8 +126,11 @@ if( $content_mode == 'auto' )
 
 		case 'posts-default':  // home page 1
 		case 'posts-next':     // next page 2, 3, etc
-		default:
 			$content_mode = $Blog->get_setting('main_content');
+			break;
+
+		default: // posts-filtered, search, flagged and etc.
+			$content_mode = $Blog->get_setting('filtered_content');
 	}
 }
 

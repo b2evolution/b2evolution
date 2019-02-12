@@ -2845,7 +2845,8 @@ class Item extends ItemLight
 		{	// This case may be called by computing of the formula:
 			// NOTE: Get a value directly from setting and not from the cached array
 			//       in order to get new updated double value after edit form updating:
-			return $this->get_setting( 'custom:'.$field_index );
+			// Use floatval() in order to consider empty value as 0
+			return floatval( $this->get_setting( 'custom:'.$field_index ) );
 		}
 
 		if( $custom_fields[ $field_index ]['type'] != 'computed' )
