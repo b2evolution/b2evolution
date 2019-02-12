@@ -478,6 +478,137 @@ if( !$Messages->has_errors() )
 			// We have EXITed already at this point!!
 			break;
 
+		case 'update_status':
+			// Set account status of selected users:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'users', 'edit', true );
+
+			param( 'account_status', 'string', '' );
+
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+			$UserCache = & get_UserCache();
+			$UserCache->clear();
+			$UserCache->load_list( get_filterset_user_IDs() );
+
+			// Try to obtain some serious time to do some serious processing (30 minutes)
+			set_max_execution_time( 1800 );
+
+			$updated_users_num = 0;
+			foreach( $UserCache->cache as $filtered_User )
+			{	// Update account status of each filtered User:
+				if( $filtered_User->ID == 1 )
+				{	// This is Admin user, Don't allow to change status:
+					continue;
+				}
+
+				if( $filtered_User->update_status_from_Request( true, $account_status ) )
+				{
+					$updated_users_num++;
+				}
+			}
+
+			$Messages->add( sprintf( T_('Account status of %d users have been updated'), $updated_users_num ), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=users', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
+
+		case 'update_groups':
+			// Change group membership of selected users:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'users', 'edit', true );
+
+			$primary_grp_ID = param( 'grp_ID', 'integer' );
+			$add_secondary_grp_ID = param( 'add_secondary_grp_ID', 'integer' );
+			$remove_secondary_grp_ID = param( 'remove_secondary_grp_ID', 'integer' );
+
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+			$GroupCache = & get_GroupCache();
+
+			if( isset( $primary_grp_ID ) )
+			{
+				$primary_group = $GroupCache->get_by_ID( $primary_grp_ID );
+			}
+
+			$UserCache = & get_UserCache();
+			$UserCache->clear();
+			$UserCache->load_list( get_filterset_user_IDs() );
+
+			$updated_primary_grp_num = 0;
+			$added_secondary_grp_num = 0;
+			$removed_secondary_grp_num = 0;
+			$updated_users_num = 0;
+
+			foreach( $UserCache->cache as $filtered_User )
+			{	// Update group membership of each filtered User:
+
+				$updated_group = false;
+
+				if( ($filtered_User->ID != 1 ) && isset( $primary_group ) && $primary_group->can_be_assigned() )
+				{	// This is Admin user, Don't allow to change status:
+					$filtered_User->set_Group( $primary_group );
+					$updated_primary_grp_num++;
+					$updated_group = true;
+				}
+
+				if( isset( $add_secondary_grp_ID ) || isset( $remove_secondary_grp_ID ) )
+				{
+					$secondary_grp_IDs = array();
+					$filtered_User->old_secondary_groups = $filtered_User->get_secondary_groups();
+					foreach( $filtered_User->secondary_groups as $secondary_Group )
+					{
+						$secondary_grp_IDs[] = $secondary_Group->ID;
+					}
+
+					if( isset( $add_secondary_grp_ID ) && ! in_array( $add_secondary_grp_ID, $secondary_grp_IDs ) )
+					{	// User not yet a member of new secondary group:
+						$new_secondary_group = $GroupCache->get_by_ID( $add_secondary_grp_ID, false, false );
+						if( isset( $new_secondary_group ) && $new_secondary_group->can_be_assigned() )
+						{
+							$secondary_grp_IDs[] = $add_secondary_grp_ID;
+							$added_secondary_grp_num++;
+							$updated_group = true;
+						}
+					}
+
+					if( isset( $remove_secondary_grp_ID ) && ( ( $key = array_search( $remove_secondary_grp_ID, $secondary_grp_IDs ) ) !== false ) )
+					{	// User is a member of secondary group to be removed:
+						unset( $secondary_grp_IDs[$key] );
+						$removed_secondary_grp_num++;
+						$updated_group = true;
+					}
+
+					$GroupCache = & get_GroupCache();
+					$GroupCache->clear();
+					// Set new groups which should be stored in DB:
+					$filtered_User->secondary_groups = $GroupCache->load_list( $secondary_grp_IDs );
+				}
+
+				if( $updated_group )
+				{
+					$filtered_User->dbupdate();
+					$updated_users_num++;
+				}
+			}
+
+			$Messages->add( sprintf( T_('Group membership of %d users have been updated'), $updated_users_num ), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=users', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
+
 		case 'merge':
 			// Select user for merging and Merge:
 			$merging_user_ID = param( 'merging_user_ID', 'integer', true, true );
@@ -774,6 +905,34 @@ switch( $action )
 		$AdminUI->disp_payload_begin();
 
 		$AdminUI->disp_view( 'users/views/_user_list_tags.form.php' );
+
+		$AdminUI->disp_payload_end();
+		break;
+
+	case 'set_status':
+		// Display a form to set user account status:
+
+		// Do not append Debuglog & Debug JSlog to response!
+		$debug = false;
+		$debug_jslog = false;
+
+		$AdminUI->disp_payload_begin();
+
+		$AdminUI->disp_view( 'users/views/_user_list_status.form.php' );
+
+		$AdminUI->disp_payload_end();
+		break;
+
+	case 'change_groups':
+		// Display a form to set user account status:
+
+		// Do not append Debuglog & Debug JSlog to response!
+		$debug = false;
+		$debug_jslog = false;
+
+		$AdminUI->disp_payload_begin();
+
+		$AdminUI->disp_view( 'users/views/_user_list_groups.form.php' );
 
 		$AdminUI->disp_payload_end();
 		break;

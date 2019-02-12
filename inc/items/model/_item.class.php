@@ -837,10 +837,8 @@ class Item extends ItemLight
 			}
 			$this->set( 'urltitle', implode( ', ', $post_urltitle ) );
 			// Added in May 2017; but old slugs are not converted yet.
-			if( preg_match( '#(^|,+)[^a-z\d_]*\d+[^a-z\d_]*($|,+)#i', get_param( 'post_urltitle' ) ) )
-			{	// Display error if item slugs contain only digits:
-				param_error( 'post_urltitle', T_('All slugs must contain at least one letter.') );
-			}
+			// Display error if item slugs don't contain at least one letter:
+			param_check_regexp( 'post_urltitle', '#^([^,]*[a-z][^,]*,?)*$#i', T_('All slugs must contain at least one letter.') );
 		}
 
 		if( $is_not_content_block )
@@ -2847,7 +2845,8 @@ class Item extends ItemLight
 		{	// This case may be called by computing of the formula:
 			// NOTE: Get a value directly from setting and not from the cached array
 			//       in order to get new updated double value after edit form updating:
-			return $this->get_setting( 'custom:'.$field_index );
+			// Use floatval() in order to consider empty value as 0
+			return floatval( $this->get_setting( 'custom:'.$field_index ) );
 		}
 
 		if( $custom_fields[ $field_index ]['type'] != 'computed' )
@@ -10451,7 +10450,7 @@ class Item extends ItemLight
 	 */
 	function get_flag( $params = array() )
 	{
-		global $current_User, $cache_items_flag_displayed;
+		global $current_User;
 
 		$params = array_merge( array(
 				'before'       => '',
@@ -10459,20 +10458,11 @@ class Item extends ItemLight
 				'title_flag'   => T_('Click to flag this.'),
 				'title_unflag' => T_('You have flagged this. Click to remove flag.'),
 				'only_flagged' => false, // Display the flag button only when this item is already flagged by current User
+				'allow_toggle' => true, // Allow to toggle flag state by AJAX
 			), $params );
 
 		if( ! $this->can_flag() )
 		{	// Don't display the flag button if it is not allowed by some reason:
-			return '';
-		}
-
-		if( ! isset( $cache_items_flag_displayed ) || ! is_array( $cache_items_flag_displayed ) )
-		{	// Initialize array to cache what items flags have been displayed for:
-			$cache_items_flag_displayed = array();
-		}
-
-		if( in_array( $this->ID, $cache_items_flag_displayed ) )
-		{	// Don't display the flag button because it has been already displayed before of the current page:
 			return '';
 		}
 
@@ -10488,7 +10478,9 @@ class Item extends ItemLight
 
 		$r = $params['before'];
 
-		$r .= '<a href="#" data-id="'.$this->ID.'" data-coll="'.$item_Blog->get( 'urlname' ).'" class="action_icon evo_post_flag_btn">'
+		if( $params['allow_toggle'] )
+		{	// Allow to toggle:
+			$r .= '<a href="#" data-id="'.$this->ID.'" data-coll="'.$item_Blog->get( 'urlname' ).'" class="action_icon evo_post_flag_btn">'
 				.get_icon( 'flag_on', 'imgtag', array(
 					'title' => $params['title_flag'],
 					'style' => $is_flagged ? '' : 'display:none',
@@ -10498,11 +10490,17 @@ class Item extends ItemLight
 					'style' => $is_flagged ? 'display:none' : '',
 				) )
 			.'</a>';
+		}
+		else
+		{	// Display only current flag state as icon:
+			$r .= '<span class="action_icon evo_post_flag_btn">'
+				.get_icon( ( $is_flagged ? 'flag_on' : 'flag_off' ), 'imgtag', array(
+						'title' => ( $is_flagged ? $params['title_flag'] : $params['title_unflag'] ),
+					) )
+				.'</span>';
+		}
 
 		$r .= $params['after'];
-
-		// Cache this to don't display flag twice for the same item on the same page:
-		$cache_items_flag_displayed[] = $this->ID;
 
 		return $r;
 	}
@@ -10547,6 +10545,9 @@ class Item extends ItemLight
 		}
 
 		$this->set_user_data( 'item_flag', $new_flag_value );
+
+		// Invalidate key for the Item data per current User:
+		BlockCache::invalidate_key( 'item_user_flag_'.$this->ID, $current_User->ID );
 
 		$DB->commit();
 	}

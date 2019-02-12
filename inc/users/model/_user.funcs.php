@@ -1710,7 +1710,7 @@ function profile_check_params( $params, $User = NULL )
 			}
 			elseif( $Settings->get('passwd_special') && ! preg_match( '~[\x20-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]~', $params['pass1'][0] ) )
 			{
-				param_error( $dummy_fields[ $params['pass1'][1] ], T_('Your password should contain at least one special character (like & ! $ * - _ + etc.)') );
+				param_error( $dummy_fields[ $params['pass1'][1] ], T_('Your password should contain at least one special character (like ! $ * - _ + etc.)') );
 			}
 			elseif( utf8_strlen( $params['pass1'][0] ) < $Settings->get( 'user_minpwdlen' ) )
 			{
@@ -3258,8 +3258,12 @@ function send_inactive_user_emails( $user_ids, $redirect_to_after = NULL, $log_m
 function check_usertags( $user_ID, $test_tags = array(), $type = 'has_any' )
 {
 	$UserCache = & get_UserCache();
-	$edited_User = $UserCache->get_by_ID( $user_ID );
-	$user_tags = $edited_User->get_usertags();
+	if( ! ( $tag_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
+	{	// Don't halt on wrong user, and consider this like user has no tags:
+		return ( $type == 'has_none' );
+	}
+
+	$user_tags = $tag_User->get_usertags();
 
 	switch( $type )
 	{
@@ -3652,7 +3656,24 @@ function callback_filter_userlist( & $Form )
 			'gender'   => '',
 			'criteria' => '0:contains:',
 			'lastseen' => '',
-		)
+		),
+		// Set order of the filters here, but filters are initalized below:
+		// (some filters may be hidden depending on current User permissions and front-office calling)
+		'gender'              => NULL, // Gender
+		'criteria'            => NULL, // Specific criteria
+		'tags'                => NULL, // User tags
+		'org'                 => NULL, // Organization
+		'group'               => NULL, // Primary Group
+		'group2'              => NULL, // Secondary Group
+		'lastseen'            => NULL, // User last seen
+		'regdate'             => NULL, // Registration date
+		'source'              => NULL, // Registration source
+		'status'              => NULL, // Account status
+		'newsletter'          => NULL, // Subscribed to
+		'report_count'        => NULL, // Reported count
+		'level'               => NULL, // User level
+		'custom_sender_email' => NULL, // Uses custom sender address
+		'custom_sender_name'  => NULL, // Uses custom sender name
 	);
 
 	$Form->hidden( 'filter', 'new' );
@@ -4066,6 +4087,15 @@ function evo_set_filter_user_tags( rule, value )
 }
 </script>
 <?php
+		}
+	}
+
+	// Find and remove filters which are not used for current case:
+	foreach( $filters as $filter_key => $filter_data )
+	{
+		if( $filter_data === NULL )
+		{
+			unset( $filters[ $filter_key ] );
 		}
 	}
 
@@ -5122,12 +5152,54 @@ function echo_userlist_tags_js()
 	// Initialize JavaScript to build and open window:
 	echo_modalwindow_js();
 
-	// Initialize variables for the file "evo_user_deldata.js":
+	// Initialize variables for the file "evo_user_tags.js":
 	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_add_remove_tags_to_users = \''.TS_('Add/Remove tags...').get_manual_link( 'add-remove-user-tags' ).'\';
 		var evo_js_lang_make_changes_now = \''.TS_('Make changes now!').'\';
 		var evo_js_userlist_tags_ajax_url = \''.$admin_url.'\';
+	</script>';
+}
+
+
+/**
+ * Initialize JavaScript for AJAX loading of popup window to set account status of users from users list
+ * @param array Params
+ */
+function echo_userlist_set_account_status_js()
+{
+	global $admin_url;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_status.js":
+		echo '<script>
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_set_user_account_status = \''.TS_('Set account status...').get_manual_link( 'set-account-status' ).'\';
+		var evo_js_lang_make_changes_now = \''.TS_('Make changes now!').'\';
+		var evo_js_userlist_set_account_status_ajax_url = \''.$admin_url.'\';
+	</script>';
+}
+
+
+/**
+ * Initialize JavaScript for AJAX loading of popup window to change group membership of users from users list
+ * @param array Params
+ */
+function echo_userlist_change_groups_js()
+{
+	global $admin_url;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_status.js":
+		echo '<script>
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_change_groups = \''.TS_('Change groups...').get_manual_link( 'change-user-groups' ).'\';
+		var evo_js_lang_make_changes_now = \''.TS_('Make changes now!').'\';
+		var evo_js_userlist_change_groups_ajax_url = \''.$admin_url.'\';
 	</script>';
 }
 
@@ -6181,6 +6253,8 @@ function users_results_block( $params = array() )
 			'display_level'        => true,
 			'display_status'       => true,
 			'display_enlt_status'  => false,
+			'display_camp_user_status' => false,
+			'display_email_status' => false,
 			'display_camp_status'  => false,
 			'display_emlog_date'   => false,
 			'display_email_tracking' => false,
@@ -6199,6 +6273,8 @@ function users_results_block( $params = array() )
 			'display_btn_export'   => false,
 			'display_automation'   => false,
 			'display_btn_tags'     => false,
+			'display_btn_account_status' => false,
+			'display_btn_change_groups'  => false,
 			'force_check_user'     => false,
 			'where_duplicate_email' => false,
 			'display_btn_delspam'  => false,
@@ -6374,6 +6450,24 @@ function users_results_block( $params = array() )
 		echo_userlist_tags_js();
 	}
 
+	if( $params['display_btn_account_status'] && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
+	{	// Button to set user account status:
+		$user_list_buttons[] = '<a href="#" class="btn btn-default" onclick="return set_account_status()">'
+				.format_to_output( T_('Set account status...') )
+			.'</a>';
+		// Init JS for form to set account status:
+		echo_userlist_set_account_status_js();
+	}
+
+	if( $params['display_btn_change_groups'] && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
+	{	// Button to change user groups:
+		$user_list_buttons[] = '<a href="#" class="btn btn-default" onclick="return change_groups()">'
+				.format_to_output( T_('Change groups...') )
+			.'</a>';
+		// Init JS for form to set account status:
+		echo_userlist_change_groups_js();
+	}
+
 	if( $params['display_automation'] && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Button to add users to an automation:
 		$user_list_buttons[] = '<a href="#" class="btn btn-primary" onclick="return add_userlist_automation()">'
@@ -6504,6 +6598,8 @@ function users_results( & $UserList, $params = array() )
 			'display_sec_groups' => false,
 			'display_level'      => true,
 			'display_status'     => true,
+			'display_camp_user_status' => false,
+			'display_email_status' => false,
 			'display_camp_status' => false,
 			'display_emlog_date' => false,
 			'display_email_tracking' => false,
@@ -6522,6 +6618,8 @@ function users_results( & $UserList, $params = array() )
 			'th_class_avatar'    => 'shrinkwrap small',
 			'td_class_avatar'    => 'shrinkwrap center small',
 			'avatar_size'        => 'crop-top-48x48',
+			'th_class_id'        => 'shrinkwrap small',
+			'td_class_id'        => 'shrinkwrap small',
 			'th_class_login'     => 'shrinkwrap small',
 			'td_class_login'     => 'small',
 			'th_class_nickname'  => 'shrinkwrap small',
@@ -6586,8 +6684,8 @@ function users_results( & $UserList, $params = array() )
 	{ // Display ID
 		$UserList->cols[] = array(
 				'th' => T_('ID'),
-				'th_class' => 'shrinkwrap small',
-				'td_class' => 'shrinkwrap small',
+				'th_class' => $params['th_class_id'],
+				'td_class' => $params['td_class_id'],
 				'order' => 'user_ID',
 				'td' => '$user_ID$',
 			);
@@ -6941,6 +7039,30 @@ function users_results( & $UserList, $params = array() )
 			);
 	}
 
+	if( $params['display_camp_user_status'] )
+	{	// Display account status before campaign status:
+		$UserList->cols[] = array(
+				'th' => T_('Account status'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'order' => 'user_status',
+				'default_dir' => 'D',
+				'td' => '%user_td_status( #user_status#, #user_ID# )%'
+			);
+	}
+
+	if( $params['display_email_status'] )
+	{	// Display account status before campaign status:
+		$UserList->cols[] = array(
+				'th' => T_('Email status'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'order' => 'emadr_status',
+				'default_dir' => 'D',
+				'td' => '%user_td_email_status( #emadr_status#, #emadr_ID# )%'
+			);
+	}
+
 	if( $params['display_camp_status'] )
 	{ // Display campaign status
 		$UserList->cols[] = array(
@@ -6948,7 +7070,7 @@ function users_results( & $UserList, $params = array() )
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'center nowrap',
 				'order' => 'csnd_status',
-				'td' => '%user_td_campaign_status( #csnd_status#, #csnd_emlog_ID# )%'
+				'td' => '%user_td_campaign_status( #csnd_status#, #csnd_emlog_ID#, #emadr_status# )%'
 			);
 	}
 
@@ -7188,8 +7310,8 @@ function users_results( & $UserList, $params = array() )
 		{	// Display actions for email campaign's users:
 			$UserList->cols[] = array(
 					'th' => T_('Actions'),
-					'th_class' => 'small',
-					'td_class' => 'shrinkwrap small',
+					'th_class' => '',
+					'td_class' => 'shrinkwrap',
 					'td' => '%user_td_campaign_actions( '.intval( $params['ecmp_ID'] ).', #user_ID#, #csnd_status# )%'
 				);
 		}
@@ -7773,13 +7895,47 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 	}
 }
 
-
 /**
- * Get user campaign status
+ * Helper function to get email status in table cell
+ *
+ * @param string Email address status
+ * @param integer Email address ID
+ * @return string
  */
-function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL )
+function user_td_email_status( $emadr_status, $emadr_ID )
 {
 	global $current_User, $admin_url;
+
+	if( empty( $emadr_status ) )
+	{	// If email address does not exist in DB:
+		$emadr_status = 'unknown';
+	}
+
+	$status_content = emadr_get_status_icon( $emadr_status ).' '.emadr_get_status_title( $emadr_status );
+
+	if( is_admin_page() && $emadr_ID > 0 && $current_User->check_perm( 'emails', 'view' ) )
+	{	// Return a link to view email address details if current User has a permission:
+		return '<a href="'.$admin_url.'?ctrl=email&amp;emadr_ID='.$emadr_ID.'">'.$status_content.'</a>';
+	}
+
+	return $status_content;
+}
+
+
+/**
+ * Helper function to get email campaign status for the user
+ *
+ * @param string Key of user campaign status
+ * @param integer Email log ID
+ * @param string Email address status
+ * @return string Title of user campaign status
+ */
+function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL, $email_status = NULL )
+{
+	if( $csnd_status != 'send_error' && is_blocked_email_status( $email_status ) )
+	{	// Force users with blocked email status("Permanent error" or "Spammer") to fake status "Cannot send":
+		$csnd_status = 'cannot_send';
+	}
 
 	switch( $csnd_status )
 	{
@@ -7793,14 +7949,14 @@ function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL )
 			return T_('Sent');
 
 		case 'send_error':
-			if( $current_User->check_perm( 'emails', 'view', true ) && ! empty( $csnd_emlog_ID ) )
-			{
-				return '<a href="'.get_dispctrl_url( 'email', 'tab=sent&amp;emlog_ID='.$csnd_emlog_ID ).'">'.T_('Send error').'</a>';
+		case 'cannot_send': // This status doesn't exist in DB!
+			global $current_User;
+			$status_text = ( $csnd_status == 'cannot_send' ? T_('Cannot send') : T_('Send error') );
+			if( ! empty( $csnd_emlog_ID ) && $current_User->check_perm( 'emails', 'view' ) )
+			{	// Make a link to view details of error sending:
+				$status_text = '<a href="'.get_dispctrl_url( 'email', 'tab=sent&amp;emlog_ID='.$csnd_emlog_ID ).'">'.$status_text.'</a>';
 			}
-			else
-			{
-				return T_('Send error');
-			}
+			return $status_text;
 
 		case 'skipped':
 			return T_('Skipped');

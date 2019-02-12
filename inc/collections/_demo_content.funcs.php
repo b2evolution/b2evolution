@@ -1478,7 +1478,7 @@ It can have multiple lines.' );
 
 '<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>'.
 
-'<p>[fields:first_numeric_field, first_string_field,second_numeric_field]</p>'.
+'<p>[fields:first_numeric_field,first_string_field,second_numeric_field]</p>'.
 
 '<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>'.
 
@@ -1518,7 +1518,7 @@ This is an extra line.' );
 
 '<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>'.
 
-'<p>[fields:first_numeric_field, first_string_field,second_numeric_field]</p>'.
+'<p>[fields:first_numeric_field,first_string_field,second_numeric_field]</p>'.
 
 '<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>'.
 
@@ -1555,9 +1555,9 @@ This is an extra line.' );
 
 '<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>'.
 
-'<p>[parent:fields:first_numeric_field, first_string_field,second_numeric_field]</p>'.
+'<p>[parent:fields:first_numeric_field,first_string_field,second_numeric_field]</p>'.
 
-'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[parent:field: first_string_field]' ).'</p>'.
+'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[parent:field:first_string_field]' ).'</p>'.
 
 '<p>'.sprintf( T_('We can also reference fields of any other post like this: %s or like this: %s.'), '[item:another-custom-fields-example:field:first_string_field]', '[item:'.$another_custom_fields_example_ID.':field:first_string_field]' ).'</p>'.
 

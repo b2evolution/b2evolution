@@ -50,6 +50,7 @@ if( ! empty( $params['Item'] ) )
 		$item_flag = $Item->get_flag( array(
 				'before'       => ' ',
 				'only_flagged' => true,
+				'allow_toggle' => false,
 			) );
 
 		// Status(only not published):

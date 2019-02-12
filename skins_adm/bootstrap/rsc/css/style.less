@@ -322,18 +322,18 @@ div.delete_messages ul {
 	}
 }
 
-// Sidebar form filter
-#comment_filter_form {
+// Sidebar form filters:
+.evo_sidebar_filters {
 	fieldset {
 		margin-bottom: 20px;
-	}
-	.controls.col-sm-10 {
-		width: 100%;
-		input[type=text] {
-			width: 100%;
+		legend {
+			margin-bottom: 10px;
 		}
 	}
-	.rating input[name=cmnt_fullview_rating_limit] {
+	.pull-right[type=submit] {
+		margin: -3px 0 0 0;
+	}
+	.rating input[name$=_rating_limit] {
 		margin-right: 10px;
 		&:first-child {
 			margin-left: 10px;

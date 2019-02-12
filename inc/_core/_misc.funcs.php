@@ -3949,12 +3949,30 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	}
 	else
 	{	// Send email message on real mode:
-		$send_mail_result = evo_mail( $to, $subject, $message_data, $headers, $additional_parameters );
+		try
+		{	// Try to send:
+			$send_mail_result = evo_mail( $to, $subject, $message_data, $headers, $additional_parameters );
+		}
+		catch( Exception $ex )
+		{	// Unexpected error:
+			$send_mail_result = false;
+			// Log the caught error:
+			$mail_log_message = $ex->getMessage();
+			// Insert a returned email's data into DB:
+			load_funcs( 'cron/model/_decode_returned_emails.funcs.php' );
+			$content = dre_limit_by_terminators( $mail_log_message );
+			$email_data = dre_get_email_data( $content, $mail_log_message, 'Empty headers' );
+			if( empty( $email_data['address'] ) )
+			{	// Use current email address if no email address is detected in the error message:
+				$email_data['address'] = $to_email_address;
+			}
+			dre_insert_returned_email( $email_data );
+		}
 	}
 
 	if( ! $send_mail_result )
 	{	// The message has not been sent successfully
-		$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED.';
+		$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED'.( $mail_log_message === NULL ? '' : ', Error: '.$mail_log_message ).'.';
 		update_mail_log( $mail_log_insert_ID, 'error', $message );
 		if( $debug > 1 )
 		{ // We agree to die for debugging...
@@ -4121,7 +4139,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 		$message = mail_template( $template_name, $UserSettings->get( 'email_format', $User->ID ), $template_params, $User );
 
 		// Autoinsert user's data
-		$subject = mail_autoinsert_user_data( $subject, $User );
+		$subject = mail_autoinsert_user_data( $subject, $User, 'text', NULL, NULL, $template_params );
 
 		// erhsatingin > moved to mail_template()
 		//$message = mail_autoinsert_user_data( $message, $User );
@@ -4193,7 +4211,7 @@ function send_mail_to_anonymous_user( $user_email, $user_name, $subject, $templa
 	$message = mail_template( $template_name, 'auto', $template_params );
 
 	// Autoinsert user's data:
-	$subject = mail_autoinsert_user_data( $subject, NULL, 'text', $user_email, $user_name );
+	$subject = mail_autoinsert_user_data( $subject, NULL, 'text', $user_email, $user_name, $template_params );
 
 	// Params for email log:
 	$email_campaign_ID = empty( $template_params['ecmp_ID'] ) ? NULL : $template_params['ecmp_ID'];
@@ -8811,8 +8829,8 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					}
 				}
 				else
-				{
-					continue;
+				{	// not an image file, do not process
+					$inlines[$current_inline] = $current_inline;
 				}
 				break;
 

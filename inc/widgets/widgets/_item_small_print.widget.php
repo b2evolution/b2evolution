@@ -284,6 +284,7 @@ class item_small_print_Widget extends ComponentWidget
 				'user_ID'      => ( is_logged_in() ? $current_User->ID : 0 ), // Has the current User changed?
 				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
 				'item_ID'      => $Item->ID, // Has the Item page changed?
+				'item_user_flag_'.$Item->ID => ( is_logged_in() ? $current_User->ID : 0 ), // Has the Item data per current User changed?
 			);
 	}
 }
