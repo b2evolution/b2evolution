@@ -838,7 +838,7 @@ class Item extends ItemLight
 			$this->set( 'urltitle', implode( ', ', $post_urltitle ) );
 			// Added in May 2017; but old slugs are not converted yet.
 			// Display error if item slugs don't contain at least one letter:
-			param_check_regexp( 'post_urltitle', '#^([^,]*[a-z][^,]*,?)+$#i', T_('All slugs must contain at least one letter.') );
+			param_check_regexp( 'post_urltitle', '#^([^,]*[a-z][^,]*,?)*$#i', T_('All slugs must contain at least one letter.') );
 		}
 
 		if( $is_not_content_block )
