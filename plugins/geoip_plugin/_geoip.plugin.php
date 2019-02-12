@@ -899,7 +899,7 @@ jQuery( document ).ready( function()
 			}
 		}
 
-		$this->print_tool_log( sprintf( T_('Remove gzip file %s...'), '<code>'.$gzip_tar_file_path.'</code>' ) );
+		$this->print_tool_log( sprintf( T_('Removing of the file %s...'), '<code>'.$gzip_tar_file_path.'</code>' ) );
 		if( ! @unlink( $tar_file_path ) )
 		{	// Failed to remove tar file:
 			$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), '<code>'.$tar_file_path.'</code>' ), 'warning' );
@@ -915,6 +915,20 @@ jQuery( document ).ready( function()
 
 		// Success message:
 		$this->print_tool_log( sprintf( T_('%s file was downloaded successfully.'), '<code>'.$this->geoip_file_name.'</code>' ), 'success' );
+
+		$old_geoip_file_path = dirname( __FILE__ ).'/GeoIP.dat';
+		if( file_exists( $old_geoip_file_path ) )
+		{	// Try to remove old data file if it exists on the disk:
+			$this->print_tool_log( '<br />'.sprintf( T_('Removing of the file %s...'), '<code>'.$old_geoip_file_path.'</code>' ) );
+			if( @unlink( $old_geoip_file_path ) )
+			{
+				$this->print_tool_log( ' OK.' );
+			}
+			else
+			{
+				$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), '<code>'.$old_geoip_file_path.'</code>' ), 'warning' );
+			}
+		}
 
 		// Try to enable plugin automatically:
 		global $Plugins;
