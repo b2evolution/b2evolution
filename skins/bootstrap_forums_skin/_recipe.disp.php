@@ -84,16 +84,57 @@ display_if_empty( array(
 if( mainlist_get_item() )
 {	// If Item is found by requested slug:
 
+	global $cat;
+
+	// In this skin, it makes no sense to navigate in any different mode than "same category"
+	// Use the category from param
+	$current_cat = param( 'cat', 'integer', 0 );
+	if( $current_cat == 0 )
+	{	// Use main category by default because the category wasn't set:
+		$current_cat = $Item->main_cat_ID;
+	}
+
+	// Breadcrumbs
+	$cat = $current_cat;
+	skin_widget( array(
+			// CODE for the widget:
+			'widget' => 'breadcrumb_path',
+			// Optional display params
+			'block_start'      => '<ol class="breadcrumb">',
+			'block_end'        => '</ol><div class="clear"></div>',
+			'separator'        => '',
+			'item_mask'        => '<li><a href="$url$">$title$</a></li>',
+			'item_active_mask' => '<li class="active">$title$</li>',
+		) );
+?>
+
+<a name="top"></a>
+<a name="p<?php echo $Item->ID; ?>"></a>
+
+<?php
+	// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
+	item_prevnext_links( array(
+			'block_start'     => '<ul class="pager col-lg-12 post_nav">',
+			'prev_start'      => '<li class="previous">',
+			'prev_text'       => '<span aria-hidden="true">&larr;</span> $title$',
+			'prev_end'        => '</li>',
+			'separator'       => ' ',
+			'next_start'      => '<li class="next">',
+			'next_text'       => '$title$ <span aria-hidden="true">&rarr;</span>',
+			'next_end'        => '</li>',
+			'block_end'       => '</ul>',
+			'target_blog'     => $Blog->ID,	// this forces to stay in the same blog, should the post be cross posted in multiple blogs
+			'post_navigation' => 'same_category', // force to stay in the same category in this skin
+			'featured'        => false, // don't include the featured posts into navigation list
+		) );
+	// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
+
 	$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 ?>
 
-<div class="evo_content_block">
+<div class="forums_list single_topic evo_content_block">
 
-<article id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>"<?php
-	echo empty( $params['item_style'] ) ? '' : ' style="'.format_to_output( $params['item_style'], 'htmlattr' ).'"' ?>>
-
-	<header>
-		<div class="small text-muted">
+	<div class="single_page_title">
 		<?php
 			if( $Item->status != 'published' )
 			{	// Display not public Item's status:
@@ -117,9 +158,53 @@ if( mainlist_get_item() )
 			) );
 			// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
 		?>
+	</div>
+
+	<div class="row">
+		<div class="<?php echo $Skin->get_column_class( 'single' ); ?>">
+
+	<section class="table evo_content_block">
+	<div class="panel panel-default">
+		<div class="panel-heading posts_panel_title_wrapper">
+			<div class="cell1 ellipsis">
+				<h4 class="evo_comment_title panel-title"><a href="<?php echo $Item->get_permanent_url(); ?>" class="permalink">#1</a>
+					<?php
+						$Item->author( array(
+							'link_text' => 'auto',
+						) );
+					?>
+					<?php
+						// Display the post date:
+						$Item->issue_time( array(
+								'before'      => '<span class="text-muted">',
+								'after'       => '</span> &nbsp; &nbsp; ',
+								'time_format' => locale_extdatefmt().' '.locale_shorttimefmt(),
+							) );
+					?>
+				</h4>
+			</div>
+					<?php
+						if( $Skin->enabled_status_banner( $Item->status ) )
+						{ // Status banner
+							echo '<div class="cell2">';
+							$Item->format_status( array(
+									'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+								) );
+							$legend_statuses[] = $Item->status;
+							echo '</div>';
+						}
+					?>
 		</div>
-	</header>
-	
+
+		<div class="panel-body">
+			<div class="ft_avatar col-md-1 col-sm-2"><?php
+				$Item->author( array(
+					'link_text'  => 'only_avatar',
+					'thumb_size' => 'crop-top-80x80',
+				) );
+			?></div>
+			<div class="post_main col-md-11 col-sm-10">
+
 	<div class="row">
 		<div class="col-sm-5">
 		<?php
@@ -279,65 +364,168 @@ if( mainlist_get_item() )
 			?>
 		</div>
 	</div>
+			</div>
+		</div><!-- ../panel-body -->
 
-	<footer>
-		<?php
-			// Display Item footer text (text can be edited in Blog Settings):
-			$Item->footer( array(
-					'mode'        => $params['footer_text_mode'], // Will detect 'single' from $disp automatically
-					'block_start' => $params['footer_text_start'],
-					'block_end'   => $params['footer_text_end'],
-				) );
-		?>
-		<nav class="post_comments_link">
-		<?php
-			// Link to comments, trackbacks, etc.:
-			$Item->feedback_link( array(
-					'type' => 'comments',
-					'link_before' => '',
-					'link_after' => '',
-					'link_text_zero' => '#',
-					'link_text_one' => '#',
-					'link_text_more' => '#',
-					'link_title' => '#',
-					// fp> WARNING: creates problem on home page: 'link_class' => 'btn btn-default btn-sm',
-					// But why do we even have a comment link on the home page ? (only when logged in)
-				) );
+		<div class="panel-footer clearfix small">
+			<?php if( $disp != 'page' ) { ?>
+			<a href="<?php echo $Item->get_permanent_url(); ?>#skin_wrapper" class="to_top"><?php echo T_('Back to top'); ?></a>
+			<?php
+			}
+				// Check if BBcode plugin is enabled for current blog
+				$bbcode_plugin_is_enabled = false;
+				if( class_exists( 'bbcode_plugin' ) )
+				{ // Plugin exists
+					global $Plugins;
+					$bbcode_Plugin = & $Plugins->get_by_classname( 'bbcode_plugin' );
+					if( $bbcode_Plugin->status == 'enabled' && $bbcode_Plugin->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) != 'never' )
+					{ // Plugin is enabled and activated for comments
+						$bbcode_plugin_is_enabled = true;
+					}
+				}
+				if( $bbcode_plugin_is_enabled && $Item->can_comment( NULL ) )
+				{	// Display button to quote this post
+					echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
+				}
 
-			// Link to comments, trackbacks, etc.:
-			$Item->feedback_link( array(
-					'type' => 'trackbacks',
-					'link_before' => ' &bull; ',
-					'link_after' => '',
-					'link_text_zero' => '#',
-					'link_text_one' => '#',
-					'link_text_more' => '#',
-					'link_title' => '#',
-				) );
+				if( $disp != 'page' )
+				{	// Display a panel with voting buttons for item:
+					$Skin->display_item_voting_panel( $Item );
+				}
+
+				echo '<span class="pull-left">';
+					$Item->edit_link( array(
+							'before' => ' ',
+							'after'  => '',
+							'title'  => T_('Edit this topic'),
+							'text'   => '#',
+							'class'  => button_class( 'text' ).' comment_edit_btn',
+						) );
+				echo '</span>';
+				echo '<div class="action_btn_group">';
+					$Item->edit_link( array(
+							'before' => ' ',
+							'after'  => '',
+							'title'  => T_('Edit this topic'),
+							'text'   => '#',
+							'class'  => button_class( 'text' ).' comment_edit_btn',
+						) );
+					echo '<span class="'.button_class( 'group' ).'">';
+					// Set redirect after publish to the same category view of the items permanent url
+					$redirect_after_publish = $Item->add_navigation_param( $Item->get_permanent_url(), 'same_category', $current_cat );
+					$Item->next_status_link( array( 'before' => ' ', 'class' => button_class( 'text' ), 'post_navigation' => 'same_category', 'nav_target' => $current_cat ), true );
+					$Item->next_status_link( array( 'class' => button_class( 'text' ), 'before_text' => '', 'post_navigation' => 'same_category', 'nav_target' => $current_cat ), false );
+					$Item->delete_link( '', '', '#', T_('Delete this topic'), button_class( 'text' ), false, '#', TS_('You are about to delete this post!\\nThis cannot be undone!'), get_caturl( $current_cat ) );
+					echo '</span>';
+				echo '</div>';
 		?>
-		</nav>
-	</footer>
+
+		</div><!-- ../panel-footer -->
+	</div><!-- ../panel panel-default -->
+	</section><!-- ../table evo_content_block -->
 
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
-		skin_include( '_item_feedback.inc.php', array_merge( array(
-				'disp_comments'        => true,
-				'disp_comment_form'    => true,
-				'disp_trackbacks'      => true,
-				'disp_trackback_url'   => true,
-				'disp_pingbacks'       => true,
-				'disp_webmentions'     => true,
-				'disp_meta_comments'   => false,
-				'before_section_title' => '<div class="clearfix"></div><h3 class="evo_comment__list_title">',
-				'after_section_title'  => '</h3>',
-			), $params ) );
+		skin_include( '_item_feedback.inc.php', array_merge( $params, array(
+			'disp_comments'         => true,
+			'disp_comment_form'     => true,
+			'disp_trackbacks'       => true,
+			'disp_trackback_url'    => true,
+			'disp_pingbacks'        => true,
+			'disp_webmentions'      => true,
+			'disp_meta_comments'    => false,
+
+			'disp_section_title'    => false,
+			'disp_meta_comment_info' => false,
+
+			'comment_post_before'   => '<br /><h4 class="evo_comment_post_title ellipsis">',
+			'comment_post_after'    => '</h4>',
+
+			'comment_title_before'  => '<div class="panel-heading posts_panel_title_wrapper"><div class="cell1 ellipsis"><h4 class="evo_comment_title panel-title">',
+			'comment_status_before' => '</h4></div>',
+			'comment_title_after'   => '</div>',
+
+			'comment_avatar_before' => '<span class="evo_comment_avatar col-md-1 col-sm-2">',
+			'comment_avatar_after'  => '</span>',
+			'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
+			'comment_text_after'    => '</div>',
+		) ) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
+
+		echo_comment_moderate_js();
+
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
 	?>
-</article>
 
-</div>
+</div><!-- .col -->
+
+		<?php
+		if( $Skin->is_visible_sidebar( 'single' ) )
+		{	// Display sidebar:
+		?>
+		<aside class="col-md-3<?php echo ( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left' : '' ); ?>">
+			<div class="evo_container evo_container__sidebar_single">
+			<?php
+				// ------------------------- "Sidebar Single" CONTAINER EMBEDDED HERE --------------------------
+				// Display container contents:
+				skin_container( NT_('Sidebar Single'), array(
+						// The following (optional) params will be used as defaults for widgets included in this container:
+						// This will enclose each widget in a block:
+						'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
+						'block_end' => '</div>',
+						// This will enclose the title of each widget:
+						'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
+						'block_title_end' => '</h4></div>',
+						// This will enclose the body of each widget:
+						'block_body_start' => '<div class="panel-body">',
+						'block_body_end' => '</div>',
+						// If a widget displays a list, this will enclose that list:
+						'list_start' => '<ul>',
+						'list_end' => '</ul>',
+						// This will enclose each item in a list:
+						'item_start' => '<li>',
+						'item_end' => '</li>',
+						// This will enclose sub-lists in a list:
+						'group_start' => '<ul>',
+						'group_end' => '</ul>',
+						// This will enclose (foot)notes:
+						'notes_start' => '<div class="notes">',
+						'notes_end' => '</div>',
+						// Widget 'Search form':
+						'search_class'         => 'compact_search_form',
+						'search_input_before'  => '<div class="input-group">',
+						'search_input_after'   => '',
+						'search_submit_before' => '<span class="input-group-btn">',
+						'search_submit_after'  => '</span></div>',
+					) );
+				// ----------------------------- END OF "Sidebar Single" CONTAINER -----------------------------
+			?>
+			</div>
+		</aside><!-- .col -->
+		<?php } ?>
+	</div><!-- .row -->
+
+</div><!-- ../forums_list single_topic -->
+
+<script>
+jQuery( document ).ready( function()
+{
+	jQuery( '.quote_button' ).click( function()
+	{ // Submit a form to save the already entered content
+		console.log( jQuery( this ).attr( 'href' ) );
+		var form = jQuery( 'form[id^=evo_omment_form_id_]' );
+		if( form.length == 0 )
+		{ // No form found, Use an url of this link
+			return true;
+		}
+		// Set an action as url of this link and submit a form
+		form.attr( 'action', jQuery( this ).attr( 'href' ) );
+		form.submit();
+		return false;
+	} );
+} );
+</script>
 <?php
 	locale_restore_previous();	// Restore previous locale (Blog locale)
 }

@@ -1323,7 +1323,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 		// =======================================================================================================
 		case 'std':
 		case 'blog_a':
-			$post_count = 13;
+			$post_count = 14;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -1540,12 +1540,42 @@ This is an extra line.' );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'demo,photo' );
 				$edited_Item->set_setting( 'custom:course', 'Main Course' );
+				$edited_Item->set_setting( 'custom:cuisine', 'South African' );
+				$edited_Item->set_setting( 'custom:servings', '2' );
+				$edited_Item->set_setting( 'custom:prep_time', '1' );
+				$edited_Item->set_setting( 'custom:cook_time', '20' );
+				$edited_Item->set_setting( 'custom:passive_time', '3' );
+				$edited_Item->set_setting( 'custom:ingredients', '1 jar Peppedew Peppers (or piquante pepper)
+4oz goat cheese (any flavor)
+1 tbsp mayonnaise
+1 tbsp sour cream
+1 bunch of chives, chopped
+hearty shot of hot sauce (Franks, Yellowbird)
+hearty crack of pepper' );
+				$mongolian_beef_ID = $edited_Item->insert( $owner_ID, T_('Stuffed Peppers'),
+'<p>We found these during Happy Hour at Chiso’s Grill in Bee Cave, Tx. We’ve since tweaked the recipe a bit. This recipe is just a starting point, add/remove anything you want (like more hot sauce if you’re into that).</p>'.
+'[teaserbreak]'.
+'<p>combine goat cheese, mayo, sour cream, 2/3rds of your chives, hot sauce, black pepper</p>'.
+'<p>if you are feeling spry, beat the mixture to make it fluffy</p>'.
+'<p>put filling in a plastic bag, snip of the tip with scissors to make a piping bag</p>'.
+'<p>fill peppers, place in bowl, top with chives and hot sauce</p>',
+						$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Recipe' );
+				$edit_File = new File( 'shared', 0, 'recipes/stuffed-peppers.jpg' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File->link_to_Object( $LinkOwner, 1, 'teaser' );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo,photo' );
+				$edited_Item->set_setting( 'custom:course', 'Main Course' );
 				$edited_Item->set_setting( 'custom:cuisine', 'Mongolian' );
 				$edited_Item->set_setting( 'custom:servings', '4' );
 				$edited_Item->set_setting( 'custom:prep_time', '2' );
 				$edited_Item->set_setting( 'custom:cook_time', '35' );
 				$edited_Item->set_setting( 'custom:passive_time', '5' );
-				$edited_Item->set_setting( 'custom:total_time', '42' );
 				$edited_Item->set_setting( 'custom:ingredients', 'vegetable oil
 1⁄2 teaspoon ginger
 1 tablespoon garlic
@@ -1566,7 +1596,7 @@ This is an extra line.' );
 '<p>Remove from the heat, add beef back in. Toss</p>'.
 '<p>Serve with rice, top with green onions</p>',
 						$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Recipe' );
-				$edit_File = new File( 'shared', 0, 'recipe/mongolian-beef.jpg' );
+				$edit_File = new File( 'shared', 0, 'recipes/mongolian-beef.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				$edit_File->link_to_Object( $LinkOwner, 1, 'teaser' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
