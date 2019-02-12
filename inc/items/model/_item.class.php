@@ -2931,7 +2931,8 @@ class Item extends ItemLight
 
 		if( $custom_fields[ $field_index ]['type'] == 'double' )
 		{	// This case may be called by computing of the formula:
-			return $this->get_custom_field_value( $field_index );
+			// Use floatval() in order to consider empty value as 0
+			return floatval( $this->get_custom_field_value( $field_index ) );
 		}
 
 		if( $custom_fields[ $field_index ]['type'] != 'computed' )
