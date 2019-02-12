@@ -140,6 +140,10 @@ if( $content_mode == 'auto' )
 			$content_mode = 'full';
 			break;
 
+		case 'flagged':
+			$content_mode = 'excerpt';
+			break;
+
 		case 'posts-default':  // home page 1
 		case 'posts-next':     // next page 2, 3, etc
 		default:
