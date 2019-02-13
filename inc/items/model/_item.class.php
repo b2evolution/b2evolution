@@ -834,11 +834,13 @@ class Item extends ItemLight
 			foreach( $post_urltitle as $u => $slug_urltitle )
 			{
 				$post_urltitle[ $u ] = replace_special_chars( $slug_urltitle, $this->get( 'locale' ) );
+				// Added in May 2017; but old slugs are not converted yet.
+				if( ! empty( $post_urltitle[ $u ] ) && preg_match( '#^[^a-z0-9]*[0-9]*[^a-z0-9]*$#i', $post_urltitle[ $u ] ) )
+				{	// Display error if one of item slugs doesn't contain at least 1 non-numeric character:
+					param_error( 'post_urltitle', T_('All slugs must contain at least 1 non-numeric character.') );
+				}
 			}
 			$this->set( 'urltitle', implode( ', ', $post_urltitle ) );
-			// Added in May 2017; but old slugs are not converted yet.
-			// Display error if item slugs don't contain at least one letter:
-			param_check_regexp( 'post_urltitle', '#^([^,]*[a-z][^,]*,?)*$#i', T_('All slugs must contain at least one letter.') );
 		}
 
 		if( $is_not_content_block )
