@@ -250,8 +250,8 @@ function create_default_data()
 			'name'           => 'Post',
 		);
 	$post_types[] = array(
-			'name'           => 'Podcast Episode',
-			'podcast'        => 1,
+			'name'          => TD_('Recipe'),
+			'template_name' => 'recipe',
 		);
 	$post_types[] = array(
 			'name'           => 'Post with Custom Fields',
@@ -259,6 +259,13 @@ function create_default_data()
 	$post_types[] = array(
 			'name'           => 'Child Post',
 			'use_parent'     => 'required',
+		);
+	$post_types[] = array(
+			'name'           => 'Podcast Episode',
+			'podcast'        => 1,
+		);
+	$post_types[] = array(
+			'name'           => 'Photo Album',
 		);
 	$post_types[] = array(
 			'name'           => 'Manual Page',
@@ -270,7 +277,8 @@ function create_default_data()
 			'allow_html'     => 0,
 		);
 	$post_types[] = array(
-			'name'           => 'Photo Album',
+			'name'       => 'Bug Report',
+			'allow_html' => 0,
 		);
 	$post_types[] = array(
 			'name'           => 'Standalone Page',
@@ -374,14 +382,6 @@ function create_default_data()
 			'allow_closing_comments' => 0,
 			'use_comment_expiration' => 'never',
 		);
-	$post_types[] = array(
-			'name'       => 'Bug Report',
-			'allow_html' => 0,
-		);
-	$post_types[] = array(
-			'name'          => TD_('Recipe'),
-			'template_name' => 'recipe',
-		);
 	// Default settings:
 	$post_type_default_settings = array(
 			'name'                     => '',
@@ -423,7 +423,7 @@ function create_default_data()
 	// Item type custom fields:
 	$parent_ityp_ID = 3;
 	$child_ityp_ID = 4;
-	$recipe_ityp_ID = 20;
+	$recipe_ityp_ID = 2;
 	$custom_fields = array(
 		// for Item Type "Post with Custom Fields":
 		array(
