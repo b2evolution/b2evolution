@@ -3166,21 +3166,13 @@ class Blog extends DataObject
 
 	/**
 	 * Make sure collection settings are loaded.
-	 * This keeps a single instance across all blogs.
-	 * fp> why?
 	 */
 	function load_CollectionSettings()
 	{
-		static $instance; // fp> why do we need static? (it actually feels totally wrong: sharing settings between blogs!)
-
-		if( ! isset($this->CollectionSettings) )
+		if( ! isset( $this->CollectionSettings ) )
 		{
-			if( ! isset( $instance ) )
-			{
-				load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
-				$instance = new CollectionSettings(); // COPY (function)
-			}
-			$this->CollectionSettings = $instance;
+			load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
+			$this->CollectionSettings = new CollectionSettings(); // COPY (function)
 		}
 	}
 
