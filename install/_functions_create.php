@@ -251,7 +251,7 @@ function create_default_data()
 			'schema'         => 'Article',
 		);
 	$post_types[] = array(
-			'name'          => TD_('Recipe'),
+			'name'          => 'Recipe',
 			'template_name' => 'recipe',
 		);
 	$post_types[] = array(

@@ -5723,10 +5723,11 @@ class Blog extends DataObject
 
 		if( ! isset( $cache_all_item_type_data ) )
 		{	// Get all item type data only first time to save execution time:
-			$cache_all_item_type_data = $DB->get_results( 'SELECT ityp_ID, ityp_usage, ityp_name FROM T_items__type' );
+			$cache_all_item_type_data = $DB->get_results( 'SELECT ityp_ID, ityp_usage, ityp_name, ityp_template_name FROM T_items__type' );
 		}
 
 		// Decide what "post" item type we can enable depending on collection kind:
+		$default_post_types_by_template = array();
 		switch( $this->type )
 		{
 			case 'main':
@@ -5743,6 +5744,7 @@ class Blog extends DataObject
 
 			case 'manual':
 				$default_post_types = array( 'Manual Page', 'Recipe' );
+				$default_post_types_by_template = array( 'recipe' );
 				break;
 
 			case 'group':
@@ -5751,6 +5753,7 @@ class Blog extends DataObject
 
 			default: // 'std'
 				$default_post_types = array( 'Post', 'Podcast Episode', 'Post with Custom Fields', 'Child Post', 'Recipe' );
+				$default_post_types_by_template = array( 'recipe' );
 				break;
 		}
 
@@ -5758,7 +5761,8 @@ class Blog extends DataObject
 		foreach( $cache_all_item_type_data as $item_type )
 		{
 			if( $item_type->ityp_usage == 'post' &&
-			    in_array( $item_type->ityp_name, $default_post_types ) )
+			    ( in_array( $item_type->ityp_name, $default_post_types ) || in_array( $item_type->ityp_template_name, $default_post_types_by_template ) ) &&
+			    ! in_array( $item_type->ityp_ID, $enable_post_types ) )
 			{	// This "post" item type can be enabled:
 				$enable_post_types[] = $item_type->ityp_ID;
 			}

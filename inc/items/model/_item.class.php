@@ -6955,7 +6955,7 @@ class Item extends ItemLight
 		$post_url = '',
 		$post_comment_status = 'open',
 		$post_renderers = array('default'),
-		$item_type_name_or_ID = '#', // Use 'Page', 'Post' and etc. OR '#' to use default post type OR integer to use post type by ID
+		$item_type_name_or_ID_or_template = '#', // Use 'Page', 'Post' and etc. OR '#' to use default post type OR integer to use post type by ID OR $template_name$
 		$item_st_ID = NULL,
 		$postcat_order = NULL,
 		$display_restrict_status_messages = true )
@@ -6963,7 +6963,7 @@ class Item extends ItemLight
 		global $DB, $query, $UserCache;
 		global $default_locale;
 
-		if( $item_type_name_or_ID == '#' )
+		if( $item_type_name_or_ID_or_template == '#' )
 		{	// Try to set default post type ID from blog setting:
 			$ChapterCache = & get_ChapterCache();
 			if( $Chapter = & $ChapterCache->get_by_ID( $main_cat_ID, false, false ) &&
@@ -6975,11 +6975,17 @@ class Item extends ItemLight
 		else
 		{	// Try to get item type by requested name:
 			$ItemTypeCache = & get_ItemTypeCache();
-			if( is_int( $item_type_name_or_ID ) && $ItemType = & $ItemTypeCache->get_by_ID( $item_type_name_or_ID, false, false ) )
+			if( is_int( $item_type_name_or_ID_or_template ) &&
+			    ( $ItemType = & $ItemTypeCache->get_by_ID( $item_type_name_or_ID_or_template, false, false ) ) )
 			{	// Item type exists in DB by requested ID, Use it:
 				$item_typ_ID = $ItemType->ID;
 			}
-			elseif( $ItemType = & $ItemTypeCache->get_by_name( $item_type_name_or_ID, false, false ) )
+			elseif( preg_match( '/^\$(.+)\$$/', $item_type_name_or_ID_or_template, $ityp_match ) &&
+			        ( $ItemType = & $ItemTypeCache->get_by_template( $ityp_match[1], false, false ) ) )
+			{	// Item type exists in DB by requested template, Use it:
+				$item_typ_ID = $ItemType->ID;
+			}
+			elseif( $ItemType = & $ItemTypeCache->get_by_name( $item_type_name_or_ID_or_template, false, false ) )
 			{	// Item type exists in DB by requested name, Use it:
 				$item_typ_ID = $ItemType->ID;
 			}
