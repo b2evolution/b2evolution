@@ -5145,7 +5145,7 @@ class Blog extends DataObject
 				break;
 
 			case 'manual':
-				$default_post_types = array( 'Manual Page' );
+				$default_post_types = array( 'Manual Page', 'Recipe' );
 				break;
 
 			case 'group':
@@ -5153,7 +5153,7 @@ class Blog extends DataObject
 				break;
 
 			default: // 'std'
-				$default_post_types = array( 'Post', 'Podcast Episode', 'Post with Custom Fields', 'Child Post' );
+				$default_post_types = array( 'Post', 'Podcast Episode', 'Post with Custom Fields', 'Child Post', 'Recipe' );
 				break;
 		}
 

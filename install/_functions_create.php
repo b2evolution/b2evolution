@@ -250,8 +250,8 @@ function create_default_data()
 			'name'           => 'Post',
 		);
 	$post_types[] = array(
-			'name'           => 'Podcast Episode',
-			'podcast'        => 1,
+			'name'          => TD_('Recipe'),
+			'template_name' => 'recipe',
 		);
 	$post_types[] = array(
 			'name'           => 'Post with Custom Fields',
@@ -259,6 +259,13 @@ function create_default_data()
 	$post_types[] = array(
 			'name'           => 'Child Post',
 			'use_parent'     => 'required',
+		);
+	$post_types[] = array(
+			'name'           => 'Podcast Episode',
+			'podcast'        => 1,
+		);
+	$post_types[] = array(
+			'name'           => 'Photo Album',
 		);
 	$post_types[] = array(
 			'name'           => 'Manual Page',
@@ -270,7 +277,8 @@ function create_default_data()
 			'allow_html'     => 0,
 		);
 	$post_types[] = array(
-			'name'           => 'Photo Album',
+			'name'       => 'Bug Report',
+			'allow_html' => 0,
 		);
 	$post_types[] = array(
 			'name'           => 'Standalone Page',
@@ -374,10 +382,6 @@ function create_default_data()
 			'allow_closing_comments' => 0,
 			'use_comment_expiration' => 'never',
 		);
-	$post_types[] = array(
-			'name' => 'Bug Report',
-			'allow_html'     => 0,
-		);
 	// Default settings:
 	$post_type_default_settings = array(
 			'name'                     => '',
@@ -419,6 +423,7 @@ function create_default_data()
 	// Item type custom fields:
 	$parent_ityp_ID = 3;
 	$child_ityp_ID = 4;
+	$recipe_ityp_ID = 2;
 	$custom_fields = array(
 		// for Item Type "Post with Custom Fields":
 		array(
@@ -546,6 +551,87 @@ function create_default_data()
 			'format'          => '#yes#;;#no#;n/a',
 			'cell_class'      => 'right',
 		),
+		// for Item Type "Recipe":
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Course'),
+			'name'            => 'course',
+			'type'            => 'varchar',
+			'order'           => 1,
+			'note'            => T_('E-g: ').'"'.TD_('Dessert').'"',
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Cuisine'),
+			'name'            => 'cuisine',
+			'type'            => 'varchar',
+			'order'           => 2,
+			'note'            => T_('E-g: ').'"'.TD_('Italian').'"',
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Servings'),
+			'name'            => 'servings',
+			'order'           => 3,
+			'note'            => TD_('people'),
+			'format'          => sprintf( TD_('%d people'), 0 ),
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Prep Time'),
+			'name'            => 'prep_time',
+			'order'           => 4,
+			'note'            => TD_('minutes'),
+			'format'          => sprintf( TD_('%s minutes'), 0 ),
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Cook Time'),
+			'name'            => 'cook_time',
+			'order'           => 5,
+			'note'            => TD_('minutes'),
+			'format'          => sprintf( TD_('%s minutes'), 0 ),
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Passive Time'),
+			'name'            => 'passive_time',
+			'order'           => 6,
+			'note'            => TD_('minutes'),
+			'format'          => sprintf( TD_('%s minutes'), 0 ),
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Total time'),
+			'name'            => 'total_time',
+			'type'            => 'computed',
+			'order'           => 7,
+			'format'          => sprintf( TD_('%s minutes'), 0 ),
+			'formula'         => '$prep_time$ + $cook_time$ + $passive_time$',
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Ingredients'),
+			'name'            => 'ingredients',
+			'type'            => 'text',
+			'order'           => 8,
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
 	);
 	// Default settings for custom fields:
 	$custom_field_default_settings = array(
@@ -556,6 +642,7 @@ function create_default_data()
 			'order'           => '',
 			'note'            => NULL,
 			'format'          => NULL,
+			'formula'         => NULL,
 			'header_class'    => 'right nowrap',
 			'cell_class'      => 'center',
 			'link'            => 'nolink',
