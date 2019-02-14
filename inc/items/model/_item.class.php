@@ -834,12 +834,22 @@ class Item extends ItemLight
 			foreach( $post_urltitle as $u => $slug_urltitle )
 			{
 				$post_urltitle[ $u ] = replace_special_chars( $slug_urltitle, $this->get( 'locale' ) );
+				if( empty( $post_urltitle[ $u ] ) )
+				{	// Unset empty slug in order to create auto slug:
+					unset( $post_urltitle[ $u ] );
+					continue;
+				}
 				// Added in May 2017; but old slugs are not converted yet.
-				if( ! empty( $post_urltitle[ $u ] ) && preg_match( '#^[^a-z0-9]*[0-9]*[^a-z0-9]*$#i', $post_urltitle[ $u ] ) )
+				if( preg_match( '#^[^a-z0-9]*[0-9]*[^a-z0-9]*$#i', $post_urltitle[ $u ] ) )
 				{	// Display error if one of item slugs doesn't contain at least 1 non-numeric character:
 					param_error( 'post_urltitle', T_('All slugs must contain at least 1 non-numeric character.') );
 				}
 			}
+			// Append old slugs at the end because they are not deleted on updating of the Item,
+			// and update array of the cached slugs from DB in order to display proper slugs after submit the forms with errors:
+			$this->get_slugs();
+			$this->slugs = array_unique( array_merge( $post_urltitle, $this->slugs ) );
+			// Set new post urltitle:
 			$this->set( 'urltitle', implode( ', ', $post_urltitle ) );
 		}
 
@@ -9083,24 +9093,30 @@ class Item extends ItemLight
 	 */
 	function get_slugs( $separator = ', ' )
 	{
-		if( empty( $this->ID ) )
-		{ // New creating Item
-			return $this->get('urltitle');
+		if( ! isset( $this->slugs ) )
+		{	// Initialize item slugs:
+			if( empty( $this->ID ) )
+			{	// Get creating Item:
+				//return $this->get( 'urltitle' );
+				$this->slugs = array();
+			}
+			else
+			{	// Load slugs from DB once:
+				global $DB;
+				$SQL = new SQL( 'Get slugs of the Item #'.$this->ID );
+				$SQL->SELECT( 'slug_title, IF( slug_ID = '.intval( $this->canonical_slug_ID ).', 0, slug_ID ) AS slug_order_num' );
+				$SQL->FROM( 'T_slug' );
+				$SQL->WHERE( 'slug_itm_ID = '.$DB->quote( $this->ID ) );
+				if( ! empty( $this->tiny_slug_ID ) )
+				{	// Exclude tiny slug from list:
+					$SQL->WHERE_and( 'slug_ID != '.$DB->quote( $this->tiny_slug_ID ) );
+				}
+				$SQL->ORDER_BY( 'slug_order_num' );
+				$this->slugs = $DB->get_col( $SQL );
+			}
 		}
 
-		global $DB;
-		$SQL = new SQL( 'Get slugs of the Item' );
-		$SQL->SELECT( 'slug_title, IF( slug_ID = '.intval( $this->canonical_slug_ID ).', 0, slug_ID ) AS slug_order_num' );
-		$SQL->FROM( 'T_slug' );
-		$SQL->WHERE( 'slug_itm_ID = '.$DB->quote( $this->ID ) );
-		if( !empty( $this->tiny_slug_ID ) )
-		{ // Exclude tiny slug from list
-			$SQL->WHERE_and( 'slug_ID != '.$DB->quote( $this->tiny_slug_ID ) );
-		}
-		$SQL->ORDER_BY( 'slug_order_num' );
-		$slugs = $DB->get_col( $SQL );
-
-		return implode( $separator, $slugs );
+		return implode( $separator, $this->slugs );
 	}
 
 
