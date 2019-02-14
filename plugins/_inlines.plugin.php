@@ -100,7 +100,7 @@ class inlines_plugin extends Plugin
 	 */
 	function DisplayEmailToolbar( & $params )
 	{
-		$params['target_type'] = 'Message';
+		$params['target_type'] = 'EmailCampaign';
 		return $this->DisplayCodeToolbar( $params );
 	}
 
@@ -113,7 +113,7 @@ class inlines_plugin extends Plugin
 	 */
 	function DisplayMessageToolbar( & $params )
 	{
-		$params['target_type'] = 'EmailCampaign';
+		$params['target_type'] = 'Message';
 		return $this->DisplayCodeToolbar( $params );
 	}
 

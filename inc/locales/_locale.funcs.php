@@ -248,6 +248,19 @@ function TS_( $string, $req_locale = '', $params = array() )
 
 
 /**
+ * Translate strings in demo/sample contents.
+ *
+ * @param string String to translate
+ * @return string The translated string
+ */
+function TD_( $string )
+{
+	// TODO: Later we will make a specific .POT file containing ONLY demo contents.
+	return $string;
+}
+
+
+/**
  * Temporarily switch to another locale
  *
  * Calls can be nested, see {@link locale_restore_previous()}.

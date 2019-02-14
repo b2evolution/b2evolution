@@ -834,11 +834,13 @@ class Item extends ItemLight
 			foreach( $post_urltitle as $u => $slug_urltitle )
 			{
 				$post_urltitle[ $u ] = replace_special_chars( $slug_urltitle, $this->get( 'locale' ) );
+				// Added in May 2017; but old slugs are not converted yet.
+				if( ! empty( $post_urltitle[ $u ] ) && preg_match( '#^[^a-z0-9]*[0-9]*[^a-z0-9]*$#i', $post_urltitle[ $u ] ) )
+				{	// Display error if one of item slugs doesn't contain at least 1 non-numeric character:
+					param_error( 'post_urltitle', T_('All slugs must contain at least 1 non-numeric character.') );
+				}
 			}
 			$this->set( 'urltitle', implode( ', ', $post_urltitle ) );
-			// Added in May 2017; but old slugs are not converted yet.
-			// Display error if item slugs don't contain at least one letter:
-			param_check_regexp( 'post_urltitle', '#^([^,]*[a-z][^,]*,?)*$#i', T_('All slugs must contain at least one letter.') );
 		}
 
 		if( $is_not_content_block )
@@ -2603,6 +2605,26 @@ class Item extends ItemLight
 			'Insert new custom field values for Item #'.$this->ID );
 
 		return ( $deleted_cf_num > 0 || $inserted_cf_num > 0 );
+	}
+
+
+	/**
+	 * Get item custom field title by field index
+	 *
+	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
+	 * @return string|boolean FALSE if the field doesn't exist
+	 */
+	function get_custom_field_title( $field_index )
+	{
+		// Get all custom fields by item ID:
+		$custom_fields = $this->get_custom_fields_defs();
+
+		if( ! isset( $custom_fields[ $field_index ] ) )
+		{	// The requested field is not detected:
+			return false;
+		}
+
+		return $custom_fields[ $field_index ]['label'];
 	}
 
 
@@ -7019,6 +7041,16 @@ class Item extends ItemLight
 		$this->set( 'ityp_ID', $item_typ_ID );
 		$this->set( 'pst_ID', $item_st_ID );
 		$this->set( 'order', $postcat_order );
+
+		// Update the computed custom fields if this Item has them:
+		$custom_fields = $this->get_custom_fields_defs();
+		foreach( $custom_fields as $custom_field )
+		{
+			if( $custom_field['type'] == 'computed' )
+			{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
+				$this->set_setting( 'custom:'.$custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ), true );
+			}
+		}
 
 		// INSERT INTO DB:
 		$this->dbinsert( $display_restrict_status_messages );

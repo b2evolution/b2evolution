@@ -2255,7 +2255,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 		// =======================================================================================================
 		case 'std':
 		case 'blog_a':
-			$post_count = 12;
+			$post_count = 14;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -2264,7 +2264,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			$cat_bg = cat_create( T_('Background'), 'NULL', $blog_ID, NULL, true );
 			$cat_fun = cat_create( T_('Fun'), 'NULL', $blog_ID, NULL, true );
 				$cat_life = cat_create( T_('In real life'), $cat_fun, $blog_ID, NULL, true );
-					$cat_sports = cat_create( T_('Sports'), $cat_life, $blog_ID, NULL, true );
+					$cat_recipes = cat_create( T_('Recipes'), $cat_life, $blog_ID, NULL, true, NULL, NULL, false, 'Recipe' );
 					$cat_movies = cat_create( T_('Movies'), $cat_life, $blog_ID, NULL, true );
 					$cat_music = cat_create( T_('Music'), $cat_life, $blog_ID, NULL, true );
 				$cat_web = cat_create( T_('On the web'), $cat_fun, $blog_ID, NULL, true );
@@ -2509,6 +2509,80 @@ This is an extra line.' );
 							$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Child Post' );
 					$item_IDs[] = array( $edited_Item->ID, $now );
 				}
+			}
+
+			if( is_available_item_type( $blog_ID, 'Recipe' ) )
+			{
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo,photo' );
+				$edited_Item->set_setting( 'custom:course', TD_('Main Course') );
+				$edited_Item->set_setting( 'custom:cuisine', TD_('South African') );
+				$edited_Item->set_setting( 'custom:servings', '2' );
+				$edited_Item->set_setting( 'custom:prep_time', '1' );
+				$edited_Item->set_setting( 'custom:cook_time', '20' );
+				$edited_Item->set_setting( 'custom:passive_time', '3' );
+				$edited_Item->set_setting( 'custom:ingredients', TD_('1 jar Peppedew Peppers (or piquante pepper)
+4oz goat cheese (any flavor)
+1 tbsp mayonnaise
+1 tbsp sour cream
+1 bunch of chives, chopped
+hearty shot of hot sauce (Franks, Yellowbird)
+hearty crack of pepper') );
+				$mongolian_beef_ID = $edited_Item->insert( $owner_ID, TD_('Stuffed Peppers'),
+'<p>'.TD_('We found these during Happy Hour at Chiso’s Grill in Bee Cave, Tx. We’ve since tweaked the recipe a bit. This recipe is just a starting point, add/remove anything you want (like more hot sauce if you’re into that).').'</p>'.
+'[teaserbreak]'.
+'<ol>'.
+	'<li>'.TD_('combine goat cheese, mayo, sour cream, 2/3rds of your chives, hot sauce, black pepper').'</li>'.
+	'<li>'.TD_('if you are feeling spry, beat the mixture to make it fluffy').'</li>'.
+	'<li>'.TD_('put filling in a plastic bag, snip of the tip with scissors to make a piping bag').'</li>'.
+	'<li>'.TD_('fill peppers, place in bowl, top with chives and hot sauce').'</li>'.
+'</ol>',
+						$now, $cat_recipes, array(), 'published', '#', '', '', 'open', array('default'), 'Recipe' );
+				$edit_File = new File( 'shared', 0, 'recipes/stuffed-peppers.jpg' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File->link_to_Object( $LinkOwner, 1, 'teaser' );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo,photo' );
+				$edited_Item->set_setting( 'custom:course', TD_('Main Course') );
+				$edited_Item->set_setting( 'custom:cuisine', TD_('Mongolian') );
+				$edited_Item->set_setting( 'custom:servings', '4' );
+				$edited_Item->set_setting( 'custom:prep_time', '2' );
+				$edited_Item->set_setting( 'custom:cook_time', '35' );
+				$edited_Item->set_setting( 'custom:passive_time', '5' );
+				$edited_Item->set_setting( 'custom:ingredients', TD_('vegetable oil
+1⁄2 teaspoon ginger
+1 tablespoon garlic
+1⁄2 cup soy sauce
+1⁄2 cup water
+3⁄4 cup dark brown sugar
+1 lb flank steak
+1 yellow onion
+2 large green onions') );
+				$mongolian_beef_ID = $edited_Item->insert( $owner_ID, TD_('Mongolian Beef'),
+'<p>'.TD_('A quick go-to dinner. Can be made with almost any meat. I often used ground. Works perfect for lettuce wraps. Try replacing the onion with thinly sliced fennel.').'</p>'.
+'<p>'.TD_('Optional: spice this thing up, with a dose of your favorite chili paste/sauce.').'</p>'.
+'[teaserbreak]'.
+'<ol>'.
+	'<li>'.TD_('Slice the beef thin and cook with a bit of oil (your choice) and the yellow onion (cut into petals) in a medium saucepan. Set aside when done.').'</li>'.
+	'<li>'.TD_('Make the sauce by heating 2 tsp of vegetable oil over med/low heat in the same pan. Don’t get the oil too hot.').'</li>'.
+	'<li>'.TD_('Add ginger and garlic to the pan and quickly add the soy sauce and water before the garlic scorches.').'</li>'.
+	'<li>'.TD_('Dissolve the brown sugar in the sauce, then raise the heat to medium and boil the sauce for 2-3 minutes or until the sauce thickens.').'</li>'.
+	'<li>'.TD_('Remove from the heat, add beef back in. Toss').'</li>'.
+	'<li>'.TD_('Serve with rice, top with green onions').'</li>'.
+'</ol>',
+						$now, $cat_recipes, array(), 'published', '#', '', '', 'open', array('default'), 'Recipe' );
+				$edit_File = new File( 'shared', 0, 'recipes/mongolian-beef.jpg' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File->link_to_Object( $LinkOwner, 1, 'teaser' );
+				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
 
 			if( is_available_item_type( $blog_ID, '#' ) )
@@ -2988,7 +3062,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 
 		// =======================================================================================================
 		case 'manual':
-			$post_count = 15;
+			$post_count = 17;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -2997,12 +3071,13 @@ T_("<p>To get you started, the installer has automatically created several sampl
 			$cat_manual_userguide = cat_create( T_('User Guide'), NULL, $blog_ID, NULL, true, 30 );
 			$cat_manual_reference = cat_create( T_('Reference'), NULL, $blog_ID, NULL, true, 40, 'alpha' );
 
-			$cat_manual_everyday = cat_create( T_('Collections'), $cat_manual_reference, $blog_ID, NULL, true, 10 );
-			$cat_manual_advanced = cat_create( T_('Other'), $cat_manual_reference, $blog_ID, NULL, true, 5 );
+			$cat_manual_collections = cat_create( T_('Collections'), $cat_manual_reference, $blog_ID, NULL, true, 10 );
+			$cat_manual_recipes = cat_create( T_('Recipes'), $cat_manual_reference, $blog_ID, NULL, true, NULL, NULL, false, 'Recipe' );
+			$cat_manual_other = cat_create( T_('Other'), $cat_manual_reference, $blog_ID, NULL, true, 5 );
 
-			$cat_manual_blogs = cat_create( T_('Blogs'), $cat_manual_everyday, $blog_ID, NULL, true, 35 );
-			$cat_manual_photos = cat_create( T_('Photo Albums'), $cat_manual_everyday, $blog_ID, NULL, true, 25 );
-			$cat_manual_forums = cat_create( T_('Forums'), $cat_manual_everyday, $blog_ID, NULL, true, 5 );
+			$cat_manual_blogs = cat_create( T_('Blogs'), $cat_manual_collections, $blog_ID, NULL, true, 35 );
+			$cat_manual_photos = cat_create( T_('Photo Albums'), $cat_manual_collections, $blog_ID, NULL, true, 25 );
+			$cat_manual_forums = cat_create( T_('Forums'), $cat_manual_collections, $blog_ID, NULL, true, 5 );
 
 
 			if( $edited_Blog = $BlogCache->get_by_ID( $blog_ID, false, false ) )
@@ -3326,7 +3401,84 @@ Hello
 |}', $now, $cat_manual_reference, array( $cat_manual_userguide ),
 'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 50 );
 				$item_IDs[] = array( $edited_Item->ID, $now );
+			}
 
+			if( is_available_item_type( $blog_ID, 'Recipe' ) )
+			{
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo,photo' );
+				$edited_Item->set_setting( 'custom:course', TD_('Main Course') );
+				$edited_Item->set_setting( 'custom:cuisine', TD_('South African') );
+				$edited_Item->set_setting( 'custom:servings', '2' );
+				$edited_Item->set_setting( 'custom:prep_time', '1' );
+				$edited_Item->set_setting( 'custom:cook_time', '20' );
+				$edited_Item->set_setting( 'custom:passive_time', '3' );
+				$edited_Item->set_setting( 'custom:ingredients', TD_('1 jar Peppedew Peppers (or piquante pepper)
+4oz goat cheese (any flavor)
+1 tbsp mayonnaise
+1 tbsp sour cream
+1 bunch of chives, chopped
+hearty shot of hot sauce (Franks, Yellowbird)
+hearty crack of pepper') );
+				$mongolian_beef_ID = $edited_Item->insert( $owner_ID, TD_('Stuffed Peppers'),
+'<p>'.TD_('We found these during Happy Hour at Chiso’s Grill in Bee Cave, Tx. We’ve since tweaked the recipe a bit. This recipe is just a starting point, add/remove anything you want (like more hot sauce if you’re into that).').'</p>'.
+'[teaserbreak]'.
+'<ol>'.
+	'<li>'.TD_('combine goat cheese, mayo, sour cream, 2/3rds of your chives, hot sauce, black pepper').'</li>'.
+	'<li>'.TD_('if you are feeling spry, beat the mixture to make it fluffy').'</li>'.
+	'<li>'.TD_('put filling in a plastic bag, snip of the tip with scissors to make a piping bag').'</li>'.
+	'<li>'.TD_('fill peppers, place in bowl, top with chives and hot sauce').'</li>'.
+'</ol>',
+						$now, $cat_manual_recipes, array(), 'published', '#', '', '', 'open', array('default'), 'Recipe' );
+				$edit_File = new File( 'shared', 0, 'recipes/stuffed-peppers.jpg' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File->link_to_Object( $LinkOwner, 1, 'teaser' );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
+				// Insert a post:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'demo,photo' );
+				$edited_Item->set_setting( 'custom:course', TD_('Main Course') );
+				$edited_Item->set_setting( 'custom:cuisine', TD_('Mongolian') );
+				$edited_Item->set_setting( 'custom:servings', '4' );
+				$edited_Item->set_setting( 'custom:prep_time', '2' );
+				$edited_Item->set_setting( 'custom:cook_time', '35' );
+				$edited_Item->set_setting( 'custom:passive_time', '5' );
+				$edited_Item->set_setting( 'custom:ingredients', TD_('vegetable oil
+1⁄2 teaspoon ginger
+1 tablespoon garlic
+1⁄2 cup soy sauce
+1⁄2 cup water
+3⁄4 cup dark brown sugar
+1 lb flank steak
+1 yellow onion
+2 large green onions') );
+				$mongolian_beef_ID = $edited_Item->insert( $owner_ID, TD_('Mongolian Beef'),
+'<p>'.TD_('A quick go-to dinner. Can be made with almost any meat. I often used ground. Works perfect for lettuce wraps. Try replacing the onion with thinly sliced fennel.').'</p>'.
+'<p>'.TD_('Optional: spice this thing up, with a dose of your favorite chili paste/sauce.').'</p>'.
+'[teaserbreak]'.
+'<ol>'.
+	'<li>'.TD_('Slice the beef thin and cook with a bit of oil (your choice) and the yellow onion (cut into petals) in a medium saucepan. Set aside when done.').'</li>'.
+	'<li>'.TD_('Make the sauce by heating 2 tsp of vegetable oil over med/low heat in the same pan. Don’t get the oil too hot.').'</li>'.
+	'<li>'.TD_('Add ginger and garlic to the pan and quickly add the soy sauce and water before the garlic scorches.').'</li>'.
+	'<li>'.TD_('Dissolve the brown sugar in the sauce, then raise the heat to medium and boil the sauce for 2-3 minutes or until the sauce thickens.').'</li>'.
+	'<li>'.TD_('Remove from the heat, add beef back in. Toss').'</li>'.
+	'<li>'.TD_('Serve with rice, top with green onions').'</li>'.
+'</ol>',
+						$now, $cat_manual_recipes, array(), 'published', '#', '', '', 'open', array('default'), 'Recipe' );
+				$edit_File = new File( 'shared', 0, 'recipes/mongolian-beef.jpg' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File->link_to_Object( $LinkOwner, 1, 'teaser' );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+			}
+
+			if( is_available_item_type( $blog_ID, 'Manual Page' ) )
+			{
 				// Insert a post:
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
@@ -3411,7 +3563,7 @@ Hello
 
 </ul>
 
-<p>You can add new collections of any type (blog, photos, forums, etc.), delete unwanted one and customize existing collections (title, sidebar, blog skin, widgets, etc.) from the admin interface.</p>"), $now, $cat_manual_intro, array( $cat_manual_everyday ),
+<p>You can add new collections of any type (blog, photos, forums, etc.), delete unwanted one and customize existing collections (title, sidebar, blog skin, widgets, etc.) from the admin interface.</p>"), $now, $cat_manual_intro, array( $cat_manual_collections ),
 					'published', '#', '', '', 'open', array('default'), 'Manual Page', NULL, 30 );
 				$edit_File = new File( 'shared', 0, 'logos/b2evolution_1016x208_wbg.png' );
 				$LinkOwner = new LinkItem( $edited_Item );

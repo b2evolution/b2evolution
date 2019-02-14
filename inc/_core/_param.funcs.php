@@ -1076,16 +1076,20 @@ function param_check_isregexp( $var, $err_msg, $field_err_msg = NULL )
  * @param string regexp
  * @param string error message
  * @param string|NULL error message for form field ($err_msg gets used if === NULL).
+ * @param boolean TRUE if the param value cannot be empty
+ * @param boolean FALSE to check the param value DOES NOT MATCH a regexp
  * @return boolean true if OK
  */
-function param_check_regexp( $var, $regexp, $err_msg, $field_err_msg = NULL, $required = true )
+function param_check_regexp( $var, $regexp, $err_msg, $field_err_msg = NULL, $required = true, $match = true )
 {
 	if( empty( $GLOBALS[$var] ) && ! $required )
 	{ // empty variable is OK
 		return true;
 	}
 
-	if( ! preg_match( $regexp, $GLOBALS[$var] ) )
+	$result = preg_match( $regexp, $GLOBALS[$var] );
+	if( ( $match && ! $result ) || // Match
+	    ( ! $match && $result ) )  // Does NOT match
 	{
 		param_error( $var, $err_msg, $field_err_msg );
 		return false;
