@@ -25,8 +25,6 @@ global $test_install_all_features;
 global $user_org_IDs;
 global $user_timestamp;
 
-global $available_item_types;
-
 load_class( 'items/model/_item.class.php', 'Item' );
 load_class( 'files/model/_file.class.php', 'File' );
 load_class( 'links/model/_linkuser.class.php', 'LinkUser' );
@@ -96,31 +94,60 @@ function get_post_timestamp_data( $num_posts = 1, $min = 30, $max = 720, $base_t
 }
 
 
-function is_available_item_type( $blog_ID, $item_type_name = '#', $item_types = array() )
+/**
+ * Check if item type is available by name or template name for requested collection
+ *
+ * @param integer Collection IF
+ * @param string Item Type name or $template_name$
+ * @return boolean
+ */
+function is_available_item_type( $blog_ID, $item_type_name_or_template = '#' )
 {
 	global $DB, $available_item_types;
 
 	$BlogCache = & get_BlogCache();
 	$ItemTypeCache = & get_ItemTypeCache();
 
-	if( $item_type_name == '#' )
+	$mode = 'name';
+
+	if( $item_type_name_or_template == '#' )
 	{
 		$Blog = & $BlogCache->get_by_ID( $blog_ID );
 		$default_item_type = $ItemTypeCache->get_by_ID( $Blog->get_setting( 'default_post_type' ) );
-		$item_type_name = $default_item_type->get_name();
+		$item_type_name_or_template = $default_item_type->get_name();
+	}
+	elseif( preg_match( '/^\$(.+)\$$/', $item_type_name_or_template, $ityp_match ) )
+	{	// This is a request to check by template name, because param is in format like $template_name$:
+		$mode = 'template';
+		$item_type_name_or_template = $ityp_match[1];
 	}
 
-	if( ! isset( $available_item_types[$blog_ID] ) )
+	if( ! isset( $available_item_types[ $blog_ID ] ) )
 	{
-		// Get available item types for the current collection
-		$SQL = new SQL();
-		$SQL->SELECT( 'it.ityp_name' );
-		$SQL->FROM( 'T_items__type AS it' );
+		if( ! isset( $available_item_types ) )
+		{
+			$available_item_types = array();
+		}
+		$available_item_types[ $blog_ID ] = array( 'name' => array(), 'template' => array() );
+		$SQL = new SQL( 'Get available item types for the collection #'.$blog_ID );
+		$SQL->SELECT( 'ityp_name, ityp_template_name' );
+		$SQL->FROM( 'T_items__type' );
 		$SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID AND itc_coll_ID = '.$blog_ID );
-		$available_item_types[$blog_ID] = $DB->get_col( $SQL->get() );
+		$item_types = $DB->get_results( $SQL );
+		foreach( $item_types as $item_type )
+		{
+			if( !in_array( $item_type->ityp_name, $available_item_types[ $blog_ID ]['name'] ) )
+			{
+				$available_item_types[ $blog_ID ]['name'][] = $item_type->ityp_name;
+			}
+			if( !in_array( $item_type->ityp_template_name, $available_item_types[ $blog_ID ]['template'] ) )
+			{
+				$available_item_types[ $blog_ID ]['template'][] = $item_type->ityp_template_name;
+			}
+		}
 	}
 
-	return in_array( $item_type_name, $available_item_types[$blog_ID] );
+	return in_array( $item_type_name_or_template, $available_item_types[ $blog_ID ][ $mode ] );
 }
 
 
@@ -1579,7 +1606,7 @@ This is an extra line.' );
 				}
 			}
 
-			if( is_available_item_type( $blog_ID, 'Recipe' ) )
+			if( is_available_item_type( $blog_ID, '$recipe$' ) )
 			{
 				// Insert a post:
 				$post_count--;
@@ -1608,7 +1635,7 @@ hearty crack of pepper') );
 	'<li>'.TD_('put filling in a plastic bag, snip of the tip with scissors to make a piping bag').'</li>'.
 	'<li>'.TD_('fill peppers, place in bowl, top with chives and hot sauce').'</li>'.
 '</ol>',
-						$now, $cat_recipes, array(), 'published', '#', '', '', 'open', array('default'), 'Recipe' );
+						$now, $cat_recipes, array(), 'published', '#', '', '', 'open', array('default'), '$recipe$' );
 				$edit_File = new File( 'shared', 0, 'recipes/stuffed-peppers.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				$edit_File->link_to_Object( $LinkOwner, 1, 'teaser' );
@@ -1646,7 +1673,7 @@ hearty crack of pepper') );
 	'<li>'.TD_('Remove from the heat, add beef back in. Toss').'</li>'.
 	'<li>'.TD_('Serve with rice, top with green onions').'</li>'.
 '</ol>',
-						$now, $cat_recipes, array(), 'published', '#', '', '', 'open', array('default'), 'Recipe' );
+						$now, $cat_recipes, array(), 'published', '#', '', '', 'open', array('default'), '$recipe$' );
 				$edit_File = new File( 'shared', 0, 'recipes/mongolian-beef.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				$edit_File->link_to_Object( $LinkOwner, 1, 'teaser' );
@@ -2468,7 +2495,7 @@ Hello
 				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
 
-			if( is_available_item_type( $blog_ID, 'Recipe' ) )
+			if( is_available_item_type( $blog_ID, '$recipe$' ) )
 			{
 				// Insert a post:
 				$post_count--;
@@ -2497,7 +2524,7 @@ hearty crack of pepper') );
 	'<li>'.TD_('put filling in a plastic bag, snip of the tip with scissors to make a piping bag').'</li>'.
 	'<li>'.TD_('fill peppers, place in bowl, top with chives and hot sauce').'</li>'.
 '</ol>',
-						$now, $cat_manual_recipes, array(), 'published', '#', '', '', 'open', array('default'), 'Recipe' );
+						$now, $cat_manual_recipes, array(), 'published', '#', '', '', 'open', array('default'), '$recipe$' );
 				$edit_File = new File( 'shared', 0, 'recipes/stuffed-peppers.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				$edit_File->link_to_Object( $LinkOwner, 1, 'teaser' );
@@ -2535,7 +2562,7 @@ hearty crack of pepper') );
 	'<li>'.TD_('Remove from the heat, add beef back in. Toss').'</li>'.
 	'<li>'.TD_('Serve with rice, top with green onions').'</li>'.
 '</ol>',
-						$now, $cat_manual_recipes, array(), 'published', '#', '', '', 'open', array('default'), 'Recipe' );
+						$now, $cat_manual_recipes, array(), 'published', '#', '', '', 'open', array('default'), '$recipe$' );
 				$edit_File = new File( 'shared', 0, 'recipes/mongolian-beef.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );
 				$edit_File->link_to_Object( $LinkOwner, 1, 'teaser' );

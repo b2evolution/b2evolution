@@ -250,7 +250,7 @@ function create_default_data()
 			'name'           => 'Post',
 		);
 	$post_types[] = array(
-			'name'          => TD_('Recipe'),
+			'name'          => 'Recipe',
 			'template_name' => 'recipe',
 		);
 	$post_types[] = array(
