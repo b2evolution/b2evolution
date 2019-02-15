@@ -146,10 +146,12 @@ switch( $action )
 
 		$edited_Blog->set( 'owner_user_ID', $current_User->ID );
 
+		param( 'skin_ID', 'integer', true );
+		$edited_Blog->set( 'normal_skin_ID', $skin_ID );
+
 		param( 'kind', 'string', true );
 		$edited_Blog->init_by_kind( $kind );
 
-		param( 'skin_ID', 'integer', true );
 		if( $sec_ID > 0 )
 		{
 			$edited_Blog->set( 'sec_ID', $sec_ID );
@@ -183,6 +185,9 @@ switch( $action )
 			// We have EXITed already at this point!!
 		}
 
+		param( 'skin_ID', 'integer', true );
+		$edited_Blog->set( 'normal_skin_ID', $skin_ID );
+
 		$edited_Blog->init_by_kind( $kind );
 		if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		{ // validate the urlname, which was already set by init_by_kind() function
@@ -190,9 +195,6 @@ switch( $action )
 		 	// When user has edit permission to blog admin part, the urlname will be validated in load_from_request() function.
 			$edited_Blog->set( 'urlname', urltitle_validate( empty( $blog_urlname ) ? $edited_Blog->get( 'urlname' ) : $blog_urlname, '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
 		}
-
-		param( 'skin_ID', 'integer', true );
-		$edited_Blog->set( 'normal_skin_ID', $skin_ID );
 
 		// Check how new content should be created for new collection:
 		param( 'create_demo_contents', 'boolean', NULL );

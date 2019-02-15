@@ -448,6 +448,7 @@ function create_blog(
 	}
 
 	$Blog->set( 'sec_ID', $section_ID );
+	$Blog->set( 'normal_skin_ID', $blog_Skin->ID );
 
 	$Blog->init_by_kind( $kind, $blog_name, $blog_shortname, $blog_urlname );
 
@@ -467,7 +468,6 @@ function create_blog(
 	$Blog->set( 'locale', $default_locale );
 	$Blog->set( 'in_bloglist', $in_bloglist );
 	$Blog->set( 'owner_user_ID', $owner_user_ID );
-	$Blog->set( 'normal_skin_ID', $blog_Skin->ID );
 
 	$Blog->dbinsert();
 
@@ -1742,27 +1742,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			if( $blog_minisite_ID )
 			{
 				$blog_ID = $blog_minisite_ID;
-
-				$BlogCache = & get_BlogCache();
-				if( $minisite_Blog = $BlogCache->get_by_ID( $blog_minisite_ID, false, false ) )
-				{
-					$blog_skin_ID = $minisite_Blog->get_skin_ID();
-					if( ! empty( $blog_skin_ID ) )
-					{
-						$SkinCache = & get_SkinCache();
-						$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
-						$Skin->set_setting( 'section_2_image_file_ID', NULL );
-						$Skin->set_setting( 'section_3_display', 1 );
-						$Skin->set_setting( 'section_3_title_color', '#FFFFFF' );
-						$Skin->set_setting( 'section_3_text_color', '#FFFFFF' );
-						$Skin->set_setting( 'section_3_link_color', '#FFFFFF' );
-						$Skin->set_setting( 'section_3_link_h_color', '#FFFFFF' );
-						$Skin->set_setting( 'section_4_image_file_ID', NULL );
-						$Skin->dbupdate_settings();
-					}
-				}
 			}
-
 			break;
 
 		// =======================================================================================================

@@ -348,10 +348,20 @@ class Blog extends DataObject
 		{
 			case 'minisite':
 				$this->set( 'type', 'minisite' );
-				$this->set( 'name', empty( $name ) ? T_('Minisite Title') : $name );
+				$this->set( 'name', empty( $name ) ? T_('Mini-Site Title') : $name );
 				$this->set( 'shortname', empty( $shortname ) ? T_('Mini-Site') : $shortname );
 				$this->set( 'urlname', empty( $urlname ) ? 'minisite' : $urlname );
 				$this->set_setting( 'front_disp', 'front' );
+				if( $blog_skin_ID = $this->get_skin_ID( 'normal' ) )
+				{
+					$this->set_setting( 'skin'.$blog_skin_ID.'_section_2_image_file_ID', NULL );
+					$this->set_setting( 'skin'.$blog_skin_ID.'_section_3_display', 1 );
+					$this->set_setting( 'skin'.$blog_skin_ID.'_section_3_title_color', '#FFFFFF' );
+					$this->set_setting( 'skin'.$blog_skin_ID.'_section_3_text_color', '#FFFFFF' );
+					$this->set_setting( 'skin'.$blog_skin_ID.'_section_3_link_color', '#FFFFFF' );
+					$this->set_setting( 'skin'.$blog_skin_ID.'_section_3_link_h_color', '#FFFFFF' );
+					$this->set_setting( 'skin'.$blog_skin_ID.'_section_4_image_file_ID', NULL );
+				}
 				break;
 
 			case 'main':

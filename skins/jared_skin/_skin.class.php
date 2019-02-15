@@ -364,7 +364,6 @@ class jared_Skin extends Skin
 						'label' => T_('Background image'),
 						'type' => 'fileselect',
 						'defaultvalue' => NULL,
-						'initialize_with' => 'shared/global/sunset/sunset.jpg',
 						'thumbnail_size' => 'fit-320x320'
 					),
 					'section_2_bg_color' => array(
