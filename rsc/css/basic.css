@@ -332,7 +332,7 @@ div#evo_toolbar {
   margin: 0;
   font: 14px "Helvetica Neue", Helvetica, sans-serif, Arial;
   position: fixed;
-  z-index: 11000;
+  z-index: 110000;
   left: 0px;
   top: 0px;
   width: 100%;
