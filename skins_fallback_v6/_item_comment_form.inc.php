@@ -583,6 +583,16 @@ else
 		'widget_item_comment_feed_link_params' => array(
 				'title' => $params['feed_title'],
 			),
+
+		// Params for plugin widget "Financial Contribution":
+		'override_params_for_fin_contrib' => array(
+				'block_start'       => '<div class="evo_widget $wi_class$ panel panel-default">',
+				'block_end'         => '</div>',
+				'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
+				'block_title_end'   => '</h4></div>',
+				'block_body_start'  => '<div class="panel-body">',
+				'block_body_end'    => '</div>',
+			),
 	) );
 	// ----------------------------- END OF "Comment Area" CONTAINER -----------------------------
 }

@@ -3907,13 +3907,33 @@ class Plugin
 
 
 	/**
+	 * Initialize Widget params
+	 *
+	 * @param array Custom params
+	 * @param array Default params
+	 */
+	function init_widget_params( $params, $default_params = array() )
+	{
+		if( ! isset( $this->widget_params ) )
+		{	// Don't initialize params twice:
+			$this->widget_params = array_merge( $default_params, $params );
+		}
+	}
+
+
+	/**
 	 * Get Widget setting
 	 * @param string Name of setting
-	 * @param array Array of params (like widget params)
+	 * @param array Array of params (like widget params), NULL - to use the initialized widget params, @see Plugin::init_widget_params()
 	 * @return mixed|null
 	 */
 	function get_widget_setting( $name = NULL, $params = NULL )
 	{
+		if( $params === NULL && isset( $this->widget_params ) )
+		{	// Use the initialized widget params by default:
+			$params = $this->widget_params;
+		}
+
 		if ( empty( $name ) || ! isset ( $params[$name] ) )
 		{
 			return NULL;
@@ -3948,10 +3968,7 @@ class Plugin
 	 */
 	function display_widget_debug_message( $message = NULL, $params = array() )
 	{
-		/**
-		 * Default params:
-		 */
-		$params = array_merge( array(
+		$this->init_widget_params( $params, array(
 				// This is what will enclose the block in the skin:
 				'block_start'       => '<div class="evo_widget widget $wi_class$">',
 				'block_end'         => "</div>\n",
@@ -3964,21 +3981,21 @@ class Plugin
 				'block_body_end'    => '',
 				// Widget debug mode: 'normal', 'designer'
 				'debug_mode'        => 'normal',
-			), $params );
+			) );
 
-		if( $params['debug_mode'] == 'designer' )
+		if( isset( $this->widget_params['debug_mode'] ) && $this->widget_params['debug_mode'] == 'designer' )
 		{	// Display message on designer mode:
-			echo $params['block_start'];
-			if( ! empty( $params['title'] ) )
+			echo $this->widget_params['block_start'];
+			if( ! empty( $this->widget_params['title'] ) )
 			{	// Display title:
-				echo $params['block_title_start'];
-				echo $params['title'];
-				echo $params['block_title_end'];
+				echo $this->widget_params['block_title_start'];
+				echo $this->widget_params['title'];
+				echo $this->widget_params['block_title_end'];
 			}
-			echo $params['block_body_start'];
+			echo $this->widget_params['block_body_start'];
 			echo $message;
-			echo $params['block_body_end'];
-			echo $params['block_end'];
+			echo $this->widget_params['block_body_end'];
+			echo $this->widget_params['block_end'];
 		}
 	}
 

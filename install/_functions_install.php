@@ -812,6 +812,11 @@ function install_basic_plugins( $old_db_version = 0 )
 	{
 		install_plugin( 'webmention_plugin' );
 	}
+
+	if( $old_db_version < 15380 )
+	{
+		install_plugin( 'financial_contribution_plugin' );
+	}
 }
 
 
