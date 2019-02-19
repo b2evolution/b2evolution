@@ -291,6 +291,11 @@ class ComponentWidget extends DataObject
 	 */
 	function get_icon()
 	{
+		if( $this->type == 'plugin' && $this->get_Plugin() )
+		{	// Use widget icon from plugin:
+			return $this->Plugin->get_widget_icon();
+		}
+
 		if( empty( $this->icon ) )
 		{
 			return '';
