@@ -161,6 +161,11 @@ class financial_contribution_plugin extends Plugin
 				'size' => 100,
 				'defaultvalue' => T_('Your contribution has been recorded. Thank you!'),
 			),
+			'deletion_message' => array(
+				'label' => T_('Deletion Message'),
+				'size' => 100,
+				'defaultvalue' => T_('Your pledge has been removed.'),
+			),
 			'thank_you_text' => array(
 				'label' => T_('Thank you text'),
 				'size' => 100,
@@ -214,6 +219,13 @@ class financial_contribution_plugin extends Plugin
 			return false;
 		}
 
+		$CurrencyCache = & get_CurrencyCache();
+		if( ! ( $Currency = $CurrencyCache->get_by_name( $this->get_coll_setting( 'currency', $Blog ), false, false ) ) )
+		{	// Don't display this widget with unknown currency:
+			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because currency is not found, please check collection settings of this plugin.' );
+			return false;
+		}
+
 		// Get contributed users:
 		$contributed_users = $this->get_users_by_item_ID( $Item->ID );
 
@@ -231,12 +243,8 @@ class financial_contribution_plugin extends Plugin
 
 		// Calculate contribution data:
 		$total_amount = 0;
-		if( empty( $contributed_users ) )
-		{
-			$current_contributors_text = $this->widget_params['no_members_text'];
-		}
-		else
-		{
+		if( ! empty( $contributed_users ) )
+		{	// Display only if at least one user contributed this Item:
 			$UserCache = & get_UserCache();
 			$UserCache->load_list( array_keys( $contributed_users ) );
 			$current_contributors_text = array();
@@ -244,7 +252,7 @@ class financial_contribution_plugin extends Plugin
 			{
 				if( $cont_User = & $UserCache->get_by_ID( $cont_user_ID, false, false ) )
 				{
-					$current_contributors_text[] = $cont_User->get_identity_link().' ('.number_format( $cont_amount, 2, '.', '\'' ).' '.$this->get_coll_setting( 'currency', $Blog ).')';
+					$current_contributors_text[] = $cont_User->get_identity_link().' ('.$Currency->get( 'shortcut' ).number_format( $cont_amount, 0, '', '\'' ).')';
 					$total_amount += $cont_amount;
 				}
 			}
@@ -271,15 +279,17 @@ class financial_contribution_plugin extends Plugin
 		$Form->add_crumb( 'contribute' );
 
 		// Total text:
-		$this->display_widget_text( 'total_text', number_format( $total_amount, 2, '.', '\'' ).' '.$this->get_coll_setting( 'currency', $Blog ) );
+		$this->display_widget_text( 'total_text', $Currency->get( 'shortcut' ).number_format( $total_amount, 0, '', '\'' ) );
 
-		// Current contributors list text param:
-		$this->display_widget_text( 'current_contributors_text', $current_contributors_text );
+		if( ! empty( $current_contributors_text ) )
+		{	// Current contributors list:
+			$this->display_widget_text( 'current_contributors_text', $current_contributors_text );
+		}
 
 		// Contribute text (amount input + submit button):
 		$Form->output = false;
 		$Form->switch_layout( 'none' );
-		$contribute_input = $Form->text_input( 'contribute_amount', $contributed_current_user_amount, NULL, '', '', array( 'style' => 'width:auto;display:inline' ) );
+		$contribute_input = $Form->text_input( 'contribute_amount', $contributed_current_user_amount, 5, '', '', array( 'maxlength' => 16, 'style' => 'width:auto;display:inline' ) );
 		$contribute_button = $Form->button( array( 'submit', 'action_name',
 			$this->get_widget_setting( $is_contributed_current_user ? 'modify_button_text' : 'contribute_button_text' ),
 			$is_contributed_current_user ? 'btn-default' : 'btn-primary' ) );
@@ -382,7 +392,7 @@ class financial_contribution_plugin extends Plugin
 		}
 
 		// Format amount:
-		$contribute_amount = number_format( $contribute_amount, 2, '.', '' );
+		$contribute_amount = floor( $contribute_amount );
 
 		if( $contribute_amount > 0 )
 		{	// Insert/Update contribution:
@@ -397,6 +407,8 @@ class financial_contribution_plugin extends Plugin
 			$DB->query( 'DELETE FROM '.$this->get_sql_table( 'contributions' ).'
 				WHERE fnct_item_ID = '.$DB->quote( $item_ID ).'
 				  AND fnct_user_ID = '.$DB->quote( $current_User->ID ) );
+			// Inform user after delete contribution:
+			$Messages->add( $Widget->get_param( 'deletion_message' ), 'warning' );
 		}
 
 		// The cached content of the widget must be invalidated:
