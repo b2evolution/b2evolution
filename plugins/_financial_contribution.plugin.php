@@ -55,7 +55,6 @@ class financial_contribution_plugin extends Plugin
 					fnct_item_ID   INT(10) UNSIGNED NOT NULL,
 					fnct_user_ID   INT(10) UNSIGNED NOT NULL,
 					fnct_amount    DOUBLE UNSIGNED NOT NULL,
-					fnct_amount    DOUBLE UNSIGNED NOT NULL,
 					fnct_timestamp TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
 					PRIMARY KEY( fnct_item_ID, fnct_user_ID )
 				) ENGINE = innodb DEFAULT CHARSET = '.$DB->connection_charset,
