@@ -198,7 +198,6 @@ class financial_contribution_plugin extends Plugin
 				'text_value_start'  => '',
 				'text_value_end'    => '',
 				'text_row_end'      => '</p>',
-				'no_members_text'   => T_('No members yet.'),
 			) );
 
 		if( empty( $Blog ) )
