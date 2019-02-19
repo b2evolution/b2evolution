@@ -7058,13 +7058,28 @@ class Item extends ItemLight
 		$this->set( 'pst_ID', $item_st_ID );
 		$this->set( 'order', $postcat_order );
 
+		if( $this->get( 'ityp_ID' ) > 0 && isset( $this->custom_fields ) )
+		{	// Reinitialize custom fields definitions if they were created to set new values before set item type for this Item, e-g on install default Items:
+			$old_custom_fields = $this->custom_fields;
+			$this->custom_fields = $this->get_custom_fields_defs();
+			foreach( $this->custom_fields as $custom_field_name => $custom_field )
+			{
+				if( isset( $old_custom_fields[ $custom_field_name ]['value'] ) )
+				{
+					$custom_field['value'] = $old_custom_fields[ $custom_field_name ]['value'];
+				}
+				$this->custom_fields[ $custom_field_name ] = $custom_field;
+			}
+			unset( $old_custom_fields );
+		}
+
 		// Update the computed custom fields if this Item has them:
 		$custom_fields = $this->get_custom_fields_defs();
 		foreach( $custom_fields as $custom_field )
 		{
 			if( $custom_field['type'] == 'computed' )
 			{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
-				$this->set_setting( 'custom:'.$custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ), true );
+				$this->set_custom_field( $custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ), 'value', true );
 			}
 		}
 

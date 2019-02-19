@@ -112,23 +112,6 @@ if( mainlist_get_item() )
 <a name="p<?php echo $Item->ID; ?>"></a>
 
 <?php
-	// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
-	item_prevnext_links( array(
-			'block_start'     => '<ul class="pager col-lg-12 post_nav">',
-			'prev_start'      => '<li class="previous">',
-			'prev_text'       => '<span aria-hidden="true">&larr;</span> $title$',
-			'prev_end'        => '</li>',
-			'separator'       => ' ',
-			'next_start'      => '<li class="next">',
-			'next_text'       => '$title$ <span aria-hidden="true">&rarr;</span>',
-			'next_end'        => '</li>',
-			'block_end'       => '</ul>',
-			'target_blog'     => $Blog->ID,	// this forces to stay in the same blog, should the post be cross posted in multiple blogs
-			'post_navigation' => 'same_category', // force to stay in the same category in this skin
-			'featured'        => false, // don't include the featured posts into navigation list
-		) );
-	// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
-
 	$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 ?>
 
@@ -136,25 +119,37 @@ if( mainlist_get_item() )
 
 	<div class="single_page_title">
 		<?php
-			if( $Item->status != 'published' )
-			{	// Display not public Item's status:
-				$Item->format_status( array(
-						'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
-					) );
-			}
-
 			// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
 			// Display container contents:
-			skin_container( /* TRANS: Widget container name */ NT_('Item Single Header'), array(
-				'widget_context' => 'item',	// Signal that we are displaying within an Item
+			widget_container( 'item_single_header', array(
+				'widget_context'             => 'item',	// Signal that we are displaying within an Item
 				// The following (optional) params will be used as defaults for widgets included in this container:
+				'container_display_if_empty' => false, // If no widget, don't display container at all
 				// This will enclose each widget in a block:
-				'block_start' => '<div class="evo_widget $wi_class$">',
-				'block_end' => '</div>',
+				'block_start'                => '<div class="evo_widget $wi_class$">',
+				'block_end'                  => '</div>',
 				// This will enclose the title of each widget:
-				'block_title_start' => '<h3>',
-				'block_title_end' => '</h3>',
-				'author_link_text' => $params['author_link_text'],
+				'block_title_start'          => '<h3>',
+				'block_title_end'            => '</h3>',
+				'author_link_text'           => $params['author_link_text'],
+				// Controlling the title:
+				'widget_item_title_display' => false,
+				// Item Next Previous widget
+				'widget_item_next_previous_display' => ! $Item->is_featured(), // Do not show Item Next Previous widget if featured item
+				'widget_item_next_previous_params' => array(
+						'block_start'     => '<ul class="pager col-lg-12 post_nav">',
+						'prev_start'      => '<li class="previous">',
+						'prev_text'       => '<span aria-hidden="true">&larr;</span> $title$',
+						'prev_end'        => '</li>',
+						'separator'       => ' ',
+						'next_start'      => '<li class="next">',
+						'next_text'       => '$title$ <span aria-hidden="true">&rarr;</span>',
+						'next_end'        => '</li>',
+						'block_end'       => '</ul>',
+						'target_blog'     => $Blog->ID,	// this forces to stay in the same blog, should the post be cross posted in multiple blogs
+						'post_navigation' => 'same_category', // force to stay in the same category in this skin
+						'featured'        => false, // don't include the featured posts into navigation list
+					),
 			) );
 			// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
 		?>
@@ -243,7 +238,7 @@ if( mainlist_get_item() )
 			$Item->title( array(
 					'before'    => $params['item_title_before'],
 					'after'     => $params['item_title_after'],
-					'link_type' => '#'
+					'link_type' => 'permalink'
 				) );
 
 			// Item Content Teaser:

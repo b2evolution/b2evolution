@@ -93,31 +93,41 @@ if( mainlist_get_item() )
 	echo empty( $params['item_style'] ) ? '' : ' style="'.format_to_output( $params['item_style'], 'htmlattr' ).'"' ?>>
 
 	<header>
-		<div class="small text-muted">
 		<?php
-			if( $Item->status != 'published' )
-			{	// Display not public Item's status:
-				$Item->format_status( array(
-						'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
-					) );
-			}
-
 			// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
 			// Display container contents:
-			skin_container( /* TRANS: Widget container name */ NT_('Item Single Header'), array(
+			widget_container( 'item_single_header', array(
 				'widget_context' => 'item',	// Signal that we are displaying within an Item
 				// The following (optional) params will be used as defaults for widgets included in this container:
+				'container_display_if_empty' => false, // If no widget, don't display container at all
 				// This will enclose each widget in a block:
 				'block_start' => '<div class="evo_widget $wi_class$">',
 				'block_end' => '</div>',
 				// This will enclose the title of each widget:
 				'block_title_start' => '<h3>',
 				'block_title_end' => '</h3>',
+
 				'author_link_text' => $params['author_link_text'],
+
+				// Controlling the title:
+				'widget_item_title_display' => false,
+				// Item Previous Next widget
+				'widget_item_next_previous_params' => array(
+						'block_start' => '<nav><ul class="pager">',
+						'block_end' => '</ul></nav>',
+						'prev_start' => '<li class="previous">',
+						'prev_end' => '</li>',
+						'next_start' => '<li class="next">',
+						'next_end' => '</li>',
+					),
+				// Item Visibility Badge widge template
+				'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
+				'widget_item_visibility_badge_params'  => array(
+						'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+					),
 			) );
 			// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
 		?>
-		</div>
 	</header>
 	
 	<div class="row">

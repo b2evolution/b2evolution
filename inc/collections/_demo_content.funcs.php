@@ -2525,13 +2525,13 @@ This is an extra line.' );
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'demo,photo' );
-				$edited_Item->set_setting( 'custom:course', TD_('Main Course') );
-				$edited_Item->set_setting( 'custom:cuisine', TD_('South African') );
-				$edited_Item->set_setting( 'custom:servings', '2' );
-				$edited_Item->set_setting( 'custom:prep_time', '1' );
-				$edited_Item->set_setting( 'custom:cook_time', '20' );
-				$edited_Item->set_setting( 'custom:passive_time', '3' );
-				$edited_Item->set_setting( 'custom:ingredients', TD_('1 jar Peppedew Peppers (or piquante pepper)
+				$edited_Item->set_custom_field( 'course', TD_('Main Course') );
+				$edited_Item->set_custom_field( 'cuisine', TD_('South African') );
+				$edited_Item->set_custom_field( 'servings', '2' );
+				$edited_Item->set_custom_field( 'prep_time', '1' );
+				$edited_Item->set_custom_field( 'cook_time', '20' );
+				$edited_Item->set_custom_field( 'passive_time', '3' );
+				$edited_Item->set_custom_field( 'ingredients', TD_('1 jar Peppedew Peppers (or piquante pepper)
 4oz goat cheese (any flavor)
 1 tbsp mayonnaise
 1 tbsp sour cream
@@ -2558,13 +2558,13 @@ hearty crack of pepper') );
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'demo,photo' );
-				$edited_Item->set_setting( 'custom:course', TD_('Main Course') );
-				$edited_Item->set_setting( 'custom:cuisine', TD_('Mongolian') );
-				$edited_Item->set_setting( 'custom:servings', '4' );
-				$edited_Item->set_setting( 'custom:prep_time', '2' );
-				$edited_Item->set_setting( 'custom:cook_time', '35' );
-				$edited_Item->set_setting( 'custom:passive_time', '5' );
-				$edited_Item->set_setting( 'custom:ingredients', TD_('vegetable oil
+				$edited_Item->set_custom_field( 'course', TD_('Main Course') );
+				$edited_Item->set_custom_field( 'cuisine', TD_('Mongolian') );
+				$edited_Item->set_custom_field( 'servings', '4' );
+				$edited_Item->set_custom_field( 'prep_time', '2' );
+				$edited_Item->set_custom_field( 'cook_time', '35' );
+				$edited_Item->set_custom_field( 'passive_time', '5' );
+				$edited_Item->set_custom_field( 'ingredients', TD_('vegetable oil
 1⁄2 teaspoon ginger
 1 tablespoon garlic
 1⁄2 cup soy sauce
@@ -3417,13 +3417,13 @@ Hello
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'demo,photo' );
-				$edited_Item->set_setting( 'custom:course', TD_('Main Course') );
-				$edited_Item->set_setting( 'custom:cuisine', TD_('South African') );
-				$edited_Item->set_setting( 'custom:servings', '2' );
-				$edited_Item->set_setting( 'custom:prep_time', '1' );
-				$edited_Item->set_setting( 'custom:cook_time', '20' );
-				$edited_Item->set_setting( 'custom:passive_time', '3' );
-				$edited_Item->set_setting( 'custom:ingredients', TD_('1 jar Peppedew Peppers (or piquante pepper)
+				$edited_Item->set_custom_field( 'course', TD_('Main Course') );
+				$edited_Item->set_custom_field( 'cuisine', TD_('South African') );
+				$edited_Item->set_custom_field( 'servings', '2' );
+				$edited_Item->set_custom_field( 'prep_time', '1' );
+				$edited_Item->set_custom_field( 'cook_time', '20' );
+				$edited_Item->set_custom_field( 'passive_time', '3' );
+				$edited_Item->set_custom_field( 'ingredients', TD_('1 jar Peppedew Peppers (or piquante pepper)
 4oz goat cheese (any flavor)
 1 tbsp mayonnaise
 1 tbsp sour cream
@@ -3450,13 +3450,13 @@ hearty crack of pepper') );
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'demo,photo' );
-				$edited_Item->set_setting( 'custom:course', TD_('Main Course') );
-				$edited_Item->set_setting( 'custom:cuisine', TD_('Mongolian') );
-				$edited_Item->set_setting( 'custom:servings', '4' );
-				$edited_Item->set_setting( 'custom:prep_time', '2' );
-				$edited_Item->set_setting( 'custom:cook_time', '35' );
-				$edited_Item->set_setting( 'custom:passive_time', '5' );
-				$edited_Item->set_setting( 'custom:ingredients', TD_('vegetable oil
+				$edited_Item->set_custom_field( 'course', TD_('Main Course') );
+				$edited_Item->set_custom_field( 'cuisine', TD_('Mongolian') );
+				$edited_Item->set_custom_field( 'servings', '4' );
+				$edited_Item->set_custom_field( 'prep_time', '2' );
+				$edited_Item->set_custom_field( 'cook_time', '35' );
+				$edited_Item->set_custom_field( 'passive_time', '5' );
+				$edited_Item->set_custom_field( 'ingredients', TD_('vegetable oil
 1⁄2 teaspoon ginger
 1 tablespoon garlic
 1⁄2 cup soy sauce
