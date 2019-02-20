@@ -344,6 +344,9 @@ class Blog extends DataObject
 	 */
 	function init_by_kind( $kind, $name = NULL, $shortname = NULL, $urlname = NULL )
 	{
+		// Set default tagline for collection of any kind:
+		$this->set( 'tagline', T_('This is the collection\'s tagline.') );
+
 		switch( $kind )
 		{
 			case 'minisite':
@@ -477,7 +480,7 @@ class Blog extends DataObject
 					}
 				}
 				$this->set( 'type', $kind );
-				$this->set( 'name', empty($name) ? T_('Public Blog') : $name );
+				$this->set( 'name', empty($name) ? T_('Blog') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Blog') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'blog' : $urlname );
 				break;

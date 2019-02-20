@@ -3244,8 +3244,87 @@ function debug_info( $force = false, $force_clean = false )
 												$printf_format ) ) - 2;
 	*/
 
+	$ReqHostPathQuery = $ReqHost.$ReqPath.( empty( $_SERVER['QUERY_STRING'] ) ? '' : '?'.$_SERVER['QUERY_STRING'] );
+
 	echo "\n\n\n";
-	echo ( $clean ? '*** Debug info ***'."\n\n" : '<div class="debug" id="debug_info"><h2>Debug info</h2>' );
+	if( ! $clean )
+	{
+		echo '<div class="debug" id="debug_info">';
+	}
+
+	// FULL DEBUG INFO(s) FROM PREVIOUS SESSION(s), after REDIRECT(s):
+	if( isset( $Session ) && ( $sess_debug_infos = $Session->get( 'debug_infos' ) ) && ! empty( $sess_debug_infos ) )
+	{
+		$count_sess_debug_infos = count( $sess_debug_infos );
+		if( $count_sess_debug_infos > 1 )
+		{	// Links to those Debuglogs:
+			if( $clean )
+			{	// kind of useless, but anyway...
+				echo "\n".'There are '.$count_sess_debug_infos.' debug infos from redirected pages.'."\n";
+			}
+			else
+			{
+				echo '<p>There are '.$count_sess_debug_infos.' debug infos from redirected pages: ';
+				for( $i = 1; $i <= $count_sess_debug_infos; $i++ )
+				{
+					echo '<a href="'.$ReqHostPathQuery.'#debug_sess_debug_info_'.$i.'">#'.$i.'</a> ';
+				}
+				echo '</p>';
+			}
+		}
+
+		foreach( $sess_debug_infos as $k => $sess_debug_info )
+		{
+			if( $clean )
+			{
+				echo "\n".'== Debug messages from redirected page (#'.( $k + 1 ).') =='."\n"
+					.'See below for the Debuglog from the current request.'."\n";
+				echo gzdecode( $sess_debug_info );
+			}
+			else
+			{
+				echo '<div class="debug_session">';
+				echo '<h3 id="debug_sess_debug_info_'.( $k + 1 ).'" style="color:#f00">Debug messages from redirected page (#'.( $k + 1 ).')</h3>'
+					// link to real Debuglog:
+					.'<p><a href="'.$ReqHostPathQuery.'#debug_current">See below for the debug from the current request.</a></p>';
+				$sess_debug_info = gzdecode( $sess_debug_info );
+				// Fix all anchors to proper work with SESSION debug info and do NOT mix with current debug info where same achors are used but without number suffix ($k + 1):
+				$anchors_regexp = '(evo_debug_queries|debug_info_cat_[^"]+)';
+				$sess_debug_info = preg_replace( '/id="'.$anchors_regexp.'"/', 'id="$1_'.( $k + 1 ).'"', $sess_debug_info );
+				echo preg_replace( '/href="([^#"]*)#'.$anchors_regexp.'"/', 'href="'.$ReqHostPathQuery.'#$2_'.( $k + 1 ).'"', $sess_debug_info );
+				echo '</div>';
+			}
+		}
+
+		if( ! $clean )
+		{	// Anchor to scrolldown to current debug:
+			echo '<a id="debug_current"></a>';
+		}
+
+		// link to first sess_debug_infos:
+		if( $clean )
+		{
+			echo 'See above for the debug info(s) from before the redirect.'."\n";
+		}
+		else
+		{
+			echo '<p><a href="'.$ReqHostPathQuery.'#debug_sess_debug_info_1">See above for the debug info(s) from before the redirect.</a></p>';
+		}
+
+		// Delete logs since they have been displayed...
+		// EXCEPT if we are redirecting, because in this case we won't see these logs in a browser (only in request debug tools)
+		// So in that case we want them to move over to the next page...
+		if( $http_response_code < 300 || $http_response_code >= 400 )
+		{	// This is NOT a 3xx redirect, assume debuglogs have been seen & delete them:
+			$Session->delete( 'debug_infos' );
+		}
+
+		echo "\n\n\n";
+	}
+	// END OF DEBUG FROM PREVIOUS SESSIONS, after REDIRECT(s).
+
+	$debug_info_title = empty( $count_sess_debug_infos ) ? 'Debug info' : 'Debug info from Current page';
+	echo ( $clean ? '*** '.$debug_info_title.' ***'."\n\n" : '<h2>'.$debug_info_title.'</h2>' );
 
 	if( !$obhandler_debug )
 	{ // don't display changing items when we want to test obhandler
@@ -3272,73 +3351,6 @@ function debug_info( $force = false, $force_clean = false )
 		echo '</div></div>';
 	}
 
-	// FULL DEBUG INFO(s) FROM PREVIOUS SESSION(s), after REDIRECT(s):
-	if( isset( $Session ) && ( $sess_debug_infos = $Session->get( 'debug_infos' ) ) && ! empty( $sess_debug_infos ) )
-	{
-		$count_sess_debug_infos = count( $sess_debug_infos );
-		if( $count_sess_debug_infos > 1 )
-		{	// Links to those Debuglogs:
-			if( $clean )
-			{	// kind of useless, but anyway...
-				echo "\n".'There are '.$count_sess_debug_infos.' debug infos from redirected pages.'."\n";
-			}
-			else
-			{
-				echo '<p>There are '.$count_sess_debug_infos.' debug infos from redirected pages: ';
-				for( $i = 1; $i <= $count_sess_debug_infos; $i++ )
-				{
-					echo '<a href="#debug_sess_debug_info_'.$i.'">#'.$i.'</a> ';
-				}
-				echo '</p>';
-			}
-		}
-
-		foreach( $sess_debug_infos as $k => $sess_debug_info )
-		{
-			if( $clean )
-			{
-				echo "\n".'== Debug messages from redirected page (#'.( $k + 1 ).') =='."\n"
-					.'See below for the Debuglog from the current request.'."\n";
-				echo gzdecode( $sess_debug_info );
-			}
-			else
-			{
-				echo '<div class="debug_session">';
-				echo '<h3 id="debug_sess_debug_info_'.( $k + 1 ).'" style="color:#f00">Debug messages from redirected page (#'.( $k + 1 ).')</h3>'
-					// link to real Debuglog:
-					.'<p><a href="#debug_current">See below for the debug from the current request.</a></p>';
-				$sess_debug_info = gzdecode( $sess_debug_info );
-				// Fix all anchors to proper work with SESSION debug info and do NOT mix with current debug info where same achors are used but without number suffix ($k + 1):
-				echo preg_replace( '/(id="|href="#)(evo_debug_queries|debug_info_cat_[^"]+)"/', '$1$2_'.( $k + 1 ).'"', $sess_debug_info );
-				echo '</div>';
-			}
-		}
-
-		if( ! $clean )
-		{	// Anchor to scrolldown to current debug:
-			echo '<a id="debug_current"></a>';
-		}
-
-		// link to first sess_debug_infos:
-		if( $clean )
-		{
-			echo 'See above for the debug info(s) from before the redirect.'."\n";
-		}
-		else
-		{
-			echo '<p><a href="#debug_sess_debug_info_1">See above for the debug info(s) from before the redirect.</a></p>';
-		}
-
-		// Delete logs since they have been displayed...
-		// EXCEPT if we are redirecting, because in this case we won't see these logs in a browser (only in request debug tools)
-		// So in that case we want them to move over to the next page...
-		if( $http_response_code < 300 || $http_response_code >= 400 )
-		{	// This is NOT a 3xx redirect, assume debuglogs have been seen & delete them:
-			$Session->delete( 'debug_infos' );
-		}
-	}
-	// END OF DEBUG FROM PREVIOUS SESSIONS, after REDIRECT(s).
-
 	if( !$obhandler_debug )
 	{ // don't display changing items when we want to test obhandler
 
@@ -3349,7 +3361,7 @@ function debug_info( $force = false, $force_clean = false )
 			echo $DB->num_queries.' SQL queries executed in '.$Timer->get_duration( 'SQL QUERIES' )." seconds\n";
 			if( ! $clean )
 			{
-				echo ' &nbsp; <a href="#evo_debug_queries">scroll down to details</a><p>';
+				echo ' &nbsp; <a href="'.$ReqHostPathQuery.'#evo_debug_queries">scroll down to details</a><p>';
 			}
 			echo '</div></div>';
 		}
@@ -3453,10 +3465,9 @@ function debug_info( $force = false, $force_clean = false )
 			echo '
 			<script>
 			(function($){
-				var clicked_once;
 				jQuery( "table.debug_timer th" ).click( function(event) {
-					if( clicked_once ) return; else clicked_once = true;
 					var table = jQuery(this).closest( "table.debug_timer" );
+					if( table.data( "clicked_once" ) ) return; else table.data( "clicked_once", true );
 					jQuery( "tbody:eq(0) tr:last", table ).remove();
 					jQuery( "tbody:eq(1) tr", table ).appendTo( jQuery( "tbody:eq(0)", table ) );
 					// click for tablesorter:
@@ -3524,7 +3535,7 @@ function debug_info( $force = false, $force_clean = false )
 		$log_head_links = array();
 		foreach( $log_cats as $l_cat )
 		{
-			$log_head_links[] .= '<a href="#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
+			$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
 		}
 		$log_container_head .= implode( ' | ', $log_head_links );
 
