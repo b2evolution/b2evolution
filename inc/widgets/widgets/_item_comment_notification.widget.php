@@ -137,9 +137,7 @@ class item_comment_notification_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item;
-		global $current_User;
-		global $Collection, $Blog;
+		global $Collection, $Blog, $Item, $current_User;
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
@@ -153,7 +151,6 @@ class item_comment_notification_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		$params = array_merge( array(
-			'widget_item_comment_notification_display' => true,
 			'widget_item_comment_notification_params'  => array(),
 		), $params );
 
@@ -165,7 +162,7 @@ class item_comment_notification_Widget extends ComponentWidget
 				'notification_after'  => '</nav>',
 			), $params['widget_item_comment_notification_params'] );
 
-		if( $params['widget_item_comment_notification_display'] && is_logged_in() && $Item->can_comment( NULL ) )
+		if( is_logged_in() && $Item->can_comment( NULL ) )
 		{
 			global $DB;
 			global $UserSettings;

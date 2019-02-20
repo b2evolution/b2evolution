@@ -74,7 +74,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 					'after' => ( in_array( $disp, array( 'single', 'page' ) ) ? '</h1>' : '</h2>' ).'</div>',
 				),
 				// Item Visibility Badge widget template:
-				'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
+				'hide_widgets_item_visibility_badge' => ( $Item->is_intro() || $Item->status == 'published' ),
 				'widget_item_visibility_badge_params'  => array(
 						'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 					),
@@ -117,7 +117,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 					),
 
 				// Item Visibility Badge widget template:
-				'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
+				'hide_widgets_item_visibility_badge' => ( $Item->is_intro() || $Item->status == 'published' ),
 				'widget_item_visibility_badge_params'  => array(
 						'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 					),

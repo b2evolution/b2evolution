@@ -928,7 +928,14 @@ class ComponentWidget extends DataObject
 				}
 			}
 
-			$this->display( $params );
+			if( empty( $params['hide_widgets_'.$this->code] ) )
+			{	// Display widget content:
+				$this->display( $params );
+			}
+			else
+			{	// Hide the widget by code if it is requsted from skin:
+				$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden by code <code>'.$this->code.'</code> from skin template.' );
+			}
 
 			if( $display_containers )
 			{ // DEBUG:
@@ -983,7 +990,14 @@ class ComponentWidget extends DataObject
 
 				$this->BlockCache->start_collect();
 
-				$this->display( $params );
+				if( empty( $params['hide_widgets_'.$this->code] ) )
+				{	// Display widget content:
+					$this->display( $params );
+				}
+				else
+				{	// Hide the widget by code if it is requsted from skin:
+					$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden by code <code>'.$this->code.'</code> from skin template.' );
+				}
 
 				// Save collected cached data if needed:
 				$this->BlockCache->end_collect();

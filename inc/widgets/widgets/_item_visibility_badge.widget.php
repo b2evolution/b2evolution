@@ -92,9 +92,7 @@ class item_visibility_badge_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $Blog;
-
-		$r = array_merge( array(
+		return array_merge( array(
 				'title' => array(
 					'label' => T_( 'Title' ),
 					'size' => 40,
@@ -102,15 +100,6 @@ class item_visibility_badge_Widget extends ComponentWidget
 					'defaultvalue' => '',
 				),
 			), parent::get_param_definitions( $params ) );
-
-		if( isset( $r['allow_blockcache'] ) )
-		{	// Disable "allow blockcache" because this widget displays dynamic data:
-			$r['allow_blockcache']['defaultvalue'] = false;
-			$r['allow_blockcache']['disabled'] = 'disabled';
-			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
-		}
-
-		return $r;
 	}
 
 
@@ -124,7 +113,6 @@ class item_visibility_badge_Widget extends ComponentWidget
 		global $Item, $disp;
 
 		$params = array_merge( array(
-				'widget_item_visibility_badge_display' => true,
 				'widget_item_visibility_badge_params'  => array(),
 			), $params );
 
@@ -135,25 +123,37 @@ class item_visibility_badge_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		if( $params['widget_item_visibility_badge_display'] )
-		{
-			echo $this->disp_params['block_start'];
-			$this->disp_title();
-			echo $this->disp_params['block_body_start'];
+		echo $this->disp_params['block_start'];
+		$this->disp_title();
+		echo $this->disp_params['block_body_start'];
 
-			$Item->format_status( array(
-					'template' => $widget_params['template'],
-					'format'   => $widget_params['format'],
-				) );
+		$Item->format_status( array(
+				'template' => $widget_params['template'],
+				'format'   => $widget_params['format'],
+			) );
 
-			echo $this->disp_params['block_body_end'];
-			echo $this->disp_params['block_end'];
+		echo $this->disp_params['block_body_end'];
+		echo $this->disp_params['block_end'];
 
-			return true;
-		}
+		return true;
+	}
 
-		$this->display_debug_message();
-		return false;
+
+	/**
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @return array of keys this widget depends on
+	 */
+	function get_cache_keys()
+	{
+		global $Collection, $Blog, $Item, $current_User;
+
+		return array(
+				'wi_ID'       => $this->ID, // Have the widget settings changed ?
+				'set_coll_ID' => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				'user_ID'     => ( is_logged_in() ? $current_User->ID : 0 ), // Has the current User changed?
+				'item_ID'     => $Item->ID, // Has the Item page changed?
+			);
 	}
 }
 

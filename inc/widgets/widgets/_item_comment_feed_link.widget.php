@@ -137,15 +137,11 @@ class item_comment_feed_link_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item;
-		global $cookie_name, $cookie_email, $cookie_url;
-		global $comment_cookies, $comment_allow_msgform, $comment_anon_notify;
-		global $Plugins;
-		global $Collection, $Blog, $dummy_fields;
+		global $Collection, $Blog, $Item;
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
-			$this->display_error_message( 'Widget "'.$this->get_name().'" is disabled because there is no Item object.' );
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item object.' );
 			return false;
 		}
 
@@ -155,7 +151,6 @@ class item_comment_feed_link_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		$params = array_merge( array(
-			'widget_item_comment_feed_link_display' => true,
 			'widget_item_comment_feed_link_params'  => array(),
 		), $params );
 
@@ -166,7 +161,7 @@ class item_comment_feed_link_Widget extends ComponentWidget
 				'title'  => '#',
 			), $params['widget_item_comment_feed_link_params'] );
 
-		if( $Item->can_see_comments( false ) && $params['widget_item_comment_feed_link_display'] )
+		if( $Item->can_see_comments( false ) )
 		{
 			echo $this->disp_params['block_start'];
 			$this->disp_title();
