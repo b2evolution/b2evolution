@@ -32,8 +32,8 @@ class snippets_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->short_desc = T_('Text snippets inserting');
-		$this->long_desc = T_('This plugin displays a toolbar with buttons to quickly insert text snippets in a content.');
+		$this->short_desc = T_('Toolbat with buttons to insert text snippets');
+		$this->long_desc = T_('This plugin displays a toolbar with buttons which allow to quickly insert text snippets into items or comments.');
 	}
 
 
