@@ -2814,7 +2814,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 
 		// =======================================================================================================
 		case 'photo':
-			$post_count = 3;
+			$post_count = 4;
 			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
 
 			// Sample categories
@@ -2840,6 +2840,20 @@ T_("<p>To get you started, the installer has automatically created several sampl
 
 			if( is_available_item_type( $blog_ID, '#' ) )
 			{
+				// Insert a post into photoblog:
+				$post_count--;
+				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
+				$edited_Item = new Item();
+				$edited_Item->set_tags_from_string( 'photo' );
+				$edited_Item->insert( $owner_ID, T_('Food'), '',
+						$now, $cat_photo_album, array(), 'published','en-US' );
+				$LinkOwner = new LinkItem( $edited_Item );
+				$edit_File = new File( 'shared', 0, 'recipes/mongolian-beef.jpg' );
+				$edit_File->link_to_Object( $LinkOwner, 1 );
+				$edit_File = new File( 'shared', 0, 'recipes/stuffed-peppers.jpg' );
+				$edit_File->link_to_Object( $LinkOwner, 2 );
+				$item_IDs[] = array( $edited_Item->ID, $now );
+
 				// Insert a post into photoblog:
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
