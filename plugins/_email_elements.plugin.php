@@ -365,7 +365,7 @@ class email_elements_plugin extends Plugin
 				$options = explode( ':', $matches[2][$i], 2 + $index_shift );
 
 				$style = explode( '#', $options[ $index_shift ] );
-				$style_link_ID = isset( $style[1] ) ? intval( $style[1] ) : NULL;
+				$style_link_data = isset( $style[1] ) ? $style[1] : NULL;
 				$style = $style[0];
 				if( in_array( $style, $this->button_styles ) )
 				{	// If 2nd/3rd option is a style then 3rd is an URL:
@@ -382,6 +382,16 @@ class email_elements_plugin extends Plugin
 				}
 				if( $style == 'image' )
 				{	// Check if correct image link ID is used:
+					if( $style_link_data !== NULL && preg_match( '/^(\d+)(\..+)?$/', $style_link_data, $style_link_match ) )
+					{	// Corrent link ID and/or style class:
+						$style_link_ID = $style_link_match[1];
+						$image_style = isset( $style_link_match[2] ) ? emailskin_style( $style_link_match[2], false ) : '';
+					}
+					else
+					{	// Wrong link ID:
+						$style_link_ID = NULL;
+						$image_style = '';
+					}
 					$image_File = NULL;
 					$LinkCache = & get_LinkCache();
 					$current_element_error_message = NULL;
@@ -402,9 +412,10 @@ class email_elements_plugin extends Plugin
 					$text = $image_Link->get_tag( array(
 						'before_image'        => '',
 						'before_image_legend' => NULL,
-						'after_image'         => '',
+						'after_image'         => empty( $text ) ? '' : '<br />'.$text,
 						'image_link_to'       => false,
 						'image_alt'           => $text,
+						'image_style'         => $image_style,
 						'add_loadimg'         => false,
 					) );
 				}
