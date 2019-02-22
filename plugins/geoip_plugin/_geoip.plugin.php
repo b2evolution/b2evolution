@@ -2,7 +2,6 @@
 require_once( dirname( __FILE__ ).'/autoload.php' );
 
 use GeoIp2\Database\Reader;
-use GeoIp2\Exception\AddressNotFoundException;
 
 /**
  * This file implements the Geo IP plugin.
@@ -242,6 +241,11 @@ class geoip_plugin extends Plugin
 	 */
 	function get_country_by_IP( $IP )
 	{
+		if( ! is_valid_ip_format( $IP ) )
+		{	// Don't try to search country by invalid IP address:
+			return false;
+		}
+
 		if( $this->status != 'enabled' || ! file_exists( $this->geoip_file_path ) )
 		{
 			return false;
@@ -257,7 +261,7 @@ class geoip_plugin extends Plugin
 			$record = $this->reader->country( $IP );
 			$country_code = $record->country->isoCode;
 		}
-		catch( AddressNotFoundException $e )
+		catch( Exception $e )
 		{
 			$country_code = NULL;
 		}
