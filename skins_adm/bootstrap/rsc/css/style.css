@@ -1177,6 +1177,7 @@ table.coll_kind .btn {
 }
 div.coll-selector {
   padding-top: 18px;
+  padding-bottom: 17px;
   background-color: #ddd;
   margin-bottom: -3px;
 }
@@ -1191,6 +1192,9 @@ div.level2 {
   background-color: #ddd;
   margin-bottom: 16px;
   border-bottom: 1px solid #ccc;
+}
+div.coll-selector + div.level2 {
+  padding-top: 0;
 }
 .nav-tabs {
   position: relative;

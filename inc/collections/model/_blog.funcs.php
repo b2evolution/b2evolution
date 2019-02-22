@@ -313,7 +313,7 @@ function valid_blog_requested()
 		if( $blog_ID )
 		{
 			$BlogCache = & get_BlogCache();
-			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+			$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID, false, false );
 		}
 	}
 
@@ -2096,15 +2096,13 @@ function blogs_all_results_block( $params = array() )
 
 
 /**
- * Display all blogs results table
+ * Display models to start new collections results table
  *
  * @param array Params
  */
 function blogs_model_results_block( $params = array() )
 {
-	global $admin_url, $current_User;
-
-	$is_coll_admin = $current_User->check_perm( 'blog_admin', 'editAll', false );
+	global $admin_url, $current_User, $DB;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -2113,10 +2111,19 @@ function blogs_model_results_block( $params = array() )
 			'results_no_text'      => T_('No model available'),
 		), $params );
 
-	if( !is_logged_in() )
-	{ // Only logged in users can access this function
+	if( ! is_logged_in() || ! $current_User->check_perm( 'blogs', 'create' ) )
+	{	// Only logged in users which can create new collections can access this function
 		return;
 	}
+
+	// Check if at least one collection exists in DB:
+	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+	if( get_table_count( 'T_blogs' ) == 0 )
+	{	// Don't display this panel if no collections:
+		return;
+	}
+
+	$is_coll_admin = $current_User->check_perm( 'blog_admin', 'editAll' );
 
 	global $current_User;
 

@@ -1041,7 +1041,7 @@ else
 							array( 'ctrl' => 'coll_settings', 'tab' => $tab, 'action' => 'edit' ) );
 
 
-	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
+	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=' ) );
 	switch( $AdminUI->get_path(1) )
 	{
 		case 'general':

@@ -760,40 +760,16 @@ class collections_Module extends Module
 			}
 		}
 
-		$working_blog = get_working_blog();
-		$new_actions = array( 'new', 'new-selskin', 'new-name' );
-		if( $working_blog )
-		{ // User is member of some blog or has at least view perms, so Dashboard and Collections menus should be visible
-			$AdminUI->add_menu_entries(
-				NULL, // root
-				array(
-					'site' => $site_menu,
-					'collections' => array(
-						'text' => T_('Collections'),
-						'href' => $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$working_blog
-					)
+		$AdminUI->add_menu_entries(
+			NULL, // root
+			array(
+				'site' => $site_menu,
+				'collections' => array(
+					'text' => T_('Collections'),
+					'href' => $admin_url.'?ctrl=collections',
 				)
-			);
-		}
-		elseif( $perm_admin_normal && param( 'ctrl', 'string' ) == 'collections' && in_array( param( 'action', 'string' ), $new_actions ) )
-		{ // User is not member of any blogs, but has admin normal permission.
-			$AdminUI->add_menu_entries(
-				NULL, // root
-				array(
-					'site' => $site_menu,
-					'collections' => array(
-						'text' => T_('Collections')
-					)
-				)
-			);
-		}
-		elseif( $perm_admin_normal )
-		{ // User is not member of any blogs, but has admin normal permission. Only the dashboard menu ( no Collections ) should be visible.
-			$AdminUI->add_menu_entries(
-				NULL, // root
-				array( 'site' => $site_menu )
-			);
-		}
+			)
+		);
 	}
 
 

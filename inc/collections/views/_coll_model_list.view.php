@@ -10,7 +10,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-// Display all blogs results table
+// Display models to start new collections results table:
 blogs_model_results_block();
 
 ?>

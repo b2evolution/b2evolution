@@ -1286,6 +1286,7 @@ table.coll_kind {
 }
 div.coll-selector {
 	padding-top: 18px;
+	padding-bottom: 17px;
 	background-color: #ddd;
 	margin-bottom: -3px; // in this case we don't want level 2 to have it's 18 px top padding
 	.btn-group {
@@ -1300,6 +1301,9 @@ div.level2 {
 	background-color: #ddd;
 	margin-bottom: 16px;
 	border-bottom: 1px solid #ccc;
+	div.coll-selector + & {
+		padding-top: 0;
+	}
 }
 .nav-tabs {
 	position: relative;

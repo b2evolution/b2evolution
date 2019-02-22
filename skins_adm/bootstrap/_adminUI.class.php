@@ -307,7 +307,7 @@ class AdminUI extends AdminUI_general
 			case 'CollectionList':
 				// Template for a list of Collections (Blogs)
 				return array(
-						'before' => '<div class="container-fluid coll-selector"><nav><div class="btn-group">',
+						'before' => '<div class="container-fluid coll-selector"><nav>$button_list_all$<div class="btn-group">',
 						'after' => '</div>$button_add_blog$$collection_groups$</nav></div>',
 						'select_start' => '<div class="btn-group" role="group">',
 						'select_end' => '</div>',
@@ -895,6 +895,12 @@ class AdminUI extends AdminUI_general
 						.'" class="btn btn-default'.( empty( $sec_ID ) && $blog == 0 ? ' active' : '' ).'">'
 						.format_to_output( $this->coll_list_all_title, 'htmlbody' ).'</a> ';
 			$r .= $template[ empty( $sec_ID ) && $blog == 0 ? 'afterEachSel' : 'afterEach' ];
+			// Don't display default button if custom is defined:
+			$button_list_all = '';
+		}
+		else
+		{	// Default button to list all collections:
+			$button_list_all = '<a href="'.$admin_url.'?ctrl=collections" class="btn btn-default'.( $blog == 0 ? ' active' : '' ).'">'.T_('List').'</a> ';
 		}
 
 		$r .= $template['buttons_start'];
@@ -916,7 +922,7 @@ class AdminUI extends AdminUI_general
 		// Button to add new collection:
 		if( $this->coll_list_disp_add && is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
 		{	// Display a button to add new collection if it is requested and current user has a permission
-			$button_add_blog = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-default" title="'.T_('New Collection').'"><span class="fa fa-plus"></span></a>';
+			$button_add_blog = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-default" title="'.format_to_output( T_('New Collection'), 'htmlattr' ).'"><span class="fa fa-plus"></span></a>';
 		}
 		else
 		{	// No request or permission to add new collection:
@@ -950,9 +956,10 @@ class AdminUI extends AdminUI_general
 			$collection_groups = '';
 		}
 
-		$r .= str_replace( array( '$button_add_blog$', '$collection_groups$' ), array( $button_add_blog, $collection_groups ), $template['after'] );
+		$r .= $template['after'];
 
-		return $r;
+		return str_replace( array( '$button_list_all$', '$button_add_blog$', '$collection_groups$' ),
+			array( $button_list_all, $button_add_blog, $collection_groups ), $r );
 	}
 
 

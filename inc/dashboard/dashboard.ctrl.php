@@ -35,15 +35,6 @@ if( empty( $_GET['blog'] ) )
 
 param_action();
 
-if( $action == 'new_demo_content' )
-{	// Update site skins setting ahead of rendering so that the menu will display correctly:
-	global $Settings;
-
-	$demo_content_type = param( 'demo_content_type', 'string', NULL );
-	$Settings->set( 'site_skins_enabled', $demo_content_type != 'minisite' );
-	$Settings->dbupdate();
-}
-
 // Site dashboard
 $AdminUI->set_path( 'site', 'dashboard' );
 
@@ -89,43 +80,13 @@ $AdminUI->disp_body_top();
 $AdminUI->disp_payload_begin();
 
 $collection_count = get_table_count( 'T_blogs' );
-if( $action == 'new_demo_content' )
-{	// Execute action inside template to display a process in real time
-
-	// Check that this action request is not a CSRF hacked request:
-	$Session->assert_received_crumb( 'demo_content' );
-
-	$block_item_Widget = new Widget( 'block_item' );
-
-	$block_item_Widget->title = T_('Demo content').':';
-	$block_item_Widget->disp_template_replaced( 'block_start' );
-
-	load_funcs( 'collections/_demo_content.funcs.php' );
-	$collection_count = install_demo_content();
-
-	$block_item_Widget->disp_template_raw( 'block_end' );
-}
 if( $current_User->check_perm( 'blogs', 'create' ) && $collection_count === 0 )
 {
 	// Display welcome panel:
 	$AdminUI->disp_view( 'collections/views/_welcome_demo_content.view.php' );
 }
 
-// Display blog list VIEW:
-$AdminUI->disp_view( 'collections/views/_coll_list.view.php' );
-load_funcs( 'collections/model/_blog_js.funcs.php' );
 $AdminUI->disp_payload_end();
-
-
-/*
- * DashboardGlobalMain to be added here (anyone?)
- */
-if( $current_User->check_perm( 'blogs', 'create' ) )
-{
-	$AdminUI->disp_payload_begin();
-	$AdminUI->disp_view( 'collections/views/_coll_model_list.view.php' );
-	$AdminUI->disp_payload_end();
-}
 
 /*
  * Administrative tasks
