@@ -209,6 +209,10 @@ function echo_installation_options( $params = array() )
 		}
 	}
 
+	// Options to select a collection for standard site:
+	$standard_collections = $collections;
+	unset( $standard_collections['home'] );
+
 	$r = '<div class="checkbox">
 				<label>
 					<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />'
@@ -223,8 +227,16 @@ function echo_installation_options( $params = array() )
 					</div>
 					<div class="radio" style="margin-left:1em">
 						<label>
+							<input type="radio" name="demo_content_type" id="standard_site_demo" value="standard_site" style="margin-top:9px" />'
+							.T_('Standard Site(1 collection):').'
+							<span class="form-inline"><select name="standard_collection" class="form-control">'.Form::get_select_options_string( $standard_collections, NULL, true ).'</span>
+							</select>
+						</label>
+					</div>
+					<div class="radio" style="margin-left:1em">
+						<label>
 							<input type="radio" name="demo_content_type" id="complex_site_demo" value="complex_site" checked="checked" />'
-							.T_('Complex Site, including:').'
+							.T_('Complex Site, including multiple collections:').'
 						</label>
 					</div>';
 
@@ -286,28 +298,12 @@ function echo_installation_options( $params = array() )
 
 					function toggle_demo_content_type_options()
 					{
-						if( jQuery( "input[name=\"demo_content_type\"]:checked" ).val() == "minisite" )
-						{
-							jQuery( "input[name=\'collections[]\']" ).attr( "disabled", true );
-						}
-						else
-						{
-							jQuery( "input[name=\'collections[]\']" ).removeAttr( "disabled" );
-						}
+						jQuery( "input[name=\'collections[]\']" ).prop( "disabled", ( jQuery( "input[name=demo_content_type]:checked" ).val() != "complex_site" ) );
 					}
 
 					function toggle_create_demo_user_options()
 					{
-						if( jQuery( "#create_demo_users" ).is( ":checked" ) )
-						{
-							jQuery( "input[name=\'create_demo_organization\']" ).removeAttr( "disabled" );
-							jQuery( "input[name=\'create_sample_private_messages\']" ).removeAttr( "disabled" );
-						}
-						else
-						{
-							jQuery( "input[name=\'create_demo_organization\']" ).attr( "disabled", true );
-							jQuery( "input[name=\'create_sample_private_messages\']" ).attr( "disabled", true );
-						}
+						jQuery( "input[name=create_demo_organization], input[name=create_sample_private_messages]" ).prop( "disabled", ! jQuery( "#create_demo_users" ).is( ":checked" ) );
 					}
 
 					jQuery( document ).ready( function() {
@@ -319,6 +315,10 @@ function echo_installation_options( $params = array() )
 					jQuery( "#create_sample_contents" ).click( toggle_create_demo_content_options );
 					jQuery( "input[name=\"demo_content_type\"]" ).click( toggle_demo_content_type_options );
 					jQuery( "#create_demo_users" ).click( toggle_create_demo_user_options );
+					jQuery( "select[name=standard_collection]" ).focus( function() {
+						jQuery( "#standard_site_demo" ).prop( "checked", true );
+						toggle_demo_content_type_options();
+					} );
 
 				</script>';
 
@@ -1226,30 +1226,44 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	else
 	{	// Array contains which collections should be installed
 		$demo_content_type = param( 'demo_content_type', 'string', NULL );
-		if( $demo_content_type == 'minisite' )
+		switch( $demo_content_type )
 		{
-			$install_collection_minisite = 1;
-			$install_collection_home     = 0;
-			$install_collection_bloga    = 0;
-			$install_collection_blogb    = 0;
-			$install_collection_photos   = 0;
-			$install_collection_forums   = 0;
-			$install_collection_manual   = 0;
-			$install_collection_tracker  = 0;
-			$site_skins_setting          = 0;
-		}
-		else
-		{
-			$collections = param( 'collections', 'array:string', array() );
-			$install_collection_minisite = 0;
-			$install_collection_home     = in_array( 'home', $collections );
-			$install_collection_bloga    = in_array( 'a', $collections );
-			$install_collection_blogb    = in_array( 'b', $collections );
-			$install_collection_photos   = in_array( 'photos', $collections );
-			$install_collection_forums   = in_array( 'forums', $collections );
-			$install_collection_manual   = in_array( 'manual', $collections );
-			$install_collection_tracker  = in_array( 'group', $collections );
-			$site_skins_setting          = 1;
+			case 'minisite':
+				$install_collection_minisite = 1;
+				$install_collection_home     = 0;
+				$install_collection_bloga    = 0;
+				$install_collection_blogb    = 0;
+				$install_collection_photos   = 0;
+				$install_collection_forums   = 0;
+				$install_collection_manual   = 0;
+				$install_collection_tracker  = 0;
+				$site_skins_setting          = 0;
+				break;
+
+			case 'standard_site':
+				$standard_collection = param( 'standard_collection', 'string', '' );
+				$install_collection_minisite = 0;
+				$install_collection_home     = 0;
+				$install_collection_bloga    = ( $standard_collection == 'a' );
+				$install_collection_blogb    = ( $standard_collection == 'b' );
+				$install_collection_photos   = ( $standard_collection == 'photos' );
+				$install_collection_forums   = ( $standard_collection == 'forums' );
+				$install_collection_manual   = ( $standard_collection == 'manual' );
+				$install_collection_tracker  = ( $standard_collection == 'group' );
+				$site_skins_setting          = 0;
+				break;
+
+			default: // complex_site
+				$collections = param( 'collections', 'array:string', array() );
+				$install_collection_minisite = 0;
+				$install_collection_home     = in_array( 'home', $collections );
+				$install_collection_bloga    = in_array( 'a', $collections );
+				$install_collection_blogb    = in_array( 'b', $collections );
+				$install_collection_photos   = in_array( 'photos', $collections );
+				$install_collection_forums   = in_array( 'forums', $collections );
+				$install_collection_manual   = in_array( 'manual', $collections );
+				$install_collection_tracker  = in_array( 'group', $collections );
+				$site_skins_setting          = 1;
 		}
 	}
 
@@ -1258,14 +1272,28 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	{
 		$SectionCache = & get_SectionCache();
 
-		$sections = array(
-				'No Section' => array( 'owner_ID' => 1, 'order' => 1 ),
-				'Home'       => array( 'owner_ID' => 1, 'order' => 2 ),
-				'Blogs'      => array( 'owner_ID' => $jay_moderator_ID, 'order' => 3 ),
-				'Photos'     => array( 'owner_ID' => $dave_blogger_ID, 'order' => 4 ),
-				'Forums'     => array( 'owner_ID' => $paul_blogger_ID, 'order' => 5 ),
-				'Manual'     => array( 'owner_ID' => $dave_blogger_ID, 'order' => 6 ),
-			);
+		$sections = array();
+		$sections['No Section'] = array( 'owner_ID' => 1, 'order' => 1 );
+		if( $install_collection_home )
+		{
+			$sections['Home'] = array( 'owner_ID' => 1, 'order' => 2 );
+		}
+		if( $install_collection_bloga || $install_collection_blogb )
+		{
+			$sections['Blogs'] = array( 'owner_ID' => $jay_moderator_ID, 'order' => 3 );
+		}
+		if( $install_collection_photos )
+		{
+			$sections['Photos'] = array( 'owner_ID' => $dave_blogger_ID, 'order' => 4 );
+		}
+		if( $install_collection_forums || $install_collection_tracker )
+		{
+			$sections['Forums'] = array( 'owner_ID' => $paul_blogger_ID, 'order' => 5 );
+		}
+		if( $install_collection_manual )
+		{
+			$sections['Manual'] = array( 'owner_ID' => $dave_blogger_ID, 'order' => 6 );
+		}
 
 		foreach( $sections as $section_name => $section_data )
 		{

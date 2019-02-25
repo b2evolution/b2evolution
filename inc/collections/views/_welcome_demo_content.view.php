@@ -36,6 +36,8 @@ $welcome_content_Widget = new Widget( 'block_item' );
 		<button id="cancel_button" type="submit" class="btn btn-primary"><?php echo T_('Create!')?></button>
 	</p>
 	</form>
+	
+	<p><?php echo sprintf( T_('Alternatively, you can also <a %s>manually create a new colleciton</a>.'), 'href="'.$admin_url.'?ctrl=collections&amp;action=new"' ); ?></p>
 	<?php
 
 	$welcome_content_Widget->disp_template_replaced( 'block_end' );

@@ -1009,8 +1009,10 @@ switch( $action )
 					$AdminUI->disp_view( 'collections/views/_welcome_demo_content.view.php' );
 				}
 
-				// Collections list:
-				$AdminUI->disp_view( 'collections/views/_coll_list.view.php' );
+				if( $collection_count > 0 )
+				{	// Collections list:
+					$AdminUI->disp_view( 'collections/views/_coll_list.view.php' );
+				}
 
 				// Models to start new collections
 				$AdminUI->disp_view( 'collections/views/_coll_model_list.view.php' );
