@@ -410,12 +410,14 @@ class email_elements_plugin extends Plugin
 					}
 					// If image file is correct we should display it instead of text:
 					$text = $image_Link->get_tag( array(
-						'before_image'        => '',
-						'before_image_legend' => NULL,
-						'after_image'         => empty( $text ) ? '' : '<br />'.$text,
+						'before_image'        => '<div'.emailskin_style( '.image_block' ).'>',
+						'before_image_legend' => '<div'.emailskin_style( '.image_legend' ).'>',
+						'after_image_legend'  => '</div>',
+						'after_image'         => '</div>',
 						'image_link_to'       => false,
 						'image_alt'           => $text,
 						'image_style'         => $image_style,
+						'image_desc'          => $text,
 						'add_loadimg'         => false,
 					) );
 				}
