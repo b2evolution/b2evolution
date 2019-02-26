@@ -24,7 +24,7 @@ $params = array_merge( array(
 		'message_footer'   => '',
 		'Blog'             => NULL,
 		'message'          => '',
-		'comment_id'       => NULL,
+		'comment_ID'       => NULL,
 		'post_id'          => NULL,
 		'recipient_User'   => NULL,
 		'Comment'          => NULL,
@@ -74,7 +74,7 @@ echo sprintf( T_( 'By replying, your email will go directly to %s.' ), $params['
 $CommentCache = & get_CommentCache();
 $ItemCache = & get_ItemCache();
 
-if( !empty( $params['comment_id'] ) && ( $Comment = & $CommentCache->get_by_ID( $params['comment_id'], false, false ) ) )
+if( !empty( $params['comment_ID'] ) && ( $Comment = & $CommentCache->get_by_ID( $params['comment_ID'], false, false ) ) )
 {
 	echo "\n\n".T_('Message sent from your comment:') . "\n"
 		.$Comment->get_permanent_url();

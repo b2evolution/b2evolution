@@ -149,7 +149,7 @@ if( $new_user_creating )
 
 	/***************  Identity  **************/
 
-$Form->begin_fieldset( T_('Identity').( is_admin_page() ? get_manual_link( 'user-profile-tab' ) : '' ) );
+$Form->begin_fieldset( T_('Identity').( is_admin_page() ? get_manual_link( 'user-profile-tab-identity' ) : '' ) );
 
 if( ($url = $edited_User->get('url')) != '' )
 {

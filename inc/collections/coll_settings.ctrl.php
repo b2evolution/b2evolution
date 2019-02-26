@@ -1070,7 +1070,7 @@ else
 			$AdminUI->set_path( 'collections', 'features', $tab );
 			$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
 			$AdminUI->breadcrumbpath_add( T_('Contact form'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
-			$AdminUI->set_page_manual_link( 'contact-form' );
+			$AdminUI->set_page_manual_link( 'contact-form-features' );
 			break;
 
 		case 'userdir':
@@ -1091,7 +1091,7 @@ else
 			$AdminUI->set_path( 'collections', 'features', $tab );
 			$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
 			$AdminUI->breadcrumbpath_add( T_('More'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
-			$AdminUI->set_page_manual_link( 'features-more' );
+			$AdminUI->set_page_manual_link( 'more-features' );
 			break;
 
 		case 'skin':

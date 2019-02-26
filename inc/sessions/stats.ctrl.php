@@ -449,7 +449,7 @@ switch( $tab )
 		$AdminUI->breadcrumbpath_add( T_('All Hits'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 
 		// Set an url for manual page:
-		$AdminUI->set_page_manual_link( 'recent-hits-list' );
+		$AdminUI->set_page_manual_link( 'all-hits' );
 		break;
 
 	case 'referers':
@@ -516,16 +516,19 @@ switch( $tab )
 		{
 			case 'top':
 				$AdminUI->breadcrumbpath_add( T_('Top referrers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'top-referring-domains' );
 				break;
 
 			case 'all':
 			default:
 				$AdminUI->breadcrumbpath_add( T_('All referrers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'referring-domains-tab' );
 				break;
 		}
-
-		// Set an url for manual page:
-		$AdminUI->set_page_manual_link( 'referring-domains-tab' );
 		break;
 
 	case 'goals':

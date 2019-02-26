@@ -30,6 +30,11 @@ $anon_email = param( 'anon_email', 'string', '' );
 switch( $type )
 {
 	case 'comment':
+		// Unsubscribe anonymous user from notifications of replies on Items where the user posted a comment:
+
+		// Stop a request from the blocked IP addresses or Domains:
+		antispam_block_request();
+
 		if( !is_email( $anon_email ) )
 		{
 			$Messages->add( 'Your email address is not correct. Probably the unsubscribe link was modified.' );
