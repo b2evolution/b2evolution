@@ -520,7 +520,7 @@ if( $success_message )
 				'message'           => $message,
 				'contact_method'    => $send_contact_method,
 				'additional_fields' => $send_additional_fields,
-				'comment_id'        => $comment_id,
+				'comment_ID'        => $comment_id,
 				'post_id'           => $post_id,
 				'recipient_User'    => $recipient_User,
 				'Comment'           => $Comment,

@@ -3797,9 +3797,6 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	global $mail_log_message;
 	$mail_log_message = NULL;
 
-	// Stop a request from the blocked IP addresses or Domains
-	antispam_block_request();
-
 	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode, $mail_log_insert_ID;
 
 	$message_data = $message;
