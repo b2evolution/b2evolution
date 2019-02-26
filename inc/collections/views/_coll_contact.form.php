@@ -33,7 +33,7 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'contact' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
-$Form->begin_fieldset( T_('Contact form').' (disp=msgform)'.get_manual_link( 'contact-form' ) );
+$Form->begin_fieldset( T_('Contact form').' (disp=msgform)'.get_manual_link( 'contact-form-features' ) );
 	$Form->text_input( 'msgform_title', $edited_Blog->get_setting( 'msgform_title' ), 80, T_('Page Title'), T_('Leave empty for default').': "'.T_('Contact').'".' );
 	$Form->begin_line( T_('Display recipient') );
 		$Form->checkbox( 'msgform_display_recipient', $edited_Blog->get_setting( 'msgform_display_recipient' ), '' );
