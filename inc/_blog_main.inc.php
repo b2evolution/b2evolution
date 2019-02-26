@@ -914,6 +914,8 @@ if( !empty( $skin ) )
 	// If we start collecting and a redirect happens, the collecting will just be lost and that's what we want.
 	if( ! $PageCache->check() )
 	{	// Cache miss, we have to generate:
+		$Timer->pause( 'PageCache' );
+
 		if( $skin_provided_by_plugin = skin_provided_by_plugin( $skin ) )
 		{
 			$tmp_params = array( 'skin' => $skin );
@@ -1021,7 +1023,10 @@ if( !empty( $skin ) )
 		// Save collected cached data if needed:
 		$PageCache->end_collect();
 	}
-	$Timer->pause( 'PageCache' );
+	if( $Timer->get_state( 'PageCache' ) == 'running' )
+	{	// Pause only when the page cache timer was not stoped above:
+		$Timer->pause( 'PageCache' );
+	}
 
 	$Timer->pause( 'SKIN DISPLAY' );
 	// LOG with APM:
