@@ -8647,36 +8647,8 @@ function render_inline_tags( $Object, $tags, $params = array() )
 							$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
 
 							if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
-							{
-								// Overwrite 'before_image' setting to add an extra class name:
-								if( $object_class == 'EmailCampaign' )
-								{
-									$el_style = '';
-									$custom_classes = array();
-									if( isset( $image_extraclass ) )
-									{
-										$classes = explode( ' ', $image_extraclass );
-										foreach( $classes as $class )
-										{
-											$class_style = emailskin_style( '.'.trim( $class ), false );
-											$el_style .= $class_style;
-											if( empty( $class_style ) )
-											{	// Doesn't have appropriate email skin style:
-												$custom_classes[] = $class;
-											}
-										}
-									}
-									$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array(
-											'class' => implode( ' ', $custom_classes ),
-											'style' => $el_style
-										) );
-								}
-								else
-								{
-									$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
-								}
-
-								// Append extra class to file inline img tags:
+							{	// Append extra class to image/file inline img tags:
+								$current_image_params['image_class'] = $image_extraclass;
 								$current_file_params['class'] = $image_extraclass;
 							}
 						}
@@ -8719,26 +8691,16 @@ function render_inline_tags( $Object, $tags, $params = array() )
 							case 'EmailCampaign':
 								// Get the IMG tag without link for email content:
 								$image_style = '';
-								if( isset( $current_image_params['image_class'] ) )
-								{
-									$classes = explode( ' ', $current_image_params['image_class'] );
-									$custom_classes = array();
-									foreach( $classes as $class )
-									{
-										$class_style = emailskin_style( '.'.trim( $class ), false );
-										$image_style .= $class_style;
-										if( empty( $class_style ) )
-										{	// Doesn't have appropriate email skin style:
-											$custom_classes[] = $class;
-										}
-									}
-									$current_image_params['image_class'] = implode( ' ', $custom_classes );
-									$current_image_params['image_style'] = $image_style;
+								if( ! empty( $current_image_params['image_class'] ) )
+								{	// Convert classes to style format:
+									$image_style = emailskin_style( '.'.str_replace( ' ', '+.', $current_image_params['image_class'] ), false );
+									// We cannot use class attribute on email campaign content:
+									unset( $current_image_params['image_class'] );
 								}
 
 								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
 										'image_link_to' => false,
-										'image_style'   => 'border: none; max-width: 100%; height: auto;',
+										'image_style'   => 'border: none; max-width: 100%; height: auto;'.$image_style,
 										'add_loadimg'   => false,
 								) ) );
 								break;
@@ -8755,22 +8717,14 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						{
 							case 'EmailCampaign':
 								$image_style = '';
-								$custom_classes = array();
 								if( ! empty( $current_file_params['class'] ) )
-								{
-									$classes = explode( ' ', $current_file_params['class'] );
-									foreach( $classes as $class )
-									{
-										$class_style = emailskin_style( '.'.trim( $class ), false );
-										$image_style .= $class_style;
-										if( empty( $class_style ) )
-										{	// Doesn't have appropriate email skin style:
-											$custom_classes[] = $class;
-										}
-									}
+								{	// Convert classes to style format:
+									$image_style = emailskin_style( '.'.str_replace( ' ', '+.', $current_file_params['class'] ), false );
+									// We cannot use class attribute on email campaign content:
+									unset( $current_file_params['class'] );
 								}
 								$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
-										implode( ' ', $custom_classes ), '', '', '', '', 1, NULL, 'border: none; max-width: 100%; height: auto;'.$image_style, false );
+										'', '', '', '', '', 1, NULL, 'border: none; max-width: 100%; height: auto;'.$image_style, false );
 								break;
 
 							default:
@@ -8863,19 +8817,10 @@ function render_inline_tags( $Object, $tags, $params = array() )
 							// Get the IMG tag without link for email content:
 							$image_style = '';
 							if( ! empty( $current_image_params['image_class'] ) )
-							{
-								$classes = explode( ' ', $current_image_params['image_class'] );
-								$custom_classes = array();
-								foreach( $classes as $class )
-								{
-									$class_style = emailskin_style( '.'.trim( $class ), false );
-									$image_style .= $class_style;
-									if( empty( $class_style ) )
-									{	// Doesn't have appropriate email skin style:
-										$custom_classes[] = $class;
-									}
-								}
-								$current_image_params['image_class'] = implode( ' ', $custom_classes );
+							{	// Convert classes to style format:
+								$image_style = emailskin_style( '.'.str_replace( ' ', '+.', $current_image_params['image_class'] ), false );
+								// We cannot use class attribute on email campaign content:
+								unset( $current_image_params['image_class'] );
 							}
 							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
 									'image_link_to' => false,
