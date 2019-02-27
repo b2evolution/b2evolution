@@ -910,7 +910,7 @@ switch( $action )
 		 */
 		track_step( 'install-start' );
 
-		$create_sample_contents = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
+		$create_sample_contents = param( 'create_sample_contents', 'string', false, true ); // during auto install this param can be 'all', 'minisite', 'home', 'blog-a', 'blog-b', 'photos, 'forums', 'manual', 'tracker'
 		$create_demo_organization = param( 'create_demo_organization', 'boolean', false, true );
 		$create_demo_users = param( 'create_demo_users', 'boolean', false, true );
 		$create_demo_messages = param( 'create_sample_private_messages', 'boolean', false, true );

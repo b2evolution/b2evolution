@@ -1211,65 +1211,106 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	load_funcs( 'widgets/_widgets.funcs.php' );
 
 	$create_sample_contents = param( 'create_sample_contents', 'string', '' );
-	if( $create_sample_contents == 'all' )
-	{	// Array contains which collections should be installed
-		$install_collection_minisite = 0;
-		$install_collection_home     = 1;
-		$install_collection_bloga    = 1;
-		$install_collection_blogb    = 1;
-		$install_collection_photos   = 1;
-		$install_collection_forums   = 1;
-		$install_collection_manual   = 1;
-		$install_collection_tracker  = 1;
-		$site_skins_setting          = 1;
-	}
-	else
-	{	// Array contains which collections should be installed
-		$demo_content_type = param( 'demo_content_type', 'string', NULL );
-		switch( $demo_content_type )
-		{
-			case 'minisite':
-				$install_collection_minisite = 1;
-				$install_collection_home     = 0;
-				$install_collection_bloga    = 0;
-				$install_collection_blogb    = 0;
-				$install_collection_photos   = 0;
-				$install_collection_forums   = 0;
-				$install_collection_manual   = 0;
-				$install_collection_tracker  = 0;
-				$site_skins_setting          = 0;
-				break;
-
-			case 'standard_site':
-				$standard_collection = param( 'standard_collection', 'string', '' );
-				$install_collection_minisite = 0;
-				$install_collection_home     = 0;
-				$install_collection_bloga    = ( $standard_collection == 'a' );
-				$install_collection_blogb    = ( $standard_collection == 'b' );
-				$install_collection_photos   = ( $standard_collection == 'photos' );
-				$install_collection_forums   = ( $standard_collection == 'forums' );
-				$install_collection_manual   = ( $standard_collection == 'manual' );
-				$install_collection_tracker  = ( $standard_collection == 'group' );
-				$site_skins_setting          = 0;
-				break;
-
-			default: // complex_site
-				$collections = param( 'collections', 'array:string', array() );
-				$install_collection_minisite = 0;
-				$install_collection_home     = in_array( 'home', $collections );
-				$install_collection_bloga    = in_array( 'a', $collections );
-				$install_collection_blogb    = in_array( 'b', $collections );
-				$install_collection_photos   = in_array( 'photos', $collections );
-				$install_collection_forums   = in_array( 'forums', $collections );
-				$install_collection_manual   = in_array( 'manual', $collections );
-				$install_collection_tracker  = in_array( 'group', $collections );
-				$site_skins_setting          = 1;
-		}
-	}
-
-	task_begin( 'Creating default sections... ' );
-	if( $demo_content_type != 'minisite' )
+	$install_collection_minisite = 0;
+	$install_collection_home     = 0;
+	$install_collection_bloga    = 0;
+	$install_collection_blogb    = 0;
+	$install_collection_photos   = 0;
+	$install_collection_forums   = 0;
+	$install_collection_manual   = 0;
+	$install_collection_tracker  = 0;
+	$site_skins_setting          = 0;
+	switch( $create_sample_contents )
 	{
+		case 'all':
+			// Install all collections except of "Mini-Site":
+			// (may be used from auto install script)
+			$install_collection_home    = 1;
+			$install_collection_bloga   = 1;
+			$install_collection_blogb   = 1;
+			$install_collection_photos  = 1;
+			$install_collection_forums  = 1;
+			$install_collection_manual  = 1;
+			$install_collection_tracker = 1;
+			$site_skins_setting         = 1;
+			break;
+
+		case 'minisite':
+			// Install "Mini-Site" from auto install script:
+			$install_collection_minisite = 1;
+			break;
+
+		case 'home':
+			// Install "Global home page" from auto install script:
+			$install_collection_home = 1;
+			$site_skins_setting      = 1;
+			break;
+
+		case 'blog-a':
+			// Install "Sample Blog A (Public)" from auto install script:
+			$install_collection_bloga = 1;
+			break;
+
+		case 'blog-b':
+			// Install "Sample Blog B (Private)" from auto install script:
+			$install_collection_blogb = 1;
+			break;
+
+		case 'photos':
+			// Install "Photo Albums" from auto install script:
+			$install_collection_photos = 1;
+			break;
+
+		case 'forums':
+			// Install "Forums" from auto install script:
+			$install_collection_forums = 1;
+			break;
+
+		case 'manual':
+			// Install "Online Manual" from auto install script:
+			$install_collection_manual = 1;
+			break;
+
+		case 'tracker':
+			// Install "Tracker" from auto install script:
+			$install_collection_tracker = 1;
+			break;
+
+		default:
+			// Install collections depending on the selected options "Create a demo site" on the submitted form:
+			$demo_content_type = param( 'demo_content_type', 'string', NULL );
+			switch( $demo_content_type )
+			{
+				case 'minisite':
+					$install_collection_minisite = 1;
+					break;
+
+				case 'standard_site':
+					$standard_collection = param( 'standard_collection', 'string', '' );
+					$install_collection_bloga   = ( $standard_collection == 'a' );
+					$install_collection_blogb   = ( $standard_collection == 'b' );
+					$install_collection_photos  = ( $standard_collection == 'photos' );
+					$install_collection_forums  = ( $standard_collection == 'forums' );
+					$install_collection_manual  = ( $standard_collection == 'manual' );
+					$install_collection_tracker = ( $standard_collection == 'group' );
+					break;
+
+				default: // complex_site
+					$collections = param( 'collections', 'array:string', array() );
+					$install_collection_home    = in_array( 'home', $collections );
+					$install_collection_bloga   = in_array( 'a', $collections );
+					$install_collection_blogb   = in_array( 'b', $collections );
+					$install_collection_photos  = in_array( 'photos', $collections );
+					$install_collection_forums  = in_array( 'forums', $collections );
+					$install_collection_manual  = in_array( 'manual', $collections );
+					$install_collection_tracker = in_array( 'group', $collections );
+					$site_skins_setting         = 1;
+			}
+	}
+
+	if( $demo_content_type == 'complex_site' || $create_sample_contents == 'all' )
+	{
+		task_begin( 'Creating default sections... ' );
 		$SectionCache = & get_SectionCache();
 
 		$sections = array();
@@ -1312,8 +1353,8 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				$sections[$section_name]['ID'] = $new_Section->ID;
 			}
 		}
+		task_end();
 	}
-	task_end();
 
 	if( $install_collection_blogb )
 	{
