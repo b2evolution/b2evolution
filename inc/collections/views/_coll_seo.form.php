@@ -54,7 +54,7 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'seo' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
-$Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(disp=posts)</span>'.get_manual_link('main_page_seo') );
+$Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(disp=posts)</span>'.get_manual_link('main-page-seo') );
 	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Default blog page'), T_('META NOINDEX') );
 	$Form->checklist( array(
 		array( 'canonical_homepage', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_homepage' ) ),
@@ -87,7 +87,7 @@ $Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(di
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_link('single_post_pages_seo') );
+$Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_link('single-post-pages-seo') );
 
 	$Form->radio( 'single_links', $edited_Blog->get_setting('single_links'),
 		array(
@@ -131,7 +131,7 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_seo') );
+$Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive-pages-seo') );
 
 	$Form->radio( 'archive_links', $edited_Blog->get_setting('archive_links'),
 		array(
@@ -163,7 +163,7 @@ $Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_s
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo') );
+$Form->begin_fieldset( T_('Category pages').get_manual_link('category-pages-seo') );
 
 	$Form->radio( 'chapter_links', $edited_Blog->get_setting('chapter_links'),
 		array(
@@ -215,7 +215,7 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo'
 	$Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo'), array('id'=>'tag_links_fieldset') );
+$Form->begin_fieldset( T_('Tag pages').get_manual_link('tag-pages-seo'), array('id'=>'tag_links_fieldset') );
 
 	$Form->radio( 'tag_links', $edited_Blog->get_setting('tag_links'),
 		array(
@@ -295,7 +295,7 @@ jQuery("#tag_prefix").keyup( function() {
 
 
 <?php
-$Form->begin_fieldset( T_('Other filtered pages').get_manual_link('other_filtered_pages_seo') );
+$Form->begin_fieldset( T_('Other filtered pages').get_manual_link('other-filtered-pages-seo') );
 	$Form->checkbox( 'filtered_noindex', $edited_Blog->get_setting( 'filtered_noindex' ), T_('Other filtered posts pages'), T_('META NOINDEX').' - '.T_('Filtered by keyword search, by author, etc.') );
 
 	$Form->radio( 'filtered_content', $edited_Blog->get_setting('filtered_content'),
@@ -306,7 +306,7 @@ $Form->begin_fieldset( T_('Other filtered pages').get_manual_link('other_filtere
 			), T_('Post contents'), true );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
+$Form->begin_fieldset( T_('Other pages').get_manual_link('other-pages-seo') );
 	$Form->checkbox( 'feedback-popup_noindex', $edited_Blog->get_setting( 'feedback-popup_noindex' ), T_('Comment popups'),
 										T_('META NOINDEX').' - '.T_('For skins with comment popups only.') );
 	$Form->checkbox( 'msgform_noindex', $edited_Blog->get_setting( 'msgform_noindex' ), T_('Contact forms'),

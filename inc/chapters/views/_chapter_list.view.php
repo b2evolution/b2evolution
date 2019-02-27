@@ -164,7 +164,7 @@ function cat_line( $Chapter, $level )
 			{	// No default type:
 				$cat_item_type_name = '<b>'.T_('No default type').'</b>';
 			}
-			elseif( ( $ItemTypeCache = & get_ItemTypeCache() ) && 
+			elseif( ( $ItemTypeCache = & get_ItemTypeCache() ) &&
 							( $cat_ItemType = & $ItemTypeCache->get_by_ID( $Chapter->get( 'ityp_ID' ), false, false ) ) )
 			{	// Custom Item Type:
 				$cat_item_type_name = $cat_ItemType->get( 'name' );
@@ -385,7 +385,7 @@ global $Settings, $dispatcher;
 echo '<div id="form_wrapper" style="margin: 2ex auto 1ex">';
 
 $Form = new Form( NULL, 'cat_order_checkchanges', 'post', 'compact' );
-$Form->begin_form( 'fform', T_('Category order').get_manual_link('categories_order') );
+$Form->begin_form( 'fform', T_('Category order').get_manual_link('categories-order') );
 $Form->add_crumb( 'collection' );
 $Form->hidden( 'ctrl', 'coll_settings' );
 $Form->hidden( 'action', 'update' );
