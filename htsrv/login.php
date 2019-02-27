@@ -123,6 +123,9 @@ switch( $action )
 	case 'resetpassword':
 		// Send password reset request by email:
 
+		// Stop a request from the blocked IP addresses or Domains
+		antispam_block_request();
+
 		global $servertimenow;
 		$login_required = true; // Do not display "Without login.." link on the form
 

@@ -294,7 +294,7 @@ $Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
 	$Form->end_line( NULL, 'info' );
 $Form->end_fieldset(); // Usage info
 
-$Form->begin_fieldset( T_('Reputation').get_manual_link('user-admin-reputaion') );
+$Form->begin_fieldset( T_('Reputation').get_manual_link('user-admin-reputation') );
 
 	$Form->info( T_('Posts'), $edited_User->get_reputation_posts() );
 

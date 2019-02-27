@@ -4471,6 +4471,53 @@ class Plugin
 
 
 	/**
+	 * This method initializes an array that used as additional tabs/forms
+	 *   for the modal/popup window "Insert image into content"
+	 *
+	 * @param array Array of parameters:
+	 *   - 'link_ID' - Link ID
+	 *   - 'active_tag' - Index of current tag: 'image', 'thumbnail', 'inline' or custom from a plugin
+	 * @return array Array:
+	 *   key - Index of additional tab/form, NOTE: indexes 'image', 'thumbnail', 'inline' are used by core
+	 *   value - Tab title
+	 */
+	function GetImageInlineTags( & $params )
+	{
+		return array();
+	}
+
+
+	/**
+	 * This method displays a form for additional tab
+	 *   on the modal/popup window "Insert image into content"
+	 *
+	 * @param array Array of parameters:
+	 *   - 'link_ID' - Link ID
+	 *   - 'active_tag' - Index of currently active tag: 'image', 'thumbnail', 'inline' or custom from a plugin
+	 *   - 'display_tag' - Index of the plugin tag which should be displayed
+	 *   - 'Form' - Form object
+	 * @return boolean Did we display a form?
+	 */
+	function DisplayImageInlineTagForm( & $params )
+	{
+		return false;
+	}
+
+
+	/**
+	 * This method initializes JavaScript before submit/insert inline tag
+	 *   from the modal/popup window "Insert image into content"
+	 *
+	 * @param array Array of parameters:
+	 *   - 'link_ID' - Link ID
+	 * @return string JavaScript code
+	 */
+	function GetInsertImageInlineTagJavaScript( & $params )
+	{
+	}
+
+
+	/**
 	 * Memorize that a specific css that file will be required by the current page.
 	 * @see require_css() for full documentation,
 	 * this function is used to add unique version number for each plugin

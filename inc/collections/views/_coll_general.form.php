@@ -176,7 +176,7 @@ if( in_array( $action, array( 'create', 'new-name' ) ) && $ctrl = 'collections' 
 	$Form->end_fieldset();
 }
 
-$Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_parameters' ), array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs-general-parameters' ), array( 'class'=>'fieldset clear' ) );
 
 	$collection_logo_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select collection logo/image'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
 	$Form->fileselect( 'collection_logo_file_ID', $edited_Blog->get_setting( 'collection_logo_file_ID' ), T_('Collection logo/image'), NULL, $collection_logo_params );
@@ -432,7 +432,7 @@ else
 
 if( ! $is_creating )
 {
-	$Form->begin_fieldset( T_('Meta data').get_manual_link('blog_meta_data') );
+	$Form->begin_fieldset( T_('Meta data').get_manual_link('blog-meta-data') );
 		$social_media_boilerplate_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select logo for social media boilerplate'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
 		$Form->fileselect( 'social_media_image_file_ID', $edited_Blog->get_setting( 'social_media_image_file_ID' ), T_('Social media boilerplate'), NULL, $social_media_boilerplate_params );
 		$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );

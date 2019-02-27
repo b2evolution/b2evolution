@@ -769,6 +769,7 @@ else
 	{
 		case 'duplicates':
 			$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users&amp;tab3='.$tab3 );
+			$AdminUI->set_page_manual_link( 'users-find-duplicates' );
 			break;
 
 		default:
@@ -783,7 +784,7 @@ else
 			load_funcs( 'regional/model/_regional.funcs.php' );
 
 			// Set an url for manual page:
-				$AdminUI->set_page_manual_link( 'users-users' );
+			$AdminUI->set_page_manual_link( 'users-users' );
 	}
 
 }

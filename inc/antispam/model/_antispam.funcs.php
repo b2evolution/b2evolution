@@ -653,7 +653,7 @@ function antispam_block_by_domain()
 			continue;
 		}
 
-		// Get domain name by current IP adress:
+		// Get domain name by current IP address:
 		$ip_domain = gethostbyaddr( $ip_address );
 
 		if( ! empty( $ip_domain ) &&

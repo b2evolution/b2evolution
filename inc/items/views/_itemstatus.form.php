@@ -134,7 +134,7 @@ if( ! empty( $ityp_usage ) )
 }
 
 $Results = new Results( $SQL->get(), 'ityp_' );
-$Results->title = T_('Item Types allowed for this Item Status').get_manual_link( 'item-statuses-allowed-per-item-type' );
+$Results->title = T_('Item Types allowed for this Item Status').get_manual_link( 'item-types-allowed-per-item-status' );
 $Results->Form = $Form;
 
 $Results->filter_area = array(

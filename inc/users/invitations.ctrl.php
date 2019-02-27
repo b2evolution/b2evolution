@@ -212,10 +212,10 @@ switch( $action )
 	case 'create_copy':
 	case 'edit':
 	case 'update':
-		$AdminUI->set_page_manual_link( 'user-settings-invitations-editing' );
+		$AdminUI->set_page_manual_link( 'invitation-code-form' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'user-settings-invitations-tab' );
+		$AdminUI->set_page_manual_link( 'invitation-codes-tab' );
 		break;
 }
 

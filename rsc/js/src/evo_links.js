@@ -99,8 +99,10 @@ function evo_link_change_position( selectInput, url, crumb )
  * @param string Type: 'image', 'file', 'video'
  * @param integer File ID
  * @param string Caption text
+ * @param boolean Replace a selected text
+ * @param string Caption, when this param is filled then tag is inserted in format like [image:123]Caption[/image]
  */
-function evo_link_insert_inline( type, link_ID, option, replace )
+function evo_link_insert_inline( type, link_ID, option, replace, caption )
 {
 	if( replace == undefined )
 	{
@@ -117,6 +119,11 @@ function evo_link_insert_inline( type, link_ID, option, replace )
 		}
 
 		insert_tag += ']';
+
+		if( typeof( caption ) != 'undefined' && caption !== false )
+		{	// Tag with caption:
+			insert_tag += caption + '[/' + type + ']';
+		}
 
 		var $position_selector = jQuery( '#display_position_' + link_ID );
 		if( $position_selector.length != 0 )

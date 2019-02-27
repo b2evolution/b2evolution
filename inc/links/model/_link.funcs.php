@@ -96,6 +96,25 @@ function & get_link_owner( $link_type, $object_ID )
 
 
 /**
+ * Get a link owner type by link ID
+ *
+ * @param integer Link ID
+ * @return string Link owner type
+ */
+function get_link_owner_type( $link_ID )
+{
+	$LinkCache = & get_LinkCache();
+	if( ( $Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) && 
+	    ( $LinkOwner = & $Link->get_LinkOwner() ) )
+	{
+		return $LinkOwner->type;
+	}
+
+	return '';
+}
+
+
+/**
  * Display attachments fieldset
  *
  * @param object Form

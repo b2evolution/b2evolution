@@ -152,12 +152,12 @@ class Plugins
 		// Set plugin path:
 		$this->plugins_path = $basepath.$plugins_subdir;
 
-		$Timer->resume( 'plugin_init' );
+		$Timer->resume( 'plugins_init' );
 
 		// Load events for enabled plugins:
 		$this->load_events();
 
-		$Timer->pause( 'plugin_init' );
+		$Timer->pause( 'plugins_init' );
 	}
 
 
@@ -677,9 +677,7 @@ class Plugins
 		// when is_installed=true).
 		$method = 'GetDefault'.$set_type;
 		$params = array('for_editing'=>false);
-		$Timer->resume( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 		$defaults = $Plugin->$method( $params );
-		$Timer->pause( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 
 		if( $set_type == 'Settings' )
 		{	// If general settings are requested we should also append custom, collection, widgets, messages, emails and shared settings:
