@@ -2535,7 +2535,7 @@ class Blog extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), $msg_mediadir_path ),
-							'error', T_('Media directory file permission error').get_manual_link('media-directory-file-permission-error').':' );
+							'error', T_('Media directory file permission error').get_manual_link('media-file-permission-errors').':' );
 				}
 				return false;
 			}
@@ -2544,7 +2544,7 @@ class Blog extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created."), $msg_mediadir_path ),
-							'error', T_('Media directory creation error').get_manual_link('media-directory-creation-error').':' );
+							'error', T_('Media directory creation error').get_manual_link('media-file-permission-errors').':' );
 				}
 				return false;
 			}

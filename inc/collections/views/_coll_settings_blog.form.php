@@ -59,7 +59,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('After each new post or comment...').get_manual_link('after_each_post_settings') );
+$Form->begin_fieldset( T_('After each new post or comment...').get_manual_link('after-each-post-settings') );
 	$Form->radio_input( 'outbound_notifications_mode', $Settings->get('outbound_notifications_mode'),
 		array(
 			array( 'value'=>'off', 'label'=>T_('Off'), 'note'=>T_('No notification about your new content will be sent out.') ),
@@ -72,7 +72,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Categories').get_manual_link('categories_global_settings'), array( 'id'=>'categories') );
+$Form->begin_fieldset( T_('Categories').get_manual_link('categories-global-settings'), array( 'id'=>'categories') );
 	$Form->checkbox_input( 'allow_moving_chapters', $Settings->get('allow_moving_chapters'), T_('Allow moving categories'), array( 'note' => T_('Check to allow moving categories accross blogs. (Caution: can break pre-existing permalinks!)' ) ) );
 $Form->end_fieldset();
 
