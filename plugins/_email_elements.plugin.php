@@ -382,15 +382,19 @@ class email_elements_plugin extends Plugin
 				}
 				if( $style == 'image' )
 				{	// Check if correct image link ID is used:
+					$image_style = '';
 					if( $style_link_data !== NULL && preg_match( '/^(\d+)(\..+)?$/', $style_link_data, $style_link_match ) )
 					{	// Corrent link ID and/or style class:
 						$style_link_ID = $style_link_match[1];
-						$image_style = isset( $style_link_match[2] ) ? emailskin_style( $style_link_match[2], false ) : '';
+						if( isset( $style_link_match[2] ) )
+						{	// Convert a separator between several classes like '.rounded.border' to '.rounded+.border' for function emailskin_style():
+							$image_style = ltrim( str_replace( '.', '+.', $style_link_match[2] ), '+' );
+							$image_style = emailskin_style( $image_style, false );
+						}
 					}
 					else
 					{	// Wrong link ID:
 						$style_link_ID = NULL;
-						$image_style = '';
 					}
 					$image_File = NULL;
 					$LinkCache = & get_LinkCache();
@@ -477,5 +481,122 @@ class email_elements_plugin extends Plugin
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * This method initializes an array that used as additional tabs/forms
+	 *   for the modal/popup window "Insert image into content"
+	 *
+	 * @param array Array of parameters:
+	 *   - 'link_ID' - Link ID
+	 *   - 'active_tag' - Index of current tag: 'image', 'thumbnail', 'inline' or custom from a plugin
+	 * @return array Array:
+	 *   key - Index of additional tab/form, NOTE: indexes 'image', 'thumbnail', 'inline' are used by core
+	 *   value - Tab title
+	 */
+	function GetImageInlineTags( & $params )
+	{
+		if( get_link_owner_type( $params['link_ID'] ) != 'emailcampaign' )
+		{	// Allow additional inline tag 'clickable' only for Email Campaigns:
+			return array();
+		}
+
+		return array( 'clickable' => T_('Clickable') );
+	}
+
+
+	/**
+	 * This method displays a form for additional tab
+	 *   on the modal/popup window "Insert image into content"
+	 *
+	 * @param array Array of parameters:
+	 *   - 'link_ID' - Link ID
+	 *   - 'active_tag' - Index of currently active tag: 'image', 'thumbnail', 'inline' or custom from a plugin
+	 *   - 'display_tag' - Index of the plugin tag which should be displayed
+	 *   - 'Form' - Form object
+	 * @return boolean Did we display a form?
+	 */
+	function DisplayImageInlineTagForm( & $params )
+	{
+		if( get_link_owner_type( $params['link_ID'] ) != 'emailcampaign' )
+		{	// Allow additional inline tag 'clickable' only for Email Campaigns:
+			return false;
+		}
+
+		if( empty( $params['Form'] ) )
+		{	// Form object must be passed for this event:
+			return false;
+		}
+
+		$Form = & $params['Form'];
+
+		switch( $params['display_tag'] )
+		{
+			case 'clickable':
+				// Caption:
+				$Form->text( 'clickable_caption', get_param( 'clickable_caption' ), 40, T_('Caption'), '<br>
+					<span style="display: flex; flex-flow: row; align-items: center; margin-top: 8px;">
+						<input type="checkbox" name="clickable_disable_caption" id="clickable_disable_caption" value="1" style="margin: 0 8px 0 0;">
+						<span>'.T_('Disable caption').'</span></span>', '' );
+				// Styles:
+				$Form->text( 'clickable_class', get_param( 'clickable_class' ), 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
+					<button class="btn btn-default btn-xs">border</button>
+					<button class="btn btn-default btn-xs">noborder</button>
+					<button class="btn btn-default btn-xs">rounded</button>
+					<button class="btn btn-default btn-xs">squared</button></div>', '' );
+				// Type:
+				$Form->output = false;
+				$Form->switch_layout( 'none' );
+				$cta_select = $Form->select_input_array( 'clickable_cta_num', NULL, $this->cta_numbers, '' );
+				$Form->switch_layout( NULL );
+				$Form->output = true;
+				$Form->radio( 'clickable_type', param( 'clickable_type', 'string', 'button' ), array(
+						array( 'button', T_('Button') ),
+						array( 'cta', T_('Call to Action'), $cta_select ),
+						array( 'like', T_('Like') ),
+						array( 'dislike', T_('Dislike') ),
+						array( 'activate', T_('Activate') ),
+						array( 'unsubscribe', T_('Unsubscribe') ),
+					), T_('Type'), true );
+				return true;
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * This method initializes JavaScript before submit/insert inline tag
+	 *   from the modal/popup window "Insert image into content"
+	 *
+	 * @param array Array of parameters:
+	 *   - 'link_ID' - Link ID
+	 * @return string JavaScript code
+	 */
+	function GetInsertImageInlineTagJavaScript( & $params )
+	{
+		if( get_link_owner_type( $params['link_ID'] ) != 'emailcampaign' )
+		{	// Allow additional inline tag 'clickable' only for Email Campaigns:
+			return;
+		}
+
+		return 'if( tagType == "clickable" )
+{
+	tag_caption = jQuery( "input[name=" + tagType + "_caption]" ).val();
+	var noCaption = jQuery( "input[name=" + tagType + "_disable_caption]" ).is( ":checked" );
+	if( noCaption )
+	{
+		tag_caption = "";
+	}
+
+	var clickable_type = jQuery( "input[name=" + tagType + "_type]:checked" ).val();
+
+	linkID = ( clickable_type == "cta" ? jQuery( "select[name=" + tagType + "_cta_num]" ).val() + ":" : "" )
+		+ "image#" + linkID + classes;
+
+	options = "";
+	tagType = clickable_type;
+}';
 	}
 }

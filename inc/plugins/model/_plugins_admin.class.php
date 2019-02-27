@@ -264,6 +264,9 @@ class Plugins_admin extends Plugins
 				'HandleDispMode' => 'Called when displaying $disp',
 
 				'GetAdditionalColumnsTable' => 'Called to add columns for Results object',
+				'GetImageInlineTags' => 'Called to add tabs on the modal/popup window "Insert image into content"',
+				'DisplayImageInlineTagForm' => 'Called to display a form for additional tab on the modal/popup window "Insert image into content"',
+				'GetInsertImageInlineTagJavaScript' => 'Called to get an additional JavaScript before submit/insert inline tag from the modal/popup window "Insert image into content"',
 			);
 
 			if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )

@@ -14,20 +14,36 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 global $retrict_tag;
-global $link_ID, $tag_type;
+global $link_ID, $tag_type, $Plugins;
 global $image_caption, $image_disable_caption, $image_class;
 global $thumbnail_size, $thumbnail_alignment, $thumbnail_class;
 global $inline_class;
 
+$tag_types = array(
+	'image'     => T_('Image'),
+	'thumbnail' => T_('Thumbnail'),
+	'inline'    => T_('Basic inline'),
+);
+
+// Get additional tabs from active Plugins:
+$plugins_tabs = $Plugins->trigger_collect( 'GetImageInlineTags', array(
+	'link_ID' => $link_ID,
+	'active_tag' => $tag_type
+) );
+foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
+{
+	$tag_types = array_merge( $tag_types, $plugin_tabs );
+}
+
 ?>
 <div class="container-fluid">
-	<?php	if( ! $restrict_tag ):	?>
+	<?php if( ! $restrict_tag ): ?>
 	<ul class="nav nav-tabs">
-		<li role="presentation" class="evo_widget widget_core_menu_link<?php echo $tag_type == 'image' ? ' active' : '' ;?>"><a href="#image" role="tab" data-toggle="tab"><?php echo T_('Image'); ?></a></li>
-		<li role="presentation" class="evo_widget widget_core_menu_link<?php echo $tag_type == 'thumbnail' ? ' active' : '' ;?>"><a href="#thumbnail" role="tab" data-toggle="tab"><?php echo T_('Thumbnail'); ?></a></li>
-		<li role="presentation" class="evo_widget widget_core_menu_link<?php echo $tag_type == 'inline' ? ' active' : '' ;?>"><a href="#inline" role="tab" data-toggle="tab"><?php echo T_('Basic inline'); ?></a></li>
+		<?php foreach( $tag_types as $tag_type_key => $tag_type_title ): ?>
+		<li role="presentation"<?php echo $tag_type == $tag_type_key ? ' class="active"' : '' ;?>><a href="#<?php echo $tag_type_key; ?>" role="tab" data-toggle="tab"><?php echo $tag_type_title; ?></a></li>
+		<?php endforeach; ?>
 	</ul>
-	<?php endif;?>
+	<?php endif; ?>
 	<div style="margin-top: 20px; display: flex; flex-flow: row nowrap; align-items: flex-start;">
 		<div id="image_preview" style="display: flex; align-items: center; min-height: 192px; margin-right: 10px;">
 		<?php echo $File->get_thumb_imgtag( 'fit-192x192' ); ?>
@@ -39,47 +55,62 @@ global $inline_class;
 			$Form->hidden( 'link_ID', $link_ID );
 			$Form->begin_fieldset( T_('Parameters') );
 			echo '<div class="tab-content">';
-				echo '<div id="image" class="tab-pane'.($tag_type == 'image' ? ' active' : '' ).'">';
-				$Form->text( 'image_caption', $image_caption, 40, T_('Caption'), '<br>
-						<span style="display: flex; flex-flow: row; align-items: center; margin-top: 8px;">
-							<input type="checkbox" name="image_disable_caption" id="image_disable_caption" value="1" style="margin: 0 8px 0 0;">
-							<span>'.T_('Disable caption').'</span></span>', '' );
-				$Form->text( 'image_class', $image_class, 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
-						<button class="btn btn-default btn-xs">border</button>
-						<button class="btn btn-default btn-xs">noborder</button>
-						<button class="btn btn-default btn-xs">rounded</button>
-						<button class="btn btn-default btn-xs">squared</button></div>', '' );
-				echo '</div>';
+			foreach( $tag_types as $tag_type_key => $tag_type_title )
+			{
+				echo '<div id="'.$tag_type_key.'" class="tab-pane'.( $tag_type == $tag_type_key ? ' active' : '' ).'">';
+				switch( $tag_type_key )
+				{
+					case 'image':
+						$Form->text( 'image_caption', $image_caption, 40, T_('Caption'), '<br>
+							<span style="display: flex; flex-flow: row; align-items: center; margin-top: 8px;">
+								<input type="checkbox" name="image_disable_caption" id="image_disable_caption" value="1" style="margin: 0 8px 0 0;">
+								<span>'.T_('Disable caption').'</span></span>', '' );
+						$Form->text( 'image_class', $image_class, 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
+							<button class="btn btn-default btn-xs">border</button>
+							<button class="btn btn-default btn-xs">noborder</button>
+							<button class="btn btn-default btn-xs">rounded</button>
+							<button class="btn btn-default btn-xs">squared</button></div>', '' );
+						break;
 
-				echo '<div id="thumbnail" class="tab-pane'.($tag_type == 'thumbnail' ? ' active' : '' ).'">';
-				$Form->radio( 'thumbnail_size', $thumbnail_size, array(
-						array( 'small', 'small' ),
-						array( 'medium', 'medium' ),
-						array( 'large', 'large' )
-					), T_( 'Size') );
-				$Form->radio( 'thumbnail_alignment', $thumbnail_alignment, array(
-						array( 'left', 'left' ),
-						array( 'right', 'right' )
-					), T_( 'Alignment') );
-				$Form->text( 'thumbnail_class', $thumbnail_class, 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
-						<button class="btn btn-default btn-xs">border</button>
-						<button class="btn btn-default btn-xs">noborder</button>
-						<button class="btn btn-default btn-xs">rounded</button>
-						<button class="btn btn-default btn-xs">squared</button></div>', '' );
-				echo '</div>';
+					case 'thumbnail':
+						$Form->radio( 'thumbnail_size', $thumbnail_size, array(
+								array( 'small', 'small' ),
+								array( 'medium', 'medium' ),
+								array( 'large', 'large' )
+							), T_( 'Size') );
+						$Form->radio( 'thumbnail_alignment', $thumbnail_alignment, array(
+								array( 'left', 'left' ),
+								array( 'right', 'right' )
+							), T_( 'Alignment') );
+						$Form->text( 'thumbnail_class', $thumbnail_class, 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
+							<button class="btn btn-default btn-xs">border</button>
+							<button class="btn btn-default btn-xs">noborder</button>
+							<button class="btn btn-default btn-xs">rounded</button>
+							<button class="btn btn-default btn-xs">squared</button></div>', '' );
+						break;
 
-				echo '<div id="inline" class="tab-pane'.($tag_type == 'inline' ? ' active' : '' ).'">';
-				$Form->text( 'inline_class', $inline_class, 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
-						<button class="btn btn-default btn-xs">border</button>
-						<button class="btn btn-default btn-xs">noborder</button>
-						<button class="btn btn-default btn-xs">rounded</button>
-						<button class="btn btn-default btn-xs">squared</button></div>', '' );
+					case 'inline':
+						$Form->text( 'inline_class', $inline_class, 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
+								<button class="btn btn-default btn-xs">border</button>
+								<button class="btn btn-default btn-xs">noborder</button>
+								<button class="btn btn-default btn-xs">rounded</button>
+								<button class="btn btn-default btn-xs">squared</button></div>', '' );
+						break;
+
+					default:
+						// Display additional inline tag form from active plugins:
+						$Plugins->trigger_event( 'DisplayImageInlineTagForm', array(
+								'link_ID'     => $link_ID,
+								'active_tag'  => $tag_type,
+								'display_tag' => $tag_type_key,
+								'Form'        => $Form,
+							) );
+				}
 				echo '</div>';
+			}
 			echo '</div>';
 
-			$Form->submit( array( 'value' => 'Insert', 'onclick' => 'return evo_image_submit();' ) );
-			//$Form->submit( array( 'value' => 'Insert', 'onclick' => 'alert("hello world!"); return false;' ) );
-			//$Form->button( array( 'type' => 'button', 'name'=>'actionArray[crop]', 'value'=> T_('Insert'), 'class' => 'SaveButton btn-primary', 'onclick' => 'return evo_image_submit( event );' ) );
+			$Form->submit( array( 'value' => 'Insert', 'onclick' => 'return evo_image_submit()' ) );
 
 			$Form->end_fieldset();
 			$Form->end_form();
@@ -100,9 +131,9 @@ global $inline_class;
 					apply_image_class( jQuery( this ).val() );
 				}, 200 ) );
 
-				jQuery( 'input[name="' + tagType + '_disable_caption"]' ).click( function() {
-						var checkbox = jQuery( this );
-						jQuery( 'input[name="' + tagType + '_caption"]' ).prop( 'disabled', checkbox.is( ':checked' ) );
+				jQuery( 'input[name$="_disable_caption"]' ).click( function() {
+						var active_tag_type = jQuery( '.tab-content .tab-pane.active' ).attr( 'id' );
+						jQuery( 'input[name="' + active_tag_type + '_caption"]' ).prop( 'disabled', jQuery( this ).is( ':checked' ) );
 					});
 
 				// Update preview on tab change
@@ -173,6 +204,7 @@ global $inline_class;
 					var size = jQuery( 'input[name="' + tagType + '_size"]:checked' ).val();
 				}
 				var classes = jQuery( 'input[name="' + tagType + '_class"]' ).val();
+				var tag_caption = false;
 
 				var options = '';
 
@@ -205,8 +237,17 @@ global $inline_class;
 						options += ( options == '' ? '' : ':' ) + classes;
 					}
 				}
-
-				window.parent.evo_link_insert_inline( tagType, linkID, options, <?php echo $replace;?> );
+				<?php
+				// Display additional JavaScript code from plugins before submit/insert inline tag:
+				$plugins_javascript = $Plugins->trigger_collect( 'GetInsertImageInlineTagJavaScript', array( 'link_ID' => $link_ID ) );
+				foreach( $plugins_javascript as $plugin_ID => $plugin_javascript )
+				{
+					echo "\n\n".'// START JS from plugin #'.$plugin_ID.':'."\n";
+					echo $plugin_javascript;
+					echo "\n".'// END JS from plugin #'.$plugin_ID.'.'."\n\n";
+				}
+				?>
+				window.parent.evo_link_insert_inline( tagType, linkID, options, <?php echo $replace;?>, tag_caption );
 
 				closeModalWindow();
 

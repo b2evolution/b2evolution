@@ -4608,7 +4608,7 @@ function echo_image_insert_modal()
 	function evo_item_image_insert( blog, tagType, linkID )
 	{
 		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
-		var evo_js_lang_insert_image = '<?php echo T_('Insert image into post');?>';
+		var evo_js_lang_insert_image = '<?php echo TS_('Insert image into content');?>';
 		var evo_js_lang_modal_action = '<?php echo TS_('Insert');?>';
 		evo_js_lang_close = '<?php echo TS_('Cancel');?>';
 
@@ -4624,7 +4624,7 @@ function echo_image_insert_modal()
 				'tag_type': tagType,
 				'link_ID': linkID,
 				'blog': blog,
-				'request_from': '<?php echo format_to_js( is_admin_page() ? 'back' : 'front' );?>',
+				'request_from': '<?php echo is_admin_page() ? 'back' : 'front';?>',
 			},
 			success: function(result)
 			{
@@ -4638,7 +4638,7 @@ function echo_image_insert_modal()
 	function evo_item_image_edit( blog, shortTag )
 	{
 		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
-		var evo_js_lang_edit_image = '<?php echo T_('Edit image');?>';
+		var evo_js_lang_edit_image = '<?php echo TS_('Edit image');?>';
 		var evo_js_lang_modal_action = '<?php echo TS_('Update');?>';
 		evo_js_lang_close = '<?php echo TS_('Cancel');?>';
 
@@ -4653,7 +4653,7 @@ function echo_image_insert_modal()
 				'action': 'get_edit_image_form',
 				'short_tag': shortTag,
 				'blog': blog,
-				'request_from': '<?php echo format_to_js( is_admin_page() ? 'back' : 'front' );?>',
+				'request_from': '<?php echo is_admin_page() ? 'back' : 'front';?>',
 			},
 			success: function(result)
 			{
