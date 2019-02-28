@@ -150,7 +150,7 @@ $Form->add_crumb( 'file' );
 $Form->hidden( 'ctrl', 'fileset' );
 $Form->hidden( 'action', 'update' );
 
-$Form->begin_fieldset( T_('Accessible file roots').get_manual_link('accessible_file_roots'), array( 'id' => 'ffset_fileroots', 'class' => 'additional_file_settings' ) );
+$Form->begin_fieldset( T_('Accessible file roots').get_manual_link('accessible-file-roots'), array( 'id' => 'ffset_fileroots', 'class' => 'additional_file_settings' ) );
 	$Form->checkbox( 'fm_enable_roots_blog', $Settings->get('fm_enable_roots_blog'), T_('Enable blog directories'), T_('Check to enable root directories for blogs.' ) );
 	$Form->checkbox( 'fm_enable_roots_user', $Settings->get('fm_enable_roots_user'), T_('Enable user directories'), T_('Check to enable root directories for users.' ) );
 	$Form->checkbox( 'fm_enable_roots_shared', $Settings->get('fm_enable_roots_shared'), T_('Enable shared directory'), T_('Check to enable shared root directory.' ) );
