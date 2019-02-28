@@ -693,11 +693,6 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'blogs', 'create', true );
 
-		// Update site skins setting ahead of rendering so that the menu will display correctly:
-		$demo_content_type = param( 'demo_content_type', 'string', NULL );
-		$Settings->set( 'site_skins_enabled', $demo_content_type != 'minisite' );
-		$Settings->dbupdate();
-
 		// Install process is executed below in template in order to display it in real time.
 		break;
 }
