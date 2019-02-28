@@ -8648,8 +8648,15 @@ function render_inline_tags( $Object, $tags, $params = array() )
 							$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
 
 							if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
-							{	// Append extra class to image/file inline img tags:
-								$current_image_params['image_class'] = $image_extraclass;
+							{
+								if( $object_class == 'EmailCampaign' )
+								{	// Append extra class to image/file inline img tags:
+									$current_image_params['image_class'] = $image_extraclass;
+								}
+								else
+								{	// Overwrite 'before_image' setting to add an extra class name:
+									$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
+								}
 								$current_file_params['class'] = $image_extraclass;
 							}
 						}
