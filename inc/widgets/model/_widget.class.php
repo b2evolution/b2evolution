@@ -928,7 +928,7 @@ class ComponentWidget extends DataObject
 				}
 			}
 
-			if( empty( $params['hide_widgets_'.$this->code] ) )
+			if( ! isset( $params['widget_'.$this->code.'_display'] ) || ! empty( $params['widget_'.$this->code.'_display'] ) )
 			{	// Display widget content:
 				$this->display( $params );
 			}
@@ -990,7 +990,7 @@ class ComponentWidget extends DataObject
 
 				$this->BlockCache->start_collect();
 
-				if( empty( $params['hide_widgets_'.$this->code] ) )
+				if( ! isset( $params['widget_'.$this->code.'_display'] ) || ! empty( $params['widget_'.$this->code.'_display'] ) )
 				{	// Display widget content:
 					$this->display( $params );
 				}

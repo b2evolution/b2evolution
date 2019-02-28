@@ -110,7 +110,7 @@ if( mainlist_get_item() )
 				'author_link_text' => $params['author_link_text'],
 
 				// Controlling the title:
-				'hide_widgets_item_title' => true,
+				'widget_item_title_display' => false,
 				// Item Previous Next widget
 				'widget_item_next_previous_params' => array(
 						'block_start' => '<nav><ul class="pager">',
@@ -121,7 +121,7 @@ if( mainlist_get_item() )
 						'next_end' => '</li>',
 					),
 				// Item Visibility Badge widge template
-				'hide_widgets_item_visibility_badge' => ( $Item->is_intro() || $Item->status == 'published' ),
+				'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
 				'widget_item_visibility_badge_params'  => array(
 						'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 					),

@@ -577,9 +577,9 @@ else
 
 		'widget_item_comment_form_params' => $params,
 
-		'hide_widgets_item_notification' => ! $params['disp_notification'],
+		'widget_item_notification_display' => $params['disp_notification'],
 
-		'hide_widgets_item_comment_feed_link' => ! ( $params['disp_comments'] || $params['disp_trackbacks'] ),
+		'widget_item_comment_feed_link_display' => ( $params['disp_comments'] || $params['disp_trackbacks'] ),
 		'widget_item_comment_feed_link_params' => array(
 				'title' => $params['feed_title'],
 			),

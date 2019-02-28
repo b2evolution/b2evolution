@@ -133,9 +133,9 @@ if( mainlist_get_item() )
 				'block_title_end'            => '</h3>',
 				'author_link_text'           => $params['author_link_text'],
 				// Controlling the title:
-				'hide_widgets_item_title' => true,
+				'widget_item_title_display' => false,
 				// Item Next Previous widget
-				'hide_widgets_item_next_previous' => $Item->is_featured(), // Do not show Item Next Previous widget if featured item
+				'widget_item_next_previous_display' => ! $Item->is_featured(), // Do not show Item Next Previous widget if featured item
 				'widget_item_next_previous_params' => array(
 						'block_start'     => '<ul class="pager col-lg-12 post_nav">',
 						'prev_start'      => '<li class="previous">',
