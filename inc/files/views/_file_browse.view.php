@@ -94,7 +94,7 @@ if( isset( $edited_User ) )
 		}
 	}
 
-	$Widget->title = T_('File browser').get_manual_link('file_browser');
+	$Widget->title = T_('File browser').get_manual_link('file-browser');
 	$Widget->disp_template_replaced( 'block_start' );
 ?>
 
