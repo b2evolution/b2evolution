@@ -435,7 +435,7 @@ echo '</div>';
 
 if( $skins_exist && empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
 {	// Display form buttons only when at least one skin exists for installation:
-	// Don't enabled this feature on new collection creating and on selecting new skin for the colleciton:
+	// Don't enabled this feature on new collection creating and on selecting new skin for the collection:
 	$form_buttons = array(
 		array( 'type' => 'button', 'id'  => 'check_all_skins', 'value' => T_('Check All'), 'class' => 'btn btn-default' ),
 		array( 'type' => 'submit', 'value' => T_('Install Checked'), 'class' => 'btn btn-primary' ),

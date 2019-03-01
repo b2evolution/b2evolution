@@ -633,7 +633,7 @@ function coll_grp_perm_col_member( $row )
 function colls_groups_perms_results( & $Results, $params = array() )
 {
 	$params = array_merge( array(
-			'type'   => 'collection', // 'colleciton' OR 'group'
+			'type'   => 'collection', // 'collection' OR 'group'
 			'object' => NULL,
 		), $params );
 

@@ -550,7 +550,7 @@ elseif( $confirmed )
 					// resubscribe to updated post moderation notifications:
 					$subs_edit_pst_type = param( 'subs_edit_pst_type', 'string', 'all' );
 					if( $subs_edit_pst_type == 'all' )
-					{	// If user was unsubscribed from ALL collections we should subsribe to ALL collecitons as well:
+					{	// If user was unsubscribed from ALL collections we should subsribe to ALL collections as well:
 						$UserSettings->set( 'notify_edit_pst_moderation', '1', $edited_User->ID );
 						$UserSettings->dbupdate();
 					}

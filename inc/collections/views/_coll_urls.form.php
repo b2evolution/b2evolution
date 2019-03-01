@@ -324,7 +324,7 @@ $Form->begin_fieldset( T_('Cookie Settings').get_admin_badge().get_manual_link( 
 			), T_('Cookie path'), true );
 	}
 	else
-	{	// Display only info about colleciton cookie domain and path if user has no permission to edit:
+	{	// Display only info about collection cookie domain and path if user has no permission to edit:
 		$Form->info( T_('Cookie domain'), $edited_Blog->get_cookie_domain() );
 		$Form->info( T_('Cookie path'), $edited_Blog->get_cookie_path() );
 	}
