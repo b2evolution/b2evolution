@@ -10,6 +10,24 @@ evo.shortcode = {
 		},
 		inline: {
 			regexp: /(<span.*?data-evo-tag.*?>)?(\[(inline):(\d+):?([^\[\]]*)\])(<\/span>)?/g
+		},
+		button: {
+			regexp: /(<span.*?data-evo-tag.*?>)?(\[(button):image#(\d+)([^\[\]]*)\][^\[]*\[\/button\])(<\/span>)?/g
+		},
+		cta: {
+			regexp: /(<span.*?data-evo-tag.*?>)?(\[(cta):?\d*:image#(\d+)([^\[\]]*)\][^\[]*\[\/cta\])(<\/span>)?/g
+		},
+		like: {
+			regexp: /(<span.*?data-evo-tag.*?>)?(\[(like):image#(\d+)([^\[\]]*)\][^\[]*\[\/like\])(<\/span>)?/g
+		},
+		dislike: {
+			regexp: /(<span.*?data-evo-tag.*?>)?(\[(dislike):image#(\d+)([^\[\]]*)\][^\[]*\[\/dislike\])(<\/span>)?/g
+		},
+		activate: {
+			regexp: /(<span.*?data-evo-tag.*?>)?(\[(activate):image#(\d+)([^\[\]]*)\][^\[]*\[\/activate\])(<\/span>)?/g
+		},
+		unsubscribe: {
+			regexp: /(<span.*?data-evo-tag.*?>)?(\[(unsubscribe):image#(\d+)([^\[\]]*)\][^\[]*\[\/unsubscribe\])(<\/span>)?/g
 		}
 	},
 	next: function( tag, text, index ) {

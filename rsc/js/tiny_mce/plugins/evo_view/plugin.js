@@ -21,7 +21,7 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 				execCommandView,
 				execCommandBefore,
 				toolbar,
-				shortTags = [ 'image', 'thumbnail', 'inline' ];
+				shortTags = [ 'image', 'thumbnail', 'inline', 'button', 'cta', 'like', 'dislike', 'activate', 'unsubscribe' ];
 
 
 		/**

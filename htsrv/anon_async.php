@@ -1503,19 +1503,20 @@ switch( $action )
 			}
 		}
 
+		// Default values:
+		$image_caption = NULL;
+		$image_class = NULL;
+		$image_disable_caption = false;
+		$thumbnail_size = 'medium';
+		$thumbnail_alignment = 'left';
+		$thumbnail_class = NULL;
+		$inline_class = NULL;
+
 		if( $action == 'get_insert_image_form' )
 		{
 			$tag_type = param( 'tag_type', 'string', 'image' );
 			$link_ID = param( 'link_ID', 'integer', true );
 			$replace = 0;
-
-			$image_caption = NULL;
-			$image_class = NULL;
-			$image_disable_caption = false;
-			$thumbnail_size = 'medium';
-			$thumbnail_alignment = 'left';
-			$thumbnail_class = NULL;
-			$inline_class = NULL;
 		}
 		else
 		{
@@ -1531,26 +1532,68 @@ switch( $action )
 			$tag_type = $parts[0];
 			$link_ID = $parts[1];
 
-			$image_caption = ( $tag_type == 'image' && isset( $parts[2] ) ? $parts[2] : NULL );
-			$image_class = ( $tag_type == 'image' && isset( $parts[3] ) ? $parts[3] : NULL );
-			$image_disable_caption = ( $tag_type == 'image' && ( isset( $image_caption ) && $image_caption == '-' ) );
-			$image_caption = ( $tag_type == 'image' && $image_caption == '-' ? NULL : $image_caption ); // disable caption, reset caption to empty string
+			switch( $tag_type )
+			{
+				case 'image':
+					if( isset( $parts[2] ) && $parts[2] != '-' )
+					{
+						$image_caption = $parts[2];
+					}
+					if( isset( $parts[3] ) )
+					{
+						$image_class = $parts[3];
+					}
+					$image_disable_caption = ( isset( $parts[2] ) && $parts[2] == '-' );
+					break;
 
-			$thumbnail_size = ( $tag_type == 'thumbnail' && isset( $parts[2] ) ? $parts[2] : 'medium' );
-			$thumbnail_alignment = ( $tag_type == 'thumbnail' && isset( $parts[3] ) ? $parts[3] : 'left' );
-			$thumbnail_class = ( $tag_type == 'thumbnail' && isset( $parts[4] ) ? $parts[4] : NULL );
+				case 'thumbnail':
+					if( isset( $parts[2] ) )
+					{
+						$thumbnail_size = $parts[2];
+					}
+					if( isset( $parts[3] ) )
+					{
+						$thumbnail_alignment = $parts[3];
+					}
+					if( isset( $parts[4] ) )
+					{
+						$thumbnail_class = $parts[4];
+					}
+					break;
 
-			$inline_class = ( $tag_type == 'inline' && isset( $parts[2] ) ? $parts[2] : NULL );
+				case 'inline':
+					if( isset( $parts[2] ) )
+					{
+						$inline_class = $parts[2];
+					}
+					break;
+
+				default:
+					// Initialize additional inline tag form from active plugins:
+					$plugin_data = $Plugins->get_trigger_event_first_return( 'InitImageInlineTagForm', array(
+							'source_tag' => $short_tag,
+							'tag_type'   => $tag_type,
+							'link_ID'    => $link_ID,
+						) );
+					if( isset( $plugin_data['tag_type'] ) )
+					{	// Override active tag type from plugins:
+						$tag_type = $plugin_data['tag_type'];
+					}
+					if( isset( $plugin_data['link_ID'] ) )
+					{	// Override link ID from plugins:
+						$link_ID = $plugin_data['link_ID'];
+					}
+			}
 		}
 
 		$LinkCache = & get_LinkCache();
-		if( ( $Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) === false )
+		if( ! ( $Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) )
 		{ // Bad request with incorrect link ID
 			echo '';
 			exit(0);
 		}
 
-		if( ( $File = & $Link->get_File() ) && empty( $File ) )
+		if( ! ( $File = & $Link->get_File() ) )
 		{ // File no longer available
 			echo '';
 			exit(0);

@@ -350,13 +350,59 @@ class email_elements_plugin extends Plugin
 	function RenderEmailAsHtml( & $params )
 	{
 		$content = & $params['data'];
-		$default_destination = isset( $params['EmailCampaign'] ) && !empty( $params['EmailCampaign']->email_defaultdest ) ? $params['EmailCampaign']->email_defaultdest : '';
+
+		// Render inline tags in email campaign content:
+		$params = array_merge( $params, array(
+				'Object'      => isset( $params['EmailCampaign'] ) ? $params['EmailCampaign'] : NULL,
+				'inline_tags' => array( $content ),
+			) );
+		$rendered_tags = $this->RenderInlineTags( $params );
+
+		$content = isset( $rendered_tags[ $content ] ) ? $rendered_tags[ $content ] : $content;
+
+		return true;
+	}
+
+
+	/**
+	 * Render inline tags in content of Email Campaign
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'inline_tags' - Array of inline tags
+	 *   - 'Object' - Item, Comment, Message, EmailCampaign
+	 * @return array Rendered tags: Key - Original inline tag, Value - The rendered tag html
+	 */
+	function RenderInlineTags( & $params )
+	{
+		if( ! isset( $params['inline_tags'] ) ||
+		    ! is_array( $params['inline_tags'] ) )
+		{	// No inline tags to render:
+			return array();
+		}
+
+		if( ! isset( $params['Object'] ) ||
+		    ! is_object( $params['Object'] ) ||
+		    get_class( $params['Object'] ) != 'EmailCampaign' )
+		{	// Not supported object by this plugin:
+			return $params['inline_tags'];
+		}
+
+		$EmailCampaign = & $params['Object'];
+
+		$default_destination = empty( $EmailCampaign->email_defaultdest ) ? '' : $EmailCampaign->email_defaultdest;
 
 		$search_pattern = '#\[(button|like|dislike|cta|activate|unsubscribe):?([^\[\]]*?)](.*?)\[\/\1]#';
-		preg_match_all( $search_pattern, $content, $matches );
 
-		if( ! empty( $matches[0] ) )
+		$rendered_tags = array();
+		foreach( $params['inline_tags'] as $inline_tag )
 		{
+			if( ! preg_match_all( $search_pattern, $inline_tag, $matches ) )
+			{
+				continue;
+			}
+
+			$rendered_tag = $inline_tag;
+
 			foreach( $matches[0] as $i => $current_element )
 			{
 				$type = $matches[1][$i];
@@ -409,11 +455,11 @@ class email_elements_plugin extends Plugin
 					}
 					if( $current_element_error_message !== NULL )
 					{	// Replace original short tag with error message:
-						$content = str_replace( $current_element, '<span class="evo_param_error">'.$current_element.' - '.$current_element_error_message.'</span>', $content );
+						$rendered_tag = str_replace( $current_element, '<span class="evo_param_error">'.$current_element.' - '.$current_element_error_message.'</span>', $rendered_tag );
 						continue;
 					}
 					// If image file is correct we should display it instead of text:
-					$text = $image_Link->get_tag( array(
+					$text = $image_Link->get_tag( array_merge( $params, array(
 						'before_image'        => '<div'.emailskin_style( '.image_block' ).'>',
 						'before_image_legend' => '<div'.emailskin_style( '.image_legend' ).'>',
 						'after_image_legend'  => '</div>',
@@ -423,7 +469,7 @@ class email_elements_plugin extends Plugin
 						'image_style'         => $image_style,
 						'image_desc'          => $text,
 						'add_loadimg'         => false,
-					) );
+					) ) );
 				}
 
 				if( empty( $url ) && in_array( $type, array( 'button', 'like', 'dislike', 'cta' ) ) )
@@ -474,13 +520,16 @@ class email_elements_plugin extends Plugin
 					}
 					$link_tag = get_link_tag( $url, $text, in_array( $style, array( 'link', 'image' ) ) ? '' : 'div.btn a+a.btn-'.$style );
 					// Render short tag:
-					$content = str_replace( $current_element, $link_tag, $content );
+					$rendered_tag = str_replace( $current_element, $link_tag, $rendered_tag );
+					continue;
 				}
-				// Otherwise keep the wrong short tag as is without rendering.
+				// Otherwise keep the wrong short tag as is without rendering:
 			}
+
+			$rendered_tags[ $inline_tag ] = $rendered_tag;
 		}
 
-		return true;
+		return $rendered_tags;
 	}
 
 
@@ -503,6 +552,42 @@ class email_elements_plugin extends Plugin
 		}
 
 		return array( 'clickable' => T_('Clickable') );
+	}
+
+
+	/**
+	 * This method initializes params for form of additional tab
+	 *   on the modal/popup window "Insert image into content"
+	 *
+	 * @param array Array of parameters:
+	 *   - 'tag_type' - Active tag type
+	 *   - 'link_ID' - Link ID
+	 *   - 'source_tag' - Full code of short tag
+	 * @return array Array of parameters:
+	 *   - 'tag_type' - Overridden tag type
+	 *   - 'link_ID' - Overridden link ID
+	 */
+	function InitImageInlineTagForm( & $params )
+	{
+		if( empty( $params['source_tag'] ) )
+		{	// No source tag:
+			return;
+		}
+
+		if( ! preg_match( '#\[(button|like|dislike|cta|activate|unsubscribe)(:(\d+))?:image\#(\d+)([^\[\]]*?)](.*?)\[\/\1]#', $params['source_tag'], $tag_match ) )
+		{	// The requested tag is not supoerted by this plugin:
+			return;
+		}
+
+		set_param( 'clickable_caption', $tag_match[6] );
+		set_param( 'clickable_class', $tag_match[5] );
+		set_param( 'clickable_type', $tag_match[1] );
+		set_param( 'clickable_cta_num', $tag_match[3] );
+
+		return array(
+				'tag_type' => 'clickable',
+				'link_ID' => $tag_match[4],
+			);
 	}
 
 
@@ -548,7 +633,7 @@ class email_elements_plugin extends Plugin
 				// Type:
 				$Form->output = false;
 				$Form->switch_layout( 'none' );
-				$cta_select = $Form->select_input_array( 'clickable_cta_num', NULL, $this->cta_numbers, '' );
+				$cta_select = $Form->select_input_array( 'clickable_cta_num', param( 'clickable_cta_num', 'integer', 1 ), $this->cta_numbers, '' );
 				$Form->switch_layout( NULL );
 				$Form->output = true;
 				$Form->radio( 'clickable_type', param( 'clickable_type', 'string', 'button' ), array(

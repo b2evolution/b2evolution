@@ -8566,12 +8566,25 @@ function render_inline_tags( $Object, $tags, $params = array() )
 		return false;
 	}
 
+	// Render inline tags by active plugins:
+	$plugins_inlines = $Plugins->trigger_collect( 'RenderInlineTags', array_merge( $params, array(
+			'Object'      => $Object,
+			'inline_tags' => $tags,
+		) ) );
+	foreach( $plugins_inlines as $plugin_ID => $plugin_inlines )
+	{
+		$inlines = array_merge( $inlines, $plugin_inlines );
+	}
+
 	foreach( $tags as $current_inline )
 	{
-		preg_match("/\[(image|file|inline|video|audio|thumbnail|folder):(\d+)(:?)([^\]]*)\]/i", $current_inline, $inline);
+		if( isset( $inlines[$current_inline] ) )
+		{	// Skip inline tag if it has been already rendered before, e-g by some plugin in the event "RenderInlineTags" above:
+			continue;
+		}
 
-		if( empty( $inline ) )
-		{
+		if( ! preg_match( '/\[(image|file|inline|video|audio|thumbnail|folder):(\d+)(:?)([^\]]*)\]/i', $current_inline, $inline ) )
+		{	// Don't render a not supported inline tag:
 			$inlines[$current_inline] = $current_inline;
 			continue;
 		}
