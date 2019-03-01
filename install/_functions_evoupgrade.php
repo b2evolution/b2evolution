@@ -10852,7 +10852,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 					}
 					$DB->query( 'INSERT INTO T_widget__container ( wico_code, wico_name, wico_coll_ID, wico_order, wico_main )
 						VALUES '.implode( ', ', $new_main_cnontainers_sql ),
-						'Insert new main widget containers which are declared in skin file for colleciton #'.$Blog->ID );
+						'Insert new main widget containers which are declared in skin file for collection #'.$Blog->ID );
 				}
 			}
 		}

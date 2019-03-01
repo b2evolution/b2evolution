@@ -1000,7 +1000,7 @@ class AdminUI extends AdminUI_general
 				'href' => $admin_url.'?ctrl=customize&amp;view=site_skin',
 			);
 		}
-		// Colleciton:
+		// Collection:
 		if( $current_User->check_perm( 'blog_properties', 'edit', false, $tab_Blog->ID ) )
 		{	// If current User can edit current collection settings:
 			$tabs['coll'] = array(

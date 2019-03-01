@@ -214,7 +214,7 @@ switch ( $action )
 			break;
 		}
 
-		// Update group permissions for each colleciton:
+		// Update group permissions for each collection:
 		blog_update_perms( $edited_Group->ID, 'coll' );
 		$Messages->add( T_('The collection permissions have been updated.'), 'success' );
 

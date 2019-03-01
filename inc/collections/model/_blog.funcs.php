@@ -1947,7 +1947,7 @@ function blogs_all_results_block( $params = array() )
 		$order_data = param( 'order_data', 'string' );
 
 		if( $order_action == 'update' )
-		{	// Update colleciton order to new value:
+		{	// Update collection order to new value:
 			$order_obj_ID = intval( str_replace( 'order-blog-', '', $order_data ) );
 			if( $order_obj_ID > 0 )
 			{	// Update collection order if ID is valid integer:
@@ -2008,7 +2008,7 @@ function blogs_all_results_block( $params = array() )
 			. ' AND ( bloggroup_group_ID = ' . $current_User->grp_ID
 			. '       OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) ) )' );
 		$section_where_sql = '';
-		$colleciton_where_sql = 'blog_owner_user_ID = '.$current_User->ID
+		$collection_where_sql = 'blog_owner_user_ID = '.$current_User->ID
 			.' OR bloguser_ismember <> 0'
 			.' OR bloggroup_ismember <> 0';
 		if( $params['grouped'] )
@@ -2022,10 +2022,10 @@ function blogs_all_results_block( $params = array() )
 			if( ! empty( $perm_allowed_sections ) )
 			{	// If at least one section is specified to be allowed for new collections:
 				$section_where_sql .= '( sec_ID IN ( '.$DB->quote( explode( ',', $perm_allowed_sections ) ).' ) '
-					.'AND ( '.$colleciton_where_sql.' ) ) OR ';
+					.'AND ( '.$collection_where_sql.' ) ) OR ';
 			}
 		}
-		$SQL->WHERE( $section_where_sql.$colleciton_where_sql );
+		$SQL->WHERE( $section_where_sql.$collection_where_sql );
 
 		$no_results = $params['results_no_perm_text'];
 	}

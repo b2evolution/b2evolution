@@ -3242,7 +3242,7 @@ class User extends DataObject
 						if( $perm_Blog = & $BlogCache->get_by_ID( $perm_target_ID, false, false ) )
 						{
 							if( $this->check_perm( 'blogs', 'create', $assert, $perm_Blog->get( 'sec_ID' ) ) )
-							{	// If user can create new colleciton in section of the duplicating collection:
+							{	// If user can create new collection in section of the duplicating collection:
 								if( $perm_Blog->get_setting( 'allow_duplicate' ) ||
 								    $this->check_perm( 'blog_properties', 'edit', false, $perm_Blog->ID ) )
 								{	// If the collection is allowed to duplicate by anyone OR user can edit the duplicating collection:

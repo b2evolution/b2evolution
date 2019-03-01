@@ -51,7 +51,7 @@ $link_reset_params = '';
 $can_edit_skin_settings =
 	// When skin ID has a real value ( when $skin_ID = 0 means it must be the same as the normal skin value )
 	$skin_ID &&
-		// If current User can edit colleciton properties:
+		// If current User can edit collection properties:
 	( ( isset( $Blog ) && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) ) ||
 		// If site skins are enabled and current User can edit site options:
 		( $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) )
