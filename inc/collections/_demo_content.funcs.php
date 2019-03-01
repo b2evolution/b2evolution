@@ -184,6 +184,9 @@ function echo_installation_options( $params = array() )
 			'enable_create_demo_users' => true,
 			'show_create_organization' => true,
 			'show_create_messages'     => true,
+			'show_create_email_lists'     => true,
+			'show_create_email_campaigns' => true,
+			'show_create_automations'     => true,
 	), $params );
 
 	$collections = array(
@@ -283,6 +286,38 @@ function echo_installation_options( $params = array() )
 
 	$r .= '</div></div>';
 
+	if( $params['show_create_email_lists'] )
+	{
+		$r .= '<div class="checkbox" style="margin-top: 15px">
+						<label>
+							<input type="checkbox" name="create_demo_email_lists" id="create_demo_email_lists" value="1" checked="checked" />'
+							.T_('Create demo email lists').
+						'</label>
+						<div id="create_demo_email_options" style="margin: 10px 0 0 20px">';
+
+		if( $params['show_create_email_campaigns'] )
+		{
+			$r .= '<div class="checkbox" style="margin-left: 1em">
+							<label>
+								<input type="checkbox" name="create_demo_email_campaigns" id="create_demo_email_campaigns" value="1" checked="checked" />'
+								.T_('Create demo campaigns').
+							'</label>
+						</div>';
+		}
+
+		if( $params['show_create_automations'] )
+		{
+			$r .= '<div class="checkbox" style="margin-left: 1em">
+							<label>
+								<input type="checkbox" name="create_demo_automations" id="create_demo_automations" value="1" checked="checked" />'
+								.T_('Create demo automations').
+							'</label>
+						</div>';
+		}
+
+		$r .= '</div></div>';
+	}
+
 	$r .= '<script type="text/javascript">
 					function toggle_create_demo_content_options()
 					{
@@ -306,15 +341,22 @@ function echo_installation_options( $params = array() )
 						jQuery( "input[name=create_demo_organization], input[name=create_sample_private_messages]" ).prop( "disabled", ! jQuery( "#create_demo_users" ).is( ":checked" ) );
 					}
 
+					function toggle_create_demo_email_options()
+					{
+						jQuery( "input[name=create_demo_email_campaigns], input[name=create_demo_automations]" ).prop( "disabled", ! jQuery( "#create_demo_email_lists" ).is( ":checked" ) );
+					}
+
 					jQuery( document ).ready( function() {
 							toggle_create_demo_content_options();
 							toggle_demo_content_type_options();
 							toggle_create_demo_user_options();
+							toggle_create_demo_email_options();
 						} );
 
 					jQuery( "#create_sample_contents" ).click( toggle_create_demo_content_options );
 					jQuery( "input[name=\"demo_content_type\"]" ).click( toggle_demo_content_type_options );
 					jQuery( "#create_demo_users" ).click( toggle_create_demo_user_options );
+					jQuery( "#create_demo_email_lists" ).click( toggle_create_demo_email_options );
 					jQuery( "select[name=standard_collection]" ).focus( function() {
 						jQuery( "#standard_site_demo" ).prop( "checked", true );
 						toggle_demo_content_type_options();
@@ -1683,6 +1725,237 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	restore_error_handler();
 
 	return $collection_created;
+}
+
+
+/**
+ * Create default email lists
+ * 
+ * @return integer Number of new created email lists
+ */
+function create_default_newsletters()
+{
+	global $DB;
+
+	task_begin( 'Creating default lists... ' );
+
+	// Insert default newsletters:
+	$created_lists_num = $DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label, enlt_order, enlt_owner_user_ID )
+		VALUES ( "News", "Send me news about this site.", 1, 1 ),
+		       ( "Promotions", "I want to receive ADs that may be relevant to my interests.", 2, 1 )' );
+
+	// Insert default subscriptions for each user on first newsletter:
+	$DB->query( 'REPLACE INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
+		SELECT user_ID, 1 FROM T_users' );
+
+	task_end();
+
+	return $created_lists_num;
+}
+
+
+/**
+ * Create default email campaigns
+ */
+function create_default_email_campaigns()
+{
+	global $DB, $Settings, $baseurl;
+
+	task_begin( 'Creating default email campaigns... ' );
+
+	load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
+	load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+	$email_campaigns = array(
+		array(
+			'name' => T_('Markdown Example'),
+			'text' => T_('Heading
+=======
+
+Sub-heading
+-----------
+
+### H3 header
+
+#### H4 header ####
+
+> Email-style angle brackets
+> are used for blockquotes.
+
+> > And, they can be nested.
+
+> ##### Headers in blockquotes
+>
+> * You can quote a list.
+> * Etc.
+
+[This is a link](http://b2evolution.net/) if Links are turned on in the markdown plugin settings
+
+Paragraphs are separated by a blank line.
+
+    This is a preformatted
+    code block.
+
+Text attributes *Italic*, **bold**, `monospace`.
+
+Shopping list:
+
+* apples
+* oranges
+* pears
+
+The rain---not the reign---in Spain.').
+"\n".
+T_('Button examples:
+[button]This is a button[/button]
+[like]I like this[/like] [dislike]I don\'t like this[/dislike]
+[cta:1:info]Call to action 1 info button[/cta] [cta:2:warning]Call to action 2 warning button[/cta] [cta:3:default]Call to action 3 default button[/cta]
+[cta:1:link]Call to action 1 link only[/cta]'),
+		),
+		array(
+			'name' => T_('Another example'),
+			'text' => sprintf( T_('Hello %s!'), '$firstname_and_login$' )."\r\n\r\n".T_('Here are some news...'),
+		),
+		array(
+			'name'  => T_('Welcome & Activate'),
+			'title' => sprintf( T_( 'Activate your account: %s' ), '$login$' ),
+			'text'  => sprintf( T_('Hello %s!'), '$username$' )."\r\n\r\n"
+				.sprintf( T_('You have recently registered a new account on %s .'), '<a href="'.$baseurl.'">'.$Settings->get( 'notification_short_name' ).'</a>' )."\r\n\r\n"
+				.'<b style="color:#d00">'.T_('You must activate this account by clicking below in order to be able to use all the site features.').'</b>'."\r\n\r\n"
+				.T_('Your login is: $login$')."\r\n\r\n"
+				.T_('Your email is: $email$')."\r\n\r\n"
+				.'[activate:primary]'.T_( 'Activate NOW' ).'[/activate]'
+		),
+	);
+
+	$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
+	foreach( $email_campaigns as $email_campaign )
+	{
+		$EmailCampaign = new EmailCampaign();
+		$EmailCampaign->set( 'enlt_ID', 1 );
+		$EmailCampaign->set( 'name', $email_campaign['name'] );
+		$EmailCampaign->set( 'email_title', isset( $email_campaign['title'] ) ? $email_campaign['title'] : $email_campaign['name'] );
+		$EmailCampaign->set( 'email_defaultdest', $baseurl );
+		$EmailCampaign->set( 'email_text', $email_campaign['text'] );
+
+		if( $EmailCampaign->dbinsert() && ! empty( $user_IDs ) )
+		{	// Add recipients after successfull email campaign creating,
+			// only if we have found the users in DB:
+			$EmailCampaign->add_recipients( $user_IDs );
+		}
+	}
+
+	task_end();
+}
+
+
+/**
+ * Create default automations
+ */
+function create_default_automations()
+{
+	global $DB;
+
+	task_begin( 'Creating default automations... ' );
+
+	//load_funcs( 'automations/model/_automation.funcs.php' );
+	load_class( 'automations/model/_automation.class.php', 'Automation' );
+	load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
+
+	$Automation = new Automation();
+	$Automation->set( 'name', T_('Sample Automation') );
+	$Automation->set( 'owner_user_ID', 1 );
+	$Automation->update_newsletters = true;
+	$Automation->newsletters = array( array(
+			'ID'        => 1,
+			'autostart' => 1,
+			'autoexit'  => 1,
+		) );
+
+	if( $Automation->dbinsert() )
+	{	// Add steps after successfull creating of the automation:
+		$AutomationStep = new AutomationStep();
+		$AutomationStep->set( 'autm_ID', $Automation->ID );
+		$AutomationStep->set( 'order', 1 );
+		$AutomationStep->set( 'type', 'notify_owner' );
+		$AutomationStep->set( 'info', '$login$ has reached step $step_number$ (ID: $step_ID$)'."\n".'in automation $automation_name$ (ID: $automation_ID$)' );
+		$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+		$AutomationStep->set( 'yes_next_step_delay', 86400 ); // 1 day
+		$AutomationStep->set( 'error_next_step_ID', 1 ); // Loop
+		$AutomationStep->set( 'error_next_step_delay', 14400 ); // 4 hours
+		$AutomationStep->set_label();
+		$AutomationStep->dbinsert();
+
+		$AutomationStep = new AutomationStep();
+		$AutomationStep->set( 'autm_ID', $Automation->ID );
+		$AutomationStep->set( 'order', 2 );
+		$AutomationStep->set( 'type', 'send_campaign' );
+		$AutomationStep->set( 'info', '1' ); // Email Campaign ID
+		$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+		$AutomationStep->set( 'yes_next_step_delay', 259200 ); // 3 days
+		$AutomationStep->set( 'no_next_step_ID', 0 ); // Continue
+		$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
+		$AutomationStep->set( 'error_next_step_ID', 2 ); // Loop
+		$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
+		$AutomationStep->set_label();
+		$AutomationStep->dbinsert();
+
+		$AutomationStep = new AutomationStep();
+		$AutomationStep->set( 'autm_ID', $Automation->ID );
+		$AutomationStep->set( 'order', 3 );
+		$AutomationStep->set( 'type', 'send_campaign' );
+		$AutomationStep->set( 'info', '2' ); // Email Campaign ID
+		$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+		$AutomationStep->set( 'yes_next_step_delay', 259200 ); // 3 days
+		$AutomationStep->set( 'no_next_step_ID', 0 ); // Continue
+		$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
+		$AutomationStep->set( 'error_next_step_ID', 3 ); // Loop
+		$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
+		$AutomationStep->set_label();
+		$AutomationStep->dbinsert();
+
+		// Add users to this automation:
+		$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
+		$Automation->add_users( $user_IDs );
+	}
+
+	task_end();
+}
+
+
+/**
+ * Create demo emails data like lists, campaigns, automations
+ * 
+ * @return integer Number of new created email lists
+ */
+function create_demo_emails()
+{
+	if( param( 'create_demo_email_lists', 'boolean', false ) )
+	{
+		evo_flush();
+		$created_lists_num = create_default_newsletters();
+
+		if( $created_lists_num > 0 )
+		{	// Install other emails data only if at least one email list has been installed:
+			if( param( 'create_demo_email_campaigns', 'boolean', false ) )
+			{	// Install demo email campaigns:
+				evo_flush();
+				create_default_email_campaigns();
+			}
+
+			if( param( 'create_demo_automations', 'boolean', false ) )
+			{	// Install demo automations:
+				evo_flush();
+				create_default_automations();
+			}
+		}
+	}
+	else
+	{
+		$created_lists_num = 0;
+	}
+
+	return $created_lists_num;
 }
 
 
@@ -3915,6 +4188,7 @@ function install_demo_content()
 	$create_demo_organization = param( 'create_demo_organization', 'boolean', false, true );
 	$create_demo_users        = param( 'create_demo_users', 'boolean', false, true );
 	$create_demo_messages     = param( 'create_sample_private_messages', 'boolean', false, true );
+	$create_demo_email_lists  = param( 'create_demo_email_lists', 'boolean', false );
 	$install_test_features    = param( 'install_test_features', 'boolean', false );
 
 	$user_org_IDs = NULL;
@@ -3947,19 +4221,30 @@ function install_demo_content()
 	}
 
 	$collections_installed = 0;
-	if( $create_sample_contents )
+	$emails_data_installed = 0;
+	if( $create_sample_contents || $create_demo_email_lists )
 	{
 		echo get_install_format_text( '<h2>'.T_('Installing sample contents...').'</h2>', 'h2' );
+	}
+
+	if( $create_sample_contents )
+	{
 		evo_flush();
 		$collections_installed = create_demo_contents( $demo_users, true, false );
 	}
 
-	if( $collections_installed )
+	if( $create_demo_email_lists )
+	{	// Create demo emails data like lists, campaigns, automations:
+		$emails_data_installed = create_demo_emails();
+	}
+
+	if( $collections_installed || $emails_data_installed )
 	{
+		evo_flush();
 		echo '<br/>';
 		echo get_install_format_text( '<span class="text-success">'.T_('Created sample contents.').'</span>' );
 	}
-	evo_flush();
+
 	$DB->commit();
 
 	return $collections_installed;

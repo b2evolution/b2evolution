@@ -288,14 +288,8 @@ function install_newdb()
 	// We still need to install the shared widgets
 	install_basic_widgets( $new_db_version );
 
-	evo_flush();
-	create_default_newsletters();
-
-	evo_flush();
-	create_default_email_campaigns();
-
-	evo_flush();
-	create_default_automations();
+	// Create demo emails data like lists, campaigns, automations:
+	create_demo_emails();
 
 	// Update the progress bar status
 	update_install_progress_bar();
