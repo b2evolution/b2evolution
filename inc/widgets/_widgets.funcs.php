@@ -64,7 +64,7 @@ function add_basic_widget( $blog_ID, $container_name, $code, $type, $order, $par
  * @param boolean should be true only when it's called after initial install
  * fp> TODO: $initial_install is used to know if we want to trust globals like $blog_photoblog_ID and $blog_forums_ID. We don't want that.
  *           We should pass a $context array with values like 'photo_source_coll_ID' => 4.
- *           Also, checking $blog_forums_ID is unnecessary complexity. We can check the colleciton kind == forum
+ *           Also, checking $blog_forums_ID is unnecessary complexity. We can check the collection kind == forum
  * @param string Kind of blog ( 'std', 'photo', 'group', 'forum' )
  */
 function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
