@@ -1,9 +1,11 @@
-.evo-view-wrap[data-evo-view-type="image"] {
+.evo-view-wrap[data-evo-view-type="image"],
+.evo-view-wrap[data-evo-view-plugin-type="email_element"] {
 	display: block;
 	clear: both;
 }
 
-.evo-view-wrap[data-evo-view-type="image"].evo-view-selected {
+.evo-view-wrap[data-evo-view-type="image"].evo-view-selected,
+.evo-view-wrap[data-evo-view-plugin-type="email_element"].evo-view-selected {
 	background-color: #eee;
 }
 

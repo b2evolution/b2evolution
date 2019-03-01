@@ -4471,6 +4471,19 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called when rendering inline tags in contents of Item, Comment, Message or Email Campaign.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'inline_tags' - Array of inline tags
+	 *   - 'Object' - Item, Comment, Message, EmailCampaign
+	 * @return array Rendered tags: Key - Original inline tag, Value - The rendered tag html
+	 */
+	function RenderInlineTags( & $params )
+	{
+	}
+
+
+	/**
 	 * This method initializes an array that used as additional tabs/forms
 	 *   for the modal/popup window "Insert image into content"
 	 *
@@ -4484,6 +4497,23 @@ class Plugin
 	function GetImageInlineTags( & $params )
 	{
 		return array();
+	}
+
+
+	/**
+	 * This method initializes params for form of additional tab
+	 *   on the modal/popup window "Insert image into content"
+	 *
+	 * @param array Array of parameters:
+	 *   - 'tag_type' - Active tag type
+	 *   - 'link_ID' - Link ID
+	 *   - 'short_tag' - Full code of short tag
+	 * @return array Array of parameters:
+	 *   - 'tag_type' - Overridden tag type
+	 *   - 'link_ID' - Overridden link ID
+	 */
+	function InitImageInlineTagForm( & $params )
+	{
 	}
 
 

@@ -851,7 +851,7 @@
 
 		views.register( 'image', image );
 
-		thumbnail = $.extend( {}, image, {
+		var extended_image_params = $.extend( {}, image, {
 			markerText: '<span class="evo-view-wrap" data-evo-view-text="%encodedText%" data-evo-view-type="%viewType%">' +
 					'<span class="evo-view-selection-before"> </span>' +
 					'<span class="evo-view-body" contenteditable="false">' +
@@ -861,18 +861,24 @@
 				'</span>',
 			} );
 
-		views.register( 'thumbnail', thumbnail );
+		views.register( 'thumbnail', extended_image_params );
+		views.register( 'inline', extended_image_params );
 
-		inline = $.extend( {}, image, {
-				markerText: '<span class="evo-view-wrap" data-evo-view-text="%encodedText%" data-evo-view-type="%viewType%">' +
-						'<span class="evo-view-selection-before"> </span>' +
-						'<span class="evo-view-body" contenteditable="false">' +
-							'<span class="evo-view-content evo-view-type-%viewType%"></span>' +
-						'</span>' +
-						'<span class="evo-view-selection-after"> </span>' +
-					'</span>',
+		// Tags for plugin "Email Elements":
+		var email_element_params = $.extend( {}, image, {
+			markerText: '<div class="evo-view-wrap" data-evo-view-text="%encodedText%" data-evo-view-type="%viewType%" data-evo-view-plugin-type="email_element">' +
+					'<div class="evo-view-selection-before"></div>' +
+					'<div class="evo-view-body" contenteditable="false">' +
+						'<div class="evo-view-content evo-view-type-%viewType%"></div>' +
+					'</div>' +
+					'<div class="evo-view-selection-after"></div>' +
+				'</div>',
 			} );
-
-		views.register( 'inline', inline );
+		views.register( 'button', email_element_params );
+		views.register( 'cta', email_element_params );
+		views.register( 'like', email_element_params );
+		views.register( 'dislike', email_element_params );
+		views.register( 'activate', email_element_params );
+		views.register( 'unsubscribe', email_element_params );
 
 	} )( window, window.evo.views, window.jQuery );

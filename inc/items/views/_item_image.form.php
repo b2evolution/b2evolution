@@ -15,9 +15,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 global $retrict_tag;
 global $link_ID, $tag_type, $Plugins;
-global $image_caption, $image_disable_caption, $image_class;
-global $thumbnail_size, $thumbnail_alignment, $thumbnail_class;
-global $inline_class;
 
 $tag_types = array(
 	'image'     => T_('Image'),
@@ -61,10 +58,11 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 				switch( $tag_type_key )
 				{
 					case 'image':
-						$Form->text( 'image_caption', $image_caption, 40, T_('Caption'), '<br>
+						$Form->text( 'image_caption', get_param( 'image_caption' ), 40, T_('Caption'), '<br>
 							<span style="display: flex; flex-flow: row; align-items: center; margin-top: 8px;">
-								<input type="checkbox" name="image_disable_caption" id="image_disable_caption" value="1" style="margin: 0 8px 0 0;">
+								<input type="checkbox" name="image_disable_caption" id="image_disable_caption" value="1" style="margin: 0 8px 0 0;"'.( get_param( 'image_disable_caption' ) ? ' checked="checked"' : '' ).'>
 								<span>'.T_('Disable caption').'</span></span>', '' );
+						$image_class = get_param( 'image_class' );
 						$Form->text( 'image_class', $image_class, 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
 							<button class="btn btn-default btn-xs">border</button>
 							<button class="btn btn-default btn-xs">noborder</button>
@@ -73,16 +71,17 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 						break;
 
 					case 'thumbnail':
-						$Form->radio( 'thumbnail_size', $thumbnail_size, array(
+						$Form->radio( 'thumbnail_size', get_param( 'thumbnail_size' ), array(
 								array( 'small', 'small' ),
 								array( 'medium', 'medium' ),
 								array( 'large', 'large' )
 							), T_( 'Size') );
-						$Form->radio( 'thumbnail_alignment', $thumbnail_alignment, array(
+						$Form->radio( 'thumbnail_alignment', get_param( 'thumbnail_alignment' ), array(
 								array( 'left', 'left' ),
 								array( 'right', 'right' )
 							), T_( 'Alignment') );
-						$Form->text( 'thumbnail_class', $thumbnail_class, 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
+						$thumbnail_class = get_param( 'thumbnail_class' );
+						$Form->text( 'thumbnail_class', get_param( 'thumbnail_class' ), 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
 							<button class="btn btn-default btn-xs">border</button>
 							<button class="btn btn-default btn-xs">noborder</button>
 							<button class="btn btn-default btn-xs">rounded</button>
@@ -90,7 +89,8 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 						break;
 
 					case 'inline':
-						$Form->text( 'inline_class', $inline_class, 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
+						$inline_class = get_param( 'inline_class' );
+						$Form->text( 'inline_class', get_param( 'inline_class' ), 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
 								<button class="btn btn-default btn-xs">border</button>
 								<button class="btn btn-default btn-xs">noborder</button>
 								<button class="btn btn-default btn-xs">rounded</button>
@@ -144,15 +144,15 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 
 				<?php
 				// Apply existing classes
-				if( $image_class )
+				if( ! empty( $image_class ) )
 				{
 					echo 'apply_image_class( "'.$image_class.'" );';
 				}
-				if( $thumbnail_class )
+				if( ! empty( $thumbnail_class ) )
 				{
 					echo 'apply_image_class( "'.$thumbnail_class.'" );';
 				}
-				if( $inline_class )
+				if( ! empty( $inline_class ) )
 				{
 					echo 'apply_image_class( "'.$inline_class.'" );';
 				}
