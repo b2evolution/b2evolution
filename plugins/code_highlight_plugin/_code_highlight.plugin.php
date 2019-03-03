@@ -66,7 +66,7 @@ class code_highlight_plugin extends Plugin
 	var $name = 'Code highlight';
 	var $code = 'evo_code';
 	var $priority = 27;
-	var $version = '6.10.7';
+	var $version = '6.11.0';
 	var $author = 'Astonish Me';
 	var $group = 'rendering';
 	var $help_topic = 'code-highlight-plugin';

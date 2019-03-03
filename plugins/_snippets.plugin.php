@@ -22,7 +22,7 @@ class snippets_plugin extends Plugin
 	var $code = 'snippets';
 	var $name = 'Snippets';
 	var $priority = 60;
-	var $version = '6.10.7';
+	var $version = '6.11.0';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
