@@ -910,13 +910,13 @@ switch( $action )
 		 */
 		track_step( 'install-start' );
 
-		$create_sample_contents = param( 'create_sample_contents', 'string', false, true ); // during auto install this param can be 'all', 'minisite', 'home', 'blog-a', 'blog-b', 'photos, 'forums', 'manual', 'tracker'
+		$create_sample_contents = param( 'create_sample_contents', 'string', false, true ); // during auto install this param can be 'full', 'minisite', 'blog-a', 'blog-b', 'photos, 'forums', 'manual', 'tracker'
 		$create_demo_organization = param( 'create_demo_organization', 'boolean', false, true );
 		$create_demo_users = param( 'create_demo_users', 'boolean', false, true );
 		$create_demo_messages = param( 'create_sample_private_messages', 'boolean', false, true );
 
-		if( $create_sample_contents == 'all' )
-		{ // Override create sample organization and demo user setting
+		if( $create_sample_contents == 'full' )
+		{	// Override create sample organization and demo user setting:
 			$create_demo_organization = true;
 			$create_demo_users = true;
 			$create_demo_messages = true;

@@ -218,10 +218,10 @@ function echo_installation_options( $params = array() )
 
 	$r = '<div class="checkbox">
 				<label>
-					<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />'
+					<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" />'
 					.T_('Create a demo site').'
 				</label>
-				<div id="create_sample_contents_options" style="margin:10px 0 0 20px">
+				<div id="create_sample_contents_options" style="margin:10px 0 0 20px;display:none">
 					<div class="radio" style="margin-left:1em">
 						<label>
 							<input type="radio" name="demo_content_type" id="minisite_demo" value="minisite" />'
@@ -259,7 +259,7 @@ function echo_installation_options( $params = array() )
 
 	$r .= '<div class="checkbox" style="margin-top: 15px">
 					<label>
-						<input type="checkbox" name="create_demo_users" id="create_demo_users" value="1" checked="checked" '.( $params['enable_create_demo_users'] ? '' : 'disabled="disabled"' ).' />'
+						<input type="checkbox" name="create_demo_users" id="create_demo_users" value="1"'.( $params['enable_create_demo_users'] ? '' : ' disabled="disabled"' ).' />'
 						.( $params['enable_create_demo_users'] ? T_('Create demo users') : T_('Your system already has several user accounts, so we won\'t create demo users.') ).
 					'</label>
 					<div id="create_demo_user_options" style="margin: 10px 0 0 20px">';
@@ -268,7 +268,7 @@ function echo_installation_options( $params = array() )
 	{
 		$r .= '<div class="checkbox" style="margin-left: 1em">
 						<label>
-							<input type="checkbox" name="create_demo_organization" id="create_demo_organization" value="1" checked="checked" />'
+							<input type="checkbox" name="create_demo_organization" id="create_demo_organization" value="1" checked="checked" disabled="disabled" />'
 							.T_('Create a demo organization / team').
 						'</label>
 					</div>';
@@ -278,7 +278,7 @@ function echo_installation_options( $params = array() )
 	{
 		$r .= '<div class="checkbox" style="margin-left: 1em">
 						<label>
-							<input type="checkbox" name="create_sample_private_messages" id="create_sameple_private_messages" value="1" checked="checked" />'
+							<input type="checkbox" name="create_sample_private_messages" id="create_sameple_private_messages" value="1" checked="checked" disabled="disabled" />'
 							.T_('Create demo private messages between users').
 						'</label>
 					</div>';
@@ -1261,7 +1261,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	$site_skins_setting          = 0;
 	switch( $create_sample_contents )
 	{
-		case 'all':
+		case 'full':
 			// Install all collections except of "Mini-Site":
 			// (may be used from auto install script)
 			$install_collection_home    = 1;
@@ -1277,12 +1277,6 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 		case 'minisite':
 			// Install "Mini-Site" from auto install script:
 			$install_collection_minisite = 1;
-			break;
-
-		case 'home':
-			// Install "Global home page" from auto install script:
-			$install_collection_home = 1;
-			$site_skins_setting      = 1;
 			break;
 
 		case 'blog-a':
@@ -1347,7 +1341,19 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 			}
 	}
 
-	if( $demo_content_type == 'complex_site' || $create_sample_contents == 'all' )
+	if( ! $install_collection_minisite &&
+	    ! $install_collection_home &&
+	    ! $install_collection_bloga &&
+	    ! $install_collection_blogb &&
+	    ! $install_collection_photos &&
+	    ! $install_collection_forums &&
+	    ! $install_collection_manual &&
+	    ! $install_collection_tracker )
+	{	// Don't try to install demo content if no collection is selected:
+		return 0;
+	}
+
+	if( $demo_content_type == 'complex_site' || $create_sample_contents == 'full' )
 	{
 		task_begin( 'Creating default sections... ' );
 		$SectionCache = & get_SectionCache();
@@ -1395,13 +1401,12 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 		task_end();
 	}
 
-	if( $install_collection_blogb )
-	{
-		global $demo_poll_ID;
-		task_begin( 'Creating default polls... ' );
-		$demo_poll_ID = create_demo_poll();
-		task_end();
-	}
+	// Create demo polls:
+	// (global $demo_poll_ID may be used in default widgets e-g for collection "Blog B")
+	global $demo_poll_ID;
+	task_begin( 'Creating default polls... ' );
+	$demo_poll_ID = create_demo_poll();
+	task_end();
 
 	// Number of demo collections created:
 	$collection_created = 0;
@@ -4181,7 +4186,7 @@ function install_demo_content()
 	global $DB, $current_User;
 	global $install_test_features;
 
-	$create_sample_contents   = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
+	$create_sample_contents   = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'full', 'minisite', 'blog-a', 'blog-b', 'photos, 'forums', 'manual', 'tracker'
 	$create_demo_organization = param( 'create_demo_organization', 'boolean', false, true );
 	$create_demo_users        = param( 'create_demo_users', 'boolean', false, true );
 	$create_demo_messages     = param( 'create_sample_private_messages', 'boolean', false, true );

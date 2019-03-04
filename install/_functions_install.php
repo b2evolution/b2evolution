@@ -184,7 +184,7 @@ function install_newdb()
 	 *
 	 * @var integer
 	 */
-	$local_installation = param( 'local_installation', 'integer', ( $create_sample_contents == 'all' ? intval( check_local_installation() ) : 0 ) );
+	$local_installation = param( 'local_installation', 'integer', ( $create_sample_contents == 'full' ? intval( check_local_installation() ) : 0 ) );
 
 	echo get_install_format_text( '<h2>'.T_('Creating b2evolution tables...').'</h2>', 'h2' );
 	evo_flush();
@@ -1419,7 +1419,7 @@ function get_install_steps_count()
 		// After Creating default sample contents(users, and probably blogs and categories):
 		$steps++;
 
-		if( $create_sample_contents == 'all' )
+		if( $create_sample_contents == 'full' )
 		{ // Array contains which collections should be installed
 			$install_collection_home =   1;
 			$install_collection_bloga =  1;
