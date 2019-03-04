@@ -231,7 +231,7 @@ function echo_installation_options( $params = array() )
 					<div class="radio" style="margin-left:1em">
 						<label>
 							<input type="radio" name="demo_content_type" id="standard_site_demo" value="standard_site" style="margin-top:9px" />'
-							.T_('Standard Site(1 collection):').'
+							.T_('Standard Site (1 collection):').'
 							<span class="form-inline"><select name="standard_collection" class="form-control">'.Form::get_select_options_string( $standard_collections, NULL, true ).'</span>
 							</select>
 						</label>
@@ -286,37 +286,34 @@ function echo_installation_options( $params = array() )
 
 	$r .= '</div></div>';
 
-	if( $params['show_create_email_lists'] )
+	$r .= '<div class="checkbox" style="margin-top: 15px">
+					<label>
+						<input type="checkbox" name="create_demo_email_lists" id="create_demo_email_lists" value="1" checked="checked"'.( $params['show_create_email_lists'] ? '' : 'disabled="disabled"' ).' />'
+						.( $params['show_create_email_lists'] ? T_('Create demo email lists') : T_('Your system already has an email list, so we won\'t create demo lists.') ).
+					'</label>
+					<div id="create_demo_email_options" style="margin: 10px 0 0 20px">';
+
+	if( $params['show_create_email_campaigns'] )
 	{
-		$r .= '<div class="checkbox" style="margin-top: 15px">
+		$r .= '<div class="checkbox" style="margin-left: 1em">
 						<label>
-							<input type="checkbox" name="create_demo_email_lists" id="create_demo_email_lists" value="1" checked="checked" />'
-							.T_('Create demo email lists').
+							<input type="checkbox" name="create_demo_email_campaigns" id="create_demo_email_campaigns" value="1" checked="checked" />'
+							.T_('Create demo campaigns').
 						'</label>
-						<div id="create_demo_email_options" style="margin: 10px 0 0 20px">';
-
-		if( $params['show_create_email_campaigns'] )
-		{
-			$r .= '<div class="checkbox" style="margin-left: 1em">
-							<label>
-								<input type="checkbox" name="create_demo_email_campaigns" id="create_demo_email_campaigns" value="1" checked="checked" />'
-								.T_('Create demo campaigns').
-							'</label>
-						</div>';
-		}
-
-		if( $params['show_create_automations'] )
-		{
-			$r .= '<div class="checkbox" style="margin-left: 1em">
-							<label>
-								<input type="checkbox" name="create_demo_automations" id="create_demo_automations" value="1" checked="checked" />'
-								.T_('Create demo automations').
-							'</label>
-						</div>';
-		}
-
-		$r .= '</div></div>';
+					</div>';
 	}
+
+	if( $params['show_create_automations'] )
+	{
+		$r .= '<div class="checkbox" style="margin-left: 1em">
+						<label>
+							<input type="checkbox" name="create_demo_automations" id="create_demo_automations" value="1" checked="checked" />'
+							.T_('Create demo automations').
+						'</label>
+					</div>';
+	}
+
+	$r .= '</div></div>';
 
 	$r .= '<script type="text/javascript">
 					function toggle_create_demo_content_options()
