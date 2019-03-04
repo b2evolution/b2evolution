@@ -129,6 +129,7 @@ if( !$Messages->has_errors() )
 			else
 			{ // We use an empty user:
 				$edited_User = new User();
+				$edited_User->set( 'status', 'manualactivated' );
 			}
 			break;
 
@@ -439,6 +440,16 @@ if( !$Messages->has_errors() )
 				$UserList = new UserList( 'admin' );
 				$UserList->refresh_query = true;
 				$UserList->query();
+
+				if( param( 'send_pass_email', 'integer', 0 ) )
+				{	// Inform new created user by email:
+					locale_temp_switch( $edited_User->get( 'locale' ) );
+					send_mail_to_User( $edited_User->ID, T_('New account'), 'new_account_password_info', array(
+							'login'    => $edited_User->get( 'login' ),
+							'password' => get_param( 'edited_user_pass1' ),
+						), true );
+					locale_restore_previous();
+				}
 
 				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=users&action=list', '', '&' ), 303 );
 			}

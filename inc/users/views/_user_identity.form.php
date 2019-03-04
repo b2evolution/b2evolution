@@ -549,8 +549,23 @@ $Form->end_fieldset();
 if( empty( $edited_User->ID ) && $action != 'view' )
 {	// Display password fields for new creating user:
 	$Form->begin_fieldset( T_('Password') );
+		$Form->radio( 'init_pass', param( 'init_pass', 'string', 'user' ), array(
+					array( 'user', T_('User must initialize') ),
+					array( 'admin', T_('Initialize as below:') ),
+			 ), T_('Initial password'), true );
 		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'maxlength' => 50, 'autocomplete'=>'off' ) );
 		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'note'=>sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'autocomplete'=>'off' ) );
+		$Form->checkbox( 'send_pass_email', param( 'send_pass_email', 'integer', 1 ), T_('Send email'), T_('Inform user by email') );
+?>
+<script>
+function new_user_pass_visibility()
+{
+	jQuery( '#ffield_edited_user_pass1, #ffield_edited_user_pass2' ).toggle( jQuery( 'input[name=init_pass]:checked' ).val() == 'admin' );
+}
+jQuery( 'input[name=init_pass]' ).click( new_user_pass_visibility );
+new_user_pass_visibility();
+</script>
+<?php
 	$Form->end_fieldset();
 }
 
