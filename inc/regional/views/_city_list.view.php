@@ -58,7 +58,7 @@ if( count( $sql_where ) > 0 )
 //echo $SQL->get();
 $Results = new Results( $SQL->get(), 'city_', '-----A' );
 
-$Results->title = T_('Cities').get_manual_link('countries_list');
+$Results->title = T_('Cities').get_manual_link('countries-list');
 
 /*
  * STATUS TD:
