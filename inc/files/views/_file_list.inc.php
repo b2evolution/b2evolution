@@ -154,7 +154,7 @@ $Form->begin_form();
 	?>
 	</thead>
 
-	<tbody id="filelist_tbody">
+	<tbody class="filelist_tbody">
 	<?php
 	$checkall = param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
 	$fm_highlight = param( 'fm_highlight', 'string', NULL );
@@ -662,11 +662,11 @@ $Form->begin_form();
 			display_dragdrop_upload_button( array(
 					'fileroot_ID'          => $fm_FileRoot->ID,
 					'path'                 => $path,
-					'listElement'          => 'jQuery( "#filelist_tbody" ).get(0)',
+					'listElement'          => 'jQuery( ".filelist_tbody" ).get(0)',
 					'list_style'           => 'table',
 					'template'             => $template,
 					'display_support_msg'  => false,
-					'additional_dropzone'  => '[ document.getElementById( "filelist_tbody" ) ]',
+					'additional_dropzone'  => '[ jQuery( ".filelist_tbody" ).get(0) ]',
 					'filename_before'      => $icon_to_link_files,
 					'noresults'            => $noresults,
 				) );

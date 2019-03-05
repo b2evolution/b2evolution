@@ -9468,10 +9468,10 @@ function insert_image_links_block( $params )
 			return;
 	}
 
-	// Set a different dragand drop button ID
-	global $dragdrop_button_prefix, $fm_mode;
+	global $fm_mode;
 	$fm_mode = 'file_select';
-	$dragdrop_button_prefix = 'modal-';
+	// Set a different drag and drop fieldset prefix:
+	$fieldset_prefix = 'modal_';
 
 	if( is_admin_page() )
 	{
@@ -9480,8 +9480,6 @@ function insert_image_links_block( $params )
 		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
 		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
 		$AdminUI = new AdminUI();
-
-		$AdminUI->disp_view( 'links/views/_link_list.view.php' );
 	}
 	else
 	{
@@ -9492,9 +9490,9 @@ function insert_image_links_block( $params )
 		$blog_skin_ID = $Blog->get_skin_ID();
 		$SkinCache = & get_SkinCache();
 		$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
-
-		require $inc_path.'links/views/_link_list.view.php';
 	}
+
+	require $inc_path.'links/views/_link_list.view.php';
 }
 
 

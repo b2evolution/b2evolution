@@ -2450,11 +2450,11 @@ function display_dragdrop_upload_button( $params = array() )
 					endpoint: <?php echo $params['fieldset_prefix']; ?>url,
 					params: { root_and_path: <?php echo $params['fieldset_prefix']; ?>root_and_path }
 				},
-				template: document.getElementById( 'qq-template'),
+				template: document.getElementById( '<?php echo $params['fieldset_prefix']; ?>qq-template' ),
 				element: document.getElementById( '<?php echo $params['fieldset_prefix']; ?>file-uploader' ),
 				listElement: <?php echo $params['listElement']; ?>,
 				dragAndDrop: {
-					extraDropzones: <?php echo $params['additional_dropzone'];?>
+					extraDropzones: <?php echo empty( $params['additional_dropzone'] ) ? '""' : $params['additional_dropzone']; ?>
 				},
 				list_style: '<?php echo $params['list_style']; ?>',
 				action: <?php echo $params['fieldset_prefix']; ?>url,
@@ -2482,20 +2482,6 @@ function display_dragdrop_upload_button( $params = array() )
 					sizeLimit: <?php echo min( array( return_bytes( ini_get('post_max_size') ), return_bytes( ini_get('upload_max_filesize') ), $Settings->get( 'upload_maxkb') * 1024 ) );?>,
 					allowedExtensions: <?php echo json_encode( $allowed_extensions );?>
 				},
-				onSubmit: function( id, fileName )
-				{
-					var noresults_row = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table tr.noresults' );
-					if( noresults_row.length )
-					{ // Add table headers and remove "No results" row
-						<?php
-						if( $params['table_headers'] != '' )
-						{ // Append table headers if they are defined
-						?>
-						noresults_row.parent().parent().prepend( '<?php echo format_to_js( $params['table_headers'] ); ?>' );
-						<?php } ?>
-						noresults_row.remove();
-					}
-				},
 				callbacks: {
 					onSubmit: function( id, fileName )
 					{
@@ -2513,7 +2499,7 @@ function display_dragdrop_upload_button( $params = array() )
 
 						setTimeout( function()
 							{
-								evo_link_fix_wrapper_height();
+								evo_link_fix_wrapper_height( '<?php echo $params['fieldset_prefix']; ?>' );
 								<?php
 								if( $params['resize_frame'] )
 								{	// Resize attachments fieldset after upload new image:
@@ -2698,7 +2684,7 @@ function display_dragdrop_upload_button( $params = array() )
 								}
 								init_colorbox( this_row.find( '.qq-upload-image a[rel^="lightbox"]' ) );
 							}
-							evo_link_sort_list();
+							evo_link_sort_list( '<?php echo $params['fieldset_prefix']; ?>' );
 						}
 						<?php
 						}
@@ -2728,7 +2714,7 @@ function display_dragdrop_upload_button( $params = array() )
 						?>
 							setTimeout( function()
 							{ // allow some time to remove cancelled row first before determining the number of rows
-								var container = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table #filelist_tbody' );
+								var container = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table .filelist_tbody' );
 								var rows = container.find( 'tr' );
 								if( !rows.length )
 								{
@@ -2861,7 +2847,7 @@ function display_dragdrop_upload_button( $params = array() )
 		<?php } ?>
 	</script>
 
-	<script type="text/template" id="qq-template">
+	<script type="text/template" id="<?php echo $params['fieldset_prefix']; ?>qq-template">
 	<?php echo $params['template'];?>
 	</script>
 

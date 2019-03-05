@@ -31,8 +31,7 @@ if( ! isset( $Skin ) )
 	global $Skin;
 }
 
-// Override $dragdrop_button_prefix to enable multiple drag and buton
-global $dragdrop_button_prefix, $fm_mode;
+global $fm_mode;
 
 if( empty( $Blog ) )
 {
@@ -78,13 +77,9 @@ else
 						);
 }
 
-function display_link_info( $link )
-{
-	return '<span data-order="'.$link->link_order.'">'.$link->link_ID.'</span>';
-}
 $Results->cols[] = array(
 						'th' => T_('Link ID'),
-						'td' => '%display_link_info( {row} )%',
+						'td' => '<span data-order="$link_order$">$link_ID$</span>',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap link_id_cell',
 					);
@@ -103,7 +98,7 @@ $Results->cols[] = array(
 				);
 
 // Add attr "id" to handle quick uploader
-$tbody_start = '<tbody id="filelist_tbody"'.( $fm_mode == 'file_select' ? ' data-file-select="true"' : '' );
+$tbody_start = '<tbody class="filelist_tbody"'.( $fm_mode == 'file_select' ? ' data-file-select="true"' : '' );
 $compact_results_params = is_admin_page() ? $AdminUI->get_template( 'compact_results' ) : $Skin->get_template( 'compact_results' );
 $compact_results_params['body_start'] = str_replace( '<tbody', $tbody_start, $compact_results_params['body_start'] );
 $compact_results_params['no_results_start'] = str_replace( '<tbody', $tbody_start, $compact_results_params['no_results_start'] );
@@ -158,12 +153,11 @@ $link_owner_positions = $LinkOwner->get_positions();
 
 // Display a button to quick upload the files by drag&drop method
 display_dragdrop_upload_button( array(
-		'fieldset_prefix' => isset( $dragdrop_button_prefix ) ? $dragdrop_button_prefix : '',
 		'before' => '<div class="evo_fileuploader_form">',
 		'after'  => '</div>',
 		'fileroot_ID'      => $upload_fileroot,
 		'path'             => $upload_path,
-		'listElement'      => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table #filelist_tbody" ).get(0)',
+		'listElement'      => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table .filelist_tbody" ).get(0)',
 		'list_style'       => 'table',
 		'template'         => '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
 				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'
@@ -196,7 +190,7 @@ display_dragdrop_upload_button( array(
 							.'<td class="qq-upload-link-position lastcol shrinkwrap"></td>'
 						.'</tr>',
 		'display_support_msg'    => false,
-		'additional_dropzone'    => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table #filelist_tbody" )',
+		'additional_dropzone'    => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table .filelist_tbody" )',
 		'filename_before'        => '',
 		'LinkOwner'              => $LinkOwner,
 		'display_status_success' => false,
