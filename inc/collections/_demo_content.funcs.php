@@ -2628,7 +2628,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'intro' );
-				$edited_Item->insert( $owner_ID, T_('Main Intro post'), T_('This is the main intro post. It appears on the homepage only.'),
+				$edited_Item->insert( $owner_ID, T_('Main Intro post'), T_('This is the main intro post of this collection. It appears on the collection\'s front page only.'),
 					$now, $cat_ann_a, array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Main' );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
