@@ -387,13 +387,10 @@ function get_filler_text( $type = NULL )
 			break;
 
 		case 'info_page':
-			$filler_text = T_('<p>This website is powered by b2evolution.</p>
-
-<p>You are currently looking at an info page about "%s".</p>
-
-<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the menu instead.</p>
-
-<p>If needed, skins can format info pages differently from regular posts.</p>');
+			$filler_text = T_('<p>This website is powered by b2evolution.</p>')."\r\n"
+				.T_('<p>You are currently looking at an info page about "%s".</p>')."\r\n"
+				.T_('<p>Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically access directly from a navigation menu.</p>')."\r\n"
+				.T_('<p>Note: If needed, skins may format info pages differently from regular posts.</p>');
 			break;
 
 		case 'markdown_examples_content':
@@ -2434,8 +2431,6 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			if( is_available_item_type( $blog_ID, 'Sidebar link' ) )
 			{
 				// Insert a post into info blog:
-				// walter : a weird line of code to create a post in the home a minute after the others.
-				// It will show a bug on home agregation by category
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
@@ -2479,13 +2474,11 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'photo' );
-				$installed_collection_info_pages[] = $edited_Item->insert( $owner_ID, T_('About this site'), T_('<p>This blog platform is powered by b2evolution.</p>
-
-<p>You are currently looking at an info page about this site.</p>
-
-<p>Info pages are very much like regular posts, except that they do not appear in the regular flow of posts. They appear as info pages in the menu instead.</p>
-
-<p>If needed, skins can format info pages differently from regular posts.</p>'), $now, $cat_home_b2evo,
+				$installed_collection_info_pages[] = $edited_Item->insert( $owner_ID, T_('About this site'), 
+						T_('<p>This website is powered by b2evolution.</p>')."\r\n"
+						.T_('<p>You are currently looking at an info page about this site.</p>')."\r\n"
+						.T_('<p>Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically access directly from a navigation menu.</p>')."\r\n"
+						.T_('<p>Note: If needed, skins may format info pages differently from regular posts.</p>'), $now, $cat_home_b2evo,
 						array( $cat_home_b2evo ), 'published', '#', '', '', 'open', array('default'), 'Standalone Page' );
 				$edit_File = new File( 'shared', 1, 'logos/b2evolution_1016x208_wbg.png' );
 				$LinkOwner = new LinkItem( $edited_Item );
