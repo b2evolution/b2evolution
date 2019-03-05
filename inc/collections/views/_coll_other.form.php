@@ -77,6 +77,13 @@ $Form->begin_fieldset( T_('Search results').get_manual_link( 'search-results-oth
 		T_('Scoring for tags') => array(
 			'tag_name'            => T_('weight multiplier for keywords found in tag name'),
 		),
+		T_('Scoring for files') => array(
+			'file_name'           => T_('weight multiplier for keywords found in file name'),
+			'file_path'           => T_('weight multiplier for keywords found in file path'),
+			'file_title'          => T_('weight multiplier for keywords found in file long title'),
+			'file_alt'            => T_('weight multiplier for keywords found in file alternative text'),
+			'file_description'    => T_('weight multiplier for keywords found in file caption/description'),
+		),
 	);
 	foreach( $score_settings as $score_group_title => $score_settings_data )
 	{

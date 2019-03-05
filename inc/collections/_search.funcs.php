@@ -714,11 +714,11 @@ function search_and_score_files( $search_term, $keywords, $quoted_parts, $author
 		}
 
 		$scores_map = array();
-		$scores_map['filename']    = score_text( basename( $file->file_path ), $search_term, $keywords, $quoted_parts, 3 );
-		$scores_map['filepath']    = score_text( $file->file_path, $search_term, $keywords, $quoted_parts );
-		$scores_map['title']       = score_text( $file->file_title, $search_term, $keywords, $quoted_parts, 3 );
-		$scores_map['alt']         = score_text( $file->file_alt, $search_term, $keywords, $quoted_parts );
-		$scores_map['description'] = score_text( $file->file_desc, $search_term, $keywords, $quoted_parts );
+		$scores_map['filename']    = score_text( basename( $file->file_path ), $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_file_name' ) );
+		$scores_map['filepath']    = score_text( $file->file_path, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_file_path' ) );
+		$scores_map['title']       = score_text( $file->file_title, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_file_title' ) );
+		$scores_map['alt']         = score_text( $file->file_alt, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_file_alt' ) );
+		$scores_map['description'] = score_text( $file->file_desc, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_file_description' ) );
 
 		$final_score = $scores_map['filename']['score']
 				+ ( isset( $scores_map['filepath'] ) ? $scores_map['filepath']['score'] : 0 )
