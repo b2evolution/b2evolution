@@ -1182,7 +1182,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
  * @param string title.  The title for the link tag
  * @param string media.  ie, 'print'
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
- * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+ * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head>
  */
 function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false )
 {
@@ -2466,6 +2466,9 @@ function display_ajax_form( $params )
 		echo '<p style="color:red;font-weight:bold">'.T_( 'This section can\'t be displayed because wrong params were created by the skin.' ).'</p>';
 		return;
 	}
+
+	// Set icons type to display correct icons on bootstrap skins:
+	$params['b2evo_icons_type'] = $b2evo_icons_type;
 
 	if( ! empty( $required_js ) )
 	{	// Send all loaded JS files to ajax request in order to don't load them twice:
@@ -3829,4 +3832,25 @@ function get_star_rating( $value, $stars_num = 5, $params = array() )
 
 	return $stars_template;
 }
+
+
+/**
+ * Registers headlines for initialization of file multi uploader
+ *
+ * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
+ * @param boolean TRUE to make the links table sortable
+ */
+function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = true )
+{
+	// Require Fine Uploader js and css files:
+	require_js( 'multiupload/fine-uploader.js', $relative_to );
+	require_css( 'fine-uploader.css', $relative_to );
+
+	if( $load_sortable_js )
+	{	// Load JS files to make the links table sortable:
+		require_js( '#jquery#', $relative_to );
+		require_js( 'jquery/jquery.sortable.min.js', $relative_to );
+	}
+}
+
 ?>

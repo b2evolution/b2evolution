@@ -4891,6 +4891,81 @@ class Form extends Widget
 
 		return $this->display_or_return( $r );
 	}
+
+
+	/**
+	 * Display attachments fieldset
+	 *
+	 * @param object Object of the links owner
+	 * @param boolean TRUE to allow folding for this fieldset, FALSE - otherwise
+	 * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
+	 */
+	function attachments_fieldset( $object, $fold = false, $fieldset_prefix = '' )
+	{
+		global $current_User;
+
+		// Get object type to initialize link owner
+		$object_type = get_class( $object );
+
+		if( $object_type != 'Comment' && ! is_logged_in() )
+		{	// User must logged in for all other objects like Item, Message and EmailCampaign:
+			// (for Comment we can allow to attach files by anonymous user depending on collection setting)
+			return;
+		}
+
+		// Declare this object as global because it is used in many link functions:
+		global $LinkOwner;
+
+		// Initialize link owner depending on object type:
+		switch( $object_type )
+		{
+			case 'Comment':
+				$Comment = $object;
+				$comment_Item = & $Comment->get_Item();
+				if( ! $comment_Item->check_blog_settings( 'allow_attachments' ) )
+				{	// Item attachments must be allowed by collection setting depending on user type(anounymous, registered, member and etc.):
+					return;
+				}
+				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+				$LinkOwner = new LinkComment( $Comment, $Comment->temp_link_owner_ID );
+				break;
+
+			case 'Item':
+				$Item = $object;
+				if( ! $Item->get_type_setting( 'allow_attachments' ) )
+				{	// Item attachments must be allowed for the item type
+					return;
+				}
+				load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+				$LinkOwner = new LinkItem( $Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
+				break;
+
+			case 'Message':
+				if( ! is_admin_page() )
+				{	// Message attachments are allowed only on back-office
+					return;
+				}
+				$Message = $object;
+				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+				$LinkOwner = new LinkMessage( $Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+				break;
+
+			case 'EmailCampaign':
+				$EmailCampaign = $object;
+				load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
+				$LinkOwner = new LinkEmailCampaign( $EmailCampaign );
+				break;
+
+			default:
+				debug_die( 'Wrong object type "'.$object_type.'" to display attachments fieldset!' );
+		}
+
+		// Display attachments fieldset:
+		display_attachments_fieldset( $this, $LinkOwner, $fold, $fieldset_prefix );
+
+		// Insert image modal window:
+		echo_image_insert_modal();
+	}
 }
 
 ?>

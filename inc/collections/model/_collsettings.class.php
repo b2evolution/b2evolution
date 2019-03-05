@@ -256,6 +256,33 @@ class CollectionSettings extends AbstractSettings
 			'search_include_cmnts' => 1, // Include comments to results on disp=search
 			'search_include_tags'  => 1, // Include tags to results on disp=search
 			'search_include_files' => 1, // Include files to results on disp=search
+			'search_score_post_title'          => 5, // weight multiplier for keywords found in post title
+			'search_score_post_content'        => 1, // weight multiplier for keywords found in post content
+			'search_score_post_tags'           => 4, // weight multiplier for keywords found in post tags
+			'search_score_post_excerpt'        => 1, // weight multiplier for keywords found in post excerpt
+			'search_score_post_titletag'       => 4, // weight multiplier for keywords found in post <title> tag
+			'search_score_post_author'         => 5, // weight multiplier for keywords found in post author login
+			'search_score_post_date_future'    => 0, // weight multiplier for posts from future
+			'search_score_post_date_moremonth' => 0, // weight multiplier for posts older month
+			'search_score_post_date_lastmonth' => 1, // weight multiplier for posts from the last month
+			'search_score_post_date_twoweeks'  => 2, // weight multiplier for posts from the last two weeks
+			'search_score_post_date_lastweek'  => 8, // weight multiplier for posts from the last week
+			'search_score_cmnt_post_title'     => 1, // weight multiplier for keywords found in title of the comment's post
+			'search_score_cmnt_content'        => 1, // weight multiplier for keywords found in comment content
+			'search_score_cmnt_author'         => 5, // weight multiplier for keywords found in comment author name
+			'search_score_cmnt_date_future'    => 0, // weight multiplier for comments from future
+			'search_score_cmnt_date_moremonth' => 0, // weight multiplier for comments older month
+			'search_score_cmnt_date_lastmonth' => 1, // weight multiplier for comments from the last month
+			'search_score_cmnt_date_twoweeks'  => 2, // weight multiplier for comments from the last two weeks
+			'search_score_cmnt_date_lastweek'  => 8, // weight multiplier for comments from the last week
+			'search_score_cat_name'            => 3, // weight multiplier for keywords found in category name
+			'search_score_cat_desc'            => 1, // weight multiplier for keywords found in category description
+			'search_score_tag_name'            => 3, // weight multiplier for keywords found in tag name
+			'search_score_file_name'           => 3, // weight multiplier for keywords found in file name
+			'search_score_file_path'           => 1, // weight multiplier for keywords found in file path
+			'search_score_file_title'          => 3, // weight multiplier for keywords found in file long title
+			'search_score_file_alt'            => 1, // weight multiplier for keywords found in file alternative text
+			'search_score_file_description'    => 1, // weight multiplier for keywords found in file caption/description
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
 
 		// Time frame settings:

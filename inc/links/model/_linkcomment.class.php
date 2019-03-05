@@ -26,11 +26,20 @@ class LinkComment extends LinkOwner
 	var $Comment;
 
 	/**
-	 * Constructor
+	 * Parent Item of the Comment
+	 * @var object
 	 */
-	function __construct( $edited_Comment )
+	var $Item = NULL;
+
+	/**
+	 * Constructor
+	 *
+	 * @param object Comment
+	 * @param integer ID of temporary object from table T_temporary_ID (used for uploads on new comments)
+	 */
+	function __construct( $Comment, $tmp_ID = NULL )
 	{
-		parent::__construct( $edited_Comment, 'comment', 'cmt_ID' );
+		parent::__construct( $Comment, 'comment', 'cmt_ID', $tmp_ID );
 		$this->Comment = & $this->link_Object;
 
 		$this->_trans = array(
@@ -47,20 +56,42 @@ class LinkComment extends LinkOwner
 	}
 
 	/**
-	 * Check current User Comment permissions
+	 * Check current User has an access to work with attachments of the link Comment
 	 *
 	 * @param string permission level
 	 * @param boolean true to assert if user dosn't have the required permission
+	 * @param object File Root to check permission to add/upload new files
+	 * @return boolean
 	 */
-	function check_perm( $permlevel, $assert = false )
+	function check_perm( $permlevel, $assert = false, $FileRoot = NULL )
 	{
 		global $current_User;
 
-		$this->load_Blog();
-		$comment_Item = $this->Comment->get_Item();
+		$r = false;
 
-		return ( $this->Comment->is_meta() && $current_User->check_perm( 'meta_comment', $permlevel, $assert, $this->Comment ) )
-			|| $current_User->check_perm( 'blog_comments', $permlevel, $assert, $this->Blog->ID );
+		if( $permlevel == 'add' )
+		{	// Check permission to add/upload new files:
+			$comment_Item = & $this->get_Item();
+			$r = $comment_Item->can_attach( $this->is_temp() ? $this->get_ID() : false );
+		}
+		elseif( $this->is_temp() )
+		{	// Check permission for new creating comment:
+			$comment_Item = & $this->get_Item();
+			$r = $comment_Item->can_comment( NULL );
+		}
+		else
+		{	// Check permission for existing comment in DB:
+			$r = is_logged_in() && (
+			     ( $this->Comment->is_meta() && $current_User->check_perm( 'meta_comment', $permlevel, $assert, $this->Comment ) ) ||
+			     $current_User->check_perm( 'blog_comments', $permlevel, $assert, $this->get_blog_ID() ) );
+		}
+
+		if( ! $r && $assert )
+		{	// Halt the denied access:
+			debug_die( 'You have no permission for comment attachments!' );
+		}
+
+		return $r;
 	}
 
 	/**
@@ -79,6 +110,7 @@ class LinkComment extends LinkOwner
 			);
 	}
 
+
 	/**
 	 * Load all links of owner Comment if it was not loaded yet
 	 */
@@ -87,7 +119,14 @@ class LinkComment extends LinkOwner
 		if( is_null( $this->Links ) )
 		{ // Links have not been loaded yet:
 			$LinkCache = & get_LinkCache();
-			$this->Links = $LinkCache->get_by_comment_ID( $this->Comment->ID );
+			if( $this->is_temp() )
+			{
+				$this->Links = $LinkCache->get_by_temporary_ID( $this->get_ID() );
+			}
+			else
+			{
+				$this->Links = $LinkCache->get_by_comment_ID( $this->get_ID() );
+			}
 		}
 	}
 
@@ -108,7 +147,7 @@ class LinkComment extends LinkOwner
 		}
 
 		$edited_Link = new Link();
-		$edited_Link->set( 'cmt_ID', $this->Comment->ID );
+		$edited_Link->set( $this->get_ID_field_name(), $this->get_ID() );
 		$edited_Link->set( 'file_ID', $file_ID );
 		$edited_Link->set( 'position', $position );
 		$edited_Link->set( 'order', $order );
@@ -120,12 +159,16 @@ class LinkComment extends LinkOwner
 			$file_dir = $File->dir_or_file( 'Directory', 'File' );
 			syslog_insert( sprintf( '%s %s was linked to %s with ID=%s', $file_dir, '[['.$file_name.']]', $this->type, $this->get_ID() ), 'info', 'file', $file_ID );
 
-			if( $update_owner )
+			if( ! $this->is_temp() && $update_owner )
 			{	// Update last touched date of the Comment & Item:
 				$this->update_last_touched_date();
 				// Also update contents last updated date of the comment's Item:
 				$this->update_contents_last_updated_ts();
 			}
+
+			// Reset the Links
+			$this->Links = NULL;
+			$this->load_Links();
 
 			return $edited_Link->ID;
 		}
@@ -133,14 +176,37 @@ class LinkComment extends LinkOwner
 		return false;
 	}
 
+
 	/**
-	 * Set Blog
+	 * Get Item of the owner Comment
+	 */
+	function & get_Item()
+	{
+		if( $this->Item === NULL )
+		{	// Try to get Item from DB and store in cache to next requests:
+			if( $this->is_temp() )
+			{	// If new Comment is creating
+				$ItemCache = & get_ItemCache();
+				$this->Item = & $ItemCache->get_by_ID( $this->link_Object->tmp_item_ID, false, false );
+			}
+			else
+			{	// If existing Comment is editing
+				$this->Item = & $this->Comment->get_Item();
+			}
+		}
+
+		return $this->Item;
+	}
+
+
+	/**
+	 * Load collection of the onwer Comment
 	 */
 	function load_Blog()
 	{
-		if( is_null( $this->Blog ) )
-		{
-			$comment_Item = $this->Comment->get_Item();
+		if( $this->Blog === NULL )
+		{	// Load collection of the comment's Item:
+			$comment_Item = & $this->get_Item();
 			$this->Blog = & $comment_Item->get_Blog();
 		}
 	}
@@ -163,21 +229,75 @@ class LinkComment extends LinkOwner
 		return parent::get( $parname );
 	}
 
+
 	/**
 	 * Get Comment edit url
+	 *
+	 * @return string
 	 */
 	function get_edit_url()
 	{
-		$this->load_Blog();
-		return '?ctrl=comments&amp;blog='.$this->Blog->ID.'&amp;action=edit&amp;comment_ID='.$this->Comment->ID;
+		if( is_admin_page() )
+		{	// Back-office:
+			global $admin_url;
+			if( $this->is_temp() )
+			{	// New creating Comment:
+				$comment_Item = & $this->get_Item();
+				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$comment_Item->ID.'#form_p'.$comment_Item->ID;
+			}
+			else
+			{	// The edited Comment:
+				return $admin_url.'?ctrl=comments&amp;blog='.$this->get_blog_ID().'&amp;action=edit&amp;comment_ID='.$this->get_ID();
+			}
+		}
+		else
+		{	// Front-office:
+			if( $this->is_temp() )
+			{	// New creating Comment:
+				$comment_Item = & $this->get_Item();
+				return $comment_Item->get_permanent_url().'#evo_comment_form_id_'.$comment_Item->ID;
+			}
+			else
+			{	// The edited Comment:
+				$comment_Blog = & $this->get_Blog();
+				return url_add_param( $comment_Blog->get( 'url' ), 'disp=edit_comment&amp;c='.$this->get_ID() );
+			}
+		}
 	}
+
 
 	/**
 	 * Get Comment view url
+	 *
+	 * @return string
 	 */
 	function get_view_url()
 	{
-		return $this->Comment->get_permanent_url();
+		if( is_admin_page() )
+		{	// Back-office:
+			global $admin_url;
+			$comment_Item = & $this->get_Item();
+			if( $this->is_temp() )
+			{	// New creating Comment:
+				return $admin_url.'?ctrl=items&amp;blog='.$comment_Item->get_blog_ID().'&amp;p='.$comment_Item->ID.'#form_p'.$comment_Item->ID;
+			}
+			else
+			{	// The editing Comment:
+				return $admin_url.'?ctrl=items&amp;blog='.$comment_Item->get_blog_ID().'&amp;p='.$comment_Item->ID.'#c'.$this->get_ID();
+			}
+		}
+		else
+		{	// Front-office:
+			if( $this->is_temp() )
+			{	// New creating Comment:
+				$comment_Item = & $this->get_Item();
+				return $comment_Item->get_permanent_url();
+			}
+			else
+			{	// The editing Comment:
+				return $this->Comment->get_permanent_url();
+			}
+		}
 	}
 
 

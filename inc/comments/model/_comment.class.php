@@ -211,6 +211,13 @@ class Comment extends DataObject
 	 */
 	var $last_touched_ts;
 
+
+	/**
+	 * ID of TemporaryID object, used to attach file to new creating comment
+	 * @var integer
+	 */
+	var $temp_link_owner_ID = NULL;
+
 	/**
 	 * Constructor
 	 */
@@ -2812,15 +2819,28 @@ class Comment extends DataObject
 	 * Template function: get content of comment
 	 *
 	 * @param string Output format, see {@link format_to_output()}
+	 * @param array Params
 	 * @return string
 	 */
-	function get_content( $format = 'htmlbody' )
+	function get_content( $format = 'htmlbody', $params = array() )
 	{
+		$params = array_merge( array(
+				'image_link_rel' => 'lightbox[c'.$this->ID.']', // Activate colorbox to open inline images full screen
+			), $params );
+
 		if( $format == 'raw_text' )
 		{
-			return format_to_output( $this->content, 'text' );
+			$content = format_to_output( $this->content, 'text' );
 		}
-		return $this->get_prerendered_content( $format );
+		else
+		{
+			$content = $this->get_prerendered_content( $format );
+		}
+
+		// Render inline file tags like [image:123:caption] or [file:123:caption] :
+		$content = $this->render_inline_tags( $content, $params );
+
+		return $content;
 	}
 
 
@@ -2854,21 +2874,34 @@ class Comment extends DataObject
 
 		if( $show_attachments )
 		{
-			if( empty( $this->ID ) && isset( $this->checked_attachments ) )
-			{ // PREVIEW
-				$attachment_ids = explode( ',', $this->checked_attachments );
-				$FileCache = & get_FileCache();
-				foreach( $attachment_ids as $ID )
-				{
-					$File = $FileCache->get_by_ID( $ID, false, false );
-					if( $File != NULL )
+			if( empty( $this->ID ) )
+			{	// PREVIEW mode, this comment is not stored in DB yet:
+				if( ! empty( $this->temp_link_owner_ID ) )
+				{	// This method is used to attach several files by quick uploader JS button:
+					$TemporaryIDCache = & get_TemporaryIDCache();
+					if( ( $TemporaryID = & $TemporaryIDCache->get_by_ID( $this->temp_link_owner_ID, false, false ) ) &&
+					    $TemporaryID->type == 'comment' )
+					{	// Get all links of the temporary object which is used for new creating comment:
+						$LinkOwner = new LinkComment( new Comment(), $TemporaryID->ID );
+						$attachments = & $LinkOwner->get_Links();
+					}
+				}
+				elseif( isset( $this->checked_attachments ) )
+				{	// This method is used to attach file per one from submit with standard file input element:
+					$attachment_ids = explode( ',', $this->checked_attachments );
+					$FileCache = & get_FileCache();
+					foreach( $attachment_ids as $ID )
 					{
-						$attachments[] = $File;
+						$File = $FileCache->get_by_ID( $ID, false, false );
+						if( $File != NULL )
+						{
+							$attachments[] = $File;
+						}
 					}
 				}
 			}
 			else
-			{ // Get all Links
+			{	// Get all Links of this comment from DB:
 				$LinkOwner = new LinkComment( $this );
 				$attachments = & $LinkOwner->get_Links();
 			}
@@ -2878,15 +2911,21 @@ class Comment extends DataObject
 		$images_below_content = '';
 		foreach( $attachments as $index => $attachment )
 		{
-			if( ! empty( $this->ID ) )
-			{ // Normal mode when comment exists in DB (NOT PREVIEW mode)
+			if( ! empty( $this->ID ) || ! empty( $this->temp_link_owner_ID ) )
+			{	// Normal mode when comment exists in DB (NOT PREVIEW mode)
+				// OR PREVIEW mode where we can upload several files to temp object:
 				$Link = $attachment;
 				$link_position = $Link->get( 'position' );
 				$params['Link'] = $Link;
 				$attachment = $attachment->get_File();
+				if( $link_position == 'inline' )
+				{	// Skip inline attachments because they are rendered in content by spec function:
+					unset( $attachments[ $index ] );
+					continue;
+				}
 			}
 			else
-			{ // Set default position for preview files
+			{	// Set default position for preview files:
 				$link_position = 'aftermore';
 			}
 
@@ -2927,7 +2966,7 @@ class Comment extends DataObject
 				{ // Image should be displayed above content
 					$images_above_content .= $r;
 				}
-				else
+				elseif( $link_position == 'aftermore' )
 				{ // Image should be displayed below content
 					$images_below_content .= $r;
 				}
@@ -2989,7 +3028,7 @@ class Comment extends DataObject
 			$ban_urls = $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this );
 		}
 
-		$output = $this->render_inline_tags( $this->get_content( $format ), $params );
+		$output = $this->get_content( $format, $params );
 
 		if( $ban_urls )
 		{ // ban urls and user has permission
@@ -3020,8 +3059,9 @@ class Comment extends DataObject
 			}
 			foreach( $attachments as $attachment )
 			{
-				// $attachment is a File in preview mode, but it is a Link in normal mode
-				$doc_File = empty( $this->ID ) ? $attachment : $attachment->get_File();
+				// $attachment is a File in preview mode and when multiuploader is disable because of no JS,
+				// but it is a Link in normal mode or when multiuploader is enabled and we can link new attachments to temp object:
+				$doc_File = ( empty( $this->ID ) && empty( $this->temp_link_owner_ID ) ) ? $attachment : $attachment->get_File();
 				echo '<li>';
 				if( empty( $doc_File ) )
 				{ // Broken File object
@@ -4822,7 +4862,11 @@ class Comment extends DataObject
 		$dbchanges = $this->dbchanges;
 
 		if( $r = parent::dbinsert() )
-		{
+		{	// The comment object could be inserted
+
+			// Link attachments from temporary object to new created Comment:
+			$this->link_from_Request();
+
 			if( isset( $this->user_notify ) && $this->user_notify && $this->author_user_ID > 0 )
 			{	// Subscribe user to the comment's post replies if such option has been selected on the comment submitted form:
 				global $DB;
@@ -5365,6 +5409,73 @@ class Comment extends DataObject
 		}
 
 		return $content;
+	}
+
+
+	/**
+	 * Link attachments from temporary object to new created Comment
+	 */
+	function link_from_Request()
+	{
+		global $DB;
+
+		if( $this->ID == 0 )
+		{	// The comment must be stored in DB:
+			return;
+		}
+
+		$temp_link_owner_ID = param( 'temp_link_owner_ID', 'integer', 0 );
+
+		$TemporaryIDCache = & get_TemporaryIDCache();
+		if( ! ( $TemporaryID = & $TemporaryIDCache->get_by_ID( $temp_link_owner_ID, false, false ) ) )
+		{	// No temporary object of attachments:
+			return;
+		}
+
+		if( $TemporaryID->type != 'comment' )
+		{	// Wrong temporary object:
+			return;
+		}
+
+		// Load all links:
+		$LinkOwner = new LinkComment( new Comment(), $TemporaryID->ID );
+		$LinkOwner->load_Links();
+
+		if( empty( $LinkOwner->Links ) )
+		{	// No links:
+			return;
+		}
+
+		// Change link owner from temporary to comment object:
+		$DB->query( 'UPDATE T_links
+			  SET link_cmt_ID = '.$this->ID.',
+			      link_tmp_ID = NULL
+			WHERE link_tmp_ID = '.$TemporaryID->ID );
+
+		// Move all temporary files to folder of new created comment:
+		foreach( $LinkOwner->Links as $comment_Link )
+		{
+			if( $comment_File = & $comment_Link->get_File() &&
+			    $comment_FileRoot = & $comment_File->get_FileRoot() )
+			{
+				if( ! file_exists( $comment_FileRoot->ads_path.'quick-uploads/c'.$this->ID.'/' ) )
+				{	// Create if folder doesn't exist for files of new created comment:
+					if( mkdir_r( $comment_FileRoot->ads_path.'quick-uploads/c'.$this->ID.'/' ) )
+					{
+						$tmp_folder_path = $comment_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/';
+					}
+				}
+				$comment_File->move_to( $comment_FileRoot->type, $comment_FileRoot->in_type_ID, 'quick-uploads/c'.$this->ID.'/'.$comment_File->get_name() );
+			}
+		}
+
+		if( isset( $tmp_folder_path ) && file_exists( $tmp_folder_path ) )
+		{	// Remove temp folder from disk completely:
+			rmdir_r( $tmp_folder_path );
+		}
+
+		// Delete temporary object from DB:
+		$TemporaryID->dbdelete();
 	}
 }
 

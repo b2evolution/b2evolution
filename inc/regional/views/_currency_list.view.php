@@ -33,7 +33,7 @@ $Results = new Results( $SQL->get(), 'curr_', '-A');
 
 $Results->Cache = & get_CurrencyCache();
 
-$Results->title = T_('Currencies list').get_manual_link('currencies_list');
+$Results->title = T_('Currencies list').get_manual_link('currencies-list');
 
 /*
  * STATUS TD:

@@ -629,6 +629,8 @@ while( $Item = & $ItemList->get_item() )
 				if( ( $Comment = get_comment_from_session( 'unsaved', $comment_type ) ) === NULL )
 				{	// There is no saved Comment in Session
 					$Comment = new Comment();
+					$Comment->set( 'type', $comment_type );
+					$Comment->set( 'item_ID', $Item->ID );
 					$comment_attachments = '';
 					$checked_attachments = '';
 				}
@@ -691,6 +693,11 @@ while( $Item = & $ItemList->get_item() )
 			// Set b2evoCanvas for plugins:
 			echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
 
+			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( $comment_renderers, array(
+					'Blog'         => & $Blog,
+					'setting_name' => 'coll_apply_comment_rendering'
+				) ) );
+
 			// Attach files:
 			if( !empty( $comment_attachments ) )
 			{	// display already attached files checkboxes
@@ -716,31 +723,12 @@ while( $Item = & $ItemList->get_item() )
 				// memorize all attachments ids
 				$Form->hidden( 'preview_attachments', $comment_attachments );
 			}
-			if( $Item->can_attach() )
-			{	// Display attach file input field:
-				$Form->input_field( array(
-						'label' => T_('Attach files'),
-						'note'  => get_icon( 'help', 'imgtag', array(
-								'data-toggle'    => 'tooltip',
-								'data-placement' => 'top',
-								'data-html'      => 'true',
-								'title'          => htmlspecialchars( get_upload_restriction( array(
-										'block_after'     => '',
-										'block_separator' => '<br /><br />' ) ) )
-							) ),
-						'name'  => 'uploadfile[]',
-						'type'  => 'file'
-					) );
-			}
 
-			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( $comment_renderers, array(
-					'Blog'         => & $Blog,
-					'setting_name' => 'coll_apply_comment_rendering'
-				) ) );
+			// Display attachments fieldset:
+			$Form->attachments_fieldset( $Comment );
 
-			$preview_text = ( $Item->can_attach() ) ? T_('Preview/Add file') : /* TRANS: Verb */ T_('Preview');
 			$Form->buttons_input( array(
-					array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview btn-info', 'value' => $preview_text ),
+					array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview btn-info', 'value' => /* TRANS: Verb */ T_('Preview') ),
 					array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit SaveButton', 'value' => T_('Send comment') )
 				) );
 

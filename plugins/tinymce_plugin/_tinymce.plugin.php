@@ -710,7 +710,7 @@ class tinymce_plugin extends Plugin
 					// Anyway, not using AJAX to fetch the file makes it more cachable anyway.
 					require_js( '#tinymce#', 'blog', false, true );
 					require_js( '#tinymce_jquery#', 'blog', false, true );
-					require_js( $this->get_plugin_url().'js/evo_view_shortcodes.bmin.js', 'blog', false, true );
+					$this->require_js( 'js/evo_view_shortcodes.bmin.js', true );
 					?>
 
 					<script>

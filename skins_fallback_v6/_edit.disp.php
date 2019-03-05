@@ -317,11 +317,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 
 	// ####################### ATTACHMENTS/LINKS #########################
-	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
-			$current_User->check_perm( 'files', 'view', false ) )
-	{	// Display attachments fieldset:
-		display_attachments_fieldset( $Form, $LinkOwner );
-	}
+	$Form->attachments_fieldset( $edited_Item );
 
 	// ################### TEXT RENDERERS & CATEGORIES ###################
 	if( $Blog->get_setting( 'in_skin_editing_renderers' ) )

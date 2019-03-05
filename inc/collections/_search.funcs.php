@@ -137,29 +137,51 @@ function score_tags( $tag_name, $search_term, $score_weight = 4 )
  * Return a search score for the given date. Recent dates get higher scores.
  *
  * @param string the date to score
+ * @param array Score weights depending on date:
+ *               - 'future'     - Wrong date because it is more than current local time
+ *               - 'more_month' - Date is more month
+ *               - 'last_month' - Last month
+ *               - 'two_weeks'  - Last two weeks
+ *               - 'last_week'  - Last week, We subtract from this score a number of day and result cannot be less than 'two_weeks'
  * @return integer the result score
  */
-function score_date( $date )
+function score_date( $date, $score_weights = array() )
 {
 	global $localtimenow;
 
+	$score_weights = array_merge( array(
+			'future'     => 0,
+			'more_month' => 0,
+			'last_month' => 1,
+			'two_weeks'  => 2,
+			'last_week'  => 8,
+		), $score_weights );
+
 	$day_diff = floor( ($localtimenow - strtotime($date)) / (60 * 60 * 24) );
 	if( $day_diff < 0 )
-	{
-		return 0;
+	{	// If date is more current locale time:
+		return $score_weights['future'];
 	}
 
 	if( $day_diff <= 7 )
-	{
-		return ( ( $day_diff < 5 ) ? ( 8 - $day_diff ) : 3 );
+	{	// Last week:
+		$score = $score_weights['last_week'] - $day_diff;
+		return ( $score > $score_weights['two_weeks'] ) ? $score : $score_weights['two_weeks'] + 1;
 	}
 
 	if( $day_diff < 15 )
-	{
-		return 2;
+	{	// Last two weeks:
+		return $score_weights['two_weeks'];
 	}
 
-	return ( ( $day_diff < 31 ) ? 1 : 0 );
+	if( $day_diff < 31 )
+	{	// Last month:
+		return $score_weights['last_month'];
+	}
+	else
+	{	// More month:
+		return $score_weights['more_month'];
+	}
 }
 
 
@@ -382,16 +404,22 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
 	{
 		$scores_map = array();
 
-		$scores_map['title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts, /* multiplier: */ 5 );
-		$scores_map['content'] = score_text( $row->post_content, $search_term, $keywords, $quoted_parts );
-		$scores_map['tags'] = score_tags( $row->tag_name, $search_term, /* multiplier: */ 4 );
-		$scores_map['excerpt'] = score_text( $row->post_excerpt, $search_term, $keywords, $quoted_parts );
-		$scores_map['titletag'] = score_text( $row->post_titletag, $search_term, $keywords, $quoted_parts, 4 );
+		$scores_map['title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_post_title' ) );
+		$scores_map['content'] = score_text( $row->post_content, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_post_content' ) );
+		$scores_map['tags'] = score_tags( $row->tag_name, $search_term, /* multiplier: */ $Blog->get_setting( 'search_score_post_tags' ) );
+		$scores_map['excerpt'] = score_text( $row->post_excerpt, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_post_excerpt' ) );
+		$scores_map['titletag'] = score_text( $row->post_titletag, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_post_titletag' ) );
 		if( !empty( $search_term ) && !empty( $row->creator_login ) && utf8_stripos( $row->creator_login, $search_term ) !== false )
 		{
-			$scores_map['creator_login'] = 5;
+			$scores_map['creator_login'] = /* multiplier: */ $Blog->get_setting( 'search_score_post_author' );
 		}
-		$scores_map['last_mod_date'] = score_date( $row->post_datemodified );
+		$scores_map['last_mod_date'] = score_date( $row->post_datemodified, /* multipliers: */ array(
+				'future'     => $Blog->get_setting( 'search_score_post_date_future' ),
+				'more_month' => $Blog->get_setting( 'search_score_post_date_moremonth' ),
+				'last_month' => $Blog->get_setting( 'search_score_post_date_lastmonth' ),
+				'two_weeks'  => $Blog->get_setting( 'search_score_post_date_twoweeks' ),
+				'last_week'  => $Blog->get_setting( 'search_score_post_date_lastweek' ),
+			) );
 
 		$final_score = $scores_map['title']['score']
 			+ $scores_map['content']['score']
@@ -466,13 +494,19 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts, $aut
 	{
 		$scores_map = array();
 
-		$scores_map['item_title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts );
-		$scores_map['content'] = score_text( $row->comment_content, $search_term, $keywords, $quoted_parts );
+		$scores_map['item_title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_cmnt_post_title' ) );
+		$scores_map['content'] = score_text( $row->comment_content, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_cmnt_content' ) );
 		if( !empty( $row->author ) && !empty( $search_term ) && utf8_stripos( $row->author, $search_term ) !== false )
 		{
-			$scores_map['author_name'] = 5;
+			$scores_map['author_name'] = /* multiplier: */ $Blog->get_setting( 'search_score_cmnt_author' );
 		}
-		$scores_map['creation_date'] = score_date( $row->comment_date );
+		$scores_map['creation_date'] = score_date( $row->comment_date, /* multipliers: */ array(
+				'future'     => $Blog->get_setting( 'search_score_cmnt_date_future' ),
+				'more_month' => $Blog->get_setting( 'search_score_cmnt_date_moremonth' ),
+				'last_month' => $Blog->get_setting( 'search_score_cmnt_date_lastmonth' ),
+				'two_weeks'  => $Blog->get_setting( 'search_score_cmnt_date_twoweeks' ),
+				'last_week'  => $Blog->get_setting( 'search_score_cmnt_date_lastweek' ),
+			) );
 
 		$final_score = $scores_map['item_title']['score']
 			+ $scores_map['content']['score']
@@ -524,8 +558,8 @@ function search_and_score_chapters( $search_term, $keywords, $quoted_parts )
 	while( ( $iterator_Chapter = & $ChapterCache->get_next() ) != NULL )
 	{
 		$scores_map = array();
-		$scores_map['name'] = score_text( $iterator_Chapter->get( 'name' ), $search_term, $keywords, $quoted_parts, 3 );
-		$scores_map['description'] = score_text( $iterator_Chapter->get( 'description' ), $search_term, $keywords, $quoted_parts );
+		$scores_map['name'] = score_text( $iterator_Chapter->get( 'name' ), $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_cat_name' ) );
+		$scores_map['description'] = score_text( $iterator_Chapter->get( 'description' ), $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_cat_desc' ) );
 
 		$final_score = $scores_map['name']['score']
 			+ $scores_map['description']['score'];
@@ -585,7 +619,7 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
 		}
 
 		$scores_map = array();
-		$scores_map['name'] = score_text( $tag->tag_name, $search_term, $keywords, $quoted_parts, 3 );
+		$scores_map['name'] = score_text( $tag->tag_name, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_tag_name' ) );
 		$final_score = $scores_map['name']['score'];
 
 		$search_result[] = array(
@@ -680,11 +714,11 @@ function search_and_score_files( $search_term, $keywords, $quoted_parts, $author
 		}
 
 		$scores_map = array();
-		$scores_map['filename']    = score_text( basename( $file->file_path ), $search_term, $keywords, $quoted_parts, 3 );
-		$scores_map['filepath']    = score_text( $file->file_path, $search_term, $keywords, $quoted_parts );
-		$scores_map['title']       = score_text( $file->file_title, $search_term, $keywords, $quoted_parts, 3 );
-		$scores_map['alt']         = score_text( $file->file_alt, $search_term, $keywords, $quoted_parts );
-		$scores_map['description'] = score_text( $file->file_desc, $search_term, $keywords, $quoted_parts );
+		$scores_map['filename']    = score_text( basename( $file->file_path ), $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_file_name' ) );
+		$scores_map['filepath']    = score_text( $file->file_path, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_file_path' ) );
+		$scores_map['title']       = score_text( $file->file_title, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_file_title' ) );
+		$scores_map['alt']         = score_text( $file->file_alt, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_file_alt' ) );
+		$scores_map['description'] = score_text( $file->file_desc, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_file_description' ) );
 
 		$final_score = $scores_map['filename']['score']
 				+ ( isset( $scores_map['filepath'] ) ? $scores_map['filepath']['score'] : 0 )
@@ -1624,6 +1658,8 @@ function display_search_result( $params = array() )
  */
 function display_score_map( $params )
 {
+	global $Blog;
+
 	echo '<ul class="search_score_map dimmed">';
 
 	echo '<li>Date: '.( empty( $params['score_date'] ) ? 'None' : mysql2localedatetime( $params['score_date'] ) ).'</li>';
@@ -1642,9 +1678,9 @@ function display_score_map( $params )
 					case 'creation_date':
 						echo '<li>'.sprintf( '%d points.', $score_map );
 						echo ' Rule: The number of points are calculated based on the days passed since creation or last modification';
-						echo '<ul><li>days_passed < 5 => ( 8 - days_passed )</li>';
-						echo '<li>5 <= days_passed < 8 => 3</li>';
-						echo '<li>when days_passed >= 8: ( days_passed < 15 ? 2 : ( days_passed < 30 ? 1 : 0 ) )</li>';
+						echo '<ul><li>days_passed < 5 => ( '.$Blog->get_setting( 'search_score_post_date_lastweek' ).' - days_passed )</li>';
+						echo '<li>'.$Blog->get_setting( 'search_score_post_date_lastweek' ).' <= days_passed < 8 => '.( $Blog->get_setting( 'search_score_post_date_twoweeks' ) + 1 ).'</li>';
+						echo '<li>when days_passed >= 8: ( days_passed < 15 ? '.$Blog->get_setting( 'search_score_post_date_twoweeks' ).' : ( days_passed < 31 ? '.$Blog->get_setting( 'search_score_post_date_lastmonth' ).' : '.$Blog->get_setting( 'search_score_post_date_moremonth' ).' ) )</li>';
 						echo '</ul>';
 						break;
 
@@ -1727,17 +1763,17 @@ function display_score_map( $params )
 				{
 					case 'word_case_sensitive_match':
 						// If at least one word from requested phrase is case sensitive matched:
-						echo '<li>Case sensitive mathces</li>';
+						echo '<li>Case sensitive matches</li>';
 						break;
 
 					case 'whole_word_match':
 						// If at least one whole word from requested phrase is case insensitive matched:
-						echo '<li>Whole word mathces</li>';
+						echo '<li>Whole word matches</li>';
 						break;
 
 					case 'word_case_insensitive_match':
 						// If at least one word from requested phrase is case insensitive matched:
-						echo '<li>Case insensitive mathces</li>';
+						echo '<li>Case insensitive matches</li>';
 						break;
 
 					case 'word_multiple_occurences':

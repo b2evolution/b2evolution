@@ -55,7 +55,7 @@ $Results->grp_cols[] = array(
 	);
 */
 
-$Results->title = T_('Installed plugins').get_manual_link('installed_plugins');
+$Results->title = T_('Installed plugins').get_manual_link('installed-plugins');
 
 if( count( $admin_Plugins->get_plugin_groups() ) )
 {
