@@ -273,14 +273,14 @@ class CollectionSettings extends AbstractSettings
 			'search_score_cmnt_date_lastmonth' => 1, // weight multiplier for comments from the last month
 			'search_score_cmnt_date_twoweeks'  => 2, // weight multiplier for comments from the last two weeks
 			'search_score_cmnt_date_lastweek'  => 8, // weight multiplier for comments from the last week
-			'search_score_cat_name'            => 3, // weight multiplier for keywords found in category name
-			'search_score_cat_desc'            => 1, // weight multiplier for keywords found in category description
-			'search_score_tag_name'            => 3, // weight multiplier for keywords found in tag name
 			'search_score_file_name'           => 3, // weight multiplier for keywords found in file name
 			'search_score_file_path'           => 1, // weight multiplier for keywords found in file path
 			'search_score_file_title'          => 3, // weight multiplier for keywords found in file long title
 			'search_score_file_alt'            => 1, // weight multiplier for keywords found in file alternative text
 			'search_score_file_description'    => 1, // weight multiplier for keywords found in file caption/description
+			'search_score_cat_name'            => 3, // weight multiplier for keywords found in category name
+			'search_score_cat_desc'            => 1, // weight multiplier for keywords found in category description
+			'search_score_tag_name'            => 3, // weight multiplier for keywords found in tag name
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
 
 		// Time frame settings:

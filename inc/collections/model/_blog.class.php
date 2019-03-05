@@ -1080,17 +1080,17 @@ class Blog extends DataObject
 			$this->set_setting( 'search_score_cmnt_date_lastmonth', param( 'search_score_cmnt_date_lastmonth', 'integer', 0 ) );
 			$this->set_setting( 'search_score_cmnt_date_twoweeks', param( 'search_score_cmnt_date_twoweeks', 'integer', 0 ) );
 			$this->set_setting( 'search_score_cmnt_date_lastweek', param( 'search_score_cmnt_date_lastweek', 'integer', 0 ) );
-			// Scoring for categories:
-			$this->set_setting( 'search_score_cat_name', param( 'search_score_cat_name', 'integer', 0 ) );
-			$this->set_setting( 'search_score_cat_desc', param( 'search_score_cat_desc', 'integer', 0 ) );
-			// Scoring for tags:
-			$this->set_setting( 'search_score_tag_name', param( 'search_score_tag_name', 'integer', 0 ) );
 			// Scoring for files:
 			$this->set_setting( 'search_score_file_name', param( 'search_score_file_name', 'integer', 0 ) );
 			$this->set_setting( 'search_score_file_path', param( 'search_score_file_path', 'integer', 0 ) );
 			$this->set_setting( 'search_score_file_title', param( 'search_score_file_title', 'integer', 0 ) );
 			$this->set_setting( 'search_score_file_alt', param( 'search_score_file_alt', 'integer', 0 ) );
 			$this->set_setting( 'search_score_file_description', param( 'search_score_file_description', 'integer', 0 ) );
+			// Scoring for categories:
+			$this->set_setting( 'search_score_cat_name', param( 'search_score_cat_name', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cat_desc', param( 'search_score_cat_desc', 'integer', 0 ) );
+			// Scoring for tags:
+			$this->set_setting( 'search_score_tag_name', param( 'search_score_tag_name', 'integer', 0 ) );
 
 			// Latest comments :
 			param_integer_range( 'latest_comments_num', 1, 9999, T_('Number of shown comments must be between %d and %d.') );
