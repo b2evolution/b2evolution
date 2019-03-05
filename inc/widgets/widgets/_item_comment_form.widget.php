@@ -577,36 +577,6 @@ class item_comment_form_Widget extends ComponentWidget
 			) );
 			$quick_setting_switch = ob_get_flush();
 
-			// Attach files:
-			if( !empty( $comment_attachments ) )
-			{	// display already attached files checkboxes
-				$FileCache = & get_FileCache();
-				$attachments = explode( ',', $comment_attachments );
-				$final_attachments = explode( ',', $checked_attachments );
-				// create attachments checklist
-				$list_options = array();
-				foreach( $attachments as $attachment_ID )
-				{
-					$attachment_File = $FileCache->get_by_ID( $attachment_ID, false );
-					if( $attachment_File )
-					{
-						// checkbox should be checked only if the corresponding file id is in the final attachments array
-						$checked = in_array( $attachment_ID, $final_attachments );
-						$list_options[] = array( 'preview_attachment'.$attachment_ID, 1, '', $checked, false, $attachment_File->get( 'name' ) );
-					}
-				}
-				if( !empty( $list_options ) )
-				{	// display list
-					$Form->checklist( $list_options, 'comment_attachments', T_( 'Attached files' ) );
-				}
-				// memorize all attachments ids
-				$Form->hidden( 'preview_attachments', $comment_attachments );
-			}
-			if( $Item->can_attach() )
-			{	// Display attach file input field
-				$Form->input_field( array( 'label' => T_('Attach files'), 'note' => $widget_params['comment_attach_info'], 'name' => 'uploadfile[]', 'type' => 'file' ) );
-			}
-
 			// Additional options:
 			$comment_options = array();
 			if( ! is_logged_in( false ) )
@@ -640,6 +610,41 @@ class item_comment_form_Widget extends ComponentWidget
 				$Form->info( T_('Text Renderers'), $comment_renderer_checkboxes );
 			}
 
+			// Attach files:
+			if( !empty( $comment_attachments ) )
+			{	// display already attached files checkboxes
+				$FileCache = & get_FileCache();
+				$attachments = explode( ',', $comment_attachments );
+				$final_attachments = explode( ',', $checked_attachments );
+				// create attachments checklist
+				$list_options = array();
+				foreach( $attachments as $attachment_ID )
+				{
+					$attachment_File = $FileCache->get_by_ID( $attachment_ID, false );
+					if( $attachment_File )
+					{
+						// checkbox should be checked only if the corresponding file id is in the final attachments array
+						$checked = in_array( $attachment_ID, $final_attachments );
+						$list_options[] = array( 'preview_attachment'.$attachment_ID, 1, '', $checked, false, $attachment_File->get( 'name' ) );
+					}
+				}
+				if( !empty( $list_options ) )
+				{	// display list
+					$Form->checklist( $list_options, 'comment_attachments', T_( 'Attached files' ) );
+				}
+				// memorize all attachments ids
+				$Form->hidden( 'preview_attachments', $comment_attachments );
+			}
+			if( $Item->can_attach() )
+			{	// Display attach file input field when JavaScript is disabled:
+				echo '<noscript>';
+				$Form->input_field( array( 'label' => T_('Attach files'), 'note' => $widget_params['comment_attach_info'], 'name' => 'uploadfile[]', 'type' => 'file' ) );
+				echo '<p>'.T_('Please enable JavaScript to use file uploader.').'</p>';
+				echo '</noscript>';
+			}
+			// Display attachments fieldset:
+			$Form->attachments_fieldset( $Comment, false, $Comment->is_meta() ? 'meta_' : '' );
+
 			$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
 
 			// Display plugin captcha for comment form before submit button:
@@ -655,6 +660,11 @@ class item_comment_form_Widget extends ComponentWidget
 				$preview_text = ( $Item->can_attach() ) ? T_('Preview/Add file') : T_('Preview');
 				$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview btn-info', 'value' => $preview_text, 'tabindex' => 9 ) );
 				$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit SaveButton', 'value' => $widget_params['form_submit_text'], 'tabindex' => 10 ) );
+
+				if( $Item->can_attach() )
+				{	// Don't display "/Add file" on the preview button if JS is enabled:
+					echo '<script type="text/javascript">jQuery( "input[type=submit].preview.btn-info" ).val( "'.TS_('Preview').'" )</script>';
+				}
 
 				$Plugins->trigger_event( 'DisplayCommentFormButton', array( 'Form' => & $Form, 'Item' => & $Item ) );
 
