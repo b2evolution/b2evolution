@@ -70,19 +70,19 @@ $Form->begin_fieldset( T_('Search results').get_manual_link( 'search-results-oth
 			'cmnt_date_twoweeks'  => T_('weight multiplier for comments from the last two weeks'),
 			'cmnt_date_lastweek'  => T_('weight multiplier for comments from the last week, depending on the days passed since modification date, and it is restricted with min value as weight multiplier of last two weeks'),
 		),
-		T_('Scoring for categories') => array(
-			'cat_name'            => T_('weight multiplier for keywords found in category name'),
-			'cat_desc'            => T_('weight multiplier for keywords found in category description'),
-		),
-		T_('Scoring for tags') => array(
-			'tag_name'            => T_('weight multiplier for keywords found in tag name'),
-		),
 		T_('Scoring for files') => array(
 			'file_name'           => T_('weight multiplier for keywords found in file name'),
 			'file_path'           => T_('weight multiplier for keywords found in file path'),
 			'file_title'          => T_('weight multiplier for keywords found in file long title'),
 			'file_alt'            => T_('weight multiplier for keywords found in file alternative text'),
 			'file_description'    => T_('weight multiplier for keywords found in file caption/description'),
+		),
+		T_('Scoring for categories') => array(
+			'cat_name'            => T_('weight multiplier for keywords found in category name'),
+			'cat_desc'            => T_('weight multiplier for keywords found in category description'),
+		),
+		T_('Scoring for tags') => array(
+			'tag_name'            => T_('weight multiplier for keywords found in tag name'),
 		),
 	);
 	foreach( $score_settings as $score_group_title => $score_settings_data )
