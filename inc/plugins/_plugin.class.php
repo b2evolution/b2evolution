@@ -4287,7 +4287,7 @@ class Plugin
 	 * this function is used to add unique version number for each plugin
 	 *
 	 * @param string Name of CSS file relative to current plugin folder
-	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head>
 	 */
 	function require_css( $css_file, $output = false )
 	{
@@ -4302,11 +4302,12 @@ class Plugin
 	 * this function is used to add unique version number for each plugin
 	 *
 	 * @param string Name of JavaScript file relative to plugin folder
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
 	 */
-	function require_js( $js_file )
+	function require_js( $js_file, $output = false )
 	{
 		global $app_version_long;
-		require_js( $this->get_plugin_url().$js_file, 'relative', false, false, $this->version.'+'.$app_version_long );
+		require_js( $this->get_plugin_url().$js_file, 'relative', false, $output, $this->version.'+'.$app_version_long );
 	}
 }
 

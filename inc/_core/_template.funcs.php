@@ -1171,7 +1171,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
  * @param string title.  The title for the link tag
  * @param string media.  ie, 'print'
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
- * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+ * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head>
  */
 function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false )
 {
