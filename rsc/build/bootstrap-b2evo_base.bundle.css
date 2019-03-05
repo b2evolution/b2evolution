@@ -3752,8 +3752,8 @@ div.evo_fileuploader_form {
 .evo_attachments_fieldset__wrapper table tbody td {
   cursor: move;
 }
-#filelist_tbody tr:first-child .action_icon_link_move_up,
-#filelist_tbody tr:last-child .action_icon_link_move_down {
+.filelist_tbody tr:first-child .action_icon_link_move_up,
+.filelist_tbody tr:last-child .action_icon_link_move_down {
   visibility: hidden;
 }
 .evo_widget_form__compact,

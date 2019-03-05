@@ -46,14 +46,17 @@ function evo_link_initialize_fieldset( fieldset_prefix )
 /**
  * Fix height of attachments wrapper
  * Used after content changing by AJAX loading
+ *
+ * @param string Fieldset prefix, e-g 'meta_' when two forms are used on the same page
  */
-function evo_link_fix_wrapper_height()
+function evo_link_fix_wrapper_height( fieldset_prefix )
 {
-	var table_height = jQuery( '#attachments_fieldset_table' ).height();
-	var wrapper_height = jQuery( '#attachments_fieldset_wrapper' ).height();
+	var prefix = typeof( fieldset_prefix ) == 'undefined' ? '' : fieldset_prefix;
+	var table_height = jQuery( '#' + prefix + 'attachments_fieldset_table' ).height();
+	var wrapper_height = jQuery( '#' + prefix + 'attachments_fieldset_wrapper' ).height();
 	if( wrapper_height != table_height )
 	{
-		jQuery( '#attachments_fieldset_wrapper' ).height( jQuery( '#attachments_fieldset_table' ).height() );
+		jQuery( '#' + prefix + 'attachments_fieldset_wrapper' ).height( jQuery( '#' + prefix + 'attachments_fieldset_table' ).height() );
 	}
 }
 
@@ -346,10 +349,13 @@ function evo_link_refresh_list( type, object_ID, action )
 
 /**
  * Sort list of Item/Comment attachments based on link_order
+ *
+ * @param string Fieldset prefix, e-g 'meta_' when two forms are used on the same page
  */
-function evo_link_sort_list()
+function evo_link_sort_list( fieldset_prefix )
 {
-	var rows = jQuery( 'tr', 'tbody#filelist_tbody' );
+	var prefix = typeof( fieldset_prefix ) == 'undefined' ? '' : fieldset_prefix;
+	var rows = jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table tbody.filelist_tbody tr' );
 	rows.sort( function( a, b )	{
 		var A = parseInt( jQuery( 'span[data-order]', a ).attr( 'data-order' ) );
 		var B = parseInt( jQuery( 'span[data-order]', b ).attr( 'data-order' ) );
@@ -374,7 +380,7 @@ function evo_link_sort_list()
 	$.each( rows, function( index, row ) {
 		if( index === 0 )
 		{
-			jQuery( row ).prependTo( 'tbody#filelist_tbody' );
+			jQuery( row ).prependTo( '#' + fieldset_prefix + 'attachments_fieldset_table tbody.filelist_tbody' );
 			previousRow = row;
 		}
 		else
