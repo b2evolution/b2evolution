@@ -28,69 +28,92 @@ load_class( 'messaging/model/_message.class.php', 'Message' );
  *
  * @param string link type ( item, comment, ... )
  * @param integer the corresponding object ID
+ * @return object|NULL Link Owner
  */
-function & get_link_owner( $link_type, $object_ID )
+function & get_LinkOwner( $link_type, $object_ID )
 {
+	$LinkOwner = NULL;
+
+	if( empty( $object_ID ) )
+	{	// ID must be defined to get Link Owner:
+		return $LinkOwner;
+	}
+
 	switch( $link_type )
 	{
 		case 'item':
 			// Create LinkItem object:
 			$ItemCache = & get_ItemCache();
-			$Item = $ItemCache->get_by_ID( $object_ID, false );
-			$LinkOwner = new LinkItem( $Item );
+			if( $Item = & $ItemCache->get_by_ID( $object_ID, false ) )
+			{	// If Item is found in DB by ID:
+				$LinkOwner = new LinkItem( $Item );
+			}
 			break;
 
 		case 'comment':
 			// Create LinkComment object:
 			$CommentCache = & get_CommentCache();
-			$Comment = $CommentCache->get_by_ID( $object_ID, false );
-			$LinkOwner = new LinkComment( $Comment );
+			if( $Comment = & $CommentCache->get_by_ID( $object_ID, false ) )
+			{	// If Comment is found in DB by ID:
+				$LinkOwner = new LinkComment( $Comment );
+			}
 			break;
 
 		case 'user':
 			// Create LinkUser object:
 			$UserCache = & get_UserCache();
-			$User = $UserCache->get_by_ID( $object_ID, false );
-			$LinkOwner = new LinkUser( $User );
+			if( $User = & $UserCache->get_by_ID( $object_ID, false ) )
+			{	// If User is found in DB by ID:
+				$LinkOwner = new LinkUser( $User );
+			}
 			break;
 
 		case 'emailcampaign':
 			// Create LinkEmailCampaign object:
 			$EmailCampaignCache = & get_EmailCampaignCache();
-			$EmailCampaign = $EmailCampaignCache->get_by_ID( $object_ID, false );
-			$LinkOwner = new LinkEmailCampaign( $EmailCampaign );
+			if( $EmailCampaign = $EmailCampaignCache->get_by_ID( $object_ID, false ) )
+			{
+				$LinkOwner = new LinkEmailCampaign( $EmailCampaign );
+			}
 			break;
 
 		case 'message':
 			// Create LinkMessage object:
 			$MessageCache = & get_MessageCache();
-			$Message = $MessageCache->get_by_ID( $object_ID, false );
-			$LinkOwner = new LinkMessage( $Message );
+			if( $Message = & $MessageCache->get_by_ID( $object_ID, false ) )
+			{	// If Message is found in DB by ID:
+				$LinkOwner = new LinkMessage( $Message );
+			}
 			break;
 
 		case 'temporary':
 			// Create Link temporary object:
 			$TemporaryIDCache = & get_TemporaryIDCache();
-			$TemporaryID = $TemporaryIDCache->get_by_ID( $object_ID, false );
-			switch( $TemporaryID->get( 'type' ) )
-			{
-				case 'message':
-					load_class( 'messaging/model/_message.class.php', 'Message' );
-					$LinkOwner = new LinkMessage( new Message(), $object_ID );
-					break;
+			if( $TemporaryID = & $TemporaryIDCache->get_by_ID( $object_ID, false ) )
+			{	// If TemporaryID is found in DB by ID:
+				switch( $TemporaryID->get( 'type' ) )
+				{
+					case 'message':
+						load_class( 'messaging/model/_message.class.php', 'Message' );
+						$LinkOwner = new LinkMessage( new Message(), $object_ID );
+						break;
 
-				case 'item':
-					load_class( 'items/model/_item.class.php', 'Item' );
-					$LinkOwner = new LinkItem( new Item(), $object_ID );
-					break;
+					case 'item':
+						load_class( 'items/model/_item.class.php', 'Item' );
+						$LinkOwner = new LinkItem( new Item(), $object_ID );
+						break;
+
+					case 'comment':
+						load_class( 'comments/model/_comment.class.php', 'Comment' );
+						$LinkOwner = new LinkComment( new Comment(), $object_ID );
+						break;
+				}
+				$LinkOwner->tmp_ID = $object_ID;
+				$LinkOwner->type = 'temporary';
 			}
-			$LinkOwner->tmp_ID = $object_ID;
-			$LinkOwner->type = 'temporary';
 			break;
-
-		default:
-			$LinkOwner = NULL;
 	}
+
 	return $LinkOwner;
 }
 
@@ -119,10 +142,10 @@ function get_link_owner_type( $link_ID )
  *
  * @param object Form
  * @param object LinkOwner object
- * @param boolean true if creating new owner object, false otherwise
  * @param boolean true to allow folding for this fieldset, false otherwise
+ * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
  */
-function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false, $fold = false )
+function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fieldset_prefix = '' )
 {
 	global $admin_url, $inc_path;
 	global $current_User, $action;
@@ -132,10 +155,8 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 		return;
 	}
 
-	if( ! is_logged_in()
-	    || ! $current_User->check_perm( 'files', 'view' )
-	    || ! $LinkOwner->check_perm( 'edit', false ) )
-	{	// Current user has no perm to view files:
+	if( ! $LinkOwner->check_perm( 'edit', false ) )
+	{	// Current user has no perm to edit the link owner:
 		return;
 	}
 
@@ -148,7 +169,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 			break;
 
 		case 'comment':
-			$window_title = format_to_js( sprintf( T_('Attach files to comment #%s'), $LinkOwner->Comment->ID ) );
+			$window_title = $LinkOwner->is_temp() ? '' : format_to_js( sprintf( T_('Attach files to comment #%s'), $LinkOwner->Comment->ID ) );
 			$form_id = 'cmntform_links';
 			break;
 
@@ -170,30 +191,12 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 
 	$fieldset_title = T_( 'Images &amp; Attachments' );
 
-	if( $creating )
-	{ // Creating new Item
-		$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' ).' - <a id="title_file_add" href="#" class="action_icon">'.get_icon( 'folder' ).' '.T_('Attach existing files').'</a>';
-
-		$Form->begin_fieldset( $fieldset_title, array( 'id' => 'itemform_createlinks', 'fold' => $fold ) );
-
-		$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save post to start uploading files'), 'SaveEditButton' ) );
-
-		if( get_param( 'p' ) > 0 )
-		{	// Display a button to duplicate the attachments to new item:
-			$Form->submit( array( 'actionArray[create_link]', /* TRANS: This is the value of an input submit button */ T_('Save & Link files from original'), 'SaveEditButton' ) );
-		}
-
-		$Form->end_fieldset();
-
-		return;
-	}
-
 	if( is_admin_page() )
 	{	// Display a link to manual page only on back-office:
 		$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' );
 	}
 
-	if( $current_User->check_perm( 'admin', 'restricted' ) )
+	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) )
 	{	// Check if current user has a permission to back-office files manager:
 		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type='.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).( $LinkOwner->type != 'message' ? '&amp;link_object_ID='.$LinkOwner->get_ID() : '' );
 		if( $linkowner_FileList = $LinkOwner->get_attachment_FileList( 1 ) )
@@ -209,10 +212,13 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 		$fieldset_title .= ' - '
 			.action_icon( T_('Attach existing files'), 'folder', $attach_files_url,
 				T_('Attach existing files'), 3, 4,
-				array( 'onclick' => 'return link_attachment_window( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) )
-			.action_icon( T_('Attach existing files'), 'permalink', $attach_files_url,
+				array( 'onclick' => 'return link_attachment_window( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) );
+		if( ! $LinkOwner->is_temp() )
+		{	// Don't allow this option for new creating objects:
+			$fieldset_title .= action_icon( T_('Attach existing files'), 'permalink', $attach_files_url,
 				T_('Attach existing files'), 1, 0,
 				array( 'target' => '_blank' ) );
+		}
 	}
 
 	$fieldset_title .= '<span class="floatright panel_heading_action_icons">&nbsp;'
@@ -220,7 +226,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 			.action_icon( T_('Refresh'), 'refresh', $LinkOwner->get_edit_url(),
 				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) )
 
-			.action_icon( T_('Sort'), 'ascending', ( is_admin_page() || $current_User->check_perm( 'admin', 'restricted' ) )
+			.action_icon( T_('Sort'), 'ascending', ( is_admin_page() || ( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) ) )
 				? $admin_url.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' )
 				: $LinkOwner->get_edit_url().'#',
 				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'sort\' )' ) )
@@ -231,14 +237,15 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 	$links_count = count( $LinkOwner->get_Links() );
 
 	$Form->begin_fieldset( $fieldset_title, array(
-			'id' => $form_id,
+			'id' => $fieldset_prefix.$form_id,
+			'style' => 'display:none', // Show this uploader fieldset only when JS is enabled
 			'fold' => $fold,
 			'deny_fold' => ( $links_count > 0 )
 		) );
 
-	echo '<div id="attachments_fieldset_wrapper">';
-		echo '<div id="attachments_fieldset_block">';
-			echo '<div id="attachments_fieldset_table">';
+	echo '<div id="'.$fieldset_prefix.'attachments_fieldset_wrapper" class="evo_attachments_fieldset__wrapper">';
+		echo '<div id="'.$fieldset_prefix.'attachments_fieldset_block" class="evo_attachments_fieldset__block">';
+			echo '<div id="'.$fieldset_prefix.'attachments_fieldset_table" class="evo_attachments_fieldset__table">';
 				require $inc_path.'links/views/_link_list.view.php';
 			echo '</div>';
 		echo '</div>';
@@ -246,8 +253,14 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $creating = false,
 
 	$Form->end_fieldset();
 
-	// Initialize JavaScript to build and open window:
-	echo_modalwindow_js();
+	// Show fieldset of quick uploader only when JS is enabled:
+	echo '<script type="text/javascript">jQuery( "#'.$fieldset_prefix.$form_id.'" ).show()</script>';
+
+	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) )
+	{	// Check if current user has a permission to back-office files manager:
+
+		// Initialize JavaScript to build and open window:
+		echo_modalwindow_js();
 ?>
 <script>
 function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_highlight )
@@ -277,6 +290,7 @@ function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_
 }
 </script>
 <?php
+	}
 }
 
 
@@ -477,7 +491,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 									 'data-link-id' => $link_ID ) );
 	}
 
-	if( $current_File && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
+	if( $current_File && is_logged_in() && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
 	{ // Locate file
 		$title = $current_File->dir_or_file( T_('Locate this directory!'), T_('Locate this file!') );
 		$url = $current_File->get_linkedit_url( $LinkOwner->type, $LinkOwner->get_ID() );
@@ -642,14 +656,16 @@ jQuery( document ).on( 'change', 'select[id^=display_position_]', {
 
 /**
  * Print out JavaScript to make the links table sortable
+ *
+ * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
  */
-function echo_link_sortable_js()
+function echo_link_sortable_js( $fieldset_prefix = '' )
 {
 ?>
 <script>
 jQuery( document ).ready( function()
 {
-	jQuery( '#attachments_fieldset_table table' ).sortable(
+	jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table' ).sortable(
 	{
 		containerSelector: 'table',
 		itemPath: '> tbody',
@@ -665,12 +681,12 @@ jQuery( document ).ready( function()
 		},
 		onDrop: function( $item, container, _super )
 		{
-			jQuery( '#attachments_fieldset_table table tr' ).removeClass( 'odd even' );
-			jQuery( '#attachments_fieldset_table table tr:odd' ).addClass( 'even' );
-			jQuery( '#attachments_fieldset_table table tr:even' ).addClass( 'odd' );
+			jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table tr' ).removeClass( 'odd even' );
+			jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table tr:odd' ).addClass( 'even' );
+			jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table tr:even' ).addClass( 'odd' );
 
 			var link_IDs = '';
-			jQuery( '#attachments_fieldset_table table tr' ).each( function()
+			jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table tr' ).each( function()
 			{
 				var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
 				if( link_ID_cell.length > 0 )
@@ -986,5 +1002,38 @@ function sort_links_by_filename( $a_Link, $b_Link )
 	}
 
 	return $r;
+}
+
+
+function link_add_iframe( $link_destination )
+{
+	global $LinkOwner, $current_File, $iframe_name, $link_type;
+	$link_owner_ID = $LinkOwner->get_ID();
+
+	if( $current_File->is_dir() && isset( $iframe_name ) )
+	{
+		$root = $current_File->get_FileRoot()->ID;
+		$path = $current_File->get_rdfp_rel_path();
+
+		// this could be made more robust
+		$link_destination = str_replace( '<a ', "<a onclick=\"return link_attachment_window( '${link_type}', '${link_owner_ID}', '${root}', '${path}' );\" ", $link_destination );
+	}
+
+	return $link_destination;
+}
+
+
+/*
+ * Sub Type column
+ */
+function display_subtype( $link_ID )
+{
+	global $LinkOwner, $current_File;
+
+	$Link = $LinkOwner->get_link_by_link_ID( $link_ID );
+	// Instantiate a File object for this line
+	$current_File = $Link->get_File();
+
+	return $Link->get_preview_thumb();
 }
 ?>

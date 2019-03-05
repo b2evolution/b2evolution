@@ -10345,6 +10345,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13120, 'Upgrade Temporary IDs table...' ) )
+	{	// part of 6.11.0-beta
+		db_add_col( 'T_temporary_ID', 'tmp_item_ID', 'INT(11) UNSIGNED NULL COMMENT \'Link to parent Item of Comment in order to enable permission checks\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13130, 'Upgrade links table...' ) )
+	{	// part of 6.11.0-beta
+		db_drop_col( 'T_links', 'link_ltype_ID' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

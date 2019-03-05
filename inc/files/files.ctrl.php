@@ -82,7 +82,7 @@ if( param( 'link_type', 'string', NULL, true, false, false ) && param( 'link_obj
 	{	// Deny to link skin files to objects:
 		debug_die( 'Skin files are not allowed to link to objects!' );
 	}
-	$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+	$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 	if( empty( $LinkOwner ) )
 	{ // We could not find the owner object to link:
 		$Messages->add( T_('Requested object does not exist any longer.'), 'error' );
@@ -1391,7 +1391,7 @@ switch( $action )
 		}
 
 		// Link file to user
-		$LinkOwner = get_link_owner( 'user', $edited_User->ID );
+		$LinkOwner = get_LinkOwner( 'user', $edited_User->ID );
 		$edited_File->link_to_Object( $LinkOwner );
 		// Assign avatar:
 		$edited_User->set( 'avatar_file_ID', $edited_File->ID );
@@ -1614,9 +1614,8 @@ if( $mode != 'modal' )
 {
 	// require colorbox js
 	require_js_helper( 'colorbox' );
-	// require Fine Uploader js and css:
-	require_js( 'multiupload/fine-uploader.js' );
-	require_css( 'fine-uploader.css' );
+	// Init JS to quick upload several files:
+	init_fileuploader_js( 'rsc_url', false );
 
 	if( $mode == 'upload' || $mode == 'import' )
 	{ // Add css to remove spaces around window

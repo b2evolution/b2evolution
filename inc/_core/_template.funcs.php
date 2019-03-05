@@ -2413,6 +2413,9 @@ function display_ajax_form( $params )
 		return;
 	}
 
+	// Set icons type to display correct icons on bootstrap skins:
+	$params['b2evo_icons_type'] = $b2evo_icons_type;
+
 	if( ! empty( $required_js ) )
 	{	// Send all loaded JS files to ajax request in order to don't load them twice:
 		// yura: It was done because JS of bootstrap modal doesn't work when jquery JS file is loaded twice.
@@ -3773,4 +3776,25 @@ function get_star_rating( $value, $stars_num = 5, $params = array() )
 
 	return $stars_template;
 }
+
+
+/**
+ * Registers headlines for initialization of file multi uploader
+ *
+ * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
+ * @param boolean TRUE to make the links table sortable
+ */
+function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = true )
+{
+	// Require Fine Uploader js and css files:
+	require_js( 'multiupload/fine-uploader.js', $relative_to );
+	require_css( 'fine-uploader.css', $relative_to );
+
+	if( $load_sortable_js )
+	{	// Load JS files to make the links table sortable:
+		require_js( '#jquery#', $relative_to );
+		require_js( 'jquery/jquery.sortable.min.js', $relative_to );
+	}
+}
+
 ?>

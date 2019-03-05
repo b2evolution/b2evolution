@@ -1119,6 +1119,12 @@ class Skin extends DataObject
 						init_autocomplete_login_js( 'blog', $this->get_template( 'autocomplete_plugin' ) );
 						init_datepicker_js( 'blog' );
 					}
+
+					// Used to quick upload several files:
+					init_fileuploader_js( 'blog' );
+
+					// Used to change link position:
+					require_js( 'backoffice.js', 'blog' );
 					break;
 
 				case 'disp_users':
@@ -1303,7 +1309,7 @@ class Skin extends DataObject
 					// Used to display a tooltip to the right of plugin help icon:
 					init_popover_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
-					// Used to switch to advanced editing:
+					// Used to switch to advanced editing and for link position changing:
 					require_js( 'backoffice.js', 'blog' );
 
 					// Used to automatically checks the matching extracat when we select a new main cat:
@@ -1318,12 +1324,8 @@ class Skin extends DataObject
 						require_js( 'bozo_validator.js', 'blog' );
 					}
 
-					// Require Fine Uploader js and css:
-					require_js( 'multiupload/fine-uploader.js', 'blog' );
-					require_css( 'fine-uploader.css', 'blog' );
-					// Load JS files to make the links table sortable:
-					require_js( '#jquery#', 'blog' );
-					require_js( 'jquery/jquery.sortable.min.js', 'blog' );
+					// Used to quick upload several files:
+					init_fileuploader_js( 'blog' );
 					break;
 
 				case 'disp_edit_comment':
@@ -1349,6 +1351,9 @@ class Skin extends DataObject
 
 					// Used to switch to advanced editing:
 					require_js( 'backoffice.js', 'blog' );
+
+					// Used to quick upload several files:
+					init_fileuploader_js( 'blog' );
 					break;
 
 				case 'disp_useritems':
