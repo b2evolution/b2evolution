@@ -377,7 +377,6 @@ class Blog extends DataObject
 				$this->set( 'shortname', empty( $shortname ) ? T_('Home') : $shortname );
 				$this->set( 'urlname', empty( $urlname ) ? 'home' : $urlname );
 				$this->set_setting( 'front_disp', 'front' );
-				$this->set_setting( 'aggregate_coll_IDs', '*' );
 				$this->set_setting( 'in_skin_login', '1' );
 				break;
 

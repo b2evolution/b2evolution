@@ -21,7 +21,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Get config array of default widgets for install, upgrade and new collections
  *
- * @param string Collection kind
+ * @param string Collection kind: 'minisite', 'main', 'std', 'photo', 'forum', 'manual', 'group'
  * @param integer Collection ID
  * @param boolean Should be true only when it's called after initial install
  * @return array
@@ -64,7 +64,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 10, 'basic_menu_link', 'coll_ID' => $blog_b_ID, 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) ),
 		array( 13, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('Latest topics') ) ),
 		array( 15, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest replies') ) ),
-		array( 17, 'flag_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Flagged topics') ) ),
+		array( 17, 'flag_menu_link', 'coll_type' => 'forum,group', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Flagged topics') ) ),
 		array( 13, 'basic_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('Latest pages') ) ),
 		array( 15, 'basic_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest comments') ) ),
 		array( 17, 'flag_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Flagged pages') ) ),
@@ -241,25 +241,35 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	/* Front Page Main Area */
 	$default_widgets['front_page_main_area'] = array(
 		array(  1, 'coll_title', 'coll_type' => 'main,minisite' ),
-		array(  2, 'coll_tagline', 'coll_type' => 'main,minisite' ),
-		array( 10, 'coll_featured_intro', 'coll_type' => '-minisite', 'params' => ( $kind == 'main' ? array(
+		array(  2, 'coll_tagline', 'coll_type' => 'minisite' ),
+		array(  5, 'free_text', 'coll_type' => 'main', 'params' => array(
+				'content' => T_('This is the Home page of your site.')."\n\n"
+					.T_('More specifically it is the "Front page" of the first collection of your site. This first collection is called "Home". Several other sample collections may have been created during the setup process. You can access these collections by clicking "Blog A", "Blog B", "Photos", etc. in the menu bar at the top of this page.')."\n\n"
+					.T_('You can think of collections as "sections" of your site. Different collections/sections may have different purposes: blog, photo gallery, forums, manual, etc. You can add or remove collections at will through the back-office. You can even remove this "Home" collection if you don\'t need it.')."\n\n"
+					.T_('Feel free to experiment! If you delete all collections, the Quick start wizard will come back and you will be able to start with a completely new arrangement of collections.'),
+			) ),
+		array( 10, 'coll_featured_intro', 'coll_type' => '-main,minisite', 'params' => ( $kind == 'main' ? array(
 			// Hide a title of the front intro post:
 				'disp_title' => 0,
 			) : NULL ) ),
 		array( 15, 'user_links', 'coll_type' => 'main' ),
 		array( 20, 'coll_featured_posts', 'coll_type' => '-minisite', 'params' => ( $kind == 'main' ? array(
-			// Display the posts from all other blogs if it is allowed by blogs setting "Collections to aggregate":
-				'blog_ID'    => '',
+				'blog_ID'    => '*', // Display Items from all Collections
 				'limit'      => 5,
 				'layout'     => 'list',
 				'thumb_size' => 'crop-80x80',
 			) : NULL ) ),
+		array( 30, 'coll_post_list', 'coll_type' => 'main', 'params' => array(
+				'blog_ID'  => '*', // Display Items from all Collections
+				'title'    => T_('More Posts'),
+				'featured' => 'other',
+			) ),
 		// Install widget "Poll" only for Blog B on install:
 		array( 40, 'poll', 'coll_ID' => $blog_b_ID, 'params' => array( 'poll_ID' => $demo_poll_ID ) ),
 		array( 45, 'content_hierarchy', 'coll_type' => 'manual' ),
-		array( 50, 'subcontainer_row', 'params' => array(
+		array( 50, 'subcontainer_row', 'coll_type' => '-main', 'params' => array(
 				'column1_container' => 'front_page_column_a',
-				'column1_class'     => ( $kind == 'main' ? 'col-xs-12' : 'col-sm-6 col-xs-12' ),
+				'column1_class'     => 'col-sm-6 col-xs-12',
 				'column2_container' => 'front_page_column_b',
 				'column2_class'     => 'col-sm-6 col-xs-12',
 			) ),
@@ -284,7 +294,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	/* Front Page Secondary Area */
 	$default_widgets['front_page_secondary_area'] = array(
 		array( 10, 'org_members', 'coll_type' => 'main,minisite' ),
-		array( 20, 'coll_flagged_list', 'coll_type' => '-minisite' ),
+		array( 20, 'coll_flagged_list', 'coll_type' => '-main,minisite' ),
 		array( 30, 'content_block', 'coll_type' => 'main', 'params' => array( 'item_slug' => 'this-is-a-content-block' ) ),
 	);
 

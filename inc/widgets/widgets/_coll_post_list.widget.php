@@ -65,7 +65,6 @@ class coll_post_list_Widget extends coll_item_list_Widget
 		// $r['featured']['no_edit'] = true;
 		$r['flagged']['no_edit'] = true;
 		$r['follow_mainlist']['no_edit'] = true;
-		$r['blog_ID']['no_edit'] = true;
 		$r['cat_IDs']['no_edit'] = true;
 		$r['item_group_by']['no_edit'] = true;
 		$r['item_title_link_type']['no_edit'] = true;
