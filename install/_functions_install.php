@@ -879,16 +879,17 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
  */
 function install_basic_widgets( $old_db_version = 0 )
 {
-	/**
-	* @var DB
-	*/
-	global $DB;
+	global $DB, $installed_default_shared_widgets;
 
 	load_funcs( 'widgets/_widgets.funcs.php' );
 
-	task_begin( 'Installing default shared widgets... ' );
-	insert_shared_widgets( 'normal' );
-	task_end();
+	if( empty( $installed_default_shared_widgets ) )
+	{	// Install default widgets only when they were not installed before,
+		// (e-g after demo collections creating):
+		task_begin( 'Installing default shared widgets... ' );
+		insert_shared_widgets( 'normal' );
+		task_end();
+	}
 
 	$blog_type = ( $old_db_version < 11010 ) ? '"std"' : 'blog_type';
 	$SQL = new SQL( 'Get all collections with their skins before install basic widgets' );

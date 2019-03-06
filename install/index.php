@@ -382,6 +382,9 @@ $booststrap_install_form_params = array(
 		'checkbox_newline_end'   => "</div>\n",
 	);
 
+// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
+init_fontawesome_icons( 'fontawesome-glyphicons' );
+
 header('Content-Type: text/html; charset='.$evo_charset);
 header('Cache-Control: no-cache'); // no request to this page should get cached!
 
@@ -402,6 +405,7 @@ if( $display != 'cli' )
 		<script src="../rsc/js/bootstrap/bootstrap.min.js"></script>
 		<link href="../rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
 		<link href="../rsc/build/b2evo_helper_screens.css" rel="stylesheet">
+		<link href="../rsc/css/font-awesome.min.css" rel="stylesheet">
 	</head>
 	<body>
 		<div class="container" id="content_wrapper">
@@ -826,7 +830,7 @@ switch( $action )
 				<div class="checkbox" style="margin-top:15px">
 					<label>
 						<input accept="" type="checkbox" name="install_test_features" id="install_test_features" value="1" />
-						<?php echo T_('Also install all test features.')?>
+						<?php echo T_('Also install all test features.').get_manual_link( 'install-test-features' ); ?>
 					</label>
 				</div>
 			<?php
@@ -836,7 +840,7 @@ switch( $action )
 			<div class="checkbox" style="margin:15px 0 15px">
 				<label>
 					<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo check_local_installation() ? ' checked="checked"' : ''; ?> />
-					<?php echo T_('This is a local / test / intranet installation.')?>
+					<?php echo T_('This is a local / test / intranet installation.').get_manual_link( 'intranet-setup' ); ?>
 				</label>
 			</div>
 

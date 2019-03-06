@@ -219,7 +219,7 @@ function echo_installation_options( $params = array() )
 	$r = '<div class="checkbox">
 				<label>
 					<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" />'
-					.T_('Create a demo site').'
+					.T_('Create a demo website').'
 				</label>
 				<div id="create_sample_contents_options" style="margin:10px 0 0 20px;display:none">
 					<div class="radio" style="margin-left:1em">
@@ -262,7 +262,7 @@ function echo_installation_options( $params = array() )
 						<input type="checkbox" name="create_demo_users" id="create_demo_users" value="1"'.( $params['enable_create_demo_users'] ? '' : ' disabled="disabled"' ).' />'
 						.( $params['enable_create_demo_users'] ? T_('Create demo users') : T_('Your system already has several user accounts, so we won\'t create demo users.') ).
 					'</label>
-					<div id="create_demo_user_options" style="margin: 10px 0 0 20px">';
+					<div id="create_demo_user_options" style="margin:10px 0 0 20px;display:none">';
 
 	if( $params['show_create_organization'] )
 	{
@@ -288,16 +288,16 @@ function echo_installation_options( $params = array() )
 
 	$r .= '<div class="checkbox" style="margin-top: 15px">
 					<label>
-						<input type="checkbox" name="create_demo_email_lists" id="create_demo_email_lists" value="1" checked="checked"'.( $params['show_create_email_lists'] ? '' : 'disabled="disabled"' ).' />'
+						<input type="checkbox" name="create_demo_email_lists" id="create_demo_email_lists" value="1"'.( $params['show_create_email_lists'] ? '' : ' disabled="disabled"' ).' />'
 						.( $params['show_create_email_lists'] ? T_('Create demo email lists') : T_('Your system already has an email list, so we won\'t create demo lists.') ).
 					'</label>
-					<div id="create_demo_email_options" style="margin: 10px 0 0 20px">';
+					<div id="create_demo_email_options" style="margin:10px 0 0 20px;display:none">';
 
 	if( $params['show_create_email_campaigns'] )
 	{
 		$r .= '<div class="checkbox" style="margin-left: 1em">
 						<label>
-							<input type="checkbox" name="create_demo_email_campaigns" id="create_demo_email_campaigns" value="1" checked="checked" />'
+							<input type="checkbox" name="create_demo_email_campaigns" id="create_demo_email_campaigns" value="1" checked="checked" disabled="disabled" />'
 							.T_('Create demo campaigns').
 						'</label>
 					</div>';
@@ -307,7 +307,7 @@ function echo_installation_options( $params = array() )
 	{
 		$r .= '<div class="checkbox" style="margin-left: 1em">
 						<label>
-							<input type="checkbox" name="create_demo_automations" id="create_demo_automations" value="1" checked="checked" />'
+							<input type="checkbox" name="create_demo_automations" id="create_demo_automations" value="1" checked="checked" disabled="disabled" />'
 							.T_('Create demo automations').
 						'</label>
 					</div>';
@@ -335,12 +335,16 @@ function echo_installation_options( $params = array() )
 
 					function toggle_create_demo_user_options()
 					{
-						jQuery( "input[name=create_demo_organization], input[name=create_sample_private_messages]" ).prop( "disabled", ! jQuery( "#create_demo_users" ).is( ":checked" ) );
+						var checked = jQuery( "#create_demo_users" ).is( ":checked" );
+						jQuery( "#create_demo_user_options" ).toggle( checked );
+						jQuery( "input[name=create_demo_organization], input[name=create_sample_private_messages]" ).prop( "disabled", ! checked );
 					}
 
 					function toggle_create_demo_email_options()
 					{
-						jQuery( "input[name=create_demo_email_campaigns], input[name=create_demo_automations]" ).prop( "disabled", ! jQuery( "#create_demo_email_lists" ).is( ":checked" ) );
+						var checked = jQuery( "#create_demo_email_lists" ).is( ":checked" );
+						jQuery( "#create_demo_email_options" ).toggle( checked );
+						jQuery( "input[name=create_demo_email_campaigns], input[name=create_demo_automations]" ).prop( "disabled", ! checked );
 					}
 
 					jQuery( document ).ready( function() {
@@ -521,7 +525,7 @@ function create_blog(
 		{	// Set a posts ordering by 'postcat_order ASC'
 			$Blog->set_setting( 'orderby', 'order' );
 			$Blog->set_setting( 'orderdir', 'ASC' );
-			echo_install_log( 'TEST FEATURE: Setting a posts ordering by asceding post order field on collection #'.$Blog->ID );
+			echo_install_log( 'TEST FEATURE: Setting a posts ordering by ascending post order field on collection #'.$Blog->ID );
 		}
 
 		$Blog->set_setting( 'use_workflow', 1 );
@@ -1307,7 +1311,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 			break;
 
 		default:
-			// Install collections depending on the selected options "Create a demo site" on the submitted form:
+			// Install collections depending on the selected options "Create a demo website" on the submitted form:
 			$demo_content_type = param( 'demo_content_type', 'string', NULL );
 			switch( $demo_content_type )
 			{
@@ -1410,9 +1414,6 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 
 	// Use this var to shift the posts of the collections in time below:
 	$timeshift = 0;
-
-	// Shared widgets should have already been installed:
-	// insert_shared_widgets( 'normal' );
 
 	if( $install_collection_home )
 	{	// Install Home blog
@@ -1645,6 +1646,13 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 			task_end( '<span class="text-danger">Failed.</span>' );
 		}
 	}
+
+	// Install default shared widgets:
+	global $installed_default_shared_widgets;
+	task_begin( 'Installing default shared widgets... ' );
+	insert_shared_widgets( 'normal', true );
+	task_end();
+	$installed_default_shared_widgets = true;
 
 	// Setting default login and default messaging collection:
 	task_begin( 'Setting default login and default messaging collection...' );

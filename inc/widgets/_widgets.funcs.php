@@ -913,7 +913,29 @@ function insert_shared_widgets( $skin_type )
 
 	$shared_widgets_insert_sql_rows = array();
 	$shared_containers = array();
+	$shared_widgets = array();
 	$shared_container_order = 1;
+
+	// Get all shared containers and widgets in order to don't install them twice when it is requested:
+	$existing_widgets_SQL = new SQL( 'Get existings shared widget containers' );
+	$existing_widgets_SQL->SELECT( 'wico_code, wico_ID, wi_code, wi_order' );
+	$existing_widgets_SQL->FROM( 'T_widget__container' );
+	$existing_widgets_SQL->FROM_add( 'LEFT JOIN T_widget__widget ON wico_ID = wi_wico_ID' );
+	$existing_widgets_SQL->WHERE( 'wico_coll_ID IS NULL' );
+	$existing_widgets = $DB->get_results( $existing_widgets_SQL );
+	foreach( $existing_widgets as $existing_widget )
+	{
+		$shared_containers[ $existing_widget->wico_code ] = $existing_widget->wico_ID;
+		if( ! isset( $shared_widgets[ $existing_widget->wico_ID ] ) )
+		{
+			$shared_widgets[ $existing_widget->wico_ID ] = array();
+		}
+		// Table T_widget__widget has the unique index ( wi_wico_ID, wi_order ),
+		// so we should check widgets per container ID and widget order
+		// in order to avoid error of duplicate records:
+		$shared_widgets[ $existing_widget->wico_ID ][ $existing_widget->wi_order ] = $existing_widget->wi_code;
+	}
+
 	foreach( $default_widgets as $wico_code => $container_widgets )
 	{
 		if( ! isset( $container_widgets['type'] ) ||
@@ -952,6 +974,11 @@ function insert_shared_widgets( $skin_type )
 
 			if( isset( $widget['install'] ) && ! $widget['install'] )
 			{	// Skip widget because it should not be installed by condition from config:
+				continue;
+			}
+
+			if( isset( $shared_widgets[ $wico_id ][ $widget[0] ] ) )
+			{	// Skip the widget because a widget was already installed for the container with same order:
 				continue;
 			}
 
