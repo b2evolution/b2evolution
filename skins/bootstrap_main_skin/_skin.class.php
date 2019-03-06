@@ -455,7 +455,7 @@ class bootstrap_main_Skin extends Skin
 					.'body.pictured .front_main_content h1 small, '
 					.'.evo_container__header, '
 					.'.evo_container__page_top, '
-					.'body.pictured.disp_access_requires_login .evo_widget.widget_core_content_block '
+					.'body.pictured.disp_access_requires_login .evo_widget.widget_core_content_block, '
 					.'body.pictured.disp_access_denied .evo_widget.widget_core_content_block '
 					.'{ color: '.$color." }\n";
 			}
