@@ -110,7 +110,7 @@ $Form->begin_form( 'fform', $form_title, array( 'title' => ( isset( $form_text_t
 
 	/***************  Preferences  **************/
 
-$Form->begin_fieldset( T_('Preferences').get_manual_link('user_preferences') );
+$Form->begin_fieldset( T_('Preferences').get_manual_link('user-preferences') );
 
 /*
  * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.

@@ -2710,7 +2710,7 @@ function skin_installed( $name )
  */
 function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 {
-	$Form->begin_fieldset( $display_params[ 'fieldset_title' ].get_manual_link('blog_skin_settings').' '.$display_params[ 'fieldset_links' ] );
+	$Form->begin_fieldset( $display_params[ 'fieldset_title' ].get_manual_link('blog-skin-settings').' '.$display_params[ 'fieldset_links' ] );
 
 	if( !$skin_ID )
 	{ // The skin ID is empty use the same as normal skin ID
