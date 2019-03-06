@@ -1813,7 +1813,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Check if the post contains inline file placeholders without corresponding attachemnt file.
+	 * Check if the post contains inline file placeholders without corresponding attachment file.
 	 * Removes the invalid inline file placeholders from the item content.
 	 *
 	 * @param string Content
@@ -1828,34 +1828,34 @@ class Item extends ItemLight
 			return $content;
 		}
 
-		// There are inline image placeholders
-		if( $this->ID > 0 )
-		{ // The post is saved, so it can actually have attachments:
-			global $DB;
-			$links_SQL = new SQL( 'Get item links IDs of the inline images' );
-			$links_SQL->SELECT( 'link_ID' );
-			$links_SQL->FROM( 'T_links' );
-			$links_SQL->WHERE( 'link_itm_ID = '.$DB->quote( $this->ID ) );
-			$links_SQL->WHERE_and( 'link_position = "inline"' );
-			$inline_links_IDs = $DB->get_col( $links_SQL );
-
-			$unused_inline_images = array();
-			foreach( $inline_images[2] as $i => $inline_link_ID )
-			{
-				if( ! in_array( $inline_link_ID, $inline_links_IDs ) )
-				{ // This inline image must be removed from content
-					$unused_inline_images[] = $inline_images[0][ $i ];
-				}
-			}
+		// There are inline image placeholders in the item's content:
+		global $DB;
+		$links_SQL = new SQL( 'Get item links IDs of the inline files' );
+		$links_SQL->SELECT( 'link_ID' );
+		$links_SQL->FROM( 'T_links' );
+		if( empty( $this->ID ) )
+		{	// Preview mode for new creating item:
+			$links_SQL->WHERE( 'link_tmp_ID = '.$DB->quote( param( 'temp_link_owner_ID', 'integer', 0 ) ) );
 		}
 		else
-		{ // The post is not saved yet, so it can not contains attachments. None of the placeholders are used.
-			$unused_inline_images = $inline_images[0];
+		{	// Normal mode for existing Item in DB:
+			$links_SQL->WHERE( 'link_itm_ID = '.$DB->quote( $this->ID ) );
+		}
+		$links_SQL->WHERE_and( 'link_position = "inline"' );
+		$inline_links_IDs = $DB->get_col( $links_SQL );
+
+		$unused_inline_images = array();
+		foreach( $inline_images[2] as $i => $inline_link_ID )
+		{
+			if( ! in_array( $inline_link_ID, $inline_links_IDs ) )
+			{ // This inline image must be removed from content
+				$unused_inline_images[] = $inline_images[0][ $i ];
+			}
 		}
 
-		// Clear the unused inline images from content
+		// Clear the unused inline images from content:
 		if( count( $unused_inline_images ) )
-		{ // Remove all unused inline images from the content
+		{	// Remove all unused inline images from the content:
 			global $Messages;
 			$unused_inline_images = array_unique( $unused_inline_images );
 			$content = replace_content_outcode( $unused_inline_images, '', $content, 'replace_content', 'str' );
