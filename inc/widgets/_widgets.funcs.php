@@ -677,7 +677,13 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'name'    => NT_('Widget Page Section 1'),
 		'order'   => 10,
 		'item_ID' => $installed_collection_info_pages['widget_page'],
-		array( 10, 'coll_featured_posts' ),
+		array(  5, 'free_text', 'params' => array(
+				'title'   => T_('This is a sample widget page'),
+				'content' => T_('A widget page is a page that is constructed entirely with widgets, rather than being constructed around a classic structure of title, content and comments.'),
+			) ),
+		array( 10, 'coll_featured_posts', 'params' => array(
+				'blog_ID' => '*', // Display Items from all Collections
+			) ),
 	);
 
 	/* Widget Page Section 2 */

@@ -294,6 +294,10 @@ function create_default_data()
 			'template_name'  => 'widget_page',
 			'perm_level'     => 'admin',
 			'use_text'       => 'never',
+			'allow_html'        => 0,
+			'allow_breaks'      => 0,
+			'allow_attachments' => 0,
+			'allow_featured'    => 0,
 			'use_comments'   => 0,
 			'use_coordinates'=> 'optional',
 		);
@@ -412,6 +416,7 @@ function create_default_data()
 			'title_maxlen'             => 100,
 			'allow_html'               => 1,
 			'allow_breaks'             => 1,
+			'allow_attachments'        => 1,
 			'allow_featured'           => 1,
 			'use_text'                 => 'optional',
 			'use_tags'                 => 'optional',

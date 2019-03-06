@@ -266,7 +266,7 @@ class ComponentWidget extends DataObject
 			{
 				return $this->Plugin->name;
 			}
-			return T_('Inactive / Uninstalled plugin');
+			return T_('Inactive / Uninstalled plugin').': "'.$this->code.'"';
 		}
 
 		return T_('Unknown');
@@ -291,9 +291,16 @@ class ComponentWidget extends DataObject
 	 */
 	function get_icon()
 	{
-		if( $this->type == 'plugin' && $this->get_Plugin() )
+		if( $this->type == 'plugin' )
 		{	// Use widget icon from plugin:
-			return $this->Plugin->get_widget_icon();
+			if( $this->get_Plugin() )
+			{	// Get widget icon from plugin:
+				return $this->Plugin->get_widget_icon();
+			}
+			else
+			{	// Set icon for inactive / uninstalled plugin:
+				$this->icon = 'warning';
+			}
 		}
 
 		if( empty( $this->icon ) )
@@ -360,7 +367,7 @@ class ComponentWidget extends DataObject
 			{
 				return $this->Plugin->short_desc;
 			}
-			return T_('Inactive / Uninstalled plugin');
+			return T_('Inactive / Uninstalled plugin').': "'.$this->code.'"';
 		}
 
 		return T_('Unknown');
@@ -818,7 +825,7 @@ class ComponentWidget extends DataObject
 				{	// Plugin failed (happens when a plugin has been disabled for example):
 					if( $this->mode == 'designer' )
 					{	// Display red text in customizer widget designer mode in order to make this plugin visible for editing:
-						echo $this->disp_params['block_start'].'<span class="evo_param_error">'.T_('Inactive / Uninstalled plugin').'</span>'.$this->disp_params['block_end'];
+						echo $this->disp_params['block_start'].'<span class="evo_param_error">'.T_('Inactive / Uninstalled plugin').': "'.$this->code.'"</span>'.$this->disp_params['block_end'];
 					}
 					return false;
 				}

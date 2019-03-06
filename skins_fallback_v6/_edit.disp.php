@@ -320,8 +320,8 @@ $Form->begin_form( 'inskin', '', $form_params );
 	$Form->attachments_fieldset( $edited_Item );
 
 	// ################### TEXT RENDERERS & CATEGORIES ###################
-	if( $Blog->get_setting( 'in_skin_editing_renderers' ) )
-	{	// If text renderers are allowed to update from front-office:
+	if( $Blog->get_setting( 'in_skin_editing_renderers' ) && $edited_Item->get_type_setting( 'use_text' ) != 'never' )
+	{	// If text renderers are allowed to update from front-office and text content is allowed for the item type:
 		$item_renderer_checkboxes = $edited_Item->get_renderer_checkboxes();
 	}
 	else

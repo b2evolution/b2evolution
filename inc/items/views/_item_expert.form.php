@@ -710,7 +710,7 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'item_featured', $edited_Item->featured );
 	}
 
-	if( $is_not_content_block )
+	if( $is_not_content_block && $edited_Item->get_type_setting( 'allow_breaks' ) )
 	{	// Display "hide teaser" checkbox for item with type usage except of content block:
 		$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.sprintf( T_('Hide teaser when displaying part after %s'), '<code>[teaserbreak]</code>' ).'</strong>' );
 	}
@@ -748,15 +748,18 @@ $Form->begin_form( '', '', $params );
 
 
 	// ################### TEXT RENDERERS ###################
+	if( $edited_Item->get_type_setting( 'use_text' ) != 'never' )
+	{	// Display text renderers only when text content is allowed for the item type:
 
-	$Form->begin_fieldset( T_('Text Renderers').get_manual_link( 'post-renderers-panel' )
+		$Form->begin_fieldset( T_('Text Renderers').get_manual_link( 'post-renderers-panel' )
 					.action_icon( T_('Plugins'), 'edit', $admin_url.'?ctrl=coll_settings&amp;tab=plugins&plugin_group=rendering&amp;blog='.$Blog->ID, T_('Plugins'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
 				array( 'id' => 'itemform_renderers', 'fold' => true ) );
 
-	// fp> TODO: there should be no param call here (shld be in controller)
-	$edited_Item->renderer_checkboxes( param('renderers', 'array:string', NULL) );
+		// fp> TODO: there should be no param call here (shld be in controller)
+		$edited_Item->renderer_checkboxes( param('renderers', 'array:string', NULL) );
 
-	$Form->end_fieldset();
+		$Form->end_fieldset();
+	}
 
 
 	// ################### COMMENT STATUS ###################
