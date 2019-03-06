@@ -61,7 +61,7 @@ else
 	$block_title = T_('Skins available for installation');
 }
 
-$block_item_Widget->title = $block_title.get_manual_link( 'installing_skins' );
+$block_item_Widget->title = $block_title.get_manual_link( 'installing-skins' );
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:

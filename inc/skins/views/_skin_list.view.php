@@ -27,7 +27,7 @@ $Results = new Results( $SQL->get(), 'skin_', '', NULL, $count_SQL->get() );
 
 $Results->Cache = & get_SkinCache();
 
-$Results->title = T_('Installed skins').get_manual_link('installed_skins');
+$Results->title = T_('Installed skins').get_manual_link('installed-skins');
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:

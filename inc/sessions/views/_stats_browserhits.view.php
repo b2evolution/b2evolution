@@ -32,7 +32,7 @@ foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
 	$diagram_columns[ $diagram_column_key ]['color'] = $referer_type_color[ $diagram_column_key ];
 }
 
-echo '<h2 class="page-title">'.T_('Hits from web browsers - Summary').get_manual_link('browser_hits_summary').'</h2>';
+echo '<h2 class="page-title">'.T_('Hits from web browsers - Summary').get_manual_link('browser-hits-summary').'</h2>';
 
 // Display panel with buttons to control a view of hits summary pages:
 display_hits_summary_panel( $diagram_columns );
