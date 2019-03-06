@@ -109,7 +109,7 @@ $Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_te
 
 	/***************  Preferences  **************/
 
-$Form->begin_fieldset( $is_admin ? T_('Other preferences').get_manual_link('user_preferences') : '', array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( $is_admin ? T_('Other preferences').get_manual_link('user-preferences') : '', array( 'class'=>'fieldset clear' ) );
 
 // Enable/disable multiple sessions for the current user
 $multiple_sessions = $Settings->get( 'multiple_sessions' );
@@ -215,7 +215,7 @@ else
 		$Form->info( T_('Session timeout'), T_('Use custom duration...') );
 		$Form->info( T_('Custom duration'), seconds_to_period( $timeout_sessions ), $timeout_sessions_note );
 	}
-	
+
 	$Form->info( T_('Show online'), ( $UserSettings->get( 'show_online', $edited_User->ID ) ? T_('yes') : T_('no') ), T_('Check this to be displayed as online when visiting the site.') );
 }
 

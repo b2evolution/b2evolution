@@ -3062,7 +3062,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 
 	if( $mode != 'customizer' )
 	{	// Except of skin customer mode:
-		$Form->begin_fieldset( $display_params[ 'fieldset_title' ].' '.$display_params[ 'fieldset_links' ] );
+		$Form->begin_fieldset( $display_params[ 'fieldset_title' ].get_manual_link('blog-skin-settings').' '.$display_params[ 'fieldset_links' ] );
 	}
 
 	if( !$skin_ID )
