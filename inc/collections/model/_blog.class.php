@@ -5775,33 +5775,34 @@ class Blog extends DataObject
 		}
 
 		// Decide what "post" item type we can enable depending on collection kind:
-		$default_post_types_by_template = array();
+		$default_post_types_by_template = array( 'recipe' );
+		$default_post_types = array( 'Post with Custom Fields', 'Child Post', 'Recipe' );
 		switch( $this->type )
 		{
 			case 'main':
-				$default_post_types = array( 'Post' );
+				$default_post_types[] = 'Post';
 				break;
 
 			case 'photo':
-				$default_post_types = array( 'Photo Album' );
+				$default_post_types[] = 'Photo Album';
 				break;
 
 			case 'forum':
-				$default_post_types = array( 'Forum Topic' );
+				$default_post_types[] = 'Forum Topic';
 				break;
 
 			case 'manual':
-				$default_post_types = array( 'Manual Page', 'Recipe' );
-				$default_post_types_by_template = array( 'recipe' );
+				$default_post_types[] = 'Manual Page';
 				break;
 
 			case 'group':
-				$default_post_types = array( 'Forum Topic', 'Bug Report' );
+				$default_post_types[] = 'Forum Topic';
+				$default_post_types[] = 'Bug Report';
 				break;
 
 			default: // 'std'
-				$default_post_types = array( 'Post', 'Podcast Episode', 'Post with Custom Fields', 'Child Post', 'Recipe' );
-				$default_post_types_by_template = array( 'recipe' );
+				$default_post_types[] = 'Post';
+				$default_post_types[] = 'Podcast Episode';
 				break;
 		}
 

@@ -2074,16 +2074,4 @@ function update_basic_config_file( $params = array() )
 
 	return true;
 }
-
-
-/**
- * Print out log text on screen
- *
- * @param string Log text
- * @param string Log type: 'warning', 'note', 'success', 'danger'
- */
-function echo_install_log( $text, $type = 'warning' )
-{
-	echo '<p class="alert alert-'.$type.'">'.$text.'</p>';
-}
 ?>
