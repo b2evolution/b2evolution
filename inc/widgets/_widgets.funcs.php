@@ -295,7 +295,10 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['front_page_secondary_area'] = array(
 		array( 10, 'org_members', 'coll_type' => 'main,minisite' ),
 		array( 20, 'coll_flagged_list', 'coll_type' => '-main,minisite' ),
-		array( 30, 'content_block', 'coll_type' => 'main', 'params' => array( 'item_slug' => 'this-is-a-content-block' ) ),
+		array( 30, 'content_block', 'coll_type' => 'main', 'params' => array(
+			'title'     => T_('Content Block Example'),
+			'item_slug' => 'this-is-a-content-block',
+		) ),
 	);
 
 	/* Front Page Area 3 */
