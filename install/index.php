@@ -840,7 +840,7 @@ switch( $action )
 			<div class="checkbox" style="margin:15px 0 15px">
 				<label>
 					<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo check_local_installation() ? ' checked="checked"' : ''; ?> />
-					<?php echo T_('This is a local / test / intranet installation.').get_manual_link( 'intranet-setup' ); ?>
+					<?php echo T_('This is a local / test / intranet installation.').get_manual_link( 'local-test-intranet-install-checkbox' ); ?>
 				</label>
 			</div>
 
