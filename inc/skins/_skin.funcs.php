@@ -200,6 +200,14 @@ function skin_init( $disp )
 				{	// A certain post page or a quote of comment/post have been requested, keep only this param and discard all others:
 					$canonical_url = url_add_param( $canonical_url, implode( '&', $page_param[1] ), '&' );
 				}
+				if( preg_match( '|[&?](revision=(p?\d+))|', $ReqURI, $revision_param )
+						&& ( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item ) )
+						&& $item_revision = $Item->get_revision( $revision_param[2] ) )
+				{ // A revision of the post, keep only this param and discard all others:
+					$canonical_url = url_add_param( $canonical_url, $revision_param[1], '&' );
+					$Item->set( 'revision', $revision_param[2] );
+					$Messages->add( sprintf( T_('You are viewing Revision #%s dated %s' ), $revision_param[2], date( locale_datetimefmt(), strtotime( $item_revision->iver_edit_last_touched_ts ) ) ), 'note' );
+				}
 				$canonical_is_same_url = is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 
 				if( ! $canonical_is_same_url && in_array( $Blog->get_setting( 'single_links' ), array( 'subchap', 'chapters' ) ) )
@@ -1409,6 +1417,14 @@ function skin_init( $disp )
 			{	// Don't allow to post in category without default Item Type:
 				$Messages->add( T_('You cannot post here'), 'error' );
 				header_redirect( $selected_Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
+			}
+
+			// Check if this Item can be updated:
+			// (e-g it can be restricted if this item has at least one proposed change)
+			$ItemCache = & get_ItemCache ();
+			if( $edited_Item = & $ItemCache->get_by_ID( $post_ID, false, false ) )
+			{
+				$edited_Item->check_before_update();
 			}
 
 			// Prepare the 'In-skin editing':

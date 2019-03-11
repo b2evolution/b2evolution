@@ -274,15 +274,41 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating item versions table',
 		"CREATE TABLE T_items__version (
 			iver_ID            INT UNSIGNED NOT NULL,
+			iver_type          ENUM('archived','proposed') COLLATE ascii_general_ci NOT NULL DEFAULT 'archived',
 			iver_itm_ID        INT UNSIGNED NOT NULL,
 			iver_edit_user_ID  INT UNSIGNED NULL,
-			iver_edit_datetime TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			iver_edit_last_touched_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			iver_status        ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NULL,
 			iver_title         VARCHAR(255) NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			iver_content       MEDIUMTEXT NULL,
-			INDEX iver_ID_itm_ID ( iver_ID , iver_itm_ID ),
+			PRIMARY KEY        ( iver_ID , iver_type, iver_itm_ID ),
 			INDEX iver_edit_user_ID ( iver_edit_user_ID )
-		) ENGINE = innodb ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_items__version_custom_field' => array(
+		'Creating item version custom fields table',
+		"CREATE TABLE T_items__version_custom_field (
+			ivcf_iver_ID     INT UNSIGNED NOT NULL,
+			ivcf_iver_type   ENUM('archived','proposed') COLLATE ascii_general_ci NOT NULL DEFAULT 'archived',
+			ivcf_iver_itm_ID INT UNSIGNED NOT NULL,
+			ivcf_itcf_ID     INT UNSIGNED NOT NULL,
+			ivcf_itcf_label  VARCHAR(255) NOT NULL,
+			ivcf_value       VARCHAR( 10000 ) NULL,
+			PRIMARY KEY      ( ivcf_iver_ID, ivcf_iver_type, ivcf_iver_itm_ID, ivcf_itcf_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_items__version_link' => array(
+		'Creating item version links table',
+		"CREATE TABLE T_items__version_link (
+			ivl_iver_ID     INT UNSIGNED NOT NULL,
+			ivl_iver_type   ENUM('archived','proposed') COLLATE ascii_general_ci NOT NULL DEFAULT 'archived',
+			ivl_iver_itm_ID INT UNSIGNED NOT NULL,
+			ivl_link_ID     INT(11) UNSIGNED NOT NULL,
+			ivl_file_ID     INT(11) UNSIGNED NULL,
+			ivl_position    VARCHAR(10) COLLATE ascii_general_ci NOT NULL,
+			ivl_order       INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY     ( ivl_iver_ID, ivl_iver_type, ivl_iver_itm_ID, ivl_link_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__status' => array(
 		'Creating table for Post Statuses',

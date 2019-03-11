@@ -1201,9 +1201,10 @@ class DB
 	 * @param string|object|NULL Optional SQL query string or SQL object to execute (or NULL for previous query)
 	 * @param string Output type (OBJECT, ARRAY_A, ARRAY_N)
 	 * @param string Optional title of query for debugging(If empty then $query_SQL->title is used instead)
+	 * @param string Column name to use as array key, NULL to use auto incremented number key
 	 * @return mixed
 	 */
-	function get_results( $query_SQL = NULL, $output = OBJECT, $title = '' )
+	function get_results( $query_SQL = NULL, $output = OBJECT, $title = '', $array_key = NULL )
 	{
 		// If there is a query then perform it if not then use cached results..
 		if( $query_SQL )
@@ -1221,21 +1222,42 @@ class DB
 			case OBJECT:
 				while( $row = $this->result->fetch_object() )
 				{
-					$r[] = $row;
+					if( $array_key === NULL || ! isset( $row->$array_key ) )
+					{	// Use auto incremented number key:
+						$r[] = $row;
+					}
+					else
+					{	// Use custom key:
+						$r[ $row->$array_key ] = $row;
+					}
 				}
 				break;
 
 			case ARRAY_A:
 				while( $row = $this->result->fetch_assoc() )
 				{
-					$r[] = $row;
+					if( $array_key === NULL || ! isset( $row[ $array_key ] ) )
+					{	// Use auto incremented number key:
+						$r[] = $row;
+					}
+					else
+					{	// Use custom key:
+						$r[ $row[ $array_key ] ] = $row;
+					}
 				}
 				break;
 
 			case ARRAY_N:
 				while( $row = $this->result->fetch_row() )
 				{
-					$r[] = $row;
+					if( $array_key === NULL || ! isset( $row[ $array_key ] ) )
+					{	// Use auto incremented number key:
+						$r[] = $row;
+					}
+					else
+					{	// Use custom key:
+						$r[ $row[ $array_key ] ] = $row;
+					}
 				}
 				break;
 			}

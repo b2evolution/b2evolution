@@ -156,7 +156,8 @@ h2 .glyphicon {
 .edit_actions .pull-left {
   margin-right: 10px;
 }
-.edit_actions .quick-publish {
+.edit_actions .quick-publish,
+.edit_actions .evo_propose_change_btn {
   margin-left: 5px;
 }
 .edit_actions .html_status {
@@ -1473,6 +1474,8 @@ table.diff td.diff-marker {
 }
 table.diff td.diff-lineno {
   font-weight: bold;
+  font-size: 0.85em;
+  color: #666;
 }
 table.diff td.diff-addedline {
   background: none repeat scroll 0 0 #CCFFCC;
@@ -1497,6 +1500,14 @@ table.diff td.diff-title-addedline {
   text-align: center;
   font-size: 120%;
   font-weight: bold;
+}
+table.diff tr.diff-custom-field td.diff-title-deletedline,
+table.diff tr.diff-custom-field td.diff-title-addedline {
+  text-align: left;
+  font-size: 100%;
+}
+table.diff td.diff-section-title {
+  background: none repeat scroll 0 0 #F5F5F5;
 }
 .radio input[type="radio"][name^="timestamp_"][value="duration"] {
   position: relative;
