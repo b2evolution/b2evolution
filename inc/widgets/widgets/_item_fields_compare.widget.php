@@ -474,6 +474,8 @@ class item_fields_compare_Widget extends ComponentWidget
 	 */
 	function get_custom_fields( & $items )
 	{
+		global $Item;
+
 		if( empty( $items ) )
 		{	// No items to compare:
 			return false;
@@ -500,6 +502,11 @@ class item_fields_compare_Widget extends ComponentWidget
 			{	// Skin wrong post:
 				unset( $items[ $i ] );
 				continue;
+			}
+
+			if( isset( $Item ) && $Item->ID == $widget_Item->ID && $Item->is_revision() )
+			{	// Display data from requested revision of the Item:
+				$widget_Item->set( 'revision', $Item->revision );
 			}
 
 			// Load all custom fields of the Item in cache:

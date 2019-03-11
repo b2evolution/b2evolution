@@ -117,7 +117,7 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Single Item view').get_manual_link('blog-features-settings'), array( 'id' => 'post_options' ) );
+$Form->begin_fieldset( T_('Single Item view').get_manual_link('item-single-item-view-features'), array( 'id' => 'post_options' ) );
 
 	$Form->radio( 'post_navigation', $edited_Blog->get_setting('post_navigation'),
 		array( array( 'same_blog', T_('same blog') ),

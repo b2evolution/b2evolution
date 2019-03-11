@@ -1368,6 +1368,7 @@ class _core_Module extends Module
 							// PLACE HOLDER FOR ENTRIES "Edit in Front-Office", "Edit in Back-Office", "View in Back-Office":
 							'edit_front' => NULL,
 							'edit_back'  => NULL,
+							'propose'    => NULL,
 							'view_back'  => NULL,
 							// PLACE HOLDERS FOR SESSIONS MODULE:
 							'stats_sep'  => NULL,
@@ -1426,6 +1427,10 @@ class _core_Module extends Module
 						$entries['page']['entries']['edit_back'] = array(
 								'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
 								'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+							);
+						$entries['page']['entries']['propose'] = array(
+								'text' => T_('Propose change').'&hellip;',
+								'href' => $admin_url.'?ctrl=items&amp;action=propose&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
 							);
 						$entries['page']['entries']['view_back'] = array(
 								'text' => sprintf( T_('View "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',

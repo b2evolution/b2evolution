@@ -353,7 +353,7 @@ while( $Item = & $ItemList->get_item() )
 			}
 
 			echo $Item->get_history_link( array(
-					'class'     => button_class( 'text' ),
+					'class'     => button_class( 'text' ).( $Item->has_proposed_change() ? ' btn-warning' : '' ),
 					'link_text' => '$icon$ '.T_('History'),
 				) );
 
@@ -385,6 +385,13 @@ while( $Item = & $ItemList->get_item() )
 					'after'  => '',
 					'class'  => button_class( 'text_primary' ),
 					'text'   => get_icon( 'edit_button' ).' '.T_('Edit')
+				) );
+
+			// Display propose change button if current user has the rights:
+			$Item->propose_change_link( array(
+					'before' => '',
+					'after'  => '',
+					'class'  => button_class( 'text' ),
 				) );
 
 			// Display copy button if current user has the rights:

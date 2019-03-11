@@ -5629,6 +5629,7 @@ function is_create_action( $action )
 
 		case 'edit':
 		case 'edit_switchtab':
+		case 'propose':
 		case 'update':	// we return in this state after a validation error
 		case 'delete':
 		// The following one's a bit far fetched, but can happen if we have no sheet display:

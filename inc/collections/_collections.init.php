@@ -59,6 +59,8 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_items__type_coll'         => $tableprefix.'items__type_coll',
 		'T_items__user_data'         => $tableprefix.'items__user_data',
 		'T_items__version'           => $tableprefix.'items__version',
+		'T_items__version_custom_field' => $tableprefix.'items__version_custom_field',
+		'T_items__version_link'      => $tableprefix.'items__version_link',
 		'T_items__votes'             => $tableprefix.'items__votes',
 		'T_items__status_type'       => $tableprefix.'items__status_type',
 		'T_links'                    => $tableprefix.'links',
@@ -1158,7 +1160,7 @@ class collections_Module extends Module
 				if( $confirmed )
 				{ // Unlink File from Item:
 					$deleted_link_ID = $edited_Link->ID;
-					$edited_Link->dbdelete();
+					$LinkOwner->remove_link( $edited_Link );
 					unset($edited_Link);
 
 					$LinkOwner->after_unlink_action( $deleted_link_ID );

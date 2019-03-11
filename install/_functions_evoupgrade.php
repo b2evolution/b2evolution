@@ -10652,6 +10652,49 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13140, 'Creating custom fields and link versions tables for item versions...' ) )
+	{	// part of 6.11.0-beta
+		db_create_table( 'T_items__version_custom_field', '
+			ivcf_iver_ID     INT UNSIGNED NOT NULL,
+			ivcf_iver_itm_ID INT UNSIGNED NOT NULL,
+			ivcf_itcf_ID     INT UNSIGNED NOT NULL,
+			ivcf_itcf_label  VARCHAR(255) NOT NULL,
+			ivcf_value       VARCHAR( 10000 ) NULL,
+			PRIMARY KEY      ( ivcf_iver_ID, ivcf_iver_itm_ID, ivcf_itcf_ID )' );
+
+		db_create_table( 'T_items__version_link', '
+			ivl_iver_ID     INT UNSIGNED NOT NULL,
+			ivl_iver_itm_ID INT UNSIGNED NOT NULL,
+			ivl_link_ID     INT(11) UNSIGNED NOT NULL,
+			ivl_file_ID     INT(11) UNSIGNED NULL,
+			ivl_position    VARCHAR(10) COLLATE ascii_general_ci NOT NULL,
+			ivl_order       INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY     ( ivl_iver_ID, ivl_iver_itm_ID, ivl_link_ID )' );
+
+		$DB->query( 'ALTER TABLE T_items__version
+				CHANGE iver_edit_datetime iver_edit_last_touched_ts TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13150, 'Upgrading item versions tables...' ) )
+	{	// part of 6.11.0-beta
+		$DB->query( 'ALTER TABLE T_items__version
+			ADD COLUMN iver_type ENUM("archived","proposed") COLLATE ascii_general_ci NOT NULL DEFAULT "archived" AFTER iver_ID,
+			DROP INDEX iver_ID_itm_ID,
+			ADD PRIMARY KEY ( iver_ID , iver_type, iver_itm_ID )' );
+
+		$DB->query( 'ALTER TABLE T_items__version_custom_field
+			ADD COLUMN ivcf_iver_type ENUM("archived","proposed") COLLATE ascii_general_ci NOT NULL DEFAULT "archived" AFTER ivcf_iver_ID,
+			DROP PRIMARY KEY,
+			ADD PRIMARY KEY ( ivcf_iver_ID, ivcf_iver_type, ivcf_iver_itm_ID, ivcf_itcf_ID )' );
+
+		$DB->query( 'ALTER TABLE T_items__version_link
+			ADD COLUMN ivl_iver_type ENUM("archived","proposed") COLLATE ascii_general_ci NOT NULL DEFAULT "archived" AFTER ivl_iver_ID,
+			DROP PRIMARY KEY,
+			ADD PRIMARY KEY ( ivl_iver_ID, ivl_iver_type, ivl_iver_itm_ID, ivl_link_ID )' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 15000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '

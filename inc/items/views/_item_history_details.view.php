@@ -17,24 +17,50 @@ global $edited_Item, $Revision;
 
 $post_statuses = get_visibility_statuses();
 
+switch( $Revision->iver_type )
+{
+	case 'archived':
+		$revision_note = T_('Archived version');
+		$revision_title = sprintf( T_('Archived version #%s for: %s'), $Revision->iver_ID, $edited_Item->get_title() );
+		break;
+
+	case 'proposed':
+		$revision_note = T_('Proposed change');
+		$revision_title = sprintf( T_('Proposed change #%s for: %s'), $Revision->iver_ID, $edited_Item->get_title() );
+		break;
+
+	case 'current':
+	default:
+		$revision_note = T_('Archived version');
+		$revision_title = sprintf( T_('Current version for: %s'), $edited_Item->get_title() );
+		break;
+}
+
 $Form = new Form( NULL, 'history', 'post', 'compact' );
 
 $Form->global_icon( T_('Cancel viewing!'), 'close', regenerate_url( 'action', 'action=history' ) );
 
-$Form->begin_form( 'fform', sprintf( T_('Revision #%s for: %s'), $Revision->iver_ID == 0 ? '('.T_('Current version').')' : $Revision->iver_ID, $edited_Item->get_title() ) );
+$Form->begin_form( 'fform', $revision_title );
 
-$Form->info( T_('Date'), mysql2localedatetime( $Revision->iver_edit_datetime, 'Y-m-d', 'H:i:s' ) );
+$Form->info( T_('Date'), mysql2localedatetime( $Revision->iver_edit_last_touched_ts, 'Y-m-d', 'H:i:s' ) );
 
 $iver_editor_user_link = get_user_identity_link( NULL, $Revision->iver_edit_user_ID );
 $Form->info( T_('User'), ( empty( $iver_editor_user_link ) ? T_( '(deleted user)' ) : $iver_editor_user_link ) );
 
 $Form->info( T_('Status'), $post_statuses[ $Revision->iver_status ] );
 
-$Form->info( T_('Note'), $Revision->iver_ID > 0 ? T_('Archived version') : T_('Current version') );
+$Form->info( T_('Note'), $revision_note );
 
 $Form->info( T_('Title'), $Revision->iver_title );
 
 $Form->info( T_('Content'), $Revision->iver_content );
+
+$edited_Item->set( 'revision', $Revision->param_ID );
+$Form->info( T_('Custom fields'), $edited_Item->get_custom_fields( array(
+		'before'       => '<div class="evo_content_block"><table class="item_custom_fields" style="margin:0">',
+		'field_format' => '<tr><th valign="top">$title$:</th><td>$value$</td></tr>',
+		'after'        => '</table></div>',
+	) ) );
 
 $Form->end_form();
 
