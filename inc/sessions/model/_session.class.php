@@ -667,6 +667,15 @@ class Session
 			return false;
 		}
 
+		// Attempt to output an error header (will not work if the output buffer has already flushed once):
+		// This should help preventing indexing robots from indexing the error :P
+		if( ! headers_sent() )
+		{
+			load_funcs( '_core/_template.funcs.php' );
+			headers_content_mightcache( 'text/html', 0, '#', false ); // Do NOT cache error messages! (Users would not see they fixed them)
+			header_http_response( '400 Bad Request' );
+		}
+
 		// ERROR MESSAGE, with form/button to bypass and enough warning hopefully.
 		// TODO: dh> please review carefully!
 		global $io_charset;
