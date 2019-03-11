@@ -637,7 +637,7 @@ switch( $tab )
 				$AdminUI->breadcrumbpath_add( T_('Test'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
-				$AdminUI->set_page_manual_link( 'return-path-configuration' );
+				$AdminUI->set_page_manual_link( 'test-saved-settings' );
 				break;
 		}
 		break;

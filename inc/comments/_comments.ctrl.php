@@ -817,7 +817,21 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'comment-mass-deletion' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'comments-tab' );
+		switch( $tab3 )
+		{
+			case 'fullview':
+				$AdminUI->set_page_manual_link( 'comments-full-text-view' );
+				break;
+			case 'listview':
+				$AdminUI->set_page_manual_link( 'comments-list-view' );
+				break;
+			case 'meta':
+				$AdminUI->set_page_manual_link( 'comments-meta-discussion' );
+				break;
+			default:
+				$AdminUI->set_page_manual_link( 'comments-tab' );
+		}
+
 		break;
 }
 
