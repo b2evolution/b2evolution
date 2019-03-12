@@ -2622,6 +2622,10 @@ class Item extends ItemLight
 		{	// from current revision if it is active for this Item:
 			return $this->get_revision_custom_field_value( $field_index );
 		}
+		elseif( isset( $this->dbchanges_custom_fields[ $field_index ] ) )
+		{	// from the submitted form:
+			return $this->get_setting( 'custom:'.$field_index );
+		}
 		else
 		{	// from the item setting:
 			return $custom_fields[ $field_index ]['value'];
@@ -5893,8 +5897,8 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
-		{	// User has no right to edit this post:
+		if( ! $current_User->check_perm( 'blog_item_propose', 'edit', false, $this->get_blog_ID() ) )
+		{	// User has no right to propose a change for this Item:
 			return false;
 		}
 
@@ -6001,9 +6005,13 @@ class Item extends ItemLight
 	 */
 	function merge_link( $params = array() )
 	{
-		echo $this->get_merge_link( $params );
+		$merge_link = $this->get_merge_link( $params );
 
-		echo_item_merge_js();
+		if( ! empty( $merge_link ) )
+		{
+			echo_item_merge_js();
+			echo $merge_link;
+		}
 	}
 
 
@@ -10905,7 +10913,10 @@ class Item extends ItemLight
 				{	// Get the custom fields from DB:
 					global $DB;
 					$SQL = new SQL( 'Get custom fields of revision #'.$Revision->iver_ID.'('.$Revision->iver_type.') for Item #'.$this->ID );
-					$SQL->SELECT( 'ivcf_itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, ivcf_itcf_label AS label, IFNULL( itcf_name, CONCAT( "!deleted_", ivcf_itcf_ID ) ) AS name, itcf_type AS type, IFNULL( itcf_order, 999999999 ) AS `order`, itcf_note AS note' );
+					$SQL->SELECT( 'ivcf_itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, ivcf_itcf_label AS label, IFNULL( itcf_name, CONCAT( "!deleted_", ivcf_itcf_ID ) ) AS name, itcf_type AS type, IFNULL( itcf_order, 999999999 ) AS `order`, itcf_note AS note, ' );
+					$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
+					$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
+					$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge' );
 					$SQL->FROM( 'T_items__version_custom_field' );
 					$SQL->FROM_add( 'LEFT JOIN T_items__type_custom_field ON ivcf_itcf_ID = itcf_ID' );
 					$SQL->WHERE_and( 'ivcf_iver_ID = '.$DB->quote( $Revision->iver_ID ) );
@@ -12162,13 +12173,27 @@ class Item extends ItemLight
 			return false;
 		}
 
+		if( ! $current_User->check_perm( 'blog_item_propose', 'edit', false, $this->get_blog_ID() ) )
+		{	// User has no right to propose a change for this Item:
+
+			// Display a message:
+			// NOTE: Do NOT translate this because it should not be displayed from normal UI:
+			$Messages->add( 'You don\'t have a permission to propose a change for the Item.', 'error' );
+
+			if( $redirect )
+			{	// Redirect back to previous page
+				header_redirect();
+			}
+			return false;
+		}
+
 		if( ( $last_proposed_Revision = $this->get_revision( 'last_proposed' ) ) &&
 		    $last_proposed_Revision->iver_edit_user_ID != $current_User->ID )
 		{	// Don't allow to propose when previous proposition was created by another user:
 			$UserCache = & get_UserCache();
 			$User = & $UserCache->get_by_ID( $last_proposed_Revision->iver_edit_user_ID, false, false );
 
-			// Display message:
+			// Display a message:
 			$Messages->add( sprintf( T_('You cannot currently propose a change because previous changes by %s are pending review.'),
 				( $User ? $User->get_identity_link() : '<span class="user deleted">'.T_('Deleted user').'</span>' ) ), 'error' );
 

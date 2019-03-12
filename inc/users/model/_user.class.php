@@ -3164,6 +3164,7 @@ class User extends DataObject
 			// NOTE: these are currently the only collections that will check multiple user groups:
 			case 'blog_ismember':
 			case 'blog_can_be_assignee':
+			case 'blog_item_propose':
 			case 'blog_post_statuses':
 			case 'blog_post!published':
 			case 'blog_post!community':

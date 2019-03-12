@@ -1232,7 +1232,7 @@ switch( $action )
 
 	case 'propose':
 		// Check permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		$current_User->check_perm( 'blog_item_propose', 'edit', true, $Blog->ID );
 
 		$AdminUI->breadcrumbpath_add( sprintf( /* TRANS: noun */ T_('Post').' #%s', $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 		$AdminUI->breadcrumbpath_add( T_('Propose change'), '?ctrl=items&amp;action=propose&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
@@ -2129,7 +2129,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		// Check edit permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		$current_User->check_perm( 'blog_item_propose', 'edit', true, $Blog->ID );
 
 		// Check if current User can create a new proposed change:
 		$edited_Item->check_proposed_change( true );
@@ -2137,8 +2137,14 @@ switch( $action )
 		if( $edited_Item->create_proposed_change() )
 		{	// If new proposed changes has been inserted in DB successfully:
 			$Messages->add( T_('New proposed change has been added.'), 'success' );
-			// Redirect to item history page with new poroposed change:
-			header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
+			if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+			{	// Redirect to item history page with new poroposed change if current User has a permisson:
+				header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
+			}
+			else
+			{	// Redirect to item view page:
+				header_redirect( $admin_url.'?ctrl=items&blog='.$edited_Item->get_blog_ID().'&p='.$edited_Item->ID );
+			}
 		}
 
 		// If some errors on creating new proposed change,
