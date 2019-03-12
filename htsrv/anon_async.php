@@ -1770,7 +1770,12 @@ switch( $action )
 		}
 
 		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'widget' );
+		$Session->assert_received_crumb( 'widget', true, array(
+				'msg_format'        => 'text',
+				'msg_no_crumb'      => T_('The server did not receive a security crumb.'),
+				'msg_expired_crumb' => T_('The security crumb has expired.'),
+				'error_code'        => '400 Bad Crumb Request',
+			) );
 
 		// Collection ID:
 		param( 'blog', 'integer', true );
@@ -1820,7 +1825,7 @@ switch( $action )
 
 		if( count( array_diff( $widgets, $enabled_widgets ) ) || count( array_diff( $enabled_widgets, $widgets ) ) )
 		{	// Display error if at least one widget was added or deleted in the container:
-			echo T_('The widgets have been changed since you last loaded this page. Please reload the page to be in sync with the server.');
+			echo T_('The widgets have been changed since you last loaded this page.').' '.T_('Please reload the page to be in sync with the server.');
 			break;
 		}
 
@@ -1858,7 +1863,12 @@ switch( $action )
 		}
 
 		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'widget' );
+		$Session->assert_received_crumb( 'widget', true, array(
+				'msg_format'        => 'text',
+				'msg_no_crumb'      => T_('The server did not receive a security crumb.'),
+				'msg_expired_crumb' => T_('The security crumb has expired.'),
+				'error_code'        => '400 Bad Crumb Request',
+			) );
 
 		param( 'blog', 'integer', 0 );
 		// Colection initialization is required for some widgets:
@@ -1874,7 +1884,7 @@ switch( $action )
 		$disabled_Widget = & $WidgetCache->get_by_ID( $wi_ID, false, false );
 		if( ! $disabled_Widget || ! $disabled_Widget->get( 'enabled' ) )
 		{	// Display error if widget doesn't exist or it is already disabled:
-			echo T_('The widgets have been changed since you last loaded this page. Please reload the page to be in sync with the server.');
+			echo T_('The widgets have been changed since you last loaded this page.').' '.T_('Please reload the page to be in sync with the server.');
 			break;
 		}
 

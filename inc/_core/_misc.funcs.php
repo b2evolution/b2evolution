@@ -3019,9 +3019,10 @@ function debug_die( $additional_info = '', $params = array() )
  *
  * This should be used when a bad user input is detected.
  *
- * @param string Message to output (HTML)
+ * @param string Message to output (HTML/TEXT)
+ * @param string Output format: 'html', 'text'
  */
-function bad_request_die( $additional_info = '' )
+function bad_request_die( $additional_info = '', $error_code = '400 Bad Request', $format = 'html' )
 {
 	global $debug, $baseurl, $is_api_request;
 
@@ -3033,10 +3034,10 @@ function bad_request_die( $additional_info = '' )
 
 		// Set JSON content type:
 		headers_content_mightcache( 'application/json', 0, '#', false ); // Do NOT cache error messages! (Users would not see they fixed them)
-		header_http_response( '400 Bad Request' );
+		header_http_response( $error_code );
 
 		echo json_encode( array(
-				'error_status' => '400 Bad Request',
+				'error_status' => $error_code,
 				'error_info'   => $additional_info,
 			) );
 
@@ -3049,8 +3050,15 @@ function bad_request_die( $additional_info = '' )
 	{
 		load_funcs('_core/_template.funcs.php');
 		headers_content_mightcache( 'text/html', 0, '#', false );		// Do NOT cache error messages! (Users would not see they fixed them)
-		header_http_response('400 Bad Request');
+		header_http_response( $error_code );
 	}
+
+	if( $format == 'text' )
+	{	// Display error message in TEXT format:
+		echo $additional_info;
+		die(2); // Error code 2. Note: this will still call the shutdown function.
+	}
+	// else display error message in HTML format:
 
 	if( ! function_exists( 'T_' ) )
 	{	// Load locale funcs to initialize function "T_" because it is used below:

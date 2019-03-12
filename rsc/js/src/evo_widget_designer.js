@@ -391,7 +391,8 @@ jQuery( document ).on( 'click', '.evo_designer__action_order_up, .evo_designer__
 		},
 		error: function( jqXHR, textStatus, errorThrown )
 		{	// Display error text on error request:
-			evo_widget_display_error( evo_js_lang_error_communicating + ' (' + textStatus + ': ' + errorThrown + ')', widget, order_type );
+			var error_text = ( jqXHR.statusText == 'Bad Crumb Request' ? jqXHR.responseText : evo_js_lang_server_error );
+			evo_widget_display_error( error_text + ' ' + evo_js_lang_sync_error, widget, order_type );
 		}
 	} );
 } );
@@ -440,7 +441,8 @@ jQuery( document ).on( 'click', '.evo_designer__action_disable', function()
 		},
 		error: function( jqXHR, textStatus, errorThrown )
 		{	// Display error text on error request:
-			evo_widget_display_error( evo_js_lang_error_communicating + ' (' + textStatus + ': ' + errorThrown + ')', widget, 'disable' );
+			var error_text = ( jqXHR.statusText == 'Bad Crumb Request' ? jqXHR.responseText : evo_js_lang_server_error );
+			evo_widget_display_error( error_text + ' ' + evo_js_lang_sync_error, widget, order_type );
 		}
 	} );
 } );
