@@ -10695,6 +10695,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13160, 'Updating collection user/group permissions...' ) )
+	{	// part of 6.11.0-beta
+		db_add_col( 'T_coll_user_perms', 'bloguser_perm_item_propose', 'tinyint NOT NULL default 0 AFTER bloguser_can_be_assignee' );
+		db_add_col( 'T_coll_group_perms', 'bloggroup_perm_item_propose', 'tinyint NOT NULL default 0 AFTER bloggroup_can_be_assignee' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 15000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '

@@ -107,6 +107,8 @@ function blog_update_perms( $object_ID, $context = 'user' )
 		$ismember = param( 'blog_ismember_'.$loop_ID, 'integer', 0 );
 		$can_be_assignee = param( 'blog_can_be_assignee_'.$loop_ID, 'integer', 0 );
 
+		$perm_item_propose = param( 'blog_perm_item_propose_'.$loop_ID, 'integer', 0 );
+
 		$perm_published = param( 'blog_perm_published_'.$loop_ID, 'string', '' );
 		if( !empty($perm_published) ) $perm_post[] = 'published';
 
@@ -171,13 +173,13 @@ function blog_update_perms( $object_ID, $context = 'user' )
 
 		// Update those permissions in DB:
 
-		if( $ismember || $can_be_assignee || count($perm_post) || $perm_delpost || $perm_edit_ts || $perm_delcmts || $perm_recycle_owncmts || $perm_vote_spam_comments || $perm_cmtstatuses ||
+		if( $ismember || $can_be_assignee || $perm_item_propose || count($perm_post) || $perm_delpost || $perm_edit_ts || $perm_delcmts || $perm_recycle_owncmts || $perm_vote_spam_comments || $perm_cmtstatuses ||
 			$perm_meta_comments || $perm_cats || $perm_properties || $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change || $perm_analytics )
 		{ // There are some permissions for this user:
 			$ismember = 1;	// Must have this permission
 
 			// insert new perms:
-			$inserted_values[] = " ( $main_object_ID, $loop_ID, $ismember, $can_be_assignee, ".$DB->quote( implode( ',',$perm_post ) ).",
+			$inserted_values[] = " ( $main_object_ID, $loop_ID, $ismember, $can_be_assignee, $perm_item_propose, ".$DB->quote( implode( ',',$perm_post ) ).",
 																".$DB->quote( $perm_item_type ).", ".$DB->quote( $perm_edit ).",
 																$perm_delpost, $perm_edit_ts, $perm_delcmts, $perm_recycle_owncmts, $perm_vote_spam_comments, $perm_cmtstatuses,
 																".$DB->quote( $perm_edit_cmt ).",
@@ -190,7 +192,7 @@ function blog_update_perms( $object_ID, $context = 'user' )
 	if( count( $inserted_values ) )
 	{
 		$DB->query( "INSERT INTO $table( {$ID_field_main}, {$ID_field_edit}, {$prefix}ismember, {$prefix}can_be_assignee,
-											{$prefix}perm_poststatuses, {$prefix}perm_item_type, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_edit_ts,
+											{$prefix}perm_item_propose, {$prefix}perm_poststatuses, {$prefix}perm_item_type, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_edit_ts,
 											{$prefix}perm_delcmts, {$prefix}perm_recycle_owncmts, {$prefix}perm_vote_spam_cmts, {$prefix}perm_cmtstatuses, {$prefix}perm_edit_cmt,
 											{$prefix}perm_meta_comment, {$prefix}perm_cats, {$prefix}perm_properties, {$prefix}perm_admin,
 											{$prefix}perm_media_upload, {$prefix}perm_media_browse, {$prefix}perm_media_change, {$prefix}perm_analytics )

@@ -2024,9 +2024,8 @@ function load_publish_status( $creating = false )
  * @param object edited Item
  * @param boolean Is in-skin editing
  * @param boolean TRUE to display a preview button
- * @param string Action
  */
-function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, $display_preview = false, $action = NULL )
+function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, $display_preview = false )
 {
 	global $Collection, $Blog, $current_User, $UserSettings;
 	global $next_action, $highest_publish_status; // needs to be passed out for echo_publishnowbutton_js( $action )
@@ -2038,7 +2037,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	}
 
 	// ---------- PREVIEW ----------
-	if( ( ! $inskin || $display_preview ) && $action != 'propose' )
+	if( ! $inskin || $display_preview )
 	{
 		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
 		$Form->button( array( 'button', '', /* TRANS: Verb */ T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
@@ -2089,51 +2088,43 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		echo '</span>';
 	}
 
-	if( $action != 'propose' )
-	{	// Don't display the following buttons on propose change action:
-		echo '<span class="btn-group">';
+	echo '<span class="btn-group">';
 
-		// ---------- SAVE ----------
-		$next_action = ($creating ? 'create' : 'update');
-		if( ! $inskin && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
-		{ // Show Save & Edit only on admin mode
-			$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-status-'.$edited_Item->get( 'status' ) ) );
-		}
-
-		if( $inskin )
-		{ // Front-office: display a save button with title depending on post status
-			$button_titles = get_visibility_statuses( 'button-titles' );
-			$button_title = isset( $button_titles[ $edited_Item->get( 'status' ) ] ) ? T_( $button_titles[ $edited_Item->get( 'status' ) ] ) : T_('Save Changes!');
-		}
-		else
-		{ // Use static button title on back-office
-			$button_title = T_('Save');
-		}
-		$Form->submit( array( 'actionArray['.$next_action.']', $button_title, 'SaveButton btn-status-'.$edited_Item->get( 'status' ) ) );
-
-		echo '</span>';
-
-		$Form->hidden( 'publish_status', $highest_publish_status );
-
-		if( $highest_publish_status == 'published' && $UserSettings->get_collection_setting( 'show_quick_publish', $Blog->ID ) )
-		{ // Display this button to make a post published
-
-			// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
-			$publish_style = ( $edited_Item->get( 'status' ) == $highest_publish_status ) ? 'display: none' : 'display: inline';
-
-			$Form->submit( array(
-				'actionArray['.$next_action.'_publish]',
-				/* TRANS: This is the value of an input submit button */ T_('Publish').'!',
-				'SaveButton btn-status-published quick-publish',
-				'',
-				$publish_style
-			) );
-		}
+	// ---------- SAVE ----------
+	$next_action = ($creating ? 'create' : 'update');
+	if( ! $inskin && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+	{ // Show Save & Edit only on admin mode
+		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-status-'.$edited_Item->get( 'status' ) ) );
 	}
 
-	if( $action == 'propose' )
-	{	// Display a button to propose change:
-		$Form->submit( array( 'actionArray[save_propose]', T_('Propose change'), 'btn-primary evo_propose_change_btn' ) );
+	if( $inskin )
+	{ // Front-office: display a save button with title depending on post status
+		$button_titles = get_visibility_statuses( 'button-titles' );
+		$button_title = isset( $button_titles[ $edited_Item->get( 'status' ) ] ) ? T_( $button_titles[ $edited_Item->get( 'status' ) ] ) : T_('Save Changes!');
+	}
+	else
+	{ // Use static button title on back-office
+		$button_title = T_('Save');
+	}
+	$Form->submit( array( 'actionArray['.$next_action.']', $button_title, 'SaveButton btn-status-'.$edited_Item->get( 'status' ) ) );
+
+	echo '</span>';
+
+	$Form->hidden( 'publish_status', $highest_publish_status );
+
+	if( $highest_publish_status == 'published' && $UserSettings->get_collection_setting( 'show_quick_publish', $Blog->ID ) )
+	{ // Display this button to make a post published
+
+		// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
+		$publish_style = ( $edited_Item->get( 'status' ) == $highest_publish_status ) ? 'display: none' : 'display: inline';
+
+		$Form->submit( array(
+			'actionArray['.$next_action.'_publish]',
+			/* TRANS: This is the value of an input submit button */ T_('Publish').'!',
+			'SaveButton btn-status-published quick-publish',
+			'',
+			$publish_style
+		) );
 	}
 }
 

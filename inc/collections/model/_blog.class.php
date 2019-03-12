@@ -3647,7 +3647,7 @@ class Blog extends DataObject
 		{ // Proceed insertion:
 			$DB->query( 'INSERT INTO T_coll_user_perms
 					( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember, bloguser_can_be_assignee,
-						bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit,
+						bloguser_perm_item_propose, bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit,
 						bloguser_perm_delpost, bloguser_perm_edit_ts,
 						bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts,
 						bloguser_perm_cmtstatuses, bloguser_perm_edit_cmt,
@@ -3655,7 +3655,7 @@ class Blog extends DataObject
 						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change,
 						bloguser_perm_analytics )
 					VALUES ( '.$this->ID.', '.$this->owner_user_ID.', 1, 1,
-						"published,community,deprecated,protected,private,review,draft,redirected", "admin", "all",
+						1, "published,community,deprecated,protected,private,review,draft,redirected", "admin", "all",
 						1, 1,
 						1, 1, 1,
 						"published,community,deprecated,protected,private,review,draft", "all",
@@ -3813,7 +3813,7 @@ class Blog extends DataObject
 		}
 
 		// Initialize fields of collection permission tables which must be duplicated:
-		$coll_perm_fields = '{prefix}ismember, {prefix}can_be_assignee, {prefix}perm_poststatuses, {prefix}perm_item_type,
+		$coll_perm_fields = '{prefix}ismember, {prefix}can_be_assignee, {prefix}perm_item_propose, {prefix}perm_poststatuses, {prefix}perm_item_type,
 				{prefix}perm_edit, {prefix}perm_delpost, {prefix}perm_edit_ts, {prefix}perm_delcmts,
 				{prefix}perm_recycle_owncmts, {prefix}perm_vote_spam_cmts, {prefix}perm_cmtstatuses,
 				{prefix}perm_edit_cmt, {prefix}perm_meta_comment, {prefix}perm_cats, {prefix}perm_properties,
@@ -4175,6 +4175,7 @@ class Blog extends DataObject
 			'admins' => array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 1,
+				'perm_item_propose'    => 1,
 				'perm_poststatuses'    => 'published,community,deprecated,protected,private,review,draft,redirected',
 				'perm_item_type'       => 'admin',
 				'perm_edit'            => 'all',
@@ -4197,6 +4198,7 @@ class Blog extends DataObject
 			'moderators' => array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 1,
+				'perm_item_propose'    => 1,
 				'perm_poststatuses'    => 'published,community,deprecated,protected,private,review,draft',
 				'perm_item_type'       => 'restricted',
 				'perm_edit'            => 'le',
@@ -4219,6 +4221,7 @@ class Blog extends DataObject
 			'editors' => array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 1,
 				'perm_poststatuses'    => '',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'no',
@@ -4244,6 +4247,7 @@ class Blog extends DataObject
 			$group_permissions['editors'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => 'community,protected,draft,deprecated',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'own',
@@ -4266,6 +4270,7 @@ class Blog extends DataObject
 			$group_permissions['users'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => 'community,draft',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'no',
@@ -4288,6 +4293,7 @@ class Blog extends DataObject
 			$group_permissions['suspect'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => 'review,draft',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'no',
@@ -4314,6 +4320,7 @@ class Blog extends DataObject
 			$group_permissions['blogb'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => '',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'no',

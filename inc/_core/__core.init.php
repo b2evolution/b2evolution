@@ -1392,7 +1392,8 @@ class _core_Module extends Module
 		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) )
 		{ // A collection is currently selected AND we can activate toolbar items for selected collection:
 
-			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) ||
+			    $current_User->check_perm( 'blog_item_propose', 'edit', false, $Blog->ID ) )
 			{ // We have permission to add a post with at least one status:
 				global $disp, $ctrl, $action, $Item, $edited_Item;
 				if( ( $disp == 'edit' || $ctrl == 'items' ) &&
@@ -1424,18 +1425,24 @@ class _core_Module extends Module
 					if( ! empty( $Item ) || ( ! empty( $edited_Item ) && $edited_Item->ID > 0 ) )
 					{	// Display menu entries to edit and view the post in back-office:
 						$menu_Item = empty( $Item ) ? $edited_Item : $Item;
-						$entries['page']['entries']['edit_back'] = array(
-								'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
-								'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
-							);
-						$entries['page']['entries']['propose'] = array(
-								'text' => T_('Propose change').'&hellip;',
-								'href' => $admin_url.'?ctrl=items&amp;action=propose&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
-							);
-						$entries['page']['entries']['view_back'] = array(
-								'text' => sprintf( T_('View "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
-								'href' => $admin_url.'?ctrl=items&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
-							);
+						if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+						{
+							$entries['page']['entries']['edit_back'] = array(
+									'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
+									'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+								);
+							$entries['page']['entries']['view_back'] = array(
+									'text' => sprintf( T_('View "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
+									'href' => $admin_url.'?ctrl=items&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+								);
+						}
+						if( $current_User->check_perm( 'blog_item_propose', 'edit', false, $Blog->ID ) )
+						{	// If current User has a permission to propose a change for the Item:
+							$entries['page']['entries']['propose'] = array(
+									'text' => T_('Propose change').'&hellip;',
+									'href' => $admin_url.'?ctrl=items&amp;action=propose&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
+								);
+						}
 					}
 				}
 				if( isset( $entries['post'] ) && $write_item_url = $Blog->get_write_item_url() )
