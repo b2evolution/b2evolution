@@ -96,7 +96,10 @@ switch( $action )
 
 		if( $action == 'propose' &&
 		    ( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) ) )
-		{	// Suggest item fields values from last proposed change when user creates new propose change:
+		{	// If the Item already has a proposed change:
+			// Check if current User can create a new proposed change:
+			$edited_Item->check_proposed_change( true );
+			// Suggest item fields values from last proposed change when user creates new propose change:
 			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
 		}
 
@@ -2127,6 +2130,9 @@ switch( $action )
 
 		// Check edit permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		// Check if current User can create a new proposed change:
+		$edited_Item->check_proposed_change( true );
 
 		if( $edited_Item->create_proposed_change() )
 		{	// If new proposed changes has been inserted in DB successfully:

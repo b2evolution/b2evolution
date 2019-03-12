@@ -12144,6 +12144,46 @@ class Item extends ItemLight
 
 
 	/**
+	 * Check if current user can create new proposed change
+	 *
+	 * @param boolean TRUE to redirect back if current user cannot create a proposed change
+	 * @return boolean
+	 */
+	function check_proposed_change( $redirect = false )
+	{
+		global $current_User, $Messages;
+
+		if( ! is_logged_in() )
+		{	// User must be logged in:
+			if( $redirect )
+			{	// Redirect back to previous page
+				header_redirect();
+			}
+			return false;
+		}
+
+		if( ( $last_proposed_Revision = $this->get_revision( 'last_proposed' ) ) &&
+		    $last_proposed_Revision->iver_edit_user_ID != $current_User->ID )
+		{	// Don't allow to propose when previous proposition was created by another user:
+			$UserCache = & get_UserCache();
+			$User = & $UserCache->get_by_ID( $last_proposed_Revision->iver_edit_user_ID, false, false );
+
+			// Display message:
+			$Messages->add( sprintf( T_('You cannot currently propose a change because previous changes by %s are pending review.'),
+				( $User ? $User->get_identity_link() : '<span class="user deleted">'.T_('Deleted user').'</span>' ) ), 'error' );
+
+			if( $redirect )
+			{	// Redirect back to previous page
+				header_redirect();
+			}
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * Create a new proposed change
 	 *
 	 * @return integer/boolean ID of created item revision if successful, otherwise False
@@ -12156,9 +12196,6 @@ class Item extends ItemLight
 		{	// Item must be created and current user must be logged in:
 			return false;
 		}
-
-		// START of loading the proposed change this this Item from request:
-		$this->set( 'status', param( 'post_status', 'string', 'published' ) );
 
 		if( $this->get_type_setting( 'allow_html' ) )
 		{	// HTML is allowed for this post, we'll accept HTML tags:
@@ -12213,12 +12250,6 @@ class Item extends ItemLight
 		// END of loading the proposed change this this Item from request.
 
 		$DB->begin( 'SERIALIZABLE' );
-
-		if( isset( $this->previous_status ) )
-		{	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
-			// (ONLY if current request is updating item status)
-			$this->restrict_status( true );
-		}
 
 		// Get next version ID:
 		$iver_ID = $this->get_next_version_ID( 'proposed' );

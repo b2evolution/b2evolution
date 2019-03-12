@@ -267,22 +267,20 @@ $Form->end_form( $buttons );
 // JS code for merge button:
 echo_item_merge_js();
 
-if( $revisions_count > 2 )
+if( $revisions_count > 1 )
 {	// Print JS code for selectors to compare the revisions
 ?>
 <script>
 jQuery( document ).ready( function()
 {	// Set default selected revisions on page loading:
-	var rows_num = jQuery( 'input[name=r1]' ).length,
-	current_index = jQuery( 'input[name=r1]' ).index( jQuery( 'input[name=r1][value=c]' ) );
-	if( current_index == rows_num - 1 )
-	{	// Suggest to compare curent version with first proposed change if post has only the proposed changes without archived versions:
+	if( jQuery( 'input[name=r1][value=p1]' ).length )
+	{	// Suggest to compare curent version with last proposed change:
 		jQuery( 'input[name=r1][value=c]' ).click();
-		jQuery( 'input[name=r2]:eq( ' + ( current_index - 1 ) + ' )' ).click();
+		jQuery( 'input[name=r2]:first' ).click();
 	}
 	else
-	{	// Suggest to compare curent version with last archived version if post has at least one archived version:
-		jQuery( 'input[name=r1]:eq( ' + ( current_index + 1 ) + ' )' ).click();
+	{	// Suggest to compare curent version with last archived version:
+		jQuery( 'input[name=r1]:eq( 1 )' ).click();
 		jQuery( 'input[name=r2][value=c]' ).click();
 	}
 } );
