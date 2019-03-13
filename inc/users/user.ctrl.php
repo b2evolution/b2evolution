@@ -444,7 +444,7 @@ if( !$Messages->has_errors() )
 				if( param( 'send_pass_email', 'integer', 0 ) )
 				{	// Inform new created user by email:
 					locale_temp_switch( $edited_User->get( 'locale' ) );
-					send_mail_to_User( $edited_User->ID, T_('New account'), 'new_account_password_info', array(
+					send_mail_to_User( $edited_User->ID, sprintf( T_('Your new account on %s'), $Settings->get( 'notification_short_name' ) ), 'new_account_password_info', array(
 							'login'    => $edited_User->get( 'login' ),
 							'password' => get_param( 'edited_user_pass1' ),
 						), true );

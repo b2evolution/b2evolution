@@ -1579,9 +1579,10 @@ function can_be_displayed_with_status( $status, $type, $blog_ID, $creator_user_I
  * @param object|NULL Current collection, Used for additional checking
  * @param boolean true if function $BlogCache->get_by_ID() should die on error
  * @param boolean true if function $BlogCache->get_by_ID() should die on empty/null
+ * @param boolean true to get first detected collection from DB when requested collection is not defined
  * @return object|NULL|false
  */
-function & get_setting_Blog( $setting_name, $current_Blog = NULL, $halt_on_error = false, $halt_on_empty = false )
+function & get_setting_Blog( $setting_name, $current_Blog = NULL, $halt_on_error = false, $halt_on_empty = false, $get_first = false )
 {
 	global $Settings;
 
@@ -1597,6 +1598,12 @@ function & get_setting_Blog( $setting_name, $current_Blog = NULL, $halt_on_error
 	{ // Check if blog really exists in DB
 		$BlogCache = & get_BlogCache();
 		$setting_Blog = & $BlogCache->get_by_ID( $blog_ID, $halt_on_error, $halt_on_empty );
+	}
+
+	if( $get_first && empty( $setting_Blog ) )
+	{	// Try to get first collection from DB:
+		$BlogCache = & get_BlogCache();
+		$setting_Blog = & $BlogCache->get_first();
 	}
 
 	if( $setting_name == 'login_blog_ID' &&
