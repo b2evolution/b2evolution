@@ -525,7 +525,7 @@ class LinkItem extends LinkOwner
 
 			$SQL = new SQL();
 			$SQL->SELECT( 'ivl_link_ID AS link_ID, ivl_iver_itm_ID AS link_itm_ID, ivl_file_ID AS link_file_ID, ivl_position AS link_position, ivl_order AS link_order' );
-			$SQL->SELECT_add( ', NULL AS link_datecreated, NULL AS link_datemodified, NULL AS link_creator_user_ID, NULL AS link_lastedit_user_ID, NULL AS link_cmt_ID, NULL AS link_usr_ID, NULL AS link_ecmp_ID, NULL AS link_msg_ID, NULL AS link_tmp_ID, NULL AS link_ltype_ID' );
+			$SQL->SELECT_add( ', NULL AS link_datecreated, NULL AS link_datemodified, NULL AS link_creator_user_ID, NULL AS link_lastedit_user_ID, NULL AS link_cmt_ID, NULL AS link_usr_ID, NULL AS link_ecmp_ID, NULL AS link_msg_ID, NULL AS link_tmp_ID' );
 			$SQL->SELECT_add( $params['sql_select_add'] );
 			$SQL->FROM( 'T_items__version_link' );
 			$SQL->WHERE( 'ivl_iver_itm_ID = '.$this->get_ID() );
