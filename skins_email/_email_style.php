@@ -49,16 +49,16 @@ $emailskins_styles = array(
 	padding: 2em 0 0 0;
 ',
 'div.email_header' => '
-	margin: 0 2em 4px;
+	margin: 0 2em 12px;
 	padding: 0;
-	text-align: right;
+	text-align: center;
 ',
 'div.email_payload' => '
 	background-color: #fff;
-	border: 1px solid #ddd;
-	margin: 8px 10px;
-	padding: 1px 1em;
-	border-radius: 5px;
+	border-top: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+	margin: 8px 0px;
+	padding: 30px 1em;
 ',
 'div.email_ugc' => '
 	margin: 1em 1em;
@@ -120,14 +120,11 @@ $emailskins_styles = array(
 	margin: 1ex 0;
 ',
 'div.buttons a' => '
-	margin: 2px 14px 8px 0;
+	margin: 3px 0;
 	padding: 6px 14px;
 	border-radius: 4px;
-	font-size: 84%;
-	font-weight: bold;
 	text-decoration: none;
 	display: inline-block;
-	box-shadow: 1px 1px 4px #c4c4c4;
 ',
 'a.button_green' => '
 	color: #454;
@@ -253,6 +250,95 @@ $emailskins_styles = array(
 	background-image: none;
 	border: 1px solid #46b8da;
 	border-radius: 4px;
+',
+'a.btn-sm' => '
+	font-size: 0.85em;
+	padding: 5px 10px;
+	border-radius: 4px;
+	line-height: 1.5;
+',
+/* Labels */
+'.label' => '
+	display: inline;
+	padding: .2em .6em .3em;
+	font-size: 75%;
+	font-weight: 700;
+	line-height: 1;
+	color: #fff;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: baseline;
+	border-radius: .25em;
+',
+'.label-default' => '
+	background-color: #777;
+',
+'.label-primary' => '
+	background-color: #337ab7;
+',
+'.label-success' => '
+	background-color: #5cb85c;
+',
+'.label-info' => '
+	background-color: #5bc0de;
+',
+'.label-warning' => '
+	background-color: #f0ad4e;
+',
+'.label-danger' => '
+	background-color: #d9534f;
+',
+/* Polls */
+'li.evo_poll_option' => '
+	margin-top: 1ex;
+	margin-bottom: 1ex;
+',
+/* Images */
+'.image_block' => '
+	text-align: center;
+',
+'.image_block img' => '
+	margin: 1ex;
+',
+'.image_legend' => '
+	font-size: 84%;
+	color: #aaa;
+	margin: 1ex;
+',
+'.evo_image_block' => '
+	text-align: center;
+',
+'.evo_image_legend' => '
+	font-size: 84%;
+	color: #aaa;
+	padding: 9px 6px 6px 6px;
+	text-align: center;
+',
+'.img-responsive' => '
+	display: inline-block;
+',
+'.evo_thumbnail' => '
+	max-width: 100%;
+',
+'.evo_thumbnail__left' => '
+  float: left;
+	margin: 0 4px 4px 0;
+',
+'.evo_thumbnail__right' => '
+	float: right;
+	margin: 0 0 4px 4px;
+',
+'.border' => '
+	border: 1px solid #666;
+',
+'.noborder' => '
+	border: none;
+',
+'.rounded' => '
+	border-radius: 4px;
+',
+'.squared' => '
+	border-radius: 0;
 ',
 );
 ?>

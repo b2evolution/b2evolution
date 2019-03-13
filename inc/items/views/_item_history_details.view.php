@@ -64,4 +64,6 @@ $Form->info( T_('Custom fields'), $edited_Item->get_custom_fields( array(
 
 $Form->end_form();
 
+// JS code for merge button:
+echo_item_merge_js();
 ?>

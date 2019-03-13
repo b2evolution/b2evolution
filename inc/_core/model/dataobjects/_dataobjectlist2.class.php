@@ -222,6 +222,58 @@ class FilteredResults extends Results
 		// Activate preset filters if necessary:
 		$this->activate_preset_filters();
 	}
+
+
+	/**
+	 * Check if filter query has at least one selected filter with given value and condition
+	 *
+	 * @param string Filter name
+	 * @param string Value
+	 * @param string Condition operator: =, !=, >, >=, <, <=
+	 */
+	function check_filter_query( $filter, $value, $condition = '=' )
+	{
+		if( empty( $this->filters['filter_query'] ) )
+		{	// Filter query is not defined for this results list:
+			return false;
+		}
+
+		if( ! preg_match_all( '/{"id":"'.$filter.'"[^}]+"value":"([^"]*)"[^}]*}/i', $this->filters['filter_query'], $filter_values ) )
+		{	// Current filter query has no value of the requested filter:
+			return false;
+		}
+
+		foreach( $filter_values[1] as $filter_value )
+		{
+			switch( $condition )
+			{
+				case '=':
+					$result = ( $filter_value == $value );
+					break;
+				case '!=':
+					$result = ( $filter_value != $value );
+					break;
+				case '>':
+					$result = ( $filter_value > $value );
+					break;
+				case '>=':
+					$result = ( $filter_value >= $value );
+					break;
+				case '<':
+					$result = ( $filter_value < $value );
+					break;
+				case '<=':
+					$result = ( $filter_value <= $value );
+					break;
+			}
+			if( $result )
+			{	// Stop of the first searched value:
+				return $result;
+			}
+		}
+
+		return false;
+	}
 }
 
 

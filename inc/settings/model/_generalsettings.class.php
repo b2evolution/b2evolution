@@ -52,20 +52,25 @@ class GeneralSettings extends AbstractSettings
 		'auto_empty_trash' => '15',         // days (How many days to keep recycled comments)
 
 		'cleanup_jobs_threshold' => 45, // days (Cleanup scheduled jobs threshold)
+		'cleanup_email_logs_threshold' => 59616000, // seconds (Cleanup email logs threshold)
 		'activate_account_reminder_threshold' => 86400, // seconds (Account activation reminder threshold)
-		'activate_account_reminder_config' => '86400'./* one day */',129600'./* 1.5 days */',345600'./* 4 days */',604800'/* 7 days */, // seconds (Account activation reminder settings)
+		'activate_account_reminder_config' => '86400,129600,345600,604800,0,0', // seconds (Account activation reminder settings), Defaults: one day, 1.5 days, 4 days, 7 days, "Don't send", "Don't delete"
+		'inactive_account_reminder_threshold' => 31536000, // seconds (Inactive account reminder threshold)
 		'comment_moderation_reminder_threshold' => 86400, // seconds (Comment moderation reminder threshold)
 		'post_moderation_reminder_threshold' => 86400, // seconds (Post moderation reminder threshold)
 		'unread_message_reminder_threshold' => 86400, // seconds (Unread private messages reminder threshold)
-		'unread_message_reminder_delay' => // Unread message reminder is sent in every y days in case when a user last logged in date is below x days.
-			// The values below are in x:y format.
-			'10:3,'.   // less than 10 days -> 3 days spacing
-			'30:6,'.   //  10 to  30 days ->   6 days spacing
-			'90:15,'.  //  30 to  90 days ->  15 days spacing
-			'180:30,'. //  90 to 180 days ->  30 days spacing
-			'365:60,'. // 180 to 365 days ->  60 days spacing
-			'730:120', // 365 to 730 days -> 120 days spacing
-			// more => "The user has not logged in for x days, so we will not send him notifications any more".
+		'unread_message_reminder_delay' => '10:3,30:6,90:15,180:30,365:60,730:120',// Unread message reminder is sent in every y days in case when a user last logged in date is below x days.
+			/* The default values are in x:y format:
+				less than 10 days ->   3 days spacing
+				   10 to  30 days ->   6 days spacing
+				   30 to  90 days ->  15 days spacing
+				   90 to 180 days ->  30 days spacing
+				  180 to 365 days ->  60 days spacing
+				  365 to 730 days -> 120 days spacing
+				more => "The user has not logged in for x days, so we will not send him notifications any more"*/
+		// Manage email address statuses:
+		'manage_email_statuses_min_delay' => 259200, // seconds, Minimum 3 days delay since last error
+		'manage_email_statuses_min_sends' => 3, // Number of minimum sends since last error
 
 		'email_service' => 'mail', // Preferred email service: 'mail', 'smtp'
 		'force_email_sending' => '0', // Force email sending
@@ -92,6 +97,7 @@ class GeneralSettings extends AbstractSettings
 		'fm_enable_roots_user' => '1',
 		'fm_enable_roots_shared' => '1',
 		'fm_enable_roots_skins' => '1',
+		'fm_enable_roots_plugins' => '1',
 
 		'fm_showtypes' => '0',
 		'fm_showfsperms' => '0',
@@ -128,11 +134,13 @@ class GeneralSettings extends AbstractSettings
 		'def_enable_email' => '0',
 		'def_notify_messages' => '1',
 		'def_notify_unread_messages' => '1',
+		'def_notify_comment_mentioned' => '1',
 		'def_notify_published_comments' => '1',
 		'def_notify_comment_moderation' => '1',
 		'def_notify_edit_cmt_moderation' => '1',
 		'def_notify_spam_cmt_moderation' => '1',
 		'def_notify_meta_comments' => '1',
+		'def_notify_post_mentioned' => '1',
 		'def_notify_post_moderation' => '1',
 		'def_notify_edit_pst_moderation' => '1',
 		'def_notify_post_assignment' => '1',
@@ -146,6 +154,7 @@ class GeneralSettings extends AbstractSettings
 
 		// Welcome private message
 		'welcomepm_enabled' => 0,
+		'welcomepm_notag'   => 0,
 		'welcomepm_from'    => 'admin',	// User login
 		'welcomepm_title'   => 'Welcome to our community!',
 		'welcomepm_message' => '',
@@ -160,24 +169,24 @@ class GeneralSettings extends AbstractSettings
 		'regexp_dirname' => '^[a-zA-Z0-9\-_]+$', // TODO: accept spaces and special chars / do full testing on this
 		'reloadpage_timeout' => '300',
 		'time_difference' => '0',
-		'timeout_sessions' => '604800',             // seconds (604800 == 7 days)
-		'timeout_online' => '1200',                 // seconds (1200 == 20 minutes)
+		'timeout_sessions' => '604800',			// seconds (604800 == 7 days)
+		'timeout_online' => '1200',				// seconds (1200 == 20 minutes)
 		'upload_enabled' => '1',
 		'upload_maxkb' => '32000',					// 32 MB
 		'evocache_foldername' => '.evocache',
 		'blogs_order_by' => 'order',				// blogs order in backoffice menu and other places
-		'blogs_order_dir' => 'ASC',					// blogs order direction in backoffice menu and other places
+		'blogs_order_dir' => 'ASC',				// blogs order direction in backoffice menu and other places
 
 		'user_minpwdlen' => '5',
-		'js_passwd_hashing' => '1',					// Use JS password hashing by default
+		'js_passwd_hashing' => '1',				// Use JS password hashing by default
 		'passwd_special' => '0',					// Do not require a special character in password by default
 		'strict_logins' => 1,						// Allow only plain ACSII characters in user login
 
-		'allow_moving_chapters' => '0',				// Do not allow moving chapters by default
+		'allow_moving_chapters' => '0',			// Do not allow moving chapters by default
 
 		'cross_posting' => 0,						// Allow additional categories from other blogs
 		'cross_posting_blog' => 0,					// Allow to choose main category from another blog
-		'redirect_moved_posts' => 0,                // Allow to redirect moved posts link to the correct blog
+		'redirect_moved_posts' => 0,				// Allow to redirect moved posts link to the correct blog
 
 		'subscribe_new_blogs' => 'public', // Subscribing to new blogs: 'page', 'public', 'all'
 
@@ -225,7 +234,9 @@ delayed 24 hours
 delayed 48 hours
 delayed 72 hours
 failure notice
-Undeliverable:',
+Undeliverable:
+Quarantine
+Карантин',
 		'repath_body_terminator' => '---------- Forwarded message ----------
 ------ This is a copy of the message, including all the headers. ------
 ----- Transcript of session follows -----
@@ -273,6 +284,8 @@ T account has been disabled
 T timeout exceeded
 T quota exceeded
 T Delivery attempts will continue
+T quarantine
+T карантин
 P is unavailable
 P not available
 P user doesn\'t have a .+ account
@@ -325,11 +338,17 @@ C message size exceeds',
 		// Account closing options:
 		'account_close_enabled' => 1, // Allow users to close their account themselves
 		'account_close_intro'   => "We are sorry to see you leave.\n\nWe value your feedback. Please be so kind and tell us in a few words why you are leaving us. This will help us to improve the site for the future.",
-		'account_close_reasons' => "I don't need this account any more.\nI do not like this site.", // Reasons to close an account, separated by new line
+		'account_close_reasons' => "I don't need this account any more.\nI do not like this site.\nI am getting spam from this site.", // Reasons to close an account, separated by new line
 		'account_close_byemsg'  => 'Your account has now been closed. If you ever want to log in again, you will need to create a new account.',
 
 	// Back-end settings, these can't be modified by the users:
 		'last_invalidation_timestamp' => 0,
+
+	// Cron job settings:
+		'cjob_maxemail_send-non-activated-account-reminders' => 50,
+		'cjob_maxemail_execute-automations' => 50,
+		'cjob_maxemail_send-inactive-account-reminders' => 50,
+		'cjob_maxemail_send-unread-messages-reminders' => 50,
 	);
 
 

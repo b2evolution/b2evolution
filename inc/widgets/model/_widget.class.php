@@ -307,8 +307,8 @@ class ComponentWidget extends DataObject
 
 		if( $use_tooltip )
 		{ // Add these data only for tooltip
-			$link_attrs['class']  = 'action_icon help_plugin_icon';
-			$link_attrs['rel']    = format_to_output( $this->get_desc(), 'htmlattr' );
+			$link_attrs['class'] = 'action_icon help_plugin_icon';
+			$link_attrs['data-popover'] = format_to_output( $this->get_desc(), 'htmlattr' );
 		}
 
 		return action_icon( '', $icon, $widget_url, NULL, NULL, NULL, $link_attrs );
@@ -350,7 +350,7 @@ class ComponentWidget extends DataObject
 			$r['widget_css_class'] = array(
 					'label' => '<span class="dimmed">'.T_( 'CSS Class' ).'</span>',
 					'size' => 20,
-					'note' => T_( 'Replaces $wi_class$ in your skins containers.'),
+					'note' => sprintf( T_('Will be injected into %s in your skin containers (along with required system classes).'), '<code>$wi_class$</code>' ),
 				);
 		}
 
@@ -359,7 +359,7 @@ class ComponentWidget extends DataObject
 			$r['widget_ID'] = array(
 					'label' => '<span class="dimmed">'.T_( 'DOM ID' ).'</span>',
 					'size' => 20,
-					'note' => T_( 'Replaces $wi_ID$ in your skins containers.'),
+					'note' => sprintf( T_('Replaces %s in your skins containers.'), '<code>$wi_ID$</code>' ).' '.sprintf( T_('Leave empty to use default value: %s.'), '<code>widget_'.$this->type.'_'.$this->code.'_'.$this->ID.'</code>' ),
 				);
 		}
 
@@ -407,13 +407,14 @@ class ComponentWidget extends DataObject
 
 
 	/**
- 	 * Get param value.
- 	 *
- 	 * @param string
- 	 * @param boolean default false, set to true only if it is called from a widget::get_param_definition() function to avoid infinite loop
- 	 * @return mixed
+	 * Get param value.
+	 *
+	 * @param string Parameter name
+	 * @param mixed Default value, Set to different than NULL only if it is called from a widget::get_param_definition() function to avoid infinite loop
+	 * @param string|NULL Group name
+	 * @return mixed
 	 */
-	function get_param( $parname, $check_infinite_loop = false, $group = NULL )
+	function get_param( $parname, $default_value = NULL, $group = NULL )
 	{
 		$this->load_param_array();
 
@@ -445,9 +446,14 @@ class ComponentWidget extends DataObject
 			return $this->param_array[ $parname ];
 		}
 
-		// Try default values:
-		// Note we set 'infinite_loop' param to avoid calling the get_param() from the get_param_definitions() function recursively
-		$params = $this->get_param_definitions( $check_infinite_loop ? array( 'infinite_loop' => true ) : NULL );
+		if( $default_value !== NULL )
+		{	// Use defined default value when it is not saved in DB yet:
+			// (This call is used to get a value from function widget::get_param_definition() to avoid infinite loop)
+			return $default_value;
+		}
+
+		// Try default values from widget config:
+		$params = $this->get_param_definitions( NULL );
 
 		if( $group === NULL )
 		{	// Get param from simple field:
@@ -1293,10 +1299,34 @@ class ComponentWidget extends DataObject
 		$Plugins_admin->filter_contents( $fake_title /* by ref */, $content /* by ref */, $widget_renderers, $params /* by ref */ );
 
 		// Render block content with selected plugins:
-		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Render' );
-		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog ), 'Display' );
+		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog, 'Widget' => $this ), 'Render' );
+		$Plugins->render( $content, $widget_renderers, 'htmlbody', array( 'Blog' => & $widget_Blog, 'Widget' => $this ), 'Display' );
 
 		return $content;
+	}
+
+
+	/**
+	 * Get JavaScript code which helps to edit widget form
+	 *
+	 * @return string
+	 */
+	function get_edit_form_javascript()
+	{
+		return false;
+	}
+
+
+	/**
+	 * Get a form display mode depending on requested skin param 'form_display'
+	 *
+	 * @param string Default value for form display: 'standard', 'compact', 'nolabels', 'inline', 'grouped'
+	 * @return string Current form display: 'standard', 'compact', 'nolabels', 'inline', 'grouped' or another default of the widget
+	 */
+	function get_form_display( $default_form_display = 'standard' )
+	{
+		$form_display = isset( $this->disp_params['form_display'] ) ? $this->disp_params['form_display'] : $default_form_display;
+		return in_array( $form_display, array( 'standard', 'compact', 'nolabels', 'inline', 'grouped' ) ) ? $form_display : $default_form_display;
 	}
 }
 ?>

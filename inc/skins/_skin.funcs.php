@@ -78,6 +78,14 @@ function skin_init( $disp )
 
 	$Debuglog->add('skin_init: $disp='.$disp, 'skins' );
 
+	if( in_array( $disp, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish', 'visits', 'closeaccount' ) ) &&
+	    $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) &&
+	    $Blog->ID != $msg_Blog->ID )
+	{	// Redirect to collection which should be used for profile/messaging pages:
+		header_redirect( $msg_Blog->get( $disp.'url', array( 'glue' => '&' ) ) );
+		// Exit here.
+	}
+
 	// This is the main template; it may be used to display very different things.
 	// Do inits depending on current $disp:
 	switch( $disp )
@@ -169,58 +177,62 @@ function skin_init( $disp )
 				$Item->check_goal();
 			}
 
-			// Check if the post has 'redirected' status:
-			if( ! $preview && $Item->status == 'redirected' && $redir == 'yes' )
-			{	// $redir=no here allows to force a 'single post' URL for commenting
-				// Redirect to the URL specified in the post:
-				$Debuglog->add( 'Redirecting to post URL ['.$Item->url.'].' );
-				header_redirect( $Item->url, true, true );
-			}
-
-			// Check if the post has 'deprecated' status:
-			if( isset( $Item->status ) && $Item->status == 'deprecated' )
-			{ // If the post is deprecated
-				global $disp;
-				$disp = '404';
-				$disp_detail = '404-deprecated-post' ;
-				break;
-			}
-
-			// Check if the post has allowed front office statuses
-			$allowed_statuses = get_inskin_statuses( $Blog->ID, 'post' );
-			if( ! $preview && ! in_array( $Item->status, $allowed_statuses ) )
-			{
-				global $disp;
-				$disp = '404';
-				$disp_detail = '404-disallowed-post-status';
-				break;
-			}
-
 			// Check if we want to redirect to a canonical URL for the post
 			// Please document encountered problems.
 			if( ! $preview
 					&& (( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
 								|| $Blog->get_setting( 'relcanonical_item_urls' ) ) )
 			{	// We want to redirect to the Item's canonical URL:
-
-				$canonical_url = $Item->get_permanent_url( '', '', '&' );
-				if( preg_match( '|[&?](page=\d+)|', $ReqURI, $page_param ) )
-				{	// A certain post page has been requested, keep only this param and discard all others:
-					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
+				$canonical_is_same_url = true;
+				$item_Blog = & $Item->get_Blog();
+				// Use item URL from first detected category of the current collection:
+				if( $item_Blog->get_setting( 'allow_crosspost_urls' ) )
+				{	// If non-canonical URL is allowed for cross-posted items,
+					// try to get a canonical URL in thecurrent collection even it is not main/canonical collection of the Item:
+					$canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID );
 				}
-				if( preg_match( '|[&?](mode=quote&[qcp]+=\d+)|', $ReqURI, $page_param ) )
-				{	// A quote of comment/post, keep only these params and discard all others:
-					$canonical_url = url_add_param( $canonical_url, $page_param[1], '&' );
+				else
+				{	// If non-canonical URL is allowed for cross-posted items, then only get canonical URL in the main collection:
+					$canonical_url = $Item->get_permanent_url( '', '', '&' );
+				}
+				$canonical_url_params_regexp = '#[&?](page=\d+|mode=quote&[qcp]+=\d+)+#';
+				if( preg_match_all( $canonical_url_params_regexp, $ReqURI, $page_param ) )
+				{	// A certain post page or a quote of comment/post have been requested, keep only this param and discard all others:
+					$canonical_url = url_add_param( $canonical_url, implode( '&', $page_param[1] ), '&' );
 				}
 				if( preg_match( '|[&?](revision=(p?\d+))|', $ReqURI, $revision_param )
 						&& ( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item ) )
-						&& $Item->get_revision( $revision_param[2] ) )
+						&& $item_revision = $Item->get_revision( $revision_param[2] ) )
 				{ // A revision of the post, keep only this param and discard all others:
 					$canonical_url = url_add_param( $canonical_url, $revision_param[1], '&' );
 					$Item->set( 'revision', $revision_param[2] );
+					$Messages->add( sprintf( T_('You are viewing Revision #%s dated %s' ), $revision_param[2], date( locale_datetimefmt(), strtotime( $item_revision->iver_edit_last_touched_ts ) ) ), 'note' );
+				}
+				$canonical_is_same_url = is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
+
+				if( ! $canonical_is_same_url && in_array( $Blog->get_setting( 'single_links' ), array( 'subchap', 'chapters' ) ) )
+				{	// If current URL is not same as first detected category then try to check all other categories from the current collection:
+					$item_chapters = $Item->get_Chapters();
+					foreach( $item_chapters as $item_Chapter )
+					{	// Try to find in what category the Item may has the same canonical url as current requested URL:
+						if( ! $item_Blog->get_setting( 'allow_crosspost_urls' ) &&
+						    $item_Blog->ID != $item_Chapter->get( 'blog_ID' ) )
+						{	// Don't allow to use URL of categories from cross-posted collection if it is restricted:
+							continue;
+						}
+						$cat_canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID, $item_Chapter->ID );
+						if( preg_match_all( $canonical_url_params_regexp, $ReqURI, $page_param ) )
+						{	// A certain post page or a quote of comment/post have been requested, keep only this param and discard all others:
+							$cat_canonical_url = url_add_param( $cat_canonical_url, implode( '&', $page_param[1] ), '&' );
+						}
+						if( $canonical_is_same_url = is_same_url( $ReqURL, $cat_canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
+						{	// We have found the same URL, stop find another and stay on the current page without redirect:
+							break;
+						}
+					}
 				}
 
-				if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+				if( ! $canonical_is_same_url )
 				{	// The requested URL does not look like the canonical URL for this post...
 					// url difference was resolved
 					$url_resolved = false;
@@ -238,7 +250,7 @@ function skin_init( $disp )
 								$MainList->nav_target = $cat_param[1];
 							}
 						}
-						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get( 'http_protocol' ) != 'always_redirect' );
+						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 					}
 					if( preg_match( '|[&?]tag=([^&A-Z]+)|', $ReqURI, $tag_param ) )
 					{ // A tag post navigation param is set
@@ -253,19 +265,24 @@ function skin_init( $disp )
 								$MainList->nav_target = $tag_param[1];
 							}
 						}
-						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get( 'http_protocol' ) != 'always_redirect' );
+						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 					}
 
-					if( !$url_resolved && $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' && ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) ) )
+					if( ! $url_resolved &&
+					    $Blog->get_setting( 'canonical_item_urls' ) &&
+					    $redir == 'yes' &&
+					    ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) || // If Item has main category in the current collection
+					      $Item->is_part_of_blog( $Blog->ID ) // If Item has extra category from not main collection
+					    ) )
 					{	// REDIRECT TO THE CANONICAL URL:
 						$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].' );
 						header_redirect( $canonical_url, true );
+						// EXITED.
 					}
 					else
 					{	// Use rel="canoncial":
 						add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 					}
-					// EXITED.
 				}
 			}
 
@@ -326,7 +343,16 @@ function skin_init( $disp )
 			if( !empty($active_filters) )
 			{	// The current page is being filtered...
 
-				if( array_diff( $active_filters, array( 'page' ) ) == array() )
+				if( array_diff( $active_filters, array( 'posts' ) ) == array() )
+				{	// This is the default blog page only if the 'front_disp' is set to 'posts'
+					$disp_detail = 'posts-default';
+					$seo_page_type = 'Default page';
+					if( $Blog->get_setting( 'default_noindex' ) )
+					{	// We prefer robots not to index archive pages:
+						$robots_index = false;
+					}
+				}
+				elseif( array_diff( $active_filters, array( 'posts', 'page' ) ) == array() )
 				{ // This is just a follow "paged" page
 					$disp_detail = 'posts-next';
 					$seo_page_type = 'Next page';
@@ -345,11 +371,15 @@ function skin_init( $disp )
 					}
 
 					global $cat, $catsel;
+
 					if( empty( $catsel ) && preg_match( '~^[0-9]+$~', $cat ) )
 					{	// We are on a single cat page:
 						// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
 						// BUT: - this can resolve to including children
 						//      - selecting exactly one cat through catsel[] is NOT OK since not equivalent (will exclude children)
+
+						$ChapterCache = & get_ChapterCache();
+						$Chapter = & $ChapterCache->get_by_ID( $cat, false, false );
 
 						// echo 'SINGLE CAT PAGE';
 						$disp_detail = 'posts-topcat';  // may become 'posts-subcat' below.
@@ -357,16 +387,12 @@ function skin_init( $disp )
 						if( ( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
 							|| $Blog->get_setting( 'relcanonical_cat_urls' ) )
 						{ // Check if the URL was canonical:
-							if( !isset( $Chapter ) )
-							{
-								$ChapterCache = & get_ChapterCache();
-								/**
-								 * @var Chapter
-								 */
-								$Chapter = & $ChapterCache->get_by_ID( $MainList->filters['cat_array'][0], false );
+							if( empty( $Chapter ) && isset( $MainList->filters['cat_array'][0] ) )
+							{	// Try to get Chapter from filters:
+								$Chapter = & $ChapterCache->get_by_ID( $MainList->filters['cat_array'][0], false, false );
 							}
 
-							if( $Chapter )
+							if( ! empty( $Chapter ) )
 							{
 								if( $Chapter->parent_ID )
 								{	// This is a sub-category page (i-e: not a level 1 category)
@@ -374,7 +400,7 @@ function skin_init( $disp )
 								}
 
 								$canonical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
-								if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+								if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 								{	// fp> TODO: we're going to lose the additional params, it would be better to keep them...
 									// fp> what additional params actually?
 									if( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
@@ -387,18 +413,19 @@ function skin_init( $disp )
 									}
 								}
 							}
-							else
-							{ // If the requested chapter was not found display 404 page
-								$Messages->add( T_('The requested chapter was not found') );
-								global $disp;
-								$disp = '404';
-								break;
-							}
 						}
 
 						if( $post_navigation == 'same_category' )
 						{ // Category is set and post navigation should go through the same category, set navigation target param
 							$MainList->nav_target = $cat;
+						}
+
+						if( empty( $Chapter ) )
+						{	// If the requested chapter was not found display 404 page:
+							$Messages->add( T_('The requested chapter was not found') );
+							global $disp;
+							$disp = '404';
+							break;
 						}
 					}
 				}
@@ -415,7 +442,7 @@ function skin_init( $disp )
 							|| $Blog->get_setting( 'relcanonical_tag_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
-						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{
 							if( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
 							{	// REDIRECT TO THE CANONICAL URL:
@@ -444,7 +471,7 @@ function skin_init( $disp )
 							|| $Blog->get_setting( 'relcanonical_archive_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w, '&', $MainList->get_active_filter('page') );
-						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get( 'http_protocol' ) != 'always_redirect' ) )
+						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{
 							if( $Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
 							{	// REDIRECT TO THE CANONICAL URL:
@@ -532,6 +559,7 @@ function skin_init( $disp )
 			$comment_id = param( 'comment_id', 'integer', 0, true );
 			$post_id = param( 'post_id', 'integer', 0, true );
 			$subject = param( 'subject', 'string', '' );
+			$redirect_to = param( 'redirect_to', 'url', regenerate_url(), true, true );
 
 			// try to init recipient_User
 			if( !empty( $recipient_id ) )
@@ -574,8 +602,6 @@ function skin_init( $disp )
 				if( $allow_msgform == 'login' )
 				{ // user must login first to be able to send a message to this User
 					$Messages->add( sprintf( T_( 'You must log in before you can contact "%s".' ), $recipient_User->get( 'login' ) ) );
-					// Override redirect to param:
-					$redirect_to = param( 'redirect_to', 'url', regenerate_url(), true, true );
 					// Redirect to special blog for login actions:
 					header_redirect( url_add_param( $Blog->get( 'loginurl', array( 'glue' => '&' ) ), 'redirect_to='.rawurlencode( $redirect_to ), '&' ) );
 					// Exit here.
@@ -621,9 +647,8 @@ function skin_init( $disp )
 					$Messages->add( T_( 'This commentator does not want to get contacted through the message form.' ), 'error' );
 				}
 
-				$blogurl = $Blog->gen_blogurl();
 				// If it was a front page request or the front page is set to 'msgform' then we must not redirect to the front page because it is forbidden for the current User
-				$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'msgform' ) ) ? url_add_param( $blogurl, 'disp=403', '&' ) : $blogurl;
+				$redirect_to = ( is_front_page() || ( $Blog->get_setting( 'front_disp' ) == 'msgform' ) ) ? url_add_param( $Blog->gen_blogurl(), 'disp=403', '&' ) : $redirect_to;
 				header_redirect( $redirect_to, 302 );
 				// exited here
 			}
@@ -1050,7 +1075,11 @@ function skin_init( $disp )
 			break;
 
 		case 'access_requires_login':
+		case 'content_requires_login':
 			global $login_mode;
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
 
 			if( is_logged_in() )
 			{	// Don't display this page for already logged in user:
@@ -1069,10 +1098,19 @@ function skin_init( $disp )
 			{	// Display this error if user already tried to log in by HTTP basic authentication and it was failed:
 				$Messages->add( T_('Wrong Login/Password provided by browser (HTTP Auth).'), 'error' );
 			}
+
+			if( $disp == 'content_requires_login' )
+			{	// Set default details for this disp:
+				$disp_detail = '403-item-requires-login';
+			}
 			break;
 
 		case 'login':
+			// Log in form:
 			global $Plugins, $login_mode;
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
 
 			if( is_logged_in() )
 			{ // User is already logged in
@@ -1115,6 +1153,11 @@ function skin_init( $disp )
 			break;
 
 		case 'register':
+			// Register form:
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
 			if( is_logged_in() )
 			{ // If user is logged in the register form should not be displayed. In this case redirect to the blog home page.
 				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
@@ -1147,13 +1190,14 @@ function skin_init( $disp )
 					set_param( 'locale', $comment_Item->get( 'locale' ) );
 				}
 			}
-
-			// Check invitation code if it exists and registration is enabled
-			global $display_invitation;
-			$display_invitation = check_invitation_code();
 			break;
 
 		case 'lostpassword':
+			// Lost password form:
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
 			if( is_logged_in() )
 			{ // If user is logged in the lost password form should not be displayed. In this case redirect to the blog home page.
 				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
@@ -1170,6 +1214,11 @@ function skin_init( $disp )
 			break;
 
 		case 'activateinfo':
+			// Activate info page:
+
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
 			if( !is_logged_in() )
 			{ // Redirect to the login page for anonymous users
 				$Messages->add( T_( 'You must log in before you can activate your account.' ) );
@@ -1218,7 +1267,6 @@ function skin_init( $disp )
 			break;
 
 		case 'profile':
-		case 'register_finish':
 		case 'avatar':
 			$action = param_action();
 			if( $action == 'crop' && is_logged_in() )
@@ -1230,9 +1278,15 @@ function skin_init( $disp )
 					set_param( 'action', '' );
 				}
 			}
+		case 'register_finish':
 		case 'pwdchange':
 		case 'userprefs':
 		case 'subs':
+			if( $disp == 'pwdchange' || $disp == 'register_finish' )
+			{	// Check and redirect if current URL must be used as https instead of http:
+				check_https_url( 'login' );
+			}
+
 			$seo_page_type = 'Special feature page';
 			if( $Blog->get_setting( 'special_noindex' ) )
 			{	// We prefer robots not to index these pages:
@@ -1302,6 +1356,12 @@ function skin_init( $disp )
 			{	// Use default category instead of the wrong requested:
 				set_param( 'cat', $Blog->get_default_cat_ID() );
 			}
+
+			if( $Chapter && $Chapter->get_ItemType() === false )
+			{	// Don't allow to post in category without default Item Type:
+				$Messages->add( T_('You cannot post here'), 'error' );
+				header_redirect( $Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
+			}
 			break;
 
 		case 'edit':
@@ -1349,10 +1409,20 @@ function skin_init( $disp )
 				header_redirect( $Blog->gen_blogurl(), 302 );
 			}
 
+			$cat = param( 'cat', 'integer' );
+			if( $cat > 0 &&
+			    ( $ChapterCache = & get_ChapterCache() ) &&
+			    ( $selected_Chapter = & $ChapterCache->get_by_ID( $cat, false, false ) ) &&
+			    ( $selected_Chapter->get_ItemType() === false ) )
+			{	// Don't allow to post in category without default Item Type:
+				$Messages->add( T_('You cannot post here'), 'error' );
+				header_redirect( $selected_Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
+			}
+
 			// Check if this Item can be updated:
 			// (e-g it can be restricted if this item has at least one proposed change)
 			$ItemCache = & get_ItemCache ();
-			if( $edited_Item = & $ItemCache->get_by_ID ( $post_ID, false, false ) )
+			if( $edited_Item = & $ItemCache->get_by_ID( $post_ID, false, false ) )
 			{
 				$edited_Item->check_before_update();
 			}
@@ -1423,6 +1493,13 @@ function skin_init( $disp )
 
 			// Restrict comment status by parent item:
 			$edited_Comment->restrict_status();
+
+			// require Fine Uploader js and css:
+			require_js( 'multiupload/fine-uploader.js' );
+			require_css( 'fine-uploader.css' );
+			// Load JS files to make the links table sortable:
+			require_js( '#jquery#' );
+			require_js( 'jquery/jquery.sortable.min.js' );
 			break;
 
 		case 'useritems':
@@ -1430,7 +1507,13 @@ function skin_init( $disp )
 			global $display_params, $viewed_User;
 
 			// get user_ID because we want it in redirect_to in case we need to ask for login.
-			$user_ID = param( 'user_ID', 'integer', true, true );
+			$user_ID = param( 'user_ID', 'integer', NULL, true );
+
+			if( $user_ID === NULL && is_logged_in() )
+			{	// Use current logged in User if it is not specified in param:
+				$user_ID = $current_User->ID;
+			}
+
 			if( empty( $user_ID ) )
 			{
 				bad_request_die( sprintf( T_('Parameter &laquo;%s&raquo; is required!'), 'user_ID' ) );
@@ -1517,15 +1600,21 @@ function skin_init( $disp )
 			break;
 
 		case 'closeaccount':
-			global $current_User;
-			if( ! $Settings->get( 'account_close_enabled' ) ||
-			    ( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) ) ||
-			    ( ! is_logged_in() && ! $Session->get( 'account_closing_success' ) ) )
-			{ // If an account closing page is disabled - Display 404 page with error message
-			  // Don't allow admins close own accounts from front office
-			  // Don't display this message for not logged in users, except of one case to display a bye message after account closing
-				global $disp;
-				$disp = '404';
+			global $current_User, $disp;
+			if( ! $Settings->get( 'account_close_enabled' ) )
+			{	// If an account closing page is disabled - Display 404 page with error message:
+				$disp = is_logged_in() ? 'profile' : 'login';
+				$Messages->add( T_('The account closing feature is disabled.'), 'error' );
+			}
+			elseif( ! is_logged_in() && ! $Session->get( 'account_closing_success' ) )
+			{	// Don't display this message for not logged in users, except of one case to display a bye message after account closing:
+				$disp = 'login';
+				$Messages->add( T_('You must log in before you can close your account.'), 'error' );
+			}
+			elseif( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
+			{	// Don't allow admins close own accounts from front office:
+				$disp = 'profile';
+				$Messages->add( T_('You have user moderation privileges. In order to prevent mistakes, you cannot close your own account. Please ask the admin (or another admin) to remove your user moderation privileges before closing your account.'), 'error' );
 			}
 			elseif( $Session->get( 'account_close_reason' ) )
 			{
@@ -1551,6 +1640,21 @@ function skin_init( $disp )
 			if( $Blog->get_setting( $disp.'_noindex' ) )
 			{	// We prefer robots not to index these pages:
 				$robots_index = false;
+			}
+			break;
+
+		case 'compare':
+			$items = trim( param( 'items', '/^[\d,]*$/' ), ',' );
+			if( ! empty( $items ) )
+			{	// Check if at least one item exist in DB:
+				$ItemCache = & get_ItemCache();
+				$items = $ItemCache->load_list( explode( ',', $items ) );
+			}
+			if( empty( $items ) )
+			{	// Display 404 page when no items to compare:
+				global $disp;
+				$disp = '404';
+				$Messages->add( T_('The requested items don\'t exist.'), 'error' );
 			}
 			break;
 	}
@@ -1743,6 +1847,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_404'                   => '_404_not_found.disp.php',
 				'disp_access_denied'         => '_access_denied.disp.php',
 				'disp_access_requires_login' => '_access_requires_login.disp.php',
+				'disp_content_requires_login'=> '_content_requires_login.disp.php',
 				'disp_activateinfo'          => '_activateinfo.disp.php',
 				'disp_anonpost'              => '_anonpost.disp.php',
 				'disp_arcdir'                => '_arcdir.disp.php',
@@ -1784,6 +1889,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_useritems'             => '_useritems.disp.php',
 				'disp_usercomments'          => '_usercomments.disp.php',
 				'disp_users'                 => '_users.disp.php',
+				'disp_compare'               => '_compare.disp.php',
 			);
 
 		// Add plugin disp handlers:
@@ -2620,11 +2726,11 @@ function skin_installed( $name )
  */
 function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 {
-	$Form->begin_fieldset( $display_params[ 'fieldset_title' ].get_manual_link('blog_skin_settings').' '.$display_params[ 'fieldset_links' ] );
+	$Form->begin_fieldset( $display_params[ 'fieldset_title' ].get_manual_link('blog-skin-settings').' '.$display_params[ 'fieldset_links' ] );
 
 	if( !$skin_ID )
 	{ // The skin ID is empty use the same as normal skin ID
-		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as normal skin').'.</div>';
+		echo '<div style="font-weight:bold;padding:0.5ex;">'.T_('Same as standard skin').'.</div>';
 	}
 	else
 	{
@@ -2650,7 +2756,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 		// Skin type
 		echo '<div class="skin_setting_row">';
 			echo '<label>'.T_('Skin type').':</label>';
-			echo '<span>'.$edited_Skin->type.'</span>';
+			echo '<span>'.get_skin_type_title( $edited_Skin->type ).'</span>';
 		echo '</div>';
 
 		// Containers
@@ -2782,6 +2888,9 @@ function skin_body_attrs( $params = array() )
 	// Logged in/Anonymous class:
 	$classes[] = is_logged_in() ? 'loggedin' : 'anonymous';
 
+	// Toolbar visibility class:
+	$classes[] = show_toolbar() ? 'evo_toolbar_visible' : 'evo_toolbar_hidden';
+
 	// User Group class:
 	$classes[] = 'usergroup_'.( ! is_logged_in() && empty( $current_User->grp_ID ) ? 'none' : $current_User->grp_ID );
 
@@ -2846,5 +2955,36 @@ function get_skin_folder_base_version( $skin_folder )
 	}
 
 	return array( $base_skin, $skin_version );
+}
+
+
+/**
+ * Get skin types
+ *
+ * @return array
+ */
+function get_skin_types()
+{
+	return array(
+		'normal'  => array( T_('Standard'), T_('Standard skin for general browsing') ),
+		'mobile'  => array( T_('Phone'), T_('Mobile skin for mobile phones browsers') ),
+		'tablet'  => array( T_('Tablet'), T_('Tablet skin for tablet browsers') ),
+		'rwd'     => array( T_('RWD'), T_('Skin can be used for general, mobile phones and tablet browsers') ),
+		'feed'    => array( T_('XML Feed'), T_('Special system skin for XML feeds like RSS and Atom') ),
+		'sitemap' => array( T_('XML Sitemap'), T_('Special system skin for XML sitemaps') ),
+	);
+}
+
+
+/**
+ * Get title of skin type
+ *
+ * @param string Skin type
+ * @return string Skin title
+ */
+function get_skin_type_title( $skin_type )
+{
+	$skin_types = get_skin_types();
+	return ( isset( $skin_types[ $skin_type ] ) ? $skin_types[ $skin_type ][0] : $skin_type );
 }
 ?>

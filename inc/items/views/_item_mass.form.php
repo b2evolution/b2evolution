@@ -101,7 +101,6 @@ $Form->begin_form( '', '', $params );
 	$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
 	$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
 	$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
-	$Form->hidden( 'item_order', $edited_Item->order );
 	// CUSTOM FIELDS
 	display_hidden_custom_fields( $Form, $edited_Item );
 
@@ -134,7 +133,7 @@ $Form->begin_form( '', '', $params );
 	echo '<br />';
 
 	// ------------------------------- SETTINGS ---------------------------------
-	$Form->checkbox( 'paragraphs_linebreak', false, '', T_( 'Create paragraphs at each line break' ), 'compose_layout' );
+	$Form->checkbox( 'paragraphs_linebreak', false, '', T_( 'Create paragraphs at each line break' ) );
 
 	$Form->switch_layout( NULL );
 
@@ -225,5 +224,6 @@ $Form->end_form();
 // ####################### JS BEHAVIORS #########################
 // New category input box:
 echo_onchange_newcat();
+echo_fieldset_folding_js();
 
 ?>

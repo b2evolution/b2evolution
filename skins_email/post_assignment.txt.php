@@ -31,7 +31,7 @@ $Collection = $Blog = & $Item->get_Blog();
 
 if( $params['notify_full'] )
 {	/* Full notification */
-	echo sprintf( T_('%s assigned you to the following post'), $principal_User->get( 'login' ) ).':'."\n\n";
+	echo sprintf( T_('%s assigned you the following post'), $principal_User->get( 'login' ) ).':'."\n\n";
 
 	// Calculate length for str_pad to align labels:
 	$pad_len = max( utf8_strlen( T_('Collection') ), utf8_strlen( T_('Author') ), utf8_strlen( T_('Title') ), utf8_strlen( T_('Url') ), utf8_strlen( T_('Content') ) );
@@ -76,7 +76,7 @@ if( $params['notify_full'] )
 }
 else
 {	/* Short notification */
-	echo sprintf( T_( '%s assigned you to a post on %s with title %s.' ), $principal_User->get_username(), '"'.$Blog->get('shortname').'"', '"'.$Item->get('title').'"' );
+	echo sprintf( T_( '%s assigned you a post on %s with title %s.' ), $principal_User->get_username(), '"'.$Blog->get('shortname').'"', '"'.$Item->get('title').'"' );
 	echo "\n\n";
 	echo T_( 'To read the full content of the post click here:' ).' ';
 	echo $Item->get_permanent_url( '', '', '&' );
@@ -84,7 +84,7 @@ else
 
 	echo "\n"
 		.T_('Status').': '.$Item->get( 't_status' )."\n"
-		.T_( 'This is a short form post assignment message. To make these emails more useful for quick review, ask the administrator to send you long form post assignment messages instead.' )
+		.T_( 'This is a short form notification. To make these emails more useful, ask the administrator to send you long form notifications instead.' )
 		."\n";
 }
 

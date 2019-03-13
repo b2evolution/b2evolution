@@ -198,7 +198,7 @@ $mediadir_long = '';
 if( $mediadir_status == 'error' )
 {
 	$mediadir_long = '<p>'.T_('You will not be able to upload files/images and b2evolution will not be able to generate thumbnails.')."</p>\n"
-	.'<p>'.T_('Your host requires that you set special file permissions on your media directory.').get_manual_link('media_file_permission_errors')."</p>\n";
+	.'<p>'.T_('Your host requires that you set special file permissions on your media directory.').get_manual_link('media-file-permission-errors')."</p>\n";
 }
 init_system_check( T_( 'Media directory' ), $mediadir_msg.' - '.$media_path );
 disp_system_check( $mediadir_status, $mediadir_long );
@@ -269,7 +269,7 @@ $cachedir_long = '';
 if( $cachedir_status == 'error' )
 {
 	$cachedir_long = '<p>'.T_('You will not be able to use page cache.')."</p>\n"
-	.'<p>'.T_('Your host requires that you set special file permissions on your cache directory.').get_manual_link('cache_file_permission_errors')."</p>\n";
+	.'<p>'.T_('Your host requires that you set special file permissions on your cache directory.').get_manual_link('cache-file-permission-errors')."</p>\n";
 }
 init_system_check( T_( 'Cache directory' ), $cachedir_msg.' - '.$cache_path );
 disp_system_check( $cachedir_status, $cachedir_long );
@@ -464,7 +464,7 @@ else
 $memory_limit = system_check_memory_limit();
 if( empty($memory_limit) )
 {
-	init_system_check( 'PHP memory_limit', T_('n.a.') );
+	init_system_check( 'PHP memory_limit', /* TRANS: "Not Available" */ T_('N/A') );
 	disp_system_check( 'note' );
 }
 else

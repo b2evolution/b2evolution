@@ -4,7 +4,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 ?>
 
-<script type="text/javascript">
+<script>
 /**
  * Init autocomplete event for Specific criteria input
  */
@@ -39,7 +39,7 @@ for(var c = 0; c < jQuery( 'select[id^=criteria_type]' ).length; c++ )
 
 <?php
 global $current_User;
-if( is_admin_page() && is_logged_in() && $current_User->check_perm( 'users', 'moderate', false ) )
+if( is_admin_page() && is_logged_in() && $current_User->check_perm( 'users', 'moderate' ) )
 {	// If user can edit the users - Init js to edit user level by AJAX
 ?>
 jQuery(document).ready( function()

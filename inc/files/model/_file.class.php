@@ -1945,9 +1945,10 @@ class File extends DataObject
 	/**
 	 * Update the DB based on previously recorded changes
 	 *
+	 * @param boolean TRUE to update last touched dates of the Link Owners of this File
 	 * @return boolean true on success, false on failure / no changes
 	 */
-	function dbupdate()
+	function dbupdate( $update_link_owner_dates = true )
 	{
 		if( $this->meta == 'unknown' )
 		{
@@ -1966,16 +1967,17 @@ class File extends DataObject
 		// Let parent do the update:
 		if( ( $r = parent::dbupdate() ) !== false )
 		{
-			// Update field 'last_touched_ts' of each item that has a link with this edited file
-			$LinkCache = & get_LinkCache();
-			$links = $LinkCache->get_by_file_ID( $this->ID );
-			foreach( $links as $Link )
-			{
-				$LinkOwner = & $Link->get_LinkOwner();
-				if( $LinkOwner != NULL )
-				{	// Update last touched date and content last updated date of the Owner:
-					$LinkOwner->update_last_touched_date();
-					$LinkOwner->update_contents_last_updated_ts();
+			if( $update_link_owner_dates )
+			{	// Update field 'last_touched_ts'(and 'contents_last_updated_ts' id exists) of each object(Item, Comment, Message and etc.) that has a link with this File:
+				$LinkCache = & get_LinkCache();
+				$links = $LinkCache->get_by_file_ID( $this->ID );
+				foreach( $links as $Link )
+				{
+					if( $LinkOwner = & $Link->get_LinkOwner() )
+					{	// Update last touched date and content last updated date of the Owner:
+						$LinkOwner->update_last_touched_date();
+						$LinkOwner->update_contents_last_updated_ts();
+					}
 				}
 			}
 
@@ -2128,11 +2130,11 @@ class File extends DataObject
 	function get_linkedit_link( $link_type = NULL, $link_obj_ID = NULL, $text = NULL, $title = NULL, $no_access_text = NULL,
 											$actionurl = '#', $target = '' )
 	{
-		global $dispatcher;
+		global $admin_url;
 
 		if( $actionurl == '#' )
 		{
-			$actionurl = $dispatcher.'?ctrl=files';
+			$actionurl = $admin_url.'?ctrl=files';
 		}
 
 		if( is_null( $text ) )
@@ -2171,11 +2173,11 @@ class File extends DataObject
 	 */
 	function get_linkedit_url( $link_type = NULL, $link_obj_ID = NULL, $actionurl = '#' )
 	{
-		global $dispatcher;
+		global $admin_url;
 
 		if( $actionurl == '#' )
 		{
-			$actionurl = $dispatcher.'?ctrl=files';
+			$actionurl = $admin_url.'?ctrl=files';
 		}
 
 		if( $this->is_dir() )
@@ -2389,7 +2391,13 @@ class File extends DataObject
 			$img_attribs['src'] = $this->get_url();
 			if( $tag_size != 'none' )
 			{	// Add attributes "width" & "height" only when they are not disabled:
-				if( ( $size_arr = $this->get_image_size( 'widthheight_assoc' ) ) )
+				if( $tag_size !== NULL )
+				{	// Use size values:
+					$tag_size = explode( 'x', $tag_size );
+					$img_attribs['width'] = $tag_size[0];
+					$img_attribs['height'] = empty( $tag_size[1] ) ? $tag_size[0] : $tag_size[1];
+				}
+				elseif( ( $size_arr = $this->get_image_size( 'widthheight_assoc' ) ) )
 				{
 					$img_attribs += $size_arr;
 				}
@@ -3183,7 +3191,9 @@ class File extends DataObject
 	{
 		$download_count = $this->download_count + $count;
 		$this->set( 'download_count', $download_count );
- 		$this->dbupdate();
+		// Update only the field 'download_count',
+		// but do NOT update last touched dates of the Link Owners of this File:
+		$this->dbupdate( false );
 
 		return $download_count;
 	}

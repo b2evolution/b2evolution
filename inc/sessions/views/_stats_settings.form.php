@@ -22,7 +22,7 @@ global $current_User;
  */
 global $Settings;
 
-global $dispatcher;
+global $admin_url;
 
 global $collections_Module;
 
@@ -38,7 +38,7 @@ $Form->hidden( 'action', 'update_settings' );
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Hit & session logging').get_manual_link('hit_logging') );
+$Form->begin_fieldset( T_('Hit & session logging').get_manual_link('hit-logging') );
 
 	$Form->checklist( array(
 			array( 'log_public_hits', 1, T_('on every public page'), $Settings->get('log_public_hits') ),
@@ -66,12 +66,13 @@ $Form->begin_fieldset( T_('Hit & session logging').get_manual_link('hit_logging'
 		'lines' => true ) );
 
 	echo '<div id="auto_prune_stats_container">';
-	$Form->text_input( 'auto_prune_stats', $Settings->get('auto_prune_stats'), 5, T_('Keep detailed hitlog for'), T_('days. How many days of hits & sessions do you want to keep in the database for stats?') );
+	$oldest_session_period = max( $Settings->get( 'auto_prune_stats' ) * 86400, $Settings->get( 'timeout_sessions' ) );
+	$Form->text_input( 'auto_prune_stats', $Settings->get( 'auto_prune_stats' ), 5, T_('Keep detailed logs for'), T_('days').'. '.sprintf( T_('Note: <a %s>logged-in Sessions</a> will be kept for %s.'), 'href="'.$admin_url.'?ctrl=usersettings"', seconds_to_period( $oldest_session_period ) ) );
 	echo '</div>';
 
 	if( $Settings->get('auto_prune_stats_mode') == 'off' )
 	{ // hide the "days" input field, if mode set to off:
-		echo '<script type="text/javascript">jQuery("#auto_prune_stats_container").hide();</script>';
+		echo '<script>jQuery("#auto_prune_stats_container").hide();</script>';
 	}
 
 $Form->end_fieldset();

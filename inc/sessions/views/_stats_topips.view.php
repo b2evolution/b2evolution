@@ -42,7 +42,7 @@ $Results->cols[] = array(
 		'th' => T_('IP'),
 		'td' => '$hit_remote_addr$',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'compact_data'
+		'td_class' => 'nowrap'
 	);
 
 // A count of the hits
@@ -55,7 +55,7 @@ $Results->cols[] = array(
 // Reverse DNS
 $Results->cols[] = array(
 		'th' => T_('Reverse DNS'),
-		'td_class' => 'nowrap compact_data',
+		'td_class' => 'nowrap',
 		'td' => '%gethostbyaddr( #hit_remote_addr# )%%evo_flush()%'
 	);
 

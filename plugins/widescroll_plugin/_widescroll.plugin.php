@@ -22,7 +22,7 @@ class widescroll_plugin extends Plugin
 	var $code = 'evo_widescroll';
 	var $name = 'Wide scroll';
 	var $priority = 100;
-	var $version = '6.10.1';
+	var $version = '6.11.0';
 	var $group = 'rendering';
 	var $number_of_installs = 1;
 
@@ -85,7 +85,7 @@ class widescroll_plugin extends Plugin
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		?><script type="text/javascript">
+		?><script>
 		//<![CDATA[
 		var widescroll_buttons = new Array();
 
@@ -133,7 +133,7 @@ class widescroll_plugin extends Plugin
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript">widescroll_toolbar( '<?php echo TS_('Wide scroll').':'; ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
+		?><script>widescroll_toolbar( '<?php echo TS_('Wide scroll').':'; ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
 
 		return true;
 	}

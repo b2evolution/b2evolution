@@ -66,9 +66,7 @@ function cat_line( $Chapter, $level )
 	$r = '<tr id="tr-'.$Chapter->ID.'"class="'.$line_class.
 					' chapter_parent_'.( $Chapter->parent_ID ? $Chapter->parent_ID : '0' ).
 					( $is_highlighted ? ' evo_highlight' : '' ).'">
-					<td class="firstcol shrinkwrap">'.
-						$Chapter->ID.'
-				</td>';
+					<td class="firstcol shrinkwrap">'.$Chapter->ID.'</td>';
 
 	// Default
 	if( $Chapter->get( 'meta' ) )
@@ -149,6 +147,46 @@ function cat_line( $Chapter, $level )
 		else
 		{
 			$r .= '<td></td>';
+		}
+
+		// Default Item Type:
+		if( $Chapter->get( 'meta' ) )
+		{	// Don't allow default Item Type for meta category because it cannot has items:
+			$r .= '<td>&nbsp;</td>';
+		}
+		else
+		{	// Normal category can has items, Allow to change its default Item Type:
+			if( $Chapter->get( 'ityp_ID' ) === NULL )
+			{	// Same as collection default:
+				$cat_item_type_name = T_('Same as collection default');
+			}
+			elseif( $Chapter->get( 'ityp_ID' ) == '0' )
+			{	// No default type:
+				$cat_item_type_name = '<b>'.T_('No default type').'</b>';
+			}
+			elseif( ( $ItemTypeCache = & get_ItemTypeCache() ) &&
+							( $cat_ItemType = & $ItemTypeCache->get_by_ID( $Chapter->get( 'ityp_ID' ), false, false ) ) )
+			{	// Custom Item Type:
+				$cat_item_type_name = $cat_ItemType->get( 'name' );
+				if( ! $cat_ItemType->is_enabled( $Chapter->get( 'blog_ID' ) ) )
+				{	// Mark not enabled Item Type with red color:
+					$cat_item_type_name = '<span class="red">'.$cat_item_type_name.'</span>';
+				}
+			}
+			else
+			{	// Not found Item Type in DB:
+				$cat_item_type_name = '<span class="red">'.T_('Not Found').' #'.$Chapter->get( 'ityp_ID' ).'</span>';
+			}
+			if( ( $cat_Blog = & $Chapter->get_Blog() ) &&
+			    $cat_Blog->get_default_cat_ID() == $Chapter->ID )
+			{	// For default category use a separate options without "No default type":
+				$cat_cell_edit_class = 'default_cat_ityp_ID_edit';
+			}
+			else
+			{	// For not default categories use full options list:
+				$cat_cell_edit_class = 'cat_ityp_ID_edit';
+			}
+			$r .= '<td class="jeditable_cell '.$cat_cell_edit_class.'"><a href="#" rel="_'.$Chapter->get( 'ityp_ID' ).'">'.$cat_item_type_name.'</a></td>';
 		}
 
 		// Lock
@@ -280,6 +318,11 @@ if( $permission_to_edit )
 					);
 
 	$Table->cols[] = array(
+						'th' => T_('Default<br />Item Type'),
+						'th_class' => 'shrinkwrap',
+					);
+
+	$Table->cols[] = array(
 						'th' => T_('Lock'),
 						'th_class' => 'shrinkwrap',
 					);
@@ -336,13 +379,13 @@ echo $results_params['after'];
 echo '<p class="note">'.T_('<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same collection (smallest category number).').'</p>';
 */
 
-global $Settings, $dispatcher;
+global $Settings, $admin_url;
 
 // Use a wrapper div to have margin around the form
 echo '<div id="form_wrapper" style="margin: 2ex auto 1ex">';
 
 $Form = new Form( NULL, 'cat_order_checkchanges', 'post', 'compact' );
-$Form->begin_form( 'fform', T_('Category order').get_manual_link('categories_order') );
+$Form->begin_form( 'fform', T_('Category order').get_manual_link('categories-order') );
 $Form->add_crumb( 'collection' );
 $Form->hidden( 'ctrl', 'coll_settings' );
 $Form->hidden( 'action', 'update' );
@@ -358,7 +401,7 @@ echo '</div>'; // form wrapper end
 
 if( ! $Settings->get('allow_moving_chapters') )
 { // TODO: check perm
-	echo '<p class="alert alert-info">'.sprintf( T_('<strong>Note:</strong> Moving categories across blogs is currently disabled in the %sblogs settings%s.'), '<a href="'.$dispatcher.'?ctrl=collections&tab=blog_settings#fieldset_wrapper_categories">', '</a>' ).'</p> ';
+	echo '<p class="alert alert-info">'.sprintf( T_('<strong>Note:</strong> Moving categories across blogs is currently disabled in the %sblogs settings%s.'), '<a href="'.$admin_url.'?ctrl=collections&tab=blog_settings#fieldset_wrapper_categories">', '</a>' ).'</p> ';
 }
 
 //Flush fadeout
@@ -373,4 +416,19 @@ echo_editable_column_js( array(
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',
 	'ID_name'         => 'cat_ID',
 	'field_type'      => 'text' ) );
+
+if( $permission_to_edit )
+{	// Print JS to edit default Item Type of category:
+	echo_editable_column_js( $cat_ityp_ID_edit_params = array(
+		'column_selector' => '.cat_ityp_ID_edit',
+		'ajax_url'        => get_htsrv_url().'async.php?action=cat_ityp_ID_edit&blogid='.$Blog->ID.'&'.url_crumb( 'catityp' ),
+		'options'         => collection_item_type_titles( $Blog->ID, NULL, '_' ),
+		'new_field_name'  => 'new_ityp_ID',
+		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',
+		'ID_name'         => 'cat_ID' ) );
+	// Separate options without "No default type" for default category of the collection:
+	$cat_ityp_ID_edit_params['column_selector'] = '.default_cat_ityp_ID_edit';
+	$cat_ityp_ID_edit_params['options'] = collection_item_type_titles( $Blog->ID, NULL, '_', false );
+	echo_editable_column_js( $cat_ityp_ID_edit_params );
+}
 ?>

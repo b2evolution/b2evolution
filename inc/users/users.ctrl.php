@@ -178,9 +178,8 @@ if( !$Messages->has_errors() )
 				break;
 			}
 
-			// Init cascade relations: If we delete user as spammer we also should remove the comments and the messages
+			// Check if the user is deleted as spammer:
 			$is_spammer = ( param( 'deltype', 'string', '', true ) == 'spammer' );
-			$edited_User->init_relations( $is_spammer );
 
 			$fullname = $edited_User->dget( 'fullname' );
 			if( param( 'confirm', 'integer', 0 ) )
@@ -247,6 +246,13 @@ if( !$Messages->has_errors() )
 				{
 					$msg = sprintf( T_('Cannot delete User &laquo;%s&raquo;'), $edited_User->dget( 'login' ) );
 				}
+
+				// Init cascade relations: If we delete user as spammer we also should remove the comments, messages and files:
+				$edited_User->init_relations( array(
+					'delete_messages' => $is_spammer,
+					'delete_comments' => $is_spammer,
+					'delete_files'    => $is_spammer,
+				) );
 
 				if( ! $edited_User->check_delete( $msg, array(), true ) )
 				{ // There are restrictions:
@@ -432,7 +438,7 @@ if( !$Messages->has_errors() )
 			$Messages->add( sprintf( T_('%d users have been added or requeued for automation "%s"'), $added_users_num, $Automation->get( 'name' ) ), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=users', 303 ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=users&autm_ID='.$Automation->ID, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 			break;
 
@@ -472,6 +478,137 @@ if( !$Messages->has_errors() )
 			// We have EXITed already at this point!!
 			break;
 
+		case 'update_status':
+			// Set account status of selected users:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'users', 'edit', true );
+
+			param( 'account_status', 'string', '' );
+
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+			$UserCache = & get_UserCache();
+			$UserCache->clear();
+			$UserCache->load_list( get_filterset_user_IDs() );
+
+			// Try to obtain some serious time to do some serious processing (30 minutes)
+			set_max_execution_time( 1800 );
+
+			$updated_users_num = 0;
+			foreach( $UserCache->cache as $filtered_User )
+			{	// Update account status of each filtered User:
+				if( $filtered_User->ID == 1 )
+				{	// This is Admin user, Don't allow to change status:
+					continue;
+				}
+
+				if( $filtered_User->update_status_from_Request( true, $account_status ) )
+				{
+					$updated_users_num++;
+				}
+			}
+
+			$Messages->add( sprintf( T_('Account status of %d users have been updated'), $updated_users_num ), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=users', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
+
+		case 'update_groups':
+			// Change group membership of selected users:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'users', 'edit', true );
+
+			$primary_grp_ID = param( 'grp_ID', 'integer' );
+			$add_secondary_grp_ID = param( 'add_secondary_grp_ID', 'integer' );
+			$remove_secondary_grp_ID = param( 'remove_secondary_grp_ID', 'integer' );
+
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+			$GroupCache = & get_GroupCache();
+
+			if( isset( $primary_grp_ID ) )
+			{
+				$primary_group = $GroupCache->get_by_ID( $primary_grp_ID );
+			}
+
+			$UserCache = & get_UserCache();
+			$UserCache->clear();
+			$UserCache->load_list( get_filterset_user_IDs() );
+
+			$updated_primary_grp_num = 0;
+			$added_secondary_grp_num = 0;
+			$removed_secondary_grp_num = 0;
+			$updated_users_num = 0;
+
+			foreach( $UserCache->cache as $filtered_User )
+			{	// Update group membership of each filtered User:
+
+				$updated_group = false;
+
+				if( ($filtered_User->ID != 1 ) && isset( $primary_group ) && $primary_group->can_be_assigned() )
+				{	// This is Admin user, Don't allow to change status:
+					$filtered_User->set_Group( $primary_group );
+					$updated_primary_grp_num++;
+					$updated_group = true;
+				}
+
+				if( isset( $add_secondary_grp_ID ) || isset( $remove_secondary_grp_ID ) )
+				{
+					$secondary_grp_IDs = array();
+					$filtered_User->old_secondary_groups = $filtered_User->get_secondary_groups();
+					foreach( $filtered_User->secondary_groups as $secondary_Group )
+					{
+						$secondary_grp_IDs[] = $secondary_Group->ID;
+					}
+
+					if( isset( $add_secondary_grp_ID ) && ! in_array( $add_secondary_grp_ID, $secondary_grp_IDs ) )
+					{	// User not yet a member of new secondary group:
+						$new_secondary_group = $GroupCache->get_by_ID( $add_secondary_grp_ID, false, false );
+						if( isset( $new_secondary_group ) && $new_secondary_group->can_be_assigned() )
+						{
+							$secondary_grp_IDs[] = $add_secondary_grp_ID;
+							$added_secondary_grp_num++;
+							$updated_group = true;
+						}
+					}
+
+					if( isset( $remove_secondary_grp_ID ) && ( ( $key = array_search( $remove_secondary_grp_ID, $secondary_grp_IDs ) ) !== false ) )
+					{	// User is a member of secondary group to be removed:
+						unset( $secondary_grp_IDs[$key] );
+						$removed_secondary_grp_num++;
+						$updated_group = true;
+					}
+
+					$GroupCache = & get_GroupCache();
+					$GroupCache->clear();
+					// Set new groups which should be stored in DB:
+					$filtered_User->secondary_groups = $GroupCache->load_list( $secondary_grp_IDs );
+				}
+
+				if( $updated_group )
+				{
+					$filtered_User->dbupdate();
+					$updated_users_num++;
+				}
+			}
+
+			$Messages->add( sprintf( T_('Group membership of %d users have been updated'), $updated_users_num ), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=users', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
+
 		case 'merge':
 			// Select user for merging and Merge:
 			$merging_user_ID = param( 'merging_user_ID', 'integer', true, true );
@@ -488,7 +625,7 @@ if( !$Messages->has_errors() )
 
 			if( empty( $selected_user_ID ) )
 			{	// Inform to select a remaining account if it is not selected yet:
-				$Messages->add( sprintf( T_('Please select a remaining account to merge with %s:'), get_user_identity_link( '', $merging_user_ID ) ), 'warning' );
+				$Messages->add( sprintf( T_('User data from account %s will be merged to the account you select below. Check a radio button and click the orange button at the bottom.'), get_user_identity_link( '', $merging_user_ID ) ), 'warning' );
 			}
 			else
 			{	// Check edit permissions for remaining user as well:
@@ -497,6 +634,96 @@ if( !$Messages->has_errors() )
 
 			// The merging process is executed in the template below by function display_users_merging_process().
 			break;
+
+		case 'delete_spammers':
+			// Delete selected users as spammers:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'users', 'edit', true );
+
+			$users = explode( ',', param( 'users', 'string' ) );
+
+			// Set this param in order to delete the users as spammer:
+			set_param( 'deltype', 'spammer' );
+
+			$deleted_spam_logins = array();
+			$not_deleted_spam_logins = array();
+			$UserCache = & get_UserCache();
+			$delspam_Messages = new Messages();
+			foreach( $users as $u => $user_ID )
+			{
+				if( ! ( $deleted_spam_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
+				{	// Skip if user is not found in DB by requested ID:
+					continue;
+				}
+				$deleted_spam_login = $deleted_spam_User->get( 'login' );
+				// Delete user as spammer:
+				if( $deleted_spam_User->dbdelete( $delspam_Messages ) )
+				{	// If user has been deleted:
+					$deleted_spam_logins[] = $deleted_spam_login;
+				}
+				else
+				{	// If user cannot be deleted by some reason:
+					$not_deleted_spam_logins[] = $deleted_spam_User->get_identity_link();
+				}
+			}
+
+			if( count( $deleted_spam_logins ) > 0 )
+			{	// Display a message if at least one spammer have been deleted:
+				$Messages->add( sprintf( T_('Spammers %s have been deleted.'), implode( ', ', $deleted_spam_logins ) ), 'success' );
+			}
+			if( count( $not_deleted_spam_logins ) > 0 )
+			{	// Display a message if at least one spammer have NOT been deleted:
+				$Messages->add( sprintf( T_('Spammers %s could not been deleted.'), implode( ', ', $not_deleted_spam_logins ) ), 'error' );
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=users'.( count( $not_deleted_spam_logins ) > 0 ? '&action=spammers' : '' ), 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
+
+		case 'export':
+			// Export user group data into CSV file:
+			load_class( 'users/model/_userlist.class.php', 'UserList' );
+			$UserList = new UserList( 'admin' );
+			$UserList->memorize = false;
+			$UserList->load_from_Request();
+			if( empty( $UserList->filters['users'] ) )
+			{	// No users to export:
+				header_redirect( $admin_url.'?ctrl=users' );
+				break;
+			}
+
+			$SQL_main_group = new SQL();
+			$SQL_main_group->SELECT( 'user_ID, user_login, grp_name, "primary" AS type' );
+			$SQL_main_group->FROM( 'T_users' );
+			$SQL_main_group->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
+			$SQL_main_group->WHERE( 'user_ID IN ('.implode( ',', $UserList->filters['users'] ).') ' );
+			$SQL_sub_groups = new SQL();
+			$SQL_sub_groups->SELECT( 'user_ID, user_login, grp_name, "secondary" AS type' );
+			$SQL_sub_groups->FROM( 'T_users' );
+			$SQL_sub_groups->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON sug_user_ID = user_ID' );
+			$SQL_sub_groups->FROM_add( 'INNER JOIN T_groups ON sug_grp_ID = grp_ID' );
+			$SQL_sub_groups->WHERE( 'sug_user_ID IN ('.implode( ',', $UserList->filters['users'] ).') ' );
+			$user_groups_sql = 'SELECT * FROM ( '.$SQL_main_group->get().' UNION '.$SQL_sub_groups->get().' ) AS users
+				ORDER BY FIND_IN_SET( user_ID, "'.implode( ',', $UserList->filters['users'] ).'" ), type';
+			$users = $DB->get_results( $user_groups_sql, ARRAY_A, 'Get users data for export group data into CSV file' );
+
+			header_nocache();
+			header_content_type( 'text/csv' );
+			header( 'Content-Disposition: attachment; filename=users.csv' );
+
+			echo get_csv_line( array( 'username', 'groupname', 'type' ) );
+
+			foreach( $users as $user )
+			{
+				unset( $user['user_ID'] );
+				echo get_csv_line( $user );
+			}
+			exit;
 	}
 }
 
@@ -542,6 +769,7 @@ else
 	{
 		case 'duplicates':
 			$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users&amp;tab3='.$tab3 );
+			$AdminUI->set_page_manual_link( 'users-find-duplicates' );
 			break;
 
 		default:
@@ -549,14 +777,14 @@ else
 
 			$AdminUI->breadcrumbpath_add( T_('List'), '?ctrl=users' );
 			$AdminUI->top_block = get_user_quick_search_form();
-			if( $current_User->check_perm( 'users', 'moderate', false ) )
+			if( $current_User->check_perm( 'users', 'moderate' ) )
 			{	// Include to edit user level
 				require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
 			}
 			load_funcs( 'regional/model/_regional.funcs.php' );
 
 			// Set an url for manual page:
-				$AdminUI->set_page_manual_link( 'users-users' );
+			$AdminUI->set_page_manual_link( 'users-users' );
 	}
 
 }
@@ -599,12 +827,16 @@ switch( $action )
 			$confirm_messages[] = array( T_('Note: this will also delete private messages sent/received by this user.'), 'note' );
 			$confirm_messages[] = array( T_('Note: this will also delete comments made by this user.'), 'note' );
 			$confirm_messages[] = array( T_('Note: this will also delete files uploaded by this user.'), 'note' );
+			$confirm_messages[] = array( '<strong>'.sprintf( T_('Note: the email address %s will be banned from registering again.'), '<code>'.$edited_User->get( 'email' ).'</code>' ).'</strong>', 'note' );
 		}
 		else
 		{	// Display the notes for standard deleting:
-			$confirm_messages[] = array( T_('Note: this will <b>not</b> automatically delete private messages sent/received by this user. However, this will delete any new orphan private messages (which no longer have any existing sender or recipient).'), 'note' );
-			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete comments made by this user. Instead it will transform them from member to visitor comments.'), 'note' );
-			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete files uploaded by this user outside of the user root. Instead the creator ID of these files will be set to NULL.'), 'note' );
+			$confirm_messages[] = array( T_('Note: this will <b>not</b> automatically delete private messages sent/received by this user. However, this will delete any new orphan private messages (which no longer have any existing sender or recipient).')
+				.'<br /><label><input type="checkbox" name="force_delete_messages" value="1" /> '.T_('Force deleting all private messages sent/received by this user.').'</label>', 'note' );
+			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete comments made by this user. Instead it will transform them from member to visitor comments.')
+				.'<br /><label><input type="checkbox" name="force_delete_comments" value="1" /> '.T_('Force deleting all comments made by this user.').'</label>', 'note' );
+			$confirm_messages[] = array( T_('Note: this will <b>not</b> delete files uploaded by this user outside of the user root. Instead the creator ID of these files will be set to NULL.')
+				.'<br /><label><input type="checkbox" name="force_delete_files" value="1" /> '.T_('Force deleting all files uploaded by this user.').'</label>', 'note' );
 		}
 
 		// Find other users with the same email address
@@ -634,8 +866,15 @@ switch( $action )
 
 		$edited_User->confirm_delete( $msg, 'user', $action, get_memorized( 'action' ), $confirm_messages, $delete_form_params );
 
-		// Display user identity form:
-		$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
+		if( $deltype == 'spammer' )
+		{	// Display user activity lists:
+			$user_tab = 'activity';
+			$AdminUI->disp_view( 'users/views/_user_activity.view.php' );
+		}
+		else
+		{	// Display user identity form:
+			$AdminUI->disp_view( 'users/views/_user_identity.form.php' );
+		}
 		$AdminUI->disp_payload_end();
 
 		// Init JS for user reporting
@@ -668,6 +907,41 @@ switch( $action )
 
 		$AdminUI->disp_view( 'users/views/_user_list_tags.form.php' );
 
+		$AdminUI->disp_payload_end();
+		break;
+
+	case 'set_status':
+		// Display a form to set user account status:
+
+		// Do not append Debuglog & Debug JSlog to response!
+		$debug = false;
+		$debug_jslog = false;
+
+		$AdminUI->disp_payload_begin();
+
+		$AdminUI->disp_view( 'users/views/_user_list_status.form.php' );
+
+		$AdminUI->disp_payload_end();
+		break;
+
+	case 'change_groups':
+		// Display a form to set user account status:
+
+		// Do not append Debuglog & Debug JSlog to response!
+		$debug = false;
+		$debug_jslog = false;
+
+		$AdminUI->disp_payload_begin();
+
+		$AdminUI->disp_view( 'users/views/_user_list_groups.form.php' );
+
+		$AdminUI->disp_payload_end();
+		break;
+
+	case 'spammers':
+		memorize_param( 'action', 'string', '', $action );
+		$AdminUI->disp_payload_begin();
+		$AdminUI->disp_view( 'users/views/_user_list_spammers.view.php' );
 		$AdminUI->disp_payload_end();
 		break;
 

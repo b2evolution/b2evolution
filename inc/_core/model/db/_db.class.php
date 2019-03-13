@@ -409,8 +409,7 @@ class DB
 		$socket = isset( $params['socket'] ) ? $params['socket'] : ini_get( 'mysqli.default_socket' );
 		$client_flags = isset( $params['client_flags'] ) ? $params['client_flags'] : 0;
 
-		/* Persistent connections are only available in PHP 5.3+ */
-		$this->use_persistent = isset( $params['use_persistent'] ) ? $params['use_persistent'] : version_compare( PHP_VERSION, '5.3', '>=' );
+		$this->use_persistent = isset( $params['use_persistent'] ) ? $params['use_persistent'] : true;
 
 		if( ! $this->dbhandle )
 		{ // Connect to the Database:
@@ -1043,7 +1042,8 @@ class DB
 
 					// Get time information from PROFILING table (which corresponds to "SHOW PROFILE")
 					$this->result = $this->dbhandle->query( 'SELECT FORMAT(SUM(DURATION), 6) AS DURATION FROM INFORMATION_SCHEMA.PROFILING GROUP BY QUERY_ID ORDER BY QUERY_ID DESC LIMIT 1' );
-					$this->queries[$this->num_queries-1]['time_profile'] = array_shift($this->result->fetch_row());
+					$time_profile_durations = $this->result->fetch_row();
+					$this->queries[$this->num_queries-1]['time_profile'] = array_shift( $time_profile_durations );
 				}
 
 				// Free "PROFILE" result:
@@ -1489,7 +1489,7 @@ class DB
 
 					echo '<code id="'.$div_id.'" style="display:none">'.$sql_short.'</code>';
 					echo '<code id="'.$div_id.'_full">'.$sql.'</code>';
-					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.','.$div_id.'_full", "Show less", "Show more", false);</script>';
+					echo '<script>debug_onclick_toggle_div("'.$div_id.','.$div_id.'_full", "Show less", "Show more", false);</script>';
 				}
 				else
 				{
@@ -1588,14 +1588,14 @@ class DB
 						echo '<div id="'.$div_id.'">';
 						echo $this->debug_get_rows_table( 100, true );
 						echo '</div>';
-						echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show EXPLAIN", "Hide EXPLAIN");</script>';
+						echo '<script>debug_onclick_toggle_div("'.$div_id.'", "Show EXPLAIN", "Hide EXPLAIN");</script>';
 					}
 					else
 					{ // TODO: dh> contains html.
 						echo $this->debug_get_rows_table( 100, true );
 					}
 				}
-				$this->result->free();
+				$this->flush();
 			}
 
 			// Profile:
@@ -1607,7 +1607,7 @@ class DB
 					echo '<div id="'.$div_id.'">';
 					echo $query['profile'];
 					echo '</div>';
-					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show PROFILE", "Hide PROFILE");</script>';
+					echo '<script>debug_onclick_toggle_div("'.$div_id.'", "Show PROFILE", "Hide PROFILE");</script>';
 				}
 				else
 				{ // TODO: dh> contains html.
@@ -1624,7 +1624,7 @@ class DB
 					echo '<div id="'.$div_id.'">';
 					echo $query['results'];
 					echo '</div>';
-					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show results", "Hide results");</script>';
+					echo '<script>debug_onclick_toggle_div("'.$div_id.'", "Show results", "Hide results");</script>';
 				}
 				else
 				{ // TODO: dh> contains html.
@@ -1641,7 +1641,7 @@ class DB
 					echo '<div id="'.$div_id.'">';
 					echo $query['function_trace'];
 					echo '</div>';
-					echo '<script type="text/javascript">debug_onclick_toggle_div("'.$div_id.'", "Show function trace", "Hide function trace");</script>';
+					echo '<script>debug_onclick_toggle_div("'.$div_id.'", "Show function trace", "Hide function trace");</script>';
 				}
 				else
 				{ // TODO: dh> contains html.

@@ -17,7 +17,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for sessions module to function properly
  */
-$required_php_version[ 'sessions' ] = '5.4';
+$required_php_version[ 'sessions' ] = '5.6';
 
 /**
  * Minimum MYSQL version required for sessions module to function properly
@@ -215,7 +215,9 @@ class sessions_Module extends Module
 			if( !is_admin_page() )
 			{	// Only for front-office:
 				$page_menus = array();
-				if( $topleft_Menu->get_node_by_path( array( 'page', 'edit' ) ) )
+				if( $topleft_Menu->get_node_by_path( array( 'page', 'edit_front' ) ) ||
+				    $topleft_Menu->get_node_by_path( array( 'page', 'edit_back' ) ) ||
+				    $topleft_Menu->get_node_by_path( array( 'page', 'view_back' ) ) )
 				{
 					$page_menus['stats_sep'] = array( 'separator' => true );
 				}
@@ -270,6 +272,9 @@ class sessions_Module extends Module
 										'browser' => array(
 											'text' => T_('Browser hits'),
 											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=browser&amp;blog='.$blog ),
+										'search_referers' => array(
+											'text' => T_('Search & Referers'),
+											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=search_referers&amp;blog='.$blog ),
 										'api' => array(
 											'text' => T_('API hits'),
 											'href' => $admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=api&amp;blog='.$blog ),

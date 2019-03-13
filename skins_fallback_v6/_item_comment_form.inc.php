@@ -58,8 +58,12 @@ $params = array_merge( array(
 			) ),
 		'comment_mode'         => '', // Can be 'quote' from GET request
 		'comment_type'         => 'comment',
+		'comment_title_before'  => '<div class="panel-heading"><h4 class="evo_comment_title panel-title">',
+		'comment_title_after'   => '</h4></div><div class="panel-body">',
 		'comment_rating_before' => '<div class="evo_comment_rating">',
 		'comment_rating_after'  => '</div>',
+		'comment_text_before'   => '<div class="evo_comment_text">',
+		'comment_text_after'    => '</div>',
 		'comment_info_before'   => '<footer class="evo_comment_footer clear text-muted"><small>',
 		'comment_info_after'    => '</small></footer></div>',
 	), $params );
@@ -207,10 +211,11 @@ if( $params['disp_comment_form'] && ( $params['comment_type'] == 'meta' && $Item
 			$comment_content = param( $dummy_fields[ 'content' ], 'html' );
 			$quoted_comment_ID = param( 'qc', 'integer', 0 );
 			$quoted_post_ID = param( 'qp', 'integer', 0 );
-			if( !empty( $quoted_comment_ID ) )
-			{
-				$CommentCache = & get_CommentCache();
-				$quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false );
+			if( ! empty( $quoted_comment_ID ) &&
+			    ( $CommentCache = & get_CommentCache() ) &&
+			    ( $quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false ) ) &&
+			    $params['comment_type'] == $quoted_Comment->get( 'type' ) )
+			{	// Allow comment quoting only for the same comment type form:
 				$quoted_Item = $quoted_Comment->get_Item();
 				if( $quoted_User = $quoted_Comment->get_author_User() )
 				{ // User is registered
@@ -223,8 +228,8 @@ if( $params['disp_comment_form'] && ( $params['comment_type'] == 'meta' && $Item
 				$quoted_content = $quoted_Comment->get( 'content' );
 				$quoted_ID = 'c'.$quoted_Comment->ID;
 			}
-			else if( !empty( $quoted_post_ID ) )
-			{
+			elseif( ! empty( $quoted_post_ID ) && $params['comment_type'] != 'meta' )
+			{	// Allow item quoting only for normal(not meta) comment type form:
 				$ItemCache = & get_ItemCache();
 				$quoted_Item = & $ItemCache->get_by_ID( $quoted_post_ID, false );
 				$quoted_login = $quoted_Item->get_creator_login();
@@ -265,11 +270,13 @@ if( $params['disp_comment_form'] && ( $params['comment_type'] == 'meta' && $Item
 	echo $params['form_title_text'];
 	echo $params['form_title_end'];
 
-	// Display a message before comment form:
-	$Item->display_comment_form_msg();
+	if( $params['comment_type'] != 'meta' )
+	{	// Display a message before comment form:
+		$Item->display_comment_form_msg();
+	}
 
 /*
-	echo '<script type="text/javascript">
+	echo '<script>
 /* <![CDATA[ *
 function validateCommentForm(form)
 {
@@ -322,7 +329,7 @@ function validateCommentForm(form)
 			$comment_author_email = $current_User->email;
 		}
 		// Note: we use funky field names to defeat the most basic guestbook spam bots
-		$Form->text( $dummy_fields[ 'name' ], $comment_author, 40, T_('Name'), '', 100, 'evo_comment_field' );
+		$Form->text( $dummy_fields[ 'name' ], $comment_author, 40, T_('Name'), '<br />'.sprintf( T_('<a %s>Click here to log in</a> if you already have an account on this site.'), 'href="'.get_login_url( 'comment form', $Item->get_permanent_url() ).'" style="font-weight:bold"' ), 100, 'evo_comment_field' );
 
 		$Form->email_input( $dummy_fields[ 'email' ], $comment_author_email, 40, T_('Email'), array(
 			'bottom_note' => T_('Your email address will <strong>not</strong> be revealed on this site.'),
@@ -397,6 +404,13 @@ function validateCommentForm(form)
 	// Set prefix for js code in plugins:
 	$plugin_js_prefix = ( $params['comment_type'] == 'meta' ? 'meta_' : '' );
 
+	// Display plugin captcha for comment form before textarea:
+	$Plugins->display_captcha( array(
+			'Form'          => & $Form,
+			'form_type'     => 'comment',
+			'form_position' => 'before_textarea',
+		) );
+
 	ob_start();
 	echo '<div class="comment_toolbars">';
 	// CALL PLUGINS NOW:
@@ -423,39 +437,18 @@ function validateCommentForm(form)
 	$Form->inputstart = $form_inputstart;
 
 	// Set canvas object for plugins:
-	echo '<script type="text/javascript">var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
+	echo '<script>var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
 
-	// Attach files:
-	if( !empty( $comment_attachments ) )
-	{	// display already attached files checkboxes
-		$FileCache = & get_FileCache();
-		$attachments = explode( ',', $comment_attachments );
-		$final_attachments = explode( ',', $checked_attachments );
-		// create attachments checklist
-		$list_options = array();
-		foreach( $attachments as $attachment_ID )
-		{
-			$attachment_File = $FileCache->get_by_ID( $attachment_ID, false );
-			if( $attachment_File )
-			{
-				// checkbox should be checked only if the corresponding file id is in the final attachments array
-				$checked = in_array( $attachment_ID, $final_attachments );
-				$list_options[] = array( 'preview_attachment'.$attachment_ID, 1, '', $checked, false, $attachment_File->get( 'name' ) );
-			}
-		}
-		if( !empty( $list_options ) )
-		{	// display list
-			$Form->checklist( $list_options, 'comment_attachments', T_( 'Attached files' ) );
-		}
-		// memorize all attachments ids
-		$Form->hidden( 'preview_attachments', $comment_attachments );
-	}
-	if( $Item->can_attach() )
-	{	// Display attach file input field
-		$Form->input_field( array( 'label' => T_('Attach files'), 'note' => $params['comment_attach_info'], 'name' => 'uploadfile[]', 'type' => 'file' ) );
-	}
+	// CALL PLUGINS NOW:
+	ob_start();
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+		'target_type'   => 'Comment',
+		'target_object' => $Comment,
+		'content_id'    => $content_id,
+		'edit_layout'   => 'inskin',
+	) );
+	$quick_setting_switch = ob_get_flush();
 
-	// Additional options:
 	$comment_options = array();
 	if( ! is_logged_in( false ) )
 	{	// For anonymous or not activated user:
@@ -488,7 +481,49 @@ function validateCommentForm(form)
 		$Form->info( T_('Text Renderers'), $comment_renderer_checkboxes );
 	}
 
+	// Attach files:
+	if( !empty( $comment_attachments ) )
+	{	// display already attached files checkboxes
+		$FileCache = & get_FileCache();
+		$attachments = explode( ',', $comment_attachments );
+		$final_attachments = explode( ',', $checked_attachments );
+		// create attachments checklist
+		$list_options = array();
+		foreach( $attachments as $attachment_ID )
+		{
+			$attachment_File = $FileCache->get_by_ID( $attachment_ID, false );
+			if( $attachment_File )
+			{
+				// checkbox should be checked only if the corresponding file id is in the final attachments array
+				$checked = in_array( $attachment_ID, $final_attachments );
+				$list_options[] = array( 'preview_attachment'.$attachment_ID, 1, '', $checked, false, $attachment_File->get( 'name' ) );
+			}
+		}
+		if( !empty( $list_options ) )
+		{	// display list
+			$Form->checklist( $list_options, 'comment_attachments', T_( 'Attached files' ) );
+		}
+		// memorize all attachments ids
+		$Form->hidden( 'preview_attachments', $comment_attachments );
+	}
+	if( $Item->can_attach() )
+	{	// Display attach file input field when JavaScript is disabled:
+		echo '<noscript>';
+		$Form->input_field( array( 'label' => T_('Attach files'), 'note' => $params['comment_attach_info'], 'name' => 'uploadfile[]', 'type' => 'file' ) );
+		echo '<p>'.T_('Please enable JavaScript to use file uploader.').'</p>';
+		echo '</noscript>';
+	}
+	// Display attachments fieldset:
+	$Form->attachments_fieldset( $Comment, false, $Comment->is_meta() ? 'meta_' : '' );
+
 	$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
+
+	// Display plugin captcha for comment form before submit button:
+	$Plugins->display_captcha( array(
+			'Form'          => & $Form,
+			'form_type'     => 'comment',
+			'form_position' => 'before_submit_button',
+		) );
 
 	$Form->begin_fieldset();
 		echo $Form->buttonsstart;
@@ -497,12 +532,22 @@ function validateCommentForm(form)
 		$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview btn-info', 'value' => $preview_text, 'tabindex' => 9 ) );
 		$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit SaveButton', 'value' => $params['form_submit_text'], 'tabindex' => 10 ) );
 
+		if( $Item->can_attach() )
+		{	// Don't display "/Add file" on the preview button if JS is enabled:
+			echo '<script type="text/javascript">jQuery( "input[type=submit].preview.btn-info" ).val( "'.TS_('Preview').'" )</script>';
+		}
+
 		$Plugins->trigger_event( 'DisplayCommentFormButton', array( 'Form' => & $Form, 'Item' => & $Item ) );
 
 		echo $Form->buttonsend;
 	$Form->end_fieldset();
 	?>
-
+	<script>
+	jQuery( document ).ready( function() {
+		// Align TinyMCE toggle buttons:
+		jQuery( '.evo_tinymce_toggle_buttons' ).addClass( 'col-sm-offset-3' );
+	} );
+	</script>
 	<div class="clear"></div>
 
 	<?php

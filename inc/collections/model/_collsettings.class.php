@@ -52,6 +52,7 @@ class CollectionSettings extends AbstractSettings
 
 		// Single post settings:
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
+			'allow_crosspost_urls' => 1,					// For cross-posted Items, allow non-canonical URL
 			'relcanonical_item_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'single_links'   => 'short',
 			'single_item_footer_text' => '',
@@ -91,6 +92,8 @@ class CollectionSettings extends AbstractSettings
 			'comments_register' => 1,
 			'comment_quick_moderation' => 'expire',		// Comment quick moderation can be 'never', 'expire' - Links expire on first edit action, and 'always'
 			'autocomplete_usernames' => 1,
+			'meta_comments_frontoffice' => 1, // Display meta comments in front-office
+			'webmentions' => 1, // Allow to accept webmentions from other sites
 
 		// Archive settings:
 			'arcdir_noindex' => '1',					// META NOINDEX on Archive directory
@@ -153,7 +156,7 @@ class CollectionSettings extends AbstractSettings
 			'enable_sitemaps' => 1,
 
 		// General settings:
-			'ajax_form_enabled' => 0,					// Comment and contacts forms will be fetched by javascript
+			'ajax_form_enabled' => 1,					// Comment, Contact & Quick registration forms will be fetched by javascript
 			'ajax_form_loggedin_enabled' => 0,			// Also use JS forms for logged in users
 			'cache_enabled' => 0,
 			'cache_enabled_widgets' => 0,
@@ -161,8 +164,9 @@ class CollectionSettings extends AbstractSettings
 			'in_skin_editing' => 0,
 			'in_skin_editing_renderers' => 1,
 			'in_skin_editing_category' => 1,
+			'in_skin_editing_category_order' => 1,
 			'default_cat_ID' => NULL,					// Default Cat for new posts
-			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet,evo_twitter', // ping plugin codes, separated by comma
+			'ping_plugins' => 'ping_pingomatic,ping_b2evonet,evo_twitter,webmention', // ping plugin codes, separated by comma
 			'allow_subscriptions' => 1,         // Allow email subscriptions for new post by default
 			'allow_comment_subscriptions' => 1, // Allow email subscriptions for new comment by default
 			'allow_item_subscriptions' => 1,    // Allow email subscriptions for a specific post by default
@@ -188,6 +192,7 @@ class CollectionSettings extends AbstractSettings
 			'allow_html_comment' => 1, // Allow HTML in comments
 			'track_unread_content' => 0, // Should we track unread content on the specific blog. It can be modified on the Features/Other settings form.
 			'allow_access' => 'public', // Allow access to blog; Values: 'public' - Everyone (Public Blog), 'users' - Logged in users, 'members' - Members of the blog
+			'http_protocol' => 'allow_both', // SSL; Values: 'always_http' - Always use http, 'always_https' - Always use https, 'allow_both' - Allow both http and https as valid URLs.
 			// Assets URLs:
 			'rsc_assets_url_type' => 'relative', // Load generic /rsc/ assets from: 'basic', 'relative', 'absolute'
 			'rsc_assets_absolute_url' => '', // Absolute URL for setting 'rsc_assets_url_type' with selected option 'absolute'
@@ -219,6 +224,11 @@ class CollectionSettings extends AbstractSettings
 			'msgform_require_message' => 1, // Require message
 
 		// User directory:
+			'userdir_filter_gender' => 1,
+			'userdir_filter_level' => 1,
+			'userdir_filter_org' => 1,
+			'userdir_filter_criteria' => 1,
+			'userdir_filter_lastseen' => 1,
 			'userdir_picture' => 1,
 			'image_size_user_list' => 'crop-top-48x48',
 			'userdir_login' => 1,
@@ -243,6 +253,34 @@ class CollectionSettings extends AbstractSettings
 			'search_include_posts' => 1, // Include posts to results on disp=search
 			'search_include_cmnts' => 1, // Include comments to results on disp=search
 			'search_include_tags'  => 1, // Include tags to results on disp=search
+			'search_include_files' => 1, // Include files to results on disp=search
+			'search_score_post_title'          => 5, // weight multiplier for keywords found in post title
+			'search_score_post_content'        => 1, // weight multiplier for keywords found in post content
+			'search_score_post_tags'           => 4, // weight multiplier for keywords found in post tags
+			'search_score_post_excerpt'        => 1, // weight multiplier for keywords found in post excerpt
+			'search_score_post_titletag'       => 4, // weight multiplier for keywords found in post <title> tag
+			'search_score_post_author'         => 5, // weight multiplier for keywords found in post author login
+			'search_score_post_date_future'    => 0, // weight multiplier for posts from future
+			'search_score_post_date_moremonth' => 0, // weight multiplier for posts older month
+			'search_score_post_date_lastmonth' => 1, // weight multiplier for posts from the last month
+			'search_score_post_date_twoweeks'  => 2, // weight multiplier for posts from the last two weeks
+			'search_score_post_date_lastweek'  => 8, // weight multiplier for posts from the last week
+			'search_score_cmnt_post_title'     => 1, // weight multiplier for keywords found in title of the comment's post
+			'search_score_cmnt_content'        => 1, // weight multiplier for keywords found in comment content
+			'search_score_cmnt_author'         => 5, // weight multiplier for keywords found in comment author name
+			'search_score_cmnt_date_future'    => 0, // weight multiplier for comments from future
+			'search_score_cmnt_date_moremonth' => 0, // weight multiplier for comments older month
+			'search_score_cmnt_date_lastmonth' => 1, // weight multiplier for comments from the last month
+			'search_score_cmnt_date_twoweeks'  => 2, // weight multiplier for comments from the last two weeks
+			'search_score_cmnt_date_lastweek'  => 8, // weight multiplier for comments from the last week
+			'search_score_file_name'           => 3, // weight multiplier for keywords found in file name
+			'search_score_file_path'           => 1, // weight multiplier for keywords found in file path
+			'search_score_file_title'          => 3, // weight multiplier for keywords found in file long title
+			'search_score_file_alt'            => 1, // weight multiplier for keywords found in file alternative text
+			'search_score_file_description'    => 1, // weight multiplier for keywords found in file caption/description
+			'search_score_cat_name'            => 3, // weight multiplier for keywords found in category name
+			'search_score_cat_desc'            => 1, // weight multiplier for keywords found in category description
+			'search_score_tag_name'            => 3, // weight multiplier for keywords found in tag name
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
 
 		// Time frame settings:

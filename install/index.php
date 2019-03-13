@@ -195,7 +195,6 @@ switch( $action )
 {
 	case 'evoupgrade':
 	case 'auto_upgrade':
-	case 'svn_upgrade':
 	case 'newdb':
 	case 'cafelogupgrade':
 	case 'deletedb':
@@ -322,7 +321,6 @@ switch( $action )
 {
 	case 'evoupgrade':
 	case 'auto_upgrade':
-	case 'svn_upgrade':
 		$title = T_('Upgrade from a previous version');
 		break;
 
@@ -399,9 +397,9 @@ if( $display != 'cli' )
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="robots" content="noindex, follow" />
 		<title><?php echo format_to_output( T_('b2evo installer').( $title ? ': '.$title : '' ), 'htmlhead' ); ?></title>
-		<script type="text/javascript" src="../rsc/js/jquery.min.js"></script>
+		<script src="../rsc/js/jquery.min.js"></script>
 		<!-- Bootstrap -->
-		<script type="text/javascript" src="../rsc/js/bootstrap/bootstrap.min.js"></script>
+		<script src="../rsc/js/bootstrap/bootstrap.min.js"></script>
 		<link href="../rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
 		<link href="../rsc/build/b2evo_helper_screens.css" rel="stylesheet">
 	</head>
@@ -608,10 +606,10 @@ switch( $action )
 					<p class="text-muted small"><?php echo T_('b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installing b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.') ?></p>
 					<?php
 					$Form->checkbox( 'conf_create_db', param( 'conf_create_db', 'integer' ), '', T_('Try to create this DB if it doesn\'t exist yet (useful for developers)') );
-					$Form->text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ), 120 );
-					$Form->text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ), 100);
-					$Form->text( 'conf_db_user', $conf_db_user, 16, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 );
-					$Form->text( 'conf_db_password', $conf_db_password, 16, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 ); // no need to hyde this. nobody installs b2evolution from a public place
+					$Form->text( 'conf_db_host', $conf_db_host, NULL, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ) );
+					$Form->text( 'conf_db_name', $conf_db_name, NULL, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ) );
+					$Form->text( 'conf_db_user', $conf_db_user, NULL, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ) );
+					$Form->text( 'conf_db_password', $conf_db_password, NULL, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ) ); // no need to hyde this. nobody installs b2evolution from a public place
 					// Too confusing for (most) newbies.	form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
 				block_close();
 
@@ -927,7 +925,7 @@ switch( $action )
 			</p>
 		</form>
 
-		<script type="text/javascript">
+		<script>
 			jQuery( '#create_sample_contents' ).click( function()
 			{
 				jQuery( '#create_sample_contents_options' ).toggle();
@@ -1086,7 +1084,6 @@ switch( $action )
 
 	case 'evoupgrade':
 	case 'auto_upgrade':
-	case 'svn_upgrade':
 		/*
 		 * -----------------------------------------------------------------------------------
 		 * EVO UPGRADE: Upgrade data from existing b2evolution database
@@ -1139,7 +1136,7 @@ switch( $action )
 		if( $is_automated_upgrade && $upgrade_result !== 'need-fix' )
 		{
 			if( $upgrade_result === true )
-			{	// After successful auto_upgrade or svn_upgrade we must remove files/folder based on the upgrade_policy.conf
+			{	// After successful auto_upgrade we must remove files/folder based on the upgrade_policy.conf
 				remove_after_upgrade();
 			}
 			// Disable maintenance mode at the end of the upgrade script:
@@ -1345,7 +1342,7 @@ if( $display != 'cli' )
 			<footer class="footer" id="sticky_footer">
 				<p class="pull-right"><a href="https://github.com/b2evolution/b2evolution" class="text-nowrap"><?php echo T_('GitHub page'); ?></a></p>
 				<p><a href="http://b2evolution.net/" class="text-nowrap">b2evolution.net</a>
-				&bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" class="text-nowrap"><?php echo T_('Find a host'); ?></a>
+				&bull; <a href="https://b2evolution.net/web-hosting/cheap-plans/" class="text-nowrap"><?php echo T_('Find a host'); ?></a>
 				&bull; <a href="http://b2evolution.net/man/" class="text-nowrap"><?php echo T_('Online manual'); ?></a>
 				&bull; <a href="http://forums.b2evolution.net" class="text-nowrap"><?php echo T_('Help forums'); ?></a>
 				</p>

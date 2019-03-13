@@ -243,7 +243,7 @@ class coll_media_index_Widget extends ComponentWidget
 		// Note: We use ItemQuery to get attachments from all posts which should be visible ( even in case of aggregate blogs )
 		$ItemQuery = new ItemQuery( $ItemCache->dbtablename, $ItemCache->dbprefix, $ItemCache->dbIDname );
 		$ItemQuery->SELECT( 'post_ID, post_datestart, post_datemodified, post_main_cat_ID, post_urltitle, post_canonical_slug_ID,
-									post_tiny_slug_ID, post_ityp_ID, post_title, post_excerpt, post_url, file_ID, file_creator_user_ID, file_type,
+									post_tiny_slug_ID, post_ityp_ID, post_title, post_short_title, post_excerpt, post_url, post_single_view, file_ID, file_creator_user_ID, file_type,
 									file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
 		$ItemQuery->FROM_add( 'INNER JOIN T_links ON post_ID = link_itm_ID' );
 		$ItemQuery->FROM_add( 'INNER JOIN T_files ON link_file_ID = file_ID' );
@@ -270,8 +270,8 @@ class coll_media_index_Widget extends ComponentWidget
 		// Maybe it would be good to get only the requested amount of files, because after a very short period the file types will be set for all images.
 		$ItemQuery->LIMIT( intval( $this->disp_params['limit'] ) * 2 );
 
-		$ItemQuery->ORDER_BY(	gen_order_clause( $this->disp_params['order_by'], $this->disp_params['order_dir'],
-											'post_', 'post_ID '.$this->disp_params['order_dir'].', link_ID' ) );
+		$ItemQuery->ORDER_BY( $ItemQuery->gen_order_clause( $this->disp_params['order_by'], $this->disp_params['order_dir'],
+											'post_', 'post_ID' ).', link_ID '.$this->disp_params['order_dir'] );
 
 		// Init FileList with the above defined query
 		$FileList = new DataObjectList2( $FileCache );
@@ -311,10 +311,17 @@ class coll_media_index_Widget extends ComponentWidget
 			// 3/ Instantiate a light object in order to get permamnent url:
 			$ItemLight = new ItemLight( $FileList->get_row_by_idx( $FileList->current_idx - 1 ) );	// index had already been incremented
 
-			$r .= '<a href="'.$ItemLight->get_permanent_url().'">';
+			$item_permanent_url = $ItemLight->get_permanent_url();
+			if( $item_permanent_url !== false )
+			{	// Some items may have no permanent url:
+				$r .= '<a href="'.$ItemLight->get_permanent_url().'">';
+			}
 			// Generate the IMG THUMBNAIL tag with all the alt, title and desc if available
 			$r .= $File->get_thumb_imgtag( $this->disp_params['thumb_size'], '', '', $ItemLight->title );
-			$r .= '</a>';
+			if( $item_permanent_url !== false )
+			{
+				$r .= '</a>';
+			}
 			if( $this->disp_params['disp_image_title'] )
 			{ // Dislay title of image or item
 				$title = ( $File->get( 'title' ) ) ? $File->get( 'title' ) : $ItemLight->title;

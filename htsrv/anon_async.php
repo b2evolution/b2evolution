@@ -141,6 +141,54 @@ switch( $action )
 		break;
 
 
+	case 'get_widget_form':
+		// Display widget form:
+
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
+		if( param( 'wi_ID', 'integer', 0 ) )
+		{	// Try to get a Widget by ID if it called from DB:
+			$WidgetCache = & get_WidgetCache();
+			$Widget = & $WidgetCache->get_by_ID( $wi_ID );
+			if( ! $Widget || $Widget->get( 'coll_ID' ) != $blog_ID )
+			{
+				debug_die( 'Wrong widget request!' );
+			}
+		}
+		else
+		{	// Try to get a Widget by code if it called from content with inline short tag like [emailcapture]:
+			param( 'wi_code', 'string', true );
+			if( ! file_exists( $inc_path.'widgets/widgets/_'.$wi_code.'.widget.php' ) )
+			{	// For some reason, that widget doesn't seem to exist... (any more?)
+				debug_die( 'Wrong widget request!' );
+			}
+			require_once $inc_path.'widgets/widgets/_'.$wi_code.'.widget.php';
+			// Create new widget by provided code:
+			$widget_classname = $wi_code.'_Widget';
+			$Widget = new $widget_classname();
+		}
+
+		param( 'params', 'array', array() );
+
+		$BlogCache = & get_BlogCache();
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
+
+		locale_activate( $Blog->get('locale') );
+
+		$blog_skin_ID = $Blog->get_skin_ID();
+		if( ! empty( $blog_skin_ID ) )
+		{ // check if Blog skin has specific comment form
+			$SkinCache = & get_SkinCache();
+			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+			$ads_current_skin_path = $skins_path.$Skin->folder.'/';
+		}
+
+		// Display widget form:
+		$Widget->display_form( $params );
+		break;
+
+
 	case 'get_user_bubbletip':
 		// Get contents of a user bubbletip
 		// Displays avatar & name
@@ -963,11 +1011,14 @@ switch( $action )
 			case 'items_edited_results_block':
 			case 'comments_results_block':
 			case 'threads_results_block':
+			case 'received_threads_results_block':
 			case 'user_reports_results_block':
 			case 'blogs_user_results_block':
 			case 'blogs_all_results_block':
 			case 'items_list_block_by_page':
 			case 'items_manual_results_block':
+			case 'user_sent_emails_results_block':
+			case 'user_email_returns_results_block':
 				break;
 
 			default:
@@ -1081,7 +1132,7 @@ switch( $action )
 		$Form->output = false;
 		$Form->switch_layout( 'none' );
 		$org_suffix = ' &nbsp; <strong>'.T_('Role').':</strong> '.$Form->text_input( 'org_roles[]', '', 20, '', '', array( 'maxlength' => 255 ) ).' &nbsp; ';
-		$org_suffix .= ' &nbsp; <strong>'.T_('Priority').':</strong> '.$Form->text_input( 'org_priorities[]', '', 10, '', '', array( 'type' => 'number', 'min' => -2147483648, 'max' => 2147483647 ) ).' &nbsp; ';
+		$org_suffix .= ' &nbsp; <strong>'.T_('Order').':</strong> '.$Form->text_input( 'org_priorities[]', '', 10, '', '', array( 'type' => 'number', 'min' => -2147483648, 'max' => 2147483647 ) ).' &nbsp; ';
 		$Form->switch_layout( NULL );
 		$Form->output = true;
 
@@ -1356,6 +1407,201 @@ switch( $action )
 		require $inc_path.'users/views/_user_groups.form.php';
 		break;
 
+	case 'render_inlines':
+		$target_ID = param( 'id', 'integer', 0 );
+		$target_type = param( 'type', 'string' );
+		$tags = param( 'tags', 'array:string', array() );
+		// 'temp_link_owner_ID' param will be passed for objects with temporary ID
+
+		// Default params from skins/skins_fallback_v6/_item_content.inc.php
+		$params = array(
+			'before_image'             => '<figure'.( $target_type == 'EmailCampaign' ? emailskin_style( '.evo_image_block' ) : ' class="evo_image_block"' ).'>',
+			'before_image_legend'      => '<figcaption'.( $target_type == 'EmailCampaign' ? emailskin_style( '.evo_image_legend' ) : ' class="evo_image_legend"' ).'>',
+			'after_image_legend'       => '</figcaption>',
+			'after_image'              => '</figure>',
+			'after_images'             => '</div>',
+			'image_class'              => 'img-responsive',
+			'image_size'               => param( 'image_size', 'string', 'fit-256x256' ),
+			'image_limit'              => 1000,
+			'image_link_to'            => 'original', // Can be 'original', 'single' or empty
+		);
+
+		switch( $target_type )
+		{
+			case 'Item':
+				$ItemCache = & get_ItemCache();
+				$edited_Item = $ItemCache->get_by_ID( $target_ID, false, false );
+				if( ! $edited_Item )
+				{
+					$edited_Item = new Item();
+				}
+				$rendered_tags = render_inline_tags( $edited_Item, $tags, $params );
+				break;
+
+			case 'Comment':
+				$CommentCache = & get_CommentCache();
+				$edited_Comment = $CommentCache->get_by_ID( $target_ID );
+				$rendered_tags = render_inline_tags( $edited_Comment, $tags, $params );
+				break;
+
+			case 'EmailCampaign':
+				$EmailCampaignCache = & get_EmailCampaignCache();
+				$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $target_ID );
+				$rendered_tags = render_inline_tags( $edited_EmailCampaign, $tags, $params );
+				break;
+
+			case 'Message':
+				$MessageCache = & get_MessageCache();
+				$edited_Message = $MessageCache->get_by_ID( $target_ID, false, false );
+				if( ! $edited_Message )
+				{
+					$edited_Message = new Message();
+				}
+
+				$rendered_tags = render_inline_tags( $edited_Message, $tags, $params );
+				break;
+		}
+
+		if( $rendered_tags )
+		{
+			echo json_encode( $rendered_tags );
+		}
+
+		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
+
+	case 'get_insert_image_form':
+	case 'get_edit_image_form':
+		$restrict_tag = false;
+		$request_from = param( 'request_from', 'string', NULL );
+
+		global $is_admin_page;
+
+		init_fontawesome_icons();
+
+		$is_admin_page = is_logged_in() && $request_from == 'back';
+
+		if( is_admin_page() )
+		{
+			global $UserSettings, $adminskins_path, $AdminUI;
+
+			$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+			$AdminUI = new AdminUI();
+		}
+		else
+		{
+			$BlogCache = & get_BlogCache();
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+			if( $Blog )
+			{
+				$blog_skin_ID = $Blog->get_skin_ID();
+				if( ! empty( $blog_skin_ID ) )
+				{
+					$SkinCache = & get_SkinCache();
+					$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+				}
+			}
+		}
+
+		// Default values:
+		$image_caption = NULL;
+		$image_class = NULL;
+		$image_disable_caption = false;
+		$thumbnail_size = 'medium';
+		$thumbnail_alignment = 'left';
+		$thumbnail_class = NULL;
+		$inline_class = NULL;
+
+		if( $action == 'get_insert_image_form' )
+		{
+			$tag_type = param( 'tag_type', 'string', 'image' );
+			$link_ID = param( 'link_ID', 'integer', true );
+			$replace = 0;
+		}
+		else
+		{
+			// Uncomment line below to hide inline type tabs
+			//$restrict_tag = true;
+			$short_tag = param( 'short_tag', 'string', true );
+			$short_tag = rawurldecode( $short_tag );
+			$replace = 1;
+
+			$parts = trim( $short_tag, '[]' );
+			$parts = explode( ':', $parts );
+
+			$tag_type = $parts[0];
+			$link_ID = $parts[1];
+
+			switch( $tag_type )
+			{
+				case 'image':
+					if( isset( $parts[2] ) && $parts[2] != '-' )
+					{
+						$image_caption = $parts[2];
+					}
+					if( isset( $parts[3] ) )
+					{
+						$image_class = $parts[3];
+					}
+					$image_disable_caption = ( isset( $parts[2] ) && $parts[2] == '-' );
+					break;
+
+				case 'thumbnail':
+					if( isset( $parts[2] ) )
+					{
+						$thumbnail_size = $parts[2];
+					}
+					if( isset( $parts[3] ) )
+					{
+						$thumbnail_alignment = $parts[3];
+					}
+					if( isset( $parts[4] ) )
+					{
+						$thumbnail_class = $parts[4];
+					}
+					break;
+
+				case 'inline':
+					if( isset( $parts[2] ) )
+					{
+						$inline_class = $parts[2];
+					}
+					break;
+
+				default:
+					// Initialize additional inline tag form from active plugins:
+					$plugin_data = $Plugins->get_trigger_event_first_return( 'InitImageInlineTagForm', array(
+							'source_tag' => $short_tag,
+							'tag_type'   => $tag_type,
+							'link_ID'    => $link_ID,
+						) );
+					if( isset( $plugin_data['tag_type'] ) )
+					{	// Override active tag type from plugins:
+						$tag_type = $plugin_data['tag_type'];
+					}
+					if( isset( $plugin_data['link_ID'] ) )
+					{	// Override link ID from plugins:
+						$link_ID = $plugin_data['link_ID'];
+					}
+			}
+		}
+
+		$LinkCache = & get_LinkCache();
+		if( ! ( $Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) )
+		{ // Bad request with incorrect link ID
+			echo '';
+			exit(0);
+		}
+
+		if( ! ( $File = & $Link->get_File() ) )
+		{ // File no longer available
+			echo '';
+			exit(0);
+		}
+
+		require $inc_path.'items/views/_item_image.form.php';
+		break;
+
 	case 'set_object_link_position':
 		// Change a position of a link on the edit item screen (fieldset "Images & Attachments")
 
@@ -1467,7 +1713,7 @@ switch( $action )
 
 		// Do real ordering start with number 1:
 		$DB->query( 'UPDATE T_links
-				SET link_order = CASE '.$real_sql_update_strings.' ELSE link_order END
+			  SET link_order = CASE '.$real_sql_update_strings.' ELSE link_order END
 			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
 
 		$LinkOwner->update_last_touched_date();

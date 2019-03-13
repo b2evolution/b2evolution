@@ -528,7 +528,7 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 		echo '</td>';
 		echo '<td>'.excerpt( $Comment->get_content( 'raw_text' ), 71 ).'</td>';
 		// no permission check, because affected_comments contains current user editable comments
-		echo '<td class="shrinkwrap">'.action_icon( T_('Edit...'), 'edit', '?ctrl=comments&amp;action=edit&amp;comment_ID='.$Comment->ID ).'</td>';
+		echo '<td class="shrinkwrap">'.action_icon( /* TRANS: Verb */ T_('Edit...'), 'edit', '?ctrl=comments&amp;action=edit&amp;comment_ID='.$Comment->ID ).'</td>';
 		echo '</tr>';
 		$count++;
 	}
@@ -653,7 +653,7 @@ function antispam_block_by_domain()
 			continue;
 		}
 
-		// Get domain name by current IP adress:
+		// Get domain name by current IP address:
 		$ip_domain = gethostbyaddr( $ip_address );
 
 		if( ! empty( $ip_domain ) &&
@@ -810,20 +810,90 @@ function antispam_suspect_check( $user_ID = NULL, $check_trust_group = true )
 
 
 /**
- * Move user to suspect group by IP address
+ * Check if the requested data are suspected
  *
- * @param string IP address, Empty value to use current IP address
- * @param integer|NULL User ID, NULL = $current_User
- * @param boolean TRUE to check if user is in trust group
+ * @param array Array of what should be checked: 'IP_address', 'domain', 'email_domain', 'country_ID', 'country_IP'
+ * @return boolean TRUE if at least one requested data item is suspected
  */
-function antispam_suspect_user_by_IP( $IP_address = '', $user_ID = NULL, $check_trust_group = true )
+function antispam_suspect_check_by_data( $data = array() )
 {
-	global $DB, $Settings, $Timer;
+	$is_suspected = false;
 
-	$Timer->start( 'suspect_user_by_IP' );
+	foreach( $data as $data_key => $data_item )
+	{
+		if( empty( $data_item ) )
+		{	// Skip empty value:
+			continue;
+		}
 
-	if( empty( $user_ID ) )
-	{	// If user_ID was not set, use the current_User:
+		switch( $data_key )
+		{
+			case 'IP_address':
+				// Check by IP address:
+				$IPRangeCache = & get_IPRangeCache();
+				$IPRange = & $IPRangeCache->get_by_ip( $data_item, false, false );
+				$is_suspected = ( $IPRange && $IPRange->get( 'status' ) == 'suspect' );
+				break;
+
+			case 'domain':
+			case 'email_domain':
+				// Check by domain or domain of email address:
+				load_funcs( 'sessions/model/_hitlog.funcs.php' );
+				if( $data_key == 'email_domain' )
+				{	// Extract domain from email address:
+					$data_item = preg_replace( '#^[^@]+@#', '', $data_item );
+				}
+				$Domain = & get_Domain_by_subdomain( $data_item );
+				$is_suspected = ( $Domain && $Domain->get( 'status' ) == 'suspect' );
+				break;
+
+			case 'country_ID':
+				// Check by country ID:
+				$CountryCache = & get_CountryCache();
+				$Country = & $CountryCache->get_by_ID( $data_item, false, false );
+				$is_suspected = ( $Country && $Country->get( 'status' ) == 'suspect' );
+				break;
+
+			case 'country_IP':
+				// Check by country IP address:
+				$Plugins_admin = & get_Plugins_admin();
+				if( ( $geoip_Plugin = & $Plugins_admin->get_by_code( 'evo_GeoIP' ) ) &&
+				    method_exists( $geoip_Plugin, 'get_country_by_IP' ) && 
+				    ( $geoip_Country = $geoip_Plugin->get_country_by_IP( $data_item ) ) )
+				{	// Check country only if it is found by GeoIP plugin:
+					$is_suspected = ( $geoip_Country->get( 'status' ) == 'suspect' );
+				}
+				break;
+		}
+
+		if( $is_suspected )
+		{	// Don't search next i current is already suspected:
+			break;
+		}
+	}
+
+	return $is_suspected;
+}
+
+
+/**
+ * Move user to suspicious group
+ *
+ * @param integer User ID
+ * @return boolean TRUE if user was moved to suspicious group
+ */
+function antispam_suspect_move_user( $user_ID = NULL )
+{
+	global $Settings;
+
+	$GroupCache = & get_GroupCache();
+	if( ! ( $suspicious_Group = & $GroupCache->get_by_ID( intval( $Settings->get( 'antispam_suspicious_group' ) ), false, false ) ) )
+	{	// Group exists in DB and we can change user's group:
+		return false;
+	}
+
+	if( $user_ID === NULL )
+	{	// If user_ID was not set, use the current User:
 		global $current_User;
 		$User = $current_User;
 	}
@@ -833,36 +903,44 @@ function antispam_suspect_user_by_IP( $IP_address = '', $user_ID = NULL, $check_
 		$User = $UserCache->get_by_ID( $user_ID, false, false );
 	}
 
-	if( !antispam_suspect_check( $user_ID, $check_trust_group ) )
+	if( $User )
+	{	// Change user group only if it is detected:
+		$User->set_Group( $suspicious_Group );
+		return $User->dbupdate();
+	}
+
+	return false;
+}
+
+
+/**
+ * Move user to suspect group by IP address
+ *
+ * @param string IP address, Empty value to use current IP address
+ * @param integer|NULL User ID, NULL = $current_User
+ * @param boolean TRUE to check if user is in trust group
+ */
+function antispam_suspect_user_by_IP( $IP_address = '', $user_ID = NULL, $check_trust_group = true )
+{
+	global $Timer;
+
+	$Timer->start( 'suspect_user_by_IP' );
+
+	if( ! antispam_suspect_check( $user_ID, $check_trust_group ) )
 	{	// Current user cannot be moved to suspect group
 		$Timer->stop( 'suspect_user_by_IP' );
 		return;
 	}
 
-	if( empty( $IP_address ) && array_key_exists( 'REMOTE_ADDR', $_SERVER ) )
+	if( empty( $IP_address ) )
 	{
-		$IP_address = $_SERVER['REMOTE_ADDR'];
+		$IP_address = get_ip_list( true );
 	}
 
 	// Check by IP address:
-	$IP_address_int = ip2int( $IP_address );
-
-	$SQL = new SQL( 'Get IP range by address "'.$IP_address.'" to check if user #'.$user_ID.' must be suspected.' );
-	$SQL->SELECT( 'aipr_ID' );
-	$SQL->FROM( 'T_antispam__iprange' );
-	$SQL->WHERE( 'aipr_IPv4start <= '.$DB->quote( $IP_address_int ) );
-	$SQL->WHERE_and( 'aipr_IPv4end >= '.$DB->quote( $IP_address_int ) );
-	$SQL->WHERE_and( 'aipr_status = \'suspect\'' );
-	$ip_range_ID = $DB->get_row( $SQL );
-
-	if( ! is_null( $ip_range_ID ) )
+	if( antispam_suspect_check_by_data( array( 'IP_address' => $IP_address ) ) )
 	{	// Move the user to suspicious group because current IP address is suspected:
-		$GroupCache = & get_GroupCache();
-		if( $suspicious_Group = & $GroupCache->get_by_ID( intval( $Settings->get( 'antispam_suspicious_group' ) ), false, false ) )
-		{	// Group exists in DB and we can change user's group:
-			$User->set_Group( $suspicious_Group );
-			$User->dbupdate();
-		}
+		antispam_suspect_move_user( $user_ID );
 	}
 
 	$Timer->stop( 'suspect_user_by_IP' );
@@ -877,12 +955,49 @@ function antispam_suspect_user_by_IP( $IP_address = '', $user_ID = NULL, $check_
  */
 function antispam_suspect_user_by_reverse_dns_domain( $user_ID = NULL, $check_trust_group = true )
 {
-	global $Settings, $UserSettings, $Timer;
+	global $UserSettings, $Timer;
 
 	$Timer->start( 'suspect_user_by_reverse_dns_domain' );
 
-	if( empty( $user_ID ) )
-	{	// If user_ID was not set, use the current_User:
+	if( ! antispam_suspect_check( $user_ID, $check_trust_group ) )
+	{	// Current user cannot be moved to suspect group:
+		$Timer->stop( 'suspect_user_by_reverse_dns_domain' );
+		return;
+	}
+
+	// Get user's reverse DNS domain that was generated from IP address on registration by function gethostbyaddr()
+	$reverse_dns_domain = $UserSettings->get( 'user_registered_from_domain', $user_ID );
+
+	// Check by reverse DNS subdomain:
+	if( antispam_suspect_check_by_data( array( 'domain' => $reverse_dns_domain ) ) )
+	{	// Move the user to suspicious group because the reverse DNS has a suspect status:
+		antispam_suspect_move_user( $user_ID );
+	}
+
+	$Timer->stop( 'suspect_user_by_reverse_dns_domain' );
+}
+
+
+/**
+ * Move user to suspect group by domain of email address
+ *
+ * @param integer|NULL User ID, NULL = $current_User
+ * @param boolean TRUE to check if user is in trust group
+ */
+function antispam_suspect_user_by_email_domain( $user_ID = NULL, $check_trust_group = true )
+{
+	global $Timer;
+
+	$Timer->start( 'suspect_user_by_email_domain' );
+
+	if( ! antispam_suspect_check( $user_ID, $check_trust_group ) )
+	{	// Current user cannot be moved to suspect group:
+		$Timer->stop( 'suspect_user_by_email_domain' );
+		return;
+	}
+
+	if( $user_ID === NULL )
+	{	// If user_ID was not set, use the current User:
 		global $current_User;
 		$User = $current_User;
 	}
@@ -892,36 +1007,19 @@ function antispam_suspect_user_by_reverse_dns_domain( $user_ID = NULL, $check_tr
 		$User = $UserCache->get_by_ID( $user_ID, false, false );
 	}
 
-	if( ! antispam_suspect_check( $user_ID, $check_trust_group ) )
-	{	// Current user cannot be moved to suspect group:
-		$Timer->stop( 'suspect_user_by_reverse_dns_domain' );
+	if( empty( $User ) )
+	{	// User must be defined for this action
+		$Timer->stop( 'suspect_user_by_email_domain' );
 		return;
 	}
 
-	// Get user's reverse DNS domain that was generated from IP address on registration by function gethostbyaddr()
-	$reverse_dns_domain = $UserSettings->get( 'user_registered_from_domain', $User->ID );
-
-	if( empty( $reverse_dns_domain ) )
-	{	// Domain must be not empty:
-		$Timer->stop( 'suspect_user_by_reverse_dns_domain' );
-		return;
-	}
-
-	// Try to get a top existing domain of reverse DNS subdomain from DB:
-	load_funcs( 'sessions/model/_hitlog.funcs.php' );
-	$Domain = & get_Domain_by_subdomain( $reverse_dns_domain );
-
-	if( $Domain && $Domain->get( 'status' ) == 'suspect' )
+	// Check by reverse DNS subdomain:
+	if( antispam_suspect_check_by_data( array( 'email_domain' => $User->get( 'email' ) ) ) )
 	{	// Move the user to suspicious group because the reverse DNS has a suspect status:
-		$GroupCache = & get_GroupCache();
-		if( $suspicious_Group = & $GroupCache->get_by_ID( intval( $Settings->get( 'antispam_suspicious_group' ) ), false, false ) )
-		{	// Group exists in DB and we can change user's group:
-			$User->set_Group( $suspicious_Group );
-			$User->dbupdate();
-		}
+		antispam_suspect_move_user( $user_ID );
 	}
 
-	$Timer->stop( 'suspect_user_by_reverse_dns_domain' );
+	$Timer->stop( 'suspect_user_by_email_domain' );
 }
 
 
@@ -934,40 +1032,23 @@ function antispam_suspect_user_by_reverse_dns_domain( $user_ID = NULL, $check_tr
  */
 function antispam_suspect_user_by_country( $country_ID, $user_ID = NULL, $check_trust_group = true )
 {
-	global $DB, $Settings;
+	global $Timer;
+
+	$Timer->start( 'suspect_user_by_country' );
 
 	if( !antispam_suspect_check( $user_ID, $check_trust_group ) )
-	{ // Current user cannot be moved to suspect group
+	{	// Current user cannot be moved to suspect group:
+		$Timer->stop( 'suspect_user_by_country' );
 		return;
 	}
 
-	if( is_null( $user_ID ) )
-	{ // current User
-		global $current_User;
-		$User = $current_User;
-	}
-	else
-	{ // Get User by ID
-		$UserCache = & get_UserCache();
-		$User = $UserCache->get_by_ID( $user_ID, false, false );
+	// Check by country ID:
+	if( antispam_suspect_check_by_data( array( 'country_ID' => $country_ID ) ) )
+	{	// Move current user to suspicious group because country is suspected:
+		antispam_suspect_move_user( $user_ID );
 	}
 
-	$SQL = new SQL( 'Check suspected country with ID #'.$country_ID );
-	$SQL->SELECT( 'ctry_ID' );
-	$SQL->FROM( 'T_regional__country' );
-	$SQL->WHERE( 'ctry_ID = '.$DB->quote( $country_ID ) );
-	$SQL->WHERE_and( 'ctry_status = \'suspect\'' );
-	$country_ID = $DB->get_var( $SQL );
-
-	if( !is_null( $country_ID ) )
-	{ // Move current user to suspicious group because country is suspected
-		$GroupCache = & get_GroupCache();
-		if( $suspicious_Group = & $GroupCache->get_by_ID( (int)$Settings->get('antispam_suspicious_group'), false, false ) )
-		{ // Group exists in DB and we can change user's group
-			$User->set_Group( $suspicious_Group );
-			$User->dbupdate();
-		}
-	}
+	$Timer->stop( 'suspect_user_by_country' );
 }
 
 

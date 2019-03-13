@@ -76,7 +76,7 @@ if( $imap_obj->Nmsgs == 0 )
 // Create posts
 dre_process_messages( $mbox, $imap_obj->Nmsgs, true );
 
-if( count( $del_cntr ) > 0 )
+if( $del_cntr > 0 )
 {	// We want to delete processed emails from server
 	imap_expunge( $mbox );
 	dre_msg( sprintf( T_('Deleted %d processed message(s) from inbox.'), $del_cntr ), true );

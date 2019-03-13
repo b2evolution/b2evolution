@@ -42,10 +42,10 @@ if( get_param( 'tab' ) == 'current_skin' )
 	switch( $sel_skin_type )
 	{
 		case 'normal':
-			$skin_type_title = /* TRANS: Skin type name */ T_('Normal');
+			$skin_type_title = /* TRANS: Skin type name */ T_('Standard');
 			break;
 		case 'mobile':
-			$skin_type_title = /* TRANS: Skin type name */ T_('Mobile');
+			$skin_type_title = /* TRANS: Skin type name */ T_('Phone');
 			break;
 		case 'tablet':
 			$skin_type_title = /* TRANS: Skin type name */ T_('Tablet');
@@ -61,11 +61,11 @@ else
 	$block_title = T_('Skins available for installation');
 }
 
-$block_item_Widget->title = $block_title.get_manual_link( 'installing_skins' );
+$block_item_Widget->title = $block_title.get_manual_link( 'installing-skins' );
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
-	$block_item_Widget->global_icon( T_('Cancel install!'), 'close', $redirect_to );
+	$block_item_Widget->global_icon( T_('Cancel installation!'), 'close', $redirect_to );
 }
 
 $block_item_Widget->disp_template_replaced( 'block_start' );
@@ -81,8 +81,8 @@ $Form->hidden( 'tab', get_param( 'tab' ) );
 $Form->begin_form( 'skin_selector_filters' );
 $Form->select_input_array( 'sel_skin_type', $sel_skin_type, array(
 		''        => T_('All skins'),
-		'normal'  => T_('Normal skins'),
-		'mobile'  => T_('Mobile skins'),
+		'normal'  => T_('Standard skins'),
+		'mobile'  => T_('Phone skins'),
 		'tablet'  => T_('Tablet skins'),
 		'feed'    => T_('Feed skins'),
 		'sitemap' => T_('Sitemap skins'),
@@ -435,7 +435,7 @@ echo '</div>';
 
 if( $skins_exist && empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
 {	// Display form buttons only when at least one skin exists for installation:
-	// Don't enabled this feature on new collection creating and on selecting new skin for the colleciton:
+	// Don't enabled this feature on new collection creating and on selecting new skin for the collection:
 	$form_buttons = array(
 		array( 'type' => 'button', 'id'  => 'check_all_skins', 'value' => T_('Check All'), 'class' => 'btn btn-default' ),
 		array( 'type' => 'submit', 'value' => T_('Install Checked'), 'class' => 'btn btn-primary' ),
@@ -450,7 +450,7 @@ $Form->end_form( $form_buttons );
 $block_item_Widget->disp_template_replaced( 'block_end' );
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#check_all_skins' ).click( function() {
 	jQuery( 'input[name="skin_folders[]"]' ).attr( 'checked', 'checked' );
 } );

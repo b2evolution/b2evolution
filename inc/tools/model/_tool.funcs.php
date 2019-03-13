@@ -439,6 +439,7 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 									'user_ID'              => $User->ID,
 									'ismember'             => 1,
 									'can_be_assignee'      => 0,
+									'perm_item_propose'    => 0,
 									'perm_poststatuses'    => '""',
 									'perm_item_type'       => '"standard"',
 									'perm_edit'            => '"no"',
@@ -466,6 +467,7 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 									'user_ID'              => $User->ID,
 									'ismember'             => 1,
 									'can_be_assignee'      => 1,
+									'perm_item_propose'    => 1,
 									'perm_poststatuses'    => '"published,community,protected,review,private,draft,deprecated"',
 									'perm_item_type'       => '"restricted"',
 									'perm_edit'            => '"le"',
@@ -493,6 +495,7 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 									'user_ID'              => $User->ID,
 									'ismember'             => 1,
 									'can_be_assignee'      => 1,
+									'perm_item_propose'    => 1,
 									'perm_poststatuses'    => '"published,community,protected,review,private,draft,deprecated,redirected"',
 									'perm_item_type'       => '"admin"',
 									'perm_edit'            => '"all"',
@@ -517,7 +520,7 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 				if( ! empty( $adv_perm_coll_insert_values ) )
 				{	// Insert advanced user perms for new created user in single query for all collections with advanced perms:
 					$DB->query( 'INSERT INTO T_coll_user_perms ( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember, bloguser_can_be_assignee,
-							bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit, bloguser_perm_delpost, bloguser_perm_edit_ts,
+							bloguser_perm_item_propose, bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit, bloguser_perm_delpost, bloguser_perm_edit_ts,
 							bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts, bloguser_perm_cmtstatuses,
 							bloguser_perm_edit_cmt, bloguser_perm_cats, bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,
 							bloguser_perm_media_browse, bloguser_perm_media_change, bloguser_perm_analytics )
@@ -829,8 +832,8 @@ Sub-heading
 
 Paragraphs are separated by a blank line.
 
-		This is a preformatted
-		code block.
+    This is a preformatted
+    code block.
 
 Text attributes *Italic*, **bold**, `monospace`.
 
@@ -840,9 +843,9 @@ Shopping list:
 * oranges
 * pears
 
-The rain---not the reign---in Spain.
-
-Button examples:
+The rain---not the reign---in Spain.').
+"\n".
+T_('Button examples:
 [button]This is a button[/button]
 [like]I like this[/like] [dislike]I don\'t like this[/dislike]
 [cta:1:info]Call to action 1 info button[/cta] [cta:2:warning]Call to action 2 warning button[/cta] [cta:3:default]Call to action 3 default button[/cta]

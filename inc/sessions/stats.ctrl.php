@@ -21,8 +21,6 @@ load_funcs('sessions/model/_hitlog.funcs.php');
  */
 global $current_User;
 
-global $dispatcher;
-
 global $collections_Module, $DB;
 param_action();
 
@@ -282,19 +280,70 @@ switch( $action )
 		// We have EXITed already at this point!!
 		break;
 
-	case 'filter_aggregated':
-		// Filter the aggregated data by date:
+	case 'filter_hits_diagram':
+		// Filter hits diagram:
 
 		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'aggfilter' );
+		$Session->assert_received_crumb( 'filterhitsdiagram' );
+
+		if( param( 'agg_period', 'string', NULL ) !== NULL )
+		{	// Filter the aggregated data by date:
+			$UserSettings->set( 'agg_period', $agg_period );
+			// Update also the filter to compare hits with same values:
+			$aggcmp_periods = array(
+				'last_30_days'   => 'prev_30_days',
+				'last_60_days'   => 'prev_60_days',
+				'current_month'  => 'prev_month',
+			);
+			$UserSettings->set( 'aggcmp_period', isset( $aggcmp_periods[ $agg_period ] ) ? $aggcmp_periods[ $agg_period ] : $agg_period );
+			if( $agg_period == 'specific_month' )
+			{
+				$UserSettings->set( 'agg_month', param( 'agg_month', 'integer' ) );
+				$UserSettings->set( 'agg_year', param( 'agg_year', 'integer' ) );
+				// Update also the filter to compare hits with same values:
+				$UserSettings->set( 'aggcmp_month', get_param( 'agg_month' ) );
+				$UserSettings->set( 'aggcmp_year', get_param( 'agg_year' ) - 1 );
+			}
+		}
+
+		// Filter hits diagram by types:
+		$filter_hits_diagram_cols = $UserSettings->get( 'filter_hits_diagram_cols' );
+		if( empty( $filter_hits_diagram_cols ) )
+		{
+			$filter_hits_diagram_cols = array();
+		}
+		$filter_hits_diagram_cols[ $tab3 ] = param( 'filter_types', 'array:string', NULL );
+		if( empty( $filter_hits_diagram_cols[ $tab3 ] ) )
+		{
+			unset( $filter_hits_diagram_cols[ $tab3 ] );
+		}
+		$UserSettings->set( 'filter_hits_diagram_cols', serialize( $filter_hits_diagram_cols ) );
 
 		// Save the filter data in settings of current user:
-		$UserSettings->set( 'agg_period', param( 'agg_period', 'string' ) );
-		if( $agg_period == 'specific_month' )
-		{
-			$UserSettings->set( 'agg_month', param( 'agg_month', 'integer' ) );
-			$UserSettings->set( 'agg_year', param( 'agg_year', 'integer' ) );
+		$UserSettings->dbupdate();
+
+		// Redirect to referer page:
+		header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
+	case 'compare_hits_diagram':
+		// Filter hits diagram to compare:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'filterhitsdiagram' );
+
+		if( param( 'aggcmp_period', 'string', NULL ) !== NULL )
+		{	// Filter the compared data by date:
+			$UserSettings->set( 'aggcmp_period', $aggcmp_period );
+			if( $aggcmp_period == 'specific_month' )
+			{
+				$UserSettings->set( 'aggcmp_month', param( 'aggcmp_month', 'integer' ) );
+				$UserSettings->set( 'aggcmp_year', param( 'aggcmp_year', 'integer' ) );
+			}
 		}
+
+		// Save the filter data in settings of current user:
 		$UserSettings->dbupdate();
 
 		// Redirect to referer page:
@@ -362,6 +411,13 @@ switch( $tab )
 				$AdminUI->set_page_manual_link( 'api-hits-summary' );
 				break;
 
+			case 'search_referers':
+				$AdminUI->breadcrumbpath_add( T_('Search & Referers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'search-referers-hits-summary' );
+				break;
+
 			case 'robot':
 				$AdminUI->breadcrumbpath_add( T_('Robots'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 
@@ -393,7 +449,7 @@ switch( $tab )
 		$AdminUI->breadcrumbpath_add( T_('All Hits'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 
 		// Set an url for manual page:
-		$AdminUI->set_page_manual_link( 'recent-hits-list' );
+		$AdminUI->set_page_manual_link( 'all-hits' );
 		break;
 
 	case 'referers':
@@ -460,16 +516,19 @@ switch( $tab )
 		{
 			case 'top':
 				$AdminUI->breadcrumbpath_add( T_('Top referrers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'top-referring-domains' );
 				break;
 
 			case 'all':
 			default:
 				$AdminUI->breadcrumbpath_add( T_('All referrers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'referring-domains-tab' );
 				break;
 		}
-
-		// Set an url for manual page:
-		$AdminUI->set_page_manual_link( 'referring-domains-tab' );
 		break;
 
 	case 'goals':
@@ -535,6 +594,7 @@ switch( $AdminUI->get_path( 1 ) )
 {
 	case 'summary':
 		// Display VIEW:
+		load_funcs( 'sessions/views/_stats_view.funcs.php' );
 		switch( $tab3 )
 		{
 			case 'browser':
@@ -543,6 +603,10 @@ switch( $AdminUI->get_path( 1 ) )
 
 			case 'api':
 				$AdminUI->disp_view( 'sessions/views/_stats_api.view.php' );
+				break;
+
+			case 'search_referers':
+				$AdminUI->disp_view( 'sessions/views/_stats_search_referers.view.php' );
 				break;
 
 			case 'robot':
@@ -564,6 +628,8 @@ switch( $AdminUI->get_path( 1 ) )
 	case 'referers':
 		// Display hits results table:
 		hits_results_block();
+		// Initialize WHOIS query window
+		echo_whois_js_bootstrap();
 		break;
 
 	case 'refsearches':
@@ -573,6 +639,8 @@ switch( $AdminUI->get_path( 1 ) )
 			case 'hits':
 				// Display hits results table:
 				hits_results_block();
+				// Initialize WHOIS query window
+				echo_whois_js_bootstrap();
 				break;
 
 			case 'keywords':

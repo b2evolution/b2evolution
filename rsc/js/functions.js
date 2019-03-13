@@ -444,6 +444,28 @@ function evoAlert( message )
 evo_alert_events_initialized = false;
 
 
+function debounce( func, wait, immediate )
+{
+	var timeout, result;
+	return function() {
+			var context = this, args = arguments, later, callNow;
+			later = function() {
+					timeout = null;
+					if (!immediate) {
+							result = func.apply(context, args);
+					}
+			};
+			callNow = immediate && !timeout;
+			clearTimeout(timeout);
+			timeout = setTimeout(later, wait);
+			if (callNow) {
+					result = func.apply(context, args);
+			}
+			return result;
+	}
+};
+
+
 /**
  * Initialize onclick event for each button with attribute "data-func"
  *

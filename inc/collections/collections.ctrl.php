@@ -68,6 +68,11 @@ switch( $action )
 			header_redirect( $redirect_to );
 		}
 
+		if( $action == 'copy' )
+		{	// Get name of the duplicating collection to display on the form:
+			$duplicating_collection_name = $edited_Blog->get( 'shortname' );
+		}
+
 		$AdminUI->append_path_level( 'new', array( 'text' => T_('New') ) );
 		break;
 
@@ -210,14 +215,22 @@ switch( $action )
 		// Check permissions:
 		$current_User->check_perm( 'blogs', 'create', true );
 
-		if( $edited_Blog->duplicate() )
+		// Get name of the duplicating collection to display on the form:
+		$duplicating_collection_name = $edited_Blog->get( 'shortname' );
+
+		$duplicate_params = array(
+				'duplicate_items'    => param( 'duplicate_items', 'integer', 0 ),
+				'duplicate_comments' => param( 'duplicate_comments', 'integer', 0 ),
+			);
+
+		if( $edited_Blog->duplicate( $duplicate_params ) )
 		{	// The collection has been duplicated successfully:
 			$Messages->add( T_('The collection has been duplicated.'), 'success' );
 
 			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
 
-		//
+		// Set action back to "copy" in order to display the edit form with errors:
 		$action = 'copy';
 		break;
 
@@ -319,7 +332,7 @@ switch( $action )
 		if( ! $Messages->has_errors() )
 		{
 			$Settings->dbupdate();
-			$Messages->add( T_('Blog settings updated.'), 'success' );
+			$Messages->add( T_('The collection settings have been updated.'), 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=collections&tab=blog_settings', 303 ); // Will EXIT
 			// We have EXITed already at this point!!

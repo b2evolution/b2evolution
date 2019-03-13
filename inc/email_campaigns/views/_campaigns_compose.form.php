@@ -17,6 +17,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $admin_url, $tab;
 global $edited_EmailCampaign, $Plugins, $UserSettings;
 
+echo_image_insert_modal();
+
 $Form = new Form( NULL, 'campaign_form' );
 $Form->begin_form( 'fform' );
 
@@ -33,7 +35,7 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 	ob_start();
 	echo '<div class="email_toolbars">';
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'DisplayEmailToolbar' );
+	$Plugins->trigger_event( 'DisplayEmailToolbar', array( 'target_type' => 'EmailCampaign', 'EmailCampaign' => & $edited_EmailCampaign ) );
 	echo '</div>';
 	$email_toolbar = ob_get_clean();
 
@@ -75,7 +77,7 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 
 
 	// set b2evoCanvas for plugins:
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "ecmp_email_text" );</script>';
+	echo '<script>var b2evoCanvas = document.getElementById( "ecmp_email_text" );</script>';
 
 	// Display renderers
 	$current_renderers = !empty( $edited_EmailCampaign ) ? $edited_EmailCampaign->get_renderers_validated() : array( 'default' );
@@ -88,15 +90,7 @@ $Form->end_fieldset();
 
 
 // ####################### ATTACHMENTS/LINKS #########################
-if( $current_User->check_perm( 'files', 'view' ) )
-{	// If current user has a permission to view the files:
-	load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
-	// Initialize this object as global because this is used in many link functions:
-	global $LinkOwner;
-	$LinkOwner = new LinkEmailCampaign( $edited_EmailCampaign );
-	// Display attachments fieldset:
-	display_attachments_fieldset( $Form, $LinkOwner );
-}
+$Form->attachments_fieldset( $edited_EmailCampaign );
 
 
 $buttons = array();
@@ -107,7 +101,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 $Form->end_form( $buttons );
 
 ?>
-<script type="text/javascript">
+<script>
 function toggleWYSIWYGSwitch( val )
 {
 	if( val )

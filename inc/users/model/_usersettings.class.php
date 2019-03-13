@@ -56,6 +56,7 @@ class UserSettings extends AbstractSettings
 		'fold_cmntform_info' => 1,
 		'fold_cmntform_notifications' => 1,
 		'fold_upgrade_backup_options' => 1,
+		'fold_upgrade_file_options' => 0,
 		'fold_plugin_vars' => 1,
 		'fold_plugin_events' => 1,
 
@@ -83,6 +84,7 @@ class UserSettings extends AbstractSettings
 		'last_activation_reminder_key' => NULL, // It will be set at the first time when activation reminder email will be sent
 		'activation_reminder_count' => 0, // How many activation reminder was sent since the user is not activated
 		'send_activation_reminder' => 1, // Send reminder to activate my account if it is not activated
+		'send_inactive_reminder' => 1, // Send reminder when my account has been inactive for an extended period of time
 		'welcome_message_sent' => 0, // Used to know if user already received a welcome message after email activation
 
 		// admin user notifications
@@ -95,6 +97,8 @@ class UserSettings extends AbstractSettings
 		'notify_reported_account' => 1, // Notify admin user when an account has been reported by another user
 		'notify_changed_account' => 1, // Notify admin user when an account has been changed
 		'notify_cronjob_error' => 1, // Notify admin user when a scheduled task ends with an error or timeout
+		'notify_list_new_subscriber' => 1, // Notify list owner user when there is a new subscriber
+		'notify_list_lost_subscriber' => 1, // Notify list owner user when list loses a subscriber
 		'notify_automation_owner' => 1, // Notify automation owner user when step is executed
 
 		'account_close_ts' => NULL, // It will be the date when the account was closed. Until the account is not closed this will be NULL.
@@ -114,6 +118,10 @@ class UserSettings extends AbstractSettings
 		'suggest_item_tags' => 1, // Suggest to autocomplete item tags on edit form
 
 		'agg_period' => 'last_30_days', // Date period to filter the aggregated hits data
+		'aggcmp_period' => 'prev_30_days', // Date period to compare the aggregated hits data
+
+		'git_upgrade_url' => 'https://github.com/b2evolution/b2evolution.git', // URL of Git repository
+		'git_upgrade_branch' => 'master', // Git branch
 	);
 
 	/**
@@ -129,10 +137,12 @@ class UserSettings extends AbstractSettings
 	var $_configurable_defaults = array(
 		'notify_messages' => 1, 	// Notify user when receives a private message
 		'notify_unread_messages' => 1, // Notify user when he has unread messages more then 24 hour, and he was not notified in the last 3 days
+		'notify_comment_mentioned' => 1, // Notify user when I have been mentioned on a comment
 		'notify_published_comments' => 1, // Notify user when a comment is published in an own post
 		'notify_comment_moderation' => 1, // Notify when new comment is awaiting moderation and the user has right to moderate that comment
 		'notify_edit_cmt_moderation' => 1, // Notify when edited comment is awaiting moderation and the user has right to moderate that comment
 		'notify_spam_cmt_moderation' => 1, // Notify when comment is reported as spam and the user has right to moderate that comment
+		'notify_post_mentioned' => 1, // Notify user when I have been mentioned on a post
 		'notify_post_moderation' => 1, // Notify when a new post is awaiting moderation and the user has right to moderate that post
 		'notify_edit_pst_moderation' => 1, // Notify when a edited post is awaiting moderation and the user has right to moderate that post
 		'notify_post_assignment' => 1, // Notify user when a post is assigned to the user

@@ -46,6 +46,16 @@ $params = array_merge( array(
 		'comment_image_size'         => 'fit-400x320',
 		'comment_attach_info'        => '<br />'.get_upload_restriction(),
 		'comment_mode'         => '', // Can be 'quote' from GET request
+		'comment_type'         => 'comment',
+		'comment_title_before'  => '<div class="bCommentTitle">',
+		'comment_title_after'   => '</div>',
+		'comment_rating_before' => '<div class="comment_rating">',
+		'comment_rating_after'  => '</div>',
+		'comment_text_before'   => '<div class="bCommentText">',
+		'comment_text_after'    => '</div>',
+		'comment_info_before'   => '<div class="bCommentSmallPrint">',
+		'comment_info_after'    => '</div>',
+
 	), $params );
 
 $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
@@ -184,10 +194,11 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			$comment_content = param( $dummy_fields[ 'content' ], 'html' );
 			$quoted_comment_ID = param( 'qc', 'integer', 0 );
 			$quoted_post_ID = param( 'qp', 'integer', 0 );
-			if( !empty( $quoted_comment_ID ) )
-			{
-				$CommentCache = & get_CommentCache();
-				$quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false );
+			if( ! empty( $quoted_comment_ID ) &&
+			    ( $CommentCache = & get_CommentCache() ) &&
+			    ( $quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false ) ) &&
+			    $params['comment_type'] == $quoted_Comment->get( 'type' ) )
+			{	// Allow comment quoting only for the same comment type form:
 				$quoted_Item = $quoted_Comment->get_Item();
 				if( $quoted_User = $quoted_Comment->get_author_User() )
 				{ // User is registered
@@ -200,8 +211,8 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 				$quoted_content = $quoted_Comment->get( 'content' );
 				$quoted_ID = 'c'.$quoted_Comment->ID;
 			}
-			else if( !empty( $quoted_post_ID ) )
-			{
+			elseif( ! empty( $quoted_post_ID ) && $params['comment_type'] != 'meta' )
+			{	// Allow item quoting only for normal(not meta) comment type form:
 				$ItemCache = & get_ItemCache();
 				$quoted_Item = & $ItemCache->get_by_ID( $quoted_post_ID, false );
 				$quoted_login = $quoted_Item->get_creator_login();
@@ -243,7 +254,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	echo $params['form_title_end'];
 
 /*
-	echo '<script type="text/javascript">
+	echo '<script>
 /* <![CDATA[ *
 function validateCommentForm(form)
 {
@@ -262,11 +273,13 @@ function validateCommentForm(form)
 
 	$Form->begin_form( 'bComment', '', array( 'target' => '_self'/*, 'onsubmit' => 'return validateCommentForm(this);'*/ ) );
 
-	// Display a message before comment form:
-	$Item->display_comment_form_msg( array(
-			'before' => '<br /><div class="warning"><div class="action_messages">',
-			'after'  => '</div></div>',
-		) );
+	if( $params['comment_type'] != 'meta' )
+	{	// Display a message before comment form:
+		$Item->display_comment_form_msg( array(
+				'before' => '<br /><div class="warning"><div class="action_messages">',
+				'after'  => '</div></div>',
+			) );
+	}
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
 	//           Actually, the best would be, if the $Form object could be changed by a plugin
@@ -304,7 +317,7 @@ function validateCommentForm(form)
 			$comment_author_email = $current_User->email;
 		}
 		// Note: we use funky field names to defeat the most basic guestbook spam bots
-		$Form->text( $dummy_fields[ 'name' ], $comment_author, 40, T_('Name'), '', 100, 'bComment' );
+		$Form->text( $dummy_fields[ 'name' ], $comment_author, 40, T_('Name'), '<br />'.sprintf( T_('<a %s>Click here to log in</a> if you already have an account on this site.'), 'href="'.get_login_url( 'comment form', $Item->get_permanent_url() ).'" style="font-weight:bold"' ), 100, 'bComment' );
 
 		$Form->email_input( $dummy_fields[ 'email' ], $comment_author_email, 40, T_('Email'), array(
 				'bottom_note' => T_('Your email address will <strong>not</strong> be revealed on this site.'),
@@ -331,6 +344,13 @@ function validateCommentForm(form)
 		$Form->info_field( '', $params['policy_text'] );
 	}
 
+	// Display plugin captcha for comment form before textarea:
+	$Plugins->display_captcha( array(
+			'Form'          => & $Form,
+			'form_type'     => 'comment',
+			'form_position' => 'before_textarea',
+		) );
+
 	ob_start();
 	echo '<div class="comment_toolbars">';
 	// CALL PLUGINS NOW:
@@ -352,7 +372,7 @@ function validateCommentForm(form)
 	$Form->inputstart = $form_inputstart;
 
 	// set b2evoCanvas for plugins
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
+	echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
 
 	// Attach files:
 	if( !empty( $comment_attachments ) )
@@ -414,6 +434,13 @@ function validateCommentForm(form)
 	}
 
 	$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
+
+	// Display plugin captcha for comment form before submit button:
+	$Plugins->display_captcha( array(
+			'Form'          => & $Form,
+			'form_type'     => 'comment',
+			'form_position' => 'before_submit_button',
+		) );
 
 	$Form->begin_fieldset();
 		echo $Form->buttonsstart;

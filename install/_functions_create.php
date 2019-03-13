@@ -250,8 +250,8 @@ function create_default_data()
 			'name'           => 'Post',
 		);
 	$post_types[] = array(
-			'name'           => 'Podcast Episode',
-			'podcast'        => 1,
+			'name'          => 'Recipe',
+			'template_name' => 'recipe',
 		);
 	$post_types[] = array(
 			'name'           => 'Post with Custom Fields',
@@ -261,7 +261,15 @@ function create_default_data()
 			'use_parent'     => 'required',
 		);
 	$post_types[] = array(
+			'name'           => 'Podcast Episode',
+			'podcast'        => 1,
+		);
+	$post_types[] = array(
+			'name'           => 'Photo Album',
+		);
+	$post_types[] = array(
 			'name'           => 'Manual Page',
+			'use_short_title'=> 'optional',
 			'allow_html'     => 0,
 		);
 	$post_types[] = array(
@@ -269,7 +277,8 @@ function create_default_data()
 			'allow_html'     => 0,
 		);
 	$post_types[] = array(
-			'name'           => 'Photo Album',
+			'name'       => 'Bug Report',
+			'allow_html' => 0,
 		);
 	$post_types[] = array(
 			'name'           => 'Standalone Page',
@@ -372,11 +381,6 @@ function create_default_data()
 			'use_comments'           => 0,
 			'allow_closing_comments' => 0,
 			'use_comment_expiration' => 'never',
-			'use_custom_fields'      => 0,
-		);
-	$post_types[] = array(
-			'name' => 'Bug Report',
-			'allow_html'     => 0,
 		);
 	// Default settings:
 	$post_type_default_settings = array(
@@ -385,6 +389,7 @@ function create_default_data()
 			'usage'                    => 'post',
 			'template_name'            => 'single',
 			'perm_level'               => 'standard',
+			'use_short_title'          => 'never',
 			'allow_html'               => 1,
 			'allow_breaks'             => 1,
 			'allow_featured'           => 1,
@@ -401,7 +406,6 @@ function create_default_data()
 			'allow_closing_comments'   => 1,
 			'allow_disabling_comments' => 0,
 			'use_comment_expiration'   => 'optional',
-			'use_custom_fields'        => 1,
 		);
 	$post_types_sql = 'INSERT INTO T_items__type ( ityp_'.implode( ', ityp_', array_keys( $post_type_default_settings ) ).' ) VALUES ';
 	foreach( $post_types as $p => $post_type )
@@ -416,14 +420,247 @@ function create_default_data()
 	// Insert item types:
 	$DB->query( $post_types_sql );
 
-	$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_type, itcf_order, itcf_note )
-			VALUES ( 3, '.$DB->quote( T_('First numeric field') ).', "first_numeric_field", "double", 1, '.$DB->quote( T_('Enter a number') ).' ),
-						 ( 3, '.$DB->quote( T_('Second numeric field') ).', "second_numeric_field", "double", 3, '.$DB->quote( T_('Enter a number') ).' ),
-						 ( 3, '.$DB->quote( T_('First string field') ).', "first_string_field", "varchar", 2, '.$DB->quote( T_('Enter a string') ).' ),
-						 ( 3, '.$DB->quote( T_('Define your own labels') ).', "define_your_own_labels", "varchar", 4, '.$DB->quote( T_('Define your own notes') ).' ),
-						 ( 3, '.$DB->quote( T_('Multiline plain text field') ).', "multiline_plain_text_field", "text", 6, '.$DB->quote( T_('Enter multiple lines') ).' ),
-						 ( 3, '.$DB->quote( T_('Multiline HTML field') ).', "multiline_html_field", "html", 5, '.$DB->quote( T_('Enter HTML code') ).' ),
-						 ( 3, '.$DB->quote( T_('URL field') ).', "url_field", "url", 7, '.$DB->quote( T_('Enter an URL (absolute or relative)') ).' )' );
+	// Item type custom fields:
+	$parent_ityp_ID = 3;
+	$child_ityp_ID = 4;
+	$recipe_ityp_ID = 2;
+	$custom_fields = array(
+		// for Item Type "Post with Custom Fields":
+		array(
+			'label'           => T_('Image 1'),
+			'name'            => 'image_1',
+			'type'            => 'image',
+			'order'           => 1,
+			'note'            => T_('Enter a link ID'),
+			'format'          => 'fit-192x192',
+			'link'            => 'linkpermzoom',
+			'line_highlight'  => 'never',
+			'green_highlight' => 'never',
+		),
+		array(
+			'label'           => T_('First numeric field'),
+			'name'            => 'first_numeric_field',
+			'type'            => 'double',
+			'order'           => 2,
+			'note'            => T_('Enter a number'),
+			'cell_class'      => 'right',
+		),
+		array(
+			'label'           => T_('Second numeric field'),
+			'name'            => 'second_numeric_field',
+			'type'            => 'double',
+			'order'           => 4,
+			'note'            => T_('Enter a number'),
+			'cell_class'      => 'right',
+		),
+		array(
+			'label'           => T_('USD Price'),
+			'name'            => 'usd_price',
+			'type'            => 'double',
+			'order'           => 8,
+			'note'            => T_('Enter a number'),
+			'format'          => '$ 0 0.00',
+			'cell_class'      => 'right',
+			'green_highlight' => 'lowest',
+		),
+		array(
+			'label'           => T_('EUR Price'),
+			'name'            => 'eur_price',
+			'type'            => 'double',
+			'order'           => 9,
+			'note'            => T_('Enter a number'),
+			'format'          => '0 0.00 €',
+			'cell_class'      => 'right',
+			'green_highlight' => 'lowest',
+		),
+		array(
+			'label'           => T_('First string field'),
+			'name'            => 'first_string_field',
+			'type'            => 'varchar',
+			'order'           => 3,
+			'note'            => T_('Enter a string'),
+		),
+		array(
+			'label'           => T_('Multiline plain text field'),
+			'name'            => 'multiline_plain_text_field',
+			'type'            => 'text',
+			'order'           => 6,
+			'note'            => T_('Enter multiple lines'),
+		),
+		array(
+			'label'           => T_('Multiline HTML field'),
+			'name'            => 'multiline_html_field',
+			'type'            => 'html',
+			'order'           => 5,
+			'note'            => T_('Enter HTML code'),
+		),
+		array(
+			'label'           => T_('URL field'),
+			'name'            => 'url_field',
+			'type'            => 'url',
+			'order'           => 7,
+			'note'            => T_('Enter an URL (absolute or relative)'),
+			'link'            => 'fieldurl',
+		),
+		array(
+			'label'           => T_('Checkmark field'),
+			'name'            => 'checkmark_field',
+			'type'            => 'double',
+			'order'           => 10,
+			'note'            => T_('1 = Yes; 0 = No'),
+			'format'          => '#yes#;;#no#;n/a',
+			'cell_class'      => 'right',
+		),
+		// for Item Type "Child Post":
+		array(
+			'ityp_ID'         => $child_ityp_ID,
+			'label'           => T_('Image 1'),
+			'name'            => 'image_1',
+			'type'            => 'image',
+			'order'           => 1,
+			'note'            => T_('Enter a link ID'),
+			'format'          => 'fit-192x192',
+			'link'            => 'linkpermzoom',
+			'line_highlight'  => 'never',
+			'green_highlight' => 'never',
+		),
+		array(
+			'ityp_ID'         => $child_ityp_ID,
+			'label'           => T_('First numeric field'),
+			'name'            => 'first_numeric_field',
+			'type'            => 'double',
+			'order'           => 2,
+			'note'            => T_('Enter a number'),
+			'cell_class'      => 'right',
+		),
+		array(
+			'ityp_ID'         => $child_ityp_ID,
+			'label'           => T_('First string field'),
+			'name'            => 'first_string_field',
+			'type'            => 'varchar',
+			'order'           => 3,
+			'note'            => T_('Enter a string'),
+		),
+		array(
+			'ityp_ID'         => $child_ityp_ID,
+			'label'           => T_('Checkmark field'),
+			'name'            => 'checkmark_field',
+			'type'            => 'double',
+			'order'           => 4,
+			'note'            => T_('1 = Yes; 0 = No'),
+			'format'          => '#yes#;;#no#;n/a',
+			'cell_class'      => 'right',
+		),
+		// for Item Type "Recipe":
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Course'),
+			'name'            => 'course',
+			'type'            => 'varchar',
+			'order'           => 1,
+			'note'            => T_('E-g: ').'"'.TD_('Dessert').'"',
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Cuisine'),
+			'name'            => 'cuisine',
+			'type'            => 'varchar',
+			'order'           => 2,
+			'note'            => T_('E-g: ').'"'.TD_('Italian').'"',
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Servings'),
+			'name'            => 'servings',
+			'order'           => 3,
+			'note'            => TD_('people'),
+			'format'          => sprintf( TD_('%d people'), 0 ),
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Prep Time'),
+			'name'            => 'prep_time',
+			'order'           => 4,
+			'note'            => TD_('minutes'),
+			'format'          => sprintf( TD_('%s minutes'), 0 ),
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Cook Time'),
+			'name'            => 'cook_time',
+			'order'           => 5,
+			'note'            => TD_('minutes'),
+			'format'          => sprintf( TD_('%s minutes'), 0 ),
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Passive Time'),
+			'name'            => 'passive_time',
+			'order'           => 6,
+			'note'            => TD_('minutes'),
+			'format'          => sprintf( TD_('%s minutes'), 0 ),
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Total time'),
+			'name'            => 'total_time',
+			'type'            => 'computed',
+			'order'           => 7,
+			'format'          => sprintf( TD_('%s minutes'), 0 ),
+			'formula'         => '$prep_time$ + $cook_time$ + $passive_time$',
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Ingredients'),
+			'name'            => 'ingredients',
+			'type'            => 'text',
+			'order'           => 8,
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+	);
+	// Default settings for custom fields:
+	$custom_field_default_settings = array(
+			'ityp_ID'         => $parent_ityp_ID,
+			'label'           => '',
+			'name'            => '',
+			'type'            => 'double',
+			'order'           => '',
+			'note'            => NULL,
+			'format'          => NULL,
+			'formula'         => NULL,
+			'header_class'    => 'right nowrap',
+			'cell_class'      => 'center',
+			'link'            => 'nolink',
+			'line_highlight'  => 'differences',
+			'green_highlight' => 'never',
+		);
+	// Insert item type custom fields:
+	$custom_fields_sql = 'INSERT INTO T_items__type_custom_field ( itcf_'.implode( ', itcf_', array_keys( $custom_field_default_settings ) ).' ) VALUES ';
+	foreach( $custom_fields as $c => $custom_field )
+	{
+		$custom_field = array_merge( $custom_field_default_settings, $custom_field );
+		$custom_fields_sql .= '( '.$DB->quote( $custom_field ).' )';
+		if( $c != count( $custom_fields ) - 1 )
+		{
+			$custom_fields_sql .= ',';
+		}
+	}
+	$DB->query( $custom_fields_sql );
 	task_end();
 
 
@@ -1058,7 +1295,62 @@ function create_default_regions()
 			(76, 74, '04', 'La R\xE9union'),
 			(77, 74, '05', 'Mayotte'),
 			(78, 74, '09', 'Outre-Mer'),
-			(79, 74, '99', 'Monaco')", $current_charset, 'iso-8859-1' ) );
+			(79, 74, '99', 'Monaco'),".
+			/*Germany*/"
+			(80, 81, 'ni', 'Niedersachsen'),
+			(81, 81, 'bb', 'Brandenburg'),
+			(82, 81, 'be', 'Berlin'),
+			(83, 81, 'bw', 'Baden-W\xfcrttemberg'),
+			(84, 81, 'by', 'Bayern'),
+			(85, 81, 'hb', 'Bremen'),
+			(86, 81, 'he', 'Hessen'),
+			(87, 81, 'hh', 'Hamburg'),
+			(88, 81, 'mv', 'Mecklenburg-Vorpommern'),
+			(89, 81, 'nw', 'Nordrhein-Westfalen'),
+			(90, 81, 'rp', 'Rheinland-Pfalz'),
+			(91, 81, 'sh', 'Schleswig-Holstein'),
+			(92, 81, 'sl', 'Saarland'),
+			(93, 81, 'sn', 'Sachsen'),
+			(94, 81, 'st', 'Sachsen-Anhalt'),
+			(95, 81, 'th', 'Th\xfcringen'),".
+			/*Netherlands*/"
+			(96, 155, 'dr', 'Drenthe'),
+			(97, 155, 'fl', 'Flevoland'),
+			(98, 155, 'fr', 'Friesland'),
+			(99, 155, 'gd', 'Gelderland'),
+			(100, 155, 'gr', 'Groningen'),
+			(101, 155, 'lb', 'Limburg'),
+			(102, 155, 'nb', 'Noord-Brabant'),
+			(103, 155, 'nh', 'Noord-Holland'),
+			(104, 155, 'ov', 'Overijssel'),
+			(105, 155, 'ut', 'Utrecht'),
+			(106, 155, 'zh', 'Zuid-Holland'),
+			(107, 155, 'zl', 'Zeeland'),".
+			/*Belgium*/"
+			(108, 22, 'ant', 'Antwerpen'),
+			(109, 22, 'hai', 'Henegouwen'),
+			(110, 22, 'lim', 'Limburg'),
+			(111, 22, 'lie', 'Luik (Li\xe8ge)'),
+			(112, 22, 'lux', 'Luxemburg'),
+			(113, 22, 'nam', 'Namen'),
+			(114, 22, 'ovl', 'Oost-Vlaanderen'),
+			(115, 22, 'vbr', 'Vlaams-Brabant'),
+			(116, 22, 'wbr', 'Waals-Brabant'),
+			(117, 22, 'wvl', 'West-Vlaanderen'),".
+			/*Luxembourg*/"
+			(118, 128, 'cle', 'Clervaux'),
+			(119, 128, 'red', 'Redange'),
+			(120, 128, 'wil', 'Wiltz'),
+			(121, 128, 'esch', 'Esch-sur-Alzette'),
+			(122, 128, 'lux', 'Luxembourg'),
+			(123, 128, 'mer', 'Mersch'),
+			(124, 128, 'die', 'Diekirch'),
+			(125, 128, 'gre', 'Grevenmacher'),
+			(126, 128, 'cap', 'Capellen'),
+			(127, 128, 'ech', 'Echternach'),
+			(128, 128, 'rem', 'Remich'),
+			(129, 128, 'via', 'Vianden')",
+		$current_charset, 'iso-8859-1' ) );
 
 	task_end();
 }
@@ -1182,7 +1474,374 @@ function create_default_subregions()
 			(103, 78, '986', 'Wallis-et-Futuna'),
 			(104, 78, '987', 'Polyn\xE9sie fran\xE7aise'),
 			(105, 78, '988', 'Nouvelle-Cal\xE9donie'),
-			(106, 79, '99', 'Monaco')", $current_charset, 'iso-8859-1') );
+			(106, 79, '99', 'Monaco'),".
+			/*Germany*/"
+			(107, 80, 'ohz', 'Osterholz'),
+			(108, 80, 'wst', 'Ammerland'),
+			(109, 80, 'aur', 'Aurich'),
+			(110, 80, 'ce', 'Celle'),
+			(111, 80, 'clp', 'Cloppenburg'),
+			(112, 80, 'cux', 'Cuxhaven'),
+			(113, 80, 'dh', 'Diepholz'),
+			(114, 80, 'el', 'Emsland'),
+			(115, 80, 'fri', 'Friesland'),
+			(116, 80, 'gf', 'Gifhorn'),
+			(117, 80, 'gs', 'Goslar'),
+			(118, 80, 'goe', 'G\xf6ttingen'),
+			(119, 80, 'noh', 'Grafschaft Bentheim'),
+			(120, 80, 'hm', 'Hameln-Pyrmont'),
+			(121, 80, 'h', 'Hannover'),
+			(122, 80, 'wl', 'Harburg'),
+			(123, 80, 'hk', 'Heidekreis'),
+			(124, 80, 'he', 'Helmstedt'),
+			(125, 80, 'hi', 'Hildesheim'),
+			(126, 80, 'hol', 'Holzminden'),
+			(127, 80, 'ler', 'Leer'),
+			(128, 80, 'dan', 'L\xfcchow-Dannenberg'),
+			(129, 80, 'lg', 'L\xfcneburg'),
+			(130, 80, 'ni', 'Nienburg/Weser'),
+			(131, 80, 'nom', 'Northeim'),
+			(132, 80, 'ol', 'Oldenburg'),
+			(133, 80, 'emd', 'Emden'),
+			(134, 80, 'del', 'Delmenhorst'),
+			(135, 80, 'bs', 'Braunschweig'),
+			(136, 80, 'os', 'Osnabr\xfcck'),
+			(137, 80, 'pe', 'Peine'),
+			(138, 80, 'row', 'Rotenburg (W\xfcmme)'),
+			(139, 80, 'sz', 'Salzgitter'),
+			(140, 80, 'shg', 'Schaumburg'),
+			(141, 80, 'std', 'Stade'),
+			(142, 80, 'ue', 'Uelzen'),
+			(143, 80, 'vec', 'Vechta'),
+			(144, 80, 'ver', 'Verden'),
+			(145, 80, 'bra', 'Wesermarsch'),
+			(146, 80, 'whv', 'Wilhelmshaven'),
+			(147, 80, 'wtm', 'Wittmund'),
+			(148, 80, 'wf', 'Wolfenb\xfcttel'),
+			(149, 80, 'wob', 'Wolfsburg'),
+			(150, 91, 'hei', 'Dithmarschen'),
+			(151, 91, 'fl', 'Flensburg'),
+			(152, 91, 'rz', 'Herzogtum Lauenburg'),
+			(153, 91, 'ki', 'Kiel'),
+			(154, 91, 'hl', 'L\xfcbeck'),
+			(155, 91, 'nms', 'Neum\xfcnster'),
+			(156, 91, 'nf', 'Nordfriesland'),
+			(157, 91, 'oh', 'Ostholstein'),
+			(158, 91, 'pi', 'Pinneberg'),
+			(159, 91, 'ploe', 'Pl\xf6n'),
+			(160, 91, 'rd', 'Rendsburg-Eckernf\xf6rde'),
+			(161, 91, 'sl', 'Schleswig-Flensburg'),
+			(162, 91, 'se', 'Segeberg'),
+			(163, 91, 'iz', 'Steinburg'),
+			(164, 91, 'od', 'Stormarn'),
+			(165, 88, 'lup', 'Ludwigslust-Parchim'),
+			(166, 88, 'mse', 'Mecklenburgische Seenplatte'),
+			(167, 88, 'nwm', 'Nordwestmecklenburg'),
+			(168, 88, 'ros', 'Rostock'),
+			(169, 88, 'sn', 'Schwerin'),
+			(170, 88, 'vg', 'Vorpommern-Greifswald'),
+			(171, 88, 'vr', 'Vorpommern-R\xfcgen'),
+			(172, 89, 'ac', 'Aachen'),
+			(173, 89, 'bi', 'Bielefeld'),
+			(174, 89, 'bo', 'Bochum'),
+			(175, 89, 'bn', 'Bonn'),
+			(176, 89, 'bor', 'Borken'),
+			(177, 89, 'bot', 'Bottrop'),
+			(178, 89, 'coe', 'Coesfeld'),
+			(179, 89, 'do', 'Dortmund'),
+			(180, 89, 'du', 'Duisburg'),
+			(181, 89, 'dn', 'D\xfcren'),
+			(182, 89, 'd', 'D\xfcsseldorf'),
+			(183, 89, 'en', 'Ennepe-Ruhr-Kreis'),
+			(184, 89, 'e', 'Essen'),
+			(185, 89, 'eu', 'Euskirchen'),
+			(186, 89, 'ge', 'Gelsenkirchen'),
+			(187, 89, 'gt', 'G\xfctersloh'),
+			(188, 89, 'ha', 'Hagen'),
+			(189, 89, 'ham', 'Hamm'),
+			(190, 89, 'hs', 'Heinsberg'),
+			(191, 89, 'hf', 'Herford'),
+			(192, 89, 'her', 'Herne'),
+			(193, 89, 'hsk', 'Hochsauerlandkreis'),
+			(194, 89, 'hx', 'H\xf6xter'),
+			(195, 89, 'kle', 'Kleve'),
+			(196, 89, 'k', 'K\xf6ln'),
+			(197, 89, 'kr', 'Krefeld'),
+			(198, 89, 'lev', 'Leverkusen'),
+			(199, 89, 'lip', 'Lippe'),
+			(200, 89, 'mk', 'M\xe4rkischer Kreis'),
+			(201, 89, 'me', 'Mettmann'),
+			(202, 89, 'mi', 'Minden-L\xfcbbecke'),
+			(203, 89, 'mg', 'M\xf6nchengladbach'),
+			(204, 89, 'mh', 'M\xfclheim an der Ruhr'),
+			(205, 89, 'ms', 'M\xfcnster'),
+			(206, 89, 'gm', 'Oberbergischer Kreis'),
+			(207, 89, 'ob', 'Oberhausen'),
+			(208, 89, 'oe', 'Olpe'),
+			(209, 89, 'pb', 'Paderborn'),
+			(210, 89, 're', 'Recklinghausen'),
+			(211, 89, 'rs', 'Remscheid'),
+			(212, 89, 'bm', 'Rhein-Erft-Kreis'),
+			(213, 89, 'gl', 'Rheinisch-Bergischer Kreis'),
+			(214, 89, 'ne', 'Rhein-Kreis Neuss'),
+			(215, 89, 'su', 'Rhein-Sieg-Kreis'),
+			(216, 89, 'si', 'Siegen-Wittgenstein'),
+			(217, 89, 'so', 'Soest'),
+			(218, 89, 'sg', 'Solingen'),
+			(219, 89, 'st', 'Steinfurt'),
+			(220, 89, 'un', 'Unna'),
+			(221, 89, 'vie', 'Viersen'),
+			(222, 89, 'waf', 'Warendorf'),
+			(223, 89, 'wes', 'Wesel'),
+			(224, 89, 'w', 'Wuppertal'),
+			(225, 86, 'hp', 'Bergstra\xdfe'),
+			(226, 86, 'di', 'Darmstadt-Dieburg'),
+			(227, 86, 'da', 'Darmstadt'),
+			(228, 86, 'f', 'Frankfurt am Main'),
+			(229, 86, 'fd', 'Fulda'),
+			(230, 86, 'gi', 'Gie\xdfen'),
+			(231, 86, 'gg', 'Gro\xdf-Gerau'),
+			(232, 86, 'hef', 'Hersfeld-Rotenburg'),
+			(233, 86, 'hg', 'Hochtaunuskreis'),
+			(234, 86, 'ks', 'Kassel'),
+			(235, 86, 'ldk', 'Lahn-Dill-Kreis'),
+			(236, 86, 'lm', 'Limburg-Weilburg'),
+			(237, 86, 'mkk', 'Main-Kinzig-Kreis'),
+			(238, 86, 'mtk', 'Main-Taunus-Kreis'),
+			(239, 86, 'mr', 'Marburg-Biedenkopf'),
+			(240, 86, 'erb', 'Odenwaldkreis'),
+			(241, 86, 'of', 'Offenbach'),
+			(242, 86, 'rued', 'Rheingau-Taunus-Kreis'),
+			(243, 86, 'hr', 'Schwalm-Eder-Kreis'),
+			(244, 86, 'vb', 'Vogelsbergkreis'),
+			(245, 86, 'kb', 'Waldeck-Frankenberg'),
+			(246, 86, 'esw', 'Werra-Mei\xdfner-Kreis'),
+			(247, 86, 'fb', 'Wetteraukreis'),
+			(248, 86, 'wi', 'Wiesbaden'),
+			(249, 90, 'aw', 'Ahrweiler'),
+			(250, 90, 'ak', 'Altenkirchen (Westerwald)'),
+			(251, 90, 'az', 'Alzey-Worms'),
+			(252, 90, 'duew', 'Bad D\xfcrkheim'),
+			(253, 90, 'kh', 'Bad Kreuznach'),
+			(254, 90, 'wil', 'Bernkastel-Wittlich'),
+			(255, 90, 'bir', 'Birkenfeld'),
+			(256, 90, 'coc', 'Cochem-Zell'),
+			(257, 90, 'kib', 'Donnersbergkreis'),
+			(258, 90, 'bit', 'Eifelkreis Bitburg-Pr\xfcm'),
+			(259, 90, 'ft', 'Frankenthal (Pfalz)'),
+			(260, 90, 'ger', 'Germersheim'),
+			(261, 90, 'kl', 'Kaiserslautern'),
+			(262, 90, 'ko', 'Koblenz'),
+			(263, 90, 'ku', 'Kusel'),
+			(264, 90, 'ld', 'Landau in der Pfalz'),
+			(265, 90, 'lu', 'Ludwigshafen am Rhein'),
+			(266, 90, 'mz', 'Mainz-Bingen'),
+			(267, 90, 'myk', 'Mayen-Koblenz'),
+			(268, 90, 'nw', 'Neustadt an der Weinstra\xdfe'),
+			(269, 90, 'nr', 'Neuwied'),
+			(271, 90, 'sim', 'Rhein-Hunsr\xfcck-Kreis'),
+			(272, 90, 'ems', 'Rhein-Lahn-Kreis'),
+			(273, 90, 'rp', 'Rhein-Pfalz-Kreis'),
+			(274, 90, 'sp', 'Speyer'),
+			(275, 90, 'suew', 'S\xfcdliche Weinstra\xdfe'),
+			(276, 90, 'ps', 'Pirmasens-S\xfcdwestpfalz'),
+			(277, 90, 'tr', 'Trier-Saarburg'),
+			(278, 90, 'dau', 'Vulkaneifel'),
+			(279, 90, 'ww', 'Westerwaldkreis'),
+			(280, 90, 'wo', 'Worms'),
+			(281, 90, 'zw', 'Zweibr\xfccken'),
+			(282, 92, 'mzg', 'Merzig-Wadern'),
+			(283, 92, 'nk', 'Neunkirchen'),
+			(284, 92, 'sb', 'Saarbr\xfccken'),
+			(285, 92, 'sls', 'Saarlouis'),
+			(286, 92, 'hom', 'Saarpfalz-Kreis'),
+			(287, 92, 'wnd', 'St. Wendel'),
+			(288, 83, 'ul', 'Ulm und Alb-Donau-Kreis'),
+			(289, 83, 'bad', 'Baden-Baden'),
+			(290, 83, 'bc', 'Biberach'),
+			(291, 83, 'bb', 'B\xf6blingen'),
+			(292, 83, 'fn', 'Bodenseekreis'),
+			(293, 83, 'fr', 'Freiburg und Breisgau-Hochschwarzwald'),
+			(294, 83, 'cw', 'Calw'),
+			(295, 83, 'em', 'Emmendingen'),
+			(296, 83, 'pf', 'Pforzheim und Enzkreis'),
+			(297, 83, 'es', 'Esslingen'),
+			(298, 83, 'fds', 'Freudenstadt'),
+			(299, 83, 'gp', 'G\xf6ppingen'),
+			(300, 83, 'hd', 'Heidelberg und Rhein-Neckar-Kreis'),
+			(301, 83, 'hdh', 'Heidenheim'),
+			(302, 83, 'hn', 'Heilbronn'),
+			(303, 83, 'kuen', 'Hohenlohekreis'),
+			(304, 83, 'ka', 'Karlsruhe'),
+			(305, 83, 'kn', 'Konstanz'),
+			(306, 83, 'loe', 'L\xf6rrach'),
+			(307, 83, 'lb', 'Ludwigsburg'),
+			(308, 83, 'tbb', 'Main-Tauber-Kreis'),
+			(309, 83, 'ma', 'Mannheim'),
+			(310, 83, 'mos', 'Neckar-Odenwald-Kreis'),
+			(311, 83, 'og', 'Ortenaukreis'),
+			(312, 83, 'aa', 'Ostalbkreis'),
+			(313, 83, 'ra', 'Rastatt'),
+			(314, 83, 'rv', 'Ravensburg'),
+			(315, 83, 'wn', 'Rems-Murr-Kreis'),
+			(316, 83, 'rt', 'Reutlingen'),
+			(317, 83, 'rw', 'Rottweil'),
+			(318, 83, 'sha', 'Schw\xe4bisch Hall'),
+			(319, 83, 'vs', 'Schwarzwald-Baar-Kreis'),
+			(320, 83, 'sig', 'Sigmaringen'),
+			(321, 83, 's', 'Stuttgart'),
+			(322, 83, 'tue', 'T\xfcbingen'),
+			(323, 83, 'tut', 'Tuttlingen'),
+			(324, 83, 'wt', 'Waldshut'),
+			(325, 83, 'bl', 'Zollernalbkreis'),
+			(326, 84, 'aic', 'Aichach-Friedberg'),
+			(327, 84, 'aoe', 'Alt\xf6tting'),
+			(328, 84, 'am', 'Amberg'),
+			(329, 84, 'as', 'Amberg-Sulzbach'),
+			(330, 84, 'an', 'Ansbach'),
+			(331, 84, 'ab', 'Aschaffenburg'),
+			(332, 84, 'a', 'Augsburg'),
+			(333, 84, 'kg', 'Bad Kissingen'),
+			(334, 84, 'toel', 'Bad T\xf6lz-Wolfratshausen'),
+			(335, 84, 'ba', 'Bamberg'),
+			(336, 84, 'bt', 'Bayreuth'),
+			(337, 84, 'bgl', 'Berchtesgadener Land'),
+			(338, 84, 'cha', 'Cham'),
+			(339, 84, 'co', 'Coburg'),
+			(340, 84, 'dah', 'Dachau'),
+			(341, 84, 'deg', 'Deggendorf'),
+			(342, 84, 'dlg', 'Dillingen an der Donau'),
+			(343, 84, 'dgf', 'Dingolfing-Landau'),
+			(344, 84, 'don', 'Donau-Ries'),
+			(345, 84, 'ebe', 'Ebersberg'),
+			(346, 84, 'ei', 'Eichst\xe4tt'),
+			(347, 84, 'ed', 'Erding'),
+			(348, 84, 'er', 'Erlangen'),
+			(349, 84, 'erh', 'Erlangen-H\xf6chstadt'),
+			(350, 84, 'fo', 'Forchheim'),
+			(351, 84, 'fs', 'Freising'),
+			(352, 84, 'frg', 'Freyung-Grafenau'),
+			(353, 84, 'ffb', 'F\xfcrstenfeldbruck'),
+			(354, 84, 'fue', 'F\xfcrth'),
+			(355, 84, 'gap', 'Garmisch-Partenkirchen'),
+			(356, 84, 'gz', 'G\xfcnzburg'),
+			(357, 84, 'has', 'Ha\xdfberge'),
+			(358, 84, 'ho', 'Hof'),
+			(359, 84, 'in', 'Ingolstadt'),
+			(360, 84, 'kf', 'Kaufbeuren'),
+			(361, 84, 'keh', 'Kelheim'),
+			(362, 84, 'ke', 'Kempten'),
+			(363, 84, 'kt', 'Kitzingen'),
+			(364, 84, 'kc', 'Kronach'),
+			(365, 84, 'ku', 'Kulmbach'),
+			(366, 84, 'll', 'Landsberg am Lech'),
+			(367, 84, 'la', 'Landshut'),
+			(368, 84, 'lif', 'Lichtenfels'),
+			(369, 84, 'li', 'Lindau (Bodensee)'),
+			(370, 84, 'msp', 'Main-Spessart'),
+			(371, 84, 'mm', 'Memmingen'),
+			(372, 84, 'mb', 'Miesbach'),
+			(373, 84, 'mil', 'Miltenberg'),
+			(374, 84, 'mue', 'M\xfchldorf am Inn'),
+			(375, 84, 'm', 'M\xfcnchen'),
+			(376, 84, 'nd', 'Neuburg-Schrobenhausen'),
+			(377, 84, 'nm', 'Neumarkt in der Oberpfalz'),
+			(378, 84, 'nea', 'Neustadt an der Aisch-Bad Windsheim'),
+			(379, 84, 'new', 'Neustadt an der Waldnaab'),
+			(380, 84, 'nu', 'Neu-Ulm'),
+			(381, 84, 'n', 'N\xfcrnberg'),
+			(382, 84, 'lau', 'N\xfcrnberger Land'),
+			(383, 84, 'oa', 'Oberallg\xe4u'),
+			(384, 84, 'oal', 'Ostallg\xe4u'),
+			(385, 84, 'pa', 'Passau'),
+			(386, 84, 'paf', 'Pfaffenhofen an der Ilm'),
+			(387, 84, 'reg', 'Regen'),
+			(388, 84, 'r', 'Regensburg'),
+			(389, 84, 'nes', 'Rh\xf6n-Grabfeld'),
+			(390, 84, 'ro', 'Rosenheim'),
+			(391, 84, 'rh', 'Roth'),
+			(392, 84, 'pan', 'Rottal-Inn'),
+			(393, 84, 'sc', 'Schwabach'),
+			(394, 84, 'sad', 'Schwandorf'),
+			(395, 84, 'sw', 'Schweinfurt'),
+			(396, 84, 'sta', 'Starnberg'),
+			(397, 84, 'sr', 'Straubing und Straubing-Bogen'),
+			(398, 84, 'tir', 'Tirschenreuth'),
+			(399, 84, 'ts', 'Traunstein'),
+			(400, 84, 'mn', 'Unterallg\xe4u'),
+			(401, 84, 'wen', 'Weiden'),
+			(402, 84, 'wm', 'Weilheim-Schongau'),
+			(403, 84, 'wug', 'Wei\xdfenburg-Gunzenhausen'),
+			(404, 84, 'wun', 'Wunsiedel im Fichtelgebirge'),
+			(405, 84, 'wue', 'W\xfcrzburg'),
+			(406, 81, 'bar', 'Barnim'),
+			(407, 81, 'brb', 'Brandenburg an der Havel'),
+			(408, 81, 'cb', 'Cottbus'),
+			(409, 81, 'lds', 'Dahme-Spreewald'),
+			(410, 81, 'ee', 'Elbe-Elster'),
+			(411, 81, 'ff', 'Frankfurt (Oder)'),
+			(412, 81, 'hvl', 'Havelland'),
+			(413, 81, 'mol', 'M\xe4rkisch-Oderland'),
+			(414, 81, 'ohv', 'Oberhavel'),
+			(415, 81, 'osl', 'Oberspreewald-Lausitz'),
+			(416, 81, 'los', 'Oder-Spree'),
+			(417, 81, 'opr', 'Ostprignitz-Ruppin'),
+			(418, 81, 'p', 'Potsdam'),
+			(419, 81, 'pm', 'Potsdam-Mittelmark'),
+			(420, 81, 'pr', 'Prignitz'),
+			(421, 81, 'spn', 'Spree-Nei\xdfe'),
+			(422, 81, 'tf', 'Teltow-Fl\xe4ming'),
+			(423, 81, 'um', 'Uckermark'),
+			(424, 94, 'saw', 'Altmarkkreis Salzwedel'),
+			(425, 94, 'abi', 'Anhalt-Bitterfeld'),
+			(426, 94, 'bk', 'B\xf6rde'),
+			(427, 94, 'blk', 'Burgenlandkreis'),
+			(428, 94, 'de', 'Dessau-Ro\xdflau'),
+			(429, 93, 'hal', 'Halle (Saale)'),
+			(430, 94, 'hz', 'Harz'),
+			(431, 94, 'jl', 'Jerichower Land'),
+			(432, 94, 'md', 'Magdeburg'),
+			(433, 94, 'msh', 'Mansfeld-S\xfcdharz'),
+			(434, 94, 'sk', 'Saalekreis'),
+			(435, 94, 'slk', 'Salzlandkreis'),
+			(436, 94, 'sdl', 'Stendal'),
+			(437, 94, 'wb', 'Wittenberg'),
+			(438, 93, 'bz', 'Bautzen'),
+			(439, 93, 'c', 'Chemnitz'),
+			(440, 93, 'dd', 'Dresden'),
+			(441, 93, 'erz', 'Erzgebirgskreis'),
+			(442, 93, 'gr', 'G\xf6rlitz'),
+			(443, 93, 'l', 'Leipzig'),
+			(444, 93, 'mei', 'Mei\xdfen'),
+			(445, 93, 'fg', 'Mittelsachsen'),
+			(446, 93, 'tdo', 'Nordsachsen'),
+			(447, 93, 'pir', 'S\xe4chsische Schweiz-Osterzgebirge'),
+			(448, 93, 'v', 'Vogtlandkreis'),
+			(449, 93, 'z', 'Zwickau'),
+			(450, 95, 'abg', 'Altenburger Land'),
+			(451, 95, 'eic', 'Eichsfeld'),
+			(452, 95, 'ea', 'Eisenach'),
+			(453, 95, 'ef', 'Erfurt'),
+			(454, 95, 'g', 'Gera'),
+			(455, 95, 'gth', 'Gotha'),
+			(456, 95, 'grz', 'Greiz'),
+			(457, 95, 'hbn', 'Hildburghausen'),
+			(458, 95, 'ik', 'Ilm-Kreis'),
+			(459, 95, 'j', 'Jena'),
+			(460, 95, 'kyf', 'Kyffh\xe4userkreis'),
+			(461, 95, 'ndh', 'Nordhausen'),
+			(462, 95, 'shk', 'Saale-Holzland-Kreis'),
+			(463, 95, 'sok', 'Saale-Orla-Kreis'),
+			(464, 95, 'slf', 'Saalfeld-Rudolstadt'),
+			(465, 95, 'sm', 'Schmalkalden-Meiningen'),
+			(466, 95, 'soem', 'S\xf6mmerda'),
+			(467, 95, 'son', 'Sonneberg'),
+			(468, 95, 'shl', 'Suhl'),
+			(469, 95, 'uh', 'Unstrut-Hainich-Kreis'),
+			(470, 95, 'wak', 'Wartburgkreis'),
+			(471, 95, 'we', 'Weimar'),
+			(472, 95, 'ap', 'Weimarer Land')",
+		$current_charset, 'iso-8859-1') );
 
 	task_end();
 }
@@ -1207,6 +1866,7 @@ function create_default_jobs( $is_upgrade = false )
 	$next_sunday = date2mysql( strtotime( 'next Sunday',  $localtimenow + 86400 ) );
 
 	$cleanup_jobs_key         = 'cleanup-scheduled-jobs';
+	$cleanup_email_logs_key   = 'cleanup-email-logs';
 	$heavy_db_maintenance_key = 'heavy-db-maintenance';
 	$light_db_maintenance_key = 'light-db-maintenance';
 	$poll_antispam_key        = 'poll-antispam-blacklist';
@@ -1215,30 +1875,41 @@ function create_default_jobs( $is_upgrade = false )
 	$prune_sessions_key       = 'prune-old-hits-and-sessions';
 	$prune_comments_key       = 'prune-recycled-comments';
 	$activate_reminder_key    = 'send-non-activated-account-reminders';
+	$inactive_reminder_key    = 'send-inactive-account-reminders';
 	$comment_reminder_key     = 'send-unmoderated-comments-reminders';
 	$messages_reminder_key    = 'send-unread-messages-reminders';
 	$post_reminder_key        = 'send-unmoderated-posts-reminders';
 	$alert_old_contents_key   = 'monthly-alert-old-contents';
 	$execute_automations_key  = 'execute-automations';
+	$manage_email_status_key  = 'manage-email-statuses';
+	$process_return_path_key  = 'process-return-path-inbox';
 
 	// init insert values
 	$insert_values = array(
-			// run unread messages reminder in every 29 minutes
-			$messages_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '01:00:00' ) ).", 1740,  ".$DB->quote( $messages_reminder_key ).", ".$ctsk_params." )",
-			// run activate account reminder in every 31 minutes
-			$activate_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '01:30:00' ) ).", 1860,  ".$DB->quote( $activate_reminder_key ).", ".$ctsk_params." )",
-			$prune_pagecache_key      => "( ".$DB->quote( form_date( $tomorrow, '02:00:00' ) ).", 86400, ".$DB->quote( $prune_pagecache_key ).", ".$ctsk_params." )",
-			$process_hitlog_key       => "( ".$DB->quote( form_date( $tomorrow, '02:30:00' ) ).", 86400, ".$DB->quote( $process_hitlog_key ).", ".$ctsk_params." )",
-			$prune_sessions_key       => "( ".$DB->quote( form_date( $tomorrow, '03:00:00' ) ).", 86400, ".$DB->quote( $prune_sessions_key ).", ".$ctsk_params." )",
-			$poll_antispam_key        => "( ".$DB->quote( form_date( $tomorrow, '04:00:00' ) ).", 86400, ".$DB->quote( $poll_antispam_key ).", ".$ctsk_params." )",
-			$comment_reminder_key     => "( ".$DB->quote( form_date( $tomorrow, '04:30:00' ) ).", 86400, ".$DB->quote( $comment_reminder_key ).", ".$ctsk_params." )",
-			$cleanup_jobs_key         => "( ".$DB->quote( form_date( $tomorrow, '05:00:00' ) ).", 86400, ".$DB->quote( $cleanup_jobs_key ).", ".$ctsk_params." )",
-			$prune_comments_key       => "( ".$DB->quote( form_date( $tomorrow, '05:30:00' ) ).", 86400, ".$DB->quote( $prune_comments_key ).", ".$ctsk_params." )",
-			$light_db_maintenance_key => "( ".$DB->quote( form_date( $tomorrow, '06:00:00' ) ).", 86400, ".$DB->quote( $light_db_maintenance_key ).", ".$ctsk_params." )",
-			$heavy_db_maintenance_key => "( ".$DB->quote( form_date( $next_sunday, '06:30:00' ) ).", 604800, ".$DB->quote( $heavy_db_maintenance_key ).", ".$ctsk_params." )",
-			$post_reminder_key        => "( ".$DB->quote( form_date( $tomorrow, '07:00:00' ) ).", 86400, ".$DB->quote( $post_reminder_key ).", ".$ctsk_params." )",
-			$alert_old_contents_key   => "( ".$DB->quote( form_date( $next_sunday, '07:30:00' ) ).", 604800, ".$DB->quote( $alert_old_contents_key ).", ".$ctsk_params." )",
 			$execute_automations_key  => "( ".$DB->quote( form_date( $today, '00:00:00' ) ).", 300, ".$DB->quote( $execute_automations_key ).", ".$ctsk_params." )",
+
+			// run check return path inbox every 11 minutes:
+			$process_return_path_key  => "( ".$DB->quote( form_date( $tomorrow, '00:03:00' ) ).", 660, ".$DB->quote( $process_return_path_key ).", ".$ctsk_params." )",
+			// run unread messages reminder in every 29 minutes:
+			$messages_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '01:06:00' ) ).", 1740,  ".$DB->quote( $messages_reminder_key ).", ".$ctsk_params." )",
+			// run activate account reminder in every 31 minutes:
+			$activate_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '01:09:00' ) ).", 1860,  ".$DB->quote( $activate_reminder_key ).", ".$ctsk_params." )",
+
+			$prune_pagecache_key      => "( ".$DB->quote( form_date( $tomorrow, '02:00:00' ) ).", 86400, ".$DB->quote( $prune_pagecache_key ).", ".$ctsk_params." )",
+			$process_hitlog_key       => "( ".$DB->quote( form_date( $tomorrow, '02:15:00' ) ).", 86400, ".$DB->quote( $process_hitlog_key ).", ".$ctsk_params." )",
+			$prune_sessions_key       => "( ".$DB->quote( form_date( $tomorrow, '02:30:00' ) ).", 86400, ".$DB->quote( $prune_sessions_key ).", ".$ctsk_params." )",
+			$poll_antispam_key        => "( ".$DB->quote( form_date( $tomorrow, '02:45:00' ) ).", 86400, ".$DB->quote( $poll_antispam_key ).", ".$ctsk_params." )",
+			$post_reminder_key        => "( ".$DB->quote( form_date( $tomorrow, '03:00:00' ) ).", 86400, ".$DB->quote( $post_reminder_key ).", ".$ctsk_params." )",
+			$inactive_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '03:15:00' ) ).", 86400, ".$DB->quote( $inactive_reminder_key ).", ".$ctsk_params." )",
+			$comment_reminder_key     => "( ".$DB->quote( form_date( $tomorrow, '03:30:00' ) ).", 86400, ".$DB->quote( $comment_reminder_key ).", ".$ctsk_params." )",
+			$prune_comments_key       => "( ".$DB->quote( form_date( $tomorrow, '03:45:00' ) ).", 86400, ".$DB->quote( $prune_comments_key ).", ".$ctsk_params." )",
+			$cleanup_email_logs_key   => "( ".$DB->quote( form_date( $tomorrow, '04:00:00' ) ).", 86400, ".$DB->quote( $cleanup_email_logs_key ).", ".$ctsk_params." )",
+			$manage_email_status_key  => "( ".$DB->quote( form_date( $tomorrow, '04:15:00' ) ).", 86400, ".$DB->quote( $manage_email_status_key ).", ".$ctsk_params." )",
+			$cleanup_jobs_key         => "( ".$DB->quote( form_date( $tomorrow, '04:30:00' ) ).", 86400, ".$DB->quote( $cleanup_jobs_key ).", ".$ctsk_params." )",
+			$light_db_maintenance_key => "( ".$DB->quote( form_date( $tomorrow, '04:45:00' ) ).", 86400, ".$DB->quote( $light_db_maintenance_key ).", ".$ctsk_params." )",
+
+			$alert_old_contents_key   => "( ".$DB->quote( form_date( $next_sunday, '05:00:00' ) ).", 604800, ".$DB->quote( $alert_old_contents_key ).", ".$ctsk_params." )",
+			$heavy_db_maintenance_key => "( ".$DB->quote( form_date( $next_sunday, '05:15:00' ) ).", 604800, ".$DB->quote( $heavy_db_maintenance_key ).", ".$ctsk_params." )",
 		);
 	if( $is_upgrade )
 	{ // Check if these jobs already exist, and don't create another
@@ -1741,8 +2412,8 @@ function create_demo_contents()
 
 
 	task_begin( 'Creating default polls... ' );
-	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text )
-		VALUES ( 1, "What is your favorite b2evolution feature?" )' );
+	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text, pqst_max_answers )
+		VALUES ( 1, "What are your favorite b2evolution features?", 3 )' );
 	$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
 		VALUES ( 1, "Multiple blogs",          1 ),
 		       ( 1, "Photo Galleries",         2 ),
@@ -1751,13 +2422,13 @@ function create_demo_contents()
 		       ( 1, "Lists / E-mailing", 5 ),
 		       ( 1, "Easy Maintenance",        6 )' );
 	$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
-		VALUES ( 1, 5, 1 ),
-		       ( 1, 6, 2 ),
-		       ( 1, 7, 2 ),
-		       ( 1, 2, 2 ),
-		       ( 1, 3, 3 ),
-		       ( 1, 4, 3 ),
-		       ( 1, 1, 6 )' );
+		VALUES ( 1, 5, 1 ), ( 1, 5, 5 ), ( 1, 5, 6 ),
+		       ( 1, 6, 2 ), ( 1, 6, 5 ), ( 1, 6, 1 ),
+		       ( 1, 7, 2 ), ( 1, 7, 5 ), ( 1, 6, 3 ),
+		       ( 1, 2, 2 ), ( 1, 2, 5 ), ( 1, 2, 4 ),
+		       ( 1, 3, 3 ), ( 1, 3, 5 ), ( 1, 3, 1 ),
+		       ( 1, 4, 3 ), ( 1, 4, 6 ), ( 1, 4, 2 ),
+		       ( 1, 1, 6 ), ( 1, 1, 5 ), ( 1, 1, 3 )' );
 	task_end();
 
 
@@ -1809,9 +2480,9 @@ function create_default_newsletters()
 	if( $create_sample_contents )
 	{
 		// Insert default newsletters:
-		$DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label, enlt_order )
-			VALUES ( "News", "Send me news about this site.", 1 ),
-			       ( "Promotions", "I want to receive ADs that may be relevant to my interests.", 2 )' );
+		$DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label, enlt_order, enlt_owner_user_ID )
+			VALUES ( "News", "Send me news about this site.", 1, 1 ),
+			       ( "Promotions", "I want to receive ADs that may be relevant to my interests.", 2, 1 )' );
 
 		// Insert default subscriptions for each user on first newsletter:
 		$DB->query( 'REPLACE INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
@@ -1827,20 +2498,19 @@ function create_default_newsletters()
  */
 function create_default_email_campaigns()
 {
-	global $DB, $create_sample_contents, $baseurl;
+	global $DB, $Settings, $create_sample_contents, $baseurl;
 
 	task_begin( 'Creating default email campaigns... ' );
 
-	load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
-	load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
-
 	if( $create_sample_contents )
 	{
-		$EmailCampaign = new EmailCampaign();
-		$EmailCampaign->set( 'enlt_ID', 1 );
-		$EmailCampaign->set( 'name', T_('Markdown Example') );
-		$EmailCampaign->set( 'email_defaultdest', $baseurl );
-		$EmailCampaign->set( 'email_text', T_('Heading
+		load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
+		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+		$email_campaigns = array(
+			array(
+				'name' => T_('Markdown Example'),
+				'text' => T_('Heading
 =======
 
 Sub-heading
@@ -1875,21 +2545,122 @@ Shopping list:
 * oranges
 * pears
 
-The rain---not the reign---in Spain.
-
-Button examples:
+The rain---not the reign---in Spain.').
+"\n".
+T_('Button examples:
 [button]This is a button[/button]
 [like]I like this[/like] [dislike]I don\'t like this[/dislike]
 [cta:1:info]Call to action 1 info button[/cta] [cta:2:warning]Call to action 2 warning button[/cta] [cta:3:default]Call to action 3 default button[/cta]
-[cta:1:link]Call to action 1 link only[/cta]') );
+[cta:1:link]Call to action 1 link only[/cta]'),
+			),
+			array(
+				'name' => T_('Another example'),
+				'text' => sprintf( T_('Hello %s!'), '$firstname_and_login$' )."\r\n\r\n".T_('Here are some news...'),
+			),
+			array(
+				'name'  => T_('Welcome & Activate'),
+				'title' => sprintf( T_( 'Activate your account: %s' ), '$login$' ),
+				'text'  => sprintf( T_('Hello %s!'), '$username$' )."\r\n\r\n"
+					.sprintf( T_('You have recently registered a new account on %s .'), '<a href="'.$baseurl.'">'.$Settings->get( 'notification_short_name' ).'</a>' )."\r\n\r\n"
+					.'<b style="color:#d00">'.T_('You must activate this account by clicking below in order to be able to use all the site features.').'</b>'."\r\n\r\n"
+					.T_('Your login is: $login$')."\r\n\r\n"
+					.T_('Your email is: $email$')."\r\n\r\n"
+					.'[activate:primary]'.T_( 'Activate NOW' ).'[/activate]'
+			),
+		);
 
-		if( $EmailCampaign->dbinsert() )
-		{	// Add recipients after successfull email campaign creating:
-			$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
-			if( ! empty( $user_IDs ) )
-			{	// Only if we have found the users in DB
+		$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
+		foreach( $email_campaigns as $email_campaign )
+		{
+			$EmailCampaign = new EmailCampaign();
+			$EmailCampaign->set( 'enlt_ID', 1 );
+			$EmailCampaign->set( 'name', $email_campaign['name'] );
+			$EmailCampaign->set( 'email_title', isset( $email_campaign['title'] ) ? $email_campaign['title'] : $email_campaign['name'] );
+			$EmailCampaign->set( 'email_defaultdest', $baseurl );
+			$EmailCampaign->set( 'email_text', $email_campaign['text'] );
+
+			if( $EmailCampaign->dbinsert() && ! empty( $user_IDs ) )
+			{	// Add recipients after successfull email campaign creating,
+				// only if we have found the users in DB:
 				$EmailCampaign->add_recipients( $user_IDs );
 			}
+		}
+	}
+
+	task_end();
+}
+
+
+/**
+ * Create default automations
+ */
+function create_default_automations()
+{
+	global $DB, $create_sample_contents, $baseurl;
+
+	task_begin( 'Creating default automations... ' );
+
+	if( $create_sample_contents )
+	{
+		//load_funcs( 'automations/model/_automation.funcs.php' );
+		load_class( 'automations/model/_automation.class.php', 'Automation' );
+		load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
+
+		$Automation = new Automation();
+		$Automation->set( 'name', T_('Sample Automation') );
+		$Automation->set( 'owner_user_ID', 1 );
+		$Automation->update_newsletters = true;
+		$Automation->newsletters = array( array(
+				'ID'        => 1,
+				'autostart' => 1,
+				'autoexit'  => 1,
+			) );
+
+		if( $Automation->dbinsert() )
+		{	// Add steps after successfull creating of the automation:
+			$AutomationStep = new AutomationStep();
+			$AutomationStep->set( 'autm_ID', $Automation->ID );
+			$AutomationStep->set( 'order', 1 );
+			$AutomationStep->set( 'type', 'notify_owner' );
+			$AutomationStep->set( 'info', '$login$ has reached step $step_number$ (ID: $step_ID$)'."\n".'in automation $automation_name$ (ID: $automation_ID$)' );
+			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'yes_next_step_delay', 86400 ); // 1 day
+			$AutomationStep->set( 'error_next_step_ID', 1 ); // Loop
+			$AutomationStep->set( 'error_next_step_delay', 14400 ); // 4 hours
+			$AutomationStep->set_label();
+			$AutomationStep->dbinsert();
+
+			$AutomationStep = new AutomationStep();
+			$AutomationStep->set( 'autm_ID', $Automation->ID );
+			$AutomationStep->set( 'order', 2 );
+			$AutomationStep->set( 'type', 'send_campaign' );
+			$AutomationStep->set( 'info', '1' ); // Email Campaign ID
+			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'yes_next_step_delay', 259200 ); // 3 days
+			$AutomationStep->set( 'no_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
+			$AutomationStep->set( 'error_next_step_ID', 2 ); // Loop
+			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
+			$AutomationStep->set_label();
+			$AutomationStep->dbinsert();
+
+			$AutomationStep = new AutomationStep();
+			$AutomationStep->set( 'autm_ID', $Automation->ID );
+			$AutomationStep->set( 'order', 3 );
+			$AutomationStep->set( 'type', 'send_campaign' );
+			$AutomationStep->set( 'info', '2' ); // Email Campaign ID
+			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'yes_next_step_delay', 259200 ); // 3 days
+			$AutomationStep->set( 'no_next_step_ID', 0 ); // Continue
+			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
+			$AutomationStep->set( 'error_next_step_ID', 3 ); // Loop
+			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
+			$AutomationStep->set_label();
+			$AutomationStep->dbinsert();
+
+			// Add users to this automation:
+			$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
+			$Automation->add_users( $user_IDs );
 		}
 	}
 

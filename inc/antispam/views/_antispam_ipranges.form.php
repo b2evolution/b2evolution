@@ -47,7 +47,7 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New IP Range') : T_('IP Range') )
 
 	$Form->info( T_('Block count'), (int)$edited_IPRange->get( 'block_count' ) );
 
-$Form->end_form( array( array( 'submit', 'save', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'save', ( $creating ? /* TRANS: Verb */ T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
 
 if( $edited_IPRange->ID > 0 )
 {	// Display Users registered through this IP Range:
@@ -175,7 +175,7 @@ if( $edited_IPRange->ID > 0 )
 }
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '#delete_iprange_conflicts' ).click( function()

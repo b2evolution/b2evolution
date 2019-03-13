@@ -60,13 +60,6 @@ $Form = new Form( $form_action, 'item_checkchanges', 'post' );
 
 $Form->switch_template_parts( $params['edit_form_params'] );
 
-// =================================== INSTRUCTION ====================================
-$ItemType = & $edited_Item->get_ItemType();
-if( $ItemType && ( $ItemType->get( 'front_instruction' ) == 1 ) && $ItemType->get( 'instruction' ) )
-{
-	echo '<div class="alert alert-info fade in">'.$ItemType->get( 'instruction' ).'</div>';
-}
-
 // ================================ START OF EDIT FORM ================================
 $form_params = array();
 $iframe_name = NULL;
@@ -110,6 +103,10 @@ $Form->begin_form( 'inskin', '', $form_params );
 	{ // DO NOT ADD HIDDEN FIELDS IF THEY ARE NOT SET
 		// These fields will be set only in case when switch tab from admin editing to in-skin editing
 		// Fields used in "advanced" form, but not here:
+		if( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' )
+		{
+			$Form->hidden( 'post_short_title', $edited_Item->get( 'short_title' ) );
+		}
 		$Form->hidden( 'post_comment_status', $edited_Item->get( 'comment_status' ) );
 		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
@@ -135,7 +132,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
 		$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
 		$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
-		$Form->hidden( 'item_order', $edited_Item->order );
 
 		$creator_User = $edited_Item->get_creator_User();
 		$Form->hidden( 'item_owner_login', $creator_User->login );
@@ -218,15 +214,20 @@ $Form->begin_form( 'inskin', '', $form_params );
 	$use_title = $edited_Item->get_type_setting( 'use_title' );
 	if( $use_title != 'never' )
 	{
-		$Form->switch_layout( 'none' );
-		echo '<table width="100%" class="compose_layout"><tr>';
-		$Form->labelstart = '<th width="1%" class="label">';
-		$Form->labelend = '</th>';
-		$Form->inputstart = '<td>';
-		$Form->inputend = '</td>';
+		$Form->switch_layout( 'fields_table' );
+		$Form->begin_fieldset();
 		$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array( 'maxlength' => 255, 'style' => 'width: 100%;', 'required' => ( $use_title == 'required' ) ) );
-		echo '</tr></table>';
+		$Form->end_fieldset();
 		$Form->switch_layout( NULL );
+	}
+
+	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
+			$current_User->check_perm( 'files', 'view', false ) )
+	{	// If current user has a permission to view the files AND attachments are allowed for the item type:
+		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+		// Initialize this object as global because this is used in many link functions:
+		global $LinkOwner;
+		$LinkOwner = new LinkItem( $edited_Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
 	}
 
 	if( $edited_Item->get_type_setting( 'use_text' ) != 'never' )
@@ -234,10 +235,15 @@ $Form->begin_form( 'inskin', '', $form_params );
 		// --------------------------- TOOLBARS ------------------------------------
 		echo '<div class="edit_toolbars">';
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'AdminDisplayToolbar', array(
+		$admin_toolbar_params = array(
 				'edit_layout' => 'expert',
 				'Item' => $edited_Item,
-			) );
+			);
+		if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+		{
+			$admin_toolbar_params['temp_ID'] = $LinkOwner->get_ID();
+		}
+		$Plugins->trigger_event( 'AdminDisplayToolbar', $admin_toolbar_params );
 		echo '</div>';
 
 		// ---------------------------- TEXTAREA -------------------------------------
@@ -251,7 +257,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 			) );
 		$Form->switch_layout( NULL );
 		?>
-		<script type="text/javascript" language="JavaScript">
+		<script>
 			<!--
 			// This is for toolbar plugins
 			var b2evoCanvas = document.getElementById('itemform_post_content');
@@ -261,12 +267,17 @@ $Form->begin_form( 'inskin', '', $form_params );
 		<?php
 		echo '<div class="edit_plugin_actions">';
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'DisplayEditorButton', array(
+		$display_editor_params = array(
 				'target_type'   => 'Item',
 				'target_object' => $edited_Item,
 				'content_id'    => 'itemform_post_content',
-				'edit_layout'   => 'inskin'
-			) );
+				'edit_layout'   => 'inskin',
+			);
+		if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+		{
+			$display_editor_params['temp_ID'] = $LinkOwner->get_ID();
+		}
+		$Plugins->trigger_event( 'DisplayEditorButton', $display_editor_params );
 		echo '</div>';
 	}
 	else
@@ -275,6 +286,38 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 
 	$Form->end_fieldset();
+
+	// =================================== INSTRUCTION ====================================
+	if( $edited_Item->get_type_setting( 'front_instruction' ) && $edited_Item->get_type_setting( 'instruction' ) )
+	{
+		echo '<div class="alert alert-info fade in evo_instruction">'.$edited_Item->get_type_setting( 'instruction' ).'</div>';
+	}
+
+	// ################### LOCATIONS ###################
+	echo_item_location_form( $Form, $edited_Item );
+
+	if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
+	{
+		$Form->hidden( 'item_latitude', $edited_Item->get_setting( 'latitude' ) );
+		$Form->hidden( 'item_longitude', $edited_Item->get_setting( 'longitude' ) );
+		$Form->hidden( 'google_map_zoom', $edited_Item->get_setting( 'map_zoom' ) );
+		$Form->hidden( 'google_map_type', $edited_Item->get_setting( 'map_type' ) );
+	}
+
+	// ################### CUSTOM FIELDS ###################
+	$custom_fields = $edited_Item->get_type_custom_fields();
+	if( count( $custom_fields ) > 0 )
+	{
+		$Form->begin_fieldset( T_('Additional fields'), array( 'id' => 'itemform_custom_fields' ) );
+
+		// Display inputs to edit custom fields:
+		display_editable_custom_fields( $Form, $edited_Item );
+
+		$Form->end_fieldset();
+	}
+
+	// ####################### ATTACHMENTS/LINKS #########################
+	$Form->attachments_fieldset( $edited_Item );
 
 	// ################### TEXT RENDERERS & CATEGORIES ###################
 	if( $Blog->get_setting( 'in_skin_editing_renderers' ) )
@@ -326,69 +369,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 
 	echo $two_columns_layout['after'];
-?>
-
-<div class="clear"></div>
-
-<?php
-// ################### LOCATIONS ###################
-echo_item_location_form( $Form, $edited_Item );
-
-if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
-{
-	$Form->hidden( 'item_latitude', $edited_Item->get_setting( 'latitude' ) );
-	$Form->hidden( 'item_longitude', $edited_Item->get_setting( 'longitude' ) );
-	$Form->hidden( 'google_map_zoom', $edited_Item->get_setting( 'map_zoom' ) );
-	$Form->hidden( 'google_map_type', $edited_Item->get_setting( 'map_type' ) );
-}
-
-// ################### PROPERTIES ###################
-if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
-{ // Custom fields are hidden by otem type
-	display_hidden_custom_fields( $Form, $edited_Item );
-}
-else
-{ // Custom fields should be displayed
-	$custom_fields = $edited_Item->get_type_custom_fields();
-
-	if( count( $custom_fields ) > 0 )
-	{
-		$Form->begin_fieldset( T_('Additional fields'), array( 'id' => 'itemform_custom_fields' ) );
-
-		foreach( $custom_fields as $custom_field )
-		{	// Display each custom field:
-			switch( $custom_field['type'] )
-			{
-				case 'double':
-					$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_double_'.$custom_field['ID'] ), 10, $custom_field['label'], $custom_field['note'].' <code>'.$custom_field['name'].'</code>' );
-					break;
-				case 'varchar':
-					$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_varchar_'.$custom_field['ID'] ), 20, $custom_field['label'], '<br />'.$custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
-					break;
-				case 'text':
-					$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_text_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
-					break;
-				case 'html':
-					$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_setting( 'custom_html_'.$custom_field['ID'] ), 5, $custom_field['label'], array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
-					break;
-			}
-		}
-
-		$Form->end_fieldset();
-	}
-}
-
-// ####################### ATTACHMENTS/LINKS #########################
-if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
-    $current_User->check_perm( 'files', 'view', false ) )
-{	// If current user has a permission to view the files AND attachments are allowed for the item type:
-	load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
-	// Initialize this object as global because this is used in many link functions:
-	global $LinkOwner;
-	$LinkOwner = new LinkItem( $edited_Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
-	// Display attachments fieldset:
-	display_attachments_fieldset( $Form, $LinkOwner );
-}
 
 // ####################### PLUGIN FIELDSETS #########################
 $Plugins->trigger_event( 'DisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item) );
@@ -414,6 +394,10 @@ echo_status_dropdown_button_js( 'post' );
 // New category input box:
 echo_onchange_newcat();
 echo_autocomplete_tags();
+echo_fieldset_folding_js();
+
+// Insert image modal window:
+echo_image_insert_modal();
 
 $edited_Item->load_Blog();
 // Location

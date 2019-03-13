@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @var Blog
  */
 global $edited_Blog;
-global $action, $next_action, $blogtemplate, $blog, $tab, $admin_url, $locales;
+global $action, $next_action, $blogtemplate, $blog, $tab, $admin_url, $locales, $duplicating_collection_name;
 global $Settings;
 
 $Form = new Form();
@@ -35,7 +35,7 @@ if( $edited_Blog->ID == 0 )
 }
 elseif( $action == 'copy' )
 {	// Copy collection form:
-	$form_title = sprintf( T_('Duplicate "%s" collection'), $edited_Blog->get( 'shortname' ) ).':';
+	$form_title = sprintf( T_('Duplicate "%s" collection'), $duplicating_collection_name ).':';
 
 	$Form->global_icon( T_('Abort duplicating collection'), 'close', $admin_url.'?ctrl=dashboard', ' '.T_('Abort duplicating collection'), 3, 3 );
 }
@@ -176,7 +176,10 @@ if( in_array( $action, array( 'create', 'new-name' ) ) && $ctrl = 'collections' 
 	$Form->end_fieldset();
 }
 
-$Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_parameters' ), array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs-general-parameters' ), array( 'class'=>'fieldset clear' ) );
+
+	$collection_logo_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select collection logo/image'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
+	$Form->fileselect( 'collection_logo_file_ID', $edited_Blog->get_setting( 'collection_logo_file_ID' ), T_('Collection logo/image'), NULL, $collection_logo_params );
 
 	$name_chars_count = utf8_strlen( html_entity_decode( $edited_Blog->get( 'name' ) ) );
 	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Title'), T_('Will be displayed on top of the blog.')
@@ -206,7 +209,7 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_
 	{
 		$blog_urlname = $action == 'copy' ? NULL : $edited_Blog->get( 'urlname' );
 		?>
-		<script type="text/javascript">
+		<script>
 		var shortNameInput = jQuery( '#blog_shortname');
 		var timeoutId = 0;
 
@@ -310,6 +313,13 @@ else
 	}
 }
 
+if( $action == 'copy' )
+{	// Additional options for collection duplicating:
+	$Form->begin_fieldset( T_('Options').get_manual_link( 'collection-options' ) );
+		$Form->checkbox( 'duplicate_items', param( 'duplicate_items', 'integer', 1 ), T_('Duplicate contents'), T_('Check to duplicate posts/items from source collection.') );
+		$Form->checkbox( 'duplicate_comments', param( 'duplicate_comments', 'integer', 0 ), T_('Duplicate comments'), T_('Check to duplicate comments from source collection.'), '', 1, ! get_param( 'duplicate_items' ) );
+	$Form->end_fieldset();
+}
 
 $Form->begin_fieldset( T_('Collection permissions').get_manual_link( 'collection-permission-settings' ) );
 
@@ -387,7 +397,12 @@ if( ! $is_creating )
 
 		$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is typically displayed by a widget right under the collection name in the front-office.'), 250 );
 
-		$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This may be displayed in several places of the front-office. This may also be included in the XML feeds. You may use HTML markup here.'), 50 );
+		$shortdesc_chars_count = utf8_strlen( html_entity_decode( $edited_Blog->get( 'shortdesc' ) ) );
+		$Form->text( 'blog_shortdesc', $edited_Blog->get( 'shortdesc' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!')
+			.' ('.sprintf( T_('%s characters'), '<span id="blog_shortdesc_chars_count">'.$shortdesc_chars_count.'</span>' ).')', 250, 'large' );
+
+		$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This will be used in Open Graph tags and XML feeds. This may also be displayed by widgets in the front-office.')
+			.' '.T_(' HTML markup possible but not recommended.'), 50 );
 
 	$Form->end_fieldset();
 }
@@ -396,16 +411,43 @@ else
 	$Form->hidden( 'blog_order', $edited_Blog->get( 'order' ) );
 	$Form->hidden( 'blog_in_bloglist', $edited_Blog->get( 'in_bloglist' ) );
 	$Form->hidden( 'blog_tagline', $edited_Blog->get( 'tagline' ) );
+	$Form->hidden( 'blog_shortdesc', $edited_Blog->get( 'shortdesc' ) );
 	$Form->hidden( 'blog_longdesc', $edited_Blog->get( 'longdesc' ) );
 }
 
+if( ! $is_creating )
+{
+	$Form->begin_fieldset( T_('Meta data').get_manual_link('blog-meta-data') );
+		$social_media_boilerplate_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select logo for social media boilerplate'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
+		$Form->fileselect( 'social_media_image_file_ID', $edited_Blog->get_setting( 'social_media_image_file_ID' ), T_('Social media boilerplate'), NULL, $social_media_boilerplate_params );
+		$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
+		$Form->text( 'blog_footer_text', $edited_Blog->get_setting( 'blog_footer_text' ), 60, T_('Blog footer'), sprintf(
+			T_('Use &lt;br /&gt; to insert a line break. You might want to put your copyright or <a href="%s" target="_blank">creative commons</a> notice here.'),
+			'http://creativecommons.org/license/' ), 1000, 'large' );
+		$Form->textarea( 'single_item_footer_text', $edited_Blog->get_setting( 'single_item_footer_text' ), 2, T_('Single post footer'),
+			T_('This will be displayed after each post in single post view.').' '.sprintf( T_('Available variables: %s.'), '<b>$perm_url$</b>, <b>$title$</b>, <b>$excerpt$</b>, <b>$author$</b>, <b>$author_login$</b>' ), 50 );
+		$Form->textarea( 'xml_item_footer_text', $edited_Blog->get_setting( 'xml_item_footer_text' ), 2, T_('Post footer in RSS/Atom'),
+			T_('This will be appended to each post in your RSS/Atom feeds.').' '.sprintf( T_('Available variables: %s.'), T_('same as above') ), 50 );
+		$Form->textarea( 'blog_notes', $edited_Blog->get( 'notes' ), 5, T_('Notes'),
+			T_('Additional info. Appears in the backoffice.'), 50 );
+	$Form->end_fieldset();
+}
+else
+{
+	$Form->hidden( 'blog_keywords', $edited_Blog->get( 'keywords' ) );
+	$Form->hidden( 'blog_footer_text', $edited_Blog->get_setting( 'blog_footer_text' ) );
+	$Form->hidden( 'single_item_footer_text', $edited_Blog->get_setting( 'single_item_footer_text' ) );
+	$Form->hidden( 'xml_item_footer_text', $edited_Blog->get_setting( 'xml_item_footer_text' ) );
+	$Form->hidden( 'blog_notes', $edited_Blog->get( 'notes' ) );
+}
 
-$Form->buttons( array( array( 'submit', 'submit', ( $action == 'copy' ? sprintf( T_('Save and duplicate all settings from %s'), $edited_Blog->get( 'shortname' ) ) : T_('Save Changes!') ), 'SaveButton' ) ) );
+
+$Form->buttons( array( array( 'submit', 'submit', ( $action == 'copy' ? T_('Duplicate NOW!') : T_('Save Changes!') ), 'SaveButton' ) ) );
 
 $Form->end_form();
 
 ?>
-<script type="text/javascript">
+<script>
 
 function updateDemoContentInputs()
 {
@@ -442,4 +484,13 @@ jQuery( '#blog_name' ).keyup( function()
 	jQuery( '#blog_name_chars_count' ).html( jQuery( this ).val().replace( /&[^;\s]+;/g, '&' ).length );
 } );
 
+jQuery( '#duplicate_items' ).click( function()
+{	// Disable option for comments duplicating when items duplicating is disabled:
+	jQuery( '#duplicate_comments' ).prop( 'disabled', ! jQuery( this ).is( ':checked' ) );
+} );
+
+jQuery( '#blog_shortdesc' ).keyup( function()
+{	// Count characters of meta short description(each html entity is counted as single char):
+	jQuery( '#blog_shortdesc_chars_count' ).html( jQuery( this ).val().replace( /&[^;\s]+;/g, '&' ).length );
+} );
 </script>

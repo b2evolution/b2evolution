@@ -1707,8 +1707,8 @@ class Form extends Widget
 		{
 			$precision_mn = $matches[1];
 			$precision_s = 0;
-			// convert the precision in sec
-			$precision *= 60;
+			// convert the precision in sec:
+			$precision = $precision_mn * 60;
 		}
 		else
 		{
@@ -2205,7 +2205,7 @@ class Form extends Widget
 		if( $this->form_type == 'form' )	// DO not do this for div's
 		{	// Initialization of javascript vars used to create parent_child select lists
 			// fp>yura: TODO: does this make sense to add it to every form??
-			$r .= '<script type="text/javascript">
+			$r .= '<script>
 								var nb_dynamicSelects = 0;
 								var tab_dynamicSelects = Array();
 						</script>';
@@ -2217,7 +2217,7 @@ class Form extends Widget
 			&& preg_match( '#^(.*)_checkchanges#', $this->form_name ) )
 		{ // This form will trigger the bozo validator, preset a localized bozo confirm message:
 
-			$r .= '<script type="text/javascript">
+			$r .= '<script>
 					if( typeof bozo == "object" )
 					{ // If Bozo validator is active:
 						bozo.confirm_mess = \'';
@@ -2309,7 +2309,7 @@ class Form extends Widget
 
 			// When the page loads, Initialize all the parent child select lists + other javascripts
 			$r .= '
-				<script type="text/javascript">
+				<script>
 					//<![CDATA[
 					if( typeof init_dynamicSelect == "function" )
 					{
@@ -2730,15 +2730,35 @@ class Form extends Widget
 
 		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form-control';
 
-		$r .="\n<select".get_field_attribs_as_string($field_params).'>'
+		if( isset($field_params['input_prefix']) )
+		{
+			$input_prefix = $field_params['input_prefix'];
+			unset($field_params['input_prefix']); // no HTML attribute
+		}
+		else
+		{
+			$input_prefix = '';
+		}
+
+		if( isset($field_params['input_suffix']) )
+		{
+			$input_suffix = $field_params['input_suffix'];
+			unset($field_params['input_suffix']); // no HTML attribute
+		}
+		else
+		{
+			$input_suffix = "\n";
+		}
+
+		$r .= $input_prefix.'<select'.get_field_attribs_as_string( $field_params ).'>'
 			 .$field_options
-			 ."</select>\n";
+			 .'</select>'.$input_suffix;
 
 		$r .= $this->end_field();
 
 		if( !empty( $field_params['parent'] ) )
 		{ // Set up the dynamic preselection array from the parent to this select list options
-			$r .= "<script type='text/javascript'>
+			$r .= "<script>
 								tab_dynamicSelects[nb_dynamicSelects] = Array();
 								tab_dynamicSelects[nb_dynamicSelects]['parent'] = '".$field_params['parent']."';
 								tab_dynamicSelects[nb_dynamicSelects]['child'] = '$field_name';
@@ -4031,7 +4051,7 @@ class Form extends Widget
 			if( empty( $file_select_js_initialized ) )
 			{
 				$r .= '
-						<script type="text/javascript">
+						<script>
 						var fsel_size, fsel_name, fsel_type, fsel_obj, fsel_replace = false, fsel_title;
 
 						function file_select_attachment_window( event_object, replace_item, fm_highlight )
@@ -4225,6 +4245,24 @@ class Form extends Widget
 
 
 	/**
+	 * Generate a user tag text input
+	 *
+	 * @param string The name of the input field. This gets used for id also, if no id given in $field_params.
+	 * @param string Initial value
+	 * @param integer Size of the input field
+	 * @param string Label displayed with the field
+	 * @param string "help" note (Should provide something useful, otherwise leave it empty)
+	 * @param array Optional params, @see $this->tag_input() and $this->text_input()
+	 */
+	function usertag_input( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_params = array() )
+	{
+		$field_params['tag_type'] = 'user';
+
+		return $this->tag_input( $field_name, $field_value, $field_size, $field_label, $field_note, $field_params );
+	}
+
+
+	/**
 	 * Generate a tag text input
 	 *
 	 * @param string The name of the input field. This gets used for id also, if no id given in $field_params.
@@ -4232,37 +4270,48 @@ class Form extends Widget
 	 * @param integer Size of the input field
 	 * @param string Label displayed with the field
 	 * @param string "help" note (Should provide something useful, otherwise leave it empty)
-	 * @param array Optional params. Additionally to {@link $_common_params} you can use:
-	 *              - 'class': CSS class for select
-	 *              - 'required': will only mark field as required, no front-end validation implemented
+	 * @param array Optional params. Additionally to {@link $this->text_input()} you can use:
+	 *              - 'tag_type': What tags should be displayed in suggesting list, 'user' - user tags, 'item' - item/post tags
 	 */
-	function usertag_input( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_params = array() )
+	function tag_input( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_params = array() )
 	{
 		global $tag_input_js_initialized;
 
 		$field_params = array_merge( array(
-			'input_prefix' => '<div class="input-group user_admin_tags" style="width: 100%">',
+			'tag_type'     => 'item', // 'user' - to load in suggesting tags list only existing user tags, 'item' - item/post tags
+			'input_prefix' => '<div class="evo_input__tags">',
 			'input_suffix' => '</div>',
 		), $field_params );
 
 		if( isset( $field_params['required'] ) && $field_params['required'] === true )
-		{ // We can only mark this field as required, the actual input is hidden and cannot be focused on when validation fails.
+		{	// We can only mark this field as required, the actual input is hidden and cannot be focused on when validation fails
 			$field_params['required'] = 'mark_only';
 		}
 
-		$save_output = $this->output;
-		$this->output = false;
-
-		$r = $this->text_input( $field_name, $field_value, $field_size, $field_label, '', $field_params );	// TEMP: Note already in params
-
-		if( ! isset( $tag_input_js_initialized ) )
+		switch( $field_params['tag_type'] )
 		{
-			$r .= '<script type="text/javascript">
-						function init_autocomplete_tags( selector )
+			case 'user':
+				$tags_url = get_restapi_url().'usertags';
+				break;
+			case 'item':
+			default:
+				$tags_url = get_restapi_url().'tags';
+				break;
+		}
+
+		if( ! is_array( $tag_input_js_initialized ) )
+		{
+			$tag_input_js_initialized = array();
+		}
+
+		if( ! isset( $tag_input_js_initialized[ $field_params['tag_type'] ] ) )
+		{
+			$field_params['input_suffix'] .= '<script>
+						function init_autocomplete_tags_'.$field_params['tag_type'].'( selector )
 						{
 							var tags = jQuery( selector ).val();
 							var tags_json = new Array();
-							if( tags.length > 0 )
+							if( tags && tags.length > 0 )
 							{ // Get tags from <input>
 								tags = tags.split( \',\' );
 								for( var t in tags )
@@ -4271,7 +4320,7 @@ class Form extends Widget
 								}
 							}
 
-							jQuery( selector ).tokenInput( \''.get_restapi_url().'usertags\',
+							jQuery( selector ).tokenInput( \''.$tags_url.'\',
 							{
 								theme: \'facebook\',
 								queryParam: \'s\',
@@ -4286,21 +4335,22 @@ class Form extends Widget
 							} );
 						}
 						</script>';
-			$tag_input_js_initialized = true;
+			$tag_input_js_initialized[ $field_params['tag_type'] ] = true;
 		}
 
-		$r .= '<script type="text/javascript">
+		$field_params['input_suffix'] .= '<script>
 					jQuery( document ).ready( function()
 					{
 						jQuery( "#'.format_to_js( $field_name ).'" ).hide();
-						init_autocomplete_tags( "#'.format_to_js( $field_name ).'" );'.
+						init_autocomplete_tags_'.$field_params['tag_type'].'( "#'.format_to_js( $field_name ).'" );'.
 						get_prevent_key_enter_js( '#token-input-'.$field_name ).'
 					} );
 					</script>';
 
-		$this->output = $save_output;
+		// Unset this param because we don't need this as attribute of the text input element:
+		unset( $field_params['tag_type'] );
 
-		return $this->display_or_return( $r );
+		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_note, $field_params );
 	}
 
 
@@ -4455,18 +4505,26 @@ class Form extends Widget
 
 		$r = $input_prefix;
 
-		if( $field_params['tag'] == 'button' )
+		switch( $field_params['tag'] )
 		{
-			$value = $field_params['value'];
-			unset( $field_params['value'] );
-			unset( $field_params['tag'] );
+			case 'button':
+				$value = $field_params['value'];
+				unset( $field_params['value'] );
+				unset( $field_params['tag'] );
+				$r .= '<button'.get_field_attribs_as_string( $field_params, $format_to_output ).'>'.$value.'</button>';
+				break;
 
-			$r .= '<button'.get_field_attribs_as_string( $field_params, $format_to_output ).'>'.$value.'</button>';
-		}
-		else
-		{
-			unset( $field_params['tag'] );
-			$r .= '<input'.get_field_attribs_as_string( $field_params, $format_to_output ).' />';
+			case 'link':
+				$value = $field_params['value'];
+				unset( $field_params['value'] );
+				unset( $field_params['tag'] );
+				unset( $field_params['type'] );
+				$r .= '<a'.get_field_attribs_as_string( $field_params, $format_to_output ).'>'.$value.'</a>';
+				break;
+
+			default:
+				unset( $field_params['tag'] );
+				$r .= '<input'.get_field_attribs_as_string( $field_params, $format_to_output ).' />';
 		}
 
 		$r .= $input_suffix;
@@ -4850,6 +4908,81 @@ class Form extends Widget
 		$r .= $this->end_field( $field_type );
 
 		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Display attachments fieldset
+	 *
+	 * @param object Object of the links owner
+	 * @param boolean TRUE to allow folding for this fieldset, FALSE - otherwise
+	 * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
+	 */
+	function attachments_fieldset( $object, $fold = false, $fieldset_prefix = '' )
+	{
+		global $current_User;
+
+		// Get object type to initialize link owner
+		$object_type = get_class( $object );
+
+		if( $object_type != 'Comment' && ! is_logged_in() )
+		{	// User must logged in for all other objects like Item, Message and EmailCampaign:
+			// (for Comment we can allow to attach files by anonymous user depending on collection setting)
+			return;
+		}
+
+		// Declare this object as global because it is used in many link functions:
+		global $LinkOwner;
+
+		// Initialize link owner depending on object type:
+		switch( $object_type )
+		{
+			case 'Comment':
+				$Comment = $object;
+				$comment_Item = & $Comment->get_Item();
+				if( ! $comment_Item->check_blog_settings( 'allow_attachments' ) )
+				{	// Item attachments must be allowed by collection setting depending on user type(anounymous, registered, member and etc.):
+					return;
+				}
+				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+				$LinkOwner = new LinkComment( $Comment, $Comment->temp_link_owner_ID );
+				break;
+
+			case 'Item':
+				$Item = $object;
+				if( ! $Item->get_type_setting( 'allow_attachments' ) )
+				{	// Item attachments must be allowed for the item type
+					return;
+				}
+				load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+				$LinkOwner = new LinkItem( $Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
+				break;
+
+			case 'Message':
+				if( ! is_admin_page() )
+				{	// Message attachments are allowed only on back-office
+					return;
+				}
+				$Message = $object;
+				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+				$LinkOwner = new LinkMessage( $Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+				break;
+
+			case 'EmailCampaign':
+				$EmailCampaign = $object;
+				load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
+				$LinkOwner = new LinkEmailCampaign( $EmailCampaign );
+				break;
+
+			default:
+				debug_die( 'Wrong object type "'.$object_type.'" to display attachments fieldset!' );
+		}
+
+		// Display attachments fieldset:
+		display_attachments_fieldset( $this, $LinkOwner, $fold, $fieldset_prefix );
+
+		// Insert image modal window:
+		echo_image_insert_modal();
 	}
 }
 

@@ -25,6 +25,9 @@ $is_login_page = true;
 
 require_once $inc_path.'_main.inc.php';
 
+// Check and redirect if current URL must be used as https instead of http:
+check_https_url( 'login' );
+
 $login = param( $dummy_fields['login'], 'string', '' );
 param_action( 'req_login' );
 param( 'mode', 'string', '' );
@@ -112,6 +115,9 @@ switch( $action )
 
 	case 'resetpassword':
 		// Send password reset request by email:
+
+		// Stop a request from the blocked IP addresses or Domains
+		antispam_block_request();
 
 		global $servertimenow;
 		$login_required = true; // Do not display "Without login.." link on the form
@@ -580,7 +586,7 @@ switch( $action )
 
 if( strlen( $redirect_to ) )
 { // Make it relative to the form's target, in case it has been set absolute (and can be made relative).
-	$redirect_to = url_rel_to_same_host( $redirect_to, get_htsrv_url( true ) );
+	$redirect_to = url_rel_to_same_host( $redirect_to, get_htsrv_url( 'login' ) );
 }
 if( preg_match( '#/login.php([&?].*)?$#', $redirect_to ) )
 { // avoid "endless loops"
@@ -592,7 +598,7 @@ $Debuglog->add( 'redirect_to: '.$redirect_to );
 
 if( strlen( $return_to ) )
 { // Make it relative to the form's target, in case it has been set absolute (and can be made relative).
-	$return_to = url_rel_to_same_host( $return_to, get_htsrv_url( true ) );
+	$return_to = url_rel_to_same_host( $return_to, get_htsrv_url( 'login' ) );
 }
 if( preg_match( '#/login.php([&?].*)?$#', $return_to ) )
 { // avoid "endless loops"
@@ -650,14 +656,14 @@ if( $inskin && use_in_skin_login() )
 
 
 /**
- * Display one of the standard login management screens:
+ * Display one of the basic login management screens:
  */
 switch( $action )
 {
 	case 'lostpassword':
 		// Lost password:
 		$page_title = T_('Lost your password?');
-		$hidden_params = array( 'redirect_to' => url_rel_to_same_host( $redirect_to, get_htsrv_url( true ) ) );
+		$hidden_params = array( 'redirect_to' => url_rel_to_same_host( $redirect_to, get_htsrv_url( 'login' ) ) );
 		$wrap_width = '480px';
 
 		// Use the links in the form title

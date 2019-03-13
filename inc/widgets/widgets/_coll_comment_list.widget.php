@@ -178,7 +178,7 @@ class coll_comment_list_Widget extends ComponentWidget
 		$CommentList = new CommentList2( $listBlog, $limit, 'CommentCache', $this->code.'_' );
 
 		$filters = array(
-				'types' => array( 'comment','trackback','pingback' ),
+				'types' => array( 'comment','trackback','pingback','webmentions' ),
 				'statuses' => explode( ',', $listBlog->get_setting( 'comment_inskin_statuses' ) ),
 				'order' => $order,
 				'comments' => $limit,
@@ -200,7 +200,7 @@ class coll_comment_list_Widget extends ComponentWidget
 
 		if( $count )
 		{
-			echo $this->disp_params[ 'block_start'];
+			echo $this->disp_params['block_start'];
 
 			// Display title if requested
 			$this->disp_title();
@@ -253,7 +253,7 @@ class coll_comment_list_Widget extends ComponentWidget
 
 			echo $this->disp_params['block_body_end'];
 
-			echo $this->disp_params[ 'block_end' ];
+			echo $this->disp_params['block_end'];
 
 			return true;
 		}

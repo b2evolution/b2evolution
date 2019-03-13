@@ -27,7 +27,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher;
+global $admin_url;
 
 // Check permission:
 $current_User->check_perm( 'admin', 'normal', true );
@@ -88,13 +88,13 @@ if( is_file( $adminskins_path.'legacy/rsc/css/custom.css' ) )
 	$head .= '<link href="'.$adminskins_url.'legacy/rsc/css/custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />';
 }
 $head .= <<<EOB
-<script type="text/javascript" src="{$rsc_url}js/styleswitcher.js?v=2"></script>
+<script src="{$rsc_url}js/styleswitcher.js?v=2"></script>
 </head>
 <body>
 <div id="header">
 	<div id="headinfo">
 		<span style="font-size:150%; font-weight:bold">Movable Type to b2evolution importer</span>
-		[<a href="{$dispatcher}?ctrl=tools">Back to b2evolution</a>]
+		[<a href="{$admin_url}?ctrl=tools">Back to b2evolution</a>]
 	</div>
 EOB;
 
@@ -132,7 +132,7 @@ param( 'import_mode', 'string', 'normal' );
 	foreach( array( 'easy', 'normal', 'expert' ) as $tab )
 	{
 		echo ( $tab == $import_mode ) ? '<li class="current">' : '<li>';
-		echo '<a href="'.$dispatcher.'?ctrl=mtimport&amp;import_mode='.$tab.( !empty($exportedfile) ? '&amp;exportedfile='.$exportedfile : '' ).'">'.ucwords($tab).'</a></li>';
+		echo '<a href="'.$admin_url.'?ctrl=mtimport&amp;import_mode='.$tab.( !empty($exportedfile) ? '&amp;exportedfile='.$exportedfile : '' ).'">'.ucwords($tab).'</a></li>';
 	}
 ?></ul>
 </div>
@@ -210,7 +210,7 @@ param( 'import_mode', 'string', 'normal' );
 			echo '['.$exportedfile.'].';
 			if( '' == MTEXPORT )
 			{
-				?> [<a href="<?php echo $dispatcher ?>?ctrl=mtimport&amp;import_mode=<?php echo $import_mode ?>">choose another export-file</a>]<?php
+				?> [<a href="<?php echo $admin_url; ?>?ctrl=mtimport&amp;import_mode=<?php echo $import_mode ?>">choose another export-file</a>]<?php
 			} ?></p>
 
 		<p>This file contains <?php echo count( $posts ) ?> post(s) from <?php echo count( $authors ) ?> author(s) in <?php echo count( $categories ) ?> category(ies).</p>
@@ -231,7 +231,7 @@ param( 'import_mode', 'string', 'normal' );
 
 
 		<div class="panelblock">
-		<form class="fform" action="<?php echo $dispatcher ?>" method="post">
+		<form class="fform" action="<?php echo $admin_url; ?>" method="post">
 			<input type="hidden" name="ctrl" value="mtimport" />
 			<input type="hidden" name="action" value="import" />
 		<?php
@@ -430,7 +430,7 @@ param( 'import_mode', 'string', 'normal' );
 				$i++;
 			}
 
-			echo '<p class="center"><a id="imgurls" href="<?php echo $dispatcher ?>?ctrl=mtimport&amp;tab=import&amp;singleimgurls='.( $singleimgurls ? '0' : '1' );
+			echo '<p class="center"><a id="imgurls" href="<?php echo $admin_url; ?>?ctrl=mtimport&amp;tab=import&amp;singleimgurls='.( $singleimgurls ? '0' : '1' );
 			if( !empty($exportedfile) ) echo '&amp;exportedfile='.$exportedfile;
 			echo '">'.( $singleimgurls ? 'hide img urls only used once' : 'show also img urls only used once').'</a></p>';
 
@@ -1148,7 +1148,7 @@ param( 'import_mode', 'string', 'normal' );
 		if( $simulate )
 		{
 			echo '
-			<form action="'.$dispatcher.'" method="post">
+			<form action="'.$admin_url.'" method="post">
 			<input type="hidden" name="ctrl" value="mtimport" />
 			<p>
 			<strong>This was only simulated..</strong>
@@ -1398,7 +1398,7 @@ function import_data_extract_authors_cats()
 	global $categories_countprim;
 	global $importdata;
 	global $import_mode;
-	global $dispatcher;
+	global $admin_url;
 
 	$fp = fopen( $exportedfile, 'rb');
 //slamp_080609_begin: to avoid warning when importing file with 0 bytes of data
@@ -1413,7 +1413,7 @@ function import_data_extract_authors_cats()
 	fclose($fp);
 	if( !preg_match( '/^[-\s]*AUTHOR: /', $buffer ) )
 	{
-		dieerror("The file [$exportedfile] does not seem to be a MT exported file.. ".'[<a href="'.$dispatcher.'?ctrl=mtimport&amp;import_mode='.$import_mode.'">choose another export-file</a>]');
+		dieerror("The file [$exportedfile] does not seem to be a MT exported file.. ".'[<a href="'.$admin_url.'?ctrl=mtimport&amp;import_mode='.$import_mode.'">choose another export-file</a>]');
 	}
 
 	$importdata = preg_replace( "/\r?\n|\r/", "\n", $buffer );
@@ -1597,7 +1597,7 @@ function debug_dump( $var, $title = '' )
 
 function chooseexportfile()
 {
-	global $exportedfile, $import_mode, $dispatcher;
+	global $exportedfile, $import_mode, $admin_url;
 
 	// Go through directory:
 	$this_dir = dir( IMPORT_SRC_DIR );
@@ -1615,7 +1615,7 @@ function chooseexportfile()
 	if( $r )
 	{
 		?>
-		<form action="<?php echo $dispatcher ?>" class="center">
+		<form action="<?php echo $admin_url ?>" class="center">
 			<p>First, choose a file to import (.TXT files from the b2evolution base directory):</p>
 			<select name="exportedfile" onChange="submit()">
 				<?php echo $r ?>

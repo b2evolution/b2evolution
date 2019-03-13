@@ -19,11 +19,41 @@ $params = array_merge( array(
 	), $params );
 
 $recipient_user_ID  = empty( $params['recipient_User'] ) ? NULL : $params['recipient_User']->ID;
-?>
 
+if( ! in_array( $params['template_name'], array( 'account_activate', 'account_activated' ) ) )
+{
+	// Add custom messages here
+}
+
+if( ! empty( $params['is_welcome_email'] ) )
+{	// If this is a welcome email campaign on newsletter subsribing:
+	// Add custom messages here
+}
+
+if( isset( $params['ecmp_ID'] ) && $params['ecmp_ID'] == 1 )
+{	// Email Campaign #1 is sending now:
+	// Add custom messages here
+}
+
+if( isset( $params['enlt_ID'] ) && $params['enlt_ID'] == 1 )
+{	// Newsletter/List #1 is sending now:
+	// Add custom messages here
+}
+
+if( check_usertags( $recipient_user_ID, array( 'user_tag_1', 'user_tag_2' ), 'has_any' ) )
+{	// Check user tags of the recipient, 3rd param has 3 values:
+	//   'has_any' - has at least one tag from the array,
+	//   'has_all' - has all tags from the array,
+	//   'has_none' - has no all tags from the array.
+	// Add custom messages here
+}
+
+?>
+</div>
 </div>
 
 <div class="email_footer"<?php echo emailskin_style( 'div.email_footer' ); ?>>
+<div style="max-width: 700px; margin: 1ex auto;">
 
 <?php
 echo '<p'.emailskin_style( '.p' ).'><b>'.T_( 'Please do not reply to this email!' ).'</b><br />'."\n";
@@ -51,7 +81,7 @@ if( ! empty( $params['recipient_User'] ) || ! empty( $params['comment_ID'] ) )
 
 echo '<p'.emailskin_style( '.p+p.center' ).'><img'.emailskin_style( '.img+img.b2evo' ).' src="'.$rsc_url.'img/powered-by-b2evolution-120t.gif" alt="Powered by b2evolution" /></p>';
 ?>
-
+</div>
 </div>
 
 </div><?php /* End of "div.email_wrap"*/?>

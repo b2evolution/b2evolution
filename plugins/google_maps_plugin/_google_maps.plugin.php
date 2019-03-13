@@ -34,7 +34,7 @@ class google_maps_plugin extends Plugin
 	var $name = 'Google Maps';
 	var $code = 'evo_Gmaps';
 	var $priority = 50;
-	var $version = '6.10.1';
+	var $version = '6.11.0';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -357,8 +357,8 @@ class google_maps_plugin extends Plugin
 
 	?>
 	<div id="map_canvas" style="width:100%; <?php echo $height; ?>; margin: 5px 0px;"></div>
-	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=<?php echo $api_key;?>"></script>
-	<script type="text/javascript">
+	<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $api_key;?>"></script>
+	<script>
 	var post_position = 0;
 	<?php
 	switch ($map_type)
@@ -973,8 +973,8 @@ function locate()
 		?>
 		<div class="map_title"><?php echo $this->get_widget_setting('map_title_coll'.$Blog->ID, $params); ?></div>
 		<div class="map_canvas" id="map_canvas<?php echo $this->number_of_widgets; ?>" style="<?php echo $width; ?>; <?php echo $height; ?>; margin: 5px 5px 5px 5px;"></div>
-		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=<?php echo $api_key;?>"></script>
-		<script type="text/javascript">
+		<script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $api_key;?>"></script>
+		<script>
 		<?php
 		$map_type = (string)$this->get_widget_setting('map_type', $params);
 		switch ($map_type)

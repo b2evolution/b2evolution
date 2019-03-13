@@ -21,7 +21,7 @@ class custom_tags_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc = 'Custom tags';
 	var $long_desc;
-	var $version = '0.1';
+	var $version = '6.11.0';
 	var $number_of_installs = 1;
 
 	// Internal
@@ -470,7 +470,7 @@ class custom_tags_plugin extends Plugin
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		?><script type="text/javascript">
+		?><script>
 		//<![CDATA[
 		<?php echo $js_code_prefix;?>_tagButtons = new Array();
 		<?php echo $js_code_prefix;?>_tagOpenTags = new Array();
@@ -631,7 +631,7 @@ class custom_tags_plugin extends Plugin
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $js_code_prefix.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript"><?php echo $js_code_prefix;?>_tagToolbar();</script><?php
+		?><script><?php echo $js_code_prefix;?>_tagToolbar();</script><?php
 
 		return true;
 	}

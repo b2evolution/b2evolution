@@ -252,6 +252,14 @@ class Results extends Table
 	var $query_title_prefix = '';
 
 	/**
+	 * List of checkbox toggle selectors to display checkbox toggle panel.
+	 * Can be a single selector, e.g., 'input[name^=prefix_]:checkbox',
+	 * or an array of selectors for toggling multiple set of checkboxes,
+	 * e.g., array( 'Checkbox set 1 label' => 'input[^=set1_]:checkbox', 'Checkbox set 2 label' => 'input[^=set2_]:checkbox' )
+	 */
+	var $checkbox_toggle_selectors;
+
+	/**
 	 * Constructor
 	 *
 	 * @todo we might not want to count total rows when not needed...
@@ -1462,6 +1470,58 @@ class Results extends Table
 
 
 	/**
+	 * Display list/table end.
+	 *
+	 * Typically outputs </ul> or </table>
+	 */
+	function display_list_end()
+	{
+		if( $this->total_pages == 0 )
+		{ // There are no results! Nothing to display!
+			echo $this->replace_vars( $this->params['no_results_end'] );
+		}
+		else
+		{	// We have rows to display:
+			$r = '';
+			if( ! empty( $this->checkbox_toggle_selectors ) )
+			{
+				$r .= $this->params['footer_start'];
+				$r .= '<div class="form-inline">';
+				if( is_array( $this->checkbox_toggle_selectors ) && count( $this->checkbox_toggle_selectors ) > 1 )
+				{
+					$r .= '<select class="form-control input-sm">';
+					foreach( $this->checkbox_toggle_selectors as $label => $selector )
+					{
+						$r .= '<option value="'.format_to_output( $selector, 'formvalue' ).'">'.$label.'</option>';
+					}
+					$r .= '</select> ';
+					$r .= '<input type="button" class="btn btn-default btn-xs" value="'.T_('Check all').'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', true );" /> '.
+							'<input type="button" class="btn btn-default btn-xs" value="'.T_('Uncheck all').'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', false );" /> '.
+							'<input type="button" class="btn btn-default btn-xs" value="'.T_('Reverse').'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).each( function() { this.checked = !this.checked } );"  />';
+				}
+				else
+				{
+					if( is_array( $this->checkbox_toggle_selectors ) )
+					{
+						$selector = current( $this->checkbox_toggle_selectors );
+					}
+					else
+					{
+						$selector = $this->checkbox_toggle_selectors;
+					}
+					$r .= '<input type="button" class="btn btn-default btn-xs" value="'.T_('Check all').'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', true );" /> '.
+							'<input type="button" class="btn btn-default btn-xs" value="'.T_('Uncheck all').'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', false );" /> '.
+							'<input type="button" class="btn btn-default btn-xs" value="'.T_('Reverse').'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).each( function() { this.checked = !this.checked } );"  />';
+				}
+				$r .= '</div>';
+				$r .= $this->params['footer_end'];
+			}
+			echo $this->params['list_end'].$r;
+		}
+	}
+
+
+	/**
 	 * Returns values needed to make sort links for a given column
 	 *
 	 * Returns an array containing the following values:
@@ -1975,21 +2035,33 @@ class Results extends Table
 	function display_first( $page_url = '' )
 	{
 		$r = '';
-		if( $this->page == 1 )
+		if( $this->page == 1 && isset( $this->params['page_item_current_before'] ) )
 		{
-			if( isset( $this->params['page_item_current_before'] ) )
-			{
-				$r .= add_tag_class( $this->params['page_item_current_before'], 'listnav_first' );
-			}
+			$r .= add_tag_class( $this->params['page_item_current_before'], 'listnav_first' );
 		}
 		elseif( isset( $this->params['page_item_before'] ) )
 		{
 			$r .= add_tag_class( $this->params['page_item_before'], 'listnav_first' );
 		}
 
-		$r .= '<a href="'.regenerate_url( $this->page_param, '', $page_url ).'">1</a>';
+		if( $this->page == 1 )
+		{	// no link for the current page
+			if( ! isset( $this->params['page_current_template'] ) )
+			{
+				$this->params['page_current_template'] = '<strong class="current_page">$page_num$</strong>';
+			}
+			$r .= str_replace( '$page_num$', 1, $this->params['page_current_template'] );
+		}
+		else
+		{	// a link for non-current pages
+			$r .= '<a href="'.regenerate_url( $this->page_param, '', $page_url ).'">1</a>';
+		}
 
-		if( isset( $this->params['page_item_after'] ) )
+		if( $this->page == 1 && isset( $this->params['page_item_current_after'] ) )
+		{
+			$r .= $this->params['page_item_current_after'];
+		}
+		elseif( isset( $this->params['page_item_after'] ) )
 		{
 			$r .= $this->params['page_item_after'];
 		}
@@ -2004,21 +2076,33 @@ class Results extends Table
 	function display_last( $page_url = '' )
 	{
 		$r = '';
-		if( $this->page == $this->total_pages )
+		if( $this->page == $this->total_pages && isset( $this->params['page_item_current_before'] ) )
 		{
-			if( isset( $this->params['page_item_current_before'] ) )
-			{
-				$r .= add_tag_class( $this->params['page_item_current_before'], 'listnav_last' );
-			}
+			$r .= add_tag_class( $this->params['page_item_current_before'], 'listnav_last' );
 		}
 		elseif( isset( $this->params['page_item_before'] ) )
 		{
 			$r .= add_tag_class( $this->params['page_item_before'], 'listnav_last' );
 		}
 
-		$r .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$this->total_pages, $page_url ).'">'.$this->total_pages.'</a>';
+		if( $this->page == $this->total_pages )
+		{	// no link for the current page
+			if( ! isset( $this->params['page_current_template'] ) )
+			{
+				$this->params['page_current_template'] = '<strong class="current_page">$page_num$</strong>';
+			}
+			$r .= str_replace( '$page_num$', $this->total_pages, $this->params['page_current_template'] );
+		}
+		else
+		{	// a link for non-current pages
+			$r .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$this->total_pages, $page_url ).'">'.$this->total_pages.'</a>';
+		}
 
-		if( isset( $this->params['page_item_after'] ) )
+		if( $this->page == $this->total_pages && isset( $this->params['page_item_current_after'] ) )
+		{
+			$r .= $this->params['page_item_current_after'];
+		}
+		elseif( isset( $this->params['page_item_after'] ) )
 		{
 			$r .= $this->params['page_item_after'];
 		}

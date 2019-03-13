@@ -177,9 +177,9 @@ switch ( $action )
 			break;
 		}
 
-		// Update group permissions for each colleciton:
+		// Update group permissions for each collection:
 		blog_update_perms( $edited_Group->ID, 'coll' );
-		$Messages->add( T_('The blog permissions have been updated'), 'success' );
+		$Messages->add( T_('The collection permissions have been updated.'), 'success' );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $admin_url.'?ctrl=groups&action=edit&tab=collection&grp_ID='.$edited_Group->ID, 303 ); // Will EXIT

@@ -332,7 +332,7 @@ function campaign_results_block( $params = array() )
 
 	$params = array_merge( array(
 		'enlt_ID'               => NULL,
-		'results_title'         => T_('Email campaigns').get_manual_link( 'email-campaigns' ),
+		'results_title'         => T_('Email campaigns').get_manual_link( 'email-campaign-list' ),
 		'display_create_button' => true
 	), $params );
 
@@ -396,7 +396,7 @@ function campaign_results_block( $params = array() )
 			'order' => 'ecmp_date_ts',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'timestamp compact_data',
+			'td_class' => 'timestamp',
 			'td' => '%mysql2localedatetime_spans( #ecmp_date_ts# )%',
 		);
 
@@ -425,7 +425,7 @@ function campaign_results_block( $params = array() )
 			'order' => 'ecmp_welcome',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' => '%campaign_td_welcome( #ecmp_ID#, #ecmp_welcome# )%',
+			'td' => '%campaign_td_welcome( #ecmp_ID#, #ecmp_welcome#, #ecmp_activate# )%',
 		);
 
 	$Results->cols[] = array(
@@ -433,7 +433,7 @@ function campaign_results_block( $params = array() )
 			'order' => 'ecmp_sent_ts',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'timestamp compact_data',
+			'td_class' => 'timestamp',
 			'td' => '%mysql2localedatetime_spans( #ecmp_sent_ts# )%',
 		);
 
@@ -442,13 +442,13 @@ function campaign_results_block( $params = array() )
 			'order' => 'ecmp_auto_sent_ts',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'timestamp compact_data',
+			'td_class' => 'timestamp',
 			'td' => '%mysql2localedatetime_spans( #ecmp_auto_sent_ts# )%',
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Send count'),
-			'order' => 'send_count',
+			'order' => 'ecmp_send_count',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
@@ -466,7 +466,7 @@ function campaign_results_block( $params = array() )
 
 	$Results->cols[] = array(
 			'th' => /* TRANS: Image load count */ T_('Img loads'),
-			'order' => 'open_count',
+			'order' => 'ecmp_img_loads',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
@@ -475,7 +475,7 @@ function campaign_results_block( $params = array() )
 
 	$Results->cols[] = array(
 			'th' => T_('Link clicks'),
-			'order' => 'click_count',
+			'order' => 'ecmp_link_clicks',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
@@ -484,6 +484,7 @@ function campaign_results_block( $params = array() )
 
 	$Results->cols[] = array(
 			'th' => /* TRANS: Call To Action 1*/ T_('CTA1'),
+			'order' => 'ecmp_cta1_clicks',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
 			'td' =>'%campaign_td_recipient_action( {row}, "cta1" )%',
@@ -491,6 +492,7 @@ function campaign_results_block( $params = array() )
 
 	$Results->cols[] = array(
 			'th' => /* TRANS: Call To Action 2*/ T_('CTA2'),
+			'order' => 'ecmp_cta2_clicks',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
 			'td' =>'%campaign_td_recipient_action( {row}, "cta2" )%',
@@ -498,6 +500,7 @@ function campaign_results_block( $params = array() )
 
 	$Results->cols[] = array(
 			'th' => /* TRANS: Call To Action 3*/ T_('CTA3'),
+			'order' => 'ecmp_cta3_clicks',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
 			'td' =>'%campaign_td_recipient_action( {row}, "cta3" )%',
@@ -505,6 +508,7 @@ function campaign_results_block( $params = array() )
 
 	$Results->cols[] = array(
 			'th' => T_('Likes'),
+			'order' => 'ecmp_like_count',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center text-success',
 			'td' =>'%campaign_td_recipient_action( {row}, "liked" )%',
@@ -512,6 +516,7 @@ function campaign_results_block( $params = array() )
 
 	$Results->cols[] = array(
 			'th' => T_('Dislikes'),
+			'order' => 'ecmp_dislike_count',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center text-danger',
 			//'td' =>'%empty( #send_count# ) ? "" : #dislike_count#%'
@@ -520,7 +525,7 @@ function campaign_results_block( $params = array() )
 
 	$Results->cols[] = array(
 			'th' => T_('Unsub clicks'),
-			'order' => 'unsubscribe_click_count',
+			'order' => 'ecmp_unsub_clicks',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center text-danger',
@@ -549,29 +554,46 @@ function campaign_results_block( $params = array() )
  *
  * @param integer Email Campaign ID
  * @param integer TRUE/1 if this is a welcome Email Campaign
+ * @param integer TRUE/1 if this is an activate Email Campaign
  * @return string
  */
-function campaign_td_welcome( $ecmp_ID, $ecmp_welcome )
+function campaign_td_welcome( $ecmp_ID, $ecmp_welcome, $ecmp_activate )
 {
 	global $current_User;
 
 	if( $ecmp_welcome )
-	{	// If newsletter is active:
+	{	// If email campaign is used as welcome message:
 		$welcome_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => T_('The email campaign is used as "Welcome" for its list.') ) );
+		if( $ecmp_activate )
+		{	// If email campaign is used as activate message:
+			$activate_icon = get_icon( 'bullet_dark_blue', 'imgtag', array( 'title' => T_('This welcome email doubles as an activation message. No separate activation email will be sent.') ) );
+		}
+		else
+		{	// If email campaign is NOT used as activate message:
+			$activate_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_('This welcome email does not act as an activation message.') ) );
+		}
 	}
 	else
-	{	// If newsletter is NOT active:
+	{	// If email campaign is NOT used as welcome message:
 		$welcome_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_('The email campaign is not used as "Welcome" for its list.') ) );
+		// Don't use email campaign as activate message when it is not used as welcome message:
+		$activate_icon = '';
 	}
 
 	if( $current_User->check_perm( 'emails', 'edit' ) )
-	{	// Make icon toggle welcome status if current User has a perm to edit this:
+	{	// Make icon(s) toggle welcome/activate statuses if current User has a perm to edit this:
 		global $admin_url, $ctrl;
-		$url_param = $ctrl == 'newsletters' ? '&amp;from='.$ctrl : '';
-		$welcome_icon = '<a href="'.$admin_url.'?ctrl=campaigns&amp;action='.( $ecmp_welcome ? 'disable_welcome' : 'enable_welcome' )
-			.'&amp;ecmp_ID='.$ecmp_ID.$url_param.'&amp;'.url_crumb( 'campaign' ).'">'.$welcome_icon.'</a>';
+		$icon_url = $admin_url.'?ctrl=campaigns'
+			.'&amp;ecmp_ID='.$ecmp_ID
+			.( $ctrl == 'newsletters' ? '&amp;from='.$ctrl : '' )
+			.'&amp;'.url_crumb( 'campaign' );
+		$welcome_icon = '<a href="'.$icon_url.'&amp;action='.( $ecmp_welcome ? 'disable_welcome' : 'enable_welcome' ).'">'.$welcome_icon.'</a>';
+		if( ! empty( $activate_icon ) )
+		{	// Make activate icon clickable:
+			$activate_icon = '<a href="'.$icon_url.'&amp;action='.( $ecmp_activate ? 'disable_activate' : 'enable_activate' ).'">'.$activate_icon.'</a>';
+		}
 	}
 
-	return $welcome_icon;
+	return $welcome_icon.( empty( $activate_icon ) ? '' : ' '.$activate_icon );
 }
 ?>

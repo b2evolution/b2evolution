@@ -344,6 +344,6 @@ foreach( $loaded_ids as $moderator_ID )
 	locale_restore_previous();
 }
 
-cron_log_append( ( ( $mail_sent + $mail_failed ) ? "\n" : '' ).sprintf( T_( '%d moderators have been notified!' ), $mail_sent ) );
+cron_log_append( ( ( $mail_sent + $mail_failed ) ? "\n" : '' ).sprintf( '%d of %d moderators have been notified!', $mail_sent, ( $mail_sent + $mail_failed ) ) );
 return 1; /*OK*/
 ?>

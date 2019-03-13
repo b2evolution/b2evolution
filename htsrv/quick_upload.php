@@ -96,6 +96,7 @@ param( 'upload', 'boolean', true );
 param( 'root_and_path', 'filepath', true );
 param( 'blog', 'integer' );
 param( 'link_owner', 'string' );
+param( 'fm_mode', 'string' );
 // Use the glyph or font-awesome icons if requested by skin
 param( 'b2evo_icons_type', 'string', '' );
 
@@ -126,7 +127,18 @@ if( $upload_path === false )
 	exit();
 }
 
-if( $upload && ( !$current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) ) )
+$link_owner_type = NULL;
+$link_owner_ID = NULL;
+$link_owner_is_temp = NULL;
+if( ! empty( $link_owner ) )
+{	// Get link owner data for Item/Comment/EmailCampaign/Message from request param:
+	list( $link_owner_type, $link_owner_ID, $link_owner_is_temp ) = explode( '_', $link_owner, 3 );
+	$link_owner_ID = intval( $link_owner_ID );
+}
+// Try to get LinkOwner by type and ID:
+$LinkOwner = get_LinkOwner( ( $link_owner_is_temp ? 'temporary' : $link_owner_type ), $link_owner_ID );
+
+if( $upload && ! check_perm_upload_files( $LinkOwner, $fm_FileRoot ) )
 {
 	$message['error'] = T_( 'You don\'t have permission to upload on this file root.' );
 	$message['status'] = 'error';
@@ -235,68 +247,17 @@ if( $upload )
 		// Prepare the uploaded file to the final format ( E.g. Resize and Rotate images )
 		prepare_uploaded_files( array( $newFile ) );
 
-		if( ! empty( $link_owner ) )
-		{	// Try to link the uploaded file to the object Item/Comment/EmailCampaign:
-			list( $link_owner_type, $link_owner_ID, $link_owner_is_temp ) = explode( '_', $link_owner, 3 );
-			$link_owner_ID = intval( $link_owner_ID );
-			if( $link_owner_ID > 0 )
+		if( isset( $LinkOwner ) )
+		{ // Link the uploaded file to the object only if it is found in DB:
+			$LinkCache = & get_LinkCache();
+			do
 			{
-				switch( $link_owner_type )
-				{
-					case 'item':
-						if( $link_owner_is_temp )
-						{	// Get LinkOwner object of the Temporary ID for new creating Item:
-							load_class( 'items/model/_item.class.php', 'Item' );
-							$LinkOwner = new LinkItem( new Item(), $link_owner_ID );
-						}
-						else
-						{	// Get LinkOwner object of the Item:
-							$ItemCache = & get_ItemCache();
-							if( $linked_Item = & $ItemCache->get_by_ID( $link_owner_ID, false, false ) )
-							{
-								$LinkOwner = new LinkItem( $linked_Item );
-							}
-						}
-						break;
-
-					case 'comment':
-						// Get LinkOwner object of the Comment
-						$CommentCache = & get_CommentCache();
-						if( $linked_Comment = & $CommentCache->get_by_ID( $link_owner_ID, false, false ) )
-						{
-							$LinkOwner = new LinkComment( $linked_Comment );
-						}
-						break;
-
-					case 'emailcampaign':
-						// Get LinkOwner object of the EmailCampaign:
-						$EmailCampaignCache = & get_EmailCampaignCache();
-						if( $linked_EmailCampaign = & $EmailCampaignCache->get_by_ID( $link_owner_ID, false, false ) )
-						{
-							$LinkOwner = new LinkEmailCampaign( $linked_EmailCampaign );
-						}
-						break;
-
-					case 'message':
-						// Get LinkOwner object of the Message:
-						load_class( 'messaging/model/_message.class.php', 'Message' );
-						$LinkOwner = new LinkMessage( new Message(), $link_owner_ID );
-						break;
-				}
+				$new_link_ID = $newFile->link_to_Object( $LinkOwner );
+				// Check if Link has been created really
+				$new_Link = & $LinkCache->get_by_ID( $new_link_ID, false, false );
 			}
-
-			if( isset( $LinkOwner ) )
-			{ // Link the uploaded file to the object only if it is found in DB
-				$LinkCache = & get_LinkCache();
-				do
-				{
-					$new_link_ID = $newFile->link_to_Object( $LinkOwner );
-					// Check if Link has been created really
-					$new_Link = & $LinkCache->get_by_ID( $new_link_ID, false, false );
-				}
-				while( empty( $new_Link ) );
-				$current_File = $newFile; // $current_File is used in the function link_actions() as global var
-			}
+			while( empty( $new_Link ) );
+			$current_File = $newFile; // $current_File is used in the function link_actions() as global var
 		}
 
 		$message = '';
@@ -388,7 +349,7 @@ if( $upload )
 		}
 
 		$message['warning'] = $warning;
-		$message['path'] = rawurlencode( $newFile->get_rdfp_rel_path() );
+		$message['path'] = $newFile->get_rdfp_rel_path();
 		$message['checkbox'] = '<span name="surround_check" class="checkbox_surround_init">'
 				.'<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"'
 				.' name="fm_selected[]" value="'.format_to_output( $newFile->get_rdfp_rel_path(), 'formvalue' ).'" id="cb_filename_u'.$newFile->ID.'" />'
@@ -403,13 +364,17 @@ if( $upload )
 			$message['link_preview'] = $new_Link->get_preview_thumb();
 			$message['link_actions'] = link_actions( $new_Link->ID, 'last', $link_owner_type );
 			$message['link_order'] = $new_Link->get( 'order' );
+			if( isset( $fm_mode ) && $fm_mode == 'file_select' )
+			{
+				$message['select_link_button'] = select_link_button( $new_Link->ID );
+			}
 			$mask_row = (object) array(
 					'link_ID'       => $new_Link->ID,
 					'file_ID'       => $newFile->ID,
 					'file_type'     => $newFile->get_file_type(),
 					'link_position' => $new_Link->get( 'position' ),
 				);
-			$message['link_position'] = display_link_position( $mask_row );
+			$message['link_position'] = display_link_position( $mask_row, $fm_mode != 'file_select'  );
 		}
 
 		out_echo( $message, $specialchars );

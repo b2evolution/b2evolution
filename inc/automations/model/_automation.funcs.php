@@ -22,7 +22,7 @@ function autm_display_breadcrumb()
 {
 	global $admin_url, $edited_Automation, $edited_AutomationStep;
 
-	echo '<nav aria-label="breadcrumb"><ol class="breadcrumb" style="margin-left:0">';
+	echo '<nav aria-label="breadcrumb"><ol class="breadcrumb">';
 	echo '<li class="breadcrumb-item'.( isset( $edited_Automation ) || isset( $edited_AutomationStep ) ? '' : ' active' ).'">'
 			.( isset( $edited_Automation ) || isset( $edited_AutomationStep ) ? '<a href="'.$admin_url.'?ctrl=automations">'.T_('All').'</a>' : T_('All') )
 		.'</li>';
@@ -212,6 +212,7 @@ function step_get_type_titles()
 		'subscribe'        => T_('Subscribe User to List'),
 		'unsubscribe'      => T_('Unsubscribe User from List'),
 		'start_automation' => T_('Start new automation'),
+		'user_status'      => T_('Change user account status'),
 	);
 }
 
@@ -278,6 +279,11 @@ function step_get_result_titles()
 			'NO'    => 'Users was already in the other automation %s',
 			'ERROR' => 'Automation does not exist',
 		),
+		'user_status' => array(
+			'YES'   => 'User account status was changed to %s',
+			'NO'    => 'User account is already in the desired status %s',
+			'ERROR' => 'ERROR: %s',
+		),
 	);
 }
 
@@ -327,8 +333,13 @@ function step_get_result_labels()
 		),
 		'start_automation' => array(
 			'YES'   => NT_('Next step if User started new automation successfully'),
-			'NO'    => NT_('Next step if Users was already in the other automation'),
+			'NO'    => NT_('Next step if User was already in the other automation'),
 			'ERROR' => NT_('Next step if Automation does not exist'),
+		),
+		'user_status' => array(
+			'YES'   => NT_('Next step if User account status was changed successfully'),
+			'NO'    => NT_('Next step if User account is already in the desired status'),
+			'ERROR' => NT_('Next step if User account status cannot be changed'),
 		),
 	);
 }
@@ -547,7 +558,7 @@ function echo_requeue_automation_js()
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_deldata.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_requeue_automation_for_finished_steps = \''.TS_('Requeue automation for finished steps').get_manual_link( 'requeue-automation-for-finished-steps' ).'\';
 		var evo_js_lang_requeue_automation_for_step_users = \''.TS_('Requeue automation for users of step #%s').get_manual_link( 'requeue-automation-for-step' ).'\';
@@ -585,8 +596,8 @@ function automation_results_block( $params = array() )
 		WHERE autm_ID = an.aunl_autm_ID ) AS newsletters' );
 	$SQL->FROM( 'T_automation__automation' );
 	$SQL->FROM_add( 'LEFT JOIN T_automation__user_state ON aust_autm_ID = autm_ID' );
-	$SQL->FROM_add( 'INNER JOIN T_automation__newsletter ON autm_ID = aunl_autm_ID' );
-	$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON enlt_ID = aunl_enlt_ID' );
+	$SQL->FROM_add( 'LEFT JOIN T_automation__newsletter ON autm_ID = aunl_autm_ID' );
+	$SQL->FROM_add( 'LEFT JOIN T_email__newsletter ON enlt_ID = aunl_enlt_ID' );
 	$SQL->GROUP_BY( 'autm_ID' );
 
 	$count_SQL = new SQL( 'Get a count of automations' );

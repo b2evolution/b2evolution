@@ -52,6 +52,7 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 
 	init_bubbletip_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) ); // Init popover windows for usernames
 	init_results_js(); // Add functions to work with Results tables
+	init_affix_messages_js();
 
 	require_js( '#jqueryUI#' ); // Need to animate background, e.g. in function evoFadeBg()
 
@@ -78,7 +79,7 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 		// gets initialized in _footer.php
 
 		$begin_script = <<<JS
-		<script type="text/javascript">
+		<script>
 		<!--
 		  var allchecked = Array();
 		  var idprefix;

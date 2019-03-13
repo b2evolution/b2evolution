@@ -295,6 +295,8 @@ switch( $action )
 			case 'general':
 				$AdminUI->set_page_manual_link( 'editing-an-email-list' );
 				$AdminUI->set_path( 'email', 'newsletters', 'general' );
+				// Init JS to autcomplete the user logins
+				init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 		}
 		break;
 
@@ -338,7 +340,7 @@ switch( $action )
 				// Display automations tied to this Newsletter:
 				automation_results_block( array(
 						'enlt_ID'               => $edited_Newsletter->ID,
-						'results_title'         => T_('Automations').get_manual_link( 'email-list-automations' ),
+						'results_title'         => T_('Automations').get_manual_link( 'automations-for-a-list' ),
 						'results_prefix'        => 'enltautm_',
 					) );
 				break;

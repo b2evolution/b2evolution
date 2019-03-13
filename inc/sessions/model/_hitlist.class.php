@@ -98,12 +98,13 @@ class Hitlist
 	 * NOTE: do not call this directly, but only in conjuction with auto_prune_stats_mode.
 	 *
 	 * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
+	 * @param boolean TRUE to limit a pruning by one execution per day
 	 * @return array array(
 	 *   'result'  => 'error' | 'ok'
 	 *   'message' => Message of the error or result data
 	 * )
 	 */
-	static function dbprune( $output_message = true )
+	static function dbprune( $output_message = true, $day_limit = true )
 	{
 		/**
 		 * @var DB
@@ -112,23 +113,32 @@ class Hitlist
 		global $Debuglog, $Settings, $localtimenow;
 		global $Plugins, $Messages;
 
+		$return_message = '';
+
 		// Prune when $localtime is a NEW day (which will be the 1st request after midnight):
 		$last_prune = $Settings->get( 'auto_prune_stats_done' );
 		if( $last_prune >= date( 'Y-m-d', $localtimenow ) && $last_prune <= date( 'Y-m-d', $localtimenow + 86400 ) )
 		{ // Already pruned today (and not more than one day in the future -- which typically never happens)
-			$message = T_('Pruning has already been done today');
+			$error_message = Hitlist::log_pruning( T_('Pruning has already been done today'), $output_message );
 			if( $output_message )
 			{
-				$Messages->add( $message, 'error' );
+				$Messages->add( $error_message, 'error' );
 			}
-			return array(
-					'result'  => 'error',
-					'message' => $message
-				);
+			if( $day_limit )
+			{	// Limit a pruning by one execution per day:
+				return array(
+						'result'  => 'error',
+						'message' => $error_message
+					);
+			}
+			else
+			{	// Don't limit by day but display a warning:
+				$return_message .= Hitlist::log_pruning( '<span class="text-danger">'.T_('WARNING').': '.$error_message.'</span>', $output_message );
+			}
 		}
 
 		// DO NOT TRANSLATE! (This is sysadmin level info -- we assume they can read English)
-		$return_message = Hitlist::log_pruning( 'STATUS:', $output_message );
+		$return_message .= Hitlist::log_pruning( 'STATUS:', $output_message );
 
 		// Get tables info:
 		$tables_info = $DB->get_results( 'SHOW TABLE STATUS WHERE Name IN ( '.$DB->quote( array( 'T_hitlog', 'T_sessions', 'T_basedomains' ) ).' )' );
@@ -175,14 +185,19 @@ class Hitlist
 		$sess_prune_before = ( $localtimenow - $Settings->get( 'timeout_sessions' ) );
 		// IMPORTANT: we cut off at the oldest date between session timeout and sessions pruning.
 		// So if session timeout is really long (2 years for example), the sessions table won't be pruned as small as expected from the pruning delay.
-		$smaller_time = min( $sess_prune_before, $time_prune_before );
+		$oldest_date = min( $sess_prune_before, $time_prune_before );
 
 		// allow plugins to prune session based data
-		$Plugins->trigger_event( 'BeforeSessionsDelete', $temp_array = array( 'cutoff_timestamp' => $smaller_time ) );
+		$Plugins->trigger_event( 'BeforeSessionsDelete', $temp_array = array( 'cutoff_timestamp' => $oldest_date ) );
 
 		// PRUNE SESSIONS:
 		$hitlist_Timer->start( 'sessions' );
-		$sessions_rows_affected = $DB->query( 'DELETE FROM T_sessions WHERE sess_lastseen_ts < '.$DB->quote( date( 'Y-m-d H:i:s', $smaller_time ) ), 'Autoprune sessions' );
+		$sessions_rows_affected = $DB->query( 'DELETE FROM T_sessions
+			WHERE
+				( sess_user_ID IS NOT NULL AND sess_lastseen_ts < '.$DB->quote( date( 'Y-m-d H:i:s', $oldest_date ) ).' )
+				OR
+				( sess_user_ID IS NULL AND sess_lastseen_ts < '.$DB->quote( date( 'Y-m-d H:i:s', $time_prune_before ) ).' )',
+			'Autoprune sessions' );
 		$hitlist_Timer->stop( 'sessions' );
 		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$sessions_rows_affected.' rows from T_sessions.', 'request' );
 		$return_message .= Hitlist::log_pruning( sprintf( '%s rows from T_sessions, Execution time: %s seconds', $sessions_rows_affected, $hitlist_Timer->get_duration( 'sessions' ) ), $output_message, true );

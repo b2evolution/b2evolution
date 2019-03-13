@@ -21,8 +21,6 @@ global $current_User;
  */
 global $Settings;
 
-global $dispatcher;
-
 global $collections_Module, $Plugins;
 
 global $baseurl;
@@ -63,6 +61,9 @@ $Form->begin_fieldset( T_('Default user permissions').get_manual_link('default-u
 	$Form->checkbox_input( 'quick_registration', $Settings->get( 'quick_registration' ), T_('Quick registration'), array_merge( array( 'note' => T_('Check to allow registering with email only (no username, no password) using the quick registration widget.' ) ), $disabled_param_grouplevel ) );
 
 	$GroupCache = & get_GroupCache();
+	$GroupCache->clear();
+	$GroupCache->load_where( 'grp_usage = "primary"' );
+	$GroupCache->all_loaded = true;
 	$Form->select_input_object( 'newusers_grp_ID', $Settings->get( 'newusers_grp_ID' ), $GroupCache, T_('Group for new users'), array_merge( array( 'note' => T_('Groups determine user roles and permissions.') ), $disabled_param_grouplevel ) );
 
 	$Form->text_input( 'newusers_level', $Settings->get( 'newusers_level' ), 1, T_('Level for new users'), T_('Levels determine hierarchy of users in blogs.' ), array_merge( array( 'maxlength' => 1, 'required' => true ), $disabled_param_grouplevel ) );
@@ -86,6 +87,7 @@ $Form->begin_fieldset( T_('Default user settings').get_manual_link('default-user
 			array( 'notify_unread_messages', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'I have unread private messages for more than 24 hours.' ),  $Settings->get( 'def_notify_unread_messages' ), false, T_( 'This notification is sent only once every 3 days.' ) ),
 		), 'default_user_notification', T_('Messaging') );
 	$Form->checklist( array(
+			array( 'notify_comment_mentioned', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'I have been mentioned on a comment.' ), $Settings->get( 'def_notify_comment_mentioned' ) ),
 			array( 'notify_published_comments', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is published on one of <strong>my</strong> posts.' ), $Settings->get( 'def_notify_published_comments' ) ),
 			array( 'notify_comment_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is posted and I have permissions to moderate it.' ), $Settings->get( 'def_notify_comment_moderation' ) ),
 			array( 'notify_edit_cmt_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is modified and I have permissions to moderate it.' ), $Settings->get( 'def_notify_edit_cmt_moderation' ) ),
@@ -93,6 +95,7 @@ $Form->begin_fieldset( T_('Default user settings').get_manual_link('default-user
 			array( 'notify_meta_comments', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a meta comment is posted and I have permission to view it.' ), $Settings->get( 'def_notify_meta_comments' ) ),
 		), 'default_user_notification', T_('Comments') );
 	$Form->checklist( array(
+			array( 'notify_post_mentioned', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'I have been mentioned on a post.' ), $Settings->get( 'def_notify_post_mentioned' ) ),
 			array( 'notify_post_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a post is created and I have permissions to moderate it.' ), $Settings->get( 'def_notify_post_moderation' ) ),
 			array( 'notify_edit_pst_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a post is modified and I have permissions to moderate it.' ), $Settings->get( 'def_notify_edit_pst_moderation' ) ),
 			array( 'notify_post_assignment', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a post was assigned to me.' ), $Settings->get( 'def_notify_post_assignment' ) ),
@@ -205,7 +208,9 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Security options').get_manual_link('registration-security-settings') );
+$Form->begin_fieldset( T_('Security options').get_manual_link('registration-security-settings'), array( 'id' => 'security_options' ) );
+
+	$Form->checkbox( 'require_ssl', (bool)$Settings->get( 'require_ssl' ), T_('Require SSL'), T_('Force all login, registration, password recovery & password change forms to use <code>https</code>, even if they would normally use <code>http</code>.') );
 
 	$plugins_note = '';
 	$plugin_params = $Plugins->trigger_event_first_true( 'LoginAttemptNeedsRawPassword' );
@@ -241,7 +246,7 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 }
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'input[name=newusers_canregister]' ).click( function()
 {
 	if( jQuery( this ).val() == 'yes' )

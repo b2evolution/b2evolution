@@ -197,6 +197,7 @@ class Session
 							{
 								// dh> TODO: "old" messages should rather get prepended to any existing ones from the current request, rather than appended
 								$Messages->add_messages( $sess_Messages );
+								$Messages->affixed = $sess_Messages->affixed;
 								$Debuglog->add( 'Session: Added Messages from session data.', 'request' );
 								$this->delete( 'Messages' );
 							}
@@ -280,9 +281,12 @@ class Session
 	/**
 	 * Delete sessions from database based on where condition or by object ids
 	 *
-	 * @return array
+	 * @param string where condition
+	 * @param array object ids
+	 * @param array additional params if required
+	 * @return mixed # of rows affected or false if error
 	 */
-	static function db_delete_where( $class_name, $sql_where, $object_ids = NULL, $params = NULL )
+	static function db_delete_where( $sql_where, $object_ids = NULL, $params = NULL )
 	{
 		global $DB;
 
@@ -661,6 +665,15 @@ class Session
 		if( ! $die )
 		{
 			return false;
+		}
+
+		// Attempt to output an error header (will not work if the output buffer has already flushed once):
+		// This should help preventing indexing robots from indexing the error :P
+		if( ! headers_sent() )
+		{
+			load_funcs( '_core/_template.funcs.php' );
+			headers_content_mightcache( 'text/html', 0, '#', false ); // Do NOT cache error messages! (Users would not see they fixed them)
+			header_http_response( '400 Bad Request' );
 		}
 
 		// ERROR MESSAGE, with form/button to bypass and enough warning hopefully.

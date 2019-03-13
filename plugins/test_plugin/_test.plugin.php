@@ -34,7 +34,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = '6.10.1';
+	var $version = '6.11.0';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -408,7 +408,7 @@ class test_plugin extends Plugin
 	 *
 	 * Each <b>class</b> of dependency can have the following types:
 	 *  - 'events_by_one': A list of eventlists that have to be provided by a single plugin,
-	 *                     e.g., <code>array( array('CaptchaPayload', 'CaptchaValidated') )</code>
+	 *                     e.g., <code>array( array('RequestCaptcha', 'ValidateCaptcha') )</code>
 	 *                     to look for a plugin that provides both events.
 	 *  - 'plugins':
 	 *    A list of plugins, either just the plugin's classname or an array with
@@ -1060,7 +1060,7 @@ class test_plugin extends Plugin
 	 */
 	function SkinEndHtmlHead( & $params )
 	{
-		echo '<script type="text/javascript">
+		echo '<script>
 			jQuery( document ).ready( function()
 			{
 				jQuery( "#plugin_test_htsrv_action_'.$this->ID.'" ).click( function()
@@ -1902,10 +1902,6 @@ class test_plugin extends Plugin
 		$params['Form']->begin_fieldset( 'TEST plugin' );
 		$params['Form']->info_field( 'TEST plugin', 'This is the TEST plugin responding to the DisplayCommentFormFieldset event.' );
 		$params['Form']->end_fieldset( 'Foo' );
-
-		$params['form_type'] = 'comment';
-		$this->CaptchaPayload( $params );
-
 		return true;
 	}
 
@@ -1980,14 +1976,6 @@ class test_plugin extends Plugin
 	function BeforeCommentFormInsert( & $params )
 	{
 		$this->msg( 'This is the TEST plugin responding to the BeforeCommentFormInsert event.' );
-
-		$params['form_type'] = 'comment';
-
-		if( $this->CaptchaValidated( $params ) === false )
-		{	// Some error on captcha validation:
-			$validate_error = $params['validate_error'];
-			param_error( 'captcha_'.$this->code.'_'.$this->ID.'_answer', $validate_error );
-		}
 	}
 
 
@@ -3080,26 +3068,25 @@ class test_plugin extends Plugin
 	// General events: {{{
 
 	/**
-	 * Event handler: general event to inject payload for a captcha test.
+	 * Event handler: Return data to display captcha html code
 	 *
-	 * This does not get called by b2evolution itself, but provides an interface
-	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
-	 * uses this event optionally to whitelist a user.
-	 *
-	 * @see Plugin::CaptchaPayload()
-	 * @param array Associative array of parameters
-	 *   - 'Form': the {@link form} where payload should get added (by reference, OPTIONALLY!)
-	 *     If it's not given as param, you have to create an own form, if you need one.
-	 *   - 'form_use_fieldset': if a "Form" param is given and we use it, should we add
-	 *                          an own fieldset? (boolean, default "true", OPTIONALLY!)
-	 *   - 'key': A key that is associated to the caller of the event (string, OPTIONALLY!)
-	 * @return boolean True, if you have provided payload for a captcha test
+	 * @param array Associative array of parameters:
+	 *   - 'Form':          Form object
+	 *   - 'form_type':     Form type
+	 *   - 'form_position': Current form position where this event is called
+	 *   - 'captcha_info':  Default captcha info text(can be changed by this plugin)
+	 *   - 'captcha_template_question': Default HTML template for question text = '<span class="evo_captcha_question">$captcha_question$</span><br>'
+	 *   - 'captcha_template_answer':   Default HTML template for answer field = '<span class="evo_captcha_answer">$captcha_answer$</span><br>'
+	 * @return array Associative array of parameters:
+	 *   - 'captcha_position': Captcha position where current plugin must be displayed for the requested form type
+	 *   - 'captcha_html':     Captcha html code
+	 *   - 'captcha_info':     Captcha info text
 	 */
-	function CaptchaPayload( & $params )
+	function RequestCaptcha( & $params )
 	{
 		if( ! isset( $params['form_type'] ) || $params['form_type'] != 'comment' )
 		{	// Apply captcha only for comment form:
-			return;
+			return false;
 		}
 
 		// Get current or new question:
@@ -3107,54 +3094,46 @@ class test_plugin extends Plugin
 
 		if( empty( $question ) )
 		{	// No question detected:
-			echo 'Test plugin CaptchaPayload: Sorry, impossible to initialize questions for captcha validation.';
-			return;
+			return false;
 		}
 
-		if( ! isset( $params['Form'] ) )
-		{	// There's no Form where we add to, but we create our own form:
-			$Form = new Form( regenerate_url() );
-			$Form->begin_form();
-		}
-		else
-		{
-			$Form = & $params['Form'];
-		}
+		// Question text:
+		$captcha_html = str_replace( '$captcha_question$', $question['question'], $params['captcha_template_question'] );
+		// Answer input field:
+		$captcha_field_params = array(
+				'type'     => 'text',
+				'name'     => 'captcha_'.$this->code.'_'.$this->ID.'_answer',
+				'value'    => param( 'captcha_'.$this->code.'_'.$this->ID.'_answer', 'string', '' ),
+				'size'     => 10,
+				'required' => true,
+				'class'    => 'form_text_input form-control',
+			);
+		$Form = & $params['Form'];
+		$captcha_html .= str_replace( '$captcha_answer$', $Form->get_input_element( $captcha_field_params ), $params['captcha_template_answer'] );
 
-		$Form->info( 'TEST Captcha question', $question['question'] );
-		$Form->text_input( 'captcha_'.$this->code.'_'.$this->ID.'_answer', param( 'captcha_'.$this->code.'_'.$this->ID.'_answer', 'string', '' ), 10, 'TEST Captcha answer' );
-
-		if( ! isset( $params['Form'] ) )
-		{	// There's no Form where we add to, but our own form:
-			$Form->end_form( array( array( 'submit', 'submit', 'Validate me', 'ActionButton' ) ) );
-		}
+		return array(
+				'captcha_position' => 'before_submit_button',
+				'captcha_html'     => $captcha_html,
+				'captcha_info'     => $params['captcha_info'],
+			);
 	}
 
 
 	/**
 	 * Event handler: general event to validate a captcha which payload was added
-	 * through {@link CaptchaPayload()}.
+	 * through {@link RequestCaptcha()}.
 	 *
-	 * This does not get called by b2evolution itself, but provides an interface
-	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
-	 * uses this event optionally to whitelist a user.
-	 *
-	 * NOTE: if the action is verified/completed in total, you HAVE to call
-	 *       {@link CaptchaValidatedCleanup()}, so that the plugin can cleanup its data
+	 * NOTE: if the action is verified/completed in total, you HAVE to cleanup its data
 	 *       and is not vulnerable against multiple usage of the same captcha!
 	 *
-	 * @see Plugin::CaptchaValidated()
 	 * @param array Associative array of parameters
-	 *   - 'validate_error': you can optionally set this, if you want to give a reason
-	 *     of the failure. This is optionally and meant to be used by other plugins
-	 *     that trigger this event.
 	 * @return boolean true if the catcha could be validated
 	 */
-	function CaptchaValidated( & $params )
+	function ValidateCaptcha( & $params )
 	{
-		if( ! isset( $params['form_type'] ) || $params['form_type'] != 'comment' )
-		{	// Apply captcha only for comment form:
-			return;
+		if( ! empty( $params['is_preview'] ) || ! isset( $params['form_type'] ) || $params['form_type'] != 'comment' )
+		{	// We should not apply captcha to the requested form:
+			return true;
 		}
 
 		$posted_answer = utf8_strtolower( param( 'captcha_'.$this->code.'_'.$this->ID.'_answer', 'string', '' ) );
@@ -3162,7 +3141,7 @@ class test_plugin extends Plugin
 		if( empty( $posted_answer ) )
 		{
 			$this->debug_log( 'captcha_'.$this->code.'_'.$this->ID.'_answer' );
-			$params['validate_error'] = 'Please enter TEST captcha answer.';
+			param_error( 'captcha_'.$this->code.'_'.$this->ID.'_answer', 'Please enter TEST captcha answer.' );
 			if( $comment_Item = & $params['Comment']->get_Item() )
 			{
 				syslog_insert( 'Comment TEST captcha answer is not entered', 'warning', 'item', $comment_Item->ID, 'plugin', $this->ID );
@@ -3176,7 +3155,7 @@ class test_plugin extends Plugin
 		if( $posted_answer != utf8_strtolower( $current_question['answer'] ) )
 		{	// Wrong answer:
 			$this->debug_log( 'Posted ('.$posted_answer.') and answer "test" do not match!' );
-			$params['validate_error'] = 'The entered TEST answer is incorrect.';
+			param_error( 'captcha_'.$this->code.'_'.$this->ID.'_answer', 'The entered TEST answer is incorrect.' );
 			if( $comment_Item = & $params['Comment']->get_Item() )
 			{
 				syslog_insert( 'Comment TEST captcha answer is incorrect', 'warning', 'item', $comment_Item->ID, 'plugin', $this->ID );
@@ -3187,30 +3166,10 @@ class test_plugin extends Plugin
 		// If answer is correct:
 		//   We should clean the question ID that was assigned for current session and IP address
 		//   It gives to assign new question on the next captcha event
-		$this->CaptchaValidatedCleanup( $params );
+		global $Session;
+		$Session->delete( 'captcha_'.$this->code.'_'.$this->ID );
 
 		return true;
-	}
-
-
-	/**
-	 * Event handler: general event to be called after an action has been taken, which
-	 * involved {@link CaptchaPayload()} and {@link CaptchaValidated()}.
-	 *
-	 * This is meant to cleanup generated data for the Captcha test.
-	 *
-	 * This does not get called by b2evolution itself, but provides an interface
-	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
-	 * uses this event optionally to whitelist a user.
-	 * 
-	 * @see Plugin::CaptchaValidatedCleanup()
-	 */
-	function CaptchaValidatedCleanup( & $params )
-	{
-		global $Session;
-
-		// Remove question ID from session
-		$Session->delete( 'captcha_'.$this->code.'_'.$this->ID );
 	}
 
 

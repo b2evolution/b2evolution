@@ -580,11 +580,11 @@ switch( $action )
 					INNER JOIN T_categories ON cat_ID = post_main_cat_ID
 					WHERE comment_status = "trash" AND cat_blog_ID = '.$DB->quote( $blog_ID );
 			$comment_ids = $DB->get_col( $query, 0, 'get trash comment ids' );
-			$result = Comment::db_delete_where( 'Comment', NULL, $comment_ids );
+			$result = Comment::db_delete_where( NULL, $comment_ids );
 		}
 		else
 		{ // delete by where clause
-			$result = Comment::db_delete_where( 'Comment', 'comment_status = "trash"' );
+			$result = Comment::db_delete_where( 'comment_status = "trash"' );
 		}
 
 		if( $result !== false )
@@ -772,6 +772,11 @@ if( $tab3 == 'fullview' || $tab3 == 'meta' )
 	require_js( '#jqueryUI#' );
 }
 
+if( $tab3 == 'fullview' || $tab3 == 'listview' )
+{	// Init JS to autcomplete the user logins:
+	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+}
+
 if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit', 'elevate', 'switch_view' ) ) )
 { // Initialize date picker for _comment.form.php
 	init_datepicker_js();
@@ -779,13 +784,8 @@ if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit',
 	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 	// Require colorbox js:
 	require_js_helper( 'colorbox' );
-	// Require Fine Uploader js and css:
-	init_fineuploader_js_lang_strings();
-	require_js( 'multiupload/fine-uploader.js' );
-	require_css( 'fine-uploader.css' );
-	// Load JS files to make the links table sortable:
-	require_js( '#jquery#' );
-	require_js( 'jquery/jquery.sortable.min.js' );
+	// Init JS to quick upload several files:
+	init_fileuploader_js();
 }
 
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
@@ -813,7 +813,21 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'comment-mass-deletion' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'comments-tab' );
+		switch( $tab3 )
+		{
+			case 'fullview':
+				$AdminUI->set_page_manual_link( 'comments-full-text-view' );
+				break;
+			case 'listview':
+				$AdminUI->set_page_manual_link( 'comments-list-view' );
+				break;
+			case 'meta':
+				$AdminUI->set_page_manual_link( 'comments-meta-discussion' );
+				break;
+			default:
+				$AdminUI->set_page_manual_link( 'comments-tab' );
+		}
+
 		break;
 }
 

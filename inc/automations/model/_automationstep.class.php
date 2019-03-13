@@ -37,6 +37,7 @@ class AutomationStep extends DataObject
 	var $no_next_step_delay;
 	var $error_next_step_ID;
 	var $error_next_step_delay;
+	var $diagram;
 
 	var $Automation = NULL;
 
@@ -68,6 +69,7 @@ class AutomationStep extends DataObject
 			$this->no_next_step_delay = $db_row->step_no_next_step_delay;
 			$this->error_next_step_ID = $db_row->step_error_next_step_ID;
 			$this->error_next_step_delay = $db_row->step_error_next_step_delay;
+			$this->diagram = $db_row->step_diagram;
 		}
 	}
 
@@ -91,10 +93,16 @@ class AutomationStep extends DataObject
 	/**
 	 * Insert object into DB based on previously recorded changes.
 	 *
+	 * @param boolean TRUE to check if step can be inserted e.g. when automation is not paused
 	 * @return boolean true on success
 	 */
-	function dbinsert()
+	function dbinsert( $check_restriction = true )
 	{
+		if( $check_restriction && ! $this->can_be_modified() )
+		{	// If this step cannnot be modified
+			return false;
+		}
+
 		if( $r = parent::dbinsert() )
 		{
 			// Update next steps with selected option "Loop" to ID of this new inserted Step:
@@ -114,6 +122,22 @@ class AutomationStep extends DataObject
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 *
+	 * @return boolean true on success, false on failure to update, NULL if no update necessary
+	 */
+	function dbupdate()
+	{
+		if( ! $this->can_be_modified() )
+		{	// If this step cannnot be modified
+			return false;
+		}
+
+		return parent::dbupdate();
 	}
 
 
@@ -149,6 +173,14 @@ class AutomationStep extends DataObject
 		{	// Set Automation only for new creating Step:
 			param( 'autm_ID', 'integer', true );
 			$this->set_from_Request( 'autm_ID', 'autm_ID' );
+		}
+
+		if( ! $this->can_be_modified() && ! param( 'confirm_pause', 'integer' ) )
+		{	// Don't allow to edit step of active automation without confirmation:
+			global $Messages;
+			$Messages->add( empty( $this->ID )
+				? T_('You must pause the automation before creating new step.')
+				: T_('You must pause the automation before changing step.'), 'error' );
 		}
 
 		// Order:
@@ -238,6 +270,13 @@ class AutomationStep extends DataObject
 				param( 'step_automation', 'integer', true );
 				param_check_not_empty( 'step_automation', T_('Please select an automation.') );
 				$this->set( 'info', get_param( 'step_automation' ) );
+				break;
+
+			case 'user_status':
+				// Change user account status:
+				param( 'user_status', 'string', true );
+				param_check_not_empty( 'user_status', /* Do NOT translate because this error is impossible for normal form */'Please select an account status.' );
+				$this->set( 'info', get_param( 'user_status' ) );
 				break;
 
 			default:
@@ -337,16 +376,7 @@ class AutomationStep extends DataObject
 		}
 		elseif( $next_step_ID == 0 || ! $next_AutomationStep )
 		{	// Get next ordered Step when option is selected to "Continue" OR Step cannot be found by ID in DB:
-			global $DB;
-			$next_ordered_step_SQL = new SQL( 'Get next ordered Step after current Step #'.$this->ID );
-			$next_ordered_step_SQL->SELECT( 'step_ID' );
-			$next_ordered_step_SQL->FROM( 'T_automation__step' );
-			$next_ordered_step_SQL->WHERE( 'step_autm_ID = '.$DB->quote( $this->get( 'autm_ID' ) ) );
-			$next_ordered_step_SQL->WHERE_and( 'step_order > '.$DB->quote( $this->get( 'order' ) ) );
-			$next_ordered_step_SQL->ORDER_BY( 'step_order ASC' );
-			$next_ordered_step_SQL->LIMIT( 1 );
-			$next_ordered_step_ID = $DB->get_var( $next_ordered_step_SQL );
-			$next_AutomationStep = & $AutomationStepCache->get_by_ID( $next_ordered_step_ID, false, false );
+			$next_AutomationStep = & $AutomationStepCache->get_by_ID( $this->get_next_ordered_step_ID(), false, false );
 			if( empty( $next_AutomationStep ) )
 			{	// If it is the latest Step of the Automation:
 				$next_AutomationStep = false;
@@ -354,6 +384,32 @@ class AutomationStep extends DataObject
 		}
 
 		return $next_AutomationStep;
+	}
+
+
+	/**
+	 * Get ID of the next ordered Step after this Step
+	 *
+	 * @return integer|NULL Step ID or NULL if this is the latest
+	 */
+	function get_next_ordered_step_ID()
+	{
+		if( empty( $this->ID ) )
+		{	// New creating step is the latest by default:
+			return NULL;
+		}
+
+		global $DB;
+
+		$next_ordered_step_SQL = new SQL( 'Get next ordered Step after current Step #'.$this->ID );
+		$next_ordered_step_SQL->SELECT( 'step_ID' );
+		$next_ordered_step_SQL->FROM( 'T_automation__step' );
+		$next_ordered_step_SQL->WHERE( 'step_autm_ID = '.$DB->quote( $this->get( 'autm_ID' ) ) );
+		$next_ordered_step_SQL->WHERE_and( 'step_order > '.$DB->quote( $this->get( 'order' ) ) );
+		$next_ordered_step_SQL->ORDER_BY( 'step_order ASC' );
+		$next_ordered_step_SQL->LIMIT( 1 );
+
+		return $DB->get_var( $next_ordered_step_SQL );
 	}
 
 
@@ -549,8 +605,8 @@ class AutomationStep extends DataObject
 						) );
 
 					$email_template_params = array(
-						'message_html' => str_replace( '$login$', $step_user_login_html, $notification_message ),
-						'message_text' => nl2br( str_replace( '$login$', $step_User->get( 'login' ), $notification_message ) ),
+						'message_html' => nl2br( str_replace( '$login$', $step_user_login_html, $notification_message ) ),
+						'message_text' => str_replace( '$login$', $step_User->get( 'login' ), $notification_message ),
 					);
 
 					if( send_mail_to_User( $owner_User->ID, sprintf( T_('Notification of automation %s'), '"'.$Automation->get( 'name' ).'"' ), 'automation_owner_notification', $email_template_params ) )
@@ -612,10 +668,16 @@ class AutomationStep extends DataObject
 						if( $this->get( 'type' ) == 'subscribe' )
 						{	// Subscribe:
 							$affected_subscriprions_num = $step_User->subscribe( $Newsletter->ID );
+
+							// Send notification to owners of lists where user was subscribed:
+							$step_User->send_list_owner_notifications( 'subscribe' );
 						}
 						else
 						{	// Unsubscribe:
 							$affected_subscriprions_num = $step_User->unsubscribe( $Newsletter->ID );
+
+							// Send notification to owners of lists where user was unsubscribed:
+							$step_User->send_list_owner_notifications( 'unsubscribe' );
 						}
 						$step_result = ( $affected_subscriprions_num ? 'YES' : 'NO' );
 						// Display newsletter name in log:
@@ -646,6 +708,44 @@ class AutomationStep extends DataObject
 					{	// If List/Newsletter does not exist:
 						$step_result = 'ERROR';
 						$additional_result_message = 'Automation #'.$this->get( 'info' ).' is not found in DB.';
+					}
+					break;
+
+				case 'user_status':
+					// Change user account status:
+					$current_status = $step_User->get( 'status' );
+					$new_status = $this->get( 'info' );
+					if( $step_User->ID == 1 )
+					{	// Don't allow to change status of the Admin user:
+						$step_result = 'ERROR';
+						$additional_result_message = 'Status of admin user account cannot be changed';
+					}
+					elseif( $current_status == $new_status )
+					{	// If step User's account is already in the desired status:
+						$step_result = 'NO';
+						// Display status title in log:
+						$user_statuses = get_user_statuses();
+						$additional_result_message = ( isset( $user_statuses[ $new_status ] ) ? $user_statuses[ $new_status ] : $new_status );
+					}
+					elseif( $current_status == 'closed' )
+					{	// Don't allow to change a closed status:
+						$step_result = 'ERROR';
+						$additional_result_message = 'The closed user account cannot be changed to any other status';
+					}
+					else
+					{	// Change user account to another status:
+						$step_User->set( 'status', $new_status );
+						if( $step_User->dbupdate() )
+						{	// Successful user updating:
+							$step_result = 'YES';
+							// Display status title in log:
+							$user_statuses = get_user_statuses();
+							$additional_result_message = ( isset( $user_statuses[ $new_status ] ) ? $user_statuses[ $new_status ] : $new_status );
+						}
+						else
+						{	// Unknown error on user updating:
+							$step_result = 'ERROR';
+						}
 					}
 					break;
 
@@ -1027,7 +1127,8 @@ class AutomationStep extends DataObject
 
 			case 'listsend_last_sent_to_user':
 				// Check last sent list to user:
-				return $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'enls_last_sent_manual_ts' );
+				return $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'enls_last_sent_manual_ts' ) ||
+							 $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'enls_last_sent_auto_ts' );
 
 			case 'listsend_last_opened_by_user':
 				// Check last opened list by user:
@@ -1220,6 +1321,14 @@ class AutomationStep extends DataObject
 				}
 				break;
 
+			case 'user_status':
+				$user_statuses = get_user_statuses();
+				if( isset( $user_statuses[ $this->get( 'info' ) ] ) )
+				{	// Get status title from status key:
+					$label = $user_statuses[ $this->get( 'info' ) ];
+				}
+				break;
+
 			case 'add_usertag':
 			case 'remove_usertag':
 			default:
@@ -1228,6 +1337,57 @@ class AutomationStep extends DataObject
 		}
 
 		$this->set( 'label', utf8_substr( utf8_trim( $label ), 0, 500 ) );
+	}
+
+
+	/**
+	 * Check if this automation step can be modified(added/edited/deleted) currently
+	 *
+	 * @param boolean
+	 */
+	function can_be_modified()
+	{
+		if( ( $step_Automation = & $this->get_Automation() ) &&
+		    $step_Automation->get( 'status' ) == 'paused' )
+		{	// Automation of this step must be paused in order to edit steps:
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Pause automation by confirmation from request
+	 *
+	 * @return boolean
+	 */
+	function pause_automation()
+	{
+		if( $this->can_be_modified() )
+		{	// If step automation is already paused
+			return true;
+		}
+
+		if( ! param( 'confirm_pause', 'integer' ) )
+		{	// If action is not confirmed
+			return false;
+		}
+
+		// Try to pause the step's automation:
+		$step_Automation = & $this->get_Automation();
+		$step_Automation->set( 'status', 'paused' );
+
+		if( $step_Automation->dbupdate() )
+		{	// Display a message if automation has been paused:
+			global $Messages;
+			$Messages->add( T_('Automation has been paused.'), 'success' );
+			return true;
+		}
+		else
+		{	// If automation could not paused
+			return false;
+		}
 	}
 }
 

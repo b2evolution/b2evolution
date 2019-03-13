@@ -66,7 +66,7 @@ $Form->begin_fieldset( T_('Front page').get_manual_link('collection-front-page-s
 	{ // Hide input 'front_post_ID' if Front page is not a specific page
 		$Form->fieldstart = str_replace( '>', ' style="display:none">', $Form->fieldstart );
 	}
-	$Form->text_input( 'front_post_ID', $edited_Blog->get_setting('front_post_ID'), 5, T_('Specific post ID'), '', array( 'required' => true ) );
+	$Form->text_input( 'front_post_ID', $edited_Blog->get_setting('front_post_ID'), 5, T_('Specific post ID'), '', array( 'required' => $edited_Blog->get_setting('front_disp') == 'page' ? 'required' : 'mark_only'  ) );
 	$Form->fieldstart = $fieldstart;
 
 $Form->end_fieldset();
@@ -74,17 +74,18 @@ $Form->end_fieldset();
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'input[name=front_disp]' ).click( function()
 {
-	console.log( jQuery( this ).val() );
 	if( jQuery( this ).val() == 'page' )
 	{
 		jQuery( '[id$=front_post_ID]' ).show();
+		jQuery( '[id$=front_post_ID]' ).attr( 'required', 'required' );
 	}
 	else
 	{
 		jQuery( '[id$=front_post_ID]' ).hide();
+		jQuery( '[id$=front_post_ID]' ).removeAttr( 'required' );
 	}
 } );
 </script>

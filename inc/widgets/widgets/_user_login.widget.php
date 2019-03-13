@@ -210,8 +210,8 @@ class user_login_Widget extends ComponentWidget
 		if( empty( $redirect_to ) )
 		{	// Set redirect URL if it is not set in general settings:
 			global $disp;
-			if( $disp == 'access_requires_login' )
-			{	// Use a collection main page for disp "access_requires_login":
+			if( $disp == 'access_requires_login' || $disp == 'content_requires_login' )
+			{	// Use a collection main page for disp "access_requires_login" and "content_requires_login":
 				$redirect_to = $Blog->get( 'url' );
 			}
 			else
@@ -234,7 +234,7 @@ class user_login_Widget extends ComponentWidget
 			'display_reg_link'      => $this->get_param( 'register_link_show' ),
 			'reg_link_text'         => $this->get_param( 'register_link_text' ),
 			'reg_link_class'        => $this->get_param( 'register_link_class' ),
-			'transmit_hashed_password'       => true,
+			'transmit_hashed_password'       => can_use_hashed_password(),
 			'get_widget_login_hidden_fields' => true,
 		);
 		require skin_template_path( '_login.disp.php' );

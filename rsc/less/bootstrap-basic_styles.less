@@ -117,3 +117,49 @@ div.filters .filter_item {
 		margin-bottom: 2px;
 	}
 }
+
+// Style for comment quick moderation
+.evo_form__comment_review {
+	.comment_avatar {
+		float: left;
+		margin: 0 10px 10px 0;
+		img.user {
+			border-radius: 50%;
+		}
+	}
+	h3.comment_title {
+		font-size: 16px;
+		margin: 0;
+	}
+}
+
+// Affixed messages
+.msg_wrapper {
+	.affix {
+		div.alert {
+			box-shadow: 1px 10px 35px rgba(75, 75, 75, 0.75);
+		}
+	}
+}
+
+// Affixed publish buttons
+div#publish_buttons {
+	border-radius: 4px;
+	padding: 5px;
+	text-align: center;
+	.quick-publish {
+		margin-left: 5px;
+	}
+}
+.publish_buttons_wrapper {
+	div#publish_buttons.affix {
+		background-color: #ffffff;
+		box-shadow: 1px 10px 35px rgba(75, 75, 75, 0.75);
+		z-index: 99999;
+	}
+}
+
+// Fieldset folding for Category selection
+tbody.fieldset_wrapper.folded+tbody[id^=cat_sel_] {
+	display: none;
+}

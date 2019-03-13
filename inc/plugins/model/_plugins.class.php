@@ -152,12 +152,12 @@ class Plugins
 		// Set plugin path:
 		$this->plugins_path = $basepath.$plugins_subdir;
 
-		$Timer->resume( 'plugin_init' );
+		$Timer->resume( 'plugins_init' );
 
 		// Load events for enabled plugins:
 		$this->load_events();
 
-		$Timer->pause( 'plugin_init' );
+		$Timer->pause( 'plugins_init' );
 	}
 
 
@@ -639,23 +639,14 @@ class Plugins
 	 */
 	function init_settings( & $Plugin )
 	{
-		if( version_compare( PHP_VERSION, '5.1', '>=' ) )
-		{ // we use overloading for PHP5, therefor the member has to be unset:
-			// Note: this is somehow buggy at least in PHP 5.0.5, therefor we use it from 5.1 on.
-			//       see http://forums.b2evolution.net/viewtopic.php?p=49031#49031
-			unset( $Plugin->Settings );
-			unset( $Plugin->UserSettings );
+		// we use overloading for PHP5, therefor the member has to be unset:
+		// Note: this is somehow buggy at least in PHP 5.0.5, therefor we use it from 5.1 on.
+		//       see http://forums.b2evolution.net/viewtopic.php?p=49031#49031
+		unset( $Plugin->Settings );
+		unset( $Plugin->UserSettings );
 
-			// Nothing to do here, will get called through Plugin::__get() when accessed
-			return;
-		}
-
-		// PHP < 5.1: instantiate now, but only for installed plugins (needs DB).
-		if( $Plugin->ID > 0 )
-		{
-			$this->instantiate_Settings( $Plugin, 'Settings' );
-			$this->instantiate_Settings( $Plugin, 'UserSettings' );
-		}
+		// Nothing to do here, will get called through Plugin::__get() when accessed
+		return;
 	}
 
 
@@ -685,9 +676,7 @@ class Plugins
 		// when is_installed=true).
 		$method = 'GetDefault'.$set_type;
 		$params = array('for_editing'=>false);
-		$Timer->resume( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 		$defaults = $Plugin->$method( $params );
-		$Timer->pause( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 
 		if( $set_type == 'Settings' )
 		{	// If general settings are requested we should also append custom, collection, widgets, messages and emails settings:
@@ -756,6 +745,10 @@ class Plugins
 			elseif( isset( $l_meta['type'] ) && strpos( $l_meta['type'], 'array' ) === 0 )
 			{
 				$set_Obj->_defaults[$l_name] = array();
+			}
+			elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'checklist' )
+			{
+				$set_Obj->_defaults[$l_name] = NULL;
 			}
 			elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'input_group' && is_array( $l_meta['inputs'] ) )
 			{	// Get default values from input group fields:
@@ -1850,7 +1843,7 @@ class Plugins
 	 *
 	 * @param array|string A single event or a list thereof
 	 * @param boolean Make sure there's at least one plugin that provides them all?
-	 *                This is useful for event pairs like "CaptchaPayload" and "CaptchaValidated", which
+	 *                This is useful for event pairs like "RequestCaptcha" and "ValidateCaptcha", which
 	 *                should be served by the same plugin.
 	 * @return boolean
 	 */
@@ -2175,7 +2168,7 @@ class Plugins
 				break;
 
 			case 'email_apply_rendering':
-				// Get Message renderer plugins
+				// Get Email Campaign renderer plugins
 				$RendererPlugins = $this->get_list_by_events( array('FilterEmailContent') );
 				break;
 
@@ -2187,7 +2180,7 @@ class Plugins
 			case 'coll_apply_rendering':
 			default:
 				// Get Item renderer plugins
-				$RendererPlugins = $this->get_list_by_events( array('RenderItemAsHtml', 'RenderItemAsXml', 'RenderItemAsText') );
+				$RendererPlugins = $this->get_list_by_events( array( 'RenderItemAsHtml', 'RenderItemAsXml', 'RenderItemAsText', 'DisplayItemAsHtml', 'DisplayItemAsXml', 'DisplayItemAsText' ) );
 				break;
 		}
 
@@ -2391,6 +2384,71 @@ class Plugins
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Display captcha
+	 *
+	 * @param array Associative array of parameters:
+	 *   - 'Form':                   Form object
+	 *   - 'form_type':              Form type
+	 *   - 'form_position':          Current form position where this function is called
+	 *   - 'captcha_info':           Info under the captcha field in note style
+	 *   - 'captcha_info_anonymous': Captcha info for not logged in user when the plugin knows it will NOT ask for captcha in case of logged in users
+	 */
+	function display_captcha( $params = array() )
+	{
+		if( ! isset( $params['Form'] ) ||
+		    ! isset( $params['form_type'] ) ||
+		    ! isset( $params['form_position'] ) )
+		{	// Exit here if the mandatory params are not defined:
+			return;
+		}
+
+		$params = array_merge( array(
+				'captcha_template_question' => '<span class="evo_captcha_question">$captcha_question$</span><br>',
+				'captcha_template_answer'   => '<span class="evo_captcha_answer">$captcha_answer$</span><br>',
+				// Default captcha info text(can be customized by plugin):
+				'captcha_info' => T_('We ask for this in order to slow down spammers.')
+													.'<br>'.T_('Sorry for the inconvenience.')
+													.( is_logged_in() ? '' : '<br>'.T_('Please log in to avoid this antispam check.') ),
+			), $params );
+
+		$form_type = $params['form_type'];
+
+		if( ! isset( $this->captcha_data ) )
+		{	// Initialize array to cache captcha data per current page request:
+			$this->captcha_data = array();
+		}
+
+		if( ! isset( $this->captcha_data[ $form_type ] ) )
+		{	// Load once captcha data per form type and use this for all next calls of this function:
+			$plugin_data = $this->trigger_event_first_return( 'RequestCaptcha', $params );
+			$this->captcha_data[ $form_type ] = isset( $plugin_data['plugin_return'] ) ? $plugin_data['plugin_return'] : false;
+		}
+
+		$captcha_data = $this->captcha_data[ $form_type ];
+
+		if( isset( $captcha_data['captcha_position'], $captcha_data['captcha_html'] ) &&
+		    $captcha_data['captcha_position'] == $params['form_position'] )
+		{	// Display captcha html code only for requested form type and position:
+			$Form = & $params['Form'];
+			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
+			{	// Begin fieldset if it is required from skin file:
+				$Form->begin_fieldset();
+			}
+
+			$Form->info_field( T_('Antispam'), $captcha_data['captcha_html'], array(
+				'note'     => ( isset( $captcha_data['captcha_info'] ) ? $captcha_data['captcha_info'] : $params['captcha_info'] ),
+				'required' => true,
+			) );
+
+			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
+			{	// End fieldset if it is required from skin file:
+				$Form->end_fieldset();
+			}
+		}
 	}
 
 

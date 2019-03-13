@@ -138,11 +138,35 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 		}
 		else
 		{	// Display a select with text input field for subject:
-			$subject_options = array_merge( array( '' => '---' ), $subject_options );
+			$subject_options = array_merge( array( '' => '---' ), $subject_options, array( '_other' => T_('Other').':' ) );
 			$Form->begin_line( T_('Subject'), NULL, '', array( 'required'  => $Blog->get_setting( 'msgform_require_subject' ) ) );
 				$Form->select_input_array( $dummy_fields['subject'], $subject, $subject_options, '' );
-				$Form->text_input( $dummy_fields['subject'].'_other', $subject_other, 50, T_('Other').': ', '', array( 'maxlength' => 255 ) );
+				$Form->text_input( $dummy_fields['subject'].'_other', $subject_other, 50, '', '', array( 'maxlength' => 255, 'style' => 'margin-left: 5px; display: none;' ) );
 			$Form->end_line();
+			?>
+			<script>
+			jQuery( document ).ready( function() {
+				var select_field = jQuery( '#<?php echo $dummy_fields['subject'];?>' );
+				var other_field = jQuery( '#<?php echo $dummy_fields['subject'];?>_other' );
+
+				function onSubjectChange( obj )
+				{
+					if( select_field.val() == '_other' )
+					{
+						other_field.show();
+					}
+					else
+					{
+						other_field.hide();
+						other_field.val( null );
+					}
+				}
+
+				onSubjectChange();
+				select_field.on( 'change', onSubjectChange );
+			} );
+			</script>
+			<?php
 		}
 	}
 
@@ -154,9 +178,17 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 		$msgform_contact_methods = get_msgform_contact_methods( isset( $recipient_User ) ? $recipient_User : NULL );
 		if( count( $msgform_contact_methods ) > 1 )
 		{	// Only when at least two methods are allowed:
-			$Form->select_input_array( 'contact_method', $contact_method, $msgform_contact_methods, T_('Preferred contact method'), '', array( 'force_keys_as_values' => true ) );
+			$Form->select_input_array( 'contact_method', $contact_method, $msgform_contact_methods, T_('Reply method'), T_('How would you prefer to receive a reply?'), array( 'force_keys_as_values' => true ) );
 		}
 	}
+
+	// Display plugin captcha for message form before textarea:
+	$Plugins->display_captcha( array(
+			'Form'              => & $Form,
+			'form_type'         => 'message',
+			'form_position'     => 'before_textarea',
+			'form_use_fieldset' => false,
+		) );
 
 	if( $Blog->get_setting( 'msgform_display_message' ) )
 	{	// Display a field to enter a message:
@@ -166,8 +198,21 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 			T_('Plain text only.'), 35, 'wide_textarea', $Blog->get_setting( 'msgform_require_message' ) );
 	}
 
-	$Plugins->trigger_event( 'DisplayMessageFormFieldset', array( 'Form' => & $Form,
-		'recipient_ID' => & $recipient_id, 'item_ID' => $post_id, 'comment_ID' => $comment_id ) );
+	$Plugins->trigger_event( 'DisplayMessageFormFieldset', array(
+			'Form'              => & $Form,
+			'recipient_ID'      => & $recipient_id,
+			'item_ID'           => $post_id,
+			'comment_ID'        => $comment_id,
+			'form_use_fieldset' => false,
+		) );
+
+	// Display plugin captcha for message form before submit button:
+	$Plugins->display_captcha( array(
+			'Form'              => & $Form,
+			'form_type'         => 'message',
+			'form_position'     => 'before_submit_button',
+			'form_use_fieldset' => false,
+		) );
 
 	// Form buttons:
 	echo $Form->begin_field( NULL, '' );

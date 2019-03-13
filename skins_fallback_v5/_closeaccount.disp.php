@@ -23,23 +23,23 @@ if( ! empty( $account_closing_success ) )
 else
 { // Display a form to close an account
 
-	$Form = new Form( get_htsrv_url( true ).'login.php' );
+	$Form = new Form( get_htsrv_url( 'login' ).'login.php' );
 
 	$Form->begin_form( 'inskin' );
 
 	$Form->add_crumb( 'closeaccountform' );
-	$Form->hidden( 'redirect_to', url_add_param( $Blog->gen_blogurl(), 'disp=closeaccount', '&' ) );
+	$Form->hidden( 'redirect_to', $Blog->get( 'closeaccounturl', array( 'glue' => '&' ) ) );
 	$Form->hidden( 'action', 'closeaccount' );
 
 	// Display intro message
-	echo '<p>'.nl2br( $Settings->get( 'account_close_intro' ) ).'</p>'."\n";
+	$Form->info( NULL, nl2br( $Settings->get( 'account_close_intro' ) ) );
 
 	// Display the reasons
 	$reasons = trim( $Settings->get( 'account_close_reasons' ) );
 	if( ! empty( $reasons ) )
 	{
 		$reasons = explode( "\n", str_replace( array( "\r\n", "\n\n" ), "\n", $reasons ) );
-		$reasons[] = NT_('Other').':';
+		$reasons[] = NT_('Other');
 		$reasons_options = array();
 		foreach( $reasons as $reason )
 		{
@@ -48,15 +48,14 @@ else
 		$Form->radio_input( 'account_close_type', '', $reasons_options, '<b>'.T_('Reason').'</b>', array( 'lines' => true ) );
 	}
 
-	$Form->textarea_input( 'account_close_reason', $account_close_reason, 3, NULL, array( 'cols' => 40, 'maxlength' => 255 ) );
+	$Form->textarea_input( 'account_close_reason', $account_close_reason, 3, T_('Details'), array( 'cols' => 40, 'maxlength' => 255 ) );
 	$Form->info_field( NULL, '%s characters left', array( 'class' => 'section_requires_javascript dimmed', 'name' => 'character_counter' ) );
 ?>
-	<script type="text/javascript">
+	<script>
 		<?php echo 'var counter_text = "'.T_( '%s characters left' ).'";';?>
 		var characterCounter = jQuery("#ffield_character_counter > div");
 		var otherReason = jQuery("#account_close_reason");
 		jQuery("#ffield_account_close_reason").css( { marginBottom: 0 } );
-		jQuery("div.form-group.radio-group").css( { marginBottom: 0 } );
 		characterCounter.html( counter_text.replace( "%s", 255 - otherReason[0].value.length ) );
 		otherReason.bind( "keyup", function(event)
 		{
@@ -72,7 +71,6 @@ else
 		<?php echo T_( '255 characters max' ); ?>
 	</noscript>
 <?php
-	echo '</div>';
 
 	$Form->buttons( array( array( 'submit', 'submit', T_('Close my account now'), 'SaveButton' ) ) );
 

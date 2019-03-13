@@ -76,7 +76,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 
 	<?php
-	$Form->begin_fieldset( T_('Comment contents').get_manual_link( 'editing-comments' ) );
+	$Form->begin_fieldset( sprintf( T_('Comment #%s'), $edited_Comment->ID ).get_manual_link( 'editing-comments' ) );
 
 	echo '<div class="row">';
 		echo '<div class="col-sm-12">';
@@ -126,7 +126,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		{	// This is not a member comment
 			$Form->text_input( 'newcomment_author', $edited_Comment->author, 20, T_('Author'), '', array( 'maxlength' => 100, 'style' => 'width:100%' ) );
 			$Form->email_input( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), array( 'maxlength' => 255, 'style' => 'width:100%' ) );
-			$Form->checkbox( 'comment_allow_msgform', $edited_Comment->allow_msgform, T_('Allow contact'), T_('If checked, the comment author can be contacted through a form that will send him en email.') );
+			$Form->checkbox( 'comment_allow_msgform', $edited_Comment->allow_msgform, T_('Allow contact'), T_('If checked, the comment author can be contacted through a form that will send him an email.') );
 			$Form->checkbox( 'comment_anon_notify', $edited_Comment->anon_notify, T_('Notify me of replies') );
 			$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('Website URL'), '', array( 'maxlength' => 255, 'style' => 'width:100%' ) );
 		}
@@ -150,7 +150,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$Form->fieldstart = '<div class="tile">';
 	$Form->fieldend = '</div>';
 	?>
-	<script type="text/javascript">
+	<script>
 		<!--
 		// This is for toolbar plugins
 		var b2evoCanvas = document.getElementById('commentform_post_content');
@@ -168,7 +168,14 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	}
 
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array( 'target_type' => 'Comment', 'edit_layout' => NULL ) );
+	ob_start();
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+			'target_type'   => 'Comment',
+			'target_object' => $edited_Comment,
+			'content_id'    => 'commentform_post_content',
+			'edit_layout'   => NULL
+		) );
+	$quick_setting_switch = ob_get_flush();
 
 	echo '<div class="pull-right">';
 	echo_comment_buttons( $Form, $edited_Comment );
@@ -180,19 +187,10 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	<?php
 	$Form->end_fieldset();
 
-	// -------------------------- ATTACHMENTS/LINKS --------------------------
-	if( $current_User->check_perm( 'files', 'view' ) )
-	{	// If current user has a permission to view the files:
-		load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
-		// Initialize this object as global because this is used in many link functions:
-		global $LinkOwner;
-		$LinkOwner = new LinkComment( $edited_Comment );
-		// Display attachments fieldset:
-		display_attachments_fieldset( $Form, $LinkOwner, false, true );
-	}
+	// ####################### ATTACHMENTS/LINKS #########################
+	$Form->attachments_fieldset( $edited_Comment, true );
 
 	// ####################### PLUGIN FIELDSETS #########################
-
 	$Plugins->trigger_event( 'AdminDisplayCommentFormFieldset', array( 'Form' => & $Form, 'Comment' => & $edited_Comment, 'edit_layout' => NULL ) );
 	?>
 
@@ -314,4 +312,6 @@ $Form->end_form();
 echo_status_dropdown_button_js( 'comment' );
 // JS code for fieldset folding:
 echo_fieldset_folding_js();
+// JS code for inserting preview image
+echo_image_insert_modal();
 ?>

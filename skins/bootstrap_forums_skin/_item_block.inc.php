@@ -325,8 +325,18 @@ skin_widget( array(
 	?>
 
 	<?php
+	if( is_single_page() )
+	{	// Display comments only on single Item's page:
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( $params, array(
+			'disp_comments'         => true,
+			'disp_comment_form'     => true,
+			'disp_trackbacks'       => true,
+			'disp_trackback_url'    => true,
+			'disp_pingbacks'        => true,
+			'disp_webmentions'      => true,
+			'disp_meta_comments'    => false,
+
 			'disp_section_title'    => false,
 			'disp_meta_comment_info' => false,
 
@@ -348,6 +358,7 @@ skin_widget( array(
 		echo_comment_moderate_js();
 
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+	}
 	?>
 
 	<?php
@@ -433,7 +444,7 @@ skin_widget( array(
 	<?php
 		locale_restore_previous();	// Restore previous locale (Blog locale)
 	?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '.quote_button' ).click( function()

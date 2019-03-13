@@ -226,7 +226,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 
 	// Check if the type is the special array or regexp
 	if( substr( $type, 0, 7 ) == 'array:/' )
-	{ // It is an array type param which may contains elements mathcing to the given regular expression
+	{ // It is an array type param which may contains elements matching to the given regular expression
 		$elements_regexp = substr( $type, 6 );
 		$elements_type = 'string';
 		$type = 'array:regexp';
@@ -884,9 +884,12 @@ function param_check_new_user_email( $var, $value = NULL, $link_Blog = NULL )
 			global $Blog;
 			$link_Blog = $Blog;
 		}
-		param_error( $var, sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know or have forgotten it, you can <a %s>set your password here</a>.'),
+		global $dummy_fields;
+		$lostpassword_url = ( $link_Blog === NULL ? get_lostpassword_url() : $link_Blog->get( 'lostpasswordurl' ) );
+		$lostpassword_url = url_add_param( $lostpassword_url, $dummy_fields['login'].'='.urlencode( $value ) );
+		param_error( $var, sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know it or have forgotten it, you can <a %s>reset your password here</a>.'),
 			'href="'.( $link_Blog === NULL ? get_login_url( '' ) : $link_Blog->get( 'loginurl' ) ).'"',
-			'href="'.( $link_Blog === NULL ? get_lostpassword_url() : $link_Blog->get( 'lostpasswordurl' ) ).'"' ) );
+			'href="'.$lostpassword_url.'"' ) );
 		return false;
 	}
 
@@ -1073,16 +1076,20 @@ function param_check_isregexp( $var, $err_msg, $field_err_msg = NULL )
  * @param string regexp
  * @param string error message
  * @param string|NULL error message for form field ($err_msg gets used if === NULL).
+ * @param boolean TRUE if the param value cannot be empty
+ * @param boolean FALSE to check the param value DOES NOT MATCH a regexp
  * @return boolean true if OK
  */
-function param_check_regexp( $var, $regexp, $err_msg, $field_err_msg = NULL, $required = true )
+function param_check_regexp( $var, $regexp, $err_msg, $field_err_msg = NULL, $required = true, $match = true )
 {
 	if( empty( $GLOBALS[$var] ) && ! $required )
 	{ // empty variable is OK
 		return true;
 	}
 
-	if( ! preg_match( $regexp, $GLOBALS[$var] ) )
+	$result = preg_match( $regexp, $GLOBALS[$var] );
+	if( ( $match && ! $result ) || // Match
+	    ( ! $match && $result ) )  // Does NOT match
 	{
 		param_error( $var, $err_msg, $field_err_msg );
 		return false;
@@ -2566,7 +2573,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		{
 			$errmsg = ($context == 'commenting')
 				? T_('Illegal content found (spam?)').'.'
-				: sprintf( T_('Illegal content found: blacklisted word &laquo;%s&raquo;.'), htmlspecialchars($block) );
+				: sprintf( T_('Illegal content found: blacklisted word "%s".'), htmlspecialchars($block) );
 		}
 
 		$Messages->add_to_group(	$errmsg, 'error', T_('Validation errors:') );
@@ -2883,13 +2890,14 @@ function is_safe_filepath( $filepath )
  * @param string Default value or TRUE if user input required
  * @param boolean Do we need to memorize this to regenerate the URL for this page?
  * @return string Validated and formatted value of condition param which is ready to be stored in DB
+ * @param string|array Allowed rules separated by comma, Use char "-" before each rule to deny it, NULL - to allow all rules
  */
-function param_condition( $var, $default = '', $memorize = false )
+function param_condition( $var, $default = '', $memorize = false, $rules = NULL )
 {
 	$condition = param( $var, 'string', $default, $memorize );
 
 	// Format condition to database format:
-	$condition = param_format_condition( $condition, 'db' );
+	$condition = param_format_condition( $condition, 'db', $rules );
 
 	// Update condition param with validated and formatted value:
 	set_param( $var, $condition );
@@ -2904,9 +2912,10 @@ function param_condition( $var, $default = '', $memorize = false )
  *
  * @param object|string JSON object of condition param
  * @param string Format action: 'db' - to database format, 'js' - from database to JavaScript format
+ * @param string|array Allowed rules separated by comma, Use char "-" before each rule to deny it, NULL - to allow all rules
  * @return object
  */
-function param_format_condition( $condition, $action )
+function param_format_condition( $condition, $action, $rules = NULL )
 {
 	$is_encoded = ! is_object( $condition );
 
@@ -2918,21 +2927,57 @@ function param_format_condition( $condition, $action )
 		{	// Wrong condition object:
 			return $action == 'db' ? '' : 'null';
 		}
+
+		if( ! isset( $condition->condition ) )
+		{	// Set default condition:
+			$condition->condition = 'AND';
+		}
 	}
 
 	if( empty( $condition->rules ) )
 	{	// No rules, Skip it:
+		if( $is_encoded )
+		{	// If the source param has been passed here as encoded we should return it in the same format:
+			$condition = json_encode( $condition );
+		}
 		return $condition;
 	}
 
+	if( $rules !== NULL )
+	{
+		if( is_string( $rules ) )
+		{	// Convert string to array:
+			$rules = array_map( 'trim', explode( ',', $rules ) );
+		}
+		$allowed_rules = array();
+		$denied_rules = array();
+		foreach( $rules as $r => $rule )
+		{
+			if( substr( $rule, 0, 1 ) == '-' )
+			{	// Deny this rule:
+				$denied_rules[] = substr( $rule, 1 );
+			}
+			else
+			{	// Allow this rule:
+				$allowed_rules[] = $rule;
+			}
+		}
+	}
+
+	$condition_rules = array();
 	foreach( $condition->rules as $r => $rule )
 	{
 		if( isset( $rule->rules ) && is_array( $rule->rules ) )
 		{	// This is a group of conditions, Run this function recursively:
-			$condition->rules[ $r ] = param_format_condition( $rule, $action );
+			$condition_rules[] = param_format_condition( $rule, $action, $rules );
 		}
-		else
-		{	// This is a single field, Format condition only for this field:
+		elseif( $rules === NULL || 
+		        ( $rules !== NULL && in_array( $rule->id, $allowed_rules ) && ! in_array( $rule->id, $denied_rules ) ) )
+		{	// This is a single allowed field, Format condition only for this field:
+			if( ! isset( $rule->type ) )
+			{	// Set default type:
+				$rule->type = 'string';
+			}
 			if( is_array( $rule->value ) )
 			{	// Field with multiple values like 'between'(field BETWEEN value_1 AND value_2):
 				foreach( $rule->value as $v => $rule_value )
@@ -2944,8 +2989,15 @@ function param_format_condition( $condition, $action )
 			{	// Field with single value like 'equal'(field = value):
 				$rule->value = param_format_condition_rule( $rule->value, $rule->type, $action );
 			}
-			$condition->rules[ $r ] = $rule;
+			$condition_rules[] = $rule;
 		}
+	}
+
+	$condition->rules = $condition_rules;
+
+	if( empty( $condition->rules ) )
+	{	// Return empty string if condition has no allowed rules:
+		return $action == 'db' ? '' : 'null';
 	}
 
 	if( $is_encoded )
@@ -2978,7 +3030,8 @@ function param_format_condition_rule( $rule_value, $rule_type, $action )
 
 				case 'js':
 					// To JavaScript format:
-					return mysql2date( locale_input_datefmt(), $rule_value );
+					$formatted_date = mysql2date( locale_input_datefmt(), $rule_value );
+					return $formatted_date ? $formatted_date : $rule_value;
 			}
 			break;
 	}

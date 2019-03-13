@@ -25,6 +25,8 @@ global $DB, $action, $Plugins, $Settings;
 
 global $Collection, $Blog;
 
+global $thrd_recipients_array, $recipients_selected;
+
 $creating = is_create_action( $action );
 
 if( !isset( $display_params ) )
@@ -75,7 +77,12 @@ $Form->begin_form( $params['form_class_thread'], $params['form_title'], array( '
 if( $params['allow_select_recipients'] )
 {	// User can select recipients
 	$Form->text_input( 'thrd_recipients', $edited_Thread->recipients, $params['cols'], T_('Recipients'),
-		'<noscript>'.T_('Enter usernames. Separate with comma (,)').'</noscript>', array( 'maxlength'=> 255, 'required'=>true, 'class'=>'wide_input' ) );
+		'<noscript>'.T_('Enter usernames. Separate with comma (,)').'</noscript>',
+		array(
+			'maxlength'=> 255,
+			'required'=>true,
+			'class'=>'wide_input'
+		) );
 
 	echo '<div id="multiple_recipients">';
 	$Form->radio( 'thrdtype', $params['thrdtype'], array(
@@ -87,33 +94,74 @@ if( $params['allow_select_recipients'] )
 else
 {	// No available to select recipients, Used in /contact.php
 	$Form->info( T_('Recipients'), $edited_Thread->recipients );
-	foreach( $recipients_selected as $recipient )
+	if( $recipients_selected )
 	{
-		$Form->hidden( 'thrd_recipients_array[id][]', $recipient['id'] );
-		$Form->hidden( 'thrd_recipients_array[login][]', $recipient['login'] );
+		foreach( $recipients_selected as $recipient )
+		{
+			$Form->hidden( 'thrd_recipients_array[id][]', $recipient['id'] );
+			$Form->hidden( 'thrd_recipients_array[login][]', $recipient['login'] );
+		}
 	}
 }
 
 $Form->text_input( 'thrd_title', $edited_Thread->title, $params['cols'], T_('Subject'), '', array( 'maxlength'=> 255, 'required'=>true, 'class'=>'wide_input large' ) );
 
+// Display plugin captcha for message form before textarea:
+$Plugins->display_captcha( array(
+		'Form'              => & $Form,
+		'form_type'         => 'message',
+		'form_position'     => 'before_textarea',
+		'form_use_fieldset' => false,
+	) );
+
+if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
+{	// If current user has a permission to view the files AND it is back-office:
+	load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+	// Initialize this object as global because this is used in many link functions:
+	global $LinkOwner;
+	$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+}
 
 ob_start();
 echo '<div class="message_toolbars">';
 // CALL PLUGINS NOW:
-$Plugins->trigger_event( 'DisplayMessageToolbar', array() );
+$message_toolbar_params = array( 'Message' => & $edited_Message );
+if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+{
+	$message_toolbar_params['temp_ID'] = $LinkOwner->get_ID();
+}
+$Plugins->trigger_event( 'DisplayMessageToolbar', $message_toolbar_params );
 echo '</div>';
 $message_toolbar = ob_get_clean();
 
+// CALL PLUGINS NOW:
+ob_start();
+$admin_editor_params = array(
+		'target_type'   => 'Message',
+		'target_object' => $edited_Message,
+		'content_id'    => 'msg_text',
+		'edit_layout'   => NULL,
+	);
+if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+{
+	$admin_editor_params['temp_ID'] = $LinkOwner->get_ID();
+}
+$Plugins->trigger_event( 'AdminDisplayEditorButton', $admin_editor_params );
+$quick_setting_switch = ob_get_clean();
+
 $form_inputstart = $Form->inputstart;
+$form_inputend = $Form->inputend;
 $Form->inputstart .= $message_toolbar;
+$Form->inputend = $quick_setting_switch.$Form->inputend;
 $Form->textarea_input( 'msg_text', $edited_Message->original_text, 10, T_('Message'), array(
 		'cols' => $params['cols'],
 		'required' => true
 	) );
 $Form->inputstart = $form_inputstart;
+$Form->inputend = $form_inputend;
 
 // set b2evoCanvas for plugins
-echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "msg_text" );</script>';
+echo '<script>var b2evoCanvas = document.getElementById( "msg_text" );</script>';
 
 // Display renderers
 $current_renderers = !empty( $edited_Message ) ? $edited_Message->get_renderers_validated() : array( 'default' );
@@ -124,17 +172,8 @@ if( !empty( $message_renderer_checkboxes ) )
 }
 
 // ####################### ATTACHMENTS/LINKS #########################
-if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
-{	// If current user has a permission to view the files AND it is back-office:
-	load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
-	// Initialize this object as global because this is used in many link functions:
-	global $LinkOwner;
-	$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
-	// Display attachments fieldset:
-	display_attachments_fieldset( $Form, $LinkOwner );
-}
+$Form->attachments_fieldset( $edited_Message );
 
-global $thrd_recipients_array, $recipients_selected;
 if( !empty( $thrd_recipients_array ) )
 {	// Initialize the preselected users (from post request or when user send a message to own contacts)
 	foreach( $thrd_recipients_array['id'] as $rnum => $recipient_ID )
@@ -146,16 +185,24 @@ if( !empty( $thrd_recipients_array ) )
 	}
 }
 
+// Display plugin captcha for message form before submit button:
+$Plugins->display_captcha( array(
+		'Form'              => & $Form,
+		'form_type'         => 'message',
+		'form_position'     => 'before_submit_button',
+		'form_use_fieldset' => false,
+	) );
+
 // display submit button, but only if enabled
 $Form->end_form( array(
-		array( 'submit', 'actionArray[preview]', T_('Preview'), 'SaveButton btn-info' ),
+		array( 'submit', 'actionArray[preview]', /* TRANS: Verb */ T_('Preview'), 'SaveButton btn-info' ),
 		array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' )
 	) );
 
 if( $params['allow_select_recipients'] )
 {	// User can select recipients
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	check_multiple_recipients();
@@ -203,15 +250,19 @@ jQuery( '#thrd_recipients' ).tokenInput(
 		{
 			check_multiple_recipients();
 		},
-		<?php
-		if( param_has_error( 'thrd_recipients' ) )
-		{ // Mark this field as error
-		?>
 		onReady: function()
 		{
-			jQuery( '.token-input-list-facebook' ).addClass( 'token-input-list-error' );
+			<?php
+			if( param_has_error( 'thrd_recipients' ) )
+			{ // Mark this field as error
+			?>
+				jQuery( '.token-input-list-facebook' ).addClass( 'token-input-list-error' );
+			<?php
+			}
+			?>
+			// Remove required attribute to prevent unfocusable field error during validation checking when the field is hidden:
+			jQuery( '#thrd_recipients' ).removeAttr( 'required' );
 		}
-		<?php } ?>
 	}
 );
 
@@ -248,7 +299,7 @@ function check_form_thread()
 }
 </script>
 <?php }
-
+echo_image_insert_modal();
 if( $action == 'preview' )
 { // ------------------ PREVIEW MESSAGE START ------------------ //
 	if( isset( $edited_Thread->recipients_list ) )

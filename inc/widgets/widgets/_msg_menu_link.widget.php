@@ -37,8 +37,8 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 		parent::__construct( $db_row, 'core', 'msg_menu_link' );
 
 		$this->link_types = array(
-			'messages' => T_('Messages'),
-			'contacts' => T_('Contacts'),
+			'messages' => T_('Private messages'),
+			'contacts' => T_('Messaging contacts'),
 		);
 	}
 
@@ -72,7 +72,7 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 
 		if( !empty($this->param_array['link_type']) )
 		{	// Messaging or Contacts
-			return sprintf( T_( '%s link' ), $this->link_types[ $this->param_array['link_type'] ] );
+			return sprintf( T_('Link to: %s'), $this->link_types[ $this->param_array['link_type'] ] );
 		}
 
 		return $this->get_name();
@@ -101,13 +101,15 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 		// Try to get collection that is used for messages on this site:
 		$msg_Blog = & get_setting_Blog( 'msg_blog_ID' );
 
+		$default_link_type = 'messages';
+
 		$r = array_merge( array(
 				'link_type' => array(
 					'label' => T_( 'Link Type' ),
 					'note' => T_('What do you want to link to?'),
 					'type' => 'select',
 					'options' => $this->link_types,
-					'defaultvalue' => 'messages',
+					'defaultvalue' => $default_link_type,
 					'onchange' => '
 						var curr_link_type = this.value;
 						var show_badge = jQuery("[id$=\'_set_show_badge\']");
@@ -173,8 +175,7 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 		{ // Not called from the update process
 			// Turn off allow blockcache by default, because it is forbidden in case of messages
 			// Note: we may call $this->get_param() only if this function was not called from there. This way we prevent infinite recursion/loop.
-			$link_type = ( empty( $this->params ) || isset( $params['infinite_loop'] ) ) ? 'messages' : $this->get_param( 'link_type', true );
-			if( $link_type == 'contacts' )
+			if( $this->get_param( 'link_type', $default_link_type ) == 'contacts' )
 			{
 				$r['show_badge']['defaultvalue'] = false;
 				$r['show_badge']['disabled'] = 'disabled';

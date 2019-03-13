@@ -41,7 +41,7 @@ $user_status_icons = get_user_status_icons();
 
 $Form = new Form( NULL, 'user_checkchanges' );
 
-$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
+$Form->title_fmt = '$title$';
 
 echo_user_actions( $Form, $edited_User, $action );
 
@@ -117,9 +117,9 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th'       => T_('Next execution time'),
 		'order'    => 'aust_next_exec_ts',
-		'td'       => '%mysql2localedatetime( #aust_next_exec_ts# )%',
+		'td'       => '%mysql2localedatetime_spans( #aust_next_exec_ts# )%',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'nowrap',
+		'td_class' => 'timestamp',
 	);
 
 $Results->cols[] = array(
@@ -133,7 +133,7 @@ $Results->display();
 
 // Display email campaigns
 $campaign_SQL = new SQL( 'Get email campaigns for the edited Uer #'.$edited_User->ID );
-$campaign_SQL->SELECT( 'ecmp_ID, ecmp_name, csnd_last_sent_ts, csnd_last_open_ts, csnd_last_click_ts, csnd_cta1, csnd_cta2, csnd_cta3, csnd_like, csnd_status, enls_subscribed' );
+$campaign_SQL->SELECT( 'ecmp_ID, ecmp_name, csnd_last_sent_ts, csnd_last_open_ts, csnd_last_click_ts, csnd_cta1, csnd_cta2, csnd_cta3, csnd_like, csnd_status, enls_subscribed, csnd_emlog_ID' );
 $campaign_SQL->FROM( 'T_email__campaign' );
 $campaign_SQL->FROM_add( 'INNER JOIN T_email__newsletter_subscription ON enls_user_ID = '.$edited_User->ID.' AND enls_enlt_ID = ecmp_enlt_ID' );
 $campaign_SQL->FROM_add( 'INNER JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID' );
@@ -171,13 +171,13 @@ $campaign_Results->cols[] = array(
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center nowrap',
 		'order' => 'csnd_status',
-		'td' => '%user_td_campaign_status( #csnd_status# )%'
+		'td' => '%user_td_campaign_status( #csnd_status#, #csnd_emlog_ID# )%'
 	);
 
 $campaign_Results->cols[] = array(
 		'th' => T_('Send date'),
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'timestamp compact_data',
+		'td_class' => 'timestamp',
 		'order' => 'csnd_last_sent_ts',
 		'default_dir' => 'D',
 		'td' => '%user_td_emlog_date( #csnd_last_sent_ts# )%',
@@ -186,7 +186,7 @@ $campaign_Results->cols[] = array(
 $campaign_Results->cols[] = array(
 	'th' => T_('Last opened'),
 	'th_class' => 'shrinkwrap',
-	'td_class' => 'timestamp compact_data',
+	'td_class' => 'timestamp',
 	'order' => 'csnd_last_open_ts',
 	'default_dir' => 'D',
 	'td' => '%user_td_emlog_date( #csnd_last_open_ts# )%',
@@ -195,7 +195,7 @@ $campaign_Results->cols[] = array(
 $campaign_Results->cols[] = array(
 	'th' => T_('Last clicked'),
 	'th_class' => 'shrinkwrap',
-	'td_class' => 'timestamp compact_data',
+	'td_class' => 'timestamp',
 	'order' => 'csnd_last_click_ts',
 	'default_dir' => 'D',
 	'td' => '%user_td_emlog_date( #csnd_last_click_ts# )%',

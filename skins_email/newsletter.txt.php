@@ -17,14 +17,14 @@ emailskin_include( '_email_header.inc.txt.php', $params, 'header' );
 // Default params:
 $params = array_merge( array(
 		'message_text' => '',
-		'newsletter'   => '',
+		'enlt_ID'      => '',
 	), $params );
 
 echo $params['message_text'];
 
 // Footer vars:
-$params['unsubscribe_text'] = T_( 'If you don\'t want to receive this list anymore, click here:' ).' '.
-		get_htsrv_url().'quick_unsubscribe.php?type=newsletter&newsletter='.$params['newsletter'].'&user_ID=$user_ID$&key=$unsubscribe_key$';
+$params['unsubscribe_text'] = T_( 'If you don\'t want to receive emails from this list anymore, click here:' ).' '.
+		get_htsrv_url().'quick_unsubscribe.php?type=newsletter&newsletter='.$params['enlt_ID'].'&user_ID=$user_ID$&key=$unsubscribe_key$';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params, 'footer' );

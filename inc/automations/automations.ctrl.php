@@ -74,6 +74,11 @@ switch( $action )
 		{	// Clear an order of the duplicating step in order to set this automatically right below current one:
 			$edited_AutomationStep->set( 'order', '' );
 		}
+
+		if( ( $action == 'edit_step' || $action == 'copy_step' ) && ! $edited_AutomationStep->can_be_modified() )
+		{	// If step cannot be modified currently
+			$Messages->add( T_('You must pause the automation before changing step.'), 'warning' );
+		}
 		break;
 
 	case 'new_step':
@@ -85,6 +90,11 @@ switch( $action )
 		// Create object of new Automation:
 		$edited_AutomationStep = new AutomationStep();
 		$edited_AutomationStep->set( 'autm_ID', $autm_ID );
+
+		if( ! $edited_AutomationStep->can_be_modified() )
+		{	// If step cannot be modified currently
+			$Messages->add( T_('You must pause the automation before creating new step.'), 'warning' );
+		}
 		break;
 
 	case 'create':
@@ -101,8 +111,23 @@ switch( $action )
 		if( $edited_Automation->load_from_Request() )
 		{	// We could load data from form without errors:
 			// Insert in DB:
-			$edited_Automation->dbinsert();
-			$Messages->add( T_('New automation has been created.'), 'success' );
+			if( $edited_Automation->dbinsert() )
+			{
+				$Messages->add( T_('New automation has been created.'), 'success' );
+
+				// Create default step automatically:
+				$default_AutomationStep = new AutomationStep();
+				$default_AutomationStep->set( 'autm_ID', $edited_Automation->ID );
+				$default_AutomationStep->set( 'order', '1' );
+				$default_AutomationStep->set( 'type', 'notify_owner' );
+				$default_AutomationStep->set( 'info', '$login$ has ENTERED automation $automation_name$ (ID: $automation_ID$)'."\n\n".'Step $step_number$ (ID: $step_ID$)' );
+				$default_AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+				$default_AutomationStep->set( 'yes_next_step_delay', 86400 ); // 1 day
+				$default_AutomationStep->set( 'error_next_step_ID', 1 ); // Loop
+				$default_AutomationStep->set( 'error_next_step_delay', 14400 ); // 4 hours
+				$default_AutomationStep->set_label();
+				$default_AutomationStep->dbinsert( false/* Insert step even when automation is not paused */ );
+			}
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=automations', 303 ); // Will EXIT
@@ -202,9 +227,9 @@ switch( $action )
 		{	// A list of automations on the edited List page:
 			$redirect_to = $admin_url.'?ctrl=newsletters&tab=automations&action=edit&enlt_ID='.$enlt_ID;
 		}
-		elseif( $tab == 'steps' )
+		elseif( $tab == 'steps' || $tab == 'diagram' )
 		{	// Tab "Steps" of the edited Automation page:
-			$redirect_to = $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_Automation->ID;
+			$redirect_to = $admin_url.'?ctrl=automations&action=edit&tab='.$tab.'&autm_ID='.$edited_Automation->ID;
 		}
 		else
 		{	// A list of all automations:
@@ -283,6 +308,15 @@ switch( $action )
 
 		// Check that current user has permission to create automation steps:
 		$current_User->check_perm( 'options', 'edit', true );
+
+		if( ! $edited_AutomationStep->can_be_modified() )
+		{	// If step cannot be modified currently
+			$Messages->add( T_('You must pause the automation before changing step.'), 'error' );
+			$action = 'edit'; // To keep same opened page
+			// We want to highlight the Step:
+			$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
+			break;
+		}
 
 		// Make sure we got an step_ID:
 		param( 'step_ID', 'integer', true );
@@ -365,8 +399,9 @@ switch( $action )
 		$entered_step_order = param( 'step_order', 'integer', NULL );
 
 		// load data from request
-		if( $edited_AutomationStep->load_from_Request() )
-		{	// We could load data from form without errors:
+		if( $edited_AutomationStep->load_from_Request() &&
+		    $edited_AutomationStep->pause_automation() )
+		{	// We could load data from form without errors and automation can be paused:
 			// Insert in DB:
 			$edited_AutomationStep->dbinsert();
 			$Messages->add( T_('New automation step has been created.'), 'success' );
@@ -374,7 +409,7 @@ switch( $action )
 			$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab='.$tab.'&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'new_step';
@@ -398,8 +433,9 @@ switch( $action )
 		$entered_step_order = param( 'step_order', 'integer', NULL );
 
 		// Load data from request:
-		if( $edited_AutomationStep->load_from_Request() )
-		{	// We could load data from form without errors:
+		if( $edited_AutomationStep->load_from_Request() &&
+		    $edited_AutomationStep->pause_automation() )
+		{	// We could load data from form without errors and automation can be paused:
 			// Insert in DB:
 			$edited_AutomationStep->dbinsert();
 
@@ -453,19 +489,108 @@ switch( $action )
 		param( 'step_ID', 'integer', true );
 
 		// load data from request:
-		if( $edited_AutomationStep->load_from_Request() )
-		{	// We could load data from form without errors:
+		if( $edited_AutomationStep->load_from_Request() &&
+		    $edited_AutomationStep->pause_automation() )
+		{	// We could load data from form without errors and automation can be paused:
 			// Update automation step in DB:
 			$edited_AutomationStep->dbupdate();
 			$Messages->add( T_('Automation step has been updated.'), 'success' );
-			// We want to highlight the moved Step on next list display:
-			$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
+			if( $tab != 'diagram' )
+			{	// We want to highlight the moved Step on next list display:
+				$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
+			}
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab='.$tab.'&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'edit_step';
+		break;
+
+	case 'update_step_position':
+		// Update step position on automation diagram:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automationstep' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		param( 'pos', 'array:integer' );
+
+		if( count( $pos ) != 2 )
+		{	// Position array must contains 2 values: row|x and column|y:
+			debug_die( 'Wrong step position!' );
+		}
+
+		// Update step position:
+		$edited_AutomationStep->set( 'diagram', implode( ':', $pos ) );
+		$edited_AutomationStep->dbupdate();
+
+		// Exit here because we don't need UI for this AJAX action:
+		exit;
+
+	case 'update_step_connection':
+		// Update steps connection on automation diagram:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automationstep' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		param( 'connection_type', 'string', true );
+
+		if( ! in_array( $connection_type, array( 'yes', 'no', 'error' ) ) )
+		{	// Wrong connection type:
+			debug_die( 'Wrong step connection type!' );
+		}
+
+		// Set correct ID for next/target Step:
+		param( 'target_step_ID', 'integer' );
+		if( $target_step_ID > 0 )
+		{	// If step has been connected with target Step:
+			$target_AutomationStep = & $AutomationStepCache->get_by_ID( $target_step_ID );
+			if( $edited_AutomationStep->get_next_ordered_step_ID() == $target_AutomationStep->ID )
+			{	// If target Step is the next ordered Step we should use an option "Continue":
+				$target_step_ID = 0;
+			}
+			else
+			{	// Some other next target Step:
+				$target_step_ID = $target_AutomationStep->ID;
+			}
+		}
+		else
+		{	// if step has been disconnected:
+			$target_step_ID = -1;
+		}
+
+		// Update step connection or disconnection between the requested Steps:
+		$edited_AutomationStep->set( $connection_type.'_next_step_ID', $target_step_ID, true );
+		$edited_AutomationStep->dbupdate();
+
+		// Exit here because we don't need UI for this AJAX action:
+		exit;
+
+	case 'reset_diagram':
+		// Reset steps positions on automation diagram to default positions:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automationstep' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		// Reset positions of all steps of the edited Automation:
+		$DB->query( 'UPDATE T_automation__step
+			  SET step_diagram = NULL
+			WHERE step_autm_ID = '.$DB->quote( $edited_Automation->ID ) );
+
+		$Messages->add( T_('Diagram layout has been reset.'), 'success' );
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=diagram&autm_ID='.$edited_Automation->ID, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 
 	case 'delete_step':
@@ -480,7 +605,11 @@ switch( $action )
 		// Make sure we got an autm_ID:
 		param( 'autm_ID', 'integer', true );
 
-		if( $edited_AutomationStep->dbdelete() )
+		if( ! $edited_AutomationStep->can_be_modified() )
+		{	// If step cannot be modified currently
+			$Messages->add( T_('You must pause the automation before deleting step.'), 'error' );
+		}
+		elseif( $edited_AutomationStep->dbdelete() )
 		{
 			$Messages->add( T_('Automation step has been deleted.'), 'success' );
 
@@ -491,7 +620,7 @@ switch( $action )
 
 		// Display the same edit automation page with steps list because step cannot be deleted by some restriciton:
 		$action = 'edit';
-		// We want to highlight the Step which cannot de leted on next list display:
+		// We want to highlight the Step which cannot be deleted on next list display:
 		$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
 		break;
 
@@ -619,7 +748,7 @@ switch( $action )
 			if( empty( $edited_Automation ) )
 			{	// Get Automation of the edited Step:
 				$edited_Automation = & $edited_AutomationStep->get_Automation();
-				set_param( 'tab', 'steps' );
+				set_param( 'tab', $display_mode == 'js' ? 'diagram' : 'steps' );
 			}
 			$AdminUI->add_menu_entries( array( 'email', 'automations' ), array(
 					'settings' => array(
@@ -628,6 +757,9 @@ switch( $action )
 					'steps' => array(
 						'text' => T_('Steps'),
 						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=steps&amp;autm_ID='.$edited_Automation->ID ),
+					'diagram' => array(
+						'text' => T_('Diagram view'),
+						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=diagram&amp;autm_ID='.$edited_Automation->ID ),
 					'users' => array(
 						'text' => T_('Users'),
 						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=users&amp;autm_ID='.$edited_Automation->ID ),
@@ -646,13 +778,23 @@ switch( $action )
 		switch( $tab )
 		{
 			case 'steps':
-				$AdminUI->set_page_manual_link( 'automation-steps' );
+				$AdminUI->set_page_manual_link( in_array( $action, array( 'new_step', 'edit_step', 'copy_step' ) ) ? 'automation-step-details' : 'automation-steps' );
 				$AdminUI->set_path( 'email', 'automations', 'steps' );
 				break;
 
 			case 'users':
 				$AdminUI->set_page_manual_link( 'automation-users-queued' );
 				$AdminUI->set_path( 'email', 'automations', 'users' );
+				break;
+
+			case 'diagram':
+				$AdminUI->set_page_manual_link( 'automation-diagram-view' );
+				$AdminUI->set_path( 'email', 'automations', 'diagram' );
+				// Load files to draw diagram by plugin jsPlumb:
+				require_js( 'jquery/jsplumb/jsplumb.min.js', 'rsc_url' );
+				require_css( 'jquery/jsplumb/jsplumbtoolkit-defaults.css', 'rsc_url' );
+				require_css( 'jquery/jsplumb/jsplumbtoolkit-b2evo.css', 'rsc_url' );
+				require_js( 'jquery/jquery.panzoom.min.js', 'rsc_url' );
 				break;
 
 			default:
@@ -686,6 +828,10 @@ if( in_array( $action, array( 'new_step', 'edit_step', 'copy_step' ) ) )
 	{
 		$AdminUI->display_breadcrumbpath_add( T_('Step').' #'.$edited_AutomationStep->dget( 'order' ) );
 	}
+}
+if( $tab == 'diagram' )
+{	// Load jQuery QueryBuilder plugin files for edit step form in modal window:
+	init_querybuilder_js( 'rsc_url' );
 }
 
 if( $display_mode != 'js' )
@@ -721,6 +867,10 @@ switch( $action )
 
 			case 'users':
 				$AdminUI->disp_view( 'automations/views/_automation_users.view.php' );
+				break;
+
+			case 'diagram':
+				$AdminUI->disp_view( 'automations/views/_automation_diagram.view.php' );
 				break;
 
 			case 'settings':

@@ -198,6 +198,13 @@ switch( $action )
 			// Max execution time:
 			$Settings->set( 'cjob_timeout_'.$cron_job_key, param_duration( 'cjob_timeout_'.$cron_job_key ) );
 
+			$cjob_maxemail = param( 'cjob_maxemail_'.$cron_job_key, 'string', NULL );
+			if( $cjob_maxemail !== NULL )
+			{	// Setting only for cron jobs that use email sending:
+				$cjob_maxemail = intval( $cjob_maxemail );
+				$Settings->set( 'cjob_maxemail_'.$cron_job_key, ( $cjob_maxemail > 0 ? $cjob_maxemail : '' ) );
+			}
+
 			// Additional settings per cron job:
 			switch( $cron_job_key )
 			{
@@ -232,6 +239,11 @@ switch( $action )
 					$Settings->set( 'cleanup_jobs_threshold', param( 'cleanup_jobs_threshold', 'integer', 0 ) );
 					break;
 
+				case 'cleanup-email-logs':
+					// Clean up email logs older than a threshold:
+					$Settings->set( 'cleanup_email_logs_threshold', param_duration( 'cleanup_email_logs_threshold', 'integer', 0 ) );
+					break;
+
 				case 'send-non-activated-account-reminders':
 					// Send reminders about non-activated accounts:
 					$Settings->set( 'activate_account_reminder_threshold', param_duration( 'activate_account_reminder_threshold' ) );
@@ -241,20 +253,25 @@ switch( $action )
 					for( $c = 0; $c <= $reminder_config_num; $c++ )
 					{
 						$reminder_config_value = param_duration( 'activate_account_reminder_config_'.$c );
-						if( $reminder_config_value > 0 )
-						{	// Store only a selected reminder:
+						if( $reminder_config_value > 0 || $c >= $reminder_config_num - 2 )
+						{	// Store only a selected reminder and 3 last options("Mark as Failed / Pending delete", "Delete warning", "Delete account"):
 							$reminder_config[ $c ] = $reminder_config_value;
 						}
 					}
-					if( count( $reminder_config ) < 2 )
+					if( count( $reminder_config ) < 4 )
 					{	// If no reminder has been selected:
 						param_error( 'activate_account_reminder_config_0', T_('Please select at least one reminder for account activation reminder after subscription.') );
 					}
-					if( ! isset( $reminder_config[ $reminder_config_num ] ) )
-					{	// If "Mark as failed" is not selected:
-						param_error( 'activate_account_reminder_config_'.$reminder_config_num, T_('Please select account activation reminder threshold to mark as failed after subscription.') );
+					if( empty( $reminder_config[ $reminder_config_num - 2 ] ) )
+					{	// If "Mark as Failed / Pending delete" is not selected:
+						param_error( 'activate_account_reminder_config_'.( $reminder_config_num - 2 ), /* Do NOT translate because it is impossible for normal form */'Please select account activation reminder threshold to "Marked as Failed / Pending delete" after subscription.' );
 					}
 					$Settings->set( 'activate_account_reminder_config', implode( ',', $reminder_config ) );
+					break;
+
+				case 'send-inactive-account-reminders':
+					// Send reminders about inactivate accounts:
+					$Settings->set( 'inactive_account_reminder_threshold', param_duration( 'inactive_account_reminder_threshold' ) );
 					break;
 
 				case 'send-unmoderated-comments-reminders':
@@ -283,21 +300,21 @@ switch( $action )
 						{	// Store only a filled reminder:
 							if( empty( $reminder_delay_day ) )
 							{	// If one field is not filled:
-								param_error( 'unread_message_reminder_delay_day_'.$i, sprintf( T_('Please fill two fields of the unread private messages reminder #%d.'), $i ) );
+								param_error( 'unread_message_reminder_delay_day_'.$i, sprintf( T_('Please fill both fields of the unread private messages reminder #%d.'), $i ) );
 								$reminder_delay_day = 0;
 							}
 							elseif( $prev_reminder_delay_day >= $reminder_delay_day )
 							{	// If current value is less than previous:
-								param_error( 'unread_message_reminder_delay_day_'.$i, T_('The values of the unread private messages reminder must be ascendant.') );
+								param_error( 'unread_message_reminder_delay_day_'.$i, T_('The values of the unread private messages reminder must be ascending.') );
 							}
 							if( empty( $reminder_delay_spacing ) )
 							{	// If one field is not filled:
-								param_error( 'unread_message_reminder_delay_spacing_'.$i, sprintf( T_('Please fill two fields of the unread private messages reminder #%d.'), $i ) );
+								param_error( 'unread_message_reminder_delay_spacing_'.$i, sprintf( T_('Please fill both fields of the unread private messages reminder #%d.'), $i ) );
 								$reminder_delay_spacing = 0;
 							}
 							elseif( $prev_reminder_delay_spacing >= $reminder_delay_spacing )
 							{	// If current value is less than previous:
-								param_error( 'unread_message_reminder_delay_spacing_'.$i, T_('The values of the unread private messages reminder must be ascendant.') );
+								param_error( 'unread_message_reminder_delay_spacing_'.$i, T_('The values of the unread private messages reminder must be ascending.') );
 							}
 							$reminder_delay[] = $reminder_delay_day.':'.$reminder_delay_spacing;
 							$prev_reminder_delay_day = $reminder_delay_day;
@@ -312,6 +329,15 @@ switch( $action )
 						$reminder_delay[] = '0:0';
 					}
 					$Settings->set( 'unread_message_reminder_delay', implode( ',', $reminder_delay ) );
+					break;
+
+				case 'manage-email-statuses':
+					// Manage email address statuses:
+					$manage_email_statuses_min_delay = param_duration( 'manage_email_statuses_min_delay' );
+					param_check_not_empty( 'manage_email_statuses_min_delay', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Minimum delay since last error') ) );
+					$Settings->set( 'manage_email_statuses_min_delay', $manage_email_statuses_min_delay );
+					param_integer_range( 'manage_email_statuses_min_sends', 1, 999999999, sprintf( T_('The minimum value of the field "%s" is %d.'), T_('Minimum sends since last error'), 1 ) );
+					$Settings->set( 'manage_email_statuses_min_sends', $manage_email_statuses_min_sends );
 					break;
 			}
 		}

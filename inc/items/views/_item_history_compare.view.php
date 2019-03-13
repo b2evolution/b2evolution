@@ -38,19 +38,39 @@ $version_titles = array(
 	<col class="diff-content" />
 	<col class="diff-marker" />
 	<col class="diff-content" />
+	<tr><td colspan="4">&nbsp;</td></tr>
+	<tr>
+		<td colspan="4" class="diff-title-addedline diff-section-title"><b><?php echo T_('Version').':'; ?></b></td>
+	</tr>
 	<tr>
 		<td colspan="2" class="diff-otitle">
 			<p><?php echo get_item_version_title( $Revision_1 ); ?></p>
-			<div class="center"><small><?php echo T_('Status').': '.$post_statuses[ $Revision_1->iver_status ]; ?></small></div>
 		</td>
 		<td colspan="2" class="diff-ntitle">
 			<p><?php echo get_item_version_title( $Revision_2 ); ?></p>
-			<div class="center"><small<?php echo $Revision_1->iver_status != $Revision_2->iver_status ? ' style="color:#F00;font-weight:bold"' : ''; ?>><?php echo T_('Status').': '.$post_statuses[ $Revision_2->iver_status ]; ?></small></div>
+		</td>
+	</tr>
+	<tr><td colspan="4">&nbsp;</td></tr>
+	<tr>
+		<td colspan="4" class="diff-title-addedline diff-section-title"><b><?php echo T_('Status').':'; ?></b></td>
+	</tr>
+	<tr>
+		<td colspan="2" class="diff-otitle">
+			<div class="center"><?php echo $post_statuses[ $Revision_1->iver_status ]; ?></div>
+		</td>
+		<td colspan="2" class="diff-ntitle">
+			<div class="center"><span<?php echo $Revision_1->iver_status != $Revision_2->iver_status ? ' style="color:#F00;font-weight:bold"' : ''; ?>><?php echo $post_statuses[ $Revision_2->iver_status ]; ?></span></div>
 		</td>
 	</tr>
 <?php
 	if( !empty( $revisions_difference_title ) )
 	{	// Display title difference
+		?>
+		<tr><td colspan="4">&nbsp;</td></tr>
+		<tr>
+			<td colspan="4" class="diff-title-addedline diff-section-title"><b><?php echo T_('Title').':'; ?></b></td>
+		</tr>
+		<?php
 		echo $revisions_difference_title;
 	}
 	else
@@ -66,7 +86,12 @@ $version_titles = array(
 	<tr><td colspan="4">&nbsp;</td></tr>
 <?php
 if( !empty( $revisions_difference_content ) )
-{	// Dispay content difference
+{	// Display content difference
+	?>
+	<tr>
+		<td colspan="4" class="diff-title-addedline diff-section-title"><b><?php echo T_('Content').':'; ?></b></td>
+	</tr>
+	<?php
 	echo $revisions_difference_content;
 }
 else
@@ -81,7 +106,7 @@ if( ! empty( $revisions_difference_custom_fields ) )
 ?>
 		<tr><td colspan="4">&nbsp;</td></tr>
 		<tr>
-			<td colspan="4" class="diff-title-addedline"><b><?php echo T_('Custom fields').':'; ?></b></td>
+			<td colspan="4" class="diff-title-addedline diff-section-title"><b><?php echo T_('Custom fields').':'; ?></b></td>
 		</tr>
 	<?php
 	foreach( $revisions_difference_custom_fields as $revisions_diff_data )
@@ -114,7 +139,7 @@ if( ! empty( $revisions_difference_custom_fields ) )
 				}
 				elseif( $r == 1 )
 				{	// If field exists only in new revision:
-					echo '<td class="red"><b>'.sprintf( T_('The field "%s" does not exist'), $revisions_diff_data['r'.$r.'_label'] ).'</b></td>';
+					echo '<td class="red"><b>'.sprintf( T_('The field "%s" did not exist'), $revisions_diff_data['r'.$r.'_label'] ).'</b></td>';
 				}
 				else
 				{	// If field exists only in old revision:
@@ -131,7 +156,7 @@ if( ! empty( $revisions_difference_links ) )
 ?>
 		<tr><td colspan="4">&nbsp;</td></tr>
 		<tr>
-			<td colspan="4" class="diff-title-addedline"><b><?php echo T_('Images &amp; Attachments').':'; ?></b></td>
+			<td colspan="4" class="diff-title-addedline diff-section-title"><b><?php echo T_('Images &amp; Attachments').':'; ?></b></td>
 		</tr>
 		<tr>
 			<td colspan="4">
@@ -212,4 +237,6 @@ if( ! empty( $revisions_difference_links ) )
 
 $Form->end_form();
 
+// JS code for merge button:
+echo_item_merge_js();
 ?>

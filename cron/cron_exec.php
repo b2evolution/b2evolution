@@ -49,17 +49,6 @@ $quiet = 0;
 if( $is_cli )
 { // called through Command Line Interface, handle args:
 
-	if( empty( $secure_htsrv_url ) )
-	{ // Initialize this url when it is empty:
-		global $ReqHost;
-		if( empty( $ReqHost ) )
-		{ // In CLI mode the HOST is unknown, so use $baseurl from the config:
-			global $baseurl;
-			$ReqHost = $baseurl;
-		}
-		$secure_htsrv_url = get_htsrv_url( true );
-	}
-
 	// Load required functions ( we need to load here, because in CLI mode it is not loaded )
 	load_funcs( '_core/_url.funcs.php' );
 
@@ -163,6 +152,9 @@ else
 
 	// Initialize a var to count a number of cron job actions:
 	$cron_log_actions_num = NULL;
+
+	// Store key of currently executing cron job:
+	$executing_cron_task_key = $task->ctsk_key;
 
 	cron_log( 'Requesting lock on task #'.$ctsk_ID.' ['.$ctsk_name.']', 0 );
 
@@ -271,8 +263,9 @@ else
 		$DB->query( $sql, 'Record task as finished.' );
 	}
 
-	// Unset ID of the executed cron job to 
+	// Unset data of the executed cron job:
 	unset( $ctsk_ID );
+	unset( $executing_cron_task_key );
 }
 
 

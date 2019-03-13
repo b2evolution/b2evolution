@@ -33,7 +33,7 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'contact' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
-$Form->begin_fieldset( T_('Contact form').' (disp=msgform)'.get_manual_link( 'contact-form' ) );
+$Form->begin_fieldset( T_('Contact form').' (disp=msgform)'.get_manual_link( 'contact-form-features' ) );
 	$Form->text_input( 'msgform_title', $edited_Blog->get_setting( 'msgform_title' ), 80, T_('Page Title'), T_('Leave empty for default').': "'.T_('Contact').'".' );
 	$Form->begin_line( T_('Display recipient') );
 		$Form->checkbox( 'msgform_display_recipient', $edited_Blog->get_setting( 'msgform_display_recipient' ), '' );
@@ -67,7 +67,7 @@ $Form->begin_fieldset( T_('Contact form').' (disp=msgform)'.get_manual_link( 'co
 			'input_prefix' => $saved_additional_fields,
 			'field_suffix' => '<button type="button" id="button_add_field" class="btn btn-default">'.T_('Add').'</button>'
 		) );
-	$Form->checkbox( 'msgform_contact_method', $edited_Blog->get_setting( 'msgform_contact_method' ), T_('Preferred contact method'), T_('Check to let user specify a preferred contact method.') );
+	$Form->checkbox( 'msgform_contact_method', $edited_Blog->get_setting( 'msgform_contact_method' ), T_('Reply method'), T_('Check to let user specify a preferred contact method.') );
 	$Form->checkbox( 'msgform_display_message', $edited_Blog->get_setting( 'msgform_display_message' ), T_('Allow message field'), T_('Check to display textarea.') );
 	$Form->checkbox( 'msgform_require_message', $edited_Blog->get_setting( 'msgform_require_message' ), T_('Require message field'), T_('Check to require a custom message.'), '', 1, ! $edited_Blog->get_setting( 'msgform_display_message' ) );
 	$msgform_message_label_params = array();
@@ -81,7 +81,7 @@ $Form->end_fieldset();
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#button_add_field' ).click( function ()
 {	// Action for the button to add a new field in the additional fields:
 	var field_id = jQuery( this ).prev().find( 'option:selected' ).val();

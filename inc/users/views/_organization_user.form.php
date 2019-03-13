@@ -41,7 +41,7 @@ $Form->begin_form( 'fform' );
 
 	$Form->text_input( 'role', '', 32, T_('Role'), '', array( 'maxlength' => 255 ) );
 
-	$Form->text_input( 'priority', '', 32, T_('Priority'), '', array( 'maxlength' => 255, 'type' => 'number' ) );
+	$Form->text_input( 'priority', '', 32, T_('Order'), '', array( 'maxlength' => 255, 'type' => 'number' ) );
 
 $buttons = array();
 if( $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )

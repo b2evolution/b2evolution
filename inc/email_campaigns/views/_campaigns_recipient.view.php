@@ -38,7 +38,7 @@ $Results->cols[] = array(
 	'order' => 'ecmp_sent_ts',
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
-	'td_class' => 'timestamp compact_data',
+	'td_class' => 'timestamp',
 	'td' => '%mysql2localedatetime_spans( #ecmp_sent_ts# )%',
 );
 
@@ -47,13 +47,13 @@ $Results->cols[] = array(
 	'order' => 'ecmp_auto_sent_ts',
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
-	'td_class' => 'timestamp compact_data',
+	'td_class' => 'timestamp',
 	'td' => '%mysql2localedatetime_spans( #ecmp_auto_sent_ts# )%',
 );
 
 $Results->cols[] = array(
 	'th' => T_('Send count'),
-	'order' => 'send_count',
+	'order' => 'ecmp_send_count',
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
@@ -71,7 +71,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => /* TRANS: Image load count */ T_('Img loads'),
-	'order' => 'open_count',
+	'order' => 'ecmp_img_loads',
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
@@ -80,7 +80,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => T_('Link clicks'),
-	'order' => 'click_count',
+	'order' => 'ecmp_link_clicks',
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
@@ -89,6 +89,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => /* TRANS: Call To Action 1*/ T_('CTA1'),
+	'order' => 'ecmp_cta1_clicks',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
 	'td' =>'%campaign_td_recipient_action( {row}, "cta1" )%',
@@ -96,6 +97,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => /* TRANS: Call To Action 2*/ T_('CTA2'),
+	'order' => 'ecmp_cta2_clicks',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
 	'td' =>'%campaign_td_recipient_action( {row}, "cta2" )%',
@@ -103,6 +105,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => /* TRANS: Call To Action 3*/ T_('CTA3'),
+	'order' => 'ecmp_cta3_clicks',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
 	'td' =>'%campaign_td_recipient_action( {row}, "cta3" )%',
@@ -110,6 +113,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => T_('Likes'),
+	'order' => 'ecmp_like_count',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
 	'td' =>'%campaign_td_recipient_action( {row}, "liked" )%',
@@ -117,6 +121,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => T_('Dislikes'),
+	'order' => 'ecmp_dislike_count',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
 	'td' =>'%campaign_td_recipient_action( {row}, "disliked" )%',
@@ -124,7 +129,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 	'th' => T_('Unsub clicks'),
-	'order' => 'unsubscribe_click_count',
+	'order' => 'ecmp_unsub_clicks',
 	'default_dir' => 'D',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
@@ -147,12 +152,11 @@ users_results_block( array(
 		'page_url'             => get_dispctrl_url( 'campaigns', 'action=edit&amp;tab=recipient&amp;ecmp_ID='.$edited_EmailCampaign->ID.
 				( empty( $recipient_type ) ? '' : '&amp;recipient_type='.$recipient_type ).
 				( empty( $recipient_action ) ? '' : '&amp;recipient_action='.$recipient_action ) ),
-		'display_ID'           => false,
+		'display_ID'           => true,
 		'display_btn_adduser'  => false,
 		'display_btn_addgroup' => false,
 		'display_avatar'       => false,
-		'display_firstname'    => true,
-		'display_lastname'     => true,
+		'display_nickname'     => false,
 		'display_name'         => false,
 		'display_gender'       => false,
 		'display_country'      => false,
@@ -171,12 +175,14 @@ users_results_block( array(
 		'display_campaign_actions' => true,
 		'display_newsletter'   => false,
 		'display_enlt_status'  => true,
+		'display_camp_user_status' => true,
+		'display_email_status' => true,
 		'display_camp_status'  => true,
 		'display_emlog_date'   => true,
 		'display_email_tracking' => true,
-		'th_class_login'       => 'shrinkwrap',
+		'th_class_id'          => 'shrinkwrap',
+		'td_class_id'          => 'shrinkwrap',
+		'th_class_login'       => '',
 		'td_class_login'       => '',
-		'th_class_nickname'    => 'shrinkwrap',
-		'td_class_nickname'    => '',
 	) );
 ?>

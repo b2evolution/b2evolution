@@ -77,7 +77,7 @@ else
 }
 
 ?>
-<script type="text/javascript">
+<script>
 function check_goal_redir_url_required()
 {
 	if( jQuery( '#goal_temp_redir_url' ).val() == '' )

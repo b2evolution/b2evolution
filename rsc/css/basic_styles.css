@@ -3,25 +3,32 @@
  * These are included in basic.css but also in item_base.css so they are available in WYSIWYG editors
  */
 .red {
-  color: #f00;
+  color: #f00 !important;
 }
 .violet {
   color: #9400D3;
 }
 .orange {
-  color: #f60;
+  color: #f60 !important;
 }
 .green {
-  color: #00cc00;
+  color: #0c0 !important;
 }
 .black {
-  color: #000;
+  color: #000 !important;
 }
 .gray,
 .grey,
 .dimmed,
 .disabled {
-  color: #999;
+  color: #999 !important;
+}
+.evo_param_error {
+  color: #F00;
+  background-color: #fcf8e3;
+  border-radius: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 .note,
 .notes {
@@ -30,16 +37,16 @@
   font-weight: normal;
 }
 .left {
-  text-align: left;
+  text-align: left !important;
 }
 .center {
-  text-align: center;
+  text-align: center !important;
 }
 .right {
-  text-align: right;
+  text-align: right !important;
 }
 .justify {
-  text-align: justify;
+  text-align: justify !important;
 }
 .nobr,
 .nowrap,
@@ -72,26 +79,32 @@ code {
       -ms-hyphens: none;
           hyphens: none;
 }
+code {
+  background-color: rgba(27, 31, 35, 0.05);
+  color: #24292e;
+}
 img {
   border: none;
   max-width: 100%;
   height: auto;
 }
 .top {
-  vertical-align: top;
+  vertical-align: top !important;
 }
 .middle {
-  vertical-align: middle;
+  vertical-align: middle !important;
 }
-.bottom,
-img.icon {
-  vertical-align: bottom;
+.bottom {
+  vertical-align: bottom !important;
 }
 .baseline {
-  vertical-align: baseline;
+  vertical-align: baseline !important;
 }
 .text-bottom {
-  vertical-align: text-bottom;
+  vertical-align: text-bottom !important;
+}
+img.icon {
+  vertical-align: bottom;
 }
 img.raised,
 .image_block.raised img,
@@ -209,14 +222,6 @@ span.icon.voted {
 }
 a.rollover_sprite:hover span.icon {
   visibility: hidden;
-  visibility: visible\0/;
-  /* IE8 */
-}
-@media screen and (min-width: 0\0) {
-  /* IE9-10 */
-  a.rollover_sprite:hover span.icon {
-    visibility: visible;
-  }
 }
 a.rollover_sprite:hover span.icon:before {
   visibility: visible !important;
@@ -1049,6 +1054,7 @@ span.roundbutton.rbtn_black:hover,
   border: 1px solid transparent;
   border-radius: 4px;
   box-sizing: border-box;
+  padding: 1px 7px 2px;
 }
 .btn:hover,
 .btn:focus {

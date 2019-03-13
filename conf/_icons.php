@@ -550,6 +550,13 @@ function get_icon_info( $name )
 			'fa' => 'circle',
 			'color' => '#5bc0de'
 		);
+		case 'bullet_dark_blue': return array(
+			'alt' => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 32, 192 ),
+			'fa' => 'circle',
+			'color' => '#337ab7'
+		);
 		case 'bullet_red': return array(
 			'alt'  => '&bull;',
 			'size' => array( 9, 9 ),
@@ -612,14 +619,14 @@ function get_icon_info( $name )
 			'legend' => T_('Activate'),
 			'size' => array( 16, 16 ),
 			'xy' => array( 64, 96 ),
-			'fa' => 'toggle-on'
+			'fa' => 'toggle-off'
 		);
 		case 'deactivate': return array(
 			'alt'  => /* TRANS: Short for "Deactivate(d)" */ T_('Deact.'),
 			'legend' => T_('Deactivate'),
 			'size' => array( 16, 16 ),
 			'xy' => array( 80, 96 ),
-			'fa' => 'toggle-off'
+			'fa' => 'toggle-on'
 		);
 		case 'enabled': return array(
 			'alt'  => /* TRANS: Short for "Activate(d)" */ T_('Act.'),
@@ -671,7 +678,7 @@ function get_icon_info( $name )
 		case 'manual': return array(
 			'rollover' => true,
 			'alt'  => T_('Help'),
-			'legend' => T_('Online Manual'),
+			'legend' => T_('Online manual'),
 			'size' => array( 16, 15 ),
 			'xy' => array( 128, 96 ),
 			'glyph' => 'book',

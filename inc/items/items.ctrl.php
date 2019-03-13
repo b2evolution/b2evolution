@@ -40,7 +40,7 @@ global $current_User;
  */
 global $Collection, $Blog;
 
-global $dispatcher;
+global $admin_url;
 
 global $basehost;
 
@@ -96,7 +96,10 @@ switch( $action )
 
 		if( $action == 'propose' &&
 		    ( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) ) )
-		{	// Suggest item fields values from last proposed change when user creates new propose change:
+		{	// If the Item already has a proposed change:
+			// Check if current User can create a new proposed change:
+			$edited_Item->check_proposed_change( true );
+			// Suggest item fields values from last proposed change when user creates new propose change:
 			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
 		}
 
@@ -389,7 +392,7 @@ switch( $action )
 
 		// Note: we redirect without restoring filter. This should allow to see the new files.
 		// &filter=restore
-		header_redirect( $dispatcher.'?ctrl=items&blog='.$blog );	// Will save $Messages
+		header_redirect( $admin_url.'?ctrl=items&blog='.$blog );	// Will save $Messages
 
 		// Note: we should have EXITED here. In case we don't (error, or sth...)
 
@@ -554,7 +557,78 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=items&blog='.$blog.'&p='.( $new_post_creation_result ? $new_Item->ID : $item_ID.'&comment_type=feedback#comments' ) );
 		break;
 
-	case 'set_visibility':
+	case 'items_visibility':
+		// Change visibility of selected items:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'items' );
+
+		$selected_items = param( 'selected_items', 'array:integer' );
+		$page = param( 'page', 'integer', 1 );
+
+		// Set an URL to redirect to items list after this action:
+		$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.( $page > 1 ? '&items_full_paged='.$page : '' );
+
+		if( empty( $selected_items ) )
+		{	// If no items selected:
+			$Messages->add( T_('Please select at least one item.'), 'error' );
+			// REDIRECT / EXIT:
+			header_redirect( $redirect_to );
+		}
+
+		$item_status = param( 'post_status', 'string' );
+		$status_options = get_visibility_statuses();
+		$item_status_title = isset( $status_options[ $item_status ] ) ? $status_options[ $item_status ] : $item_status;
+
+		$ItemCache = & get_ItemCache();
+		$items_success = 0;
+		$items_restricted = array();
+		$items_failed = 0;
+		foreach( $selected_items as $selected_item_ID )
+		{
+			if( ( $selected_Item = & $ItemCache->get_by_ID( $selected_item_ID, false, false ) ) &&
+			    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $selected_Item ) )
+			{	// If current User has a permission to edit the selected Item:
+				$selected_Item->set( 'status', $item_status );
+				if( $selected_Item->dbupdate() )
+				{
+					if( $item_status == $selected_Item->get( 'status' ) )
+					{	// If the item has been updated to the requested status:
+						$items_success++;
+					}
+					else
+					{	// If the item could not be updated to the requested status because of restriction e.g. by post status:
+						if( ! isset( $items_restricted[ $selected_Item->get( 'status' ) ] ) )
+						{
+							$items_restricted[ $selected_Item->get( 'status' ) ] = 0;
+						}
+						$items_restricted[ $selected_Item->get( 'status' ) ]++;
+					}
+					continue;
+				}
+			}
+			// Wrong item or current User has no perm to edit the selected item:
+			$items_failed++;
+		}
+
+		if( $items_success )
+		{	// Inform about success updates:
+			$Messages->add( sprintf( T_('Visibility of %d items have been updated to %s.'), $items_success, $item_status_title ), 'success' );
+		}
+		foreach( $items_restricted as $restricted_status => $restricted_status_num )
+		{	// Inform about restricted updates:
+			$Messages->add( sprintf( T_('Visibility of %d items have been restricted to %s.'), $restricted_status_num, isset( $status_options[ $restricted_status ] ) ? $status_options[ $restricted_status ] : $restricted_status ), 'note' );
+		}
+		if( $items_failed )
+		{	// Inform about failed updates:
+			$Messages->add( sprintf( T_('Visibility of %d items could not be updated to %s.'), $items_failed, $item_status_title ), 'error' );
+		}
+
+		// REDIRECT / EXIT:
+		header_redirect( $redirect_to );
+		break;
+
+	case 'comments_visibility':
 		// Set visibility of selected comments:
 
 		// Check that this action request is not a CSRF hacked request:
@@ -562,6 +636,7 @@ switch( $action )
 
 		$item_ID = param( 'p', 'integer', 0 );
 		$selected_comments = param( 'selected_comments', 'array:integer' );
+		$page = param( 'page', 'integer', 1 );
 
 		if( $item_ID > 0 )
 		{	// Set an URL to redirect to item view details page after this action:
@@ -569,7 +644,7 @@ switch( $action )
 		}
 		else
 		{	// Set an URL to redirect to comments list after this action:
-			$redirect_to = $admin_url.'?ctrl=comments&blog='.$blog;
+			$redirect_to = $admin_url.'?ctrl=comments&blog='.$blog.( $page > 1 ? '&cmnt_fullview_paged='.$page : '' );
 		}
 
 		if( empty( $selected_comments ) )
@@ -585,6 +660,7 @@ switch( $action )
 
 		$CommentCache = & get_CommentCache();
 		$comments_success = 0;
+		$comments_restricted = array();
 		$comments_failed = 0;
 		foreach( $selected_comments as $selected_comment_ID )
 		{
@@ -595,7 +671,18 @@ switch( $action )
 				$selected_Comment->set( 'status', $comment_status );
 				if( $selected_Comment->dbupdate() )
 				{
-					$comments_success++;
+					if( $comment_status == $selected_Comment->get( 'status' ) )
+					{	// If the comment has been updated to the requested status:
+						$comments_success++;
+					}
+					else
+					{	// If the comment could not be updated to the requested status because of restriction e.g. by post status:
+						if( ! isset( $comments_restricted[ $selected_Comment->get( 'status' ) ] ) )
+						{
+							$comments_restricted[ $selected_Comment->get( 'status' ) ] = 0;
+						}
+						$comments_restricted[ $selected_Comment->get( 'status' ) ]++;
+					}
 					continue;
 				}
 			}
@@ -606,6 +693,10 @@ switch( $action )
 		if( $comments_success )
 		{	// Inform about success updates:
 			$Messages->add( sprintf( T_('Visibility of %d comments have been updated to %s.'), $comments_success, $comment_status_title ), 'success' );
+		}
+		foreach( $comments_restricted as $restricted_status => $restricted_status_num )
+		{	// Inform about restricted updates:
+			$Messages->add( sprintf( T_('Visibility of %d comments have been restricted to %s.'), $restricted_status_num, isset( $status_options[ $restricted_status ] ) ? $status_options[ $restricted_status ] : $restricted_status ), 'note' );
 		}
 		if( $comments_failed )
 		{	// Inform about failed updates:
@@ -881,9 +972,13 @@ switch( $action )
 		// but we need to make sure the requested/default one is ok:
 		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status, $edited_Item );
 
-		// We use the request variables to fill the edit form, because we need to be able to pass those values
-		// from tab to tab via javascript when the editor wants to switch views...
-		$edited_Item->load_from_Request( true ); // needs Blog set
+		param( 'load_from_request', 'integer', 1 );
+		if( $load_from_request )
+		{
+			// We use the request variables to fill the edit form, because we need to be able to pass those values
+			// from tab to tab via javascript when the editor wants to switch views...
+			$edited_Item->load_from_Request( true ); // needs Blog set
+		}
 
 		// Check if new category was started to create. If yes then set up parameters for next page:
 		check_categories_nosave( $post_category, $post_extracats,$edited_Item, ( $action == 'edit_switchtab' ? 'frontoffice' : 'backoffice' ) );
@@ -970,7 +1065,7 @@ switch( $action )
 		$r1_custom_fields = array();
 		foreach( $custom_fields as $custom_field )
 		{
-			$r1_custom_fields[ $custom_field['name'] ] = $edited_Item->get_custom_field_value( $custom_field['name'], false, false );
+			$r1_custom_fields[ $custom_field['name'] ] = $edited_Item->get_custom_field_value( $custom_field['name'] );
 		}
 		// Switch to 2nd revision:
 		$edited_Item->set( 'revision', get_param( 'r2' ) );
@@ -987,31 +1082,30 @@ switch( $action )
 			// Get custom field values of both revisions:
 			$r1_custom_field_value = isset( $r1_custom_fields[ $custom_field['name'] ] ) ? $r1_custom_fields[ $custom_field['name'] ] : false;
 			$r2_custom_field_value = $edited_Item->get_custom_field_value( $custom_field['name'], false, false );
-			if( $r1_custom_field_value != $r2_custom_field_value &&
-			    $r1_custom_field_value !== false &&
-			    $r2_custom_field_value !== false )
-			{	// Compare custom field values of 1st and 2nd revisions if they are used for both revisions:
-				$revisions_difference_custom_field = new Diff(
-						explode( "\n", $r1_custom_field_value ),
-						explode( "\n", $r2_custom_field_value )
-					);
-				if( $custom_field['type'] == 'html' || $custom_field['type'] == 'text' )
-				{	// Display a line number for custom fields with multiple lines:
-					$revisions_difference_custom_field = $TableDiffFormatter->format( $revisions_difference_custom_field );
+			$revisions_difference_custom_field = '';
+			if( $r1_custom_field_value != $r2_custom_field_value )
+			{	// If values are different:
+				if( $r1_custom_field_value !== false &&
+				    $r2_custom_field_value !== false )
+				{	// Compare custom field values of 1st and 2nd revisions if they are used for both revisions:
+					$revisions_difference_custom_field = new Diff(
+							explode( "\n", $r1_custom_field_value ),
+							explode( "\n", $r2_custom_field_value )
+						);
+					if( $custom_field['type'] == 'html' || $custom_field['type'] == 'text' )
+					{	// Display a line number for custom fields with multiple lines:
+						$revisions_difference_custom_field = $TableDiffFormatter->format( $revisions_difference_custom_field );
+					}
+					else
+					{	// Don't display a line number for custom fields with single line:
+						$revisions_difference_custom_field = $oneline_TableDiffFormatter->format( $revisions_difference_custom_field );
+					}
 				}
-				else
-				{	// Don't display a line number for custom fields with single line:
-					$revisions_difference_custom_field = $oneline_TableDiffFormatter->format( $revisions_difference_custom_field );
+				elseif( $r1_custom_field_value !== false ||
+				        $r2_custom_field_value !== false)
+				{	// Don't compare custom field values if at least one is not used in revision but however they are different:
+					$revisions_difference_custom_field = NULL;
 				}
-			}
-			elseif( $r1_custom_field_value !== false ||
-			        $r2_custom_field_value !== false )
-			{	// Don't compare custom field values if at least one is not used in revision but however they are different:
-				$revisions_difference_custom_field = NULL;
-			}
-			else
-			{	// Skip if both revisions have no the custom field:
-				continue;
 			}
 
 			if( $revisions_difference_custom_field !== '' )
@@ -1138,7 +1232,7 @@ switch( $action )
 
 	case 'propose':
 		// Check permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		$current_User->check_perm( 'blog_item_propose', 'edit', true, $Blog->ID );
 
 		$AdminUI->breadcrumbpath_add( sprintf( /* TRANS: noun */ T_('Post').' #%s', $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 		$AdminUI->breadcrumbpath_add( T_('Propose change'), '?ctrl=items&amp;action=propose&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
@@ -1177,7 +1271,7 @@ switch( $action )
 		// Get requested Post Type:
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
 		// Check permission on post type: (also verifies that post type is enabled and NOT reserved)
-		check_perm_posttype( $item_typ_ID, $post_extracats );
+		$valid_item_type = check_perm_posttype( $item_typ_ID, $post_extracats, false );
 
 		// Update the folding positions for current user
 		save_fieldset_folding_values( $Blog->ID );
@@ -1195,6 +1289,9 @@ switch( $action )
 		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit' || $action == 'create_link'), /* creating? */ true );
 
 		$Plugins->trigger_event ( 'AdminBeforeItemEditCreate', array ('Item' => & $edited_Item ) );
+
+		// Validate first enabled captcha plugin:
+		$Plugins->trigger_event_first_return( 'ValidateCaptcha', array( 'form_type' => 'item' ) );
 
 		if( !empty( $mass_create ) )
 		{	// ------ MASS CREATE ------
@@ -1297,7 +1394,14 @@ switch( $action )
 		// We want to highlight the edited object on next list display:
 		$Session->set( 'fadeout_array', array( 'item-'.$edited_Item->ID ) );
 
-		if( $edited_Item->status != 'redirected' &&
+		if( ! $valid_item_type )
+		{	// Item Type is not enabled for this collection, we will redirect to item type selection to allow user to change it t a valid one:
+			$Messages->add( sprintf( T_('You just edited an Item of Type "%s" which is not valid for this collection. Please select a new Item type below...'), $edited_Item->get( 't_type' ) ), 'warning' );
+
+			// load_from_request param set to 0 will prevent loading of Item data from request because we are not passing any item data from request!
+			$redirect_to = url_add_param( $admin_url, 'ctrl=items&action=edit_type&post_ID='.$edited_Item->ID.'&load_from_request=0' );
+		}
+		elseif( $edited_Item->status != 'redirected' &&
 		    ! strpos( $redirect_to, 'tab=tracker' ) &&
 		    ! strpos( $redirect_to, 'tab=manual' ) )
 		{	// Where to go after creating the post?
@@ -1375,7 +1479,7 @@ switch( $action )
 		// Get requested Post Type:
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
 		// Check permission on post type: (also verifies that post type is enabled and NOT reserved)
-		check_perm_posttype( $item_typ_ID, $post_extracats );
+		$valid_item_type = check_perm_posttype( $item_typ_ID, $post_extracats, false );
 
 		// UPDATE POST:
 		// Set the params we already got:
@@ -1472,7 +1576,12 @@ switch( $action )
 		}
 
 		// Where to go after editing the post?
-		if( $edited_Item->status == 'redirected' ||
+		if( ! $valid_item_type )
+		{	// Item Type is not enabled for this collection, we will redirect to item type selection to allow user to change it t a valid one:
+			$Messages->add( sprintf( T_('You just edited an Item of Type "%s" which is not valid for this collection. Please select a new Item type below...'), $edited_Item->get( 't_type' ) ), 'warning' );
+			$blog_redirect_setting = 'post_type';
+		}
+		elseif( $edited_Item->status == 'redirected' ||
 		    strpos( $redirect_to, 'tab=tracker' ) )
 		{ // We should show the posts list if:
 			//    a post is in "Redirected" status
@@ -1503,6 +1612,10 @@ switch( $action )
 			$Session->set( 'highlight_id', $edited_Item->ID );
 			$Session->set( 'fadeout_array', array( 'item-'.$edited_Item->ID ) );
 			$redirect_to = url_add_param( $redirect_to, 'highlight_id='.$edited_Item->ID, '&' );
+		}
+		elseif( $blog_redirect_setting == 'post_type' )
+		{	// load_from_request param set to 0 will prevent loading of Item data from request because we are not passing any item data from request!
+			$redirect_to = url_add_param( $admin_url, 'ctrl=items&action=edit_type&post_ID='.$edited_Item->ID.'&load_from_request=0' );
 		}
 		else
 		{ // $blog_redirect_setting == 'no', set redirect_to = NULL which will redirect to posts list
@@ -1608,6 +1721,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		param( 'status', 'string', true );
+		param( 'cat_ID', 'integer', NULL );
 
 		// Check edit permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
@@ -1638,8 +1752,11 @@ switch( $action )
 			$edited_Item->handle_notifications();
 
 			// Set redirect back to items list with new item type tab:
-			$tab = get_tab_by_item_type_usage( $edited_Item->get_type_setting( 'usage' ) );
-			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab=type&tab_type='.( $tab ? $tab[0] : 'post' ).'&filter=restore';
+			$tab = param( 'tab', 'string', 'type' );
+			$tab_type = get_tab_by_item_type_usage( $edited_Item->get_type_setting( 'usage' ) );
+			$tab_type_param = ( $tab == 'type' ? '&tab_type='.( $tab_type ? $tab_type[0] : 'post' ) : '' );
+			$cat_param = ( $cat_ID === NULL ? '' : '&cat_ID='.$cat_ID );
+			$redirect_to = $admin_url.'?ctrl=items&blog='.$Blog->ID.'&tab='.$tab.$tab_type_param.$cat_param.'&filter=restore';
 
 			// Highlight the updated item in list
 			$Session->set( 'highlight_id', $edited_Item->ID );
@@ -1912,7 +2029,7 @@ switch( $action )
 		}
 
 		if( $action == 'append' )
-		{	// If we should append
+		{	// If we should append item and comments at the end with new dates
 			$SQL = new SQL( 'Get the latest comment of Item #'.$dest_Item->ID.' to append Item #'.$edited_Item->ID );
 			$SQL->SELECT( 'MAX( comment_date )' );
 			$SQL->FROM( 'T_comments' );
@@ -1941,7 +2058,18 @@ switch( $action )
 			$Comment->set( 'date', $edited_Item->get( 'datestart' ) );
 		}
 		$Comment->set( 'notif_status', $edited_Item->get( 'notifications_status' ) );
-		$Comment->set( 'notif_flags', $edited_Item->get( 'notifications_flags' ) );
+		$notifications_flags = $edited_Item->get( 'notifications_flags' );
+		if( is_array( $notifications_flags ) )
+		{
+			foreach( $notifications_flags as $n => $notifications_flag )
+			{
+				if( ! in_array( $notifications_flag, array( 'moderators_notified', 'members_notified', 'community_notified' ) ) )
+				{	// Skip values which are not allowed for comment:
+					unset( $notifications_flags[ $n ] );
+				}
+			}
+		}
+		$Comment->set( 'notif_flags', $notifications_flags );
 		if( $Comment->dbinsert() )
 		{	// If comment has been created try to copy all attachments from source Item:
 			$DB->query( 'UPDATE T_links
@@ -1950,8 +2078,8 @@ switch( $action )
 			$DB->query( 'UPDATE T_links
 				  SET link_position = "aftermore"
 				WHERE link_cmt_ID = '.$Comment->ID.'
-					AND link_position != "teaser"
-					AND link_position != "aftermore"' );
+				  AND link_position != "teaser"
+				  AND link_position != "aftermore"' );
 		}
 		// Move all comments of the source Item to the target Item:
 		if( isset( $append_comment_timestamp ) )
@@ -1965,8 +2093,8 @@ switch( $action )
 			foreach( $source_comment_IDs as $source_comment_ID )
 			{
 				$DB->query( 'UPDATE T_comments
-						SET comment_item_ID = '.$dest_Item->ID.',
-						    comment_date = '.$DB->quote( date2mysql( $append_comment_timestamp ) ).'
+					  SET comment_item_ID = '.$dest_Item->ID.',
+					      comment_date = '.$DB->quote( date2mysql( $append_comment_timestamp ) ).'
 					WHERE comment_ID = '.$source_comment_ID );
 				// Increment 1 minute for each next appending comment:
 				$append_comment_timestamp += 60;
@@ -1975,9 +2103,13 @@ switch( $action )
 		else
 		{	// Merge comments with saving their dates:
 			$DB->query( 'UPDATE T_comments
-						SET comment_item_ID = '.$dest_Item->ID.'
-					WHERE comment_item_ID = '.$edited_Item->ID );
+				  SET comment_item_ID = '.$dest_Item->ID.'
+				WHERE comment_item_ID = '.$edited_Item->ID );
 		}
+		// Copy all slugs from source Item to destination Item:
+		$DB->query( 'UPDATE T_slug
+				  SET slug_itm_ID = '.$dest_Item->ID.'
+				WHERE slug_itm_ID = '.$edited_Item->ID );
 		// Delete the source Item completely:
 		$edited_Item_ID = $edited_Item->ID;
 		$edited_Item->dbdelete();
@@ -1997,13 +2129,22 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		// Check edit permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		$current_User->check_perm( 'blog_item_propose', 'edit', true, $Blog->ID );
+
+		// Check if current User can create a new proposed change:
+		$edited_Item->check_proposed_change( true );
 
 		if( $edited_Item->create_proposed_change() )
 		{	// If new proposed changes has been inserted in DB successfully:
 			$Messages->add( T_('New proposed change has been added.'), 'success' );
-			// Redirect to item history page with new poroposed change:
-			header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
+			if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+			{	// Redirect to item history page with new poroposed change if current User has a permisson:
+				header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
+			}
+			else
+			{	// Redirect to item view page:
+				header_redirect( $admin_url.'?ctrl=items&blog='.$edited_Item->get_blog_ID().'&p='.$edited_Item->ID );
+			}
 		}
 
 		// If some errors on creating new proposed change,
@@ -2110,6 +2251,8 @@ function init_list_mode()
 
 	// Set different filterset name for each different tab and tab_type
 	$filterset_name = ( $tab == 'type' ) ? $tab.'_'.utf8_strtolower( $tab_type ) : $tab;
+	// Append collection ID to filterset in order to keep filters separately per collection:
+	$filterset_name .= $Blog->ID;
 
 	// Create empty List:
 	$ItemList = new ItemList2( $Blog, NULL, NULL, $UserSettings->get('results_per_page'), 'ItemCache', $items_list_param_prefix, $filterset_name /* filterset name */ ); // COPY (func)
@@ -2137,6 +2280,17 @@ function init_list_mode()
 			require_js_helper( 'colorbox' );
 
 			$AdminUI->breadcrumbpath_add( T_('All'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
+			break;
+
+		case 'summary':
+			$ItemList->set_default_filters( array(
+					'itemtype_usage' => NULL // All types
+				) );
+
+			// require colorbox js
+			require_js_helper( 'colorbox' );
+
+			$AdminUI->breadcrumbpath_add( T_('Summary'), '?ctrl=items&amp;blog=$blog$&amp;tab=summary&amp;filter=restore' );
 			break;
 
 		case 'manual':
@@ -2236,12 +2390,25 @@ switch( $action )
 	case 'update': // on error
 	case 'update_publish': // on error
 	case 'history':
+	case 'history_details':
+	case 'history_compare':
 	case 'extract_tags':
 
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'filter' => 'restore' ) );
 
 		$display_permalink = false;
+
+		// Display item's title and ID in <title> tag instead of default breadcrumb path:
+		$AdminUI->htmltitle = $edited_Item->get_title( array(
+				'title_field' => 'short_title,title',
+				'link_type'   => 'none',
+			) );
+		if( empty( $AdminUI->htmltitle ) )
+		{	// Display collection short name when item has no yet e.g. on creating or when titles are disabled for current Item Type:
+			$AdminUI->htmltitle = $Blog->get( 'shortname' );
+		}
+		$AdminUI->htmltitle .= ' ('.( empty( $edited_Item->ID ) ? T_('New') : '#'.$edited_Item->ID ).')';
 
 		switch( $action )
 		{
@@ -2250,7 +2417,6 @@ switch( $action )
 			case 'update_edit':
 			case 'update': // on error
 			case 'update_publish': // on error
-			case 'history':
 			case 'extract_tags':
 				$item_permanent_url = $edited_Item->get_permanent_url( '', '', '&amp;', array( 'none' ) );
 				if( $item_permanent_url !== false )
@@ -2262,12 +2428,31 @@ switch( $action )
 					$display_permalink = true;
 				}
 
+				if( $Blog->get_setting( 'allow_comments' ) != 'never' )
+				{
+					$comments_number = generic_ctp_number( $edited_Item->ID, 'comments', 'total', true );
+					$item_feedback_title = ( $comments_number == 0 ? T_('no comment') : ( $comments_number == 1 ? T_('1 comment') : sprintf( T_('%d comments'), $comments_number ) ) );
+					$AdminUI->global_icon( $item_feedback_title, ( $comments_number > 0 ? 'comments' : 'nocomment' ), $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID.'#comments',
+						' '.$item_feedback_title, 4, 3, array(
+								'style' => 'margin-right: 3ex;',
+						) );
+				}
+
 				$edited_item_url = $edited_Item->get_copy_url();
 				if( ! empty( $edited_item_url ) )
 				{	// If user has a permission to copy the edited Item:
 					$AdminUI->global_icon( T_('Duplicate this post...'), 'copy', $edited_item_url,
 						' '.T_('Duplicate...'), 4, 3, array(
 								'style' => 'margin-right: 3ex;',
+						) );
+				}
+
+				if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+				{	// If user has a permission to merge the edited Item:
+					$AdminUI->global_icon( T_('Merge with...'), 'merge', '#',
+						' '.T_('Merge with...'), 4, 3, array(
+								'style' => 'margin-right: 3ex;',
+								'onclick' => 'return evo_merge_load_window( '.$edited_Item->ID.' )',
 						) );
 				}
 
@@ -2282,7 +2467,7 @@ switch( $action )
 				break;
 		}
 
-		if( ! in_array( $action, array( 'new_type', 'edit_type' ) ) )
+		if( ! in_array( $action, array( 'new_type', 'edit_type', 'history', 'history_details', 'history_compare' ) ) )
 		{
 			if( $edited_Item->ID > 0 )
 			{ // Display a link to history if Item exists in DB
@@ -2330,6 +2515,25 @@ switch( $action )
 			init_tokeninput_js();
 		}
 
+		if( in_array( $action, array( 'history', 'history_details', 'history_compare' ) ) )
+		{	// History tabs:
+			if( $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
+			{	// User has permissions to edit this Item:
+				$AdminUI->global_icon( T_('Edit current version'), 'edit',  $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$edited_Item->ID, T_('Edit current version'), 4, 3, array( 'style' => 'margin-right:3ex' ) );
+			}
+
+			$item_permanent_url = $edited_Item->get_permanent_url( '', '', '&amp;', array( 'none' ) );
+			if( $item_permanent_url !== false )
+			{	// Display item permanent URL only if permanent type is not 'none':
+				$AdminUI->global_icon( T_('Permanent link to full entry'), 'permalink', $item_permanent_url,
+						' '.T_('Permalink'), 4, 3, array(
+								'style' => 'margin-right: 3ex',
+						) );
+			}
+
+			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', $redirect_to, T_('Cancel'), 4, 2 );
+		}
+
 		break;
 
 	case 'new_mass':
@@ -2353,10 +2557,17 @@ switch( $action )
 	break;
 
 	case 'view':
+	case 'history_compare':
+	case 'history_details':
 		// We're displaying a SINGLE specific post:
 		$item_ID = param( 'p', 'integer', true );
 
 		$AdminUI->title_titlearea = T_('View post & comments');
+
+		if( ! isset( $tab ) )
+		{
+			$tab = 'full';
+		}
 
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'tab' => $tab, 'filter' => 'restore' ) );
@@ -2405,7 +2616,7 @@ else
 	$AdminUI->append_path_level( empty( $tab ) ? 'full' : $tab );
 }
 
-if( ( isset( $tab ) && in_array( $tab, array( 'full', 'type', 'tracker' ) ) ) || strpos( $action, 'edit' ) === 0 )
+if( ( isset( $tab ) && in_array( $tab, array( 'full', 'summary', 'type', 'tracker' ) ) ) || strpos( $action, 'edit' ) === 0 )
 { // Init JS to autcomplete the user logins
 	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 	// Initialize date picker for _item_expert.form.php
@@ -2414,7 +2625,7 @@ if( ( isset( $tab ) && in_array( $tab, array( 'full', 'type', 'tracker' ) ) ) ||
 
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
-init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
+init_popover_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
 /* fp> I am disabling this. We haven't really used per-blof styles yet and at the moment it creates interference with boostrap Admin
 // Load the appropriate ITEM/POST styles depending on the blog's skin:
@@ -2435,18 +2646,13 @@ if( !empty( $Blog ) )
 }
 */
 
-if( $action == 'view' || $action == 'history_compare' || strpos( $action, 'edit' ) !== false || strpos( $action, 'new' ) !== false )
+if( $action == 'view' || $action == 'history_compare' || strpos( $action, 'edit' ) !== false || strpos( $action, 'new' ) !== false || $action == 'copy' )
 {	// Initialize js to autocomplete usernames in post/comment form
 	init_autocomplete_usernames_js();
 	// Require colorbox js:
 	require_js_helper( 'colorbox' );
-	// Require Fine Uploader js and css:
-	init_fineuploader_js_lang_strings();
-	require_js( 'multiupload/fine-uploader.js' );
-	require_css( 'fine-uploader.css' );
-	// Load JS files to make the links table sortable:
-	require_js( '#jquery#' );
-	require_js( 'jquery/jquery.sortable.min.js' );
+	// Init JS to quick upload several files:
+	init_fileuploader_js();
 }
 
 if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish', 'extract_tags' ) ) )
@@ -2723,6 +2929,11 @@ switch( $action )
 					$AdminUI->disp_view( 'items/views/_item_list_full.view.php' );
 					break;
 
+				case 'summary':
+					// Display VIEW:
+					$AdminUI->disp_view( 'items/views/_item_list_summary.view.php' );
+					break;
+
 				case 'manual':
 					// Display VIEW:
 					$AdminUI->disp_view( 'items/views/_item_list_manual.view.php' );
@@ -2739,13 +2950,13 @@ switch( $action )
 			// would be used for moderation rules.
 			if( $Blog->get( 'notes' ) )
 			{
-				$block_item_Widget = new Widget( 'block_item' );
-				$block_item_Widget->title = T_('Notes');
-				// show a quicklink to edit if user has permission:
-/* fp> TODO: use an action icon (will appear on the right)
+				$edit_link = '';
 				if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
-					$block_item_Widget->title .=	' <a href="?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#ffield_blog_notes">'.get_icon( 'edit' ).'</a>';
-*/
+				{
+					$edit_link = action_icon( T_('Edit').'...', 'edit_button', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID, ' '.T_('Edit').'...', 3, 4, array( 'class' => 'btn btn-default btn-sm' ) );
+				}
+				$block_item_Widget = new Widget( 'block_item' );
+				$block_item_Widget->title = '<span class="pull-right panel_heading_action_icons">'.$edit_link.'</span>'.T_('Notes');
 				$block_item_Widget->disp_template_replaced( 'block_start' );
 				$Blog->disp( 'notes', 'htmlbody' );
 				$block_item_Widget->disp_template_replaced( 'block_end' );

@@ -49,7 +49,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New user field') : T_('User field')
 
 	// Show this textarea only for field type with "Option list"
 	echo '<div id="div_ufdf_options"'. ( $edited_Userfield->type != 'list' ? ' style="display:none"' : '' ) .'>';
-	$Form->textarea_input( 'ufdf_options', $edited_Userfield->options, 10, T_('Options'), array( 'required' => true, 'maxlength' => 255, 'note' => T_('Enter one option per line. Max length 255 symbols.') ) );
+	$Form->textarea_input( 'ufdf_options', $edited_Userfield->options, 10, T_('Options'), array( 'required' => ( $edited_Userfield->type == 'list' ? true : 'mark_only' ), 'maxlength' => 255, 'note' => T_('Enter one option per line. Max length 255 symbols.') ) );
 	echo '</div>';
 
 	// Suggest values only for field type with "Single word"
@@ -74,7 +74,7 @@ else
 	$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
 }
 ?>
-<script type="text/javascript">
+<script>
 	jQuery( '#ufdf_type' ).change( function()
 	{	// Show textarea input only for field type with "Option list"
 		if( jQuery( this ).val() == 'list' )

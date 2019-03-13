@@ -33,7 +33,7 @@ global $Settings;
  */
 function JS_showhide_class_on_checkbox( $class, $checkbox_id )
 {
-	return '<script type="text/javascript">
+	return '<script>
     if( document.getElementById("'.$checkbox_id.'").checked )
 		{
  			jQuery(".'.$class.'").show();
@@ -60,7 +60,7 @@ function JS_showhide_ids_on_checkbox( $div_ids, $checkbox_id )
 	{
 		$div_ids = array( $div_ids );
 	}
-	$r = '<script type="text/javascript">
+	$r = '<script>
 		var display = document.getElementById("'.$checkbox_id.'").checked ? "" : "none";'."\n";
 	foreach( $div_ids as $div_id )
 	{
@@ -81,7 +81,7 @@ function JS_showhide_ids_on_checkbox( $div_ids, $checkbox_id )
  */
 function JS_showhide_ffield_on_checkbox( $field_id, $checkbox_id )
 {
-	return '<script type="text/javascript">
+	return '<script>
 		document.getElementById("ffield_'.$field_id.'").style.display = (document.getElementById("'.$checkbox_id.'").checked ? "" : "none")
 	</script>';
 }
@@ -150,14 +150,15 @@ $Form->add_crumb( 'file' );
 $Form->hidden( 'ctrl', 'fileset' );
 $Form->hidden( 'action', 'update' );
 
-$Form->begin_fieldset( T_('Accessible file roots').get_manual_link('accessible_file_roots'), array( 'id' => 'ffset_fileroots', 'class' => 'additional_file_settings' ) );
+$Form->begin_fieldset( T_('Accessible file roots').get_manual_link('accessible-file-roots'), array( 'id' => 'ffset_fileroots', 'class' => 'additional_file_settings' ) );
 	$Form->checkbox( 'fm_enable_roots_blog', $Settings->get('fm_enable_roots_blog'), T_('Enable blog directories'), T_('Check to enable root directories for blogs.' ) );
 	$Form->checkbox( 'fm_enable_roots_user', $Settings->get('fm_enable_roots_user'), T_('Enable user directories'), T_('Check to enable root directories for users.' ) );
 	$Form->checkbox( 'fm_enable_roots_shared', $Settings->get('fm_enable_roots_shared'), T_('Enable shared directory'), T_('Check to enable shared root directory.' ) );
 	$Form->checkbox( 'fm_enable_roots_skins', $Settings->get('fm_enable_roots_skins'), T_('Enable skins directory'), T_('Check to enable root directory for skins.' ) );	// fp> note: meaning may change to 1 dir per (installed) skin
+	$Form->checkbox( 'fm_enable_roots_plugins', $Settings->get('fm_enable_roots_plugins'), T_('Enable plugins directory'), T_('Check to enable root directory for plugins.' ) );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('File creation options'), array( 'id' => 'ffset_filecreate', 'class' => 'additional_file_settings' ) );
+$Form->begin_fieldset( T_('File creation options').get_manual_link('file-creation-options'), array( 'id' => 'ffset_filecreate', 'class' => 'additional_file_settings' ) );
 	$Form->checkbox( 'fm_enable_create_dir', $Settings->get('fm_enable_create_dir'), T_('Enable creation of folders'), T_('Check to enable creation of directories.' ) );
 	$Form->checkbox( 'fm_enable_create_file', $Settings->get('fm_enable_create_file'), T_('Enable creation of files'), T_('Check to enable creation of files.' ) );
 	$Form->checkbox_input( 'upload_enabled', $Settings->get( 'upload_enabled', true ), T_('Enable upload of files'), array(
@@ -179,12 +180,13 @@ $Form->begin_fieldset( T_('File creation options'), array( 'id' => 'ffset_filecr
 	echo JS_showhide_ffield_on_checkbox( 'upload_maxkb', 'upload_enabled' );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Advanced options'), array( 'id' => 'ffset_fileadvanced', 'class' => 'additional_file_settings' ) );
+$Form->begin_fieldset( T_('Advanced options').get_manual_link('advanced-file-options'), array( 'id' => 'ffset_fileadvanced', 'class' => 'additional_file_settings' ) );
 
-	$Form->text_input( 'fm_default_chmod_dir', $Settings->get('fm_default_chmod_dir'), 4, T_('Default folder permissions'), T_('Default CHMOD (UNIX permissions) for new directories created by the file manager.' ) );
+	$Form->text_input( 'fm_default_chmod_dir', $Settings->get('fm_default_chmod_dir'), 4, T_('Permissions for new folders'), T_('Default CHMOD (UNIX permissions) for new directories created by b2evolution.') );
 
-	// fp> Does the following also applu to *uploaded* files? (It should)
- 	$Form->text_input( 'fm_default_chmod_file', $Settings->get('fm_default_chmod_file'), 4, T_('Default file permissions'), T_('Default CHMOD (UNIX permissions) for new files created by the file manager.' ) );
+	// fp> Does the following also apply to *uploaded* files? (It should)
+	// yb> Yes, I tested on December 8, 2018, ver. 6.10.4-stable, branch "develop".
+	$Form->text_input( 'fm_default_chmod_file', $Settings->get('fm_default_chmod_file'), 4, T_('Permissions for new files'), T_('Default CHMOD (UNIX permissions) for new files created by b2evolution.') );
 
 	if( empty( $force_regexp_filename ) || empty( $force_regexp_dirname ) )
 	{ // At least one of these strings can be configured in the UI:

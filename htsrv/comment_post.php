@@ -279,6 +279,8 @@ else
 	$Comment->set( 'allow_msgform', $comment_allow_msgform );
 	$Comment->set( 'anon_notify', $comment_anon_notify );
 }
+// Set temporary ID to keep the attached files after redirect to preview comment or to correct some form errors:
+$Comment->temp_link_owner_ID = param( 'temp_link_owner_ID', 'integer', NULL );
 
 if( ! $Comment->is_meta() && $commented_Item->can_rate() )
 {	// Comment rating:
@@ -323,7 +325,7 @@ if( !empty( $preview_attachments ) )
 	}
 }
 
-if( $commented_Item->can_attach() && !empty( $_FILES['uploadfile'] ) && !empty( $_FILES['uploadfile']['size'] ) && !empty( $_FILES['uploadfile']['size'][0] ) )
+if( $commented_Item->can_attach( $Comment->temp_link_owner_ID ) && !empty( $_FILES['uploadfile'] ) && !empty( $_FILES['uploadfile']['size'] ) && !empty( $_FILES['uploadfile']['size'][0] ) )
 { // attaching files is permitted
 	$FileRootCache = & get_FileRootCache();
 	if( is_logged_in() )
@@ -390,6 +392,13 @@ $Plugins->trigger_event('BeforeCommentFormInsert', array(
 	'is_preview' => ($action == 'preview'),
 	'action' => & $action ) );
 
+// Validate first enabled captcha plugin:
+$Plugins->trigger_event_first_return( 'ValidateCaptcha', array(
+	'form_type'  => 'comment',
+	'Comment'    => & $Comment,
+	'is_preview' => ( $action == 'preview' ),
+) );
+
 // Redirect and:
 // Display error messages for the comment form OR
 // Display success message when workflow has been updated but comment text has not been filled:
@@ -446,7 +455,9 @@ if( $action == 'preview' )
 
 	// This message serves the purpose that the next page will not even try to retrieve preview from cache... (and won't collect data to be cached)
 	// This is session based, so it's not 100% safe to prevent caching. We are also using explicit caching prevention whenever personal data is displayed
-	$Messages->add_to_group( T_('This is a preview only! Do not forget to send your comment!'), 'error', T_('Preview:') );
+	$Messages->add_to_group( T_('This is a preview only! Do not forget to send your comment!'), 'error', /* TRANS: Noun */ T_('Preview:') );
+	// Set affixed variable to float the Messages:
+	$Messages->affixed = true;
 
 	if( $comments_email_is_detected )
 	{ // Comment contains an email address, We should show an error about this
@@ -458,7 +469,7 @@ if( $action == 'preview' )
 			}
 			$link_log_in = 'href="'.get_login_url( 'blocked comment email', $commented_Item->get_url( 'public_view' ) ).'"';
 			$link_register = 'href="'.get_user_register_url( $commented_Item->get_url( 'public_view' ), 'blocked comment email' ).'"';
-			$Messages->add_to_group( sprintf( T_('Your comment contains an email address. Please <a %s>log in</a> or <a %s>create an account now</a> instead. This will allow people to send you private messages without revealing your email address to SPAM robots.'), $link_log_in, $link_register ), 'error', T_('Preview:') );
+			$Messages->add_to_group( sprintf( T_('Your comment contains an email address. Please <a %s>log in</a> or <a %s>create an account now</a> instead. This will allow people to send you private messages without revealing your email address to SPAM robots.'), $link_log_in, $link_register ), 'error', /* TRANS: Noun */ T_('Preview:') );
 
 			// Save the user data if he will go to register form after this action
 			$register_user = array(
@@ -469,7 +480,7 @@ if( $action == 'preview' )
 		}
 		else
 		{	// No registration
-			$Messages->add_to_group( T_('Your comment contains an email address. We recommend you check the box "Allow message form." below instead. This will allow people to contact you without revealing your email address to SPAM robots.'), 'error', T_('Preview:') );
+			$Messages->add_to_group( T_('Your comment contains an email address. We recommend you check the box "Allow message form." below instead. This will allow people to contact you without revealing your email address to SPAM robots.'), 'error', /* TRANS: Noun */ T_('Preview:') );
 		}
 	}
 
@@ -628,6 +639,9 @@ if( $Comment->ID )
 			break;
 	}
 	$Messages->add( $success_message, 'success' );
+
+	// Set affixed variable to float the Messages:
+	$Messages->affixed = true;
 
 	if( !is_logged_in() )
 	{

@@ -237,7 +237,7 @@ skin_include( '_access_denied.disp.php' );
 							'item_before_opened'   => get_icon( 'collapse' ),
 							'item_before_closed'   => get_icon( 'expand' ),
 							'item_before_post'     => get_icon( 'file_message' ),
-							'expand_all'           => false,
+							'item_title_fields'    => 'short_title,title',
 							'sorted'               => true
 						) );
 					// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
@@ -279,7 +279,7 @@ skin_include( '_access_denied.disp.php' );
 							'item_before_opened'   => get_icon( 'collapse' ),
 							'item_before_closed'   => get_icon( 'expand' ),
 							'item_before_post'     => get_icon( 'file_message' ),
-							'expand_all'           => false,
+							'item_title_fields'    => 'short_title,title',
 							'sorted'               => true
 						) );
 					// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------

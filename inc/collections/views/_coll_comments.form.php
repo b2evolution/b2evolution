@@ -22,7 +22,7 @@ global $edited_Blog, $AdminUI, $Settings, $admin_url;
 $notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 ?>
-<script type="text/javascript">
+<script>
 	<!--
 	function show_hide_feedback_details(ob)
 	{
@@ -138,6 +138,18 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 		$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Trackbacks').$trackbacks_title, $trackbacks_warning.T_('Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.') );
 	}
 
+	if( $perm_blog_admin || $edited_Blog->get_setting( 'webmentions' ) )
+	{	// Only admin can turn ON this setting
+		$Form->checkbox( 'blog_webmentions', $edited_Blog->get_setting( 'webmentions' ),
+			T_('Webmentions').( ! $edited_Blog->get_setting( 'webmentions' ) ? get_admin_badge() : '' ),
+			T_('Allow other bloggers to send webmentions to this collection, letting you know when they refer to it.')
+			// Display additional note for not public collection:
+			.( $edited_Blog->get_setting( 'allow_access' ) != 'public' ? ' <span class="red">'.T_('This collection cannot receive webmentions because it is not public.').'</span>' : '' ),
+			'', 1,
+			// Disable receiving of webmentions for not public collections:
+			$edited_Blog->get_setting( 'allow_access' ) != 'public' );
+	}
+
 	$Form->checkbox( 'autocomplete_usernames', $edited_Blog->get_setting( 'autocomplete_usernames' ),
 		T_( 'Autocomplete usernames in back-office' ), T_( 'Check to enable auto-completion of usernames entered after a "@" sign in the comment forms' ) );
 
@@ -145,7 +157,7 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 
 	if( $edited_Blog->get_setting( 'allow_comments' ) == 'never' )
 	{ ?>
-	<script type="text/javascript">
+	<script>
 		<!--
 		jQuery( '.feedback_details_container' ).hide();
 		//-->
@@ -288,7 +300,15 @@ if( $notifications_mode != 'off' )
 		$Form->checklist( array(
 					array( 'allow_comment_subscriptions', 1, T_('Allow users to subscribe and receive email notifications for each new comment.'), $edited_Blog->get_setting( 'allow_comment_subscriptions' ) ),
 					array( 'allow_item_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ), $edited_Blog->get_setting( 'allow_item_subscriptions' ) ),
-				), 'allow_coll_subscriptions', T_('Email subscriptions') );
+				), 'allow_coll_subscriptions', T_('Registered users') );
+		$Form->checklist( array(
+				array( 'allow_anon_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for replies to their comments.' ), $edited_Blog->get_setting( 'allow_anon_subscriptions' ) ),
+			), 'allow_anon_subscriptions', T_('Anonymous users') );
+		$Form->radio( 'default_anon_comment_notify', $edited_Blog->get_setting( 'default_anon_comment_notify' ), array(
+				array( 1, T_('Checked') ),
+				array( 0, T_('Unchecked') ),
+			), T_('Default option') );
+		$Form->text( 'anon_notification_email_limit', $edited_Blog->get_setting( 'anon_notification_email_limit' ), 4, T_('Limit'),  T_('Max # of emails an anonymous user may receive per day.'), 4 );
 	$Form->end_fieldset();
 }
 
@@ -307,6 +327,13 @@ $Form->begin_fieldset( T_('Comment recycle bin').get_manual_link('recycle-bin-se
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset( T_('Meta Comments').get_manual_link( 'meta-comments-settings' ) );
+
+	$Form->checkbox( 'meta_comments_frontoffice', $edited_Blog->get_setting( 'meta_comments_frontoffice' ), T_('Display in Front-Office'), T_('Display meta comments in Front-Office.') );
+
+$Form->end_fieldset();
+
+
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 echo '<div class="well">';
@@ -320,7 +347,7 @@ echo '</ul>';
 echo '</div>';
 
 ?>
-<script type="text/javascript">
+<script>
 	var paged_comments_is_checked = jQuery( '#paged_comments' ).is( ':checked' );
 	jQuery( '#threaded_comments' ).click( function()
 	{ // Disable checkbox "Paged comments" if "Threaded comments" is ON

@@ -52,7 +52,7 @@ global $AdminUI;
 // Admin skin dropdown list handler
 // Display settings corresponding only for the current (loaded) admin skin
 ?>
-<script type="text/javascript">
+<script>
 	function admin_skin_changed()
 	{
 		// admin skin dropdown list selected value
@@ -88,7 +88,7 @@ user_prevnext_links( array(
 
 $Form = new Form( NULL, 'user_checkchanges' );
 
-$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
+$Form->title_fmt = '$title$';
 
 if( !$user_profile_only )
 {
@@ -110,7 +110,7 @@ $Form->begin_form( 'fform', $form_title, array( 'title' => ( isset( $form_text_t
 
 	/***************  Preferences  **************/
 
-$Form->begin_fieldset( T_('Preferences').get_manual_link('user_preferences') );
+$Form->begin_fieldset( T_('Preferences').get_manual_link('user-preferences') );
 
 /*
  * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.

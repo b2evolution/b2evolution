@@ -115,10 +115,13 @@ function dbm_delete_pagecache( $display_details = true )
 {
 	global $DB, $Messages, $cache_path;
 
-	print_log( T_('Clearing page caches:'), 'normal', array( 'text_style' => 'bold' ) );
-	evo_flush();
+	if( $display_details )
+	{	// Display message only when it is required:
+		print_log( T_('Clearing page caches:'), 'normal', array( 'text_style' => 'bold' ) );
+		evo_flush();
 
-	echo '<ul>';
+		echo '<ul>';
+	}
 
 	// Clear general cache directory:
 	$result = cleardir_r( $cache_path.'general' );
@@ -169,10 +172,13 @@ function dbm_delete_pagecache( $display_details = true )
 		}
 	}
 
-	echo '</ul>';
+	if( $display_details )
+	{	// Display message only when it is required:
+		echo '</ul>';
 
-	echo '<br />';
-	print_log( T_('Page caches deleted.'), 'success' );
+		echo '<br />';
+		print_log( T_('Page caches deleted.'), 'success' );
+	}
 }
 
 
@@ -995,7 +1001,7 @@ function echo_progress_log_update( $progress_log_id, $done, $all )
 {
 	echo '<span class="function_echo_progress_log_update">';
 	?>
-	<script type="text/javascript">
+	<script>
 		jQuery('.function_echo_progress_log_update').remove();
 		jQuery( '#' + '<?php echo $progress_log_id; ?>' ).html("<?php echo ' '.$done.' / '.$all ?>");
 	</script>

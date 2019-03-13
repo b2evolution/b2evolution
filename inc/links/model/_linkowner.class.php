@@ -116,12 +116,15 @@ class LinkOwner
 			}
 			else
 			{	// Create new temporary object:
-				global $blog;
 				$tmp_link_Object = new TemporaryID();
 				$tmp_link_Object->set( 'type', $this->type );
-				if( ! empty( $blog ) )
-				{
-					$tmp_link_Object->set( 'coll_ID', $blog );
+				if( ! empty( $this->link_Object->blog_ID ) )
+				{	// Set parent collection ID of Item:
+					$tmp_link_Object->set( 'coll_ID', $this->link_Object->blog_ID );
+				}
+				if( ! empty( $this->link_Object->item_ID ) )
+				{	// Set parent item ID of Comment:
+					$tmp_link_Object->set( 'item_ID', $this->link_Object->item_ID );
 				}
 				$tmp_link_Object->dbinsert();
 			}
@@ -155,10 +158,13 @@ class LinkOwner
 				}
 			}
 
-			// Mark this link owner is using a temporary object:
-			$this->link_Object->tmp_ID = $tmp_link_Object->ID;
-			$this->link_Object->tmp_coll_ID = $tmp_link_Object->get( 'coll_ID' );
-			$this->link_Object->type = $tmp_link_Object->get( 'type' );
+			if( $tmp_link_Object->ID > 0 )
+			{	// Mark this link owner is using a temporary object:
+				$this->link_Object->tmp_ID = $tmp_link_Object->ID;
+				$this->link_Object->tmp_coll_ID = $tmp_link_Object->get( 'coll_ID' );
+				$this->link_Object->tmp_item_ID = $tmp_link_Object->get( 'item_ID' );
+				$this->link_Object->type = $tmp_link_Object->get( 'type' );
+			}
 		}
 	}
 
@@ -243,14 +249,30 @@ class LinkOwner
 		return count( $this->Links );
 	}
 
+
 	/**
-	 * Get Blog
+	 * Get collection object
+	 *
+	 * @return object
 	 */
 	function & get_Blog()
 	{
 		$this->load_Blog();
 
 		return $this->Blog;
+	}
+
+
+	/**
+	 * Get collection ID
+	 *
+	 * @return integer
+	 */
+	function get_blog_ID()
+	{
+		$Blog = & $this->get_Blog();
+
+		return $Blog ? $Blog->ID : 0;
 	}
 
 

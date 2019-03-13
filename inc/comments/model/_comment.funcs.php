@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'comments/model/_comment.class.php', 'Comment' );
 
 /**
- * Generic comments/trackbacks/pingbacks counting
+ * Generic comments/trackbacks/pingbacks/webmentions counting
  *
  * @todo check this in a multiblog page...
  * @todo This should support visibility: at least in the default front office (_feedback.php), there should only the number of visible comments/trackbacks get used ({@link Item::feedback_link()}).
@@ -79,7 +79,8 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 						'trackbacks' => $statuses_array,
 						'pingbacks'  => $statuses_array,
 						'feedbacks'  => $statuses_array,
-						'metas'      => $statuses_array
+						'metas'      => $statuses_array,
+						'webmentions'=> $statuses_array,
 					);
 			}
 
@@ -121,7 +122,8 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 				'trackbacks' => $statuses_array,
 				'pingbacks'  => $statuses_array,
 				'feedbacks'  => $statuses_array,
-				'metas'      => $statuses_array
+				'metas'      => $statuses_array,
+				'webmentions'=> $statuses_array,
 			);
 
 		$count_SQL->WHERE_and( 'comment_item_ID = '.intval($post_id) );
@@ -145,7 +147,7 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 		}
 	}
 
-	if( ! in_array( $mode, array( 'comments', 'trackbacks', 'pingbacks', 'metas' ) ) )
+	if( ! in_array( $mode, array( 'comments', 'trackbacks', 'pingbacks', 'metas', 'webmentions' ) ) )
 	{
 		$mode = 'feedbacks';
 	}
@@ -353,7 +355,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
  * @param object Form
  * @param object edited Comment
  * @param string Max allowed status
- * @param string Action: 'update' - for button titles like 'Save as Public!', 'set_visibility' - for button titles like 'Set visibility to Public'
+ * @param string Action: 'update' - for button titles like 'Save as Public!', 'comments_visibility' - for button titles like 'Set visibility to Public'
  */
 function echo_comment_status_buttons( $Form, $edited_Comment = NULL, $max_allowed_status = '', $action = 'update' )
 {
@@ -382,7 +384,7 @@ function echo_comment_status_buttons( $Form, $edited_Comment = NULL, $max_allowe
 	// Get those statuses which are not allowed for the current User to create posts in this blog
 	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit', $comment_status, $restrict_max_allowed_status ), array( 'redirected', 'trash' ) );
 	// Get allowed visibility statuses:
-	if( $action == 'set_visibility' )
+	if( $action == 'comments_visibility' )
 	{
 		$status_options = get_visibility_statuses( '', $exclude_statuses );
 		foreach( $status_options as $status_key => $status_title )
@@ -926,7 +928,7 @@ function echo_comment_reply_js( $Item )
 	}
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'a.comment_reply' ).click( function()
 {	// The click action for the links "Reply to this comment"
 	var comment_ID = jQuery( this ).attr( 'rel' );

@@ -61,8 +61,8 @@ if( !empty( $datestop ) )
 if( !empty( $email ) )
 {	// Filter by email
 	$email = utf8_strtolower( $email );
-	$SQL->WHERE_and( 'emret_address LIKE '.$DB->quote( $email ) );
-	$count_SQL->WHERE_and( 'emret_address LIKE '.$DB->quote( $email ) );
+	$SQL->WHERE_and( 'emret_address LIKE '.$DB->quote( '%'.$email.'%' ) );
+	$count_SQL->WHERE_and( 'emret_address LIKE '.$DB->quote( '%'.$email.'%' ) );
 }
 
 
@@ -81,7 +81,7 @@ function filter_email_return( & $Form )
 
 	$Form->date_input( 'datestartinput', $datestart, T_('From date') );
 	$Form->date_input( 'datestopinput', $datestop, T_('To date') );
-	$Form->email_input( 'email', $email, 40, T_('Email') );
+	$Form->text_input( 'email', $email, 40, T_('Email') );
 }
 $Results->filter_area = array(
 	'callback' => 'filter_email_return',
@@ -90,55 +90,8 @@ $Results->filter_area = array(
 		)
 	);
 
-$Results->cols[] = array(
-		'th' => T_('ID'),
-		'order' => 'emret_ID',
-		'th_class' => 'shrinkwrap',
-		'td_class' => 'right',
-		'td' => '$emret_ID$',
-	);
-
-$Results->cols[] = array(
-		'th' => T_('Date Time'),
-		'order' => 'emret_timestamp',
-		'default_dir' => 'D',
-		'th_class' => 'shrinkwrap',
-		'td_class' => 'timestamp compact_data',
-		'td' => '%mysql2localedatetime_spans( #emret_timestamp# )%',
-	);
-
-function emret_address_col( $emret_address )
-{
-	return '<a href="'.regenerate_url( 'email,action,emret_ID', 'email='.$emret_address ).'">'.$emret_address.'</a>';
-}
-$Results->cols[] = array(
-		'th' => T_('Address'),
-		'order' => 'emret_address',
-		'td' => '%emret_address_col( #emret_address# )%',
-		'th_class' => 'shrinkwrap',
-	);
-
-$Results->cols[] = array(
-		'th' => T_('Err Type'),
-		'order' => 'emret_errtype',
-		'td' => '%dre_decode_error_type( #emret_errtype# )%',
-		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap',
-	);
-
-$Results->cols[] = array(
-		'th' => T_('Error'),
-		'order' => 'emret_errormsg',
-		'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=return&amp;emret_ID=$emret_ID$">%htmlspecialchars( #emret_errormsg# )%</a>',
-	);
-
-$Results->cols[] = array(
-		'th' => T_('Actions'),
-		'th_class' => 'shrinkwrap small',
-		'td_class' => 'shrinkwrap',
-		'td' => action_icon( T_('View this email...'), 'magnifier', $admin_url.'?ctrl=email&amp;tab=return&amp;emret_ID=$emret_ID$' )
-			.action_icon( T_('Go to users list with this email address'), 'play', $admin_url.'?ctrl=users&amp;filter=new&amp;keywords=$emret_address$' )
-	);
+// Initialize Results object:
+email_returns_results( $Results );
 
 // Display results:
 $Results->display();

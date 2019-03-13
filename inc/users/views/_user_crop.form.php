@@ -67,13 +67,9 @@ $Form = new Form( $form_action, 'user_checkchanges' );
 
 if( is_admin_page() )
 {
-	$form_class = 'fform';
-	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
 	$ctrl_param = '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID;
-
 	$form_title = '';
 	$form_class = 'fform';
-	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
 }
 else
 {
@@ -164,7 +160,7 @@ if( $can_crop )
 	}
 </style>
 
-<script type="text/javascript">
+<script>
 	var jcrop_api;
 	var image_url = '<?php echo format_to_js( $cropped_File->get_url() ); ?>';
 	var gutter = 10;

@@ -18,20 +18,34 @@ function get_upgrade_folder_path( $version_folder_name )
 		debug_die( 'Invalid name of upgrade folder' );
 	}
 
-	// Use a root path by default
+	// Use a root path by default:
 	$upgrade_folder_path = $upgrade_path.$version_folder_name;
 
-	if( file_exists( $upgrade_folder_path.'/b2evolution/blogs' ) )
-	{ // Use 'b2evolution/blogs' folder
-		$upgrade_folder_path .= '/b2evolution/blogs';
-	}
-	else if( file_exists( $upgrade_folder_path.'/b2evolution/site' ) )
-	{ // Use 'b2evolution/site' folder
-		$upgrade_folder_path .= '/b2evolution/site';
-	}
-	else if( file_exists( $upgrade_folder_path.'/b2evolution' ) )
-	{ // Use 'b2evolution' folder
-		$upgrade_folder_path .= '/b2evolution';
+	if( $dir_handle = @opendir( $upgrade_folder_path ) )
+	{
+		while( ( $dir_name = readdir( $dir_handle ) ) !== false )
+		{
+			$dir_path = $upgrade_folder_path.'/'.$dir_name;
+			if( is_dir( $dir_path ) && preg_match( '#^b2evolution#i', $dir_name ) )
+			{	// Use any folder which name is started with "b2evolution":
+				if( file_exists( $dir_path.'/blogs' ) )
+				{	// Use 'b2evolution*/blogs' folder:
+					$upgrade_folder_path = $dir_path.'/blogs';
+					break;
+				}
+				elseif( file_exists( $dir_path.'/site' ) )
+				{	// Use 'b2evolution*/site' folder:
+					$upgrade_folder_path = $dir_path.'/site';
+					break;
+				}
+				elseif( file_exists( $dir_path ) )
+				{	// Use 'b2evolution*' folder:
+					$upgrade_folder_path = $dir_path;
+					break;
+				}
+			}
+		}
+		closedir( $dir_handle );
 	}
 
 	return $upgrade_folder_path;
@@ -282,15 +296,26 @@ function prepare_maintenance_dir( $dir_name, $deny_access = true )
  */
 function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_name = '' )
 {
-	if( !file_exists( $dest_dir ) )
-	{ // We can create directory
-		if ( ! mkdir_r( $dest_dir ) )
-		{
-			echo '<p class="text-danger">'.sprintf( T_( 'Unable to create &laquo;%s&raquo; directory to extract files from ZIP archive.' ), $dest_dir ).'</p>';
-			evo_flush();
+	global $Settings, $current_User;
 
-			return false;
+	if( ! is_logged_in() || ! $current_User->check_perm( 'files', 'all' ) )
+	{	// No permission to unzip files:
+		$error = '<span class="text-danger">'.T_('You don\'t have permission to UNZIP files automatically on the server.').'</span>';
+		if( $current_User->check_perm( 'users', 'edit' ) )
+		{	// Link to edit permissions:
+			global $admin_url;
+			$error = '<a href="'.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->get( 'grp_ID' ).'#fieldset_wrapper_file">'.$error.'</a>';
 		}
+		echo '<p>'.$error.'</p>';
+		evo_flush();
+		return false;
+	}
+
+	if( ! file_exists( $dest_dir ) && ! mkdir_r( $dest_dir ) )
+	{	// Destination directory doesn't exist and it couldn't be created:
+		echo '<p class="text-danger">'.sprintf( T_( 'Unable to create &laquo;%s&raquo; directory to extract files from ZIP archive.' ), $dest_dir ).'</p>';
+		evo_flush();
+		return false;
 	}
 
 	if( function_exists( 'gzopen' ) )
@@ -300,7 +325,7 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 		load_class( '_ext/pclzip/pclzip.lib.php', 'PclZip' );
 
 		$PclZip = new PclZip( $src_file );
-		if( $PclZip->extract( PCLZIP_OPT_PATH, $dest_dir ) == 0 )
+		if( $PclZip->extract( PCLZIP_OPT_PATH, $dest_dir, PCLZIP_OPT_SET_CHMOD, octdec( $Settings->get( 'fm_default_chmod_file' ) ) ) == 0 )
 		{
 			if( empty( $src_file_name ) )
 			{ // Set zip file name
@@ -335,7 +360,7 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
  */
 function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read_only_list )
 {
-	global $basepath;
+	global $basepath, $Settings;
 
 	/**
 	 * Result of this function is FALSE when some error was detected
@@ -529,6 +554,10 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 			echo '<div class="red">'.sprintf( T_('Unavailable copying to %s, probably no permissions.'), '&laquo;<b>'.$dest_file_name.'</b>&raquo;' ).'</div>';
 			$result = false;
 			evo_flush();
+		}
+		else
+		{	// Change rights for new file:
+			@chmod( $dest_file, octdec( $Settings->get( 'fm_default_chmod_file' ) ) );
 		}
 	}
 
@@ -894,35 +923,17 @@ function get_tool_steps( $steps, $current_step )
  * Display steps panel
  *
  * @param integer Current step
+ * @param string Type: 'auto', 'git'
  */
-function autoupgrade_display_steps( $current_step )
+function autoupgrade_display_steps( $current_step, $type = '' )
 {
 	$steps = array(
-			1 => T_('Check for updates'),
+			1 => $type == 'git' ? T_('Connect to Git') : T_('Check for updates'),
 			2 => T_('Download'),
 			3 => T_('Unzip'),
 			4 => T_('Ready to upgrade'),
 			5 => T_('Backup &amp; Upgrade'),
 			6 => T_('Installer script'),
-		);
-
-	echo get_tool_steps( $steps, $current_step );
-}
-
-
-/**
- * Display steps panel
- *
- * @param integer Current step
- */
-function svnupgrade_display_steps( $current_step )
-{
-	$steps = array(
-			1 => T_('Connect to SVN'),
-			2 => T_('Export'),
-			3 => T_('Ready to upgrade'),
-			4 => T_('Backup &amp; Upgrade'),
-			5 => T_('Installer script'),
 		);
 
 	echo get_tool_steps( $steps, $current_step );

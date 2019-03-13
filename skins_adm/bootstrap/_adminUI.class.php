@@ -40,7 +40,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function init_templates()
 	{
-		global $Messages, $debug, $Hit, $check_browser_version;
+		global $Messages, $debug, $Hit, $check_browser_version, $adminskins_url;
 
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
@@ -51,7 +51,7 @@ class AdminUI extends AdminUI_general
 		require_js( '#bootstrap_typeahead#', 'rsc_url' );
 
 		// JS to init Bootstrap tooltips (E.g. on badges with title "Admin"):
-		add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip() } )' );
+		add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip( {html: true} ) } )' );
 
 		if( $debug )
 		{	// Use readable CSS:
@@ -68,11 +68,11 @@ class AdminUI extends AdminUI_general
 		// Make sure standard CSS is called ahead of custom CSS generated below:
 		if( $debug )
 		{	// Use readable CSS:
-			require_css( 'skins_adm/bootstrap/rsc/css/style.css', 'relative' );	// Relative to <base> tag (current skin folder)
+			require_css( $adminskins_url.'bootstrap/rsc/css/style.css', 'relative' );	// Relative to <base> tag (current skin folder)
 		}
 		else
 		{	// Use minified CSS:
-			require_css( 'skins_adm/bootstrap/rsc/css/style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
+			require_css( $adminskins_url.'bootstrap/rsc/css/style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
 		}
 
 		// Load general JS file:
@@ -274,9 +274,8 @@ class AdminUI extends AdminUI_general
 								.'<ul class="nav nav-tabs">'."\n",
 						'after' => '</ul>'."\n"
 										.'</nav>'."\n"
-									.'</div>'."\n"
-									.'<div class="container-fluid pull-right">$global_icons$</div>',
-						'empty' => '<div class="container-fluid pull-right">$global_icons$</div>',
+									.'</div>'."\n",
+						'empty' => '',
 						'beforeEach'    => '<li role="presentation">',
 						'afterEach'     => '</li>',
 						'beforeEachSel' => '<li role="presentation" class="active">',
@@ -296,8 +295,9 @@ class AdminUI extends AdminUI_general
 									.'<ul class="nav nav-pills">'."\n",
 						'after' => '</ul>'."\n"
 									.'</nav>'."\n"
-								.'</div>'."\n",
-						'empty' => '',
+								.'</div>'."\n"
+								.'<div class="container-fluid container-global-icons"><div class="pull-right">$global_icons$</div></div>'."\n",
+						'empty' => '<div class="container-fluid"><div class="pull-right">$global_icons$</div></div>'."\n",
 						'beforeEach' => '<li role="presentation">',
 						'afterEach'  => '</li>',
 						'beforeEachSel' => '<li role="presentation" class="active">',
@@ -326,12 +326,12 @@ class AdminUI extends AdminUI_general
 					'page_url' => '', // All generated links will refer to the current page
 					'before' => '<div class="results panel panel-default">',
 					'content_start' => '<div id="$prefix$ajax_content">',
-					'header_start' => '',
+					'header_start' => '<div class="evo_panel">',
 						'header_text' => '<div class="center"><ul class="pagination">'
 								.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 							.'</ul></div>',
 						'header_text_single' => '',
-					'header_end' => '',
+					'header_end' => '</div>',
 					'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 					'global_icons_class' => 'btn btn-default btn-sm',
 					'filters_start'        => '<div class="filters panel-body">',
@@ -387,7 +387,7 @@ class AdminUI extends AdminUI_general
 							'total_col_end' => "</td>\n",
 						'total_line_end' => "</tr>\n\n",
 					'list_end' => "</table></div>\n\n",
-					'footer_start' => '<div class="panel-footer">',
+					'footer_start' => '<div class="evo_panel evo_panel__footer">',
 					'footer_text' => '<div class="center"><ul class="pagination">'
 							.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 						.'</ul></div><div class="center page_size_selector">$page_size$</div>'
@@ -645,6 +645,21 @@ class AdminUI extends AdminUI_general
 					'radio_oneline_end'      => "</label>\n",
 				);
 
+			case 'fields_table_form':
+				return array_merge( $this->get_template( 'Form' ), array(
+						'fieldset_begin' => '<div class="evo_fields_table $class$" id="fieldset_wrapper_$id$" $fieldset_attribs$>'."\n",
+						'fieldset_end'   => '</div>'."\n",
+						'fieldstart'     => '<div class="evo_fields_table__field" $ID$>'."\n",
+						'fieldend'       => "</div>\n\n",
+						'labelclass'     => 'evo_fields_table__label',
+						'labelstart'     => '',
+						'labelend'       => "\n",
+						'labelempty'     => '',
+						'inputstart'     => '<div class="evo_fields_table__input">',
+						'inputend'       => "</div>\n",
+					) );
+				break;
+
 			case 'file_browser':
 				return array(
 					'block_start' => '<div class="panel panel-default file_browser"><div class="panel-heading"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div><div class="panel-body">',
@@ -693,6 +708,11 @@ class AdminUI extends AdminUI_general
 					'text_danger'  => 'btn btn-danger',
 					'text_warning' => 'btn btn-warning',
 					'group'        => 'btn-group',
+					'small_text'   => 'btn btn-default btn-xs',
+					'small_text_primary' => 'btn btn-primary btn-xs',
+					'small_text_success' => 'btn btn-success btn-xs',
+					'small_text_danger'  => 'btn btn-danger btn-xs',
+					'small_text_warning' => 'btn btn-warning btn-xs',
 				);
 
 			case 'table_browse':

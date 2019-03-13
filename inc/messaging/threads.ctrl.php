@@ -175,7 +175,7 @@ switch( $action )
 		break;
 }
 
-init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
+init_popover_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
 $AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
@@ -191,13 +191,8 @@ switch( $action )
 
 		// Require colorbox js:
 		require_js_helper( 'colorbox' );
-		// Require Fine Uploader js and css:
-		init_fineuploader_js_lang_strings();
-		require_js( 'multiupload/fine-uploader.js' );
-		require_css( 'fine-uploader.css' );
-		// Load JS files to make the links table sortable:
-		require_js( '#jquery#' );
-		require_js( 'jquery/jquery.sortable.min.js' );
+		// Init JS to quick upload several files:
+		init_fileuploader_js();
 		break;
 	default:
 		$AdminUI->set_page_manual_link( 'conversations-list' );

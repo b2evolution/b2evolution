@@ -19,7 +19,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for maintenance module to function properly
  */
-$required_php_version[ 'maintenance' ] = '5.4';
+$required_php_version[ 'maintenance' ] = '5.6';
 
 /**
  * Minimum MYSQL version required for maintenance module to function properly
@@ -187,9 +187,9 @@ class maintenance_Module extends Module
 									'href' => '?ctrl=upgrade' ),
 							) );
 			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
-									'upgradesvn' => array(
-									'text' => T_('Upgrade from SVN'),
-									'href' => '?ctrl=upgrade&amp;tab=svn' ),
+									'upgradegit' => array(
+									'text' => T_('Upgrade from Git'),
+									'href' => '?ctrl=upgrade&amp;tab=git' ),
 							) );
 		}
 	}
@@ -219,6 +219,12 @@ class maintenance_Module extends Module
 				'name'   => T_('Clean up scheduled jobs older than a threshold'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_cleanup_jobs.job.php',
+				'params' => NULL,
+			),
+			'cleanup-email-logs' => array(
+				'name'   => T_('Clean up email logs older than a threshold'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_cleanup_email_logs.job.php',
 				'params' => NULL,
 			),
 			'heavy-db-maintenance' => array(

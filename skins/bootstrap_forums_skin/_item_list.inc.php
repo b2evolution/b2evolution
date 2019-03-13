@@ -111,10 +111,10 @@ $display_workflow = ( $disp == 'posts' ) &&
 							switch( $Item->get_read_status() )
 							{
 								case 'new':
-									$legend_icons['topic_new'] = 1;
+									$legend_icons[ $Item->is_featured() || $Item->is_intro() ? 'topic_sticky_new' : 'topic_new' ] = 1;
 									break;
 								case 'updated':
-									$legend_icons['topic_updated'] = 1;
+									$legend_icons[ $Item->is_featured() || $Item->is_intro() ? 'topic_sticky_updated' : 'topic_updated' ] = 1;
 									break;
 							}
 						}
@@ -163,7 +163,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 		echo '<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-5">';
 		if( $comments_number == 0 && $Item->comment_status == 'disabled' )
 		{ // The comments are disabled:
-			echo T_('n.a.');
+			echo /* TRANS: "Not Available" */ T_('N/A');
 		}
 		else if( $latest_Comment = & $Item->get_latest_Comment() )
 		{	// At least one reply exists:
@@ -270,7 +270,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 		echo '<div class="ft_date_header">';
 		if( $comments_number == 0 && $Item->comment_status == 'disabled' )
 		{ // The comments are disabled:
-			echo T_('n.a.');
+			echo /* TRANS: "Not Available" */ T_('N/A');
 		}
 		else if( $latest_Comment = & $Item->get_latest_Comment() )
 		{	// At least one reply exists:

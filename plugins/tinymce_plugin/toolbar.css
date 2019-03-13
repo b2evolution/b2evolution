@@ -13,3 +13,6 @@
 .mce-menu {
 	min-width: 50px !important;
 }
+.mce-listbox {
+	border: 1px solid #b3b3b3 !important;
+}

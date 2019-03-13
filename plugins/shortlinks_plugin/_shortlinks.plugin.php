@@ -22,7 +22,7 @@ class shortlinks_plugin extends Plugin
 	var $code = 'b2evWiLi';
 	var $name = 'Short Links';
 	var $priority = 35;
-	var $version = '6.10.1';
+	var $version = '6.11.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -771,7 +771,7 @@ class shortlinks_plugin extends Plugin
 		// Initialize JavaScript to build and open window:
 		echo_modalwindow_js();
 
-		?><script type="text/javascript">
+		?><script>
 		//<![CDATA[
 		function shortlinks_toolbar( title, prefix )
 		{
@@ -1114,7 +1114,7 @@ class shortlinks_plugin extends Plugin
 				shortlinks_display_search_form( coll_urlname, coll_name );
 			}
 
-			var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&paged=' + page;
+			var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&page=' + page;
 
 			shortlinks_api_request( 'collections/' + coll_urlname + '/items&orderby=datemodified&order=DESC' + page_param, '#shortlinks_posts_list', function( data )
 			{	// Display the posts on success request:
@@ -1508,7 +1508,7 @@ class shortlinks_plugin extends Plugin
 		 */
 		function shortlinks_insert_link_text( text )
 		{
-			
+
 			if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
 			{	// tinyMCE plugin is active now, we should focus cursor to the edit area:
 				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
@@ -1623,7 +1623,7 @@ class shortlinks_plugin extends Plugin
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript">shortlinks_toolbar( '<?php echo TS_('Short Links:'); ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
+		?><script>shortlinks_toolbar( '<?php echo TS_('Short Links:'); ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
 
 		return true;
 	}

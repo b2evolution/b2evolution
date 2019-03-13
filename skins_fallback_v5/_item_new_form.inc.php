@@ -20,14 +20,14 @@ if( is_logged_in() || ! $Blog->get_setting( 'post_anonymous' ) )
 	return;
 }
 
+$new_Item = get_session_Item( 0, true );
+
 $params = array_merge( array(
 		'form_params'           => array(), // Use to change a structre of form, i.e. fieldstart, fieldend and etc.
-		'item_new_form_start'   => '<h3>'.sprintf( T_('New [%s]'), $Blog->get_default_item_type_name() ).'</h3>',
+		'item_new_form_start'   => '<h3>'.sprintf( T_('New [%s]'), $new_Item->get_type_setting( 'name' ) ).'</h3>',
 		'item_new_form_end'     => '',
 		'item_new_submit_text'  => T_('Create post'),
 	), $params );
-
-$new_Item = get_session_Item( 0, true );
 
 echo $params['item_new_form_start'];
 
@@ -39,16 +39,14 @@ $Form->begin_form();
 
 $Form->hidden( 'mname', 'collections' );
 $Form->add_crumb( 'collections_create_post' );
+$Form->hidden( 'blog', $Blog->ID );
 $Form->hidden( 'cat', get_param( 'cat' ) );
+$Form->hidden( 'item_typ_ID', $new_Item->ityp_ID );
 
-$Form->switch_layout( 'none' );
-echo '<table width="100%" class="compose_layout">';
-$Form->labelstart = '<tr><th width="1%" class="label">';
-$Form->labelend = '</th>';
-$Form->inputstart = '<td>';
-$Form->inputend = '</td></tr>';
+$Form->switch_layout( 'fields_table' );
+$Form->begin_fieldset();
 
-$Form->text_input( $dummy_fields['name'], ( isset( $new_Item->temp_user_name ) ? $new_Item->temp_user_name : '' ), 40, T_('Name'), '', array( 'maxlength' => 100, 'required' => true, 'style' => 'width:auto' ) );
+$Form->text_input( $dummy_fields['name'], ( isset( $new_Item->temp_user_name ) ? $new_Item->temp_user_name : '' ), 40, T_('Name'), sprintf( T_('<a %s>Click here to log in</a> if you already have an account on this site.'), 'href="'.get_login_url( 'new item form', $Blog->get( 'url' ) ).'" style="font-weight:bold"' ), array( 'maxlength' => 100, 'required' => true, 'style' => 'width:auto' ) );
 
 $Form->email_input( $dummy_fields['email'], ( isset( $new_Item->temp_user_email ) ? $new_Item->temp_user_email : '' ), 40, T_('Email'), array( 'maxlength' => 255, 'required' => true, 'style' => 'width:auto', 'note' => T_('Your email address will <strong>not</strong> be revealed on this site.') ) );
 
@@ -59,7 +57,15 @@ if( $use_title != 'never' )
 	$Form->text_input( 'post_title', $new_Item->get( 'title' ), 20, T_('Title'), '', array( 'maxlength' => 255, 'style' => 'width: 100%;', 'required' => ( $use_title == 'required' ) ) );
 }
 
-echo '</table>';
+// Display plugin captcha for item form before textarea:
+$Plugins->display_captcha( array(
+		'Form'              => & $Form,
+		'form_type'         => 'item',
+		'form_position'     => 'before_textarea',
+		'form_use_fieldset' => false,
+	) );
+
+$Form->end_fieldset();
 $Form->switch_layout( NULL );
 
 if( $new_Item->get_type_setting( 'use_text' ) != 'never' )
@@ -84,7 +90,7 @@ if( $new_Item->get_type_setting( 'use_text' ) != 'never' )
 		) );
 	$Form->switch_layout( NULL );
 	?>
-	<script type="text/javascript" language="JavaScript">
+	<script>
 		<!--
 		// This is for toolbar plugins
 		var b2evoCanvas = document.getElementById('itemform_post_content');
@@ -103,7 +109,14 @@ if( $new_Item->get_type_setting( 'use_text' ) != 'never' )
 	echo '</div>';
 
 	// set b2evoCanvas for plugins
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
+	echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
+
+
+	// =================================== INSTRUCTION ====================================
+	if( $new_Item->get_type_setting( 'front_instruction' ) && $new_Item->get_type_setting( 'instruction' ) )
+	{
+		echo '<br><div class="alert alert-info fade in evo_instruction">'.$new_Item->get_type_setting( 'instruction' ).'</div>';
+	}
 
 	// Display renderers:
 	$item_renderer_checkboxes = ( $Blog->get_setting( 'in_skin_editing_renderers' ) ? $new_Item->get_renderer_checkboxes() : false );
@@ -117,6 +130,14 @@ if( $new_Item->get_type_setting( 'use_text' ) != 'never' )
 $Plugins->trigger_event( 'DisplayItemFormFieldset', array(
 		'Form'              => & $Form,
 		'Item'              => & $new_Item,
+		'form_use_fieldset' => false,
+	) );
+
+// Display plugin captcha for item form before submit button:
+$Plugins->display_captcha( array(
+		'Form'              => & $Form,
+		'form_type'         => 'item',
+		'form_position'     => 'before_submit_button',
 		'form_use_fieldset' => false,
 	) );
 

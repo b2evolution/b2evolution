@@ -21,7 +21,7 @@ class bootstrap_forums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.10.1';
+	var $version = '6.11.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -139,6 +139,13 @@ class bootstrap_forums_Skin extends Skin
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
+						'allow_empty' => true,
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
 						'allow_empty' => true,
 					),
 				'section_layout_end' => array(
@@ -360,12 +367,15 @@ class bootstrap_forums_Skin extends Skin
 		}
 
 		if( in_array( $disp, array( 'single', 'page' ) ) )
-		{	// Init JS to autcomplete the user logins
+		{	// Init JS to autcomplete the user logins:
 			require_js( '#bootstrap_typeahead#', 'blog' );
 			init_autocomplete_login_js( 'blog', 'typeahead' );
-			// Initialize date picker for _item_expert.form.php
+			// Initialize date picker for _item_expert.form.php:
 			init_datepicker_js( 'blog' );
 		}
+
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
 
 
@@ -401,11 +411,26 @@ class bootstrap_forums_Skin extends Skin
 		$post_button = '';
 
 		$chapter_is_locked = false;
+		$default_new_ItemType = $Blog->get_default_new_ItemType();
+
+		if( $default_new_ItemType === false )
+		{ // Do not show button on disabled default item type for new items:
+			return '';
+		}
 
 		$write_new_post_url = $Blog->get_write_item_url( $chapter_ID );
 		if( $write_new_post_url != '' )
 		{ // Display button to write a new post
-			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post a new topic').'"><i class="fa fa-pencil"></i> '.T_('New topic').'</a>';
+			if( empty( $default_new_ItemType ) )
+			{	// Use default button text:
+				$button_text = T_('New topic');
+			}
+			else
+			{	// Use button text from Item Type:
+				$button_text = $default_new_ItemType->get_item_denomination( 'inskin_new_btn' );
+			}
+
+			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post a new topic').'"><i class="fa fa-pencil"></i> '.$button_text.'</a>';
 		}
 		else
 		{ // If a creating of new post is unavailable

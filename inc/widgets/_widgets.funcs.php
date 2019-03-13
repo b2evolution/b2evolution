@@ -64,7 +64,7 @@ function add_basic_widget( $blog_ID, $container_name, $code, $type, $order, $par
  * @param boolean should be true only when it's called after initial install
  * fp> TODO: $initial_install is used to know if we want to trust globals like $blog_photoblog_ID and $blog_forums_ID. We don't want that.
  *           We should pass a $context array with values like 'photo_source_coll_ID' => 4.
- *           Also, checking $blog_forums_ID is unnecessary complexity. We can check the colleciton kind == forum
+ *           Also, checking $blog_forums_ID is unnecessary complexity. We can check the collection kind == forum
  * @param string Kind of blog ( 'std', 'photo', 'group', 'forum' )
  */
 function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
@@ -302,7 +302,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		}
 		add_basic_widget( $blog_id, 'Sidebar 2', 'coll_comment_list', 'core', 10 );
 		add_basic_widget( $blog_id, 'Sidebar 2', 'coll_media_index', 'core', 15, 'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";'.$default_blog_param.'s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
-		add_basic_widget( $blog_id, 'Sidebar 2', 'free_html', 'core', 20, 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
+		add_basic_widget( $blog_id, 'Sidebar 2', 'free_html', 'core', 20, 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:166:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Collection", then "Widgets&hellip;".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' );
 	}
 
 
@@ -347,13 +347,17 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_post_list', 'core', 25, array( 'title' => T_('More Posts'), 'featured' => 'other' ) );
 
 	if( $kind != 'main' )
-	{ // Don't install the "Recent Commnets" widget for Main blogs
+	{ // Don't install the "Recent Comments" widget for Main blogs
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'coll_comment_list', 'core', 30 );
 	}
 
 	if( $blog_id == $blog_b_ID )
 	{	// Install widget "Poll" only for Blog B on install:
 		add_basic_widget( $blog_id, 'Front Page Main Area', 'poll', 'core', 40, array( 'poll_ID' => 1 ) );
+	}
+	if( $kind == 'manual' )
+	{
+		add_basic_widget( $blog_id, 'Front Page Main Area', 'content_hierarchy', 'core', 45 );
 	}
 
 
@@ -375,6 +379,9 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 		add_basic_widget( $blog_id, 'Forum Front Secondary Area', 'coll_activity_stats', 'core', 10 );
 	}
 
+	/* Compare Main Area */
+	add_basic_widget( $blog_id, 'Compare Main Area', 'item_fields_compare', 'core', 10, array( 'items_source' => 'all' ) );
+
 
 	/* 404 Page */
 	add_basic_widget( $blog_id, '404 Page', 'page_404_not_found', 'core', 10 );
@@ -383,7 +390,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Login Required */
-	add_basic_widget( $blog_id, 'Login Required', 'content_block', 'core', 10, array( 'item_slug' => 'login-required-'.$blog_id ) );
+	add_basic_widget( $blog_id, 'Login Required', 'content_block', 'core', 10, array( 'item_slug' => 'login-required' ) );
 	add_basic_widget( $blog_id, 'Login Required', 'user_login', 'core', 20, array(
 			'title'               => T_( 'Log in to your account' ),
 			'login_button_class'  => 'btn btn-success btn-lg',
@@ -392,7 +399,19 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 
 	/* Access Denied */
-	add_basic_widget( $blog_id, 'Access Denied', 'content_block', 'core', 10, array( 'item_slug' => 'access-denied-'.$blog_id ) );
+	add_basic_widget( $blog_id, 'Access Denied', 'content_block', 'core', 10, array( 'item_slug' => 'access-denied' ) );
+
+
+	/* Help */
+	add_basic_widget( $blog_id, 'Help', 'content_block', 'core', 10, array(
+			'item_slug' => 'help-content',
+			'title'     => T_('Personal Data & Privacy'),
+		) );
+
+
+	/* Help */
+	add_basic_widget( $blog_id, 'Register', 'user_register_standard', 'core', 10 );
+	add_basic_widget( $blog_id, 'Register', 'content_block', 'core', 20, array( 'item_slug' => 'register-content' ) );
 
 
 	/* Mobile Footer */

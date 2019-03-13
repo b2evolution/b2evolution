@@ -108,7 +108,7 @@ switch( $action )
 			case 'general':
 			case 'urls':
 			case 'comments':
-				if( $edited_Blog->load_from_Request( array() ) )
+				if( $edited_Blog->load_from_Request( array( $tab ) ) )
 				{ // Commit update to the DB:
 					global $Settings;
 
@@ -137,7 +137,7 @@ switch( $action )
 					$Settings->dbupdate();
 
 					$edited_Blog->dbupdate();
-					$Messages->add( T_('The blog settings have been updated'), 'success' );
+					$Messages->add( T_('The collection settings have been updated.'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
 					header_redirect( $update_redirect_url, 303 ); // Will EXIT
 				}
@@ -152,7 +152,7 @@ switch( $action )
 				if( $edited_Blog->load_from_Request( array( $tab ) ) )
 				{ // Commit update to the DB:
 					$edited_Blog->dbupdate();
-					$Messages->add( T_('The blog settings have been updated'), 'success' );
+					$Messages->add( T_('The collection settings have been updated.'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
 					header_redirect( $update_redirect_url, 303 ); // Will EXIT
 				}
@@ -162,7 +162,7 @@ switch( $action )
 				if( $edited_Blog->load_from_Request( array( 'seo' ) ) )
 				{ // Commit update to the DB:
 					$edited_Blog->dbupdate();
-					$Messages->add( T_('The blog settings have been updated'), 'success' );
+					$Messages->add( T_('The collection settings have been updated.'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
 					header_redirect( $update_redirect_url, 303 ); // Will EXIT
 				}
@@ -272,7 +272,7 @@ switch( $action )
 				break;
 
 			case 'advanced':
-				if( $edited_Blog->load_from_Request( array( 'pings', 'cache', 'authors', 'login', 'styles', 'template' ) ) )
+				if( $edited_Blog->load_from_Request( array( 'pings', 'cache', 'authors', 'login', 'styles', 'template', 'credits' ) ) )
 				{ // Commit update to the DB:
 					if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 					{
@@ -287,7 +287,7 @@ switch( $action )
 					}
 
 					$edited_Blog->dbupdate();
-					$Messages->add( T_('The blog settings have been updated'), 'success' );
+					$Messages->add( T_('The collection settings have been updated.'), 'success' );
 					// Redirect so that a reload doesn't write to the DB twice:
 					header_redirect( $update_redirect_url, 303 ); // Will EXIT
 				}
@@ -295,12 +295,12 @@ switch( $action )
 
 			case 'perm':
 				blog_update_perms( $blog, 'user' );
-				$Messages->add( T_('The blog permissions have been updated'), 'success' );
+				$Messages->add( T_('The collection permissions have been updated.'), 'success' );
 				break;
 
 			case 'permgroup':
 				blog_update_perms( $blog, 'group' );
-				$Messages->add( T_('The blog permissions have been updated'), 'success' );
+				$Messages->add( T_('The collection permissions have been updated.'), 'success' );
 				break;
 
 			case 'chapters':
@@ -375,7 +375,7 @@ switch( $action )
 			case 'fav':
 				// Favorite Blog
 				$edited_Blog->favorite( $current_User->ID, $setting_value );
-				$result_message = T_('The collection setting has been updated.');
+				$result_message = T_('The collection settings have been updated.');
 				break;
 
 			case 'page_cache':
@@ -412,6 +412,44 @@ switch( $action )
 		header_redirect( $update_redirect_url, 303 ); // Will EXIT
 
 		break;
+
+	case 'export_userperms':
+		// Export user permissions into CSV file:
+
+		load_funcs( 'collections/views/_coll_perm_view.funcs.php' );
+
+		$keywords = param( 'keywords', 'string', '' );
+
+		// Get SQL for collection user permissions:
+		$SQL = get_coll_user_perms_SQL( $edited_Blog, $keywords, false );
+
+		$user_perms = $DB->get_results( $SQL );
+
+		header_nocache();
+		header_content_type( 'text/csv' );
+		header( 'Content-Disposition: attachment; filename=colls_userperms.csv' );
+
+		echo get_csv_coll_perms( 'bloguser_', $user_perms, $edited_Blog );
+		exit;
+
+	case 'export_groupperms':
+		// Export group permissions into CSV file:
+
+		load_funcs( 'collections/views/_coll_perm_view.funcs.php' );
+
+		$keywords = param( 'keywords', 'string', '' );
+
+		// Get SQL for collection user permissions:
+		$SQL = get_coll_group_perms_SQL( $edited_Blog, $keywords, false );
+
+		$group_perms = $DB->get_results( $SQL );
+
+		header_nocache();
+		header_content_type( 'text/csv' );
+		header( 'Content-Disposition: attachment; filename=colls_groupperms.csv' );
+
+		echo get_csv_coll_perms( 'bloggroup_', $group_perms, $edited_Blog );
+		exit;
 }
 
 if( $action == 'dashboard' )
@@ -495,7 +533,7 @@ if( $action == 'dashboard' )
 
 			// Filter list:
 			$CommentList->set_filters( array(
-					'types' => array( 'comment','trackback','pingback' ),
+					'types' => array( 'comment','trackback','pingback','webmention' ),
 					'statuses' => $user_modeartion_statuses,
 					'user_perm' => 'moderate',
 					'post_statuses' => array( 'published', 'community', 'protected' ),
@@ -547,11 +585,17 @@ if( $action == 'dashboard' )
 		echo '<div class="first_payload_block">'."\n";
 
 		$AdminUI->disp_payload_begin();
+		$collection_image = $Blog->get( 'collection_image' );
 		echo '<div class="row">';
 			echo '<div class="col-xs-12 col-sm-3 col-sm-push-9 col-lg-2 col-lg-push-10 text-right">';
 			echo action_icon( TS_('View in Front-Office'), '', $Blog->get( 'url' ), T_('View in Front-Office'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
 			echo '</div>';
-			echo '<h2 class="col-xs-12 col-sm-9 col-sm-pull-3 col-lg-10 col-lg-pull-2 page-title">'.get_coll_fav_icon( $Blog->ID, array( 'class' => 'coll-fav' ) ).'&nbsp;'.$Blog->dget( 'name' ).' <span class="text-muted" style="font-size: 0.6em;">('./* TRANS: abbr. for "Collection" */ T_('Collection').' #'.$Blog->ID.')</span>'.'</h2>';
+			echo '<h2 class="col-xs-12 col-sm-9 col-sm-pull-3 col-lg-10 col-lg-pull-2 page-title">'
+					.get_coll_fav_icon( $Blog->ID, array( 'class' => 'coll-fav' ) ).'&nbsp;'
+					.( ! empty( $collection_image ) ? $collection_image->get_tag( '', '', '', '', 'crop-32x32' ).'&nbsp;' : '' )
+					.$Blog->dget( 'name' )
+					.' <span class="text-muted" style="font-size: 0.6em;">('./* TRANS: abbr. for "Collection" */ T_('Collection').' #'.$Blog->ID.')</span>'
+					.'</h2>';
 		echo '</div>';
 		load_funcs( 'collections/model/_blog_js.funcs.php' );
 		echo '<div class="row browse">';
@@ -607,9 +651,24 @@ if( $action == 'dashboard' )
 				$side_item_Widget->disp_template_raw( 'block_end' );
 				echo '</div>';
 			}
-			echo '</div><!-- End of Block Group 1 -->';
-
 			$Timer->stop( 'Panel: Collection Metrics' );
+
+			if( $Blog->get( 'notes' ) )
+			{
+				$edit_link = '';
+				if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
+				{
+					$edit_link = action_icon( T_('Edit').'...', 'edit_button', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID, ' '.T_('Edit').'...', 3, 4, array( 'class' => 'btn btn-default btn-sm' ) );
+				}
+
+				$block_item_Widget = new Widget( 'block_item' );
+				$block_item_Widget->title = '<span class="pull-right panel_heading_action_icons">'.$edit_link.'</span>'.T_('Notes');
+				$block_item_Widget->disp_template_replaced( 'block_start' );
+				$Blog->disp( 'notes', 'htmlbody' );
+				$block_item_Widget->disp_template_replaced( 'block_end' );
+			}
+
+			echo '</div><!-- End of Block Group 1 -->';
 			evo_flush();
 		}
 
@@ -628,8 +687,8 @@ if( $action == 'dashboard' )
 				echo '<!-- Start of Comments Awaiting Moderation Block -->';
 				$opentrash_link = get_opentrash_link( true, false, array(
 						'class'  => 'btn btn-default btn-sm',
-						'before' => '',
-						'after'  => '',
+						'before' => '<span id="recycle_bin">',
+						'after'  => '</span> ',
 					) );
 				$refresh_link = action_icon( T_('Refresh comment list'), 'refresh', $admin_url.'?blog='.$blog, ' '.T_('Refresh'), 3, 4, array( 'onclick' => 'startRefreshComments( \'dashboard\' ); return false;', 'class' => 'btn btn-default btn-sm' ) );
 
@@ -728,12 +787,9 @@ if( $action == 'dashboard' )
 				$nb_blocks_displayed++;
 
 				echo '<!-- Start of Latest Meta Comments Block -->';
-				$opentrash_link = get_opentrash_link( true, false, array(
-						'class' => 'btn btn-default'
-					) );
 
 				$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $user_modeartion_statuses );
-				$block_item_Widget->title = $opentrash_link.T_('Latest Meta Comments').
+				$block_item_Widget->title = T_('Latest Meta Comments').
 					' <a href="'.$admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;tab3=meta" style="text-decoration:none">'.
 					'<span id="badge" class="badge badge-important">'.$CommentList->get_total_rows().'</span></a>';
 
@@ -872,7 +928,7 @@ if( $action == 'dashboard' )
 			$nb_blocks_displayed++;
 
 			$block_item_Widget = new Widget( 'block_item' );
-			$block_item_Widget->title = T_('Getting started');
+			$block_item_Widget->title = T_('Getting Started');
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
 			echo '<p><strong>'.T_('Welcome to your new collection\'s dashboard!').'</strong></p>';
@@ -905,7 +961,7 @@ if( $action == 'dashboard' )
 	if( ! empty( $chart_data ) )
 	{ // JavaScript to initialize charts
 	?>
-	<script type="text/javascript">
+	<script>
 	jQuery( 'document' ).ready( function()
 	{
 		var chart_params = {
@@ -1014,7 +1070,7 @@ else
 			$AdminUI->set_path( 'collections', 'features', $tab );
 			$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
 			$AdminUI->breadcrumbpath_add( T_('Contact form'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
-			$AdminUI->set_page_manual_link( 'contact-form' );
+			$AdminUI->set_page_manual_link( 'contact-form-features' );
 			break;
 
 		case 'userdir':
@@ -1035,7 +1091,7 @@ else
 			$AdminUI->set_path( 'collections', 'features', $tab );
 			$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
 			$AdminUI->breadcrumbpath_add( T_('More'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
-			$AdminUI->set_page_manual_link( 'features-more' );
+			$AdminUI->set_page_manual_link( 'more-features' );
 			break;
 
 		case 'skin':

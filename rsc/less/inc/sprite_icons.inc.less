@@ -13,26 +13,17 @@ span.icon {
 		margin: 0 2px;
 	}
 }
-// The fixes for rollover icon on IE8+
-@fix-IE8-visibility: ~"visible\0/";
 a.rollover_sprite:hover span.icon {
 	visibility: hidden;
-	visibility: @fix-IE8-visibility;/* IE8 */
-}
-@fix-IE9-10-media-min-width: ~"screen and (min-width: 0\0)";
-@media @fix-IE9-10-media-min-width { /* IE9-10 */
-	a.rollover_sprite:hover span.icon {
-		visibility: visible;
+	&:before {
+		visibility: visible !important;
+		background: inherit;
+		float: left;
+		width: 32px;
+		height: 16px;
+		content: "";
+		margin-left: -16px;
 	}
-}
-a.rollover_sprite:hover span.icon:before {
-	visibility: visible !important;
-	background: inherit;
-	float: left;
-	width: 32px;
-	height: 16px;
-	content: "";
-	margin-left: -16px;
 }
 .vote_spam span.icon.voted {
 	margin: auto;

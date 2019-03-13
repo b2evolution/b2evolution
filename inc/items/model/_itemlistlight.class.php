@@ -129,6 +129,7 @@ class ItemListLight extends DataObjectList2
 				'cat_modifier' => NULL,
 				'cat_focus' => 'wide',					// Search in extra categories, not just main cat
 				'tags' => NULL,
+				'tags_operator' => 'OR',
 				'authors' => NULL,
 				'authors_login' => NULL,
 				'assignees' => NULL,
@@ -608,7 +609,7 @@ class ItemListLight extends DataObjectList2
 			$this->ItemQuery->Blog = $this->Blog;
 		}
 
-		$this->ItemQuery->where_tags( $this->filters['tags'] );
+		$this->ItemQuery->where_tags( $this->filters['tags'], $this->filters['tags_operator'] );
 		$this->ItemQuery->where_author( $this->filters['authors'] );
 		$this->ItemQuery->where_author_logins( $this->filters['authors_login'] );
 		$this->ItemQuery->where_assignees( $this->filters['assignees'] );
@@ -816,13 +817,21 @@ class ItemListLight extends DataObjectList2
 		}
 
 		// QUERY:
-		$this->sql = 'SELECT DISTINCT '.$this->Cache->dbIDname.', post_datestart, post_datemodified, post_title, post_url,
-									post_excerpt, post_urltitle, post_canonical_slug_ID, post_tiny_slug_ID, post_main_cat_ID, post_ityp_ID '
-									.$this->ItemQuery->get_from()
-									.$this->ItemQuery->get_where()
-									.$this->ItemQuery->get_group_by()
-									.$this->ItemQuery->get_order_by()
-									.$this->ItemQuery->get_limit();
+		$this->ItemQuery->SELECT( 'DISTINCT '.$this->Cache->dbIDname.', post_datestart, post_datemodified, post_title, post_short_title, post_url,' );
+		$this->ItemQuery->SELECT_add( 'post_excerpt, post_urltitle, post_canonical_slug_ID, post_tiny_slug_ID, post_main_cat_ID, post_ityp_ID, post_single_view' );
+		if( ! preg_match( '/'.preg_quote( 'T_postcats' ).'( AS ([^\s]+))?/i', $this->ItemQuery->get_from(), $match_postcats_alias ) )
+		{	// If categories table is not joined yet we should use it for column postcat_cat_ID
+			$this->ItemQuery->FROM_add( 'INNER JOIN T_postcats ON '.$this->Cache->dbIDname.' = postcat_post_ID' );
+		}
+		// Use the custom alias(probably "postcatsorders") of the table T_postcats if it is used in the FROM clause,
+		// and use default alias T_postcats if there is no defined alias:
+		$table_postcats_alias = empty( $match_postcats_alias[2] ) ? 'T_postcats' : $match_postcats_alias[2];
+		$this->ItemQuery->SELECT_add( ', '.$table_postcats_alias.'.postcat_cat_ID' );
+		if( $this->ItemQuery->get_group_by() == '' )
+		{	// Group by item ID only if another grouping is not used currently:
+			$this->ItemQuery->GROUP_BY( $this->Cache->dbIDname );
+		}
+		$this->sql = $this->ItemQuery->get();
 
 		// echo DB::format_query( $this->sql );
 

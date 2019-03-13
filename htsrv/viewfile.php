@@ -110,10 +110,10 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<title><?php echo $selected_File->dget('name').' ('.T_('Preview').')'; ?></title>
+	<title><?php echo $selected_File->dget('name').' ('./* TRANS: Noun */ T_('Preview').')'; ?></title>
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 <?php if( isset( $JS_additional ) ) { ?>
-	<script type="text/javascript"><?php echo $JS_additional; ?></script>
+	<script><?php echo $JS_additional; ?></script>
 <?php } ?>
 </head>
 
@@ -205,13 +205,13 @@ switch( $viewtype )
 
 				echo ' [';
 				?>
-				<noscript type="text/javascript">
+				<noscript>
 					<a href="<?php echo $selected_File->get_url().'&amp;showlinenrs='.(1-$showlinenrs); ?>">
 
 					<?php echo $showlinenrs ? T_('Hide line numbers') : T_('Show line numbers');
 					?></a>
 				</noscript>
-				<script type="text/javascript">
+				<script>
 					<!--
 					document.write('<a id="togglelinenrs" href="javascript:toggle_linenrs()">toggle</a>');
 

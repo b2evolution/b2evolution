@@ -194,17 +194,12 @@ else
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'messages-view-thread' );
 
-init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
+init_popover_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
 // Require colorbox js:
 require_js_helper( 'colorbox' );
-// Require Fine Uploader js and css:
-init_fineuploader_js_lang_strings();
-require_js( 'multiupload/fine-uploader.js' );
-require_css( 'fine-uploader.css' );
-// Load JS files to make the links table sortable:
-require_js( '#jquery#' );
-require_js( 'jquery/jquery.sortable.min.js' );
+// Init JS to quick upload several files:
+init_fileuploader_js();
 
 // Display messages depending on user email status
 display_user_email_status_message();

@@ -291,22 +291,14 @@ div.container_menu_top div.widget_core_coll_search_form {
 div.container_menu_top input.search_field {
 	width: 160px;	// There is typically more space here
 }
+div.extended_search_form {
+	div[class^='col-'] {
+		padding-left: 3px;
+		padding-right: 3px;
+	}
+}
 
 // User login/register widget
-.widget_core_user_register #register_form {
-	margin-top: 5px;
-}
-.widget_core_user_register fieldset {
-	border: none;
-	padding: 0;
-	margin: 0;
-}
-.widget_core_user_register .field_register_btn {
-	margin: 5px 0;
-}
-.widget_core_user_register .input_text {
-	width: 96%;
-}
 .widget_core_user_login {
 	.control-buttons {
 		width: 100%;
@@ -381,6 +373,11 @@ div.results {
 	}
 }
 
+// Styles for edit-screen instructions
+.evo_instruction {
+	margin: 0 0 20px;
+}
+
 // Styles for in-skin editing
 form.inskin{
 	padding: 10px;
@@ -416,6 +413,15 @@ table.catselect {
 	> thead:first-child > tr:first-child > th {
 		border-top: 1px solid #bbb;
 	}
+	th, td {
+		border-right: 1px solid #bbb;
+		&:last-child {
+			border-right: none;
+		}
+	}
+	&.table > thead > tr > th {
+		border-color: #bbb;
+	}
 	td {
 		padding: .2ex 1ex;
 		background: none;
@@ -425,20 +431,16 @@ table.catselect {
 		border-bottom: 1px solid #bbb;
 		font-weight: bold;
 	}
-	tr.odd, tr.odd input {
+	tr.odd {
 		background-color: #eee;
 	}
 	tr.even, tr.even input {
 		background: none !important;
 	}
-	th.selector, td.selector {
+	td.selector {
 		width: 1%;
-		text-align:center;
-		border-right: 1px solid #bbb;
-	}
-	#new_category_name {
-		background-color: white;
-		width: 92% !important;
+		text-align: center;
+		vertical-align: middle;
 	}
 	tbody tr.group.catselect_blog__current td {
 		background: #31b0d5;
@@ -446,6 +448,14 @@ table.catselect {
 	}
 	.catsel_name label {
 		font-weight: normal;
+	}
+	.catsel_order input {
+		width: 40px;
+		padding-left: 3px;
+		padding-right: 3px;
+	}
+	input[type=text] {
+		height: 25px;
 	}
 }
 
@@ -645,26 +655,6 @@ div.results {
 	}
 }
 
-@fix-IE8-media-screen: ~"\0screen";
-@media @fix-IE8-media-screen {/* IE8 */
-	.evo_content_block span {
-		&.status_published,
-		&.status_community,
-		&.status_protected,
-		&.status_review,
-		&.status_private,
-		&.status_draft,
-		&.status_deprecated,
-		&.status_redirected,
-		&.status_trash {
-			span {
-				top: -15px;
-				left: -2px;
-			}
-		}
-	}
-}
-
 .search_title {
 	font-size: 125%;
 	color: #666;
@@ -857,31 +847,31 @@ form#comment_edit {
 }
 
 // Standard style for all tables of content:
-.evo_content_block table {
-	margin: 1em 0;
-	th {
-		border: 1px solid #ddd;
-		padding: 8px;
-		background-color: #eee;
-	}
-	td {
-		border: 1px solid #ddd;
-		padding: 8px;
-		vertical-align: top;
-	}
-}
-
-.evo_content_block table.evo_poll__table {
-	margin: 1em 0;
-	th {
-		border: 0;
-		padding: 2px 10px 2px 0;
-		background-color: #eee;
-	}
-	td {
-		border: 0;
-		padding: 2px 10px 2px 0;
-		vertical-align: top;
+.evo_content_block {
+	table {
+		margin: 1em 0;
+		th {
+			border: 1px solid #ddd;
+			padding: 8px;
+			background-color: #eee;
+		}
+		td {
+			border: 1px solid #ddd;
+			padding: 8px;
+			vertical-align: top;
+		}
+		&.evo_poll__table {
+			td {
+				border: 0;
+				padding: 2px 10px 2px 0;
+			}
+		}
+		&.item_custom_fields {
+			margin-bottom: 10px;
+			th, td {
+				vertical-align: middle;
+			}
+		}
 	}
 }
 
@@ -904,6 +894,19 @@ form#comment_edit {
 	}
 	.bg-warning {
 		margin: 0px !important;
+	}
+}
+#cmntform_links, #meta_cmntform_links {
+	.panel {
+		margin-bottom: 20px;
+		border: 1px solid #ddd;
+		border-radius: 4px;
+		.panel-body {
+			padding: 0;
+		}
+	}
+	table {
+		margin: 0;
 	}
 }
 .form-horizontal {
@@ -1039,8 +1042,10 @@ form#comment_edit {
 }
 
 // Attachments table:
-#itemform_links .panel-body {
-	padding: 0;
+#itemform_links, #cmntform_links {
+	.panel-body {
+		padding: 0;
+	}
 }
 div.qq-upload-button,
 div.qq-upload-drop-area,
@@ -1057,18 +1062,18 @@ div.qq-upload-drop-area-active {
 ul.qq-upload-list {
 	margin: 0;
 }
-div#fileuploader_form {
+div.evo_fileuploader_form {
 	padding: 5px;
 	height: 65px;
 	background: #f5f5f5;
 }
-#attachments_fieldset_wrapper {
+.evo_attachments_fieldset__wrapper {
 	width: 100%;
 	height: 160px;
 	position: relative;
 	padding-bottom: 6px;
 	box-sizing: content-box;
-	#attachments_fieldset_block {
+	.evo_attachments_fieldset__block {
 		overflow: auto;
 		height: 100%;
 	}
@@ -1103,9 +1108,89 @@ div#fileuploader_form {
 		}
 	}
 }
-#filelist_tbody {
+.filelist_tbody {
 	tr:first-child .action_icon_link_move_up,
 	tr:last-child .action_icon_link_move_down {
 		visibility: hidden;
+	}
+}
+
+// Widget forms:
+.evo_widget_form__compact, .evo_widget_form__nolabels {
+	margin-bottom: -15px; // to remove bottom margin from the last form-group of submit button
+	label.control-label {
+		text-align: left;
+		width: auto;
+		padding: 0;
+	}
+	.controls {
+		width: 100%;
+	}
+	.form_text_input.form-control {
+		width: 100%;
+		&.inline_widget {
+			width: 100%;
+			max-width: 250px;
+		}
+	}
+	.control-buttons {
+		margin: 0;
+		padding: 0;
+		.btn {
+			margin: 0;
+		}
+	}
+}
+.evo_widget_form__nolabels {
+	label.control-label {
+		display: none;
+	}
+}
+.evo_widget_form__inline, .evo_widget_form__grouped {
+	label.control-label {
+		display: none;
+		float: none;
+	}
+	div {
+		display: inline-block;
+		margin: 0;
+		padding: 0;
+		width: auto;
+	}
+	input.btn {
+		margin: 0;
+	}
+}
+.evo_widget_form__inline {
+	div.controls, div.control-buttons {
+		float: none;
+		margin-bottom: 4px;
+		.form-control {
+			width: 100%;
+		}
+	}
+}
+.evo_widget_form__grouped {
+	.controls {
+		input {
+			border-radius: 0;
+			vertical-align: top;
+		}
+		input:not(:last-child) {
+			border-right: none;
+		}
+		input:first-child {
+			border-radius: 4px 0 0 4px;
+		}
+		input:last-child {
+			border-radius: 0 4px 4px 0;
+		}
+		select {
+			-webkit-border-radius: 0;
+			border: 0;
+			outline: 1px solid #ccc;
+			outline-offset: -1px;
+			vertical-align: top;
+		}
 	}
 }

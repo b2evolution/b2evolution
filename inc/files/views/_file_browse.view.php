@@ -94,7 +94,7 @@ if( isset( $edited_User ) )
 		}
 	}
 
-	$Widget->title = T_('File browser').get_manual_link('file_browser');
+	$Widget->title = T_('File browser').get_manual_link('file-browser');
 	$Widget->disp_template_replaced( 'block_start' );
 ?>
 
@@ -305,7 +305,7 @@ else
 }
 ?>
 	</div>
-<script type="text/javascript">
+<script>
 if( typeof file_uploader_note_text != 'undefined' )
 {
 	document.write( '<div class="note pull-right">' + file_uploader_note_text + '</div>' );
@@ -331,7 +331,7 @@ if( typeof file_uploader_note_text != 'undefined' )
 	$new_root_selector_html = preg_replace( '/<script.*?<\/script>/is', '', $new_root_selector_html );
 	$new_root_selector_html = format_to_js( $new_root_selector_html );
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '#new_root_selector a[data-type]' ).click( function()
@@ -359,8 +359,8 @@ jQuery( document ).ready( function()
 			evo_rest_api_request( 'collections',
 			{
 				'per_page': 20,
-				'filter'  : 'all',
-				'restrict': 'available_fileroots',
+				'list_in_frontoffice' : 'all',
+				'restrict_to_available_fileroots': 1,
 				'fields'  : 'id,shortname',
 				'q'       : jQuery( '#new_root_selector_field' ).val()
 			},
@@ -389,7 +389,7 @@ jQuery( document ).ready( function()
 			evo_rest_api_request( 'users',
 			{
 				'per_page': 20,
-				'restrict': 'available_fileroots',
+				'restrict_to_available_fileroots': 1,
 				'filter'  : 'new',
 				'list_params': { 'keywords_fields': 'user_login', 'order_by_login_length': 'D' },
 				'keywords': jQuery( '#new_root_selector_field' ).val()

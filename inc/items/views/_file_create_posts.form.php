@@ -185,7 +185,7 @@ else
 $Form->end_form( array( array( 'submit', 'actionArray[make_posts_from_files]', T_('Make posts'), 'ActionButton') ) );
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'input[id^=new_categories]' ).focus( function()
 {
 	var num = jQuery( this ).attr( 'id' ).replace( /new_categories\[(\d+)\]/gi, '$1' );

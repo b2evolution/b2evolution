@@ -33,17 +33,17 @@ $Form->begin_form( 'fform' );
 	{
 		case 'normal':
 			$skin_ID = $Blog->get( 'normal_skin_ID' );
-			$fieldset_title = T_('Default skin');
+			$fieldset_title = T_('Standard skin for this collection');
 			break;
 
 		case 'mobile':
 			$skin_ID = $Blog->get( 'mobile_skin_ID', array( 'real_value' => true ) );
-			$fieldset_title = T_('Default mobile phone skin');
+			$fieldset_title = T_('Phone skin for this collection');
 			break;
 
 		case 'tablet':
 			$skin_ID = $Blog->get( 'tablet_skin_ID', array( 'real_value' => true ) );
-			$fieldset_title = T_('Default tablet skin');
+			$fieldset_title = T_('Tablet skin for this collection');
 			break;
 
 		default:
@@ -65,7 +65,7 @@ $Form->begin_form( 'fform' );
 
 $buttons = array();
 if( $skin_ID )
-{	// Allow to update skin params only when it is really selected (Don't display this button to case "Same as normal skin."):
+{	// Allow to update skin params only when it is really selected (Don't display this button to case "Same as standard skin."):
 	$buttons[] = array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' );
 }
 

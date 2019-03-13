@@ -65,7 +65,6 @@ class Blog extends DataObject
 	var $locale;
 	var $order;
 	var $access_type;
-	var $http_protocol;
 
 	/*
 	 * ?> TODO: we should have an extra DB column that either defines type of blog_siteurl
@@ -219,7 +218,6 @@ class Blog extends DataObject
 			$this->longdesc = $db_row->blog_longdesc;
 			$this->locale = $db_row->blog_locale;
 			$this->access_type = $db_row->blog_access_type;
-			$this->http_protocol = isset( $db_row->blog_http_protocol ) ? $db_row->blog_http_protocol : 'always_redirect';
 			$this->siteurl = $db_row->blog_siteurl;
 			$this->urlname = $db_row->blog_urlname;
 			$this->links_blog_ID = $db_row->blog_links_blog_ID; // DEPRECATED
@@ -259,10 +257,14 @@ class Blog extends DataObject
 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_coll_ID', 'msg'=>T_('%d subscriptions') ),
 				array( 'table'=>'T_widget', 'fk'=>'wi_coll_ID', 'msg'=>T_('%d widgets') ),
 				array( 'table'=>'T_hitlog', 'fk'=>'hit_coll_ID', 'msg'=>T_('%d hits') ),
+				array( 'table'=>'T_hits__aggregate', 'fk'=>'hagg_coll_ID', 'msg'=>T_('%d hits aggregations') ),
+				array( 'table'=>'T_hits__aggregate_sessions', 'fk'=>'hags_coll_ID', 'msg'=>T_('%d sessions aggregations') ),
+				array( 'table'=>'T_items__type_coll', 'fk'=>'itc_coll_ID', 'msg'=>T_('%d Post type associations with collections') ),
 				array( 'table'=>'T_categories', 'fk'=>'cat_blog_ID', 'msg'=>T_('%d related categories with all of their content recursively'),
 						'class'=>'Chapter', 'class_path'=>'chapters/model/_chapter.class.php' ),
 				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "collection"', 'msg'=>T_('%d files in this blog file root'),
 						'class'=>'File', 'class_path'=>'files/model/_file.class.php' ),
+				array( 'table'=>'T_temporary_ID', 'fk'=>'tmp_coll_ID', 'msg'=>T_('%d temporary uploaded links') ),
 			);
 	}
 
@@ -319,6 +321,9 @@ class Blog extends DataObject
 	 */
 	function init_by_kind( $kind, $name = NULL, $shortname = NULL, $urlname = NULL )
 	{
+		// Set default tagline for collection of any kind:
+		$this->set( 'tagline', T_('This is the collection\'s tagline.') );
+
 		switch( $kind )
 		{
 			case 'main':
@@ -433,7 +438,7 @@ class Blog extends DataObject
 					}
 				}
 				$this->set( 'type', $kind );
-				$this->set( 'name', empty($name) ? T_('Public Blog') : $name );
+				$this->set( 'name', empty($name) ? T_('Blog') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Blog') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'blog' : $urlname );
 				break;
@@ -473,6 +478,9 @@ class Blog extends DataObject
 
 		if( param( 'blog_name', 'string', NULL ) !== NULL )
 		{ // General params:
+
+			$this->set_setting( 'collection_logo_file_ID', param( 'collection_logo_file_ID', 'integer', NULL ) );
+
 			$this->set_from_Request( 'name' );
 			$this->set( 'shortname', param( 'blog_shortname', 'string', true ) );
 
@@ -577,8 +585,8 @@ class Blog extends DataObject
 				// Force enabled statuses regardless of previous settings
 				$this->set_setting( 'moderation_statuses', implode( ',', $enable_comment_moderation_statuses ) );
 			}
-			if( $this->get_setting( 'allow_access' ) == 'users' || $this->get_setting( 'allow_access' ) == 'members' )
-			{ // Disable site maps, feeds and ping plugins when access is restricted on this blog
+			if( $this->get_setting( 'allow_access' ) != 'public' )
+			{	// Disable site maps, feeds and ping plugins for not public collection:
 				$this->set_setting( 'enable_sitemaps', 0 );
 				$this->set_setting( 'feed_content', 'none' );
 				$this->set_setting( 'ping_plugins', '' );
@@ -781,6 +789,8 @@ class Blog extends DataObject
 			$this->set_from_Request( 'shortdesc' );
 		}
 
+		$this->set_setting( 'social_media_image_file_ID', param( 'social_media_image_file_ID', 'integer', NULL ) );
+
 		if( param( 'blog_keywords', 'string', NULL ) !== NULL )
 		{	// Keywords:
 			$this->set_from_Request( 'keywords' );
@@ -815,17 +825,13 @@ class Blog extends DataObject
 		{	// HTML notes:
 			param_check_html( 'blog_notes', T_('Invalid Blog Notes') );
 			$this->set( 'notes', get_param( 'blog_notes' ) );
-
-			param_integer_range( 'max_footer_credits', 0, 3, T_('Max credits must be between %d and %d.') );
-			$this->set_setting( 'max_footer_credits', get_param( 'max_footer_credits' ) );
 		}
 
 
 		if( in_array( 'pings', $groups ) )
 		{ // we want to load the ping checkboxes:
 			$blog_ping_plugins = param( 'blog_ping_plugins', 'array:string', array() );
-			$blog_ping_plugins = array_unique($blog_ping_plugins);
-			$this->set_setting('ping_plugins', implode(',', $blog_ping_plugins));
+			$this->set_setting( 'ping_plugins', implode( ',', array_unique( $blog_ping_plugins ) ) );
 		}
 
 		if( in_array( 'home', $groups ) )
@@ -868,10 +874,14 @@ class Blog extends DataObject
 			{	// We have permission to edit advanced admin settings:
 				$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
 				if( $this->get_setting( 'in_skin_editing' ) )
-				{
+				{	// Only when in-skin editing in enabled
 					$this->set_setting( 'in_skin_editing_renderers', param( 'in_skin_editing_renderers', 'integer', 0 ) );
-					$this->set_setting( 'in_skin_editing_category', param( 'in_skin_editing_category', 'integer', 0 ) );
 				}
+			}
+			if( $this->get_setting( 'in_skin_editing' ) )
+			{	// Only when in-skin editing in enabled
+				$this->set_setting( 'in_skin_editing_category', param( 'in_skin_editing_category', 'integer', 0 ) );
+				$this->set_setting( 'in_skin_editing_category_order', param( 'in_skin_editing_category_order', 'integer', 0 ) );
 			}
 
 			$this->set_setting( 'post_navigation', param( 'post_navigation', 'string', NULL ) );
@@ -943,9 +953,6 @@ class Blog extends DataObject
 				$this->set_setting( 'allow_subscriptions', param( 'allow_subscriptions', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_mod_subscriptions', param( 'allow_item_mod_subscriptions', 'integer', 0 ) );
-				$this->set_setting( 'allow_anon_subscriptions', param( 'allow_anon_subscriptions', 'integer', 0 ) );
-				$this->set_setting( 'default_anon_comment_notify', param( 'default_anon_comment_notify', 'integer', 0 ) );
-				$this->set_setting( 'anon_notification_email_limit', param( 'anon_notification_email_limit', 'integer', 0 ) );
 			}
 
 			// Voting options:
@@ -977,10 +984,14 @@ class Blog extends DataObject
 				// Subscriptions:
 				$this->set_setting( 'allow_comment_subscriptions', param( 'allow_comment_subscriptions', 'integer', 0 ) );
 				$this->set_setting( 'allow_item_subscriptions', param( 'allow_item_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'allow_anon_subscriptions', param( 'allow_anon_subscriptions', 'integer', 0 ) );
+				$this->set_setting( 'default_anon_comment_notify', param( 'default_anon_comment_notify', 'integer', 0 ) );
+				$this->set_setting( 'anon_notification_email_limit', param( 'anon_notification_email_limit', 'integer', 0 ) );
 			}
 
 			$this->set_setting( 'comments_detect_email', param( 'comments_detect_email', 'integer', 0 ) );
 			$this->set_setting( 'comments_register', param( 'comments_register', 'integer', 0 ) );
+			$this->set_setting( 'meta_comments_frontoffice', param( 'meta_comments_frontoffice', 'integer', 0 ) );
 		}
 
 		if( in_array( 'contact', $groups ) )
@@ -1008,6 +1019,12 @@ class Blog extends DataObject
 
 		if( in_array( 'userdir', $groups ) )
 		{ // we want to load the user directory settings:
+			$this->set_setting( 'userdir_filter_gender', param( 'userdir_filter_gender', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_level', param( 'userdir_filter_level', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_org', param( 'userdir_filter_org', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_criteria', param( 'userdir_filter_criteria', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_lastseen', param( 'userdir_filter_lastseen', 'integer', 0 ) );
+
 			$this->set_setting( 'userdir_picture', param( 'userdir_picture', 'integer', 0 ) );
 			$this->set_setting( 'image_size_user_list', param( 'image_size_user_list', 'string' ) );
 
@@ -1041,6 +1058,39 @@ class Blog extends DataObject
 			$this->set_setting( 'search_include_posts', param( 'search_include_posts', 'integer', 0 ) );
 			$this->set_setting( 'search_include_cmnts', param( 'search_include_cmnts', 'integer', 0 ) );
 			$this->set_setting( 'search_include_tags', param( 'search_include_tags', 'integer', 0 ) );
+			$this->set_setting( 'search_include_files', param( 'search_include_files', 'integer', 0 ) );
+			// Scoring for posts:
+			$this->set_setting( 'search_score_post_title', param( 'search_score_post_title', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_content', param( 'search_score_post_content', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_tags', param( 'search_score_post_tags', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_excerpt', param( 'search_score_post_excerpt', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_titletag', param( 'search_score_post_titletag', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_author', param( 'search_score_post_author', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_date_future', param( 'search_score_post_date_future', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_date_moremonth', param( 'search_score_post_date_moremonth', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_date_lastmonth', param( 'search_score_post_date_lastmonth', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_date_twoweeks', param( 'search_score_post_date_twoweeks', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_date_lastweek', param( 'search_score_post_date_lastweek', 'integer', 0 ) );
+			// Scoring for comments:
+			$this->set_setting( 'search_score_cmnt_post_title', param( 'search_score_cmnt_post_title', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_content', param( 'search_score_cmnt_content', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_author', param( 'search_score_cmnt_author', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_date_future', param( 'search_score_cmnt_date_future', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_date_moremonth', param( 'search_score_cmnt_date_moremonth', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_date_lastmonth', param( 'search_score_cmnt_date_lastmonth', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_date_twoweeks', param( 'search_score_cmnt_date_twoweeks', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_date_lastweek', param( 'search_score_cmnt_date_lastweek', 'integer', 0 ) );
+			// Scoring for files:
+			$this->set_setting( 'search_score_file_name', param( 'search_score_file_name', 'integer', 0 ) );
+			$this->set_setting( 'search_score_file_path', param( 'search_score_file_path', 'integer', 0 ) );
+			$this->set_setting( 'search_score_file_title', param( 'search_score_file_title', 'integer', 0 ) );
+			$this->set_setting( 'search_score_file_alt', param( 'search_score_file_alt', 'integer', 0 ) );
+			$this->set_setting( 'search_score_file_description', param( 'search_score_file_description', 'integer', 0 ) );
+			// Scoring for categories:
+			$this->set_setting( 'search_score_cat_name', param( 'search_score_cat_name', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cat_desc', param( 'search_score_cat_desc', 'integer', 0 ) );
+			// Scoring for tags:
+			$this->set_setting( 'search_score_tag_name', param( 'search_score_tag_name', 'integer', 0 ) );
 
 			// Latest comments :
 			param_integer_range( 'latest_comments_num', 1, 9999, T_('Number of shown comments must be between %d and %d.') );
@@ -1104,6 +1154,11 @@ class Blog extends DataObject
 			{ // Only admin can turn ON this setting
 				$this->set( 'allowtrackbacks', $blog_allowtrackbacks );
 			}
+			$blog_webmentions = param( 'blog_webmentions', 'integer', 0 );
+			if( $blog_webmentions != $this->get_setting( 'webmentions' ) && ( $blog_webmentions == 0 || $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
+			{	// Only admin can turn ON this setting
+				$this->set_setting( 'webmentions', $blog_webmentions );
+			}
 			$this->set_setting( 'comments_orderdir', param( 'comments_orderdir', '/^(?:ASC|DESC)$/', 'ASC' ) );
 
 			// call modules update_collection_comments on this blog
@@ -1127,6 +1182,7 @@ class Blog extends DataObject
 			$this->set_setting( 'canonical_homepage', param( 'canonical_homepage', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_homepage', param( 'relcanonical_homepage', 'integer', 0 ) );
 			$this->set_setting( 'canonical_item_urls', param( 'canonical_item_urls', 'integer', 0 ) );
+			$this->set_setting( 'allow_crosspost_urls', param( 'allow_crosspost_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_item_urls', param( 'relcanonical_item_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_archive_urls', param( 'canonical_archive_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_archive_urls', param( 'relcanonical_archive_urls', 'integer', 0 ) );
@@ -1160,6 +1216,11 @@ class Blog extends DataObject
 			$this->set_setting( 'download_nofollowto', param( 'download_nofollowto', 'integer', 0 ) );
 		}
 
+		if( in_array( 'credits', $groups ) )
+		{	// We want to load the software credits settings:
+			param_integer_range( 'max_footer_credits', 0, 3, T_('Max credits must be between %d and %d.') );
+			$this->set_setting( 'max_footer_credits', get_param( 'max_footer_credits' ) );
+		}
 
 		/*
 		 * ADVANCED ADMIN SETTINGS
@@ -1292,9 +1353,9 @@ class Blog extends DataObject
 				}
 			}
 
-			if( ( $http_protocol = param( 'blog_http_protocol', 'string', 'always_redirect' ) ) !== NULL )
-			{
-				$this->set( 'http_protocol', $http_protocol );
+			if( ( $http_protocol = param( 'http_protocol', 'string', NULL ) ) !== NULL )
+			{	// SSL:
+				$this->set_setting( 'http_protocol', $http_protocol );
 			}
 
 			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
@@ -1487,7 +1548,7 @@ class Blog extends DataObject
 				}
 			}
 
-			if( ! param_errors_detected() && ! empty( $old_media_dir ) )
+			if( $this->ID > 0 && ! param_errors_detected() && ! empty( $old_media_dir ) )
 			{ // No error were detected before and possibly the media directory path was updated, check if it can be managed
 				$this->check_media_dir_change( $old_media_dir, isset( $old_media_location ) ? $old_media_location : NULL );
 			}
@@ -1635,7 +1696,7 @@ class Blog extends DataObject
 
 	/**
 	 * Generate blog URL. That is the URL of the main page/home page of the blog.
-	 * This will nto necessarily be a folder. For example, it can end in index.php?blog=4
+	 * This will not necessarily be a folder. For example, it can end in index.php?blog=4
 	 *
 	 * @param string default|dynamic|static
 	 */
@@ -1654,35 +1715,35 @@ class Blog extends DataObject
 					// or if we call by absolute URL
 					if( $this->get( 'access_type' ) == 'default' )
 					{
-						return $baseurl.$this->siteurl.'index.php';
+						return $this->get_protocol_url( $baseurl ).$this->siteurl.'index.php';
 					}
 					else
 					{
-						return $baseurl.$this->siteurl;
+						return $this->get_protocol_url( $baseurl ).$this->siteurl;
 					}
 				}
 				// ... otherwise, we add the blog ID:
 
 			case 'index.php':
 				// Access through index.php + blog qualifier
-				return $baseurl.$this->siteurl.'index.php?blog='.$this->ID;
+				return $this->get_protocol_url( $baseurl ).$this->siteurl.'index.php?blog='.$this->ID;
 
 			case 'extrabase':
 				// We want to use extra path on base url, use the blog urlname:
-				return $baseurl.$this->siteurl.$this->urlname.'/';
+				return $this->get_protocol_url( $baseurl ).$this->siteurl.$this->urlname.'/';
 
 			case 'extrapath':
 				// We want to use extra path on index.php, use the blog urlname:
-				return $baseurl.$this->siteurl.'index.php/'.$this->urlname.'/';
+				return $this->get_protocol_url( $baseurl ).$this->siteurl.'index.php/'.$this->urlname.'/';
 
 			case 'relative':
-				return $baseurl.$this->siteurl;
+				return $this->get_protocol_url( $baseurl ).$this->siteurl;
 
 			case 'subdom':
-				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.$baseport.'/';
+				return $this->get_protocol_url( $baseprotocol.'://' ).$this->urlname.'.'.$basehost.$baseport.'/';
 
 			case 'absolute':
-				return $this->siteurl;
+				return $this->get_protocol_url( $this->siteurl );
 
 			default:
 				debug_die( 'Unhandled Blog access type ['.$this->get( 'access_type' ).']' );
@@ -1701,29 +1762,29 @@ class Blog extends DataObject
 		switch( $this->get( 'access_type' ) )
 		{
 			case 'baseurl':
-				return $baseurl.$this->siteurl;
+				return $this->get_protocol_url( $baseurl ).$this->siteurl;
 
 			case 'default':
 			case 'index.php':
-				return $baseurl.$this->siteurl.'index.php/';
+				return $this->get_protocol_url( $baseurl ).$this->siteurl.'index.php/';
 
 			case 'extrabase':
 				// We want to use extra path on base url, use the blog urlname:
-				return $baseurl.$this->siteurl.$this->urlname.'/';
+				return $this->get_protocol_url( $baseurl ).$this->siteurl.$this->urlname.'/';
 
 			case 'extrapath':
 				// We want to use extra path on index.php, use the blog urlname:
-				return $baseurl.$this->siteurl.'index.php/'.$this->urlname.'/';
+				return $this->get_protocol_url( $baseurl ).$this->siteurl.'index.php/'.$this->urlname.'/';
 
 			case 'relative':
-				$url = $baseurl.$this->siteurl;
+				$url = $this->get_protocol_url( $baseurl ).$this->siteurl;
 				break;
 
 			case 'subdom':
-				return $baseprotocol.'://'.$this->urlname.'.'.$basehost.$baseport.'/';
+				return $this->get_protocol_url( $baseprotocol.'://' ).$this->urlname.'.'.$basehost.$baseport.'/';
 
 			case 'absolute':
-				$url = $this->siteurl;
+				$url = $this->get_protocol_url( $this->siteurl );
 				break;
 
 			default:
@@ -1783,6 +1844,9 @@ class Blog extends DataObject
 			{	// Build url from base and sub path:
 				$this->basepath_url = $this->get_baseurl_root().$this->get_basepath();
 			}
+
+			// Get URL with protocol which is defined by collection setting "SSL":
+			$this->basepath_url = $this->get_protocol_url( $this->basepath_url );
 		}
 
 		return $this->basepath_url;
@@ -1901,25 +1965,20 @@ class Blog extends DataObject
 	 */
 	function get_htsrv_url( $force_https = false )
 	{
-		$force_https = intval( $force_https );
-
 		if( ! isset( $this->htsrv_urls[ $force_https ] ) )
 		{	// Initialize collection htsrv URL only first time and store in cache:
-			global $htsrv_url, $htsrv_url_sensitive, $htsrv_subdir;
+			global $htsrv_url, $htsrv_subdir;
 
 			if( ! is_array( $this->htsrv_urls ) )
 			{
 				$this->htsrv_urls = array();
 			}
 
-			if( $force_https )
-			{	// If secure htsrv URL is required:
-				$required_htsrv_url = $htsrv_url_sensitive;
-			}
-			else
-			{	// If normal htsrv URL is required:
-				$required_htsrv_url = $htsrv_url;
-			}
+			// Get URL with protocol which is defined by collection setting "SSL":
+			$required_htsrv_url = $this->get_protocol_url( $htsrv_url );
+
+			// Force URL to https depending on the param $force_https:
+			$required_htsrv_url = force_https_url( $required_htsrv_url, $force_https );
 
 			// Cut htsrv folder from end of the URL:
 			$required_htsrv_url = substr( $required_htsrv_url, 0, strlen( $required_htsrv_url ) - strlen( $htsrv_subdir ) );
@@ -1944,6 +2003,7 @@ class Blog extends DataObject
 				.( empty( $htsrv_url_parts['path'] ) ? '' : $htsrv_url_parts['path'] );
 
 			if( isset( $coll_url_parts['scheme'], $htsrv_url_parts['scheme'] ) &&
+			    $htsrv_url_parts['scheme'] != 'https' && // Don't force htsrv back to http when it was already forced to https above by force_https_url()
 			    $coll_url_parts['scheme'] != $htsrv_url_parts['scheme'] )
 			{	// If this collection uses an url with scheme like "https://" then
 				// htsrv url must also uses the same url scheme to avoid restriction by secure reason:
@@ -1978,12 +2038,18 @@ class Blog extends DataObject
 		}
 		elseif( $url_type == 'absolute' )
 		{	// Absolute URL:
-			return $this->get_setting( 'htsrv_assets_absolute_url' );
+			// Get URL with protocol which is defined by collection setting "SSL":
+			$htsrv_assets_absolute_url = $this->get_protocol_url( $this->get_setting( 'htsrv_assets_absolute_url' ) );
+			// Force URL to https depending on the param $force_https:
+			return force_https_url( $htsrv_assets_absolute_url, $force_https );
 		}
 		else// == 'basic'
 		{	// Basic Config URL from config:
-			global $htsrv_url_sensitive, $htsrv_url;
-			return $force_https ? $htsrv_url_sensitive : $htsrv_url;
+			global $htsrv_url;
+			// Get URL with protocol which is defined by collection setting "SSL":
+			$basic_htsrv_url = $this->get_protocol_url( $htsrv_url );
+			// Force URL to https depending on the param $force_https:
+			return force_https_url( $basic_htsrv_url, $force_https );
 		}
 	}
 
@@ -2004,23 +2070,26 @@ class Blog extends DataObject
 			if( ! $force_normal_using && is_admin_page() )
 			{	// Force to absolute base URL on back-office side and email template:
 				global $media_url;
-				return $media_url;
+				$local_media_url = $media_url;
 			}
 			else
 			{	// Use absolute URL relative to collection media folder:
 				global $media_subdir;
-				return $this->get_baseurl_root().$this->get_basepath().$media_subdir;
+				$local_media_url = $this->get_baseurl_root().$this->get_basepath().$media_subdir;
 			}
 		}
 		elseif( $url_type == 'absolute' )
 		{	// Absolute URL:
-			return $this->get_setting( 'media_assets_absolute_url' );
+			$local_media_url = $this->get_setting( 'media_assets_absolute_url' );
 		}
 		else// == 'basic'
 		{	// Basic URL from config:
 			global $media_url;
-			return $media_url;
+			$local_media_url = $media_url;
 		}
+
+		// Get URL with protocol which is defined by collection setting "SSL":
+		return $this->get_protocol_url( $local_media_url );
 	}
 
 
@@ -2037,17 +2106,20 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $rsc_subdir;
-			return $this->get_basepath().$rsc_subdir;
+			$local_rsc_url = $this->get_basepath().$rsc_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
-			return $this->get_setting( 'rsc_assets_absolute_url' );
+			$local_rsc_url = $this->get_setting( 'rsc_assets_absolute_url' );
 		}
 		else// == 'basic'
 		{ // Basic URL from config
 			global $rsc_url;
-			return $rsc_url;
+			$local_rsc_url = $rsc_url;
 		}
+
+		// Get URL with protocol which is defined by collection setting "SSL":
+		return $this->get_protocol_url( $local_rsc_url );
 	}
 
 
@@ -2064,17 +2136,20 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{ // Relative URL
 			global $skins_subdir;
-			return $this->get_basepath().$skins_subdir;
+			$local_skins_url = $this->get_basepath().$skins_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{ // Absolute URL
-			return $this->get_setting( 'skins_assets_absolute_url' );
+			$local_skins_url = $this->get_setting( 'skins_assets_absolute_url' );
 		}
 		else// == 'basic'
 		{ // Basic URL from config
 			global $skins_url;
-			return $skins_url;
+			$local_skins_url = $skins_url;
 		}
+
+		// Get URL with protocol which is defined by collection setting "SSL":
+		return $this->get_protocol_url( $local_skins_url );
 	}
 
 
@@ -2091,17 +2166,20 @@ class Blog extends DataObject
 		if( $url_type == 'relative' )
 		{	// Relative URL:
 			global $plugins_subdir;
-			return $this->get_basepath().$plugins_subdir;
+			$local_plugins_url = $this->get_basepath().$plugins_subdir;
 		}
 		elseif( $url_type == 'absolute' )
 		{	// Absolute URL:
-			return $this->get_setting( 'plugins_assets_absolute_url' );
+			$local_plugins_url = $this->get_setting( 'plugins_assets_absolute_url' );
 		}
 		else// == 'basic'
 		{	// Basic Config URL from config:
 			global $plugins_url;
-			return $plugins_url;
+			$local_plugins_url = $plugins_url;
 		}
+
+		// Get URL with protocol which is defined by collection setting "SSL":
+		return $this->get_protocol_url( $local_plugins_url );
 	}
 
 
@@ -2378,6 +2456,11 @@ class Blog extends DataObject
 			}
 		}
 
+		if( $allowed_status === NULL )
+		{	// Use max allowed status if it could not be found above:
+			$allowed_status = $max_allowed_status;
+		}
+
 		return $allowed_status;
 	}
 
@@ -2484,7 +2567,7 @@ class Blog extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), $msg_mediadir_path ),
-							'error', T_('Media directory file permission error').get_manual_link('media-directory-file-permission-error').':' );
+							'error', T_('Media directory file permission error').get_manual_link('media-file-permission-errors').':' );
 				}
 				return false;
 			}
@@ -2493,7 +2576,7 @@ class Blog extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created."), $msg_mediadir_path ),
-							'error', T_('Media directory creation error').get_manual_link('media-directory-creation-error').':' );
+							'error', T_('Media directory creation error').get_manual_link('media-file-permission-errors').':' );
 				}
 				return false;
 			}
@@ -2535,7 +2618,7 @@ class Blog extends DataObject
 				break;
 
 			case 'custom':
-				return $this->media_url;
+				return $this->get_protocol_url( $this->media_url );
 
 			case 'none':
 			default:
@@ -2734,6 +2817,10 @@ class Blog extends DataObject
 				$disp_param = 'userprefs';
 				break;
 
+			case 'closeaccounturl':
+				$disp_param = 'closeaccount';
+				break;
+
 			case 'subsurl':
 				$disp_param = 'subs';
 				$params['url_suffix'] .= '#subs';
@@ -2768,6 +2855,7 @@ class Blog extends DataObject
 			case 'lostpasswordurl':
 			case 'activateinfourl':
 			case 'access_requires_loginurl':
+			case 'content_requires_loginurl':
 				$url_disp = str_replace( 'url', '', $parname );
 				if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $this ) )
 				{ // Use special blog for login/register actions if it is defined in general settings
@@ -2781,6 +2869,7 @@ class Blog extends DataObject
 				{ // Append url suffix
 					$url = url_add_param( $url, $params['url_suffix'], $params['glue'] );
 				}
+				$url = force_https_url( $url, 'login' );
 				return $url;
 
 			case 'threadsurl':
@@ -2882,11 +2971,6 @@ class Blog extends DataObject
 			case 'mobile_skin_ID':
 			case 'tablet_skin_ID':
 				$result = parent::get( $parname );
-				if( $result === NULL )
-				{ // Try to get default from the global settings
-					$result = $Settings->get( 'def_'.$parname );
-				}
-
 				if( $parname == 'mobile_skin_ID' || $parname == 'tablet_skin_ID' )
 				{
 					if( empty( $result ) && ! ( isset( $params['real_value'] ) && $params['real_value'] ) )
@@ -2896,6 +2980,17 @@ class Blog extends DataObject
 				}
 				return $result;
 
+			case 'collection_image':
+				$FileCache = & get_FileCache();
+				if( $collection_image_ID = $this->get_setting( 'collection_logo_file_ID' ) )
+				{
+					if( $collection_image_File = & $FileCache->get_by_ID( $collection_image_ID, false, false ) )
+					{
+						return $collection_image_File;
+					}
+				}
+				return NULL;
+
 			default:
 				// All other params:
 				return parent::get( $parname );
@@ -2904,7 +2999,7 @@ class Blog extends DataObject
 		if( ! empty( $disp_param ) )
 		{ // Get url depending on value of param 'disp'
 			$this_Blog = & $this;
-			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish', 'visits' ) ) )
+			if( in_array( $disp_param, array( 'threads', 'messages', 'contacts', 'msgform', 'user', 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish', 'visits', 'closeaccount' ) ) )
 			{ // Check if we can use this blog for messaging actions or we should use spec blog
 				if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) )
 				{ // Use special blog for messaging actions if it is defined in general settings
@@ -2920,6 +3015,12 @@ class Blog extends DataObject
 			{ // Add disp param to blog's url when current disp is not a front page
 				$url = url_add_param( $this_Blog->gen_blogurl(), 'disp='.$disp_param, $params['glue'] );
 			}
+
+			if( $disp_param == 'pwdchange' || $disp_param == 'register_finish' )
+			{	// Force these pages to https if it is required by setting "Require SSL":
+				$url = force_https_url( $url, 'login' );
+			}
+
 			if( ! empty( $params['url_suffix'] ) )
 			{ // Append url suffix
 				$url = url_add_param( $url, $params['url_suffix'], $params['glue'] );
@@ -3019,6 +3120,20 @@ class Blog extends DataObject
 					}
 				}
 				break;
+
+			case 'webmentions':
+				if( $this->get_setting( 'allow_access' ) != 'public' )
+				{	// Disable receiving of webmentions for not public collections:
+					$result = 0;
+				}
+				break;
+
+			case 'ping_plugins':
+				if( $this->get_setting( 'allow_access' ) != 'public' )
+				{	// Disable ping plugins for not public collections:
+					$result = '';
+				}
+				break;
 		}
 
 		return $result;
@@ -3090,21 +3205,13 @@ class Blog extends DataObject
 
 	/**
 	 * Make sure collection settings are loaded.
-	 * This keeps a single instance across all blogs.
-	 * fp> why?
 	 */
 	function load_CollectionSettings()
 	{
-		static $instance; // fp> why do we need static? (it actually feels totally wrong: sharing settings between blogs!)
-
-		if( ! isset($this->CollectionSettings) )
+		if( ! isset( $this->CollectionSettings ) )
 		{
-			if( ! isset( $instance ) )
-			{
-				load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
-				$instance = new CollectionSettings(); // COPY (function)
-			}
-			$this->CollectionSettings = $instance;
+			load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
+			$this->CollectionSettings = new CollectionSettings(); // COPY (function)
 		}
 	}
 
@@ -3117,6 +3224,21 @@ class Blog extends DataObject
 	function dbinsert()
 	{
 		global $DB, $Plugins, $Settings;
+
+		// Set default skins on creating new collection:
+		$skin_types = array( 'normal', 'mobile', 'tablet' );
+		foreach( $skin_types as $skin_type )
+		{
+			$skin_ID = $this->get( $skin_type.'_skin_ID', array( 'real_value' => true ) );
+			if( empty( $skin_ID ) )
+			{	// Only if skin is not selected during creating:
+				$default_skin_ID = $Settings->get( 'def_'.$skin_type.'_skin_ID' );
+				if( ! empty( $default_skin_ID ) )
+				{	// And if default skin is defined for the skin type:
+					$this->set( $skin_type.'_skin_ID', $default_skin_ID );
+				}
+			}
+		}
 
 		$DB->begin();
 
@@ -3200,6 +3322,9 @@ class Blog extends DataObject
 
 			$DB->commit();
 
+			// Create collection media directory:
+			$this->get_media_dir();
+
 			return true;
 		}
 
@@ -3241,7 +3366,7 @@ class Blog extends DataObject
 		{ // Proceed insertion:
 			$DB->query( 'INSERT INTO T_coll_user_perms
 					( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember, bloguser_can_be_assignee,
-						bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit,
+						bloguser_perm_item_propose, bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit,
 						bloguser_perm_delpost, bloguser_perm_edit_ts,
 						bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts,
 						bloguser_perm_cmtstatuses, bloguser_perm_edit_cmt,
@@ -3249,7 +3374,7 @@ class Blog extends DataObject
 						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change,
 						bloguser_perm_analytics )
 					VALUES ( '.$this->ID.', '.$this->owner_user_ID.', 1, 1,
-						"published,community,deprecated,protected,private,review,draft,redirected", "admin", "all",
+						1, "published,community,deprecated,protected,private,review,draft,redirected", "admin", "all",
 						1, 1,
 						1, 1, 1,
 						"published,community,deprecated,protected,private,review,draft", "all",
@@ -3316,11 +3441,17 @@ class Blog extends DataObject
 	/**
 	 * Duplicate collection to new one
 	 *
+	 * @param boolean TRUE to duplicate categories and posts/items from source collection
 	 * @return boolean Result
 	 */
-	function duplicate()
+	function duplicate( $params = array() )
 	{
 		global $DB, $current_User;
+
+		$params = array_merge( array(
+				'duplicate_items'    => false,
+				'duplicate_comments' => false,
+			), $params );
 
 		$DB->begin();
 
@@ -3374,6 +3505,11 @@ class Blog extends DataObject
 			$this->set( 'urlname', urltitle_validate( empty( $blog_urlname ) ? $this->get( 'urlname' ) : $blog_urlname, '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
 		}
 
+		// Duplicated collection should not have the same siteurl as original collection, set access type to default extrapath
+		// and empty the siteurl, similar to what a new blank collection have:
+		$this->set( 'access_type', 'extrapath' );
+		$this->set( 'siteurl', '' );
+
 		// Set collection owner to current user
 		$this->set( 'owner_user_ID', $current_User->ID );
 
@@ -3395,7 +3531,7 @@ class Blog extends DataObject
 		}
 
 		// Initialize fields of collection permission tables which must be duplicated:
-		$coll_perm_fields = '{prefix}ismember, {prefix}can_be_assignee, {prefix}perm_poststatuses, {prefix}perm_item_type,
+		$coll_perm_fields = '{prefix}ismember, {prefix}can_be_assignee, {prefix}perm_item_propose, {prefix}perm_poststatuses, {prefix}perm_item_type,
 				{prefix}perm_edit, {prefix}perm_delpost, {prefix}perm_edit_ts, {prefix}perm_delcmts,
 				{prefix}perm_recycle_owncmts, {prefix}perm_vote_spam_cmts, {prefix}perm_cmtstatuses,
 				{prefix}perm_edit_cmt, {prefix}perm_meta_comment, {prefix}perm_cats, {prefix}perm_properties,
@@ -3428,48 +3564,280 @@ class Blog extends DataObject
 			 WHERE wi_coll_ID = '.$DB->quote( $duplicated_coll_ID ),
 			'Duplicate all widgets from collection #'.$duplicated_coll_ID.' to #'.$this->ID );
 
-		/*
-		// There is currently no use case to duplicate categories if category contents are not duplicated
-
-		// Copy all categories from duplicated collection to new created:
-		$source_cats_SQL = new SQL( 'Get all categories of the duplicating collection #'.$duplicated_coll_ID );
-		$source_cats_SQL->SELECT( '*' );
-		$source_cats_SQL->FROM( 'T_categories' );
-		$source_cats_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $duplicated_coll_ID ) );
-		$source_cats = $DB->get_results( $source_cats_SQL, ARRAY_A );
-		$new_cats = array(); // Store all new created categories with key as ID of copied category in order to correct assign parent IDs
-		$ChapterCache = & get_ChapterCache();
-		foreach( $source_cats as $source_cat_fields )
-		{	// Copy each category separately because of unique field "cat_urlname":
-			$new_Chapter = & $ChapterCache->new_obj( NULL, $this->ID );
-			foreach( $source_cat_fields as $source_cat_field_name => $source_cat_field_value )
-			{
-				// Cut prefix "cat_" of each field:
-				$source_cat_field_name = substr( $source_cat_field_name, 4 );
-				if( $source_cat_field_name == 'ID' || $source_cat_field_name == 'blog_ID' )
-				{	// Skip these fields, they must be new:
-					continue;
+		if( $params['duplicate_items'] )
+		{	// Duplicate categories and posts/items:
+			// Copy all categories from duplicated collection to new created:
+			$source_cats_SQL = new SQL( 'Get all categories of the duplicating collection #'.$duplicated_coll_ID );
+			$source_cats_SQL->SELECT( '*' );
+			$source_cats_SQL->FROM( 'T_categories' );
+			$source_cats_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $duplicated_coll_ID ) );
+			$source_cats = $DB->get_results( $source_cats_SQL, ARRAY_A );
+			$new_cats = array(); // Store all new created categories with key as ID of copied category in order to correct assign parent IDs
+			$ChapterCache = & get_ChapterCache();
+			foreach( $source_cats as $source_cat_fields )
+			{	// Copy each category separately because of unique field "cat_urlname":
+				$new_Chapter = & $ChapterCache->new_obj( NULL, $this->ID );
+				foreach( $source_cat_fields as $source_cat_field_name => $source_cat_field_value )
+				{
+					// Cut prefix "cat_" of each field:
+					$source_cat_field_name = substr( $source_cat_field_name, 4 );
+					if( $source_cat_field_name == 'ID' || $source_cat_field_name == 'blog_ID' )
+					{	// Skip these fields, they must be new:
+						continue;
+					}
+					$new_Chapter->set( $source_cat_field_name, $source_cat_field_value );
 				}
-				$new_Chapter->set( $source_cat_field_name, $source_cat_field_value );
+				// Insert the duplicated category:
+				if( $new_Chapter->dbinsert() )
+				{	// If category has been inserted successfully, then update IDs for correct parent hierarchy:
+					// Key - ID of copied category, Value - new created category:
+					$new_cats[ $source_cat_fields['cat_ID'] ] = $new_Chapter;
+				}
 			}
-			// Insert the duplicated category:
-			if( $new_Chapter->dbinsert() )
-			{	// If category has been inserted successfully, then update IDs for correct parent hierarchy:
-				// Key - ID of copied category, Value - new created category:
-				$new_cats[ $source_cat_fields['cat_ID'] ] = $new_Chapter;
+			foreach( $new_cats as $duplicated_cat_ID => $new_Chapter )
+			{	// Update wrong parent IDs to IDs of new created categories:
+				$old_cat_parent_ID = intval( $new_Chapter->get( 'parent_ID' ) );
+				if( $old_cat_parent_ID > 0 && isset( $new_cats[ $old_cat_parent_ID ] ) )
+				{
+					$new_parent_Chapter = $new_cats[ $old_cat_parent_ID ];
+					$new_Chapter->set( 'parent_ID', $new_parent_Chapter->ID );
+					$new_Chapter->dbupdate();
+				}
+				if( $this->get_setting( 'default_cat_ID' ) == $duplicated_cat_ID )
+				{	// Update wrong default category with correct ID of new duplicated category:
+					$this->set_setting( 'default_cat_ID', $new_Chapter->ID );
+					$this->dbupdate();
+				}
+			}
+
+			if( ! empty( $new_cats ) )
+			{	// Duplicate posts if collection has at least one category:
+				$old_items_SQL = new SQL( 'Get all posts of collection #'.$duplicated_coll_ID.' before duplicating them into collection #'.$this->ID );
+				$old_items_SQL->SELECT( 'T_items__item.*' );
+				$old_items_SQL->FROM( 'T_items__item' );
+				$old_items_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
+				$old_items_SQL->WHERE( 'cat_blog_ID = '.$duplicated_coll_ID );
+				$old_items_SQL->ORDER_BY( 'post_ID' );
+				$old_items = $DB->get_results( $old_items_SQL, ARRAY_A );
+				$new_items = array();
+				foreach( $old_items as $old_item )
+				{
+					$old_item_ID = $old_item['post_ID'];
+					unset( $old_item['post_ID'] );
+
+					if( isset( $new_cats[ $old_item['post_main_cat_ID'] ] ) )
+					{	// Use correct category ID:
+						$new_item_Chapter = $new_cats[ $old_item['post_main_cat_ID'] ];
+						$old_item['post_main_cat_ID'] = $new_item_Chapter->ID;
+					}
+
+					// Get new unique slug:
+					$old_item['post_urltitle'] = urltitle_validate( $old_item['post_urltitle'], $old_item['post_title'], 0, false, 'slug_title', 'slug_itm_ID', 'T_slug', $old_item['post_locale'], 'T_items__item' );
+
+					// Duplicate a post:
+					$DB->query( 'INSERT INTO T_items__item ( '.implode( ', ', array_keys( $old_item ) ).' ) VALUES ( '.$DB->quote( $old_item ).' )',
+						'Duplicate from post #'.$old_item_ID );
+					$new_item_ID = $DB->insert_id;
+
+					// Create canonical and tiny slugs:
+					load_funcs( 'slugs/model/_slug.funcs.php' );
+					$new_canonical_Slug = new Slug();
+					$new_canonical_Slug->set( 'title', $old_item['post_urltitle'] );
+					$new_canonical_Slug->set( 'type', 'item' );
+					$new_canonical_Slug->set( 'itm_ID', $new_item_ID );
+					$new_canonical_Slug->dbinsert();
+					$new_tiny_Slug = new Slug();
+					$new_tiny_Slug->set( 'title', getnext_tinyurl() );
+					$new_tiny_Slug->set( 'type', 'item' );
+					$new_tiny_Slug->set( 'itm_ID', $new_item_ID );
+					$new_tiny_Slug->dbinsert();
+
+					$DB->query( 'UPDATE T_items__item
+						  SET post_canonical_slug_ID = '.$new_canonical_Slug->ID.',
+						      post_tiny_slug_ID = '.$new_tiny_Slug->ID.'
+						WHERE post_ID = '.$new_item_ID );
+
+					$new_items[ $old_item_ID ] = $new_item_ID;
+				}
+
+				// Update parent post IDs with correct IDs of new inserted posts:
+				$update_parent_items_sql = '';
+				foreach( $old_items as $old_item )
+				{
+					if( ! empty( $old_item['post_parent_ID'] ) && isset( $new_items[ $old_item['post_parent_ID'] ] ) )
+					{
+						$update_parent_items_sql .= ' WHEN post_parent_ID = '.$old_item['post_parent_ID'].' THEN '.$new_items[ $old_item['post_parent_ID'] ];
+					}
+				}
+				if( $update_parent_items_sql != '' )
+				{
+					$DB->query( 'UPDATE T_items__item
+						INNER JOIN T_categories ON post_main_cat_ID = cat_ID
+						  SET post_parent_ID = CASE '.$update_parent_items_sql.' ELSE post_parent_ID END
+						WHERE cat_blog_ID = '.$this->ID );
+				}
+
+				if( ! empty( $new_items ) )
+				{
+					$old_items_IDs = $DB->quote( array_keys( $new_items ) );
+
+					// Duplicate extra categories:
+					$old_extra_cats_SQL = new SQL( 'Get all posts categories of collection #'.$duplicated_coll_ID.' before duplicating' );
+					$old_extra_cats_SQL->SELECT( 'postcat_post_ID, postcat_cat_ID' );
+					$old_extra_cats_SQL->FROM( 'T_postcats' );
+					$old_extra_cats_SQL->WHERE( 'postcat_post_ID IN ( '.$old_items_IDs.' )' );
+					$old_extra_cats = $DB->get_results( $old_extra_cats_SQL, ARRAY_A );
+					$new_extra_cats_values = array();
+					foreach( $old_extra_cats as $old_extra_cat )
+					{
+						if( isset( $new_items[ $old_extra_cat['postcat_post_ID'] ], $new_cats[ $old_extra_cat['postcat_cat_ID'] ] ) )
+						{
+							$new_extra_cats_values[] = '( '.$new_items[ $old_extra_cat['postcat_post_ID'] ].', '.$new_cats[ $old_extra_cat['postcat_cat_ID'] ]->ID.' )';
+						}
+					}
+					if( ! empty( $new_extra_cats_values ) )
+					{
+						$DB->query( 'INSERT INTO T_postcats ( '.$old_extra_cats_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_extra_cats_values ),
+							'Duplicate extra categories for posts of collection #'.$duplicated_coll_ID );
+					}
+
+					// Duplicate tags:
+					$old_tags_SQL = new SQL( 'Get all posts tags of collection #'.$duplicated_coll_ID.' before duplicating' );
+					$old_tags_SQL->SELECT( 'itag_itm_ID, itag_tag_ID' );
+					$old_tags_SQL->FROM( 'T_items__itemtag' );
+					$old_tags_SQL->WHERE( 'itag_itm_ID IN ( '.$old_items_IDs.' )' );
+					$old_tags = $DB->get_results( $old_tags_SQL, ARRAY_A );
+					$new_tags_values = array();
+					foreach( $old_tags as $old_tag )
+					{
+						if( isset( $new_items[ $old_tag['itag_itm_ID'] ] ) )
+						{
+							$old_tag['itag_itm_ID'] = $new_items[ $old_tag['itag_itm_ID'] ];
+							$new_tags_values[] = '( '.$DB->quote( $old_tag ).' )';
+						}
+					}
+					if( ! empty( $new_tags_values ) )
+					{
+						$DB->query( 'INSERT INTO T_items__itemtag ( '.$old_tags_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_tags_values ),
+							'Duplicate tags for posts of collection #'.$duplicated_coll_ID );
+					}
+
+					// Duplicate settings:
+					$old_settings_SQL = new SQL( 'Get all posts settings of collection #'.$duplicated_coll_ID.' before duplicating' );
+					$old_settings_SQL->SELECT( 'iset_item_ID, iset_name, iset_value' );
+					$old_settings_SQL->FROM( 'T_items__item_settings' );
+					$old_settings_SQL->WHERE( 'iset_item_ID IN ( '.$old_items_IDs.' )' );
+					$old_settings = $DB->get_results( $old_settings_SQL, ARRAY_A );
+					$new_settings_values = array();
+					foreach( $old_settings as $old_setting )
+					{
+						if( isset( $new_items[ $old_setting['iset_item_ID'] ] ) )
+						{
+							$old_setting['iset_item_ID'] = $new_items[ $old_setting['iset_item_ID'] ];
+							$new_settings_values[] = '( '.$DB->quote( $old_setting ).' )';
+						}
+					}
+					if( ! empty( $new_settings_values ) )
+					{
+						$DB->query( 'INSERT INTO T_items__item_settings ( '.$old_settings_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_settings_values ),
+							'Duplicate settings for posts of collection #'.$duplicated_coll_ID );
+					}
+
+					// Duplicate links/attachments:
+					$old_links_SQL = new SQL( 'Get all posts attachments of collection #'.$duplicated_coll_ID.' before duplicating' );
+					$old_links_SQL->SELECT( 'link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_itm_ID, link_file_ID, link_position, link_order' );
+					$old_links_SQL->FROM( 'T_links' );
+					$old_links_SQL->WHERE( 'link_itm_ID IN ( '.$old_items_IDs.' )' );
+					$old_links = $DB->get_results( $old_links_SQL, ARRAY_A );
+					$new_links_values = array();
+					foreach( $old_links as $old_link )
+					{
+						if( isset( $new_items[ $old_link['link_itm_ID'] ] ) )
+						{
+							$old_link['link_itm_ID'] = $new_items[ $old_link['link_itm_ID'] ];
+							$new_links_values[] = '( '.$DB->quote( $old_link ).' )';
+						}
+					}
+					if( ! empty( $new_links_values ) )
+					{
+						$DB->query( 'INSERT INTO T_links ( '.$old_links_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_links_values ),
+							'Duplicate links for posts of collection #'.$duplicated_coll_ID );
+					}
+
+					if( $params['duplicate_comments'] )
+					{	// Duplicate comments:
+						$old_comments_SQL = new SQL( 'Get all comments of collection #'.$duplicated_coll_ID.' before duplicating' );
+						$old_comments_SQL->SELECT( '*' );
+						$old_comments_SQL->FROM( 'T_comments' );
+						$old_comments_SQL->WHERE( 'comment_item_ID IN ( '.$old_items_IDs.' )' );
+						$old_comments = $DB->get_results( $old_comments_SQL, ARRAY_A );
+						foreach( $old_comments as $old_comment )
+						{
+							if( isset( $new_items[ $old_comment['comment_item_ID'] ] ) )
+							{	// Insert only comments with correct item ID:
+								$old_comment_ID = $old_comment['comment_ID'];
+								unset( $old_comment['comment_ID'] );
+								$old_comment['comment_item_ID'] = $new_items[ $old_comment['comment_item_ID'] ];
+								$DB->query( 'INSERT INTO T_comments ( '.implode( ', ', array_keys( $old_comment ) ).' ) VALUES ( '.$DB->quote( $old_comment ).' )',
+									'Duplicate comment #'.$old_comment_ID.' of collection #'.$duplicated_coll_ID );
+								$new_comment_ID = $DB->insert_id;
+								$new_comments[ $old_comment_ID ] = $new_comment_ID;
+							}
+						}
+
+						// Update parent comment IDs with correct IDs of new inserted comments:
+						$update_parent_comments_sql = '';
+						foreach( $old_comments as $old_comment )
+						{
+							if( ! empty( $old_comment['comment_in_reply_to_cmt_ID'] ) && isset( $new_comments[ $old_comment['comment_in_reply_to_cmt_ID'] ] ) )
+							{
+								$update_parent_comments_sql .= ' WHEN comment_in_reply_to_cmt_ID = '.$old_comment['comment_in_reply_to_cmt_ID'].' THEN '.$new_comments[ $old_comment['comment_in_reply_to_cmt_ID'] ];
+							}
+						}
+						if( $update_parent_comments_sql != '' )
+						{
+							$DB->query( 'UPDATE T_comments
+									SET comment_in_reply_to_cmt_ID = CASE '.$update_parent_comments_sql.' ELSE comment_in_reply_to_cmt_ID END
+								WHERE comment_item_ID IN ( '.$DB->quote( $new_items ).' )' );
+						}
+
+						if( ! empty( $new_comments ) )
+						{	// Duplicate links/attachments of the comments:
+							$old_links_SQL = new SQL( 'Get all comments attachments of collection #'.$duplicated_coll_ID.' before duplicating' );
+							$old_links_SQL->SELECT( 'link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_cmt_ID, link_file_ID, link_position, link_order' );
+							$old_links_SQL->FROM( 'T_links' );
+							$old_links_SQL->WHERE( 'link_cmt_ID IN ( '.$old_items_IDs.' )' );
+							$old_links = $DB->get_results( $old_links_SQL, ARRAY_A );
+							$new_links_values = array();
+							foreach( $old_links as $old_link )
+							{
+								if( isset( $new_comments[ $old_link['link_cmt_ID'] ] ) )
+								{
+									$old_link['link_cmt_ID'] = $new_comments[ $old_link['link_cmt_ID'] ];
+									$new_links_values[] = '( '.$DB->quote( $old_link ).' )';
+								}
+							}
+							if( ! empty( $new_links_values ) )
+							{
+								$DB->query( 'INSERT INTO T_links ( '.$old_links_SQL->get_select( '' ).' ) VALUES '.implode( ', ', $new_links_values ),
+									'Duplicate links for comments of collection #'.$duplicated_coll_ID );
+							}
+						}
+					}
+				}
 			}
 		}
-		foreach( $new_cats as $duplicated_cat_ID => $new_Chapter )
-		{	// Update wrong parent IDs to IDs of new created categories:
-			$old_cat_parent_ID = intval( $new_Chapter->get( 'parent_ID' ) );
-			if( $old_cat_parent_ID > 0 && isset( $new_cats[ $old_cat_parent_ID ] ) )
-			{
-				$new_parent_Chapter = $new_cats[ $old_cat_parent_ID ];
-				$new_Chapter->set( 'parent_ID', $new_parent_Chapter->ID );
-				$new_Chapter->dbupdate();
-			}
+		else
+		{	// Create at least one default category:
+			load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
+			$new_Chapter = new Chapter( NULL, $this->ID );
+			$new_Chapter->set( 'name', T_('Uncategorized') );
+			$new_Chapter->set( 'urlname', $this->get( 'urlname' ).'-main' );
+			$new_Chapter->dbinsert();
+			// Use this single category as default:
+			$this->set_setting( 'default_cat_ID', $new_Chapter->ID );
+			$this->dbupdate();
 		}
-		*/
 
 		// The duplicating is successful, So commit all above changes:
 		$DB->commit();
@@ -3507,6 +3875,7 @@ class Blog extends DataObject
 			'admins' => array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 1,
+				'perm_item_propose'    => 1,
 				'perm_poststatuses'    => 'published,community,deprecated,protected,private,review,draft,redirected',
 				'perm_item_type'       => 'admin',
 				'perm_edit'            => 'all',
@@ -3529,6 +3898,7 @@ class Blog extends DataObject
 			'moderators' => array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 1,
+				'perm_item_propose'    => 1,
 				'perm_poststatuses'    => 'published,community,deprecated,protected,private,review,draft',
 				'perm_item_type'       => 'restricted',
 				'perm_edit'            => 'le',
@@ -3551,6 +3921,7 @@ class Blog extends DataObject
 			'editors' => array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 1,
 				'perm_poststatuses'    => '',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'no',
@@ -3576,6 +3947,7 @@ class Blog extends DataObject
 			$group_permissions['editors'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => 'community,protected,draft,deprecated',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'own',
@@ -3598,6 +3970,7 @@ class Blog extends DataObject
 			$group_permissions['users'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => 'community,draft',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'no',
@@ -3620,6 +3993,7 @@ class Blog extends DataObject
 			$group_permissions['suspect'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => 'review,draft',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'no',
@@ -3646,6 +4020,7 @@ class Blog extends DataObject
 			$group_permissions['blogb'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => '',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'no',
@@ -4367,19 +4742,27 @@ class Blog extends DataObject
 
 			$ChapterCache = & get_ChapterCache();
 			$selected_Chapter = $ChapterCache->get_by_ID( $cat_ID, false, false );
-			if( $selected_Chapter && $selected_Chapter->lock )
-			{ // This category is locked, don't allow to create new post with this cat
+			if( $selected_Chapter &&
+			    ( $selected_Chapter->get( 'lock' ) ||
+			      ( $cat_ItemType = & $selected_Chapter->get_ItemType() ) === false ) )
+			{	// Don't allow to create new post with this category if it is locked or no default item type for the category:
 				return '';
 			}
+
 			if( ! is_logged_in() || $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->ID ) )
 			{	// We have permission to add a post with at least one status:
 				if( $this->get_setting( 'in_skin_editing' ) && ! is_admin_page() )
 				{	// We have a mode 'In-skin editing' for the current Blog
 					// User must have a permission to publish a post in this blog
 					$cat_url_param = '';
-					if( $cat_ID > 0 )
+					if( $selected_Chapter )
 					{	// Link to create a Item with predefined category
-						$cat_url_param = '&amp;cat='.$cat_ID;
+						$cat_url_param = '&amp;cat='.$selected_Chapter->ID;
+						if( empty( $post_type_usage ) &&
+						    ( $cat_ItemType = & $selected_Chapter->get_ItemType() ) )
+						{	// Use predefined Item Type from selected category:
+							$cat_url_param .= '&amp;item_typ_ID='.$cat_ItemType->ID;
+						}
 					}
 					$url = url_add_param( $this->get( 'url' ), ( is_logged_in() ? 'disp=edit' : 'disp=anonpost' ).$cat_url_param );
 				}
@@ -4505,7 +4888,7 @@ class Blog extends DataObject
 			return true;
 		}
 
-		if( in_array( $disp, array( 'login', 'lostpassword', 'register', 'help', 'msgform', 'access_requires_login' ) ) )
+		if( in_array( $disp, array( 'login', 'lostpassword', 'register', 'help', 'msgform', 'access_requires_login', 'content_requires_login' ) ) )
 		{ // Don't restrict these pages
 			return true;
 		}
@@ -4789,10 +5172,11 @@ class Blog extends DataObject
 
 		if( ! isset( $cache_all_item_type_data ) )
 		{	// Get all item type data only first time to save execution time:
-			$cache_all_item_type_data = $DB->get_results( 'SELECT ityp_ID, ityp_usage, ityp_name FROM T_items__type' );
+			$cache_all_item_type_data = $DB->get_results( 'SELECT ityp_ID, ityp_usage, ityp_name, ityp_template_name FROM T_items__type' );
 		}
 
 		// Decide what "post" item type we can enable depending on collection kind:
+		$default_post_types_by_template = array();
 		switch( $this->type )
 		{
 			case 'main':
@@ -4808,7 +5192,8 @@ class Blog extends DataObject
 				break;
 
 			case 'manual':
-				$default_post_types = array( 'Manual Page' );
+				$default_post_types = array( 'Manual Page', 'Recipe' );
+				$default_post_types_by_template = array( 'recipe' );
 				break;
 
 			case 'group':
@@ -4816,7 +5201,8 @@ class Blog extends DataObject
 				break;
 
 			default: // 'std'
-				$default_post_types = array( 'Post', 'Podcast Episode', 'Post with Custom Fields', 'Child Post' );
+				$default_post_types = array( 'Post', 'Podcast Episode', 'Post with Custom Fields', 'Child Post', 'Recipe' );
+				$default_post_types_by_template = array( 'recipe' );
 				break;
 		}
 
@@ -4824,7 +5210,8 @@ class Blog extends DataObject
 		foreach( $cache_all_item_type_data as $item_type )
 		{
 			if( $item_type->ityp_usage == 'post' &&
-			    in_array( $item_type->ityp_name, $default_post_types ) )
+			    ( in_array( $item_type->ityp_name, $default_post_types ) || in_array( $item_type->ityp_template_name, $default_post_types_by_template ) ) &&
+			    ! in_array( $item_type->ityp_ID, $enable_post_types ) )
 			{	// This "post" item type can be enabled:
 				$enable_post_types[] = $item_type->ityp_ID;
 			}
@@ -5381,6 +5768,129 @@ class Blog extends DataObject
 		$default_ItemType = $this->get_default_ItemType();
 
 		return $default_ItemType ? $default_ItemType->get_name() : T_('Post');
+	}
+
+
+	/**
+	 * Get URL with protocol which is defined by collection setting "SSL"
+	 *
+	 * @param string Requested URL
+	 * @param string Forced URL
+	 */
+	function get_protocol_url( $url )
+	{
+		if( empty( $this->ID ) )
+		{
+			return $url;
+		}
+
+		switch( $this->get_setting( 'http_protocol' ) )
+		{	// Force URL's protocol depending on collection setting "SSL":
+			case 'always_http':
+				$url = preg_replace( '#^https://#', 'http://', $url );
+				break;
+			case 'always_https':
+				$url = preg_replace( '#^http://#', 'https://', $url );
+				break;
+		}
+
+		return $url;
+	}
+
+
+	/**
+	 * Get default new item type based on the collection's default category or current working category
+	 *
+	 * @return object|false ItemType object, false if default item type is disabled
+	 */
+	function & get_default_new_ItemType()
+	{
+		global $cat;
+
+		// Get a working category:
+		$working_cat = $cat;
+		if( empty( $cat ) )
+		{	// Use default collection category when global category is not defined:
+			$working_cat = $this->get_default_cat_ID();
+		}
+
+		$ChapterCache = & get_ChapterCache();
+		$working_Chapter = & $ChapterCache->get_by_ID( $working_cat, false, false );
+
+		if( ! $working_Chapter ||
+		    ( ( $working_cat_ItemType = & $working_Chapter->get_ItemType() ) === false ) )
+		{	// The working category is not detected in DB or it has no default Item Type:
+			$r = false;
+			return $r;
+		}
+
+		if( $working_cat_ItemType === NULL )
+		{	// If the working category uses the same as collection default:
+			$coll_default_ItemType = $this->get_default_ItemType();
+			return $coll_default_ItemType;
+		}
+
+		// If the working category uses a custom Item Type:
+		return $working_cat_ItemType;
+	}
+
+
+	/**
+	 * Get default item denomination depending on current collection type
+	 *
+	 * @param string Position where denomination will be used, can be one of the following: 'evobar_new', 'inskin_new_btn', 'title_new', 'title_update'
+	 * @return string Item denomination
+	 */
+	function get_item_denomination( $position = 'evobar_new' )
+	{
+		switch( $this->get( 'type' ) )
+		{
+			case 'photo':
+				$denominations = array(
+						'evobar_new'     => T_('Album'),
+						'inskin_new_btn' => T_('New album'),
+						'title_new'      => T_('New album'),
+						'title_updated'  => T_('Updated album'),
+					);
+				break;
+
+			case 'group':
+				$denominations = array(
+						'evobar_new'     => T_('Task'),
+						'inskin_new_btn' => T_('New task'),
+						'title_new'      => T_('New task'),
+						'title_updated'  => T_('Updated task'),
+					);
+				break;
+
+			case 'forum':
+				$denominations = array(
+						'evobar_new'     => T_('Topic'),
+						'inskin_new_btn' => T_('New topic'),
+						'title_new'      => T_('New topic'),
+						'title_updated'  => T_('Updated topic'),
+					);
+				break;
+
+			case 'manual':
+				$denominations = array(
+						'evobar_new'     => T_('Page'),
+						'inskin_new_btn' => T_('New page'),
+						'title_new'      => T_('New page'),
+						'title_updated'  => T_('Updated page'),
+					);
+				break;
+
+			default:
+				$denominations = array(
+						'evobar_new'     => T_('Post'),
+						'inskin_new_btn' => T_('New post'),
+						'title_new'      => T_('New post'),
+						'title_updated'  => T_('Updated post'),
+					);
+		}
+
+		return isset( $denominations[ $position ] ) ? $denominations[ $position ] : '';
 	}
 }
 

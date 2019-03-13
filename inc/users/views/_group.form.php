@@ -113,7 +113,7 @@ $perm_view_option = array( 'view', T_('View details') );
 $perm_edit_option = array( 'edit', T_('Edit/delete all') );
 
 
-$Form->begin_fieldset( T_('General').get_manual_link('group_properties_general') );
+$Form->begin_fieldset( T_('General').get_manual_link('group-properties-general') );
 
 	$Form->text( 'edited_grp_name', $edited_Group->name, 50, T_('Name'), '', 50, 'large' );
 
@@ -137,13 +137,13 @@ $Form->end_fieldset();
 // Show/Hide the panels below depending on group usage:
 $primary_panels_style = $edited_Group->get( 'usage' ) == 'primary' ? '' : 'display:none';
 
-$Form->begin_fieldset( T_('Evobar & Back-office').get_manual_link('group_properties_evobar'), array( 'id' => 'evobar', 'style' => $primary_panels_style ) );
+$Form->begin_fieldset( T_('Evobar & Back-office').get_manual_link('group-properties-evobar'), array( 'id' => 'evobar', 'style' => $primary_panels_style ) );
 
 	display_pluggable_permissions( $Form, 'core_evobar' );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Blogging permissions').get_manual_link('group_properties_blogging'), array( 'id' => 'blogging', 'style' => $primary_panels_style ) );
+$Form->begin_fieldset( T_('Blogging permissions').get_manual_link('group-properties-blogging'), array( 'id' => 'blogging', 'style' => $primary_panels_style ) );
 
 	$Form->radio( 'edited_grp_perm_blogs', $edited_Group->get('perm_blogs'),
 			array(  array( 'user', T_('Depending on each blog\'s permissions') ),
@@ -184,7 +184,7 @@ $Form->begin_fieldset( T_('Blogging permissions').get_manual_link('group_propert
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_properties_additional_permissions'), array( 'id' => 'additional', 'style' => $primary_panels_style ) );
+$Form->begin_fieldset( T_('Additional permissions').get_manual_link('group-properties-additional-permissions'), array( 'id' => 'additional', 'style' => $primary_panels_style ) );
 
 	$Form->radio( 'edited_grp_perm_stats', $edited_Group->get('perm_stats'),
 			array(  $perm_none_option,
@@ -198,11 +198,11 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('File permissions').get_manual_link('group_properties_file_permissions'), array( 'id' => 'file', 'style' => $primary_panels_style ) );
+$Form->begin_fieldset( T_('File permissions').get_manual_link('group-properties-file-permissions'), array( 'id' => 'file', 'style' => $primary_panels_style ) );
 	display_pluggable_permissions( $Form, 'file' );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_properties_system_permissions'), array( 'id' => 'system', 'style' => $primary_panels_style ) );
+$Form->begin_fieldset( T_('System admin permissions').get_manual_link('group-properties-system-permissions'), array( 'id' => 'system', 'style' => $primary_panels_style ) );
 
 	// Display pluggable permissions:
 	display_pluggable_permissions( $Form, 'core' );
@@ -233,7 +233,7 @@ $Form->end_form();
 
 // set shared root permission availability, when form was loaded and when file perms was changed
 ?>
-<script type="text/javascript">
+<script>
 <?php
 global $Settings;
 if( $Settings->get('fm_enable_roots_shared') )

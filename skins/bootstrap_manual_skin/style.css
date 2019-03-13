@@ -87,9 +87,6 @@ div.extended_search_form .search_options .search_option {
   display: inline-block;
   margin-right: 10px;
 }
-table.catselect input#new_category_name {
-  width: 98% !important;
-}
 label.control-label[for=post_title] {
   width: auto;
 }
@@ -170,15 +167,35 @@ div.bSideItem h4 {
 .evo_panel__register {
   max-width: 580px;
 }
-.evo_panel__register .control-buttons {
-  text-align: left;
-}
-.evo_panel__register.register-disabled {
-  width: 350px;
-}
 .evo_panel__register .form-control#country,
 .evo_panel__register .form-control#u {
   width: 100%;
+}
+.evo_panel__register #fieldset_wrapper_captcha_qstn .panel {
+  margin: 0;
+}
+.evo_panel__register #fieldset_wrapper_captcha_qstn .panel div[id$=_answer] .control-label {
+  padding-right: 14px;
+}
+.evo_panel__register .panel-body {
+  padding: 15px;
+}
+.evo_panel__register .panel-body p:last-child {
+  margin-bottom: 0;
+}
+@media (min-width: 768px) {
+  #fieldset_wrapper_captcha_qstn .panel div[id$=_answer] {
+    max-height: 34px;
+  }
+}
+.evo_register_buttons {
+  text-align: center;
+}
+.evo_register_buttons input.btn {
+  margin: 0 0 15px 0;
+}
+.evo_register_buttons a.btn {
+  margin: 0;
 }
 .evo_form__login_links {
   padding: 0 5px;
@@ -269,7 +286,8 @@ div#skin_wrapper.skin_wrapper_loggedin .sitewide_header {
   font-size: inherit;
   margin-right: 5px;
 }
-.posts_list li > .btn-group {
+.posts_list li > .btn-group,
+.posts_list li > .evo_status {
   margin: 0 0 6px 30px;
 }
 ol.breadcrumb {
@@ -295,6 +313,22 @@ ol.breadcrumb {
 .evo_post_title .btn-group .btn,
 .cat_title .btn-group .btn {
   float: none;
+}
+@media (max-width: 767px) {
+  .evo_post_title,
+  .cat_title {
+    display: block;
+  }
+  .evo_post_title h1,
+  .cat_title h1 {
+    display: block;
+  }
+  .evo_post_title .btn-group,
+  .cat_title .btn-group {
+    display: block;
+    text-align: right;
+    padding: 0 0 10px 0;
+  }
 }
 .evo_content_block .evo_comment .evo_comment_footer .action_btn_group {
   float: right;

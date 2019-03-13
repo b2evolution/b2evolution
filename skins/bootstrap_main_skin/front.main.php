@@ -58,7 +58,7 @@ if( ! empty( $bg_File ) && $bg_File->exists() )
 		<!-- ================================= START OF MAIN AREA ================================== -->
 
 		<?php
-		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login' ) ) )
+		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login', 'content_requires_login' ) ) )
 		{ // Don't display the messages here because they are displayed inside wrapper to have the same width as form
 			// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
 			messages( array(
@@ -167,15 +167,6 @@ if( ! empty( $bg_File ) && $bg_File->exists() )
 					'display_reg_link'      => true,
 					'abort_link_position'   => 'form_title',
 					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-					// Register
-					'register_page_before'      => '<div class="evo_panel__register">',
-					'register_page_after'       => '</div>',
-					'register_form_title'       => T_('Register'),
-					'register_links_attrs'      => '',
-					'register_use_placeholders' => true,
-					'register_field_width'      => 252,
-					'register_disabled_page_before' => '<div class="evo_panel__register register-disabled">',
-					'register_disabled_page_after'  => '</div>',
 					// Activate form
 					'activate_form_title'  => T_('Account activation'),
 					'activate_page_before' => '<div class="evo_panel__activation">',
@@ -190,6 +181,8 @@ if( ! empty( $bg_File ) && $bg_File->exists() )
 					'front_block_first_title_end'   => '</h1>',
 					'front_block_title_start'       => '<h2>',
 					'front_block_title_end'         => '</h2>',
+					'intro_class'                   => '',
+					'featured_class'                => 'featurepost',
 					// Form "Sending a message"
 					'msgform_form_title' => T_('Contact'),
 				) );

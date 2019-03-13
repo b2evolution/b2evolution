@@ -358,7 +358,7 @@ class AdminUI_general extends Menu
 	function display_breadcrumbpath_get_html( $params = array() )
 	{
 		$params = array_merge( array(
-				'before'     => '<div class="col-md-12"><nav aria-label="breadcrumb"><ol class="breadcrumb" style="margin-left: 0">',
+				'before'     => '<div class="col-md-12"><nav aria-label="breadcrumb"><ol class="breadcrumb">',
 				'after'      => '</ol></nav></div>',
 				'beforeText' => '',
 				'beforeEach' => '<li class="breadcrumb-item">',
@@ -494,7 +494,11 @@ class AdminUI_general extends Menu
 	{
 		global $app_shortname;
 
-		if( $htmltitle = $this->get_prop_for_node( $this->path, array( 'htmltitle' ) ) )
+		if( ! empty( $this->htmltitle ) )
+		{	// Get html title which is specified for current page:
+			$r = $this->htmltitle;
+		}
+		elseif( $htmltitle = $this->get_prop_for_node( $this->path, array( 'htmltitle' ) ) )
 		{	// Explicit htmltitle set:
 			$r = $htmltitle;
 		}
@@ -734,7 +738,6 @@ class AdminUI_general extends Menu
 			$path0 = $this->get_path(0);
 			$r = $this->get_html_menu( $path0, 'sub', 0, ! $params['display_menu2'] );
 
-			echo $this->replace_vars( $r );
 			//echo ' disp_submenu-END ';
 
 			// Show breadcrumbs
@@ -745,8 +748,9 @@ class AdminUI_general extends Menu
 
 			// Show 3rd level menu for settings tab
 			$path1 = $this->get_path(1);
-			echo $this->get_html_menu( array($path0, $path1), 'menu3', 0, ! $params['display_menu3'] );
+			$r .= $this->get_html_menu( array($path0, $path1), 'menu3', 0, ! $params['display_menu3'] );
 
+			echo $this->replace_vars( $r );
 
 			$this->displayed_sub_begin = 1;
 		}
@@ -1610,7 +1614,7 @@ class AdminUI_general extends Menu
 			<div id="headinfo">
 				<span id="headfunctions">'
 					// Note: if we log in with another user, we may not have the perms to come back to the same place any more, thus: redirect to admin home.
-					.'<a href="'.get_htsrv_url( true ).'login.php?action=logout&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $admin_url, get_htsrv_url( true ) ) ).'">'.T_('Log out').'</a>
+					.'<a href="'.get_htsrv_url( 'login' ).'login.php?action=logout&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $admin_url, get_htsrv_url( 'login' ) ) ).'">'.T_('Log out').'</a>
 					<img src="'.$rsc_url.'icons/close.gif" width="14" height="14" border="0" class="top" alt="" title="'
 					.T_('Log out').'" /></a>
 				</span>

@@ -25,7 +25,7 @@ global $preset;
 global $rsc_url;
 
 ?>
-<script type="text/javascript">
+<script>
 	function show_hide_chapter_prefix(ob)
 	{
 		var fldset = document.getElementById( 'category_prefix_container' );
@@ -54,7 +54,7 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'seo' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
-$Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(disp=posts)</span>'.get_manual_link('main_page_seo') );
+$Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(disp=posts)</span>'.get_manual_link('main-page-seo') );
 	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Default blog page'), T_('META NOINDEX') );
 	$Form->checklist( array(
 		array( 'canonical_homepage', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_homepage' ) ),
@@ -87,7 +87,7 @@ $Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(di
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_link('single_post_pages_seo') );
+$Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_link('single-post-pages-seo') );
 
 	$Form->radio( 'single_links', $edited_Blog->get_setting('single_links'),
 		array(
@@ -113,6 +113,7 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 
 	$Form->checklist( array(
 		array( 'canonical_item_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_item_urls' ) ),
+		array( 'allow_crosspost_urls', 1, T_('For cross-posted Items, allow non-canonical URL'), $edited_Blog->get_setting( 'allow_crosspost_urls' ), ! $edited_Blog->get_setting( 'canonical_item_urls' ) ),
 		array( 'relcanonical_item_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_item_urls' ) ),
 		), 'canonical_item_urls_options', T_('Make canonical') );
 
@@ -130,7 +131,7 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_seo') );
+$Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive-pages-seo') );
 
 	$Form->radio( 'archive_links', $edited_Blog->get_setting('archive_links'),
 		array(
@@ -162,7 +163,7 @@ $Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_s
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo') );
+$Form->begin_fieldset( T_('Category pages').get_manual_link('category-pages-seo') );
 
 	$Form->radio( 'chapter_links', $edited_Blog->get_setting('chapter_links'),
 		array(
@@ -181,7 +182,7 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo'
 		echo '</div>';
 		if( $edited_Blog->get_setting( 'chapter_links' ) == 'param_num' )
 		{ ?>
-		<script type="text/javascript">
+		<script>
 			<!--
 			var fldset = document.getElementById( 'category_prefix_container' );
 			fldset.style.display = 'none';
@@ -214,7 +215,7 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo'
 	$Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo'), array('id'=>'tag_links_fieldset') );
+$Form->begin_fieldset( T_('Tag pages').get_manual_link('tag-pages-seo'), array('id'=>'tag_links_fieldset') );
 
 	$Form->radio( 'tag_links', $edited_Blog->get_setting('tag_links'),
 		array(
@@ -259,7 +260,7 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo'), array('
 
 // Javascript juice for the tag fields.
 ?>
-<script type="text/javascript">
+<script>
 jQuery("#tag_links_fieldset input[name=tag_links][type=radio]").click( function()
 {
 	// Disable tag_prefix, if "param" is used. fp> TODO: visual feedback that this is disabled
@@ -294,7 +295,7 @@ jQuery("#tag_prefix").keyup( function() {
 
 
 <?php
-$Form->begin_fieldset( T_('Other filtered pages').get_manual_link('other_filtered_pages_seo') );
+$Form->begin_fieldset( T_('Other filtered pages').get_manual_link('other-filtered-pages-seo') );
 	$Form->checkbox( 'filtered_noindex', $edited_Blog->get_setting( 'filtered_noindex' ), T_('Other filtered posts pages'), T_('META NOINDEX').' - '.T_('Filtered by keyword search, by author, etc.') );
 
 	$Form->radio( 'filtered_content', $edited_Blog->get_setting('filtered_content'),
@@ -305,7 +306,7 @@ $Form->begin_fieldset( T_('Other filtered pages').get_manual_link('other_filtere
 			), T_('Post contents'), true );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
+$Form->begin_fieldset( T_('Other pages').get_manual_link('other-pages-seo') );
 	$Form->checkbox( 'feedback-popup_noindex', $edited_Blog->get_setting( 'feedback-popup_noindex' ), T_('Comment popups'),
 										T_('META NOINDEX').' - '.T_('For skins with comment popups only.') );
 	$Form->checkbox( 'msgform_noindex', $edited_Blog->get_setting( 'msgform_noindex' ), T_('Contact forms'),
@@ -318,7 +319,7 @@ $Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
 				array( '301', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '301' ) ),
 				array( '302', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '302' ) ),
 				array( '303', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '303' ) ),
-				array( '404', T_('404 "Not found" response') ),
+				array( '404', T_('404 "Not Found" response') ),
 				array( '410', T_('410 "Gone" response') ),
 			), T_('404 "Not Found" response'), true );
 
@@ -340,3 +341,14 @@ $Form->end_fieldset();
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>
+<script>
+jQuery( 'input[name=canonical_item_urls]' ).click( function()
+{
+	var canonical_item_urls_is_unchecked = ! jQuery( this ).prop( 'checked' );
+	jQuery( 'input[name=allow_crosspost_urls]' ).prop( 'disabled', canonical_item_urls_is_unchecked );
+	if( canonical_item_urls_is_unchecked )
+	{
+		jQuery( 'input[name=allow_crosspost_urls]' ).prop( 'checked', false );
+	}
+} );
+</script>

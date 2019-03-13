@@ -19,6 +19,7 @@ if( $Blog->get_ajax_form_enabled() )
 			'action'        => 'get_item_form',
 			'blog'          => $Blog->ID,
 			'cat'           => get_param( 'cat' ),
+			'item_typ_ID'   => get_param( 'item_typ_ID' ),
 			'post_title'    => param( 'post_title', 'string' ),
 			'post_urltitle' => param( 'post_urltitle', 'string' ),
 		) );

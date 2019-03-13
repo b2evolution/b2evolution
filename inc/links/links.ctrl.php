@@ -69,7 +69,7 @@ if( $action == 'edit_links' || $action == 'sort_links' )
 { // set LinkOwner from params
 	$link_type = param( 'link_type', 'string', 'item', true );
 	$object_ID = param( 'link_object_ID', 'integer', 0, true );
-	$LinkOwner = get_link_owner( $link_type, $object_ID );
+	$LinkOwner = get_LinkOwner( $link_type, $object_ID );
 	if( empty( $Blog ) )
 	{ // Load the blog we're in:
 		$Collection = $Blog = & $LinkOwner->get_Blog();
@@ -283,15 +283,8 @@ switch( $action )
 
 // require colorbox js
 require_js_helper( 'colorbox' );
-// require Fine Uploader js and css:
-init_fineuploader_js_lang_strings();
-require_js( 'multiupload/fine-uploader.js' );
-require_css( 'fine-uploader.css' );
-if( $action == 'edit_links' )
-{ // Load JS files to make the links table sortable:
-	require_js( '#jquery#' );
-	require_js( 'jquery/jquery.sortable.min.js' );
-}
+// Init JS to quick upload several files:
+init_fileuploader_js( 'rsc_url', ( $action == 'edit_links' ) );
 
 $AdminUI->disp_html_head();
 $AdminUI->disp_body_top( false );

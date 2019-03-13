@@ -41,6 +41,7 @@ $params = array_merge( array(
 		'after_comment_error'  => '</em></p>',
 		'before_comment_form'  => '',
 		'after_comment_form'   => '',
+		'comment_type'         => 'comment',
 	), $params );
 
 echo '<div id="textinputwrap">';
@@ -180,7 +181,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	echo $params['form_title_end'];
 
 /*
-	echo '<script type="text/javascript">
+	echo '<script>
 /* <![CDATA[ *
 function validateCommentForm(form)
 {
@@ -198,11 +199,13 @@ function validateCommentForm(form)
 
 	$Form->begin_form( 'bComment', '', array( 'target' => '_self', /*'onsubmit' => 'return validateCommentForm(this);'*/ ) );
 
-	// Display a message before comment form:
-	$Item->display_comment_form_msg( array(
-			'before' => '<br /><div class="warning"><div class="action_messages">',
-			'after'  => '</div></div>',
-		) );
+	if( $params['comment_type'] != 'meta' )
+	{	// Display a message before comment form:
+		$Item->display_comment_form_msg( array(
+				'before' => '<br /><div class="warning"><div class="action_messages">',
+				'after'  => '</div></div>',
+			) );
+	}
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
 	//           Actually, the best would be, if the $Form object could be changed by a plugin
@@ -241,7 +244,7 @@ function validateCommentForm(form)
 			$comment_author_email = $current_User->email;
 		}
 		// Note: we use funky field names to defeat the most basic guestbook spam bots
-		$Form->text( $dummy_fields[ 'name' ], $comment_author, 40, T_('Name'), '', 100, 'bComment' );
+		$Form->text( $dummy_fields[ 'name' ], $comment_author, 40, T_('Name'), '<br />'.sprintf( T_('<a %s>Click here to log in</a> if you already have an account on this site.'), 'href="'.get_login_url( 'comment form', $Item->get_permanent_url() ).'" style="font-weight:bold"' ), 100, 'bComment' );
 
 		$Form->email_input( $dummy_fields[ 'email' ], $comment_author_email, 40, T_('Email'), array(
 			'bottom_note' => T_('Your email address will <strong>not</strong> be revealed on this site.'),
@@ -266,6 +269,13 @@ function validateCommentForm(form)
 	{	// We have a policy text to display
 		$Form->info_field( '', $params['policy_text'] );
 	}
+
+	// Display plugin captcha for comment form before textarea:
+	$Plugins->display_captcha( array(
+			'Form'          => & $Form,
+			'form_type'     => 'comment',
+			'form_position' => 'before_textarea',
+		) );
 
 	ob_start();
 	echo '<div class="comment_toolbars">';
@@ -293,7 +303,7 @@ function validateCommentForm(form)
 	$Form->inputstart = $form_inputstart;
 
 	// set b2evoCanvas for plugins
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
+	echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
 
 	// Attach files:
 	if( !empty( $comment_attachments ) )
@@ -360,6 +370,13 @@ function validateCommentForm(form)
 	}
 
 	$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
+
+	// Display plugin captcha for comment form before submit button:
+	$Plugins->display_captcha( array(
+			'Form'          => & $Form,
+			'form_type'     => 'comment',
+			'form_position' => 'before_submit_button',
+		) );
 
 	$Form->begin_fieldset();
 		echo '<div class="input">';

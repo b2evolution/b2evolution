@@ -102,18 +102,17 @@ class ItemQuery extends SQL
 		// if a post urltitle is specified, load that post
 		if( !empty( $title ) )
 		{
+			global $DB;
 			if( substr( $this->title, 0, 1 ) == '-' )
 			{	// Starts with MINUS sign:
-				$eq_title = ' <> ';
-				$this->title = substr( $this->title, 1 );
+				$title = substr( $this->title, 1 );
+				$this->WHERE_and( 'post_ID NOT IN ( SELECT slug_itm_ID FROM T_slug WHERE slug_title = '.$DB->quote( $title ).' )' );
 			}
 			else
 			{
-				$eq_title = ' = ';
+				$this->FROM_add( 'LEFT JOIN T_slug ON slug_itm_ID = post_ID AND slug_type = "item" AND slug_title = '.$DB->quote( $title ) );
+				$this->WHERE_and( 'slug_title IS NOT NULL' );
 			}
-
-			global $DB;
-			$this->WHERE_and( $this->dbprefix.'urltitle'.$eq_title.$DB->quote($this->title) );
 			$r = true;
 		}
 
@@ -240,13 +239,13 @@ class ItemQuery extends SQL
 			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID' );
 			$this->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID'.$sql_join_categories );
 			// fp> we try to restrict as close as possible to the posts but I don't know if it matters
-			$cat_ID_field = 'postcat_cat_ID';
+			$cat_ID_field = 'T_postcats.postcat_cat_ID';
 		}
 		elseif( get_allow_cross_posting() >= 1 )
 		{	// Select extra categories if cross posting is enabled:
 			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID' );
 			$this->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
-			$cat_ID_field = 'postcat_cat_ID';
+			$cat_ID_field = 'T_postcats.postcat_cat_ID';
 		}
 		else
 		{	// Select only main categories:
@@ -390,8 +389,9 @@ class ItemQuery extends SQL
 	 * Restrict to specific tags
 	 *
 	 * @param string List of tags to restrict to
+	 * @param string Condition to search by tags, 'OR' - if item has at least one tag, 'AND' - item must has all tags from the list
 	 */
-	function where_tags( $tags )
+	function where_tags( $tags, $tags_operator = 'OR' )
 	{
 		global $DB;
 
@@ -404,8 +404,20 @@ class ItemQuery extends SQL
 
 		$tags = explode( ',', $tags );
 
-		$this->FROM_add( 'INNER JOIN T_items__itemtag ON post_ID = itag_itm_ID
-								INNER JOIN T_items__tag ON (itag_tag_ID = tag_ID AND tag_name IN ('.$DB->quote($tags).') )' );
+		if( $tags_operator == 'AND' )
+		{	// Search items with ALL tags from the restriction list:
+			$this->WHERE_and( '( SELECT COUNT( itag_tag_ID )
+				 FROM T_items__tag
+				INNER JOIN T_items__itemtag ON tag_ID = itag_tag_ID
+				WHERE itag_itm_ID = post_ID
+				  AND tag_name IN ( '.$DB->quote( $tags ).' )
+				) = '.count( $tags ) );
+		}
+		else // 'OR'
+		{	// Search items with at least one tag from the restriction list:
+			$this->FROM_add( 'INNER JOIN T_items__itemtag ON post_ID = itag_itm_ID' );
+			$this->FROM_add( 'INNER JOIN T_items__tag ON itag_tag_ID = tag_ID AND tag_name IN ( '.$DB->quote( $tags ).' )' );
+		}
 	}
 
 
@@ -1079,6 +1091,18 @@ class ItemQuery extends SQL
 		$available_fields[] = 'status';
 		$available_fields[] = 'T_categories.cat_name';
 		$available_fields[] = 'T_categories.cat_order';
+
+		if( in_array( 'order', $orderby_array ) )
+		{	// If list is ordered by field 'order':
+			if( ( $order_i = array_search( 'order', $available_fields ) ) !== false )
+			{	// Use an order per category instead of old field 'post_order':
+				$available_fields[ $order_i ] = 'postcatsorders.postcat_order';
+			}
+			// Join table of categories for field 'postcat_order':
+			$this->FROM_add( 'INNER JOIN T_postcats AS postcatsorders ON postcatsorders.postcat_post_ID = post_ID AND post_main_cat_ID = postcatsorders.postcat_cat_ID' );
+			// Replace field to real name:
+			$order_by = str_replace( 'order', 'postcatsorders.postcat_order', $order_by );
+		}
 
 		$order_clause = gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname, $available_fields );
 

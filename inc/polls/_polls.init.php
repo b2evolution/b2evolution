@@ -17,7 +17,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for messaging module to function properly
  */
-$required_php_version[ 'polls' ] = '5.4';
+$required_php_version[ 'polls' ] = '5.6';
 
 /**
  * Minimum MYSQL version required for messaging module to function properly
@@ -262,19 +262,21 @@ class polls_Module extends Module
 	{
 		global $Session, $Messages;
 
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'polls' );
+		$action = param_action();
 
-		if( ! is_logged_in() )
-		{	// User must be logged in
-			debug_die( 'User must be logged in to vote!' );
+		if( $action != 'email_vote' )
+		{	// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'polls' );
+
+			if( ! is_logged_in() )
+			{	// User must be logged in
+				debug_die( 'User must be logged in to vote!' );
+			}
 		}
 
 		// Load classes:
 		load_class( 'polls/model/_poll.class.php', 'Poll' );
 		load_class( 'polls/model/_poll_option.class.php', 'PollOption' );
-
-		$action = param_action();
 
 		switch( $action )
 		{
@@ -325,6 +327,43 @@ class polls_Module extends Module
 					$PollOption->vote();
 				}
 				$Messages->add( T_('Your vote has been cast.'), 'success' );
+				break;
+
+			case 'email_vote':
+				global $DB, $Messages;
+
+				$email_ID = param( 'email_ID', 'integer', true );
+				$email_key = param( 'email_key', 'string', true );
+				$poll_ID = param( 'poll_ID', 'integer', true );
+				$poll_answer = param( 'poll_answer', 'integer', true );
+				$redirect_to = param( 'redirect_to', 'url', '' );
+
+				$email_log = $DB->get_row( 'SELECT * FROM T_email__log WHERE emlog_ID = '.$DB->quote( $email_ID ).' AND emlog_key = '.$DB->quote( $email_key ), ARRAY_A );
+
+				if( $email_log )
+				{
+					$user_ID = $email_log['emlog_user_ID'];
+					$UserCache = & get_UserCache();
+					$User = & $UserCache->get_by_ID( $user_ID );
+					$PollCache = & get_PollCache();
+					$PollOptionCache = & get_PollOptionCache();
+					$Poll = & $PollCache->get_by_ID( $poll_ID );
+					$PollOption = & $PollOptionCache->get_by_ID( $poll_answer );
+
+					if( $Poll && $PollOption && $User )
+					{
+						$Poll->clear_user_votes( $User->ID );
+						$PollOption->vote( $User->ID );
+
+						$Messages->add( T_('Your vote has been cast.'), 'success' );
+					}
+				}
+
+				if( ! empty( $redirect_to ) )
+				{ // header_redirect can prevent redirection depending on some advanced settings like $allow_redirects_to_different_domain!
+					header( 'Location: '.$redirect_to, true, 303 ); // explictly setting the status is required for (fast)cgi
+					exit( 0 );
+				}
 				break;
 		}
 	}

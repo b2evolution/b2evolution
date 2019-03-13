@@ -14,7 +14,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher;
 global $current_User, $Settings;
 global $DB;
 
@@ -271,7 +270,7 @@ if( in_array( 'login', $show_columns ) )
 		{
 			if( $link )
 			{
-				$login_text = get_user_identity_link( $User->login, $User->ID, 'user', 'login' );
+				$login_text = get_user_identity_link( $User->login, $User->ID, 'profile', 'login' );
 				if( $User->check_status( 'is_closed' ) )
 				{ // add (closed account) note to corresponding contacts!
 					$login_text .= '<span class="note">('.T_( 'closed account' ).')</span>';
@@ -494,7 +493,7 @@ if( count( $Results->rows ) > 0 )
 	$Form->switch_layout( NULL );
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#send_selected_recipients' ).click( function()
 { // Add selected users to this link
 	var recipients_param = '';

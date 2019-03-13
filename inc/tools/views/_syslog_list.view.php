@@ -117,7 +117,7 @@ $Results->cols[] = array(
 		'default_dir' => 'D',
 		'td' => '%mysql2localedatetime_spans( #slg_timestamp# )%',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap timestamp'
+		'td_class' => 'timestamp'
 	);
 
 $Results->cols[] = array(
@@ -202,7 +202,7 @@ function syslog_object_link( $object_type, $object_ID )
 				if( $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $Comment ) )
 				{ // Current user has permission to edit this comment
 					$Item = & $Comment->get_Item();
-					$link = '<a href="'.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID.'">'.$Item->title.' #'.$Comment->ID.'</a>';
+					$link = '<a href="'.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID.'">'.$Item->get( 'title' ).' #'.$Comment->ID.'</a>';
 				}
 			}
 			else
@@ -218,7 +218,7 @@ function syslog_object_link( $object_type, $object_ID )
 			{
 				if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 				{ // Current user has permission to edit this item
-					$link = '<a href="'.$Item->get_edit_url().'">'.$Item->title.'</a>';
+					$link = '<a href="'.$Item->get_edit_url().'">'.$Item->get( 'title' ).'</a>';
 				}
 			}
 			else
@@ -256,6 +256,11 @@ function syslog_object_link( $object_type, $object_ID )
 				$link = 'No file';
 			}
 			break;
+
+		case 'email_log':
+			// Link to email log
+			$link = get_link_tag( $admin_url.'?ctrl=email&tab=sent&emlog_ID='.$object_ID, sprintf( T_('Mail log ID#%s'), $object_ID ) );
+			break;
 	}
 
 	return $link;
@@ -268,7 +273,7 @@ $Results->cols[] = array(
 $Results->display();
 
 ?>
-<script type="text/javascript">
+<script>
 function syslog_origin_ID()
 {
 	if( jQuery( '#origin' ).val() == 'plugin' )

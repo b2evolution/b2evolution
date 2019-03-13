@@ -21,7 +21,7 @@ class bootstrap_photoblog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.10.1';
+	var $version = '6.11.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -131,6 +131,13 @@ class bootstrap_photoblog_Skin extends Skin
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
 						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'allow_empty' => true,
@@ -479,6 +486,9 @@ class bootstrap_photoblog_Skin extends Skin
 		</style>';
 		add_headline( $custom_css );
 		}
+
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
 
 

@@ -58,6 +58,7 @@ else
 <?php } ?>
 
 <div class="email_payload"<?php echo emailskin_style( 'div.email_payload' ); ?>>
+<div style="max-width: 700px; margin: 1ex auto;">
 <?php
 if( $params['include_greeting'] )
 { // Display the greeting message

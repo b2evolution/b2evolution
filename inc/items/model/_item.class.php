@@ -190,9 +190,9 @@ class Item extends ItemLight
 	var $priority;
 
 	/**
-	 * @var float
+	 * @var array Item orders per category
 	 */
-	var $order;
+	var $orders;
 	/**
 	 * @var boolean
 	 */
@@ -307,6 +307,10 @@ class Item extends ItemLight
 	 * @var integer
 	 */
 	var $countvotes;
+	/**
+	 * Lazy filled, use {@link get_social_media_image()} to access it.
+	 */
+	var $social_media_image_File = NULL;
 
 	/**
 	 * Current revision
@@ -428,9 +432,8 @@ class Item extends ItemLight
 			$this->notifications_ctsk_ID = $db_row->post_notifications_ctsk_ID;
 			$this->notifications_flags = $db_row->post_notifications_flags;
 			$this->comment_status = $db_row->post_comment_status;			// Comments status
-			$this->order = $db_row->post_order;
 			$this->featured = $db_row->post_featured;
-			$this->parent_ID = $db_row->post_parent_ID;
+			$this->parent_ID = $db_row->post_parent_ID === NULL ? NULL : intval( $db_row->post_parent_ID );
 
 			// echo 'renderers=', $db_row->post_renderers;
 			$this->renderers = $db_row->post_renderers;
@@ -488,6 +491,42 @@ class Item extends ItemLight
 
 
 	/**
+	 * Compare two Items based on the short title if this field is not empty otherwise use title to compare
+	 *
+	 * @param Item A
+	 * @param Item B
+	 * @return number -1 if A->short_title < B->short_title, 1 if A->short_title > B->short_title, 0 if A->short_title == B->short_title
+	 */
+	static function compare_items_by_short_title( $a_Item, $b_Item )
+	{
+		if( $a_Item == NULL || $b_Item == NULL )
+		{
+			debug_die('Invalid item objects received to compare.');
+		}
+
+		if( ! empty( $a_Item->short_title ) && $a_Item->get_type_setting( 'use_short_title' ) == 'optional' )
+		{	// Use short title only if it is not empty and allowed by item type:
+			$a_title_value =  $a_Item->short_title;
+		}
+		else
+		{	// Otherwise use title:
+			$a_title_value =  $a_Item->title;
+		}
+
+		if( ! empty( $b_Item->short_title ) && $b_Item->get_type_setting( 'use_short_title' ) == 'optional' )
+		{	// Use short title only if it is not empty and allowed by item type:
+			$b_title_value =  $b_Item->short_title;
+		}
+		else
+		{	// Otherwise use title:
+			$b_title_value =  $b_Item->title;
+		}
+
+		return strcmp( $a_title_value, $b_title_value );
+	}
+
+
+	/**
 	 * Compare two Items based on the order field
 	 *
 	 * @param Item A
@@ -501,16 +540,20 @@ class Item extends ItemLight
 			debug_die('Invalid item objects received to compare.');
 		}
 
-		if( $a_Item->order == NULL )
+		// Get item orders depending on current category:
+		$a_item_order = isset( $a_Item->sort_current_cat_ID ) ? $a_Item->sort_current_cat_ID : NULL;
+		$b_item_order = isset( $b_Item->sort_current_cat_ID ) ? $b_Item->sort_current_cat_ID : NULL;
+
+		if( $a_Item->get_order( $a_item_order ) == NULL )
 		{
-			return $b_Item->order == NULL ? 0 : 1;
+			return $b_Item->get_order( $b_item_order ) == NULL ? 0 : 1;
 		}
-		elseif( $b_Item->order == NULL )
+		elseif( $b_Item->get_order( $b_item_order ) == NULL )
 		{
 			return -1;
 		}
 
-		return ( $a_Item->order < $b_Item->order ) ? -1 : ( ( $a_Item->order > $b_Item->order ) ? 1 : 0 );
+		return ( $a_Item->get_order( $a_item_order ) < $b_Item->get_order( $b_item_order ) ) ? -1 : ( ( $a_Item->get_order( $a_item_order ) > $b_Item->get_order( $b_item_order ) ) ? 1 : 0 );
 	}
 
 
@@ -681,7 +724,7 @@ class Item extends ItemLight
 	 */
 	function load_from_Request( $editing = false, $creating = false )
 	{
-		global $default_locale, $current_User, $localtimenow;
+		global $default_locale, $current_User, $localtimenow, $Blog;
 		global $item_typ_ID;
 
 		// Check if this Item can be updated:
@@ -751,7 +794,21 @@ class Item extends ItemLight
 			}
 		}
 
-		if( $this->status == 'redirected' && empty( $this->url ) )
+		// Single/page view:
+		if( ( $single_view = param( 'post_single_view', 'string', NULL ) ) !== NULL )
+		{
+			if( $this->get( 'status' ) == 'redirected' )
+			{	// Single view of "Redirected" item can be only redirected as well:
+				$single_view = 'redirected';
+			}
+			elseif( $this->previous_status == 'redirected' && $single_view == 'redirected' )
+			{	// Set single view to normal mode when item status is updating from redirected to another status:
+				$single_view = 'normal';
+			}
+			$this->set( 'single_view', $single_view );
+		}
+
+		if( ( $this->status == 'redirected' || $this->get( 'single_view' ) == 'redirected' ) && empty( $this->url ) )
 		{ // Note: post_url is not part of the simple form, so this message can be a little bit awkward there
 			param_error( 'post_url',
 				T_('If you want to redirect this post, you must specify an URL!').' ('.T_('Advanced properties panel').')',
@@ -788,12 +845,31 @@ class Item extends ItemLight
 		// SLUG:
 		if( param( 'post_urltitle', 'string', NULL ) !== NULL )
 		{
-			$this->set_from_Request( 'urltitle' );
-			// Added in May 2017; but old slugs are not converted yet.
-			if( preg_match( '#(^|,+)[^a-z\d_]*\d+[^a-z\d_]*($|,+)#i', get_param( 'post_urltitle' ) ) )
-			{	// Display error if item slugs contain only digits:
-				param_error( 'post_urltitle', T_('All slugs must contain at least one letter.') );
+			// Replace special chars/umlauts:
+			load_funcs( 'locales/_charset.funcs.php' );
+			// Split slug url titles with comma because the function replace_special_chars()
+			// converts `,` to `-`, so separate slugs are concatenated in single, that's wrong:
+			$post_urltitle = explode( ',', get_param( 'post_urltitle' ) );
+			foreach( $post_urltitle as $u => $slug_urltitle )
+			{
+				$post_urltitle[ $u ] = replace_special_chars( $slug_urltitle, $this->get( 'locale' ) );
+				if( empty( $post_urltitle[ $u ] ) )
+				{	// Unset empty slug in order to create auto slug:
+					unset( $post_urltitle[ $u ] );
+					continue;
+				}
+				// Added in May 2017; but old slugs are not converted yet.
+				if( preg_match( '#^[^a-z0-9]*[0-9]*[^a-z0-9]*$#i', $post_urltitle[ $u ] ) )
+				{	// Display error if one of item slugs doesn't contain at least 1 non-numeric character:
+					param_error( 'post_urltitle', T_('All slugs must contain at least 1 non-numeric character.') );
+				}
 			}
+			// Append old slugs at the end because they are not deleted on updating of the Item,
+			// and update array of the cached slugs from DB in order to display proper slugs after submit the forms with errors:
+			$this->get_slugs();
+			$this->slugs = array_unique( array_merge( $post_urltitle, $this->slugs ) );
+			// Set new post urltitle:
+			$this->set( 'urltitle', implode( ', ', $post_urltitle ) );
 		}
 
 		if( $is_not_content_block )
@@ -866,10 +942,6 @@ class Item extends ItemLight
 				$this->set_setting( 'goal_ID', $goal_ID, true );
 			}
 		}
-
-		// ORDER:
-		param( 'item_order', 'double', NULL );
-		$this->set_from_Request( 'order', 'item_order', true );
 
 		// OWNER:
 		$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
@@ -988,6 +1060,10 @@ class Item extends ItemLight
 			$renderers = $this->get_renderers();
 		}
 
+		// Short title:
+		$post_short_title = param( 'post_short_title', 'htmlspecialchars', NULL );
+		$this->set_from_Request( 'short_title', 'post_short_title', true );
+
 		// CONTENT + TITLE:
 		if( $this->get_type_setting( 'allow_html' ) )
 		{	// HTML is allowed for this post, we'll accept HTML tags:
@@ -1004,12 +1080,17 @@ class Item extends ItemLight
 			$this->set_setting( 'editor_code', $editor_code );
 		}
 
+		// Never allow html content on post titles:  (fp> probably so as to not mess up backoffice and all sorts of tools)
+		param( 'post_title', 'htmlspecialchars', NULL );
+		// Title checking:
+		if( ( ! $editing || $creating ) && $this->get_type_setting( 'use_title' ) == 'required' ) // creating is important, when the action is create_edit
+		{
+			param_check_not_empty( 'post_title', T_('Please provide a title.'), '' );
+		}
+
 		$content = param( 'content', $text_format, NULL );
 		if( $content !== NULL )
 		{
-			// Never allow html content on post titles:  (fp> probably so as to not mess up backoffice and all sorts of tools)
-			param( 'post_title', 'htmlspecialchars', NULL );
-
 			// Do some optional filtering on the content
 			// Typically stuff that will help the content to validate
 			// Useful for code display.
@@ -1022,26 +1103,19 @@ class Item extends ItemLight
 				);
 			$Plugins_admin->filter_contents( $GLOBALS['post_title'] /* by ref */, $GLOBALS['content'] /* by ref */, $renderers, $params /* by ref */ );
 
-			// Title checking:
-			$use_title = $this->get_type_setting( 'use_title' );
-
-			if( ( ! $editing || $creating ) && $use_title == 'required' ) // creating is important, when the action is create_edit
-			{
-				param_check_not_empty( 'post_title', T_('Please provide a title.'), '' );
-			}
-
 			// Format raw HTML input to cleaned up and validated HTML:
 			param_check_html( 'content', T_('Invalid content.') );
 			$content = prepare_item_content( get_param( 'content' ) );
 
 			$this->set( 'content', $content );
-
-			$this->set( 'title', get_param( 'post_title' ) );
 		}
 		if( empty( $content ) && $this->get_type_setting( 'use_text' ) == 'required' )
 		{ // Content must be entered
 			param_check_not_empty( 'content', T_('Please enter some text.'), '' );
 		}
+
+		// Set title only here because it may be filtered by plugins above:
+		$this->set( 'title', get_param( 'post_title' ), true );
 
 		if( $is_not_content_block )
 		{	// Save excerpt for item with type usage except of content block:
@@ -1100,6 +1174,21 @@ class Item extends ItemLight
 					&& cities_exist( $country_ID, $region_ID, $subregion_ID );
 			param_check_number( 'item_city_ID', T_('Please select a city'), $city_is_required );
 			$this->set_from_Request( 'city_ID', 'item_city_ID', true );
+		}
+
+		if( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) )
+		{	// Item orders per category:
+			$post_cat_orders = param( 'post_cat_orders', 'array:string' );
+			$this->orders = array();
+			foreach( $post_cat_orders as $post_cat_ID => $post_cat_order )
+			{
+				if( isset( $this->extra_cat_IDs ) &&
+						is_array( $this->extra_cat_IDs ) &&
+						in_array( $post_cat_ID, $this->extra_cat_IDs ) )
+				{	// Set order only for selected category:
+					$this->orders[ $post_cat_ID ] = ( $post_cat_order === '' ? NULL : floatval( $post_cat_order ) );
+				}
+			}
 		}
 
 		return ! param_errors_detected();
@@ -1180,7 +1269,7 @@ class Item extends ItemLight
 		$this->dbchanges_custom_fields = array();
 		foreach( $custom_fields as $custom_field )
 		{ // update each custom field
-			$param_name = 'item_'.$custom_field['type'].'_'.$custom_field['ID'];
+			$param_name = 'item_cf_'.$custom_field['name'];
 			$param_error = false;
 			if( isset_param( $param_name ) )
 			{ // param is set
@@ -1209,6 +1298,15 @@ class Item extends ItemLight
 							$param_error = true;
 						}
 						break;
+					case 'image':
+						$param_type = 'integer';
+						$field_value = param( $param_name, 'string', NULL );
+						if( ! empty( $field_value ) && ! is_number( $field_value ) )
+						{
+							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
+							$param_error = true;
+						}
+						break;
 					case 'varchar':
 					default:
 						$param_type = 'string';
@@ -1220,15 +1318,24 @@ class Item extends ItemLight
 				}
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
 
-				$custom_field_value = $this->get_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'] );
+				$custom_field_value = $this->get_setting( 'custom:'.$custom_field['name'] );
 				if( $custom_field_value != false )
 				{
 					$this->dbchanges_custom_fields[ $custom_field['name'] ] = $custom_field_value;
 					$this->dbchanges_flags['custom_fields'] = true;
 				}
-				$this->set_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'], get_param( $param_name ), $custom_field_make_null );
+				$this->set_setting( 'custom:'.$custom_field['name'], get_param( $param_name ), $custom_field_make_null );
 			}
 		}
+		foreach( $custom_fields as $custom_field )
+		{	// Update computed custom fields after when all fields we updated above:
+			if( $custom_field['type'] == 'computed' )
+			{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
+				$this->set_setting( 'custom:'.$custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ), true );
+			}
+		}
+		// Clear the cached values to use new after updating:
+		unset( $this->custom_fields );
 	}
 
 
@@ -1542,7 +1649,7 @@ class Item extends ItemLight
 		if( $display )
 		{ // display a comment form section even if comment form won't be displayed, "add new comment" links should point to this section
 			$comment_form_anchor = empty( $params['comment_form_anchor'] ) ? 'form_p' : $params['comment_form_anchor'];
-			echo '<a id="'.$comment_form_anchor.$this->ID.'"></a>';
+			echo '<a id="'.format_to_output( $comment_form_anchor.$this->ID, 'htmlattr' ).'"></a>';
 		}
 
 		if( ! $this->get_type_setting( 'use_comments' ) )
@@ -1632,6 +1739,15 @@ class Item extends ItemLight
 			return false;
 		}
 
+		if( ! is_admin_page() )
+		{	// Check visibility of meta comments on front-office:
+			$item_Blog = & $this->get_Blog();
+			if( ! $item_Blog || ! $item_Blog->get_setting( 'meta_comments_frontoffice' ) )
+			{	// Meta comments are disabled to be displayed on front-office for this Item's collection:
+				return false;
+			}
+		}
+
 		global $current_User;
 
 		return $current_User->check_perm( 'meta_comment', 'view', false, $this->get_blog_ID() );
@@ -1693,9 +1809,11 @@ class Item extends ItemLight
 	/**
 	 * Template function: Check if user can attach files to this post comments
 	 *
+	 * @param boolean|integer ID of Temporary object to count also temporary attached files to new creating comment,
+	 *                        FALSE to count ONLY attachments of the created comments
 	 * @return boolean true if user can attach files to this post comments, false if s/he cannot
 	 */
-	function can_attach()
+	function can_attach( $link_tmp_ID = false )
 	{
 		global $Settings;
 
@@ -1709,7 +1827,7 @@ class Item extends ItemLight
 				global $DB, $current_User, $Session;
 
 				// Get a number of attachments for current user on this post
-				$attachments_count = $this->get_attachments_number();
+				$attachments_count = $this->get_attachments_number( NULL, $link_tmp_ID );
 
 				// Get the attachments from preview comment
 				global $checked_attachments;
@@ -1730,7 +1848,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Check if the post contains inline file placeholders without corresponding attachemnt file.
+	 * Check if the post contains inline file placeholders without corresponding attachment file.
 	 * Removes the invalid inline file placeholders from the item content.
 	 *
 	 * @param string Content
@@ -1745,34 +1863,34 @@ class Item extends ItemLight
 			return $content;
 		}
 
-		// There are inline image placeholders
-		if( $this->ID > 0 )
-		{ // The post is saved, so it can actually have attachments:
-			global $DB;
-			$links_SQL = new SQL( 'Get item links IDs of the inline images' );
-			$links_SQL->SELECT( 'link_ID' );
-			$links_SQL->FROM( 'T_links' );
-			$links_SQL->WHERE( 'link_itm_ID = '.$DB->quote( $this->ID ) );
-			$links_SQL->WHERE_and( 'link_position = "inline"' );
-			$inline_links_IDs = $DB->get_col( $links_SQL );
-
-			$unused_inline_images = array();
-			foreach( $inline_images[2] as $i => $inline_link_ID )
-			{
-				if( ! in_array( $inline_link_ID, $inline_links_IDs ) )
-				{ // This inline image must be removed from content
-					$unused_inline_images[] = $inline_images[0][ $i ];
-				}
-			}
+		// There are inline image placeholders in the item's content:
+		global $DB;
+		$links_SQL = new SQL( 'Get item links IDs of the inline files' );
+		$links_SQL->SELECT( 'link_ID' );
+		$links_SQL->FROM( 'T_links' );
+		if( empty( $this->ID ) )
+		{	// Preview mode for new creating item:
+			$links_SQL->WHERE( 'link_tmp_ID = '.$DB->quote( param( 'temp_link_owner_ID', 'integer', 0 ) ) );
 		}
 		else
-		{ // The post is not saved yet, so it can not contains attachments. None of the placeholders are used.
-			$unused_inline_images = $inline_images[0];
+		{	// Normal mode for existing Item in DB:
+			$links_SQL->WHERE( 'link_itm_ID = '.$DB->quote( $this->ID ) );
+		}
+		$links_SQL->WHERE_and( 'link_position = "inline"' );
+		$inline_links_IDs = $DB->get_col( $links_SQL );
+
+		$unused_inline_images = array();
+		foreach( $inline_images[2] as $i => $inline_link_ID )
+		{
+			if( ! in_array( $inline_link_ID, $inline_links_IDs ) )
+			{ // This inline image must be removed from content
+				$unused_inline_images[] = $inline_images[0][ $i ];
+			}
 		}
 
-		// Clear the unused inline images from content
+		// Clear the unused inline images from content:
 		if( count( $unused_inline_images ) )
-		{ // Remove all unused inline images from the content
+		{	// Remove all unused inline images from the content:
 			global $Messages;
 			$unused_inline_images = array_unique( $unused_inline_images );
 			$content = replace_content_outcode( $unused_inline_images, '', $content, 'replace_content', 'str' );
@@ -1787,9 +1905,11 @@ class Item extends ItemLight
 	 * Get a number of attachments on this post
 	 *
 	 * @param object User
+	 * @param boolean|integer ID of Temporary object to count also temporary attached files to new creating comment,
+	 *                        FALSE to count ONLY attachments of the created comments
 	 * @return integer Number of attachments
 	 */
-	function get_attachments_number( $User = NULL )
+	function get_attachments_number( $User = NULL, $link_tmp_ID = false )
 	{
 		global $DB, $cache_item_attachments_number;
 
@@ -1804,21 +1924,26 @@ class Item extends ItemLight
 			$cache_item_attachments_number = array();
 		}
 
-		if( isset( $cache_item_attachments_number[$User->ID] ) )
-		{	// Get a number of attachments from cache variable
-			return $cache_item_attachments_number[$User->ID];
+		if( isset( $cache_item_attachments_number[ $User->ID ][ $link_tmp_ID ] ) )
+		{	// Get a number of attachments from cache variable:
+			return $cache_item_attachments_number[ $User->ID ][ $link_tmp_ID ];
 		}
 
-		// Get a number of attachments from DB
-		$SQL = new SQL( 'Get a number of attachments for user #'.$User->ID.' and post #'.$this->ID );
+		// Get a number of attachments from DB:
+		$SQL = new SQL( 'Get a number of comment attachments per item #'.$this->ID.' by user #'.$User->ID );
 		$SQL->SELECT( 'COUNT( link_ID )' );
 		$SQL->FROM( 'T_links' );
-		$SQL->FROM_add( 'INNER JOIN T_comments ON comment_ID = link_cmt_ID' );
+		$SQL->FROM_add( 'LEFT JOIN T_comments ON comment_ID = link_cmt_ID' );
 		$SQL->WHERE( 'link_creator_user_ID = '.$DB->quote( $User->ID ) );
-		$SQL->WHERE_and( 'comment_item_ID = '.$DB->quote( $this->ID ) );
-		$cache_item_attachments_number[$User->ID] = (int)$DB->get_var( $SQL );
+		$sql_where = 'comment_item_ID = '.$DB->quote( $this->ID );
+		if( $link_tmp_ID )
+		{	// Count also the attached files to new creating comment:
+			$sql_where .= ' OR ( comment_item_ID IS NULL AND link_tmp_ID = '.$DB->quote( $link_tmp_ID ).' )';
+		}
+		$SQL->WHERE_and( $sql_where );
+		$cache_item_attachments_number[ $User->ID ][ $link_tmp_ID ] = intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
 
-		return $cache_item_attachments_number[$User->ID];
+		return $cache_item_attachments_number[ $User->ID ][ $link_tmp_ID ];
 	}
 
 
@@ -2418,83 +2543,486 @@ class Item extends ItemLight
 
 
 	/**
-	 * Load item custom field value by index
+	 * Get all custom fields definitions of this Item with once loading them into cache array $this->custom_fields
 	 *
-	 * @param String field index, this is the lowercase value of the trimmed field name ( whitespaces are converted to one '_' character )
-	 * @return boolean true on success false if custom field with this index doesn't exist
+	 * @return array Custom fields, each array item is array with keys: ID, ityp_ID, label, name, type, order, note, value.
 	 */
-	function load_custom_field_value( $field_index )
+	function get_custom_fields_defs()
 	{
-		if( empty( $this->custom_fields ) )
-		{ // load item custom_fields
-			$this->custom_fields = $this->get_type_custom_fields();
+		if( ! isset( $this->custom_fields ) )
+		{	// Load item custom fields only once:
+			global $DB;
+
+			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
+			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, iset_value AS value, ' );
+			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
+			$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
+			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge' );
+			$SQL->FROM( 'T_items__type_custom_field' );
+			$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON iset_name = CONCAT( "custom:", itcf_name ) AND iset_item_ID = '.$this->ID );
+			$SQL->WHERE_and( 'itcf_ityp_ID = '.$DB->quote( $this->get( 'ityp_ID' ) ) );
+			$SQL->ORDER_BY( 'itcf_order, itcf_ID' );
+			$custom_fields = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+
+			$this->custom_fields = array();
+			foreach( $custom_fields as $c => $custom_field )
+			{	// Use field name/code as key/index of array:
+				$this->custom_fields[ $custom_field['name'] ] = $custom_field;
+			}
 		}
 
-		if( empty( $this->custom_fields[$field_index] ) )
-		{ // there is no such custom field
-			return false;
-		}
-
-		if( empty( $this->custom_fields[$field_index]['value'] ) )
-		{	// Get custom item field value:
-			if( $this->is_revision() )
-			{	// from current revision if it is active for this Item:
-				$this->custom_fields[$field_index]['value'] = $this->get_revision_custom_field_value( $field_index );
-			}
-			else
-			{	// from the item setting:
-				$this->custom_fields[$field_index]['value'] = $this->get_setting( 'custom_'.$this->custom_fields[$field_index]['type'].'_'.$this->custom_fields[$field_index]['ID'] );
-			}
-		}
-		return true;
+		return $this->custom_fields;
 	}
 
 
 	/**
-	 * Get item custom field value by index
+	 * Get item custom field title by field index
+	 *
+	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
+	 * @return string|boolean FALSE if the field doesn't exist
+	 */
+	function get_custom_field_title( $field_index )
+	{
+		// Get all custom fields by item ID:
+		$custom_fields = $this->get_custom_fields_defs();
+
+		if( ! isset( $custom_fields[ $field_index ] ) )
+		{	// The requested field is not detected:
+			return false;
+		}
+
+		return $custom_fields[ $field_index ]['label'];
+	}
+
+
+	/**
+	 * Get item custom field value by field index
 	 *
 	 * @param string Field index which by default is the field name, see {@link load_custom_field_value()}
 	 * @param string Restring field by type, FALSE - to don't restrict
-	 * @param boolean TRUE to prepare value to display depending on field type
 	 * @return mixed false if the field doesn't exist Double/String otherwise depending from the custom field type
 	 */
-	function get_custom_field_value( $field_index, $restrict_type = false, $prepare_value = true )
+	function get_custom_field_value( $field_index, $restrict_type = false )
 	{
-		if( $this->load_custom_field_value( $field_index ) )
-		{
-			if( $restrict_type !== false && $this->custom_fields[ $field_index ]['type'] != $restrict_type )
-			{	// The requested field is detected but it has another type:
-				return false;
-			}
+		// Get all custom fields by item ID:
+		$custom_fields = $this->get_custom_fields_defs();
 
-			$custom_field_value = $this->custom_fields[ $field_index ]['value'];
-			if( $prepare_value )
-			{	// Prepare value:
-				$custom_field_value = utf8_trim( $custom_field_value );
-				if( $this->custom_fields[ $field_index ]['type'] == 'text' )
-				{	// Escape html tags and convert new lines to html <br> for text fields:
-					$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
-				}
-			}
+		if( ! isset( $custom_fields[ $field_index ] ) )
+		{	// The requested field is not detected:
+			return false;
+		}
+
+		if( $restrict_type !== false && $custom_fields[ $field_index ]['type'] != $restrict_type )
+		{	// The requested field is detected but it has another type:
+			return false;
+		}
+
+		// Get custom item field value:
+		if( $this->is_revision() )
+		{	// from current revision if it is active for this Item:
+			return $this->get_revision_custom_field_value( $field_index );
+		}
+		elseif( isset( $this->dbchanges_custom_fields[ $field_index ] ) )
+		{	// from the submitted form:
+			return $this->get_setting( 'custom:'.$field_index );
+		}
+		else
+		{	// from the item setting:
+			return $custom_fields[ $field_index ]['value'];
+		}
+	}
+
+
+	/**
+	 * Get formatted item custom field value by field index
+	 *
+	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
+	 * @param array Params
+	 * @return string|boolean FALSE if the field doesn't exist
+	 */
+	function get_custom_field_formatted( $field_index, $params = array() )
+	{
+		$params = array_merge( array(
+				'field_value_format'  => '', // Format for custom field, Leave empty to use a format from DB
+				'field_restrict_type' => false, // Restrict field by type(double, varchar, html, text, url, image, computed, separator), FALSE - to don't restrict
+				'expansion'           => 'default', // 'default': || = '<br />', | | = space; 'vertical': both = '<br />'; 'horizontal': both = space.
+			), $params );
+
+		// Try to get an original value of the requested custom field:
+		$custom_field_value = $this->get_custom_field_value( $field_index, $params['field_restrict_type'] );
+
+		if( $custom_field_value === false )
+		{	// The requested field is not found for the item type:
+			return false;
+		}
+
+		$orig_custom_field_value = $custom_field_value;
+
+		// Get custom field:
+		$custom_fields = $this->get_custom_fields_defs();
+		$custom_field = $custom_fields[ $field_index ];
+
+		if( ( $custom_field_value === '' || $custom_field_value === NULL ) && // don't format empty value
+		    ! in_array( $custom_field['type'], array( 'double', 'computed', 'url' ) ) ) // double, computed and url fields may have a special format even for empty value
+		{	// Don't format value in such cases:
 			return $custom_field_value;
 		}
-		return false;
+
+		if( $params['field_value_format'] === '' )
+		{	// Use a format from DB:
+			$format = $custom_field['format'];
+		}
+		else
+		{	// Use a format from params:
+			$format = $params['field_value_format'];
+		}
+
+		switch( $custom_field['type'] )
+		{
+			case 'double':
+			case 'computed':
+				// Format double/computed field value:
+				if( $format === NULL || $format === '' )
+				{	// No format:
+					break;
+				}
+
+				$formats = explode( ';', $format );
+
+				if( count( $formats ) > 4 )
+				{	// Check formats like 123=text:
+					for( $f = 4; $f < count( $formats ); $f++ )
+					{
+						if( strpos( $formats[ $f ], '=' ) !== false )
+						{	// If format contains the equal sign
+							$cur_format = explode( '=', $formats[ $f ], 2 );
+							if( $cur_format[0] == $custom_field_value )
+							{	// Use the searched format for given value:
+								$custom_field_value = isset( $cur_format[1] ) ? $cur_format[1] : $custom_field_value;
+								// Stop here to don't apply other format:
+								break 2;
+							}
+						}
+					}
+				}
+
+				if( $custom_field_value === '' || $custom_field_value === NULL )
+				{	// If value is empty string or NULL
+					if( empty( $formats[3] ) )
+					{	// Use default for empty values:
+						$custom_field_value = /* TRANS: "Not Available" */ '{'.T_('N/A').'}';
+					}
+					else
+					{	// Use a special format for empty values:
+						$custom_field_value = $formats[3];
+					}
+					// Stop here to don't apply other format:
+					break;
+				}
+
+				if( $custom_field_value == 0 && isset( $formats[2] ) )
+				{	// If value == 0
+					$custom_field_value = $formats[2];
+					// Stop here to don't apply other format:
+					break;
+				}
+
+				// Format all other values which are not related to the formats above:
+				$format = $formats[0];
+				if( $custom_field_value < 0 && ! empty( $formats[1] ) )
+				{	// Use a format for negative values:
+					$custom_field_value = abs( $custom_field_value );
+					$format = $formats[1];
+				}
+
+				if( in_array( $format, array( '#yes#', '(yes)', '#no#', '(no)', '(+)', '(-)', '(!)', '||', '| |' ) ) ||
+				    strpos( $format, '#stars' ) !== false ||
+				    ( $format !== '' && ! preg_match( '/\d/', $format ) ) )
+				{	// Use special formats:
+					$custom_field_value = $format;
+					break;
+				}
+
+				// Format number:
+				$format = preg_split( '#(\d+)#', $format, -1, PREG_SPLIT_DELIM_CAPTURE );
+				$f_num = count( $format );
+				$format_decimals = 0;
+				$format_dec_point = '.';
+				$format_thousands_sep = '';
+				$format_prefix = isset( $format[0] ) ? $format[0] : '';
+				$format_suffix = $f_num > 1 ? $format[ $f_num - 1 ] : '';
+				if( $f_num > 2 )
+				{	// Extract data for number fomatting:
+					if( in_array( $format[ $f_num - 3 ], array( '.', ',' ) ) )
+					{	// Allow only chars '.' and ',' as decimal separator:
+						if( $f_num > 3 && preg_match( '#^\d+$#', $format[ $f_num - 2 ] ) )
+						{	// Get a number of digits after dot:
+							$format_decimals = strlen( $format[ $f_num - 2 ] );
+						}
+						if( $f_num > 4 && preg_match( '#^[^\d]+$#', $format[ $f_num - 3 ] ) )
+						{	// Get a decimal point:
+							$format_dec_point = $format[ $f_num - 3 ];
+						}
+						$thousands_sep_pos = 5;
+					}
+					else
+					{	// If format has no decimal part:
+						$format_decimals = 0;
+						$thousands_sep_pos = 3;
+					}
+					if( $f_num > $thousands_sep_pos + 1 && preg_match( '#^[^\d]+$#', $format[ $f_num - $thousands_sep_pos ] ) )
+					{	// Get a thousands separator:
+						$format_thousands_sep = $format[ $f_num - $thousands_sep_pos ];
+					}
+					// Format number with extracted data:
+					$custom_field_value = number_format( floatval( $custom_field_value ), $format_decimals, $format_dec_point, $format_thousands_sep );
+				}
+				// Add prefix and suffix:
+				$custom_field_value = $format_prefix.$custom_field_value.$format_suffix;
+				break;
+
+			case 'text':
+				// Escape html tags and convert new lines to html <br> for text fields:
+				$custom_field_value = nl2br( utf8_trim( utf8_strip_tags( $custom_field_value ) ) );
+				break;
+
+			case 'image':
+				// Display image fields as thumbnail:
+				$LinkCache = & get_LinkCache();
+				if( $Link = & $LinkCache->get_by_ID( $custom_field_value, false, false ) )
+				{
+					$custom_field_value = $Link->get_tag( array(
+						'image_link_to' => false,
+						'image_size'    => $format,
+					) );
+				}
+				else
+				{	// Display an error if Link is not found in DB:
+					$custom_field_value = '<span class="text-danger">'.T_('Invalid link ID:').' '.$custom_field_value.'</span>';
+				}
+				break;
+
+			case 'url':
+				// Format URL field value:
+				if( $format === NULL || $format === '' )
+				{	// No format:
+					break;
+				}
+
+				$formats = explode( ';', $format );
+
+				if( $custom_field_value === '' || $custom_field_value === NULL )
+				{	// Use second format option for empty url:
+					if( ! isset( $formats[1] ) || $formats[1] === '' )
+					{	// No format for empty URL:
+						return $custom_field_value;
+					}
+					else
+					{	// Set a format for empty URL:
+						$format_value = $formats[1];
+					}
+				}
+				else
+				{	// Use first format option for not empty url:
+					$format_value = $formats[0];
+				}
+
+				if( $format_value != '#url#' )
+				{	// Use specific text for link from format if it is not requested to use original url as link text:
+					$custom_field_value = $format_value;
+				}
+				break;
+		}
+
+		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
+		$params['stars_value'] = $orig_custom_field_value;
+		$custom_field_value = render_custom_field( $custom_field_value, $params );
+
+		// Apply setting "Link to":
+		if( $custom_field['link'] != 'nolink' && ! empty( $custom_field_value ) )
+		{
+			$link_fallbacks = array(
+				'linkpermzoom' => array( 'link', 'perm', 'zoom' ),
+				'permzoom'     => array( 'perm', 'zoom' ),
+				'linkperm'     => array( 'link', 'perm' ),
+				'linkto'       => array( 'link' ),
+				'permalink'    => array( 'perm' ),
+				'zoom'         => array( 'zoom' ),
+				'fieldurl'     => array( 'url' ),
+				'fieldurlblank'=> array( 'urlblank' ),
+			);
+
+			if( isset( $link_fallbacks[ $custom_field['link'] ] ) )
+			{
+				$fallback_count = count( $link_fallbacks[ $custom_field['link'] ] );
+				$link_class_attr = empty( $custom_field['link_class'] ) ? '' : ' class="'.format_to_output( $custom_field['link_class'], 'htmlattr' ).'"';
+				$nofollow_attr = $custom_field['link_nofollow'] ? ' rel="nofollow"' : '';
+				foreach( $link_fallbacks[ $custom_field['link'] ] as $l => $link_fallback )
+				{
+					switch( $link_fallback )
+					{
+						case 'link':
+							// Link to "URL":
+							if( $this->get( 'url' ) != '' )
+							{	// If this post has a specified setting "Link to url":
+								$custom_field_value = '<a href="'.$this->get( 'url' ).'" target="_blank"'.$nofollow_attr.$link_class_attr.'>'.$custom_field_value.'</a>';
+								break 2;
+							}
+							// else fallback to other points:
+							break;
+
+						case 'perm':
+							// Permalink:
+							global $disp, $Item;
+							if( ( $disp != 'single' && $disp != 'page' ) ||
+							    $Item->ID != $this->ID ||
+							    $fallback_count == $l + 1 )
+							{	// Use permalink if it is not last point and we don't view this current post:
+								$custom_field_value = $this->get_permanent_link( $custom_field_value, '#', $custom_field['link_class'], '', '', NULL, array(), array( 'nofollow' => $custom_field['link_nofollow'] ) );
+								break 2;
+							}
+							// else fallback to other points:
+							break;
+
+						case 'zoom':
+							// Link to zoom image:
+							if( $custom_field['type'] == 'image' &&
+							    $LinkCache = & get_LinkCache() &&
+							    $Link = & $LinkCache->get_by_ID( $orig_custom_field_value, false, false ) &&
+							    $File = & $Link->get_File() )
+							{	// Link to original file:
+								$custom_field_value = '<a href="'.$File->get_url().'"'.( $File->is_image() ? ' rel="lightbox[p'.$this->ID.']"' : '' ).$link_class_attr.'>'.$custom_field_value.'</a>';
+							}
+							// else fallback to other points:
+							break;
+
+						case 'url':
+						case 'urlblank':
+							// Use value of url fields as URL to the link:
+							if( ! empty( $orig_custom_field_value ) )
+							{	// Format URL to link only with not empty URL otherwise display URL as simple text if special text is defined in format for empty URL:
+								$custom_field_value = '<a href="'.$orig_custom_field_value.'"'.$nofollow_attr.$link_class_attr.( $link_fallback == 'urlblank' ? ' target="_blank"' : '' ).'>'.$custom_field_value.'</a>';
+							}
+							break 2;
+					}
+				}
+			}
+		}
+
+		return $custom_field_value;
+	}
+
+
+	/**
+	 * Get computed item custom field value by field index
+	 *
+	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
+	 * @return string|boolean|NULL FALSE if the field doesn't exist, NULL if formula is invalid
+	 */
+	function get_custom_field_computed( $field_index )
+	{
+		// Get all custom fields by item ID:
+		$custom_fields = $this->get_custom_fields_defs();
+
+		if( ! isset( $custom_fields[ $field_index ] ) )
+		{	// The requested field is not detected:
+			return false;
+		}
+
+		if( $custom_fields[ $field_index ]['type'] == 'double' )
+		{	// This case may be called by computing of the formula:
+			// NOTE: Get a value directly from setting and not from the cached array
+			//       in order to get new updated double value after edit form updating:
+			// Use floatval() in order to consider empty value as 0
+			return floatval( $this->get_setting( 'custom:'.$field_index ) );
+		}
+
+		if( $custom_fields[ $field_index ]['type'] != 'computed' )
+		{	// The requested field is detected but it is not computed field:
+			return false;
+		}
+
+		// Compute value by formula:
+		$formula = $custom_fields[ $field_index ]['formula'];
+		if( empty( $formula ) )
+		{	// Use NULL value because formula is empty:
+			return NULL;
+		}
+
+		// Use NULL value for all cases below when formula is invalid or it cannot be computed by some unknown reason:
+		$custom_field_value = NULL;
+
+		if( ! isset( $this->cache_computed_custom_fields ) )
+		{	// Store in this array all computed fields to avoid recursion:
+			$this->cache_computed_custom_fields = array();
+		}
+		if( in_array( $field_index, $this->cache_computed_custom_fields ) )
+		{	// Stop here because of recursion:
+			return NULL;
+		}
+		$this->cache_computed_custom_fields[] = $field_index;
+
+		// Try to use a formula:
+		$formula_is_valid = true;
+		if( preg_match_all( '#\$([^$]+)\$#', $formula, $formula_match ) )
+		{
+			foreach( $formula_match[1] as $formula_field_index )
+			{
+				if( ! isset( $custom_fields[ $formula_field_index ] ) ||
+						! in_array( $custom_fields[ $formula_field_index ]['type'], array( 'double', 'computed' ) ) ||
+						( $formula_field_value = $this->get_custom_field_computed( $formula_field_index ) ) === false ||
+						! is_numeric( $formula_field_value ) )
+				{	// Formula must use only custom fields with type "double"/"computed" and value must be a numeric:
+					$formula_is_valid = false;
+					// Stop here to don't check other fields because formula is already invalid:
+					break;
+				}
+			}
+		}
+
+		if( $formula_is_valid )
+		{	// Try to compute a value if formula is valid:
+			$formula = preg_replace( '#\$([^$]+)\$#', '$this->get_custom_field_computed( \'$1\' )', $formula );
+			try
+			{	// Compute value:
+				ob_start();
+				$custom_field_value = eval( "return $formula;" );
+				$formula_code_output = ob_get_clean();
+				if( ( $formula_code_output !== '' && $formula_code_output !== false ) ||
+						! is_numeric( $custom_field_value ) )
+				{	// If output buffer contains some text it means there is some error;
+					// Don't allow to use not numeric value for the "computed" custom field:
+					$custom_field_value = NULL;
+				}
+			}
+			catch( Error $e )
+			{	// Set NULL value for wrong formula:
+				$custom_field_value = NULL;
+			}
+			catch( ParseError $e )
+			{	// Set NULL value for wrong formula:
+				$custom_field_value = NULL;
+			}
+		}
+
+		// Unset temp array at the end of recursion:
+		unset( $this->cache_computed_custom_fields );
+
+		return $custom_field_value;
 	}
 
 
 	/**
 	 * Display custom field
+	 *
+	 * @param array Params
 	 */
 	function custom( $params )
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'before'        => ' ',
-				'after'         => ' ',
-				'format'        => 'htmlbody',
-				'decimals'      => 2,
-				'dec_point'     => '.',
-				'thousands_sep' => ',',
+				'before' => ' ',
+				'after'  => ' ',
 			), $params );
 
 		if( empty( $params['field'] ) )
@@ -2502,37 +3030,20 @@ class Item extends ItemLight
 			return;
 		}
 
-		// Load custom field by index
+		// Load custom field by index:
+		$custom_fields = $this->get_custom_fields_defs();
 		$field_index = $params['field'];
-		if( !$this->load_custom_field_value( $field_index ) )
+		if( ! isset( $custom_fields[ $field_index ] ) )
 		{ // Custom field with this index doesn't exist
 			echo $params['before']
-				.'<span class="red">'.sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_index.'</b>' ).'</span>'
+				.'<span class="evo_param_error">'.sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_index.'</b>' ).'</span>'
 				.$params['after'];
 			return;
 		}
 
-		// Get value and type
-		$value = $this->custom_fields[$field_index]['value'];
-		$type = $this->custom_fields[$field_index]['type'];
-
-		if( !empty( $params['max'] ) && ( $type == 'double' ) && ( $value == 9999999999 ) )
-		{
-			echo $params['max'];
-		}
-		elseif( !empty( $value ) )
-		{
-			echo $params['before'];
-			if( $type == 'double' )
-			{
-				echo number_format( $value, $params['decimals'], $params['dec_point'], $params['thousands_sep']  );
-			}
-			else
-			{
-				echo format_to_output( $value, $params['format'] );
-			}
-			echo $params['after'];
-		}
+		echo $params['before'];
+		echo $this->get_custom_field_formatted( $field_index, $params );
+		echo $params['after'];
 	}
 
 
@@ -2548,7 +3059,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get all custom fields of current Item
+	 * Get all custom fields of this Item as HTML code
 	 *
 	 * @param array Params
 	 * @return string
@@ -2557,73 +3068,26 @@ class Item extends ItemLight
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'before'       => '<table class="item_custom_fields">',
-				'field_format' => '<tr><th>$title$:</th><td>$value$</td></tr>', // $title$ $value$
-				'after'        => '</table>',
-				'fields'       => '', // Empty string to display ALL fields, OR fields names separated by comma to display only requested fields in order what you want
+				'fields'        => '', // Empty string to display ALL fields, OR fields names separated by comma to show/hide only the requested fields in order what you want
+				'fields_source' => 'include', // 'all' - All item's fields, 'exclude' - All except fields listed in the param 'fields', 'include' - Only fields listed in the param 'fields'
+				// See default template params in the widget function item_fields_compare_Widget->display():
 			), $params );
 
-		if( empty( $this->custom_fields ) )
-		{
-			$this->custom_fields = $this->get_type_custom_fields();
-		}
+		// Convert fields separator to widget format:
+		$custom_fields = str_replace( ',', "\n", trim( $params['fields'], ', ' ) );
 
-		$fields_exist = false;
+		// Call widget with params only when content is not generated yet above:
+		ob_start();
+		skin_widget( array_merge( $params, array(
+				'widget'        => 'item_custom_fields',
+				'fields_source' => empty( $custom_fields ) ? 'all' : $params['fields_source'],
+				'fields'        => $custom_fields,
+				'items'         => $this->ID,
+			) ) );
+		$widget_html = ob_get_contents();
+		ob_end_clean();
 
-		if( empty( $params['fields'] ) )
-		{	// Display all fields:
-			$display_fields = array_keys( $this->custom_fields );
-		}
-		else
-		{	// Display only the requested fields:
-			$display_fields = explode( ',', $params['fields'] );
-			$fields_exist = true;
-		}
-
-		if( ! $fields_exist && count( $this->custom_fields ) == 0 )
-		{	// No custom fields:
-			return '';
-		}
-
-		$html = $params['before'];
-
-		$mask = array( '$title$', '$value$' );
-		foreach( $display_fields as $field_name )
-		{
-			$field_name = trim( $field_name );
-			if( ! isset( $this->custom_fields[ $field_name ] ) )
-			{	// Wrong field:
-				$values = array( $field_name, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_name ).'</span>' );
-				$html .= str_replace( $mask, $values, $params['field_format'] );
-				$fields_exist = true;
-				continue;
-			}
-
-			$field = $this->custom_fields[ $field_name ];
-			$custom_field_value = $this->get_custom_field_value( $field_name );
-			if( ! empty( $custom_field_value ) ||
-			    ( $field['type'] == 'double' && $custom_field_value == '0' ) )
-			{	// Display only the filled field AND also numeric field with '0' value:
-				if( $field['label'] === NULL && strpos( $field['name'], '!deleted_' ) === 0 )
-				{	// Use this label when nonexistent custom field is loaded from revision:
-					$field['label'] = '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), '#'.$field['ID'] ).'</span>';
-				}
-				$values = array( $field['label'], $custom_field_value );
-				$html .= str_replace( $mask, $values, $params['field_format'] );
-				$fields_exist = true;
-			}
-		}
-
-		$html .= $params['after'];
-
-		if( $fields_exist )
-		{	// Print out if at least one field is filled for this item
-			return $html;
-		}
-		else
-		{
-			return '';
-		}
+		return $widget_html;
 	}
 
 
@@ -2641,11 +3105,16 @@ class Item extends ItemLight
 				'render_inline_files'   => true,
 				'render_links'          => true,
 				'render_custom_fields'  => true,
-				'render_parent'         => true,
+				'render_other_item'     => true,
 				'render_collection'     => true,
 				'render_content_blocks' => true,
 				'render_inline_widgets' => true,
 			), $params );
+
+		if( $params['render_inline_widgets'] )
+		{	// Render widget tags (subscribe, emailcapture, compare, fields):
+			$content = $this->render_inline_widgets( $content, $params );
+		}
 
 		if( $params['render_inline_files'] )
 		{	// Render inline file tags like [image:123:caption] or [file:123:caption]:
@@ -2658,13 +3127,13 @@ class Item extends ItemLight
 		}
 
 		if( $params['render_custom_fields'] )
-		{	// Render Custom Fields [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field]:
+		{	// Render single value of Custom Fields [field:first_string_field]:
 			$content = $this->render_custom_fields( $content, $params );
 		}
 
-		if( $params['render_parent'] )
-		{	// Render Parent Data [parent], [parent:fields] and etc.:
-			$content = $this->render_parent_data( $content, $params );
+		if( $params['render_other_item'] )
+		{	// Render parent/other item data [parent:titlelink], [parent:url], [parent:field:first_string_field], [item:123:titlelink], [item:slug:titlelink] and etc.:
+			$content = $this->render_other_item_data( $content, $params );
 		}
 
 		if( $params['render_collection'] )
@@ -2677,17 +3146,12 @@ class Item extends ItemLight
 			$content = $this->render_content_blocks( $content, $params );
 		}
 
-		if( $params['render_inline_widgets'] )
-		{ // Render subscription related tags
-			$content = $this->render_inline_widgets( $content, $params );
-		}
-
 		return $content;
 	}
 
 
 	/**
-	 * Convert inline widget tags like [subscribe] and [emailcapture] into HTML tags
+	 * Convert inline widget tags like [subscribe], [emailcapture], [compare], [fields], [parent:fields], [item:123:fields], [item:slug:fields] into HTML tags
 	 *
 	 * @param string Source content
 	 * @param array Params
@@ -2708,46 +3172,49 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of widgets:
-		preg_match_all( '/\[(subscribe|emailcapture):([^\]]*)\]/i', $content, $tags );
+		preg_match_all( '/\[(parent:|item:[^:\]]+:)?(subscribe|emailcapture|compare|fields):?([^\]]*)\]/i', $content, $tags );
 
 		if( count( $tags[0] ) > 0 )
 		{	// If at least one widget tag is found in content:
 			foreach( $tags[0] as $t => $source_tag )
 			{	// Render URL custom field as html:
 				$field_Item = $this;
-				$widget_html = $source_tag;
-
-				$widget_params = explode( ':', $tags[2][$t] );
-				switch( $tags[1][$t] )
+				$widget_params = false;
+				$widget_html = false;
+				$tag_prefix = $tags[1][$t];
+				$widget_name = $tags[2][$t];
+				$tag_params = explode( ':', $tags[3][$t] );
+				switch( $widget_name )
 				{
 					case 'subscribe':
+						// Widget "Newsletter/Email list subscription":
 						$button_notsubscribed = '';
 						$button_subscribed = '';
 						$button_notloggedin = '';
 
-						preg_match( '/(\d+)(?:\/(.*))?/', $widget_params[0], $newsletter_ID_tags );
+						preg_match( '/(\d+)(?:\/(.*))?/', $tag_params[0], $newsletter_ID_tags );
 						$newsletter_ID = intval( $newsletter_ID_tags[1] );
 						if( isset( $newsletter_ID_tags[2] ) )
 						{
 							$user_tags = $newsletter_ID_tags[2];
 						}
 
-						if( isset( $widget_params[1] ) )
+						if( isset( $tag_params[1] ) )
 						{
-							$button_notsubscribed = $widget_params[1];
+							$button_notsubscribed = $tag_params[1];
 						}
 
-						if( isset( $widget_params[2] ) )
+						if( isset( $tag_params[2] ) )
 						{
-							$button_subscribed = $widget_params[2];
+							$button_subscribed = $tag_params[2];
 						}
 
-						if( isset( $widget_params[3] ) )
+						if( isset( $tag_params[3] ) )
 						{
-							$button_notloggedin = $widget_params[3];
+							$button_notloggedin = $tag_params[3];
 						}
 
-						$params = array(
+						$widget_params = array(
 							'widget' => 'newsletter_subscription',
 							'title' => '',
 							'intro' => '',
@@ -2762,16 +3229,16 @@ class Item extends ItemLight
 						);
 						if( ! empty( $button_notsubscribed ) )
 						{
-							$params['button_notsubscribed'] = $button_notsubscribed;
+							$widget_params['button_notsubscribed'] = $button_notsubscribed;
 						}
 						if( ! empty( $button_subscribed ) )
 						{
-							$params['button_subscribed'] = $button_subscribed;
+							$widget_params['button_subscribed'] = $button_subscribed;
 						}
 						if( ! empty( $user_tags ) )
 						{
-							$params['usertags'] = $user_tags;
-							$params['unsubscribed_if_not_tagged'] = true;
+							$widget_params['usertags'] = $user_tags;
+							$widget_params['unsubscribed_if_not_tagged'] = true;
 						}
 
 						if( ! empty( $button_notloggedin ) && ! is_logged_in() )
@@ -2781,49 +3248,27 @@ class Item extends ItemLight
 							$widget_html .= '<a href="'.get_login_url( 'inline subscribe', $redirect_to ).'" class="btn btn-primary">'.$button_notloggedin.'</a>';
 							$widget_html .= '</div>';
 						}
-						else
-						{
-							ob_start();
-							skin_widget( $params );
-							$widget_html = ob_get_contents();
-							ob_end_clean();
-						}
-
 						break;
 
 					case 'emailcapture':
-						$fields_to_display = array();
-						$button_text = '';
+						// Widget "Email capture / Quick registration":
+						preg_match( '/(\d+)?(?:\/(.*))?/', $tag_params[0], $newsletter_ID_tags );
+						$newsletter_ID = isset( $newsletter_ID_tags[1] ) ? intval( $newsletter_ID_tags[1] ) : NULL;
+						$user_tags = isset( $newsletter_ID_tags[2] ) ? $newsletter_ID_tags[2] : NULL;
+						$fields_to_display = isset( $tag_params[1] ) ? explode( '+', $tag_params[1] ) : array();
+						$button_text = isset( $tag_params[2] ) ? $tag_params[2] : '';
 
-						preg_match( '/(\d+)?(?:\/(.*))?/', $widget_params[0], $newsletter_ID_tags );
-						if( isset( $newsletter_ID_tags[1] ) )
-						{
-							$newsletter_ID = intval( $newsletter_ID_tags[1] );
-						}
-						if( isset( $newsletter_ID_tags[2] ) )
-						{
-							$user_tags = $newsletter_ID_tags[2];
-						}
-						if( isset( $widget_params[1] ) )
-						{
-							$fields_to_display = explode( '+', $widget_params[1] );
-						}
-						if( isset( $widget_params[2] ) )
-						{
-							$button_text = $widget_params[2];
-						}
-
-						$params = array(
-							'widget' => 'user_register',
+						$widget_params = array(
+							'widget' => 'user_register_quick',
 							'title' => '',
 							'intro' => '',
 							'ask_firstname' => in_array( 'firstname', $fields_to_display ) ? 'required' : 'no',
 							'ask_lastname' => in_array( 'lastname', $fields_to_display ) ? 'required' : 'no',
+							'ask_country' => in_array( 'country', $fields_to_display ) ? 'required' : 'no',
 							'source' => 'Page: '.$this->get( 'urltitle' ),
-							'usertags' => isset( $user_tags ) ? $user_tags : NULL,
+							'usertags' => $user_tags,
 							'subscribe_post' => 0,
 							'subscribe_comment' => 0,
-							'subscribe_post_mod' => 0,
 							'button_class' => 'btn-primary',
 							'inline' => 1
 						);
@@ -2847,24 +3292,95 @@ class Item extends ItemLight
 							T_('Also subscribe user to all default newsletters for new users.'),
 							empty( $newsletter_ID ) ? 1 : 0, // checked if no specific newsletter ID specified
 						);
-						$params['newsletters'] = $newsletters_options;
+						$widget_params['newsletters'] = $newsletters_options;
 
 						if( ! empty ( $button_text ) )
 						{
-							$params['button'] = $button_text;
+							$widget_params['button'] = $button_text;
 						}
-
-						ob_start();
-						skin_widget( $params );
-						$widget_html = ob_get_contents();
-						ob_end_clean();
 						break;
 
-					default:
-						$widget_html = 'xxx';
+					case 'compare':
+						// Widget "Compare Item Fields":
+						// Set item IDs to compare:
+						$compare_items = isset( $tag_params[0] ) ? trim( $tag_params[0], ', ' ) : '';
+						if( empty( $compare_items ) )
+						{	// Skip a compare tag without item IDs:
+							break;
+						}
+						// Set fields to compare:
+						$compare_fields = isset( $tag_params[1] ) ? str_replace( ',', "\n", trim( $tag_params[1], ', ' ) ) : '';
+						// Set widget params to display:
+						$widget_params = array(
+							'widget'        => 'item_fields_compare',
+							'items_source'  => 'list',
+							'items'         => $compare_items,
+							'fields_source' => empty( $compare_fields ) ? 'all' : 'include',
+							'fields'        => $compare_fields,
+						);
+						break;
+
+					case 'fields':
+						// Widget "Item Custom Fields":
+						if( $tag_prefix == 'parent:' )
+						{	// Use parent item:
+							$widget_item_ID = '$parent$';
+							if( ! ( $widget_Item = & $this->get_parent_Item() ) )
+							{	// Display error message if parent doesn't exist:
+								$widget_html = '<span class="text-danger">'.T_('This Item has no parent.').'</span>';
+								break;
+							}
+						}
+						elseif( strpos( $tag_prefix, 'item:' ) === 0 )
+						{	// Use other item by ID or slug:
+							$widget_item_ID_slug = substr( $tag_prefix, 5, -1 );
+							$widget_item_data_is_number = is_number( $widget_item_ID_slug );
+							$ItemCache = & get_ItemCache();
+							if( ! ( $widget_item_data_is_number && $widget_Item = & $ItemCache->get_by_ID( $widget_item_ID_slug, false, false ) ) &&
+									! ( ! $widget_item_data_is_number && $widget_Item = & $ItemCache->get_by_urltitle( $widget_item_ID_slug, false, false ) ) )
+							{	// Display error message if other item is not found by ID and slug:
+								$widget_html = '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$widget_item_ID_slug.'</code>' ).'</span>';
+								break;
+							}
+							$widget_item_ID = $widget_Item->ID;
+						}
+						else
+						{	// Use current Item:
+							$widget_item_ID = '$this$';
+							$widget_Item = $this;
+						}
+
+						$custom_fields = $widget_Item->get_custom_fields_defs();
+						if( ! $custom_fields )
+						{	// Fields don't exist for this Item:
+							$widget_html = '<span class="text-danger">'.T_('The Item has no custom fields.').'</span>';
+							break;
+						}
+
+						// Set fields to display:
+						$custom_fields = isset( $tag_params[0] ) ? str_replace( ',', "\n", trim( $tag_params[0], ', ' ) ) : '';
+						// Set widget params to display:
+						$widget_params = array(
+							'widget'        => 'item_custom_fields',
+							'fields_source' => empty( $custom_fields ) ? 'all' : 'include',
+							'fields'        => $custom_fields,
+							'items'         => $widget_item_ID,
+						);
+						break;
 				}
 
-				$content = substr_replace( $content, $widget_html, strpos( $content, $source_tag ), strlen( $source_tag ) );
+				// If widget display params are initialized for the inline tag:
+				if( $widget_params !== false && $widget_html === false )
+				{	// Call widget with params only when content is not generated yet above:
+					ob_start();
+					skin_widget( array_merge( $params, $widget_params ) );
+					$widget_html = ob_get_contents();
+					ob_end_clean();
+				}
+				if( $widget_html !== false )
+				{	// Replace inline widget tag with content generated by requested widget:
+					$content = substr_replace( $content, $widget_html, strpos( $content, $source_tag ), strlen( $source_tag ) );
+				}
 			}
 		}
 
@@ -2873,7 +3389,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Convert inline custom field tags like [fields], [fields:second_numeric_field,first_string_field] or [field:first_string_field] into HTML tags
+	 * Convert inline custom field tags like [field:first_string_field] into HTML tags
 	 *
 	 * @param string Source content
 	 * @param array Params
@@ -2891,39 +3407,28 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of custom fields:
-		preg_match_all( '/\[(fields?):?([^\]]*)?\]/i', $content, $tags );
+		preg_match_all( '/\[field:([^\]]*)?\]/i', $content, $tags );
 
 		foreach( $tags[0] as $t => $source_tag )
 		{
-			switch( $tags[1][ $t ] )
-			{
-				case 'fields':
-					// Render several fields as HTML table:
-					$custom_fields_params = array( 'fields' => trim( $tags[2][ $t ] ) );
-						$field_value = $this->get_custom_fields( $custom_fields_params );
-						if( empty( $field_value ) )
-						{	// Fields don't exist:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The item has no custom fields').'</span>', $content );
-						}
-						else
-						{	// Display fields:
-							$content = str_replace( $source_tag, $field_value, $content );
-						}
-					break;
-
-				case 'field':
-					// Render single field as text:
-					$field_index = trim( $tags[2][ $t ] );
-					$field_value = $this->get_custom_field_value( $field_index );
-					if( $field_value === false )
-					{	// Wrong field request, display error:
-						$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_index ).'</span>', $content );
-					}
-					else
-					{	// Display field value:
-						$content = str_replace( $source_tag, $field_value, $content );
-					}
-					break;
+			// Render single field as text:
+			$field_index = trim( $tags[1][ $t ] );
+			$field_value = $this->get_custom_field_formatted( $field_index, $params );
+			if( $field_value === false )
+			{	// Wrong field request, display error:
+				$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_index ).'</span>', $content );
+			}
+			else
+			{	// Display field value:
+				$custom_fields = $this->get_custom_fields_defs();
+				if( $custom_fields[ $field_index ]['public'] )
+				{	// Display value only if custom field is public:
+					$content = str_replace( $source_tag, $field_value, $content );
+				}
+				else
+				{	// Display an error for not public custom field:
+					$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_index ).'</span>', $content );
+				}
 			}
 		}
 
@@ -2932,79 +3437,92 @@ class Item extends ItemLight
 
 
 	/**
-	 * Convert inline parent tags into HTML tags like:
-	 *    [parent]
+	 * Convert inline parent/other item tags into HTML tags like:
 	 *    [parent:titlelink]
 	 *    [parent:url]
-	 *    [parent:fields:second_numeric_field,first_string_field]
 	 *    [parent:field:first_string_field]
+	 *    [item:123:titlelink]
+	 *    [item:123:url]
+	 *    [item:123:field:first_string_field]
+	 *    [item:slug:titlelink]
+	 *    [item:slug:url]
+	 *    [item:slug:field:first_string_field]
 	 *
 	 * @param string Source content
 	 * @param array Params
 	 * @return string Content
 	 */
-	function render_parent_data( $content, $params = array() )
+	function render_other_item_data( $content, $params = array() )
 	{
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
-		{	// Call $this->render_parent_data() on everything outside code/pre:
+		{	// Call $this->render_other_item_data() on everything outside code/pre:
 			$params['check_code_block'] = false;
 			$content = callback_on_non_matching_blocks( $content,
 				'~<(code|pre)[^>]*>.*?</\1>~is',
-				array( $this, 'render_parent_data' ), array( $params ) );
+				array( $this, 'render_other_item_data' ), array( $params ) );
 			return $content;
 		}
 
 		// Find all matches with tags of parent data:
-		preg_match_all( '/\[parent:([a-z]+):?([^\]]*)?\]/i', $content, $tags );
+		preg_match_all( '/\[(parent|item:[^:]+):([a-z]+):?([^\]]*)?\]/i', $content, $tags );
 
 		if( count( $tags[0] ) > 0 )
-		{	// If at least one parent tag is found in content:
-			if( ! ( $parent_Item = & $this->get_parent_Item() ) )
-			{	// If parent doesn't exist:
-				$content = str_replace( $tags[0], '<span class="text-danger">'.T_('This item has no parent.').'</span>', $content );
-				return $content;
-			}
-
+		{	// If at least one other item tag is found in content:
 			foreach( $tags[0] as $t => $source_tag )
 			{
-				switch( $tags[1][ $t ] )
-				{
-					case 'fields':
-						// Render several parent custom fields as HTML table:
-						$custom_fields_params = array( 'fields' => trim( $tags[2][ $t ] ) );
-						$field_value = $parent_Item->get_custom_fields( $custom_fields_params );
-						if( empty( $field_value ) )
-						{	// Fields don't exist:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.T_('The parent item has no custom fields').'</span>', $content );
-						}
-						else
-						{	// Display fields:
-							$content = str_replace( $source_tag, $field_value, $content );
-						}
-						break;
+				if( $tags[1][ $t ] == 'parent' )
+				{	// Get data of item parent:
+					if( ! ( $other_Item = & $this->get_parent_Item() ) )
+					{	// Display error message if parent doesn't exist:
+						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.T_('This Item has no parent.').'</span>', $content );
+						continue;
+					}
+				}
+				else
+				{	// Try to use other item by ID or slug:
+					$other_item_ID_slug = substr( $tags[1][ $t ], 5 );
+					$other_item_data_is_number = is_number( $other_item_ID_slug );
+					$ItemCache = & get_ItemCache();
+					if( ! ( $other_item_data_is_number && $other_Item = & $ItemCache->get_by_ID( $other_item_ID_slug, false, false ) ) &&
+					    ! ( ! $other_item_data_is_number && $other_Item = & $ItemCache->get_by_urltitle( $other_item_ID_slug, false, false ) ) )
+					{	// Display error message if other item is not found by ID and slug:
+						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$other_item_ID_slug.'</code>' ).'</span>', $content );
+						continue;
+					}
+				}
 
+				switch( $tags[2][ $t ] )
+				{
 					case 'field':
 						// Render single parent custom field as text:
-						$field_index = trim( $tags[2][ $t ] );
-						$field_value = $parent_Item->get_custom_field_value( $field_index );
+						$field_index = trim( $tags[3][ $t ] );
+						$field_value = $other_Item->get_custom_field_formatted( $field_index, $params );
 						if( $field_value === false )
 						{	// Wrong field request, display error:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist'), $field_index ).'</span>', $content );
+							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_index ).'</span>', $content );
 						}
 						else
 						{	// Display field value:
-							$content = str_replace( $source_tag, $field_value, $content );
+							$custom_fields = $other_Item->get_custom_fields_defs();
+							if( $custom_fields[ $field_index ]['public'] )
+							{	// Display value only if custom field is public:
+								$content = str_replace( $source_tag, $field_value, $content );
+							}
+							else
+							{	// Display an error for not public custom field:
+								$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_index ).'</span>', $content );
+							}
 						}
 						break;
 
 					case 'titlelink':
 						// Render parent title with link:
-						$content = str_replace( $source_tag, $parent_Item->get_title(), $content );
+						$content = str_replace( $source_tag, $other_Item->get_title(), $content );
 						break;
 
 					case 'url':
 						// Render parent URL:
-						$content = str_replace( $source_tag, $parent_Item->get_permanent_url(), $content );
+						$content = str_replace( $source_tag, $other_Item->get_permanent_url(), $content );
 						break;
 				}
 			}
@@ -3085,17 +3603,35 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of link data:
-		preg_match_all( '/\[(parent:)?link:([^\]]+)\]((.*?)\[\/link\])?/i', $content, $tags );
+		preg_match_all( '/\[(parent:|item:[^:]+:)?link:([^\]]+)\]((.*?)\[\/link\])?/i', $content, $tags );
 
 		if( count( $tags[0] ) > 0 )
 		{	// If at least one link tag is found in content:
 			foreach( $tags[0] as $t => $source_tag )
 			{	// Render URL custom field as html:
-				$field_Item = $this;
-				if( $tags[1][ $t ] == 'parent:' && ! ( $field_Item = & $this->get_parent_Item() ) )
-				{	// If parent doesn't exist:
-					$content = substr_replace( $content, '<span class="text-danger">'.T_('This item has no parent.').'</span>', strpos( $content, $source_tag ), strlen( $source_tag ) );
-					continue;
+				if( $tags[1][ $t ] == 'parent:' )
+				{	// Try to use parent:
+					if( ! ( $other_Item = & $this->get_parent_Item() ) )
+					{	// Display error message if parent doesn't exist:
+						$content = substr_replace( $content, '<span class="text-danger">'.T_('This Item has no parent.').'</span>', strpos( $content, $source_tag ), strlen( $source_tag ) );
+						continue;
+					}
+				}
+				elseif( ! empty( $tags[1][ $t ] ) )
+				{	// Try to use other item by ID or slug:
+					$other_item_ID_slug = rtrim( substr( $tags[1][ $t ], 5 ), ':' );
+					$other_item_data_is_number = is_number( $other_item_ID_slug );
+					$ItemCache = & get_ItemCache();
+					if( ! ( $other_item_data_is_number && $other_Item = & $ItemCache->get_by_ID( $other_item_ID_slug, false, false ) ) &&
+					    ! ( ! $other_item_data_is_number && $other_Item = & $ItemCache->get_by_urltitle( $other_item_ID_slug, false, false ) ) )
+					{	// Display error message if other item is not found by ID and slug:
+						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$other_item_ID_slug.'</code>' ).'</span>', $content );
+						continue;
+					}
+				}
+				else
+				{	// Use this Item:
+					$other_Item = $this;
 				}
 
 				$link_data = explode( ':', $tags[2][ $t ] );
@@ -3103,10 +3639,19 @@ class Item extends ItemLight
 				// Get field code:
 				$url_field_code = trim( $link_data[0] );
 
-				$field_value = $field_Item->get_custom_field_value( $url_field_code, 'url' );
+				$custom_fields = $other_Item->get_custom_fields_defs();
+				$field_value = $other_Item->get_custom_field_value( $url_field_code, 'url' );
 				if( $field_value === false )
 				{	// Wrong field request, display error:
-					$link_html = '<span class="text-danger">'.sprintf( T_('The URL field "%s" does not exist'), $url_field_code ).'</span>';
+					$link_html = '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $url_field_code ).'</span>';
+				}
+				elseif( ! $custom_fields[ $url_field_code ]['public'] )
+				{	// Display an error for not public custom field:
+					$link_html = '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $url_field_code ).'</span>';
+				}
+				elseif( $field_value === '' )
+				{	// Empty field value, display error:
+					$link_html = '<span class="text-danger">'.sprintf( T_('Referenced URL field is empty.'), $url_field_code ).'</span>';
 				}
 				else
 				{	// Display URL field as html link:
@@ -3169,23 +3714,25 @@ class Item extends ItemLight
 					$wrong_item_info = '<code>'.$item_ID_slug.'</code>';
 				}
 				// Replace inline content block tag with error message about wrong referenced item:
-				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>', $content );
+				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>', $content );
 				continue;
 			}
 			elseif( get_status_permvalue( $this->get( 'status' ) ) > get_status_permvalue( $content_Item->get( 'status' ) ) )
 			{	// Deny to display content block Item with lower status than parent Item:
-				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('The visibility level of the content block "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('The visibility level of the content block "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
 				continue;
 			}
 			elseif( $content_Item->get( 'creator_user_ID' ) != $this->get( 'creator_user_ID' ) &&
 			        ( ! $item_Blog || $content_Item->get( 'creator_user_ID' ) != $item_Blog->get( 'owner_user_ID' ) ) &&
-			        ( ! $item_Blog || $content_Item->get_blog_ID() != $item_Blog->ID )
+			        ( ! $item_Blog || $content_Item->get_blog_ID() != $item_Blog->ID ) &&
+		          ( ! ( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) || $content_Item->get_blog_ID() != $info_Blog->ID )
 			      )
 			{	// We can display a content block item with at least one condition:
 				//  - Content block Item has same owner as owner of parent Item,
 				//  - Content block Item has same owner as owner of parent Item's collection,
-				//  - Content block Item is in same collection as parent Item:
-				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				//  - Content block Item is in same collection as parent Item,
+				//  - Content block Item from collection for info pages:
+				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
 				continue;
 			}
 
@@ -3196,7 +3743,7 @@ class Item extends ItemLight
 
 			if( in_array( $content_Item->ID, $content_block_items ) )
 			{	// Replace inline content block tag with error message about recursion:
-				$content = str_replace( $source_tag, '<p class="red">'.sprintf( T_('Content inclusion loop detected. Not including "%s".'), '#'.$content_Item->ID.' '.$content_Item->get( 'title' ) ).'</p>', $content );
+				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('Content inclusion loop detected. Not including "%s".'), '#'.$content_Item->ID.' '.$content_Item->get( 'title' ) ).'</p>', $content );
 				continue;
 			}
 
@@ -3419,7 +3966,7 @@ class Item extends ItemLight
 	 */
 	function get_titletag()
 	{
-		if( empty($this->titletag) )
+		if( empty( $this->titletag ) )
 		{
 			return $this->get( 'title' );
 		}
@@ -3779,7 +4326,7 @@ class Item extends ItemLight
 					'image_link_to'    => $link_to,
 					'image_link_title' => $link_title,
 					'image_link_rel'   => $link_rel,
-					'image_alt'        => $this->title,
+					'image_alt'        => $this->get( 'title' ),
 				) ) );
 	}
 
@@ -4393,9 +4940,20 @@ class Item extends ItemLight
 	 *
 	 * @return string
 	 */
-	function get_feedback_url( $popup = false, $glue = '&amp;' )
+	function get_feedback_url( $popup = false, $glue = '&amp;', $blog_ID = NULL )
 	{
-		$url = $this->get_single_url( 'auto', '', $glue );
+		if( $blog_ID !== NULL &&
+				( $BlogCache = & get_BlogCache() ) &&
+				( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) ) )
+		{
+			$blog_url = $Blog->get( 'url' );
+		}
+		else
+		{
+			$blog_url = '';
+		}
+
+		$url = $this->get_single_url( 'auto', $blog_url, $glue, $blog_ID );
 		if( $popup )
 		{
 			$url = url_add_param( $url, 'disp=feedback-popup', $glue );
@@ -4423,7 +4981,7 @@ class Item extends ItemLight
 	 */
 	function get_feedback_link( $params )
 	{
-		global $ReqURL;
+		global $ReqURL, $Blog, $Settings;
 
 		if( ! $this->can_see_comments() )
 		{	// Comments disabled
@@ -4431,23 +4989,37 @@ class Item extends ItemLight
 		}
 
 		$params = array_merge( array(
-									'type' => 'feedbacks',		// Kind of feedbacks to count
-									'status' => '#',	// Statuses of feedbacks to count, can be a string for one status or array for several. '#' - active front-office comment statuses, '#moderation#' - "require moderation" statuses.
-									'link_before' => '',
-									'link_after' => '',
-									'link_text_zero' => '#',
-									'link_text_one' => '#',
-									'link_text_more' => '#',
-									'link_anchor_zero' => '#',
-									'link_anchor_one' => '#',
-									'link_anchor_more' => '#',
-									'link_title' => '#',
-									'link_class' => '',
-									'show_in_single_mode' => false,		// Do we want to show this link even if we are viewing the current post in single view mode
-									'url' => '#',
-								), $params );
+				'type' => 'feedbacks',		// Kind of feedbacks to count
+				'status' => '#',	// Statuses of feedbacks to count, can be a string for one status or array for several. '#' - active front-office comment statuses, '#moderation#' - "require moderation" statuses.
+				'link_before' => '',
+				'link_after' => '',
+				'link_text_zero' => '#',
+				'link_text_one' => '#',
+				'link_text_more' => '#',
+				'link_anchor_zero' => '#',
+				'link_anchor_one' => '#',
+				'link_anchor_more' => '#',
+				'link_title' => '#',
+				'link_class' => '',
+				'show_in_single_mode' => false,		// Do we want to show this link even if we are viewing the current post in single view mode
+				'url' => '#',
+				'stay_in_same_collection' => 'auto', // 'auto' - follow 'allow_crosspost_urls' if we are cross posted, true - always stay in same collection if we are cross posted, false - always go to permalink if we are cross posted
+			), $params );
 
-		if( $params['show_in_single_mode'] == false && is_same_url( $this->get_permanent_url('','','&'), $ReqURL ) )
+		if( isset( $Blog ) &&
+		    ( $params['stay_in_same_collection'] === true || // always stay in current collection
+		      ( $params['stay_in_same_collection'] == 'auto' && ( $item_Blog = & $this->get_Blog() ) && $item_Blog->get_setting( 'allow_crosspost_urls' ) ) // follow 'allow_crosspost_urls' to stay in current collection
+		    ) )
+		{	// Use current collection if this Item is cross posted and has at least one category from current collection:
+			$current_blog_ID = $Blog->ID;
+			$current_blog_URL = $Blog->get( 'url' );
+		}
+		else
+		{	// Use main collection of this Item:
+			$current_blog_ID = NULL;
+			$current_blog_URL = '';
+		}
+		if( $params['show_in_single_mode'] == false && is_same_url( $this->get_permanent_url( '', $current_blog_URL, '&', array(), $current_blog_ID ), $ReqURL ) )
 		{	// We are viewing the single page for this pos, which (typically) )contains comments, so we dpn't want to display this link
 			return;
 		}
@@ -4505,6 +5077,18 @@ class Item extends ItemLight
 				if( $params['link_text_more'] == '#' ) $params['link_text_more'] = T_('%d pingbacks').' &raquo;';
 				break;
 
+			case 'webmentions':
+				if( ! $this->can_receive_webmentions() )
+				{ // Webmentions not allowed on this collection:
+					// We'll consider webmentions to follow the same restriction
+					return;
+				}
+				if( $params['link_title'] == '#' ) $params['link_title'] = T_('Display webmentions');
+				if( $params['link_text_zero'] == '#' ) $params['link_text_zero'] = T_('No webmention yet').' &raquo;';
+				if( $params['link_text_one'] == '#' ) $params['link_text_one'] = T_('1 webmention').' &raquo;';
+				if( $params['link_text_more'] == '#' ) $params['link_text_more'] = T_('%d webmentions').' &raquo;';
+				break;
+
 			default:
 				debug_die( "Unknown feedback type [{$params['type']}]" );
 		}
@@ -4518,7 +5102,7 @@ class Item extends ItemLight
 
 		if( $params['url'] == '#' )
 		{ // We want a link to single post:
-			$params['url'] = $this->get_feedback_url();
+			$params['url'] = $this->get_feedback_url( false, '&amp;', $current_blog_ID );
 		}
 
 		// Anchor position
@@ -4539,8 +5123,8 @@ class Item extends ItemLight
 
 		if( !empty( $params['url'] ) )
 		{
-			$r .= '<a href="'.$params['url'].$anchor.'" class="'.$params['link_class'].'" ';	// Position on feedback
-			$r .= 'title="'.$params['link_title'].'"';
+			$r .= '<a href="'.$params['url'].$anchor.'" class="'.format_to_output( $params['link_class'], 'htmlattr' ).'" ';	// Position on feedback
+			$r .= 'title="'.format_to_output( $params['link_title'], 'htmlattr' ).'"';
 			$r .= '>';
 			$r .= $link_text;
 			$r .= '</a>';
@@ -4576,6 +5160,7 @@ class Item extends ItemLight
 			case 'comments':
 			case 'trackbacks':
 			case 'pingbacks':
+			case 'webmentions':
 				break;
 			default:
 				debug_die( "Unknown feedback type [{$params['type']}]" );
@@ -4600,9 +5185,21 @@ class Item extends ItemLight
 
 
 	/**
+	 * Return true if webmentions are allowed
+	 *
+	 * @return boolean
+	 */
+	function can_receive_webmentions()
+	{
+		$this->load_Blog();
+		return $this->Blog->get_setting( 'webmentions' ) && $this->can_comment( NULL );
+	}
+
+
+	/**
 	 * Get text depending on number of comments
 	 *
-	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks)
+	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks/webmentions)
 	 * @param string Link text to display when there are 0 comments
 	 * @param string Link text to display when there is 1 comment
 	 * @param string Link text to display when there are >1 comments (include %d for # of comments)
@@ -4649,6 +5246,12 @@ class Item extends ItemLight
 				if( $zero == '#' ) $zero = '';
 				if( $one == '#' ) $one = T_('1 meta comment');
 				if( $more == '#' ) $more = T_('%d meta comments');
+				break;
+
+			case 'webmentions':
+				if( $zero == '#' ) $zero = '';
+				if( $one == '#' ) $one = T_('1 webmention');
+				if( $more == '#' ) $more = T_('%d webmentions');
 				break;
 
 			default:
@@ -4726,7 +5329,7 @@ class Item extends ItemLight
 		$table .= '<div class="rating_summary_total">
 			'.$ratings_count.' '.( $ratings_count > 1 ? T_('ratings') : T_('rating') ).'
 			<div class="average_rating">'.T_('Average user rating').':<br />
-			'.get_star_rating( $average_real ).'<span>('.$average_real.')</span>
+			'.get_star_rating( $average_real ).'<span class="average_rating_score">('.$average_real.')</span>
 			</div></div><div class="clear"></div>';
 
 		return $table;
@@ -4790,7 +5393,7 @@ class Item extends ItemLight
 	/**
 	 * Template function: Displays feeback moderation info
 	 *
-	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks)
+	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks/webmentions)
 	 * @param string String to display before the link (if comments are to be displayed)
 	 * @param string String to display after the link (if comments are to be displayed)
 	 * @param string Link text to display when there are 0 comments
@@ -5217,8 +5820,6 @@ class Item extends ItemLight
 	function edit_link( $params = array() )
 	{
 		echo $this->get_edit_link( $params );
-
-		echo_item_merge_js();
 	}
 
 
@@ -5295,8 +5896,8 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
-		{	// User has no right to edit this post:
+		if( ! $current_User->check_perm( 'blog_item_propose', 'edit', false, $this->get_blog_ID() ) )
+		{	// User has no right to propose a change for this Item:
 			return false;
 		}
 
@@ -5403,7 +6004,13 @@ class Item extends ItemLight
 	 */
 	function merge_link( $params = array() )
 	{
-		echo $this->get_merge_link( $params );
+		$merge_link = $this->get_merge_link( $params );
+
+		if( ! empty( $merge_link ) )
+		{
+			echo_item_merge_js();
+			echo $merge_link;
+		}
 	}
 
 
@@ -6335,7 +6942,17 @@ class Item extends ItemLight
 				return $this->set_param( 'datedeadline', 'date', $parvalue, true );
 
 			case 'order':
-				return $this->set_param( 'order', 'number', $parvalue, true );
+				// Field 'post_order' is deprecated,
+				// but we can set it per each category:
+				if( is_array( $this->extra_cat_IDs ) )
+				{	// Update order per each item category:
+					$this->orders = array();
+					foreach( $this->extra_cat_IDs as $extra_cat_ID )
+					{
+						$this->orders[ $extra_cat_ID ] = $parvalue;
+					}
+				}
+				return false;
 
 			case 'renderers': // deprecated
 				return $this->set_renderers( $parvalue );
@@ -6470,20 +7087,20 @@ class Item extends ItemLight
 		$post_timestamp,              // 'Y-m-d H:i:s'
 		$main_cat_ID = 1,             // Main cat ID
 		$extra_cat_IDs = array(),     // Table of extra cats
-		$post_status = 'published',
+		$post_status = 'published',   // Use first char '!' before status name to force this status without restriction by max allowed status of the collection
 		$post_locale = '#',
 		$post_urltitle = '',
 		$post_url = '',
 		$post_comment_status = 'open',
 		$post_renderers = array('default'),
-		$item_type_name_or_ID = '#', // Use 'Page', 'Post' and etc. OR '#' to use default post type OR integer to use post type by ID
+		$item_type_name_or_ID_or_template = '#', // Use 'Page', 'Post' and etc. OR '#' to use default post type OR integer to use post type by ID OR $template_name$
 		$item_st_ID = NULL,
-		$post_order = NULL )
+		$postcat_order = NULL )
 	{
 		global $DB, $query, $UserCache;
 		global $default_locale;
 
-		if( $item_type_name_or_ID == '#' )
+		if( $item_type_name_or_ID_or_template == '#' )
 		{	// Try to set default post type ID from blog setting:
 			$ChapterCache = & get_ChapterCache();
 			if( $Chapter = & $ChapterCache->get_by_ID( $main_cat_ID, false, false ) &&
@@ -6495,11 +7112,17 @@ class Item extends ItemLight
 		else
 		{	// Try to get item type by requested name:
 			$ItemTypeCache = & get_ItemTypeCache();
-			if( is_int( $item_type_name_or_ID ) && $ItemType = & $ItemTypeCache->get_by_ID( $item_type_name_or_ID, false, false ) )
+			if( is_int( $item_type_name_or_ID_or_template ) &&
+			    ( $ItemType = & $ItemTypeCache->get_by_ID( $item_type_name_or_ID_or_template, false, false ) ) )
 			{	// Item type exists in DB by requested ID, Use it:
 				$item_typ_ID = $ItemType->ID;
 			}
-			elseif( $ItemType = & $ItemTypeCache->get_by_name( $item_type_name_or_ID, false, false ) )
+			elseif( preg_match( '/^\$(.+)\$$/', $item_type_name_or_ID_or_template, $ityp_match ) &&
+			        ( $ItemType = & $ItemTypeCache->get_by_template( $ityp_match[1], false, false ) ) )
+			{	// Item type exists in DB by requested template, Use it:
+				$item_typ_ID = $ItemType->ID;
+			}
+			elseif( $ItemType = & $ItemTypeCache->get_by_name( $item_type_name_or_ID_or_template, false, false ) )
 			{	// Item type exists in DB by requested name, Use it:
 				$item_typ_ID = $ItemType->ID;
 			}
@@ -6544,14 +7167,33 @@ class Item extends ItemLight
 
 		$this->set( 'main_cat_ID', $main_cat_ID );
 		$this->set( 'extra_cat_IDs', $extra_cat_IDs );
+		if( substr( $post_status, 0, 1 ) == '!' )
+		{	// Force the requested status to ignore restriction by collection settings:
+			$post_status = substr( $post_status, 1 );
+			$force_status = true;
+		}
 		$this->set( 'status', $post_status );
+		if( ! empty( $force_status ) )
+		{	// Unset flag to don't restrict the status:
+			unset( $this->previous_status );
+		}
 		$this->set( 'locale', $post_locale );
 		$this->set( 'url', $post_url );
 		$this->set( 'comment_status', $post_comment_status );
 		$this->set_renderers( $post_renderers );
 		$this->set( 'ityp_ID', $item_typ_ID );
 		$this->set( 'pst_ID', $item_st_ID );
-		$this->set( 'order', $post_order );
+		$this->set( 'order', $postcat_order );
+
+		// Update the computed custom fields if this Item has them:
+		$custom_fields = $this->get_custom_fields_defs();
+		foreach( $custom_fields as $custom_field )
+		{
+			if( $custom_field['type'] == 'computed' )
+			{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
+				$this->set_setting( 'custom:'.$custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ), true );
+			}
+		}
 
 		// INSERT INTO DB:
 		$this->dbinsert();
@@ -6798,11 +7440,12 @@ class Item extends ItemLight
 	 * @param boolean Update slug? - We want to PREVENT updating slug when item dbupdate is called,
 	 * 	because of the item canonical url title was changed on the slugs edit form, so slug update is already done.
 	 *  If slug update wasn't done already, then this param has to be true.
+	 * @param boolean Update custom fields of child posts?
 	 * @return boolean true on success
 	 */
-	function dbupdate( $auto_track_modification = true, $update_slug = true, $dummy = true )
+	function dbupdate( $auto_track_modification = true, $update_slug = true, $update_child_custom_fields = true )
 	{
-		global $DB, $Plugins;
+		global $DB, $Plugins, $Messages;
 
 		$DB->begin( 'SERIALIZABLE' );
 
@@ -6830,17 +7473,142 @@ class Item extends ItemLight
 
 		if( ! empty( $dbchanges['post_ityp_ID'] ) )
 		{	// If item type has been changed to another,
-			// Clear all custom fields values of previous item type:
+			// Clear custom fields values ONLY of previous item type:
+			// But don't delete old custom field values if fields with same names exist in new selected item type:
+			$new_custom_fields = $this->get_type_custom_fields();
+			$sql_new_custom_fields = ( empty( $new_custom_fields ) ? '' : ' AND iset_name NOT IN ( "custom:'.implode( '", "custom:', array_keys( $new_custom_fields ) ).'" )' );
 			// NOTE: Call this before item settings updating in order to don't remove values of new selected item type:
 			$DB->query( 'DELETE FROM T_items__item_settings
 				WHERE iset_item_ID = '.$this->ID.'
-					AND iset_name LIKE "custom\_%"' );
+					AND iset_name LIKE "custom:%"'
+					.$sql_new_custom_fields );
 		}
 
 		// save Item settings
 		if( isset( $this->ItemSettings ) )
 		{
-			$db_changed = $this->ItemSettings->dbupdate() || $db_changed;
+			$item_settings_changed = $this->ItemSettings->dbupdate();
+			$db_changed = $item_settings_changed || $db_changed;
+
+			if( $item_settings_changed )
+			{	// Update post modified date when at least one setting of this post updated, e.g. when custom field value has been updated:
+				global $localtimenow;
+				$this->set_param( $this->datemodified_field, 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
+			}
+		}
+
+		if( $update_child_custom_fields )
+		{	// Update custom fields of all child posts of this post:
+			$custom_fields = $this->get_type_custom_fields();
+			if( ! empty( $custom_fields ) )
+			{	// If this post has at least one custom field
+				if( ! isset( $this->recursive_updated_items ) )
+				{	// Store in this array all updated items in order to avoid inifitie loop updating:
+					$this->recursive_updated_items = array();
+					$this->recursive_updated_messages = array();
+				}
+				$this->recursive_updated_items[] = $this->ID;
+
+				$ItemCache = & get_ItemCache();
+				$ItemCache->clear();
+				$item_cache_SQL = $ItemCache->get_SQL_object();
+				$item_cache_SQL->FROM_add( 'INNER JOIN T_items__type ON ityp_ID = post_ityp_ID' );
+				$item_cache_SQL->WHERE_and( 'post_parent_ID = '.$this->ID );
+				$item_cache_SQL->WHERE_and( 'ityp_use_parent != "never"' );
+				$child_items = $ItemCache->load_by_sql( $item_cache_SQL );
+				foreach( $child_items as $child_Item )
+				{
+					if( in_array( $child_Item->ID, $this->recursive_updated_items ) )
+					{	// Display error to inform about infinite loop:
+						if( ! isset( $this->recursive_updated_messages['nogroup'] ) )
+						{
+							$this->recursive_updated_messages['nogroup'] = array();
+						}
+						$this->recursive_updated_messages['nogroup'][] = array(
+							'text' => sprintf( T_('Recursive update has stopped because of infinite loop. Item #%d has child #%d which was already updated.'), intval( $this->ID ), intval( $child_Item->ID ) ),
+							'type' => 'error',
+						);
+						// Stop here to avoid infinite loop:
+						continue;
+					}
+					$child_custom_fields = $child_Item->get_type_custom_fields();
+					if( ! empty( $child_custom_fields ) )
+					{	// If child post has at least one custom field:
+						$update_child_custom_field = false;
+						foreach( $custom_fields as $custom_field_code => $custom_field )
+						{
+							if( isset( $child_custom_fields[ $custom_field_code ] ) &&
+							    $child_custom_fields[ $custom_field_code ]['type'] == $custom_field['type'] &&
+							    $custom_field['type'] != 'computed' ) // NOTE: we must NOT copy the computed values from parent because child custom field may has a different formula!
+							{	// If child post has a custom field with same code and type:
+								$child_Item->set_setting( 'custom:'.$custom_field['name'], $this->get_custom_field_value( $custom_field_code, $custom_field['type'] ) );
+								// Mark to know custom fields of the child post must be updated from parent:
+								$update_child_custom_field = true;
+							}
+						}
+						// NOTE: we must recompute values of the "computed" fields because child custom field may has a different formula than parent!
+						foreach( $child_custom_fields as $child_custom_field )
+						{	// Update computed custom fields after when all fields we updated above:
+							if( $child_custom_field['type'] == 'computed' )
+							{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
+								$child_Item->set_setting( 'custom:'.$child_custom_field['name'], $child_Item->get_custom_field_computed( $child_custom_field['name'] ), true );
+								// Mark to know custom fields of the child post must be updated from parent:
+								$update_child_custom_field = true;
+							}
+						}
+						if( $update_child_custom_field )
+						{	// Update child post custom fields if at least one field has been detected with same code and type as parent:
+							$child_Item->recursive_updated_items = & $this->recursive_updated_items;
+							$child_Item->recursive_updated_messages = & $this->recursive_updated_messages;
+							if( $child_Item->dbupdate() )
+							{	// Display a message to inform about updated child posts:
+								$child_item_Blog = $child_Item->get_Blog();
+								$child_item_edit_link = $child_Item->get_edit_link( array(
+										'text'   => $child_Item->ID,
+										'before' => '',
+										'after'  => '',
+									) );
+								if( ! $child_item_edit_link )
+								{	// If current user has no permission to edit the child Item display the ID as text:
+									$child_item_edit_link = $child_Item->ID;
+								}
+								$msg_group = T_('Custom fields have been replicated to the following child posts').':';
+								if( ! isset( $this->recursive_updated_messages[ $msg_group ] ) )
+								{
+									$this->recursive_updated_messages[ $msg_group ] = array();
+								}
+								$this->recursive_updated_messages[ $msg_group ][] = array(
+									'text' => $child_Item->get_title().' ('.$child_item_edit_link.') '.T_('in').' '.$child_item_Blog->get( 'shortname' ),
+									'type' => 'note',
+								);
+							}
+						}
+					}
+				}
+
+				// Display messages from recursion:
+				if( $this->ID == $this->recursive_updated_items[0] &&
+				    ! empty( $this->recursive_updated_messages ) )
+				{	// If we have at least one message during recursive updating of the child posts and this is end of the recursion:
+					foreach( $this->recursive_updated_messages as $msg_group => $messages )
+					{	// Reverse message to display in proper way and not as it is returned by recursion:
+						$messages = array_reverse( $messages );
+						foreach( $messages as $message )
+						{
+							if( $msg_group == 'nogroup' )
+							{	// Single message:
+								$Messages->add( $message['text'], $message['type'] );
+							}
+							else
+							{	// Grouped message:
+								$Messages->add_to_group( $message['text'], $message['type'], $msg_group );
+							}
+						}
+					}
+					unset( $this->recursive_updated_items );
+					unset( $this->recursive_updated_messages );
+				}
+			}
 		}
 
 		// validate url title / slug
@@ -6977,6 +7745,8 @@ class Item extends ItemLight
 
 			// BLOCK CACHE INVALIDATION:
 			BlockCache::invalidate_key( 'cont_coll_ID', $Blog->ID ); // Content has changed
+			BlockCache::invalidate_key( 'item_ID', $this->ID ); // Item has changed
+			BlockCache::invalidate_key( 'item_'.$this->ID, 1 ); // Item has changed (useful for compare widget which needs to check several item_IDs, including from different collections)
 
 			if( $this->is_intro() || $this->is_featured() )
 			{ // Content of intro or featured post has changed
@@ -6998,6 +7768,8 @@ class Item extends ItemLight
 	 */
 	function update_slugs( $urltitle = NULL )
 	{
+		$SlugCache = & get_SlugCache();
+
 		if( ! isset( $urltitle ) )
 		{
 			$urltitle = $this->urltitle;
@@ -7018,9 +7790,17 @@ class Item extends ItemLight
 			$new_Slug->set( 'type', 'item' );
 			$new_Slug->set( 'itm_ID', $this->ID );
 
+			if( ( $urltitle != $new_Slug->get( 'title' ) ) &&
+			    ( strtolower( $urltitle ) == $new_Slug->get( 'title' ) ) &&
+			    ( $prev_Slug = $SlugCache->get_by_name( $urltitle, false, false ) ) )
+			{	// Allow to use uppercase chars in slug title only if this is a single difference between requested slug title and result of urltitle_validate(),
+				// and only if such slug title alredy exists in DB:
+				// (such case possible after item merging when all sulgs were merged and also tiny slugs which have a format like aC8)
+				$new_Slug->set( 'title', $urltitle );
+			}
+
 			// Check if this slug was already used by this item or not.
 			// We need this check, because urltitle_validate() function will modify an existing urltitle only if it belongs to a different object
-			$SlugCache = & get_SlugCache();
 			$prev_Slug = $SlugCache->get_by_name( $new_Slug->get('title'), false, false );
 			if( $prev_Slug )
 			{ // A slug with this title already exists. It must belong to the same item!
@@ -7124,6 +7904,8 @@ class Item extends ItemLight
 
 			// BLOCK CACHE INVALIDATION:
 			BlockCache::invalidate_key( 'cont_coll_ID', $Blog->ID ); // Content has changed
+			BlockCache::invalidate_key( 'item_ID', $old_ID ); // Item has deleted
+			BlockCache::invalidate_key( 'item_'.$old_ID, 1 ); // Item has deleted (useful for compare widget which needs to check several item_IDs, including from different collections)
 
 			if( $this->is_intro() || $this->is_featured() )
 			{ // Content of intro or featured post has changed
@@ -7196,7 +7978,7 @@ class Item extends ItemLight
 	 */
 	function insert_update_extracats( $mode )
 	{
-		global $DB, $Messages;
+		global $DB, $Messages, $Settings, $Blog;
 
 		if( ! is_null( $this->extra_cat_IDs ) )
 		{ // Okay the extra cats are defined:
@@ -7209,21 +7991,32 @@ class Item extends ItemLight
 				$Messages->add( T_('Could not set the selected categories!'), 'error' );
 				return false;
 			}
+
+			// Load item orders per categories before delete them from DB:
+			$this->load_orders();
+
 			if( $mode == 'update' )
 			{
 				// delete previous extracats:
-				$DB->query( 'DELETE FROM T_postcats WHERE postcat_post_ID = '.$this->ID, 'delete previous extracats' );
+				$DB->query( 'DELETE FROM T_postcats WHERE postcat_post_ID = '.$this->ID, 'Delete previous extracats of Item #'.$this->ID );
 			}
 
+			// Allow to use field "postcat_order" only since 12972 DB version:
+			$postcat_order_field = ( $Settings->get( 'db_version' ) >= 12972 ? ', postcat_order' : '' );
+
 			// insert new extracats:
-			$query = "INSERT INTO T_postcats( postcat_post_ID, postcat_cat_ID ) VALUES ";
+			$query = 'INSERT INTO T_postcats ( postcat_post_ID, postcat_cat_ID'.$postcat_order_field.' ) VALUES ';
 			foreach( $this->extra_cat_IDs as $extra_cat_ID )
 			{
-				//echo "extracat: $extracat_ID <br />";
-				$query .= "( $this->ID, $extra_cat_ID ),";
+				$query .= '( '.$this->ID.', '.$extra_cat_ID;
+				if( ! empty( $postcat_order_field ) )
+				{	// Insert item order per category only when this field exists in DB:
+					$query .= ', '.$DB->quote( $this->get_order( $extra_cat_ID ) );
+				}
+				$query .= ' ),';
 			}
 			$query = substr( $query, 0, strlen( $query ) - 1 );
-			$DB->query( $query, 'insert new extracats' );
+			$DB->query( $query, 'Insert new extracats for Item #'.$this->ID );
 
 			$DB->commit();
 		}
@@ -7511,7 +8304,7 @@ class Item extends ItemLight
 			}
 		}
 
-		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt:
+		// Save the new processing status to DB, but do not update last edited by user, slug or child custom fields:
 		$this->dbupdate( false, false, false );
 
 		return true;
@@ -7639,7 +8432,7 @@ class Item extends ItemLight
 
 		// Record that we have notified the moderators (for info only):
 		$this->set( 'notifications_flags', 'moderators_notified' );
-		// Save the new processing status to DB, but do not update last edited by user, slug or post excerpt:
+		// Save the new processing status to DB, but do not update last edited by user, slug or child custom fields:
 		$this->dbupdate( false, false, false );
 
 		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), count( $notified_user_IDs ) ), 'note', T_('Sending notifications:')  );
@@ -7728,9 +8521,10 @@ class Item extends ItemLight
 	 *                       'skip' - Skip notifications
 	 *                       'force' - Force notifications
 	 * @param boolean|string Force sending notifications for community (use same values of third param)
+	 * @param boolean|string 'cron_job' - to log messages for cron job, FALSE - to don't log
 	 * @return array Notified flags: 'members_notified', 'community_notified'
 	 */
-	function send_email_notifications( $executed_by_userid = NULL, $is_new_item = false, $already_notified_user_IDs = NULL, $force_members = false, $force_community = false )
+	function send_email_notifications( $executed_by_userid = NULL, $is_new_item = false, $already_notified_user_IDs = NULL, $force_members = false, $force_community = false, $log_messages = false )
 	{
 		global $DB, $debug, $Messages, $Debuglog;
 
@@ -7744,14 +8538,30 @@ class Item extends ItemLight
 
 		if( ! $edited_Blog->get_setting( 'allow_subscriptions' ) )
 		{	// Subscriptions not enabled!
-			$Messages->add_to_group( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return array();
 		}
 
 		if( ! $this->notifications_allowed() )
 		{	// Don't send notifications about some post/usages like "special":
 			// Note: this is a safety but this case should never happen, so don't make translators work on this:
-			$Messages->add_to_group( 'This post type/usage cannot support notifications: skipping notifications...', 'note', T_('Sending notifications:') );
+			$message = 'This post type/usage cannot support notifications: skipping notifications...';
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return array();
 		}
 
@@ -7759,27 +8569,67 @@ class Item extends ItemLight
 		{	// Don't send notifications about items with not allowed status:
 			$status_titles = get_visibility_statuses( '', array() );
 			$status_title = isset( $status_titles[ $this->get( 'status' ) ] ) ? $status_titles[ $this->get( 'status' ) ] : $this->get( 'status' );
-			$Messages->add_to_group( sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title ), 'note', T_('Sending notifications:') );
+			$message = sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title );
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return array();
 		}
 
 		if( $force_members == 'skip' && $force_community == 'skip' )
 		{	// Skip subscriber notifications because of it is forced by param:
-			$Messages->add_to_group( T_('Skipping email notifications to subscribers.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping email notifications to subscribers.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return array();
 		}
 
 		if( $force_members == 'force' && $force_community == 'force' )
 		{	// Force to members and community:
-			$Messages->add_to_group( T_('Force sending email notifications to subscribers...'), 'note', T_('Sending notifications:') );
+			$message = T_('Force sending email notifications to subscribers...');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 		elseif( $force_members == 'force' )
 		{	// Force to members only:
-			$Messages->add_to_group( T_('Force sending email notifications to subscribed members...'), 'note', T_('Sending notifications:') );
+			$message = T_('Force sending email notifications to subscribed members...');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 		elseif( $force_community == 'force' )
 		{	// Force to community only:
-			$Messages->add_to_group( T_('Force sending email notifications to other subscribers...'), 'note', T_('Sending notifications:') );
+			$message = T_('Force sending email notifications to other subscribers...');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 		else
 		{	// Check if email notifications can be sent for this item currently:
@@ -7788,7 +8638,15 @@ class Item extends ItemLight
 			// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
 			if( $this->get_type_setting( 'usage' ) != 'post' )
 			{	// Don't send outbound pings for items that are not regular posts:
-				$Messages->add_to_group( T_('This post type/usage doesn\'t need notifications by default: skipping notifications...'), 'note', T_('Sending notifications:') );
+				$message = T_('This post type/usage doesn\'t need notifications by default: skipping notifications...');
+				if( $log_messages == 'cron_job' )
+				{
+					cron_log_append( $message."\n" );
+				}
+				else
+				{
+					$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+				}
 				return array();
 			}
 		}
@@ -7817,18 +8675,42 @@ class Item extends ItemLight
 
 		if( ! $notify_members && ! $notify_community )
 		{	// Everyone has already been notified, nothing to do:
-			$Messages->add_to_group( T_('Skipping email notifications to subscribers because they were already notified.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping email notifications to subscribers because they were already notified.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return array();
 		}
 
 		if( $notify_members && $force_members == 'skip' )
 		{	// Skip email notifications to members because it is forced by param:
-			$Messages->add_to_group( T_('Skipping email notifications to subscribed members.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping email notifications to subscribed members.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			$notify_members = false;
 		}
 		if( $notify_community && $force_community == 'skip' )
 		{	// Skip email notifications to community because it is forced by param:
-			$Messages->add_to_group( T_('Skipping email notifications to other subscribers.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping email notifications to other subscribers.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			$notify_community = false;
 		}
 
@@ -7850,6 +8732,15 @@ class Item extends ItemLight
 
 		$Debuglog->add( 'Ready to send notifications to members? : '.($notify_members ? 'Yes' : 'No' ), 'notifications' );
 		$Debuglog->add( 'Ready to send notifications to community? : '.($notify_community ? 'Yes' : 'No' ), 'notifications' );
+
+		$notify_users = array();
+
+		// Get list of users who want to be notified when his login is mentioned in the item content by @user's_login:
+		$mentioned_user_IDs = get_mentioned_user_IDs( 'item', $this->get( 'content' ), $already_notified_user_IDs );
+		foreach( $mentioned_user_IDs as $mentioned_user_ID )
+		{
+			$notify_users[ $mentioned_user_ID ] = 'post_mentioned';
+		}
 
 		// Get list of users who want to be notified:
 		// TODO: also use extra cats/blogs??
@@ -7887,7 +8778,7 @@ class Item extends ItemLight
 					LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
 					LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
 					LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
-					LEFT JOIN T_users ON ( user_ID = sub_user_ID )
+					LEFT JOIN T_users ON ( user_ID = sug_user_ID )
 					WHERE opt.cset_coll_ID = '.$this->get_blog_ID().'
 						AND opt.cset_name = "opt_out_subscription"
 						AND opt.cset_value = 1
@@ -7922,24 +8813,35 @@ class Item extends ItemLight
 			$sql .= ' AND user_ID != '.$DB->quote( $executed_by_userid );
 		}
 
-		$notify_users = $DB->get_col( $sql, 0, 'Get users to be notified', 0, 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
+		$notify_list = $DB->get_col( $sql, 0, 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
 
-		$Debuglog->add( 'Number of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID().' = '.count($notify_users), 'notifications' );
-		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice($notify_users, 0, 10) ), 'notifications' );
+		// Preprocess list:
+		foreach( $notify_list as $notify_user_ID )
+		{
+			if( ! isset( $notify_users[ $notify_user_ID ] ) )
+			{	// Don't rewrite a notify type if user already is notified by other type before:
+				$notify_users[ $notify_user_ID ] = 'subscription';
+			}
+		}
+
+		$notify_user_IDs = array_keys( $notify_users );
+
+		$Debuglog->add( 'Number of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID().' = '.count( $notify_users ), 'notifications' );
+		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice( $notify_user_IDs, 0, 10 ) ), 'notifications' );
 
 		// Load all users who will be notified:
 		$UserCache = & get_UserCache();
-		$UserCache->load_list( $notify_users );
+		$UserCache->load_list( $notify_user_IDs );
 
 		$members_count = 0;
 		$community_count = 0;
-		foreach( $notify_users as $u => $user_ID )
+		foreach( $notify_users as $user_ID => $notify_type )
 		{	// Check for each subscribed User, if we can send a notification to him depending on current request and Item settings:
 
 			if( ! ( $notify_User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
 			{	// Invalid User, Skip it:
 				$Debuglog->add( 'User #'.$user_ID.' is invalid.', 'notifications'  );
-				unset( $notify_users[ $u ] );
+				unset( $notify_users[ $user_ID ] );
 				continue;
 			}
 
@@ -7966,7 +8868,7 @@ class Item extends ItemLight
 				else
 				{	// Skip not member:
 					$Debuglog->add( 'User #'.$user_ID.' is a not a member but at this time, we only want to notify members.', 'notifications'  );
-					unset( $notify_users[ $u ] );
+					unset( $notify_users[ $user_ID ] );
 				}
 			}
 			else
@@ -7978,21 +8880,37 @@ class Item extends ItemLight
 				else
 				{	// Skip member:
 					$Debuglog->add( 'User #'.$user_ID.' is a member but we at this time, we only want to notify community.', 'notifications'  );
-					unset( $notify_users[ $u ] );
+					unset( $notify_users[ $user_ID ] );
 				}
 			}
 		}
 
-		$Debuglog->add( 'Number of users who are allowed to be notified about new items on colection #'.$this->get_blog_ID().' = '.count($notify_users), 'notifications' );
-		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice($notify_users, 0, 10) ), 'notifications' );
+		$Debuglog->add( 'Number of users who are allowed to be notified about new items on colection #'.$this->get_blog_ID().' = '.count( $notify_users ), 'notifications' );
+		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice( $notify_user_IDs, 0, 10 ) ), 'notifications' );
 
 		if( $notify_members )
 		{	// Display a message to know how many members are notified:
-			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), 'note', T_('Sending notifications:') );
+			$message = sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count );
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 		if( $notify_community )
 		{	// Display a message to know how many community users are notified:
-			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), 'note', T_('Sending notifications:') );
+			$message = sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count );
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 
 		if( empty( $notify_users ) )
@@ -8006,11 +8924,12 @@ class Item extends ItemLight
 		$this->get_creator_User();
 
 		// Load a list with the blocked emails in cache:
-		load_blocked_emails( $notify_users );
+		load_blocked_emails( $notify_user_IDs );
 
 		// Send emails:
+		$notified_users_num = 0;
 		$cache_by_locale = array();
-		foreach( $notify_users as $user_ID )
+		foreach( $notify_users as $user_ID => $notify_type )
 		{
 			$notify_User = & $UserCache->get_by_ID( $user_ID, false, false );
 			if( empty( $notify_User ) )
@@ -8042,7 +8961,7 @@ class Item extends ItemLight
 					'notify_full'    => $notify_full,
 					'Item'           => $this,
 					'recipient_User' => $notify_User,
-					'notify_type'    => 'subscription',
+					'notify_type'    => $notify_type,
 					'is_new_item'    => $is_new_item,
 				);
 
@@ -8052,12 +8971,30 @@ class Item extends ItemLight
 				echo "<p>Sending notification to $notify_email:<pre>$message_content</pre>";
 			}
 
-			send_mail_to_User( $user_ID, $cache_by_locale[$notify_locale]['subject'], 'post_new', $email_template_params );
+			if( send_mail_to_User( $user_ID, $cache_by_locale[$notify_locale]['subject'], 'post_new', $email_template_params ) )
+			{
+				$notified_users_num++;
+				if( $log_messages == 'cron_job' )
+				{	// Log success mail sending for cron job:
+					cron_log_action_end( 'User '.$notify_User->get_identity_link().' has been notified' );
+				}
+			}
+			elseif( $log_messages == 'cron_job' )
+			{	// Log failed mail sending for cron job:
+				global $mail_log_message;
+				cron_log_action_end( 'User '.$notify_User->get_identity_link().' could not be notified because of error: '
+					.'"'.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'"', 'warning' );
+			}
 
 			blocked_emails_memorize( $notify_User->email );
 		}
 
-		blocked_emails_display();
+		blocked_emails_display( $log_messages );
+
+		if( $log_messages == 'cron_job' )
+		{	// Log how much users were really notified:
+			cron_log_append( sprintf( '%d of %d users have been notified!', $notified_users_num, count( $notify_users ) ) );
+		}
 
 		return $notified_flags;
 	}
@@ -8070,41 +9007,82 @@ class Item extends ItemLight
 	 *                       false - Auto mode depending on current item statuses
 	 *                       'skip' - Skip notifications
 	 *                       'force' - Force notifications
+	 * @param boolean|string 'cron_job' - to log messages for cron job, FALSE - to don't log
 	 * @return boolean TRUE on success
 	 */
-	function send_outbound_pings( $force_pings = false )
+	function send_outbound_pings( $force_pings = false, $log_messages = false )
 	{
 		global $Plugins, $baseurl, $Messages, $evonetsrv_host, $allow_post_pings_on_localhost;
 
 		if( ! $this->notifications_allowed() )
 		{	// Don't send pings about some post/usages like "special":
 			// Note: this is a safety but this case should never happen, so don't make translators work on this:
-			$Messages->add_to_group( 'This post type/usage cannot support pings: skipping pings...', 'note', T_('Sending notifications:') );
+			$message = 'This post type/usage cannot support pings: skipping pings...';
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return false;
 		}
 
 		if( $this->get( 'status' ) != 'published' )
 		{	// Don't send pings if item is not 'public':
-			$Messages->add_to_group( T_('Skipping outbound pings because item is not published yet.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping outbound pings because item is not published yet.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return false;
 		}
 
 		if( $force_pings == 'skip' )
 		{	// Skip pings because it is forced by param:
-			$Messages->add_to_group( T_('Skipping outbound pings.'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping outbound pings.');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return false;
 		}
 
 		if( $force_pings == 'force' )
 		{	// Force pings:
-			$Messages->add_to_group( T_('Force sending outbound pings...'), 'note', T_('Sending notifications:') );
+			$message = T_('Force sending outbound pings...');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 		}
 		else
 		{	// Check if pings can be sent for this item currently:
 
 			if( $this->check_notifications_flags( 'pings_sent' ) )
 			{	// Don't send pings if they have already been sent:
-				$Messages->add_to_group( T_('Skipping outbound pings because they were already sent.'), 'note', T_('Sending notifications:') );
+				$message = T_('Skipping outbound pings because they were already sent.');
+				if( $log_messages == 'cron_job' )
+				{
+					cron_log_append( $message."\n" );
+				}
+				else
+				{
+					$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+				}
 				return false;
 			}
 
@@ -8112,7 +9090,15 @@ class Item extends ItemLight
 			// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
 			if( $this->get_type_setting( 'usage' ) != 'post' )
 			{	// Don't send outbound pings for items that are not regular posts:
-				$Messages->add_to_group( T_('This post type/usage doesn\'t need pings by default: skipping pings...'), 'note', T_('Sending notifications:') );
+				$message = T_('This post type/usage doesn\'t need pings by default: skipping pings...');
+				if( $log_messages == 'cron_job' )
+				{
+					cron_log_append( $message."\n" );
+				}
+				else
+				{
+					$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+				}
 				return false;
 			}
 		}
@@ -8125,12 +9111,28 @@ class Item extends ItemLight
 		    ( preg_match( '#^http://localhost[/:]#', $baseurl ) ||
 		      preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) ) /* domain ending in ".local" */
 		{	// Don't send pings from localhost:
-			$Messages->add_to_group( T_('Skipping pings (Running on localhost).'), 'note', T_('Sending notifications:') );
+			$message = T_('Skipping pings (Running on localhost).');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 			return false;
 		}
 		else
 		{	// Send pings:
-			$Messages->add_to_group( T_('Trying to find plugins for sending outbound pings...'), 'note', T_('Sending notifications:') );
+			$message = T_('Trying to find plugins for sending outbound pings...');
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n" );
+			}
+			else
+			{
+				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
+			}
 
 			load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 
@@ -8140,13 +9142,13 @@ class Item extends ItemLight
 
 			foreach( $ping_plugins as $plugin_code )
 			{
-				$Plugin = & $Plugins->get_by_code($plugin_code);
+				$Plugin = & $Plugins->get_by_code( $plugin_code );
 
 				if( $Plugin )
 				{
 					$ping_messages = array();
 					$ping_messages[] = array(
-						'message' => sprintf( T_('Pinging %s...'), $Plugin->ping_service_name ),
+						'message' => isset( $Plugin->ping_service_process_message ) ? $Plugin->ping_service_process_message : sprintf( /* TRANS: %s is a ping service name */ T_('Pinging %s...'), $Plugin->ping_service_name ),
 						'type' => 'note' );
 					$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
 
@@ -8209,7 +9211,14 @@ class Item extends ItemLight
 						}
 						else
 						{
-							$Messages->add_to_group( $current_message, $current_type, $current_title );
+							if( $log_messages == 'cron_job' )
+							{
+								cron_log_append( $current_message."\n", $current_type );
+							}
+							else
+							{
+								$Messages->add_to_group( $current_message, $current_type, $current_title );
+							}
 							$current_message = $loop_message;
 							$current_type = $loop_type;
 							$current_title = $loop_title;
@@ -8218,7 +9227,14 @@ class Item extends ItemLight
 
 					if( !empty( $current_message ) )
 					{ // Display last message
-						$Messages->add_to_group( $current_message, $current_type, $current_title );
+						if( $log_messages == 'cron_job' )
+						{
+							cron_log_append( $current_message."\n", $current_type );
+						}
+						else
+						{
+							$Messages->add_to_group( $current_message, $current_type, $current_title );
+						}
 					}
 				}
 			}
@@ -8244,7 +9260,7 @@ class Item extends ItemLight
 
 			case 'title':
 			case 'item_title':
-				return $this->title;
+				return $this->get( 'title' );
 
 			case 'excerpt':
 				return $this->get_excerpt();
@@ -8321,6 +9337,10 @@ class Item extends ItemLight
 			case 'notifications_flags':
 				return empty( $this->notifications_flags ) ? array() : explode( ',', $this->notifications_flags );
 
+			case 'order':
+				// Get item order in main category:
+				return $this->get_order();
+
 			case 'title':
 			case 'content':
 			case 'status':
@@ -8328,6 +9348,79 @@ class Item extends ItemLight
 		}
 
 		return parent::get( $parname );
+	}
+
+
+	/**
+	 * Load item orders per categories
+	 */
+	function load_orders()
+	{
+		if( ! isset( $this->orders ) && $this->ID > 0 )
+		{	// Initialize item orders in all assigned categories:
+			global $DB;
+			$SQL = new SQL( 'Get all orders per categories of Item #'.$this->ID );
+			$SQL->SELECT( 'postcat_cat_ID, postcat_order' );
+			$SQL->FROM( 'T_postcats' );
+			$SQL->WHERE( 'postcat_post_ID = '.$this->ID );
+			$this->orders = $DB->get_assoc( $SQL );
+		}
+	}
+
+
+	/**
+	 * Get item order per category
+	 *
+	 * @param integer Category ID, NULL - for main category
+	 * @return double|NULL Order or NULL if an order is not defined for requested category
+	 */
+	function get_order( $cat_ID = NULL )
+	{
+		$this->load_orders();
+
+		if( $cat_ID === NULL )
+		{	// Use main category:
+			$cat_ID = $this->get( 'main_cat_ID' );
+		}
+
+		return isset( $this->orders[ $cat_ID ] ) ? $this->orders[ $cat_ID ] : NULL;
+	}
+
+
+	/**
+	 * Update item order per category
+	 *
+	 * @param double New order value
+	 * @param integer Category ID, NULL - for main category
+	 * @return boolean 
+	 */
+	function update_order( $order, $cat_ID = NULL )
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// Item must be created:
+			return false;
+		}
+
+		if( $cat_ID === NULL )
+		{	// Use main category:
+			$cat_ID = $this->get( 'main_cat_ID' );
+		}
+
+		// Change order to correct value:
+		$order = ( $order === '' || $order === NULL ? NULL : floatval( $order ) );
+
+		// Insert/Update order per category:
+		$r = $DB->query( 'REPLACE INTO T_postcats ( postcat_post_ID, postcat_cat_ID, postcat_order )
+			VALUES ( '.$this->ID.', '.intval( $cat_ID ).', '.$DB->quote( $order ).' ) ' );
+
+		if( $r )
+		{	// Update last touched date:
+			$this->update_last_touched_date();
+		}
+
+		return $r;
 	}
 
 
@@ -8507,24 +9600,30 @@ class Item extends ItemLight
 	 */
 	function get_slugs( $separator = ', ' )
 	{
-		if( empty( $this->ID ) )
-		{ // New creating Item
-			return $this->get('urltitle');
+		if( ! isset( $this->slugs ) )
+		{	// Initialize item slugs:
+			if( empty( $this->ID ) )
+			{	// Get creating Item:
+				//return $this->get( 'urltitle' );
+				$this->slugs = array();
+			}
+			else
+			{	// Load slugs from DB once:
+				global $DB;
+				$SQL = new SQL( 'Get slugs of the Item #'.$this->ID );
+				$SQL->SELECT( 'slug_title, IF( slug_ID = '.intval( $this->canonical_slug_ID ).', 0, slug_ID ) AS slug_order_num' );
+				$SQL->FROM( 'T_slug' );
+				$SQL->WHERE( 'slug_itm_ID = '.$DB->quote( $this->ID ) );
+				if( ! empty( $this->tiny_slug_ID ) )
+				{	// Exclude tiny slug from list:
+					$SQL->WHERE_and( 'slug_ID != '.$DB->quote( $this->tiny_slug_ID ) );
+				}
+				$SQL->ORDER_BY( 'slug_order_num' );
+				$this->slugs = $DB->get_col( $SQL );
+			}
 		}
 
-		global $DB;
-		$SQL = new SQL( 'Get slugs of the Item' );
-		$SQL->SELECT( 'slug_title, IF( slug_ID = '.intval( $this->canonical_slug_ID ).', 0, slug_ID ) AS slug_order_num' );
-		$SQL->FROM( 'T_slug' );
-		$SQL->WHERE( 'slug_itm_ID = '.$DB->quote( $this->ID ) );
-		if( !empty( $this->tiny_slug_ID ) )
-		{ // Exclude tiny slug from list
-			$SQL->WHERE_and( 'slug_ID != '.$DB->quote( $this->tiny_slug_ID ) );
-		}
-		$SQL->ORDER_BY( 'slug_order_num' );
-		$slugs = $DB->get_col( $SQL );
-
-		return implode( $separator, $slugs );
+		return implode( $separator, $this->slugs );
 	}
 
 
@@ -8661,9 +9760,10 @@ class Item extends ItemLight
 	 * Get the latest Comment on this Item
 	 *
 	 * @param array|NULL Restrict comments selection with statuses, NULL - to select only allowed statuses for current User
+	 * @param string Type of the latest comment: NULL|'date' - latest added comment, 'last_touched_ts' - latest touched comment
 	 * @return Comment
 	 */
-	function & get_latest_Comment( $statuses = NULL )
+	function & get_latest_Comment( $statuses = NULL, $order_date_type = NULL )
 	{
 		global $DB;
 
@@ -8688,7 +9788,14 @@ class Item extends ItemLight
 			{	// Restrict with given comment statuses:
 				$SQL->WHERE_and( 'comment_status IN ( '.$DB->quote( $statuses ).' )' );
 			}
-			$SQL->ORDER_BY( 'comment_date DESC' );
+			if( $order_date_type == 'last_touched_ts' )
+			{	// Get the latest touched comment:
+				$SQL->ORDER_BY( 'comment_last_touched_ts DESC, comment_ID DESC' );
+			}
+			else
+			{	// Get the latest added comment:
+				$SQL->ORDER_BY( 'comment_date DESC, comment_ID DESC' );
+			}
 			$SQL->LIMIT( '1' );
 
 			if( $comment_ID = $DB->get_var( $SQL ) )
@@ -9183,14 +10290,14 @@ class Item extends ItemLight
 		$this->set( 'title', $Revision->iver_title );
 		$this->set( 'content', $Revision->iver_content );
 
-		if( $this->get_type_setting( 'use_custom_fields' ) )
-		{	// Update custom fields if item type allows them:
-			$custom_fields = $this->get_type_custom_fields();
+		$custom_fields = $this->get_type_custom_fields();
+		if( count( $custom_fields ) )
+		{	// Update custom fields if item type has them:
 			// Switch to the requested revision:
 			$this->set( 'revision', $Revision->param_ID );
 			foreach( $custom_fields as $custom_field )
 			{
-				$this->set_setting( 'custom_'.$custom_field['type'].'_'.$custom_field['ID'], $this->get_custom_field_value( $custom_field['name'] ) );
+				$this->set_setting( 'custom:'.$custom_field['name'], $this->get_custom_field_value( $custom_field['name'] ) );
 			}
 		}
 
@@ -9372,8 +10479,9 @@ class Item extends ItemLight
 	 * @param boolean Use transaction
 	 * @param boolean Use TRUE to update item field last_touched_ts
 	 * @param boolean Use TRUE to update item field contents_last_updated_ts
+	 * @param boolean do we want to auto track the mod date?
 	 */
-	function update_last_touched_date( $use_transaction = true, $update_last_touched_ts = true, $update_contents_last_updated_ts = false )
+	function update_last_touched_date( $use_transaction = true, $update_last_touched_ts = true, $update_contents_last_updated_ts = false, $auto_track_modification = false )
 	{
 		if( $use_transaction )
 		{
@@ -9391,7 +10499,7 @@ class Item extends ItemLight
 			{	// Update field contents_last_updated_ts:
 				$this->set_contents_last_updated_ts();
 			}
-			$this->dbupdate( false, false, false );
+			$this->dbupdate( $auto_track_modification, false, false );
 		}
 
 		// Also update last touched date of all categories of this Item
@@ -9647,16 +10755,9 @@ class Item extends ItemLight
 		}
 
 		// Set titles by Blog type:
-		if( $this->Blog->get( 'type' ) == 'forum' )
-		{
-			$title_new = T_('New topic');
-			$title_updated = T_('Updated topic');
-		}
-		else
-		{
-			$title_new = T_('New post');
-			$title_updated = T_('Updated post');
-		}
+		$this->get_ItemType();
+		$title_new = $this->ItemType->get_item_denomination( 'title_new' );
+		$title_updated = $this->ItemType->get_item_denomination( 'title_updated' );
 
 		// Merge params
 		$params = array_merge( array(
@@ -9795,7 +10896,7 @@ class Item extends ItemLight
 	/**
 	 * Get custom fields of post type
 	 *
-	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url'. Use comma separator to get several types
+	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url', 'image', 'computed', 'separator'. Use comma separator to get several types
 	 * @param boolean TRUE to force use custom fields of current version instead of revision
 	 * @return array
 	 */
@@ -9811,7 +10912,10 @@ class Item extends ItemLight
 				{	// Get the custom fields from DB:
 					global $DB;
 					$SQL = new SQL( 'Get custom fields of revision #'.$Revision->iver_ID.'('.$Revision->iver_type.') for Item #'.$this->ID );
-					$SQL->SELECT( 'ivcf_itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, ivcf_itcf_label AS label, IFNULL( itcf_name, CONCAT( "!deleted_", ivcf_itcf_ID ) ) AS name, itcf_type AS type, IFNULL( itcf_order, 999999999 ) AS `order`, itcf_note AS note' );
+					$SQL->SELECT( 'ivcf_itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, ivcf_itcf_label AS label, IFNULL( itcf_name, CONCAT( "!deleted_", ivcf_itcf_ID ) ) AS name, itcf_type AS type, IFNULL( itcf_order, 999999999 ) AS `order`, itcf_note AS note, ' );
+					$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
+					$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
+					$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge' );
 					$SQL->FROM( 'T_items__version_custom_field' );
 					$SQL->FROM_add( 'LEFT JOIN T_items__type_custom_field ON ivcf_itcf_ID = itcf_ID' );
 					$SQL->WHERE_and( 'ivcf_iver_ID = '.$DB->quote( $Revision->iver_ID ) );
@@ -9938,8 +11042,9 @@ class Item extends ItemLight
 	 */
 	function & get_parent_Item()
 	{
-		if( ! empty( $this->parent_Item ) )
-		{	// Return the initialized parent Item:
+		if( ! empty( $this->parent_Item ) &&
+		    $this->parent_Item->ID == $this->parent_ID )
+		{	// Return the initialized parent Item and if it is really parent of this Item:
 			return $this->parent_Item;
 		}
 
@@ -10161,7 +11266,7 @@ class Item extends ItemLight
 	 */
 	function get_flag( $params = array() )
 	{
-		global $current_User, $cache_items_flag_displayed;
+		global $current_User;
 
 		$params = array_merge( array(
 				'before'       => '',
@@ -10169,20 +11274,11 @@ class Item extends ItemLight
 				'title_flag'   => T_('Click to flag this.'),
 				'title_unflag' => T_('You have flagged this. Click to remove flag.'),
 				'only_flagged' => false, // Display the flag button only when this item is already flagged by current User
+				'allow_toggle' => true, // Allow to toggle flag state by AJAX
 			), $params );
 
 		if( ! $this->can_flag() )
 		{	// Don't display the flag button if it is not allowed by some reason:
-			return '';
-		}
-
-		if( ! isset( $cache_items_flag_displayed ) || ! is_array( $cache_items_flag_displayed ) )
-		{	// Initialize array to cache what items flags have been displayed for:
-			$cache_items_flag_displayed = array();
-		}
-
-		if( in_array( $this->ID, $cache_items_flag_displayed ) )
-		{	// Don't display the flag button because it has been already displayed before of the current page:
 			return '';
 		}
 
@@ -10198,7 +11294,9 @@ class Item extends ItemLight
 
 		$r = $params['before'];
 
-		$r .= '<a href="#" data-id="'.$this->ID.'" data-coll="'.$item_Blog->get( 'urlname' ).'" class="action_icon evo_post_flag_btn">'
+		if( $params['allow_toggle'] )
+		{	// Allow to toggle:
+			$r .= '<a href="#" data-id="'.$this->ID.'" data-coll="'.$item_Blog->get( 'urlname' ).'" class="action_icon evo_post_flag_btn">'
 				.get_icon( 'flag_on', 'imgtag', array(
 					'title' => $params['title_flag'],
 					'style' => $is_flagged ? '' : 'display:none',
@@ -10208,11 +11306,17 @@ class Item extends ItemLight
 					'style' => $is_flagged ? 'display:none' : '',
 				) )
 			.'</a>';
+		}
+		else
+		{	// Display only current flag state as icon:
+			$r .= '<span class="action_icon evo_post_flag_btn">'
+				.get_icon( ( $is_flagged ? 'flag_on' : 'flag_off' ), 'imgtag', array(
+						'title' => ( $is_flagged ? $params['title_flag'] : $params['title_unflag'] ),
+					) )
+				.'</span>';
+		}
 
 		$r .= $params['after'];
-
-		// Cache this to don't display flag twice for the same item on the same page:
-		$cache_items_flag_displayed[] = $this->ID;
 
 		return $r;
 	}
@@ -10257,6 +11361,9 @@ class Item extends ItemLight
 		}
 
 		$this->set_user_data( 'item_flag', $new_flag_value );
+
+		// Invalidate key for the Item data per current User:
+		BlockCache::invalidate_key( 'item_user_flag_'.$this->ID, $current_User->ID );
 
 		$DB->commit();
 	}
@@ -10697,12 +11804,14 @@ class Item extends ItemLight
 		}
 
 		$params = array_merge( array(
-				'glue' => '&amp;'
+				'glue' => '&amp;',
+				'type' => 'touch', // What comment date use to update: 'touch' - 'comment_last_touched_ts', 'create' - 'comment_date'
 			), $params );
 
 		$url = get_htsrv_url().'action.php?mname=collections'.$params['glue']
 			.'action=refresh_contents_last_updated'.$params['glue']
 			.'item_ID='.$this->ID.$params['glue']
+			.( $params['type'] != 'touch' ? 'type='.$params['type'].$params['glue'] : '' )
 			.url_crumb( 'collections_refresh_contents_last_updated' );
 
 		return $url;
@@ -10733,7 +11842,7 @@ class Item extends ItemLight
 
 		if( $params['title'] == '#' )
 		{	// Use default title
-			$params['title'] = T_('Refresh "contents last updated" timestamp!');
+			$params['title'] = T_('Reset the "contents last updated" date to the latest content change on this thread');
 		}
 
 		$params['text'] = utf8_trim( $params['text'] );
@@ -10758,34 +11867,163 @@ class Item extends ItemLight
 	/**
 	 * Refresh contents last updated ts with date of the latest Comment
 	 *
+	 * @param boolean TRUE to display messages
+	 * @param string Field name(without prefix "comment_") of the latest comment which should be used to refresh the post date column: 'date', 'last_touched_ts'
+	 * @param string What post and comment date fields use to refresh:
+	                   'touched' - 'post_datemodified', 'comment_last_touched_ts' (Default)
+	                   'created' - 'post_datestart', 'comment_date'
 	 * @return boolean TRUE of success
 	 */
-	function refresh_contents_last_updated_ts()
+	function refresh_contents_last_updated_ts( $display_messages = false, $date_type = 'touched' )
 	{
 		if( ! $this->can_refresh_contents_last_updated() )
 		{	// If current User has no permission to refresh a contents last updated date of the requested Item:
 			return false;
 		}
 
+		global $DB, $Messages;
+
 		// Clear latest Comment from previous calling before Comment updating:
 		$this->latest_Comment = NULL;
 
-		if( $latest_Comment = & $this->get_latest_Comment( get_inskin_statuses( $this->get_blog_ID(), 'comment' ) ) )
-		{	// Use date from the latest public Comment:
-			$new_contents_last_updated_ts = $latest_Comment->get( 'last_touched_ts' );
+		if( $date_type == 'created' )
+		{	// Use dates for 'created' mode:
+			$post_date_field = 'datestart';
+			$comment_date_field = 'date';
 		}
 		else
-		{	// Use date from issue date of this Item:
-			$new_contents_last_updated_ts = $this->get( 'datestart' );
+		{	// Use dates for 'touched' mode:
+			$post_date_field = 'datemodified';
+			$comment_date_field = 'last_touched_ts';
 		}
 
-		global $DB;
+		if( $latest_Comment = & $this->get_latest_Comment( get_inskin_statuses( $this->get_blog_ID(), 'comment' ), $comment_date_field ) )
+		{	// Use date from the latest public Comment:
+			$new_contents_last_updated_ts = $latest_Comment->get( $comment_date_field );
+			if( $display_messages )
+			{	// Display message:
+				$Messages->add( sprintf(
+						( $date_type == 'created'
+							? T_('"Contents last updated" timestamp has been refreshed using <a %s>most recently added comment</a> date = %s.')
+							: T_('"Contents last updated" timestamp has been refreshed using <a %s>most recently touched comment</a> date = %s.')
+						),
+						'href="'.$latest_Comment->get_permanent_url().'"',
+						mysql2localedatetime( $new_contents_last_updated_ts )
+					), 'success' );
+			}
+		}
+		else
+		{	// Use date from issue date of this Item when it has no comments yet:
+			$new_contents_last_updated_ts = $this->get( $post_date_field );
+			if( $display_messages )
+			{	// Display message:
+				$Messages->add( sprintf(
+						( $date_type == 'created'
+							? T_('"Contents last updated" timestamp has been refreshed using post issue date = %s.')
+							: T_('"Contents last updated" timestamp has been refreshed using post modified date = %s.')
+						),
+						mysql2localedatetime( $new_contents_last_updated_ts )
+					), 'success' );
+			}
+		}
 
 		$DB->query( 'UPDATE T_items__item
 					SET post_contents_last_updated_ts = '.$DB->quote( $new_contents_last_updated_ts ).'
 				WHERE post_ID = '.$this->ID );
 
 		return true;
+	}
+
+
+	/**
+	 * Get image file used for social media
+	 *
+	 * @param boolean Use category social media boiler plate or category image as fallback
+	 * @param boolean Use site social media boiler plate or site logo as fallback
+	 * @return object Image File or Link object
+	 */
+	function get_social_media_image( $use_category_fallback = false, $use_site_fallback = false, $return_as_link = false )
+	{
+		if( ! empty( $this->social_media_image_File ) && ! $return_as_link )
+		{
+			return $this->social_media_image_File;
+		}
+
+		$LinkOwner = new LinkItem( $this );
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink,inline', 'image', array(
+				'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
+				'sql_order_by'   => 'link_priority ASC, link_order ASC' ) ) )
+		{ // Item has linked files
+			while( $Link = & $LinkList->get_next() )
+			{
+				if( ! ( $File = & $Link->get_File() ) )
+				{ // No File object
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+					continue;
+				}
+
+				if( ! $File->exists() )
+				{ // File doesn't exist
+					global $Debuglog;
+					$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+					continue;
+				}
+
+				if( $File->is_image() )
+				{ // Use only image files for og:image tag
+					$this->social_media_image_File = $File;
+					if( $return_as_link )
+					{
+						return $Link;
+					}
+					break;
+				}
+			}
+		}
+
+		if( empty( $this->social_media_image_File ) && $use_category_fallback )
+		{
+			$FileCache = & get_FileCache();
+			if( $default_Chapter = & $this->get_main_Chapter() )
+			{ // Try social media boilerplate image
+				$social_media_image_file_ID = $default_Chapter->get( 'social_media_image_file_ID', false );
+				if( $social_media_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) ) && $File->is_image() )
+				{
+					$this->social_media_image_File = $File;
+				}
+				else
+				{ // Try category image
+					$cat_image_file_ID = $default_Chapter->get( 'image_file_ID', false );
+					if( $cat_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $cat_image_file_ID ) ) && $File->is_image() )
+					{
+						$this->social_media_image_File = $File;
+					}
+				}
+			}
+		}
+
+		if( empty( $this->social_media_image_File ) && $use_site_fallback )
+		{ // Use social media boilerplate logo if configured
+			global $Settings;
+
+			$FileCache = & get_FileCache();
+			$social_media_image_file_ID = intval( $Settings->get( 'social_media_image_file_ID' ) );
+			if( $social_media_image_file_ID > 0 && ( $File = $FileCache->get_by_ID( $social_media_image_file_ID, false ) ) && $File->is_image() )
+			{
+				$this->social_media_image_File = $File;
+			}
+			else
+			{ // Use site logo as fallback if configured
+				$notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
+				if( $notification_logo_file_ID > 0 && ( $File = $FileCache->get_by_ID( $notification_logo_file_ID, false ) ) && $File->is_image() )
+				{
+					$this->social_media_image_File = $File;
+				}
+			}
+		}
+
+		return $this->social_media_image_File;
 	}
 
 
@@ -10916,6 +12154,60 @@ class Item extends ItemLight
 
 
 	/**
+	 * Check if current user can create new proposed change
+	 *
+	 * @param boolean TRUE to redirect back if current user cannot create a proposed change
+	 * @return boolean
+	 */
+	function check_proposed_change( $redirect = false )
+	{
+		global $current_User, $Messages;
+
+		if( ! is_logged_in() )
+		{	// User must be logged in:
+			if( $redirect )
+			{	// Redirect back to previous page
+				header_redirect();
+			}
+			return false;
+		}
+
+		if( ! $current_User->check_perm( 'blog_item_propose', 'edit', false, $this->get_blog_ID() ) )
+		{	// User has no right to propose a change for this Item:
+
+			// Display a message:
+			// NOTE: Do NOT translate this because it should not be displayed from normal UI:
+			$Messages->add( 'You don\'t have a permission to propose a change for the Item.', 'error' );
+
+			if( $redirect )
+			{	// Redirect back to previous page
+				header_redirect();
+			}
+			return false;
+		}
+
+		if( ( $last_proposed_Revision = $this->get_revision( 'last_proposed' ) ) &&
+		    $last_proposed_Revision->iver_edit_user_ID != $current_User->ID )
+		{	// Don't allow to propose when previous proposition was created by another user:
+			$UserCache = & get_UserCache();
+			$User = & $UserCache->get_by_ID( $last_proposed_Revision->iver_edit_user_ID, false, false );
+
+			// Display a message:
+			$Messages->add( sprintf( T_('You cannot currently propose a change because previous changes by %s are pending review.'),
+				( $User ? $User->get_identity_link() : '<span class="user deleted">'.T_('Deleted user').'</span>' ) ), 'error' );
+
+			if( $redirect )
+			{	// Redirect back to previous page
+				header_redirect();
+			}
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * Create a new proposed change
 	 *
 	 * @return integer/boolean ID of created item revision if successful, otherwise False
@@ -10928,9 +12220,6 @@ class Item extends ItemLight
 		{	// Item must be created and current user must be logged in:
 			return false;
 		}
-
-		// START of loading the proposed change this this Item from request:
-		$this->set( 'status', param( 'post_status', 'string', 'published' ) );
 
 		if( $this->get_type_setting( 'allow_html' ) )
 		{	// HTML is allowed for this post, we'll accept HTML tags:
@@ -10986,12 +12275,6 @@ class Item extends ItemLight
 
 		$DB->begin( 'SERIALIZABLE' );
 
-		if( isset( $this->previous_status ) )
-		{	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
-			// (ONLY if current request is updating item status)
-			$this->restrict_status( true );
-		}
-
 		// Get next version ID:
 		$iver_ID = $this->get_next_version_ID( 'proposed' );
 	
@@ -11016,7 +12299,7 @@ class Item extends ItemLight
 					.$this->ID.', '
 					.$DB->quote( $custom_field['ID'] ).','
 					.$DB->quote( $custom_field['label'] ).','
-					.$DB->quote( $this->get_custom_field_value( $custom_field['name'], false, false ) ).' )';
+					.$DB->quote( $this->get_setting( 'custom:'.$custom_field['name'] ) ).' )';
 			}
 			$result = $DB->query( 'INSERT INTO T_items__version_custom_field ( ivcf_iver_ID, ivcf_iver_type, ivcf_iver_itm_ID, ivcf_itcf_ID, ivcf_itcf_label, ivcf_value )
 				VALUES '.implode( ', ', $custom_fields_insert_sql ),

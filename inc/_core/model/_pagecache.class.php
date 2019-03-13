@@ -229,7 +229,13 @@ class PageCache
 			return false;
 		}
 
-		if( $disp == 'login' || $disp == 'access_requires_login' || $disp == 'register' || $disp == 'lostpassword' || $disp == 'anonpost' )
+		if( $disp == '403' )
+		{	// We do NOT want caching for 403 pages (illimited possibilities!)
+			$Debuglog->add( 'Never cache 403s!', 'pagecache' );
+			return false;
+		}
+
+		if( in_array( $disp, array( 'login', 'access_requires_login', 'content_requires_login', 'register', 'lostpassword', 'anonpost' ) ) )
 		{	// We do NOT want caching for in-skin login, register, lostpassord pages and new item anonymous form:
 			$Debuglog->add( 'Never cache the in-skin login, register and anonymous new item pages!', 'pagecache' );
 			return false;

@@ -168,13 +168,13 @@ ol.breadcrumb {
 .forums_list .ft_status_topic .fa.fa-comments {
   color: #000000;
 }
-.forums_list .ft_status_topic .fa.fa-comments.updated {
+.forums_list .ft_status_topic .fa.updated {
   color: #990000;
 }
-.forums_list .ft_status_topic .fa.fa-comments.new {
+.forums_list .ft_status_topic .fa.new {
   color: #FF6600;
 }
-.forums_list .ft_status_topic .fa.fa-comments:hover {
+.forums_list .ft_status_topic .fa:hover {
   color: inherit;
 }
 .forums_list .ft_count {
@@ -344,6 +344,12 @@ ol.breadcrumb {
 .evo_comment_title a.permalink:hover {
   color: #23527c;
 }
+.evo_comment_title .label {
+  display: inline-block;
+  padding-top: .3em;
+  position: relative;
+  top: -1px;
+}
 .bCommentAvatar {
   border-radius: 50%;
   float: left;
@@ -391,10 +397,10 @@ ol.breadcrumb {
 .legend-item .fa.fa-comments {
   color: #000000;
 }
-.legend-item .fa.fa-comments.updated {
+.legend-item .fa.updated {
   color: #990000;
 }
-.legend-item .fa.fa-comments.new {
+.legend-item .fa.new {
   color: #FF6600;
 }
 ul.legend {
@@ -486,15 +492,35 @@ ul.legend span.note {
 .evo_panel__register {
   max-width: 580px;
 }
-.evo_panel__register .control-buttons {
-  text-align: left;
-}
-.evo_panel__register.register-disabled {
-  width: 350px;
-}
 .evo_panel__register .form-control#country,
 .evo_panel__register .form-control#u {
   width: 100%;
+}
+.evo_panel__register #fieldset_wrapper_captcha_qstn .panel {
+  margin: 0;
+}
+.evo_panel__register #fieldset_wrapper_captcha_qstn .panel div[id$=_answer] .control-label {
+  padding-right: 14px;
+}
+.evo_panel__register .panel-body {
+  padding: 15px;
+}
+.evo_panel__register .panel-body p:last-child {
+  margin-bottom: 0;
+}
+@media (min-width: 768px) {
+  #fieldset_wrapper_captcha_qstn .panel div[id$=_answer] {
+    max-height: 34px;
+  }
+}
+.evo_register_buttons {
+  text-align: center;
+}
+.evo_register_buttons input.btn {
+  margin: 0 0 15px 0;
+}
+.evo_register_buttons a.btn {
+  margin: 0;
 }
 .evo_form__login_links {
   padding: 0 5px;
@@ -678,47 +704,15 @@ main .widget_core_coll_search_form div.compact_search_form input.search_field {
 aside .widget_core_coll_search_form div.compact_search_form input.search_field {
   width: 100%;
 }
-.widget_core_user_register #register_form .form-group {
-  margin: 0;
-}
-.widget_core_user_register #register_form label {
-  text-align: left;
-  width: 160px;
-  padding-left: 0;
-}
-.widget_core_user_register #register_form .controls {
-  padding: 0;
-  width: 100%;
-}
-.widget_core_user_register #register_form .form_text_input.form-control {
-  width: 100%;
-}
-.widget_core_user_register .field_register_btn .panel {
-  margin: 0;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-}
-.widget_core_user_register .field_register_btn .panel .panel-body {
-  padding-left: 0;
-  padding-right: 0;
-  padding-bottom: 0;
-}
 .extended_search_form {
-  width: 100%;
-  display: inline-block;
-  vertical-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  display: block;
   text-align: center;
 }
 .extended_search_form input {
   text-align: left;
   display: inline-block;
-}
-.extended_search_form .SearchField {
-  width: 50%;
-}
-.extended_search_form .search_submit {
-  margin-top: -2px;
 }
 .evo_search_navigation {
   padding-bottom: 20px;
@@ -1057,9 +1051,13 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
   float: none !important;
   display: inline;
 }
+.posts_panel_title_wrapper .cell2 .evo_status.badge {
+  top: 0;
+}
 .cell1,
 .cell2 {
   display: table-cell;
+  vertical-align: middle;
 }
 a.to_top {
   font-size: 14px !important;

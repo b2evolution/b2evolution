@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -72,23 +72,18 @@ $Form->begin_form( '', '', $params );
 	}
 	$Form->begin_fieldset( $form_title_item_ID.get_manual_link( 'post-contents-panel' ), array( 'id' => 'itemform_content' ) );
 
-	$Form->switch_layout( 'none' );
+	$Form->switch_layout( 'fields_table' );
 
-	echo '<table cellspacing="0" class="compose_layout" align="center"><tr>';
-	$display_title_field = $edited_Item->get_type_setting( 'use_title' ) != 'never';
-	if( $display_title_field )
-	{ // Display title
-		$field_required = ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ? $required_star : '';
-		echo '<td class="label">'.$field_required.'<strong>'.T_('Title').':</strong></td>';
-		echo '<td width="100%" class="input">';
-		$Form->text_input( 'post_title', $item_title, 20, '', '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
-		echo '</td>';
+	$Form->begin_fieldset( '', array( 'class' => 'evo_fields_table__single_row' ) );
+	if( $edited_Item->get_type_setting( 'use_title' ) != 'never' )
+	{	// Display a post title field:
+		$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array( 'maxlength' => 255, 'required' => ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ) );
 	}
 	else
-	{ // Hide title
+	{	// Hide a post title field:
 		$Form->hidden( 'post_title', $item_title );
 	}
-	echo '</tr></table>';
+	$Form->end_fieldset();
 
 	$Form->switch_layout( NULL );
 
@@ -154,7 +149,7 @@ $Form->begin_form( '', '', $params );
 	echo '</div>';
 
 	echo '<div class="pull-right">';
-	echo_publish_buttons( $Form, false, $edited_Item, false, false, $action );
+	$Form->submit( array( 'actionArray[save_propose]', T_('Propose change'), 'btn-primary evo_propose_change_btn' ) );
 	echo '</div>';
 
 	echo '<div class="clearfix"></div>';
@@ -164,50 +159,31 @@ $Form->begin_form( '', '', $params );
 	$Form->end_fieldset();
 
 	// ############################ CUSTOM FIELDS #############################
-
-	if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
-	{	// All CUSTOM FIELDS are hidden by post type:
-		display_hidden_custom_fields( $Form, $edited_Item );
-	}
-	else
-	{	// CUSTOM FIELDS:
-		$custom_fields = $edited_Item->get_type_custom_fields( 'all', true );
-
-		if( count( $custom_fields ) )
-		{	// Display fieldset with custom fields only if at least one exists:
-			$Form->begin_fieldset( T_('Custom fields').get_manual_link( 'post-custom-fields-panel' ), array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
-
-			echo '<table cellspacing="0" class="compose_layout">';
-
-			foreach( $custom_fields as $custom_field )
-			{	// Loop through custom fields:
-				echo '<tr><td class="label"><label for="item_'.$custom_field['type'].'_'.$custom_field['ID'].'"><strong>'.$custom_field['label'].':</strong></label></td>';
-				echo '<td class="input" width="97%">';
-				switch( $custom_field['type'] )
-				{
-					case 'double':
-						$Form->text( 'item_double_'.$custom_field['ID'], $edited_Item->get_custom_field_value( $custom_field['name'], false, false ), 10, '', $custom_field['note'].' <code>'.$custom_field['name'].'</code>' );
-						break;
-					case 'varchar':
-						$Form->text_input( 'item_varchar_'.$custom_field['ID'], $edited_Item->get_custom_field_value( $custom_field['name'], false, false ), 20, '', '<br />'.$custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
-						break;
-					case 'text':
-						$Form->textarea_input( 'item_text_'.$custom_field['ID'], $edited_Item->get_custom_field_value( $custom_field['name'], false, false ), 5, '', array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
-						break;
-					case 'html':
-						$Form->textarea_input( 'item_html_'.$custom_field['ID'], $edited_Item->get_custom_field_value( $custom_field['name'], false, false ), 5, '', array( 'note' => $custom_field['note'].' <code>'.$custom_field['name'].'</code>' ) );
-						break;
-					case 'url':
-						$Form->text_input( 'item_url_'.$custom_field['ID'], $edited_Item->get_custom_field_value( $custom_field['name'], false, false ), 20, '', '<br />'.$custom_field['note'].' <code>'.$custom_field['name'].'</code>', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
-						break;
-				}
-				echo '</td></tr>';
-			}
-
-			echo '</table>';
-
-			$Form->end_fieldset();
+	$custom_fields = $edited_Item->get_type_custom_fields();
+	if( count( $custom_fields ) )
+	{	// Display fieldset with custom fields only if at least one exists:
+		$custom_fields_title = T_('Custom fields').get_manual_link( 'post-custom-fields-panel' );
+		if( $current_User->check_perm( 'options', 'edit' ) )
+		{	// Display an icon to edit post type if current user has a permission:
+			$custom_fields_title .= '<span class="floatright panel_heading_action_icons">'
+					.action_icon( T_('Edit fields...'), 'edit',
+						$admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID='.$edited_Item->get( 'ityp_ID' ).'#fieldset_wrapper_custom_fields',
+						T_('Edit fields...'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm' ) )
+				.'</span>';
 		}
+
+		$Form->begin_fieldset( $custom_fields_title, array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
+
+		$Form->switch_layout( 'fields_table' );
+		$Form->begin_fieldset();
+
+		// Display inputs to edit custom fields:
+		display_editable_custom_fields( $Form, $edited_Item, true );
+
+		$Form->end_fieldset();
+		$Form->switch_layout( NULL );
+
+		$Form->end_fieldset();
 	}
 	?>
 
@@ -219,8 +195,6 @@ $Form->begin_form( '', '', $params );
 // ================================== END OF PROPOSE CHANGE FORM ==================================
 $Form->end_form();
 
-// JS code for status dropdown select button
-echo_status_dropdown_button_js( 'post' );
 // Save and restore item content field height and scroll position:
 echo_item_content_position_js( get_param( 'content_height' ), get_param( 'content_scroll' ) );
 // Fieldset folding

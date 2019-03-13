@@ -56,6 +56,9 @@ div.status_icon {
   font-weight: bold;
   margin: 2px;
 }
+span.action_icon {
+  cursor: pointer;
+}
 .btn-group .action_icon {
   margin-left: 0;
   margin-right: 0;
@@ -161,24 +164,9 @@ h2 .glyphicon {
   margin-top: 14px;
   display: inline-block;
 }
-.compose_layout {
-  margin-bottom: 15px;
-}
-.compose_layout td.label {
-  font-size: 100%;
-  padding-right: 10px;
-  color: #333;
-}
-.compose_layout #post_locale {
-  width: 180px !important;
-}
-.compose_layout td {
+.edit_actions_visibility {
   white-space: nowrap;
-  vertical-align: middle;
-}
-#itemform_custom_fields .compose_layout,
-#itemform_adv_props .compose_layout {
-  margin-bottom: 0;
+  margin-right: 5px;
 }
 div.log_container {
   margin: 0;
@@ -199,6 +187,16 @@ div.delete_messages ul {
 }
 div.delete_messages ul li {
   list-style: inherit;
+}
+div.delete_messages ul label {
+  font-weight: normal;
+  margin: 0;
+}
+.evo_panel {
+  margin-bottom: 20px;
+}
+.evo_panel__footer {
+  padding: 10px 15px;
 }
 /*
  * Browse pages of items and comments ( ?ctrl=items and ?ctrl=comments - full views )
@@ -282,19 +280,25 @@ div.delete_messages ul li {
   padding: 10px;
   color: #5bc0de;
 }
-#comment_filter_form fieldset {
+.evo_content_summary .evo_post .bTitle {
+  font-weight: bold;
+}
+.evo_content_summary .evo_post .bText {
+  padding-left: 420px;
+}
+.evo_sidebar_filters fieldset {
   margin-bottom: 20px;
 }
-#comment_filter_form .controls.col-sm-10 {
-  width: 100%;
+.evo_sidebar_filters fieldset legend {
+  margin-bottom: 10px;
 }
-#comment_filter_form .controls.col-sm-10 input[type=text] {
-  width: 100%;
+.evo_sidebar_filters .pull-right[type=submit] {
+  margin: -3px 0 0 0;
 }
-#comment_filter_form .rating input[name=cmnt_fullview_rating_limit] {
+.evo_sidebar_filters .rating input[name$=_rating_limit] {
   margin-right: 10px;
 }
-#comment_filter_form .rating input[name=cmnt_fullview_rating_limit]:first-child {
+.evo_sidebar_filters .rating input[name$=_rating_limit]:first-child {
   margin-left: 10px;
 }
 .evo_comments_container .evo_comment {
@@ -616,11 +620,11 @@ fieldset ul {
   color: #000;
   font-weight: normal;
 }
-.user_admin_tags {
-  width: 500px;
+.evo_input__tags {
+  width: 100%;
   max-width: 100%;
 }
-.user_admin_tags ul.token-input-list-facebook {
+.evo_input__tags ul.token-input-list-facebook {
   width: 100%;
   max-width: 100%;
 }
@@ -681,12 +685,14 @@ fieldset ul {
 }
 #itemform_links .panel,
 #cmntform_links .panel,
+#meta_cmntform_links .panel,
 #ecmpform_links .panel,
 #msgform_links .panel {
   overflow: hidden;
 }
 #itemform_links .panel-body,
 #cmntform_links .panel-body,
+#meta_cmntform_links .panel-body,
 #ecmpform_links .panel-body,
 #msgform_links .panel-body {
   padding: 0;
@@ -697,23 +703,36 @@ fieldset ul {
 #itemform_goals td {
   padding-bottom: 2px;
 }
-#attachments_fieldset_wrapper {
+.custom_fields_edit_table .results {
+  overflow: initial;
+}
+.custom_fields_edit_table .table_scroll {
+  margin-bottom: 20px;
+}
+.custom_fields_edit_table .form-control {
+  width: auto;
+}
+.custom_fields_edit_table .form-control.custom_field_label {
+  width: 100%;
+  min-width: 200px;
+}
+.evo_attachments_fieldset__wrapper {
   width: 100%;
   height: 160px;
   position: relative;
   padding-bottom: 6px;
   box-sizing: content-box;
 }
-#attachments_fieldset_wrapper #attachments_fieldset_block {
+.evo_attachments_fieldset__wrapper .evo_attachments_fieldset__block {
   overflow: auto;
   height: 100%;
 }
-#attachments_fieldset_wrapper .ui-resizable-s {
+.evo_attachments_fieldset__wrapper .ui-resizable-s {
   background: #c0c0c0;
   height: 6px;
   bottom: 0;
 }
-#attachments_fieldset_wrapper .ui-resizable-s:after {
+.evo_attachments_fieldset__wrapper .ui-resizable-s:after {
   content: "...";
   font-size: 10px;
   top: -7px;
@@ -721,23 +740,26 @@ fieldset ul {
   text-align: center;
   display: block;
 }
-#attachments_fieldset_wrapper .table_scroll {
+.evo_attachments_fieldset__wrapper .table_scroll {
   position: relative;
 }
-#attachments_fieldset_wrapper div.results,
-#attachments_fieldset_wrapper div.table_scroll {
+.evo_attachments_fieldset__wrapper div.results,
+.evo_attachments_fieldset__wrapper div.table_scroll {
   overflow: initial;
 }
-#attachments_fieldset_wrapper table tbody .dragged {
+.evo_attachments_fieldset__wrapper table tbody .dragged {
   opacity: 0.8;
   position: absolute;
   z-index: 1000;
 }
-#attachments_fieldset_wrapper table tbody td {
+.evo_attachments_fieldset__wrapper table tbody td {
   cursor: move;
 }
-#filelist_tbody tr:first-child .action_icon_link_move_up,
-#filelist_tbody tr:last-child .action_icon_link_move_down {
+.evo_attachments_fieldset__wrapper table tbody tr.odd td {
+  background-color: #FFF;
+}
+.filelist_tbody tr:first-child .action_icon_link_move_up,
+.filelist_tbody tr:last-child .action_icon_link_move_down {
   visibility: hidden;
 }
 table.filelist {
@@ -849,12 +871,12 @@ ul#uploadfileinputs li {
   border-bottom: 1px solid #DDD;
   padding: 10px 0;
 }
-div#fileuploader_form {
+div.evo_fileuploader_form {
   padding: 5px;
   height: 65px;
   background: #f5f5f5;
 }
-tr#fileuploader_form td {
+tr.evo_fileuploader_form td {
   background: #f5f5f5;
 }
 .file_browser .panel-body {
@@ -963,14 +985,37 @@ h2.user_title::first-line {
 #itemform_edit_workflow .form-group .controls {
   display: inline-block;
 }
+#itemform_extra td.flabel_item_owner_login {
+  vertical-align: top;
+  padding-top: 6px;
+}
 #itemform_extra #ffield_item_owner_login .help-inline {
   display: inline-block;
   vertical-align: middle;
   margin-top: 10px;
 }
+#itemform_extra #ffield_item_owner_login #item_owner_login {
+  vertical-align: middle !important;
+}
 #itemform_extra label.ffield_item_create_user {
   padding: 0;
   font-weight: normal;
+}
+#itemform_extra .itemform_extra_radio {
+  padding-top: 10px;
+}
+#itemform_extra .itemform_extra_radio > label {
+  padding: 0;
+  margin: 0;
+}
+#itemform_extra .itemform_extra_radio input[type=radio][name=item_dateset][value="1"] {
+  margin-top: 11px;
+}
+#itemform_extra .itemform_extra_radio .form-group {
+  vertical-align: middle;
+}
+#itemform_extra .itemform_extra_radio .form-group input {
+  margin-left: 0;
 }
 span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
@@ -988,11 +1033,17 @@ div#import_wrapper {
 div.fieldset_wrapper {
   margin-top: 0;
 }
+div.fieldset_wrapper + div.fieldset_wrapper {
+  margin-top: 10px;
+}
 div.fieldset_wrapper.folded .panel-body {
   display: none;
 }
 span[id^=title_folding_] {
   cursor: default;
+}
+tbody.fieldset_wrapper.folded + tbody[id^=cat_sel_] {
+  display: none;
 }
 .browse .evo_content_block {
   margin-right: 0;
@@ -1114,6 +1165,9 @@ div.coll-selector {
 div.coll-selector .btn-group {
   margin-right: 4px;
 }
+div.coll-selector .btn-group .dropdown-toggle .caret {
+  margin-left: 6px;
+}
 div.level2 {
   padding-top: 17px;
   background-color: #ddd;
@@ -1184,6 +1238,13 @@ div.level3 nav .nav > li.active a:focus {
 }
 div.level3 nav .nav > li + li {
   margin-left: 0px;
+}
+ol.breadcrumb {
+  margin: 20px 0;
+}
+.container-global-icons {
+  margin-top: 9px;
+  margin-bottom: -3px;
 }
 .footer {
   background-color: #f5f5f5;
@@ -1413,6 +1474,8 @@ table.diff td.diff-marker {
 }
 table.diff td.diff-lineno {
   font-weight: bold;
+  font-size: 0.85em;
+  color: #666;
 }
 table.diff td.diff-addedline {
   background: none repeat scroll 0 0 #CCFFCC;
@@ -1443,6 +1506,9 @@ table.diff tr.diff-custom-field td.diff-title-addedline {
   text-align: left;
   font-size: 100%;
 }
+table.diff td.diff-section-title {
+  background: none repeat scroll 0 0 #F5F5F5;
+}
 .radio input[type="radio"][name^="timestamp_"][value="duration"] {
   position: relative;
   margin-right: 4px;
@@ -1465,9 +1531,6 @@ table.diff tr.diff-custom-field td.diff-title-addedline {
 }
 .timestamp .time {
   font-size: 84%;
-}
-.compact_data {
-  white-space: nowrap;
 }
 #skin_wrapper .email_wrap .email_payload > p:first-child {
   margin-top: 10px;
@@ -1641,15 +1704,24 @@ table.diff tr.diff-custom-field td.diff-title-addedline {
 .evo_checkbox_status__meta {
   background-color: #5bc0de;
 }
-.evo_aggregate_filter {
+.evo_filter_diagram_hits {
   white-space: nowrap;
+  float: left;
+  padding-left: 15px;
 }
-.evo_aggregate_filter label {
-  padding-top: 5px;
-  padding-right: 5px;
+.evo_filter_diagram_hits label {
+  float: none;
+  padding: 0 5px 0 0;
   width: auto;
+  font-weight: normal;
 }
-.evo_aggregate_filter select {
+.evo_filter_diagram_hits label.control-label {
+  font-weight: bold;
+}
+.evo_filter_diagram_hits label input {
+  display: inline;
+}
+.evo_filter_diagram_hits select {
   display: inline;
   width: auto;
 }
@@ -1659,4 +1731,11 @@ table.diff tr.diff-custom-field td.diff-title-addedline {
 .jeditable_cell select,
 .jeditable_cell input {
   max-width: 100%;
+}
+div.query-builder .rule-container .rule-value-container {
+  border: none;
+  padding-left: 0;
+}
+.ui-effects-transfer {
+  border: 1px solid #F00;
 }

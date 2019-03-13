@@ -217,138 +217,155 @@ class item_info_line_Widget extends ComponentWidget
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
-		// Flag:
-		if( $this->disp_params['flag_icon'] )
-		{
-			$Item->flag();
-		}
+		$display_widget = $this->disp_params['flag_icon'] || $this->disp_params['permalink_icon'] || $this->disp_params['before_author'] != 'none'
+				|| $this->disp_params['date_format'] != 'none' || $this->disp_params['time_format'] != 'none' || $this->disp_params['category']
+				|| $this->disp_params['last_touched'] || $this->disp_params['contents_updated'] || $this->disp_params['edit_link'];
 
-		// Permalink:
-		if( $this->disp_params['permalink_icon'] )
+		if( empty( $Item ) )
+		{	// Display error message when no Item object:
+			echo '<span class="evo_param_error">'.sprintf( T_('No %s object found. Cannot display widget "%s".'), '<code>Item</code>', $this->get_name() ).'</span>';
+		}
+		elseif( ! $display_widget )
 		{
-			$Item->permanent_link( array(
-					'text' => '#icon#',
-					'after' => ' ',
+			global $admin_url;
+			echo '<span class="evo_param_error">'.sprintf( T_('Nothing to display! Check "%s" <a %s>widget settings</a>.'),
+					$this->get_name(), 'href="'.url_add_param( $admin_url, array( 'ctrl' => 'widgets', 'action' => 'edit', 'wi_ID' => $this->ID ) ).'"' ).'</span>';
+		}
+		else
+		{
+			// Flag:
+			if( $this->disp_params['flag_icon'] )
+			{
+				$Item->flag();
+			}
+
+			// Permalink:
+			if( $this->disp_params['permalink_icon'] )
+			{
+				$Item->permanent_link( array(
+						'text' => '#icon#',
+						'after' => ' ',
+					) );
+			}
+
+			// Author
+			if( $this->disp_params['before_author'] != 'none' )
+			{
+				switch( $this->disp_params['before_author'] )
+				{
+					case 'posted_by':
+						$before_author = T_('Posted by').' ';
+						break;
+
+					case 'started_by':
+						$before_author = T_('Started by').' ';
+						break;
+
+					default:
+						$before_author = '';
+				}
+				$Item->author( array(
+					'before'    => /* TRANS: author name */ $before_author,
+					'after'     => ' ',
+					'link_text' => $params['author_link_text'],
 				) );
-		}
-
-		// Author
-		if( $this->disp_params['before_author'] != 'none' )
-		{
-			switch( $this->disp_params['before_author'] )
-			{
-				case 'posted_by':
-					$before_author = T_('Posted by').' ';
-					break;
-
-				case 'started_by':
-					$before_author = T_('Started by').' ';
-					break;
-
-				default:
-					$before_author = '';
 			}
-			$Item->author( array(
-				'before'    => /* TRANS: author name */ $before_author,
-				'after'     => ' ',
-				'link_text' => $params['author_link_text'],
-			) );
-		}
 
-		// We want to display the post time:
-		$date_format = '';
-		if( $this->disp_params['date_format'] != 'none' )
-		{
-			switch( $this->disp_params['date_format'] )
+			// We want to display the post time:
+			$date_format = '';
+			if( $this->disp_params['date_format'] != 'none' )
 			{
-				case 'extended':
-					$date_format = locale_extdatefmt();
-					break;
+				switch( $this->disp_params['date_format'] )
+				{
+					case 'extended':
+						$date_format = locale_extdatefmt();
+						break;
 
-				case 'long':
-					$date_format = locale_longdatefmt();
-					break;
+					case 'long':
+						$date_format = locale_longdatefmt();
+						break;
 
-				case 'short':
-					$date_format = locale_datefmt();
-					break;
+					case 'short':
+						$date_format = locale_datefmt();
+						break;
+				}
 			}
-		}
 
-		$time_format = '';
-		if( $this->disp_params['time_format'] != 'none' )
-		{
-			switch( $this->disp_params['time_format'] )
+			$time_format = '';
+			if( $this->disp_params['time_format'] != 'none' )
 			{
-				case 'long':
-					$time_format = locale_timefmt();
-					break;
+				switch( $this->disp_params['time_format'] )
+				{
+					case 'long':
+						$time_format = locale_timefmt();
+						break;
 
-				case 'short':
-					$time_format = locale_shorttimefmt();
-					break;
+					case 'short':
+						$time_format = locale_shorttimefmt();
+						break;
+				}
 			}
-		}
 
-		if( $this->disp_params['date_format'] != 'none' || $this->disp_params['time_format'] != 'none' )
-		{
-			switch( $this->disp_params['display_date'] )
+			if( $this->disp_params['date_format'] != 'none' || $this->disp_params['time_format'] != 'none' )
 			{
-				case 'issue_date':
-					$Item->issue_time( array(
-							'before'      => $this->disp_params['before_author'] == 'none' ? '' : T_('on').' ',
-							'after'       => ' ',
-							'time_format' => $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format
-						) );
-					break;
+				switch( $this->disp_params['display_date'] )
+				{
+					case 'issue_date':
+						$Item->issue_time( array(
+								'before'      => $this->disp_params['before_author'] == 'none' ? '' : T_('on').' ',
+								'after'       => ' ',
+								'time_format' => $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format
+							) );
+						break;
 
-				case 'date_created':
-					echo $this->disp_params['before_author'] == 'none' ? '' : T_('on').' ';
-					echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->datecreated ).' ';
-					break;
+					case 'date_created':
+						echo $this->disp_params['before_author'] == 'none' ? '' : T_('on').' ';
+						echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->datecreated ).' ';
+						break;
+				}
 			}
-		}
 
 
-		// Categories
-		if( $this->disp_params['category'] )
-		{
-			$Item->categories( array(
-				'before'          => /* TRANS: category name(s) */ T_('in').' ',
-				'after'           => ' ',
-				'include_main'    => true,
-				'include_other'   => true,
-				'include_external'=> true,
-				'link_categories' => true,
-			) );
-		}
+			// Categories
+			if( $this->disp_params['category'] )
+			{
+				$Item->categories( array(
+					'before'          => /* TRANS: category name(s) */ T_('in').' ',
+					'after'           => ' ',
+					'include_main'    => true,
+					'include_other'   => true,
+					'include_external'=> true,
+					'link_categories' => true,
+				) );
+			}
 
-		// Last touched
-		if( $this->disp_params['last_touched'] )
-		{
-			echo '<span class="text-muted"> &ndash; '
-				.T_('Last touched').': '
-				.mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) )
-				.'</span>';
-		}
+			// Last touched
+			if( $this->disp_params['last_touched'] )
+			{
+				echo '<span class="text-muted"> &ndash; '
+					.T_('Last touched').': '
+					.mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) )
+					.'</span>';
+			}
 
-		// Contents last updated:
-		if( $this->disp_params['contents_updated'] )
-		{
-			echo '<span class="text-muted"> &ndash; '
-				.T_('Contents updated').': '
-				.mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'contents_last_updated_ts' ) )
-				.$Item->get_refresh_contents_last_updated_link()
-				.'</span>';
-		}
+			// Contents last updated:
+			if( $this->disp_params['contents_updated'] )
+			{
+				echo '<span class="text-muted"> &ndash; '
+					.T_('Contents updated').': '
+					.mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'contents_last_updated_ts' ) )
+					.$Item->get_refresh_contents_last_updated_link()
+					.'</span>';
+			}
 
-		// Link for editing
-		if( $this->disp_params['edit_link'] )
-		{
-			$Item->edit_link( array(
-				'before'    => ' &bull; ',
-				'after'     => '',
-			) );
+			// Link for editing
+			if( $this->disp_params['edit_link'] )
+			{
+				$Item->edit_link( array(
+					'before'    => ' &bull; ',
+					'after'     => '',
+				) );
+			}
 		}
 
 		echo $this->disp_params['block_body_end'];

@@ -218,7 +218,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				break;
 
 			case 'Widget':
-				$set_value = $Obj->get_param( $parname, false, $group );
+				$set_value = $Obj->get_param( $parname, NULL, $group );
 				$error_value = NULL;
 				break;
 
@@ -268,6 +268,12 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	if( $value_from_request !== NULL )
 	{
 		$set_value = $value_from_request;
+	}
+
+	if( ! empty( $parmeta['hide'] ) )
+	{	// Hide this field on the editing form:
+		$original_form_fieldstart = $Form->fieldstart;
+		$Form->fieldstart = preg_replace( '/>$/', 'style="display:none">', $Form->fieldstart );
 	}
 
 	switch( $parmeta['type'] )
@@ -592,16 +598,13 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			break;
 
 		case 'usertag':
-			if( isset( $parmeta['size'] ) )
-			{
-				$size = (int) $parmeta['size'];
-			}
-			else
-			{
-				$size = 30;
-			}
-
+			$size = isset( $parmeta['size'] ) ? intval( $parmeta['size'] ) : 30;
 			$Form->usertag_input( $input_name, $set_value, $size, $set_label, '', $params );
+			break;
+
+		case 'itemtag':
+			$size = isset( $parmeta['size'] ) ? intval( $parmeta['size'] ) : 30;
+			$Form->tag_input( $input_name, $set_value, $size, $set_label, '', $params );
 			break;
 
 		case 'info':
@@ -646,9 +649,14 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			debug_die( 'Unsupported type ['.$parmeta['type'].'] from GetDefaultSettings()!' );
 	}
 
+	if( isset( $original_form_fieldstart ) )
+	{	// Revert original field start html code:
+		$Form->fieldstart = $original_form_fieldstart;
+	}
+
 	if( $outer_most && $has_array_type )
 	{ // Note for Non-Javascript users:
-		echo '<script type="text/javascript"></script><noscript>';
+		echo '<script></script><noscript>';
 		echo '<p class="note">'.T_('Note: before adding a new set you have to save any changes.').'</p>';
 		echo '</noscript>';
 	}
@@ -986,6 +994,10 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 			case 'checklist':
 				$l_param_type = 'array';
 				$l_param_default = array();
+				break;
+
+			case 'textarea':
+				$l_param_type = 'text';
 				break;
 
 			case 'html_input':

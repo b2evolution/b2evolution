@@ -16,16 +16,20 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $blog, $admin_url, $UserSettings, $email, $statuses, $all_statuses;
 
 param( 'email', 'string', '', true );
-param( 'statuses', 'array:string', array( 'redemption', 'warning', 'suspicious3' ), true );
-if( param( 'all_statuses', 'integer', 0, true ) )
+param( 'statuses', 'array:string', NULL, true );
+if( $statuses === NULL && param( 'all_statuses', 'integer', 0, true ) )
 {	// Filter to get email addresses with all statuses:
 	$statuses = array_keys( emadr_get_status_titles() );
+}
+if( $statuses === NULL )
+{	// Default filter:
+	$statuses = array( 'redemption', 'warning', 'suspicious3' );
 }
 
 // Create result set:
 
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE emadr_ID, emadr_address, emadr_status, emadr_last_sent_ts, emadr_sent_count, emadr_sent_last_returnerror, emadr_last_error_ts,
+$SQL->SELECT( 'SQL_NO_CACHE emadr_ID, emadr_address, emadr_status, emadr_last_sent_ts, emadr_sent_count, emadr_sent_last_returnerror, emadr_last_error_ts, emadr_last_open_ts,
 ( emadr_prmerror_count + emadr_tmperror_count + emadr_spamerror_count + emadr_othererror_count ) AS emadr_all_count,
 emadr_prmerror_count, emadr_tmperror_count, emadr_spamerror_count, emadr_othererror_count,
 COUNT( user_ID ) AS users_count' );
@@ -40,8 +44,8 @@ $count_SQL->FROM( 'T_email__address' );
 if( !empty( $email ) )
 {	// Filter by email
 	$email = utf8_strtolower( $email );
-	$SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( $email ) );
-	$count_SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( $email ) );
+	$SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( '%'.$email.'%' ) );
+	$count_SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( '%'.$email.'%' ) );
 }
 if( !empty( $statuses ) )
 {	// Filter by statuses
@@ -65,12 +69,12 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
  */
 function filter_email_blocked( & $Form )
 {
-	$Form->email_input( 'email', get_param( 'email' ), 40, T_('Email') );
+	$Form->text_input( 'email', get_param( 'email' ), 40, T_('Email') );
 
 	$statuses = emadr_get_status_titles();
 	foreach( $statuses as $status_value => $status_title )
 	{	// Display the checkboxes to filter by status
-		$Form->checkbox( 'statuses[]', in_array( $status_value, get_param( 'statuses' ) ), $status_title, '', '', $status_value );
+		$Form->checkbox( 'statuses[]', in_array( $status_value, get_param( 'statuses' ) ), '<span class="label" style="background-color:'.emadr_get_status_color( $status_value ).( in_array( $status_value, array( 'redemption', 'warning', 'suspicious1' ) ) ? ';color:#333' : '' ).'">'.$status_title.'</span>', '', '', $status_value );
 	}
 }
 $Results->filter_area = array(
@@ -125,7 +129,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th_group' => T_('Send messages'),
+		'th_group' => T_('Sent messages'),
 		'th' => T_('Last sent date'),
 		'order' => 'emadr_last_sent_ts',
 		'default_dir' => 'D',
@@ -134,7 +138,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th_group' => T_('Send messages'),
+		'th_group' => T_('Sent messages'),
 		'th' => T_('Sent count'),
 		'order' => 'emadr_sent_count',
 		'default_dir' => 'D',
@@ -143,12 +147,20 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th_group' => T_('Send messages'),
+		'th_group' => T_('Sent messages'),
 		'th' => T_('Since last error'),
 		'order' => 'emadr_sent_last_returnerror',
 		'default_dir' => 'D',
 		'td' => '$emadr_sent_last_returnerror$',
 		'td_class' => 'right'
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Last opened email date'),
+		'order' => 'emadr_last_open_ts',
+		'default_dir' => 'D',
+		'td_class' => 'timestamp',
+		'td' => '%mysql2localedatetime_spans( #emadr_last_open_ts# )%',
 	);
 
 $Results->cols[] = array(

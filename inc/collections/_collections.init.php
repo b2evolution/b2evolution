@@ -20,7 +20,7 @@ $default_ctrl = 'dashboard';
 /**
  * Minimum PHP version required for collections module to function properly
  */
-$required_php_version[ 'collections' ] = '5.4';
+$required_php_version[ 'collections' ] = '5.6';
 
 /**
  * Minimum MYSQL version required for collections module to function properly
@@ -731,7 +731,7 @@ class collections_Module extends Module
 
 		// Posts
 		$collection_menu_entries['posts'] = array(
-				'text' => T_('Posts'),
+				'text' => T_('Contents'),
 				'href' => $admin_url.'?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$blog,
 			);
 		$last_group_menu_entry = 'posts';
@@ -802,7 +802,7 @@ class collections_Module extends Module
 						'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog,
 						'entries' => array(
 							'skin_normal' => array(
-								'text' => T_('Default'),
+								'text' => T_('Standard'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog
 							),
 							'skin_mobile' => array(
@@ -852,13 +852,13 @@ class collections_Module extends Module
 			{ // Post Types & Statuses
 				$AdminUI->add_menu_entries( array( 'collections', 'settings' ), array(
 					'types' => array(
-						'text' => T_('Post Types'),
-						'title' => T_('Post Types Management'),
+						'text' => T_('Item Types'),
+						'title' => T_('Item Types Management'),
 						'href' => $admin_url.'?ctrl=itemtypes&amp;tab=settings&amp;tab3=types&amp;blog='.$blog
 						),
 					'statuses' => array(
-						'text' => T_('Post Statuses'),
-						'title' => T_('Post Statuses Management'),
+						'text' => T_('Item Statuses'),
+						'title' => T_('Item Statuses Management'),
 						'href' => $admin_url.'?ctrl=itemstatuses&amp;tab=settings&amp;tab3=statuses&amp;blog='.$blog
 						),
 					)
@@ -959,7 +959,7 @@ class collections_Module extends Module
 	{
 		return array(
 			'create-post-by-email' => array(
-				'name'   => T_('Create posts by email'),
+				'name'   => T_('Create posts by email').' ('.T_('Deprecated').')',
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_post_by_email.job.php',
 				'params' => NULL,
@@ -1247,11 +1247,14 @@ class collections_Module extends Module
 					if( $current_User->unsubscribe( $Newsletter->ID ) )
 					{
 						$Messages->add( sprintf( T_('You have unsubscribed and you will no longer receive emails from %s.'), '"'.$Newsletter->get( 'name' ).'"' ), 'success' );
+
+						// Send notification to owners of lists where user subscribed:
+						$current_User->send_list_owner_notifications( 'unsubscribe' );
 					}
 				}
 				else
 				{	// Subscribe to newsletter:
-					if( $current_User->is_subscribed( $Newsletter->ID ) || $current_User->subscribe( $Newsletter->ID ) )
+					if( $current_User->is_subscribed( $Newsletter->ID ) || $current_User->subscribe( $Newsletter->ID, array( 'usertags' => $insert_user_tags ) ) )
 					{
 						if( ! empty( $insert_user_tags ) )
 						{
@@ -1259,6 +1262,9 @@ class collections_Module extends Module
 							$current_User->dbupdate();
 						}
 						$Messages->add( sprintf( T_('You have successfully subscribed to: %s.'), '"'.$Newsletter->get( 'name' ).'"' ), 'success' );
+
+						// Send notification to owners of lists where user subscribed:
+						$current_User->send_list_owner_notifications( 'subscribe' );
 					}
 				}
 
@@ -1280,16 +1286,20 @@ class collections_Module extends Module
 					// EXIT HERE.
 				}
 
+				// What post and comment date fields use to refresh:
+				// - 'touched' - 'post_datemodified', 'comment_last_touched_ts' (Default)
+				// - 'created' - 'post_datestart', 'comment_date'
+				$date_type = param( 'type', 'string', 'touched' );
+
 				// Run refreshing and display a message:
-				$refreshed_Item->refresh_contents_last_updated_ts();
-				$Messages->add( T_('"Contents last updated" timestamp has been refreshed.'), 'success' );
+				$refreshed_Item->refresh_contents_last_updated_ts( true, $date_type );
 
 				header_redirect();
 				break; // already exited here
 
 			case 'create_post':
 				// Create new post from front-office by anonymous user:
-				global $dummy_fields, $Plugins;
+				global $dummy_fields, $Plugins, $Settings, $Hit;
 
 				load_class( 'items/model/_item.class.php', 'Item' );
 
@@ -1323,12 +1333,11 @@ class collections_Module extends Module
 				// Set item properties from submitted form:
 				$new_Item->load_from_Request( false, true );
 
-				// Use default item/post type of the collection:
-				$default_item_type_ID = $item_Blog->get_setting( 'default_post_type' );
-				$new_Item->set( 'ityp_ID', ( empty( $default_item_type_ID ) ? 1 /* Post */ : $default_item_type_ID ) );
-
 				// Call plugin event for additional checking, e-g captcha:
 				$Plugins->trigger_event( 'AdminBeforeItemEditCreate', array( 'Item' => & $new_Item ) );
+
+				// Validate first enabled captcha plugin:
+				$Plugins->trigger_event_first_return( 'ValidateCaptcha', array( 'form_type' => 'item' ) );
 
 				if( param_errors_detected() )
 				{	// If at least one error has been detected:
@@ -1388,6 +1397,94 @@ class collections_Module extends Module
 					report_user_create( $new_User );
 				}
 
+				// Save trigger page:
+				$session_registration_trigger_url = $Session->get( 'registration_trigger_url' );
+				if( empty( $session_registration_trigger_url ) && isset( $_SERVER['HTTP_REFERER'] ) )
+				{	// Trigger page still is not defined
+					$session_registration_trigger_url = $_SERVER['HTTP_REFERER'];
+					$Session->set( 'registration_trigger_url', $session_registration_trigger_url );
+				}
+
+				$UserCache = & get_UserCache();
+				$UserCache->add( $new_User );
+
+				// Get user domain data:
+				$user_domain = $Hit->get_remote_host( true );
+				load_funcs( 'sessions/model/_hitlog.funcs.php' );
+				$DomainCache = & get_DomainCache();
+				$Domain = & get_Domain_by_subdomain( $user_domain );
+				$dom_status_titles = stats_dom_status_titles();
+				$dom_status = $dom_status_titles[ $Domain ? $Domain->get( 'status' ) : 'unknown' ];
+
+				$initial_hit = $Session->get_first_hit_params();
+				if( ! empty ( $initial_hit ) )
+				{	// Save User Settings:
+					$UserSettings->set( 'initial_sess_ID' , $initial_hit->hit_sess_ID, $new_User->ID );
+					$UserSettings->set( 'initial_blog_ID' , $initial_hit->hit_coll_ID, $new_User->ID );
+					$UserSettings->set( 'initial_URI' , $initial_hit->hit_uri, $new_User->ID );
+					$UserSettings->set( 'initial_referer' , $initial_hit->hit_referer , $new_User->ID );
+				}
+				if( ! empty( $session_registration_trigger_url ) )
+				{	// Save Trigger page:
+					$UserSettings->set( 'registration_trigger_url' , $session_registration_trigger_url, $new_User->ID );
+				}
+				$UserSettings->set( 'created_fromIPv4', ip2int( $Hit->IP ), $new_User->ID );
+				$UserSettings->set( 'user_registered_from_domain', $user_domain, $new_User->ID );
+				$UserSettings->set( 'user_browser', substr( $Hit->get_user_agent(), 0 , 200 ), $new_User->ID );
+				$UserSettings->dbupdate();
+
+				// Send notification email about new user registrations to users with edit users permission
+				$email_template_params = array(
+						'country'     => $new_User->get( 'ctry_ID' ),
+						'reg_country' => $new_User->get( 'reg_ctry_ID' ),
+						'reg_domain'  => $user_domain.' ('.$dom_status.')',
+						'user_domain' => $user_domain,
+						'firstname'   => $new_User->get( 'firstname' ),
+						'lastname'    => $new_User->get( 'lastname' ),
+						'fullname'    => $new_User->get( 'fullname' ),
+						'gender'      => $new_User->get( 'gender' ),
+						'locale'      => $new_User->get( 'locale' ),
+						'source'      => $new_User->get( 'source' ),
+						'trigger_url' => $session_registration_trigger_url,
+						'initial_hit' => $initial_hit,
+						'level'       => $new_User->get( 'level' ),
+						'group'       => ( ( $user_Group = & $new_User->get_Group() ) ? $user_Group->get_name() : '' ),
+						'login'       => $new_User->get( 'login' ),
+						'email'       => $new_User->get( 'email' ),
+						'new_user_ID' => $new_User->ID,
+					);
+				send_admin_notification( NT_('New user registration'), 'account_new', $email_template_params );
+
+				$Plugins->trigger_event( 'AfterUserRegistration', array( 'User' => & $new_User ) );
+				// Move user to suspect group by IP address and reverse DNS domain and email address domain:
+				// Make this move even if during the registration it was added to a trusted group:
+				antispam_suspect_user_by_IP( '', $new_User->ID, false );
+				antispam_suspect_user_by_reverse_dns_domain( $new_User->ID, false );
+				antispam_suspect_user_by_email_domain( $new_User->ID, false );
+
+				if( $Settings->get( 'newusers_mustvalidate' ) )
+				{	// We want that the user validates his email address:
+					if( $new_User->send_validate_email( NULL, $item_Blog->ID ) )
+					{
+						$activateinfo_link = 'href="'.get_activate_info_url( NULL, '&amp;' ).'"';
+						$Messages->add( sprintf( T_('An email has been sent to your email address. Please click on the link therein to activate your account. <a %s>More info &raquo;</a>'), $activateinfo_link ), 'success' );
+					}
+					elseif( $demo_mode )
+					{
+						$Messages->add( 'Sorry, could not send email. Sending email in demo mode is disabled.', 'error' );
+					}
+					else
+					{
+						$Messages->add( T_('Sorry, the email with the link to activate your account could not be sent.')
+							.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
+						// fp> TODO: allow to enter a different email address (just in case it's that kind of problem)
+					}
+				}
+				else
+				{	// Display this message after successful registration and without validation email:
+					$Messages->add( T_('You have successfully registered on this site. Welcome!'), 'success' );
+				}
+
 				// Autologin the user. This is more comfortable for the user and avoids
 				// extra confusion when account validation is required.
 				$Session->set_User( $new_User );
@@ -1414,6 +1511,40 @@ class collections_Module extends Module
 
 				header_redirect( $redirect_to );
 				break;
+
+			case 'update_tags':
+				// Update item tags:
+				$item_ID = param( 'item_ID', 'integer', true );
+				$item_tags = param( 'item_tags', 'string', true );
+
+				$ItemCache = & get_ItemCache();
+				$edited_Item = & $ItemCache->get_by_ID( $item_ID );
+
+				// Check perms:
+				$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+				if( empty( $item_tags ) && $edited_Item->get_type_setting( 'use_tags' ) == 'required' )
+				{	// Tags must be entered:
+					param_check_not_empty( 'item_tags', T_('Please provide at least one tag.') );
+				}
+
+				if( ! param_errors_detected() )
+				{	// Update tags only when no errors:
+					$edited_Item->set_tags_from_string( $item_tags );
+					if( $edited_Item->dbupdate() )
+					{
+						$Messages->add( T_('Post has been updated.'), 'success' );
+					}
+				}
+
+				if( isset( $_POST['actionArray']['update_tags'] ) )
+				{	// Use a default redirect to referer page when it has been submitted as normal form:
+					break;
+				}
+				else
+				{	// Exit here when AJAX request, so we don't need a redirect after this function:
+					exit(0);
+				}
 		}
 	}
 }

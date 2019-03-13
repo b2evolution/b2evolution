@@ -23,7 +23,7 @@ $default_ctrl = 'settings';
  * Minimum PHP version required for _core module to function properly.
  * This value can't be higher then the application required php version.
  */
-$required_php_version[ '_core' ] = '5.4';
+$required_php_version[ '_core' ] = '5.6';
 
 /**
  * Minimum MYSQL version required for _core module to function properly.
@@ -69,6 +69,7 @@ $db_config['aliases'] = array(
 		'T_users__user_org'        => $tableprefix.'users__user_org',
 		'T_users__secondary_user_groups' => $tableprefix.'users__secondary_user_groups',
 		'T_users__profile_visits'  => $tableprefix.'users__profile_visits',
+		'T_users__profile_visit_counters' => $tableprefix.'users__profile_visit_counters',
 		'T_users__tag'             => $tableprefix.'users__tag',
 		'T_users__usertag'         => $tableprefix.'users__usertag',
 		'T_slug'                   => $tableprefix.'slug',
@@ -284,6 +285,25 @@ function & get_Plugins_admin()
 
 
 /**
+ * Get the Plugins
+ *
+ * @return object Plugins
+ */
+function & get_Plugins()
+{
+	global $Plugins;
+
+	if( ! is_object( $Plugins ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+		$Plugins = new Plugins();
+	}
+
+	return $Plugins;
+}
+
+
+/**
  * Get the UserCache
  *
  * @return UserCache
@@ -469,6 +489,25 @@ function & get_EmailAddressCache()
 	}
 
 	return $EmailAddressCache;
+}
+
+
+/**
+ * Get the EmailLogCache
+ *
+ * @return EmailLogCache
+ */
+function & get_EmailLogCache()
+{
+	global $EmailLogCache;
+
+	if( ! isset( $EmailLogCache ) )
+	{ // Cache doesn't exist yet:
+		load_class( 'tools/model/_emaillog.class.php', 'EmailLog' );
+		$EmailLogCache = new DataObjectCache( 'EmailLog', false, 'T_email__log', 'emlog_', 'emlog_ID' );
+	}
+
+	return $EmailLogCache;
 }
 
 
@@ -1103,16 +1142,18 @@ class _core_Module extends Module
 		$working_blog = get_working_blog();
 		if( $working_blog )
 		{ // Set collection url only when current user has an access to the working blog
+			$BlogCache = & get_BlogCache();
+			$working_Blog = & $BlogCache->get_by_ID( $working_blog );
 			if( is_admin_page() )
 			{ // Front page of the working blog
-				$BlogCache = & get_BlogCache();
-				$working_Blog = & $BlogCache->get_by_ID( $working_blog );
 				$collection_url = $working_Blog->get( 'url' );
 			}
 			else
 			{ // Dashboard of the working blog
 				$collection_url = $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog='.$working_blog;
 			}
+
+			$default_new_ItemType = $working_Blog->get_default_new_ItemType();
 		}
 
 		if( $perm_admin_normal || $perm_admin_restricted )
@@ -1306,32 +1347,35 @@ class _core_Module extends Module
 				$entries['page'] = array(
 						'text' => T_('Page'),
 						'entries' => array(
-							// PLACE HOLDER FOR ENTRY "Edit contents":
-							'edit'       => NULL,
+							// PLACE HOLDER FOR ENTRIES "Edit in Front-Office", "Edit in Back-Office", "View in Back-Office":
+							'edit_front' => NULL,
+							'edit_back'  => NULL,
+							'propose'    => NULL,
+							'view_back'  => NULL,
 							// PLACE HOLDERS FOR SESSIONS MODULE:
 							'stats_sep'  => NULL,
 							'stats_page' => NULL,
 						)
 					);
 			}
-
-			// ---- "Post"/"Edit" MENU ----
-			if( $perm_admin_normal )
-			{	// Only for normal access display a menu item to create new:
-				$entries['post'] = array(
-						'text' => get_icon( 'new' ).' './* TRANS: noun */ T_('Post'),
-						'title' => T_('No blog is currently selected'),
-						'disabled' => true,
-						'entry_class' => 'rwdhide evobar-entry-new-post',
-					);
-			}
 		}
 
+		if( ! empty( $default_new_ItemType ) )
+		{	// ---- "+ Post" MENU ----
+			$default_item_denomination = /* TRANS: noun */ T_('Post');
+			$entries['post'] = array(
+					'text' => get_icon( 'new' ).' '.$default_new_ItemType->get_item_denomination( 'evobar_new', /* TRANS: noun */ T_('Post') ),
+					//'title' => T_('No blog is currently selected'),
+					'disabled' => true,
+					'entry_class' => 'rwdhide evobar-entry-new-post',
+				);
+		}
 
 		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) )
 		{ // A collection is currently selected AND we can activate toolbar items for selected collection:
 
-			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) ||
+			    $current_User->check_perm( 'blog_item_propose', 'edit', false, $Blog->ID ) )
 			{ // We have permission to add a post with at least one status:
 				global $disp, $ctrl, $action, $Item, $edited_Item;
 				if( ( $disp == 'edit' || $ctrl == 'items' ) &&
@@ -1339,61 +1383,55 @@ class _core_Module extends Module
 				    $edited_Item->ID > 0 &&
 				    $view_item_url = $edited_Item->get_permanent_url() )
 				{	// If curent user has a permission to edit a current viewing post:
-					$entries['post'] = array(
+					$entries['permalink'] = array(
 							'text'        => get_icon( 'permalink' ).' '.T_('Permalink'),
 							'href'        => $view_item_url,
 							'title'       => T_('Permanent link to full entry'),
 							'entry_class' => 'rwdhide',
 						);
 				}
-				elseif( ! is_admin_page() &&
-				  ( $disp == 'single' || $disp == 'page' ) &&
-				  ! empty( $Item ) &&
-				  $edit_item_url = $Item->get_edit_url() )
-				{	// If curent user has a permission to edit a current viewing post:
-					$entries['post'] = array(
-							'text'        => '<span class="fa fa-pencil-square"></span> '.( $perm_admin_restricted ? T_('Post') : T_('Edit') ),
-							'href'        => $edit_item_url,
-							'title'       => T_('Edit current post'),
-							'entry_class' => 'rwdhide',
-						);
-					if( $perm_admin_restricted )
-					{	// Menu entries to edit and view post in back-office:
-						$entries['post']['entries'] = array();
-						if( $Blog->get_setting( 'in_skin_editing' ) )
-						{	// If collection allows to edit posts in front-office:
-							$entries['post']['entries']['edit_front'] = array(
-									'text' => T_('Edit in Front-Office').'&hellip;',
-									'href' => $edit_item_url,
-								);
-						}
-						$entries['post']['entries']['edit_back'] = array(
-								'text' => T_('Edit in Back-Office').'&hellip;',
-								'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
-							);
-						$entries['post']['entries']['propose'] = array(
-								'text' => T_('Propose change').'&hellip;',
-								'href' => $admin_url.'?ctrl=items&amp;action=propose&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
-							);
-						$entries['post']['entries']['view_back'] = array(
-								'text' => T_('View in Back-Office').'&hellip;',
-								'href' => $admin_url.'?ctrl=items&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
+				if( ! is_admin_page() &&
+				    in_array( $disp, array( 'single', 'page', 'edit' ) ) &&
+				    $perm_admin_restricted )
+				{	// If curent user has a permission to edit a current editing/viewing post:
+					if( $disp != 'edit' &&
+					    $Blog->get_setting( 'in_skin_editing' ) &&
+					    ! empty( $Item ) &&
+					    $edit_item_url = $Item->get_edit_url() )
+					{	// Display menu entry to edit the post in front-office:
+						$entries['page']['entries']['edit_front'] = array(
+								'text' => sprintf( T_('Edit "%s" in Front-Office'), $Item->get_type_setting( 'name' ) ).'&hellip;',
+								'href' => $edit_item_url,
 							);
 					}
-					$entries['page']['entries']['edit'] = array(
-							'text'  => T_('Edit contents').'&hellip;',
-							'title' => T_('Edit current post'),
-							'href'  => $edit_item_url,
-						);
+					if( ! empty( $Item ) || ( ! empty( $edited_Item ) && $edited_Item->ID > 0 ) )
+					{	// Display menu entries to edit and view the post in back-office:
+						$menu_Item = empty( $Item ) ? $edited_Item : $Item;
+						if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+						{
+							$entries['page']['entries']['edit_back'] = array(
+									'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
+									'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+								);
+							$entries['page']['entries']['view_back'] = array(
+									'text' => sprintf( T_('View "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
+									'href' => $admin_url.'?ctrl=items&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+								);
+						}
+						if( $current_User->check_perm( 'blog_item_propose', 'edit', false, $Blog->ID ) )
+						{	// If current User has a permission to propose a change for the Item:
+							$entries['page']['entries']['propose'] = array(
+									'text' => T_('Propose change').'&hellip;',
+									'href' => $admin_url.'?ctrl=items&amp;action=propose&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
+								);
+						}
+					}
 				}
-				elseif( $write_item_url = $Blog->get_write_item_url() )
-				{	// If write item URL is not empty, it's sure that user can create new post:
-					if( ! $perm_admin_normal )
-					{	// Initialize this menu item when user has no back-office access but can create new post:
-						$entries['post'] = array(
-							'text'        => get_icon( 'new' ).' './* TRANS: noun */ T_('Post'),
-							'entry_class' => 'rwdhide evobar-entry-new-post',
-						);
+				if( isset( $entries['post'] ) && $write_item_url = $Blog->get_write_item_url() )
+				{	// Enable menu to create new item if current User has a permission in current collection:
+					if( ! empty( $default_new_ItemType ) )
+					{	// The get_write_url() function above does not allow specifying the item type ID we'll manually add it:
+						$write_item_url = url_add_param( $write_item_url, 'item_typ_ID='.$default_new_ItemType->ID );
 					}
 					$entries['post']['href'] = $write_item_url;
 					$entries['post']['disabled'] = false;
@@ -1462,7 +1500,7 @@ class _core_Module extends Module
 					}
 
 					$entries['blog']['entries']['posts'] = array(
-							'text' => T_('Posts').'&hellip;',
+							'text' => T_('Contents').'&hellip;',
 							'href' => $items_url,
 						);
 					$display_separator = true;
@@ -1592,11 +1630,11 @@ class _core_Module extends Module
 					if( $current_User->check_perm( 'options', 'view', false, $Blog->ID ) )
 					{ // Post Types & Statuses
 						$entries['blog']['entries']['general']['entries']['item_types'] = array(
-								'text' => T_('Post Types').'&hellip;',
+								'text' => T_('Item Types').'&hellip;',
 								'href' => $admin_url.'?ctrl=itemtypes&amp;tab=settings&amp;tab3=types'.$blog_param,
 							);
 						$entries['blog']['entries']['general']['entries']['item_statuses'] = array(
-								'text' => T_('Post Statuses').'&hellip;',
+								'text' => T_('Item Statuses').'&hellip;',
 								'href' => $admin_url.'?ctrl=itemstatuses&amp;tab=settings&amp;tab3=statuses'.$blog_param,
 							);
 					}
@@ -2302,10 +2340,22 @@ class _core_Module extends Module
 				'ctrl'   => 'cron/jobs/_decode_returned_emails.job.php',
 				'params' => NULL,
 			),
+			'manage-email-statuses' => array(
+				'name'   => T_('Manage email address statuses'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_manage_email_statuses.job.php',
+				'params' => NULL,
+			),
 			'send-non-activated-account-reminders' => array(
 				'name'   => T_('Send reminders about non-activated accounts'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_activate_account_reminder.job.php',
+				'params' => NULL,
+			),
+			'send-inactive-account-reminders' => array(
+				'name'   => T_('Send reminders about inactive accounts'),
+				'help'   => '#',
+				'ctrl'   => 'cron/jobs/_inactive_account_reminder.job.php',
 				'params' => NULL,
 			),
 			'execute-automations' => array(

@@ -106,7 +106,7 @@ class UserList extends DataObjectList2
 				'keywords'            => NULL,    // string, Search words
 				'gender'              => NULL,    // string: 'M', 'F', 'O', 'MF', 'MO', 'FO' or 'MFO'
 				'status_activated'    => NULL,    // string: 'activated'
-				'account_status'      => NULL,    // string: 'new', 'activated', 'manualactivated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
+				'account_status'      => NULL,    // string: 'new', 'activated', 'manualactivated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'pendingdelete', 'closed'
 				'registered_min'      => NULL,    // date: Registered date from
 				'registered_max'      => NULL,    // date: Registered date to
 				'reported'            => NULL,    // integer: 1 to show only reported users
@@ -709,9 +709,9 @@ class UserList extends DataObjectList2
 			{	// Initialize count of collections (used on order by this field):
 				$step1_SQL->SELECT_add( ', COUNT( DISTINCT blog_ID ) AS nb_blogs' );
 			}
-			if( !empty( $this->filters['reported'] ) && $this->filters['reported'] )
-			{	// Filter is set to 'Reported users'
-				$step1_SQL->SELECT_add( ', COUNT( DISTINCT urep_reporter_ID ) AS user_rep' );
+			if( ! empty( $this->filters['reported'] ) && ( empty( $this->filters['filter_query'] ) || $this->check_filter_query( 'report_count', 0, '>' ) ) )
+			{	// Filter is selected to 'Report count'
+				$step1_SQL->SELECT_add( ', user_rep' );
 			}
 			if( ! empty( $this->query_params['join_sec_groups'] ) )
 			{	// Initialize count of secondary groups (used on order by this field):
@@ -724,6 +724,7 @@ class UserList extends DataObjectList2
 
 			$step1_SQL->FROM( $this->UserQuery->get_from( '' ) );
 			$step1_SQL->WHERE( $this->UserQuery->get_where( '' ) );
+			$step1_SQL->WHERE_and( 'T_users.user_ID IS NOT NULL' );
 			$step1_SQL->GROUP_BY( $this->UserQuery->get_group_by( '' ) );
 			$step1_SQL->ORDER_BY( $this->UserQuery->get_order_by( '' ) );
 			$step1_SQL->LIMIT( 0 );
