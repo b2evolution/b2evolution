@@ -10407,12 +10407,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13170, 'Upgrading links table...' ) )
-	{	// part of 6.11.0-beta
-		db_drop_col( 'T_links', 'link_ltype_ID' );
-		upg_task_end();
-	}
-
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
