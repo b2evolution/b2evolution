@@ -10383,6 +10383,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 13150, 'Upgrading item versions tables...' ) )
 	{	// part of 6.11.0-beta
+
+		// Make column iver_ID unique per Item in order to avoid error on adding PRIMARY(unique) KEY below:
+		$DB->query( 'SET @iver_ID = 0' );
+		$DB->query( 'SET @iver_itm_ID = 0' );
+		$DB->query( 'UPDATE T_items__version
+			  SET iver_ID = IF( @iver_itm_ID != iver_itm_ID, @iver_ID := 1 AND @iver_itm_ID := iver_itm_ID, @iver_ID := @iver_ID + 1 )
+			ORDER BY iver_itm_ID, iver_edit_last_touched_ts' );
+
 		$DB->query( 'ALTER TABLE T_items__version
 			ADD COLUMN iver_type ENUM("archived","proposed") COLLATE ascii_general_ci NOT NULL DEFAULT "archived" AFTER iver_ID,
 			DROP INDEX iver_ID_itm_ID,
