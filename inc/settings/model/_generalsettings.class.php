@@ -143,6 +143,7 @@ class GeneralSettings extends AbstractSettings
 		'def_notify_post_mentioned' => '1',
 		'def_notify_post_moderation' => '1',
 		'def_notify_edit_pst_moderation' => '1',
+		'def_notify_post_proposed' => '1',
 		'def_notify_post_assignment' => '1',
 		'def_newsletters' => '1',
 		'def_notification_email_limit' => '3',

@@ -2957,6 +2957,7 @@ class Item extends ItemLight
 							// Permalink:
 							global $disp, $Item;
 							if( ( $disp != 'single' && $disp != 'page' ) ||
+							    ! ( $Item instanceof Item ) ||
 							    $Item->ID != $this->ID ||
 							    $fallback_count == $l + 1 )
 							{	// Use permalink if it is not last point and we don't view this current post:
@@ -8286,7 +8287,7 @@ class Item extends ItemLight
 		$Blog = & $this->get_Blog();
 		if( $Blog->get_setting( 'use_workflow' ) && $this->assigned_to_new_user && ! empty( $this->assigned_user_ID ) )
 		{
-			$already_notified_user_IDs = array_merge( $already_notified_user_IDs, $this->send_assignment_notification( $executed_by_userid, $is_new_item ) );
+			$already_notified_user_IDs = array_merge( $already_notified_user_IDs, $this->send_assignment_notification( $executed_by_userid ) );
 		}
 
 		// THIRD: Subscribers may be notified asynchornously... and that is a even a requirement if the post has an issue_date in the future.
@@ -8404,15 +8405,16 @@ class Item extends ItemLight
 
 
 	/**
-	 * Send "post may need moderation" notifications for those users who have permission to moderate this post and would like to receive these notifications.
+	 * Get item moderators
 	 *
+	 * @param string Setting name of notification: 'notify_post_moderation', 'notify_edit_pst_moderation', 'notify_post_proposed'
 	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
-	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
-	 * @return array the notified user ids
+	 * @param string|false Additional check with collection subscription: 'sub_items', 'sub_items_mod', 'sub_comments'
+	 * @return array Key - User ID, Value - perm level
 	 */
-	function send_moderation_emails( $executed_by_userid = NULL, $is_new_item = false )
+	function get_moderators( $notify_setting_name, $executed_by_userid = NULL, $check_coll_subscription = false )
 	{
-		global $Settings, $UserSettings, $DB, $Messages;
+		global $Settings, $DB;
 
 		if( $executed_by_userid === NULL && is_logged_in() )
 		{	// Use current user by default:
@@ -8420,29 +8422,24 @@ class Item extends ItemLight
 			$executed_by_userid = $current_User->ID;
 		}
 
-		// Select all users who are post moderators in this Item's blog
-		$blog_ID = $this->load_Blog();
-
-		$notify_moderation_setting_name = ( $is_new_item ? 'notify_post_moderation' : 'notify_edit_pst_moderation' );
-
 		$notify_condition = 'uset_value IS NOT NULL AND uset_value <> "0"';
-		if( $Settings->get( 'def_'.$notify_moderation_setting_name ) )
+		if( $Settings->get( 'def_'.$notify_setting_name ) )
 		{
 			$notify_condition = '( uset_value IS NULL OR ( '.$notify_condition.' ) )';
 		}
-		if( ! $is_new_item && $this->Blog->get_setting( 'allow_item_mod_subscriptions' ) )
+		if( $check_coll_subscription !== false )
 		{	// Notify moderators which selected to be notified per collection (if it is enabled by collection setting):
-			$notify_condition = '( sub_items_mod = 1 OR ( '.$notify_condition.' ) )';
+			$notify_condition = '( '.$check_coll_subscription.' = 1 OR ( '.$notify_condition.' ) )';
 		}
 
 		// Select user_ids with the corresponding item edit permission on this item's blog
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get moderators "'.$notify_setting_name.'" for Item #'.$this->ID );
 		$SQL->SELECT( 'user_ID, IF( grp_perm_blogs = "editall" OR user_ID = blog_owner_user_ID, "all", IF( IFNULL( bloguser_perm_edit + 0, 0 ) > IFNULL( bloggroup_perm_edit + 0, 0 ), bloguser_perm_edit, bloggroup_perm_edit ) ) as perm' );
 		$SQL->FROM( 'T_users' );
-		$SQL->FROM_add( 'LEFT JOIN T_blogs ON ( blog_ID = '.$this->blog_ID.' )' );
-		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0 AND user_ID = bloguser_user_ID AND bloguser_blog_ID = '.$this->blog_ID.' )' );
-		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0 AND user_grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$this->blog_ID.' )' );
-		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "'.$notify_moderation_setting_name.'"' );
+		$SQL->FROM_add( 'LEFT JOIN T_blogs ON ( blog_ID = '.$this->get_blog_ID().' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0 AND user_ID = bloguser_user_ID AND bloguser_blog_ID = '.$this->get_blog_ID().' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0 AND user_grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$this->get_blog_ID().' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "'.$notify_setting_name.'"' );
 		$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 		$SQL->FROM_add( 'LEFT JOIN T_subscriptions ON sub_coll_ID = blog_ID AND sub_user_ID = user_ID' );
 		$SQL->WHERE( $notify_condition );
@@ -8455,11 +8452,31 @@ class Item extends ItemLight
 			$SQL->WHERE_and( 'user_ID != '.$DB->quote( $executed_by_userid ) );
 		}
 
-		$post_moderators = $DB->get_assoc( $SQL->get() );
+		return $DB->get_assoc( $SQL );
+	}
+
+
+	/**
+	 * Send "post may need moderation" notifications for those users who have permission to moderate this post and would like to receive these notifications.
+	 *
+	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
+	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
+	 * @return array the notified user ids
+	 */
+	function send_moderation_emails( $executed_by_userid = NULL, $is_new_item = false )
+	{
+		global $Messages;
+
+		$notify_moderation_setting_name = ( $is_new_item ? 'notify_post_moderation' : 'notify_edit_pst_moderation' );
+		// Notify moderators which selected to be notified per collection (if it is enabled by collection setting):
+		$check_coll_subscription = ( ! $is_new_item && $this->get_Blog()->get_setting( 'allow_item_mod_subscriptions' ) ? 'sub_items_mod' : false );
+
+		// Get all users who are post moderators in this Item's blog:
+		$post_moderators = $this->get_moderators( $notify_moderation_setting_name, $executed_by_userid, $check_coll_subscription );
 
 		$post_creator_User = & $this->get_creator_User();
 		if( isset( $post_moderators[$post_creator_User->ID] ) )
-		{ // Don't notify the user who just created this Item
+		{	// Don't notify the user who just created this Item:
 			unset( $post_moderators[$post_creator_User->ID] );
 		}
 
@@ -8534,13 +8551,81 @@ class Item extends ItemLight
 
 
 	/**
+	 * Send "post proposed change" notifications for those users who have permission to moderate this post and would like to receive these notifications.
+	 *
+	 * @param integer Version ID of new proposed change
+	 */
+	function send_proposed_change_notification( $iver_ID )
+	{
+		global $Messages, $current_User;
+
+		if( ! is_logged_in() )
+		{	// Only logged in user can propose a change
+			return;
+		}
+
+		// Get all users who are post moderators in this Item's blog:
+		$post_moderators = $this->get_moderators( 'notify_post_proposed' );
+
+		if( empty( $post_moderators ) )
+		{ // There are no moderator users who would like to receive notificaitons
+			return;
+		}
+
+		// Collect all notified User IDs in this array:
+		$notified_users_num = 0;
+
+		$post_creator_User = & $this->get_creator_User();
+		$post_creator_level = $post_creator_User->level;
+		$UserCache = & get_UserCache();
+		$UserCache->load_list( array_keys( $post_moderators ) );
+
+		foreach( $post_moderators as $moderator_ID => $perm )
+		{
+			$moderator_User = $UserCache->get_by_ID( $moderator_ID );
+			if( ( $perm == 'lt' ) && ( $moderator_User->level <= $post_creator_level ) )
+			{ // User has no permission moderate this post
+				continue;
+			}
+			if( ( $perm == 'le' ) && ( $moderator_User->level < $post_creator_level ) )
+			{ // User has no permission moderate this post
+				continue;
+			}
+
+			$moderator_user_Group = $moderator_User->get_Group();
+
+			$email_template_params = array(
+				'iver_ID'        => $iver_ID,
+				'Item'           => $this,
+				'recipient_User' => $moderator_User,
+				'proposer_User'  => $current_User,
+			);
+
+			locale_temp_switch( $moderator_User->locale );
+
+			// TRANS: Subject of the mail to send on new posts to moderators. First %s is blog name, the second %s is the item's title.
+			$subject = sprintf( T_('[%s] New change was proposed on a post: "%s"'), $this->get_Blog()->get( 'shortname' ), $this->get( 'title' ) );
+
+			// Send the email:
+			if( send_mail_to_User( $moderator_ID, $subject, 'post_proposed_change', $email_template_params, false, array( 'Reply-To' => $post_creator_User->email ) ) )
+			{	// A send notification email request to the user with $moderator_ID ID was processed:
+				$notified_users_num++;
+			}
+
+			locale_restore_previous();
+		}
+
+		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), $notified_users_num ), 'note', T_('Sending notifications:')  );
+	}
+
+
+	/**
 	 * Send "post assignment" notifications for user who have been assigned to this post and would like to receive these notifications.
 	 *
 	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
-	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
 	 * @return array the notified user ids
 	 */
-	function send_assignment_notification( $executed_by_userid = NULL, $is_new_item = false )
+	function send_assignment_notification( $executed_by_userid = NULL )
 	{
 		global $current_User, $Messages, $UserSettings;
 
@@ -12442,6 +12527,14 @@ class Item extends ItemLight
 		if( $result )
 		{
 			$DB->commit();
+
+			// Reset this Item in order to use current title, content and other data in email message:
+			$ItemCache = get_ItemCache();
+			unset( $ItemCache->cache[ $this->ID ] );
+			$Item = & $ItemCache->get_by_ID( $this->ID );
+
+			// Send email notification to moderators about new proposed change:
+			$Item->send_proposed_change_notification( $iver_ID );
 		}
 		else
 		{
