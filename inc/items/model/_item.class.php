@@ -2799,6 +2799,7 @@ class Item extends ItemLight
 							// Permalink:
 							global $disp, $Item;
 							if( ( $disp != 'single' && $disp != 'page' ) ||
+							    ! ( $Item instanceof Item ) ||
 							    $Item->ID != $this->ID ||
 							    $fallback_count == $l + 1 )
 							{	// Use permalink if it is not last point and we don't view this current post:
