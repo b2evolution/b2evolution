@@ -479,12 +479,16 @@ switch( $action )
 		$Backup->load_from_Request( true );
 
 		// File options:
-		param( 'fm_default_chmod_dir', 'string' );
-		param_check_regexp( 'fm_default_chmod_dir', '~^[0-7]{3}$~', T_('Invalid CHMOD value. Use 3 digits.') );
-		$Settings->set( 'fm_default_chmod_dir', $fm_default_chmod_dir );
-		param( 'fm_default_chmod_file', 'string' );
-		param_check_regexp( 'fm_default_chmod_file', '~^[0-7]{3}$~', T_('Invalid CHMOD value. Use 3 digits.') );
-		$Settings->set( 'fm_default_chmod_file', $fm_default_chmod_file );
+		if( param( 'fm_default_chmod_dir', 'string', NULL ) !== NULL )
+		{
+			param_check_regexp( 'fm_default_chmod_dir', '~^[0-7]{3}$~', T_('Invalid CHMOD value. Use 3 digits.') );
+			$Settings->set( 'fm_default_chmod_dir', $fm_default_chmod_dir );
+		}
+		if( param( 'fm_default_chmod_file', 'string', NULL ) !== NULL )
+		{
+			param_check_regexp( 'fm_default_chmod_file', '~^[0-7]{3}$~', T_('Invalid CHMOD value. Use 3 digits.') );
+			$Settings->set( 'fm_default_chmod_file', $fm_default_chmod_file );
+		}
 
 		if( param_errors_detected() )
 		{	// Display the previous step form in order to fix the detected errors:
