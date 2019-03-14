@@ -563,7 +563,7 @@ switch( $action )
 				if( $Item->assign_to( $new_assigned_ID, $new_assigned_login ) )
 				{ // An assigned user can be changed
 					$Item->dbupdate();
-					$Item->send_assignment_notification( NULL, false );
+					$Item->send_assignment_notification();
 				}
 				else
 				{ // Error on changing of an assigned user

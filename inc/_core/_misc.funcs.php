@@ -4121,7 +4121,9 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'post_new':
 				// 'notify_post_mentioned' - "I have been mentioned on a post.",
 				// 'notify_post_moderation' - "a post is created and I have permissions to moderate it."
-				// 'notify_edit_pst_moderation' - "a post is modified and I have permissions to moderate it."
+				// 'notify_edit_pst_moderation' - "someone proposed a change on a post and I have permissions to moderate it."
+			case 'post_proposed':
+				// 'notify_post_proposed' - "a post is modified and I have permissions to moderate it."
 			case 'post_assignment':
 				// 'notify_post_assignment' - "a post was assigned to me."
 			case 'posts_unmoderated_reminder':

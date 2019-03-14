@@ -241,6 +241,12 @@ elseif( $confirmed )
 					}
 					break;
 
+				case 'post_proposed_change':
+					// unsubscribe from post proposed change notifications:
+					$UserSettings->set( 'notify_post_proposed', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
 				case 'unread_msg':
 					// unsubscribe from unread messages reminder
 					$UserSettings->set( 'notify_unread_messages', '0', $edited_User->ID );
@@ -569,6 +575,12 @@ elseif( $confirmed )
 								  AND sub_coll_ID = '.$DB->quote( $coll_ID ) );
 						}
 					}
+					break;
+
+				case 'post_proposed_change':
+					// resubscribe to post proposed change notifications:
+					$UserSettings->set( 'notify_post_proposed', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
 					break;
 
 				case 'unread_msg':
