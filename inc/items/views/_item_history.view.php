@@ -273,7 +273,7 @@ if( $revisions_count > 1 )
 <script>
 jQuery( document ).ready( function()
 {	// Set default selected revisions on page loading:
-	if( jQuery( 'input[name=r1][value=p1]' ).length )
+	if( jQuery( 'input[name=r1][value^=p]' ).length )
 	{	// Suggest to compare curent version with last proposed change:
 		jQuery( 'input[name=r1][value=c]' ).click();
 		jQuery( 'input[name=r2]:first' ).click();

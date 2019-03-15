@@ -809,6 +809,11 @@ switch( $type )
 		$type_str = $notification_prefix.': '.T_('a post is modified and I have permissions to moderate it.');
 		break;
 
+	case 'post_proposed_change':
+		// unsubscribe from post proposed change notifications:
+		$type_str = $notification_prefix.': '.T_('someone proposed a change on a post and I have permissions to moderate it.');
+		break;
+
 	case 'unread_msg':
 		// unsubscribe from unread messages reminder
 		$type_str = $notification_prefix.': '.sprintf( T_('I have unread private messages for more than %s.'), seconds_to_period( $Settings->get( 'unread_message_reminder_threshold' ) ) );

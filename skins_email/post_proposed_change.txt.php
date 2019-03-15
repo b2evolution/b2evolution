@@ -32,9 +32,9 @@ echo sprintf( T_('%s proposed a change on a post %s.'), $proposer_User->get_user
 echo "\n\n";
 
 // Buttons:
-echo T_('View changes').': '.$admin_url.'?ctrl=items&action=history_compare&p='.$Item->ID.'&r1=c&r2=p'.$params['iver_ID']."\n";
+echo T_('View all changes').': '.$admin_url.'?ctrl=items&action=history_compare&p='.$Item->ID.'&r1=c&r2=p'.$params['iver_ID']."\n";
+echo T_('View history').': '.$admin_url.'?ctrl=items&action=history&p='.$Item->ID."\n";
 echo T_('View post').': '.$Item->get_permanent_url( '', '', '&' )."\n";
-echo T_('Edit post').': '.$admin_url.'?ctrl=items&blog='.$Item->get_blog_ID().'&p='.$Item->ID."\n";
 
 // Footer vars:
 $params['unsubscribe_text'] = T_('You are a moderator in this blog, and you are receiving notifications when a post may need moderation.')."\n"
