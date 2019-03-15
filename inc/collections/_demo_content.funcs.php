@@ -1045,7 +1045,7 @@ function get_demo_user( $login, $create = false, $output = true )
 
 		if( $output )
 		{
-			task_begin( sprintf( 'Creating demo user %s...', $login ) );
+			task_begin( sprintf( T_('Creating demo user %s...'), $login ) );
 		}
 		adjust_timestamp( $user_timestamp, 360, 1440, false );
 
@@ -1356,7 +1356,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 
 	if( $demo_content_type == 'complex_site' || $create_sample_contents == 'full' )
 	{
-		task_begin( 'Creating default sections... ' );
+		task_begin( T_('Creating default sections...') );
 		$SectionCache = & get_SectionCache();
 
 		$sections = array();
@@ -1405,7 +1405,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	// Create demo polls:
 	// (global $demo_poll_ID may be used in default widgets e-g for collection "Blog B")
 	global $demo_poll_ID;
-	task_begin( 'Creating default polls... ' );
+	task_begin( T_('Creating default polls...') );
 	$demo_poll_ID = create_demo_poll();
 	task_end();
 
@@ -1417,7 +1417,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 
 	if( $install_collection_home )
 	{	// Install Home blog
-		task_begin( 'Creating Home collection...' );
+		task_begin( sprintf( T_('Creating %s collection...'), T_('Home') ) );
 		$section_ID = isset( $sections['Home']['ID'] ) ? $sections['Home']['ID'] : 1;
 		if( $blog_ID = create_demo_collection( 'main', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID ) )
 		{
@@ -1440,14 +1440,14 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 		}
 		else
 		{
-			task_end( '<span class="text-danger">Failed.</span>' );
+			task_end( '<span class="text-danger">'.T_('Failed').'.</span>' );
 		}
 	}
 
 	if( $install_collection_bloga )
 	{	// Install Blog A
 		$timeshift += 86400;
-		task_begin( 'Creating Blog A collection...' );
+		task_begin( sprintf( T_('Creating %s collection...'), T_('Blog A') ) );
 		$section_ID = isset( $sections['Blogs']['ID'] ) ? $sections['Blogs']['ID'] : 1;
 		if( $blog_ID = create_demo_collection( 'blog_a', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID ) )
 		{
@@ -1476,7 +1476,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	if( $install_collection_blogb )
 	{	// Install Blog B
 		$timeshift += 86400;
-		task_begin( 'Creating Blog B collection...' );
+		task_begin( sprintf( T_('Creating %s collection...'), T_('Blog B') ) );
 		$section_ID = isset( $sections['Blogs']['ID'] ) ? $sections['Blogs']['ID'] : 1;
 		if( $blog_ID = create_demo_collection( 'blog_b', $paul_blogger_ID, $use_demo_users, $timeshift, $section_ID ) )
 		{
@@ -1505,7 +1505,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	if( $install_collection_photos )
 	{	// Install Photos blog
 		$timeshift += 86400;
-		task_begin( 'Creating Photos collection...' );
+		task_begin( sprintf( T_('Creating %s collection...'), T_('Photos') ) );
 		$section_ID = isset( $sections['Photos']['ID'] ) ? $sections['Photos']['ID'] : 1;
 		if( $blog_ID = create_demo_collection( 'photo', $dave_blogger_ID, $use_demo_users, $timeshift, $section_ID ) )
 		{
@@ -1534,7 +1534,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	if( $install_collection_forums )
 	{	// Install Forums blog
 		$timeshift += 86400;
-		task_begin( 'Creating Forums collection...' );
+		task_begin( sprintf( T_('Creating %s collection...'), T_('Forums') ) );
 		$section_ID = isset( $sections['Forums']['ID'] ) ? $sections['Forums']['ID'] : 1;
 		if( $blog_ID = create_demo_collection( 'forum', $paul_blogger_ID, $use_demo_users, $timeshift, $section_ID ) )
 		{
@@ -1563,7 +1563,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	if( $install_collection_manual )
 	{	// Install Manual blog
 		$timeshift += 86400;
-		task_begin( 'Creating Manual collection...' );
+		task_begin( sprintf( T_('Creating %s collection...'), T_('Manual') ) );
 		$section_ID = isset( $sections['Manual']['ID'] ) ? $sections['Manual']['ID'] : 1;
 		if( $blog_ID = create_demo_collection( 'manual', $dave_blogger_ID, $use_demo_users, $timeshift, $section_ID ) )
 		{
@@ -1592,7 +1592,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	if( $install_collection_tracker )
 	{	// Install Tracker blog
 		$timeshift += 86400;
-		task_begin( 'Creating Tracker collection...' );
+		task_begin( sprintf( T_('Creating %s collection...'), T_('Tracker') ) );
 		$section_ID = isset( $sections['Forums']['ID'] ) ? $sections['Forums']['ID'] : 1;
 		if( $blog_ID = create_demo_collection( 'group', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID ) )
 		{
@@ -1621,7 +1621,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	if( $install_collection_minisite )
 	{	// Install Mini-site collection
 		$timeshift += 86400;
-		task_begin( 'Creating Mini-Site collection...' );
+		task_begin( sprintf( T_('Creating %s collection...'), T_('Mini-Site') ) );
 		if( $blog_ID = create_demo_collection( 'minisite', $jay_moderator_ID, $use_demo_users, $timeshift, 1 ) )
 		{
 			if( $initial_install )
@@ -1649,13 +1649,13 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 
 	// Install default shared widgets:
 	global $installed_default_shared_widgets;
-	task_begin( 'Installing default shared widgets... ' );
+	task_begin( T_('Installing default shared widgets...') );
 	insert_shared_widgets( 'normal', true );
 	task_end();
 	$installed_default_shared_widgets = true;
 
 	// Setting default login and default messaging collection:
-	task_begin( 'Setting default login and default messaging collection...' );
+	task_begin( T_('Setting default login and default messaging collection...') );
 	if( $demo_content_type == 'minisite' )
 	{
 		$Settings->set( 'login_blog_ID', 0 );
@@ -1684,7 +1684,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	}
 	task_end();
 
-	task_begin( 'Set setting for site skins...' );
+	task_begin( T_('Set setting for site skins...') );
 	$Settings->set( 'site_skins_enabled', $site_skins_setting );
 	$Settings->dbupdate();
 	task_end();
@@ -1694,7 +1694,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 		if( $install_test_features )
 		{
 			echo_install_log( 'TEST FEATURE: Creating fake hit statistics' );
-			task_begin( 'Creating fake hit statistics... ' );
+			task_begin( T_('Creating fake hit statistics...') );
 			load_funcs('sessions/model/_hitlog.funcs.php');
 			load_funcs('_core/_url.funcs.php');
 			$insert_data_count = generate_hit_stat(10, 0, 5000);
@@ -1744,7 +1744,7 @@ function create_default_newsletters()
 {
 	global $DB;
 
-	task_begin( 'Creating demo email lists... ' );
+	task_begin( T_('Creating demo email lists...') );
 
 	// Insert default newsletters:
 	$created_lists_num = $DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label, enlt_order, enlt_owner_user_ID )
@@ -1768,7 +1768,7 @@ function create_default_email_campaigns()
 {
 	global $DB, $Settings, $baseurl;
 
-	task_begin( 'Creating default email campaigns... ' );
+	task_begin( T_('Creating demo email campaigns...') );
 
 	load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
 	load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
@@ -1863,7 +1863,7 @@ function create_default_automations()
 {
 	global $DB;
 
-	task_begin( 'Creating default automations... ' );
+	task_begin( T_('Creating demo automations...') );
 
 	//load_funcs( 'automations/model/_automation.funcs.php' );
 	load_class( 'automations/model/_automation.class.php', 'Automation' );
@@ -3992,11 +3992,11 @@ function install_demo_content()
 
 		if( $create_demo_organization )
 		{
-			task_begin( 'Creating demo organization...' );
+			task_begin( T_('Creating demo organization...') );
 			$user_org_IDs = array( create_demo_organization( $current_User->ID )->ID );
 			task_end();
 
-			task_begin( 'Adding admin user to demo organization...' );
+			task_begin( T_('Adding admin user to demo organization...') );
 			$current_User->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
 			task_end();
 		}
@@ -4006,7 +4006,7 @@ function install_demo_content()
 
 	if( $create_demo_users && $create_demo_messages )
 	{
-		task_begin( 'Creating demo private messages...' );
+		task_begin( T_('Creating demo private messages...') );
 		create_demo_messages();
 		task_end();
 	}
