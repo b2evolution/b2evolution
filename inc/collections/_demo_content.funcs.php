@@ -1744,7 +1744,7 @@ function create_default_newsletters()
 {
 	global $DB;
 
-	task_begin( 'Creating default lists... ' );
+	task_begin( 'Creating demo email lists... ' );
 
 	// Insert default newsletters:
 	$created_lists_num = $DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label, enlt_order, enlt_owner_user_ID )
@@ -2454,15 +2454,6 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				'comment_status' => 'disabled',
 			);
 
-			$demo_items['widget_page'] = array(
-				'title'    => T_('Widget Page'),
-				'category' => 'b2evolution',
-				'type'     => 'Widget Page',
-				'files'    => array(
-					array( 'monument-valley/monuments.jpg', 'cover' ),
-				),
-			);
-
 			$demo_items['about_this_site'] = array(
 				'title'    => T_('About this site'),
 				'category' => 'b2evolution',
@@ -2474,6 +2465,17 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				'files'    => array(
 					array( 'logos/b2evolution_1016x208_wbg.png' ),
 				),
+				'widget_info_page' => true,
+			);
+
+			$demo_items['widget_page'] = array(
+				'title'    => T_('Widget Page'),
+				'category' => 'b2evolution',
+				'type'     => 'Widget Page',
+				'files'    => array(
+					array( 'monument-valley/monuments.jpg', 'cover' ),
+				),
+				'widget_info_page' => true,
 			);
 
 			$demo_items['b2evo_the_other_blog_tool'] = array(
@@ -3696,14 +3698,13 @@ Hello
 				$new_Item->dbupdate();
 			}
 
+			if( ! empty( $demo_item['widget_info_page'] ) )
+			{	// Update global variable which may be used on install default widgets:
+				$installed_collection_info_pages[ $demo_item_key ] = $new_Item->ID;
+			}
+
 			switch( $item_type )
 			{
-				case 'Widget Page':
-					// Update global variable when widget page has been installed,
-					// this may be used on install default widgets:
-					$installed_collection_info_pages['widget_page'] = $new_Item->ID;
-					break;
-
 				case 'Terms & Conditions':
 					// Use the Item as default terms & conditions:
 					$Settings->set( 'site_terms', $new_Item->ID );
@@ -3983,7 +3984,7 @@ function install_demo_content()
 	$DB->begin();
 	if( $create_demo_organization )
 	{
-		echo get_install_format_text( '<h2>'.T_('Creating sample organization and users...').'</h2>', 'h2' );
+		echo get_install_format_text( '<h2>'.T_('Creating demo organization and users...').'</h2>', 'h2' );
 		evo_flush();
 
 		if( $create_demo_organization )
@@ -4011,7 +4012,7 @@ function install_demo_content()
 	$emails_data_installed = 0;
 	if( $create_sample_contents || $create_demo_email_lists )
 	{
-		echo get_install_format_text( '<h2>'.T_('Installing sample contents...').'</h2>', 'h2' );
+		echo get_install_format_text( '<h2>'.T_('Creating demo website...').'</h2>', 'h2' );
 	}
 
 	if( $create_sample_contents )
@@ -4029,7 +4030,13 @@ function install_demo_content()
 	{
 		evo_flush();
 		echo '<br/>';
-		echo get_install_format_text( '<span class="text-success">'.T_('Created sample contents.').'</span>' );
+		echo get_install_format_text( '<span class="text-success">'.T_('Demo elements successfully created.').'</span>' );
+
+		if( $collections_installed )
+		{	// Display button to view website if at least one collection was created:
+			global $baseurl;
+			echo '<br/><br/><a href="'.$baseurl.'" class="btn btn-info">'.T_('View website now').' &gt;&gt;</a>';
+		}
 	}
 
 	$DB->commit();

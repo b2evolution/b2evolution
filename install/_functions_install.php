@@ -203,7 +203,7 @@ function install_newdb()
 
 	if( $create_demo_organization || $create_demo_users )
 	{
-		echo get_install_format_text( '<h2>'.T_('Creating sample organization and users...').'</h2>', 'h2' );
+		echo get_install_format_text( '<h2>'.T_('Creating demo organization and users...').'</h2>', 'h2' );
 		evo_flush();
 
 		// Create demo organization if selected:
@@ -261,7 +261,7 @@ function install_newdb()
 	{
 		global $Settings, $install_test_features;
 
-		echo get_install_format_text( '<h2>'.T_('Installing sample contents...').'</h2>', 'h2' );
+		echo get_install_format_text( '<h2>'.T_('Creating demo website...').'</h2>', 'h2' );
 		evo_flush();
 
 		// We're gonna need some environment in order to create the demo contents...
