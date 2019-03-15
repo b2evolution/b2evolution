@@ -10415,7 +10415,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13170, 'Creating Markdown Documentation file type...' ) )
+	if( upg_task_start( 13170, 'Creating Markdown text file type...' ) )
 	{	// part of 6.11.0-beta
 		$SQL = new SQL( 'Check for file type .md' );
 		$SQL->SELECT( 'ftyp_ID' );
@@ -10425,7 +10425,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		{	// Insert new file type for Markdown Documentation only if it doesn't exist:
 			$DB->query( 'INSERT INTO T_filetypes
 				       ( ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed )
-				VALUES ( "md", "Markdown Documentation file", "text/plain", "file_document", "text", "registered" )' );
+				VALUES ( "md", "Markdown text file", "text/plain", "file_document", "text", "registered" )' );
 		}
 		upg_task_end();
 	}

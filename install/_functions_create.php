@@ -713,7 +713,7 @@ function create_default_data()
 			(22, 'ogv', 'Ogg video file', 'video/ogg', 'file_video', 'browser', 'registered'),
 			(23, 'm3u8', 'M3U8 video file', 'application/x-mpegurl', 'file_video', 'browser', 'registered'),
 			(24, 'xml', 'XML file', 'application/xml', 'file_www', 'browser', 'admin'),
-			(25, 'md', 'Markdown Documentation file', 'text/plain', 'file_document', 'text', 'registered')
+			(25, 'md', 'Markdown text file', 'text/plain', 'file_document', 'text', 'registered')
 		" );
 	task_end();
 
