@@ -1185,6 +1185,8 @@ switch( $action )
 			}
 		}
 
+		// Clear revision in order to display current data on the form:
+		$edited_Item->clear_revision();
 		break;
 
 	case 'history_restore':
@@ -2175,26 +2177,30 @@ switch( $action )
 			// Update current Item with values from the requested proposed change:
 			$result = $edited_Item->update_from_revision( get_param( 'r' ) );
 			$success_message = sprintf( T_('The proposed change #%d has been accepted.'), $Revision->iver_ID );
+			// Delete only previous proposed changes:
+			$delete_direction = '<=';
 		}
 		else
 		{	// Reject the proposed change:
 			$result = true;
 			$success_message = sprintf( T_('The proposed change #%d has been rejected.'), $Revision->iver_ID );
+			// Delete only newer proposed changes:
+			$delete_direction = '>=';
 		}
 		if( $result )
 		{	// Delete also the proposed changes with custom fields and links to complete accept/reject action:
 			$DB->query( 'DELETE FROM T_items__version
 				WHERE iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
 				  AND iver_type = "proposed"
-				  AND iver_ID >= '.$Revision->iver_ID );
+				  AND iver_ID '.$delete_direction.' '.$Revision->iver_ID );
 			$DB->query( 'DELETE FROM T_items__version_custom_field
 				WHERE ivcf_iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
 				  AND ivcf_iver_type = "proposed"
-				  AND ivcf_iver_ID >= '.$Revision->iver_ID );
+				  AND ivcf_iver_ID '.$delete_direction.' '.$Revision->iver_ID );
 			$DB->query( 'DELETE FROM T_items__version_link
 				WHERE ivl_iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
 				  AND ivl_iver_type = "proposed"
-				  AND ivl_iver_ID >= '.$Revision->iver_ID );
+				  AND ivl_iver_ID '.$delete_direction.' '.$Revision->iver_ID );
 			// Display success message:
 			$Messages->add( $success_message, 'success' );
 		}
@@ -2531,7 +2537,7 @@ switch( $action )
 						) );
 			}
 
-			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', $redirect_to, T_('Cancel'), 4, 2 );
+			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action', 'action=history' ), T_('Cancel'), 4, 2 );
 		}
 
 		break;

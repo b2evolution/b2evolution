@@ -8481,6 +8481,9 @@ class Item extends ItemLight
 			return;
 		}
 
+		// Clear revision in order to use current data in the email message:
+		$this->clear_revision();
+
 		// Collect all notified User IDs in this array:
 		$notified_users_num = 0;
 
@@ -8512,8 +8515,8 @@ class Item extends ItemLight
 
 			locale_temp_switch( $moderator_User->locale );
 
-			// TRANS: Subject of the mail to send on new posts to moderators. First %s is blog name, the second %s is the item's title.
-			$subject = sprintf( T_('[%s] New change was proposed on a post: "%s"'), $this->get_Blog()->get( 'shortname' ), $this->get( 'title' ) );
+			// TRANS: Subject of the mail to send on a post proposed change to moderators. First %s is blog name, the second %s is the item's title.
+			$subject = sprintf( T_('[%s] New change was proposed on: "%s"'), $this->get_Blog()->get( 'shortname' ), $this->get( 'title' ) );
 
 			// Send the email:
 			if( send_mail_to_User( $moderator_ID, $subject, 'post_proposed_change', $email_template_params, false, array( 'Reply-To' => $post_creator_User->email ) ) )
@@ -10309,6 +10312,30 @@ class Item extends ItemLight
 		}
 
 		return $this->revisions[ $orig_iver_ID ];
+	}
+
+
+	/**
+	 * Clear revision and item's data to current version
+	 */
+	function clear_revision()
+	{
+		// Reset this Item in order to use current title, content and other data:
+		$ItemCache = get_ItemCache();
+		unset( $ItemCache->cache[ $this->ID ] );
+		if( $current_Item = $ItemCache->get_by_ID( $this->ID, false, false ) )
+		{	// Revert fields to current values:
+			$revision_fields = array( 'title', 'content', 'status' );
+			foreach( $revision_fields as $revision_field )
+			{
+				$this->set( $revision_field, $current_Item->get( $revision_field ) );
+			}
+		}
+
+		if( isset( $this->revision ) )
+		{	// Reset to use data from current Item:
+			unset( $this->revision );
+		}
 	}
 
 
@@ -12406,14 +12433,8 @@ class Item extends ItemLight
 		if( $result )
 		{
 			$DB->commit();
-
-			// Reset this Item in order to use current title, content and other data in email message:
-			$ItemCache = get_ItemCache();
-			unset( $ItemCache->cache[ $this->ID ] );
-			$Item = & $ItemCache->get_by_ID( $this->ID );
-
 			// Send email notification to moderators about new proposed change:
-			$Item->send_proposed_change_notification( $iver_ID );
+			$this->send_proposed_change_notification( $iver_ID );
 		}
 		else
 		{

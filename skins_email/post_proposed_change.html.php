@@ -36,9 +36,9 @@ echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('%s proposed a change on a pos
 // Buttons:
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
 
-echo get_link_tag( $admin_url.'?ctrl=items&action=history_compare&p='.$Item->ID.'&r1=c&r2=p'.$params['iver_ID'], T_('View changes'), 'div.buttons a+a.btn-primary' )."\n";
+echo get_link_tag( $admin_url.'?ctrl=items&action=history_compare&p='.$Item->ID.'&r1=c&r2=p'.$params['iver_ID'], T_('View all changes'), 'div.buttons a+a.btn-primary' )."\n";
+echo get_link_tag( $admin_url.'?ctrl=items&action=history&p='.$Item->ID, T_('View history'), 'div.buttons a+a.btn-default' )."\n";
 echo get_link_tag( $Item->get_permanent_url( '', '', '&' ), T_('View post'), 'div.buttons a+a.btn-default' )."\n";
-echo get_link_tag( $admin_url.'?ctrl=items&blog='.$Item->get_blog_ID().'&p='.$Item->ID, T_('Edit post'), 'div.buttons a+a.btn-default' )."\n";
 
 echo "</div>\n";
 
