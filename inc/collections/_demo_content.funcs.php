@@ -2346,592 +2346,12 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 	// Sample Items for collection with ANY type:
 	$demo_items = array();
 
-	switch( $collection_type )
-	{
-		// =======================================================================================================
-		case 'minisite':
-			// Mini-Site
-
-			// Sample categories:
-			$categories = array(
-				'b2evolution'  => 'b2evolution',
-				'contributors' => T_('Contributors'),
-			);
-
-			// Additional sample Items:
-			$demo_items['about_minisite'] = array(
-				'title'    => T_('About Minisite'),
-				'category' => 'b2evolution',
-				'type'     => 'Standalone Page',
-				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Mini-Site') ),
-				'files'    => array(
-					array( 'monument-valley/monument-valley.jpg', 'cover' ),
-				),
-			);
-
-			$demo_items['more_info'] = array(
-				'title'    => T_('More info'),
-				'category' => 'b2evolution',
-				'type'     => 'Widget Page',
-				'files'    => array(
-					array( 'monument-valley/monuments.jpg', 'cover' ),
-				),
-			);
-			break;
-
-		// =======================================================================================================
-		case 'main':
-			// Global home page
-
-			// Sample categories:
-			$categories = array(
-				'b2evolution'  => 'b2evolution',
-				'contributors' => T_('Contributors'),
-			);
-
-			// Additional sample Items:
-			$demo_items['terms_conditions'] = array(
-				'title'    => T_('Terms & Conditions'),
-				'tags'     => 'intro',
-				'category' => 'b2evolution',
-				'type'     => 'Terms & Conditions',
-				'content'  => '<p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum</p>
-
-<p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum</p>',
-			);
-
-			$demo_items['support'] = array(
-				'title'    => 'Support',
-				'category' => 'contributors',
-				'type'     => 'Sidebar link',
-				'url'      => 'http://forums.b2evolution.net/',
-				'locale'   => 'en-US',
-				'comment_status' => 'disabled',
-			);
-
-			$demo_items['manual'] = array(
-				'title'    => 'Manual',
-				'category' => 'contributors',
-				'type'     => 'Sidebar link',
-				'url'      => get_manual_url( NULL ),
-				'locale'   => 'en-US',
-				'comment_status' => 'disabled',
-			);
-
-			$demo_items['web_hosting'] = array(
-				'title'    => 'Web hosting',
-				'category' => 'contributors',
-				'type'     => 'Sidebar link',
-				'url'      => 'http://b2evolution.net/web-hosting/blog/',
-				'locale'   => 'en-US',
-				'comment_status' => 'disabled',
-			);
-
-			$demo_items['blog_news'] = array(
-				'title'    => 'Blog news',
-				'category' => 'contributors',
-				'type'     => 'Sidebar link',
-				'url'      => 'http://b2evolution.net/news.php',
-				'locale'   => 'en-US',
-				'comment_status' => 'disabled',
-			);
-
-			$demo_items['francois'] = array(
-				'title'    => 'Francois',
-				'category' => 'contributors',
-				'type'     => 'Sidebar link',
-				'url'      => 'http://fplanque.com/',
-				'locale'   => 'fr-FR',
-				'comment_status' => 'disabled',
-			);
-
-			$demo_items['evo_factory'] = array(
-				'title'    => 'Evo Factory',
-				'category' => 'contributors',
-				'type'     => 'Sidebar link',
-				'url'      => 'http://evofactory.com/',
-				'locale'   => 'en-US',
-				'comment_status' => 'disabled',
-			);
-
-			$demo_items['about_this_site'] = array(
-				'title'    => T_('About this site'),
-				'category' => 'b2evolution',
-				'type'     => 'Standalone Page',
-				'content'  => T_('<p>This website is powered by b2evolution.</p>')."\r\n"
-					.T_('<p>You are currently looking at an info page about this site.</p>')."\r\n"
-					.T_('<p>Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically access directly from a navigation menu.</p>')."\r\n"
-					.T_('<p>Note: If needed, skins may format info pages differently from regular posts.</p>'),
-				'files'    => array(
-					array( 'logos/b2evolution_1016x208_wbg.png' ),
-				),
-				'widget_info_page' => true,
-			);
-
-			$demo_items['widget_page'] = array(
-				'title'    => T_('Widget Page'),
-				'category' => 'b2evolution',
-				'type'     => 'Widget Page',
-				'files'    => array(
-					array( 'monument-valley/monuments.jpg', 'cover' ),
-				),
-				'widget_info_page' => true,
-			);
-
-			$demo_items['b2evo_the_other_blog_tool'] = array(
-				'title'    => /* TRANS: sample ad content */ T_('b2evo: The other blog tool!'),
-				'tags'     => 'photo',
-				'category' => 'b2evolution',
-				'type'     => 'Advertisement',
-				'url'      => 'http://b2evolution.net',
-				'content'  => /* TRANS: sample ad content */ T_('The other blog tool!'),
-				'files'    => array(
-					array( 'banners/b2evo-125-other.png' ),
-				),
-			);
-
-			$demo_items['b2evo_better_blog_software'] = array(
-				'title'    => /* TRANS: sample ad content */ T_('b2evo: Better Blog Software!'),
-				'tags'     => 'photo',
-				'category' => 'b2evolution',
-				'type'     => 'Advertisement',
-				'url'      => 'http://b2evolution.net',
-				'content'  => /* TRANS: sample ad content */ T_('Better Blog Software!'),
-				'files'    => array(
-					array( 'banners/b2evo-125-better.png' ),
-				),
-			);
-
-			$demo_items['b2evo_the_software_for_blog_pros'] = array(
-				'title'    => /* TRANS: sample ad content */ T_('b2evo: The software for blog pros!'),
-				'tags'     => 'photo',
-				'category' => 'b2evolution',
-				'type'     => 'Advertisement',
-				'url'      => 'http://b2evolution.net',
-				'content'  => /* TRANS: sample ad content */ T_('The software for blog pros!'),
-				'files'    => array(
-					array( 'banners/b2evo-125-pros.png' ),
-				),
-			);
-
-			$demo_items['register_content'] = array(
-				'title'    => T_('Register content'),
-				'slug'     => 'help-content',
-				'tags'     => 'demo',
-				'category' => 'b2evolution',
-				'type'     => 'Content Block',
-				'content'  => T_('The information you provide in this form will be recorded in your user account.')
-					."\n\n"
-					.T_('You will be able to modify it (or even close your account) at any time after logging in with your username and password.')
-					."\n\n"
-					.T_('Should you forget your password, you will be able to reset it by receiving a link on your email address.')
-					."\n\n"
-					.T_('All other info is used to personalize your experience with this website.')
-					."\n\n"
-					.T_('This site may allow conversation between users.')
-					.' '.T_('Your email address and password will not be shared with other users.')
-					.' '.T_('All other information may be shared with other users.')
-					.' '.T_('Do not provide information you are not willing to share.'),
-			);
-
-			$demo_items['help_content'] = array(
-				'title'    => T_('Help content'),
-				'slug'     => 'help-content',
-				'tags'     => 'demo',
-				'category' => 'b2evolution',
-				'type'     => 'Content Block',
-				'content'  => '### '.T_('Email preferences')
-					."\n\n"
-					.sprintf( T_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>'), 'href="'.$edited_Blog->get( 'subsurl' ).'"' )
-					."\n\n"
-					.'### '.T_('Managing your personal information')
-					."\n\n"
-					.sprintf( T_('You can see and correct the personal details we know about you by clicking <a %s>here</a>'), 'href="'.$edited_Blog->get( 'profileurl' ).'"' )
-					."\n\n"
-					.'### '.T_('Closing your account')
-					."\n\n"
-					.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>'), 'href="'.$edited_Blog->get( 'closeaccounturl' ).'"' ),
-			);
-
-			$demo_items['access_denied'] = array(
-				'title'    => T_('Access Denied'),
-				'slug'     => 'access-denied',
-				'tags'     => 'demo',
-				'category' => 'b2evolution',
-				'type'     => 'Content Block',
-				'content'  => '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
-			);
-
-			$demo_items['login_required'] = array(
-				'title'    => T_('Login Required'),
-				'slug'     => 'login-required',
-				'tags'     => 'demo',
-				'category' => 'b2evolution',
-				'type'     => 'Content Block',
-				'content'  => '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
-			);
-
-			$demo_items['this_is_a_content_block'] = array(
-				'title'    => T_('This is a Content Block'),
-				'tags'     => 'demo',
-				'category' => 'b2evolution',
-				'type'     => 'Content Block',
-				'content'  => T_('<p>This is a Post/Item of type "Content Block".</p>
-
-<p>A content block can be included in several places.</p>'),
-			);
-			break;
-
-		// =======================================================================================================
-		case 'std':
-			// Blog
-		case 'blog_a':
-			// Sample Blog A (Public)
-
-			// Sample categories:
-			$categories = array(
-				'welcome'    => T_('Welcome'),
-				'news'       => T_('News'),
-				'background' => T_('Background'),
-				'fun'        => array( T_('Fun'), 'subs' => array(
-					'in-real-life' => array( T_('In real life'), 'subs' => array(
-						'recipes' => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
-						'movies'  => T_('Movies'),
-						'music'   => T_('Music'),
-					) ),
-					'on-the-web' => T_('On the web'),
-				) ),
-			);
-
-			// Additional sample Items:
-			$demo_items['main_intro_post'] = array(
-				'title'    => T_('Main Intro post'),
-				'tags'     => 'intro',
-				'category' => 'welcome',
-				'type'     => 'Intro-Main',
-				'content'  => T_('This is the main intro post of this collection. It appears on the collection\'s front page only.'),
-			);
-
-			$demo_items['about_blog_a'] = array(
-				'title'    => T_('About Blog A'),
-				'category' => 'welcome',
-				'type'     => 'Standalone Page',
-				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Blog A') ),
-			);
-			break;
-
-		// =======================================================================================================
-		case 'blog_b':
-			// Sample Blog B (Private)
-
-			// Sample categories:
-			$categories = array(
-				'announcements'        => T_('Announcements'),
-				'b2evolution_tips'     => T_('b2evolution Tips'),
-				'get_additional_skins' => T_('Get additional skins'),
-			);
-
-			// Additional sample Items:
-			$demo_items['b2evo_skins_repository'] = array(
-				'title'    => T_('b2evo skins repository'),
-				'category' => 'get_additional_skins',
-				'type'     => 'Sidebar link',
-				'url'      => 'http://skins.b2evolution.net/',
-			);
-
-			$demo_items['skin_faktory'] = array(
-				'title'    => 'Skin Faktory',
-				'category' => 'get_additional_skins',
-				'type'     => 'Sidebar link',
-				'url'      => 'http://www.skinfaktory.com/',
-			);
-
-			$demo_items['about_blog_a'] = array(
-				'title'    => T_('About Blog B'),
-				'category' => 'announcements',
-				'type'     => 'Standalone Page',
-				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Blog B') ),
-			);
-
-			$demo_items['widgets_tag_sub_intro_post'] = array(
-				'title'    => T_('Widgets tag &ndash; Sub Intro post'),
-				'tags'     => 'intro',
-				'category' => 'b2evolution_tips',
-				'type'     => 'Intro-Tag',
-				'content'  => T_('This uses post type "Intro-Tag" and is tagged with the desired Tag(s).'),
-			);
-
-			$demo_items['b2evolution_tips_category_sub_intro_post'] = array(
-				'title'    => T_('b2evolution tips category &ndash; Sub Intro post'),
-				'tags'     => 'intro',
-				'category' => 'b2evolution_tips',
-				'type'     => 'Intro-Cat',
-				'content'  => T_('This uses post type "Intro-Cat" and is attached to the desired Category(ies).'),
-			);
-
-			$demo_items['welcome_to_blog_b'] = array(
-				'title'    => T_('Welcome to Blog B'),
-				'tags'     => 'intro',
-				'category' => 'b2evolution_tips',
-				'type'     => 'Intro-Front',
-				'content'  => sprintf( T_('<p>This is the intro post for the front page of Blog B.</p>
-
-<p>Blog B is currently configured to show a front page like this one instead of directly showing the blog\'s posts.</p>
-
-<ul>
-<li>To view the blog\'s posts, click on "News" in the menu above.</li>
-<li>If you don\'t want to have such a front page, you can disable it in the Blog\'s settings > Features > <a %s>Front Page</a>. You can also see an example of a blog without a Front Page in Blog A</li>
-</ul>'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=home&amp;blog='.$blog_ID.'"' ),
-			);
-			break;
-
-		// =======================================================================================================
-		case 'photo':
-			// Photo Albums
-
-			// Sample categories:
-			$categories = array(
-				'landscapes' => T_('Landscapes'),
-			);
-
-			// Additional sample Items:
-			$demo_items['about_photos'] = array(
-				'title'    => T_('About Photos'),
-				'category' => 'landscapes',
-				'type'     => 'Standalone Page',
-				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Photos') ),
-			);
-
-			$demo_items['bus_stop_ahead'] = array(
-				'title'    => T_('Bus Stop Ahead'),
-				'tags'     => 'photo',
-				'category' => 'landscapes',
-				'content'  => T_('In the middle of nowhere: a school bus stop where you wouldn\'t really expect it!'),
-				'files'    => array(
-					array( 'monument-valley/bus-stop-ahead.jpg', 'set_var' => 'photo_link_1_ID' ),
-					array( 'monument-valley/john-ford-point.jpg', 'aftermore', 'set_var' => 'photo_link_2_ID' ),
-					array( 'monument-valley/monuments.jpg', 'aftermore' ),
-					array( 'monument-valley/monument-valley-road.jpg', 'aftermore', 'set_var' => 'photo_link_4_ID' ),
-					array( 'monument-valley/monument-valley.jpg', 'aftermore' ),
-				),
-			);
-			if( $install_test_features )
-			{	// Add examples for infodots plugin
-				$demo_items['bus_stop_ahead']['tags'] = 'photo,demo';
-				$demo_items['bus_stop_ahead']['update_content'] = $demo_items['bus_stop_ahead']['content'].sprintf( '
-[infodot:%s:191:36:100px]School bus [b]here[/b]
-
-#### In the middle of nowhere:
-a school bus stop where you wouldn\'t really expect it!
-
-1. Item 1
-2. Item 2
-3. Item 3
-
-[enddot]
-[infodot:%s:104:99]cowboy and horse[enddot]
-[infodot:%s:207:28:15em]Red planet[enddot]', '#get_var#photo_link_1_ID#', '#get_var#photo_link_2_ID#', '#get_var#photo_link_4_ID#' );
-			}
-
-			$demo_items['sunset'] = array(
-				'title'    => T_('Sunset'),
-				'tags'     => 'photo',
-				'category' => 'landscapes',
-				'files'    => array(
-					array( 'sunset/sunset.jpg' ),
-				),
-			);
-
-			$demo_items['food'] = array(
-				'title'    => T_('Food'),
-				'tags'     => 'photo',
-				'category' => 'landscapes',
-				'files'    => array(
-					array( 'recipes/mongolian-beef.jpg' ),
-					array( 'recipes/stuffed-peppers.jpg' ),
-				),
-			);
-			break;
-
-		// =======================================================================================================
-		case 'forum':
-			// Forums
-
-			// Sample categories:
-			$categories = array(
-				'a_forum_group'    => array( T_('A forum group'), 'meta' => true, 'order' => 1, 'subs' => array(
-					'welcome'       => array( T_('Welcome'), 'desc' => T_('Welcome description'), 'order' => 1 ),
-					'a_forum'       => array( T_('A forum'), 'desc' => T_('Short description of this forum'), 'order' => 2 ),
-					'another_forum' => array( T_('Another forum'), 'desc' => T_('Short description of this forum'), 'order' => 3 ),
-				) ),
-				'another_group'    => array( T_('Another group'), 'meta' => true, 'order' => 2, 'subs' => array(
-					'background' => array( T_('Background'), 'desc' => T_('Background description'), 'order' => 1 ),
-					'news'       => array( T_('News'), 'desc' => T_('News description'), 'order' => 2 ),
-					'fun'        => array( T_('Fun'), 'desc' => T_('Fun description'), 'order' => 3, 'subs' => array(
-						'in-real-life' => array( T_('In real life'), 'order' => 4, 'subcat_ordering' => 'alpha', 'subs' => array(
-							'movies' => T_('Movies'),
-							'music'  => T_('Music'),
-							'sports' => T_('Sports'),
-						) ),
-						'on-the-web' => array( T_('On the web'), 'order' => 4 ),
-					) ),
-				) ),
-			);
-
-			// Additional sample Items:
-			$demo_items['about_forums'] = array(
-				'title'    => T_('About Forums'),
-				'category' => 'welcome',
-				'type'     => 'Standalone Page',
-				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Photos') ),
-			);
-			break;
-
-		// =======================================================================================================
-		case 'manual':
-			// Online Manual
-
-			// Sample categories:
-			$categories = array(
-				'introduction'    => array( T_('Introduction'), 'order' => 10 ),
-				'getting-started' => array( T_('Getting Started'), 'order' => 20 ),
-				'user-guide'      => array( T_('User Guide'), 'order' => 30 ),
-				'reference'       => array( T_('Reference'), 'order' => 40, 'subcat_ordering' => 'alpha', 'subs' => array(
-					'collections' => array( T_('Collections'), 'order' => 10, 'subs' => array(
-						'blogs'        => array( T_('Blogs'), 'order' => 35 ),
-						'photo_albums' => array( T_('Photo Albums'), 'order' => 25 ),
-						'forums'       => array( T_('Forums'), 'order' => 5 ),
-					) ),
-					'recipes'     => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
-					'other'       => array( T_('Other'), 'order' => 5 ),
-				) ),
-			);
-
-			// Additional sample Items:
-			$demo_items['chapter_intro'] = array(
-				'title'    => T_('Chapter Intro'),
-				'tags'     => 'intro',
-				'category' => 'reference',
-				'type'     => 'Intro-Cat',
-				'content'  => T_('This is an introduction for this chapter. It is a post using the "intro-cat" type.')
-."\n\n".T_('Contrary to the other sections which are explictely sorted by default, this section is sorted alphabetically by default.'),
-			);
-
-			$demo_items['chapter_intro'] = array(
-				'title'    => T_('Chapter Intro'),
-				'tags'     => 'intro',
-				'category' => 'introduction',
-				'type'     => 'Intro-Cat',
-				'content'  => T_('This is an introduction for this chapter. It is a post using the "intro-cat" type.'),
-			);
-
-			$demo_items['welcome_here'] = array(
-				'title'    => T_('Welcome here!'),
-				'tags'     => 'intro',
-				'category' => 'introduction',
-				'type'     => 'Intro-Front',
-				'content'  => T_('This is the main introduction for this demo online manual. It is a post using the type "Intro-Front". It will only appear on the front page of the manual.
-
-You may delete this post if you don\'t want such an introduction.
-
-Just to be clear: this is a **demo** of a manual. The user manual for b2evolution is here: http://b2evolution.net/man/.'),
-			);
-
-			$demo_items['about_this_manual'] = array(
-				'title'    => T_('About this manual'),
-				'category' => 'introduction',
-				'type'     => 'Standalone Page',
-				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Manual') ),
-			);
-			break;
-
-		// =======================================================================================================
-		case 'group':
-			// Tracker
-
-			// Sample categories:
-			$categories = array(
-				'bug'             => array( T_('Bug'), 'order' => 10 ),
-				'feature_request' => array( T_('Feature Request'), 'order' => 20 ),
-			);
-
-			// Additional sample Items:
-			$tasks = 'ABCDEFGHIJKLMNOPQRST';
-			$priorities = array( 1, 2, 3, 4, 5 );
-			$task_status = array( 1, 2 ); // New, In Progress
-
-			// Check demo users if they can be assignee
-			$allowed_assignee = array();
-			foreach( $demo_users as $key => $demo_user )
-			{
-				if( $demo_user->check_perm( 'blog_can_be_assignee', 'edit', false, $blog_ID ) )
-				{
-					$allowed_assignee[] = $demo_user->ID;
-				}
-			}
-
-			for( $i = 0, $j = 0, $k = 0, $m = 0; $i < 20; $i++ )
-			{
-				$demo_items['task_'.$tasks[$i]] = array(
-					'title'    => sprintf( T_('Task %s'), $tasks[$i] ),
-					'tags'     => 'demo',
-					'category' => 'bug',
-					'content'  => '<p>'.sprintf( T_('This is a demo task description for Task %s.'), $tasks[$i] ).'</p>',
-					'priority' =>  $priorities[$j],
-					'pst_ID'   => $task_status[$k],
-				);
-
-				if( $use_demo_user )
-				{	// Assign task to allowed assignee:
-					$demo_items['task_'.$tasks[$i]]['assigned_user_ID'] = $allowed_assignee[$m];
-				}
-
-				// Iterate through all priorities and repeat
-				if( $j < ( count( $priorities ) - 1 ) )
-				{
-					$j++;
-				}
-				else
-				{
-					$j = 0;
-				}
-
-				// Iterate through all status and repeat
-				if( $k < ( count( $task_status ) - 1 ) )
-				{
-					$k++;
-				}
-				else
-				{
-					$k = 0;
-				}
-
-				// Iterate through all allowed assignee, increment only if $i is odd
-				if( $m < ( count( $allowed_assignee ) - 1 ) )
-				{
-					if( $i % 2 )
-					{
-						$m++;
-					}
-				}
-				else
-				{
-					$m = 0;
-				}
-			}
-			break;
-
-		default:
-			// do nothing
-	}
-
 	// --------------------- START OF GENERIC SAMPLE ITEMS -------------------- //
 	$demo_items['extended_post'] = array(
 		'title'    => T_('Extended post'),
 		'featured' => true,
 		'tags'     => 'photo,demo',
-		'category' => array( 'background', 'manual' => 'user-guide' ),
-		'order'    => array( 'manual' => 10 ),
+		'category' => 'background',
 		'content'  => '<p>'.T_('This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.').'</p>'.get_filler_text( 'lorem_1paragraph' )
 .'[teaserbreak]
 
@@ -2947,9 +2367,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 		'title'      => T_('Post with Images'),
 		'featured'   => true,
 		'tags'       => 'photo,demo',
-		'category'   => array( 'background', 'manual' => 'getting-started' ),
-		'extra_cats' => array( 'manual' => array( 'blogs' ) ),
-		'order'      => array( 'manual' => 10 ),
+		'category'   => 'background',
 		'content'    => T_('<p>This post has several images attached to it. Each one uses a different Attachment Position. Each may be displayed differently depending on the skin they are viewed in.</p>
 
 <p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>'),
@@ -3158,8 +2576,7 @@ This is an extra line.' ),
 	$demo_items['extended_post_with_no_teaser'] = array(
 		'title'       => T_('Extended post with no teaser'),
 		'tags'        => 'demo',
-		'category'    => array( 'background', 'manual' => 'user-guide' ),
-		'order'       => array( 'manual' => 20 ),
+		'category'    => 'background',
 		'hide_teaser' => true,
 		'content'     => '<p>'.T_('This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.').'</p>'.get_filler_text( 'lorem_1paragraph' )
 .'[teaserbreak]
@@ -3170,8 +2587,7 @@ This is an extra line.' ),
 	$demo_items['multipage_post'] = array(
 		'title'    => T_('This is a multipage post'),
 		'tags'     => 'demo',
-		'category' => array( 'background', 'manual' => 'user-guide' ),
-		'order'    => array( 'manual' => 30 ),
+		'category' => 'background',
 		'content'  => T_('<p>This is page 1 of a multipage post.</p>
 
 <blockquote><p>This is a Block Quote.</p></blockquote>
@@ -3197,8 +2613,7 @@ This is an extra line.' ),
 		'title'      => T_('Featured post'),
 		'featured'   => true,
 		'tags'       => 'demo',
-		'category'   => array( 'background', 'blog_b' => 'b2evolution_tips' ),
-		'extra_cats' => array( 'blog_b' => array( 'announcements' ) ),
+		'category'   => 'background',
 		'content'    => T_('<p>This is a demo of a featured post.</p>
 
 <p>It will be featured whenever we have no specific "Intro" post to display for the current request. To see it in action, try displaying the "Announcements" category.</p>
@@ -3208,18 +2623,15 @@ This is an extra line.' ),
 
 	$demo_items['markdown_examples'] = array(
 		'title'    => T_('Markdown examples'),
-		'featured' => true,
 		'tags'     => 'demo',
-		'category' => array( 'background', 'forums' => 'news', 'manual' => 'user-guide' ),
+		'category' => 'background',
 		'content'  => get_filler_text( 'markdown_examples_content' ),
 	);
 
 	$demo_items['wiki_tables'] = array(
 		'title'      => T_('Wiki Tables'),
 		'tags'       => 'demo',
-		'category'   => array( 'background', 'manual' => 'reference' ),
-		'extra_cats' => array( 'manual' => array( 'user-guide' ) ),
-		'order'      => array( 'manual' => 50 ),
+		'category'   => 'background',
 		'content'    => /* DO NOT TRANSLATE - TOO COMPLEX */ '<p>This is the topic with samples of the wiki tables.</p>
 
 {|
@@ -3464,7 +2876,7 @@ Hello
 	$demo_items['about_widgets'] = array(
 		'title'    => T_('About widgets...'),
 		'tags'     => 'widgets',
-		'category' => array( 'background', 'blog_b' => 'b2evolution_tips' ),
+		'category' => 'background',
 		'content'  => T_('<p>b2evolution blogs are installed with a default selection of Widgets. For example, the sidebar of this blog includes widgets like a calendar, a search field, a list of categories, a list of XML feeds, etc.</p>
 
 <p>You can add, remove and reorder widgets from the Blog Settings tab in the admin interface.</p>
@@ -3475,7 +2887,7 @@ Hello
 	$demo_items['about_skins'] = array(
 		'title'    => T_('About skins...'),
 		'tags'     => 'skins',
-		'category' => array( 'background', 'blog_b' => 'b2evolution_tips' ),
+		'category' => 'background',
 		'content'  => sprintf( T_('<p>By default, b2evolution blogs are displayed using an evoskin.</p>
 
 <p>You can change the skin used by any blog by editing the blog settings in the admin interface.</p>
@@ -3491,8 +2903,7 @@ Hello
 
 	$demo_items['apache_optimization'] = array(
 		'title'      => T_('Apache optimization...'),
-		'category'   => array( 'background', 'blog_b' => 'b2evolution_tips' ),
-		'extra_cats' => array( 'blog_b' => array( 'announcements' ) ),
+		'category'   => 'background',
 		'content'    => sprintf( T_('<p>b2evolution comes with an <code>.htaccess</code> file destined to optimize the way b2evolution is handled by your webseerver (if you are using Apache). In some circumstances, that file may not be automatically activated at setup. Please see the man page about <a %s>Tricky Stuff</a> for more information.</p>
 
 <p>For further optimization, please review the manual page about <a %s>Performance optimization</a>. Depending on your current configuration and on what your <a %s>web hosting</a> company allows you to do, you may increase the speed of b2evolution by up to a factor of 10!</p>'),
@@ -3504,8 +2915,7 @@ Hello
 	$demo_items['second_post'] = array(
 		'title'    => T_('Second post'),
 		'category' => 'news',
-		'order'    => array( 'manual' => 20 ),
-		'extra_cats' => array( 'welcome', 'manual' => array( 'getting-started' ) ),
+		'extra_cats' => array( 'welcome' ),
 		'content'  => T_('<p>This is the second post in the "[coll:shortname]" collection.</p>
 
 <p>It appears in multiple categories.</p>'),
@@ -3514,12 +2924,630 @@ Hello
 	$demo_items['first_post'] = array(
 		'title'    => T_('First Post'),
 		'category' => 'welcome',
-		'order'    => array( 'manual' => 10 ),
 		'content'  => T_('<p>This is the second post in the "[coll:shortname]" collection.</p>
 
 <p>It appears in multiple categories.</p>'),
 	);
 	// ---------------------- END OF GENERIC SAMPLE ITEMS -------------------- //
+
+	switch( $collection_type )
+	{
+		// =======================================================================================================
+		case 'minisite':
+			// Mini-Site
+
+			// Sample categories:
+			$categories = array(
+				'b2evolution'  => 'b2evolution',
+				'contributors' => T_('Contributors'),
+				'recipes'      => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
+			);
+
+			// Additional sample Items:
+			$demo_items['about_minisite'] = array(
+				'title'    => T_('About Minisite'),
+				'category' => 'b2evolution',
+				'type'     => 'Standalone Page',
+				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Mini-Site') ),
+				'files'    => array(
+					array( 'monument-valley/monument-valley.jpg', 'cover' ),
+				),
+				'widget_info_page' => true,
+			);
+
+			$demo_items['more_info'] = array(
+				'title'    => T_('More info'),
+				'category' => 'b2evolution',
+				'type'     => 'Widget Page',
+				'files'    => array(
+					array( 'monument-valley/monuments.jpg', 'cover' ),
+				),
+				'widget_info_page' => true,
+			);
+			break;
+
+		// =======================================================================================================
+		case 'main':
+			// Global home page
+
+			// Sample categories:
+			$categories = array(
+				'b2evolution'  => 'b2evolution',
+				'contributors' => T_('Contributors'),
+				'recipes'      => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
+			);
+
+			// Additional sample Items:
+			$demo_items['terms_conditions'] = array(
+				'title'    => T_('Terms & Conditions'),
+				'tags'     => 'intro',
+				'category' => 'b2evolution',
+				'type'     => 'Terms & Conditions',
+				'content'  => '<p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum</p>
+
+<p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum</p>',
+			);
+
+			$demo_items['support'] = array(
+				'title'    => 'Support',
+				'category' => 'contributors',
+				'type'     => 'Sidebar link',
+				'url'      => 'http://forums.b2evolution.net/',
+				'locale'   => 'en-US',
+				'comment_status' => 'disabled',
+			);
+
+			$demo_items['manual'] = array(
+				'title'    => 'Manual',
+				'category' => 'contributors',
+				'type'     => 'Sidebar link',
+				'url'      => get_manual_url( NULL ),
+				'locale'   => 'en-US',
+				'comment_status' => 'disabled',
+			);
+
+			$demo_items['web_hosting'] = array(
+				'title'    => 'Web hosting',
+				'category' => 'contributors',
+				'type'     => 'Sidebar link',
+				'url'      => 'http://b2evolution.net/web-hosting/blog/',
+				'locale'   => 'en-US',
+				'comment_status' => 'disabled',
+			);
+
+			$demo_items['blog_news'] = array(
+				'title'    => 'Blog news',
+				'category' => 'contributors',
+				'type'     => 'Sidebar link',
+				'url'      => 'http://b2evolution.net/news.php',
+				'locale'   => 'en-US',
+				'comment_status' => 'disabled',
+			);
+
+			$demo_items['francois'] = array(
+				'title'    => 'Francois',
+				'category' => 'contributors',
+				'type'     => 'Sidebar link',
+				'url'      => 'http://fplanque.com/',
+				'locale'   => 'fr-FR',
+				'comment_status' => 'disabled',
+			);
+
+			$demo_items['evo_factory'] = array(
+				'title'    => 'Evo Factory',
+				'category' => 'contributors',
+				'type'     => 'Sidebar link',
+				'url'      => 'http://evofactory.com/',
+				'locale'   => 'en-US',
+				'comment_status' => 'disabled',
+			);
+
+			$demo_items['about_this_site'] = array(
+				'title'    => T_('About this site'),
+				'category' => 'b2evolution',
+				'type'     => 'Standalone Page',
+				'content'  => T_('<p>This website is powered by b2evolution.</p>')."\r\n"
+					.T_('<p>You are currently looking at an info page about this site.</p>')."\r\n"
+					.T_('<p>Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically access directly from a navigation menu.</p>')."\r\n"
+					.T_('<p>Note: If needed, skins may format info pages differently from regular posts.</p>'),
+				'files'    => array(
+					array( 'logos/b2evolution_1016x208_wbg.png' ),
+				),
+				'widget_info_page' => true,
+			);
+
+			$demo_items['widget_page'] = array(
+				'title'    => T_('Widget Page'),
+				'category' => 'b2evolution',
+				'type'     => 'Widget Page',
+				'files'    => array(
+					array( 'monument-valley/monuments.jpg', 'cover' ),
+				),
+				'widget_info_page' => true,
+			);
+
+			$demo_items['b2evo_the_other_blog_tool'] = array(
+				'title'    => /* TRANS: sample ad content */ T_('b2evo: The other blog tool!'),
+				'tags'     => 'photo',
+				'category' => 'b2evolution',
+				'type'     => 'Advertisement',
+				'url'      => 'http://b2evolution.net',
+				'content'  => /* TRANS: sample ad content */ T_('The other blog tool!'),
+				'files'    => array(
+					array( 'banners/b2evo-125-other.png' ),
+				),
+			);
+
+			$demo_items['b2evo_better_blog_software'] = array(
+				'title'    => /* TRANS: sample ad content */ T_('b2evo: Better Blog Software!'),
+				'tags'     => 'photo',
+				'category' => 'b2evolution',
+				'type'     => 'Advertisement',
+				'url'      => 'http://b2evolution.net',
+				'content'  => /* TRANS: sample ad content */ T_('Better Blog Software!'),
+				'files'    => array(
+					array( 'banners/b2evo-125-better.png' ),
+				),
+			);
+
+			$demo_items['b2evo_the_software_for_blog_pros'] = array(
+				'title'    => /* TRANS: sample ad content */ T_('b2evo: The software for blog pros!'),
+				'tags'     => 'photo',
+				'category' => 'b2evolution',
+				'type'     => 'Advertisement',
+				'url'      => 'http://b2evolution.net',
+				'content'  => /* TRANS: sample ad content */ T_('The software for blog pros!'),
+				'files'    => array(
+					array( 'banners/b2evo-125-pros.png' ),
+				),
+			);
+
+			$demo_items['register_content'] = array(
+				'title'    => T_('Register content'),
+				'slug'     => 'help-content',
+				'tags'     => 'demo',
+				'category' => 'b2evolution',
+				'type'     => 'Content Block',
+				'content'  => T_('The information you provide in this form will be recorded in your user account.')
+					."\n\n"
+					.T_('You will be able to modify it (or even close your account) at any time after logging in with your username and password.')
+					."\n\n"
+					.T_('Should you forget your password, you will be able to reset it by receiving a link on your email address.')
+					."\n\n"
+					.T_('All other info is used to personalize your experience with this website.')
+					."\n\n"
+					.T_('This site may allow conversation between users.')
+					.' '.T_('Your email address and password will not be shared with other users.')
+					.' '.T_('All other information may be shared with other users.')
+					.' '.T_('Do not provide information you are not willing to share.'),
+			);
+
+			$demo_items['help_content'] = array(
+				'title'    => T_('Help content'),
+				'slug'     => 'help-content',
+				'tags'     => 'demo',
+				'category' => 'b2evolution',
+				'type'     => 'Content Block',
+				'content'  => '### '.T_('Email preferences')
+					."\n\n"
+					.sprintf( T_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>'), 'href="'.$edited_Blog->get( 'subsurl' ).'"' )
+					."\n\n"
+					.'### '.T_('Managing your personal information')
+					."\n\n"
+					.sprintf( T_('You can see and correct the personal details we know about you by clicking <a %s>here</a>'), 'href="'.$edited_Blog->get( 'profileurl' ).'"' )
+					."\n\n"
+					.'### '.T_('Closing your account')
+					."\n\n"
+					.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>'), 'href="'.$edited_Blog->get( 'closeaccounturl' ).'"' ),
+			);
+
+			$demo_items['access_denied'] = array(
+				'title'    => T_('Access Denied'),
+				'slug'     => 'access-denied',
+				'tags'     => 'demo',
+				'category' => 'b2evolution',
+				'type'     => 'Content Block',
+				'content'  => '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
+			);
+
+			$demo_items['login_required'] = array(
+				'title'    => T_('Login Required'),
+				'slug'     => 'login-required',
+				'tags'     => 'demo',
+				'category' => 'b2evolution',
+				'type'     => 'Content Block',
+				'content'  => '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
+			);
+
+			$demo_items['this_is_a_content_block'] = array(
+				'title'    => T_('This is a Content Block'),
+				'tags'     => 'demo',
+				'category' => 'b2evolution',
+				'type'     => 'Content Block',
+				'content'  => T_('<p>This is a Post/Item of type "Content Block".</p>
+
+<p>A content block can be included in several places.</p>'),
+			);
+			break;
+
+		// =======================================================================================================
+		case 'std':
+			// Blog
+		case 'blog_a':
+			// Sample Blog A (Public)
+
+			// Sample categories:
+			$categories = array(
+				'welcome'    => T_('Welcome'),
+				'news'       => T_('News'),
+				'background' => T_('Background'),
+				'fun'        => array( T_('Fun'), 'subs' => array(
+					'in-real-life' => array( T_('In real life'), 'subs' => array(
+						'recipes' => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
+						'movies'  => T_('Movies'),
+						'music'   => T_('Music'),
+					) ),
+					'on-the-web' => T_('On the web'),
+				) ),
+			);
+
+			// Additional sample Items:
+			$demo_items['main_intro_post'] = array(
+				'title'    => T_('Main Intro post'),
+				'tags'     => 'intro',
+				'category' => 'welcome',
+				'type'     => 'Intro-Main',
+				'content'  => T_('This is the main intro post of this collection. It appears on the collection\'s front page only.'),
+			);
+
+			$demo_items['about_blog_a'] = array(
+				'title'    => T_('About Blog A'),
+				'category' => 'welcome',
+				'type'     => 'Standalone Page',
+				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Blog A') ),
+			);
+			break;
+
+		// =======================================================================================================
+		case 'blog_b':
+			// Sample Blog B (Private)
+
+			// Sample categories:
+			$categories = array(
+				'announcements'        => T_('Announcements'),
+				'b2evolution_tips'     => T_('b2evolution Tips'),
+				'get_additional_skins' => T_('Get additional skins'),
+				'recipes'              => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
+			);
+
+			// Override settings of generic items:
+			$demo_items['about_widgets']['category'] = 'b2evolution_tips';
+			$demo_items['about_skins']['category'] = 'b2evolution_tips';
+			$demo_items['featured_post']['category'] = 'b2evolution_tips';
+			$demo_items['featured_post']['extra_cats'] = array( 'announcements' );
+			$demo_items['apache_optimization']['category'] = 'b2evolution_tips';
+			$demo_items['apache_optimization']['extra_cats'] = array( 'announcements' );
+
+			// Additional sample Items:
+			$demo_items['b2evo_skins_repository'] = array(
+				'title'    => T_('b2evo skins repository'),
+				'category' => 'get_additional_skins',
+				'type'     => 'Sidebar link',
+				'url'      => 'http://skins.b2evolution.net/',
+			);
+
+			$demo_items['skin_faktory'] = array(
+				'title'    => 'Skin Faktory',
+				'category' => 'get_additional_skins',
+				'type'     => 'Sidebar link',
+				'url'      => 'http://www.skinfaktory.com/',
+			);
+
+			$demo_items['about_blog_a'] = array(
+				'title'    => T_('About Blog B'),
+				'category' => 'announcements',
+				'type'     => 'Standalone Page',
+				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Blog B') ),
+			);
+
+			$demo_items['widgets_tag_sub_intro_post'] = array(
+				'title'    => T_('Widgets tag &ndash; Sub Intro post'),
+				'tags'     => 'intro',
+				'category' => 'b2evolution_tips',
+				'type'     => 'Intro-Tag',
+				'content'  => T_('This uses post type "Intro-Tag" and is tagged with the desired Tag(s).'),
+			);
+
+			$demo_items['b2evolution_tips_category_sub_intro_post'] = array(
+				'title'    => T_('b2evolution tips category &ndash; Sub Intro post'),
+				'tags'     => 'intro',
+				'category' => 'b2evolution_tips',
+				'type'     => 'Intro-Cat',
+				'content'  => T_('This uses post type "Intro-Cat" and is attached to the desired Category(ies).'),
+			);
+
+			$demo_items['welcome_to_blog_b'] = array(
+				'title'    => T_('Welcome to Blog B'),
+				'tags'     => 'intro',
+				'category' => 'b2evolution_tips',
+				'type'     => 'Intro-Front',
+				'content'  => sprintf( T_('<p>This is the intro post for the front page of Blog B.</p>
+
+<p>Blog B is currently configured to show a front page like this one instead of directly showing the blog\'s posts.</p>
+
+<ul>
+<li>To view the blog\'s posts, click on "News" in the menu above.</li>
+<li>If you don\'t want to have such a front page, you can disable it in the Blog\'s settings > Features > <a %s>Front Page</a>. You can also see an example of a blog without a Front Page in Blog A</li>
+</ul>'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=home&amp;blog='.$blog_ID.'"' ),
+			);
+			break;
+
+		// =======================================================================================================
+		case 'photo':
+			// Photo Albums
+
+			// Sample categories:
+			$categories = array(
+				'landscapes' => T_('Landscapes'),
+			);
+
+			// Don't install generic items for this collection type:
+			$demo_items = array();
+
+			// Additional sample Items:
+			$demo_items['about_photos'] = array(
+				'title'    => T_('About Photos'),
+				'category' => 'landscapes',
+				'type'     => 'Standalone Page',
+				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Photos') ),
+			);
+
+			$demo_items['bus_stop_ahead'] = array(
+				'title'    => T_('Bus Stop Ahead'),
+				'tags'     => 'photo',
+				'category' => 'landscapes',
+				'content'  => T_('In the middle of nowhere: a school bus stop where you wouldn\'t really expect it!'),
+				'files'    => array(
+					array( 'monument-valley/bus-stop-ahead.jpg', 'set_var' => 'photo_link_1_ID' ),
+					array( 'monument-valley/john-ford-point.jpg', 'aftermore', 'set_var' => 'photo_link_2_ID' ),
+					array( 'monument-valley/monuments.jpg', 'aftermore' ),
+					array( 'monument-valley/monument-valley-road.jpg', 'aftermore', 'set_var' => 'photo_link_4_ID' ),
+					array( 'monument-valley/monument-valley.jpg', 'aftermore' ),
+				),
+			);
+			if( $install_test_features )
+			{	// Add examples for infodots plugin
+				$demo_items['bus_stop_ahead']['tags'] = 'photo,demo';
+				$demo_items['bus_stop_ahead']['update_content'] = $demo_items['bus_stop_ahead']['content'].sprintf( '
+[infodot:%s:191:36:100px]School bus [b]here[/b]
+
+#### In the middle of nowhere:
+a school bus stop where you wouldn\'t really expect it!
+
+1. Item 1
+2. Item 2
+3. Item 3
+
+[enddot]
+[infodot:%s:104:99]cowboy and horse[enddot]
+[infodot:%s:207:28:15em]Red planet[enddot]', '#get_var#photo_link_1_ID#', '#get_var#photo_link_2_ID#', '#get_var#photo_link_4_ID#' );
+			}
+
+			$demo_items['sunset'] = array(
+				'title'    => T_('Sunset'),
+				'tags'     => 'photo',
+				'category' => 'landscapes',
+				'files'    => array(
+					array( 'sunset/sunset.jpg' ),
+				),
+			);
+
+			$demo_items['food'] = array(
+				'title'    => T_('Food'),
+				'tags'     => 'photo',
+				'category' => 'landscapes',
+				'files'    => array(
+					array( 'recipes/mongolian-beef.jpg' ),
+					array( 'recipes/stuffed-peppers.jpg' ),
+				),
+			);
+			break;
+
+		// =======================================================================================================
+		case 'forum':
+			// Forums
+
+			// Sample categories:
+			$categories = array(
+				'a_forum_group'    => array( T_('A forum group'), 'meta' => true, 'order' => 1, 'subs' => array(
+					'welcome'       => array( T_('Welcome'), 'desc' => T_('Welcome description'), 'order' => 1 ),
+					'a_forum'       => array( T_('A forum'), 'desc' => T_('Short description of this forum'), 'order' => 2 ),
+					'another_forum' => array( T_('Another forum'), 'desc' => T_('Short description of this forum'), 'order' => 3 ),
+				) ),
+				'another_group'    => array( T_('Another group'), 'meta' => true, 'order' => 2, 'subs' => array(
+					'background' => array( T_('Background'), 'desc' => T_('Background description'), 'order' => 1 ),
+					'news'       => array( T_('News'), 'desc' => T_('News description'), 'order' => 2 ),
+					'fun'        => array( T_('Fun'), 'desc' => T_('Fun description'), 'order' => 3, 'subs' => array(
+						'in-real-life' => array( T_('In real life'), 'order' => 4, 'subcat_ordering' => 'alpha', 'subs' => array(
+							'movies' => T_('Movies'),
+							'music'  => T_('Music'),
+							'recipes' => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
+						) ),
+						'on-the-web' => array( T_('On the web'), 'order' => 4 ),
+					) ),
+				) ),
+			);
+
+			// Override settings of generic items:
+			$demo_items['markdown_examples']['category'] = 'news';
+
+			// Additional sample Items:
+			$demo_items['about_forums'] = array(
+				'title'    => T_('About Forums'),
+				'category' => 'welcome',
+				'type'     => 'Standalone Page',
+				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Photos') ),
+			);
+			break;
+
+		// =======================================================================================================
+		case 'manual':
+			// Online Manual
+
+			// Sample categories:
+			$categories = array(
+				'introduction'    => array( T_('Introduction'), 'order' => 10 ),
+				'getting-started' => array( T_('Getting Started'), 'order' => 20 ),
+				'user-guide'      => array( T_('User Guide'), 'order' => 30 ),
+				'reference'       => array( T_('Reference'), 'order' => 40, 'subcat_ordering' => 'alpha', 'subs' => array(
+					'collections' => array( T_('Collections'), 'order' => 10, 'subs' => array(
+						'blogs'        => array( T_('Blogs'), 'order' => 35 ),
+						'photo_albums' => array( T_('Photo Albums'), 'order' => 25 ),
+						'forums'       => array( T_('Forums'), 'order' => 5 ),
+					) ),
+					'recipes'     => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
+					'other'       => array( T_('Other'), 'order' => 5 ),
+				) ),
+			);
+
+			// Override settings of generic items:
+			$demo_items['extended_post']['category'] = 'user-guide';
+			$demo_items['extended_post']['order'] = 10;
+			$demo_items['extended_post_with_no_teaser']['category'] = 'user-guide';
+			$demo_items['extended_post_with_no_teaser']['order'] = 20;
+			$demo_items['multipage_post']['category'] = 'user-guide';
+			$demo_items['multipage_post']['order'] = 30;
+			$demo_items['wiki_tables']['category'] = 'reference';
+			$demo_items['wiki_tables']['extra_cats'] = array( 'user-guide' );
+			$demo_items['wiki_tables']['order'] = 50;
+			$demo_items['markdown_examples']['category'] = 'user-guide';
+			$demo_items['post_with_images']['category'] = 'getting-started';
+			$demo_items['post_with_images']['extra_cats'] = array( 'blogs' );
+			$demo_items['post_with_images']['order'] = 10;
+			$demo_items['second_post']['order'] = 20;
+			$demo_items['second_post']['extra_cats'] = array( 'getting-started' );
+			$demo_items['first_post']['order'] = 10;
+
+			// Additional sample Items:
+			$demo_items['chapter_intro'] = array(
+				'title'    => T_('Chapter Intro'),
+				'tags'     => 'intro',
+				'category' => 'reference',
+				'type'     => 'Intro-Cat',
+				'content'  => T_('This is an introduction for this chapter. It is a post using the "intro-cat" type.')
+."\n\n".T_('Contrary to the other sections which are explictely sorted by default, this section is sorted alphabetically by default.'),
+			);
+
+			$demo_items['chapter_intro'] = array(
+				'title'    => T_('Chapter Intro'),
+				'tags'     => 'intro',
+				'category' => 'introduction',
+				'type'     => 'Intro-Cat',
+				'content'  => T_('This is an introduction for this chapter. It is a post using the "intro-cat" type.'),
+			);
+
+			$demo_items['welcome_here'] = array(
+				'title'    => T_('Welcome here!'),
+				'tags'     => 'intro',
+				'category' => 'introduction',
+				'type'     => 'Intro-Front',
+				'content'  => T_('This is the main introduction for this demo online manual. It is a post using the type "Intro-Front". It will only appear on the front page of the manual.
+
+You may delete this post if you don\'t want such an introduction.
+
+Just to be clear: this is a **demo** of a manual. The user manual for b2evolution is here: http://b2evolution.net/man/.'),
+			);
+
+			$demo_items['about_this_manual'] = array(
+				'title'    => T_('About this manual'),
+				'category' => 'introduction',
+				'type'     => 'Standalone Page',
+				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Manual') ),
+			);
+			break;
+
+		// =======================================================================================================
+		case 'group':
+			// Tracker
+
+			// Sample categories:
+			$categories = array(
+				'bug'             => array( T_('Bug'), 'order' => 10 ),
+				'feature_request' => array( T_('Feature Request'), 'order' => 20 ),
+				'recipes'         => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
+			);
+
+			// Additional sample Items:
+			$tasks = 'ABCDEFGHIJKLMNOPQRST';
+			$priorities = array( 1, 2, 3, 4, 5 );
+			$task_status = array( 1, 2 ); // New, In Progress
+
+			// Check demo users if they can be assignee
+			$allowed_assignee = array();
+			foreach( $demo_users as $key => $demo_user )
+			{
+				if( $demo_user->check_perm( 'blog_can_be_assignee', 'edit', false, $blog_ID ) )
+				{
+					$allowed_assignee[] = $demo_user->ID;
+				}
+			}
+
+			$top_demo_items = array();
+
+			for( $i = 0, $j = 0, $k = 0, $m = 0; $i < 20; $i++ )
+			{
+				$top_demo_items['task_'.$tasks[$i]] = array(
+					'title'    => sprintf( T_('Task %s'), $tasks[$i] ),
+					'tags'     => 'demo',
+					'category' => 'bug',
+					'content'  => '<p>'.sprintf( T_('This is a demo task description for Task %s.'), $tasks[$i] ).'</p>',
+					'priority' =>  $priorities[$j],
+					'pst_ID'   => $task_status[$k],
+				);
+
+				if( $use_demo_user )
+				{	// Assign task to allowed assignee:
+					$top_demo_items['task_'.$tasks[$i]]['assigned_user_ID'] = $allowed_assignee[$m];
+				}
+
+				// Iterate through all priorities and repeat
+				if( $j < ( count( $priorities ) - 1 ) )
+				{
+					$j++;
+				}
+				else
+				{
+					$j = 0;
+				}
+
+				// Iterate through all status and repeat
+				if( $k < ( count( $task_status ) - 1 ) )
+				{
+					$k++;
+				}
+				else
+				{
+					$k = 0;
+				}
+
+				// Iterate through all allowed assignee, increment only if $i is odd
+				if( $m < ( count( $allowed_assignee ) - 1 ) )
+				{
+					if( $i % 2 )
+					{
+						$m++;
+					}
+				}
+				else
+				{
+					$m = 0;
+				}
+			}
+
+			// Prepend additional sample Items before generic Items:
+			$demo_items = array_merge( $top_demo_items, $demo_items );
+			break;
+	}
 
 	// Insert sample Categories and Items:
 	if( ! empty( $categories ) )
@@ -3547,30 +3575,16 @@ Hello
 				continue;
 			}
 
-			if( is_array( $demo_item['category'] ) )
-			{	// Use category for current collection type if it is defined:
-				$item_category = isset( $demo_item['category'][ $collection_type ] ) ? $demo_item['category'][ $collection_type ] : $demo_item['category'][0];
-			}
-			else
-			{	// Use single category for all collection types:
-				$item_category = $demo_item['category'];
-			}
-
-			if( ! ( $category_ID = get_demo_category_ID( $item_category, $categories ) ) )
+			if( ! ( $category_ID = get_demo_category_ID( $demo_item['category'], $categories ) ) )
 			{	// Skip Item without category:
-				pre_dump( 'skipped cat', $item_category, $demo_item, $categories );
 				continue;
 			}
 
 			// Set extra categories:
 			$extra_cats_IDs = array();
-			if( ! empty( $demo_item['extra_cats'][ $collection_type ] ) ||
-			    ! empty( $demo_item['extra_cats'][0] ) )
+			if( ! empty( $demo_item['extra_cats'] ) )
 			{
-				$extra_cats_keys = empty( $demo_item['extra_cats'][ $collection_type ] )
-					? $demo_item['extra_cats']
-					: $demo_item['extra_cats'][ $collection_type ];
-				foreach( $extra_cats_keys as $extra_cat )
+				foreach( $demo_item['extra_cats'] as $extra_cat )
 				{
 					if( ! is_array( $extra_cat ) &&
 					    ( $extra_cat_ID = get_demo_category_ID( $extra_cat, $categories ) ) )
@@ -3610,17 +3624,6 @@ Hello
 				$new_Item->set( 'parent_ID', replace_demo_content_vars( $demo_item['parent_ID'], $demo_items, $demo_vars ) );
 			}
 
-			// Set item order:
-			$item_order = NULL;
-			if( isset( $demo_item['order'][ $collection_type ] ) )
-			{
-				$item_order = $demo_item['order'][ $collection_type ];
-			}
-			elseif( isset( $demo_item['order'] ) && ! is_array( $demo_item['order'] ) )
-			{
-				$item_order = $demo_item['order'];
-			}
-
 			if( ! empty( $demo_item['priority'] ) )
 			{	// Set task priority:
 				$new_Item->set( 'priority', $demo_item['priority'] );
@@ -3652,7 +3655,7 @@ Hello
 				array( 'default' ),
 				$item_type,
 				NULL,
-				$item_order,
+				$demo_item['order'],
 				false );
 
 			if( ! $insert_new_item_result )
