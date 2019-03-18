@@ -354,47 +354,7 @@ jQuery( '#voting_positive' ).click( function()
 } );
 
 // JS for order fields:
-jQuery( document ).ready( function()
-{
-	disable_selected_orderby_options();
-} );
-
-jQuery( 'select[id^=orderby]' ).change( function()
-{
-	if( jQuery( this ).attr( 'id' ) == 'orderby_1' )
-	{ // First additional order field was changed
-		if( jQuery( this ).val() == '' )
-		{ // If 'None' is selected - Disable second additional order field
-			jQuery( '#orderby_2, #orderdir_2' ).attr( 'disabled', 'disabled' ).val( '' );
-		}
-		else
-		{ // Enable second if first is selected
-			jQuery( '#orderby_2, #orderdir_2' ).removeAttr( 'disabled' );
-		}
-	}
-
-	// Redisable options after some order field was changed
-	jQuery( 'select[id^=orderby] option' ).removeAttr( 'disabled' );
-	disable_selected_orderby_options();
-} );
-
-/**
- * Disable the selected option in two other 'orderby' <select>s
- */
-function disable_selected_orderby_options()
-{
-	jQuery( 'select[id^=orderby]' ).each( function()
-	{
-		var selected = jQuery( this ).val();
-		if( selected != '' )
-		{
-			jQuery( 'select[id^=orderby][id!="' + jQuery( this ).attr( 'id' ) + '"]' ).each( function()
-			{
-				jQuery( this ).find( 'option[value="' + selected + '"]' ).attr( 'disabled', 'disabled' );
-			} );
-		}
-	} );
-}
+<?php echo get_post_orderby_js( 'orderby', 'orderdir' ); ?>
 
 jQuery( 'input[name=blog_use_workflow]' ).click( function()
 {	// Disable setting "Use deadline" when setting "Use workflow" is unchecked:

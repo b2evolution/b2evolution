@@ -1316,6 +1316,10 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 				// Check if the selected values can be used for the select element:
 				foreach( $check_options as $v )
 				{
+					if( empty( $v ) && ! empty( $meta['allow_none'] ) )
+					{ // empty is ok:
+						continue;
+					}
 					if( ! in_array( $v, $meta_options ) )
 					{
 						param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $v ) );
