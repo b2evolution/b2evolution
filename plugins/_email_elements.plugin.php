@@ -384,7 +384,7 @@ class email_elements_plugin extends Plugin
 		    ! is_object( $params['Object'] ) ||
 		    get_class( $params['Object'] ) != 'EmailCampaign' )
 		{	// Not supported object by this plugin:
-			return $params['inline_tags'];
+			return array();
 		}
 
 		$EmailCampaign = & $params['Object'];
