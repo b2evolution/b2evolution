@@ -97,7 +97,15 @@ function get_post_timestamp_data( $num_posts = 1, $min = 30, $max = 720, $base_t
 {
 	if( is_null( $base_timestamp ) )
 	{
-		$base_timestamp = time();
+		global $install_post_random_timestamps;
+		if( empty( $install_post_random_timestamps ) )
+		{	// Start new timestamp from current time:
+			$base_timestamp = time();
+		}
+		else
+		{	// Continue to use next time after previous calling:
+			$base_timestamp = $install_post_random_timestamps;
+		}
 	}
 
 	// Add max comment time allowance, i.e., 2 comments at max. 12 hour interval
@@ -109,6 +117,7 @@ function get_post_timestamp_data( $num_posts = 1, $min = 30, $max = 720, $base_t
 	{
 		$interval = ( rand( $min, $max ) * 60 ) + rand( 0, 3600 );
 		$loop_timestamp -= $interval;
+		$install_post_random_timestamps = $loop_timestamp;
 		$post_timestamp_array[] = $loop_timestamp;
 	}
 
@@ -2940,8 +2949,10 @@ Hello
 			$categories = array(
 				'b2evolution'  => 'b2evolution',
 				'contributors' => T_('Contributors'),
-				'recipes'      => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
 			);
+
+			// Don't install generic items for this collection type:
+			$demo_items = array();
 
 			// Additional sample Items:
 			$demo_items['about_minisite'] = array(
@@ -2974,8 +2985,10 @@ Hello
 			$categories = array(
 				'b2evolution'  => 'b2evolution',
 				'contributors' => T_('Contributors'),
-				'recipes'      => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
 			);
+
+			// Don't install generic items for this collection type:
+			$demo_items = array();
 
 			// Additional sample Items:
 			$demo_items['terms_conditions'] = array(
@@ -3214,38 +3227,37 @@ Hello
 
 			// Sample categories:
 			$categories = array(
-				'announcements'        => T_('Announcements'),
-				'b2evolution_tips'     => T_('b2evolution Tips'),
-				'get_additional_skins' => T_('Get additional skins'),
-				'recipes'              => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
+				'welcome'    => T_('Welcome'),
+				'news'       => T_('News'),
+				'background' => T_('Background'),
+				'fun'        => array( T_('Fun'), 'subs' => array(
+					'in-real-life' => array( T_('In real life'), 'subs' => array(
+						'recipes' => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
+						'movies'  => T_('Movies'),
+						'music'   => T_('Music'),
+					) ),
+					'on-the-web' => T_('On the web'),
+				) ),
 			);
-
-			// Override settings of generic items:
-			$demo_items['about_widgets']['category'] = 'b2evolution_tips';
-			$demo_items['about_skins']['category'] = 'b2evolution_tips';
-			$demo_items['featured_post']['category'] = 'b2evolution_tips';
-			$demo_items['featured_post']['extra_cats'] = array( 'announcements' );
-			$demo_items['apache_optimization']['category'] = 'b2evolution_tips';
-			$demo_items['apache_optimization']['extra_cats'] = array( 'announcements' );
 
 			// Additional sample Items:
 			$demo_items['b2evo_skins_repository'] = array(
 				'title'    => T_('b2evo skins repository'),
-				'category' => 'get_additional_skins',
+				'category' => 'background',
 				'type'     => 'Sidebar link',
 				'url'      => 'http://skins.b2evolution.net/',
 			);
 
 			$demo_items['skin_faktory'] = array(
 				'title'    => 'Skin Faktory',
-				'category' => 'get_additional_skins',
+				'category' => 'background',
 				'type'     => 'Sidebar link',
 				'url'      => 'http://www.skinfaktory.com/',
 			);
 
 			$demo_items['about_blog_a'] = array(
 				'title'    => T_('About Blog B'),
-				'category' => 'announcements',
+				'category' => 'welcome',
 				'type'     => 'Standalone Page',
 				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Blog B') ),
 			);
@@ -3253,7 +3265,7 @@ Hello
 			$demo_items['widgets_tag_sub_intro_post'] = array(
 				'title'    => T_('Widgets tag &ndash; Sub Intro post'),
 				'tags'     => 'intro',
-				'category' => 'b2evolution_tips',
+				'category' => 'welcome',
 				'type'     => 'Intro-Tag',
 				'content'  => T_('This uses post type "Intro-Tag" and is tagged with the desired Tag(s).'),
 			);
@@ -3261,7 +3273,7 @@ Hello
 			$demo_items['b2evolution_tips_category_sub_intro_post'] = array(
 				'title'    => T_('b2evolution tips category &ndash; Sub Intro post'),
 				'tags'     => 'intro',
-				'category' => 'b2evolution_tips',
+				'category' => 'welcome',
 				'type'     => 'Intro-Cat',
 				'content'  => T_('This uses post type "Intro-Cat" and is attached to the desired Category(ies).'),
 			);
@@ -3269,7 +3281,7 @@ Hello
 			$demo_items['welcome_to_blog_b'] = array(
 				'title'    => T_('Welcome to Blog B'),
 				'tags'     => 'intro',
-				'category' => 'b2evolution_tips',
+				'category' => 'welcome',
 				'type'     => 'Intro-Front',
 				'content'  => sprintf( T_('<p>This is the intro post for the front page of Blog B.</p>
 
