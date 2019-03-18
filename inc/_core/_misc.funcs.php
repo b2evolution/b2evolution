@@ -900,8 +900,8 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 		// Create an unique string in order to replace all matching blocks temporarily
 		$unique_replacement = md5( time() + rand() );
 
-		$matches_search = array();
-		$matches_replace = array();
+		$matches_source = array();
+		$matches_temp = array();
 		foreach( $matches[0] as $l => $l_matching )
 		{	// Build arrays with a source code of the matching blocks and with temporary replacement
 			$matches_source[] = $l_matching[0];

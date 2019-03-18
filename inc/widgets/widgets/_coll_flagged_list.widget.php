@@ -51,6 +51,15 @@ class coll_flagged_list_Widget extends coll_item_list_Widget
 		$r['flagged']['defaultvalue'] = 1;
 		$r['flagged']['no_edit'] = true;
 
+		// Hide the 2 last orderby fields with order direction:
+		for( $order_index = 1; $order_index <= 2 /* The number of orderby fields - 1 */; $order_index++ )
+		{
+			$r['orderby_'.$order_index.'_begin_line']['no_edit'] = true;
+			$r['order_by_'.$order_index]['no_edit'] = true;
+			$r['order_dir_'.$order_index]['no_edit'] = true;
+			$r['orderby_'.$order_index.'_end_line']['no_edit'] = true;
+		}
+
 		return $r;
 	}
 
