@@ -145,6 +145,13 @@ function init_inskin_editing()
 		$ItemCache = & get_ItemCache ();
 		$edited_Item = $ItemCache->get_by_ID ( $post_ID );
 
+		// Check if the editing Item has at least one proposed change:
+		if( ! $edited_Item->check_before_update( 'warning' ) &&
+		    ( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) ) )
+		{	// Use item fields values from last proposed change:
+			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
+		}
+
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
 		$post_extracats = postcats_get_byID( $post_ID );
 
@@ -210,9 +217,9 @@ function init_inskin_editing()
 	// Used in the edit form:
 
 	// We never allow HTML in titles, so we always encode and decode special chars.
-	$item_title = htmlspecialchars_decode( $edited_Item->title );
+	$item_title = htmlspecialchars_decode( $edited_Item->get( 'title' ) );
 
-	$item_content = prepare_item_content( $edited_Item->content );
+	$item_content = prepare_item_content( $edited_Item->get( 'content' ) );
 
 	if( ! $edited_Item->get_type_setting( 'allow_html' ) )
 	{ // HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:

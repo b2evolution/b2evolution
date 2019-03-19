@@ -47,6 +47,7 @@ class LinkItem extends LinkOwner
 			'Link files to current xxx' => NT_( 'Link files to current item' ),
 			'Selected files have been linked to xxx.' => NT_( 'Selected files have been linked to item.' ),
 			'Link has been deleted from $xxx$.' => NT_( 'Link has been deleted from &laquo;item&raquo;.' ),
+			'Cannot delete Link from $xxx$.' => NT_( 'Cannot delete Link from &laquo;item&raquo;.' ),
 		);
 	}
 
@@ -198,7 +199,7 @@ class LinkItem extends LinkOwner
 	{
 		global $DB, $localtimenow;
 
-		if( ! $this->Item->check_before_update() )
+		if( ! $this->Item->check_before_update( 'error' ) )
 		{	// If the Link's Item cannot be updated:
 			// (e-g it can be restricted if this item has at least one proposed change)
 			return false;
@@ -261,7 +262,7 @@ class LinkItem extends LinkOwner
 	{
 		global $DB, $localtimenow;
 
-		if( ! $force && ! $this->Item->check_before_update() )
+		if( ! $force && ! $this->Item->check_before_update( 'error' ) )
 		{	// If the Link's Item cannot be updated:
 			// (e-g it can be restricted if this item has at least one proposed change)
 			return false;

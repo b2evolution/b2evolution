@@ -47,6 +47,7 @@ class LinkMessage extends LinkOwner
 			'Link files to current xxx' => NT_('Link files to current message'),
 			'Selected files have been linked to xxx.' => NT_('Selected files have been linked to message.'),
 			'Link has been deleted from $xxx$.' => NT_('Link has been deleted from message.'),
+			'Cannot delete Link from $xxx$.' => NT_( 'Cannot delete Link from message.' ),
 		);
 	}
 

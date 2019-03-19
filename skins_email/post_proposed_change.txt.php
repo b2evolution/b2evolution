@@ -28,7 +28,7 @@ $recipient_User = $params['recipient_User'];
 $proposer_User = $params['proposer_User'];
 $Item = $params['Item'];
 
-echo sprintf( T_('%s proposed a change on a post %s.'), $proposer_User->get_username(), '"'.$Item->get( 'title' ).'"' );
+echo sprintf( T_('%s proposed a change on the post "%s".'), $proposer_User->get_username(), $Item->get( 'title' ) );
 echo "\n\n";
 
 // Buttons:
