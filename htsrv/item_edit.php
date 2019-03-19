@@ -297,6 +297,9 @@ switch( $action )
 			{ // Send post assignment notification
 				$edited_Item->send_assignment_notification();
 			}
+
+			// Clear all proposed changes of the updated Item:
+			$edited_Item->clear_proposed_changes();
 		}
 
 		// post post-publishing operations:

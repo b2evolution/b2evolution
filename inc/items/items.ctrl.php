@@ -110,10 +110,12 @@ switch( $action )
 		// Where are we going to redirect to?
 		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' ) );
 
-		if( $action == 'edit' )
-		{	// Check if this Item can be updated:
-			// (e-g it can be restricted if this item has at least one proposed change)
-			$edited_Item->check_before_update();
+		// Check if the editing Item has at least one proposed change:
+		if( $action == 'edit' &&
+		    ! $edited_Item->check_before_update( 'warning' ) &&
+		    ( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) ) )
+		{	// Use item fields values from last proposed change:
+			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
 		}
 		break;
 
@@ -1196,7 +1198,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
-		if( $edited_Item->check_before_update() )
+		if( $edited_Item->check_before_update( 'error' ) )
 		{	// Allow to restore an archived version only when it is not restricted currently for the edited Item:
 			param( 'r', 'integer', 0 );
 
@@ -1558,6 +1560,11 @@ switch( $action )
 		// Execute or schedule notifications & pings:
 		$edited_Item->handle_notifications( NULL, false, $item_members_notified, $item_community_notified, $item_pings_sent );
 
+		if( in_array( $action, array( 'update_edit', 'update', 'update_publish' ) ) )
+		{	// Clear all proposed changes of the updated Item:
+			$edited_Item->clear_proposed_changes();
+		}
+
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
 		if( $action == 'extract_tags' )
@@ -1850,7 +1857,11 @@ switch( $action )
 		}
 
 		// UPDATE POST IN DB:
-		$edited_Item->dbupdate();
+		if( $edited_Item->dbupdate() )
+		{
+			// Clear all proposed changes of the updated Item:
+			$edited_Item->clear_proposed_changes();
+		}
 
 		// Get params to skip/force/mark notifications and pings:
 		param( 'item_members_notified', 'string', NULL );
@@ -2177,30 +2188,15 @@ switch( $action )
 			// Update current Item with values from the requested proposed change:
 			$result = $edited_Item->update_from_revision( get_param( 'r' ) );
 			$success_message = sprintf( T_('The proposed change #%d has been accepted.'), $Revision->iver_ID );
-			// Delete only previous proposed changes:
-			$delete_direction = '<=';
 		}
 		else
 		{	// Reject the proposed change:
 			$result = true;
 			$success_message = sprintf( T_('The proposed change #%d has been rejected.'), $Revision->iver_ID );
-			// Delete only newer proposed changes:
-			$delete_direction = '>=';
 		}
 		if( $result )
 		{	// Delete also the proposed changes with custom fields and links to complete accept/reject action:
-			$DB->query( 'DELETE FROM T_items__version
-				WHERE iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
-				  AND iver_type = "proposed"
-				  AND iver_ID '.$delete_direction.' '.$Revision->iver_ID );
-			$DB->query( 'DELETE FROM T_items__version_custom_field
-				WHERE ivcf_iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
-				  AND ivcf_iver_type = "proposed"
-				  AND ivcf_iver_ID '.$delete_direction.' '.$Revision->iver_ID );
-			$DB->query( 'DELETE FROM T_items__version_link
-				WHERE ivl_iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
-				  AND ivl_iver_type = "proposed"
-				  AND ivl_iver_ID '.$delete_direction.' '.$Revision->iver_ID );
+			$edited_Item->clear_proposed_changes( $action, $Revision->iver_ID );
 			// Display success message:
 			$Messages->add( $success_message, 'success' );
 		}

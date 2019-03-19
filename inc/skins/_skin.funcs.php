@@ -1424,14 +1424,6 @@ function skin_init( $disp )
 				header_redirect( $selected_Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
 			}
 
-			// Check if this Item can be updated:
-			// (e-g it can be restricted if this item has at least one proposed change)
-			$ItemCache = & get_ItemCache ();
-			if( $edited_Item = & $ItemCache->get_by_ID( $post_ID, false, false ) )
-			{
-				$edited_Item->check_before_update();
-			}
-
 			// Prepare the 'In-skin editing':
 			init_inskin_editing();
 			break;

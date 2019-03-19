@@ -1160,30 +1160,32 @@ class collections_Module extends Module
 				if( $confirmed )
 				{ // Unlink File from Item:
 					$deleted_link_ID = $edited_Link->ID;
-					$LinkOwner->remove_link( $edited_Link );
-					unset($edited_Link);
+					if( $LinkOwner->remove_link( $edited_Link ) )
+					{	// If Link has been removed successfully:
+						unset($edited_Link);
 
-					$LinkOwner->after_unlink_action( $deleted_link_ID );
+						$LinkOwner->after_unlink_action( $deleted_link_ID );
 
-					$Messages->add( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'success' );
+						$Messages->add( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'success' );
 
-					if( $current_User->check_perm( 'files', 'edit' ) )
-					{ // current User has permission to edit/delete files
-						$file_name = $linked_File->get_name();
-						$links_count--;
-						if( $links_count > 0 )
-						{ // File is linked to other objects
-							$Messages->add( sprintf( T_('File %s is still linked to %d other objects'), $file_name, $links_count ), 'note' );
-						}
-						else
-						{ // File is not linked to other objects
-							if( $linked_File->unlink() )
-							{ // File removed successful ( removed from db and from storage device also )
-								$Messages->add( sprintf( T_('File %s has been deleted.'), $file_name ), 'success' );
+						if( $current_User->check_perm( 'files', 'edit' ) )
+						{ // current User has permission to edit/delete files
+							$file_name = $linked_File->get_name();
+							$links_count--;
+							if( $links_count > 0 )
+							{ // File is linked to other objects
+								$Messages->add( sprintf( T_('File %s is still linked to %d other objects'), $file_name, $links_count ), 'note' );
 							}
 							else
-							{ // Could not completly remove the file
-								$Messages->add( sprintf( T_('File %s could not be deleted.'), $file_name ), 'error' );
+							{ // File is not linked to other objects
+								if( $linked_File->unlink() )
+								{ // File removed successful ( removed from db and from storage device also )
+									$Messages->add( sprintf( T_('File %s has been deleted.'), $file_name ), 'success' );
+								}
+								else
+								{ // Could not completly remove the file
+									$Messages->add( sprintf( T_('File %s could not be deleted.'), $file_name ), 'error' );
+								}
 							}
 						}
 					}

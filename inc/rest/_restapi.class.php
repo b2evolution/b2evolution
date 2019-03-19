@@ -2208,18 +2208,25 @@ class RestApi
 
 		// Unlink File from Item/Comment:
 		$deleted_link_ID = $deleted_Link->ID;
-		$LinkOwner->remove_link( $deleted_Link );
+		if( $LinkOwner->remove_link( $deleted_Link ) )
+		{	// If Link has been removed successfully:
 
-		$LinkOwner->after_unlink_action( $deleted_link_ID );
+			$LinkOwner->after_unlink_action( $deleted_link_ID );
 
-		if( $action == 'delete' && ! empty( $linked_File ) )
-		{	// Delete a linked file from disk and DB completely:
-			$linked_File->unlink();
+			if( $action == 'delete' && ! empty( $linked_File ) )
+			{	// Delete a linked file from disk and DB completely:
+				$linked_File->unlink();
+			}
+
+			// The requested link has been deleted successfully:
+			$this->halt( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'delete_success', 200 );
+			// Exit here.
 		}
-
-		// The requested link has been deleted successfully:
-		$this->halt( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'delete_success', 200 );
-		// Exit here.
+		else
+		{	// The requested link cannot be deleted:
+			$this->halt( $LinkOwner->translate( 'Cannot delete Link from $xxx$.' ), 'delete_failed', 403 );
+			// Exit here.
+		}
 	}
 
 

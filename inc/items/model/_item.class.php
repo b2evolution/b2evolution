@@ -727,10 +727,6 @@ class Item extends ItemLight
 		global $default_locale, $current_User, $localtimenow, $Blog;
 		global $item_typ_ID;
 
-		// Check if this Item can be updated:
-		// (e-g it can be restricted if this item has at least one proposed change)
-		$this->check_before_update();
-
 		// LOCALE:
 		if( param( 'post_locale', 'string', NULL ) !== NULL )
 		{
@@ -5875,7 +5871,7 @@ class Item extends ItemLight
 
 		$this->load_Blog();
 		$url = false;
-		if( $this->Blog->get_setting( 'in_skin_editing' ) && ! is_admin_page() )
+		if( $this->Blog->get_setting( 'in_skin_editing' ) && ( ! is_admin_page() || ! empty( $params['force_in_skin_editing'] ) ) )
 		{	// We have a mode 'In-skin editing' for the current Blog
 			if( check_item_perm_edit( $this->ID, false ) )
 			{	// Current user can edit this post
@@ -10505,7 +10501,21 @@ class Item extends ItemLight
 			}
 		}
 
-		$r = $this->dbupdate();
+		if( $Revision->iver_type == 'proposed' )
+		{	// Update last updated data from proposed change:
+			$this->set( 'lastedit_user_ID', $Revision->iver_edit_user_ID );
+			$this->set( 'datemodified', $Revision->iver_edit_last_touched_ts );
+			$this->set( 'contents_last_updated_ts', $Revision->iver_edit_last_touched_ts );
+			$this->set_last_touched_ts();
+			// Don't auto track date fields on accepting of proposed change:
+			$auto_track_modification = false;
+		}
+		else
+		{	// Auto track date fields on restoring from history:
+			$auto_track_modification = true;
+		}
+
+		$r = $this->dbupdate( $auto_track_modification );
 
 		// Update attachments:
 		$current_links_SQL = new SQL( 'Get current links of Item #'.$this->ID.' before updating from revision' );
@@ -10611,6 +10621,65 @@ class Item extends ItemLight
 		$DB->commit();
 
 		return $r;
+	}
+
+
+	/**
+	 * Delete proposed changes of this Item from DB
+	 *
+	 * @param string Action 'accept', 'reject'
+	 * @param integer|string ID of the proposed change, 'last' to get last proposed change
+	 */
+	function clear_proposed_changes( $action = 'accept', $iver_ID = 'last' )
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// Item must be stored in nDB:
+			return;
+		}
+
+		if( $iver_ID === 'last' )
+		{	// Try to get ID of the last proposed change:
+			if( $last_proposed_Revision = $this->get_revision( 'last_proposed' ) )
+			{	// If this Item has at least one proposed change:
+				$iver_ID = $last_proposed_Revision->iver_ID;
+			}
+			else
+			{	// This Item has no proposed changes:
+				return;
+			}
+			
+		}
+
+		if( strpos( $action, 'accept' ) !== false )
+		{	// Accept(delete) all previous proposed changes:
+			$delete_direction = '<=';
+		}
+		elseif( strpos( $action, 'reject' ) !== false )
+		{	// Reject(delete) all newer proposed changes:
+			$delete_direction = '>=';
+		}
+		else
+		{
+			debug_die( 'Unhandled action "'.$action.'" to clear proposed changes!' );
+		}
+
+		// Clear proposed changes:
+		$DB->query( 'DELETE FROM T_items__version
+			WHERE iver_itm_ID = '.$DB->quote( $this->ID ).'
+			  AND iver_type = "proposed"
+			  AND iver_ID '.$delete_direction.' '.$DB->quote( $iver_ID ) );
+		// Clear custom fields of the proposed changes:
+		$DB->query( 'DELETE FROM T_items__version_custom_field
+			WHERE ivcf_iver_itm_ID = '.$DB->quote( $this->ID ).'
+			  AND ivcf_iver_type = "proposed"
+			  AND ivcf_iver_ID '.$delete_direction.' '.$DB->quote( $iver_ID ) );
+		// Clear links/attachments of the proposed changes:
+		$DB->query( 'DELETE FROM T_items__version_link
+			WHERE ivl_iver_itm_ID = '.$DB->quote( $this->ID ).'
+			  AND ivl_iver_type = "proposed"
+			  AND ivl_iver_ID '.$delete_direction.' '.$DB->quote( $iver_ID ) );
 	}
 
 
@@ -12397,11 +12466,21 @@ class Item extends ItemLight
 	{
 		global $current_User, $Messages;
 
+		if( $redirect )
+		{	// Set a redirect URL:
+			$redirect_to = get_returnto_url();
+			$inskin_edit_script = '/item_edit.php';
+			if( strpos( $redirect_to, $inskin_edit_script ) == strlen( $redirect_to ) - strlen( $inskin_edit_script ) )
+			{	// Fix a redirect page to correct in-skin editing page
+				$redirect_to = $this->get_edit_url( array( 'force_in_skin_editing' => true ) );
+			}
+		}
+
 		if( ! is_logged_in() )
 		{	// User must be logged in:
 			if( $redirect )
 			{	// Redirect back to previous page
-				header_redirect();
+				header_redirect( $redirect_to );
 			}
 			return false;
 		}
@@ -12415,7 +12494,7 @@ class Item extends ItemLight
 
 			if( $redirect )
 			{	// Redirect back to previous page
-				header_redirect();
+				header_redirect( $redirect_to );
 			}
 			return false;
 		}
@@ -12432,7 +12511,7 @@ class Item extends ItemLight
 
 			if( $redirect )
 			{	// Redirect back to previous page
-				header_redirect();
+				header_redirect( $redirect_to );
 			}
 			return false;
 		}
@@ -12569,10 +12648,10 @@ class Item extends ItemLight
 	/**
 	 * Check if this item can be updated depending on proposed changes
 	 *
-	 * @param boolean TRUE to display messages
+	 * @param boolean|string FALSE to don't display message of restriction, Message type: 'error', 'warning', 'note', 'success'
 	 * @return boolean
 	 */
-	function check_before_update( $display_messages = true )
+	function check_before_update( $restriction_message_type = 'warning' )
 	{
 		if( ! isset( $this->check_before_update ) )
 		{	// Check and save result in cache var:
@@ -12580,13 +12659,19 @@ class Item extends ItemLight
 			{	// Item is not created yet, so it can be updated, i.e. insert new record without restriction:
 				$this->check_before_update = true;
 			}
-			elseif( $this->has_proposed_change() )
+			elseif( $last_proposed_Revision = $this->get_revision( 'last_proposed' ) )
 			{	// Don't allow to edit this Item if it has at least one proposed change:
-				if( $display_messages )
+				if( $restriction_message_type !== false )
 				{	// Display a message to inform user about this restriction:
 					global $Messages, $admin_url;
-					$Messages->add( sprintf( T_('You must accept or reject the <a %s>proposed changes</a> in order to continue edit this Item.'),
-						'href="'.$admin_url.'?ctrl=items&amp;action=history&amp;p='.$this->ID.'"' ), 'error' );
+
+					$UserCache = & get_UserCache();
+					$User = & $UserCache->get_by_ID( $last_proposed_Revision->iver_edit_user_ID, false, false );
+
+					$Messages->add( sprintf( T_('The content below includes <a %s>proposed changes</a> submitted by %s. If you edit the post, the changes will be considered accepted and you will save a new version with your own changes.'),
+							'href="'.$admin_url.'?ctrl=items&amp;action=history&amp;p='.$this->ID.'"',
+							( $User ? $User->get_identity_link() : '<span class="user deleted">'.T_('Deleted user').'</span>' )
+						), $restriction_message_type );
 				}
 				$this->check_before_update = false;
 			}

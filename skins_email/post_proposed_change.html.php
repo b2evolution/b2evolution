@@ -28,9 +28,9 @@ $recipient_User = $params['recipient_User'];
 $proposer_User = $params['proposer_User'];
 $Item = $params['Item'];
 
-echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('%s proposed a change on a post %s.'),
+echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('%s proposed a change on the post "%s".'),
 		$proposer_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:', 'login_text' => 'name' ) ),
-		'<b>'.$Item->get( 'title' ).'</b>'
+		$Item->get_title()
 	)."</p>\n";
 
 // Buttons:

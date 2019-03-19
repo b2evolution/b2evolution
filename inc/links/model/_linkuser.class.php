@@ -41,6 +41,7 @@ class LinkUser extends LinkOwner
 			'Edit this xxx...' => NT_( 'Edit this user...' ),
 			'Link files to current xxx' => NT_( 'Link files to current user' ),
 			'Link has been deleted from $xxx$.' => NT_( 'Link has been deleted from &laquo;user&raquo;.' ),
+			'Cannot delete Link from $xxx$.' => NT_( 'Cannot delete Link from &laquo;user&raquo;.' ),
 		);
 	}
 
