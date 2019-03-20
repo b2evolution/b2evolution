@@ -164,7 +164,18 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 	switch( $LinkOwner->type )
 	{
 		case 'item':
-			$window_title = $LinkOwner->is_temp() ? '' : format_to_js( sprintf( T_('Attach files to "%s"'), $LinkOwner->Item->get( 'title' ) ) );
+			if( $LinkOwner->is_temp() )
+			{
+				$window_title = '';
+			}
+			else
+			{
+				$window_title = format_to_js( sprintf( T_('Attach files to "%s"'), $LinkOwner->Item->get( 'title' ) ) );
+				if( ! $LinkOwner->Item->check_proposed_change_restriction() )
+				{	// Display overlay if the Item has a restriction by existing proposed change:
+					$restriction_overlay = T_('You must save the post and/or accept the proposed changes before you can edit the attachments.');
+				}
+			}
 			$form_id = 'itemform_links';
 			break;
 
@@ -244,6 +255,10 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 		) );
 
 	echo '<div id="'.$fieldset_prefix.'attachments_fieldset_wrapper" class="evo_attachments_fieldset__wrapper">';
+		if( ! empty( $restriction_overlay ) )
+		{	// Restrict attachments with overlay:
+			echo '<div id="'.$fieldset_prefix.'attachments_fieldset_overlay" class="evo_attachments_fieldset__overlay"><b>'.$restriction_overlay.'</b></div>';
+		}
 		echo '<div id="'.$fieldset_prefix.'attachments_fieldset_block" class="evo_attachments_fieldset__block">';
 			echo '<div id="'.$fieldset_prefix.'attachments_fieldset_table" class="evo_attachments_fieldset__table">';
 				require $inc_path.'links/views/_link_list.view.php';
@@ -256,7 +271,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 	// Show fieldset of quick uploader only when JS is enabled:
 	echo '<script type="text/javascript">jQuery( "#'.$fieldset_prefix.$form_id.'" ).show()</script>';
 
-	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) )
+	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) && empty( $restriction_overlay ) )
 	{	// Check if current user has a permission to back-office files manager:
 
 		// Initialize JavaScript to build and open window:

@@ -12462,7 +12462,7 @@ class Item extends ItemLight
 	 * @param boolean TRUE to redirect back if current user cannot create a proposed change
 	 * @return boolean
 	 */
-	function check_proposed_change( $redirect = false )
+	function can_propose_change( $redirect = false )
 	{
 		global $current_User, $Messages;
 
@@ -12651,13 +12651,13 @@ class Item extends ItemLight
 	 * @param boolean|string FALSE to don't display message of restriction, Message type: 'error', 'warning', 'note', 'success'
 	 * @return boolean
 	 */
-	function check_before_update( $restriction_message_type = 'warning' )
+	function check_proposed_change_restriction( $restriction_message_type = false )
 	{
-		if( ! isset( $this->check_before_update ) )
+		if( ! isset( $this->check_proposed_change_restriction ) )
 		{	// Check and save result in cache var:
 			if( empty( $this->ID ) )
 			{	// Item is not created yet, so it can be updated, i.e. insert new record without restriction:
-				$this->check_before_update = true;
+				$this->check_proposed_change_restriction = true;
 			}
 			elseif( $last_proposed_Revision = $this->get_revision( 'last_proposed' ) )
 			{	// Don't allow to edit this Item if it has at least one proposed change:
@@ -12673,15 +12673,15 @@ class Item extends ItemLight
 							( $User ? $User->get_identity_link() : '<span class="user deleted">'.T_('Deleted user').'</span>' )
 						), $restriction_message_type );
 				}
-				$this->check_before_update = false;
+				$this->check_proposed_change_restriction = false;
 			}
 			else
 			{	// Item can be updated:
-				$this->check_before_update = true;
+				$this->check_proposed_change_restriction = true;
 			}
 		}
 
-		return $this->check_before_update;
+		return $this->check_proposed_change_restriction;
 	}
 }
 ?>

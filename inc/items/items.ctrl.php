@@ -98,7 +98,7 @@ switch( $action )
 		    ( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) ) )
 		{	// If the Item already has a proposed change:
 			// Check if current User can create a new proposed change:
-			$edited_Item->check_proposed_change( true );
+			$edited_Item->can_propose_change( true );
 			// Suggest item fields values from last proposed change when user creates new propose change:
 			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
 		}
@@ -112,7 +112,7 @@ switch( $action )
 
 		// Check if the editing Item has at least one proposed change:
 		if( $action == 'edit' &&
-		    ! $edited_Item->check_before_update( 'warning' ) &&
+		    ! $edited_Item->check_proposed_change_restriction( 'warning' ) &&
 		    ( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) ) )
 		{	// Use item fields values from last proposed change:
 			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
@@ -1041,8 +1041,9 @@ switch( $action )
 		$Revision_2 = $edited_Item->get_revision( param( 'r2', 'string' ) );
 
 		if( ! $Revision_1 || ! $Revision_2 )
-		{	// Exit on wrong requested revision:
-			debug_die( 'The requested revision is not found in DB!' );
+		{	// Redirect to history list on wrong requested revision:
+			$Messages->add( T_('The changes has already been accepted or rejected.'), 'error' );
+			header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
 		}
 
 		load_class( '_core/model/_diff.class.php', 'Diff' );
@@ -1198,8 +1199,8 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
-		if( $edited_Item->check_before_update( 'error' ) )
-		{	// Allow to restore an archived version only when it is not restricted currently for the edited Item:
+		if( $edited_Item->check_proposed_change_restriction( 'error' ) )
+		{	// Allow to restore an archived version only when item's editing is not restricted by proposed chnages:
 			param( 'r', 'integer', 0 );
 
 			if( $r > 0 && $edited_Item->update_from_revision( $r ) )
@@ -2145,7 +2146,7 @@ switch( $action )
 		$current_User->check_perm( 'blog_item_propose', 'edit', true, $Blog->ID );
 
 		// Check if current User can create a new proposed change:
-		$edited_Item->check_proposed_change( true );
+		$edited_Item->can_propose_change( true );
 
 		if( $edited_Item->create_proposed_change() )
 		{	// If new proposed changes has been inserted in DB successfully:
