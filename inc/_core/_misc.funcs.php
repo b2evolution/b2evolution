@@ -8920,7 +8920,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_audio_params );
 
 					// Render attachments by plugin:
-					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_audio_params ) ) != 0 )
+					if( count( $Plugins->trigger_event_first_true_with_params( $render_plugin_event_name, $current_audio_params ) ) != 0 )
 					{	// This attachment has been rendered by a plugin (to $current_audio_params['data']):
 						$inlines[$current_inline] =  $current_audio_params['data'];
 					}
