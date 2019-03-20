@@ -1042,7 +1042,7 @@ switch( $action )
 
 		if( ! $Revision_1 || ! $Revision_2 )
 		{	// Redirect to history list on wrong requested revision:
-			$Messages->add( T_('The changes has already been accepted or rejected.'), 'error' );
+			$Messages->add( T_('The changes have already been accepted or rejected.'), 'error' );
 			header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
 		}
 
@@ -1199,14 +1199,11 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
-		if( $edited_Item->check_proposed_change_restriction( 'error' ) )
-		{	// Allow to restore an archived version only when item's editing is not restricted by proposed chnages:
-			param( 'r', 'integer', 0 );
+		param( 'r', 'integer', 0 );
 
-			if( $r > 0 && $edited_Item->update_from_revision( $r ) )
-			{	// Update item only from revisions ($r == 0 for current version):
-				$Messages->add( sprintf( T_('Item has been restored from revision #%s'), $r ), 'success' );
-			}
+		if( $r > 0 && $edited_Item->update_from_revision( $r ) )
+		{	// Update item only from revisions ($r == 0 for current version):
+			$Messages->add( sprintf( T_('Item has been restored from revision #%s'), $r ), 'success' );
 		}
 
 		header_redirect( regenerate_url( 'action', 'action=history', '', '&' ) );

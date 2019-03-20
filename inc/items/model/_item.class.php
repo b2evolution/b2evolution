@@ -7538,9 +7538,10 @@ class Item extends ItemLight
 	 * 	because of the item canonical url title was changed on the slugs edit form, so slug update is already done.
 	 *  If slug update wasn't done already, then this param has to be true.
 	 * @param boolean Update custom fields of child posts?
+	 * @param boolean TRUE to force to create revision
 	 * @return boolean true on success
 	 */
-	function dbupdate( $auto_track_modification = true, $update_slug = true, $update_child_custom_fields = true )
+	function dbupdate( $auto_track_modification = true, $update_slug = true, $update_child_custom_fields = true, $force_create_revision = false )
 	{
 		global $DB, $Plugins, $Messages;
 
@@ -7731,7 +7732,7 @@ class Item extends ItemLight
 			// fp> TODO: actually, only the fields that have been changed should be copied to the version, the other should be left as NULL
 
 			global $localtimenow;
-			if( $localtimenow - strtotime( $this->last_touched_ts ) > 90 )
+			if( $force_create_revision || $localtimenow - strtotime( $this->last_touched_ts ) > 10 )
 			{ // Create new revision
 				$result = $this->create_revision();
 			}
@@ -10509,13 +10510,17 @@ class Item extends ItemLight
 			$this->set_last_touched_ts();
 			// Don't auto track date fields on accepting of proposed change:
 			$auto_track_modification = false;
+			// Force to create new revision even if no 90 seconds after last changing:
+			$force_create_revision = true;
 		}
 		else
 		{	// Auto track date fields on restoring from history:
 			$auto_track_modification = true;
+			// Don't force creating of new revision:
+			$force_create_revision = false;
 		}
 
-		$r = $this->dbupdate( $auto_track_modification );
+		$r = $this->dbupdate( $auto_track_modification, true, true, $force_create_revision );
 
 		// Update attachments:
 		$current_links_SQL = new SQL( 'Get current links of Item #'.$this->ID.' before updating from revision' );
