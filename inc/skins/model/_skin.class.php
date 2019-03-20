@@ -921,6 +921,39 @@ class Skin extends DataObject
 
 
 	/**
+	 * Get style code
+	 *
+	 * @param string Setting name
+	 * @param string Style template with mask instead of setting value
+	 * @param string Custom value, used instead of current setting value
+	 * @param string 
+	 */
+	function get_style( $setting_name, $style_template, $setting_value = NULL )
+	{
+		if( $setting_value === NULL )
+		{	// Try to get current setting value:
+			$setting_value = $this->get_setting( $setting_name );
+		}
+
+		if( ! $setting_value )
+		{	// No value for the requested setting:
+			return '';
+		}
+
+		global $Session, $blog;
+
+		if( $Session->get( 'customizer_mode_'.$blog ) )
+		{	// If customizer mode enabled we should append a special css comment code
+			// in order to quick change the value from the customizer panel on change input value:
+			$setting_value .= '/*'.$setting_name.'*/';
+		}
+
+		// Replace mask with setting value:
+		return str_replace( '$setting_value$', $setting_value, $style_template );
+	}
+
+
+	/**
 	 * Get current skin post navigation setting.
 	 * Possible values:
 	 *    - NULL - In this case the Blog post navigation setting will be used

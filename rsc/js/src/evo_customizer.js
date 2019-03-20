@@ -96,6 +96,26 @@ jQuery( document ).on( 'ready', function()
 
 		// Open links from widget edit form on top window:
 		backoffice_content.find( 'form#widget_checkchanges a:not([target])' ).attr( 'target', '_top' );
+
+		// Update custom styles of the skin:
+		backoffice_content.find( '.evo_customizer__content input' ).focus( function()
+		{	// Store value before changing:
+			jQuery( this ).data( 'prev-value', jQuery( this ).val() );
+		} );
+		backoffice_content.find( '.evo_customizer__content input' ).blur( function()
+		{	// Check if value was changed:
+			if( jQuery( this ).data( 'prev-value' ) == jQuery( this ).val() )
+			{	// No changes:
+				return;
+			}
+
+			var skin_style = jQuery( '#evo_customizer__frontoffice' ).contents().find( 'style#evo_skin_styles' );
+			var skin_setting_name = jQuery( this ).attr( 'name' ).replace( /^edit_skin_\d+_set_/, '' );
+
+			// Replace previous value with new updated:
+			var regexp = new RegExp( ':[^\\/:]+(\\/\\*' + skin_setting_name + '\\*\\/)', 'g' );
+			skin_style.text( skin_style.text().replace( regexp, ':' + jQuery( this ).val() + '$1' ) )
+		} );
 	} );
 
 	jQuery( '#evo_customizer__updater' ).on( 'load', function()

@@ -451,6 +451,9 @@ class bootstrap_main_Skin extends Skin
 				$custom_css .= 'body.pictured .main_page_wrapper .text-muted { color: '.$color." }\n";
 			}
 
+			// Front Page Main Area Settings:
+
+			// Background color + Background opacity:
 			if( $color = $this->get_setting( 'front_bg_cont_color' ) )
 			{ // Custom body background color:
 				$color_transparency = floatval( $this->get_setting( 'front_bg_opacity' ) / 100 );
@@ -467,41 +470,42 @@ class bootstrap_main_Skin extends Skin
 						$color[ $c ] = $v.$v;
 					}
 				}
-				$custom_css .= '.front_main_content { background-color: rgba('.implode( ',', array_map( 'hexdec', $color ) ).','.$color_transparency.')'." }\n";
+				$front_bg_cont_color_opacity = 'rgba('.implode( ',', array_map( 'hexdec', $color ) ).','.$color_transparency.')';
 			}
+			$custom_css .= $this->get_style( 'front_bg_cont_color+front_bg_opacity',
+					'.front_main_content { background-color: $setting_value$'." }\n",
+					$front_bg_cont_color_opacity
+				);
 
-			if( $color = $this->get_setting( 'front_text_color' ) )
-			{ // Custom text color:
-				$custom_css .= 'body.pictured .front_main_content, '
+			// Text color:
+			$custom_css .= $this->get_style( 'front_text_color',
+					'body.pictured .front_main_content, '
 					.'body.pictured .front_main_content h1 small, '
 					.'.evo_container__header, '
 					.'.evo_container__page_top, '
 					.'body.pictured.disp_access_requires_login .evo_widget.widget_core_content_block, '
 					.'body.pictured.disp_access_denied .evo_widget.widget_core_content_block '
-					.'{ color: '.$color." }\n";
-			}
+					.'{ color: $setting_value$'." }\n"
+				);
 
-			$link_color = $this->get_setting( 'front_link_color' );
-			$icon_color = $this->get_setting( 'front_icon_color' );
-			if( $link_color )
-			{ // Custom link color:
-				$custom_css .= 'body.pictured .main_page_wrapper .front_main_area a:not(.btn),
-				body.pictured .main_page_wrapper .front_main_area div.evo_withteaser div.item_content > a { color: '.$link_color.' }
-				body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_item_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a,
-				body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_post_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a { color: '.$link_color." }\n";
-			}
-			if( $link_color && $icon_color )
-			{ // Custom icon color:
-				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__textcolor"]):not(:hover) { color: '.$icon_color." }\n";
-				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__bgcolor"]):not(:hover) { background-color: '.$link_color." }\n";
-				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hovertextcolor"]) { color: '.$link_color." }\n";
-				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hoverbgcolor"]) { background-color: '.$icon_color." }\n";
-			}
+			// Link color:
+			$custom_css .= $this->get_style( 'front_link_color',
+					'body.pictured .main_page_wrapper .front_main_area a:not(.btn),'.
+					'body.pictured .main_page_wrapper .front_main_area div.evo_withteaser div.item_content > a { color: $setting_value$ }'.
+					'body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_item_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a,'.
+					'body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_post_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a { color: $setting_value$'." }\n".
+					'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__bgcolor"]):not(:hover) { background-color: $setting_value$'." }\n".
+					'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hovertextcolor"]) { color: $setting_value$'." }\n"
+				);
 
-			if( $width = $this->get_setting( 'front_width' ) )
-			{ // Custom width for front main area:
-				$custom_css .= 'div.front_main_area { width: '.$width." }\n";
-			}
+			// Inverse icon color:
+			$custom_css .= $this->get_style( 'front_icon_color',
+					'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__textcolor"]):not(:hover) { color: $setting_value$'." }\n".
+					'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hoverbgcolor"]) { background-color: $setting_value$'." }\n"
+				);
+
+			// Width:
+			$custom_css .= $this->get_style( 'front_width', 'div.front_main_area { width: $setting_value$'." }\n" );
 
 			if( $position = $this->get_setting( 'front_position' ) )
 			{ // Custom width for front main area:
@@ -548,7 +552,7 @@ class bootstrap_main_Skin extends Skin
 						'.$custom_css.'
 					}';
 			}
-			$custom_css = '<style type="text/css">
+			$custom_css = '<style type="text/css" id="evo_skin_styles">
 <!--
 '.$custom_css.'
 -->
