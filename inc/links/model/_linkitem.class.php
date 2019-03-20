@@ -199,9 +199,8 @@ class LinkItem extends LinkOwner
 	{
 		global $DB, $localtimenow;
 
-		if( ! $this->Item->check_before_update( 'error' ) )
-		{	// If the Link's Item cannot be updated:
-			// (e-g it can be restricted if this item has at least one proposed change)
+		if( ! $this->Item->check_proposed_change_restriction( 'error' ) )
+		{	// If the Link's Item cannot be updated because of proposed change:
 			return false;
 		}
 
@@ -262,9 +261,8 @@ class LinkItem extends LinkOwner
 	{
 		global $DB, $localtimenow;
 
-		if( ! $force && ! $this->Item->check_before_update( 'error' ) )
-		{	// If the Link's Item cannot be updated:
-			// (e-g it can be restricted if this item has at least one proposed change)
+		if( ! $force && ! $this->Item->check_proposed_change_restriction( 'error' ) )
+		{	// If the Link's Item cannot be updated because of proposed change:
 			return false;
 		}
 

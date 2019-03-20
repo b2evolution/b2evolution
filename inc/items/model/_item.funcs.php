@@ -146,7 +146,7 @@ function init_inskin_editing()
 		$edited_Item = $ItemCache->get_by_ID ( $post_ID );
 
 		// Check if the editing Item has at least one proposed change:
-		if( ! $edited_Item->check_before_update( 'warning' ) &&
+		if( ! $edited_Item->check_proposed_change_restriction( 'warning' ) &&
 		    ( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) ) )
 		{	// Use item fields values from last proposed change:
 			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
