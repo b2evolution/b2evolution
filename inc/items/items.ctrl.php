@@ -98,7 +98,7 @@ switch( $action )
 		    ( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) ) )
 		{	// If the Item already has a proposed change:
 			// Check if current User can create a new proposed change:
-			$edited_Item->check_proposed_change( true );
+			$edited_Item->can_propose_change( true );
 			// Suggest item fields values from last proposed change when user creates new propose change:
 			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
 		}
@@ -110,10 +110,12 @@ switch( $action )
 		// Where are we going to redirect to?
 		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' ) );
 
-		if( $action == 'edit' )
-		{	// Check if this Item can be updated:
-			// (e-g it can be restricted if this item has at least one proposed change)
-			$edited_Item->check_before_update();
+		// Check if the editing Item has at least one proposed change:
+		if( $action == 'edit' &&
+		    ! $edited_Item->check_proposed_change_restriction( 'warning' ) &&
+		    ( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) ) )
+		{	// Use item fields values from last proposed change:
+			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
 		}
 		break;
 
@@ -1022,8 +1024,17 @@ switch( $action )
 		$Revision = $edited_Item->get_revision( param( 'r', 'string' ) );
 
 		if( ! $Revision )
-		{	// Exit on wrong requested revision:
-			debug_die( 'The requested revision is not found in DB!' );
+		{	// Redirect to history list on wrong requested revision:
+			if( substr( get_param( 'r' ), 0, 1 ) == 'p' )
+			{	// When view old(not existing) proposed change:
+				$Messages->add( T_('The changes have already been accepted or rejected.'), 'error' );
+			}
+			else
+			{	// When view archived version:
+				// Don't translate because it should not happens on normal work:
+				$Messages->add( 'The requested version does not exist.', 'error' );
+			}
+			header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
 		}
 		break;
 
@@ -1039,8 +1050,17 @@ switch( $action )
 		$Revision_2 = $edited_Item->get_revision( param( 'r2', 'string' ) );
 
 		if( ! $Revision_1 || ! $Revision_2 )
-		{	// Exit on wrong requested revision:
-			debug_die( 'The requested revision is not found in DB!' );
+		{	// Redirect to history list on wrong requested revision:
+			if( substr( get_param( 'r1' ), 0, 1 ) == 'c' && substr( get_param( 'r2' ), 0, 1 ) == 'p' )
+			{	// When compare current version with old(not existing) proposed change(e.g. on opening url from old email message):
+				$Messages->add( T_('The changes have already been accepted or rejected.'), 'error' );
+			}
+			else
+			{	// When compare all other cases:
+				// Don't translate because it should not happens on normal work:
+				$Messages->add( 'The requested version does not exist.', 'error' );
+			}
+			header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
 		}
 
 		load_class( '_core/model/_diff.class.php', 'Diff' );
@@ -1185,6 +1205,8 @@ switch( $action )
 			}
 		}
 
+		// Clear revision in order to display current data on the form:
+		$edited_Item->clear_revision();
 		break;
 
 	case 'history_restore':
@@ -1194,14 +1216,11 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
-		if( $edited_Item->check_before_update() )
-		{	// Allow to restore an archived version only when it is not restricted currently for the edited Item:
-			param( 'r', 'integer', 0 );
+		param( 'r', 'integer', 0 );
 
-			if( $r > 0 && $edited_Item->update_from_revision( $r ) )
-			{	// Update item only from revisions ($r == 0 for current version):
-				$Messages->add( sprintf( T_('Item has been restored from revision #%s'), $r ), 'success' );
-			}
+		if( $r > 0 && $edited_Item->update_from_revision( $r ) )
+		{	// Update item only from revisions ($r == 0 for current version):
+			$Messages->add( sprintf( T_('Item has been restored from revision #%s'), $r ), 'success' );
 		}
 
 		header_redirect( regenerate_url( 'action', 'action=history', '', '&' ) );
@@ -1556,6 +1575,11 @@ switch( $action )
 		// Execute or schedule notifications & pings:
 		$edited_Item->handle_notifications( NULL, false, $item_members_notified, $item_community_notified, $item_pings_sent );
 
+		if( in_array( $action, array( 'update_edit', 'update', 'update_publish' ) ) )
+		{	// Clear all proposed changes of the updated Item:
+			$edited_Item->clear_proposed_changes();
+		}
+
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
 		if( $action == 'extract_tags' )
@@ -1848,7 +1872,11 @@ switch( $action )
 		}
 
 		// UPDATE POST IN DB:
-		$edited_Item->dbupdate();
+		if( $edited_Item->dbupdate() )
+		{
+			// Clear all proposed changes of the updated Item:
+			$edited_Item->clear_proposed_changes();
+		}
 
 		// Get params to skip/force/mark notifications and pings:
 		param( 'item_members_notified', 'string', NULL );
@@ -2132,7 +2160,7 @@ switch( $action )
 		$current_User->check_perm( 'blog_item_propose', 'edit', true, $Blog->ID );
 
 		// Check if current User can create a new proposed change:
-		$edited_Item->check_proposed_change( true );
+		$edited_Item->can_propose_change( true );
 
 		if( $edited_Item->create_proposed_change() )
 		{	// If new proposed changes has been inserted in DB successfully:
@@ -2183,18 +2211,7 @@ switch( $action )
 		}
 		if( $result )
 		{	// Delete also the proposed changes with custom fields and links to complete accept/reject action:
-			$DB->query( 'DELETE FROM T_items__version
-				WHERE iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
-				  AND iver_type = "proposed"
-				  AND iver_ID >= '.$Revision->iver_ID );
-			$DB->query( 'DELETE FROM T_items__version_custom_field
-				WHERE ivcf_iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
-				  AND ivcf_iver_type = "proposed"
-				  AND ivcf_iver_ID >= '.$Revision->iver_ID );
-			$DB->query( 'DELETE FROM T_items__version_link
-				WHERE ivl_iver_itm_ID = '.$DB->quote( $edited_Item->ID ).'
-				  AND ivl_iver_type = "proposed"
-				  AND ivl_iver_ID >= '.$Revision->iver_ID );
+			$edited_Item->clear_proposed_changes( $action, $Revision->iver_ID );
 			// Display success message:
 			$Messages->add( $success_message, 'success' );
 		}
@@ -2531,7 +2548,7 @@ switch( $action )
 						) );
 			}
 
-			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', $redirect_to, T_('Cancel'), 4, 2 );
+			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action', 'action=history' ), T_('Cancel'), 4, 2 );
 		}
 
 		break;

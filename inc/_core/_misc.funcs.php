@@ -900,8 +900,8 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 		// Create an unique string in order to replace all matching blocks temporarily
 		$unique_replacement = md5( time() + rand() );
 
-		$matches_search = array();
-		$matches_replace = array();
+		$matches_source = array();
+		$matches_temp = array();
 		foreach( $matches[0] as $l => $l_matching )
 		{	// Build arrays with a source code of the matching blocks and with temporary replacement
 			$matches_source[] = $l_matching[0];
@@ -4121,7 +4121,9 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'post_new':
 				// 'notify_post_mentioned' - "I have been mentioned on a post.",
 				// 'notify_post_moderation' - "a post is created and I have permissions to moderate it."
-				// 'notify_edit_pst_moderation' - "a post is modified and I have permissions to moderate it."
+				// 'notify_edit_pst_moderation' - "someone proposed a change on a post and I have permissions to moderate it."
+			case 'post_proposed_change':
+				// 'notify_post_proposed' - "someone proposed a change on a post and I have permissions to moderate it."
 			case 'post_assignment':
 				// 'notify_post_assignment' - "a post was assigned to me."
 			case 'posts_unmoderated_reminder':
@@ -8515,7 +8517,6 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				'image_size'               => 'fit-400x320',
 				'image_link_to'            => 'original', // Can be 'orginal' (image) or 'single' (this post)
 				'limit'                    => 1000, // Max # of images displayed
-				'get_rendered_attachments' => true,
 			), $params );
 
 	if( !isset( $LinkList ) )
@@ -8676,12 +8677,6 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						}
 					}
 
-					if( ! $current_image_params['get_rendered_attachments'] )
-					{	// Save $r to temp var in order to don't get the rendered data from plugins
-						$temp_r = $r;
-					}
-
-					$temp_params = $current_image_params;
 					foreach( $current_image_params as $param_key => $param_value )
 					{	// Pass all params by reference, in order to give possibility to modify them by plugin
 						// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
@@ -8692,13 +8687,10 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_image_params );
 
 					// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r:
-					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_image_params ) ) != 0 )
+					if( count( $Plugins->trigger_event_first_true_with_params( $render_plugin_event_name, $current_image_params ) ) != 0 )
 					{	// This attachment has been rendered by a plugin (to $current_image_params['data']):
-						if( ! $current_image_params['get_rendered_attachments'] )
-						{	// Restore $r value and mark this Object has the rendered attachments:
-							$r = $temp_r;
-							$plugin_render_attachments = true;
-						}
+						$inlines[ $current_inline ] = $current_image_params['data'];
+						break;
 					}
 
 					if( $inline_type == 'image' )
@@ -8919,7 +8911,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_video_params );
 
 					// Render attachments by plugin:
-					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_video_params ) ) != 0 )
+					if( count( $Plugins->trigger_event_first_true_with_params( $render_plugin_event_name, $current_video_params ) ) != 0 )
 					{	// This attachment has been rendered by a plugin (to $current_video_params['data']):
 						$inlines[$current_inline] = $current_video_params['data'];
 					}
@@ -8951,9 +8943,9 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_audio_params );
 
 					// Render attachments by plugin:
-					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_audio_params ) ) != 0 )
+					if( count( $Plugins->trigger_event_first_true_with_params( $render_plugin_event_name, $current_audio_params ) ) != 0 )
 					{	// This attachment has been rendered by a plugin (to $current_audio_params['data']):
-						$inlines[$current_inline] =  $current_audio_params['data'];
+						$inlines[$current_inline] = $current_audio_params['data'];
 					}
 					else
 					{ // no plugin available or was able to render the tag

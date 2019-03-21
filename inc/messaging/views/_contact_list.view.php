@@ -413,8 +413,8 @@ $Results->cols[] = array(
 
 $Results->display( $display_params );
 
-if( count( $Results->rows ) > 0 )
-{	// Display actions buttons
+if( $Results->total_rows > 0 )
+{	// Display actions buttons if current User has at least one contact:
 	global $module_contacts_list_params;
 	modules_call_method( 'get_contacts_list_params' );
 

@@ -727,10 +727,6 @@ class Item extends ItemLight
 		global $default_locale, $current_User, $localtimenow, $Blog;
 		global $item_typ_ID;
 
-		// Check if this Item can be updated:
-		// (e-g it can be restricted if this item has at least one proposed change)
-		$this->check_before_update();
-
 		// LOCALE:
 		if( param( 'post_locale', 'string', NULL ) !== NULL )
 		{
@@ -2875,6 +2871,7 @@ class Item extends ItemLight
 							// Permalink:
 							global $disp, $Item;
 							if( ( $disp != 'single' && $disp != 'page' ) ||
+							    ! ( $Item instanceof Item ) ||
 							    $Item->ID != $this->ID ||
 							    $fallback_count == $l + 1 )
 							{	// Use permalink if it is not last point and we don't view this current post:
@@ -5794,7 +5791,7 @@ class Item extends ItemLight
 
 		$this->load_Blog();
 		$url = false;
-		if( $this->Blog->get_setting( 'in_skin_editing' ) && ! is_admin_page() )
+		if( $this->Blog->get_setting( 'in_skin_editing' ) && ( ! is_admin_page() || ! empty( $params['force_in_skin_editing'] ) ) )
 		{	// We have a mode 'In-skin editing' for the current Blog
 			if( check_item_perm_edit( $this->ID, false ) )
 			{	// Current user can edit this post
@@ -7441,9 +7438,10 @@ class Item extends ItemLight
 	 * 	because of the item canonical url title was changed on the slugs edit form, so slug update is already done.
 	 *  If slug update wasn't done already, then this param has to be true.
 	 * @param boolean Update custom fields of child posts?
+	 * @param boolean TRUE to force to create revision
 	 * @return boolean true on success
 	 */
-	function dbupdate( $auto_track_modification = true, $update_slug = true, $update_child_custom_fields = true )
+	function dbupdate( $auto_track_modification = true, $update_slug = true, $update_child_custom_fields = true, $force_create_revision = false )
 	{
 		global $DB, $Plugins, $Messages;
 
@@ -7642,7 +7640,7 @@ class Item extends ItemLight
 			// fp> TODO: actually, only the fields that have been changed should be copied to the version, the other should be left as NULL
 
 			global $localtimenow;
-			if( $localtimenow - strtotime( $this->last_touched_ts ) > 90 )
+			if( $force_create_revision || $localtimenow - strtotime( $this->last_touched_ts ) > 10 )
 			{ // Create new revision
 				$result = $this->create_revision();
 			}
@@ -8194,7 +8192,7 @@ class Item extends ItemLight
 		$Blog = & $this->get_Blog();
 		if( $Blog->get_setting( 'use_workflow' ) && $this->assigned_to_new_user && ! empty( $this->assigned_user_ID ) )
 		{
-			$already_notified_user_IDs = array_merge( $already_notified_user_IDs, $this->send_assignment_notification( $executed_by_userid, $is_new_item ) );
+			$already_notified_user_IDs = array_merge( $already_notified_user_IDs, $this->send_assignment_notification( $executed_by_userid ) );
 		}
 
 		// THIRD: Subscribers may be notified asynchornously... and that is a even a requirement if the post has an issue_date in the future.
@@ -8312,15 +8310,16 @@ class Item extends ItemLight
 
 
 	/**
-	 * Send "post may need moderation" notifications for those users who have permission to moderate this post and would like to receive these notifications.
+	 * Get item moderators
 	 *
+	 * @param string Setting name of notification: 'notify_post_moderation', 'notify_edit_pst_moderation', 'notify_post_proposed'
 	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
-	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
-	 * @return array the notified user ids
+	 * @param string|false Additional check with collection subscription: 'sub_items', 'sub_items_mod', 'sub_comments'
+	 * @return array Key - User ID, Value - perm level
 	 */
-	function send_moderation_emails( $executed_by_userid = NULL, $is_new_item = false )
+	function get_moderators( $notify_setting_name, $executed_by_userid = NULL, $check_coll_subscription = false )
 	{
-		global $Settings, $UserSettings, $DB, $Messages;
+		global $Settings, $DB;
 
 		if( $executed_by_userid === NULL && is_logged_in() )
 		{	// Use current user by default:
@@ -8328,29 +8327,24 @@ class Item extends ItemLight
 			$executed_by_userid = $current_User->ID;
 		}
 
-		// Select all users who are post moderators in this Item's blog
-		$blog_ID = $this->load_Blog();
-
-		$notify_moderation_setting_name = ( $is_new_item ? 'notify_post_moderation' : 'notify_edit_pst_moderation' );
-
 		$notify_condition = 'uset_value IS NOT NULL AND uset_value <> "0"';
-		if( $Settings->get( 'def_'.$notify_moderation_setting_name ) )
+		if( $Settings->get( 'def_'.$notify_setting_name ) )
 		{
 			$notify_condition = '( uset_value IS NULL OR ( '.$notify_condition.' ) )';
 		}
-		if( ! $is_new_item && $this->Blog->get_setting( 'allow_item_mod_subscriptions' ) )
+		if( $check_coll_subscription !== false )
 		{	// Notify moderators which selected to be notified per collection (if it is enabled by collection setting):
-			$notify_condition = '( sub_items_mod = 1 OR ( '.$notify_condition.' ) )';
+			$notify_condition = '( '.$check_coll_subscription.' = 1 OR ( '.$notify_condition.' ) )';
 		}
 
 		// Select user_ids with the corresponding item edit permission on this item's blog
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get moderators "'.$notify_setting_name.'" for Item #'.$this->ID );
 		$SQL->SELECT( 'user_ID, IF( grp_perm_blogs = "editall" OR user_ID = blog_owner_user_ID, "all", IF( IFNULL( bloguser_perm_edit + 0, 0 ) > IFNULL( bloggroup_perm_edit + 0, 0 ), bloguser_perm_edit, bloggroup_perm_edit ) ) as perm' );
 		$SQL->FROM( 'T_users' );
-		$SQL->FROM_add( 'LEFT JOIN T_blogs ON ( blog_ID = '.$this->blog_ID.' )' );
-		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0 AND user_ID = bloguser_user_ID AND bloguser_blog_ID = '.$this->blog_ID.' )' );
-		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0 AND user_grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$this->blog_ID.' )' );
-		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "'.$notify_moderation_setting_name.'"' );
+		$SQL->FROM_add( 'LEFT JOIN T_blogs ON ( blog_ID = '.$this->get_blog_ID().' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0 AND user_ID = bloguser_user_ID AND bloguser_blog_ID = '.$this->get_blog_ID().' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0 AND user_grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$this->get_blog_ID().' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "'.$notify_setting_name.'"' );
 		$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 		$SQL->FROM_add( 'LEFT JOIN T_subscriptions ON sub_coll_ID = blog_ID AND sub_user_ID = user_ID' );
 		$SQL->WHERE( $notify_condition );
@@ -8363,11 +8357,31 @@ class Item extends ItemLight
 			$SQL->WHERE_and( 'user_ID != '.$DB->quote( $executed_by_userid ) );
 		}
 
-		$post_moderators = $DB->get_assoc( $SQL->get() );
+		return $DB->get_assoc( $SQL );
+	}
+
+
+	/**
+	 * Send "post may need moderation" notifications for those users who have permission to moderate this post and would like to receive these notifications.
+	 *
+	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
+	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
+	 * @return array the notified user ids
+	 */
+	function send_moderation_emails( $executed_by_userid = NULL, $is_new_item = false )
+	{
+		global $Messages;
+
+		$notify_moderation_setting_name = ( $is_new_item ? 'notify_post_moderation' : 'notify_edit_pst_moderation' );
+		// Notify moderators which selected to be notified per collection (if it is enabled by collection setting):
+		$check_coll_subscription = ( ! $is_new_item && $this->get_Blog()->get_setting( 'allow_item_mod_subscriptions' ) ? 'sub_items_mod' : false );
+
+		// Get all users who are post moderators in this Item's blog:
+		$post_moderators = $this->get_moderators( $notify_moderation_setting_name, $executed_by_userid, $check_coll_subscription );
 
 		$post_creator_User = & $this->get_creator_User();
 		if( isset( $post_moderators[$post_creator_User->ID] ) )
-		{ // Don't notify the user who just created this Item
+		{	// Don't notify the user who just created this Item:
 			unset( $post_moderators[$post_creator_User->ID] );
 		}
 
@@ -8442,13 +8456,84 @@ class Item extends ItemLight
 
 
 	/**
+	 * Send "post proposed change" notifications for those users who have permission to moderate this post and would like to receive these notifications.
+	 *
+	 * @param integer Version ID of new proposed change
+	 */
+	function send_proposed_change_notification( $iver_ID )
+	{
+		global $Messages, $current_User;
+
+		if( ! is_logged_in() )
+		{	// Only logged in user can propose a change
+			return;
+		}
+
+		// Get all users who are post moderators in this Item's blog:
+		$post_moderators = $this->get_moderators( 'notify_post_proposed' );
+
+		if( empty( $post_moderators ) )
+		{ // There are no moderator users who would like to receive notificaitons
+			return;
+		}
+
+		// Clear revision in order to use current data in the email message:
+		$this->clear_revision();
+
+		// Collect all notified User IDs in this array:
+		$notified_users_num = 0;
+
+		$post_creator_User = & $this->get_creator_User();
+		$post_creator_level = $post_creator_User->level;
+		$UserCache = & get_UserCache();
+		$UserCache->load_list( array_keys( $post_moderators ) );
+
+		foreach( $post_moderators as $moderator_ID => $perm )
+		{
+			$moderator_User = $UserCache->get_by_ID( $moderator_ID );
+			if( ( $perm == 'lt' ) && ( $moderator_User->level <= $post_creator_level ) )
+			{ // User has no permission moderate this post
+				continue;
+			}
+			if( ( $perm == 'le' ) && ( $moderator_User->level < $post_creator_level ) )
+			{ // User has no permission moderate this post
+				continue;
+			}
+
+			$moderator_user_Group = $moderator_User->get_Group();
+
+			$email_template_params = array(
+				'iver_ID'        => $iver_ID,
+				'Item'           => $this,
+				'recipient_User' => $moderator_User,
+				'proposer_User'  => $current_User,
+			);
+
+			locale_temp_switch( $moderator_User->locale );
+
+			// TRANS: Subject of the mail to send on a post proposed change to moderators. First %s is blog name, the second %s is the item's title.
+			$subject = sprintf( T_('[%s] New change was proposed on: "%s"'), $this->get_Blog()->get( 'shortname' ), $this->get( 'title' ) );
+
+			// Send the email:
+			if( send_mail_to_User( $moderator_ID, $subject, 'post_proposed_change', $email_template_params, false, array( 'Reply-To' => $post_creator_User->email ) ) )
+			{	// A send notification email request to the user with $moderator_ID ID was processed:
+				$notified_users_num++;
+			}
+
+			locale_restore_previous();
+		}
+
+		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), $notified_users_num ), 'note', T_('Sending notifications:')  );
+	}
+
+
+	/**
 	 * Send "post assignment" notifications for user who have been assigned to this post and would like to receive these notifications.
 	 *
 	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
-	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
 	 * @return array the notified user ids
 	 */
-	function send_assignment_notification( $executed_by_userid = NULL, $is_new_item = false )
+	function send_assignment_notification( $executed_by_userid = NULL )
 	{
 		global $current_User, $Messages, $UserSettings;
 
@@ -10227,6 +10312,30 @@ class Item extends ItemLight
 
 
 	/**
+	 * Clear revision and item's data to current version
+	 */
+	function clear_revision()
+	{
+		// Reset this Item in order to use current title, content and other data:
+		$ItemCache = get_ItemCache();
+		unset( $ItemCache->cache[ $this->ID ] );
+		if( $current_Item = $ItemCache->get_by_ID( $this->ID, false, false ) )
+		{	// Revert fields to current values:
+			$revision_fields = array( 'title', 'content', 'status' );
+			foreach( $revision_fields as $revision_field )
+			{
+				$this->set( $revision_field, $current_Item->get( $revision_field ) );
+			}
+		}
+
+		if( isset( $this->revision ) )
+		{	// Reset to use data from current Item:
+			unset( $this->revision );
+		}
+	}
+
+
+	/**
 	 * Get item custom field value by index from current revision
 	 *
 	 * @param string Field index which by default is the field name, see {@link load_custom_field_value()}
@@ -10301,7 +10410,25 @@ class Item extends ItemLight
 			}
 		}
 
-		$r = $this->dbupdate();
+		if( $Revision->iver_type == 'proposed' )
+		{	// Update last updated data from proposed change:
+			$this->set( 'lastedit_user_ID', $Revision->iver_edit_user_ID );
+			$this->set( 'datemodified', $Revision->iver_edit_last_touched_ts );
+			$this->set( 'contents_last_updated_ts', $Revision->iver_edit_last_touched_ts );
+			$this->set_last_touched_ts();
+			// Don't auto track date fields on accepting of proposed change:
+			$auto_track_modification = false;
+			// Force to create new revision even if no 90 seconds after last changing:
+			$force_create_revision = true;
+		}
+		else
+		{	// Auto track date fields on restoring from history:
+			$auto_track_modification = true;
+			// Don't force creating of new revision:
+			$force_create_revision = false;
+		}
+
+		$r = $this->dbupdate( $auto_track_modification, true, true, $force_create_revision );
 
 		// Update attachments:
 		$current_links_SQL = new SQL( 'Get current links of Item #'.$this->ID.' before updating from revision' );
@@ -10407,6 +10534,65 @@ class Item extends ItemLight
 		$DB->commit();
 
 		return $r;
+	}
+
+
+	/**
+	 * Delete proposed changes of this Item from DB
+	 *
+	 * @param string Action 'accept', 'reject'
+	 * @param integer|string ID of the proposed change, 'last' to get last proposed change
+	 */
+	function clear_proposed_changes( $action = 'accept', $iver_ID = 'last' )
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// Item must be stored in nDB:
+			return;
+		}
+
+		if( $iver_ID === 'last' )
+		{	// Try to get ID of the last proposed change:
+			if( $last_proposed_Revision = $this->get_revision( 'last_proposed' ) )
+			{	// If this Item has at least one proposed change:
+				$iver_ID = $last_proposed_Revision->iver_ID;
+			}
+			else
+			{	// This Item has no proposed changes:
+				return;
+			}
+			
+		}
+
+		if( strpos( $action, 'accept' ) !== false )
+		{	// Accept(delete) all previous proposed changes:
+			$delete_direction = '<=';
+		}
+		elseif( strpos( $action, 'reject' ) !== false )
+		{	// Reject(delete) all newer proposed changes:
+			$delete_direction = '>=';
+		}
+		else
+		{
+			debug_die( 'Unhandled action "'.$action.'" to clear proposed changes!' );
+		}
+
+		// Clear proposed changes:
+		$DB->query( 'DELETE FROM T_items__version
+			WHERE iver_itm_ID = '.$DB->quote( $this->ID ).'
+			  AND iver_type = "proposed"
+			  AND iver_ID '.$delete_direction.' '.$DB->quote( $iver_ID ) );
+		// Clear custom fields of the proposed changes:
+		$DB->query( 'DELETE FROM T_items__version_custom_field
+			WHERE ivcf_iver_itm_ID = '.$DB->quote( $this->ID ).'
+			  AND ivcf_iver_type = "proposed"
+			  AND ivcf_iver_ID '.$delete_direction.' '.$DB->quote( $iver_ID ) );
+		// Clear links/attachments of the proposed changes:
+		$DB->query( 'DELETE FROM T_items__version_link
+			WHERE ivl_iver_itm_ID = '.$DB->quote( $this->ID ).'
+			  AND ivl_iver_type = "proposed"
+			  AND ivl_iver_ID '.$delete_direction.' '.$DB->quote( $iver_ID ) );
 	}
 
 
@@ -12159,15 +12345,25 @@ class Item extends ItemLight
 	 * @param boolean TRUE to redirect back if current user cannot create a proposed change
 	 * @return boolean
 	 */
-	function check_proposed_change( $redirect = false )
+	function can_propose_change( $redirect = false )
 	{
 		global $current_User, $Messages;
+
+		if( $redirect )
+		{	// Set a redirect URL:
+			$redirect_to = get_returnto_url();
+			$inskin_edit_script = '/item_edit.php';
+			if( strpos( $redirect_to, $inskin_edit_script ) == strlen( $redirect_to ) - strlen( $inskin_edit_script ) )
+			{	// Fix a redirect page to correct in-skin editing page
+				$redirect_to = $this->get_edit_url( array( 'force_in_skin_editing' => true ) );
+			}
+		}
 
 		if( ! is_logged_in() )
 		{	// User must be logged in:
 			if( $redirect )
 			{	// Redirect back to previous page
-				header_redirect();
+				header_redirect( $redirect_to );
 			}
 			return false;
 		}
@@ -12181,7 +12377,7 @@ class Item extends ItemLight
 
 			if( $redirect )
 			{	// Redirect back to previous page
-				header_redirect();
+				header_redirect( $redirect_to );
 			}
 			return false;
 		}
@@ -12198,7 +12394,7 @@ class Item extends ItemLight
 
 			if( $redirect )
 			{	// Redirect back to previous page
-				header_redirect();
+				header_redirect( $redirect_to );
 			}
 			return false;
 		}
@@ -12320,6 +12516,8 @@ class Item extends ItemLight
 		if( $result )
 		{
 			$DB->commit();
+			// Send email notification to moderators about new proposed change:
+			$this->send_proposed_change_notification( $iver_ID );
 		}
 		else
 		{
@@ -12333,34 +12531,40 @@ class Item extends ItemLight
 	/**
 	 * Check if this item can be updated depending on proposed changes
 	 *
-	 * @param boolean TRUE to display messages
+	 * @param boolean|string FALSE to don't display message of restriction, Message type: 'error', 'warning', 'note', 'success'
 	 * @return boolean
 	 */
-	function check_before_update( $display_messages = true )
+	function check_proposed_change_restriction( $restriction_message_type = false )
 	{
-		if( ! isset( $this->check_before_update ) )
+		if( ! isset( $this->check_proposed_change_restriction ) )
 		{	// Check and save result in cache var:
 			if( empty( $this->ID ) )
 			{	// Item is not created yet, so it can be updated, i.e. insert new record without restriction:
-				$this->check_before_update = true;
+				$this->check_proposed_change_restriction = true;
 			}
-			elseif( $this->has_proposed_change() )
+			elseif( $last_proposed_Revision = $this->get_revision( 'last_proposed' ) )
 			{	// Don't allow to edit this Item if it has at least one proposed change:
-				if( $display_messages )
+				if( $restriction_message_type !== false )
 				{	// Display a message to inform user about this restriction:
 					global $Messages, $admin_url;
-					$Messages->add( sprintf( T_('You must accept or reject the <a %s>proposed changes</a> in order to continue edit this Item.'),
-						'href="'.$admin_url.'?ctrl=items&amp;action=history&amp;p='.$this->ID.'"' ), 'error' );
+
+					$UserCache = & get_UserCache();
+					$User = & $UserCache->get_by_ID( $last_proposed_Revision->iver_edit_user_ID, false, false );
+
+					$Messages->add( sprintf( T_('The content below includes <a %s>proposed changes</a> submitted by %s. If you edit the post, the changes will be considered accepted and you will save a new version with your own changes.'),
+							'href="'.$admin_url.'?ctrl=items&amp;action=history&amp;p='.$this->ID.'"',
+							( $User ? $User->get_identity_link() : '<span class="user deleted">'.T_('Deleted user').'</span>' )
+						), $restriction_message_type );
 				}
-				$this->check_before_update = false;
+				$this->check_proposed_change_restriction = false;
 			}
 			else
 			{	// Item can be updated:
-				$this->check_before_update = true;
+				$this->check_proposed_change_restriction = true;
 			}
 		}
 
-		return $this->check_before_update;
+		return $this->check_proposed_change_restriction;
 	}
 }
 ?>

@@ -509,6 +509,12 @@ class Link extends DataObject
 		$LinkOwner = & $this->get_LinkOwner();
 		if( $LinkOwner && $LinkOwner->type == 'item' && isset( $this->dbchanges['link_position'] ) || isset( $this->dbchanges['link_order'] ) )
 		{
+			if( ! $LinkOwner->Item->check_proposed_change_restriction( 'error' ) )
+			{	// If the Link's Item cannot be updated because of proposed change:
+				$DB->rollback();
+				return false;
+			}
+
 			$update_values = array();
 
 			if( isset( $this->dbchanges['link_position'] ) )

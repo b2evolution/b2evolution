@@ -52,6 +52,7 @@ class LinkComment extends LinkOwner
 			'Link files to current xxx' => NT_( 'Link files to current comment' ),
 			'Selected files have been linked to xxx.' => NT_( 'Selected files have been linked to comment.' ),
 			'Link has been deleted from $xxx$.' => NT_( 'Link has been deleted from the &laquo;Comment&raquo;.' ),
+			'Cannot delete Link from $xxx$.' => NT_( 'Cannot delete Link from &laquo;Comment&raquo;.' ),
 		);
 	}
 

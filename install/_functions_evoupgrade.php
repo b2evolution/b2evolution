@@ -10383,6 +10383,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 13150, 'Upgrading item versions tables...' ) )
 	{	// part of 6.11.0-beta
+
+		// Make column iver_ID unique per Item in order to avoid error on adding PRIMARY(unique) KEY below:
+		$DB->query( 'SET @iver_ID = 0' );
+		$DB->query( 'SET @iver_itm_ID = 0' );
+		$DB->query( 'UPDATE T_items__version
+			  SET iver_ID = IF( @iver_itm_ID != iver_itm_ID, @iver_ID := 1 AND @iver_itm_ID := iver_itm_ID, @iver_ID := @iver_ID + 1 )
+			ORDER BY iver_itm_ID, iver_edit_last_touched_ts' );
+
 		$DB->query( 'ALTER TABLE T_items__version
 			ADD COLUMN iver_type ENUM("archived","proposed") COLLATE ascii_general_ci NOT NULL DEFAULT "archived" AFTER iver_ID,
 			DROP INDEX iver_ID_itm_ID,
@@ -10404,6 +10412,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	{	// part of 6.11.0-beta
 		db_add_col( 'T_coll_user_perms', 'bloguser_perm_item_propose', 'tinyint NOT NULL default 0 AFTER bloguser_can_be_assignee' );
 		db_add_col( 'T_coll_group_perms', 'bloggroup_perm_item_propose', 'tinyint NOT NULL default 0 AFTER bloggroup_can_be_assignee' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13170, 'Creating Markdown text file type...' ) )
+	{	// part of 6.11.0-beta
+		$SQL = new SQL( 'Check for file type .md' );
+		$SQL->SELECT( 'ftyp_ID' );
+		$SQL->FROM( 'T_filetypes' );
+		$SQL->WHERE( 'ftyp_extensions REGEXP "(^| )md( |$)"' );
+		if( ! $DB->get_var( $SQL ) )
+		{	// Insert new file type for Markdown Documentation only if it doesn't exist:
+			$DB->query( 'INSERT INTO T_filetypes
+				       ( ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed )
+				VALUES ( "md", "Markdown text file", "text/plain", "file_document", "text", "registered" )' );
+		}
 		upg_task_end();
 	}
 

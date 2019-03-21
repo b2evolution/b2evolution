@@ -1422,7 +1422,7 @@ class _core_Module extends Module
 						{	// If current User has a permission to propose a change for the Item:
 							$entries['page']['entries']['propose'] = array(
 									'text' => T_('Propose change').'&hellip;',
-									'href' => $admin_url.'?ctrl=items&amp;action=propose&amp;p='.$Item->ID.'&amp;blog='.$Blog->ID,
+									'href' => $admin_url.'?ctrl=items&amp;action=propose&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
 								);
 						}
 					}

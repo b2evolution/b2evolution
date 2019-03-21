@@ -83,6 +83,15 @@ class coll_featured_posts_Widget extends coll_item_list_Widget
 		$r['widget_css_class']['no_edit'] = true;
 		$r['widget_ID']['no_edit'] = true;
 
+		// Hide the 2 last orderby fields with order direction:
+		for( $order_index = 1; $order_index <= 2 /* The number of orderby fields - 1 */; $order_index++ )
+		{
+			$r['orderby_'.$order_index.'_begin_line']['no_edit'] = true;
+			$r['order_by_'.$order_index]['no_edit'] = true;
+			$r['order_dir_'.$order_index]['no_edit'] = true;
+			$r['orderby_'.$order_index.'_end_line']['no_edit'] = true;
+		}
+
 		// Allow to select what post item type to display:
 		$r['item_type'] = array(
 				'label' => T_('Exact post type'),

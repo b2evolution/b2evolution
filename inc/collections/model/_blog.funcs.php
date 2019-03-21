@@ -1703,6 +1703,40 @@ function get_post_orderby_options( $coll_ID = NULL, $selected_value, $allow_none
 
 
 /**
+ * Get JavaScript to enable/disable fields to order post fields
+ * (used on ?ctrl=coll_settings&tab=features and for "Universal Item list" widget settings form)
+ *
+ * @param string "Order by" field name
+ * @param string "Order direction" field name
+ * @return string JavaScript
+ */
+function get_post_orderby_js( $field_order_by, $field_order_dir )
+{
+	return 'jQuery( document ).ready( function() { disable_selected_orderby_options(); } );
+jQuery( "select[id^='.$field_order_by.']" ).change( function() { disable_selected_orderby_options(); } );
+function disable_selected_orderby_options()
+{
+	// Disable/Enable second additional order field if the first was changed:
+	jQuery( "#'.$field_order_by.'_2, #'.$field_order_dir.'_2" ).prop( "disabled", jQuery( "#'.$field_order_by.'_1" ).val() == "" );
+
+	// Redisable options after some order field was changed:
+	jQuery( "select[id^='.$field_order_by.'] option" ).prop( "disabled", false );
+	jQuery( "select[id^='.$field_order_by.']" ).each( function()
+	{
+		var selected = jQuery( this ).val();
+		if( selected != "" )
+		{
+			jQuery( "select[id^='.$field_order_by.'][id!=" + jQuery( this ).attr( "id" ) + "]" ).each( function()
+			{
+				jQuery( this ).find( "option[value=" + selected + "]" ).prop( "disabled", true );
+			} );
+		}
+	} );
+}';
+}
+
+
+/**
  * Display blogs results table
  *
  * @param array Params

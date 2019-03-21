@@ -621,7 +621,7 @@ class Backup
 			$zip_filepath = $backup_dirpath.'db.zip';
 			$PclZip = new PclZip( $zip_filepath );
 
-			$file_list = $PclZip->add( $backup_dirpath.$backup_sql_filename, PCLZIP_OPT_REMOVE_PATH, no_trailing_slash( $backup_dirpath ) );
+			$file_list = $PclZip->add( $backup_dirpath.$backup_sql_filename, PCLZIP_OPT_REMOVE_ALL_PATH );
 			if( $file_list == 0 )
 			{
 				echo '<p style="color:red">'

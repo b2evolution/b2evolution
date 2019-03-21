@@ -241,6 +241,12 @@ elseif( $confirmed )
 					}
 					break;
 
+				case 'post_proposed_change':
+					// unsubscribe from post proposed change notifications:
+					$UserSettings->set( 'notify_post_proposed', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
 				case 'unread_msg':
 					// unsubscribe from unread messages reminder
 					$UserSettings->set( 'notify_unread_messages', '0', $edited_User->ID );
@@ -571,6 +577,12 @@ elseif( $confirmed )
 					}
 					break;
 
+				case 'post_proposed_change':
+					// resubscribe to post proposed change notifications:
+					$UserSettings->set( 'notify_post_proposed', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
 				case 'unread_msg':
 					// resubscribe from unread messages reminder
 					$UserSettings->set( 'notify_unread_messages', '1', $edited_User->ID );
@@ -795,6 +807,11 @@ switch( $type )
 	case 'post_moderator_edit':
 		// unsubscribe from updated post moderation notifications:
 		$type_str = $notification_prefix.': '.T_('a post is modified and I have permissions to moderate it.');
+		break;
+
+	case 'post_proposed_change':
+		// unsubscribe from post proposed change notifications:
+		$type_str = $notification_prefix.': '.T_('someone proposed a change on a post and I have permissions to moderate it.');
 		break;
 
 	case 'unread_msg':
