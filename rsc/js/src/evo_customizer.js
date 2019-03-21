@@ -103,19 +103,68 @@ jQuery( document ).on( 'ready', function()
 			jQuery( this ).data( 'prev-value', jQuery( this ).val() );
 		} );
 		backoffice_content.find( '.evo_customizer__content input' ).blur( function()
-		{	// Check if value was changed:
-			if( jQuery( this ).data( 'prev-value' ) == jQuery( this ).val() )
+		{	// Update style with new changed value:
+			evo_customizer_update_style( jQuery( this ) );
+		} );
+		backoffice_content.find( '.evo_customizer__content select' ).change( function()
+		{	// Update style with new changed value:
+			evo_customizer_update_style( jQuery( this ) );
+		} );
+		function evo_customizer_update_style( setting_input )
+		{
+			// Check if value was changed:
+			if( setting_input.data( 'prev-value' ) == setting_input.val() )
 			{	// No changes:
 				return;
 			}
 
 			var skin_style = jQuery( '#evo_customizer__frontoffice' ).contents().find( 'style#evo_skin_styles' );
-			var skin_setting_name = jQuery( this ).attr( 'name' ).replace( /^edit_skin_\d+_set_/, '' );
+			if( skin_style.length == 0 )
+			{	// Skip skin without customizable style sheet:
+				return;
+			}
+			var skin_setting_name = setting_input.attr( 'name' ).replace( /^edit_skin_\d+_set_/, '' );
 
 			// Replace previous value with new updated:
-			var regexp = new RegExp( ':[^\\/:]+(\\/\\*' + skin_setting_name + '\\*\\/)', 'g' );
-			skin_style.text( skin_style.text().replace( regexp, ':' + jQuery( this ).val() + '$1' ) )
-		} );
+			var regexp = new RegExp( '(\\/\\*customize\\*\\/)[^\\/]*(\\/\\*(([a-z_\\+]+\\+)?' + skin_setting_name + '(\\+[a-z_\\+]+)?)(\\/([a-z]+):([^\\*]+))?\\*\\/)', 'i' );
+			var new_value = setting_input.val();
+			skin_style.text( skin_style.text().replace( regexp, function( m0, m1, m2, m3, m4, m5, m6, m7, m8 )
+			{
+				switch( m7 )
+				{
+					case 'options':
+						// Get preset value:
+						m8.split( '|' ).forEach( function( value_preset, i, arr )
+						{	// Find preset by selected value:
+							var value_preset = value_preset.split( '$' );
+							if( value_preset[0] == new_value )
+							{	// Use style code what is predefined for the value:
+								new_value = value_preset[1];
+							}
+						} );
+						break;
+					case 'suffix':
+						// Append suffix:
+						new_value += m8;
+						break;
+					case 'function':
+						// Apply function:
+						var func_params = m3.split( '+' );
+						if( m8 == 'rgba' )
+						{	// Convert hex color and opacity to RGBA color format:
+							var hex_color = backoffice_content.find( 'input[name$="' + func_params[0] + '"]' ).val(),
+							opacity = backoffice_content.find( 'input[name$="' + func_params[1] + '"]' ).val(),
+							r = parseInt( hex_color.slice( 1, 3 ), 16 ),
+							g = parseInt( hex_color.slice( 3, 5 ), 16 ),
+							b = parseInt( hex_color.slice( 5, 7 ), 16 );
+							new_value = 'rgba(' + r + ',' + g + ',' + b + ',' + ( opacity / 100 ) + ')';
+						}
+						break;
+				}
+
+				return m1 + new_value + m2;
+			} ) );
+		}
 	} );
 
 	jQuery( '#evo_customizer__updater' ).on( 'load', function()
