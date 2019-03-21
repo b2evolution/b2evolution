@@ -1024,8 +1024,17 @@ switch( $action )
 		$Revision = $edited_Item->get_revision( param( 'r', 'string' ) );
 
 		if( ! $Revision )
-		{	// Exit on wrong requested revision:
-			debug_die( 'The requested revision is not found in DB!' );
+		{	// Redirect to history list on wrong requested revision:
+			if( substr( get_param( 'r' ), 0, 1 ) == 'p' )
+			{	// When view old(not existing) proposed change:
+				$Messages->add( T_('The changes have already been accepted or rejected.'), 'error' );
+			}
+			else
+			{	// When view archived version:
+				// Don't translate because it should not happens on normal work:
+				$Messages->add( 'The requested version does not exist.', 'error' );
+			}
+			header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
 		}
 		break;
 
@@ -1042,7 +1051,15 @@ switch( $action )
 
 		if( ! $Revision_1 || ! $Revision_2 )
 		{	// Redirect to history list on wrong requested revision:
-			$Messages->add( T_('The changes have already been accepted or rejected.'), 'error' );
+			if( substr( get_param( 'r1' ), 0, 1 ) == 'c' && substr( get_param( 'r2' ), 0, 1 ) == 'p' )
+			{	// When compare current version with old(not existing) proposed change(e.g. on opening url from old email message):
+				$Messages->add( T_('The changes have already been accepted or rejected.'), 'error' );
+			}
+			else
+			{	// When compare all other cases:
+				// Don't translate because it should not happens on normal work:
+				$Messages->add( 'The requested version does not exist.', 'error' );
+			}
 			header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
 		}
 
