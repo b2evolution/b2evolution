@@ -30,7 +30,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 		// Template params for "Content Hierarchy" widget:
 		'widget_content_hierarchy_params' => array(
-				'open_children_levels' => 20,
 				'class_selected'       => '',
 				'custom_title'         => '<h2 class="table_contents">'.T_('Table of contents').'</h2>',
 				'item_before_opened'   => get_icon( 'collapse' ),
