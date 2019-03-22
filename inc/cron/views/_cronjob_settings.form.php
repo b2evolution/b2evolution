@@ -60,7 +60,8 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 
 			case 'cleanup-scheduled-jobs':
 				// Clean up scheduled jobs older than a threshold:
-				$Form->text_input( 'cleanup_jobs_threshold', $Settings->get( 'cleanup_jobs_threshold' ), 5, T_('Trigger after'), T_('days').'. '.T_('The scheduled jobs older than the selected number of days will be removed.') );
+				$Form->text_input( 'cleanup_jobs_threshold', $Settings->get( 'cleanup_jobs_threshold' ), 5, T_('Keep normally finished tasks for'), T_('days').'. '.T_('The successfully finished scheduled jobs older than the selected number of days will be removed.') );
+				$Form->text_input( 'cleanup_jobs_threshold_failed', $Settings->get( 'cleanup_jobs_threshold_failed' ), 5, T_('Keep other tasks for'), T_('days').'. '.T_('The failed scheduled jobs older than the selected number of days will be removed.') );
 				break;
 
 			case 'cleanup-email-logs':

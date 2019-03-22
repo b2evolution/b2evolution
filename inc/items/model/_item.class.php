@@ -10296,17 +10296,6 @@ class Item extends ItemLight
 
 
 	/**
-	 * Check if currently this Item is viewed as revision(archived version or proposed change)
-	 *
-	 * @return boolean
-	 */
-	function is_revision()
-	{
-		return ! empty( $this->revision );
-	}
-
-
-	/**
 	 * Get item revision
 	 *
 	 * @param string Revision ID with prefix as first char: 'a'(or digit) - archived version, 'c' - current version, 'p' - proposed change, NULL - to use current revision

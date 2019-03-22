@@ -11,20 +11,16 @@ global $DB, $servertimenow, $Settings;
 /**
  * The scheduled jobs older than X days will be removed
  */
-$days_in_seconds = $Settings->get( 'cleanup_jobs_threshold' ) * 86400; // x days * 'seconds in one day'
-
-/**
- * The scheduled jobs with this status will be removed
- */
-$status = 'finished';
+$success_days_in_seconds = $Settings->get( 'cleanup_jobs_threshold' ) * 86400; // x days * 'seconds in one day'
+$failed_days_in_seconds = $Settings->get( 'cleanup_jobs_threshold_failed' ) * 86400; // x days * 'seconds in one day'
 
 
 // Get IDs of jobs to delete them from DB
 $SQL = new SQL( 'Get the scheduled jobs older than 45 days' );
 $SQL->SELECT( 'clog_ctsk_ID' );
 $SQL->FROM( 'T_cron__log' );
-$SQL->WHERE( 'clog_status = '.$DB->quote( $status ) );
-$SQL->WHERE_and( 'clog_realstart_datetime < '.$DB->quote( date2mysql( $servertimenow - $days_in_seconds ) ) );
+$SQL->WHERE( '( clog_status = "finished" AND clog_realstart_datetime < '.$DB->quote( date2mysql( $servertimenow - $success_days_in_seconds ) ).' )' );
+$SQL->WHERE_or( 'clog_status != "finished" AND clog_realstart_datetime < '.$DB->quote( date2mysql( $servertimenow - $failed_days_in_seconds ) ) );
 $jobs = $DB->get_col( $SQL );
 
 

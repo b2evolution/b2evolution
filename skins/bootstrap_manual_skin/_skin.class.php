@@ -300,6 +300,9 @@ class bootstrap_manual_Skin extends Skin
 			case 'front':
 				// Init star rating for intro posts:
 				init_ratings_js( 'blog', true );
+
+				// Used to quick upload several files:
+				init_fileuploader_js( 'blog' );
 				break;
 
 			case 'posts':

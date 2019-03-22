@@ -3846,9 +3846,11 @@ function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = tru
 	require_js( 'multiupload/fine-uploader.js', $relative_to );
 	require_css( 'fine-uploader.css', $relative_to );
 
+	// Used to make uploader area resizable:
+	require_js( '#jqueryUI#', $relative_to );
+
 	if( $load_sortable_js )
 	{	// Load JS files to make the links table sortable:
-		require_js( '#jquery#', $relative_to );
 		require_js( 'jquery/jquery.sortable.min.js', $relative_to );
 	}
 }
