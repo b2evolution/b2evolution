@@ -770,13 +770,16 @@ class LinkCache extends DataObjectCache
 		$link_file_ids = array();
 		foreach( $link_rows as $row )
 		{
-			$link_file_ids[] = $row->link_file_ID;
+			if( ! empty( $row->link_file_ID ) )
+			{	// Skip a link with worn file ID:
+				$link_file_ids[] = $row->link_file_ID;
+			}
 		}
 
-		if( !empty( $link_file_ids ) )
-		{ // Load required Files into FileCache
+		if( ! empty( $link_file_ids ) )
+		{	// Load required Files into FileCache:
 			$FileCache = & get_FileCache();
-			$FileCache->load_where( 'file_ID IN ( '.implode( ',', $link_file_ids ).' )' );
+			$FileCache->load_list( $link_file_ids );
 		}
 	}
 

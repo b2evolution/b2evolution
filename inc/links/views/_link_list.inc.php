@@ -121,7 +121,7 @@ if( $current_User->check_perm( 'files', 'view' ) )
 
 		$r = '';
 
-		if( isset($current_File) && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
+		if( ! empty( $current_File ) && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
 		{
 			if( $current_File->is_dir() )
 				$title = T_('Locate this directory!');
