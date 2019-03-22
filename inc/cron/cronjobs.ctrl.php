@@ -237,6 +237,7 @@ switch( $action )
 				case 'cleanup-scheduled-jobs':
 					// Clean up scheduled jobs older than a threshold:
 					$Settings->set( 'cleanup_jobs_threshold', param( 'cleanup_jobs_threshold', 'integer', 0 ) );
+					$Settings->set( 'cleanup_jobs_threshold_failed', param( 'cleanup_jobs_threshold_failed', 'integer', 0 ) );
 					break;
 
 				case 'cleanup-email-logs':
