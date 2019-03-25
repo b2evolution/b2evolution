@@ -1315,9 +1315,10 @@ class Item extends ItemLight
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
 
 				$custom_field_value = $this->get_setting( 'custom:'.$custom_field['name'] );
-				if( $custom_field_value != false )
-				{
+				if( $custom_field_value !== NULL )
+				{	// Store previous value in order to save this in archived version:
 					$this->dbchanges_custom_fields[ $custom_field['name'] ] = $custom_field_value;
+					// Flag to know custom fields were changed:
 					$this->dbchanges_flags['custom_fields'] = true;
 				}
 				$this->set_setting( 'custom:'.$custom_field['name'], get_param( $param_name ), $custom_field_make_null );
@@ -2600,6 +2601,11 @@ class Item extends ItemLight
 	 */
 	function get_custom_field_value( $field_index, $restrict_type = false )
 	{
+		if( empty( $this->ID ) || isset( $this->dbchanges_custom_fields[ $field_index ] ) )
+		{	// Get value from the submitted form:
+			return $this->get_setting( 'custom:'.$field_index );
+		}
+
 		// Get all custom fields by item ID:
 		$custom_fields = $this->get_custom_fields_defs();
 
@@ -2617,10 +2623,6 @@ class Item extends ItemLight
 		if( $this->is_revision() )
 		{	// from current revision if it is active for this Item:
 			return $this->get_revision_custom_field_value( $field_index );
-		}
-		elseif( isset( $this->dbchanges_custom_fields[ $field_index ] ) )
-		{	// from the submitted form:
-			return $this->get_setting( 'custom:'.$field_index );
 		}
 		else
 		{	// from the item setting:
