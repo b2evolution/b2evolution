@@ -1321,7 +1321,7 @@ class Item extends ItemLight
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
 
 				$custom_field_value = $this->get_custom_field_value( $custom_field['name'] );
-				if( $custom_field_value !== NULL )
+				if( $custom_field_value !== NULL && $custom_field_value !== false )
 				{	// Store previous value in order to save this in archived version:
 					$this->dbchanges_custom_fields[ $custom_field['name'] ] = $custom_field_value;
 					// Flag to know custom fields were changed:
