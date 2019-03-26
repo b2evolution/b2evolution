@@ -147,6 +147,21 @@ function cron_log_action_end( $message, $type = NULL, $nl = "\n" )
 
 
 /**
+ * Set a number of cron job actions.
+ *
+ * Used for manual updating the actions number when cron job has no separate
+ * actions, but it does many actions by single code like mysql query.
+ *
+ * @param integer Number of actions
+ */
+function cron_log_report_action_count( $num )
+{
+	global $cron_log_actions_num;
+	$cron_log_actions_num = $num;
+}
+
+
+/**
  * Get a time of cron log
  *
  * @param integer A number of cron log action

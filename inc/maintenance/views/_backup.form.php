@@ -150,6 +150,8 @@ foreach( $backup_tables as $name => $settings )
 	$Form->checkbox( 'bk_'.$name, $current_Backup->backup_tables[$name], $settings['label'], $note );
 }
 
+$Form->checkbox( 'db_structure', $current_Backup->backup_db_structure, T_('DB Structure'), sprintf( T_('Add %s statements for ALL tables, in order to allow quick restore.'), '<code>CREATE TABLE</code>' ) );
+
 $Form->end_fieldset();
 
 // Enable/Disable maintenance mode

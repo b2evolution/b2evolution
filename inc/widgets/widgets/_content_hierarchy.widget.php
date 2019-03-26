@@ -82,9 +82,12 @@ class content_hierarchy_Widget extends ComponentWidget
 				),
 			), parent::get_param_definitions( $params ) );
 
-		if( isset( $r['allow_blockcache'] ) &&
-		    ( $this->get_param( 'highlight_current', 1 ) ||
-		      $this->get_param( 'show_flags', 1 ) ) )
+		if( isset( $r['allow_blockcache'] ) && (
+		    // Check for editing form:
+		    ( empty( $params['for_updating'] ) && ( $this->get_param( 'highlight_current', 1 ) || $this->get_param( 'show_flags', 1 ) ) ) ||
+		    // Check for updating action:
+		    ( ! empty( $params['for_updating'] ) && ( param( $this->get_param_prefix().'highlight_current', 'integer' ) || param( $this->get_param_prefix().'show_flags', 'integer' ) ) )
+		  ) )
 		{	// Disable "Allow caching" because this widget:
 			// - highlights the current page and opens the branch of the current page automatically,
 			// - display a falg icon after each flagged post by current User.
@@ -102,13 +105,16 @@ class content_hierarchy_Widget extends ComponentWidget
 	 */
 	function get_edit_form_javascript()
 	{
-		// Disable "Allow caching" when "Highlight current page" OR "Mark flagged posts" is enabled:
-		return 'jQuery( "#'.$this->get_param_prefix().'highlight_current, #'.$this->get_param_prefix().'show_flags" ).click( function()
-		{
-			jQuery( "#'.$this->get_param_prefix().'allow_blockcache" ).prop( "disabled",
-				jQuery( "#'.$this->get_param_prefix().'highlight_current" ).prop( "checked" ) ||
-				jQuery( "#'.$this->get_param_prefix().'show_flags" ).prop( "checked" ) )
-		} );';
+		if( ( $widget_Blog = & $this->get_Blog() ) &&
+		    $widget_Blog->get_setting( 'cache_enabled_widgets' ) )
+		{	// Disable "Allow caching" when "Highlight current page" OR "Mark flagged posts" is enabled:
+			return 'jQuery( "#'.$this->get_param_prefix().'highlight_current, #'.$this->get_param_prefix().'show_flags" ).click( function()
+{
+	jQuery( "#'.$this->get_param_prefix().'allow_blockcache" ).prop( "disabled",
+		jQuery( "#'.$this->get_param_prefix().'highlight_current" ).prop( "checked" ) ||
+		jQuery( "#'.$this->get_param_prefix().'show_flags" ).prop( "checked" ) )
+} );';
+		}
 	}
 
 

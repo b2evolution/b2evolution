@@ -35,10 +35,13 @@ else
 		WHERE ctsk_ID IN ( '.$DB->quote( $jobs ).' )' );
 
 	// Delete the logs of jobs
-	$DB->query( 'DELETE FROM T_cron__log
+	$deleted_logs_num = $DB->query( 'DELETE FROM T_cron__log
 		WHERE clog_ctsk_ID IN ( '.$DB->quote( $jobs ).' )' );
 
-	cron_log_append( sprintf( T_('%s scheduled jobs were deleted.'), count( $jobs ) ) );
+	cron_log_append( sprintf( T_('%s scheduled jobs were deleted.'), $deleted_logs_num ) );
+
+	// Save a number of the deleted cron job logs:
+	cron_log_report_action_count( $deleted_logs_num );
 }
 
 return 1; /* ok */
