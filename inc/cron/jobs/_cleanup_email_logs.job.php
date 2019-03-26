@@ -20,7 +20,10 @@ if( $affected_rows == 0 )
 }
 else
 {
-	cron_log_action_end( sprintf( T_('%d email log records were deleted.'), $affected_rows ), 'success' );
+	cron_log_append( sprintf( T_('%d email log records were deleted.'), $affected_rows ), 'success' );
+
+	// Save a number of the deleted cron email logs:
+	cron_log_report_action_count( $affected_rows );
 }
 
 return 1; /* ok */
