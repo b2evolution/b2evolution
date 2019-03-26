@@ -961,7 +961,8 @@ function get_hit_agent_name_by_ID( $agent_ID )
 /**
  * Extract keyphrases from the hitlog
  *
- * @return mixed boolean true on success, string message if the process is already running and not allowed to run
+ * @return integer Number of new inserted key phrases,
+ *         string Error message if the process is already running and not allowed to run
  */
 function extract_keyphrase_from_hitlogs()
 {
@@ -975,6 +976,8 @@ function extract_keyphrase_from_hitlogs()
 		// Do not translate.
 		return 'Keyphrase extraction is already in progress in a different process. This new request would duplicate the effort so it is aborted.';
 	}
+
+	$inserted_keyphrases_num = 0;
 
 	// Important: If a two or more different simultanious process will arrive to this point at the same time, only one of them will acquire the lock!
 	// The other processes have to wait until the one who acquired the lock will release it. After that the other process will get it one by one.
@@ -1002,7 +1005,7 @@ function extract_keyphrase_from_hitlogs()
 						AND h.hit_referer_type = "search"
 				ON DUPLICATE KEY UPDATE
 				T_track__keyphrase.keyp_count_refered_searches = T_track__keyphrase.keyp_count_refered_searches + 1';
-		$DB->query( $sql, ' Insert/Update external keyphrase' );
+		$inserted_keyphrases_num += $DB->query( $sql, ' Insert/Update external keyphrase' );
 
 		$sql = 'INSERT INTO T_track__keyphrase(keyp_phrase, keyp_count_internal_searches)
 					SELECT h.hit_keyphrase, 1
@@ -1014,7 +1017,7 @@ function extract_keyphrase_from_hitlogs()
 						AND h.hit_referer_type != "search"
 				ON DUPLICATE KEY UPDATE
 				T_track__keyphrase.keyp_count_internal_searches = T_track__keyphrase.keyp_count_internal_searches + 1';
-		$DB->query( $sql, 'Insert/Update  internal keyphrase' );
+		$inserted_keyphrases_num += $DB->query( $sql, 'Insert/Update internal keyphrase' );
 
 		$sql = 'UPDATE T_hitlog as h, T_track__keyphrase as k
 				SET h.hit_keyphrase_keyp_ID = k.keyp_ID
@@ -1028,7 +1031,7 @@ function extract_keyphrase_from_hitlogs()
 
 	$DB->get_var( 'SELECT RELEASE_LOCK( '.$DB->quote( $lock_name ).' )' );
 
-	return true;
+	return $inserted_keyphrases_num;
 }
 
 
