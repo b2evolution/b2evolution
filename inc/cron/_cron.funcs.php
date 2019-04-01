@@ -250,7 +250,7 @@ function call_job( $job_key, $job_params = array() )
 
 	if( $error_code != 1 )
 	{	// We got an error
-		$result_status = 'error';
+		$result_status = ( $error_code == 20 ? 'imap_error' : 'error' );
 		$result_message_text = '[Error code: '.$error_code.']'."\n".$result_message_text;
 		if( is_array( $result_message ) )
 		{ // If result is array
@@ -287,6 +287,39 @@ function call_job( $job_key, $job_params = array() )
 
 
 /**
+ * Get status titles
+ *
+ * @return array
+ */
+function cron_statuses()
+{
+	return array(
+			'pending'    => T_('Pending'),
+			'started'    => T_('Started'),
+			'warning'    => T_('Warning'),
+			'timeout'    => T_('Timed out'),
+			'error'      => T_('Error'),
+			'imap_error' => T_('IMAP error'),
+			'finished'   => T_('Finished'),
+		);
+}
+
+
+/**
+ * Get status title of sheduled job by status value
+ *
+ * @param string Status
+ * @return string Title
+ */
+function cron_status_title( $status )
+{
+	$titles = cron_statuses();
+
+	return isset( $titles[ $status ] ) ? $titles[ $status ] : $status;
+}
+
+
+/**
  * Get status color of sheduled job by status value
  *
  * @param string Status value
@@ -300,6 +333,7 @@ function cron_status_color( $status )
 			'warning'  => 'dbdb57',
 			'timeout'  => 'e09952',
 			'error'    => 'cb4d4d',
+			'imap_error' => 'cb4d4d',
 			'finished' => '34b27d',
 		);
 
@@ -465,7 +499,19 @@ function detect_timeout_cron_jobs( $error_task = NULL )
 				'timeout_tasks' => $tasks,
 				'error_task'    => $error_task,
 			);
-		send_admin_notification( NT_('Scheduled task error'), 'scheduled_task_error_report', $email_template_params );
+		if( $error_task !== NULL )
+		{	// Use name of error task in email subject:
+			$first_task_name = $error_task['name'];
+		}
+		else
+		{	// Use name of first timed out task in email subject:
+			foreach( $tasks as $timeout_task )
+			{
+				$first_task_name = $timeout_task['name'];
+				break;
+			}
+		}
+		send_admin_notification( array( NT_('Error in task: %s'), $first_task_name ), 'scheduled_task_error_report', $email_template_params );
 	}
 }
 

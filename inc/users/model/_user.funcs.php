@@ -481,8 +481,8 @@ function redirect_after_account_activation()
 /**
  * Send notification to users with edit users permission
  *
- * @param string notification email suject
- * @param string notificaiton email template name
+ * @param string|array notification email subject, Array if subject string contains a replaceable vars like %s, %d
+ * @param string notification email template name
  * @param array notification email template params
  */
 function send_admin_notification( $subject, $template_name, $template_params )
@@ -555,7 +555,15 @@ function send_admin_notification( $subject, $template_name, $template_params )
 		{ // this user must be notifed
 			locale_temp_switch( $User->get( 'locale' ) );
 			// send mail to user (using his local)
-			$localized_subject = T_( $subject ).$subject_suffix;
+			if( is_array( $subject ) )
+			{	// If subject string has at least one replaceable var:
+				$user_subject = call_user_func_array( 'sprintf', array_map( 'T_', $subject ) );
+			}
+			else
+			{	// Subject string has no replaceable vars:
+				$user_subject = T_( $subject );
+			}
+			$localized_subject = $user_subject.$subject_suffix;
 			send_mail_to_User( $User->ID, $localized_subject, $template_name, $template_params ); // ok, if this may fail
 			locale_restore_previous();
 		}
