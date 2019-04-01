@@ -397,7 +397,7 @@ function cron_job_name( $job_key, $job_name = '', $job_params = '' )
 					$ItemCache = & get_ItemCache();
 					if( $Item = $ItemCache->get_by_ID( $job_params['item_ID'], false, false ) )
 					{
-						$job_name = sprintf( $job_name, $Item->get( 'title' ) );
+						$job_name = sprintf( $job_name, $Item->ID, $Item->get( 'title' ) );
 					}
 				}
 				break;
