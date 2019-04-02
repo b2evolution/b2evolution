@@ -35,16 +35,16 @@ if( is_array( $params['timeout_tasks'] ) && count( $params['timeout_tasks'] ) )
 {	// Display timeout tasks:
 	echo '<p'.emailskin_style( '.p' ).'>'.T_('The following scheduled tasks have timed out:')."</p>\n";
 	echo '<p'.emailskin_style( '.p' ).'><ul>';
-	foreach( $params['timeout_tasks'] as $task_ID => $task )
+	foreach( $params['timeout_tasks'] as $task_ID => $task_name )
 	{
-		echo '<li><b>'.$task['name'].'</b> ('.get_link_tag( $admin_url.'?ctrl=crontab&action=view&cjob_ID='.$task_ID, '#'.$task_ID, '.a' ).'):<br>'.str_replace( "\n", '<br>', T_( $task['message'] ) ).'</li>';
+		echo '<li><b>'.$task_name.'</b> ('.get_link_tag( $admin_url.'?ctrl=crontab&action=view&cjob_ID='.$task_ID, '#'.$task_ID, '.a' ).')</li>';
 	}
 	echo "</ul></p>\n";
 }
 
 // Buttons:
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
-echo get_link_tag( $admin_url.'?ctrl=crontab&ctst_status[]=warning&ctst_status[]=timeout&ctst_status[]=error', T_( 'Review tasks with errors' ), 'div.buttons a+a.btn-primary' )."\n";
+echo get_link_tag( $admin_url.'?ctrl=crontab&ctst_status[]=warning&ctst_status[]=timeout&ctst_status[]=error&ctst_status[]=imap_error', T_( 'Review tasks with errors' ), 'div.buttons a+a.btn-primary' )."\n";
 echo "</div>\n";
 
 

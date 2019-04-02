@@ -481,10 +481,7 @@ function detect_timeout_cron_jobs( $error_task = NULL )
 			{ // Try to get default task name by key:
 				$task_name = ( isset( $cron_jobs_names[ $timeout_task->ctsk_key ] ) ? $cron_jobs_names[ $timeout_task->ctsk_key ] : $timeout_task->ctsk_key );
 			}
-			$tasks[ $timeout_task->ctsk_ID ] = array(
-					'name'    => $task_name,
-					'message' => NT_('Cron job has timed out.'),	// Here is not a good place to translate! We don't know the language of the recipient here.
-				);
+			$tasks[ $timeout_task->ctsk_ID ] = $task_name;
 		}
 
 		// Update timed out cron jobs:
@@ -493,25 +490,30 @@ function detect_timeout_cron_jobs( $error_task = NULL )
 			WHERE clog_ctsk_ID IN ( '.$DB->quote( array_keys( $tasks ) ).' )', 'Mark timeouts in cron jobs.' );
 	}
 
-	if( count( $tasks ) > 0 || $error_task !== NULL )
+	$timeout_tasks_num = count( $tasks );
+	if( $timeout_tasks_num > 0 || $error_task !== NULL )
 	{	// Send notification email about timed out and error cron jobs to users with edit options permission:
 		$email_template_params = array(
 				'timeout_tasks' => $tasks,
 				'error_task'    => $error_task,
 			);
-		if( $error_task !== NULL )
+		if( $timeout_tasks_num > 1 || ( $error_task !== NULL && $timeout_tasks_num > 0 ) )
+		{	// Set email subject for multiple cron jobs:
+			$email_subject = NT_('Errors in multiple scheduled tasks');
+		}
+		elseif( $error_task !== NULL )
 		{	// Use name of error task in email subject:
-			$first_task_name = $error_task['name'];
+			$email_subject = array( NT_('Error in task: %s'), $error_task['name'] );
 		}
 		else
 		{	// Use name of first timed out task in email subject:
-			foreach( $tasks as $timeout_task )
+			foreach( $tasks as $timeout_task_name )
 			{
-				$first_task_name = $timeout_task['name'];
+				$email_subject = array( NT_('Error in task: %s'), $timeout_task_name );
 				break;
 			}
 		}
-		send_admin_notification( array( NT_('Error in task: %s'), $first_task_name ), 'scheduled_task_error_report', $email_template_params );
+		send_admin_notification( $email_subject, 'scheduled_task_error_report', $email_template_params );
 	}
 }
 
