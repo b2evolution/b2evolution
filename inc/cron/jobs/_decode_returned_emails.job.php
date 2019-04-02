@@ -58,7 +58,7 @@ if( isset($GLOBALS['files_Module']) )
 
 if( ! $mbox = dre_connect( true ) )
 {	// We couldn't connect to the mail server
-	return 2; // error
+	return 20; // IMAP error
 }
 
 // Read messages from server

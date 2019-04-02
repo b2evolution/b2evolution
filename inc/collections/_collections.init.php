@@ -1069,7 +1069,7 @@ class collections_Module extends Module
 				'params' => NULL, // 'comment_ID', 'executed_by_userid', 'is_new_comment', 'already_notified_user_IDs', 'force_members', 'force_community'
 			),
 			'send-post-notifications' => array( // not user schedulable
-				'name'   => T_('Send notifications for &laquo;%s&raquo;'),
+				'name'   => T_('Send notifications for #%d &laquo;%s&raquo;'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_post_notifications.job.php',
 				'params' => NULL, // 'item_ID', 'executed_by_userid', 'is_new_item', 'already_notified_user_IDs', 'force_members', 'force_community', 'force_pings'

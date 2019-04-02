@@ -349,10 +349,14 @@ C message size exceeds',
 		'last_invalidation_timestamp' => 0,
 
 	// Cron job settings:
+		// Max emails to send:
 		'cjob_maxemail_send-non-activated-account-reminders' => 50,
 		'cjob_maxemail_execute-automations' => 50,
 		'cjob_maxemail_send-inactive-account-reminders' => 50,
 		'cjob_maxemail_send-unread-messages-reminders' => 50,
+		// Do not notify IMAP errors before X consecutive errors:
+		'cjob_imap_error_process-return-path-inbox' => 3,
+		'cjob_imap_error_create-post-by-email' => 3,
 	);
 
 

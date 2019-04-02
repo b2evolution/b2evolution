@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $skins_path, $admin_url, $redirect_to, $action, $kind, $blog, $skin_type;
+global $skins_path, $admin_url, $redirect_to, $action, $kind, $blog, $skin_type, $max_skin_api_version;
 
 $sel_skin_type = param( 'sel_skin_type', 'string', $skin_type );
 $tab = get_param( 'tab' );
@@ -377,8 +377,17 @@ foreach( $skin_folders_data as $skin_folder => $data )
 				$redirect_to_after_install = $admin_url.'?ctrl=collections&action=new-name&kind='.$kind.$coll_url_suffix.'&skin_ID=$skin_ID$';
 			}
 
-			if( $skin_compatible )
-			{
+			if( $folder_Skin->get_api_version() > $max_skin_api_version )
+			{	// Unsupported skin API version:
+				$disp_params = array(
+						'function'  => 'broken',
+						'msg'       => T_('Unsupported version!'),
+						'help_info' => sprintf( T_('The skin API version %s is not supported by this version of b2evolution'), $folder_Skin->get_api_version() ),
+				);
+				$skin_folders_data[$skin_folder]['status'] = 'unsupported api version';
+			}
+			elseif( $skin_compatible )
+			{	// Skin is compatible:
 				$disp_params = array(
 					'function'        => 'install',
 					'function_url'    => $admin_url.'?ctrl=skins&amp;action=create&amp;tab='.get_param( 'tab' )
@@ -391,7 +400,7 @@ foreach( $skin_folders_data as $skin_folder => $data )
 				$skin_folders_data[$skin_folder]['status'] = 'ok';
 			}
 			else
-			{
+			{	// Wrong skin type:
 				$disp_params = array(
 						'function'      => 'broken',
 						'msg'           => T_('Wrong Type!'),

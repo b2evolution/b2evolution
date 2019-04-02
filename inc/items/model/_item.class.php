@@ -8260,6 +8260,12 @@ class Item extends ItemLight
 	{
 		global $Settings, $Messages, $localtimenow, $Debuglog;
 
+		if( empty( $this->ID ) )
+		{	// Don't send notifications for not created Item:
+			$Debuglog->add( 'Item->handle_notifications() : Item is NOT saved in DB', 'notifications' );
+			return false;
+		}
+
 		// Immediate notifications? Asynchronous? Off?
 		$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 

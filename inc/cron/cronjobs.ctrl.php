@@ -205,6 +205,13 @@ switch( $action )
 				$Settings->set( 'cjob_maxemail_'.$cron_job_key, ( $cjob_maxemail > 0 ? $cjob_maxemail : '' ) );
 			}
 
+			$cjob_imap_error = param( 'cjob_imap_error_'.$cron_job_key, 'string', NULL );
+			if( $cjob_imap_error !== NULL )
+			{	// Setting only for cron jobs that use IMAP email sending:
+				$cjob_imap_error = intval( $cjob_imap_error );
+				$Settings->set( 'cjob_imap_error_'.$cron_job_key, ( $cjob_imap_error > 1 ? $cjob_imap_error : 1 ) );
+			}
+
 			// Additional settings per cron job:
 			switch( $cron_job_key )
 			{

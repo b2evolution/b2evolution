@@ -169,6 +169,11 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 			$Form->text_input( 'cjob_maxemail_'.$cron_job_key, $Settings->get( 'cjob_maxemail_'.$cron_job_key ), 10, T_('Max emails to send'), T_('Leave empty for no limit'), array( 'type' => 'number', 'min' => 0 ) );
 		}
 
+		if( $Settings->get( 'cjob_imap_error_'.$cron_job_key ) !== NULL )
+		{	// Setting only for cron jobs that use IMAP email sending:
+			$Form->text_input( 'cjob_imap_error_'.$cron_job_key, $Settings->get( 'cjob_imap_error_'.$cron_job_key ), 5, T_('Do not notify IMAP errors before'), '', array( 'input_suffix' => ' '.T_('consecutive errors'), 'type' => 'number', 'min' => 1 ) );
+		}
+
 	$Form->end_fieldset();
 }
 
