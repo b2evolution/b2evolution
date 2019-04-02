@@ -889,6 +889,13 @@ $outgoing_proxy_password = '';
 $check_browser_version = false;
 
 
+/**
+ * Maximum skin API version which is supported by current version of b2evolution.
+ * Skin API version is defined in the method Skin::get_api_version() of each skin.
+ */
+$max_skin_api_version = 6;
+
+
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
 $evonetsrv_protocol = 'http';
 $evonetsrv_host = 'rpc.b2evo.net';
