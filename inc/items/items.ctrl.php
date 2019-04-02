@@ -1557,6 +1557,11 @@ switch( $action )
 			break;
 		}
 
+		if( strpos( $action, 'update' ) === 0 )
+		{	// Update attachments folder:
+			$edited_Item->update_attachments_folder();
+		}
+
 		// post post-publishing operations:
 		param( 'trackback_url', 'string' );
 		if( !empty( $trackback_url ) )
@@ -1874,6 +1879,9 @@ switch( $action )
 		// UPDATE POST IN DB:
 		if( $edited_Item->dbupdate() )
 		{
+			// Update attachments folder:
+			$edited_Item->update_attachments_folder();
+
 			// Clear all proposed changes of the updated Item:
 			$edited_Item->clear_proposed_changes();
 		}

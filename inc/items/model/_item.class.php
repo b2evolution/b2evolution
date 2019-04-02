@@ -7085,6 +7085,13 @@ class Item extends ItemLight
 				$this->revision = $parvalue;
 				return true;
 
+			case 'urltitle':
+				if( ! isset( $this->previous_urltitle ) )
+				{	// Save previous urltitle, may be used to rename folder of attachments:
+					$this->previous_urltitle = $this->get( 'urltitle' );
+				}
+				return parent::set( $parname, $parvalue, $make_null );
+
 			default:
 				return parent::set( $parname, $parvalue, $make_null );
 		}
@@ -12683,6 +12690,133 @@ class Item extends ItemLight
 		}
 
 		return $this->check_proposed_change_restriction;
+	}
+
+
+	/**
+	 * Update folder of Item's attachments
+	 *
+	 * @return boolean TRUE if folder was updated
+	 */
+	function update_attachments_folder()
+	{
+		if( empty( $this->ID ) )
+		{	// Item must be saved in DB:
+			return false;
+		}
+
+		$FileRootCache = & get_FileRootCache();
+		if( ! ( $collection_FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $this->get_blog_ID() ) ) )
+		{	// Unknown file root:
+			return false;
+		}
+
+		// Folder with current/new slug:
+		$item_new_slug_folder_path = $collection_FileRoot->ads_path.'quick-uploads/'.$this->get( 'urltitle' );
+		if( file_exists( $item_new_slug_folder_path ) )
+		{	// Folder already exists, Don't try to move files:
+			return false;
+		}
+
+		// Folder with Item ID:
+		$item_id_folder_name = 'quick-uploads/p'.$this->ID;
+		$item_id_folder_path = $collection_FileRoot->ads_path.$item_id_folder_name;
+
+		// Folder with preivous/old slug:
+		if( isset( $this->previous_urltitle ) && $this->previous_urltitle != $this->get( 'urltitle' ) )
+		{	// We should move files from old slug folder to new:
+			$item_old_slug_folder_name = 'quick-uploads/'.$this->previous_urltitle;
+			$item_old_slug_folder_path = $collection_FileRoot->ads_path.$item_old_slug_folder_name;
+		}
+
+		$LinkOwner = new LinkItem( $this );
+
+		if( ! $LinkList = $LinkOwner->get_attachment_LinkList() )
+		{	// Item has no attachments:
+			return false;
+		}
+
+		$moved_files = array();
+		while( $Link = & $LinkList->get_next() )
+		{
+			if( ! ( $File = & $Link->get_File() ) )
+			{	// No File object
+				global $Debuglog;
+				$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+				continue;
+			}
+
+			if( ! $File->exists() )
+			{	// File doesn't exist
+				global $Debuglog;
+				$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+				continue;
+			}
+
+			// Set new path with item slug which is used below to update file path in DB:
+			if( strpos( $File->get_rdfp_rel_path(), $item_id_folder_name.'/' ) === 0 )
+			{	// If File used a folder name with Item ID:
+				$moved_files[ $File->ID ] = 'quick-uploads/'.$this->get( 'urltitle' ).substr( $File->get_rdfp_rel_path(), strlen( $item_id_folder_name ) );
+			}
+			elseif( isset( $item_old_slug_folder_name ) &&
+			    strpos( $File->get_rdfp_rel_path(), $item_old_slug_folder_name.'/' ) === 0 )
+			{	// If File used a folder name with previous Item's slug:
+				$moved_files[ $File->ID ] = 'quick-uploads/'.$this->get( 'urltitle' ).substr( $File->get_rdfp_rel_path(), strlen( $item_old_slug_folder_name ) );
+			}
+		}
+
+		if( empty( $moved_files ) )
+		{	// No attachments in the folder "/quick-uploads/p123":
+			return false;
+		}
+
+		global $DB;
+		$SQL = new SQL( 'Check Files for muplitle Links before moving to item slug folder' );
+		$SQL->SELECT( 'COUNT( link_ID )' );
+		$SQL->FROM( 'T_links' );
+		$SQL->WHERE( 'link_file_ID IN ( '.$DB->quote( array_keys( $moved_files ) ).' )' );
+		if( $DB->get_var( $SQL ) != count( $moved_files ) )
+		{	// Don't move if at least one File is linked with several Items:
+			return false;
+		}
+
+		// Rename old item id folder to new folder with new/current item slug:
+		if( file_exists( $item_id_folder_path ) &&
+		    ! @rename( $item_id_folder_path, $item_new_slug_folder_path ) )
+		{	// Impossible to rename folder:
+			global $Messages;
+			$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'), $item_id_folder_path, $item_new_slug_folder_path ), 'warning' );
+			return false;
+		}
+
+		// Rename previous/old item slug folder to new folder with new/current item slug:
+		if( isset( $item_old_slug_folder_path ) &&
+		    file_exists( $item_old_slug_folder_path ) &&
+		    ! @rename( $item_old_slug_folder_path, $item_new_slug_folder_path ) )
+		{	// Impossible to rename folder:
+			global $Messages;
+			$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'), $item_old_slug_folder_path, $item_new_slug_folder_path ), 'warning' );
+			return false;
+		}
+
+		// Update paths of the moved files:
+		$FileCache = & get_FileCache();
+		foreach( $moved_files as $moved_file_ID => $moved_file_new_path )
+		{
+			if( $moved_File = & $FileCache->get_by_ID( $moved_file_ID, false, false ) )
+			{
+				$moved_File->set( 'path', $moved_file_new_path );
+				$moved_File->dbupdate();
+			}
+		}
+
+		// Reset the Links and Files of this Item in order to display files with new folder after update:
+		$LinkOwner->Links = NULL;
+		$LinkCache = & get_LinkCache();
+		$LinkCache->clear( false, 'item', $this->ID );
+		$FileCache->clear();
+
+		return true;
 	}
 }
 ?>
