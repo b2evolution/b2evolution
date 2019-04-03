@@ -814,7 +814,10 @@ class Skin extends DataObject
 		$r = array();
 
 		// Skin v7 definitions for kind of current collection:
-		if( $this->get_api_version() == 7 && method_exists( $this, 'get_param_definitions_'.$Blog->get( 'type' ) ) )
+		if( $this->get_api_version() == 7 &&
+		    $this->provides_collection_skin() &&
+		    ! empty( $Blog ) &&
+		    method_exists( $this, 'get_param_definitions_'.$Blog->get( 'type' ) ) )
 		{	// If skin has declared the method for collection kind:
 			$coll_kind_param_definitions = call_user_func( array( $this, 'get_param_definitions_'.$Blog->get( 'type' ) ), $params );
 
