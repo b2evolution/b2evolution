@@ -1667,9 +1667,10 @@ class File extends DataObject
 	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
 	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 * @param string Subpath for this file/folder, relative the associated root (no trailing slash)
+	 * @param boolean TRUE to don't rewrite existing file in the destination path, try to create unique file with appending siffix like "-1", "-2" and etc.
 	 * @return boolean true on success, false on failure
 	 */
-	function move_to( $root_type, $root_ID, $rdfp_rel_path )
+	function move_to( $root_type, $root_ID, $rdfp_rel_path, $keep_unique = false )
 	{
 		$old_file_name = $this->get_name();
 
@@ -1678,6 +1679,20 @@ class File extends DataObject
 		$FileRootCache = & get_FileRootCache();
 
 		$new_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID, true );
+
+		if( $keep_unique && preg_match( '#(.+\/)?(([^.\/]+)(\.[^.]+)?)$#', $rdfp_rel_path, $new_path_match ) )
+		{	// Try to find free unique file name if same name is already used in the destination folder:
+			$file_unique_name = $new_path_match[2];
+			$file_extension = isset( $new_path_match[4] ) ? $new_path_match[4] : '';
+			$file_unique_num = 1;
+			while( file_exists( $new_FileRoot->ads_path.$new_path_match[1].$file_unique_name ) )
+			{	// Find next free file with unique name in the same folder:
+				$file_unique_name = $new_path_match[3].'-'.$file_unique_num.$file_extension;
+				$file_unique_num++;
+			}
+			$rdfp_rel_path = $new_path_match[1].$file_unique_name;
+		}
+
 		$adfp_posix_path = $new_FileRoot->ads_path.$rdfp_rel_path;
 
 		if( ! @rename( $this->_adfp_full_path, $adfp_posix_path ) )

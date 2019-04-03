@@ -130,25 +130,7 @@ switch( $link_owner_type )
 {
 	case 'item':
 		$upload_fileroot = FileRoot::gen_ID( 'collection', $LinkOwner->get_blog_ID() );
-		if( $LinkOwner->is_temp() )
-		{	// Set upload path for new creating Item:
-			$upload_path = '/quick-uploads/tmp'.$LinkOwner->get_ID().'/';
-		}
-		else
-		{	// Set upload path for item saved in DB:
-			$FileRootCache = & get_FileRootCache();
-			if( ( $collection_FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $LinkOwner->get_blog_ID() ) ) &&
-			    isset( $LinkOwner->Item ) &&
-			    $LinkOwner->Item instanceof Item &&
-			    file_exists( $collection_FileRoot->ads_path.'quick-uploads/'.$LinkOwner->Item->get( 'urltitle' ).'/' ) )
-			{	// Use folder with item slug if it already exists:
-				$upload_path = '/quick-uploads/'.$LinkOwner->Item->get( 'urltitle' ).'/';
-			}
-			else
-			{	// Use folder with item ID:
-				$upload_path = '/quick-uploads/p'.$LinkOwner->get_ID().'/';
-			}
-		}
+		$upload_path = '/quick-uploads/'.( $LinkOwner->is_temp() ? 'tmp'.$LinkOwner->get_ID() : $LinkOwner->Item->get( 'urltitle' ) ).'/';
 		break;
 
 	case 'comment':

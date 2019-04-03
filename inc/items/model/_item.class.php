@@ -1376,26 +1376,25 @@ class Item extends ItemLight
 			      link_tmp_ID = NULL
 			WHERE link_tmp_ID = '.$TemporaryID->ID );
 
+		$item_slug_folder_name = 'quick-uploads/'.$this->get( 'urltitle' ).'/';
+
 		// Move all temporary files to folder of new created message:
 		foreach( $LinkOwner->Links as $item_Link )
 		{
 			if( $item_File = & $item_Link->get_File() &&
 			    $item_FileRoot = & $item_File->get_FileRoot() )
 			{
-				if( ! file_exists( $item_FileRoot->ads_path.'quick-uploads/p'.$this->ID.'/' ) )
+				if( ! file_exists( $item_FileRoot->ads_path.$item_slug_folder_name ) )
 				{	// Create if folder doesn't exist for files of new created message:
-					if( mkdir_r( $item_FileRoot->ads_path.'quick-uploads/p'.$this->ID.'/' ) )
-					{
-						$tmp_folder_path = $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/';
-					}
+					mkdir_r( $item_FileRoot->ads_path.$item_slug_folder_name );
 				}
-				$item_File->move_to( $item_FileRoot->type, $item_FileRoot->in_type_ID, 'quick-uploads/p'.$this->ID.'/'.$item_File->get_name() );
+				$item_File->move_to( $item_FileRoot->type, $item_FileRoot->in_type_ID, $item_slug_folder_name.$item_File->get_name(), true );
 			}
 		}
 
-		if( isset( $tmp_folder_path ) && file_exists( $tmp_folder_path ) )
+		if( file_exists( $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/' ) )
 		{	// Remove temp folder from disk completely:
-			rmdir_r( $tmp_folder_path );
+			rmdir_r( $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/' );
 		}
 
 		// Delete temporary object from DB:
@@ -12576,10 +12575,12 @@ class Item extends ItemLight
 	/**
 	 * Update folder of Item's attachments
 	 *
-	 * @return boolean TRUE if folder was updated
+	 * @return boolean TRUE if at least one attachment was moved to current slug folder
 	 */
 	function update_attachments_folder()
 	{
+		global $DB, $Debuglog;
+
 		if( empty( $this->ID ) )
 		{	// Item must be saved in DB:
 			return false;
@@ -12593,12 +12594,8 @@ class Item extends ItemLight
 
 		// Folder with current/new slug:
 		$item_new_slug_folder_path = $collection_FileRoot->ads_path.'quick-uploads/'.$this->get( 'urltitle' );
-		if( file_exists( $item_new_slug_folder_path ) )
-		{	// Folder already exists, Don't try to move files:
-			return false;
-		}
 
-		// Folder with Item ID:
+		// Folder with Item ID(obsolete folder):
 		$item_id_folder_name = 'quick-uploads/p'.$this->ID;
 		$item_id_folder_path = $collection_FileRoot->ads_path.$item_id_folder_name;
 
@@ -12616,87 +12613,73 @@ class Item extends ItemLight
 			return false;
 		}
 
-		$moved_files = array();
+		$result = false;
 		while( $Link = & $LinkList->get_next() )
 		{
 			if( ! ( $File = & $Link->get_File() ) )
 			{	// No File object
-				global $Debuglog;
 				$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
 				continue;
 			}
 
 			if( ! $File->exists() )
 			{	// File doesn't exist
-				global $Debuglog;
 				$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
 				continue;
 			}
 
-			// Set new path with item slug which is used below to update file path in DB:
-			if( strpos( $File->get_rdfp_rel_path(), $item_id_folder_name.'/' ) === 0 )
-			{	// If File used a folder name with Item ID:
-				$moved_files[ $File->ID ] = 'quick-uploads/'.$this->get( 'urltitle' ).substr( $File->get_rdfp_rel_path(), strlen( $item_id_folder_name ) );
+			if( strpos( $File->get_rdfp_rel_path(), $item_id_folder_name.'/' ) !== 0 &&
+			    ( ! isset( $item_old_slug_folder_name ) || strpos( $File->get_rdfp_rel_path(), $item_old_slug_folder_name.'/' ) !== 0 ) )
+			{	// Skip if File was not located in the obsolete ID folder AND not in old/previous slug folder:
+				continue;
 			}
-			elseif( isset( $item_old_slug_folder_name ) &&
-			    strpos( $File->get_rdfp_rel_path(), $item_old_slug_folder_name.'/' ) === 0 )
-			{	// If File used a folder name with previous Item's slug:
-				$moved_files[ $File->ID ] = 'quick-uploads/'.$this->get( 'urltitle' ).substr( $File->get_rdfp_rel_path(), strlen( $item_old_slug_folder_name ) );
+
+			$SQL = new SQL( 'Check File #'.$File->ID.' for muplitle Links before moving to slug folder of Item #'.$this->ID );
+			$SQL->SELECT( 'COUNT( link_ID )' );
+			$SQL->FROM( 'T_links' );
+			$SQL->WHERE( 'link_file_ID = '.$DB->quote( $File->ID ) );
+			if( $DB->get_var( $SQL ) > 1 )
+			{	// Don't move if File is linked with several Items:
+				continue;
 			}
+
+			if( ! file_exists( $item_new_slug_folder_path ) )
+			{	// Try to create a folder for new item slug:
+				if( ! mkdir_r( $item_new_slug_folder_path ) )
+				{	// Stop trying to move other files when no file rights to create new folder on the disc:
+					$log_message = 'No file rights to create a folder %s before moving Item\'s files to slug folder!';
+					$Debuglog->add( sprintf( $log_message, '"'.$item_new_slug_folder_path.'"' ), array( 'error', 'files' ) );
+					syslog_insert( sprintf( $log_message, '[['.$item_new_slug_folder_path.']]'), 'error', 'item', $this->ID );
+					return false;
+				}
+			}
+
+			// Move File to the folder with name as current Item's slug:
+			$result = $File->move_to( $collection_FileRoot->type, $collection_FileRoot->in_type_ID, 'quick-uploads/'.$this->get( 'urltitle' ).'/'.$File->get_name() ) || $result;
 		}
 
-		if( empty( $moved_files ) )
-		{	// No attachments in the folder "/quick-uploads/p123":
-			return false;
-		}
-
-		global $DB;
-		$SQL = new SQL( 'Check Files for muplitle Links before moving to item slug folder' );
-		$SQL->SELECT( 'COUNT( link_ID )' );
-		$SQL->FROM( 'T_links' );
-		$SQL->WHERE( 'link_file_ID IN ( '.$DB->quote( array_keys( $moved_files ) ).' )' );
-		if( $DB->get_var( $SQL ) != count( $moved_files ) )
-		{	// Don't move if at least one File is linked with several Items:
-			return false;
-		}
-
-		// Rename old item id folder to new folder with new/current item slug:
+		// Delete obsolete item ID folder if it is empty:
 		if( file_exists( $item_id_folder_path ) &&
-		    ! @rename( $item_id_folder_path, $item_new_slug_folder_path ) )
-		{	// Impossible to rename folder:
-			global $Messages;
-			$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'), $item_id_folder_path, $item_new_slug_folder_path ), 'warning' );
-			return false;
+		    is_empty_directory( $item_id_folder_path ) &&
+		    ! rmdir_r( $item_id_folder_path ) )
+		{	// Log error:
+			$log_message = 'No file rights to delete an empty folder %s after moving Item\'s files to slug folder!';
+			$Debuglog->add( sprintf( $log_message, '"'.$item_id_folder_path.'"' ), array( 'error', 'files' ) );
+			syslog_insert( sprintf( $log_message, '[['.$item_id_folder_path.']]' ), 'warning', 'item', $this->ID );
 		}
 
-		// Rename previous/old item slug folder to new folder with new/current item slug:
+		// Delete old/previous item slug folder if it is empty:
 		if( isset( $item_old_slug_folder_path ) &&
 		    file_exists( $item_old_slug_folder_path ) &&
-		    ! @rename( $item_old_slug_folder_path, $item_new_slug_folder_path ) )
-		{	// Impossible to rename folder:
-			global $Messages;
-			$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'), $item_old_slug_folder_path, $item_new_slug_folder_path ), 'warning' );
-			return false;
+		    is_empty_directory( $item_old_slug_folder_path ) &&
+		    ! rmdir_r( $item_old_slug_folder_path ) )
+		{	// Log error:
+			$log_message = 'No file rights to delete an empty folder "%s" after moving Item\'s files to slug folder!';
+			$Debuglog->add( sprintf( $log_message, '"'.$item_old_slug_folder_path.'"' ), array( 'error', 'files' ) );
+			syslog_insert( sprintf( $log_message, '[['.$item_old_slug_folder_path.']]' ), 'warning', 'item', $this->ID );
 		}
 
-		// Update paths of the moved files:
-		$FileCache = & get_FileCache();
-		foreach( $moved_files as $moved_file_ID => $moved_file_new_path )
-		{
-			if( $moved_File = & $FileCache->get_by_ID( $moved_file_ID, false, false ) )
-			{
-				$moved_File->set( 'path', $moved_file_new_path );
-				$moved_File->dbupdate();
-			}
-		}
-
-		// Reset the Links and Files of this Item in order to display files with new folder after update:
-		$LinkOwner->Links = NULL;
-		$LinkCache = & get_LinkCache();
-		$LinkCache->clear( false, 'item', $this->ID );
-		$FileCache->clear();
-
-		return true;
+		return $result;
 	}
 }
 ?>
