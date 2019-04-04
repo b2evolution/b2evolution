@@ -12590,23 +12590,9 @@ class Item extends ItemLight
 		}
 
 		$FileRootCache = & get_FileRootCache();
-		if( ! ( $collection_FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $this->get_blog_ID() ) ) )
+		if( ! ( $item_FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $this->get_blog_ID(), true ) ) )
 		{	// Unknown file root:
 			return false;
-		}
-
-		// Folder with current/new slug:
-		$item_new_slug_folder_path = $collection_FileRoot->ads_path.'quick-uploads/'.$this->get( 'urltitle' );
-
-		// Folder with Item ID(obsolete folder):
-		$item_id_folder_name = 'quick-uploads/p'.$this->ID;
-		$item_id_folder_path = $collection_FileRoot->ads_path.$item_id_folder_name;
-
-		// Folder with preivous/old slug:
-		if( isset( $this->previous_urltitle ) && $this->previous_urltitle != $this->get( 'urltitle' ) )
-		{	// We should move files from old slug folder to new:
-			$item_old_slug_folder_name = 'quick-uploads/'.$this->previous_urltitle;
-			$item_old_slug_folder_path = $collection_FileRoot->ads_path.$item_old_slug_folder_name;
 		}
 
 		$LinkOwner = new LinkItem( $this );
@@ -12616,7 +12602,12 @@ class Item extends ItemLight
 			return false;
 		}
 
+		// Folder with current/new slug:
+		$item_new_slug_folder_name = 'quick-uploads/'.$this->get( 'urltitle' ).'/';
+		$item_new_slug_folder_path = $item_FileRoot->ads_path.$item_new_slug_folder_name;
+
 		$result = false;
+		$folders_of_moved_files = array();
 		while( $Link = & $LinkList->get_next() )
 		{
 			if( ! ( $File = & $Link->get_File() ) )
@@ -12631,9 +12622,12 @@ class Item extends ItemLight
 				continue;
 			}
 
-			if( strpos( $File->get_rdfp_rel_path(), $item_id_folder_name.'/' ) !== 0 &&
-			    ( ! isset( $item_old_slug_folder_name ) || strpos( $File->get_rdfp_rel_path(), $item_old_slug_folder_name.'/' ) !== 0 ) )
-			{	// Skip if File was not located in the obsolete ID folder AND not in old/previous slug folder:
+			if( strpos( $File->get_rdfp_rel_path(), 'quick-uploads/' ) !== 0 ||
+			    ( strpos( $File->get_rdfp_rel_path(), $item_new_slug_folder_name ) === 0 &&
+			      ( $file_FileRoot = & $File->get_FileRoot() ) &&
+			      $item_FileRoot->ID == $file_FileRoot->ID ) )
+			{	// Skip if File is not located in the folder "quick-uploads/"
+				//      or File is already located in the current slug folder of this Item:
 				continue;
 			}
 
@@ -12657,29 +12651,31 @@ class Item extends ItemLight
 				}
 			}
 
+			// Save file folder before moving:
+			$old_file_dir = isset( $File->_dir ) ? $File->_dir : false;
+
 			// Move File to the folder with name as current Item's slug:
-			$result = $File->move_to( $collection_FileRoot->type, $collection_FileRoot->in_type_ID, 'quick-uploads/'.$this->get( 'urltitle' ).'/'.$File->get_name() ) || $result;
+			if( $File->move_to( $item_FileRoot->type, $item_FileRoot->in_type_ID, $item_new_slug_folder_name.$File->get_name(), true ) )
+			{	// If File was moved successfully
+				$result = true;
+				if( $old_file_dir && ! in_array( $old_file_dir, $folders_of_moved_files ) )
+				{	// Collect a folder in order to check and remove if it is empty after moving all files from the folder:
+					$folders_of_moved_files[] = $old_file_dir;
+				}
+			}
 		}
 
-		// Delete obsolete item ID folder if it is empty:
-		if( file_exists( $item_id_folder_path ) &&
-		    is_empty_directory( $item_id_folder_path ) &&
-		    ! rmdir_r( $item_id_folder_path ) )
-		{	// Log error:
-			$log_message = 'No file rights to delete an empty folder %s after moving Item\'s files to slug folder!';
-			$Debuglog->add( sprintf( $log_message, '"'.$item_id_folder_path.'"' ), array( 'error', 'files' ) );
-			syslog_insert( sprintf( $log_message, '[['.$item_id_folder_path.']]' ), 'warning', 'item', $this->ID );
-		}
-
-		// Delete old/previous item slug folder if it is empty:
-		if( isset( $item_old_slug_folder_path ) &&
-		    file_exists( $item_old_slug_folder_path ) &&
-		    is_empty_directory( $item_old_slug_folder_path ) &&
-		    ! rmdir_r( $item_old_slug_folder_path ) )
-		{	// Log error:
-			$log_message = 'No file rights to delete an empty folder "%s" after moving Item\'s files to slug folder!';
-			$Debuglog->add( sprintf( $log_message, '"'.$item_old_slug_folder_path.'"' ), array( 'error', 'files' ) );
-			syslog_insert( sprintf( $log_message, '[['.$item_old_slug_folder_path.']]' ), 'warning', 'item', $this->ID );
+		// Delete folders which are empty after moving all files:
+		foreach( $folders_of_moved_files as $folder_of_moved_files )
+		{
+			if( file_exists( $folder_of_moved_files ) &&
+			    is_empty_directory( $folder_of_moved_files ) &&
+			    ! rmdir_r( $folder_of_moved_files ) )
+			{	// Log error:
+				$log_message = 'No file rights to delete an empty folder %s after moving Item\'s files to slug folder!';
+				$Debuglog->add( sprintf( $log_message, '"'.$folder_of_moved_files.'"' ), array( 'error', 'files' ) );
+				syslog_insert( sprintf( $log_message, '[['.$folder_of_moved_files.']]' ), 'warning', 'item', $this->ID );
+			}
 		}
 
 		return $result;
