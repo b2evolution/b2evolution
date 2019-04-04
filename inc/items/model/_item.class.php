@@ -7043,6 +7043,8 @@ class Item extends ItemLight
 						}
 					}
 				}
+				// Clear cached slugs in order to display new unique updated on the edit form:
+				$this->slugs = NULL;
 			}
 
 			// Create tiny slug:
@@ -7391,6 +7393,27 @@ class Item extends ItemLight
 			}
 		}
 
+		// Let's handle the slugs:
+		// TODO: dh> $result handling here feels wrong: when it's true already, it should not become false (add "|| $result"?)
+		// asimo>dh The result handling is in a transaction. If somehow the new slug creation fails, then the item insertion should rollback as well
+		if( $result && ! empty( $edited_slugs ) )
+		{	// if we have new created $edited_slugs, we have to insert it into the database:
+			foreach( $edited_slugs as $edited_Slug )
+			{
+				if( $edited_Slug->ID == 0 )
+				{	// Insert only new created slugs:
+					$edited_Slug->dbinsert();
+				}
+			}
+			if( isset( $edited_slugs[0] ) && $edited_slugs[0]->ID > 0 )
+			{	// Make first slug from list as main slug for this item:
+				$this->set( 'canonical_slug_ID', $edited_slugs[0]->ID );
+				$this->set( 'urltitle', $edited_slugs[0]->get( 'title' ) );
+			}
+			// Clear cached slugs in order to display new unique updated on the edit form:
+			$this->slugs = NULL;
+		}
+
 		$parent_update = $this->dbupdate_worker( $auto_track_modification );
 		if( $result && ( $parent_update !== false ) )
 		{ // We could update the item object:
@@ -7406,26 +7429,6 @@ class Item extends ItemLight
 			{ // Let's handle the tags:
 				$this->insert_update_tags( 'update' );
 				$db_changed = true;
-			}
-
-			// Let's handle the slugs:
-			// TODO: dh> $result handling here feels wrong: when it's true already, it should not become false (add "|| $result"?)
-			// asimo>dh The result handling is in a transaction. If somehow the new slug creation fails, then the item insertion should rollback as well
-			if( $result && !empty( $edited_slugs ) )
-			{ // if we have new created $edited_slugs, we have to insert it into the database:
-				foreach( $edited_slugs as $edited_Slug )
-				{
-					if( $edited_Slug->ID == 0 )
-					{ // Insert only new created slugs
-						$edited_Slug->dbinsert();
-					}
-				}
-				if( isset( $edited_slugs[0] ) && $edited_slugs[0]->ID > 0 )
-				{ // Make first slug from list as main slug for this item
-					$this->set( 'canonical_slug_ID', $edited_slugs[0]->ID );
-					$this->set( 'urltitle', $edited_slugs[0]->get( 'title' ) );
-					$result = parent::dbupdate();
-				}
 			}
 
 			// Update last touched date of this Item and also all categories of this Item
