@@ -387,6 +387,10 @@ class Form extends Widget
 
 			if( is_array( $template ) && ! empty( $template ) )
 			{ // Template is detected on current skin, Use it
+				if( ! isset( $template['fieldset_title'] ) )
+				{	// Set default fieldset title if old template doesn't define it:
+					$template['fieldset_title'] = '';
+				}
 				foreach( $template as $t_param_name => $t_param_value )
 				{
 					$this->$t_param_name = $t_param_value;
@@ -407,6 +411,7 @@ class Form extends Widget
 																	.'$title$</div></th></tr>'."\n";
 					$this->no_title_fmt   = '<tr><th colspan="2"><span class="right_icons">$global_icons$</span></th></tr>'."\n";
 					$this->no_title_no_icons_fmt = "\n";
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -456,6 +461,7 @@ class Form extends Widget
 					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>'."\n";
 					$this->no_title_no_icons_fmt = "\n";
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																		.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -504,6 +510,7 @@ class Form extends Widget
 					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>&nbsp;'."\n";
 					$this->no_title_no_icons_fmt = "\n";
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -553,6 +560,7 @@ class Form extends Widget
 					$this->title_fmt      = '$title$'."\n"; // TODO: icons
 					$this->no_title_fmt   = '';          //           "
 					$this->no_title_no_icons_fmt = '';
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -603,6 +611,7 @@ class Form extends Widget
 					$this->title_fmt      = '$title$'."\n"; // TODO: icons
 					$this->no_title_fmt   = '';          //           "
 					$this->no_title_fmt   = '';          //           "
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
