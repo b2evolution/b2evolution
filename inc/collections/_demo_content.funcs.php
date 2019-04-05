@@ -2963,7 +2963,7 @@ Hello
 				'files'    => array(
 					array( 'monument-valley/monument-valley.jpg', 'cover' ),
 				),
-				'widget_info_page' => true,
+				'widget_info_page' => 'about_minisite',
 			);
 
 			$demo_items['more_info'] = array(
@@ -2973,7 +2973,7 @@ Hello
 				'files'    => array(
 					array( 'monument-valley/monuments.jpg', 'cover' ),
 				),
-				'widget_info_page' => true,
+				'widget_info_page' => 'widget_page',
 			);
 			break;
 
@@ -3066,7 +3066,7 @@ Hello
 				'files'    => array(
 					array( 'logos/b2evolution_1016x208_wbg.png' ),
 				),
-				'widget_info_page' => true,
+				'widget_info_page' => 'about_this_site',
 			);
 
 			$demo_items['widget_page'] = array(
@@ -3076,7 +3076,7 @@ Hello
 				'files'    => array(
 					array( 'monument-valley/monuments.jpg', 'cover' ),
 				),
-				'widget_info_page' => true,
+				'widget_info_page' => 'widget_page',
 			);
 
 			$demo_items['b2evo_the_other_blog_tool'] = array(
@@ -3715,7 +3715,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 			if( ! empty( $demo_item['widget_info_page'] ) )
 			{	// Update global variable which may be used on install default widgets:
-				$installed_collection_info_pages[ $demo_item_key ] = $new_Item->ID;
+				$installed_collection_info_pages[ $demo_item['widget_info_page'] ] = $new_Item->ID;
 			}
 
 			switch( $item_type )
