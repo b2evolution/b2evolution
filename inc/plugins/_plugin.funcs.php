@@ -631,6 +631,10 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			break;
 
 		case 'color':
+			if( isset( $parmeta['transparency'] ) )
+			{
+				$params['transparency'] = $parmeta['transparency'];
+			}
 			$Form->color_input( $input_name, $set_value, $set_label, '', $params );
 			break;
 
@@ -1394,6 +1398,14 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 							return false;
 						}
 					}
+				}
+				break;
+
+			case 'color':
+				if( ! is_color( $value ) )
+				{
+					param_error( $param_name, sprintf(  T_('Invalid color code for &laquo;%s&raquo;.'), $meta['label'] ) );
+					return false;
 				}
 				break;
 		}

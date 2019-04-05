@@ -1170,11 +1170,14 @@ class Form extends Widget
 				'type'      => 'text',
 				'value'     => $field_value,
 				'note'      => $field_note,
-				'size'      => 7,
-				'maxlength' => 7,
+				'size'      => 18,
+				'maxlength' => 22,
 				'name'      => $field_name,
 				'label'     => $field_label,
 				'class'     => '', // default class 'form_text_input form-control form_color_input'
+				'transparency' => false, // TRUE to allow select transparent color
+				'input_prefix' => '',
+				'input_suffix' => '',
 			), $field_params );
 
 		if( isset( $field_params['force_to'] ) )
@@ -1189,6 +1192,16 @@ class Form extends Widget
 
 		// Give it a class, so it can be selected for CSS in IE6
 		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form_text_input form-control form_color_input';
+
+		if( $field_params['transparency'] )
+		{	// Set class to initialize colorpicker with transparency option:
+			$field_params['class'] .= ' form_color_transparent';
+			unset( $field_params['transparency'] );
+		}
+
+		// Initialize colorpicker wrappers to display a color selector box after color input field:
+		$field_params['input_prefix'] = $field_params['input_prefix'].'<span class="input-group colorpicker-component">';
+		$field_params['input_suffix'] = '<span class="input-group-addon"><i></i></span></span>'.$field_params['input_suffix'];
 
 		return $this->input_field( $field_params );
 	}

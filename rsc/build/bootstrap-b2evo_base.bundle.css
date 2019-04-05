@@ -1020,6 +1020,9 @@ div#publish_buttons .quick-publish {
 tbody.fieldset_wrapper.folded + tbody[id^=cat_sel_] {
   display: none;
 }
+.input-group.colorpicker-component {
+  width: 100px;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.
