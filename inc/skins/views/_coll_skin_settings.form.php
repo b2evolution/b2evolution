@@ -140,6 +140,7 @@ $buttons = array();
 if( $can_edit_skin_settings )
 {	// Display a button to update skin params only when if current User can edit this:
 	$buttons[] = array( 'submit', 'save', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton' );
+	$buttons[] = array( 'reset', 'reset', T_('Reset'), 'ResetButton' );
 }
 
 if( $mode == 'customizer' )
@@ -185,6 +186,24 @@ else
 }
 ?>
 }
+
+jQuery( 'form' ).on( 'reset', function()
+{	// Reset skin settings to values what were on loaded form:
+	setTimeout( function()
+	{
+		jQuery( 'input, select' ).each( function()
+		{
+			if( jQuery( this ).hasClass( 'form_color_input' ) )
+			{	// Reset color input:
+				jQuery( this ).parent().colorpicker( 'setValue', jQuery( this ).val() );
+			}
+			if( typeof( parent.evo_customizer_update_style ) == "function" )
+			{	// Update style in designer customizer mode if it is enabled currently:
+				parent.evo_customizer_update_style( jQuery( this ) );
+			}
+		} );
+	}, 100 );
+} );
 </script>
 <?php
 }

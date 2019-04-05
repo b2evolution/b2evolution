@@ -29,6 +29,43 @@ function evo_customizer_hide_backoffice()
 	jQuery( '#evo_customizer__backoffice' ).css( 'height', '99.9%' );
 }
 
+function evo_customizer_update_style( setting_input )
+{
+	var skin_style = jQuery( '#evo_customizer__frontoffice' ).contents().find( 'style#evo_skin_styles' );
+	if( skin_style.length == 0 )
+	{	// Skip skin without customizable style sheet:
+		return;
+	}
+	var skin_setting_name = setting_input.attr( 'name' ).replace( /^edit_skin_\d+_set_/, '' );
+
+	// Replace previous value with new updated:
+	var regexp = new RegExp( '(\\/\\*customize\\*\\/)[^\\/]*(\\/\\*(([a-z_\\+]+\\+)?' + skin_setting_name + '(\\+[a-z_\\+]+)?)(\\/([a-z]+):([^\\*]+))?\\*\\/)', 'i' );
+	var new_value = setting_input.val();
+	skin_style.text( skin_style.text().replace( regexp, function( m0, m1, m2, m3, m4, m5, m6, m7, m8 )
+	{
+		switch( m7 )
+		{
+			case 'options':
+				// Get preset value:
+				m8.split( '|' ).forEach( function( value_preset, i, arr )
+				{	// Find preset by selected value:
+					var value_preset = value_preset.split( '$' );
+					if( value_preset[0] == new_value )
+					{	// Use style code what is predefined for the value:
+						new_value = value_preset[1];
+					}
+				} );
+				break;
+			case 'suffix':
+				// Append suffix:
+				new_value += m8;
+				break;
+		}
+
+		return m1 + new_value + m2;
+	} ) );
+}
+
 jQuery( document ).on( 'ready', function()
 {
 	jQuery( '#evo_customizer__backoffice' ).on( 'load', function()
@@ -106,48 +143,6 @@ jQuery( document ).on( 'ready', function()
 		{	// Update style with new changed value:
 			evo_customizer_update_style( jQuery( this ) );
 		} );
-		function evo_customizer_update_style( setting_input )
-		{
-			// Check if value was changed:
-			if( setting_input.data( 'prev-value' ) == setting_input.val() )
-			{	// No changes:
-				return;
-			}
-
-			var skin_style = jQuery( '#evo_customizer__frontoffice' ).contents().find( 'style#evo_skin_styles' );
-			if( skin_style.length == 0 )
-			{	// Skip skin without customizable style sheet:
-				return;
-			}
-			var skin_setting_name = setting_input.attr( 'name' ).replace( /^edit_skin_\d+_set_/, '' );
-
-			// Replace previous value with new updated:
-			var regexp = new RegExp( '(\\/\\*customize\\*\\/)[^\\/]*(\\/\\*(([a-z_\\+]+\\+)?' + skin_setting_name + '(\\+[a-z_\\+]+)?)(\\/([a-z]+):([^\\*]+))?\\*\\/)', 'i' );
-			var new_value = setting_input.val();
-			skin_style.text( skin_style.text().replace( regexp, function( m0, m1, m2, m3, m4, m5, m6, m7, m8 )
-			{
-				switch( m7 )
-				{
-					case 'options':
-						// Get preset value:
-						m8.split( '|' ).forEach( function( value_preset, i, arr )
-						{	// Find preset by selected value:
-							var value_preset = value_preset.split( '$' );
-							if( value_preset[0] == new_value )
-							{	// Use style code what is predefined for the value:
-								new_value = value_preset[1];
-							}
-						} );
-						break;
-					case 'suffix':
-						// Append suffix:
-						new_value += m8;
-						break;
-				}
-
-				return m1 + new_value + m2;
-			} ) );
-		}
 	} );
 
 	jQuery( '#evo_customizer__updater' ).on( 'load', function()

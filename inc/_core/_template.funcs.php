@@ -1854,11 +1854,19 @@ function evo_initialize_colorpicker_inputs()
 	jQuery( ".form_color_input" ).each( function()
 	{
 		var predefined_colors = ["'.implode( '","', $user_colors ).'"];
-		var colored_input = jQuery( this ).parent();
-		colored_input.colorpicker( {
+		var colored_input = jQuery( this );
+		colored_input.parent().colorpicker( {
 			format: jQuery( this ).hasClass( "form_color_transparent" ) ? false : "hex",
 			colorSelectors: predefined_colors
-		} ).on( "hidePicker", function( e )
+		} )
+		.on( "changeColor", function()
+		{
+			if( typeof( parent.evo_customizer_update_style ) == "function" )
+			{	// Update style in designer customizer mode if it is enabled currently:
+				parent.evo_customizer_update_style( colored_input );
+			}
+		} )
+		.on( "hidePicker", function( e )
 		{	// Update predefined colors with new last selected:
 			var current_colors = e.color.predefinedColors;
 			var new_colors = current_colors.slice();
