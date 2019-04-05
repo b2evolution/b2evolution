@@ -2220,13 +2220,14 @@ function is_valid_login( $login, $force_strict_logins = false )
 
 /**
  * Checks if the color is valid
+ * Allowed formats: #09ABEF, rgba(100,200,255,0.99)
  *
  * @param string color to check
  * @return boolean true if OK
  */
 function is_color( $color )
 {
-	return preg_match( '~^(#([a-f0-9]{3}){1,2})?$~i', $color );
+	return preg_match( '~^(#([a-f0-9]{3}){1,2}|rgba\(\d{1,3},\d{1,3},\d{1,3},(1|0(\.\d{1,2})?)\))$~i', $color );
 }
 
 
@@ -7371,6 +7372,19 @@ function save_to_file( $data, $filename, $mode = 'a' )
 
 /**
  * Check if current request is AJAX
+ *
+ * @return boolean TRUE/FALSE
+ */
+function is_ajax_request()
+{
+	global $is_ajax_request;
+
+	return isset( $is_ajax_request ) && $is_ajax_request === true;
+}
+
+
+/**
+ * Check if current request is AJAX content
  * Used in order to get only content of the requested page
  *
  * @param string Template name

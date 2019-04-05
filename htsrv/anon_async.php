@@ -18,6 +18,11 @@
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
 
+/**
+ * @global boolean Is this AJAX request? Use {@link is_ajax_request()} to query it, because it may change.
+ */
+$is_ajax_request = true;
+
 // Disable log in with HTTP basic authentication because we need some action even for anonymous users,
 // but it is impossible if wrong login was entered on "HTTP Basic Authentication" form.
 // (Used to correct work of action "get_user_salt")
@@ -1758,6 +1763,23 @@ switch( $action )
 				'fieldValue' => $current_File->ID,
 				'item' => base64_encode( $r )
 			) );
+		break;
+
+	case "colorpicker":
+		// Save last selected colors in bootstrap colorpicker per User:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'colorpicker' );
+
+		if( ! is_logged_in() )
+		{	// User must be loggedin for this action:
+			break;
+		}
+
+		param( 'colors', 'string' );
+
+		$UserSettings->set( 'colorpicker', $colors, $current_User->ID );
+		$UserSettings->dbupdate();
 		break;
 
 	case 'reorder_widgets':

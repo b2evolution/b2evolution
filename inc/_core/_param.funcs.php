@@ -2500,6 +2500,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 			$allow_iframes    = false;
 			$allow_objects    = false;
 			$bypass_antispam  = false;
+			$trim_content     = false;
 			// Do not add error messages in this context
 			$verbose = false;
 			break;
@@ -2579,7 +2580,10 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		$Messages->add_to_group(	$errmsg, 'error', T_('Validation errors:') );
 	}
 
-	$content = trim( $content );
+	if( ! isset( $trim_content ) || $trim_content )
+	{	// Trim content if it is allowed for the requested context:
+		$content = trim( $content );
+	}
 
 	if( $use_balanceTags && ( $context != 'general_array_params' ) )
 	{ // Auto close open tags:
