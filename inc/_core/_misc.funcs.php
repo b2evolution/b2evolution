@@ -7358,6 +7358,19 @@ function save_to_file( $data, $filename, $mode = 'a' )
 
 /**
  * Check if current request is AJAX
+ *
+ * @return boolean TRUE/FALSE
+ */
+function is_ajax_request()
+{
+	global $is_ajax_request;
+
+	return isset( $is_ajax_request ) && $is_ajax_request === true;
+}
+
+
+/**
+ * Check if current request is AJAX content
  * Used in order to get only content of the requested page
  *
  * @param string Template name

@@ -18,6 +18,11 @@
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
 
+/**
+ * @global boolean Is this AJAX request? Use {@link is_ajax_request()} to query it, because it may change.
+ */
+$is_ajax_request = true;
+
 // Disable log in with HTTP basic authentication because we need some action even for anonymous users,
 // but it is impossible if wrong login was entered on "HTTP Basic Authentication" form.
 // (Used to correct work of action "get_user_salt")
