@@ -1321,9 +1321,10 @@ class Item extends ItemLight
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
 
 				$custom_field_value = $this->get_custom_field_value( $custom_field['name'] );
-				if( $custom_field_value != false )
-				{
+				if( $custom_field_value !== NULL && $custom_field_value !== false )
+				{	// Store previous value in order to save this in archived version:
 					$this->dbchanges_custom_fields[ $custom_field['name'] ] = $custom_field_value;
+					// Flag to know custom fields were changed:
 					$this->dbchanges_flags['custom_fields'] = true;
 				}
 				$this->set_custom_field( $custom_field['name'], get_param( $param_name ), 'value', $custom_field_make_null );
@@ -1379,26 +1380,25 @@ class Item extends ItemLight
 			      link_tmp_ID = NULL
 			WHERE link_tmp_ID = '.$TemporaryID->ID );
 
+		$item_slug_folder_name = 'quick-uploads/'.$this->get( 'urltitle' ).'/';
+
 		// Move all temporary files to folder of new created message:
 		foreach( $LinkOwner->Links as $item_Link )
 		{
 			if( $item_File = & $item_Link->get_File() &&
 			    $item_FileRoot = & $item_File->get_FileRoot() )
 			{
-				if( ! file_exists( $item_FileRoot->ads_path.'quick-uploads/p'.$this->ID.'/' ) )
+				if( ! file_exists( $item_FileRoot->ads_path.$item_slug_folder_name ) )
 				{	// Create if folder doesn't exist for files of new created message:
-					if( mkdir_r( $item_FileRoot->ads_path.'quick-uploads/p'.$this->ID.'/' ) )
-					{
-						$tmp_folder_path = $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/';
-					}
+					mkdir_r( $item_FileRoot->ads_path.$item_slug_folder_name );
 				}
-				$item_File->move_to( $item_FileRoot->type, $item_FileRoot->in_type_ID, 'quick-uploads/p'.$this->ID.'/'.$item_File->get_name() );
+				$item_File->move_to( $item_FileRoot->type, $item_FileRoot->in_type_ID, $item_slug_folder_name.$item_File->get_name(), true );
 			}
 		}
 
-		if( isset( $tmp_folder_path ) && file_exists( $tmp_folder_path ) )
+		if( file_exists( $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/' ) )
 		{	// Remove temp folder from disk completely:
-			rmdir_r( $tmp_folder_path );
+			rmdir_r( $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/' );
 		}
 
 		// Delete temporary object from DB:
@@ -7084,6 +7084,13 @@ class Item extends ItemLight
 				$this->revision = $parvalue;
 				return true;
 
+			case 'urltitle':
+				if( ! isset( $this->previous_urltitle ) )
+				{	// Save previous urltitle, may be used to rename folder of attachments:
+					$this->previous_urltitle = $this->get( 'urltitle' );
+				}
+				return parent::set( $parname, $parvalue, $make_null );
+
 			default:
 				return parent::set( $parname, $parvalue, $make_null );
 		}
@@ -7419,6 +7426,8 @@ class Item extends ItemLight
 						}
 					}
 				}
+				// Clear cached slugs in order to display new unique updated on the edit form:
+				$this->slugs = NULL;
 			}
 
 			// Create tiny slug:
@@ -7538,9 +7547,10 @@ class Item extends ItemLight
 	 * 	because of the item canonical url title was changed on the slugs edit form, so slug update is already done.
 	 *  If slug update wasn't done already, then this param has to be true.
 	 * @param boolean Update custom fields of child posts?
+	 * @param boolean TRUE to force to create revision
 	 * @return boolean true on success
 	 */
-	function dbupdate( $auto_track_modification = true, $update_slug = true, $update_child_custom_fields = true )
+	function dbupdate( $auto_track_modification = true, $update_slug = true, $update_child_custom_fields = true, $force_create_revision = false )
 	{
 		global $DB, $Plugins, $Messages;
 
@@ -7731,7 +7741,7 @@ class Item extends ItemLight
 			// fp> TODO: actually, only the fields that have been changed should be copied to the version, the other should be left as NULL
 
 			global $localtimenow;
-			if( $localtimenow - strtotime( $this->last_touched_ts ) > 90 )
+			if( $force_create_revision || $localtimenow - strtotime( $this->last_touched_ts ) > 10 )
 			{ // Create new revision
 				$result = $this->create_revision();
 			}
@@ -7758,6 +7768,27 @@ class Item extends ItemLight
 		$this->dbchanges_custom_fields = array();
 		unset( $this->dbchanges_flags['custom_fields'] );
 
+		// Let's handle the slugs:
+		// TODO: dh> $result handling here feels wrong: when it's true already, it should not become false (add "|| $result"?)
+		// asimo>dh The result handling is in a transaction. If somehow the new slug creation fails, then the item insertion should rollback as well
+		if( $result && ! empty( $edited_slugs ) )
+		{	// if we have new created $edited_slugs, we have to insert it into the database:
+			foreach( $edited_slugs as $edited_Slug )
+			{
+				if( $edited_Slug->ID == 0 )
+				{	// Insert only new created slugs:
+					$edited_Slug->dbinsert();
+				}
+			}
+			if( isset( $edited_slugs[0] ) && $edited_slugs[0]->ID > 0 )
+			{	// Make first slug from list as main slug for this item:
+				$this->set( 'canonical_slug_ID', $edited_slugs[0]->ID );
+				$this->set( 'urltitle', $edited_slugs[0]->get( 'title' ) );
+			}
+			// Clear cached slugs in order to display new unique updated on the edit form:
+			$this->slugs = NULL;
+		}
+
 		$parent_update = $this->dbupdate_worker( $auto_track_modification );
 		if( $result && ( $parent_update !== false ) )
 		{ // We could update the item object:
@@ -7773,26 +7804,6 @@ class Item extends ItemLight
 			{ // Let's handle the tags:
 				$this->insert_update_tags( 'update' );
 				$db_changed = true;
-			}
-
-			// Let's handle the slugs:
-			// TODO: dh> $result handling here feels wrong: when it's true already, it should not become false (add "|| $result"?)
-			// asimo>dh The result handling is in a transaction. If somehow the new slug creation fails, then the item insertion should rollback as well
-			if( $result && !empty( $edited_slugs ) )
-			{ // if we have new created $edited_slugs, we have to insert it into the database:
-				foreach( $edited_slugs as $edited_Slug )
-				{
-					if( $edited_Slug->ID == 0 )
-					{ // Insert only new created slugs
-						$edited_Slug->dbinsert();
-					}
-				}
-				if( isset( $edited_slugs[0] ) && $edited_slugs[0]->ID > 0 )
-				{ // Make first slug from list as main slug for this item
-					$this->set( 'canonical_slug_ID', $edited_slugs[0]->ID );
-					$this->set( 'urltitle', $edited_slugs[0]->get( 'title' ) );
-					$result = parent::dbupdate();
-				}
 			}
 
 			// Update last touched date of this Item and also all categories of this Item
@@ -8257,6 +8268,12 @@ class Item extends ItemLight
 	function handle_notifications( $executed_by_userid = NULL, $is_new_item = false, $force_members = false, $force_community = false, $force_pings = false )
 	{
 		global $Settings, $Messages, $localtimenow, $Debuglog;
+
+		if( empty( $this->ID ) )
+		{	// Don't send notifications for not created Item:
+			$Debuglog->add( 'Item->handle_notifications() : Item is NOT saved in DB', 'notifications' );
+			return false;
+		}
 
 		// Immediate notifications? Asynchronous? Off?
 		$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
@@ -10295,17 +10312,6 @@ class Item extends ItemLight
 
 
 	/**
-	 * Check if currently this Item is viewed as revision(archived version or proposed change)
-	 *
-	 * @return boolean
-	 */
-	function is_revision()
-	{
-		return ! empty( $this->revision );
-	}
-
-
-	/**
 	 * Get item revision
 	 *
 	 * @param string Revision ID with prefix as first char: 'a'(or digit) - archived version, 'c' - current version, 'p' - proposed change, NULL - to use current revision
@@ -10509,13 +10515,17 @@ class Item extends ItemLight
 			$this->set_last_touched_ts();
 			// Don't auto track date fields on accepting of proposed change:
 			$auto_track_modification = false;
+			// Force to create new revision even if no 90 seconds after last changing:
+			$force_create_revision = true;
 		}
 		else
 		{	// Auto track date fields on restoring from history:
 			$auto_track_modification = true;
+			// Don't force creating of new revision:
+			$force_create_revision = false;
 		}
 
-		$r = $this->dbupdate( $auto_track_modification );
+		$r = $this->dbupdate( $auto_track_modification, true, true, $force_create_revision );
 
 		// Update attachments:
 		$current_links_SQL = new SQL( 'Get current links of Item #'.$this->ID.' before updating from revision' );
@@ -12462,7 +12472,7 @@ class Item extends ItemLight
 	 * @param boolean TRUE to redirect back if current user cannot create a proposed change
 	 * @return boolean
 	 */
-	function check_proposed_change( $redirect = false )
+	function can_propose_change( $redirect = false )
 	{
 		global $current_User, $Messages;
 
@@ -12651,13 +12661,13 @@ class Item extends ItemLight
 	 * @param boolean|string FALSE to don't display message of restriction, Message type: 'error', 'warning', 'note', 'success'
 	 * @return boolean
 	 */
-	function check_before_update( $restriction_message_type = 'warning' )
+	function check_proposed_change_restriction( $restriction_message_type = false )
 	{
-		if( ! isset( $this->check_before_update ) )
+		if( ! isset( $this->check_proposed_change_restriction ) )
 		{	// Check and save result in cache var:
 			if( empty( $this->ID ) )
 			{	// Item is not created yet, so it can be updated, i.e. insert new record without restriction:
-				$this->check_before_update = true;
+				$this->check_proposed_change_restriction = true;
 			}
 			elseif( $last_proposed_Revision = $this->get_revision( 'last_proposed' ) )
 			{	// Don't allow to edit this Item if it has at least one proposed change:
@@ -12673,15 +12683,122 @@ class Item extends ItemLight
 							( $User ? $User->get_identity_link() : '<span class="user deleted">'.T_('Deleted user').'</span>' )
 						), $restriction_message_type );
 				}
-				$this->check_before_update = false;
+				$this->check_proposed_change_restriction = false;
 			}
 			else
 			{	// Item can be updated:
-				$this->check_before_update = true;
+				$this->check_proposed_change_restriction = true;
 			}
 		}
 
-		return $this->check_before_update;
+		return $this->check_proposed_change_restriction;
+	}
+
+
+	/**
+	 * Update folder of Item's attachments
+	 *
+	 * @return boolean TRUE if at least one attachment was moved to current slug folder
+	 */
+	function update_attachments_folder()
+	{
+		global $DB, $Debuglog;
+
+		if( empty( $this->ID ) )
+		{	// Item must be saved in DB:
+			return false;
+		}
+
+		$FileRootCache = & get_FileRootCache();
+		if( ! ( $item_FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $this->get_blog_ID(), true ) ) )
+		{	// Unknown file root:
+			return false;
+		}
+
+		$LinkOwner = new LinkItem( $this );
+
+		if( ! $LinkList = $LinkOwner->get_attachment_LinkList() )
+		{	// Item has no attachments:
+			return false;
+		}
+
+		// Folder with current/new slug:
+		$item_new_slug_folder_name = 'quick-uploads/'.$this->get( 'urltitle' ).'/';
+		$item_new_slug_folder_path = $item_FileRoot->ads_path.$item_new_slug_folder_name;
+
+		$result = false;
+		$folders_of_moved_files = array();
+		while( $Link = & $LinkList->get_next() )
+		{
+			if( ! ( $File = & $Link->get_File() ) )
+			{	// No File object
+				$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+				continue;
+			}
+
+			if( ! $File->exists() )
+			{	// File doesn't exist
+				$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+				continue;
+			}
+
+			if( strpos( $File->get_rdfp_rel_path(), 'quick-uploads/' ) !== 0 ||
+			    ( strpos( $File->get_rdfp_rel_path(), $item_new_slug_folder_name ) === 0 &&
+			      ( $file_FileRoot = & $File->get_FileRoot() ) &&
+			      $item_FileRoot->ID == $file_FileRoot->ID ) )
+			{	// Skip if File is not located in the folder "quick-uploads/"
+				//      or File is already located in the current slug folder of this Item:
+				continue;
+			}
+
+			$SQL = new SQL( 'Check File #'.$File->ID.' for muplitle Links before moving to slug folder of Item #'.$this->ID );
+			$SQL->SELECT( 'COUNT( link_ID )' );
+			$SQL->FROM( 'T_links' );
+			$SQL->WHERE( 'link_file_ID = '.$DB->quote( $File->ID ) );
+			if( $DB->get_var( $SQL ) > 1 )
+			{	// Don't move if File is linked with several Items:
+				continue;
+			}
+
+			if( ! file_exists( $item_new_slug_folder_path ) )
+			{	// Try to create a folder for new item slug:
+				if( ! mkdir_r( $item_new_slug_folder_path ) )
+				{	// Stop trying to move other files when no file rights to create new folder on the disc:
+					$log_message = 'No file rights to create a folder %s before moving Item\'s files to slug folder!';
+					$Debuglog->add( sprintf( $log_message, '"'.$item_new_slug_folder_path.'"' ), array( 'error', 'files' ) );
+					syslog_insert( sprintf( $log_message, '[['.$item_new_slug_folder_path.']]'), 'error', 'item', $this->ID );
+					return false;
+				}
+			}
+
+			// Save file folder before moving:
+			$old_file_dir = isset( $File->_dir ) ? $File->_dir : false;
+
+			// Move File to the folder with name as current Item's slug:
+			if( $File->move_to( $item_FileRoot->type, $item_FileRoot->in_type_ID, $item_new_slug_folder_name.$File->get_name(), true ) )
+			{	// If File was moved successfully
+				$result = true;
+				if( $old_file_dir && ! in_array( $old_file_dir, $folders_of_moved_files ) )
+				{	// Collect a folder in order to check and remove if it is empty after moving all files from the folder:
+					$folders_of_moved_files[] = $old_file_dir;
+				}
+			}
+		}
+
+		// Delete folders which are empty after moving all files:
+		foreach( $folders_of_moved_files as $folder_of_moved_files )
+		{
+			if( file_exists( $folder_of_moved_files ) &&
+			    is_empty_directory( $folder_of_moved_files ) &&
+			    ! rmdir_r( $folder_of_moved_files ) )
+			{	// Log error:
+				$log_message = 'No file rights to delete an empty folder %s after moving Item\'s files to slug folder!';
+				$Debuglog->add( sprintf( $log_message, '"'.$folder_of_moved_files.'"' ), array( 'error', 'files' ) );
+				syslog_insert( sprintf( $log_message, '[['.$folder_of_moved_files.']]' ), 'warning', 'item', $this->ID );
+			}
+		}
+
+		return $result;
 	}
 }
 ?>

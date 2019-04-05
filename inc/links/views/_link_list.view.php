@@ -130,7 +130,7 @@ switch( $link_owner_type )
 {
 	case 'item':
 		$upload_fileroot = FileRoot::gen_ID( 'collection', $LinkOwner->get_blog_ID() );
-		$upload_path = '/quick-uploads/'.( $LinkOwner->is_temp() ? 'tmp' : 'p' ).$LinkOwner->get_ID().'/';
+		$upload_path = '/quick-uploads/'.( $LinkOwner->is_temp() ? 'tmp'.$LinkOwner->get_ID() : $LinkOwner->Item->get( 'urltitle' ) ).'/';
 		break;
 
 	case 'comment':

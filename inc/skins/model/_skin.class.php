@@ -270,14 +270,21 @@ class Skin extends DataObject
 		// Loop through all widget params:
 		foreach( $this->get_param_definitions( array('for_editing'=>true) ) as $parname => $parmeta )
 		{
-			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'color' && empty( $parmeta['valid_pattern'] ) )
-			{ // Set default validation for color fields
-				$parmeta['valid_pattern'] = array(
-						'pattern' => '~^(#([a-f0-9]{3}){1,2})?$~i',
-						'error'   => T_('Invalid color code.')
-					);
+			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'input_group' )
+			{
+				if( ! empty( $parmeta['inputs'] ) )
+				{
+					foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )
+					{
+						$l_parmeta['group'] = $parname; // inject group into meta
+						autoform_set_param_from_request( $l_parname, $l_parmeta, $this, 'Skin' );
+					}
+				}
 			}
-			autoform_set_param_from_request( $parname, $parmeta, $this, 'Skin' );
+			else
+			{
+				autoform_set_param_from_request( $parname, $parmeta, $this, 'Skin' );
+			}
 		}
 	}
 
@@ -814,7 +821,10 @@ class Skin extends DataObject
 		$r = array();
 
 		// Skin v7 definitions for kind of current collection:
-		if( $this->get_api_version() == 7 && method_exists( $this, 'get_param_definitions_'.$Blog->get( 'type' ) ) )
+		if( $this->get_api_version() == 7 &&
+		    $this->provides_collection_skin() &&
+		    ! empty( $Blog ) &&
+		    method_exists( $this, 'get_param_definitions_'.$Blog->get( 'type' ) ) )
 		{	// If skin has declared the method for collection kind:
 			$coll_kind_param_definitions = call_user_func( array( $this, 'get_param_definitions_'.$Blog->get( 'type' ) ), $params );
 

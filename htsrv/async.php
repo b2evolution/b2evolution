@@ -22,6 +22,11 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 
 /**
+ * @global boolean Is this AJAX request? Use {@link is_ajax_request()} to query it, because it may change.
+ */
+$is_ajax_request = true;
+
+/**
  * HEAVY :(
  *
  * @todo dh> refactor _main.inc.php to be able to include small parts
@@ -151,7 +156,9 @@ switch( $action )
 		{
 			bad_request_die('Invalid Plugin.');
 		}
-		param( 'set_path', '/^\w+(?:\[\w+\])+$/', '' );
+		param( 'param_name', 'string', '' );
+		param( 'param_num', 'integer', '' );
+		$set_path = $param_name.'['.$param_num.']';
 
 		load_funcs('plugins/_plugin.funcs.php');
 

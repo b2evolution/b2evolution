@@ -1805,6 +1805,17 @@ class ItemLight extends DataObject
 
 		return $chapter_links;
 	}
+
+
+	/**
+	 * Check if currently this Item is viewed as revision(archived version or proposed change)
+	 *
+	 * @return boolean
+	 */
+	function is_revision()
+	{
+		return ! empty( $this->revision );
+	}
 }
 
 ?>

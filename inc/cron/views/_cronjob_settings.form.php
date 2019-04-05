@@ -60,7 +60,8 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 
 			case 'cleanup-scheduled-jobs':
 				// Clean up scheduled jobs older than a threshold:
-				$Form->text_input( 'cleanup_jobs_threshold', $Settings->get( 'cleanup_jobs_threshold' ), 5, T_('Trigger after'), T_('days').'. '.T_('The scheduled jobs older than the selected number of days will be removed.') );
+				$Form->text_input( 'cleanup_jobs_threshold', $Settings->get( 'cleanup_jobs_threshold' ), 5, T_('Keep normally finished tasks for'), T_('days').'. '.T_('The successfully finished scheduled jobs older than the selected number of days will be removed.') );
+				$Form->text_input( 'cleanup_jobs_threshold_failed', $Settings->get( 'cleanup_jobs_threshold_failed' ), 5, T_('Keep other tasks for'), T_('days').'. '.T_('The failed scheduled jobs older than the selected number of days will be removed.') );
 				break;
 
 			case 'cleanup-email-logs':
@@ -166,6 +167,11 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 		if( $Settings->get( 'cjob_maxemail_'.$cron_job_key ) !== NULL )
 		{	// Setting only for cron jobs that use email sending:
 			$Form->text_input( 'cjob_maxemail_'.$cron_job_key, $Settings->get( 'cjob_maxemail_'.$cron_job_key ), 10, T_('Max emails to send'), T_('Leave empty for no limit'), array( 'type' => 'number', 'min' => 0 ) );
+		}
+
+		if( $Settings->get( 'cjob_imap_error_'.$cron_job_key ) !== NULL )
+		{	// Setting only for cron jobs that use IMAP email sending:
+			$Form->text_input( 'cjob_imap_error_'.$cron_job_key, $Settings->get( 'cjob_imap_error_'.$cron_job_key ), 5, T_('Do not notify IMAP errors before'), '', array( 'input_suffix' => ' '.T_('consecutive errors'), 'type' => 'number', 'min' => 1 ) );
 		}
 
 	$Form->end_fieldset();

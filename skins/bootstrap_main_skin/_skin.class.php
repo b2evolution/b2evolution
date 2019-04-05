@@ -55,7 +55,7 @@ class bootstrap_main_Skin extends Skin
 	 */
 	function get_api_version()
 	{
-		return 6;
+		return 7;
 	}
 
 
@@ -165,6 +165,7 @@ class bootstrap_main_Skin extends Skin
 						'note' => T_('This color will be used if Background image is not set or does not exist.'),
 						'defaultvalue' => '#333333',
 						'type' => 'color',
+						'transparency' => true,
 					),
 				'1_end' => array(
 					'layout' => 'end_fieldset',
@@ -193,21 +194,9 @@ class bootstrap_main_Skin extends Skin
 					'front_bg_cont_color' => array(
 						'label' => T_('Background color'),
 						'note' => T_('Click to select a color.'),
-						'defaultvalue' => '#000000',
+						'defaultvalue' => 'rgba(0,0,0,0.1)',
 						'type' => 'color',
-					),
-					'front_bg_opacity' => array(
-						'label' => T_('Background opacity'),
-						'input_suffix' => ' % ',
-						'note' => T_('Adjust the background transparency level.'),
-						'size' => '7',
-						'maxlength' => '3',
-						'defaultvalue' => '10',
-						'type' => 'integer',
-						'valid_range' => array(
-							'min' => 0, // from 0%
-							'max' => 100, // to 100%
-						),
+						'transparency' => true,
 					),
 					'pict_title_color' => array(
 						'label' => T_('Title color'),
@@ -251,6 +240,7 @@ class bootstrap_main_Skin extends Skin
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
+						'transparency' => true,
 					),
 					'secondary_text_color' => array(
 						'label' => T_('Text color'),
@@ -458,31 +448,9 @@ class bootstrap_main_Skin extends Skin
 				'body.pictured .main_page_wrapper .text-muted { color: $setting_value$'." }\n"
 			);
 
-			// Background color + Background opacity:
-			if( $color = $this->get_setting( 'front_bg_cont_color' ) )
-			{ // Custom body background color:
-				$color_transparency = floatval( $this->get_setting( 'front_bg_opacity' ) / 100 );
-				$color = substr( $color, 1 );
-				if( strlen( $color ) == '6' )
-				{ // Color value in format #FFFFFF
-					$color = str_split( $color, 2 );
-				}
-				else
-				{ // Color value in format #FFF
-					$color = str_split( $color, 1 );
-					foreach( $color as $c => $v )
-					{
-						$color[ $c ] = $v.$v;
-					}
-				}
-				$front_bg_cont_color_opacity = 'rgba('.implode( ',', array_map( 'hexdec', $color ) ).','.$color_transparency.')';
-			}
-			$custom_css .= $this->get_style( 'front_bg_cont_color+front_bg_opacity',
-				'.front_main_content { background-color: $setting_value$'." }\n",
-				array(
-					'value'    => $front_bg_cont_color_opacity,
-					'function' => 'rgba',
-				)
+			// Background color:
+			$custom_css .= $this->get_style( 'front_bg_cont_color',
+				'.front_main_content { background-color: $setting_value$'." }\n"
 			);
 
 			// Text color:

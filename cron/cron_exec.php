@@ -234,13 +234,35 @@ else
 		}
 		restore_error_handler();
 
-		if( !empty( $error_message ) )
-		{
+		if( ! empty( $error_message ) )
+		{	// Set error task in order to report by email to admin in the function detect_timeout_cron_jobs():
 			$error_task = array(
 					'ID'      => $ctsk_ID,
 					'name'    => $ctsk_name,
 					'message' => $error_message,
 				);
+
+			if( $result_status == 'imap_error' &&
+			    ( $max_consecutive_imap_errors = $Settings->get( 'cjob_imap_error_'.$task->ctsk_key ) ) > 1 )
+			{	// Check if imap error task can be reported by email to admin:
+				$previous_tasks_SQL = new SQL( 'Check consecutive imap error cron jobs' );
+				$previous_tasks_SQL->SELECT( 'clog_status' );
+				$previous_tasks_SQL->FROM( 'T_cron__log' );
+				$previous_tasks_SQL->FROM_add( 'INNER JOIN T_cron__task ON clog_ctsk_ID = ctsk_ID' );
+				$previous_tasks_SQL->WHERE( 'ctsk_key = '.$DB->quote( $task->ctsk_key ) );
+				$previous_tasks_SQL->ORDER_BY( 'clog_realstart_datetime DESC' );
+				// Skip first task because this is a currently executing task still has a status "started" in DB,
+				// but after update below the status will be "imap_error":
+				$previous_tasks_SQL->LIMIT( '1, '.( $max_consecutive_imap_errors - 1 ) );
+				$previous_tasks = $DB->get_col( $previous_tasks_SQL );
+				$previous_tasks[] = 'imap_error'; // append status of the currently executing task
+				if( count( $previous_tasks ) < $max_consecutive_imap_errors ||
+				    count( array_unique( $previous_tasks ) ) > 1 )
+				{	// If X previous consecutive tasks have no same status "IMAP error",
+					// unset error task in order to don't report by email to admin:
+					$error_task = NULL;
+				}
+			}
 		}
 
 		// Record task as finished:

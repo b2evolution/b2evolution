@@ -98,7 +98,7 @@ switch( $action )
 		    ( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) ) )
 		{	// If the Item already has a proposed change:
 			// Check if current User can create a new proposed change:
-			$edited_Item->check_proposed_change( true );
+			$edited_Item->can_propose_change( true );
 			// Suggest item fields values from last proposed change when user creates new propose change:
 			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
 		}
@@ -112,7 +112,7 @@ switch( $action )
 
 		// Check if the editing Item has at least one proposed change:
 		if( $action == 'edit' &&
-		    ! $edited_Item->check_before_update( 'warning' ) &&
+		    ! $edited_Item->check_proposed_change_restriction( 'warning' ) &&
 		    ( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) ) )
 		{	// Use item fields values from last proposed change:
 			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
@@ -1024,8 +1024,17 @@ switch( $action )
 		$Revision = $edited_Item->get_revision( param( 'r', 'string' ) );
 
 		if( ! $Revision )
-		{	// Exit on wrong requested revision:
-			debug_die( 'The requested revision is not found in DB!' );
+		{	// Redirect to history list on wrong requested revision:
+			if( substr( get_param( 'r' ), 0, 1 ) == 'p' )
+			{	// When view old(not existing) proposed change:
+				$Messages->add( T_('The changes have already been accepted or rejected.'), 'error' );
+			}
+			else
+			{	// When view archived version:
+				// Don't translate because it should not happens on normal work:
+				$Messages->add( 'The requested version does not exist.', 'error' );
+			}
+			header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
 		}
 		break;
 
@@ -1041,8 +1050,17 @@ switch( $action )
 		$Revision_2 = $edited_Item->get_revision( param( 'r2', 'string' ) );
 
 		if( ! $Revision_1 || ! $Revision_2 )
-		{	// Exit on wrong requested revision:
-			debug_die( 'The requested revision is not found in DB!' );
+		{	// Redirect to history list on wrong requested revision:
+			if( substr( get_param( 'r1' ), 0, 1 ) == 'c' && substr( get_param( 'r2' ), 0, 1 ) == 'p' )
+			{	// When compare current version with old(not existing) proposed change(e.g. on opening url from old email message):
+				$Messages->add( T_('The changes have already been accepted or rejected.'), 'error' );
+			}
+			else
+			{	// When compare all other cases:
+				// Don't translate because it should not happens on normal work:
+				$Messages->add( 'The requested version does not exist.', 'error' );
+			}
+			header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
 		}
 
 		load_class( '_core/model/_diff.class.php', 'Diff' );
@@ -1198,14 +1216,11 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
-		if( $edited_Item->check_before_update( 'error' ) )
-		{	// Allow to restore an archived version only when it is not restricted currently for the edited Item:
-			param( 'r', 'integer', 0 );
+		param( 'r', 'integer', 0 );
 
-			if( $r > 0 && $edited_Item->update_from_revision( $r ) )
-			{	// Update item only from revisions ($r == 0 for current version):
-				$Messages->add( sprintf( T_('Item has been restored from revision #%s'), $r ), 'success' );
-			}
+		if( $r > 0 && $edited_Item->update_from_revision( $r ) )
+		{	// Update item only from revisions ($r == 0 for current version):
+			$Messages->add( sprintf( T_('Item has been restored from revision #%s'), $r ), 'success' );
 		}
 
 		header_redirect( regenerate_url( 'action', 'action=history', '', '&' ) );
@@ -1542,6 +1557,11 @@ switch( $action )
 			break;
 		}
 
+		if( strpos( $action, 'update' ) === 0 )
+		{	// Update attachments folder:
+			$edited_Item->update_attachments_folder();
+		}
+
 		// post post-publishing operations:
 		param( 'trackback_url', 'string' );
 		if( !empty( $trackback_url ) )
@@ -1859,6 +1879,9 @@ switch( $action )
 		// UPDATE POST IN DB:
 		if( $edited_Item->dbupdate() )
 		{
+			// Update attachments folder:
+			$edited_Item->update_attachments_folder();
+
 			// Clear all proposed changes of the updated Item:
 			$edited_Item->clear_proposed_changes();
 		}
@@ -2145,7 +2168,7 @@ switch( $action )
 		$current_User->check_perm( 'blog_item_propose', 'edit', true, $Blog->ID );
 
 		// Check if current User can create a new proposed change:
-		$edited_Item->check_proposed_change( true );
+		$edited_Item->can_propose_change( true );
 
 		if( $edited_Item->create_proposed_change() )
 		{	// If new proposed changes has been inserted in DB successfully:

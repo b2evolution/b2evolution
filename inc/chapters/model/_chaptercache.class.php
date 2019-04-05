@@ -741,6 +741,7 @@ class ChapterCache extends DataObjectCache
 	function recurse( $callbacks, $subset_ID = NULL, $cat_array = NULL, $level = 0, $max_level = 0, $params = array() )
 	{
 		$params = array_merge( array(
+				'highlight_current' => true,
 				'sorted' => false,
 				'chapter_path' => array(),
 				'expand_all' => true,
@@ -783,7 +784,7 @@ class ChapterCache extends DataObjectCache
 		foreach( $cat_array as $cat )
 		{
 			// Check if category is expended
-			$params['is_selected'] = in_array( $cat->ID, $params['chapter_path'] );
+			$params['is_selected'] = $params['highlight_current'] && in_array( $cat->ID, $params['chapter_path'] );
 			$params['is_opened'] = $params['expand_all'] || $params['is_selected'];
 
 			// Display a category:

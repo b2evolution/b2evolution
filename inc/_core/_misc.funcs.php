@@ -2220,13 +2220,14 @@ function is_valid_login( $login, $force_strict_logins = false )
 
 /**
  * Checks if the color is valid
+ * Allowed formats: #09ABEF, rgba(100,200,255,0.99)
  *
  * @param string color to check
  * @return boolean true if OK
  */
 function is_color( $color )
 {
-	return preg_match( '~^(#([a-f0-9]{3}){1,2})?$~i', $color );
+	return preg_match( '~^(#([a-f0-9]{3}){1,2}|rgba\(\d{1,3},\d{1,3},\d{1,3},(1|0(\.\d{1,2})?)\))$~i', $color );
 }
 
 
@@ -7371,6 +7372,19 @@ function save_to_file( $data, $filename, $mode = 'a' )
 
 /**
  * Check if current request is AJAX
+ *
+ * @return boolean TRUE/FALSE
+ */
+function is_ajax_request()
+{
+	global $is_ajax_request;
+
+	return isset( $is_ajax_request ) && $is_ajax_request === true;
+}
+
+
+/**
+ * Check if current request is AJAX content
  * Used in order to get only content of the requested page
  *
  * @param string Template name
@@ -8530,7 +8544,6 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				'image_size'               => 'fit-400x320',
 				'image_link_to'            => 'original', // Can be 'orginal' (image) or 'single' (this post)
 				'limit'                    => 1000, // Max # of images displayed
-				'get_rendered_attachments' => true,
 			), $params );
 
 	if( !isset( $LinkList ) )
@@ -8691,12 +8704,6 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						}
 					}
 
-					if( ! $current_image_params['get_rendered_attachments'] )
-					{	// Save $r to temp var in order to don't get the rendered data from plugins
-						$temp_r = $r;
-					}
-
-					$temp_params = $current_image_params;
 					foreach( $current_image_params as $param_key => $param_value )
 					{	// Pass all params by reference, in order to give possibility to modify them by plugin
 						// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
@@ -8707,13 +8714,10 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_image_params );
 
 					// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r:
-					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_image_params ) ) != 0 )
+					if( count( $Plugins->trigger_event_first_true_with_params( $render_plugin_event_name, $current_image_params ) ) != 0 )
 					{	// This attachment has been rendered by a plugin (to $current_image_params['data']):
-						if( ! $current_image_params['get_rendered_attachments'] )
-						{	// Restore $r value and mark this Object has the rendered attachments:
-							$r = $temp_r;
-							$plugin_render_attachments = true;
-						}
+						$inlines[ $current_inline ] = $current_image_params['data'];
+						break;
 					}
 
 					if( $inline_type == 'image' )
@@ -8934,7 +8938,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_video_params );
 
 					// Render attachments by plugin:
-					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_video_params ) ) != 0 )
+					if( count( $Plugins->trigger_event_first_true_with_params( $render_plugin_event_name, $current_video_params ) ) != 0 )
 					{	// This attachment has been rendered by a plugin (to $current_video_params['data']):
 						$inlines[$current_inline] = $current_video_params['data'];
 					}
@@ -8966,9 +8970,9 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_audio_params );
 
 					// Render attachments by plugin:
-					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_audio_params ) ) != 0 )
+					if( count( $Plugins->trigger_event_first_true_with_params( $render_plugin_event_name, $current_audio_params ) ) != 0 )
 					{	// This attachment has been rendered by a plugin (to $current_audio_params['data']):
-						$inlines[$current_inline] =  $current_audio_params['data'];
+						$inlines[$current_inline] = $current_audio_params['data'];
 					}
 					else
 					{ // no plugin available or was able to render the tag

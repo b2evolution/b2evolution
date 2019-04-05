@@ -98,15 +98,11 @@ jQuery( document ).on( 'ready', function()
 		backoffice_content.find( 'form#widget_checkchanges a:not([target])' ).attr( 'target', '_top' );
 
 		// Update custom styles of the skin:
-		backoffice_content.find( '.evo_customizer__content input' ).focus( function()
-		{	// Store value before changing:
-			jQuery( this ).data( 'prev-value', jQuery( this ).val() );
-		} );
-		backoffice_content.find( '.evo_customizer__content input' ).blur( function()
+		backoffice_content.find( '.evo_customizer__content input' ).on( 'input', function()
 		{	// Update style with new changed value:
 			evo_customizer_update_style( jQuery( this ) );
 		} );
-		backoffice_content.find( '.evo_customizer__content select' ).change( function()
+		backoffice_content.find( '.evo_customizer__content select' ).on( 'change', function()
 		{	// Update style with new changed value:
 			evo_customizer_update_style( jQuery( this ) );
 		} );
@@ -146,19 +142,6 @@ jQuery( document ).on( 'ready', function()
 					case 'suffix':
 						// Append suffix:
 						new_value += m8;
-						break;
-					case 'function':
-						// Apply function:
-						var func_params = m3.split( '+' );
-						if( m8 == 'rgba' )
-						{	// Convert hex color and opacity to RGBA color format:
-							var hex_color = backoffice_content.find( 'input[name$="' + func_params[0] + '"]' ).val(),
-							opacity = backoffice_content.find( 'input[name$="' + func_params[1] + '"]' ).val(),
-							r = parseInt( hex_color.slice( 1, 3 ), 16 ),
-							g = parseInt( hex_color.slice( 3, 5 ), 16 ),
-							b = parseInt( hex_color.slice( 5, 7 ), 16 );
-							new_value = 'rgba(' + r + ',' + g + ',' + b + ',' + ( opacity / 100 ) + ')';
-						}
 						break;
 				}
 

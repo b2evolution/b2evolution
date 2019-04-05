@@ -1084,6 +1084,9 @@ form#comment_edit {
 
 // Attachments table:
 #itemform_links, #cmntform_links {
+	.panel {
+		overflow: hidden;
+	}
 	.panel-body {
 		padding: 0;
 	}
@@ -1146,6 +1149,41 @@ div.evo_fileuploader_form {
 		}
 		td {
 			cursor: move;
+		}
+	}
+	.evo_attachments_fieldset__overlay {
+		position: absolute;
+		top: -43px;
+		z-index: 1;
+		width: 100%;
+		height: 140px;
+		background: rgba( 0, 0, 0, 0.5 );
+		color: #FFF;
+		text-align: center;
+		font-size: 200%;
+		b {
+			width: 100%;
+			margin: 0;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+	}
+}
+@media (max-width: 768px) {
+	.evo_attachments_fieldset__wrapper {
+		.evo_attachments_fieldset__overlay {
+			font-size: 170%;
+		}
+	}
+}
+@media (max-width: 431px) {
+	.evo_attachments_fieldset__wrapper {
+		.evo_attachments_fieldset__overlay {
+			top: -65px;
+			height: 162px;
+			font-size: 140%;
 		}
 	}
 }

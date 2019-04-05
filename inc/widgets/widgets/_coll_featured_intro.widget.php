@@ -274,13 +274,21 @@ class coll_featured_intro_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Collection, $Blog, $current_User;
+		global $Collection, $Blog, $FeaturedList, $current_User;
+
+		// Get intro Item which is displayed for this widget:
+		$Item = get_featured_Item( 'front', $this->disp_params['blog_ID'] );
+		if( ! empty( $FeaturedList ) )
+		{	// Restart results of the featured list in order to keep the same Item on display this widget:
+			$FeaturedList->restart();
+		}
 
 		return array(
 				'wi_ID' => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID' => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'user_ID' => (is_logged_in() ? $current_User->ID : 0), // Has the current User changed?
 				'intro_feat_coll_ID' => empty($this->disp_params['blog_ID']) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the intro/featured post changed ?
+				'item_ID' => empty( $Item ) ? 0 : $Item->ID, // Cache each item separately + Has the Item changed?
 			);
 	}
 

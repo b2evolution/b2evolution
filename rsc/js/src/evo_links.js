@@ -15,6 +15,8 @@
 
 /**
  * Initialize attachments fieldset to set proper height and handler to resize it
+ *
+ * @param string Fieldset prefix, e-g 'meta_' when two forms are used on the same page
  */
 function evo_link_initialize_fieldset( fieldset_prefix )
 {
@@ -31,6 +33,7 @@ function evo_link_initialize_fieldset( fieldset_prefix )
 			resize: function( e, ui )
 			{	// Limit max height by table of attachments:
 				jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table' ).height() );
+				evo_link_update_overlay( fieldset_prefix );
 			}
 		} );
 		jQuery( document ).on( 'click', '#' + fieldset_prefix + 'attachments_fieldset_wrapper .ui-resizable-handle', function()
@@ -38,7 +41,22 @@ function evo_link_initialize_fieldset( fieldset_prefix )
 			var max_height = jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table' ).height();
 			var height = jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).height() + 80;
 			jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).css( 'height', height > max_height ? max_height : height );
+			evo_link_update_overlay( fieldset_prefix );
 		} );
+	}
+}
+
+
+/**
+ * Update position and size of overlay which restrict edit of attachments
+ *
+ * @param string Fieldset prefix, e-g 'meta_' when two forms are used on the same page
+ */
+function evo_link_update_overlay( fieldset_prefix )
+{
+	if( jQuery( '#' + fieldset_prefix + 'attachments_fieldset_overlay' ).length )
+	{	// Update height of restriction overlay if it exists:
+		jQuery( '#' + fieldset_prefix + 'attachments_fieldset_overlay' ).css( 'height', jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).closest( '.panel' ).height() );
 	}
 }
 
