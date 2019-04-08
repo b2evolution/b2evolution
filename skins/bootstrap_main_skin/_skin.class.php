@@ -402,9 +402,6 @@ class bootstrap_main_Skin extends Skin
 
 		// Skin specific initializations:
 
-		// Add custom CSS:
-		$custom_css = '';
-
 		// **** Layout Settings / START ****
 		// Max image height:
 		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$; width: auto; }', array(
@@ -415,17 +412,12 @@ class bootstrap_main_Skin extends Skin
 		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'content_requires_login' ) ) )
 		{
 			// **** Image section / START ****
-			if( $this->get_setting( 'front_bg_image_file_ID' ) &&
-			    ( $FileCache = & get_FileCache() ) && 
-			    ( $bg_image_File = & $FileCache->get_by_ID( $this->get_setting( 'front_bg_image_file_ID' ), false, false ) ) &&
-			    $bg_image_File->exists() )
-			{	// Background image:
-				$custom_css .= '.evo_pictured_layout { background-image: url('.$bg_image_File->get_url().") }\n";
-			}
-			else
-			{	// Background color:
-				$this->dynamic_style_rule( 'front_bg_color', '.evo_pictured_layout { background: $setting_value$ }' );
-			}
+			// Background image:
+			$this->dynamic_style_rule( 'front_bg_image_file_ID', '.evo_pictured_layout { background-image: $setting_value$ }', array(
+				'type' => 'image_file',
+			) );
+			// Background color:
+			$this->dynamic_style_rule( 'front_bg_color', '.evo_pictured_layout { background-color: $setting_value$ }' );
 			// **** Image section / END ****
 
 			// **** Front Page Main Area Settings / START ****
@@ -495,7 +487,7 @@ class bootstrap_main_Skin extends Skin
 		$this->dynamic_style_rule( 'bgimg_hover_link_color', '.evo_hasbgimg a:hover { color: $setting_value$ }' );
 		// **** Featured posts Settings / END ****
 
-		$custom_css .= $this->get_dynamic_styles();
+		$custom_css = $this->get_dynamic_styles();
 		if( ! empty( $custom_css ) )
 		{
 			if( $disp == 'front' )

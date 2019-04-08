@@ -39,7 +39,7 @@ function evo_customizer_update_style( setting_input )
 	var skin_setting_name = setting_input.attr( 'name' ).replace( /^edit_skin_\d+_set_/, '' );
 
 	// Replace previous value with new updated:
-	var regexp = new RegExp( '(\\/\\*customize\\*\\/)[^\\/]*(\\/\\*(([a-z_\\+]+\\+)?' + skin_setting_name + '(\\+[a-z_\\+]+)?)(\\/([a-z]+):([^\\*]+))?\\*\\/)', 'i' );
+	var regexp = new RegExp( '(\\/\\*customize:\\*\\/).*?(\\/\\*(([a-z_\\+]+\\+)?' + skin_setting_name + '(\\+[a-z_\\+]+)?)(\\/([a-z]+):([^\\*]+))?\\*\\/)', 'i' );
 	var new_value = setting_input.val();
 	skin_style.text( skin_style.text().replace( regexp, function( m0, m1, m2, m3, m4, m5, m6, m7, m8 )
 	{
@@ -59,6 +59,24 @@ function evo_customizer_update_style( setting_input )
 			case 'suffix':
 				// Append suffix:
 				new_value += m8;
+				break;
+			case 'type':
+				// Special type:
+				if( m8 == 'image_file' )
+				{	// Special setting with image URL:
+					var file_image_obj = setting_input.next().find( '.file_select_item' )
+					if( setting_input.attr( 'type' ) == 'hidden' &&
+					    setting_input.next().data( 'file-type' ) == 'image' &&
+					    file_image_obj.length &&
+					    file_image_obj.data( 'file-url' ) )
+					{	// If image URL is defined:
+						new_value = 'url("' + file_image_obj.data( 'file-url' ) + '")';
+					}
+					else
+					{	// No image:
+						new_value = 'none';
+					}
+				}
 				break;
 		}
 

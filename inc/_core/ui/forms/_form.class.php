@@ -3976,7 +3976,7 @@ class Form extends Widget
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
 		$field_params = array_merge( array(
-				'field_item_start' => '<div class="file_select_item" data-item-value="%value%">',
+				'field_item_start' => '<div class="file_select_item" data-item-value="%value%" data-file-url="%url%">',
 				'field_item_end' => '</div>',
 				'size_name' => 'crop-64x64',
 				'class' => '',
@@ -4188,6 +4188,11 @@ class Form extends Widget
 										// Trigger change so bozo validator will pickup the change
 										inputField.trigger( "change" );
 
+										if( typeof( parent.evo_customizer_update_style ) == "function" )
+										{	// Update style in designer customizer mode if it is enabled currently:
+											parent.evo_customizer_update_style( inputField );
+										}
+
 										// close modal if single item select
 										if( maxLength == 1 )
 										{
@@ -4237,6 +4242,11 @@ class Form extends Widget
 							}
 							inputField.val( values.join( "'.$field_params['value_separator'].'" ) );
 							inputField.trigger( "change" );
+
+							if( typeof( parent.evo_customizer_update_style ) == "function" )
+							{	// Update style in designer customizer mode if it is enabled currently:
+								parent.evo_customizer_update_style( inputField );
+							}
 
 							return false;
 						}
