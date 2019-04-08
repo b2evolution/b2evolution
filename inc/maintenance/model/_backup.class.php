@@ -122,7 +122,6 @@ $backup_tables = array(
 		'table'   => array(
 			'T_sessions',
 			'T_hitlog',
-			'T_basedomains',
 			'T_track__goalhit',
 			'T_track__keyphrase',
 		),
