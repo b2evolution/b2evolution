@@ -931,14 +931,14 @@ class Skin extends DataObject
 
 
 	/**
-	 * Get style code
+	 * Set dynamic style rule and store in array $this->dynamic_styles
+	 * (Use Skin->get_dynamic_styles() to get style as single string)
 	 *
 	 * @param string Setting name
 	 * @param string Style template with mask instead of setting value
 	 * @param array Additional params
-	 * @return string CSS code
 	 */
-	function get_style( $setting_name, $style_template, $params = array() )
+	function dynamic_style_rule( $setting_name, $style_template, $params = array() )
 	{
 		$params = array_merge( array(
 				'value'    => NULL, // Custom value, different of what stored in the setting
@@ -1001,8 +1001,24 @@ class Skin extends DataObject
 			$setting_value = '/*customize*/'.$setting_value.'/*'.$setting_name.$setting_options.'*/';
 		}
 
+		if( ! isset( $this->dynamic_styles ) )
+		{
+			$this->dynamic_styles = array();
+		}
+
 		// Replace mask with setting value:
-		return str_replace( '$setting_value$', $setting_value, $style_template );
+		$this->dynamic_styles[] = str_replace( '$setting_value$', $setting_value, $style_template );
+	}
+
+
+	/**
+	 * Get dynamic style rules
+	 *
+	 * @return string
+	 */
+	function get_dynamic_styles()
+	{
+		return isset( $this->dynamic_styles ) ? implode( "\n", $this->dynamic_styles ) : '';
 	}
 
 

@@ -131,6 +131,11 @@ jQuery( document ).on( 'ready', function()
 			}
 		} );
 
+		backoffice_content.find( 'form' ).on( 'keypress', function( e )
+		{ // Don't submit a form on press "Enter/Return" key:
+			return e.keyCode != 13;
+		} );
+
 		// Open links from widget edit form on top window:
 		backoffice_content.find( 'form#widget_checkchanges a:not([target])' ).attr( 'target', '_top' );
 

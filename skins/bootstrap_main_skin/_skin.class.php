@@ -407,11 +407,9 @@ class bootstrap_main_Skin extends Skin
 
 		// **** Layout Settings / START ****
 		// Max image height:
-		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
-		$custom_css .= $this->get_style( 'max_image_height',
-			'.evo_image_block img { max-height: $setting_value$; width: auto;'." }\n",
-			array( 'suffix' => 'px' )
-		);
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$; width: auto; }', array(
+			'suffix' => 'px'
+		) );
 		// **** Layout Settings / END ****
 
 		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'content_requires_login' ) ) )
@@ -426,98 +424,78 @@ class bootstrap_main_Skin extends Skin
 			}
 			else
 			{	// Background color:
-				$custom_css .= $this->get_style( 'front_bg_color',
-					'.evo_pictured_layout { background: $setting_value$'." }\n"
-				);
+				$this->dynamic_style_rule( 'front_bg_color', '.evo_pictured_layout { background: $setting_value$ }' );
 			}
 			// **** Image section / END ****
 
 			// **** Front Page Main Area Settings / START ****
 			// Width:
-			$custom_css .= $this->get_style( 'front_width',
-				'div.front_main_area { width: $setting_value$'." }\n"
-			);
+			$this->dynamic_style_rule( 'front_width', 'div.front_main_area { width: $setting_value$ }' );
 
 			// Title color:
-			$custom_css .= $this->get_style( 'pict_title_color',
-				'body.pictured .main_page_wrapper .front_main_area .widget_core_coll_title h2 a { color: $setting_value$'." }\n"
-			);
+			$this->dynamic_style_rule( 'pict_title_color', 'body.pictured .main_page_wrapper .front_main_area .widget_core_coll_title h2 a { color: $setting_value$ }' );
 
 			// Muted text color:
-			$custom_css .= $this->get_style( 'pict_muted_color',
-				'body.pictured .main_page_wrapper .text-muted { color: $setting_value$'." }\n"
-			);
+			$this->dynamic_style_rule( 'pict_muted_color', 'body.pictured .main_page_wrapper .text-muted { color: $setting_value$ }' );
 
 			// Background color:
-			$custom_css .= $this->get_style( 'front_bg_cont_color',
-				'.front_main_content { background-color: $setting_value$'." }\n"
-			);
+			$this->dynamic_style_rule( 'front_bg_cont_color', '.front_main_content { background-color: $setting_value$ }' );
 
 			// Text color:
-			$custom_css .= $this->get_style( 'front_text_color',
+			$this->dynamic_style_rule( 'front_text_color',
 				'body.pictured .front_main_content, '.
 				'body.pictured .front_main_content h1 small, '.
 				'.evo_container__header, '.
 				'.evo_container__page_top, '.
 				'body.pictured.disp_access_requires_login .evo_widget.widget_core_content_block, '.
 				'body.pictured.disp_access_denied .evo_widget.widget_core_content_block '.
-				'{ color: $setting_value$'." }\n"
+				'{ color: $setting_value$ }'
 			);
 
 			// Link color:
-			$custom_css .= $this->get_style( 'front_link_color',
+			$this->dynamic_style_rule( 'front_link_color',
 				'body.pictured .main_page_wrapper .front_main_area a:not(.btn),'.
 				'body.pictured .main_page_wrapper .front_main_area div.evo_withteaser div.item_content > a { color: $setting_value$ }'.
 				'body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_item_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a,'.
 				'body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_post_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a { color: $setting_value$'." }\n".
 				'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__bgcolor"]):not(:hover) { background-color: $setting_value$'." }\n".
-				'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hovertextcolor"]) { color: $setting_value$'." }\n"
+				'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hovertextcolor"]) { color: $setting_value$ }'
 			);
 
 			// Inverse icon color:
-			$custom_css .= $this->get_style( 'front_icon_color',
+			$this->dynamic_style_rule( 'front_icon_color',
 				'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__textcolor"]):not(:hover) { color: $setting_value$'." }\n".
-				'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hoverbgcolor"]) { background-color: $setting_value$'." }\n"
+				'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hoverbgcolor"]) { background-color: $setting_value$ }'
 			);
 
 			// Position:
-			$custom_css .= $this->get_style( 'front_position',
-				'div.front_main_area { $setting_value$'." }\n",
-				array( 'options' => array(
+			$this->dynamic_style_rule( 'front_position', 'div.front_main_area { $setting_value$ }', array(
+				'options' => array(
 					'left'   => '',// default value
 					'middle' => 'float: none; margin-left: auto; margin-right: auto;',
 					'right'  => 'float: right;',
-				) )
-			);
+				)
+			) );
 			// **** Front Page Main Area Settings / END ****
 
 			// **** Front Page Secondary Area Settings / START ****
 			// Background color:
-			$custom_css .= $this->get_style( 'secondary_bg_color',
-				'section.secondary_area { background-color: $setting_value$'." }\n"
-			);
+			$this->dynamic_style_rule( 'secondary_bg_color', 'section.secondary_area { background-color: $setting_value$ }' );
 			// Text color:
-			$custom_css .= $this->get_style( 'secondary_text_color',
-				'section.secondary_area, .widget_core_org_members { color: $setting_value$ !important'." }\n"
-			);
+			$this->dynamic_style_rule( 'secondary_text_color', 'section.secondary_area, .widget_core_org_members { color: $setting_value$ !important }' );
 			// **** Front Page Secondary Area Settings / END ****
 		}
 
 		// **** Featured posts Settings / START ****
 		// Text color on background image:
-		$custom_css .= $this->get_style( 'bgimg_text_color',
-			'.evo_hasbgimg { color: $setting_value$'." }\n"
-		);
+		$this->dynamic_style_rule( 'bgimg_text_color', '.evo_hasbgimg { color: $setting_value$ }' );
 		// Link color on background image:
-		$custom_css .= $this->get_style( 'bgimg_link_color',
-			'.evo_hasbgimg a { color: $setting_value$'." }\n"
-		);
+		$this->dynamic_style_rule( 'bgimg_link_color', '.evo_hasbgimg a { color: $setting_value$ }' );
 		// Hover link color on background image:
-		$custom_css .= $this->get_style( 'bgimg_hover_link_color',
-			'.evo_hasbgimg a:hover { color: $setting_value$'." }\n"
-		);
+		$this->dynamic_style_rule( 'bgimg_hover_link_color', '.evo_hasbgimg a:hover { color: $setting_value$ }' );
 		// **** Featured posts Settings / END ****
 
+		$custom_css .= $this->get_dynamic_styles();
 		if( ! empty( $custom_css ) )
 		{
 			if( $disp == 'front' )
