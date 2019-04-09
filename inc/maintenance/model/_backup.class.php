@@ -120,8 +120,9 @@ $backup_tables = array(
 	'logs_stats_tables'   => array(
 		'label'    => T_('Logs & stats tables'),
 		'table'   => array(
-			'T_sessions',
+			'T_email__log',
 			'T_hitlog',
+			'T_sessions',
 			'T_track__goalhit',
 			'T_track__keyphrase',
 		),
