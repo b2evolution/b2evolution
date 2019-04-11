@@ -3526,10 +3526,11 @@ class Comment extends DataObject
 	 *                       'force' - Force notifications
 	 *                       'mark'  - Change DB flag to "notified" but do NOT actually send notifications
 	 * @param boolean|string Force sending notifications for community (use same values of third param)
+	 * @return boolean TRUE on success
 	 */
 	function handle_notifications( $executed_by_userid = NULL, $is_new_comment = false, $force_members = false, $force_community = false )
 	{
-		global $Settings, $Messages;
+		global $Settings, $Messages, $DB;
 
 		// Immediate notifications? Asynchronous? Off?
 		$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
@@ -3579,6 +3580,7 @@ class Comment extends DataObject
 		}
 
 		// IMMEDIATE vs ASYNCHRONOUS sending:
+		$DB->begin();
 
 		if( $notifications_mode == 'immediate' )
 		{	// Send email notifications now!:
@@ -3629,7 +3631,16 @@ class Comment extends DataObject
 		}
 
 		// Update comment notification params:
-		$this->dbupdate();
+		if( $this->dbupdate() )
+		{
+			$DB->commit();
+			return true;
+		}
+		else
+		{
+			$DB->rollback();
+			return false;
+		}
 	}
 
 
