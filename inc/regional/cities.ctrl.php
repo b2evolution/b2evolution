@@ -268,6 +268,8 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
+		set_max_execution_time( 0 );
+
 		// Country Id
 		param( 'ctry_ID', 'integer', true );
 		param_check_number( 'ctry_ID', T_('Please select a country'), true );

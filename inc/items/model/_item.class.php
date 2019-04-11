@@ -8267,7 +8267,7 @@ class Item extends ItemLight
 	 */
 	function handle_notifications( $executed_by_userid = NULL, $is_new_item = false, $force_members = false, $force_community = false, $force_pings = false )
 	{
-		global $Settings, $Messages, $localtimenow, $Debuglog;
+		global $Settings, $Messages, $localtimenow, $Debuglog, $DB;
 
 		if( empty( $this->ID ) )
 		{	// Don't send notifications for not created Item:
@@ -8340,6 +8340,7 @@ class Item extends ItemLight
 		}
 
 		// IMMEDIATE vs ASYNCHRONOUS sending:
+		$DB->begin( 'SERIALIZABLE' );
 
 		if( $notifications_mode == 'immediate' && strtotime( $this->issue_date ) <= $localtimenow )
 		{	// We want to send the notifications immediately (can only be done if post does not have an issue_date in the future):
@@ -8411,9 +8412,16 @@ class Item extends ItemLight
 		}
 
 		// Save the new processing status to DB, but do not update last edited by user, slug or child custom fields:
-		$this->dbupdate( false, false, false );
-
-		return true;
+		if( $this->dbupdate( false, false, false ) )
+		{
+			$DB->commit();
+			return true;
+		}
+		else
+		{
+			$DB->rollback();
+			return false;
+		}
 	}
 
 

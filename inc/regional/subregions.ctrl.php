@@ -139,6 +139,11 @@ switch( $action )
 		}
 		break;
 
+	case 'csv':
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+		break;
+
 	case 'edit':
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -249,6 +254,53 @@ switch( $action )
 		}
 		break;
 
+	case 'import':
+		// Import new sub-regions:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'subregion' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		set_max_execution_time( 0 );
+
+		// Country Id
+		param( 'ctry_ID', 'integer', true );
+		param_check_number( 'ctry_ID', T_('Please select a country'), true );
+
+		// CSV File
+		$csv = $_FILES['csv'];
+		if( $csv['size'] == 0 )
+		{	// File is empty
+			$Messages->add( T_('Please select a CSV file to import.'), 'error' );
+		}
+		else if( ! preg_match( '/\.csv$/i', $csv['name'] ) )
+		{	// Extension is incorrect
+			$Messages->add( sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), $csv['name'] ), 'error' );
+		}
+
+		if( param_errors_detected() )
+		{	// Some errors are exist, Stop the importing:
+			$action = 'csv';
+			break;
+		}
+
+		load_funcs( 'regional/model/_regional.funcs.php' );
+
+		// Import a new sub-regions from CSV file:
+		$count_subregions = import_subregions( $ctry_ID, $csv['tmp_name'] );
+
+		load_class( 'regional/model/_country.class.php', 'Country' );
+		$CountryCache = & get_CountryCache();
+		$Country = $CountryCache->get_by_ID( $ctry_ID );
+
+		$Messages->add( sprintf( T_('%s sub-regions have been added and %s sub-regions have been updated for country %s.'),
+			$count_subregions['inserted'], $count_subregions['updated'], $Country->get_name() ), 'success' );
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $admin_url.'?ctrl=subregions&c='.$ctry_ID, 303 ); // Will EXIT
+		break;
+
 }
 
 
@@ -269,6 +321,9 @@ switch( $action )
 	case 'edit':
 	case 'update':
 		$AdminUI->set_page_manual_link( 'subregions-editing' );
+		break;
+	case 'csv':
+		$AdminUI->set_page_manual_link( 'subregions-import' );
 		break;
 	default:
 		$AdminUI->set_page_manual_link( 'subregions-list' );
@@ -304,6 +359,10 @@ switch( $action )
 	case 'edit':
 	case 'update':
 		$AdminUI->disp_view( 'regional/views/_subregion.form.php' );
+		break;
+
+	case 'csv':
+		$AdminUI->disp_view( 'regional/views/_subregion_import.form.php' );
 		break;
 
 	default:
