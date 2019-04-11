@@ -140,7 +140,7 @@ $buttons = array();
 if( $can_edit_skin_settings )
 {	// Display a button to update skin params only when if current User can edit this:
 	$buttons[] = array( 'submit', 'save', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton' );
-	$buttons[] = array( 'reset', 'reset', T_('Reset'), 'ResetButton' );
+	$buttons[] = array( 'button', 'cancel', T_('Cancel'), 'ResetButton', 'location.reload()' );
 }
 
 if( $mode == 'customizer' )
@@ -163,7 +163,7 @@ if( isset( $link_reset_url ) )
 {	// Initialize JS to confirm skin reset action if current user has a permission:
 	$skin_reset_confirmation_msg = TS_( 'This will reset all the params to the defaults recommended by the skin.\nYou will lose your custom settings.\nAre you sure?' );
 ?>
-<script type="text/javascript">
+<script>
 function evo_confirm_skin_reset()
 {
 <?php
@@ -186,24 +186,20 @@ else
 }
 ?>
 }
-
-jQuery( 'form' ).on( 'reset', function()
-{	// Reset skin settings to values what were on loaded form:
-	setTimeout( function()
+<?php
+if( $mode == 'customizer' )
+{	// Reload front-office iframe on cancel changes:
+?>
+jQuery( 'input[type=button][name=cancel]' ).on( 'click', function()
+{
+	if( typeof( parent.evo_customizer_reload_frontoffice ) == "function" )
 	{
-		jQuery( 'input, select' ).each( function()
-		{
-			if( jQuery( this ).hasClass( 'form_color_input' ) )
-			{	// Reset color input:
-				jQuery( this ).parent().colorpicker( 'setValue', jQuery( this ).val() );
-			}
-			if( typeof( parent.evo_customizer_update_style ) == "function" )
-			{	// Update style in designer customizer mode if it is enabled currently:
-				parent.evo_customizer_update_style( jQuery( this ) );
-			}
-		} );
-	}, 100 );
+		parent.evo_customizer_reload_frontoffice();
+	}
 } );
+<?php
+}
+?>
 </script>
 <?php
 }
