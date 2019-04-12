@@ -875,9 +875,27 @@ function get_affected_tables( $table )
 	}
 	elseif( $table == '*' )
 	{
+		// Get tables what should be excluded from full tables list:
+		global $backup_tables;
+		$exclude_tables = array();
+		foreach( $backup_tables as $backup_data )
+		{
+			if( isset( $backup_data['included'] ) &&
+			    ! $backup_data['included'] &&
+			    is_array( $backup_data['table'] ) )
+			{
+				$exclude_tables = array_merge( $exclude_tables, aliases_to_tables( $backup_data['table'] ) );
+			}
+		}
+
 		$tables = array();
 		foreach( $DB->get_results( 'SHOW TABLES', ARRAY_N ) as $row )
+		{
+			if( ! in_array( $row[0], $exclude_tables ) )
+			{
 				$tables[] = $row[0];
+			}
+		}
 
 		$affected_tables .= implode( ', ', $tables );
 	}
