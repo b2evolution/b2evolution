@@ -9536,6 +9536,343 @@ function get_csv_line( $row, $delimiter = ';', $enclosure = '"', $eol = "\n" )
 
 
 /**
+ * Display a panel to upload files before import
+ *
+ * @param array Params
+ * @return array Already uploaded files in the requested folder
+ */
+function display_importer_upload_panel( $params = array() )
+{
+	global $admin_url, $current_User, $media_path;
+
+	$params = array_merge( array(
+			'folder'              => '',
+			'allowed_extensions'  => 'csv',
+			'infolder_extensions' => false,
+			'find_attachments'    => false,
+			'help_slug'           => '',
+			'refresh_url'         => '',
+		), $params );
+
+	// Get available files to import from the folder /media/import/
+	$import_files = get_import_files( $params['folder'], $params['allowed_extensions'], $params['infolder_extensions'], $params['find_attachments'] );
+
+	$Table = new Table( NULL, 'import' );
+
+	$Table->cols = array();
+	$Table->cols[] = array( 'th' => T_('Import'), 'td_class' => 'shrinkwrap' );
+	$Table->cols[] = array( 'th' => T_('File') );
+	$file_types_count = count( explode( '|', $params['allowed_extensions'] ) );
+	if( $file_types_count > 1 )
+	{	// Display this column only when importer tool allows several file types:
+		$Table->cols[] = array( 'th' => T_('Type') );
+	}
+	$Table->cols[] = array( 'th' => T_('Date'), 'td_class' => 'shrinkwrap' );
+
+	// Get link to manual page:
+	$manual_link = ( empty( $params['help_slug'] ) ? '' : get_manual_link( $params['help_slug'] ) );
+
+	$Table->title = T_('Potential files to be imported').$manual_link;
+	if( ! empty( $params['refresh_url'] ) )
+	{	// Display a link to refresh the uploaded files:
+		$Table->title .= ' - '.action_icon( T_('Refresh'), 'refresh', $params['refresh_url'], T_('Refresh'), 3, 4 );
+	}
+
+	$FileRootCache = & get_FileRootCache();
+	$FileRoot = & $FileRootCache->get_by_type_and_ID( 'import', '0', true );
+	$import_perm_view = $current_User->check_perm( 'files', 'view', false, $FileRoot );
+	if( $import_perm_view )
+	{ // Current user must has access to the import dir
+		if( $current_User->check_perm( 'files', 'edit_allowed', false, $FileRoot ) )
+		{ // User has full access
+			$import_title = T_('Upload/Manage import files');
+		}
+		else if( $current_User->check_perm( 'files', 'add', false, $FileRoot ) )
+		{ // User can only upload the files to import root
+			$import_title = T_('Upload import files');
+		}
+		else
+		{ // Only view
+			$import_title = T_('View import files');
+		}
+		$Table->title .= ' - '
+			.action_icon( $import_title, 'folder', $admin_url.'?ctrl=files&amp;root=import_0&amp;path='.$params['folder'], $import_title, 3, 4,
+				array( 'onclick' => 'return import_files_window()' )
+			).' <span class="note">(popup)</span>';
+	}
+	$Table->display_init();
+
+	echo $Table->params['before'];
+
+	// TITLE:
+	$Table->display_head();
+
+	if( empty( $import_files ) )
+	{	// No files to import:
+		$Table->total_pages = 0;
+		$Table->no_results_text = '<div class="center">'.T_('We have not found any suitable file to perform the import. Please read the details at the manual page.').$manual_link.'</div>';
+
+		// BODY START:
+		$Table->display_body_start();
+		$Table->display_list_start();
+		$Table->display_list_end();
+		// BODY END:
+		$Table->display_body_end();
+	}
+	else
+	{	// Display the files to import in table:
+
+		// TABLE START:
+		$Table->display_list_start();
+
+		// COLUMN HEADERS:
+		$Table->display_col_headers();
+		// BODY START:
+		$Table->display_body_start();
+
+		$media_path_length = strlen( $media_path.'import/'.( empty( $params['folder'] ) ? '' : $params['folder'].'/' ) );
+
+		foreach( $import_files as $import_file )
+		{
+			$Table->display_line_start();
+
+			// Checkbox to import
+			$Table->display_col_start();
+			echo '<input type="radio" name="import_file" value="'.$import_file['path'].'"'.( get_param( 'import_file' ) == $import_file['path'] ? ' checked="checked"' : '' ).' />';
+			$Table->display_col_end();
+
+			// File
+			$Table->display_col_start();
+			echo substr( $import_file['path'], $media_path_length );
+			$Table->display_col_end();
+
+			// Type
+			if( $file_types_count > 1 )
+			{	// Display this column only when importer tool allows several file types:
+				$Table->display_col_start();
+				echo $import_file['type'];
+				$Table->display_col_end();
+			}
+
+			// File date
+			$Table->display_col_start();
+			echo date( locale_datefmt().' '.locale_timefmt(), filemtime( $import_file['path'] ) );
+			$Table->display_col_end();
+
+			$Table->display_line_end();
+
+			evo_flush();
+		}
+
+		// BODY END:
+		$Table->display_body_end();
+
+		// TABLE END:
+		$Table->display_list_end();
+	}
+
+	echo $Table->params['after'];
+
+?>
+<script>
+jQuery( '.table_scroll td' ).click( function()
+{
+	jQuery( this ).parent().find( 'input[type=radio]' ).prop( 'checked', true );
+} );
+</script>
+<?php
+	if( $import_perm_view )
+	{	// Current user must has access to the import dir:
+
+		// Initialize JavaScript to build and open window:
+		echo_modalwindow_js();
+?>
+<script>
+function import_files_window()
+{
+	openModalWindow( '<span class="loader_img absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
+		'90%', '80%', true, '<?php echo TS_('Add/Link files'); ?>', '', true );
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: '<?php echo get_htsrv_url(); ?>async.php',
+		data:
+		{
+			'action': 'import_files',
+			'path': '<?php echo $params['folder']; ?>',
+			'crumb_import': '<?php echo get_crumb( 'import' ); ?>',
+		},
+		success: function( result )
+		{
+			openModalWindow( result, '90%', '80%', true, '<?php echo TS_('Upload/Manage import files'); ?>', '' );
+		}
+	} );
+	return false;
+}
+
+jQuery( document ).on( 'click', '#modal_window button[data-dismiss=modal]', function()
+{	// Reload page on closing modal window to display new uploaded files:
+	location.reload();
+} );
+</script>
+<?php
+	}
+
+	return $import_files;
+}
+
+
+/**
+ * Get available files to import from the requested folder
+ *
+ * @param string Sub folder in the folder /media/import/
+ * @param string Allowed extensions to import, separated by |
+ * @param string Allowed extensions inside folders, separated by |, FALSE - to don't find files in subfolders
+ * @param boolean TRUE - to find folder of attachments
+ * @return array Files
+ */
+function get_import_files( $folder = '', $allowed_extensions = 'xml|txt|zip', $infolder_extensions = 'xml|txt', $find_attachments = true )
+{
+	global $media_path;
+
+	// Get all files from the import folder:
+	$files = get_filenames( $media_path.'import/'.( empty( $folder ) ? '' : $folder.'/' ), array(
+			'flat' => false
+		) );
+
+	$import_files = array();
+
+	if( empty( $files ) )
+	{ // No access to the import folder OR it is empty
+		return $import_files;
+	}
+
+	foreach( $files as $file )
+	{
+		$file_paths = array();
+		$file_type = '';
+		if( is_array( $file ) )
+		{	// It is a folder
+			if( $infolder_extensions !== false )
+			{	// Find files inside:
+				foreach( $file as $key => $sub_file )
+				{
+					if( is_string( $sub_file ) && preg_match( '/\.('.$infolder_extensions.')$/i', $sub_file ) )
+					{
+						$file_paths[] = $sub_file;
+					}
+				}
+			}
+		}
+		elseif( is_string( $file ) )
+		{	// File in the root:
+			$file_paths[] = $file;
+		}
+
+		foreach( $file_paths as $file_path )
+		{
+			if( ! empty( $file_path ) && preg_match( '/\.('.$allowed_extensions.')$/i', $file_path, $file_matches ) )
+			{	// This file can be a file with import data
+				if( empty( $file_type ) )
+				{	// Set type from file extension
+					if( $file_matches[1] == 'zip' )
+					{
+						$file_type = T_('Compressed Archive');
+					}
+					else
+					{
+						if( $find_attachments && ( $file_attachments_folder = get_import_attachments_folder( $file_path ) ) )
+						{	// Probably it is a file with attachments folder:
+							$file_type = sprintf( T_('Complete export (attachments folder: %s)'), '<code>'.basename( $file_attachments_folder ).'</code>' );
+						}
+						else
+						{	// Single XML file without attachments folder:
+							$file_type = T_('Basic export').( $find_attachments ? ' ('.T_('no attachments folder found').')' : '' );
+						}
+					}
+				}
+				$import_files[] = array(
+						'path' => $file_path,
+						'type' => $file_type,
+					);
+			}
+		}
+	}
+
+	return $import_files;
+}
+
+
+/**
+ * Find attachments folder path for given import file path
+ *
+ * @param string File path
+ * @param boolean TRUE to use first found folder if no reserved folders not found before
+ * @return string Folder path
+ */
+function get_import_attachments_folder( $file_path, $first_folder = false )
+{
+	$file_name = basename( $file_path );
+	$file_folder_path = dirname( $file_path ).'/';
+	$folder_full_name = preg_replace( '#\.[^\.]+$#', '', $file_name );
+	$folder_part_name = preg_replace( '#_[^_]+$#', '', $folder_full_name );
+
+	// Find and get first existing folder with attachments:
+	if( is_dir( $file_folder_path.$folder_full_name ) )
+	{	// 1st priority folder:
+		return $file_folder_path.$folder_full_name.'/';
+	}
+	if( is_dir( $file_folder_path.$folder_part_name.'_files' ) )
+	{	// 2nd priority folder:
+		return $file_folder_path.$folder_part_name.'_files/';
+	}
+	if( is_dir( $file_folder_path.$folder_part_name.'_attachments' ) )
+	{	// 3rd priority folder:
+		return $file_folder_path.$folder_part_name.'_attachments/';
+	}
+	if( is_dir( $file_folder_path.'b2evolution_export_files' ) )
+	{	// 4th priority folder:
+		return $file_folder_path.'b2evolution_export_files/';
+	}
+	if( is_dir( $file_folder_path.'export_files' ) )
+	{	// 5th priority folder:
+		return $file_folder_path.'export_files/';
+	}
+	if( is_dir( $file_folder_path.'import_files' ) )
+	{	// 6th priority folder:
+		return $file_folder_path.'import_files/';
+	}
+	if( is_dir( $file_folder_path.'files' ) )
+	{	// 7th priority folder:
+		return $file_folder_path.'files/';
+	}
+	if( is_dir( $file_folder_path.'attachments' ) )
+	{	// 8th priority folder:
+		return $file_folder_path.'attachments/';
+	}
+
+	if( $first_folder )
+	{	// Try to use first found folder:
+		$files = scandir( $file_folder_path );
+		foreach( $files as $file )
+		{
+			if( $file == '.' || $file == '..' )
+			{	// Skip reserved dir names of the current path:
+				continue;
+			}
+			if( is_dir( $file_folder_path.$file ) )
+			{	// 9th priority folder:
+				return $file_folder_path.$file.'/';
+			}
+		}
+	}
+
+	// File has no attachments folder
+	return false;
+}
+
+
+/**
  * Check if the given allowed
  *
  * @param string The options which should be checked

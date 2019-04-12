@@ -269,15 +269,17 @@ switch( $action )
 		param( 'ctry_ID', 'integer', true );
 		param_check_number( 'ctry_ID', T_('Please select a country'), true );
 
+		param( 'auto_create_regions', 'boolean' );
+
 		// CSV File
-		$csv = $_FILES['csv'];
-		if( $csv['size'] == 0 )
-		{	// File is empty
+		$import_file = param( 'import_file', 'string', '' );
+		if( empty( $import_file ) )
+		{	// File is not selected:
 			$Messages->add( T_('Please select a CSV file to import.'), 'error' );
 		}
-		else if( ! preg_match( '/\.csv$/i', $csv['name'] ) )
+		else if( ! preg_match( '/\.csv$/i', $import_file ) )
 		{	// Extension is incorrect
-			$Messages->add( sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), $csv['name'] ), 'error' );
+			$Messages->add( sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), basename( $import_file ) ), 'error' );
 		}
 
 		if( param_errors_detected() )
@@ -286,10 +288,8 @@ switch( $action )
 			break;
 		}
 
-		load_funcs( 'regional/model/_regional.funcs.php' );
-
 		// Import a new sub-regions from CSV file:
-		$count_subregions = import_subregions( $ctry_ID, $csv['tmp_name'] );
+		$count_subregions = import_subregions( $ctry_ID, $import_file, $auto_create_regions );
 
 		load_class( 'regional/model/_country.class.php', 'Country' );
 		$CountryCache = & get_CountryCache();
@@ -297,6 +297,13 @@ switch( $action )
 
 		$Messages->add( sprintf( T_('%s sub-regions have been added and %s sub-regions have been updated for country %s.'),
 			$count_subregions['inserted'], $count_subregions['updated'], $Country->get_name() ), 'success' );
+
+		if( $count_subregions['regions'] > 0 )
+		{	// Inform when at least one region has been created automatically:
+			$Messages->add( sprintf( T_('%s regions have been automatically created for country %s.'),
+				$count_subregions['regions'], $Country->get_name() ), 'success' );
+		}
+
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $admin_url.'?ctrl=subregions&c='.$ctry_ID, 303 ); // Will EXIT
 		break;

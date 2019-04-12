@@ -10802,6 +10802,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13200, 'Creating CSV file type...' ) )
+	{	// part of 6.11.0-beta
+		$SQL = new SQL( 'Check for file type .csv' );
+		$SQL->SELECT( 'ftyp_ID' );
+		$SQL->FROM( 'T_filetypes' );
+		$SQL->WHERE( 'ftyp_extensions REGEXP "(^| )csv( |$)"' );
+		if( ! $DB->get_var( $SQL ) )
+		{	// Insert new file type for Markdown Documentation only if it doesn't exist:
+			$DB->query( 'INSERT INTO T_filetypes
+				       ( ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed )
+				VALUES ( "csv", "CSV file", "text/plain", "file_document", "text", "registered" )' );
+		}
+		upg_task_end();
+	}
+
 	if( upg_task_start( 15000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '
