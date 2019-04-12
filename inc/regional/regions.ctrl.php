@@ -14,6 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Load Region class (PHP4):
 load_class( 'regional/model/_region.class.php', 'Region' );
+load_funcs( 'regional/model/_regional.funcs.php' );
 
 /**
  * @var User
@@ -267,14 +268,14 @@ switch( $action )
 		param_check_number( 'ctry_ID', T_('Please select a country'), true );
 
 		// CSV File
-		$csv = $_FILES['csv'];
-		if( $csv['size'] == 0 )
-		{	// File is empty
+		$import_file = param( 'import_file', 'string', '' );
+		if( empty( $import_file ) )
+		{	// File is not selected:
 			$Messages->add( T_('Please select a CSV file to import.'), 'error' );
 		}
-		else if( ! preg_match( '/\.csv$/i', $csv['name'] ) )
+		else if( ! preg_match( '/\.csv$/i', $import_file ) )
 		{	// Extension is incorrect
-			$Messages->add( sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), $csv['name'] ), 'error' );
+			$Messages->add( sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), basename( $import_file ) ), 'error' );
 		}
 
 		if( param_errors_detected() )
@@ -283,10 +284,8 @@ switch( $action )
 			break;
 		}
 
-		load_funcs( 'regional/model/_regional.funcs.php' );
-
 		// Import a new regions from CSV file:
-		$count_regions = import_regions( $ctry_ID, $csv['tmp_name'] );
+		$count_regions = import_regions( $ctry_ID, $import_file );
 
 		load_class( 'regional/model/_country.class.php', 'Country' );
 		$CountryCache = & get_CountryCache();

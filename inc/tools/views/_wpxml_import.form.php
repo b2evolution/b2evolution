@@ -24,7 +24,7 @@ $Form->begin_form( 'fform', T_('WordPress XML Importer') );
 $Form->begin_fieldset( T_('Report of the import') );
 
 	// Get data to import from wordpress XML file:
-	$wp_file = get_param( 'wp_file' );
+	$wp_file = get_param( 'import_file' );
 	$wpxml_import_data = wpxml_get_import_data( $wp_file );
 
 	echo '<p>';

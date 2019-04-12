@@ -13,28 +13,34 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $admin_url;
+
 load_class( 'regional/model/_country.class.php', 'Country' );
 
-$Form = new Form( NULL, 'region_checkchanges', 'post', 'compact', 'multipart/form-data' );
+$Form = new Form( NULL, 'region_checkchanges' );
 
 $Form->global_icon( T_('Cancel importing!'), 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', T_('Import regions').get_manual_link( 'regions-import' ) );
-
-	echo T_('Select a country and upload a CSV file with the following columns:');
-	echo '<div style="padding:10px 0 10px 40px">';
-	echo '1. '.T_('Region code').'<br />';
-	echo '2. '.T_('Region name').'<br />';
-	echo '</div>';
+$Form->begin_form( 'fform', T_('Import regions') );
 
 	$Form->add_crumb( 'region' );
 	$Form->hiddens_by_key( get_memorized( 'action' ) ); // (this allows to come back to the right list order & page)
 
-	$CountryCache = & get_CountryCache();
-	$Form->select_country( 'ctry_ID', get_param( 'ctry_ID' ), $CountryCache, T_('Country'), array( 'allow_none' => true, 'required' => true ) );
+	// Display a panel to upload files before import:
+	$import_files = display_importer_upload_panel( array(
+			'folder'      => 'regions',
+			'help_slug'   => 'regions-import',
+			'refresh_url' => $admin_url.'?ctrl=regions&amp;action=csv',
+		) );
 
-	$Form->input_field( array( 'label' => T_('CSV File'), 'name' => 'csv', 'type' => 'file', 'required' => false ) );
+	if( ! empty( $import_files ) )
+	{
+		$CountryCache = & get_CountryCache();
+		$Form->select_country( 'ctry_ID', get_param( 'ctry_ID' ), $CountryCache, T_('Country'), array( 'allow_none' => true, 'required' => true ) );
 
-$Form->end_form( array( array( 'submit', 'actionArray[import]', T_('Import'), 'SaveButton' ) ) );
+		$Form->buttons( array( array( 'submit', 'actionArray[import]', T_('Import'), 'SaveButton' ) ) );
+	}
+
+$Form->end_form();
 
 ?>
