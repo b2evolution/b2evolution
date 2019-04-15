@@ -483,6 +483,7 @@ function get_request_title( $params = array() )
 			'help_text'           => T_('In case of issues with this site...'),
 			'compare_text'           => /* TRANS: title for disp=compare */ T_('%s compared'),
 			'compare_text_separator' => /* TRANS: title separator for disp=compare */ ' '.T_('vs').' ',
+			'proposechange_text'     => T_('Propose change for Item %s'),
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -780,6 +781,11 @@ function get_request_title( $params = array() )
 				$title .= $params['edit_links_template']['after'];
 			}
 			$r[] = $title;
+			break;
+
+		case 'proposechange':
+			global $edited_Item;
+			$r[] = sprintf( $params['proposechange_text'], '"'.$edited_Item->get_title().'"' );
 			break;
 
 		case 'edit_comment':

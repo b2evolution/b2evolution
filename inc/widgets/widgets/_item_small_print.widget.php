@@ -259,6 +259,11 @@ class item_small_print_Widget extends ComponentWidget
 					'before'    => $this->disp_params['widget_item_small_print_separator'],
 					'link_text' => T_('View history')
 				) );
+
+			$Item->propose_change_link( array(
+					'before' => $this->disp_params['widget_item_small_print_separator'],
+					'text'   => T_('Propose a change')
+				) );
 		}
 
 		echo $this->disp_params['widget_item_small_print_after'];

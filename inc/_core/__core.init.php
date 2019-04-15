@@ -1378,7 +1378,7 @@ class _core_Module extends Module
 			    $current_User->check_perm( 'blog_item_propose', 'edit', false, $Blog->ID ) )
 			{ // We have permission to add a post with at least one status:
 				global $disp, $ctrl, $action, $Item, $edited_Item;
-				if( ( $disp == 'edit' || $ctrl == 'items' ) &&
+				if( ( $disp == 'edit' || $disp == 'proposechange' || $ctrl == 'items' ) &&
 				    isset( $edited_Item ) &&
 				    $edited_Item->ID > 0 &&
 				    $view_item_url = $edited_Item->get_permanent_url() )
@@ -1391,9 +1391,8 @@ class _core_Module extends Module
 						);
 				}
 				if( ! is_admin_page() &&
-				    in_array( $disp, array( 'single', 'page', 'edit' ) ) &&
-				    $perm_admin_restricted )
-				{	// If curent user has a permission to edit a current editing/viewing post:
+				    in_array( $disp, array( 'single', 'page', 'edit', 'proposechange' ) ) )
+				{	// If curent user has a permission to edit a current editing/viewing/proposing post:
 					if( $disp != 'edit' &&
 					    $Blog->get_setting( 'in_skin_editing' ) &&
 					    ! empty( $Item ) &&
@@ -1407,24 +1406,32 @@ class _core_Module extends Module
 					if( ! empty( $Item ) || ( ! empty( $edited_Item ) && $edited_Item->ID > 0 ) )
 					{	// Display menu entries to edit and view the post in back-office:
 						$menu_Item = empty( $Item ) ? $edited_Item : $Item;
-						if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
-						{
+						if( $perm_admin_restricted && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $menu_Item ) )
+						{	// Menu item to edit post in back-office:
 							$entries['page']['entries']['edit_back'] = array(
 									'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
 									'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
 								);
+						}
+						if( $perm_admin_restricted && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+						{	// Menu item to view post in back-office:
 							$entries['page']['entries']['view_back'] = array(
 									'text' => sprintf( T_('View "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
 									'href' => $admin_url.'?ctrl=items&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
 								);
 						}
-						if( $current_User->check_perm( 'blog_item_propose', 'edit', false, $Blog->ID ) )
+						if( $disp != 'proposechange' && ( $propose_change_item_url = $menu_Item->get_propose_change_url() ) )
 						{	// If current User has a permission to propose a change for the Item:
 							$entries['page']['entries']['propose'] = array(
 									'text' => T_('Propose change').'&hellip;',
-									'href' => $admin_url.'?ctrl=items&amp;action=propose&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+									'href' => $propose_change_item_url,
 								);
 						}
+					}
+
+					if( isset( $entries['page'] ) )
+					{	// Set a title when at least one menu item is allowed for current User:
+						$entries['page']['text'] = T_('Page');
 					}
 				}
 				if( isset( $entries['post'] ) && $write_item_url = $Blog->get_write_item_url() )

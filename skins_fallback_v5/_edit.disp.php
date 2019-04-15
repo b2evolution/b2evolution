@@ -227,9 +227,9 @@ $Form->begin_form( 'inskin', '', $form_params );
 			);
 		if( isset( $LinkOwner) && $LinkOwner->is_temp() )
 		{
-			$admin_editor_params['temp_ID'] = $LinkOwner->get_ID();
+			$admin_toolbar_params['temp_ID'] = $LinkOwner->get_ID();
 		}
-		$Plugins->trigger_event( 'AdminDisplayToolbar', $admin_editor_params );
+		$Plugins->trigger_event( 'AdminDisplayToolbar', $admin_toolbar_params );
 		echo '</div>';
 
 		// ---------------------------- TEXTAREA -------------------------------------

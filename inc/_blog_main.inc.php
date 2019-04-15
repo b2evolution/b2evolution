@@ -941,6 +941,7 @@ if( !empty( $skin ) )
 					'contacts'              => 'contacts.main.php',
 					'download'              => 'download.main.php',
 					'edit'                  => 'edit.main.php',
+					'proposechange'         => 'proposechange.main.php',
 					'edit_comment'          => 'edit_comment.main.php',
 					'feedback-popup'        => 'feedback_popup.main.php',
 					'flagged'               => 'flagged.main.php',
